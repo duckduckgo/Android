@@ -1,0 +1,184 @@
+/*
+ * Copyright (c) 2025 DuckDuckGo
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package com.duckduckgo.duckchat.impl.ui.dialog
+
+import android.animation.Animator
+import android.annotation.SuppressLint
+import android.content.Context
+import android.content.DialogInterface
+import android.view.LayoutInflater
+import android.view.ViewGroup
+import android.widget.FrameLayout
+import androidx.core.content.ContextCompat
+import com.airbnb.lottie.LottieAnimationView
+import com.airbnb.lottie.LottieDrawable
+import com.duckduckgo.duckchat.impl.R
+import com.duckduckgo.duckchat.impl.databinding.BottomSheetNewAddressBarOptionBinding
+import com.google.android.material.bottomsheet.BottomSheetBehavior
+import com.google.android.material.bottomsheet.BottomSheetDialog
+import com.google.android.material.shape.CornerFamily
+import com.google.android.material.shape.MaterialShapeDrawable
+
+@SuppressLint("NoBottomSheetDialog")
+class NewAddressBarOptionBottomSheetDialog(
+    private val context: Context,
+    private val isLightModeEnabled: Boolean,
+) : BottomSheetDialog(context) {
+
+    private val binding: BottomSheetNewAddressBarOptionBinding =
+        BottomSheetNewAddressBarOptionBinding.inflate(LayoutInflater.from(context))
+
+    var eventListener: EventListener? = null
+
+    private var isSearchOnlySelected = true
+
+    init {
+        setContentView(binding.root)
+        this.behavior.state = BottomSheetBehavior.STATE_EXPANDED
+        this.behavior.isDraggable = false
+        this.behavior.skipCollapsed = true
+        this.behavior.peekHeight = 0
+
+        setOnShowListener { dialogInterface ->
+            val bottomSheet = findViewById<FrameLayout>(com.google.android.material.R.id.design_bottom_sheet)
+            bottomSheet?.layoutParams = bottomSheet?.layoutParams?.apply {
+                height = ViewGroup.LayoutParams.MATCH_PARENT
+            }
+
+            setRoundCorners(dialogInterface)
+
+            eventListener?.onShown()
+        }
+        setOnCancelListener {
+            eventListener?.onCanceled()
+            dismiss()
+        }
+
+        setupLottieAnimation()
+        setupSelectionLogic()
+        binding.newAddressBarOptionBottomSheetDialogPrimaryButton.setOnClickListener {
+            eventListener?.onAddWidgetButtonClicked()
+            dismiss()
+        }
+        binding.newAddressBarOptionBottomSheetDialogGhostButton.setOnClickListener {
+            eventListener?.onNotNowButtonClicked()
+            dismiss()
+        }
+    }
+
+    private fun setupSelectionLogic() {
+        updateSelectionState()
+
+        binding.newAddressBarOptionBottomSheetDialogSearchOnlyButton.setOnClickListener {
+            if (!isSearchOnlySelected) {
+                isSearchOnlySelected = true
+                updateSelectionState()
+                eventListener?.onSearchOnlySelected()
+            }
+        }
+
+        binding.newAddressBarOptionBottomSheetDialogSearchAndDuckAiButton.setOnClickListener {
+            if (isSearchOnlySelected) {
+                isSearchOnlySelected = false
+                updateSelectionState()
+                eventListener?.onSearchAndDuckAiSelected()
+            }
+        }
+    }
+
+    private fun updateSelectionState() {
+        binding.newAddressBarOptionBottomSheetDialogSearchOnlyButton.isSelected = isSearchOnlySelected
+        binding.searchOnlyCheckbox.isChecked = isSearchOnlySelected
+        binding.searchOnlyCheckbox.isEnabled = isSearchOnlySelected
+        binding.newAddressBarOptionBottomSheetDialogSearchOnlyButton.background =
+            if (isSearchOnlySelected) {
+                ContextCompat.getDrawable(context, R.drawable.background_new_address_bar_option_selected)
+            } else {
+                ContextCompat.getDrawable(context, R.drawable.background_new_address_bar_option)
+            }
+
+        binding.newAddressBarOptionBottomSheetDialogSearchAndDuckAiButton.isSelected = !isSearchOnlySelected
+        binding.searchAndDuckAiCheckbox.isChecked = !isSearchOnlySelected
+        binding.searchAndDuckAiCheckbox.isEnabled = !isSearchOnlySelected
+        binding.newAddressBarOptionBottomSheetDialogSearchAndDuckAiButton.background =
+            if (!isSearchOnlySelected) {
+                ContextCompat.getDrawable(context, R.drawable.background_new_address_bar_option_selected)
+            } else {
+                ContextCompat.getDrawable(context, R.drawable.background_new_address_bar_option)
+            }
+    }
+
+    private fun setupLottieAnimation() {
+        val lottieView = binding.newAddressBarOptionBottomSheetDialogAnimation
+
+        val animationResource = if (isLightModeEnabled) {
+            R.raw.new_address_bar_option_animation_light
+        } else {
+            R.raw.new_address_bar_option_animation_dark
+        }
+        lottieView.setAnimation(animationResource)
+
+        lottieView.addLottieOnCompositionLoadedListener { composition ->
+            playIntroThenLoop(lottieView, composition.durationFrames.toInt())
+        }
+    }
+
+    private fun playIntroThenLoop(lottieView: LottieAnimationView, totalFrames: Int) {
+        lottieView.setMinAndMaxFrame(0, 30)
+        lottieView.repeatCount = 0
+        lottieView.playAnimation()
+
+        lottieView.addAnimatorListener(object : Animator.AnimatorListener {
+            override fun onAnimationStart(animation: Animator) {}
+
+            override fun onAnimationEnd(animation: Animator) {
+                lottieView.removeAnimatorListener(this)
+
+                lottieView.setMinAndMaxFrame(31, totalFrames - 1)
+                lottieView.repeatCount = LottieDrawable.INFINITE
+                lottieView.playAnimation()
+            }
+
+            override fun onAnimationCancel(animation: Animator) {}
+            override fun onAnimationRepeat(animation: Animator) {}
+        },
+        )
+    }
+
+    private fun setRoundCorners(dialogInterface: DialogInterface) {
+        val bottomSheet = findViewById<FrameLayout>(com.google.android.material.R.id.design_bottom_sheet)
+
+        val shapeDrawable = MaterialShapeDrawable.createWithElevationOverlay(context)
+        shapeDrawable.shapeAppearanceModel = shapeDrawable.shapeAppearanceModel
+            .toBuilder()
+            .setTopLeftCorner(CornerFamily.ROUNDED, context.resources.getDimension(com.duckduckgo.mobile.android.R.dimen.dialogBorderRadius))
+            .setTopRightCorner(CornerFamily.ROUNDED, context.resources.getDimension(com.duckduckgo.mobile.android.R.dimen.dialogBorderRadius))
+            .build()
+        bottomSheet?.background = shapeDrawable
+    }
+
+    fun isSearchOnlySelected(): Boolean = isSearchOnlySelected
+
+    interface EventListener {
+        fun onShown()
+        fun onCanceled()
+        fun onAddWidgetButtonClicked()
+        fun onNotNowButtonClicked()
+        fun onSearchOnlySelected()
+        fun onSearchAndDuckAiSelected()
+    }
+}
