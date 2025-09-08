@@ -578,7 +578,7 @@ class OmnibarLayoutViewModel @Inject constructor(
                 showVoiceSearch = shouldShowVoiceSearch(
                     hasFocus = hasFocus,
                     query = query,
-                    hasQueryChanged = true,
+                    hasQueryChanged = query != updatedQuery,
                     urlLoaded = _viewState.value.url,
                 ),
             )

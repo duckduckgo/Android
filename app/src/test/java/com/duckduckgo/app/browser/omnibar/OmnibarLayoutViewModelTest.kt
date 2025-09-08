@@ -1901,4 +1901,23 @@ class OmnibarLayoutViewModelTest {
             expectNoEvents()
         }
     }
+
+    @Test
+    fun whenInputStateChangedAndClearingQueryThenHasQueryChangedTruePassedToVoiceSearchAvailability() = runTest {
+        var capturedHasQueryChanged: Boolean? = null
+        whenever(voiceSearchAvailability.shouldShowVoiceSearch(any(), any(), any(), any())).thenAnswer { invocation ->
+            capturedHasQueryChanged = invocation.getArgument(2)
+            true
+        }
+
+        // First set a non-empty query
+        testee.onInputStateChanged("initial", hasFocus = true, clearQuery = false, deleteLastCharacter = false)
+        // Then clear the query which should set hasQueryChanged = true because updatedQuery retains previous value
+        testee.onInputStateChanged("", hasFocus = true, clearQuery = true, deleteLastCharacter = false)
+
+        testee.viewState.test {
+            awaitItem()
+            assertTrue(capturedHasQueryChanged == true)
+        }
+    }
 }
