@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 DuckDuckGo
+ * Copyright (c) 2025 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,20 +14,14 @@
  * limitations under the License.
  */
 
-plugins {
-    id 'com.android.library'
-    id 'kotlin-android'
-}
+package com.duckduckgo.contentscopescripts.impl.messaging
 
-apply from: "$rootProject.projectDir/gradle/android-library.gradle"
+import com.duckduckgo.anvil.annotations.ContributesPluginPoint
+import com.duckduckgo.di.scopes.AppScope
 
-dependencies {
-    implementation AndroidX.core.ktx
-    implementation AndroidX.webkit
-    implementation project(':feature-toggles-api')
-    implementation project(':js-messaging-api')
-}
-
-android {
-    namespace 'com.duckduckgo.contentscopescripts.api'
-}
+@ContributesPluginPoint(
+    scope = AppScope::class,
+    boundType = GlobalContentScopeJsMessageHandlersPlugin::class,
+)
+@Suppress("unused")
+interface GlobalContentScopeJsMessageHandlersPluginPoint
