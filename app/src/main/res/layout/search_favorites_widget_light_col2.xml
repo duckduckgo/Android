@@ -25,7 +25,9 @@
 
     <FrameLayout
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/searchWidgetFavoritesSideMargin"
+        android:layout_marginEnd="@dimen/searchWidgetFavoritesSideMargin">
 
         <GridView
             android:id="@+id/emptyfavoritesGrid"
@@ -37,5 +39,6 @@
             style="@style/Widget.DuckDuckGo.SearchWidgetFavoritesGrid"
             android:numColumns="2" />
 
+        <include layout="@layout/search_favorites_widget_empty_hint_light" />
     </FrameLayout>
 </LinearLayout>
