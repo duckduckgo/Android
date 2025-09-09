@@ -217,7 +217,7 @@
             android:layout_marginTop="8dp"
             android:gravity="center"
             android:text="@string/newAddressBarOptionBottomSheetDialogFooter"
-            app:textType="primary"
+            app:textType="secondary"
             app:typography="body2" />
 
     </LinearLayout>

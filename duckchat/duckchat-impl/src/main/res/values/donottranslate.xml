@@ -28,6 +28,6 @@
     <string name="newAddressBarOptionBottomSheetDialogFooter">Adjust in Settings > AI Features.</string>
     <string name="newAddressBarOptionBottomSheetDialogSearchOnly">Search only</string>
     <string name="newAddressBarOptionBottomSheetDialogSearchAndDuckAi">Search and Duck.ai</string>
-    <string name="newAddressBarOptionBottomSheetDialogHeader">New address bar option</string>
+    <string name="newAddressBarOptionBottomSheetDialogHeader">Choose a new address bar</string>
 
 </resources>
