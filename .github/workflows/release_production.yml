@@ -1,0 +1,34 @@
+name: Production Release to Play Store and Github
+
+on:
+  workflow_dispatch:
+    inputs:
+      app-version:
+        description: 'Ref to build APK from (branch, tag, commit)'
+        required: true
+
+env:
+  ASANA_PAT: ${{ secrets.ASANA_ACCESS_TOKEN }}
+  GH_TOKEN: ${{ secrets.GT_DAXMOBILE }}
+  GOOGLE_APPLICATION_CREDENTIALS: '#{ENV["HOME"]}/jenkins_static/com.duckduckgo.mobile.android/ddg-upload-firebase.json'
+
+jobs:
+  trigger-asana-task-creation:
+    runs-on: ubuntu-latest
+    name: Trigger Create Asana Task
+    uses: ./.github/workflows/release-create-task.yml
+    with:
+      ref: ${{ github.event.inputs.app-version }}
+
+  trigger-asana-error-task-creation:
+    runs-on: ubuntu-latest
+    name: Create Asana task when workflow failed
+    if: ${{ failure() }}
+    uses: duckduckgo/native-github-asana-sync@v2.0
+    with:
+      asana-pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
+      asana-project: ${{ vars.GH_ANDROID_APP_PROJECT_ID }}
+      asana-section: ${{ vars.GH_ANDROID_APP_INCOMING_SECTION_ID }}
+      asana-task-name: GH Workflow Failure - Release Production
+      asana-task-description: The Release Production workflow has failed. See https://github.com/duckduckgo/Android/actions/runs/${{ github.run_id }}
+      action: 'create-asana-task'
