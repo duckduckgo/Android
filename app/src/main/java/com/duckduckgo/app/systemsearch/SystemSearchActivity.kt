@@ -91,6 +91,7 @@ import com.duckduckgo.common.utils.extensions.html
 import com.duckduckgo.common.utils.extensions.showKeyboard
 import com.duckduckgo.common.utils.text.TextChangedWatcher
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.mobile.android.R as CommonR
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.savedsites.api.models.SavedSite
 import com.duckduckgo.savedsites.impl.dialogs.EditSavedSiteDialogFragment
@@ -101,12 +102,11 @@ import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.card.MaterialCardView
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.Snackbar
+import javax.inject.Inject
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import logcat.LogPriority.VERBOSE
 import logcat.logcat
-import javax.inject.Inject
-import com.duckduckgo.mobile.android.R as CommonR
 
 @InjectWith(ActivityScope::class)
 class SystemSearchActivity : DuckDuckGoActivity() {
