@@ -14,14 +14,39 @@ env:
 
 jobs:
   trigger-asana-task-creation:
-    runs-on: ubuntu-latest
     name: Trigger Create Asana Task
-    uses: ./.github/workflows/release-create-task.yml
+    uses: ./.github/workflows/release_create_task.yml
     with:
       ref: ${{ github.event.inputs.app-version }}
 
+  trigger-tag-creation:
+    name: Trigger Create Git Tag
+    uses: ./.github/workflows/release_create_tag.yml
+    needs: trigger-asana-task-creation
+    with:
+      ref: ${{ github.event.inputs.app-version }}
+
+  trigger-release-tests:
+    name: Trigger Run Release Tests
+    uses: ./.github/workflows/release_tests.yml
+    needs: trigger-asana-tag-creation
+    with:
+      ref: ${{ github.event.inputs.app-version }}
+      test-tag: 'releaseTest'
+
+  trigger-upload-play-store-github:
+    name: Trigger Upload to Play Store and Github
+    uses: ./.github/workflows/release_upload_play_store.yml
+    needs: trigger-release-tests
+    with:
+      ref: ${{ github.event.inputs.app-version }}
+
+  trigger-upload-internal:
+    name: Trigger Internal Release
+    uses: ./.github/workflows/release_upload_internal.yml
+    needs: trigger-upload-play-store-github
+
   trigger-asana-error-task-creation:
-    runs-on: ubuntu-latest
     name: Create Asana task when workflow failed
     if: ${{ failure() }}
     uses: duckduckgo/native-github-asana-sync@v2.0
