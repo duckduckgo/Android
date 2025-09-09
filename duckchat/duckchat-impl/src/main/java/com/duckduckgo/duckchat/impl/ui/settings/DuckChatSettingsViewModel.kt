@@ -22,6 +22,7 @@ import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.duckchat.impl.DuckChatInternal
+import com.duckduckgo.duckchat.impl.inputscreen.ui.metrics.discovery.InputScreenDiscoveryFunnel
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
 import com.duckduckgo.duckchat.impl.ui.settings.DuckChatSettingsViewModel.Command.OpenLink
 import com.duckduckgo.duckchat.impl.ui.settings.DuckChatSettingsViewModel.Command.OpenLinkInNewTab
@@ -41,6 +42,7 @@ class DuckChatSettingsViewModel @Inject constructor(
     private val duckChat: DuckChatInternal,
     private val pixel: Pixel,
     private val rebrandingAiFeaturesEnabled: SubscriptionRebrandingFeatureToggle,
+    private val inputScreenDiscoveryFunnel: InputScreenDiscoveryFunnel,
 ) : ViewModel() {
 
     private val commandChannel = Channel<Command>(capacity = 1, onBufferOverflow = DROP_OLDEST)
@@ -129,6 +131,7 @@ class DuckChatSettingsViewModel @Inject constructor(
     fun onDuckAiInputScreenWithoutAiSelected() {
         viewModelScope.launch {
             pixel.fire(DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_ADDRESS_BAR_SETTING_OFF)
+            inputScreenDiscoveryFunnel.onInputScreenDisabled()
             duckChat.setInputScreenUserSetting(enabled = false)
         }
     }
@@ -136,6 +139,7 @@ class DuckChatSettingsViewModel @Inject constructor(
     fun onDuckAiInputScreenWithAiSelected() {
         viewModelScope.launch {
             pixel.fire(DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_ADDRESS_BAR_SETTING_ON)
+            inputScreenDiscoveryFunnel.onInputScreenEnabled()
             duckChat.setInputScreenUserSetting(enabled = true)
         }
     }

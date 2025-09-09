@@ -19,6 +19,7 @@ import com.duckduckgo.duckchat.impl.inputscreen.ui.command.Command.SubmitChat
 import com.duckduckgo.duckchat.impl.inputscreen.ui.command.Command.SubmitSearch
 import com.duckduckgo.duckchat.impl.inputscreen.ui.command.InputFieldCommand
 import com.duckduckgo.duckchat.impl.inputscreen.ui.command.SearchCommand
+import com.duckduckgo.duckchat.impl.inputscreen.ui.metrics.discovery.InputScreenDiscoveryFunnel
 import com.duckduckgo.duckchat.impl.inputscreen.ui.session.InputScreenSessionStore
 import com.duckduckgo.duckchat.impl.inputscreen.ui.state.SubmitButtonIcon
 import com.duckduckgo.duckchat.impl.inputscreen.ui.viewmodel.InputScreenViewModel
@@ -62,6 +63,7 @@ class InputScreenViewModelTest {
     private val pixel: Pixel = mock()
     private val inputScreenSessionStore: InputScreenSessionStore = mock()
     private val duckChat: DuckChat = mock()
+    private val inputScreenDiscoveryFunnel: InputScreenDiscoveryFunnel = mock()
 
     @Before
     fun setup() {
@@ -83,6 +85,7 @@ class InputScreenViewModelTest {
             pixel = pixel,
             sessionStore = inputScreenSessionStore,
             duckChat = duckChat,
+            inputScreenDiscoveryFunnel = inputScreenDiscoveryFunnel,
         )
     }
 
@@ -965,5 +968,29 @@ class InputScreenViewModelTest {
 
         verify(pixel).fire(DuckChatPixelName.DUCK_CHAT_OPEN_AUTOCOMPLETE_EXPERIMENTAL, params)
         verify(autoComplete).fireAutocompletePixel(any(), any(), any())
+    }
+
+    @Test
+    fun `when onSearchSubmitted then discovery funnel onSearchSubmitted is called`() = runTest {
+        val viewModel = createViewModel()
+
+        whenever(inputScreenSessionStore.hasUsedSearchMode()).thenReturn(false)
+        whenever(inputScreenSessionStore.hasUsedChatMode()).thenReturn(false)
+
+        viewModel.onSearchSubmitted("query")
+
+        verify(inputScreenDiscoveryFunnel).onSearchSubmitted()
+    }
+
+    @Test
+    fun `when onChatSubmitted with prompt then discovery funnel onPromptSubmitted is called`() = runTest {
+        val viewModel = createViewModel()
+
+        whenever(inputScreenSessionStore.hasUsedSearchMode()).thenReturn(false)
+        whenever(inputScreenSessionStore.hasUsedChatMode()).thenReturn(false)
+
+        viewModel.onChatSubmitted("prompt")
+
+        verify(inputScreenDiscoveryFunnel).onPromptSubmitted()
     }
 }
