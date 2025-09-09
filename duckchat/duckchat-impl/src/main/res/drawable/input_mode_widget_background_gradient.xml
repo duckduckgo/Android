@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item>
+        <shape>
+            <gradient
+                android:angle="270"
+                android:centerColor="?attr/daxColorBackground"
+                android:centerY="0.8"
+                android:endColor="@android:color/transparent"
+                android:startColor="?attr/daxColorBackground"
+                android:type="linear" />
+        </shape>
+    </item>
+</layer-list>

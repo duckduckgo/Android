@@ -28,10 +28,12 @@ import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.settings.clear.FireAnimation
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.tabs.store.TabSwitcherDataStore
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.ui.DuckDuckGoTheme
 import com.duckduckgo.common.ui.store.AppTheme
 import com.duckduckgo.common.ui.store.ThemingDataStore
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Before
@@ -67,6 +69,9 @@ internal class AppearanceViewModelTest {
     @Mock
     private lateinit var mockAppTheme: AppTheme
 
+    @Mock
+    private lateinit var mockTabSwitcherDataStore: TabSwitcherDataStore
+
     @SuppressLint("DenyListedApi")
     @Before
     fun before() {
@@ -76,12 +81,14 @@ internal class AppearanceViewModelTest {
         whenever(mockThemeSettingsDataStore.theme).thenReturn(DuckDuckGoTheme.SYSTEM_DEFAULT)
         whenever(mockAppSettingsDataStore.selectedFireAnimation).thenReturn(FireAnimation.HeroFire)
         whenever(mockAppSettingsDataStore.omnibarPosition).thenReturn(TOP)
+        whenever(mockTabSwitcherDataStore.isTrackersAnimationInfoTileHidden()).thenReturn(flowOf(false))
 
         testee = AppearanceViewModel(
             mockThemeSettingsDataStore,
             mockAppSettingsDataStore,
             mockPixel,
             coroutineTestRule.testDispatcherProvider,
+            mockTabSwitcherDataStore,
         )
     }
 
@@ -235,6 +242,34 @@ internal class AppearanceViewModelTest {
         val params = mapOf(Pixel.PixelParameter.IS_ENABLED to enabled.toString())
         verify(mockPixel).fire(
             AppPixelName.SETTINGS_APPEARANCE_IS_FULL_URL_OPTION_TOGGLED,
+            params,
+            emptyMap(),
+            Pixel.PixelType.Count,
+        )
+    }
+
+    @Test
+    fun `when tracker count in tab switcher is enabled then setting enabled`() = runTest {
+        val enabled = true
+        testee.onShowTrackersCountInTabSwitcherChanged(enabled)
+        verify(mockTabSwitcherDataStore).setTrackersAnimationInfoTileHidden(!enabled)
+        val params = mapOf(Pixel.PixelParameter.IS_ENABLED to enabled.toString())
+        verify(mockPixel).fire(
+            AppPixelName.SETTINGS_APPEARANCE_IS_TRACKER_COUNT_IN_TAB_SWITCHER_TOGGLED,
+            params,
+            emptyMap(),
+            Pixel.PixelType.Count,
+        )
+    }
+
+    @Test
+    fun `when tracker count in tab switcher is disabled then setting disabled`() = runTest {
+        val enabled = false
+        testee.onShowTrackersCountInTabSwitcherChanged(enabled)
+        verify(mockTabSwitcherDataStore).setTrackersAnimationInfoTileHidden(!enabled)
+        val params = mapOf(Pixel.PixelParameter.IS_ENABLED to enabled.toString())
+        verify(mockPixel).fire(
+            AppPixelName.SETTINGS_APPEARANCE_IS_TRACKER_COUNT_IN_TAB_SWITCHER_TOGGLED,
             params,
             emptyMap(),
             Pixel.PixelType.Count,

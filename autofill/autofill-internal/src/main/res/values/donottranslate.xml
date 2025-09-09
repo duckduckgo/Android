@@ -43,6 +43,9 @@
     <string name="autofillDevSettingsImportPasswordsExportPasswordsOurAppTitle">Launch Google Passwords (normal tab)</string>
     <string name="autofillDevSettingsImportPasswordsExportPasswordsImportFlowTitle">Launch Google Passwords (import flow)</string>
     <string name="autofillDevSettingsImportPasswordsImportPasswordsCsvTitle">Import CSV</string>
+    <string name="autofillDevSettingsImportPasswordsGoogleLogoutTitle">Google Account Logout</string>
+    <string name="autofillDevSettingsImportPasswordsGoogleInstruction">Tap to clear all Google cookies</string>
+    <string name="autofillDevSettingsGoogleLogoutSuccess">Google cookies cleared</string>
     <string name="autofillDevSettingsImportGooglePasswordsSuccessMessage" instruction="Placeholder is the number of passwords we were able to import">%1$d passwords imported from Google</string>
     <string name="autofillDevSettingsResetGooglePasswordsImportFlagTitle">Clear Previous Google Imports interactions</string>
     <string name="autofillDevSettingsResetGooglePasswordsImportFlagInstruction">Tap to forget whether we\'ve previously imported, what we chose when previously prompted etc…</string>
