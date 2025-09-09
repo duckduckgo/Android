@@ -31,7 +31,6 @@ import com.duckduckgo.app.systemsearch.SystemSearchViewModel.Command
 import com.duckduckgo.app.systemsearch.SystemSearchViewModel.Command.AutocompleteItemRemoved
 import com.duckduckgo.app.systemsearch.SystemSearchViewModel.Command.LaunchDuckDuckGo
 import com.duckduckgo.app.systemsearch.SystemSearchViewModel.Command.ShowRemoveSearchSuggestionDialog
-import com.duckduckgo.app.systemsearch.SystemSearchViewModel.Command.UpdateVoiceSearch
 import com.duckduckgo.app.systemsearch.SystemSearchViewModel.Suggestions.QuickAccessItems
 import com.duckduckgo.app.systemsearch.SystemSearchViewModel.Suggestions.SystemSearchResultsViewState
 import com.duckduckgo.app.widget.experiment.PostCtaExperienceExperiment
@@ -45,10 +44,15 @@ import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggesti
 import com.duckduckgo.browser.api.autocomplete.AutoCompleteSettings
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.test.InstantSchedulersRule
+import com.duckduckgo.duckchat.api.DuckAiFeatureState
+import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.history.api.NavigationHistory
 import com.duckduckgo.savedsites.api.SavedSitesRepository
 import com.duckduckgo.savedsites.api.models.SavedSite.Favorite
 import com.duckduckgo.savedsites.impl.SavedSitesPixelName
+import com.duckduckgo.voice.api.VoiceSearchAvailability
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.*
@@ -79,6 +83,9 @@ class SystemSearchViewModelTest {
     private val mockHistory: NavigationHistory = mock()
     private val mockPostCtaExperienceExperiment: PostCtaExperienceExperiment = mock()
     private val mockOnboardingHomeScreenWidgetExperiment: OnboardingHomeScreenWidgetExperiment = mock()
+    private val mockDuckChat: DuckChat = mock()
+    private val mockDuckAiFeatureState: DuckAiFeatureState = mock()
+    private val mockVoiceSearchAvailability: VoiceSearchAvailability = mock()
 
     private val commandObserver: Observer<Command> = mock()
     private val commandCaptor = argumentCaptor<Command>()
@@ -93,7 +100,13 @@ class SystemSearchViewModelTest {
         whenever(mockDeviceAppLookup.query(BLANK_QUERY)).thenReturn(appBlankResult)
         whenever(mocksavedSitesRepository.getFavorites()).thenReturn(flowOf())
         doReturn(true).whenever(mockAutoCompleteSettings).autoCompleteSuggestionsEnabled
+        whenever(mockVoiceSearchAvailability.isVoiceSearchAvailable).thenReturn(false)
+        whenever(mockDuckAiFeatureState.showOmnibarShortcutOnNtpAndOnFocus).thenReturn(MutableStateFlow(false))
+
         testee = SystemSearchViewModel(
+            mockDuckAiFeatureState,
+            mockVoiceSearchAvailability,
+            mockDuckChat,
             mockUserStageStore,
             mockAutoComplete,
             mockDeviceAppLookup,
@@ -409,6 +422,9 @@ class SystemSearchViewModelTest {
         val savedSite = Favorite("favorite1", "title", "http://example.com", "timestamp", 0)
         whenever(mocksavedSitesRepository.getFavorites()).thenReturn(flowOf(listOf(savedSite)))
         testee = SystemSearchViewModel(
+            mockDuckAiFeatureState,
+            mockVoiceSearchAvailability,
+            mockDuckChat,
             mockUserStageStore,
             mockAutoComplete,
             mockDeviceAppLookup,
@@ -437,6 +453,9 @@ class SystemSearchViewModelTest {
         val savedSite = Favorite("favorite1", "title", "http://example.com", "timestamp", 0)
         whenever(mocksavedSitesRepository.getFavorites()).thenReturn(flowOf(listOf(savedSite)))
         testee = SystemSearchViewModel(
+            mockDuckAiFeatureState,
+            mockVoiceSearchAvailability,
+            mockDuckChat,
             mockUserStageStore,
             mockAutoComplete,
             mockDeviceAppLookup,
@@ -492,6 +511,9 @@ class SystemSearchViewModelTest {
         val savedSite = Favorite("favorite1", "title", "http://example.com", "timestamp", 0)
         whenever(mocksavedSitesRepository.getFavorites()).thenReturn(flowOf(listOf(savedSite)))
         testee = SystemSearchViewModel(
+            mockDuckAiFeatureState,
+            mockVoiceSearchAvailability,
+            mockDuckChat,
             mockUserStageStore,
             mockAutoComplete,
             mockDeviceAppLookup,
@@ -509,14 +531,6 @@ class SystemSearchViewModelTest {
         val viewState = testee.resultsViewState.value as SystemSearchViewModel.Suggestions.QuickAccessItems
         assertEquals(1, viewState.favorites.size)
         assertEquals(savedSite, viewState.favorites.first().favorite)
-    }
-
-    @Test
-    fun whenVoiceSearchDisabledThenShouldEmitUpdateVoiceSearchCommand() {
-        testee.voiceSearchDisabled()
-
-        verify(commandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
-        assertEquals(UpdateVoiceSearch, commandCaptor.lastValue)
     }
 
     @Test
@@ -590,6 +604,73 @@ class SystemSearchViewModelTest {
         assertCommandIssued<AutocompleteItemRemoved>()
     }
 
+    @Test
+    fun onDuckAiTappedThenDuckChatOpenedWithQuery() {
+        val query = "What is DuckDuckGo?"
+        testee.onDuckAiRequested(query)
+        verify(mockDuckChat).openDuckChatWithAutoPrompt(query)
+    }
+
+    @Test
+    fun whenQueryIsEmptyAndVoiceSearchDisabledAndDuckAiDisabledThenOmnibarViewStateIsCorrect() = runTest {
+        whenever(mockVoiceSearchAvailability.isVoiceSearchAvailable).thenReturn(false)
+        (mockDuckAiFeatureState.showOmnibarShortcutOnNtpAndOnFocus as MutableStateFlow).value = false
+        testee.queryFlow.value = ""
+        val viewState = testee.omnibarViewState.first()
+        assertFalse(viewState.isVoiceSearchButtonVisible)
+        assertFalse(viewState.isDuckAiButtonVisible)
+        assertFalse(viewState.isClearButtonVisible)
+        assertFalse(viewState.isButtonDividerVisible)
+    }
+
+    @Test
+    fun whenQueryIsNotEmptyAndVoiceSearchEnabledAndDuckAiEnabledThenOmnibarViewStateIsCorrect() = runTest {
+        whenever(mockVoiceSearchAvailability.isVoiceSearchAvailable).thenReturn(true)
+        (mockDuckAiFeatureState.showOmnibarShortcutOnNtpAndOnFocus as MutableStateFlow).value = true
+        testee.queryFlow.value = "query"
+        val viewState = testee.omnibarViewState.first()
+        assertTrue(viewState.isVoiceSearchButtonVisible)
+        assertTrue(viewState.isDuckAiButtonVisible)
+        assertTrue(viewState.isClearButtonVisible)
+        assertTrue(viewState.isButtonDividerVisible)
+    }
+
+    @Test
+    fun whenQueryIsNotEmptyAndVoiceSearchDisabledAndDuckAiEnabledThenOmnibarViewStateIsCorrect() = runTest {
+        whenever(mockVoiceSearchAvailability.isVoiceSearchAvailable).thenReturn(false)
+        (mockDuckAiFeatureState.showOmnibarShortcutOnNtpAndOnFocus as MutableStateFlow).value = true
+        testee.queryFlow.value = "query"
+        val viewState = testee.omnibarViewState.first()
+        assertFalse(viewState.isVoiceSearchButtonVisible)
+        assertTrue(viewState.isDuckAiButtonVisible)
+        assertTrue(viewState.isClearButtonVisible)
+        assertTrue(viewState.isButtonDividerVisible)
+    }
+
+    @Test
+    fun whenQueryIsEmptyAndVoiceSearchEnabledAndDuckAiEnabledThenOmnibarViewStateIsCorrect() = runTest {
+        whenever(mockVoiceSearchAvailability.isVoiceSearchAvailable).thenReturn(true)
+        (mockDuckAiFeatureState.showOmnibarShortcutOnNtpAndOnFocus as MutableStateFlow).value = true
+        testee.queryFlow.value = ""
+        val viewState = testee.omnibarViewState.first()
+        assertTrue(viewState.isVoiceSearchButtonVisible)
+        assertTrue(viewState.isDuckAiButtonVisible)
+        assertFalse(viewState.isClearButtonVisible)
+        assertTrue(viewState.isButtonDividerVisible)
+    }
+
+    @Test
+    fun whenQueryIsNotEmptyAndVoiceSearchEnabledAndDuckAiDisabledThenOmnibarViewStateIsCorrect() = runTest {
+        whenever(mockVoiceSearchAvailability.isVoiceSearchAvailable).thenReturn(true)
+        (mockDuckAiFeatureState.showOmnibarShortcutOnNtpAndOnFocus as MutableStateFlow).value = false
+        testee.queryFlow.value = "query"
+        val viewState = testee.omnibarViewState.first()
+        assertTrue(viewState.isVoiceSearchButtonVisible)
+        assertFalse(viewState.isDuckAiButtonVisible)
+        assertTrue(viewState.isClearButtonVisible)
+        assertFalse(viewState.isButtonDividerVisible)
+    }
+
     private suspend fun whenOnboardingShowing() {
         whenever(mockUserStageStore.getUserAppStage()).thenReturn(AppStage.NEW)
         testee.resetViewState()
@@ -598,7 +679,7 @@ class SystemSearchViewModelTest {
     private inline fun <reified T : Command> assertCommandIssued(instanceAssertions: T.() -> Unit = {}) {
         verify(commandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
         val issuedCommand = commandCaptor.allValues.find { it is T }
-        assertNotNull(issuedCommand)
+        assertNotNull("Command of type ${T::class.java.simpleName} not issued. All commands: ${commandCaptor.allValues}", issuedCommand)
         (issuedCommand as T).apply { instanceAssertions() }
     }
 
@@ -607,7 +688,7 @@ class SystemSearchViewModelTest {
         if (defaultMockingDetails.invocations.isNotEmpty()) {
             verify(commandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
             val issuedCommand = commandCaptor.allValues.find { it is T }
-            assertNull(issuedCommand)
+            assertNull("Command of type ${T::class.java.simpleName} was issued but should not have been. Command: $issuedCommand. All commands: ${commandCaptor.allValues}", issuedCommand)
         }
     }
 
