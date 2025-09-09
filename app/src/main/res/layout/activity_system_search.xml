@@ -26,14 +26,14 @@
         android:id="@+id/appBarLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:outlineProvider="none"
         android:theme="@style/Widget.DuckDuckGo.ToolbarTheme">
 
         <LinearLayout
             android:id="@+id/rootContainer"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            app:layout_scrollFlags="scroll|enterAlways|snap">
+            android:orientation="vertical">
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/toolbarContainer"
@@ -44,7 +44,7 @@
                 <androidx.appcompat.widget.Toolbar
                     android:id="@+id/toolbar"
                     android:layout_width="0dp"
-                    android:layout_height="@dimen/experimentalToolbarSize"
+                    android:layout_height="@dimen/toolbarSize"
                     android:clipChildren="false"
                     app:contentInsetEnd="0dp"
                     app:contentInsetStart="0dp"
@@ -58,9 +58,9 @@
                         android:id="@+id/omniBarContainerShadow"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:layout_marginHorizontal="@dimen/experimentalOmnibarCardMarginHorizontal"
-                        android:layout_marginTop="@dimen/experimentalOmnibarCardMarginTop"
-                        android:layout_marginBottom="@dimen/experimentalOmnibarCardMarginBottom"
+                        android:layout_marginHorizontal="@dimen/omnibarCardMarginHorizontal"
+                        android:layout_marginTop="@dimen/omnibarCardMarginTop"
+                        android:layout_marginBottom="@dimen/omnibarCardMarginBottom"
                         app:cardCornerRadius="@dimen/largeShapeCornerRadius">
 
                         <com.google.android.material.card.MaterialCardView
@@ -70,7 +70,7 @@
                             android:layout_height="match_parent"
                             app:cardElevation="0dp"
                             app:strokeColor="?daxColorAccentBlue"
-                            app:strokeWidth="@dimen/experimentalOmnibarOutlineWidth">
+                            app:strokeWidth="@dimen/omnibarOutlineWidth">
 
                             <androidx.constraintlayout.widget.ConstraintLayout
                                 android:id="@+id/omniBarContentContainer"
@@ -165,27 +165,31 @@
                     </com.google.android.material.card.MaterialCardView>
                 </androidx.appcompat.widget.Toolbar>
             </androidx.constraintlayout.widget.ConstraintLayout>
+            <View
+                android:id="@+id/bottomBrowserOutlineStroke"
+                android:layout_width="match_parent"
+                android:layout_height="0.5dp"
+                android:background="?attr/daxColorShade"
+                android:elevation="20dp" />
         </LinearLayout>
     </com.google.android.material.appbar.AppBarLayout>
 
-    <include layout="@layout/include_quick_access_items" />
+    <include id="@+id/includeQuickAccessItems"
+        layout="@layout/include_quick_access_items" />
 
     <androidx.core.widget.NestedScrollView
         android:id="@+id/results"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:clipToPadding="false"
-        android:elevation="@dimen/keyline_1"
-        android:paddingBottom="@dimen/keyline_1"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+        android:layout_height="match_parent"
+        android:layout_marginVertical="@dimen/keyline_2"
+        android:clipToPadding="false">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/resultsContent"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="?attr/daxColorBrowserOverlay"
-            android:clipToPadding="false"
-            android:elevation="4dp">
+            android:clipToPadding="false">
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/autocompleteSuggestions"
@@ -226,4 +230,159 @@
 
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.core.widget.NestedScrollView>
+
+    <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/appBarLayoutBottom"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:outlineProvider="none"
+        android:theme="@style/Widget.DuckDuckGo.ToolbarTheme">
+
+        <View
+            android:id="@+id/topBrowserOutlineStroke"
+            android:layout_width="match_parent"
+            android:layout_height="0.5dp"
+            android:background="?attr/daxColorShade"
+            android:elevation="20dp"
+            android:layout_alignParentTop="true" />
+
+        <LinearLayout
+            android:id="@+id/rootContainerBottom"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/toolbarContainerBottom"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="?attr/daxColorToolbar">
+
+                <androidx.appcompat.widget.Toolbar
+                    android:id="@+id/toolbarBottom"
+                    android:layout_width="0dp"
+                    android:layout_height="@dimen/toolbarSize"
+                    android:clipChildren="false"
+                    app:contentInsetEnd="0dp"
+                    app:contentInsetStart="0dp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:popupTheme="@style/Widget.DuckDuckGo.PopUpOverflowMenu">
+
+                    <com.google.android.material.card.MaterialCardView
+                        android:id="@+id/omniBarContainerShadowBottom"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_marginHorizontal="@dimen/omnibarCardMarginHorizontal"
+                        android:layout_marginTop="@dimen/omnibarCardMarginBottom"
+                        android:layout_marginBottom="@dimen/omnibarCardMarginTop"
+                        app:cardCornerRadius="@dimen/largeShapeCornerRadius">
+
+                        <com.google.android.material.card.MaterialCardView
+                            android:id="@+id/omniBarContainerBottom"
+                            style="@style/Widget.DuckDuckGo.OmnibarCardView"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            app:cardElevation="0dp"
+                            app:strokeColor="?daxColorAccentBlue"
+                            app:strokeWidth="@dimen/omnibarOutlineWidth">
+
+                            <androidx.constraintlayout.widget.ConstraintLayout
+                                android:id="@+id/omniBarContentContainerBottom"
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:layout_gravity="center">
+
+                                <FrameLayout
+                                    android:id="@+id/omnibarIconContainerBottom"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginStart="@dimen/keyline_0"
+                                    android:layout_marginEnd="@dimen/keyline_0"
+                                    android:minWidth="@dimen/toolbarIcon"
+                                    app:layout_constraintBottom_toBottomOf="parent"
+                                    app:layout_constraintStart_toStartOf="parent"
+                                    app:layout_constraintTop_toTopOf="parent">
+
+                                    <ImageView
+                                        android:id="@+id/logoBottom"
+                                        android:layout_width="@dimen/toolbarIcon"
+                                        android:layout_height="@dimen/toolbarIcon"
+                                        android:layout_gravity="center"
+                                        android:importantForAccessibility="no"
+                                        android:padding="@dimen/keyline_1"
+                                        android:scaleType="center"
+                                        app:srcCompat="@drawable/ic_ddg_logo" />
+                                </FrameLayout>
+
+                                <com.duckduckgo.common.ui.view.KeyboardAwareEditText
+                                    android:id="@+id/omnibarTextInputBottom"
+                                    style="@style/Base.V7.Widget.AppCompat.EditText"
+                                    android:layout_width="0dp"
+                                    android:layout_height="0dp"
+                                    android:background="@null"
+                                    android:fontFamily="sans-serif"
+                                    android:hint="@string/omnibarInputHint"
+                                    android:imeOptions="flagNoExtractUi|actionGo|flagNoPersonalizedLearning"
+                                    android:inputType="textUri|textNoSuggestions"
+                                    android:maxLines="1"
+                                    android:selectAllOnFocus="true"
+                                    android:textColor="?attr/daxColorPrimaryText"
+                                    android:textColorHighlight="?attr/daxOmnibarTextColorHighlight"
+                                    android:textColorHint="?attr/daxColorSecondaryText"
+                                    android:textCursorDrawable="@drawable/text_cursor"
+                                    android:textSize="16sp"
+                                    android:textStyle="normal"
+                                    app:layout_constraintBottom_toBottomOf="parent"
+                                    app:layout_constraintEnd_toStartOf="@id/endIconsContainerBottom"
+                                    app:layout_constraintStart_toEndOf="@id/omnibarIconContainerBottom"
+                                    app:layout_constraintTop_toTopOf="parent" />
+
+                                <androidx.constraintlayout.widget.ConstraintLayout
+                                    android:id="@+id/endIconsContainerBottom"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="match_parent"
+                                    android:layout_marginEnd="@dimen/keyline_0"
+                                    android:minWidth="8dp"
+                                    app:layout_constraintBottom_toBottomOf="parent"
+                                    app:layout_constraintEnd_toEndOf="parent"
+                                    app:layout_constraintTop_toTopOf="parent">
+
+                                    <ImageView
+                                        android:id="@+id/clearTextButtonBottom"
+                                        android:layout_width="@dimen/toolbarIcon"
+                                        android:layout_height="@dimen/toolbarIcon"
+                                        android:background="@drawable/selectable_item_experimental_background"
+                                        android:contentDescription="@string/clearButtonContentDescription"
+                                        android:scaleType="center"
+                                        android:src="@drawable/ic_close_circle_small_secondary_24"
+                                        android:visibility="invisible"
+                                        app:layout_constraintBottom_toBottomOf="parent"
+                                        app:layout_constraintEnd_toStartOf="@id/voiceSearchButtonBottom"
+                                        app:layout_constraintTop_toTopOf="parent"
+                                        tools:visibility="visible" />
+
+                                    <ImageView
+                                        android:id="@+id/voiceSearchButtonBottom"
+                                        android:layout_width="@dimen/toolbarIcon"
+                                        android:layout_height="@dimen/toolbarIcon"
+                                        android:background="@drawable/selectable_item_experimental_background"
+                                        android:contentDescription="@string/voiceSearchIconContentDescription"
+                                        android:scaleType="center"
+                                        app:srcCompat="@drawable/ic_microphone_24"
+                                        app:layout_constraintBottom_toBottomOf="parent"
+                                        app:layout_constraintEnd_toEndOf="parent"
+                                        app:layout_constraintTop_toTopOf="parent" />
+
+                                </androidx.constraintlayout.widget.ConstraintLayout>
+                            </androidx.constraintlayout.widget.ConstraintLayout>
+                        </com.google.android.material.card.MaterialCardView>
+                    </com.google.android.material.card.MaterialCardView>
+                </androidx.appcompat.widget.Toolbar>
+            </androidx.constraintlayout.widget.ConstraintLayout>
+        </LinearLayout>
+    </com.google.android.material.appbar.AppBarLayout>
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
