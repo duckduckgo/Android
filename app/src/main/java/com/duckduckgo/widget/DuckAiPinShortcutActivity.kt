@@ -31,7 +31,7 @@ class DuckAiPinShortcutActivity : AppCompatActivity() {
     }
 
     private fun createShortcutInfo(context: Context): ShortcutInfoCompat {
-        val shortLabel = getString(com.duckduckgo.duckchat.impl.R.string.duck_chat_title)
+        val shortLabel = getString(R.string.duckAiOnlyPinShortcutLabel)
 
         val shortcutIntent = BrowserActivity.intent(context, openDuckChat = true, duckChatSessionActive = true).apply {
             action = Intent.ACTION_VIEW
