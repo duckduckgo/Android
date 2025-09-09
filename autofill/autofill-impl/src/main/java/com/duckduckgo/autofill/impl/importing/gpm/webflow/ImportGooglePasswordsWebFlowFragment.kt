@@ -289,7 +289,7 @@ class ImportGooglePasswordsWebFlowFragment :
         }
     }
 
-    @SuppressLint("RequiresFeature")
+    @SuppressLint("RequiresFeature", "AddDocumentStartJavaScriptUsage")
     private suspend fun configurePasswordImportJavascript(webView: WebView) {
         if (importPasswordConfig.getConfig().canInjectJavascript) {
             val script = passwordImporterScriptLoader.getScript()

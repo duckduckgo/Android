@@ -37,12 +37,15 @@ import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggesti
 import com.duckduckgo.browser.api.autocomplete.AutoCompleteSettings
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.SingleLiveEvent
+import com.duckduckgo.common.utils.extensions.toBinaryString
+import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.impl.inputscreen.ui.command.Command
 import com.duckduckgo.duckchat.impl.inputscreen.ui.command.Command.EditWithSelectedQuery
 import com.duckduckgo.duckchat.impl.inputscreen.ui.command.Command.SwitchToTab
 import com.duckduckgo.duckchat.impl.inputscreen.ui.command.InputFieldCommand
 import com.duckduckgo.duckchat.impl.inputscreen.ui.command.SearchCommand
 import com.duckduckgo.duckchat.impl.inputscreen.ui.command.SearchCommand.ShowRemoveSearchSuggestionDialog
+import com.duckduckgo.duckchat.impl.inputscreen.ui.metrics.discovery.InputScreenDiscoveryFunnel
 import com.duckduckgo.duckchat.impl.inputscreen.ui.metrics.usage.InputScreenSessionUsageMetric
 import com.duckduckgo.duckchat.impl.inputscreen.ui.session.InputScreenSessionStore
 import com.duckduckgo.duckchat.impl.inputscreen.ui.state.AutoCompleteScrollState
@@ -53,6 +56,7 @@ import com.duckduckgo.duckchat.impl.inputscreen.ui.state.SubmitButtonIconState
 import com.duckduckgo.duckchat.impl.inputscreen.ui.viewmodel.UserSelectedMode.CHAT
 import com.duckduckgo.duckchat.impl.inputscreen.ui.viewmodel.UserSelectedMode.NONE
 import com.duckduckgo.duckchat.impl.inputscreen.ui.viewmodel.UserSelectedMode.SEARCH
+import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_OMNIBAR_MODE_SWITCHED
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_OMNIBAR_PROMPT_SUBMITTED
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_OMNIBAR_PROMPT_SUBMITTED_DAILY
@@ -61,6 +65,7 @@ import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_EXPERIMENT
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_OMNIBAR_SESSION_BOTH_MODES
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_OMNIBAR_SESSION_BOTH_MODES_DAILY
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_OMNIBAR_SHOWN
+import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelParameters
 import com.duckduckgo.history.api.NavigationHistory
 import com.duckduckgo.voice.api.VoiceSearchAvailability
 import dagger.assisted.Assisted
@@ -109,8 +114,10 @@ class InputScreenViewModel @AssistedInject constructor(
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val voiceSearchAvailability: VoiceSearchAvailability,
     private val autoCompleteSettings: AutoCompleteSettings,
+    private val duckChat: DuckChat,
     private val pixel: Pixel,
     private val sessionStore: InputScreenSessionStore,
+    private val inputScreenDiscoveryFunnel: InputScreenDiscoveryFunnel,
     private val inputScreenSessionUsageMetric: InputScreenSessionUsageMetric,
 ) : ViewModel() {
 
@@ -260,6 +267,7 @@ class InputScreenViewModel @AssistedInject constructor(
 
     fun userSelectedAutocomplete(suggestion: AutoCompleteSuggestion) {
         appCoroutineScope.launch(dispatchers.io()) {
+            autoComplete.fireAutocompletePixel(autoCompleteSuggestionResults.value.suggestions, suggestion, true)
             withContext(dispatchers.main()) {
                 when (suggestion) {
                     is AutoCompleteDefaultSuggestion -> onUserSubmittedQuery(suggestion.phrase)
@@ -269,6 +277,7 @@ class InputScreenViewModel @AssistedInject constructor(
                     is AutoCompleteHistorySearchSuggestion -> onUserSubmittedQuery(suggestion.phrase)
                     is AutoCompleteSwitchToTabSuggestion -> onUserSwitchedToTab(suggestion.tabId)
                     is AutoCompleteInAppMessageSuggestion -> return@withContext
+                    is AutoCompleteSuggestion.AutoCompleteDuckAIPrompt -> onUserTappedDuckAiPromptAutocomplete(suggestion.phrase)
                 }
             }
         }
@@ -276,6 +285,15 @@ class InputScreenViewModel @AssistedInject constructor(
 
     private fun onUserSwitchedToTab(tabId: String) {
         command.value = SwitchToTab(tabId)
+    }
+
+    private fun onUserTappedDuckAiPromptAutocomplete(prompt: String) {
+        command.value = Command.SubmitChat(prompt)
+        appCoroutineScope.launch(dispatchers.io()) {
+            val params = mapOf(DuckChatPixelParameters.WAS_USED_BEFORE to duckChat.wasOpenedBefore().toBinaryString())
+            pixel.fire(DuckChatPixelName.DUCK_CHAT_OPEN_AUTOCOMPLETE_EXPERIMENTAL, parameters = params)
+        }
+        duckChat.openDuckChatWithAutoPrompt(prompt)
     }
 
     fun userLongPressedAutocomplete(suggestion: AutoCompleteSuggestion) {
@@ -344,6 +362,7 @@ class InputScreenViewModel @AssistedInject constructor(
         command.value = Command.SubmitSearch(sanitizedQuery)
         pixel.fire(DUCK_CHAT_EXPERIMENTAL_OMNIBAR_QUERY_SUBMITTED)
         pixel.fire(DUCK_CHAT_EXPERIMENTAL_OMNIBAR_QUERY_SUBMITTED_DAILY, type = Daily())
+        inputScreenDiscoveryFunnel.onSearchSubmitted()
         inputScreenSessionUsageMetric.onSearchSubmitted()
 
         viewModelScope.launch {
@@ -357,9 +376,11 @@ class InputScreenViewModel @AssistedInject constructor(
             command.value = Command.SubmitSearch(query)
         } else {
             command.value = Command.SubmitChat(query)
+            duckChat.openDuckChatWithAutoPrompt(query)
         }
         pixel.fire(DUCK_CHAT_EXPERIMENTAL_OMNIBAR_PROMPT_SUBMITTED)
         pixel.fire(DUCK_CHAT_EXPERIMENTAL_OMNIBAR_PROMPT_SUBMITTED_DAILY, type = Daily())
+        inputScreenDiscoveryFunnel.onPromptSubmitted()
         inputScreenSessionUsageMetric.onPromptSubmitted()
 
         viewModelScope.launch {

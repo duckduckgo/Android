@@ -71,7 +71,7 @@ class TabItemDecorator(context: Context) : RecyclerView.ItemDecoration() {
                     tabSwitcherItem is NormalTab && tabSwitcherItem.isActive -> {
                         drawTabDecoration(child, canvas, activeTabBorderStroke)
                     }
-                    tabSwitcherItem is TabSwitcherItem.TrackerAnimationInfoPanel -> Unit // No border for animation tile
+                    tabSwitcherItem is TabSwitcherItem.TrackersAnimationInfoPanel -> Unit // No border for animation tile
                 }
             }
         }

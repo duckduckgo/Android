@@ -854,11 +854,6 @@
     <string name="newTabPageDefaultBrowserMessagePrimaryCta" instruction="This text appears on a button">Sett som standard</string>
     <string name="newTabPageDefaultBrowserMessageSecondaryCta" instruction="This text appears on a button">Ikke spør igjen</string>
 
-    <!--TabSwitcher Animation Tile Dialog-->
-    <string name="tabSwitcherAnimationTileRemovalDialogTitle">DuckDuckGo blokkerer sporere for å beskytte surfingen din</string>
-    <string name="tabSwitcherAnimationTileRemovalDialogBody">Hvis du fjerner fanene og dataene dine, slettes sporingsblokkeringshistorikken din, og dette tallet tilbakestilles til null.\n\nSkjul dette banneret hvis du ikke vil se det i fanevisningen.</string>
-    <string name="tabSwitcherAnimationTileRemovalDialogNegativeButton">Skjul banner</string>
-
     <!-- Threat protection -->
     <string name="maliciousSiteTitle">Advarsel: Dette nettstedet kan utgjøre en sikkerhetsrisiko</string>
     <string name="maliciousSiteMalwareHeadline"><![CDATA[DuckDuckGo blokkerte denne siden fordi det er mulig at den distribuerer skadelig programvare som er laget for å kompromittere enheten din eller stjele personopplysningene dine.\n<a href=\"\">Finn ut mer</a>]]></string>
@@ -922,5 +917,12 @@
     <string name="onboardingPrivacyProDaxDialogDescriptionRebranding"><![CDATA[DuckDuckGo har også et <b>valgfritt betalt abonnement</b>, med en sikker <b>VPN</b> og <b>avansert, privat AI</b>.]]></string>
     <string name="settingsDuckAiRebranding">AI-funksjoner</string>
     <string name="settingsDuckAi">Duck.ai</string>
+
+    <!--TabSwitcher Trackers Animation-->
+    <string name="showTrackerCountInTabSwitcher">Vis antall sporere i fanebytteren</string>
+    <string name="tabSwitcherAnimationTileRemovalDialogTitle" instruction="A title for a dialog that shows when a user clicks a tile that shows them their current blocked tracker count">Vil du skjule antall sporere?</string>
+    <string name="tabSwitcherAnimationTileRemovalDialogBody" instruction="A message for a dialog that shows when a user clicks a tile that shows them their current blocked tracker count">Du kan slå på dette igjen i Innstillinger &gt; Utseende.</string>
+    <string name="tabSwitcherAnimationTileRemovalDialogPositiveButton">Skjul</string>
+    <string name="tabSwitcherAnimationTileRemovalDialogNegativeButton">Behold</string>
 
 </resources>

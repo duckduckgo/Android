@@ -854,11 +854,6 @@
     <string name="newTabPageDefaultBrowserMessagePrimaryCta" instruction="This text appears on a button">Définir par défaut</string>
     <string name="newTabPageDefaultBrowserMessageSecondaryCta" instruction="This text appears on a button">Ne plus demander</string>
 
-    <!--TabSwitcher Animation Tile Dialog-->
-    <string name="tabSwitcherAnimationTileRemovalDialogTitle">DuckDuckGo bloque les traqueurs pour protéger votre navigation</string>
-    <string name="tabSwitcherAnimationTileRemovalDialogBody">En effaçant vos onglets et vos données, vous supprimerez votre historique de blocage des traqueurs et remettrez ce nombre à zéro.\n\nMasquez cette bannière si vous préférez ne pas la voir dans la vue des onglets.</string>
-    <string name="tabSwitcherAnimationTileRemovalDialogNegativeButton">Masquer la bannière</string>
-
     <!-- Threat protection -->
     <string name="maliciousSiteTitle">Avertissement : ce site peut présenter un risque pour la sécurité</string>
     <string name="maliciousSiteMalwareHeadline"><![CDATA[DuckDuckGo a bloqué cette page car elle pourrait diffuser des logiciels malveillants conçus pour compromettre votre appareil ou voler vos informations personnelles.\n<a href=\"\">En savoir plus</a>]]></string>
@@ -922,5 +917,12 @@
     <string name="onboardingPrivacyProDaxDialogDescriptionRebranding"><![CDATA[DuckDuckGo propose également un <b>abonnement payant en option</b>, avec un <b>VPN</b> sécurisé et une <b>IA privée et évoluée</b>.]]></string>
     <string name="settingsDuckAiRebranding">Fonctionnalités de l\'IA</string>
     <string name="settingsDuckAi">Duck.ai</string>
+
+    <!--TabSwitcher Trackers Animation-->
+    <string name="showTrackerCountInTabSwitcher">Afficher le nombre de traqueurs dans l\'outil de changement d\'onglet</string>
+    <string name="tabSwitcherAnimationTileRemovalDialogTitle" instruction="A title for a dialog that shows when a user clicks a tile that shows them their current blocked tracker count">Masquer le nombre de traqueurs ?</string>
+    <string name="tabSwitcherAnimationTileRemovalDialogBody" instruction="A message for a dialog that shows when a user clicks a tile that shows them their current blocked tracker count">Vous pouvez réactiver cette option dans Paramètres &gt; Apparence.</string>
+    <string name="tabSwitcherAnimationTileRemovalDialogPositiveButton">Masquer</string>
+    <string name="tabSwitcherAnimationTileRemovalDialogNegativeButton">Conserver</string>
 
 </resources>

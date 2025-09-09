@@ -161,6 +161,9 @@
         <!-- App Tracking Protection -->
         <item name="appTPHeaderBackground">@color/black</item>
 
+        <!-- Tab Switcher Trackers Animation -->
+        <item name="tabSwitcherTrackersAnimationInfoPanelBackgroundColor">@color/green12</item>
+
         <!-- Design System Reference Colors Dark -->
         <item name="preferredStatusBarColor">@color/background_background_dark</item>
         <item name="preferredNavigationBarColor">@color/background_background_dark</item>
@@ -296,6 +299,9 @@
 
         <!-- App Tracking Protection -->
         <item name="appTPHeaderBackground">@color/white_60</item>
+
+        <!-- Tab Switcher Trackers Animation -->
+        <item name="tabSwitcherTrackersAnimationInfoPanelBackgroundColor">@color/green0</item>
 
         <!-- Design System Reference Colors Light -->
         <item name="preferredStatusBarColor">@color/background_background_light</item>

@@ -854,11 +854,6 @@
     <string name="newTabPageDefaultBrowserMessagePrimaryCta" instruction="This text appears on a button">Määra vaikebrauseriks</string>
     <string name="newTabPageDefaultBrowserMessageSecondaryCta" instruction="This text appears on a button">Ära enam küsi</string>
 
-    <!--TabSwitcher Animation Tile Dialog-->
-    <string name="tabSwitcherAnimationTileRemovalDialogTitle">DuckDuckGo blokeerib jälgurid, et kaitsta sinu sirvimist</string>
-    <string name="tabSwitcherAnimationTileRemovalDialogBody">Vahekaartide ja andmete kustutamine kustutab sinu jälguri blokeerimise ajaloo ja lähtestab selle numbri nulli.\n\nPeida see ribareklaam, kui sa ei soovi seda vahekaartide vaates näha.</string>
-    <string name="tabSwitcherAnimationTileRemovalDialogNegativeButton">Peida ribareklaam</string>
-
     <!-- Threat protection -->
     <string name="maliciousSiteTitle">Hoiatus: see sait võib olla turvaoht</string>
     <string name="maliciousSiteMalwareHeadline"><![CDATA[DuckDuckGo blokeeris selle saidi, kuna see võib levitada pahavara, mis on loodud teie seadme kahjustamiseks või teie isikuandmete varastamiseks.\n<a href=\"\">Vaata lähemalt</a>]]></string>
@@ -922,5 +917,12 @@
     <string name="onboardingPrivacyProDaxDialogDescriptionRebranding"><![CDATA[DuckDuckGo-l on ka <b>valikuline tasuline tellimus</b>, mis sisaldab turvalist <b>VPN-i</b> ja <b>täiustatud privaatset tehisintellekti</b>.]]></string>
     <string name="settingsDuckAiRebranding">AI funktsioonid</string>
     <string name="settingsDuckAi">Duck.ai</string>
+
+    <!--TabSwitcher Trackers Animation-->
+    <string name="showTrackerCountInTabSwitcher">Kuva jälgurite arv vahekaardi vahetajas</string>
+    <string name="tabSwitcherAnimationTileRemovalDialogTitle" instruction="A title for a dialog that shows when a user clicks a tile that shows them their current blocked tracker count">Kas peita jälgurite arv?</string>
+    <string name="tabSwitcherAnimationTileRemovalDialogBody" instruction="A message for a dialog that shows when a user clicks a tile that shows them their current blocked tracker count">Saad selle uuesti sisse lülitada suvandis Seaded &gt; Välimus.</string>
+    <string name="tabSwitcherAnimationTileRemovalDialogPositiveButton">Peida</string>
+    <string name="tabSwitcherAnimationTileRemovalDialogNegativeButton">Jäta alles</string>
 
 </resources>

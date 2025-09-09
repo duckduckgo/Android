@@ -18,6 +18,8 @@ tags:
             - pressKey: Enter
             - runFlow: ../shared/browser_screen/click_on_tabs_button.yaml
             - assertVisible:
+                text: "0 trackers blocked in the last 7 days"
+            - assertVisible:
                 text: "Privacy Test Pages - Home"
             - tapOn: "New Tab"
             - assertVisible:

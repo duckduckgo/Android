@@ -23,13 +23,6 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.Observer
 import androidx.lifecycle.liveData
 import com.duckduckgo.app.browser.favicon.FaviconManager
-import com.duckduckgo.app.browser.senseofprotection.SenseOfProtectionExperiment
-import com.duckduckgo.app.browser.senseofprotection.SenseOfProtectionExperimentImpl
-import com.duckduckgo.app.browser.senseofprotection.SenseOfProtectionPixelsPlugin
-import com.duckduckgo.app.browser.senseofprotection.SenseOfProtectionToggles
-import com.duckduckgo.app.browser.senseofprotection.SenseOfProtectionToggles.Cohorts.MODIFIED_CONTROL
-import com.duckduckgo.app.browser.senseofprotection.SenseOfProtectionToggles.Cohorts.VARIANT_1
-import com.duckduckgo.app.browser.senseofprotection.SenseOfProtectionToggles.Cohorts.VARIANT_2
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
@@ -66,10 +59,7 @@ import com.duckduckgo.common.ui.tabs.SwipingTabsFeatureProvider
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
-import com.duckduckgo.fakes.FakePixel
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
-import com.duckduckgo.feature.toggles.api.FakeToggleStore
-import com.duckduckgo.feature.toggles.api.FeatureToggles
 import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.savedsites.api.SavedSitesRepository
 import com.duckduckgo.savedsites.api.models.SavedSite.Bookmark
@@ -94,7 +84,7 @@ import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import org.mockito.Mock
+import org.mockito.Mockito.mock
 import org.mockito.MockitoAnnotations
 import org.mockito.kotlin.any
 import org.mockito.kotlin.argumentCaptor
@@ -114,56 +104,35 @@ class TabSwitcherViewModelTest {
     @get:Rule
     var coroutinesTestRule = CoroutineTestRule()
 
-    @Mock
-    private lateinit var mockCommandObserver: Observer<Command>
+    private val mockCommandObserver: Observer<Command> = mock()
 
-    @Mock
-    private lateinit var mockTabSwitcherItemsObserver: Observer<List<TabSwitcherItem>>
+    private val mockTabSwitcherItemsObserver: Observer<List<TabSwitcherItem>> = mock()
 
     private val commandCaptor = argumentCaptor<Command>()
 
-    @Mock
-    private lateinit var mockTabRepository: TabRepository
+    private val mockTabRepository: TabRepository = mock()
 
-    @Mock
-    private lateinit var mockPixel: Pixel
+    private val mockPixel: Pixel = mock()
 
-    @Mock
-    private lateinit var statisticsDataStore: StatisticsDataStore
+    private val statisticsDataStore: StatisticsDataStore = mock()
 
-    @Mock
-    private lateinit var duckChatMock: DuckChat
+    private val duckChatMock: DuckChat = mock()
 
-    @Mock
-    private lateinit var duckAiFeatureStateMock: DuckAiFeatureState
+    private val duckAiFeatureStateMock: DuckAiFeatureState = mock()
 
-    @Mock
-    private lateinit var faviconManager: FaviconManager
+    private val faviconManager: FaviconManager = mock()
 
-    @Mock
-    private lateinit var savedSitesRepository: SavedSitesRepository
+    private val savedSitesRepository: SavedSitesRepository = mock()
 
-    @Mock
-    private lateinit var mockWebTrackersBlockedAppRepository: WebTrackersBlockedAppRepository
+    private val mockWebTrackersBlockedAppRepository: WebTrackersBlockedAppRepository = mock()
 
-    @Mock
-    private lateinit var mockTabSwitcherPrefsDataStore: TabSwitcherPrefsDataStore
+    private val mockTabSwitcherPrefsDataStore: TabSwitcherPrefsDataStore = mock()
 
-    @Mock
-    private lateinit var senseOfProtectionPixelsPluginMock: SenseOfProtectionPixelsPlugin
-
-    private lateinit var senseOfProtectionExperiment: SenseOfProtectionExperiment
+    private val mockTrackersAnimationInfoPanelPixels: TrackersAnimationInfoPanelPixels = mock()
 
     private val tabManagerFeatureFlags = FakeFeatureToggleFactory.create(TabManagerFeatureFlags::class.java)
     private val swipingTabsFeature = FakeFeatureToggleFactory.create(SwipingTabsFeature::class.java)
     private val swipingTabsFeatureProvider = SwipingTabsFeatureProvider(swipingTabsFeature)
-
-    private lateinit var fakeSenseOfProtectionToggles: SenseOfProtectionToggles
-    private val cohorts = listOf(
-        State.Cohort(name = MODIFIED_CONTROL.cohortName, weight = 1),
-        State.Cohort(name = VARIANT_1.cohortName, weight = 1),
-        State.Cohort(name = VARIANT_2.cohortName, weight = 1),
-    )
 
     private lateinit var testee: TabSwitcherViewModel
 
@@ -178,40 +147,27 @@ class TabSwitcherViewModelTest {
     private val tabSwitcherData = TabSwitcherData(NEW, GRID)
 
     @Before
-    fun before() {
+    fun before() = runTest {
         MockitoAnnotations.openMocks(this)
 
         swipingTabsFeature.self().setRawStoredState(State(enable = false))
-        tabManagerFeatureFlags.multiSelection().setRawStoredState(State(enable = false))
         tabManagerFeatureFlags.newToolbarFeature().setRawStoredState(State(enable = false))
         swipingTabsFeature.enabledForUsers().setRawStoredState(State(enable = true))
 
-        whenever(mockTabSwitcherPrefsDataStore.isAnimationTileDismissed()).thenReturn(flowOf(false))
+        whenever(mockTabSwitcherPrefsDataStore.isTrackersAnimationInfoTileHidden()).thenReturn(flowOf(false))
         whenever(statisticsDataStore.variant).thenReturn("")
         whenever(mockTabRepository.flowDeletableTabs).thenReturn(repoDeletableTabs.consumeAsFlow())
         runBlocking {
             whenever(mockTabRepository.add()).thenReturn("TAB_ID")
+            whenever(mockWebTrackersBlockedAppRepository.getTrackerCountForLast7Days()).thenReturn(0)
         }
         whenever(mockTabRepository.tabSwitcherData).thenReturn(flowOf(tabSwitcherData))
 
         whenever(duckAiFeatureStateMock.showOmnibarShortcutOnNtpAndOnFocus).thenReturn(MutableStateFlow(false))
 
-        fakeSenseOfProtectionToggles = FeatureToggles.Builder(
-            FakeToggleStore(),
-            featureName = SenseOfProtectionToggles.BASE_EXPERIMENT_NAME,
-        ).build().create(SenseOfProtectionToggles::class.java)
-
-        senseOfProtectionExperiment = SenseOfProtectionExperimentImpl(
-            appCoroutineScope = coroutinesTestRule.testScope,
-            dispatcherProvider = coroutinesTestRule.testDispatcherProvider,
-            userBrowserProperties = FakeUserBrowserProperties(),
-            senseOfProtectionToggles = fakeSenseOfProtectionToggles,
-            senseOfProtectionPixelsPlugin = senseOfProtectionPixelsPluginMock,
-            pixel = FakePixel(),
-        )
-
         initializeMockTabEntitesData()
         initializeViewModel()
+        prepareSelectionMode()
     }
 
     private fun initializeMockTabEntitesData() {
@@ -229,11 +185,11 @@ class TabSwitcherViewModelTest {
             duckChatMock,
             duckAiFeatureState = duckAiFeatureStateMock,
             tabManagerFeatureFlags,
-            senseOfProtectionExperiment,
             mockWebTrackersBlockedAppRepository,
             tabSwitcherDataStore,
             faviconManager,
             savedSitesRepository,
+            mockTrackersAnimationInfoPanelPixels,
         )
         testee.command.observeForever(mockCommandObserver)
         testee.tabSwitcherItemsLiveData.observeForever(mockTabSwitcherItemsObserver)
@@ -570,16 +526,14 @@ class TabSwitcherViewModelTest {
         initializeViewModel()
 
         testee.onTabCloseInNormalModeRequested(tab)
-        verify(mockTabRepository).deleteTabs(listOf(tab.id))
+        verify(mockTabRepository).markDeletable(tab.tabEntity)
 
         verify(mockCommandObserver).onChanged(commandCaptor.capture())
-        assertEquals(Command.Close, commandCaptor.lastValue)
+        assertEquals(Command.ShowUndoDeleteTabsMessage(listOf(tab.id)), commandCaptor.lastValue)
     }
 
     @Test
     fun whenTabClosedInNormalModeWithSwipeGestureThenCallMarkDeletableAndSendUndoCommandAndSendPixel() = runTest {
-        tabManagerFeatureFlags.multiSelection().setRawStoredState(State(enable = true))
-
         val swipeGestureUsed = true
         val tab = tabSwitcherItems.first()
 
@@ -594,8 +548,6 @@ class TabSwitcherViewModelTest {
 
     @Test
     fun whenTabClosedUsingCloseButtonInNormalModeThenCallMarkDeletableAndSendUndoCommandAndSendPixel() = runTest {
-        tabManagerFeatureFlags.multiSelection().setRawStoredState(State(enable = true))
-
         val swipeGestureUsed = false
         val tab = tabSwitcherItems.first()
 
@@ -671,18 +623,14 @@ class TabSwitcherViewModelTest {
         val tabIdCaptor = argumentCaptor<String>()
         whenever(mockTabRepository.getTab(tabIdCaptor.capture())).thenAnswer { _ -> tabList.first { it.tabId == tabIdCaptor.lastValue } }
 
-        testee.tabSwitcherItemsLiveData.blockingObserve()
-
         testee.onCloseAllTabsConfirmed()
 
-        tabList.forEach {
-            verify(mockTabRepository).deleteTabs(tabList.map { it.tabId })
-        }
+        verify(mockTabRepository).markDeletable(tabList.map { it.tabId })
         verify(mockPixel).fire(AppPixelName.TAB_MANAGER_MENU_CLOSE_ALL_TABS_CONFIRMED)
         verify(mockPixel).fire(AppPixelName.TAB_MANAGER_MENU_CLOSE_ALL_TABS_CONFIRMED_DAILY, type = Daily())
 
         verify(mockCommandObserver).onChanged(commandCaptor.capture())
-        assertEquals(Command.Close, commandCaptor.lastValue)
+        assertEquals(Command.CloseAndShowUndoMessage(tabList.map { it.tabId }), commandCaptor.lastValue)
     }
 
     @Test
@@ -1733,15 +1681,40 @@ class TabSwitcherViewModelTest {
     }
 
     @Test
-    fun `when tab switcher animation feature disabled then tab switcher items contain only tabs`() = runTest {
-        whenever(mockTabSwitcherPrefsDataStore.isAnimationTileDismissed()).thenReturn(flowOf(true))
+    fun `when animated info panel has not been hidden then tab switcher items include animation tile and tabs`() = runTest {
+        val fakeTabSwitcherDataStore = FakeTabSwitcherDataStore().apply {
+            setTrackersAnimationInfoTileHidden(false)
+        }
+
+        val tab1 = TabEntity("1", position = 1)
+        val tab2 = TabEntity("2", position = 2)
+        tabList = listOf(tab1, tab2)
+
+        whenever(mockWebTrackersBlockedAppRepository.getTrackerCountForLast7Days()).thenReturn(15)
+
+        initializeMockTabEntitesData()
+        initializeViewModel(fakeTabSwitcherDataStore)
+
+        val items = testee.tabSwitcherItemsLiveData.blockingObserve() ?: listOf()
+
+        assertEquals(3, items.size)
+        assert(items.first() is TabSwitcherItem.TrackersAnimationInfoPanel)
+        assert(items[1] is TabSwitcherItem.Tab)
+        assert(items[2] is TabSwitcherItem.Tab)
+    }
+
+    @Test
+    fun `when animated info panel has been hidden then tab switcher items contain only tabs`() = runTest {
+        val fakeTabSwitcherDataStore = FakeTabSwitcherDataStore().apply {
+            setTrackersAnimationInfoTileHidden(true)
+        }
 
         val tab1 = TabEntity("1", position = 1)
         val tab2 = TabEntity("2", position = 2)
         tabList = listOf(tab1, tab2)
 
         initializeMockTabEntitesData()
-        initializeViewModel(FakeTabSwitcherDataStore())
+        initializeViewModel(fakeTabSwitcherDataStore)
 
         val items = testee.tabSwitcherItemsLiveData.blockingObserve() ?: listOf()
 
@@ -1752,141 +1725,65 @@ class TabSwitcherViewModelTest {
     }
 
     @Test
-    fun `when animated info panel negative button clicked then animated info panel is removed`() = runTest {
+    fun `when animated info panel positive button clicked then animated info panel is hidden`() = runTest {
+        val tab1 = TabEntity("1", position = 1)
+        val tab2 = TabEntity("2", position = 2)
+        tabList = listOf(tab1, tab2)
+
+        initializeMockTabEntitesData()
         initializeViewModel(FakeTabSwitcherDataStore())
 
-        fakeSenseOfProtectionToggles.senseOfProtectionNewUserExperiment27May25().setRawStoredState(
-            State(
-                remoteEnableState = true,
-                enable = true,
-                assignedCohort = State.Cohort(name = VARIANT_2.cohortName, weight = 1),
-                cohorts = cohorts,
-            ),
-        )
+        testee.onTrackerAnimationTilePositiveButtonClicked()
+
+        val items = testee.tabSwitcherItemsLiveData.blockingObserve() ?: listOf()
+
+        assertFalse(items.first() is TabSwitcherItem.TrackersAnimationInfoPanel)
+    }
+
+    @Test
+    fun `when animated info panel negative button clicked then animated info panel is still visible`() = runTest {
+        initializeViewModel(FakeTabSwitcherDataStore())
 
         val tab1 = TabEntity("1", position = 1)
         val tab2 = TabEntity("2", position = 2)
         tabList = listOf(tab1, tab2)
 
-        whenever(mockWebTrackersBlockedAppRepository.getTrackerCountForLast7Days()).thenReturn(15)
-
         testee.onTrackerAnimationTileNegativeButtonClicked()
 
         val items = testee.tabSwitcherItemsLiveData.blockingObserve() ?: listOf()
 
-        assertFalse(items.first() is TabSwitcherItem.TrackerAnimationInfoPanel)
+        assertTrue(items.first() is TabSwitcherItem.TrackersAnimationInfoPanel)
     }
 
     @Test
     fun `when animated info panel visible then impressions pixel fired`() = runTest {
-        fakeSenseOfProtectionToggles.senseOfProtectionNewUserExperiment27May25().setRawStoredState(
-            State(
-                remoteEnableState = true,
-                enable = true,
-                assignedCohort = State.Cohort(name = VARIANT_2.cohortName, weight = 1),
-                cohorts = cohorts,
-            ),
-        )
-
         whenever(mockWebTrackersBlockedAppRepository.getTrackerCountForLast7Days()).thenReturn(15)
         initializeViewModel(FakeTabSwitcherDataStore())
 
         testee.onTrackerAnimationInfoPanelVisible()
 
-        verify(mockPixel).fire(
-            pixel = AppPixelName.TAB_MANAGER_INFO_PANEL_IMPRESSIONS,
-            parameters = mapOf(
-                "cohort" to VARIANT_2.cohortName,
-                "experiment" to fakeSenseOfProtectionToggles.senseOfProtectionNewUserExperiment27May25().featureName().name,
-            ),
-        )
+        verify(mockTrackersAnimationInfoPanelPixels).fireInfoPanelImpression()
     }
 
     @Test
     fun `when animated info panel clicked then tapped pixel fired`() = runTest {
         whenever(mockWebTrackersBlockedAppRepository.getTrackerCountForLast7Days()).thenReturn(15)
-        fakeSenseOfProtectionToggles.senseOfProtectionExistingUserExperiment27May25().setRawStoredState(
-            State(
-                remoteEnableState = true,
-                enable = true,
-                assignedCohort = State.Cohort(name = VARIANT_2.cohortName, weight = 1),
-                cohorts = cohorts,
-            ),
-        )
 
-        initializeViewModel(FakeTabSwitcherDataStore())
+        initializeViewModel()
 
         testee.onTrackerAnimationInfoPanelClicked()
 
-        verify(mockPixel).fire(
-            pixel = AppPixelName.TAB_MANAGER_INFO_PANEL_TAPPED,
-            parameters = mapOf(
-                "cohort" to VARIANT_2.cohortName,
-                "experiment" to fakeSenseOfProtectionToggles.senseOfProtectionExistingUserExperiment27May25().featureName().name,
-            ),
-        )
+        verify(mockTrackersAnimationInfoPanelPixels).fireInfoPanelTapped()
     }
 
     @Test
-    fun `when animated info panel negative button clicked then dismiss pixel fired`() = runTest {
-        fakeSenseOfProtectionToggles.senseOfProtectionNewUserExperiment27May25().setRawStoredState(
-            State(
-                remoteEnableState = true,
-                enable = true,
-                assignedCohort = State.Cohort(name = VARIANT_2.cohortName, weight = 1),
-                cohorts = cohorts,
-            ),
-        )
-
+    fun `when animated info panel positive button clicked then dismiss pixel fired`() = runTest {
         whenever(mockWebTrackersBlockedAppRepository.getTrackerCountForLast7Days()).thenReturn(15)
-        initializeViewModel(FakeTabSwitcherDataStore())
+        initializeViewModel()
 
-        testee.onTrackerAnimationTileNegativeButtonClicked()
+        testee.onTrackerAnimationTilePositiveButtonClicked()
 
-        verify(mockPixel).fire(
-            pixel = AppPixelName.TAB_MANAGER_INFO_PANEL_DISMISSED,
-            parameters = mapOf(
-                "trackerCount" to "15",
-                "cohort" to VARIANT_2.cohortName,
-                "experiment" to fakeSenseOfProtectionToggles.senseOfProtectionNewUserExperiment27May25().featureName().name,
-            ),
-        )
-    }
-
-    @Test
-    fun `when user is in modified control of sense of protection experiment then animated tile is not shown`() = runTest {
-        fakeSenseOfProtectionToggles.senseOfProtectionExistingUserExperiment27May25().setRawStoredState(
-            State(
-                remoteEnableState = true,
-                enable = true,
-                assignedCohort = State.Cohort(name = MODIFIED_CONTROL.cohortName, weight = 1),
-                cohorts = cohorts,
-            ),
-        )
-
-        initializeViewModel(FakeTabSwitcherDataStore())
-
-        val items = testee.tabSwitcherItemsLiveData.blockingObserve() ?: listOf()
-
-        assertTrue(items.find { it is TabSwitcherItem.TrackerAnimationInfoPanel } == null)
-    }
-
-    @Test
-    fun `when user is in variant 1 of sense of protection experiment then animated tile is not shown`() = runTest {
-        fakeSenseOfProtectionToggles.senseOfProtectionNewUserExperiment27May25().setRawStoredState(
-            State(
-                remoteEnableState = true,
-                enable = true,
-                assignedCohort = State.Cohort(name = VARIANT_1.cohortName, weight = 1),
-                cohorts = cohorts,
-            ),
-        )
-
-        initializeViewModel(FakeTabSwitcherDataStore())
-
-        val items = testee.tabSwitcherItemsLiveData.blockingObserve() ?: listOf()
-
-        assertTrue(items.find { it is TabSwitcherItem.TrackerAnimationInfoPanel } == null)
+        verify(mockTrackersAnimationInfoPanelPixels).fireInfoPanelDismissed()
     }
 
     private class FakeTabSwitcherDataStore : TabSwitcherDataStore {
@@ -1900,16 +1797,14 @@ class TabSwitcherViewModelTest {
 
         override suspend fun setTabLayoutType(layoutType: LayoutType) {}
 
-        override fun isAnimationTileDismissed(): Flow<Boolean> = animationTileDismissedFlow
+        override fun isTrackersAnimationInfoTileHidden(): Flow<Boolean> = animationTileDismissedFlow
 
-        override suspend fun setIsAnimationTileDismissed(isDismissed: Boolean) {
-            animationTileDismissedFlow.value = isDismissed
+        override suspend fun setTrackersAnimationInfoTileHidden(isHidden: Boolean) {
+            animationTileDismissedFlow.value = isHidden
         }
     }
 
     private fun TestScope.prepareSelectionMode() {
-        tabManagerFeatureFlags.multiSelection().setRawStoredState(State(enable = true))
-
         backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
             testee.selectionViewState.collect()
         }

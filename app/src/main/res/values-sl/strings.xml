@@ -886,11 +886,6 @@
     <string name="newTabPageDefaultBrowserMessagePrimaryCta" instruction="This text appears on a button">Nastavi kot privzeto</string>
     <string name="newTabPageDefaultBrowserMessageSecondaryCta" instruction="This text appears on a button">Ne vprašaj več</string>
 
-    <!--TabSwitcher Animation Tile Dialog-->
-    <string name="tabSwitcherAnimationTileRemovalDialogTitle">DuckDuckGo blokira sledilnike, da zaščiti vaše brskanje</string>
-    <string name="tabSwitcherAnimationTileRemovalDialogBody">Če izbrišete zavihke in podatke, boste izbrisali zgodovino blokiranja sledilnika in to številko ponastavili na nič.\n\nSkrijte to pasico, če je ne želite videti v pogledu zavihkov.</string>
-    <string name="tabSwitcherAnimationTileRemovalDialogNegativeButton">Skrij pasico</string>
-
     <!-- Threat protection -->
     <string name="maliciousSiteTitle">Opozorilo: To spletno mesto je lahko varnostno tveganje</string>
     <string name="maliciousSiteMalwareHeadline"><![CDATA[DuckDuckGo je blokiral to stran, ker morda distribuira zlonamerno programsko opremo, namenjeno ogrožanju vaše naprave ali kraji vaših osebnih podatkov.\n<a href=\"\">Več o tem</a>]]></string>
@@ -958,5 +953,12 @@
     <string name="onboardingPrivacyProDaxDialogDescriptionRebranding"><![CDATA[DuckDuckGo ima tudi <b>izbirno plačljivo naročnino</b> z varnim omrežjem <b>VPN</b> in <b>napredno, zasebno umetno inteligenco</b>.]]></string>
     <string name="settingsDuckAiRebranding">Lastnosti UI</string>
     <string name="settingsDuckAi">Duck.ai</string>
+
+    <!--TabSwitcher Trackers Animation-->
+    <string name="showTrackerCountInTabSwitcher">Pokaži število sledilnikov v preklopniku zavihkov</string>
+    <string name="tabSwitcherAnimationTileRemovalDialogTitle" instruction="A title for a dialog that shows when a user clicks a tile that shows them their current blocked tracker count">Želite skriti število sledilnikov?</string>
+    <string name="tabSwitcherAnimationTileRemovalDialogBody" instruction="A message for a dialog that shows when a user clicks a tile that shows them their current blocked tracker count">To lahko znova vklopite, če greste na Nastavitve &gt; Videz.</string>
+    <string name="tabSwitcherAnimationTileRemovalDialogPositiveButton">Skrij se</string>
+    <string name="tabSwitcherAnimationTileRemovalDialogNegativeButton">Obdrži</string>
 
 </resources>
