@@ -95,7 +95,10 @@
                 app:primaryText="@string/settingsPrivacyProtectionAllowlist" />
 
             <com.duckduckgo.common.ui.view.divider.HorizontalDivider
+                android:id="@+id/protectionsListDivider"
                 android:layout_width="match_parent"
+                android:visibility="gone"
+                tools:visibility="visible"
                 android:layout_height="wrap_content" />
 
             <com.duckduckgo.common.ui.view.text.DaxTextView
@@ -106,6 +109,8 @@
                 android:layout_marginTop="@dimen/keyline_3"
                 android:layout_marginBottom="6dp"
                 android:gravity="start"
+                android:visibility="gone"
+                tools:visibility="visible"
                 android:text="@string/webTrackingProtectionExplanationTitle"
                 android:textColor="?daxColorTertiaryText"
                 app:typography="h4" />
@@ -114,6 +119,8 @@
                 android:id="@+id/protectionsList"
                 android:layout_width="match_parent"
                 android:overScrollMode="never"
+                android:visibility="gone"
+                tools:visibility="visible"
                 android:paddingHorizontal="10dp"
                 android:layout_height="match_parent" />
 

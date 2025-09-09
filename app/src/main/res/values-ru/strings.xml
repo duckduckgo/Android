@@ -190,8 +190,8 @@
     <string name="webTrackingProtectionActivityTitle">Защита от отслеживания онлайн</string>
     <string name="webTrackingProtectionLearnMoreTitle">Защита от отслеживания онлайн</string>
     <string name="webTrackingProtectionTitle">Защита от отслеживания онлайн</string>
-    <string name="webTrackingProtectionExplanationDescription"><![CDATA[Функции защиты от отслеживания в составе DuckDuckGo работают без остановки.\n<a href=\"\">Подробнее...</a>]]></string>
-    <string name="webTrackingProtectionExplanationAlternativeDescription"><![CDATA[При просмотре веб-страниц браузер DuckDuckGo обеспечивает защиту от отслеживания, сохраняя ваши данные в безопасности.\n<a href=\"\">Подробнее</a>]]></string>
+    <string name="webTrackingProtectionDescriptionNew"><![CDATA[DuckDuckGo автоматически блокирует скрытые трекеры, пока вы посещаете сайты.\n<a href=\"\">Подробнее…</a>]]></string>
+    <string name="webTrackingProtectionExplanationDescription"><![CDATA[Функции защиты от отслеживания в составе DuckDuckGo работают без остановки.\n<a href=\"\">Подробнее…</a>]]></string>
     <string name="webTrackingProtectionExplanationTitle">Как мы вас защищаем</string>
     <string name="webTrackingProtectionThirdPartyTrackersTitle">Блокировка сторонних трекеров</string>
     <string name="webTrackingProtectionThirdPartyTrackersDescription">Не дает сторонним трекерам даже загрузиться, чтобы они не отслеживали ваши перемещения с сайта на сайт.</string>

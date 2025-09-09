@@ -188,8 +188,8 @@
     <string name="webTrackingProtectionActivityTitle">Proteção contra rastreamento na internet</string>
     <string name="webTrackingProtectionLearnMoreTitle">Proteção contra rastreamento na internet</string>
     <string name="webTrackingProtectionTitle">Proteção contra rastreamento na internet</string>
+    <string name="webTrackingProtectionDescriptionNew"><![CDATA[O DuckDuckGo bloqueia automaticamente os rastreadores ocultos enquanto navegas na Internet.\n<a href=\"\">Sabe mais</a>]]></string>
     <string name="webTrackingProtectionExplanationDescription"><![CDATA[O navegador DuckDuckGo fornece proteções contra rastreamento, que estão sempre ativas.\n<a href=\"\">Sabe mais</a>]]></string>
-    <string name="webTrackingProtectionExplanationAlternativeDescription"><![CDATA[O navegador DuckDuckGo fornece proteções contra rastreamento que ajudam a manter os teus dados seguros enquanto navegas.\n<a href=\"\">Sabe mais</a>]]></string>
     <string name="webTrackingProtectionExplanationTitle">Como te protegemos</string>
     <string name="webTrackingProtectionThirdPartyTrackersTitle">Bloqueia rastreadores de terceiros</string>
     <string name="webTrackingProtectionThirdPartyTrackersDescription">Ajuda a bloquear cookies de terceiros que te rastreiam de site para site, impedindo que os rastreadores de terceiros sejam carregados desde o início.</string>

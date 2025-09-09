@@ -189,8 +189,8 @@
     <string name="webTrackingProtectionActivityTitle">Tīmekļa izsekošanas aizsardzība</string>
     <string name="webTrackingProtectionLearnMoreTitle">Tīmekļa izsekošanas aizsardzība</string>
     <string name="webTrackingProtectionTitle">Tīmekļa izsekošanas aizsardzība</string>
+    <string name="webTrackingProtectionDescriptionNew"><![CDATA[DuckDuckGo automātiski bloķē slēptos izsekotājus tīmekļa pārlūkošanas laikā.\n<a href=\"\">Uzzināt vairāk</a>]]></string>
     <string name="webTrackingProtectionExplanationDescription"><![CDATA[DuckDuckGo pārlūkprogramma nodrošina izsekošanas aizsardzības, kas vienmēr ir aktīvas.\n<a href=\"\">Uzzināt vairāk</a>]]></string>
-    <string name="webTrackingProtectionExplanationAlternativeDescription"><![CDATA[DuckDuckGo pārlūkprogramma nodrošina izsekošanas aizsardzību, kas pārlūkošanas laikā palīdz saglabāt tavu datu drošību.\n<a href=\"\">Uzzināt vairāk</a>]]></string>
     <string name="webTrackingProtectionExplanationTitle">Kā mēs tevi aizsargājam</string>
     <string name="webTrackingProtectionThirdPartyTrackersTitle">Bloķē trešo pušu izsekotājus</string>
     <string name="webTrackingProtectionThirdPartyTrackersDescription">Palīdz bloķēt trešo pušu sīkfailus, kas izseko tevi no vietnes uz vietni un neļauj ielādēt trešo pušu izsekotājus.</string>

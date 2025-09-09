@@ -190,8 +190,8 @@
     <string name="webTrackingProtectionActivityTitle">Ochrana před sledováním na webu</string>
     <string name="webTrackingProtectionLearnMoreTitle">Ochrana před sledováním na webu</string>
     <string name="webTrackingProtectionTitle">Ochrana před sledováním na webu</string>
+    <string name="webTrackingProtectionDescriptionNew"><![CDATA[DuckDuckGo automaticky blokuje skryté trackery při procházení webu.\n<a href=\"\">Další informace</a>]]></string>
     <string name="webTrackingProtectionExplanationDescription"><![CDATA[Prohlížeč DuckDuckGo poskytuje ochranu proti sledování, která je neustále zapnutá.\n<a href=\"\">Další informace</a>]]></string>
-    <string name="webTrackingProtectionExplanationAlternativeDescription"><![CDATA[Prohlížeč DuckDuckGo chrání před sledováním a pomáhá tak udržovat tvoje data na webu v bezpečí.\n<a href=\"\">Další informace</a>]]></string>
     <string name="webTrackingProtectionExplanationTitle">Jak tě chráníme</string>
     <string name="webTrackingProtectionThirdPartyTrackersTitle">Blokuje trackery třetích stran</string>
     <string name="webTrackingProtectionThirdPartyTrackersDescription">Pomáhá blokovat cookies třetích stran, které se tě snaží sledovat napříč různými weby tím, že brání načítání trackerů třetích stran.</string>
