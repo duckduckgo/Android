@@ -215,6 +215,7 @@
             android:name="com.duckduckgo.app.systemsearch.SystemSearchActivity"
             android:autoRemoveFromRecents="true"
             android:documentLaunchMode="intoExisting"
+            android:windowSoftInputMode="adjustResize"
             android:exported="true"
             android:label="@string/appName"
             android:launchMode="singleTask"

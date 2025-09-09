@@ -23,6 +23,7 @@ import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.browser.defaultbrowsing.prompts.ui.experiment.OnboardingHomeScreenWidgetExperiment
 import com.duckduckgo.app.browser.newtab.FavoritesQuickAccessAdapter
+import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.onboarding.store.AppStage
 import com.duckduckgo.app.onboarding.store.UserStageStore
@@ -68,6 +69,7 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import logcat.LogPriority.WARN
@@ -143,6 +145,8 @@ class SystemSearchViewModel @Inject constructor(
 
     private var appsJob: Job? = null
 
+    private var omnibarPosition: OmnibarPosition = appSettingsPreferencesStore.omnibarPosition
+
     init {
         resetViewState()
         configureResults()
@@ -172,6 +176,7 @@ class SystemSearchViewModel @Inject constructor(
             resetOnboardingState()
         }
         resetResultsState()
+        resultsStateFlow.update { "" }
     }
 
     private suspend fun resetOnboardingState() {
@@ -214,6 +219,13 @@ class SystemSearchViewModel @Inject constructor(
             SystemSearchResult(autocompleteResult, appsResult)
         }
     }
+
+    fun onOmnibarConfigured(position: OmnibarPosition) {
+        omnibarPosition = position
+    }
+
+    val hasOmnibarPositionChanged: Boolean
+        get() = omnibarPosition != appSettingsPreferencesStore.omnibarPosition
 
     fun userTappedOnboardingToggle() {
         onboardingViewState.value = currentOnboardingState().copy(expanded = !currentOnboardingState().expanded)
