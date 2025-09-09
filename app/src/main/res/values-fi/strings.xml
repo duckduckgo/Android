@@ -188,8 +188,8 @@
     <string name="webTrackingProtectionActivityTitle">Verkkoseurannan suojaus</string>
     <string name="webTrackingProtectionLearnMoreTitle">Verkkoseurannan suojaus</string>
     <string name="webTrackingProtectionTitle">Verkkoseurannan suojaus</string>
+    <string name="webTrackingProtectionDescriptionNew"><![CDATA[DuckDuckGo estää automaattisesti piilotetut jäljittäjät, kun selaat verkkoa.\n<a href=\"\">Lue lisää</a>]]></string>
     <string name="webTrackingProtectionExplanationDescription"><![CDATA[DuckDuckGo-selain tarjoaa aina käytössä olevan seurantasuojauksen.\n<a href=\"\">Lue lisää</a>]]></string>
-    <string name="webTrackingProtectionExplanationAlternativeDescription"><![CDATA[DuckDuckGo-selain tarjoaa seurantasuojausta, joka auttaa pitämään tietosi turvassa selaillessasi.\n<a href=\"\">Lue lisää</a>]]></string>
     <string name="webTrackingProtectionExplanationTitle">Näin suojaamme sinua</string>
     <string name="webTrackingProtectionThirdPartyTrackersTitle">Estää kolmannen osapuolen seuraimet</string>
     <string name="webTrackingProtectionThirdPartyTrackersDescription">Auttaa estämään kolmannen osapuolen evästeitä, jotka seuraavat sinua sivustolta toiselle, estämällä kolmannen osapuolen seurantatoimintoja latautumasta.</string>

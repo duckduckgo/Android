@@ -188,8 +188,8 @@
     <string name="webTrackingProtectionActivityTitle">Protezione dal tracciamento web</string>
     <string name="webTrackingProtectionLearnMoreTitle">Protezione dal tracciamento web</string>
     <string name="webTrackingProtectionTitle">Protezione dal tracciamento web</string>
+    <string name="webTrackingProtectionDescriptionNew"><![CDATA[DuckDuckGo blocca automaticamente i sistemi di tracciamento nascosti mentre navighi sul web.\n<a href=\"\">Ulteriori informazioni</a>]]></string>
     <string name="webTrackingProtectionExplanationDescription"><![CDATA[Il browser DuckDuckGo fornisce protezioni dal tracciamento, che sono sempre attive.\n<a href=\"\">Ulteriori informazioni</a>]]></string>
-    <string name="webTrackingProtectionExplanationAlternativeDescription"><![CDATA[Il browser DuckDuckGo fornisce protezioni dal tracciamento che contribuiscono a mantenere i dati al sicuro durante la navigazione.\n<a href=\"\">Ulteriori informazioni</a>]]></string>
     <string name="webTrackingProtectionExplanationTitle">Come proteggiamo</string>
     <string name="webTrackingProtectionThirdPartyTrackersTitle">Blocca i sistemi di tracciamento di terze parti</string>
     <string name="webTrackingProtectionThirdPartyTrackersDescription">Aiuta a bloccare i cookie di terze parti che ti tracciano da un sito all\'altro, impedendo il caricamento dei sistemi di tracciamento di terze parti fin dall\'inizio.</string>

@@ -188,8 +188,8 @@
     <string name="webTrackingProtectionActivityTitle">Защита от проследяване в мрежата</string>
     <string name="webTrackingProtectionLearnMoreTitle">Защита от проследяване в мрежата</string>
     <string name="webTrackingProtectionTitle">Защита от проследяване в мрежата</string>
+    <string name="webTrackingProtectionDescriptionNew"><![CDATA[DuckDuckGo автоматично блокира скритите тракери, докато сърфирате в мрежата.\n<a href=\"\">Научете повече</a>]]></string>
     <string name="webTrackingProtectionExplanationDescription"><![CDATA[Браузърът DuckDuckGo предоставя защити от проследяване, които винаги са активни.\n<a href=\"\">Научете повече</a>]]></string>
-    <string name="webTrackingProtectionExplanationAlternativeDescription"><![CDATA[Браузърът DuckDuckGo предоставя защита от проследяване, която помага да запазиш данните си в безопасност, докато сърфираш.\n<a href=\"\">Научи повече</a>]]></string>
     <string name="webTrackingProtectionExplanationTitle">Как защитаваме теб</string>
     <string name="webTrackingProtectionThirdPartyTrackersTitle">Блокира тракерите на трети страни</string>
     <string name="webTrackingProtectionThirdPartyTrackersDescription">Помага да се блокират бисквитките на 3-ти страни, които ви проследяват от сайт на сайт, като предотвратява зареждането на тракери на 3-ти страни от самото начало.</string>

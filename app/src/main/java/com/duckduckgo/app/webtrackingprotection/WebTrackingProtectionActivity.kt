@@ -24,6 +24,8 @@ import android.text.method.LinkMovementMethod
 import android.text.style.ClickableSpan
 import android.text.style.URLSpan
 import android.view.View
+import androidx.annotation.StringRes
+import androidx.core.view.isVisible
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
@@ -36,6 +38,7 @@ import com.duckduckgo.app.globalprivacycontrol.ui.GlobalPrivacyControlActivity
 import com.duckduckgo.app.privacy.ui.AllowListActivity
 import com.duckduckgo.app.webtrackingprotection.WebTrackingProtectionViewModel.Command
 import com.duckduckgo.app.webtrackingprotection.list.FeatureGridAdapter
+import com.duckduckgo.app.webtrackingprotection.list.FeatureGridItem
 import com.duckduckgo.browser.api.ui.BrowserScreens.WebViewActivityWithParams
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.view.getColorFromAttr
@@ -54,6 +57,9 @@ class WebTrackingProtectionActivity : DuckDuckGoActivity() {
 
     @Inject
     lateinit var globalActivityStarter: GlobalActivityStarter
+
+    @Inject
+    lateinit var webTrackingProtectionsGridFeature: WebTrackingProtectionsGridFeature
 
     private val viewModel: WebTrackingProtectionViewModel by bindViewModel()
     private val binding: ActivityWebTrackingProtectionBinding by viewBinding()
@@ -90,9 +96,13 @@ class WebTrackingProtectionActivity : DuckDuckGoActivity() {
     }
 
     private fun configureClickableLink() {
-        val htmlGPCText = getString(
-            R.string.webTrackingProtectionExplanationDescription,
-        ).html(this)
+        @StringRes val descriptionStringRes = if (webTrackingProtectionsGridFeature.self().isEnabled()) {
+            R.string.webTrackingProtectionExplanationDescription
+        } else {
+            R.string.webTrackingProtectionDescriptionNew
+        }
+
+        val htmlGPCText = getString(descriptionStringRes).html(this)
         val gpcSpannableString = SpannableStringBuilder(htmlGPCText)
         val urlSpans = htmlGPCText.getSpans(0, htmlGPCText.length, URLSpan::class.java)
         urlSpans?.forEach {
@@ -115,6 +125,14 @@ class WebTrackingProtectionActivity : DuckDuckGoActivity() {
     }
 
     private fun configureGridList() {
+        if (!webTrackingProtectionsGridFeature.self().isEnabled()) {
+            return
+        }
+
+        binding.protectionsListDivider.isVisible = true
+        binding.protectionsTitle.isVisible = true
+        binding.protectionsList.isVisible = true
+
         val columnCount = resources.getInteger(R.integer.web_tracking_protection_grid_column_count)
         val layoutManager = StaggeredGridLayoutManager(columnCount, StaggeredGridLayoutManager.VERTICAL)
         binding.protectionsList.layoutManager = layoutManager
@@ -127,7 +145,7 @@ class WebTrackingProtectionActivity : DuckDuckGoActivity() {
             .flowWithLifecycle(lifecycle, Lifecycle.State.RESUMED)
             .onEach { viewState ->
                 setGlobalPrivacyControlSetting(viewState.globalPrivacyControlEnabled)
-                gridAdapter.submitList(viewState.protectionItems)
+                updateProtectionsGridList(viewState.protectionItems)
             }.launchIn(lifecycleScope)
 
         viewModel.commands()
@@ -171,5 +189,13 @@ class WebTrackingProtectionActivity : DuckDuckGoActivity() {
     private fun launchGlobalPrivacyControl() {
         val options = ActivityOptions.makeSceneTransitionAnimation(this).toBundle()
         startActivity(GlobalPrivacyControlActivity.intent(this), options)
+    }
+
+    private fun updateProtectionsGridList(protectionItems: List<FeatureGridItem>) {
+        if (!webTrackingProtectionsGridFeature.self().isEnabled()) {
+            return
+        }
+
+        gridAdapter.submitList(protectionItems)
     }
 }
