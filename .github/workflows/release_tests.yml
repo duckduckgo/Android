@@ -9,7 +9,6 @@ on:
       test-tag:
         description: 'Maestro Tests tag to include'
         required: true
-        default: 'releaseTest'
 
   workflow_dispatch:
     inputs:

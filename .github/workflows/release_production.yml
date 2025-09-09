@@ -29,9 +29,9 @@ jobs:
   trigger-release-tests:
     name: Trigger Run Release Tests
     uses: ./.github/workflows/release_tests.yml
-    needs: trigger-asana-tag-creation
+    needs: trigger-tag-creation
     with:
-      ref: ${{ github.event.inputs.app-version }}
+      app-version: ${{ github.event.inputs.app-version }}
       test-tag: 'releaseTest'
 
   trigger-upload-play-store-github:
