@@ -26,6 +26,6 @@ import com.duckduckgo.feature.toggles.api.Toggle.DefaultFeatureValue
     featureName = "webTrackingProtectionsGrid",
 )
 interface WebTrackingProtectionsGridFeature {
-    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
+    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun self(): Toggle
 }
