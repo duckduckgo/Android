@@ -854,11 +854,6 @@
     <string name="newTabPageDefaultBrowserMessagePrimaryCta" instruction="This text appears on a button">Varsayılan Olarak Ayarla</string>
     <string name="newTabPageDefaultBrowserMessageSecondaryCta" instruction="This text appears on a button">Bir Daha Sorma</string>
 
-    <!--TabSwitcher Animation Tile Dialog-->
-    <string name="tabSwitcherAnimationTileRemovalDialogTitle">DuckDuckGo, gezinmenizi korumak için izleyicileri engeller</string>
-    <string name="tabSwitcherAnimationTileRemovalDialogBody">Sekmelerinizi ve verilerinizi temizlemek, izleyici engelleme geçmişinizi silecek ve bu sayıyı sıfırlayacaktır.\n\nSekmeler görünümünde görmemeyi tercih ediyorsanız bu başlığı gizleyin.</string>
-    <string name="tabSwitcherAnimationTileRemovalDialogNegativeButton">Banner\'ı Gizle</string>
-
     <!-- Threat protection -->
     <string name="maliciousSiteTitle">Uyarı: Bu site bir güvenlik riski oluşturabilir</string>
     <string name="maliciousSiteMalwareHeadline"><![CDATA[Cihazınızı tehlikeye atmak veya kişisel bilgilerinizi çalmak için tasarlanmış kötü amaçlı yazılım dağıtıyor olabileceğinden, DuckDuckGo bu sayfayı engelledi. <a href=\"\">Daha fazla bilgi</a>]]></string>
@@ -922,5 +917,12 @@
     <string name="onboardingPrivacyProDaxDialogDescriptionRebranding"><![CDATA[DuckDuckGo\'nun ayrıca güvenli bir <b>VPN</b> ve <b>gelişmiş, gizli yapay zeka</b> içeren <b>isteğe bağlı ücretli bir aboneliği</b> var.]]></string>
     <string name="settingsDuckAiRebranding">AI Özellikleri</string>
     <string name="settingsDuckAi">Duck.ai</string>
+
+    <!--TabSwitcher Trackers Animation-->
+    <string name="showTrackerCountInTabSwitcher">Sekme Değiştiricide İzleyici sayısını göster</string>
+    <string name="tabSwitcherAnimationTileRemovalDialogTitle" instruction="A title for a dialog that shows when a user clicks a tile that shows them their current blocked tracker count">İzleyici Sayısı Gizlensin mi?</string>
+    <string name="tabSwitcherAnimationTileRemovalDialogBody" instruction="A message for a dialog that shows when a user clicks a tile that shows them their current blocked tracker count">Bunu Ayarlar &gt; Görünüm\'den tekrar açabilirsiniz.</string>
+    <string name="tabSwitcherAnimationTileRemovalDialogPositiveButton">Gizle</string>
+    <string name="tabSwitcherAnimationTileRemovalDialogNegativeButton">Gizleme</string>
 
 </resources>

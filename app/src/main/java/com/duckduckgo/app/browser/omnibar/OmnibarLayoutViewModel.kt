@@ -43,7 +43,6 @@ import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.LeadingIconStat
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.LeadingIconState.Globe
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.LeadingIconState.PrivacyShield
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.LeadingIconState.Search
-import com.duckduckgo.app.browser.senseofprotection.SenseOfProtectionExperiment
 import com.duckduckgo.app.browser.viewstate.HighlightableButton
 import com.duckduckgo.app.browser.viewstate.LoadingViewState
 import com.duckduckgo.app.browser.viewstate.OmnibarViewState
@@ -97,7 +96,6 @@ class OmnibarLayoutViewModel @Inject constructor(
     private val userBrowserProperties: UserBrowserProperties,
     private val dispatcherProvider: DispatcherProvider,
     private val additionalDefaultBrowserPrompts: AdditionalDefaultBrowserPrompts,
-    private val senseOfProtectionExperiment: SenseOfProtectionExperiment,
     private val duckChat: DuckChat,
     private val duckAiFeatureState: DuckAiFeatureState,
     private val addressDisplayFormatter: AddressDisplayFormatter,
@@ -580,7 +578,7 @@ class OmnibarLayoutViewModel @Inject constructor(
                 showVoiceSearch = shouldShowVoiceSearch(
                     hasFocus = hasFocus,
                     query = query,
-                    hasQueryChanged = true,
+                    hasQueryChanged = query != updatedQuery,
                     urlLoaded = _viewState.value.url,
                 ),
             )

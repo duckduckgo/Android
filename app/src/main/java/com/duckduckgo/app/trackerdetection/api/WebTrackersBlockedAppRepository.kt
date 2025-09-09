@@ -45,7 +45,6 @@ class WebTrackersBlockedAppRepository @Inject constructor(appDatabase: AppDataba
         dao.deleteAll()
     }
 
-    // TODO move to public API if experiment kept
     suspend fun getTrackerCountForLast7Days(): Int {
         return getTrackersCountBetween(
             startTime = LocalDateTime.now().minusDays(7),

@@ -20,10 +20,13 @@ import android.net.Uri
 import androidx.annotation.VisibleForTesting
 import androidx.core.net.toUri
 import com.duckduckgo.app.autocomplete.AutocompleteTabsFeature
+import com.duckduckgo.app.autocomplete.impl.AutoCompletePixelNames
 import com.duckduckgo.app.autocomplete.impl.AutoCompleteRepository
 import com.duckduckgo.app.browser.UriString
 import com.duckduckgo.app.onboarding.store.AppStage
 import com.duckduckgo.app.onboarding.store.UserStageStore
+import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.browser.api.autocomplete.AutoComplete
@@ -40,6 +43,7 @@ import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggesti
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion.AutoCompleteUrlSuggestion.AutoCompleteSwitchToTabSuggestion
 import com.duckduckgo.common.utils.AppUrl
 import com.duckduckgo.common.utils.AppUrl.Url
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.UrlScheme
 import com.duckduckgo.common.utils.baseHost
 import com.duckduckgo.common.utils.toStringDropScheme
@@ -62,6 +66,7 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.withContext
 
 const val maximumNumberOfSuggestions = 12
 const val maximumNumberOfTopHits = 2
@@ -78,6 +83,9 @@ class AutoCompleteApi @Inject constructor(
     private val userStageStore: UserStageStore,
     private val autocompleteTabsFeature: AutocompleteTabsFeature,
     private val duckChat: DuckChat,
+    private val history: NavigationHistory,
+    private val dispatchers: DispatcherProvider,
+    private val pixel: Pixel,
 ) : AutoComplete {
 
     private var isAutocompleteTabsFeatureEnabled: Boolean? = null
@@ -227,6 +235,68 @@ class AutoCompleteApi @Inject constructor(
 
     override suspend fun submitUserSeenHistoryIAM() {
         autoCompleteRepository.submitUserSeenHistoryIAM()
+    }
+
+    override suspend fun fireAutocompletePixel(
+        suggestions: List<AutoCompleteSuggestion>,
+        suggestion: AutoCompleteSuggestion,
+        experimentalInputScreen: Boolean,
+    ) {
+        val hasBookmarks = withContext(dispatchers.io()) {
+            savedSitesRepository.hasBookmarks()
+        }
+        val hasFavorites = withContext(dispatchers.io()) {
+            savedSitesRepository.hasFavorites()
+        }
+        val hasHistory = withContext(dispatchers.io()) {
+            history.hasHistory()
+        }
+        val hasTabs = withContext(dispatchers.io()) {
+            (tabRepository.liveTabs.value?.size ?: 0) > 1
+        }
+
+        val hasBookmarkResults = suggestions.any { it is AutoCompleteBookmarkSuggestion && !it.isFavorite }
+        val hasFavoriteResults = suggestions.any { it is AutoCompleteBookmarkSuggestion && it.isFavorite }
+        val hasHistoryResults = suggestions.any { it is AutoCompleteHistorySuggestion || it is AutoCompleteHistorySearchSuggestion }
+        val hasSwitchToTabResults = suggestions.any { it is AutoCompleteSwitchToTabSuggestion }
+        val params = mapOf(
+            PixelParameter.SHOWED_BOOKMARKS to hasBookmarkResults.toString(),
+            PixelParameter.SHOWED_FAVORITES to hasFavoriteResults.toString(),
+            PixelParameter.BOOKMARK_CAPABLE to hasBookmarks.toString(),
+            PixelParameter.FAVORITE_CAPABLE to hasFavorites.toString(),
+            PixelParameter.HISTORY_CAPABLE to hasHistory.toString(),
+            PixelParameter.SHOWED_HISTORY to hasHistoryResults.toString(),
+            PixelParameter.SWITCH_TO_TAB_CAPABLE to hasTabs.toString(),
+            PixelParameter.SHOWED_SWITCH_TO_TAB to hasSwitchToTabResults.toString(),
+        )
+        val pixelName = when (suggestion) {
+            is AutoCompleteBookmarkSuggestion -> {
+                if (suggestion.isFavorite) {
+                    AutoCompletePixelNames.AUTOCOMPLETE_FAVORITE_SELECTION
+                } else {
+                    AutoCompletePixelNames.AUTOCOMPLETE_BOOKMARK_SELECTION
+                }
+            }
+
+            is AutoCompleteSearchSuggestion -> if (suggestion.isUrl) {
+                AutoCompletePixelNames.AUTOCOMPLETE_SEARCH_WEBSITE_SELECTION
+            } else {
+                AutoCompletePixelNames.AUTOCOMPLETE_SEARCH_PHRASE_SELECTION
+            }
+
+            is AutoCompleteHistorySuggestion -> AutoCompletePixelNames.AUTOCOMPLETE_HISTORY_SITE_SELECTION
+            is AutoCompleteHistorySearchSuggestion -> AutoCompletePixelNames.AUTOCOMPLETE_HISTORY_SEARCH_SELECTION
+            is AutoCompleteSwitchToTabSuggestion -> AutoCompletePixelNames.AUTOCOMPLETE_SWITCH_TO_TAB_SELECTION
+            is AutoCompleteSuggestion.AutoCompleteDuckAIPrompt -> if (experimentalInputScreen) {
+                AutoCompletePixelNames.AUTOCOMPLETE_DUCKAI_PROMPT_EXPERIMENTAL_SELECTION
+            } else {
+                AutoCompletePixelNames.AUTOCOMPLETE_DUCKAI_PROMPT_LEGACY_SELECTION
+            }
+
+            else -> return
+        }
+
+        pixel.fire(pixelName, params)
     }
 
     private fun isAllowedInTopHits(entry: HistoryEntry): Boolean {
