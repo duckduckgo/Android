@@ -23,7 +23,6 @@ import android.os.Build
 import android.os.Bundle
 import android.text.Editable
 import android.text.Spanned
-import android.view.Gravity
 import android.view.KeyEvent
 import android.view.View
 import android.view.inputmethod.EditorInfo
@@ -177,6 +176,11 @@ class SystemSearchActivity : DuckDuckGoActivity() {
             return if (settingsDataStore.omnibarPosition == OmnibarPosition.TOP) binding.logo else binding.logoBottom
         }
 
+    private val duckAi: ImageView
+        get() {
+            return if (settingsDataStore.omnibarPosition == OmnibarPosition.TOP) binding.aiChatIconMenu else binding.aiChatIconMenuBottom
+        }
+
     private val textChangeWatcher = object : TextChangedWatcher() {
         override fun afterTextChanged(editable: Editable) {
             showOmnibar()
@@ -201,6 +205,7 @@ class SystemSearchActivity : DuckDuckGoActivity() {
         configureTextInput()
         configureQuickAccessGrid()
         configureVoiceSearch()
+        configureDuckAi()
 
         if (savedInstanceState == null) {
             intent?.let {
@@ -405,6 +410,12 @@ class SystemSearchActivity : DuckDuckGoActivity() {
         }
     }
 
+    fun configureDuckAi() {
+        duckAi.setOnClickListener {
+            viewModel.onDuckAiRequested(omnibarTextInput.text.toString())
+        }
+    }
+
     private fun updateVoiceSearchVisibility() {
         val searchQuery = omnibarTextInput.text.toString()
         voiceSearch.isVisible =
@@ -459,11 +470,9 @@ class SystemSearchActivity : DuckDuckGoActivity() {
         }
         deviceAppSuggestionsAdapter.updateData(viewState.appResults)
 
-        if (viewState.autocompleteResults.suggestions.isEmpty() && viewState.appResults.isEmpty()) {
-            binding.results.gone()
-        } else {
-            binding.results.show()
-        }
+        binding.autocompleteSuggestions.isVisible = !viewState.autocompleteResults.suggestions.isEmpty()
+        binding.deviceLabel.isVisible = !viewState.appResults.isEmpty()
+        binding.deviceAppSuggestions.isVisible = !viewState.appResults.isEmpty()
     }
 
     private fun renderQuickAccessItems(it: SystemSearchViewModel.Suggestions.QuickAccessItems) {
@@ -533,6 +542,8 @@ class SystemSearchActivity : DuckDuckGoActivity() {
             }
 
             AutocompleteItemRemoved -> autocompleteItemRemoved()
+
+            SystemSearchViewModel.Command.ExitSearch -> finish()
         }
     }
 

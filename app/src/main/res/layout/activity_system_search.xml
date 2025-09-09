@@ -129,9 +129,7 @@
                                     android:layout_height="match_parent"
                                     android:layout_marginEnd="@dimen/keyline_0"
                                     android:minWidth="8dp"
-                                    app:layout_constraintBottom_toBottomOf="parent"
-                                    app:layout_constraintEnd_toEndOf="parent"
-                                    app:layout_constraintTop_toTopOf="parent">
+                                    app:layout_constraintEnd_toEndOf="parent">
 
                                     <ImageView
                                         android:id="@+id/clearTextButton"
@@ -141,7 +139,7 @@
                                         android:contentDescription="@string/clearButtonContentDescription"
                                         android:scaleType="center"
                                         android:src="@drawable/ic_close_circle_small_secondary_24"
-                                        android:visibility="invisible"
+                                        android:visibility="gone"
                                         app:layout_constraintBottom_toBottomOf="parent"
                                         app:layout_constraintEnd_toStartOf="@id/voiceSearchButton"
                                         app:layout_constraintTop_toTopOf="parent"
@@ -154,10 +152,38 @@
                                         android:background="@drawable/selectable_item_experimental_background"
                                         android:contentDescription="@string/voiceSearchIconContentDescription"
                                         android:scaleType="center"
+                                        android:visibility="gone"
+                                        app:layout_constraintBottom_toBottomOf="parent"
+                                        app:layout_constraintEnd_toStartOf="@id/verticalDivider"
+                                        app:layout_constraintTop_toTopOf="parent"
                                         app:srcCompat="@drawable/ic_microphone_24"
+                                        tools:visibility="visible" />
+
+                                    <View
+                                        android:id="@+id/verticalDivider"
+                                        android:layout_width="1dp"
+                                        android:layout_height="20dp"
+                                        android:layout_marginHorizontal="2dp"
+                                        android:background="?daxColorLines"
+                                        android:importantForAccessibility="no"
+                                        app:layout_constraintBottom_toBottomOf="parent"
+                                        app:layout_constraintEnd_toStartOf="@id/aiChatIconMenu"
+                                        app:layout_constraintTop_toTopOf="parent"
+                                        tools:ignore="MissingVerticalDivider" />
+
+                                    <ImageView
+                                        android:id="@+id/aiChatIconMenu"
+                                        android:layout_width="@dimen/toolbarIcon"
+                                        android:layout_height="@dimen/toolbarIcon"
+                                        android:layout_gravity="center"
+                                        android:background="@drawable/selectable_item_experimental_background"
+                                        android:contentDescription="@string/browserPopupMenu"
+                                        android:scaleType="center"
+                                        android:src="@drawable/ic_ai_chat_24"
                                         app:layout_constraintBottom_toBottomOf="parent"
                                         app:layout_constraintEnd_toEndOf="parent"
-                                        app:layout_constraintTop_toTopOf="parent" />
+                                        app:layout_constraintTop_toTopOf="parent"
+                                        tools:visibility="visible" />
 
                                 </androidx.constraintlayout.widget.ConstraintLayout>
                             </androidx.constraintlayout.widget.ConstraintLayout>
@@ -347,9 +373,7 @@
                                     android:layout_height="match_parent"
                                     android:layout_marginEnd="@dimen/keyline_0"
                                     android:minWidth="8dp"
-                                    app:layout_constraintBottom_toBottomOf="parent"
-                                    app:layout_constraintEnd_toEndOf="parent"
-                                    app:layout_constraintTop_toTopOf="parent">
+                                    app:layout_constraintEnd_toEndOf="parent">
 
                                     <ImageView
                                         android:id="@+id/clearTextButtonBottom"
@@ -359,7 +383,7 @@
                                         android:contentDescription="@string/clearButtonContentDescription"
                                         android:scaleType="center"
                                         android:src="@drawable/ic_close_circle_small_secondary_24"
-                                        android:visibility="invisible"
+                                        android:visibility="gone"
                                         app:layout_constraintBottom_toBottomOf="parent"
                                         app:layout_constraintEnd_toStartOf="@id/voiceSearchButtonBottom"
                                         app:layout_constraintTop_toTopOf="parent"
@@ -372,10 +396,38 @@
                                         android:background="@drawable/selectable_item_experimental_background"
                                         android:contentDescription="@string/voiceSearchIconContentDescription"
                                         android:scaleType="center"
+                                        android:visibility="gone"
+                                        app:layout_constraintBottom_toBottomOf="parent"
+                                        app:layout_constraintEnd_toStartOf="@id/verticalDividerBottom"
+                                        app:layout_constraintTop_toTopOf="parent"
                                         app:srcCompat="@drawable/ic_microphone_24"
+                                        tools:visibility="visible" />
+
+                                    <View
+                                        android:id="@+id/verticalDividerBottom"
+                                        android:layout_width="1dp"
+                                        android:layout_height="20dp"
+                                        android:layout_marginHorizontal="2dp"
+                                        android:background="?daxColorLines"
+                                        android:importantForAccessibility="no"
+                                        app:layout_constraintBottom_toBottomOf="parent"
+                                        app:layout_constraintEnd_toStartOf="@id/aiChatIconMenuBottom"
+                                        app:layout_constraintTop_toTopOf="parent"
+                                        tools:ignore="MissingVerticalDivider" />
+
+                                    <ImageView
+                                        android:id="@+id/aiChatIconMenuBottom"
+                                        android:layout_width="@dimen/toolbarIcon"
+                                        android:layout_height="@dimen/toolbarIcon"
+                                        android:layout_gravity="center"
+                                        android:background="@drawable/selectable_item_experimental_background"
+                                        android:contentDescription="@string/browserPopupMenu"
+                                        android:scaleType="center"
+                                        android:src="@drawable/ic_ai_chat_24"
                                         app:layout_constraintBottom_toBottomOf="parent"
                                         app:layout_constraintEnd_toEndOf="parent"
-                                        app:layout_constraintTop_toTopOf="parent" />
+                                        app:layout_constraintTop_toTopOf="parent"
+                                        tools:visibility="visible" />
 
                                 </androidx.constraintlayout.widget.ConstraintLayout>
                             </androidx.constraintlayout.widget.ConstraintLayout>

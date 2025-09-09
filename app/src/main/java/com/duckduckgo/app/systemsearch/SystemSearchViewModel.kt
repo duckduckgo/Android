@@ -46,6 +46,7 @@ import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.SingleLiveEvent
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.history.api.NavigationHistory
 import com.duckduckgo.savedsites.api.SavedSitesRepository
 import com.duckduckgo.savedsites.api.models.SavedSite
@@ -83,6 +84,7 @@ data class SystemSearchResult(
 
 @ContributesViewModel(ActivityScope::class)
 class SystemSearchViewModel @Inject constructor(
+    private val duckChat: DuckChat,
     private var userStageStore: UserStageStore,
     private val autoComplete: AutoComplete,
     private val deviceAppLookup: DeviceAppLookup,
@@ -126,6 +128,7 @@ class SystemSearchViewModel @Inject constructor(
         data object UpdateVoiceSearch : Command()
         data class ShowRemoveSearchSuggestionDialog(val suggestion: AutoCompleteSuggestion) : Command()
         data object AutocompleteItemRemoved : Command()
+        data object ExitSearch : Command()
     }
 
     val onboardingViewState: MutableLiveData<OnboardingViewState> = MutableLiveData()
@@ -249,6 +252,11 @@ class SystemSearchViewModel @Inject constructor(
         command.value = Command.EditQuery(query)
     }
 
+    fun onDuckAiRequested(query: String) {
+        duckChat.openDuckChatWithAutoPrompt(query)
+        command.value = Command.ExitSearch
+    }
+
     fun userUpdatedQuery(query: String) {
         appsJob?.cancel()
 
@@ -331,6 +339,9 @@ class SystemSearchViewModel @Inject constructor(
         when (suggestion) {
             is AutoCompleteSwitchToTabSuggestion -> {
                 command.value = Command.LaunchBrowserAndSwitchToTab(suggestion.phrase, suggestion.tabId)
+            }
+            is AutoCompleteSuggestion.AutoCompleteDuckAIPrompt -> {
+                onDuckAiRequested(suggestion.phrase)
             }
             else -> {
                 command.value = Command.LaunchBrowser(suggestion.phrase)
