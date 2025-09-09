@@ -142,20 +142,21 @@ class NewAddressBarOptionBottomSheetDialog(
         lottieView.repeatCount = 0
         lottieView.playAnimation()
 
-        lottieView.addAnimatorListener(object : Animator.AnimatorListener {
-            override fun onAnimationStart(animation: Animator) {}
+        lottieView.addAnimatorListener(
+            object : Animator.AnimatorListener {
+                override fun onAnimationStart(animation: Animator) {}
 
-            override fun onAnimationEnd(animation: Animator) {
-                lottieView.removeAnimatorListener(this)
+                override fun onAnimationEnd(animation: Animator) {
+                    lottieView.removeAnimatorListener(this)
 
-                lottieView.setMinAndMaxFrame(31, totalFrames - 1)
-                lottieView.repeatCount = LottieDrawable.INFINITE
-                lottieView.playAnimation()
-            }
+                    lottieView.setMinAndMaxFrame(31, totalFrames - 1)
+                    lottieView.repeatCount = LottieDrawable.INFINITE
+                    lottieView.playAnimation()
+                }
 
-            override fun onAnimationCancel(animation: Animator) {}
-            override fun onAnimationRepeat(animation: Animator) {}
-        },
+                override fun onAnimationCancel(animation: Animator) {}
+                override fun onAnimationRepeat(animation: Animator) {}
+            },
         )
     }
 
