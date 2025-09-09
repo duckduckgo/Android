@@ -530,7 +530,7 @@
     ]
   );
   var platformSupport = {
-    apple: ["webCompat", "duckPlayerNative", ...baseFeatures, "duckAiListener"],
+    apple: ["webCompat", "duckPlayerNative", ...baseFeatures, "duckAiListener", "pageContext"],
     "apple-isolated": [
       "duckPlayer",
       "duckPlayerNative",
@@ -538,8 +538,7 @@
       "performanceMetrics",
       "clickToLoad",
       "messageBridge",
-      "favicon",
-      "pageContext"
+      "favicon"
     ],
     android: [...baseFeatures, "webCompat", "breakageReporting", "duckPlayer", "messageBridge"],
     "android-broker-protection": ["brokerProtection"],
@@ -564,7 +563,9 @@
       "brokerProtection",
       "breakageReporting",
       "messageBridge",
-      "webCompat"
+      "webCompat",
+      "pageContext",
+      "duckAiListener"
     ],
     firefox: ["cookie", ...baseFeatures, "clickToLoad"],
     chrome: ["cookie", ...baseFeatures, "clickToLoad"],
@@ -3524,6 +3525,40 @@
     get isDebug() {
       return this.args?.debug || false;
     }
+    get shouldLog() {
+      return this.isDebug;
+    }
+    /**
+     * Logging utility for this feature (Stolen some inspo from DuckPlayer logger, will unify in the future)
+     */
+    get log() {
+      const shouldLog = this.shouldLog;
+      const prefix = `${this.name.padEnd(20, " ")} |`;
+      return {
+        // These are getters to have the call site be the reported line number.
+        get info() {
+          if (!shouldLog) {
+            return () => {
+            };
+          }
+          return console.log.bind(console, prefix);
+        },
+        get warn() {
+          if (!shouldLog) {
+            return () => {
+            };
+          }
+          return console.warn.bind(console, prefix);
+        },
+        get error() {
+          if (!shouldLog) {
+            return () => {
+            };
+          }
+          return console.error.bind(console, prefix);
+        }
+      };
+    }
     get desktopModeEnabled() {
       return this.args?.desktopModeEnabled || false;
     }
@@ -5594,6 +5629,14 @@
       }
     });
     historyMethodProxy.overload();
+    const historyMethodProxyReplace = new DDGProxy(urlChangedInstance, History.prototype, "replaceState", {
+      apply(target, thisArg, args) {
+        const changeResult = DDGReflect.apply(target, thisArg, args);
+        handleURLChange("replace");
+        return changeResult;
+      }
+    });
+    historyMethodProxyReplace.overload();
     window.addEventListener("popstate", () => {
       handleURLChange("traverse");
     });
