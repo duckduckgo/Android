@@ -190,6 +190,28 @@
     <string name="webTrackingProtectionLearnMoreTitle">Tīmekļa izsekošanas aizsardzība</string>
     <string name="webTrackingProtectionTitle">Tīmekļa izsekošanas aizsardzība</string>
     <string name="webTrackingProtectionDescriptionNew"><![CDATA[DuckDuckGo automātiski bloķē slēptos izsekotājus tīmekļa pārlūkošanas laikā.\n<a href=\"\">Uzzināt vairāk</a>]]></string>
+    <string name="webTrackingProtectionExplanationDescription"><![CDATA[DuckDuckGo pārlūkprogramma nodrošina izsekošanas aizsardzības, kas vienmēr ir aktīvas.\n<a href=\"\">Uzzināt vairāk</a>]]></string>
+    <string name="webTrackingProtectionExplanationTitle">Kā mēs tevi aizsargājam</string>
+    <string name="webTrackingProtectionThirdPartyTrackersTitle">Bloķē trešo pušu izsekotājus</string>
+    <string name="webTrackingProtectionThirdPartyTrackersDescription">Palīdz bloķēt trešo pušu sīkfailus, kas izseko tevi no vietnes uz vietni un neļauj ielādēt trešo pušu izsekotājus.</string>
+    <string name="webTrackingProtectionTargetedAdsTitle">Bloķē mērķētas reklāmas</string>
+    <string name="webTrackingProtectionTargetedAdsDescription">Bloķē uzmācīgus izsekotājus, pirms tie tiek ielādēti, tādējādi efektīvi novēršot reklāmas, kas balstās uz izsekošanu.</string>
+    <string name="webTrackingProtectionFingerprintTrackingTitle">Novērš identificējošo ciparvirkņu izsekošanu</string>
+    <string name="webTrackingProtectionFingerprintTrackingDescription">Palīdz neļaut izsekošanas uzņēmumiem iegūt unikālus identifikatorus par tavu pārlūkprogrammu un ierīci, kurus viņi izmanto, lai sekotu tev tīmeklī.</string>
+    <string name="webTrackingProtectionLinkTrackingTitle">Bloķē saišu izsekošanu</string>
+    <string name="webTrackingProtectionLinkTrackingDescription">Noņem izsekošanas parametrus saitēs, lai trešās personas nevarētu izsekot tavai uzvedībai dažādās vietnēs.</string>
+    <string name="webTrackingProtectionReferrerTrackingTitle">Aizsargā pret novirzītāju izsekošanu</string>
+    <string name="webTrackingProtectionReferrerTrackingDescription">Palīdz neļaut uzņēmumiem identificēt tavu pēdējo apmeklēto vietni.</string>
+    <string name="webTrackingProtectionFirstPartyCookiesTitle">Atspējo pirmās puses sīkfailus</string>
+    <string name="webTrackingProtectionFirstPartyCookiesDescription">Pēc 30 dienām automātiski izbeidzas 1. puses sīkfaili, lai vietnes nevarētu tevi izsekot bezgalīgi, kad esi izrakstījies.</string>
+    <string name="webTrackingProtectionDnsCnameCloakingTitle">Aizsargā pret DNS CNAME maskēšanu</string>
+    <string name="webTrackingProtectionDnsCnameCloakingDescription">Palīdz bloķēt trešo pušu izsekotājus, kas mēģina maskēties tīmekļa vietnē, izmantojot DNS.</string>
+    <string name="webTrackingProtectionGoogleAmpTrackingTitle">Bloķē Google AMP izsekošanu</string>
+    <string name="webTrackingProtectionGoogleAmpTrackingDescription">Aizstāj Google AMP saites ar sākotnējā izdevēja vietni.</string>
+    <string name="webTrackingProtectionGoogleSigninPopupsTitle">Bloķē Google pieteikšanās uznirstošos logus</string>
+    <string name="webTrackingProtectionGoogleSigninPopupsDescription">Bloķē Google pierakstīšanās uznirstošos logus vietnēs, kas nepieder Google.</string>
+    <string name="webTrackingProtectionGlobalPrivacyControlTitle">Vispārēja privātuma pārvaldība</string>
+    <string name="webTrackingProtectionGlobalPrivacyControlDescription">Tavā vārdā pauž atteikšanās tiesības, liekot vietnēm nepārdot un nekopīgot tavu personisko informāciju.</string>
 
     <!-- Cookie Pop-Up Protection -->
     <string name="cookiePopupProtectionTitle">Sīkfailu uznirstošo logu aizsardzība</string>

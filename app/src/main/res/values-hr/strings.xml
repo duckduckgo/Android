@@ -191,6 +191,28 @@
     <string name="webTrackingProtectionLearnMoreTitle">Zaštita od praćenja na webu</string>
     <string name="webTrackingProtectionTitle">Zaštita od praćenja na webu</string>
     <string name="webTrackingProtectionDescriptionNew"><![CDATA[DuckDuckGo automatski blokira skrivene alate za praćenje dok \"surfaš\" po internetu.\n<a href=\"\">Saznaj više</a>]]></string>
+    <string name="webTrackingProtectionExplanationDescription"><![CDATA[Preglednik DuckDuckGo pruža zaštite od praćenja koje su uvijek aktivne.\n<a href=\"\">Saznaj više</a>]]></string>
+    <string name="webTrackingProtectionExplanationTitle">Kako te štitimo</string>
+    <string name="webTrackingProtectionThirdPartyTrackersTitle">Blokira alate za praćenje trećih strana</string>
+    <string name="webTrackingProtectionThirdPartyTrackersDescription">Pomaže u blokiranju kolačića trećih strana koji te prate od stranice do stranice sprječavanjem učitavanja alata za praćenje trećih strana.</string>
+    <string name="webTrackingProtectionTargetedAdsTitle">Blokira ciljane oglase</string>
+    <string name="webTrackingProtectionTargetedAdsDescription">Blokira invazivne alate za praćenje prije nego što se učitaju, učinkovito eliminirajući oglase koji se oslanjaju na praćenje.</string>
+    <string name="webTrackingProtectionFingerprintTrackingTitle">Sprječava praćenje otiska prsta</string>
+    <string name="webTrackingProtectionFingerprintTrackingDescription">Pomaže u sprječavanju tvrtki za praćenje da prikupe jedinstvene identifikatore o vašem pregledniku i uređaju, koje koriste za praćenje na internetu.</string>
+    <string name="webTrackingProtectionLinkTrackingTitle">Blokira praćenje poveznica</string>
+    <string name="webTrackingProtectionLinkTrackingDescription">Uklanja parametre praćenja u vezama kako bi se spriječilo da treće strane prate tvoje ponašanje na svim internetskim stranicama.</string>
+    <string name="webTrackingProtectionReferrerTrackingTitle">Štiti od praćenja izvora</string>
+    <string name="webTrackingProtectionReferrerTrackingDescription">Pomaže blokirati tvrtke u identificiranju posljednjeg web-mjesta koje si posjetio.</string>
+    <string name="webTrackingProtectionFirstPartyCookiesTitle">Istek kolačića prvih strana</string>
+    <string name="webTrackingProtectionFirstPartyCookiesDescription">Kolačići prve strane automatski istječu nakon 30 dana, čime se osigurava da vas web-mjesta ne mogu pratiti unedogled kada ste odjavljeni.</string>
+    <string name="webTrackingProtectionDnsCnameCloakingTitle">Štiti od prikrivanja DNS-a CNAME</string>
+    <string name="webTrackingProtectionDnsCnameCloakingDescription">Pomaže u blokiranju trećih strana koje se pokušavaju prikriti unutar web-mjesta pomoću DNS-a.</string>
+    <string name="webTrackingProtectionGoogleAmpTrackingTitle">Blokira Googleovo AMP praćenje</string>
+    <string name="webTrackingProtectionGoogleAmpTrackingDescription">Zamjenjuje Google AMP poveznice izvornom mrežnom lokacijom izdavača.</string>
+    <string name="webTrackingProtectionGoogleSigninPopupsTitle">Blokira Googleove skočne prozore za prijavu</string>
+    <string name="webTrackingProtectionGoogleSigninPopupsDescription">Blokira skočne prozore za prijavu na Google na internetskim stranicama koje Google ne posjeduje.</string>
+    <string name="webTrackingProtectionGlobalPrivacyControlTitle">Global Privacy Control</string>
+    <string name="webTrackingProtectionGlobalPrivacyControlDescription">Izražava prava na isključenje u tvoje ime, govoreći stranicama da ne prodaju i ne dijele tvoje osobne podatke.</string>
 
     <!-- Cookie Pop-Up Protection -->
     <string name="cookiePopupProtectionTitle">Zaštita od skočnih prozora kolačića</string>

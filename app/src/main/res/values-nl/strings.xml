@@ -189,6 +189,28 @@
     <string name="webTrackingProtectionLearnMoreTitle">Bescherming tegen webtracking</string>
     <string name="webTrackingProtectionTitle">Bescherming tegen webtracking</string>
     <string name="webTrackingProtectionDescriptionNew"><![CDATA[DuckDuckGo blokkeert automatisch verborgen trackers terwijl je op het web surft.\n<a href=\"\">Meer informatie</a>]]></string>
+    <string name="webTrackingProtectionExplanationDescription"><![CDATA[De DuckDuckGo-browser biedt bescherming tegen tracking die altijd actief is.\n<a href=\"\">Meer informatie</a>]]></string>
+    <string name="webTrackingProtectionExplanationTitle">Hoe wij je beschermen</string>
+    <string name="webTrackingProtectionThirdPartyTrackersTitle">Blokkeert trackers van derden</string>
+    <string name="webTrackingProtectionThirdPartyTrackersDescription">Helpt bij het blokkeren van cookies van derden die je op elke website volgen door te voorkomen dat trackers van derden überhaupt worden geladen.</string>
+    <string name="webTrackingProtectionTargetedAdsTitle">Blokkeert gerichte advertenties</string>
+    <string name="webTrackingProtectionTargetedAdsDescription">We blokkeren invasieve trackers voordat ze worden geladen. Zo elimineren we effectief advertenties die afhankelijk zijn van tracking.</string>
+    <string name="webTrackingProtectionFingerprintTrackingTitle">Voorkomt fingerprint tracking</string>
+    <string name="webTrackingProtectionFingerprintTrackingDescription">Helpt voorkomen dat trackingbedrijven unieke identificatiegegevens over je browser en apparaat verkrijgen, die ze gebruiken om je op het internet te volgen.</string>
+    <string name="webTrackingProtectionLinkTrackingTitle">Blokkeert het volgen van links</string>
+    <string name="webTrackingProtectionLinkTrackingDescription">Verwijdert trackingparameters in links om te voorkomen dat derden je gedrag op verschillende sites kunnen volgen.</string>
+    <string name="webTrackingProtectionReferrerTrackingTitle">Beschermt tegen referrer tracking</string>
+    <string name="webTrackingProtectionReferrerTrackingDescription">Helpt voorkomen dat bedrijven de laatst bezochte website kunnen identificeren.</string>
+    <string name="webTrackingProtectionFirstPartyCookiesTitle">Laat cookies van eerste partijen vervallen</string>
+    <string name="webTrackingProtectionFirstPartyCookiesDescription">Verlaat automatisch cookies van eerste partijen na 30 dagen, zodat sites je niet onbeperkt kunnen volgen als je bent uitgelogd.</string>
+    <string name="webTrackingProtectionDnsCnameCloakingTitle">Beschermt tegen DNS CNAME cloaking</string>
+    <string name="webTrackingProtectionDnsCnameCloakingDescription">Helpt bij het blokkeren van trackers van derden die zich proberen te vermommen binnen een website met behulp van DNS.</string>
+    <string name="webTrackingProtectionGoogleAmpTrackingTitle">Blokkeert Google\'s AMP-tracking</string>
+    <string name="webTrackingProtectionGoogleAmpTrackingDescription">Vervangt Google AMP-links door de site van de oorspronkelijke uitgever.</string>
+    <string name="webTrackingProtectionGoogleSigninPopupsTitle">Blokkeert de pop-ups voor aanmelden bij Google</string>
+    <string name="webTrackingProtectionGoogleSigninPopupsDescription">Blokkeert aanmeldingspop-ups van Google op sites die niet van Google zijn.</string>
+    <string name="webTrackingProtectionGlobalPrivacyControlTitle">Global Privacy Control (GPC)</string>
+    <string name="webTrackingProtectionGlobalPrivacyControlDescription">Kiest er namens jou voor om je af te melden door sites mee te delen je persoonlijke gegevens niet te verkopen of te delen.</string>
 
     <!-- Cookie Pop-Up Protection -->
     <string name="cookiePopupProtectionTitle">Bescherming tegen cookiepop-ups</string>

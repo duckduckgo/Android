@@ -191,6 +191,28 @@
     <string name="webTrackingProtectionLearnMoreTitle">Ochrana pred sledovaním webu</string>
     <string name="webTrackingProtectionTitle">Ochrana pred sledovaním webu</string>
     <string name="webTrackingProtectionDescriptionNew"><![CDATA[DuckDuckGo pri prehliadaní webu automaticky blokuje skryté sledovače.\n<a href=\"\">Zisti viac</a>]]></string>
+    <string name="webTrackingProtectionExplanationDescription"><![CDATA[Prehliadač DuckDuckGo poskytuje ochrany proti sledovaniu, ktoré sú vždy aktívne.\n<a href=\"\">Zisti viac</a>]]></string>
+    <string name="webTrackingProtectionExplanationTitle">Ako ťa chránime</string>
+    <string name="webTrackingProtectionThirdPartyTrackersTitle">Blokuje sledovanie tretích strán</string>
+    <string name="webTrackingProtectionThirdPartyTrackersDescription">Pomáha blokovať súbory cookie tretích strán, ktoré ťa sledujú naprieč lokalitami tým, že zabraňuje načítaniu sledovacích zariadení tretích strán už na začiatku.</string>
+    <string name="webTrackingProtectionTargetedAdsTitle">Blokuje cielené reklamy</string>
+    <string name="webTrackingProtectionTargetedAdsDescription">Blokuje invazívne sledovače skôr, než sa načítajú, čím efektívne eliminuje reklamy, ktoré sa spoliehajú na sledovanie.</string>
+    <string name="webTrackingProtectionFingerprintTrackingTitle">Zabraňuje sledovaniu odtlačkov prstov</string>
+    <string name="webTrackingProtectionFingerprintTrackingDescription">Pomáha zabrániť sledovacím spoločnostiam v získavaní jedinečných identifikátorov o tvojom prehliadači a zariadení, ktoré používajú na to, aby ťa sledovali na webe.</string>
+    <string name="webTrackingProtectionLinkTrackingTitle">Blokuje sledovanie odkazov</string>
+    <string name="webTrackingProtectionLinkTrackingDescription">Odstráni parametre sledovania v odkazoch, aby zabránil tretím stranám sledovať tvoje správanie na stránkach.</string>
+    <string name="webTrackingProtectionReferrerTrackingTitle">Chráni pred sledovaním odkazov</string>
+    <string name="webTrackingProtectionReferrerTrackingDescription">Pomáha firmám blokovať zistenie poslednej webovej stránky, ktorú ste navštívili.</string>
+    <string name="webTrackingProtectionFirstPartyCookiesTitle">Exspirácia súborov cookie prvej strany</string>
+    <string name="webTrackingProtectionFirstPartyCookiesDescription">Po 30 dňoch automaticky vyprší platnosť súborov cookie prvej strany, čím sa zabezpečí, že ťa weby nebudú po odhlásení sledovať bez časového obmedzenia.</string>
+    <string name="webTrackingProtectionDnsCnameCloakingTitle">Chráni pred maskovaním názvov DNS CNAME</string>
+    <string name="webTrackingProtectionDnsCnameCloakingDescription">Pomáha blokovať sledovacie programy tretích strán, ktoré sa snažia zamaskovať v rámci webovej lokality pomocou DNS.</string>
+    <string name="webTrackingProtectionGoogleAmpTrackingTitle">Blokuje sledovanie AMP spoločnosti Google</string>
+    <string name="webTrackingProtectionGoogleAmpTrackingDescription">Nahradí odkazy Google AMP webom pôvodného vydavateľa.</string>
+    <string name="webTrackingProtectionGoogleSigninPopupsTitle">Blokuje vyskakovacie okná na prihlásenie do služby Google</string>
+    <string name="webTrackingProtectionGoogleSigninPopupsDescription">Blokuje vyskakovacie okná pre prihlásenie pomocou Google na stránkach, ktoré spoločnosť Google nevlastní.</string>
+    <string name="webTrackingProtectionGlobalPrivacyControlTitle">Globálna kontrola súkromia</string>
+    <string name="webTrackingProtectionGlobalPrivacyControlDescription">Vyjadruje právo na explicitný nesúhlas vo vašom mene tým, že webovým lokalitám hovorí, aby nepredávali ani nezdieľali vaše osobné údaje.</string>
 
     <!-- Cookie Pop-Up Protection -->
     <string name="cookiePopupProtectionTitle">Ochrana proti automatickému otváraniu okien o súboroch cookie</string>
