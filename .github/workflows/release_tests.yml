@@ -6,7 +6,6 @@ on:
       app-version:
         description: 'App Version for Testing'
         required: true
-        default: 'PLACEHOLDER'
       test-tag:
         description: 'Maestro Tests tag to include'
         required: true

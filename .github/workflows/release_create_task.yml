@@ -6,7 +6,6 @@ on:
       app-version:
         description: 'App Version for Release'
         required: true
-        default: 'PLACEHOLDER'
   workflow_dispatch:
     inputs:
       app-version:
