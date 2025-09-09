@@ -38,6 +38,8 @@ import androidx.core.view.postDelayed
 import androidx.core.view.updateLayoutParams
 import androidx.core.view.updatePadding
 import androidx.core.widget.NestedScrollView
+import androidx.lifecycle.flowWithLifecycle
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -71,7 +73,6 @@ import com.duckduckgo.app.systemsearch.SystemSearchViewModel.Command.LaunchDuckD
 import com.duckduckgo.app.systemsearch.SystemSearchViewModel.Command.LaunchEditDialog
 import com.duckduckgo.app.systemsearch.SystemSearchViewModel.Command.ShowAppNotFoundMessage
 import com.duckduckgo.app.systemsearch.SystemSearchViewModel.Command.ShowRemoveSearchSuggestionDialog
-import com.duckduckgo.app.systemsearch.SystemSearchViewModel.Command.UpdateVoiceSearch
 import com.duckduckgo.app.tabs.ui.GridViewColumnCalculator
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion
 import com.duckduckgo.browser.api.ui.BrowserScreens.PrivateSearchScreenNoParams
@@ -100,6 +101,8 @@ import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.card.MaterialCardView
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.Snackbar
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 import logcat.LogPriority.VERBOSE
 import logcat.logcat
 import javax.inject.Inject
@@ -181,10 +184,14 @@ class SystemSearchActivity : DuckDuckGoActivity() {
             return if (settingsDataStore.omnibarPosition == OmnibarPosition.TOP) binding.aiChatIconMenu else binding.aiChatIconMenuBottom
         }
 
+    private val omnibarDivider: View
+        get() {
+            return if (settingsDataStore.omnibarPosition == OmnibarPosition.TOP) binding.verticalDivider else binding.verticalDividerBottom
+        }
+
     private val textChangeWatcher = object : TextChangedWatcher() {
         override fun afterTextChanged(editable: Editable) {
             showOmnibar()
-            updateVoiceSearchVisibility()
             val searchQuery = omnibarTextInput.text.toString()
             clearTextButton.isVisible = searchQuery.isNotEmpty()
             viewModel.userUpdatedQuery(omnibarTextInput.text.toString())
@@ -287,6 +294,12 @@ class SystemSearchActivity : DuckDuckGoActivity() {
                 processCommand(it)
             },
         )
+
+        lifecycleScope.launch {
+            viewModel.omnibarViewState.flowWithLifecycle(lifecycle).collectLatest {
+                renderOmnibarState(it)
+            }
+        }
     }
 
     private fun configureOnboarding() {
@@ -392,21 +405,16 @@ class SystemSearchActivity : DuckDuckGoActivity() {
     }
 
     private fun configureVoiceSearch() {
-        if (voiceSearchAvailability.isVoiceSearchAvailable) {
-            voiceSearch.visibility = View.VISIBLE
-            voiceSearchLauncher.registerResultsCallback(this, this, WIDGET) {
-                if (it is VoiceSearchLauncher.Event.VoiceRecognitionSuccess) {
-                    viewModel.onUserSelectedToEditQuery(it.result)
-                } else if (it is VoiceSearchLauncher.Event.VoiceSearchDisabled) {
-                    viewModel.voiceSearchDisabled()
-                }
+        voiceSearchLauncher.registerResultsCallback(this, this, WIDGET) {
+            if (it is VoiceSearchLauncher.Event.VoiceRecognitionSuccess) {
+                viewModel.onUserSelectedToEditQuery(it.result)
+            } else if (it is VoiceSearchLauncher.Event.VoiceSearchDisabled) {
+                viewModel.onVoiceSearchStateChanged()
             }
-            voiceSearch.setOnClickListener {
-                omnibarTextInput.hideKeyboard()
-                voiceSearchLauncher.launch(this)
-            }
-        } else {
-            voiceSearch.visibility = View.GONE
+        }
+        voiceSearch.setOnClickListener {
+            omnibarTextInput.hideKeyboard()
+            voiceSearchLauncher.launch(this)
         }
     }
 
@@ -414,13 +422,6 @@ class SystemSearchActivity : DuckDuckGoActivity() {
         duckAi.setOnClickListener {
             viewModel.onDuckAiRequested(omnibarTextInput.text.toString())
         }
-    }
-
-    private fun updateVoiceSearchVisibility() {
-        val searchQuery = omnibarTextInput.text.toString()
-        voiceSearch.isVisible =
-            voiceSearchAvailability.shouldShowVoiceSearch(true, omnibarTextInput.text.toString(), omnibarTextInput.text.toString().isNotEmpty(), "")
-        clearTextButton.isVisible = searchQuery.isNotEmpty()
     }
 
     private fun showEditSavedSiteDialog(savedSite: SavedSite) {
@@ -475,6 +476,13 @@ class SystemSearchActivity : DuckDuckGoActivity() {
         binding.deviceAppSuggestions.isVisible = !viewState.appResults.isEmpty()
     }
 
+    private fun renderOmnibarState(viewState: SystemSearchViewModel.OmnibarViewState) {
+        voiceSearch.isVisible = viewState.isVoiceSearchButtonVisible
+        clearTextButton.isVisible = viewState.isClearButtonVisible
+        duckAi.isVisible = viewState.isDuckAiButtonVisible
+        omnibarDivider.isVisible = viewState.isButtonDividerVisible
+    }
+
     private fun renderQuickAccessItems(it: SystemSearchViewModel.Suggestions.QuickAccessItems) {
         if (it.favorites.isEmpty()) {
             quickAccessItemsBinding.quickAccessRecyclerView.gone()
@@ -490,7 +498,6 @@ class SystemSearchActivity : DuckDuckGoActivity() {
                 omnibarTextInput.removeTextChangedListener(textChangeWatcher)
                 omnibarTextInput.setText("")
                 omnibarTextInput.addTextChangedListener(textChangeWatcher)
-                updateVoiceSearchVisibility()
             }
 
             is LaunchDuckDuckGo -> {
@@ -531,10 +538,6 @@ class SystemSearchActivity : DuckDuckGoActivity() {
 
             is DeleteSavedSiteConfirmation -> {
                 confirmDeleteSavedSite(command.savedSite)
-            }
-
-            is UpdateVoiceSearch -> {
-                updateVoiceSearchVisibility()
             }
 
             is ShowRemoveSearchSuggestionDialog -> {

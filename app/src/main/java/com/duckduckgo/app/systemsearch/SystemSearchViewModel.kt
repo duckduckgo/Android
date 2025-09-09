@@ -32,7 +32,6 @@ import com.duckduckgo.app.pixels.AppPixelName.*
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
-import com.duckduckgo.app.systemsearch.SystemSearchViewModel.Command.UpdateVoiceSearch
 import com.duckduckgo.app.widget.experiment.PostCtaExperienceExperiment
 import com.duckduckgo.browser.api.autocomplete.AutoComplete
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteResult
@@ -46,6 +45,7 @@ import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.SingleLiveEvent
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.history.api.NavigationHistory
 import com.duckduckgo.savedsites.api.SavedSitesRepository
@@ -54,12 +54,14 @@ import com.duckduckgo.savedsites.api.models.SavedSite.Bookmark
 import com.duckduckgo.savedsites.api.models.SavedSite.Favorite
 import com.duckduckgo.savedsites.impl.SavedSitesPixelName
 import com.duckduckgo.savedsites.impl.dialogs.EditSavedSiteDialogFragment
+import com.duckduckgo.voice.api.VoiceSearchAvailability
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
@@ -69,7 +71,9 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -84,6 +88,8 @@ data class SystemSearchResult(
 
 @ContributesViewModel(ActivityScope::class)
 class SystemSearchViewModel @Inject constructor(
+    private val duckAiFeatureState: DuckAiFeatureState,
+    private val voiceSearchAvailability: VoiceSearchAvailability,
     private val duckChat: DuckChat,
     private var userStageStore: UserStageStore,
     private val autoComplete: AutoComplete,
@@ -103,6 +109,15 @@ class SystemSearchViewModel @Inject constructor(
         val visible: Boolean,
         val expanded: Boolean = false,
     )
+
+    data class OmnibarViewState(
+        val isVoiceSearchButtonVisible: Boolean = false,
+        val isDuckAiButtonVisible: Boolean = false,
+        val isClearButtonVisible: Boolean = false,
+    ) {
+        val isButtonDividerVisible: Boolean
+            get() = (isClearButtonVisible || isVoiceSearchButtonVisible) && isDuckAiButtonVisible
+    }
 
     sealed class Suggestions {
         data class SystemSearchResultsViewState(
@@ -125,7 +140,6 @@ class SystemSearchViewModel @Inject constructor(
         data class ShowAppNotFoundMessage(val appName: String) : Command()
         data object DismissKeyboard : Command()
         data class EditQuery(val query: String) : Command()
-        data object UpdateVoiceSearch : Command()
         data class ShowRemoveSearchSuggestionDialog(val suggestion: AutoCompleteSuggestion) : Command()
         data object AutocompleteItemRemoved : Command()
         data object ExitSearch : Command()
@@ -136,7 +150,21 @@ class SystemSearchViewModel @Inject constructor(
     val command: SingleLiveEvent<Command> = SingleLiveEvent()
 
     @VisibleForTesting
-    internal val resultsStateFlow = MutableStateFlow("")
+    internal val queryFlow = MutableStateFlow("")
+
+    private val voiceSearchState = MutableSharedFlow<Unit>(replay = 1)
+    val omnibarViewState = combine(
+        flow = voiceSearchState.map { voiceSearchAvailability.isVoiceSearchAvailable },
+        flow2 = queryFlow,
+        flow3 = duckAiFeatureState.showOmnibarShortcutOnNtpAndOnFocus,
+    ) { isVoiceSearchEnabled, query, isDuckAiEnabled ->
+        OmnibarViewState(
+            isVoiceSearchButtonVisible = isVoiceSearchEnabled,
+            isDuckAiButtonVisible = isDuckAiEnabled,
+            isClearButtonVisible = query.isNotEmpty(),
+        )
+    }
+
     private var results = SystemSearchResult(AutoCompleteResult("", emptyList()), emptyList())
     private var resultsJob = ConflatedJob()
     private var latestQuickAccessItems: Suggestions.QuickAccessItems = Suggestions.QuickAccessItems(emptyList())
@@ -179,7 +207,8 @@ class SystemSearchViewModel @Inject constructor(
             resetOnboardingState()
         }
         resetResultsState()
-        resultsStateFlow.update { "" }
+        queryFlow.update { "" }
+        voiceSearchState.tryEmit(Unit)
     }
 
     private suspend fun resetOnboardingState() {
@@ -198,7 +227,7 @@ class SystemSearchViewModel @Inject constructor(
 
     @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
     private fun configureResults() {
-        resultsJob += resultsStateFlow
+        resultsJob += queryFlow
             .debounce(DEBOUNCE_TIME_MS)
             .distinctUntilChanged()
             .flatMapLatest { buildResultsFlow(query = it) }
@@ -252,6 +281,10 @@ class SystemSearchViewModel @Inject constructor(
         command.value = Command.EditQuery(query)
     }
 
+    fun onVoiceSearchStateChanged() {
+        voiceSearchState.tryEmit(Unit)
+    }
+
     fun onDuckAiRequested(query: String) {
         duckChat.openDuckChatWithAutoPrompt(query)
         command.value = Command.ExitSearch
@@ -267,7 +300,7 @@ class SystemSearchViewModel @Inject constructor(
 
         if (autoCompleteSettings.autoCompleteSuggestionsEnabled) {
             val trimmedQuery = query.trim()
-            resultsStateFlow.value = trimmedQuery
+            queryFlow.value = trimmedQuery
         }
     }
 
@@ -301,7 +334,7 @@ class SystemSearchViewModel @Inject constructor(
 
     private fun inputCleared() {
         if (autoCompleteSettings.autoCompleteSuggestionsEnabled) {
-            resultsStateFlow.value = ""
+            queryFlow.value = ""
         }
         resetResultsState()
     }
@@ -384,7 +417,7 @@ class SystemSearchViewModel @Inject constructor(
                 else -> {}
             }
             withContext(dispatchers.main()) {
-                resultsStateFlow.value = omnibarText
+                queryFlow.value = omnibarText
                 command.value = Command.AutocompleteItemRemoved
             }
         }
@@ -499,10 +532,6 @@ class SystemSearchViewModel @Inject constructor(
                 ),
             )
         }
-    }
-
-    fun voiceSearchDisabled() {
-        command.value = UpdateVoiceSearch
     }
 
     fun onUserDismissedAutoCompleteInAppMessage() {

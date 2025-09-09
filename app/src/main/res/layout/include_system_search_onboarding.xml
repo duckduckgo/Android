@@ -25,7 +25,6 @@
     android:layout_height="wrap_content"
     android:background="?attr/colorPrimary"
     android:clipToPadding="false"
-    android:elevation="4dp"
     android:paddingStart="16dp"
     android:paddingEnd="16dp"
     android:visibility="gone"
