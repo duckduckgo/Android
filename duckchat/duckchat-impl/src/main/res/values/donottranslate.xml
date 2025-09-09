@@ -26,8 +26,8 @@
     <string name="newAddressBarOptionBottomSheetDialogPrimaryButton">Confirm</string>
     <string name="newAddressBarOptionBottomSheetDialogGhostButton">Not Now</string>
     <string name="newAddressBarOptionBottomSheetDialogFooter">Adjust in Settings > AI Features.</string>
-    <string name="newAddressBarOptionBottomSheetDialogSearchOnly">Search only</string>
-    <string name="newAddressBarOptionBottomSheetDialogSearchAndDuckAi">Search and Duck.ai</string>
+    <string name="newAddressBarOptionBottomSheetDialogSearchOnly">Classic Search Only</string>
+    <string name="newAddressBarOptionBottomSheetDialogSearchAndDuckAi">New Search &amp; Duck.ai</string>
     <string name="newAddressBarOptionBottomSheetDialogHeader">Choose a new address bar</string>
 
 </resources>
