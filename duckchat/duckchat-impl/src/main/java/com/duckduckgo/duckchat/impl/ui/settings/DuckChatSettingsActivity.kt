@@ -16,6 +16,7 @@
 
 package com.duckduckgo.duckchat.impl.ui.settings
 
+import android.appwidget.AppWidgetManager
 import android.content.Intent
 import android.content.res.Configuration
 import android.os.Bundle
@@ -62,6 +63,7 @@ class DuckChatSettingsActivity : DuckDuckGoActivity() {
     private val userEnabledDuckChatToggleListener =
         CompoundButton.OnCheckedChangeListener { _, isChecked ->
             viewModel.onDuckChatUserEnabledToggled(isChecked)
+            updateWidgets()
         }
 
     @Inject
@@ -253,5 +255,10 @@ class DuckChatSettingsActivity : DuckDuckGoActivity() {
                 else -> R.drawable.searchbox_withai_inactive_dark
             }
         }
+    }
+
+    private fun updateWidgets() {
+        val intent = Intent(AppWidgetManager.ACTION_APPWIDGET_UPDATE)
+        sendBroadcast(intent)
     }
 }

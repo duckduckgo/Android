@@ -162,6 +162,8 @@ import com.duckduckgo.app.browser.commands.Command.ShowWebContent
 import com.duckduckgo.app.browser.commands.Command.ShowWebPageTitle
 import com.duckduckgo.app.browser.commands.Command.ToggleReportFeedback
 import com.duckduckgo.app.browser.commands.Command.WebShareRequest
+import com.duckduckgo.app.browser.commands.Command.WebViewCompatScreenLock
+import com.duckduckgo.app.browser.commands.Command.WebViewCompatWebShareRequest
 import com.duckduckgo.app.browser.commands.Command.WebViewError
 import com.duckduckgo.app.browser.commands.NavigationCommand
 import com.duckduckgo.app.browser.customtabs.CustomTabPixelNames
@@ -194,7 +196,6 @@ import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition
 import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition.TOP
 import com.duckduckgo.app.browser.refreshpixels.RefreshPixelSender
 import com.duckduckgo.app.browser.santize.NonHttpAppLinkChecker
-import com.duckduckgo.app.browser.senseofprotection.SenseOfProtectionExperiment
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
 import com.duckduckgo.app.browser.tabs.TabManager
 import com.duckduckgo.app.browser.urlextraction.UrlExtractionListener
@@ -243,12 +244,8 @@ import com.duckduckgo.app.onboardingdesignexperiment.OnboardingDesignExperimentM
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.pixels.AppPixelName.AUTOCOMPLETE_BANNER_DISMISSED
 import com.duckduckgo.app.pixels.AppPixelName.AUTOCOMPLETE_BANNER_SHOWN
-import com.duckduckgo.app.pixels.AppPixelName.AUTOCOMPLETE_HISTORY_SEARCH_SELECTION
-import com.duckduckgo.app.pixels.AppPixelName.AUTOCOMPLETE_HISTORY_SITE_SELECTION
 import com.duckduckgo.app.pixels.AppPixelName.AUTOCOMPLETE_RESULT_DELETED
 import com.duckduckgo.app.pixels.AppPixelName.AUTOCOMPLETE_RESULT_DELETED_DAILY
-import com.duckduckgo.app.pixels.AppPixelName.AUTOCOMPLETE_SEARCH_PHRASE_SELECTION
-import com.duckduckgo.app.pixels.AppPixelName.AUTOCOMPLETE_SEARCH_WEBSITE_SELECTION
 import com.duckduckgo.app.pixels.AppPixelName.ONBOARDING_SEARCH_CUSTOM
 import com.duckduckgo.app.pixels.AppPixelName.ONBOARDING_VISIT_SITE_CUSTOM
 import com.duckduckgo.app.pixels.AppPixelName.TAB_MANAGER_CLICKED_DAILY
@@ -474,7 +471,6 @@ class BrowserTabViewModel @Inject constructor(
     private val siteErrorHandlerKillSwitch: SiteErrorHandlerKillSwitch,
     private val siteErrorHandler: StringSiteErrorHandler,
     private val siteHttpErrorHandler: HttpCodeSiteErrorHandler,
-    private val senseOfProtectionExperiment: SenseOfProtectionExperiment,
     private val subscriptionsJSHelper: SubscriptionsJSHelper,
     private val tabManager: TabManager,
     private val addressDisplayFormatter: AddressDisplayFormatter,
@@ -581,8 +577,6 @@ class BrowserTabViewModel @Inject constructor(
     private var isProcessingTrackingLink = false
     private var isLinkOpenedInNewTab = false
     private var allowlistRefreshTriggerJob: Job? = null
-    private var lastSubmittedUserQuery: String? = null
-    private var lastSubmittedChatQuery: String? = null
 
     private val fireproofWebsitesObserver = Observer<List<FireproofWebsiteEntity>> {
         browserViewState.value = currentBrowserViewState().copy(isFireproofWebsite = isFireproofWebsite())
@@ -947,59 +941,10 @@ class BrowserTabViewModel @Inject constructor(
         }
     }
 
-    suspend fun fireAutocompletePixel(suggestion: AutoCompleteSuggestion) {
-        val currentViewState = currentAutoCompleteViewState()
-
-        val hasBookmarks = withContext(dispatchers.io()) {
-            savedSitesRepository.hasBookmarks()
-        }
-        val hasFavorites = withContext(dispatchers.io()) {
-            savedSitesRepository.hasFavorites()
-        }
-        val hasHistory = withContext(dispatchers.io()) {
-            history.hasHistory()
-        }
-        val hasTabs = withContext(dispatchers.io()) {
-            (tabRepository.liveTabs.value?.size ?: 0) > 1
-        }
-        val hasBookmarkResults = currentViewState.searchResults.suggestions.any { it is AutoCompleteBookmarkSuggestion && !it.isFavorite }
-        val hasFavoriteResults = currentViewState.searchResults.suggestions.any { it is AutoCompleteBookmarkSuggestion && it.isFavorite }
-        val hasHistoryResults =
-            currentViewState.searchResults.suggestions.any { it is AutoCompleteHistorySuggestion || it is AutoCompleteHistorySearchSuggestion }
-        val hasSwitchToTabResults = currentViewState.searchResults.suggestions.any { it is AutoCompleteSwitchToTabSuggestion }
-        val params = mapOf(
-            PixelParameter.SHOWED_BOOKMARKS to hasBookmarkResults.toString(),
-            PixelParameter.SHOWED_FAVORITES to hasFavoriteResults.toString(),
-            PixelParameter.BOOKMARK_CAPABLE to hasBookmarks.toString(),
-            PixelParameter.FAVORITE_CAPABLE to hasFavorites.toString(),
-            PixelParameter.HISTORY_CAPABLE to hasHistory.toString(),
-            PixelParameter.SHOWED_HISTORY to hasHistoryResults.toString(),
-            PixelParameter.SWITCH_TO_TAB_CAPABLE to hasTabs.toString(),
-            PixelParameter.SHOWED_SWITCH_TO_TAB to hasSwitchToTabResults.toString(),
-        )
-        val pixelName = when (suggestion) {
-            is AutoCompleteBookmarkSuggestion -> {
-                if (suggestion.isFavorite) {
-                    AppPixelName.AUTOCOMPLETE_FAVORITE_SELECTION
-                } else {
-                    AppPixelName.AUTOCOMPLETE_BOOKMARK_SELECTION
-                }
-            }
-
-            is AutoCompleteSearchSuggestion -> if (suggestion.isUrl) AUTOCOMPLETE_SEARCH_WEBSITE_SELECTION else AUTOCOMPLETE_SEARCH_PHRASE_SELECTION
-            is AutoCompleteHistorySuggestion -> AUTOCOMPLETE_HISTORY_SITE_SELECTION
-            is AutoCompleteHistorySearchSuggestion -> AUTOCOMPLETE_HISTORY_SEARCH_SELECTION
-            is AutoCompleteSwitchToTabSuggestion -> AppPixelName.AUTOCOMPLETE_SWITCH_TO_TAB_SELECTION
-            else -> return
-        }
-
-        pixel.fire(pixelName, params)
-    }
-
     fun userSelectedAutocomplete(suggestion: AutoCompleteSuggestion) {
         // send pixel before submitting the query and changing the autocomplete state to empty; otherwise will send the wrong params
         appCoroutineScope.launch(dispatchers.io()) {
-            fireAutocompletePixel(suggestion)
+            val autoCompleteViewState = currentAutoCompleteViewState()
             withContext(dispatchers.main()) {
                 when (suggestion) {
                     is AutoCompleteDefaultSuggestion -> onUserSubmittedQuery(suggestion.phrase, FromAutocomplete(isNav = false))
@@ -1009,8 +954,10 @@ class BrowserTabViewModel @Inject constructor(
                     is AutoCompleteHistorySearchSuggestion -> onUserSubmittedQuery(suggestion.phrase, FromAutocomplete(isNav = false))
                     is AutoCompleteSwitchToTabSuggestion -> onUserSwitchedToTab(suggestion.tabId)
                     is AutoCompleteInAppMessageSuggestion -> return@withContext
+                    is AutoCompleteSuggestion.AutoCompleteDuckAIPrompt -> onUserTappedDuckAiPromptAutocomplete(suggestion.phrase)
                 }
             }
+            autoComplete.fireAutocompletePixel(autoCompleteViewState.searchResults.suggestions, suggestion)
         }
     }
 
@@ -3676,6 +3623,91 @@ class BrowserTabViewModel @Inject constructor(
         )
     }
 
+    fun webViewCompatProcessJsCallbackMessage(
+        context: String,
+        featureName: String,
+        method: String,
+        id: String?,
+        data: JSONObject?,
+        onResponse: (JSONObject) -> Unit,
+    ) {
+        processGlobalMessages(
+            featureName = featureName,
+            method = method,
+            id = id,
+            data = data,
+            onResponse = onResponse,
+        )
+
+        when (context) {
+            "contentScopeScripts" -> processContentScopeMessages(
+                featureName = featureName,
+                method = method,
+                id = id,
+                data = data,
+                onResponse = onResponse,
+            )
+        }
+    }
+
+    private fun processGlobalMessages(
+        featureName: String,
+        method: String,
+        id: String?,
+        data: JSONObject?,
+        onResponse: (JSONObject) -> Unit,
+    ) {
+        when (method) {
+            "addDebugFlag" -> {
+                site?.debugFlags =
+                    (site?.debugFlags ?: listOf())
+                        .toMutableList()
+                        .plus(featureName)
+                        .distinct()
+            }
+        }
+    }
+
+    private fun processContentScopeMessages(
+        featureName: String,
+        method: String,
+        id: String?,
+        data: JSONObject?,
+        onResponse: (JSONObject) -> Unit,
+    ) {
+        when (featureName) {
+            "webCompat" -> {
+                when (method) {
+                    "webShare" -> if (id != null && data != null) {
+                        webViewCompatWebShare(featureName, method, id, data, onResponse)
+                    }
+                    "permissionsQuery" -> if (id != null && data != null) {
+                        webViewCompatPermissionsQuery(featureName, method, id, data, onResponse)
+                    }
+
+                    "screenLock" -> if (id != null && data != null) {
+                        webViewCompatScreenLock(featureName, method, id, data, onResponse)
+                    }
+
+                    "screenUnlock" -> screenUnlock()
+                }
+            }
+            "breakageReportResult" -> if (data != null) {
+                breakageReportResult(data)
+            }
+            "initialPing" -> {
+                // TODO: Eventually, we might want plugins here
+                val response = JSONObject(
+                    mapOf(
+                        "desktopModeEnabled" to (getSite()?.isDesktopMode ?: false),
+                        "forcedZoomEnabled" to (accessibilityViewState.value?.forceZoom ?: false),
+                    ),
+                )
+                onResponse(response)
+            }
+        }
+    }
+
     fun processJsCallbackMessage(
         featureName: String,
         method: String,
@@ -3762,6 +3794,18 @@ class BrowserTabViewModel @Inject constructor(
         }
     }
 
+    private fun webViewCompatWebShare(
+        featureName: String,
+        method: String,
+        id: String,
+        data: JSONObject,
+        onResponse: (JSONObject) -> Unit,
+    ) {
+        viewModelScope.launch(dispatchers.main()) {
+            command.value = WebViewCompatWebShareRequest(JsCallbackData(data, featureName, method, id), onResponse)
+        }
+    }
+
     private fun permissionsQuery(
         featureName: String,
         method: String,
@@ -3782,6 +3826,27 @@ class BrowserTabViewModel @Inject constructor(
         }
     }
 
+    private fun webViewCompatPermissionsQuery(
+        featureName: String,
+        method: String,
+        id: String,
+        data: JSONObject,
+        onResponse: (JSONObject) -> Unit,
+    ) {
+        viewModelScope.launch(dispatchers.io()) {
+            val response = if (url == null) {
+                getDataForPermissionState(featureName, method, id, SitePermissionQueryResponse.Denied)
+            } else {
+                val permissionState = sitePermissionsManager.getPermissionsQueryResponse(url!!, tabId, data.optString("name"))
+                getDataForPermissionState(featureName, method, id, permissionState)
+            }
+
+            withContext(dispatchers.main()) {
+                onResponse(response.params)
+            }
+        }
+    }
+
     private fun screenLock(
         featureName: String,
         method: String,
@@ -3792,6 +3857,22 @@ class BrowserTabViewModel @Inject constructor(
             if (androidBrowserConfig.screenLock().isEnabled()) {
                 withContext(dispatchers.main()) {
                     command.value = ScreenLock(JsCallbackData(data, featureName, method, id))
+                }
+            }
+        }
+    }
+
+    private fun webViewCompatScreenLock(
+        featureName: String,
+        method: String,
+        id: String,
+        data: JSONObject,
+        onResponse: (JSONObject) -> Unit,
+    ) {
+        viewModelScope.launch(dispatchers.main()) {
+            if (androidBrowserConfig.screenLock().isEnabled()) {
+                withContext(dispatchers.main()) {
+                    command.value = WebViewCompatScreenLock(JsCallbackData(data, featureName, method, id), onResponse)
                 }
             }
         }
@@ -4204,37 +4285,32 @@ class BrowserTabViewModel @Inject constructor(
         command.value = Command.SwitchToTab(tabId)
     }
 
+    private fun onUserTappedDuckAiPromptAutocomplete(prompt: String) {
+        command.value = Command.SubmitChat(prompt)
+
+        viewModelScope.launch {
+            val params = duckChat.createWasUsedBeforePixelParams()
+            pixel.fire(DuckChatPixelName.DUCK_CHAT_OPEN_AUTOCOMPLETE_LEGACY, parameters = params)
+        }
+    }
+
     fun onDuckChatMenuClicked() {
         viewModelScope.launch {
             command.value = HideKeyboardForChat
+            val params = duckChat.createWasUsedBeforePixelParams()
+            pixel.fire(DuckChatPixelName.DUCK_CHAT_OPEN_BROWSER_MENU, parameters = params)
         }
-        openDuckChat(pixelName = DuckChatPixelName.DUCK_CHAT_OPEN_BROWSER_MENU)
+        duckChat.openDuckChat()
     }
 
-    fun onDuckChatOmnibarButtonClicked(query: String?) {
+    fun onDuckChatOmnibarButtonClicked(query: String?, hasFocus: Boolean, isNtp: Boolean) {
         viewModelScope.launch {
             command.value = HideKeyboardForChat
         }
-        query?.let {
-            openDuckChat(query = query)
-        } ?: openDuckChat()
-    }
-
-    private fun openDuckChat(
-        pixelName: Pixel.PixelName? = null,
-        query: String? = null,
-    ) {
-        viewModelScope.launch {
-            if (pixelName != null) {
-                val params = duckChat.createWasUsedBeforePixelParams()
-                pixel.fire(pixelName, parameters = params)
-            }
-
-            if (query?.isNotEmpty() == true) {
-                duckChat.openDuckChatWithAutoPrompt(query)
-            } else {
-                duckChat.openDuckChat()
-            }
+        when {
+            hasFocus && isNtp && query.isNullOrBlank() -> duckChat.openDuckChat()
+            hasFocus -> duckChat.openDuckChatWithAutoPrompt(query ?: "")
+            else -> duckChat.openDuckChat()
         }
     }
 
@@ -4268,36 +4344,11 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     fun onOmnibarPrivacyShieldButtonPressed() {
-        senseOfProtectionExperiment.firePrivacyDashboardClickedPixelIfInExperiment()
         if (currentCtaViewState().cta is OnboardingDaxDialogCta.DaxTrackersBlockedCta) {
             viewModelScope.launch {
                 onboardingDesignExperimentManager.firePrivacyDashClickedFromOnboardingPixel()
             }
         }
-    }
-
-    fun openDuckChat(query: String?) {
-        when {
-            query.isNullOrBlank() || query == url -> duckChat.openDuckChat()
-            lastSubmittedUserQuery == null && (query != omnibarViewState.value?.queryOrFullUrl) -> duckChat.openDuckChatWithAutoPrompt(query)
-            lastSubmittedUserQuery == null && (query == omnibarViewState.value?.queryOrFullUrl) -> duckChat.openDuckChatWithPrefill(query)
-            lastSubmittedChatQuery == null -> duckChat.openDuckChatWithPrefill(query)
-            lastSubmittedChatQuery != lastSubmittedUserQuery -> duckChat.openDuckChatWithPrefill(query)
-            query == lastSubmittedUserQuery -> duckChat.openDuckChatWithPrefill(query)
-
-            else -> duckChat.openDuckChatWithAutoPrompt(query)
-        }
-        if (query != null) {
-            setLastSubmittedUserChatQuery(query)
-        }
-    }
-
-    fun setLastSubmittedUserQuery(query: String) {
-        lastSubmittedUserQuery = query
-    }
-
-    fun setLastSubmittedUserChatQuery(query: String) {
-        lastSubmittedChatQuery = query
     }
 
     fun onUserSelectedOnboardingDialogOption(

@@ -54,6 +54,7 @@ import com.duckduckgo.duckchat.impl.inputscreen.ui.state.SubmitButtonIconState
 import com.duckduckgo.duckchat.impl.inputscreen.ui.viewmodel.UserSelectedMode.CHAT
 import com.duckduckgo.duckchat.impl.inputscreen.ui.viewmodel.UserSelectedMode.NONE
 import com.duckduckgo.duckchat.impl.inputscreen.ui.viewmodel.UserSelectedMode.SEARCH
+import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_OMNIBAR_MODE_SWITCHED
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_OMNIBAR_PROMPT_SUBMITTED
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_OMNIBAR_PROMPT_SUBMITTED_DAILY
@@ -111,9 +112,9 @@ class InputScreenViewModel @AssistedInject constructor(
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val voiceSearchAvailability: VoiceSearchAvailability,
     private val autoCompleteSettings: AutoCompleteSettings,
+    private val duckChat: DuckChat,
     private val pixel: Pixel,
     private val sessionStore: InputScreenSessionStore,
-    private val duckChat: DuckChat,
 ) : ViewModel() {
 
     private var hasUserSeenHistoryIAM = false
@@ -262,6 +263,7 @@ class InputScreenViewModel @AssistedInject constructor(
 
     fun userSelectedAutocomplete(suggestion: AutoCompleteSuggestion) {
         appCoroutineScope.launch(dispatchers.io()) {
+            autoComplete.fireAutocompletePixel(autoCompleteSuggestionResults.value.suggestions, suggestion, true)
             withContext(dispatchers.main()) {
                 when (suggestion) {
                     is AutoCompleteDefaultSuggestion -> onUserSubmittedQuery(suggestion.phrase)
@@ -271,6 +273,7 @@ class InputScreenViewModel @AssistedInject constructor(
                     is AutoCompleteHistorySearchSuggestion -> onUserSubmittedQuery(suggestion.phrase)
                     is AutoCompleteSwitchToTabSuggestion -> onUserSwitchedToTab(suggestion.tabId)
                     is AutoCompleteInAppMessageSuggestion -> return@withContext
+                    is AutoCompleteSuggestion.AutoCompleteDuckAIPrompt -> onUserTappedDuckAiPromptAutocomplete(suggestion.phrase)
                 }
             }
         }
@@ -278,6 +281,15 @@ class InputScreenViewModel @AssistedInject constructor(
 
     private fun onUserSwitchedToTab(tabId: String) {
         command.value = SwitchToTab(tabId)
+    }
+
+    private fun onUserTappedDuckAiPromptAutocomplete(prompt: String) {
+        command.value = Command.SubmitChat(prompt)
+        appCoroutineScope.launch(dispatchers.io()) {
+            val params = mapOf(DuckChatPixelParameters.WAS_USED_BEFORE to duckChat.wasOpenedBefore().toBinaryString())
+            pixel.fire(DuckChatPixelName.DUCK_CHAT_OPEN_AUTOCOMPLETE_EXPERIMENTAL, parameters = params)
+        }
+        duckChat.openDuckChatWithAutoPrompt(prompt)
     }
 
     fun userLongPressedAutocomplete(suggestion: AutoCompleteSuggestion) {
@@ -360,6 +372,7 @@ class InputScreenViewModel @AssistedInject constructor(
                 command.value = Command.SubmitSearch(query)
             } else {
                 command.value = Command.SubmitChat(query)
+                duckChat.openDuckChatWithAutoPrompt(query)
             }
             sessionStore.setHasUsedChatMode(true)
             checkAndFireBothModesPixel()

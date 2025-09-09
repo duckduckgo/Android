@@ -244,12 +244,12 @@
     <string name="widgetConfigurationSystemThemeOption">System default</string>
     <string name="widgetConfigurationLightThemeOption">Light</string>
     <string name="widgetConfigurationDarkThemeOption">Dark</string>
-    <string name="widgetConfigurationAddWidgetOption">Add widget</string>
+    <string name="widgetConfigurationAddWidgetOption">Add Widget</string>
     <string name="searchWidgetEmtpyFavoritesHint">No favorites added yet</string>
     <string name="searchWidgetEmtpyFavoritesCta">Add Favorite</string>
     <string name="widgetConfigurationActivityTitle">Widget Configuration</string>
-    <string name="favoritesWidgetLabel">Favorites</string>
-    <string name="searchWidgetLabel">Search</string>
+    <string name="favoritesWidgetLabel">Search and Favorites</string>
+    <string name="searchWidgetLabel">Search and Duck.ai</string>
 
     <!-- Home Screen Shortcuts -->
     <string name="addToHome">Add to Home Screen</string>
@@ -853,11 +853,6 @@
     <string name="newTabPageDefaultBrowserMessagePrimaryCta" instruction="This text appears on a button">Set As Default</string>
     <string name="newTabPageDefaultBrowserMessageSecondaryCta" instruction="This text appears on a button">Don\'t Ask Again</string>
 
-    <!--TabSwitcher Animation Tile Dialog-->
-    <string name="tabSwitcherAnimationTileRemovalDialogTitle">DuckDuckGo blocks trackers to protect your browsing</string>
-    <string name="tabSwitcherAnimationTileRemovalDialogBody">Clearing your tabs and data will delete your tracker blocking history and reset this number to zero.\n\nHide this banner if you\'d prefer not to see it in the tabs view.</string>
-    <string name="tabSwitcherAnimationTileRemovalDialogNegativeButton">Hide Banner</string>
-
     <!-- Threat protection -->
     <string name="maliciousSiteTitle">Warning: This site may be a security risk</string>
     <string name="maliciousSiteMalwareHeadline"><![CDATA[DuckDuckGo blocked this page because it may be distributing malware designed to compromise your device or steal your personal information.\n<a href="">Learn more</a>]]></string>
@@ -921,5 +916,12 @@
     <string name="onboardingPrivacyProDaxDialogDescriptionRebranding"><![CDATA[DuckDuckGo also has an <b>optional paid subscription</b>, with a secure <b>VPN</b> and <b>advanced, private AI</b>.]]></string>
     <string name="settingsDuckAiRebranding">AI Features</string>
     <string name="settingsDuckAi">Duck.ai</string>
+
+    <!--TabSwitcher Trackers Animation-->
+    <string name="showTrackerCountInTabSwitcher">Show Tracker Count in Tab Switcher</string>
+    <string name="tabSwitcherAnimationTileRemovalDialogTitle" instruction="A title for a dialog that shows when a user clicks a tile that shows them their current blocked tracker count">Hide tracker count?</string>
+    <string name="tabSwitcherAnimationTileRemovalDialogBody" instruction="A message for a dialog that shows when a user clicks a tile that shows them their current blocked tracker count">You can turn this back on in Settings > Appearance.</string>
+    <string name="tabSwitcherAnimationTileRemovalDialogPositiveButton">Hide</string>
+    <string name="tabSwitcherAnimationTileRemovalDialogNegativeButton">Keep</string>
 
 </resources>

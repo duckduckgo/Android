@@ -29,6 +29,7 @@ import com.duckduckgo.pir.impl.dashboard.state.PirDashboardInitialScanStateProvi
 import com.duckduckgo.pir.impl.dashboard.state.PirDashboardInitialScanStateProvider.DashboardBrokerWithStatus
 import com.duckduckgo.pir.impl.models.AddressCityState
 import com.duckduckgo.pir.impl.models.ExtractedProfile
+import com.duckduckgo.pir.impl.store.PirRepository
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import java.util.concurrent.TimeUnit
@@ -59,6 +60,7 @@ class PirWebInitialScanStatusMessageHandlerTest {
     private val mockStateProvider: PirDashboardInitialScanStateProvider = mock()
     private val mockJsMessageCallback: JsMessageCallback = mock()
     private val testScope = TestScope()
+    private val mockRepository: PirRepository = mock()
 
     @Before
     fun setUp() {
@@ -66,6 +68,7 @@ class PirWebInitialScanStatusMessageHandlerTest {
             dispatcherProvider = coroutineRule.testDispatcherProvider,
             appCoroutineScope = testScope,
             stateProvider = mockStateProvider,
+            pirRepository = mockRepository,
         )
         fakeJsMessaging.reset()
     }
@@ -79,10 +82,52 @@ class PirWebInitialScanStatusMessageHandlerTest {
     fun whenProcessWithNoDataThenSendsEmptyResponse() = runTest {
         // Given
         val jsMessage = createJsMessage("", PirDashboardWebMessages.INITIAL_SCAN_STATUS)
+        whenever(mockRepository.getUserProfileQueries()).thenReturn(listOf(mock()))
         whenever(mockStateProvider.getScanResults()).thenReturn(emptyList())
         whenever(mockStateProvider.getFullyCompletedBrokersTotal()).thenReturn(0)
         whenever(mockStateProvider.getActiveBrokersAndMirrorSitesTotal()).thenReturn(0)
         whenever(mockStateProvider.getAllScannedBrokersStatus()).thenReturn(emptyList())
+
+        // When
+        testee.process(jsMessage, fakeJsMessaging, mockJsMessageCallback)
+
+        // Then
+        verifyInitialScanResponse(
+            expectedResultsCount = 0,
+            expectedCurrentScans = 0,
+            expectedTotalScans = 0,
+            expectedScannedBrokersCount = 0,
+        )
+    }
+
+    @Test
+    fun whenProcessWithNoProfilesThenSendsEmptyResponse() = runTest {
+        // Given
+        val jsMessage = createJsMessage("", PirDashboardWebMessages.INITIAL_SCAN_STATUS)
+        val extractedProfile = createExtractedProfile()
+        val dashboardBroker = createDashboardBroker()
+        val scanResults = listOf(
+            DashboardExtractedProfileResult(
+                extractedProfile = extractedProfile,
+                broker = dashboardBroker,
+                optOutSubmittedDateInMillis = 1640995200000L,
+                optOutRemovedDateInMillis = 1643673600000L,
+                estimatedRemovalDateInMillis = 1641081600000L,
+                hasMatchingRecordOnParentBroker = true,
+            ),
+        )
+        val scannedBrokers = listOf(
+            DashboardBrokerWithStatus(
+                broker = dashboardBroker,
+                status = DashboardBrokerWithStatus.Status.COMPLETED,
+            ),
+        )
+
+        whenever(mockRepository.getUserProfileQueries()).thenReturn(emptyList())
+        whenever(mockStateProvider.getScanResults()).thenReturn(scanResults)
+        whenever(mockStateProvider.getFullyCompletedBrokersTotal()).thenReturn(5)
+        whenever(mockStateProvider.getActiveBrokersAndMirrorSitesTotal()).thenReturn(10)
+        whenever(mockStateProvider.getAllScannedBrokersStatus()).thenReturn(scannedBrokers)
 
         // When
         testee.process(jsMessage, fakeJsMessaging, mockJsMessageCallback)
@@ -119,6 +164,7 @@ class PirWebInitialScanStatusMessageHandlerTest {
             ),
         )
 
+        whenever(mockRepository.getUserProfileQueries()).thenReturn(listOf(mock()))
         whenever(mockStateProvider.getScanResults()).thenReturn(scanResults)
         whenever(mockStateProvider.getFullyCompletedBrokersTotal()).thenReturn(5)
         whenever(mockStateProvider.getActiveBrokersAndMirrorSitesTotal()).thenReturn(10)
@@ -175,6 +221,7 @@ class PirWebInitialScanStatusMessageHandlerTest {
             ),
         )
 
+        whenever(mockRepository.getUserProfileQueries()).thenReturn(listOf(mock()))
         whenever(mockStateProvider.getScanResults()).thenReturn(scanResults)
         whenever(mockStateProvider.getFullyCompletedBrokersTotal()).thenReturn(2)
         whenever(mockStateProvider.getActiveBrokersAndMirrorSitesTotal()).thenReturn(5)
@@ -248,6 +295,7 @@ class PirWebInitialScanStatusMessageHandlerTest {
             ),
         )
 
+        whenever(mockRepository.getUserProfileQueries()).thenReturn(listOf(mock()))
         whenever(mockStateProvider.getScanResults()).thenReturn(emptyList())
         whenever(mockStateProvider.getFullyCompletedBrokersTotal()).thenReturn(1)
         whenever(mockStateProvider.getActiveBrokersAndMirrorSitesTotal()).thenReturn(2)

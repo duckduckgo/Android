@@ -30,9 +30,6 @@ interface TabManagerFeatureFlags {
     @Toggle.InternalAlwaysEnabled
     fun self(): Toggle
 
-    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
-    fun multiSelection(): Toggle
-
     @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun tabInsertionFixes(): Toggle
 

@@ -48,6 +48,14 @@ class WidgetUpdaterImpl @Inject constructor() : WidgetUpdater {
             )
         }
 
+        AppWidgetManager.getInstance(context).getAppWidgetIds(ComponentName(context, SearchOnlyWidget::class.java))?.also {
+            broadcastUpdate(
+                it,
+                context,
+                SearchOnlyWidget::class.java,
+            )
+        }
+
         AppWidgetManager.getInstance(context).getAppWidgetIds(ComponentName(context, SearchAndFavoritesWidget::class.java))?.also {
             broadcastUpdate(
                 it,
