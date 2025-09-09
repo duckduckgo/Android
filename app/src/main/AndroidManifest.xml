@@ -249,6 +249,19 @@
             android:resizeableActivity="true" />
 
         <activity
+            android:name="com.duckduckgo.widget.DuckAiPinShortcutActivity"
+            android:exported="true"
+            android:launchMode="singleTask"
+            android:icon="@drawable/duckai_64"
+            android:label="@string/duckAiOnlyPinShortcutLabel"
+            android:theme="@style/Theme.AppCompat.Transparent.NoActionBar">
+            <intent-filter>
+                <action android:name="android.intent.action.CREATE_SHORTCUT" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+
+        <activity
             android:name="com.duckduckgo.app.dispatchers.IntentDispatcherActivity"
             android:theme="@style/Theme.AppCompat.Transparent.NoActionBar"
             android:exported="true">
