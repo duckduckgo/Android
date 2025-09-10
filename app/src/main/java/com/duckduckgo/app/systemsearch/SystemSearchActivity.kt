@@ -146,7 +146,9 @@ class SystemSearchActivity : DuckDuckGoActivity() {
     private var nestedScrollViewPosition: Int = 0
     private var nestedScrollViewRestorePosition: Int = 0
 
-    private val isOmnibarAtTop = settingsDataStore.omnibarPosition == OmnibarPosition.TOP
+    private val isOmnibarAtTop by lazy {
+        settingsDataStore.omnibarPosition == OmnibarPosition.TOP
+    }
 
     private val systemSearchOnboarding
         get() = binding.includeSystemSearchOnboarding
@@ -473,7 +475,7 @@ class SystemSearchActivity : DuckDuckGoActivity() {
         deviceAppSuggestionsAdapter.updateData(viewState.appResults)
 
         binding.autocompleteSuggestions.isVisible = !viewState.autocompleteResults.suggestions.isEmpty()
-        binding.deviceLabel.isVisible = viewState.appResults.isNotEmpty()
+        binding.listDivider.isVisible = viewState.appResults.isNotEmpty()
         binding.deviceAppSuggestions.isVisible = !viewState.appResults.isEmpty()
     }
 

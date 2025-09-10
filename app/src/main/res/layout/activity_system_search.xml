@@ -222,30 +222,31 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="1.0"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 tools:itemCount="4"
                 tools:listitem="@layout/item_autocomplete_search_suggestion" />
 
-            <com.duckduckgo.common.ui.view.text.DaxTextView
-                android:id="@+id/deviceLabel"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:paddingHorizontal="?attr/autocompleteListItemHorizontalPadding"
-                android:paddingVertical="@dimen/keyline_2"
-                android:text="@string/systemSearchDeviceAppLabel"
-                android:visibility="gone"
+            <View
+                android:id="@+id/listDivider"
+                android:layout_width="match_parent"
+                android:layout_height="0.5dp"
+                android:background="?attr/daxColorShade"
+                android:layout_marginVertical="@dimen/keyline_2"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/autocompleteSuggestions"/>
+                app:layout_constraintTop_toBottomOf="@id/autocompleteSuggestions"
+                app:layout_constraintBottom_toTopOf="@id/deviceAppSuggestions"/>
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/deviceAppSuggestions"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/keyline_2"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/deviceLabel"
+                app:layout_constraintTop_toBottomOf="@id/listDivider"
                 tools:itemCount="4"
                 tools:listitem="@layout/item_device_app_suggestion" />
 

@@ -426,7 +426,6 @@
     <string name="crashedWebViewErrorAction">"Reload"</string>
 
     <!-- System Search-->
-    <string name="systemSearchDeviceAppLabel">From This Device</string>
     <string name="systemSearchAppNotFound">Application could not be found</string>
     <string name="systemSearchOnboardingThanks">Thanks for choosing DuckDuckGo!\nUsing our browser helps keep you protected from hackers, scammers, and data-hungry companies.</string>
     <string name="systemSearchOnboardingFeaturesIntroText">The DuckDuckGo app also:</string>
