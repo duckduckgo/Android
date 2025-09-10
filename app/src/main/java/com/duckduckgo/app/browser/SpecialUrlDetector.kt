@@ -191,7 +191,9 @@ class SpecialUrlDetectorImpl(
             return try {
                 val intent = Intent.parseUri(uriString, intentFlags)
                 // only proceed if something can handle it
-                if (userInitiated && (intent == null || packageManager.resolveActivity(intent, 0) == null)) {
+                if (userInitiated && (intent == null || packageManager.resolveActivity(intent, 0) == null) &&
+                    androidBrowserConfigFeature.validateIntentResolution().isEnabled()
+                ) {
                     return UrlType.Unknown(uriString)
                 }
 
