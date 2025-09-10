@@ -62,15 +62,27 @@
                         app:layout_constraintTop_toTopOf="parent"
                         app:layout_constraintVertical_bias="0.5">
 
-                        <com.duckduckgo.common.ui.view.text.DaxTextView
+                        <LinearLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_marginHorizontal="40dp"
                             android:gravity="center"
-                            android:text="@string/newAddressBarOptionBottomSheetDialogHeader"
-                            android:textColor="@color/red50"
-                            app:textAllCaps="true"
-                            app:typography="body2_bold" />
+                            android:orientation="horizontal">
+
+                            <ImageView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginEnd="8dp"
+                                android:src="@drawable/ic_new_pill" />
+
+                            <com.duckduckgo.common.ui.view.text.DaxTextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/newAddressBarOptionBottomSheetDialogHeader"
+                                android:textColor="@color/red50"
+                                app:textAllCaps="true"
+                                app:typography="body2_bold" />
+
+                        </LinearLayout>
 
                         <com.duckduckgo.common.ui.view.text.DaxTextView
                             android:layout_width="match_parent"
@@ -189,7 +201,6 @@
                     app:useMaterialThemeColors="false" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
-
         </LinearLayout>
 
         <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
