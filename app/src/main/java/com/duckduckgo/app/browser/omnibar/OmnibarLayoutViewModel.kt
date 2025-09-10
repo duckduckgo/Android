@@ -768,6 +768,7 @@ class OmnibarLayoutViewModel @Inject constructor(
             AppPixelName.ADDRESS_BAR_SERP_CLOSED,
             AppPixelName.ADDRESS_BAR_WEBSITE_CLOSED,
         )
+        pixel.fire(DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_LEGACY_OMNIBAR_BACK_BUTTON_PRESSED)
     }
 
     fun onEnterKeyPressed() {
