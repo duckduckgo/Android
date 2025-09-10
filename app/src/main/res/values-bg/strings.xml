@@ -189,6 +189,28 @@
     <string name="webTrackingProtectionLearnMoreTitle">Защита от проследяване в мрежата</string>
     <string name="webTrackingProtectionTitle">Защита от проследяване в мрежата</string>
     <string name="webTrackingProtectionDescriptionNew"><![CDATA[DuckDuckGo автоматично блокира скритите тракери, докато сърфирате в мрежата.\n<a href=\"\">Научете повече</a>]]></string>
+    <string name="webTrackingProtectionExplanationDescription"><![CDATA[Браузърът DuckDuckGo предоставя защити от проследяване, които винаги са активни.\n<a href=\"\">Научете повече</a>]]></string>
+    <string name="webTrackingProtectionExplanationTitle">Как защитаваме теб</string>
+    <string name="webTrackingProtectionThirdPartyTrackersTitle">Блокира тракерите на трети страни</string>
+    <string name="webTrackingProtectionThirdPartyTrackersDescription">Помага да се блокират бисквитките на 3-ти страни, които ви проследяват от сайт на сайт, като предотвратява зареждането на тракери на 3-ти страни от самото начало.</string>
+    <string name="webTrackingProtectionTargetedAdsTitle">Блокира насочени реклами</string>
+    <string name="webTrackingProtectionTargetedAdsDescription">Блокира инвазивните тракери, преди да се заредят, като ефективно елиминира рекламите, които разчитат на проследяването.</string>
+    <string name="webTrackingProtectionFingerprintTrackingTitle">Предотвратява проследяването с пръстови отпечатъци</string>
+    <string name="webTrackingProtectionFingerprintTrackingDescription">Помага да се предотврати получаването на уникални идентификатори за вашия браузър и устройство от страна на компаниите за проследяване, които те използват, за да ви следят в интернет.</string>
+    <string name="webTrackingProtectionLinkTrackingTitle">Блокира проследяването на линкове</string>
+    <string name="webTrackingProtectionLinkTrackingDescription">Премахва параметрите за проследяване във връзките, за да попречи на 3-ти страни да следят поведението ти в различни сайтове.</string>
+    <string name="webTrackingProtectionReferrerTrackingTitle">Предпазва от проследяване с препращане</string>
+    <string name="webTrackingProtectionReferrerTrackingDescription">Предотвратява идентифицирането на последния уебсайт, който сте посетили, от страна на компаниите.</string>
+    <string name="webTrackingProtectionFirstPartyCookiesTitle">Приключва срока на действие на бисквитките на първи страни</string>
+    <string name="webTrackingProtectionFirstPartyCookiesDescription">Бисквитките от 1-ва страна изтичат автоматично след 30 дни, което гарантира, че сайтовете не могат да ви проследяват за неопределено време, когато сте излезли.</string>
+    <string name="webTrackingProtectionDnsCnameCloakingTitle">Защитава срещу прикриване с DNS CNAME</string>
+    <string name="webTrackingProtectionDnsCnameCloakingDescription">Блокира тракерите на трети страни, които се опитват да се представят като част от уебсайт с помощта на DNS.</string>
+    <string name="webTrackingProtectionGoogleAmpTrackingTitle">Блокира AMP проследяването на Google</string>
+    <string name="webTrackingProtectionGoogleAmpTrackingDescription">Заменя Google AMP връзките с оригиналния сайт на издателя.</string>
+    <string name="webTrackingProtectionGoogleSigninPopupsTitle">Блокира изскачащите прозорци за влизане в Google</string>
+    <string name="webTrackingProtectionGoogleSigninPopupsDescription">Блокира изскачащите прозорци за влизане в Google на сайтове, които не са собственост на Google.</string>
+    <string name="webTrackingProtectionGlobalPrivacyControlTitle">Глобален контрол на поверителността</string>
+    <string name="webTrackingProtectionGlobalPrivacyControlDescription">Упражнява правото Ви на отказ от Ваше име, като казва на сайтовете да не продават или споделят личната Ви информация.</string>
 
     <!-- Cookie Pop-Up Protection -->
     <string name="cookiePopupProtectionTitle">Защита от изскачащи прозорци за бисквитки</string>

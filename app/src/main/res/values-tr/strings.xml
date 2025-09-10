@@ -189,6 +189,28 @@
     <string name="webTrackingProtectionLearnMoreTitle">Web İzleme Koruması</string>
     <string name="webTrackingProtectionTitle">Web İzleme Koruması</string>
     <string name="webTrackingProtectionDescriptionNew"><![CDATA[DuckDuckGo, web\'de gezinirken gizli izleyicileri otomatik olarak engeller.\n<a href=\"\">Daha Fazla Bilgi</a>]]></string>
+    <string name="webTrackingProtectionExplanationDescription"><![CDATA[DuckDuckGo tarayıcısı, her zaman etkin olan izleme korumaları sunar.\n<a href=\"\">Daha Fazla Bilgi</a>]]></string>
+    <string name="webTrackingProtectionExplanationTitle">Sizi Nasıl Koruyoruz?</string>
+    <string name="webTrackingProtectionThirdPartyTrackersTitle">Üçüncü taraf izleyicileri engeller</string>
+    <string name="webTrackingProtectionThirdPartyTrackersDescription">Üçüncü taraf izleyicilerin yüklenmesini baştan engelleyerek, sizi siteden siteye takip eden üçüncü taraf çerezlerini engellemeye yardımcı olur.</string>
+    <string name="webTrackingProtectionTargetedAdsTitle">Hedefli reklamları engeller</string>
+    <string name="webTrackingProtectionTargetedAdsDescription">İstilacı izleyicileri yüklenmeden önce engelleyerek, izlemeye dayalı reklamları etkili bir şekilde ortadan kaldırır.</string>
+    <string name="webTrackingProtectionFingerprintTrackingTitle">Parmak izi izlemeyi önler</string>
+    <string name="webTrackingProtectionFingerprintTrackingDescription">İzleme şirketlerinin, tarayıcınız ve cihazınız hakkında sizi web\'de takip etmek için kullandıkları benzersiz tanımlayıcılar edinmelerini engellemeye yardımcı olur.</string>
+    <string name="webTrackingProtectionLinkTrackingTitle">Bağlantı izlemeyi engeller</string>
+    <string name="webTrackingProtectionLinkTrackingDescription">Üçüncü tarafların sitelerde yaptıklarınızı izlemesini önlemek için bağlantılardaki izleme parametrelerini kaldırır.</string>
+    <string name="webTrackingProtectionReferrerTrackingTitle">Yönlendiren izlemesine karşı koruma sağlar</string>
+    <string name="webTrackingProtectionReferrerTrackingDescription">Şirketlerin ziyaret ettiğiniz son web sitesini tanımlamasını engellemeye yardımcı olur.</string>
+    <string name="webTrackingProtectionFirstPartyCookiesTitle">Birinci taraf çerezleri kaldırır</string>
+    <string name="webTrackingProtectionFirstPartyCookiesDescription">Çıkış yaptığınızda sitelerin sizi süresiz olarak izleyememesi için birinci taraf çerezlerini 30 gün sonra otomatik olarak sonlandırır.</string>
+    <string name="webTrackingProtectionDnsCnameCloakingTitle">DNS CNAME gizlemesine karşı koruma sağlar</string>
+    <string name="webTrackingProtectionDnsCnameCloakingDescription">DNS kullanarak bir web sitesinde kendilerini gizlemeye çalışan üçüncü taraf izleyicileri engellemeye yardımcı olur.</string>
+    <string name="webTrackingProtectionGoogleAmpTrackingTitle">Google\'ın AMP İzlemesini Engeller</string>
+    <string name="webTrackingProtectionGoogleAmpTrackingDescription">Google AMP bağlantılarını orijinal yayıncının sitesiyle değiştirir.</string>
+    <string name="webTrackingProtectionGoogleSigninPopupsTitle">Google\'ın oturum açma açılır pencerelerini engeller</string>
+    <string name="webTrackingProtectionGoogleSigninPopupsDescription">Google\'ın sahibi olmadığı sitelerdeki Google oturum açma açılır pencerelerini engeller.</string>
+    <string name="webTrackingProtectionGlobalPrivacyControlTitle">Global Privacy Control</string>
+    <string name="webTrackingProtectionGlobalPrivacyControlDescription">Sitelere kişisel bilgilerinizi satmamalarını veya paylaşmamalarını söyleyerek sizin adınıza devre dışı bırakma haklarını ifade eder.</string>
 
     <!-- Cookie Pop-Up Protection -->
     <string name="cookiePopupProtectionTitle">Çerez Açılır Pencere Engelleyici</string>

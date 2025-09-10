@@ -189,6 +189,28 @@
     <string name="webTrackingProtectionLearnMoreTitle">Protection contre le pistage sur le Web</string>
     <string name="webTrackingProtectionTitle">Protection contre le pistage sur le Web</string>
     <string name="webTrackingProtectionDescriptionNew"><![CDATA[DuckDuckGo bloque automatiquement les traqueurs cachés lorsque vous naviguez sur le Web.\n<a href=\"\">En savoir plus</a>]]></string>
+    <string name="webTrackingProtectionExplanationDescription"><![CDATA[Le navigateur DuckDuckGo fournit des protections contre le pistage qui sont toujours actives.\n<a href=\"\">En savoir plus</a>]]></string>
+    <string name="webTrackingProtectionExplanationTitle">Comment nous vous protégeons</string>
+    <string name="webTrackingProtectionThirdPartyTrackersTitle">Bloque les traqueurs tiers</string>
+    <string name="webTrackingProtectionThirdPartyTrackersDescription">Permet de bloquer les cookies tiers qui vous suivent d\'un site à l\'autre en empêchant dès le départ le chargement des traqueurs tiers.</string>
+    <string name="webTrackingProtectionTargetedAdsTitle">Bloque les publicités ciblées</string>
+    <string name="webTrackingProtectionTargetedAdsDescription">Bloque les traqueurs invasifs avant leur chargement, ce qui permet d\'éliminer efficacement les publicités reposant sur le pistage.</string>
+    <string name="webTrackingProtectionFingerprintTrackingTitle">Empêche le pistage par fingerprinting</string>
+    <string name="webTrackingProtectionFingerprintTrackingDescription">Permet d\'empêcher les entreprises de pistage d\'obtenir des identifiants uniques sur votre navigateur et votre appareil, qu\'elles utilisent pour vous suivre sur le Web.</string>
+    <string name="webTrackingProtectionLinkTrackingTitle">Bloque le pistage des liens</string>
+    <string name="webTrackingProtectionLinkTrackingDescription">Supprime les paramètres de pistage dans les liens pour empêcher les tiers de suivre votre comportement sur plusieurs sites.</string>
+    <string name="webTrackingProtectionReferrerTrackingTitle">Protège contre le pistage via référent</string>
+    <string name="webTrackingProtectionReferrerTrackingDescription">Permet d\'empêcher les entreprises d\'identifier le dernier site Web que vous avez visité.</string>
+    <string name="webTrackingProtectionFirstPartyCookiesTitle">Fait expirer les cookies propriétaires</string>
+    <string name="webTrackingProtectionFirstPartyCookiesDescription">Permet l\'expiration automatique des cookies propriétaires après 30 jours afin que les sites ne puissent pas vous suivre indéfiniment lorsque vous êtes déconnecté(e).</string>
+    <string name="webTrackingProtectionDnsCnameCloakingTitle">Protège contre le DNS CNAME cloaking</string>
+    <string name="webTrackingProtectionDnsCnameCloakingDescription">Permet de bloquer les traqueurs tiers qui tentent de se dissimuler sur un site Web à l\'aide du DNS.</string>
+    <string name="webTrackingProtectionGoogleAmpTrackingTitle">Bloque le pistage AMP de Google</string>
+    <string name="webTrackingProtectionGoogleAmpTrackingDescription">Remplace les liens Google AMP par le site de l\'éditeur d\'origine.</string>
+    <string name="webTrackingProtectionGoogleSigninPopupsTitle">Bloque les fenêtres contextuelles de connexion de Google</string>
+    <string name="webTrackingProtectionGoogleSigninPopupsDescription">Bloque les fenêtres contextuelles de connexion à Google sur les sites qui ne lui appartiennent pas.</string>
+    <string name="webTrackingProtectionGlobalPrivacyControlTitle">Global Privacy Control</string>
+    <string name="webTrackingProtectionGlobalPrivacyControlDescription">Formule des droits de retrait en votre nom en indiquant aux sites de ne pas vendre ou partager vos informations personnelles.</string>
 
     <!-- Cookie Pop-Up Protection -->
     <string name="cookiePopupProtectionTitle">Protection contre les fenêtres contextuelles des cookies</string>
