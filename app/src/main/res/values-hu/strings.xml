@@ -188,8 +188,8 @@
     <string name="webTrackingProtectionActivityTitle">Webes követés elleni védelem</string>
     <string name="webTrackingProtectionLearnMoreTitle">Webes követés elleni védelem</string>
     <string name="webTrackingProtectionTitle">Webes követés elleni védelem</string>
+    <string name="webTrackingProtectionDescriptionNew"><![CDATA[A DuckDuckGo böngészés közben automatikusan blokkolja a rejtett nyomkövetőket.\n<a href=\"\">További részletek</a>]]></string>
     <string name="webTrackingProtectionExplanationDescription"><![CDATA[A DuckDuckGo böngésző nyomkövetés elleni védelmi megoldásokat kínál, amelyek mindig aktívak.\n<a href=\"\">További részletek</a>]]></string>
-    <string name="webTrackingProtectionExplanationAlternativeDescription"><![CDATA[A DuckDuckGo böngésző nyomkövetés elleni védelmet biztosít, hogy biztonságban legyenek az adataid böngészés közben.\n<a href=\"\">További részletek</a>]]></string>
     <string name="webTrackingProtectionExplanationTitle">Így védünk téged</string>
     <string name="webTrackingProtectionThirdPartyTrackersTitle">Blokkolja a harmadik féltől származó nyomkövetőket</string>
     <string name="webTrackingProtectionThirdPartyTrackersDescription">A harmadik féltől származó nyomkövetők betöltésének megakadályozásával segít blokkolni a téged webhelyről webhelyre követő harmadik féltől származó sütiket.</string>
@@ -271,8 +271,8 @@
     <string name="searchWidgetEmtpyFavoritesHint">Még nincsenek hozzáadva kedvencek.</string>
     <string name="searchWidgetEmtpyFavoritesCta">Kedvenc hozzáadása</string>
     <string name="widgetConfigurationActivityTitle">Minialkalmazás konfigurációja</string>
-    <string name="favoritesWidgetLabel">Kedvencek</string>
-    <string name="searchWidgetLabel">Keresés</string>
+    <string name="favoritesWidgetLabel">Keresés és kedvencek</string>
+    <string name="searchWidgetLabel">Keresés és Duck.ai</string>
 
     <!-- Home Screen Shortcuts -->
     <string name="addToHome">Hozzáadás a kezdőlaphoz</string>

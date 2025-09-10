@@ -188,8 +188,8 @@
     <string name="webTrackingProtectionActivityTitle">Web Tracking Protection</string>
     <string name="webTrackingProtectionLearnMoreTitle">Web Tracking Protection</string>
     <string name="webTrackingProtectionTitle">Web Tracking Protection</string>
+    <string name="webTrackingProtectionDescriptionNew"><![CDATA[DuckDuckGo blockerar automatiskt dolda spårare när du surfar på webben.\n<a href=\"\">Läs mer</a>]]></string>
     <string name="webTrackingProtectionExplanationDescription"><![CDATA[DuckDuckGo-webbläsaren erbjuder spårningsskydd som alltid är aktiva.\n<a href=\"\">Läs mer</a>]]></string>
-    <string name="webTrackingProtectionExplanationAlternativeDescription"><![CDATA[DuckDuckGo-webbläsaren erbjuder spårningsskydd som bidrar till att hålla dina data säkra när du surfar.\n<a href=\"\">Läs mer</a>]]></string>
     <string name="webTrackingProtectionExplanationTitle">Hur vi skyddar dig</string>
     <string name="webTrackingProtectionThirdPartyTrackersTitle">Blockerar spårare från tredje part</string>
     <string name="webTrackingProtectionThirdPartyTrackersDescription">Hjälper till att blockera tredjepartscookies som spårar dig från webbplats till webbplats genom att förhindra att tredjepartsspårare laddas.</string>
@@ -271,8 +271,8 @@
     <string name="searchWidgetEmtpyFavoritesHint">Inga favoriter har lagts till ännu</string>
     <string name="searchWidgetEmtpyFavoritesCta">Lägg till favorit</string>
     <string name="widgetConfigurationActivityTitle">Konfigurering av widget</string>
-    <string name="favoritesWidgetLabel">Favoriter</string>
-    <string name="searchWidgetLabel">Sökning</string>
+    <string name="favoritesWidgetLabel">Sökning och favoriter</string>
+    <string name="searchWidgetLabel">Sök och Duck.ai</string>
 
     <!-- Home Screen Shortcuts -->
     <string name="addToHome">Lägg till på hemskärmen</string>

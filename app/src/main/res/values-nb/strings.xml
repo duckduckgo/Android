@@ -188,8 +188,8 @@
     <string name="webTrackingProtectionActivityTitle">Beskyttelse mot nettsporing</string>
     <string name="webTrackingProtectionLearnMoreTitle">Beskyttelse mot nettsporing</string>
     <string name="webTrackingProtectionTitle">Beskyttelse mot nettsporing</string>
+    <string name="webTrackingProtectionDescriptionNew"><![CDATA[DuckDuckGo blokkerer automatisk skjulte sporere når du surfer på nettet.\n<a href=\"\">Finn ut mer</a>]]></string>
     <string name="webTrackingProtectionExplanationDescription"><![CDATA[DuckDuckGo-nettleseren gir deg sporingsbeskyttelser, som alltid er aktive.\n<a href=\"\">Finn ut mer</a>]]></string>
-    <string name="webTrackingProtectionExplanationAlternativeDescription"><![CDATA[DuckDuckGo-nettleseren har sporingsbeskyttelser som holder dataene dine trygge mens du surfer.\n<a href=\"\">Finn ut mer</a>]]></string>
     <string name="webTrackingProtectionExplanationTitle">Slik beskytter vi deg</string>
     <string name="webTrackingProtectionThirdPartyTrackersTitle">Blokkerer tredjepartssporere</string>
     <string name="webTrackingProtectionThirdPartyTrackersDescription">Bidrar til å blokkere tredjeparts informasjonskapsler som sporer deg fra nettsted til nettsted ved å forhindre at tredjepartssporere lastes i det hele tatt.</string>
@@ -271,8 +271,8 @@
     <string name="searchWidgetEmtpyFavoritesHint">Ingen favoritter ennå</string>
     <string name="searchWidgetEmtpyFavoritesCta">Legg til favoritt</string>
     <string name="widgetConfigurationActivityTitle">Widget-konfigurasjon</string>
-    <string name="favoritesWidgetLabel">Favoritter</string>
-    <string name="searchWidgetLabel">Søk</string>
+    <string name="favoritesWidgetLabel">Søk og favoritter</string>
+    <string name="searchWidgetLabel">Søk og Duck.ai</string>
 
     <!-- Home Screen Shortcuts -->
     <string name="addToHome">Legg til på startskjermen</string>

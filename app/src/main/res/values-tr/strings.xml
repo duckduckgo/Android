@@ -188,8 +188,8 @@
     <string name="webTrackingProtectionActivityTitle">Web İzleme Koruması</string>
     <string name="webTrackingProtectionLearnMoreTitle">Web İzleme Koruması</string>
     <string name="webTrackingProtectionTitle">Web İzleme Koruması</string>
+    <string name="webTrackingProtectionDescriptionNew"><![CDATA[DuckDuckGo, web\'de gezinirken gizli izleyicileri otomatik olarak engeller.\n<a href=\"\">Daha Fazla Bilgi</a>]]></string>
     <string name="webTrackingProtectionExplanationDescription"><![CDATA[DuckDuckGo tarayıcısı, her zaman etkin olan izleme korumaları sunar.\n<a href=\"\">Daha Fazla Bilgi</a>]]></string>
-    <string name="webTrackingProtectionExplanationAlternativeDescription"><![CDATA[DuckDuckGo tarayıcısı, gezinirken verilerinizi güvende tutmaya yardımcı olan izleme korumaları sağlar.\n<a href=\"\">Daha Fazla Bilgi</a>]]></string>
     <string name="webTrackingProtectionExplanationTitle">Sizi Nasıl Koruyoruz?</string>
     <string name="webTrackingProtectionThirdPartyTrackersTitle">Üçüncü taraf izleyicileri engeller</string>
     <string name="webTrackingProtectionThirdPartyTrackersDescription">Üçüncü taraf izleyicilerin yüklenmesini baştan engelleyerek, sizi siteden siteye takip eden üçüncü taraf çerezlerini engellemeye yardımcı olur.</string>
@@ -267,12 +267,12 @@
     <string name="widgetConfigurationSystemThemeOption">Sistem Varsayılanı</string>
     <string name="widgetConfigurationLightThemeOption">Açık</string>
     <string name="widgetConfigurationDarkThemeOption">Karanlık</string>
-    <string name="widgetConfigurationAddWidgetOption">Widget ekle</string>
+    <string name="widgetConfigurationAddWidgetOption">Widget Ekle</string>
     <string name="searchWidgetEmtpyFavoritesHint">Henüz hiç favori eklenmedi</string>
     <string name="searchWidgetEmtpyFavoritesCta">Favori Ekle</string>
     <string name="widgetConfigurationActivityTitle">Widget Yapılandırması</string>
-    <string name="favoritesWidgetLabel">Favoriler</string>
-    <string name="searchWidgetLabel">Arama yap</string>
+    <string name="favoritesWidgetLabel">Arama ve Favoriler</string>
+    <string name="searchWidgetLabel">Arama ve Duck.ai</string>
 
     <!-- Home Screen Shortcuts -->
     <string name="addToHome">Ana ekrana ekle</string>
