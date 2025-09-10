@@ -230,7 +230,6 @@
             android:layout_marginStart="@dimen/keyline_4"
             android:contentDescription="@string/back"
             app:srcCompat="@drawable/ic_arrow_left_24"
-            app:tint="@color/menu_icon_tint_selector"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
@@ -240,7 +239,6 @@
             style="@style/Widget.DuckDuckGo.NavigationalIcon"
             android:contentDescription="@string/forward"
             app:srcCompat="@drawable/ic_arrow_right_24"
-            app:tint="@color/menu_icon_tint_selector"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/refreshMenuItem"
             app:layout_constraintStart_toEndOf="@+id/backMenuItem"
@@ -252,7 +250,6 @@
             android:layout_marginEnd="@dimen/keyline_4"
             android:contentDescription="@string/refresh"
             app:srcCompat="@drawable/ic_reload_24"
-            app:tint="@color/menu_icon_tint_selector"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
