@@ -18,14 +18,17 @@ package com.duckduckgo.duckchat.impl.ui.dialog
 
 import android.animation.Animator
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.content.Context
 import android.content.DialogInterface
+import android.content.pm.ActivityInfo
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.FrameLayout
 import androidx.core.content.ContextCompat
 import com.airbnb.lottie.LottieAnimationView
 import com.airbnb.lottie.LottieDrawable
+import com.duckduckgo.common.ui.view.toPx
 import com.duckduckgo.duckchat.impl.R
 import com.duckduckgo.duckchat.impl.databinding.BottomSheetNewAddressBarOptionBinding
 import com.google.android.material.bottomsheet.BottomSheetBehavior
@@ -45,6 +48,7 @@ class NewAddressBarOptionBottomSheetDialog(
     var eventListener: EventListener? = null
 
     private var isSearchOnlySelected = true
+    private var originalOrientation: Int = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
 
     init {
         setContentView(binding.root)
@@ -52,6 +56,7 @@ class NewAddressBarOptionBottomSheetDialog(
         this.behavior.isDraggable = false
         this.behavior.skipCollapsed = true
         this.behavior.peekHeight = 0
+        this.behavior.maxHeight = 900.toPx()
 
         setOnShowListener { dialogInterface ->
             val bottomSheet = findViewById<FrameLayout>(com.google.android.material.R.id.design_bottom_sheet)
@@ -61,10 +66,13 @@ class NewAddressBarOptionBottomSheetDialog(
 
             setRoundCorners(dialogInterface)
 
+            lockOrientationToPortrait()
+
             eventListener?.onShown()
         }
         setOnCancelListener {
             eventListener?.onCanceled()
+            restoreOrientation()
             dismiss()
         }
 
@@ -72,10 +80,12 @@ class NewAddressBarOptionBottomSheetDialog(
         setupSelectionLogic()
         binding.newAddressBarOptionBottomSheetDialogPrimaryButton.setOnClickListener {
             eventListener?.onAddWidgetButtonClicked()
+            restoreOrientation()
             dismiss()
         }
         binding.newAddressBarOptionBottomSheetDialogGhostButton.setOnClickListener {
             eventListener?.onNotNowButtonClicked()
+            restoreOrientation()
             dismiss()
         }
     }
@@ -170,6 +180,20 @@ class NewAddressBarOptionBottomSheetDialog(
             .setTopRightCorner(CornerFamily.ROUNDED, context.resources.getDimension(com.duckduckgo.mobile.android.R.dimen.dialogBorderRadius))
             .build()
         bottomSheet?.background = shapeDrawable
+    }
+
+    @SuppressLint("SourceLockedOrientationActivity")
+    private fun lockOrientationToPortrait() {
+        (context as? Activity)?.let {
+            originalOrientation = it.requestedOrientation
+            it.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+        }
+    }
+
+    private fun restoreOrientation() {
+        (context as? Activity)?.let {
+            it.requestedOrientation = originalOrientation
+        }
     }
 
     fun isSearchOnlySelected(): Boolean = isSearchOnlySelected
