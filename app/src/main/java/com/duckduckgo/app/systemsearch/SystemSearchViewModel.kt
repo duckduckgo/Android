@@ -21,7 +21,6 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
-import com.duckduckgo.app.browser.defaultbrowsing.prompts.ui.experiment.OnboardingHomeScreenWidgetExperiment
 import com.duckduckgo.app.browser.newtab.FavoritesQuickAccessAdapter
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.onboarding.store.AppStage
@@ -90,7 +89,6 @@ class SystemSearchViewModel @Inject constructor(
     private val history: NavigationHistory,
     private val dispatchers: DispatcherProvider,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
-    private val onboardingHomeScreenWidgetExperiment: OnboardingHomeScreenWidgetExperiment,
 ) : ViewModel(), EditSavedSiteDialogFragment.EditSavedSiteListener {
 
     data class OnboardingViewState(
@@ -306,8 +304,6 @@ class SystemSearchViewModel @Inject constructor(
             userStageStore.stageCompleted(AppStage.NEW)
             command.value = Command.LaunchBrowser(query.trim())
             pixel.fire(INTERSTITIAL_LAUNCH_BROWSER_QUERY)
-            onboardingHomeScreenWidgetExperiment.fireWidgetSearch()
-            onboardingHomeScreenWidgetExperiment.fireWidgetSearchXCount()
         }
     }
 
@@ -321,10 +317,6 @@ class SystemSearchViewModel @Inject constructor(
             }
         }
         pixel.fire(INTERSTITIAL_LAUNCH_BROWSER_QUERY)
-        viewModelScope.launch {
-            onboardingHomeScreenWidgetExperiment.fireWidgetSearch()
-            onboardingHomeScreenWidgetExperiment.fireWidgetSearchXCount()
-        }
     }
 
     fun userLongPressedAutocomplete(suggestion: AutoCompleteSuggestion) {

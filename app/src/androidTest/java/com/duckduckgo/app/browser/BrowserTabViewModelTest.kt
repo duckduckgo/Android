@@ -91,7 +91,7 @@ import com.duckduckgo.app.browser.commands.NavigationCommand
 import com.duckduckgo.app.browser.commands.NavigationCommand.Navigate
 import com.duckduckgo.app.browser.customtabs.CustomTabPixelNames
 import com.duckduckgo.app.browser.defaultbrowsing.prompts.AdditionalDefaultBrowserPrompts
-import com.duckduckgo.app.browser.defaultbrowsing.prompts.ui.experiment.OnboardingHomeScreenWidgetExperiment
+import com.duckduckgo.app.browser.defaultbrowsing.prompts.ui.experiment.OnboardingHomeScreenWidgetToggles
 import com.duckduckgo.app.browser.duckplayer.DUCK_PLAYER_FEATURE_NAME
 import com.duckduckgo.app.browser.duckplayer.DUCK_PLAYER_PAGE_FEATURE_NAME
 import com.duckduckgo.app.browser.duckplayer.DuckPlayerJSHelper
@@ -561,7 +561,7 @@ class BrowserTabViewModelTest {
     private val mockSiteHttpErrorHandler: HttpCodeSiteErrorHandler = mock()
     private val mockSubscriptionsJSHelper: SubscriptionsJSHelper = mock()
     private val mockReactivateUsersExperiment: ReactivateUsersExperiment = mock()
-    private val mockOnboardingHomeScreenWidgetExperiment: OnboardingHomeScreenWidgetExperiment = mock()
+    private val mockOnboardingHomeScreenWidgetToggles: OnboardingHomeScreenWidgetToggles = mock()
     private val mockRebrandingFeatureToggle: SubscriptionRebrandingFeatureToggle = mock()
     private val tabManager: TabManager = mock()
 
@@ -674,7 +674,7 @@ class BrowserTabViewModelTest {
             subscriptions = subscriptions,
             duckPlayer = mockDuckPlayer,
             brokenSitePrompt = mockBrokenSitePrompt,
-            onboardingHomeScreenWidgetExperiment = mockOnboardingHomeScreenWidgetExperiment,
+            onboardingHomeScreenWidgetToggles = mockOnboardingHomeScreenWidgetToggles,
             onboardingDesignExperimentManager = mockOnboardingDesignExperimentManager,
             rebrandingFeatureToggle = mockRebrandingFeatureToggle,
         )
