@@ -200,7 +200,7 @@
         </LinearLayout>
     </com.google.android.material.appbar.AppBarLayout>
 
-    <include id="@+id/includeQuickAccessItems"
+    <include android:id="@+id/includeQuickAccessItems"
         layout="@layout/include_quick_access_items" />
 
     <androidx.core.widget.NestedScrollView
