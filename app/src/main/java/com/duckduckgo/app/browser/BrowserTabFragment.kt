@@ -4646,13 +4646,13 @@ class BrowserTabFragment :
 
         private fun showBottomSheetCta(configuration: HomePanelCta) {
             if (configuration is AddWidgetAutoOnboardingExperiment) {
-                showExperimentalHomeWidget(configuration)
+                showAlternativeHomeWidgetPrompt(configuration)
             } else {
                 showHomeCta(configuration)
             }
         }
 
-        private fun showExperimentalHomeWidget(
+        private fun showAlternativeHomeWidgetPrompt(
             configuration: HomePanelCta,
         ) {
             hideDaxCta()
