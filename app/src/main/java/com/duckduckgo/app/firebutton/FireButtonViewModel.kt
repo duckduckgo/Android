@@ -66,7 +66,11 @@ class FireButtonViewModel @Inject constructor(
 
     sealed class Command {
         data object LaunchFireproofWebsites : Command()
-        data class ShowClearWhatDialog(val option: ClearWhatOption) : Command()
+        data class ShowClearWhatDialog(
+            val option: ClearWhatOption,
+            val clearDuckAi: Boolean,
+        ) : Command()
+
         data class ShowClearWhenDialog(val option: ClearWhenOption) : Command()
         data class LaunchFireAnimationSettings(val animation: FireAnimation) : Command()
     }
@@ -105,7 +109,14 @@ class FireButtonViewModel @Inject constructor(
     }
 
     fun onAutomaticallyClearWhatClicked() {
-        viewModelScope.launch { command.send(Command.ShowClearWhatDialog(viewState.value.automaticallyClearData.clearWhatOption)) }
+        viewModelScope.launch {
+            command.send(
+                Command.ShowClearWhatDialog(
+                    viewState.value.automaticallyClearData.clearWhatOption,
+                    viewState.value.clearDuckAiData,
+                ),
+            )
+        }
         pixel.fire(AppPixelName.SETTINGS_AUTOMATICALLY_CLEAR_WHAT_PRESSED)
     }
 

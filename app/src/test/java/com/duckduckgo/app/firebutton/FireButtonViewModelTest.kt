@@ -119,7 +119,7 @@ internal class FireButtonViewModelTest {
         testee.commands().test {
             testee.onAutomaticallyClearWhatClicked()
 
-            assertEquals(Command.ShowClearWhatDialog(ClearWhatOption.CLEAR_NONE), awaitItem())
+            assertEquals(Command.ShowClearWhatDialog(ClearWhatOption.CLEAR_NONE, false), awaitItem())
             verify(mockPixel).fire(AppPixelName.SETTINGS_AUTOMATICALLY_CLEAR_WHAT_PRESSED)
 
             cancelAndConsumeRemainingEvents()

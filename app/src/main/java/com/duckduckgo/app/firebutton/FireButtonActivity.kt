@@ -94,7 +94,7 @@ class FireButtonActivity : DuckDuckGoActivity() {
             .flowWithLifecycle(lifecycle, Lifecycle.State.RESUMED)
             .onEach { viewState ->
                 viewState.let {
-                    updateAutomaticClearDataOptions(it.automaticallyClearData)
+                    updateAutomaticClearDataOptions(it.automaticallyClearData, it.clearDuckAiData)
                     updateSelectedFireAnimation(it.selectedFireAnimation)
                     updateClearDuckAiDataSetting(it.clearDuckAiData, it.showClearDuckAiDataSetting)
                 }
@@ -106,8 +106,11 @@ class FireButtonActivity : DuckDuckGoActivity() {
             .launchIn(lifecycleScope)
     }
 
-    private fun updateAutomaticClearDataOptions(automaticallyClearData: AutomaticallyClearData) {
-        val clearWhatSubtitle = getString(automaticallyClearData.clearWhatOption.nameStringResourceId())
+    private fun updateAutomaticClearDataOptions(
+        automaticallyClearData: AutomaticallyClearData,
+        clearDuckAiData: Boolean,
+    ) {
+        val clearWhatSubtitle = getString(automaticallyClearData.clearWhatOption.nameStringResourceId(clearDuckAiData))
         binding.automaticallyClearWhatSetting.setSecondaryText(clearWhatSubtitle)
 
         val clearWhenSubtitle = getString(automaticallyClearData.clearWhenOption.nameStringResourceId())
@@ -122,7 +125,10 @@ class FireButtonActivity : DuckDuckGoActivity() {
         binding.selectedFireAnimationSetting.setSecondaryText(subtitle)
     }
 
-    private fun updateClearDuckAiDataSetting(enabled: Boolean, isVisible: Boolean) {
+    private fun updateClearDuckAiDataSetting(
+        enabled: Boolean,
+        isVisible: Boolean,
+    ) {
         binding.clearDuckAiDataSetting.setIsChecked(enabled)
         binding.clearDuckAiDataSetting.visibility = if (isVisible) View.VISIBLE else View.GONE
     }
@@ -130,18 +136,22 @@ class FireButtonActivity : DuckDuckGoActivity() {
     private fun processCommand(it: Command) {
         when (it) {
             is Command.LaunchFireproofWebsites -> launchFireproofWebsites()
-            is Command.ShowClearWhatDialog -> launchAutomaticallyClearWhatDialog(it.option)
+            is Command.ShowClearWhatDialog -> launchAutomaticallyClearWhatDialog(it.option, it.clearDuckAi)
             is Command.ShowClearWhenDialog -> launchAutomaticallyClearWhenDialog(it.option)
             is Command.LaunchFireAnimationSettings -> launchFireAnimationSelector(it.animation)
         }
     }
 
     @StringRes
-    private fun ClearWhatOption.nameStringResourceId(): Int {
+    private fun ClearWhatOption.nameStringResourceId(clearDuckAi: Boolean): Int {
         return when (this) {
             ClearWhatOption.CLEAR_NONE -> R.string.settingsAutomaticallyClearWhatOptionNone
             ClearWhatOption.CLEAR_TABS_ONLY -> R.string.settingsAutomaticallyClearWhatOptionTabs
-            ClearWhatOption.CLEAR_TABS_AND_DATA -> R.string.settingsAutomaticallyClearWhatOptionTabsAndData
+            ClearWhatOption.CLEAR_TABS_AND_DATA -> if (clearDuckAi) {
+                R.string.settingsAutomaticallyClearWhatOptionTabsAndDataAndChats
+            } else {
+                R.string.settingsAutomaticallyClearWhatOptionTabsAndData
+            }
         }
     }
 
@@ -162,7 +172,10 @@ class FireButtonActivity : DuckDuckGoActivity() {
         startActivity(FireproofWebsitesActivity.intent(this), options)
     }
 
-    private fun launchAutomaticallyClearWhatDialog(option: ClearWhatOption) {
+    private fun launchAutomaticallyClearWhatDialog(
+        option: ClearWhatOption,
+        clearDuckAi: Boolean,
+    ) {
         val currentOption = option.getOptionIndex()
         RadioListAlertDialogBuilder(this)
             .setTitle(R.string.settingsAutomaticallyClearWhatDialogTitle)
@@ -170,7 +183,11 @@ class FireButtonActivity : DuckDuckGoActivity() {
                 listOf(
                     R.string.settingsAutomaticallyClearWhatOptionNone,
                     R.string.settingsAutomaticallyClearWhatOptionTabs,
-                    R.string.settingsAutomaticallyClearWhatOptionTabsAndData,
+                    if (clearDuckAi) {
+                        R.string.settingsAutomaticallyClearWhatOptionTabsAndDataAndChats
+                    } else {
+                        R.string.settingsAutomaticallyClearWhatOptionTabsAndData
+                    },
                 ),
                 currentOption,
             )
