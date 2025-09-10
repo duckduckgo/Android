@@ -50,7 +50,6 @@ import com.duckduckgo.app.browser.R.string
 import com.duckduckgo.app.browser.autocomplete.BrowserAutoCompleteSuggestionsAdapter
 import com.duckduckgo.app.browser.autocomplete.SuggestionItemDecoration
 import com.duckduckgo.app.browser.databinding.ActivitySystemSearchBinding
-import com.duckduckgo.app.browser.databinding.IncludeQuickAccessItemsBinding
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.browser.newtab.FavoritesQuickAccessAdapter
 import com.duckduckgo.app.browser.newtab.FavoritesQuickAccessAdapter.Companion.QUICK_ACCESS_ITEM_MAX_SIZE_DP
@@ -137,7 +136,6 @@ class SystemSearchActivity : DuckDuckGoActivity() {
 
     private val viewModel: SystemSearchViewModel by bindViewModel()
     private val binding: ActivitySystemSearchBinding by viewBinding()
-    private lateinit var quickAccessItemsBinding: IncludeQuickAccessItemsBinding
     private lateinit var autocompleteSuggestionsAdapter: BrowserAutoCompleteSuggestionsAdapter
     private lateinit var deviceAppSuggestionsAdapter: DeviceAppSuggestionsAdapter
     private lateinit var quickAccessAdapter: FavoritesQuickAccessAdapter
@@ -205,7 +203,6 @@ class SystemSearchActivity : DuckDuckGoActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         dataClearerForegroundAppRestartPixel.registerIntent(intent)
-        quickAccessItemsBinding = IncludeQuickAccessItemsBinding.bind(binding.root)
         setContentView(binding.root)
         configureObservers()
         configureOnboarding()
@@ -354,7 +351,7 @@ class SystemSearchActivity : DuckDuckGoActivity() {
     }
 
     private fun configureQuickAccessGrid() {
-        val quickAccessRecyclerView = quickAccessItemsBinding.quickAccessRecyclerView
+        val quickAccessRecyclerView = binding.quickAccessRecyclerView
         val numOfColumns = gridViewColumnCalculator.calculateNumberOfColumns(QUICK_ACCESS_ITEM_MAX_SIZE_DP, QUICK_ACCESS_GRID_MAX_COLUMNS)
         val layoutManager = GridLayoutManager(this, numOfColumns)
         quickAccessRecyclerView.layoutManager = layoutManager
@@ -395,13 +392,13 @@ class SystemSearchActivity : DuckDuckGoActivity() {
         if (isOmnibarAtTop) {
             binding.rootView.removeView(binding.appBarLayoutBottom)
             binding.results.updatePadding(top = toolbarSize)
-            quickAccessItemsBinding.quickAccessRecyclerView.updateLayoutParams<CoordinatorLayout.LayoutParams> {
+            binding.quickAccessRecyclerView.updateLayoutParams<CoordinatorLayout.LayoutParams> {
                 topMargin = toolbarSize
             }
         } else {
             binding.rootView.removeView(binding.appBarLayout)
             binding.results.updatePadding(bottom = toolbarSize)
-            quickAccessItemsBinding.quickAccessRecyclerView.updateLayoutParams<CoordinatorLayout.LayoutParams> {
+            binding.quickAccessRecyclerView.updateLayoutParams<CoordinatorLayout.LayoutParams> {
                 bottomMargin = toolbarSize
             }
         }
@@ -488,9 +485,9 @@ class SystemSearchActivity : DuckDuckGoActivity() {
 
     private fun renderQuickAccessItems(it: SystemSearchViewModel.Suggestions.QuickAccessItems) {
         if (it.favorites.isEmpty()) {
-            quickAccessItemsBinding.quickAccessRecyclerView.gone()
+            binding.quickAccessRecyclerView.gone()
         } else {
-            quickAccessItemsBinding.quickAccessRecyclerView.show()
+            binding.quickAccessRecyclerView.show()
             quickAccessAdapter.submitList(it.favorites)
         }
     }

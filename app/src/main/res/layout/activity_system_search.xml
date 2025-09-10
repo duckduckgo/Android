@@ -200,8 +200,15 @@
         </LinearLayout>
     </com.google.android.material.appbar.AppBarLayout>
 
-    <include android:id="@+id/includeQuickAccessItems"
-        layout="@layout/include_quick_access_items" />
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/quickAccessRecyclerView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:overScrollMode="never"
+        tools:itemCount="8"
+        tools:listItem="@layout/view_quick_access_item"
+        tools:showIn="@layout/activity_system_search"
+        tools:spanCount="4" />
 
     <androidx.core.widget.NestedScrollView
         android:id="@+id/results"
