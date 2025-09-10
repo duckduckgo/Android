@@ -64,7 +64,7 @@ import com.duckduckgo.app.settings.SettingsViewModel.Command.LaunchPrivateSearch
 import com.duckduckgo.app.settings.SettingsViewModel.Command.LaunchSyncSettings
 import com.duckduckgo.app.settings.SettingsViewModel.Command.LaunchWebTrackingProtectionScreen
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.app.widget.experiment.PostCtaExperienceExperiment
+import com.duckduckgo.app.widget.experiment.PostCtaExperienceToggles
 import com.duckduckgo.app.widget.ui.WidgetCapabilities
 import com.duckduckgo.autoconsent.api.Autoconsent
 import com.duckduckgo.autofill.api.AutofillCapabilityChecker
@@ -124,7 +124,7 @@ class SettingsViewModel @Inject constructor(
     private val androidBrowserConfigFeature: AndroidBrowserConfigFeature,
     private val settingsPageFeature: SettingsPageFeature,
     private val widgetCapabilities: WidgetCapabilities,
-    private val postCtaExperienceExperiment: PostCtaExperienceExperiment,
+    private val postCtaExperienceToggles: PostCtaExperienceToggles,
     private val rebrandingFeatureToggle: SubscriptionRebrandingFeatureToggle,
 ) : ViewModel(), DefaultLifecycleObserver {
 
@@ -255,13 +255,11 @@ class SettingsViewModel @Inject constructor(
 
     fun userRequestedToAddHomeScreenWidget() {
         viewModelScope.launch(dispatcherProvider.io()) {
-            postCtaExperienceExperiment.enroll()
-            val simpleWidgetPrompt = postCtaExperienceExperiment.isSimpleSearchWidgetPrompt()
+            val simpleWidgetPrompt = postCtaExperienceToggles.self().isEnabled() && postCtaExperienceToggles.simpleSearchWidgetPrompt().isEnabled()
             command.send(LaunchAddHomeScreenWidget(simpleWidgetPrompt))
             if (!currentViewState().widgetsInstalled) {
                 widgetPromptShown = true
             }
-            postCtaExperienceExperiment.fireSettingsWidgetDisplay()
         }
     }
 
@@ -356,7 +354,6 @@ class SettingsViewModel @Inject constructor(
                 widgetPromptShown = false
                 if (!widgetsInstalled) {
                     logcat { "Widget bottom sheet was dismissed." }
-                    postCtaExperienceExperiment.fireSettingsWidgetDismiss()
                 }
             }
         }

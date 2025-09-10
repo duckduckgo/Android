@@ -20,7 +20,6 @@ import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.pixels.AppPixelName.WIDGETS_DELETED
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.app.widget.experiment.PostCtaExperienceExperiment
 import com.duckduckgo.app.widget.ui.AppWidgetCapabilities
 import javax.inject.Inject
 
@@ -28,16 +27,14 @@ class SearchWidgetLifecycleDelegate @Inject constructor(
     private val appInstallStore: AppInstallStore,
     private val widgetCapabilities: AppWidgetCapabilities,
     private val pixel: Pixel,
-    private val postCtaExperienceExperiment: PostCtaExperienceExperiment,
 ) {
 
-    suspend fun handleOnWidgetEnabled(widgetSpecificAddedPixel: AppPixelName) {
+    fun handleOnWidgetEnabled(widgetSpecificAddedPixel: AppPixelName) {
         if (!appInstallStore.widgetInstalled) {
             appInstallStore.widgetInstalled = true
             pixel.fire(AppPixelName.WIDGETS_ADDED)
         }
         pixel.fire(widgetSpecificAddedPixel)
-        postCtaExperienceExperiment.fireSettingsWidgetAdd()
     }
 
     fun handleOnWidgetDisabled(widgetSpecificDeletedPixel: AppPixelName) {

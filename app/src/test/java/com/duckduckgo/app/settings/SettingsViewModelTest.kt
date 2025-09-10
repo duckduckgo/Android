@@ -25,7 +25,7 @@ import com.duckduckgo.app.settings.SettingsViewModel.Command.LaunchAddHomeScreen
 import com.duckduckgo.app.settings.SettingsViewModel.Command.LaunchAutofillPasswordsManagement
 import com.duckduckgo.app.settings.SettingsViewModel.Command.LaunchAutofillSettings
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.app.widget.experiment.PostCtaExperienceExperiment
+import com.duckduckgo.app.widget.experiment.PostCtaExperienceToggles
 import com.duckduckgo.app.widget.ui.WidgetCapabilities
 import com.duckduckgo.autoconsent.api.Autoconsent
 import com.duckduckgo.autofill.api.AutofillCapabilityChecker
@@ -98,11 +98,10 @@ class SettingsViewModelTest {
 
     private val mockWidgetCapabilities: WidgetCapabilities = mock()
 
-    private val mockPostCtaExperienceExperiment: PostCtaExperienceExperiment = mock()
-
     private val mockDuckAiFeatureState: DuckAiFeatureState = mock()
     private val duckAiShowSettingsFlow = MutableStateFlow(false)
 
+    private val fakePostCtaExperienceToggles = FakeFeatureToggleFactory.create(PostCtaExperienceToggles::class.java)
     private val mockRebrandingFeatureToggle: SubscriptionRebrandingFeatureToggle = mock()
 
     @Before
@@ -133,7 +132,7 @@ class SettingsViewModelTest {
             androidBrowserConfigFeature = fakeAndroidBrowserConfigFeature,
             settingsPageFeature = fakeSettingsPageFeature,
             widgetCapabilities = mockWidgetCapabilities,
-            postCtaExperienceExperiment = mockPostCtaExperienceExperiment,
+            postCtaExperienceToggles = fakePostCtaExperienceToggles,
             rebrandingFeatureToggle = mockRebrandingFeatureToggle,
         )
     }
@@ -210,11 +209,10 @@ class SettingsViewModelTest {
 
     @Test
     fun whenUserRequestedToAddHomeScreenWidgetAndSimpleWidgetThenLaunchAddHomeScreenWidgetCommandSentWithTrue() = runTest {
-        whenever(mockPostCtaExperienceExperiment.isSimpleSearchWidgetPrompt()).thenReturn(true)
-        testee.userRequestedToAddHomeScreenWidget()
+        fakePostCtaExperienceToggles.self().setRawStoredState(State(true))
+        fakePostCtaExperienceToggles.simpleSearchWidgetPrompt().setRawStoredState(State(true))
 
-        verify(mockPostCtaExperienceExperiment).enroll()
-        verify(mockPostCtaExperienceExperiment).fireSettingsWidgetDisplay()
+        testee.userRequestedToAddHomeScreenWidget()
 
         testee.commands().test {
             assertEquals(LaunchAddHomeScreenWidget(true), awaitItem())
@@ -223,11 +221,11 @@ class SettingsViewModelTest {
 
     @Test
     fun whenUserRequestedToAddHomeScreenWidgetAndNotSimpleWidgetThenLaunchAddHomeScreenWidgetCommandSentWithFalse() = runTest {
-        whenever(mockPostCtaExperienceExperiment.isSimpleSearchWidgetPrompt()).thenReturn(false)
+        fakePostCtaExperienceToggles.self().setRawStoredState(State(true))
+        fakePostCtaExperienceToggles.simpleSearchWidgetPrompt().setRawStoredState(State(false))
+
         testee.userRequestedToAddHomeScreenWidget()
 
-        verify(mockPostCtaExperienceExperiment).enroll()
-        verify(mockPostCtaExperienceExperiment).fireSettingsWidgetDisplay()
         testee.commands().test {
             assertEquals(LaunchAddHomeScreenWidget(false), awaitItem())
         }
@@ -267,41 +265,6 @@ class SettingsViewModelTest {
             testee.refreshWidgetsInstalledState()
 
             assertEquals(false, testee.viewState().value.widgetsInstalled)
-        }
-
-    @Test
-    fun whenRefreshWidgetsInstalledStateAndWidgetPromptShownAndWidgetsNotInstalledThenFireSettingsWidgetDismiss() =
-        runTest {
-            whenever(mockPostCtaExperienceExperiment.isSimpleSearchWidgetPrompt()).thenReturn(true)
-            whenever(mockWidgetCapabilities.hasInstalledWidgets).thenReturn(false)
-            testee.userRequestedToAddHomeScreenWidget() // Simulate user requesting to add widget, which shows the prompt
-
-            testee.refreshWidgetsInstalledState()
-
-            verify(mockPostCtaExperienceExperiment).fireSettingsWidgetDismiss()
-        }
-
-    @Test
-    fun whenRefreshWidgetsInstalledStateAndWidgetPromptShownAndWidgetsInstalledThenFireSettingsWidgetDismissNotCalled() =
-        runTest {
-            whenever(mockPostCtaExperienceExperiment.isSimpleSearchWidgetPrompt()).thenReturn(true)
-            whenever(mockWidgetCapabilities.hasInstalledWidgets).thenReturn(true)
-            testee.userRequestedToAddHomeScreenWidget() // Simulate user requesting to add widget, which shows the prompt
-
-            testee.refreshWidgetsInstalledState()
-
-            verify(mockPostCtaExperienceExperiment, never()).fireSettingsWidgetDismiss()
-        }
-
-    @Test
-    fun whenRefreshWidgetsInstalledStateAndWidgetPromptNotShownAndWidgetsNotInstalledThenFireSettingsWidgetDismissNotCalled() =
-        runTest {
-            whenever(mockPostCtaExperienceExperiment.isSimpleSearchWidgetPrompt()).thenReturn(true)
-            whenever(mockWidgetCapabilities.hasInstalledWidgets).thenReturn(false)
-
-            testee.refreshWidgetsInstalledState()
-
-            verify(mockPostCtaExperienceExperiment, never()).fireSettingsWidgetDismiss()
         }
 
     @Test
