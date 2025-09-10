@@ -999,7 +999,6 @@ class InputScreenViewModelTest {
 
     @Test
     fun `when only chat mode used then both modes pixel is not fired`() = runTest {
-        whenever(duckChat.wasOpenedBefore()).thenReturn(false)
         val viewModel = createViewModel()
         whenever(inputScreenSessionStore.hasUsedSearchMode()).thenReturn(false)
         whenever(inputScreenSessionStore.hasUsedChatMode()).thenReturn(true)

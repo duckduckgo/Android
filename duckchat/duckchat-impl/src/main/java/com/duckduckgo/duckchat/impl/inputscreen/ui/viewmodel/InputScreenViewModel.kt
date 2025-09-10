@@ -383,15 +383,16 @@ class InputScreenViewModel @AssistedInject constructor(
                 command.value = Command.SubmitChat(query)
                 duckChat.openDuckChatWithAutoPrompt(query)
             }
+
+            val params = mapOf(DuckChatPixelParameters.WAS_USED_BEFORE to wasDuckAiOpenedBefore.toBinaryString())
+            pixel.fire(pixel = DUCK_CHAT_EXPERIMENTAL_OMNIBAR_PROMPT_SUBMITTED, parameters = params)
+            pixel.fire(DUCK_CHAT_EXPERIMENTAL_OMNIBAR_PROMPT_SUBMITTED_DAILY, type = Daily())
+
             inputScreenDiscoveryFunnel.onPromptSubmitted()
             inputScreenSessionUsageMetric.onPromptSubmitted()
 
             sessionStore.setHasUsedChatMode(true)
             checkAndFireBothModesPixel()
-
-            val params = mapOf(DuckChatPixelParameters.WAS_USED_BEFORE to wasDuckAiOpenedBefore.toBinaryString())
-            pixel.fire(pixel = DUCK_CHAT_EXPERIMENTAL_OMNIBAR_PROMPT_SUBMITTED, parameters = params)
-            pixel.fire(DUCK_CHAT_EXPERIMENTAL_OMNIBAR_PROMPT_SUBMITTED_DAILY, type = Daily())
         }
     }
 
