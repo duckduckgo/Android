@@ -1,11 +1,6 @@
 name: Release - Create Release Task in Asana
 
 on:
-  workflow_call:
-    inputs:
-      app-version:
-        description: 'App Version for Release'
-        required: true
   workflow_dispatch:
     inputs:
       app-version:
