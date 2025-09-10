@@ -22,7 +22,7 @@ import android.content.DialogInterface
 import android.view.LayoutInflater
 import android.widget.FrameLayout
 import com.duckduckgo.app.browser.R
-import com.duckduckgo.app.browser.databinding.BottomSheetExperimentHomeScreenWidgetBinding
+import com.duckduckgo.app.browser.databinding.BottomSheetHomeScreenWidgetBinding
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.shape.CornerFamily
@@ -34,8 +34,8 @@ class AlternativeHomeScreenWidgetBottomSheetDialog(
     isLightModeEnabled: Boolean,
 ) : BottomSheetDialog(context) {
 
-    private val binding: BottomSheetExperimentHomeScreenWidgetBinding =
-        BottomSheetExperimentHomeScreenWidgetBinding.inflate(LayoutInflater.from(context))
+    private val binding: BottomSheetHomeScreenWidgetBinding =
+        BottomSheetHomeScreenWidgetBinding.inflate(LayoutInflater.from(context))
 
     var eventListener: EventListener? = null
 
@@ -54,18 +54,18 @@ class AlternativeHomeScreenWidgetBottomSheetDialog(
             eventListener?.onCanceled()
             dismiss()
         }
-        binding.experimentHomeScreenWidgetBottomSheetDialogImage.setImageResource(
+        binding.homeScreenWidgetBottomSheetDialogImage.setImageResource(
             if (isLightModeEnabled) {
-                R.drawable.experiment_widget_promo_light
+                R.drawable.widget_promo_light
             } else {
-                R.drawable.experiment_widget_promo_dark
+                R.drawable.widget_promo_dark
             },
         )
-        binding.experimentHomeScreenWidgetBottomSheetDialogPrimaryButton.setOnClickListener {
+        binding.homeScreenWidgetBottomSheetDialogPrimaryButton.setOnClickListener {
             eventListener?.onAddWidgetButtonClicked()
             dismiss()
         }
-        binding.experimentHomeScreenWidgetBottomSheetDialogGhostButton.setOnClickListener {
+        binding.homeScreenWidgetBottomSheetDialogGhostButton.setOnClickListener {
             eventListener?.onNotNowButtonClicked()
             dismiss()
         }
