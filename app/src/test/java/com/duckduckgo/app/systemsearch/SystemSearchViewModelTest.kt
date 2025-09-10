@@ -689,7 +689,8 @@ class SystemSearchViewModelTest {
             verify(commandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
             val issuedCommand = commandCaptor.allValues.find { it is T }
             assertNull(
-                "Command of type ${T::class.java.simpleName} was issued but should not have been. Command: $issuedCommand. All commands: ${commandCaptor.allValues}",
+                "Command of type ${T::class.java.simpleName} was issued but should not have been. " +
+                    "Command: $issuedCommand. All commands: ${commandCaptor.allValues}",
                 issuedCommand,
             )
         }

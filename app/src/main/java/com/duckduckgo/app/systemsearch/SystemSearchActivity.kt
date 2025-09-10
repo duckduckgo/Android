@@ -87,7 +87,6 @@ import com.duckduckgo.common.ui.view.showKeyboard
 import com.duckduckgo.common.ui.view.toPx
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.KeyboardVisibilityUtil
-import com.duckduckgo.common.utils.extensions.capitalizeFirstLetter
 import com.duckduckgo.common.utils.extensions.html
 import com.duckduckgo.common.utils.extensions.showKeyboard
 import com.duckduckgo.common.utils.text.TextChangedWatcher
@@ -147,47 +146,49 @@ class SystemSearchActivity : DuckDuckGoActivity() {
     private var nestedScrollViewPosition: Int = 0
     private var nestedScrollViewRestorePosition: Int = 0
 
+    private val isOmnibarAtTop = settingsDataStore.omnibarPosition == OmnibarPosition.TOP
+
     private val systemSearchOnboarding
         get() = binding.includeSystemSearchOnboarding
 
     private val omnibarTextInput: KeyboardAwareEditText
         get() {
-            return if (settingsDataStore.omnibarPosition == OmnibarPosition.TOP) binding.omnibarTextInput else binding.omnibarTextInputBottom
+            return if (isOmnibarAtTop) binding.omnibarTextInput else binding.omnibarTextInputBottom
         }
 
     private val voiceSearch: ImageView
         get() {
-            return if (settingsDataStore.omnibarPosition == OmnibarPosition.TOP) binding.voiceSearchButton else binding.voiceSearchButtonBottom
+            return if (isOmnibarAtTop) binding.voiceSearchButton else binding.voiceSearchButtonBottom
         }
 
     private val clearTextButton: ImageView
         get() {
-            return if (settingsDataStore.omnibarPosition == OmnibarPosition.TOP) binding.clearTextButton else binding.clearTextButtonBottom
+            return if (isOmnibarAtTop) binding.clearTextButton else binding.clearTextButtonBottom
         }
 
     private val appBarLayout: AppBarLayout
         get() {
-            return if (settingsDataStore.omnibarPosition == OmnibarPosition.TOP) binding.appBarLayout else binding.appBarLayoutBottom
+            return if (isOmnibarAtTop) binding.appBarLayout else binding.appBarLayoutBottom
         }
 
     private val shadowContainer: MaterialCardView
         get() {
-            return if (settingsDataStore.omnibarPosition == OmnibarPosition.TOP) binding.omniBarContainerShadow else binding.omniBarContainerShadowBottom
+            return if (isOmnibarAtTop) binding.omniBarContainerShadow else binding.omniBarContainerShadowBottom
         }
 
     private val logo: ImageView
         get() {
-            return if (settingsDataStore.omnibarPosition == OmnibarPosition.TOP) binding.logo else binding.logoBottom
+            return if (isOmnibarAtTop) binding.logo else binding.logoBottom
         }
 
     private val duckAi: ImageView
         get() {
-            return if (settingsDataStore.omnibarPosition == OmnibarPosition.TOP) binding.aiChatIconMenu else binding.aiChatIconMenuBottom
+            return if (isOmnibarAtTop) binding.aiChatIconMenu else binding.aiChatIconMenuBottom
         }
 
     private val omnibarDivider: View
         get() {
-            return if (settingsDataStore.omnibarPosition == OmnibarPosition.TOP) binding.verticalDivider else binding.verticalDividerBottom
+            return if (isOmnibarAtTop) binding.verticalDivider else binding.verticalDividerBottom
         }
 
     private val textChangeWatcher = object : TextChangedWatcher() {
@@ -389,7 +390,7 @@ class SystemSearchActivity : DuckDuckGoActivity() {
 
     private fun configureOmnibar() {
         val toolbarSize = resources.getDimensionPixelSize(com.duckduckgo.mobile.android.R.dimen.toolbarSize)
-        if (settingsDataStore.omnibarPosition == OmnibarPosition.TOP) {
+        if (isOmnibarAtTop) {
             binding.rootView.removeView(binding.appBarLayoutBottom)
             binding.results.updatePadding(top = toolbarSize)
             quickAccessItemsBinding.quickAccessRecyclerView.updateLayoutParams<CoordinatorLayout.LayoutParams> {
