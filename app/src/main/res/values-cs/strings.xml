@@ -273,8 +273,8 @@
     <string name="searchWidgetEmtpyFavoritesHint">Zatím nebyly přidány žádné oblíbené položky</string>
     <string name="searchWidgetEmtpyFavoritesCta">Přidat oblíbené</string>
     <string name="widgetConfigurationActivityTitle">Konfigurace widgetu</string>
-    <string name="favoritesWidgetLabel">Oblíbené</string>
-    <string name="searchWidgetLabel">Vyhledávání</string>
+    <string name="favoritesWidgetLabel">Vyhledávání a oblíbené položky</string>
+    <string name="searchWidgetLabel">Vyhledávání a Duck.ai</string>
 
     <!-- Home Screen Shortcuts -->
     <string name="addToHome">Přidat na domovskou obrazovku</string>
@@ -983,4 +983,10 @@
     <string name="tabSwitcherAnimationTileRemovalDialogPositiveButton">Skrýt</string>
     <string name="tabSwitcherAnimationTileRemovalDialogNegativeButton">Ponechat</string>
 
+    <!-- Widgets -->
+    <string name="searchOnlyWidgetLabel" instruction="Label for the search-only widget">Jen vyhledávání</string>
+    <string name="searchOnlyWidgetDescription" instruction="Description for the search-only widget">Rychle spusť soukromé vyhledávání pomocí DuckDuckGo.</string>
+    <string name="searchAndFavoritesWidgetDescription" instruction="Description for the search and favorites widget">Vyhledávej nebo navštěvuj své oblíbené weby soukromě jediným klepnutím. Stačí povolit hlasové vyhledávání a Duck.ai.</string>
+    <string name="searchWidgetDescription" instruction="Description for the search widget, which may include Duck.ai and voice search">Vyhledávej soukromě pomocí DuckDuckGo nebo se zeptej Duck.ai. Stačí povolit hlasové vyhledávání a Duck.ai.</string>
+    <string name="duckAiOnlyPinShortcutLabel" instruction="Label for the Duck.ai pinned shortcut. Should be Duck.ai in all languages">Duck.ai</string>
 </resources>
