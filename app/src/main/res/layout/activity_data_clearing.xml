@@ -72,11 +72,12 @@
                 app:primaryText="@string/settingsAutomaticallyClearWhen"
                 tools:secondaryText="test test test" />
 
-            <com.duckduckgo.common.ui.view.listitem.OneLineListItem
+            <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
                 android:id="@+id/clearDuckAiDataSetting"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:primaryText="@string/settingsClearAiData"
+                app:primaryText="@string/settingsClearAiDataTitle"
+                app:secondaryText="@string/settingsClearAiDataTitle"
                 app:showSwitch="true" />
 
         </LinearLayout>

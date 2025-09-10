@@ -89,9 +89,13 @@ class DuckDuckGoWebLocalStorageManager @Inject constructor(
                     db.delete(entry.key)
                     logcat { "WebLocalStorageManager: Deleted key: $key" }
                 } else if (settingsDataStore.clearDuckAiData && domainForMatchingAllowedKey == DUCKDUCKGO_DOMAIN) {
-                    if (allowedKeys.none { key.endsWith(it) }) {
-                        db.delete(entry.key)
-                        logcat { "WebLocalStorageManager: Deleted key: $key" }
+                    if (key.endsWith("duckaiHasAgreedToTerms")) {
+                        logcat { "WebLocalStorageManager: Don't delete key: $key" }
+                    } else {
+                        if (allowedKeys.none { key.endsWith(it) }) {
+                            db.delete(entry.key)
+                            logcat { "WebLocalStorageManager: Deleted key: $key" }
+                        }
                     }
                 }
             }
