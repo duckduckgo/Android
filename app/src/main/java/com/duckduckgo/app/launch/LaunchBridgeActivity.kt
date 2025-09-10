@@ -72,6 +72,9 @@ class LaunchBridgeActivity : DuckDuckGoActivity() {
         val splashScreen = installSplashScreen()
         super.onCreate(savedInstanceState)
         splashScreen.setKeepOnScreenCondition { true }
+        logcat {
+            "lp_test; LaunchBridgeActivity; action: ${intent?.action}; categories: ${intent?.categories}; package: ${intent?.`package`}; extras: ${intent?.extras}"
+        }
 
         setContentView(R.layout.activity_launch)
 

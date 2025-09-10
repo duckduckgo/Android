@@ -896,6 +896,9 @@ class BrowserTabFragment :
     private lateinit var privacyProtectionsPopup: PrivacyProtectionsPopup
 
     private val inputScreenLauncher = registerForActivityResult(StartActivityForResult()) { result ->
+        logcat {
+            "lp_test; input screen result"
+        }
         val data = result.data ?: return@registerForActivityResult
 
         when (result.resultCode) {
@@ -1090,7 +1093,7 @@ class BrowserTabFragment :
 
     private fun configureInputScreenLauncher() {
         omnibar.configureInputScreenLaunchListener { query ->
-            launchInputScreen(query)
+            viewModel.onOmnibarInputScreenLaunchRequested(query)
         }
     }
 
@@ -2218,7 +2221,7 @@ class BrowserTabFragment :
             is Command.LaunchInputScreen -> {
                 // if the fire button is used, prevent automatically launching the input screen until the process reloads
                 if ((requireActivity() as? BrowserActivity)?.isDataClearingInProgress == false) {
-                    launchInputScreen(query = "")
+                    launchInputScreen(query = it.query)
                 }
             }
             is Command.ExtractSerpLogo -> extractSerpLogo(webView, it.currentUrl)

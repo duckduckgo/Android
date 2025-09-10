@@ -531,6 +531,9 @@ open class BrowserActivity : DuckDuckGoActivity() {
     }
 
     private fun launchNewSearchOrQuery(intent: Intent?) {
+        logcat {
+            "lp_test; launchNewSearchOrQuery; action: ${intent?.action}; categories: ${intent?.categories}; package: ${intent?.`package`}; extras: ${intent?.extras}"
+        }
         logcat(INFO) { "launchNewSearchOrQuery: $intent" }
 
         if (intent == null) {

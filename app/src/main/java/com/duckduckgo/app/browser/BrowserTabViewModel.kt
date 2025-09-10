@@ -484,6 +484,7 @@ class BrowserTabViewModel @Inject constructor(
     ViewModel(),
     NavigationHistoryListener {
 
+    private var inputScreenLaunched = false
     private var buildingSiteFactoryJob: Job? = null
     private var hasUserSeenHistoryIAM = false
     private var lastAutoCompleteState: AutoCompleteViewState? = null
@@ -736,6 +737,7 @@ class BrowserTabViewModel @Inject constructor(
 
         // observe when user opens a new tab and launch the input screen, if the feature is enabled
         tabRepository.flowSelectedTab
+            // .drop(1)
             .distinctUntilChangedBy { selectedTab -> selectedTab?.tabId } // only observe when the tab changes and ignore further updates
             .filter { selectedTab ->
                 // fire event when activating a genuinely new tab
@@ -743,12 +745,15 @@ class BrowserTabViewModel @Inject constructor(
                 val showInputScreenAutomatically = duckAiFeatureState.showInputScreenAutomaticallyOnNewTab.value
                 val isActiveTab = ::tabId.isInitialized && selectedTab?.tabId == tabId
                 val isOpenedFromAnotherTab = selectedTab?.sourceTabId != null
+                logcat {
+                    "lp_test\nselectedTab: $selectedTab\nisActiveTab: $isActiveTab\nisOpenedFromAnotherTab: $isOpenedFromAnotherTab"
+                }
                 showInputScreenAutomatically && isActiveTab && selectedTab?.url.isNullOrBlank() && !isOpenedFromAnotherTab
             }
             .flowOn(dispatchers.main()) // don't use the immediate dispatcher so that the tabId field has a chance to initialize
             .onEach {
                 // whenever an event fires, so the user switched to a new tab page, launch the input screen
-                command.value = LaunchInputScreen
+                // command.value = LaunchInputScreen
             }
             .launchIn(viewModelScope)
     }
@@ -759,6 +764,9 @@ class BrowserTabViewModel @Inject constructor(
         skipHome: Boolean,
         isExternal: Boolean,
     ) {
+        logcat {
+            "lp_test; loadData; tabId: ${tabId}; initialUrl: ${initialUrl}; skipHome: ${skipHome}; isExternal: $isExternal"
+        }
         this.tabId = tabId
         this.skipHome = skipHome
         siteLiveData = tabRepository.retrieveSiteData(tabId)
@@ -898,10 +906,13 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     fun onViewVisible() {
+        logcat {
+            "lp_test; onViewVisible; tabId: $tabId"
+        }
         setAdClickActiveTabData(url)
 
         // we expect refreshCta to be called when a site is fully loaded if browsingShowing -trackers data available-.
-        if (!currentBrowserViewState().browserShowing && !currentBrowserViewState().maliciousSiteBlocked) {
+        if (!currentBrowserViewState().browserShowing && !currentBrowserViewState().maliciousSiteBlocked && !inputScreenLaunched) {
             viewModelScope.launch {
                 val cta = refreshCta()
                 showOrHideKeyboard(cta)
@@ -918,6 +929,7 @@ class BrowserTabViewModel @Inject constructor(
         } else {
             command.value = HideKeyboard
         }
+        inputScreenLaunched = false
 
         browserViewState.value = currentBrowserViewState().copy(
             showDuckChatOption = duckAiFeatureState.showPopupMenuShortcut.value,
@@ -2879,8 +2891,17 @@ class BrowserTabViewModel @Inject constructor(
     private fun showOrHideKeyboard(cta: Cta?) {
         // we hide the keyboard when showing a DialogCta and HomeCta type in the home screen otherwise we show it
         val shouldHideKeyboard = cta is HomePanelCta || cta is DaxBubbleCta.DaxPrivacyProCta ||
-            duckAiFeatureState.showInputScreen.value || currentBrowserViewState().lastQueryOrigin == QueryOrigin.FromBookmark
-        command.value = if (shouldHideKeyboard) HideKeyboard else ShowKeyboard
+            currentBrowserViewState().lastQueryOrigin == QueryOrigin.FromBookmark
+        command.value = if (shouldHideKeyboard) {
+            HideKeyboard
+        } else {
+            if (duckAiFeatureState.showInputScreen.value) {
+                inputScreenLaunched = true
+                LaunchInputScreen()
+            } else {
+                ShowKeyboard
+            }
+        }
     }
 
     fun onUserClickCtaOkButton(cta: Cta) {
@@ -4373,6 +4394,11 @@ class BrowserTabViewModel @Inject constructor(
 
     fun onDynamicLogoClicked(url: String) {
         command.value = Command.ShowSerpEasterEggLogo(url)
+    }
+
+    fun onOmnibarInputScreenLaunchRequested(query: String) {
+        inputScreenLaunched = true
+        command.value = LaunchInputScreen(query)
     }
 
     companion object {
