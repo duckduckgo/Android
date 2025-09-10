@@ -49,6 +49,7 @@ import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.Feed
 import com.duckduckgo.privacy.dashboard.api.ui.DashboardOpener
 import com.duckduckgo.savedsites.api.models.SavedSite
 import com.duckduckgo.site.permissions.api.SitePermissionsManager.SitePermissions
+import org.json.JSONObject
 
 sealed class Command {
     class OpenInNewTab(
@@ -250,7 +251,9 @@ sealed class Command {
     data class SendResponseToDuckPlayer(val data: JsCallbackData) : Command()
     data class SendSubscriptions(val cssData: SubscriptionEventData, val duckPlayerData: SubscriptionEventData) : Command()
     data class WebShareRequest(val data: JsCallbackData) : Command()
+    data class WebViewCompatWebShareRequest(val data: JsCallbackData, val onResponse: (JSONObject) -> Unit) : Command()
     data class ScreenLock(val data: JsCallbackData) : Command()
+    data class WebViewCompatScreenLock(val data: JsCallbackData, val onResponse: (JSONObject) -> Unit) : Command()
     data object ScreenUnlock : Command()
     data object ShowFaviconsPrompt : Command()
     data class ShowSSLError(val handler: SslErrorHandler, val error: SslErrorResponse) : Command()

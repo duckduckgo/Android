@@ -45,6 +45,8 @@ import com.duckduckgo.duckchat.impl.inputscreen.ui.command.Command.SwitchToTab
 import com.duckduckgo.duckchat.impl.inputscreen.ui.command.InputFieldCommand
 import com.duckduckgo.duckchat.impl.inputscreen.ui.command.SearchCommand
 import com.duckduckgo.duckchat.impl.inputscreen.ui.command.SearchCommand.ShowRemoveSearchSuggestionDialog
+import com.duckduckgo.duckchat.impl.inputscreen.ui.metrics.discovery.InputScreenDiscoveryFunnel
+import com.duckduckgo.duckchat.impl.inputscreen.ui.metrics.usage.InputScreenSessionUsageMetric
 import com.duckduckgo.duckchat.impl.inputscreen.ui.session.InputScreenSessionStore
 import com.duckduckgo.duckchat.impl.inputscreen.ui.state.AutoCompleteScrollState
 import com.duckduckgo.duckchat.impl.inputscreen.ui.state.InputFieldState
@@ -115,6 +117,8 @@ class InputScreenViewModel @AssistedInject constructor(
     private val duckChat: DuckChat,
     private val pixel: Pixel,
     private val sessionStore: InputScreenSessionStore,
+    private val inputScreenDiscoveryFunnel: InputScreenDiscoveryFunnel,
+    private val inputScreenSessionUsageMetric: InputScreenSessionUsageMetric,
 ) : ViewModel() {
 
     private var hasUserSeenHistoryIAM = false
@@ -358,6 +362,8 @@ class InputScreenViewModel @AssistedInject constructor(
         command.value = Command.SubmitSearch(sanitizedQuery)
         pixel.fire(DUCK_CHAT_EXPERIMENTAL_OMNIBAR_QUERY_SUBMITTED)
         pixel.fire(DUCK_CHAT_EXPERIMENTAL_OMNIBAR_QUERY_SUBMITTED_DAILY, type = Daily())
+        inputScreenDiscoveryFunnel.onSearchSubmitted()
+        inputScreenSessionUsageMetric.onSearchSubmitted()
 
         viewModelScope.launch {
             sessionStore.setHasUsedSearchMode(true)
@@ -374,6 +380,8 @@ class InputScreenViewModel @AssistedInject constructor(
         }
         pixel.fire(DUCK_CHAT_EXPERIMENTAL_OMNIBAR_PROMPT_SUBMITTED)
         pixel.fire(DUCK_CHAT_EXPERIMENTAL_OMNIBAR_PROMPT_SUBMITTED_DAILY, type = Daily())
+        inputScreenDiscoveryFunnel.onPromptSubmitted()
+        inputScreenSessionUsageMetric.onPromptSubmitted()
 
         viewModelScope.launch {
             sessionStore.setHasUsedChatMode(true)

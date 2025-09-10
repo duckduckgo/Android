@@ -96,8 +96,6 @@ class TabSwitcherViewModel @Inject constructor(
     private val savedSitesRepository: SavedSitesRepository,
     private val trackersAnimationInfoPanelPixels: TrackersAnimationInfoPanelPixels,
 ) : ViewModel() {
-
-    val activeTab = tabRepository.liveSelectedTab
     val deletableTabs: LiveData<List<TabEntity>> = tabRepository.flowDeletableTabs.asLiveData(
         context = viewModelScope.coroutineContext,
     )
@@ -143,13 +141,7 @@ class TabSwitcherViewModel @Inject constructor(
 
     // all tab items, including the animated tile
     val tabSwitcherItems: List<TabSwitcherItem>
-        get() {
-            return if (tabManagerFeatureFlags.multiSelection().isEnabled()) {
-                selectionViewState.value.tabSwitcherItems
-            } else {
-                tabSwitcherItemsLiveData.value.orEmpty()
-            }
-        }
+        get() = selectionViewState.value.tabSwitcherItems
 
     // only the actual browser tabs
     val tabs: List<Tab>
@@ -205,7 +197,7 @@ class TabSwitcherViewModel @Inject constructor(
 
     suspend fun onTabSelected(tabId: String) {
         val mode = selectionViewState.value.mode as? Selection ?: Normal
-        if (tabManagerFeatureFlags.multiSelection().isEnabled() && mode is Selection) {
+        if (mode is Selection) {
             if (tabId in mode.selectedTabs) {
                 pixel.fire(AppPixelName.TAB_MANAGER_TAB_DESELECTED)
                 unselectTab(tabId)
@@ -367,15 +359,9 @@ class TabSwitcherViewModel @Inject constructor(
                 pixel.fire(AppPixelName.TAB_MANAGER_MENU_CLOSE_ALL_TABS_CONFIRMED)
                 pixel.fire(AppPixelName.TAB_MANAGER_MENU_CLOSE_ALL_TABS_CONFIRMED_DAILY, type = Daily())
 
-                if (tabManagerFeatureFlags.multiSelection().isEnabled()) {
-                    // mark tabs as deletable, the undo snackbar will be displayed when the tab switcher is closed
-                    tabRepository.markDeletable(tabIds)
-                    command.value = Command.CloseAndShowUndoMessage(tabIds)
-                } else {
-                    // all tabs can be deleted immediately because no snackbar is needed and the tab switcher will be closed
-                    deleteTabs(tabIds)
-                    command.value = Command.Close
-                }
+                // mark tabs as deletable, the undo snackbar will be displayed when the tab switcher is closed
+                tabRepository.markDeletable(tabIds)
+                command.value = Command.CloseAndShowUndoMessage(tabIds)
             } else {
                 pixel.fire(AppPixelName.TAB_MANAGER_CLOSE_TABS_CONFIRMED)
                 pixel.fire(AppPixelName.TAB_MANAGER_CLOSE_TABS_CONFIRMED_DAILY, type = Daily())
@@ -398,22 +384,12 @@ class TabSwitcherViewModel @Inject constructor(
     ) {
         viewModelScope.launch {
             if (tabs.size == 1) {
-                if (tabManagerFeatureFlags.multiSelection().isEnabled()) {
-                    // mark the tab as deletable, the undo snackbar will be shown after tab switcher is closed
-                    markTabAsDeletable(tab, swipeGestureUsed)
-                    command.value = Command.CloseAndShowUndoMessage(listOf(tab.id))
-                } else {
-                    // the last tab can be deleted immediately because no snackbar is needed and the tab switcher will be closed
-                    deleteTabs(listOf(tab.id))
-                    command.value = Command.Close
-                }
+                // mark the tab as deletable, the undo snackbar will be shown after tab switcher is closed
+                markTabAsDeletable(tab, swipeGestureUsed)
+                command.value = Command.CloseAndShowUndoMessage(listOf(tab.id))
             } else {
                 markTabAsDeletable(tab, swipeGestureUsed)
-
-                // when the feature flag is disabled, the undo snackbar is shown via deletable tabs observer
-                if (tabManagerFeatureFlags.multiSelection().isEnabled()) {
-                    command.value = Command.ShowUndoDeleteTabsMessage(listOf(tab.id))
-                }
+                command.value = Command.ShowUndoDeleteTabsMessage(listOf(tab.id))
             }
         }
     }
@@ -466,7 +442,7 @@ class TabSwitcherViewModel @Inject constructor(
     }
 
     fun onEmptyAreaClicked() {
-        if (tabManagerFeatureFlags.multiSelection().isEnabled() && selectionViewState.value.mode is Selection) {
+        if (selectionViewState.value.mode is Selection) {
             triggerNormalMode()
         }
     }
@@ -474,7 +450,7 @@ class TabSwitcherViewModel @Inject constructor(
     fun onUpButtonPressed() {
         pixel.fire(AppPixelName.TAB_MANAGER_UP_BUTTON_PRESSED)
 
-        if (tabManagerFeatureFlags.multiSelection().isEnabled() && selectionViewState.value.mode is Selection) {
+        if (selectionViewState.value.mode is Selection) {
             triggerNormalMode()
         } else {
             command.value = Command.Close
@@ -484,7 +460,7 @@ class TabSwitcherViewModel @Inject constructor(
     fun onBackButtonPressed() {
         pixel.fire(AppPixelName.TAB_MANAGER_BACK_BUTTON_PRESSED)
 
-        if (tabManagerFeatureFlags.multiSelection().isEnabled() && selectionViewState.value.mode is Selection) {
+        if (selectionViewState.value.mode is Selection) {
             triggerNormalMode()
         } else {
             command.value = Command.Close
@@ -492,7 +468,7 @@ class TabSwitcherViewModel @Inject constructor(
     }
 
     fun onMenuOpened() {
-        if (tabManagerFeatureFlags.multiSelection().isEnabled() && selectionViewState.value.mode is Selection) {
+        if (selectionViewState.value.mode is Selection) {
             pixel.fire(AppPixelName.TAB_MANAGER_SELECT_MODE_MENU_PRESSED)
         } else {
             pixel.fire(AppPixelName.TAB_MANAGER_MENU_PRESSED)
@@ -631,7 +607,7 @@ class TabSwitcherViewModel @Inject constructor(
             }
         }
 
-        return if (tabManagerFeatureFlags.multiSelection().isEnabled() && mode is Selection) {
+        return if (mode is Selection) {
             tabEntities.map {
                 SelectableTab(it, isSelected = it.tabId in mode.selectedTabs)
             }

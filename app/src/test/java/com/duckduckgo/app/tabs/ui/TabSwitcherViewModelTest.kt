@@ -84,7 +84,7 @@ import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import org.mockito.Mock
+import org.mockito.Mockito.mock
 import org.mockito.MockitoAnnotations
 import org.mockito.kotlin.any
 import org.mockito.kotlin.argumentCaptor
@@ -104,43 +104,31 @@ class TabSwitcherViewModelTest {
     @get:Rule
     var coroutinesTestRule = CoroutineTestRule()
 
-    @Mock
-    private lateinit var mockCommandObserver: Observer<Command>
+    private val mockCommandObserver: Observer<Command> = mock()
 
-    @Mock
-    private lateinit var mockTabSwitcherItemsObserver: Observer<List<TabSwitcherItem>>
+    private val mockTabSwitcherItemsObserver: Observer<List<TabSwitcherItem>> = mock()
 
     private val commandCaptor = argumentCaptor<Command>()
 
-    @Mock
-    private lateinit var mockTabRepository: TabRepository
+    private val mockTabRepository: TabRepository = mock()
 
-    @Mock
-    private lateinit var mockPixel: Pixel
+    private val mockPixel: Pixel = mock()
 
-    @Mock
-    private lateinit var statisticsDataStore: StatisticsDataStore
+    private val statisticsDataStore: StatisticsDataStore = mock()
 
-    @Mock
-    private lateinit var duckChatMock: DuckChat
+    private val duckChatMock: DuckChat = mock()
 
-    @Mock
-    private lateinit var duckAiFeatureStateMock: DuckAiFeatureState
+    private val duckAiFeatureStateMock: DuckAiFeatureState = mock()
 
-    @Mock
-    private lateinit var faviconManager: FaviconManager
+    private val faviconManager: FaviconManager = mock()
 
-    @Mock
-    private lateinit var savedSitesRepository: SavedSitesRepository
+    private val savedSitesRepository: SavedSitesRepository = mock()
 
-    @Mock
-    private lateinit var mockWebTrackersBlockedAppRepository: WebTrackersBlockedAppRepository
+    private val mockWebTrackersBlockedAppRepository: WebTrackersBlockedAppRepository = mock()
 
-    @Mock
-    private lateinit var mockTabSwitcherPrefsDataStore: TabSwitcherPrefsDataStore
+    private val mockTabSwitcherPrefsDataStore: TabSwitcherPrefsDataStore = mock()
 
-    @Mock
-    private lateinit var mockTrackersAnimationInfoPanelPixels: TrackersAnimationInfoPanelPixels
+    private val mockTrackersAnimationInfoPanelPixels: TrackersAnimationInfoPanelPixels = mock()
 
     private val tabManagerFeatureFlags = FakeFeatureToggleFactory.create(TabManagerFeatureFlags::class.java)
     private val swipingTabsFeature = FakeFeatureToggleFactory.create(SwipingTabsFeature::class.java)
@@ -159,11 +147,10 @@ class TabSwitcherViewModelTest {
     private val tabSwitcherData = TabSwitcherData(NEW, GRID)
 
     @Before
-    fun before() {
+    fun before() = runTest {
         MockitoAnnotations.openMocks(this)
 
         swipingTabsFeature.self().setRawStoredState(State(enable = false))
-        tabManagerFeatureFlags.multiSelection().setRawStoredState(State(enable = false))
         tabManagerFeatureFlags.newToolbarFeature().setRawStoredState(State(enable = false))
         swipingTabsFeature.enabledForUsers().setRawStoredState(State(enable = true))
 
@@ -180,6 +167,7 @@ class TabSwitcherViewModelTest {
 
         initializeMockTabEntitesData()
         initializeViewModel()
+        prepareSelectionMode()
     }
 
     private fun initializeMockTabEntitesData() {
@@ -538,16 +526,14 @@ class TabSwitcherViewModelTest {
         initializeViewModel()
 
         testee.onTabCloseInNormalModeRequested(tab)
-        verify(mockTabRepository).deleteTabs(listOf(tab.id))
+        verify(mockTabRepository).markDeletable(tab.tabEntity)
 
         verify(mockCommandObserver).onChanged(commandCaptor.capture())
-        assertEquals(Command.Close, commandCaptor.lastValue)
+        assertEquals(Command.ShowUndoDeleteTabsMessage(listOf(tab.id)), commandCaptor.lastValue)
     }
 
     @Test
     fun whenTabClosedInNormalModeWithSwipeGestureThenCallMarkDeletableAndSendUndoCommandAndSendPixel() = runTest {
-        tabManagerFeatureFlags.multiSelection().setRawStoredState(State(enable = true))
-
         val swipeGestureUsed = true
         val tab = tabSwitcherItems.first()
 
@@ -562,8 +548,6 @@ class TabSwitcherViewModelTest {
 
     @Test
     fun whenTabClosedUsingCloseButtonInNormalModeThenCallMarkDeletableAndSendUndoCommandAndSendPixel() = runTest {
-        tabManagerFeatureFlags.multiSelection().setRawStoredState(State(enable = true))
-
         val swipeGestureUsed = false
         val tab = tabSwitcherItems.first()
 
@@ -639,18 +623,14 @@ class TabSwitcherViewModelTest {
         val tabIdCaptor = argumentCaptor<String>()
         whenever(mockTabRepository.getTab(tabIdCaptor.capture())).thenAnswer { _ -> tabList.first { it.tabId == tabIdCaptor.lastValue } }
 
-        testee.tabSwitcherItemsLiveData.blockingObserve()
-
         testee.onCloseAllTabsConfirmed()
 
-        tabList.forEach {
-            verify(mockTabRepository).deleteTabs(tabList.map { it.tabId })
-        }
+        verify(mockTabRepository).markDeletable(tabList.map { it.tabId })
         verify(mockPixel).fire(AppPixelName.TAB_MANAGER_MENU_CLOSE_ALL_TABS_CONFIRMED)
         verify(mockPixel).fire(AppPixelName.TAB_MANAGER_MENU_CLOSE_ALL_TABS_CONFIRMED_DAILY, type = Daily())
 
         verify(mockCommandObserver).onChanged(commandCaptor.capture())
-        assertEquals(Command.Close, commandCaptor.lastValue)
+        assertEquals(Command.CloseAndShowUndoMessage(tabList.map { it.tabId }), commandCaptor.lastValue)
     }
 
     @Test
@@ -1825,8 +1805,6 @@ class TabSwitcherViewModelTest {
     }
 
     private fun TestScope.prepareSelectionMode() {
-        tabManagerFeatureFlags.multiSelection().setRawStoredState(State(enable = true))
-
         backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
             testee.selectionViewState.collect()
         }

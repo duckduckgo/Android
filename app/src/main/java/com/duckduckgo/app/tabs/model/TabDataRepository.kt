@@ -365,9 +365,8 @@ class TabDataRepository @Inject constructor(
     }
 
     override suspend fun purgeDeletableTabs() = withContext(dispatchers.io()) {
-        if (tabManagerFeatureFlags.multiSelection().isEnabled()) {
-            clearAllSiteData(getDeletableTabIds())
-        }
+        clearAllSiteData(getDeletableTabIds())
+
         purgeDeletableTabsJob += appCoroutineScope.launch(dispatchers.io()) {
             tabsDao.purgeDeletableTabsAndUpdateSelection()
         }

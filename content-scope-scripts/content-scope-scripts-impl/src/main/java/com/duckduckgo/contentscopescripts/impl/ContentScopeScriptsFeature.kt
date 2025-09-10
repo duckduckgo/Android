@@ -29,4 +29,7 @@ import com.duckduckgo.feature.toggles.api.Toggle.DefaultFeatureValue
 interface ContentScopeScriptsFeature {
     @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun self(): Toggle
+
+    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
+    fun useNewWebCompatApis(): Toggle
 }

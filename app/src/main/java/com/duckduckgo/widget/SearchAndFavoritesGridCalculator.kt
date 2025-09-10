@@ -27,7 +27,8 @@ class SearchAndFavoritesGridCalculator {
         context: Context,
         width: Int,
     ): Int {
-        val margins = context.resources.getDimension(CommonR.dimen.searchWidgetFavoritesSideMargin).toDp()
+        val limitColumns = context.resources.getInteger(CommonR.integer.searchAndFavoritesWidgetGridColumns)
+        val margins = context.resources.getDimension(CommonR.dimen.searchWidgetFavoriteMargin).toDp()
         val item = context.resources.getDimension(CommonR.dimen.searchWidgetFavoriteItemContainerWidth).toDp()
         val divider = context.resources.getDimension(CommonR.dimen.searchWidgetFavoritesHorizontalSpacing).toDp()
         var n = 2
@@ -40,7 +41,7 @@ class SearchAndFavoritesGridCalculator {
             logcat(INFO) { "SearchAndFavoritesWidget width n:$n $totalSize vs $width" }
         }
 
-        return WIDGET_COLUMNS_MIN.coerceAtLeast(n - 1)
+        return WIDGET_COLUMNS_MIN.coerceAtLeast(n - 1).coerceAtMost(limitColumns)
     }
 
     fun calculateRows(
