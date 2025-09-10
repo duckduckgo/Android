@@ -231,14 +231,13 @@
                 android:id="@+id/deviceLabel"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:paddingHorizontal="16dp"
-                android:paddingVertical="8dp"
+                android:paddingHorizontal="?attr/autocompleteListItemHorizontalPadding"
+                android:paddingVertical="@dimen/keyline_2"
                 android:text="@string/systemSearchDeviceAppLabel"
                 android:visibility="gone"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/autocompleteSuggestions"
-                app:typography="caption_allCaps" />
+                app:layout_constraintTop_toBottomOf="@id/autocompleteSuggestions"/>
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/deviceAppSuggestions"

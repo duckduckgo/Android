@@ -87,6 +87,7 @@ import com.duckduckgo.common.ui.view.showKeyboard
 import com.duckduckgo.common.ui.view.toPx
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.KeyboardVisibilityUtil
+import com.duckduckgo.common.utils.extensions.capitalizeFirstLetter
 import com.duckduckgo.common.utils.extensions.html
 import com.duckduckgo.common.utils.extensions.showKeyboard
 import com.duckduckgo.common.utils.text.TextChangedWatcher
@@ -464,7 +465,6 @@ class SystemSearchActivity : DuckDuckGoActivity() {
     }
 
     private fun renderResultsViewState(viewState: SystemSearchViewModel.Suggestions.SystemSearchResultsViewState) {
-        binding.deviceLabel.isVisible = viewState.appResults.isNotEmpty()
         autocompleteSuggestionsAdapter.updateData(viewState.autocompleteResults.query, viewState.autocompleteResults.suggestions)
         if (viewState.autocompleteResults.suggestions.isEmpty()) {
             viewModel.autoCompleteSuggestionsGone()
@@ -472,7 +472,7 @@ class SystemSearchActivity : DuckDuckGoActivity() {
         deviceAppSuggestionsAdapter.updateData(viewState.appResults)
 
         binding.autocompleteSuggestions.isVisible = !viewState.autocompleteResults.suggestions.isEmpty()
-        binding.deviceLabel.isVisible = !viewState.appResults.isEmpty()
+        binding.deviceLabel.isVisible = viewState.appResults.isNotEmpty()
         binding.deviceAppSuggestions.isVisible = !viewState.appResults.isEmpty()
     }
 
