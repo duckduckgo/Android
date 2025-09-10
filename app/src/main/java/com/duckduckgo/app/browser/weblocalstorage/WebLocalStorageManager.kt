@@ -53,7 +53,7 @@ class DuckDuckGoWebLocalStorageManager @Inject constructor(
 ) : WebLocalStorageManager {
 
     private var domains = emptyList<String>()
-    private var allowedKeys = emptyList<String>()
+    private var keysToDelete = emptyList<String>()
     private var matchingRegex = emptyList<String>()
 
     override fun clearWebLocalStorage() = runBlocking {
@@ -69,11 +69,11 @@ class DuckDuckGoWebLocalStorageManager @Inject constructor(
         }
 
         domains = webLocalStorageSettings.domains.list + fireproofedDomains
-        allowedKeys = webLocalStorageSettings.allowedKeys.list
+        keysToDelete = webLocalStorageSettings.keysToDelete.list
         matchingRegex = webLocalStorageSettings.matchingRegex.list
 
         logcat { "WebLocalStorageManager: Allowed domains: $domains" }
-        logcat { "WebLocalStorageManager: Allowed keys: $allowedKeys" }
+        logcat { "WebLocalStorageManager: Keys to delete: $keysToDelete" }
         logcat { "WebLocalStorageManager: Matching regex: $matchingRegex" }
 
         val db = databaseProvider.get()
@@ -92,7 +92,7 @@ class DuckDuckGoWebLocalStorageManager @Inject constructor(
                     if (key.endsWith("duckaiHasAgreedToTerms")) {
                         logcat { "WebLocalStorageManager: Don't delete key: $key" }
                     } else {
-                        if (allowedKeys.none { key.endsWith(it) }) {
+                        if (keysToDelete.any { key.endsWith(it) }) {
                             db.delete(entry.key)
                             logcat { "WebLocalStorageManager: Deleted key: $key" }
                         }
