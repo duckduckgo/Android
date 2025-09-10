@@ -68,11 +68,12 @@ class InputScreenViewModelTest {
     private val inputScreenSessionUsageMetric: InputScreenSessionUsageMetric = mock()
 
     @Before
-    fun setup() {
+    fun setup() = runTest {
         whenever(autoCompleteSettings.autoCompleteSuggestionsEnabled).thenReturn(true)
         whenever(autoComplete.autoComplete(any())).thenReturn(
             flowOf(AutoCompleteResult("", listOf(AutoCompleteDefaultSuggestion("suggestion")))),
         )
+        whenever(duckChat.wasOpenedBefore()).thenReturn(false)
     }
 
     private fun createViewModel(currentOmnibarText: String = ""): InputScreenViewModel {
@@ -852,6 +853,7 @@ class InputScreenViewModelTest {
 
     @Test
     fun `when onChatSubmitted then prompt submitted pixels are fired`() = runTest {
+        whenever(duckChat.wasOpenedBefore()).thenReturn(false)
         val viewModel = createViewModel()
 
         whenever(inputScreenSessionStore.hasUsedSearchMode()).thenReturn(false)
@@ -859,7 +861,27 @@ class InputScreenViewModelTest {
 
         viewModel.onChatSubmitted("prompt")
 
-        verify(pixel).fire(DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_OMNIBAR_PROMPT_SUBMITTED)
+        verify(pixel).fire(
+            pixel = DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_OMNIBAR_PROMPT_SUBMITTED,
+            parameters = mapOf(DuckChatPixelParameters.WAS_USED_BEFORE to "0"),
+        )
+        verify(pixel).fire(DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_OMNIBAR_PROMPT_SUBMITTED_DAILY, type = Daily())
+    }
+
+    @Test
+    fun `when onChatSubmitted and DuckChat was used before then prompt submitted pixel includes was_used_before parameter as 1`() = runTest {
+        whenever(duckChat.wasOpenedBefore()).thenReturn(true)
+        val viewModel = createViewModel()
+
+        whenever(inputScreenSessionStore.hasUsedSearchMode()).thenReturn(false)
+        whenever(inputScreenSessionStore.hasUsedChatMode()).thenReturn(false)
+
+        viewModel.onChatSubmitted("prompt")
+
+        verify(pixel).fire(
+            pixel = DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_OMNIBAR_PROMPT_SUBMITTED,
+            parameters = mapOf(DuckChatPixelParameters.WAS_USED_BEFORE to "1"),
+        )
         verify(pixel).fire(DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_OMNIBAR_PROMPT_SUBMITTED_DAILY, type = Daily())
     }
 

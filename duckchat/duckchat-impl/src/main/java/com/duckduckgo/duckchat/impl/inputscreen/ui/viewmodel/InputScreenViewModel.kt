@@ -375,18 +375,22 @@ class InputScreenViewModel @AssistedInject constructor(
     }
 
     fun onChatSubmitted(query: String) {
-        if (isWebUrl(query)) {
-            command.value = Command.SubmitSearch(query)
-        } else {
-            command.value = Command.SubmitChat(query)
-            duckChat.openDuckChatWithAutoPrompt(query)
-        }
-        pixel.fire(DUCK_CHAT_EXPERIMENTAL_OMNIBAR_PROMPT_SUBMITTED)
-        pixel.fire(DUCK_CHAT_EXPERIMENTAL_OMNIBAR_PROMPT_SUBMITTED_DAILY, type = Daily())
-        inputScreenDiscoveryFunnel.onPromptSubmitted()
-        inputScreenSessionUsageMetric.onPromptSubmitted()
-
         viewModelScope.launch {
+            val wasDuckAiOpenedBefore = duckChat.wasOpenedBefore()
+            if (isWebUrl(query)) {
+                command.value = Command.SubmitSearch(query)
+            } else {
+                command.value = Command.SubmitChat(query)
+                duckChat.openDuckChatWithAutoPrompt(query)
+            }
+
+            val params = mapOf(DuckChatPixelParameters.WAS_USED_BEFORE to wasDuckAiOpenedBefore.toBinaryString())
+            pixel.fire(pixel = DUCK_CHAT_EXPERIMENTAL_OMNIBAR_PROMPT_SUBMITTED, parameters = params)
+            pixel.fire(DUCK_CHAT_EXPERIMENTAL_OMNIBAR_PROMPT_SUBMITTED_DAILY, type = Daily())
+
+            inputScreenDiscoveryFunnel.onPromptSubmitted()
+            inputScreenSessionUsageMetric.onPromptSubmitted()
+
             sessionStore.setHasUsedChatMode(true)
             checkAndFireBothModesPixel()
         }
