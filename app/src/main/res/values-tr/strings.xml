@@ -427,7 +427,6 @@
     <string name="crashedWebViewErrorAction">"Tekrar yükle"</string>
 
     <!-- System Search-->
-    <string name="systemSearchDeviceAppLabel">Bu cihazdan</string>
     <string name="systemSearchAppNotFound">Uygulama bulunamadı</string>
     <string name="systemSearchOnboardingThanks">DuckDuckGo\'yu seçtiğiniz için teşekkürler!\nTarayıcımızı kullanmak, bilgisayar korsanlarından, dolandırıcılardan ve verilerinizi toplamak isteyen şirketlerden korunmanıza yardımcı olur.</string>
     <string name="systemSearchOnboardingFeaturesIntroText">DuckDuckGo uygulaması ayrıca:</string>

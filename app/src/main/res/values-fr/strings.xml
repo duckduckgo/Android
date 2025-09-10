@@ -427,7 +427,6 @@
     <string name="crashedWebViewErrorAction">"Recharger"</string>
 
     <!-- System Search-->
-    <string name="systemSearchDeviceAppLabel">Depuis cet appareil</string>
     <string name="systemSearchAppNotFound">Impossible de trouver l\'application</string>
     <string name="systemSearchOnboardingThanks">Merci d\'avoir choisi DuckDuckGo !\nL\'utilisation de notre navigateur vous permet de vous protéger contre les pirates, les escrocs et les entreprises avides de données.</string>
     <string name="systemSearchOnboardingFeaturesIntroText">L\'application DuckDuckGo offre également les fonctionnalités suivantes :</string>

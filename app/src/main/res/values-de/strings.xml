@@ -427,7 +427,6 @@
     <string name="crashedWebViewErrorAction">"Neu laden"</string>
 
     <!-- System Search-->
-    <string name="systemSearchDeviceAppLabel">Von diesem Gerät</string>
     <string name="systemSearchAppNotFound">Die Anwendung konnte nicht gefunden werden.</string>
     <string name="systemSearchOnboardingThanks">Vielen Dank, dass du dich für DuckDuckGo entschieden hast!\nDie Nutzung unseres Browsers schützt dich vor Hackern, Betrügern und datenhungrigen Unternehmen.</string>
     <string name="systemSearchOnboardingFeaturesIntroText">Das kann die DuckDuckGo App auch:</string>

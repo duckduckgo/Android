@@ -427,7 +427,6 @@
     <string name="crashedWebViewErrorAction">"Ladda om"</string>
 
     <!-- System Search-->
-    <string name="systemSearchDeviceAppLabel">Från den här enheten</string>
     <string name="systemSearchAppNotFound">Appen kunde inte hittas</string>
     <string name="systemSearchOnboardingThanks">Tack för att du väljer DuckDuckGo!\nGenom att använda vår webbläsare skyddar du dig mot hackare, bedragare och dataslukande företag.</string>
     <string name="systemSearchOnboardingFeaturesIntroText">Annat som DuckDuckGo-appen gör:</string>

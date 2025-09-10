@@ -427,7 +427,6 @@
     <string name="crashedWebViewErrorAction">"Lataa uudelleen"</string>
 
     <!-- System Search-->
-    <string name="systemSearchDeviceAppLabel">Tästä laitteesta</string>
     <string name="systemSearchAppNotFound">Sovellusta ei löytynyt</string>
     <string name="systemSearchOnboardingThanks">Kiitos, että valitsit DuckDuckGon!\nSelaimemme käyttö auttaa suojaamaan sinua hakkereilta, huijareilta ja tietoa janoavilta yrityksiltä.</string>
     <string name="systemSearchOnboardingFeaturesIntroText">DuckDuckGo-sovellus myös:</string>
