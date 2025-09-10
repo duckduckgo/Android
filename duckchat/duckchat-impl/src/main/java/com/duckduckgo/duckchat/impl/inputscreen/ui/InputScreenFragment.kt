@@ -27,12 +27,12 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.viewpager2.widget.ViewPager2.OnPageChangeCallback
 import com.duckduckgo.anvil.annotations.InjectWith
+import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.ui.DuckDuckGoFragment
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.extensions.hideKeyboard
 import com.duckduckgo.common.utils.extensions.showKeyboard
 import com.duckduckgo.di.scopes.FragmentScope
-import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.api.inputscreen.InputScreenActivityParams
 import com.duckduckgo.duckchat.api.inputscreen.InputScreenActivityResultCodes
 import com.duckduckgo.duckchat.api.inputscreen.InputScreenActivityResultParams
@@ -53,6 +53,7 @@ import com.duckduckgo.duckchat.impl.inputscreen.ui.tabs.InputScreenPagerAdapter
 import com.duckduckgo.duckchat.impl.inputscreen.ui.viewmodel.InputScreenViewModel
 import com.duckduckgo.duckchat.impl.inputscreen.ui.viewmodel.InputScreenViewModel.InputScreenViewModelFactory
 import com.duckduckgo.duckchat.impl.inputscreen.ui.viewmodel.InputScreenViewModel.InputScreenViewModelProviderFactory
+import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
 import com.duckduckgo.navigation.api.getActivityParams
 import com.duckduckgo.voice.api.VoiceSearchAvailability
 import com.duckduckgo.voice.api.VoiceSearchLauncher
@@ -68,13 +69,13 @@ import kotlinx.coroutines.flow.onEach
 class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
 
     @Inject
-    lateinit var duckChat: DuckChat
-
-    @Inject
     lateinit var voiceSearchLauncher: VoiceSearchLauncher
 
     @Inject
     lateinit var voiceSearchAvailability: VoiceSearchAvailability
+
+    @Inject
+    lateinit var pixel: Pixel
 
     @Inject
     lateinit var viewModelFactory: InputScreenViewModelFactory
@@ -124,13 +125,16 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
         )
 
         binding.actionSend.setOnClickListener {
+            // todo remove round-tripping through the input mode widget - actions should go directly to the view model
             binding.inputModeWidget.submitMessage()
+            viewModel.onSendButtonClicked()
         }
         binding.inputModeWidget.inputField.post {
             showKeyboard(binding.inputModeWidget.inputField)
         }
         binding.actionNewLine.setOnClickListener {
             binding.inputModeWidget.printNewLine()
+            pixel.fire(DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_OMNIBAR_FLOATING_RETURN_PRESSED)
         }
 
         viewModel.fireShownPixel()
@@ -250,7 +254,6 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
         val data = Intent().putExtra(InputScreenActivityResultParams.CANCELED_DRAFT_PARAM, query)
         requireActivity().setResult(Activity.RESULT_CANCELED, data)
         requireActivity().finish()
-        duckChat.openDuckChatWithAutoPrompt(query)
     }
 
     private fun submitSearchQuery(query: String) {

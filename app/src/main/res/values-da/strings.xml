@@ -189,6 +189,28 @@
     <string name="webTrackingProtectionLearnMoreTitle">Beskyttelse mod sporing på nettet</string>
     <string name="webTrackingProtectionTitle">Beskyttelse mod sporing på nettet</string>
     <string name="webTrackingProtectionDescriptionNew"><![CDATA[DuckDuckGo blokerer automatisk skjulte trackere, når du surfer på nettet.\n<a href=\"\">Mere info</a>]]></string>
+    <string name="webTrackingProtectionExplanationDescription"><![CDATA[DuckDuckGo-browseren giver sporingbeskyttelse, som altid er aktiv.\n<a href=\"\">Mere info</a>]]></string>
+    <string name="webTrackingProtectionExplanationTitle">Sådan beskytter vi dig</string>
+    <string name="webTrackingProtectionThirdPartyTrackersTitle">Bloker tredjeparts-trackere</string>
+    <string name="webTrackingProtectionThirdPartyTrackersDescription">Hjælper med at blokere tredjepartscookies, der tracker dig fra websted til websted, ved at forhindre tredjepartstrackere i at blive indlæst.</string>
+    <string name="webTrackingProtectionTargetedAdsTitle">Blokerer målrettede annoncer</string>
+    <string name="webTrackingProtectionTargetedAdsDescription">Vi blokerer invasive trackere, før de indlæses, hvilket effektivt eliminerer annoncer, der er afhængige af sporing.</string>
+    <string name="webTrackingProtectionFingerprintTrackingTitle">Forhindrer sporing af fingeraftryk</string>
+    <string name="webTrackingProtectionFingerprintTrackingDescription">Hjælper med at forhindre sporingsvirksomheder i at få unikke identifikatorer om din browser og enhed, som de bruger til at følge dig rundt på nettet.</string>
+    <string name="webTrackingProtectionLinkTrackingTitle">Blokerer linksporing</string>
+    <string name="webTrackingProtectionLinkTrackingDescription">Fjerner sporingsparametre i links for at forhindre tredjeparter i at spore din adfærd på tværs af websteder.</string>
+    <string name="webTrackingProtectionReferrerTrackingTitle">Beskytter mod henvisningssporing</string>
+    <string name="webTrackingProtectionReferrerTrackingDescription">Hjælper med at forhindre virksomheder i at identificere den sidste hjemmeside, du har besøgt.</string>
+    <string name="webTrackingProtectionFirstPartyCookiesTitle">Udløber førsteparts-cookies</string>
+    <string name="webTrackingProtectionFirstPartyCookiesDescription">Lader automatisk førsteparts-cookies udløbe efter 30 dage, hvilket sikrer, at websteder ikke kan spore dig på ubestemt tid, når du er logget ud.</string>
+    <string name="webTrackingProtectionDnsCnameCloakingTitle">Beskytter mod DNS CNAME-tilsløring</string>
+    <string name="webTrackingProtectionDnsCnameCloakingDescription">Hjælper med at blokere tredjepartstrackere, der forsøger at skjule sig på et websted ved hjælp af DNS.</string>
+    <string name="webTrackingProtectionGoogleAmpTrackingTitle">Blokerer Googles AMP-sporing</string>
+    <string name="webTrackingProtectionGoogleAmpTrackingDescription">Erstatter Google AMP-links med den oprindelige udgivers websted.</string>
+    <string name="webTrackingProtectionGoogleSigninPopupsTitle">Blokerer Googles pop op-vinduer til login</string>
+    <string name="webTrackingProtectionGoogleSigninPopupsDescription">Blokerer pop op-vinduer til Google-login på websteder, som Google ikke ejer.</string>
+    <string name="webTrackingProtectionGlobalPrivacyControlTitle">Global Privacy Control (GPC)</string>
+    <string name="webTrackingProtectionGlobalPrivacyControlDescription">Udtrykker fravalgsrettigheder på dine vegne ved at fortælle websteder, at de ikke må sælge eller dele dine personlige oplysninger.</string>
 
     <!-- Cookie Pop-Up Protection -->
     <string name="cookiePopupProtectionTitle">Beskyttelse mod pop op-beskeder om cookies</string>
@@ -854,11 +876,6 @@
     <string name="newTabPageDefaultBrowserMessagePrimaryCta" instruction="This text appears on a button">Angiv som standard</string>
     <string name="newTabPageDefaultBrowserMessageSecondaryCta" instruction="This text appears on a button">Spørg ikke igen</string>
 
-    <!--TabSwitcher Animation Tile Dialog-->
-    <string name="tabSwitcherAnimationTileRemovalDialogTitle">DuckDuckGo blokerer trackere for at beskytte din browsing</string>
-    <string name="tabSwitcherAnimationTileRemovalDialogBody">Hvis du rydder dine faner og data, slettes din tracker-blokeringshistorik, og dette tal nulstilles.\n\nSkjul dette banner, hvis du ikke ønsker at se det i fanebladene.</string>
-    <string name="tabSwitcherAnimationTileRemovalDialogNegativeButton">Skjul banner</string>
-
     <!-- Threat protection -->
     <string name="maliciousSiteTitle">Advarsel: Dette websted kan udgøre en sikkerhedsrisiko</string>
     <string name="maliciousSiteMalwareHeadline"><![CDATA[DuckDuckGo har blokeret denne side, fordi den muligvis distribuerer malware, der er designet til at kompromittere din enhed eller stjæle dine personlige oplysninger.\n<a href=\"\">Få mere at vide</a>]]></string>
@@ -922,5 +939,12 @@
     <string name="onboardingPrivacyProDaxDialogDescriptionRebranding"><![CDATA[DuckDuckGo har også et <b>valgfrit betalt abonnement</b> med en sikker <b>VPN</b> og <b>avanceret, privat AI</b>.]]></string>
     <string name="settingsDuckAiRebranding">AI-funktioner</string>
     <string name="settingsDuckAi">Duck.ai</string>
+
+    <!--TabSwitcher Trackers Animation-->
+    <string name="showTrackerCountInTabSwitcher">Vis tracker-antal i faneomskifteren</string>
+    <string name="tabSwitcherAnimationTileRemovalDialogTitle" instruction="A title for a dialog that shows when a user clicks a tile that shows them their current blocked tracker count">Skjul tracker-antallet?</string>
+    <string name="tabSwitcherAnimationTileRemovalDialogBody" instruction="A message for a dialog that shows when a user clicks a tile that shows them their current blocked tracker count">Du kan slå det til igen i Indstillinger &gt; Udseende.</string>
+    <string name="tabSwitcherAnimationTileRemovalDialogPositiveButton">Skjul</string>
+    <string name="tabSwitcherAnimationTileRemovalDialogNegativeButton">Behold</string>
 
 </resources>

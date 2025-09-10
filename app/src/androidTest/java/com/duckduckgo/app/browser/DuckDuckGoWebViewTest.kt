@@ -17,17 +17,28 @@
 package com.duckduckgo.app.browser
 
 import androidx.test.annotation.UiThreadTest
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import org.junit.Assert.assertFalse
+import org.junit.Before
 import org.junit.Test
+import org.junit.runner.RunWith
 
+@RunWith(AndroidJUnit4::class)
 class DuckDuckGoWebViewTest {
+
+    private lateinit var testee: DuckDuckGoWebView
+
+    @Before
+    @UiThreadTest
+    fun setUp() {
+        val context = InstrumentationRegistry.getInstrumentation().targetContext
+        testee = DuckDuckGoWebView(context)
+    }
 
     @Test
     @UiThreadTest
     fun whenWebViewInitialisedThenSafeBrowsingDisabled() {
-        val context = InstrumentationRegistry.getInstrumentation().targetContext
-        val testee = DuckDuckGoWebView(context)
         assertFalse(testee.settings.safeBrowsingEnabled)
     }
 }

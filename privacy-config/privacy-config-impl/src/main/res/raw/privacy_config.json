@@ -10,15 +10,15 @@
                     "cohorts": [
                         {
                             "name": "modifiedControl",
-                            "weight": 1
+                            "weight": 0
                         },
                         {
                             "name": "bb",
-                            "weight": 1
+                            "weight": 0
                         },
                         {
                             "name": "buck",
-                            "weight": 1
+                            "weight": 0
                         }
                     ]
                 }

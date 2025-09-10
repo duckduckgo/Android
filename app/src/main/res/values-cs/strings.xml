@@ -191,6 +191,28 @@
     <string name="webTrackingProtectionLearnMoreTitle">Ochrana před sledováním na webu</string>
     <string name="webTrackingProtectionTitle">Ochrana před sledováním na webu</string>
     <string name="webTrackingProtectionDescriptionNew"><![CDATA[DuckDuckGo automaticky blokuje skryté trackery při procházení webu.\n<a href=\"\">Další informace</a>]]></string>
+    <string name="webTrackingProtectionExplanationDescription"><![CDATA[Prohlížeč DuckDuckGo poskytuje ochranu proti sledování, která je neustále zapnutá.\n<a href=\"\">Další informace</a>]]></string>
+    <string name="webTrackingProtectionExplanationTitle">Jak tě chráníme</string>
+    <string name="webTrackingProtectionThirdPartyTrackersTitle">Blokuje trackery třetích stran</string>
+    <string name="webTrackingProtectionThirdPartyTrackersDescription">Pomáhá blokovat cookies třetích stran, které se tě snaží sledovat napříč různými weby tím, že brání načítání trackerů třetích stran.</string>
+    <string name="webTrackingProtectionTargetedAdsTitle">Blokuje cílené reklamy</string>
+    <string name="webTrackingProtectionTargetedAdsDescription">Zablokuje invazivní trackery ještě před jejich načtením, čímž účinně eliminuje reklamy, které tě pronásledují.</string>
+    <string name="webTrackingProtectionFingerprintTrackingTitle">Brání vytváření digitálních stop</string>
+    <string name="webTrackingProtectionFingerprintTrackingDescription">Brání tomu, aby společnosti, které sledují uživatele, získávaly jedinečné údaje o tvém prohlížeči a zařízení, takže nebudou moct sledovat tvůj pohyb po internetu.</string>
+    <string name="webTrackingProtectionLinkTrackingTitle">Blokuje sledování přes odkazy</string>
+    <string name="webTrackingProtectionLinkTrackingDescription">Odstraní parametry sledování v odkazech, aby třetí strany nemohly sledovat tvoje chování napříč weby.</string>
+    <string name="webTrackingProtectionReferrerTrackingTitle">Chrání před sledováním poslední navštívené stránky</string>
+    <string name="webTrackingProtectionReferrerTrackingDescription">Brání tomu, aby společnosti mohly zjistit, jaká byla tvoje naposledy navštívená webová stránka.</string>
+    <string name="webTrackingProtectionFirstPartyCookiesTitle">Ukončí platnost souborů cookie první strany</string>
+    <string name="webTrackingProtectionFirstPartyCookiesDescription">Automaticky nechá po 30 dnech vypršet cookies první strany, aby tě stránky nemohly po odhlášení sledovat donekonečna.</string>
+    <string name="webTrackingProtectionDnsCnameCloakingTitle">Chrání před maskováním DNS CNAME</string>
+    <string name="webTrackingProtectionDnsCnameCloakingDescription">Pomáhá blokovat trackery třetích stran, které se snaží maskovat na webu pomocí DNS.</string>
+    <string name="webTrackingProtectionGoogleAmpTrackingTitle">Blokuje sledování pomocí stránek AMP na Googlu</string>
+    <string name="webTrackingProtectionGoogleAmpTrackingDescription">Nahradí odkazy Google AMP webem původního vydavatele.</string>
+    <string name="webTrackingProtectionGoogleSigninPopupsTitle">Blokuje vyskakovací okna pro přihlášení na Google</string>
+    <string name="webTrackingProtectionGoogleSigninPopupsDescription">Blokuje vyskakovací okna pro přihlášení na Google na webech, které Google nevlastní.</string>
+    <string name="webTrackingProtectionGlobalPrivacyControlTitle">Celoplošná ochrana soukromí</string>
+    <string name="webTrackingProtectionGlobalPrivacyControlDescription">Uplatní tvoje právo odmítnout předávání osobních údajů. Požádá za tebe weby, aby tyto údaje neprodávaly ani nesdílely.</string>
 
     <!-- Cookie Pop-Up Protection -->
     <string name="cookiePopupProtectionTitle">Ochrana před vyskakovacími okny ohledně cookies</string>
@@ -886,11 +908,6 @@
     <string name="newTabPageDefaultBrowserMessagePrimaryCta" instruction="This text appears on a button">Nastavit jako výchozí</string>
     <string name="newTabPageDefaultBrowserMessageSecondaryCta" instruction="This text appears on a button">Už se znovu neptat</string>
 
-    <!--TabSwitcher Animation Tile Dialog-->
-    <string name="tabSwitcherAnimationTileRemovalDialogTitle">Služba DuckDuckGo blokuje trackery, aby tě chránila při prohlížení</string>
-    <string name="tabSwitcherAnimationTileRemovalDialogBody">Vymazáním panelů a dat smažeš historii blokování trackerů a resetuješ údaj o nich na nulu.\n\nPokud tenhle banner v zobrazení panelů už nechceš vidět, můžeš ho skrýt.</string>
-    <string name="tabSwitcherAnimationTileRemovalDialogNegativeButton">Skrýt banner</string>
-
     <!-- Threat protection -->
     <string name="maliciousSiteTitle">Pozor: Tahle stránka může představovat bezpečnostní riziko</string>
     <string name="maliciousSiteMalwareHeadline"><![CDATA[Služba DuckDuckGo tuhle stránku zablokovala, protože může šířit malware, jehož cílem je narušit zabezpečení zařízení nebo odcizit osobní údaje.\n<a href=\"\">Přečti si víc</a>]]></string>
@@ -958,5 +975,12 @@
     <string name="onboardingPrivacyProDaxDialogDescriptionRebranding"><![CDATA[DuckDuckGo má také <b>volitelné předplatné</b> s bezpečnou <b>VPN</b> a <b>špičkovou soukromou umělou inteligencí</b>.]]></string>
     <string name="settingsDuckAiRebranding">Funkce AI</string>
     <string name="settingsDuckAi">Duck.ai</string>
+
+    <!--TabSwitcher Trackers Animation-->
+    <string name="showTrackerCountInTabSwitcher">Zobrazit počet trackerů v přepínači karet</string>
+    <string name="tabSwitcherAnimationTileRemovalDialogTitle" instruction="A title for a dialog that shows when a user clicks a tile that shows them their current blocked tracker count">Skrýt počet trackerů?</string>
+    <string name="tabSwitcherAnimationTileRemovalDialogBody" instruction="A message for a dialog that shows when a user clicks a tile that shows them their current blocked tracker count">Tuhle funkci můžeš zase zapnout v Nastavení &gt; Vzhled.</string>
+    <string name="tabSwitcherAnimationTileRemovalDialogPositiveButton">Skrýt</string>
+    <string name="tabSwitcherAnimationTileRemovalDialogNegativeButton">Ponechat</string>
 
 </resources>

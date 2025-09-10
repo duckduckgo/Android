@@ -22,6 +22,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.duckduckgo.app.browser.autocomplete.AutoCompleteViewHolder.EmptySuggestionViewHolder
 import com.duckduckgo.app.browser.autocomplete.BrowserAutoCompleteSuggestionsAdapter.Type.BOOKMARK_TYPE
 import com.duckduckgo.app.browser.autocomplete.BrowserAutoCompleteSuggestionsAdapter.Type.DEFAULT_TYPE
+import com.duckduckgo.app.browser.autocomplete.BrowserAutoCompleteSuggestionsAdapter.Type.DUCK_AI_PROMPT
 import com.duckduckgo.app.browser.autocomplete.BrowserAutoCompleteSuggestionsAdapter.Type.EMPTY_TYPE
 import com.duckduckgo.app.browser.autocomplete.BrowserAutoCompleteSuggestionsAdapter.Type.HISTORY_SEARCH_TYPE
 import com.duckduckgo.app.browser.autocomplete.BrowserAutoCompleteSuggestionsAdapter.Type.HISTORY_TYPE
@@ -62,6 +63,7 @@ class BrowserAutoCompleteSuggestionsAdapter(
         IN_APP_MESSAGE_TYPE to InAppMessageViewHolderFactory(),
         DEFAULT_TYPE to DefaultSuggestionViewHolderFactory(omnibarPosition),
         SWITCH_TO_TAB_TYPE to SwitchToTabSuggestionViewHolderFactory(),
+        DUCK_AI_PROMPT to DuckAIPromptSuggestionViewHolderFactory(),
     )
 
     private var phrase = ""
@@ -83,6 +85,7 @@ class BrowserAutoCompleteSuggestionsAdapter(
             suggestions[position] is AutoCompleteDefaultSuggestion -> DEFAULT_TYPE
             suggestions[position] is AutoCompleteSwitchToTabSuggestion -> SWITCH_TO_TAB_TYPE
             suggestions[position] is AutoCompleteUrlSuggestion -> SWITCH_TO_TAB_TYPE
+            suggestions[position] is AutoCompleteSuggestion.AutoCompleteDuckAIPrompt -> DUCK_AI_PROMPT
             else -> SUGGESTION_TYPE
         }
     }
@@ -133,5 +136,6 @@ class BrowserAutoCompleteSuggestionsAdapter(
         const val IN_APP_MESSAGE_TYPE = 6
         const val DEFAULT_TYPE = 7
         const val SWITCH_TO_TAB_TYPE = 8
+        const val DUCK_AI_PROMPT = 9
     }
 }

@@ -15,7 +15,6 @@ import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.Command
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.Command.LaunchInputScreen
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.LeadingIconState
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.LeadingIconState.Search
-import com.duckduckgo.app.browser.senseofprotection.SenseOfProtectionExperiment
 import com.duckduckgo.app.browser.viewstate.HighlightableButton
 import com.duckduckgo.app.browser.viewstate.LoadingViewState
 import com.duckduckgo.app.browser.viewstate.OmnibarViewState
@@ -80,7 +79,6 @@ class OmnibarLayoutViewModelTest {
     private val defaultBrowserPromptsExperimentHighlightOverflowMenuFlow = MutableStateFlow(false)
     private val additionalDefaultBrowserPrompts: AdditionalDefaultBrowserPrompts = mock()
 
-    private val mockSenseOfProtectionExperiment: SenseOfProtectionExperiment = mock()
     private val duckChat: DuckChat = mock()
     private val duckAiFeatureState: DuckAiFeatureState = mock()
     private val duckAiShowOmnibarShortcutOnNtpAndOnFocusFlow = MutableStateFlow(true)
@@ -153,7 +151,6 @@ class OmnibarLayoutViewModelTest {
             userBrowserProperties = userBrowserProperties,
             dispatcherProvider = coroutineTestRule.testDispatcherProvider,
             additionalDefaultBrowserPrompts = additionalDefaultBrowserPrompts,
-            senseOfProtectionExperiment = mockSenseOfProtectionExperiment,
             duckChat = duckChat,
             duckAiFeatureState = duckAiFeatureState,
             addressDisplayFormatter = mockAddressDisplayFormatter,
@@ -941,8 +938,6 @@ class OmnibarLayoutViewModelTest {
 
     @Test
     fun whenTrackersAnimationStartedAndOmnibarNotFocusedThenCommandAndViewStateCorrect() = runTest {
-        whenever(mockSenseOfProtectionExperiment.isUserEnrolledInModifiedControlCohortAndExperimentEnabled()).thenReturn(false)
-        whenever(mockSenseOfProtectionExperiment.isUserEnrolledInAVariantAndExperimentEnabled()).thenReturn(false)
         testee.onOmnibarFocusChanged(false, SERP_URL)
         val trackers = givenSomeTrackers()
         testee.onAnimationStarted(Decoration.LaunchTrackersAnimation(trackers))
@@ -1905,5 +1900,30 @@ class OmnibarLayoutViewModelTest {
         testee.commands().test {
             expectNoEvents()
         }
+    }
+
+    @Test
+    fun whenInputStateChangedAndClearingQueryThenHasQueryChangedTruePassedToVoiceSearchAvailability() = runTest {
+        var capturedHasQueryChanged: Boolean? = null
+        whenever(voiceSearchAvailability.shouldShowVoiceSearch(any(), any(), any(), any())).thenAnswer { invocation ->
+            capturedHasQueryChanged = invocation.getArgument(2)
+            true
+        }
+
+        // First set a non-empty query
+        testee.onInputStateChanged("initial", hasFocus = true, clearQuery = false, deleteLastCharacter = false)
+        // Then clear the query which should set hasQueryChanged = true because updatedQuery retains previous value
+        testee.onInputStateChanged("", hasFocus = true, clearQuery = true, deleteLastCharacter = false)
+
+        testee.viewState.test {
+            awaitItem()
+            assertTrue(capturedHasQueryChanged == true)
+        }
+    }
+
+    @Test
+    fun whenBackButtonPressedThenDuckChatLegacyOmnibarBackButtonPixelSent() = runTest {
+        testee.onBackButtonPressed()
+        verify(pixel).fire(DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_LEGACY_OMNIBAR_BACK_BUTTON_PRESSED)
     }
 }
