@@ -124,7 +124,6 @@ import com.duckduckgo.app.browser.customtabs.CustomTabPixelNames
 import com.duckduckgo.app.browser.customtabs.CustomTabViewModel.Companion.CUSTOM_TAB_NAME_PREFIX
 import com.duckduckgo.app.browser.databinding.FragmentBrowserTabBinding
 import com.duckduckgo.app.browser.databinding.HttpAuthenticationBinding
-import com.duckduckgo.app.browser.defaultbrowsing.prompts.ui.experiment.ExperimentalHomeScreenWidgetBottomSheetDialog
 import com.duckduckgo.app.browser.downloader.BlobConverterInjector
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.browser.filechooser.FileChooserIntentBuilder
@@ -159,6 +158,7 @@ import com.duckduckgo.app.browser.tabpreview.WebViewPreviewGenerator
 import com.duckduckgo.app.browser.tabpreview.WebViewPreviewPersister
 import com.duckduckgo.app.browser.ui.dialogs.AutomaticFireproofDialogOptions
 import com.duckduckgo.app.browser.ui.dialogs.LaunchInExternalAppOptions
+import com.duckduckgo.app.browser.ui.dialogs.widgetprompt.AlternativeHomeScreenWidgetBottomSheetDialog
 import com.duckduckgo.app.browser.urlextraction.DOMUrlExtractor
 import com.duckduckgo.app.browser.urlextraction.UrlExtractingWebView
 import com.duckduckgo.app.browser.urlextraction.UrlExtractingWebViewClient
@@ -603,7 +603,7 @@ class BrowserTabFragment :
 
     private lateinit var popupMenu: BrowserPopupMenu
     private lateinit var ctaBottomSheet: PromoBottomSheetDialog
-    private lateinit var experimentalBottomSheet: ExperimentalHomeScreenWidgetBottomSheetDialog
+    private lateinit var widgetBottomSheetDialog: AlternativeHomeScreenWidgetBottomSheetDialog
 
     private lateinit var autoCompleteSuggestionsAdapter: BrowserAutoCompleteSuggestionsAdapter
 
@@ -4657,12 +4657,12 @@ class BrowserTabFragment :
         ) {
             hideDaxCta()
 
-            if (!::experimentalBottomSheet.isInitialized) {
-                experimentalBottomSheet = ExperimentalHomeScreenWidgetBottomSheetDialog(
+            if (!::widgetBottomSheetDialog.isInitialized) {
+                widgetBottomSheetDialog = AlternativeHomeScreenWidgetBottomSheetDialog(
                     context = requireContext(),
                     isLightModeEnabled = appTheme.isLightModeEnabled(),
                 )
-                experimentalBottomSheet.eventListener = object : ExperimentalHomeScreenWidgetBottomSheetDialog.EventListener {
+                widgetBottomSheetDialog.eventListener = object : AlternativeHomeScreenWidgetBottomSheetDialog.EventListener {
                     override fun onShown() {
                         viewModel.onCtaShown()
                     }
@@ -4679,10 +4679,10 @@ class BrowserTabFragment :
                         viewModel.onUserClickCtaSecondaryButton(configuration)
                     }
                 }
-                experimentalBottomSheet.show()
+                widgetBottomSheetDialog.show()
             } else {
-                if (!experimentalBottomSheet.isShowing) {
-                    experimentalBottomSheet.show()
+                if (!widgetBottomSheetDialog.isShowing) {
+                    widgetBottomSheetDialog.show()
                 }
             }
         }

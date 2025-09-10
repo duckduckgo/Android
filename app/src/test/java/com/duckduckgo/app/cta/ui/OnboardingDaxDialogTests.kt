@@ -18,7 +18,7 @@ package com.duckduckgo.app.cta.ui
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.duckduckgo.app.browser.DuckDuckGoUrlDetector
-import com.duckduckgo.app.browser.defaultbrowsing.prompts.ui.experiment.OnboardingHomeScreenWidgetToggles
+import com.duckduckgo.app.browser.ui.dialogs.widgetprompt.OnboardingHomeScreenWidgetToggles
 import com.duckduckgo.app.cta.db.DismissedCtaDao
 import com.duckduckgo.app.cta.model.CtaId.DAX_DIALOG_NETWORK
 import com.duckduckgo.app.cta.model.CtaId.DAX_DIALOG_OTHER

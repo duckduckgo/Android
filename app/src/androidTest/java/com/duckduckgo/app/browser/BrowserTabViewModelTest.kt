@@ -91,7 +91,6 @@ import com.duckduckgo.app.browser.commands.NavigationCommand
 import com.duckduckgo.app.browser.commands.NavigationCommand.Navigate
 import com.duckduckgo.app.browser.customtabs.CustomTabPixelNames
 import com.duckduckgo.app.browser.defaultbrowsing.prompts.AdditionalDefaultBrowserPrompts
-import com.duckduckgo.app.browser.defaultbrowsing.prompts.ui.experiment.OnboardingHomeScreenWidgetToggles
 import com.duckduckgo.app.browser.duckplayer.DUCK_PLAYER_FEATURE_NAME
 import com.duckduckgo.app.browser.duckplayer.DUCK_PLAYER_PAGE_FEATURE_NAME
 import com.duckduckgo.app.browser.duckplayer.DuckPlayerJSHelper
@@ -122,6 +121,7 @@ import com.duckduckgo.app.browser.santize.NonHttpAppLinkChecker
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
 import com.duckduckgo.app.browser.tabs.TabManager
 import com.duckduckgo.app.browser.trafficquality.AndroidFeaturesHeaderPlugin.Companion.X_DUCKDUCKGO_ANDROID_HEADER
+import com.duckduckgo.app.browser.ui.dialogs.widgetprompt.OnboardingHomeScreenWidgetToggles
 import com.duckduckgo.app.browser.viewstate.BrowserViewState
 import com.duckduckgo.app.browser.viewstate.CtaViewState
 import com.duckduckgo.app.browser.viewstate.FindInPageViewState

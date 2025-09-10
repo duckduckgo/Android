@@ -14,13 +14,11 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.browser.defaultbrowsing.prompts.ui.experiment
+package com.duckduckgo.app.browser.ui.dialogs.widgetprompt
 
 import com.duckduckgo.anvil.annotations.ContributesRemoteFeature
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.Toggle
-import com.duckduckgo.feature.toggles.api.Toggle.DefaultFeatureValue.FALSE
-import com.duckduckgo.feature.toggles.api.Toggle.DefaultValue
 
 @ContributesRemoteFeature(
     scope = AppScope::class,
@@ -28,9 +26,9 @@ import com.duckduckgo.feature.toggles.api.Toggle.DefaultValue
 )
 interface OnboardingHomeScreenWidgetToggles {
 
-    @DefaultValue(FALSE)
+    @Toggle.DefaultValue(Toggle.DefaultFeatureValue.FALSE)
     fun self(): Toggle
 
-    @DefaultValue(FALSE)
+    @Toggle.DefaultValue(Toggle.DefaultFeatureValue.FALSE)
     fun onboardingHomeScreenWidgetPrompt(): Toggle
 }

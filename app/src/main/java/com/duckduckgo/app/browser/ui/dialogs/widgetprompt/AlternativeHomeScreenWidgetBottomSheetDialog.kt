@@ -14,22 +14,22 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.browser.defaultbrowsing.prompts.ui.experiment
+package com.duckduckgo.app.browser.ui.dialogs.widgetprompt
 
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.DialogInterface
 import android.view.LayoutInflater
 import android.widget.FrameLayout
+import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.BottomSheetExperimentHomeScreenWidgetBinding
-import com.google.android.material.R
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.shape.CornerFamily
 import com.google.android.material.shape.MaterialShapeDrawable
 
 @SuppressLint("NoBottomSheetDialog")
-class ExperimentalHomeScreenWidgetBottomSheetDialog(
+class AlternativeHomeScreenWidgetBottomSheetDialog(
     private val context: Context,
     isLightModeEnabled: Boolean,
 ) : BottomSheetDialog(context) {
@@ -56,9 +56,9 @@ class ExperimentalHomeScreenWidgetBottomSheetDialog(
         }
         binding.experimentHomeScreenWidgetBottomSheetDialogImage.setImageResource(
             if (isLightModeEnabled) {
-                com.duckduckgo.app.browser.R.drawable.experiment_widget_promo_light
+                R.drawable.experiment_widget_promo_light
             } else {
-                com.duckduckgo.app.browser.R.drawable.experiment_widget_promo_dark
+                R.drawable.experiment_widget_promo_dark
             },
         )
         binding.experimentHomeScreenWidgetBottomSheetDialogPrimaryButton.setOnClickListener {
@@ -77,7 +77,7 @@ class ExperimentalHomeScreenWidgetBottomSheetDialog(
      */
     private fun setRoundCorners(dialogInterface: DialogInterface) {
         val bottomSheetDialog = dialogInterface as BottomSheetDialog
-        val bottomSheet = bottomSheetDialog.findViewById<FrameLayout>(R.id.design_bottom_sheet)
+        val bottomSheet = bottomSheetDialog.findViewById<FrameLayout>(com.google.android.material.R.id.design_bottom_sheet)
 
         val shapeDrawable = MaterialShapeDrawable.createWithElevationOverlay(context)
         shapeDrawable.shapeAppearanceModel = shapeDrawable.shapeAppearanceModel
