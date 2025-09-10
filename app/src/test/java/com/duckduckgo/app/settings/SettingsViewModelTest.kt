@@ -25,7 +25,6 @@ import com.duckduckgo.app.settings.SettingsViewModel.Command.LaunchAddHomeScreen
 import com.duckduckgo.app.settings.SettingsViewModel.Command.LaunchAutofillPasswordsManagement
 import com.duckduckgo.app.settings.SettingsViewModel.Command.LaunchAutofillSettings
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.app.widget.experiment.PostCtaExperienceToggles
 import com.duckduckgo.app.widget.ui.WidgetCapabilities
 import com.duckduckgo.autoconsent.api.Autoconsent
 import com.duckduckgo.autofill.api.AutofillCapabilityChecker

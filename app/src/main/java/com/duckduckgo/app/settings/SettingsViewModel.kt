@@ -64,7 +64,6 @@ import com.duckduckgo.app.settings.SettingsViewModel.Command.LaunchPrivateSearch
 import com.duckduckgo.app.settings.SettingsViewModel.Command.LaunchSyncSettings
 import com.duckduckgo.app.settings.SettingsViewModel.Command.LaunchWebTrackingProtectionScreen
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.app.widget.experiment.PostCtaExperienceToggles
 import com.duckduckgo.app.widget.ui.WidgetCapabilities
 import com.duckduckgo.autoconsent.api.Autoconsent
 import com.duckduckgo.autofill.api.AutofillCapabilityChecker
