@@ -30,7 +30,6 @@
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
         android:background="?attr/daxColorToolbar"
-        android:paddingTop="?attr/toolbarExtraPadding"
         android:theme="@style/TabSwitcher.Widget.Toolbar"
         app:popupTheme="@style/Widget.DuckDuckGo.PopUpOverflowMenu" />
 
