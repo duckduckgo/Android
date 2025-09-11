@@ -25,6 +25,11 @@
     android:elevation="0dp"
     android:outlineProvider="none">
 
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="0.5dp"
+        android:background="?attr/daxColorShadeSolid" />
+
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
