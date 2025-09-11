@@ -158,6 +158,6 @@ interface AutofillFeature {
     @Toggle.DefaultValue(defaultValue = DefaultFeatureValue.INTERNAL)
     fun passkeySupport(): Toggle
 
-    @Toggle.DefaultValue(defaultValue = DefaultFeatureValue.INTERNAL)
+    @Toggle.DefaultValue(defaultValue = DefaultFeatureValue.TRUE)
     fun canReAuthenticateGoogleLoginsAutomatically(): Toggle
 }
