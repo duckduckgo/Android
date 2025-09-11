@@ -22,6 +22,7 @@ import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Lazy
@@ -50,6 +51,7 @@ class DuckDuckGoWebLocalStorageManager @Inject constructor(
     private val fireproofWebsiteRepository: FireproofWebsiteRepository,
     private val dispatcherProvider: DispatcherProvider,
     private val settingsDataStore: SettingsDataStore,
+    private val duckAiFeatureState: DuckAiFeatureState,
 ) : WebLocalStorageManager {
 
     private var domains = emptyList<String>()
@@ -88,7 +90,7 @@ class DuckDuckGoWebLocalStorageManager @Inject constructor(
                 if (domainForMatchingAllowedKey == null) {
                     db.delete(entry.key)
                     logcat { "WebLocalStorageManager: Deleted key: $key" }
-                } else if (settingsDataStore.clearDuckAiData && domainForMatchingAllowedKey == DUCKDUCKGO_DOMAIN) {
+                } else if (shouldClearDuckAIData(domainForMatchingAllowedKey)) {
                     if (keysToDelete.any { key.endsWith(it) }) {
                         db.delete(entry.key)
                         logcat { "WebLocalStorageManager: Deleted key: $key" }
@@ -96,6 +98,10 @@ class DuckDuckGoWebLocalStorageManager @Inject constructor(
                 }
             }
         }
+    }
+
+    private fun shouldClearDuckAIData(domainForMatchingAllowedKey: String): Boolean {
+        return settingsDataStore.clearDuckAiData && duckAiFeatureState.showClearDuckAIChatHistory.value && domainForMatchingAllowedKey == DUCKDUCKGO_DOMAIN
     }
 
     private fun getDomainForMatchingAllowedKey(key: String): String? {
