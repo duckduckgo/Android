@@ -119,7 +119,7 @@ class NewAddressBarOptionBottomSheetDialog(
             if (isSearchOnlySelected) {
                 ContextCompat.getDrawable(
                     context,
-                    R.drawable.background_new_address_bar_option_selected
+                    R.drawable.background_new_address_bar_option_selected,
                 )
             } else {
                 ContextCompat.getDrawable(context, R.drawable.background_new_address_bar_option)
@@ -133,7 +133,7 @@ class NewAddressBarOptionBottomSheetDialog(
             if (!isSearchOnlySelected) {
                 ContextCompat.getDrawable(
                     context,
-                    R.drawable.background_new_address_bar_option_selected
+                    R.drawable.background_new_address_bar_option_selected,
                 )
             } else {
                 ContextCompat.getDrawable(context, R.drawable.background_new_address_bar_option)
@@ -187,11 +187,11 @@ class NewAddressBarOptionBottomSheetDialog(
             .toBuilder()
             .setTopLeftCorner(
                 CornerFamily.ROUNDED,
-                context.resources.getDimension(com.duckduckgo.mobile.android.R.dimen.dialogBorderRadius)
+                context.resources.getDimension(com.duckduckgo.mobile.android.R.dimen.dialogBorderRadius),
             )
             .setTopRightCorner(
                 CornerFamily.ROUNDED,
-                context.resources.getDimension(com.duckduckgo.mobile.android.R.dimen.dialogBorderRadius)
+                context.resources.getDimension(com.duckduckgo.mobile.android.R.dimen.dialogBorderRadius),
             )
             .build()
         bottomSheet?.background = shapeDrawable
