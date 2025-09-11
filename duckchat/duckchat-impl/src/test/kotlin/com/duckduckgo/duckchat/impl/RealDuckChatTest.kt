@@ -790,9 +790,9 @@ class RealDuckChatTest {
         duckChatFeature.showAIChatAddressBarChoiceScreen().setRawStoredState(State(enable = true))
         whenever(mockDuckChatFeatureRepository.isDuckChatUserEnabled()).thenReturn(true)
         whenever(mockDuckChatFeatureRepository.shouldShowInAddressBar()).thenReturn(true)
-        
+
         testee.onPrivacyConfigDownloaded()
-        
+
         assertTrue(testee.showNewAddressBarOptionAnnouncement.value)
     }
 
@@ -801,9 +801,9 @@ class RealDuckChatTest {
         duckChatFeature.showAIChatAddressBarChoiceScreen().setRawStoredState(State(enable = false))
         whenever(mockDuckChatFeatureRepository.isDuckChatUserEnabled()).thenReturn(true)
         whenever(mockDuckChatFeatureRepository.shouldShowInAddressBar()).thenReturn(true)
-        
+
         testee.onPrivacyConfigDownloaded()
-        
+
         assertFalse(testee.showNewAddressBarOptionAnnouncement.value)
     }
 
