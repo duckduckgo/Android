@@ -69,7 +69,7 @@ interface DuckChatFeature {
 
     /**
      * @return `true` when the new address bar option announcement should be shown
-     * If the remote feature is not present defaults to `false`
+     * If the remote feature is not present defaults to `internal`
      */
     @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
     fun showAIChatAddressBarChoiceScreen(): Toggle
