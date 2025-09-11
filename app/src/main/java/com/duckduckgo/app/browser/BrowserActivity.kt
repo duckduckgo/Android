@@ -55,7 +55,7 @@ import com.duckduckgo.app.browser.databinding.IncludeOmnibarToolbarMockupBinding
 import com.duckduckgo.app.browser.databinding.IncludeOmnibarToolbarMockupBottomBinding
 import com.duckduckgo.app.browser.defaultbrowsing.prompts.ui.DefaultBrowserBottomSheetDialog
 import com.duckduckgo.app.browser.defaultbrowsing.prompts.ui.DefaultBrowserBottomSheetDialog.EventListener
-import com.duckduckgo.app.browser.newaddressbaroption.NewAddressBarOptionTrigger
+import com.duckduckgo.app.browser.newaddressbaroption.NewAddressBarOptionManager
 import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
 import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition.BOTTOM
 import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition.TOP
@@ -211,7 +211,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
     lateinit var browserFeatures: AndroidBrowserConfigFeature
 
     @Inject
-    lateinit var newAddressBarOptionTrigger: NewAddressBarOptionTrigger
+    lateinit var newAddressBarOptionManager: NewAddressBarOptionManager
 
     private val lastActiveTabs = TabList()
 
@@ -1085,7 +1085,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
         lifecycleScope.launch(dispatcherProvider.io()) {
             try {
                 val isExternalLaunch = intent.getBooleanExtra(LAUNCH_FROM_EXTERNAL_EXTRA, false)
-                val shouldShow = newAddressBarOptionTrigger.shouldTrigger(launchedFromExternal = isExternalLaunch)
+                val shouldShow = newAddressBarOptionManager.shouldTrigger(launchedFromExternal = isExternalLaunch)
 
                 if (shouldShow) {
                     withContext(dispatcherProvider.main()) {
@@ -1106,38 +1106,13 @@ open class BrowserActivity : DuckDuckGoActivity() {
 
         dialog.eventListener = object : NewAddressBarOptionBottomSheetDialog.EventListener {
             override fun onShown() {
-                logcat(INFO) { "New address bar option dialog shown" }
-            }
-
-            override fun onCanceled() {
-                logcat(INFO) { "New address bar option dialog canceled" }
                 lifecycleScope.launch(dispatcherProvider.io()) {
-                    newAddressBarOptionTrigger.markAsShown()
+                    newAddressBarOptionManager.markAsShown()
                 }
-            }
-
-            override fun onAddWidgetButtonClicked() {
-                logcat(INFO) { "New address bar option dialog confirmed" }
-                lifecycleScope.launch(dispatcherProvider.io()) {
-                    newAddressBarOptionTrigger.markAsShown()
-                }
-            }
-
-            override fun onNotNowButtonClicked() {
-                logcat(INFO) { "New address bar option dialog dismissed" }
-                lifecycleScope.launch(dispatcherProvider.io()) {
-                    newAddressBarOptionTrigger.markAsShown()
-                }
-            }
-
-            override fun onSearchOnlySelected() {
-                logcat(INFO) { "User selected search only option" }
-                // TODO: Handle the selection - update user preferences
             }
 
             override fun onSearchAndDuckAiSelected() {
-                logcat(INFO) { "User selected search and Duck AI option" }
-                // TODO: Handle the selection - update user preferences
+                // TODO
             }
         }
 

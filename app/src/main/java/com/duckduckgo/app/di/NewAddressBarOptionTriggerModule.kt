@@ -17,8 +17,8 @@
 package com.duckduckgo.app.di
 
 import com.duckduckgo.app.browser.newaddressbaroption.NewAddressBarOptionDataStore
-import com.duckduckgo.app.browser.newaddressbaroption.NewAddressBarOptionTrigger
-import com.duckduckgo.app.browser.newaddressbaroption.RealNewAddressBarOptionTrigger
+import com.duckduckgo.app.browser.newaddressbaroption.NewAddressBarOptionManager
+import com.duckduckgo.app.browser.newaddressbaroption.RealNewAddressBarOptionManager
 import com.duckduckgo.app.onboarding.store.UserStageStore
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.di.scopes.AppScope
@@ -41,8 +41,8 @@ object NewAddressBarOptionTriggerModule {
         remoteMessagingRepository: RemoteMessagingRepository,
         newAddressBarOptionDataStore: NewAddressBarOptionDataStore,
         settingsDataStore: SettingsDataStore,
-    ): NewAddressBarOptionTrigger {
-        return RealNewAddressBarOptionTrigger(
+    ): NewAddressBarOptionManager {
+        return RealNewAddressBarOptionManager(
             duckAiFeatureState = duckAiFeatureState,
             userStageStore = userStageStore,
             duckChat = duckChat,

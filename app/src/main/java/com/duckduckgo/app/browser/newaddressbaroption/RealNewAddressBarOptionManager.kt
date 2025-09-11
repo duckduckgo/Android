@@ -26,19 +26,19 @@ import com.duckduckgo.remote.messaging.api.RemoteMessagingRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
-interface NewAddressBarOptionTrigger {
+interface NewAddressBarOptionManager {
     suspend fun shouldTrigger(launchedFromExternal: Boolean): Boolean
     suspend fun markAsShown()
 }
 
-class RealNewAddressBarOptionTrigger(
+class RealNewAddressBarOptionManager(
     private val duckAiFeatureState: DuckAiFeatureState,
     private val userStageStore: UserStageStore,
     private val duckChat: DuckChat,
     private val remoteMessagingRepository: RemoteMessagingRepository,
     private val newAddressBarOptionDataStore: NewAddressBarOptionDataStore,
     private val settingsDataStore: SettingsDataStore,
-) : NewAddressBarOptionTrigger {
+) : NewAddressBarOptionManager {
 
     override suspend fun shouldTrigger(launchedFromExternal: Boolean): Boolean = withContext(Dispatchers.IO) {
         isDuckAiEnabled() &&

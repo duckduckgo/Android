@@ -20,7 +20,6 @@ import android.animation.Animator
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
-import android.content.DialogInterface
 import android.content.pm.ActivityInfo
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -58,33 +57,36 @@ class NewAddressBarOptionBottomSheetDialog(
         this.behavior.peekHeight = 0
         this.behavior.maxHeight = 900.toPx()
 
-        setOnShowListener { dialogInterface ->
-            val bottomSheet = findViewById<FrameLayout>(com.google.android.material.R.id.design_bottom_sheet)
+        setOnShowListener {
+            val bottomSheet =
+                findViewById<FrameLayout>(com.google.android.material.R.id.design_bottom_sheet)
             bottomSheet?.layoutParams = bottomSheet?.layoutParams?.apply {
                 height = ViewGroup.LayoutParams.MATCH_PARENT
             }
 
-            setRoundCorners(dialogInterface)
+            setRoundCorners()
 
             lockOrientationToPortrait()
 
             eventListener?.onShown()
         }
+
         setOnCancelListener {
-            eventListener?.onCanceled()
+
             restoreOrientation()
             dismiss()
         }
 
         setupLottieAnimation()
         setupSelectionLogic()
+
         binding.newAddressBarOptionBottomSheetDialogPrimaryButton.setOnClickListener {
-            eventListener?.onAddWidgetButtonClicked()
+            eventListener?.onSearchAndDuckAiSelected()
             restoreOrientation()
             dismiss()
         }
+
         binding.newAddressBarOptionBottomSheetDialogGhostButton.setOnClickListener {
-            eventListener?.onNotNowButtonClicked()
             restoreOrientation()
             dismiss()
         }
@@ -97,7 +99,6 @@ class NewAddressBarOptionBottomSheetDialog(
             if (!isSearchOnlySelected) {
                 isSearchOnlySelected = true
                 updateSelectionState()
-                eventListener?.onSearchOnlySelected()
             }
         }
 
@@ -105,28 +106,35 @@ class NewAddressBarOptionBottomSheetDialog(
             if (isSearchOnlySelected) {
                 isSearchOnlySelected = false
                 updateSelectionState()
-                eventListener?.onSearchAndDuckAiSelected()
             }
         }
     }
 
     private fun updateSelectionState() {
-        binding.newAddressBarOptionBottomSheetDialogSearchOnlyButton.isSelected = isSearchOnlySelected
+        binding.newAddressBarOptionBottomSheetDialogSearchOnlyButton.isSelected =
+            isSearchOnlySelected
         binding.searchOnlyCheckbox.isChecked = isSearchOnlySelected
         binding.searchOnlyCheckbox.isEnabled = isSearchOnlySelected
         binding.newAddressBarOptionBottomSheetDialogSearchOnlyButton.background =
             if (isSearchOnlySelected) {
-                ContextCompat.getDrawable(context, R.drawable.background_new_address_bar_option_selected)
+                ContextCompat.getDrawable(
+                    context,
+                    R.drawable.background_new_address_bar_option_selected
+                )
             } else {
                 ContextCompat.getDrawable(context, R.drawable.background_new_address_bar_option)
             }
 
-        binding.newAddressBarOptionBottomSheetDialogSearchAndDuckAiButton.isSelected = !isSearchOnlySelected
+        binding.newAddressBarOptionBottomSheetDialogSearchAndDuckAiButton.isSelected =
+            !isSearchOnlySelected
         binding.searchAndDuckAiCheckbox.isChecked = !isSearchOnlySelected
         binding.searchAndDuckAiCheckbox.isEnabled = !isSearchOnlySelected
         binding.newAddressBarOptionBottomSheetDialogSearchAndDuckAiButton.background =
             if (!isSearchOnlySelected) {
-                ContextCompat.getDrawable(context, R.drawable.background_new_address_bar_option_selected)
+                ContextCompat.getDrawable(
+                    context,
+                    R.drawable.background_new_address_bar_option_selected
+                )
             } else {
                 ContextCompat.getDrawable(context, R.drawable.background_new_address_bar_option)
             }
@@ -170,14 +178,21 @@ class NewAddressBarOptionBottomSheetDialog(
         )
     }
 
-    private fun setRoundCorners(dialogInterface: DialogInterface) {
-        val bottomSheet = findViewById<FrameLayout>(com.google.android.material.R.id.design_bottom_sheet)
+    private fun setRoundCorners() {
+        val bottomSheet =
+            findViewById<FrameLayout>(com.google.android.material.R.id.design_bottom_sheet)
 
         val shapeDrawable = MaterialShapeDrawable.createWithElevationOverlay(context)
         shapeDrawable.shapeAppearanceModel = shapeDrawable.shapeAppearanceModel
             .toBuilder()
-            .setTopLeftCorner(CornerFamily.ROUNDED, context.resources.getDimension(com.duckduckgo.mobile.android.R.dimen.dialogBorderRadius))
-            .setTopRightCorner(CornerFamily.ROUNDED, context.resources.getDimension(com.duckduckgo.mobile.android.R.dimen.dialogBorderRadius))
+            .setTopLeftCorner(
+                CornerFamily.ROUNDED,
+                context.resources.getDimension(com.duckduckgo.mobile.android.R.dimen.dialogBorderRadius)
+            )
+            .setTopRightCorner(
+                CornerFamily.ROUNDED,
+                context.resources.getDimension(com.duckduckgo.mobile.android.R.dimen.dialogBorderRadius)
+            )
             .build()
         bottomSheet?.background = shapeDrawable
     }
@@ -196,14 +211,8 @@ class NewAddressBarOptionBottomSheetDialog(
         }
     }
 
-    fun isSearchOnlySelected(): Boolean = isSearchOnlySelected
-
     interface EventListener {
         fun onShown()
-        fun onCanceled()
-        fun onAddWidgetButtonClicked()
-        fun onNotNowButtonClicked()
-        fun onSearchOnlySelected()
         fun onSearchAndDuckAiSelected()
     }
 }
