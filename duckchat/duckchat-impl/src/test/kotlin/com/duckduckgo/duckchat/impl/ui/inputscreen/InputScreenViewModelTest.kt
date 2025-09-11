@@ -883,9 +883,13 @@ class InputScreenViewModelTest {
 
         viewModel.onChatSubmitted("prompt")
 
+        val expectedParams = mapOf(
+            DuckChatPixelParameters.WAS_USED_BEFORE to "1",
+            DuckChatPixelParameters.TEXT_LENGTH_BUCKET to "short",
+        )
         verify(pixel).fire(
             pixel = DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_OMNIBAR_PROMPT_SUBMITTED,
-            parameters = mapOf(DuckChatPixelParameters.WAS_USED_BEFORE to "1"),
+            parameters = expectedParams,
         )
         verify(pixel).fire(DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_OMNIBAR_PROMPT_SUBMITTED_DAILY, type = Daily())
     }
@@ -1230,9 +1234,13 @@ class InputScreenViewModelTest {
 
             viewModel.onChatSubmitted(testCase.prompt)
 
+            val expectedParams = mapOf(
+                DuckChatPixelParameters.WAS_USED_BEFORE to "0",
+                DuckChatPixelParameters.TEXT_LENGTH_BUCKET to testCase.expectedBucket,
+            )
             verify(pixel).fire(
                 DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_OMNIBAR_PROMPT_SUBMITTED,
-                parameters = mapOf("text_length_bucket" to testCase.expectedBucket),
+                parameters = expectedParams,
             )
             clearInvocations(pixel) // Reset mock for next iteration
         }
