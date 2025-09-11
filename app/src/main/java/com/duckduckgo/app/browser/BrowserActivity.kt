@@ -64,6 +64,7 @@ import com.duckduckgo.app.browser.tabs.TabManager.TabModel
 import com.duckduckgo.app.browser.tabs.adapter.TabPagerAdapter
 import com.duckduckgo.app.browser.webview.RealMaliciousSiteBlockerWebViewIntegration
 import com.duckduckgo.app.di.AppCoroutineScope
+import com.duckduckgo.app.dispatchers.ExternalIntentProcessingState
 import com.duckduckgo.app.downloads.DownloadsScreens.DownloadsScreenNoParams
 import com.duckduckgo.app.feedback.ui.common.FeedbackActivity
 import com.duckduckgo.app.fire.DataClearer
@@ -170,6 +171,9 @@ open class BrowserActivity : DuckDuckGoActivity() {
 
     @Inject
     lateinit var fireButtonStore: FireButtonStore
+
+    @Inject
+    lateinit var externalIntentProcessingState: ExternalIntentProcessingState
 
     @Inject
     lateinit var appBuildConfig: AppBuildConfig
@@ -579,6 +583,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
 
         if (launchNewSearch(intent)) {
             logcat(WARN) { "new tab requested" }
+            externalIntentProcessingState.onIntentRequestToChangeTab()
             launchNewTab()
             return
         }
@@ -597,6 +602,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
 
         val existingTabId = intent.getStringExtra(OPEN_EXISTING_TAB_ID_EXTRA)
         if (existingTabId != null) {
+            externalIntentProcessingState.onIntentRequestToChangeTab()
             openExistingTab(existingTabId)
             return
         }
@@ -604,6 +610,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
         val sharedText = intent.intentText
         if (sharedText != null) {
             closeDuckChat()
+            externalIntentProcessingState.onIntentRequestToChangeTab()
             if (intent.getBooleanExtra(ShortcutBuilder.SHORTCUT_EXTRA_ARG, false)) {
                 logcat { "Shortcut opened with url $sharedText" }
                 lifecycleScope.launch { viewModel.onOpenShortcut(sharedText) }
