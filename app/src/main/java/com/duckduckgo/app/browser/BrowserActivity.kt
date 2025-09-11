@@ -48,7 +48,9 @@ import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.BrowserViewModel.Command
 import com.duckduckgo.app.browser.animations.slideAndFadeInFromLeft
 import com.duckduckgo.app.browser.animations.slideAndFadeInFromRight
+import com.duckduckgo.app.browser.validator.NewAddressBarOptionTrigger
 import com.duckduckgo.app.browser.animations.slideAndFadeOutToLeft
+import com.duckduckgo.duckchat.impl.ui.dialog.NewAddressBarOptionBottomSheetDialog
 import com.duckduckgo.app.browser.animations.slideAndFadeOutToRight
 import com.duckduckgo.app.browser.databinding.ActivityBrowserBinding
 import com.duckduckgo.app.browser.databinding.IncludeOmnibarToolbarMockupBinding
@@ -121,6 +123,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import logcat.LogPriority.ERROR
 import logcat.LogPriority.INFO
 import logcat.LogPriority.VERBOSE
@@ -206,6 +209,9 @@ open class BrowserActivity : DuckDuckGoActivity() {
 
     @Inject
     lateinit var browserFeatures: AndroidBrowserConfigFeature
+
+    @Inject
+    lateinit var newAddressBarOptionTrigger: NewAddressBarOptionTrigger
 
     private val lastActiveTabs = TabList()
 
@@ -1069,8 +1075,73 @@ open class BrowserActivity : DuckDuckGoActivity() {
                 logcat(INFO) { "Original instance state is null, so will inspect intent for actions to take. $intent" }
                 launchNewSearchOrQuery(intent)
                 processedOriginalIntent = true
+                
+                checkAndShowNewAddressBarOptionAnnouncement()
             }
         }
+    }
+
+    private fun checkAndShowNewAddressBarOptionAnnouncement() {
+        lifecycleScope.launch(dispatcherProvider.io()) {
+            try {
+                val isExternalLaunch = intent.getBooleanExtra(LAUNCH_FROM_EXTERNAL_EXTRA, false)
+                val shouldShow = newAddressBarOptionTrigger.shouldTrigger(launchedFromExternal = isExternalLaunch)
+                
+                if (shouldShow) {
+                    withContext(dispatcherProvider.main()) {
+                        showNewAddressBarOptionDialog()
+                    }
+                }
+            } catch (e: Exception) {
+                logcat(ERROR) { "Error checking new address bar option announcement: ${e.asLog()}" }
+            }
+        }
+    }
+
+    private fun showNewAddressBarOptionDialog() {
+        val dialog = NewAddressBarOptionBottomSheetDialog(
+            context = this,
+            isLightModeEnabled = !isDarkThemeEnabled()
+        )
+        
+        dialog.eventListener = object : NewAddressBarOptionBottomSheetDialog.EventListener {
+            override fun onShown() {
+                logcat(INFO) { "New address bar option dialog shown" }
+            }
+            
+            override fun onCanceled() {
+                logcat(INFO) { "New address bar option dialog canceled" }
+                lifecycleScope.launch(dispatcherProvider.io()) {
+                    newAddressBarOptionTrigger.markAsSeen()
+                }
+            }
+            
+            override fun onAddWidgetButtonClicked() {
+                logcat(INFO) { "New address bar option dialog confirmed" }
+                lifecycleScope.launch(dispatcherProvider.io()) {
+                    newAddressBarOptionTrigger.markAsSeen()
+                }
+            }
+            
+            override fun onNotNowButtonClicked() {
+                logcat(INFO) { "New address bar option dialog dismissed" }
+                lifecycleScope.launch(dispatcherProvider.io()) {
+                    newAddressBarOptionTrigger.markAsSeen()
+                }
+            }
+            
+            override fun onSearchOnlySelected() {
+                logcat(INFO) { "User selected search only option" }
+                // TODO: Handle the selection - update user preferences
+            }
+            
+            override fun onSearchAndDuckAiSelected() {
+                logcat(INFO) { "User selected search and Duck AI option" }
+                // TODO: Handle the selection - update user preferences
+            }
+        }
+        
+        dialog.show()
     }
 
     private fun initializeTabs(savedInstanceState: Bundle?) {
