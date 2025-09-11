@@ -28,7 +28,7 @@
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
-        android:layout_height="@dimen/toolbarSize"
+        android:layout_height="?attr/actionBarSize"
         android:background="?attr/daxColorToolbar"
         android:theme="@style/TabSwitcher.Widget.Toolbar"
         app:popupTheme="@style/Widget.DuckDuckGo.PopUpOverflowMenu" />
