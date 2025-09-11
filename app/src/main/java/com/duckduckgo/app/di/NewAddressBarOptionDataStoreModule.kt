@@ -36,7 +36,7 @@ object NewAddressBarOptionDataStoreModule {
 
     @Provides
     @NewAddressBarOption
-    fun provideNewAddressBarPickerDataStore(context: Context): DataStore<Preferences> = context.newAddressBarOptionDataStore
+    fun provideNewAddressBarOptionDataStore(context: Context): DataStore<Preferences> = context.newAddressBarOptionDataStore
 }
 
 @Qualifier
