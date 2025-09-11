@@ -52,7 +52,7 @@ class NewAddressBarOptionBottomSheetDialog(
 
     var eventListener: EventListener? = null
 
-    private var isSearchOnlySelected = false
+    private var searchAndDuckAiSelected = true
     private var originalOrientation: Int = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
 
     init {
@@ -84,7 +84,9 @@ class NewAddressBarOptionBottomSheetDialog(
 
         binding.newAddressBarOptionBottomSheetDialogPrimaryButton.setOnClickListener {
             lifecycleScope.launch(dispatcherProvider.io()) {
-                duckChatInternal.setInputScreenUserSetting(true)
+                if (searchAndDuckAiSelected) {
+                    duckChatInternal.setInputScreenUserSetting(true)
+                }
             }
             restoreOrientation()
             dismiss()
@@ -100,15 +102,15 @@ class NewAddressBarOptionBottomSheetDialog(
         updateSelectionState()
 
         binding.newAddressBarOptionBottomSheetDialogSearchOnlyButton.setOnClickListener {
-            if (!isSearchOnlySelected) {
-                isSearchOnlySelected = true
+            if (searchAndDuckAiSelected) {
+                searchAndDuckAiSelected = false
                 updateSelectionState()
             }
         }
 
         binding.newAddressBarOptionBottomSheetDialogSearchAndDuckAiButton.setOnClickListener {
-            if (isSearchOnlySelected) {
-                isSearchOnlySelected = false
+            if (!searchAndDuckAiSelected) {
+                searchAndDuckAiSelected = true
                 updateSelectionState()
             }
         }
@@ -116,11 +118,11 @@ class NewAddressBarOptionBottomSheetDialog(
 
     private fun updateSelectionState() {
         binding.newAddressBarOptionBottomSheetDialogSearchOnlyButton.isSelected =
-            isSearchOnlySelected
-        binding.searchOnlyCheckbox.isChecked = isSearchOnlySelected
-        binding.searchOnlyCheckbox.isEnabled = isSearchOnlySelected
+            !searchAndDuckAiSelected
+        binding.searchOnlyCheckbox.isChecked = !searchAndDuckAiSelected
+        binding.searchOnlyCheckbox.isEnabled = !searchAndDuckAiSelected
         binding.newAddressBarOptionBottomSheetDialogSearchOnlyButton.background =
-            if (isSearchOnlySelected) {
+            if (!searchAndDuckAiSelected) {
                 ContextCompat.getDrawable(
                     context,
                     R.drawable.background_new_address_bar_option_selected,
@@ -130,11 +132,11 @@ class NewAddressBarOptionBottomSheetDialog(
             }
 
         binding.newAddressBarOptionBottomSheetDialogSearchAndDuckAiButton.isSelected =
-            !isSearchOnlySelected
-        binding.searchAndDuckAiCheckbox.isChecked = !isSearchOnlySelected
-        binding.searchAndDuckAiCheckbox.isEnabled = !isSearchOnlySelected
+            searchAndDuckAiSelected
+        binding.searchAndDuckAiCheckbox.isChecked = searchAndDuckAiSelected
+        binding.searchAndDuckAiCheckbox.isEnabled = searchAndDuckAiSelected
         binding.newAddressBarOptionBottomSheetDialogSearchAndDuckAiButton.background =
-            if (!isSearchOnlySelected) {
+            if (searchAndDuckAiSelected) {
                 ContextCompat.getDrawable(
                     context,
                     R.drawable.background_new_address_bar_option_selected,
