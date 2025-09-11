@@ -65,14 +65,11 @@ class NewAddressBarOptionBottomSheetDialog(
             }
 
             setRoundCorners()
-
             lockOrientationToPortrait()
-
             eventListener?.onShown()
         }
 
         setOnCancelListener {
-
             restoreOrientation()
             dismiss()
         }
@@ -209,6 +206,11 @@ class NewAddressBarOptionBottomSheetDialog(
         (context as? Activity)?.let {
             it.requestedOrientation = originalOrientation
         }
+    }
+
+    override fun onDetachedFromWindow() {
+        super.onDetachedFromWindow()
+        restoreOrientation()
     }
 
     interface EventListener {
