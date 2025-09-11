@@ -16,8 +16,10 @@
 
 package com.duckduckgo.app.browser.validator
 
+import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition
 import com.duckduckgo.app.onboarding.store.AppStage
 import com.duckduckgo.app.onboarding.store.UserStageStore
+import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.remote.messaging.api.RemoteMessagingRepository
@@ -26,7 +28,7 @@ import kotlinx.coroutines.withContext
 
 interface NewAddressBarOptionTrigger {
     suspend fun shouldTrigger(launchedFromExternal: Boolean): Boolean
-    suspend fun markAsSeen()
+    suspend fun markAsShown()
 }
 
 class RealNewAddressBarOptionTrigger(
@@ -35,6 +37,7 @@ class RealNewAddressBarOptionTrigger(
     private val duckChat: DuckChat,
     private val remoteMessagingRepository: RemoteMessagingRepository,
     private val newAddressBarOptionStorage: NewAddressBarOptionStorage,
+    private val settingsDataStore: SettingsDataStore,
 ) : NewAddressBarOptionTrigger {
 
     override suspend fun shouldTrigger(launchedFromExternal: Boolean): Boolean = withContext(Dispatchers.IO) {
@@ -45,7 +48,8 @@ class RealNewAddressBarOptionTrigger(
             !isInputScreenEnabled() &&
             !hasForceChoiceBeenShown() &&
             !launchedFromExternal &&
-            !hasInteractedWithSearchAndDuckAiAnnouncement()
+            !hasInteractedWithSearchAndDuckAiAnnouncement() &&
+            !hasBottomAddressBarEnabled()
     }
 
     private fun isDuckAiEnabled(): Boolean {
@@ -76,7 +80,11 @@ class RealNewAddressBarOptionTrigger(
         return remoteMessagingRepository.dismissedMessages().contains("search_duck_ai_announcement")
     }
 
-    override suspend fun markAsSeen() = withContext(Dispatchers.IO) {
+    private fun hasBottomAddressBarEnabled(): Boolean {
+        return settingsDataStore.omnibarPosition == OmnibarPosition.BOTTOM
+    }
+
+    override suspend fun markAsShown() = withContext(Dispatchers.IO) {
         newAddressBarOptionStorage.markAsShown()
     }
 }

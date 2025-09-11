@@ -1112,21 +1112,21 @@ open class BrowserActivity : DuckDuckGoActivity() {
             override fun onCanceled() {
                 logcat(INFO) { "New address bar option dialog canceled" }
                 lifecycleScope.launch(dispatcherProvider.io()) {
-                    newAddressBarOptionTrigger.markAsSeen()
+                    newAddressBarOptionTrigger.markAsShown()
                 }
             }
 
             override fun onAddWidgetButtonClicked() {
                 logcat(INFO) { "New address bar option dialog confirmed" }
                 lifecycleScope.launch(dispatcherProvider.io()) {
-                    newAddressBarOptionTrigger.markAsSeen()
+                    newAddressBarOptionTrigger.markAsShown()
                 }
             }
 
             override fun onNotNowButtonClicked() {
                 logcat(INFO) { "New address bar option dialog dismissed" }
                 lifecycleScope.launch(dispatcherProvider.io()) {
-                    newAddressBarOptionTrigger.markAsSeen()
+                    newAddressBarOptionTrigger.markAsShown()
                 }
             }
 
