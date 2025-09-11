@@ -191,6 +191,28 @@
     <string name="webTrackingProtectionLearnMoreTitle">Ochrona przed śledzeniem w sieci</string>
     <string name="webTrackingProtectionTitle">Ochrona przed śledzeniem w sieci</string>
     <string name="webTrackingProtectionDescriptionNew"><![CDATA[Podczas przeglądania stron internetowych DuckDuckGo automatycznie blokuje ukryte mechanizmy śledzące.\n<a href=\"\">Dowiedz się więcej</a>]]></string>
+    <string name="webTrackingProtectionExplanationDescription"><![CDATA[Przeglądarka DuckDuckGo zapewnia ochronę przed śledzeniem, która jest zawsze aktywna.\n<a href=\"\">Dowiedz się więcej</a>]]></string>
+    <string name="webTrackingProtectionExplanationTitle">W jaki sposób Cię chronimy</string>
+    <string name="webTrackingProtectionThirdPartyTrackersTitle">Blokuje mechanizmy śledzące innych firm</string>
+    <string name="webTrackingProtectionThirdPartyTrackersDescription">Pomaga blokować pliki cookie innych firm, które śledzą Twoją aktywność na stronach, poprzez uniemożliwienie ładowania mechanizmów śledzących innych firm.</string>
+    <string name="webTrackingProtectionTargetedAdsTitle">Blokowanie ukierunkowanych reklam</string>
+    <string name="webTrackingProtectionTargetedAdsDescription">Blokuje inwazyjne mechanizmy śledzące przed ich załadowaniem, skutecznie eliminując reklamy, które opierają się na śledzeniu.</string>
+    <string name="webTrackingProtectionFingerprintTrackingTitle">Zapobiega śledzeniu cyfrowego odcisku palca</string>
+    <string name="webTrackingProtectionFingerprintTrackingDescription">Pomaga uniemożliwić firmom śledzącym uzyskiwanie niepowtarzalnych identyfikatorów Twojej przeglądarki i urządzenia, których używają do śledzenia Cię w sieci.</string>
+    <string name="webTrackingProtectionLinkTrackingTitle">Blokuje śledzenie linków</string>
+    <string name="webTrackingProtectionLinkTrackingDescription">Usuwa parametry śledzenia w linkach, aby uniemożliwić innym firmom śledzenie Twojego zachowania na odwiedzanych stronach.</string>
+    <string name="webTrackingProtectionReferrerTrackingTitle">Chroni przed śledzeniem stron odsyłających</string>
+    <string name="webTrackingProtectionReferrerTrackingDescription">Pomaga blokować możliwość zidentyfikowania ostatnio odwiedzonej witryny przez firmy.</string>
+    <string name="webTrackingProtectionFirstPartyCookiesTitle">Ogranicza ważność własnych plików cookie</string>
+    <string name="webTrackingProtectionFirstPartyCookiesDescription">Automatycznie powoduje utratę ważności własnych plików cookie witryn po 30 dniach, aby nie mogły śledzić Cię w nieskończoność po wylogowaniu.</string>
+    <string name="webTrackingProtectionDnsCnameCloakingTitle">Chroni przed maskowaniem DNS CNAME</string>
+    <string name="webTrackingProtectionDnsCnameCloakingDescription">Pomaga blokować mechanizmy śledzące innych firm, które próbują ukryć się w witrynie internetowej za pomocą DNS.</string>
+    <string name="webTrackingProtectionGoogleAmpTrackingTitle">Blokuje śledzenie AMP Google</string>
+    <string name="webTrackingProtectionGoogleAmpTrackingDescription">Zastępuje linki Google AMP oryginalną witryną wydawcy.</string>
+    <string name="webTrackingProtectionGoogleSigninPopupsTitle">Blokuje wyskakujące okienka logowania Google</string>
+    <string name="webTrackingProtectionGoogleSigninPopupsDescription">Blokuje wyskakujące okienka logowania Google w witrynach, które nie są własnością Google.</string>
+    <string name="webTrackingProtectionGlobalPrivacyControlTitle">Globalna Kontrola Prywatności</string>
+    <string name="webTrackingProtectionGlobalPrivacyControlDescription">Korzysta w Twoim imieniu z prawa do rezygnacji, informując witryny, aby nie sprzedawały ani nie udostępniały Twoich danych osobowych.</string>
 
     <!-- Cookie Pop-Up Protection -->
     <string name="cookiePopupProtectionTitle">Ochrona przed wyskakującymi okienkami dotyczącymi plików cookie</string>
@@ -886,11 +908,6 @@
     <string name="newTabPageDefaultBrowserMessagePrimaryCta" instruction="This text appears on a button">Ustaw jako domyślną</string>
     <string name="newTabPageDefaultBrowserMessageSecondaryCta" instruction="This text appears on a button">Nie pytaj ponownie</string>
 
-    <!--TabSwitcher Animation Tile Dialog-->
-    <string name="tabSwitcherAnimationTileRemovalDialogTitle">DuckDuckGo blokuje skrypty śledzące, aby chronić Twoje przeglądanie</string>
-    <string name="tabSwitcherAnimationTileRemovalDialogBody">Wyczyszczenie kart i danych spowoduje usunięcie historii blokowania mechanizmów śledzących i zresetowanie tej liczby do zera.\n\nUkryj ten baner, jeśli wolisz go nie widzieć w widoku kart.</string>
-    <string name="tabSwitcherAnimationTileRemovalDialogNegativeButton">Ukryj baner</string>
-
     <!-- Threat protection -->
     <string name="maliciousSiteTitle">Ostrzeżenie: ta witryna może stanowić zagrożenie dla bezpieczeństwa</string>
     <string name="maliciousSiteMalwareHeadline"><![CDATA[Ta strona została zablokowana przez DuckDuckGo, ponieważ może rozpowszechniać złośliwe oprogramowanie, którego celem jest naruszenie bezpieczeństwa urządzenia lub kradzież danych osobowych.\n<a href=\"\">Dowiedz się więcej</a>]]></string>
@@ -958,5 +975,12 @@
     <string name="onboardingPrivacyProDaxDialogDescriptionRebranding"><![CDATA[DuckDuckGo oferuje również <b>opcjonalną płatną subskrypcję</b> z bezpieczną <b>siecią VPN</b> i <b>zaawansowaną, prywatną sztuczną inteligencją</b>.]]></string>
     <string name="settingsDuckAiRebranding">Funkcje AI</string>
     <string name="settingsDuckAi">Duck.ai</string>
+
+    <!--TabSwitcher Trackers Animation-->
+    <string name="showTrackerCountInTabSwitcher">Pokaż liczbę mechanizmów śledzących w przełączniku kart</string>
+    <string name="tabSwitcherAnimationTileRemovalDialogTitle" instruction="A title for a dialog that shows when a user clicks a tile that shows them their current blocked tracker count">Ukryć liczbę mechanizmów śledzących?</string>
+    <string name="tabSwitcherAnimationTileRemovalDialogBody" instruction="A message for a dialog that shows when a user clicks a tile that shows them their current blocked tracker count">Możesz to włączyć ponownie, wybierając kolejno Ustawienia &gt; Wygląd.</string>
+    <string name="tabSwitcherAnimationTileRemovalDialogPositiveButton">Ukryj</string>
+    <string name="tabSwitcherAnimationTileRemovalDialogNegativeButton">Zachowaj</string>
 
 </resources>

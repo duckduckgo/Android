@@ -16,6 +16,7 @@
 
 package com.duckduckgo.duckchat.impl.ui.settings
 
+import android.appwidget.AppWidgetManager
 import android.content.Intent
 import android.content.res.Configuration
 import android.os.Bundle
@@ -44,6 +45,7 @@ import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.duckchat.api.DuckChatSettingsNoParams
 import com.duckduckgo.duckchat.impl.R
 import com.duckduckgo.duckchat.impl.databinding.ActivityDuckChatSettingsBinding
+import com.duckduckgo.duckchat.impl.inputscreen.ui.metrics.discovery.InputScreenDiscoveryFunnel
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_SETTINGS_DISPLAYED
 import com.duckduckgo.duckchat.impl.ui.settings.DuckChatSettingsViewModel.ViewState
 import com.duckduckgo.mobile.android.R as CommonR
@@ -62,6 +64,7 @@ class DuckChatSettingsActivity : DuckDuckGoActivity() {
     private val userEnabledDuckChatToggleListener =
         CompoundButton.OnCheckedChangeListener { _, isChecked ->
             viewModel.onDuckChatUserEnabledToggled(isChecked)
+            updateWidgets()
         }
 
     @Inject
@@ -76,6 +79,9 @@ class DuckChatSettingsActivity : DuckDuckGoActivity() {
     @Inject
     lateinit var appTheme: AppTheme
 
+    @Inject
+    lateinit var inputScreenDiscoveryFunnel: InputScreenDiscoveryFunnel
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -86,6 +92,7 @@ class DuckChatSettingsActivity : DuckDuckGoActivity() {
         observeViewModel()
 
         pixel.fire(DUCK_CHAT_SETTINGS_DISPLAYED)
+        inputScreenDiscoveryFunnel.onDuckAiSettingsSeen()
     }
 
     private fun observeViewModel() {
@@ -253,5 +260,10 @@ class DuckChatSettingsActivity : DuckDuckGoActivity() {
                 else -> R.drawable.searchbox_withai_inactive_dark
             }
         }
+    }
+
+    private fun updateWidgets() {
+        val intent = Intent(AppWidgetManager.ACTION_APPWIDGET_UPDATE)
+        sendBroadcast(intent)
     }
 }

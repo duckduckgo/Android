@@ -87,6 +87,10 @@ class AppearanceActivity : DuckDuckGoActivity() {
         viewModel.onFullUrlSettingChanged(isChecked)
     }
 
+    private val showTrackersCountInTabSwitcher = CompoundButton.OnCheckedChangeListener { _, isChecked ->
+        viewModel.onShowTrackersCountInTabSwitcherChanged(isChecked)
+    }
+
     private val changeIconFlow = registerForActivityResult(ChangeIconContract()) { resultOk ->
         if (resultOk) {
             logcat { "Icon changed." }
@@ -122,6 +126,10 @@ class AppearanceActivity : DuckDuckGoActivity() {
                     binding.experimentalNightMode.isVisible = viewState.supportsForceDarkMode
                     updateSelectedOmnibarPosition(it.omnibarPosition)
                     binding.showFullUrlSetting.quietlySetIsChecked(viewState.isFullUrlEnabled, showFullUrlToggleListener)
+                    binding.showTrackersCountInTabSwitcher.quietlySetIsChecked(
+                        viewState.isTrackersCountInTabSwitcherEnabled,
+                        showTrackersCountInTabSwitcher,
+                    )
                 }
             }.launchIn(lifecycleScope)
 

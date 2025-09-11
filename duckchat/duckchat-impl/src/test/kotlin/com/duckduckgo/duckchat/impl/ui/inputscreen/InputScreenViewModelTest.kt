@@ -19,6 +19,8 @@ import com.duckduckgo.duckchat.impl.inputscreen.ui.command.Command.SubmitChat
 import com.duckduckgo.duckchat.impl.inputscreen.ui.command.Command.SubmitSearch
 import com.duckduckgo.duckchat.impl.inputscreen.ui.command.InputFieldCommand
 import com.duckduckgo.duckchat.impl.inputscreen.ui.command.SearchCommand
+import com.duckduckgo.duckchat.impl.inputscreen.ui.metrics.discovery.InputScreenDiscoveryFunnel
+import com.duckduckgo.duckchat.impl.inputscreen.ui.metrics.usage.InputScreenSessionUsageMetric
 import com.duckduckgo.duckchat.impl.inputscreen.ui.session.InputScreenSessionStore
 import com.duckduckgo.duckchat.impl.inputscreen.ui.state.SubmitButtonIcon
 import com.duckduckgo.duckchat.impl.inputscreen.ui.viewmodel.InputScreenViewModel
@@ -63,13 +65,16 @@ class InputScreenViewModelTest {
     private val pixel: Pixel = mock()
     private val inputScreenSessionStore: InputScreenSessionStore = mock()
     private val duckChat: DuckChat = mock()
+    private val inputScreenDiscoveryFunnel: InputScreenDiscoveryFunnel = mock()
+    private val inputScreenSessionUsageMetric: InputScreenSessionUsageMetric = mock()
 
     @Before
-    fun setup() {
+    fun setup() = runTest {
         whenever(autoCompleteSettings.autoCompleteSuggestionsEnabled).thenReturn(true)
         whenever(autoComplete.autoComplete(any())).thenReturn(
             flowOf(AutoCompleteResult("", listOf(AutoCompleteDefaultSuggestion("suggestion")))),
         )
+        whenever(duckChat.wasOpenedBefore()).thenReturn(false)
     }
 
     private fun createViewModel(currentOmnibarText: String = ""): InputScreenViewModel {
@@ -84,6 +89,8 @@ class InputScreenViewModelTest {
             pixel = pixel,
             sessionStore = inputScreenSessionStore,
             duckChat = duckChat,
+            inputScreenDiscoveryFunnel = inputScreenDiscoveryFunnel,
+            inputScreenSessionUsageMetric = inputScreenSessionUsageMetric,
         )
     }
 
@@ -835,7 +842,20 @@ class InputScreenViewModelTest {
     }
 
     @Test
+    fun `when onSearchSubmitted then inputScreenSessionUsage onSearchSubmitted is called`() = runTest {
+        val viewModel = createViewModel()
+
+        whenever(inputScreenSessionStore.hasUsedSearchMode()).thenReturn(false)
+        whenever(inputScreenSessionStore.hasUsedChatMode()).thenReturn(false)
+
+        viewModel.onSearchSubmitted("query")
+
+        verify(inputScreenSessionUsageMetric).onSearchSubmitted()
+    }
+
+    @Test
     fun `when onChatSubmitted then prompt submitted pixels are fired`() = runTest {
+        whenever(duckChat.wasOpenedBefore()).thenReturn(false)
         val viewModel = createViewModel()
 
         whenever(inputScreenSessionStore.hasUsedSearchMode()).thenReturn(false)
@@ -843,19 +863,72 @@ class InputScreenViewModelTest {
 
         viewModel.onChatSubmitted("prompt")
 
-        val expectedParams = mapOf("text_length_bucket" to "short")
-        verify(pixel).fire(DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_OMNIBAR_PROMPT_SUBMITTED, parameters = expectedParams)
+        verify(pixel).fire(
+            pixel = DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_OMNIBAR_PROMPT_SUBMITTED,
+            parameters = mapOf(
+                DuckChatPixelParameters.WAS_USED_BEFORE to "0",
+                "text_length_bucket" to "short",
+            ),
+        )
         verify(pixel).fire(DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_OMNIBAR_PROMPT_SUBMITTED_DAILY, type = Daily())
     }
 
     @Test
-    fun `when onSearchSelected and user was in chat mode then mode switched pixel is fired`() = runTest {
+    fun `when onChatSubmitted and DuckChat was used before then prompt submitted pixel includes was_used_before parameter as 1`() = runTest {
+        whenever(duckChat.wasOpenedBefore()).thenReturn(true)
+        val viewModel = createViewModel()
+
+        whenever(inputScreenSessionStore.hasUsedSearchMode()).thenReturn(false)
+        whenever(inputScreenSessionStore.hasUsedChatMode()).thenReturn(false)
+
+        viewModel.onChatSubmitted("prompt")
+
+        verify(pixel).fire(
+            pixel = DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_OMNIBAR_PROMPT_SUBMITTED,
+            parameters = mapOf(DuckChatPixelParameters.WAS_USED_BEFORE to "1"),
+        )
+        verify(pixel).fire(DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_OMNIBAR_PROMPT_SUBMITTED_DAILY, type = Daily())
+    }
+
+    @Test
+    fun `when onChatSubmitted then inputScreenSessionUsage onPromptSubmitted is called`() = runTest {
+        val viewModel = createViewModel()
+
+        whenever(inputScreenSessionStore.hasUsedSearchMode()).thenReturn(false)
+        whenever(inputScreenSessionStore.hasUsedChatMode()).thenReturn(false)
+
+        viewModel.onChatSubmitted("prompt")
+
+        verify(inputScreenSessionUsageMetric).onPromptSubmitted()
+    }
+
+    @Test
+    fun `when onSearchSelected and user was in chat mode with text then mode switched pixel is fired with correct parameters`() = runTest {
+        val viewModel = createViewModel()
+
+        viewModel.onChatSelected()
+        viewModel.onChatInputTextChanged("some chat text")
+        viewModel.onSearchSelected()
+
+        val expectedParams = mapOf(
+            "direction" to "to_search",
+            "had_text" to "true",
+        )
+        verify(pixel).fire(DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_OMNIBAR_MODE_SWITCHED, expectedParams)
+    }
+
+    @Test
+    fun `when onSearchSelected and user was in chat mode without text then mode switched pixel is fired with correct parameters`() = runTest {
         val viewModel = createViewModel()
 
         viewModel.onChatSelected()
         viewModel.onSearchSelected()
 
-        verify(pixel).fire(DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_OMNIBAR_MODE_SWITCHED)
+        val expectedParams = mapOf(
+            "direction" to "to_search",
+            "had_text" to "false",
+        )
+        verify(pixel).fire(DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_OMNIBAR_MODE_SWITCHED, expectedParams)
     }
 
     @Test
@@ -868,13 +941,32 @@ class InputScreenViewModelTest {
     }
 
     @Test
-    fun `when onChatSelected and user was in search mode then mode switched pixel is fired`() = runTest {
+    fun `when onChatSelected and user was in search mode with text then mode switched pixel is fired with correct parameters`() = runTest {
+        val viewModel = createViewModel()
+
+        viewModel.onSearchSelected()
+        viewModel.onSearchInputTextChanged("some search text")
+        viewModel.onChatSelected()
+
+        val expectedParams = mapOf(
+            "direction" to "to_duckai",
+            "had_text" to "true",
+        )
+        verify(pixel).fire(DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_OMNIBAR_MODE_SWITCHED, expectedParams)
+    }
+
+    @Test
+    fun `when onChatSelected and user was in search mode without text then mode switched pixel is fired with correct parameters`() = runTest {
         val viewModel = createViewModel()
 
         viewModel.onSearchSelected()
         viewModel.onChatSelected()
 
-        verify(pixel).fire(DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_OMNIBAR_MODE_SWITCHED)
+        val expectedParams = mapOf(
+            "direction" to "to_duckai",
+            "had_text" to "false",
+        )
+        verify(pixel).fire(DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_OMNIBAR_MODE_SWITCHED, expectedParams)
     }
 
     @Test
@@ -967,7 +1059,97 @@ class InputScreenViewModelTest {
         assertEquals(SubmitChat(query), viewModel.command.value)
 
         verify(pixel).fire(DuckChatPixelName.DUCK_CHAT_OPEN_AUTOCOMPLETE_EXPERIMENTAL, params)
-        verify(pixel).fire(DuckChatPixelName.AUTOCOMPLETE_DUCKAI_PROMPT_EXPERIMENTAL_SELECTION, params)
+        verify(autoComplete).fireAutocompletePixel(any(), any(), any())
+    }
+
+    @Test
+    fun `when onSearchSubmitted then discovery funnel onSearchSubmitted is called`() = runTest {
+        val viewModel = createViewModel()
+
+        whenever(inputScreenSessionStore.hasUsedSearchMode()).thenReturn(false)
+        whenever(inputScreenSessionStore.hasUsedChatMode()).thenReturn(false)
+
+        viewModel.onSearchSubmitted("query")
+
+        verify(inputScreenDiscoveryFunnel).onSearchSubmitted()
+    }
+
+    @Test
+    fun `when onChatSubmitted with prompt then discovery funnel onPromptSubmitted is called`() = runTest {
+        val viewModel = createViewModel()
+
+        whenever(inputScreenSessionStore.hasUsedSearchMode()).thenReturn(false)
+        whenever(inputScreenSessionStore.hasUsedChatMode()).thenReturn(false)
+
+        viewModel.onChatSubmitted("prompt")
+
+        verify(inputScreenDiscoveryFunnel).onPromptSubmitted()
+    }
+
+    @Test
+    fun `when onChatInputTextChanged then chatInputTextState is updated`() = runTest {
+        val viewModel = createViewModel()
+
+        viewModel.onChatInputTextChanged("  test chat input  ")
+
+        // The chatInputTextState is trimmed and stored internally
+        // We can verify this indirectly by testing the mode switch pixel behavior
+        viewModel.onChatSelected()
+        viewModel.onSearchSelected()
+
+        val expectedParams = mapOf(
+            "direction" to "to_search",
+            "had_text" to "true", // Should be true because we have trimmed text
+        )
+        verify(pixel).fire(DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_OMNIBAR_MODE_SWITCHED, expectedParams)
+    }
+
+    @Test
+    fun `when onChatInputTextChanged with empty text then chatInputTextState reflects empty state`() = runTest {
+        val viewModel = createViewModel()
+
+        viewModel.onChatInputTextChanged("some text")
+        viewModel.onChatInputTextChanged("   ") // Only whitespace, should be trimmed to empty
+
+        // Verify through mode switch behavior
+        viewModel.onChatSelected()
+        viewModel.onSearchSelected()
+
+        val expectedParams = mapOf(
+            "direction" to "to_search",
+            "had_text" to "false", // Should be false because trimmed text is empty
+        )
+        verify(pixel).fire(DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_OMNIBAR_MODE_SWITCHED, expectedParams)
+    }
+
+    @Test
+    fun `when onSendButtonClicked in search mode then pixel is fired with search mode parameter`() = runTest {
+        val viewModel = createViewModel()
+
+        // Set to search mode
+        viewModel.onSearchSelected()
+
+        viewModel.onSendButtonClicked()
+
+        val expectedParams = mapOf(
+            DuckChatPixelParameters.INPUT_SCREEN_MODE to "search",
+        )
+        verify(pixel).fire(DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_OMNIBAR_FLOATING_SUBMIT_PRESSED, expectedParams)
+    }
+
+    @Test
+    fun `when onSendButtonClicked in chat mode then pixel is fired with aiChat mode parameter`() = runTest {
+        val viewModel = createViewModel()
+
+        // Set to chat mode
+        viewModel.onChatSelected()
+
+        viewModel.onSendButtonClicked()
+
+        val expectedParams = mapOf(
+            DuckChatPixelParameters.INPUT_SCREEN_MODE to "aiChat",
+        )
+        verify(pixel).fire(DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_OMNIBAR_FLOATING_SUBMIT_PRESSED, expectedParams)
     }
 
     @Test

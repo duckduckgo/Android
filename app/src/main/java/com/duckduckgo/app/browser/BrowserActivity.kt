@@ -419,7 +419,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
         }
 
         // we don't want to purge during device rotation
-        if (isFinishing && tabManagerFeatureFlags.multiSelection().isEnabled()) {
+        if (isFinishing) {
             viewModel.purgeDeletableTabs()
         }
 
