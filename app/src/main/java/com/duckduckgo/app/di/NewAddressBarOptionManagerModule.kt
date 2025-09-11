@@ -23,7 +23,8 @@ import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.api.DuckChat
-import com.duckduckgo.duckchat.impl.inputscreen.newaddressbaroption.NewAddressBarOptionDataStore
+import com.duckduckgo.duckchat.impl.inputscreen.newaddressbaroption.NewAddressBarOptionBottomSheetDialogFactory
+import com.duckduckgo.duckchat.impl.inputscreen.newaddressbaroption.NewAddressBarOptionRepository
 import com.duckduckgo.remote.messaging.api.RemoteMessagingRepository
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
@@ -39,16 +40,18 @@ object NewAddressBarOptionManagerModule {
         userStageStore: UserStageStore,
         duckChat: DuckChat,
         remoteMessagingRepository: RemoteMessagingRepository,
-        newAddressBarOptionDataStore: NewAddressBarOptionDataStore,
+        newAddressBarOptionRepository: NewAddressBarOptionRepository,
         settingsDataStore: SettingsDataStore,
+        newAddressBarOptionBottomSheetDialogFactory: NewAddressBarOptionBottomSheetDialogFactory,
     ): NewAddressBarOptionManager {
         return RealNewAddressBarOptionManager(
             duckAiFeatureState = duckAiFeatureState,
             userStageStore = userStageStore,
             duckChat = duckChat,
             remoteMessagingRepository = remoteMessagingRepository,
-            newAddressBarOptionDataStore = newAddressBarOptionDataStore,
+            newAddressBarOptionRepository = newAddressBarOptionRepository,
             settingsDataStore = settingsDataStore,
+            newAddressBarOptionBottomSheetDialogFactory = newAddressBarOptionBottomSheetDialogFactory,
         )
     }
 }

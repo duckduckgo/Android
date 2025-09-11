@@ -109,7 +109,6 @@ import com.duckduckgo.common.utils.playstore.PlayStoreUtils
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.api.DuckChat
-import com.duckduckgo.duckchat.impl.inputscreen.newaddressbaroption.NewAddressBarOptionBottomSheetDialogFactory
 import com.duckduckgo.duckchat.impl.ui.DuckChatWebViewFragment
 import com.duckduckgo.duckchat.impl.ui.DuckChatWebViewFragment.Companion.KEY_DUCK_AI_URL
 import com.duckduckgo.navigation.api.GlobalActivityStarter
@@ -123,7 +122,6 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import logcat.LogPriority.ERROR
 import logcat.LogPriority.INFO
 import logcat.LogPriority.VERBOSE
@@ -194,9 +192,6 @@ open class BrowserActivity : DuckDuckGoActivity() {
 
     @Inject
     lateinit var duckAiFeatureState: DuckAiFeatureState
-
-    @Inject
-    lateinit var newAddressBarOptionBottomSheetDialogFactory: NewAddressBarOptionBottomSheetDialogFactory
 
     @Inject
     lateinit var syncUrlIdentifier: SyncUrlIdentifier
@@ -1085,27 +1080,14 @@ open class BrowserActivity : DuckDuckGoActivity() {
 
     private fun checkAndShowNewAddressBarOptionAnnouncement() {
         lifecycleScope.launch(dispatcherProvider.io()) {
-            try {
-                val isExternalLaunch = intent.getBooleanExtra(LAUNCH_FROM_EXTERNAL_EXTRA, false)
-                val shouldShow = newAddressBarOptionManager.shouldTrigger(launchedFromExternal = isExternalLaunch)
-
-                if (shouldShow) {
-                    withContext(dispatcherProvider.main()) {
-                        showNewAddressBarOptionDialog()
-                    }
-                }
-            } catch (e: Exception) {
-                logcat(ERROR) { "Error checking new address bar option announcement: ${e.asLog()}" }
+            runCatching {
+                newAddressBarOptionManager.showDialog(
+                    context = this@BrowserActivity,
+                    launchedFromExternal = intent.getBooleanExtra(LAUNCH_FROM_EXTERNAL_EXTRA, false),
+                    isLightModeEnabled = !isDarkThemeEnabled(),
+                )
             }
         }
-    }
-
-    private fun showNewAddressBarOptionDialog() {
-        val dialog = newAddressBarOptionBottomSheetDialogFactory.create(
-            context = this,
-            isLightModeEnabled = !isDarkThemeEnabled(),
-        )
-        dialog.show()
     }
 
     private fun initializeTabs(savedInstanceState: Bundle?) {

@@ -16,19 +16,21 @@
 
 package com.duckduckgo.app.browser.newaddressbaroption
 
+import android.content.Context
 import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition
 import com.duckduckgo.app.onboarding.store.AppStage
 import com.duckduckgo.app.onboarding.store.UserStageStore
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.api.DuckChat
-import com.duckduckgo.duckchat.impl.inputscreen.newaddressbaroption.NewAddressBarOptionDataStore
+import com.duckduckgo.duckchat.impl.inputscreen.newaddressbaroption.NewAddressBarOptionBottomSheetDialogFactory
+import com.duckduckgo.duckchat.impl.inputscreen.newaddressbaroption.NewAddressBarOptionRepository
 import com.duckduckgo.remote.messaging.api.RemoteMessagingRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
 interface NewAddressBarOptionManager {
-    suspend fun shouldTrigger(launchedFromExternal: Boolean): Boolean
+    suspend fun showDialog(context: Context, launchedFromExternal: Boolean, isLightModeEnabled: Boolean)
     suspend fun markAsShown()
 }
 
@@ -37,11 +39,12 @@ class RealNewAddressBarOptionManager(
     private val userStageStore: UserStageStore,
     private val duckChat: DuckChat,
     private val remoteMessagingRepository: RemoteMessagingRepository,
-    private val newAddressBarOptionDataStore: NewAddressBarOptionDataStore,
+    private val newAddressBarOptionRepository: NewAddressBarOptionRepository,
     private val settingsDataStore: SettingsDataStore,
+    private val newAddressBarOptionBottomSheetDialogFactory: NewAddressBarOptionBottomSheetDialogFactory,
 ) : NewAddressBarOptionManager {
 
-    override suspend fun shouldTrigger(launchedFromExternal: Boolean): Boolean = withContext(Dispatchers.IO) {
+    private suspend fun shouldTrigger(launchedFromExternal: Boolean): Boolean = withContext(Dispatchers.IO) {
         isDuckAiEnabled() &&
             isOnboardingCompleted() &&
             isFeatureFlagEnabled() &&
@@ -51,6 +54,19 @@ class RealNewAddressBarOptionManager(
             !launchedFromExternal &&
             !hasInteractedWithSearchAndDuckAiAnnouncement() &&
             !hasBottomAddressBarEnabled()
+    }
+
+    override suspend fun showDialog(
+        context: Context,
+        launchedFromExternal: Boolean,
+        isLightModeEnabled: Boolean,
+    ) = withContext(Dispatchers.IO) {
+        if (shouldTrigger(launchedFromExternal)) {
+            newAddressBarOptionBottomSheetDialogFactory.create(
+                context = context,
+                isLightModeEnabled = isLightModeEnabled,
+            ).show()
+        }
     }
 
     private fun isDuckAiEnabled(): Boolean {
@@ -74,7 +90,7 @@ class RealNewAddressBarOptionManager(
     }
 
     private suspend fun hasForceChoiceBeenShown(): Boolean {
-        return newAddressBarOptionDataStore.getHasBeenShown()
+        return newAddressBarOptionRepository.getHasBeenShown()
     }
 
     private fun hasInteractedWithSearchAndDuckAiAnnouncement(): Boolean {
@@ -86,6 +102,6 @@ class RealNewAddressBarOptionManager(
     }
 
     override suspend fun markAsShown() = withContext(Dispatchers.IO) {
-        newAddressBarOptionDataStore.markAsShown()
+        newAddressBarOptionRepository.markAsShown()
     }
 }

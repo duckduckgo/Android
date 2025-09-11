@@ -23,18 +23,20 @@ import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.api.DuckChat
-import com.duckduckgo.duckchat.impl.inputscreen.newaddressbaroption.NewAddressBarOptionDataStore
+import com.duckduckgo.duckchat.impl.inputscreen.newaddressbaroption.NewAddressBarOptionBottomSheetDialog
+import com.duckduckgo.duckchat.impl.inputscreen.newaddressbaroption.NewAddressBarOptionBottomSheetDialogFactory
+import com.duckduckgo.duckchat.impl.inputscreen.newaddressbaroption.NewAddressBarOptionRepository
 import com.duckduckgo.remote.messaging.api.RemoteMessagingRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.runTest
-import org.junit.Assert.assertFalse
-import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.Mock
 import org.mockito.MockitoAnnotations
+import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
@@ -56,10 +58,16 @@ class RealNewAddressBarOptionManagerTest {
     private var remoteMessagingRepositoryMock: RemoteMessagingRepository = mock()
 
     @Mock
-    private var newAddressBarOptionDataStoreMock: NewAddressBarOptionDataStore = mock()
+    private var newAddressBarOptionRepositoryMock: NewAddressBarOptionRepository = mock()
 
     @Mock
     private var settingsDataStoreMock: SettingsDataStore = mock()
+
+    @Mock
+    private var newAddressBarOptionBottomSheetDialogFactoryMock: NewAddressBarOptionBottomSheetDialogFactory = mock()
+
+    @Mock
+    private var newAddressBarOptionBottomSheetDialogMock: NewAddressBarOptionBottomSheetDialog = mock()
 
     private val showNewAddressBarOptionAnnouncementFlow = MutableStateFlow(false)
     private val showOmnibarShortcutInAllStatesFlow = MutableStateFlow(false)
@@ -74,100 +82,122 @@ class RealNewAddressBarOptionManagerTest {
         whenever(duckAiFeatureStateMock.showNewAddressBarOptionAnnouncement).thenReturn(showNewAddressBarOptionAnnouncementFlow)
         whenever(duckAiFeatureStateMock.showOmnibarShortcutInAllStates).thenReturn(showOmnibarShortcutInAllStatesFlow)
         whenever(duckAiFeatureStateMock.showInputScreen).thenReturn(showInputScreenFlow)
+        whenever(newAddressBarOptionBottomSheetDialogFactoryMock.create(any(), any())).thenReturn(newAddressBarOptionBottomSheetDialogMock)
 
         testee = RealNewAddressBarOptionManager(
             duckAiFeatureStateMock,
             userStageStoreMock,
             duckChatMock,
             remoteMessagingRepositoryMock,
-            newAddressBarOptionDataStoreMock,
+            newAddressBarOptionRepositoryMock,
             settingsDataStoreMock,
+            newAddressBarOptionBottomSheetDialogFactoryMock,
         )
     }
 
     @Test
-    fun `when all conditions are met and not launched from external then should trigger returns true`() = runTest {
+    fun `when all conditions are met and not launched from external then showDialog shows dialog`() = runTest {
         setupAllConditionsMet()
 
-        assertTrue(testee.shouldTrigger(launchedFromExternal = false))
+        testee.showDialog(mock(), launchedFromExternal = false, isLightModeEnabled = true)
+
+        verify(newAddressBarOptionBottomSheetDialogFactoryMock).create(any(), any())
     }
 
     @Test
-    fun `when launched from external then should trigger returns false`() = runTest {
+    fun `when launched from external then showDialog does not show dialog`() = runTest {
         setupAllConditionsMet()
 
-        assertFalse(testee.shouldTrigger(launchedFromExternal = true))
+        testee.showDialog(mock(), launchedFromExternal = true, isLightModeEnabled = true)
+
+        verify(newAddressBarOptionBottomSheetDialogFactoryMock, never()).create(any(), any())
     }
 
     @Test
-    fun `when duck AI is disabled then should trigger returns false`() = runTest {
+    fun `when duck AI is disabled then showDialog does not show dialog`() = runTest {
         setupAllConditionsMet()
         whenever(duckChatMock.isEnabled()).thenReturn(false)
 
-        assertFalse(testee.shouldTrigger(launchedFromExternal = false))
+        testee.showDialog(mock(), launchedFromExternal = false, isLightModeEnabled = true)
+
+        verify(newAddressBarOptionBottomSheetDialogFactoryMock, never()).create(any(), any())
     }
 
     @Test
-    fun `when onboarding is not completed then should trigger returns false`() = runTest {
+    fun `when onboarding is not completed then showDialog does not show dialog`() = runTest {
         setupAllConditionsMet()
         whenever(userStageStoreMock.getUserAppStage()).thenReturn(AppStage.DAX_ONBOARDING)
 
-        assertFalse(testee.shouldTrigger(launchedFromExternal = false))
+        testee.showDialog(mock(), launchedFromExternal = false, isLightModeEnabled = true)
+
+        verify(newAddressBarOptionBottomSheetDialogFactoryMock, never()).create(any(), any())
     }
 
     @Test
-    fun `when feature flag is disabled then should trigger returns false`() = runTest {
+    fun `when feature flag is disabled then showDialog does not show dialog`() = runTest {
         setupAllConditionsMet()
         showNewAddressBarOptionAnnouncementFlow.value = false
 
-        assertFalse(testee.shouldTrigger(launchedFromExternal = false))
+        testee.showDialog(mock(), launchedFromExternal = false, isLightModeEnabled = true)
+
+        verify(newAddressBarOptionBottomSheetDialogFactoryMock, never()).create(any(), any())
     }
 
     @Test
-    fun `when duck AI omnibar shortcut is disabled then should trigger returns false`() = runTest {
+    fun `when duck AI omnibar shortcut is disabled then showDialog does not show dialog`() = runTest {
         setupAllConditionsMet()
         showOmnibarShortcutInAllStatesFlow.value = false
 
-        assertFalse(testee.shouldTrigger(launchedFromExternal = false))
+        testee.showDialog(mock(), launchedFromExternal = false, isLightModeEnabled = true)
+
+        verify(newAddressBarOptionBottomSheetDialogFactoryMock, never()).create(any(), any())
     }
 
     @Test
-    fun `when input screen is enabled then should trigger returns false`() = runTest {
+    fun `when input screen is enabled then showDialog does not show dialog`() = runTest {
         setupAllConditionsMet()
         showInputScreenFlow.value = true
 
-        assertFalse(testee.shouldTrigger(launchedFromExternal = false))
+        testee.showDialog(mock(), launchedFromExternal = false, isLightModeEnabled = true)
+
+        verify(newAddressBarOptionBottomSheetDialogFactoryMock, never()).create(any(), any())
     }
 
     @Test
-    fun `when force choice has been shown then should trigger returns false`() = runTest {
+    fun `when force choice has been shown then showDialog does not show dialog`() = runTest {
         setupAllConditionsMet()
-        whenever(newAddressBarOptionDataStoreMock.getHasBeenShown()).thenReturn(true)
+        whenever(newAddressBarOptionRepositoryMock.getHasBeenShown()).thenReturn(true)
 
-        assertFalse(testee.shouldTrigger(launchedFromExternal = false))
+        testee.showDialog(mock(), launchedFromExternal = false, isLightModeEnabled = true)
+
+        verify(newAddressBarOptionBottomSheetDialogFactoryMock, never()).create(any(), any())
     }
 
     @Test
-    fun `when user has interacted with search and duck AI announcement then should trigger returns false`() = runTest {
+    fun `when user has interacted with search and duck AI announcement then showDialog does not show dialog`() = runTest {
         setupAllConditionsMet()
         whenever(remoteMessagingRepositoryMock.dismissedMessages()).thenReturn(listOf("search_duck_ai_announcement"))
 
-        assertFalse(testee.shouldTrigger(launchedFromExternal = false))
+        testee.showDialog(mock(), launchedFromExternal = false, isLightModeEnabled = true)
+
+        verify(newAddressBarOptionBottomSheetDialogFactoryMock, never()).create(any(), any())
     }
 
     @Test
-    fun `when bottom address bar is enabled then should trigger returns false`() = runTest {
+    fun `when bottom address bar is enabled then showDialog does not show dialog`() = runTest {
         setupAllConditionsMet()
         whenever(settingsDataStoreMock.omnibarPosition).thenReturn(OmnibarPosition.BOTTOM)
 
-        assertFalse(testee.shouldTrigger(launchedFromExternal = false))
+        testee.showDialog(mock(), launchedFromExternal = false, isLightModeEnabled = true)
+
+        verify(newAddressBarOptionBottomSheetDialogFactoryMock, never()).create(any(), any())
     }
 
     @Test
-    fun `when mark as shown is called then data store mark as shown is called`() = runTest {
+    fun `when mark as shown is called then repository mark as shown is called`() = runTest {
         testee.markAsShown()
 
-        verify(newAddressBarOptionDataStoreMock).markAsShown()
+        verify(newAddressBarOptionRepositoryMock).markAsShown()
     }
 
     private suspend fun setupAllConditionsMet() {
@@ -176,7 +206,7 @@ class RealNewAddressBarOptionManagerTest {
         showNewAddressBarOptionAnnouncementFlow.value = true
         showOmnibarShortcutInAllStatesFlow.value = true
         showInputScreenFlow.value = false
-        whenever(newAddressBarOptionDataStoreMock.getHasBeenShown()).thenReturn(false)
+        whenever(newAddressBarOptionRepositoryMock.getHasBeenShown()).thenReturn(false)
         whenever(remoteMessagingRepositoryMock.dismissedMessages()).thenReturn(emptyList())
         whenever(settingsDataStoreMock.omnibarPosition).thenReturn(OmnibarPosition.TOP)
     }
