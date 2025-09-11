@@ -47,7 +47,7 @@
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="@dimen/keyline_1"
             android:layout_marginTop="@dimen/keyline_2"
-            app:typography="h5"
+            app:typography="h4"
             tools:text="@string/webTrackingProtectionThirdPartyTrackersTitle" />
 
         <com.duckduckgo.common.ui.view.text.DaxTextView
@@ -58,7 +58,7 @@
             android:layout_marginTop="@dimen/keyline_1"
             android:layout_marginBottom="@dimen/keyline_2"
             app:textType="secondary"
-            app:typography="caption"
+            app:typography="body2"
             tools:text="@string/webTrackingProtectionThirdPartyTrackersDescription" />
 
     </LinearLayout>
