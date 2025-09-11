@@ -110,6 +110,7 @@ import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.impl.ui.DuckChatWebViewFragment
+import com.duckduckgo.duckchat.impl.ui.dialog.NewAddressBarOptionBottomSheetDialogFactory
 import com.duckduckgo.duckchat.impl.ui.DuckChatWebViewFragment.Companion.KEY_DUCK_AI_URL
 import com.duckduckgo.duckchat.impl.ui.dialog.NewAddressBarOptionBottomSheetDialog
 import com.duckduckgo.navigation.api.GlobalActivityStarter
@@ -194,6 +195,9 @@ open class BrowserActivity : DuckDuckGoActivity() {
 
     @Inject
     lateinit var duckAiFeatureState: DuckAiFeatureState
+
+    @Inject
+    lateinit var newAddressBarOptionBottomSheetDialogFactory: NewAddressBarOptionBottomSheetDialogFactory
 
     @Inject
     lateinit var syncUrlIdentifier: SyncUrlIdentifier
@@ -1099,7 +1103,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
     }
 
     private fun showNewAddressBarOptionDialog() {
-        val dialog = NewAddressBarOptionBottomSheetDialog(
+        val dialog = newAddressBarOptionBottomSheetDialogFactory.create(
             context = this,
             isLightModeEnabled = !isDarkThemeEnabled(),
         )
@@ -1109,10 +1113,6 @@ open class BrowserActivity : DuckDuckGoActivity() {
                 lifecycleScope.launch(dispatcherProvider.io()) {
                     newAddressBarOptionManager.markAsShown()
                 }
-            }
-
-            override fun onSearchAndDuckAiSelected() {
-                // TODO
             }
         }
 

@@ -25,20 +25,26 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.FrameLayout
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.lifecycleScope
 import com.airbnb.lottie.LottieAnimationView
 import com.airbnb.lottie.LottieDrawable
 import com.duckduckgo.common.ui.view.toPx
+import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.duckchat.impl.DuckChatInternal
 import com.duckduckgo.duckchat.impl.R
 import com.duckduckgo.duckchat.impl.databinding.BottomSheetNewAddressBarOptionBinding
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.shape.CornerFamily
 import com.google.android.material.shape.MaterialShapeDrawable
+import kotlinx.coroutines.launch
 
 @SuppressLint("NoBottomSheetDialog")
 class NewAddressBarOptionBottomSheetDialog(
     private val context: Context,
     private val isLightModeEnabled: Boolean,
+    private val dispatcherProvider: DispatcherProvider,
+    private val duckChatInternal: DuckChatInternal,
 ) : BottomSheetDialog(context) {
 
     private val binding: BottomSheetNewAddressBarOptionBinding =
@@ -63,7 +69,6 @@ class NewAddressBarOptionBottomSheetDialog(
             bottomSheet?.layoutParams = bottomSheet?.layoutParams?.apply {
                 height = ViewGroup.LayoutParams.MATCH_PARENT
             }
-
             setRoundCorners()
             lockOrientationToPortrait()
             eventListener?.onShown()
@@ -78,7 +83,9 @@ class NewAddressBarOptionBottomSheetDialog(
         setupSelectionLogic()
 
         binding.newAddressBarOptionBottomSheetDialogPrimaryButton.setOnClickListener {
-            eventListener?.onSearchAndDuckAiSelected()
+            lifecycleScope.launch(dispatcherProvider.io()) {
+                duckChatInternal.setInputScreenUserSetting(true)
+            }
             restoreOrientation()
             dismiss()
         }
@@ -215,6 +222,5 @@ class NewAddressBarOptionBottomSheetDialog(
 
     interface EventListener {
         fun onShown()
-        fun onSearchAndDuckAiSelected()
     }
 }
