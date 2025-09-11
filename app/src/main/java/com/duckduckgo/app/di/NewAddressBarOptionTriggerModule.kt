@@ -16,12 +16,12 @@
 
 package com.duckduckgo.app.di
 
+import com.duckduckgo.app.browser.validator.NewAddressBarOptionStorage
+import com.duckduckgo.app.browser.validator.NewAddressBarOptionTrigger
+import com.duckduckgo.app.browser.validator.RealNewAddressBarOptionTrigger
 import com.duckduckgo.app.onboarding.store.UserStageStore
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
-import com.duckduckgo.app.browser.validator.NewAddressBarOptionTrigger
-import com.duckduckgo.app.browser.validator.RealNewAddressBarOptionTrigger
-import com.duckduckgo.app.browser.validator.NewAddressBarOptionStorage
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.remote.messaging.api.RemoteMessagingRepository
 import com.squareup.anvil.annotations.ContributesTo
@@ -38,14 +38,14 @@ object NewAddressBarOptionTriggerModule {
         userStageStore: UserStageStore,
         duckChat: DuckChat,
         remoteMessagingRepository: RemoteMessagingRepository,
-        newAddressBarOptionStorage: NewAddressBarOptionStorage
+        newAddressBarOptionStorage: NewAddressBarOptionStorage,
     ): NewAddressBarOptionTrigger {
         return RealNewAddressBarOptionTrigger(
             duckAiFeatureState = duckAiFeatureState,
             userStageStore = userStageStore,
             duckChat = duckChat,
             remoteMessagingRepository = remoteMessagingRepository,
-            newAddressBarOptionStorage = newAddressBarOptionStorage
+            newAddressBarOptionStorage = newAddressBarOptionStorage,
         )
     }
 }

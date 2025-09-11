@@ -20,14 +20,15 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
+import com.duckduckgo.app.browser.validator.DataStoreNewAddressBarOptionStorage.Keys.HAS_BEEN_SHOWN
 import com.duckduckgo.app.di.NewAddressBarOption
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.withContext
 import javax.inject.Inject
+import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.withContext
 
 interface NewAddressBarOptionStorage {
     suspend fun markAsShown()
@@ -48,12 +49,12 @@ class DataStoreNewAddressBarOptionStorage @Inject constructor(
     override suspend fun markAsShown() {
         withContext(dispatchers.io()) {
             dataStore.edit { prefs ->
-                prefs[Keys.HAS_BEEN_SHOWN] = true
+                prefs[HAS_BEEN_SHOWN] = true
             }
         }
     }
 
     override suspend fun getHasBeenShown(): Boolean = withContext(dispatchers.io()) {
-        dataStore.data.first()[Keys.HAS_BEEN_SHOWN] ?: false
+        dataStore.data.firstOrNull()?.let { it[HAS_BEEN_SHOWN] } ?: false
     }
 }

@@ -48,9 +48,7 @@ import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.BrowserViewModel.Command
 import com.duckduckgo.app.browser.animations.slideAndFadeInFromLeft
 import com.duckduckgo.app.browser.animations.slideAndFadeInFromRight
-import com.duckduckgo.app.browser.validator.NewAddressBarOptionTrigger
 import com.duckduckgo.app.browser.animations.slideAndFadeOutToLeft
-import com.duckduckgo.duckchat.impl.ui.dialog.NewAddressBarOptionBottomSheetDialog
 import com.duckduckgo.app.browser.animations.slideAndFadeOutToRight
 import com.duckduckgo.app.browser.databinding.ActivityBrowserBinding
 import com.duckduckgo.app.browser.databinding.IncludeOmnibarToolbarMockupBinding
@@ -64,6 +62,7 @@ import com.duckduckgo.app.browser.shortcut.ShortcutBuilder
 import com.duckduckgo.app.browser.tabs.TabManager
 import com.duckduckgo.app.browser.tabs.TabManager.TabModel
 import com.duckduckgo.app.browser.tabs.adapter.TabPagerAdapter
+import com.duckduckgo.app.browser.validator.NewAddressBarOptionTrigger
 import com.duckduckgo.app.browser.webview.RealMaliciousSiteBlockerWebViewIntegration
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.downloads.DownloadsScreens.DownloadsScreenNoParams
@@ -112,6 +111,7 @@ import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.impl.ui.DuckChatWebViewFragment
 import com.duckduckgo.duckchat.impl.ui.DuckChatWebViewFragment.Companion.KEY_DUCK_AI_URL
+import com.duckduckgo.duckchat.impl.ui.dialog.NewAddressBarOptionBottomSheetDialog
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.savedsites.impl.bookmarks.BookmarksActivity.Companion.SAVED_SITE_URL_EXTRA
 import com.duckduckgo.site.permissions.impl.ui.SitePermissionScreenNoParams
@@ -1075,7 +1075,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
                 logcat(INFO) { "Original instance state is null, so will inspect intent for actions to take. $intent" }
                 launchNewSearchOrQuery(intent)
                 processedOriginalIntent = true
-                
+
                 checkAndShowNewAddressBarOptionAnnouncement()
             }
         }
@@ -1086,7 +1086,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
             try {
                 val isExternalLaunch = intent.getBooleanExtra(LAUNCH_FROM_EXTERNAL_EXTRA, false)
                 val shouldShow = newAddressBarOptionTrigger.shouldTrigger(launchedFromExternal = isExternalLaunch)
-                
+
                 if (shouldShow) {
                     withContext(dispatcherProvider.main()) {
                         showNewAddressBarOptionDialog()
@@ -1101,46 +1101,46 @@ open class BrowserActivity : DuckDuckGoActivity() {
     private fun showNewAddressBarOptionDialog() {
         val dialog = NewAddressBarOptionBottomSheetDialog(
             context = this,
-            isLightModeEnabled = !isDarkThemeEnabled()
+            isLightModeEnabled = !isDarkThemeEnabled(),
         )
-        
+
         dialog.eventListener = object : NewAddressBarOptionBottomSheetDialog.EventListener {
             override fun onShown() {
                 logcat(INFO) { "New address bar option dialog shown" }
             }
-            
+
             override fun onCanceled() {
                 logcat(INFO) { "New address bar option dialog canceled" }
                 lifecycleScope.launch(dispatcherProvider.io()) {
                     newAddressBarOptionTrigger.markAsSeen()
                 }
             }
-            
+
             override fun onAddWidgetButtonClicked() {
                 logcat(INFO) { "New address bar option dialog confirmed" }
                 lifecycleScope.launch(dispatcherProvider.io()) {
                     newAddressBarOptionTrigger.markAsSeen()
                 }
             }
-            
+
             override fun onNotNowButtonClicked() {
                 logcat(INFO) { "New address bar option dialog dismissed" }
                 lifecycleScope.launch(dispatcherProvider.io()) {
                     newAddressBarOptionTrigger.markAsSeen()
                 }
             }
-            
+
             override fun onSearchOnlySelected() {
                 logcat(INFO) { "User selected search only option" }
                 // TODO: Handle the selection - update user preferences
             }
-            
+
             override fun onSearchAndDuckAiSelected() {
                 logcat(INFO) { "User selected search and Duck AI option" }
                 // TODO: Handle the selection - update user preferences
             }
         }
-        
+
         dialog.show()
     }
 

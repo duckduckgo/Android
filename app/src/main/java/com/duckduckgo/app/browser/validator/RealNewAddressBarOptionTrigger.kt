@@ -34,18 +34,18 @@ class RealNewAddressBarOptionTrigger(
     private val userStageStore: UserStageStore,
     private val duckChat: DuckChat,
     private val remoteMessagingRepository: RemoteMessagingRepository,
-    private val newAddressBarOptionStorage: NewAddressBarOptionStorage
+    private val newAddressBarOptionStorage: NewAddressBarOptionStorage,
 ) : NewAddressBarOptionTrigger {
 
     override suspend fun shouldTrigger(launchedFromExternal: Boolean): Boolean = withContext(Dispatchers.IO) {
         isDuckAiEnabled() &&
-        isOnboardingCompleted() &&
-        isFeatureFlagEnabled() &&
-        !isDuckAiOmnibarShortcutDisabled() &&
-        !isInputScreenEnabled() &&
-        !hasForceChoiceBeenShown() &&
-        !launchedFromExternal &&
-        !hasInteractedWithSearchAndDuckAiAnnouncement()
+            isOnboardingCompleted() &&
+            isFeatureFlagEnabled() &&
+            !isDuckAiOmnibarShortcutDisabled() &&
+            !isInputScreenEnabled() &&
+            !hasForceChoiceBeenShown() &&
+            !launchedFromExternal &&
+            !hasInteractedWithSearchAndDuckAiAnnouncement()
     }
 
     private fun isDuckAiEnabled(): Boolean {
