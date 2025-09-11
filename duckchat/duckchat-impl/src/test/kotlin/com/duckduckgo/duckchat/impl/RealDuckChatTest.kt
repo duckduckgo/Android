@@ -785,6 +785,28 @@ class RealDuckChatTest {
         assertTrue(testee.showInputScreenAutomaticallyOnNewTab.value)
     }
 
+    @Test
+    fun `when showAIChatAddressBarChoiceScreen enabled then showNewAddressBarOptionAnnouncement emits true`() = runTest {
+        duckChatFeature.showAIChatAddressBarChoiceScreen().setRawStoredState(State(enable = true))
+        whenever(mockDuckChatFeatureRepository.isDuckChatUserEnabled()).thenReturn(true)
+        whenever(mockDuckChatFeatureRepository.shouldShowInAddressBar()).thenReturn(true)
+        
+        testee.onPrivacyConfigDownloaded()
+        
+        assertTrue(testee.showNewAddressBarOptionAnnouncement.value)
+    }
+
+    @Test
+    fun `when showAIChatAddressBarChoiceScreen disabled then showNewAddressBarOptionAnnouncement emits false`() = runTest {
+        duckChatFeature.showAIChatAddressBarChoiceScreen().setRawStoredState(State(enable = false))
+        whenever(mockDuckChatFeatureRepository.isDuckChatUserEnabled()).thenReturn(true)
+        whenever(mockDuckChatFeatureRepository.shouldShowInAddressBar()).thenReturn(true)
+        
+        testee.onPrivacyConfigDownloaded()
+        
+        assertFalse(testee.showNewAddressBarOptionAnnouncement.value)
+    }
+
     companion object {
         val SETTINGS_JSON = """
         {
