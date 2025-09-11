@@ -1073,12 +1073,12 @@ open class BrowserActivity : DuckDuckGoActivity() {
                 logcat(INFO) { "Original instance state is null, so will inspect intent for actions to take. $intent" }
                 launchNewSearchOrQuery(intent)
                 processedOriginalIntent = true
-                checkAndShowNewAddressBarOptionAnnouncement()
+                showNewAddressBarOptionAnnouncement()
             }
         }
     }
 
-    private fun checkAndShowNewAddressBarOptionAnnouncement() {
+    private fun showNewAddressBarOptionAnnouncement() {
         lifecycleScope.launch(dispatcherProvider.io()) {
             runCatching {
                 newAddressBarOptionManager.showDialog(
