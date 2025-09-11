@@ -28,6 +28,7 @@ import com.duckduckgo.app.settings.clear.getPixelValue
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.api.DuckChat
 import javax.inject.Inject
 import kotlinx.coroutines.channels.BufferOverflow
@@ -46,6 +47,7 @@ class FireButtonViewModel @Inject constructor(
     private val fireAnimationLoader: FireAnimationLoader,
     private val pixel: Pixel,
     private val duckChat: DuckChat,
+    private val duckAiFeatureState: DuckAiFeatureState,
 ) : ViewModel() {
 
     data class ViewState(
@@ -93,7 +95,7 @@ class FireButtonViewModel @Inject constructor(
                     ),
                     selectedFireAnimation = settingsDataStore.selectedFireAnimation,
                     clearDuckAiData = settingsDataStore.clearDuckAiData,
-                    showClearDuckAiDataSetting = duckChat.wasOpenedBefore(),
+                    showClearDuckAiDataSetting = duckChat.wasOpenedBefore() && duckAiFeatureState.showClearDuckAIChatHistory.value,
                 ),
             )
         }

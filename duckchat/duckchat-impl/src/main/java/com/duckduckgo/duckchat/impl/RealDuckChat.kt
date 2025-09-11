@@ -229,6 +229,7 @@ class RealDuckChat @Inject constructor(
     private val _showInBrowserMenu = MutableStateFlow(false)
     private val _showInAddressBar = MutableStateFlow(false)
     private val _showOmnibarShortcutInAllStates = MutableStateFlow(false)
+    private val _showClearDuckAIChatHistory = MutableStateFlow(true)
     private val _chatState = MutableStateFlow(ChatState.HIDE)
     private val _keepSession = MutableStateFlow(false)
 
@@ -246,6 +247,7 @@ class RealDuckChat @Inject constructor(
     private var isAddressBarEntryPointEnabled: Boolean = false
     private var isImageUploadEnabled: Boolean = false
     private var keepSessionAliveInMinutes: Int = DEFAULT_SESSION_ALIVE
+    private var clearChatHistory: Boolean = true
 
     init {
         if (isMainProcess) {
@@ -363,6 +365,8 @@ class RealDuckChat @Inject constructor(
     override val showOmnibarShortcutOnNtpAndOnFocus: StateFlow<Boolean> = _showInAddressBar.asStateFlow()
 
     override val showOmnibarShortcutInAllStates: StateFlow<Boolean> = _showOmnibarShortcutInAllStates.asStateFlow()
+
+    override val showClearDuckAIChatHistory: StateFlow<Boolean> = _showClearDuckAIChatHistory.asStateFlow()
 
     override val chatState: StateFlow<ChatState> = _chatState.asStateFlow()
 
@@ -534,6 +538,7 @@ class RealDuckChat @Inject constructor(
             isDuckAiInBrowserEnabled = duckChatFeature.duckAiButtonInBrowser().isEnabled()
             duckAiInputScreen = duckChatFeature.duckAiInputScreen().isEnabled()
             duckAiInputScreenOpenAutomaticallyEnabled = duckChatFeature.showInputScreenAutomaticallyOnNewTab().isEnabled()
+            clearChatHistory = duckChatFeature.clearHistory().isEnabled()
 
             val settingsString = duckChatFeature.self().getSettings()
             val settingsJson = settingsString?.let {
@@ -575,6 +580,9 @@ class RealDuckChat @Inject constructor(
 
         val showOmnibarShortcutInAllStates = showInAddressBar && isDuckAiInBrowserEnabled
         _showOmnibarShortcutInAllStates.emit(showOmnibarShortcutInAllStates)
+
+        val showClearChatHistory = clearChatHistory
+        _showClearDuckAIChatHistory.emit(showClearChatHistory)
     }
 
     companion object {
