@@ -16,7 +16,7 @@
 
 package com.duckduckgo.app.di
 
-import com.duckduckgo.app.browser.newaddressbaroption.NewAddressBarOptionStorage
+import com.duckduckgo.app.browser.newaddressbaroption.NewAddressBarOptionDataStore
 import com.duckduckgo.app.browser.newaddressbaroption.NewAddressBarOptionTrigger
 import com.duckduckgo.app.browser.newaddressbaroption.RealNewAddressBarOptionTrigger
 import com.duckduckgo.app.onboarding.store.UserStageStore
@@ -39,7 +39,7 @@ object NewAddressBarOptionTriggerModule {
         userStageStore: UserStageStore,
         duckChat: DuckChat,
         remoteMessagingRepository: RemoteMessagingRepository,
-        newAddressBarOptionStorage: NewAddressBarOptionStorage,
+        newAddressBarOptionDataStore: NewAddressBarOptionDataStore,
         settingsDataStore: SettingsDataStore,
     ): NewAddressBarOptionTrigger {
         return RealNewAddressBarOptionTrigger(
@@ -47,7 +47,7 @@ object NewAddressBarOptionTriggerModule {
             userStageStore = userStageStore,
             duckChat = duckChat,
             remoteMessagingRepository = remoteMessagingRepository,
-            newAddressBarOptionStorage = newAddressBarOptionStorage,
+            newAddressBarOptionDataStore = newAddressBarOptionDataStore,
             settingsDataStore = settingsDataStore,
         )
     }

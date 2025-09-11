@@ -20,7 +20,7 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
-import com.duckduckgo.app.browser.newaddressbaroption.DataStoreNewAddressBarOptionStorage.Keys.HAS_BEEN_SHOWN
+import com.duckduckgo.app.browser.newaddressbaroption.SharedPreferencesNewAddressBarOptionDataStore.Keys.HAS_BEEN_SHOWN
 import com.duckduckgo.app.di.NewAddressBarOption
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
@@ -30,17 +30,17 @@ import javax.inject.Inject
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.withContext
 
-interface NewAddressBarOptionStorage {
+interface NewAddressBarOptionDataStore {
     suspend fun markAsShown()
     suspend fun getHasBeenShown(): Boolean
 }
 
 @SingleInstanceIn(AppScope::class)
 @ContributesBinding(AppScope::class)
-class DataStoreNewAddressBarOptionStorage @Inject constructor(
+class SharedPreferencesNewAddressBarOptionDataStore @Inject constructor(
     @NewAddressBarOption private val dataStore: DataStore<Preferences>,
     private val dispatchers: DispatcherProvider,
-) : NewAddressBarOptionStorage {
+) : NewAddressBarOptionDataStore {
 
     private object Keys {
         val HAS_BEEN_SHOWN = booleanPreferencesKey(name = "NEW_ADDRESS_BAR_OPTION_SHOWN")

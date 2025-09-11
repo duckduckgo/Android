@@ -36,7 +36,7 @@ class RealNewAddressBarOptionTrigger(
     private val userStageStore: UserStageStore,
     private val duckChat: DuckChat,
     private val remoteMessagingRepository: RemoteMessagingRepository,
-    private val newAddressBarOptionStorage: NewAddressBarOptionStorage,
+    private val newAddressBarOptionDataStore: NewAddressBarOptionDataStore,
     private val settingsDataStore: SettingsDataStore,
 ) : NewAddressBarOptionTrigger {
 
@@ -73,7 +73,7 @@ class RealNewAddressBarOptionTrigger(
     }
 
     private suspend fun hasForceChoiceBeenShown(): Boolean {
-        return newAddressBarOptionStorage.getHasBeenShown()
+        return newAddressBarOptionDataStore.getHasBeenShown()
     }
 
     private fun hasInteractedWithSearchAndDuckAiAnnouncement(): Boolean {
@@ -85,6 +85,6 @@ class RealNewAddressBarOptionTrigger(
     }
 
     override suspend fun markAsShown() = withContext(Dispatchers.IO) {
-        newAddressBarOptionStorage.markAsShown()
+        newAddressBarOptionDataStore.markAsShown()
     }
 }
