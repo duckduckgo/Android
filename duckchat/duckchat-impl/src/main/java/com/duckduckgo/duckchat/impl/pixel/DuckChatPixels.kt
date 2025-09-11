@@ -184,6 +184,7 @@ object DuckChatPixelParameters {
     const val WAS_USED_BEFORE = "was_used_before"
     const val DELTA_TIMESTAMP_PARAMETERS = "delta-timestamp-minutes"
     const val INPUT_SCREEN_MODE = "mode"
+    const val TEXT_LENGTH_BUCKET = "text_length_bucket"
 }
 
 @ContributesMultibinding(AppScope::class)

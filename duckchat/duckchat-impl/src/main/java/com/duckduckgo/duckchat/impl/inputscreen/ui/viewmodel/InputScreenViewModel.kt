@@ -364,7 +364,7 @@ class InputScreenViewModel @AssistedInject constructor(
         val sanitizedQuery = query.replace(oldValue = "\n", newValue = " ")
         command.value = Command.SubmitSearch(sanitizedQuery)
         val params = mapOf(
-            "text_length_bucket" to sanitizedQuery.length.toQueryLengthBucket(),
+            DuckChatPixelParameters.TEXT_LENGTH_BUCKET to sanitizedQuery.length.toQueryLengthBucket(),
         )
         pixel.fire(pixel = DUCK_CHAT_EXPERIMENTAL_OMNIBAR_QUERY_SUBMITTED, parameters = params)
         pixel.fire(DUCK_CHAT_EXPERIMENTAL_OMNIBAR_QUERY_SUBMITTED_DAILY, type = Daily())
@@ -389,7 +389,7 @@ class InputScreenViewModel @AssistedInject constructor(
 
             val params = mapOf(
                 DuckChatPixelParameters.WAS_USED_BEFORE to wasDuckAiOpenedBefore.toBinaryString(),
-                "text_length_bucket" to query.length.toQueryLengthBucket(),
+                DuckChatPixelParameters.TEXT_LENGTH_BUCKET to query.length.toQueryLengthBucket(),
             )
             pixel.fire(pixel = DUCK_CHAT_EXPERIMENTAL_OMNIBAR_PROMPT_SUBMITTED, parameters = params)
             pixel.fire(DUCK_CHAT_EXPERIMENTAL_OMNIBAR_PROMPT_SUBMITTED_DAILY, type = Daily())
