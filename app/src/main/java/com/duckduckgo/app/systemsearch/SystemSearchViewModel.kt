@@ -21,7 +21,6 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
-import com.duckduckgo.app.browser.defaultbrowsing.prompts.ui.experiment.OnboardingHomeScreenWidgetExperiment
 import com.duckduckgo.app.browser.newtab.FavoritesQuickAccessAdapter
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.onboarding.store.AppStage
@@ -32,7 +31,6 @@ import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
 import com.duckduckgo.app.systemsearch.SystemSearchViewModel.Command.UpdateVoiceSearch
-import com.duckduckgo.app.widget.experiment.PostCtaExperienceExperiment
 import com.duckduckgo.browser.api.autocomplete.AutoComplete
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteResult
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion
@@ -91,8 +89,6 @@ class SystemSearchViewModel @Inject constructor(
     private val history: NavigationHistory,
     private val dispatchers: DispatcherProvider,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
-    private val postCtaExperienceExperiment: PostCtaExperienceExperiment,
-    private val onboardingHomeScreenWidgetExperiment: OnboardingHomeScreenWidgetExperiment,
 ) : ViewModel(), EditSavedSiteDialogFragment.EditSavedSiteListener {
 
     data class OnboardingViewState(
@@ -308,10 +304,6 @@ class SystemSearchViewModel @Inject constructor(
             userStageStore.stageCompleted(AppStage.NEW)
             command.value = Command.LaunchBrowser(query.trim())
             pixel.fire(INTERSTITIAL_LAUNCH_BROWSER_QUERY)
-            postCtaExperienceExperiment.fireWidgetSearch()
-            postCtaExperienceExperiment.fireWidgetSearchXCount()
-            onboardingHomeScreenWidgetExperiment.fireWidgetSearch()
-            onboardingHomeScreenWidgetExperiment.fireWidgetSearchXCount()
         }
     }
 
@@ -325,12 +317,6 @@ class SystemSearchViewModel @Inject constructor(
             }
         }
         pixel.fire(INTERSTITIAL_LAUNCH_BROWSER_QUERY)
-        viewModelScope.launch {
-            postCtaExperienceExperiment.fireWidgetSearch()
-            postCtaExperienceExperiment.fireWidgetSearchXCount()
-            onboardingHomeScreenWidgetExperiment.fireWidgetSearch()
-            onboardingHomeScreenWidgetExperiment.fireWidgetSearchXCount()
-        }
     }
 
     fun userLongPressedAutocomplete(suggestion: AutoCompleteSuggestion) {

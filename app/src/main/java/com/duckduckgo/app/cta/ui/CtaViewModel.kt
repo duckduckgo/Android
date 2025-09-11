@@ -21,7 +21,7 @@ import androidx.annotation.WorkerThread
 import androidx.core.net.toUri
 import com.duckduckgo.app.browser.DuckDuckGoUrlDetector
 import com.duckduckgo.app.browser.R
-import com.duckduckgo.app.browser.defaultbrowsing.prompts.ui.experiment.OnboardingHomeScreenWidgetExperiment
+import com.duckduckgo.app.browser.ui.dialogs.widgetprompt.OnboardingHomeScreenWidgetToggles
 import com.duckduckgo.app.cta.db.DismissedCtaDao
 import com.duckduckgo.app.cta.model.CtaId
 import com.duckduckgo.app.cta.model.DismissedCta
@@ -85,7 +85,7 @@ class CtaViewModel @Inject constructor(
     private val subscriptions: Subscriptions,
     private val duckPlayer: DuckPlayer,
     private val brokenSitePrompt: BrokenSitePrompt,
-    private val onboardingHomeScreenWidgetExperiment: OnboardingHomeScreenWidgetExperiment,
+    private val onboardingHomeScreenWidgetToggles: OnboardingHomeScreenWidgetToggles,
     private val onboardingDesignExperimentManager: OnboardingDesignExperimentManager,
     private val rebrandingFeatureToggle: SubscriptionRebrandingFeatureToggle,
 ) {
@@ -169,9 +169,6 @@ class CtaViewModel @Inject constructor(
             }
 
             cta.cancelPixel?.let {
-                if (cta is AddWidgetAuto || cta is AddWidgetAutoOnboardingExperiment) {
-                    onboardingHomeScreenWidgetExperiment.fireOnboardingWidgetDismiss()
-                }
                 pixel.fire(it, cta.pixelCancelParameters())
             }
             if (viaCloseBtn) {
@@ -188,9 +185,6 @@ class CtaViewModel @Inject constructor(
 
     suspend fun onUserClickCtaOkButton(cta: Cta) {
         cta.okPixel?.let {
-            if (cta is AddWidgetAuto || cta is AddWidgetAutoOnboardingExperiment) {
-                onboardingHomeScreenWidgetExperiment.fireOnboardingWidgetAdd()
-            }
             pixel.fire(it, cta.pixelOkParameters())
         }
         if (cta is BrokenSitePromptDialogCta) {
@@ -285,12 +279,11 @@ class CtaViewModel @Inject constructor(
             // Add Widget
             canShowWidgetCta() -> {
                 if (widgetCapabilities.supportsAutomaticWidgetAdd) {
-                    onboardingHomeScreenWidgetExperiment.enroll()
-                    if (onboardingHomeScreenWidgetExperiment.isOnboardingHomeScreenWidgetExperiment()) {
-                        onboardingHomeScreenWidgetExperiment.fireOnboardingWidgetDisplay()
+                    val showOnboardingHomeScreenWidgetPrompt = onboardingHomeScreenWidgetToggles.self().isEnabled() &&
+                        onboardingHomeScreenWidgetToggles.onboardingHomeScreenWidgetPrompt().isEnabled()
+                    if (showOnboardingHomeScreenWidgetPrompt) {
                         AddWidgetAutoOnboardingExperiment
                     } else {
-                        onboardingHomeScreenWidgetExperiment.fireOnboardingWidgetDisplay()
                         AddWidgetAuto
                     }
                 } else {

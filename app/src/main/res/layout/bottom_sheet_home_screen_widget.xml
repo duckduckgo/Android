@@ -40,11 +40,11 @@
             tools:ignore="DeprecatedWidgetInXml">
 
             <ImageView
-                android:id="@+id/experimentHomeScreenWidgetBottomSheetDialogImage"
+                android:id="@+id/homeScreenWidgetBottomSheetDialogImage"
                 android:layout_width="360dp"
                 android:layout_height="100dp"
                 android:layout_gravity="center"
-                app:srcCompat="@drawable/experiment_widget_promo_light"
+                app:srcCompat="@drawable/widget_promo_light"
                 tools:ignore="ContentDescription" />
 
             <!-- Using TextView instead of DaxTextView as the text color has to be the same regardless
@@ -85,7 +85,7 @@
             app:typography="body1" />
 
         <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
-            android:id="@+id/experimentHomeScreenWidgetBottomSheetDialogPrimaryButton"
+            android:id="@+id/homeScreenWidgetBottomSheetDialogPrimaryButton"
             android:layout_width="327dp"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
@@ -94,7 +94,7 @@
             app:daxButtonSize="large" />
 
         <com.duckduckgo.common.ui.view.button.DaxButtonGhost
-            android:id="@+id/experimentHomeScreenWidgetBottomSheetDialogGhostButton"
+            android:id="@+id/homeScreenWidgetBottomSheetDialogGhostButton"
             android:layout_width="327dp"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"

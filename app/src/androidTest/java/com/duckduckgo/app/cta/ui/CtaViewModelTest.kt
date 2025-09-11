@@ -25,7 +25,7 @@ import androidx.room.Room
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.browser.DuckDuckGoUrlDetectorImpl
 import com.duckduckgo.app.browser.R
-import com.duckduckgo.app.browser.defaultbrowsing.prompts.ui.experiment.OnboardingHomeScreenWidgetExperiment
+import com.duckduckgo.app.browser.ui.dialogs.widgetprompt.OnboardingHomeScreenWidgetToggles
 import com.duckduckgo.app.cta.db.DismissedCtaDao
 import com.duckduckgo.app.cta.model.CtaId
 import com.duckduckgo.app.cta.model.DismissedCta
@@ -60,6 +60,7 @@ import com.duckduckgo.duckplayer.api.DuckPlayer.DuckPlayerState.DISABLED
 import com.duckduckgo.duckplayer.api.DuckPlayer.DuckPlayerState.ENABLED
 import com.duckduckgo.duckplayer.api.DuckPlayer.UserPreferences
 import com.duckduckgo.duckplayer.api.PrivatePlayerMode.AlwaysAsk
+import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.subscriptions.api.SubscriptionRebrandingFeatureToggle
 import com.duckduckgo.subscriptions.api.Subscriptions
@@ -121,7 +122,7 @@ class CtaViewModelTest {
 
     private val mockBrokenSitePrompt: BrokenSitePrompt = mock()
 
-    private val mockOnboardingHomeScreenWidgetExperiment: OnboardingHomeScreenWidgetExperiment = mock()
+    private val fakeOnboardingHomeScreenWidgetToggles = FakeFeatureToggleFactory.create(OnboardingHomeScreenWidgetToggles::class.java)
 
     private val mockOnboardingDesignExperimentManager: OnboardingDesignExperimentManager = mock()
 
@@ -183,7 +184,7 @@ class CtaViewModelTest {
             subscriptions = mockSubscriptions,
             duckPlayer = mockDuckPlayer,
             brokenSitePrompt = mockBrokenSitePrompt,
-            onboardingHomeScreenWidgetExperiment = mockOnboardingHomeScreenWidgetExperiment,
+            onboardingHomeScreenWidgetToggles = fakeOnboardingHomeScreenWidgetToggles,
             onboardingDesignExperimentManager = mockOnboardingDesignExperimentManager,
             rebrandingFeatureToggle = mockRebrandingFeatureToggle,
         )
@@ -356,7 +357,8 @@ class CtaViewModelTest {
     fun whenRefreshCtaOnHomeTabAndHideTipsIsTrueAndWidgetCompatibleThenReturnWidgetCta() = runTest {
         whenever(mockSettingsDataStore.hideTips).thenReturn(true)
         whenever(mockWidgetCapabilities.supportsAutomaticWidgetAdd).thenReturn(true)
-        whenever(mockOnboardingHomeScreenWidgetExperiment.isOnboardingHomeScreenWidgetExperiment()).thenReturn(false)
+        fakeOnboardingHomeScreenWidgetToggles.self().setRawStoredState(Toggle.State(true))
+        fakeOnboardingHomeScreenWidgetToggles.onboardingHomeScreenWidgetPrompt().setRawStoredState(Toggle.State(false))
 
         val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = false, detectedRefreshPatterns = detectedRefreshPatterns)
         assertTrue(value is HomePanelCta.AddWidgetAuto)
@@ -382,7 +384,8 @@ class CtaViewModelTest {
         whenever(mockSettingsDataStore.hideTips).thenReturn(true)
         whenever(mockWidgetCapabilities.supportsAutomaticWidgetAdd).thenReturn(true)
         whenever(mockWidgetCapabilities.hasInstalledWidgets).thenReturn(false)
-        whenever(mockOnboardingHomeScreenWidgetExperiment.isOnboardingHomeScreenWidgetExperiment()).thenReturn(false)
+        fakeOnboardingHomeScreenWidgetToggles.self().setRawStoredState(Toggle.State(true))
+        fakeOnboardingHomeScreenWidgetToggles.onboardingHomeScreenWidgetPrompt().setRawStoredState(Toggle.State(false))
 
         val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = false, detectedRefreshPatterns = detectedRefreshPatterns)
         assertTrue(value is HomePanelCta.AddWidgetAuto)
@@ -393,7 +396,8 @@ class CtaViewModelTest {
         whenever(mockSettingsDataStore.hideTips).thenReturn(true)
         whenever(mockWidgetCapabilities.supportsAutomaticWidgetAdd).thenReturn(true)
         whenever(mockWidgetCapabilities.hasInstalledWidgets).thenReturn(false)
-        whenever(mockOnboardingHomeScreenWidgetExperiment.isOnboardingHomeScreenWidgetExperiment()).thenReturn(true)
+        fakeOnboardingHomeScreenWidgetToggles.self().setRawStoredState(Toggle.State(true))
+        fakeOnboardingHomeScreenWidgetToggles.onboardingHomeScreenWidgetPrompt().setRawStoredState(Toggle.State(true))
 
         val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = false, detectedRefreshPatterns = detectedRefreshPatterns)
         assertTrue(value is HomePanelCta.AddWidgetAutoOnboardingExperiment)
@@ -897,7 +901,8 @@ class CtaViewModelTest {
         whenever(mockDismissedCtaDao.exists(CtaId.DAX_INTRO_VISIT_SITE)).thenReturn(true)
         whenever(mockDismissedCtaDao.exists(CtaId.DAX_END)).thenReturn(true)
         whenever(mockWidgetCapabilities.supportsAutomaticWidgetAdd).thenReturn(true)
-        whenever(mockOnboardingHomeScreenWidgetExperiment.isOnboardingHomeScreenWidgetExperiment()).thenReturn(false)
+        fakeOnboardingHomeScreenWidgetToggles.self().setRawStoredState(Toggle.State(true))
+        fakeOnboardingHomeScreenWidgetToggles.onboardingHomeScreenWidgetPrompt().setRawStoredState(Toggle.State(false))
 
         val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = false, detectedRefreshPatterns = detectedRefreshPatterns)
         assertFalse(value is DaxBubbleCta.DaxPrivacyProCta)
