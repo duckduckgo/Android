@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.duckchat.impl.ui.dialog
+package com.duckduckgo.duckchat.impl.inputscreen.newaddressbaroption
 
 import android.animation.Animator
 import android.annotation.SuppressLint
