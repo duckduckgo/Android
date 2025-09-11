@@ -79,6 +79,7 @@ import kotlinx.coroutines.withContext
 import logcat.LogPriority.WARN
 import logcat.asLog
 import logcat.logcat
+import kotlin.collections.plusAssign
 
 data class SystemSearchResult(
     val autocomplete: AutoCompleteResult,
@@ -164,6 +165,7 @@ class SystemSearchViewModel @Inject constructor(
         )
     }
 
+    private val refreshTrigger = MutableSharedFlow<Unit>(replay = 1)
     private var results = SystemSearchResult(AutoCompleteResult("", emptyList()), emptyList())
     private var resultsJob = ConflatedJob()
     private var latestQuickAccessItems: Suggestions.QuickAccessItems = Suggestions.QuickAccessItems(emptyList())
@@ -181,6 +183,8 @@ class SystemSearchViewModel @Inject constructor(
         resetViewState()
         configureResults()
         refreshAppList()
+
+        refreshTrigger.tryEmit(Unit)
 
         savedSitesRepository.getFavorites()
             .combine(hiddenIds) { favorites, hiddenIds ->
@@ -226,9 +230,12 @@ class SystemSearchViewModel @Inject constructor(
 
     @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
     private fun configureResults() {
-        resultsJob += queryFlow
-            .debounce(DEBOUNCE_TIME_MS)
-            .distinctUntilChanged()
+        resultsJob += combine(
+            queryFlow
+                .debounce(DEBOUNCE_TIME_MS)
+                .distinctUntilChanged(),
+            refreshTrigger,
+        ) { query, _ -> query }
             .flatMapLatest { buildResultsFlow(query = it) }
             .flowOn(dispatchers.io())
             .onEach { result ->
@@ -243,7 +250,7 @@ class SystemSearchViewModel @Inject constructor(
         return combine(
             autoComplete.autoComplete(query),
             flow { emit(deviceAppLookup.query(query)) },
-        ) { autocompleteResult: AutoCompleteResult, appsResult: List<DeviceApp> ->
+        ) { autocompleteResult, appsResult ->
             if (autocompleteResult.suggestions.contains(AutoCompleteInAppMessageSuggestion)) {
                 hasUserSeenHistory = true
             }
@@ -417,6 +424,7 @@ class SystemSearchViewModel @Inject constructor(
             }
             withContext(dispatchers.main()) {
                 queryFlow.value = omnibarText
+                refreshTrigger.tryEmit(Unit)
                 command.value = Command.AutocompleteItemRemoved
             }
         }
