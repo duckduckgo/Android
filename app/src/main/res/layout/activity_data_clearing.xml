@@ -77,7 +77,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:primaryText="@string/settingsClearAiDataTitle"
-                app:secondaryText="@string/settingsClearAiDataTitle"
+                app:secondaryText="@string/settingsClearAiDataMessage"
                 app:showSwitch="true" />
 
         </LinearLayout>

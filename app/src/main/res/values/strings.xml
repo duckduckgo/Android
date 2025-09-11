@@ -234,7 +234,7 @@
     <string name="settingsAutomaticallyClearWhatOptionNone">None</string>
     <string name="settingsAutomaticallyClearWhatOptionTabs">Tabs</string>
     <string name="settingsAutomaticallyClearWhatOptionTabsAndData">Tabs and data</string>
-    <string name="settingsAutomaticallyClearWhatOptionTabsAndDataAndChats">Tabs, data and Duck.ai chats</string>
+    <string name="settingsAutomaticallyClearWhatOptionTabsAndDataAndChats">Tabs, data, and Duck.ai chats</string>
 
     <string name="settingsAutomaticallyClearWhen">Clear On…</string>
     <string name="settingsAutomaticallyClearWhenDialogTitle">Clear on…</string>
@@ -245,7 +245,7 @@
     <string name="settingsAutomaticallyClearWhenAppExit30Minutes">App exit, inactive for 30 minutes</string>
     <string name="settingsAutomaticallyClearWhenAppExit60Minutes">App exit, inactive for 1 hour</string>
     <string name="settingsClearAiDataTitle">Clear Duck.ai Chats</string>
-    <string name="settingsClearAiDataMessage">Let Fire Button also clear your Duck.ai chat history”</string>
+    <string name="settingsClearAiDataMessage">Fire Button will also delete Duck.ai history</string>
 
     <!-- About Activity -->
     <string name="aboutActivityTitle">About DuckDuckGo</string>

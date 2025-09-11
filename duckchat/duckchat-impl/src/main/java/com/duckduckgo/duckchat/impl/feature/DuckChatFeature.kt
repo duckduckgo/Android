@@ -66,4 +66,10 @@ interface DuckChatFeature {
      */
     @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun showInputScreenAutomaticallyOnNewTab(): Toggle
+
+    /**
+     * @return `true` when the Setting for allowing Duck.ai chats to be deleted with the Fire Button is enabled
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
+    fun clearHistory(): Toggle
 }
