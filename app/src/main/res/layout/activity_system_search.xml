@@ -213,7 +213,7 @@
     <androidx.core.widget.NestedScrollView
         android:id="@+id/results"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:layout_marginVertical="@dimen/keyline_2"
         android:clipToPadding="false">
 
