@@ -47,7 +47,7 @@ class NewAddressBarOptionBottomSheetDialog(
 
     var eventListener: EventListener? = null
 
-    private var isSearchOnlySelected = true
+    private var isSearchOnlySelected = false
     private var originalOrientation: Int = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
 
     init {

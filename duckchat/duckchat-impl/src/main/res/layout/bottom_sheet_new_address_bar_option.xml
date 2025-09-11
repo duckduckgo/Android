@@ -140,9 +140,9 @@
                 android:layout_width="match_parent"
                 android:layout_height="48dp"
                 android:layout_marginBottom="8dp"
+                android:background="@drawable/background_new_address_bar_option"
                 android:clickable="true"
-                android:focusable="true"
-                android:tag="selected">
+                android:focusable="true">
 
                 <com.duckduckgo.common.ui.view.text.DaxTextView
                     android:id="@+id/searchOnlyText"
@@ -160,7 +160,7 @@
                     android:layout_width="@dimen/keyline_5"
                     android:layout_height="@dimen/keyline_5"
                     android:layout_marginEnd="@dimen/keyline_4"
-                    android:checked="true"
+                    android:checked="false"
                     android:clickable="false"
                     app:buttonTint="@drawable/selector_new_address_bar_option_checkbox"
                     app:layout_constraintBottom_toBottomOf="parent"
@@ -174,10 +174,9 @@
                 android:id="@+id/newAddressBarOptionBottomSheetDialogSearchAndDuckAiButton"
                 android:layout_width="match_parent"
                 android:layout_height="48dp"
-                android:background="@drawable/background_new_address_bar_option"
+                android:background="@drawable/background_new_address_bar_option_selected"
                 android:clickable="true"
-                android:focusable="true"
-                android:tag="unselected">
+                android:focusable="true">
 
                 <com.duckduckgo.common.ui.view.text.DaxTextView
                     android:id="@+id/searchAndDuckAiText"
@@ -195,6 +194,7 @@
                     android:layout_width="@dimen/keyline_5"
                     android:layout_height="@dimen/keyline_5"
                     android:layout_marginEnd="@dimen/keyline_4"
+                    android:checked="true"
                     android:clickable="false"
                     app:buttonTint="@drawable/selector_new_address_bar_option_checkbox"
                     app:layout_constraintBottom_toBottomOf="parent"
