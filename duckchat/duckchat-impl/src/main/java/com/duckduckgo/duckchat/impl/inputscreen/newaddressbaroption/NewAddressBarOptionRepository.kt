@@ -16,32 +16,30 @@
 
 package com.duckduckgo.duckchat.impl.inputscreen.newaddressbaroption
 
-import android.content.Context
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.duckchat.impl.DuckChatInternal
 import com.squareup.anvil.annotations.ContributesBinding
+import dagger.SingleInstanceIn
 import javax.inject.Inject
+import kotlinx.coroutines.withContext
 
-interface NewAddressBarOptionBottomSheetDialogFactory {
-    fun create(
-        context: Context,
-        isLightModeEnabled: Boolean,
-    ): NewAddressBarOptionBottomSheetDialog
+interface NewAddressBarOptionRepository {
+    suspend fun markAsShown()
+    suspend fun getHasBeenShown(): Boolean
 }
 
+@SingleInstanceIn(AppScope::class)
 @ContributesBinding(AppScope::class)
-class RealNewAddressBarOptionBottomSheetDialogFactory @Inject constructor(
-    private val duckChatInternal: DuckChatInternal,
-) : NewAddressBarOptionBottomSheetDialogFactory {
+class RealNewAddressBarOptionRepository @Inject constructor(
+    private val newAddressBarOptionDataStore: NewAddressBarOptionDataStore,
+    private val dispatchers: DispatcherProvider,
+) : NewAddressBarOptionRepository {
 
-    override fun create(
-        context: Context,
-        isLightModeEnabled: Boolean,
-    ): NewAddressBarOptionBottomSheetDialog {
-        return NewAddressBarOptionBottomSheetDialog(
-            context = context,
-            isLightModeEnabled = isLightModeEnabled,
-            duckChatInternal = duckChatInternal,
-        )
+    override suspend fun markAsShown() = withContext(dispatchers.io()) {
+        newAddressBarOptionDataStore.markAsShown()
+    }
+
+    override suspend fun getHasBeenShown(): Boolean = withContext(dispatchers.io()) {
+        newAddressBarOptionDataStore.getHasBeenShown()
     }
 }

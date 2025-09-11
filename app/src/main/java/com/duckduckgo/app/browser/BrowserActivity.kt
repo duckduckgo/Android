@@ -109,7 +109,6 @@ import com.duckduckgo.common.utils.playstore.PlayStoreUtils
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.api.DuckChat
-import com.duckduckgo.duckchat.impl.inputscreen.newaddressbaroption.NewAddressBarOptionBottomSheetDialog
 import com.duckduckgo.duckchat.impl.inputscreen.newaddressbaroption.NewAddressBarOptionBottomSheetDialogFactory
 import com.duckduckgo.duckchat.impl.ui.DuckChatWebViewFragment
 import com.duckduckgo.duckchat.impl.ui.DuckChatWebViewFragment.Companion.KEY_DUCK_AI_URL
@@ -1079,7 +1078,6 @@ open class BrowserActivity : DuckDuckGoActivity() {
                 logcat(INFO) { "Original instance state is null, so will inspect intent for actions to take. $intent" }
                 launchNewSearchOrQuery(intent)
                 processedOriginalIntent = true
-
                 checkAndShowNewAddressBarOptionAnnouncement()
             }
         }
@@ -1107,15 +1105,6 @@ open class BrowserActivity : DuckDuckGoActivity() {
             context = this,
             isLightModeEnabled = !isDarkThemeEnabled(),
         )
-
-        dialog.eventListener = object : NewAddressBarOptionBottomSheetDialog.EventListener {
-            override fun onShown() {
-                lifecycleScope.launch(dispatcherProvider.io()) {
-                    newAddressBarOptionManager.markAsShown()
-                }
-            }
-        }
-
         dialog.show()
     }
 

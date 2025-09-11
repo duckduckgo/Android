@@ -36,6 +36,7 @@ import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.api.DuckChatSettingsNoParams
 import com.duckduckgo.duckchat.impl.feature.AIChatImageUploadFeature
 import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
+import com.duckduckgo.duckchat.impl.inputscreen.newaddressbaroption.NewAddressBarOptionRepository
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelParameters
 import com.duckduckgo.duckchat.impl.repository.DuckChatFeatureRepository
@@ -161,6 +162,11 @@ interface DuckChatInternal : DuckChat {
      * Checks whether DuckChat is enabled based on remote config flag.
      */
     fun isDuckChatFeatureEnabled(): Boolean
+
+    /**
+     * Called when the new address bar option announcement is shown.
+     */
+    fun onNewAddressBarOptionShown()
 }
 
 enum class ChatState(val value: String) {
@@ -220,6 +226,7 @@ class RealDuckChat @Inject constructor(
     private val pixel: Pixel,
     private val imageUploadFeature: AIChatImageUploadFeature,
     private val browserNav: BrowserNav,
+    private val newAddressBarOptionRepository: NewAddressBarOptionRepository,
 ) : DuckChatInternal, DuckAiFeatureState, PrivacyConfigCallbackPlugin {
 
     private val closeChatFlow = MutableSharedFlow<Unit>(replay = 0)
@@ -289,6 +296,12 @@ class RealDuckChat @Inject constructor(
 
     override fun isDuckChatFeatureEnabled(): Boolean {
         return isDuckChatFeatureEnabled
+    }
+
+    override fun onNewAddressBarOptionShown() {
+        appCoroutineScope.launch {
+            newAddressBarOptionRepository.markAsShown()
+        }
     }
 
     override fun observeEnableDuckChatUserSetting(): Flow<Boolean> {

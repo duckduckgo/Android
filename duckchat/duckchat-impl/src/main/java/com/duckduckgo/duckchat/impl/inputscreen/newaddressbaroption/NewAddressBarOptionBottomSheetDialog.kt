@@ -29,7 +29,6 @@ import androidx.lifecycle.lifecycleScope
 import com.airbnb.lottie.LottieAnimationView
 import com.airbnb.lottie.LottieDrawable
 import com.duckduckgo.common.ui.view.toPx
-import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.duckchat.impl.DuckChatInternal
 import com.duckduckgo.duckchat.impl.R
 import com.duckduckgo.duckchat.impl.databinding.BottomSheetNewAddressBarOptionBinding
@@ -43,14 +42,11 @@ import kotlinx.coroutines.launch
 class NewAddressBarOptionBottomSheetDialog(
     private val context: Context,
     private val isLightModeEnabled: Boolean,
-    private val dispatcherProvider: DispatcherProvider,
     private val duckChatInternal: DuckChatInternal,
 ) : BottomSheetDialog(context) {
 
     private val binding: BottomSheetNewAddressBarOptionBinding =
         BottomSheetNewAddressBarOptionBinding.inflate(LayoutInflater.from(context))
-
-    var eventListener: EventListener? = null
 
     private var searchAndDuckAiSelected = true
     private var originalOrientation: Int = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
@@ -71,7 +67,7 @@ class NewAddressBarOptionBottomSheetDialog(
             }
             setRoundCorners()
             lockOrientationToPortrait()
-            eventListener?.onShown()
+            duckChatInternal.onNewAddressBarOptionShown()
         }
 
         setOnCancelListener {
@@ -83,13 +79,13 @@ class NewAddressBarOptionBottomSheetDialog(
         setupSelectionLogic()
 
         binding.newAddressBarOptionBottomSheetDialogPrimaryButton.setOnClickListener {
-            lifecycleScope.launch(dispatcherProvider.io()) {
+            lifecycleScope.launch {
                 if (searchAndDuckAiSelected) {
                     duckChatInternal.setInputScreenUserSetting(true)
                 }
+                restoreOrientation()
+                dismiss()
             }
-            restoreOrientation()
-            dismiss()
         }
 
         binding.newAddressBarOptionBottomSheetDialogGhostButton.setOnClickListener {
@@ -220,9 +216,5 @@ class NewAddressBarOptionBottomSheetDialog(
     override fun onDetachedFromWindow() {
         super.onDetachedFromWindow()
         restoreOrientation()
-    }
-
-    interface EventListener {
-        fun onShown()
     }
 }
