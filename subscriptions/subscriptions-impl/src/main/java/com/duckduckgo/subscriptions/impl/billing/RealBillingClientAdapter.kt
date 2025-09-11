@@ -178,6 +178,46 @@ class RealBillingClientAdapter @Inject constructor(
         }
     }
 
+    override suspend fun launchSubscriptionUpdate(
+        activity: Activity,
+        productDetails: ProductDetails,
+        offerToken: String,
+        externalId: String,
+        oldPurchaseToken: String,
+        replacementMode: SubscriptionReplacementMode,
+    ): LaunchBillingFlowResult {
+        val client = billingClient
+        if (client == null || !client.isReady) return LaunchBillingFlowResult.Failure
+
+        val subscriptionUpdateParams = BillingFlowParams.SubscriptionUpdateParams.newBuilder()
+            .setOldPurchaseToken(oldPurchaseToken)
+            .setSubscriptionReplacementMode(replacementMode.value)
+            .build()
+
+        val billingFlowParams = BillingFlowParams.newBuilder()
+            .setProductDetailsParamsList(
+                listOf(
+                    BillingFlowParams.ProductDetailsParams.newBuilder()
+                        .setProductDetails(productDetails)
+                        .setOfferToken(offerToken)
+                        .build(),
+                ),
+            )
+            .setObfuscatedAccountId(externalId)
+            .setObfuscatedProfileId(externalId)
+            .setSubscriptionUpdateParams(subscriptionUpdateParams)
+            .build()
+
+        val result = withContext(coroutineDispatchers.main()) {
+            client.launchBillingFlow(activity, billingFlowParams)
+        }
+
+        return when (result.responseCode) {
+            BillingResponseCode.OK -> LaunchBillingFlowResult.Success
+            else -> LaunchBillingFlowResult.Failure
+        }
+    }
+
     private fun reset() {
         billingClient?.endConnection()
         billingClient = null
