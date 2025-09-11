@@ -363,7 +363,10 @@ class InputScreenViewModel @AssistedInject constructor(
     fun onSearchSubmitted(query: String) {
         val sanitizedQuery = query.replace(oldValue = "\n", newValue = " ")
         command.value = Command.SubmitSearch(sanitizedQuery)
-        pixel.fire(DUCK_CHAT_EXPERIMENTAL_OMNIBAR_QUERY_SUBMITTED)
+        val params = mapOf(
+            DuckChatPixelParameters.TEXT_LENGTH_BUCKET to sanitizedQuery.length.toQueryLengthBucket(),
+        )
+        pixel.fire(pixel = DUCK_CHAT_EXPERIMENTAL_OMNIBAR_QUERY_SUBMITTED, parameters = params)
         pixel.fire(DUCK_CHAT_EXPERIMENTAL_OMNIBAR_QUERY_SUBMITTED_DAILY, type = Daily())
         inputScreenDiscoveryFunnel.onSearchSubmitted()
         inputScreenSessionUsageMetric.onSearchSubmitted()
@@ -384,7 +387,10 @@ class InputScreenViewModel @AssistedInject constructor(
                 duckChat.openDuckChatWithAutoPrompt(query)
             }
 
-            val params = mapOf(DuckChatPixelParameters.WAS_USED_BEFORE to wasDuckAiOpenedBefore.toBinaryString())
+            val params = mapOf(
+                DuckChatPixelParameters.WAS_USED_BEFORE to wasDuckAiOpenedBefore.toBinaryString(),
+                DuckChatPixelParameters.TEXT_LENGTH_BUCKET to query.length.toQueryLengthBucket(),
+            )
             pixel.fire(pixel = DUCK_CHAT_EXPERIMENTAL_OMNIBAR_PROMPT_SUBMITTED, parameters = params)
             pixel.fire(DUCK_CHAT_EXPERIMENTAL_OMNIBAR_PROMPT_SUBMITTED_DAILY, type = Daily())
 
@@ -518,6 +524,13 @@ class InputScreenViewModel @AssistedInject constructor(
             pixel.fire(DUCK_CHAT_EXPERIMENTAL_OMNIBAR_SESSION_BOTH_MODES)
             pixel.fire(DUCK_CHAT_EXPERIMENTAL_OMNIBAR_SESSION_BOTH_MODES_DAILY, type = Daily())
         }
+    }
+
+    private fun Int.toQueryLengthBucket(): String = when {
+        this <= 15 -> "short"
+        this <= 40 -> "medium"
+        this <= 100 -> "long"
+        else -> "very_long"
     }
 
     class InputScreenViewModelProviderFactory(
