@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.browser.validator
+package com.duckduckgo.app.browser.newaddressbaroption
 
 import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition
 import com.duckduckgo.app.onboarding.store.AppStage

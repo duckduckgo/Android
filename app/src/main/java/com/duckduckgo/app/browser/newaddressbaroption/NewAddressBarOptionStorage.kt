@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.browser.validator
+package com.duckduckgo.app.browser.newaddressbaroption
 
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
-import com.duckduckgo.app.browser.validator.DataStoreNewAddressBarOptionStorage.Keys.HAS_BEEN_SHOWN
+import com.duckduckgo.app.browser.newaddressbaroption.DataStoreNewAddressBarOptionStorage.Keys.HAS_BEEN_SHOWN
 import com.duckduckgo.app.di.NewAddressBarOption
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope

@@ -16,9 +16,9 @@
 
 package com.duckduckgo.app.di
 
-import com.duckduckgo.app.browser.validator.NewAddressBarOptionStorage
-import com.duckduckgo.app.browser.validator.NewAddressBarOptionTrigger
-import com.duckduckgo.app.browser.validator.RealNewAddressBarOptionTrigger
+import com.duckduckgo.app.browser.newaddressbaroption.NewAddressBarOptionStorage
+import com.duckduckgo.app.browser.newaddressbaroption.NewAddressBarOptionTrigger
+import com.duckduckgo.app.browser.newaddressbaroption.RealNewAddressBarOptionTrigger
 import com.duckduckgo.app.onboarding.store.UserStageStore
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.di.scopes.AppScope
