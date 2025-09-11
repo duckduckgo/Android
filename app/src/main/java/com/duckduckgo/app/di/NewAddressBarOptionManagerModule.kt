@@ -16,7 +16,6 @@
 
 package com.duckduckgo.app.di
 
-import com.duckduckgo.app.browser.newaddressbaroption.NewAddressBarOptionDataStore
 import com.duckduckgo.app.browser.newaddressbaroption.NewAddressBarOptionManager
 import com.duckduckgo.app.browser.newaddressbaroption.RealNewAddressBarOptionManager
 import com.duckduckgo.app.onboarding.store.UserStageStore
@@ -24,6 +23,7 @@ import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.api.DuckChat
+import com.duckduckgo.duckchat.impl.inputscreen.newaddressbaroption.NewAddressBarOptionDataStore
 import com.duckduckgo.remote.messaging.api.RemoteMessagingRepository
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
@@ -31,10 +31,10 @@ import dagger.Provides
 
 @ContributesTo(AppScope::class)
 @Module
-object NewAddressBarOptionTriggerModule {
+object NewAddressBarOptionManagerModule {
 
     @Provides
-    fun provideNewAddressBarOptionTrigger(
+    fun provideNewAddressBarOptionManager(
         duckAiFeatureState: DuckAiFeatureState,
         userStageStore: UserStageStore,
         duckChat: DuckChat,
