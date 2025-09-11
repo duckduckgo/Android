@@ -27,7 +27,9 @@ import com.duckduckgo.app.settings.clear.FireAnimation
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.api.DuckChat
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -64,6 +66,11 @@ internal class FireButtonViewModelTest {
     @Mock
     private lateinit var mockDuckChat: DuckChat
 
+    @Mock
+    private lateinit var mockDuckAiFeatureState: DuckAiFeatureState
+
+    private val duckAishowClearDuckAIChatHistoryFlow = MutableStateFlow(false)
+
     @Before
     fun before() {
         MockitoAnnotations.openMocks(this)
@@ -71,6 +78,8 @@ internal class FireButtonViewModelTest {
         whenever(mockAppSettingsDataStore.automaticallyClearWhenOption).thenReturn(ClearWhenOption.APP_EXIT_ONLY)
         whenever(mockAppSettingsDataStore.automaticallyClearWhatOption).thenReturn(ClearWhatOption.CLEAR_NONE)
         whenever(mockAppSettingsDataStore.selectedFireAnimation).thenReturn(FireAnimation.HeroFire)
+        whenever(mockDuckAiFeatureState.showClearDuckAIChatHistory).thenReturn(duckAishowClearDuckAIChatHistoryFlow)
+
         runBlocking {
             whenever(mockDuckChat.wasOpenedBefore()).thenReturn(false)
         }
@@ -80,6 +89,7 @@ internal class FireButtonViewModelTest {
             mockFireAnimationLoader,
             mockPixel,
             mockDuckChat,
+            mockDuckAiFeatureState,
         )
     }
 
@@ -97,6 +107,73 @@ internal class FireButtonViewModelTest {
 
             assertEquals(expectedClearData, value.automaticallyClearData)
             assertEquals(FireAnimation.HeroFire, value.selectedFireAnimation)
+            assertEquals(false, value.showClearDuckAiDataSetting)
+
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenInitialisedAndDuckAiUsedAndFFEnabledThenViewStateEmittedWithDefaultValues() = runTest {
+        duckAishowClearDuckAIChatHistoryFlow.value = true
+        whenever(mockDuckChat.wasOpenedBefore()).thenReturn(true)
+        whenever(mockAppSettingsDataStore.selectedFireAnimation).thenReturn(FireAnimation.HeroFire)
+        val expectedClearData = FireButtonViewModel.AutomaticallyClearData(
+            clearWhatOption = ClearWhatOption.CLEAR_NONE,
+            clearWhenOption = ClearWhenOption.APP_EXIT_ONLY,
+            clearWhenOptionEnabled = false,
+        )
+
+        testee.viewState().test {
+            val value = awaitItem()
+
+            assertEquals(expectedClearData, value.automaticallyClearData)
+            assertEquals(FireAnimation.HeroFire, value.selectedFireAnimation)
+            assertEquals(true, value.showClearDuckAiDataSetting)
+
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenInitialisedAndDuckAiUsedAndFFDisabledThenViewStateEmittedWithDefaultValues() = runTest {
+        duckAishowClearDuckAIChatHistoryFlow.value = false
+        whenever(mockDuckChat.wasOpenedBefore()).thenReturn(true)
+        whenever(mockAppSettingsDataStore.selectedFireAnimation).thenReturn(FireAnimation.HeroFire)
+        val expectedClearData = FireButtonViewModel.AutomaticallyClearData(
+            clearWhatOption = ClearWhatOption.CLEAR_NONE,
+            clearWhenOption = ClearWhenOption.APP_EXIT_ONLY,
+            clearWhenOptionEnabled = false,
+        )
+
+        testee.viewState().test {
+            val value = awaitItem()
+
+            assertEquals(expectedClearData, value.automaticallyClearData)
+            assertEquals(FireAnimation.HeroFire, value.selectedFireAnimation)
+            assertEquals(false, value.showClearDuckAiDataSetting)
+
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenInitialisedAndDuckAiNeverUsedAndFFEnabledThenViewStateEmittedWithDefaultValues() = runTest {
+        duckAishowClearDuckAIChatHistoryFlow.value = true
+        whenever(mockDuckChat.wasOpenedBefore()).thenReturn(false)
+        whenever(mockAppSettingsDataStore.selectedFireAnimation).thenReturn(FireAnimation.HeroFire)
+        val expectedClearData = FireButtonViewModel.AutomaticallyClearData(
+            clearWhatOption = ClearWhatOption.CLEAR_NONE,
+            clearWhenOption = ClearWhenOption.APP_EXIT_ONLY,
+            clearWhenOptionEnabled = false,
+        )
+
+        testee.viewState().test {
+            val value = awaitItem()
+
+            assertEquals(expectedClearData, value.automaticallyClearData)
+            assertEquals(FireAnimation.HeroFire, value.selectedFireAnimation)
+            assertEquals(false, value.showClearDuckAiDataSetting)
 
             cancelAndConsumeRemainingEvents()
         }
