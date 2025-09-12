@@ -30,6 +30,7 @@ import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.duckchat.api.DuckChatSettingsNoParams
 import com.duckduckgo.duckchat.impl.feature.AIChatImageUploadFeature
 import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
+import com.duckduckgo.duckchat.impl.inputscreen.newaddressbaroption.NewAddressBarOptionRepository
 import com.duckduckgo.duckchat.impl.repository.DuckChatFeatureRepository
 import com.duckduckgo.duckchat.impl.ui.DuckChatWebViewActivityWithParams
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
@@ -77,6 +78,7 @@ class RealDuckChatTest {
     private val mockPixel: Pixel = mock()
     private val mockIntent: Intent = mock()
     private val mockBrowserNav: BrowserNav = mock()
+    private val mockNewAddressBarOptionRepository: NewAddressBarOptionRepository = mock()
     private val imageUploadFeature: AIChatImageUploadFeature = FakeFeatureToggleFactory.create(AIChatImageUploadFeature::class.java)
 
     private lateinit var testee: RealDuckChat
@@ -106,6 +108,7 @@ class RealDuckChatTest {
                 mockPixel,
                 imageUploadFeature,
                 mockBrowserNav,
+                mockNewAddressBarOptionRepository
             ),
         )
         coroutineRule.testScope.advanceUntilIdle()
