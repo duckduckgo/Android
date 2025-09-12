@@ -28,6 +28,8 @@ import com.duckduckgo.duckchat.impl.inputscreen.newaddressbaroption.NewAddressBa
 import com.duckduckgo.remote.messaging.api.RemoteMessagingRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import logcat.LogPriority.DEBUG
+import logcat.logcat
 
 interface NewAddressBarOptionManager {
     suspend fun showDialog(context: Context, launchedFromExternal: Boolean, isLightModeEnabled: Boolean)
@@ -71,44 +73,59 @@ class RealNewAddressBarOptionManager(
         }
     }
 
-    private fun isDuckAiEnabled(): Boolean {
-        return duckChat.isEnabled()
-    }
+    private fun isDuckAiEnabled(): Boolean =
+        duckChat.isEnabled().also {
+            logcat(DEBUG) { "NewAddressBarOptionManager: isDuckAiEnabled: $it" }
+        }
 
-    private suspend fun isOnboardingCompleted(): Boolean {
-        return userStageStore.getUserAppStage() == AppStage.ESTABLISHED
-    }
+    private suspend fun isOnboardingCompleted(): Boolean =
+        (userStageStore.getUserAppStage() == AppStage.ESTABLISHED).also { result ->
+            logcat(DEBUG) { "NewAddressBarOptionManager: isOnboardingCompleted: appStage=${userStageStore.getUserAppStage()}, result=$result" }
+        }
 
-    private fun isFeatureFlagEnabled(): Boolean {
-        return duckAiFeatureState.showNewAddressBarOptionAnnouncement.value
-    }
+    private fun isFeatureFlagEnabled(): Boolean =
+        duckAiFeatureState.showNewAddressBarOptionAnnouncement.value.also {
+            logcat(DEBUG) { "NewAddressBarOptionManager: isFeatureFlagEnabled: $it" }
+        }
 
-    private fun isDuckAiOmnibarShortcutDisabled(): Boolean {
-        return !duckAiFeatureState.showOmnibarShortcutInAllStates.value
-    }
+    private fun isDuckAiOmnibarShortcutDisabled(): Boolean =
+        (!duckAiFeatureState.showOmnibarShortcutInAllStates.value).also {
+            logcat(DEBUG) { "NewAddressBarOptionManager: isDuckAiOmnibarShortcutDisabled: $it" }
+        }
 
-    private fun isInputScreenEnabled(): Boolean {
-        return duckAiFeatureState.showInputScreen.value
-    }
+    private fun isInputScreenEnabled(): Boolean =
+        duckAiFeatureState.showInputScreen.value.also {
+            logcat(DEBUG) { "NewAddressBarOptionManager: isInputScreenEnabled: $it" }
+        }
 
-    private suspend fun hasForceChoiceBeenShown(): Boolean {
-        return newAddressBarOptionRepository.hasBeenShown()
-    }
+    private suspend fun hasForceChoiceBeenShown(): Boolean =
+        newAddressBarOptionRepository.hasBeenShown().also {
+            logcat(DEBUG) { "NewAddressBarOptionManager: hasForceChoiceBeenShown: $it" }
+        }
 
-    private fun hasInteractedWithSearchAndDuckAiAnnouncement(): Boolean {
-        return remoteMessagingRepository.dismissedMessages().contains("search_duck_ai_announcement")
-    }
+    private fun hasInteractedWithSearchAndDuckAiAnnouncement(): Boolean =
+        remoteMessagingRepository.dismissedMessages().let { dismissedMessages ->
+            dismissedMessages.contains("search_duck_ai_announcement").also { result ->
+                logcat(DEBUG) { "NewAddressBarOptionManager: hasInteractedWithSearchAndDuckAiAnnouncement: dismissedMessages=$dismissedMessages, result=$result" }
+            }
+        }
 
-    private fun hasBottomAddressBarEnabled(): Boolean {
-        return settingsDataStore.omnibarPosition == OmnibarPosition.BOTTOM
-    }
+    private fun hasBottomAddressBarEnabled(): Boolean =
+        (settingsDataStore.omnibarPosition == OmnibarPosition.BOTTOM).also { result ->
+            logcat(DEBUG) { "NewAddressBarOptionManager: hasBottomAddressBarEnabled: omnibarPosition=${settingsDataStore.omnibarPosition}, result=$result" }
+        }
 
     private suspend fun isSubsequentLaunch(): Boolean {
-        if (newAddressBarOptionRepository.hasBeenChecked()) {
-            return true
+        val hasBeenChecked = newAddressBarOptionRepository.hasBeenChecked()
+        logcat(DEBUG) { "NewAddressBarOptionManager: isSubsequentLaunch: hasBeenChecked=$hasBeenChecked" }
+
+        return if (hasBeenChecked) {
+            logcat(DEBUG) { "NewAddressBarOptionManager: isSubsequentLaunch: Checked before, returning true" }
+            true
         } else {
+            logcat(DEBUG) { "NewAddressBarOptionManager: isSubsequentLaunch: Not checked before, marking as checked and returning false" }
             newAddressBarOptionRepository.markAsChecked()
-            return false
+            false
         }
     }
 }
