@@ -44,31 +44,31 @@ class SharedPreferencesNewAddressBarOptionDataStore @Inject constructor(
 ) : NewAddressBarOptionDataStore {
 
     private object Keys {
-        val HAS_BEEN_SHOWN = booleanPreferencesKey(name = "NEW_ADDRESS_BAR_OPTION_SHOWN")
-        val HAS_FEATURE_FLAG_BEEN_CHECKED = booleanPreferencesKey(name = "NEW_ADDRESS_BAR_OPTION_FEATURE_FLAG_CHECKED")
+        val HAS_BEEN_SHOWN_KEY = booleanPreferencesKey(name = "NEW_ADDRESS_BAR_OPTION_SHOWN")
+        val HAS_BEEN_CHECKED_KEY = booleanPreferencesKey(name = "NEW_ADDRESS_BAR_OPTION_CHECKED")
     }
 
     override suspend fun markAsShown() {
         withContext(dispatchers.io()) {
             dataStore.edit { prefs ->
-                prefs[Keys.HAS_BEEN_SHOWN] = true
+                prefs[Keys.HAS_BEEN_SHOWN_KEY] = true
             }
         }
     }
 
     override suspend fun hasBeenShown(): Boolean = withContext(dispatchers.io()) {
-        dataStore.data.firstOrNull()?.let { it[Keys.HAS_BEEN_SHOWN] } ?: false
+        dataStore.data.firstOrNull()?.let { it[Keys.HAS_BEEN_SHOWN_KEY] } ?: false
     }
 
     override suspend fun markAsChecked() {
         withContext(dispatchers.io()) {
             dataStore.edit { prefs ->
-                prefs[Keys.HAS_FEATURE_FLAG_BEEN_CHECKED] = true
+                prefs[Keys.HAS_BEEN_CHECKED_KEY] = true
             }
         }
     }
 
     override suspend fun hasBeenChecked(): Boolean = withContext(dispatchers.io()) {
-        dataStore.data.firstOrNull()?.let { it[Keys.HAS_FEATURE_FLAG_BEEN_CHECKED] } ?: false
+        dataStore.data.firstOrNull()?.let { it[Keys.HAS_BEEN_CHECKED_KEY] } ?: false
     }
 }
