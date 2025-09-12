@@ -271,8 +271,8 @@
     <string name="searchWidgetEmtpyFavoritesHint">Még nincsenek hozzáadva kedvencek.</string>
     <string name="searchWidgetEmtpyFavoritesCta">Kedvenc hozzáadása</string>
     <string name="widgetConfigurationActivityTitle">Minialkalmazás konfigurációja</string>
-    <string name="favoritesWidgetLabel">Kedvencek</string>
-    <string name="searchWidgetLabel">Keresés</string>
+    <string name="favoritesWidgetLabel">Keresés és kedvencek</string>
+    <string name="searchWidgetLabel">Keresés és Duck.ai</string>
 
     <!-- Home Screen Shortcuts -->
     <string name="addToHome">Hozzáadás a kezdőlaphoz</string>
@@ -947,4 +947,10 @@
     <string name="tabSwitcherAnimationTileRemovalDialogPositiveButton">Elrejtés</string>
     <string name="tabSwitcherAnimationTileRemovalDialogNegativeButton">Megtartás.</string>
 
+    <!-- Widgets -->
+    <string name="searchOnlyWidgetLabel" instruction="Label for the search-only widget">Csak keresés</string>
+    <string name="searchOnlyWidgetDescription" instruction="Description for the search-only widget">Indíts gyorsan egy privát keresést a DuckDuckGóval.</string>
+    <string name="searchWidgetDescription" instruction="Description for the search widget, which may include Duck.ai and voice search">Keress privát módon a DuckDuckGóval, vagy tegyél fel kérdést a Duck.ai számára. A hangalapú keresés és a Duck.ai akkor érhető el, ha engedélyezve van.</string>
+    <string name="searchAndFavoritesWidgetDescription" instruction="Description for the search and favorites widget">Látogasd meg a kedvenc weboldalaidat és keress rajtuk privát módon egyetlen koppintással. A hangalapú keresés és a Duck.ai akkor érhető el, ha engedélyezve van.</string>
+    <string name="duckAiOnlyPinShortcutLabel" instruction="Label for the Duck.ai pinned shortcut. Should be Duck.ai in all languages">Duck.ai</string>
 </resources>

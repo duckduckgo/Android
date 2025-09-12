@@ -267,12 +267,12 @@
     <string name="widgetConfigurationSystemThemeOption">Sistem Varsayılanı</string>
     <string name="widgetConfigurationLightThemeOption">Açık</string>
     <string name="widgetConfigurationDarkThemeOption">Karanlık</string>
-    <string name="widgetConfigurationAddWidgetOption">Widget ekle</string>
+    <string name="widgetConfigurationAddWidgetOption">Widget Ekle</string>
     <string name="searchWidgetEmtpyFavoritesHint">Henüz hiç favori eklenmedi</string>
     <string name="searchWidgetEmtpyFavoritesCta">Favori Ekle</string>
     <string name="widgetConfigurationActivityTitle">Widget Yapılandırması</string>
-    <string name="favoritesWidgetLabel">Favoriler</string>
-    <string name="searchWidgetLabel">Arama yap</string>
+    <string name="favoritesWidgetLabel">Arama ve Favoriler</string>
+    <string name="searchWidgetLabel">Arama ve Duck.ai</string>
 
     <!-- Home Screen Shortcuts -->
     <string name="addToHome">Ana ekrana ekle</string>
@@ -947,4 +947,10 @@
     <string name="tabSwitcherAnimationTileRemovalDialogPositiveButton">Gizle</string>
     <string name="tabSwitcherAnimationTileRemovalDialogNegativeButton">Gizleme</string>
 
+    <!-- Widgets -->
+    <string name="searchOnlyWidgetLabel" instruction="Label for the search-only widget">Yalnızca Arama</string>
+    <string name="searchOnlyWidgetDescription" instruction="Description for the search-only widget">DuckDuckGo ile hızlıca gizli bir arama başlatın.</string>
+    <string name="searchWidgetDescription" instruction="Description for the search widget, which may include Duck.ai and voice search">DuckDuckGo ile gizli arama yapın veya Duck.ai\'a sorun. Etkinleştirildiğinde Sesli Arama ve Duck.ai kullanılabilir.</string>
+    <string name="searchAndFavoritesWidgetDescription" instruction="Description for the search and favorites widget">Tek dokunuşla favori sitelerinizi gizlice arayın veya ziyaret edin. Etkinleştirildiğinde Sesli Arama ve Duck.ai kullanılabilir.</string>
+    <string name="duckAiOnlyPinShortcutLabel" instruction="Label for the Duck.ai pinned shortcut. Should be Duck.ai in all languages">Duck.ai</string>
 </resources>
