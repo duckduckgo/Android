@@ -27,7 +27,6 @@ import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
-import com.duckduckgo.duckchat.impl.inputscreen.ui.metrics.discovery.InputScreenDiscoveryFunnelStore
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
 import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.SingleInstanceIn
@@ -39,7 +38,6 @@ import kotlinx.coroutines.sync.withLock
 import logcat.LogPriority.ERROR
 import logcat.asLog
 import logcat.logcat
-import java.time.ZoneId
 import java.time.ZonedDateTime
 import javax.inject.Inject
 
@@ -64,8 +62,6 @@ class InputScreenRetentionMonitor @Inject constructor(
     private val processingMutex = Mutex()
 
     override fun onResume(owner: LifecycleOwner) {
-        super.onResume(owner)
-
         coroutineScope.launch {
             processingMutex.withLock {
                 val persistedData = retentionMonitorDataStore.data.firstOrNull()
@@ -80,11 +76,10 @@ class InputScreenRetentionMonitor @Inject constructor(
                                 val isStillEnabled = duckAiFeatureState.showInputScreen.value
                                 pixel.fire(
                                     pixel = DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_OMNIBAR_DAILY_RETENTION,
-                                    parameters = mapOf("still_enabled" to isStillEnabled.toString())
+                                    parameters = mapOf("still_enabled" to isStillEnabled.toString()),
                                 )
                             }
-                        } else {
-                            return@launch
+                            persistCurrentState()
                         }
                     } catch (ex: Exception) {
                         logcat(priority = ERROR) {
@@ -95,17 +90,20 @@ class InputScreenRetentionMonitor @Inject constructor(
                         retentionMonitorDataStore.edit { preferences ->
                             preferences[Key.LAST_CHECK_DATE_TIME_ET] = currentTimeETString
                         }
-                        return@launch
                     }
-                }
-
-                val currentTimeETString = timeProvider.nowInEasternTime().toString()
-                val isFeatureEnabled = duckAiFeatureState.showInputScreen.value
-                retentionMonitorDataStore.edit { preferences ->
-                    preferences[Key.LAST_CHECK_DATE_TIME_ET] = currentTimeETString
-                    preferences[Key.LAST_ENABLED_STATE] = isFeatureEnabled
+                } else {
+                    persistCurrentState()
                 }
             }
+        }
+    }
+
+    private suspend fun persistCurrentState() {
+        val currentTimeETString = timeProvider.nowInEasternTime().toString()
+        val isFeatureEnabled = duckAiFeatureState.showInputScreen.value
+        retentionMonitorDataStore.edit { preferences ->
+            preferences[Key.LAST_CHECK_DATE_TIME_ET] = currentTimeETString
+            preferences[Key.LAST_ENABLED_STATE] = isFeatureEnabled
         }
     }
 }
