@@ -142,52 +142,16 @@ class SystemSearchActivity : DuckDuckGoActivity() {
     private var nestedScrollViewPosition: Int = 0
     private var nestedScrollViewRestorePosition: Int = 0
 
-    private val isOmnibarAtTop by lazy {
-        settingsDataStore.omnibarPosition == OmnibarPosition.TOP
-    }
-
     private val systemSearchOnboarding
         get() = binding.includeSystemSearchOnboarding
 
-    private val omnibarTextInput: KeyboardAwareEditText
-        get() {
-            return if (isOmnibarAtTop) binding.omnibarTextInput else binding.omnibarTextInputBottom
-        }
-
-    private val voiceSearch: ImageView
-        get() {
-            return if (isOmnibarAtTop) binding.voiceSearchButton else binding.voiceSearchButtonBottom
-        }
-
-    private val clearTextButton: ImageView
-        get() {
-            return if (isOmnibarAtTop) binding.clearTextButton else binding.clearTextButtonBottom
-        }
-
-    private val appBarLayout: AppBarLayout
-        get() {
-            return if (isOmnibarAtTop) binding.appBarLayout else binding.appBarLayoutBottom
-        }
-
-    private val shadowContainer: MaterialCardView
-        get() {
-            return if (isOmnibarAtTop) binding.omniBarContainerShadow else binding.omniBarContainerShadowBottom
-        }
-
-    private val logo: ImageView
-        get() {
-            return if (isOmnibarAtTop) binding.logo else binding.logoBottom
-        }
-
-    private val duckAi: ImageView
-        get() {
-            return if (isOmnibarAtTop) binding.aiChatIconMenu else binding.aiChatIconMenuBottom
-        }
-
-    private val omnibarDivider: View
-        get() {
-            return if (isOmnibarAtTop) binding.verticalDivider else binding.verticalDividerBottom
-        }
+    private lateinit var omnibarTextInput: KeyboardAwareEditText
+    private lateinit var voiceSearch: ImageView
+    private lateinit var clearTextButton: ImageView
+    private lateinit var shadowContainer: MaterialCardView
+    private lateinit var logo: ImageView
+    private lateinit var duckAi: ImageView
+    private lateinit var omnibarDivider: View
 
     private val textChangeWatcher = object : TextChangedWatcher() {
         override fun afterTextChanged(editable: Editable) {
@@ -198,16 +162,30 @@ class SystemSearchActivity : DuckDuckGoActivity() {
         }
     }
 
+    private fun configureViewReferences(isOmnibarAtTop: Boolean) {
+        omnibarTextInput = if (isOmnibarAtTop) binding.omnibarTextInput else binding.omnibarTextInputBottom
+        voiceSearch = if (isOmnibarAtTop) binding.voiceSearchButton else binding.voiceSearchButtonBottom
+        clearTextButton = if (isOmnibarAtTop) binding.clearTextButton else binding.clearTextButtonBottom
+        shadowContainer = if (isOmnibarAtTop) binding.omniBarContainerShadow else binding.omniBarContainerShadowBottom
+        logo = if (isOmnibarAtTop) binding.logo else binding.logoBottom
+        duckAi = if (isOmnibarAtTop) binding.aiChatIconMenu else binding.aiChatIconMenuBottom
+        omnibarDivider = if (isOmnibarAtTop) binding.verticalDivider else binding.verticalDividerBottom
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         dataClearerForegroundAppRestartPixel.registerIntent(intent)
         setContentView(binding.root)
+
+        val isOmnibarAtTop = settingsDataStore.omnibarPosition == OmnibarPosition.TOP
+
+        configureViewReferences(isOmnibarAtTop)
+        configureOmnibar(isOmnibarAtTop)
         configureObservers()
         configureOnboarding()
         configureAutoComplete()
         configureDeviceAppSuggestions()
         configureDaxButton()
-        configureOmnibar()
         configureTextInput()
         configureQuickAccessGrid()
         configureVoiceSearch()
@@ -383,7 +361,7 @@ class SystemSearchActivity : DuckDuckGoActivity() {
         }
     }
 
-    private fun configureOmnibar() {
+    private fun configureOmnibar(isOmnibarAtTop: Boolean) {
         if (isOmnibarAtTop) {
             binding.rootView.removeView(binding.appBarLayoutBottom)
         } else {
