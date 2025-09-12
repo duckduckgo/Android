@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 DuckDuckGo
+ * Copyright (c) 2025 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,14 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.duckduckgo.autofill.impl.configuration
 
-import com.duckduckgo.autofill.api.BrowserAutofill.Configurator
+package com.duckduckgo.app.browser.ui.dialogs.widgetprompt
+
+import com.duckduckgo.anvil.annotations.ContributesRemoteFeature
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesBinding
-import javax.inject.Inject
+import com.duckduckgo.feature.toggles.api.Toggle
 
-@ContributesBinding(AppScope::class)
-class InlineBrowserAutofillConfigurator @Inject constructor(
-    private val configurator: InternalBrowserAutofillConfigurator,
-) : Configurator by configurator
+@ContributesRemoteFeature(
+    scope = AppScope::class,
+    featureName = "onboardingHomeScreenWidget",
+)
+interface OnboardingHomeScreenWidgetToggles {
+
+    @Toggle.DefaultValue(Toggle.DefaultFeatureValue.FALSE)
+    fun self(): Toggle
+
+    @Toggle.DefaultValue(Toggle.DefaultFeatureValue.FALSE)
+    fun onboardingHomeScreenWidgetPrompt(): Toggle
+}

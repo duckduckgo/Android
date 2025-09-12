@@ -271,8 +271,8 @@
     <string name="searchWidgetEmtpyFavoritesHint">Todavía no se han añadido favoritos</string>
     <string name="searchWidgetEmtpyFavoritesCta">Añadir favorito</string>
     <string name="widgetConfigurationActivityTitle">Configuración del widget</string>
-    <string name="favoritesWidgetLabel">Favoritos</string>
-    <string name="searchWidgetLabel">Buscar</string>
+    <string name="favoritesWidgetLabel">Búsqueda y favoritos</string>
+    <string name="searchWidgetLabel">Búsqueda y Duck.ai</string>
 
     <!-- Home Screen Shortcuts -->
     <string name="addToHome">Añadir a la Pantalla de Inicio</string>
@@ -946,4 +946,10 @@
     <string name="tabSwitcherAnimationTileRemovalDialogPositiveButton">Ocultar</string>
     <string name="tabSwitcherAnimationTileRemovalDialogNegativeButton">Mantener</string>
 
+    <!-- Widgets -->
+    <string name="searchOnlyWidgetLabel" instruction="Label for the search-only widget">Solo buscar</string>
+    <string name="searchOnlyWidgetDescription" instruction="Description for the search-only widget">Empieza rápidamente una búsqueda privada con DuckDuckGo.</string>
+    <string name="searchWidgetDescription" instruction="Description for the search widget, which may include Duck.ai and voice search">Busca de manera privada con DuckDuckGo o pregúntale a Duck.ai. Búsqueda por voz y Duck.ai disponibles si están habilitados.</string>
+    <string name="searchAndFavoritesWidgetDescription" instruction="Description for the search and favorites widget">Busca o visita tus sitios web de forma privada con solo pulsar un botón. Búsqueda por voz y Duck.ai disponibles si están habilitados.</string>
+    <string name="duckAiOnlyPinShortcutLabel" instruction="Label for the Duck.ai pinned shortcut. Should be Duck.ai in all languages">Duck.ai</string>
 </resources>

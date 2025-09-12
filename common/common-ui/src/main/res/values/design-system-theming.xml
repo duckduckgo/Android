@@ -143,7 +143,7 @@
         <item name="cookiesAnimationRadius">@dimen/smallShapeCornerRadius</item>
         <item name="cookiesAnimationHeight">@dimen/omnibarCookieAnimationBannerHeight</item>
 
-        <item name="toolbarExtraPadding">@dimen/keyline_empty</item>
+        <item name="actionBarSize">@dimen/toolbarSize</item>
     </style>
 
     <!-- The app theme will mostly contain values for colour attributes -->
@@ -212,9 +212,6 @@
 
         <item name="cookiesAnimationRadius">@dimen/cookiesAnimationRadius</item>
         <item name="cookiesAnimationHeight">@dimen/cookiesAnimationHeight</item>
-
-        <item name="toolbarExtraPadding">@dimen/keyline_1</item>
-        <item name="actionBarSize">@dimen/toolbarSize</item>
 
         <!-- Design System Component Colors Dark -->
         <!-- Buttons -->
@@ -352,9 +349,6 @@
 
         <item name="cookiesAnimationRadius">@dimen/cookiesAnimationRadius</item>
         <item name="cookiesAnimationHeight">@dimen/cookiesAnimationHeight</item>
-
-        <item name="toolbarExtraPadding">@dimen/keyline_1</item>
-        <item name="actionBarSize">@dimen/toolbarSize</item>
 
         <!-- Design System Component Colors Light -->
         <!-- Buttons -->

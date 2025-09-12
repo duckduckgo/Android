@@ -271,8 +271,8 @@
     <string name="searchWidgetEmtpyFavoritesHint">Все още няма добавени любими</string>
     <string name="searchWidgetEmtpyFavoritesCta">Добавяне в любими</string>
     <string name="widgetConfigurationActivityTitle">Конфигуриране на уиджет</string>
-    <string name="favoritesWidgetLabel">Любими</string>
-    <string name="searchWidgetLabel">Търсене</string>
+    <string name="favoritesWidgetLabel">Търсене и любими</string>
+    <string name="searchWidgetLabel">Търсене и Duck.ai</string>
 
     <!-- Home Screen Shortcuts -->
     <string name="addToHome">Добавете към Начална Страница</string>
@@ -946,4 +946,10 @@
     <string name="tabSwitcherAnimationTileRemovalDialogPositiveButton">Скрий</string>
     <string name="tabSwitcherAnimationTileRemovalDialogNegativeButton">Запазване</string>
 
+    <!-- Widgets -->
+    <string name="searchOnlyWidgetLabel" instruction="Label for the search-only widget">Само търсене</string>
+    <string name="searchOnlyWidgetDescription" instruction="Description for the search-only widget">Стартирай бързо анонимно търсене с DuckDuckGo.</string>
+    <string name="searchWidgetDescription" instruction="Description for the search widget, which may include Duck.ai and voice search">Търси анонимно с DuckDuckGo или попитай Duck.ai. Гласово търсене и Duck.ai са налични, ако са активирани.</string>
+    <string name="searchAndFavoritesWidgetDescription" instruction="Description for the search and favorites widget">Търсете или посещавайте любимите си сайтове анонимно с едно докосване. Гласово търсене и Duck.ai са налични, ако са активирани.</string>
+    <string name="duckAiOnlyPinShortcutLabel" instruction="Label for the Duck.ai pinned shortcut. Should be Duck.ai in all languages">Duck.ai</string>
 </resources>

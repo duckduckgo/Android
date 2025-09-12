@@ -273,8 +273,8 @@
     <string name="searchWidgetEmtpyFavoritesHint">Zatiaľ neboli pridané žiadne obľúbené položky</string>
     <string name="searchWidgetEmtpyFavoritesCta">Pridať do obľúbených položiek</string>
     <string name="widgetConfigurationActivityTitle">Konfigurácia miniaplikácie</string>
-    <string name="favoritesWidgetLabel">Obľúbené položky</string>
-    <string name="searchWidgetLabel">Vyhľadávať</string>
+    <string name="favoritesWidgetLabel">Vyhľadávanie a obľúbené položky</string>
+    <string name="searchWidgetLabel">Vyhľadať a Duck.ai</string>
 
     <!-- Home Screen Shortcuts -->
     <string name="addToHome">Pridať na domovskú obrazovku</string>
@@ -982,4 +982,10 @@
     <string name="tabSwitcherAnimationTileRemovalDialogPositiveButton">Skryť</string>
     <string name="tabSwitcherAnimationTileRemovalDialogNegativeButton">Ponechať</string>
 
+    <!-- Widgets -->
+    <string name="searchOnlyWidgetLabel" instruction="Label for the search-only widget">Len vyhľadávanie</string>
+    <string name="searchOnlyWidgetDescription" instruction="Description for the search-only widget">Rýchlo spusti súkromné vyhľadávanie s DuckDuckGo.</string>
+    <string name="searchWidgetDescription" instruction="Description for the search widget, which may include Duck.ai and voice search">Vyhľadávaj súkromne s DuckDuckGo alebo sa opýtaj Duck.ai. Hlasové vyhľadávanie a Duck.ai sú k dispozícii, ak sú povolené.</string>
+    <string name="searchAndFavoritesWidgetDescription" instruction="Description for the search and favorites widget">Jedným ťuknutím súkromne vyhľadávaj alebo navštív svoje obľúbené stránky. Hlasové vyhľadávanie a Duck.ai sú k dispozícii, ak sú povolené.</string>
+    <string name="duckAiOnlyPinShortcutLabel" instruction="Label for the Duck.ai pinned shortcut. Should be Duck.ai in all languages">Duck.ai</string>
 </resources>

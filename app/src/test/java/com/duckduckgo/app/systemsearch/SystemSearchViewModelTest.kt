@@ -20,7 +20,6 @@ import android.content.Intent
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
-import com.duckduckgo.app.browser.defaultbrowsing.prompts.ui.experiment.OnboardingHomeScreenWidgetExperiment
 import com.duckduckgo.app.browser.newtab.FavoritesQuickAccessAdapter.QuickAccessFavorite
 import com.duckduckgo.app.onboarding.store.*
 import com.duckduckgo.app.pixels.AppPixelName.*
@@ -33,7 +32,6 @@ import com.duckduckgo.app.systemsearch.SystemSearchViewModel.Command.LaunchDuckD
 import com.duckduckgo.app.systemsearch.SystemSearchViewModel.Command.ShowRemoveSearchSuggestionDialog
 import com.duckduckgo.app.systemsearch.SystemSearchViewModel.Suggestions.QuickAccessItems
 import com.duckduckgo.app.systemsearch.SystemSearchViewModel.Suggestions.SystemSearchResultsViewState
-import com.duckduckgo.app.widget.experiment.PostCtaExperienceExperiment
 import com.duckduckgo.browser.api.autocomplete.AutoComplete
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteResult
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion.AutoCompleteDefaultSuggestion
@@ -81,8 +79,6 @@ class SystemSearchViewModelTest {
     private val mockSettingsStore: SettingsDataStore = mock()
     private val mockAutoCompleteSettings: AutoCompleteSettings = mock()
     private val mockHistory: NavigationHistory = mock()
-    private val mockPostCtaExperienceExperiment: PostCtaExperienceExperiment = mock()
-    private val mockOnboardingHomeScreenWidgetExperiment: OnboardingHomeScreenWidgetExperiment = mock()
     private val mockDuckChat: DuckChat = mock()
     private val mockDuckAiFeatureState: DuckAiFeatureState = mock()
     private val mockVoiceSearchAvailability: VoiceSearchAvailability = mock()
@@ -117,8 +113,6 @@ class SystemSearchViewModelTest {
             mockHistory,
             coroutineRule.testDispatcherProvider,
             coroutineRule.testScope,
-            mockPostCtaExperienceExperiment,
-            mockOnboardingHomeScreenWidgetExperiment,
         )
         testee.command.observeForever(commandObserver)
     }
@@ -261,8 +255,6 @@ class SystemSearchViewModelTest {
         verify(commandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
         assertEquals(Command.LaunchBrowser(QUERY), commandCaptor.lastValue)
         verify(mockPixel).fire(INTERSTITIAL_LAUNCH_BROWSER_QUERY)
-        verify(mockPostCtaExperienceExperiment).fireWidgetSearch()
-        verify(mockPostCtaExperienceExperiment).fireWidgetSearchXCount()
     }
 
     @Test
@@ -271,8 +263,6 @@ class SystemSearchViewModelTest {
         verify(commandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
         assertEquals(Command.LaunchBrowser(QUERY), commandCaptor.lastValue)
         verify(mockPixel).fire(INTERSTITIAL_LAUNCH_BROWSER_QUERY)
-        verify(mockPostCtaExperienceExperiment).fireWidgetSearch()
-        verify(mockPostCtaExperienceExperiment).fireWidgetSearchXCount()
     }
 
     @Test
@@ -280,16 +270,12 @@ class SystemSearchViewModelTest {
         testee.userSubmittedQuery(BLANK_QUERY)
         assertFalse(commandCaptor.allValues.any { it is Command.LaunchBrowser })
         verify(mockPixel, never()).fire(INTERSTITIAL_LAUNCH_BROWSER_QUERY)
-        verify(mockPostCtaExperienceExperiment, never()).fireWidgetSearch()
-        verify(mockPostCtaExperienceExperiment, never()).fireWidgetSearchXCount()
     }
 
     @Test
     fun whenUserSubmitsQueryThenOnboardingCompleted() = runTest {
         testee.userSubmittedQuery(QUERY)
         verify(mockUserStageStore).stageCompleted(AppStage.NEW)
-        verify(mockPostCtaExperienceExperiment).fireWidgetSearch()
-        verify(mockPostCtaExperienceExperiment).fireWidgetSearchXCount()
     }
 
     @Test
@@ -298,8 +284,6 @@ class SystemSearchViewModelTest {
         verify(commandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
         assertEquals(Command.LaunchBrowser(AUTOCOMPLETE_RESULT), commandCaptor.lastValue)
         verify(mockPixel).fire(INTERSTITIAL_LAUNCH_BROWSER_QUERY)
-        verify(mockPostCtaExperienceExperiment).fireWidgetSearch()
-        verify(mockPostCtaExperienceExperiment).fireWidgetSearchXCount()
     }
 
     @Test
@@ -312,8 +296,6 @@ class SystemSearchViewModelTest {
         verify(commandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
         assertEquals(Command.LaunchBrowserAndSwitchToTab(phrase, tabId), commandCaptor.lastValue)
         verify(mockPixel).fire(INTERSTITIAL_LAUNCH_BROWSER_QUERY)
-        verify(mockPostCtaExperienceExperiment).fireWidgetSearch()
-        verify(mockPostCtaExperienceExperiment).fireWidgetSearchXCount()
     }
 
     @Test
@@ -435,8 +417,6 @@ class SystemSearchViewModelTest {
             mockHistory,
             coroutineRule.testDispatcherProvider,
             coroutineRule.testScope,
-            mockPostCtaExperienceExperiment,
-            mockOnboardingHomeScreenWidgetExperiment,
         )
 
         val viewState = testee.resultsViewState.value as QuickAccessItems
@@ -466,8 +446,6 @@ class SystemSearchViewModelTest {
             mockHistory,
             coroutineRule.testDispatcherProvider,
             coroutineRule.testScope,
-            mockPostCtaExperienceExperiment,
-            mockOnboardingHomeScreenWidgetExperiment,
         )
 
         val viewState = testee.resultsViewState.value as QuickAccessItems
@@ -524,8 +502,6 @@ class SystemSearchViewModelTest {
             mockHistory,
             coroutineRule.testDispatcherProvider,
             coroutineRule.testScope,
-            mockPostCtaExperienceExperiment,
-            mockOnboardingHomeScreenWidgetExperiment,
         )
 
         val viewState = testee.resultsViewState.value as SystemSearchViewModel.Suggestions.QuickAccessItems

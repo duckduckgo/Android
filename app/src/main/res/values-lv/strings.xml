@@ -272,8 +272,8 @@
     <string name="searchWidgetEmtpyFavoritesHint">Vēl nav pievienota neviena izlase</string>
     <string name="searchWidgetEmtpyFavoritesCta">Pievienot izlases vienumu</string>
     <string name="widgetConfigurationActivityTitle">Logrīka konfigurācija</string>
-    <string name="favoritesWidgetLabel">Izlase</string>
-    <string name="searchWidgetLabel">Meklēt</string>
+    <string name="favoritesWidgetLabel">Meklēšana un izlase</string>
+    <string name="searchWidgetLabel">Meklēšana un Duck.ai</string>
 
     <!-- Home Screen Shortcuts -->
     <string name="addToHome">Pievienot sākuma ekrānam</string>
@@ -964,4 +964,10 @@
     <string name="tabSwitcherAnimationTileRemovalDialogPositiveButton">Paslēpt</string>
     <string name="tabSwitcherAnimationTileRemovalDialogNegativeButton">Saglabāt</string>
 
+    <!-- Widgets -->
+    <string name="searchOnlyWidgetLabel" instruction="Label for the search-only widget">Meklēt tikai</string>
+    <string name="searchOnlyWidgetDescription" instruction="Description for the search-only widget">Ātri sāc privātu meklēšanu ar DuckDuckGo.</string>
+    <string name="searchWidgetDescription" instruction="Description for the search widget, which may include Duck.ai and voice search">Meklē privāti ar DuckDuckGo vai jautā Duck.ai. Ja ir iespējota balss meklēšana un Duck.ai.</string>
+    <string name="searchAndFavoritesWidgetDescription" instruction="Description for the search and favorites widget">Savas iecienītākās vietnes meklē vai apmeklē privāti ar vienu pieskārienu. Balss meklēšana un Duck.ai ir pieejami, ja tie iespējoti.</string>
+    <string name="duckAiOnlyPinShortcutLabel" instruction="Label for the Duck.ai pinned shortcut. Should be Duck.ai in all languages">Duck.ai</string>
 </resources>

@@ -273,8 +273,8 @@
     <string name="searchWidgetEmtpyFavoritesHint">Mėgstamų dar nepridėta</string>
     <string name="searchWidgetEmtpyFavoritesCta">Pridėti mėgstamą</string>
     <string name="widgetConfigurationActivityTitle">Valdiklio konfigūracija</string>
-    <string name="favoritesWidgetLabel">Mėgstami</string>
-    <string name="searchWidgetLabel">Paieška</string>
+    <string name="favoritesWidgetLabel">Paieška ir mėgstamiausi</string>
+    <string name="searchWidgetLabel">Paieška ir „Duck.ai“</string>
 
     <!-- Home Screen Shortcuts -->
     <string name="addToHome">Pridėti prie pagrindinio ekrano</string>
@@ -982,4 +982,10 @@
     <string name="tabSwitcherAnimationTileRemovalDialogPositiveButton">Slėpti</string>
     <string name="tabSwitcherAnimationTileRemovalDialogNegativeButton">Laikyti</string>
 
+    <!-- Widgets -->
+    <string name="searchOnlyWidgetLabel" instruction="Label for the search-only widget">Tik paieška</string>
+    <string name="searchOnlyWidgetDescription" instruction="Description for the search-only widget">Greitai pradėkite privačią paiešką naudodami „DuckDuckGo“.</string>
+    <string name="searchWidgetDescription" instruction="Description for the search widget, which may include Duck.ai and voice search">Ieškokite privačiai naudodami „DuckDuckGo“ arba paklauskite „Duck.ai“. Jei įjungta, galima naudotis paieška balsu ir „Duck.ai“.</string>
+    <string name="searchAndFavoritesWidgetDescription" instruction="Description for the search and favorites widget">Ieškokite arba lankykitės savo mėgstamose svetainėse privačiai vienu spustelėjimu. Jei įjungta, galima naudotis paieška balsu ir „Duck.ai“.</string>
+    <string name="duckAiOnlyPinShortcutLabel" instruction="Label for the Duck.ai pinned shortcut. Should be Duck.ai in all languages">Duck.ai</string>
 </resources>

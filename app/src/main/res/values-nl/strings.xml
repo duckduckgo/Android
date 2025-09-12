@@ -271,8 +271,8 @@
     <string name="searchWidgetEmtpyFavoritesHint">Nog geen favorieten toegevoegd</string>
     <string name="searchWidgetEmtpyFavoritesCta">Favoriet toevoegen</string>
     <string name="widgetConfigurationActivityTitle">Widgetconfiguratie</string>
-    <string name="favoritesWidgetLabel">Favorieten</string>
-    <string name="searchWidgetLabel">Zoeken</string>
+    <string name="favoritesWidgetLabel">Zoeken en Favorieten</string>
+    <string name="searchWidgetLabel">Zoeken en Duck.ai</string>
 
     <!-- Home Screen Shortcuts -->
     <string name="addToHome">Toevoegen aan Home Screen</string>
@@ -946,4 +946,10 @@
     <string name="tabSwitcherAnimationTileRemovalDialogPositiveButton">Verbergen</string>
     <string name="tabSwitcherAnimationTileRemovalDialogNegativeButton">Bewaren</string>
 
+    <!-- Widgets -->
+    <string name="searchOnlyWidgetLabel" instruction="Label for the search-only widget">Alleen zoeken</string>
+    <string name="searchOnlyWidgetDescription" instruction="Description for the search-only widget">Voer snel een privézoekopdracht uit in DuckDuckGo.</string>
+    <string name="searchWidgetDescription" instruction="Description for the search widget, which may include Duck.ai and voice search">Zoek privé met DuckDuckGo of vraag het aan Duck.ai. Voice Search en Duck.ai zijn beschikbaar indien ingeschakeld.</string>
+    <string name="searchAndFavoritesWidgetDescription" instruction="Description for the search and favorites widget">Zoek of bezoek je favoriete sites in de privémodus met één tik. Zoeken via spraak en Duck.ai zijn beschikbaar indien ingeschakeld.</string>
+    <string name="duckAiOnlyPinShortcutLabel" instruction="Label for the Duck.ai pinned shortcut. Should be Duck.ai in all languages">Duck.ai</string>
 </resources>

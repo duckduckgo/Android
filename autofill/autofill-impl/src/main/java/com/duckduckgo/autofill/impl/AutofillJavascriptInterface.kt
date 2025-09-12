@@ -262,7 +262,23 @@ class AutofillStoredBackJavascriptInterface @Inject constructor(
                 callback?.noCredentialsAvailable(url)
             }
         } else {
-            callback?.onCredentialsAvailableToInject(url, finalCredentialList, triggerType)
+            notifyListenerThatCredentialsAvailableToInject(url, finalCredentialList, triggerType, request)
+        }
+    }
+
+    private suspend fun notifyListenerThatCredentialsAvailableToInject(
+        url: String,
+        finalCredentialList: List<LoginCredentials>,
+        triggerType: LoginTriggerType,
+        request: AutofillDataRequest,
+    ) {
+        when (val currentCallback = callback) {
+            is InternalCallback -> {
+                currentCallback.onCredentialsAvailableToInjectWithReauth(url, finalCredentialList, triggerType, request.subType)
+            }
+            else -> {
+                currentCallback?.onCredentialsAvailableToInject(url, finalCredentialList, triggerType)
+            }
         }
     }
 

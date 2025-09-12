@@ -273,8 +273,8 @@
     <string name="searchWidgetEmtpyFavoritesHint">Priljubljeni še niso dodani</string>
     <string name="searchWidgetEmtpyFavoritesCta">Dodaj priljubljene</string>
     <string name="widgetConfigurationActivityTitle">Konfiguracija pripomočka</string>
-    <string name="favoritesWidgetLabel">Priljubljeni</string>
-    <string name="searchWidgetLabel">Iskanje</string>
+    <string name="favoritesWidgetLabel">Iskanje in priljubljeni</string>
+    <string name="searchWidgetLabel">Iskanje in Duck.ai</string>
 
     <!-- Home Screen Shortcuts -->
     <string name="addToHome">Dodaj na Domači Zaslon</string>
@@ -982,4 +982,10 @@
     <string name="tabSwitcherAnimationTileRemovalDialogPositiveButton">Skrij se</string>
     <string name="tabSwitcherAnimationTileRemovalDialogNegativeButton">Obdrži</string>
 
+    <!-- Widgets -->
+    <string name="searchOnlyWidgetLabel" instruction="Label for the search-only widget">Samo iskanje</string>
+    <string name="searchOnlyWidgetDescription" instruction="Description for the search-only widget">Hitro zaženite zasebno iskanje z DuckDuckGo.</string>
+    <string name="searchWidgetDescription" instruction="Description for the search widget, which may include Duck.ai and voice search">Zasebno iščite z DuckDuckGo ali vprašajte Duck.ai. Glasovno iskanje in Duck.ai sta na voljo, če sta omogočena.</string>
+    <string name="searchAndFavoritesWidgetDescription" instruction="Description for the search and favorites widget">Z enim dotikom zasebno poiščite ali obiščite svoja najljubša spletna mesta. Glasovno iskanje in Duck.ai sta na voljo, če sta omogočena.</string>
+    <string name="duckAiOnlyPinShortcutLabel" instruction="Label for the Duck.ai pinned shortcut. Should be Duck.ai in all languages">Duck.ai</string>
 </resources>

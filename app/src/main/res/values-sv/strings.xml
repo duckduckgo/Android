@@ -271,8 +271,8 @@
     <string name="searchWidgetEmtpyFavoritesHint">Inga favoriter har lagts till ännu</string>
     <string name="searchWidgetEmtpyFavoritesCta">Lägg till favorit</string>
     <string name="widgetConfigurationActivityTitle">Konfigurering av widget</string>
-    <string name="favoritesWidgetLabel">Favoriter</string>
-    <string name="searchWidgetLabel">Sökning</string>
+    <string name="favoritesWidgetLabel">Sökning och favoriter</string>
+    <string name="searchWidgetLabel">Sök och Duck.ai</string>
 
     <!-- Home Screen Shortcuts -->
     <string name="addToHome">Lägg till på hemskärmen</string>
@@ -946,4 +946,10 @@
     <string name="tabSwitcherAnimationTileRemovalDialogPositiveButton">Dölj</string>
     <string name="tabSwitcherAnimationTileRemovalDialogNegativeButton">Behåll</string>
 
+    <!-- Widgets -->
+    <string name="searchOnlyWidgetLabel" instruction="Label for the search-only widget">Sök endast</string>
+    <string name="searchOnlyWidgetDescription" instruction="Description for the search-only widget">Snabbstarta en privat sökning med DuckDuckGo.</string>
+    <string name="searchWidgetDescription" instruction="Description for the search widget, which may include Duck.ai and voice search">Sök privat med DuckDuckGo eller fråga Duck.ai. Röstsökning och Duck.ai kan användas efter aktivering.</string>
+    <string name="searchAndFavoritesWidgetDescription" instruction="Description for the search and favorites widget">Gör sökningar eller besök dina favoritwebbplatser privat med ett tryck. Röstsökning och Duck.ai kan användas efter aktivering.</string>
+    <string name="duckAiOnlyPinShortcutLabel" instruction="Label for the Duck.ai pinned shortcut. Should be Duck.ai in all languages">Duck.ai</string>
 </resources>
