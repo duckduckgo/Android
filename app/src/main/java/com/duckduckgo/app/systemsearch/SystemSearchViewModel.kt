@@ -56,6 +56,7 @@ import com.duckduckgo.savedsites.impl.SavedSitesPixelName
 import com.duckduckgo.savedsites.impl.dialogs.EditSavedSiteDialogFragment
 import com.duckduckgo.voice.api.VoiceSearchAvailability
 import javax.inject.Inject
+import kotlin.collections.plusAssign
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
@@ -79,7 +80,6 @@ import kotlinx.coroutines.withContext
 import logcat.LogPriority.WARN
 import logcat.asLog
 import logcat.logcat
-import kotlin.collections.plusAssign
 
 data class SystemSearchResult(
     val autocomplete: AutoCompleteResult,
@@ -212,14 +212,14 @@ class SystemSearchViewModel @Inject constructor(
                 favorites.filter { it.id !in hiddenIds.favorites }
             }
         }.flowOn(dispatchers.io())
-        .onEach { filteredFavourites ->
-            withContext(dispatchers.main()) {
-                latestQuickAccessItems =
-                    Suggestions.QuickAccessItems(filteredFavourites.map { FavoritesQuickAccessAdapter.QuickAccessFavorite(it) })
-                resultsViewState.postValue(latestQuickAccessItems)
+            .onEach { filteredFavourites ->
+                withContext(dispatchers.main()) {
+                    latestQuickAccessItems =
+                        Suggestions.QuickAccessItems(filteredFavourites.map { FavoritesQuickAccessAdapter.QuickAccessFavorite(it) })
+                    resultsViewState.postValue(latestQuickAccessItems)
+                }
             }
-        }
-        .launchIn(viewModelScope)
+            .launchIn(viewModelScope)
     }
 
     private fun currentOnboardingState(): OnboardingViewState = onboardingViewState.value!!
