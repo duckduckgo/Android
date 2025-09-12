@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.systemsearch
 
+import android.R.attr.logo
 import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
@@ -36,8 +37,10 @@ import androidx.core.text.toSpannable
 import androidx.core.view.isVisible
 import androidx.core.view.postDelayed
 import androidx.core.widget.NestedScrollView
+import androidx.lifecycle.Lifecycle.State.STARTED
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -49,7 +52,9 @@ import com.duckduckgo.app.browser.R.string
 import com.duckduckgo.app.browser.autocomplete.BrowserAutoCompleteSuggestionsAdapter
 import com.duckduckgo.app.browser.autocomplete.SuggestionItemDecoration
 import com.duckduckgo.app.browser.databinding.ActivitySystemSearchBinding
+import com.duckduckgo.app.browser.di.BrowserModule_GridViewColumnCalculatorFactory.gridViewColumnCalculator
 import com.duckduckgo.app.browser.favicon.FaviconManager
+import com.duckduckgo.app.browser.favicon.FaviconModule_FaviconManagerFactory.faviconManager
 import com.duckduckgo.app.browser.newtab.FavoritesQuickAccessAdapter
 import com.duckduckgo.app.browser.newtab.FavoritesQuickAccessAdapter.Companion.QUICK_ACCESS_GRID_MAX_COLUMNS
 import com.duckduckgo.app.browser.newtab.FavoritesQuickAccessAdapter.Companion.QUICK_ACCESS_ITEM_MAX_SIZE_DP
@@ -182,6 +187,7 @@ class SystemSearchActivity : DuckDuckGoActivity() {
         configureViewReferences(isOmnibarAtTop)
         configureOmnibar(isOmnibarAtTop)
         configureObservers()
+        configureFlowCollectors()
         configureOnboarding()
         configureAutoComplete()
         configureDeviceAppSuggestions()
@@ -244,25 +250,33 @@ class SystemSearchActivity : DuckDuckGoActivity() {
         }
     }
 
+    private fun configureFlowCollectors() {
+        lifecycleScope.launch {
+            repeatOnLifecycle(STARTED) {
+                launch {
+                    viewModel.suggestionsViewState.collectLatest {
+                        renderResultsViewState(it)
+                    }
+                }
+                launch {
+                    viewModel.omnibarViewState.collectLatest {
+                        renderOmnibarState(it)
+                    }
+                }
+                launch {
+                    viewModel.favoritesViewState.collectLatest {
+                        renderQuickAccessItems(it)
+                    }
+                }
+            }
+        }
+    }
+
     private fun configureObservers() {
         viewModel.onboardingViewState.observe(
             this,
             {
                 it?.let { renderOnboardingViewState(it) }
-            },
-        )
-        viewModel.resultsViewState.observe(
-            this,
-            {
-                when (it) {
-                    is SystemSearchViewModel.Suggestions.SystemSearchResultsViewState -> {
-                        renderResultsViewState(it)
-                    }
-
-                    is SystemSearchViewModel.Suggestions.QuickAccessItems -> {
-                        renderQuickAccessItems(it)
-                    }
-                }
             },
         )
         viewModel.command.observe(
@@ -271,12 +285,6 @@ class SystemSearchActivity : DuckDuckGoActivity() {
                 processCommand(it)
             },
         )
-
-        lifecycleScope.launch {
-            viewModel.omnibarViewState.flowWithLifecycle(lifecycle).collectLatest {
-                renderOmnibarState(it)
-            }
-        }
     }
 
     private fun configureOnboarding() {

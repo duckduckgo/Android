@@ -56,7 +56,6 @@ import com.duckduckgo.savedsites.impl.SavedSitesPixelName
 import com.duckduckgo.savedsites.impl.dialogs.EditSavedSiteDialogFragment
 import com.duckduckgo.voice.api.VoiceSearchAvailability
 import javax.inject.Inject
-import kotlin.collections.plusAssign
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
@@ -64,6 +63,8 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.debounce
@@ -74,6 +75,7 @@ import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -125,14 +127,20 @@ class SystemSearchViewModel @Inject constructor(
             val appResults: List<DeviceApp> = emptyList(),
         ) : Suggestions()
 
-        data class QuickAccessItems(val favorites: List<FavoritesQuickAccessAdapter.QuickAccessFavorite>) : Suggestions()
+        data class QuickAccessItems(val favorites: List<FavoritesQuickAccessAdapter.QuickAccessFavorite> = emptyList()) : Suggestions()
     }
+
+    data class HiddenBookmarksIds(val favorites: List<String> = emptyList())
 
     sealed class Command {
         data object ClearInputText : Command()
         data object LaunchDuckDuckGo : Command()
         data class LaunchBrowser(val query: String) : Command()
-        data class LaunchBrowserAndSwitchToTab(val query: String, val tabId: String) : Command()
+        data class LaunchBrowserAndSwitchToTab(
+            val query: String,
+            val tabId: String
+        ) : Command()
+
         data class LaunchEditDialog(val savedSite: SavedSite) : Command()
         data class DeleteFavoriteConfirmation(val savedSite: SavedSite) : Command()
         data class DeleteSavedSiteConfirmation(val savedSite: SavedSite) : Command()
@@ -146,13 +154,45 @@ class SystemSearchViewModel @Inject constructor(
     }
 
     val onboardingViewState: MutableLiveData<OnboardingViewState> = MutableLiveData()
-    val resultsViewState: MutableLiveData<Suggestions> = MutableLiveData()
     val command: SingleLiveEvent<Command> = SingleLiveEvent()
 
     @VisibleForTesting
     internal val queryFlow = MutableStateFlow("")
-
+    private val refreshTrigger = MutableSharedFlow<Unit>(replay = 1)
     private val voiceSearchState = MutableSharedFlow<Unit>(replay = 1)
+    private val hiddenIds = MutableStateFlow(HiddenBookmarksIds())
+
+    private var hasUserSeenHistory = false
+    private var omnibarPosition: OmnibarPosition = appSettingsPreferencesStore.omnibarPosition
+
+    @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
+    val suggestionsViewState = combine(queryFlow, refreshTrigger) { query, _ -> query.trim() }
+        .debounce(DEBOUNCE_TIME_MS)
+        .distinctUntilChanged()
+        .flatMapLatest { query ->
+            buildResultsFlow(query)
+        }
+        .flowOn(dispatchers.io())
+        .catch { t: Throwable? -> logcat(WARN) { "Failed to get search results: ${t?.asLog()}" } }
+        .map { results ->
+            updateResults(results)
+        }
+        .stateIn(viewModelScope, SharingStarted.Lazily, Suggestions.SystemSearchResultsViewState())
+
+    val favoritesViewState = combine(
+        flow = savedSitesRepository.getFavorites(),
+        flow2 = hiddenIds,
+        queryFlow
+    ) { favorites, hiddenIds, query ->
+        if (query.isEmpty()) {
+            favorites.filter { it.id !in hiddenIds.favorites }
+        } else {
+            emptyList()
+        }
+    }.map { favorites ->
+        Suggestions.QuickAccessItems(favorites = favorites.map { favorite -> FavoritesQuickAccessAdapter.QuickAccessFavorite(favorite) })
+    }.stateIn(viewModelScope, SharingStarted.Lazily, Suggestions.QuickAccessItems())
+
     val omnibarViewState = combine(
         flow = voiceSearchState.map { voiceSearchAvailability.isVoiceSearchAvailable },
         flow2 = queryFlow,
@@ -163,76 +203,25 @@ class SystemSearchViewModel @Inject constructor(
             isDuckAiButtonVisible = isDuckAiEnabled,
             isClearButtonVisible = query.isNotEmpty(),
         )
-    }
-
-    private val refreshTrigger = MutableSharedFlow<Unit>(replay = 1)
-    private var results = SystemSearchResult(AutoCompleteResult("", emptyList()), emptyList())
-    private var resultsJob = ConflatedJob()
-    private var latestQuickAccessItems: Suggestions.QuickAccessItems = Suggestions.QuickAccessItems(emptyList())
-    private var hasUserSeenHistory = false
-
-    val hiddenIds = MutableStateFlow(HiddenBookmarksIds())
-
-    data class HiddenBookmarksIds(val favorites: List<String> = emptyList())
-
-    private var appsJob: Job? = null
-
-    private var omnibarPosition: OmnibarPosition = appSettingsPreferencesStore.omnibarPosition
-
-    @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
-    private val resultsFlow = combine(
-        queryFlow
-            .debounce(DEBOUNCE_TIME_MS)
-            .distinctUntilChanged(),
-        refreshTrigger,
-    ) { query, _ -> query }
-        .flatMapLatest { buildResultsFlow(query = it) }
-        .flowOn(dispatchers.io())
-        .onEach { result ->
-            updateResults(result)
-        }
-        .flowOn(dispatchers.main())
-        .catch { t: Throwable? -> logcat(WARN) { "Failed to get search results: ${t?.asLog()}" } }
+    }.stateIn(viewModelScope, SharingStarted.Lazily, OmnibarViewState())
 
     init {
         resetViewState()
-        configureResults()
         refreshAppList()
-        configureFavorites()
-
-        refreshTrigger.tryEmit(Unit)
-    }
-
-    private fun configureFavorites() {
-        combine(savedSitesRepository.getFavorites(), hiddenIds, resultsFlow) { favorites, hiddenIds, results ->
-            // Only show favorites when there are no search results
-            if (results.autocomplete.suggestions.isNotEmpty() || results.deviceApps.isNotEmpty()) {
-                emptyList()
-            } else {
-                favorites.filter { it.id !in hiddenIds.favorites }
-            }
-        }.flowOn(dispatchers.io())
-            .onEach { filteredFavourites ->
-                withContext(dispatchers.main()) {
-                    latestQuickAccessItems =
-                        Suggestions.QuickAccessItems(filteredFavourites.map { FavoritesQuickAccessAdapter.QuickAccessFavorite(it) })
-                    resultsViewState.postValue(latestQuickAccessItems)
-                }
-            }
-            .launchIn(viewModelScope)
     }
 
     private fun currentOnboardingState(): OnboardingViewState = onboardingViewState.value!!
-    private fun currentResultsState(): Suggestions = resultsViewState.value!!
 
     fun resetViewState() {
         command.value = Command.ClearInputText
         viewModelScope.launch {
             resetOnboardingState()
         }
-        resetResultsState()
+
         queryFlow.update { "" }
+
         voiceSearchState.tryEmit(Unit)
+        refreshTrigger.tryEmit(Unit)
     }
 
     private suspend fun resetOnboardingState() {
@@ -241,16 +230,6 @@ class SystemSearchViewModel @Inject constructor(
         if (showOnboarding) {
             pixel.fire(INTERSTITIAL_ONBOARDING_SHOWN)
         }
-    }
-
-    private fun resetResultsState() {
-        results = SystemSearchResult(AutoCompleteResult("", emptyList()), emptyList())
-        appsJob?.cancel()
-        resultsViewState.value = latestQuickAccessItems
-    }
-
-    private fun configureResults() {
-        resultsJob += resultsFlow.launchIn(viewModelScope)
     }
 
     private fun buildResultsFlow(query: String): Flow<SystemSearchResult> {
@@ -304,52 +283,26 @@ class SystemSearchViewModel @Inject constructor(
     }
 
     fun userUpdatedQuery(query: String) {
-        appsJob?.cancel()
-
-        if (query.isBlank()) {
-            inputCleared()
-            return
-        }
-
         if (autoCompleteSettings.autoCompleteSuggestionsEnabled) {
-            val trimmedQuery = query.trim()
-            queryFlow.value = trimmedQuery
+            queryFlow.update { query }
         }
     }
 
-    private fun updateResults(results: SystemSearchResult) {
-        this.results = results
-
+    private fun updateResults(results: SystemSearchResult): Suggestions.SystemSearchResultsViewState {
         val suggestions = results.autocomplete.suggestions
         val appResults = results.deviceApps
         val hasMultiResults = suggestions.isNotEmpty() && appResults.isNotEmpty()
 
         val updatedSuggestions = if (hasMultiResults) suggestions.take(RESULTS_MAX_RESULTS_PER_GROUP) else suggestions
         val updatedApps = if (hasMultiResults) appResults.take(RESULTS_MAX_RESULTS_PER_GROUP) else appResults
-        resultsViewState.postValue(
-            when (val currentResultsState = currentResultsState()) {
-                is Suggestions.SystemSearchResultsViewState -> {
-                    currentResultsState.copy(
-                        autocompleteResults = AutoCompleteResult(results.autocomplete.query, updatedSuggestions),
-                        appResults = updatedApps,
-                    )
-                }
-
-                is Suggestions.QuickAccessItems -> {
-                    Suggestions.SystemSearchResultsViewState(
-                        autocompleteResults = AutoCompleteResult(results.autocomplete.query, updatedSuggestions),
-                        appResults = updatedApps,
-                    )
-                }
-            },
+        return Suggestions.SystemSearchResultsViewState(
+            autocompleteResults = AutoCompleteResult(results.autocomplete.query, updatedSuggestions),
+            appResults = updatedApps,
         )
     }
 
     private fun inputCleared() {
-        if (autoCompleteSettings.autoCompleteSuggestionsEnabled) {
-            queryFlow.value = ""
-        }
-        resetResultsState()
+        queryFlow.update { "" }
     }
 
     fun userTappedDax() {
@@ -452,11 +405,6 @@ class SystemSearchViewModel @Inject constructor(
         viewModelScope.launch(dispatchers.io()) {
             deviceAppLookup.refreshAppList()
         }
-    }
-
-    override fun onCleared() {
-        resultsJob.cancel()
-        super.onCleared()
     }
 
     fun onQuickAccessListChanged(newList: List<FavoritesQuickAccessAdapter.QuickAccessFavorite>) {
