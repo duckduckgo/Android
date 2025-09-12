@@ -226,7 +226,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:overScrollMode="never"
-                android:paddingTop="@dimen/keyline_2"
+                android:padding="@dimen/keyline_2"
                 tools:itemCount="8"
                 tools:listItem="@layout/view_quick_access_item"
                 tools:showIn="@layout/activity_system_search"
