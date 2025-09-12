@@ -108,7 +108,7 @@ class RealDuckChatTest {
                 mockPixel,
                 imageUploadFeature,
                 mockBrowserNav,
-                mockNewAddressBarOptionRepository
+                mockNewAddressBarOptionRepository,
             ),
         )
         coroutineRule.testScope.advanceUntilIdle()
