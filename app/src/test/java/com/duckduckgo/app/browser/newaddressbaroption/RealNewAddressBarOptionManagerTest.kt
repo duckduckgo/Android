@@ -193,6 +193,38 @@ class RealNewAddressBarOptionManagerTest {
         verify(newAddressBarOptionBottomSheetDialogFactoryMock, never()).create(any(), any())
     }
 
+    @Test
+    fun `when has not been checked before then showDialog does not show dialog and marks as checked`() = runTest {
+        setupAllConditionsMet()
+        whenever(newAddressBarOptionRepositoryMock.hasBeenChecked()).thenReturn(false)
+
+        testee.showDialog(mock(), launchedFromExternal = false, isLightModeEnabled = true)
+
+        verify(newAddressBarOptionBottomSheetDialogFactoryMock, never()).create(any(), any())
+        verify(newAddressBarOptionRepositoryMock).markAsChecked()
+    }
+
+    @Test
+    fun `when has been checked before then showDialog shows dialog`() = runTest {
+        setupAllConditionsMet()
+
+        testee.showDialog(mock(), launchedFromExternal = false, isLightModeEnabled = true)
+
+        verify(newAddressBarOptionBottomSheetDialogFactoryMock).create(any(), any())
+    }
+
+    @Test
+    fun `when is disabled then markAsChecked is not called`() = runTest {
+        setupAllConditionsMet()
+        showNewAddressBarOptionAnnouncementFlow.value = false
+        whenever(newAddressBarOptionRepositoryMock.hasBeenChecked()).thenReturn(false)
+
+        testee.showDialog(mock(), launchedFromExternal = false, isLightModeEnabled = true)
+
+        verify(newAddressBarOptionRepositoryMock, never()).markAsChecked()
+        verify(newAddressBarOptionBottomSheetDialogFactoryMock, never()).create(any(), any())
+    }
+
     private suspend fun setupAllConditionsMet() {
         whenever(duckChatMock.isEnabled()).thenReturn(true)
         whenever(userStageStoreMock.getUserAppStage()).thenReturn(AppStage.ESTABLISHED)
@@ -202,5 +234,6 @@ class RealNewAddressBarOptionManagerTest {
         whenever(newAddressBarOptionRepositoryMock.hasBeenShown()).thenReturn(false)
         whenever(remoteMessagingRepositoryMock.dismissedMessages()).thenReturn(emptyList())
         whenever(settingsDataStoreMock.omnibarPosition).thenReturn(OmnibarPosition.TOP)
+        whenever(newAddressBarOptionRepositoryMock.hasBeenChecked()).thenReturn(true)
     }
 }
