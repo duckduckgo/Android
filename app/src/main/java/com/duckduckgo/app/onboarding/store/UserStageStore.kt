@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.onboarding.store
 
+import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.common.utils.DispatcherProvider
 import javax.inject.Inject
 import kotlinx.coroutines.flow.Flow
@@ -33,6 +34,7 @@ interface UserStageStore {
 class AppUserStageStore @Inject constructor(
     private val userStageDao: UserStageDao,
     private val dispatcher: DispatcherProvider,
+    private val androidBrowserConfigFeature: AndroidBrowserConfigFeature,
 ) : UserStageStore {
 
     override fun userAppStageFlow(): Flow<AppStage> {
@@ -48,6 +50,10 @@ class AppUserStageStore @Inject constructor(
 
     override suspend fun stageCompleted(appStage: AppStage): AppStage {
         return withContext(dispatcher.io()) {
+            if (getUserAppStage() == AppStage.ESTABLISHED && androidBrowserConfigFeature.establishedAppStageGuard().isEnabled()) {
+                return@withContext AppStage.ESTABLISHED
+            }
+
             val newAppStage = when (appStage) {
                 AppStage.NEW -> AppStage.DAX_ONBOARDING
                 AppStage.DAX_ONBOARDING -> AppStage.ESTABLISHED
