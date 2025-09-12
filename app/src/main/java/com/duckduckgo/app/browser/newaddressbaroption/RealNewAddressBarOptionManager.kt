@@ -56,7 +56,7 @@ class RealNewAddressBarOptionManager(
             isSubsequentLaunch() &&
             !isDuckAiOmnibarShortcutDisabled() &&
             !isInputScreenEnabled() &&
-            !hasForceChoiceBeenShown() &&
+            !hasNewAddressBarOptionBeenShown() &&
             !launchedFromExternal &&
             !interstitialScreen &&
             !hasInteractedWithSearchAndDuckAiAnnouncement() &&
@@ -104,9 +104,9 @@ class RealNewAddressBarOptionManager(
             logcat(DEBUG) { "NewAddressBarOptionManager: isInputScreenEnabled: $it" }
         }
 
-    private suspend fun hasForceChoiceBeenShown(): Boolean =
+    private suspend fun hasNewAddressBarOptionBeenShown(): Boolean =
         newAddressBarOptionRepository.hasBeenShown().also {
-            logcat(DEBUG) { "NewAddressBarOptionManager: hasForceChoiceBeenShown: $it" }
+            logcat(DEBUG) { "NewAddressBarOptionManager: hasNewAddressBarOption: $it" }
         }
 
     private fun hasInteractedWithSearchAndDuckAiAnnouncement(): Boolean =

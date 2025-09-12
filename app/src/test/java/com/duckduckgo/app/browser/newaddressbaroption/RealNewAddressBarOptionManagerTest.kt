@@ -173,7 +173,7 @@ class RealNewAddressBarOptionManagerTest {
     }
 
     @Test
-    fun `when force choice has been shown then showDialog does not show dialog`() = runTest {
+    fun `when new address bar option has been shown then showDialog does not show dialog`() = runTest {
         setupAllConditionsMet()
         whenever(newAddressBarOptionRepositoryMock.hasBeenShown()).thenReturn(true)
 
