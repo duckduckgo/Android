@@ -22,6 +22,8 @@ import javax.inject.Inject
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
+import logcat.LogPriority.DEBUG
+import logcat.logcat
 
 interface UserStageStore {
     fun userAppStageFlow(): Flow<AppStage>
@@ -50,7 +52,9 @@ class AppUserStageStore @Inject constructor(
 
     override suspend fun stageCompleted(appStage: AppStage): AppStage {
         return withContext(dispatcher.io()) {
-            if (getUserAppStage() == AppStage.ESTABLISHED && androidBrowserConfigFeature.establishedAppStageGuard().isEnabled()) {
+            val currentStage = getUserAppStage()
+            if (currentStage == AppStage.ESTABLISHED && androidBrowserConfigFeature.establishedAppStageGuard().isEnabled()) {
+                logcat(DEBUG) { "UserStageStore: User is already ESTABLISHED (currentStage=$currentStage, requestedStage=$appStage), returning ESTABLISHED" }
                 return@withContext AppStage.ESTABLISHED
             }
 
