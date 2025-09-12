@@ -47,6 +47,7 @@ class RealNewAddressBarOptionManager(
         return isDuckAiEnabled() &&
             isOnboardingCompleted() &&
             isFeatureFlagEnabled() &&
+            isSubsequentLaunch() &&
             !isDuckAiOmnibarShortcutDisabled() &&
             !isInputScreenEnabled() &&
             !hasForceChoiceBeenShown() &&
@@ -100,5 +101,14 @@ class RealNewAddressBarOptionManager(
 
     private fun hasBottomAddressBarEnabled(): Boolean {
         return settingsDataStore.omnibarPosition == OmnibarPosition.BOTTOM
+    }
+
+    private suspend fun isSubsequentLaunch(): Boolean {
+        if (newAddressBarOptionRepository.hasBeenChecked()) {
+            return true
+        } else {
+            newAddressBarOptionRepository.markAsChecked()
+            return false
+        }
     }
 }

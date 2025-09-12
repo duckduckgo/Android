@@ -31,7 +31,9 @@ import kotlinx.coroutines.withContext
 
 interface NewAddressBarOptionDataStore {
     suspend fun markAsShown()
-    suspend fun getHasBeenShown(): Boolean
+    suspend fun hasBeenShown(): Boolean
+    suspend fun markAsChecked()
+    suspend fun hasBeenChecked(): Boolean
 }
 
 @SingleInstanceIn(AppScope::class)
@@ -43,6 +45,7 @@ class SharedPreferencesNewAddressBarOptionDataStore @Inject constructor(
 
     private object Keys {
         val HAS_BEEN_SHOWN = booleanPreferencesKey(name = "NEW_ADDRESS_BAR_OPTION_SHOWN")
+        val HAS_FEATURE_FLAG_BEEN_CHECKED = booleanPreferencesKey(name = "NEW_ADDRESS_BAR_OPTION_FEATURE_FLAG_CHECKED")
     }
 
     override suspend fun markAsShown() {
@@ -53,7 +56,19 @@ class SharedPreferencesNewAddressBarOptionDataStore @Inject constructor(
         }
     }
 
-    override suspend fun getHasBeenShown(): Boolean = withContext(dispatchers.io()) {
+    override suspend fun hasBeenShown(): Boolean = withContext(dispatchers.io()) {
         dataStore.data.firstOrNull()?.let { it[Keys.HAS_BEEN_SHOWN] } ?: false
+    }
+
+    override suspend fun markAsChecked() {
+        withContext(dispatchers.io()) {
+            dataStore.edit { prefs ->
+                prefs[Keys.HAS_FEATURE_FLAG_BEEN_CHECKED] = true
+            }
+        }
+    }
+
+    override suspend fun hasBeenChecked(): Boolean = withContext(dispatchers.io()) {
+        dataStore.data.firstOrNull()?.let { it[Keys.HAS_FEATURE_FLAG_BEEN_CHECKED] } ?: false
     }
 }
