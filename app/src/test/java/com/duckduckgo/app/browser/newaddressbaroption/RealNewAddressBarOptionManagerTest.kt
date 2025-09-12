@@ -193,13 +193,6 @@ class RealNewAddressBarOptionManagerTest {
         verify(newAddressBarOptionBottomSheetDialogFactoryMock, never()).create(any(), any())
     }
 
-    @Test
-    fun `when mark as shown is called then repository mark as shown is called`() = runTest {
-        testee.markAsShown()
-
-        verify(newAddressBarOptionRepositoryMock).markAsShown()
-    }
-
     private suspend fun setupAllConditionsMet() {
         whenever(duckChatMock.isEnabled()).thenReturn(true)
         whenever(userStageStoreMock.getUserAppStage()).thenReturn(AppStage.ESTABLISHED)

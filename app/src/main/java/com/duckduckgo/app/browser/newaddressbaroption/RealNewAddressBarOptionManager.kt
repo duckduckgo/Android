@@ -26,12 +26,9 @@ import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.impl.inputscreen.newaddressbaroption.NewAddressBarOptionBottomSheetDialogFactory
 import com.duckduckgo.duckchat.impl.inputscreen.newaddressbaroption.NewAddressBarOptionRepository
 import com.duckduckgo.remote.messaging.api.RemoteMessagingRepository
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 
 interface NewAddressBarOptionManager {
     suspend fun showDialog(context: Context, launchedFromExternal: Boolean, isLightModeEnabled: Boolean)
-    suspend fun markAsShown()
 }
 
 class RealNewAddressBarOptionManager(
@@ -99,9 +96,5 @@ class RealNewAddressBarOptionManager(
 
     private fun hasBottomAddressBarEnabled(): Boolean {
         return settingsDataStore.omnibarPosition == OmnibarPosition.BOTTOM
-    }
-
-    override suspend fun markAsShown() = withContext(Dispatchers.IO) {
-        newAddressBarOptionRepository.markAsShown()
     }
 }
