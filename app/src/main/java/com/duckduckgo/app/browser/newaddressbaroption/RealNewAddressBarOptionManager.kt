@@ -32,7 +32,7 @@ import logcat.LogPriority.DEBUG
 import logcat.logcat
 
 interface NewAddressBarOptionManager {
-    suspend fun showDialog(context: Context, launchedFromExternal: Boolean, isLightModeEnabled: Boolean)
+    suspend fun showDialog(context: Context, launchedFromExternal: Boolean, interstitialScreen: Boolean, isLightModeEnabled: Boolean)
 }
 
 class RealNewAddressBarOptionManager(
@@ -45,7 +45,11 @@ class RealNewAddressBarOptionManager(
     private val newAddressBarOptionBottomSheetDialogFactory: NewAddressBarOptionBottomSheetDialogFactory,
 ) : NewAddressBarOptionManager {
 
-    private suspend fun shouldTrigger(launchedFromExternal: Boolean): Boolean {
+    private suspend fun shouldTrigger(launchedFromExternal: Boolean, interstitialScreen: Boolean): Boolean {
+        logcat(DEBUG) {
+            "NewAddressBarOptionManager: shouldTrigger: " +
+                "launchedFromExternal=$launchedFromExternal, interstitialScreen=$interstitialScreen"
+        }
         return isDuckAiEnabled() &&
             isOnboardingCompleted() &&
             isFeatureFlagEnabled() &&
@@ -54,6 +58,7 @@ class RealNewAddressBarOptionManager(
             !isInputScreenEnabled() &&
             !hasForceChoiceBeenShown() &&
             !launchedFromExternal &&
+            !interstitialScreen &&
             !hasInteractedWithSearchAndDuckAiAnnouncement() &&
             !hasBottomAddressBarEnabled()
     }
@@ -61,9 +66,10 @@ class RealNewAddressBarOptionManager(
     override suspend fun showDialog(
         context: Context,
         launchedFromExternal: Boolean,
+        interstitialScreen: Boolean,
         isLightModeEnabled: Boolean,
     ) {
-        if (shouldTrigger(launchedFromExternal)) {
+        if (shouldTrigger(launchedFromExternal, interstitialScreen)) {
             withContext(Dispatchers.Main) {
                 newAddressBarOptionBottomSheetDialogFactory.create(
                     context = context,
@@ -106,13 +112,19 @@ class RealNewAddressBarOptionManager(
     private fun hasInteractedWithSearchAndDuckAiAnnouncement(): Boolean =
         remoteMessagingRepository.dismissedMessages().let { dismissedMessages ->
             dismissedMessages.contains("search_duck_ai_announcement").also { result ->
-                logcat(DEBUG) { "NewAddressBarOptionManager: hasInteractedWithSearchAndDuckAiAnnouncement: dismissedMessages=$dismissedMessages, result=$result" }
+                logcat(DEBUG) {
+                    "NewAddressBarOptionManager: hasInteractedWithSearchAndDuckAiAnnouncement: " +
+                        "dismissedMessages=$dismissedMessages, result=$result"
+                }
             }
         }
 
     private fun hasBottomAddressBarEnabled(): Boolean =
         (settingsDataStore.omnibarPosition == OmnibarPosition.BOTTOM).also { result ->
-            logcat(DEBUG) { "NewAddressBarOptionManager: hasBottomAddressBarEnabled: omnibarPosition=${settingsDataStore.omnibarPosition}, result=$result" }
+            logcat(DEBUG) {
+                "NewAddressBarOptionManager: hasBottomAddressBarEnabled: " +
+                    "omnibarPosition=${settingsDataStore.omnibarPosition}, result=$result"
+            }
         }
 
     private suspend fun isSubsequentLaunch(): Boolean {

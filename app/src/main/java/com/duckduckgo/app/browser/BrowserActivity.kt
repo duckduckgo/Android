@@ -1084,6 +1084,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
                 newAddressBarOptionManager.showDialog(
                     context = this@BrowserActivity,
                     launchedFromExternal = intent.getBooleanExtra(LAUNCH_FROM_EXTERNAL_EXTRA, false),
+                    interstitialScreen = intent.getBooleanExtra(LAUNCH_FROM_INTERSTITIAL_EXTRA, false),
                     isLightModeEnabled = !isDarkThemeEnabled(),
                 )
             }
