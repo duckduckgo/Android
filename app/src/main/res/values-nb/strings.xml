@@ -126,6 +126,7 @@
     <!-- Fire -->
     <string name="fireMenu">Slett data</string>
     <string name="fireClearAll">Lukk alle faner og slett data</string>
+    <string name="fireClearAllPlusDuckChats">Fjern alle faner, data og Duck.ai-chatter</string>
     <string name="fireCancel">Avbryt</string>
     <string name="fireDataCleared">Data slettet</string>
 
@@ -234,6 +235,7 @@
     <string name="settingsAutomaticallyClearWhatOptionNone">Ingen</string>
     <string name="settingsAutomaticallyClearWhatOptionTabs">Faner</string>
     <string name="settingsAutomaticallyClearWhatOptionTabsAndData">Faner og data</string>
+    <string name="settingsAutomaticallyClearWhatOptionTabsAndDataAndChats">Faner, data og Duck.ai-chatter</string>
 
     <string name="settingsAutomaticallyClearWhen">Slett …</string>
     <string name="settingsAutomaticallyClearWhenDialogTitle">Slett …</string>
@@ -243,6 +245,8 @@
     <string name="settingsAutomaticallyClearWhenAppExit15Minutes">når appen lukkes eller har vært inaktiv i 15 minutter</string>
     <string name="settingsAutomaticallyClearWhenAppExit30Minutes">når appen lukkes eller har vært inaktiv i 30 minutter</string>
     <string name="settingsAutomaticallyClearWhenAppExit60Minutes">når appen lukkes eller har vært inaktiv i 1 time</string>
+    <string name="settingsClearAiDataTitle">Fjern Duck.ai-chatter</string>
+    <string name="settingsClearAiDataMessage">Fire Button sletter også Duck.ai-historikk</string>
 
     <!-- About Activity -->
     <string name="aboutActivityTitle">Om DuckDuckGo</string>
@@ -271,8 +275,8 @@
     <string name="searchWidgetEmtpyFavoritesHint">Ingen favoritter ennå</string>
     <string name="searchWidgetEmtpyFavoritesCta">Legg til favoritt</string>
     <string name="widgetConfigurationActivityTitle">Widget-konfigurasjon</string>
-    <string name="favoritesWidgetLabel">Favoritter</string>
-    <string name="searchWidgetLabel">Søk</string>
+    <string name="favoritesWidgetLabel">Søk og favoritter</string>
+    <string name="searchWidgetLabel">Søk og Duck.ai</string>
 
     <!-- Home Screen Shortcuts -->
     <string name="addToHome">Legg til på startskjermen</string>
