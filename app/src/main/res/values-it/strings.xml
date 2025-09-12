@@ -271,8 +271,8 @@
     <string name="searchWidgetEmtpyFavoritesHint">Non è stato ancora aggiunto alcun preferito</string>
     <string name="searchWidgetEmtpyFavoritesCta">Aggiungi preferito</string>
     <string name="widgetConfigurationActivityTitle">Configurazione widget</string>
-    <string name="favoritesWidgetLabel">Preferiti</string>
-    <string name="searchWidgetLabel">Ricerca</string>
+    <string name="favoritesWidgetLabel">Ricerca e Preferiti</string>
+    <string name="searchWidgetLabel">Cerca e Duck.ai</string>
 
     <!-- Home Screen Shortcuts -->
     <string name="addToHome">Aggiungi alla Schermata Home</string>
@@ -947,4 +947,10 @@
     <string name="tabSwitcherAnimationTileRemovalDialogPositiveButton">Nascondi</string>
     <string name="tabSwitcherAnimationTileRemovalDialogNegativeButton">Tieni</string>
 
+    <!-- Widgets -->
+    <string name="searchOnlyWidgetLabel" instruction="Label for the search-only widget">Solo ricerca</string>
+    <string name="searchOnlyWidgetDescription" instruction="Description for the search-only widget">Avvia rapidamente una ricerca privata con DuckDuckGo.</string>
+    <string name="searchWidgetDescription" instruction="Description for the search widget, which may include Duck.ai and voice search">Cerca privatamente con DuckDuckGo o chiedi a Duck.ai. Ricerca vocale e Duck.ai disponibili se abilitati.</string>
+    <string name="searchAndFavoritesWidgetDescription" instruction="Description for the search and favorites widget">Cerca o visita i tuoi siti preferiti in privato con un tocco. Ricerca vocale e Duck.ai disponibili se abilitati.</string>
+    <string name="duckAiOnlyPinShortcutLabel" instruction="Label for the Duck.ai pinned shortcut. Should be Duck.ai in all languages">Duck.ai</string>
 </resources>
