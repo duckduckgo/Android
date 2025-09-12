@@ -53,8 +53,10 @@ class AppUserStageStore @Inject constructor(
     override suspend fun stageCompleted(appStage: AppStage): AppStage {
         return withContext(dispatcher.io()) {
             val currentStage = getUserAppStage()
-            if (currentStage == AppStage.ESTABLISHED && androidBrowserConfigFeature.establishedAppStageGuard().isEnabled()) {
-                logcat(DEBUG) { "UserStageStore: User is already ESTABLISHED (currentStage=$currentStage, requestedStage=$appStage), returning ESTABLISHED" }
+            if (currentStage == AppStage.ESTABLISHED &&
+                androidBrowserConfigFeature.establishedAppStageGuard().isEnabled()
+            ) {
+                logcat(DEBUG) { "UserStageStore: User is already ESTABLISHED, returning ESTABLISHED" }
                 return@withContext AppStage.ESTABLISHED
             }
 
@@ -65,6 +67,7 @@ class AppUserStageStore @Inject constructor(
             }
 
             if (newAppStage != appStage) {
+                logcat(DEBUG) { "UserStageStore: currentStage=$currentStage, newAppStage=$newAppStage" }
                 userStageDao.updateUserStage(newAppStage)
             }
 
