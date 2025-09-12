@@ -47,7 +47,6 @@
                 app:secondaryText="@string/settingsHeroFireAnimation" />
 
             <com.duckduckgo.common.ui.view.divider.HorizontalDivider
-                android:id="@+id/addressBarPositionSettingDivider"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
 
@@ -56,6 +55,10 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:primaryText="@string/settingsFireproofWebsites" />
+
+            <com.duckduckgo.common.ui.view.divider.HorizontalDivider
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
 
             <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
                 android:id="@+id/automaticallyClearWhatSetting"
@@ -71,6 +74,10 @@
                 android:layout_height="wrap_content"
                 app:primaryText="@string/settingsAutomaticallyClearWhen"
                 tools:secondaryText="test test test" />
+
+            <com.duckduckgo.common.ui.view.divider.HorizontalDivider
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
 
             <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
                 android:id="@+id/clearDuckAiDataSetting"
