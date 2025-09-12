@@ -22,9 +22,13 @@ import javax.inject.Inject
 
 @SingleInstanceIn(AppScope::class)
 class SwipingTabsFeatureProvider @Inject constructor(
-    swipingTabsFeature: SwipingTabsFeature,
+    private val swipingTabsFeature: SwipingTabsFeature,
 ) {
     val isEnabled: Boolean by lazy {
         swipingTabsFeature.self().isEnabled() && swipingTabsFeature.enabledForUsers().isEnabled()
+    }
+
+    fun applyAutofillFixEnabled(): Boolean {
+        return swipingTabsFeature.applyAutofillFix().isEnabled()
     }
 }

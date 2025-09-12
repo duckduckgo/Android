@@ -29,6 +29,7 @@ import android.os.SystemClock
 import android.view.KeyEvent
 import android.view.MotionEvent
 import android.view.View
+import android.view.View.IMPORTANT_FOR_AUTOFILL_YES
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.ActivityResult
@@ -121,6 +122,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import logcat.LogPriority.ERROR
 import logcat.LogPriority.INFO
 import logcat.LogPriority.VERBOSE
@@ -1083,6 +1085,8 @@ open class BrowserActivity : DuckDuckGoActivity() {
             tabPager.registerOnPageChangeCallback(onTabPageChangeListener)
             tabPager.setPageTransformer(MarginPageTransformer(resources.getDimension(com.duckduckgo.mobile.android.R.dimen.keyline_1).toPx().toInt()))
 
+            configureViewPagerForSystemAutofill(tabPager)
+
             savedInstanceState?.getBundle(KEY_TAB_PAGER_STATE)?.let {
                 tabPagerAdapter.restore(it)
             }
@@ -1090,6 +1094,25 @@ open class BrowserActivity : DuckDuckGoActivity() {
 
         binding.fragmentContainer.isVisible = !swipingTabsFeature.isEnabled
         tabPager.isVisible = swipingTabsFeature.isEnabled
+    }
+
+    private fun configureViewPagerForSystemAutofill(viewPager: ViewPager2) {
+        lifecycleScope.launch {
+            val applyAutofillFix = withContext(dispatcherProvider.io()) {
+                swipingTabsFeature.applyAutofillFixEnabled()
+            }
+
+            // Configure the internal RecyclerView - wait for layout to complete
+            if (applyAutofillFix) {
+                logcat(VERBOSE) { "Applying autofill fix to ViewPager2" }
+
+                viewPager.post {
+                    (viewPager.getChildAt(0) as? androidx.recyclerview.widget.RecyclerView)?.let {
+                        it.importantForAutofill = IMPORTANT_FOR_AUTOFILL_YES
+                    }
+                }
+            }
+        }
     }
 
     private val Intent.launchedFromRecents: Boolean
