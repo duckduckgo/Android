@@ -50,23 +50,17 @@ class NewAddressBarOptionBottomSheetDialog(
 
     private var searchAndDuckAiSelected = true
     private var originalOrientation: Int = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
+    private var isLottieLoaded = false
+    private var pendingShow = false
 
     init {
         setContentView(binding.root)
-        this.behavior.state = BottomSheetBehavior.STATE_EXPANDED
         this.behavior.isDraggable = false
-        this.behavior.skipCollapsed = true
         this.behavior.peekHeight = 0
         this.behavior.maxHeight = 900.toPx()
 
         setOnShowListener {
-            val bottomSheet =
-                findViewById<FrameLayout>(com.google.android.material.R.id.design_bottom_sheet)
-            bottomSheet?.layoutParams = bottomSheet?.layoutParams?.apply {
-                height = ViewGroup.LayoutParams.MATCH_PARENT
-            }
             setRoundCorners()
-            lockOrientationToPortrait()
             duckChatInternal.onNewAddressBarOptionShown()
         }
 
@@ -92,6 +86,19 @@ class NewAddressBarOptionBottomSheetDialog(
             restoreOrientation()
             dismiss()
         }
+    }
+
+    override fun onCreate(savedInstanceState: android.os.Bundle?) {
+        super.onCreate(savedInstanceState)
+
+        val bottomSheet = findViewById<FrameLayout>(com.google.android.material.R.id.design_bottom_sheet)
+        bottomSheet?.layoutParams = bottomSheet?.layoutParams?.apply {
+            height = ViewGroup.LayoutParams.MATCH_PARENT
+        }
+        setRoundCorners()
+        lockOrientationToPortrait()
+
+        this.behavior.state = BottomSheetBehavior.STATE_EXPANDED
     }
 
     private fun setupSelectionLogic() {
@@ -153,7 +160,15 @@ class NewAddressBarOptionBottomSheetDialog(
         lottieView.setAnimation(animationResource)
 
         lottieView.addLottieOnCompositionLoadedListener { composition ->
-            playIntroThenLoop(lottieView, composition.durationFrames.toInt())
+            isLottieLoaded = true
+            lottieView.postDelayed({
+                playIntroThenLoop(lottieView, composition.durationFrames.toInt())
+            }, 100,)
+
+            if (pendingShow) {
+                pendingShow = false
+                show()
+            }
         }
     }
 
@@ -210,6 +225,19 @@ class NewAddressBarOptionBottomSheetDialog(
     private fun restoreOrientation() {
         (context as? Activity)?.let {
             it.requestedOrientation = originalOrientation
+        }
+    }
+
+    override fun show() {
+        val lottieView = binding.newAddressBarOptionBottomSheetDialogAnimation
+        if (isLottieLoaded || lottieView.composition != null) {
+            if (!isLottieLoaded) {
+                isLottieLoaded = true
+                playIntroThenLoop(lottieView, lottieView.composition!!.durationFrames.toInt())
+            }
+            super.show()
+        } else {
+            pendingShow = true
         }
     }
 
