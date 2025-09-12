@@ -25,7 +25,7 @@ import kotlinx.coroutines.withContext
 
 interface NewAddressBarOptionRepository {
     suspend fun markAsShown()
-    suspend fun getHasBeenShown(): Boolean
+    suspend fun hasBeenShown(): Boolean
 }
 
 @SingleInstanceIn(AppScope::class)
@@ -39,7 +39,7 @@ class RealNewAddressBarOptionRepository @Inject constructor(
         newAddressBarOptionDataStore.markAsShown()
     }
 
-    override suspend fun getHasBeenShown(): Boolean = withContext(dispatchers.io()) {
+    override suspend fun hasBeenShown(): Boolean = withContext(dispatchers.io()) {
         newAddressBarOptionDataStore.getHasBeenShown()
     }
 }

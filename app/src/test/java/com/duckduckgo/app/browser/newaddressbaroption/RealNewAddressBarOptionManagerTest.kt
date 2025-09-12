@@ -166,7 +166,7 @@ class RealNewAddressBarOptionManagerTest {
     @Test
     fun `when force choice has been shown then showDialog does not show dialog`() = runTest {
         setupAllConditionsMet()
-        whenever(newAddressBarOptionRepositoryMock.getHasBeenShown()).thenReturn(true)
+        whenever(newAddressBarOptionRepositoryMock.hasBeenShown()).thenReturn(true)
 
         testee.showDialog(mock(), launchedFromExternal = false, isLightModeEnabled = true)
 
@@ -199,7 +199,7 @@ class RealNewAddressBarOptionManagerTest {
         showNewAddressBarOptionAnnouncementFlow.value = true
         showOmnibarShortcutInAllStatesFlow.value = true
         showInputScreenFlow.value = false
-        whenever(newAddressBarOptionRepositoryMock.getHasBeenShown()).thenReturn(false)
+        whenever(newAddressBarOptionRepositoryMock.hasBeenShown()).thenReturn(false)
         whenever(remoteMessagingRepositoryMock.dismissedMessages()).thenReturn(emptyList())
         whenever(settingsDataStoreMock.omnibarPosition).thenReturn(OmnibarPosition.TOP)
     }

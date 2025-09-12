@@ -87,7 +87,7 @@ class RealNewAddressBarOptionManager(
     }
 
     private suspend fun hasForceChoiceBeenShown(): Boolean {
-        return newAddressBarOptionRepository.getHasBeenShown()
+        return newAddressBarOptionRepository.hasBeenShown()
     }
 
     private fun hasInteractedWithSearchAndDuckAiAnnouncement(): Boolean {
