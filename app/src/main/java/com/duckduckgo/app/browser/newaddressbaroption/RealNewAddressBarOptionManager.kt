@@ -26,6 +26,8 @@ import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.impl.inputscreen.newaddressbaroption.NewAddressBarOptionBottomSheetDialogFactory
 import com.duckduckgo.duckchat.impl.inputscreen.newaddressbaroption.NewAddressBarOptionRepository
 import com.duckduckgo.remote.messaging.api.RemoteMessagingRepository
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 interface NewAddressBarOptionManager {
     suspend fun showDialog(context: Context, launchedFromExternal: Boolean, isLightModeEnabled: Boolean)
@@ -59,10 +61,12 @@ class RealNewAddressBarOptionManager(
         isLightModeEnabled: Boolean,
     ) {
         if (shouldTrigger(launchedFromExternal)) {
-            newAddressBarOptionBottomSheetDialogFactory.create(
-                context = context,
-                isLightModeEnabled = isLightModeEnabled,
-            ).show()
+            withContext(Dispatchers.Main) {
+                newAddressBarOptionBottomSheetDialogFactory.create(
+                    context = context,
+                    isLightModeEnabled = isLightModeEnabled,
+                ).show()
+            }
         }
     }
 
