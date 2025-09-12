@@ -403,6 +403,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
             delay(DUCK_AI_ANIM_READY_DELAY_MS)
             duckAiShouldAnimate = true
         }
+        showNewAddressBarOptionAnnouncement()
     }
 
     override fun onStop() {
@@ -1073,7 +1074,6 @@ open class BrowserActivity : DuckDuckGoActivity() {
                 logcat(INFO) { "Original instance state is null, so will inspect intent for actions to take. $intent" }
                 launchNewSearchOrQuery(intent)
                 processedOriginalIntent = true
-                showNewAddressBarOptionAnnouncement()
             }
         }
     }
