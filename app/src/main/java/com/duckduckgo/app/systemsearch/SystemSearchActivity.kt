@@ -388,19 +388,10 @@ class SystemSearchActivity : DuckDuckGoActivity() {
     }
 
     private fun configureOmnibar() {
-        val toolbarSize = resources.getDimensionPixelSize(com.duckduckgo.mobile.android.R.dimen.toolbarSize)
         if (isOmnibarAtTop) {
             binding.rootView.removeView(binding.appBarLayoutBottom)
-            binding.results.updatePadding(top = toolbarSize)
-            binding.quickAccessRecyclerView.updateLayoutParams<CoordinatorLayout.LayoutParams> {
-                topMargin = toolbarSize
-            }
         } else {
             binding.rootView.removeView(binding.appBarLayout)
-            binding.results.updatePadding(bottom = toolbarSize)
-            binding.quickAccessRecyclerView.updateLayoutParams<CoordinatorLayout.LayoutParams> {
-                bottomMargin = toolbarSize
-            }
         }
         viewModel.onOmnibarConfigured(settingsDataStore.omnibarPosition)
     }

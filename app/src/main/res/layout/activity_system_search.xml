@@ -15,9 +15,10 @@
   ~ limitations under the License.
   -->
 
-<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
     android:id="@+id/rootView"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
@@ -25,8 +26,11 @@
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/appBarLayout"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="?attr/actionBarSize"
         android:outlineProvider="none"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
         android:theme="@style/Widget.DuckDuckGo.ToolbarTheme">
 
         <LinearLayout
@@ -191,30 +195,19 @@
                     </com.google.android.material.card.MaterialCardView>
                 </androidx.appcompat.widget.Toolbar>
             </androidx.constraintlayout.widget.ConstraintLayout>
-            <View
-                android:id="@+id/bottomBrowserOutlineStroke"
-                android:layout_width="match_parent"
-                android:layout_height="0.5dp"
-                android:background="?attr/daxColorShade"
-                android:elevation="20dp" />
+
         </LinearLayout>
     </com.google.android.material.appbar.AppBarLayout>
-
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/quickAccessRecyclerView"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:overScrollMode="never"
-        tools:itemCount="8"
-        tools:listItem="@layout/view_quick_access_item"
-        tools:showIn="@layout/activity_system_search"
-        tools:spanCount="4" />
 
     <androidx.core.widget.NestedScrollView
         android:id="@+id/results"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginVertical="@dimen/keyline_2"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        app:layout_constraintTop_toBottomOf="@id/appBarLayout"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/appBarLayoutBottom"
         android:clipToPadding="false">
 
         <androidx.constraintlayout.widget.ConstraintLayout
@@ -225,12 +218,28 @@
             android:clipToPadding="false">
 
             <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/autocompleteSuggestions"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
+                android:id="@+id/quickAccessRecyclerView"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:overScrollMode="never"
+                tools:itemCount="8"
+                tools:listItem="@layout/view_quick_access_item"
+                tools:showIn="@layout/activity_system_search"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="1.0"
                 app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:spanCount="4" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/autocompleteSuggestions"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:overScrollMode="never"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="1.0"
+                app:layout_constraintStart_toStartOf="parent"
+                android:nestedScrollingEnabled="false"
                 app:layout_constraintTop_toTopOf="parent"
                 tools:itemCount="4"
                 tools:listitem="@layout/item_autocomplete_search_suggestion" />
@@ -251,6 +260,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/keyline_2"
+                android:overScrollMode="never"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/listDivider"
@@ -267,18 +277,13 @@
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/appBarLayoutBottom"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="?attr/actionBarSize"
         android:layout_gravity="bottom"
         android:outlineProvider="none"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
         android:theme="@style/Widget.DuckDuckGo.ToolbarTheme">
-
-        <View
-            android:id="@+id/topBrowserOutlineStroke"
-            android:layout_width="match_parent"
-            android:layout_height="0.5dp"
-            android:background="?attr/daxColorShade"
-            android:elevation="20dp"
-            android:layout_alignParentTop="true" />
 
         <LinearLayout
             android:id="@+id/rootContainerBottom"
@@ -444,4 +449,4 @@
             </androidx.constraintlayout.widget.ConstraintLayout>
         </LinearLayout>
     </com.google.android.material.appbar.AppBarLayout>
-</androidx.coordinatorlayout.widget.CoordinatorLayout>
+</LinearLayout>
