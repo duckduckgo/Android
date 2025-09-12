@@ -583,7 +583,9 @@ open class BrowserActivity : DuckDuckGoActivity() {
 
         if (launchNewSearch(intent)) {
             logcat(WARN) { "new tab requested" }
-            externalIntentProcessingState.onIntentRequestToChangeTab()
+            if (duckAiFeatureState.showInputScreenAutomaticallyOnNewTab.value) {
+                externalIntentProcessingState.onIntentRequestToChangeTab()
+            }
             launchNewTab()
             return
         }
@@ -602,7 +604,9 @@ open class BrowserActivity : DuckDuckGoActivity() {
 
         val existingTabId = intent.getStringExtra(OPEN_EXISTING_TAB_ID_EXTRA)
         if (existingTabId != null) {
-            externalIntentProcessingState.onIntentRequestToChangeTab()
+            if (duckAiFeatureState.showInputScreenAutomaticallyOnNewTab.value) {
+                externalIntentProcessingState.onIntentRequestToChangeTab()
+            }
             openExistingTab(existingTabId)
             return
         }
@@ -610,7 +614,9 @@ open class BrowserActivity : DuckDuckGoActivity() {
         val sharedText = intent.intentText
         if (sharedText != null) {
             closeDuckChat()
-            externalIntentProcessingState.onIntentRequestToChangeTab()
+            if (duckAiFeatureState.showInputScreenAutomaticallyOnNewTab.value) {
+                externalIntentProcessingState.onIntentRequestToChangeTab()
+            }
             if (intent.getBooleanExtra(ShortcutBuilder.SHORTCUT_EXTRA_ARG, false)) {
                 logcat { "Shortcut opened with url $sharedText" }
                 lifecycleScope.launch { viewModel.onOpenShortcut(sharedText) }
