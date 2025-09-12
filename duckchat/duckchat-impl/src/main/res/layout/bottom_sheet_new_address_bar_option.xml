@@ -78,7 +78,7 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="@string/newAddressBarOptionBottomSheetDialogHeader"
-                                android:textColor="@color/red50"
+                                android:textColor="?attr/daxColorNewAddressBarOptionDialogHeader"
                                 app:textAllCaps="true"
                                 app:typography="body2_bold" />
 

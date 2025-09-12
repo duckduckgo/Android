@@ -418,6 +418,7 @@
         <item name="daxColorBackdrop">@color/controls_fill_primary_light</item>
         <item name="daxColorInputModeIndicator">@color/white84</item>
         <item name="daxColorInputModeIndicatorShadow">@color/gray60</item>
+        <item name="daxColorNewAddressBarOptionDialogHeader">@color/red50</item>
     </style>
 
     <style name="Theme.DuckDuckGo.Survey" parent="Theme.DuckDuckGo.Light">
