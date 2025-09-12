@@ -214,18 +214,14 @@
         android:layout_weight="1"
         android:clipToPadding="false">
 
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/resultsContent"
+        <FrameLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:background="?attr/daxColorBrowserOverlay"
-            android:clipToPadding="false">
+            android:layout_height="match_parent">
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/quickAccessRecyclerView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:overScrollMode="never"
                 android:padding="@dimen/keyline_2"
                 tools:itemCount="8"
                 tools:listItem="@layout/view_quick_access_item"
@@ -233,50 +229,60 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                tools:spanCount="4" />
+            tools:spanCount="4" />
 
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/autocompleteSuggestions"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:overScrollMode="never"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="1.0"
-                app:layout_constraintStart_toStartOf="parent"
-                android:nestedScrollingEnabled="false"
-                app:layout_constraintTop_toTopOf="parent"
-                tools:itemCount="4"
-                tools:listitem="@layout/item_autocomplete_search_suggestion" />
-
-            <View
-                android:id="@+id/listDivider"
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/resultsContent"
                 android:layout_width="match_parent"
-                android:layout_height="0.5dp"
-                android:background="?attr/daxColorShade"
-                android:layout_marginVertical="@dimen/keyline_2"
-                android:visibility="gone"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/autocompleteSuggestions"
-                app:layout_constraintBottom_toTopOf="@id/deviceAppSuggestions"/>
-
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/deviceAppSuggestions"
-                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/keyline_2"
-                android:overScrollMode="never"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/listDivider"
-                tools:itemCount="4"
-                tools:listitem="@layout/item_device_app_suggestion" />
+                android:background="?attr/daxColorBrowserOverlay"
+                android:clipToPadding="false">
 
-            <include
-                android:id="@+id/includeSystemSearchOnboarding"
-                layout="@layout/include_system_search_onboarding" />
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/autocompleteSuggestions"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:overScrollMode="never"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintHorizontal_bias="1.0"
+                    app:layout_constraintStart_toStartOf="parent"
+                    android:nestedScrollingEnabled="false"
+                    app:layout_constraintTop_toTopOf="parent"
+                    tools:itemCount="4"
+                    tools:listitem="@layout/item_autocomplete_search_suggestion" />
 
-        </androidx.constraintlayout.widget.ConstraintLayout>
+                <View
+                    android:id="@+id/listDivider"
+                    android:layout_width="match_parent"
+                    android:layout_height="0.5dp"
+                    android:background="?attr/daxColorShade"
+                    android:layout_marginVertical="@dimen/keyline_2"
+                    android:visibility="gone"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/autocompleteSuggestions"
+                    app:layout_constraintBottom_toTopOf="@id/deviceAppSuggestions"/>
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/deviceAppSuggestions"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/keyline_2"
+                    android:overScrollMode="never"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/listDivider"
+                    tools:itemCount="4"
+                    tools:listitem="@layout/item_device_app_suggestion" />
+
+                <include
+                    android:id="@+id/includeSystemSearchOnboarding"
+                    layout="@layout/include_system_search_onboarding" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+        </FrameLayout>
+
     </androidx.core.widget.NestedScrollView>
 
     <View
