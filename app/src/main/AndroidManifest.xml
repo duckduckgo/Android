@@ -218,6 +218,8 @@
             android:windowSoftInputMode="adjustResize"
             android:exported="true"
             android:label="@string/appName"
+            android:roundIcon="${appIconRound}"
+            android:theme="@style/Theme.DuckDuckGo.SplashScreen"
             android:launchMode="singleTask"
             android:stateNotNeeded="true">
 
@@ -462,7 +464,8 @@
             android:name="com.duckduckgo.app.WidgetThemeConfiguration"
             android:exported="false"
             android:label="@string/widgetConfigurationActivityTitle"
-            android:theme="@style/Theme.DuckDuckGo.Light">
+            android:roundIcon="${appIconRound}"
+            android:theme="@style/Theme.DuckDuckGo.SplashScreen">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_CONFIGURE" />
             </intent-filter>
