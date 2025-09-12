@@ -179,26 +179,47 @@ class SystemSearchViewModel @Inject constructor(
 
     private var omnibarPosition: OmnibarPosition = appSettingsPreferencesStore.omnibarPosition
 
+    @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
+    private val resultsFlow = combine(
+        queryFlow
+            .debounce(DEBOUNCE_TIME_MS)
+            .distinctUntilChanged(),
+        refreshTrigger,
+    ) { query, _ -> query }
+        .flatMapLatest { buildResultsFlow(query = it) }
+        .flowOn(dispatchers.io())
+        .onEach { result ->
+            updateResults(result)
+        }
+        .flowOn(dispatchers.main())
+        .catch { t: Throwable? -> logcat(WARN) { "Failed to get search results: ${t?.asLog()}" } }
+
     init {
         resetViewState()
         configureResults()
         refreshAppList()
+        configureFavorites()
 
         refreshTrigger.tryEmit(Unit)
+    }
 
-        savedSitesRepository.getFavorites()
-            .combine(hiddenIds) { favorites, hiddenIds ->
+    private fun configureFavorites() {
+        combine(savedSitesRepository.getFavorites(), hiddenIds, resultsFlow) { favorites, hiddenIds, results ->
+            // Only show favorites when there are no search results
+            if (results.autocomplete.suggestions.isNotEmpty() || results.deviceApps.isNotEmpty()) {
+                emptyList()
+            } else {
                 favorites.filter { it.id !in hiddenIds.favorites }
             }
-            .flowOn(dispatchers.io())
-            .onEach { filteredFavourites ->
-                withContext(dispatchers.main()) {
-                    latestQuickAccessItems =
-                        Suggestions.QuickAccessItems(filteredFavourites.map { FavoritesQuickAccessAdapter.QuickAccessFavorite(it) })
-                    resultsViewState.postValue(latestQuickAccessItems)
-                }
+        }.flowOn(dispatchers.io())
+        .onEach { filteredFavourites ->
+            withContext(dispatchers.main()) {
+                latestQuickAccessItems =
+                    Suggestions.QuickAccessItems(filteredFavourites.map { FavoritesQuickAccessAdapter.QuickAccessFavorite(it) })
+                resultsViewState.postValue(latestQuickAccessItems)
             }
-            .launchIn(viewModelScope)
+        }
+        .launchIn(viewModelScope)
     }
 
     private fun currentOnboardingState(): OnboardingViewState = onboardingViewState.value!!
@@ -228,22 +249,8 @@ class SystemSearchViewModel @Inject constructor(
         resultsViewState.value = latestQuickAccessItems
     }
 
-    @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
     private fun configureResults() {
-        resultsJob += combine(
-            queryFlow
-                .debounce(DEBOUNCE_TIME_MS)
-                .distinctUntilChanged(),
-            refreshTrigger,
-        ) { query, _ -> query }
-            .flatMapLatest { buildResultsFlow(query = it) }
-            .flowOn(dispatchers.io())
-            .onEach { result ->
-                updateResults(result)
-            }
-            .flowOn(dispatchers.main())
-            .catch { t: Throwable? -> logcat(WARN) { "Failed to get search results: ${t?.asLog()}" } }
-            .launchIn(viewModelScope)
+        resultsJob += resultsFlow.launchIn(viewModelScope)
     }
 
     private fun buildResultsFlow(query: String): Flow<SystemSearchResult> {
