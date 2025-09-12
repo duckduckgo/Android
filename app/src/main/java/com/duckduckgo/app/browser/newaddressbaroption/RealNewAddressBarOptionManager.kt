@@ -44,8 +44,8 @@ class RealNewAddressBarOptionManager(
     private val newAddressBarOptionBottomSheetDialogFactory: NewAddressBarOptionBottomSheetDialogFactory,
 ) : NewAddressBarOptionManager {
 
-    private suspend fun shouldTrigger(launchedFromExternal: Boolean): Boolean = withContext(Dispatchers.IO) {
-        isDuckAiEnabled() &&
+    private suspend fun shouldTrigger(launchedFromExternal: Boolean): Boolean {
+        return isDuckAiEnabled() &&
             isOnboardingCompleted() &&
             isFeatureFlagEnabled() &&
             !isDuckAiOmnibarShortcutDisabled() &&
@@ -60,7 +60,7 @@ class RealNewAddressBarOptionManager(
         context: Context,
         launchedFromExternal: Boolean,
         isLightModeEnabled: Boolean,
-    ) = withContext(Dispatchers.IO) {
+    ) {
         if (shouldTrigger(launchedFromExternal)) {
             newAddressBarOptionBottomSheetDialogFactory.create(
                 context = context,
