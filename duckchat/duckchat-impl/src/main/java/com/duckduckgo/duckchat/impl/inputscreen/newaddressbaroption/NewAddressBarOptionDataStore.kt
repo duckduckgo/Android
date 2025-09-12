@@ -34,6 +34,8 @@ interface NewAddressBarOptionDataStore {
     suspend fun hasBeenShown(): Boolean
     suspend fun markAsChecked()
     suspend fun hasBeenChecked(): Boolean
+    suspend fun setBackgrounded()
+    suspend fun wasBackgrounded(): Boolean
 }
 
 @SingleInstanceIn(AppScope::class)
@@ -46,6 +48,7 @@ class SharedPreferencesNewAddressBarOptionDataStore @Inject constructor(
     private object Keys {
         val HAS_BEEN_SHOWN_KEY = booleanPreferencesKey(name = "NEW_ADDRESS_BAR_OPTION_SHOWN")
         val HAS_BEEN_CHECKED_KEY = booleanPreferencesKey(name = "NEW_ADDRESS_BAR_OPTION_CHECKED")
+        val WAS_BACKGROUNDED_KEY = booleanPreferencesKey(name = "NEW_ADDRESS_BAR_WAS_BACKGROUNDED")
     }
 
     override suspend fun markAsShown() {
@@ -70,5 +73,17 @@ class SharedPreferencesNewAddressBarOptionDataStore @Inject constructor(
 
     override suspend fun hasBeenChecked(): Boolean = withContext(dispatchers.io()) {
         dataStore.data.firstOrNull()?.let { it[Keys.HAS_BEEN_CHECKED_KEY] } ?: false
+    }
+
+    override suspend fun setBackgrounded() {
+        withContext(dispatchers.io()) {
+            dataStore.edit { prefs ->
+                prefs[Keys.WAS_BACKGROUNDED_KEY] = true
+            }
+        }
+    }
+
+    override suspend fun wasBackgrounded(): Boolean = withContext(dispatchers.io()) {
+        dataStore.data.firstOrNull()?.let { it[Keys.WAS_BACKGROUNDED_KEY] } ?: false
     }
 }

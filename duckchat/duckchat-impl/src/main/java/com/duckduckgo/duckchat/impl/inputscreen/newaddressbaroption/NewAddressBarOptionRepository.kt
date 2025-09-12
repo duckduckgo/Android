@@ -28,6 +28,8 @@ interface NewAddressBarOptionRepository {
     suspend fun hasBeenShown(): Boolean
     suspend fun markAsChecked()
     suspend fun hasBeenChecked(): Boolean
+    suspend fun setBackgrounded()
+    suspend fun wasBackgrounded(): Boolean
 }
 
 @SingleInstanceIn(AppScope::class)
@@ -51,5 +53,13 @@ class RealNewAddressBarOptionRepository @Inject constructor(
 
     override suspend fun hasBeenChecked(): Boolean = withContext(dispatchers.io()) {
         newAddressBarOptionDataStore.hasBeenChecked()
+    }
+
+    override suspend fun setBackgrounded() = withContext(dispatchers.io()) {
+        newAddressBarOptionDataStore.setBackgrounded()
+    }
+
+    override suspend fun wasBackgrounded(): Boolean = withContext(dispatchers.io()) {
+        newAddressBarOptionDataStore.wasBackgrounded()
     }
 }

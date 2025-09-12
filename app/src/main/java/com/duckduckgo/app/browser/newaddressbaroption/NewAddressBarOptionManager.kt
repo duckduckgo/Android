@@ -16,7 +16,7 @@
 
 package com.duckduckgo.app.browser.newaddressbaroption
 
-import android.content.Context
+import android.app.Activity
 import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition
 import com.duckduckgo.app.onboarding.store.AppStage
 import com.duckduckgo.app.onboarding.store.UserStageStore
@@ -32,7 +32,13 @@ import logcat.LogPriority.DEBUG
 import logcat.logcat
 
 interface NewAddressBarOptionManager {
-    suspend fun showDialog(context: Context, launchedFromExternal: Boolean, interstitialScreen: Boolean, isLightModeEnabled: Boolean)
+    suspend fun showDialog(
+        activity: Activity,
+        launchedFromExternal: Boolean,
+        interstitialScreen: Boolean,
+        isFreshLaunch: Boolean,
+        isLightModeEnabled: Boolean,
+    )
 }
 
 class RealNewAddressBarOptionManager(
@@ -45,7 +51,12 @@ class RealNewAddressBarOptionManager(
     private val newAddressBarOptionBottomSheetDialogFactory: NewAddressBarOptionBottomSheetDialogFactory,
 ) : NewAddressBarOptionManager {
 
-    private suspend fun shouldTrigger(launchedFromExternal: Boolean, interstitialScreen: Boolean): Boolean {
+    private suspend fun shouldTrigger(
+        activity: Activity,
+        freshLaunch: Boolean,
+        launchedFromExternal: Boolean,
+        interstitialScreen: Boolean,
+    ): Boolean {
         logcat(DEBUG) {
             "NewAddressBarOptionManager: shouldTrigger: " +
                 "launchedFromExternal=$launchedFromExternal, interstitialScreen=$interstitialScreen"
@@ -60,19 +71,23 @@ class RealNewAddressBarOptionManager(
             !launchedFromExternal &&
             !interstitialScreen &&
             !hasInteractedWithSearchAndDuckAiAnnouncement() &&
-            !hasBottomAddressBarEnabled()
+            !hasBottomAddressBarEnabled() &&
+            !activity.isFinishing &&
+            !activity.isDestroyed &&
+            (freshLaunch || newAddressBarOptionRepository.wasBackgrounded())
     }
 
     override suspend fun showDialog(
-        context: Context,
+        activity: Activity,
         launchedFromExternal: Boolean,
         interstitialScreen: Boolean,
+        isFreshLaunch: Boolean,
         isLightModeEnabled: Boolean,
     ) {
-        if (shouldTrigger(launchedFromExternal, interstitialScreen)) {
+        if (shouldTrigger(activity, isFreshLaunch, launchedFromExternal, interstitialScreen)) {
             withContext(Dispatchers.Main) {
                 newAddressBarOptionBottomSheetDialogFactory.create(
-                    context = context,
+                    context = activity,
                     isLightModeEnabled = isLightModeEnabled,
                 ).show()
             }
