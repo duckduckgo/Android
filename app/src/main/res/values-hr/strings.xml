@@ -128,6 +128,7 @@
     <!-- Fire -->
     <string name="fireMenu">Obriši podatke</string>
     <string name="fireClearAll">Obriši sve kartice i podatke</string>
+    <string name="fireClearAllPlusDuckChats">Izbriši sve kartice, podatke i razgovore s Duck.ai</string>
     <string name="fireCancel">Odustani</string>
     <string name="fireDataCleared">Podaci su obrisani</string>
 
@@ -236,6 +237,7 @@
     <string name="settingsAutomaticallyClearWhatOptionNone">Nijedno</string>
     <string name="settingsAutomaticallyClearWhatOptionTabs">Kartice</string>
     <string name="settingsAutomaticallyClearWhatOptionTabsAndData">Kartice i podaci</string>
+    <string name="settingsAutomaticallyClearWhatOptionTabsAndDataAndChats">Kartice, podaci i razgovori s Duck.ai</string>
 
     <string name="settingsAutomaticallyClearWhen">Očisti na…</string>
     <string name="settingsAutomaticallyClearWhenDialogTitle">Očisti na…</string>
@@ -245,6 +247,8 @@
     <string name="settingsAutomaticallyClearWhenAppExit15Minutes">Izlaz iz aplikacije, neaktivna 15 minuta</string>
     <string name="settingsAutomaticallyClearWhenAppExit30Minutes">Izlaz iz aplikacije, neaktivna 30 minuta</string>
     <string name="settingsAutomaticallyClearWhenAppExit60Minutes">Izlaz iz aplikacije, neaktivna 1 sat</string>
+    <string name="settingsClearAiDataTitle">Izbriši razgovore s Duck.ai</string>
+    <string name="settingsClearAiDataMessage">Fire Button će također izbrisati povijest usluge Duck.ai.</string>
 
     <!-- About Activity -->
     <string name="aboutActivityTitle">O DuckDuckGou</string>
@@ -273,8 +277,8 @@
     <string name="searchWidgetEmtpyFavoritesHint">Još uvijek nema omiljenih stavki</string>
     <string name="searchWidgetEmtpyFavoritesCta">Dodaj omiljenu stavku</string>
     <string name="widgetConfigurationActivityTitle">Konfiguracija widgeta</string>
-    <string name="favoritesWidgetLabel">Omiljeno</string>
-    <string name="searchWidgetLabel">Pretraga</string>
+    <string name="favoritesWidgetLabel">Pretraživanje i favoriti</string>
+    <string name="searchWidgetLabel">Pretraživanje i Duck.ai</string>
 
     <!-- Home Screen Shortcuts -->
     <string name="addToHome">Dodaj na početni zaslon</string>
