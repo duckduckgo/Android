@@ -950,7 +950,7 @@
     <!-- Widgets -->
     <string name="searchOnlyWidgetLabel" instruction="Label for the search-only widget">Bare søk</string>
     <string name="searchOnlyWidgetDescription" instruction="Description for the search-only widget">Start et privatsøk raskt i DuckDuckGo.</string>
-    <string name="searchAndFavoritesWidgetDescription" instruction="Description for the search and favorites widget">Søk eller besøk favorittsider privat med ett trykk. Talesøk og Duck.ai er tilgjengelig hvis det er aktivert.</string>
     <string name="searchWidgetDescription" instruction="Description for the search widget, which may include Duck.ai and voice search">Søk privat med DuckDuckGo eller spør Duck.ai. Talesøk og Duck.ai er tilgjengelig hvis det er aktivert.</string>
+    <string name="searchAndFavoritesWidgetDescription" instruction="Description for the search and favorites widget">Søk eller besøk favorittsider privat med ett trykk. Talesøk og Duck.ai er tilgjengelig hvis det er aktivert.</string>
     <string name="duckAiOnlyPinShortcutLabel" instruction="Label for the Duck.ai pinned shortcut. Should be Duck.ai in all languages">Duck.ai</string>
 </resources>
