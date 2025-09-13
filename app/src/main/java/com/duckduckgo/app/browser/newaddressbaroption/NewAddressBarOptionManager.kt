@@ -68,6 +68,7 @@ class RealNewAddressBarOptionManager @Inject constructor(
     ) {
         showDialogMutex.withLock {
             if (shouldTrigger(activity, isFreshLaunch, isLaunchedFromExternal)) {
+                logcat(DEBUG) { "NewAddressBarOptionManager: All conditions met, showing dialog" }
                 newAddressBarOptionRepository.setAsShown()
                 withContext(Dispatchers.Main) {
                     newAddressBarOptionBottomSheetDialogFactory.create(
@@ -84,6 +85,11 @@ class RealNewAddressBarOptionManager @Inject constructor(
         isFreshLaunch: Boolean,
         isLaunchedFromExternal: Boolean,
     ): Boolean {
+        logcat(DEBUG) {
+            "--------------------------\n" +
+                "NewAddressBarOptionManager: Starting validation..." +
+                "\n--------------------------"
+        }
         return isActivityValid(activity) &&
             isOnboardingCompleted() &&
             hasNotShownNewAddressBarOptionAnnouncement() &&
@@ -98,82 +104,67 @@ class RealNewAddressBarOptionManager @Inject constructor(
     }
 
     private fun isActivityValid(activity: Activity): Boolean {
-        return (!activity.isFinishing && !activity.isDestroyed).also { result ->
-            logcat(DEBUG) {
-                "NewAddressBarOptionManager: isActivityValid: " +
-                    "isFinishing=${activity.isFinishing}, isDestroyed=${activity.isDestroyed}, result=$result"
-            }
+        return (!activity.isFinishing && !activity.isDestroyed).also {
+            logcat(DEBUG) { "NewAddressBarOptionManager: $it isActivityValid" }
         }
     }
 
     private suspend fun isOnboardingCompleted(): Boolean =
-        (userStageStore.getUserAppStage() == AppStage.ESTABLISHED).also { result ->
-            logcat(DEBUG) { "NewAddressBarOptionManager: isOnboardingCompleted: appStage=${userStageStore.getUserAppStage()}, result=$result" }
+        (userStageStore.getUserAppStage() == AppStage.ESTABLISHED).also {
+            logcat(DEBUG) { "NewAddressBarOptionManager: $it isOnboardingCompleted" }
         }
 
     private suspend fun hasNotShownNewAddressBarOptionAnnouncement(): Boolean =
         (!newAddressBarOptionRepository.wasShown()).also {
-            logcat(DEBUG) { "NewAddressBarOptionManager: hasNotShownNewAddressBarOptionAnnouncement: $it" }
+            logcat(DEBUG) { "NewAddressBarOptionManager: $it hasNotShownNewAddressBarOptionAnnouncement" }
         }
 
     private fun isDuckAiEnabled(): Boolean =
         duckChat.isEnabled().also {
-            logcat(DEBUG) { "NewAddressBarOptionManager: isDuckAiEnabled: $it" }
+            logcat(DEBUG) { "NewAddressBarOptionManager: $it isDuckAiEnabled" }
         }
 
     private fun isDuckAiOmnibarShortcutEnabled(): Boolean =
         duckAiFeatureState.showOmnibarShortcutInAllStates.value.also {
-            logcat(DEBUG) { "NewAddressBarOptionManager: isDuckAiOmnibarShortcutEnabled: $it" }
+            logcat(DEBUG) { "NewAddressBarOptionManager: $it isDuckAiOmnibarShortcutEnabled" }
         }
 
     private fun isInputScreenDisabled(): Boolean =
         (!duckAiFeatureState.showInputScreen.value).also {
-            logcat(DEBUG) { "NewAddressBarOptionManager: isInputScreenDisabled: $it" }
+            logcat(DEBUG) { "NewAddressBarOptionManager: $it isInputScreenDisabled" }
         }
 
     private fun isBottomAddressBarDisabled(): Boolean =
-        (settingsDataStore.omnibarPosition != OmnibarPosition.BOTTOM).also { result ->
-            logcat(DEBUG) {
-                "NewAddressBarOptionManager: isBottomAddressBarDisabled: " +
-                    "omnibarPosition=${settingsDataStore.omnibarPosition}, result=$result"
-            }
+        (settingsDataStore.omnibarPosition != OmnibarPosition.BOTTOM).also {
+            logcat(DEBUG) { "NewAddressBarOptionManager: $it isBottomAddressBarDisabled" }
         }
 
     private fun hasNotInteractedWithSearchAndDuckAiRMF(): Boolean =
         remoteMessagingRepository.dismissedMessages().let { dismissedMessages ->
-            !dismissedMessages.contains("search_duck_ai_announcement").also { result ->
-                logcat(DEBUG) {
-                    "NewAddressBarOptionManager: hasNotInteractedWithSearchAndDuckAiRMF: " +
-                        "dismissedMessages=$dismissedMessages, result=$result"
-                }
+            (!dismissedMessages.contains("search_duck_ai_announcement")).also {
+                logcat(DEBUG) { "NewAddressBarOptionManager: $it hasNotInteractedWithSearchAndDuckAiRMF" }
             }
         }
 
     private fun isNewAddressBarOptionAnnouncementEnabled(): Boolean =
         duckAiFeatureState.showNewAddressBarOptionAnnouncement.value.also {
-            logcat(DEBUG) { "NewAddressBarOptionManager: isNewAddressBarOptionAnnouncementEnabled: $it" }
+            logcat(DEBUG) { "NewAddressBarOptionManager: $it isNewAddressBarOptionAnnouncementEnabled" }
         }
 
     private suspend fun isSubsequentLaunch(isFreshLaunch: Boolean): Boolean {
-        val wasValidated = newAddressBarOptionRepository.wasValidated()
-        logcat(DEBUG) { "NewAddressBarOptionManager: isSubsequentLaunch: wasValidated=$wasValidated" }
-
-        return if (wasValidated) {
-            return (isFreshLaunch || newAddressBarOptionRepository.wasBackgrounded()).also { result ->
-                logcat(DEBUG) {
-                    "NewAddressBarOptionManager: isSubsequentLaunch: " +
-                        "isFreshLaunch=$isFreshLaunch, wasBackgrounded=${newAddressBarOptionRepository.wasBackgrounded()}, result=$result"
-                }
+        return if (newAddressBarOptionRepository.wasValidated()) {
+            return (isFreshLaunch || newAddressBarOptionRepository.wasBackgrounded()).also {
+                logcat(DEBUG) { "NewAddressBarOptionManager: $it isSubsequentLaunch" }
             }
         } else {
-            logcat(DEBUG) { "NewAddressBarOptionManager: isSubsequentLaunch: Not been validated before, setting as validated and returning false" }
+            logcat(DEBUG) { "NewAddressBarOptionManager: false isSubsequentLaunch" }
             newAddressBarOptionRepository.setAsValidated()
             false
         }
     }
 
     private fun isNotLaunchedFromExternal(launchedFromExternal: Boolean): Boolean =
-        !launchedFromExternal.also {
-            logcat(DEBUG) { "NewAddressBarOptionManager: isNotLaunchedFromExternal: launchedFromExternal=$launchedFromExternal, result=$it" }
+        (!launchedFromExternal).also {
+            logcat(DEBUG) { "NewAddressBarOptionManager: $it isNotLaunchedFromExternal" }
         }
 }
