@@ -62,10 +62,10 @@ class RealNewAddressBarOptionManager(
                 "launchedFromExternal=$launchedFromExternal, interstitialScreen=$interstitialScreen"
         }
         return isActivityValid(activity) &&
+            isSubsequentLaunch(isFreshLaunch) &&
             isDuckAiEnabled() &&
             isOnboardingCompleted() &&
             isFeatureFlagEnabled() &&
-            isSubsequentLaunch(isFreshLaunch) &&
             !isDuckAiOmnibarShortcutDisabled() &&
             !isInputScreenEnabled() &&
             !hasNewAddressBarOptionBeenShown() &&
