@@ -66,7 +66,8 @@ class RealNewAddressBarOptionManager(
             "NewAddressBarOptionManager: shouldTrigger: " +
                 "launchedFromExternal=$launchedFromExternal, interstitialScreen=$interstitialScreen"
         }
-        return isActivityValid(activity) &&
+        return !dialogShown &&
+            isActivityValid(activity) &&
             isSubsequentLaunch(isFreshLaunch) &&
             isDuckAiEnabled() &&
             isOnboardingCompleted() &&
@@ -77,8 +78,7 @@ class RealNewAddressBarOptionManager(
             !launchedFromExternal &&
             !interstitialScreen &&
             !hasInteractedWithSearchAndDuckAiAnnouncement() &&
-            !hasBottomAddressBarEnabled() &&
-            !dialogShown
+            !hasBottomAddressBarEnabled()
     }
 
     override suspend fun showDialog(
