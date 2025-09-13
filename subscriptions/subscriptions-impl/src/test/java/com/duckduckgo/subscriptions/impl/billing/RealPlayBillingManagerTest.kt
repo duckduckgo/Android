@@ -19,6 +19,7 @@ import com.duckduckgo.subscriptions.impl.billing.FakeBillingClientAdapter.FakeMe
 import com.duckduckgo.subscriptions.impl.billing.FakeBillingClientAdapter.FakeMethodInvocation.GetSubscriptions
 import com.duckduckgo.subscriptions.impl.billing.FakeBillingClientAdapter.FakeMethodInvocation.GetSubscriptionsPurchaseHistory
 import com.duckduckgo.subscriptions.impl.billing.FakeBillingClientAdapter.FakeMethodInvocation.LaunchBillingFlow
+import com.duckduckgo.subscriptions.impl.billing.FakeBillingClientAdapter.FakeMethodInvocation.LaunchSubscriptionUpdate
 import com.duckduckgo.subscriptions.impl.billing.PurchaseState.Canceled
 import com.duckduckgo.subscriptions.impl.billing.PurchaseState.InProgress
 import kotlin.time.Duration.Companion.minutes
@@ -202,6 +203,149 @@ class RealPlayBillingManagerTest {
 
         billingClientAdapter.verifyLaunchBillingFlowInvoked(productDetails, offerToken = offerDetails.offerToken, externalId)
     }
+
+    @Test
+    fun `when launchSubscriptionUpdate called with valid parameters then launches subscription update flow`() = runTest {
+        // Set up purchase history so getCurrentPurchaseToken() returns a valid token
+        val mockPurchase: PurchaseHistoryRecord = mock {
+            whenever(it.products).thenReturn(listOf(BASIC_SUBSCRIPTION))
+            whenever(it.purchaseTime).thenReturn(1000L)
+            whenever(it.purchaseToken).thenReturn("old_purchase_token")
+        }
+        billingClientAdapter.subscriptionsPurchaseHistory = listOf(mockPurchase)
+
+        processLifecycleOwner.currentState = RESUMED
+        runCurrent() // Ensure purchase history is loaded
+
+        billingClientAdapter.launchBillingFlowResult = LaunchBillingFlowResult.Success
+
+        val productDetails = billingClientAdapter.subscriptions.first()
+        val offerDetails = productDetails.subscriptionOfferDetails!!.first()
+        val externalId = "test_external_id"
+        val oldPurchaseToken = "old_purchase_token" // This is what getCurrentPurchaseToken() will return
+        val replacementMode = SubscriptionReplacementMode.DEFERRED
+
+        subject.purchaseState.test {
+            expectNoEvents()
+
+            subject.launchSubscriptionUpdate(
+                activity = mock(),
+                newPlanId = MONTHLY_PLAN_US,
+                externalId = externalId,
+                newOfferId = null,
+                replacementMode = replacementMode,
+            )
+
+            assertEquals(InProgress, awaitItem())
+        }
+
+        billingClientAdapter.verifyLaunchSubscriptionUpdateInvoked(
+            productDetails = productDetails,
+            offerToken = offerDetails.offerToken,
+            externalId = externalId,
+            oldPurchaseToken = oldPurchaseToken,
+            replacementMode = replacementMode,
+        )
+    }
+
+    @Test
+    fun `when launchSubscriptionUpdate called with invalid plan then emits canceled state`() = runTest {
+        // Set up purchase history so getCurrentPurchaseToken() returns a valid token
+        val mockPurchase: PurchaseHistoryRecord = mock {
+            whenever(it.products).thenReturn(listOf(BASIC_SUBSCRIPTION))
+            whenever(it.purchaseTime).thenReturn(1000L)
+            whenever(it.purchaseToken).thenReturn("old_purchase_token")
+        }
+        billingClientAdapter.subscriptionsPurchaseHistory = listOf(mockPurchase)
+
+        processLifecycleOwner.currentState = RESUMED
+        runCurrent() // Ensure purchase history is loaded
+
+        val externalId = "test_external_id"
+
+        subject.purchaseState.test {
+            expectNoEvents()
+
+            subject.launchSubscriptionUpdate(
+                activity = mock(),
+                newPlanId = "invalid_plan_id",
+                externalId = externalId,
+                newOfferId = null,
+            )
+
+            assertEquals(Canceled, awaitItem())
+        }
+
+        billingClientAdapter.verifyLaunchSubscriptionUpdateNotInvoked()
+    }
+
+    @Test
+    fun `when launchSubscriptionUpdate fails then emits canceled state`() = runTest {
+        // Set up purchase history so getCurrentPurchaseToken() returns a valid token
+        val mockPurchase: PurchaseHistoryRecord = mock {
+            whenever(it.products).thenReturn(listOf(BASIC_SUBSCRIPTION))
+            whenever(it.purchaseTime).thenReturn(1000L)
+            whenever(it.purchaseToken).thenReturn("old_purchase_token")
+        }
+        billingClientAdapter.subscriptionsPurchaseHistory = listOf(mockPurchase)
+
+        processLifecycleOwner.currentState = RESUMED
+        runCurrent() // Ensure purchase history is loaded
+
+        billingClientAdapter.launchBillingFlowResult = LaunchBillingFlowResult.Failure
+
+        val productDetails = billingClientAdapter.subscriptions.first()
+        val offerDetails = productDetails.subscriptionOfferDetails!!.first()
+        val externalId = "test_external_id"
+        val oldPurchaseToken = "old_purchase_token" // This is what getCurrentPurchaseToken() will return
+
+        subject.purchaseState.test {
+            expectNoEvents()
+
+            subject.launchSubscriptionUpdate(
+                activity = mock(),
+                newPlanId = MONTHLY_PLAN_US,
+                externalId = externalId,
+                newOfferId = null,
+            )
+
+            assertEquals(Canceled, awaitItem())
+        }
+
+        billingClientAdapter.verifyLaunchSubscriptionUpdateInvoked(
+            productDetails = productDetails,
+            offerToken = offerDetails.offerToken,
+            externalId = externalId,
+            oldPurchaseToken = oldPurchaseToken,
+            replacementMode = SubscriptionReplacementMode.DEFERRED, // default value
+        )
+    }
+
+    @Test
+    fun `when launchSubscriptionUpdate called with no purchase history then emits canceled state`() = runTest {
+        // No purchase history set up, so getCurrentPurchaseToken() will return null
+        billingClientAdapter.subscriptionsPurchaseHistory = emptyList()
+
+        processLifecycleOwner.currentState = RESUMED
+        runCurrent() // Ensure purchase history is loaded
+
+        val externalId = "test_external_id"
+
+        subject.purchaseState.test {
+            expectNoEvents()
+
+            subject.launchSubscriptionUpdate(
+                activity = mock(),
+                newPlanId = MONTHLY_PLAN_US,
+                externalId = externalId,
+                newOfferId = null,
+            )
+
+            assertEquals(Canceled, awaitItem())
+        }
+
+        billingClientAdapter.verifyLaunchSubscriptionUpdateNotInvoked()
+    }
 }
 
 class FakeBillingClientAdapter : BillingClientAdapter {
@@ -287,6 +431,18 @@ class FakeBillingClientAdapter : BillingClientAdapter {
         return launchBillingFlowResult
     }
 
+    override suspend fun launchSubscriptionUpdate(
+        activity: Activity,
+        productDetails: ProductDetails,
+        offerToken: String,
+        externalId: String,
+        oldPurchaseToken: String,
+        replacementMode: SubscriptionReplacementMode,
+    ): LaunchBillingFlowResult {
+        methodInvocations.add(LaunchSubscriptionUpdate(productDetails, offerToken, externalId, oldPurchaseToken, replacementMode))
+        return launchBillingFlowResult
+    }
+
     fun verifyConnectInvoked(times: Int = 1) {
         val invocations = methodInvocations.filterIsInstance<Connect>()
         assertEquals(times, invocations.count())
@@ -324,6 +480,30 @@ class FakeBillingClientAdapter : BillingClientAdapter {
         assertTrue(methodInvocations.filterIsInstance<LaunchBillingFlow>().isEmpty())
     }
 
+    fun verifyLaunchSubscriptionUpdateInvoked(
+        productDetails: ProductDetails,
+        offerToken: String,
+        externalId: String,
+        oldPurchaseToken: String,
+        replacementMode: SubscriptionReplacementMode,
+        times: Int = 1,
+    ) {
+        val invocations = methodInvocations
+            .filterIsInstance<LaunchSubscriptionUpdate>()
+            .filter { invocation ->
+                invocation.productDetails == productDetails &&
+                    invocation.offerToken == offerToken &&
+                    invocation.externalId == externalId &&
+                    invocation.oldPurchaseToken == oldPurchaseToken &&
+                    invocation.replacementMode == replacementMode
+            }
+        assertEquals(times, invocations.count())
+    }
+
+    fun verifyLaunchSubscriptionUpdateNotInvoked() {
+        assertTrue(methodInvocations.filterIsInstance<LaunchSubscriptionUpdate>().isEmpty())
+    }
+
     sealed class FakeMethodInvocation {
         data object Connect : FakeMethodInvocation()
         data class GetSubscriptions(val productIds: List<String>) : FakeMethodInvocation()
@@ -333,6 +513,14 @@ class FakeBillingClientAdapter : BillingClientAdapter {
             val productDetails: ProductDetails,
             val offerToken: String,
             val externalId: String,
+        ) : FakeMethodInvocation()
+
+        data class LaunchSubscriptionUpdate(
+            val productDetails: ProductDetails,
+            val offerToken: String,
+            val externalId: String,
+            val oldPurchaseToken: String,
+            val replacementMode: SubscriptionReplacementMode,
         ) : FakeMethodInvocation()
     }
 }
