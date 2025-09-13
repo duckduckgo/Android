@@ -36,7 +36,7 @@ class NewAddressBarOptionLifecycleObserver @Inject constructor(
 
     override fun onStop(owner: LifecycleOwner) {
         appCoroutineScope.launch {
-            newAddressBarOptionDataStore.setBackgrounded()
+            newAddressBarOptionDataStore.setAsBackgrounded()
         }
     }
 }

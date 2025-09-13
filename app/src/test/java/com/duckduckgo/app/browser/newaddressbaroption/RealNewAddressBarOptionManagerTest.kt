@@ -99,7 +99,7 @@ class RealNewAddressBarOptionManagerTest {
     fun `when all conditions are met and not launched from external then showDialog shows dialog`() = runTest {
         setupAllConditionsMet()
 
-        testee.showDialog(mock(), launchedFromExternal = false, interstitialScreen = false, isLightModeEnabled = true)
+        testee.showDialog(mock(), launchedFromExternal = false, interstitialScreen = false, isFreshLaunch = true, isLightModeEnabled = true)
 
         verify(newAddressBarOptionBottomSheetDialogFactoryMock).create(any(), any())
     }
@@ -108,7 +108,7 @@ class RealNewAddressBarOptionManagerTest {
     fun `when launched from external then showDialog does not show dialog`() = runTest {
         setupAllConditionsMet()
 
-        testee.showDialog(mock(), launchedFromExternal = true, interstitialScreen = false, isLightModeEnabled = true)
+        testee.showDialog(mock(), launchedFromExternal = true, interstitialScreen = false, isFreshLaunch = true, isLightModeEnabled = true)
 
         verify(newAddressBarOptionBottomSheetDialogFactoryMock, never()).create(any(), any())
     }
@@ -117,7 +117,7 @@ class RealNewAddressBarOptionManagerTest {
     fun `when launched from interstitial screen then showDialog does not show dialog`() = runTest {
         setupAllConditionsMet()
 
-        testee.showDialog(mock(), launchedFromExternal = false, interstitialScreen = true, isLightModeEnabled = true)
+        testee.showDialog(mock(), launchedFromExternal = false, interstitialScreen = true, isFreshLaunch = true, isLightModeEnabled = true)
 
         verify(newAddressBarOptionBottomSheetDialogFactoryMock, never()).create(any(), any())
     }
@@ -127,7 +127,7 @@ class RealNewAddressBarOptionManagerTest {
         setupAllConditionsMet()
         whenever(duckChatMock.isEnabled()).thenReturn(false)
 
-        testee.showDialog(mock(), launchedFromExternal = false, interstitialScreen = false, isLightModeEnabled = true)
+        testee.showDialog(mock(), launchedFromExternal = false, interstitialScreen = false, isFreshLaunch = true, isLightModeEnabled = true)
 
         verify(newAddressBarOptionBottomSheetDialogFactoryMock, never()).create(any(), any())
     }
@@ -137,7 +137,7 @@ class RealNewAddressBarOptionManagerTest {
         setupAllConditionsMet()
         whenever(userStageStoreMock.getUserAppStage()).thenReturn(AppStage.DAX_ONBOARDING)
 
-        testee.showDialog(mock(), launchedFromExternal = false, interstitialScreen = false, isLightModeEnabled = true)
+        testee.showDialog(mock(), launchedFromExternal = false, interstitialScreen = false, isFreshLaunch = true, isLightModeEnabled = true)
 
         verify(newAddressBarOptionBottomSheetDialogFactoryMock, never()).create(any(), any())
     }
@@ -147,7 +147,7 @@ class RealNewAddressBarOptionManagerTest {
         setupAllConditionsMet()
         showNewAddressBarOptionAnnouncementFlow.value = false
 
-        testee.showDialog(mock(), launchedFromExternal = false, interstitialScreen = false, isLightModeEnabled = true)
+        testee.showDialog(mock(), launchedFromExternal = false, interstitialScreen = false, isFreshLaunch = true, isLightModeEnabled = true)
 
         verify(newAddressBarOptionBottomSheetDialogFactoryMock, never()).create(any(), any())
     }
@@ -157,7 +157,7 @@ class RealNewAddressBarOptionManagerTest {
         setupAllConditionsMet()
         showOmnibarShortcutInAllStatesFlow.value = false
 
-        testee.showDialog(mock(), launchedFromExternal = false, interstitialScreen = false, isLightModeEnabled = true)
+        testee.showDialog(mock(), launchedFromExternal = false, interstitialScreen = false, isFreshLaunch = true, isLightModeEnabled = true)
 
         verify(newAddressBarOptionBottomSheetDialogFactoryMock, never()).create(any(), any())
     }
@@ -167,17 +167,17 @@ class RealNewAddressBarOptionManagerTest {
         setupAllConditionsMet()
         showInputScreenFlow.value = true
 
-        testee.showDialog(mock(), launchedFromExternal = false, interstitialScreen = false, isLightModeEnabled = true)
+        testee.showDialog(mock(), launchedFromExternal = false, interstitialScreen = false, isFreshLaunch = true, isLightModeEnabled = true)
 
         verify(newAddressBarOptionBottomSheetDialogFactoryMock, never()).create(any(), any())
     }
 
     @Test
-    fun `when new address bar option has been shown then showDialog does not show dialog`() = runTest {
+    fun `when new address bar option was shown before then showDialog does not show dialog`() = runTest {
         setupAllConditionsMet()
-        whenever(newAddressBarOptionRepositoryMock.hasBeenShown()).thenReturn(true)
+        whenever(newAddressBarOptionRepositoryMock.wasShown()).thenReturn(true)
 
-        testee.showDialog(mock(), launchedFromExternal = false, interstitialScreen = false, isLightModeEnabled = true)
+        testee.showDialog(mock(), launchedFromExternal = false, interstitialScreen = false, isFreshLaunch = true, isLightModeEnabled = true)
 
         verify(newAddressBarOptionBottomSheetDialogFactoryMock, never()).create(any(), any())
     }
@@ -187,7 +187,7 @@ class RealNewAddressBarOptionManagerTest {
         setupAllConditionsMet()
         whenever(remoteMessagingRepositoryMock.dismissedMessages()).thenReturn(listOf("search_duck_ai_announcement"))
 
-        testee.showDialog(mock(), launchedFromExternal = false, interstitialScreen = false, isLightModeEnabled = true)
+        testee.showDialog(mock(), launchedFromExternal = false, interstitialScreen = false, isFreshLaunch = true, isLightModeEnabled = true)
 
         verify(newAddressBarOptionBottomSheetDialogFactoryMock, never()).create(any(), any())
     }
@@ -197,27 +197,27 @@ class RealNewAddressBarOptionManagerTest {
         setupAllConditionsMet()
         whenever(settingsDataStoreMock.omnibarPosition).thenReturn(OmnibarPosition.BOTTOM)
 
-        testee.showDialog(mock(), launchedFromExternal = false, interstitialScreen = false, isLightModeEnabled = true)
+        testee.showDialog(mock(), launchedFromExternal = false, interstitialScreen = false, isFreshLaunch = true, isLightModeEnabled = true)
 
         verify(newAddressBarOptionBottomSheetDialogFactoryMock, never()).create(any(), any())
     }
 
     @Test
-    fun `when has not been checked before then showDialog does not show dialog and marks as checked`() = runTest {
+    fun `when was validated before then showDialog does not show dialog and sets as validated`() = runTest {
         setupAllConditionsMet()
-        whenever(newAddressBarOptionRepositoryMock.hasBeenChecked()).thenReturn(false)
+        whenever(newAddressBarOptionRepositoryMock.wasValidated()).thenReturn(false)
 
-        testee.showDialog(mock(), launchedFromExternal = false, interstitialScreen = false, isLightModeEnabled = true)
+        testee.showDialog(mock(), launchedFromExternal = false, interstitialScreen = false, isFreshLaunch = true, isLightModeEnabled = true)
 
         verify(newAddressBarOptionBottomSheetDialogFactoryMock, never()).create(any(), any())
-        verify(newAddressBarOptionRepositoryMock).markAsChecked()
+        verify(newAddressBarOptionRepositoryMock).setAsValidated()
     }
 
     @Test
-    fun `when has been checked before then showDialog shows dialog`() = runTest {
+    fun `when was validated before then showDialog shows dialog`() = runTest {
         setupAllConditionsMet()
 
-        testee.showDialog(mock(), launchedFromExternal = false, interstitialScreen = false, isLightModeEnabled = true)
+        testee.showDialog(mock(), launchedFromExternal = false, interstitialScreen = false, isFreshLaunch = true, isLightModeEnabled = true)
 
         verify(newAddressBarOptionBottomSheetDialogFactoryMock).create(any(), any())
     }
@@ -226,11 +226,11 @@ class RealNewAddressBarOptionManagerTest {
     fun `when is disabled then markAsChecked is not called`() = runTest {
         setupAllConditionsMet()
         showNewAddressBarOptionAnnouncementFlow.value = false
-        whenever(newAddressBarOptionRepositoryMock.hasBeenChecked()).thenReturn(false)
+        whenever(newAddressBarOptionRepositoryMock.wasValidated()).thenReturn(false)
 
-        testee.showDialog(mock(), launchedFromExternal = false, interstitialScreen = false, isLightModeEnabled = true)
+        testee.showDialog(mock(), launchedFromExternal = false, interstitialScreen = false, isFreshLaunch = true, isLightModeEnabled = true)
 
-        verify(newAddressBarOptionRepositoryMock, never()).markAsChecked()
+        verify(newAddressBarOptionRepositoryMock, never()).setAsValidated()
         verify(newAddressBarOptionBottomSheetDialogFactoryMock, never()).create(any(), any())
     }
 
@@ -240,9 +240,9 @@ class RealNewAddressBarOptionManagerTest {
         showNewAddressBarOptionAnnouncementFlow.value = true
         showOmnibarShortcutInAllStatesFlow.value = true
         showInputScreenFlow.value = false
-        whenever(newAddressBarOptionRepositoryMock.hasBeenShown()).thenReturn(false)
+        whenever(newAddressBarOptionRepositoryMock.wasShown()).thenReturn(false)
         whenever(remoteMessagingRepositoryMock.dismissedMessages()).thenReturn(emptyList())
         whenever(settingsDataStoreMock.omnibarPosition).thenReturn(OmnibarPosition.TOP)
-        whenever(newAddressBarOptionRepositoryMock.hasBeenChecked()).thenReturn(true)
+        whenever(newAddressBarOptionRepositoryMock.wasValidated()).thenReturn(true)
     }
 }

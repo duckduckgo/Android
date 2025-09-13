@@ -300,7 +300,7 @@ class RealDuckChat @Inject constructor(
 
     override fun onNewAddressBarOptionShown() {
         appCoroutineScope.launch {
-            newAddressBarOptionRepository.markAsShown()
+            newAddressBarOptionRepository.setAsShown()
         }
     }
 

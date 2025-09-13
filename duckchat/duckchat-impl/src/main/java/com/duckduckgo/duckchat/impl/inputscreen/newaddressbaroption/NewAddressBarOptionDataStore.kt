@@ -30,11 +30,13 @@ import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.withContext
 
 interface NewAddressBarOptionDataStore {
-    suspend fun markAsShown()
-    suspend fun hasBeenShown(): Boolean
-    suspend fun markAsChecked()
-    suspend fun hasBeenChecked(): Boolean
-    suspend fun setBackgrounded()
+    suspend fun setAsShown()
+    suspend fun wasShown(): Boolean
+
+    suspend fun setAsValidated()
+    suspend fun wasValidated(): Boolean
+
+    suspend fun setAsBackgrounded()
     suspend fun wasBackgrounded(): Boolean
 }
 
@@ -46,36 +48,36 @@ class SharedPreferencesNewAddressBarOptionDataStore @Inject constructor(
 ) : NewAddressBarOptionDataStore {
 
     private object Keys {
-        val HAS_BEEN_SHOWN_KEY = booleanPreferencesKey(name = "NEW_ADDRESS_BAR_OPTION_SHOWN")
-        val HAS_BEEN_CHECKED_KEY = booleanPreferencesKey(name = "NEW_ADDRESS_BAR_OPTION_CHECKED")
-        val WAS_BACKGROUNDED_KEY = booleanPreferencesKey(name = "NEW_ADDRESS_BAR_WAS_BACKGROUNDED")
+        val WAS_SHOWN_KEY = booleanPreferencesKey(name = "NEW_ADDRESS_BAR_OPTION_WAS_SHOWN")
+        val WAS_VALIDATED_KEY = booleanPreferencesKey(name = "NEW_ADDRESS_BAR_OPTION_WAS_VALIDATED")
+        val WAS_BACKGROUNDED_KEY = booleanPreferencesKey(name = "NEW_ADDRESS_BAR_OPTION_WAS_BACKGROUNDED")
     }
 
-    override suspend fun markAsShown() {
+    override suspend fun setAsShown() {
         withContext(dispatchers.io()) {
             dataStore.edit { prefs ->
-                prefs[Keys.HAS_BEEN_SHOWN_KEY] = true
+                prefs[Keys.WAS_SHOWN_KEY] = true
             }
         }
     }
 
-    override suspend fun hasBeenShown(): Boolean = withContext(dispatchers.io()) {
-        dataStore.data.firstOrNull()?.let { it[Keys.HAS_BEEN_SHOWN_KEY] } ?: false
+    override suspend fun wasShown(): Boolean = withContext(dispatchers.io()) {
+        dataStore.data.firstOrNull()?.let { it[Keys.WAS_SHOWN_KEY] } ?: false
     }
 
-    override suspend fun markAsChecked() {
+    override suspend fun setAsValidated() {
         withContext(dispatchers.io()) {
             dataStore.edit { prefs ->
-                prefs[Keys.HAS_BEEN_CHECKED_KEY] = true
+                prefs[Keys.WAS_VALIDATED_KEY] = true
             }
         }
     }
 
-    override suspend fun hasBeenChecked(): Boolean = withContext(dispatchers.io()) {
-        dataStore.data.firstOrNull()?.let { it[Keys.HAS_BEEN_CHECKED_KEY] } ?: false
+    override suspend fun wasValidated(): Boolean = withContext(dispatchers.io()) {
+        dataStore.data.firstOrNull()?.let { it[Keys.WAS_VALIDATED_KEY] } ?: false
     }
 
-    override suspend fun setBackgrounded() {
+    override suspend fun setAsBackgrounded() {
         withContext(dispatchers.io()) {
             dataStore.edit { prefs ->
                 prefs[Keys.WAS_BACKGROUNDED_KEY] = true

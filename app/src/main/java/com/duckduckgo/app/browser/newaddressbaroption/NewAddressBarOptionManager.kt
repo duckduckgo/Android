@@ -120,7 +120,7 @@ class RealNewAddressBarOptionManager(
         }
 
     private suspend fun hasNewAddressBarOptionBeenShown(): Boolean =
-        newAddressBarOptionRepository.hasBeenShown().also {
+        newAddressBarOptionRepository.wasShown().also {
             logcat(DEBUG) { "NewAddressBarOptionManager: hasNewAddressBarOption: $it" }
         }
 
@@ -143,15 +143,15 @@ class RealNewAddressBarOptionManager(
         }
 
     private suspend fun isSubsequentLaunch(): Boolean {
-        val hasBeenChecked = newAddressBarOptionRepository.hasBeenChecked()
-        logcat(DEBUG) { "NewAddressBarOptionManager: isSubsequentLaunch: hasBeenChecked=$hasBeenChecked" }
+        val wasValidated = newAddressBarOptionRepository.wasValidated()
+        logcat(DEBUG) { "NewAddressBarOptionManager: isSubsequentLaunch: wasValidated=$wasValidated" }
 
-        return if (hasBeenChecked) {
-            logcat(DEBUG) { "NewAddressBarOptionManager: isSubsequentLaunch: Checked before, returning true" }
+        return if (wasValidated) {
+            logcat(DEBUG) { "NewAddressBarOptionManager: isSubsequentLaunch: Validated before, returning true" }
             true
         } else {
-            logcat(DEBUG) { "NewAddressBarOptionManager: isSubsequentLaunch: Not checked before, marking as checked and returning false" }
-            newAddressBarOptionRepository.markAsChecked()
+            logcat(DEBUG) { "NewAddressBarOptionManager: isSubsequentLaunch: Not been validated before, setting as validated and returning false" }
+            newAddressBarOptionRepository.setAsValidated()
             false
         }
     }

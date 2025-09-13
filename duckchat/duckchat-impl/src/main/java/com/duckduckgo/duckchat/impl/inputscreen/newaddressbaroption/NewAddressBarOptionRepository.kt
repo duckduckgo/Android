@@ -24,11 +24,13 @@ import javax.inject.Inject
 import kotlinx.coroutines.withContext
 
 interface NewAddressBarOptionRepository {
-    suspend fun markAsShown()
-    suspend fun hasBeenShown(): Boolean
-    suspend fun markAsChecked()
-    suspend fun hasBeenChecked(): Boolean
-    suspend fun setBackgrounded()
+    suspend fun setAsShown()
+    suspend fun wasShown(): Boolean
+
+    suspend fun setAsValidated()
+    suspend fun wasValidated(): Boolean
+
+    suspend fun setAsBackgrounded()
     suspend fun wasBackgrounded(): Boolean
 }
 
@@ -39,24 +41,24 @@ class RealNewAddressBarOptionRepository @Inject constructor(
     private val dispatchers: DispatcherProvider,
 ) : NewAddressBarOptionRepository {
 
-    override suspend fun markAsShown() = withContext(dispatchers.io()) {
-        newAddressBarOptionDataStore.markAsShown()
+    override suspend fun setAsShown() = withContext(dispatchers.io()) {
+        newAddressBarOptionDataStore.setAsShown()
     }
 
-    override suspend fun hasBeenShown(): Boolean = withContext(dispatchers.io()) {
-        newAddressBarOptionDataStore.hasBeenShown()
+    override suspend fun wasShown(): Boolean = withContext(dispatchers.io()) {
+        newAddressBarOptionDataStore.wasShown()
     }
 
-    override suspend fun markAsChecked() = withContext(dispatchers.io()) {
-        newAddressBarOptionDataStore.markAsChecked()
+    override suspend fun setAsValidated() = withContext(dispatchers.io()) {
+        newAddressBarOptionDataStore.setAsValidated()
     }
 
-    override suspend fun hasBeenChecked(): Boolean = withContext(dispatchers.io()) {
-        newAddressBarOptionDataStore.hasBeenChecked()
+    override suspend fun wasValidated(): Boolean = withContext(dispatchers.io()) {
+        newAddressBarOptionDataStore.wasValidated()
     }
 
-    override suspend fun setBackgrounded() = withContext(dispatchers.io()) {
-        newAddressBarOptionDataStore.setBackgrounded()
+    override suspend fun setAsBackgrounded() = withContext(dispatchers.io()) {
+        newAddressBarOptionDataStore.setAsBackgrounded()
     }
 
     override suspend fun wasBackgrounded(): Boolean = withContext(dispatchers.io()) {

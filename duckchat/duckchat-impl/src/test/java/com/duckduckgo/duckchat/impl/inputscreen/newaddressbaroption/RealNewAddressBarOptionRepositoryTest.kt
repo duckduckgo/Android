@@ -17,7 +17,6 @@
 package com.duckduckgo.duckchat.impl.inputscreen.newaddressbaroption
 
 import com.duckduckgo.common.test.CoroutineTestRule
-import com.duckduckgo.common.utils.DispatcherProvider
 import junit.framework.TestCase.assertFalse
 import junit.framework.TestCase.assertTrue
 import kotlinx.coroutines.test.runTest
@@ -38,9 +37,6 @@ class RealNewAddressBarOptionRepositoryTest {
     @Mock
     private var newAddressBarOptionDataStoreMock: NewAddressBarOptionDataStore = mock()
 
-    @Mock
-    private var dispatcherProviderMock: DispatcherProvider = mock()
-
     private lateinit var testee: RealNewAddressBarOptionRepository
 
     @Before
@@ -48,53 +44,53 @@ class RealNewAddressBarOptionRepositoryTest {
         MockitoAnnotations.openMocks(this)
         testee = RealNewAddressBarOptionRepository(
             newAddressBarOptionDataStore = newAddressBarOptionDataStoreMock,
-            dispatchers = dispatcherProviderMock,
+            dispatchers = coroutineTestRule.testDispatcherProvider,
         )
     }
 
     @Test
-    fun `when markAsShown is called then dataStore markAsShown is called`() = runTest {
-        testee.markAsShown()
+    fun `when setAsShown is called then dataStore setAsShown is called`() = runTest {
+        testee.setAsShown()
 
-        verify(newAddressBarOptionDataStoreMock).markAsShown()
+        verify(newAddressBarOptionDataStoreMock).setAsShown()
     }
 
     @Test
-    fun `when hasBeenShown is called and dataStore hasBeenShown is true then return true`() = runTest {
-        whenever(newAddressBarOptionDataStoreMock.hasBeenShown()).thenReturn(true)
+    fun `when wasShown is called and dataStore wasShown is true then return true`() = runTest {
+        whenever(newAddressBarOptionDataStoreMock.wasShown()).thenReturn(true)
 
-        assertTrue(testee.hasBeenShown())
-        verify(newAddressBarOptionDataStoreMock).hasBeenShown()
+        assertTrue(testee.wasShown())
+        verify(newAddressBarOptionDataStoreMock).wasShown()
     }
 
     @Test
-    fun `when hasBeenShown is called and dataStore hasBeenShown is false then return false`() = runTest {
-        whenever(newAddressBarOptionDataStoreMock.hasBeenShown()).thenReturn(false)
+    fun `when wasShown is called and dataStore wasShown is false then return false`() = runTest {
+        whenever(newAddressBarOptionDataStoreMock.wasShown()).thenReturn(false)
 
-        assertFalse(testee.hasBeenShown())
-        verify(newAddressBarOptionDataStoreMock).hasBeenShown()
+        assertFalse(testee.wasShown())
+        verify(newAddressBarOptionDataStoreMock).wasShown()
     }
 
     @Test
-    fun `when markAsChecked is called then dataStore markAsChecked is called`() = runTest {
-        testee.markAsChecked()
+    fun `when setAsValidated is called then dataStore setAsValidated is called`() = runTest {
+        testee.setAsValidated()
 
-        verify(newAddressBarOptionDataStoreMock).markAsChecked()
+        verify(newAddressBarOptionDataStoreMock).setAsValidated()
     }
 
     @Test
-    fun `when hasBeenChecked is called and dataStore hasBeenChecked is true then return true`() = runTest {
-        whenever(newAddressBarOptionDataStoreMock.hasBeenChecked()).thenReturn(true)
+    fun `when wasValidated is called and dataStore wasValidated is true then return true`() = runTest {
+        whenever(newAddressBarOptionDataStoreMock.wasValidated()).thenReturn(true)
 
-        assertTrue(testee.hasBeenChecked())
-        verify(newAddressBarOptionDataStoreMock).hasBeenChecked()
+        assertTrue(testee.wasValidated())
+        verify(newAddressBarOptionDataStoreMock).wasValidated()
     }
 
     @Test
-    fun `when hasBeenChecked is called and dataStore hasBeenChecked is false then return false`() = runTest {
-        whenever(newAddressBarOptionDataStoreMock.hasBeenChecked()).thenReturn(false)
+    fun `when wasValidated is called and dataStore wasValidated is false then return false`() = runTest {
+        whenever(newAddressBarOptionDataStoreMock.wasValidated()).thenReturn(false)
 
-        assertFalse(testee.hasBeenChecked())
-        verify(newAddressBarOptionDataStoreMock).hasBeenChecked()
+        assertFalse(testee.wasValidated())
+        verify(newAddressBarOptionDataStoreMock).wasValidated()
     }
 }
