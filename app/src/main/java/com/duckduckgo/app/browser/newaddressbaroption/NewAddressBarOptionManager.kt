@@ -27,7 +27,9 @@ import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.impl.inputscreen.newaddressbaroption.NewAddressBarOptionBottomSheetDialogFactory
 import com.duckduckgo.duckchat.impl.inputscreen.newaddressbaroption.NewAddressBarOptionRepository
 import com.duckduckgo.remote.messaging.api.RemoteMessagingRepository
+import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
+import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import logcat.LogPriority.DEBUG
@@ -44,7 +46,8 @@ interface NewAddressBarOptionManager {
 }
 
 @SingleInstanceIn(AppScope::class)
-class RealNewAddressBarOptionManager(
+@ContributesBinding(AppScope::class)
+class RealNewAddressBarOptionManager @Inject constructor(
     private val duckAiFeatureState: DuckAiFeatureState,
     private val userStageStore: UserStageStore,
     private val duckChat: DuckChat,
