@@ -51,6 +51,8 @@ class RealNewAddressBarOptionManager(
     private val newAddressBarOptionBottomSheetDialogFactory: NewAddressBarOptionBottomSheetDialogFactory,
 ) : NewAddressBarOptionManager {
 
+    private var dialogShown = false
+
     private suspend fun shouldTrigger(
         activity: Activity,
         isFreshLaunch: Boolean,
@@ -72,7 +74,8 @@ class RealNewAddressBarOptionManager(
             !launchedFromExternal &&
             !interstitialScreen &&
             !hasInteractedWithSearchAndDuckAiAnnouncement() &&
-            !hasBottomAddressBarEnabled()
+            !hasBottomAddressBarEnabled() &&
+            !dialogShown
     }
 
     override suspend fun showDialog(
@@ -84,6 +87,7 @@ class RealNewAddressBarOptionManager(
     ) {
         if (shouldTrigger(activity, isFreshLaunch, launchedFromExternal, interstitialScreen)) {
             withContext(Dispatchers.Main) {
+                dialogShown = true
                 newAddressBarOptionBottomSheetDialogFactory.create(
                     context = activity,
                     isLightModeEnabled = isLightModeEnabled,
