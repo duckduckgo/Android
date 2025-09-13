@@ -53,7 +53,7 @@ class RealNewAddressBarOptionManager(
 
     private suspend fun shouldTrigger(
         activity: Activity,
-        freshLaunch: Boolean,
+        isFreshLaunch: Boolean,
         launchedFromExternal: Boolean,
         interstitialScreen: Boolean,
     ): Boolean {
@@ -61,20 +61,18 @@ class RealNewAddressBarOptionManager(
             "NewAddressBarOptionManager: shouldTrigger: " +
                 "launchedFromExternal=$launchedFromExternal, interstitialScreen=$interstitialScreen"
         }
-        return isDuckAiEnabled() &&
+        return isActivityValid(activity) &&
+            isDuckAiEnabled() &&
             isOnboardingCompleted() &&
             isFeatureFlagEnabled() &&
-            isSubsequentLaunch() &&
+            isSubsequentLaunch(isFreshLaunch) &&
             !isDuckAiOmnibarShortcutDisabled() &&
             !isInputScreenEnabled() &&
             !hasNewAddressBarOptionBeenShown() &&
             !launchedFromExternal &&
             !interstitialScreen &&
             !hasInteractedWithSearchAndDuckAiAnnouncement() &&
-            !hasBottomAddressBarEnabled() &&
-            !activity.isFinishing &&
-            !activity.isDestroyed &&
-            (freshLaunch || newAddressBarOptionRepository.wasBackgrounded())
+            !hasBottomAddressBarEnabled()
     }
 
     override suspend fun showDialog(
@@ -90,6 +88,15 @@ class RealNewAddressBarOptionManager(
                     context = activity,
                     isLightModeEnabled = isLightModeEnabled,
                 ).show()
+            }
+        }
+    }
+
+    private fun isActivityValid(activity: Activity): Boolean {
+        return (!activity.isFinishing && !activity.isDestroyed).also { result ->
+            logcat(DEBUG) {
+                "NewAddressBarOptionManager: isActivityValid: " +
+                    "isFinishing=${activity.isFinishing}, isDestroyed=${activity.isDestroyed}, result=$result"
             }
         }
     }
@@ -142,13 +149,17 @@ class RealNewAddressBarOptionManager(
             }
         }
 
-    private suspend fun isSubsequentLaunch(): Boolean {
+    private suspend fun isSubsequentLaunch(isFreshLaunch: Boolean): Boolean {
         val wasValidated = newAddressBarOptionRepository.wasValidated()
         logcat(DEBUG) { "NewAddressBarOptionManager: isSubsequentLaunch: wasValidated=$wasValidated" }
 
         return if (wasValidated) {
-            logcat(DEBUG) { "NewAddressBarOptionManager: isSubsequentLaunch: Validated before, returning true" }
-            true
+            return (isFreshLaunch || newAddressBarOptionRepository.wasBackgrounded()).also { result ->
+                logcat(DEBUG) {
+                    "NewAddressBarOptionManager: isSubsequentLaunch: " +
+                        "isFreshLaunch=$isFreshLaunch, wasBackgrounded=${newAddressBarOptionRepository.wasBackgrounded()}, result=$result"
+                }
+            }
         } else {
             logcat(DEBUG) { "NewAddressBarOptionManager: isSubsequentLaunch: Not been validated before, setting as validated and returning false" }
             newAddressBarOptionRepository.setAsValidated()
