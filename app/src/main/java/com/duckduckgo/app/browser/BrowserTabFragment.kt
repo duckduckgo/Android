@@ -2770,6 +2770,8 @@ class BrowserTabFragment :
 
         val authDialogBinding = HttpAuthenticationBinding.inflate(layoutInflater)
         authDialogBinding.httpAuthInformationText.text = getString(R.string.authenticationDialogMessage, request.site)
+        authDialogBinding.usernameInput.setAutofillDomain(request.site)
+        authDialogBinding.passwordInput.setAutofillDomain(request.site)
         CustomAlertDialogBuilder(requireActivity())
             .setPositiveButton(R.string.authenticationDialogPositiveButton)
             .setNegativeButton(R.string.authenticationDialogNegativeButton)

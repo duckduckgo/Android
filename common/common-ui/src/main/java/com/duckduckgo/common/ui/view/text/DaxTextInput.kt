@@ -33,6 +33,7 @@ import android.util.AttributeSet
 import android.util.SparseArray
 import android.view.View
 import android.view.View.OnFocusChangeListener
+import android.view.ViewStructure
 import android.view.inputmethod.EditorInfo
 import android.widget.TextView.OnEditorActionListener
 import androidx.annotation.DrawableRes
@@ -103,6 +104,7 @@ class DaxTextInput @JvmOverloads constructor(
     private var isPasswordShown: Boolean = false
     private var isClickable: Boolean = false
     private var internalFocusChangedListener: OnFocusChangeListener? = null
+    private var autofillDomain: String = ""
 
     init {
         context.obtainStyledAttributes(
@@ -224,6 +226,20 @@ class DaxTextInput @JvmOverloads constructor(
     fun showKeyboardDelayed() {
         binding.root.postDelayed(KEYBOARD_DELAY) {
             binding.internalEditText.showKeyboard()
+        }
+    }
+
+    fun setAutofillDomain(domain: String) {
+        this.autofillDomain = domain
+    }
+
+    override fun onProvideAutofillStructure(
+        structure: ViewStructure?,
+        flags: Int,
+    ) {
+        super.onProvideAutofillStructure(structure, flags)
+        this.autofillDomain.takeUnless { it.isBlank() }?.let {
+            structure?.setWebDomain(it)
         }
     }
 
