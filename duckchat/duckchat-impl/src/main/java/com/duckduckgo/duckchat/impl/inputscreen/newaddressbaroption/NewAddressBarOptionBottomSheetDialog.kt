@@ -61,7 +61,6 @@ class NewAddressBarOptionBottomSheetDialog(
 
         setOnShowListener {
             setRoundCorners()
-            duckChatInternal.onNewAddressBarOptionShown()
         }
 
         setOnCancelListener {
