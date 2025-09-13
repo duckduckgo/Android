@@ -31,6 +31,8 @@ import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
 import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import logcat.LogPriority.DEBUG
 import logcat.logcat
@@ -56,6 +58,8 @@ class RealNewAddressBarOptionManager @Inject constructor(
     private val settingsDataStore: SettingsDataStore,
     private val newAddressBarOptionBottomSheetDialogFactory: NewAddressBarOptionBottomSheetDialogFactory,
 ) : NewAddressBarOptionManager {
+
+    private val showDialogMutex = Mutex()
 
     private suspend fun shouldTrigger(
         activity: Activity,
@@ -88,13 +92,15 @@ class RealNewAddressBarOptionManager @Inject constructor(
         isFreshLaunch: Boolean,
         isLightModeEnabled: Boolean,
     ) {
-        if (shouldTrigger(activity, isFreshLaunch, launchedFromExternal, interstitialScreen)) {
-            newAddressBarOptionRepository.setAsShown()
-            withContext(Dispatchers.Main) {
-                newAddressBarOptionBottomSheetDialogFactory.create(
-                    context = activity,
-                    isLightModeEnabled = isLightModeEnabled,
-                ).show()
+        showDialogMutex.withLock {
+            if (shouldTrigger(activity, isFreshLaunch, launchedFromExternal, interstitialScreen)) {
+                newAddressBarOptionRepository.setAsShown()
+                withContext(Dispatchers.Main) {
+                    newAddressBarOptionBottomSheetDialogFactory.create(
+                        context = activity,
+                        isLightModeEnabled = isLightModeEnabled,
+                    ).show()
+                }
             }
         }
     }
