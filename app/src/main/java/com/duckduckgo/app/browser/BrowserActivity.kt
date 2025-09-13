@@ -1084,8 +1084,12 @@ open class BrowserActivity : DuckDuckGoActivity() {
             runCatching {
                 newAddressBarOptionManager.showDialog(
                     activity = this@BrowserActivity,
-                    launchedFromExternal = intent.getBooleanExtra(LAUNCH_FROM_EXTERNAL_EXTRA, false),
-                    interstitialScreen = intent.getBooleanExtra(LAUNCH_FROM_INTERSTITIAL_EXTRA, false),
+                    launchedFromExternal =
+                        intent.getBooleanExtra(LAUNCH_FROM_EXTERNAL_EXTRA, false) ||
+                        intent.getBooleanExtra(LAUNCH_FROM_CLEAR_DATA_ACTION, false) ||
+                        intent.getBooleanExtra(LAUNCH_FROM_FAVORITES_WIDGET, false) ||
+                        intent.getBooleanExtra(OPEN_DUCK_CHAT, false) ||
+                        intent.getBooleanExtra(LAUNCH_FROM_INTERSTITIAL_EXTRA, false),
                     isFreshLaunch = isFreshLaunch,
                     isLightModeEnabled = !isDarkThemeEnabled(),
                 )

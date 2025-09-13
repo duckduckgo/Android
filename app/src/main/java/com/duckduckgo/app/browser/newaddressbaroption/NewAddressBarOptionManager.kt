@@ -41,7 +41,6 @@ interface NewAddressBarOptionManager {
     suspend fun showDialog(
         activity: Activity,
         launchedFromExternal: Boolean,
-        interstitialScreen: Boolean,
         isFreshLaunch: Boolean,
         isLightModeEnabled: Boolean,
     )
@@ -65,11 +64,10 @@ class RealNewAddressBarOptionManager @Inject constructor(
         activity: Activity,
         isFreshLaunch: Boolean,
         launchedFromExternal: Boolean,
-        interstitialScreen: Boolean,
     ): Boolean {
         logcat(DEBUG) {
             "NewAddressBarOptionManager: shouldTrigger: " +
-                "launchedFromExternal=$launchedFromExternal, interstitialScreen=$interstitialScreen"
+                "launchedFromExternal=$launchedFromExternal"
         }
         return isActivityValid(activity) &&
             isDuckAiEnabled() &&
@@ -80,7 +78,6 @@ class RealNewAddressBarOptionManager @Inject constructor(
             !isInputScreenEnabled() &&
             !hasNewAddressBarOptionBeenShown() &&
             !launchedFromExternal &&
-            !interstitialScreen &&
             !hasInteractedWithSearchAndDuckAiAnnouncement() &&
             !hasBottomAddressBarEnabled()
     }
@@ -88,12 +85,11 @@ class RealNewAddressBarOptionManager @Inject constructor(
     override suspend fun showDialog(
         activity: Activity,
         launchedFromExternal: Boolean,
-        interstitialScreen: Boolean,
         isFreshLaunch: Boolean,
         isLightModeEnabled: Boolean,
     ) {
         showDialogMutex.withLock {
-            if (shouldTrigger(activity, isFreshLaunch, launchedFromExternal, interstitialScreen)) {
+            if (shouldTrigger(activity, isFreshLaunch, launchedFromExternal)) {
                 newAddressBarOptionRepository.setAsShown()
                 withContext(Dispatchers.Main) {
                     newAddressBarOptionBottomSheetDialogFactory.create(
