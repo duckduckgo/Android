@@ -40,7 +40,7 @@ import logcat.logcat
 interface NewAddressBarOptionManager {
     suspend fun showDialog(
         activity: Activity,
-        launchedFromExternal: Boolean,
+        isLaunchedFromExternal: Boolean,
         isFreshLaunch: Boolean,
         isLightModeEnabled: Boolean,
     )
@@ -62,12 +62,12 @@ class RealNewAddressBarOptionManager @Inject constructor(
 
     override suspend fun showDialog(
         activity: Activity,
-        launchedFromExternal: Boolean,
+        isLaunchedFromExternal: Boolean,
         isFreshLaunch: Boolean,
         isLightModeEnabled: Boolean,
     ) {
         showDialogMutex.withLock {
-            if (shouldTrigger(activity, isFreshLaunch, launchedFromExternal)) {
+            if (shouldTrigger(activity, isFreshLaunch, isLaunchedFromExternal)) {
                 newAddressBarOptionRepository.setAsShown()
                 withContext(Dispatchers.Main) {
                     newAddressBarOptionBottomSheetDialogFactory.create(
@@ -82,7 +82,7 @@ class RealNewAddressBarOptionManager @Inject constructor(
     private suspend fun shouldTrigger(
         activity: Activity,
         isFreshLaunch: Boolean,
-        launchedFromExternal: Boolean,
+        isLaunchedFromExternal: Boolean,
     ): Boolean {
         return isActivityValid(activity) &&
             isOnboardingCompleted() &&
@@ -94,7 +94,7 @@ class RealNewAddressBarOptionManager @Inject constructor(
             hasNotInteractedWithSearchAndDuckAiRMF() &&
             isNewAddressBarOptionAnnouncementEnabled() &&
             isSubsequentLaunch(isFreshLaunch) &&
-            isNotLaunchedFromExternal(launchedFromExternal)
+            isNotLaunchedFromExternal(isLaunchedFromExternal)
     }
 
     private fun isActivityValid(activity: Activity): Boolean {

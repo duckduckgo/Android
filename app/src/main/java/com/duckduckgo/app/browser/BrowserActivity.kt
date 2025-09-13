@@ -1088,7 +1088,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
             runCatching {
                 newAddressBarOptionManager.showDialog(
                     activity = this@BrowserActivity,
-                    launchedFromExternal = intent.getBooleanExtra(LAUNCHED_FROM_EXTERNAL_SOURCE, false),
+                    isLaunchedFromExternal = intent.getBooleanExtra(LAUNCHED_FROM_EXTERNAL_SOURCE, false),
                     isFreshLaunch = isFreshLaunch,
                     isLightModeEnabled = !isDarkThemeEnabled(),
                 )
