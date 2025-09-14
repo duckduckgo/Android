@@ -91,8 +91,8 @@ class RealNewAddressBarOptionManager @Inject constructor(
             isBottomAddressBarDisabled() &&
             hasNotInteractedWithSearchAndDuckAiRMF() &&
             isNewAddressBarOptionChoiceScreenEnabled() &&
-            isSubsequentLaunch() &&
-            isNotLaunchedFromExternal(isLaunchedFromExternal)
+            isNotLaunchedFromExternal(isLaunchedFromExternal) &&
+            isSubsequentLaunch()
     }
 
     private fun isActivityValid(activity: Activity): Boolean {
@@ -143,6 +143,11 @@ class RealNewAddressBarOptionManager @Inject constructor(
             logcat(DEBUG) { "NewAddressBarOptionManager: $it isNewAddressBarOptionChoiceScreenEnabled" }
         }
 
+    private fun isNotLaunchedFromExternal(launchedFromExternal: Boolean): Boolean =
+        (!launchedFromExternal).also {
+            logcat(DEBUG) { "NewAddressBarOptionManager: $it isNotLaunchedFromExternal" }
+        }
+
     private suspend fun isSubsequentLaunch(): Boolean {
         return if (newAddressBarOptionDataStore.wasValidated()) {
             true
@@ -153,9 +158,4 @@ class RealNewAddressBarOptionManager @Inject constructor(
             logcat(DEBUG) { "NewAddressBarOptionManager: $it isSubsequentLaunch" }
         }
     }
-
-    private fun isNotLaunchedFromExternal(launchedFromExternal: Boolean): Boolean =
-        (!launchedFromExternal).also {
-            logcat(DEBUG) { "NewAddressBarOptionManager: $it isNotLaunchedFromExternal" }
-        }
 }
