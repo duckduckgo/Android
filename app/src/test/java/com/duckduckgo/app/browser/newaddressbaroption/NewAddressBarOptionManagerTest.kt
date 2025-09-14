@@ -184,7 +184,7 @@ class NewAddressBarOptionManagerTest {
     }
 
     @Test
-    fun `when was validated before then showChoiceScreen does not show dialog and sets as validated`() = runTest {
+    fun `when was not validated before then showChoiceScreen does not show dialog and sets as validated`() = runTest {
         setupAllConditionsMet()
         whenever(newAddressBarOptionDataStoreMock.wasValidated()).thenReturn(false)
 
@@ -204,7 +204,7 @@ class NewAddressBarOptionManagerTest {
     }
 
     @Test
-    fun `when is disabled then markAsChecked is not called`() = runTest {
+    fun `when feature is disabled then setAsValidated is not called`() = runTest {
         setupAllConditionsMet()
         showNewAddressBarOptionAnnouncementFlow.value = false
         whenever(newAddressBarOptionDataStoreMock.wasValidated()).thenReturn(false)
