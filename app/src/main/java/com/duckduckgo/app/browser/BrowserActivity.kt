@@ -1086,7 +1086,8 @@ open class BrowserActivity : DuckDuckGoActivity() {
                     intent.getBooleanExtra(LAUNCH_FROM_CLEAR_DATA_ACTION, false) ||
                     intent.getBooleanExtra(NOTIFY_DATA_CLEARED_EXTRA, false) ||
                     intent.getBooleanExtra(LAUNCH_FROM_INTERSTITIAL_EXTRA, false) ||
-                    intent.getBooleanExtra(OPEN_DUCK_CHAT, false),
+                    intent.getBooleanExtra(OPEN_DUCK_CHAT, false) ||
+                    intent.getBooleanExtra(LAUNCH_FROM_FAVORITES_WIDGET, false),
             )
         }
     }
