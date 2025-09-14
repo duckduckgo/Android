@@ -36,8 +36,6 @@ import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.api.DuckChatSettingsNoParams
 import com.duckduckgo.duckchat.impl.feature.AIChatImageUploadFeature
 import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
-import com.duckduckgo.duckchat.impl.inputscreen.newaddressbaroption.ChoiceSelectionCallback
-import com.duckduckgo.duckchat.impl.inputscreen.newaddressbaroption.NewAddressBarOptionBottomSheetDialogFactory
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelParameters
 import com.duckduckgo.duckchat.impl.repository.DuckChatFeatureRepository
@@ -222,7 +220,6 @@ class RealDuckChat @Inject constructor(
     private val pixel: Pixel,
     private val imageUploadFeature: AIChatImageUploadFeature,
     private val browserNav: BrowserNav,
-    private val newAddressBarOptionBottomSheetDialogFactory: NewAddressBarOptionBottomSheetDialogFactory,
 ) : DuckChatInternal, DuckAiFeatureState, PrivacyConfigCallbackPlugin {
 
     private val closeChatFlow = MutableSharedFlow<Unit>(replay = 0)
@@ -520,20 +517,6 @@ class RealDuckChat @Inject constructor(
 
     override suspend fun wasOpenedBefore(): Boolean {
         return duckChatFeatureRepository.wasOpenedBefore()
-    }
-
-    override fun showNewAddressBarOptionChoiceScreen(context: Context, isDarkThemeEnabled: Boolean) {
-        newAddressBarOptionBottomSheetDialogFactory.create(
-            context = context,
-            isDarkThemeEnabled = isDarkThemeEnabled,
-            choiceSelectionCallback = object : ChoiceSelectionCallback {
-                override fun onSearchAndDuckAiSelected() {
-                    appCoroutineScope.launch {
-                        setInputScreenUserSetting(true)
-                    }
-                }
-            },
-        ).show()
     }
 
     private suspend fun hasActiveSession(): Boolean {

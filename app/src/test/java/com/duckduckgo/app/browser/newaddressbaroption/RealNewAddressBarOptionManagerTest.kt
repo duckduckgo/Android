@@ -23,6 +23,7 @@ import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.api.DuckChat
+import com.duckduckgo.duckchat.api.inputscreen.InputScreen
 import com.duckduckgo.remote.messaging.api.RemoteMessagingRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.runTest
@@ -52,6 +53,9 @@ class RealNewAddressBarOptionManagerTest {
     private var duckChatMock: DuckChat = mock()
 
     @Mock
+    private var inputScreenMock: InputScreen = mock()
+
+    @Mock
     private var remoteMessagingRepositoryMock: RemoteMessagingRepository = mock()
 
     @Mock
@@ -78,6 +82,7 @@ class RealNewAddressBarOptionManagerTest {
             duckAiFeatureStateMock,
             userStageStoreMock,
             duckChatMock,
+            inputScreenMock,
             remoteMessagingRepositoryMock,
             newAddressBarOptionDataStoreMock,
             settingsDataStoreMock,
@@ -91,7 +96,7 @@ class RealNewAddressBarOptionManagerTest {
 
         testee.showChoiceScreen(mock(), isLaunchedFromExternal = false)
 
-        verify(duckChatMock).showNewAddressBarOptionChoiceScreen(any(), any())
+        verify(inputScreenMock).showNewAddressBarOptionChoiceScreen(any(), any())
     }
 
     @Test
@@ -100,7 +105,7 @@ class RealNewAddressBarOptionManagerTest {
 
         testee.showChoiceScreen(mock(), isLaunchedFromExternal = true)
 
-        verify(duckChatMock, never()).showNewAddressBarOptionChoiceScreen(any(), any())
+        verify(inputScreenMock, never()).showNewAddressBarOptionChoiceScreen(any(), any())
     }
 
     @Test
@@ -110,7 +115,7 @@ class RealNewAddressBarOptionManagerTest {
 
         testee.showChoiceScreen(mock(), isLaunchedFromExternal = false)
 
-        verify(duckChatMock, never()).showNewAddressBarOptionChoiceScreen(any(), any())
+        verify(inputScreenMock, never()).showNewAddressBarOptionChoiceScreen(any(), any())
     }
 
     @Test
@@ -120,7 +125,7 @@ class RealNewAddressBarOptionManagerTest {
 
         testee.showChoiceScreen(mock(), isLaunchedFromExternal = false)
 
-        verify(duckChatMock, never()).showNewAddressBarOptionChoiceScreen(any(), any())
+        verify(inputScreenMock, never()).showNewAddressBarOptionChoiceScreen(any(), any())
     }
 
     @Test
@@ -130,7 +135,7 @@ class RealNewAddressBarOptionManagerTest {
 
         testee.showChoiceScreen(mock(), isLaunchedFromExternal = false)
 
-        verify(duckChatMock, never()).showNewAddressBarOptionChoiceScreen(any(), any())
+        verify(inputScreenMock, never()).showNewAddressBarOptionChoiceScreen(any(), any())
     }
 
     @Test
@@ -140,7 +145,7 @@ class RealNewAddressBarOptionManagerTest {
 
         testee.showChoiceScreen(mock(), isLaunchedFromExternal = false)
 
-        verify(duckChatMock, never()).showNewAddressBarOptionChoiceScreen(any(), any())
+        verify(inputScreenMock, never()).showNewAddressBarOptionChoiceScreen(any(), any())
     }
 
     @Test
@@ -150,7 +155,7 @@ class RealNewAddressBarOptionManagerTest {
 
         testee.showChoiceScreen(mock(), isLaunchedFromExternal = false)
 
-        verify(duckChatMock, never()).showNewAddressBarOptionChoiceScreen(any(), any())
+        verify(inputScreenMock, never()).showNewAddressBarOptionChoiceScreen(any(), any())
     }
 
     @Test
@@ -160,7 +165,7 @@ class RealNewAddressBarOptionManagerTest {
 
         testee.showChoiceScreen(mock(), isLaunchedFromExternal = false)
 
-        verify(duckChatMock, never()).showNewAddressBarOptionChoiceScreen(any(), any())
+        verify(inputScreenMock, never()).showNewAddressBarOptionChoiceScreen(any(), any())
     }
 
     @Test
@@ -170,7 +175,7 @@ class RealNewAddressBarOptionManagerTest {
 
         testee.showChoiceScreen(mock(), isLaunchedFromExternal = false)
 
-        verify(duckChatMock, never()).showNewAddressBarOptionChoiceScreen(any(), any())
+        verify(inputScreenMock, never()).showNewAddressBarOptionChoiceScreen(any(), any())
     }
 
     @Test
@@ -180,7 +185,7 @@ class RealNewAddressBarOptionManagerTest {
 
         testee.showChoiceScreen(mock(), isLaunchedFromExternal = false)
 
-        verify(duckChatMock, never()).showNewAddressBarOptionChoiceScreen(any(), any())
+        verify(inputScreenMock, never()).showNewAddressBarOptionChoiceScreen(any(), any())
     }
 
     @Test
@@ -190,7 +195,7 @@ class RealNewAddressBarOptionManagerTest {
 
         testee.showChoiceScreen(mock(), isLaunchedFromExternal = false)
 
-        verify(duckChatMock, never()).showNewAddressBarOptionChoiceScreen(any(), any())
+        verify(inputScreenMock, never()).showNewAddressBarOptionChoiceScreen(any(), any())
         verify(newAddressBarOptionDataStoreMock).setAsValidated()
     }
 
@@ -200,7 +205,7 @@ class RealNewAddressBarOptionManagerTest {
 
         testee.showChoiceScreen(mock(), isLaunchedFromExternal = false)
 
-        verify(duckChatMock).showNewAddressBarOptionChoiceScreen(any(), any())
+        verify(inputScreenMock).showNewAddressBarOptionChoiceScreen(any(), any())
     }
 
     @Test
@@ -212,7 +217,7 @@ class RealNewAddressBarOptionManagerTest {
         testee.showChoiceScreen(mock(), isLaunchedFromExternal = false)
 
         verify(newAddressBarOptionDataStoreMock, never()).setAsValidated()
-        verify(duckChatMock, never()).showNewAddressBarOptionChoiceScreen(any(), any())
+        verify(inputScreenMock, never()).showNewAddressBarOptionChoiceScreen(any(), any())
     }
 
     private suspend fun setupAllConditionsMet() {

@@ -27,6 +27,7 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.api.DuckChat
+import com.duckduckgo.duckchat.api.inputscreen.InputScreen
 import com.duckduckgo.remote.messaging.api.RemoteMessagingRepository
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
@@ -50,6 +51,7 @@ class RealNewAddressBarOptionManager @Inject constructor(
     private val duckAiFeatureState: DuckAiFeatureState,
     private val userStageStore: UserStageStore,
     private val duckChat: DuckChat,
+    private val inputScreen: InputScreen,
     private val remoteMessagingRepository: RemoteMessagingRepository,
     private val newAddressBarOptionDataStore: NewAddressBarOptionDataStore,
     private val settingsDataStore: SettingsDataStore,
@@ -67,7 +69,7 @@ class RealNewAddressBarOptionManager @Inject constructor(
                 logcat(DEBUG) { "NewAddressBarOptionManager: All conditions met, showing choice screen" }
                 newAddressBarOptionDataStore.setAsShown()
                 withContext(dispatchers.main()) {
-                    duckChat.showNewAddressBarOptionChoiceScreen(activity, activity.isDarkThemeEnabled())
+                    inputScreen.showNewAddressBarOptionChoiceScreen(activity, activity.isDarkThemeEnabled())
                 }
             }
         }
