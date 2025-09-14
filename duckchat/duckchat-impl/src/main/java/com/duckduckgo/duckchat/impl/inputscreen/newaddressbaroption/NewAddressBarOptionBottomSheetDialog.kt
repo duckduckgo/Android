@@ -58,7 +58,7 @@ class NewAddressBarOptionBottomSheetDialog(
         setContentView(binding.root)
         this.behavior.isDraggable = false
         this.behavior.peekHeight = 0
-        this.behavior.maxHeight = 900.toPx()
+        this.behavior.maxHeight = MAX_HEIGHT_DP.toPx()
 
         setOnShowListener {
             setRoundCorners()
@@ -159,9 +159,7 @@ class NewAddressBarOptionBottomSheetDialog(
 
         lottieView.addLottieOnCompositionLoadedListener { composition ->
             isLottieLoaded = true
-            lottieView.postDelayed({
-                playIntroThenLoop(lottieView, composition.durationFrames.toInt())
-            }, 100,)
+            playIntroThenLoop(lottieView, composition.durationFrames.toInt())
 
             if (pendingShow) {
                 pendingShow = false
@@ -242,5 +240,9 @@ class NewAddressBarOptionBottomSheetDialog(
     override fun onDetachedFromWindow() {
         super.onDetachedFromWindow()
         restoreOrientation()
+    }
+
+    companion object {
+        const val MAX_HEIGHT_DP = 900
     }
 }
