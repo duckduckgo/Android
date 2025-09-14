@@ -818,7 +818,8 @@ class RealDuckChatTest {
 
     @Test
     fun `when showNewAddressBarOptionChoiceScreen called with dark theme then show dialog with dark theme`() = runTest {
-        testee.showNewAddressBarOptionChoiceScreen(mock(), true)
+        val mockContext = mock<Context>()
+        testee.showNewAddressBarOptionChoiceScreen(mockContext, true)
 
         val argumentCaptor = argumentCaptor<Context>()
         val themeCaptor = argumentCaptor<Boolean>()
@@ -835,7 +836,8 @@ class RealDuckChatTest {
 
     @Test
     fun `when showNewAddressBarOptionChoiceScreen called with light theme then show dialog with light theme`() = runTest {
-        testee.showNewAddressBarOptionChoiceScreen(mock(), false)
+        val mockContext = mock<Context>()
+        testee.showNewAddressBarOptionChoiceScreen(mockContext, false)
 
         val argumentCaptor = argumentCaptor<Context>()
         val themeCaptor = argumentCaptor<Boolean>()
@@ -858,7 +860,8 @@ class RealDuckChatTest {
             mockNewAddressBarOptionBottomSheetDialog
         }
 
-        testee.showNewAddressBarOptionChoiceScreen(mock(), true)
+        val mockContext = mock<Context>()
+        testee.showNewAddressBarOptionChoiceScreen(mockContext, true)
 
         verify(mockNewAddressBarOptionBottomSheetDialogFactory).create(
             any(),
