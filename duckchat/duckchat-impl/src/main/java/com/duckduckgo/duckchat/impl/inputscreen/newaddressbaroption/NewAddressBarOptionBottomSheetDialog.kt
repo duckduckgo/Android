@@ -226,10 +226,13 @@ class NewAddressBarOptionBottomSheetDialog(
 
     override fun show() {
         val lottieView = binding.newAddressBarOptionBottomSheetDialogAnimation
-        if (isLottieLoaded || lottieView.composition != null) {
+        val composition = lottieView.composition
+        if (isLottieLoaded || composition != null) {
             if (!isLottieLoaded) {
                 isLottieLoaded = true
-                playIntroThenLoop(lottieView, lottieView.composition!!.durationFrames.toInt())
+                composition?.let {
+                    playIntroThenLoop(lottieView, it.durationFrames.toInt())
+                }
             }
             super.show()
         } else {
