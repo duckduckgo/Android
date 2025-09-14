@@ -1002,7 +1002,10 @@ open class BrowserActivity : DuckDuckGoActivity() {
             intent.putExtra(CLOSE_DUCK_CHAT, closeDuckChat)
             intent.putExtra(DUCK_CHAT_URL, duckChatUrl)
             intent.putExtra(DUCK_CHAT_SESSION_ACTIVE, duckChatSessionActive)
-            intent.putExtra(LAUNCHED_FROM_EXTERNAL_SOURCE, isExternal || isLaunchFromClearDataAction || interstitialScreen || openDuckChat)
+            intent.putExtra(
+                LAUNCHED_FROM_EXTERNAL_SOURCE,
+                isExternal || isLaunchFromClearDataAction || notifyDataCleared || interstitialScreen || openDuckChat,
+            )
             return intent
         }
 
