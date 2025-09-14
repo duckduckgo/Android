@@ -23,8 +23,6 @@ import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.api.DuckChat
-import com.duckduckgo.duckchat.impl.inputscreen.newaddressbaroption.NewAddressBarOptionBottomSheetDialog
-import com.duckduckgo.duckchat.impl.inputscreen.newaddressbaroption.NewAddressBarOptionBottomSheetDialogFactory
 import com.duckduckgo.remote.messaging.api.RemoteMessagingRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.runTest
@@ -62,12 +60,6 @@ class RealNewAddressBarOptionManagerTest {
     @Mock
     private var settingsDataStoreMock: SettingsDataStore = mock()
 
-    @Mock
-    private var newAddressBarOptionBottomSheetDialogFactoryMock: NewAddressBarOptionBottomSheetDialogFactory = mock()
-
-    @Mock
-    private var newAddressBarOptionBottomSheetDialogMock: NewAddressBarOptionBottomSheetDialog = mock()
-
     private val showNewAddressBarOptionAnnouncementFlow = MutableStateFlow(false)
     private val showOmnibarShortcutInAllStatesFlow = MutableStateFlow(false)
     private val showInputScreenFlow = MutableStateFlow(false)
@@ -81,7 +73,6 @@ class RealNewAddressBarOptionManagerTest {
         whenever(duckAiFeatureStateMock.showNewAddressBarOptionAnnouncement).thenReturn(showNewAddressBarOptionAnnouncementFlow)
         whenever(duckAiFeatureStateMock.showOmnibarShortcutInAllStates).thenReturn(showOmnibarShortcutInAllStatesFlow)
         whenever(duckAiFeatureStateMock.showInputScreen).thenReturn(showInputScreenFlow)
-        whenever(newAddressBarOptionBottomSheetDialogFactoryMock.create(any(), any())).thenReturn(newAddressBarOptionBottomSheetDialogMock)
 
         testee = RealNewAddressBarOptionManager(
             duckAiFeatureStateMock,
@@ -90,127 +81,126 @@ class RealNewAddressBarOptionManagerTest {
             remoteMessagingRepositoryMock,
             newAddressBarOptionDataStoreMock,
             settingsDataStoreMock,
-            newAddressBarOptionBottomSheetDialogFactoryMock,
             coroutineTestRule.testDispatcherProvider,
         )
     }
 
     @Test
-    fun `when all conditions are met and not launched from external then showDialog shows dialog`() = runTest {
+    fun `when all conditions are met and not launched from external then showChoiceScreen shows dialog`() = runTest {
         setupAllConditionsMet()
 
-        testee.showDialog(mock(), isLaunchedFromExternal = false, isLightModeEnabled = true)
+        testee.showChoiceScreen(mock(), isLaunchedFromExternal = false)
 
-        verify(newAddressBarOptionBottomSheetDialogFactoryMock).create(any(), any())
+        verify(duckChatMock).showNewAddressBarOptionChoiceScreen(any(), any())
     }
 
     @Test
-    fun `when launched from external then showDialog does not show dialog`() = runTest {
+    fun `when launched from external then showChoiceScreen does not show dialog`() = runTest {
         setupAllConditionsMet()
 
-        testee.showDialog(mock(), isLaunchedFromExternal = true, isLightModeEnabled = true)
+        testee.showChoiceScreen(mock(), isLaunchedFromExternal = true)
 
-        verify(newAddressBarOptionBottomSheetDialogFactoryMock, never()).create(any(), any())
+        verify(duckChatMock, never()).showNewAddressBarOptionChoiceScreen(any(), any())
     }
 
     @Test
-    fun `when duck AI is disabled then showDialog does not show dialog`() = runTest {
+    fun `when duck AI is disabled then showChoiceScreen does not show dialog`() = runTest {
         setupAllConditionsMet()
         whenever(duckChatMock.isEnabled()).thenReturn(false)
 
-        testee.showDialog(mock(), isLaunchedFromExternal = false, isLightModeEnabled = true)
+        testee.showChoiceScreen(mock(), isLaunchedFromExternal = false)
 
-        verify(newAddressBarOptionBottomSheetDialogFactoryMock, never()).create(any(), any())
+        verify(duckChatMock, never()).showNewAddressBarOptionChoiceScreen(any(), any())
     }
 
     @Test
-    fun `when onboarding is not completed then showDialog does not show dialog`() = runTest {
+    fun `when onboarding is not completed then showChoiceScreen does not show dialog`() = runTest {
         setupAllConditionsMet()
         whenever(userStageStoreMock.getUserAppStage()).thenReturn(AppStage.DAX_ONBOARDING)
 
-        testee.showDialog(mock(), isLaunchedFromExternal = false, isLightModeEnabled = true)
+        testee.showChoiceScreen(mock(), isLaunchedFromExternal = false)
 
-        verify(newAddressBarOptionBottomSheetDialogFactoryMock, never()).create(any(), any())
+        verify(duckChatMock, never()).showNewAddressBarOptionChoiceScreen(any(), any())
     }
 
     @Test
-    fun `when feature flag is disabled then showDialog does not show dialog`() = runTest {
+    fun `when feature flag is disabled then showChoiceScreen does not show dialog`() = runTest {
         setupAllConditionsMet()
         showNewAddressBarOptionAnnouncementFlow.value = false
 
-        testee.showDialog(mock(), isLaunchedFromExternal = false, isLightModeEnabled = true)
+        testee.showChoiceScreen(mock(), isLaunchedFromExternal = false)
 
-        verify(newAddressBarOptionBottomSheetDialogFactoryMock, never()).create(any(), any())
+        verify(duckChatMock, never()).showNewAddressBarOptionChoiceScreen(any(), any())
     }
 
     @Test
-    fun `when duck AI omnibar shortcut is disabled then showDialog does not show dialog`() = runTest {
+    fun `when duck AI omnibar shortcut is disabled then showChoiceScreen does not show dialog`() = runTest {
         setupAllConditionsMet()
         showOmnibarShortcutInAllStatesFlow.value = false
 
-        testee.showDialog(mock(), isLaunchedFromExternal = false, isLightModeEnabled = true)
+        testee.showChoiceScreen(mock(), isLaunchedFromExternal = false)
 
-        verify(newAddressBarOptionBottomSheetDialogFactoryMock, never()).create(any(), any())
+        verify(duckChatMock, never()).showNewAddressBarOptionChoiceScreen(any(), any())
     }
 
     @Test
-    fun `when input screen is enabled then showDialog does not show dialog`() = runTest {
+    fun `when input screen is enabled then showChoiceScreen does not show dialog`() = runTest {
         setupAllConditionsMet()
         showInputScreenFlow.value = true
 
-        testee.showDialog(mock(), isLaunchedFromExternal = false, isLightModeEnabled = true)
+        testee.showChoiceScreen(mock(), isLaunchedFromExternal = false)
 
-        verify(newAddressBarOptionBottomSheetDialogFactoryMock, never()).create(any(), any())
+        verify(duckChatMock, never()).showNewAddressBarOptionChoiceScreen(any(), any())
     }
 
     @Test
-    fun `when new address bar option was shown before then showDialog does not show dialog`() = runTest {
+    fun `when new address bar option was shown before then showChoiceScreen does not show dialog`() = runTest {
         setupAllConditionsMet()
         whenever(newAddressBarOptionDataStoreMock.wasShown()).thenReturn(true)
 
-        testee.showDialog(mock(), isLaunchedFromExternal = false, isLightModeEnabled = true)
+        testee.showChoiceScreen(mock(), isLaunchedFromExternal = false)
 
-        verify(newAddressBarOptionBottomSheetDialogFactoryMock, never()).create(any(), any())
+        verify(duckChatMock, never()).showNewAddressBarOptionChoiceScreen(any(), any())
     }
 
     @Test
-    fun `when user has interacted with search and duck AI announcement then showDialog does not show dialog`() = runTest {
+    fun `when user has interacted with search and duck AI announcement then showChoiceScreen does not show dialog`() = runTest {
         setupAllConditionsMet()
         whenever(remoteMessagingRepositoryMock.dismissedMessages()).thenReturn(listOf("search_duck_ai_announcement"))
 
-        testee.showDialog(mock(), isLaunchedFromExternal = false, isLightModeEnabled = true)
+        testee.showChoiceScreen(mock(), isLaunchedFromExternal = false)
 
-        verify(newAddressBarOptionBottomSheetDialogFactoryMock, never()).create(any(), any())
+        verify(duckChatMock, never()).showNewAddressBarOptionChoiceScreen(any(), any())
     }
 
     @Test
-    fun `when bottom address bar is enabled then showDialog does not show dialog`() = runTest {
+    fun `when bottom address bar is enabled then showChoiceScreen does not show dialog`() = runTest {
         setupAllConditionsMet()
         whenever(settingsDataStoreMock.omnibarPosition).thenReturn(OmnibarPosition.BOTTOM)
 
-        testee.showDialog(mock(), isLaunchedFromExternal = false, isLightModeEnabled = true)
+        testee.showChoiceScreen(mock(), isLaunchedFromExternal = false)
 
-        verify(newAddressBarOptionBottomSheetDialogFactoryMock, never()).create(any(), any())
+        verify(duckChatMock, never()).showNewAddressBarOptionChoiceScreen(any(), any())
     }
 
     @Test
-    fun `when was validated before then showDialog does not show dialog and sets as validated`() = runTest {
+    fun `when was validated before then showChoiceScreen does not show dialog and sets as validated`() = runTest {
         setupAllConditionsMet()
         whenever(newAddressBarOptionDataStoreMock.wasValidated()).thenReturn(false)
 
-        testee.showDialog(mock(), isLaunchedFromExternal = false, isLightModeEnabled = true)
+        testee.showChoiceScreen(mock(), isLaunchedFromExternal = false)
 
-        verify(newAddressBarOptionBottomSheetDialogFactoryMock, never()).create(any(), any())
+        verify(duckChatMock, never()).showNewAddressBarOptionChoiceScreen(any(), any())
         verify(newAddressBarOptionDataStoreMock).setAsValidated()
     }
 
     @Test
-    fun `when was validated before then showDialog shows dialog`() = runTest {
+    fun `when was validated before then showChoiceScreen shows dialog`() = runTest {
         setupAllConditionsMet()
 
-        testee.showDialog(mock(), isLaunchedFromExternal = false, isLightModeEnabled = true)
+        testee.showChoiceScreen(mock(), isLaunchedFromExternal = false)
 
-        verify(newAddressBarOptionBottomSheetDialogFactoryMock).create(any(), any())
+        verify(duckChatMock).showNewAddressBarOptionChoiceScreen(any(), any())
     }
 
     @Test
@@ -219,10 +209,10 @@ class RealNewAddressBarOptionManagerTest {
         showNewAddressBarOptionAnnouncementFlow.value = false
         whenever(newAddressBarOptionDataStoreMock.wasValidated()).thenReturn(false)
 
-        testee.showDialog(mock(), isLaunchedFromExternal = false, isLightModeEnabled = true)
+        testee.showChoiceScreen(mock(), isLaunchedFromExternal = false)
 
         verify(newAddressBarOptionDataStoreMock, never()).setAsValidated()
-        verify(newAddressBarOptionBottomSheetDialogFactoryMock, never()).create(any(), any())
+        verify(duckChatMock, never()).showNewAddressBarOptionChoiceScreen(any(), any())
     }
 
     private suspend fun setupAllConditionsMet() {

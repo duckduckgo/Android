@@ -16,6 +16,7 @@
 
 package com.duckduckgo.duckchat.api
 
+import android.content.Context
 import android.net.Uri
 
 /**
@@ -56,4 +57,9 @@ interface DuckChat {
      * Returns `true` if Duck Chat was ever opened before.
      */
     suspend fun wasOpenedBefore(): Boolean
+
+    /**
+     * Displays the new address bar option choice screen.
+     */
+    fun showNewAddressBarOptionChoiceScreen(context: Context, isDarkThemeEnabled: Boolean)
 }

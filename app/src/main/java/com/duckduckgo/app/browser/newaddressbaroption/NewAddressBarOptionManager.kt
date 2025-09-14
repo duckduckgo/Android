@@ -21,12 +21,12 @@ import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition
 import com.duckduckgo.app.onboarding.store.AppStage
 import com.duckduckgo.app.onboarding.store.UserStageStore
 import com.duckduckgo.app.settings.db.SettingsDataStore
+import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.utils.DefaultDispatcherProvider
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.api.DuckChat
-import com.duckduckgo.duckchat.impl.inputscreen.newaddressbaroption.NewAddressBarOptionBottomSheetDialogFactory
 import com.duckduckgo.remote.messaging.api.RemoteMessagingRepository
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
@@ -38,10 +38,9 @@ import logcat.LogPriority.DEBUG
 import logcat.logcat
 
 interface NewAddressBarOptionManager {
-    suspend fun showDialog(
-        activity: Activity,
+    suspend fun showChoiceScreen(
+        activity: DuckDuckGoActivity,
         isLaunchedFromExternal: Boolean,
-        isLightModeEnabled: Boolean,
     )
 }
 
@@ -54,26 +53,21 @@ class RealNewAddressBarOptionManager @Inject constructor(
     private val remoteMessagingRepository: RemoteMessagingRepository,
     private val newAddressBarOptionDataStore: NewAddressBarOptionDataStore,
     private val settingsDataStore: SettingsDataStore,
-    private val newAddressBarOptionBottomSheetDialogFactory: NewAddressBarOptionBottomSheetDialogFactory,
     private val dispatchers: DispatcherProvider = DefaultDispatcherProvider(),
 ) : NewAddressBarOptionManager {
 
-    private val showDialogMutex = Mutex()
+    private val showChoiceScreenMutex = Mutex()
 
-    override suspend fun showDialog(
-        activity: Activity,
+    override suspend fun showChoiceScreen(
+        activity: DuckDuckGoActivity,
         isLaunchedFromExternal: Boolean,
-        isLightModeEnabled: Boolean,
     ) {
-        showDialogMutex.withLock {
+        showChoiceScreenMutex.withLock {
             if (validate(activity, isLaunchedFromExternal)) {
-                logcat(DEBUG) { "NewAddressBarOptionManager: All conditions met, showing dialog" }
+                logcat(DEBUG) { "NewAddressBarOptionManager: All conditions met, showing choice screen" }
                 newAddressBarOptionDataStore.setAsShown()
                 withContext(dispatchers.main()) {
-                    newAddressBarOptionBottomSheetDialogFactory.create(
-                        context = activity,
-                        isLightModeEnabled = isLightModeEnabled,
-                    ).show()
+                    duckChat.showNewAddressBarOptionChoiceScreen(activity, activity.isDarkThemeEnabled())
                 }
             }
         }

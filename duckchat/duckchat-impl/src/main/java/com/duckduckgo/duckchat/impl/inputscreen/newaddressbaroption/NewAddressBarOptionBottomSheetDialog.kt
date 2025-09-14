@@ -25,24 +25,25 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.FrameLayout
 import androidx.core.content.ContextCompat
-import androidx.lifecycle.lifecycleScope
 import com.airbnb.lottie.LottieAnimationView
 import com.airbnb.lottie.LottieDrawable
 import com.duckduckgo.common.ui.view.toPx
-import com.duckduckgo.duckchat.impl.DuckChatInternal
 import com.duckduckgo.duckchat.impl.R
 import com.duckduckgo.duckchat.impl.databinding.BottomSheetNewAddressBarOptionBinding
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.shape.CornerFamily
 import com.google.android.material.shape.MaterialShapeDrawable
-import kotlinx.coroutines.launch
+
+interface ChoiceSelectionCallback {
+    fun onSearchAndDuckAiSelected()
+}
 
 @SuppressLint("NoBottomSheetDialog")
 class NewAddressBarOptionBottomSheetDialog(
     private val context: Context,
-    private val isLightModeEnabled: Boolean,
-    private val duckChatInternal: DuckChatInternal,
+    private val isDarkThemeEnabled: Boolean,
+    private val choiceSelectionCallback: ChoiceSelectionCallback?,
 ) : BottomSheetDialog(context) {
 
     private val binding: BottomSheetNewAddressBarOptionBinding =
@@ -72,13 +73,11 @@ class NewAddressBarOptionBottomSheetDialog(
         setupSelectionLogic()
 
         binding.newAddressBarOptionBottomSheetDialogPrimaryButton.setOnClickListener {
-            lifecycleScope.launch {
-                if (searchAndDuckAiSelected) {
-                    duckChatInternal.setInputScreenUserSetting(true)
-                }
-                restoreOrientation()
-                dismiss()
+            if (searchAndDuckAiSelected) {
+                choiceSelectionCallback?.onSearchAndDuckAiSelected()
             }
+            restoreOrientation()
+            dismiss()
         }
 
         binding.newAddressBarOptionBottomSheetDialogGhostButton.setOnClickListener {
@@ -151,10 +150,10 @@ class NewAddressBarOptionBottomSheetDialog(
     private fun setupLottieAnimation() {
         val lottieView = binding.newAddressBarOptionBottomSheetDialogAnimation
 
-        val animationResource = if (isLightModeEnabled) {
-            R.raw.new_address_bar_option_animation_light
-        } else {
+        val animationResource = if (isDarkThemeEnabled) {
             R.raw.new_address_bar_option_animation_dark
+        } else {
+            R.raw.new_address_bar_option_animation_light
         }
         lottieView.setAnimation(animationResource)
 

@@ -18,30 +18,29 @@ package com.duckduckgo.duckchat.impl.inputscreen.newaddressbaroption
 
 import android.content.Context
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.duckchat.impl.DuckChatInternal
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
 
 interface NewAddressBarOptionBottomSheetDialogFactory {
     fun create(
         context: Context,
-        isLightModeEnabled: Boolean,
+        isDarkThemeEnabled: Boolean,
+        choiceSelectionCallback: ChoiceSelectionCallback?,
     ): NewAddressBarOptionBottomSheetDialog
 }
 
 @ContributesBinding(AppScope::class)
-class RealNewAddressBarOptionBottomSheetDialogFactory @Inject constructor(
-    private val duckChatInternal: DuckChatInternal,
-) : NewAddressBarOptionBottomSheetDialogFactory {
+class RealNewAddressBarOptionBottomSheetDialogFactory @Inject constructor() : NewAddressBarOptionBottomSheetDialogFactory {
 
     override fun create(
         context: Context,
-        isLightModeEnabled: Boolean,
+        isDarkThemeEnabled: Boolean,
+        choiceSelectionCallback: ChoiceSelectionCallback?,
     ): NewAddressBarOptionBottomSheetDialog {
         return NewAddressBarOptionBottomSheetDialog(
             context = context,
-            isLightModeEnabled = isLightModeEnabled,
-            duckChatInternal = duckChatInternal,
+            isDarkThemeEnabled = isDarkThemeEnabled,
+            choiceSelectionCallback = choiceSelectionCallback,
         )
     }
 }

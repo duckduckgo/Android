@@ -361,7 +361,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
             viewModel.onLaunchedFromNotification(it)
         }
         configureOnBackPressedListener()
-        showNewAddressBarOptionAnnouncement()
+        showNewAddressBarOptionChoiceScreen()
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -1078,19 +1078,16 @@ open class BrowserActivity : DuckDuckGoActivity() {
         }
     }
 
-    private fun showNewAddressBarOptionAnnouncement() {
+    private fun showNewAddressBarOptionChoiceScreen() {
         lifecycleScope.launch(dispatcherProvider.io()) {
-            runCatching {
-                newAddressBarOptionManager.showDialog(
-                    activity = this@BrowserActivity,
-                    isLaunchedFromExternal = intent.getBooleanExtra(LAUNCH_FROM_EXTERNAL_EXTRA, false) ||
-                        intent.getBooleanExtra(LAUNCH_FROM_CLEAR_DATA_ACTION, false) ||
-                        intent.getBooleanExtra(NOTIFY_DATA_CLEARED_EXTRA, false) ||
-                        intent.getBooleanExtra(LAUNCH_FROM_INTERSTITIAL_EXTRA, false) ||
-                        intent.getBooleanExtra(OPEN_DUCK_CHAT, false),
-                    isLightModeEnabled = !isDarkThemeEnabled(),
-                )
-            }
+            newAddressBarOptionManager.showChoiceScreen(
+                activity = this@BrowserActivity,
+                isLaunchedFromExternal = intent.getBooleanExtra(LAUNCH_FROM_EXTERNAL_EXTRA, false) ||
+                    intent.getBooleanExtra(LAUNCH_FROM_CLEAR_DATA_ACTION, false) ||
+                    intent.getBooleanExtra(NOTIFY_DATA_CLEARED_EXTRA, false) ||
+                    intent.getBooleanExtra(LAUNCH_FROM_INTERSTITIAL_EXTRA, false) ||
+                    intent.getBooleanExtra(OPEN_DUCK_CHAT, false),
+            )
         }
     }
 
