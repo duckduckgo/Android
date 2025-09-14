@@ -41,7 +41,6 @@ interface NewAddressBarOptionManager {
     suspend fun showDialog(
         activity: Activity,
         isLaunchedFromExternal: Boolean,
-        isFreshLaunch: Boolean,
         isLightModeEnabled: Boolean,
     )
 }
@@ -63,11 +62,10 @@ class RealNewAddressBarOptionManager @Inject constructor(
     override suspend fun showDialog(
         activity: Activity,
         isLaunchedFromExternal: Boolean,
-        isFreshLaunch: Boolean,
         isLightModeEnabled: Boolean,
     ) {
         showDialogMutex.withLock {
-            if (shouldTrigger(activity, isFreshLaunch, isLaunchedFromExternal)) {
+            if (shouldTrigger(activity, isLaunchedFromExternal)) {
                 logcat(DEBUG) { "NewAddressBarOptionManager: All conditions met, showing dialog" }
                 newAddressBarOptionRepository.setAsShown()
                 withContext(Dispatchers.Main) {
@@ -82,7 +80,6 @@ class RealNewAddressBarOptionManager @Inject constructor(
 
     private suspend fun shouldTrigger(
         activity: Activity,
-        isFreshLaunch: Boolean,
         isLaunchedFromExternal: Boolean,
     ): Boolean {
         logcat(DEBUG) {
@@ -99,7 +96,7 @@ class RealNewAddressBarOptionManager @Inject constructor(
             isBottomAddressBarDisabled() &&
             hasNotInteractedWithSearchAndDuckAiRMF() &&
             isNewAddressBarOptionAnnouncementEnabled() &&
-            isSubsequentLaunch(isFreshLaunch) &&
+            isSubsequentLaunch() &&
             isNotLaunchedFromExternal(isLaunchedFromExternal)
     }
 
@@ -151,15 +148,14 @@ class RealNewAddressBarOptionManager @Inject constructor(
             logcat(DEBUG) { "NewAddressBarOptionManager: $it isNewAddressBarOptionAnnouncementEnabled" }
         }
 
-    private suspend fun isSubsequentLaunch(isFreshLaunch: Boolean): Boolean {
+    private suspend fun isSubsequentLaunch(): Boolean {
         return if (newAddressBarOptionRepository.wasValidated()) {
-            return (isFreshLaunch || newAddressBarOptionRepository.wasBackgrounded()).also {
-                logcat(DEBUG) { "NewAddressBarOptionManager: $it isSubsequentLaunch" }
-            }
+            true
         } else {
-            logcat(DEBUG) { "NewAddressBarOptionManager: false isSubsequentLaunch" }
             newAddressBarOptionRepository.setAsValidated()
             false
+        }.also {
+            logcat(DEBUG) { "NewAddressBarOptionManager: $it isSubsequentLaunch" }
         }
     }
 

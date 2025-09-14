@@ -361,7 +361,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
             viewModel.onLaunchedFromNotification(it)
         }
         configureOnBackPressedListener()
-        showNewAddressBarOptionAnnouncement(isFreshLaunch = true)
+        showNewAddressBarOptionAnnouncement()
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -404,7 +404,6 @@ open class BrowserActivity : DuckDuckGoActivity() {
             delay(DUCK_AI_ANIM_READY_DELAY_MS)
             duckAiShouldAnimate = true
         }
-        showNewAddressBarOptionAnnouncement(isFreshLaunch = false)
     }
 
     override fun onStop() {
@@ -1083,13 +1082,12 @@ open class BrowserActivity : DuckDuckGoActivity() {
         }
     }
 
-    private fun showNewAddressBarOptionAnnouncement(isFreshLaunch: Boolean) {
+    private fun showNewAddressBarOptionAnnouncement() {
         lifecycleScope.launch(dispatcherProvider.io()) {
             runCatching {
                 newAddressBarOptionManager.showDialog(
                     activity = this@BrowserActivity,
                     isLaunchedFromExternal = intent.getBooleanExtra(LAUNCHED_FROM_EXTERNAL_SOURCE, false),
-                    isFreshLaunch = isFreshLaunch,
                     isLightModeEnabled = !isDarkThemeEnabled(),
                 )
             }

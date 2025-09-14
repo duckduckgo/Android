@@ -29,9 +29,6 @@ interface NewAddressBarOptionRepository {
 
     suspend fun setAsValidated()
     suspend fun wasValidated(): Boolean
-
-    suspend fun setAsBackgrounded()
-    suspend fun wasBackgrounded(): Boolean
 }
 
 @SingleInstanceIn(AppScope::class)
@@ -55,13 +52,5 @@ class RealNewAddressBarOptionRepository @Inject constructor(
 
     override suspend fun wasValidated(): Boolean = withContext(dispatchers.io()) {
         newAddressBarOptionDataStore.wasValidated()
-    }
-
-    override suspend fun setAsBackgrounded() = withContext(dispatchers.io()) {
-        newAddressBarOptionDataStore.setAsBackgrounded()
-    }
-
-    override suspend fun wasBackgrounded(): Boolean = withContext(dispatchers.io()) {
-        newAddressBarOptionDataStore.wasBackgrounded()
     }
 }
