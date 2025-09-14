@@ -68,7 +68,7 @@ interface DuckChatFeature {
     fun showInputScreenAutomaticallyOnNewTab(): Toggle
 
     /**
-     * @return `true` when the new address bar option announcement should be shown
+     * @return `true` when the new address bar option choice screen should be shown
      * If the remote feature is not present defaults to `internal`
      */
     @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
