@@ -65,7 +65,7 @@ class RealNewAddressBarOptionManager @Inject constructor(
         isLightModeEnabled: Boolean,
     ) {
         showDialogMutex.withLock {
-            if (shouldTrigger(activity, isLaunchedFromExternal)) {
+            if (validate(activity, isLaunchedFromExternal)) {
                 logcat(DEBUG) { "NewAddressBarOptionManager: All conditions met, showing dialog" }
                 newAddressBarOptionRepository.setAsShown()
                 withContext(Dispatchers.Main) {
@@ -78,7 +78,7 @@ class RealNewAddressBarOptionManager @Inject constructor(
         }
     }
 
-    private suspend fun shouldTrigger(
+    private suspend fun validate(
         activity: Activity,
         isLaunchedFromExternal: Boolean,
     ): Boolean {
