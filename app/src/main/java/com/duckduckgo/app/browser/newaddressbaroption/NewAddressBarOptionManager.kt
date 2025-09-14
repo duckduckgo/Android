@@ -52,7 +52,7 @@ class RealNewAddressBarOptionManager @Inject constructor(
     private val userStageStore: UserStageStore,
     private val duckChat: DuckChat,
     private val remoteMessagingRepository: RemoteMessagingRepository,
-    private val newAddressBarOptionRepository: NewAddressBarOptionRepository,
+    private val newAddressBarOptionDataStore: NewAddressBarOptionDataStore,
     private val settingsDataStore: SettingsDataStore,
     private val newAddressBarOptionBottomSheetDialogFactory: NewAddressBarOptionBottomSheetDialogFactory,
     private val dispatchers: DispatcherProvider = DefaultDispatcherProvider(),
@@ -68,7 +68,7 @@ class RealNewAddressBarOptionManager @Inject constructor(
         showDialogMutex.withLock {
             if (validate(activity, isLaunchedFromExternal)) {
                 logcat(DEBUG) { "NewAddressBarOptionManager: All conditions met, showing dialog" }
-                newAddressBarOptionRepository.setAsShown()
+                newAddressBarOptionDataStore.setAsShown()
                 withContext(dispatchers.main()) {
                     newAddressBarOptionBottomSheetDialogFactory.create(
                         context = activity,
@@ -113,7 +113,7 @@ class RealNewAddressBarOptionManager @Inject constructor(
         }
 
     private suspend fun hasNotShownNewAddressBarOptionAnnouncement(): Boolean =
-        (!newAddressBarOptionRepository.wasShown()).also {
+        (!newAddressBarOptionDataStore.wasShown()).also {
             logcat(DEBUG) { "NewAddressBarOptionManager: $it hasNotShownNewAddressBarOptionAnnouncement" }
         }
 
@@ -150,10 +150,10 @@ class RealNewAddressBarOptionManager @Inject constructor(
         }
 
     private suspend fun isSubsequentLaunch(): Boolean {
-        return if (newAddressBarOptionRepository.wasValidated()) {
+        return if (newAddressBarOptionDataStore.wasValidated()) {
             true
         } else {
-            newAddressBarOptionRepository.setAsValidated()
+            newAddressBarOptionDataStore.setAsValidated()
             false
         }.also {
             logcat(DEBUG) { "NewAddressBarOptionManager: $it isSubsequentLaunch" }
