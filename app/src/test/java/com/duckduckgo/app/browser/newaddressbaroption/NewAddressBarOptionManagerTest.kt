@@ -37,7 +37,7 @@ import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
-class RealNewAddressBarOptionManagerTest {
+class NewAddressBarOptionManagerTest {
 
     @get:Rule
     val coroutineTestRule: CoroutineTestRule = CoroutineTestRule()
