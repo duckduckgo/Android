@@ -51,7 +51,7 @@ interface DuckAiFeatureState {
     val showOmnibarShortcutInAllStates: StateFlow<Boolean>
 
     /**
-     * Indicates whether the new address bar option announcement feature is enabled.
+     * Indicates whether the new address bar option choice screen feature is enabled.
      */
-    val showNewAddressBarOptionAnnouncement: StateFlow<Boolean>
+    val showNewAddressBarOptionChoiceScreen: StateFlow<Boolean>
 }

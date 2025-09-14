@@ -61,7 +61,6 @@ import org.mockito.Mockito.mock
 import org.mockito.Mockito.spy
 import org.mockito.kotlin.any
 import org.mockito.kotlin.argumentCaptor
-import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
@@ -795,25 +794,25 @@ class RealDuckChatTest {
     }
 
     @Test
-    fun `when showAIChatAddressBarChoiceScreen enabled then showNewAddressBarOptionAnnouncement emits true`() = runTest {
+    fun `when showAIChatAddressBarChoiceScreen enabled then showNewAddressBarOptionChoiceScreen emits true`() = runTest {
         duckChatFeature.showAIChatAddressBarChoiceScreen().setRawStoredState(State(enable = true))
         whenever(mockDuckChatFeatureRepository.isDuckChatUserEnabled()).thenReturn(true)
         whenever(mockDuckChatFeatureRepository.shouldShowInAddressBar()).thenReturn(true)
 
         testee.onPrivacyConfigDownloaded()
 
-        assertTrue(testee.showNewAddressBarOptionAnnouncement.value)
+        assertTrue(testee.showNewAddressBarOptionChoiceScreen.value)
     }
 
     @Test
-    fun `when showAIChatAddressBarChoiceScreen disabled then showNewAddressBarOptionAnnouncement emits false`() = runTest {
+    fun `when showAIChatAddressBarChoiceScreen disabled then showNewAddressBarOptionChoiceScreen emits false`() = runTest {
         duckChatFeature.showAIChatAddressBarChoiceScreen().setRawStoredState(State(enable = false))
         whenever(mockDuckChatFeatureRepository.isDuckChatUserEnabled()).thenReturn(true)
         whenever(mockDuckChatFeatureRepository.shouldShowInAddressBar()).thenReturn(true)
 
         testee.onPrivacyConfigDownloaded()
 
-        assertFalse(testee.showNewAddressBarOptionAnnouncement.value)
+        assertFalse(testee.showNewAddressBarOptionChoiceScreen.value)
     }
 
     @Test

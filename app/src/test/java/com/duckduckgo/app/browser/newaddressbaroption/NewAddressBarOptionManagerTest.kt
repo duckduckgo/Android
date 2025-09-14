@@ -73,7 +73,7 @@ class NewAddressBarOptionManagerTest {
     fun setUp() = runTest {
         MockitoAnnotations.openMocks(this)
 
-        whenever(duckAiFeatureStateMock.showNewAddressBarOptionAnnouncement).thenReturn(showNewAddressBarOptionAnnouncementFlow)
+        whenever(duckAiFeatureStateMock.showNewAddressBarOptionChoiceScreen).thenReturn(showNewAddressBarOptionAnnouncementFlow)
         whenever(duckAiFeatureStateMock.showOmnibarShortcutInAllStates).thenReturn(showOmnibarShortcutInAllStatesFlow)
         whenever(duckAiFeatureStateMock.showInputScreen).thenReturn(showInputScreenFlow)
 

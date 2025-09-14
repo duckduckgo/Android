@@ -90,7 +90,7 @@ class RealNewAddressBarOptionManager @Inject constructor(
             isInputScreenDisabled() &&
             isBottomAddressBarDisabled() &&
             hasNotInteractedWithSearchAndDuckAiRMF() &&
-            isNewAddressBarOptionAnnouncementEnabled() &&
+            isNewAddressBarOptionChoiceScreenEnabled() &&
             isSubsequentLaunch() &&
             isNotLaunchedFromExternal(isLaunchedFromExternal)
     }
@@ -138,9 +138,9 @@ class RealNewAddressBarOptionManager @Inject constructor(
             }
         }
 
-    private fun isNewAddressBarOptionAnnouncementEnabled(): Boolean =
-        duckAiFeatureState.showNewAddressBarOptionAnnouncement.value.also {
-            logcat(DEBUG) { "NewAddressBarOptionManager: $it isNewAddressBarOptionAnnouncementEnabled" }
+    private fun isNewAddressBarOptionChoiceScreenEnabled(): Boolean =
+        duckAiFeatureState.showNewAddressBarOptionChoiceScreen.value.also {
+            logcat(DEBUG) { "NewAddressBarOptionManager: $it isNewAddressBarOptionChoiceScreenEnabled" }
         }
 
     private suspend fun isSubsequentLaunch(): Boolean {
