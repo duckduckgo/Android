@@ -985,6 +985,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
             closeDuckChat: Boolean = false,
             duckChatUrl: String? = null,
             duckChatSessionActive: Boolean = false,
+            isLaunchFromBookmarksAppShortcut: Boolean = false,
         ): Intent {
             val intent = Intent(context, BrowserActivity::class.java)
             intent.putExtra(EXTRA_TEXT, queryExtra)
@@ -1000,6 +1001,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
             intent.putExtra(CLOSE_DUCK_CHAT, closeDuckChat)
             intent.putExtra(DUCK_CHAT_URL, duckChatUrl)
             intent.putExtra(DUCK_CHAT_SESSION_ACTIVE, duckChatSessionActive)
+            intent.putExtra(LAUNCH_FROM_BOOKMARKS_APP_SHORTCUT_EXTRA, isLaunchFromBookmarksAppShortcut)
             return intent
         }
 
@@ -1008,6 +1010,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
         const val NOTIFY_DATA_CLEARED_EXTRA = "NOTIFY_DATA_CLEARED_EXTRA"
         const val LAUNCH_FROM_DEFAULT_BROWSER_DIALOG = "LAUNCH_FROM_DEFAULT_BROWSER_DIALOG"
         const val LAUNCH_FROM_FAVORITES_WIDGET = "LAUNCH_FROM_FAVORITES_WIDGET"
+        const val LAUNCH_FROM_BOOKMARKS_APP_SHORTCUT_EXTRA = "LAUNCH_FROM_BOOKMARKS_APP_SHORTCUT_EXTRA"
         const val LAUNCH_FROM_NOTIFICATION_PIXEL_NAME = "LAUNCH_FROM_NOTIFICATION_PIXEL_NAME"
         const val OPEN_IN_CURRENT_TAB_EXTRA = "OPEN_IN_CURRENT_TAB_EXTRA"
         const val SELECTED_TEXT_EXTRA = "SELECTED_TEXT_EXTRA"
@@ -1087,7 +1090,8 @@ open class BrowserActivity : DuckDuckGoActivity() {
                     intent.getBooleanExtra(NOTIFY_DATA_CLEARED_EXTRA, false) ||
                     intent.getBooleanExtra(LAUNCH_FROM_INTERSTITIAL_EXTRA, false) ||
                     intent.getBooleanExtra(OPEN_DUCK_CHAT, false) ||
-                    intent.getBooleanExtra(LAUNCH_FROM_FAVORITES_WIDGET, false),
+                    intent.getBooleanExtra(LAUNCH_FROM_FAVORITES_WIDGET, false) ||
+                    intent.getBooleanExtra(LAUNCH_FROM_BOOKMARKS_APP_SHORTCUT_EXTRA, false),
             )
         }
     }

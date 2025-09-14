@@ -137,7 +137,10 @@ class AppShortcutCreator @Inject constructor(
     }
 
     private fun buildBookmarksShortcut(context: Context): ShortcutInfo {
-        val browserActivity = BrowserActivity.intent(context).also { it.action = Intent.ACTION_VIEW }
+        val browserActivity = BrowserActivity.intent(
+            context = context,
+            isLaunchFromBookmarksAppShortcut = true,
+        ).also { it.action = Intent.ACTION_VIEW }
         val bookmarksActivity = BookmarksActivity.intent(context).also { it.action = Intent.ACTION_VIEW }
 
         val stackBuilder = TaskStackBuilder.create(context)
