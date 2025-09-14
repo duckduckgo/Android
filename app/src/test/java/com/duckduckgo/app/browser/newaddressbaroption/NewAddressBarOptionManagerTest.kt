@@ -21,17 +21,20 @@ import com.duckduckgo.app.onboarding.store.AppStage
 import com.duckduckgo.app.onboarding.store.UserStageStore
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.remote.messaging.api.RemoteMessagingRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.runTest
+import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.Mock
 import org.mockito.MockitoAnnotations
 import org.mockito.kotlin.any
+import org.mockito.kotlin.argumentCaptor
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
@@ -213,6 +216,56 @@ class NewAddressBarOptionManagerTest {
 
         verify(newAddressBarOptionDataStoreMock, never()).setAsValidated()
         verify(duckChatMock, never()).showNewAddressBarOptionChoiceScreen(any(), any())
+    }
+
+    @Test
+    fun `when activity is finishing then showChoiceScreen does not show dialog`() = runTest {
+        setupAllConditionsMet()
+        val mockActivity = mock<DuckDuckGoActivity>()
+        whenever(mockActivity.isFinishing).thenReturn(true)
+        whenever(mockActivity.isDestroyed).thenReturn(false)
+
+        testee.showChoiceScreen(mockActivity, isLaunchedFromExternal = false)
+
+        verify(duckChatMock, never()).showNewAddressBarOptionChoiceScreen(any(), any())
+    }
+
+    @Test
+    fun `when activity is destroyed then showChoiceScreen does not show dialog`() = runTest {
+        setupAllConditionsMet()
+        val mockActivity = mock<DuckDuckGoActivity>()
+        whenever(mockActivity.isFinishing).thenReturn(false)
+        whenever(mockActivity.isDestroyed).thenReturn(true)
+
+        testee.showChoiceScreen(mockActivity, isLaunchedFromExternal = false)
+
+        verify(duckChatMock, never()).showNewAddressBarOptionChoiceScreen(any(), any())
+    }
+
+    @Test
+    fun `when dialog is shown then setAsShown is called`() = runTest {
+        setupAllConditionsMet()
+
+        testee.showChoiceScreen(mock(), isLaunchedFromExternal = false)
+
+        verify(duckChatMock).showNewAddressBarOptionChoiceScreen(any(), any())
+        verify(newAddressBarOptionDataStoreMock).setAsShown()
+    }
+
+    @Test
+    fun `when dialog is shown then dark theme parameter is passed correctly`() = runTest {
+        setupAllConditionsMet()
+        val mockActivity = mock<DuckDuckGoActivity>()
+        whenever(mockActivity.isDarkThemeEnabled()).thenReturn(true)
+
+        testee.showChoiceScreen(mockActivity, isLaunchedFromExternal = false)
+
+        val activityCaptor = argumentCaptor<DuckDuckGoActivity>()
+        val darkThemeCaptor = argumentCaptor<Boolean>()
+        verify(duckChatMock).showNewAddressBarOptionChoiceScreen(activityCaptor.capture(), darkThemeCaptor.capture())
+
+        assertEquals(mockActivity, activityCaptor.firstValue)
+        assertEquals(true, darkThemeCaptor.firstValue)
     }
 
     private suspend fun setupAllConditionsMet() {
