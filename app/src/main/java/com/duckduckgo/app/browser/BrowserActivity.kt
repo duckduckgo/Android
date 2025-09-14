@@ -413,8 +413,6 @@ open class BrowserActivity : DuckDuckGoActivity() {
 
         duckAiAnimDelayJob?.cancel()
         duckAiShouldAnimate = false
-
-        intent.removeExtra(LAUNCHED_FROM_EXTERNAL_SOURCE)
     }
 
     override fun onDestroy() {
@@ -1002,10 +1000,6 @@ open class BrowserActivity : DuckDuckGoActivity() {
             intent.putExtra(CLOSE_DUCK_CHAT, closeDuckChat)
             intent.putExtra(DUCK_CHAT_URL, duckChatUrl)
             intent.putExtra(DUCK_CHAT_SESSION_ACTIVE, duckChatSessionActive)
-            intent.putExtra(
-                LAUNCHED_FROM_EXTERNAL_SOURCE,
-                isExternal || isLaunchFromClearDataAction || notifyDataCleared || interstitialScreen || openDuckChat,
-            )
             return intent
         }
 
@@ -1024,7 +1018,6 @@ open class BrowserActivity : DuckDuckGoActivity() {
         private const val LAUNCH_FROM_CLEAR_DATA_ACTION = "LAUNCH_FROM_CLEAR_DATA_ACTION"
         private const val OPEN_DUCK_CHAT = "OPEN_DUCK_CHAT_EXTRA"
         private const val CLOSE_DUCK_CHAT = "CLOSE_DUCK_CHAT_EXTRA"
-        private const val LAUNCHED_FROM_EXTERNAL_SOURCE = "LAUNCHED_FROM_EXTERNAL_SOURCE"
         private const val DUCK_CHAT_URL = "DUCK_CHAT_URL"
         private const val DUCK_CHAT_SESSION_ACTIVE = "DUCK_CHAT_SESSION_ACTIVE"
 
@@ -1090,7 +1083,11 @@ open class BrowserActivity : DuckDuckGoActivity() {
             runCatching {
                 newAddressBarOptionManager.showDialog(
                     activity = this@BrowserActivity,
-                    isLaunchedFromExternal = intent.getBooleanExtra(LAUNCHED_FROM_EXTERNAL_SOURCE, false),
+                    isLaunchedFromExternal = intent.getBooleanExtra(LAUNCH_FROM_EXTERNAL_EXTRA, false) ||
+                        intent.getBooleanExtra(LAUNCH_FROM_CLEAR_DATA_ACTION, false) ||
+                        intent.getBooleanExtra(NOTIFY_DATA_CLEARED_EXTRA, false) ||
+                        intent.getBooleanExtra(LAUNCH_FROM_INTERSTITIAL_EXTRA, false) ||
+                        intent.getBooleanExtra(OPEN_DUCK_CHAT, false),
                     isLightModeEnabled = !isDarkThemeEnabled(),
                 )
             }
