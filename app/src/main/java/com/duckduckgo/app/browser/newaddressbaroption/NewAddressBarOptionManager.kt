@@ -21,6 +21,8 @@ import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition
 import com.duckduckgo.app.onboarding.store.AppStage
 import com.duckduckgo.app.onboarding.store.UserStageStore
 import com.duckduckgo.app.settings.db.SettingsDataStore
+import com.duckduckgo.common.utils.DefaultDispatcherProvider
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.api.DuckChat
@@ -30,7 +32,6 @@ import com.duckduckgo.remote.messaging.api.RemoteMessagingRepository
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
 import javax.inject.Inject
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
@@ -55,6 +56,7 @@ class RealNewAddressBarOptionManager @Inject constructor(
     private val newAddressBarOptionRepository: NewAddressBarOptionRepository,
     private val settingsDataStore: SettingsDataStore,
     private val newAddressBarOptionBottomSheetDialogFactory: NewAddressBarOptionBottomSheetDialogFactory,
+    private val dispatchers: DispatcherProvider = DefaultDispatcherProvider(),
 ) : NewAddressBarOptionManager {
 
     private val showDialogMutex = Mutex()
@@ -68,7 +70,7 @@ class RealNewAddressBarOptionManager @Inject constructor(
             if (validate(activity, isLaunchedFromExternal)) {
                 logcat(DEBUG) { "NewAddressBarOptionManager: All conditions met, showing dialog" }
                 newAddressBarOptionRepository.setAsShown()
-                withContext(Dispatchers.Main) {
+                withContext(dispatchers.main()) {
                     newAddressBarOptionBottomSheetDialogFactory.create(
                         context = activity,
                         isLightModeEnabled = isLightModeEnabled,

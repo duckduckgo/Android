@@ -92,6 +92,7 @@ class RealNewAddressBarOptionManagerTest {
             newAddressBarOptionRepositoryMock,
             settingsDataStoreMock,
             newAddressBarOptionBottomSheetDialogFactoryMock,
+            coroutineTestRule.testDispatcherProvider,
         )
     }
 
