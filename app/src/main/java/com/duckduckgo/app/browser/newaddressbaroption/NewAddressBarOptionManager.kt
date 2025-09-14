@@ -27,7 +27,6 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.impl.inputscreen.newaddressbaroption.NewAddressBarOptionBottomSheetDialogFactory
-import com.duckduckgo.duckchat.impl.inputscreen.newaddressbaroption.NewAddressBarOptionRepository
 import com.duckduckgo.remote.messaging.api.RemoteMessagingRepository
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.duckchat.impl.di
+package com.duckduckgo.app.di
 
 import android.content.Context
 import androidx.datastore.core.DataStore

@@ -35,14 +35,14 @@ class RealNewAddressBarOptionRepositoryTest {
     val coroutineTestRule: CoroutineTestRule = CoroutineTestRule()
 
     @Mock
-    private var newAddressBarOptionDataStoreMock: NewAddressBarOptionDataStore = mock()
+    private var newAddressBarOptionDataStoreMock: com.duckduckgo.app.browser.newaddressbaroption.NewAddressBarOptionDataStore = mock()
 
-    private lateinit var testee: RealNewAddressBarOptionRepository
+    private lateinit var testee: com.duckduckgo.app.browser.newaddressbaroption.RealNewAddressBarOptionRepository
 
     @Before
     fun setup() {
         MockitoAnnotations.openMocks(this)
-        testee = RealNewAddressBarOptionRepository(
+        testee = com.duckduckgo.app.browser.newaddressbaroption.RealNewAddressBarOptionRepository(
             newAddressBarOptionDataStore = newAddressBarOptionDataStoreMock,
             dispatchers = coroutineTestRule.testDispatcherProvider,
         )
