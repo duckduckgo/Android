@@ -30,6 +30,9 @@ import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.duckchat.api.DuckChatSettingsNoParams
 import com.duckduckgo.duckchat.impl.feature.AIChatImageUploadFeature
 import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
+import com.duckduckgo.duckchat.impl.inputscreen.newaddressbaroption.ChoiceSelectionCallback
+import com.duckduckgo.duckchat.impl.inputscreen.newaddressbaroption.NewAddressBarOptionBottomSheetDialog
+import com.duckduckgo.duckchat.impl.inputscreen.newaddressbaroption.NewAddressBarOptionBottomSheetDialogFactory
 import com.duckduckgo.duckchat.impl.repository.DuckChatFeatureRepository
 import com.duckduckgo.duckchat.impl.ui.DuckChatWebViewActivityWithParams
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
@@ -47,6 +50,7 @@ import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
@@ -57,6 +61,7 @@ import org.mockito.Mockito.mock
 import org.mockito.Mockito.spy
 import org.mockito.kotlin.any
 import org.mockito.kotlin.argumentCaptor
+import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
@@ -78,6 +83,8 @@ class RealDuckChatTest {
     private val mockIntent: Intent = mock()
     private val mockBrowserNav: BrowserNav = mock()
     private val imageUploadFeature: AIChatImageUploadFeature = FakeFeatureToggleFactory.create(AIChatImageUploadFeature::class.java)
+    private val mockNewAddressBarOptionBottomSheetDialogFactory: NewAddressBarOptionBottomSheetDialogFactory = mock()
+    private val mockNewAddressBarOptionBottomSheetDialog: NewAddressBarOptionBottomSheetDialog = mock()
 
     private lateinit var testee: RealDuckChat
 
@@ -106,11 +113,13 @@ class RealDuckChatTest {
                 mockPixel,
                 imageUploadFeature,
                 mockBrowserNav,
+                mockNewAddressBarOptionBottomSheetDialogFactory,
             ),
         )
         coroutineRule.testScope.advanceUntilIdle()
 
         whenever(mockGlobalActivityStarter.startIntent(any(), any<DuckChatWebViewActivityWithParams>())).thenReturn(mockIntent)
+        whenever(mockNewAddressBarOptionBottomSheetDialogFactory.create(any(), any(), any())).thenReturn(mockNewAddressBarOptionBottomSheetDialog)
     }
 
     @Test
@@ -805,6 +814,66 @@ class RealDuckChatTest {
         testee.onPrivacyConfigDownloaded()
 
         assertFalse(testee.showNewAddressBarOptionAnnouncement.value)
+    }
+
+    @Test
+    fun `when showNewAddressBarOptionChoiceScreen called with dark theme then show dialog with dark theme`() = runTest {
+        testee.showNewAddressBarOptionChoiceScreen(mock(), true)
+
+        val argumentCaptor = argumentCaptor<Context>()
+        val themeCaptor = argumentCaptor<Boolean>()
+
+        verify(mockNewAddressBarOptionBottomSheetDialogFactory).create(
+            argumentCaptor.capture(),
+            themeCaptor.capture(),
+            any(),
+        )
+        verify(mockNewAddressBarOptionBottomSheetDialog).show()
+        assertEquals(mockContext, argumentCaptor.firstValue)
+        assertTrue(themeCaptor.firstValue)
+    }
+
+    @Test
+    fun `when showNewAddressBarOptionChoiceScreen called with light theme then show dialog with light theme`() = runTest {
+        testee.showNewAddressBarOptionChoiceScreen(mock(), false)
+
+        val argumentCaptor = argumentCaptor<Context>()
+        val themeCaptor = argumentCaptor<Boolean>()
+
+        verify(mockNewAddressBarOptionBottomSheetDialogFactory).create(
+            argumentCaptor.capture(),
+            themeCaptor.capture(),
+            any(),
+        )
+        verify(mockNewAddressBarOptionBottomSheetDialog).show()
+        assertEquals(mockContext, argumentCaptor.firstValue)
+        assertFalse(themeCaptor.firstValue)
+    }
+
+    @Test
+    fun `when choice selection callback onSearchAndDuckAiSelected called then setInputScreenUserSetting is called`() = runTest {
+        var capturedCallback: ChoiceSelectionCallback? = null
+        whenever(mockNewAddressBarOptionBottomSheetDialogFactory.create(any(), any(), any())).thenAnswer { invocation ->
+            capturedCallback = invocation.getArgument<ChoiceSelectionCallback?>(2)
+            mockNewAddressBarOptionBottomSheetDialog
+        }
+
+        testee.showNewAddressBarOptionChoiceScreen(mock(), true)
+
+        verify(mockNewAddressBarOptionBottomSheetDialogFactory).create(
+            any(),
+            any(),
+            any(),
+        )
+
+        verify(mockNewAddressBarOptionBottomSheetDialog).show()
+
+        assertNotNull(capturedCallback)
+        capturedCallback!!.onSearchAndDuckAiSelected()
+
+        coroutineRule.testScope.advanceUntilIdle()
+
+        verify(mockDuckChatFeatureRepository).setInputScreenUserSetting(true)
     }
 
     companion object {
