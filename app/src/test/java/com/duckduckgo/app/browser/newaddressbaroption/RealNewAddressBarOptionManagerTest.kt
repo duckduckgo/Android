@@ -57,7 +57,7 @@ class RealNewAddressBarOptionManagerTest {
     private var remoteMessagingRepositoryMock: RemoteMessagingRepository = mock()
 
     @Mock
-    private var newAddressBarOptionRepositoryMock: NewAddressBarOptionRepository = mock()
+    private var newAddressBarOptionDataStoreMock: NewAddressBarOptionDataStore = mock()
 
     @Mock
     private var settingsDataStoreMock: SettingsDataStore = mock()
@@ -88,7 +88,7 @@ class RealNewAddressBarOptionManagerTest {
             userStageStoreMock,
             duckChatMock,
             remoteMessagingRepositoryMock,
-            newAddressBarOptionRepositoryMock,
+            newAddressBarOptionDataStoreMock,
             settingsDataStoreMock,
             newAddressBarOptionBottomSheetDialogFactoryMock,
             coroutineTestRule.testDispatcherProvider,
@@ -166,7 +166,7 @@ class RealNewAddressBarOptionManagerTest {
     @Test
     fun `when new address bar option was shown before then showDialog does not show dialog`() = runTest {
         setupAllConditionsMet()
-        whenever(newAddressBarOptionRepositoryMock.wasShown()).thenReturn(true)
+        whenever(newAddressBarOptionDataStoreMock.wasShown()).thenReturn(true)
 
         testee.showDialog(mock(), isLaunchedFromExternal = false, isLightModeEnabled = true)
 
@@ -196,12 +196,12 @@ class RealNewAddressBarOptionManagerTest {
     @Test
     fun `when was validated before then showDialog does not show dialog and sets as validated`() = runTest {
         setupAllConditionsMet()
-        whenever(newAddressBarOptionRepositoryMock.wasValidated()).thenReturn(false)
+        whenever(newAddressBarOptionDataStoreMock.wasValidated()).thenReturn(false)
 
         testee.showDialog(mock(), isLaunchedFromExternal = false, isLightModeEnabled = true)
 
         verify(newAddressBarOptionBottomSheetDialogFactoryMock, never()).create(any(), any())
-        verify(newAddressBarOptionRepositoryMock).setAsValidated()
+        verify(newAddressBarOptionDataStoreMock).setAsValidated()
     }
 
     @Test
@@ -217,11 +217,11 @@ class RealNewAddressBarOptionManagerTest {
     fun `when is disabled then markAsChecked is not called`() = runTest {
         setupAllConditionsMet()
         showNewAddressBarOptionAnnouncementFlow.value = false
-        whenever(newAddressBarOptionRepositoryMock.wasValidated()).thenReturn(false)
+        whenever(newAddressBarOptionDataStoreMock.wasValidated()).thenReturn(false)
 
         testee.showDialog(mock(), isLaunchedFromExternal = false, isLightModeEnabled = true)
 
-        verify(newAddressBarOptionRepositoryMock, never()).setAsValidated()
+        verify(newAddressBarOptionDataStoreMock, never()).setAsValidated()
         verify(newAddressBarOptionBottomSheetDialogFactoryMock, never()).create(any(), any())
     }
 
@@ -231,9 +231,9 @@ class RealNewAddressBarOptionManagerTest {
         showNewAddressBarOptionAnnouncementFlow.value = true
         showOmnibarShortcutInAllStatesFlow.value = true
         showInputScreenFlow.value = false
-        whenever(newAddressBarOptionRepositoryMock.wasShown()).thenReturn(false)
+        whenever(newAddressBarOptionDataStoreMock.wasShown()).thenReturn(false)
         whenever(remoteMessagingRepositoryMock.dismissedMessages()).thenReturn(emptyList())
         whenever(settingsDataStoreMock.omnibarPosition).thenReturn(OmnibarPosition.TOP)
-        whenever(newAddressBarOptionRepositoryMock.wasValidated()).thenReturn(true)
+        whenever(newAddressBarOptionDataStoreMock.wasValidated()).thenReturn(true)
     }
 }
