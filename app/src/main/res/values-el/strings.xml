@@ -126,6 +126,7 @@
     <!-- Fire -->
     <string name="fireMenu">Εκκαθάριση δεδομένων</string>
     <string name="fireClearAll">Εκκαθάριση όλων των καρτελών και δεδομένων</string>
+    <string name="fireClearAllPlusDuckChats">Εκκαθάριση όλων των καρτελών, δεδομένων και συνομιλιών Duck.ai</string>
     <string name="fireCancel">Ακύρωση</string>
     <string name="fireDataCleared">Εκκαθάριση δεδομένων</string>
 
@@ -234,6 +235,7 @@
     <string name="settingsAutomaticallyClearWhatOptionNone">Κανένα</string>
     <string name="settingsAutomaticallyClearWhatOptionTabs">Καρτέλες</string>
     <string name="settingsAutomaticallyClearWhatOptionTabsAndData">Καρτέλες και δεδομένα</string>
+    <string name="settingsAutomaticallyClearWhatOptionTabsAndDataAndChats">Καρτέλες, δεδομένα και συνομιλίες Duck.ai</string>
 
     <string name="settingsAutomaticallyClearWhen">Εκκαθάριση στις…</string>
     <string name="settingsAutomaticallyClearWhenDialogTitle">Εκκαθάριση στις…</string>
@@ -243,6 +245,8 @@
     <string name="settingsAutomaticallyClearWhenAppExit15Minutes">Έξοδος εφαρμογής, ανενεργή για 15 λεπτά</string>
     <string name="settingsAutomaticallyClearWhenAppExit30Minutes">Έξοδος εφαρμογής, ανενεργή για 30 λεπτά</string>
     <string name="settingsAutomaticallyClearWhenAppExit60Minutes">Έξοδος εφαρμογής, ανενεργή για 1 ώρα</string>
+    <string name="settingsClearAiDataTitle">Εκκαθάριση συνομιλιών Duck.ai</string>
+    <string name="settingsClearAiDataMessage">Το Fire Button θα διαγράψει επίσης το ιστορικό του Duck.ai.</string>
 
     <!-- About Activity -->
     <string name="aboutActivityTitle">Σχετικά με το DuckDuckGo</string>
@@ -271,8 +275,8 @@
     <string name="searchWidgetEmtpyFavoritesHint">Δεν έχουν προστεθεί ακόμα αγαπημένα</string>
     <string name="searchWidgetEmtpyFavoritesCta">Προσθήκη Αγαπημένου</string>
     <string name="widgetConfigurationActivityTitle">Διαμόρφωση μικροεφαρμογής</string>
-    <string name="favoritesWidgetLabel">Αγαπημένα</string>
-    <string name="searchWidgetLabel">Αναζήτηση</string>
+    <string name="favoritesWidgetLabel">Αναζήτηση και Αγαπημένα</string>
+    <string name="searchWidgetLabel">Αναζήτηση και Duck.ai</string>
 
     <!-- Home Screen Shortcuts -->
     <string name="addToHome">Προσθήκη στην Αρχική Οθόνη</string>
