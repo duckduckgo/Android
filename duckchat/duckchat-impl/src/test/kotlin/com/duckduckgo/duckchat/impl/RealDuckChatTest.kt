@@ -30,9 +30,15 @@ import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.duckchat.api.DuckChatSettingsNoParams
 import com.duckduckgo.duckchat.impl.feature.AIChatImageUploadFeature
 import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
-import com.duckduckgo.duckchat.impl.inputscreen.newaddressbaroption.ChoiceSelectionCallback
+import com.duckduckgo.duckchat.impl.inputscreen.newaddressbaroption.NewAddressBarCallback
 import com.duckduckgo.duckchat.impl.inputscreen.newaddressbaroption.NewAddressBarOptionBottomSheetDialog
 import com.duckduckgo.duckchat.impl.inputscreen.newaddressbaroption.NewAddressBarOptionBottomSheetDialogFactory
+import com.duckduckgo.duckchat.impl.inputscreen.newaddressbaroption.NewAddressBarSelection.SEARCH_AND_AI
+import com.duckduckgo.duckchat.impl.inputscreen.newaddressbaroption.NewAddressBarSelection.SEARCH_ONLY
+import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_NEW_ADDRESS_BAR_PICKER_CONFIRMED
+import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_NEW_ADDRESS_BAR_PICKER_DISPLAYED
+import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_NEW_ADDRESS_BAR_PICKER_NOT_NOW
+import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelParameters.NEW_ADDRESS_BAR_SELECTION
 import com.duckduckgo.duckchat.impl.repository.DuckChatFeatureRepository
 import com.duckduckgo.duckchat.impl.ui.DuckChatWebViewActivityWithParams
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
@@ -61,6 +67,7 @@ import org.mockito.Mockito.mock
 import org.mockito.Mockito.spy
 import org.mockito.kotlin.any
 import org.mockito.kotlin.argumentCaptor
+import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
@@ -852,10 +859,10 @@ class RealDuckChatTest {
     }
 
     @Test
-    fun `when choice selection callback onSearchAndDuckAiSelected called then setInputScreenUserSetting is called`() = runTest {
-        var capturedCallback: ChoiceSelectionCallback? = null
+    fun `when onDisplayed called then DUCK_CHAT_NEW_ADDRESS_BAR_PICKER_DISPLAYED pixel is fired`() = runTest {
+        var capturedCallback: NewAddressBarCallback? = null
         whenever(mockNewAddressBarOptionBottomSheetDialogFactory.create(any(), any(), any())).thenAnswer { invocation ->
-            capturedCallback = invocation.getArgument<ChoiceSelectionCallback?>(2)
+            capturedCallback = invocation.getArgument<NewAddressBarCallback?>(2)
             mockNewAddressBarOptionBottomSheetDialog
         }
 
@@ -871,11 +878,95 @@ class RealDuckChatTest {
         verify(mockNewAddressBarOptionBottomSheetDialog).show()
 
         assertNotNull(capturedCallback)
-        capturedCallback!!.onSearchAndDuckAiSelected()
+        capturedCallback!!.onDisplayed()
+
+        verify(mockPixel).fire(DUCK_CHAT_NEW_ADDRESS_BAR_PICKER_DISPLAYED)
+    }
+
+    @Test
+    fun `when onConfirmed called with SEARCH_AND_AI then setInputScreenUserSetting to true and pixel fired with search_and_ai`() = runTest {
+        var capturedCallback: NewAddressBarCallback? = null
+        whenever(mockNewAddressBarOptionBottomSheetDialogFactory.create(any(), any(), any())).thenAnswer { invocation ->
+            capturedCallback = invocation.getArgument<NewAddressBarCallback?>(2)
+            mockNewAddressBarOptionBottomSheetDialog
+        }
+
+        val mockContext = mock<Context>()
+        testee.showNewAddressBarOptionChoiceScreen(mockContext, true)
+
+        verify(mockNewAddressBarOptionBottomSheetDialogFactory).create(
+            any(),
+            any(),
+            any(),
+        )
+
+        verify(mockNewAddressBarOptionBottomSheetDialog).show()
+
+        assertNotNull(capturedCallback)
+        capturedCallback!!.onConfirmed(SEARCH_AND_AI)
 
         coroutineRule.testScope.advanceUntilIdle()
 
         verify(mockDuckChatFeatureRepository).setInputScreenUserSetting(true)
+        verify(mockPixel).fire(
+            pixel = DUCK_CHAT_NEW_ADDRESS_BAR_PICKER_CONFIRMED,
+            parameters = mapOf(NEW_ADDRESS_BAR_SELECTION to "search_and_ai"),
+        )
+    }
+
+    @Test
+    fun `when onConfirmed called with SEARCH_ONLY then DUCK_CHAT_NEW_ADDRESS_BAR_PICKER_CONFIRMED pixel is fired with search_only`() = runTest {
+        var capturedCallback: NewAddressBarCallback? = null
+        whenever(mockNewAddressBarOptionBottomSheetDialogFactory.create(any(), any(), any())).thenAnswer { invocation ->
+            capturedCallback = invocation.getArgument<NewAddressBarCallback?>(2)
+            mockNewAddressBarOptionBottomSheetDialog
+        }
+
+        val mockContext = mock<Context>()
+        testee.showNewAddressBarOptionChoiceScreen(mockContext, true)
+
+        verify(mockNewAddressBarOptionBottomSheetDialogFactory).create(
+            any(),
+            any(),
+            any(),
+        )
+
+        verify(mockNewAddressBarOptionBottomSheetDialog).show()
+
+        assertNotNull(capturedCallback)
+        capturedCallback!!.onConfirmed(SEARCH_ONLY)
+
+        verify(mockDuckChatFeatureRepository, times(0)).setInputScreenUserSetting(any())
+        verify(mockPixel).fire(
+            pixel = DUCK_CHAT_NEW_ADDRESS_BAR_PICKER_CONFIRMED,
+            parameters = mapOf(NEW_ADDRESS_BAR_SELECTION to "search_only"),
+        )
+    }
+
+    @Test
+    fun `when onNotNow called then DUCK_CHAT_NEW_ADDRESS_BAR_PICKER_NOT_NOW pixel is fired`() = runTest {
+        var capturedCallback: NewAddressBarCallback? = null
+        whenever(mockNewAddressBarOptionBottomSheetDialogFactory.create(any(), any(), any())).thenAnswer { invocation ->
+            capturedCallback = invocation.getArgument<NewAddressBarCallback?>(2)
+            mockNewAddressBarOptionBottomSheetDialog
+        }
+
+        val mockContext = mock<Context>()
+        testee.showNewAddressBarOptionChoiceScreen(mockContext, true)
+
+        verify(mockNewAddressBarOptionBottomSheetDialogFactory).create(
+            any(),
+            any(),
+            any(),
+        )
+
+        verify(mockNewAddressBarOptionBottomSheetDialog).show()
+
+        assertNotNull(capturedCallback)
+        capturedCallback!!.onNotNow()
+
+        verify(mockDuckChatFeatureRepository, times(0)).setInputScreenUserSetting(any())
+        verify(mockPixel).fire(DUCK_CHAT_NEW_ADDRESS_BAR_PICKER_NOT_NOW)
     }
 
     companion object {
