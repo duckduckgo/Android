@@ -1091,7 +1091,8 @@ open class BrowserActivity : DuckDuckGoActivity() {
                     intent.getBooleanExtra(LAUNCH_FROM_INTERSTITIAL_EXTRA, false) ||
                     intent.getBooleanExtra(OPEN_DUCK_CHAT, false) ||
                     intent.getBooleanExtra(LAUNCH_FROM_FAVORITES_WIDGET, false) ||
-                    intent.getBooleanExtra(LAUNCH_FROM_BOOKMARKS_APP_SHORTCUT_EXTRA, false),
+                    intent.getBooleanExtra(LAUNCH_FROM_BOOKMARKS_APP_SHORTCUT_EXTRA, false) ||
+                    intent.getBooleanExtra(NEW_SEARCH_EXTRA, false),
             )
         }
     }
