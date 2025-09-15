@@ -51,6 +51,9 @@
     <string name="input_screen_search_hint">Keresés vagy cím megadása</string>
     <string name="input_screen_chat_tab">Duck.ai</string>
     <string name="input_screen_chat_hint">Kérdezz privátban</string>
+    <string name="input_screen_user_pref_without_ai">Csak keresés</string>
+    <string name="input_screen_user_pref_with_ai">Keresés és Duck.ai</string>
+    <string name="input_screen_user_pref_description">Próbáld ki azt az új lehetőséget, hogy közvetlenül a címsorban tehetsz fel kérdéseket a Duck.ai számára. <annotation type="share_feedback">Visszajelzés küldése</annotation></string>
 
     <!-- Duck.ai Pro settings -->
     <string name="duck_ai_paid_settings_title">Duck.ai</string>

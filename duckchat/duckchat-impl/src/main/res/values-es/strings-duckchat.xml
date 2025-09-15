@@ -51,6 +51,9 @@
     <string name="input_screen_search_hint">Buscar o introducir dirección</string>
     <string name="input_screen_chat_tab">Duck.ai</string>
     <string name="input_screen_chat_hint">Pregunta en privado</string>
+    <string name="input_screen_user_pref_without_ai">Solo buscar</string>
+    <string name="input_screen_user_pref_with_ai">Búsqueda y Duck.ai</string>
+    <string name="input_screen_user_pref_description">Prueba nuestra nueva opción para preguntar directamente a Duck.ai desde la barra de direcciones. <annotation type="share_feedback">Comparte tus comentarios</annotation></string>
 
     <!-- Duck.ai Pro settings -->
     <string name="duck_ai_paid_settings_title">Duck.ai</string>

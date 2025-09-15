@@ -51,6 +51,9 @@
     <string name="input_screen_search_hint">Otsi või sisesta aadress</string>
     <string name="input_screen_chat_tab">Duck.ai</string>
     <string name="input_screen_chat_hint">Küsi privaatselt</string>
+    <string name="input_screen_user_pref_without_ai">Ainult otsi</string>
+    <string name="input_screen_user_pref_with_ai">Otsi ja Duck.ai</string>
+    <string name="input_screen_user_pref_description">Proovi meie uut valikut küsida Duck.ai käest otse aadressiribalt. <annotation type="share_feedback">Jaga tagasisidet</annotation></string>
 
     <!-- Duck.ai Pro settings -->
     <string name="duck_ai_paid_settings_title">Duck.ai</string>
