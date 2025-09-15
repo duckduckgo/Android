@@ -113,6 +113,7 @@ import com.duckduckgo.app.browser.applinks.AppLinksLauncher
 import com.duckduckgo.app.browser.applinks.AppLinksSnackBarConfigurator
 import com.duckduckgo.app.browser.autocomplete.BrowserAutoCompleteSuggestionsAdapter
 import com.duckduckgo.app.browser.autocomplete.SuggestionItemDecoration
+import com.duckduckgo.app.browser.autofill.SystemAutofillEngagement
 import com.duckduckgo.app.browser.commands.Command
 import com.duckduckgo.app.browser.commands.Command.OpenBrokenSiteLearnMore
 import com.duckduckgo.app.browser.commands.Command.ReportBrokenSiteError
@@ -616,6 +617,9 @@ class BrowserTabFragment :
 
     @Inject
     lateinit var autofillFragmentResultListeners: PluginPoint<AutofillFragmentResultsPlugin>
+
+    @Inject
+    lateinit var systemAutofillEngagement: SystemAutofillEngagement
 
     private var isActiveTab: Boolean = false
 
@@ -3344,6 +3348,10 @@ class BrowserTabFragment :
     }
 
     private fun configureWebViewForAutofill(it: DuckDuckGoWebView) {
+        it.setSystemAutofillCallback {
+            systemAutofillEngagement.onSystemAutofillEvent()
+        }
+
         browserAutofill.addJsInterface(it, autofillCallback, this, null, tabId)
 
         autofillFragmentResultListeners.getPlugins().forEach { plugin ->
@@ -3905,6 +3913,7 @@ class BrowserTabFragment :
     private fun destroyWebView() {
         if (::webViewContainer.isInitialized) webViewContainer.removeAllViews()
         webView?.let {
+            it.removeSystemAutofillCallback()
             webViewClient.destroy(it)
             it.destroy()
         }
