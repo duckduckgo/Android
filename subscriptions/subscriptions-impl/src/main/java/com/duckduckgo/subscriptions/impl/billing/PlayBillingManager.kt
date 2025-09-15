@@ -77,6 +77,19 @@ interface PlayBillingManager {
         externalId: String,
         offerId: String?,
     )
+
+    /**
+     * Launches the subscription update flow
+     *
+     * It is safe to call this method without specifying dispatcher as it's handled internally
+     */
+    suspend fun launchSubscriptionUpdate(
+        activity: Activity,
+        newPlanId: String,
+        externalId: String,
+        newOfferId: String?,
+        replacementMode: SubscriptionReplacementMode = SubscriptionReplacementMode.DEFERRED,
+    )
 }
 
 @SingleInstanceIn(AppScope::class)
@@ -210,6 +223,63 @@ class RealPlayBillingManager @Inject constructor(
                 _purchaseState.emit(Canceled)
             }
         }
+    }
+
+    override suspend fun launchSubscriptionUpdate(
+        activity: Activity,
+        newPlanId: String,
+        externalId: String,
+        newOfferId: String?,
+        replacementMode: SubscriptionReplacementMode,
+    ) = withContext(dispatcherProvider.io()) {
+        if (!billingClient.ready) {
+            logcat { "Service not ready" }
+            connect()
+        }
+
+        val oldPurchaseToken: String? = getCurrentPurchaseToken()
+
+        val productDetails = products.find { it.productId == BASIC_SUBSCRIPTION }
+
+        val offerToken = productDetails
+            ?.subscriptionOfferDetails
+            ?.find { it.basePlanId == newPlanId && it.offerId == newOfferId }
+            ?.offerToken
+
+        if (productDetails == null || offerToken == null || oldPurchaseToken == null) {
+            _purchaseState.emit(Canceled)
+            return@withContext
+        }
+
+        val launchBillingFlowResult = billingClient.launchSubscriptionUpdate(
+            activity = activity,
+            productDetails = productDetails,
+            offerToken = offerToken,
+            externalId = externalId,
+            oldPurchaseToken = oldPurchaseToken,
+            replacementMode = replacementMode,
+        )
+
+        when (launchBillingFlowResult) {
+            LaunchBillingFlowResult.Success -> {
+                _purchaseState.emit(InProgress)
+                billingFlowInProgress = true
+            }
+
+            LaunchBillingFlowResult.Failure -> {
+                _purchaseState.emit(Canceled)
+            }
+        }
+    }
+
+    /**
+     * Gets the current purchase token for the active subscription
+     */
+    private suspend fun getCurrentPurchaseToken(): String? = withContext(dispatcherProvider.io()) {
+        return@withContext purchaseHistory
+            .filter { it.products.contains(BASIC_SUBSCRIPTION) }
+            .maxByOrNull { it.purchaseTime }
+            ?.purchaseToken
     }
 
     private fun onPurchasesUpdated(result: PurchasesUpdateResult) {

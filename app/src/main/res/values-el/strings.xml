@@ -271,8 +271,8 @@
     <string name="searchWidgetEmtpyFavoritesHint">Δεν έχουν προστεθεί ακόμα αγαπημένα</string>
     <string name="searchWidgetEmtpyFavoritesCta">Προσθήκη Αγαπημένου</string>
     <string name="widgetConfigurationActivityTitle">Διαμόρφωση μικροεφαρμογής</string>
-    <string name="favoritesWidgetLabel">Αγαπημένα</string>
-    <string name="searchWidgetLabel">Αναζήτηση</string>
+    <string name="favoritesWidgetLabel">Αναζήτηση και Αγαπημένα</string>
+    <string name="searchWidgetLabel">Αναζήτηση και Duck.ai</string>
 
     <!-- Home Screen Shortcuts -->
     <string name="addToHome">Προσθήκη στην Αρχική Οθόνη</string>
@@ -427,7 +427,6 @@
     <string name="crashedWebViewErrorAction">"Γίνεται επαναφόρτωση"</string>
 
     <!-- System Search-->
-    <string name="systemSearchDeviceAppLabel">Από αυτή τη συσκευή</string>
     <string name="systemSearchAppNotFound">Η εφαρμογή δεν βρέθηκε</string>
     <string name="systemSearchOnboardingThanks">Σας ευχαριστούμε που επιλέξατε το DuckDuckGo!\nΗ χρήση του προγράμματος περιήγησής μας συμβάλλει στην προστασία σας από χάκερ, απατεώνες και εταιρείες που διψούν για δεδομένα.</string>
     <string name="systemSearchOnboardingFeaturesIntroText">Η εφαρμογή DuckDuckGo επίσης:</string>
@@ -947,4 +946,10 @@
     <string name="tabSwitcherAnimationTileRemovalDialogPositiveButton">Αποκρυψη</string>
     <string name="tabSwitcherAnimationTileRemovalDialogNegativeButton">Διατήρηση</string>
 
+    <!-- Widgets -->
+    <string name="searchOnlyWidgetLabel" instruction="Label for the search-only widget">Αναζήτηση μόνο</string>
+    <string name="searchOnlyWidgetDescription" instruction="Description for the search-only widget">Ξεκινήστε γρήγορα μια ιδιωτική αναζήτηση με το DuckDuckGo.</string>
+    <string name="searchWidgetDescription" instruction="Description for the search widget, which may include Duck.ai and voice search">Πραγματοποιήστε αναζήτηση ιδιωτικά με το DuckDuckGo ή ρωτήστε το Duck.ai. Η φωνητική αναζήτηση και το Duck.ai είναι διαθέσιμα αν είναι ενεργοποιημένα.</string>
+    <string name="searchAndFavoritesWidgetDescription" instruction="Description for the search and favorites widget">Κάντε αναζήτηση ή επισκεφτείτε τους αγαπημένους ιστότοπούς σας ιδιωτικά, με ένα πάτημα. Η φωνητική αναζήτηση και το Duck.ai είναι διαθέσιμα αν είναι ενεργοποιημένα.</string>
+    <string name="duckAiOnlyPinShortcutLabel" instruction="Label for the Duck.ai pinned shortcut. Should be Duck.ai in all languages">Duck.ai</string>
 </resources>

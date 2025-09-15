@@ -15,50 +15,48 @@
   -->
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              xmlns:tools="http://schemas.android.com/tools"
-              android:layout_width="match_parent"
-              android:layout_height="wrap_content"
-              xmlns:app="http://schemas.android.com/apk/res-auto"
-              android:orientation="vertical"
-              android:paddingTop="15dp"
-              android:paddingBottom="15dp"
-              android:clipToPadding="false"
-              android:background="?selectableItemBackground"
-              android:clickable="true"
-              android:focusable="true">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:clipToPadding="false"
+    android:orientation="vertical"
+    android:padding="@dimen/keyline_2">
 
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/quickAccessFaviconCard"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="@dimen/gridItemImageSize"
+        android:layout_height="@dimen/gridItemImageSize"
         android:layout_gravity="center_horizontal"
-        android:paddingStart="15dp"
-        android:paddingEnd="15dp"
-        app:cardBackgroundColor="?attr/daxColorBackground"
-        app:cardCornerRadius="@dimen/smallShapeCornerRadius"
-        app:cardElevation="4dp">
+        app:cardBackgroundColor="?attr/daxColorSurface"
+        app:cardCornerRadius="@dimen/mediumShapeCornerRadius"
+        tools:visibility="gone"
+        app:cardElevation="0dp">
 
-        <ImageView
+        <com.google.android.material.imageview.ShapeableImageView
             android:id="@+id/quickAccessFavicon"
-            android:layout_width="@dimen/savedSiteGridItemFavicon"
-            android:layout_height="@dimen/savedSiteGridItemFavicon"
-            android:importantForAccessibility="no"/>
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:padding="@dimen/keyline_2"
+            android:layout_gravity="center"
+            app:shapeAppearanceOverlay="@style/Widget.DuckDuckGo.FavouritesItemFavicon"
+            android:importantForAccessibility="no" />
 
     </com.google.android.material.card.MaterialCardView>
 
     <com.duckduckgo.common.ui.view.text.DaxTextView
         android:id="@+id/quickAccessTitle"
-        android:layout_width="match_parent"
+        android:layout_width="@dimen/gridItemTextWidth"
         android:layout_height="wrap_content"
-        app:typography="caption"
-        app:textType="secondary"
         android:layout_gravity="center_horizontal"
         android:ellipsize="end"
         android:gravity="center"
+        android:layout_marginTop="@dimen/keyline_1"
+        android:includeFontPadding="false"
+        android:text="@string/bookmarksActivityTitle"
         android:maxLines="2"
-        android:paddingStart="11dp"
-        android:paddingEnd="11dp"
-        android:paddingTop="8dp"
-        tools:text="Super long favorite title"/>
+        app:textType="primary"
+        app:typography="caption"
+        tools:text="Super long favorite title" />
 
 </LinearLayout>

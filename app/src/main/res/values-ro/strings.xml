@@ -268,12 +268,12 @@
     <string name="widgetConfigurationSystemThemeOption">Folosește tema sistemului</string>
     <string name="widgetConfigurationLightThemeOption">Luminoasă</string>
     <string name="widgetConfigurationDarkThemeOption">Intunecată</string>
-    <string name="widgetConfigurationAddWidgetOption">Adăugare widget</string>
+    <string name="widgetConfigurationAddWidgetOption">Adaugă widget</string>
     <string name="searchWidgetEmtpyFavoritesHint">Nu s-a adăugat niciun favorit</string>
     <string name="searchWidgetEmtpyFavoritesCta">Adaugă favorit</string>
     <string name="widgetConfigurationActivityTitle">Configurare widget</string>
-    <string name="favoritesWidgetLabel">Preferințe</string>
-    <string name="searchWidgetLabel">Căutare</string>
+    <string name="favoritesWidgetLabel">Căutare și preferințe</string>
+    <string name="searchWidgetLabel">Caută și pe Duck.ai</string>
 
     <!-- Home Screen Shortcuts -->
     <string name="addToHome">Adaugă pe ecranul de pornire</string>
@@ -428,7 +428,6 @@
     <string name="crashedWebViewErrorAction">"Reîncarcă"</string>
 
     <!-- System Search-->
-    <string name="systemSearchDeviceAppLabel">De pe acest dispozitiv</string>
     <string name="systemSearchAppNotFound">Aplicația nu a fost găsită</string>
     <string name="systemSearchOnboardingThanks">Îți mulțumim că ai ales DuckDuckGo!\nFolosirea browserului nostru te ajută să te protejezi de hackeri, escroci și companii avide după date.</string>
     <string name="systemSearchOnboardingFeaturesIntroText">De asemenea, aplicația DuckDuckGo:</string>
@@ -965,4 +964,10 @@
     <string name="tabSwitcherAnimationTileRemovalDialogPositiveButton">Ascunde</string>
     <string name="tabSwitcherAnimationTileRemovalDialogNegativeButton">Păstrează</string>
 
+    <!-- Widgets -->
+    <string name="searchOnlyWidgetLabel" instruction="Label for the search-only widget">Doar căutare</string>
+    <string name="searchOnlyWidgetDescription" instruction="Description for the search-only widget">Lansează rapid o căutare privată cu DuckDuckGo.</string>
+    <string name="searchWidgetDescription" instruction="Description for the search widget, which may include Duck.ai and voice search">Caută în mod privat cu DuckDuckGo sau întreabă Duck.ai. Căutarea vocală și Duck.ai sunt disponibile dacă sunt activate.</string>
+    <string name="searchAndFavoritesWidgetDescription" instruction="Description for the search and favorites widget">Caută sau vizitează site-urile preferate în mod privat, cu o singură atingere. Căutarea vocală și Duck.ai sunt disponibile dacă sunt activate.</string>
+    <string name="duckAiOnlyPinShortcutLabel" instruction="Label for the Duck.ai pinned shortcut. Should be Duck.ai in all languages">Duck.ai</string>
 </resources>

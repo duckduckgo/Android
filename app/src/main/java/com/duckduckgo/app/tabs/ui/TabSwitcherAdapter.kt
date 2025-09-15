@@ -236,10 +236,12 @@ class TabSwitcherAdapter(
                     holder.selectionIndicator.contentDescription = holder.rootView.resources.getString(R.string.tabNotSelectedIndicator)
                 }
                 holder.selectionIndicator.show()
+                holder.close.isClickable = false
                 holder.close.hide()
             }
             else -> {
                 holder.selectionIndicator.hide()
+                holder.close.isClickable = true
                 holder.close.show()
             }
         }

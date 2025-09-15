@@ -29,6 +29,7 @@ import android.os.SystemClock
 import android.view.KeyEvent
 import android.view.MotionEvent
 import android.view.View
+import android.view.View.IMPORTANT_FOR_AUTOFILL_YES
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.ActivityResult
@@ -55,6 +56,7 @@ import com.duckduckgo.app.browser.databinding.IncludeOmnibarToolbarMockupBinding
 import com.duckduckgo.app.browser.databinding.IncludeOmnibarToolbarMockupBottomBinding
 import com.duckduckgo.app.browser.defaultbrowsing.prompts.ui.DefaultBrowserBottomSheetDialog
 import com.duckduckgo.app.browser.defaultbrowsing.prompts.ui.DefaultBrowserBottomSheetDialog.EventListener
+import com.duckduckgo.app.browser.newaddressbaroption.NewAddressBarOptionManager
 import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
 import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition.BOTTOM
 import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition.TOP
@@ -64,6 +66,7 @@ import com.duckduckgo.app.browser.tabs.TabManager.TabModel
 import com.duckduckgo.app.browser.tabs.adapter.TabPagerAdapter
 import com.duckduckgo.app.browser.webview.RealMaliciousSiteBlockerWebViewIntegration
 import com.duckduckgo.app.di.AppCoroutineScope
+import com.duckduckgo.app.dispatchers.ExternalIntentProcessingState
 import com.duckduckgo.app.downloads.DownloadsScreens.DownloadsScreenNoParams
 import com.duckduckgo.app.feedback.ui.common.FeedbackActivity
 import com.duckduckgo.app.fire.DataClearer
@@ -121,6 +124,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import logcat.LogPriority.ERROR
 import logcat.LogPriority.INFO
 import logcat.LogPriority.VERBOSE
@@ -172,6 +176,9 @@ open class BrowserActivity : DuckDuckGoActivity() {
     lateinit var fireButtonStore: FireButtonStore
 
     @Inject
+    lateinit var externalIntentProcessingState: ExternalIntentProcessingState
+
+    @Inject
     lateinit var appBuildConfig: AppBuildConfig
 
     @Inject
@@ -206,6 +213,9 @@ open class BrowserActivity : DuckDuckGoActivity() {
 
     @Inject
     lateinit var browserFeatures: AndroidBrowserConfigFeature
+
+    @Inject
+    lateinit var newAddressBarOptionManager: NewAddressBarOptionManager
 
     private val lastActiveTabs = TabList()
 
@@ -357,6 +367,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
             viewModel.onLaunchedFromNotification(it)
         }
         configureOnBackPressedListener()
+        showNewAddressBarOptionChoiceScreen()
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -579,6 +590,9 @@ open class BrowserActivity : DuckDuckGoActivity() {
 
         if (launchNewSearch(intent)) {
             logcat(WARN) { "new tab requested" }
+            if (duckAiFeatureState.showInputScreenAutomaticallyOnNewTab.value) {
+                externalIntentProcessingState.onIntentRequestToChangeTab()
+            }
             launchNewTab()
             return
         }
@@ -597,6 +611,9 @@ open class BrowserActivity : DuckDuckGoActivity() {
 
         val existingTabId = intent.getStringExtra(OPEN_EXISTING_TAB_ID_EXTRA)
         if (existingTabId != null) {
+            if (duckAiFeatureState.showInputScreenAutomaticallyOnNewTab.value) {
+                externalIntentProcessingState.onIntentRequestToChangeTab()
+            }
             openExistingTab(existingTabId)
             return
         }
@@ -604,6 +621,9 @@ open class BrowserActivity : DuckDuckGoActivity() {
         val sharedText = intent.intentText
         if (sharedText != null) {
             closeDuckChat()
+            if (duckAiFeatureState.showInputScreenAutomaticallyOnNewTab.value) {
+                externalIntentProcessingState.onIntentRequestToChangeTab()
+            }
             if (intent.getBooleanExtra(ShortcutBuilder.SHORTCUT_EXTRA_ARG, false)) {
                 logcat { "Shortcut opened with url $sharedText" }
                 lifecycleScope.launch { viewModel.onOpenShortcut(sharedText) }
@@ -980,6 +1000,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
             closeDuckChat: Boolean = false,
             duckChatUrl: String? = null,
             duckChatSessionActive: Boolean = false,
+            isLaunchFromBookmarksAppShortcut: Boolean = false,
         ): Intent {
             val intent = Intent(context, BrowserActivity::class.java)
             intent.putExtra(EXTRA_TEXT, queryExtra)
@@ -995,6 +1016,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
             intent.putExtra(CLOSE_DUCK_CHAT, closeDuckChat)
             intent.putExtra(DUCK_CHAT_URL, duckChatUrl)
             intent.putExtra(DUCK_CHAT_SESSION_ACTIVE, duckChatSessionActive)
+            intent.putExtra(LAUNCH_FROM_BOOKMARKS_APP_SHORTCUT_EXTRA, isLaunchFromBookmarksAppShortcut)
             return intent
         }
 
@@ -1003,6 +1025,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
         const val NOTIFY_DATA_CLEARED_EXTRA = "NOTIFY_DATA_CLEARED_EXTRA"
         const val LAUNCH_FROM_DEFAULT_BROWSER_DIALOG = "LAUNCH_FROM_DEFAULT_BROWSER_DIALOG"
         const val LAUNCH_FROM_FAVORITES_WIDGET = "LAUNCH_FROM_FAVORITES_WIDGET"
+        const val LAUNCH_FROM_BOOKMARKS_APP_SHORTCUT_EXTRA = "LAUNCH_FROM_BOOKMARKS_APP_SHORTCUT_EXTRA"
         const val LAUNCH_FROM_NOTIFICATION_PIXEL_NAME = "LAUNCH_FROM_NOTIFICATION_PIXEL_NAME"
         const val OPEN_IN_CURRENT_TAB_EXTRA = "OPEN_IN_CURRENT_TAB_EXTRA"
         const val SELECTED_TEXT_EXTRA = "SELECTED_TEXT_EXTRA"
@@ -1073,6 +1096,22 @@ open class BrowserActivity : DuckDuckGoActivity() {
         }
     }
 
+    private fun showNewAddressBarOptionChoiceScreen() {
+        lifecycleScope.launch(dispatcherProvider.io()) {
+            newAddressBarOptionManager.showChoiceScreen(
+                activity = this@BrowserActivity,
+                isLaunchedFromExternal = intent.getBooleanExtra(LAUNCH_FROM_EXTERNAL_EXTRA, false) ||
+                    intent.getBooleanExtra(LAUNCH_FROM_CLEAR_DATA_ACTION, false) ||
+                    intent.getBooleanExtra(NOTIFY_DATA_CLEARED_EXTRA, false) ||
+                    intent.getBooleanExtra(LAUNCH_FROM_INTERSTITIAL_EXTRA, false) ||
+                    intent.getBooleanExtra(OPEN_DUCK_CHAT, false) ||
+                    intent.getBooleanExtra(LAUNCH_FROM_FAVORITES_WIDGET, false) ||
+                    intent.getBooleanExtra(LAUNCH_FROM_BOOKMARKS_APP_SHORTCUT_EXTRA, false) ||
+                    intent.getBooleanExtra(NEW_SEARCH_EXTRA, false),
+            )
+        }
+    }
+
     private fun initializeTabs(savedInstanceState: Bundle?) {
         if (swipingTabsFeature.isEnabled) {
             tabManager.registerCallbacks(
@@ -1083,6 +1122,8 @@ open class BrowserActivity : DuckDuckGoActivity() {
             tabPager.registerOnPageChangeCallback(onTabPageChangeListener)
             tabPager.setPageTransformer(MarginPageTransformer(resources.getDimension(com.duckduckgo.mobile.android.R.dimen.keyline_1).toPx().toInt()))
 
+            configureViewPagerForSystemAutofill(tabPager)
+
             savedInstanceState?.getBundle(KEY_TAB_PAGER_STATE)?.let {
                 tabPagerAdapter.restore(it)
             }
@@ -1090,6 +1131,25 @@ open class BrowserActivity : DuckDuckGoActivity() {
 
         binding.fragmentContainer.isVisible = !swipingTabsFeature.isEnabled
         tabPager.isVisible = swipingTabsFeature.isEnabled
+    }
+
+    private fun configureViewPagerForSystemAutofill(viewPager: ViewPager2) {
+        lifecycleScope.launch {
+            val applyAutofillFix = withContext(dispatcherProvider.io()) {
+                swipingTabsFeature.applyAutofillFixEnabled()
+            }
+
+            // Configure the internal RecyclerView - wait for layout to complete
+            if (applyAutofillFix) {
+                logcat(VERBOSE) { "Applying autofill fix to ViewPager2" }
+
+                viewPager.post {
+                    (viewPager.getChildAt(0) as? androidx.recyclerview.widget.RecyclerView)?.let {
+                        it.importantForAutofill = IMPORTANT_FOR_AUTOFILL_YES
+                    }
+                }
+            }
+        }
     }
 
     private val Intent.launchedFromRecents: Boolean

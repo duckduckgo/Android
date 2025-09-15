@@ -271,8 +271,8 @@
     <string name="searchWidgetEmtpyFavoritesHint">Lemmikuid pole veel lisatud</string>
     <string name="searchWidgetEmtpyFavoritesCta">Lisa lemmik</string>
     <string name="widgetConfigurationActivityTitle">Vidina konfiguratsioon</string>
-    <string name="favoritesWidgetLabel">Lemmikud</string>
-    <string name="searchWidgetLabel">Otsing</string>
+    <string name="favoritesWidgetLabel">Otsing ja lemmikud</string>
+    <string name="searchWidgetLabel">Otsing ja Duck.ai</string>
 
     <!-- Home Screen Shortcuts -->
     <string name="addToHome">Lisa kodukuvale</string>
@@ -427,7 +427,6 @@
     <string name="crashedWebViewErrorAction">"Laadige uuesti"</string>
 
     <!-- System Search-->
-    <string name="systemSearchDeviceAppLabel">Sellest seadmest</string>
     <string name="systemSearchAppNotFound">Rakendust ei leitud</string>
     <string name="systemSearchOnboardingThanks">Aitäh, et valisite DuckDuckGo!\nMeie brauseri kasutamine aitab teid kaitsta häkkerite, petturite ja andmenäljaste ettevõtete eest.</string>
     <string name="systemSearchOnboardingFeaturesIntroText">Peale selle DuckDuckGo rakendus:</string>
@@ -947,4 +946,10 @@
     <string name="tabSwitcherAnimationTileRemovalDialogPositiveButton">Peida</string>
     <string name="tabSwitcherAnimationTileRemovalDialogNegativeButton">Jäta alles</string>
 
+    <!-- Widgets -->
+    <string name="searchOnlyWidgetLabel" instruction="Label for the search-only widget">Ainult otsi</string>
+    <string name="searchOnlyWidgetDescription" instruction="Description for the search-only widget">Käivita kiiresti privaatne otsing DuckDuckGo\'ga.</string>
+    <string name="searchWidgetDescription" instruction="Description for the search widget, which may include Duck.ai and voice search">Otsi privaatselt DuckDuckGo\'ga või küsi Duck.ai käest. Häälotsing ja Duck.ai on saadaval, kui need on lubatud.</string>
+    <string name="searchAndFavoritesWidgetDescription" instruction="Description for the search and favorites widget">Otsi või külasta oma lemmiksaite privaatselt ühe puudutusega. Häälotsing ja Duck.ai on saadaval, kui need on lubatud.</string>
+    <string name="duckAiOnlyPinShortcutLabel" instruction="Label for the Duck.ai pinned shortcut. Should be Duck.ai in all languages">Duck.ai</string>
 </resources>

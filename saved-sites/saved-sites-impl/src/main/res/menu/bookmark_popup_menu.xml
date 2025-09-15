@@ -17,7 +17,7 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item
         android:id="@+id/bookmark_edit"
-        android:title="@string/newTabPageMenuEdit" />
+        android:title="@string/savedSiteDialogTitleEdit" />
     <item
         android:id="@+id/bookmark_add_to_favorites"
         android:title="@string/addToFavorites" />

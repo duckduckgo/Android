@@ -36,6 +36,8 @@ import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.api.DuckChatSettingsNoParams
 import com.duckduckgo.duckchat.impl.feature.AIChatImageUploadFeature
 import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
+import com.duckduckgo.duckchat.impl.inputscreen.newaddressbaroption.ChoiceSelectionCallback
+import com.duckduckgo.duckchat.impl.inputscreen.newaddressbaroption.NewAddressBarOptionBottomSheetDialogFactory
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelParameters
 import com.duckduckgo.duckchat.impl.repository.DuckChatFeatureRepository
@@ -186,6 +188,7 @@ enum class ReportMetric(val metric: String) {
     USER_DID_OPEN_HISTORY("userDidOpenHistory"),
     USER_DID_SELECT_FIRST_HISTORY_ITEM("userDidSelectFirstHistoryItem"),
     USER_DID_CREATE_NEW_CHAT("userDidCreateNewChat"),
+    USER_DID_TAP_KEYBOARD_RETURN_KEY("userDidTapKeyboardReturnKey"),
     ;
 
     companion object {
@@ -220,6 +223,7 @@ class RealDuckChat @Inject constructor(
     private val pixel: Pixel,
     private val imageUploadFeature: AIChatImageUploadFeature,
     private val browserNav: BrowserNav,
+    private val newAddressBarOptionBottomSheetDialogFactory: NewAddressBarOptionBottomSheetDialogFactory,
 ) : DuckChatInternal, DuckAiFeatureState, PrivacyConfigCallbackPlugin {
 
     private val closeChatFlow = MutableSharedFlow<Unit>(replay = 0)
@@ -229,6 +233,7 @@ class RealDuckChat @Inject constructor(
     private val _showInBrowserMenu = MutableStateFlow(false)
     private val _showInAddressBar = MutableStateFlow(false)
     private val _showOmnibarShortcutInAllStates = MutableStateFlow(false)
+    private val _showNewAddressBarOptionAnnouncement = MutableStateFlow(false)
     private val _chatState = MutableStateFlow(ChatState.HIDE)
     private val _keepSession = MutableStateFlow(false)
 
@@ -240,6 +245,7 @@ class RealDuckChat @Inject constructor(
     private var isDuckAiInBrowserEnabled = false
     private var duckAiInputScreen = false
     private var duckAiInputScreenOpenAutomaticallyEnabled = false
+    private var showAIChatAddressBarChoiceScreen = false
     private var isDuckChatUserEnabled = false
     private var duckChatLink = DUCK_CHAT_WEB_LINK
     private var bangRegex: Regex? = null
@@ -363,6 +369,8 @@ class RealDuckChat @Inject constructor(
     override val showOmnibarShortcutOnNtpAndOnFocus: StateFlow<Boolean> = _showInAddressBar.asStateFlow()
 
     override val showOmnibarShortcutInAllStates: StateFlow<Boolean> = _showOmnibarShortcutInAllStates.asStateFlow()
+
+    override val showNewAddressBarOptionChoiceScreen: StateFlow<Boolean> = _showNewAddressBarOptionAnnouncement.asStateFlow()
 
     override val chatState: StateFlow<ChatState> = _chatState.asStateFlow()
 
@@ -515,6 +523,20 @@ class RealDuckChat @Inject constructor(
         return duckChatFeatureRepository.wasOpenedBefore()
     }
 
+    override fun showNewAddressBarOptionChoiceScreen(context: Context, isDarkThemeEnabled: Boolean) {
+        newAddressBarOptionBottomSheetDialogFactory.create(
+            context = context,
+            isDarkThemeEnabled = isDarkThemeEnabled,
+            choiceSelectionCallback = object : ChoiceSelectionCallback {
+                override fun onSearchAndDuckAiSelected() {
+                    appCoroutineScope.launch {
+                        setInputScreenUserSetting(true)
+                    }
+                }
+            },
+        ).show()
+    }
+
     private suspend fun hasActiveSession(): Boolean {
         val now = System.currentTimeMillis()
         val lastSession = duckChatFeatureRepository.lastSessionTimestamp()
@@ -534,6 +556,7 @@ class RealDuckChat @Inject constructor(
             isDuckAiInBrowserEnabled = duckChatFeature.duckAiButtonInBrowser().isEnabled()
             duckAiInputScreen = duckChatFeature.duckAiInputScreen().isEnabled()
             duckAiInputScreenOpenAutomaticallyEnabled = duckChatFeature.showInputScreenAutomaticallyOnNewTab().isEnabled()
+            showAIChatAddressBarChoiceScreen = duckChatFeature.showAIChatAddressBarChoiceScreen().isEnabled()
 
             val settingsString = duckChatFeature.self().getSettings()
             val settingsJson = settingsString?.let {
@@ -575,6 +598,8 @@ class RealDuckChat @Inject constructor(
 
         val showOmnibarShortcutInAllStates = showInAddressBar && isDuckAiInBrowserEnabled
         _showOmnibarShortcutInAllStates.emit(showOmnibarShortcutInAllStates)
+
+        _showNewAddressBarOptionAnnouncement.emit(showAIChatAddressBarChoiceScreen)
     }
 
     companion object {

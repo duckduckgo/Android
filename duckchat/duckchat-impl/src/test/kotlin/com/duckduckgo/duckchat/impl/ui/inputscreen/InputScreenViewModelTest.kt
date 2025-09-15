@@ -3,6 +3,7 @@ package com.duckduckgo.duckchat.impl.ui.inputscreen
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import app.cash.turbine.test
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Count
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
 import com.duckduckgo.browser.api.autocomplete.AutoComplete
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteResult
@@ -818,12 +819,13 @@ class InputScreenViewModelTest {
     }
 
     @Test
-    fun `when fireShownPixel then DUCK_CHAT_EXPERIMENTAL_OMNIBAR_SHOWN daily pixel is fired`() = runTest {
+    fun `when fireShownPixel then DUCK_CHAT_EXPERIMENTAL_OMNIBAR_SHOWN pixels is fired`() = runTest {
         val viewModel = createViewModel()
 
         viewModel.fireShownPixel()
 
-        verify(pixel).fire(DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_OMNIBAR_SHOWN, type = Daily())
+        verify(pixel).fire(DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_OMNIBAR_SHOWN_DAILY, type = Daily())
+        verify(pixel).fire(DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_OMNIBAR_SHOWN_COUNT, type = Count)
     }
 
     @Test

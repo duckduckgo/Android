@@ -273,8 +273,8 @@
     <string name="searchWidgetEmtpyFavoritesHint">Još uvijek nema omiljenih stavki</string>
     <string name="searchWidgetEmtpyFavoritesCta">Dodaj omiljenu stavku</string>
     <string name="widgetConfigurationActivityTitle">Konfiguracija widgeta</string>
-    <string name="favoritesWidgetLabel">Omiljeno</string>
-    <string name="searchWidgetLabel">Pretraga</string>
+    <string name="favoritesWidgetLabel">Pretraživanje i favoriti</string>
+    <string name="searchWidgetLabel">Pretraživanje i Duck.ai</string>
 
     <!-- Home Screen Shortcuts -->
     <string name="addToHome">Dodaj na početni zaslon</string>
@@ -429,7 +429,6 @@
     <string name="crashedWebViewErrorAction">"Ponovno učitaj"</string>
 
     <!-- System Search-->
-    <string name="systemSearchDeviceAppLabel">Sa ovog uređaja</string>
     <string name="systemSearchAppNotFound">Aplikaciju nije bilo moguće pronaći</string>
     <string name="systemSearchOnboardingThanks">Hvala ti na odabiru DuckDuckGoa!\nKorištenje našeg preglednika pomaže ti u zaštiti od hakera, prevaranata i tvrtki koje otimaju podatke.</string>
     <string name="systemSearchOnboardingFeaturesIntroText">Aplikacija DuckDuckGo također:</string>
@@ -983,4 +982,10 @@
     <string name="tabSwitcherAnimationTileRemovalDialogPositiveButton">Sakrij</string>
     <string name="tabSwitcherAnimationTileRemovalDialogNegativeButton">Zadrži</string>
 
+    <!-- Widgets -->
+    <string name="searchOnlyWidgetLabel" instruction="Label for the search-only widget">Samo pretraživanje</string>
+    <string name="searchOnlyWidgetDescription" instruction="Description for the search-only widget">Brzo pokreni privatnu pretragu pomoću preglednika DuckDuckGo.</string>
+    <string name="searchWidgetDescription" instruction="Description for the search widget, which may include Duck.ai and voice search">Pretražuj privatno s DuckDuckGo-om ili pitaj Duck.ai. Glasovno pretraživanje i Duck.ai dostupni su ako su omogućeni.</string>
+    <string name="searchAndFavoritesWidgetDescription" instruction="Description for the search and favorites widget">Pretraži ili posjeti svoje omiljene mrežne lokacije privatno jednim dodirom. Glasovno pretraživanje i Duck.ai dostupni su ako su omogućeni.</string>
+    <string name="duckAiOnlyPinShortcutLabel" instruction="Label for the Duck.ai pinned shortcut. Should be Duck.ai in all languages">Duck.ai</string>
 </resources>
