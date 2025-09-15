@@ -20,7 +20,12 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.duckchat.impl.ChatState
 import com.duckduckgo.duckchat.impl.DuckChatInternal
+import com.duckduckgo.duckchat.impl.ReportMetric.USER_DID_CREATE_NEW_CHAT
+import com.duckduckgo.duckchat.impl.ReportMetric.USER_DID_OPEN_HISTORY
+import com.duckduckgo.duckchat.impl.ReportMetric.USER_DID_SELECT_FIRST_HISTORY_ITEM
+import com.duckduckgo.duckchat.impl.ReportMetric.USER_DID_SUBMIT_FIRST_PROMPT
 import com.duckduckgo.duckchat.impl.ReportMetric.USER_DID_SUBMIT_PROMPT
+import com.duckduckgo.duckchat.impl.ReportMetric.USER_DID_TAP_KEYBOARD_RETURN_KEY
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
 import com.duckduckgo.duckchat.impl.store.DuckChatDataStore
 import com.duckduckgo.js.messaging.api.JsCallbackData
@@ -388,5 +393,65 @@ class RealDuckChatJSHelperTest {
         assertNull(testee.processJsCallbackMessage(featureName, method, id, data))
 
         verify(mockDuckChatPixels).sendReportMetricPixel(USER_DID_SUBMIT_PROMPT)
+    }
+
+    @Test
+    fun whenReportMetricWithFirstPromptThenPixelSent() = runTest {
+        val featureName = "aiChat"
+        val method = "reportMetric"
+        val id = "123"
+        val data = JSONObject(mapOf("metricName" to "userDidSubmitFirstPrompt"))
+
+        assertNull(testee.processJsCallbackMessage(featureName, method, id, data))
+
+        verify(mockDuckChatPixels).sendReportMetricPixel(USER_DID_SUBMIT_FIRST_PROMPT)
+    }
+
+    @Test
+    fun whenReportMetricWithOpenHistoryThenPixelSent() = runTest {
+        val featureName = "aiChat"
+        val method = "reportMetric"
+        val id = "123"
+        val data = JSONObject(mapOf("metricName" to "userDidOpenHistory"))
+
+        assertNull(testee.processJsCallbackMessage(featureName, method, id, data))
+
+        verify(mockDuckChatPixels).sendReportMetricPixel(USER_DID_OPEN_HISTORY)
+    }
+
+    @Test
+    fun whenReportMetricWithSelectFirstHistoryItemThenPixelSent() = runTest {
+        val featureName = "aiChat"
+        val method = "reportMetric"
+        val id = "123"
+        val data = JSONObject(mapOf("metricName" to "userDidSelectFirstHistoryItem"))
+
+        assertNull(testee.processJsCallbackMessage(featureName, method, id, data))
+
+        verify(mockDuckChatPixels).sendReportMetricPixel(USER_DID_SELECT_FIRST_HISTORY_ITEM)
+    }
+
+    @Test
+    fun whenReportMetricWithCreateNewChatThenPixelSent() = runTest {
+        val featureName = "aiChat"
+        val method = "reportMetric"
+        val id = "123"
+        val data = JSONObject(mapOf("metricName" to "userDidCreateNewChat"))
+
+        assertNull(testee.processJsCallbackMessage(featureName, method, id, data))
+
+        verify(mockDuckChatPixels).sendReportMetricPixel(USER_DID_CREATE_NEW_CHAT)
+    }
+
+    @Test
+    fun whenReportMetricWithKeyboardReturnKeyThenPixelSent() = runTest {
+        val featureName = "aiChat"
+        val method = "reportMetric"
+        val id = "123"
+        val data = JSONObject(mapOf("metricName" to "userDidTapKeyboardReturnKey"))
+
+        assertNull(testee.processJsCallbackMessage(featureName, method, id, data))
+
+        verify(mockDuckChatPixels).sendReportMetricPixel(USER_DID_TAP_KEYBOARD_RETURN_KEY)
     }
 }

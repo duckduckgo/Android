@@ -188,6 +188,7 @@ enum class ReportMetric(val metric: String) {
     USER_DID_OPEN_HISTORY("userDidOpenHistory"),
     USER_DID_SELECT_FIRST_HISTORY_ITEM("userDidSelectFirstHistoryItem"),
     USER_DID_CREATE_NEW_CHAT("userDidCreateNewChat"),
+    USER_DID_TAP_KEYBOARD_RETURN_KEY("userDidTapKeyboardReturnKey"),
     ;
 
     companion object {
