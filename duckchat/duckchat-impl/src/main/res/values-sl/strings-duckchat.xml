@@ -51,9 +51,6 @@
     <string name="input_screen_search_hint">Poišči ali vnesi naslov</string>
     <string name="input_screen_chat_tab">Duck.ai</string>
     <string name="input_screen_chat_hint">Vprašaj zasebno</string>
-    <string name="input_screen_user_pref_without_ai">Samo iskanje\n(privzeto)</string>
-    <string name="input_screen_user_pref_with_ai">Iskanje in Duck.ai\n(poskusno)</string>
-    <string name="input_screen_user_pref_description">Preizkusite našo poskusno možnost, da vprašate Duck.ai neposredno iz naslovne vrstice. <annotation type="share_feedback">Podajte povratne informacije</annotation></string>
 
     <!-- Duck.ai Pro settings -->
     <string name="duck_ai_paid_settings_title">Duck.ai</string>

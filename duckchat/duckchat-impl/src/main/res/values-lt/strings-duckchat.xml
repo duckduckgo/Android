@@ -51,9 +51,6 @@
     <string name="input_screen_search_hint">Ieškoti arba įvesti adresą</string>
     <string name="input_screen_chat_tab">Duck.ai</string>
     <string name="input_screen_chat_hint">Klauskite privačiai</string>
-    <string name="input_screen_user_pref_without_ai">Ieškoti tik\n(numatytasis)</string>
-    <string name="input_screen_user_pref_with_ai">Paieška ir „Duck.ai“\n (eksperimentinis)</string>
-    <string name="input_screen_user_pref_description">Išbandykite mūsų eksperimentinę parinktį ir užduokite klausimą „Duck.ai“ tiesiai iš adreso juostos. <annotation type="share_feedback">Bendrinti atsiliepimą</annotation></string>
 
     <!-- Duck.ai Pro settings -->
     <string name="duck_ai_paid_settings_title">Duck.ai</string>
