@@ -64,7 +64,8 @@ import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_EXPERIMENT
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_OMNIBAR_QUERY_SUBMITTED_DAILY
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_OMNIBAR_SESSION_BOTH_MODES
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_OMNIBAR_SESSION_BOTH_MODES_DAILY
-import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_OMNIBAR_SHOWN
+import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_OMNIBAR_SHOWN_COUNT
+import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_OMNIBAR_SHOWN_DAILY
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelParameters
 import com.duckduckgo.duckchat.impl.pixel.inputScreenPixelsModeParam
 import com.duckduckgo.history.api.NavigationHistory
@@ -499,7 +500,8 @@ class InputScreenViewModel @AssistedInject constructor(
     }
 
     fun fireShownPixel() {
-        pixel.fire(DUCK_CHAT_EXPERIMENTAL_OMNIBAR_SHOWN, type = Daily())
+        pixel.fire(DUCK_CHAT_EXPERIMENTAL_OMNIBAR_SHOWN_DAILY, type = Daily())
+        pixel.fire(DUCK_CHAT_EXPERIMENTAL_OMNIBAR_SHOWN_COUNT)
     }
 
     private fun fireModeSwitchedPixel(directionToSearch: Boolean) {
