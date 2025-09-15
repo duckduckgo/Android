@@ -49,4 +49,9 @@ interface DuckAiFeatureState {
      * Indicates whether the Duck AI omnibar shortcut should be shown in all states, including when the omnibar is not focused.
      */
     val showOmnibarShortcutInAllStates: StateFlow<Boolean>
+
+    /**
+     * Indicates whether the new address bar option choice screen feature is enabled.
+     */
+    val showNewAddressBarOptionChoiceScreen: StateFlow<Boolean>
 }
