@@ -428,7 +428,6 @@
     <string name="crashedWebViewErrorAction">"Pārlādēt"</string>
 
     <!-- System Search-->
-    <string name="systemSearchDeviceAppLabel">No šīs ierīces</string>
     <string name="systemSearchAppNotFound">Lietojumprogrammu nevarēja atrast</string>
     <string name="systemSearchOnboardingThanks">Paldies, ka izvēlējies DuckDuckGo!\nMūsu pārlūkprogrammas izmantošana palīdz aizsargāt tevi no hakeriem, krāpniekiem un uzņēmumiem, kas alkst pēc personu datiem.</string>
     <string name="systemSearchOnboardingFeaturesIntroText">Tāpat DuckDuckGo lietotne:</string>

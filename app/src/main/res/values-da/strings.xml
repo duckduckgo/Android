@@ -427,7 +427,6 @@
     <string name="crashedWebViewErrorAction">"Genindlæs"</string>
 
     <!-- System Search-->
-    <string name="systemSearchDeviceAppLabel">Fra denne enhed</string>
     <string name="systemSearchAppNotFound">Appen kunne ikke findes</string>
     <string name="systemSearchOnboardingThanks">Tak, fordi du valgte DuckDuckGo!\nNår du bruger vores browser, er du bedre beskyttet mod hackere, svindlere og datahungrende virksomheder.</string>
     <string name="systemSearchOnboardingFeaturesIntroText">DuckDuckGo-appen kan også:</string>

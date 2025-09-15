@@ -427,7 +427,6 @@
     <string name="crashedWebViewErrorAction">"Opnieuw laden"</string>
 
     <!-- System Search-->
-    <string name="systemSearchDeviceAppLabel">Van dit apparaat</string>
     <string name="systemSearchAppNotFound">Toepassing kon niet worden gevonden</string>
     <string name="systemSearchOnboardingThanks">Bedankt dat je voor DuckDuckGo hebt gekozen!\nDoor onze browser te gebruiken, blijf je beschermd tegen hackers, oplichters en bedrijven die gegevens indrinken als water.</string>
     <string name="systemSearchOnboardingFeaturesIntroText">De DuckDuckGo-app:</string>

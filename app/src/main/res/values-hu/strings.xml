@@ -427,7 +427,6 @@
     <string name="crashedWebViewErrorAction">"Újratöltés"</string>
 
     <!-- System Search-->
-    <string name="systemSearchDeviceAppLabel">Ebből az eszközből</string>
     <string name="systemSearchAppNotFound">Az alkalmazás nem található</string>
     <string name="systemSearchOnboardingThanks">Köszönjük, hogy a DuckDuckGót választod!\nBöngészőnk hozzájárul ahhoz, hogy védve legyél a hekkerektől, a csalóktól és az adataidra kíváncsi vállalatoktól.</string>
     <string name="systemSearchOnboardingFeaturesIntroText">A DuckDuckGo alkalmazás is:</string>

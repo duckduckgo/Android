@@ -427,7 +427,6 @@
     <string name="crashedWebViewErrorAction">"Презареждане"</string>
 
     <!-- System Search-->
-    <string name="systemSearchDeviceAppLabel">От това устройство</string>
     <string name="systemSearchAppNotFound">Приложението не може да бъде намерено</string>
     <string name="systemSearchOnboardingThanks">Благодарим Ви, че избрахте DuckDuckGo!\nИзползването на нашия браузър помага да се защитите от хакери, измамници и жадни за данни компании.</string>
     <string name="systemSearchOnboardingFeaturesIntroText">Приложението също:</string>

@@ -44,6 +44,22 @@ class SuggestionItemDecoration(private val divider: Drawable) : RecyclerView.Ite
                 val nextViewType = nextView.tag
                 val nextViewParams = nextView.layoutParams as MarginLayoutParams
 
+                currentView.updateLayoutParams {
+                    currentParams.apply {
+                        if (i == 0) {
+                            topMargin = 0
+                        }
+                        bottomMargin = 0
+                    }
+                }
+                nextView.updateLayoutParams {
+                    nextViewParams.apply {
+                        topMargin = 0
+                        if (i == childCount - 1) {
+                            bottomMargin = 0
+                        }
+                    }
+                }
                 if (currentViewType == SEARCH_ITEM && nextViewType == OTHER_ITEM || currentViewType == OTHER_ITEM && nextViewType == SEARCH_ITEM) {
                     currentView.updateLayoutParams {
                         currentParams.apply {

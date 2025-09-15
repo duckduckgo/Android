@@ -429,7 +429,6 @@
     <string name="crashedWebViewErrorAction">"Перезагрузить"</string>
 
     <!-- System Search-->
-    <string name="systemSearchDeviceAppLabel">С этого устройства</string>
     <string name="systemSearchAppNotFound">Приложение не найдено</string>
     <string name="systemSearchOnboardingThanks">Благодарим за выбор DuckDuckGo!\nНаш браузер помогает защищать вас от хакеров, мошенников и компаний, собирающих чужие данные.</string>
     <string name="systemSearchOnboardingFeaturesIntroText">Приложение DuckDuckGo также:</string>

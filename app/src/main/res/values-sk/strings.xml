@@ -429,7 +429,6 @@
     <string name="crashedWebViewErrorAction">"Znovu načítať"</string>
 
     <!-- System Search-->
-    <string name="systemSearchDeviceAppLabel">Z tohto zariadenia</string>
     <string name="systemSearchAppNotFound">Aplikáciu sa nepodarilo nájsť</string>
     <string name="systemSearchOnboardingThanks">Ďakujeme, že si si vybral/a DuckDuckGo!\nPoužívanie nášho prehliadača ti pomôže chrániť sa pred hackermi, podvodníkmi a spoločnosťami bažiacimi po údajoch.</string>
     <string name="systemSearchOnboardingFeaturesIntroText">Aplikácia DuckDuckGo tiež:</string>

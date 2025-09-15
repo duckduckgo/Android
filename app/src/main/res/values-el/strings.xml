@@ -427,7 +427,6 @@
     <string name="crashedWebViewErrorAction">"Γίνεται επαναφόρτωση"</string>
 
     <!-- System Search-->
-    <string name="systemSearchDeviceAppLabel">Από αυτή τη συσκευή</string>
     <string name="systemSearchAppNotFound">Η εφαρμογή δεν βρέθηκε</string>
     <string name="systemSearchOnboardingThanks">Σας ευχαριστούμε που επιλέξατε το DuckDuckGo!\nΗ χρήση του προγράμματος περιήγησής μας συμβάλλει στην προστασία σας από χάκερ, απατεώνες και εταιρείες που διψούν για δεδομένα.</string>
     <string name="systemSearchOnboardingFeaturesIntroText">Η εφαρμογή DuckDuckGo επίσης:</string>
