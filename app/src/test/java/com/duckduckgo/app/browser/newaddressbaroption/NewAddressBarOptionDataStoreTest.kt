@@ -25,7 +25,7 @@ import androidx.datastore.preferences.preferencesDataStoreFile
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.common.test.CoroutineTestRule
-import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.*
 import org.junit.Rule
@@ -66,7 +66,7 @@ class NewAddressBarOptionDataStoreTest {
     fun `when setAsShown called then wasShown returns true`() = runTest {
         testee.setAsShown()
         assertTrue(testee.wasShown())
-        assertTrue(testDataStore.data.first()[WAS_SHOWN_KEY] == true)
+        assertTrue(testDataStore.data.firstOrNull()?.get(WAS_SHOWN_KEY) == true)
     }
 
     @Test
@@ -78,6 +78,6 @@ class NewAddressBarOptionDataStoreTest {
     fun `when setAsValidated called then wasValidated returns true`() = runTest {
         testee.setAsValidated()
         assertTrue(testee.wasValidated())
-        assertTrue(testDataStore.data.first()[WAS_VALIDATED_KEY] == true)
+        assertTrue(testDataStore.data.firstOrNull()?.get(WAS_VALIDATED_KEY) == true)
     }
 }
