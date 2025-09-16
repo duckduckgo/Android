@@ -599,6 +599,9 @@ open class BrowserActivity : DuckDuckGoActivity() {
 
         if (intent.getBooleanExtra(OPEN_DUCK_CHAT, false)) {
             isDuckChatVisible = true
+            if (duckAiFeatureState.showInputScreenAutomaticallyOnNewTab.value) {
+                externalIntentProcessingState.onIntentRequestToChangeTab()
+            }
             val duckChatSessionActive = intent.getBooleanExtra(DUCK_CHAT_SESSION_ACTIVE, false)
             viewModel.openDuckChat(intent.getStringExtra(DUCK_CHAT_URL), duckChatSessionActive, withTransition = duckAiShouldAnimate)
             return
