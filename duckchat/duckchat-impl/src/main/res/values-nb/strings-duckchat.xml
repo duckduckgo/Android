@@ -51,9 +51,9 @@
     <string name="input_screen_search_hint">Søk eller skriv inn adresse</string>
     <string name="input_screen_chat_tab">Duck.ai</string>
     <string name="input_screen_chat_hint">Spør privat</string>
-    <string name="input_screen_user_pref_without_ai">Bare søk\n(Standard)</string>
-    <string name="input_screen_user_pref_with_ai">Søk og Duck.ai\n(Eksperimentelt)</string>
-    <string name="input_screen_user_pref_description">Prøv den eksperimentelle valgmuligheten der du kan spørre Duck.ai direkte fra adressefeltet. <annotation type="share_feedback">Del tilbakemelding</annotation></string>
+    <string name="input_screen_user_pref_without_ai">Bare søk</string>
+    <string name="input_screen_user_pref_with_ai">Søk og Duck.ai</string>
+    <string name="input_screen_user_pref_description">Prøv den nye valgmuligheten der du kan spørre Duck.ai direkte fra adressefeltet. <annotation type="share_feedback">Del tilbakemelding</annotation></string>
 
     <!-- Duck.ai Pro settings -->
     <string name="duck_ai_paid_settings_title">Duck.ai</string>

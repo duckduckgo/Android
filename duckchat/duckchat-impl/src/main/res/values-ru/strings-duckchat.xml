@@ -51,9 +51,9 @@
     <string name="input_screen_search_hint">Введите поисковый запрос или адрес сайта</string>
     <string name="input_screen_chat_tab">Duck.ai</string>
     <string name="input_screen_chat_hint">Задать вопрос (конфиденциально)</string>
-    <string name="input_screen_user_pref_without_ai">Только поиск\n(по умолчанию)</string>
-    <string name="input_screen_user_pref_with_ai">Поиск и Duck.ai\n(экспериментальный вариант)</string>
-    <string name="input_screen_user_pref_description">Попробуйте нашу экспериментальную функцию: вопрос чат-боту Duck.ai прямо из адресной строки. <annotation type="share_feedback">Оставить отзыв</annotation></string>
+    <string name="input_screen_user_pref_without_ai">Только поиск</string>
+    <string name="input_screen_user_pref_with_ai">Поиск и Duck.ai</string>
+    <string name="input_screen_user_pref_description">Новая функция! Вопрос чат-боту Duck.ai прямо из адресной строки. <annotation type="share_feedback">Оставить отзыв</annotation></string>
 
     <!-- Duck.ai Pro settings -->
     <string name="duck_ai_paid_settings_title">Duck.ai</string>

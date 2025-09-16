@@ -51,9 +51,9 @@
     <string name="input_screen_search_hint">Pretraži ili unesi adresu</string>
     <string name="input_screen_chat_tab">Duck.ai</string>
     <string name="input_screen_chat_hint">Pitaj privatno</string>
-    <string name="input_screen_user_pref_without_ai">Samo pretraživanje\n(Zadano)</string>
-    <string name="input_screen_user_pref_with_ai">Pretraživanje i Duck.ai\n(Eksperimentalno)</string>
-    <string name="input_screen_user_pref_description">Isprobaj našu eksperimentalnu opciju postavljanja pitanja usluzi Duck.ai izravno iz adresne trake. <annotation type="share_feedback">Podijeli povratne informacije</annotation></string>
+    <string name="input_screen_user_pref_without_ai">Samo pretraživanje</string>
+    <string name="input_screen_user_pref_with_ai">Pretraživanje i Duck.ai</string>
+    <string name="input_screen_user_pref_description">Isprobaj našu novu opciju za izravno postavljanje pitanja s adresne trake usluzi Duck.ai. <annotation type="share_feedback">Podijeli povratne informacije</annotation></string>
 
     <!-- Duck.ai Pro settings -->
     <string name="duck_ai_paid_settings_title">Duck.ai</string>
