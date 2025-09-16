@@ -72,4 +72,15 @@
 
     <!-- AutoComplete -->
     <string name="autocompleteDuckAiPrompt">Vprašajte Duck.ai</string>
+
+    <!-- New Address Bar Option Bottom Sheet Dialog -->
+    <string name="newAddressBarOptionBottomSheetDialogSearchText">Poišči ali vnesi naslov</string>
+    <string name="newAddressBarOptionBottomSheetDialogTitle">Preklapljanje med iskanjem in klepetom UI</string>
+    <string name="newAddressBarOptionBottomSheetDialogSubTitle">Funkcije umetne inteligence so vedno izbirne.</string>
+    <string name="newAddressBarOptionBottomSheetDialogPrimaryButton">Potrdi</string>
+    <string name="newAddressBarOptionBottomSheetDialogGhostButton">Ne zdaj</string>
+    <string name="newAddressBarOptionBottomSheetDialogFooter">Prilagodite v Nastavitve &gt; Funkcije UI.</string>
+    <string name="newAddressBarOptionBottomSheetDialogSearchOnly">Samo iskanje</string>
+    <string name="newAddressBarOptionBottomSheetDialogSearchAndDuckAi">Iskanje in Duck.ai</string>
+    <string name="newAddressBarOptionBottomSheetDialogHeader">Možnost naslovne vrstice</string>
 </resources>
