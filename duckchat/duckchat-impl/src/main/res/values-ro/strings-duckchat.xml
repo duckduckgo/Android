@@ -72,4 +72,15 @@
 
     <!-- AutoComplete -->
     <string name="autocompleteDuckAiPrompt">Întreabă Duck.ai</string>
+
+    <!-- New Address Bar Option Bottom Sheet Dialog -->
+    <string name="newAddressBarOptionBottomSheetDialogSearchText">Caută sau introdu adresa</string>
+    <string name="newAddressBarOptionBottomSheetDialogTitle">Comută între căutare și chat IA</string>
+    <string name="newAddressBarOptionBottomSheetDialogSubTitle">Funcțiile IA sunt întotdeauna opționale.</string>
+    <string name="newAddressBarOptionBottomSheetDialogPrimaryButton">Confirmare</string>
+    <string name="newAddressBarOptionBottomSheetDialogGhostButton">Nu acum</string>
+    <string name="newAddressBarOptionBottomSheetDialogFooter">Ajustează din Setări &gt; Funcții IA.</string>
+    <string name="newAddressBarOptionBottomSheetDialogSearchOnly">Doar căutare</string>
+    <string name="newAddressBarOptionBottomSheetDialogSearchAndDuckAi">Caută pe Duck.ai</string>
+    <string name="newAddressBarOptionBottomSheetDialogHeader">Opțiunea bară de adrese</string>
 </resources>
