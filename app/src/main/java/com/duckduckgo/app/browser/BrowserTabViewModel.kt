@@ -738,7 +738,12 @@ class BrowserTabViewModel @Inject constructor(
             .launchIn(viewModelScope)
 
         // auto-launch input screen for new, empty tabs (New Tab Page)
-        externalIntentProcessingState.hasPendingTabLaunch.flatMapLatest {
+        combine(
+            externalIntentProcessingState.hasPendingTabLaunch,
+            externalIntentProcessingState.hasPendingDuckAiOpen,
+        ) { hasPendingTabLaunch, hasPendingDuckAiOpen ->
+            hasPendingTabLaunch || hasPendingDuckAiOpen
+        }.flatMapLatest {
             if (it) {
                 // suppress auto-launch while processing external intents (for example, opening links from other apps)
                 // this prevents the New Tab Page from incorrectly triggering the input screen when the app

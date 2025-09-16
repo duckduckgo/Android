@@ -32,7 +32,10 @@ import kotlinx.coroutines.flow.onEach
 
 interface ExternalIntentProcessingState {
     val hasPendingTabLaunch: StateFlow<Boolean>
+    val hasPendingDuckAiOpen: StateFlow<Boolean>
     fun onIntentRequestToChangeTab()
+    fun onIntentRequestToOpenDuckAi()
+    fun onDuckAiClosed()
 }
 
 @ContributesBinding(AppScope::class)
@@ -43,6 +46,9 @@ class ExternalIntentProcessingStateImpl @Inject constructor(
 ) : ExternalIntentProcessingState {
     private val _hasPendingTabLaunch = MutableStateFlow(false)
     override val hasPendingTabLaunch: StateFlow<Boolean> = _hasPendingTabLaunch.asStateFlow()
+
+    private val _hasPendingDuckAiOpen = MutableStateFlow(false)
+    override val hasPendingDuckAiOpen: StateFlow<Boolean> = _hasPendingDuckAiOpen.asStateFlow()
 
     init {
         tabRepository.flowSelectedTab.filterNotNull().onEach { tab ->
@@ -55,5 +61,13 @@ class ExternalIntentProcessingStateImpl @Inject constructor(
 
     override fun onIntentRequestToChangeTab() {
         _hasPendingTabLaunch.value = true
+    }
+
+    override fun onIntentRequestToOpenDuckAi() {
+        _hasPendingDuckAiOpen.value = true
+    }
+
+    override fun onDuckAiClosed() {
+        _hasPendingDuckAiOpen.value = false
     }
 }
