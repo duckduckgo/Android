@@ -16,9 +16,6 @@
 
 <resources>
 
-    <!-- AutoComplete -->
-    <string name="autocompleteDuckAiPrompt">Ask Duck.ai</string>
-
     <!-- New Address Bar Option Bottom Sheet Dialog -->
     <string name="newAddressBarOptionBottomSheetDialogSearchText">Search or enter address</string>
     <string name="newAddressBarOptionBottomSheetDialogTitle">Toggle between\nsearch and AI chat</string>
