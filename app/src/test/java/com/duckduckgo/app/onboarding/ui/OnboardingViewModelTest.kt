@@ -17,6 +17,7 @@
 package com.duckduckgo.app.onboarding.ui
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
+import com.duckduckgo.app.browser.newaddressbaroption.RealNewAddressBarOptionManager
 import com.duckduckgo.app.onboarding.store.AppStage
 import com.duckduckgo.app.onboarding.store.UserStageStore
 import com.duckduckgo.app.onboarding.ui.FullOnboardingSkipper.ViewState
@@ -52,6 +53,8 @@ class OnboardingViewModelTest {
 
     private val onboardingDesignExperimentManager: OnboardingDesignExperimentManager = mock()
 
+    private val newAddressBarOptionManager: RealNewAddressBarOptionManager = mock()
+
     private val testee: OnboardingViewModel by lazy {
         OnboardingViewModel(
             userStageStore = userStageStore,
@@ -60,6 +63,7 @@ class OnboardingViewModelTest {
             onboardingSkipper = onboardingSkipper,
             appBuildConfig = appBuildConfig,
             onboardingDesignExperimentManager = onboardingDesignExperimentManager,
+            newAddressBarOptionManager = newAddressBarOptionManager,
         )
     }
 
@@ -121,6 +125,14 @@ class OnboardingViewModelTest {
 
         verify(onboardingDesignExperimentManager).enroll()
         verify(pageLayout).buildPageBlueprints()
+    }
+
+    @Test
+    fun whenDevOnlyFullyCompleteAllOnboardingCalledThenMarkOnboardingAsCompletedAndSetAsShown() = runTest {
+        testee.devOnlyFullyCompleteAllOnboarding()
+
+        verify(onboardingSkipper).markOnboardingAsCompleted()
+        verify(newAddressBarOptionManager).setAsShown()
     }
 
     private fun configureSkipperFlow() = runTest {
