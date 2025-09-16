@@ -72,4 +72,15 @@
 
     <!-- AutoComplete -->
     <string name="autocompleteDuckAiPrompt">Paklausk „Duck.ai“</string>
+
+    <!-- New Address Bar Option Bottom Sheet Dialog -->
+    <string name="newAddressBarOptionBottomSheetDialogSearchText">Ieškoti arba įvesti adresą</string>
+    <string name="newAddressBarOptionBottomSheetDialogTitle">Perjunkite paiešką ir DI pokalbius</string>
+    <string name="newAddressBarOptionBottomSheetDialogSubTitle">DI funkcijos visada yra pasirenkamos.</string>
+    <string name="newAddressBarOptionBottomSheetDialogPrimaryButton">Patvirtinti</string>
+    <string name="newAddressBarOptionBottomSheetDialogGhostButton">Ne dabar</string>
+    <string name="newAddressBarOptionBottomSheetDialogFooter">Koreguokite skiltyje „Nustatymai“ &gt; „DI funkcijos“.</string>
+    <string name="newAddressBarOptionBottomSheetDialogSearchOnly">Tik paieška</string>
+    <string name="newAddressBarOptionBottomSheetDialogSearchAndDuckAi">Paieška ir „Duck.ai“</string>
+    <string name="newAddressBarOptionBottomSheetDialogHeader">Adreso juostos parinktis</string>
 </resources>
