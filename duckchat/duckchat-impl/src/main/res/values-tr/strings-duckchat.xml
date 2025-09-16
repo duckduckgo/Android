@@ -72,4 +72,15 @@
 
     <!-- AutoComplete -->
     <string name="autocompleteDuckAiPrompt">Duck.ai\'a sor</string>
+
+    <!-- New Address Bar Option Bottom Sheet Dialog -->
+    <string name="newAddressBarOptionBottomSheetDialogSearchText">Adres ara veya gir</string>
+    <string name="newAddressBarOptionBottomSheetDialogTitle">Arama ve AI sohbeti arasında geçiş yapın</string>
+    <string name="newAddressBarOptionBottomSheetDialogSubTitle">Yapay zeka özellikleri her zaman isteğe bağlıdır.</string>
+    <string name="newAddressBarOptionBottomSheetDialogPrimaryButton">Onayla</string>
+    <string name="newAddressBarOptionBottomSheetDialogGhostButton">Şimdi Değil</string>
+    <string name="newAddressBarOptionBottomSheetDialogFooter">Ayarlar &gt; AI Özellikleri bölümünden ayarlarınızı değiştirebilirsiniz.</string>
+    <string name="newAddressBarOptionBottomSheetDialogSearchOnly">Yalnızca Arama</string>
+    <string name="newAddressBarOptionBottomSheetDialogSearchAndDuckAi">Arama ve Duck.ai</string>
+    <string name="newAddressBarOptionBottomSheetDialogHeader">Adres çubuğu seçeneği</string>
 </resources>
