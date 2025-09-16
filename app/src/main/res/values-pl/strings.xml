@@ -128,6 +128,7 @@
     <!-- Fire -->
     <string name="fireMenu">Wyczyść dane</string>
     <string name="fireClearAll">Wyczyść wszystkie karty i dane</string>
+    <string name="fireClearAllPlusDuckChats">Wyczyść wszystkie karty, dane i czaty Duck.ai</string>
     <string name="fireCancel">Anuluj</string>
     <string name="fireDataCleared">Dane zostały usunięte</string>
 
@@ -236,6 +237,7 @@
     <string name="settingsAutomaticallyClearWhatOptionNone">Brak</string>
     <string name="settingsAutomaticallyClearWhatOptionTabs">Karty</string>
     <string name="settingsAutomaticallyClearWhatOptionTabsAndData">Karty i dane</string>
+    <string name="settingsAutomaticallyClearWhatOptionTabsAndDataAndChats">Karty, dane i czaty Duck.ai</string>
 
     <string name="settingsAutomaticallyClearWhen">Usuń w terminie…</string>
     <string name="settingsAutomaticallyClearWhenDialogTitle">Usuń w terminie…</string>
@@ -245,6 +247,8 @@
     <string name="settingsAutomaticallyClearWhenAppExit15Minutes">Zamknięcie aplikacji, brak aktywności przez 15 minut</string>
     <string name="settingsAutomaticallyClearWhenAppExit30Minutes">Zamknięcie aplikacji, brak aktywności przez 30 minut</string>
     <string name="settingsAutomaticallyClearWhenAppExit60Minutes">Zamknięcie aplikacji, nieaktywna przez 1 godzinę</string>
+    <string name="settingsClearAiDataTitle">Wyczyść czaty Duck.ai</string>
+    <string name="settingsClearAiDataMessage">Przycisk Fire Button usunie także historię Duck.ai.</string>
 
     <!-- About Activity -->
     <string name="aboutActivityTitle">O DuckDuckGo</string>
@@ -273,8 +277,8 @@
     <string name="searchWidgetEmtpyFavoritesHint">Nie dodano jeszcze ulubionych</string>
     <string name="searchWidgetEmtpyFavoritesCta">Dodaj do Ulubionych</string>
     <string name="widgetConfigurationActivityTitle">Konfiguracja widżetu</string>
-    <string name="favoritesWidgetLabel">Ulubione</string>
-    <string name="searchWidgetLabel">Szukaj</string>
+    <string name="favoritesWidgetLabel">Wyszukiwanie i Ulubione</string>
+    <string name="searchWidgetLabel">Wyszukiwanie i Duck.ai</string>
 
     <!-- Home Screen Shortcuts -->
     <string name="addToHome">Dodaj do ekranu głównego</string>

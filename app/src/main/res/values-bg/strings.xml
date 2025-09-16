@@ -126,6 +126,7 @@
     <!-- Fire -->
     <string name="fireMenu">Изчистване на данни</string>
     <string name="fireClearAll">Изчистване на всички раздели и данни</string>
+    <string name="fireClearAllPlusDuckChats">Изчистване на всички раздели, данни и чатове с Duck.ai</string>
     <string name="fireCancel">Отмени</string>
     <string name="fireDataCleared">Данните са изчистени</string>
 
@@ -234,6 +235,7 @@
     <string name="settingsAutomaticallyClearWhatOptionNone">Няма</string>
     <string name="settingsAutomaticallyClearWhatOptionTabs">Раздели</string>
     <string name="settingsAutomaticallyClearWhatOptionTabsAndData">Раздели и данни</string>
+    <string name="settingsAutomaticallyClearWhatOptionTabsAndDataAndChats">Раздели, данни и чатове с Duck.ai</string>
 
     <string name="settingsAutomaticallyClearWhen">Изчистване на…</string>
     <string name="settingsAutomaticallyClearWhenDialogTitle">Изчистване на…</string>
@@ -243,6 +245,8 @@
     <string name="settingsAutomaticallyClearWhenAppExit15Minutes">Изход от приложението, неактивен за 15 минути</string>
     <string name="settingsAutomaticallyClearWhenAppExit30Minutes">Изход от приложението, неактивен за 30 минути</string>
     <string name="settingsAutomaticallyClearWhenAppExit60Minutes">Изход от приложението, 1 час без активност</string>
+    <string name="settingsClearAiDataTitle">Изчистване на чатовете с Duck.ai</string>
+    <string name="settingsClearAiDataMessage">Fire Button ще изтрие също и историята на Duck.ai</string>
 
     <!-- About Activity -->
     <string name="aboutActivityTitle">Относно DuckDuckGo</string>
@@ -271,8 +275,8 @@
     <string name="searchWidgetEmtpyFavoritesHint">Все още няма добавени любими</string>
     <string name="searchWidgetEmtpyFavoritesCta">Добавяне в любими</string>
     <string name="widgetConfigurationActivityTitle">Конфигуриране на уиджет</string>
-    <string name="favoritesWidgetLabel">Любими</string>
-    <string name="searchWidgetLabel">Търсене</string>
+    <string name="favoritesWidgetLabel">Търсене и любими</string>
+    <string name="searchWidgetLabel">Търсене и Duck.ai</string>
 
     <!-- Home Screen Shortcuts -->
     <string name="addToHome">Добавете към Начална Страница</string>

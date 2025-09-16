@@ -126,6 +126,7 @@
     <!-- Fire -->
     <string name="fireMenu">Gegevens wissen</string>
     <string name="fireClearAll">Alle tabbladen en gegevens wissen</string>
+    <string name="fireClearAllPlusDuckChats">Alle tabbladen, gegevens en Duck.ai-chats wissen</string>
     <string name="fireCancel">Annuleren</string>
     <string name="fireDataCleared">Gegevens gewist</string>
 
@@ -234,6 +235,7 @@
     <string name="settingsAutomaticallyClearWhatOptionNone">Geen</string>
     <string name="settingsAutomaticallyClearWhatOptionTabs">Tabbladen</string>
     <string name="settingsAutomaticallyClearWhatOptionTabsAndData">Tabbladen en gegevens</string>
+    <string name="settingsAutomaticallyClearWhatOptionTabsAndDataAndChats">Tabbladen, gegevens en Duck.ai-chats</string>
 
     <string name="settingsAutomaticallyClearWhen">Wissen op…</string>
     <string name="settingsAutomaticallyClearWhenDialogTitle">Wissen op…</string>
@@ -243,6 +245,8 @@
     <string name="settingsAutomaticallyClearWhenAppExit15Minutes">App afsluiten, 15 minuten inactief</string>
     <string name="settingsAutomaticallyClearWhenAppExit30Minutes">App afsluiten, 30 minuten inactief</string>
     <string name="settingsAutomaticallyClearWhenAppExit60Minutes">App afsluiten, 1 uur inactief</string>
+    <string name="settingsClearAiDataTitle">Duck.ai chats wissen</string>
+    <string name="settingsClearAiDataMessage">De Fire Button verwijdert ook de Duck.ai-geschiedenis</string>
 
     <!-- About Activity -->
     <string name="aboutActivityTitle">Over DuckDuckGo</string>
@@ -271,8 +275,8 @@
     <string name="searchWidgetEmtpyFavoritesHint">Nog geen favorieten toegevoegd</string>
     <string name="searchWidgetEmtpyFavoritesCta">Favoriet toevoegen</string>
     <string name="widgetConfigurationActivityTitle">Widgetconfiguratie</string>
-    <string name="favoritesWidgetLabel">Favorieten</string>
-    <string name="searchWidgetLabel">Zoeken</string>
+    <string name="favoritesWidgetLabel">Zoeken en Favorieten</string>
+    <string name="searchWidgetLabel">Zoeken en Duck.ai</string>
 
     <!-- Home Screen Shortcuts -->
     <string name="addToHome">Toevoegen aan Home Screen</string>

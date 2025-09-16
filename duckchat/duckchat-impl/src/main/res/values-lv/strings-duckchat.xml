@@ -69,4 +69,7 @@
     <string name="duck_chat_enable_duck_ai_setting_description_rebranding">Privāti tērzē ar populāriem trešo personu mākslīgā intelekta modeļiem</string>
     <string name="duck_chat_assist_settings_title_rebranding">Meklēšanas Assist iestatījumi</string>
     <string name="duck_chat_assist_settings_description_rebranding">Izvēlies, cik bieži tu vēlies, lai MI atbalstītās atbildes parādītos tavos meklējumos.</string>
+
+    <!-- AutoComplete -->
+    <string name="autocompleteDuckAiPrompt">Pajautā Duck.ai</string>
 </resources>

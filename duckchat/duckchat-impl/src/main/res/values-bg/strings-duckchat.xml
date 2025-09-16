@@ -69,4 +69,7 @@
     <string name="duck_chat_enable_duck_ai_setting_description_rebranding">Поверителен чат с популярни AI модели на трети страни</string>
     <string name="duck_chat_assist_settings_title_rebranding">Настройки за Assist при търсене</string>
     <string name="duck_chat_assist_settings_description_rebranding">Изберете колко често искате да се появяват отговори, подпомагани от изкуствен интелект, в търсенето</string>
+
+    <!-- AutoComplete -->
+    <string name="autocompleteDuckAiPrompt">Попитай Duck.ai</string>
 </resources>
