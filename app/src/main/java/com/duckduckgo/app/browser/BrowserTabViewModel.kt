@@ -3702,8 +3702,12 @@ class BrowserTabViewModel @Inject constructor(
                     "screenUnlock" -> screenUnlock()
                 }
             }
-            "breakageReportResult" -> if (data != null) {
-                breakageReportResult(data)
+            "breakageReporting" -> if (data != null) {
+                when (method) {
+                    "breakageReportResult" -> {
+                        breakageReportResult(data)
+                    }
+                }
             }
             "initialPing" -> {
                 // TODO: Eventually, we might want plugins here
