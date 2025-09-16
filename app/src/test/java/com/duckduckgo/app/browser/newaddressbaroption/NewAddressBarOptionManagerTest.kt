@@ -268,6 +268,13 @@ class NewAddressBarOptionManagerTest {
         assertEquals(true, darkThemeCaptor.firstValue)
     }
 
+    @Test
+    fun `when setAsShown is called then data store setAsShown is called`() = runTest {
+        testee.setAsShown()
+
+        verify(newAddressBarOptionDataStoreMock).setAsShown()
+    }
+
     private suspend fun setupAllConditionsMet() {
         whenever(duckChatMock.isEnabled()).thenReturn(true)
         whenever(userStageStoreMock.getUserAppStage()).thenReturn(AppStage.ESTABLISHED)

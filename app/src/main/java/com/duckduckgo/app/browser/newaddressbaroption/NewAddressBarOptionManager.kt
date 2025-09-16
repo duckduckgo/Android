@@ -42,6 +42,7 @@ interface NewAddressBarOptionManager {
         activity: DuckDuckGoActivity,
         isLaunchedFromExternal: Boolean,
     )
+    suspend fun setAsShown()
 }
 
 @SingleInstanceIn(AppScope::class)
@@ -71,6 +72,10 @@ class RealNewAddressBarOptionManager @Inject constructor(
                 }
             }
         }
+    }
+
+    override suspend fun setAsShown() {
+        newAddressBarOptionDataStore.setAsShown()
     }
 
     private suspend fun validate(

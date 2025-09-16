@@ -19,6 +19,7 @@ package com.duckduckgo.app.onboarding.ui
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
+import com.duckduckgo.app.browser.newaddressbaroption.RealNewAddressBarOptionManager
 import com.duckduckgo.app.onboarding.store.AppStage
 import com.duckduckgo.app.onboarding.store.UserStageStore
 import com.duckduckgo.app.onboarding.ui.page.OnboardingPageFragment
@@ -39,6 +40,7 @@ class OnboardingViewModel @Inject constructor(
     private val onboardingSkipper: OnboardingSkipper,
     private val appBuildConfig: AppBuildConfig,
     private val onboardingDesignExperimentManager: OnboardingDesignExperimentManager,
+    private val newAddressBarOptionManager: RealNewAddressBarOptionManager,
 ) : ViewModel() {
 
     private val _viewState = MutableStateFlow(ViewState())
@@ -94,6 +96,7 @@ class OnboardingViewModel @Inject constructor(
 
     suspend fun devOnlyFullyCompleteAllOnboarding() {
         onboardingSkipper.markOnboardingAsCompleted()
+        newAddressBarOptionManager.setAsShown()
     }
 
     companion object {
