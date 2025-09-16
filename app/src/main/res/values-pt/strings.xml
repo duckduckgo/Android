@@ -126,6 +126,7 @@
     <!-- Fire -->
     <string name="fireMenu">Limpar dados</string>
     <string name="fireClearAll">Limpar todos os separadores e dados</string>
+    <string name="fireClearAllPlusDuckChats">Limpar todos os separadores, dados e conversas do Duck.ai</string>
     <string name="fireCancel">Cancelar</string>
     <string name="fireDataCleared">Dados limpos</string>
 
@@ -234,6 +235,7 @@
     <string name="settingsAutomaticallyClearWhatOptionNone">Nenhum</string>
     <string name="settingsAutomaticallyClearWhatOptionTabs">Separadores</string>
     <string name="settingsAutomaticallyClearWhatOptionTabsAndData">Separadores e dados</string>
+    <string name="settingsAutomaticallyClearWhatOptionTabsAndDataAndChats">Separadores, dados e conversas do Duck.ai</string>
 
     <string name="settingsAutomaticallyClearWhen">Limpar em…</string>
     <string name="settingsAutomaticallyClearWhenDialogTitle">Limpar em…</string>
@@ -243,6 +245,8 @@
     <string name="settingsAutomaticallyClearWhenAppExit15Minutes">Saída da aplicação, inativa durante 15 minutos</string>
     <string name="settingsAutomaticallyClearWhenAppExit30Minutes">Saída da aplicação, inativa durante 30 minutos</string>
     <string name="settingsAutomaticallyClearWhenAppExit60Minutes">Saída da aplicação, inativa por 1 hora</string>
+    <string name="settingsClearAiDataTitle">Limpar conversas do Duck.ai</string>
+    <string name="settingsClearAiDataMessage">O Fire Button também elimina o histórico do Duck.ai</string>
 
     <!-- About Activity -->
     <string name="aboutActivityTitle">Sobre o DuckDuckGo</string>

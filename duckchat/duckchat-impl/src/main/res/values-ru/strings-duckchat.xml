@@ -69,4 +69,7 @@
     <string name="duck_chat_enable_duck_ai_setting_description_rebranding">Общайтесь в приватном чате с популярными сторонними моделями искусственного интеллекта</string>
     <string name="duck_chat_assist_settings_title_rebranding">Настройки Search Assist</string>
     <string name="duck_chat_assist_settings_description_rebranding">Выберите, как часто вы хотите видеть ответы от ИИ в результатах поиска.</string>
+
+    <!-- AutoComplete -->
+    <string name="autocompleteDuckAiPrompt">Спросить у Duck.ai</string>
 </resources>

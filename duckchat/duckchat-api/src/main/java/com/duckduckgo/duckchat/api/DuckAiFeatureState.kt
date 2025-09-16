@@ -54,4 +54,9 @@ interface DuckAiFeatureState {
      * Indicates whether the new address bar option choice screen feature is enabled.
      */
     val showNewAddressBarOptionChoiceScreen: StateFlow<Boolean>
+
+    /**
+     * Indicates whether the Setting for allowing Duck.ai chats to be deleted with the Fire Button is enabled
+     */
+    val showClearDuckAIChatHistory: StateFlow<Boolean>
 }

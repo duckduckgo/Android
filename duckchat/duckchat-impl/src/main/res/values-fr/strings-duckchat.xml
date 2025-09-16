@@ -69,4 +69,7 @@
     <string name="duck_chat_enable_duck_ai_setting_description_rebranding">Discutez en privé avec des modèles d\'IA tiers populaires</string>
     <string name="duck_chat_assist_settings_title_rebranding">Paramètres de recherche Assist</string>
     <string name="duck_chat_assist_settings_description_rebranding">Choisissez la fréquence à laquelle vous souhaitez que les réponses assistées par l\'IA apparaissent dans vos recherches</string>
+
+    <!-- AutoComplete -->
+    <string name="autocompleteDuckAiPrompt">Demandez à Duck.ai</string>
 </resources>

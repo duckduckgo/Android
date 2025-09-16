@@ -69,4 +69,7 @@
     <string name="duck_chat_enable_duck_ai_setting_description_rebranding">Keskustele yksityisesti suosittujen kolmannen osapuolen tekoälymallien kanssa</string>
     <string name="duck_chat_assist_settings_title_rebranding">Search Assist -asetukset</string>
     <string name="duck_chat_assist_settings_description_rebranding">Valitse, kuinka usein haluat tekoälyavusteisten vastausten näkyvän hauissasi</string>
+
+    <!-- AutoComplete -->
+    <string name="autocompleteDuckAiPrompt">Kysy Duck.ai:lta</string>
 </resources>

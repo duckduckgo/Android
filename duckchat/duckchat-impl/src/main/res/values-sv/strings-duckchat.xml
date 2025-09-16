@@ -69,4 +69,7 @@
     <string name="duck_chat_enable_duck_ai_setting_description_rebranding">Chatta privat med populära AI-modeller från tredje part</string>
     <string name="duck_chat_assist_settings_title_rebranding">Inställningar för Search Assist</string>
     <string name="duck_chat_assist_settings_description_rebranding">Välj hur ofta du vill att AI-assisterade svar ska visas i dina sökningar</string>
+
+    <!-- AutoComplete -->
+    <string name="autocompleteDuckAiPrompt">Fråga Duck.ai</string>
 </resources>

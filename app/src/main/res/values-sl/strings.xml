@@ -128,6 +128,7 @@
     <!-- Fire -->
     <string name="fireMenu">Počisti podatke</string>
     <string name="fireClearAll">Počisti vse zavihke in podatke</string>
+    <string name="fireClearAllPlusDuckChats">Počisti vse zavihke, podatke in klepete Duck.ai</string>
     <string name="fireCancel">Preklic</string>
     <string name="fireDataCleared">Podatki izbrisani</string>
 
@@ -236,6 +237,7 @@
     <string name="settingsAutomaticallyClearWhatOptionNone">Brez</string>
     <string name="settingsAutomaticallyClearWhatOptionTabs">Zavihki</string>
     <string name="settingsAutomaticallyClearWhatOptionTabsAndData">Zavihki in podatki</string>
+    <string name="settingsAutomaticallyClearWhatOptionTabsAndDataAndChats">Zavihki, podatki in klepeti Duck.ai</string>
 
     <string name="settingsAutomaticallyClearWhen">Počisti dne …</string>
     <string name="settingsAutomaticallyClearWhenDialogTitle">Počisti dne …</string>
@@ -245,6 +247,8 @@
     <string name="settingsAutomaticallyClearWhenAppExit15Minutes">Izhod iz aplikacije, neaktivnost 15 minut</string>
     <string name="settingsAutomaticallyClearWhenAppExit30Minutes">Izhod iz aplikacije, neaktivnost 30 minut</string>
     <string name="settingsAutomaticallyClearWhenAppExit60Minutes">Izhod iz aplikacije, neaktivnost 1 ura</string>
+    <string name="settingsClearAiDataTitle">Počisti klepete Duck.ai</string>
+    <string name="settingsClearAiDataMessage">Gumb Fire Button bo izbrisal tudi zgodovino Duck.ai.</string>
 
     <!-- About Activity -->
     <string name="aboutActivityTitle">O DuckDuckGo</string>

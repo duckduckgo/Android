@@ -69,4 +69,7 @@
     <string name="duck_chat_enable_duck_ai_setting_description_rebranding">Privatno čavrljaj s popularnim modelima umjetne inteligencije trećih strana</string>
     <string name="duck_chat_assist_settings_title_rebranding">Pretraži postavke Assista</string>
     <string name="duck_chat_assist_settings_description_rebranding">Odaberi koliko često želiš da se odgovori potpomognuti umjetnom inteligencijom pojavljuju u tvojim pretraživanjima</string>
+
+    <!-- AutoComplete -->
+    <string name="autocompleteDuckAiPrompt">Pitaj Duck.ai</string>
 </resources>

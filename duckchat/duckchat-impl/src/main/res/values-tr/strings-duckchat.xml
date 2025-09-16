@@ -69,4 +69,7 @@
     <string name="duck_chat_enable_duck_ai_setting_description_rebranding">Popüler 3. taraf AI modelleriyle gizli sohbet et</string>
     <string name="duck_chat_assist_settings_title_rebranding">Search Assist Ayarları</string>
     <string name="duck_chat_assist_settings_description_rebranding">Yapay zeka destekli yanıtların aramalarınızda ne sıklıkta görünmesini istediğinizi seçin</string>
+
+    <!-- AutoComplete -->
+    <string name="autocompleteDuckAiPrompt">Duck.ai\'a sor</string>
 </resources>

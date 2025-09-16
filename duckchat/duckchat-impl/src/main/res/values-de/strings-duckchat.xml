@@ -69,4 +69,7 @@
     <string name="duck_chat_enable_duck_ai_setting_description_rebranding">Privat mit beliebten KI-Modellen von Drittanbietern chatten</string>
     <string name="duck_chat_assist_settings_title_rebranding">Such-Assist-Einstellungen</string>
     <string name="duck_chat_assist_settings_description_rebranding">Du kannst auswählen, wie oft KI-gestützte Antworten in deinen Suchergebnissen angezeigt werden sollen.</string>
+
+    <!-- AutoComplete -->
+    <string name="autocompleteDuckAiPrompt">Frag Duck.ai</string>
 </resources>

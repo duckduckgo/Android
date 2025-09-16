@@ -72,6 +72,14 @@
                 app:primaryText="@string/settingsAutomaticallyClearWhen"
                 tools:secondaryText="test test test" />
 
+            <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
+                android:id="@+id/clearDuckAiDataSetting"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:primaryText="@string/settingsClearAiDataTitle"
+                app:secondaryText="@string/settingsClearAiDataMessage"
+                app:showSwitch="true" />
+
         </LinearLayout>
     </ScrollView>
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

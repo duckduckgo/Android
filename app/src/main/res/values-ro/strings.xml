@@ -127,6 +127,7 @@
     <!-- Fire -->
     <string name="fireMenu">Ștergere date</string>
     <string name="fireClearAll">Șterge toate filele și datele</string>
+    <string name="fireClearAllPlusDuckChats">Șterge toate filele, datele și chaturile Duck.ai</string>
     <string name="fireCancel">Anulează</string>
     <string name="fireDataCleared">Date șterse</string>
 
@@ -235,6 +236,7 @@
     <string name="settingsAutomaticallyClearWhatOptionNone">Niciuna</string>
     <string name="settingsAutomaticallyClearWhatOptionTabs">File</string>
     <string name="settingsAutomaticallyClearWhatOptionTabsAndData">File și date</string>
+    <string name="settingsAutomaticallyClearWhatOptionTabsAndDataAndChats">File, date și chaturi Duck.ai</string>
 
     <string name="settingsAutomaticallyClearWhen">Șterge la…</string>
     <string name="settingsAutomaticallyClearWhenDialogTitle">Șterge la…</string>
@@ -244,6 +246,8 @@
     <string name="settingsAutomaticallyClearWhenAppExit15Minutes">Ieșire din aplicație, inactiv timp de 15 minute</string>
     <string name="settingsAutomaticallyClearWhenAppExit30Minutes">Ieșire din aplicație, inactiv timp de 30 de minute</string>
     <string name="settingsAutomaticallyClearWhenAppExit60Minutes">Ieșire din aplicație, inactiv timp de 1 oră</string>
+    <string name="settingsClearAiDataTitle">Șterge chaturile Duck.ai</string>
+    <string name="settingsClearAiDataMessage">Fire Button va șterge și istoricul Duck.ai</string>
 
     <!-- About Activity -->
     <string name="aboutActivityTitle">Despre DuckDuckGo</string>

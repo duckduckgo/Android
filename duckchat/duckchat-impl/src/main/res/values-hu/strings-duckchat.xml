@@ -69,4 +69,7 @@
     <string name="duck_chat_enable_duck_ai_setting_description_rebranding">Privát csevegés harmadik féltől származó népszerű AI-modellekkel</string>
     <string name="duck_chat_assist_settings_title_rebranding">Keresési asszisztens beállításai</string>
     <string name="duck_chat_assist_settings_description_rebranding">Válaszd ki, milyen gyakran szeretnél mesterséges intelligenciával generált válaszokat látni a kereséseid során</string>
+
+    <!-- AutoComplete -->
+    <string name="autocompleteDuckAiPrompt">Duck.ai kérdezése</string>
 </resources>
