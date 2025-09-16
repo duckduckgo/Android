@@ -69,4 +69,7 @@
     <string name="duck_chat_enable_duck_ai_setting_description_rebranding">Kalbėkis privačiai su populiariais trečiųjų šalių DI modeliais</string>
     <string name="duck_chat_assist_settings_title_rebranding">„Assist“ paieškos nustatymai</string>
     <string name="duck_chat_assist_settings_description_rebranding">Pasirink, kaip dažnai nori, kad tavo paieškose būtų rodomi DI generuojami atsakymai</string>
+
+    <!-- AutoComplete -->
+    <string name="autocompleteDuckAiPrompt">Paklausk „Duck.ai“</string>
 </resources>

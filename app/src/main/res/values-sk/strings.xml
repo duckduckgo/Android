@@ -128,6 +128,7 @@
     <!-- Fire -->
     <string name="fireMenu">Vymazať údaje</string>
     <string name="fireClearAll">Vymazať všetky karty a údaje</string>
+    <string name="fireClearAllPlusDuckChats">Vymazať všetky karty, údaje a chaty Duck.ai</string>
     <string name="fireCancel">Zrušiť</string>
     <string name="fireDataCleared">Údaje boli vymazané</string>
 
@@ -236,6 +237,7 @@
     <string name="settingsAutomaticallyClearWhatOptionNone">Žiadne</string>
     <string name="settingsAutomaticallyClearWhatOptionTabs">Karty</string>
     <string name="settingsAutomaticallyClearWhatOptionTabsAndData">Karty a údaje</string>
+    <string name="settingsAutomaticallyClearWhatOptionTabsAndDataAndChats">Karty, údaje a chaty Duck.ai</string>
 
     <string name="settingsAutomaticallyClearWhen">Vymazať po…</string>
     <string name="settingsAutomaticallyClearWhenDialogTitle">Vymazať po…</string>
@@ -245,6 +247,8 @@
     <string name="settingsAutomaticallyClearWhenAppExit15Minutes">Ukončení aplikácie, neaktívnej po dobu 15 minút</string>
     <string name="settingsAutomaticallyClearWhenAppExit30Minutes">Ukončení aplikácie, neaktívnej po dobu 30 minút</string>
     <string name="settingsAutomaticallyClearWhenAppExit60Minutes">Ukončení aplikácie, neaktívnej po dobu 1 hodiny</string>
+    <string name="settingsClearAiDataTitle">Vymazať chaty Duck.ai</string>
+    <string name="settingsClearAiDataMessage">Tlačidlo Fire Button tiež vymaže históriu Duck.ai</string>
 
     <!-- About Activity -->
     <string name="aboutActivityTitle">O DuckDuckGo</string>

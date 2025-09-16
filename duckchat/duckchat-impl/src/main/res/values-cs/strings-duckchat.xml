@@ -69,4 +69,7 @@
     <string name="duck_chat_enable_duck_ai_setting_description_rebranding">S populárními AI modely třetích stran můžeš chatovat soukromě</string>
     <string name="duck_chat_assist_settings_title_rebranding">Nastavení vyhledávání s funkcí Assist</string>
     <string name="duck_chat_assist_settings_description_rebranding">Vyber, jak často chceš, aby se odpovědi s podporou umělé inteligence zobrazovaly ve tvých vyhledáváních</string>
+
+    <!-- AutoComplete -->
+    <string name="autocompleteDuckAiPrompt">Zeptej se Duck.ai</string>
 </resources>

@@ -69,4 +69,7 @@
     <string name="duck_chat_enable_duck_ai_setting_description_rebranding">Vestle privaatselt populaarsete kolmanda osapoole tehisintellekti mudelitega</string>
     <string name="duck_chat_assist_settings_title_rebranding">Otsingu Assist seaded</string>
     <string name="duck_chat_assist_settings_description_rebranding">Vali, kui tihti soovid, et AI-toega vastused ilmuksid sinu otsingutesse</string>
+
+    <!-- AutoComplete -->
+    <string name="autocompleteDuckAiPrompt">Küsi Duck.ai käest</string>
 </resources>
