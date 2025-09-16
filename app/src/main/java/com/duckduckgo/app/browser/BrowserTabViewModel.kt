@@ -3709,15 +3709,17 @@ class BrowserTabViewModel @Inject constructor(
                     }
                 }
             }
-            "initialPing" -> {
-                // TODO: Eventually, we might want plugins here
-                val response = JSONObject(
-                    mapOf(
-                        "desktopModeEnabled" to (getSite()?.isDesktopMode ?: false),
-                        "forcedZoomEnabled" to (accessibilityViewState.value?.forceZoom ?: false),
-                    ),
-                )
-                onResponse(response)
+            "messaging" -> when (method) {
+                "initialPing" -> {
+                    // TODO: Eventually, we might want plugins here
+                    val response = JSONObject(
+                        mapOf(
+                            "desktopModeEnabled" to (getSite()?.isDesktopMode ?: false),
+                            "forcedZoomEnabled" to (accessibilityViewState.value?.forceZoom ?: false),
+                        ),
+                    )
+                    onResponse(response)
+                }
             }
         }
     }
