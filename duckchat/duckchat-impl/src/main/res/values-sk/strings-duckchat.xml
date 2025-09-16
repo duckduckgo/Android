@@ -72,4 +72,15 @@
 
     <!-- AutoComplete -->
     <string name="autocompleteDuckAiPrompt">Spýtaj sa Duck.ai</string>
+
+    <!-- New Address Bar Option Bottom Sheet Dialog -->
+    <string name="newAddressBarOptionBottomSheetDialogSearchText">Vyhľadajte alebo zadajte adresu</string>
+    <string name="newAddressBarOptionBottomSheetDialogTitle">Prepnúť medzi vyhľadávaním a AI chatom</string>
+    <string name="newAddressBarOptionBottomSheetDialogSubTitle">Funkcie AI sú vždy voliteľné.</string>
+    <string name="newAddressBarOptionBottomSheetDialogPrimaryButton">Potvrdiť</string>
+    <string name="newAddressBarOptionBottomSheetDialogGhostButton">Teraz nie</string>
+    <string name="newAddressBarOptionBottomSheetDialogFooter">Uprav v Nastaveniach &gt; Funkcie AI.</string>
+    <string name="newAddressBarOptionBottomSheetDialogSearchOnly">Len vyhľadávanie</string>
+    <string name="newAddressBarOptionBottomSheetDialogSearchAndDuckAi">Vyhľadávanie &amp; Duck.ai</string>
+    <string name="newAddressBarOptionBottomSheetDialogHeader">Možnosť panela s adresou</string>
 </resources>
