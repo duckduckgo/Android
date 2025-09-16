@@ -72,4 +72,15 @@
 
     <!-- AutoComplete -->
     <string name="autocompleteDuckAiPrompt">Спросить у Duck.ai</string>
+
+    <!-- New Address Bar Option Bottom Sheet Dialog -->
+    <string name="newAddressBarOptionBottomSheetDialogSearchText">Введите поисковый запрос или адрес сайта</string>
+    <string name="newAddressBarOptionBottomSheetDialogTitle">Переключатель между поиском и чатом с ИИ</string>
+    <string name="newAddressBarOptionBottomSheetDialogSubTitle">От функций на базе ИИ всегда можно отказаться.</string>
+    <string name="newAddressBarOptionBottomSheetDialogPrimaryButton">Подтвердить</string>
+    <string name="newAddressBarOptionBottomSheetDialogGhostButton">Не сейчас</string>
+    <string name="newAddressBarOptionBottomSheetDialogFooter">Посетите раздел «Настройки &gt; Функции ИИ».</string>
+    <string name="newAddressBarOptionBottomSheetDialogSearchOnly">Только поиск</string>
+    <string name="newAddressBarOptionBottomSheetDialogSearchAndDuckAi">Поиск и Duck.ai</string>
+    <string name="newAddressBarOptionBottomSheetDialogHeader">Опция адресной строки</string>
 </resources>
