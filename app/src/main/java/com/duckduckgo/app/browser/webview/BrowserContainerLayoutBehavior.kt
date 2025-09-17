@@ -27,6 +27,7 @@ import com.duckduckgo.app.browser.omnibar.OmnibarLayout
 import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition
 import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.appbar.AppBarLayout.ScrollingViewBehavior
+import kotlin.math.roundToInt
 
 /**
  * A [ScrollingViewBehavior] that observes [AppBarLayout] (top omnibar) present in the view hierarchy and applies top offset to the child view
@@ -108,7 +109,9 @@ private fun offsetByBottomElementVisibleHeight(
     val newBottomPadding = if (dependency.isGone) {
         0
     } else {
-        dependency.measuredHeight - dependency.translationY.toInt()
+        // Clamp negative translation (e.g., IME pushing the bar up) to avoid inflating padding
+        val clampedTranslationY = if (dependency.translationY > 0f) dependency.translationY.roundToInt() else 0
+        (dependency.measuredHeight - clampedTranslationY).coerceAtLeast(0)
     }
     return if (child.paddingBottom != newBottomPadding) {
         child.setPadding(
