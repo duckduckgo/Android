@@ -30,20 +30,29 @@ import com.airbnb.lottie.LottieDrawable
 import com.duckduckgo.common.ui.view.toPx
 import com.duckduckgo.duckchat.impl.R
 import com.duckduckgo.duckchat.impl.databinding.BottomSheetNewAddressBarOptionBinding
+import com.duckduckgo.duckchat.impl.inputscreen.newaddressbaroption.NewAddressBarSelection.SEARCH_AND_AI
+import com.duckduckgo.duckchat.impl.inputscreen.newaddressbaroption.NewAddressBarSelection.SEARCH_ONLY
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.shape.CornerFamily
 import com.google.android.material.shape.MaterialShapeDrawable
 
-interface ChoiceSelectionCallback {
-    fun onSearchAndDuckAiSelected()
+enum class NewAddressBarSelection(val value: String) {
+    SEARCH_ONLY("search_only"),
+    SEARCH_AND_AI("search_and_ai"),
+}
+
+interface NewAddressBarCallback {
+    fun onDisplayed()
+    fun onConfirmed(selection: NewAddressBarSelection)
+    fun onNotNow()
 }
 
 @SuppressLint("NoBottomSheetDialog")
 class NewAddressBarOptionBottomSheetDialog(
     private val context: Context,
     private val isDarkThemeEnabled: Boolean,
-    private val choiceSelectionCallback: ChoiceSelectionCallback?,
+    private val newAddressBarCallback: NewAddressBarCallback?,
 ) : BottomSheetDialog(context) {
 
     private val binding: BottomSheetNewAddressBarOptionBinding =
@@ -62,6 +71,7 @@ class NewAddressBarOptionBottomSheetDialog(
 
         setOnShowListener {
             setRoundCorners()
+            newAddressBarCallback?.onDisplayed()
         }
 
         setOnCancelListener {
@@ -73,14 +83,14 @@ class NewAddressBarOptionBottomSheetDialog(
         setupSelectionLogic()
 
         binding.newAddressBarOptionBottomSheetDialogPrimaryButton.setOnClickListener {
-            if (searchAndDuckAiSelected) {
-                choiceSelectionCallback?.onSearchAndDuckAiSelected()
-            }
+            val selection = if (searchAndDuckAiSelected) SEARCH_AND_AI else SEARCH_ONLY
+            newAddressBarCallback?.onConfirmed(selection)
             restoreOrientation()
             dismiss()
         }
 
         binding.newAddressBarOptionBottomSheetDialogGhostButton.setOnClickListener {
+            newAddressBarCallback?.onNotNow()
             restoreOrientation()
             dismiss()
         }

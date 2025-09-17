@@ -36,10 +36,16 @@ import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.api.DuckChatSettingsNoParams
 import com.duckduckgo.duckchat.impl.feature.AIChatImageUploadFeature
 import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
-import com.duckduckgo.duckchat.impl.inputscreen.newaddressbaroption.ChoiceSelectionCallback
+import com.duckduckgo.duckchat.impl.inputscreen.newaddressbaroption.NewAddressBarCallback
 import com.duckduckgo.duckchat.impl.inputscreen.newaddressbaroption.NewAddressBarOptionBottomSheetDialogFactory
+import com.duckduckgo.duckchat.impl.inputscreen.newaddressbaroption.NewAddressBarSelection
+import com.duckduckgo.duckchat.impl.inputscreen.newaddressbaroption.NewAddressBarSelection.SEARCH_AND_AI
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
+import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_NEW_ADDRESS_BAR_PICKER_CONFIRMED
+import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_NEW_ADDRESS_BAR_PICKER_DISPLAYED
+import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_NEW_ADDRESS_BAR_PICKER_NOT_NOW
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelParameters
+import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelParameters.NEW_ADDRESS_BAR_SELECTION
 import com.duckduckgo.duckchat.impl.repository.DuckChatFeatureRepository
 import com.duckduckgo.duckchat.impl.ui.DuckChatWebViewActivityWithParams
 import com.duckduckgo.navigation.api.GlobalActivityStarter
@@ -531,11 +537,25 @@ class RealDuckChat @Inject constructor(
         newAddressBarOptionBottomSheetDialogFactory.create(
             context = context,
             isDarkThemeEnabled = isDarkThemeEnabled,
-            choiceSelectionCallback = object : ChoiceSelectionCallback {
-                override fun onSearchAndDuckAiSelected() {
-                    appCoroutineScope.launch {
-                        setInputScreenUserSetting(true)
+            newAddressBarCallback = object : NewAddressBarCallback {
+                override fun onDisplayed() {
+                    pixel.fire(DUCK_CHAT_NEW_ADDRESS_BAR_PICKER_DISPLAYED)
+                }
+
+                override fun onConfirmed(selection: NewAddressBarSelection) {
+                    if (selection == SEARCH_AND_AI) {
+                        appCoroutineScope.launch {
+                            setInputScreenUserSetting(true)
+                        }
                     }
+                    pixel.fire(
+                        pixel = DUCK_CHAT_NEW_ADDRESS_BAR_PICKER_CONFIRMED,
+                        parameters = mapOf(NEW_ADDRESS_BAR_SELECTION to selection.value),
+                    )
+                }
+
+                override fun onNotNow() {
+                    pixel.fire(DUCK_CHAT_NEW_ADDRESS_BAR_PICKER_NOT_NOW)
                 }
             },
         ).show()

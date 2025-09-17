@@ -25,7 +25,7 @@ interface NewAddressBarOptionBottomSheetDialogFactory {
     fun create(
         context: Context,
         isDarkThemeEnabled: Boolean,
-        choiceSelectionCallback: ChoiceSelectionCallback?,
+        newAddressBarCallback: NewAddressBarCallback?,
     ): NewAddressBarOptionBottomSheetDialog
 }
 
@@ -35,12 +35,12 @@ class RealNewAddressBarOptionBottomSheetDialogFactory @Inject constructor() : Ne
     override fun create(
         context: Context,
         isDarkThemeEnabled: Boolean,
-        choiceSelectionCallback: ChoiceSelectionCallback?,
+        newAddressBarCallback: NewAddressBarCallback?,
     ): NewAddressBarOptionBottomSheetDialog {
         return NewAddressBarOptionBottomSheetDialog(
             context = context,
             isDarkThemeEnabled = isDarkThemeEnabled,
-            choiceSelectionCallback = choiceSelectionCallback,
+            newAddressBarCallback = newAddressBarCallback,
         )
     }
 }
