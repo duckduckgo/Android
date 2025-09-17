@@ -160,4 +160,7 @@ interface AutofillFeature {
 
     @Toggle.DefaultValue(defaultValue = DefaultFeatureValue.TRUE)
     fun canReAuthenticateGoogleLoginsAutomatically(): Toggle
+
+    @Toggle.DefaultValue(defaultValue = DefaultFeatureValue.TRUE)
+    fun canDetectSystemAutofillEngagement(): Toggle
 }

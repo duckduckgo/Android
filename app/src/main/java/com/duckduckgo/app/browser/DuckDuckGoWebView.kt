@@ -21,7 +21,9 @@ import android.content.Context
 import android.os.Message
 import android.print.PrintDocumentAdapter
 import android.util.AttributeSet
+import android.util.SparseArray
 import android.view.MotionEvent
+import android.view.autofill.AutofillValue
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputConnection
 import android.webkit.DownloadListener
@@ -61,6 +63,7 @@ class DuckDuckGoWebView : WebView, NestedScrollingChild3 {
     private var enableSwipeRefreshCallback: ((Boolean) -> Unit)? = null
     private var hasGestureFinished = true
     private var canSwipeToRefresh = true
+    private var systemAutofillCallback: (() -> Unit)? = null
 
     private var lastY: Int = 0
     private var lastDeltaY: Int = 0
@@ -191,6 +194,20 @@ class DuckDuckGoWebView : WebView, NestedScrollingChild3 {
     override fun setFindListener(listener: FindListener?) {
         if (!isDestroyed) {
             super.setFindListener(listener)
+        }
+    }
+
+    override fun autofill(value: AutofillValue?) {
+        if (!isDestroyed) {
+            super.autofill(value)
+            systemAutofillCallback?.invoke()
+        }
+    }
+
+    override fun autofill(values: SparseArray<AutofillValue?>) {
+        if (!isDestroyed) {
+            super.autofill(values)
+            systemAutofillCallback?.invoke()
         }
     }
 
@@ -409,6 +426,14 @@ class DuckDuckGoWebView : WebView, NestedScrollingChild3 {
 
     fun removeEnableSwipeRefreshCallback() {
         enableSwipeRefreshCallback = null
+    }
+
+    fun setSystemAutofillCallback(callback: () -> Unit) {
+        systemAutofillCallback = callback
+    }
+
+    fun removeSystemAutofillCallback() {
+        systemAutofillCallback = null
     }
 
     private fun enableSwipeRefresh(enable: Boolean) {
