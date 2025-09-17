@@ -16,7 +16,6 @@
 
 package com.duckduckgo.app.browser.newtab
 
-import android.animation.LayoutTransition
 import android.app.PendingIntent
 import android.content.ActivityNotFoundException
 import android.content.Context
@@ -119,10 +118,6 @@ class NewTabLegacyPageView @JvmOverloads constructor(
     override fun onAttachedToWindow() {
         AndroidSupportInjection.inject(this)
         super.onAttachedToWindow()
-
-        // Enable CHANGING transition for smoother logo animation
-        val layoutTransition = binding.ddgLogoContainer.layoutTransition
-        layoutTransition?.enableTransitionType(LayoutTransition.CHANGING)
 
         findViewTreeLifecycleOwner()?.lifecycle?.addObserver(viewModel)
 
