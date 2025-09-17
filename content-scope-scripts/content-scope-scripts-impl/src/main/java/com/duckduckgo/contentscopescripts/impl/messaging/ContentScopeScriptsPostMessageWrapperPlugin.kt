@@ -17,10 +17,14 @@
 package com.duckduckgo.contentscopescripts.impl.messaging
 
 import android.annotation.SuppressLint
+import android.webkit.WebView
 import com.duckduckgo.app.di.AppCoroutineScope
+import com.duckduckgo.contentscopescripts.impl.CoreContentScopeScripts
 import com.duckduckgo.contentscopescripts.impl.WebViewCompatContentScopeScripts
 import com.duckduckgo.di.scopes.FragmentScope
+import com.duckduckgo.js.messaging.api.JsMessageHelper
 import com.duckduckgo.js.messaging.api.PostMessageWrapperPlugin
+import com.duckduckgo.js.messaging.api.SubscriptionEvent
 import com.duckduckgo.js.messaging.api.SubscriptionEventData
 import com.duckduckgo.js.messaging.api.WebMessagingPlugin
 import com.squareup.anvil.annotations.ContributesMultibinding
@@ -32,25 +36,33 @@ import kotlinx.coroutines.launch
 @ContributesMultibinding(FragmentScope::class)
 class ContentScopeScriptsPostMessageWrapperPlugin @Inject constructor(
     @Named("contentScopeScripts") private val webMessagingPlugin: WebMessagingPlugin,
-    private val contentScopeScriptsJsMessaging: ContentScopeScriptsJsMessaging,
+    private val jsMessageHelper: JsMessageHelper,
+    private val coreContentScopeScripts: CoreContentScopeScripts,
     private val webViewCompatContentScopeScripts: WebViewCompatContentScopeScripts,
     @AppCoroutineScope private val coroutineScope: CoroutineScope,
 ) : PostMessageWrapperPlugin {
     @SuppressLint("PostMessageUsage")
-    override fun postMessage(message: SubscriptionEventData) {
+    override fun postMessage(message: SubscriptionEventData, webView: WebView) {
         coroutineScope.launch {
             if (webViewCompatContentScopeScripts.isEnabled()) {
                 webMessagingPlugin.postMessage(message)
             } else {
-                contentScopeScriptsJsMessaging.sendSubscriptionEvent(message)
+                val subscriptionEvent = SubscriptionEvent(
+                    context = webMessagingPlugin.context,
+                    featureName = message.featureName,
+                    subscriptionName = message.subscriptionName,
+                    params = message.params,
+                )
+                jsMessageHelper.sendSubscriptionEvent(
+                    subscriptionEvent = subscriptionEvent,
+                    callbackName = coreContentScopeScripts.callbackName,
+                    secret = coreContentScopeScripts.secret,
+                    webView = webView,
+                )
             }
         }
     }
 
     override val context: String
-        get() = if (webMessagingPlugin.context == contentScopeScriptsJsMessaging.context) {
-            webMessagingPlugin.context
-        } else {
-            throw Exception("Mismatched contexts between WebMessagingPlugin and ContentScopeScriptsJsMessaging")
-        }
+        get() = webMessagingPlugin.context
 }

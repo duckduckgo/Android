@@ -1197,7 +1197,9 @@ class BrowserTabFragment :
 
     private fun postBreakageReportingEvent() {
         val eventData = createBreakageReportingEventData()
-        webViewClient.postContentScopeMessage(eventData)
+        webView?.let {
+            webViewClient.postContentScopeMessage(eventData, it)
+        }
     }
 
     private fun onFireButtonPressed() {
