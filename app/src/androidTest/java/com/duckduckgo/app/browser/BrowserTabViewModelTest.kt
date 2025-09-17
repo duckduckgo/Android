@@ -452,6 +452,8 @@ class BrowserTabViewModelTest {
 
     private val mockHasPendingTabLaunchFlow = MutableStateFlow(false)
 
+    private val mockHasPendingDuckAiOpenFlow = MutableStateFlow(false)
+
     private val mockAppBuildConfig: AppBuildConfig = mock()
 
     private val mockDuckDuckGoUrlDetector: DuckDuckGoUrlDetector = mock()
@@ -657,6 +659,7 @@ class BrowserTabViewModelTest {
         whenever(mockDuckAiFeatureState.showInputScreen).thenReturn(mockDuckAiFeatureStateInputScreenFlow)
         whenever(mockDuckAiFeatureState.showInputScreenAutomaticallyOnNewTab).thenReturn(mockDuckAiFeatureStateInputScreenOpenAutomaticallyFlow)
         whenever(mockExternalIntentProcessingState.hasPendingTabLaunch).thenReturn(mockHasPendingTabLaunchFlow)
+        whenever(mockExternalIntentProcessingState.hasPendingDuckAiOpen).thenReturn(mockHasPendingDuckAiOpenFlow)
         whenever(mockOnboardingDesignExperimentManager.isModifiedControlEnrolledAndEnabled()).thenReturn(false)
         whenever(mockOnboardingDesignExperimentManager.isBuckEnrolledAndEnabled()).thenReturn(false)
         whenever(mockOnboardingDesignExperimentManager.isBbEnrolledAndEnabled()).thenReturn(false)
@@ -6991,6 +6994,58 @@ class BrowserTabViewModelTest {
         val commands = commandCaptor.allValues
         assertTrue(
             "LaunchInputScreen command should be triggered when external intent processing completes",
+            commands.any { it is Command.LaunchInputScreen },
+        )
+    }
+
+    @Test
+    fun whenInputScreenEnabledAndDuckAiOpenThenLaunchInputScreenCommandSuppressed() = runTest {
+        val initialTabId = "initial-tab"
+        val initialTab = TabEntity(tabId = initialTabId, url = "https://example.com", title = "EX", skipHome = false, viewed = true, position = 0)
+        val ntpTabId = "ntp-tab"
+        val ntpTab = TabEntity(tabId = ntpTabId, url = null, title = "", skipHome = false, viewed = true, position = 0)
+        whenever(mockTabRepository.getTab(initialTabId)).thenReturn(initialTab)
+        whenever(mockTabRepository.getTab(ntpTabId)).thenReturn(ntpTab)
+        flowSelectedTab.emit(initialTab)
+
+        testee.loadData(tabId = ntpTabId, initialUrl = null, skipHome = false, isExternal = false)
+        mockDuckAiFeatureStateInputScreenOpenAutomaticallyFlow.emit(true)
+        mockHasPendingDuckAiOpenFlow.emit(true)
+
+        flowSelectedTab.emit(ntpTab)
+
+        verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
+        val commands = commandCaptor.allValues
+        assertFalse(
+            "LaunchInputScreen command should be suppressed when Duck.ai is opened",
+            commands.any { it is Command.LaunchInputScreen },
+        )
+    }
+
+    @Test
+    fun whenInputScreenEnabledAndDuckAiClosedThenLaunchInputScreenCommandTriggered() = runTest {
+        val initialTabId = "initial-tab"
+        val initialTab = TabEntity(tabId = initialTabId, url = "https://example.com", title = "EX", skipHome = false, viewed = true, position = 0)
+        val ntpTabId = "ntp-tab"
+        val ntpTab = TabEntity(tabId = ntpTabId, url = null, title = "", skipHome = false, viewed = true, position = 0)
+        whenever(mockTabRepository.getTab(initialTabId)).thenReturn(initialTab)
+        whenever(mockTabRepository.getTab(ntpTabId)).thenReturn(ntpTab)
+        flowSelectedTab.emit(initialTab)
+
+        testee.loadData(tabId = ntpTabId, initialUrl = null, skipHome = false, isExternal = false)
+        mockDuckAiFeatureStateInputScreenOpenAutomaticallyFlow.emit(true)
+        mockHasPendingDuckAiOpenFlow.emit(true)
+
+        // Switch to a new tab with no URL
+        flowSelectedTab.emit(ntpTab)
+
+        // Close Duck.ai
+        mockHasPendingDuckAiOpenFlow.emit(false)
+
+        verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
+        val commands = commandCaptor.allValues
+        assertTrue(
+            "LaunchInputScreen command should be triggered when Duck.ai is closed",
             commands.any { it is Command.LaunchInputScreen },
         )
     }

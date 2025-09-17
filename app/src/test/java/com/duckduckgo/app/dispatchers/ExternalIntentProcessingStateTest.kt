@@ -170,4 +170,37 @@ class ExternalIntentProcessingStateTest {
             cancelAndConsumeRemainingEvents()
         }
     }
+
+    @Test
+    fun `when initialized then hasPendingDuckAiOpen is false`() = runTest {
+        testee.hasPendingDuckAiOpen.test {
+            assertFalse(awaitItem())
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `when onIntentRequestToOpenDuckAi called then hasPendingDuckAiOpen is true`() = runTest {
+        testee.hasPendingDuckAiOpen.test {
+            assertFalse(awaitItem())
+            testee.onIntentRequestToOpenDuckAi()
+
+            assertTrue(awaitItem())
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `when onDuckAiClosed called then hasPendingDuckAiOpen is false`() = runTest {
+        testee.onIntentRequestToOpenDuckAi()
+
+        testee.hasPendingDuckAiOpen.test {
+            assertTrue(awaitItem())
+
+            testee.onDuckAiClosed()
+
+            assertFalse(awaitItem())
+            cancelAndConsumeRemainingEvents()
+        }
+    }
 }
