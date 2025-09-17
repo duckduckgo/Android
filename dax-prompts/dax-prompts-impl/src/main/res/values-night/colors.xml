@@ -14,7 +14,8 @@
   ~ limitations under the License.
   -->
 
-<shape xmlns:android="http://schemas.android.com/apk/res/android">
-    <solid android:color="@color/daxMessageBackground" />
-    <corners android:radius="24dp" />
-</shape>
+<resources>
+    <color name="daxPromptSearchIconCircle">#6B4EBA</color>
+    <color name="daxPromptSearchIconLine">#A591DC</color>
+    <color name="daxMessageBackground">#373737</color>
+</resources>

@@ -14,7 +14,11 @@
   ~ limitations under the License.
   -->
 
-<shape xmlns:android="http://schemas.android.com/apk/res/android">
-    <solid android:color="@color/daxMessageBackground" />
-    <corners android:radius="24dp" />
-</shape>
+<resources>
+    <fraction name="daxPromptVerticalGuidelinePercentStart">0</fraction>
+    <fraction name="daxPromptVerticalGuidelinePercentEnd">1</fraction>
+    <dimen name="messageMargin">16dp</dimen>
+    <dimen name="daxShapeMarginBottom">24dp</dimen>
+    <dimen name="messageWidth">0dp</dimen>
+    <dimen name="daxPromptMessageConstraintMaxHeight">520dp</dimen>
+</resources>

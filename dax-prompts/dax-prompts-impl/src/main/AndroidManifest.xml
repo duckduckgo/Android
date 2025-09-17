@@ -24,6 +24,7 @@
         <activity
             android:name="com.duckduckgo.daxprompts.impl.ui.DaxPromptBrowserComparisonActivity"
             android:exported="false"
+            android:screenOrientation="portrait"
             android:label="@string/dax_prompt_browser_comparison_title" />
     </application>
 </manifest>
