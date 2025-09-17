@@ -99,6 +99,7 @@ class SpecialUrlDetectorImplTest {
         whenever(mockAIChatQueryDetectionFeatureToggle.isEnabled()).thenReturn(false)
         whenever(mockAIChatQueryDetectionFeature.self()).thenReturn(mockAIChatQueryDetectionFeatureToggle)
         androidBrowserConfigFeature.handleIntentScheme().setRawStoredState(State(true))
+        androidBrowserConfigFeature.validateIntentResolution().setRawStoredState(State(true))
     }
 
     @Test
@@ -301,12 +302,34 @@ class SpecialUrlDetectorImplTest {
     }
 
     @Test
+    fun whenUrlIsCustomUriSchemeAndRedirectThenNonHttpAppLinkTypeDetectedWithAdditionalIntentFlags() {
+        externalAppIntentFlagsFeature.self().setRawStoredState(State(true))
+        whenever(mockPackageManager.resolveActivity(any(), anyInt())).thenReturn(ResolveInfo())
+        val actual = testee.determineType("https://www.example.com", "myapp:foo bar".toUri()) as NonHttpAppLink
+        assertEquals("myapp:foo bar", actual.uriString)
+        assertEquals(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP, actual.intent.flags)
+        assertEquals(Intent.CATEGORY_BROWSABLE, actual.intent.categories.first())
+    }
+
+    @Test
     fun whenUrlIsCustomUriSchemeAndNoResolveInfoThenUnknownTypeDetected() {
         externalAppIntentFlagsFeature.self().setRawStoredState(State(true))
         whenever(mockPackageManager.resolveActivity(any(), anyInt())).thenReturn(null)
         val expected = Unknown::class
         val actual = testee.determineType("myapp:foo bar")
         assertEquals(expected, actual::class)
+    }
+
+    @Test
+    fun whenUrlIsCustomUriSchemeAndNoResolveInfoAndRedirectThenNonHttpAppLinkDetected() {
+        externalAppIntentFlagsFeature.self().setRawStoredState(State(true))
+        whenever(mockPackageManager.resolveActivity(any(), anyInt())).thenReturn(null)
+        val expected = NonHttpAppLink::class
+        val actual = testee.determineType("https://www.example.com", "myapp:foo bar".toUri()) as NonHttpAppLink
+        assertEquals(expected, actual::class)
+        assertEquals("myapp:foo bar", actual.uriString)
+        assertEquals(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP, actual.intent.flags)
+        assertEquals(Intent.CATEGORY_BROWSABLE, actual.intent.categories.first())
     }
 
     @Test
@@ -317,6 +340,16 @@ class SpecialUrlDetectorImplTest {
         assertEquals("myapp:foo bar", type.uriString)
         assertEquals(0, type.intent.flags)
         assertNull(type.intent.categories)
+    }
+
+    @Test
+    fun whenUrlIsCustomUriSchemeAndRedirectThenNonHttpAppLinkTypeDetectedWithoutAdditionalIntentFlags() {
+        externalAppIntentFlagsFeature.self().setRawStoredState(State(false))
+        whenever(mockPackageManager.resolveActivity(any(), anyInt())).thenReturn(ResolveInfo())
+        val actual = testee.determineType("https://www.example.com", "myapp:foo bar".toUri()) as NonHttpAppLink
+        assertEquals("myapp:foo bar", actual.uriString)
+        assertEquals(0, actual.intent.flags)
+        assertNull(actual.intent.categories)
     }
 
     @Test
@@ -531,7 +564,7 @@ class SpecialUrlDetectorImplTest {
 
         testee.determineType("intent://path#Intent;scheme=testscheme;package=com.example.app;end")
 
-        verify(testee).checkForIntent(eq("intent"), any(), eq(URI_INTENT_SCHEME))
+        verify(testee).checkForIntent(eq("intent"), any(), eq(URI_INTENT_SCHEME), eq(true))
     }
 
     @Test
@@ -540,7 +573,50 @@ class SpecialUrlDetectorImplTest {
 
         testee.determineType("intent://path#Intent;scheme=testscheme;package=com.example.app;end")
 
-        verify(testee).checkForIntent(eq("intent"), any(), eq(URI_ANDROID_APP_SCHEME))
+        verify(testee).checkForIntent(eq("intent"), any(), eq(URI_ANDROID_APP_SCHEME), eq(true))
+    }
+
+    @Test
+    fun whenValidateIntentResolutionEnabledAndNoResolveInfoThenReturnUnknownType() {
+        androidBrowserConfigFeature.validateIntentResolution().setRawStoredState(State(true))
+        whenever(mockPackageManager.resolveActivity(any(), anyInt())).thenReturn(null)
+
+        val result = testee.determineType("myapp:foo bar")
+
+        assertTrue(result is Unknown)
+    }
+
+    @Test
+    fun whenValidateIntentResolutionDisabledAndNoResolveInfoThenReturnNonHttpAppLinkType() {
+        androidBrowserConfigFeature.validateIntentResolution().setRawStoredState(State(false))
+        whenever(mockPackageManager.resolveActivity(any(), anyInt())).thenReturn(null)
+
+        val result = testee.determineType("myapp:foo bar")
+
+        assertTrue(result is NonHttpAppLink)
+        assertEquals("myapp:foo bar", (result as NonHttpAppLink).uriString)
+    }
+
+    @Test
+    fun whenValidateIntentResolutionEnabledAndResolveInfoExistsThenReturnNonHttpAppLinkType() {
+        androidBrowserConfigFeature.validateIntentResolution().setRawStoredState(State(true))
+        whenever(mockPackageManager.resolveActivity(any(), anyInt())).thenReturn(ResolveInfo())
+
+        val result = testee.determineType("myapp:foo bar")
+
+        assertTrue(result is NonHttpAppLink)
+        assertEquals("myapp:foo bar", (result as NonHttpAppLink).uriString)
+    }
+
+    @Test
+    fun whenValidateIntentResolutionDisabledAndResolveInfoExistsThenReturnNonHttpAppLinkType() {
+        androidBrowserConfigFeature.validateIntentResolution().setRawStoredState(State(false))
+        whenever(mockPackageManager.resolveActivity(any(), anyInt())).thenReturn(ResolveInfo())
+
+        val result = testee.determineType("myapp:foo bar")
+
+        assertTrue(result is NonHttpAppLink)
+        assertEquals("myapp:foo bar", (result as NonHttpAppLink).uriString)
     }
 
     private fun randomString(length: Int): String {

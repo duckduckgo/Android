@@ -79,6 +79,10 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     SEARCH_AND_FAVORITES_WIDGET_DELETED(pixelName = "m_search_and_favorites_widget_deleted"),
     SEARCH_WIDGET_ADDED(pixelName = "m_search_widget_added"),
     SEARCH_WIDGET_DELETED(pixelName = "m_search_widget_deleted"),
+    SEARCH_ONLY_WIDGET_ADDED(pixelName = "m_search_only_widget_added"),
+    SEARCH_ONLY_WIDGET_DELETED(pixelName = "m_search_only_widget_deleted"),
+    DUCKAI_ONLY_WIDGET_ADDED(pixelName = "m_duckai_only_widget_added"),
+    DUCKAI_ONLY_WIDGET_DELETED(pixelName = "m_duckai_only_widget_deleted"),
 
     FAVORITE_OMNIBAR_ITEM_PRESSED("m_fav_o"),
     FAVORITE_HOMETAB_ITEM_PRESSED("m_fav_ht"),
@@ -135,6 +139,7 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     SETTINGS_APPEARANCE_PRESSED("ms_appearance_setting_pressed"),
     SETTINGS_APPEARANCE_IS_FULL_URL_OPTION_TOGGLED("m_appearance_settings_is_full_url_option_toggled"),
     APPEARANCE_SETTINGS_IS_FULL_URL_ENABLED_DAILY("m_appearance_settings_is_full_url_enabled_daily"),
+    SETTINGS_APPEARANCE_IS_TRACKER_COUNT_IN_TAB_SWITCHER_TOGGLED("m_appearance_settings_is_tracker_count_in_tab_switcher_toggled"),
     SETTINGS_APP_ICON_PRESSED("ms_app_icon_setting_pressed"),
     SETTINGS_ADDRESS_BAR_POSITION_PRESSED("ms_address_bar_position_setting_pressed"),
     SETTINGS_ADDRESS_BAR_POSITION_SELECTED_TOP("ms_address_bar_position_setting_selected_top"),
@@ -157,6 +162,8 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     SETTINGS_PRIVATE_SEARCH_MORE_SEARCH_SETTINGS_PRESSED("ms_private_search_more_search_settings_pressed"),
     SETTINGS_COOKIE_POPUP_PROTECTION_PRESSED("ms_cookie_popup_protection_setting_pressed"),
     SETTINGS_FIRE_BUTTON_PRESSED("ms_fire_button_setting_pressed"),
+    SETTINGS_CLEAR_DUCK_AI_DATA_TOGGLED_ON("ms_clear_duck_ai_data_toggled_on"),
+    SETTINGS_CLEAR_DUCK_AI_DATA_TOGGLED_OFF("ms_clear_duck_ai_data_toggled_off"),
     SETTINGS_GENERAL_APP_LAUNCH_PRESSED("m_settings_general_app_launch_pressed"),
 
     SURVEY_CTA_SHOWN(pixelName = "mus_cs"),
@@ -203,16 +210,6 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
 
     FEEDBACK_POSITIVE_SUBMISSION("mfbs_%s_submit"),
     FEEDBACK_NEGATIVE_SUBMISSION("mfbs_%s_%s_%s"),
-
-    AUTOCOMPLETE_BOOKMARK_SELECTION("m_autocomplete_click_bookmark"),
-    AUTOCOMPLETE_FAVORITE_SELECTION("m_autocomplete_click_favorite"),
-    AUTOCOMPLETE_SEARCH_PHRASE_SELECTION("m_autocomplete_click_phrase"),
-    AUTOCOMPLETE_SEARCH_WEBSITE_SELECTION("m_autocomplete_click_website"),
-
-    AUTOCOMPLETE_HISTORY_SEARCH_SELECTION("m_autocomplete_click_history_search"),
-    AUTOCOMPLETE_HISTORY_SITE_SELECTION("m_autocomplete_click_history_site"),
-
-    AUTOCOMPLETE_SWITCH_TO_TAB_SELECTION("m_autocomplete_click_switch_to_tab"),
 
     AUTOCOMPLETE_TOGGLED_OFF("m_autocomplete_recent_sites_toggled_off"),
     AUTOCOMPLETE_TOGGLED_ON("m_autocomplete_recent_sites_toggled_on"),

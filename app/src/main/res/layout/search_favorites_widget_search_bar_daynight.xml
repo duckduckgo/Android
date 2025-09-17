@@ -1,5 +1,5 @@
-<!--
-  ~ Copyright (c) 2018 DuckDuckGo
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Copyright (c) 2025 DuckDuckGo
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
@@ -14,34 +14,58 @@
   ~ limitations under the License.
   -->
 
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/widgetSearchBarContainer"
     style="@style/Widget.DuckDuckGo.SearchWithFavoritesWidgetSearchBarContainer"
     android:background="@drawable/search_widget_background_daynight"
+    android:gravity="center_vertical"
+    android:orientation="horizontal"
     tools:ignore="DeprecatedWidgetInXml">
 
     <ImageView
         android:id="@+id/logo"
         style="@style/Widget.DuckDuckGo.SearchWidgetDDGLogo"
-        android:src="@drawable/logo_mini" />
+        android:layout_gravity="center_vertical"
+        android:src="@drawable/ic_ddg_logo"
+        tools:ignore="ContentDescription" />
 
     <TextView
         android:id="@+id/searchInputBox"
         style="@style/Widget.DuckDuckGo.SearchWidgetInputBox"
-        android:layout_toStartOf="@+id/search"
-        android:layout_toEndOf="@+id/logo"
+        android:layout_width="0dp"
+        android:layout_weight="1"
+        android:ellipsize="end"
         android:text="@string/searchWidgetTextHint"
-        android:textColor="@color/searchWidgetSearchBarHintColor" />
+        android:textColor="@color/searchWidgetSearchBarHintColor"
+        tools:ignore="ContentDescription" />
 
     <ImageView
         android:id="@+id/voiceSearch"
         style="@style/Widget.DuckDuckGo.SearchWidgetSearchIcon"
         android:src="@drawable/ic_microphone_widget_daynight"
-        android:visibility="gone" />
+        android:visibility="gone"
+        tools:ignore="ContentDescription" />
+
+    <ImageView
+        android:id="@+id/separator"
+        style="@style/Widget.DuckDuckGo.SearchWidgetSearchIcon"
+        android:src="@drawable/ic_vertical_separator_daynight"
+        android:visibility="gone"
+        tools:ignore="ContentDescription" />
+
+    <ImageView
+        android:id="@+id/duckAi"
+        style="@style/Widget.DuckDuckGo.SearchWidgetSearchIcon"
+        android:src="@drawable/ic_duck_ai_24_daynight"
+        android:visibility="gone"
+        tools:ignore="ContentDescription" />
 
     <ImageView
         android:id="@+id/search"
         style="@style/Widget.DuckDuckGo.SearchWidgetSearchIcon"
-        android:src="@drawable/ic_find_search_20_daynight" />
-</RelativeLayout>
+        android:src="@drawable/ic_find_search_24_daynight"
+        android:visibility="visible"
+        tools:ignore="ContentDescription" />
+
+</LinearLayout>

@@ -79,6 +79,11 @@ import com.duckduckgo.duckplayer.api.DuckPlayer.DuckPlayerState.ENABLED
 import com.duckduckgo.duckplayer.api.DuckPlayer.OpenDuckPlayerInNewTab.On
 import com.duckduckgo.duckplayer.impl.DUCK_PLAYER_OPEN_IN_YOUTUBE_PATH
 import com.duckduckgo.history.api.NavigationHistory
+import com.duckduckgo.js.messaging.api.AddDocumentStartJavaScriptPlugin
+import com.duckduckgo.js.messaging.api.PostMessageWrapperPlugin
+import com.duckduckgo.js.messaging.api.SubscriptionEventData
+import com.duckduckgo.js.messaging.api.WebMessagingPlugin
+import com.duckduckgo.js.messaging.api.WebViewCompatMessageCallback
 import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.Feed
 import com.duckduckgo.privacy.config.api.AmpLinks
 import com.duckduckgo.subscriptions.api.Subscriptions
@@ -126,6 +131,9 @@ class BrowserWebViewClient @Inject constructor(
     private val androidFeaturesHeaderPlugin: AndroidFeaturesHeaderPlugin,
     private val duckChat: DuckChat,
     private val contentScopeExperiments: ContentScopeExperiments,
+    private val addDocumentStartJavascriptPlugins: PluginPoint<AddDocumentStartJavaScriptPlugin>,
+    private val webMessagingPlugins: PluginPoint<WebMessagingPlugin>,
+    private val postMessageWrapperPlugins: PluginPoint<PostMessageWrapperPlugin>,
 ) : WebViewClient() {
 
     var webViewClientListener: WebViewClientListener? = null
@@ -463,6 +471,18 @@ class BrowserWebViewClient @Inject constructor(
         webView.settings.mediaPlaybackRequiresUserGesture = mediaPlayback.doesMediaPlaybackRequireUserGestureForUrl(url)
     }
 
+    fun configureWebView(webView: DuckDuckGoWebView, callback: WebViewCompatMessageCallback?) {
+        addDocumentStartJavascriptPlugins.getPlugins().forEach { plugin ->
+            plugin.addDocumentStartJavaScript(webView)
+        }
+
+        callback?.let {
+            webMessagingPlugins.getPlugins().forEach { plugin ->
+                plugin.register(callback, webView)
+            }
+        }
+    }
+
     @UiThread
     override fun onPageFinished(webView: WebView, url: String?) {
         logcat(VERBOSE) { "onPageFinished webViewUrl: ${webView.url} URL: $url progress: ${webView.progress}" }
@@ -470,7 +490,16 @@ class BrowserWebViewClient @Inject constructor(
         // See https://app.asana.com/0/0/1206159443951489/f (WebView limitations)
         if (webView.progress == 100) {
             jsPlugins.getPlugins().forEach {
-                it.onPageFinished(webView, url, webViewClientListener?.getSite())
+                it.onPageFinished(
+                    webView,
+                    url,
+                    webViewClientListener?.getSite(),
+                )
+            }
+            addDocumentStartJavascriptPlugins.getPlugins().forEach {
+                it.addDocumentStartJavaScript(
+                    webView,
+                )
             }
 
             url?.let {
@@ -730,6 +759,21 @@ class BrowserWebViewClient @Inject constructor(
 
     fun addExemptedMaliciousSite(url: Uri, feed: Feed) {
         requestInterceptor.addExemptedMaliciousSite(url, feed)
+    }
+
+    fun destroy(webView: DuckDuckGoWebView) {
+        webMessagingPlugins.getPlugins().forEach { plugin ->
+            plugin.unregister(webView)
+        }
+    }
+
+    fun postContentScopeMessage(
+        eventData: SubscriptionEventData,
+        webView: WebView,
+    ) {
+        postMessageWrapperPlugins.getPlugins()
+            .firstOrNull { it.context == "contentScopeScripts" }
+            ?.postMessage(eventData, webView)
     }
 }
 

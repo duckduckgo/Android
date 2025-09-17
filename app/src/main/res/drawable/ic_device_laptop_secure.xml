@@ -1,0 +1,41 @@
+<!--
+  ~ Copyright (c) 2025 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="16dp"
+    android:height="16dp"
+    android:viewportWidth="16"
+    android:viewportHeight="16">
+  <group>
+    <clip-path
+        android:pathData="M0,0h16v16H0z"/>
+    <path
+        android:pathData="M3,2a2,2 0,0 0,-2 2v8.5H0.75a0.75,0.75 0,0 0,0 1.5h7.625v-1.636c0,-0.308 0.066,-0.6 0.185,-0.864H2.5V4a0.5,0.5 0,0 1,0.5 -0.5h10a0.5,0.5 0,0 1,0.5 0.5v2.706a3.5,3.5 0,0 1,1.5 0.735V4a2,2 0,0 0,-2 -2z"
+        android:fillColor="?attr/daxColorPrimaryIcon"
+        android:fillType="evenOdd"/>
+    <path
+        android:pathData="M10.25,12.364c0,-0.126 0.102,-0.228 0.227,-0.228h4.546c0.125,0 0.227,0.102 0.227,0.228v2.727a0.227,0.227 0,0 1,-0.227 0.227h-4.546a0.227,0.227 0,0 1,-0.227 -0.227z"
+        android:fillColor="?attr/daxColorPrimaryIcon"/>
+    <path
+        android:pathData="M9.5,12.364c0,-0.54 0.438,-0.978 0.977,-0.978h4.546c0.54,0 0.977,0.438 0.977,0.978v2.727c0,0.54 -0.438,0.977 -0.977,0.977h-4.546a0.977,0.977 0,0 1,-0.977 -0.977zM11,12.886v1.682h3.5v-1.682z"
+        android:fillColor="?attr/daxColorPrimaryIcon"
+        android:fillType="evenOdd"/>
+    <path
+        android:pathData="M12.75,9.25c-0.491,0 -0.84,0.377 -0.84,0.782v1.877h-1.5v-1.877c0,-1.287 1.074,-2.282 2.34,-2.282s2.34,0.995 2.34,2.282v1.877h-1.5v-1.877c0,-0.405 -0.349,-0.782 -0.84,-0.782"
+        android:fillColor="?attr/daxColorPrimaryIcon"
+        android:fillType="evenOdd"/>
+  </group>
+</vector>

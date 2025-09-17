@@ -85,6 +85,17 @@ sealed interface PirWebMessageResponse {
             val totalScans: Int,
             val scannedBrokers: List<ScannedBroker>,
         )
+
+        companion object {
+            val EMPTY = InitialScanResponse(
+                resultsFound = emptyList(),
+                scanProgress = ScanProgress(
+                    currentScans = 0,
+                    totalScans = 0,
+                    scannedBrokers = emptyList(),
+                ),
+            )
+        }
     }
 
     data class ScanResult(

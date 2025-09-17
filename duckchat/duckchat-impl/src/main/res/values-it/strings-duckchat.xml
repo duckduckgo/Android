@@ -51,9 +51,9 @@
     <string name="input_screen_search_hint">Cerca o digita l\'indirizzo</string>
     <string name="input_screen_chat_tab">Duck.ai</string>
     <string name="input_screen_chat_hint">Chiedi in privato</string>
-    <string name="input_screen_user_pref_without_ai">Solo ricerca\n(impostazione predefinita)</string>
-    <string name="input_screen_user_pref_with_ai">Ricerca e Duck.ai\n(Sperimentale)</string>
-    <string name="input_screen_user_pref_description">Prova la nostra opzione sperimentale per chiedere a Duck.ai direttamente dalla barra degli indirizzi. <annotation type="share_feedback">Condividi feedback</annotation></string>
+    <string name="input_screen_user_pref_without_ai">Solo ricerca</string>
+    <string name="input_screen_user_pref_with_ai">Ricerca e Duck.ai</string>
+    <string name="input_screen_user_pref_description">Prova la nostra nuova opzione per chiedere a Duck.ai direttamente dalla barra degli indirizzi. <annotation type="share_feedback">Condividi feedback</annotation></string>
 
     <!-- Duck.ai Pro settings -->
     <string name="duck_ai_paid_settings_title">Duck.ai</string>
@@ -69,4 +69,18 @@
     <string name="duck_chat_enable_duck_ai_setting_description_rebranding">Chatta privatamente con i più diffusi modelli di AI di terze parti</string>
     <string name="duck_chat_assist_settings_title_rebranding">Impostazioni di Search Assist</string>
     <string name="duck_chat_assist_settings_description_rebranding">Scegli la frequenza con cui vuoi che le risposte assistite dall\'intelligenza artificiale appaiano nelle tue ricerche</string>
+
+    <!-- AutoComplete -->
+    <string name="autocompleteDuckAiPrompt">Chiedi a Duck.ai</string>
+
+    <!-- New Address Bar Option Bottom Sheet Dialog -->
+    <string name="newAddressBarOptionBottomSheetDialogSearchText">Cerca o digita l\'indirizzo</string>
+    <string name="newAddressBarOptionBottomSheetDialogTitle">Passa dalla ricerca alla chat AI e viceversa</string>
+    <string name="newAddressBarOptionBottomSheetDialogSubTitle">Le funzionalità AI sono sempre facoltative.</string>
+    <string name="newAddressBarOptionBottomSheetDialogPrimaryButton">Conferma</string>
+    <string name="newAddressBarOptionBottomSheetDialogGhostButton">Non adesso</string>
+    <string name="newAddressBarOptionBottomSheetDialogFooter">Regola in Impostazioni &gt; Funzionalità AI.</string>
+    <string name="newAddressBarOptionBottomSheetDialogSearchOnly">Solo ricerca</string>
+    <string name="newAddressBarOptionBottomSheetDialogSearchAndDuckAi">Ricerca e Duck.ai</string>
+    <string name="newAddressBarOptionBottomSheetDialogHeader">Opzione Barra degli indirizzi</string>
 </resources>

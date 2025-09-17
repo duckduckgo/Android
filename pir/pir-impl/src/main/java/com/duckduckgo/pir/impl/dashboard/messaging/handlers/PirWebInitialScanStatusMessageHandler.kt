@@ -29,6 +29,7 @@ import com.duckduckgo.pir.impl.dashboard.messaging.model.PirWebMessageResponse.S
 import com.duckduckgo.pir.impl.dashboard.messaging.model.PirWebMessageResponse.ScanResult.ScanResultAddress
 import com.duckduckgo.pir.impl.dashboard.messaging.model.PirWebMessageResponse.ScannedBroker
 import com.duckduckgo.pir.impl.dashboard.state.PirDashboardInitialScanStateProvider
+import com.duckduckgo.pir.impl.store.PirRepository
 import com.squareup.anvil.annotations.ContributesMultibinding
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
@@ -47,6 +48,7 @@ class PirWebInitialScanStatusMessageHandler @Inject constructor(
     private val dispatcherProvider: DispatcherProvider,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val stateProvider: PirDashboardInitialScanStateProvider,
+    private val pirRepository: PirRepository,
 ) : PirWebJsMessageHandler() {
 
     override val message = PirDashboardWebMessages.INITIAL_SCAN_STATUS
@@ -59,6 +61,14 @@ class PirWebInitialScanStatusMessageHandler @Inject constructor(
         logcat { "PIR-WEB: InitialScanStatusMessageHandler: process $jsMessage" }
 
         appCoroutineScope.launch(dispatcherProvider.io()) {
+            if (!canRunScan()) {
+                jsMessaging.sendResponse(
+                    jsMessage = jsMessage,
+                    response = PirWebMessageResponse.InitialScanResponse.EMPTY,
+                )
+                return@launch
+            }
+
             jsMessaging.sendResponse(
                 jsMessage = jsMessage,
                 response = PirWebMessageResponse.InitialScanResponse(
@@ -71,6 +81,10 @@ class PirWebInitialScanStatusMessageHandler @Inject constructor(
                 ),
             )
         }
+    }
+
+    private suspend fun canRunScan(): Boolean {
+        return pirRepository.getUserProfileQueries().isNotEmpty()
     }
 
     private suspend fun getResultsFound(): List<ScanResult> {

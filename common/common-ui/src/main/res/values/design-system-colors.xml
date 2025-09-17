@@ -60,6 +60,7 @@
     <attr name="daxColorDestructive" format="color"/>
     <attr name="daxColorLines" format="color"/>
     <attr name="daxColorShade" format="color"/>
+    <attr name="daxColorShadeSolid" format="color"/>
     <attr name="daxColorAccentBlue" format="color"/>
     <attr name="daxColorAccentYellow" format="color"/>
     <attr name="daxColorAccentContentPrimary" format="color"/>
@@ -161,6 +162,7 @@
     <color name="yellow10">#FFF0C2</color>
 
     <color name="green0">#D3FFCC</color>
+    <color name="green12">#2C3A2A</color>
     <color name="green50">#4CBA3C</color>
     <color name="green70">#288419</color>
     <color name="green80">#1A690D</color>
@@ -285,7 +287,8 @@
     <color name="lines_dark">#1FF9F9F9</color>
 
     <!-- Tone -->
-    <color name="shade_dark">#52171718</color>
+    <color name="shade_dark">#1FF9F9F9</color>
+    <color name="shade_dark_solid">#414141</color>
 
     <!-- Controls -->
     <color name="controls_fill_primary_dark">#1FF9F9F9</color>
@@ -318,7 +321,8 @@
     <color name="lines_light">#171F1F1F</color>
 
     <!-- Tone -->
-    <color name="shade_light">#2E1F1F1F</color>
+    <color name="shade_light">#29000000</color>
+    <color name="shade_light_solid">#CBCBCB</color>
 
     <!-- Controls -->
     <color name="controls_fill_primary_light">#171F1F1F</color>

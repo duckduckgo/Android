@@ -63,8 +63,8 @@ import com.duckduckgo.app.tabs.ui.TabSwitcherAdapter.TabSwitcherViewHolder.Compa
 import com.duckduckgo.app.tabs.ui.TabSwitcherAdapter.TabSwitcherViewHolder.TabViewHolder
 import com.duckduckgo.app.tabs.ui.TabSwitcherItem.Tab
 import com.duckduckgo.app.tabs.ui.TabSwitcherItem.Tab.SelectableTab
-import com.duckduckgo.app.tabs.ui.TabSwitcherItem.TrackerAnimationInfoPanel.Companion.ANIMATED_TILE_DEFAULT_ALPHA
-import com.duckduckgo.app.tabs.ui.TabSwitcherItem.TrackerAnimationInfoPanel.Companion.ANIMATED_TILE_NO_REPLACE_ALPHA
+import com.duckduckgo.app.tabs.ui.TabSwitcherItem.TrackersAnimationInfoPanel.Companion.ANIMATED_TILE_DEFAULT_ALPHA
+import com.duckduckgo.app.tabs.ui.TabSwitcherItem.TrackersAnimationInfoPanel.Companion.ANIMATED_TILE_NO_REPLACE_ALPHA
 import com.duckduckgo.common.ui.view.hide
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.view.toPx
@@ -131,7 +131,7 @@ class TabSwitcherAdapter(
                     LIST -> LIST_TAB
                 }
             }
-            is TabSwitcherItem.TrackerAnimationInfoPanel -> TRACKER_ANIMATION_TILE_INFO_PANEL
+            is TabSwitcherItem.TrackersAnimationInfoPanel -> TRACKER_ANIMATION_TILE_INFO_PANEL
         }
 
     override fun getItemCount(): Int = list.size
@@ -145,9 +145,9 @@ class TabSwitcherAdapter(
                 bindListTab(holder, list[position] as Tab)
             }
             is TabSwitcherViewHolder.TrackerAnimationInfoPanelViewHolder -> {
-                val trackerAnimationInfoPanel = list[position] as TabSwitcherItem.TrackerAnimationInfoPanel
+                val trackersAnimationInfoPanel = list[position] as TabSwitcherItem.TrackersAnimationInfoPanel
 
-                val stringRes = if (trackerAnimationInfoPanel.trackerCount == 1) {
+                val stringRes = if (trackersAnimationInfoPanel.trackerCount == 1) {
                     R.string.trackerBlockedInTheLast7days
                 } else {
                     R.string.trackersBlockedInTheLast7days
@@ -156,7 +156,7 @@ class TabSwitcherAdapter(
                 trackerCountAnimator.animateTrackersBlockedCountView(
                     context = holder.binding.root.context,
                     stringRes = stringRes,
-                    totalTrackerCount = trackerAnimationInfoPanel.trackerCount,
+                    totalTrackerCount = trackersAnimationInfoPanel.trackerCount,
                     trackerTextView = holder.binding.infoPanelText,
                 )
                 holder.binding.root.setOnClickListener {
@@ -236,10 +236,12 @@ class TabSwitcherAdapter(
                     holder.selectionIndicator.contentDescription = holder.rootView.resources.getString(R.string.tabNotSelectedIndicator)
                 }
                 holder.selectionIndicator.show()
+                holder.close.isClickable = false
                 holder.close.hide()
             }
             else -> {
                 holder.selectionIndicator.hide()
+                holder.close.isClickable = true
                 holder.close.show()
             }
         }
@@ -406,7 +408,7 @@ class TabSwitcherAdapter(
     }
 
     private fun updateAnimatedTileAlpha(alpha: Float) {
-        val animatedTilePosition = list.indexOfFirst { it is TabSwitcherItem.TrackerAnimationInfoPanel }
+        val animatedTilePosition = list.indexOfFirst { it is TabSwitcherItem.TrackersAnimationInfoPanel }
         if (animatedTilePosition != -1) {
             notifyItemChanged(
                 animatedTilePosition,

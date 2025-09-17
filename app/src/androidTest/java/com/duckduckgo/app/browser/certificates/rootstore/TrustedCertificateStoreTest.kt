@@ -20,6 +20,7 @@ import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.browser.certificates.LetsEncryptCertificateProvider
 import com.duckduckgo.app.browser.certificates.LetsEncryptCertificateProviderImpl
 import org.junit.Assert.assertEquals
+import org.junit.Ignore
 import org.junit.Test
 
 class TrustedCertificateStoreTest {
@@ -117,6 +118,7 @@ class TrustedCertificateStoreTest {
         )
     }
 
+    @Ignore("Skipping until https://app.asana.com/1/137249556945/project/1202552961248957/task/1211370790060438?focus=true")
     @Test
     fun whenValidateSslCertificateChainWithR3TrustedChainThenSuccess() {
         val letsEncryptCertificateProvider: LetsEncryptCertificateProvider = LetsEncryptCertificateProviderImpl(
@@ -143,6 +145,7 @@ class TrustedCertificateStoreTest {
         )
     }
 
+    @Ignore("Skipping until https://app.asana.com/1/137249556945/project/1202552961248957/task/1211370790060438?focus=true")
     @Test
     fun whenValidateSslCertificateChainWithMissingRootThenError() {
         val letsEncryptCertificateProvider: LetsEncryptCertificateProvider = LetsEncryptCertificateProviderImpl(

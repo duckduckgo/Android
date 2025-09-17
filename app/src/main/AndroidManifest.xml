@@ -215,8 +215,11 @@
             android:name="com.duckduckgo.app.systemsearch.SystemSearchActivity"
             android:autoRemoveFromRecents="true"
             android:documentLaunchMode="intoExisting"
+            android:windowSoftInputMode="adjustResize"
             android:exported="true"
             android:label="@string/appName"
+            android:roundIcon="${appIconRound}"
+            android:theme="@style/Theme.DuckDuckGo.SplashScreen"
             android:launchMode="singleTask"
             android:stateNotNeeded="true">
 
@@ -247,6 +250,19 @@
             android:excludeFromRecents="true"
             android:configChanges="orientation|screenSize|screenLayout|smallestScreenSize"
             android:resizeableActivity="true" />
+
+        <activity
+            android:name="com.duckduckgo.widget.DuckAiPinShortcutActivity"
+            android:exported="true"
+            android:launchMode="singleTask"
+            android:icon="@drawable/duckai_64"
+            android:label="@string/duckAiOnlyPinShortcutLabel"
+            android:theme="@style/Theme.AppCompat.Transparent.NoActionBar">
+            <intent-filter>
+                <action android:name="android.intent.action.CREATE_SHORTCUT" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
 
         <activity
             android:name="com.duckduckgo.app.dispatchers.IntentDispatcherActivity"
@@ -448,7 +464,8 @@
             android:name="com.duckduckgo.app.WidgetThemeConfiguration"
             android:exported="false"
             android:label="@string/widgetConfigurationActivityTitle"
-            android:theme="@style/Theme.DuckDuckGo.Light">
+            android:roundIcon="${appIconRound}"
+            android:theme="@style/Theme.DuckDuckGo.SplashScreen">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_CONFIGURE" />
             </intent-filter>
@@ -519,6 +536,18 @@
         </receiver>
 
         <receiver
+            android:name="com.duckduckgo.widget.SearchOnlyWidget"
+            android:exported="false"
+            android:label="@string/searchOnlyWidgetLabel">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/search_only_widget_info" />
+        </receiver>
+
+        <receiver
             android:name="com.duckduckgo.widget.SearchAndFavoritesWidget"
             android:exported="false"
             android:label="@string/favoritesWidgetLabel">
@@ -535,6 +564,14 @@
             android:exported="false">
             <intent-filter>
                 <action android:name="android.intent.action.LOCALE_CHANGED" />
+            </intent-filter>
+        </receiver>
+
+        <receiver
+            android:name="com.duckduckgo.widget.DuckAiSearchWidgetUpdaterReceiver"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
             </intent-filter>
         </receiver>
 

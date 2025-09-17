@@ -51,9 +51,9 @@
     <string name="input_screen_search_hint">Otsi või sisesta aadress</string>
     <string name="input_screen_chat_tab">Duck.ai</string>
     <string name="input_screen_chat_hint">Küsi privaatselt</string>
-    <string name="input_screen_user_pref_without_ai">Ainult otsing\n(vaikimisi)</string>
-    <string name="input_screen_user_pref_with_ai">Otsing ja Duck.ai\n (eksperimentaalne)</string>
-    <string name="input_screen_user_pref_description">Proovi meie eksperimentaalset valikut küsida Duck.ai käest otse aadressiribalt. <annotation type="share_feedback">Jaga tagasisidet</annotation></string>
+    <string name="input_screen_user_pref_without_ai">Ainult otsi</string>
+    <string name="input_screen_user_pref_with_ai">Otsi ja Duck.ai</string>
+    <string name="input_screen_user_pref_description">Proovi meie uut valikut küsida Duck.ai käest otse aadressiribalt. <annotation type="share_feedback">Jaga tagasisidet</annotation></string>
 
     <!-- Duck.ai Pro settings -->
     <string name="duck_ai_paid_settings_title">Duck.ai</string>
@@ -69,4 +69,18 @@
     <string name="duck_chat_enable_duck_ai_setting_description_rebranding">Vestle privaatselt populaarsete kolmanda osapoole tehisintellekti mudelitega</string>
     <string name="duck_chat_assist_settings_title_rebranding">Otsingu Assist seaded</string>
     <string name="duck_chat_assist_settings_description_rebranding">Vali, kui tihti soovid, et AI-toega vastused ilmuksid sinu otsingutesse</string>
+
+    <!-- AutoComplete -->
+    <string name="autocompleteDuckAiPrompt">Küsi Duck.ai käest</string>
+
+    <!-- New Address Bar Option Bottom Sheet Dialog -->
+    <string name="newAddressBarOptionBottomSheetDialogSearchText">Otsi või sisesta aadress</string>
+    <string name="newAddressBarOptionBottomSheetDialogTitle">Vaheta otsingu ja tehisintellekti vestluse vahel</string>
+    <string name="newAddressBarOptionBottomSheetDialogSubTitle">Tehisintellekti funktsioonid on alati valikulised.</string>
+    <string name="newAddressBarOptionBottomSheetDialogPrimaryButton">Kinnita</string>
+    <string name="newAddressBarOptionBottomSheetDialogGhostButton">Mitte praegu</string>
+    <string name="newAddressBarOptionBottomSheetDialogFooter">Kohanda menüüs Seaded &gt; Tehisintellekti funktsioonid.</string>
+    <string name="newAddressBarOptionBottomSheetDialogSearchOnly">Ainult otsi</string>
+    <string name="newAddressBarOptionBottomSheetDialogSearchAndDuckAi">Otsi ja Duck.ai</string>
+    <string name="newAddressBarOptionBottomSheetDialogHeader">Aadressiriba valik</string>
 </resources>

@@ -127,6 +127,7 @@
     <!-- Fire -->
     <string name="fireMenu">Notīrīt datus</string>
     <string name="fireClearAll">Notīrīt visas cilnes un datus</string>
+    <string name="fireClearAllPlusDuckChats">Notīrīt visas cilnes, datus un Duck.ai tērzējumus</string>
     <string name="fireCancel">Atcelt</string>
     <string name="fireDataCleared">Dati ir notīrīti</string>
 
@@ -190,6 +191,28 @@
     <string name="webTrackingProtectionLearnMoreTitle">Tīmekļa izsekošanas aizsardzība</string>
     <string name="webTrackingProtectionTitle">Tīmekļa izsekošanas aizsardzība</string>
     <string name="webTrackingProtectionDescriptionNew"><![CDATA[DuckDuckGo automātiski bloķē slēptos izsekotājus tīmekļa pārlūkošanas laikā.\n<a href=\"\">Uzzināt vairāk</a>]]></string>
+    <string name="webTrackingProtectionExplanationDescription"><![CDATA[DuckDuckGo pārlūkprogramma nodrošina izsekošanas aizsardzības, kas vienmēr ir aktīvas.\n<a href=\"\">Uzzināt vairāk</a>]]></string>
+    <string name="webTrackingProtectionExplanationTitle">Kā mēs tevi aizsargājam</string>
+    <string name="webTrackingProtectionThirdPartyTrackersTitle">Bloķē trešo pušu izsekotājus</string>
+    <string name="webTrackingProtectionThirdPartyTrackersDescription">Palīdz bloķēt trešo pušu sīkfailus, kas izseko tevi no vietnes uz vietni un neļauj ielādēt trešo pušu izsekotājus.</string>
+    <string name="webTrackingProtectionTargetedAdsTitle">Bloķē mērķētas reklāmas</string>
+    <string name="webTrackingProtectionTargetedAdsDescription">Bloķē uzmācīgus izsekotājus, pirms tie tiek ielādēti, tādējādi efektīvi novēršot reklāmas, kas balstās uz izsekošanu.</string>
+    <string name="webTrackingProtectionFingerprintTrackingTitle">Novērš identificējošo ciparvirkņu izsekošanu</string>
+    <string name="webTrackingProtectionFingerprintTrackingDescription">Palīdz neļaut izsekošanas uzņēmumiem iegūt unikālus identifikatorus par tavu pārlūkprogrammu un ierīci, kurus viņi izmanto, lai sekotu tev tīmeklī.</string>
+    <string name="webTrackingProtectionLinkTrackingTitle">Bloķē saišu izsekošanu</string>
+    <string name="webTrackingProtectionLinkTrackingDescription">Noņem izsekošanas parametrus saitēs, lai trešās personas nevarētu izsekot tavai uzvedībai dažādās vietnēs.</string>
+    <string name="webTrackingProtectionReferrerTrackingTitle">Aizsargā pret novirzītāju izsekošanu</string>
+    <string name="webTrackingProtectionReferrerTrackingDescription">Palīdz neļaut uzņēmumiem identificēt tavu pēdējo apmeklēto vietni.</string>
+    <string name="webTrackingProtectionFirstPartyCookiesTitle">Atspējo pirmās puses sīkfailus</string>
+    <string name="webTrackingProtectionFirstPartyCookiesDescription">Pēc 30 dienām automātiski izbeidzas 1. puses sīkfaili, lai vietnes nevarētu tevi izsekot bezgalīgi, kad esi izrakstījies.</string>
+    <string name="webTrackingProtectionDnsCnameCloakingTitle">Aizsargā pret DNS CNAME maskēšanu</string>
+    <string name="webTrackingProtectionDnsCnameCloakingDescription">Palīdz bloķēt trešo pušu izsekotājus, kas mēģina maskēties tīmekļa vietnē, izmantojot DNS.</string>
+    <string name="webTrackingProtectionGoogleAmpTrackingTitle">Bloķē Google AMP izsekošanu</string>
+    <string name="webTrackingProtectionGoogleAmpTrackingDescription">Aizstāj Google AMP saites ar sākotnējā izdevēja vietni.</string>
+    <string name="webTrackingProtectionGoogleSigninPopupsTitle">Bloķē Google pieteikšanās uznirstošos logus</string>
+    <string name="webTrackingProtectionGoogleSigninPopupsDescription">Bloķē Google pierakstīšanās uznirstošos logus vietnēs, kas nepieder Google.</string>
+    <string name="webTrackingProtectionGlobalPrivacyControlTitle">Vispārēja privātuma pārvaldība</string>
+    <string name="webTrackingProtectionGlobalPrivacyControlDescription">Tavā vārdā pauž atteikšanās tiesības, liekot vietnēm nepārdot un nekopīgot tavu personisko informāciju.</string>
 
     <!-- Cookie Pop-Up Protection -->
     <string name="cookiePopupProtectionTitle">Sīkfailu uznirstošo logu aizsardzība</string>
@@ -213,6 +236,7 @@
     <string name="settingsAutomaticallyClearWhatOptionNone">Nav</string>
     <string name="settingsAutomaticallyClearWhatOptionTabs">Cilnes</string>
     <string name="settingsAutomaticallyClearWhatOptionTabsAndData">Cilnes un dati</string>
+    <string name="settingsAutomaticallyClearWhatOptionTabsAndDataAndChats">Cilnes, dati un Duck.ai tērzēšanas</string>
 
     <string name="settingsAutomaticallyClearWhen">Notīrīt…</string>
     <string name="settingsAutomaticallyClearWhenDialogTitle">Notīrīt…</string>
@@ -222,6 +246,8 @@
     <string name="settingsAutomaticallyClearWhenAppExit15Minutes">Iziešana no lietotnes, neaktīva 15 minūtes</string>
     <string name="settingsAutomaticallyClearWhenAppExit30Minutes">Iziešana no lietotnes, neaktīva 30 minūtes</string>
     <string name="settingsAutomaticallyClearWhenAppExit60Minutes">Iziešana no lietotnes, neaktīva 1 stundu</string>
+    <string name="settingsClearAiDataTitle">Notīrīt Duck.ai tērzēšanas sarunas</string>
+    <string name="settingsClearAiDataMessage">Fire Button arī izdzēsīs Duck.ai vēsturi.</string>
 
     <!-- About Activity -->
     <string name="aboutActivityTitle">Par DuckDuckGo</string>
@@ -250,8 +276,8 @@
     <string name="searchWidgetEmtpyFavoritesHint">Vēl nav pievienota neviena izlase</string>
     <string name="searchWidgetEmtpyFavoritesCta">Pievienot izlases vienumu</string>
     <string name="widgetConfigurationActivityTitle">Logrīka konfigurācija</string>
-    <string name="favoritesWidgetLabel">Izlase</string>
-    <string name="searchWidgetLabel">Meklēt</string>
+    <string name="favoritesWidgetLabel">Meklēšana un izlase</string>
+    <string name="searchWidgetLabel">Meklēšana un Duck.ai</string>
 
     <!-- Home Screen Shortcuts -->
     <string name="addToHome">Pievienot sākuma ekrānam</string>
@@ -406,7 +432,6 @@
     <string name="crashedWebViewErrorAction">"Pārlādēt"</string>
 
     <!-- System Search-->
-    <string name="systemSearchDeviceAppLabel">No šīs ierīces</string>
     <string name="systemSearchAppNotFound">Lietojumprogrammu nevarēja atrast</string>
     <string name="systemSearchOnboardingThanks">Paldies, ka izvēlējies DuckDuckGo!\nMūsu pārlūkprogrammas izmantošana palīdz aizsargāt tevi no hakeriem, krāpniekiem un uzņēmumiem, kas alkst pēc personu datiem.</string>
     <string name="systemSearchOnboardingFeaturesIntroText">Tāpat DuckDuckGo lietotne:</string>
@@ -870,11 +895,6 @@
     <string name="newTabPageDefaultBrowserMessagePrimaryCta" instruction="This text appears on a button">Iestatīt kā noklusējumu</string>
     <string name="newTabPageDefaultBrowserMessageSecondaryCta" instruction="This text appears on a button">Vairs nejautāt</string>
 
-    <!--TabSwitcher Animation Tile Dialog-->
-    <string name="tabSwitcherAnimationTileRemovalDialogTitle">DuckDuckGo bloķē izsekotājus, lai aizsargātu tavu pārlūkošanu</string>
-    <string name="tabSwitcherAnimationTileRemovalDialogBody">Notīrot savas cilnes un datus, tiks izdzēsta tava izsekotāja bloķēšanas vēsture un šis skaitlis tiks atiestatīts uz nulli.\n\nPaslēp šo reklāmkarogu, ja nevēlies to redzēt cilņu skatā.</string>
-    <string name="tabSwitcherAnimationTileRemovalDialogNegativeButton">Paslēpt reklāmkarogu</string>
-
     <!-- Threat protection -->
     <string name="maliciousSiteTitle">Brīdinājums: šī vietne var radīt drošības risku</string>
     <string name="maliciousSiteMalwareHeadline"><![CDATA[DuckDuckGo bloķēja šo lapu, jo tajā, iespējams, tiek izplatīta ļaunprātīga programmatūra, kas paredzēta, lai apdraudētu tavu ierīci vai nozagtu tavu personisko informāciju.\n<a href=\"\">Uzzini vairāk</a>]]></string>
@@ -941,4 +961,17 @@
     <string name="settingsDuckAiRebranding">Mākslīgā intelekta funkcijas</string>
     <string name="settingsDuckAi">Duck.ai</string>
 
+    <!--TabSwitcher Trackers Animation-->
+    <string name="showTrackerCountInTabSwitcher">Rādīt izsekotāju skaitu ciļņu pārslēdzējā</string>
+    <string name="tabSwitcherAnimationTileRemovalDialogTitle" instruction="A title for a dialog that shows when a user clicks a tile that shows them their current blocked tracker count">Vai slēpt izsekotāju skaitu?</string>
+    <string name="tabSwitcherAnimationTileRemovalDialogBody" instruction="A message for a dialog that shows when a user clicks a tile that shows them their current blocked tracker count">Vari to atkal ieslēgt sadaļā Iestatījumi &gt; Izskats.</string>
+    <string name="tabSwitcherAnimationTileRemovalDialogPositiveButton">Paslēpt</string>
+    <string name="tabSwitcherAnimationTileRemovalDialogNegativeButton">Saglabāt</string>
+
+    <!-- Widgets -->
+    <string name="searchOnlyWidgetLabel" instruction="Label for the search-only widget">Meklēt tikai</string>
+    <string name="searchOnlyWidgetDescription" instruction="Description for the search-only widget">Ātri sāc privātu meklēšanu ar DuckDuckGo.</string>
+    <string name="searchWidgetDescription" instruction="Description for the search widget, which may include Duck.ai and voice search">Meklē privāti ar DuckDuckGo vai jautā Duck.ai. Ja ir iespējota balss meklēšana un Duck.ai.</string>
+    <string name="searchAndFavoritesWidgetDescription" instruction="Description for the search and favorites widget">Savas iecienītākās vietnes meklē vai apmeklē privāti ar vienu pieskārienu. Balss meklēšana un Duck.ai ir pieejami, ja tie iespējoti.</string>
+    <string name="duckAiOnlyPinShortcutLabel" instruction="Label for the Duck.ai pinned shortcut. Should be Duck.ai in all languages">Duck.ai</string>
 </resources>

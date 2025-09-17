@@ -24,6 +24,7 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.MotionEvent
 import android.view.View
+import android.widget.FrameLayout
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatDelegate.FEATURE_SUPPORT_ACTION_BAR
 import androidx.appcompat.widget.Toolbar
@@ -58,12 +59,10 @@ import com.duckduckgo.app.settings.clear.OnboardingExperimentFireAnimationHelper
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.tabs.TabManagerFeatureFlags
-import com.duckduckgo.app.tabs.TabSwitcherAnimationFeature
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabSwitcherData.LayoutType
 import com.duckduckgo.app.tabs.ui.TabSwitcherItem.Tab
-import com.duckduckgo.app.tabs.ui.TabSwitcherItem.Tab.NormalTab
-import com.duckduckgo.app.tabs.ui.TabSwitcherItem.TrackerAnimationInfoPanel
+import com.duckduckgo.app.tabs.ui.TabSwitcherItem.TrackersAnimationInfoPanel
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command.BookmarkTabsRequest
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command.Close
@@ -156,9 +155,6 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
     lateinit var duckChat: DuckChat
 
     @Inject
-    lateinit var tabSwitcherAnimationFeature: TabSwitcherAnimationFeature
-
-    @Inject
     lateinit var trackerCountAnimator: TrackerCountAnimator
 
     @Inject
@@ -202,6 +198,7 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
 
     private lateinit var tabTouchHelper: TabTouchHelper
     private lateinit var tabsRecycler: RecyclerView
+    private lateinit var tabsContainer: FrameLayout
     private lateinit var tabItemDecorator: TabItemDecorator
     private lateinit var toolbar: Toolbar
 
@@ -232,10 +229,8 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
 
         firstTimeLoadingTabsList = savedInstanceState?.getBoolean(KEY_FIRST_TIME_LOADING) ?: true
 
-        if (tabSwitcherAnimationFeature.self().isEnabled()) {
-            tabsAdapter.setAnimationTileCloseClickListener {
-                viewModel.onTrackerAnimationInfoPanelClicked()
-            }
+        tabsAdapter.setAnimationTileCloseClickListener {
+            viewModel.onTrackerAnimationInfoPanelClicked()
         }
 
         extractIntentExtras()
@@ -250,9 +245,7 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
         configureObservers()
         configureOnBackPressedListener()
 
-        if (tabManagerFeatureFlags.multiSelection().isEnabled()) {
-            initMenuClickListeners()
-        }
+        initMenuClickListeners()
     }
 
     private fun configureFabs() {
@@ -293,6 +286,8 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
         }
 
         toolbar = findViewById(R.id.toolbar)
+
+        tabsContainer = findViewById(R.id.tabsContainer)
     }
 
     private fun configureRecycler() {
@@ -318,17 +313,15 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
 
         tabsRecycler.setHasFixedSize(true)
 
-        if (tabManagerFeatureFlags.multiSelection().isEnabled()) {
-            if (viewModel.isNewToolbarEnabled) {
-                handleFabStateUpdates()
-            }
-
-            handleSelectionModeCancellation()
+        if (viewModel.isNewToolbarEnabled) {
+            handleFabStateUpdates()
         }
+
+        handleSelectionModeCancellation()
 
         if (viewModel.isNewToolbarEnabled) {
             // Set the layout params for the tabs recycler view based on omnibar position
-            tabsRecycler.updateLayoutParams {
+            tabsContainer.updateLayoutParams {
                 this as CoordinatorLayout.LayoutParams
                 this.behavior = null
                 if (settingsDataStore.omnibarPosition == OmnibarPosition.TOP) {
@@ -404,13 +397,9 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
     }
 
     private fun checkTrackerAnimationPanelVisibility() {
-        if (!tabSwitcherAnimationFeature.self().isEnabled()) {
-            return
-        }
-
         val layoutManager = tabsRecycler.layoutManager as? LinearLayoutManager ?: return
         val firstVisible = layoutManager.findFirstVisibleItemPosition()
-        val isPanelCurrentlyVisible = firstVisible == 0 && tabsAdapter.getTabSwitcherItem(0) is TrackerAnimationInfoPanel
+        val isPanelCurrentlyVisible = firstVisible == 0 && tabsAdapter.getTabSwitcherItem(0) is TrackersAnimationInfoPanel
 
         if (!isPanelCurrentlyVisible) {
             isTrackerAnimationPanelVisible = false
@@ -435,49 +424,21 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
     }
 
     private fun configureObservers() {
-        if (tabManagerFeatureFlags.multiSelection().isEnabled()) {
-            lifecycleScope.launch {
-                viewModel.selectionViewState.flowWithLifecycle(lifecycle).collectLatest {
-                    tabsRecycler.invalidateItemDecorations()
-                    tabsAdapter.updateData(it.tabSwitcherItems)
+        lifecycleScope.launch {
+            viewModel.selectionViewState.flowWithLifecycle(lifecycle).collectLatest {
+                tabsRecycler.invalidateItemDecorations()
+                tabsAdapter.updateData(it.tabSwitcherItems)
 
-                    updateToolbarTitle(it.mode, it.tabs.size)
-                    updateTabGridItemDecorator()
+                updateToolbarTitle(it.mode, it.tabs.size)
+                updateTabGridItemDecorator()
 
-                    tabTouchHelper.mode = it.mode
+                tabTouchHelper.mode = it.mode
 
-                    invalidateOptionsMenu()
+                invalidateOptionsMenu()
 
-                    if (firstTimeLoadingTabsList && it.tabs.isNotEmpty()) {
-                        firstTimeLoadingTabsList = false
-                        scrollToActiveTab()
-                    }
-                }
-            }
-        } else {
-            viewModel.activeTab.observe(this) { tab ->
-                if (tab != null && !tab.deletable) {
-                    updateTabGridItemDecorator()
-                }
-            }
-
-            viewModel.tabSwitcherItemsLiveData.observe(this) { tabSwitcherItems ->
-                tabsAdapter.updateData(tabSwitcherItems)
-
-                val noTabSelected = tabSwitcherItems.none { (it as? NormalTab)?.isActive == true }
-                if (noTabSelected && tabSwitcherItems.isNotEmpty()) {
-                    updateTabGridItemDecorator()
-                }
-
-                if (firstTimeLoadingTabsList) {
+                if (firstTimeLoadingTabsList && it.tabs.isNotEmpty()) {
                     firstTimeLoadingTabsList = false
                     scrollToActiveTab()
-                }
-            }
-
-            viewModel.deletableTabs.observe(this) {
-                if (it.isNotEmpty()) {
-                    showTabDeletedSnackbar(it.last())
                 }
             }
         }
@@ -505,17 +466,9 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
 
                 val gridLayoutManager = getGridLayoutManager(columnCount)
                 tabsRecycler.layoutManager = gridLayoutManager
-
-                if (!tabManagerFeatureFlags.multiSelection().isEnabled()) {
-                    showListLayoutButton()
-                }
             }
             LayoutType.LIST -> {
                 tabsRecycler.layoutManager = LinearLayoutManager(this@TabSwitcherActivity)
-
-                if (!tabManagerFeatureFlags.multiSelection().isEnabled()) {
-                    showGridLayoutButton()
-                }
             }
         }
 
@@ -539,7 +492,7 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
         ).apply {
             spanSizeLookup = object : SpanSizeLookup() {
                 override fun getSpanSize(position: Int): Int {
-                    return if (tabsAdapter.getTabSwitcherItem(position) is TrackerAnimationInfoPanel) {
+                    return if (tabsAdapter.getTabSwitcherItem(position) is TrackersAnimationInfoPanel) {
                         columnCount
                     } else {
                         1
@@ -618,13 +571,7 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
                 )
                 finishAfterTransition()
             }
-            is CloseAllTabsRequest -> {
-                if (tabManagerFeatureFlags.multiSelection().isEnabled()) {
-                    showCloseAllTabsConfirmation(command.numTabs)
-                } else {
-                    showCloseAllTabsConfirmation()
-                }
-            }
+            is CloseAllTabsRequest -> showCloseAllTabsConfirmation(command.numTabs)
             is ShareLinks -> launchShareMultipleLinkChooser(command.links)
             is ShareLink -> launchShareLinkChooser(command.link, command.title)
             is BookmarkTabsRequest -> showBookmarkTabsConfirmation(command.tabIds)
@@ -650,32 +597,21 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        if (tabManagerFeatureFlags.multiSelection().isEnabled()) {
-            menuInflater.inflate(R.menu.menu_tab_switcher_activity_with_selection, menu)
+        menuInflater.inflate(R.menu.menu_tab_switcher_activity_with_selection, menu)
 
-            val popupBinding = PopupTabsMenuBinding.bind(popupMenu.contentView)
-            val viewState = viewModel.selectionViewState.value
+        val popupBinding = PopupTabsMenuBinding.bind(popupMenu.contentView)
+        val viewState = viewModel.selectionViewState.value
 
-            val numSelectedTabs = viewModel.selectionViewState.value.numSelectedTabs
-            menu.createDynamicInterface(
-                numSelectedTabs,
-                popupBinding,
-                binding.mainFab,
-                binding.aiChatFab,
-                tabsRecycler,
-                toolbar,
-                viewState.dynamicInterface,
-            )
-        } else {
-            menuInflater.inflate(R.menu.menu_tab_switcher_activity, menu)
-            layoutTypeMenuItem = menu.findItem(R.id.layoutTypeToolbarButton)
-
-            when (viewModel.layoutType.value) {
-                LayoutType.GRID -> showListLayoutButton()
-                LayoutType.LIST -> showGridLayoutButton()
-                null -> layoutTypeMenuItem?.isVisible = false
-            }
-        }
+        val numSelectedTabs = viewModel.selectionViewState.value.numSelectedTabs
+        menu.createDynamicInterface(
+            numSelectedTabs,
+            popupBinding,
+            binding.mainFab,
+            binding.aiChatFab,
+            tabsRecycler,
+            toolbar,
+            viewState.dynamicInterface,
+        )
 
         return true
     }
@@ -769,30 +705,21 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
                 is Tab -> {
                     viewModel.onTabCloseInNormalModeRequested(tab, swipeGestureUsed = deletedBySwipe)
                 }
-                is TrackerAnimationInfoPanel -> Unit
+                is TrackersAnimationInfoPanel -> Unit
             }
         }
     }
 
     override fun onTabMoved(from: Int, to: Int) {
-        if (tabSwitcherAnimationFeature.self().isEnabled()) {
-            val isTrackerAnimationInfoPanelVisible = viewModel.tabSwitcherItems.firstOrNull() is TrackerAnimationInfoPanel
-            val canSwapFromIndex = if (isTrackerAnimationInfoPanelVisible) 1 else 0
-            val tabSwitcherItemCount = viewModel.tabSwitcherItems.size
+        val isTrackerAnimationInfoPanelVisible = viewModel.tabSwitcherItems.firstOrNull() is TrackersAnimationInfoPanel
+        val canSwapFromIndex = if (isTrackerAnimationInfoPanelVisible) 1 else 0
+        val tabSwitcherItemCount = viewModel.tabSwitcherItems.size
 
-            val canSwap = from in canSwapFromIndex..<tabSwitcherItemCount && to in canSwapFromIndex..<tabSwitcherItemCount
-            if (canSwap) {
-                tabsAdapter.onTabMoved(from, to)
-                // Adjust indices if animation feature is enabled to account for the TrackerAnimationTile at index 0
-                viewModel.onTabMoved(from - canSwapFromIndex, to - canSwapFromIndex)
-            }
-        } else {
-            val tabCount = viewModel.tabSwitcherItems.size
-            val canSwap = from in 0..< tabCount && to in 0..< tabCount
-            if (canSwap) {
-                tabsAdapter.onTabMoved(from, to)
-                viewModel.onTabMoved(from, to)
-            }
+        val canSwap = from in canSwapFromIndex..<tabSwitcherItemCount && to in canSwapFromIndex..<tabSwitcherItemCount
+        if (canSwap) {
+            tabsAdapter.onTabMoved(from, to)
+            // Adjust indices if animation feature is enabled to account for the TrackerAnimationTile at index 0
+            viewModel.onTabMoved(from - canSwapFromIndex, to - canSwapFromIndex)
         }
     }
 
@@ -896,7 +823,7 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
         // we don't want to purge during device rotation
         if (isFinishing) {
             launch {
-                if (!tabManagerFeatureFlags.multiSelection().isEnabled() || !skipTabPurge) {
+                if (!skipTabPurge) {
                     viewModel.purgeDeletableTabs()
                 }
             }
@@ -989,7 +916,7 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
         tabSwitcherAnimationTileRemovalDialog = TextAlertDialogBuilder(this)
             .setTitle(R.string.tabSwitcherAnimationTileRemovalDialogTitle)
             .setMessage(R.string.tabSwitcherAnimationTileRemovalDialogBody)
-            .setPositiveButton(R.string.daxDialogGotIt)
+            .setPositiveButton(R.string.tabSwitcherAnimationTileRemovalDialogPositiveButton)
             .setNegativeButton(R.string.tabSwitcherAnimationTileRemovalDialogNegativeButton, GHOST)
             .setCancellable(true)
             .addEventListener(

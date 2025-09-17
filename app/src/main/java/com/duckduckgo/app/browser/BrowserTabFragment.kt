@@ -50,7 +50,6 @@ import android.view.ContextMenu
 import android.view.MenuItem
 import android.view.MotionEvent
 import android.view.View
-import android.view.ViewGroup
 import android.view.ViewGroup.LayoutParams
 import android.webkit.PermissionRequest
 import android.webkit.SslErrorHandler
@@ -114,6 +113,7 @@ import com.duckduckgo.app.browser.applinks.AppLinksLauncher
 import com.duckduckgo.app.browser.applinks.AppLinksSnackBarConfigurator
 import com.duckduckgo.app.browser.autocomplete.BrowserAutoCompleteSuggestionsAdapter
 import com.duckduckgo.app.browser.autocomplete.SuggestionItemDecoration
+import com.duckduckgo.app.browser.autofill.SystemAutofillEngagement
 import com.duckduckgo.app.browser.commands.Command
 import com.duckduckgo.app.browser.commands.Command.OpenBrokenSiteLearnMore
 import com.duckduckgo.app.browser.commands.Command.ReportBrokenSiteError
@@ -125,7 +125,6 @@ import com.duckduckgo.app.browser.customtabs.CustomTabPixelNames
 import com.duckduckgo.app.browser.customtabs.CustomTabViewModel.Companion.CUSTOM_TAB_NAME_PREFIX
 import com.duckduckgo.app.browser.databinding.FragmentBrowserTabBinding
 import com.duckduckgo.app.browser.databinding.HttpAuthenticationBinding
-import com.duckduckgo.app.browser.defaultbrowsing.prompts.ui.experiment.ExperimentalHomeScreenWidgetBottomSheetDialog
 import com.duckduckgo.app.browser.downloader.BlobConverterInjector
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.browser.filechooser.FileChooserIntentBuilder
@@ -155,7 +154,6 @@ import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition.TOP
 import com.duckduckgo.app.browser.print.PrintDocumentAdapterFactory
 import com.duckduckgo.app.browser.print.PrintInjector
 import com.duckduckgo.app.browser.remotemessage.SharePromoLinkRMFBroadCastReceiver
-import com.duckduckgo.app.browser.senseofprotection.SenseOfProtectionExperiment
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
 import com.duckduckgo.app.browser.shortcut.ShortcutBuilder
 import com.duckduckgo.app.browser.tabpreview.WebViewPreviewGenerator
@@ -163,6 +161,7 @@ import com.duckduckgo.app.browser.tabpreview.WebViewPreviewPersister
 import com.duckduckgo.app.browser.ui.InsetsWithKeyboardAnimationCallback
 import com.duckduckgo.app.browser.ui.dialogs.AutomaticFireproofDialogOptions
 import com.duckduckgo.app.browser.ui.dialogs.LaunchInExternalAppOptions
+import com.duckduckgo.app.browser.ui.dialogs.widgetprompt.AlternativeHomeScreenWidgetBottomSheetDialog
 import com.duckduckgo.app.browser.urlextraction.DOMUrlExtractor
 import com.duckduckgo.app.browser.urlextraction.UrlExtractingWebView
 import com.duckduckgo.app.browser.urlextraction.UrlExtractingWebViewClient
@@ -178,6 +177,7 @@ import com.duckduckgo.app.browser.viewstate.PrivacyShieldViewState
 import com.duckduckgo.app.browser.viewstate.SavedSiteChangedViewState
 import com.duckduckgo.app.browser.webauthn.WebViewPasskeyInitializer
 import com.duckduckgo.app.browser.webshare.WebShareChooser
+import com.duckduckgo.app.browser.webshare.WebViewCompatWebShareChooser
 import com.duckduckgo.app.browser.webview.WebContentDebugging
 import com.duckduckgo.app.browser.webview.WebViewBlobDownloadFeature
 import com.duckduckgo.app.browser.webview.safewebview.SafeWebViewFeature
@@ -248,6 +248,7 @@ import com.duckduckgo.browser.api.brokensite.BrokenSiteData
 import com.duckduckgo.browser.api.brokensite.BrokenSiteData.ReportFlow.RELOAD_THREE_TIMES_WITHIN_20_SECONDS
 import com.duckduckgo.browser.api.ui.BrowserScreens.PrivateSearchScreenNoParams
 import com.duckduckgo.browser.api.ui.BrowserScreens.WebViewActivityWithParams
+import com.duckduckgo.browser.api.webviewcompat.WebViewCompatWrapper
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.DuckDuckGoFragment
 import com.duckduckgo.common.ui.store.BrowserAppTheme
@@ -302,6 +303,7 @@ import com.duckduckgo.js.messaging.api.JsCallbackData
 import com.duckduckgo.js.messaging.api.JsMessageCallback
 import com.duckduckgo.js.messaging.api.JsMessaging
 import com.duckduckgo.js.messaging.api.SubscriptionEventData
+import com.duckduckgo.js.messaging.api.WebViewCompatMessageCallback
 import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.Feed
 import com.duckduckgo.mobile.android.R as CommonR
 import com.duckduckgo.mobile.android.app.tracking.ui.AppTrackingProtectionScreens.AppTrackerOnboardingActivityWithEmptyParamsParams
@@ -573,9 +575,6 @@ class BrowserTabFragment :
     lateinit var swipingTabsFeature: SwipingTabsFeatureProvider
 
     @Inject
-    lateinit var senseOfProtectionExperiment: SenseOfProtectionExperiment
-
-    @Inject
     lateinit var onboardingDesignExperimentManager: OnboardingDesignExperimentManager
 
     @Inject
@@ -586,6 +585,9 @@ class BrowserTabFragment :
 
     @Inject
     lateinit var passkeyInitializer: WebViewPasskeyInitializer
+
+    @Inject
+    lateinit var webViewCompatWrapper: WebViewCompatWrapper
 
     /**
      * We use this to monitor whether the user was seeing the in-context Email Protection signup prompt
@@ -604,7 +606,7 @@ class BrowserTabFragment :
 
     private lateinit var popupMenu: BrowserPopupMenu
     private lateinit var ctaBottomSheet: PromoBottomSheetDialog
-    private lateinit var experimentalBottomSheet: ExperimentalHomeScreenWidgetBottomSheetDialog
+    private lateinit var widgetBottomSheetDialog: AlternativeHomeScreenWidgetBottomSheetDialog
 
     private lateinit var autoCompleteSuggestionsAdapter: BrowserAutoCompleteSuggestionsAdapter
 
@@ -617,6 +619,9 @@ class BrowserTabFragment :
 
     @Inject
     lateinit var autofillFragmentResultListeners: PluginPoint<AutofillFragmentResultsPlugin>
+
+    @Inject
+    lateinit var systemAutofillEngagement: SystemAutofillEngagement
 
     private var isActiveTab: Boolean = false
 
@@ -731,16 +736,17 @@ class BrowserTabFragment :
         override fun onPopUpHandled(isCosmetic: Boolean) {
             launch {
                 context?.let {
-                    if (senseOfProtectionExperiment.isUserEnrolledInAVariantAndExperimentEnabled() &&
+                    // TODO uncomment when sense of protection experiment shield is enabled
+/*                    if (senseOfProtectionExperiment.isUserEnrolledInAVariantAndExperimentEnabled() &&
                         viewModel.trackersCount().isNotEmpty()
                     ) {
                         if (isCosmetic) {
                             delay(COOKIES_ANIMATION_DELAY)
                         }
                         omnibar.enqueueCookiesAnimation(isCosmetic)
-                    } else {
-                        viewModel.onAutoConsentPopUpHandled(isCosmetic)
-                    }
+                    } else {*/
+                    viewModel.onAutoConsentPopUpHandled(isCosmetic)
+                    // }
                 }
             }
         }
@@ -881,6 +887,13 @@ class BrowserTabFragment :
         registerForActivityResult(WebShareChooser()) {
             contentScopeScripts.onResponse(it)
         }
+
+    private var currentWebShareReplyCallback: ((JSONObject) -> Unit)? = null
+
+    private val webViewCompatWebShareLauncher = registerForActivityResult(WebViewCompatWebShareChooser()) { result ->
+        currentWebShareReplyCallback?.invoke(result)
+        currentWebShareReplyCallback = null
+    }
 
     // Instantiating a private class that contains an implementation detail of BrowserTabFragment but is separated for tidiness
     // see discussion in https://github.com/duckduckgo/Android/pull/4027#discussion_r1433373625
@@ -1188,9 +1201,16 @@ class BrowserTabFragment :
     private fun onOmnibarCustomTabPrivacyDashboardPressed() {
         val params = PrivacyDashboardPrimaryScreen(tabId)
         val intent = globalActivityStarter.startIntent(requireContext(), params)
-        contentScopeScripts.sendSubscriptionEvent(createBreakageReportingEventData())
+        postBreakageReportingEvent()
         intent?.let { activityResultPrivacyDashboard.launch(intent) }
         pixel.fire(CustomTabPixelNames.CUSTOM_TABS_PRIVACY_DASHBOARD_OPENED)
+    }
+
+    private fun postBreakageReportingEvent() {
+        val eventData = createBreakageReportingEventData()
+        webView?.let {
+            webViewClient.postContentScopeMessage(eventData, it)
+        }
     }
 
     private fun onFireButtonPressed() {
@@ -1200,13 +1220,12 @@ class BrowserTabFragment :
     }
 
     private fun onBrowserMenuButtonPressed() {
-        contentScopeScripts.sendSubscriptionEvent(createBreakageReportingEventData())
+        postBreakageReportingEvent()
         viewModel.onBrowserMenuClicked(isCustomTab = isActiveCustomTab())
     }
 
     private fun onOmnibarPrivacyShieldButtonPressed() {
-        contentScopeScripts.sendSubscriptionEvent(createBreakageReportingEventData())
-        viewModel.onOmnibarPrivacyShieldButtonPressed()
+        postBreakageReportingEvent()
         launchPrivacyDashboard(toggle = false)
     }
 
@@ -1216,8 +1235,8 @@ class BrowserTabFragment :
         voiceSearchLauncher.launch(requireActivity())
     }
 
-    private fun onOmnibarDuckChatPressed(query: String) {
-        viewModel.onDuckChatOmnibarButtonClicked(query)
+    private fun onOmnibarDuckChatPressed(query: String, hasFocus: Boolean, isNtp: Boolean) {
+        viewModel.onDuckChatOmnibarButtonClicked(query = query, hasFocus = hasFocus, isNtp = isNtp)
     }
 
     private fun configureCustomTab() {
@@ -1542,6 +1561,15 @@ class BrowserTabFragment :
                 it.let { renderer.renderPrivacyShield(it) }
             },
         )
+
+        lifecycleScope.launch {
+            viewModel.areFavoritesDisplayed
+                .flowWithLifecycle(lifecycle, Lifecycle.State.RESUMED)
+                .collectLatest { hasFavorites ->
+                    binding.includeNewBrowserTab.topNtpOutlineStroke.isVisible = hasFavorites
+                    binding.includeNewBrowserTab.bottomNtpOutlineStroke.isVisible = hasFavorites
+                }
+        }
 
         addTabsObserver()
     }
@@ -1924,11 +1952,17 @@ class BrowserTabFragment :
             is Command.ShowFireproofWebSiteConfirmation -> fireproofWebsiteConfirmation(it.fireproofWebsiteEntity)
             is Command.DeleteFireproofConfirmation -> removeFireproofWebsiteConfirmation(it.fireproofWebsiteEntity)
             is Command.RefreshAndShowPrivacyProtectionEnabledConfirmation -> {
+                webView?.let {
+                    webViewClient.configureWebView(it, null)
+                }
                 refresh()
                 privacyProtectionEnabledConfirmation(it.domain)
             }
 
             is Command.RefreshAndShowPrivacyProtectionDisabledConfirmation -> {
+                webView?.let {
+                    webViewClient.configureWebView(it, null)
+                }
                 refresh()
                 privacyProtectionDisabledConfirmation(it.domain)
             }
@@ -2006,9 +2040,9 @@ class BrowserTabFragment :
             is Command.ShowFullScreen -> {
                 binding.webViewFullScreenContainer.addView(
                     it.view,
-                    ViewGroup.LayoutParams(
-                        ViewGroup.LayoutParams.MATCH_PARENT,
-                        ViewGroup.LayoutParams.MATCH_PARENT,
+                    LayoutParams(
+                        LayoutParams.MATCH_PARENT,
+                        LayoutParams.MATCH_PARENT,
                     ),
                 )
             }
@@ -2127,7 +2161,12 @@ class BrowserTabFragment :
             is Command.SendResponseToJs -> contentScopeScripts.onResponse(it.data)
             is Command.SendResponseToDuckPlayer -> duckPlayerScripts.onResponse(it.data)
             is Command.WebShareRequest -> webShareRequest.launch(it.data)
+            is Command.WebViewCompatWebShareRequest -> {
+                currentWebShareReplyCallback = it.onResponse
+                webViewCompatWebShareLauncher.launch(it.data)
+            }
             is Command.ScreenLock -> screenLock(it.data)
+            is Command.WebViewCompatScreenLock -> webViewCompatScreenLock(it.data, it.onResponse)
             is Command.ScreenUnlock -> screenUnlock()
             is Command.ShowFaviconsPrompt -> showFaviconsPrompt()
             is Command.ShowWebPageTitle -> showWebPageTitleInCustomTab(it.title, it.url, it.showDuckPlayerIcon)
@@ -2200,6 +2239,8 @@ class BrowserTabFragment :
             null -> {
                 // NO OP
             }
+
+            is Command.SubmitChat -> duckChat.openDuckChatWithAutoPrompt(it.query)
         }
     }
 
@@ -2894,7 +2935,9 @@ class BrowserTabFragment :
                         pixel.fire(DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_LEGACY_OMNIBAR_AICHAT_BUTTON_PRESSED)
                         pixel.fire(DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_LEGACY_OMNIBAR_AICHAT_BUTTON_PRESSED_DAILY, type = Daily())
                     }
-                    onOmnibarDuckChatPressed(omnibar.getText())
+                    val hasFocus = omnibar.omnibarTextInput.hasFocus()
+                    val isNtp = omnibar.viewMode == ViewMode.NewTab
+                    onOmnibarDuckChatPressed(query = omnibar.getText(), hasFocus = hasFocus, isNtp = isNtp)
                 }
             },
         )
@@ -2953,7 +2996,8 @@ class BrowserTabFragment :
     ) {
         viewModel.triggerAutocomplete(query, hasFocus, false)
         if (hasFocus) {
-            pixel.fire(DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_LEGACY_OMNIBAR_SHOWN, type = Daily())
+            pixel.fire(DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_LEGACY_OMNIBAR_SHOWN_DAILY, type = Daily())
+            pixel.fire(DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_LEGACY_OMNIBAR_SHOWN_COUNT)
             cancelPendingAutofillRequestsToChooseCredentials()
         } else {
             omnibar.omnibarTextInput.hideKeyboard()
@@ -2987,7 +3031,6 @@ class BrowserTabFragment :
     }
 
     private fun userEnteredQuery(query: String) {
-        viewModel.setLastSubmittedUserQuery(query)
         viewModel.onUserSubmittedQuery(query)
     }
 
@@ -3099,6 +3142,28 @@ class BrowserTabFragment :
                     }
                 },
             )
+            webViewClient.configureWebView(
+                it,
+                object : WebViewCompatMessageCallback {
+                    override fun process(
+                        context: String,
+                        featureName: String,
+                        method: String,
+                        id: String?,
+                        data: JSONObject?,
+                        onResponse: (JSONObject) -> Unit,
+                    ) {
+                        viewModel.webViewCompatProcessJsCallbackMessage(
+                            context = context,
+                            featureName = featureName,
+                            method = method,
+                            id = id,
+                            data = data,
+                            onResponse = onResponse,
+                        )
+                    }
+                },
+            )
             duckPlayerScripts.register(
                 it,
                 object : JsMessageCallback() {
@@ -3126,6 +3191,14 @@ class BrowserTabFragment :
     private fun screenLock(data: JsCallbackData) {
         val returnData = jsOrientationHandler.updateOrientation(data, this)
         contentScopeScripts.onResponse(returnData)
+    }
+
+    private fun webViewCompatScreenLock(
+        data: JsCallbackData,
+        onResponse: (JSONObject) -> Unit,
+    ) {
+        val returnData = jsOrientationHandler.updateOrientation(data, this)
+        onResponse(returnData.params)
     }
 
     private fun screenUnlock() {
@@ -3189,14 +3262,15 @@ class BrowserTabFragment :
         daxDialogIntroBubble.root.gone()
     }
 
+    @SuppressLint("AddDocumentStartJavaScriptUsage")
     private fun configureWebViewForBlobDownload(webView: DuckDuckGoWebView) {
         lifecycleScope.launch(dispatchers.main()) {
             if (isBlobDownloadWebViewFeatureEnabled(webView)) {
                 val script = blobDownloadScript()
                 WebViewCompat.addDocumentStartJavaScript(webView, script, setOf("*"))
 
-                webView.safeAddWebMessageListener(
-                    webViewCapabilityChecker,
+                webViewCompatWrapper.addWebMessageListener(
+                    webView,
                     "ddgBlobDownloadObj",
                     setOf("*"),
                     object : WebViewCompat.WebMessageListener {
@@ -3283,6 +3357,10 @@ class BrowserTabFragment :
     }
 
     private fun configureWebViewForAutofill(it: DuckDuckGoWebView) {
+        it.setSystemAutofillCallback {
+            systemAutofillEngagement.onSystemAutofillEvent()
+        }
+
         browserAutofill.addJsInterface(it, autofillCallback, this, null, tabId)
 
         autofillFragmentResultListeners.getPlugins().forEach { plugin ->
@@ -3843,7 +3921,11 @@ class BrowserTabFragment :
 
     private fun destroyWebView() {
         if (::webViewContainer.isInitialized) webViewContainer.removeAllViews()
-        webView?.destroy()
+        webView?.let {
+            it.removeSystemAutofillCallback()
+            webViewClient.destroy(it)
+            it.destroy()
+        }
         webView = null
     }
 
@@ -4583,23 +4665,23 @@ class BrowserTabFragment :
 
         private fun showBottomSheetCta(configuration: HomePanelCta) {
             if (configuration is AddWidgetAutoOnboardingExperiment) {
-                showExperimentalHomeWidget(configuration)
+                showAlternativeHomeWidgetPrompt(configuration)
             } else {
                 showHomeCta(configuration)
             }
         }
 
-        private fun showExperimentalHomeWidget(
+        private fun showAlternativeHomeWidgetPrompt(
             configuration: HomePanelCta,
         ) {
             hideDaxCta()
 
-            if (!::experimentalBottomSheet.isInitialized) {
-                experimentalBottomSheet = ExperimentalHomeScreenWidgetBottomSheetDialog(
+            if (!::widgetBottomSheetDialog.isInitialized) {
+                widgetBottomSheetDialog = AlternativeHomeScreenWidgetBottomSheetDialog(
                     context = requireContext(),
                     isLightModeEnabled = appTheme.isLightModeEnabled(),
                 )
-                experimentalBottomSheet.eventListener = object : ExperimentalHomeScreenWidgetBottomSheetDialog.EventListener {
+                widgetBottomSheetDialog.eventListener = object : AlternativeHomeScreenWidgetBottomSheetDialog.EventListener {
                     override fun onShown() {
                         viewModel.onCtaShown()
                     }
@@ -4616,10 +4698,10 @@ class BrowserTabFragment :
                         viewModel.onUserClickCtaSecondaryButton(configuration)
                     }
                 }
-                experimentalBottomSheet.show()
+                widgetBottomSheetDialog.show()
             } else {
-                if (!experimentalBottomSheet.isShowing) {
-                    experimentalBottomSheet.show()
+                if (!widgetBottomSheetDialog.isShowing) {
+                    widgetBottomSheetDialog.show()
                 }
             }
         }

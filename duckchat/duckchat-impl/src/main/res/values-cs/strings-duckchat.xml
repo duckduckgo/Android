@@ -51,9 +51,9 @@
     <string name="input_screen_search_hint">Vyhledejte nebo zadejte adresu</string>
     <string name="input_screen_chat_tab">Duck.ai</string>
     <string name="input_screen_chat_hint">Zeptej se soukromě</string>
-    <string name="input_screen_user_pref_without_ai">Jen vyhledávání\n(výchozí)</string>
-    <string name="input_screen_user_pref_with_ai">Vyhledávání a Duck.ai\n(experimentální)</string>
-    <string name="input_screen_user_pref_description">Vyzkoušej naši experimentální možnost zeptat se Duck.ai přímo z adresního řádku. <annotation type="share_feedback">Sdílet zpětnou vazbu</annotation></string>
+    <string name="input_screen_user_pref_without_ai">Jen vyhledávání</string>
+    <string name="input_screen_user_pref_with_ai">Vyhledávání a Duck.ai</string>
+    <string name="input_screen_user_pref_description">Vyzkoušej naši novou možnost zeptat se Duck.ai přímo z adresního řádku. <annotation type="share_feedback">Sdílet zpětnou vazbu</annotation></string>
 
     <!-- Duck.ai Pro settings -->
     <string name="duck_ai_paid_settings_title">Duck.ai</string>
@@ -69,4 +69,18 @@
     <string name="duck_chat_enable_duck_ai_setting_description_rebranding">S populárními AI modely třetích stran můžeš chatovat soukromě</string>
     <string name="duck_chat_assist_settings_title_rebranding">Nastavení vyhledávání s funkcí Assist</string>
     <string name="duck_chat_assist_settings_description_rebranding">Vyber, jak často chceš, aby se odpovědi s podporou umělé inteligence zobrazovaly ve tvých vyhledáváních</string>
+
+    <!-- AutoComplete -->
+    <string name="autocompleteDuckAiPrompt">Zeptej se Duck.ai</string>
+
+    <!-- New Address Bar Option Bottom Sheet Dialog -->
+    <string name="newAddressBarOptionBottomSheetDialogSearchText">Vyhledejte nebo zadejte adresu</string>
+    <string name="newAddressBarOptionBottomSheetDialogTitle">Přepínat mezi vyhledáváním a AI chatem</string>
+    <string name="newAddressBarOptionBottomSheetDialogSubTitle">Funkce AI jsou vždycky volitelné.</string>
+    <string name="newAddressBarOptionBottomSheetDialogPrimaryButton">Potvrdit</string>
+    <string name="newAddressBarOptionBottomSheetDialogGhostButton">Teď ne</string>
+    <string name="newAddressBarOptionBottomSheetDialogFooter">Úpravy provedeš v Nastavení &gt; Funkce AI.</string>
+    <string name="newAddressBarOptionBottomSheetDialogSearchOnly">Jen vyhledávání</string>
+    <string name="newAddressBarOptionBottomSheetDialogSearchAndDuckAi">Vyhledávání a Duck.ai</string>
+    <string name="newAddressBarOptionBottomSheetDialogHeader">Možnost adresního řádku</string>
 </resources>

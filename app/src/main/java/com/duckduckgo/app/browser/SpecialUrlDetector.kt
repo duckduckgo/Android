@@ -81,7 +81,9 @@ class SpecialUrlDetectorImpl(
                 } else {
                     URI_ANDROID_APP_SCHEME
                 }
-                checkForIntent(scheme, uriString, intentFlags)
+                // if there's no redirects (initiatingUrl = null) then it's user initiated
+                val userInitiated = initiatingUrl == null
+                checkForIntent(scheme, uriString, intentFlags, userInitiated)
             }
         }
     }
@@ -183,35 +185,38 @@ class SpecialUrlDetectorImpl(
         scheme: String,
         uriString: String,
         intentFlags: Int,
+        userInitiated: Boolean,
     ): UrlType {
+        fun buildIntent(uriString: String, intentFlags: Int, userInitiated: Boolean): UrlType {
+            return try {
+                val intent = Intent.parseUri(uriString, intentFlags)
+                // only proceed if something can handle it
+                if (userInitiated && (intent == null || packageManager.resolveActivity(intent, 0) == null) &&
+                    androidBrowserConfigFeature.validateIntentResolution().isEnabled()
+                ) {
+                    return UrlType.Unknown(uriString)
+                }
+
+                if (externalAppIntentFlagsFeature.self().isEnabled()) {
+                    intent.addCategory(Intent.CATEGORY_BROWSABLE)
+                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP)
+                }
+
+                val fallbackUrl = intent.getStringExtra(EXTRA_FALLBACK_URL)
+                val fallbackIntent = buildFallbackIntent(fallbackUrl)
+                UrlType.NonHttpAppLink(uriString = uriString, intent = intent, fallbackUrl = fallbackUrl, fallbackIntent = fallbackIntent)
+            } catch (e: URISyntaxException) {
+                logcat(WARN) { "Failed to parse uri $uriString: ${e.asLog()}" }
+                return UrlType.Unknown(uriString)
+            }
+        }
+
         val validUriSchemeRegex = Regex("[a-z][a-zA-Z\\d+.-]+")
         if (scheme.matches(validUriSchemeRegex)) {
-            return buildIntent(uriString, intentFlags)
+            return buildIntent(uriString, intentFlags, userInitiated)
         }
 
         return UrlType.SearchQuery(uriString)
-    }
-
-    private fun buildIntent(uriString: String, intentFlags: Int): UrlType {
-        return try {
-            val intent = Intent.parseUri(uriString, intentFlags)
-            // only proceed if something can handle it
-            if (intent == null || packageManager.resolveActivity(intent, 0) == null) {
-                return UrlType.Unknown(uriString)
-            }
-
-            if (externalAppIntentFlagsFeature.self().isEnabled()) {
-                intent.addCategory(Intent.CATEGORY_BROWSABLE)
-                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP)
-            }
-
-            val fallbackUrl = intent.getStringExtra(EXTRA_FALLBACK_URL)
-            val fallbackIntent = buildFallbackIntent(fallbackUrl)
-            UrlType.NonHttpAppLink(uriString = uriString, intent = intent, fallbackUrl = fallbackUrl, fallbackIntent = fallbackIntent)
-        } catch (e: URISyntaxException) {
-            logcat(WARN) { "Failed to parse uri $uriString: ${e.asLog()}" }
-            return UrlType.Unknown(uriString)
-        }
     }
 
     private fun buildFallbackIntent(fallbackUrl: String?): Intent? {

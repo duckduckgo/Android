@@ -80,6 +80,7 @@ class AutofillImportPasswordConfigStoreImpl @Inject constructor(
 
         // order is important; first match wins so keep the most specific to start of the list
         internal val URL_MAPPINGS_DEFAULT = listOf(
+            UrlMapping(key = "webflow-signin-rejected", url = "https://accounts.google.com/v3/signin/rejected"),
             UrlMapping(key = "webflow-passphrase-encryption", url = "https://passwords.google.com/error/sync-passphrase"),
             UrlMapping(key = "webflow-pre-login", url = "https://passwords.google.com/intro"),
             UrlMapping(key = "webflow-export", url = "https://passwords.google.com/options?ep=1"),

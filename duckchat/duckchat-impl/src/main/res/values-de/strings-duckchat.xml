@@ -51,9 +51,9 @@
     <string name="input_screen_search_hint">Adresse suchen oder eingeben</string>
     <string name="input_screen_chat_tab">Duck.ai</string>
     <string name="input_screen_chat_hint">Privat fragen</string>
-    <string name="input_screen_user_pref_without_ai">Nur suchen\n(Standard)</string>
-    <string name="input_screen_user_pref_with_ai">Suchen &amp; Duck.ai\n(Experimentell)</string>
-    <string name="input_screen_user_pref_description">Probiere unsere experimentelle Option aus, um Duck.ai direkt aus der Adressleiste zu fragen. <annotation type="share_feedback">Feedback teilen</annotation></string>
+    <string name="input_screen_user_pref_without_ai">Nur Suchen</string>
+    <string name="input_screen_user_pref_with_ai">Suche &amp; Duck.ai</string>
+    <string name="input_screen_user_pref_description">Probiere unsere neue Option aus, um Duck.ai direkt aus der Adressleiste zu fragen. <annotation type="share_feedback">Feedback teilen</annotation></string>
 
     <!-- Duck.ai Pro settings -->
     <string name="duck_ai_paid_settings_title">Duck.ai</string>
@@ -69,4 +69,18 @@
     <string name="duck_chat_enable_duck_ai_setting_description_rebranding">Privat mit beliebten KI-Modellen von Drittanbietern chatten</string>
     <string name="duck_chat_assist_settings_title_rebranding">Such-Assist-Einstellungen</string>
     <string name="duck_chat_assist_settings_description_rebranding">Du kannst auswählen, wie oft KI-gestützte Antworten in deinen Suchergebnissen angezeigt werden sollen.</string>
+
+    <!-- AutoComplete -->
+    <string name="autocompleteDuckAiPrompt">Frag Duck.ai</string>
+
+    <!-- New Address Bar Option Bottom Sheet Dialog -->
+    <string name="newAddressBarOptionBottomSheetDialogSearchText">Adresse suchen oder eingeben</string>
+    <string name="newAddressBarOptionBottomSheetDialogTitle">Wechseln zwischen Suche und KI-Chat</string>
+    <string name="newAddressBarOptionBottomSheetDialogSubTitle">KI-Funktionen sind immer optional.</string>
+    <string name="newAddressBarOptionBottomSheetDialogPrimaryButton">Bestätigen</string>
+    <string name="newAddressBarOptionBottomSheetDialogGhostButton">Jetzt nicht</string>
+    <string name="newAddressBarOptionBottomSheetDialogFooter">Anpassen unter Einstellungen &gt; KI-Funktionen.</string>
+    <string name="newAddressBarOptionBottomSheetDialogSearchOnly">Nur Suchen</string>
+    <string name="newAddressBarOptionBottomSheetDialogSearchAndDuckAi">Suche &amp; Duck.ai</string>
+    <string name="newAddressBarOptionBottomSheetDialogHeader">Adressleistenoption</string>
 </resources>

@@ -50,9 +50,9 @@
     <string name="input_screen_search_hint">Search or enter address</string>
     <string name="input_screen_chat_tab">Duck.ai</string>
     <string name="input_screen_chat_hint">Ask privately</string>
-    <string name="input_screen_user_pref_without_ai">Search Only\n(Default)</string>
-    <string name="input_screen_user_pref_with_ai">Search &amp; Duck.ai\n(Experimental)</string>
-    <string name="input_screen_user_pref_description">Try our experimental option to ask Duck.ai directly from the Address Bar. <annotation type="share_feedback">Share Feedback</annotation></string>
+    <string name="input_screen_user_pref_without_ai">Search Only</string>
+    <string name="input_screen_user_pref_with_ai">Search &amp; Duck.ai</string>
+    <string name="input_screen_user_pref_description">Try our new option to ask Duck.ai directly from the Address Bar. <annotation type="share_feedback">Share Feedback</annotation></string>
 
     <!-- Duck.ai Pro settings -->
     <string name="duck_ai_paid_settings_title">Duck.ai</string>
@@ -68,4 +68,18 @@
     <string name="duck_chat_enable_duck_ai_setting_description_rebranding">Chat privately with popular 3rd-party AI models</string>
     <string name="duck_chat_assist_settings_title_rebranding">Search Assist Settings</string>
     <string name="duck_chat_assist_settings_description_rebranding">Choose how often you want AI-Assisted answers to appear in your searches</string>
+
+    <!-- AutoComplete -->
+    <string name="autocompleteDuckAiPrompt">Ask Duck.ai</string>
+
+    <!-- New Address Bar Option Bottom Sheet Dialog -->
+    <string name="newAddressBarOptionBottomSheetDialogSearchText">Search or enter address</string>
+    <string name="newAddressBarOptionBottomSheetDialogTitle">Toggle between\nsearch and AI chat</string>
+    <string name="newAddressBarOptionBottomSheetDialogSubTitle">AI features are always optional.</string>
+    <string name="newAddressBarOptionBottomSheetDialogPrimaryButton">Confirm</string>
+    <string name="newAddressBarOptionBottomSheetDialogGhostButton">Not Now</string>
+    <string name="newAddressBarOptionBottomSheetDialogFooter">Adjust in Settings > AI Features.</string>
+    <string name="newAddressBarOptionBottomSheetDialogSearchOnly">Search Only</string>
+    <string name="newAddressBarOptionBottomSheetDialogSearchAndDuckAi">Search &amp; Duck.ai</string>
+    <string name="newAddressBarOptionBottomSheetDialogHeader">Address bar option</string>
 </resources>

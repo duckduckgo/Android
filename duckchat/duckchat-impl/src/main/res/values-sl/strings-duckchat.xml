@@ -51,9 +51,9 @@
     <string name="input_screen_search_hint">Poišči ali vnesi naslov</string>
     <string name="input_screen_chat_tab">Duck.ai</string>
     <string name="input_screen_chat_hint">Vprašaj zasebno</string>
-    <string name="input_screen_user_pref_without_ai">Samo iskanje\n(privzeto)</string>
-    <string name="input_screen_user_pref_with_ai">Iskanje in Duck.ai\n(poskusno)</string>
-    <string name="input_screen_user_pref_description">Preizkusite našo poskusno možnost, da vprašate Duck.ai neposredno iz naslovne vrstice. <annotation type="share_feedback">Podajte povratne informacije</annotation></string>
+    <string name="input_screen_user_pref_without_ai">Samo iskanje</string>
+    <string name="input_screen_user_pref_with_ai">Iskanje in Duck.ai</string>
+    <string name="input_screen_user_pref_description">Preizkusite našo novo možnost, da vprašate Duck.ai neposredno iz naslovne vrstice. <annotation type="share_feedback">Podajte povratne informacije</annotation></string>
 
     <!-- Duck.ai Pro settings -->
     <string name="duck_ai_paid_settings_title">Duck.ai</string>
@@ -69,4 +69,18 @@
     <string name="duck_chat_enable_duck_ai_setting_description_rebranding">Klepetajte zasebno s priljubljenimi modeli umetne inteligence tretjih oseb</string>
     <string name="duck_chat_assist_settings_title_rebranding">Nastavitve modula Search Assist</string>
     <string name="duck_chat_assist_settings_description_rebranding">Izberite, kako pogosto želite, da se odgovori s pomočjo umetne inteligence prikazujejo v vaših iskanjih</string>
+
+    <!-- AutoComplete -->
+    <string name="autocompleteDuckAiPrompt">Vprašajte Duck.ai</string>
+
+    <!-- New Address Bar Option Bottom Sheet Dialog -->
+    <string name="newAddressBarOptionBottomSheetDialogSearchText">Poišči ali vnesi naslov</string>
+    <string name="newAddressBarOptionBottomSheetDialogTitle">Preklapljanje med iskanjem in klepetom UI</string>
+    <string name="newAddressBarOptionBottomSheetDialogSubTitle">Funkcije umetne inteligence so vedno izbirne.</string>
+    <string name="newAddressBarOptionBottomSheetDialogPrimaryButton">Potrdi</string>
+    <string name="newAddressBarOptionBottomSheetDialogGhostButton">Ne zdaj</string>
+    <string name="newAddressBarOptionBottomSheetDialogFooter">Prilagodite v Nastavitve &gt; Funkcije UI.</string>
+    <string name="newAddressBarOptionBottomSheetDialogSearchOnly">Samo iskanje</string>
+    <string name="newAddressBarOptionBottomSheetDialogSearchAndDuckAi">Iskanje in Duck.ai</string>
+    <string name="newAddressBarOptionBottomSheetDialogHeader">Možnost naslovne vrstice</string>
 </resources>

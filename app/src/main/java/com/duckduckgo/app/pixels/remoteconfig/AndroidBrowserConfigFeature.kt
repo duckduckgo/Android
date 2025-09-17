@@ -161,4 +161,22 @@ interface AndroidBrowserConfigFeature {
 
     @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun hideDuckAiInSerpKillSwitch(): Toggle
+
+    /**
+     * Kill switch for intent resolution validation in SpecialUrlDetector
+     * @return `true` when the remote config has the global "validateIntentResolution" androidBrowserConfig
+     * sub-feature flag enabled
+     * If the remote feature is not present defaults to `true`
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
+    fun validateIntentResolution(): Toggle
+
+    /**
+     * Kill switch to prevent changing the onboarding stage once AppStage.ESTABLISHED is reached
+     * @return `true` when the remote config has the global "establishedAppStageGuard" androidBrowserConfig
+     * sub-feature flag enabled
+     * If the remote feature is not present defaults to `true`
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
+    fun establishedAppStageGuard(): Toggle
 }

@@ -127,6 +127,7 @@
     <!-- Fire -->
     <string name="fireMenu">Ștergere date</string>
     <string name="fireClearAll">Șterge toate filele și datele</string>
+    <string name="fireClearAllPlusDuckChats">Șterge toate filele, datele și chaturile Duck.ai</string>
     <string name="fireCancel">Anulează</string>
     <string name="fireDataCleared">Date șterse</string>
 
@@ -190,6 +191,28 @@
     <string name="webTrackingProtectionLearnMoreTitle">Protecție împotriva urmăririi pe web</string>
     <string name="webTrackingProtectionTitle">Protecție împotriva urmăririi pe web</string>
     <string name="webTrackingProtectionDescriptionNew"><![CDATA[DuckDuckGo blochează automat tehnologiile de urmărire ascunse în timp ce navighezi pe web.\n<a href=\"\">Află mai multe</a>]]></string>
+    <string name="webTrackingProtectionExplanationDescription"><![CDATA[Browserul DuckDuckGo oferă instrumente de protecție împotriva urmăririi, care sunt mereu active.\n<a href=\"\">Află mai multe</a>]]></string>
+    <string name="webTrackingProtectionExplanationTitle">Cum te protejăm</string>
+    <string name="webTrackingProtectionThirdPartyTrackersTitle">Blochează tehnologiile de urmărire terță parte</string>
+    <string name="webTrackingProtectionThirdPartyTrackersDescription">Ajută la blocarea modulelor cookie terțe care te urmăresc de la un site la altul, împiedicând încărcarea instrumentelor de urmărire terțe de la bun început.</string>
+    <string name="webTrackingProtectionTargetedAdsTitle">Blochează reclamele direcționate</string>
+    <string name="webTrackingProtectionTargetedAdsDescription">Blochează tehnologiile de urmărire invazive înainte de a se încărca, eliminând eficient reclamele care se bazează pe urmărire.</string>
+    <string name="webTrackingProtectionFingerprintTrackingTitle">Împiedică urmărirea amprentelor digitale</string>
+    <string name="webTrackingProtectionFingerprintTrackingDescription">Ajută la împiedicarea companiilor de urmărire să obțină identificatori unici despre browserul și dispozitivul tău, pe care să îl folosească pentru a te urmări pe web.</string>
+    <string name="webTrackingProtectionLinkTrackingTitle">Blochează urmărirea linkurilor</string>
+    <string name="webTrackingProtectionLinkTrackingDescription">Elimină parametrii de urmărire din linkuri pentru a împiedica terții să-ți urmărească comportamentul pe site-uri.</string>
+    <string name="webTrackingProtectionReferrerTrackingTitle">Protejează împotriva urmăririi numelui de gazdă de referință</string>
+    <string name="webTrackingProtectionReferrerTrackingDescription">Ajută la blocarea identificării de către companii a ultimului site pe care l-ai vizitat.</string>
+    <string name="webTrackingProtectionFirstPartyCookiesTitle">Expiră modulele cookie originale</string>
+    <string name="webTrackingProtectionFirstPartyCookiesDescription">Expiră automat modulele cookie originale după 30 de zile, asigurând faptul că site-urile nu te pot urmări la nesfârșit atunci când ești deconectat.</string>
+    <string name="webTrackingProtectionDnsCnameCloakingTitle">Protejează împotriva disimulării DNS CNAME</string>
+    <string name="webTrackingProtectionDnsCnameCloakingDescription">Ajută la blocarea tehnologiilor de urmărire externe care încearcă să se deghizeze pe un site web folosind DNS.</string>
+    <string name="webTrackingProtectionGoogleAmpTrackingTitle">Blochează urmărirea AMP de la Google</string>
+    <string name="webTrackingProtectionGoogleAmpTrackingDescription">Înlocuiește linkurile Google AMP cu site-ul editorului original.</string>
+    <string name="webTrackingProtectionGoogleSigninPopupsTitle">Blochează ferestrele pop-up de conectare la Google</string>
+    <string name="webTrackingProtectionGoogleSigninPopupsDescription">Blochează ferestrele pop-up de conectare Google pe site-urile pe care nu le deține Google.</string>
+    <string name="webTrackingProtectionGlobalPrivacyControlTitle">Controlul global al confidențialității</string>
+    <string name="webTrackingProtectionGlobalPrivacyControlDescription">Exprimă drepturile de retragere în numele tău, comunicând site-urilor să nu vândă sau să nu partajeze informațiile tale personale.</string>
 
     <!-- Cookie Pop-Up Protection -->
     <string name="cookiePopupProtectionTitle">Protecție pentru ferestre pop-up aferente modulelor cookie</string>
@@ -213,6 +236,7 @@
     <string name="settingsAutomaticallyClearWhatOptionNone">Niciuna</string>
     <string name="settingsAutomaticallyClearWhatOptionTabs">File</string>
     <string name="settingsAutomaticallyClearWhatOptionTabsAndData">File și date</string>
+    <string name="settingsAutomaticallyClearWhatOptionTabsAndDataAndChats">File, date și chaturi Duck.ai</string>
 
     <string name="settingsAutomaticallyClearWhen">Șterge la…</string>
     <string name="settingsAutomaticallyClearWhenDialogTitle">Șterge la…</string>
@@ -222,6 +246,8 @@
     <string name="settingsAutomaticallyClearWhenAppExit15Minutes">Ieșire din aplicație, inactiv timp de 15 minute</string>
     <string name="settingsAutomaticallyClearWhenAppExit30Minutes">Ieșire din aplicație, inactiv timp de 30 de minute</string>
     <string name="settingsAutomaticallyClearWhenAppExit60Minutes">Ieșire din aplicație, inactiv timp de 1 oră</string>
+    <string name="settingsClearAiDataTitle">Șterge chaturile Duck.ai</string>
+    <string name="settingsClearAiDataMessage">Fire Button va șterge și istoricul Duck.ai</string>
 
     <!-- About Activity -->
     <string name="aboutActivityTitle">Despre DuckDuckGo</string>
@@ -246,12 +272,12 @@
     <string name="widgetConfigurationSystemThemeOption">Folosește tema sistemului</string>
     <string name="widgetConfigurationLightThemeOption">Luminoasă</string>
     <string name="widgetConfigurationDarkThemeOption">Intunecată</string>
-    <string name="widgetConfigurationAddWidgetOption">Adăugare widget</string>
+    <string name="widgetConfigurationAddWidgetOption">Adaugă widget</string>
     <string name="searchWidgetEmtpyFavoritesHint">Nu s-a adăugat niciun favorit</string>
     <string name="searchWidgetEmtpyFavoritesCta">Adaugă favorit</string>
     <string name="widgetConfigurationActivityTitle">Configurare widget</string>
-    <string name="favoritesWidgetLabel">Preferințe</string>
-    <string name="searchWidgetLabel">Căutare</string>
+    <string name="favoritesWidgetLabel">Căutare și preferințe</string>
+    <string name="searchWidgetLabel">Caută și pe Duck.ai</string>
 
     <!-- Home Screen Shortcuts -->
     <string name="addToHome">Adaugă pe ecranul de pornire</string>
@@ -406,7 +432,6 @@
     <string name="crashedWebViewErrorAction">"Reîncarcă"</string>
 
     <!-- System Search-->
-    <string name="systemSearchDeviceAppLabel">De pe acest dispozitiv</string>
     <string name="systemSearchAppNotFound">Aplicația nu a fost găsită</string>
     <string name="systemSearchOnboardingThanks">Îți mulțumim că ai ales DuckDuckGo!\nFolosirea browserului nostru te ajută să te protejezi de hackeri, escroci și companii avide după date.</string>
     <string name="systemSearchOnboardingFeaturesIntroText">De asemenea, aplicația DuckDuckGo:</string>
@@ -870,11 +895,6 @@
     <string name="newTabPageDefaultBrowserMessagePrimaryCta" instruction="This text appears on a button">Setează ca implicit</string>
     <string name="newTabPageDefaultBrowserMessageSecondaryCta" instruction="This text appears on a button">Nu întreba din nou</string>
 
-    <!--TabSwitcher Animation Tile Dialog-->
-    <string name="tabSwitcherAnimationTileRemovalDialogTitle">DuckDuckGo blochează tehnologiile de urmărire pentru a-ți proteja navigarea</string>
-    <string name="tabSwitcherAnimationTileRemovalDialogBody">Ștergerea filelor și a datelor tale va șterge istoricul blocării tehnologiilor de urmărire și va reseta acest număr la zero.\n\nAscunde acest banner dacă preferi să nu-l vezi în vizualizarea filelor.</string>
-    <string name="tabSwitcherAnimationTileRemovalDialogNegativeButton">Ascunde bannerul</string>
-
     <!-- Threat protection -->
     <string name="maliciousSiteTitle">Avertizare: acest site ar putea prezenta un risc de securitate</string>
     <string name="maliciousSiteMalwareHeadline"><![CDATA[DuckDuckGo a blocat această pagină deoarece este posibil să distribuie programe rău intenționate, menite să-ți compromită dispozitivul sau să-ți fure datele cu caracter personal.\n<a href=\"\">Află mai multe</a>]]></string>
@@ -941,4 +961,17 @@
     <string name="settingsDuckAiRebranding">Caracteristici AI</string>
     <string name="settingsDuckAi">Duck.ai</string>
 
+    <!--TabSwitcher Trackers Animation-->
+    <string name="showTrackerCountInTabSwitcher">Afișează numărul de tehnologii de urmărire în comutatorul de file</string>
+    <string name="tabSwitcherAnimationTileRemovalDialogTitle" instruction="A title for a dialog that shows when a user clicks a tile that shows them their current blocked tracker count">Ascunzi contorul tehnologiilor de urmărire?</string>
+    <string name="tabSwitcherAnimationTileRemovalDialogBody" instruction="A message for a dialog that shows when a user clicks a tile that shows them their current blocked tracker count">Poți să activezi din nou această opțiune în Setări &gt; Aspect.</string>
+    <string name="tabSwitcherAnimationTileRemovalDialogPositiveButton">Ascunde</string>
+    <string name="tabSwitcherAnimationTileRemovalDialogNegativeButton">Păstrează</string>
+
+    <!-- Widgets -->
+    <string name="searchOnlyWidgetLabel" instruction="Label for the search-only widget">Doar căutare</string>
+    <string name="searchOnlyWidgetDescription" instruction="Description for the search-only widget">Lansează rapid o căutare privată cu DuckDuckGo.</string>
+    <string name="searchWidgetDescription" instruction="Description for the search widget, which may include Duck.ai and voice search">Caută în mod privat cu DuckDuckGo sau întreabă Duck.ai. Căutarea vocală și Duck.ai sunt disponibile dacă sunt activate.</string>
+    <string name="searchAndFavoritesWidgetDescription" instruction="Description for the search and favorites widget">Caută sau vizitează site-urile preferate în mod privat, cu o singură atingere. Căutarea vocală și Duck.ai sunt disponibile dacă sunt activate.</string>
+    <string name="duckAiOnlyPinShortcutLabel" instruction="Label for the Duck.ai pinned shortcut. Should be Duck.ai in all languages">Duck.ai</string>
 </resources>

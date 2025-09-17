@@ -126,6 +126,7 @@
     <!-- Fire -->
     <string name="fireMenu">Изчистване на данни</string>
     <string name="fireClearAll">Изчистване на всички раздели и данни</string>
+    <string name="fireClearAllPlusDuckChats">Изчистване на всички раздели, данни и чатове с Duck.ai</string>
     <string name="fireCancel">Отмени</string>
     <string name="fireDataCleared">Данните са изчистени</string>
 
@@ -189,6 +190,28 @@
     <string name="webTrackingProtectionLearnMoreTitle">Защита от проследяване в мрежата</string>
     <string name="webTrackingProtectionTitle">Защита от проследяване в мрежата</string>
     <string name="webTrackingProtectionDescriptionNew"><![CDATA[DuckDuckGo автоматично блокира скритите тракери, докато сърфирате в мрежата.\n<a href=\"\">Научете повече</a>]]></string>
+    <string name="webTrackingProtectionExplanationDescription"><![CDATA[Браузърът DuckDuckGo предоставя защити от проследяване, които винаги са активни.\n<a href=\"\">Научете повече</a>]]></string>
+    <string name="webTrackingProtectionExplanationTitle">Как защитаваме теб</string>
+    <string name="webTrackingProtectionThirdPartyTrackersTitle">Блокира тракерите на трети страни</string>
+    <string name="webTrackingProtectionThirdPartyTrackersDescription">Помага да се блокират бисквитките на 3-ти страни, които ви проследяват от сайт на сайт, като предотвратява зареждането на тракери на 3-ти страни от самото начало.</string>
+    <string name="webTrackingProtectionTargetedAdsTitle">Блокира насочени реклами</string>
+    <string name="webTrackingProtectionTargetedAdsDescription">Блокира инвазивните тракери, преди да се заредят, като ефективно елиминира рекламите, които разчитат на проследяването.</string>
+    <string name="webTrackingProtectionFingerprintTrackingTitle">Предотвратява проследяването с пръстови отпечатъци</string>
+    <string name="webTrackingProtectionFingerprintTrackingDescription">Помага да се предотврати получаването на уникални идентификатори за вашия браузър и устройство от страна на компаниите за проследяване, които те използват, за да ви следят в интернет.</string>
+    <string name="webTrackingProtectionLinkTrackingTitle">Блокира проследяването на линкове</string>
+    <string name="webTrackingProtectionLinkTrackingDescription">Премахва параметрите за проследяване във връзките, за да попречи на 3-ти страни да следят поведението ти в различни сайтове.</string>
+    <string name="webTrackingProtectionReferrerTrackingTitle">Предпазва от проследяване с препращане</string>
+    <string name="webTrackingProtectionReferrerTrackingDescription">Предотвратява идентифицирането на последния уебсайт, който сте посетили, от страна на компаниите.</string>
+    <string name="webTrackingProtectionFirstPartyCookiesTitle">Приключва срока на действие на бисквитките на първи страни</string>
+    <string name="webTrackingProtectionFirstPartyCookiesDescription">Бисквитките от 1-ва страна изтичат автоматично след 30 дни, което гарантира, че сайтовете не могат да ви проследяват за неопределено време, когато сте излезли.</string>
+    <string name="webTrackingProtectionDnsCnameCloakingTitle">Защитава срещу прикриване с DNS CNAME</string>
+    <string name="webTrackingProtectionDnsCnameCloakingDescription">Блокира тракерите на трети страни, които се опитват да се представят като част от уебсайт с помощта на DNS.</string>
+    <string name="webTrackingProtectionGoogleAmpTrackingTitle">Блокира AMP проследяването на Google</string>
+    <string name="webTrackingProtectionGoogleAmpTrackingDescription">Заменя Google AMP връзките с оригиналния сайт на издателя.</string>
+    <string name="webTrackingProtectionGoogleSigninPopupsTitle">Блокира изскачащите прозорци за влизане в Google</string>
+    <string name="webTrackingProtectionGoogleSigninPopupsDescription">Блокира изскачащите прозорци за влизане в Google на сайтове, които не са собственост на Google.</string>
+    <string name="webTrackingProtectionGlobalPrivacyControlTitle">Глобален контрол на поверителността</string>
+    <string name="webTrackingProtectionGlobalPrivacyControlDescription">Упражнява правото Ви на отказ от Ваше име, като казва на сайтовете да не продават или споделят личната Ви информация.</string>
 
     <!-- Cookie Pop-Up Protection -->
     <string name="cookiePopupProtectionTitle">Защита от изскачащи прозорци за бисквитки</string>
@@ -212,6 +235,7 @@
     <string name="settingsAutomaticallyClearWhatOptionNone">Няма</string>
     <string name="settingsAutomaticallyClearWhatOptionTabs">Раздели</string>
     <string name="settingsAutomaticallyClearWhatOptionTabsAndData">Раздели и данни</string>
+    <string name="settingsAutomaticallyClearWhatOptionTabsAndDataAndChats">Раздели, данни и чатове с Duck.ai</string>
 
     <string name="settingsAutomaticallyClearWhen">Изчистване на…</string>
     <string name="settingsAutomaticallyClearWhenDialogTitle">Изчистване на…</string>
@@ -221,6 +245,8 @@
     <string name="settingsAutomaticallyClearWhenAppExit15Minutes">Изход от приложението, неактивен за 15 минути</string>
     <string name="settingsAutomaticallyClearWhenAppExit30Minutes">Изход от приложението, неактивен за 30 минути</string>
     <string name="settingsAutomaticallyClearWhenAppExit60Minutes">Изход от приложението, 1 час без активност</string>
+    <string name="settingsClearAiDataTitle">Изчистване на чатовете с Duck.ai</string>
+    <string name="settingsClearAiDataMessage">Fire Button ще изтрие също и историята на Duck.ai</string>
 
     <!-- About Activity -->
     <string name="aboutActivityTitle">Относно DuckDuckGo</string>
@@ -249,8 +275,8 @@
     <string name="searchWidgetEmtpyFavoritesHint">Все още няма добавени любими</string>
     <string name="searchWidgetEmtpyFavoritesCta">Добавяне в любими</string>
     <string name="widgetConfigurationActivityTitle">Конфигуриране на уиджет</string>
-    <string name="favoritesWidgetLabel">Любими</string>
-    <string name="searchWidgetLabel">Търсене</string>
+    <string name="favoritesWidgetLabel">Търсене и любими</string>
+    <string name="searchWidgetLabel">Търсене и Duck.ai</string>
 
     <!-- Home Screen Shortcuts -->
     <string name="addToHome">Добавете към Начална Страница</string>
@@ -405,7 +431,6 @@
     <string name="crashedWebViewErrorAction">"Презареждане"</string>
 
     <!-- System Search-->
-    <string name="systemSearchDeviceAppLabel">От това устройство</string>
     <string name="systemSearchAppNotFound">Приложението не може да бъде намерено</string>
     <string name="systemSearchOnboardingThanks">Благодарим Ви, че избрахте DuckDuckGo!\nИзползването на нашия браузър помага да се защитите от хакери, измамници и жадни за данни компании.</string>
     <string name="systemSearchOnboardingFeaturesIntroText">Приложението също:</string>
@@ -854,11 +879,6 @@
     <string name="newTabPageDefaultBrowserMessagePrimaryCta" instruction="This text appears on a button">Задаване по подразбиране</string>
     <string name="newTabPageDefaultBrowserMessageSecondaryCta" instruction="This text appears on a button">Не ме питай повече</string>
 
-    <!--TabSwitcher Animation Tile Dialog-->
-    <string name="tabSwitcherAnimationTileRemovalDialogTitle">DuckDuckGo блокира тракерите и Ви защитава при сърфиране</string>
-    <string name="tabSwitcherAnimationTileRemovalDialogBody">Когато изчистите разделите и данните, историята на блокираните тракери ще бъде изтрита и това число ще се нулира.\n\nСкрийте този банер, ако предпочитате да не го виждате в изгледа на разделите.</string>
-    <string name="tabSwitcherAnimationTileRemovalDialogNegativeButton">Скриване на банера</string>
-
     <!-- Threat protection -->
     <string name="maliciousSiteTitle">Предупреждение: Този сайт може да представлява риск за сигурността</string>
     <string name="maliciousSiteMalwareHeadline"><![CDATA[DuckDuckGo блокира тази страница, защото тя може да разпространява зловреден софтуер, който да компрометира устройството ви или да открадне личната ви информация.\n<a href=\"\">Научете повече</a>]]></string>
@@ -923,4 +943,17 @@
     <string name="settingsDuckAiRebranding">Функции с изкуствен интелект</string>
     <string name="settingsDuckAi">Duck.ai</string>
 
+    <!--TabSwitcher Trackers Animation-->
+    <string name="showTrackerCountInTabSwitcher">Показване на броя на тракерите в превключвателя на раздели</string>
+    <string name="tabSwitcherAnimationTileRemovalDialogTitle" instruction="A title for a dialog that shows when a user clicks a tile that shows them their current blocked tracker count">Искате ли да скриете брояча на тракери?</string>
+    <string name="tabSwitcherAnimationTileRemovalDialogBody" instruction="A message for a dialog that shows when a user clicks a tile that shows them their current blocked tracker count">Можете да го включите отново в Настройки &gt; Външен вид.</string>
+    <string name="tabSwitcherAnimationTileRemovalDialogPositiveButton">Скрий</string>
+    <string name="tabSwitcherAnimationTileRemovalDialogNegativeButton">Запазване</string>
+
+    <!-- Widgets -->
+    <string name="searchOnlyWidgetLabel" instruction="Label for the search-only widget">Само търсене</string>
+    <string name="searchOnlyWidgetDescription" instruction="Description for the search-only widget">Стартирай бързо анонимно търсене с DuckDuckGo.</string>
+    <string name="searchWidgetDescription" instruction="Description for the search widget, which may include Duck.ai and voice search">Търси анонимно с DuckDuckGo или попитай Duck.ai. Гласово търсене и Duck.ai са налични, ако са активирани.</string>
+    <string name="searchAndFavoritesWidgetDescription" instruction="Description for the search and favorites widget">Търсете или посещавайте любимите си сайтове анонимно с едно докосване. Гласово търсене и Duck.ai са налични, ако са активирани.</string>
+    <string name="duckAiOnlyPinShortcutLabel" instruction="Label for the Duck.ai pinned shortcut. Should be Duck.ai in all languages">Duck.ai</string>
 </resources>

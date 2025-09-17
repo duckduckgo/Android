@@ -126,6 +126,7 @@
     <!-- Fire -->
     <string name="fireMenu">Poista tiedot</string>
     <string name="fireClearAll">Poista kaikki välilehdet ja tiedot</string>
+    <string name="fireClearAllPlusDuckChats">Tyhjennä kaikki välilehdet, tiedot ja Duck.ai-keskustelut</string>
     <string name="fireCancel">Peruuta</string>
     <string name="fireDataCleared">Tiedot poistettu</string>
 
@@ -189,6 +190,28 @@
     <string name="webTrackingProtectionLearnMoreTitle">Verkkoseurannan suojaus</string>
     <string name="webTrackingProtectionTitle">Verkkoseurannan suojaus</string>
     <string name="webTrackingProtectionDescriptionNew"><![CDATA[DuckDuckGo estää automaattisesti piilotetut jäljittäjät, kun selaat verkkoa.\n<a href=\"\">Lue lisää</a>]]></string>
+    <string name="webTrackingProtectionExplanationDescription"><![CDATA[DuckDuckGo-selain tarjoaa aina käytössä olevan seurantasuojauksen.\n<a href=\"\">Lue lisää</a>]]></string>
+    <string name="webTrackingProtectionExplanationTitle">Näin suojaamme sinua</string>
+    <string name="webTrackingProtectionThirdPartyTrackersTitle">Estää kolmannen osapuolen seuraimet</string>
+    <string name="webTrackingProtectionThirdPartyTrackersDescription">Auttaa estämään kolmannen osapuolen evästeitä, jotka seuraavat sinua sivustolta toiselle, estämällä kolmannen osapuolen seurantatoimintoja latautumasta.</string>
+    <string name="webTrackingProtectionTargetedAdsTitle">Estää kohdennetut mainokset</string>
+    <string name="webTrackingProtectionTargetedAdsDescription">Estää tunkeilevat seurantatoiminnot ennen niiden latautumista, mikä eliminoi tehokkaasti seurantaa käyttävät mainokset.</string>
+    <string name="webTrackingProtectionFingerprintTrackingTitle">Estää sormenjälkien seurannan</string>
+    <string name="webTrackingProtectionFingerprintTrackingDescription">Auttaa estämään seurantayrityksiä hankkimasta selaimestasi ja laitteestasi yksilöllisiä tunnisteita, joiden avulla ne seuraavat sinua verkossa.</string>
+    <string name="webTrackingProtectionLinkTrackingTitle">Estää linkkien seurannan</string>
+    <string name="webTrackingProtectionLinkTrackingDescription">Poistaa seurantaparametrit linkeistä estääkseen kolmansia osapuolia seuraamasta toimintaasi eri sivustoilla.</string>
+    <string name="webTrackingProtectionReferrerTrackingTitle">Suojaa viittausseurannalta</string>
+    <string name="webTrackingProtectionReferrerTrackingDescription">Auttaa estämään yrityksiä tunnistamasta verkkosivustoa, jossa viimeksi vierailit.</string>
+    <string name="webTrackingProtectionFirstPartyCookiesTitle">Vanhentaa ensimmäisen osapuolen evästeet</string>
+    <string name="webTrackingProtectionFirstPartyCookiesDescription">Vanhentaa automaattisesti ensimmäisen osapuolen evästeet 30 päivän kuluttua, jotta sivustot eivät voi seurata sinua loputtomiin, kun olet kirjautunut ulos.</string>
+    <string name="webTrackingProtectionDnsCnameCloakingTitle">Suojaa DNS CNAME -naamioitumiselta</string>
+    <string name="webTrackingProtectionDnsCnameCloakingDescription">Auttaa estämään kolmannen osapuolen seurantalaitteet, jotka yrittävät naamioida itsensä verkkosivustolla DNS:n avulla.</string>
+    <string name="webTrackingProtectionGoogleAmpTrackingTitle">Estää Googlen AMP-seurannan</string>
+    <string name="webTrackingProtectionGoogleAmpTrackingDescription">Korvaa Googlen AMP-linkit alkuperäisen julkaisijan sivuston linkeillä.</string>
+    <string name="webTrackingProtectionGoogleSigninPopupsTitle">Estää Googlen kirjautumisponnahdusikkunat</string>
+    <string name="webTrackingProtectionGoogleSigninPopupsDescription">Estää Googlen kirjautumisponnahdusikkunat sivustoissa, joita Google ei omista.</string>
+    <string name="webTrackingProtectionGlobalPrivacyControlTitle">Global Privacy Control (GPC)</string>
+    <string name="webTrackingProtectionGlobalPrivacyControlDescription">Ilmaisee kieltäytymisoikeudet puolestasi kertomalla sivustoille, etteivät ne saa myydä tai jakaa henkilötietojasi.</string>
 
     <!-- Cookie Pop-Up Protection -->
     <string name="cookiePopupProtectionTitle">Evästeiden ponnahdusikkuna -suojaus</string>
@@ -212,6 +235,7 @@
     <string name="settingsAutomaticallyClearWhatOptionNone">Ei mitään</string>
     <string name="settingsAutomaticallyClearWhatOptionTabs">Välilehdet</string>
     <string name="settingsAutomaticallyClearWhatOptionTabsAndData">Välilehdet ja tiedot</string>
+    <string name="settingsAutomaticallyClearWhatOptionTabsAndDataAndChats">Välilehdet, tiedot ja Duck.ai-keskustelut</string>
 
     <string name="settingsAutomaticallyClearWhen">Tyhjennä…</string>
     <string name="settingsAutomaticallyClearWhenDialogTitle">Tyhjennä…</string>
@@ -221,6 +245,8 @@
     <string name="settingsAutomaticallyClearWhenAppExit15Minutes">Sovelluksesta poistuttaessa, 15 minuutin toimettomuuden jälkeen</string>
     <string name="settingsAutomaticallyClearWhenAppExit30Minutes">Sovelluksesta poistuttaessa, 30 minuutin toimettomuuden jälkeen</string>
     <string name="settingsAutomaticallyClearWhenAppExit60Minutes">Sovelluksesta poistuttaessa, 1 tunnin toimettomuuden jälkeen</string>
+    <string name="settingsClearAiDataTitle">Tyhjennä Duck.ai-keskustelut</string>
+    <string name="settingsClearAiDataMessage">Fire Button poistaa myös Duck.ai-historian</string>
 
     <!-- About Activity -->
     <string name="aboutActivityTitle">Tietoa DuckDuckGo:sta</string>
@@ -249,8 +275,8 @@
     <string name="searchWidgetEmtpyFavoritesHint">Suosikkeja ei ole vielä lisätty</string>
     <string name="searchWidgetEmtpyFavoritesCta">Lisää suosikki</string>
     <string name="widgetConfigurationActivityTitle">Widget-asetukset</string>
-    <string name="favoritesWidgetLabel">Suosikit</string>
-    <string name="searchWidgetLabel">Hae</string>
+    <string name="favoritesWidgetLabel">Haku ja suosikit</string>
+    <string name="searchWidgetLabel">Haku ja Duck.ai</string>
 
     <!-- Home Screen Shortcuts -->
     <string name="addToHome">Lisää kotinäytölle</string>
@@ -405,7 +431,6 @@
     <string name="crashedWebViewErrorAction">"Lataa uudelleen"</string>
 
     <!-- System Search-->
-    <string name="systemSearchDeviceAppLabel">Tästä laitteesta</string>
     <string name="systemSearchAppNotFound">Sovellusta ei löytynyt</string>
     <string name="systemSearchOnboardingThanks">Kiitos, että valitsit DuckDuckGon!\nSelaimemme käyttö auttaa suojaamaan sinua hakkereilta, huijareilta ja tietoa janoavilta yrityksiltä.</string>
     <string name="systemSearchOnboardingFeaturesIntroText">DuckDuckGo-sovellus myös:</string>
@@ -854,11 +879,6 @@
     <string name="newTabPageDefaultBrowserMessagePrimaryCta" instruction="This text appears on a button">Aseta oletukseksi</string>
     <string name="newTabPageDefaultBrowserMessageSecondaryCta" instruction="This text appears on a button">Älä kysy uudelleen</string>
 
-    <!--TabSwitcher Animation Tile Dialog-->
-    <string name="tabSwitcherAnimationTileRemovalDialogTitle">DuckDuckGo suojaa selaamistasi estämällä seurantatoiminnot</string>
-    <string name="tabSwitcherAnimationTileRemovalDialogBody">Välilehtiesi ja tietojesi tyhjentäminen poistaa seurantatoimintojen estohistorian ja palauttaa tämän luvun nollaan.\n\nJos et halua nähdä tätä banneria välilehtinäkymässä, piilota se.</string>
-    <string name="tabSwitcherAnimationTileRemovalDialogNegativeButton">Piilota banneri</string>
-
     <!-- Threat protection -->
     <string name="maliciousSiteTitle">Varoitus: Tämä sivusto saattaa olla tietoturvariski</string>
     <string name="maliciousSiteMalwareHeadline"><![CDATA[DuckDuckGo esti tämän sivun, koska se saattaa levittää haittaohjelmia, jotka voivat vaarantaa laitteesi tai varastaa henkilökohtaisia tietojasi.\n<a href=\"\">Lue lisää</a>]]></string>
@@ -923,4 +943,17 @@
     <string name="settingsDuckAiRebranding">Tekoälyominaisuudet</string>
     <string name="settingsDuckAi">Duck.ai</string>
 
+    <!--TabSwitcher Trackers Animation-->
+    <string name="showTrackerCountInTabSwitcher">Näytä seurantaohjelmien määrä välilehtien vaihtotyökalussa</string>
+    <string name="tabSwitcherAnimationTileRemovalDialogTitle" instruction="A title for a dialog that shows when a user clicks a tile that shows them their current blocked tracker count">Piilotetaanko seurantalaskuri?</string>
+    <string name="tabSwitcherAnimationTileRemovalDialogBody" instruction="A message for a dialog that shows when a user clicks a tile that shows them their current blocked tracker count">Voit ottaa tämän takaisin käyttöön kohdassa Asetukset &gt; Ulkoasu.</string>
+    <string name="tabSwitcherAnimationTileRemovalDialogPositiveButton">Piilota</string>
+    <string name="tabSwitcherAnimationTileRemovalDialogNegativeButton">Säilytä</string>
+
+    <!-- Widgets -->
+    <string name="searchOnlyWidgetLabel" instruction="Label for the search-only widget">Vain haku</string>
+    <string name="searchOnlyWidgetDescription" instruction="Description for the search-only widget">Käynnistä yksityinen haku DuckDuckGo:lla nopeasti.</string>
+    <string name="searchWidgetDescription" instruction="Description for the search widget, which may include Duck.ai and voice search">Tee yksityisiä hakuja DuckDuckGo:n avulla tai kysy Duck.ai:lta. Äänihaku ja Duck.ai ovat käytettävissä, jos ne on aktivoitu.</string>
+    <string name="searchAndFavoritesWidgetDescription" instruction="Description for the search and favorites widget">Tee hakuja ja käy lempisivustoillasi yhdellä napautuksella. Äänihaku ja Duck.ai ovat käytettävissä, jos ne on aktivoitu.</string>
+    <string name="duckAiOnlyPinShortcutLabel" instruction="Label for the Duck.ai pinned shortcut. Should be Duck.ai in all languages">Duck.ai</string>
 </resources>

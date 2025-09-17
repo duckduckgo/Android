@@ -21,7 +21,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/appBarLayoutMockup"
     android:layout_width="match_parent"
-    android:layout_height="@dimen/toolbarSize"
+    android:layout_height="?attr/actionBarSize"
     android:background="?daxColorToolbar"
     android:clipChildren="false">
 

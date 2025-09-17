@@ -126,6 +126,7 @@
     <!-- Fire -->
     <string name="fireMenu">Gegevens wissen</string>
     <string name="fireClearAll">Alle tabbladen en gegevens wissen</string>
+    <string name="fireClearAllPlusDuckChats">Alle tabbladen, gegevens en Duck.ai-chats wissen</string>
     <string name="fireCancel">Annuleren</string>
     <string name="fireDataCleared">Gegevens gewist</string>
 
@@ -189,6 +190,28 @@
     <string name="webTrackingProtectionLearnMoreTitle">Bescherming tegen webtracking</string>
     <string name="webTrackingProtectionTitle">Bescherming tegen webtracking</string>
     <string name="webTrackingProtectionDescriptionNew"><![CDATA[DuckDuckGo blokkeert automatisch verborgen trackers terwijl je op het web surft.\n<a href=\"\">Meer informatie</a>]]></string>
+    <string name="webTrackingProtectionExplanationDescription"><![CDATA[De DuckDuckGo-browser biedt bescherming tegen tracking die altijd actief is.\n<a href=\"\">Meer informatie</a>]]></string>
+    <string name="webTrackingProtectionExplanationTitle">Hoe wij je beschermen</string>
+    <string name="webTrackingProtectionThirdPartyTrackersTitle">Blokkeert trackers van derden</string>
+    <string name="webTrackingProtectionThirdPartyTrackersDescription">Helpt bij het blokkeren van cookies van derden die je op elke website volgen door te voorkomen dat trackers van derden überhaupt worden geladen.</string>
+    <string name="webTrackingProtectionTargetedAdsTitle">Blokkeert gerichte advertenties</string>
+    <string name="webTrackingProtectionTargetedAdsDescription">We blokkeren invasieve trackers voordat ze worden geladen. Zo elimineren we effectief advertenties die afhankelijk zijn van tracking.</string>
+    <string name="webTrackingProtectionFingerprintTrackingTitle">Voorkomt fingerprint tracking</string>
+    <string name="webTrackingProtectionFingerprintTrackingDescription">Helpt voorkomen dat trackingbedrijven unieke identificatiegegevens over je browser en apparaat verkrijgen, die ze gebruiken om je op het internet te volgen.</string>
+    <string name="webTrackingProtectionLinkTrackingTitle">Blokkeert het volgen van links</string>
+    <string name="webTrackingProtectionLinkTrackingDescription">Verwijdert trackingparameters in links om te voorkomen dat derden je gedrag op verschillende sites kunnen volgen.</string>
+    <string name="webTrackingProtectionReferrerTrackingTitle">Beschermt tegen referrer tracking</string>
+    <string name="webTrackingProtectionReferrerTrackingDescription">Helpt voorkomen dat bedrijven de laatst bezochte website kunnen identificeren.</string>
+    <string name="webTrackingProtectionFirstPartyCookiesTitle">Laat cookies van eerste partijen vervallen</string>
+    <string name="webTrackingProtectionFirstPartyCookiesDescription">Verlaat automatisch cookies van eerste partijen na 30 dagen, zodat sites je niet onbeperkt kunnen volgen als je bent uitgelogd.</string>
+    <string name="webTrackingProtectionDnsCnameCloakingTitle">Beschermt tegen DNS CNAME cloaking</string>
+    <string name="webTrackingProtectionDnsCnameCloakingDescription">Helpt bij het blokkeren van trackers van derden die zich proberen te vermommen binnen een website met behulp van DNS.</string>
+    <string name="webTrackingProtectionGoogleAmpTrackingTitle">Blokkeert Google\'s AMP-tracking</string>
+    <string name="webTrackingProtectionGoogleAmpTrackingDescription">Vervangt Google AMP-links door de site van de oorspronkelijke uitgever.</string>
+    <string name="webTrackingProtectionGoogleSigninPopupsTitle">Blokkeert de pop-ups voor aanmelden bij Google</string>
+    <string name="webTrackingProtectionGoogleSigninPopupsDescription">Blokkeert aanmeldingspop-ups van Google op sites die niet van Google zijn.</string>
+    <string name="webTrackingProtectionGlobalPrivacyControlTitle">Global Privacy Control (GPC)</string>
+    <string name="webTrackingProtectionGlobalPrivacyControlDescription">Kiest er namens jou voor om je af te melden door sites mee te delen je persoonlijke gegevens niet te verkopen of te delen.</string>
 
     <!-- Cookie Pop-Up Protection -->
     <string name="cookiePopupProtectionTitle">Bescherming tegen cookiepop-ups</string>
@@ -212,6 +235,7 @@
     <string name="settingsAutomaticallyClearWhatOptionNone">Geen</string>
     <string name="settingsAutomaticallyClearWhatOptionTabs">Tabbladen</string>
     <string name="settingsAutomaticallyClearWhatOptionTabsAndData">Tabbladen en gegevens</string>
+    <string name="settingsAutomaticallyClearWhatOptionTabsAndDataAndChats">Tabbladen, gegevens en Duck.ai-chats</string>
 
     <string name="settingsAutomaticallyClearWhen">Wissen op…</string>
     <string name="settingsAutomaticallyClearWhenDialogTitle">Wissen op…</string>
@@ -221,6 +245,8 @@
     <string name="settingsAutomaticallyClearWhenAppExit15Minutes">App afsluiten, 15 minuten inactief</string>
     <string name="settingsAutomaticallyClearWhenAppExit30Minutes">App afsluiten, 30 minuten inactief</string>
     <string name="settingsAutomaticallyClearWhenAppExit60Minutes">App afsluiten, 1 uur inactief</string>
+    <string name="settingsClearAiDataTitle">Duck.ai chats wissen</string>
+    <string name="settingsClearAiDataMessage">De Fire Button verwijdert ook de Duck.ai-geschiedenis</string>
 
     <!-- About Activity -->
     <string name="aboutActivityTitle">Over DuckDuckGo</string>
@@ -249,8 +275,8 @@
     <string name="searchWidgetEmtpyFavoritesHint">Nog geen favorieten toegevoegd</string>
     <string name="searchWidgetEmtpyFavoritesCta">Favoriet toevoegen</string>
     <string name="widgetConfigurationActivityTitle">Widgetconfiguratie</string>
-    <string name="favoritesWidgetLabel">Favorieten</string>
-    <string name="searchWidgetLabel">Zoeken</string>
+    <string name="favoritesWidgetLabel">Zoeken en Favorieten</string>
+    <string name="searchWidgetLabel">Zoeken en Duck.ai</string>
 
     <!-- Home Screen Shortcuts -->
     <string name="addToHome">Toevoegen aan Home Screen</string>
@@ -405,7 +431,6 @@
     <string name="crashedWebViewErrorAction">"Opnieuw laden"</string>
 
     <!-- System Search-->
-    <string name="systemSearchDeviceAppLabel">Van dit apparaat</string>
     <string name="systemSearchAppNotFound">Toepassing kon niet worden gevonden</string>
     <string name="systemSearchOnboardingThanks">Bedankt dat je voor DuckDuckGo hebt gekozen!\nDoor onze browser te gebruiken, blijf je beschermd tegen hackers, oplichters en bedrijven die gegevens indrinken als water.</string>
     <string name="systemSearchOnboardingFeaturesIntroText">De DuckDuckGo-app:</string>
@@ -854,11 +879,6 @@
     <string name="newTabPageDefaultBrowserMessagePrimaryCta" instruction="This text appears on a button">Als standaard instellen</string>
     <string name="newTabPageDefaultBrowserMessageSecondaryCta" instruction="This text appears on a button">Niet opnieuw vragen</string>
 
-    <!--TabSwitcher Animation Tile Dialog-->
-    <string name="tabSwitcherAnimationTileRemovalDialogTitle">DuckDuckGo blokkeert trackers om je te beschermen tijdens het browsen  </string>
-    <string name="tabSwitcherAnimationTileRemovalDialogBody">Als je je tabbladen en gegevens wist, wordt je geschiedenis met geblokkeerde trackers verwijderd. Dit getal wordt dan weer op nul gezet.\n\nVerberg deze banner als je deze liever niet in de tabbladweergave wilt zien.</string>
-    <string name="tabSwitcherAnimationTileRemovalDialogNegativeButton">Banner verbergen</string>
-
     <!-- Threat protection -->
     <string name="maliciousSiteTitle">Waarschuwing: Deze website vormt mogelijk een veiligheidsrisico</string>
     <string name="maliciousSiteMalwareHeadline"><![CDATA[DuckDuckGo heeft deze pagina geblokkeerd omdat deze mogelijk malware verspreidt om je apparaat te beschadigen of je persoonlijke gegevens te stelen.\n<a href=\"\">Meer informatie</a>]]></string>
@@ -923,4 +943,17 @@
     <string name="settingsDuckAiRebranding">AI-functies</string>
     <string name="settingsDuckAi">Duck.ai</string>
 
+    <!--TabSwitcher Trackers Animation-->
+    <string name="showTrackerCountInTabSwitcher">Aantal trackers in tabbladwisselaar</string>
+    <string name="tabSwitcherAnimationTileRemovalDialogTitle" instruction="A title for a dialog that shows when a user clicks a tile that shows them their current blocked tracker count">Trackertelling verbergen?</string>
+    <string name="tabSwitcherAnimationTileRemovalDialogBody" instruction="A message for a dialog that shows when a user clicks a tile that shows them their current blocked tracker count">Je kunt dit weer inschakelen in Instellingen &gt; Weergave.</string>
+    <string name="tabSwitcherAnimationTileRemovalDialogPositiveButton">Verbergen</string>
+    <string name="tabSwitcherAnimationTileRemovalDialogNegativeButton">Bewaren</string>
+
+    <!-- Widgets -->
+    <string name="searchOnlyWidgetLabel" instruction="Label for the search-only widget">Alleen zoeken</string>
+    <string name="searchOnlyWidgetDescription" instruction="Description for the search-only widget">Voer snel een privézoekopdracht uit in DuckDuckGo.</string>
+    <string name="searchWidgetDescription" instruction="Description for the search widget, which may include Duck.ai and voice search">Zoek privé met DuckDuckGo of vraag het aan Duck.ai. Voice Search en Duck.ai zijn beschikbaar indien ingeschakeld.</string>
+    <string name="searchAndFavoritesWidgetDescription" instruction="Description for the search and favorites widget">Zoek of bezoek je favoriete sites in de privémodus met één tik. Zoeken via spraak en Duck.ai zijn beschikbaar indien ingeschakeld.</string>
+    <string name="duckAiOnlyPinShortcutLabel" instruction="Label for the Duck.ai pinned shortcut. Should be Duck.ai in all languages">Duck.ai</string>
 </resources>

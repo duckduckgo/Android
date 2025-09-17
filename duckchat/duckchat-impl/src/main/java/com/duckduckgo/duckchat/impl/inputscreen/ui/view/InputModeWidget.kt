@@ -40,19 +40,26 @@ import androidx.core.view.isVisible
 import androidx.core.widget.doAfterTextChanged
 import androidx.core.widget.doOnTextChanged
 import com.duckduckgo.anvil.annotations.InjectWith
+import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.ui.view.addBottomShadow
-import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.duckchat.impl.R
-import com.duckduckgo.mobile.android.R as CommonR
+import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
+import com.duckduckgo.duckchat.impl.pixel.inputScreenPixelsModeParam
 import com.google.android.material.card.MaterialCardView
 import com.google.android.material.tabs.TabLayout
+import dagger.android.support.AndroidSupportInjection
+import javax.inject.Inject
 
-@InjectWith(ActivityScope::class)
+@InjectWith(ViewScope::class)
 class InputModeWidget @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyle: Int = 0,
 ) : ConstraintLayout(context, attrs, defStyle) {
+
+    @Inject
+    lateinit var pixel: Pixel
 
     val inputField: EditText
     private val inputFieldClearText: View
@@ -114,6 +121,11 @@ class InputModeWidget @JvmOverloads constructor(
         configureShadow()
     }
 
+    override fun onAttachedToWindow() {
+        AndroidSupportInjection.inject(this)
+        super.onAttachedToWindow()
+    }
+
     fun provideInitialText(text: String) {
         originalText = text
         this.text = text
@@ -129,8 +141,15 @@ class InputModeWidget @JvmOverloads constructor(
             inputField.setSelection(0)
             inputField.scrollTo(0, 0)
             beginChangeBoundsTransition()
+            val params = inputScreenPixelsModeParam(isSearchMode = inputModeSwitch.selectedTabPosition == 0)
+            pixel.fire(DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_OMNIBAR_CLEAR_BUTTON_PRESSED, parameters = params)
         }
-        inputModeWidgetBack.setOnClickListener { onBack?.invoke() }
+        inputModeWidgetBack.setOnClickListener {
+            onBack?.invoke()
+
+            val params = inputScreenPixelsModeParam(isSearchMode = inputModeSwitch.selectedTabPosition == 0)
+            pixel.fire(DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_OMNIBAR_BACK_BUTTON_PRESSED, parameters = params)
+        }
         inputField.setOnClickListener {
             onInputFieldClicked?.invoke()
         }
@@ -142,6 +161,9 @@ class InputModeWidget @JvmOverloads constructor(
         setOnEditorActionListener { _, actionId, _ ->
             if (actionId == EditorInfo.IME_ACTION_GO) {
                 submitMessage()
+
+                val params = inputScreenPixelsModeParam(isSearchMode = inputModeSwitch.selectedTabPosition == 0)
+                pixel.fire(DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_OMNIBAR_KEYBOARD_GO_PRESSED, parameters = params)
                 true
             } else {
                 false
@@ -298,12 +320,7 @@ class InputModeWidget @JvmOverloads constructor(
 
     private fun configureShadow() {
         if (Build.VERSION.SDK_INT >= 28) {
-            inputModeWidgetCard.addBottomShadow(
-                shadowSizeDp = 12f,
-                offsetYDp = 3f,
-                insetDp = 3f,
-                shadowColor = context.getColor(CommonR.color.background_omnibar_shadow),
-            )
+            inputModeWidgetCard.addBottomShadow()
         }
     }
 

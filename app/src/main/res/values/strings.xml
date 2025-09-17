@@ -125,6 +125,7 @@
     <!-- Fire -->
     <string name="fireMenu">Clear Data</string>
     <string name="fireClearAll">Clear All Tabs And Data</string>
+    <string name="fireClearAllPlusDuckChats">Clear All Tabs, Data, and Duck.ai Chats</string>
     <string name="fireCancel">Cancel</string>
     <string name="fireDataCleared">Data cleared</string>
 
@@ -188,6 +189,28 @@
     <string name="webTrackingProtectionLearnMoreTitle">Web Tracking Protection</string>
     <string name="webTrackingProtectionTitle">Web Tracking Protection</string>
     <string name="webTrackingProtectionDescriptionNew"><![CDATA[DuckDuckGo automatically blocks hidden trackers as you browse the web.\n<a href="">Learn More</a>]]></string>
+    <string name="webTrackingProtectionExplanationDescription"><![CDATA[The DuckDuckGo browser provides tracking protections, which are always active.\n<a href="">Learn More</a>]]></string>
+    <string name="webTrackingProtectionExplanationTitle">How We Protect You</string>
+    <string name="webTrackingProtectionThirdPartyTrackersTitle">Blocks 3rd-party trackers</string>
+    <string name="webTrackingProtectionThirdPartyTrackersDescription">Helps block 3rd-party cookies that track you from site to site by preventing 3rd-party trackers from loading in the first place.</string>
+    <string name="webTrackingProtectionTargetedAdsTitle">Blocks targeted ads</string>
+    <string name="webTrackingProtectionTargetedAdsDescription">Blocks invasive trackers before they load, effectively eliminating ads that rely on tracking.</string>
+    <string name="webTrackingProtectionFingerprintTrackingTitle">Prevents fingerprint tracking</string>
+    <string name="webTrackingProtectionFingerprintTrackingDescription">Helps stop tracking companies from obtaining unique identifiers about your browser and device, which they use to follow you around the web.</string>
+    <string name="webTrackingProtectionLinkTrackingTitle">Blocks link tracking</string>
+    <string name="webTrackingProtectionLinkTrackingDescription">Removes tracking parameters in links to prevent 3rd parties from tracking your behavior across sites.</string>
+    <string name="webTrackingProtectionReferrerTrackingTitle">Protects against referrer tracking</string>
+    <string name="webTrackingProtectionReferrerTrackingDescription">Helps block companies from identifying the last website you visited.</string>
+    <string name="webTrackingProtectionFirstPartyCookiesTitle">Expires 1st-party cookies</string>
+    <string name="webTrackingProtectionFirstPartyCookiesDescription">Automatically expires 1st-party cookies after 30 days, ensuring sites can\'t track you indefinitely when you\'re logged out.</string>
+    <string name="webTrackingProtectionDnsCnameCloakingTitle">Protects against DNS CNAME cloaking</string>
+    <string name="webTrackingProtectionDnsCnameCloakingDescription">Helps block 3rd-party trackers that try to disguise themselves within a website using DNS.</string>
+    <string name="webTrackingProtectionGoogleAmpTrackingTitle">Blocks Google\'s AMP Tracking</string>
+    <string name="webTrackingProtectionGoogleAmpTrackingDescription">Replaces Google AMP links with the original publisher\'s site.</string>
+    <string name="webTrackingProtectionGoogleSigninPopupsTitle">Blocks Google\'s sign-in pop-ups</string>
+    <string name="webTrackingProtectionGoogleSigninPopupsDescription">Blocks Google sign-in pop-ups on sites Google doesn\'t own.</string>
+    <string name="webTrackingProtectionGlobalPrivacyControlTitle">Global Privacy Control</string>
+    <string name="webTrackingProtectionGlobalPrivacyControlDescription">Expresses opt-out rights on your behalf by telling sites not to sell or share your personal info.</string>
 
     <!-- Cookie Pop-Up Protection -->
     <string name="cookiePopupProtectionTitle">Cookie Pop-Up Protection</string>
@@ -211,6 +234,7 @@
     <string name="settingsAutomaticallyClearWhatOptionNone">None</string>
     <string name="settingsAutomaticallyClearWhatOptionTabs">Tabs</string>
     <string name="settingsAutomaticallyClearWhatOptionTabsAndData">Tabs and data</string>
+    <string name="settingsAutomaticallyClearWhatOptionTabsAndDataAndChats">Tabs, data, and Duck.ai chats</string>
 
     <string name="settingsAutomaticallyClearWhen">Clear On…</string>
     <string name="settingsAutomaticallyClearWhenDialogTitle">Clear on…</string>
@@ -220,6 +244,8 @@
     <string name="settingsAutomaticallyClearWhenAppExit15Minutes">App exit, inactive for 15 minutes</string>
     <string name="settingsAutomaticallyClearWhenAppExit30Minutes">App exit, inactive for 30 minutes</string>
     <string name="settingsAutomaticallyClearWhenAppExit60Minutes">App exit, inactive for 1 hour</string>
+    <string name="settingsClearAiDataTitle">Clear Duck.ai Chats</string>
+    <string name="settingsClearAiDataMessage">Fire Button will also delete Duck.ai history</string>
 
     <!-- About Activity -->
     <string name="aboutActivityTitle">About DuckDuckGo</string>
@@ -244,12 +270,12 @@
     <string name="widgetConfigurationSystemThemeOption">System default</string>
     <string name="widgetConfigurationLightThemeOption">Light</string>
     <string name="widgetConfigurationDarkThemeOption">Dark</string>
-    <string name="widgetConfigurationAddWidgetOption">Add widget</string>
+    <string name="widgetConfigurationAddWidgetOption">Add Widget</string>
     <string name="searchWidgetEmtpyFavoritesHint">No favorites added yet</string>
     <string name="searchWidgetEmtpyFavoritesCta">Add Favorite</string>
     <string name="widgetConfigurationActivityTitle">Widget Configuration</string>
-    <string name="favoritesWidgetLabel">Favorites</string>
-    <string name="searchWidgetLabel">Search</string>
+    <string name="favoritesWidgetLabel">Search and Favorites</string>
+    <string name="searchWidgetLabel">Search and Duck.ai</string>
 
     <!-- Home Screen Shortcuts -->
     <string name="addToHome">Add to Home Screen</string>
@@ -404,7 +430,6 @@
     <string name="crashedWebViewErrorAction">"Reload"</string>
 
     <!-- System Search-->
-    <string name="systemSearchDeviceAppLabel">From this device</string>
     <string name="systemSearchAppNotFound">Application could not be found</string>
     <string name="systemSearchOnboardingThanks">Thanks for choosing DuckDuckGo!\nUsing our browser helps keep you protected from hackers, scammers, and data-hungry companies.</string>
     <string name="systemSearchOnboardingFeaturesIntroText">The DuckDuckGo app also:</string>
@@ -853,11 +878,6 @@
     <string name="newTabPageDefaultBrowserMessagePrimaryCta" instruction="This text appears on a button">Set As Default</string>
     <string name="newTabPageDefaultBrowserMessageSecondaryCta" instruction="This text appears on a button">Don\'t Ask Again</string>
 
-    <!--TabSwitcher Animation Tile Dialog-->
-    <string name="tabSwitcherAnimationTileRemovalDialogTitle">DuckDuckGo blocks trackers to protect your browsing</string>
-    <string name="tabSwitcherAnimationTileRemovalDialogBody">Clearing your tabs and data will delete your tracker blocking history and reset this number to zero.\n\nHide this banner if you\'d prefer not to see it in the tabs view.</string>
-    <string name="tabSwitcherAnimationTileRemovalDialogNegativeButton">Hide Banner</string>
-
     <!-- Threat protection -->
     <string name="maliciousSiteTitle">Warning: This site may be a security risk</string>
     <string name="maliciousSiteMalwareHeadline"><![CDATA[DuckDuckGo blocked this page because it may be distributing malware designed to compromise your device or steal your personal information.\n<a href="">Learn more</a>]]></string>
@@ -922,4 +942,17 @@
     <string name="settingsDuckAiRebranding">AI Features</string>
     <string name="settingsDuckAi">Duck.ai</string>
 
+    <!--TabSwitcher Trackers Animation-->
+    <string name="showTrackerCountInTabSwitcher">Show Tracker Count in Tab Switcher</string>
+    <string name="tabSwitcherAnimationTileRemovalDialogTitle" instruction="A title for a dialog that shows when a user clicks a tile that shows them their current blocked tracker count">Hide tracker count?</string>
+    <string name="tabSwitcherAnimationTileRemovalDialogBody" instruction="A message for a dialog that shows when a user clicks a tile that shows them their current blocked tracker count">You can turn this back on in Settings > Appearance.</string>
+    <string name="tabSwitcherAnimationTileRemovalDialogPositiveButton">Hide</string>
+    <string name="tabSwitcherAnimationTileRemovalDialogNegativeButton">Keep</string>
+
+    <!-- Widgets -->
+    <string name="searchOnlyWidgetLabel" instruction="Label for the search-only widget">Search Only</string>
+    <string name="searchOnlyWidgetDescription" instruction="Description for the search-only widget">Quickly launch a private search with DuckDuckGo.</string>
+    <string name="searchWidgetDescription" instruction="Description for the search widget, which may include Duck.ai and voice search">Search privately with DuckDuckGo or ask Duck.ai. Voice Search and Duck.ai available if enabled.</string>
+    <string name="searchAndFavoritesWidgetDescription" instruction="Description for the search and favorites widget">Search or visit your favorite sites privately with one tap. Voice Search and Duck.ai available if enabled.</string>
+    <string name="duckAiOnlyPinShortcutLabel" instruction="Label for the Duck.ai pinned shortcut. Should be Duck.ai in all languages">Duck.ai</string>
 </resources>

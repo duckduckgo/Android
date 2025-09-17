@@ -21,6 +21,7 @@ import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.webkit.CookieManager
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.IntentCompat
@@ -315,6 +316,10 @@ class AutofillInternalSettingsActivity : DuckDuckGoActivity() {
                 type = "*/*"
             }
             importCsvLauncher.launch(intent)
+        }
+
+        binding.importPasswordsGoogleLogoutButton.setClickListener {
+            clearGoogleCookies()
         }
 
         binding.importPasswordsResetImportedFlagButton.setClickListener {
@@ -649,6 +654,21 @@ class AutofillInternalSettingsActivity : DuckDuckGoActivity() {
         password: String = "password-123",
     ): LoginCredentials {
         return LoginCredentials(username = username, password = password, domain = domain)
+    }
+
+    private fun clearGoogleCookies() {
+        val cookieManager = CookieManager.getInstance()
+        val domain = ".google.com"
+
+        cookieManager.getCookie(domain)?.let { cookies ->
+            cookies.split(";").forEach { cookie ->
+                val cookieName = cookie.substringBefore("=").trim()
+                cookieManager.setCookie(domain, "$cookieName=; Max-Age=0; Path=/")
+            }
+        }
+        cookieManager.flush()
+
+        Toast.makeText(this, R.string.autofillDevSettingsGoogleLogoutSuccess, Toast.LENGTH_SHORT).show()
     }
 
     companion object {

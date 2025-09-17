@@ -28,6 +28,8 @@ import com.duckduckgo.app.settings.clear.getPixelValue
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.duckchat.api.DuckAiFeatureState
+import com.duckduckgo.duckchat.api.DuckChat
 import javax.inject.Inject
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
@@ -44,6 +46,8 @@ class FireButtonViewModel @Inject constructor(
     private val settingsDataStore: SettingsDataStore,
     private val fireAnimationLoader: FireAnimationLoader,
     private val pixel: Pixel,
+    private val duckChat: DuckChat,
+    private val duckAiFeatureState: DuckAiFeatureState,
 ) : ViewModel() {
 
     data class ViewState(
@@ -52,6 +56,8 @@ class FireButtonViewModel @Inject constructor(
             ClearWhenOption.APP_EXIT_ONLY,
         ),
         val selectedFireAnimation: FireAnimation = FireAnimation.HeroFire,
+        val clearDuckAiData: Boolean = false,
+        val showClearDuckAiDataSetting: Boolean = false,
     )
 
     data class AutomaticallyClearData(
@@ -62,7 +68,11 @@ class FireButtonViewModel @Inject constructor(
 
     sealed class Command {
         data object LaunchFireproofWebsites : Command()
-        data class ShowClearWhatDialog(val option: ClearWhatOption) : Command()
+        data class ShowClearWhatDialog(
+            val option: ClearWhatOption,
+            val clearDuckAi: Boolean,
+        ) : Command()
+
         data class ShowClearWhenDialog(val option: ClearWhenOption) : Command()
         data class LaunchFireAnimationSettings(val animation: FireAnimation) : Command()
     }
@@ -84,6 +94,8 @@ class FireButtonViewModel @Inject constructor(
                         automaticallyClearWhenEnabled,
                     ),
                     selectedFireAnimation = settingsDataStore.selectedFireAnimation,
+                    clearDuckAiData = settingsDataStore.clearDuckAiData,
+                    showClearDuckAiDataSetting = duckChat.wasOpenedBefore() && duckAiFeatureState.showClearDuckAIChatHistory.value,
                 ),
             )
         }
@@ -99,7 +111,14 @@ class FireButtonViewModel @Inject constructor(
     }
 
     fun onAutomaticallyClearWhatClicked() {
-        viewModelScope.launch { command.send(Command.ShowClearWhatDialog(viewState.value.automaticallyClearData.clearWhatOption)) }
+        viewModelScope.launch {
+            command.send(
+                Command.ShowClearWhatDialog(
+                    viewState.value.automaticallyClearData.clearWhatOption,
+                    viewState.value.clearDuckAiData,
+                ),
+            )
+        }
         pixel.fire(AppPixelName.SETTINGS_AUTOMATICALLY_CLEAR_WHAT_PRESSED)
     }
 
@@ -174,6 +193,24 @@ class FireButtonViewModel @Inject constructor(
 
     fun onLaunchedFromNotification(pixelName: String) {
         pixel.fire(pixelName)
+    }
+
+    fun onClearDuckAiDataToggled(enabled: Boolean) {
+        if (settingsDataStore.clearDuckAiData == enabled) {
+            logcat(VERBOSE) { "User selected same thing they already have set: clearDuckAiData=$enabled; no need to do anything else" }
+            return
+        }
+
+        settingsDataStore.clearDuckAiData = enabled
+        viewModelScope.launch {
+            viewState.emit(currentViewState().copy(clearDuckAiData = enabled))
+        }
+
+        if (enabled) {
+            pixel.fire(AppPixelName.SETTINGS_CLEAR_DUCK_AI_DATA_TOGGLED_ON)
+        } else {
+            pixel.fire(AppPixelName.SETTINGS_CLEAR_DUCK_AI_DATA_TOGGLED_OFF)
+        }
     }
 
     private fun ClearWhatOption.pixelEvent(): Pixel.PixelName {

@@ -22,16 +22,20 @@
     android:id="@+id/appBarLayout"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="?attr/daxColorToolbar">
+    android:background="@android:color/transparent"
+    android:outlineProvider="none">
 
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
-        android:layout_height="@dimen/tabSwitcherToolbarTopSize"
+        android:layout_height="?attr/actionBarSize"
         android:background="?attr/daxColorToolbar"
-        android:layout_marginBottom="?attr/toolbarExtraPadding"
         android:theme="@style/TabSwitcher.Widget.Toolbar"
         app:popupTheme="@style/Widget.DuckDuckGo.PopUpOverflowMenu" />
 
-</com.google.android.material.appbar.AppBarLayout>
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="0.5dp"
+        android:background="?attr/daxColorShade" />
 
+</com.google.android.material.appbar.AppBarLayout>
