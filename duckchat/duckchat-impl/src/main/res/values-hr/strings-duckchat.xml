@@ -72,4 +72,15 @@
 
     <!-- AutoComplete -->
     <string name="autocompleteDuckAiPrompt">Pitaj Duck.ai</string>
+
+    <!-- New Address Bar Option Bottom Sheet Dialog -->
+    <string name="newAddressBarOptionBottomSheetDialogSearchText">Pretraži ili unesi adresu</string>
+    <string name="newAddressBarOptionBottomSheetDialogTitle">Prebacuj se između pretraživanja i AI čavrljanja</string>
+    <string name="newAddressBarOptionBottomSheetDialogSubTitle">Značajke umjetne inteligencije uvijek su neobavezne.</string>
+    <string name="newAddressBarOptionBottomSheetDialogPrimaryButton">Potvrdi</string>
+    <string name="newAddressBarOptionBottomSheetDialogGhostButton">Ne sad</string>
+    <string name="newAddressBarOptionBottomSheetDialogFooter">Prilagodi u Postavke &gt; Značajke umjetne inteligencije.</string>
+    <string name="newAddressBarOptionBottomSheetDialogSearchOnly">Samo pretraživanje</string>
+    <string name="newAddressBarOptionBottomSheetDialogSearchAndDuckAi">Pretraživanje i Duck.ai</string>
+    <string name="newAddressBarOptionBottomSheetDialogHeader">Opcija adresne trake</string>
 </resources>

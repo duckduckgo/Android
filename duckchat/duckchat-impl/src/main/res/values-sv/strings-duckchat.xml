@@ -72,4 +72,15 @@
 
     <!-- AutoComplete -->
     <string name="autocompleteDuckAiPrompt">Fråga Duck.ai</string>
+
+    <!-- New Address Bar Option Bottom Sheet Dialog -->
+    <string name="newAddressBarOptionBottomSheetDialogSearchText">Sök eller ange adress</string>
+    <string name="newAddressBarOptionBottomSheetDialogTitle">Växla mellan sökning och AI-chatt</string>
+    <string name="newAddressBarOptionBottomSheetDialogSubTitle">AI-funktioner är alltid valfria.</string>
+    <string name="newAddressBarOptionBottomSheetDialogPrimaryButton">Bekräfta</string>
+    <string name="newAddressBarOptionBottomSheetDialogGhostButton">Inte nu</string>
+    <string name="newAddressBarOptionBottomSheetDialogFooter">Justera i Inställningar &gt; AI-funktioner.</string>
+    <string name="newAddressBarOptionBottomSheetDialogSearchOnly">Sök endast</string>
+    <string name="newAddressBarOptionBottomSheetDialogSearchAndDuckAi">Sök &amp; Duck.ai</string>
+    <string name="newAddressBarOptionBottomSheetDialogHeader">Alternativ för adressfält</string>
 </resources>

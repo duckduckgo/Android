@@ -72,4 +72,15 @@
 
     <!-- AutoComplete -->
     <string name="autocompleteDuckAiPrompt">Pajautā Duck.ai</string>
+
+    <!-- New Address Bar Option Bottom Sheet Dialog -->
+    <string name="newAddressBarOptionBottomSheetDialogSearchText">Meklē vai ievadi adresi</string>
+    <string name="newAddressBarOptionBottomSheetDialogTitle">Pārslēgties starp meklēšanu un MI tērzēšanu</string>
+    <string name="newAddressBarOptionBottomSheetDialogSubTitle">MI funkcijas vienmēr var izvēlēties nelietot.</string>
+    <string name="newAddressBarOptionBottomSheetDialogPrimaryButton">Apstiprināt</string>
+    <string name="newAddressBarOptionBottomSheetDialogGhostButton">Ne tagad</string>
+    <string name="newAddressBarOptionBottomSheetDialogFooter">Pielāgo iestatījumos &gt; MI funkcijas.</string>
+    <string name="newAddressBarOptionBottomSheetDialogSearchOnly">Meklēt tikai</string>
+    <string name="newAddressBarOptionBottomSheetDialogSearchAndDuckAi">Meklēšana &amp; Duck.ai</string>
+    <string name="newAddressBarOptionBottomSheetDialogHeader">Adreses joslas opcija</string>
 </resources>

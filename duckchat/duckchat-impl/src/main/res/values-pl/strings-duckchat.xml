@@ -72,4 +72,15 @@
 
     <!-- AutoComplete -->
     <string name="autocompleteDuckAiPrompt">Zapytaj Duck.ai</string>
+
+    <!-- New Address Bar Option Bottom Sheet Dialog -->
+    <string name="newAddressBarOptionBottomSheetDialogSearchText">Wyszukaj lub wprowadź adres</string>
+    <string name="newAddressBarOptionBottomSheetDialogTitle">Przełączanie między wyszukiwaniem a czatem AI</string>
+    <string name="newAddressBarOptionBottomSheetDialogSubTitle">Funkcje AI są zawsze opcjonalne.</string>
+    <string name="newAddressBarOptionBottomSheetDialogPrimaryButton">Potwierdź</string>
+    <string name="newAddressBarOptionBottomSheetDialogGhostButton">Nie teraz</string>
+    <string name="newAddressBarOptionBottomSheetDialogFooter">Dostosuj opcje w obszarze Ustawienia &gt; Funkcje AI.</string>
+    <string name="newAddressBarOptionBottomSheetDialogSearchOnly">Tylko wyszukiwanie</string>
+    <string name="newAddressBarOptionBottomSheetDialogSearchAndDuckAi">Wyszukiwanie i Duck.ai</string>
+    <string name="newAddressBarOptionBottomSheetDialogHeader">Opcja paska adresu</string>
 </resources>

@@ -72,4 +72,15 @@
 
     <!-- AutoComplete -->
     <string name="autocompleteDuckAiPrompt">Kysy Duck.ai:lta</string>
+
+    <!-- New Address Bar Option Bottom Sheet Dialog -->
+    <string name="newAddressBarOptionBottomSheetDialogSearchText">Hae tai anna osoite</string>
+    <string name="newAddressBarOptionBottomSheetDialogTitle">Vaihda haun ja tekoälykeskustelun välillä</string>
+    <string name="newAddressBarOptionBottomSheetDialogSubTitle">Tekoälyominaisuudet ovat aina valinnaisia.</string>
+    <string name="newAddressBarOptionBottomSheetDialogPrimaryButton">Vahvista</string>
+    <string name="newAddressBarOptionBottomSheetDialogGhostButton">Ei nyt</string>
+    <string name="newAddressBarOptionBottomSheetDialogFooter">Säädä kohdassa Asetukset &gt; Tekoälyominaisuudet.</string>
+    <string name="newAddressBarOptionBottomSheetDialogSearchOnly">Vain haku</string>
+    <string name="newAddressBarOptionBottomSheetDialogSearchAndDuckAi">Haku ja Duck.ai</string>
+    <string name="newAddressBarOptionBottomSheetDialogHeader">Osoiterivi-vaihtoehto</string>
 </resources>
