@@ -107,6 +107,10 @@
                 android:id="@+id/includeDefaultBrowserMenuItem"
                 layout="@layout/view_menu_item_default_browser" />
 
+            <include
+                android:id="@+id/includeVpnMenuItem"
+                layout="@layout/view_menu_item_vpn" />
+
             <com.duckduckgo.common.ui.view.MenuItemView
                 android:id="@+id/sharePageMenuItem"
                 android:layout_width="match_parent"
