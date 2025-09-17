@@ -51,9 +51,9 @@
     <string name="input_screen_search_hint">Търсене или въвеждане на адрес</string>
     <string name="input_screen_chat_tab">Duck.ai</string>
     <string name="input_screen_chat_hint">Задавайте въпроси поверително</string>
-    <string name="input_screen_user_pref_without_ai">Само търсене\n(По подразбиране)</string>
-    <string name="input_screen_user_pref_with_ai">Търсене и Duck.ai\n(Експериментално)</string>
-    <string name="input_screen_user_pref_description">Изпробвайте нашата експериментална опция за задаване на въпроси към Duck.ai директно от адресната лента. <annotation type="share_feedback">Споделяне на отзив</annotation></string>
+    <string name="input_screen_user_pref_without_ai">Само търсене</string>
+    <string name="input_screen_user_pref_with_ai">Търсене и Duck.ai</string>
+    <string name="input_screen_user_pref_description">Изпробвайте нашата нова опция за задаване на въпроси към Duck.ai директно от адресната лента. <annotation type="share_feedback">Споделяне на отзив</annotation></string>
 
     <!-- Duck.ai Pro settings -->
     <string name="duck_ai_paid_settings_title">Duck.ai</string>
@@ -69,4 +69,18 @@
     <string name="duck_chat_enable_duck_ai_setting_description_rebranding">Поверителен чат с популярни AI модели на трети страни</string>
     <string name="duck_chat_assist_settings_title_rebranding">Настройки за Assist при търсене</string>
     <string name="duck_chat_assist_settings_description_rebranding">Изберете колко често искате да се появяват отговори, подпомагани от изкуствен интелект, в търсенето</string>
+
+    <!-- AutoComplete -->
+    <string name="autocompleteDuckAiPrompt">Попитай Duck.ai</string>
+
+    <!-- New Address Bar Option Bottom Sheet Dialog -->
+    <string name="newAddressBarOptionBottomSheetDialogSearchText">Търсене или въвеждане на адрес</string>
+    <string name="newAddressBarOptionBottomSheetDialogTitle">Превключвайте между търсене и AI чат</string>
+    <string name="newAddressBarOptionBottomSheetDialogSubTitle">AI функциите винаги са незадължителни.</string>
+    <string name="newAddressBarOptionBottomSheetDialogPrimaryButton">Потвърдете</string>
+    <string name="newAddressBarOptionBottomSheetDialogGhostButton">Не сега</string>
+    <string name="newAddressBarOptionBottomSheetDialogFooter">Промени в Настройки &gt; функции на ИИ.</string>
+    <string name="newAddressBarOptionBottomSheetDialogSearchOnly">Само търсене</string>
+    <string name="newAddressBarOptionBottomSheetDialogSearchAndDuckAi">Търсене и Duck.ai</string>
+    <string name="newAddressBarOptionBottomSheetDialogHeader">Опция за адресната лента</string>
 </resources>

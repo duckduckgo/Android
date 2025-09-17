@@ -18,9 +18,8 @@ package com.duckduckgo.app.systemsearch
 
 import android.content.Intent
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
-import com.duckduckgo.app.browser.defaultbrowsing.prompts.ui.experiment.OnboardingHomeScreenWidgetExperiment
+import app.cash.turbine.test
 import com.duckduckgo.app.browser.newtab.FavoritesQuickAccessAdapter.QuickAccessFavorite
 import com.duckduckgo.app.onboarding.store.*
 import com.duckduckgo.app.pixels.AppPixelName.*
@@ -31,10 +30,6 @@ import com.duckduckgo.app.systemsearch.SystemSearchViewModel.Command
 import com.duckduckgo.app.systemsearch.SystemSearchViewModel.Command.AutocompleteItemRemoved
 import com.duckduckgo.app.systemsearch.SystemSearchViewModel.Command.LaunchDuckDuckGo
 import com.duckduckgo.app.systemsearch.SystemSearchViewModel.Command.ShowRemoveSearchSuggestionDialog
-import com.duckduckgo.app.systemsearch.SystemSearchViewModel.Command.UpdateVoiceSearch
-import com.duckduckgo.app.systemsearch.SystemSearchViewModel.Suggestions.QuickAccessItems
-import com.duckduckgo.app.systemsearch.SystemSearchViewModel.Suggestions.SystemSearchResultsViewState
-import com.duckduckgo.app.widget.experiment.PostCtaExperienceExperiment
 import com.duckduckgo.browser.api.autocomplete.AutoComplete
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteResult
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion.AutoCompleteDefaultSuggestion
@@ -45,10 +40,15 @@ import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggesti
 import com.duckduckgo.browser.api.autocomplete.AutoCompleteSettings
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.test.InstantSchedulersRule
+import com.duckduckgo.duckchat.api.DuckAiFeatureState
+import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.history.api.NavigationHistory
 import com.duckduckgo.savedsites.api.SavedSitesRepository
 import com.duckduckgo.savedsites.api.models.SavedSite.Favorite
 import com.duckduckgo.savedsites.impl.SavedSitesPixelName
+import com.duckduckgo.voice.api.VoiceSearchAvailability
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.*
@@ -77,8 +77,9 @@ class SystemSearchViewModelTest {
     private val mockSettingsStore: SettingsDataStore = mock()
     private val mockAutoCompleteSettings: AutoCompleteSettings = mock()
     private val mockHistory: NavigationHistory = mock()
-    private val mockPostCtaExperienceExperiment: PostCtaExperienceExperiment = mock()
-    private val mockOnboardingHomeScreenWidgetExperiment: OnboardingHomeScreenWidgetExperiment = mock()
+    private val mockDuckChat: DuckChat = mock()
+    private val mockDuckAiFeatureState: DuckAiFeatureState = mock()
+    private val mockVoiceSearchAvailability: VoiceSearchAvailability = mock()
 
     private val commandObserver: Observer<Command> = mock()
     private val commandCaptor = argumentCaptor<Command>()
@@ -91,9 +92,15 @@ class SystemSearchViewModelTest {
         whenever(mockAutoComplete.autoComplete(BLANK_QUERY)).thenReturn(flowOf(autocompleteBlankResult))
         whenever(mockDeviceAppLookup.query(QUERY)).thenReturn(appQueryResult)
         whenever(mockDeviceAppLookup.query(BLANK_QUERY)).thenReturn(appBlankResult)
-        whenever(mocksavedSitesRepository.getFavorites()).thenReturn(flowOf())
+        whenever(mocksavedSitesRepository.getFavorites()).thenReturn(flowOf(emptyList())) // Ensure initial favorites is empty for most tests
         doReturn(true).whenever(mockAutoCompleteSettings).autoCompleteSuggestionsEnabled
+        whenever(mockVoiceSearchAvailability.isVoiceSearchAvailable).thenReturn(false)
+        whenever(mockDuckAiFeatureState.showOmnibarShortcutOnNtpAndOnFocus).thenReturn(MutableStateFlow(false))
+
         testee = SystemSearchViewModel(
+            mockDuckAiFeatureState,
+            mockVoiceSearchAvailability,
+            mockDuckChat,
             mockUserStageStore,
             mockAutoComplete,
             mockDeviceAppLookup,
@@ -104,8 +111,6 @@ class SystemSearchViewModelTest {
             mockHistory,
             coroutineRule.testDispatcherProvider,
             coroutineRule.testScope,
-            mockPostCtaExperienceExperiment,
-            mockOnboardingHomeScreenWidgetExperiment,
         )
         testee.command.observeForever(commandObserver)
     }
@@ -176,70 +181,79 @@ class SystemSearchViewModelTest {
 
     @Test
     fun whenUserUpdatesQueryThenViewStateUpdated() = runTest {
-        testee.userUpdatedQuery(QUERY)
-
-        val observer = Observer<SystemSearchViewModel.Suggestions> { state ->
-            val newViewState = state as SystemSearchResultsViewState
+        testee.suggestionsViewState.test {
+            testee.userUpdatedQuery(QUERY)
+            coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+            val newViewState = expectMostRecentItem()
             assertNotNull(newViewState)
             assertEquals(appQueryResult, newViewState.appResults)
             assertEquals(autocompleteQueryResult, newViewState.autocompleteResults)
         }
-
-        testee.resultsViewState.observeAndSkipFirstEvent(observer)
     }
 
     @Test
     fun whenUserAddsSpaceToQueryThenViewStateMatchesAndSpaceTrimmedFromAutocomplete() = runTest {
-        testee.userUpdatedQuery(QUERY)
-        testee.userUpdatedQuery("$QUERY ")
-
-        val observer = Observer<SystemSearchViewModel.Suggestions> { state ->
-            val newViewState = state as SystemSearchResultsViewState
+        testee.suggestionsViewState.test {
+            // initial default emission
+            awaitItem()
+            testee.userUpdatedQuery("$QUERY ")
+            // account for debounce
+            coroutineRule.testDispatcher.scheduler.advanceTimeBy(300)
+            coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+            val newViewState = awaitItem()
             assertNotNull(newViewState)
             assertEquals(appQueryResult, newViewState.appResults)
             assertEquals(autocompleteQueryResult, newViewState.autocompleteResults)
         }
-
-        testee.resultsViewState.observeAndSkipFirstEvent(observer)
     }
 
     @Test
     fun whenUsersUpdatesWithAutoCompleteEnabledThenAutoCompleteSuggestionsIsNotEmpty() = runTest {
-        doReturn(true).whenever(mockAutoCompleteSettings).autoCompleteSuggestionsEnabled
-        testee.userUpdatedQuery(QUERY)
-
-        val observer = Observer<SystemSearchViewModel.Suggestions> { state ->
-            val newViewState = state as SystemSearchResultsViewState
+        testee.suggestionsViewState.test {
+            doReturn(true).whenever(mockAutoCompleteSettings).autoCompleteSuggestionsEnabled
+            testee.userUpdatedQuery(QUERY)
+            coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+            val newViewState = expectMostRecentItem()
             assertNotNull(newViewState)
             assertEquals(appQueryResult, newViewState.appResults)
             assertEquals(autocompleteQueryResult, newViewState.autocompleteResults)
         }
-
-        testee.resultsViewState.observeAndSkipFirstEvent(observer)
     }
 
     @Test
     fun whenUsersUpdatesWithAutoCompleteDisabledThenViewStateReset() = runTest {
-        doReturn(false).whenever(mockAutoCompleteSettings).autoCompleteSuggestionsEnabled
-        testee.userUpdatedQuery(QUERY)
-
-        assertTrue(testee.resultsViewState.value is SystemSearchViewModel.Suggestions.QuickAccessItems)
+        testee.suggestionsViewState.test {
+            doReturn(false).whenever(mockAutoCompleteSettings).autoCompleteSuggestionsEnabled
+            testee.userUpdatedQuery(QUERY)
+            coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+            assertTrue(expectMostRecentItem().autocompleteResults.suggestions.isEmpty())
+        }
     }
 
     @Test
     fun whenUserClearsQueryThenViewStateReset() = runTest {
-        testee.userUpdatedQuery(QUERY)
-        testee.userRequestedClear()
+        testee.suggestionsViewState.test {
+            testee.userUpdatedQuery(QUERY)
+            coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+            expectMostRecentItem() // Initial state after query
 
-        assertTrue(testee.resultsViewState.value is SystemSearchViewModel.Suggestions.QuickAccessItems)
+            testee.userRequestedClear()
+            coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+            assertTrue(expectMostRecentItem().autocompleteResults.suggestions.isEmpty())
+        }
     }
 
     @Test
     fun whenUsersUpdatesWithBlankQueryThenViewStateReset() = runTest {
-        testee.userUpdatedQuery(QUERY)
-        testee.userUpdatedQuery(BLANK_QUERY)
+        testee.suggestionsViewState.test {
+            testee.userUpdatedQuery(QUERY)
+            coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+            expectMostRecentItem() // Initial state after query
 
-        assertTrue(testee.resultsViewState.value is SystemSearchViewModel.Suggestions.QuickAccessItems)
+            testee.userUpdatedQuery(BLANK_QUERY)
+            coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+            assertTrue(expectMostRecentItem().autocompleteResults.suggestions.isEmpty())
+        }
     }
 
     @Test
@@ -248,8 +262,6 @@ class SystemSearchViewModelTest {
         verify(commandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
         assertEquals(Command.LaunchBrowser(QUERY), commandCaptor.lastValue)
         verify(mockPixel).fire(INTERSTITIAL_LAUNCH_BROWSER_QUERY)
-        verify(mockPostCtaExperienceExperiment).fireWidgetSearch()
-        verify(mockPostCtaExperienceExperiment).fireWidgetSearchXCount()
     }
 
     @Test
@@ -258,8 +270,6 @@ class SystemSearchViewModelTest {
         verify(commandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
         assertEquals(Command.LaunchBrowser(QUERY), commandCaptor.lastValue)
         verify(mockPixel).fire(INTERSTITIAL_LAUNCH_BROWSER_QUERY)
-        verify(mockPostCtaExperienceExperiment).fireWidgetSearch()
-        verify(mockPostCtaExperienceExperiment).fireWidgetSearchXCount()
     }
 
     @Test
@@ -267,16 +277,12 @@ class SystemSearchViewModelTest {
         testee.userSubmittedQuery(BLANK_QUERY)
         assertFalse(commandCaptor.allValues.any { it is Command.LaunchBrowser })
         verify(mockPixel, never()).fire(INTERSTITIAL_LAUNCH_BROWSER_QUERY)
-        verify(mockPostCtaExperienceExperiment, never()).fireWidgetSearch()
-        verify(mockPostCtaExperienceExperiment, never()).fireWidgetSearchXCount()
     }
 
     @Test
     fun whenUserSubmitsQueryThenOnboardingCompleted() = runTest {
         testee.userSubmittedQuery(QUERY)
         verify(mockUserStageStore).stageCompleted(AppStage.NEW)
-        verify(mockPostCtaExperienceExperiment).fireWidgetSearch()
-        verify(mockPostCtaExperienceExperiment).fireWidgetSearchXCount()
     }
 
     @Test
@@ -285,8 +291,6 @@ class SystemSearchViewModelTest {
         verify(commandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
         assertEquals(Command.LaunchBrowser(AUTOCOMPLETE_RESULT), commandCaptor.lastValue)
         verify(mockPixel).fire(INTERSTITIAL_LAUNCH_BROWSER_QUERY)
-        verify(mockPostCtaExperienceExperiment).fireWidgetSearch()
-        verify(mockPostCtaExperienceExperiment).fireWidgetSearchXCount()
     }
 
     @Test
@@ -299,8 +303,6 @@ class SystemSearchViewModelTest {
         verify(commandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
         assertEquals(Command.LaunchBrowserAndSwitchToTab(phrase, tabId), commandCaptor.lastValue)
         verify(mockPixel).fire(INTERSTITIAL_LAUNCH_BROWSER_QUERY)
-        verify(mockPostCtaExperienceExperiment).fireWidgetSearch()
-        verify(mockPostCtaExperienceExperiment).fireWidgetSearchXCount()
     }
 
     @Test
@@ -408,7 +410,11 @@ class SystemSearchViewModelTest {
     fun whenQuickAccessDeleteRequestedThenFavouriteDeletedFromViewState() = runTest {
         val savedSite = Favorite("favorite1", "title", "http://example.com", "timestamp", 0)
         whenever(mocksavedSitesRepository.getFavorites()).thenReturn(flowOf(listOf(savedSite)))
+        // Re-initialize testee to pick up the new mock value for getFavorites()
         testee = SystemSearchViewModel(
+            mockDuckAiFeatureState,
+            mockVoiceSearchAvailability,
+            mockDuckChat,
             mockUserStageStore,
             mockAutoComplete,
             mockDeviceAppLookup,
@@ -419,24 +425,30 @@ class SystemSearchViewModelTest {
             mockHistory,
             coroutineRule.testDispatcherProvider,
             coroutineRule.testScope,
-            mockPostCtaExperienceExperiment,
-            mockOnboardingHomeScreenWidgetExperiment,
         )
+        testee.command.observeForever(commandObserver) // Re-observe commands after re-initialization
 
-        val viewState = testee.resultsViewState.value as QuickAccessItems
-        assertFalse(viewState.favorites.isEmpty())
+        testee.favoritesViewState.test {
+            coroutineRule.testDispatcher.scheduler.advanceUntilIdle() // Ensure initial state is processed
+            var viewState = expectMostRecentItem()
+            assertFalse(viewState.favorites.isEmpty())
 
-        testee.onDeleteQuickAccessItemRequested(QuickAccessFavorite(savedSite))
-
-        val newViewState = testee.resultsViewState.value as QuickAccessItems
-        assertTrue(newViewState.favorites.isEmpty())
+            testee.onDeleteQuickAccessItemRequested(QuickAccessFavorite(savedSite))
+            coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+            viewState = expectMostRecentItem()
+            assertTrue(viewState.favorites.isEmpty())
+        }
     }
 
     @Test
     fun whenQuickAccessDeleteUndoThenViewStateUpdated() = runTest {
         val savedSite = Favorite("favorite1", "title", "http://example.com", "timestamp", 0)
         whenever(mocksavedSitesRepository.getFavorites()).thenReturn(flowOf(listOf(savedSite)))
+        // Re-initialize testee to pick up the new mock value for getFavorites()
         testee = SystemSearchViewModel(
+            mockDuckAiFeatureState,
+            mockVoiceSearchAvailability,
+            mockDuckChat,
             mockUserStageStore,
             mockAutoComplete,
             mockDeviceAppLookup,
@@ -447,16 +459,25 @@ class SystemSearchViewModelTest {
             mockHistory,
             coroutineRule.testDispatcherProvider,
             coroutineRule.testScope,
-            mockPostCtaExperienceExperiment,
-            mockOnboardingHomeScreenWidgetExperiment,
         )
+        testee.command.observeForever(commandObserver) // Re-observe commands after re-initialization
 
-        val viewState = testee.resultsViewState.value as QuickAccessItems
-        assertFalse(viewState.favorites.isEmpty())
+        testee.favoritesViewState.test {
+            coroutineRule.testDispatcher.scheduler.advanceUntilIdle() // Ensure initial state is processed
+            var viewState = expectMostRecentItem()
+            assertFalse(viewState.favorites.isEmpty()) // Initial state check
 
-        testee.undoDelete(savedSite)
+            // Simulate deletion
+            testee.onDeleteQuickAccessItemRequested(QuickAccessFavorite(savedSite))
+            coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+            viewState = expectMostRecentItem()
+            assertTrue(viewState.favorites.isEmpty()) // State after deletion
 
-        assertFalse(viewState.favorites.isEmpty())
+            testee.undoDelete(savedSite)
+            coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+            viewState = expectMostRecentItem()
+            assertFalse(viewState.favorites.isEmpty()) // State after undo
+        }
     }
 
     @Test
@@ -488,10 +509,14 @@ class SystemSearchViewModelTest {
     }
 
     @Test
-    fun whenUserHasFavoritesThenInitialStateShowsFavorites() {
+    fun whenUserHasFavoritesThenInitialStateShowsFavorites() = runTest {
         val savedSite = Favorite("favorite1", "title", "http://example.com", "timestamp", 0)
         whenever(mocksavedSitesRepository.getFavorites()).thenReturn(flowOf(listOf(savedSite)))
+        // Re-initialize testee to pick up the new mock value for getFavorites()
         testee = SystemSearchViewModel(
+            mockDuckAiFeatureState,
+            mockVoiceSearchAvailability,
+            mockDuckChat,
             mockUserStageStore,
             mockAutoComplete,
             mockDeviceAppLookup,
@@ -502,21 +527,15 @@ class SystemSearchViewModelTest {
             mockHistory,
             coroutineRule.testDispatcherProvider,
             coroutineRule.testScope,
-            mockPostCtaExperienceExperiment,
-            mockOnboardingHomeScreenWidgetExperiment,
         )
+        testee.command.observeForever(commandObserver) // Re-observe commands after re-initialization
 
-        val viewState = testee.resultsViewState.value as SystemSearchViewModel.Suggestions.QuickAccessItems
-        assertEquals(1, viewState.favorites.size)
-        assertEquals(savedSite, viewState.favorites.first().favorite)
-    }
-
-    @Test
-    fun whenVoiceSearchDisabledThenShouldEmitUpdateVoiceSearchCommand() {
-        testee.voiceSearchDisabled()
-
-        verify(commandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
-        assertEquals(UpdateVoiceSearch, commandCaptor.lastValue)
+        testee.favoritesViewState.test {
+            coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+            val viewState = expectMostRecentItem()
+            assertEquals(1, viewState.favorites.size)
+            assertEquals(savedSite, viewState.favorites.first().favorite)
+        }
     }
 
     @Test
@@ -590,6 +609,83 @@ class SystemSearchViewModelTest {
         assertCommandIssued<AutocompleteItemRemoved>()
     }
 
+    @Test
+    fun onDuckAiTappedThenDuckChatOpenedWithQuery() {
+        val query = "What is DuckDuckGo?"
+        testee.onDuckAiRequested(query)
+        verify(mockDuckChat).openDuckChatWithAutoPrompt(query)
+    }
+
+    @Test
+    fun whenQueryIsEmptyAndVoiceSearchDisabledAndDuckAiDisabledThenOmnibarViewStateIsCorrect() = runTest {
+        whenever(mockVoiceSearchAvailability.isVoiceSearchAvailable).thenReturn(false)
+        (mockDuckAiFeatureState.showOmnibarShortcutOnNtpAndOnFocus as MutableStateFlow).value = false
+        testee.queryFlow.value = ""
+        testee.omnibarViewState.test {
+            val viewState = awaitItem()
+            assertFalse(viewState.isVoiceSearchButtonVisible)
+            assertFalse(viewState.isDuckAiButtonVisible)
+            assertFalse(viewState.isClearButtonVisible)
+            assertFalse(viewState.isButtonDividerVisible)
+        }
+    }
+
+    @Test
+    fun whenQueryIsNotEmptyAndVoiceSearchEnabledAndDuckAiEnabledThenOmnibarViewStateIsCorrect() = runTest {
+        whenever(mockVoiceSearchAvailability.isVoiceSearchAvailable).thenReturn(true)
+        (mockDuckAiFeatureState.showOmnibarShortcutOnNtpAndOnFocus as MutableStateFlow).value = true
+        testee.queryFlow.value = "query"
+        testee.omnibarViewState.test {
+            val viewState = awaitItem()
+            assertTrue(viewState.isVoiceSearchButtonVisible)
+            assertTrue(viewState.isDuckAiButtonVisible)
+            assertTrue(viewState.isClearButtonVisible)
+            assertTrue(viewState.isButtonDividerVisible)
+        }
+    }
+
+    @Test
+    fun whenQueryIsNotEmptyAndVoiceSearchDisabledAndDuckAiEnabledThenOmnibarViewStateIsCorrect() = runTest {
+        whenever(mockVoiceSearchAvailability.isVoiceSearchAvailable).thenReturn(false)
+        (mockDuckAiFeatureState.showOmnibarShortcutOnNtpAndOnFocus as MutableStateFlow).value = true
+        testee.queryFlow.value = "query"
+        testee.omnibarViewState.test {
+            val viewState = awaitItem()
+            assertFalse(viewState.isVoiceSearchButtonVisible)
+            assertTrue(viewState.isDuckAiButtonVisible)
+            assertTrue(viewState.isClearButtonVisible)
+            assertTrue(viewState.isButtonDividerVisible)
+        }
+    }
+
+    @Test
+    fun whenQueryIsEmptyAndVoiceSearchEnabledAndDuckAiEnabledThenOmnibarViewStateIsCorrect() = runTest {
+        whenever(mockVoiceSearchAvailability.isVoiceSearchAvailable).thenReturn(true)
+        (mockDuckAiFeatureState.showOmnibarShortcutOnNtpAndOnFocus as MutableStateFlow).value = true
+        testee.queryFlow.value = ""
+        testee.omnibarViewState.test {
+            val viewState = awaitItem()
+            assertTrue(viewState.isVoiceSearchButtonVisible)
+            assertTrue(viewState.isDuckAiButtonVisible)
+            assertFalse(viewState.isClearButtonVisible)
+            assertTrue(viewState.isButtonDividerVisible)
+        }
+    }
+
+    @Test
+    fun whenQueryIsNotEmptyAndVoiceSearchEnabledAndDuckAiDisabledThenOmnibarViewStateIsCorrect() = runTest {
+        whenever(mockVoiceSearchAvailability.isVoiceSearchAvailable).thenReturn(true)
+        (mockDuckAiFeatureState.showOmnibarShortcutOnNtpAndOnFocus as MutableStateFlow).value = false
+        testee.queryFlow.value = "query"
+        testee.omnibarViewState.test {
+            val viewState = awaitItem()
+            assertTrue(viewState.isVoiceSearchButtonVisible)
+            assertFalse(viewState.isDuckAiButtonVisible)
+            assertTrue(viewState.isClearButtonVisible)
+            assertFalse(viewState.isButtonDividerVisible)
+        }
+    }
+
     private suspend fun whenOnboardingShowing() {
         whenever(mockUserStageStore.getUserAppStage()).thenReturn(AppStage.NEW)
         testee.resetViewState()
@@ -598,7 +694,7 @@ class SystemSearchViewModelTest {
     private inline fun <reified T : Command> assertCommandIssued(instanceAssertions: T.() -> Unit = {}) {
         verify(commandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
         val issuedCommand = commandCaptor.allValues.find { it is T }
-        assertNotNull(issuedCommand)
+        assertNotNull("Command of type ${'$'}{T::class.java.simpleName} not issued. All commands: ${'$'}{commandCaptor.allValues}", issuedCommand)
         (issuedCommand as T).apply { instanceAssertions() }
     }
 
@@ -607,19 +703,11 @@ class SystemSearchViewModelTest {
         if (defaultMockingDetails.invocations.isNotEmpty()) {
             verify(commandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
             val issuedCommand = commandCaptor.allValues.find { it is T }
-            assertNull(issuedCommand)
-        }
-    }
-
-    private fun <T> MutableLiveData<T>.observeAndSkipFirstEvent(observer: Observer<T>) {
-        var skipFirstEvent = true
-        observeForever { value ->
-            if (skipFirstEvent) {
-                skipFirstEvent = false
-                return@observeForever
-            }
-            observer.onChanged(value)
-            removeObserver(observer)
+            assertNull(
+                "Command of type ${'$'}{T::class.java.simpleName} was issued but should not have been. " +
+                    "Command: ${'$'}issuedCommand. All commands: ${'$'}{commandCaptor.allValues}",
+                issuedCommand,
+            )
         }
     }
 

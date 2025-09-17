@@ -51,9 +51,9 @@
     <string name="input_screen_search_hint">Ieškoti arba įvesti adresą</string>
     <string name="input_screen_chat_tab">Duck.ai</string>
     <string name="input_screen_chat_hint">Klauskite privačiai</string>
-    <string name="input_screen_user_pref_without_ai">Ieškoti tik\n(numatytasis)</string>
-    <string name="input_screen_user_pref_with_ai">Paieška ir „Duck.ai“\n (eksperimentinis)</string>
-    <string name="input_screen_user_pref_description">Išbandykite mūsų eksperimentinę parinktį ir užduokite klausimą „Duck.ai“ tiesiai iš adreso juostos. <annotation type="share_feedback">Bendrinti atsiliepimą</annotation></string>
+    <string name="input_screen_user_pref_without_ai">Tik paieška</string>
+    <string name="input_screen_user_pref_with_ai">Paieška ir „Duck.ai“</string>
+    <string name="input_screen_user_pref_description">Išbandykite mūsų eksperimentinę parinktį ir užduokite klausimus „Duck.ai“ tiesiai iš adreso juostos. <annotation type="share_feedback">Bendrinti atsiliepimą</annotation></string>
 
     <!-- Duck.ai Pro settings -->
     <string name="duck_ai_paid_settings_title">Duck.ai</string>
@@ -69,4 +69,18 @@
     <string name="duck_chat_enable_duck_ai_setting_description_rebranding">Kalbėkis privačiai su populiariais trečiųjų šalių DI modeliais</string>
     <string name="duck_chat_assist_settings_title_rebranding">„Assist“ paieškos nustatymai</string>
     <string name="duck_chat_assist_settings_description_rebranding">Pasirink, kaip dažnai nori, kad tavo paieškose būtų rodomi DI generuojami atsakymai</string>
+
+    <!-- AutoComplete -->
+    <string name="autocompleteDuckAiPrompt">Paklausk „Duck.ai“</string>
+
+    <!-- New Address Bar Option Bottom Sheet Dialog -->
+    <string name="newAddressBarOptionBottomSheetDialogSearchText">Ieškoti arba įvesti adresą</string>
+    <string name="newAddressBarOptionBottomSheetDialogTitle">Perjunkite paiešką ir DI pokalbius</string>
+    <string name="newAddressBarOptionBottomSheetDialogSubTitle">DI funkcijos visada yra pasirenkamos.</string>
+    <string name="newAddressBarOptionBottomSheetDialogPrimaryButton">Patvirtinti</string>
+    <string name="newAddressBarOptionBottomSheetDialogGhostButton">Ne dabar</string>
+    <string name="newAddressBarOptionBottomSheetDialogFooter">Koreguokite skiltyje „Nustatymai“ &gt; „DI funkcijos“.</string>
+    <string name="newAddressBarOptionBottomSheetDialogSearchOnly">Tik paieška</string>
+    <string name="newAddressBarOptionBottomSheetDialogSearchAndDuckAi">Paieška ir „Duck.ai“</string>
+    <string name="newAddressBarOptionBottomSheetDialogHeader">Adreso juostos parinktis</string>
 </resources>

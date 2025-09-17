@@ -43,7 +43,6 @@
     <dimen name="toolbarIconPadding">3dp</dimen>
     <dimen name="toolbarIcon">40dp</dimen>
     <dimen name="toolbarSize">60dp</dimen>
-    <dimen name="tabSwitcherToolbarTopSize">56dp</dimen>
 
     <!-- Navigation Bar -->
     <dimen name="experimentalNavigationBarPaddingTopWhenStandalone">12dp</dimen>

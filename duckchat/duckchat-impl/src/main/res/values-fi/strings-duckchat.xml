@@ -51,9 +51,9 @@
     <string name="input_screen_search_hint">Hae tai anna osoite</string>
     <string name="input_screen_chat_tab">Duck.ai</string>
     <string name="input_screen_chat_hint">Kysy yksityisesti</string>
-    <string name="input_screen_user_pref_without_ai">Vain haku\n(oletus)</string>
-    <string name="input_screen_user_pref_with_ai">Etsi &amp; Duck.ai\n(kokeellinen)</string>
-    <string name="input_screen_user_pref_description">Kokeile kokeellista vaihtoehtoa kysyäksesi Duck.ai:lta suoraan osoiteriviltä. <annotation type="share_feedback">Anna palautetta</annotation></string>
+    <string name="input_screen_user_pref_without_ai">Vain haku</string>
+    <string name="input_screen_user_pref_with_ai">Haku ja Duck.ai</string>
+    <string name="input_screen_user_pref_description">Kokeile uutta vaihtoehtoamme kysyä Duck.ai:lta suoraan osoiteriviltä. <annotation type="share_feedback">Anna palautetta</annotation></string>
 
     <!-- Duck.ai Pro settings -->
     <string name="duck_ai_paid_settings_title">Duck.ai</string>
@@ -69,4 +69,18 @@
     <string name="duck_chat_enable_duck_ai_setting_description_rebranding">Keskustele yksityisesti suosittujen kolmannen osapuolen tekoälymallien kanssa</string>
     <string name="duck_chat_assist_settings_title_rebranding">Search Assist -asetukset</string>
     <string name="duck_chat_assist_settings_description_rebranding">Valitse, kuinka usein haluat tekoälyavusteisten vastausten näkyvän hauissasi</string>
+
+    <!-- AutoComplete -->
+    <string name="autocompleteDuckAiPrompt">Kysy Duck.ai:lta</string>
+
+    <!-- New Address Bar Option Bottom Sheet Dialog -->
+    <string name="newAddressBarOptionBottomSheetDialogSearchText">Hae tai anna osoite</string>
+    <string name="newAddressBarOptionBottomSheetDialogTitle">Vaihda haun ja tekoälykeskustelun välillä</string>
+    <string name="newAddressBarOptionBottomSheetDialogSubTitle">Tekoälyominaisuudet ovat aina valinnaisia.</string>
+    <string name="newAddressBarOptionBottomSheetDialogPrimaryButton">Vahvista</string>
+    <string name="newAddressBarOptionBottomSheetDialogGhostButton">Ei nyt</string>
+    <string name="newAddressBarOptionBottomSheetDialogFooter">Säädä kohdassa Asetukset &gt; Tekoälyominaisuudet.</string>
+    <string name="newAddressBarOptionBottomSheetDialogSearchOnly">Vain haku</string>
+    <string name="newAddressBarOptionBottomSheetDialogSearchAndDuckAi">Haku ja Duck.ai</string>
+    <string name="newAddressBarOptionBottomSheetDialogHeader">Osoiterivi-vaihtoehto</string>
 </resources>

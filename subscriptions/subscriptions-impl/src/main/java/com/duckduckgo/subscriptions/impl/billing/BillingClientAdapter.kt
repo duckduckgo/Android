@@ -38,6 +38,15 @@ interface BillingClientAdapter {
         offerToken: String,
         externalId: String,
     ): LaunchBillingFlowResult
+
+    suspend fun launchSubscriptionUpdate(
+        activity: Activity,
+        productDetails: ProductDetails,
+        offerToken: String,
+        externalId: String,
+        oldPurchaseToken: String,
+        replacementMode: SubscriptionReplacementMode = SubscriptionReplacementMode.DEFERRED,
+    ): LaunchBillingFlowResult
 }
 
 sealed class BillingInitResult {
@@ -91,4 +100,20 @@ enum class BillingError {
     UNKNOWN_ERROR, // for when billing returns something we don't understand
     BILLING_CRASH_ERROR, // This is our own error
     ;
+}
+
+/**
+ * Defines supported replacement modes for Google Play Billing subscription updates.
+ *
+ * Currently, we only use the [DEFERRED] mode in our implementation.
+ *
+ * For a complete list of available values, refer to the official documentation:
+ * https://developer.android.com/reference/com/android/billingclient/api/BillingFlowParams.SubscriptionUpdateParams.ReplacementMode
+ */
+enum class SubscriptionReplacementMode(val value: Int) {
+    /**
+     * New subscription starts after current subscription expires.
+     * Best for: When you want to avoid billing complications or user requested delayed switch.
+     */
+    DEFERRED(6),
 }

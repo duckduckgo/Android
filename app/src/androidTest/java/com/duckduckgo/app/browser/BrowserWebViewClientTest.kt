@@ -387,7 +387,7 @@ class BrowserWebViewClientTest {
 
         assertFalse(fakePostMessageWrapperPlugins.plugin.postMessageCalled)
 
-        testee.postContentScopeMessage(data)
+        testee.postContentScopeMessage(data, webView)
 
         assertTrue(fakePostMessageWrapperPlugins.plugin.postMessageCalled)
     }
@@ -1383,7 +1383,7 @@ class BrowserWebViewClientTest {
         var postMessageCalled = false
             private set
 
-        override fun postMessage(message: SubscriptionEventData) {
+        override fun postMessage(message: SubscriptionEventData, webView: WebView) {
             postMessageCalled = true
         }
 

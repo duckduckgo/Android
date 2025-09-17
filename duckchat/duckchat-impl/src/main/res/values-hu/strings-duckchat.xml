@@ -51,9 +51,9 @@
     <string name="input_screen_search_hint">Keresés vagy cím megadása</string>
     <string name="input_screen_chat_tab">Duck.ai</string>
     <string name="input_screen_chat_hint">Kérdezz privátban</string>
-    <string name="input_screen_user_pref_without_ai">Csak keresés\n(alapértelmezett)</string>
-    <string name="input_screen_user_pref_with_ai">Keresés és Duck.ai\n(kísérleti)</string>
-    <string name="input_screen_user_pref_description">Próbáld ki azt a kísérleti lehetőséget, hogy közvetlenül a címsorban tehetsz fel kérdéseket a Duck.ai számára. <annotation type="share_feedback">Visszajelzés küldése</annotation></string>
+    <string name="input_screen_user_pref_without_ai">Csak keresés</string>
+    <string name="input_screen_user_pref_with_ai">Keresés és Duck.ai</string>
+    <string name="input_screen_user_pref_description">Próbáld ki azt az új lehetőséget, hogy közvetlenül a címsorban tehetsz fel kérdéseket a Duck.ai számára. <annotation type="share_feedback">Visszajelzés küldése</annotation></string>
 
     <!-- Duck.ai Pro settings -->
     <string name="duck_ai_paid_settings_title">Duck.ai</string>
@@ -69,4 +69,18 @@
     <string name="duck_chat_enable_duck_ai_setting_description_rebranding">Privát csevegés harmadik féltől származó népszerű AI-modellekkel</string>
     <string name="duck_chat_assist_settings_title_rebranding">Keresési asszisztens beállításai</string>
     <string name="duck_chat_assist_settings_description_rebranding">Válaszd ki, milyen gyakran szeretnél mesterséges intelligenciával generált válaszokat látni a kereséseid során</string>
+
+    <!-- AutoComplete -->
+    <string name="autocompleteDuckAiPrompt">Duck.ai kérdezése</string>
+
+    <!-- New Address Bar Option Bottom Sheet Dialog -->
+    <string name="newAddressBarOptionBottomSheetDialogSearchText">Keresés vagy cím megadása</string>
+    <string name="newAddressBarOptionBottomSheetDialogTitle">Váltogatás a keresés és az AI-csevegés között</string>
+    <string name="newAddressBarOptionBottomSheetDialogSubTitle">Az AI-funkciók használata mindig opcionális.</string>
+    <string name="newAddressBarOptionBottomSheetDialogPrimaryButton">Megerősítés</string>
+    <string name="newAddressBarOptionBottomSheetDialogGhostButton">Most nem</string>
+    <string name="newAddressBarOptionBottomSheetDialogFooter">Állítsd be a Beállítások &gt; AI-funkciók menüpontban.</string>
+    <string name="newAddressBarOptionBottomSheetDialogSearchOnly">Csak keresés</string>
+    <string name="newAddressBarOptionBottomSheetDialogSearchAndDuckAi">Keresés és Duck.ai</string>
+    <string name="newAddressBarOptionBottomSheetDialogHeader">Címsorbeállítás</string>
 </resources>

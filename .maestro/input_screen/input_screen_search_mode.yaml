@@ -23,11 +23,13 @@ tags:
           id: "omnibarTextInput"
       - assertVisible:
           id: "inputModeWidget"
-      - inputText: "redd"
+      - inputText: "reddit"
       - assertVisible:
           id: "autoCompleteSuggestionsList"
       - assertVisible:
-          text: "reddit"
+          text: "reddit.com"
+          childOf:
+            id: "autoCompleteSuggestionsList"
 
       # verify that submitting a search query opens SERP
       - tapOn:
@@ -38,6 +40,8 @@ tags:
           id: "browserLayout"
       - assertVisible:
           text: "reddit"
+          childOf:
+            id: "browserLayout"
 
       # add the page to favorites (for future assertions)
       - runFlow: ../shared/browser_screen/click_on_menu_button.yaml
@@ -59,11 +63,13 @@ tags:
       - assertVisible:
           id: "inputModeWidget"
       - assertVisible:
-          text: "redd"
+          text: "reddit"
       - assertVisible:
           id: "autoCompleteSuggestionsList"
       - assertVisible:
           text: "reddit.com"
+          childOf:
+            id: "autoCompleteSuggestionsList"
 
       # verify that clearing the Input Screen text and submitting a URL opens the web page
       - tapOn:
@@ -86,7 +92,7 @@ tags:
       - assertNotVisible:
           id: "autoCompleteSuggestionsList"
       - assertVisible:
-          text: "redd at DuckDuckGo"
+          text: "reddit at DuckDuckGo"
           childOf:
             id: "focusedFavourites"
 
@@ -121,8 +127,10 @@ tags:
       - assertVisible:
           id: "browserLayout"
       - assertVisible:
-          text: "redd"
+          text: "reddit"
           childOf:
             id: "singleOmnibar"
       - assertVisible:
           text: "reddit"
+          childOf:
+            id: "browserLayout"

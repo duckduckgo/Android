@@ -128,6 +128,7 @@
     <!-- Fire -->
     <string name="fireMenu">Vymazat data</string>
     <string name="fireClearAll">Vymazat všechny karty a data</string>
+    <string name="fireClearAllPlusDuckChats">Vymazat všechny karty, data a chaty Duck.ai</string>
     <string name="fireCancel">Zrušit</string>
     <string name="fireDataCleared">Data vymazána</string>
 
@@ -236,6 +237,7 @@
     <string name="settingsAutomaticallyClearWhatOptionNone">Žádný</string>
     <string name="settingsAutomaticallyClearWhatOptionTabs">Karty</string>
     <string name="settingsAutomaticallyClearWhatOptionTabsAndData">Karty a data</string>
+    <string name="settingsAutomaticallyClearWhatOptionTabsAndDataAndChats">Karty, data a chaty Duck.ai</string>
 
     <string name="settingsAutomaticallyClearWhen">Vymazat po…</string>
     <string name="settingsAutomaticallyClearWhenDialogTitle">Vymazat po…</string>
@@ -245,6 +247,8 @@
     <string name="settingsAutomaticallyClearWhenAppExit15Minutes">Ukončení aplikace, neaktivní po dobu 15 minut</string>
     <string name="settingsAutomaticallyClearWhenAppExit30Minutes">Ukončení aplikace, neaktivní po dobu 30 minut</string>
     <string name="settingsAutomaticallyClearWhenAppExit60Minutes">Ukončení aplikace, neaktivní po dobu 1 hodiny</string>
+    <string name="settingsClearAiDataTitle">Vymazat chaty Duck.ai</string>
+    <string name="settingsClearAiDataMessage">Tlačítko Fire Button taky smaže historii Duck.ai</string>
 
     <!-- About Activity -->
     <string name="aboutActivityTitle">O DuckDuckGo</string>
@@ -273,8 +277,8 @@
     <string name="searchWidgetEmtpyFavoritesHint">Zatím nebyly přidány žádné oblíbené položky</string>
     <string name="searchWidgetEmtpyFavoritesCta">Přidat oblíbené</string>
     <string name="widgetConfigurationActivityTitle">Konfigurace widgetu</string>
-    <string name="favoritesWidgetLabel">Oblíbené</string>
-    <string name="searchWidgetLabel">Vyhledávání</string>
+    <string name="favoritesWidgetLabel">Vyhledávání a oblíbené položky</string>
+    <string name="searchWidgetLabel">Vyhledávání a Duck.ai</string>
 
     <!-- Home Screen Shortcuts -->
     <string name="addToHome">Přidat na domovskou obrazovku</string>
@@ -429,7 +433,6 @@
     <string name="crashedWebViewErrorAction">"Načíst znovu"</string>
 
     <!-- System Search-->
-    <string name="systemSearchDeviceAppLabel">Z tohoto zařízení</string>
     <string name="systemSearchAppNotFound">Aplikace nebyla nalezena</string>
     <string name="systemSearchOnboardingThanks">Díky, že používáš DuckDuckGo!\nNáš prohlížeč tě chrání před hackery, podvodníky a společnostmi, které nemají osobních dat nikdy dost.</string>
     <string name="systemSearchOnboardingFeaturesIntroText">Aplikace DuckDuckGo také:</string>
@@ -983,4 +986,10 @@
     <string name="tabSwitcherAnimationTileRemovalDialogPositiveButton">Skrýt</string>
     <string name="tabSwitcherAnimationTileRemovalDialogNegativeButton">Ponechat</string>
 
+    <!-- Widgets -->
+    <string name="searchOnlyWidgetLabel" instruction="Label for the search-only widget">Jen vyhledávání</string>
+    <string name="searchOnlyWidgetDescription" instruction="Description for the search-only widget">Rychle spusť soukromé vyhledávání pomocí DuckDuckGo.</string>
+    <string name="searchWidgetDescription" instruction="Description for the search widget, which may include Duck.ai and voice search">Vyhledávej soukromě pomocí DuckDuckGo nebo se zeptej Duck.ai. Stačí povolit hlasové vyhledávání a Duck.ai.</string>
+    <string name="searchAndFavoritesWidgetDescription" instruction="Description for the search and favorites widget">Vyhledávej nebo navštěvuj své oblíbené weby soukromě jediným klepnutím. Stačí povolit hlasové vyhledávání a Duck.ai.</string>
+    <string name="duckAiOnlyPinShortcutLabel" instruction="Label for the Duck.ai pinned shortcut. Should be Duck.ai in all languages">Duck.ai</string>
 </resources>

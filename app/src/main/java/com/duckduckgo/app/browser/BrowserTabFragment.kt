@@ -113,6 +113,7 @@ import com.duckduckgo.app.browser.applinks.AppLinksLauncher
 import com.duckduckgo.app.browser.applinks.AppLinksSnackBarConfigurator
 import com.duckduckgo.app.browser.autocomplete.BrowserAutoCompleteSuggestionsAdapter
 import com.duckduckgo.app.browser.autocomplete.SuggestionItemDecoration
+import com.duckduckgo.app.browser.autofill.SystemAutofillEngagement
 import com.duckduckgo.app.browser.commands.Command
 import com.duckduckgo.app.browser.commands.Command.OpenBrokenSiteLearnMore
 import com.duckduckgo.app.browser.commands.Command.ReportBrokenSiteError
@@ -124,7 +125,6 @@ import com.duckduckgo.app.browser.customtabs.CustomTabPixelNames
 import com.duckduckgo.app.browser.customtabs.CustomTabViewModel.Companion.CUSTOM_TAB_NAME_PREFIX
 import com.duckduckgo.app.browser.databinding.FragmentBrowserTabBinding
 import com.duckduckgo.app.browser.databinding.HttpAuthenticationBinding
-import com.duckduckgo.app.browser.defaultbrowsing.prompts.ui.experiment.ExperimentalHomeScreenWidgetBottomSheetDialog
 import com.duckduckgo.app.browser.downloader.BlobConverterInjector
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.browser.filechooser.FileChooserIntentBuilder
@@ -159,6 +159,7 @@ import com.duckduckgo.app.browser.tabpreview.WebViewPreviewGenerator
 import com.duckduckgo.app.browser.tabpreview.WebViewPreviewPersister
 import com.duckduckgo.app.browser.ui.dialogs.AutomaticFireproofDialogOptions
 import com.duckduckgo.app.browser.ui.dialogs.LaunchInExternalAppOptions
+import com.duckduckgo.app.browser.ui.dialogs.widgetprompt.AlternativeHomeScreenWidgetBottomSheetDialog
 import com.duckduckgo.app.browser.urlextraction.DOMUrlExtractor
 import com.duckduckgo.app.browser.urlextraction.UrlExtractingWebView
 import com.duckduckgo.app.browser.urlextraction.UrlExtractingWebViewClient
@@ -603,7 +604,7 @@ class BrowserTabFragment :
 
     private lateinit var popupMenu: BrowserPopupMenu
     private lateinit var ctaBottomSheet: PromoBottomSheetDialog
-    private lateinit var experimentalBottomSheet: ExperimentalHomeScreenWidgetBottomSheetDialog
+    private lateinit var widgetBottomSheetDialog: AlternativeHomeScreenWidgetBottomSheetDialog
 
     private lateinit var autoCompleteSuggestionsAdapter: BrowserAutoCompleteSuggestionsAdapter
 
@@ -616,6 +617,9 @@ class BrowserTabFragment :
 
     @Inject
     lateinit var autofillFragmentResultListeners: PluginPoint<AutofillFragmentResultsPlugin>
+
+    @Inject
+    lateinit var systemAutofillEngagement: SystemAutofillEngagement
 
     private var isActiveTab: Boolean = false
 
@@ -1197,7 +1201,9 @@ class BrowserTabFragment :
 
     private fun postBreakageReportingEvent() {
         val eventData = createBreakageReportingEventData()
-        webViewClient.postContentScopeMessage(eventData)
+        webView?.let {
+            webViewClient.postContentScopeMessage(eventData, it)
+        }
     }
 
     private fun onFireButtonPressed() {
@@ -2983,7 +2989,8 @@ class BrowserTabFragment :
     ) {
         viewModel.triggerAutocomplete(query, hasFocus, false)
         if (hasFocus) {
-            pixel.fire(DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_LEGACY_OMNIBAR_SHOWN, type = Daily())
+            pixel.fire(DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_LEGACY_OMNIBAR_SHOWN_DAILY, type = Daily())
+            pixel.fire(DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_LEGACY_OMNIBAR_SHOWN_COUNT)
             cancelPendingAutofillRequestsToChooseCredentials()
         } else {
             omnibar.omnibarTextInput.hideKeyboard()
@@ -3343,6 +3350,10 @@ class BrowserTabFragment :
     }
 
     private fun configureWebViewForAutofill(it: DuckDuckGoWebView) {
+        it.setSystemAutofillCallback {
+            systemAutofillEngagement.onSystemAutofillEvent()
+        }
+
         browserAutofill.addJsInterface(it, autofillCallback, this, null, tabId)
 
         autofillFragmentResultListeners.getPlugins().forEach { plugin ->
@@ -3904,6 +3915,7 @@ class BrowserTabFragment :
     private fun destroyWebView() {
         if (::webViewContainer.isInitialized) webViewContainer.removeAllViews()
         webView?.let {
+            it.removeSystemAutofillCallback()
             webViewClient.destroy(it)
             it.destroy()
         }
@@ -4646,23 +4658,23 @@ class BrowserTabFragment :
 
         private fun showBottomSheetCta(configuration: HomePanelCta) {
             if (configuration is AddWidgetAutoOnboardingExperiment) {
-                showExperimentalHomeWidget(configuration)
+                showAlternativeHomeWidgetPrompt(configuration)
             } else {
                 showHomeCta(configuration)
             }
         }
 
-        private fun showExperimentalHomeWidget(
+        private fun showAlternativeHomeWidgetPrompt(
             configuration: HomePanelCta,
         ) {
             hideDaxCta()
 
-            if (!::experimentalBottomSheet.isInitialized) {
-                experimentalBottomSheet = ExperimentalHomeScreenWidgetBottomSheetDialog(
+            if (!::widgetBottomSheetDialog.isInitialized) {
+                widgetBottomSheetDialog = AlternativeHomeScreenWidgetBottomSheetDialog(
                     context = requireContext(),
                     isLightModeEnabled = appTheme.isLightModeEnabled(),
                 )
-                experimentalBottomSheet.eventListener = object : ExperimentalHomeScreenWidgetBottomSheetDialog.EventListener {
+                widgetBottomSheetDialog.eventListener = object : AlternativeHomeScreenWidgetBottomSheetDialog.EventListener {
                     override fun onShown() {
                         viewModel.onCtaShown()
                     }
@@ -4679,10 +4691,10 @@ class BrowserTabFragment :
                         viewModel.onUserClickCtaSecondaryButton(configuration)
                     }
                 }
-                experimentalBottomSheet.show()
+                widgetBottomSheetDialog.show()
             } else {
-                if (!experimentalBottomSheet.isShowing) {
-                    experimentalBottomSheet.show()
+                if (!widgetBottomSheetDialog.isShowing) {
+                    widgetBottomSheetDialog.show()
                 }
             }
         }

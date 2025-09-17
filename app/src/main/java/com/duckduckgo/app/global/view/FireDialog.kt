@@ -32,6 +32,7 @@ import androidx.core.view.WindowInsetsCompat.Type
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.core.view.updatePadding
 import com.airbnb.lottie.RenderMode
+import com.duckduckgo.app.R
 import com.duckduckgo.app.browser.databinding.SheetFireClearDataBinding
 import com.duckduckgo.app.firebutton.FireButtonStore
 import com.duckduckgo.app.global.events.db.UserEventKey
@@ -105,6 +106,10 @@ class FireDialog(
         }
         binding.cancelOption.setOnClickListener {
             cancel()
+        }
+
+        if (settingsDataStore.clearDuckAiData) {
+            binding.clearAllOption.setPrimaryText(context.getString(com.duckduckgo.app.browser.R.string.fireClearAllPlusDuckChats))
         }
 
         if (appBuildConfig.sdkInt == Build.VERSION_CODES.O) {

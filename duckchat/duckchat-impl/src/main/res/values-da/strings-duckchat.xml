@@ -51,9 +51,9 @@
     <string name="input_screen_search_hint">Søg eller indtast adresse</string>
     <string name="input_screen_chat_tab">Duck.ai</string>
     <string name="input_screen_chat_hint">Spørg privat</string>
-    <string name="input_screen_user_pref_without_ai">Kun søgning\n(Standard)</string>
-    <string name="input_screen_user_pref_with_ai">Søgning og Duck.ai\n(Eksperimentel)</string>
-    <string name="input_screen_user_pref_description">Prøv vores eksperimentelle mulighed for at spørge Duck.ai direkte fra adresselinjen. <annotation type="share_feedback">Del feedback</annotation></string>
+    <string name="input_screen_user_pref_without_ai">Kun søgning</string>
+    <string name="input_screen_user_pref_with_ai">Søg &amp; Duck.ai</string>
+    <string name="input_screen_user_pref_description">Prøv den nye mulighed for at spørge Duck.ai direkte fra adresselinjen. <annotation type="share_feedback">Del feedback</annotation></string>
 
     <!-- Duck.ai Pro settings -->
     <string name="duck_ai_paid_settings_title">Duck.ai</string>
@@ -69,4 +69,18 @@
     <string name="duck_chat_enable_duck_ai_setting_description_rebranding">Chat privat med populære tredjeparts AI-modeller</string>
     <string name="duck_chat_assist_settings_title_rebranding">Indstillinger for Search Assist</string>
     <string name="duck_chat_assist_settings_description_rebranding">Vælg, hvor ofte du vil have AI-assisterede svar til at optræde i dine søgninger</string>
+
+    <!-- AutoComplete -->
+    <string name="autocompleteDuckAiPrompt">Spørg Duck.ai</string>
+
+    <!-- New Address Bar Option Bottom Sheet Dialog -->
+    <string name="newAddressBarOptionBottomSheetDialogSearchText">Søg eller indtast adresse</string>
+    <string name="newAddressBarOptionBottomSheetDialogTitle">Skift mellem søgning og AI-chat</string>
+    <string name="newAddressBarOptionBottomSheetDialogSubTitle">AI-funktioner er altid valgfrie.</string>
+    <string name="newAddressBarOptionBottomSheetDialogPrimaryButton">Bekræft</string>
+    <string name="newAddressBarOptionBottomSheetDialogGhostButton">Ikke nu</string>
+    <string name="newAddressBarOptionBottomSheetDialogFooter">Tilpas i Indstillinger &gt; AI-funktioner.</string>
+    <string name="newAddressBarOptionBottomSheetDialogSearchOnly">Kun søgning</string>
+    <string name="newAddressBarOptionBottomSheetDialogSearchAndDuckAi">Søg &amp; Duck.ai</string>
+    <string name="newAddressBarOptionBottomSheetDialogHeader">Indstilling af adresselinje</string>
 </resources>

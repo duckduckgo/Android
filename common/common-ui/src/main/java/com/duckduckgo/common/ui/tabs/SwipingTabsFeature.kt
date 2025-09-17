@@ -35,4 +35,7 @@ interface SwipingTabsFeature {
     @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
     @InternalAlwaysEnabled
     fun enabledForUsers(): Toggle
+
+    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
+    fun applyAutofillFix(): Toggle
 }

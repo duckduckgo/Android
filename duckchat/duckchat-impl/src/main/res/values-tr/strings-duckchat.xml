@@ -51,9 +51,9 @@
     <string name="input_screen_search_hint">Adres ara veya gir</string>
     <string name="input_screen_chat_tab">Duck.ai</string>
     <string name="input_screen_chat_hint">Özel olarak sor</string>
-    <string name="input_screen_user_pref_without_ai">Sadece Arama\n(Varsayılan)</string>
-    <string name="input_screen_user_pref_with_ai">Arama ve Duck.ai\n(Deneysel)</string>
-    <string name="input_screen_user_pref_description">Adres Çubuğundan Duck.ai\'a doğrudan soru sormanızı sağlayan deneysel seçeneğimizi deneyin. <annotation type="share_feedback">Geri Bildirim Paylaş</annotation></string>
+    <string name="input_screen_user_pref_without_ai">Yalnızca Arama</string>
+    <string name="input_screen_user_pref_with_ai">Arama ve Duck.ai</string>
+    <string name="input_screen_user_pref_description">Adres Çubuğundan doğrudan Duck.ai\'a soru sormanızı sağlayan yeni seçeneğimizi deneyin. <annotation type="share_feedback">Geri Bildirim Paylaş</annotation></string>
 
     <!-- Duck.ai Pro settings -->
     <string name="duck_ai_paid_settings_title">Duck.ai</string>
@@ -69,4 +69,18 @@
     <string name="duck_chat_enable_duck_ai_setting_description_rebranding">Popüler 3. taraf AI modelleriyle gizli sohbet et</string>
     <string name="duck_chat_assist_settings_title_rebranding">Search Assist Ayarları</string>
     <string name="duck_chat_assist_settings_description_rebranding">Yapay zeka destekli yanıtların aramalarınızda ne sıklıkta görünmesini istediğinizi seçin</string>
+
+    <!-- AutoComplete -->
+    <string name="autocompleteDuckAiPrompt">Duck.ai\'a sor</string>
+
+    <!-- New Address Bar Option Bottom Sheet Dialog -->
+    <string name="newAddressBarOptionBottomSheetDialogSearchText">Adres ara veya gir</string>
+    <string name="newAddressBarOptionBottomSheetDialogTitle">Arama ve AI sohbeti arasında geçiş yapın</string>
+    <string name="newAddressBarOptionBottomSheetDialogSubTitle">Yapay zeka özellikleri her zaman isteğe bağlıdır.</string>
+    <string name="newAddressBarOptionBottomSheetDialogPrimaryButton">Onayla</string>
+    <string name="newAddressBarOptionBottomSheetDialogGhostButton">Şimdi Değil</string>
+    <string name="newAddressBarOptionBottomSheetDialogFooter">Ayarlar &gt; AI Özellikleri bölümünden ayarlarınızı değiştirebilirsiniz.</string>
+    <string name="newAddressBarOptionBottomSheetDialogSearchOnly">Yalnızca Arama</string>
+    <string name="newAddressBarOptionBottomSheetDialogSearchAndDuckAi">Arama ve Duck.ai</string>
+    <string name="newAddressBarOptionBottomSheetDialogHeader">Adres çubuğu seçeneği</string>
 </resources>

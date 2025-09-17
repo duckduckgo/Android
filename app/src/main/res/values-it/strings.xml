@@ -126,6 +126,7 @@
     <!-- Fire -->
     <string name="fireMenu">Elimina dati</string>
     <string name="fireClearAll">Elimina tutte le schede e i dati</string>
+    <string name="fireClearAllPlusDuckChats">Cancella tutte le schede, i dati e le chat di Duck.ai</string>
     <string name="fireCancel">Annulla</string>
     <string name="fireDataCleared">I dati sono stati eliminati</string>
 
@@ -234,6 +235,7 @@
     <string name="settingsAutomaticallyClearWhatOptionNone">Nessuno</string>
     <string name="settingsAutomaticallyClearWhatOptionTabs">Schede</string>
     <string name="settingsAutomaticallyClearWhatOptionTabsAndData">Schede e dati</string>
+    <string name="settingsAutomaticallyClearWhatOptionTabsAndDataAndChats">Schede, dati e chat di Duck.ai</string>
 
     <string name="settingsAutomaticallyClearWhen">Elimina…</string>
     <string name="settingsAutomaticallyClearWhenDialogTitle">Elimina…</string>
@@ -243,6 +245,8 @@
     <string name="settingsAutomaticallyClearWhenAppExit15Minutes">Uscita dall\'app, inattività di 15 minuti</string>
     <string name="settingsAutomaticallyClearWhenAppExit30Minutes">Uscita dall\'app, inattività di 30 minuti</string>
     <string name="settingsAutomaticallyClearWhenAppExit60Minutes">Uscita dall\'app, inattività di 1 ora</string>
+    <string name="settingsClearAiDataTitle">Cancella le chat di Duck.ai</string>
+    <string name="settingsClearAiDataMessage">Fire Button eliminerà anche la cronologia di Duck.ai</string>
 
     <!-- About Activity -->
     <string name="aboutActivityTitle">Info su DuckDuckGo</string>
@@ -271,8 +275,8 @@
     <string name="searchWidgetEmtpyFavoritesHint">Non è stato ancora aggiunto alcun preferito</string>
     <string name="searchWidgetEmtpyFavoritesCta">Aggiungi preferito</string>
     <string name="widgetConfigurationActivityTitle">Configurazione widget</string>
-    <string name="favoritesWidgetLabel">Preferiti</string>
-    <string name="searchWidgetLabel">Ricerca</string>
+    <string name="favoritesWidgetLabel">Ricerca e Preferiti</string>
+    <string name="searchWidgetLabel">Cerca e Duck.ai</string>
 
     <!-- Home Screen Shortcuts -->
     <string name="addToHome">Aggiungi alla Schermata Home</string>
@@ -427,7 +431,6 @@
     <string name="crashedWebViewErrorAction">"Ricarica"</string>
 
     <!-- System Search-->
-    <string name="systemSearchDeviceAppLabel">Da questo dispositivo</string>
     <string name="systemSearchAppNotFound">Impossibile trovare l\'applicazione</string>
     <string name="systemSearchOnboardingThanks">Grazie per aver scelto DuckDuckGo!\nUsare il nostro browser aiuta a proteggersi da hacker, truffatori e aziende affamate di dati.</string>
     <string name="systemSearchOnboardingFeaturesIntroText">Inoltre, l\'app DuckDuckGo:</string>
@@ -947,4 +950,10 @@
     <string name="tabSwitcherAnimationTileRemovalDialogPositiveButton">Nascondi</string>
     <string name="tabSwitcherAnimationTileRemovalDialogNegativeButton">Tieni</string>
 
+    <!-- Widgets -->
+    <string name="searchOnlyWidgetLabel" instruction="Label for the search-only widget">Solo ricerca</string>
+    <string name="searchOnlyWidgetDescription" instruction="Description for the search-only widget">Avvia rapidamente una ricerca privata con DuckDuckGo.</string>
+    <string name="searchWidgetDescription" instruction="Description for the search widget, which may include Duck.ai and voice search">Cerca privatamente con DuckDuckGo o chiedi a Duck.ai. Ricerca vocale e Duck.ai disponibili se abilitati.</string>
+    <string name="searchAndFavoritesWidgetDescription" instruction="Description for the search and favorites widget">Cerca o visita i tuoi siti preferiti in privato con un tocco. Ricerca vocale e Duck.ai disponibili se abilitati.</string>
+    <string name="duckAiOnlyPinShortcutLabel" instruction="Label for the Duck.ai pinned shortcut. Should be Duck.ai in all languages">Duck.ai</string>
 </resources>

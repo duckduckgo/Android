@@ -51,9 +51,9 @@
     <string name="input_screen_search_hint">Zoek of voer een adres in</string>
     <string name="input_screen_chat_tab">Duck.ai</string>
     <string name="input_screen_chat_hint">Vraag privé</string>
-    <string name="input_screen_user_pref_without_ai">Alleen zoeken\n(Standaardinstelling)</string>
-    <string name="input_screen_user_pref_with_ai">Zoeken en Duck.ai\n(Experimenteel)</string>
-    <string name="input_screen_user_pref_description">Probeer onze experimentele optie om direct een vraag te stellen aan Duck.ai vanuit de adresbalk. <annotation type="share_feedback">Feedback delen</annotation></string>
+    <string name="input_screen_user_pref_without_ai">Alleen zoeken</string>
+    <string name="input_screen_user_pref_with_ai">Zoeken en Duck.ai</string>
+    <string name="input_screen_user_pref_description">Probeer onze nieuwe optie om direct een vraag te stellen aan Duck.ai vanuit de adresbalk. <annotation type="share_feedback">Feedback delen</annotation></string>
 
     <!-- Duck.ai Pro settings -->
     <string name="duck_ai_paid_settings_title">Duck.ai</string>
@@ -69,4 +69,18 @@
     <string name="duck_chat_enable_duck_ai_setting_description_rebranding">Chat privé met populaire AI-modellen van derden</string>
     <string name="duck_chat_assist_settings_title_rebranding">Instellingen voor zoek Assist</string>
     <string name="duck_chat_assist_settings_description_rebranding">Kies hoe vaak antwoorden op basis van AI in je zoekresultaten moeten worden weergegeven</string>
+
+    <!-- AutoComplete -->
+    <string name="autocompleteDuckAiPrompt">Vraag stellen aan Duck.ai</string>
+
+    <!-- New Address Bar Option Bottom Sheet Dialog -->
+    <string name="newAddressBarOptionBottomSheetDialogSearchText">Zoek of voer een adres in</string>
+    <string name="newAddressBarOptionBottomSheetDialogTitle">Schakelen tussen zoeken en AI-chat</string>
+    <string name="newAddressBarOptionBottomSheetDialogSubTitle">AI-functies zijn altijd optioneel.</string>
+    <string name="newAddressBarOptionBottomSheetDialogPrimaryButton">Bevestigen</string>
+    <string name="newAddressBarOptionBottomSheetDialogGhostButton">Niet nu</string>
+    <string name="newAddressBarOptionBottomSheetDialogFooter">Aanpassen in Instellingen &gt; AI-functies</string>
+    <string name="newAddressBarOptionBottomSheetDialogSearchOnly">Alleen zoeken</string>
+    <string name="newAddressBarOptionBottomSheetDialogSearchAndDuckAi">Zoeken en Duck.ai</string>
+    <string name="newAddressBarOptionBottomSheetDialogHeader">Optie voor adresbalk</string>
 </resources>

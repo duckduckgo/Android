@@ -128,6 +128,7 @@
     <!-- Fire -->
     <string name="fireMenu">Сбросить данные</string>
     <string name="fireClearAll">Закрыть вкладки и удалить данные</string>
+    <string name="fireClearAllPlusDuckChats">Закрыть все вкладки и стереть все данные и чаты Duck.ai</string>
     <string name="fireCancel">Отменить</string>
     <string name="fireDataCleared">Данные сброшены</string>
 
@@ -190,8 +191,8 @@
     <string name="webTrackingProtectionActivityTitle">Защита от отслеживания онлайн</string>
     <string name="webTrackingProtectionLearnMoreTitle">Защита от отслеживания онлайн</string>
     <string name="webTrackingProtectionTitle">Защита от отслеживания онлайн</string>
-    <string name="webTrackingProtectionDescriptionNew"><![CDATA[DuckDuckGo автоматически блокирует скрытые трекеры, пока вы посещаете сайты.\n<a href=\"\">Подробнее…</a>]]></string>
-    <string name="webTrackingProtectionExplanationDescription"><![CDATA[Функции защиты от отслеживания в составе DuckDuckGo работают без остановки.\n<a href=\"\">Подробнее…</a>]]></string>
+    <string name="webTrackingProtectionDescriptionNew"><![CDATA[DuckDuckGo автоматически блокирует скрытые трекеры, пока вы посещаете сайты.\n<a href=\"\">Подробнее...</a>]]></string>
+    <string name="webTrackingProtectionExplanationDescription"><![CDATA[Функции защиты от отслеживания в составе DuckDuckGo работают без остановки.\n<a href=\"\">Подробнее...</a>]]></string>
     <string name="webTrackingProtectionExplanationTitle">Как мы вас защищаем</string>
     <string name="webTrackingProtectionThirdPartyTrackersTitle">Блокировка сторонних трекеров</string>
     <string name="webTrackingProtectionThirdPartyTrackersDescription">Не дает сторонним трекерам даже загрузиться, чтобы они не отслеживали ваши перемещения с сайта на сайт.</string>
@@ -236,6 +237,7 @@
     <string name="settingsAutomaticallyClearWhatOptionNone">Ничего</string>
     <string name="settingsAutomaticallyClearWhatOptionTabs">Вкладки</string>
     <string name="settingsAutomaticallyClearWhatOptionTabsAndData">Вкладки и данные</string>
+    <string name="settingsAutomaticallyClearWhatOptionTabsAndDataAndChats">Вкладки, данные и чаты Duck.ai</string>
 
     <string name="settingsAutomaticallyClearWhen">Выполнять сброс…</string>
     <string name="settingsAutomaticallyClearWhenDialogTitle">Выполнять сброс…</string>
@@ -245,6 +247,8 @@
     <string name="settingsAutomaticallyClearWhenAppExit15Minutes">После выхода из приложения, через 15 минут бездействия</string>
     <string name="settingsAutomaticallyClearWhenAppExit30Minutes">После выхода из приложения, через 30 минут бездействия</string>
     <string name="settingsAutomaticallyClearWhenAppExit60Minutes">После выхода из приложения, через 1 час бездействия</string>
+    <string name="settingsClearAiDataTitle">Очистить чаты Duck.ai</string>
+    <string name="settingsClearAiDataMessage">Кнопка Fire Button также стирает историю Duck.ai.</string>
 
     <!-- About Activity -->
     <string name="aboutActivityTitle">Несколько слов о DuckDuckGo</string>
@@ -273,8 +277,8 @@
     <string name="searchWidgetEmtpyFavoritesHint">В избранное пока ничего не добавлено</string>
     <string name="searchWidgetEmtpyFavoritesCta">Добавить в избранное</string>
     <string name="widgetConfigurationActivityTitle">Настройка виджета</string>
-    <string name="favoritesWidgetLabel">Избранное</string>
-    <string name="searchWidgetLabel">Поиск</string>
+    <string name="favoritesWidgetLabel">Поиск и избранное</string>
+    <string name="searchWidgetLabel">Поиск плюс Duck.ai</string>
 
     <!-- Home Screen Shortcuts -->
     <string name="addToHome">Добавить на домашнюю страницу</string>
@@ -429,7 +433,6 @@
     <string name="crashedWebViewErrorAction">"Перезагрузить"</string>
 
     <!-- System Search-->
-    <string name="systemSearchDeviceAppLabel">С этого устройства</string>
     <string name="systemSearchAppNotFound">Приложение не найдено</string>
     <string name="systemSearchOnboardingThanks">Благодарим за выбор DuckDuckGo!\nНаш браузер помогает защищать вас от хакеров, мошенников и компаний, собирающих чужие данные.</string>
     <string name="systemSearchOnboardingFeaturesIntroText">Приложение DuckDuckGo также:</string>
@@ -983,4 +986,10 @@
     <string name="tabSwitcherAnimationTileRemovalDialogPositiveButton">Скрыть</string>
     <string name="tabSwitcherAnimationTileRemovalDialogNegativeButton">Оставить</string>
 
+    <!-- Widgets -->
+    <string name="searchOnlyWidgetLabel" instruction="Label for the search-only widget">Только поиск</string>
+    <string name="searchOnlyWidgetDescription" instruction="Description for the search-only widget">Конфиденциальный поиск через DuckDuckGo в два счета.</string>
+    <string name="searchWidgetDescription" instruction="Description for the search widget, which may include Duck.ai and voice search">Конфиденциальный поиск с DuckDuckGo или вопросы для Duck.ai. Голосовой поиск и Duck.ai можно включить по желанию.</string>
+    <string name="searchAndFavoritesWidgetDescription" instruction="Description for the search and favorites widget">Поиск или посещение любимых сайтов в приватном режиме одним касанием. По желанию можно включить голосовой поиск и Duck.ai.</string>
+    <string name="duckAiOnlyPinShortcutLabel" instruction="Label for the Duck.ai pinned shortcut. Should be Duck.ai in all languages">Duck.ai</string>
 </resources>

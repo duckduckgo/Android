@@ -125,6 +125,7 @@
     <!-- Fire -->
     <string name="fireMenu">Clear Data</string>
     <string name="fireClearAll">Clear All Tabs And Data</string>
+    <string name="fireClearAllPlusDuckChats">Clear All Tabs, Data, and Duck.ai Chats</string>
     <string name="fireCancel">Cancel</string>
     <string name="fireDataCleared">Data cleared</string>
 
@@ -233,6 +234,7 @@
     <string name="settingsAutomaticallyClearWhatOptionNone">None</string>
     <string name="settingsAutomaticallyClearWhatOptionTabs">Tabs</string>
     <string name="settingsAutomaticallyClearWhatOptionTabsAndData">Tabs and data</string>
+    <string name="settingsAutomaticallyClearWhatOptionTabsAndDataAndChats">Tabs, data, and Duck.ai chats</string>
 
     <string name="settingsAutomaticallyClearWhen">Clear On…</string>
     <string name="settingsAutomaticallyClearWhenDialogTitle">Clear on…</string>
@@ -242,6 +244,8 @@
     <string name="settingsAutomaticallyClearWhenAppExit15Minutes">App exit, inactive for 15 minutes</string>
     <string name="settingsAutomaticallyClearWhenAppExit30Minutes">App exit, inactive for 30 minutes</string>
     <string name="settingsAutomaticallyClearWhenAppExit60Minutes">App exit, inactive for 1 hour</string>
+    <string name="settingsClearAiDataTitle">Clear Duck.ai Chats</string>
+    <string name="settingsClearAiDataMessage">Fire Button will also delete Duck.ai history</string>
 
     <!-- About Activity -->
     <string name="aboutActivityTitle">About DuckDuckGo</string>
@@ -426,7 +430,6 @@
     <string name="crashedWebViewErrorAction">"Reload"</string>
 
     <!-- System Search-->
-    <string name="systemSearchDeviceAppLabel">From this device</string>
     <string name="systemSearchAppNotFound">Application could not be found</string>
     <string name="systemSearchOnboardingThanks">Thanks for choosing DuckDuckGo!\nUsing our browser helps keep you protected from hackers, scammers, and data-hungry companies.</string>
     <string name="systemSearchOnboardingFeaturesIntroText">The DuckDuckGo app also:</string>
@@ -946,4 +949,10 @@
     <string name="tabSwitcherAnimationTileRemovalDialogPositiveButton">Hide</string>
     <string name="tabSwitcherAnimationTileRemovalDialogNegativeButton">Keep</string>
 
+    <!-- Widgets -->
+    <string name="searchOnlyWidgetLabel" instruction="Label for the search-only widget">Search Only</string>
+    <string name="searchOnlyWidgetDescription" instruction="Description for the search-only widget">Quickly launch a private search with DuckDuckGo.</string>
+    <string name="searchWidgetDescription" instruction="Description for the search widget, which may include Duck.ai and voice search">Search privately with DuckDuckGo or ask Duck.ai. Voice Search and Duck.ai available if enabled.</string>
+    <string name="searchAndFavoritesWidgetDescription" instruction="Description for the search and favorites widget">Search or visit your favorite sites privately with one tap. Voice Search and Duck.ai available if enabled.</string>
+    <string name="duckAiOnlyPinShortcutLabel" instruction="Label for the Duck.ai pinned shortcut. Should be Duck.ai in all languages">Duck.ai</string>
 </resources>
