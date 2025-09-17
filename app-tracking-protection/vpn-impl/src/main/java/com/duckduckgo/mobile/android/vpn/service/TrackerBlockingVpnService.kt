@@ -18,6 +18,7 @@ package com.duckduckgo.mobile.android.vpn.service
 
 import android.annotation.SuppressLint
 import android.app.ActivityManager
+import android.app.ForegroundServiceStartNotAllowedException
 import android.app.Service
 import android.content.ComponentName
 import android.content.Context
@@ -815,7 +816,7 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), V
             if (!isServiceRunning(appContext)) return
 
             snoozeIntent(appContext, triggerAtMillis).run {
-                ContextCompat.startForegroundService(appContext, this)
+                appContext.startForegroundServiceWithFallback(this)
             }
         }
 
@@ -842,7 +843,7 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), V
             if (isServiceRunning(applicationContext)) return
 
             startIntent(applicationContext).run {
-                ContextCompat.startForegroundService(applicationContext, this)
+                applicationContext.startForegroundServiceWithFallback(this)
             }
         }
 
@@ -852,7 +853,7 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), V
             if (!isServiceRunning(applicationContext)) return
 
             stopIntent(applicationContext).run {
-                ContextCompat.startForegroundService(applicationContext, this)
+                applicationContext.startForegroundServiceWithFallback(this)
             }
         }
 
@@ -860,7 +861,7 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), V
             val applicationContext = context.applicationContext
 
             restartIntent(applicationContext).run {
-                ContextCompat.startForegroundService(applicationContext, this)
+                applicationContext.startForegroundServiceWithFallback(this)
             }
         }
 
@@ -880,6 +881,23 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), V
             } else if (forceRestart) {
                 logcat { "VPN log: starting service" }
                 startVpnService(applicationContext)
+            }
+        }
+
+        @SuppressLint("DenyListedApi") // static private method
+        private fun Context.startForegroundServiceWithFallback(intent: Intent) {
+            try {
+                ContextCompat.startForegroundService(this, intent)
+            } catch (ex: ForegroundServiceStartNotAllowedException) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                    try {
+                        this.startService(intent)
+                    } catch (_: Throwable) {
+                        // no-op
+                    }
+                } else {
+                    throw ex
+                }
             }
         }
 
