@@ -16,8 +16,10 @@
 
 package com.duckduckgo.js.messaging.api
 
+import android.webkit.WebView
+
 interface PostMessageWrapperPlugin {
-    fun postMessage(message: SubscriptionEventData)
+    fun postMessage(message: SubscriptionEventData, webView: WebView)
 
     val context: String
 }

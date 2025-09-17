@@ -769,10 +769,11 @@ class BrowserWebViewClient @Inject constructor(
 
     fun postContentScopeMessage(
         eventData: SubscriptionEventData,
+        webView: WebView,
     ) {
         postMessageWrapperPlugins.getPlugins()
             .firstOrNull { it.context == "contentScopeScripts" }
-            ?.postMessage(eventData)
+            ?.postMessage(eventData, webView)
     }
 }
 
