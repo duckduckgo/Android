@@ -47,14 +47,13 @@ class ContentScopeScriptsPostMessageWrapperPlugin @Inject constructor(
             if (webViewCompatContentScopeScripts.isEnabled()) {
                 webMessagingPlugin.postMessage(message)
             } else {
-                val subscriptionEvent = SubscriptionEvent(
-                    context = webMessagingPlugin.context,
-                    featureName = message.featureName,
-                    subscriptionName = message.subscriptionName,
-                    params = message.params,
-                )
                 jsMessageHelper.sendSubscriptionEvent(
-                    subscriptionEvent = subscriptionEvent,
+                    subscriptionEvent = SubscriptionEvent(
+                        context = webMessagingPlugin.context,
+                        featureName = message.featureName,
+                        subscriptionName = message.subscriptionName,
+                        params = message.params,
+                    ),
                     callbackName = coreContentScopeScripts.callbackName,
                     secret = coreContentScopeScripts.secret,
                     webView = webView,

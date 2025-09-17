@@ -14,7 +14,7 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.Mockito.mock
-import org.mockito.kotlin.any
+import org.mockito.kotlin.eq
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
@@ -73,10 +73,10 @@ class ContentScopeScriptsPostMessageWrapperPluginTest {
         testee.postMessage(subscriptionEventData, mockWebView)
 
         verify(mockJsHelper).sendSubscriptionEvent(
-            any(),
-            any(),
-            any(),
-            any(),
+            eq(subscriptionEvent),
+            eq("callbackName"),
+            eq("secret"),
+            eq(mockWebView),
         )
     }
 }
