@@ -6789,9 +6789,6 @@
       if (this.getFeatureSettingEnabled("modifyCookies")) {
         this.modifyCookies();
       }
-      if (this.getFeatureSettingEnabled("disableDeviceEnumeration")) {
-        this.preventDeviceEnumeration();
-      }
       if (this.getFeatureSettingEnabled("enumerateDevices")) {
         this.deviceEnumerationFix();
       }
@@ -7346,32 +7343,6 @@
           }
         });
         this.forceViewportTag(viewportTag, newContent.join(", "));
-      }
-    }
-    /**
-     * Prevents device enumeration by returning an empty array when enabled
-     */
-    preventDeviceEnumeration() {
-      if (!window.MediaDevices) {
-        return;
-      }
-      let disableDeviceEnumeration = false;
-      const isFrame = window.self !== window.top;
-      if (isFrame) {
-        disableDeviceEnumeration = this.getFeatureSettingEnabled("disableDeviceEnumerationFrames");
-      } else {
-        disableDeviceEnumeration = this.getFeatureSettingEnabled("disableDeviceEnumeration");
-      }
-      if (disableDeviceEnumeration) {
-        const enumerateDevicesProxy = new DDGProxy(this, MediaDevices.prototype, "enumerateDevices", {
-          /**
-           * @returns {Promise<MediaDeviceInfo[]>}
-           */
-          apply() {
-            return Promise.resolve([]);
-          }
-        });
-        enumerateDevicesProxy.overload();
       }
     }
     /**
