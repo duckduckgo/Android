@@ -22,6 +22,8 @@ import com.duckduckgo.browser.api.UserBrowserProperties
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.daxprompts.api.DaxPrompts.ActionType
 import com.duckduckgo.daxprompts.impl.repository.DaxPromptsRepository
+import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
+import com.duckduckgo.feature.toggles.api.Toggle
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
@@ -42,7 +44,7 @@ class RealDaxPromptsTest {
     private lateinit var testee: RealDaxPrompts
 
     private val mockRepository: DaxPromptsRepository = mock()
-    private val mockReactivateUsersExperiment: ReactivateUsersExperiment = mock()
+    private val fakeReactivateUsersToggles = FakeFeatureToggleFactory.create(ReactivateUsersToggles::class.java)
     private val mockUserBrowserProperties: UserBrowserProperties = mock()
     private val mockDefaultBrowserDetector: DefaultBrowserDetector = mock()
     private val mockDefaultRoleBrowserDialog: DefaultRoleBrowserDialog = mock()
@@ -51,7 +53,7 @@ class RealDaxPromptsTest {
     fun setup() {
         testee = RealDaxPrompts(
             mockRepository,
-            mockReactivateUsersExperiment,
+            fakeReactivateUsersToggles,
             mockUserBrowserProperties,
             mockDefaultBrowserDetector,
             mockDefaultRoleBrowserDialog,
@@ -60,7 +62,17 @@ class RealDaxPromptsTest {
     }
 
     @Test
+    fun whenFlagIsDisabledThenReturnNone() = runTest {
+        mockFlagIsDisabled()
+
+        val result = testee.evaluate()
+
+        assertEquals(ActionType.NONE, result)
+    }
+
+    @Test
     fun whenUserIsNotEligibleThenReturnNone() = runTest {
+        mockFlagIsEnabled()
         mockUserIsNotEligible()
 
         val result = testee.evaluate()
@@ -69,53 +81,25 @@ class RealDaxPromptsTest {
     }
 
     @Test
-    fun whenUserIsEligibleAndInControlGroupThenReturnShowControl() = runTest {
+    fun whenShouldNotShowBrowserComparisonThenReturnNone() = runTest {
+        mockFlagIsEnabled()
         mockUserIsEligible()
-        whenever(mockReactivateUsersExperiment.isControl()).thenReturn(true)
+        mockShouldNotShowBrowserComparisonPrompt()
 
         val result = testee.evaluate()
 
-        assertEquals(ActionType.SHOW_CONTROL, result)
+        assertEquals(ActionType.NONE, result)
     }
 
     @Test
-    fun whenUserIsEligibleAndInBrowserComparisonGroupAndShouldShowPromptThenReturnShowVariant2() = runTest {
+    fun whenFlagIsEnabledAndUserIsEligibleAndShouldShowBrowserComparison() = runTest {
+        mockFlagIsEnabled()
         mockUserIsEligible()
-        whenever(mockReactivateUsersExperiment.isControl()).thenReturn(false)
-        whenever(mockReactivateUsersExperiment.isDuckPlayerPrompt()).thenReturn(false)
-        whenever(mockReactivateUsersExperiment.isBrowserComparisonPrompt()).thenReturn(true)
-        whenever(mockDefaultBrowserDetector.isDefaultBrowser()).thenReturn(false)
-        whenever(mockDefaultRoleBrowserDialog.shouldShowDialog()).thenReturn(true)
-        whenever(mockRepository.getDaxPromptsShowBrowserComparison()).thenReturn(true)
+        mockShouldShowBrowserComparisonPrompt()
 
         val result = testee.evaluate()
 
         assertEquals(ActionType.SHOW_VARIANT_BROWSER_COMPARISON, result)
-    }
-
-    @Test
-    fun whenUserIsEligibleAndInBrowserComparisonGroupAndShouldNotShowPromptThenReturnNone() = runTest {
-        mockUserIsEligible()
-        whenever(mockReactivateUsersExperiment.isControl()).thenReturn(false)
-        whenever(mockReactivateUsersExperiment.isDuckPlayerPrompt()).thenReturn(false)
-        whenever(mockReactivateUsersExperiment.isBrowserComparisonPrompt()).thenReturn(true)
-        whenever(mockRepository.getDaxPromptsShowBrowserComparison()).thenReturn(false)
-
-        val result = testee.evaluate()
-
-        assertEquals(ActionType.NONE, result)
-    }
-
-    @Test
-    fun whenUserIsEligibleButNotInAnyExperimentGroupThenReturnNone() = runTest {
-        mockUserIsEligible()
-        whenever(mockReactivateUsersExperiment.isControl()).thenReturn(false)
-        whenever(mockReactivateUsersExperiment.isDuckPlayerPrompt()).thenReturn(false)
-        whenever(mockReactivateUsersExperiment.isBrowserComparisonPrompt()).thenReturn(false)
-
-        val result = testee.evaluate()
-
-        assertEquals(ActionType.NONE, result)
     }
 
     @Test
@@ -175,5 +159,27 @@ class RealDaxPromptsTest {
 
     private fun mockUserIsNotEligible() {
         whenever(mockUserBrowserProperties.daysSinceInstalled()).thenReturn(27)
+    }
+
+    private fun mockFlagIsEnabled() {
+        fakeReactivateUsersToggles.self().setRawStoredState(Toggle.State(true))
+        fakeReactivateUsersToggles.browserComparisonPrompt().setRawStoredState(Toggle.State(true))
+    }
+
+    private fun mockFlagIsDisabled() {
+        fakeReactivateUsersToggles.self().setRawStoredState(Toggle.State(true))
+        fakeReactivateUsersToggles.browserComparisonPrompt().setRawStoredState(Toggle.State(false))
+    }
+
+    private fun mockShouldShowBrowserComparisonPrompt() {
+        runBlocking {
+            whenever(mockRepository.getDaxPromptsShowBrowserComparison()).thenReturn(true)
+        }
+    }
+
+    private fun mockShouldNotShowBrowserComparisonPrompt() {
+        runBlocking {
+            whenever(mockRepository.getDaxPromptsShowBrowserComparison()).thenReturn(false)
+        }
     }
 }

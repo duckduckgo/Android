@@ -37,7 +37,7 @@ private const val EXISTING_USER_DAYS_INACTIVE_MILLIS = 7 * 24 * 60 * 60 * 1000 /
 @ContributesBinding(AppScope::class, boundType = DaxPrompts::class)
 class RealDaxPrompts @Inject constructor(
     private val daxPromptsRepository: DaxPromptsRepository,
-    private val reactivateUsersExperiment: ReactivateUsersExperiment,
+    private val reactivateUsersToggles: ReactivateUsersToggles,
     private val userBrowserProperties: UserBrowserProperties,
     private val defaultBrowserDetector: DefaultBrowserDetector,
     private val defaultRoleBrowserDialog: DefaultRoleBrowserDialog,
@@ -45,20 +45,16 @@ class RealDaxPrompts @Inject constructor(
 ) : DaxPrompts {
 
     override suspend fun evaluate(): ActionType {
+        return if (isEnabled() && isEligible() && shouldShowBrowserComparisonPrompt()) {
+            ActionType.SHOW_VARIANT_BROWSER_COMPARISON
+        } else {
+            ActionType.NONE
+        }
+    }
+
+    private suspend fun isEnabled(): Boolean {
         return withContext(dispatchers.io()) {
-            if (!isEligible()) {
-                return@withContext ActionType.NONE
-            }
-
-            reactivateUsersExperiment.enrol()
-
-            if (reactivateUsersExperiment.isControl()) {
-                ActionType.SHOW_CONTROL
-            } else if (reactivateUsersExperiment.isBrowserComparisonPrompt()) {
-                if (shouldShowBrowserComparisonPrompt()) ActionType.SHOW_VARIANT_BROWSER_COMPARISON else ActionType.NONE
-            } else {
-                ActionType.NONE
-            }
+            reactivateUsersToggles.self().isEnabled() && reactivateUsersToggles.browserComparisonPrompt().isEnabled()
         }
     }
 

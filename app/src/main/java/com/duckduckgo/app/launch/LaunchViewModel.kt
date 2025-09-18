@@ -27,7 +27,6 @@ import com.duckduckgo.app.referral.AppInstallationReferrerStateListener.Companio
 import com.duckduckgo.common.utils.SingleLiveEvent
 import com.duckduckgo.daxprompts.api.DaxPrompts
 import com.duckduckgo.daxprompts.api.DaxPrompts.ActionType.NONE
-import com.duckduckgo.daxprompts.api.DaxPrompts.ActionType.SHOW_CONTROL
 import com.duckduckgo.daxprompts.api.DaxPrompts.ActionType.SHOW_VARIANT_BROWSER_COMPARISON
 import com.duckduckgo.di.scopes.ActivityScope
 import javax.inject.Inject
@@ -71,7 +70,7 @@ class LaunchViewModel @Inject constructor(
         }
 
         when (daxPrompts.evaluate()) {
-            SHOW_CONTROL, NONE -> {
+            NONE -> {
                 logcat { "Control / None action" }
                 showOnboardingOrHome()
             }

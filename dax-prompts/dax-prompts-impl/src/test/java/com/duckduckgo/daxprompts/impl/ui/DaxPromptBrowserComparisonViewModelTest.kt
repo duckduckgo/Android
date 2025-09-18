@@ -23,9 +23,7 @@ import androidx.test.platform.app.InstrumentationRegistry
 import app.cash.turbine.test
 import com.duckduckgo.app.global.DefaultRoleBrowserDialog
 import com.duckduckgo.common.test.CoroutineTestRule
-import com.duckduckgo.daxprompts.impl.ReactivateUsersExperiment
 import com.duckduckgo.daxprompts.impl.repository.DaxPromptsRepository
-import com.duckduckgo.daxprompts.impl.ui.DaxPromptBrowserComparisonViewModel.Companion.BROWSER_COMPARISON_MORE_URL
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -34,7 +32,6 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mockito.mock
-import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
@@ -49,7 +46,6 @@ class DaxPromptBrowserComparisonViewModelTest {
 
     private val mockDefaultRoleBrowserDialog: DefaultRoleBrowserDialog = mock()
     private val mockDaxPromptsRepository: DaxPromptsRepository = mock()
-    private val mockReactivateUsersExperiment: ReactivateUsersExperiment = mock()
     private val mockApplicationContext: Context = InstrumentationRegistry.getInstrumentation().targetContext
 
     @Before
@@ -57,20 +53,8 @@ class DaxPromptBrowserComparisonViewModelTest {
         testee = DaxPromptBrowserComparisonViewModel(
             mockDefaultRoleBrowserDialog,
             mockDaxPromptsRepository,
-            mockReactivateUsersExperiment,
             mockApplicationContext,
         )
-    }
-
-    @Test
-    fun whenMoreLinkClickedThenEmitsOpenDetailsPageCommand() = runTest {
-        testee.onMoreLinkClicked()
-
-        testee.commands().test {
-            assertEquals(DaxPromptBrowserComparisonViewModel.Command.OpenDetailsPage(BROWSER_COMPARISON_MORE_URL), awaitItem())
-            cancelAndIgnoreRemainingEvents()
-        }
-        verify(mockReactivateUsersExperiment).firePlusEvenMoreProtectionsLinkClick()
     }
 
     @Test
@@ -81,7 +65,6 @@ class DaxPromptBrowserComparisonViewModelTest {
             assertEquals(DaxPromptBrowserComparisonViewModel.Command.CloseScreen(), awaitItem())
             cancelAndIgnoreRemainingEvents()
         }
-        verify(mockReactivateUsersExperiment).fireCloseScreen()
     }
 
     @Test
@@ -96,7 +79,6 @@ class DaxPromptBrowserComparisonViewModelTest {
             assertEquals(DaxPromptBrowserComparisonViewModel.Command.BrowserComparisonChart(mockIntent), awaitItem())
             cancelAndIgnoreRemainingEvents()
         }
-        verify(mockReactivateUsersExperiment).fireChooseYourBrowserClick()
     }
 
     @Test
@@ -110,7 +92,6 @@ class DaxPromptBrowserComparisonViewModelTest {
             assertEquals(DaxPromptBrowserComparisonViewModel.Command.CloseScreen(), awaitItem())
             cancelAndIgnoreRemainingEvents()
         }
-        verify(mockReactivateUsersExperiment, never()).fireChooseYourBrowserClick()
     }
 
     @Test
@@ -123,7 +104,6 @@ class DaxPromptBrowserComparisonViewModelTest {
             assertEquals(DaxPromptBrowserComparisonViewModel.Command.CloseScreen(), awaitItem())
             cancelAndIgnoreRemainingEvents()
         }
-        verify(mockReactivateUsersExperiment, never()).fireChooseYourBrowserClick()
     }
 
     @Test
@@ -135,7 +115,6 @@ class DaxPromptBrowserComparisonViewModelTest {
             assertEquals(DaxPromptBrowserComparisonViewModel.Command.CloseScreen(true), awaitItem())
             cancelAndIgnoreRemainingEvents()
         }
-        verify(mockReactivateUsersExperiment).fireSetBrowserAsDefault()
     }
 
     @Test

@@ -30,7 +30,6 @@ import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
 import com.duckduckgo.anvil.annotations.InjectWith
-import com.duckduckgo.browser.api.ui.BrowserScreens.WebViewActivityWithParams
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.daxprompts.api.DaxPromptBrowserComparisonNoParams
@@ -86,7 +85,7 @@ class DaxPromptBrowserComparisonActivity : DuckDuckGoActivity() {
             viewModel.onPrimaryButtonClicked()
         }
 
-        binding.daxPromptBrowserComparisonGhostButton?.setOnClickListener {
+        binding.daxPromptBrowserComparisonGhostButton.setOnClickListener {
             viewModel.onGhostButtonClicked()
         }
     }
@@ -114,16 +113,6 @@ class DaxPromptBrowserComparisonActivity : DuckDuckGoActivity() {
 
             is Command.BrowserComparisonChart -> {
                 startBrowserComparisonChartActivityForResult.launch(command.intent)
-            }
-
-            is Command.OpenDetailsPage -> {
-                globalActivityStarter.start(
-                    this,
-                    WebViewActivityWithParams(
-                        url = command.url,
-                        screenTitle = "",
-                    ),
-                )
             }
         }
     }

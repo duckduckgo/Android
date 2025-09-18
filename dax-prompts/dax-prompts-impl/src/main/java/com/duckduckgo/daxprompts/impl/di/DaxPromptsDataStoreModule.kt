@@ -31,7 +31,7 @@ import javax.inject.Qualifier
 object DaxPromptsDataStoreModule {
 
     private val Context.daxPromptsDataStore: DataStore<Preferences> by preferencesDataStore(
-        name = "dax_prompts",
+        name = "dax_prompts_feature",
     )
 
     @Provides
