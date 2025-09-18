@@ -37,9 +37,9 @@ interface PageLoadedHandler {
         title: String?,
         start: Long,
         end: Long,
-        isTabInForeground: Boolean,
-        requestsOnStart: Int,
-        requestsWhenFinished: Int
+        isTabInForegroundOnFinish: Boolean,
+        activeRequestsOnLoadStart: Int,
+        concurrentRequestsOnFinish: Int,
     )
 }
 
@@ -59,9 +59,9 @@ class RealPageLoadedHandler @Inject constructor(
         title: String?,
         start: Long,
         end: Long,
-        isTabInForeground: Boolean,
-        requestsOnStart: Int,
-        requestsWhenFinished: Int,
+        isTabInForegroundOnFinish: Boolean,
+        activeRequestsOnLoadStart: Int,
+        concurrentRequestsOnFinish: Int,
     ) {
         appCoroutineScope.launch(dispatcherProvider.io()) {
             if (sites.any { UriString.sameOrSubdomain(url, it) }) {
@@ -75,8 +75,11 @@ class RealPageLoadedHandler @Inject constructor(
                     ),
                 )
             }
-            logcat { "$$$: Page load time: ${end - start}, foreground: $isTabInForeground, " +
-                "requestsOnStart: $requestsOnStart, requestsWhenFinished: $requestsWhenFinished" }
+            logcat {
+                "$$$: Page load time: ${end - start}, foreground: $isTabInForegroundOnFinish, " +
+                    "activeRequestsOnLoadStart: $activeRequestsOnLoadStart, " +
+                    "concurrentRequestsOnFinish: $concurrentRequestsOnFinish"
+            }
         }
     }
 }

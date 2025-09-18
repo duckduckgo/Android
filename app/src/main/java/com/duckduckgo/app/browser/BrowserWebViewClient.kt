@@ -89,6 +89,9 @@ import com.duckduckgo.privacy.config.api.AmpLinks
 import com.duckduckgo.subscriptions.api.Subscriptions
 import com.duckduckgo.user.agent.api.ClientBrandHintProvider
 import java.net.URI
+import java.util.UUID
+import java.util.concurrent.ConcurrentHashMap
+import java.util.concurrent.atomic.AtomicInteger
 import javax.inject.Inject
 import kotlinx.coroutines.*
 import logcat.LogPriority
@@ -96,9 +99,6 @@ import logcat.LogPriority.INFO
 import logcat.LogPriority.VERBOSE
 import logcat.LogPriority.WARN
 import logcat.logcat
-import java.util.UUID
-import java.util.concurrent.ConcurrentHashMap
-import java.util.concurrent.atomic.AtomicInteger
 
 private const val ABOUT_BLANK = "about:blank"
 
@@ -565,9 +565,9 @@ class BrowserWebViewClient @Inject constructor(
                             title = navigationList.currentItem?.title,
                             start = safeStart,
                             end = currentTimeProvider.elapsedRealtime(),
-                            isTabInForeground = webViewClientListener?.isTabInForeground() ?: true,
-                            requestsOnStart = parallelRequestsOnStart,
-                            requestsWhenFinished = parallelRequestCounter.get() - 1
+                            isTabInForegroundOnFinish = webViewClientListener?.isTabInForeground() ?: true,
+                            activeRequestsOnLoadStart = parallelRequestsOnStart,
+                            concurrentRequestsOnFinish = parallelRequestCounter.get() - 1,
                         )
                         shouldSendPagePaintedPixel(webView = webView, url = it)
                         appCoroutineScope.launch(dispatcherProvider.io()) {
