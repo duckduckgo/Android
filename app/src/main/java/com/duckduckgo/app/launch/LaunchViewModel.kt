@@ -29,7 +29,6 @@ import com.duckduckgo.daxprompts.api.DaxPrompts
 import com.duckduckgo.daxprompts.api.DaxPrompts.ActionType.NONE
 import com.duckduckgo.daxprompts.api.DaxPrompts.ActionType.SHOW_CONTROL
 import com.duckduckgo.daxprompts.api.DaxPrompts.ActionType.SHOW_VARIANT_BROWSER_COMPARISON
-import com.duckduckgo.daxprompts.api.DaxPrompts.ActionType.SHOW_VARIANT_DUCKPLAYER
 import com.duckduckgo.di.scopes.ActivityScope
 import javax.inject.Inject
 import kotlinx.coroutines.async
@@ -52,8 +51,6 @@ class LaunchViewModel @Inject constructor(
     sealed class Command {
         data object Onboarding : Command()
         data class Home(val replaceExistingSearch: Boolean = false) : Command()
-        data object DaxPromptDuckPlayer : Command()
-        data class PlayVideoInDuckPlayer(val url: String) : Command()
         data object DaxPromptBrowserComparison : Command()
         data object CloseDaxPrompt : Command()
     }
@@ -79,11 +76,6 @@ class LaunchViewModel @Inject constructor(
                 showOnboardingOrHome()
             }
 
-            SHOW_VARIANT_DUCKPLAYER -> {
-                logcat { "Variant Duck Player action" }
-                command.value = Command.DaxPromptDuckPlayer
-            }
-
             SHOW_VARIANT_BROWSER_COMPARISON -> {
                 logcat { "Variant Browser Comparison action" }
                 command.value = Command.DaxPromptBrowserComparison
@@ -96,14 +88,6 @@ class LaunchViewModel @Inject constructor(
             command.value = Command.Onboarding
         } else {
             command.value = Command.Home()
-        }
-    }
-
-    fun onDaxPromptDuckPlayerActivityResult(url: String? = null) {
-        if (url != null) {
-            command.value = Command.PlayVideoInDuckPlayer(url)
-        } else {
-            command.value = Command.CloseDaxPrompt
         }
     }
 

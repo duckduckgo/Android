@@ -46,53 +46,53 @@ class RealDaxPromptsRepositoryTest {
     }
 
     @Test
-    fun whenGetDaxPromptsShowDuckPlayerAndNoCachedValueThenReturnFromDataStore() = runTest {
-        whenever(mockDataStore.getDaxPromptsShowDuckPlayer()).thenReturn(true)
+    fun whenGetDaxPromptsShowBrowserComparisonAndNoCachedValueThenReturnFromDataStore() = runTest {
+        whenever(mockDataStore.getDaxPromptsShowBrowserComparison()).thenReturn(true)
 
-        val result = testee.getDaxPromptsShowDuckPlayer()
+        val result = testee.getDaxPromptsShowBrowserComparison()
 
         assertEquals(true, result)
-        verify(mockDataStore, times(1)).getDaxPromptsShowDuckPlayer()
+        verify(mockDataStore, times(1)).getDaxPromptsShowBrowserComparison()
     }
 
     @Test
-    fun whenGetDaxPromptsShowDuckPlayerAndCachedValueExistsThenReturnCachedValue() = runTest {
-        whenever(mockDataStore.getDaxPromptsShowDuckPlayer()).thenReturn(true)
-        testee.setDaxPromptsShowDuckPlayer(false)
-        whenever(mockDataStore.getDaxPromptsShowDuckPlayer()).thenReturn(true) // This shouldn't be called
+    fun whenGetDaxPromptsShowBrowserComparisonAndCachedValueExistsThenReturnCachedValue() = runTest {
+        whenever(mockDataStore.getDaxPromptsShowBrowserComparison()).thenReturn(true)
+        testee.setDaxPromptsShowBrowserComparison(false)
+        whenever(mockDataStore.getDaxPromptsShowBrowserComparison()).thenReturn(true) // This shouldn't be called
 
-        val result = testee.getDaxPromptsShowDuckPlayer()
+        val result = testee.getDaxPromptsShowBrowserComparison()
 
         assertEquals(false, result)
-        verify(mockDataStore, never()).getDaxPromptsShowDuckPlayer()
+        verify(mockDataStore, never()).getDaxPromptsShowBrowserComparison()
     }
 
     @Test
-    fun whenSetDaxPromptsShowDuckPlayerThenUpdateBothCacheAndDataStore() = runTest {
-        testee.setDaxPromptsShowDuckPlayer(true)
+    fun whenSetDaxPromptsShowBrowserComparisonThenUpdateBothCacheAndDataStore() = runTest {
+        testee.setDaxPromptsShowBrowserComparison(true)
 
-        verify(mockDataStore, times(1)).setDaxPromptsShowDuckPlayer(true)
-        assertEquals(true, testee.getDaxPromptsShowDuckPlayer())
+        verify(mockDataStore, times(1)).setDaxPromptsShowBrowserComparison(true)
+        assertEquals(true, testee.getDaxPromptsShowBrowserComparison())
     }
 
     @Test
-    fun whenSetDaxPromptsShowDuckPlayerThenSubsequentGetReturnsNewValue() = runTest {
-        whenever(mockDataStore.getDaxPromptsShowDuckPlayer()).thenReturn(false)
+    fun whenSetDaxPromptsShowBrowserComparisonThenSubsequentGetReturnsNewValue() = runTest {
+        whenever(mockDataStore.getDaxPromptsShowBrowserComparison()).thenReturn(false)
 
-        val initialResult = testee.getDaxPromptsShowDuckPlayer()
-        testee.setDaxPromptsShowDuckPlayer(true)
-        val finalResult = testee.getDaxPromptsShowDuckPlayer()
+        val initialResult = testee.getDaxPromptsShowBrowserComparison()
+        testee.setDaxPromptsShowBrowserComparison(true)
+        val finalResult = testee.getDaxPromptsShowBrowserComparison()
 
         assertEquals(false, initialResult)
         assertEquals(true, finalResult)
     }
 
     @Test
-    fun whenSetDaxPromptsShowDuckPlayerWithSameValueThenStillUpdateDataStore() = runTest {
-        testee.setDaxPromptsShowDuckPlayer(true)
+    fun whenSetDaxPromptsShowBrowserComparisonWithSameValueThenStillUpdateDataStore() = runTest {
+        testee.setDaxPromptsShowBrowserComparison(true)
 
-        testee.setDaxPromptsShowDuckPlayer(true)
+        testee.setDaxPromptsShowBrowserComparison(true)
 
-        verify(mockDataStore, times(2)).setDaxPromptsShowDuckPlayer(true)
+        verify(mockDataStore, times(2)).setDaxPromptsShowBrowserComparison(true)
     }
 }

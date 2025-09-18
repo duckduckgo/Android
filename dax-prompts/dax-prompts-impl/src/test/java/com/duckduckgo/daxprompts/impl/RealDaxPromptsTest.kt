@@ -22,11 +22,6 @@ import com.duckduckgo.browser.api.UserBrowserProperties
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.daxprompts.api.DaxPrompts.ActionType
 import com.duckduckgo.daxprompts.impl.repository.DaxPromptsRepository
-import com.duckduckgo.duckplayer.api.DuckPlayer
-import com.duckduckgo.duckplayer.api.DuckPlayer.UserPreferences
-import com.duckduckgo.duckplayer.api.PrivatePlayerMode.AlwaysAsk
-import com.duckduckgo.duckplayer.api.PrivatePlayerMode.Disabled
-import com.duckduckgo.duckplayer.api.PrivatePlayerMode.Enabled
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
@@ -51,7 +46,6 @@ class RealDaxPromptsTest {
     private val mockUserBrowserProperties: UserBrowserProperties = mock()
     private val mockDefaultBrowserDetector: DefaultBrowserDetector = mock()
     private val mockDefaultRoleBrowserDialog: DefaultRoleBrowserDialog = mock()
-    private val mockDuckPlayer: DuckPlayer = mock()
 
     @Before
     fun setup() {
@@ -61,7 +55,6 @@ class RealDaxPromptsTest {
             mockUserBrowserProperties,
             mockDefaultBrowserDetector,
             mockDefaultRoleBrowserDialog,
-            mockDuckPlayer,
             coroutineTestRule.testDispatcherProvider,
         )
     }
@@ -83,30 +76,6 @@ class RealDaxPromptsTest {
         val result = testee.evaluate()
 
         assertEquals(ActionType.SHOW_CONTROL, result)
-    }
-
-    @Test
-    fun whenUserIsEligibleAndInDuckPlayerGroupAndShouldShowPromptThenReturnShowVariant1() = runTest {
-        mockUserIsEligible()
-        whenever(mockReactivateUsersExperiment.isControl()).thenReturn(false)
-        whenever(mockReactivateUsersExperiment.isDuckPlayerPrompt()).thenReturn(true)
-        whenever(mockRepository.getDaxPromptsShowDuckPlayer()).thenReturn(true)
-
-        val result = testee.evaluate()
-
-        assertEquals(ActionType.SHOW_VARIANT_DUCKPLAYER, result)
-    }
-
-    @Test
-    fun whenUserIsEligibleAndInDuckPlayerGroupAndShouldNotShowPromptThenReturnNone() = runTest {
-        mockUserIsEligible()
-        whenever(mockReactivateUsersExperiment.isControl()).thenReturn(false)
-        whenever(mockReactivateUsersExperiment.isDuckPlayerPrompt()).thenReturn(true)
-        whenever(mockRepository.getDaxPromptsShowDuckPlayer()).thenReturn(false)
-
-        val result = testee.evaluate()
-
-        assertEquals(ActionType.NONE, result)
     }
 
     @Test
@@ -155,7 +124,6 @@ class RealDaxPromptsTest {
         whenever(mockUserBrowserProperties.daysUsedSince(any())).thenReturn(0)
         whenever(mockDefaultBrowserDetector.isDefaultBrowser()).thenReturn(false)
         whenever(mockDefaultRoleBrowserDialog.shouldShowDialog()).thenReturn(true)
-        whenever(mockDuckPlayer.getUserPreferences()).thenReturn(UserPreferences(false, AlwaysAsk))
 
         val result = testee.evaluate()
 
@@ -168,7 +136,6 @@ class RealDaxPromptsTest {
         whenever(mockUserBrowserProperties.daysUsedSince(any())).thenReturn(1)
         whenever(mockDefaultBrowserDetector.isDefaultBrowser()).thenReturn(false)
         whenever(mockDefaultRoleBrowserDialog.shouldShowDialog()).thenReturn(true)
-        whenever(mockDuckPlayer.getUserPreferences()).thenReturn(UserPreferences(false, AlwaysAsk))
 
         val result = testee.evaluate()
 
@@ -181,7 +148,6 @@ class RealDaxPromptsTest {
         whenever(mockUserBrowserProperties.daysUsedSince(any())).thenReturn(0)
         whenever(mockDefaultBrowserDetector.isDefaultBrowser()).thenReturn(true)
         whenever(mockDefaultRoleBrowserDialog.shouldShowDialog()).thenReturn(true)
-        whenever(mockDuckPlayer.getUserPreferences()).thenReturn(UserPreferences(false, AlwaysAsk))
 
         val result = testee.evaluate()
 
@@ -194,47 +160,6 @@ class RealDaxPromptsTest {
         whenever(mockUserBrowserProperties.daysUsedSince(any())).thenReturn(0)
         whenever(mockDefaultBrowserDetector.isDefaultBrowser()).thenReturn(false)
         whenever(mockDefaultRoleBrowserDialog.shouldShowDialog()).thenReturn(false)
-        whenever(mockDuckPlayer.getUserPreferences()).thenReturn(UserPreferences(false, AlwaysAsk))
-
-        val result = testee.evaluate()
-
-        assertEquals(ActionType.NONE, result)
-    }
-
-    @Test
-    fun whenDuckPlayerIsEnabledThenUserIsNotEligible() = runTest {
-        whenever(mockUserBrowserProperties.daysSinceInstalled()).thenReturn(30)
-        whenever(mockUserBrowserProperties.daysUsedSince(any())).thenReturn(0)
-        whenever(mockDefaultBrowserDetector.isDefaultBrowser()).thenReturn(false)
-        whenever(mockDefaultRoleBrowserDialog.shouldShowDialog()).thenReturn(true)
-        whenever(mockDuckPlayer.getUserPreferences()).thenReturn(UserPreferences(false, Enabled))
-
-        val result = testee.evaluate()
-
-        assertEquals(ActionType.NONE, result)
-    }
-
-    @Test
-    fun whenDuckPlayerIsDisabledThenUserIsNotEligible() = runTest {
-        whenever(mockUserBrowserProperties.daysSinceInstalled()).thenReturn(30)
-        whenever(mockUserBrowserProperties.daysUsedSince(any())).thenReturn(0)
-        whenever(mockDefaultBrowserDetector.isDefaultBrowser()).thenReturn(false)
-        whenever(mockDefaultRoleBrowserDialog.shouldShowDialog()).thenReturn(true)
-        whenever(mockDuckPlayer.getUserPreferences()).thenReturn(UserPreferences(false, Disabled))
-
-        val result = testee.evaluate()
-
-        assertEquals(ActionType.NONE, result)
-    }
-
-    @Test
-    fun whenDuckPlayerIsFeatureFlagDisabledThenUserIsNotEligible() = runTest {
-        whenever(mockUserBrowserProperties.daysSinceInstalled()).thenReturn(30)
-        whenever(mockUserBrowserProperties.daysUsedSince(any())).thenReturn(0)
-        whenever(mockDefaultBrowserDetector.isDefaultBrowser()).thenReturn(false)
-        whenever(mockDefaultRoleBrowserDialog.shouldShowDialog()).thenReturn(true)
-        whenever(mockDuckPlayer.getUserPreferences()).thenReturn(UserPreferences(false, AlwaysAsk))
-        whenever(mockDuckPlayer.getDuckPlayerState()).thenReturn(DuckPlayer.DuckPlayerState.DISABLED)
 
         val result = testee.evaluate()
 
@@ -246,8 +171,6 @@ class RealDaxPromptsTest {
         whenever(mockUserBrowserProperties.daysUsedSince(any())).thenReturn(0)
         whenever(mockDefaultBrowserDetector.isDefaultBrowser()).thenReturn(false)
         whenever(mockDefaultRoleBrowserDialog.shouldShowDialog()).thenReturn(true)
-        whenever(mockDuckPlayer.getUserPreferences()).thenReturn(UserPreferences(false, AlwaysAsk))
-        whenever(mockDuckPlayer.getDuckPlayerState()).thenReturn(DuckPlayer.DuckPlayerState.ENABLED)
     }
 
     private fun mockUserIsNotEligible() {

@@ -25,7 +25,6 @@ interface DaxPrompts {
 
     enum class ActionType {
         SHOW_CONTROL,
-        SHOW_VARIANT_DUCKPLAYER,
         SHOW_VARIANT_BROWSER_COMPARISON,
         NONE,
     }

@@ -25,8 +25,6 @@ import javax.inject.Inject
 import kotlinx.coroutines.withContext
 
 interface DaxPromptsRepository {
-    suspend fun setDaxPromptsShowDuckPlayer(show: Boolean)
-    suspend fun getDaxPromptsShowDuckPlayer(): Boolean
     suspend fun setDaxPromptsShowBrowserComparison(show: Boolean)
     suspend fun getDaxPromptsShowBrowserComparison(): Boolean
 }
@@ -37,20 +35,7 @@ class RealDaxPromptsRepository @Inject constructor(
     private val daxPromptsDataStore: DaxPromptsDataStore,
     private val dispatchers: DispatcherProvider,
 ) : DaxPromptsRepository {
-
-    private var showDuckPlayer: Boolean? = null
     private var showBrowserComparison: Boolean? = null
-
-    override suspend fun setDaxPromptsShowDuckPlayer(show: Boolean) {
-        showDuckPlayer = show
-        withContext(dispatchers.io()) {
-            daxPromptsDataStore.setDaxPromptsShowDuckPlayer(show)
-        }
-    }
-
-    override suspend fun getDaxPromptsShowDuckPlayer(): Boolean {
-        return showDuckPlayer ?: daxPromptsDataStore.getDaxPromptsShowDuckPlayer()
-    }
 
     override suspend fun setDaxPromptsShowBrowserComparison(show: Boolean) {
         showBrowserComparison = show

@@ -24,8 +24,6 @@ import com.duckduckgo.daxprompts.api.DaxPrompts
 import com.duckduckgo.daxprompts.api.DaxPrompts.ActionType
 import com.duckduckgo.daxprompts.impl.repository.DaxPromptsRepository
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.duckplayer.api.DuckPlayer
-import com.duckduckgo.duckplayer.api.PrivatePlayerMode.AlwaysAsk
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
 import java.util.Date
@@ -43,7 +41,6 @@ class RealDaxPrompts @Inject constructor(
     private val userBrowserProperties: UserBrowserProperties,
     private val defaultBrowserDetector: DefaultBrowserDetector,
     private val defaultRoleBrowserDialog: DefaultRoleBrowserDialog,
-    private val duckPlayer: DuckPlayer,
     private val dispatchers: DispatcherProvider,
 ) : DaxPrompts {
 
@@ -57,8 +54,6 @@ class RealDaxPrompts @Inject constructor(
 
             if (reactivateUsersExperiment.isControl()) {
                 ActionType.SHOW_CONTROL
-            } else if (reactivateUsersExperiment.isDuckPlayerPrompt()) {
-                if (shouldShowDuckPlayerPrompt()) ActionType.SHOW_VARIANT_DUCKPLAYER else ActionType.NONE
             } else if (reactivateUsersExperiment.isBrowserComparisonPrompt()) {
                 if (shouldShowBrowserComparisonPrompt()) ActionType.SHOW_VARIANT_BROWSER_COMPARISON else ActionType.NONE
             } else {
@@ -78,24 +73,12 @@ class RealDaxPrompts @Inject constructor(
                 return@withContext false
             }
 
-            if (duckPlayer.getDuckPlayerState() != DuckPlayer.DuckPlayerState.ENABLED) {
-                return@withContext false
-            }
-
-            if (duckPlayer.getUserPreferences().privatePlayerMode != AlwaysAsk) {
-                return@withContext false
-            }
-
             if (defaultBrowserDetector.isDefaultBrowser()) {
                 return@withContext false
             }
 
             defaultRoleBrowserDialog.shouldShowDialog()
         }
-    }
-
-    private suspend fun shouldShowDuckPlayerPrompt(): Boolean = withContext(dispatchers.io()) {
-        daxPromptsRepository.getDaxPromptsShowDuckPlayer()
     }
 
     private suspend fun shouldShowBrowserComparisonPrompt(): Boolean = withContext(dispatchers.io()) {
