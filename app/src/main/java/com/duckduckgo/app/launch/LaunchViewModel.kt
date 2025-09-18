@@ -27,7 +27,7 @@ import com.duckduckgo.app.referral.AppInstallationReferrerStateListener.Companio
 import com.duckduckgo.common.utils.SingleLiveEvent
 import com.duckduckgo.daxprompts.api.DaxPrompts
 import com.duckduckgo.daxprompts.api.DaxPrompts.ActionType.NONE
-import com.duckduckgo.daxprompts.api.DaxPrompts.ActionType.SHOW_VARIANT_BROWSER_COMPARISON
+import com.duckduckgo.daxprompts.api.DaxPrompts.ActionType.SHOW_BROWSER_COMPARISON_PROMPT
 import com.duckduckgo.di.scopes.ActivityScope
 import javax.inject.Inject
 import kotlinx.coroutines.async
@@ -71,12 +71,12 @@ class LaunchViewModel @Inject constructor(
 
         when (daxPrompts.evaluate()) {
             NONE -> {
-                logcat { "Control / None action" }
+                logcat { "daxPrompts evaluate: None action" }
                 showOnboardingOrHome()
             }
 
-            SHOW_VARIANT_BROWSER_COMPARISON -> {
-                logcat { "Variant Browser Comparison action" }
+            SHOW_BROWSER_COMPARISON_PROMPT -> {
+                logcat { "daxPrompts evaluate: Browser Comparison Prompt action" }
                 command.value = Command.DaxPromptBrowserComparison
             }
         }

@@ -179,7 +179,7 @@ class LaunchViewModelTest {
             mockAppInstallStore,
             mockOnboardingExperiment,
         )
-        whenever(mockDaxPrompts.evaluate()).thenReturn(ActionType.SHOW_VARIANT_BROWSER_COMPARISON)
+        whenever(mockDaxPrompts.evaluate()).thenReturn(ActionType.SHOW_BROWSER_COMPARISON_PROMPT)
         whenever(userStageStore.getUserAppStage()).thenReturn(AppStage.DAX_ONBOARDING)
         testee.command.observeForever(mockCommandObserver)
         testee.determineViewToShow()

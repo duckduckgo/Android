@@ -46,7 +46,7 @@ class RealDaxPrompts @Inject constructor(
 
     override suspend fun evaluate(): ActionType {
         return if (isEnabled() && isEligible() && shouldShowBrowserComparisonPrompt()) {
-            ActionType.SHOW_VARIANT_BROWSER_COMPARISON
+            ActionType.SHOW_BROWSER_COMPARISON_PROMPT
         } else {
             ActionType.NONE
         }

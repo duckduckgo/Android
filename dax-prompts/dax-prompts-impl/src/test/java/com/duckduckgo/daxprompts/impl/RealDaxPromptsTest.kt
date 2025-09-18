@@ -99,7 +99,7 @@ class RealDaxPromptsTest {
 
         val result = testee.evaluate()
 
-        assertEquals(ActionType.SHOW_VARIANT_BROWSER_COMPARISON, result)
+        assertEquals(ActionType.SHOW_BROWSER_COMPARISON_PROMPT, result)
     }
 
     @Test

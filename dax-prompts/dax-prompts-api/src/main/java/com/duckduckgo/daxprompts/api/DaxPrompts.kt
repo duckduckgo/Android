@@ -24,7 +24,7 @@ interface DaxPrompts {
     suspend fun evaluate(): ActionType
 
     enum class ActionType {
-        SHOW_VARIANT_BROWSER_COMPARISON,
+        SHOW_BROWSER_COMPARISON_PROMPT,
         NONE,
     }
 }
