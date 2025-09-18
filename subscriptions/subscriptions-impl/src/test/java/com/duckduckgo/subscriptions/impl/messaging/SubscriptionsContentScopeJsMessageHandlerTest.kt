@@ -6,6 +6,7 @@ import kotlinx.coroutines.test.runTest
 import org.json.JSONObject
 import org.junit.Assert.*
 import org.junit.Test
+import org.mockito.kotlin.mock
 
 class SubscriptionsContentScopeJsMessageHandlerTest {
     private val handler = SubscriptionsContentScopeJsMessageHandler().getJsMessageHandler()
@@ -20,7 +21,7 @@ class SubscriptionsContentScopeJsMessageHandlerTest {
             params = JSONObject(),
         )
 
-        handler.process(message, "secret", callback)
+        handler.process(message, mock(), callback)
 
         assertEquals(1, callback.counter)
     }
@@ -40,9 +41,14 @@ class SubscriptionsContentScopeJsMessageHandlerTest {
     @Test
     fun `only contains valid methods`() = runTest {
         val methods = handler.methods
-        assertTrue(methods.size == 2)
-        assertTrue(methods.first() == "handshake")
-        assertTrue(methods.last() == "subscriptionDetails")
+        assertTrue(methods.size == 7)
+        assertTrue(methods.contains("handshake"))
+        assertTrue(methods.contains("subscriptionDetails"))
+        assertTrue(methods.contains("getAuthAccessToken"))
+        assertTrue(methods.contains("getFeatureConfig"))
+        assertTrue(methods.contains("backToSettings"))
+        assertTrue(methods.contains("openSubscriptionActivation"))
+        assertTrue(methods.contains("openSubscriptionPurchase"))
     }
 
     private val callback = object : JsMessageCallback() {

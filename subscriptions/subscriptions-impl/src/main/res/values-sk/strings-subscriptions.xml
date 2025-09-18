@@ -62,16 +62,17 @@
     <string name="subscriptionStatusSubscribed">Prihlásený/-á</string>
     <string name="privacyPolicyAndTermsOfService">Zásady ochrany osobných údajov a podmienky služby</string>
     <string name="subscriptionStatusFreeTrial">Bezplatná skúšobná verzia je aktívna</string>
-    <string name="monthly">mesačné</string>
-    <string name="yearly">ročne</string>
-    <string name="freeTrialActiveSubscriptionsData" instruction="Placeholder is a date in format MMMM dd, yyyy, second is if trial is monthly or yearly">Tvoja bezplatná skúšobná verzia končí dňa %1$s a v ten deň sa automaticky zmení na %2$s platené predplatné.</string>
+    <string name="freeTrialMonthlyActiveSubscriptionsData" instruction="Placeholder is a date in format MMMM dd, yyyy">Tvoja bezplatná skúšobná verzia končí dňa %1$s a v ten deň sa automaticky zmení na mesačné platené predplatné.</string>
+    <string name="freeTrialYearlyActiveSubscriptionsData" instruction="Placeholder is a date in format MMMM dd, yyyy">Tvoja bezplatná skúšobná verzia končí dňa %1$s a v ten deň sa automaticky zmení na ročné platené predplatné.</string>
     <string name="freeTrialCancelledSubscriptionsData" instruction="Placeholder is a date in format MMMM dd, yyyy">Tvoja bezplatná skúšobná verzia končí %1$s a nebude sa automaticky meniť na platené predplatné.</string>
 
     <!--Settings Subscriptions-->
     <string name="subscriptionSetting">Nastavenia predplatného</string>
     <string name="subscriptionSettingSubscribe">Chráň si pripojenie a totožnosť pomocou Privacy Pro</string>
-    <string name="subscriptionSettingSubscribeSubtitle">Zahŕňa naše služby VPN, Personal Information Removal a Identity Theft Restoration.</string>
-    <string name="subscriptionSettingSubscribeSubtitleRow">Zahŕňa našu VPN a Identity Theft Restoration.</string>
+
+    <string name="subscriptionSettingSubscribeSubtitle">Predplatitelia získajú našu sieť VPN, Personal Information Removal a Identity Theft Restoration.</string>
+    <string name="subscriptionSettingSubscribeSubtitleRow">Predplatitelia získajú našu VPN a Identity Theft Restoration.</string>
+
     <string name="subscriptionSettingGet">Získaj Privacy Pro</string>
     <string name="subscriptionSettingTryFreeTrial">Vyskúšaj Privacy Pro zadarmo</string>
     <string name="subscriptionSettingRestore">Mám predplatné</string>
@@ -167,4 +168,34 @@
     <string name="activityActivateSubscription">Mám predplatné</string>
     <string name="activityPir" translatable="false">Privacy Pro</string>
     <string name="activitySendFeedback">Odoslať spätnú väzbu</string>
+
+    <!-- Privacy Pro Rebranding-->
+    <string name="privacyProRebranding">Predplatné DuckDuckGo</string>
+    <string name="subscriptionSettingExpiredRebranding">Platnosť tvojho predplatného DuckDuckGo vypršala</string>
+    <string name="privacyProFaqRebranding">Potrebuješ pomoc s tvojím predplatným?</string>
+    <string name="privacyProFaqSecondaryRebranding">Získaj odpovede na často kladené otázky alebo kontaktuj podporu predplatného na našich stránkach pomoci. Dostupnosť funkcií sa líši podľa krajiny.</string>
+    <string name="restoreSubscriptionTitleRebranding">Pridaj svoje predplatné do tohto zariadenia</string>
+    <string name="restoreSubscriptionEmailDescriptionRebranding">Prepoj e-mailovú adresu so svojím predplatným, aby si ho mohol/mohla pridať do tohto zariadenia.</string>
+    <string name="activateOnOtherDevicesRebranding">Pridaj svoje predplatné do ďalších zariadení</string>
+    <string name="addToDeviceSecondaryTextWithoutEmailRebranding">Pridaj si predplatné do svojich ďalších zariadení cez Google Play alebo prepojením e-mailovej adresy.</string>
+    <string name="addToDeviceSecondaryTextWithEmailRebranding">Použi vyššie uvedený e-mail na pridanie predplatného v&amp;nbsp;iných zariadeniach v&amp;nbsp;aplikácii DuckDuckGo. Prejdi do Nastavenia &gt; Nastavenia predplatného &gt; Mám predplatné.</string>
+    <string name="subscriptionSettingRebrandingMessage">Privacy Pro sa teraz nazýva predplatné DuckDuckGo.</string>
+    <string name="subscriptionSettingSubscribeRebranding">Chráň si pripojenie a identitu s jedným predplatným.</string>
+    <string name="removeFromDeviceDescriptionRebranding">Na tomto zariadení už nebudeš mať prístup k svojmu predplatnému. Tým sa tvoje predplatné nezruší a zostane aktívne na tvojich ostatných zariadeniach.</string>
+
+    <string name="subscriptionSettingSubscribeWithDuckAiSubtitle">Predplatitelia získajú našu VPN, pokročilé modely umelej inteligencie v Duck.ai, Personal Information Removal a Identity Theft Restoration.</string>
+    <string name="subscriptionSettingSubscribeWithDuckAiSubtitleRow">Predplatitelia získajú našu VPN, pokročilé modely umelej inteligencie v Duck.ai a službu Identity Theft Restoration.</string>
+
+    <string name="feedbackCategoryDuckAi">Duck.ai</string>
+    <string name="feedbackSubCategoryDuckAiSubscriberModels">Nepodarilo sa získať prístup k modelom Duck.ai, ktoré sú určené výhradne pre predplatiteľov.</string>
+    <string name="feedbackSubCategoryDuckAiLoginThirdPartyBrowser">Nemôžem sa s mojím predplatným dostať na Duck.ai v iných prehliadačoch.</string>
+    <string name="feedbackSubCategoryDuckAiOther">Ďalšie pripomienky Duck.ai</string>
+
+    <string name="subscriptionSettingSectionTitle" translatable="false">DuckDuckGo Subscription</string>
+    <string name="subscriptionSettingSubscribeSecure">Zabezpeč si Wi-Fi a chatuj súkromne s pokročilými modelmi umelej inteligencie</string>
+
+    <string name="subscriptionSettingGetRebranding">Predplatné DuckDuckGo</string>
+    <string name="subscriptionSettingTryFreeTrialRebranding">Vyskúšať zadarmo</string>
+    <string name="feedbackGeneralSubscription">Predplatné</string>
+
 </resources>

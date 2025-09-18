@@ -27,7 +27,7 @@ import com.airbnb.lottie.RenderMode
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ActivityFireAnimationBinding
-import com.duckduckgo.app.onboardingdesignexperiment.OnboardingDesignExperimentToggles
+import com.duckduckgo.app.onboardingdesignexperiment.OnboardingDesignExperimentManager
 import com.duckduckgo.app.settings.clear.FireAnimation
 import com.duckduckgo.app.settings.clear.OnboardingExperimentFireAnimationHelper
 import com.duckduckgo.common.ui.DuckDuckGoActivity
@@ -41,7 +41,7 @@ import javax.inject.Inject
 class FireAnimationActivity : DuckDuckGoActivity() {
 
     @Inject
-    lateinit var onboardingDesignExperimentToggles: OnboardingDesignExperimentToggles
+    lateinit var onboardingDesignExperimentManager: OnboardingDesignExperimentManager
 
     @Inject
     lateinit var onboardingExperimentFireAnimationHelper: OnboardingExperimentFireAnimationHelper
@@ -66,7 +66,7 @@ class FireAnimationActivity : DuckDuckGoActivity() {
         fireAnimation: FireAnimation,
         fireAnimationView: LottieAnimationView,
     ) {
-        if (onboardingDesignExperimentToggles.buckOnboarding().isEnabled()) {
+        if (onboardingDesignExperimentManager.isAnyExperimentEnrolledAndEnabled()) {
             val resId = onboardingExperimentFireAnimationHelper.getSelectedFireAnimationResId(fireAnimation)
             fireAnimationView.setAnimation(resId)
         } else {

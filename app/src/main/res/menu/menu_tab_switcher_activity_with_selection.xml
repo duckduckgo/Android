@@ -20,20 +20,31 @@
     tools:ignore="AlwaysShowAction">
 
     <item
-        android:id="@+id/fireMenuItem"
+        android:id="@+id/duckAIToolbarButton"
+        android:icon="@drawable/ic_ai_chat_24"
+        android:title="@string/tabSwitcherListViewMenu"
+        app:showAsAction="always" />
+
+    <item
+        android:id="@+id/fireToolbarButton"
         android:icon="@drawable/ic_fire_24"
         android:title="@string/fireMenu"
         app:showAsAction="always" />
 
     <item
-        android:id="@+id/layoutTypeMenuItem"
-        android:icon="@drawable/ic_view_list_24"
-        android:title="@string/tabSwitcherListViewMenu"
-        android:visible="false"
+        android:id="@+id/newTabToolbarButton"
+        android:icon="@drawable/ic_add_24"
+        android:title="@string/newTabMenuItem"
         app:showAsAction="always" />
 
     <item
-        android:id="@+id/popupMenuItem"
+        android:id="@+id/layoutTypeToolbarButton"
+        android:icon="@drawable/ic_view_list_24"
+        android:title="@string/tabSwitcherListViewMenu"
+        app:showAsAction="always" />
+
+    <item
+        android:id="@+id/popupMenuToolbarButton"
         android:icon="@drawable/ic_menu_vertical_24"
         android:title="@string/browserPopupMenu"
         app:showAsAction="always" />

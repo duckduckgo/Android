@@ -18,12 +18,18 @@ package com.duckduckgo.common.ui.view
 
 import android.content.Context
 import android.content.res.Resources
+import android.graphics.Outline
 import android.view.View
 import android.view.ViewGroup
+import android.view.ViewOutlineProvider
 import android.view.inputmethod.InputMethodManager
 import android.widget.CompoundButton
+import androidx.annotation.ColorInt
+import androidx.annotation.RequiresApi
 import androidx.annotation.StringRes
+import androidx.core.content.ContextCompat
 import androidx.core.view.children
+import com.google.android.material.card.MaterialCardView
 import com.google.android.material.slider.Slider
 import com.google.android.material.snackbar.BaseTransientBottomBar.Duration
 import com.google.android.material.snackbar.Snackbar
@@ -246,4 +252,53 @@ private inline fun <reified T : ViewGroup.LayoutParams> updateLayoutParam(
     val params = view.layoutParams as T
     block(params)
     view.layoutParams = params
+}
+
+/**
+ * Adds a custom shadow below a view with specified size in dp and rounded corners.
+ *
+ * @param shadowSizeDp The size of the shadow in dp
+ * @param offsetYDp Optional vertical offset in dp to position shadow below the view
+ * @param insetDp Optional horizontal inset in dp to prevent shadow from being cut off
+ * @param shadowColor Optional shadow color (Android P and above only)
+ */
+@RequiresApi(28)
+fun View.addBottomShadow(
+    shadowSizeDp: Float = 12f,
+    offsetYDp: Float = 3f,
+    insetDp: Float = 3f,
+    @ColorInt shadowColor: Int = ContextCompat.getColor(context, com.duckduckgo.mobile.android.R.color.background_omnibar_shadow),
+) {
+    val shadowSize = shadowSizeDp.toPx(context)
+    val offsetY = offsetYDp.toPx(context)
+    val inset = insetDp.toPx(context).toInt()
+
+    // Get corner radius if view is a card
+    val cornerRadius = when (this) {
+        is MaterialCardView -> this.radius
+        else -> 0f
+    }
+
+    outlineProvider = object : ViewOutlineProvider() {
+        override fun getOutline(view: View, outline: Outline) {
+            // Create outline with rounded corners that match the view
+            outline.setRoundRect(
+                -inset,
+                0,
+                view.width + inset,
+                view.height,
+                cornerRadius,
+            )
+            // Make the shadow appear only below the view
+            outline.offset(0, offsetY.toInt())
+        }
+    }
+
+    // Set custom shadow color if specified (Android P and above)
+    outlineSpotShadowColor = ContextCompat.getColor(context, android.R.color.transparent)
+    outlineAmbientShadowColor = shadowColor
+
+    clipToOutline = false
+    elevation = shadowSize
+    setAllParentsClip(false)
 }

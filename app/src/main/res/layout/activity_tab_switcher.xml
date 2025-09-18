@@ -22,25 +22,49 @@
     android:layout_height="match_parent">
 
     <include
-        android:id="@+id/toolbarInclude"
+        android:id="@+id/tabSwitcherExperimentToolbarTop"
+        layout="@layout/include_tab_switcher_toolbar_top"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <include
+        android:id="@+id/tabSwitcherToolbarTop"
         layout="@layout/include_default_toolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/tabsRecycler"
+    <FrameLayout
+        android:id="@+id/tabsContainer"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:clipToPadding="false"
-        android:paddingHorizontal="@dimen/keyline_2"
-        android:paddingTop="@dimen/keyline_2"
-        android:paddingBottom="@dimen/keyline_2"
-        app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior"
-        tools:itemCount="3"
-        tools:listitem="@layout/item_tab_grid"
-        tools:showIn="@layout/activity_tab_switcher"
-        tools:spanCount="2" />
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="0.5dp"
+            android:background="?attr/daxColorShade"
+            android:layout_gravity="top"
+            android:elevation="20dp" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/tabsRecycler"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:clipToPadding="false"
+            android:padding="@dimen/keyline_2"
+            app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
+            tools:itemCount="3"
+            tools:listitem="@layout/item_tab_grid"
+            tools:showIn="@layout/activity_tab_switcher"
+            tools:spanCount="2" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="0.5dp"
+            android:background="?attr/daxColorShadeSolid"
+            android:layout_gravity="bottom" />
+
+    </FrameLayout>
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/aiChatFab"
@@ -71,5 +95,12 @@
         tools:text="Test"
         android:visibility="gone"
         app:icon="@drawable/ic_add_24_solid_color" />
+
+    <include
+        android:id="@+id/tabSwitcherToolbarBottom"
+        layout="@layout/include_tab_switcher_toolbar_bottom"
+        android:layout_gravity="bottom"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

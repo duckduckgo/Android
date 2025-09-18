@@ -23,6 +23,8 @@ apply from: "$rootProject.projectDir/gradle/android-library.gradle"
 
 dependencies {
     implementation AndroidX.core.ktx
+    implementation AndroidX.webkit
+    implementation project(':feature-toggles-api')
     implementation project(':js-messaging-api')
 }
 

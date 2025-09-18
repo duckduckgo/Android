@@ -29,6 +29,9 @@ import androidx.lifecycle.repeatOnLifecycle
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.autofill.api.AutofillFeature
+import com.duckduckgo.autofill.api.AutofillImportLaunchSource
+import com.duckduckgo.autofill.api.AutofillImportLaunchSource.PasswordManagementEmptyState
+import com.duckduckgo.autofill.api.AutofillImportLaunchSource.PasswordManagementOverflow
 import com.duckduckgo.autofill.api.AutofillScreenLaunchSource
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.autofill.api.promotion.PasswordsScreenPromotionPlugin
@@ -48,7 +51,7 @@ import com.duckduckgo.autofill.impl.ui.credential.management.AutofillManagementR
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillManagementRecyclerAdapter.CredentialsLoadedState.Loading
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillPasswordsManagementViewModel
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillPasswordsManagementViewModel.ListModeCommand.LaunchDeleteAllPasswordsConfirmation
-import com.duckduckgo.autofill.impl.ui.credential.management.AutofillPasswordsManagementViewModel.ListModeCommand.LaunchImportPasswordsFromGooglePasswordManager
+import com.duckduckgo.autofill.impl.ui.credential.management.AutofillPasswordsManagementViewModel.ListModeCommand.LaunchImportGooglePasswords
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillPasswordsManagementViewModel.ListModeCommand.LaunchReportAutofillBreakageConfirmation
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillPasswordsManagementViewModel.ListModeCommand.LaunchResetNeverSaveListConfirmation
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillPasswordsManagementViewModel.ListModeCommand.PromptUserToAuthenticateMassDeletion
@@ -232,7 +235,7 @@ class AutofillManagementListMode : DuckDuckGoFragment(R.layout.fragment_autofill
                         }
 
                         R.id.importGooglePasswords -> {
-                            viewModel.onImportPasswordsFromGooglePasswordManager()
+                            viewModel.onImportPasswordsFromGooglePasswordManager(importSource = PasswordManagementOverflow)
                             importPasswordsPixelSender.onImportPasswordsOverflowMenuTapped()
                             true
                         }
@@ -338,7 +341,7 @@ class AutofillManagementListMode : DuckDuckGoFragment(R.layout.fragment_autofill
             LaunchResetNeverSaveListConfirmation -> launchResetNeverSavedSitesConfirmation()
             is LaunchDeleteAllPasswordsConfirmation -> launchDeleteAllLoginsConfirmationDialog(command.numberToDelete)
             is PromptUserToAuthenticateMassDeletion -> promptUserToAuthenticateMassDeletion(command.authConfiguration)
-            is LaunchImportPasswordsFromGooglePasswordManager -> launchImportPasswordsScreen()
+            is LaunchImportGooglePasswords -> launchImportPasswordsScreen(importSource = command.importSource)
             is LaunchReportAutofillBreakageConfirmation -> launchReportBreakageConfirmation(command.eTldPlusOne)
             is ShowUserReportSentMessage -> showUserReportSentMessage()
             is ReevalutePromotions -> evaluatePromotions()
@@ -356,9 +359,9 @@ class AutofillManagementListMode : DuckDuckGoFragment(R.layout.fragment_autofill
         Snackbar.make(binding.root, R.string.autofillManagementReportBreakageSuccessMessage, Snackbar.LENGTH_LONG).show()
     }
 
-    private fun launchImportPasswordsScreen() {
+    private fun launchImportPasswordsScreen(importSource: AutofillImportLaunchSource) {
         context?.let {
-            val dialog = ImportFromGooglePasswordsDialog.instance()
+            val dialog = ImportFromGooglePasswordsDialog.instance(importSource = importSource)
             dialog.show(parentFragmentManager, IMPORT_FROM_GPM_DIALOG_TAG)
         }
     }
@@ -522,7 +525,7 @@ class AutofillManagementListMode : DuckDuckGoFragment(R.layout.fragment_autofill
             onReportBreakageClicked = { viewModel.onReportBreakageClicked() },
             launchHelpPageClicked = this::launchHelpPage,
             onAutofillToggleClicked = this::onAutofillToggledChanged,
-            onImportFromGoogleClicked = this::onImportFromGoogleClicked,
+            onImportFromGoogleClicked = this::onImportFromGoogleClickedFromEmptyList,
             onImportViaDesktopSyncClicked = this::onImportViaDesktopSyncClicked,
         ).also { binding.logins.adapter = it }
     }
@@ -535,9 +538,9 @@ class AutofillManagementListMode : DuckDuckGoFragment(R.layout.fragment_autofill
         }
     }
 
-    private fun onImportFromGoogleClicked() {
-        viewModel.onImportPasswordsFromGooglePasswordManager()
-        importPasswordsPixelSender.onImportPasswordsButtonTapped()
+    private fun onImportFromGoogleClickedFromEmptyList() {
+        viewModel.onImportPasswordsFromGooglePasswordManager(PasswordManagementEmptyState)
+        importPasswordsPixelSender.onImportPasswordsButtonTapped(PasswordManagementEmptyState)
     }
 
     private fun onImportViaDesktopSyncClicked() {

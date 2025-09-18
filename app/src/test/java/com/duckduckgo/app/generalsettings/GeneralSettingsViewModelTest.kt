@@ -402,6 +402,7 @@ internal class GeneralSettingsViewModelTest {
     private fun initTestee() {
         testee = GeneralSettingsViewModel(
             fakeAppSettingsDataStore,
+            fakeAppSettingsDataStore,
             mockPixel,
             mockHistory,
             mockVoiceSearchAvailability,

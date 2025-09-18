@@ -40,6 +40,16 @@ interface InternalAutofillStore : AutofillStore {
      */
     var hasEverBeenPromptedToSaveLogin: Boolean
 
+    var hasEverImportedPasswords: Boolean
+
+    var hasDeclinedInBrowserPasswordImportPromo: Boolean
+    var hasDeclinedPasswordManagementImportPromo: Boolean
+
+    fun hasEverImportedPasswordsFlow(): Flow<Boolean>
+
+    var inBrowserImportPromoShownCount: Int
+    var hasDismissedMainAppSettingsPromo: Boolean
+
     /**
      * Find saved credential for the given id
      * @param id of the saved credential

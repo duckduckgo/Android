@@ -128,6 +128,7 @@
     <!-- Fire -->
     <string name="fireMenu">Сбросить данные</string>
     <string name="fireClearAll">Закрыть вкладки и удалить данные</string>
+    <string name="fireClearAllPlusDuckChats">Закрыть все вкладки и стереть все данные и чаты Duck.ai</string>
     <string name="fireCancel">Отменить</string>
     <string name="fireDataCleared">Данные сброшены</string>
 
@@ -191,6 +192,28 @@
     <string name="webTrackingProtectionLearnMoreTitle">Защита от отслеживания онлайн</string>
     <string name="webTrackingProtectionTitle">Защита от отслеживания онлайн</string>
     <string name="webTrackingProtectionDescriptionNew"><![CDATA[DuckDuckGo автоматически блокирует скрытые трекеры, пока вы посещаете сайты.\n<a href=\"\">Подробнее...</a>]]></string>
+    <string name="webTrackingProtectionExplanationDescription"><![CDATA[Функции защиты от отслеживания в составе DuckDuckGo работают без остановки.\n<a href=\"\">Подробнее...</a>]]></string>
+    <string name="webTrackingProtectionExplanationTitle">Как мы вас защищаем</string>
+    <string name="webTrackingProtectionThirdPartyTrackersTitle">Блокировка сторонних трекеров</string>
+    <string name="webTrackingProtectionThirdPartyTrackersDescription">Не дает сторонним трекерам даже загрузиться, чтобы они не отслеживали ваши перемещения с сайта на сайт.</string>
+    <string name="webTrackingProtectionTargetedAdsTitle">Блокирует целевую рекламу</string>
+    <string name="webTrackingProtectionTargetedAdsDescription">Пресекает загрузку непрошенных трекеров, эффективно избавляя вас от рекламы, которая полагается на отслеживание.</string>
+    <string name="webTrackingProtectionFingerprintTrackingTitle">Защита от отслеживания по цифровому отпечатку</string>
+    <string name="webTrackingProtectionFingerprintTrackingDescription">Не позволяет компаниям собирать уникальные идентификаторы вашего браузера и устройства для дальнейшей слежки за вами в cети.</string>
+    <string name="webTrackingProtectionLinkTrackingTitle">Блокировка отслеживания ссылок</string>
+    <string name="webTrackingProtectionLinkTrackingDescription">Удаляет параметры отслеживания в ссылках, чтобы сторонние компании не могли считывать ваши действия на разных сайтах.</string>
+    <string name="webTrackingProtectionReferrerTrackingTitle">Защита от отслеживания источников трафика</string>
+    <string name="webTrackingProtectionReferrerTrackingDescription">Не позволяет компаниям идентифицировать последний посещенный вами сайт.</string>
+    <string name="webTrackingProtectionFirstPartyCookiesTitle">Остановка действия куки-файлов</string>
+    <string name="webTrackingProtectionFirstPartyCookiesDescription">Автоматически завершает срок действия собственных куки-файлов сайтов по истечении 30 дней, чтобы они не могли бесконечно отслеживать вас после выхода из учетной записи.</string>
+    <string name="webTrackingProtectionDnsCnameCloakingTitle">Защита от маскировки CNAME в DNS</string>
+    <string name="webTrackingProtectionDnsCnameCloakingDescription">Помогает блокировать сторонние трекеры, которые пытаются маскироваться на сайтах с помощью DNS.</string>
+    <string name="webTrackingProtectionGoogleAmpTrackingTitle">Блокировка отслеживания через Google AMP</string>
+    <string name="webTrackingProtectionGoogleAmpTrackingDescription">Заменяет ссылки Google AMP на ссылки источника.</string>
+    <string name="webTrackingProtectionGoogleSigninPopupsTitle">Блокировка всплывающих окон входа в Google</string>
+    <string name="webTrackingProtectionGoogleSigninPopupsDescription">Блокирует всплывающие окна входа в Google на сайтах, не принадлежащих компании.</string>
+    <string name="webTrackingProtectionGlobalPrivacyControlTitle">Глобальный контроль конфиденциальности</string>
+    <string name="webTrackingProtectionGlobalPrivacyControlDescription">От вашего имени задействует право на отказ от распространения данных и запрещает сайтам продавать или передавать вашу личную информацию.</string>
 
     <!-- Cookie Pop-Up Protection -->
     <string name="cookiePopupProtectionTitle">Защита от всплывающих окон куки</string>
@@ -204,6 +227,7 @@
 
     <!-- Appearance -->
     <string name="appearanceActivityTitle">Внешний вид</string>
+    <string name="settingsShowFullUrlTitle">Показывать полный адрес сайта</string>
 
     <!-- Settings - Automatically clearing data -->
     <string name="settingsAutomaticallyClearingDialogSave">Сохранить</string>
@@ -213,6 +237,7 @@
     <string name="settingsAutomaticallyClearWhatOptionNone">Ничего</string>
     <string name="settingsAutomaticallyClearWhatOptionTabs">Вкладки</string>
     <string name="settingsAutomaticallyClearWhatOptionTabsAndData">Вкладки и данные</string>
+    <string name="settingsAutomaticallyClearWhatOptionTabsAndDataAndChats">Вкладки, данные и чаты Duck.ai</string>
 
     <string name="settingsAutomaticallyClearWhen">Выполнять сброс…</string>
     <string name="settingsAutomaticallyClearWhenDialogTitle">Выполнять сброс…</string>
@@ -222,6 +247,8 @@
     <string name="settingsAutomaticallyClearWhenAppExit15Minutes">После выхода из приложения, через 15 минут бездействия</string>
     <string name="settingsAutomaticallyClearWhenAppExit30Minutes">После выхода из приложения, через 30 минут бездействия</string>
     <string name="settingsAutomaticallyClearWhenAppExit60Minutes">После выхода из приложения, через 1 час бездействия</string>
+    <string name="settingsClearAiDataTitle">Очистить чаты Duck.ai</string>
+    <string name="settingsClearAiDataMessage">Кнопка Fire Button также стирает историю Duck.ai.</string>
 
     <!-- About Activity -->
     <string name="aboutActivityTitle">Несколько слов о DuckDuckGo</string>
@@ -250,8 +277,8 @@
     <string name="searchWidgetEmtpyFavoritesHint">В избранное пока ничего не добавлено</string>
     <string name="searchWidgetEmtpyFavoritesCta">Добавить в избранное</string>
     <string name="widgetConfigurationActivityTitle">Настройка виджета</string>
-    <string name="favoritesWidgetLabel">Избранное</string>
-    <string name="searchWidgetLabel">Поиск</string>
+    <string name="favoritesWidgetLabel">Поиск и избранное</string>
+    <string name="searchWidgetLabel">Поиск плюс Duck.ai</string>
 
     <!-- Home Screen Shortcuts -->
     <string name="addToHome">Добавить на домашнюю страницу</string>
@@ -406,7 +433,6 @@
     <string name="crashedWebViewErrorAction">"Перезагрузить"</string>
 
     <!-- System Search-->
-    <string name="systemSearchDeviceAppLabel">С этого устройства</string>
     <string name="systemSearchAppNotFound">Приложение не найдено</string>
     <string name="systemSearchOnboardingThanks">Благодарим за выбор DuckDuckGo!\nНаш браузер помогает защищать вас от хакеров, мошенников и компаний, собирающих чужие данные.</string>
     <string name="systemSearchOnboardingFeaturesIntroText">Приложение DuckDuckGo также:</string>
@@ -785,7 +811,7 @@
     <string name="preOnboardingComparisonChartItem1">Конфиденциальный поиск по умолчанию</string>
     <string name="preOnboardingComparisonChartItem2">Блокировка сторонних трекеров</string>
     <string name="preOnboardingComparisonChartItem3">Блокировка всплывающих окон куки</string>
-    <string name="preOnboardingComparisonChartItem4">Блокирует рекламу с отслеживанием</string>
+    <string name="preOnboardingComparisonChartItem4">Блокировка целевой рекламы</string>
     <string name="preOnboardingComparisonChartItem5">Стирает данные браузера одним нажатием</string>
     <string name="preOnboardingDaxDialog3Title">Супер! Добро пожаловать в утиную команду!</string>
     <string name="preOnboardingDaxDialog3Button">Начать просмотр</string>
@@ -828,8 +854,9 @@
     <string name="onboardingEndDaxDialogDescription">Бродить по сайтам с нами — значит подрезать крылья назойливой рекламе. 👌</string>
     <string name="onboardingEndDaxDialogButton">Всё готово!</string>
     <string name="onboardingPrivacyProDaxDialogTitle">Кстати, пока не забыл...</string>
-    <string name="onboardingPrivacyProDaxDialogDescription"><![CDATA[В DuckDuckGo также есть встроенный <b>VPN</b>!<br/><br/>Для активации этой услуги требуется <b>платная подписка Privacy Pro</b>.]]></string>
+    <string name="onboardingPrivacyProDaxDialogDescription"><![CDATA[DuckDuckGo также предлагает безопасный <b>VPN и еще два вида первоклассной защиты</b> на условиях <b>платной подписки</b>.]]></string>
     <string name="onboardingPrivacyProDaxDialogOkButton">Узнать больше</string>
+    <string name="onboardingPrivacyProDaxDialogFreeTrialOkButton">Ознакомление бесплатное!</string>
     <string name="onboardingPrivacyProDaxDialogCancelButton">Пропустить</string>
 
     <!-- Highlight Onboarding Experiment-->
@@ -874,19 +901,15 @@
     <!-- Privacy Dashboard -->
     <string name="brokenSiteSubmittedReportMessage">Спасибо! Ваш отчет поможет улучшить DuckDuckGo для всех.</string>
 
-    <!-- DuckChat -->
-    <string name="duckChatTitle">Duck.ai</string>
-    <string name="duckChatMenuItem">Запустить AI Chat</string>
-
     <!--    Default Browser Bottom Sheet Dialog -->
     <string name="defaultBrowserBottomSheetDialogTitle">Оставайтесь под защитой DuckDuckGo большую часть времени, проводимого в Интернете</string>
-    <string name="defaultBrowserBottomSheetDialogSubTitle">Сделайте его браузером по умолчанию, чтобы все ссылки на сайты открывались в DuckDuckGo.</string>
-    <string name="defaultBrowserBottomSheetDialogGhostButton">Не сейчас</string>
+    <string name="defaultBrowserBottomSheetDialogSubTitle">Чтобы ссылки всегда открывались в DuckDuckGo, назначьте его браузером по умолчанию.</string>
+    <string name="defaultBrowserBottomSheetDialogGhostButton" instruction="This text appears on a button">Не сейчас</string>
 
-    <!--TabSwitcher Animation Tile Dialog-->
-    <string name="tabSwitcherAnimationTileRemovalDialogTitle">Для безопасности просмотра DuckDuckGo блокирует трекеры</string>
-    <string name="tabSwitcherAnimationTileRemovalDialogBody">В результате закрытия вкладок и очистки данных также будет удалена история блокировки трекеров, а их счетчик будет сброшен до нуля.\n\nЭтот баннер на вкладках можно при желании скрыть.</string>
-    <string name="tabSwitcherAnimationTileRemovalDialogNegativeButton">Скрыть баннер</string>
+    <!-- Default Browser message -->
+    <string name="newTabPageDefaultBrowserMessageHeading">DuckDuckGo не назначен вашим браузером по умолчанию. Почему бы не поднять уровень защиты?</string>
+    <string name="newTabPageDefaultBrowserMessagePrimaryCta" instruction="This text appears on a button">Сделать браузером по умолчанию</string>
+    <string name="newTabPageDefaultBrowserMessageSecondaryCta" instruction="This text appears on a button">Больше не спрашивать</string>
 
     <!-- Threat protection -->
     <string name="maliciousSiteTitle">Предупреждение: этот сайт может быть опасным</string>
@@ -910,4 +933,63 @@
     <string name="scamBlockerTitle">Блокировщик мошенничества</string>
     <string name="scamBlockerDescription">Предупреждать о мошеннических, фишинговых и вредоносных сайтах.</string>
     <string name="threatProtectionLearnMoreTitle">Подробнее</string>
+
+    <!-- Experiment: Improve prompts for "homescreen widget" -->
+    <string name="experimentHomeScreenWidgetBottomSheetDialogTitle">Попробуйте виджет для главного экрана!</string>
+    <string name="experimentHomeScreenWidgetBottomSheetDialogSubTitle">Добавьте наш поисковый виджет на домашний экран для быстрого и удобного доступа.</string>
+    <string name="experimentHomeScreenWidgetBottomSheetDialogPrimaryButton">Добавить виджет</string>
+    <string name="experimentHomeScreenWidgetBottomSheetDialogGhostButton">Не сейчас</string>
+    <string name="experimentHomeScreenWidgetBottomSheetDialogSearchText">Поиск в DuckDuckGo</string>
+
+    <!-- Change under remote feature flag: Widget as a Protection -->
+    <string name="settingsAddHomeWidgetTitle">Виджет для главного экрана</string>
+
+    <!-- Section in main app settings -->
+    <string name="settingsHeadingCompleteSetup">Завершение настройки</string>
+
+    <!-- Buck Onboarding Experiment -->
+    <string name="highlightsPreOnboardingDaxDialog1TitleBuck">Привет!</string>
+    <string name="highlightsPreOnboardingDaxDialog1DescriptionBuck">Быстрый и надежный браузер заказывали?</string>
+    <string name="highlightsPreOnboardingDaxDialog2TitleBuck"><![CDATA[<b>Защита</b> <i>включена!</i>]]></string>
+
+    <!-- BB Onboarding Experiment -->
+    <string name="highlightsPreOnboardingDaxDialog1TitleBb"><![CDATA[Привет!<br/>Быстрый и надежный браузер заказывали?]]></string>
+
+    <string name="bbOnboardingFireButtonDaxDialogTitle"><![CDATA[Кнопка <font color=\"#F05C2B\">Fire Button</font> моментально стирает данные о посещении сайтов]]></string>
+    <string name="bbOnboardingFireButtonDaxDialogDescription">Попробуйте!️</string>
+
+    <plurals name="bbOnboardingTrackersBlockedDialogTitle">
+        <item quantity="one"><![CDATA[ и еще %1$d сервис пытались вести за вами слежку, <font color=\"#F05C2B\">но мы их заблокировали</font>!]]></item>
+        <item quantity="few"><![CDATA[ и еще %1$d сервиса пытались вести за вами слежку, <font color=\"#F05C2B\">но мы их заблокировали</font>!]]></item>
+        <item quantity="many"><![CDATA[ и еще %1$d сервисов пытались вести за вами слежку, <font color=\"#F05C2B\">но мы их заблокировали</font>!]]></item>
+        <item quantity="other"><![CDATA[ и другие сервисы (%1$d) пытались вести за вами слежку, <font color=\"#F05C2B\">но мы их заблокировали</font>!]]></item>
+    </plurals>
+    <plurals name="bbOnboardingTrackersBlockedZeroDialogTitle" tools:ignore="ImpliedQuantity">
+        <item quantity="one"><![CDATA[ пытался вести за вами слежку, <font color=\"#F05C2B\">но мы его заблокировали</font>!]]></item>
+        <item quantity="few"><![CDATA[ пытались вести за вами слежку, <font color=\"#F05C2B\">но мы их заблокировали</font>!]]></item>
+        <item quantity="many"><![CDATA[ пытались вести за вами слежку, <font color=\"#F05C2B\">но мы их заблокировали</font>!]]></item>
+        <item quantity="other"><![CDATA[ пытались вести за вами слежку, <font color=\"#F05C2B\">но мы их заблокировали</font>!]]></item>
+    </plurals>
+
+    <string name="bbOnboardingTrackersBlockedDialogDescription">☝️ Нажмите на щит, чтобы узнать подробности.️</string>
+
+    <!-- Privacy Pro Rebranding-->
+    <string name="aboutDescriptionBrandUpdate2025Rebranding">Welcome to the Duck Side!\n\nDuckDuckGo — независимая компания, которая обеспечивает защиту личной информации в интернете тем, кто хочет вернуть себе контроль над собственными данными.\n\nМы считаем, что лучший способ защитить личную информацию от хакеров, мошенников и навязчивых компаний — полностью пресечь ее сбор. Вот почему миллионы людей <annotation type="chart_comparison">выбирают DuckDuckGo вместо Chrome и других браузеров</annotation> для поиска и просмотра сайтов. Наша встроенная поисковая система работает точно так же, как Google, только не отслеживает ваши запросы. А попытки других компаний собрать ваши данные пресекаются такими защитными функциями, как блокировка рекламных трекеров и куки-файлов. К тому же наш браузер работает бесплатно: мы получаем доход от <annotation type="privacy_respecting_ads">показа рекламных объявлений</annotation>, а не от продажи ваших персональных данных.\n\nВдобавок мы предлагаем подписку <annotation type="ppro_help_page">DuckDuckGo</annotation>, интегрированную прямо в наш браузер. Ее обладателям открываются расширенные возможности — быстрая и удобная служба <annotation type="vpn_help_page">VPN</annotation> для защиты онлайн-активности, передовые ИИ-модели в чат-сервисе Duck.ai, услуга по обнаружению и удалению личной информации с сайтов поиска людей, а также восстановление данных после «кражи личности».\n\nЕсли вы хотите вернуть себе контроль над личной информацией, выбирайте браузер, созданный для защиты, а не сбора данных.</string>
+    <string name="onboardingPrivacyProDaxDialogDescriptionRebranding"><![CDATA[DuckDuckGo также предлагает <b>платную подписку</b> с надежной службой <b>VPN</b> и <b>современными приватными ИИ-моделями</b>.]]></string>
+    <string name="settingsDuckAiRebranding">Функции ИИ</string>
+    <string name="settingsDuckAi">Duck.ai</string>
+
+    <!--TabSwitcher Trackers Animation-->
+    <string name="showTrackerCountInTabSwitcher">Показывать счетчик трекеров в переключателе вкладок</string>
+    <string name="tabSwitcherAnimationTileRemovalDialogTitle" instruction="A title for a dialog that shows when a user clicks a tile that shows them their current blocked tracker count">Скрыть счетчик трекеров?</string>
+    <string name="tabSwitcherAnimationTileRemovalDialogBody" instruction="A message for a dialog that shows when a user clicks a tile that shows them their current blocked tracker count">Вы можете включить его снова в разделе «Настройки &gt; Внешний вид».</string>
+    <string name="tabSwitcherAnimationTileRemovalDialogPositiveButton">Скрыть</string>
+    <string name="tabSwitcherAnimationTileRemovalDialogNegativeButton">Оставить</string>
+
+    <!-- Widgets -->
+    <string name="searchOnlyWidgetLabel" instruction="Label for the search-only widget">Только поиск</string>
+    <string name="searchOnlyWidgetDescription" instruction="Description for the search-only widget">Конфиденциальный поиск через DuckDuckGo в два счета.</string>
+    <string name="searchWidgetDescription" instruction="Description for the search widget, which may include Duck.ai and voice search">Конфиденциальный поиск с DuckDuckGo или вопросы для Duck.ai. Голосовой поиск и Duck.ai можно включить по желанию.</string>
+    <string name="searchAndFavoritesWidgetDescription" instruction="Description for the search and favorites widget">Поиск или посещение любимых сайтов в приватном режиме одним касанием. По желанию можно включить голосовой поиск и Duck.ai.</string>
+    <string name="duckAiOnlyPinShortcutLabel" instruction="Label for the Duck.ai pinned shortcut. Should be Duck.ai in all languages">Duck.ai</string>
 </resources>

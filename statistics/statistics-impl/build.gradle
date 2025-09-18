@@ -99,4 +99,7 @@ android {
     compileOptions {
         coreLibraryDesugaringEnabled = true
     }
+    buildFeatures {
+        buildConfig = true
+    }
 }

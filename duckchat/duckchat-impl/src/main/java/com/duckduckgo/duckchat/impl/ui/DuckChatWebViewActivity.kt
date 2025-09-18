@@ -70,8 +70,10 @@ import com.duckduckgo.duckchat.impl.ui.filechooser.capture.launcher.UploadFromEx
 import com.duckduckgo.duckchat.impl.ui.filechooser.capture.launcher.UploadFromExternalMediaAppLauncher.MediaCaptureResult.NoMediaCaptured
 import com.duckduckgo.js.messaging.api.JsMessageCallback
 import com.duckduckgo.js.messaging.api.JsMessaging
+import com.duckduckgo.js.messaging.api.SubscriptionEventData
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.navigation.api.getActivityParams
+import com.duckduckgo.subscriptions.api.SUBSCRIPTIONS_FEATURE_NAME
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.Snackbar
 import java.io.File
@@ -79,6 +81,8 @@ import javax.inject.Inject
 import javax.inject.Named
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.cancellable
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.json.JSONObject
@@ -91,6 +95,8 @@ internal data class DuckChatWebViewActivityWithParams(
 @ContributeToActivityStarter(DuckChatWebViewActivityWithParams::class)
 open class DuckChatWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationDialogListener {
 
+    private val viewModel: DuckChatWebViewActivityViewModel by bindViewModel()
+
     @Inject
     lateinit var webViewClient: DuckChatWebViewClient
 
@@ -100,6 +106,9 @@ open class DuckChatWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationD
 
     @Inject
     lateinit var duckChatJSHelper: DuckChatJSHelper
+
+    @Inject
+    lateinit var subscriptionsHandler: SubscriptionsHandler
 
     @Inject
     @AppCoroutineScope
@@ -240,6 +249,19 @@ open class DuckChatWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationD
                                     }
                                 }
                             }
+
+                            SUBSCRIPTIONS_FEATURE_NAME -> {
+                                subscriptionsHandler.handleSubscriptionsFeature(
+                                    featureName,
+                                    method,
+                                    id,
+                                    data,
+                                    this@DuckChatWebViewActivity,
+                                    appCoroutineScope,
+                                    contentScopeScripts,
+                                )
+                            }
+
                             else -> {}
                         }
                     }
@@ -267,6 +289,21 @@ open class DuckChatWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationD
             }
             pendingUploadTask = null
         }
+
+        // Observe ViewModel commands
+        viewModel.commands
+            .onEach { command ->
+                when (command) {
+                    is DuckChatWebViewActivityViewModel.Command.SendSubscriptionAuthUpdateEvent -> {
+                        val authUpdateEvent = SubscriptionEventData(
+                            featureName = SUBSCRIPTIONS_FEATURE_NAME,
+                            subscriptionName = "authUpdate",
+                            params = org.json.JSONObject(),
+                        )
+                        contentScopeScripts.sendSubscriptionEvent(authUpdateEvent)
+                    }
+                }
+            }.launchIn(lifecycleScope)
     }
 
     data class FileChooserRequestedParams(

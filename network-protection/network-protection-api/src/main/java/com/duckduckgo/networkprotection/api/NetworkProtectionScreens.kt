@@ -21,7 +21,7 @@ sealed class NetworkProtectionScreens {
     /**
      * Use this model to launch the NetworkProtectionManagement screen
      */
-    object NetworkProtectionManagementScreenNoParams : ActivityParams
+    data object NetworkProtectionManagementScreenNoParams : ActivityParams
 
     /**
      * Use this model to launch the NetworkProtectionManagement screen
@@ -32,5 +32,5 @@ sealed class NetworkProtectionScreens {
     /**
      * Use this model to launch the NetP app exclusion list screen
      */
-    object NetPAppExclusionListNoParams : ActivityParams
+    data object NetPAppExclusionListNoParams : ActivityParams
 }

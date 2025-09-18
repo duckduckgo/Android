@@ -1,0 +1,36 @@
+appId: com.duckduckgo.mobile.android
+name: "Input Screen Chat Mode test"
+tags:
+  - inputScreenTest
+---
+- retry:
+    maxRetries: 3
+    commands:
+      - launchApp:
+          clearState: true
+          stopApp: true
+      - runFlow: ../shared/skip_all_onboarding.yaml
+
+      # enable the Input Screen
+      - runFlow: ../shared/open_ai_settings_screen.yaml
+      - tapOn:
+          id: "duckAiInputScreenToggleWithAiImage"
+      - action: back
+      - action: back
+
+      # verify that Duck.ai web view is opened when submitting a query in chat mode
+      - tapOn:
+          id: "omnibarTextInput"
+      - assertVisible:
+          id: "inputModeWidget"
+      - tapOn:
+          text: "Duck.ai"
+      - assertVisible:
+          text: "Ask privately"
+      - inputText: "hey"
+      - tapOn:
+          id: "actionSend"
+      - assertVisible:
+          text: "Duck.ai"
+          childOf:
+            id: "toolbar"

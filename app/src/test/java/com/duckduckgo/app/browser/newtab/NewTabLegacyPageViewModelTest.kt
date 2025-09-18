@@ -22,22 +22,27 @@ import com.duckduckgo.app.browser.newtab.NewTabLegacyPageViewModel.Command
 import com.duckduckgo.app.browser.remotemessage.CommandActionMapper
 import com.duckduckgo.app.cta.db.DismissedCtaDao
 import com.duckduckgo.app.cta.model.CtaId.DAX_END
-import com.duckduckgo.app.onboarding.store.UserStageStore
 import com.duckduckgo.app.onboarding.ui.page.extendedonboarding.ExtendedOnboardingFeatureToggles
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.common.ui.view.MessageCta
 import com.duckduckgo.common.utils.playstore.PlayStoreUtils
 import com.duckduckgo.feature.toggles.api.Toggle
+import com.duckduckgo.mobile.android.R
+import com.duckduckgo.mobile.android.app.tracking.AppTrackingProtection
 import com.duckduckgo.remote.messaging.api.Action
 import com.duckduckgo.remote.messaging.api.Content
 import com.duckduckgo.remote.messaging.api.RemoteMessage
 import com.duckduckgo.remote.messaging.api.RemoteMessageModel
 import com.duckduckgo.savedsites.api.SavedSitesRepository
+import com.duckduckgo.savedsites.api.models.SavedSite
 import com.duckduckgo.sync.api.engine.SyncEngine
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
@@ -61,18 +66,25 @@ class NewTabLegacyPageViewModelTest {
     private var mockDismissedCtaDao: DismissedCtaDao = mock()
     private val mockExtendedOnboardingFeatureToggles: ExtendedOnboardingFeatureToggles = mock()
     private val mockSettingsDataStore: SettingsDataStore = mock()
-    private val mockUserStageStore: UserStageStore = mock()
+    private val mockLowPriorityMessagingModel: LowPriorityMessagingModel = mock()
+    private val mockAppTrackingProtection: AppTrackingProtection = mock()
 
     private lateinit var testee: NewTabLegacyPageViewModel
 
     @Before
-    fun setUp() {
+    fun setUp() = runTest {
         val mockDisabledToggle: Toggle = mock { on { it.isEnabled() } doReturn false }
         whenever(mockExtendedOnboardingFeatureToggles.noBrowserCtas()).thenReturn(mockDisabledToggle)
         whenever(mockSavedSitesRepository.getFavorites()).thenReturn(flowOf(emptyList()))
         whenever(mockRemoteMessageModel.getActiveMessages()).thenReturn(flowOf(null))
+        whenever(mockAppTrackingProtection.isEnabled()).thenReturn(false)
 
-        testee = NewTabLegacyPageViewModel(
+        testee = createTestee()
+    }
+
+    private fun createTestee(showLogo: Boolean = true): NewTabLegacyPageViewModel {
+        return NewTabLegacyPageViewModel(
+            showDaxLogo = showLogo,
             dispatchers = coroutinesTestRule.testDispatcherProvider,
             remoteMessagingModel = mockRemoteMessageModel,
             playStoreUtils = mockPlaystoreUtils,
@@ -82,6 +94,8 @@ class NewTabLegacyPageViewModelTest {
             dismissedCtaDao = mockDismissedCtaDao,
             extendedOnboardingFeatureToggles = mockExtendedOnboardingFeatureToggles,
             settingsDataStore = mockSettingsDataStore,
+            lowPriorityMessagingModel = mockLowPriorityMessagingModel,
+            appTrackingProtection = mockAppTrackingProtection,
         )
     }
 
@@ -96,7 +110,7 @@ class NewTabLegacyPageViewModelTest {
         testee.viewState.test {
             expectMostRecentItem().also {
                 assertEquals(it.message, remoteMessage)
-                assertTrue(it.favourites.isEmpty())
+                assertTrue(it.favourites?.isEmpty() == true)
                 assertTrue(it.newMessage)
                 assertFalse(it.onboardingComplete)
             }
@@ -114,7 +128,7 @@ class NewTabLegacyPageViewModelTest {
         testee.viewState.test {
             expectMostRecentItem().also {
                 assertEquals(it.message, remoteMessage)
-                assertTrue(it.favourites.isEmpty())
+                assertTrue(it.favourites?.isEmpty() == true)
                 assertTrue(it.newMessage)
                 assertFalse(it.onboardingComplete)
             }
@@ -132,7 +146,7 @@ class NewTabLegacyPageViewModelTest {
         testee.viewState.test {
             expectMostRecentItem().also {
                 assertEquals(it.message, remoteMessage)
-                assertTrue(it.favourites.isEmpty())
+                assertTrue(it.favourites?.isEmpty() == true)
                 assertTrue(it.newMessage)
                 assertTrue(it.onboardingComplete)
             }
@@ -219,6 +233,246 @@ class NewTabLegacyPageViewModelTest {
         testee.commands().test {
             expectMostRecentItem().also {
                 assertEquals(it, Command.DismissMessage)
+            }
+        }
+    }
+
+    @Test
+    fun whenOnLowPriorityMessagePrimaryButtonClickedThenGetPrimaryButtonCommandCalledAndCommandSent() = runTest {
+        whenever(mockLowPriorityMessagingModel.getPrimaryButtonCommand()).thenReturn(Command.LaunchDefaultBrowser)
+        testee.onLowPriorityMessagePrimaryButtonClicked()
+
+        verify(mockLowPriorityMessagingModel).getPrimaryButtonCommand()
+        testee.commands().test {
+            expectMostRecentItem().also {
+                assertEquals(it, Command.LaunchDefaultBrowser)
+            }
+        }
+    }
+
+    @Test
+    fun whenRemoteMessageAvailableAndLowPriorityMessageAvailableThenLowPriorityMessageIsNull() = runTest {
+        val remoteMessage = RemoteMessage("id1", Content.Small("", ""), emptyList(), emptyList())
+        val lowPriorityMessage = LowPriorityMessage.DefaultBrowserMessage(
+            message = MessageCta.Message(
+                topIllustration = R.drawable.ic_device_mobile_default,
+                title = "Set as default browser",
+                action = "Set as default",
+                action2 = "Do not ask again",
+            ),
+            onPrimaryAction = {},
+            onSecondaryAction = {},
+            onClose = {},
+            onShown = {},
+        )
+        whenever(mockRemoteMessageModel.getActiveMessages()).thenReturn(flowOf(remoteMessage))
+        whenever(mockDismissedCtaDao.exists(DAX_END)).thenReturn(true)
+        whenever(mockLowPriorityMessagingModel.getMessage()).thenReturn(lowPriorityMessage)
+
+        testee.onStart(mockLifecycleOwner)
+
+        testee.viewState.test {
+            expectMostRecentItem().also {
+                assertEquals(remoteMessage, it.message)
+                assertTrue(it.newMessage)
+                assertNull(it.lowPriorityMessage)
+            }
+        }
+    }
+
+    @Test
+    fun whenNoRemoteMessageAvailableAndLowPriorityMessageAvailableThenLowPriorityMessageIsShown() = runTest {
+        val remoteMessage: RemoteMessage? = null
+        val lowPriorityMessage = LowPriorityMessage.DefaultBrowserMessage(
+            message = MessageCta.Message(
+                topIllustration = R.drawable.ic_device_mobile_default,
+                title = "Set as default browser",
+                action = "Set as default",
+                action2 = "Do not ask again",
+            ),
+            onPrimaryAction = {},
+            onSecondaryAction = {},
+            onClose = {},
+            onShown = {},
+        )
+        whenever(mockRemoteMessageModel.getActiveMessages()).thenReturn(flowOf(remoteMessage))
+        whenever(mockDismissedCtaDao.exists(DAX_END)).thenReturn(true)
+        whenever(mockLowPriorityMessagingModel.getMessage()).thenReturn(lowPriorityMessage)
+
+        testee.onStart(mockLifecycleOwner)
+
+        testee.viewState.test {
+            expectMostRecentItem().also {
+                assertNull(it.message)
+                assertFalse(it.newMessage)
+                assertEquals(lowPriorityMessage, it.lowPriorityMessage)
+            }
+        }
+    }
+
+    @Test
+    fun `when onboarding finished and logo enabled, then show logo`() = runTest {
+        whenever(mockDismissedCtaDao.exists(DAX_END)).thenReturn(true)
+
+        testee.onStart(mockLifecycleOwner)
+
+        testee.viewState.test {
+            expectMostRecentItem().also {
+                assertTrue(it.shouldShowLogo)
+                assertTrue(it.hasContent)
+            }
+        }
+    }
+
+    @Test
+    fun `when onboarding finished and logo disabled, then hide logo and report no content`() = runTest {
+        val testeeWithoutLogo = createTestee(showLogo = false)
+        whenever(mockDismissedCtaDao.exists(DAX_END)).thenReturn(true)
+
+        testeeWithoutLogo.onStart(mockLifecycleOwner)
+
+        testeeWithoutLogo.viewState.test {
+            expectMostRecentItem().also {
+                assertFalse(it.shouldShowLogo)
+                assertFalse(it.hasContent)
+            }
+        }
+    }
+
+    @Test
+    fun `when AppTP enabled, then show logo`() = runTest {
+        whenever(mockAppTrackingProtection.isEnabled()).thenReturn(true)
+        whenever(mockDismissedCtaDao.exists(DAX_END)).thenReturn(true)
+
+        testee.onStart(mockLifecycleOwner)
+
+        testee.viewState.test {
+            expectMostRecentItem().also {
+                assertTrue(it.hasContent)
+                assertTrue(it.shouldShowLogo)
+            }
+        }
+    }
+
+    @Test
+    fun `when AppTP enabled and logo disabled, then hide logo`() = runTest {
+        val testeeWithoutLogo = createTestee(showLogo = false)
+        whenever(mockAppTrackingProtection.isEnabled()).thenReturn(true)
+        whenever(mockDismissedCtaDao.exists(DAX_END)).thenReturn(true)
+
+        testeeWithoutLogo.onStart(mockLifecycleOwner)
+
+        testeeWithoutLogo.viewState.test {
+            expectMostRecentItem().also {
+                assertFalse(it.shouldShowLogo)
+                assertTrue(it.hasContent)
+            }
+        }
+    }
+
+    @Test
+    fun `when onboarding complete and RMF available, then hide logo`() = runTest {
+        val remoteMessage = RemoteMessage("id1", Content.Small("", ""), emptyList(), emptyList())
+        whenever(mockRemoteMessageModel.getActiveMessages()).thenReturn(flowOf(remoteMessage))
+        whenever(mockDismissedCtaDao.exists(DAX_END)).thenReturn(true)
+
+        testee.onStart(mockLifecycleOwner)
+
+        testee.viewState.test {
+            expectMostRecentItem().also {
+                assertFalse(it.shouldShowLogo)
+                assertTrue(it.hasContent)
+            }
+        }
+    }
+
+    @Test
+    fun `when favorites available, then hide logo`() = runTest {
+        val favorites = listOf(
+            SavedSite.Favorite("1", "Test", "https://test.com", lastModified = "2024-01-01", 0),
+        )
+        whenever(mockSavedSitesRepository.getFavorites()).thenReturn(flowOf(favorites))
+        whenever(mockDismissedCtaDao.exists(DAX_END)).thenReturn(true)
+        whenever(mockAppTrackingProtection.isEnabled()).thenReturn(false)
+
+        testee.onStart(mockLifecycleOwner)
+
+        testee.viewState.test {
+            expectMostRecentItem().also {
+                assertFalse(it.shouldShowLogo)
+                assertTrue(it.hasContent)
+            }
+        }
+    }
+
+    @Test
+    fun `when favourites loading, then hide logo but still report content`() = runTest {
+        val favouritesFlow = MutableSharedFlow<List<SavedSite.Favorite>>(replay = 0)
+        val remoteMessageFlow = MutableSharedFlow<RemoteMessage?>(replay = 0)
+        whenever(mockSavedSitesRepository.getFavorites()).thenReturn(favouritesFlow)
+        whenever(mockRemoteMessageModel.getActiveMessages()).thenReturn(remoteMessageFlow)
+
+        testee = createTestee()
+        testee.onStart(mockLifecycleOwner)
+
+        testee.viewState.test {
+            expectMostRecentItem().also {
+                assertFalse(it.shouldShowLogo)
+                assertTrue(it.hasContent)
+                assertNull(it.favourites)
+            }
+        }
+    }
+
+    @Test
+    fun `when low priority message available, then show logo`() = runTest {
+        val lowPriorityMessage = LowPriorityMessage.DefaultBrowserMessage(
+            message = MessageCta.Message(
+                topIllustration = R.drawable.ic_device_mobile_default,
+                title = "Set as default browser",
+                action = "Set as default",
+                action2 = "Do not ask again",
+            ),
+            onPrimaryAction = {},
+            onSecondaryAction = {},
+            onClose = {},
+            onShown = {},
+        )
+        whenever(mockLowPriorityMessagingModel.getMessage()).thenReturn(lowPriorityMessage)
+
+        testee.onStart(mockLifecycleOwner)
+
+        testee.viewState.test {
+            expectMostRecentItem().also {
+                assertTrue(it.shouldShowLogo)
+                assertTrue(it.hasContent)
+            }
+        }
+    }
+
+    @Test
+    fun `when low priority message available and logo disabled, then hide logo`() = runTest {
+        val testeeWithoutLogo = createTestee(showLogo = false)
+        val lowPriorityMessage = LowPriorityMessage.DefaultBrowserMessage(
+            message = MessageCta.Message(
+                topIllustration = R.drawable.ic_device_mobile_default,
+                title = "Set as default browser",
+                action = "Set as default",
+                action2 = "Do not ask again",
+            ),
+            onPrimaryAction = {},
+            onSecondaryAction = {},
+            onClose = {},
+            onShown = {},
+        )
+        whenever(mockLowPriorityMessagingModel.getMessage()).thenReturn(lowPriorityMessage)
+
+        testeeWithoutLogo.onStart(mockLifecycleOwner)
+
+        testeeWithoutLogo.viewState.test {
+            expectMostRecentItem().also {
+                assertFalse(it.shouldShowLogo)
+                assertTrue(it.hasContent)
             }
         }
     }

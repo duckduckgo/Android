@@ -18,11 +18,15 @@ package com.duckduckgo.common.utils.extensions
 
 import android.annotation.SuppressLint
 import android.app.Activity
+import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.provider.Settings
+import android.view.View
+import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.getSystemService
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 
@@ -95,4 +99,15 @@ fun Activity.showKeyboard(editText: EditText) {
 
 fun Activity.hideKeyboard(editText: EditText) {
     WindowInsetsControllerCompat(window, editText).hide(WindowInsetsCompat.Type.ime())
+}
+
+fun Activity.hideKeyboard() {
+    val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager
+    // Check if the view that has focus is part of this Fragment's view hierarchy
+    var currentFocus = currentFocus
+    if (currentFocus == null) {
+        // If no view has focus, create a temporary one to ensure the window token is valid
+        currentFocus = View(this)
+    }
+    imm?.hideSoftInputFromWindow(currentFocus.windowToken, 0)
 }

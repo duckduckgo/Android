@@ -20,25 +20,26 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion
-import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteDefaultSuggestion
-import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteHistoryRelatedSuggestion.AutoCompleteHistorySearchSuggestion
-import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteHistoryRelatedSuggestion.AutoCompleteHistorySuggestion
-import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteSearchSuggestion
-import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteUrlSuggestion.AutoCompleteBookmarkSuggestion
-import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteUrlSuggestion.AutoCompleteSwitchToTabSuggestion
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.autocomplete.AutoCompleteViewHolder.InAppMessageViewHolder
 import com.duckduckgo.app.browser.autocomplete.SuggestionItemDecoration.Companion.OTHER_ITEM
 import com.duckduckgo.app.browser.autocomplete.SuggestionItemDecoration.Companion.SEARCH_ITEM
 import com.duckduckgo.app.browser.databinding.ItemAutocompleteBookmarkSuggestionBinding
 import com.duckduckgo.app.browser.databinding.ItemAutocompleteDefaultBinding
+import com.duckduckgo.app.browser.databinding.ItemAutocompleteDuckaiSuggestionBinding
 import com.duckduckgo.app.browser.databinding.ItemAutocompleteHistorySearchSuggestionBinding
 import com.duckduckgo.app.browser.databinding.ItemAutocompleteHistorySuggestionBinding
 import com.duckduckgo.app.browser.databinding.ItemAutocompleteInAppMessageBinding
 import com.duckduckgo.app.browser.databinding.ItemAutocompleteSearchSuggestionBinding
 import com.duckduckgo.app.browser.databinding.ItemAutocompleteSwitchToTabSuggestionBinding
 import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition
+import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion
+import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion.AutoCompleteDefaultSuggestion
+import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion.AutoCompleteHistoryRelatedSuggestion.AutoCompleteHistorySearchSuggestion
+import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion.AutoCompleteHistoryRelatedSuggestion.AutoCompleteHistorySuggestion
+import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion.AutoCompleteSearchSuggestion
+import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion.AutoCompleteUrlSuggestion.AutoCompleteBookmarkSuggestion
+import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion.AutoCompleteUrlSuggestion.AutoCompleteSwitchToTabSuggestion
 import com.duckduckgo.common.ui.view.MessageCta.Message
 import com.duckduckgo.mobile.android.R as CommonR
 
@@ -251,6 +252,31 @@ class InAppMessageViewHolderFactory : SuggestionViewHolderFactory {
     }
 }
 
+class DuckAIPromptSuggestionViewHolderFactory : SuggestionViewHolderFactory {
+
+    override fun onCreateViewHolder(parent: ViewGroup): AutoCompleteViewHolder {
+        val inflater = LayoutInflater.from(parent.context)
+        val binding = ItemAutocompleteDuckaiSuggestionBinding.inflate(inflater, parent, false)
+        return AutoCompleteViewHolder.DuckAIPromptViewHolder(binding)
+    }
+
+    override fun onBindViewHolder(
+        holder: AutoCompleteViewHolder,
+        suggestion: AutoCompleteSuggestion,
+        immediateSearchClickListener: (AutoCompleteSuggestion) -> Unit,
+        editableSearchClickListener: (AutoCompleteSuggestion) -> Unit,
+        deleteClickListener: (AutoCompleteSuggestion) -> Unit,
+        openSettingsClickListener: () -> Unit,
+        longPressClickListener: (AutoCompleteSuggestion) -> Unit,
+    ) {
+        val bookmarkSuggestionViewHolder = holder as AutoCompleteViewHolder.DuckAIPromptViewHolder
+        bookmarkSuggestionViewHolder.bind(
+            suggestion as AutoCompleteSuggestion.AutoCompleteDuckAIPrompt,
+            immediateSearchClickListener,
+        )
+    }
+}
+
 sealed class AutoCompleteViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
     class SearchSuggestionViewHolder(val binding: ItemAutocompleteSearchSuggestionBinding) : AutoCompleteViewHolder(binding.root) {
@@ -383,6 +409,19 @@ sealed class AutoCompleteViewHolder(itemView: View) : RecyclerView.ViewHolder(it
             binding.messageCta.onPrimaryActionClicked { openSettingsClickListener() }
 
             binding.root.tag = OTHER_ITEM
+        }
+    }
+
+    class DuckAIPromptViewHolder(val binding: ItemAutocompleteDuckaiSuggestionBinding) : AutoCompleteViewHolder(binding.root) {
+        fun bind(
+            item: AutoCompleteSuggestion.AutoCompleteDuckAIPrompt,
+            itemClickListener: (AutoCompleteSuggestion) -> Unit,
+        ) = with(binding) {
+            title.text = item.phrase
+
+            root.setOnClickListener { itemClickListener(item) }
+
+            root.tag = OTHER_ITEM
         }
     }
 }

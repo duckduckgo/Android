@@ -117,6 +117,11 @@ class SharedPreferencesDuckChatDataStoreTest {
     }
 
     @Test
+    fun `when isInputScreenUserSettingEnabled then return default value`() = runTest {
+        assertFalse(testee.isInputScreenUserSettingEnabled())
+    }
+
+    @Test
     fun whenMenuFlagChangesLaterThenAddressBarRemainsUnchanged() = runTest {
         assertTrue(testee.getShowInBrowserMenu())
         assertTrue(testee.getShowInAddressBar())
@@ -143,6 +148,12 @@ class SharedPreferencesDuckChatDataStoreTest {
     fun whenSetShowInAddressBarThenGetShowInAddressBarThenReturnValue() = runTest {
         testee.setShowInAddressBar(false)
         assertFalse(testee.getShowInAddressBar())
+    }
+
+    @Test
+    fun `when setInputScreenUserSetting then return value`() = runTest {
+        testee.setInputScreenUserSetting(false)
+        assertFalse(testee.isInputScreenUserSettingEnabled())
     }
 
     @Test
@@ -185,6 +196,20 @@ class SharedPreferencesDuckChatDataStoreTest {
         job.join()
 
         assertEquals(listOf(true, false), results)
+    }
+
+    @Test
+    fun `when observeInputScreenUserSettingEnabled then receive updates`() = runTest {
+        val results = mutableListOf<Boolean>()
+        val job = launch {
+            testee.observeInputScreenUserSettingEnabled()
+                .take(2)
+                .toList(results)
+        }
+        testee.setInputScreenUserSetting(true)
+        job.join()
+
+        assertEquals(listOf(false, true), results)
     }
 
     @Test

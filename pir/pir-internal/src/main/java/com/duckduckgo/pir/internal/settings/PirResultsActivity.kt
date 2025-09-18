@@ -29,15 +29,12 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter.ActivityParams
 import com.duckduckgo.navigation.api.getActivityParams
+import com.duckduckgo.pir.impl.store.PirEventsRepository
 import com.duckduckgo.pir.internal.R
 import com.duckduckgo.pir.internal.databinding.ActivityPirInternalResultsBinding
 import com.duckduckgo.pir.internal.settings.PirResultsScreenParams.PirEventsResultsScreen
 import com.duckduckgo.pir.internal.settings.PirResultsScreenParams.PirOptOutResultsScreen
 import com.duckduckgo.pir.internal.settings.PirResultsScreenParams.PirScanResultsScreen
-import com.duckduckgo.pir.internal.store.PirRepository
-import com.duckduckgo.pir.internal.store.PirRepository.ScanResult.ErrorResult
-import com.duckduckgo.pir.internal.store.PirRepository.ScanResult.ExtractedProfileResult
-import com.duckduckgo.pir.internal.store.PirRepository.ScanResult.NavigateResult
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -49,7 +46,7 @@ import kotlinx.coroutines.flow.onEach
 @ContributeToActivityStarter(PirResultsScreenParams::class)
 class PirResultsActivity : DuckDuckGoActivity() {
     @Inject
-    lateinit var repository: PirRepository
+    lateinit var eventsRepository: PirEventsRepository
 
     @Inject
     lateinit var dispatcherProvider: DispatcherProvider
@@ -94,7 +91,7 @@ class PirResultsActivity : DuckDuckGoActivity() {
     }
 
     private fun showOptOutResults() {
-        repository.getAllOptOutActionLogFlow()
+        eventsRepository.getAllOptOutActionLogFlow()
             .flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
             .onEach { optOutEvents ->
                 optOutEvents.map { result ->
@@ -114,26 +111,15 @@ class PirResultsActivity : DuckDuckGoActivity() {
     }
 
     private fun showScanResults() {
-        repository.getAllScanResultsFlow()
+        eventsRepository.getScannedBrokersFlow()
             .flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
             .onEach { scanResults ->
                 scanResults.map {
                     val stringBuilder = StringBuilder()
-                    stringBuilder.append("BROKER NAME: ${it.brokerName}\nACTION EXECUTED: ${it.actionType}\n")
-                    when (it) {
-                        is NavigateResult -> {
-                            stringBuilder.append("URL TO NAVIGATE: ${it.url}\n")
-                        }
-
-                        is ExtractedProfileResult -> {
-                            val records = it.extractResults.size
-                            stringBuilder.append("VALID RECORDS FOUND COUNT: $records\n")
-                        }
-
-                        is ErrorResult -> {
-                            stringBuilder.append("*ERROR ENCOUNTERED: ${it.message}\n")
-                        }
-                    }
+                    stringBuilder.append("BROKER NAME: ${it.brokerName}\n")
+                    stringBuilder.append("PROFILE ID: ${it.profileQueryId}\n")
+                    stringBuilder.append("COMPLETED WITH NO ERROR: ${it.isSuccess}\n")
+                    stringBuilder.append("DURATION: ${it.endTimeInMillis - it.startTimeInMillis}\n")
                     stringBuilder.toString()
                 }.also {
                     render(it)
@@ -143,7 +129,7 @@ class PirResultsActivity : DuckDuckGoActivity() {
     }
 
     private fun showAllEvents() {
-        repository.getAllEventLogsFlow()
+        eventsRepository.getAllEventLogsFlow()
             .flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
             .onEach { scanEvents ->
                 scanEvents.map { result ->

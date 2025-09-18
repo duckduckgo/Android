@@ -17,9 +17,12 @@
 package com.duckduckgo.app.settings.clear
 
 import com.duckduckgo.app.browser.R
+import com.duckduckgo.app.onboardingdesignexperiment.OnboardingDesignExperimentManager
 import javax.inject.Inject
 
-class OnboardingExperimentFireAnimationHelper @Inject constructor() {
+class OnboardingExperimentFireAnimationHelper @Inject constructor(
+    private val onboardingDesignExperimentManager: OnboardingDesignExperimentManager,
+) {
 
     /**
      * Returns the resource ID for the selected fire animation.
@@ -27,7 +30,11 @@ class OnboardingExperimentFireAnimationHelper @Inject constructor() {
      */
     fun getSelectedFireAnimationResId(selectedFireAnimation: FireAnimation): Int {
         return if (selectedFireAnimation is FireAnimation.HeroFire) {
-            R.raw.buck_experiment_fire
+            when {
+                onboardingDesignExperimentManager.isBuckEnrolledAndEnabled() -> R.raw.buck_experiment_fire
+                onboardingDesignExperimentManager.isBbEnrolledAndEnabled() -> R.raw.bb_experiment_fire_optimised
+                else -> R.raw.hero_fire_inferno
+            }
         } else {
             selectedFireAnimation.resId
         }

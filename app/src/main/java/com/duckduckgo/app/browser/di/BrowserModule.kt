@@ -111,8 +111,10 @@ class BrowserModule {
         statisticsStore: StatisticsDataStore,
         variantManager: VariantManager,
         appReferrerDataStore: AppReferrerDataStore,
+        duckChat: DuckChat,
+        androidBrowserConfigFeature: AndroidBrowserConfigFeature,
     ): RequestRewriter {
-        return DuckDuckGoRequestRewriter(urlDetector, statisticsStore, variantManager, appReferrerDataStore)
+        return DuckDuckGoRequestRewriter(urlDetector, statisticsStore, variantManager, appReferrerDataStore, duckChat, androidBrowserConfigFeature)
     }
 
     @Provides
@@ -182,6 +184,7 @@ class BrowserModule {
         duckPlayer: DuckPlayer,
         duckChat: DuckChat,
         aiChatQueryDetectionFeature: AIChatQueryDetectionFeature,
+        androidBrowserConfigFeature: AndroidBrowserConfigFeature,
     ): SpecialUrlDetector = SpecialUrlDetectorImpl(
         packageManager,
         ampLinks,
@@ -191,6 +194,7 @@ class BrowserModule {
         duckPlayer,
         duckChat,
         aiChatQueryDetectionFeature,
+        androidBrowserConfigFeature,
     )
 
     @Provides

@@ -61,6 +61,8 @@ class RealPrivacyConfigPersisterTest {
     private lateinit var privacyRepository: PrivacyConfigRepository
     private lateinit var unprotectedTemporaryRepository: UnprotectedTemporaryRepository
     private val pluginPoint = FakePrivacyFeaturePluginPoint(listOf(FakePrivacyFeaturePlugin()))
+    private val callback = FakePrivacyConfigCallbackPlugin()
+    private val persisterPluginPoint = FakeFakePrivacyConfigCallbackPluginPoint(listOf(callback))
     private val variantManagerPlugin = FakePrivacyVariantManagerPlugin()
     private lateinit var sharedPreferences: SharedPreferences
 
@@ -84,6 +86,7 @@ class RealPrivacyConfigPersisterTest {
                 privacyRepository,
                 db,
                 sharedPreferences,
+                persisterPluginPoint,
             )
     }
 
@@ -167,6 +170,7 @@ class RealPrivacyConfigPersisterTest {
                     privacyRepository,
                     db,
                     sharedPreferences,
+                    persisterPluginPoint,
                 )
             testee.persistPrivacyConfig(getJsonPrivacyConfig())
 
@@ -242,6 +246,18 @@ class RealPrivacyConfigPersisterTest {
             assertEquals(2, privacyRepository.get()!!.version)
         }
 
+    @Test
+    fun whenPersistPrivacyConfigThenExecutePlugins() =
+        runTest {
+            assertEquals(0, callback.persistCallCount)
+
+            privacyRepository.insert(PrivacyConfig(version = 1, readme = "readme", eTag = "eTag", timestamp = "2023-01-02"))
+
+            testee.persistPrivacyConfig(getJsonPrivacyConfig())
+
+            assertEquals(1, callback.persistCallCount)
+        }
+
     private fun getJsonPrivacyConfig(): JsonPrivacyConfig {
         return JsonPrivacyConfig(
             version = 2,
@@ -312,9 +328,14 @@ class RealPrivacyConfigPersisterTest {
 
     internal class FakePrivacyConfigCallbackPlugin : PrivacyConfigCallbackPlugin {
         internal var downloadCallCount = 0
+        internal var persistCallCount = 0
 
         override fun onPrivacyConfigDownloaded() {
             downloadCallCount++
+        }
+
+        override fun onPrivacyConfigPersisted() {
+            persistCallCount++
         }
     }
 

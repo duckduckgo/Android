@@ -62,16 +62,17 @@
     <string name="subscriptionStatusSubscribed">Abonēts</string>
     <string name="privacyPolicyAndTermsOfService">Privātuma politika un Pakalpojumu sniegšanas noteikumi</string>
     <string name="subscriptionStatusFreeTrial">Bezmaksas izmēģinājuma periods ir aktīvs</string>
-    <string name="monthly">ikmēneša</string>
-    <string name="yearly">ikgadējs</string>
-    <string name="freeTrialActiveSubscriptionsData" instruction="Placeholder is a date in format MMMM dd, yyyy, second is if trial is monthly or yearly">Tava bezmaksas izmēģinājuma versija beidzas %1$s un tajā pašā dienā automātiski tiek pārvērsta par %2$s maksas abonementu.</string>
+    <string name="freeTrialMonthlyActiveSubscriptionsData" instruction="Placeholder is a date in format MMMM dd, yyyy">Tavs bezmaksas izmēģinājuma periods beidzas %1$s un tajā dienā automātiski pārvēršas par ikmēneša maksas abonementu.</string>
+    <string name="freeTrialYearlyActiveSubscriptionsData" instruction="Placeholder is a date in format MMMM dd, yyyy">Tavs bezmaksas izmēģinājuma periods beidzas %1$s un tajā pašā dienā automātiski pārvēršas par par gada maksas abonementu.</string>
     <string name="freeTrialCancelledSubscriptionsData" instruction="Placeholder is a date in format MMMM dd, yyyy">Tava bezmaksas izmēģinājuma versija beidzas %1$s un tā netiks pārvērsta par maksas abonementu.</string>
 
     <!--Settings Subscriptions-->
     <string name="subscriptionSetting">Abonementa iestatījumi</string>
     <string name="subscriptionSettingSubscribe">Aizsargā savu savienojumu un identitāti ar Privacy Pro</string>
-    <string name="subscriptionSettingSubscribeSubtitle">Ietver mūsu VPN, Personal Information Removal un Identity Theft Restoration.</string>
-    <string name="subscriptionSettingSubscribeSubtitleRow">Ietver mūsu VPN un Identity Theft Restoration.</string>
+
+    <string name="subscriptionSettingSubscribeSubtitle">Abonenti saņem mūsu VPN, Personal Information Removal un Identity Theft Restoration.</string>
+    <string name="subscriptionSettingSubscribeSubtitleRow">Abonenti saņem mūsu VPN un Identity Theft Restoration.</string>
+
     <string name="subscriptionSettingGet">Iegūsti Privacy Pro</string>
     <string name="subscriptionSettingTryFreeTrial">Izmēģināt Privacy Pro bez maksas</string>
     <string name="subscriptionSettingRestore">Man ir abonements</string>
@@ -167,4 +168,34 @@
     <string name="activityActivateSubscription">Man ir abonements</string>
     <string name="activityPir" translatable="false">Privacy Pro</string>
     <string name="activitySendFeedback">Sūtīt atsauksmi</string>
+
+    <!-- Privacy Pro Rebranding-->
+    <string name="privacyProRebranding">DuckDuckGo abonements</string>
+    <string name="subscriptionSettingExpiredRebranding">Tavs DuckDuckGo abonements ir beidzies.</string>
+    <string name="privacyProFaqRebranding">Nepieciešama palīdzība saistībā ar abonēšanu?</string>
+    <string name="privacyProFaqSecondaryRebranding">Saņem atbildes uz bieži uzdotiem jautājumiem vai sazinies ar abonēšanas atbalsta dienestu mūsu palīdzības lapās. Funkciju pieejamība atšķiras atkarībā no valsts.</string>
+    <string name="restoreSubscriptionTitleRebranding">Pievieno savu abonementu šai ierīcei</string>
+    <string name="restoreSubscriptionEmailDescriptionRebranding">Saisti e-pasta adresi ar savu abonementu, lai pievienotu to šai ierīcei.</string>
+    <string name="activateOnOtherDevicesRebranding">Pievieno savu abonementu citām ierīcēm</string>
+    <string name="addToDeviceSecondaryTextWithoutEmailRebranding">Pievieno savu abonementu citām ierīcēm, izmantojot Google Play vai piesaistot e-pasta adresi.</string>
+    <string name="addToDeviceSecondaryTextWithEmailRebranding">Izmanto iepriekš norādīto e-pasta adresi, lai pievienotu abonementu citām ierīcēm DuckDuckGo lietotnē. Iet uz Iestatījumi &gt; Abonementu iestatījumi &gt; Man ir abonements.</string>
+    <string name="subscriptionSettingRebrandingMessage">Privacy Pro tagad vienkārši sauc par DuckDuckGo abonementu</string>
+    <string name="subscriptionSettingSubscribeRebranding">Aizsargā savu savienojumu un identitāti ar vienu abonementu.</string>
+    <string name="removeFromDeviceDescriptionRebranding">Šajā ierīcē vairs nevarēsi piekļūt savam abonementam. Tas neatcels tavu abonementu, un tas paliks aktīvs citās tavās ierīcēs.</string>
+
+    <string name="subscriptionSettingSubscribeWithDuckAiSubtitle">Abonenti saņem mūsu VPN un uzlabotus mākslīgā intelekta modeļus Duck.ai. Personal Information Removal un Identity Theft Restoration.</string>
+    <string name="subscriptionSettingSubscribeWithDuckAiSubtitleRow">Abonenti saņem mūsu VPN, uzlabotus MI modeļus Duck.ai un Identity Theft Restoration.</string>
+
+    <string name="feedbackCategoryDuckAi">Duck.ai</string>
+    <string name="feedbackSubCategoryDuckAiSubscriberModels">Nevaru piekļūt tikai abonentiem paredzētajiem Duck.ai modeļiem.</string>
+    <string name="feedbackSubCategoryDuckAiLoginThirdPartyBrowser">Nevaru piekļūt Duck.ai ar savu abonementu citās pārlūkprogrammās.</string>
+    <string name="feedbackSubCategoryDuckAiOther">Citas Duck.ai atsauksmes</string>
+
+    <string name="subscriptionSettingSectionTitle" translatable="false">DuckDuckGo Subscription</string>
+    <string name="subscriptionSettingSubscribeSecure">Nodrošini sava Wi-Fi drošību un privāti tērzē ar uzlabotiem mākslīgā intelekta modeļiem</string>
+
+    <string name="subscriptionSettingGetRebranding">Abonē DuckDuckGo</string>
+    <string name="subscriptionSettingTryFreeTrialRebranding">Izmēģini bez maksas</string>
+    <string name="feedbackGeneralSubscription">Abonements</string>
+
 </resources>

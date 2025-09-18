@@ -121,19 +121,19 @@ interface EmailProtectionChooseEmailDialog {
          * User chose to use their personal duck address
          */
         @Parcelize
-        object UsePersonalEmailAddress : UseEmailResultType
+        data object UsePersonalEmailAddress : UseEmailResultType
 
         /**
          * User chose to use a private alias address
          */
         @Parcelize
-        object UsePrivateAliasAddress : UseEmailResultType
+        data object UsePrivateAliasAddress : UseEmailResultType
 
         /**
          * User cancelled the dialog
          */
         @Parcelize
-        object DoNotUseEmailProtection : UseEmailResultType
+        data object DoNotUseEmailProtection : UseEmailResultType
     }
 
     companion object {
@@ -161,19 +161,19 @@ interface EmailProtectionInContextSignUpDialog {
          * User chose to enable Email Protection
          */
         @Parcelize
-        object SignUp : EmailProtectionInContextSignUpResult
+        data object SignUp : EmailProtectionInContextSignUpResult
 
         /**
          * User chose to dismiss dialog
          */
         @Parcelize
-        object Cancel : EmailProtectionInContextSignUpResult
+        data object Cancel : EmailProtectionInContextSignUpResult
 
         /**
          * User chose to dismiss dialog and not be shown again
          */
         @Parcelize
-        object DoNotShowAgain : EmailProtectionInContextSignUpResult
+        data object DoNotShowAgain : EmailProtectionInContextSignUpResult
     }
 
     companion object {
@@ -249,6 +249,11 @@ interface CredentialAutofillDialogFactory {
      * Creates a dialog which prompts the user to sign up for Email Protection
      */
     fun emailProtectionInContextSignUpDialog(tabId: String): DialogFragment
+
+    /**
+     * Creates a dialog which prompts the user to import passwords from Google Passwords
+     */
+    fun autofillImportPasswordsPromoDialog(importSource: AutofillImportLaunchSource, tabId: String, url: String): DialogFragment
 }
 
 private fun prefix(
@@ -256,4 +261,15 @@ private fun prefix(
     tag: String,
 ): String {
     return "$tabId/$tag"
+}
+
+@Parcelize
+enum class AutofillImportLaunchSource(val value: String) : Parcelable {
+    PasswordManagementPromo("password_management_promo"),
+    PasswordManagementEmptyState("password_management_empty_state"),
+    PasswordManagementOverflow("password_management_overflow"),
+    AutofillSettings("autofill_settings_button"),
+    InBrowserPromo("in_browser_promo"),
+    Unknown("unknown"),
+    MainAppSettings("settings"),
 }

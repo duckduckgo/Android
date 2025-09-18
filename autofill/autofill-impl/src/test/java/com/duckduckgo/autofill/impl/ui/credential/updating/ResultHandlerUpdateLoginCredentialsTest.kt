@@ -17,6 +17,7 @@
 package com.duckduckgo.autofill.impl.ui.credential.updating
 
 import android.os.Bundle
+import android.webkit.WebView
 import androidx.fragment.app.Fragment
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
@@ -46,6 +47,7 @@ class ResultHandlerUpdateLoginCredentialsTest {
     private val autofillDialogSuppressor: AutofillFireproofDialogSuppressor = mock()
     private val callback: AutofillEventListener = mock()
     private val appBuildConfig: AppBuildConfig = mock()
+    private val webView: WebView = mock()
 
     private val testee = ResultHandlerUpdateLoginCredentials(
         autofillFireproofDialogSuppressor = autofillDialogSuppressor,
@@ -62,7 +64,7 @@ class ResultHandlerUpdateLoginCredentialsTest {
             credentials = someLoginCredentials(),
             Password,
         )
-        testee.processResult(bundle, context, "tab-id-123", Fragment(), callback)
+        testee.processResult(bundle, context, "tab-id-123", Fragment(), callback, webView)
         verifyUpdateNeverCalled()
     }
 
@@ -70,7 +72,7 @@ class ResultHandlerUpdateLoginCredentialsTest {
     fun whenUpdateBundleMissingCredentialsThenNoAttemptToSaveMade() = runTest {
         val bundle =
             bundleForUpdateDialog(url = "example.com", credentials = null, Password)
-        testee.processResult(bundle, context, "tab-id-123", Fragment(), callback)
+        testee.processResult(bundle, context, "tab-id-123", Fragment(), callback, webView)
         verifyUpdateNeverCalled()
     }
 
@@ -78,7 +80,7 @@ class ResultHandlerUpdateLoginCredentialsTest {
     fun whenUpdateBundleWellFormedThenCredentialsAreUpdated() = runTest {
         val loginCredentials = LoginCredentials(domain = "example.com", username = "foo", password = "bar")
         val bundle = bundleForUpdateDialog("example.com", loginCredentials, Password)
-        testee.processResult(bundle, context, "tab-id-123", Fragment(), callback)
+        testee.processResult(bundle, context, "tab-id-123", Fragment(), callback, webView)
         verify(autofillStore).updateCredentials(
             eq("example.com"),
             eq(loginCredentials),

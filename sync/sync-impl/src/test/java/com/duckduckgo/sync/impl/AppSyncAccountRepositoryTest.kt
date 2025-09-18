@@ -883,6 +883,32 @@ class AppSyncAccountRepositoryTest {
         }
     }
 
+    @Test
+    fun whenAccountDeletedWithASingleConnectedDeviceThenPixelFired() {
+        prepareForExchangeSuccess()
+        whenever(syncApi.deleteAccount(token)).thenReturn(deleteAccountSuccess)
+        configureAsSignedWithConnectedDevices(1)
+        syncRepo.deleteAccount()
+        verify(syncPixels).fireUserConfirmedToTurnOffSyncAndDelete(eq(1))
+    }
+
+    @Test
+    fun whenAccountDeletedWithMultipleConnectedDevicesThenPixelFired() {
+        prepareForExchangeSuccess()
+        whenever(syncApi.deleteAccount(token)).thenReturn(deleteAccountSuccess)
+        configureAsSignedWithConnectedDevices(10)
+        syncRepo.deleteAccount()
+        verify(syncPixels).fireUserConfirmedToTurnOffSyncAndDelete(eq(10))
+    }
+
+    @Test
+    fun whenAccountDeletedWithNoConnectedDevicesThenPixelFired() {
+        prepareForExchangeSuccess()
+        whenever(syncApi.deleteAccount(token)).thenReturn(deleteAccountSuccess)
+        syncRepo.deleteAccount()
+        verify(syncPixels).fireUserConfirmedToTurnOffSyncAndDelete(eq(0))
+    }
+
     private fun configureUrlWrappedCodeFeatureFlagState(enabled: Boolean) {
         syncFeature.syncSetupBarcodeIsUrlBased().setRawStoredState(State(enable = enabled))
     }

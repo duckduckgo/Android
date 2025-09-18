@@ -252,7 +252,7 @@
 
     <string name="newTabPageShortcutPasswords">Hesla</string>
 
-    <string name="autofillImportGooglePasswordsWebFlowTitle">Import hesel z Googlu</string>
+    <string name="autofillImportGooglePasswordsWebFlowTitle">Importovat hesla</string>
     <string name="autofillImportGooglePasswordsSuccessMessage" instruction="Placeholder is the number of passwords imported">Hesel importovaných z Googlu: %1$d</string>
     <string name="autofillImportCsvPasswordsSuccessMessage" instruction="Placeholder is the number of passwords imported">Hesel importovaných z CSV: %1$d</string>
 
@@ -262,9 +262,9 @@
     <string name="autofillSyncDesktopPasswordEmptyStateButtonTitle">Synchronizovat hesla na počítači</string>
     <string name="autofillSyncDesktopPasswordsMenuTitle">Synchronizovat hesla na počítači</string>
 
-    <string name="importPasswordsChooseMethodDialogTitle">Importuj si hesla z Googlu</string>
+    <string name="importPasswordsChooseMethodDialogTitle">Import hesel z Googlu</string>
     <string name="importPasswordsChooseMethodDialogSubtitle">Google tě může požádat o přihlášení nebo potvrzení zadáním hesla.</string>
-    <string name="importPasswordsChooseMethodDialogGpmButton">Otevřít hesla na Googlu</string>
+    <string name="importPasswordsChooseMethodDialogGpmButton">Import z Googlu</string>
     <string name="importPasswordsChooseMethodDialogCsvButton">Vybrat soubor CSV</string>
     <string name="importPasswordsChooseMethodDialogDesktopSyncButton">Importovat z prohlížeče na počítači</string>
 
@@ -292,5 +292,13 @@
     <string name="autofillSettingsImportFromGoogleLabel">Import hesel z Googlu</string>
     <string name="autofillSettingsImportFromDesktopSync">Synchronizovat hesla na počítači</string>
     <string name="autofillSettingsResetExcludedSitesTitle">Obnovit vyloučené stránky</string>
+
+    <string name="passwords_import_promo_title" instruction="The &apos;br&apos; is a forced line break for English. It does not need to be included in translations.">Přenes si hesla&lt;br /&gt;z Googlu do DuckDuckGo</string>
+    <string name="passwords_import_promo_subtitle">Rychle a bezpečně importuj svá hesla do DuckDuckGo. Google tě může požádat o zadání hesla.</string>
+    <string name="passwords_import_promo_action">Import z Googlu</string>
+    <string name="passwords_import_promo_in_browser_title">Přenes si hesla z Googlu do DuckDuckGo</string>
+    <string name="passwords_import_promo_in_browser_secondary_action_button">Už se znovu neptat</string>
+    <string name="passwords_import_promo_in_settings_title">Import hesel z Googlu</string>
+    <string name="passwords_import_promo_in_settings_dismiss_text">Skrýt</string>
 
 </resources>

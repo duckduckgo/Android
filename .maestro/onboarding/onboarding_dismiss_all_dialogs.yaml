@@ -54,4 +54,4 @@ tags:
       - runFlow: ../shared/browser_screen/click_on_tabs_button.yaml
       - tapOn: "New Tab"
       - assertVisible:
-          text: ".*Try our search widget!.*"
+          text: ".*Try our Home screen widget!.*"

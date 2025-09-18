@@ -35,4 +35,48 @@ interface DuckChatFeature {
      */
     @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
     fun self(): Toggle
+
+    /**
+     * @return `true` when the remote config has the "duckAiButtonInBrowser" Duck.ai button in browser
+     * sub-feature flag enabled
+     * If the remote feature is not present defaults to `internal`
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    fun duckAiButtonInBrowser(): Toggle
+
+    /**
+     * @return `true` when the remote config has the "keepSessionAlive"
+     * sub-feature flag enabled
+     * If the remote feature is not present defaults to `internal`
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    fun keepSession(): Toggle
+
+    /**
+     * @return `true` when the remote config has the "duckAiInputScreen"
+     * sub-feature flag enabled
+     * If the remote feature is not present defaults to `internal`
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    fun duckAiInputScreen(): Toggle
+
+    /**
+     * @return `true` when the Input Screen should open automatically when user creates a New Tab
+     * If the remote feature is not present defaults to `enabled`
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
+    fun showInputScreenAutomaticallyOnNewTab(): Toggle
+
+    /**
+     * @return `true` when the new address bar option choice screen should be shown
+     * If the remote feature is not present defaults to `internal`
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    fun showAIChatAddressBarChoiceScreen(): Toggle
+
+    /**
+     * @return `true` when the Setting for allowing Duck.ai chats to be deleted with the Fire Button is enabled
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
+    fun clearHistory(): Toggle
 }

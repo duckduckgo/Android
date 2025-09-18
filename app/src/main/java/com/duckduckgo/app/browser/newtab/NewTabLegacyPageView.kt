@@ -41,6 +41,8 @@ import com.duckduckgo.app.browser.newtab.NewTabLegacyPageViewModel.Command.Launc
 import com.duckduckgo.app.browser.newtab.NewTabLegacyPageViewModel.Command.LaunchScreen
 import com.duckduckgo.app.browser.newtab.NewTabLegacyPageViewModel.Command.SharePromoLinkRMF
 import com.duckduckgo.app.browser.newtab.NewTabLegacyPageViewModel.Command.SubmitUrl
+import com.duckduckgo.app.browser.newtab.NewTabLegacyPageViewModel.NewTabLegacyPageViewModelFactory
+import com.duckduckgo.app.browser.newtab.NewTabLegacyPageViewModel.NewTabLegacyPageViewModelProviderFactory
 import com.duckduckgo.app.browser.newtab.NewTabLegacyPageViewModel.ViewState
 import com.duckduckgo.app.browser.remotemessage.SharePromoLinkRMFBroadCastReceiver
 import com.duckduckgo.app.browser.remotemessage.asMessage
@@ -53,7 +55,6 @@ import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.DispatcherProvider
-import com.duckduckgo.common.utils.ViewViewModelFactory
 import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.mobile.android.app.tracking.ui.AppTrackingProtectionScreens.AppTrackerOnboardingActivityWithEmptyParamsParams
 import com.duckduckgo.navigation.api.GlobalActivityStarter
@@ -61,9 +62,9 @@ import com.duckduckgo.navigation.api.GlobalActivityStarter.DeeplinkActivityParam
 import com.duckduckgo.remote.messaging.api.RemoteMessage
 import dagger.android.support.AndroidSupportInjection
 import javax.inject.Inject
-import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
 import logcat.LogPriority.WARN
 import logcat.asLog
 import logcat.logcat
@@ -73,10 +74,9 @@ class NewTabLegacyPageView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyle: Int = 0,
+    private val showLogo: Boolean = true,
+    private val onHasContent: ((Boolean) -> Unit)? = null,
 ) : LinearLayout(context, attrs, defStyle) {
-
-    @Inject
-    lateinit var viewModelFactory: ViewViewModelFactory
 
     @Inject
     lateinit var globalActivityStarter: GlobalActivityStarter
@@ -100,8 +100,12 @@ class NewTabLegacyPageView @JvmOverloads constructor(
 
     private val homeBackgroundLogo by lazy { HomeBackgroundLogo(binding.ddgLogo) }
 
+    @Inject
+    lateinit var viewModelFactory: NewTabLegacyPageViewModelFactory
+
     private val viewModel: NewTabLegacyPageViewModel by lazy {
-        ViewModelProvider(findViewTreeViewModelStoreOwner()!!, viewModelFactory)[NewTabLegacyPageViewModel::class.java]
+        val providerFactory = NewTabLegacyPageViewModelProviderFactory(viewModelFactory, showDaxLogo = showLogo)
+        ViewModelProvider(owner = findViewTreeViewModelStoreOwner()!!, factory = providerFactory)[NewTabLegacyPageViewModel::class.java]
     }
 
     private val conflatedStateJob = ConflatedJob()
@@ -132,7 +136,10 @@ class NewTabLegacyPageView @JvmOverloads constructor(
 
     private fun render(viewState: ViewState) {
         logcat { "New Tab: render $viewState" }
-        if (viewState.message == null && viewState.favourites.isEmpty()) {
+
+        onHasContent?.invoke(viewState.hasContent)
+
+        if (viewState.shouldShowLogo) {
             homeBackgroundLogo.showLogo()
         } else {
             homeBackgroundLogo.hideLogo()
@@ -141,9 +148,12 @@ class NewTabLegacyPageView @JvmOverloads constructor(
             showRemoteMessage(viewState.message, viewState.newMessage)
         } else {
             binding.messageCta.gone()
+            if (viewState.lowPriorityMessage != null) {
+                showLowPriorityMessage(viewState.lowPriorityMessage)
+            }
         }
 
-        if (viewState.favourites.isEmpty()) {
+        if (viewState.favourites.isNullOrEmpty()) {
             binding.focusedFavourites.gone()
         } else {
             binding.focusedFavourites.show()
@@ -231,5 +241,39 @@ class NewTabLegacyPageView @JvmOverloads constructor(
             binding.messageCta.show()
             viewModel.onMessageShown()
         }
+    }
+
+    private fun showLowPriorityMessage(message: LowPriorityMessage) {
+        val parentVisible = (this.parent as? View)?.isVisible ?: false
+        val shouldRender = parentVisible && binding.messageCta.isGone
+
+        if (shouldRender) {
+            binding.messageCta.setMessage(message.message)
+            binding.messageCta.onCloseButtonClicked {
+                findViewTreeLifecycleOwner()?.lifecycleScope?.launch {
+                    message.onCloseButtonClicked()
+                    removeLowPriorityMessage()
+                }
+            }
+            binding.messageCta.onPrimaryActionClicked {
+                findViewTreeLifecycleOwner()?.lifecycleScope?.launch {
+                    message.onPrimaryButtonClicked()
+                    viewModel.onLowPriorityMessagePrimaryButtonClicked()
+                    removeLowPriorityMessage()
+                }
+            }
+            binding.messageCta.onSecondaryActionClicked {
+                findViewTreeLifecycleOwner()?.lifecycleScope?.launch {
+                    message.onSecondaryButtonClicked()
+                    removeLowPriorityMessage()
+                }
+            }
+            binding.messageCta.show()
+            message.onMessageShown()
+        }
+    }
+
+    private fun removeLowPriorityMessage() {
+        binding.messageCta.gone()
     }
 }

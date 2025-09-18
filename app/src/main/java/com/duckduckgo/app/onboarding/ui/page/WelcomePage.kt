@@ -22,9 +22,7 @@ import android.app.Activity
 import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import android.view.WindowManager
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.view.ViewCompat
@@ -39,21 +37,21 @@ import androidx.transition.TransitionManager
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ContentOnboardingWelcomePageBinding
-import com.duckduckgo.app.onboarding.ui.page.WelcomePage.Companion.PreOnboardingDialogType.ADDRESS_BAR_POSITION
-import com.duckduckgo.app.onboarding.ui.page.WelcomePage.Companion.PreOnboardingDialogType.COMPARISON_CHART
-import com.duckduckgo.app.onboarding.ui.page.WelcomePage.Companion.PreOnboardingDialogType.INITIAL
-import com.duckduckgo.app.onboarding.ui.page.WelcomePage.Companion.PreOnboardingDialogType.INITIAL_REINSTALL_USER
-import com.duckduckgo.app.onboarding.ui.page.WelcomePage.Companion.PreOnboardingDialogType.SKIP_ONBOARDING_OPTION
+import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.ADDRESS_BAR_POSITION
+import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.COMPARISON_CHART
+import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.INITIAL
+import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.INITIAL_REINSTALL_USER
+import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.SKIP_ONBOARDING_OPTION
 import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.Finish
 import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.OnboardingSkipped
 import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.SetAddressBarPositionOptions
-import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.SetBackgroundResource
 import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.ShowAddressBarPositionDialog
 import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.ShowComparisonChart
 import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.ShowDefaultBrowserDialog
 import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.ShowInitialDialog
 import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.ShowInitialReinstallUserDialog
 import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.ShowSkipOnboardingOption
+import com.duckduckgo.app.onboardingdesignexperiment.OnboardingDesignExperimentManager
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.ui.store.AppTheme
 import com.duckduckgo.common.ui.view.gone
@@ -61,10 +59,12 @@ import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.FragmentViewModelFactory
 import com.duckduckgo.common.utils.extensions.html
+import com.duckduckgo.common.utils.extensions.preventWidows
 import com.duckduckgo.di.scopes.FragmentScope
 import javax.inject.Inject
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
 
 @InjectWith(FragmentScope::class)
 class WelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome_page) {
@@ -77,6 +77,9 @@ class WelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome_p
 
     @Inject
     lateinit var appTheme: AppTheme
+
+    @Inject
+    lateinit var onboardingDesignExperimentManager: OnboardingDesignExperimentManager
 
     private val binding: ContentOnboardingWelcomePageBinding by viewBinding()
     private val viewModel by lazy {
@@ -97,13 +100,9 @@ class WelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome_p
         }
     }
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?,
-    ): View {
-        val binding = ContentOnboardingWelcomePageBinding.inflate(inflater, container, false)
-        viewModel.setBackgroundResource(appTheme.isLightModeEnabled())
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
         viewModel.commands.flowWithLifecycle(lifecycle, Lifecycle.State.STARTED).onEach {
             when (it) {
                 is ShowInitialReinstallUserDialog -> configureDaxCta(INITIAL_REINSTALL_USER)
@@ -114,11 +113,9 @@ class WelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome_p
                 is ShowAddressBarPositionDialog -> configureDaxCta(ADDRESS_BAR_POSITION)
                 is Finish -> onContinuePressed()
                 is OnboardingSkipped -> onSkipPressed()
-                is SetBackgroundResource -> setBackgroundRes(it.backgroundRes)
                 is SetAddressBarPositionOptions -> setAddressBarPositionOptions(it.defaultOption)
             }
         }.launchIn(lifecycleScope)
-        return binding.root
     }
 
     private fun setAddressBarPositionOptions(defaultOption: Boolean) {
@@ -140,7 +137,21 @@ class WelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome_p
         savedInstanceState: Bundle?,
     ) {
         super.onViewCreated(view, savedInstanceState)
-        requestNotificationsPermissions()
+
+        setBackgroundRes(
+            if (appTheme.isLightModeEnabled()) {
+                R.drawable.onboarding_background_bitmap_light
+            } else {
+                R.drawable.onboarding_background_bitmap_dark
+            },
+        )
+
+        if (onboardingDesignExperimentManager.isModifiedControlEnrolledAndEnabled()) {
+            scheduleWelcomeAnimation()
+        } else {
+            requestNotificationsPermissions()
+        }
+
         setSkipAnimationListener()
     }
 
@@ -289,7 +300,13 @@ class WelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome_p
                     binding.daxDialogCta.progressBarText.text = "2 / 2"
                     binding.daxDialogCta.progressBar.show()
                     binding.daxDialogCta.progressBar.progress = 2
-                    val ctaText = it.getString(R.string.highlightsPreOnboardingAddressBarTitle)
+                    val ctaText = it.getString(R.string.highlightsPreOnboardingAddressBarTitle).run {
+                        if (onboardingDesignExperimentManager.isModifiedControlEnrolledAndEnabled()) {
+                            preventWidows()
+                        } else {
+                            this
+                        }
+                    }
                     binding.daxDialogCta.hiddenTextCta.text = ctaText.html(it)
                     binding.daxDialogCta.primaryCta.alpha = MIN_ALPHA
                     binding.daxDialogCta.addressBarPosition.root.show()
@@ -345,7 +362,10 @@ class WelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome_p
             }
     }
 
-    private fun scheduleTypingAnimation(ctaText: String, afterAnimation: () -> Unit = {}) {
+    private fun scheduleTypingAnimation(
+        ctaText: String,
+        afterAnimation: () -> Unit = {},
+    ) {
         typingAnimation = ViewCompat.animate(binding.daxDialogCta.daxCtaContainer)
             .alpha(MAX_ALPHA)
             .setDuration(ANIMATION_DURATION)
@@ -379,15 +399,6 @@ class WelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome_p
     }
 
     companion object {
-
-        enum class PreOnboardingDialogType {
-            INITIAL_REINSTALL_USER,
-            INITIAL,
-            SKIP_ONBOARDING_OPTION,
-            COMPARISON_CHART,
-            ADDRESS_BAR_POSITION,
-        }
-
         private const val MIN_ALPHA = 0f
         private const val MAX_ALPHA = 1f
         private const val ANIMATION_DURATION = 400L

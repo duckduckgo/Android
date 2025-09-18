@@ -18,22 +18,27 @@ package com.duckduckgo.duckchat.impl.helper
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.common.test.CoroutineTestRule
-import com.duckduckgo.common.ui.experiments.visual.store.VisualDesignExperimentDataStore
 import com.duckduckgo.duckchat.impl.ChatState
 import com.duckduckgo.duckchat.impl.DuckChatInternal
+import com.duckduckgo.duckchat.impl.ReportMetric.USER_DID_CREATE_NEW_CHAT
+import com.duckduckgo.duckchat.impl.ReportMetric.USER_DID_OPEN_HISTORY
+import com.duckduckgo.duckchat.impl.ReportMetric.USER_DID_SELECT_FIRST_HISTORY_ITEM
+import com.duckduckgo.duckchat.impl.ReportMetric.USER_DID_SUBMIT_FIRST_PROMPT
+import com.duckduckgo.duckchat.impl.ReportMetric.USER_DID_SUBMIT_PROMPT
+import com.duckduckgo.duckchat.impl.ReportMetric.USER_DID_TAP_KEYBOARD_RETURN_KEY
+import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
 import com.duckduckgo.duckchat.impl.store.DuckChatDataStore
 import com.duckduckgo.js.messaging.api.JsCallbackData
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.runTest
 import org.json.JSONObject
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
-import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
+import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 
 @RunWith(AndroidJUnit4::class)
@@ -44,18 +49,13 @@ class RealDuckChatJSHelperTest {
 
     private val mockDuckChat: DuckChatInternal = mock()
     private val mockDataStore: DuckChatDataStore = mock()
-    private val mockExperimentDataStore: VisualDesignExperimentDataStore = mock()
+    private val mockDuckChatPixels: DuckChatPixels = mock()
 
     private val testee = RealDuckChatJSHelper(
         duckChat = mockDuckChat,
         dataStore = mockDataStore,
-        experimentDataStore = mockExperimentDataStore,
+        duckChatPixels = mockDuckChatPixels,
     )
-
-    @Before
-    fun setUp() {
-        whenever(mockExperimentDataStore.isExperimentEnabled).thenReturn(MutableStateFlow(false))
-    }
 
     @Test
     fun whenMethodIsUnknownThenReturnNull() = runTest {
@@ -79,12 +79,12 @@ class RealDuckChatJSHelperTest {
     }
 
     @Test
-    fun whenGetAIChatNativeHandoffDataAndDuckChatEnabledThenReturnJsCallbackDataWithDuckChatEnabled() = runTest {
+    fun whenGetAIChatNativeHandoffDataAndDuckChatFeatureEnabledThenReturnJsCallbackDataWithDuckChatEnabled() = runTest {
         val featureName = "aiChat"
         val method = "getAIChatNativeHandoffData"
         val id = "123"
 
-        whenever(mockDuckChat.isEnabled()).thenReturn(true)
+        whenever(mockDuckChat.isDuckChatFeatureEnabled()).thenReturn(true)
         whenever(mockDataStore.fetchAndClearUserPreferences()).thenReturn("preferences")
 
         val result = testee.processJsCallbackMessage(featureName, method, id, null)
@@ -104,12 +104,12 @@ class RealDuckChatJSHelperTest {
     }
 
     @Test
-    fun whenGetAIChatNativeHandoffDataAndDuckChatDisabledThenReturnJsCallbackDataWithDuckChatDisabled() = runTest {
+    fun whenGetAIChatNativeHandoffDataAndDuckChatFeatureDisabledThenReturnJsCallbackDataWithDuckChatDisabled() = runTest {
         val featureName = "aiChat"
         val method = "getAIChatNativeHandoffData"
         val id = "123"
 
-        whenever(mockDuckChat.isEnabled()).thenReturn(false)
+        whenever(mockDuckChat.isDuckChatFeatureEnabled()).thenReturn(false)
         whenever(mockDataStore.fetchAndClearUserPreferences()).thenReturn("preferences")
 
         val result = testee.processJsCallbackMessage(featureName, method, id, null)
@@ -134,7 +134,7 @@ class RealDuckChatJSHelperTest {
         val method = "getAIChatNativeHandoffData"
         val id = "123"
 
-        whenever(mockDuckChat.isEnabled()).thenReturn(true)
+        whenever(mockDuckChat.isDuckChatFeatureEnabled()).thenReturn(true)
         whenever(mockDataStore.fetchAndClearUserPreferences()).thenReturn(null)
 
         val result = testee.processJsCallbackMessage(featureName, method, id, null)
@@ -164,12 +164,12 @@ class RealDuckChatJSHelperTest {
     }
 
     @Test
-    fun whenGetAIChatNativeConfigValuesAndDuckChatEnabledThenReturnJsCallbackDataWithDuckChatEnabled() = runTest {
+    fun whenGetAIChatNativeConfigValuesAndDuckChatFeatureEnabledThenReturnJsCallbackDataWithDuckChatEnabled() = runTest {
         val featureName = "aiChat"
         val method = "getAIChatNativeConfigValues"
         val id = "123"
 
-        whenever(mockDuckChat.isEnabled()).thenReturn(true)
+        whenever(mockDuckChat.isDuckChatFeatureEnabled()).thenReturn(true)
 
         val result = testee.processJsCallbackMessage(featureName, method, id, null)
 
@@ -191,12 +191,12 @@ class RealDuckChatJSHelperTest {
     }
 
     @Test
-    fun whenGetAIChatNativeConfigValuesAndDuckChatDisabledThenReturnJsCallbackDataWithDuckChatDisabled() = runTest {
+    fun whenGetAIChatNativeConfigValuesAndDuckChatFeatureDisabledThenReturnJsCallbackDataWithDuckChatDisabled() = runTest {
         val featureName = "aiChat"
         val method = "getAIChatNativeConfigValues"
         val id = "123"
 
-        whenever(mockDuckChat.isEnabled()).thenReturn(false)
+        whenever(mockDuckChat.isDuckChatFeatureEnabled()).thenReturn(false)
 
         val result = testee.processJsCallbackMessage(featureName, method, id, null)
 
@@ -229,7 +229,7 @@ class RealDuckChatJSHelperTest {
         assertNull(testee.processJsCallbackMessage(featureName, method, id, data))
 
         verify(mockDataStore).updateUserPreferences(payloadString)
-        verify(mockDuckChat).openDuckChat()
+        verify(mockDuckChat).openNewDuckChatSession()
     }
 
     @Test
@@ -240,7 +240,7 @@ class RealDuckChatJSHelperTest {
 
         assertNull(testee.processJsCallbackMessage(featureName, method, id, null))
         verify(mockDataStore).updateUserPreferences(null)
-        verify(mockDuckChat).openDuckChat()
+        verify(mockDuckChat).openNewDuckChatSession()
     }
 
     @Test
@@ -252,7 +252,7 @@ class RealDuckChatJSHelperTest {
 
         assertNull(testee.processJsCallbackMessage(featureName, method, id, data))
         verify(mockDataStore).updateUserPreferences(null)
-        verify(mockDuckChat).openDuckChat()
+        verify(mockDuckChat).openNewDuckChatSession()
     }
 
     @Test
@@ -350,36 +350,12 @@ class RealDuckChatJSHelperTest {
     }
 
     @Test
-    fun whenGetAIChatNativeConfigValuesAndSupportsNativeChatInputThenReturnJsCallbackDataWithSupportsNativeChatInputEnabled() = runTest {
-        val featureName = "aiChat"
-        val method = "getAIChatNativeConfigValues"
-        val id = "123"
-
-        whenever(mockDuckChat.isEnabled()).thenReturn(true)
-        whenever(mockExperimentDataStore.isExperimentEnabled).thenReturn(MutableStateFlow(true))
-        whenever(mockExperimentDataStore.isDuckAIPoCEnabled).thenReturn(MutableStateFlow(true))
-
-        val result = testee.processJsCallbackMessage(featureName, method, id, null)
-
-        val expectedPayload = JSONObject().apply {
-            put("platform", "android")
-            put("isAIChatHandoffEnabled", true)
-            put("supportsClosingAIChat", true)
-            put("supportsOpeningSettings", true)
-            put("supportsNativeChatInput", true)
-            put("supportsImageUpload", false)
-        }
-
-        assertEquals(expectedPayload.toString(), result!!.params.toString())
-    }
-
-    @Test
     fun whenGetAIChatNativeConfigValuesAndSupportsImageUploadThenReturnJsCallbackDataWithSupportsImageUploadEnabled() = runTest {
         val featureName = "aiChat"
         val method = "getAIChatNativeConfigValues"
         val id = "123"
 
-        whenever(mockDuckChat.isEnabled()).thenReturn(true)
+        whenever(mockDuckChat.isDuckChatFeatureEnabled()).thenReturn(true)
         whenever(mockDuckChat.isImageUploadEnabled()).thenReturn(true)
 
         val result = testee.processJsCallbackMessage(featureName, method, id, null)
@@ -394,5 +370,88 @@ class RealDuckChatJSHelperTest {
         }
 
         assertEquals(expectedPayload.toString(), result!!.params.toString())
+    }
+
+    @Test
+    fun whenReportMetricWithoutDataThenPixelNotSent() = runTest {
+        val featureName = "aiChat"
+        val method = "reportMetric"
+        val id = "123"
+
+        assertNull(testee.processJsCallbackMessage(featureName, method, id, null))
+
+        verifyNoInteractions(mockDuckChatPixels)
+    }
+
+    @Test
+    fun whenReportMetricWithDataThenPixelSent() = runTest {
+        val featureName = "aiChat"
+        val method = "reportMetric"
+        val id = "123"
+        val data = JSONObject(mapOf("metricName" to "userDidSubmitPrompt"))
+
+        assertNull(testee.processJsCallbackMessage(featureName, method, id, data))
+
+        verify(mockDuckChatPixels).sendReportMetricPixel(USER_DID_SUBMIT_PROMPT)
+    }
+
+    @Test
+    fun whenReportMetricWithFirstPromptThenPixelSent() = runTest {
+        val featureName = "aiChat"
+        val method = "reportMetric"
+        val id = "123"
+        val data = JSONObject(mapOf("metricName" to "userDidSubmitFirstPrompt"))
+
+        assertNull(testee.processJsCallbackMessage(featureName, method, id, data))
+
+        verify(mockDuckChatPixels).sendReportMetricPixel(USER_DID_SUBMIT_FIRST_PROMPT)
+    }
+
+    @Test
+    fun whenReportMetricWithOpenHistoryThenPixelSent() = runTest {
+        val featureName = "aiChat"
+        val method = "reportMetric"
+        val id = "123"
+        val data = JSONObject(mapOf("metricName" to "userDidOpenHistory"))
+
+        assertNull(testee.processJsCallbackMessage(featureName, method, id, data))
+
+        verify(mockDuckChatPixels).sendReportMetricPixel(USER_DID_OPEN_HISTORY)
+    }
+
+    @Test
+    fun whenReportMetricWithSelectFirstHistoryItemThenPixelSent() = runTest {
+        val featureName = "aiChat"
+        val method = "reportMetric"
+        val id = "123"
+        val data = JSONObject(mapOf("metricName" to "userDidSelectFirstHistoryItem"))
+
+        assertNull(testee.processJsCallbackMessage(featureName, method, id, data))
+
+        verify(mockDuckChatPixels).sendReportMetricPixel(USER_DID_SELECT_FIRST_HISTORY_ITEM)
+    }
+
+    @Test
+    fun whenReportMetricWithCreateNewChatThenPixelSent() = runTest {
+        val featureName = "aiChat"
+        val method = "reportMetric"
+        val id = "123"
+        val data = JSONObject(mapOf("metricName" to "userDidCreateNewChat"))
+
+        assertNull(testee.processJsCallbackMessage(featureName, method, id, data))
+
+        verify(mockDuckChatPixels).sendReportMetricPixel(USER_DID_CREATE_NEW_CHAT)
+    }
+
+    @Test
+    fun whenReportMetricWithKeyboardReturnKeyThenPixelSent() = runTest {
+        val featureName = "aiChat"
+        val method = "reportMetric"
+        val id = "123"
+        val data = JSONObject(mapOf("metricName" to "userDidTapKeyboardReturnKey"))
+
+        assertNull(testee.processJsCallbackMessage(featureName, method, id, data))
+
+        verify(mockDuckChatPixels).sendReportMetricPixel(USER_DID_TAP_KEYBOARD_RETURN_KEY)
     }
 }

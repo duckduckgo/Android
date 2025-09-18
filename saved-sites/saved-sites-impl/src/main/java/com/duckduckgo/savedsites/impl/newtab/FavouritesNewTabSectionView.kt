@@ -24,6 +24,7 @@ import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
+import android.view.ViewConfiguration
 import android.widget.LinearLayout
 import android.widget.PopupWindow
 import androidx.core.text.HtmlCompat
@@ -66,6 +67,8 @@ import com.duckduckgo.savedsites.api.models.SavedSite
 import com.duckduckgo.savedsites.api.models.SavedSite.Bookmark
 import com.duckduckgo.savedsites.api.models.SavedSite.Favorite
 import com.duckduckgo.savedsites.api.models.SavedSitesNames
+import com.duckduckgo.savedsites.api.views.FavoritesGridConfig
+import com.duckduckgo.savedsites.api.views.FavoritesPlacement
 import com.duckduckgo.savedsites.impl.dialogs.EditSavedSiteDialogFragment
 import com.duckduckgo.savedsites.impl.dialogs.EditSavedSiteDialogFragment.DeleteBookmarkListener
 import com.duckduckgo.savedsites.impl.dialogs.EditSavedSiteDialogFragment.EditSavedSiteListener
@@ -74,8 +77,8 @@ import com.duckduckgo.savedsites.impl.newtab.FavouritesNewTabSectionViewModel.Co
 import com.duckduckgo.savedsites.impl.newtab.FavouritesNewTabSectionViewModel.Command.DeleteFavoriteConfirmation
 import com.duckduckgo.savedsites.impl.newtab.FavouritesNewTabSectionViewModel.Command.DeleteSavedSiteConfirmation
 import com.duckduckgo.savedsites.impl.newtab.FavouritesNewTabSectionViewModel.Command.ShowEditSavedSiteDialog
-import com.duckduckgo.savedsites.impl.newtab.FavouritesNewTabSectionViewModel.Placement
 import com.duckduckgo.savedsites.impl.newtab.FavouritesNewTabSectionViewModel.SavedSiteChangedViewState
+import com.duckduckgo.savedsites.impl.newtab.FavouritesNewTabSectionViewModel.SwipeDecision
 import com.duckduckgo.savedsites.impl.newtab.FavouritesNewTabSectionViewModel.ViewState
 import com.duckduckgo.savedsites.impl.newtab.FavouritesNewTabSectionsAdapter.Companion.QUICK_ACCESS_GRID_MAX_COLUMNS
 import com.duckduckgo.savedsites.impl.newtab.FavouritesNewTabSectionsAdapter.Companion.QUICK_ACCESS_ITEM_MAX_SIZE_DP
@@ -109,9 +112,12 @@ class FavouritesNewTabSectionView @JvmOverloads constructor(
     @Inject
     lateinit var swipingTabsFeature: SwipingTabsFeatureProvider
 
+    @Inject
+    lateinit var favoritesSwipeHandling: FavoritesSwipeHandling
+
     private var isExpandable = true
     private var showPlaceholders = false
-    private var placement = Placement.NEW_TAB_PAGE
+    private var placement: FavoritesPlacement = FavoritesPlacement.NEW_TAB_PAGE
 
     private val binding: ViewNewTabFavouritesSectionBinding by viewBinding()
 
@@ -133,6 +139,14 @@ class FavouritesNewTabSectionView @JvmOverloads constructor(
     private val conflatedStateJob = ConflatedJob()
     private val conflatedCommandJob = ConflatedJob()
 
+    private val touchSlop: Int by lazy { ViewConfiguration.get(context).scaledTouchSlop }
+    private val longPressTimeoutMs: Long by lazy { ViewConfiguration.getLongPressTimeout().toLong() }
+
+    private val longPressRunnable = Runnable {
+        viewModel.onLongPressTriggered()
+        parent?.requestDisallowInterceptTouchEvent(true)
+    }
+
     init {
         context.obtainStyledAttributes(
             attrs,
@@ -142,8 +156,16 @@ class FavouritesNewTabSectionView @JvmOverloads constructor(
         ).apply {
             isExpandable = getBoolean(R.styleable.FavouritesNewTabSectionView_isExpandable, true)
             showPlaceholders = getBoolean(R.styleable.FavouritesNewTabSectionView_showPlaceholders, true)
-            placement = Placement.from(getInt(R.styleable.FavouritesNewTabSectionView_favoritesPlacement, 1))
+            placement = FavoritesPlacement.from(getInt(R.styleable.FavouritesNewTabSectionView_favoritesPlacement, 1))
             recycle()
+        }
+    }
+
+    constructor(context: Context, config: FavoritesGridConfig?) : this(context, null, 0) {
+        config?.let {
+            isExpandable = it.isExpandable
+            showPlaceholders = it.showPlaceholders
+            placement = it.placement
         }
     }
 
@@ -177,8 +199,37 @@ class FavouritesNewTabSectionView @JvmOverloads constructor(
     }
 
     override fun dispatchTouchEvent(ev: MotionEvent?): Boolean {
-        if (swipingTabsFeature.isEnabled) {
-            parent.requestDisallowInterceptTouchEvent(true)
+        if (favoritesSwipeHandling.self().isEnabled()) {
+            when (ev?.actionMasked) {
+                MotionEvent.ACTION_DOWN -> {
+                    viewModel.onTouchDown(ev.x, ev.y)
+                    removeCallbacks(longPressRunnable)
+                    postDelayed(longPressRunnable, longPressTimeoutMs)
+                    parent?.requestDisallowInterceptTouchEvent(false)
+                }
+
+                MotionEvent.ACTION_MOVE -> {
+                    if (viewModel.isLongPressActive()) {
+                        parent?.requestDisallowInterceptTouchEvent(true)
+                    } else {
+                        viewModel.onTouchMove(ev.x, ev.y, touchSlop)?.let { decision ->
+                            when (decision) {
+                                SwipeDecision.CANCEL_LONG_PRESS -> removeCallbacks(longPressRunnable)
+                                SwipeDecision.HORIZONTAL -> parent?.requestDisallowInterceptTouchEvent(false)
+                                SwipeDecision.VERTICAL -> parent?.requestDisallowInterceptTouchEvent(true)
+                            }
+                        }
+                    }
+                }
+
+                MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
+                    removeCallbacks(longPressRunnable)
+                    viewModel.onTouchUp()
+                    parent?.requestDisallowInterceptTouchEvent(false)
+                }
+            }
+        } else if (swipingTabsFeature.isEnabled) {
+            parent?.requestDisallowInterceptTouchEvent(true)
         }
         return super.dispatchTouchEvent(ev)
     }

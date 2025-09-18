@@ -29,15 +29,16 @@ import androidx.core.view.doOnLayout
 import androidx.core.view.isVisible
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
+import com.duckduckgo.app.onboardingdesignexperiment.OnboardingDesignExperimentManager
 import com.duckduckgo.common.ui.view.setAllParentsClip
 import com.duckduckgo.common.utils.ConflatedJob
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 
 @SuppressLint("NoLifecycleObserver") // we don't observe app lifecycle
-class PulseAnimation(private val lifecycleOwner: LifecycleOwner) : DefaultLifecycleObserver {
+class PulseAnimation(
+    private val lifecycleOwner: LifecycleOwner,
+    private val onboardingDesignExperimentManager: OnboardingDesignExperimentManager,
+) : DefaultLifecycleObserver {
+
     private var pulseAnimation: AnimatorSet = AnimatorSet()
     private var highlightImageView: View? = null
     private val conflatedJob = ConflatedJob()
@@ -60,12 +61,12 @@ class PulseAnimation(private val lifecycleOwner: LifecycleOwner) : DefaultLifecy
         conflatedJob.cancel()
     }
 
-    fun playOn(targetView: View, isExperimentAndShieldView: Boolean) {
+    fun playOn(targetView: View) {
         if (highlightImageView == null) {
-            highlightImageView = addHighlightView(targetView, isExperimentAndShieldView)
+            highlightImageView = addHighlightView(targetView)
             highlightImageView?.doOnLayout {
                 it.setAllParentsClip(enabled = false)
-                startPulseAnimation(it, isExperimentAndShieldView)
+                startPulseAnimation(it)
             }
             lifecycleOwner.lifecycle.addObserver(this)
         }
@@ -81,20 +82,21 @@ class PulseAnimation(private val lifecycleOwner: LifecycleOwner) : DefaultLifecy
     }
 
     @SuppressLint("NoHardcodedCoroutineDispatcher")
-    private fun startPulseAnimation(view: View, isExperimentAndShieldView: Boolean) {
+    private fun startPulseAnimation(view: View) {
         if (!pulseAnimation.isRunning) {
             val pulse = getPulseObjectAnimator(view)
             pulse.repeatCount = ObjectAnimator.INFINITE
             pulse.duration = 1100L
 
-            if (isExperimentAndShieldView) {
+            // TODO renable when sense of protection animated shield is implemented
+/*            if (false) {
                 pulse.startDelay = 1000L
                 view.alpha = 0.0f
                 conflatedJob += CoroutineScope(Dispatchers.Main).launch {
                     delay(1000L)
                     view.alpha = 1.0f
                 }
-            }
+            }*/
 
             pulseAnimation = AnimatorSet().apply {
                 play(pulse)
@@ -127,18 +129,27 @@ class PulseAnimation(private val lifecycleOwner: LifecycleOwner) : DefaultLifecy
         }
     }
 
-    private fun addHighlightView(targetView: View, isExperimentAndShieldView: Boolean): View {
+    private fun addHighlightView(
+        targetView: View,
+    ): View {
         if (targetView.parent !is ViewGroup) error("targetView parent should be ViewGroup")
 
         val highlightImageView = ImageView(targetView.context)
         highlightImageView.id = View.generateViewId()
         val gravity: Int
-        if (isExperimentAndShieldView) {
-            highlightImageView.setImageResource(R.drawable.ic_circle_pulse_green)
-            gravity = Gravity.START
-        } else {
-            highlightImageView.setImageResource(R.drawable.ic_circle_pulse_blue)
-            gravity = Gravity.CENTER
+        when {
+            onboardingDesignExperimentManager.isBuckEnrolledAndEnabled() -> {
+                highlightImageView.setImageResource(R.drawable.ic_circle_pulse_buck)
+                gravity = Gravity.CENTER
+            }
+            onboardingDesignExperimentManager.isBbEnrolledAndEnabled() -> {
+                highlightImageView.setImageResource(R.drawable.ic_circle_pulse_bb)
+                gravity = Gravity.CENTER
+            }
+            else -> {
+                highlightImageView.setImageResource(R.drawable.ic_circle_pulse_blue)
+                gravity = Gravity.CENTER
+            }
         }
         val layoutParams = FrameLayout.LayoutParams(targetView.width, targetView.height, gravity)
         (targetView.parent as ViewGroup).addView(highlightImageView, 0, layoutParams)

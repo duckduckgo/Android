@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Copyright (c) 2025 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/daxCtaContainer"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:clipChildren="false"
+    android:clipToPadding="false">
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/daxDialogDismissButton"
+        style="@style/Widget.DuckDuckGo.FloatingActionButton.Circular"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="-12dp"
+        android:layout_marginEnd="-12dp"
+        android:alpha="0"
+        android:contentDescription="@null"
+        android:elevation="@dimen/keyline_2"
+        app:backgroundTint="@color/buckColorButtonFAB"
+        app:fabSize="mini"
+        app:layout_constraintEnd_toEndOf="@+id/buckOnboardingDialogView"
+        app:layout_constraintTop_toTopOf="@id/buckOnboardingDialogView"
+        app:srcCompat="@drawable/ic_close_24"
+        tools:ignore="InvalidColorAttribute" />
+
+    <com.duckduckgo.app.onboarding.ui.page.BuckOnboardingDialogView
+        android:id="@+id/buckOnboardingDialogView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="@dimen/keyline_4"
+        android:layout_marginTop="@dimen/keyline_4"
+        android:layout_marginBottom="36dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintWidth_max="600dp">
+
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <LinearLayout
+                android:id="@+id/cardContainer"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:paddingHorizontal="@dimen/keyline_5"
+                android:paddingVertical="@dimen/keyline_6">
+
+                <TextView
+                    android:id="@+id/daxBubbleDialogTitle"
+                    style="@style/Typography.Buck.H1"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/buckColorPrimaryText"
+                    tools:ignore="DeprecatedWidgetInXml,InvalidColorAttribute"
+                    tools:text="@string/onboardingSearchDaxDialogTitle" />
+
+                <FrameLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/keyline_1">
+
+                    <TextView
+                        android:id="@+id/hiddenTextCta"
+                        style="@style/Typography.Buck.Body1"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:visibility="invisible"
+                        tools:ignore="DeprecatedWidgetInXml"
+                        tools:text="@string/onboardingSearchDaxDialogDescription"
+                        tools:visibility="visible" />
+
+                    <com.duckduckgo.common.ui.view.TypeAnimationTextView
+                        android:id="@+id/dialogTextCta"
+                        style="@style/Typography.Buck.Body1"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:textColor="@color/buckColorPrimaryText"
+                        tools:ignore="InvalidColorAttribute" />
+                </FrameLayout>
+
+                <ImageView
+                    android:id="@+id/placeholderImageView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="44dp"
+                    android:layout_gravity="center"
+                    android:adjustViewBounds="true"
+                    android:visibility="gone"
+                    android:layout_marginTop="@dimen/keyline_4"
+                    app:srcCompat="@drawable/buck_shield"
+                    tools:visibility="gone" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/daxDialogOption1"
+                    style="@style/Widget.DuckDuckGo.BuckButton.Secondary"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="20dp"
+                    android:alpha="0"
+                    android:text="@string/onboardingSearchDaxDialogOption1"
+                    android:visibility="gone"
+                    app:icon="@drawable/ic_find_search_16"
+                    tools:alpha="1"
+                    tools:ignore="DeprecatedWidgetInXml" />
+
+                <Space
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/keyline_2" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/daxDialogOption2"
+                    style="@style/Widget.DuckDuckGo.BuckButton.Secondary"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:alpha="0"
+                    android:text="@string/onboardingSearchDaxDialogOption2"
+                    android:visibility="gone"
+                    app:icon="@drawable/ic_find_search_16"
+                    tools:alpha="1"
+                    tools:ignore="DeprecatedWidgetInXml" />
+
+                <Space
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/keyline_2" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/daxDialogOption3"
+                    style="@style/Widget.DuckDuckGo.BuckButton.Secondary"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:alpha="0"
+                    android:text="@string/onboardingSearchDaxDialogOption3"
+                    android:visibility="gone"
+                    app:icon="@drawable/ic_find_search_16"
+                    tools:alpha="1"
+                    tools:ignore="DeprecatedWidgetInXml" />
+
+                <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
+                    android:id="@+id/primaryCta"
+                    style="@style/Widget.DuckDuckGo.BuckButton.TextButton.Primary"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/keyline_2"
+                    android:visibility="gone"
+                    tools:ignore="DeprecatedWidgetInXml"
+                    tools:text="Primary Cta"
+                    tools:visibility="visible" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/secondaryCta"
+                    style="@style/Widget.DuckDuckGo.BuckButton.Secondary"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:visibility="gone"
+                    tools:ignore="DeprecatedWidgetInXml"
+                    tools:text="Secondary Cta"
+                    tools:visibility="visible" />
+
+            </LinearLayout>
+        </ScrollView>
+    </com.duckduckgo.app.onboarding.ui.page.BuckOnboardingDialogView>
+</androidx.constraintlayout.widget.ConstraintLayout>

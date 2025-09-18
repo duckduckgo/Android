@@ -43,7 +43,6 @@ import com.duckduckgo.newtabpage.impl.databinding.ViewNewTabPageBinding
 import com.duckduckgo.newtabpage.impl.view.NewTabPageViewModel.ViewState
 import dagger.android.support.AndroidSupportInjection
 import javax.inject.Inject
-import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import logcat.logcat
@@ -53,6 +52,8 @@ class NewTabPageView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyle: Int = 0,
+    private val showLogo: Boolean = true,
+    private val onHasContent: ((Boolean) -> Unit)? = null,
 ) : LinearLayout(context, attrs, defStyle) {
 
     @Inject
@@ -96,10 +97,17 @@ class NewTabPageView @JvmOverloads constructor(
         if (viewState.loading) {
             binding.newTabContentShimmer.startShimmer()
         } else {
-            if (viewState.showDax) {
-                binding.ddgLogo.show()
+            if (!showLogo && viewState.showDax) {
+                this.gone()
+                onHasContent?.invoke(false)
             } else {
-                binding.ddgLogo.gone()
+                this.show()
+                onHasContent?.invoke(true)
+                if (viewState.showDax) {
+                    binding.ddgLogo.show()
+                } else {
+                    binding.ddgLogo.gone()
+                }
             }
 
             if (viewState.sections.isEmpty()) {

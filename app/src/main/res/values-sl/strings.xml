@@ -128,6 +128,7 @@
     <!-- Fire -->
     <string name="fireMenu">Počisti podatke</string>
     <string name="fireClearAll">Počisti vse zavihke in podatke</string>
+    <string name="fireClearAllPlusDuckChats">Počisti vse zavihke, podatke in klepete Duck.ai</string>
     <string name="fireCancel">Preklic</string>
     <string name="fireDataCleared">Podatki izbrisani</string>
 
@@ -191,6 +192,28 @@
     <string name="webTrackingProtectionLearnMoreTitle">Zaščita pred spletnim sledenjem</string>
     <string name="webTrackingProtectionTitle">Zaščita pred spletnim sledenjem</string>
     <string name="webTrackingProtectionDescriptionNew"><![CDATA[DuckDuckGo samodejno blokira skrite sledilnike med brskanjem po spletu.\n<a href=\"\">Več o tem</a>]]></string>
+    <string name="webTrackingProtectionExplanationDescription"><![CDATA[Brskalnik DuckDuckGo nudi zaščito pred sledenjem, ki je vedno aktivna.\n<a href=\"\">Več o tem</a>]]></string>
+    <string name="webTrackingProtectionExplanationTitle">Kako vas ščitimo</string>
+    <string name="webTrackingProtectionThirdPartyTrackersTitle">Blokira sledilnike tretjih oseb</string>
+    <string name="webTrackingProtectionThirdPartyTrackersDescription">Pomaga blokirati piškotke tretjih oseb, ki vam sledijo od enega do drugega spletnega mesta, in sicer s preprečevanjem, da bi se sledilniki tretjih oseb sploh naložili.</string>
+    <string name="webTrackingProtectionTargetedAdsTitle">Blokira ciljane oglase</string>
+    <string name="webTrackingProtectionTargetedAdsDescription">Blokira invazivne sledilnike, še preden se naložijo, s čimer učinkovito odstrani oglase, ki temeljijo na sledenju.</string>
+    <string name="webTrackingProtectionFingerprintTrackingTitle">Preprečuje sledenje prstnim odtisom</string>
+    <string name="webTrackingProtectionFingerprintTrackingDescription">Podjetjem preprečuje sledenje in s tem pridobivanje enoličnih identifikatorjev o vašem brskalniku in napravi, na podlagi katerih vam lahko sledijo povsod po spletu.</string>
+    <string name="webTrackingProtectionLinkTrackingTitle">Blokira sledenje povezavam</string>
+    <string name="webTrackingProtectionLinkTrackingDescription">Odstrani parametre sledenja v povezavah, da tretjim osebam prepreči sledenje vašemu vedenju na različnih spletnih mestih.</string>
+    <string name="webTrackingProtectionReferrerTrackingTitle">Ščiti pred sledenjem napotiteljem</string>
+    <string name="webTrackingProtectionReferrerTrackingDescription">Pomaga preprečiti, da bi podjetja prepoznala spletno mesto, ki ste ga nazadnje obiskali.</string>
+    <string name="webTrackingProtectionFirstPartyCookiesTitle">Poteče veljavnost lastnih piškotkov</string>
+    <string name="webTrackingProtectionFirstPartyCookiesDescription">Poskrbi, da lastni piškotki samodejno potečejo po 30 dneh, tako da vam spletna mesta ne morejo slediti za nedoločen čas, ko ste odjavljeni.</string>
+    <string name="webTrackingProtectionDnsCnameCloakingTitle">Ščiti pred prikrivanjem DNS CNAME</string>
+    <string name="webTrackingProtectionDnsCnameCloakingDescription">Pomaga blokirati sledilnike tretjih oseb, ki se poskušajo prikriti znotraj spletnega mesta z uporabo DNS.</string>
+    <string name="webTrackingProtectionGoogleAmpTrackingTitle">Blokira Googlovo sledenje AMP</string>
+    <string name="webTrackingProtectionGoogleAmpTrackingDescription">Povezave Google AMP zamenja s spletnim mestom prvotnega založnika.</string>
+    <string name="webTrackingProtectionGoogleSigninPopupsTitle">Blokira Googlova pojavna okna za prijavo</string>
+    <string name="webTrackingProtectionGoogleSigninPopupsDescription">Blokira pojavna okna za prijavo v Google na spletnih mestih, ki niso v Googlovi lasti.</string>
+    <string name="webTrackingProtectionGlobalPrivacyControlTitle">Globalni nadzor zasebnosti</string>
+    <string name="webTrackingProtectionGlobalPrivacyControlDescription">V vašem imenu izraža pravice do zavrnitve tako, da spletnim mestom naroči, naj ne prodajajo ali delijo vaših osebnih podatkov.</string>
 
     <!-- Cookie Pop-Up Protection -->
     <string name="cookiePopupProtectionTitle">Zaščita pred pojavnimi okni piškotkov</string>
@@ -204,6 +227,7 @@
 
     <!-- Appearance -->
     <string name="appearanceActivityTitle">Izgled</string>
+    <string name="settingsShowFullUrlTitle">Prikaži polni naslov spletnega mesta</string>
 
     <!-- Settings - Automatically clearing data -->
     <string name="settingsAutomaticallyClearingDialogSave">Shrani</string>
@@ -213,6 +237,7 @@
     <string name="settingsAutomaticallyClearWhatOptionNone">Brez</string>
     <string name="settingsAutomaticallyClearWhatOptionTabs">Zavihki</string>
     <string name="settingsAutomaticallyClearWhatOptionTabsAndData">Zavihki in podatki</string>
+    <string name="settingsAutomaticallyClearWhatOptionTabsAndDataAndChats">Zavihki, podatki in klepeti Duck.ai</string>
 
     <string name="settingsAutomaticallyClearWhen">Počisti dne …</string>
     <string name="settingsAutomaticallyClearWhenDialogTitle">Počisti dne …</string>
@@ -222,6 +247,8 @@
     <string name="settingsAutomaticallyClearWhenAppExit15Minutes">Izhod iz aplikacije, neaktivnost 15 minut</string>
     <string name="settingsAutomaticallyClearWhenAppExit30Minutes">Izhod iz aplikacije, neaktivnost 30 minut</string>
     <string name="settingsAutomaticallyClearWhenAppExit60Minutes">Izhod iz aplikacije, neaktivnost 1 ura</string>
+    <string name="settingsClearAiDataTitle">Počisti klepete Duck.ai</string>
+    <string name="settingsClearAiDataMessage">Gumb Fire Button bo izbrisal tudi zgodovino Duck.ai.</string>
 
     <!-- About Activity -->
     <string name="aboutActivityTitle">O DuckDuckGo</string>
@@ -250,8 +277,8 @@
     <string name="searchWidgetEmtpyFavoritesHint">Priljubljeni še niso dodani</string>
     <string name="searchWidgetEmtpyFavoritesCta">Dodaj priljubljene</string>
     <string name="widgetConfigurationActivityTitle">Konfiguracija pripomočka</string>
-    <string name="favoritesWidgetLabel">Priljubljeni</string>
-    <string name="searchWidgetLabel">Iskanje</string>
+    <string name="favoritesWidgetLabel">Iskanje in priljubljeni</string>
+    <string name="searchWidgetLabel">Iskanje in Duck.ai</string>
 
     <!-- Home Screen Shortcuts -->
     <string name="addToHome">Dodaj na Domači Zaslon</string>
@@ -406,7 +433,6 @@
     <string name="crashedWebViewErrorAction">"Ponovno naloži"</string>
 
     <!-- System Search-->
-    <string name="systemSearchDeviceAppLabel">Iz te naprave</string>
     <string name="systemSearchAppNotFound">Prošnje ni bilo mogoče najti</string>
     <string name="systemSearchOnboardingThanks">Hvala, ker ste izbrali DuckDuckGo!\nZ uporabo našega brskalnika ste zaščiteni pred hekerji, goljufi in podjetji, ki želijo pridobiti podatke.</string>
     <string name="systemSearchOnboardingFeaturesIntroText">Tudi aplikacija DuckDuckGo:</string>
@@ -785,7 +811,7 @@
     <string name="preOnboardingComparisonChartItem1">Privzeto išče zasebno</string>
     <string name="preOnboardingComparisonChartItem2">Blokirajte sledilnike tretjih oseb</string>
     <string name="preOnboardingComparisonChartItem3">Blokirajte pojavna okna za piškotke</string>
-    <string name="preOnboardingComparisonChartItem4">Blokiraj oglase, ki sledijo</string>
+    <string name="preOnboardingComparisonChartItem4">Blokiranje ciljnih oglasov</string>
     <string name="preOnboardingComparisonChartItem5">Izbriši podatke o brskanju z enim gumbom</string>
     <string name="preOnboardingDaxDialog3Title">Odlično! Veseli nas, da ste se nam pridružili.</string>
     <string name="preOnboardingDaxDialog3Button">Začni brskanje</string>
@@ -828,8 +854,9 @@
     <string name="onboardingEndDaxDialogDescription">Ne pozabite: Vedno kadar brskate z mano, shrljivemu oglasu pristrižete peruti. 👌</string>
     <string name="onboardingEndDaxDialogButton">Končano!</string>
     <string name="onboardingPrivacyProDaxDialogTitle">Oh, preden pozabim ...</string>
-    <string name="onboardingPrivacyProDaxDialogDescription"><![CDATA[DuckDuckGo ima tudi vgrajen <b>VPN</b>!<br/><br/>Aktivirajte ga s <b>plačljivo naročnino Privacy Pro.</b>]]></string>
+    <string name="onboardingPrivacyProDaxDialogDescription"><![CDATA[DuckDuckGo ima tudi varen <b>VPN in še 2 dodatni premium zaščiti</b>, ki so na voljo z <b>neobvezno plačljivo naročnino</b>.]]></string>
     <string name="onboardingPrivacyProDaxDialogOkButton">Več</string>
+    <string name="onboardingPrivacyProDaxDialogFreeTrialOkButton">Poskusite brezplačno!</string>
     <string name="onboardingPrivacyProDaxDialogCancelButton">Preskoči</string>
 
     <!-- Highlight Onboarding Experiment-->
@@ -874,19 +901,15 @@
     <!-- Privacy Dashboard -->
     <string name="brokenSiteSubmittedReportMessage">Hvala! Vaše poročilo pripomore k temu, da lahko DuckDuckGo postane boljši za vse!</string>
 
-    <!-- DuckChat -->
-    <string name="duckChatTitle">Duck.ai</string>
-    <string name="duckChatMenuItem">Novi klepet z umetno inteligenco</string>
-
     <!--    Default Browser Bottom Sheet Dialog -->
     <string name="defaultBrowserBottomSheetDialogTitle">Naj DuckDuckGo zaščiti več vaše dejavnosti na spletu.</string>
-    <string name="defaultBrowserBottomSheetDialogSubTitle">Nastavite nas kot privzeti brskalnik, da se vse povezave do spletnih mest odprejo v DuckDuckGo.</string>
-    <string name="defaultBrowserBottomSheetDialogGhostButton">Ne zdaj</string>
+    <string name="defaultBrowserBottomSheetDialogSubTitle">Spremenite privzeti brskalnik, da se bodo povezave odpirale v DuckDuckGo.</string>
+    <string name="defaultBrowserBottomSheetDialogGhostButton" instruction="This text appears on a button">Ne zdaj</string>
 
-    <!--TabSwitcher Animation Tile Dialog-->
-    <string name="tabSwitcherAnimationTileRemovalDialogTitle">DuckDuckGo blokira sledilnike, da zaščiti vaše brskanje</string>
-    <string name="tabSwitcherAnimationTileRemovalDialogBody">Če izbrišete zavihke in podatke, boste izbrisali zgodovino blokiranja sledilnika in to številko ponastavili na nič.\n\nSkrijte to pasico, če je ne želite videti v pogledu zavihkov.</string>
-    <string name="tabSwitcherAnimationTileRemovalDialogNegativeButton">Skrij pasico</string>
+    <!-- Default Browser message -->
+    <string name="newTabPageDefaultBrowserMessageHeading">DuckDuckGo ni vaš privzeti brskalnik. Pridobite več zaščite.</string>
+    <string name="newTabPageDefaultBrowserMessagePrimaryCta" instruction="This text appears on a button">Nastavi kot privzeto</string>
+    <string name="newTabPageDefaultBrowserMessageSecondaryCta" instruction="This text appears on a button">Ne vprašaj več</string>
 
     <!-- Threat protection -->
     <string name="maliciousSiteTitle">Opozorilo: To spletno mesto je lahko varnostno tveganje</string>
@@ -910,4 +933,63 @@
     <string name="scamBlockerTitle">Preprečevanje prevar</string>
     <string name="scamBlockerDescription">Prikaži opozorilo na spletnih mestih, označenih zaradi prevar, lažnega predstavljanja in zlonamerne programske opreme.</string>
     <string name="threatProtectionLearnMoreTitle">Več</string>
+
+    <!-- Experiment: Improve prompts for "homescreen widget" -->
+    <string name="experimentHomeScreenWidgetBottomSheetDialogTitle">Preizkusite naš pripomoček za domači zaslon!</string>
+    <string name="experimentHomeScreenWidgetBottomSheetDialogSubTitle">Dodajte naš gradnik za iskanje na domači zaslon za hiter in preprost dostop.</string>
+    <string name="experimentHomeScreenWidgetBottomSheetDialogPrimaryButton">Dodaj gradnik</string>
+    <string name="experimentHomeScreenWidgetBottomSheetDialogGhostButton">Ne zdaj</string>
+    <string name="experimentHomeScreenWidgetBottomSheetDialogSearchText">Poišči DuckDuckGo</string>
+
+    <!-- Change under remote feature flag: Widget as a Protection -->
+    <string name="settingsAddHomeWidgetTitle">Pripomoček na domačem zaslonu</string>
+
+    <!-- Section in main app settings -->
+    <string name="settingsHeadingCompleteSetup">Dokončanje nastavitve</string>
+
+    <!-- Buck Onboarding Experiment -->
+    <string name="highlightsPreOnboardingDaxDialog1TitleBuck">Pozdravljeni.</string>
+    <string name="highlightsPreOnboardingDaxDialog1DescriptionBuck">Ste pripravljeni na hitrejši brskalnik, ki vas zaščiti?</string>
+    <string name="highlightsPreOnboardingDaxDialog2TitleBuck"><![CDATA[<b>Zaščite</b> so <i>aktivirane!</i>]]></string>
+
+    <!-- BB Onboarding Experiment -->
+    <string name="highlightsPreOnboardingDaxDialog1TitleBb"><![CDATA[Pozdravljeni.<br/>Ste pripravljeni na hitrejši brskalnik, ki vas zaščiti?]]></string>
+
+    <string name="bbOnboardingFireButtonDaxDialogTitle"><![CDATA[Takoj počistite svojo dejavnost brskanja z gumbom <font color=\"#F05C2B\">Fire Button</font>]]></string>
+    <string name="bbOnboardingFireButtonDaxDialogDescription">Poskusite!️</string>
+
+    <plurals name="bbOnboardingTrackersBlockedDialogTitle">
+        <item quantity="one"><![CDATA[ in še %1$d sta vam poskušala tukaj slediti. <font color=\"#F05C2B\">Blokiral sem ju!</font>]]></item>
+        <item quantity="two"><![CDATA[ in še %1$d so vam poskušali tukaj slediti. <font color=\"#F05C2B\">Blokiral sem ju!</font>]]></item>
+        <item quantity="few"><![CDATA[ in še %1$d so vam poskušali tukaj slediti. <font color=\"#F05C2B\">Blokiral sem ju!</font>]]></item>
+        <item quantity="other"><![CDATA[ in še %1$d so vam poskušali tukaj slediti. <font color=\"#F05C2B\">Blokiral sem ju!</font>]]></item>
+    </plurals>
+    <plurals name="bbOnboardingTrackersBlockedZeroDialogTitle" tools:ignore="ImpliedQuantity">
+        <item quantity="one"><![CDATA[ vam je poskušal tukaj slediti. <font color=\"#F05C2B\">Blokiral sem ga!</font>]]></item>
+        <item quantity="two"><![CDATA[ sta vam poskušala tukaj slediti. <font color=\"#F05C2B\">Blokiral sem ju!</font>]]></item>
+        <item quantity="few"><![CDATA[ so vam poskušali tukaj slediti. <font color=\"#F05C2B\">Blokiral sem jih!</font>]]></item>
+        <item quantity="other"><![CDATA[ so vam poskušali tukaj slediti. <font color=\"#F05C2B\">Blokiral sem jih!</font>]]></item>
+    </plurals>
+
+    <string name="bbOnboardingTrackersBlockedDialogDescription">☝️Tapnite ščit za več informacij.️</string>
+
+    <!-- Privacy Pro Rebranding-->
+    <string name="aboutDescriptionBrandUpdate2025Rebranding">Welcome to the Duck Side!\n\nDuckDuckGo je neodvisno podjetje za spletno zaščito za vse, ki želijo znova prevzeti nadzor nad svojimi osebnimi podatki.\n\nVerjamemo, da je najboljši način za zaščito vaših osebnih podatkov pred hekerji, prevaranti in podjetji, ki posegajo v zasebnost, da preprečimo njihovo zbiranje. Zato na milijone ljudi za iskanje in brskanje po spletu <annotation type="chart_comparison">namesto brskalnika Chrome in drugih brskalnikov izbira DuckDuckGo</annotation>. Naš vgrajeni iskalnik je kot Google, vendar nikoli ne sledi vašim iskanjem. Naše zaščite pri brskanju, kot sta blokiranje sledilnikov oglasov in piškotkov, pomagajo drugim podjetjem preprečevati zbiranje vaših podatkov. In še to, naš brskalnik je brezplačen – zaslužimo z <annotation type="privacy_respecting_ads">oglasi v iskanju, ki spoštujejo zasebnost</annotation>, ne z izkoriščanjem vaših podatkov.\n\nPoleg tega ponujamo tudi <annotation type="ppro_help_page">naročnino na DuckDuckGo</annotation>, integrirano v naš brskalnik. Naročniki dobijo še večjo zaščito zasebnosti s hitrim in preprostim omrežjem <annotation type="vpn_help_page">VPN</annotation>, ki pomaga zaščititi vašo spletno dejavnost, dostop do naprednih modelov umetne inteligence v naši zasebni storitvi klepetov z umetno inteligenco Duck.ai, storitev, ki najde in odstrani vaše osebne podatke s spletnih mest za iskanje ljudi, ter storitev, ki obnovi vašo identiteto, če je ukradena.\n\nPrevzemite nadzor nad svojimi osebnimi podatki z brskalnikom, ki je zasnovan za varstvo podatkov, ne za zbiranje podatkov.</string>
+    <string name="onboardingPrivacyProDaxDialogDescriptionRebranding"><![CDATA[DuckDuckGo ima tudi <b>izbirno plačljivo naročnino</b> z varnim omrežjem <b>VPN</b> in <b>napredno, zasebno umetno inteligenco</b>.]]></string>
+    <string name="settingsDuckAiRebranding">Lastnosti UI</string>
+    <string name="settingsDuckAi">Duck.ai</string>
+
+    <!--TabSwitcher Trackers Animation-->
+    <string name="showTrackerCountInTabSwitcher">Pokaži število sledilnikov v preklopniku zavihkov</string>
+    <string name="tabSwitcherAnimationTileRemovalDialogTitle" instruction="A title for a dialog that shows when a user clicks a tile that shows them their current blocked tracker count">Želite skriti število sledilnikov?</string>
+    <string name="tabSwitcherAnimationTileRemovalDialogBody" instruction="A message for a dialog that shows when a user clicks a tile that shows them their current blocked tracker count">To lahko znova vklopite, če greste na Nastavitve &gt; Videz.</string>
+    <string name="tabSwitcherAnimationTileRemovalDialogPositiveButton">Skrij se</string>
+    <string name="tabSwitcherAnimationTileRemovalDialogNegativeButton">Obdrži</string>
+
+    <!-- Widgets -->
+    <string name="searchOnlyWidgetLabel" instruction="Label for the search-only widget">Samo iskanje</string>
+    <string name="searchOnlyWidgetDescription" instruction="Description for the search-only widget">Hitro zaženite zasebno iskanje z DuckDuckGo.</string>
+    <string name="searchWidgetDescription" instruction="Description for the search widget, which may include Duck.ai and voice search">Zasebno iščite z DuckDuckGo ali vprašajte Duck.ai. Glasovno iskanje in Duck.ai sta na voljo, če sta omogočena.</string>
+    <string name="searchAndFavoritesWidgetDescription" instruction="Description for the search and favorites widget">Z enim dotikom zasebno poiščite ali obiščite svoja najljubša spletna mesta. Glasovno iskanje in Duck.ai sta na voljo, če sta omogočena.</string>
+    <string name="duckAiOnlyPinShortcutLabel" instruction="Label for the Duck.ai pinned shortcut. Should be Duck.ai in all languages">Duck.ai</string>
 </resources>

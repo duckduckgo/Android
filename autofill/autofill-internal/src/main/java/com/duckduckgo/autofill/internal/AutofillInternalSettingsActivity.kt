@@ -21,6 +21,7 @@ import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.webkit.CookieManager
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.IntentCompat
@@ -29,9 +30,6 @@ import androidx.lifecycle.Lifecycle.State.STARTED
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.duckduckgo.anvil.annotations.InjectWith
-import com.duckduckgo.app.browser.api.WebViewCapabilityChecker
-import com.duckduckgo.app.browser.api.WebViewCapabilityChecker.WebViewCapability.DocumentStartJavaScript
-import com.duckduckgo.app.browser.api.WebViewCapabilityChecker.WebViewCapability.WebMessageListener
 import com.duckduckgo.app.tabs.BrowserNav
 import com.duckduckgo.autofill.api.AutofillFeature
 import com.duckduckgo.autofill.api.AutofillScreenLaunchSource.InternalDevSettings
@@ -46,6 +44,8 @@ import com.duckduckgo.autofill.impl.importing.CredentialImporter.ImportResult.Fi
 import com.duckduckgo.autofill.impl.importing.CredentialImporter.ImportResult.InProgress
 import com.duckduckgo.autofill.impl.importing.CsvCredentialConverter
 import com.duckduckgo.autofill.impl.importing.CsvCredentialConverter.CsvCredentialImportResult
+import com.duckduckgo.autofill.impl.importing.InternalInBrowserPromoStore
+import com.duckduckgo.autofill.impl.importing.capability.ImportGooglePasswordsCapabilityChecker
 import com.duckduckgo.autofill.impl.importing.gpm.feature.AutofillImportPasswordConfigStore
 import com.duckduckgo.autofill.impl.importing.gpm.webflow.ImportGooglePassword.AutofillImportViaGooglePasswordManagerScreen
 import com.duckduckgo.autofill.impl.importing.gpm.webflow.ImportGooglePasswordResult
@@ -139,7 +139,10 @@ class AutofillInternalSettingsActivity : DuckDuckGoActivity() {
     lateinit var autofillImportPasswordConfigStore: AutofillImportPasswordConfigStore
 
     @Inject
-    lateinit var webViewCapabilityChecker: WebViewCapabilityChecker
+    lateinit var importGooglePasswordsCapabilityChecker: ImportGooglePasswordsCapabilityChecker
+
+    @Inject
+    lateinit var inBrowserImportPromoPreviousPromptsStore: InternalInBrowserPromoStore
 
     private var passwordImportWatcher = ConflatedJob()
 
@@ -297,9 +300,7 @@ class AutofillInternalSettingsActivity : DuckDuckGoActivity() {
         }
         binding.importPasswordsLaunchGooglePasswordCustomFlow.setClickListener {
             lifecycleScope.launch {
-                val webViewWebMessageSupport = webViewCapabilityChecker.isSupported(WebMessageListener)
-                val webViewDocumentStartJavascript = webViewCapabilityChecker.isSupported(DocumentStartJavaScript)
-                if (webViewDocumentStartJavascript && webViewWebMessageSupport) {
+                if (importGooglePasswordsCapabilityChecker.webViewCapableOfImporting()) {
                     val intent =
                         globalActivityStarter.startIntent(this@AutofillInternalSettingsActivity, AutofillImportViaGooglePasswordManagerScreen)
                     importGooglePasswordsFlowLauncher.launch(intent)
@@ -315,6 +316,37 @@ class AutofillInternalSettingsActivity : DuckDuckGoActivity() {
                 type = "*/*"
             }
             importCsvLauncher.launch(intent)
+        }
+
+        binding.importPasswordsGoogleLogoutButton.setClickListener {
+            clearGoogleCookies()
+        }
+
+        binding.importPasswordsResetImportedFlagButton.setClickListener {
+            lifecycleScope.launch(dispatchers.io()) {
+                autofillStore.hasDismissedMainAppSettingsPromo = false
+                autofillStore.hasEverImportedPasswords = false
+                autofillStore.hasDeclinedPasswordManagementImportPromo = false
+                autofillStore.hasDeclinedInBrowserPasswordImportPromo = false
+                autofillStore.inBrowserImportPromoShownCount = 0
+                inBrowserImportPromoPreviousPromptsStore.clear()
+            }
+            Toast.makeText(
+                this@AutofillInternalSettingsActivity,
+                getString(R.string.autofillDevSettingsResetGooglePasswordsImportFlagConfirmation),
+                Toast.LENGTH_SHORT,
+            ).show()
+        }
+
+        binding.markPasswordsAsPreviouslyImportedButton.setClickListener {
+            lifecycleScope.launch(dispatchers.io()) {
+                autofillStore.hasEverImportedPasswords = true
+            }
+            Toast.makeText(
+                this@AutofillInternalSettingsActivity,
+                getString(R.string.autofillDevSettingsSimulatePasswordsImportedConfirmation),
+                Toast.LENGTH_SHORT,
+            ).show()
         }
     }
 
@@ -622,6 +654,21 @@ class AutofillInternalSettingsActivity : DuckDuckGoActivity() {
         password: String = "password-123",
     ): LoginCredentials {
         return LoginCredentials(username = username, password = password, domain = domain)
+    }
+
+    private fun clearGoogleCookies() {
+        val cookieManager = CookieManager.getInstance()
+        val domain = ".google.com"
+
+        cookieManager.getCookie(domain)?.let { cookies ->
+            cookies.split(";").forEach { cookie ->
+                val cookieName = cookie.substringBefore("=").trim()
+                cookieManager.setCookie(domain, "$cookieName=; Max-Age=0; Path=/")
+            }
+        }
+        cookieManager.flush()
+
+        Toast.makeText(this, R.string.autofillDevSettingsGoogleLogoutSuccess, Toast.LENGTH_SHORT).show()
     }
 
     companion object {

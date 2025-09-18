@@ -20,13 +20,11 @@ import android.content.Context
 import android.content.SharedPreferences
 import androidx.core.content.edit
 import com.duckduckgo.common.ui.DuckDuckGoTheme
-import com.duckduckgo.common.ui.experiments.visual.store.VisualDesignExperimentDataStore
 import com.duckduckgo.common.ui.isInNightMode
 import javax.inject.Inject
 
 class ThemingSharedPreferences @Inject constructor(
     private val context: Context,
-    private val visualDesignExperimentDataStore: VisualDesignExperimentDataStore,
 ) : ThemingDataStore {
 
     private val themePrefMapper = ThemePrefsMapper()
@@ -45,7 +43,6 @@ class ThemingSharedPreferences @Inject constructor(
             savedValue,
             DuckDuckGoTheme.SYSTEM_DEFAULT,
             context.isInNightMode(),
-            visualDesignExperimentDataStore.isExperimentEnabled.value,
         )
     }
 
@@ -70,31 +67,17 @@ class ThemingSharedPreferences @Inject constructor(
             value: String?,
             defValue: DuckDuckGoTheme,
             isInNightMode: Boolean,
-            isExperimentEnabled: Boolean,
         ) =
             when (value) {
-                THEME_LIGHT -> if (isExperimentEnabled) {
-                    DuckDuckGoTheme.EXPERIMENT_LIGHT
+                THEME_LIGHT -> DuckDuckGoTheme.LIGHT
+
+                THEME_DARK -> DuckDuckGoTheme.DARK
+
+                else -> if (isInNightMode) {
+                    DuckDuckGoTheme.DARK
                 } else {
                     DuckDuckGoTheme.LIGHT
                 }
-
-                THEME_DARK -> if (isExperimentEnabled) {
-                    DuckDuckGoTheme.EXPERIMENT_DARK
-                } else {
-                    DuckDuckGoTheme.DARK
-                }
-
-                else ->
-                    if (isExperimentEnabled) {
-                        if (isInNightMode) {
-                            DuckDuckGoTheme.EXPERIMENT_DARK
-                        } else {
-                            DuckDuckGoTheme.EXPERIMENT_LIGHT
-                        }
-                    } else {
-                        DuckDuckGoTheme.SYSTEM_DEFAULT
-                    }
             }
     }
 

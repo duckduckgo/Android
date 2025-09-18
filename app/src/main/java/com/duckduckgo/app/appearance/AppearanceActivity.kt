@@ -40,16 +40,12 @@ import com.duckduckgo.app.fire.FireActivity
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.DuckDuckGoTheme
 import com.duckduckgo.common.ui.DuckDuckGoTheme.DARK
-import com.duckduckgo.common.ui.DuckDuckGoTheme.EXPERIMENT_DARK
-import com.duckduckgo.common.ui.DuckDuckGoTheme.EXPERIMENT_LIGHT
 import com.duckduckgo.common.ui.DuckDuckGoTheme.LIGHT
 import com.duckduckgo.common.ui.DuckDuckGoTheme.SYSTEM_DEFAULT
 import com.duckduckgo.common.ui.sendThemeChangedBroadcast
 import com.duckduckgo.common.ui.view.dialog.RadioListAlertDialogBuilder
 import com.duckduckgo.common.ui.view.dialog.TextAlertDialogBuilder
 import com.duckduckgo.common.ui.view.getColorFromAttr
-import com.duckduckgo.common.ui.view.gone
-import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.navigation.api.getActivityParams
@@ -87,6 +83,14 @@ class AppearanceActivity : DuckDuckGoActivity() {
             .show()
     }
 
+    private val showFullUrlToggleListener = CompoundButton.OnCheckedChangeListener { _, isChecked ->
+        viewModel.onFullUrlSettingChanged(isChecked)
+    }
+
+    private val showTrackersCountInTabSwitcher = CompoundButton.OnCheckedChangeListener { _, isChecked ->
+        viewModel.onShowTrackersCountInTabSwitcherChanged(isChecked)
+    }
+
     private val changeIconFlow = registerForActivityResult(ChangeIconContract()) { resultOk ->
         if (resultOk) {
             logcat { "Icon changed." }
@@ -120,7 +124,12 @@ class AppearanceActivity : DuckDuckGoActivity() {
                     binding.experimentalNightMode.quietlySetIsChecked(viewState.forceDarkModeEnabled, forceDarkModeToggleListener)
                     binding.experimentalNightMode.isEnabled = viewState.canForceDarkMode
                     binding.experimentalNightMode.isVisible = viewState.supportsForceDarkMode
-                    updateSelectedOmnibarPosition(it.isOmnibarPositionFeatureEnabled, it.omnibarPosition)
+                    updateSelectedOmnibarPosition(it.omnibarPosition)
+                    binding.showFullUrlSetting.quietlySetIsChecked(viewState.isFullUrlEnabled, showFullUrlToggleListener)
+                    binding.showTrackersCountInTabSwitcher.quietlySetIsChecked(
+                        viewState.isTrackersCountInTabSwitcherEnabled,
+                        showTrackersCountInTabSwitcher,
+                    )
                 }
             }.launchIn(lifecycleScope)
 
@@ -136,28 +145,19 @@ class AppearanceActivity : DuckDuckGoActivity() {
                 DARK -> R.string.settingsDarkTheme
                 LIGHT -> R.string.settingsLightTheme
                 SYSTEM_DEFAULT -> R.string.settingsSystemTheme
-                EXPERIMENT_DARK -> R.string.settingsDarkTheme
-                EXPERIMENT_LIGHT -> R.string.settingsLightTheme
             },
         )
         binding.selectedThemeSetting.setSecondaryText(subtitle)
     }
 
-    private fun updateSelectedOmnibarPosition(isFeatureEnabled: Boolean, position: OmnibarPosition) {
-        if (isFeatureEnabled) {
-            val subtitle = getString(
-                when (position) {
-                    OmnibarPosition.TOP -> R.string.settingsAddressBarPositionTop
-                    OmnibarPosition.BOTTOM -> R.string.settingsAddressBarPositionBottom
-                },
-            )
-            binding.addressBarPositionSetting.setSecondaryText(subtitle)
-            binding.addressBarPositionSettingDivider.show()
-            binding.addressBarPositionSetting.show()
-        } else {
-            binding.addressBarPositionSettingDivider.gone()
-            binding.addressBarPositionSetting.gone()
-        }
+    private fun updateSelectedOmnibarPosition(position: OmnibarPosition) {
+        val subtitle = getString(
+            when (position) {
+                OmnibarPosition.TOP -> R.string.settingsAddressBarPositionTop
+                OmnibarPosition.BOTTOM -> R.string.settingsAddressBarPositionBottom
+            },
+        )
+        binding.addressBarPositionSetting.setSecondaryText(subtitle)
     }
 
     private fun processCommand(it: Command) {

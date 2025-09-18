@@ -1,0 +1,240 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Copyright (c) 2025 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/background_rounded_top_corners"
+        android:orientation="vertical"
+        android:paddingTop="20dp"
+        android:paddingBottom="24dp">
+
+        <ScrollView
+            android:id="@+id/contentScroll"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:fillViewport="true">
+
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:alpha="0.2"
+                    android:background="@drawable/background_new_address_bar_option_vertical_gradient" />
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
+
+                    <LinearLayout
+                        android:id="@+id/textBlock"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="8dp"
+                        android:orientation="vertical"
+                        app:layout_constraintBottom_toTopOf="@id/animationContainer"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintVertical_bias="0.5">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="center"
+                            android:orientation="horizontal">
+
+                            <ImageView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginEnd="8dp"
+                                android:src="@drawable/ic_new_pill" />
+
+                            <com.duckduckgo.common.ui.view.text.DaxTextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/newAddressBarOptionBottomSheetDialogHeader"
+                                android:textColor="@color/red50"
+                                app:textAllCaps="true"
+                                app:typography="body2_bold"
+                                tools:ignore="InvalidColorAttribute" />
+
+                        </LinearLayout>
+
+                        <com.duckduckgo.common.ui.view.text.DaxTextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginHorizontal="40dp"
+                            android:layout_marginTop="8dp"
+                            android:gravity="center"
+                            android:text="@string/newAddressBarOptionBottomSheetDialogTitle"
+                            app:textType="primary"
+                            app:typography="title" />
+
+                        <com.duckduckgo.common.ui.view.text.DaxTextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginHorizontal="40dp"
+                            android:layout_marginTop="16dp"
+                            android:gravity="center"
+                            android:text="@string/newAddressBarOptionBottomSheetDialogSubTitle"
+                            app:textType="secondary"
+                            app:typography="body2" />
+                    </LinearLayout>
+
+                    <FrameLayout
+                        android:id="@+id/animationContainer"
+                        android:layout_width="0dp"
+                        android:layout_height="260dp"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent">
+
+                        <com.airbnb.lottie.LottieAnimationView
+                            android:id="@+id/newAddressBarOptionBottomSheetDialogAnimation"
+                            android:layout_width="wrap_content"
+                            android:layout_height="260dp"
+                            android:layout_gravity="center"
+                            app:lottie_autoPlay="false"
+                            app:lottie_imageAssetsFolder="images"
+                            app:lottie_loop="true"
+                            tools:ignore="ContentDescription" />
+                    </FrameLayout>
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+            </FrameLayout>
+        </ScrollView>
+
+        <LinearLayout
+            android:layout_width="327dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="24dp"
+            android:orientation="vertical">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/newAddressBarOptionBottomSheetDialogSearchOnlyButton"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:layout_marginBottom="8dp"
+                android:background="@drawable/background_new_address_bar_option"
+                android:clickable="true"
+                android:focusable="true">
+
+                <com.duckduckgo.common.ui.view.text.DaxTextView
+                    android:id="@+id/searchOnlyText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/keyline_4"
+                    android:text="@string/newAddressBarOptionBottomSheetDialogSearchOnly"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:typography="body1" />
+
+                <com.google.android.material.checkbox.MaterialCheckBox
+                    android:id="@+id/searchOnlyCheckbox"
+                    android:layout_width="@dimen/keyline_5"
+                    android:layout_height="@dimen/keyline_5"
+                    android:layout_marginEnd="@dimen/keyline_4"
+                    android:checked="false"
+                    android:clickable="false"
+                    android:background="@null"
+                    app:buttonTint="@drawable/selector_new_address_bar_option_checkbox"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:useMaterialThemeColors="false" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/newAddressBarOptionBottomSheetDialogSearchAndDuckAiButton"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:background="@drawable/background_new_address_bar_option_selected"
+                android:clickable="true"
+                android:focusable="true">
+
+                <com.duckduckgo.common.ui.view.text.DaxTextView
+                    android:id="@+id/searchAndDuckAiText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/keyline_4"
+                    android:text="@string/newAddressBarOptionBottomSheetDialogSearchAndDuckAi"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:typography="body1" />
+
+                <com.google.android.material.checkbox.MaterialCheckBox
+                    android:id="@+id/searchAndDuckAiCheckbox"
+                    android:layout_width="@dimen/keyline_5"
+                    android:layout_height="@dimen/keyline_5"
+                    android:layout_marginEnd="@dimen/keyline_4"
+                    android:checked="true"
+                    android:clickable="false"
+                    android:background="@null"
+                    app:buttonTint="@drawable/selector_new_address_bar_option_checkbox"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:useMaterialThemeColors="false" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+        </LinearLayout>
+
+        <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
+            android:id="@+id/newAddressBarOptionBottomSheetDialogPrimaryButton"
+            android:layout_width="327dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="8dp"
+            android:text="@string/newAddressBarOptionBottomSheetDialogPrimaryButton"
+            app:daxButtonSize="large" />
+
+        <com.duckduckgo.common.ui.view.button.DaxButtonGhost
+            android:id="@+id/newAddressBarOptionBottomSheetDialogGhostButton"
+            android:layout_width="327dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="-4dp"
+            android:text="@string/newAddressBarOptionBottomSheetDialogGhostButton"
+            app:daxButtonSize="large" />
+
+        <com.duckduckgo.common.ui.view.text.DaxTextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="40dp"
+            android:layout_marginTop="8dp"
+            android:gravity="center"
+            android:text="@string/newAddressBarOptionBottomSheetDialogFooter"
+            app:textType="secondary"
+            app:typography="body2" />
+
+    </LinearLayout>
+</LinearLayout>

@@ -141,7 +141,7 @@ jobs:
       - name: Decode secret
         env:
           FLANK: ${{ secrets.FLANK }}
-        run: echo $FLANK > flank.json
+        run: echo "$FLANK" > flank.json
 
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v3
@@ -149,24 +149,55 @@ jobs:
       - name: Build
         run: ./gradlew androidTestsBuild
 
+      - name: Find test APK path
+        id: find-apk
+        run: |
+          TEST_APK_PATH=$(find . -path '*/build/outputs/apk/play/debug/*.apk' -type f -print -quit)
+          echo "Found test APK at: $TEST_APK_PATH"
+          echo "apk_path=$TEST_APK_PATH" >> "$GITHUB_OUTPUT"
+
+      - name: Make script executable
+        run: chmod +x scripts/check_elf_alignment.sh
+
+      - name: Check native libraries alignment
+        id: check-alignment
+        continue-on-error: true
+        run: ./scripts/check_elf_alignment.sh ${{ steps.find-apk.outputs.apk_path }}
+
+      - name: Handle native alignment failure
+        if: steps.check-alignment.outcome == 'failure'
+        run: |
+          echo "::error::Native library alignment check failed!"
+          echo "::error::Please check the native libraries in your APK for correct page size alignment."
+          exit 1
+
       - name: Run Android Tests
-        run: ./gradlew runFlankAndroidTests
+        if: steps.check-alignment.outcome == 'success'
+        run: ./gradlew runFlankAndroidTests --no-configuration-cache
 
       - name: Bundle the Android CI tests report
-        if: always()
+        if: |
+          always() &&
+          steps.check-alignment.outcome == 'success'
         run: find . -type d -name 'fladleResults' | zip -@ -r android-tests-report.zip
 
       - name: Generate json file with failures
-        if: ${{ failure() }}
-        run: cat build/fladle/fladleResults/HtmlErrorReport.html | cut -d\`  -f2 >> results.json
+        if: |
+          failure() &&
+          steps.check-alignment.outcome == 'success'
+        run: cut -d\`  -f2 < build/fladle/fladleResults/HtmlErrorReport.html >> results.json
 
       - name: Print failure report
-        if: ${{ failure() }}
+        if: |
+          failure() &&
+          steps.check-alignment.outcome == 'success'
         run: |
           jq -r '.[] | .label as $id | .items[] | "Test:", $id, "Failure:", .label, "URL:", .url, "\n"' results.json
 
       - name: Upload the Android CI tests report
-        if: always()
+        if: |
+          always() &&
+          steps.check-alignment.outcome == 'success'
         uses: actions/upload-artifact@v4
         with:
           name: android-tests-report

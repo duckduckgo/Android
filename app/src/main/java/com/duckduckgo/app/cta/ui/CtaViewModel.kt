@@ -21,11 +21,12 @@ import androidx.annotation.WorkerThread
 import androidx.core.net.toUri
 import com.duckduckgo.app.browser.DuckDuckGoUrlDetector
 import com.duckduckgo.app.browser.R
-import com.duckduckgo.app.browser.senseofprotection.SenseOfProtectionExperiment
+import com.duckduckgo.app.browser.ui.dialogs.widgetprompt.OnboardingHomeScreenWidgetToggles
 import com.duckduckgo.app.cta.db.DismissedCtaDao
 import com.duckduckgo.app.cta.model.CtaId
 import com.duckduckgo.app.cta.model.DismissedCta
 import com.duckduckgo.app.cta.ui.HomePanelCta.AddWidgetAuto
+import com.duckduckgo.app.cta.ui.HomePanelCta.AddWidgetAutoOnboardingExperiment
 import com.duckduckgo.app.cta.ui.HomePanelCta.AddWidgetInstructions
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.global.model.Site
@@ -36,7 +37,7 @@ import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.onboarding.store.UserStageStore
 import com.duckduckgo.app.onboarding.store.daxOnboardingActive
 import com.duckduckgo.app.onboarding.ui.page.extendedonboarding.ExtendedOnboardingFeatureToggles
-import com.duckduckgo.app.pixels.AppPixelName
+import com.duckduckgo.app.onboardingdesignexperiment.OnboardingDesignExperimentManager
 import com.duckduckgo.app.privacy.db.UserAllowListRepository
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
@@ -44,12 +45,12 @@ import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.widget.ui.WidgetCapabilities
 import com.duckduckgo.brokensite.api.BrokenSitePrompt
 import com.duckduckgo.brokensite.api.RefreshPattern
-import com.duckduckgo.browser.api.UserBrowserProperties
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckplayer.api.DuckPlayer
 import com.duckduckgo.duckplayer.api.DuckPlayer.DuckPlayerState
 import com.duckduckgo.duckplayer.api.PrivatePlayerMode.AlwaysAsk
+import com.duckduckgo.subscriptions.api.SubscriptionRebrandingFeatureToggle
 import com.duckduckgo.subscriptions.api.Subscriptions
 import dagger.SingleInstanceIn
 import javax.inject.Inject
@@ -84,8 +85,9 @@ class CtaViewModel @Inject constructor(
     private val subscriptions: Subscriptions,
     private val duckPlayer: DuckPlayer,
     private val brokenSitePrompt: BrokenSitePrompt,
-    private val userBrowserProperties: UserBrowserProperties,
-    private val senseOfProtectionExperiment: SenseOfProtectionExperiment,
+    private val onboardingHomeScreenWidgetToggles: OnboardingHomeScreenWidgetToggles,
+    private val onboardingDesignExperimentManager: OnboardingDesignExperimentManager,
+    private val rebrandingFeatureToggle: SubscriptionRebrandingFeatureToggle,
 ) {
     @ExperimentalCoroutinesApi
     @VisibleForTesting
@@ -150,18 +152,6 @@ class CtaViewModel @Inject constructor(
             if (cta is BrokenSitePromptDialogCta) {
                 brokenSitePrompt.ctaShown()
             }
-
-            // Temporary pixel
-            val isVisitSiteSuggestionsCta = cta is DaxBubbleCta.DaxIntroVisitSiteOptionsCta || cta is OnboardingDaxDialogCta.DaxSiteSuggestionsCta
-            if (isVisitSiteSuggestionsCta) {
-                if (userBrowserProperties.daysSinceInstalled() <= MIN_DAYS_TO_COUNT_ONBOARDING_CTA_SHOWN) {
-                    val count = onboardingStore.visitSiteCtaDisplayCount ?: 0
-                    pixel.fire(AppPixelName.ONBOARDING_VISIT_SITE_CTA_SHOWN, mapOf("count" to count.toString()))
-                    onboardingStore.visitSiteCtaDisplayCount = count + 1
-                } else {
-                    onboardingStore.clearVisitSiteCtaDisplayCount()
-                }
-            }
         }
     }
 
@@ -209,7 +199,6 @@ class CtaViewModel @Inject constructor(
         detectedRefreshPatterns: Set<RefreshPattern>,
     ): Cta? {
         return withContext(dispatcher) {
-            markOnboardingAsCompletedIfRequiredCtasShown()
             if (isBrowserShowing) {
                 getBrowserCta(site, detectedRefreshPatterns)
             } else {
@@ -218,33 +207,29 @@ class CtaViewModel @Inject constructor(
         }
     }
 
-    // Temporary function to complete onboarding if all CTAs were shown
-    private suspend fun markOnboardingAsCompletedIfRequiredCtasShown() {
-        if (daxOnboardingActive() && allOnboardingCtasShown()) {
-            logcat { "Auto completing DAX ONBOARDING" }
-            userStageStore.stageCompleted(AppStage.DAX_ONBOARDING)
-            pixel.fire(AppPixelName.ONBOARDING_AUTO_COMPLETE)
-        }
-    }
-
     suspend fun getFireDialogCta(): OnboardingDaxDialogCta? {
         return withContext(dispatchers.io()) {
             if (!daxOnboardingActive() || daxDialogFireEducationShown()) return@withContext null
-            OnboardingDaxDialogCta.DaxFireButtonCta(onboardingStore, appInstallStore)
+            OnboardingDaxDialogCta.DaxFireButtonCta(onboardingStore, appInstallStore, onboardingDesignExperimentManager)
         }
     }
 
-    suspend fun getSiteSuggestionsDialogCta(): OnboardingDaxDialogCta? {
+    suspend fun getSiteSuggestionsDialogCta(onSiteSuggestionOptionClicked: (index: Int) -> Unit): OnboardingDaxDialogCta? {
         return withContext(dispatchers.io()) {
             if (!daxOnboardingActive() || !canShowDaxIntroVisitSiteCta()) return@withContext null
-            OnboardingDaxDialogCta.DaxSiteSuggestionsCta(onboardingStore, appInstallStore)
+            OnboardingDaxDialogCta.DaxSiteSuggestionsCta(
+                onboardingStore,
+                appInstallStore,
+                onboardingDesignExperimentManager,
+                onSiteSuggestionOptionClicked,
+            )
         }
     }
 
     suspend fun getEndStaticDialogCta(): OnboardingDaxDialogCta.DaxEndCta? {
         return withContext(dispatchers.io()) {
             if (!daxOnboardingActive() && daxDialogEndShown()) return@withContext null
-            return@withContext OnboardingDaxDialogCta.DaxEndCta(onboardingStore, appInstallStore)
+            return@withContext OnboardingDaxDialogCta.DaxEndCta(onboardingStore, appInstallStore, onboardingDesignExperimentManager)
         }
     }
 
@@ -259,13 +244,14 @@ class CtaViewModel @Inject constructor(
 
             // Search suggestions
             canShowDaxIntroCta() && !extendedOnboardingFeatureToggles.noBrowserCtas().isEnabled() -> {
-                senseOfProtectionExperiment.enrolUserInNewExperimentIfEligible()
                 DaxBubbleCta.DaxIntroSearchOptionsCta(onboardingStore, appInstallStore)
             }
 
             // Site suggestions
             canShowDaxIntroVisitSiteCta() && !extendedOnboardingFeatureToggles.noBrowserCtas().isEnabled() -> {
-                DaxBubbleCta.DaxIntroVisitSiteOptionsCta(onboardingStore, appInstallStore)
+                DaxBubbleCta.DaxIntroVisitSiteOptionsCta(onboardingStore, appInstallStore).apply {
+                    isModifiedControlOnboardingExperimentEnabled = onboardingDesignExperimentManager.isModifiedControlEnrolledAndEnabled()
+                }
             }
 
             // End
@@ -276,14 +262,33 @@ class CtaViewModel @Inject constructor(
             // Privacy Pro
             canShowPrivacyProCta() -> {
                 val titleRes: Int = R.string.onboardingPrivacyProDaxDialogTitle
-                val descriptionRes: Int = R.string.onboardingPrivacyProDaxDialogDescription
+                val descriptionRes: Int = if (rebrandingFeatureToggle.isSubscriptionRebrandingEnabled()) {
+                    R.string.onboardingPrivacyProDaxDialogDescriptionRebranding
+                } else {
+                    R.string.onboardingPrivacyProDaxDialogDescription
+                }
+                val primaryCtaRes: Int = if (freeTrialCopyAvailable()) {
+                    R.string.onboardingPrivacyProDaxDialogFreeTrialOkButton
+                } else {
+                    R.string.onboardingPrivacyProDaxDialogOkButton
+                }
 
-                DaxBubbleCta.DaxPrivacyProCta(onboardingStore, appInstallStore, titleRes, descriptionRes)
+                DaxBubbleCta.DaxPrivacyProCta(onboardingStore, appInstallStore, titleRes, descriptionRes, primaryCtaRes)
             }
 
             // Add Widget
             canShowWidgetCta() -> {
-                if (widgetCapabilities.supportsAutomaticWidgetAdd) AddWidgetAuto else AddWidgetInstructions
+                if (widgetCapabilities.supportsAutomaticWidgetAdd) {
+                    val showOnboardingHomeScreenWidgetPrompt = onboardingHomeScreenWidgetToggles.self().isEnabled() &&
+                        onboardingHomeScreenWidgetToggles.onboardingHomeScreenWidgetPrompt().isEnabled()
+                    if (showOnboardingHomeScreenWidgetPrompt) {
+                        AddWidgetAutoOnboardingExperiment
+                    } else {
+                        AddWidgetAuto
+                    }
+                } else {
+                    AddWidgetInstructions
+                }
             }
 
             else -> null
@@ -309,6 +314,9 @@ class CtaViewModel @Inject constructor(
     private fun canShowWidgetCta(): Boolean {
         return !widgetCapabilities.hasInstalledWidgets && !dismissedCtaDao.exists(CtaId.ADD_WIDGET)
     }
+
+    private suspend fun freeTrialCopyAvailable(): Boolean =
+        extendedOnboardingFeatureToggles.freeTrialCopy().isEnabled() && subscriptions.isFreeTrialEligible()
 
     @WorkerThread
     private suspend fun getBrowserCta(site: Site?, detectedRefreshPatterns: Set<RefreshPattern>): Cta? {
@@ -340,6 +348,7 @@ class CtaViewModel @Inject constructor(
                     appInstallStore,
                     it.orderedTrackerBlockedEntities(),
                     settingsDataStore,
+                    onboardingDesignExperimentManager,
                 )
             }
 
@@ -349,24 +358,30 @@ class CtaViewModel @Inject constructor(
                     if (!daxDialogNetworkShown() && !daxDialogTrackersFoundShown() &&
                         OnboardingDaxDialogCta.mainTrackerNetworks.any { mainNetwork -> entity.displayName.contains(mainNetwork) }
                     ) {
-                        return OnboardingDaxDialogCta.DaxMainNetworkCta(onboardingStore, appInstallStore, entity.displayName, host)
+                        return OnboardingDaxDialogCta.DaxMainNetworkCta(
+                            onboardingStore,
+                            appInstallStore,
+                            entity.displayName,
+                            host,
+                            onboardingDesignExperimentManager,
+                        )
                     }
                 }
             }
 
             // SERP
             if (isSerpUrl(it.url) && !daxDialogSerpShown()) {
-                return OnboardingDaxDialogCta.DaxSerpCta(onboardingStore, appInstallStore)
+                return OnboardingDaxDialogCta.DaxSerpCta(onboardingStore, appInstallStore, onboardingDesignExperimentManager)
             }
 
             // No trackers blocked
             if (!isSerpUrl(it.url) && !daxDialogOtherShown() && !daxDialogTrackersFoundShown() && !daxDialogNetworkShown()) {
-                return OnboardingDaxDialogCta.DaxNoTrackersCta(onboardingStore, appInstallStore)
+                return OnboardingDaxDialogCta.DaxNoTrackersCta(onboardingStore, appInstallStore, onboardingDesignExperimentManager)
             }
 
             // End
             if (canShowDaxCtaEndOfJourney() && daxDialogFireEducationShown()) {
-                return OnboardingDaxDialogCta.DaxEndCta(onboardingStore, appInstallStore)
+                return OnboardingDaxDialogCta.DaxEndCta(onboardingStore, appInstallStore, onboardingDesignExperimentManager)
             }
 
             return null
@@ -479,6 +494,5 @@ class CtaViewModel @Inject constructor(
 
     companion object {
         private const val MAX_TABS_OPEN_FIRE_EDUCATION = 2
-        private const val MIN_DAYS_TO_COUNT_ONBOARDING_CTA_SHOWN = 3
     }
 }

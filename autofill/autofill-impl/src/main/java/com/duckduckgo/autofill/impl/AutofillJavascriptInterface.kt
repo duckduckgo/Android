@@ -33,6 +33,7 @@ import com.duckduckgo.autofill.impl.deduper.AutofillLoginDeduplicator
 import com.duckduckgo.autofill.impl.domain.javascript.JavascriptCredentials
 import com.duckduckgo.autofill.impl.email.incontext.availability.EmailProtectionInContextRecentInstallChecker
 import com.duckduckgo.autofill.impl.email.incontext.store.EmailProtectionInContextDataStore
+import com.duckduckgo.autofill.impl.importing.InBrowserImportPromo
 import com.duckduckgo.autofill.impl.jsbridge.AutofillMessagePoster
 import com.duckduckgo.autofill.impl.jsbridge.request.AutofillDataRequest
 import com.duckduckgo.autofill.impl.jsbridge.request.AutofillRequestParser
@@ -46,6 +47,7 @@ import com.duckduckgo.autofill.impl.jsbridge.request.SupportedAutofillInputSubTy
 import com.duckduckgo.autofill.impl.jsbridge.request.SupportedAutofillInputSubType.USERNAME
 import com.duckduckgo.autofill.impl.jsbridge.request.SupportedAutofillTriggerType
 import com.duckduckgo.autofill.impl.jsbridge.request.SupportedAutofillTriggerType.AUTOPROMPT
+import com.duckduckgo.autofill.impl.jsbridge.request.SupportedAutofillTriggerType.CREDENTIALS_IMPORT
 import com.duckduckgo.autofill.impl.jsbridge.request.SupportedAutofillTriggerType.USER_INITIATED
 import com.duckduckgo.autofill.impl.jsbridge.response.AutofillResponseWriter
 import com.duckduckgo.autofill.impl.partialsave.PartialCredentialSaveStore
@@ -133,6 +135,7 @@ class AutofillStoredBackJavascriptInterface @Inject constructor(
     private val partialCredentialSaveStore: PartialCredentialSaveStore,
     private val usernameBackFiller: UsernameBackFiller,
     private val existingCredentialMatchDetector: ExistingCredentialMatchDetector,
+    private val inBrowserImportPromo: InBrowserImportPromo,
 ) : AutofillJavascriptInterface {
 
     override var callback: Callback? = null
@@ -183,6 +186,12 @@ class AutofillStoredBackJavascriptInterface @Inject constructor(
             } else {
                 logcat(WARN) { "Unable to process request; don't know how to handle request $requestString" }
             }
+        }
+    }
+
+    private fun handlePromoteImport(url: String) {
+        coroutineScope.launch(dispatcherProvider.io()) {
+            callback?.promptUserToImportPassword(url)
         }
     }
 
@@ -246,9 +255,30 @@ class AutofillStoredBackJavascriptInterface @Inject constructor(
         val finalCredentialList = ensureUsernamesNotNull(dedupedCredentials)
 
         if (finalCredentialList.isEmpty()) {
-            callback?.noCredentialsAvailable(url)
+            val canShowImport = inBrowserImportPromo.canShowPromo(credentialsAvailableForCurrentPage = false, url = url)
+            if (canShowImport) {
+                handlePromoteImport(url)
+            } else {
+                callback?.noCredentialsAvailable(url)
+            }
         } else {
-            callback?.onCredentialsAvailableToInject(url, finalCredentialList, triggerType)
+            notifyListenerThatCredentialsAvailableToInject(url, finalCredentialList, triggerType, request)
+        }
+    }
+
+    private suspend fun notifyListenerThatCredentialsAvailableToInject(
+        url: String,
+        finalCredentialList: List<LoginCredentials>,
+        triggerType: LoginTriggerType,
+        request: AutofillDataRequest,
+    ) {
+        when (val currentCallback = callback) {
+            is InternalCallback -> {
+                currentCallback.onCredentialsAvailableToInjectWithReauth(url, finalCredentialList, triggerType, request.subType)
+            }
+            else -> {
+                currentCallback?.onCredentialsAvailableToInject(url, finalCredentialList, triggerType)
+            }
         }
     }
 
@@ -265,6 +295,7 @@ class AutofillStoredBackJavascriptInterface @Inject constructor(
         return when (trigger) {
             USER_INITIATED -> LoginTriggerType.USER_INITIATED
             AUTOPROMPT -> LoginTriggerType.AUTOPROMPT
+            CREDENTIALS_IMPORT -> LoginTriggerType.AUTOPROMPT
         }
     }
 

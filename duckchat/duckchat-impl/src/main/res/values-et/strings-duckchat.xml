@@ -39,9 +39,48 @@
     <!-- Settings -->
     <string name="duck_chat_settings_activity_description">Duck.ai on valikuline funktsioon, mis võimaldab anonüümselt vestelda populaarsete kolmanda poole AI vestlusmudelitega. Teie vestlusi ei kasutata tehisintellekti treenimiseks.\n<annotation type="learn_more_link">Lisateave</annotation></string>
     <string name="duck_chat_enable_duck_ai_setting">Luba Duck.ai</string>
-    <string name="duck_chat_show_in_heading">Otseteed</string>
     <string name="duck_chat_visibility_setting">Brauseri menüü</string>
     <string name="duck_chat_address_bar_visibility_setting">Aadressiriba</string>
     <string name="duck_chat_assist_settings_title">Assisti seaded</string>
     <string name="duck_chat_assist_settings_description">Vali, kui tihti soovid, et AI-toega vastused ilmuksid sinu otsingutesse</string>
+    <string name="duck_ai_shortcut_settings_title">Duck.ai otseteed</string>
+    <string name="duck_ai_shortcut_settings_description">Vali, milliseid Duck.ai otseteid kuvada</string>
+
+    <!-- Input Screen  -->
+    <string name="input_screen_search_tab">Otsing</string>
+    <string name="input_screen_search_hint">Otsi või sisesta aadress</string>
+    <string name="input_screen_chat_tab">Duck.ai</string>
+    <string name="input_screen_chat_hint">Küsi privaatselt</string>
+    <string name="input_screen_user_pref_without_ai">Ainult otsi</string>
+    <string name="input_screen_user_pref_with_ai">Otsi ja Duck.ai</string>
+    <string name="input_screen_user_pref_description">Proovi meie uut valikut küsida Duck.ai käest otse aadressiribalt. <annotation type="share_feedback">Jaga tagasisidet</annotation></string>
+
+    <!-- Duck.ai Pro settings -->
+    <string name="duck_ai_paid_settings_title">Duck.ai</string>
+    <string name="duck_ai_paid_settings_page_title">Duck.ai</string>
+    <string name="duck_ai_paid_settings_page_description"><![CDATA[Vestle privaatselt tellijatele mõeldud eksklusiivsete AI-mudelitega.\n<a href=\"\">Loe edasi</a>]]></string>
+    <string name="duck_ai_paid_settings_open_duck_ai">Ava Duck.ai</string>
+    <string name="duck_ai_paid_settings_learn_more_title">Loe edasi</string>
+
+    <!-- Rebranding-->
+    <string name="duck_chat_title_rebranding">AI funktsioonid</string>
+    <string name="duck_chat_settings_activity_description_rebranding">DuckDuckGo tehisintellekti funktsioonid on privaatsed ja valikulised.Sinu andmeid ei kasutata tehisintellekti treenimiseks.\n<annotation type="learn_more_link">Lisateave</annotation></string>
+    <string name="duck_chat_enable_duck_ai_setting_rebranding">Duck.ai</string>
+    <string name="duck_chat_enable_duck_ai_setting_description_rebranding">Vestle privaatselt populaarsete kolmanda osapoole tehisintellekti mudelitega</string>
+    <string name="duck_chat_assist_settings_title_rebranding">Otsingu Assist seaded</string>
+    <string name="duck_chat_assist_settings_description_rebranding">Vali, kui tihti soovid, et AI-toega vastused ilmuksid sinu otsingutesse</string>
+
+    <!-- AutoComplete -->
+    <string name="autocompleteDuckAiPrompt">Küsi Duck.ai käest</string>
+
+    <!-- New Address Bar Option Bottom Sheet Dialog -->
+    <string name="newAddressBarOptionBottomSheetDialogSearchText">Otsi või sisesta aadress</string>
+    <string name="newAddressBarOptionBottomSheetDialogTitle">Vaheta otsingu ja tehisintellekti vestluse vahel</string>
+    <string name="newAddressBarOptionBottomSheetDialogSubTitle">Tehisintellekti funktsioonid on alati valikulised.</string>
+    <string name="newAddressBarOptionBottomSheetDialogPrimaryButton">Kinnita</string>
+    <string name="newAddressBarOptionBottomSheetDialogGhostButton">Mitte praegu</string>
+    <string name="newAddressBarOptionBottomSheetDialogFooter">Kohanda menüüs Seaded &gt; Tehisintellekti funktsioonid.</string>
+    <string name="newAddressBarOptionBottomSheetDialogSearchOnly">Ainult otsi</string>
+    <string name="newAddressBarOptionBottomSheetDialogSearchAndDuckAi">Otsi ja Duck.ai</string>
+    <string name="newAddressBarOptionBottomSheetDialogHeader">Aadressiriba valik</string>
 </resources>

@@ -18,6 +18,7 @@ package com.duckduckgo.subscriptions.impl.settings.views
 
 import app.cash.turbine.test
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.pir.api.PirFeature
 import com.duckduckgo.subscriptions.api.Product
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.AUTO_RENEWABLE
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.EXPIRED
@@ -30,10 +31,11 @@ import com.duckduckgo.subscriptions.api.Subscriptions
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
 import com.duckduckgo.subscriptions.impl.settings.views.PirSettingViewModel.ViewState.PirState.Disabled
 import com.duckduckgo.subscriptions.impl.settings.views.PirSettingViewModel.ViewState.PirState.Enabled
+import com.duckduckgo.subscriptions.impl.settings.views.PirSettingViewModel.ViewState.PirState.Enabled.Type
 import com.duckduckgo.subscriptions.impl.settings.views.PirSettingViewModel.ViewState.PirState.Hidden
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
-import org.junit.Assert.*
+import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -48,6 +50,7 @@ class PirSettingViewModelTest {
 
     private val subscriptionPixelSender: SubscriptionPixelSender = mock()
     private val subscriptions: Subscriptions = mock()
+    private val pirFeature: PirFeature = mock()
     private lateinit var pirSettingsViewModel: PirSettingViewModel
 
     @Before
@@ -55,12 +58,13 @@ class PirSettingViewModelTest {
         pirSettingsViewModel = PirSettingViewModel(
             subscriptionPixelSender,
             subscriptions,
+            pirFeature,
         )
     }
 
     @Test
     fun `when onPir then report app settings pixel sent`() = runTest {
-        pirSettingsViewModel.onPir()
+        pirSettingsViewModel.onPir(Type.DESKTOP)
         verify(subscriptionPixelSender).reportAppSettingsPirClick()
     }
 
@@ -176,15 +180,32 @@ class PirSettingViewModelTest {
     }
 
     @Test
-    fun `when subscription state is auto renewable and entitled then PirState is enabled`() = runTest {
+    fun `when subscription state is auto renewable and entitled then PirState is enabled and beta FF is false`() = runTest {
         whenever(subscriptions.getEntitlementStatus()).thenReturn(flowOf(listOf(Product.PIR)))
         whenever(subscriptions.getSubscriptionStatus()).thenReturn(AUTO_RENEWABLE)
+        whenever(pirFeature.isPirBetaEnabled()).thenReturn(false)
 
         pirSettingsViewModel.onCreate(mock())
 
         pirSettingsViewModel.viewState.test {
             assertEquals(
-                Enabled,
+                Enabled(Type.DESKTOP),
+                expectMostRecentItem().pirState,
+            )
+        }
+    }
+
+    @Test
+    fun `when subscription state is auto renewable and entitled then PirState is enabled and beta FF is true`() = runTest {
+        whenever(subscriptions.getEntitlementStatus()).thenReturn(flowOf(listOf(Product.PIR)))
+        whenever(subscriptions.getSubscriptionStatus()).thenReturn(AUTO_RENEWABLE)
+        whenever(pirFeature.isPirBetaEnabled()).thenReturn(true)
+
+        pirSettingsViewModel.onCreate(mock())
+
+        pirSettingsViewModel.viewState.test {
+            assertEquals(
+                Enabled(Type.DASHBOARD),
                 expectMostRecentItem().pirState,
             )
         }
@@ -206,15 +227,32 @@ class PirSettingViewModelTest {
     }
 
     @Test
-    fun `when subscription state is not auto renewable and entitled then PirState is enabled`() = runTest {
+    fun `when subscription state is not auto renewable and entitled then PirState is enabled and beta FF is false`() = runTest {
         whenever(subscriptions.getEntitlementStatus()).thenReturn(flowOf(listOf(Product.PIR)))
         whenever(subscriptions.getSubscriptionStatus()).thenReturn(NOT_AUTO_RENEWABLE)
+        whenever(pirFeature.isPirBetaEnabled()).thenReturn(false)
 
         pirSettingsViewModel.onCreate(mock())
 
         pirSettingsViewModel.viewState.test {
             assertEquals(
-                Enabled,
+                Enabled(Type.DESKTOP),
+                expectMostRecentItem().pirState,
+            )
+        }
+    }
+
+    @Test
+    fun `when subscription state is not auto renewable and entitled then PirState is enabled and beta FF is true`() = runTest {
+        whenever(subscriptions.getEntitlementStatus()).thenReturn(flowOf(listOf(Product.PIR)))
+        whenever(subscriptions.getSubscriptionStatus()).thenReturn(NOT_AUTO_RENEWABLE)
+        whenever(pirFeature.isPirBetaEnabled()).thenReturn(true)
+
+        pirSettingsViewModel.onCreate(mock())
+
+        pirSettingsViewModel.viewState.test {
+            assertEquals(
+                Enabled(Type.DASHBOARD),
                 expectMostRecentItem().pirState,
             )
         }
@@ -236,15 +274,32 @@ class PirSettingViewModelTest {
     }
 
     @Test
-    fun `when subscription state is grace period and entitled then PirState is enabled`() = runTest {
+    fun `when subscription state is grace period and entitled then PirState is enabled and beta FF is false`() = runTest {
         whenever(subscriptions.getEntitlementStatus()).thenReturn(flowOf(listOf(Product.PIR)))
         whenever(subscriptions.getSubscriptionStatus()).thenReturn(GRACE_PERIOD)
+        whenever(pirFeature.isPirBetaEnabled()).thenReturn(false)
 
         pirSettingsViewModel.onCreate(mock())
 
         pirSettingsViewModel.viewState.test {
             assertEquals(
-                Enabled,
+                Enabled(Type.DESKTOP),
+                expectMostRecentItem().pirState,
+            )
+        }
+    }
+
+    @Test
+    fun `when subscription state is grace period and entitled then PirState is enabled and beta FF is true`() = runTest {
+        whenever(subscriptions.getEntitlementStatus()).thenReturn(flowOf(listOf(Product.PIR)))
+        whenever(subscriptions.getSubscriptionStatus()).thenReturn(GRACE_PERIOD)
+        whenever(pirFeature.isPirBetaEnabled()).thenReturn(true)
+
+        pirSettingsViewModel.onCreate(mock())
+
+        pirSettingsViewModel.viewState.test {
+            assertEquals(
+                Enabled(Type.DASHBOARD),
                 expectMostRecentItem().pirState,
             )
         }

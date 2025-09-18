@@ -70,10 +70,19 @@ class ContentScopeScriptsJsMessaging @Inject constructor(
             }
             jsMessage?.let {
                 if (this.secret == secret && context == jsMessage.context && (allowedDomains.isEmpty() || allowedDomains.contains(domain))) {
+                    if (jsMessage.method == "addDebugFlag") {
+                        // If method is addDebugFlag, we want to handle it for all features
+                        jsMessageCallback.process(
+                            featureName = jsMessage.featureName,
+                            method = jsMessage.method,
+                            id = jsMessage.id,
+                            data = jsMessage.params,
+                        )
+                    }
                     handlers.getPlugins().map { it.getJsMessageHandler() }.firstOrNull {
                         it.methods.contains(jsMessage.method) && it.featureName == jsMessage.featureName &&
                             (it.allowedDomains.isEmpty() || it.allowedDomains.contains(domain))
-                    }?.process(jsMessage, secret, jsMessageCallback)
+                    }?.process(jsMessage, this, jsMessageCallback)
                 }
             }
         } catch (e: Exception) {
@@ -95,7 +104,9 @@ class ContentScopeScriptsJsMessaging @Inject constructor(
             subscriptionEventData.subscriptionName,
             subscriptionEventData.params,
         )
-        jsMessageHelper.sendSubscriptionEvent(subscriptionEvent, callbackName, secret, webView)
+        if (::webView.isInitialized) {
+            jsMessageHelper.sendSubscriptionEvent(subscriptionEvent, callbackName, secret, webView)
+        }
     }
 
     override fun onResponse(response: JsCallbackData) {

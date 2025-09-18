@@ -240,7 +240,7 @@
 
     <string name="newTabPageShortcutPasswords">Κωδικοί πρόσβασης</string>
 
-    <string name="autofillImportGooglePasswordsWebFlowTitle">Εισαγωγή κωδικών πρόσβασης Google</string>
+    <string name="autofillImportGooglePasswordsWebFlowTitle">Εισαγωγή κωδικών πρόσβασης</string>
     <string name="autofillImportGooglePasswordsSuccessMessage" instruction="Placeholder is the number of passwords imported">%1$d κωδικοί πρόσβασης εισήχθησαν από το Google</string>
     <string name="autofillImportCsvPasswordsSuccessMessage" instruction="Placeholder is the number of passwords imported">%1$d κωδικοί πρόσβασης εισήχθησαν από CSV</string>
 
@@ -250,9 +250,9 @@
     <string name="autofillSyncDesktopPasswordEmptyStateButtonTitle">Συγχρονισμός κωδικών πρόσβασης υπολογιστών</string>
     <string name="autofillSyncDesktopPasswordsMenuTitle">Συγχρονισμός κωδικών πρόσβασης υπολογιστών</string>
 
-    <string name="importPasswordsChooseMethodDialogTitle">Εισαγωγή κωδικών πρόσβασης Google που διαθέτετε</string>
+    <string name="importPasswordsChooseMethodDialogTitle">Εισαγωγή κωδικών πρόσβασης από το Google</string>
     <string name="importPasswordsChooseMethodDialogSubtitle">Η Google μπορεί να σας ζητήσει να συνδεθείτε ή να εισαγάγετε τον κωδικό πρόσβασής σας για επιβεβαίωση.</string>
-    <string name="importPasswordsChooseMethodDialogGpmButton">Άνοιγμα κωδικών πρόσβασης Google</string>
+    <string name="importPasswordsChooseMethodDialogGpmButton">Εισαγωγή από το Google</string>
     <string name="importPasswordsChooseMethodDialogCsvButton">Επιλογή αρχείου CSV</string>
     <string name="importPasswordsChooseMethodDialogDesktopSyncButton">Εισαγωγή από πρόγραμμα περιήγησης για υπολογιστές</string>
 
@@ -280,5 +280,13 @@
     <string name="autofillSettingsImportFromGoogleLabel">Εισαγωγή κωδικών πρόσβασης από το Google</string>
     <string name="autofillSettingsImportFromDesktopSync">Συγχρονισμός κωδικών πρόσβασης υπολογιστών</string>
     <string name="autofillSettingsResetExcludedSitesTitle">Επαναφορά αποκλεισμένων ιστότοπων</string>
+
+    <string name="passwords_import_promo_title" instruction="The &apos;br&apos; is a forced line break for English. It does not need to be included in translations.">Μεταφέρετε τους κωδικούς σας από&lt;br /&gt;το Google στο DuckDuckGo</string>
+    <string name="passwords_import_promo_subtitle">Εισαγάγετε γρήγορα και με ασφάλεια τους κωδικούς πρόσβασής σας στο DuckDuckGo. Η Google ίσως σας ζητήσει να εισαγάγετε τον κωδικό πρόσβασής σας.</string>
+    <string name="passwords_import_promo_action">Εισαγωγή από το Google</string>
+    <string name="passwords_import_promo_in_browser_title">Μεταφέρετε τους κωδικούς σας από&lt;br /&gt;το Google στο DuckDuckGo</string>
+    <string name="passwords_import_promo_in_browser_secondary_action_button">Να μην ερωτηθώ ξανά</string>
+    <string name="passwords_import_promo_in_settings_title">Εισαγωγή κωδικών πρόσβασης από το Google</string>
+    <string name="passwords_import_promo_in_settings_dismiss_text">Αποκρυψη</string>
 
 </resources>

@@ -17,11 +17,15 @@
 package com.duckduckgo.common.ui.view
 
 import android.content.Context
+import android.os.Build
 import android.util.AttributeSet
 import android.widget.FrameLayout
 import androidx.annotation.DrawableRes
+import androidx.annotation.RawRes
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.text.HtmlCompat
+import androidx.core.view.isVisible
+import com.airbnb.lottie.LottieAnimationView
 import com.duckduckgo.common.ui.view.MessageCta.MessageType.REMOTE_MESSAGE
 import com.duckduckgo.common.ui.view.MessageCta.MessageType.REMOTE_PROMO_MESSAGE
 import com.duckduckgo.common.ui.viewbinding.viewBinding
@@ -58,6 +62,11 @@ class MessageCta : FrameLayout {
     ) : super(context, attrs, defStyle) {
 
         layoutParams = LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT)
+
+        if (Build.VERSION.SDK_INT >= 28) {
+            binding.remoteMessage.remoteMessage.addBottomShadow()
+            binding.promoRemoteMessage.promoMessage.addBottomShadow()
+        }
     }
 
     fun setMessage(message: Message) {
@@ -71,13 +80,10 @@ class MessageCta : FrameLayout {
         binding.remoteMessage.root.show()
         binding.promoRemoteMessage.root.gone()
 
-        if (message.topIllustration == null) {
-            remoteMessageBinding.topIllustration.gone()
-        } else {
-            val drawable = AppCompatResources.getDrawable(context, message.topIllustration)
-            remoteMessageBinding.topIllustration.setImageDrawable(drawable)
-            remoteMessageBinding.topIllustration.show()
-        }
+        configureTopIllustration(
+            drawableRes = message.topIllustration,
+            animationRes = message.topAnimation,
+        )
 
         remoteMessageBinding.messageTitle.text = HtmlCompat.fromHtml(message.title, HtmlCompat.FROM_HTML_MODE_LEGACY)
         remoteMessageBinding.messageSubtitle.text = HtmlCompat.fromHtml(message.subtitle, HtmlCompat.FROM_HTML_MODE_LEGACY)
@@ -93,6 +99,9 @@ class MessageCta : FrameLayout {
             remoteMessageBinding.primaryActionButton.gone()
         } else {
             remoteMessageBinding.primaryActionButton.text = message.action
+            message.actionIcon?.let { icon ->
+                remoteMessageBinding.primaryActionButton.icon = AppCompatResources.getDrawable(context, icon)
+            }
             remoteMessageBinding.primaryActionButton.show()
         }
 
@@ -106,6 +115,23 @@ class MessageCta : FrameLayout {
 
         remoteMessageBinding.secondaryActionButton.setOnClickListener {
             onSecondaryButtonClicked.invoke()
+        }
+    }
+
+    private fun configureTopIllustration(@DrawableRes drawableRes: Int?, @RawRes animationRes: Int?) {
+        with(remoteMessageBinding) {
+            if (animationRes != null) {
+                topIllustration.gone()
+                topIllustrationAnimated.setAnimation(animationRes)
+                topIllustrationAnimated.show()
+            } else if (drawableRes != null) {
+                topIllustrationAnimated.gone()
+                topIllustration.setImageDrawable(AppCompatResources.getDrawable(context, drawableRes))
+                topIllustration.show()
+            } else {
+                topIllustration.gone()
+                topIllustrationAnimated.gone()
+            }
         }
     }
 
@@ -150,12 +176,21 @@ class MessageCta : FrameLayout {
         this.onCloseButton = onDismiss
     }
 
+    fun onTopAnimationConfigured(configure: (LottieAnimationView) -> Unit) {
+        val view = binding.remoteMessage.topIllustrationAnimated
+        if (view.isVisible) {
+            configure(view)
+        }
+    }
+
     data class Message(
         @DrawableRes val topIllustration: Int? = null,
         @DrawableRes val middleIllustration: Int? = null,
+        @RawRes val topAnimation: Int? = null,
         val title: String = "",
         val subtitle: String = "",
         val action: String = "",
+        val actionIcon: Int? = null,
         val action2: String = "",
         val promoAction: String = "",
         val messageType: MessageType = REMOTE_MESSAGE,

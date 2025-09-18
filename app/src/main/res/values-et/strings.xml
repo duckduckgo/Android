@@ -126,6 +126,7 @@
     <!-- Fire -->
     <string name="fireMenu">Kustuta andmed</string>
     <string name="fireClearAll">Kustuta kõik vahekaardid ja andmed</string>
+    <string name="fireClearAllPlusDuckChats">Kustuta kõik vahekaardid, andmed ja Duck.ai vestlused</string>
     <string name="fireCancel">Tühista</string>
     <string name="fireDataCleared">Andmed on kustutatud</string>
 
@@ -189,6 +190,28 @@
     <string name="webTrackingProtectionLearnMoreTitle">Veebijälgimise kaitse</string>
     <string name="webTrackingProtectionTitle">Veebijälgimise kaitse</string>
     <string name="webTrackingProtectionDescriptionNew"><![CDATA[DuckDuckGo blokeerib automaatselt peidetud jälgijaid, kui sa veebis sirvid.\n<a href=\"\">Loe edasi</a>]]></string>
+    <string name="webTrackingProtectionExplanationDescription"><![CDATA[DuckDuckGo brauser pakub jälgimiskaitseid, mis on alati aktiivsed.\n<a href=\"\">Loe edasi</a>]]></string>
+    <string name="webTrackingProtectionExplanationTitle">Kuidas me sind kaitseme</string>
+    <string name="webTrackingProtectionThirdPartyTrackersTitle">Blokeerib kolmanda poole jälgurid</string>
+    <string name="webTrackingProtectionThirdPartyTrackersDescription">Aitab blokeerida kolmanda poole küpsiseid, mis jälgivad sind lehelt lehele, takistades kolmanda poole jälgijate laadimist.</string>
+    <string name="webTrackingProtectionTargetedAdsTitle">Blokeerib suunatud reklaamid</string>
+    <string name="webTrackingProtectionTargetedAdsDescription">Blokeerib invasiivsed jälgijad enne nende laadimist, kõrvaldades tõhusalt reklaamid, mis tuginevad jälgimisele.</string>
+    <string name="webTrackingProtectionFingerprintTrackingTitle">Takistab sõrmejälje jälgimist</string>
+    <string name="webTrackingProtectionFingerprintTrackingDescription">Aitab takistada jälgimisfirmadel hankida sinu brauseri ja seadme kohta kordumatuid tunnuseid, mida nad kasutavad sinu jälgimiseks veebis.</string>
+    <string name="webTrackingProtectionLinkTrackingTitle">Blokeerib linkide jälgimise</string>
+    <string name="webTrackingProtectionLinkTrackingDescription">Eemaldab linkide jälgimisparameetrid, et vältida kolmandate osapoolte jälgimist sinu käitumise jälgimisel saitidel.</string>
+    <string name="webTrackingProtectionReferrerTrackingTitle">Kaitseb suunaja jälgimise eest</string>
+    <string name="webTrackingProtectionReferrerTrackingDescription">Aitab blokeerida ettevõtetel tuvastada viimast külastatud veebisaiti.</string>
+    <string name="webTrackingProtectionFirstPartyCookiesTitle">Muudab esimese poole küpsised aegunuks</string>
+    <string name="webTrackingProtectionFirstPartyCookiesDescription">Muudab 30 päeva pärast automaatselt esimese poole küpsised kehtetuks, tagades, et veebilehed ei saa sind piiramatult jälgida, kui oled välja loginud.</string>
+    <string name="webTrackingProtectionDnsCnameCloakingTitle">Kaitseb DNS CNAME varjamise eest</string>
+    <string name="webTrackingProtectionDnsCnameCloakingDescription">Aitab blokeerida kolmanda poole jälgureid, mis üritavad end DNS-i abil veebisaidil maskeerida.</string>
+    <string name="webTrackingProtectionGoogleAmpTrackingTitle">Blokeerib Google\'i AMP jälgimise</string>
+    <string name="webTrackingProtectionGoogleAmpTrackingDescription">Asendab Google AMPi lingid algse avaldaja saidiga.</string>
+    <string name="webTrackingProtectionGoogleSigninPopupsTitle">Blokeerib Google\'i sisselogimise hüpikaknad</string>
+    <string name="webTrackingProtectionGoogleSigninPopupsDescription">Blokeerib Google\'i sisselogimise hüpikaknad saitidel, mida Google ei oma.</string>
+    <string name="webTrackingProtectionGlobalPrivacyControlTitle">Üleilmne privaatsuskontroll (Global Privacy Control)</string>
+    <string name="webTrackingProtectionGlobalPrivacyControlDescription">Väljendab sinu nimel loobumisõigusi, käskides saitidel mitte müüa ega jagada sinu isiklikke andmeid.</string>
 
     <!-- Cookie Pop-Up Protection -->
     <string name="cookiePopupProtectionTitle">Küpsiste hüpikakna kaitse</string>
@@ -202,6 +225,7 @@
 
     <!-- Appearance -->
     <string name="appearanceActivityTitle">Välimus</string>
+    <string name="settingsShowFullUrlTitle">Näita kogu saidi aadressi</string>
 
     <!-- Settings - Automatically clearing data -->
     <string name="settingsAutomaticallyClearingDialogSave">Salvesta</string>
@@ -211,6 +235,7 @@
     <string name="settingsAutomaticallyClearWhatOptionNone">Puudub</string>
     <string name="settingsAutomaticallyClearWhatOptionTabs">Vahelehed</string>
     <string name="settingsAutomaticallyClearWhatOptionTabsAndData">Vahelehed ja andmed</string>
+    <string name="settingsAutomaticallyClearWhatOptionTabsAndDataAndChats">Vahekaardid, andmed ja Duck.ai vestlused</string>
 
     <string name="settingsAutomaticallyClearWhen">Kustuta…</string>
     <string name="settingsAutomaticallyClearWhenDialogTitle">Kustuta…</string>
@@ -220,6 +245,8 @@
     <string name="settingsAutomaticallyClearWhenAppExit15Minutes">Rakendusest väljumisel, 15-minutilise passiivsuse järel</string>
     <string name="settingsAutomaticallyClearWhenAppExit30Minutes">Rakendusest väljumisel, 30-minutilise passiivsuse järel</string>
     <string name="settingsAutomaticallyClearWhenAppExit60Minutes">Rakendusest väljumisel, 1-tunnise passiivsuse järel</string>
+    <string name="settingsClearAiDataTitle">Tühjenda Duck.ai vestlused</string>
+    <string name="settingsClearAiDataMessage">Fire Button kustutab ka Duck.ai ajaloo</string>
 
     <!-- About Activity -->
     <string name="aboutActivityTitle">DuckDuckGo\'st</string>
@@ -248,8 +275,8 @@
     <string name="searchWidgetEmtpyFavoritesHint">Lemmikuid pole veel lisatud</string>
     <string name="searchWidgetEmtpyFavoritesCta">Lisa lemmik</string>
     <string name="widgetConfigurationActivityTitle">Vidina konfiguratsioon</string>
-    <string name="favoritesWidgetLabel">Lemmikud</string>
-    <string name="searchWidgetLabel">Otsing</string>
+    <string name="favoritesWidgetLabel">Otsing ja lemmikud</string>
+    <string name="searchWidgetLabel">Otsing ja Duck.ai</string>
 
     <!-- Home Screen Shortcuts -->
     <string name="addToHome">Lisa kodukuvale</string>
@@ -404,7 +431,6 @@
     <string name="crashedWebViewErrorAction">"Laadige uuesti"</string>
 
     <!-- System Search-->
-    <string name="systemSearchDeviceAppLabel">Sellest seadmest</string>
     <string name="systemSearchAppNotFound">Rakendust ei leitud</string>
     <string name="systemSearchOnboardingThanks">Aitäh, et valisite DuckDuckGo!\nMeie brauseri kasutamine aitab teid kaitsta häkkerite, petturite ja andmenäljaste ettevõtete eest.</string>
     <string name="systemSearchOnboardingFeaturesIntroText">Peale selle DuckDuckGo rakendus:</string>
@@ -757,7 +783,7 @@
     <string name="preOnboardingComparisonChartItem1">Otsi vaikimisi privaatselt</string>
     <string name="preOnboardingComparisonChartItem2">Blokeeri kolmanda poole jälgurid</string>
     <string name="preOnboardingComparisonChartItem3">Blokeeri küpsiste hüpikaknad</string>
-    <string name="preOnboardingComparisonChartItem4">Blokeeri jälgivad reklaamid</string>
+    <string name="preOnboardingComparisonChartItem4">Blokeeri suunatud reklaamid</string>
     <string name="preOnboardingComparisonChartItem5">Kustuta sirvimisandmed ühe nupuga</string>
     <string name="preOnboardingDaxDialog3Title">Suurepärane! Tere tulemast pardi poolele.</string>
     <string name="preOnboardingDaxDialog3Button">Alusta sirvimist</string>
@@ -796,8 +822,9 @@
     <string name="onboardingEndDaxDialogDescription">Pea meeles: iga kord kui minuga sirvid, kaotab jube reklaam oma tiivad. 👌</string>
     <string name="onboardingEndDaxDialogButton">Kõik valmis!</string>
     <string name="onboardingPrivacyProDaxDialogTitle">Ja enne kui ma unustan...</string>
-    <string name="onboardingPrivacyProDaxDialogDescription"><![CDATA[DuckDuckGo-l on ka sisseehitatud <b>VPN</b>!<br/><br/>Aktiveeri see <b>tasulise Privacy Pro püsitellimusega.</b>]]></string>
+    <string name="onboardingPrivacyProDaxDialogDescription"><![CDATA[DuckDuckGo-l on ka turvaline <b>VPN + veel kaks esmaklassilist kaitset</b>, mis on saadaval <b>valikulise tasulise tellimusega</b>.]]></string>
     <string name="onboardingPrivacyProDaxDialogOkButton">Loe edasi</string>
+    <string name="onboardingPrivacyProDaxDialogFreeTrialOkButton">Proovi tasuta!</string>
     <string name="onboardingPrivacyProDaxDialogCancelButton">Jäta vahele</string>
 
     <!-- Highlight Onboarding Experiment-->
@@ -842,19 +869,15 @@
     <!-- Privacy Dashboard -->
     <string name="brokenSiteSubmittedReportMessage">Aitäh! Sinu aruanne aitab muuta DuckDuckGo kõigi jaoks paremaks!</string>
 
-    <!-- DuckChat -->
-    <string name="duckChatTitle">Duck.ai</string>
-    <string name="duckChatMenuItem">Uus AI vestlus</string>
-
     <!--    Default Browser Bottom Sheet Dialog -->
     <string name="defaultBrowserBottomSheetDialogTitle">Laske DuckDuckGo\'l kaitsta rohkem seda, mida te veebis teete</string>
-    <string name="defaultBrowserBottomSheetDialogSubTitle">Muutke meid oma vaikebrauseriks, et kõik saidilingid avaneksid DuckDuckGos.</string>
-    <string name="defaultBrowserBottomSheetDialogGhostButton">Mitte praegu</string>
+    <string name="defaultBrowserBottomSheetDialogSubTitle">Vaheta oma vaikebrauserit, et lingid avaneksid DuckDuckGos.</string>
+    <string name="defaultBrowserBottomSheetDialogGhostButton" instruction="This text appears on a button">Mitte praegu</string>
 
-    <!--TabSwitcher Animation Tile Dialog-->
-    <string name="tabSwitcherAnimationTileRemovalDialogTitle">DuckDuckGo blokeerib jälgurid, et kaitsta sinu sirvimist</string>
-    <string name="tabSwitcherAnimationTileRemovalDialogBody">Vahekaartide ja andmete kustutamine kustutab sinu jälguri blokeerimise ajaloo ja lähtestab selle numbri nulli.\n\nPeida see ribareklaam, kui sa ei soovi seda vahekaartide vaates näha.</string>
-    <string name="tabSwitcherAnimationTileRemovalDialogNegativeButton">Peida ribareklaam</string>
+    <!-- Default Browser message -->
+    <string name="newTabPageDefaultBrowserMessageHeading">DuckDuckGo ei ole sinu vaikebrauser. Saa rohkem kaitset.</string>
+    <string name="newTabPageDefaultBrowserMessagePrimaryCta" instruction="This text appears on a button">Määra vaikebrauseriks</string>
+    <string name="newTabPageDefaultBrowserMessageSecondaryCta" instruction="This text appears on a button">Ära enam küsi</string>
 
     <!-- Threat protection -->
     <string name="maliciousSiteTitle">Hoiatus: see sait võib olla turvaoht</string>
@@ -878,4 +901,59 @@
     <string name="scamBlockerTitle">Pettuste blokeerija</string>
     <string name="scamBlockerDescription">Hoiata mind pettuste, andmepüügi ja pahavara tõttu märgistatud saitidel.</string>
     <string name="threatProtectionLearnMoreTitle">Loe edasi</string>
+
+    <!-- Experiment: Improve prompts for "homescreen widget" -->
+    <string name="experimentHomeScreenWidgetBottomSheetDialogTitle">Proovige meie avakuva vidinat!</string>
+    <string name="experimentHomeScreenWidgetBottomSheetDialogSubTitle">Kiire ja hõlpsa juurdepääsu tagamiseks lisage meie meie otsinguvidin avakuvale.</string>
+    <string name="experimentHomeScreenWidgetBottomSheetDialogPrimaryButton">Lisage vidin</string>
+    <string name="experimentHomeScreenWidgetBottomSheetDialogGhostButton">Mitte praegu</string>
+    <string name="experimentHomeScreenWidgetBottomSheetDialogSearchText">DuckDuckGo otsing</string>
+
+    <!-- Change under remote feature flag: Widget as a Protection -->
+    <string name="settingsAddHomeWidgetTitle">Avakuva vidin</string>
+
+    <!-- Section in main app settings -->
+    <string name="settingsHeadingCompleteSetup">Vii seadistamine lõpule</string>
+
+    <!-- Buck Onboarding Experiment -->
+    <string name="highlightsPreOnboardingDaxDialog1TitleBuck">Tere!</string>
+    <string name="highlightsPreOnboardingDaxDialog1DescriptionBuck">Kas oled valmis kasutama kiiremat brauserit, mis hoiab sind kaitstud?</string>
+    <string name="highlightsPreOnboardingDaxDialog2TitleBuck"><![CDATA[<b>Kaitsed</b> <i>aktiveeritud!</i>]]></string>
+
+    <!-- BB Onboarding Experiment -->
+    <string name="highlightsPreOnboardingDaxDialog1TitleBb"><![CDATA[Tere!<br/>Kas oled valmis kasutama kiiremat brauserit, mis hoiab sind kaitstud?]]></string>
+
+    <string name="bbOnboardingFireButtonDaxDialogTitle"><![CDATA[Tühjenda oma sirvimistegevus hetkega nupuga <font color=\"#F05C2B\">Fire Button</font>]]></string>
+    <string name="bbOnboardingFireButtonDaxDialogDescription">Proovi ära!️</string>
+
+    <plurals name="bbOnboardingTrackersBlockedDialogTitle">
+        <item quantity="one"><![CDATA[ ja %1$d teine üritasid sind siin jälgida. <font color=\"#F05C2B\">Ma blokeerisin need!</font>]]></item>
+        <item quantity="other"><![CDATA[ ja %1$d teist üritasid sind siin jälgida. <font color=\"#F05C2B\">Ma blokeerisin need!</font>]]></item>
+    </plurals>
+    <plurals name="bbOnboardingTrackersBlockedZeroDialogTitle" tools:ignore="ImpliedQuantity">
+        <item quantity="one"><![CDATA[ üritas sind siin jälitada. <font color=\"#F05C2B\">Ma blokeerisin need!</font>]]></item>
+        <item quantity="other"><![CDATA[ üritasid sind siin jälitada. <font color=\"#F05C2B\">Ma blokeerisin need!</font>]]></item>
+    </plurals>
+
+    <string name="bbOnboardingTrackersBlockedDialogDescription">☝️ Lisateabe saamiseks vajuta kilbile.️</string>
+
+    <!-- Privacy Pro Rebranding-->
+    <string name="aboutDescriptionBrandUpdate2025Rebranding">Welcome to the Duck Side!\n\nDuckDuckGo on sõltumatu veebikaitseettevõte kõikidele, kes tahavad oma isikliku teabe üle kontrolli tagasi saada.\n\nUsume, et parim viis sinu isikuandmete kaitsmiseks häkkerite, petturite ja eraelu puutumatust rikkuvate ettevõtete eest on nende kogumise täielik vältimine. Seetõttu valivad miljonid inimesed <annotation type="chart_comparison">DuckDuckGo Chrome\'i ja teiste brauserite asemel</annotation>, et otsida ja sirvida internetis. Meie sisseehitatud otsingumootor on nagu Google, kuid ei jälgi kunagi teie otsinguid. Ja meie sirvimiskaitsed, nagu reklaamijälgijate ja küpsiste blokeerimine, aitavad takistada teistel ettevõtetel sinu andmeid kogumast. Ja muideks, meie brauser on tasuta — teenime raha <annotation type="privacy_respecting_ads">privaatsust austavate otsingureklaamidega</annotation>, mitte sinu andmeid ära kasutades.\n\nLisaks pakume ka <annotation type="ppro_help_page">DuckDuckGo tellimust</annotation>, mis on integreeritud meie brauserisse. Tellijad saavad veelgi tõhusama privaatsuse kaitse kiire ja lihtsa <annotation type="vpn_help_page">VPN-iga</annotation>, mis aitab kaitsta sinu veebitegevust, juurdepääsu täiustatud tehisintellekti mudelitele meie privaatses tehisintellekti vestlusteenuses Duck.ai, teenuse, mis otsib ja eemaldab sinu isikuandmeid inimesteotsingu saitidelt, ning teenuse, mis taastab sinu identiteedi, kui see varastatakse.\n\nVõta tagasi kontroll oma isikuandmete üle brauseriga, mis on loodud andmete kaitsmiseks ja mitte nende kogumiseks.</string>
+    <string name="onboardingPrivacyProDaxDialogDescriptionRebranding"><![CDATA[DuckDuckGo-l on ka <b>valikuline tasuline tellimus</b>, mis sisaldab turvalist <b>VPN-i</b> ja <b>täiustatud privaatset tehisintellekti</b>.]]></string>
+    <string name="settingsDuckAiRebranding">AI funktsioonid</string>
+    <string name="settingsDuckAi">Duck.ai</string>
+
+    <!--TabSwitcher Trackers Animation-->
+    <string name="showTrackerCountInTabSwitcher">Kuva jälgurite arv vahekaardi vahetajas</string>
+    <string name="tabSwitcherAnimationTileRemovalDialogTitle" instruction="A title for a dialog that shows when a user clicks a tile that shows them their current blocked tracker count">Kas peita jälgurite arv?</string>
+    <string name="tabSwitcherAnimationTileRemovalDialogBody" instruction="A message for a dialog that shows when a user clicks a tile that shows them their current blocked tracker count">Saad selle uuesti sisse lülitada suvandis Seaded &gt; Välimus.</string>
+    <string name="tabSwitcherAnimationTileRemovalDialogPositiveButton">Peida</string>
+    <string name="tabSwitcherAnimationTileRemovalDialogNegativeButton">Jäta alles</string>
+
+    <!-- Widgets -->
+    <string name="searchOnlyWidgetLabel" instruction="Label for the search-only widget">Ainult otsi</string>
+    <string name="searchOnlyWidgetDescription" instruction="Description for the search-only widget">Käivita kiiresti privaatne otsing DuckDuckGo\'ga.</string>
+    <string name="searchWidgetDescription" instruction="Description for the search widget, which may include Duck.ai and voice search">Otsi privaatselt DuckDuckGo\'ga või küsi Duck.ai käest. Häälotsing ja Duck.ai on saadaval, kui need on lubatud.</string>
+    <string name="searchAndFavoritesWidgetDescription" instruction="Description for the search and favorites widget">Otsi või külasta oma lemmiksaite privaatselt ühe puudutusega. Häälotsing ja Duck.ai on saadaval, kui need on lubatud.</string>
+    <string name="duckAiOnlyPinShortcutLabel" instruction="Label for the Duck.ai pinned shortcut. Should be Duck.ai in all languages">Duck.ai</string>
 </resources>

@@ -46,6 +46,7 @@ dependencies {
     implementation project(':data-store-api')
     testImplementation project(':feature-toggles-test')
     implementation project(path: ':settings-api') // temporary until we release new settings
+    implementation project(':library-loader-api')
 
     anvil project(path: ':anvil-compiler')
     implementation project(path: ':anvil-annotations')
@@ -67,6 +68,8 @@ dependencies {
 
     implementation "de.siegmar:fastcsv:_"
 
+    implementation "com.airbnb.android:lottie:_"
+
     implementation Square.retrofit2.converter.moshi
     implementation "com.squareup.moshi:moshi-kotlin:_"
     implementation "com.squareup.moshi:moshi-adapters:_"
@@ -78,7 +81,7 @@ dependencies {
     ksp AndroidX.room.compiler
     implementation AndroidX.room.ktx
 
-    implementation "net.zetetic:android-database-sqlcipher:_"
+    implementation "net.zetetic:sqlcipher-android:_"
     implementation "com.facebook.shimmer:shimmer:_"
 
     // Testing dependencies
@@ -119,6 +122,9 @@ android {
     namespace 'com.duckduckgo.autofill.impl'
     compileOptions {
         coreLibraryDesugaringEnabled = true
+    }
+    buildFeatures {
+        buildConfig = true
     }
     defaultConfig {
         if (project.hasProperty("$autofillDisableAuthRequirementBuildFlag")) {

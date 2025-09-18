@@ -246,7 +246,7 @@
 
     <string name="newTabPageShortcutPasswords">Paroles</string>
 
-    <string name="autofillImportGooglePasswordsWebFlowTitle">Importēt Google paroles</string>
+    <string name="autofillImportGooglePasswordsWebFlowTitle">Importēt paroles</string>
     <string name="autofillImportGooglePasswordsSuccessMessage" instruction="Placeholder is the number of passwords imported">%1$d paroles importētas no Google</string>
     <string name="autofillImportCsvPasswordsSuccessMessage" instruction="Placeholder is the number of passwords imported">%1$d paroles importētas no CSV</string>
 
@@ -256,9 +256,9 @@
     <string name="autofillSyncDesktopPasswordEmptyStateButtonTitle">Sinhronizēt darbvirsmas paroles</string>
     <string name="autofillSyncDesktopPasswordsMenuTitle">Sinhronizēt darbvirsmas paroles</string>
 
-    <string name="importPasswordsChooseMethodDialogTitle">Importē savas Google paroles</string>
+    <string name="importPasswordsChooseMethodDialogTitle">Importēt paroles no Google</string>
     <string name="importPasswordsChooseMethodDialogSubtitle">Google var lūgt tevi pierakstīties vai ievadīt paroli, lai apstiprinātu.</string>
-    <string name="importPasswordsChooseMethodDialogGpmButton">Atvērt Google paroles</string>
+    <string name="importPasswordsChooseMethodDialogGpmButton">Importēt no Google</string>
     <string name="importPasswordsChooseMethodDialogCsvButton">Izvēlies CSV failu</string>
     <string name="importPasswordsChooseMethodDialogDesktopSyncButton">Importēt no galddatora pārlūka</string>
 
@@ -286,5 +286,13 @@
     <string name="autofillSettingsImportFromGoogleLabel">Importēt paroles no Google</string>
     <string name="autofillSettingsImportFromDesktopSync">Sinhronizēt darbvirsmas paroles</string>
     <string name="autofillSettingsResetExcludedSitesTitle">Atiestatīt izslēgtās vietnes</string>
+
+    <string name="passwords_import_promo_title" instruction="The &apos;br&apos; is a forced line break for English. It does not need to be included in translations.">Pārnes savas paroles no&lt;br /&gt;Google uz DuckDuckGo</string>
+    <string name="passwords_import_promo_subtitle">Ātri un droši importē savas paroles DuckDuckGo. Google var lūgt tevi ievadīt savu paroli.</string>
+    <string name="passwords_import_promo_action">Importēt no Google</string>
+    <string name="passwords_import_promo_in_browser_title">Pārvieto savas paroles no&lt;br /&gt;Google uz DuckDuckGo</string>
+    <string name="passwords_import_promo_in_browser_secondary_action_button">Vairs nejautāt</string>
+    <string name="passwords_import_promo_in_settings_title">Importēt paroles no Google</string>
+    <string name="passwords_import_promo_in_settings_dismiss_text">Paslēpt</string>
 
 </resources>

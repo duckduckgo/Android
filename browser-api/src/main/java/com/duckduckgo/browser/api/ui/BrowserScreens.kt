@@ -35,20 +35,25 @@ sealed class BrowserScreens {
     /**
      * Use this model to launch the Feedback screen
      */
-    object FeedbackActivityWithEmptyParams : GlobalActivityStarter.ActivityParams
+    data object FeedbackActivityWithEmptyParams : GlobalActivityStarter.ActivityParams
 
     /**
      * Use this model to launch the Bookmarks screen
      */
-    object BookmarksScreenNoParams : GlobalActivityStarter.ActivityParams
+    data object BookmarksScreenNoParams : GlobalActivityStarter.ActivityParams
 
     /**
      * Use this model to launch the Settings screen
      */
-    object SettingsScreenNoParams : GlobalActivityStarter.ActivityParams
+    data object SettingsScreenNoParams : GlobalActivityStarter.ActivityParams
 
     /**
      * Use this model to launch the New Tab Settings screen
      */
-    object NewTabSettingsScreenNoParams : GlobalActivityStarter.ActivityParams
+    data object NewTabSettingsScreenNoParams : GlobalActivityStarter.ActivityParams
+
+    /**
+     * Use this model to launch the PrivateSearch screen
+     */
+    data object PrivateSearchScreenNoParams : GlobalActivityStarter.ActivityParams
 }

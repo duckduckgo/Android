@@ -26,8 +26,8 @@ import androidx.sqlite.db.SupportSQLiteDatabase
 import com.duckduckgo.app.bookmarks.db.*
 import com.duckduckgo.app.browser.cookies.db.AuthCookieAllowedDomainEntity
 import com.duckduckgo.app.browser.cookies.db.AuthCookiesAllowedDomainsDao
-import com.duckduckgo.app.browser.defaultbrowsing.prompts.store.ExperimentAppUsageDao
-import com.duckduckgo.app.browser.defaultbrowsing.prompts.store.ExperimentAppUsageEntity
+import com.duckduckgo.app.browser.defaultbrowsing.prompts.store.DefaultBrowserPromptsAppUsageDao
+import com.duckduckgo.app.browser.defaultbrowsing.prompts.store.DefaultBrowserPromptsAppUsageEntity
 import com.duckduckgo.app.browser.pageloadpixel.PageLoadedPixelDao
 import com.duckduckgo.app.browser.pageloadpixel.PageLoadedPixelEntity
 import com.duckduckgo.app.browser.pageloadpixel.firstpaint.PagePaintedPixelDao
@@ -73,7 +73,7 @@ import com.duckduckgo.savedsites.store.SavedSitesRelationsDao
 
 @Database(
     exportSchema = true,
-    version = 58,
+    version = 59,
     entities = [
         TdsTracker::class,
         TdsEntity::class,
@@ -106,7 +106,7 @@ import com.duckduckgo.savedsites.store.SavedSitesRelationsDao
         AuthCookieAllowedDomainEntity::class,
         Entity::class,
         Relation::class,
-        ExperimentAppUsageEntity::class,
+        DefaultBrowserPromptsAppUsageEntity::class,
     ],
 )
 
@@ -160,7 +160,7 @@ abstract class AppDatabase : RoomDatabase() {
 
     abstract fun syncRelationsDao(): SavedSitesRelationsDao
 
-    abstract fun experimentAppUsageDao(): ExperimentAppUsageDao
+    abstract fun defaultBrowserPromptsAppUsageDao(): DefaultBrowserPromptsAppUsageDao
 }
 
 @Suppress("PropertyName")
@@ -694,6 +694,13 @@ class MigrationsProvider(val context: Context, val settingsDataStore: SettingsDa
         }
     }
 
+    private val MIGRATION_58_TO_59: Migration = object : Migration(58, 59) {
+        override fun migrate(database: SupportSQLiteDatabase) {
+            database.execSQL("CREATE TABLE IF NOT EXISTS `default_browser_prompts_app_usage` (`isoDateET` TEXT NOT NULL, PRIMARY KEY(`isoDateET`))")
+            database.execSQL("DROP TABLE IF EXISTS `experiment_app_usage_entity`")
+        }
+    }
+
     /**
      * WARNING ⚠️
      * This needs to happen because Room doesn't support UNIQUE (...) ON CONFLICT REPLACE when creating the bookmarks table.
@@ -777,6 +784,7 @@ class MigrationsProvider(val context: Context, val settingsDataStore: SettingsDa
             MIGRATION_55_TO_56,
             MIGRATION_56_TO_57,
             MIGRATION_57_TO_58,
+            MIGRATION_58_TO_59,
         )
 
     @Deprecated(

@@ -17,7 +17,10 @@
 package com.duckduckgo.app.firebutton
 
 import android.app.ActivityOptions
+import android.content.Context
+import android.content.Intent
 import android.os.Bundle
+import android.view.View
 import androidx.annotation.StringRes
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
@@ -70,6 +73,10 @@ class FireButtonActivity : DuckDuckGoActivity() {
 
         configureUiEventHandlers()
         observeViewModel()
+
+        intent?.getStringExtra(LAUNCH_FROM_NOTIFICATION_PIXEL_NAME)?.let {
+            viewModel.onLaunchedFromNotification(it)
+        }
     }
 
     private fun configureUiEventHandlers() {
@@ -78,6 +85,7 @@ class FireButtonActivity : DuckDuckGoActivity() {
             automaticallyClearWhatSetting.setClickListener { viewModel.onAutomaticallyClearWhatClicked() }
             automaticallyClearWhenSetting.setClickListener { viewModel.onAutomaticallyClearWhenClicked() }
             selectedFireAnimationSetting.setClickListener { viewModel.userRequestedToChangeFireAnimation() }
+            clearDuckAiDataSetting.setOnCheckedChangeListener { _, isChecked -> viewModel.onClearDuckAiDataToggled(isChecked) }
         }
     }
 
@@ -86,8 +94,9 @@ class FireButtonActivity : DuckDuckGoActivity() {
             .flowWithLifecycle(lifecycle, Lifecycle.State.RESUMED)
             .onEach { viewState ->
                 viewState.let {
-                    updateAutomaticClearDataOptions(it.automaticallyClearData)
+                    updateAutomaticClearDataOptions(it.automaticallyClearData, it.clearDuckAiData)
                     updateSelectedFireAnimation(it.selectedFireAnimation)
+                    updateClearDuckAiDataSetting(it.clearDuckAiData, it.showClearDuckAiDataSetting)
                 }
             }.launchIn(lifecycleScope)
 
@@ -97,8 +106,11 @@ class FireButtonActivity : DuckDuckGoActivity() {
             .launchIn(lifecycleScope)
     }
 
-    private fun updateAutomaticClearDataOptions(automaticallyClearData: AutomaticallyClearData) {
-        val clearWhatSubtitle = getString(automaticallyClearData.clearWhatOption.nameStringResourceId())
+    private fun updateAutomaticClearDataOptions(
+        automaticallyClearData: AutomaticallyClearData,
+        clearDuckAiData: Boolean,
+    ) {
+        val clearWhatSubtitle = getString(automaticallyClearData.clearWhatOption.nameStringResourceId(clearDuckAiData))
         binding.automaticallyClearWhatSetting.setSecondaryText(clearWhatSubtitle)
 
         val clearWhenSubtitle = getString(automaticallyClearData.clearWhenOption.nameStringResourceId())
@@ -113,21 +125,33 @@ class FireButtonActivity : DuckDuckGoActivity() {
         binding.selectedFireAnimationSetting.setSecondaryText(subtitle)
     }
 
+    private fun updateClearDuckAiDataSetting(
+        enabled: Boolean,
+        isVisible: Boolean,
+    ) {
+        binding.clearDuckAiDataSetting.setIsChecked(enabled)
+        binding.clearDuckAiDataSetting.visibility = if (isVisible) View.VISIBLE else View.GONE
+    }
+
     private fun processCommand(it: Command) {
         when (it) {
             is Command.LaunchFireproofWebsites -> launchFireproofWebsites()
-            is Command.ShowClearWhatDialog -> launchAutomaticallyClearWhatDialog(it.option)
+            is Command.ShowClearWhatDialog -> launchAutomaticallyClearWhatDialog(it.option, it.clearDuckAi)
             is Command.ShowClearWhenDialog -> launchAutomaticallyClearWhenDialog(it.option)
             is Command.LaunchFireAnimationSettings -> launchFireAnimationSelector(it.animation)
         }
     }
 
     @StringRes
-    private fun ClearWhatOption.nameStringResourceId(): Int {
+    private fun ClearWhatOption.nameStringResourceId(clearDuckAi: Boolean): Int {
         return when (this) {
             ClearWhatOption.CLEAR_NONE -> R.string.settingsAutomaticallyClearWhatOptionNone
             ClearWhatOption.CLEAR_TABS_ONLY -> R.string.settingsAutomaticallyClearWhatOptionTabs
-            ClearWhatOption.CLEAR_TABS_AND_DATA -> R.string.settingsAutomaticallyClearWhatOptionTabsAndData
+            ClearWhatOption.CLEAR_TABS_AND_DATA -> if (clearDuckAi) {
+                R.string.settingsAutomaticallyClearWhatOptionTabsAndDataAndChats
+            } else {
+                R.string.settingsAutomaticallyClearWhatOptionTabsAndData
+            }
         }
     }
 
@@ -148,7 +172,10 @@ class FireButtonActivity : DuckDuckGoActivity() {
         startActivity(FireproofWebsitesActivity.intent(this), options)
     }
 
-    private fun launchAutomaticallyClearWhatDialog(option: ClearWhatOption) {
+    private fun launchAutomaticallyClearWhatDialog(
+        option: ClearWhatOption,
+        clearDuckAi: Boolean,
+    ) {
         val currentOption = option.getOptionIndex()
         RadioListAlertDialogBuilder(this)
             .setTitle(R.string.settingsAutomaticallyClearWhatDialogTitle)
@@ -156,7 +183,11 @@ class FireButtonActivity : DuckDuckGoActivity() {
                 listOf(
                     R.string.settingsAutomaticallyClearWhatOptionNone,
                     R.string.settingsAutomaticallyClearWhatOptionTabs,
-                    R.string.settingsAutomaticallyClearWhatOptionTabsAndData,
+                    if (clearDuckAi) {
+                        R.string.settingsAutomaticallyClearWhatOptionTabsAndDataAndChats
+                    } else {
+                        R.string.settingsAutomaticallyClearWhatOptionTabsAndData
+                    },
                 ),
                 currentOption,
             )
@@ -237,5 +268,13 @@ class FireButtonActivity : DuckDuckGoActivity() {
                 },
             )
             .show()
+    }
+
+    companion object {
+        const val LAUNCH_FROM_NOTIFICATION_PIXEL_NAME = "LAUNCH_FROM_NOTIFICATION_PIXEL_NAME"
+
+        fun intent(context: Context): Intent {
+            return Intent(context, FireButtonActivity::class.java)
+        }
     }
 }

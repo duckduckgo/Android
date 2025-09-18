@@ -30,11 +30,11 @@ import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.navigation.api.getActivityParams
+import com.duckduckgo.subscriptions.api.SubscriptionScreens.RestoreSubscriptionScreenWithParams
+import com.duckduckgo.subscriptions.api.SubscriptionScreens.SubscriptionsSettingsScreenWithEmptyParams
 import com.duckduckgo.subscriptions.impl.R.string
-import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.ACTIVATE_URL
-import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.BUY_URL
 import com.duckduckgo.subscriptions.impl.databinding.ActivityRestoreSubscriptionBinding
-import com.duckduckgo.subscriptions.impl.ui.RestoreSubscriptionActivity.Companion.RestoreSubscriptionScreenWithParams
+import com.duckduckgo.subscriptions.impl.internal.SubscriptionsUrlProvider
 import com.duckduckgo.subscriptions.impl.ui.RestoreSubscriptionViewModel.Command
 import com.duckduckgo.subscriptions.impl.ui.RestoreSubscriptionViewModel.Command.Error
 import com.duckduckgo.subscriptions.impl.ui.RestoreSubscriptionViewModel.Command.FinishAndGoToOnboarding
@@ -42,7 +42,7 @@ import com.duckduckgo.subscriptions.impl.ui.RestoreSubscriptionViewModel.Command
 import com.duckduckgo.subscriptions.impl.ui.RestoreSubscriptionViewModel.Command.RestoreFromEmail
 import com.duckduckgo.subscriptions.impl.ui.RestoreSubscriptionViewModel.Command.SubscriptionNotFound
 import com.duckduckgo.subscriptions.impl.ui.RestoreSubscriptionViewModel.Command.Success
-import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsActivity.Companion.SubscriptionsSettingsScreenWithEmptyParams
+import com.duckduckgo.subscriptions.impl.ui.RestoreSubscriptionViewModel.ViewState
 import javax.inject.Inject
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -53,6 +53,9 @@ class RestoreSubscriptionActivity : DuckDuckGoActivity() {
 
     @Inject
     lateinit var globalActivityStarter: GlobalActivityStarter
+
+    @Inject
+    lateinit var subscriptionsUrlProvider: SubscriptionsUrlProvider
 
     private val viewModel: RestoreSubscriptionViewModel by bindViewModel()
     private val binding: ActivityRestoreSubscriptionBinding by viewBinding()
@@ -77,6 +80,24 @@ class RestoreSubscriptionActivity : DuckDuckGoActivity() {
             .onEach { processCommand(it) }
             .launchIn(lifecycleScope)
 
+        viewModel.viewState
+            .onEach { renderView(it) }
+            .launchIn(lifecycleScope)
+    }
+
+    private fun renderView(viewState: ViewState) {
+        val title: Int
+        val secondaryText: Int
+        if (viewState.rebrandingEnabled) {
+            title = string.restoreSubscriptionTitleRebranding
+            secondaryText = string.restoreSubscriptionEmailDescriptionRebranding
+        } else {
+            title = string.restoreSubscriptionTitle
+            secondaryText = string.restoreSubscriptionEmailDescription
+        }
+        binding.title.setText(title)
+        binding.restoreSubscriptionEmailTitle.setSecondaryText(getString(secondaryText))
+
         // removing the click listeners from the LineListItems
         // so that they don't trigger the selectable background animation when interacted with
         binding.restoreSubscriptionEmailTitle.setOnClickListener(null)
@@ -100,7 +121,7 @@ class RestoreSubscriptionActivity : DuckDuckGoActivity() {
         val intent = globalActivityStarter.startIntent(
             this,
             SubscriptionsWebViewActivityWithParams(
-                url = ACTIVATE_URL,
+                url = subscriptionsUrlProvider.activateUrl,
             ),
         )
         startForResultRestore.launch(intent)
@@ -117,7 +138,7 @@ class RestoreSubscriptionActivity : DuckDuckGoActivity() {
                         if (isOriginWeb) {
                             setResult(RESULT_OK)
                         } else {
-                            goToSubscriptions()
+                            goToSubscriptionsWelcomePage()
                         }
                         finish()
                     }
@@ -127,11 +148,17 @@ class RestoreSubscriptionActivity : DuckDuckGoActivity() {
     }
 
     private fun goToSubscriptions() {
+        startSubscriptionsWebViewActivity(url = subscriptionsUrlProvider.buyUrl)
+    }
+
+    private fun goToSubscriptionsWelcomePage() {
+        startSubscriptionsWebViewActivity(url = subscriptionsUrlProvider.welcomeUrl)
+    }
+
+    private fun startSubscriptionsWebViewActivity(url: String) {
         globalActivityStarter.start(
-            this@RestoreSubscriptionActivity,
-            SubscriptionsWebViewActivityWithParams(
-                url = BUY_URL,
-            ),
+            context = this,
+            params = SubscriptionsWebViewActivityWithParams(url),
         )
     }
 
@@ -163,7 +190,7 @@ class RestoreSubscriptionActivity : DuckDuckGoActivity() {
         if (isOriginWeb) {
             setResult(RESULT_OK)
         } else {
-            goToSubscriptions()
+            goToSubscriptionsWelcomePage()
         }
         finish()
     }
@@ -185,8 +212,5 @@ class RestoreSubscriptionActivity : DuckDuckGoActivity() {
             is FinishAndGoToOnboarding -> finishAndGoToOnboarding()
             is FinishAndGoToSubscriptionSettings -> finishAndGoToSubscriptionSettings()
         }
-    }
-    companion object {
-        data class RestoreSubscriptionScreenWithParams(val isOriginWeb: Boolean = true) : GlobalActivityStarter.ActivityParams
     }
 }

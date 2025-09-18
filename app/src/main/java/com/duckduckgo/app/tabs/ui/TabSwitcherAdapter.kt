@@ -19,8 +19,10 @@ package com.duckduckgo.app.tabs.ui
 import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Bitmap
+import android.graphics.Rect
 import android.os.Bundle
 import android.view.LayoutInflater
+import android.view.TouchDelegate
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
@@ -36,12 +38,11 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.RequestManager
 import com.bumptech.glide.load.Transformation
 import com.bumptech.glide.load.engine.Resource
+import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ItemTabGridBinding
-import com.duckduckgo.app.browser.databinding.ItemTabGridNewBinding
 import com.duckduckgo.app.browser.databinding.ItemTabListBinding
-import com.duckduckgo.app.browser.databinding.ItemTabListNewBinding
 import com.duckduckgo.app.browser.databinding.ItemTabSwitcherAnimationInfoPanelBinding
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.browser.tabpreview.WebViewPreviewPersister
@@ -62,10 +63,11 @@ import com.duckduckgo.app.tabs.ui.TabSwitcherAdapter.TabSwitcherViewHolder.Compa
 import com.duckduckgo.app.tabs.ui.TabSwitcherAdapter.TabSwitcherViewHolder.TabViewHolder
 import com.duckduckgo.app.tabs.ui.TabSwitcherItem.Tab
 import com.duckduckgo.app.tabs.ui.TabSwitcherItem.Tab.SelectableTab
-import com.duckduckgo.app.tabs.ui.TabSwitcherItem.TrackerAnimationInfoPanel.Companion.ANIMATED_TILE_DEFAULT_ALPHA
-import com.duckduckgo.app.tabs.ui.TabSwitcherItem.TrackerAnimationInfoPanel.Companion.ANIMATED_TILE_NO_REPLACE_ALPHA
+import com.duckduckgo.app.tabs.ui.TabSwitcherItem.TrackersAnimationInfoPanel.Companion.ANIMATED_TILE_DEFAULT_ALPHA
+import com.duckduckgo.app.tabs.ui.TabSwitcherItem.TrackersAnimationInfoPanel.Companion.ANIMATED_TILE_NO_REPLACE_ALPHA
 import com.duckduckgo.common.ui.view.hide
 import com.duckduckgo.common.ui.view.show
+import com.duckduckgo.common.ui.view.toPx
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.swap
 import com.duckduckgo.mobile.android.R as AndroidR
@@ -74,11 +76,11 @@ import java.io.File
 import java.security.MessageDigest
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import logcat.LogPriority.ERROR
 import logcat.LogPriority.VERBOSE
 import logcat.logcat
 
 class TabSwitcherAdapter(
-    private val isVisualExperimentEnabled: Boolean,
     private val itemClickListener: TabSwitcherListener,
     private val webViewPreviewPersister: WebViewPreviewPersister,
     private val lifecycleOwner: LifecycleOwner,
@@ -104,22 +106,14 @@ class TabSwitcherAdapter(
         val inflater = LayoutInflater.from(parent.context)
         return when (viewType) {
             GRID_TAB -> {
-                if (isVisualExperimentEnabled) {
-                    val binding = ItemTabGridNewBinding.inflate(inflater, parent, false)
-                    TabSwitcherViewHolder.GridTabViewHolder(binding)
-                } else {
-                    val binding = ItemTabGridBinding.inflate(inflater, parent, false)
-                    TabSwitcherViewHolder.GridTabViewHolder(binding)
-                }
+                val binding = ItemTabGridBinding.inflate(inflater, parent, false)
+                addExtraCloseButtonTouchArea(binding.close)
+                TabSwitcherViewHolder.GridTabViewHolder(binding)
             }
             LIST_TAB -> {
-                if (isVisualExperimentEnabled) {
-                    val binding = ItemTabListNewBinding.inflate(inflater, parent, false)
-                    TabSwitcherViewHolder.ListTabViewHolder(binding)
-                } else {
-                    val binding = ItemTabListBinding.inflate(inflater, parent, false)
-                    TabSwitcherViewHolder.ListTabViewHolder(binding)
-                }
+                val binding = ItemTabListBinding.inflate(inflater, parent, false)
+                addExtraCloseButtonTouchArea(binding.close)
+                TabSwitcherViewHolder.ListTabViewHolder(binding)
             }
             TRACKER_ANIMATION_TILE_INFO_PANEL -> {
                 val binding = ItemTabSwitcherAnimationInfoPanelBinding.inflate(inflater, parent, false)
@@ -137,7 +131,7 @@ class TabSwitcherAdapter(
                     LIST -> LIST_TAB
                 }
             }
-            is TabSwitcherItem.TrackerAnimationInfoPanel -> TRACKER_ANIMATION_TILE_INFO_PANEL
+            is TabSwitcherItem.TrackersAnimationInfoPanel -> TRACKER_ANIMATION_TILE_INFO_PANEL
         }
 
     override fun getItemCount(): Int = list.size
@@ -151,9 +145,9 @@ class TabSwitcherAdapter(
                 bindListTab(holder, list[position] as Tab)
             }
             is TabSwitcherViewHolder.TrackerAnimationInfoPanelViewHolder -> {
-                val trackerAnimationInfoPanel = list[position] as TabSwitcherItem.TrackerAnimationInfoPanel
+                val trackersAnimationInfoPanel = list[position] as TabSwitcherItem.TrackersAnimationInfoPanel
 
-                val stringRes = if (trackerAnimationInfoPanel.trackerCount == 1) {
+                val stringRes = if (trackersAnimationInfoPanel.trackerCount == 1) {
                     R.string.trackerBlockedInTheLast7days
                 } else {
                     R.string.trackersBlockedInTheLast7days
@@ -162,7 +156,7 @@ class TabSwitcherAdapter(
                 trackerCountAnimator.animateTrackersBlockedCountView(
                     context = holder.binding.root.context,
                     stringRes = stringRes,
-                    totalTrackerCount = trackerAnimationInfoPanel.trackerCount,
+                    totalTrackerCount = trackersAnimationInfoPanel.trackerCount,
                     trackerTextView = holder.binding.infoPanelText,
                 )
                 holder.binding.root.setOnClickListener {
@@ -242,10 +236,12 @@ class TabSwitcherAdapter(
                     holder.selectionIndicator.contentDescription = holder.rootView.resources.getString(R.string.tabNotSelectedIndicator)
                 }
                 holder.selectionIndicator.show()
+                holder.close.isClickable = false
                 holder.close.hide()
             }
             else -> {
                 holder.selectionIndicator.hide()
+                holder.close.isClickable = true
                 holder.close.show()
             }
         }
@@ -371,11 +367,7 @@ class TabSwitcherAdapter(
                 outWidth: Int,
                 outHeight: Int,
             ): Resource<Bitmap> {
-                resource.get().height = if (isVisualExperimentEnabled) {
-                    context.resources.getDimension(CommonR.dimen.gridItemPreviewHeightNew)
-                } else {
-                    context.resources.getDimension(CommonR.dimen.gridItemPreviewHeight)
-                }.toInt()
+                resource.get().height = context.resources.getDimension(CommonR.dimen.gridItemPreviewHeight).toInt()
                 return resource
             }
 
@@ -398,10 +390,17 @@ class TabSwitcherAdapter(
                     return@launch
                 }
 
-                glide.load(cachedWebViewPreview)
-                    .transition(DrawableTransitionOptions.withCrossFade())
-                    .optionalTransform(fitAndClipBottom())
-                    .into(tabPreview)
+                try {
+                    glide.load(cachedWebViewPreview)
+                        .transition(DrawableTransitionOptions.withCrossFade()).transform(
+                            fitAndClipBottom(),
+                            RoundedCorners(tabPreview.context.resources.getDimensionPixelSize(CommonR.dimen.smallShapeCornerRadius)),
+                        )
+                        .into(tabPreview)
+                } catch (e: Exception) {
+                    logcat(ERROR) { "Error loading tab preview for ${tab.tabId}: ${e.message}" }
+                    glide.load(AndroidR.drawable.ic_dax_icon_72).into(tabPreview)
+                }
             }
         } else {
             glide.clear(tabPreview)
@@ -409,7 +408,7 @@ class TabSwitcherAdapter(
     }
 
     private fun updateAnimatedTileAlpha(alpha: Float) {
-        val animatedTilePosition = list.indexOfFirst { it is TabSwitcherItem.TrackerAnimationInfoPanel }
+        val animatedTilePosition = list.indexOfFirst { it is TabSwitcherItem.TrackersAnimationInfoPanel }
         if (animatedTilePosition != -1) {
             notifyItemChanged(
                 animatedTilePosition,
@@ -468,6 +467,8 @@ class TabSwitcherAdapter(
             const val GRID_TAB = 0
             const val LIST_TAB = 1
             const val TRACKER_ANIMATION_TILE_INFO_PANEL = 2
+
+            const val EXTRA_CLOSE_BUTTON_TOUCH_AREA = 6 // dp
         }
 
         interface TabViewHolder {
@@ -498,16 +499,6 @@ class TabSwitcherAdapter(
                 selectionIndicator = binding.selectionIndicator,
                 tabPreview = binding.tabPreview,
             )
-
-            constructor(binding: ItemTabGridNewBinding) : this(
-                rootView = binding.root,
-                favicon = binding.favicon,
-                title = binding.title,
-                close = binding.close,
-                tabUnread = binding.tabUnread,
-                selectionIndicator = binding.selectionIndicator,
-                tabPreview = binding.tabPreview,
-            )
         }
 
         data class ListTabViewHolder(
@@ -529,20 +520,24 @@ class TabSwitcherAdapter(
                 selectionIndicator = binding.selectionIndicator,
                 url = binding.url,
             )
-
-            constructor(binding: ItemTabListNewBinding) : this(
-                rootView = binding.root,
-                favicon = binding.favicon,
-                title = binding.title,
-                close = binding.close,
-                tabUnread = binding.tabUnread,
-                selectionIndicator = binding.selectionIndicator,
-                url = binding.url,
-            )
         }
 
         data class TrackerAnimationInfoPanelViewHolder(
             val binding: ItemTabSwitcherAnimationInfoPanelBinding,
         ) : TabSwitcherViewHolder(binding.root)
+    }
+}
+
+private fun addExtraCloseButtonTouchArea(closeButton: ImageView) {
+    val parent = closeButton.parent as View
+    parent.post {
+        val extraSpace = TabSwitcherAdapter.TabSwitcherViewHolder.Companion.EXTRA_CLOSE_BUTTON_TOUCH_AREA.toPx()
+        val touchableArea = Rect()
+        closeButton.getHitRect(touchableArea)
+        touchableArea.top -= extraSpace
+        touchableArea.bottom += extraSpace
+        touchableArea.left -= extraSpace
+        touchableArea.right += extraSpace
+        parent.touchDelegate = TouchDelegate(touchableArea, closeButton)
     }
 }

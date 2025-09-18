@@ -240,7 +240,7 @@
 
     <string name="newTabPageShortcutPasswords">Salasanat</string>
 
-    <string name="autofillImportGooglePasswordsWebFlowTitle">Tuo Google-salasanat</string>
+    <string name="autofillImportGooglePasswordsWebFlowTitle">Tuo salasanat</string>
     <string name="autofillImportGooglePasswordsSuccessMessage" instruction="Placeholder is the number of passwords imported">%1$d Googlesta tuotua salasanaa</string>
     <string name="autofillImportCsvPasswordsSuccessMessage" instruction="Placeholder is the number of passwords imported">%1$d salasanaa tuotu CSV-tiedostosta</string>
 
@@ -250,9 +250,9 @@
     <string name="autofillSyncDesktopPasswordEmptyStateButtonTitle">Synkronoi työpöytäsalasanat</string>
     <string name="autofillSyncDesktopPasswordsMenuTitle">Synkronoi työpöytäsalasanat</string>
 
-    <string name="importPasswordsChooseMethodDialogTitle">Tuo Google-salasanasi</string>
+    <string name="importPasswordsChooseMethodDialogTitle">Tuo salasanat Googlesta</string>
     <string name="importPasswordsChooseMethodDialogSubtitle">Google saattaa pyytää sinua kirjautumaan sisään tai antamaan salasanasi vahvistusta varten.</string>
-    <string name="importPasswordsChooseMethodDialogGpmButton">Avaa Google Salasanat</string>
+    <string name="importPasswordsChooseMethodDialogGpmButton">Tuo Googlesta</string>
     <string name="importPasswordsChooseMethodDialogCsvButton">Valitse CSV-tiedosto</string>
     <string name="importPasswordsChooseMethodDialogDesktopSyncButton">Tuo tietokoneen selaimesta</string>
 
@@ -280,5 +280,13 @@
     <string name="autofillSettingsImportFromGoogleLabel">Tuo salasanat Googlesta</string>
     <string name="autofillSettingsImportFromDesktopSync">Synkronoi työpöytäsalasanat</string>
     <string name="autofillSettingsResetExcludedSitesTitle">Nollaa poissuljetut sivustot</string>
+
+    <string name="passwords_import_promo_title" instruction="The &apos;br&apos; is a forced line break for English. It does not need to be included in translations.">Tuo salasanasi Googlesta DuckDuckGohon</string>
+    <string name="passwords_import_promo_subtitle">Tuo salasanasi nopeasti ja turvallisesti DuckDuckGohon. Google saattaa pyytää sinua antamaan salasanasi.</string>
+    <string name="passwords_import_promo_action">Tuo Googlesta</string>
+    <string name="passwords_import_promo_in_browser_title">Tuo salasanasi Googlesta DuckDuckGohon</string>
+    <string name="passwords_import_promo_in_browser_secondary_action_button">Älä kysy uudelleen</string>
+    <string name="passwords_import_promo_in_settings_title">Tuo salasanat Googlesta</string>
+    <string name="passwords_import_promo_in_settings_dismiss_text">Piilota</string>
 
 </resources>

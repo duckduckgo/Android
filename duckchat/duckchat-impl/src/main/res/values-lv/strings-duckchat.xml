@@ -39,9 +39,48 @@
     <!-- Settings -->
     <string name="duck_chat_settings_activity_description">Duck.ai ir papildu līdzeklis, kas ļauj anonīmi tērzēt ar populāriem trešo pušu Ml tērzēšanas modeļiem. Tavas tērzēšanas sarunas netiek izmantotas AMI apmācībai.\n<annotation type="learn_more_link">Uzzini vairāk</annotation></string>
     <string name="duck_chat_enable_duck_ai_setting">Iespējot Duck.ai</string>
-    <string name="duck_chat_show_in_heading">Saīsnes</string>
     <string name="duck_chat_visibility_setting">Pārlūka izvēlne</string>
     <string name="duck_chat_address_bar_visibility_setting">Adreses josla</string>
     <string name="duck_chat_assist_settings_title">Assist iestatījumi</string>
     <string name="duck_chat_assist_settings_description">Izvēlies, cik bieži tu vēlies, lai MI atbalstītās atbildes parādītos tavos meklējumos.</string>
+    <string name="duck_ai_shortcut_settings_title">Duck.ai īsceļi</string>
+    <string name="duck_ai_shortcut_settings_description">Izvēlies, kurus Duck.ai īsceļus parādīt</string>
+
+    <!-- Input Screen  -->
+    <string name="input_screen_search_tab">Meklēt</string>
+    <string name="input_screen_search_hint">Meklē vai ievadi adresi</string>
+    <string name="input_screen_chat_tab">Duck.ai</string>
+    <string name="input_screen_chat_hint">Pajautāt privāti</string>
+    <string name="input_screen_user_pref_without_ai">Meklēt tikai</string>
+    <string name="input_screen_user_pref_with_ai">Meklēšana &amp; Duck.ai</string>
+    <string name="input_screen_user_pref_description">Izmēģini mūsu jauno iespēju jautāt Duck.ai tieši no adreses joslas. <annotation type="share_feedback">Dalies ar atsauksmi</annotation></string>
+
+    <!-- Duck.ai Pro settings -->
+    <string name="duck_ai_paid_settings_title">Duck.ai</string>
+    <string name="duck_ai_paid_settings_page_title">Duck.ai</string>
+    <string name="duck_ai_paid_settings_page_description"><![CDATA[Privāti tērzē ar abonentiem ekskluzīviem mākslīgā intelekta modeļiem.\n<a href=\"\">Uzzināt vairāk</a>]]></string>
+    <string name="duck_ai_paid_settings_open_duck_ai">Atver Duck.ai</string>
+    <string name="duck_ai_paid_settings_learn_more_title">Uzzināt vairāk</string>
+
+    <!-- Rebranding-->
+    <string name="duck_chat_title_rebranding">Mākslīgā intelekta funkcijas</string>
+    <string name="duck_chat_settings_activity_description_rebranding">DuckDuckGo MI funkcijas ir privātas un nav obligātas.Tavi dati netiek izmantoti mākslīgā intelekta apmācībai.\n<annotation type="learn_more_link">Uzzini vairāk</annotation></string>
+    <string name="duck_chat_enable_duck_ai_setting_rebranding">Duck.ai</string>
+    <string name="duck_chat_enable_duck_ai_setting_description_rebranding">Privāti tērzē ar populāriem trešo personu mākslīgā intelekta modeļiem</string>
+    <string name="duck_chat_assist_settings_title_rebranding">Meklēšanas Assist iestatījumi</string>
+    <string name="duck_chat_assist_settings_description_rebranding">Izvēlies, cik bieži tu vēlies, lai MI atbalstītās atbildes parādītos tavos meklējumos.</string>
+
+    <!-- AutoComplete -->
+    <string name="autocompleteDuckAiPrompt">Pajautā Duck.ai</string>
+
+    <!-- New Address Bar Option Bottom Sheet Dialog -->
+    <string name="newAddressBarOptionBottomSheetDialogSearchText">Meklē vai ievadi adresi</string>
+    <string name="newAddressBarOptionBottomSheetDialogTitle">Pārslēgties starp meklēšanu un MI tērzēšanu</string>
+    <string name="newAddressBarOptionBottomSheetDialogSubTitle">MI funkcijas vienmēr var izvēlēties nelietot.</string>
+    <string name="newAddressBarOptionBottomSheetDialogPrimaryButton">Apstiprināt</string>
+    <string name="newAddressBarOptionBottomSheetDialogGhostButton">Ne tagad</string>
+    <string name="newAddressBarOptionBottomSheetDialogFooter">Pielāgo iestatījumos &gt; MI funkcijas.</string>
+    <string name="newAddressBarOptionBottomSheetDialogSearchOnly">Meklēt tikai</string>
+    <string name="newAddressBarOptionBottomSheetDialogSearchAndDuckAi">Meklēšana &amp; Duck.ai</string>
+    <string name="newAddressBarOptionBottomSheetDialogHeader">Adreses joslas opcija</string>
 </resources>

@@ -5,6 +5,7 @@ import com.duckduckgo.js.messaging.api.JsMessageCallback
 import org.json.JSONObject
 import org.junit.Assert.*
 import org.junit.Test
+import org.mockito.kotlin.mock
 
 class DuckChatContentScopeJsMessageHandlerTest {
     private val handler = DuckChatContentScopeJsMessageHandler().getJsMessageHandler()
@@ -19,7 +20,7 @@ class DuckChatContentScopeJsMessageHandlerTest {
             params = JSONObject(),
         )
 
-        handler.process(message, "secret", callback)
+        handler.process(message, mock(), callback)
 
         assertEquals(1, callback.counter)
     }
@@ -39,7 +40,7 @@ class DuckChatContentScopeJsMessageHandlerTest {
     @Test
     fun `only contains valid methods`() {
         val methods = handler.methods
-        assertTrue(methods.size == 8)
+        assertTrue(methods.size == 9)
         assertTrue(methods[0] == "getAIChatNativeHandoffData")
         assertTrue(methods[1] == "getAIChatNativeConfigValues")
         assertTrue(methods[2] == "openAIChat")
@@ -48,6 +49,7 @@ class DuckChatContentScopeJsMessageHandlerTest {
         assertTrue(methods[5] == "responseState")
         assertTrue(methods[6] == "hideChatInput")
         assertTrue(methods[7] == "showChatInput")
+        assertTrue(methods[8] == "reportMetric")
     }
 
     private val callback = object : JsMessageCallback() {

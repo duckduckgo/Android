@@ -25,7 +25,9 @@ dependencies {
     implementation project(path: ':navigation-api')
     implementation project(path: ':common-ui')
     implementation project(path: ':common-utils')
+    implementation project(':feature-toggles-api')
     implementation AndroidX.core.ktx
+    implementation AndroidX.webkit
     implementation KotlinX.coroutines.core
 
     implementation "com.squareup.logcat:logcat:_"

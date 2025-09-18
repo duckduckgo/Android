@@ -29,5 +29,5 @@ import com.duckduckgo.survey.api.SurveyParameterPlugin
 private interface SurveyParameterProviderPluginPoint
 
 fun PluginPoint<SurveyParameterPlugin>.getProviderForSurveyParamKey(key: String): SurveyParameterPlugin? {
-    return runCatching { getPlugins().firstOrNull { it.surveyParamKey == key } }.getOrNull()
+    return runCatching { getPlugins().firstOrNull { it.matches(key) } }.getOrNull()
 }

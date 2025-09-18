@@ -17,25 +17,35 @@
 package com.duckduckgo.app.dispatchers
 
 import android.content.Intent
+import android.net.Uri
 import androidx.browser.customtabs.CustomTabsIntent
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import app.cash.turbine.test
 import com.duckduckgo.app.browser.DuckDuckGoUrlDetector
 import com.duckduckgo.app.global.intentText
+import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.appbuildconfig.api.BuildFlavor
 import com.duckduckgo.autofill.api.emailprotection.EmailProtectionLinkVerifier
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.customtabs.api.CustomTabDetector
+import com.duckduckgo.duckplayer.api.DuckPlayerSettingsNoParams
+import com.duckduckgo.sync.api.setup.SyncUrlIdentifier
+import com.duckduckgo.sync.impl.ui.qrcode.SyncBarcodeUrl
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import org.junit.runner.RunWith
 import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 
+@RunWith(AndroidJUnit4::class)
 class IntentDispatcherViewModelTest {
     @get:Rule
     val coroutineTestRule: CoroutineTestRule = CoroutineTestRule()
@@ -44,6 +54,8 @@ class IntentDispatcherViewModelTest {
     private val mockIntent: Intent = mock()
     private val emailProtectionLinkVerifier: EmailProtectionLinkVerifier = mock()
     private val duckDuckGoUrlDetector: DuckDuckGoUrlDetector = mock()
+    private val syncUrlIdentifier: SyncUrlIdentifier = mock()
+    private val mockAppBuildConfig: AppBuildConfig = mock()
 
     private lateinit var testee: IntentDispatcherViewModel
 
@@ -54,7 +66,11 @@ class IntentDispatcherViewModelTest {
             dispatcherProvider = coroutineTestRule.testDispatcherProvider,
             emailProtectionLinkVerifier = emailProtectionLinkVerifier,
             duckDuckGoUrlDetector = duckDuckGoUrlDetector,
+            syncUrlIdentifier = syncUrlIdentifier,
+            appBuildConfig = mockAppBuildConfig,
         )
+
+        whenever(syncUrlIdentifier.shouldDelegateToSyncSetup(anyOrNull())).thenReturn(false)
     }
 
     @Test
@@ -190,6 +206,48 @@ class IntentDispatcherViewModelTest {
         testee.viewState.test {
             val state = awaitItem()
             assertFalse(state.customTabRequested)
+        }
+    }
+
+    @Test
+    fun whenIntentReceivedForSyncPairingUrlThenCustomTabIsNotRequested() = runTest {
+        val intentUrl = SyncBarcodeUrl.URL_BASE
+        whenever(mockIntent.intentText).thenReturn(intentUrl)
+        whenever(syncUrlIdentifier.shouldDelegateToSyncSetup(intentUrl)).thenReturn(true)
+        testee.onIntentReceived(mockIntent, DEFAULT_COLOR, isExternal = true)
+
+        testee.viewState.test {
+            val state = awaitItem()
+            assertFalse(state.customTabRequested)
+            assertEquals(intentUrl, state.intentText)
+        }
+    }
+
+    @Test
+    fun whenIntentReceivedWithDuckPlayerDataAndInternalBuildThenActivityParamsAreSet() = runTest {
+        val uri = Uri.parse("duck://settings.player")
+        whenever(mockIntent.data).thenReturn(uri)
+        whenever(mockAppBuildConfig.flavor).thenReturn(BuildFlavor.INTERNAL)
+
+        testee.onIntentReceived(mockIntent, DEFAULT_COLOR, isExternal = false)
+
+        testee.viewState.test {
+            val state = awaitItem()
+            assertEquals(DuckPlayerSettingsNoParams, state.activityParams)
+        }
+    }
+
+    @Test
+    fun whenIntentReceivedWithDuckPlayerDataAndNotInternalBuildThenActivityParamsAreNotSet() = runTest {
+        val uri = Uri.parse("duck://settings.player")
+        whenever(mockIntent.data).thenReturn(uri)
+        whenever(mockAppBuildConfig.flavor).thenReturn(BuildFlavor.PLAY)
+
+        testee.onIntentReceived(mockIntent, DEFAULT_COLOR, isExternal = false)
+
+        testee.viewState.test {
+            val state = awaitItem()
+            assertNull(state.activityParams)
         }
     }
 

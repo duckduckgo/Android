@@ -22,6 +22,7 @@
     android:id="@+id/appBarLayout"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:outlineProvider="none"
     android:theme="@style/Widget.DuckDuckGo.ToolbarTheme">
 
     <androidx.appcompat.widget.Toolbar
@@ -31,6 +32,13 @@
         android:background="?attr/daxColorToolbar"
         android:theme="@style/Widget.DuckDuckGo.ToolbarTheme"
         app:popupTheme="@style/Widget.DuckDuckGo.PopUpOverflowMenu" />
+
+    <View
+        android:id="@+id/topBrowserOutlineStroke"
+        android:layout_width="match_parent"
+        android:layout_height="0.5dp"
+        android:background="?attr/daxColorShade"
+        android:layout_alignParentBottom="true" />
 
 </com.google.android.material.appbar.AppBarLayout>
 

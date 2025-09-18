@@ -20,7 +20,7 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.PreferenceDataStoreFactory
 import androidx.datastore.preferences.core.Preferences
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.duckduckgo.app.browser.defaultbrowsing.prompts.store.DefaultBrowserPromptsDataStore.ExperimentStage
+import com.duckduckgo.app.browser.defaultbrowsing.prompts.store.DefaultBrowserPromptsDataStore.Stage
 import com.duckduckgo.common.test.CoroutineTestRule
 import java.io.File
 import kotlinx.coroutines.flow.first
@@ -64,22 +64,22 @@ class DefaultBrowserPromptsPrefsDataStoreImplTest {
     fun whenExperimentInitializedThenDefaultValueIsNotEnrolled() = runTest {
         val testee = DefaultBrowserPromptsPrefsDataStoreImpl(testDataStore, coroutinesTestRule.testDispatcherProvider)
 
-        assertEquals(testee.experimentStage.first(), ExperimentStage.NOT_ENROLLED)
+        assertEquals(testee.stage.first(), Stage.NOT_STARTED)
     }
 
     @Test
     fun whenExperimentStageIsUpdatedThenValueIsPropagated() = runTest {
         val testee = DefaultBrowserPromptsPrefsDataStoreImpl(testDataStore, coroutinesTestRule.testDispatcherProvider)
         val expectedUpdates = listOf(
-            ExperimentStage.NOT_ENROLLED,
-            ExperimentStage.STAGE_1,
+            Stage.NOT_STARTED,
+            Stage.STAGE_1,
         )
-        val actualUpdates = mutableListOf<ExperimentStage>()
+        val actualUpdates = mutableListOf<Stage>()
         coroutinesTestRule.testScope.launch {
-            testee.experimentStage.toList(actualUpdates)
+            testee.stage.toList(actualUpdates)
         }
 
-        testee.storeExperimentStage(ExperimentStage.STAGE_1)
+        testee.storeStage(Stage.STAGE_1)
 
         assertEquals(expectedUpdates, actualUpdates)
     }

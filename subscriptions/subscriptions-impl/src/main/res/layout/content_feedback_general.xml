@@ -38,8 +38,7 @@
         <com.duckduckgo.common.ui.view.listitem.OneLineListItem
             android:id="@+id/pproFeedback"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:primaryText="@string/feedbackGeneralPpro" />
+            android:layout_height="wrap_content"/>
 
     </LinearLayout>
 </androidx.core.widget.NestedScrollView>

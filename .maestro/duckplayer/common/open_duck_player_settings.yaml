@@ -1,0 +1,8 @@
+appId: com.duckduckgo.mobile.android
+---
+# Open Duck Player video settings
+- openLink:
+    link: duck://settings.player
+
+- tapOn:
+    text: "Open YouTube Videos in Duck Player"

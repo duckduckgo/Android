@@ -16,9 +16,13 @@
 
 package com.duckduckgo.app.browser.viewstate
 
+import com.duckduckgo.serp.logos.api.SerpLogo
+
 data class OmnibarViewState(
     val omnibarText: String = "",
+    val queryOrFullUrl: String = "",
     val isEditing: Boolean = false,
     val navigationChange: Boolean = false,
     val forceExpand: Boolean = true,
+    val serpLogo: SerpLogo? = null,
 )

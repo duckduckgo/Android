@@ -128,6 +128,7 @@
     <!-- Fire -->
     <string name="fireMenu">Valyti duomenis</string>
     <string name="fireClearAll">Valyti visas korteles ir duomenis</string>
+    <string name="fireClearAllPlusDuckChats">Išvalyti visus skirtukus, duomenis ir „Duck.ai“ pokalbius</string>
     <string name="fireCancel">Atšaukti</string>
     <string name="fireDataCleared">Duomenys išvalyti</string>
 
@@ -191,6 +192,28 @@
     <string name="webTrackingProtectionLearnMoreTitle">Apsauga nuo žiniatinklio sekimo</string>
     <string name="webTrackingProtectionTitle">Apsauga nuo žiniatinklio sekimo</string>
     <string name="webTrackingProtectionDescriptionNew"><![CDATA[„DuckDuckGo“ automatiškai blokuoja paslėptas stebėjimo priemones naršant internete.\n<a href=\"\">Sužinoti daugiau</a>]]></string>
+    <string name="webTrackingProtectionExplanationDescription"><![CDATA[\"DuckDuckGo\" naršyklėje yra visada aktyvi stebėjimo apsauga.\n<a href=\"\">Sužinoti daugiau</a>]]></string>
+    <string name="webTrackingProtectionExplanationTitle">Kaip jus saugome</string>
+    <string name="webTrackingProtectionThirdPartyTrackersTitle">Blokuoja trečiųjų šalių stebėjimo priemones</string>
+    <string name="webTrackingProtectionThirdPartyTrackersDescription">Padeda blokuoti 3‑iųjų šalių slapukus, kurie seka jus iš vienos svetainės į kitą, neleidžiant įkelti 3‑iųjų šalių sekimo įrenginių.</string>
+    <string name="webTrackingProtectionTargetedAdsTitle">Blokuoja tikslines reklamas</string>
+    <string name="webTrackingProtectionTargetedAdsDescription">Blokuoja invazines sekimo priemones prieš jas įkeliant, todėl veiksmingai pašalina skelbimus, taikomus pagal sekimą.</string>
+    <string name="webTrackingProtectionFingerprintTrackingTitle">Apsaugo nuo pirštų atspaudų sekimo</string>
+    <string name="webTrackingProtectionFingerprintTrackingDescription">Padeda neleisti stebėjimo įmonėms gauti unikalius identifikatorius apie jūsų naršyklę ir įrenginį, kuriuos jie naudoja sekti jus visame internete.</string>
+    <string name="webTrackingProtectionLinkTrackingTitle">Blokuoja nuorodų sekimą</string>
+    <string name="webTrackingProtectionLinkTrackingDescription">Pašalinami nuorodose esantys sekimo parametrai, kad trečiosios šalys negalėtų sekti jūsų elgesio svetainėse.</string>
+    <string name="webTrackingProtectionReferrerTrackingTitle">Apsaugo nuo nukreipiančiojo sekimo</string>
+    <string name="webTrackingProtectionReferrerTrackingDescription">Padeda neleisti įmonėms identifikuoti paskutinę aplankytą svetainę.</string>
+    <string name="webTrackingProtectionFirstPartyCookiesTitle">Panaikina pirmosios šalies slapukų galiojimą</string>
+    <string name="webTrackingProtectionFirstPartyCookiesDescription">Automatiškai nutraukia 1‑osios šalies slapukų galiojimą po 30 dienų, kad svetainės negalėtų neribotą laiką sekti jūsų, kai esate atsijungę.</string>
+    <string name="webTrackingProtectionDnsCnameCloakingTitle">Apsauga nuo DNS CNAME slėpimo</string>
+    <string name="webTrackingProtectionDnsCnameCloakingDescription">Padeda blokuoti trečiųjų šalių sekimo priemones, kurios bando pasislėpti svetainėje naudodamos DNS.</string>
+    <string name="webTrackingProtectionGoogleAmpTrackingTitle">Blokuoja „Google“ AMP sekimą</string>
+    <string name="webTrackingProtectionGoogleAmpTrackingDescription">Pakeičia „Google AMP“ nuorodas į originalią leidėjo svetainę.</string>
+    <string name="webTrackingProtectionGoogleSigninPopupsTitle">Blokuoja „Google“ prisijungimo iššokančiuosius langus</string>
+    <string name="webTrackingProtectionGoogleSigninPopupsDescription">Blokuoja „Google“ prisijungimo iššokančiuosius langus svetainėse, kurios nepriklauso „Google“.</string>
+    <string name="webTrackingProtectionGlobalPrivacyControlTitle">Visuotinė privatumo kontrolė</string>
+    <string name="webTrackingProtectionGlobalPrivacyControlDescription">Išreiškia atsisakymo teises jūsų vardu, liepdamas svetainėms nepardavinėti jūsų asmens informacijos ir jos nebendrinti.</string>
 
     <!-- Cookie Pop-Up Protection -->
     <string name="cookiePopupProtectionTitle">Apsauga nuo slapukų iškylančiųjų langų</string>
@@ -204,6 +227,7 @@
 
     <!-- Appearance -->
     <string name="appearanceActivityTitle">Išvaizda</string>
+    <string name="settingsShowFullUrlTitle">Rodyti visą svetainės adresą</string>
 
     <!-- Settings - Automatically clearing data -->
     <string name="settingsAutomaticallyClearingDialogSave">Išsaugoti</string>
@@ -213,6 +237,7 @@
     <string name="settingsAutomaticallyClearWhatOptionNone">Jokie</string>
     <string name="settingsAutomaticallyClearWhatOptionTabs">Kortelės</string>
     <string name="settingsAutomaticallyClearWhatOptionTabsAndData">Kortelės ir duomenys</string>
+    <string name="settingsAutomaticallyClearWhatOptionTabsAndDataAndChats">Skirtukai, duomenys ir „Duck.ai“ pokalbiai</string>
 
     <string name="settingsAutomaticallyClearWhen">Valyti…</string>
     <string name="settingsAutomaticallyClearWhenDialogTitle">Valyti…</string>
@@ -222,6 +247,8 @@
     <string name="settingsAutomaticallyClearWhenAppExit15Minutes">Išeinant iš programos, po 15 min. neveikimo</string>
     <string name="settingsAutomaticallyClearWhenAppExit30Minutes">Išeinant iš programos, po 30 min. neveikimo</string>
     <string name="settingsAutomaticallyClearWhenAppExit60Minutes">Išeinant iš programos, po 1 val. neveikimo</string>
+    <string name="settingsClearAiDataTitle">Išvalyti „Duck.ai“ pokalbius</string>
+    <string name="settingsClearAiDataMessage">Mygtukas „Fire Button“ taip pat ištrins „Duck.ai“ istoriją.</string>
 
     <!-- About Activity -->
     <string name="aboutActivityTitle">Apie „DuckDuckGo“</string>
@@ -250,8 +277,8 @@
     <string name="searchWidgetEmtpyFavoritesHint">Mėgstamų dar nepridėta</string>
     <string name="searchWidgetEmtpyFavoritesCta">Pridėti mėgstamą</string>
     <string name="widgetConfigurationActivityTitle">Valdiklio konfigūracija</string>
-    <string name="favoritesWidgetLabel">Mėgstami</string>
-    <string name="searchWidgetLabel">Paieška</string>
+    <string name="favoritesWidgetLabel">Paieška ir mėgstamiausi</string>
+    <string name="searchWidgetLabel">Paieška ir „Duck.ai“</string>
 
     <!-- Home Screen Shortcuts -->
     <string name="addToHome">Pridėti prie pagrindinio ekrano</string>
@@ -406,7 +433,6 @@
     <string name="crashedWebViewErrorAction">"Įkelti iš naujo"</string>
 
     <!-- System Search-->
-    <string name="systemSearchDeviceAppLabel">Iš šio įrenginio</string>
     <string name="systemSearchAppNotFound">Nepavyko rasti programos</string>
     <string name="systemSearchOnboardingThanks">Ačiū, kad pasirinkote „DuckDuckGo“!\nNaudodami mūsų naršyklę galite apsisaugoti nuo įsilaužėlių, sukčių ir duomenų trokštančių įmonių.</string>
     <string name="systemSearchOnboardingFeaturesIntroText">„DuckDuckGo“ programėlė taip pat:</string>
@@ -785,7 +811,7 @@
     <string name="preOnboardingComparisonChartItem1">Vykdykite paiešką privačiai pagal numatytąjį nustatymą</string>
     <string name="preOnboardingComparisonChartItem2">Blokuoja trečiųjų šalių stebėjimo priemones</string>
     <string name="preOnboardingComparisonChartItem3">Blokuoti slapukų iššokančiuosius langus</string>
-    <string name="preOnboardingComparisonChartItem4">Blokuoti sekimo skelbimus</string>
+    <string name="preOnboardingComparisonChartItem4">Blokuoti tikslines reklamas</string>
     <string name="preOnboardingComparisonChartItem5">Vienu mygtuku ištrink naršymo duomenis</string>
     <string name="preOnboardingDaxDialog3Title">Nuostabu! Sveiki prisijungę prie „Duck“!</string>
     <string name="preOnboardingDaxDialog3Button">Pradėti naršyti</string>
@@ -828,8 +854,9 @@
     <string name="onboardingEndDaxDialogDescription">Įsidėmėkite: kiekvieną kartą, kai naršai su manimi, bauginantis skelbimas praranda galią. 👌</string>
     <string name="onboardingEndDaxDialogButton">Viskas!</string>
     <string name="onboardingPrivacyProDaxDialogTitle">Oi, kol nepamiršau...</string>
-    <string name="onboardingPrivacyProDaxDialogDescription"><![CDATA[„DuckDuckGo“ taip pat turi integruotą <b>VPN</b>!<br/><br/>Aktyvuokite jį su <b>mokama „Privacy Pro“ prenumerata.</b>]]></string>
+    <string name="onboardingPrivacyProDaxDialogDescription"><![CDATA[„DuckDuckGo“ taip pat turi saugų <b>VPN + dar 2 aukščiausios kokybės apsaugas</b>, kurias galima įsigyti su <b>pasirenkama mokama prenumerata</b>.]]></string>
     <string name="onboardingPrivacyProDaxDialogOkButton">Sužinoti daugiau</string>
+    <string name="onboardingPrivacyProDaxDialogFreeTrialOkButton">Išbandyk nemokamai!</string>
     <string name="onboardingPrivacyProDaxDialogCancelButton">Praleisti</string>
 
     <!-- Highlight Onboarding Experiment-->
@@ -874,19 +901,15 @@
     <!-- Privacy Dashboard -->
     <string name="brokenSiteSubmittedReportMessage">Dėkojame! Jūsų pateikta informacija padeda tobulinti „DuckDuckGo“ visiems!</string>
 
-    <!-- DuckChat -->
-    <string name="duckChatTitle">Duck.ai</string>
-    <string name="duckChatMenuItem">Naujas DI pokalbis</string>
-
     <!--    Default Browser Bottom Sheet Dialog -->
     <string name="defaultBrowserBottomSheetDialogTitle">Leiskite „DuckDuckGo“ apsaugoti daugiau jūsų veiklos internete</string>
-    <string name="defaultBrowserBottomSheetDialogSubTitle">Nustatykite „DuckDuckGo“ kaip numatytąją naršyklę, kad visos svetainių nuorodos atsidarytų su ja.</string>
-    <string name="defaultBrowserBottomSheetDialogGhostButton">Ne dabar</string>
+    <string name="defaultBrowserBottomSheetDialogSubTitle">Pakeiskite numatytąją naršyklę, kad nuorodos atsidarytų su „DuckDuckGo“.</string>
+    <string name="defaultBrowserBottomSheetDialogGhostButton" instruction="This text appears on a button">Ne dabar</string>
 
-    <!--TabSwitcher Animation Tile Dialog-->
-    <string name="tabSwitcherAnimationTileRemovalDialogTitle">„DuckDuckGo“ blokuoja stebėjimo priemones, kad apsaugotų tavo naršymą</string>
-    <string name="tabSwitcherAnimationTileRemovalDialogBody">Išvalius tavo skirtukus ir duomenis, bus ištrinta tavo sekimo blokavimo istorija ir ši vertė bus nustatyta į nulį.\n\nPaslėpk šią reklamjuostę, jei nenori jos matyti skirtukų rodinyje.</string>
-    <string name="tabSwitcherAnimationTileRemovalDialogNegativeButton">Paslėpti reklamjuostę</string>
+    <!-- Default Browser message -->
+    <string name="newTabPageDefaultBrowserMessageHeading">„DuckDuckGo“ nėra numatytoji naršyklė. Gauk daugiau apsaugos.</string>
+    <string name="newTabPageDefaultBrowserMessagePrimaryCta" instruction="This text appears on a button">Nustatyti kaip numatytąjį</string>
+    <string name="newTabPageDefaultBrowserMessageSecondaryCta" instruction="This text appears on a button">Neklausk dar kartą</string>
 
     <!-- Threat protection -->
     <string name="maliciousSiteTitle">Įspėjimas: ši svetainė gali kelti saugumo riziką</string>
@@ -910,4 +933,63 @@
     <string name="scamBlockerTitle">Sukčiavimo blokavimo įrankis</string>
     <string name="scamBlockerDescription">Įspėti svetainėse, pažymėtose dėl sukčiavimo, apgaulingo duomenų išviliojimo ir kenkėjiškų programų.</string>
     <string name="threatProtectionLearnMoreTitle">Sužinoti daugiau</string>
+
+    <!-- Experiment: Improve prompts for "homescreen widget" -->
+    <string name="experimentHomeScreenWidgetBottomSheetDialogTitle">Išbandyk mūsų pagrindinio ekrano valdiklį!</string>
+    <string name="experimentHomeScreenWidgetBottomSheetDialogSubTitle">Pridėkite mūsų paieškos valdiklį prie pagrindinio ekrano, kad galėtumėte greitai ir lengvai jį pasiekti.</string>
+    <string name="experimentHomeScreenWidgetBottomSheetDialogPrimaryButton">Pridėti valdiklį</string>
+    <string name="experimentHomeScreenWidgetBottomSheetDialogGhostButton">Ne dabar</string>
+    <string name="experimentHomeScreenWidgetBottomSheetDialogSearchText">Ieškoti „DuckDuckGo“</string>
+
+    <!-- Change under remote feature flag: Widget as a Protection -->
+    <string name="settingsAddHomeWidgetTitle">Pagrindinio ekrano valdiklis</string>
+
+    <!-- Section in main app settings -->
+    <string name="settingsHeadingCompleteSetup">Užbaik savo sąranką</string>
+
+    <!-- Buck Onboarding Experiment -->
+    <string name="highlightsPreOnboardingDaxDialog1TitleBuck">Sveiki.</string>
+    <string name="highlightsPreOnboardingDaxDialog1DescriptionBuck">Pasiruošę greitesnei naršyklei, kuri jus apsaugo?</string>
+    <string name="highlightsPreOnboardingDaxDialog2TitleBuck"><![CDATA[<b>Apsaugos priemonės</b> <i>įjungtos!</i>]]></string>
+
+    <!-- BB Onboarding Experiment -->
+    <string name="highlightsPreOnboardingDaxDialog1TitleBb"><![CDATA[Sveiki!<br/>Pasiruošę greitesnei naršyklei, kuri jus apsaugo?]]></string>
+
+    <string name="bbOnboardingFireButtonDaxDialogTitle"><![CDATA[Akimirksniu išvalykite naršymo veiklą naudodami <font color=\"#F05C2B\">Fire Button</font>]]></string>
+    <string name="bbOnboardingFireButtonDaxDialogDescription">Išbandykite!️</string>
+
+    <plurals name="bbOnboardingTrackersBlockedDialogTitle">
+        <item quantity="one"><![CDATA[ ir %1$d bandė tave čia sekti. <font color=\"#F05C2B\">Aš juos užblokavau!</font>]]></item>
+        <item quantity="few"><![CDATA[ ir %1$d bandė tave čia sekti. <font color=\"#F05C2B\">Aš juos užblokavau!</font>]]></item>
+        <item quantity="many"><![CDATA[ ir %1$d bandė tave čia sekti. <font color=\"#F05C2B\">Aš juos užblokavau!</font>]]></item>
+        <item quantity="other"><![CDATA[ ir %1$d bandė tave čia sekti. <font color=\"#F05C2B\">Aš juos užblokavau!</font>]]></item>
+    </plurals>
+    <plurals name="bbOnboardingTrackersBlockedZeroDialogTitle" tools:ignore="ImpliedQuantity">
+        <item quantity="one"><![CDATA[ bandė tave čia sekti. <font color=\"#F05C2B\">Aš juos užblokavau!</font>]]></item>
+        <item quantity="few"><![CDATA[ bandė tave čia sekti. <font color=\"#F05C2B\">Aš juos užblokavau!</font>]]></item>
+        <item quantity="many"><![CDATA[ bandė tave čia sekti. <font color=\"#F05C2B\">Aš juos užblokavau!</font>]]></item>
+        <item quantity="other"><![CDATA[ bandė tave čia sekti. <font color=\"#F05C2B\">Aš juos užblokavau!</font>]]></item>
+    </plurals>
+
+    <string name="bbOnboardingTrackersBlockedDialogDescription">☝️Norėdami gauti daugiau informacijos, bakstelėkite skydą.️</string>
+
+    <!-- Privacy Pro Rebranding-->
+    <string name="aboutDescriptionBrandUpdate2025Rebranding">Sveiki atvykę į „Duck Side“!\n\n„DuckDuckGo“ yra nepriklausoma interneto apsaugos bendrovė, skirta visiems, norintiems susigrąžinti savo asmeninės informacijos kontrolę.\n\nManome, kad geriausias būdas apsaugoti jūsų asmeninę informaciją nuo įsilaužėlių, sukčių ir į privatumą pasikėsinančių įmonių – visiškai sustabdyti jos rinkimą. Štai kodėl milijonai žmonių <annotation type="chart_comparison">pasirenka „DuckDuckGo“, o ne „Chrome“ ir kitas naršykles</annotation> ieškoti ir naršyti internete. Mūsų integruota paieškos sistema yra kaip „Google“, bet niekada nestebi jūsų paieškų. O mūsų naršymo apsaugos priemonės, tokios kaip skelbimų sekimo ir slapukų blokavimas, padeda neleisti kitoms įmonėms rinkti jūsų duomenų. O, ir mūsų naršyklė nemokama – mes uždirbame pinigus iš <annotation type="privacy_respecting_ads">privatumo paisančių paieškos skelbimų</annotation>, o ne išnaudodami jūsų duomenis.Be to, mes taip pat siūlome <annotation type="ppro_help_page">„DuckDuckGo“ prenumeratą</annotation>, integruotą į mūsų naršyklę. Prenumeratoriai gauna dar daugiau privatumo apsaugos su greitu ir paprastu naudoti <annotation type="vpn_help_page">VPN</annotation>, kuris padeda apsaugoti naršymą internete, prieigą prie pažangių DI modelių mūsų privačioje DI pokalbių paslaugoje „Duck.ai“, paslaugą, kuri randa ir pašalina asmeninę informaciją iš žmonių paieškos svetainių, ir paslaugą, kuri atkuria tapatybę, jei ji būtų pavogta.\n\nSusigrąžinkite savo asmeninės informacijos kontrolę naudodami naršyklę, sukurtą duomenų apsaugai, o ne jų rinkimui.</string>
+    <string name="onboardingPrivacyProDaxDialogDescriptionRebranding"><![CDATA[„DuckDuckGo“ taip pat turi <b>pasirenkamą mokamą prenumeratą</b> su saugiu <b>VPN</b> ir <b>pažangiu, privačiu dirbtiniu intelektu</b>.]]></string>
+    <string name="settingsDuckAiRebranding">DI funkcijos</string>
+    <string name="settingsDuckAi">Duck.ai</string>
+
+    <!--TabSwitcher Trackers Animation-->
+    <string name="showTrackerCountInTabSwitcher">Rodyti sekiklių skaičių skirtukų perjungiklyje</string>
+    <string name="tabSwitcherAnimationTileRemovalDialogTitle" instruction="A title for a dialog that shows when a user clicks a tile that shows them their current blocked tracker count">Slėpti sekiklių skaičių?</string>
+    <string name="tabSwitcherAnimationTileRemovalDialogBody" instruction="A message for a dialog that shows when a user clicks a tile that shows them their current blocked tracker count">Šią funkciją galima vėl įjungti nustatymuose &gt; Išvaizda.</string>
+    <string name="tabSwitcherAnimationTileRemovalDialogPositiveButton">Slėpti</string>
+    <string name="tabSwitcherAnimationTileRemovalDialogNegativeButton">Laikyti</string>
+
+    <!-- Widgets -->
+    <string name="searchOnlyWidgetLabel" instruction="Label for the search-only widget">Tik paieška</string>
+    <string name="searchOnlyWidgetDescription" instruction="Description for the search-only widget">Greitai pradėkite privačią paiešką naudodami „DuckDuckGo“.</string>
+    <string name="searchWidgetDescription" instruction="Description for the search widget, which may include Duck.ai and voice search">Ieškokite privačiai naudodami „DuckDuckGo“ arba paklauskite „Duck.ai“. Jei įjungta, galima naudotis paieška balsu ir „Duck.ai“.</string>
+    <string name="searchAndFavoritesWidgetDescription" instruction="Description for the search and favorites widget">Ieškokite arba lankykitės savo mėgstamose svetainėse privačiai vienu spustelėjimu. Jei įjungta, galima naudotis paieška balsu ir „Duck.ai“.</string>
+    <string name="duckAiOnlyPinShortcutLabel" instruction="Label for the Duck.ai pinned shortcut. Should be Duck.ai in all languages">Duck.ai</string>
 </resources>

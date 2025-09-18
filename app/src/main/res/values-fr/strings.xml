@@ -126,6 +126,7 @@
     <!-- Fire -->
     <string name="fireMenu">Effacer les données</string>
     <string name="fireClearAll">Effacer tous les onglets et données</string>
+    <string name="fireClearAllPlusDuckChats">Effacer tous les onglets, données et chats Duck.ai</string>
     <string name="fireCancel">Annuler</string>
     <string name="fireDataCleared">Données effacées</string>
 
@@ -189,6 +190,28 @@
     <string name="webTrackingProtectionLearnMoreTitle">Protection contre le pistage sur le Web</string>
     <string name="webTrackingProtectionTitle">Protection contre le pistage sur le Web</string>
     <string name="webTrackingProtectionDescriptionNew"><![CDATA[DuckDuckGo bloque automatiquement les traqueurs cachés lorsque vous naviguez sur le Web.\n<a href=\"\">En savoir plus</a>]]></string>
+    <string name="webTrackingProtectionExplanationDescription"><![CDATA[Le navigateur DuckDuckGo fournit des protections contre le pistage qui sont toujours actives.\n<a href=\"\">En savoir plus</a>]]></string>
+    <string name="webTrackingProtectionExplanationTitle">Comment nous vous protégeons</string>
+    <string name="webTrackingProtectionThirdPartyTrackersTitle">Bloque les traqueurs tiers</string>
+    <string name="webTrackingProtectionThirdPartyTrackersDescription">Permet de bloquer les cookies tiers qui vous suivent d\'un site à l\'autre en empêchant dès le départ le chargement des traqueurs tiers.</string>
+    <string name="webTrackingProtectionTargetedAdsTitle">Bloque les publicités ciblées</string>
+    <string name="webTrackingProtectionTargetedAdsDescription">Bloque les traqueurs invasifs avant leur chargement, ce qui permet d\'éliminer efficacement les publicités reposant sur le pistage.</string>
+    <string name="webTrackingProtectionFingerprintTrackingTitle">Empêche le pistage par fingerprinting</string>
+    <string name="webTrackingProtectionFingerprintTrackingDescription">Permet d\'empêcher les entreprises de pistage d\'obtenir des identifiants uniques sur votre navigateur et votre appareil, qu\'elles utilisent pour vous suivre sur le Web.</string>
+    <string name="webTrackingProtectionLinkTrackingTitle">Bloque le pistage des liens</string>
+    <string name="webTrackingProtectionLinkTrackingDescription">Supprime les paramètres de pistage dans les liens pour empêcher les tiers de suivre votre comportement sur plusieurs sites.</string>
+    <string name="webTrackingProtectionReferrerTrackingTitle">Protège contre le pistage via référent</string>
+    <string name="webTrackingProtectionReferrerTrackingDescription">Permet d\'empêcher les entreprises d\'identifier le dernier site Web que vous avez visité.</string>
+    <string name="webTrackingProtectionFirstPartyCookiesTitle">Fait expirer les cookies propriétaires</string>
+    <string name="webTrackingProtectionFirstPartyCookiesDescription">Permet l\'expiration automatique des cookies propriétaires après 30 jours afin que les sites ne puissent pas vous suivre indéfiniment lorsque vous êtes déconnecté(e).</string>
+    <string name="webTrackingProtectionDnsCnameCloakingTitle">Protège contre le DNS CNAME cloaking</string>
+    <string name="webTrackingProtectionDnsCnameCloakingDescription">Permet de bloquer les traqueurs tiers qui tentent de se dissimuler sur un site Web à l\'aide du DNS.</string>
+    <string name="webTrackingProtectionGoogleAmpTrackingTitle">Bloque le pistage AMP de Google</string>
+    <string name="webTrackingProtectionGoogleAmpTrackingDescription">Remplace les liens Google AMP par le site de l\'éditeur d\'origine.</string>
+    <string name="webTrackingProtectionGoogleSigninPopupsTitle">Bloque les fenêtres contextuelles de connexion de Google</string>
+    <string name="webTrackingProtectionGoogleSigninPopupsDescription">Bloque les fenêtres contextuelles de connexion à Google sur les sites qui ne lui appartiennent pas.</string>
+    <string name="webTrackingProtectionGlobalPrivacyControlTitle">Global Privacy Control</string>
+    <string name="webTrackingProtectionGlobalPrivacyControlDescription">Formule des droits de retrait en votre nom en indiquant aux sites de ne pas vendre ou partager vos informations personnelles.</string>
 
     <!-- Cookie Pop-Up Protection -->
     <string name="cookiePopupProtectionTitle">Protection contre les fenêtres contextuelles des cookies</string>
@@ -202,6 +225,7 @@
 
     <!-- Appearance -->
     <string name="appearanceActivityTitle">Apparence</string>
+    <string name="settingsShowFullUrlTitle">Afficher l\'adresse complète du site</string>
 
     <!-- Settings - Automatically clearing data -->
     <string name="settingsAutomaticallyClearingDialogSave">Enregistrer</string>
@@ -211,6 +235,7 @@
     <string name="settingsAutomaticallyClearWhatOptionNone">Aucune</string>
     <string name="settingsAutomaticallyClearWhatOptionTabs">Onglets</string>
     <string name="settingsAutomaticallyClearWhatOptionTabsAndData">Onglets et données</string>
+    <string name="settingsAutomaticallyClearWhatOptionTabsAndDataAndChats">Onglets, données et chats Duck.ai</string>
 
     <string name="settingsAutomaticallyClearWhen">Effacer le…</string>
     <string name="settingsAutomaticallyClearWhenDialogTitle">Effacer le…</string>
@@ -220,6 +245,8 @@
     <string name="settingsAutomaticallyClearWhenAppExit15Minutes">Quitter l\'application, inactivité pendant 15 minutes</string>
     <string name="settingsAutomaticallyClearWhenAppExit30Minutes">Quitter l\'application, inactivité pendant 30 minutes</string>
     <string name="settingsAutomaticallyClearWhenAppExit60Minutes">Quitter l\'application, inactivité pendant 1 heure</string>
+    <string name="settingsClearAiDataTitle">Effacer les chats Duck.ai</string>
+    <string name="settingsClearAiDataMessage">Le Fire Button supprimera également l\'historique de Duck.ai</string>
 
     <!-- About Activity -->
     <string name="aboutActivityTitle">À propos de DuckDuckGo</string>
@@ -248,8 +275,8 @@
     <string name="searchWidgetEmtpyFavoritesHint">Aucun favori ajouté pour le moment</string>
     <string name="searchWidgetEmtpyFavoritesCta">Ajouter un favori</string>
     <string name="widgetConfigurationActivityTitle">Configuration des widgets</string>
-    <string name="favoritesWidgetLabel">Favoris</string>
-    <string name="searchWidgetLabel">Rechercher</string>
+    <string name="favoritesWidgetLabel">Recherche et favoris</string>
+    <string name="searchWidgetLabel">Recherche et Duck.ai</string>
 
     <!-- Home Screen Shortcuts -->
     <string name="addToHome">Ajouter à la page d\'accueil</string>
@@ -404,7 +431,6 @@
     <string name="crashedWebViewErrorAction">"Recharger"</string>
 
     <!-- System Search-->
-    <string name="systemSearchDeviceAppLabel">Depuis cet appareil</string>
     <string name="systemSearchAppNotFound">Impossible de trouver l\'application</string>
     <string name="systemSearchOnboardingThanks">Merci d\'avoir choisi DuckDuckGo !\nL\'utilisation de notre navigateur vous permet de vous protéger contre les pirates, les escrocs et les entreprises avides de données.</string>
     <string name="systemSearchOnboardingFeaturesIntroText">L\'application DuckDuckGo offre également les fonctionnalités suivantes :</string>
@@ -757,7 +783,7 @@
     <string name="preOnboardingComparisonChartItem1">Faire une recherche privée par défaut</string>
     <string name="preOnboardingComparisonChartItem2">Bloquer les traqueurs tiers</string>
     <string name="preOnboardingComparisonChartItem3">Bloquez les fenêtres contextuelles de cookies</string>
-    <string name="preOnboardingComparisonChartItem4">Bloquez les publicités qui pistent</string>
+    <string name="preOnboardingComparisonChartItem4">Bloquez les publicités ciblées</string>
     <string name="preOnboardingComparisonChartItem5">Supprimez les données de navigation d\'un seul clic</string>
     <string name="preOnboardingDaxDialog3Title">Génial ! Bienvenue chez DuckDuckGo.</string>
     <string name="preOnboardingDaxDialog3Button">Commencer la navigation</string>
@@ -796,8 +822,9 @@
     <string name="onboardingEndDaxDialogDescription">Pensez-y : chaque fois que vous naviguez avec moi, une publicité douteuse disparaît. 👌</string>
     <string name="onboardingEndDaxDialogButton">C\'est fait !</string>
     <string name="onboardingPrivacyProDaxDialogTitle">Oh, avant que j\'oublie…</string>
-    <string name="onboardingPrivacyProDaxDialogDescription"><![CDATA[DuckDuckGo dispose également d\'un <b>VPN</b> intégré !<br/><br/>Activez-le grâce à un <b>abonnement Privacy Pro payant</b>.]]></string>
+    <string name="onboardingPrivacyProDaxDialogDescription"><![CDATA[DuckDuckGo propose également un <b>VPN sécurisé + 2 protections supplémentaires premium</b>, disponible avec un <b>abonnement payant facultatif</b>.]]></string>
     <string name="onboardingPrivacyProDaxDialogOkButton">En savoir plus</string>
+    <string name="onboardingPrivacyProDaxDialogFreeTrialOkButton">Essayez gratuitement !</string>
     <string name="onboardingPrivacyProDaxDialogCancelButton">Ignorer</string>
 
     <!-- Highlight Onboarding Experiment-->
@@ -842,19 +869,15 @@
     <!-- Privacy Dashboard -->
     <string name="brokenSiteSubmittedReportMessage">Merci ! Votre signalement contribue à améliorer DuckDuckGo pour tous.</string>
 
-    <!-- DuckChat -->
-    <string name="duckChatTitle">Duck.ai</string>
-    <string name="duckChatMenuItem">Nouvel AI Chat</string>
-
     <!--    Default Browser Bottom Sheet Dialog -->
     <string name="defaultBrowserBottomSheetDialogTitle">Laissez DuckDuckGo protéger davantage ce que vous faites en ligne</string>
-    <string name="defaultBrowserBottomSheetDialogSubTitle">Choisissez-nous comme navigateur par défaut afin que tous les liens de site s\'ouvrent dans DuckDuckGo.</string>
-    <string name="defaultBrowserBottomSheetDialogGhostButton">Pas maintenant</string>
+    <string name="defaultBrowserBottomSheetDialogSubTitle">Définissez votre navigateur par défaut pour que les liens s’ouvrent dans DuckDuckGo.</string>
+    <string name="defaultBrowserBottomSheetDialogGhostButton" instruction="This text appears on a button">Pas maintenant</string>
 
-    <!--TabSwitcher Animation Tile Dialog-->
-    <string name="tabSwitcherAnimationTileRemovalDialogTitle">DuckDuckGo bloque les traqueurs pour protéger votre navigation</string>
-    <string name="tabSwitcherAnimationTileRemovalDialogBody">En effaçant vos onglets et vos données, vous supprimerez votre historique de blocage des traqueurs et remettrez ce nombre à zéro.\n\nMasquez cette bannière si vous préférez ne pas la voir dans la vue des onglets.</string>
-    <string name="tabSwitcherAnimationTileRemovalDialogNegativeButton">Masquer la bannière</string>
+    <!-- Default Browser message -->
+    <string name="newTabPageDefaultBrowserMessageHeading">DuckDuckGo n\'est pas votre navigateur par défaut. Obtenir plus de protection.</string>
+    <string name="newTabPageDefaultBrowserMessagePrimaryCta" instruction="This text appears on a button">Définir par défaut</string>
+    <string name="newTabPageDefaultBrowserMessageSecondaryCta" instruction="This text appears on a button">Ne plus demander</string>
 
     <!-- Threat protection -->
     <string name="maliciousSiteTitle">Avertissement : ce site peut présenter un risque pour la sécurité</string>
@@ -878,4 +901,59 @@
     <string name="scamBlockerTitle">Bloqueur d\'escroqueries</string>
     <string name="scamBlockerDescription">M’avertir sur les sites signalés pour des escroqueries, de l’hameçonnage et des logiciels malveillants.</string>
     <string name="threatProtectionLearnMoreTitle">En savoir plus</string>
+
+    <!-- Experiment: Improve prompts for "homescreen widget" -->
+    <string name="experimentHomeScreenWidgetBottomSheetDialogTitle">Essayez notre widget d\'écran d\'accueil !</string>
+    <string name="experimentHomeScreenWidgetBottomSheetDialogSubTitle">Ajoutez notre widget de recherche à votre écran d\'accueil pour un accès rapide et facile.</string>
+    <string name="experimentHomeScreenWidgetBottomSheetDialogPrimaryButton">Ajouter un widget</string>
+    <string name="experimentHomeScreenWidgetBottomSheetDialogGhostButton">Pas maintenant</string>
+    <string name="experimentHomeScreenWidgetBottomSheetDialogSearchText">Rechercher avec DuckDuckGo</string>
+
+    <!-- Change under remote feature flag: Widget as a Protection -->
+    <string name="settingsAddHomeWidgetTitle">Widget écran d\'accueil</string>
+
+    <!-- Section in main app settings -->
+    <string name="settingsHeadingCompleteSetup">Terminez votre configuration</string>
+
+    <!-- Buck Onboarding Experiment -->
+    <string name="highlightsPreOnboardingDaxDialog1TitleBuck">Bonjour.</string>
+    <string name="highlightsPreOnboardingDaxDialog1DescriptionBuck">Envie de profiter d\'un navigateur plus rapide qui vous protège ?</string>
+    <string name="highlightsPreOnboardingDaxDialog2TitleBuck"><![CDATA[<b>Protections</b> <i>activées !</i>]]></string>
+
+    <!-- BB Onboarding Experiment -->
+    <string name="highlightsPreOnboardingDaxDialog1TitleBb"><![CDATA[Bonjour.<br/>Envie de profiter d\'un navigateur plus rapide qui vous protège ?]]></string>
+
+    <string name="bbOnboardingFireButtonDaxDialogTitle"><![CDATA[Effacez instantanément votre activité de navigation avec le <font color=\"#F05C2B\">Fire Button</font>]]></string>
+    <string name="bbOnboardingFireButtonDaxDialogDescription">Essayez par vous-même !️</string>
+
+    <plurals name="bbOnboardingTrackersBlockedDialogTitle">
+        <item quantity="one"><![CDATA[ et %1$d autre essayaient de vous suivre ici. <font color=\"#F05C2B\">Je les ai bloqués !</font>]]></item>
+        <item quantity="other"><![CDATA[ et %1$d autres essayaient de vous suivre ici. <font color=\"#F05C2B\">Je les ai bloqués !</font>]]></item>
+    </plurals>
+    <plurals name="bbOnboardingTrackersBlockedZeroDialogTitle" tools:ignore="ImpliedQuantity">
+        <item quantity="one"><![CDATA[ essayait de vous suivre ici. <font color=\"#F05C2B\">Je l\'ai bloqué !</font>]]></item>
+        <item quantity="other"><![CDATA[ essayaient de vous suivre ici. <font color=\"#F05C2B\">Je les ai bloqués !</font>]]></item>
+    </plurals>
+
+    <string name="bbOnboardingTrackersBlockedDialogDescription">☝️Appuyez sur le bouclier pour en savoir plus.️</string>
+
+    <!-- Privacy Pro Rebranding-->
+    <string name="aboutDescriptionBrandUpdate2025Rebranding">Welcome to the Duck Side !\n\nDuckDuckGo est l\'entreprise indépendante de protection en ligne pour tous ceux qui veulent reprendre le contrôle de leurs informations personnelles.\n\nNous croyons que la meilleure façon de protéger vos informations personnelles contre les pirates, les escrocs et les entreprises qui portent atteinte à la vie privée est d\'empêcher purement et simplement leur collecte. C\'est pour cette raison que des millions de personnes <annotation type="chart_comparison">choisissent DuckDuckGo plutôt que Chrome ou d\'autres navigateurs</annotation> pour effectuer leurs recherches et naviguer en ligne. Notre moteur de recherche intégré est similaire à Google, sauf qu\'il ne suit jamais vos recherches. Et nos protections de navigation, telles que le blocage des traqueurs publicitaires et le blocage des cookies, permettent d\'empêcher que d\'autres entreprises ne recueillent vos données. Et surtout, notre navigateur est gratuit : nous gagnons de l\'argent grâce aux <annotation type="privacy_respecting_ads">publicités de recherche respectueuses de la confidentialité</annotation> et non grâce à l\'exploitation de vos données.\n\nDe plus, nous proposons un <annotation type="ppro_help_page">abonnement DuckDuckGo</annotation> intégré à notre navigateur. Les abonnés bénéficient d\'une protection de la confidentialité encore plus poussée grâce à un <annotation type="vpn_help_page">VPN</annotation> rapide et simple qui permet de sécuriser votre activité en ligne, d\'accéder à des modèles d\'IA avancés sur notre service de chat privé Duck.ai, un service qui trouve et supprime vos informations personnelles des sites de recherche de personnes, et un service qui rétablit votre identité en cas de vol.\n\nReprenez le contrôle de vos informations personnelles avec le navigateur conçu pour la protection des données, pas pour leur collecte.</string>
+    <string name="onboardingPrivacyProDaxDialogDescriptionRebranding"><![CDATA[DuckDuckGo propose également un <b>abonnement payant en option</b>, avec un <b>VPN</b> sécurisé et une <b>IA privée et évoluée</b>.]]></string>
+    <string name="settingsDuckAiRebranding">Fonctionnalités de l\'IA</string>
+    <string name="settingsDuckAi">Duck.ai</string>
+
+    <!--TabSwitcher Trackers Animation-->
+    <string name="showTrackerCountInTabSwitcher">Afficher le nombre de traqueurs dans l\'outil de changement d\'onglet</string>
+    <string name="tabSwitcherAnimationTileRemovalDialogTitle" instruction="A title for a dialog that shows when a user clicks a tile that shows them their current blocked tracker count">Masquer le nombre de traqueurs ?</string>
+    <string name="tabSwitcherAnimationTileRemovalDialogBody" instruction="A message for a dialog that shows when a user clicks a tile that shows them their current blocked tracker count">Vous pouvez réactiver cette option dans Paramètres &gt; Apparence.</string>
+    <string name="tabSwitcherAnimationTileRemovalDialogPositiveButton">Masquer</string>
+    <string name="tabSwitcherAnimationTileRemovalDialogNegativeButton">Conserver</string>
+
+    <!-- Widgets -->
+    <string name="searchOnlyWidgetLabel" instruction="Label for the search-only widget">Recherche uniquement</string>
+    <string name="searchOnlyWidgetDescription" instruction="Description for the search-only widget">Lancez rapidement une recherche privée avec DuckDuckGo.</string>
+    <string name="searchWidgetDescription" instruction="Description for the search widget, which may include Duck.ai and voice search">Faites une recherche privée avec DuckDuckGo ou demandez à Duck.ai. La recherche vocale et Duck.ai sont disponibles si activés.</string>
+    <string name="searchAndFavoritesWidgetDescription" instruction="Description for the search and favorites widget">Faites une recherche ou visitez vos sites favoris en privé en un seul clic. La recherche vocale et Duck.ai sont disponibles si activés.</string>
+    <string name="duckAiOnlyPinShortcutLabel" instruction="Label for the Duck.ai pinned shortcut. Should be Duck.ai in all languages">Duck.ai</string>
 </resources>

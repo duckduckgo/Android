@@ -20,8 +20,8 @@ import android.os.Bundle
 import androidx.recyclerview.widget.DiffUtil
 import com.duckduckgo.app.tabs.ui.TabSwitcherItem
 import com.duckduckgo.app.tabs.ui.TabSwitcherItem.Tab.SelectableTab
-import com.duckduckgo.app.tabs.ui.TabSwitcherItem.TrackerAnimationInfoPanel.Companion.ANIMATED_TILE_DEFAULT_ALPHA
-import com.duckduckgo.app.tabs.ui.TabSwitcherItem.TrackerAnimationInfoPanel.Companion.ANIMATED_TILE_NO_REPLACE_ALPHA
+import com.duckduckgo.app.tabs.ui.TabSwitcherItem.TrackersAnimationInfoPanel.Companion.ANIMATED_TILE_DEFAULT_ALPHA
+import com.duckduckgo.app.tabs.ui.TabSwitcherItem.TrackersAnimationInfoPanel.Companion.ANIMATED_TILE_NO_REPLACE_ALPHA
 
 class TabSwitcherItemDiffCallback(
     old: List<TabSwitcherItem>,
@@ -84,7 +84,7 @@ class TabSwitcherItemDiffCallback(
                     diffBundle.putString(DIFF_KEY_SELECTION, null)
                 }
             }
-            oldItem is TabSwitcherItem.TrackerAnimationInfoPanel && newItem is TabSwitcherItem.TrackerAnimationInfoPanel -> {
+            oldItem is TabSwitcherItem.TrackersAnimationInfoPanel && newItem is TabSwitcherItem.TrackersAnimationInfoPanel -> {
                 diffBundle.putFloat(
                     DIFF_ALPHA,
                     if (isDragging) ANIMATED_TILE_NO_REPLACE_ALPHA else ANIMATED_TILE_DEFAULT_ALPHA,

@@ -18,13 +18,12 @@ package com.duckduckgo.app.browser.omnibar.animations
 
 import com.airbnb.lottie.LottieAnimationView
 import com.duckduckgo.app.browser.R
-import com.duckduckgo.app.browser.senseofprotection.SenseOfProtectionExperiment
+import com.duckduckgo.app.browser.omnibar.Omnibar
 import com.duckduckgo.app.global.model.PrivacyShield
 import com.duckduckgo.app.global.model.PrivacyShield.MALICIOUS
 import com.duckduckgo.app.global.model.PrivacyShield.PROTECTED
 import com.duckduckgo.app.global.model.PrivacyShield.UNKNOWN
 import com.duckduckgo.app.global.model.PrivacyShield.UNPROTECTED
-import com.duckduckgo.common.ui.experiments.visual.store.VisualDesignExperimentDataStore
 import com.duckduckgo.common.ui.store.AppTheme
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
@@ -36,34 +35,24 @@ import logcat.logcat
 @SingleInstanceIn(AppScope::class)
 class LottiePrivacyShieldAnimationHelper @Inject constructor(
     private val appTheme: AppTheme,
-    private val senseOfProtectionExperiment: SenseOfProtectionExperiment,
-    private val visualDesignExperimentDataStore: VisualDesignExperimentDataStore,
 ) : PrivacyShieldAnimationHelper {
 
     override fun setAnimationView(
         holder: LottieAnimationView,
         privacyShield: PrivacyShield,
+        viewMode: Omnibar.ViewMode,
     ) {
         val protectedShield: Int
         val protectedShieldDark: Int
-        val unprotectedShield: Int
-        val unprotectedShieldDark: Int
-        if (senseOfProtectionExperiment.shouldShowNewPrivacyShield()) {
-            protectedShield = R.raw.protected_shield_experiment
-            protectedShieldDark = R.raw.protected_shield_experiment
-            unprotectedShield = R.raw.unprotected_shield_experiment
-            unprotectedShieldDark = R.raw.unprotected_shield_experiment_dark
-        } else if (visualDesignExperimentDataStore.isExperimentEnabled.value) {
-            protectedShield = R.raw.protected_shield_visual_updates
-            protectedShieldDark = R.raw.dark_protected_shield_visual_updates
-            unprotectedShield = R.raw.unprotected_shield_visual_updates
-            unprotectedShieldDark = R.raw.dark_unprotected_shield_visual_updates
+        if (viewMode is Omnibar.ViewMode.CustomTab) {
+            protectedShield = R.raw.protected_shield_custom_tab
+            protectedShieldDark = R.raw.dark_protected_shield_custom_tab
         } else {
             protectedShield = R.raw.protected_shield
             protectedShieldDark = R.raw.dark_protected_shield
-            unprotectedShield = R.raw.unprotected_shield
-            unprotectedShieldDark = R.raw.dark_unprotected_shield
         }
+        val unprotectedShield: Int = R.raw.unprotected_shield
+        val unprotectedShieldDark: Int = R.raw.dark_unprotected_shield
 
         val currentAnimation = holder.tag as? Int
         val newAnimation = when (privacyShield) {

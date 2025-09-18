@@ -25,12 +25,13 @@ import android.content.res.Configuration
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
-import android.view.View
 import android.widget.RemoteViews
 import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.global.DuckDuckGoApplication
+import com.duckduckgo.app.pixels.AppPixelName.SEARCH_AND_FAVORITES_WIDGET_ADDED
+import com.duckduckgo.app.pixels.AppPixelName.SEARCH_AND_FAVORITES_WIDGET_DELETED
 import com.duckduckgo.app.systemsearch.SystemSearchActivity
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.utils.DispatcherProvider
@@ -65,7 +66,7 @@ class SearchAndFavoritesWidget : AppWidgetProvider() {
     lateinit var gridCalculator: SearchAndFavoritesGridCalculator
 
     @Inject
-    lateinit var voiceSearchWidgetConfigurator: VoiceSearchWidgetConfigurator
+    lateinit var searchWidgetConfigurator: SearchWidgetConfigurator
 
     @Inject
     lateinit var appBuildConfig: AppBuildConfig
@@ -77,6 +78,9 @@ class SearchAndFavoritesWidget : AppWidgetProvider() {
     @Inject
     lateinit var dispatchers: DispatcherProvider
 
+    @Inject
+    lateinit var searchWidgetLifecycleDelegate: SearchWidgetLifecycleDelegate
+
     private var layoutId: Int = R.layout.search_favorites_widget_daynight_auto
 
     override fun onReceive(
@@ -87,13 +91,20 @@ class SearchAndFavoritesWidget : AppWidgetProvider() {
         super.onReceive(context, intent)
     }
 
+    override fun onEnabled(context: Context) {
+        super.onEnabled(context)
+        appCoroutineScope.launch {
+            searchWidgetLifecycleDelegate.handleOnWidgetEnabled(SEARCH_AND_FAVORITES_WIDGET_ADDED)
+        }
+    }
+
     override fun onUpdate(
         context: Context,
         appWidgetManager: AppWidgetManager,
         appWidgetIds: IntArray,
     ) {
         logcat(INFO) { "SearchAndFavoritesWidget - onUpdate" }
-        appCoroutineScope.launch(dispatchers.io()) {
+        appCoroutineScope.launch {
             appWidgetIds.forEach { id ->
                 updateWidget(context, appWidgetManager, id, null)
             }
@@ -108,7 +119,7 @@ class SearchAndFavoritesWidget : AppWidgetProvider() {
         newOptions: Bundle,
     ) {
         logcat(INFO) { "SearchAndFavoritesWidget - onAppWidgetOptionsChanged" }
-        appCoroutineScope.launch(dispatchers.io()) {
+        appCoroutineScope.launch {
             updateWidget(context, appWidgetManager, appWidgetId, newOptions)
         }
         super.onAppWidgetOptionsChanged(context, appWidgetManager, appWidgetId, newOptions)
@@ -124,6 +135,11 @@ class SearchAndFavoritesWidget : AppWidgetProvider() {
             }
         }
         super.onDeleted(context, appWidgetIds)
+    }
+
+    override fun onDisabled(context: Context?) {
+        super.onDisabled(context)
+        searchWidgetLifecycleDelegate.handleOnWidgetDisabled(SEARCH_AND_FAVORITES_WIDGET_DELETED)
     }
 
     private suspend fun updateWidget(
@@ -147,13 +163,16 @@ class SearchAndFavoritesWidget : AppWidgetProvider() {
         withContext(dispatchers.main()) {
             val remoteViews = RemoteViews(context.packageName, layoutId)
 
-            remoteViews.setViewVisibility(R.id.searchInputBox, if (columns == 2) View.INVISIBLE else View.VISIBLE)
             remoteViews.setOnClickPendingIntent(R.id.widgetSearchBarContainer, buildPendingIntent(context))
 
-            voiceSearchWidgetConfigurator.configureVoiceSearch(context, remoteViews, true)
+            searchWidgetConfigurator.populateRemoteViews(
+                context = context,
+                remoteViews = remoteViews,
+                fromFavWidget = true,
+            )
             configureFavoritesGridView(context, appWidgetId, remoteViews, widgetTheme)
             configureEmptyWidgetCta(context, appWidgetId, remoteViews, widgetTheme)
-// TODO: can this be moved to io?
+
             appWidgetManager.updateAppWidget(appWidgetId, remoteViews)
             appWidgetManager.notifyAppWidgetViewDataChanged(appWidgetId, R.id.favoritesGrid)
             appWidgetManager.notifyAppWidgetViewDataChanged(appWidgetId, R.id.emptyfavoritesGrid)
@@ -275,11 +294,20 @@ class SearchAndFavoritesWidget : AppWidgetProvider() {
 
     private fun buildPendingIntent(context: Context): PendingIntent {
         val intent = SystemSearchActivity.fromFavWidget(context)
-        return PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
+        return PendingIntent.getActivity(
+            context,
+            SEARCH_AND_FAVORITES_WIDGET_REQUEST_CODE,
+            intent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
+        )
     }
 
     private fun inject(context: Context) {
         val application = context.applicationContext as DuckDuckGoApplication
         application.daggerAppComponent.inject(this)
+    }
+
+    companion object {
+        private const val SEARCH_AND_FAVORITES_WIDGET_REQUEST_CODE = 1540
     }
 }

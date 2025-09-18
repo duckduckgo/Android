@@ -24,7 +24,7 @@ import androidx.core.view.updateLayoutParams
 import androidx.recyclerview.widget.RecyclerView
 import com.duckduckgo.common.ui.view.toPx
 
-class SuggestionItemDecoration(private val divider: Drawable, private val addExtraDividerPadding: Boolean = true) : RecyclerView.ItemDecoration() {
+class SuggestionItemDecoration(private val divider: Drawable) : RecyclerView.ItemDecoration() {
 
     override fun onDrawOver(
         canvas: Canvas,
@@ -44,17 +44,31 @@ class SuggestionItemDecoration(private val divider: Drawable, private val addExt
                 val nextViewType = nextView.tag
                 val nextViewParams = nextView.layoutParams as MarginLayoutParams
 
-                if (currentViewType == SEARCH_ITEM && nextViewType == OTHER_ITEM || currentViewType == OTHER_ITEM && nextViewType == SEARCH_ITEM) {
-                    if (addExtraDividerPadding) {
-                        currentView.updateLayoutParams {
-                            currentParams.apply {
-                                bottomMargin = DIVIDER_PADDING_DP.toPx()
-                            }
+                currentView.updateLayoutParams {
+                    currentParams.apply {
+                        if (i == 0) {
+                            topMargin = 0
                         }
-                        nextView.updateLayoutParams {
-                            nextViewParams.apply {
-                                topMargin = DIVIDER_PADDING_DP.toPx()
-                            }
+                        bottomMargin = 0
+                    }
+                }
+                nextView.updateLayoutParams {
+                    nextViewParams.apply {
+                        topMargin = 0
+                        if (i == childCount - 1) {
+                            bottomMargin = 0
+                        }
+                    }
+                }
+                if (currentViewType == SEARCH_ITEM && nextViewType == OTHER_ITEM || currentViewType == OTHER_ITEM && nextViewType == SEARCH_ITEM) {
+                    currentView.updateLayoutParams {
+                        currentParams.apply {
+                            bottomMargin = DIVIDER_PADDING_DP.toPx()
+                        }
+                    }
+                    nextView.updateLayoutParams {
+                        nextViewParams.apply {
+                            topMargin = DIVIDER_PADDING_DP.toPx()
                         }
                     }
                     drawDivider(this, currentView, currentParams, parentRight)

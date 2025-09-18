@@ -19,30 +19,27 @@ package com.duckduckgo.app.onboarding.ui.page
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
-import androidx.annotation.DrawableRes
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
-import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition
 import com.duckduckgo.app.global.DefaultRoleBrowserDialog
 import com.duckduckgo.app.global.install.AppInstallStore
-import com.duckduckgo.app.onboarding.ui.page.WelcomePage.Companion.PreOnboardingDialogType
-import com.duckduckgo.app.onboarding.ui.page.WelcomePage.Companion.PreOnboardingDialogType.ADDRESS_BAR_POSITION
-import com.duckduckgo.app.onboarding.ui.page.WelcomePage.Companion.PreOnboardingDialogType.COMPARISON_CHART
-import com.duckduckgo.app.onboarding.ui.page.WelcomePage.Companion.PreOnboardingDialogType.INITIAL
-import com.duckduckgo.app.onboarding.ui.page.WelcomePage.Companion.PreOnboardingDialogType.INITIAL_REINSTALL_USER
-import com.duckduckgo.app.onboarding.ui.page.WelcomePage.Companion.PreOnboardingDialogType.SKIP_ONBOARDING_OPTION
+import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.ADDRESS_BAR_POSITION
+import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.COMPARISON_CHART
+import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.INITIAL
+import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.INITIAL_REINSTALL_USER
+import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.SKIP_ONBOARDING_OPTION
 import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.Finish
 import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.OnboardingSkipped
 import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.SetAddressBarPositionOptions
-import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.SetBackgroundResource
 import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.ShowAddressBarPositionDialog
 import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.ShowComparisonChart
 import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.ShowDefaultBrowserDialog
 import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.ShowInitialDialog
 import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.ShowInitialReinstallUserDialog
 import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.ShowSkipOnboardingOption
+import com.duckduckgo.app.onboardingdesignexperiment.OnboardingDesignExperimentManager
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.pixels.AppPixelName.NOTIFICATION_RUNTIME_PERMISSION_SHOWN
 import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_ADDRESS_BAR_POSITION_SHOWN_UNIQUE
@@ -80,6 +77,7 @@ class WelcomePageViewModel @Inject constructor(
     private val settingsDataStore: SettingsDataStore,
     private val dispatchers: DispatcherProvider,
     private val appBuildConfig: AppBuildConfig,
+    private val onboardingDesignExperimentManager: OnboardingDesignExperimentManager,
 ) : ViewModel() {
 
     private val _commands = Channel<Command>(1, DROP_OLDEST)
@@ -96,7 +94,6 @@ class WelcomePageViewModel @Inject constructor(
         data object ShowAddressBarPositionDialog : Command
         data object Finish : Command
         data object OnboardingSkipped : Command
-        data class SetBackgroundResource(@DrawableRes val backgroundRes: Int) : Command
         data class SetAddressBarPositionOptions(val defaultOption: Boolean) : Command
     }
 
@@ -134,6 +131,7 @@ class WelcomePageViewModel @Inject constructor(
                         PREONBOARDING_CHOOSE_BROWSER_PRESSED,
                         mapOf(PixelParameter.DEFAULT_BROWSER to isDDGDefaultBrowser.toString()),
                     )
+                    onboardingDesignExperimentManager.fireChooseBrowserPixel()
                 }
             }
 
@@ -150,6 +148,11 @@ class WelcomePageViewModel @Inject constructor(
                     pixel.fire(PREONBOARDING_BOTTOM_ADDRESS_BAR_SELECTED_UNIQUE)
                 }
                 viewModelScope.launch {
+                    if (!defaultAddressBarPosition) {
+                        onboardingDesignExperimentManager.fireAddressBarSetBottomPixel()
+                    } else {
+                        onboardingDesignExperimentManager.fireAddressBarSetTopPixel()
+                    }
                     _commands.send(Finish)
                 }
             }
@@ -192,6 +195,7 @@ class WelcomePageViewModel @Inject constructor(
         pixel.fire(AppPixelName.DEFAULT_BROWSER_SET, mapOf(PixelParameter.DEFAULT_BROWSER_SET_FROM_ONBOARDING to true.toString()))
 
         viewModelScope.launch {
+            onboardingDesignExperimentManager.fireSetDefaultRatePixel()
             _commands.send(ShowAddressBarPositionDialog)
         }
     }
@@ -219,22 +223,28 @@ class WelcomePageViewModel @Inject constructor(
 
     fun onDialogShown(onboardingDialogType: PreOnboardingDialogType) {
         when (onboardingDialogType) {
-            INITIAL_REINSTALL_USER -> pixel.fire(PREONBOARDING_INTRO_REINSTALL_USER_SHOWN_UNIQUE, type = Unique())
-            INITIAL -> pixel.fire(PREONBOARDING_INTRO_SHOWN_UNIQUE, type = Unique())
-            COMPARISON_CHART -> pixel.fire(PREONBOARDING_COMPARISON_CHART_SHOWN_UNIQUE, type = Unique())
+            INITIAL_REINSTALL_USER -> {
+                pixel.fire(PREONBOARDING_INTRO_REINSTALL_USER_SHOWN_UNIQUE, type = Unique())
+            }
+            INITIAL -> {
+                pixel.fire(PREONBOARDING_INTRO_SHOWN_UNIQUE, type = Unique())
+                viewModelScope.launch {
+                    onboardingDesignExperimentManager.fireIntroScreenDisplayedPixel()
+                }
+            }
+            COMPARISON_CHART -> {
+                pixel.fire(PREONBOARDING_COMPARISON_CHART_SHOWN_UNIQUE, type = Unique())
+                viewModelScope.launch {
+                    onboardingDesignExperimentManager.fireComparisonScreenDisplayedPixel()
+                }
+            }
             SKIP_ONBOARDING_OPTION -> pixel.fire(PREONBOARDING_SKIP_ONBOARDING_SHOWN_UNIQUE, type = Unique())
-            ADDRESS_BAR_POSITION -> pixel.fire(PREONBOARDING_ADDRESS_BAR_POSITION_SHOWN_UNIQUE, type = Unique())
-        }
-    }
-
-    fun setBackgroundResource(lightModeEnabled: Boolean) {
-        val backgroundRes = if (lightModeEnabled) {
-            R.drawable.onboarding_background_bitmap_light
-        } else {
-            R.drawable.onboarding_background_bitmap_dark
-        }
-        viewModelScope.launch {
-            _commands.send(SetBackgroundResource(backgroundRes))
+            ADDRESS_BAR_POSITION -> {
+                pixel.fire(PREONBOARDING_ADDRESS_BAR_POSITION_SHOWN_UNIQUE, type = Unique())
+                viewModelScope.launch {
+                    onboardingDesignExperimentManager.fireSetAddressBarDisplayedPixel()
+                }
+            }
         }
     }
 

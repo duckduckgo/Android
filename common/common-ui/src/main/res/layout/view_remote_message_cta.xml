@@ -14,105 +14,139 @@
   ~ limitations under the License.
   -->
 
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<com.google.android.material.card.MaterialCardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    style="@style/Widget.DuckDuckGo.MessageCta">
+    android:id="@+id/remoteMessage"
+    style="@style/Widget.DuckDuckGo.MessageCta"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:clipChildren="false"
+    tools:visibility="visible"
+    android:visibility="gone">
 
-    <ImageView
-        android:id="@+id/close"
-        android:layout_width="@dimen/messageCtaCloseButtonSize"
-        android:layout_height="@dimen/messageCtaCloseButtonSize"
-        android:background="?selectableItemBackground"
-        android:padding="@dimen/keyline_2"
-        android:src="@drawable/ic_close_24"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <ImageView
-        android:id="@+id/topIllustration"
-        android:layout_width="@dimen/messageCtaIllustrationSize"
-        android:layout_height="@dimen/messageCtaIllustrationSize"
-        android:layout_marginTop="@dimen/keyline_2"
-        android:scaleType="center"
-        android:visibility="visible"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <com.duckduckgo.common.ui.view.text.DaxTextView
-        android:id="@+id/messageTitle"
-        android:layout_width="0dp"
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginStart="40dp"
-        android:layout_marginTop="@dimen/keyline_2"
-        android:layout_marginEnd="40dp"
-        android:gravity="center"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/topIllustration"
-        app:layout_goneMarginTop="@dimen/keyline_4"
-        app:typography="h3"
-        tools:text="Placeholder Title" />
+        android:paddingBottom="@dimen/keyline_4">
 
-    <com.duckduckgo.common.ui.view.text.DaxTextView
-        android:id="@+id/messageSubtitle"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/keyline_4"
-        android:layout_marginTop="@dimen/keyline_1"
-        android:layout_marginEnd="@dimen/keyline_4"
-        android:gravity="center"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/messageTitle"
-        app:typography="body2"
-        tools:text="Body text goes here. This component can be used with one or two buttons." />
+        <ImageView
+            android:id="@+id/close"
+            android:layout_width="@dimen/messageCtaCloseButtonSize"
+            android:layout_height="@dimen/messageCtaCloseButtonSize"
+            android:background="?selectableItemBackground"
+            android:padding="@dimen/keyline_2"
+            android:src="@drawable/ic_close_24"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
-    <androidx.constraintlayout.widget.Barrier
-        android:id="@+id/barrierButtons"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:barrierDirection="top"
-        app:constraint_referenced_ids="primaryActionButton, secondaryActionButton, actionButton" />
+        <com.airbnb.lottie.LottieAnimationView
+            android:id="@+id/topIllustrationAnimated"
+            android:layout_width="wrap_content"
+            android:layout_height="0dp"
+            android:layout_marginTop="@dimen/keyline_2"
+            app:layout_constraintHeight_max="96dp"
+            android:visibility="gone"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:lottie_autoPlay="false"
+            app:lottie_loop="false" />
 
-    <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
-        android:id="@+id/primaryActionButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/keyline_1"
-        android:layout_marginTop="@dimen/keyline_3"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/secondaryActionButton"
-        app:layout_constraintTop_toBottomOf="@id/messageSubtitle"
-        app:layout_goneMarginStart="0dp"
-        tools:text="button" />
+        <ImageView
+            android:id="@+id/topIllustration"
+            android:layout_width="@dimen/messageCtaIllustrationSize"
+            android:layout_height="@dimen/messageCtaIllustrationSize"
+            android:layout_marginTop="@dimen/keyline_2"
+            android:scaleType="center"
+            android:visibility="gone"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
-    <com.duckduckgo.common.ui.view.button.DaxButtonGhost
-        android:id="@+id/secondaryActionButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/keyline_3"
-        android:layout_marginEnd="@dimen/keyline_1"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@id/primaryActionButton"
-        app:layout_constraintHorizontal_chainStyle="packed"
-        app:layout_constraintStart_toStartOf="parent"
-        tools:text="button" />
+        <androidx.constraintlayout.widget.Barrier
+            android:id="@+id/illustrationBarrier"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:barrierDirection="bottom"
+            app:constraint_referenced_ids="topIllustration,topIllustrationAnimated" />
 
-    <com.duckduckgo.common.ui.view.button.DaxButtonGhost
-        android:id="@+id/actionButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/keyline_2"
-        android:visibility="gone"
-        app:icon="@drawable/ic_share_android_16"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/messageSubtitle"
-        app:layout_goneMarginStart="0dp"
-        tools:text="action button" />
+        <com.duckduckgo.common.ui.view.text.DaxTextView
+            android:id="@+id/messageTitle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="40dp"
+            android:layout_marginTop="@dimen/keyline_2"
+            android:layout_marginEnd="40dp"
+            android:gravity="center"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/illustrationBarrier"
+            app:layout_goneMarginTop="@dimen/keyline_4"
+            app:typography="h3"
+            tools:text="Placeholder Title" />
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+        <com.duckduckgo.common.ui.view.text.DaxTextView
+            android:id="@+id/messageSubtitle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/keyline_4"
+            android:layout_marginTop="@dimen/keyline_1"
+            android:layout_marginEnd="@dimen/keyline_4"
+            android:gravity="center"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/messageTitle"
+            app:typography="body2"
+            tools:text="Body text goes here. This component can be used with one or two buttons." />
+
+        <androidx.constraintlayout.widget.Barrier
+            android:id="@+id/barrierButtons"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:barrierDirection="top"
+            app:constraint_referenced_ids="primaryActionButton, secondaryActionButton, actionButton" />
+
+        <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
+            android:id="@+id/primaryActionButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/keyline_1"
+            android:layout_marginTop="@dimen/keyline_3"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/secondaryActionButton"
+            app:layout_constraintTop_toBottomOf="@id/messageSubtitle"
+            app:layout_goneMarginStart="0dp"
+            tools:text="button" />
+
+        <com.duckduckgo.common.ui.view.button.DaxButtonGhost
+            android:id="@+id/secondaryActionButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/keyline_3"
+            android:layout_marginEnd="@dimen/keyline_1"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/primaryActionButton"
+            app:layout_constraintHorizontal_chainStyle="packed"
+            app:layout_constraintStart_toStartOf="parent"
+            tools:text="button" />
+
+        <com.duckduckgo.common.ui.view.button.DaxButtonGhost
+            android:id="@+id/actionButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/keyline_2"
+            android:visibility="gone"
+            app:icon="@drawable/ic_share_android_16"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/messageSubtitle"
+            app:layout_goneMarginStart="0dp"
+            tools:text="action button" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</com.google.android.material.card.MaterialCardView>

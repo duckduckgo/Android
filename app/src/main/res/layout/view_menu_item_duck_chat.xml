@@ -18,14 +18,10 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/duckChatMenuItem"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:background="?attr/selectableItemBackground"
-    android:paddingHorizontal="@dimen/keyline_5"
-    android:paddingVertical="@dimen/keyline_3">
+    android:layout_height="wrap_content">
 
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+    <LinearLayout
+        style="@style/Widget.DuckDuckGo.MenuItemView">
 
         <ImageView
             android:id="@+id/icon"
@@ -33,35 +29,16 @@
             android:layout_height="@dimen/keyline_4"
             android:layout_gravity="center_vertical"
             android:src="@drawable/ic_ai_chat_16"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
             tools:ignore="ContentDescription" />
 
         <com.duckduckgo.common.ui.view.text.DaxTextView
             android:id="@+id/label"
-            android:layout_width="0dp"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
             android:layout_marginStart="@dimen/keyline_2"
             android:text="@string/duckChatMenuItem"
-            app:layout_constraintStart_toEndOf="@id/icon"
-            app:layout_constraintEnd_toStartOf="@id/newPill"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent"
             app:typography="body1"/>
 
-        <ImageView
-            android:id="@+id/newPill"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/keyline_2"
-            android:layout_marginEnd="@dimen/keyline_1"
-            android:src="@drawable/ic_new_pill"
-            android:importantForAccessibility="no"
-            app:layout_constraintStart_toEndOf="@id/label"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent"/>
-    </androidx.constraintlayout.widget.ConstraintLayout>
+    </LinearLayout>
 </FrameLayout>

@@ -53,7 +53,7 @@ class PermissionsPerWebsiteViewModel @Inject constructor(
 
     sealed class Command {
         class ShowPermissionSettingSelectionDialog(val setting: WebsitePermissionSetting) : Command()
-        object GoBackToSitePermissions : Command()
+        data object GoBackToSitePermissions : Command()
     }
 
     fun websitePermissionSettings(url: String) {

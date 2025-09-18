@@ -62,16 +62,17 @@
     <string name="subscriptionStatusSubscribed">Subskrypcja</string>
     <string name="privacyPolicyAndTermsOfService">Polityka prywatności i warunki użytkowania</string>
     <string name="subscriptionStatusFreeTrial">Aktywny bezpłatny okres próbny</string>
-    <string name="monthly">miesięczne</string>
-    <string name="yearly">Rocznie</string>
-    <string name="freeTrialActiveSubscriptionsData" instruction="Placeholder is a date in format MMMM dd, yyyy, second is if trial is monthly or yearly">Bezpłatny okres próbny kończy się %1$s i tego samego dnia automatycznie przekształca się w %2$s płatną subskrypcję.</string>
+    <string name="freeTrialMonthlyActiveSubscriptionsData" instruction="Placeholder is a date in format MMMM dd, yyyy">Bezpłatny okres próbny kończy się %1$s i tego samego dnia automatycznie przekształca się w miesięczną płatną subskrypcję.</string>
+    <string name="freeTrialYearlyActiveSubscriptionsData" instruction="Placeholder is a date in format MMMM dd, yyyy">Bezpłatny okres próbny kończy się %1$s i tego samego dnia automatycznie przekształca się w roczną płatną subskrypcję.</string>
     <string name="freeTrialCancelledSubscriptionsData" instruction="Placeholder is a date in format MMMM dd, yyyy">Bezpłatny okres próbny kończy się %1$s i nie zostanie przekształcony w płatną subskrypcję.</string>
 
     <!--Settings Subscriptions-->
     <string name="subscriptionSetting">Ustawienia subskrypcji</string>
     <string name="subscriptionSettingSubscribe">Chroń połączenie i tożsamość dzięki subskrypcji Privacy Pro</string>
-    <string name="subscriptionSettingSubscribeSubtitle">Obejmuje usługi VPN, Personal Information Removal oraz Identity Theft Restoration.</string>
-    <string name="subscriptionSettingSubscribeSubtitleRow">Obejmuje usługi VPN oraz Identity Theft Restoration.</string>
+
+    <string name="subscriptionSettingSubscribeSubtitle">Subskrybenci otrzymują usługi VPN, Personal Information Removal oraz Identity Theft Restoration.</string>
+    <string name="subscriptionSettingSubscribeSubtitleRow">Subskrybenci otrzymują usługi VPN oraz Identity Theft Restoration.</string>
+
     <string name="subscriptionSettingGet">Uzyskaj Privacy Pro</string>
     <string name="subscriptionSettingTryFreeTrial">Wypróbuj Privacy Pro bezpłatnie</string>
     <string name="subscriptionSettingRestore">Mam subskrypcję</string>
@@ -150,7 +151,7 @@
 
     <string name="feedbackSubmitVpnHeader">Wystąpił problem, który nie został omówiony w naszym <annotation type="faqs_link">centrum pomocy</annotation>? Zdecydowanie chcemy o tym wiedzieć.\n\n</string>
     <string name="feedbackSubmitVpnDescriptionHint">Powiedz nam, co się dzieje…</string>
-    <string name="feedbackSubmitVpnDisclaimer">"Oprócz szczegółów podanych powyżej wysyłamy wraz z opinią następujące zanonimizowane informacje:\n\n • Czy niektóre funkcje przeglądarki są aktywne\n• Zbiorcza diagnostyka aplikacji (np. kody błędów)\n\n Klikając przycisk przesyłania, wyrażasz zgodę na możliwość wykorzystania przez DuckDuckGo przesłanych informacji w celu ulepszenia aplikacji."</string>
+    <string name="feedbackSubmitVpnDisclaimer">"Oprócz szczegółów podanych powyżej wysyłamy wraz z opinią następujące zanonimizowane informacje:\n\n• Czy niektóre funkcje przeglądarki są aktywne\n• Zbiorcza diagnostyka aplikacji (np. kody błędów)\n\n Klikając przycisk przesyłania, wyrażasz zgodę na możliwość wykorzystania przez DuckDuckGo przesłanych informacji w celu ulepszenia aplikacji."</string>
     <string name="feedbackSubmitVpnSubmit">Wyślij</string>
     <string name="feedbackSubmitCompletedMessage">Dziękujemy! Informacje zostały przekazane.</string>
     <string name="feedbackSubmitFailedMessage">Wystąpił błąd</string>
@@ -167,4 +168,34 @@
     <string name="activityActivateSubscription">Mam subskrypcję</string>
     <string name="activityPir" translatable="false">Privacy Pro</string>
     <string name="activitySendFeedback">Wyślij opinię</string>
+
+    <!-- Privacy Pro Rebranding-->
+    <string name="privacyProRebranding">Subskrypcja DuckDuckGo</string>
+    <string name="subscriptionSettingExpiredRebranding">Twoja subskrypcja DuckDuckGo wygasła</string>
+    <string name="privacyProFaqRebranding">Potrzebujesz pomocy z subskrypcją?</string>
+    <string name="privacyProFaqSecondaryRebranding">Uzyskaj odpowiedzi na często zadawane pytania lub skontaktuj się z pomocą techniczną ds. subskrypcji na naszych stronach pomocy. Dostępność funkcji różni się w zależności od kraju.</string>
+    <string name="restoreSubscriptionTitleRebranding">Dodaj subskrypcję do tego urządzenia</string>
+    <string name="restoreSubscriptionEmailDescriptionRebranding">Połącz adres e-mail z subskrypcją, aby dodać ją na tym urządzeniu.</string>
+    <string name="activateOnOtherDevicesRebranding">Dodaj subskrypcję do innych urządzeń</string>
+    <string name="addToDeviceSecondaryTextWithoutEmailRebranding">Dodaj subskrypcję do innych urządzeń za pośrednictwem Google Play lub połączenia adresu e-mail.</string>
+    <string name="addToDeviceSecondaryTextWithEmailRebranding">Użyj powyższego adresu e-mail, aby dodać subskrypcję na innych urządzeniach w aplikacji DuckDuckGo. Wybierz kolejno Ustawienia &gt; Ustawienia subskrypcji &gt; Mam subskrypcję.</string>
+    <string name="subscriptionSettingRebrandingMessage">Privacy Pro jest teraz po prostu nazywane subskrypcją DuckDuckGo</string>
+    <string name="subscriptionSettingSubscribeRebranding">Chroń połączenie i tożsamość za pomocą jednej subskrypcji.</string>
+    <string name="removeFromDeviceDescriptionRebranding">Nie będziesz już mieć dostępu do subskrypcji na tym urządzeniu. Nie spowoduje to anulowania Twojej subskrypcji, która pozostanie aktywna na pozostałych urządzeniach.</string>
+
+    <string name="subscriptionSettingSubscribeWithDuckAiSubtitle">Subskrybenci otrzymują VPN, zaawansowane modele sztucznej inteligencji w Duck.ai, usługi Personal Information Removal oraz Identity Theft Restoration.</string>
+    <string name="subscriptionSettingSubscribeWithDuckAiSubtitleRow">Subskrybenci otrzymują usługi VPN oraz Identity Theft Restoration i zaawansowane modele sztucznej inteligencji w Duck.ai.</string>
+
+    <string name="feedbackCategoryDuckAi">Duck.ai</string>
+    <string name="feedbackSubCategoryDuckAiSubscriberModels">Nie można uzyskać dostępu do modeli Duck.ai dostępnych wyłącznie dla subskrybentów</string>
+    <string name="feedbackSubCategoryDuckAiLoginThirdPartyBrowser">Nie można uzyskać dostępu do Duck.ai przy użyciu mojej subskrypcji w innych przeglądarkach</string>
+    <string name="feedbackSubCategoryDuckAiOther">Inne opinie o Duck.ai</string>
+
+    <string name="subscriptionSettingSectionTitle" translatable="false">DuckDuckGo Subscription</string>
+    <string name="subscriptionSettingSubscribeSecure">Zabezpiecz Wi-Fi oraz używaj zaawansowanych modeli AI</string>
+
+    <string name="subscriptionSettingGetRebranding">Subskrybuj DuckDuckGo</string>
+    <string name="subscriptionSettingTryFreeTrialRebranding">Wypróbuj za darmo</string>
+    <string name="feedbackGeneralSubscription">Subskrypcja</string>
+
 </resources>

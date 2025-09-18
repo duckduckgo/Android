@@ -20,4 +20,6 @@
     <dimen name="toolbar_horizontal_margin">8dp</dimen>
     <dimen name="recyclerViewOneFabBottomPadding">76dp</dimen>
     <dimen name="recyclerViewTwoFabsBottomPadding">136dp</dimen>
+    <dimen name="extraLargeShapeCornerRadius">24dp</dimen>
+    <bool name="show_wing_animation">false</bool>
 </resources>

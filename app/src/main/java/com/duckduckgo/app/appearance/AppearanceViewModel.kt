@@ -20,7 +20,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.webkit.WebViewFeature
 import com.duckduckgo.anvil.annotations.ContributesViewModel
-import com.duckduckgo.app.browser.omnibar.ChangeOmnibarPositionFeature
 import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition
 import com.duckduckgo.app.icon.api.AppIcon
 import com.duckduckgo.app.pixels.AppPixelName
@@ -29,20 +28,21 @@ import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_THEME_TOGGLED_LIGHT
 import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_THEME_TOGGLED_SYSTEM_DEFAULT
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.tabs.store.TabSwitcherDataStore
 import com.duckduckgo.common.ui.DuckDuckGoTheme
 import com.duckduckgo.common.ui.DuckDuckGoTheme.DARK
-import com.duckduckgo.common.ui.DuckDuckGoTheme.EXPERIMENT_DARK
-import com.duckduckgo.common.ui.DuckDuckGoTheme.EXPERIMENT_LIGHT
 import com.duckduckgo.common.ui.DuckDuckGoTheme.LIGHT
 import com.duckduckgo.common.ui.DuckDuckGoTheme.SYSTEM_DEFAULT
 import com.duckduckgo.common.ui.store.ThemingDataStore
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import javax.inject.Inject
+import kotlin.to
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
@@ -56,7 +56,7 @@ class AppearanceViewModel @Inject constructor(
     private val settingsDataStore: SettingsDataStore,
     private val pixel: Pixel,
     private val dispatcherProvider: DispatcherProvider,
-    private val changeOmnibarPositionFeature: ChangeOmnibarPositionFeature,
+    private val tabSwitcherDataStore: TabSwitcherDataStore,
 ) : ViewModel() {
 
     data class ViewState(
@@ -66,7 +66,8 @@ class AppearanceViewModel @Inject constructor(
         val canForceDarkMode: Boolean = false,
         val supportsForceDarkMode: Boolean = true,
         val omnibarPosition: OmnibarPosition = OmnibarPosition.TOP,
-        val isOmnibarPositionFeatureEnabled: Boolean = true,
+        val isFullUrlEnabled: Boolean = true,
+        val isTrackersCountInTabSwitcherEnabled: Boolean = true,
     )
 
     sealed class Command {
@@ -89,7 +90,8 @@ class AppearanceViewModel @Inject constructor(
                     canForceDarkMode = canForceDarkMode(),
                     supportsForceDarkMode = WebViewFeature.isFeatureSupported(WebViewFeature.ALGORITHMIC_DARKENING),
                     omnibarPosition = settingsDataStore.omnibarPosition,
-                    isOmnibarPositionFeatureEnabled = changeOmnibarPositionFeature.self().isEnabled(),
+                    isFullUrlEnabled = settingsDataStore.isFullUrlEnabled,
+                    isTrackersCountInTabSwitcherEnabled = tabSwitcherDataStore.isTrackersAnimationInfoTileHidden().firstOrNull() != true,
                 )
             }
         }
@@ -136,8 +138,6 @@ class AppearanceViewModel @Inject constructor(
             when (selectedTheme) {
                 LIGHT -> SETTINGS_THEME_TOGGLED_LIGHT
                 DARK -> SETTINGS_THEME_TOGGLED_DARK
-                EXPERIMENT_DARK -> SETTINGS_THEME_TOGGLED_DARK
-                EXPERIMENT_LIGHT -> SETTINGS_THEME_TOGGLED_LIGHT
                 SYSTEM_DEFAULT -> SETTINGS_THEME_TOGGLED_SYSTEM_DEFAULT
             }
         pixel.fire(pixelName)
@@ -167,6 +167,26 @@ class AppearanceViewModel @Inject constructor(
                 pixel.fire(AppPixelName.FORCE_DARK_MODE_DISABLED)
             }
             settingsDataStore.experimentalWebsiteDarkMode = checked
+        }
+    }
+
+    fun onFullUrlSettingChanged(checked: Boolean) {
+        viewModelScope.launch(dispatcherProvider.io()) {
+            settingsDataStore.isFullUrlEnabled = checked
+            viewState.update { it.copy(isFullUrlEnabled = checked) }
+
+            val params = mapOf(Pixel.PixelParameter.IS_ENABLED to checked.toString())
+            pixel.fire(AppPixelName.SETTINGS_APPEARANCE_IS_FULL_URL_OPTION_TOGGLED, params)
+        }
+    }
+
+    fun onShowTrackersCountInTabSwitcherChanged(checked: Boolean) {
+        viewModelScope.launch(dispatcherProvider.io()) {
+            tabSwitcherDataStore.setTrackersAnimationInfoTileHidden(!checked)
+            viewState.update { it.copy(isTrackersCountInTabSwitcherEnabled = checked) }
+
+            val params = mapOf(Pixel.PixelParameter.IS_ENABLED to checked.toString())
+            pixel.fire(AppPixelName.SETTINGS_APPEARANCE_IS_TRACKER_COUNT_IN_TAB_SWITCHER_TOGGLED, params)
         }
     }
 }

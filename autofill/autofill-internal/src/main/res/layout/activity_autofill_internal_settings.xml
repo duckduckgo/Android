@@ -124,6 +124,27 @@
             android:layout_height="wrap_content"
             app:primaryText="@string/autofillDevSettingsImportPasswordsImportPasswordsCsvTitle" />
 
+        <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
+            android:id="@+id/importPasswordsGoogleLogoutButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:primaryText="@string/autofillDevSettingsImportPasswordsGoogleLogoutTitle"
+            app:secondaryText="@string/autofillDevSettingsImportPasswordsGoogleInstruction" />
+
+        <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
+            android:id="@+id/importPasswordsResetImportedFlagButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:primaryText="@string/autofillDevSettingsResetGooglePasswordsImportFlagTitle"
+            app:secondaryText="@string/autofillDevSettingsResetGooglePasswordsImportFlagInstruction" />
+
+        <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
+            android:id="@+id/markPasswordsAsPreviouslyImportedButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:primaryText="@string/autofillDevSettingsSimulatePasswordsImportedTitle"
+            app:secondaryText="@string/autofillDevSettingsSimulatePasswordsImportedInstruction" />
+
 
         <com.duckduckgo.common.ui.view.divider.HorizontalDivider
             android:layout_width="match_parent"

@@ -16,6 +16,9 @@
 
 package com.duckduckgo.duckchat.impl.repository
 
+import android.appwidget.AppWidgetManager
+import android.content.Context
+import android.content.Intent
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.impl.store.DuckChatDataStore
 import com.squareup.anvil.annotations.ContributesBinding
@@ -25,28 +28,38 @@ import kotlinx.coroutines.flow.Flow
 
 interface DuckChatFeatureRepository {
     suspend fun setDuckChatUserEnabled(enabled: Boolean)
+    suspend fun setInputScreenUserSetting(enabled: Boolean)
     suspend fun setShowInBrowserMenu(showDuckChat: Boolean)
     suspend fun setShowInAddressBar(showDuckChat: Boolean)
 
     fun observeDuckChatUserEnabled(): Flow<Boolean>
+    fun observeInputScreenUserSettingEnabled(): Flow<Boolean>
     fun observeShowInBrowserMenu(): Flow<Boolean>
     fun observeShowInAddressBar(): Flow<Boolean>
 
     suspend fun isDuckChatUserEnabled(): Boolean
+    suspend fun isInputScreenUserSettingEnabled(): Boolean
     suspend fun shouldShowInBrowserMenu(): Boolean
     suspend fun shouldShowInAddressBar(): Boolean
 
     suspend fun registerOpened()
     suspend fun wasOpenedBefore(): Boolean
+    suspend fun lastSessionTimestamp(): Long
+    suspend fun sessionDeltaInMinutes(): Long
 }
 
 @SingleInstanceIn(AppScope::class)
 @ContributesBinding(AppScope::class)
 class RealDuckChatFeatureRepository @Inject constructor(
     private val duckChatDataStore: DuckChatDataStore,
+    private val context: Context,
 ) : DuckChatFeatureRepository {
     override suspend fun setDuckChatUserEnabled(enabled: Boolean) {
         duckChatDataStore.setDuckChatUserEnabled(enabled)
+    }
+
+    override suspend fun setInputScreenUserSetting(enabled: Boolean) {
+        duckChatDataStore.setInputScreenUserSetting(enabled)
     }
 
     override suspend fun setShowInBrowserMenu(showDuckChat: Boolean) {
@@ -61,6 +74,10 @@ class RealDuckChatFeatureRepository @Inject constructor(
         return duckChatDataStore.observeDuckChatUserEnabled()
     }
 
+    override fun observeInputScreenUserSettingEnabled(): Flow<Boolean> {
+        return duckChatDataStore.observeInputScreenUserSettingEnabled()
+    }
+
     override fun observeShowInBrowserMenu(): Flow<Boolean> {
         return duckChatDataStore.observeShowInBrowserMenu()
     }
@@ -73,6 +90,10 @@ class RealDuckChatFeatureRepository @Inject constructor(
         return duckChatDataStore.isDuckChatUserEnabled()
     }
 
+    override suspend fun isInputScreenUserSettingEnabled(): Boolean {
+        return duckChatDataStore.isInputScreenUserSettingEnabled()
+    }
+
     override suspend fun shouldShowInBrowserMenu(): Boolean {
         return duckChatDataStore.getShowInBrowserMenu()
     }
@@ -82,10 +103,30 @@ class RealDuckChatFeatureRepository @Inject constructor(
     }
 
     override suspend fun registerOpened() {
+        if (!duckChatDataStore.wasOpenedBefore()) {
+            updateWidgets()
+        }
         duckChatDataStore.registerOpened()
     }
 
     override suspend fun wasOpenedBefore(): Boolean {
         return duckChatDataStore.wasOpenedBefore()
+    }
+
+    override suspend fun lastSessionTimestamp(): Long {
+        return duckChatDataStore.lastSessionTimestamp()
+    }
+
+    override suspend fun sessionDeltaInMinutes(): Long {
+        return duckChatDataStore.sessionDeltaTimestamp() / MS_TO_MINUTES
+    }
+
+    private fun updateWidgets() {
+        val intent = Intent(AppWidgetManager.ACTION_APPWIDGET_UPDATE)
+        context.sendBroadcast(intent)
+    }
+
+    companion object {
+        private const val MS_TO_MINUTES = 60000
     }
 }

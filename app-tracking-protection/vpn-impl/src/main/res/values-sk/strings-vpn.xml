@@ -443,9 +443,13 @@
 
     <!-- Privacy pro upsell -->
     <string name="apptp_PproUpsellInfoDisabled">Nemôžeš používať App Tracking Protection kvôli tvojej VPN? Prejdi na DuckDuckGo VPN – jedinú VPN, ktorá je kompatibilná. <annotation type="ppro_upsell_link">Zistiť viac</annotation>.</string>
+    <string name="apptp_PproUpsellInfoDisabled_freeTrial">Nemôžeš používať App Tracking Protection kvôli tvojej VPN? Prejdi na DuckDuckGo VPN – jedinú VPN, ktorá je kompatibilná. <annotation type="ppro_upsell_link">Vyskúšaj zadarmo!</annotation>.</string>
     <string name="apptp_PproUpsellInfoRevoked"><b>App Tracking Protection je vypnutá</b>\nVypla tvoja VPN službu App Tracking Protection? Na opätovné zapnutie použi vyššie uvedený prepínač.\n\nZískaj DuckDuckGo VPN – jedinú VPN, ktorá funguje s App Tracking Protection. <annotation type="ppro_upsell_link">Zisti viac</annotation>.</string>
+    <string name="apptp_PproUpsellInfoRevoked_freeTrial"><b>Služba App Tracking Protection je vypnutá</b>\nVypla tvoja VPN službu App Tracking Protection? Na opätovné zapnutie použi vyššie uvedený prepínač.\n\nPrejdi na DuckDuckGo VPN – jedinú VPN, ktorá funguje s App Tracking Protection. <annotation type="ppro_upsell_link">Vyskúšaj zadarmo!</annotation>.</string>
     <string name="apptp_PproUpsellBannerTitle">Posuňte svoje súkromie na vyššiu úroveň</string>
     <string name="apptp_PproUpsellBannerMessage">DuckDuckGo má jedinú VPN, ktorá je kompatibilná s App Tracking Protection. Aktivuj si ju s plateným predplatným Privacy Pro.</string>
     <string name="apptp_PproUpsellBannerAction">Zistite viac</string>
+    <string name="apptp_PproUpsellBannerMessage_freeTrial">Prihlás sa na odber DuckDuckGo a získaj jedinú VPN, ktorá je kompatibilná s App Tracking Protection.</string>
+    <string name="apptp_PproUpsellBannerAction_freeTrial">Vyskúšaj zadarmo!</string>
 
 </resources>

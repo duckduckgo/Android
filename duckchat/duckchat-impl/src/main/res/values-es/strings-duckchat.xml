@@ -39,9 +39,48 @@
     <!-- Settings -->
     <string name="duck_chat_settings_activity_description">Duck.ai es una función opcional que te permite chatear de forma anónima con modelos populares de chat de IA de terceros. Tus chats no se utilizan para entrenar la IA.\n<annotation type="learn_more_link">Más información</annotation></string>
     <string name="duck_chat_enable_duck_ai_setting">Activa Duck.ai</string>
-    <string name="duck_chat_show_in_heading">Accesos directos</string>
     <string name="duck_chat_visibility_setting">Menú del navegador</string>
     <string name="duck_chat_address_bar_visibility_setting">Barra de direcciones</string>
     <string name="duck_chat_assist_settings_title">Ajustes de Assist</string>
     <string name="duck_chat_assist_settings_description">Elige con qué frecuencia deseas que las respuestas asistidas por IA aparezcan en tus búsquedas</string>
+    <string name="duck_ai_shortcut_settings_title">Atajos de Duck.ai</string>
+    <string name="duck_ai_shortcut_settings_description">Elige qué atajos de Duck.ai quieres mostrar</string>
+
+    <!-- Input Screen  -->
+    <string name="input_screen_search_tab">Buscar</string>
+    <string name="input_screen_search_hint">Buscar o introducir dirección</string>
+    <string name="input_screen_chat_tab">Duck.ai</string>
+    <string name="input_screen_chat_hint">Pregunta en privado</string>
+    <string name="input_screen_user_pref_without_ai">Solo buscar</string>
+    <string name="input_screen_user_pref_with_ai">Búsqueda y Duck.ai</string>
+    <string name="input_screen_user_pref_description">Prueba nuestra nueva opción para preguntar directamente a Duck.ai desde la barra de direcciones. <annotation type="share_feedback">Comparte tus comentarios</annotation></string>
+
+    <!-- Duck.ai Pro settings -->
+    <string name="duck_ai_paid_settings_title">Duck.ai</string>
+    <string name="duck_ai_paid_settings_page_title">Duck.ai</string>
+    <string name="duck_ai_paid_settings_page_description"><![CDATA[Chatea de forma privada con modelos de IA exclusivos para suscriptores.\n<a href=\"\">Más información</a>]]></string>
+    <string name="duck_ai_paid_settings_open_duck_ai">Abrir Duck.ai</string>
+    <string name="duck_ai_paid_settings_learn_more_title">Más información</string>
+
+    <!-- Rebranding-->
+    <string name="duck_chat_title_rebranding">Características de la IA</string>
+    <string name="duck_chat_settings_activity_description_rebranding">Las funciones de IA de DuckDuckGo son privadas y opcionales.Tus datos no se utilizan para entrenar la IA.\n<annotation type="learn_more_link">Más información</annotation></string>
+    <string name="duck_chat_enable_duck_ai_setting_rebranding">Duck.ai</string>
+    <string name="duck_chat_enable_duck_ai_setting_description_rebranding">Chatea en privado con modelos de IA populares de terceros</string>
+    <string name="duck_chat_assist_settings_title_rebranding">Configuración de Asistente de búsqueda</string>
+    <string name="duck_chat_assist_settings_description_rebranding">Elige con qué frecuencia deseas que las respuestas asistidas por IA aparezcan en tus búsquedas</string>
+
+    <!-- AutoComplete -->
+    <string name="autocompleteDuckAiPrompt">Pregúntale a Duck.ai</string>
+
+    <!-- New Address Bar Option Bottom Sheet Dialog -->
+    <string name="newAddressBarOptionBottomSheetDialogSearchText">Buscar o introducir dirección</string>
+    <string name="newAddressBarOptionBottomSheetDialogTitle">Alterna entre la búsqueda y el chat de IA</string>
+    <string name="newAddressBarOptionBottomSheetDialogSubTitle">Las funciones de IA son siempre opcionales.</string>
+    <string name="newAddressBarOptionBottomSheetDialogPrimaryButton">Confirmar</string>
+    <string name="newAddressBarOptionBottomSheetDialogGhostButton">Ahora no</string>
+    <string name="newAddressBarOptionBottomSheetDialogFooter">Ajusta en Configuración &gt; Funciones de IA.</string>
+    <string name="newAddressBarOptionBottomSheetDialogSearchOnly">Solo buscar</string>
+    <string name="newAddressBarOptionBottomSheetDialogSearchAndDuckAi">Búsqueda y Duck.ai</string>
+    <string name="newAddressBarOptionBottomSheetDialogHeader">Opción de la barra de direcciones</string>
 </resources>

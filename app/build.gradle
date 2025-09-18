@@ -72,6 +72,7 @@ android {
     }
     buildFeatures {
         viewBinding = true
+        buildConfig = true
     }
     compileOptions {
         coreLibraryDesugaringEnabled = true
@@ -289,6 +290,8 @@ dependencies {
     implementation project(':macos-api')
     implementation project(':macos-impl')
 
+    implementation project(":pir-api")
+    implementation project(":pir-impl")
     internalImplementation project(':pir-internal')
 
     implementation project(':privacy-dashboard-api')
@@ -402,6 +405,9 @@ dependencies {
 
     implementation project(':dax-prompts-api')
     implementation project(':dax-prompts-impl')
+
+    implementation project(':serp-logos-api')
+    implementation project(':serp-logos-impl')
 
     // Deprecated. TODO: Stop using this artifact.
     implementation "androidx.legacy:legacy-support-v4:_"

@@ -17,7 +17,10 @@
 package com.duckduckgo.app.onboarding.store
 
 import app.cash.turbine.test
+import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
+import com.duckduckgo.feature.toggles.api.Toggle.State
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOf
@@ -35,7 +38,8 @@ class AppUserStageStoreTest {
     var coroutineRule = CoroutineTestRule()
 
     private val userStageDao: UserStageDao = mock()
-    private val testee = AppUserStageStore(userStageDao, coroutineRule.testDispatcherProvider)
+    private val androidBrowserConfigFeature: AndroidBrowserConfigFeature = FakeFeatureToggleFactory.create(AndroidBrowserConfigFeature::class.java)
+    private val testee = AppUserStageStore(userStageDao, coroutineRule.testDispatcherProvider, androidBrowserConfigFeature)
 
     @Test
     fun whenGetUserAppStageThenReturnCurrentStage() = runTest {
@@ -100,6 +104,48 @@ class AppUserStageStoreTest {
             val actual = awaitItem()
             assertEquals(expected, actual)
         }
+    }
+
+    @Test
+    fun `when user is established and guard enabled then return established app stage without updating`() = runTest {
+        givenCurrentStage(AppStage.ESTABLISHED)
+
+        val result = testee.stageCompleted(AppStage.NEW)
+
+        assertEquals(AppStage.ESTABLISHED, result)
+        verify(userStageDao).currentUserAppStage()
+    }
+
+    @Test
+    fun `when user is established and guard disabled then update app stage`() = runTest {
+        givenCurrentStage(AppStage.ESTABLISHED)
+        androidBrowserConfigFeature.establishedAppStageGuard().setRawStoredState(State(false))
+
+        val result = testee.stageCompleted(AppStage.NEW)
+
+        assertEquals(AppStage.DAX_ONBOARDING, result)
+        verify(userStageDao).updateUserStage(AppStage.DAX_ONBOARDING)
+    }
+
+    @Test
+    fun `when user is not established and guard enabled then update app stage`() = runTest {
+        givenCurrentStage(AppStage.NEW)
+
+        val result = testee.stageCompleted(AppStage.NEW)
+
+        assertEquals(AppStage.DAX_ONBOARDING, result)
+        verify(userStageDao).updateUserStage(AppStage.DAX_ONBOARDING)
+    }
+
+    @Test
+    fun `when user is not established and guard disabled then update app stage`() = runTest {
+        givenCurrentStage(AppStage.NEW)
+        androidBrowserConfigFeature.establishedAppStageGuard().setRawStoredState(State(false))
+
+        val result = testee.stageCompleted(AppStage.NEW)
+
+        assertEquals(AppStage.DAX_ONBOARDING, result)
+        verify(userStageDao).updateUserStage(AppStage.DAX_ONBOARDING)
     }
 
     private suspend fun givenCurrentStage(appStage: AppStage) {

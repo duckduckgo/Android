@@ -39,9 +39,48 @@
     <!-- Settings -->
     <string name="duck_chat_settings_activity_description">Duck.ai — дополнительная функция, позволяющая анонимно беседовать с популярными сторонними чат-моделями на базе искусственного интеллекта. Содержимое чатов не применяется для обучения ИИ.\n<annotation type="learn_more_link">Подробнее...</annotation></string>
     <string name="duck_chat_enable_duck_ai_setting">Включить Duck.ai</string>
-    <string name="duck_chat_show_in_heading">Ярлыки</string>
     <string name="duck_chat_visibility_setting">Меню браузера</string>
     <string name="duck_chat_address_bar_visibility_setting">Адресная строка</string>
     <string name="duck_chat_assist_settings_title">Настройки Assist</string>
     <string name="duck_chat_assist_settings_description">Выберите, как часто вы хотите видеть ответы от ИИ в результатах поиска.</string>
+    <string name="duck_ai_shortcut_settings_title">Ярлыки Duck.ai</string>
+    <string name="duck_ai_shortcut_settings_description">Выберите, какие ярлыки Duck.ai нужно показывать в интерфейсе</string>
+
+    <!-- Input Screen  -->
+    <string name="input_screen_search_tab">Поиск</string>
+    <string name="input_screen_search_hint">Введите поисковый запрос или адрес сайта</string>
+    <string name="input_screen_chat_tab">Duck.ai</string>
+    <string name="input_screen_chat_hint">Задать вопрос (конфиденциально)</string>
+    <string name="input_screen_user_pref_without_ai">Только поиск</string>
+    <string name="input_screen_user_pref_with_ai">Поиск и Duck.ai</string>
+    <string name="input_screen_user_pref_description">Новая функция! Вопрос чат-боту Duck.ai прямо из адресной строки. <annotation type="share_feedback">Оставить отзыв</annotation></string>
+
+    <!-- Duck.ai Pro settings -->
+    <string name="duck_ai_paid_settings_title">Duck.ai</string>
+    <string name="duck_ai_paid_settings_page_title">Duck.ai</string>
+    <string name="duck_ai_paid_settings_page_description"><![CDATA[Приватный чат с ИИ-моделями, доступными только по подписке.\n<a href=\"\">Подробнее...</a>]]></string>
+    <string name="duck_ai_paid_settings_open_duck_ai">Открыть Duck.ai</string>
+    <string name="duck_ai_paid_settings_learn_more_title">Подробнее</string>
+
+    <!-- Rebranding-->
+    <string name="duck_chat_title_rebranding">Функции ИИ</string>
+    <string name="duck_chat_settings_activity_description_rebranding">DuckDuckGo AI — дополнительный конфиденциальный сервис.\nВаши данные не применяются для обучения ИИ.\n<annotation type="learn_more_link">Подробнее...</annotation></string>
+    <string name="duck_chat_enable_duck_ai_setting_rebranding">Duck.ai</string>
+    <string name="duck_chat_enable_duck_ai_setting_description_rebranding">Общайтесь в приватном чате с популярными сторонними моделями искусственного интеллекта</string>
+    <string name="duck_chat_assist_settings_title_rebranding">Настройки Search Assist</string>
+    <string name="duck_chat_assist_settings_description_rebranding">Выберите, как часто вы хотите видеть ответы от ИИ в результатах поиска.</string>
+
+    <!-- AutoComplete -->
+    <string name="autocompleteDuckAiPrompt">Спросить у Duck.ai</string>
+
+    <!-- New Address Bar Option Bottom Sheet Dialog -->
+    <string name="newAddressBarOptionBottomSheetDialogSearchText">Введите поисковый запрос или адрес сайта</string>
+    <string name="newAddressBarOptionBottomSheetDialogTitle">Переключатель между поиском и чатом с ИИ</string>
+    <string name="newAddressBarOptionBottomSheetDialogSubTitle">От функций на базе ИИ всегда можно отказаться.</string>
+    <string name="newAddressBarOptionBottomSheetDialogPrimaryButton">Подтвердить</string>
+    <string name="newAddressBarOptionBottomSheetDialogGhostButton">Не сейчас</string>
+    <string name="newAddressBarOptionBottomSheetDialogFooter">Посетите раздел «Настройки &gt; Функции ИИ».</string>
+    <string name="newAddressBarOptionBottomSheetDialogSearchOnly">Только поиск</string>
+    <string name="newAddressBarOptionBottomSheetDialogSearchAndDuckAi">Поиск и Duck.ai</string>
+    <string name="newAddressBarOptionBottomSheetDialogHeader">Опция адресной строки</string>
 </resources>

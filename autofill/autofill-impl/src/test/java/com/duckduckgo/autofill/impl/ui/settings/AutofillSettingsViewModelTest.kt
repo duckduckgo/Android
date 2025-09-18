@@ -3,13 +3,12 @@ package com.duckduckgo.autofill.impl.ui.settings
 import android.annotation.SuppressLint
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import app.cash.turbine.test
-import com.duckduckgo.app.browser.api.WebViewCapabilityChecker
-import com.duckduckgo.app.browser.api.WebViewCapabilityChecker.WebViewCapability.DocumentStartJavaScript
-import com.duckduckgo.app.browser.api.WebViewCapabilityChecker.WebViewCapability.WebMessageListener
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.autofill.api.AutofillFeature
+import com.duckduckgo.autofill.api.AutofillImportLaunchSource.AutofillSettings
 import com.duckduckgo.autofill.api.AutofillScreenLaunchSource
 import com.duckduckgo.autofill.impl.deviceauth.DeviceAuthenticator
+import com.duckduckgo.autofill.impl.importing.capability.ImportGooglePasswordsCapabilityChecker
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_ENABLE_AUTOFILL_TOGGLE_MANUALLY_DISABLED
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_ENABLE_AUTOFILL_TOGGLE_MANUALLY_ENABLED
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_IMPORT_GOOGLE_PASSWORDS_EMPTY_STATE_CTA_BUTTON_SHOWN
@@ -50,7 +49,7 @@ class AutofillSettingsViewModelTest {
     private val pixel: Pixel = mock()
     private val neverSavedSiteRepository: NeverSavedSiteRepository = mock()
     private val autofillFeature = FakeFeatureToggleFactory.create(AutofillFeature::class.java)
-    private val webViewCapabilityChecker: WebViewCapabilityChecker = mock()
+    private val importGooglePasswordsCapabilityChecker: ImportGooglePasswordsCapabilityChecker = mock()
     private val deviceAuthenticator: DeviceAuthenticator = mock()
     private val launchSource = AutofillScreenLaunchSource.SettingsActivity
 
@@ -60,7 +59,7 @@ class AutofillSettingsViewModelTest {
         dispatchers = coroutineTestRule.testDispatcherProvider,
         neverSavedSiteRepository = neverSavedSiteRepository,
         autofillFeature = autofillFeature,
-        webViewCapabilityChecker = webViewCapabilityChecker,
+        importGooglePasswordsCapabilityChecker = importGooglePasswordsCapabilityChecker,
         deviceAuthenticator = deviceAuthenticator,
     )
 
@@ -71,8 +70,7 @@ class AutofillSettingsViewModelTest {
             whenever(mockStore.getCredentialCount()).thenReturn(flowOf(0))
             whenever(neverSavedSiteRepository.neverSaveListCount()).thenReturn(emptyFlow())
             whenever(deviceAuthenticator.isAuthenticationRequiredForAutofill()).thenReturn(true)
-            whenever(webViewCapabilityChecker.isSupported(WebMessageListener)).thenReturn(true)
-            whenever(webViewCapabilityChecker.isSupported(DocumentStartJavaScript)).thenReturn(true)
+            whenever(importGooglePasswordsCapabilityChecker.webViewCapableOfImporting()).thenReturn(true)
             whenever(mockStore.autofillAvailable()).thenReturn(true)
             autofillFeature.self().setRawStoredState(State(enable = true))
             autofillFeature.canImportFromGooglePasswordManager().setRawStoredState(State(enable = true))
@@ -84,7 +82,7 @@ class AutofillSettingsViewModelTest {
     fun whenScreenRendersIfImportButtonAvailableThenPixelIsSent() = runTest {
         testee.viewState(launchSource).test {
             awaitItem()
-            val expectedParams = mapOf("source" to "settings")
+            val expectedParams = mapOf("source" to AutofillSettings.value)
             verify(pixel).fire(
                 pixel = eq(AUTOFILL_IMPORT_GOOGLE_PASSWORDS_EMPTY_STATE_CTA_BUTTON_SHOWN),
                 parameters = eq(expectedParams),
@@ -112,8 +110,7 @@ class AutofillSettingsViewModelTest {
 
     @Test
     fun whenScreenRendersIfImportButtonNotAvailableThenPixelIsNotSent() = runTest {
-        whenever(webViewCapabilityChecker.isSupported(WebMessageListener)).thenReturn(false)
-        whenever(webViewCapabilityChecker.isSupported(DocumentStartJavaScript)).thenReturn(false)
+        whenever(importGooglePasswordsCapabilityChecker.webViewCapableOfImporting()).thenReturn(false)
         testee.viewState(launchSource).test {
             awaitItem()
             verify(pixel, times(0)).fire(pixel = eq(AUTOFILL_IMPORT_GOOGLE_PASSWORDS_EMPTY_STATE_CTA_BUTTON_SHOWN), any(), any(), any())
@@ -122,9 +119,18 @@ class AutofillSettingsViewModelTest {
     }
 
     @Test
-    fun whenSendLaunchPixelThenPixelIsSent() = runTest {
+    fun `when send launch pixel and no credentials saved then pixel is sent`() = runTest {
+        whenever(mockStore.getCredentialCount()).thenReturn(flowOf(0))
         testee.sendLaunchPixel(AutofillScreenLaunchSource.SettingsActivity)
-        val expectedParams = mapOf("source" to "settings")
+        val expectedParams = mapOf("source" to "settings", "has_credentials_saved" to "0")
+        verify(pixel).fire(pixel = eq(AUTOFILL_SETTINGS_OPENED), parameters = eq(expectedParams), any(), any())
+    }
+
+    @Test
+    fun `when send launch pixel and has credentials saved then pixel is sent`() = runTest {
+        whenever(mockStore.getCredentialCount()).thenReturn(flowOf(5))
+        testee.sendLaunchPixel(AutofillScreenLaunchSource.BrowserOverflow)
+        val expectedParams = mapOf("source" to "overflow_menu", "has_credentials_saved" to "1")
         verify(pixel).fire(pixel = eq(AUTOFILL_SETTINGS_OPENED), parameters = eq(expectedParams), any(), any())
     }
 
@@ -245,17 +251,8 @@ class AutofillSettingsViewModelTest {
     }
 
     @Test
-    fun whenImportGooglePasswordsFeatureDisabledDueToWebMessageListenerNotSupportedThenViewStateReflectsThat() = runTest {
-        whenever(webViewCapabilityChecker.isSupported(WebMessageListener)).thenReturn(false)
-        testee.viewState(launchSource).test {
-            assertFalse(awaitItem().canImportFromGooglePasswords)
-            cancelAndIgnoreRemainingEvents()
-        }
-    }
-
-    @Test
-    fun whenImportGooglePasswordsFeatureDisabledDueToDocumentStartJavascriptNotSupportedThenViewStateReflectsThat() = runTest {
-        whenever(webViewCapabilityChecker.isSupported(DocumentStartJavaScript)).thenReturn(false)
+    fun whenImportGooglePasswordsFeatureDisabledDueToWebViewNotSupportedThenViewStateReflectsThat() = runTest {
+        whenever(importGooglePasswordsCapabilityChecker.webViewCapableOfImporting()).thenReturn(false)
         testee.viewState(launchSource).test {
             assertFalse(awaitItem().canImportFromGooglePasswords)
             cancelAndIgnoreRemainingEvents()
@@ -264,10 +261,10 @@ class AutofillSettingsViewModelTest {
 
     @Test
     fun whenUserClickOnImportGooglePasswordsThenCommandIsSent() = runTest {
-        testee.onImportPasswordsClicked(AutofillScreenLaunchSource.SettingsActivity)
+        testee.onImportPasswordsClicked(AutofillSettings)
         testee.commands.test {
             assertEquals(AutofillSettingsViewModel.Command.ImportPasswordsFromGoogle, awaitItem())
-            val expectedParams = mapOf("source" to "settings")
+            val expectedParams = mapOf("source" to AutofillSettings.value)
             verify(pixel).fire(
                 pixel = eq(AUTOFILL_IMPORT_GOOGLE_PASSWORDS_EMPTY_STATE_CTA_BUTTON_TAPPED),
                 parameters = eq(expectedParams),

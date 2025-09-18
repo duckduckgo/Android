@@ -84,6 +84,40 @@ class SecureStoreBackedAutofillStore @Inject constructor(
             autofillPrefsStore.hasEverBeenPromptedToSaveLogin = value
         }
 
+    override var hasEverImportedPasswords: Boolean
+        get() = autofillPrefsStore.hasEverImportedPasswords
+        set(value) {
+            autofillPrefsStore.hasEverImportedPasswords = value
+        }
+
+    override fun hasEverImportedPasswordsFlow(): Flow<Boolean> {
+        return autofillPrefsStore.hasEverImportedPasswordsFlow()
+    }
+
+    override var hasDismissedMainAppSettingsPromo: Boolean
+        get() = autofillPrefsStore.hasDismissedMainAppSettingsPromo
+        set(value) {
+            autofillPrefsStore.hasDismissedMainAppSettingsPromo = value
+        }
+
+    override var hasDeclinedPasswordManagementImportPromo: Boolean
+        get() = autofillPrefsStore.hasDeclinedPasswordManagementImportPromo
+        set(value) {
+            autofillPrefsStore.hasDeclinedPasswordManagementImportPromo = value
+        }
+
+    override var hasDeclinedInBrowserPasswordImportPromo: Boolean
+        get() = autofillPrefsStore.hasDeclinedInBrowserPasswordImportPromo
+        set(value) {
+            autofillPrefsStore.hasDeclinedInBrowserPasswordImportPromo = value
+        }
+
+    override var inBrowserImportPromoShownCount: Int
+        get() = autofillPrefsStore.inBrowserImportPromoShownCount
+        set(value) {
+            autofillPrefsStore.inBrowserImportPromoShownCount = value
+        }
+
     override var autofillDeclineCount: Int
         get() = autofillPrefsStore.autofillDeclineCount
         set(value) {
@@ -149,7 +183,8 @@ class SecureStoreBackedAutofillStore @Inject constructor(
             secureStorage.addWebsiteLoginDetailsWithCredentials(webSiteLoginCredentials)?.toLoginCredentials().also {
                 syncCredentialsListener.onCredentialAdded(it?.id!!)
                 it.id?.let { newCredentialId ->
-                    passwordStoreEventListeners.forEach { listener -> listener.onCredentialAdded(newCredentialId) }
+                    val credentialList = listOf(newCredentialId)
+                    passwordStoreEventListeners.forEach { listener -> listener.onCredentialAdded(credentialList) }
                 }
             }
         }
@@ -352,8 +387,9 @@ class SecureStoreBackedAutofillStore @Inject constructor(
     override suspend fun bulkInsert(credentials: List<LoginCredentials>): List<Long> {
         return withContext(dispatcherProvider.io()) {
             val mappedCredentials = credentials.map { it.prepareForBulkInsertion() }
-            return@withContext secureStorage.addWebsiteLoginDetailsWithCredentials(mappedCredentials).also {
-                syncCredentialsListener.onCredentialsAdded(it)
+            return@withContext secureStorage.addWebsiteLoginDetailsWithCredentials(mappedCredentials).also { credentialsAdded ->
+                syncCredentialsListener.onCredentialsAdded(credentialsAdded)
+                passwordStoreEventListeners.forEach { it.onCredentialAdded(credentialsAdded) }
             }
         }
     }

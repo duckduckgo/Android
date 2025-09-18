@@ -126,6 +126,7 @@
     <!-- Fire -->
     <string name="fireMenu">Ryd data</string>
     <string name="fireClearAll">Ryd alle faner og data</string>
+    <string name="fireClearAllPlusDuckChats">Ryd alle faner, data og Duck.ai-chats</string>
     <string name="fireCancel">Annuller</string>
     <string name="fireDataCleared">Data ryddet</string>
 
@@ -189,6 +190,28 @@
     <string name="webTrackingProtectionLearnMoreTitle">Beskyttelse mod sporing på nettet</string>
     <string name="webTrackingProtectionTitle">Beskyttelse mod sporing på nettet</string>
     <string name="webTrackingProtectionDescriptionNew"><![CDATA[DuckDuckGo blokerer automatisk skjulte trackere, når du surfer på nettet.\n<a href=\"\">Mere info</a>]]></string>
+    <string name="webTrackingProtectionExplanationDescription"><![CDATA[DuckDuckGo-browseren giver sporingbeskyttelse, som altid er aktiv.\n<a href=\"\">Mere info</a>]]></string>
+    <string name="webTrackingProtectionExplanationTitle">Sådan beskytter vi dig</string>
+    <string name="webTrackingProtectionThirdPartyTrackersTitle">Bloker tredjeparts-trackere</string>
+    <string name="webTrackingProtectionThirdPartyTrackersDescription">Hjælper med at blokere tredjepartscookies, der tracker dig fra websted til websted, ved at forhindre tredjepartstrackere i at blive indlæst.</string>
+    <string name="webTrackingProtectionTargetedAdsTitle">Blokerer målrettede annoncer</string>
+    <string name="webTrackingProtectionTargetedAdsDescription">Vi blokerer invasive trackere, før de indlæses, hvilket effektivt eliminerer annoncer, der er afhængige af sporing.</string>
+    <string name="webTrackingProtectionFingerprintTrackingTitle">Forhindrer sporing af fingeraftryk</string>
+    <string name="webTrackingProtectionFingerprintTrackingDescription">Hjælper med at forhindre sporingsvirksomheder i at få unikke identifikatorer om din browser og enhed, som de bruger til at følge dig rundt på nettet.</string>
+    <string name="webTrackingProtectionLinkTrackingTitle">Blokerer linksporing</string>
+    <string name="webTrackingProtectionLinkTrackingDescription">Fjerner sporingsparametre i links for at forhindre tredjeparter i at spore din adfærd på tværs af websteder.</string>
+    <string name="webTrackingProtectionReferrerTrackingTitle">Beskytter mod henvisningssporing</string>
+    <string name="webTrackingProtectionReferrerTrackingDescription">Hjælper med at forhindre virksomheder i at identificere den sidste hjemmeside, du har besøgt.</string>
+    <string name="webTrackingProtectionFirstPartyCookiesTitle">Udløber førsteparts-cookies</string>
+    <string name="webTrackingProtectionFirstPartyCookiesDescription">Lader automatisk førsteparts-cookies udløbe efter 30 dage, hvilket sikrer, at websteder ikke kan spore dig på ubestemt tid, når du er logget ud.</string>
+    <string name="webTrackingProtectionDnsCnameCloakingTitle">Beskytter mod DNS CNAME-tilsløring</string>
+    <string name="webTrackingProtectionDnsCnameCloakingDescription">Hjælper med at blokere tredjepartstrackere, der forsøger at skjule sig på et websted ved hjælp af DNS.</string>
+    <string name="webTrackingProtectionGoogleAmpTrackingTitle">Blokerer Googles AMP-sporing</string>
+    <string name="webTrackingProtectionGoogleAmpTrackingDescription">Erstatter Google AMP-links med den oprindelige udgivers websted.</string>
+    <string name="webTrackingProtectionGoogleSigninPopupsTitle">Blokerer Googles pop op-vinduer til login</string>
+    <string name="webTrackingProtectionGoogleSigninPopupsDescription">Blokerer pop op-vinduer til Google-login på websteder, som Google ikke ejer.</string>
+    <string name="webTrackingProtectionGlobalPrivacyControlTitle">Global Privacy Control (GPC)</string>
+    <string name="webTrackingProtectionGlobalPrivacyControlDescription">Udtrykker fravalgsrettigheder på dine vegne ved at fortælle websteder, at de ikke må sælge eller dele dine personlige oplysninger.</string>
 
     <!-- Cookie Pop-Up Protection -->
     <string name="cookiePopupProtectionTitle">Beskyttelse mod pop op-beskeder om cookies</string>
@@ -202,6 +225,7 @@
 
     <!-- Appearance -->
     <string name="appearanceActivityTitle">udseende</string>
+    <string name="settingsShowFullUrlTitle">Vis hele webstedsadressen</string>
 
     <!-- Settings - Automatically clearing data -->
     <string name="settingsAutomaticallyClearingDialogSave">Gem</string>
@@ -211,6 +235,7 @@
     <string name="settingsAutomaticallyClearWhatOptionNone">Ingen</string>
     <string name="settingsAutomaticallyClearWhatOptionTabs">Faner</string>
     <string name="settingsAutomaticallyClearWhatOptionTabsAndData">Faner og data</string>
+    <string name="settingsAutomaticallyClearWhatOptionTabsAndDataAndChats">Faner, data og Duck.ai-chats</string>
 
     <string name="settingsAutomaticallyClearWhen">Ryd den …</string>
     <string name="settingsAutomaticallyClearWhenDialogTitle">Ryd den …</string>
@@ -220,6 +245,8 @@
     <string name="settingsAutomaticallyClearWhenAppExit15Minutes">App-afslutning, inaktiv i 15 minutter</string>
     <string name="settingsAutomaticallyClearWhenAppExit30Minutes">App-afslutning, inaktiv i 30 minutter</string>
     <string name="settingsAutomaticallyClearWhenAppExit60Minutes">App-afslutning, inaktiv i 1 time</string>
+    <string name="settingsClearAiDataTitle">Ryd Duck.ai-chats</string>
+    <string name="settingsClearAiDataMessage">Fire Button sletter også Duck.ai-historik</string>
 
     <!-- About Activity -->
     <string name="aboutActivityTitle">Om DuckDuckGo</string>
@@ -248,8 +275,8 @@
     <string name="searchWidgetEmtpyFavoritesHint">Ingen favoritter tilføjet endnu</string>
     <string name="searchWidgetEmtpyFavoritesCta">Tilføj til favorit</string>
     <string name="widgetConfigurationActivityTitle">Widget-konfiguration</string>
-    <string name="favoritesWidgetLabel">Favoritter</string>
-    <string name="searchWidgetLabel">Søg</string>
+    <string name="favoritesWidgetLabel">Søg og favoritter</string>
+    <string name="searchWidgetLabel">Søg og Duck.ai</string>
 
     <!-- Home Screen Shortcuts -->
     <string name="addToHome">Tilføj til startskærm</string>
@@ -404,7 +431,6 @@
     <string name="crashedWebViewErrorAction">"Genindlæs"</string>
 
     <!-- System Search-->
-    <string name="systemSearchDeviceAppLabel">Fra denne enhed</string>
     <string name="systemSearchAppNotFound">Appen kunne ikke findes</string>
     <string name="systemSearchOnboardingThanks">Tak, fordi du valgte DuckDuckGo!\nNår du bruger vores browser, er du bedre beskyttet mod hackere, svindlere og datahungrende virksomheder.</string>
     <string name="systemSearchOnboardingFeaturesIntroText">DuckDuckGo-appen kan også:</string>
@@ -757,7 +783,7 @@
     <string name="preOnboardingComparisonChartItem1">Søg fortroligt som standard</string>
     <string name="preOnboardingComparisonChartItem2">Bloker tredjeparts-trackere</string>
     <string name="preOnboardingComparisonChartItem3">Bloker pop op-vinduer om cookies</string>
-    <string name="preOnboardingComparisonChartItem4">Bloker sporende annoncer</string>
+    <string name="preOnboardingComparisonChartItem4">Bloker målrettede annoncer</string>
     <string name="preOnboardingComparisonChartItem5">Slet browsingdata med én knap</string>
     <string name="preOnboardingDaxDialog3Title">Fantastisk! Velkommen til den \"anden\" side.</string>
     <string name="preOnboardingDaxDialog3Button">Start søgning</string>
@@ -796,8 +822,9 @@
     <string name="onboardingEndDaxDialogDescription">Husk: hver gang du browser med mig, mister en uhyggelig annonce sine vinger. 👌</string>
     <string name="onboardingEndDaxDialogButton">Helt færdig!</string>
     <string name="onboardingPrivacyProDaxDialogTitle">Åh, før jeg glemmer det...</string>
-    <string name="onboardingPrivacyProDaxDialogDescription"><![CDATA[DuckDuckGo har også en indbygget <b>VPN</b>!<br/><br/>Aktiver den med et <b>betalt Privacy Pro-abonnement.</b>]]></string>
+    <string name="onboardingPrivacyProDaxDialogDescription"><![CDATA[DuckDuckGo har også en sikker <b>VPN + 2 ekstra premium-beskyttelser</b>, tilgængelige med et <b>valgfrit betalt abonnement</b>.]]></string>
     <string name="onboardingPrivacyProDaxDialogOkButton">Mere info</string>
+    <string name="onboardingPrivacyProDaxDialogFreeTrialOkButton">Prøv gratis!</string>
     <string name="onboardingPrivacyProDaxDialogCancelButton">Spring over</string>
 
     <!-- Highlight Onboarding Experiment-->
@@ -842,19 +869,15 @@
     <!-- Privacy Dashboard -->
     <string name="brokenSiteSubmittedReportMessage">Tak! Din rapport hjælper med at gøre DuckDuckGo bedre for alle!</string>
 
-    <!-- DuckChat -->
-    <string name="duckChatTitle">Duck.ai</string>
-    <string name="duckChatMenuItem">Ny AI-chat</string>
-
     <!--    Default Browser Bottom Sheet Dialog -->
     <string name="defaultBrowserBottomSheetDialogTitle">Lad DuckDuckGo beskytte mere af det, du foretager dig online</string>
-    <string name="defaultBrowserBottomSheetDialogSubTitle">Gør os til din standardbrowser, så alle links åbner i DuckDuckGo.</string>
-    <string name="defaultBrowserBottomSheetDialogGhostButton">Ikke nu</string>
+    <string name="defaultBrowserBottomSheetDialogSubTitle">Skift din standardbrowser, så links åbner i DuckDuckGo.</string>
+    <string name="defaultBrowserBottomSheetDialogGhostButton" instruction="This text appears on a button">Ikke nu</string>
 
-    <!--TabSwitcher Animation Tile Dialog-->
-    <string name="tabSwitcherAnimationTileRemovalDialogTitle">DuckDuckGo blokerer trackere for at beskytte din browsing</string>
-    <string name="tabSwitcherAnimationTileRemovalDialogBody">Hvis du rydder dine faner og data, slettes din tracker-blokeringshistorik, og dette tal nulstilles.\n\nSkjul dette banner, hvis du ikke ønsker at se det i fanebladene.</string>
-    <string name="tabSwitcherAnimationTileRemovalDialogNegativeButton">Skjul banner</string>
+    <!-- Default Browser message -->
+    <string name="newTabPageDefaultBrowserMessageHeading">DuckDuckGo er ikke din standardbrowser. Få mere beskyttelse.</string>
+    <string name="newTabPageDefaultBrowserMessagePrimaryCta" instruction="This text appears on a button">Angiv som standard</string>
+    <string name="newTabPageDefaultBrowserMessageSecondaryCta" instruction="This text appears on a button">Spørg ikke igen</string>
 
     <!-- Threat protection -->
     <string name="maliciousSiteTitle">Advarsel: Dette websted kan udgøre en sikkerhedsrisiko</string>
@@ -878,4 +901,59 @@
     <string name="scamBlockerTitle">Blokering af svindel</string>
     <string name="scamBlockerDescription">Advar på websteder, der er registreret for svindel, phishing og malware.</string>
     <string name="threatProtectionLearnMoreTitle">Mere info</string>
+
+    <!-- Experiment: Improve prompts for "homescreen widget" -->
+    <string name="experimentHomeScreenWidgetBottomSheetDialogTitle">Prøv vores widget til startskærmen!</string>
+    <string name="experimentHomeScreenWidgetBottomSheetDialogSubTitle">Tilføj vores søgewidget på startskærmbilledet for hurtig og nem adgang.</string>
+    <string name="experimentHomeScreenWidgetBottomSheetDialogPrimaryButton">Tilføj widget</string>
+    <string name="experimentHomeScreenWidgetBottomSheetDialogGhostButton">Ikke nu</string>
+    <string name="experimentHomeScreenWidgetBottomSheetDialogSearchText">Søg på DuckDuckGo</string>
+
+    <!-- Change under remote feature flag: Widget as a Protection -->
+    <string name="settingsAddHomeWidgetTitle">Startskærmswidget</string>
+
+    <!-- Section in main app settings -->
+    <string name="settingsHeadingCompleteSetup">Færdiggør opsætningen</string>
+
+    <!-- Buck Onboarding Experiment -->
+    <string name="highlightsPreOnboardingDaxDialog1TitleBuck">Hej</string>
+    <string name="highlightsPreOnboardingDaxDialog1DescriptionBuck">Er du klar til en hurtigere browser, der holder dig beskyttet?</string>
+    <string name="highlightsPreOnboardingDaxDialog2TitleBuck"><![CDATA[<b>Beskyttelse</b> <i>aktiveret!</i>]]></string>
+
+    <!-- BB Onboarding Experiment -->
+    <string name="highlightsPreOnboardingDaxDialog1TitleBb"><![CDATA[Hej<br/>Er du klar til en hurtigere browser, der holder dig beskyttet?]]></string>
+
+    <string name="bbOnboardingFireButtonDaxDialogTitle"><![CDATA[Ryd din browseraktivitet på et øjeblik med <font color=\"#F05C2B\">Fire Button</font>]]></string>
+    <string name="bbOnboardingFireButtonDaxDialogDescription">Prøv det!️</string>
+
+    <plurals name="bbOnboardingTrackersBlockedDialogTitle">
+        <item quantity="one"><![CDATA[ og %1$d nogen forsøgte at spore dig her. <font color=\"#F05C2B\">Jeg blokerede dem!</font>]]></item>
+        <item quantity="other"><![CDATA[ og %1$d nogen forsøgte at spore dig her. <font color=\"#F05C2B\">Jeg blokerede dem!</font>]]></item>
+    </plurals>
+    <plurals name="bbOnboardingTrackersBlockedZeroDialogTitle" tools:ignore="ImpliedQuantity">
+        <item quantity="one"><![CDATA[ prøvede at spore dig her. <font color=\"#F05C2B\">Jeg blokerede dem!</font>]]></item>
+        <item quantity="other"><![CDATA[ prøvede at spore dig her. <font color=\"#F05C2B\">Jeg blokerede dem!</font>]]></item>
+    </plurals>
+
+    <string name="bbOnboardingTrackersBlockedDialogDescription">☝️Tryk på skjoldet for at få mere information.️</string>
+
+    <!-- Privacy Pro Rebranding-->
+    <string name="aboutDescriptionBrandUpdate2025Rebranding">Welcome to the Duck Side!\n\nDuckDuckGo er den uafhængige online-beskyttelsesvirksomhed for alle, der vil tage kontrollen over deres personlige oplysninger tilbage.\n\nVi mener, at den bedste måde at beskytte dine personlige oplysninger mod hackere, svindlere og virksomheder, der krænker privatlivets fred, er at forhindre, at de overhovedet bliver indsamlet. Derfor vælger millioner af mennesker <annotation type="chart_comparison">DuckDuckGo frem for Chrome og andre browsere</annotation> til at søge og surfe på nettet. Vores indbyggede søgemaskine er som Google, men sporer aldrig dine søgninger. Og vores browserbeskyttelse, som f.eks. blokering af reklametrackere og cookies, hjælper med at forhindre andre virksomheder i at indsamle dine data. Forresten er vores browser gratis — vi tjener penge på <annotation type="privacy_respecting_ads">søgeannoncer, der respekterer privatlivets fred</annotation>, ikke ved at udnytte dine data.Derudover tilbyder vi også et <annotation type="ppro_help_page">DuckDuckGo-abonnement</annotation>, der er integreret i vores browser. Abonnenter får endnu mere beskyttelse af privatlivet med en hurtig og enkel <annotation type="vpn_help_page">VPN</annotation>, der hjælper med at sikre din onlineaktivitet, adgang til avancerede AI-modeller i vores private AI-chattjeneste Duck.ai, en tjeneste, der finder og fjerner dine personlige oplysninger fra personfinderwebsteder, og en tjeneste, der gendanner din identitet, hvis den bliver stjålet.\n\nTag kontrollen over dine personlige oplysninger tilbage med browseren, der er designet til databeskyttelse, ikke dataindsamling.</string>
+    <string name="onboardingPrivacyProDaxDialogDescriptionRebranding"><![CDATA[DuckDuckGo har også et <b>valgfrit betalt abonnement</b> med en sikker <b>VPN</b> og <b>avanceret, privat AI</b>.]]></string>
+    <string name="settingsDuckAiRebranding">AI-funktioner</string>
+    <string name="settingsDuckAi">Duck.ai</string>
+
+    <!--TabSwitcher Trackers Animation-->
+    <string name="showTrackerCountInTabSwitcher">Vis tracker-antal i faneomskifteren</string>
+    <string name="tabSwitcherAnimationTileRemovalDialogTitle" instruction="A title for a dialog that shows when a user clicks a tile that shows them their current blocked tracker count">Skjul tracker-antallet?</string>
+    <string name="tabSwitcherAnimationTileRemovalDialogBody" instruction="A message for a dialog that shows when a user clicks a tile that shows them their current blocked tracker count">Du kan slå det til igen i Indstillinger &gt; Udseende.</string>
+    <string name="tabSwitcherAnimationTileRemovalDialogPositiveButton">Skjul</string>
+    <string name="tabSwitcherAnimationTileRemovalDialogNegativeButton">Behold</string>
+
+    <!-- Widgets -->
+    <string name="searchOnlyWidgetLabel" instruction="Label for the search-only widget">Kun søgning</string>
+    <string name="searchOnlyWidgetDescription" instruction="Description for the search-only widget">Start hurtigt en privat søgning med DuckDuckGo.</string>
+    <string name="searchWidgetDescription" instruction="Description for the search widget, which may include Duck.ai and voice search">Søg privat med DuckDuckGo, eller spørg Duck.ai. Stemmesøgning og Duck.ai er tilgængelige, hvis de er aktiveret.</string>
+    <string name="searchAndFavoritesWidgetDescription" instruction="Description for the search and favorites widget">Søg eller besøg dine yndlingssider privat med ét tryk. Stemmesøgning og Duck.ai er tilgængelige, hvis de er aktiveret.</string>
+    <string name="duckAiOnlyPinShortcutLabel" instruction="Label for the Duck.ai pinned shortcut. Should be Duck.ai in all languages">Duck.ai</string>
 </resources>

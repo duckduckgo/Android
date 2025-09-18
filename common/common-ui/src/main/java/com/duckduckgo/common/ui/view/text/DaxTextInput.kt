@@ -48,6 +48,7 @@ import com.duckduckgo.common.ui.view.text.DaxTextInput.Type.INPUT_TYPE_IP_ADDRES
 import com.duckduckgo.common.ui.view.text.DaxTextInput.Type.INPUT_TYPE_MULTI_LINE
 import com.duckduckgo.common.ui.view.text.DaxTextInput.Type.INPUT_TYPE_PASSWORD
 import com.duckduckgo.common.ui.view.text.DaxTextInput.Type.INPUT_TYPE_SINGLE_LINE
+import com.duckduckgo.common.ui.view.text.DaxTextInput.Type.INPUT_TYPE_URL_MODE
 import com.duckduckgo.common.ui.view.text.TextInput.Action
 import com.duckduckgo.common.ui.view.text.TextInput.Action.PerformEndAction
 import com.duckduckgo.common.ui.viewbinding.viewBinding
@@ -81,7 +82,7 @@ interface TextInput {
     fun doOnTextChanged(action: (CharSequence?, Int, Int, Int) -> Unit)
 
     sealed class Action {
-        object PerformEndAction : Action()
+        data object PerformEndAction : Action()
     }
 }
 
@@ -368,6 +369,8 @@ class DaxTextInput @JvmOverloads constructor(
             binding.internalEditText.keyListener = DigitsKeyListener.getInstance("0123456789.")
         } else if (inputType == INPUT_TYPE_MULTI_LINE || inputType == INPUT_TYPE_FORM_MODE) {
             binding.internalEditText.inputType = EditorInfo.TYPE_CLASS_TEXT or EditorInfo.TYPE_TEXT_FLAG_MULTI_LINE
+        } else if (inputType == INPUT_TYPE_URL_MODE) {
+            binding.internalEditText.inputType = EditorInfo.TYPE_CLASS_TEXT or EditorInfo.TYPE_TEXT_VARIATION_URI
         } else {
             binding.internalEditText.inputType = EditorInfo.TYPE_CLASS_TEXT
         }
@@ -429,6 +432,7 @@ class DaxTextInput @JvmOverloads constructor(
         INPUT_TYPE_PASSWORD(2),
         INPUT_TYPE_FORM_MODE(3),
         INPUT_TYPE_IP_ADDRESS_MODE(4),
+        INPUT_TYPE_URL_MODE(5),
     }
 
     companion object {

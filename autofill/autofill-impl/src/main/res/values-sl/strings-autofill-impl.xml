@@ -252,7 +252,7 @@
 
     <string name="newTabPageShortcutPasswords">Gesla</string>
 
-    <string name="autofillImportGooglePasswordsWebFlowTitle">Uvozi gesla iz Googla</string>
+    <string name="autofillImportGooglePasswordsWebFlowTitle">Uvozi gesla</string>
     <string name="autofillImportGooglePasswordsSuccessMessage" instruction="Placeholder is the number of passwords imported">Št. gesel, uvoženih iz Googla: %1$d</string>
     <string name="autofillImportCsvPasswordsSuccessMessage" instruction="Placeholder is the number of passwords imported">Št. gesel, uvoženih iz CSV: %1$d</string>
 
@@ -262,9 +262,9 @@
     <string name="autofillSyncDesktopPasswordEmptyStateButtonTitle">Sinhroniziraj gesla za namizje</string>
     <string name="autofillSyncDesktopPasswordsMenuTitle">Sinhroniziraj gesla za namizje</string>
 
-    <string name="importPasswordsChooseMethodDialogTitle">Uvozite svoja gesla iz Googla</string>
+    <string name="importPasswordsChooseMethodDialogTitle">Uvozi gesla iz Googla</string>
     <string name="importPasswordsChooseMethodDialogSubtitle">Google vas bo morda prosil, da se prijavite ali vnesete geslo za potrditev.</string>
-    <string name="importPasswordsChooseMethodDialogGpmButton">Odprite gesla v Googlu</string>
+    <string name="importPasswordsChooseMethodDialogGpmButton">Uvozi iz Googla</string>
     <string name="importPasswordsChooseMethodDialogCsvButton">Izberite datoteko CSV</string>
     <string name="importPasswordsChooseMethodDialogDesktopSyncButton">Uvoz iz namiznega brskalnika</string>
 
@@ -292,5 +292,13 @@
     <string name="autofillSettingsImportFromGoogleLabel">Uvozi gesla iz Googla</string>
     <string name="autofillSettingsImportFromDesktopSync">Sinhroniziraj gesla za namizje</string>
     <string name="autofillSettingsResetExcludedSitesTitle">Ponastavi izključena spletna mesta</string>
+
+    <string name="passwords_import_promo_title" instruction="The &apos;br&apos; is a forced line break for English. It does not need to be included in translations.">Prenesite gesla iz&lt;br /&gt;Googla v DuckDuckGo</string>
+    <string name="passwords_import_promo_subtitle">Hitro in varno uvozite svoja gesla v DuckDuckGo. Google vas bo morda prosil, da vnesete geslo.</string>
+    <string name="passwords_import_promo_action">Uvozi iz Googla</string>
+    <string name="passwords_import_promo_in_browser_title">Prenesite gesla iz Googla v DuckDuckGo</string>
+    <string name="passwords_import_promo_in_browser_secondary_action_button">Ne vprašaj več</string>
+    <string name="passwords_import_promo_in_settings_title">Uvozi gesla iz Googla</string>
+    <string name="passwords_import_promo_in_settings_dismiss_text">Skrij se</string>
 
 </resources>

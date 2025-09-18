@@ -32,4 +32,6 @@
         <attr name="panelText" format="string" />
     </declare-styleable>
 
+    <!--Tab Switcher Tracker Animation Info Panel-->
+    <attr name="tabSwitcherTrackersAnimationInfoPanelBackgroundColor" format="color" />
 </resources>

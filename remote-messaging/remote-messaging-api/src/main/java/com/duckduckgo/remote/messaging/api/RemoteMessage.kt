@@ -82,7 +82,8 @@ sealed class Content(val messageType: MessageType) {
         APP_UPDATE("AppUpdate"),
         MAC_AND_WINDOWS("NewForMacAndWindows"),
         PRIVACY_SHIELD("PrivacyShield"),
-        DUCK_AI("Duck.ai"),
+        DUCK_AI_OLD("Duck.ai"),
+        DUCK_AI("DuckAi"),
         VISUAL_DESIGN_UPDATE("VisualDesignUpdate"),
         ;
 
@@ -97,9 +98,9 @@ sealed class Content(val messageType: MessageType) {
 sealed class Action(val actionType: String, open val value: String, open val additionalParameters: Map<String, String>?) {
     data class Url(override val value: String) : Action(URL.jsonValue, value, null)
     data class PlayStore(override val value: String) : Action(PLAYSTORE.jsonValue, value, null)
-    object DefaultBrowser : Action(DEFAULT_BROWSER.jsonValue, "", null)
-    object Dismiss : Action(DISMISS.jsonValue, "", null)
-    object AppTpOnboarding : Action(APP_TP_ONBOARDING.jsonValue, "", null)
+    data object DefaultBrowser : Action(DEFAULT_BROWSER.jsonValue, "", null)
+    data object Dismiss : Action(DISMISS.jsonValue, "", null)
+    data object AppTpOnboarding : Action(APP_TP_ONBOARDING.jsonValue, "", null)
     data class Share(
         override val value: String,
         override val additionalParameters: Map<String, String>?,

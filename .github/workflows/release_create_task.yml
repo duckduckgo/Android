@@ -42,7 +42,7 @@ jobs:
 
       - name: Notify Mattermost of Release starting
         id: send-mm-release-starting
-        uses: duckduckgo/native-github-asana-sync@v1.8
+        uses: duckduckgo/native-github-asana-sync@v2.0
         with:
           mattermost-token: ${{ secrets.MM_AUTH_TOKEN }}
           mattermost-team-id: ${{ secrets.MM_TEAM_ID }}
@@ -63,27 +63,48 @@ jobs:
           project_gid: ${{ vars.GH_ANDROID_RELEASE_BOARD_PROJECT_ID }}
           username: ${{ github.actor }}
 
+      - name: Read Task ID from file and set as output
+        id: read_task_output_step
+        run: |
+          OUTPUT_FILE="${{ github.workspace }}/asana_task_id.txt"
+          echo "Attempting to read Task ID from file: $OUTPUT_FILE"
+          if [ -f "$OUTPUT_FILE" ]; then
+            TASK_ID_VALUE=$(cat "$OUTPUT_FILE")
+            echo "Raw content from file: '$TASK_ID_VALUE'"
+            # Check for error markers
+            if [[ "$TASK_ID_VALUE" == "TASK_NOT_FOUND" || "$TASK_ID_VALUE" == "USER_MAPPING_FILE_NOT_FOUND" || "$TASK_ID_VALUE" == "USER_NOT_IN_MAPPING" ]]; then
+              echo "::error::Error marker found in output file: $TASK_ID_VALUE"
+              echo "task_id=" >> $GITHUB_OUTPUT # Set actual output to empty on error
+            else
+              echo "Successfully read Task ID: '$TASK_ID_VALUE'"
+              echo "task_id=$TASK_ID_VALUE" >> $GITHUB_OUTPUT
+            fi
+          else
+            echo "::error::Output file $OUTPUT_FILE not found!"
+            echo "task_id=" >> $GITHUB_OUTPUT # Set actual output to empty if file not found
+          fi
+
       - name: Get Asana Task Permalink
         id: get-task-permalink
-        uses: duckduckgo/native-github-asana-sync@v1.8
-        with:          
+        uses: duckduckgo/native-github-asana-sync@v2.0
+        with:
           asana-pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
-          asana-task-id: ${{ steps.assign-release-task.outputs.task_id }}
+          asana-task-id: ${{ steps.read_task_output_step.outputs.task_id }}
           action: 'get-asana-task-permalink'
 
       - name: Notify Mattermost of Task created
         id: send-mm-task-created
-        uses: duckduckgo/native-github-asana-sync@v1.8
+        uses: duckduckgo/native-github-asana-sync@v2.0
         with:
           mattermost-token: ${{ secrets.MM_AUTH_TOKEN }}
           mattermost-team-id: ${{ secrets.MM_TEAM_ID }}
           mattermost-channel-name: ${{ vars.MM_RELEASE_NOTIFY_CHANNEL }}
-          mattermost-message: ${{env.emoji_info}} Release ${{ github.event.inputs.app-version }}. Task created successfully ${{ steps.get-task-permalink.outputs.asanaTaskPermalink }}
+          mattermost-message: ${{env.emoji_info}} Release task created successfully ${{ steps.get-task-permalink.outputs.asanaTaskPermalink }}
           action: 'send-mattermost-message'
 
       - name: Create Asana task when workflow failed
         if: ${{ failure() }}
-        uses: duckduckgo/native-github-asana-sync@v1.8
+        uses: duckduckgo/native-github-asana-sync@v2.0
         with:
           asana-pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
           asana-project: ${{ vars.GH_ANDROID_APP_PROJECT_ID }}
@@ -95,7 +116,7 @@ jobs:
       - name: Notify Mattermost when workflow failed
         if: ${{ failure() }}
         id: send-mm-message-error
-        uses: duckduckgo/native-github-asana-sync@v1.8
+        uses: duckduckgo/native-github-asana-sync@v2.0
         with:
           mattermost-token: ${{ secrets.MM_AUTH_TOKEN }}
           mattermost-team-id: ${{ secrets.MM_TEAM_ID }}

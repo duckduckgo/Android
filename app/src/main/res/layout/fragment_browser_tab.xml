@@ -20,16 +20,13 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <com.duckduckgo.app.browser.omnibar.experiments.ScrollingOmnibarLayout
-        android:id="@+id/newOmnibar"
+    <com.duckduckgo.app.browser.omnibar.SingleOmnibarLayout
+        android:id="@+id/singleOmnibar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:omnibarPosition="top" />
-
-    <com.duckduckgo.app.browser.omnibar.experiments.FadeOmnibarLayout
-        android:id="@+id/fadeOmnibar"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:background="@android:color/transparent"
+        android:elevation="1dp"
+        android:outlineProvider="none"
         app:omnibarPosition="top" />
 
     <FrameLayout
@@ -87,16 +84,33 @@
         app:layout_behavior="com.duckduckgo.app.browser.webview.TopOmnibarBrowserContainerLayoutBehavior"
         tools:context="com.duckduckgo.app.browser.BrowserActivity">
 
+        <View
+            android:id="@+id/topBrowserOutlineStroke"
+            android:layout_width="match_parent"
+            android:layout_height="0.5dp"
+            android:background="?attr/daxColorShade"
+            android:elevation="20dp"
+            android:layout_alignParentTop="true" />
+
         <FrameLayout
             android:id="@+id/daxDialogOnboardingCtaContent"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:animateLayoutChanges="true"
             android:elevation="@dimen/keyline_4">
 
             <include
                 android:id="@+id/includeOnboardingInContextDaxDialog"
                 layout="@layout/include_onboarding_in_context_dax_dialog"
+                android:visibility="gone" />
+
+            <include
+                android:id="@+id/includeOnboardingInContextBuckDialog"
+                layout="@layout/include_onboarding_in_context_buck_dialog"
+                android:visibility="gone" />
+
+            <include
+                android:id="@+id/includeOnboardingInContextBBDialog"
+                layout="@layout/include_onboarding_in_context_bb_dialog"
                 android:visibility="gone" />
 
             <include
@@ -137,27 +151,22 @@
             android:layout_below="@id/daxDialogOnboardingCtaContent"
             android:focusableInTouchMode="true" />
 
+        <View
+            android:id="@+id/bottomBrowserOutlineStroke"
+            android:layout_width="match_parent"
+            android:layout_height="0.5dp"
+            android:background="?attr/daxColorShadeSolid"
+            android:elevation="1dp"
+            android:layout_alignParentBottom="true" />
+
     </RelativeLayout>
 
-    <com.duckduckgo.app.browser.omnibar.experiments.ScrollingOmnibarLayout
-        android:id="@+id/newOmnibarBottom"
-        android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"
-        android:layout_gravity="bottom"
-        app:omnibarPosition="bottom" />
-
-    <com.duckduckgo.app.browser.omnibar.experiments.FadeOmnibarLayout
-        android:id="@+id/fadeOmnibarBottom"
+    <com.duckduckgo.app.browser.omnibar.SingleOmnibarLayout
+        android:id="@+id/singleOmnibarBottom"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:outlineProvider="none"
         android:layout_gravity="bottom"
         app:omnibarPosition="bottom" />
-
-    <com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarView
-        android:id="@+id/navigationBar"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:showShadows="true"
-        android:layout_gravity="bottom" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

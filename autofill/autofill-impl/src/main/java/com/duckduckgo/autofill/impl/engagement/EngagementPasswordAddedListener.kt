@@ -43,7 +43,7 @@ class EngagementPasswordAddedListener @Inject constructor(
     private var credentialAdded = false
 
     @Synchronized
-    override fun onCredentialAdded(id: Long) {
+    override fun onCredentialAdded(newCredentialIds: List<Long>) {
         if (credentialAdded) return
 
         credentialAdded = true

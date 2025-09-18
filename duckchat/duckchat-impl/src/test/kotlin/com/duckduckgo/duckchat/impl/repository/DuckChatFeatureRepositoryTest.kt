@@ -16,6 +16,7 @@
 
 package com.duckduckgo.duckchat.impl.repository
 
+import android.content.Context
 import com.duckduckgo.duckchat.impl.store.DuckChatDataStore
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.take
@@ -25,13 +26,17 @@ import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.mockito.Mockito.mock
+import org.mockito.kotlin.argThat
+import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
 class DuckChatFeatureRepositoryTest {
     private val mockDataStore: DuckChatDataStore = mock()
 
-    private val testee = RealDuckChatFeatureRepository(mockDataStore)
+    private val mockContext: Context = mock()
+
+    private val testee = RealDuckChatFeatureRepository(mockDataStore, mockContext)
 
     @Test
     fun whenSetDuckChatUserEnabledThenSetInDataStore() = runTest {
@@ -52,6 +57,13 @@ class DuckChatFeatureRepositoryTest {
         testee.setShowInAddressBar(false)
 
         verify(mockDataStore).setShowInAddressBar(false)
+    }
+
+    @Test
+    fun `when setInputScreenUserSetting then set in data store`() = runTest {
+        testee.setInputScreenUserSetting(false)
+
+        verify(mockDataStore).setInputScreenUserSetting(false)
     }
 
     @Test
@@ -82,6 +94,15 @@ class DuckChatFeatureRepositoryTest {
     }
 
     @Test
+    fun `when observeInputScreenUserSettingEnabled then observe data store`() = runTest {
+        whenever(mockDataStore.observeInputScreenUserSettingEnabled()).thenReturn(flowOf(false, true))
+
+        val results = testee.observeInputScreenUserSettingEnabled().take(2).toList()
+        assertFalse(results[0])
+        assertTrue(results[1])
+    }
+
+    @Test
     fun whenIsDuckChatUserEnabledThenGetFromDataStore() = runTest {
         whenever(mockDataStore.isDuckChatUserEnabled()).thenReturn(false)
         assertFalse(testee.isDuckChatUserEnabled())
@@ -101,9 +122,40 @@ class DuckChatFeatureRepositoryTest {
     }
 
     @Test
+    fun `when isInputScreenUserSettingEnabled called, then get from data store`() = runTest {
+        whenever(mockDataStore.isInputScreenUserSettingEnabled()).thenReturn(true)
+        assertTrue(testee.isInputScreenUserSettingEnabled())
+    }
+
+    @Test
     fun whenRegisterDuckChatOpenedThenDataStoreCalled() = runTest {
+        whenever(mockDataStore.wasOpenedBefore()).thenReturn(false)
         testee.registerOpened()
 
+        verify(mockDataStore).registerOpened()
+    }
+
+    @Test
+    fun whenRegisterDuckChatOpenedFirstTimeThenWidgetsUpdated() = runTest {
+        whenever(mockDataStore.wasOpenedBefore()).thenReturn(false)
+
+        testee.registerOpened()
+
+        verify(mockContext).sendBroadcast(
+            argThat { intent -> true },
+        )
+        verify(mockDataStore).registerOpened()
+    }
+
+    @Test
+    fun whenRegisterDuckChatOpenedNotFirstTimeThenWidgetsNotUpdated() = runTest {
+        whenever(mockDataStore.wasOpenedBefore()).thenReturn(true)
+
+        testee.registerOpened()
+
+        verify(mockContext, never()).sendBroadcast(
+            argThat { intent -> true },
+        )
         verify(mockDataStore).registerOpened()
     }
 

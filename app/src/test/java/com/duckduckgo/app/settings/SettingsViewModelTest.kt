@@ -21,24 +21,30 @@ import app.cash.turbine.test
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
+import com.duckduckgo.app.settings.SettingsViewModel.Command.LaunchAddHomeScreenWidget
 import com.duckduckgo.app.settings.SettingsViewModel.Command.LaunchAutofillPasswordsManagement
 import com.duckduckgo.app.settings.SettingsViewModel.Command.LaunchAutofillSettings
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.widget.ui.WidgetCapabilities
 import com.duckduckgo.autoconsent.api.Autoconsent
 import com.duckduckgo.autofill.api.AutofillCapabilityChecker
 import com.duckduckgo.autofill.api.AutofillFeature
 import com.duckduckgo.autofill.api.email.EmailManager
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckplayer.api.DuckPlayer
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.mobile.android.app.tracking.AppTrackingProtection
+import com.duckduckgo.settings.api.SettingsPageFeature
 import com.duckduckgo.subscriptions.api.PrivacyProUnifiedFeedback
+import com.duckduckgo.subscriptions.api.SubscriptionRebrandingFeatureToggle
 import com.duckduckgo.subscriptions.api.Subscriptions
 import com.duckduckgo.sync.api.DeviceSyncState
 import com.duckduckgo.voice.api.VoiceSearchAvailability
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.*
@@ -87,11 +93,23 @@ class SettingsViewModelTest {
 
     private val fakeAndroidBrowserConfigFeature = FakeFeatureToggleFactory.create(AndroidBrowserConfigFeature::class.java)
 
+    private val fakeSettingsPageFeature = FakeFeatureToggleFactory.create(SettingsPageFeature::class.java)
+
+    private val mockWidgetCapabilities: WidgetCapabilities = mock()
+
+    private val mockDuckAiFeatureState: DuckAiFeatureState = mock()
+    private val duckAiShowSettingsFlow = MutableStateFlow(false)
+
+    private val fakePostCtaExperienceToggles = FakeFeatureToggleFactory.create(PostCtaExperienceToggles::class.java)
+    private val mockRebrandingFeatureToggle: SubscriptionRebrandingFeatureToggle = mock()
+
     @Before
     fun before() = runTest {
+        whenever(dispatcherProviderMock.io()).thenReturn(coroutineTestRule.testDispatcher)
         whenever(appTrackingProtectionMock.isRunning()).thenReturn(true)
         whenever(autofillCapabilityCheckerMock.canAccessCredentialManagementScreen()).thenReturn(true)
         whenever(subscriptionsMock.isEligible()).thenReturn(true)
+        whenever(mockDuckAiFeatureState.showSettings).thenReturn(duckAiShowSettingsFlow)
 
         testee = SettingsViewModel(
             defaultWebBrowserCapability = defaultWebBrowserCapabilityMock,
@@ -105,11 +123,16 @@ class SettingsViewModelTest {
             subscriptions = subscriptionsMock,
             duckPlayer = duckPlayerMock,
             duckChat = duckChatMock,
+            duckAiFeatureState = mockDuckAiFeatureState,
             voiceSearchAvailability = voiceSearchAvailabilityMock,
             privacyProUnifiedFeedback = privacyProUnifiedFeedbackMock,
             settingsPixelDispatcher = settingsPixelDispatcherMock,
             autofillFeature = autofillFeature,
             androidBrowserConfigFeature = fakeAndroidBrowserConfigFeature,
+            settingsPageFeature = fakeSettingsPageFeature,
+            widgetCapabilities = mockWidgetCapabilities,
+            postCtaExperienceToggles = fakePostCtaExperienceToggles,
+            rebrandingFeatureToggle = mockRebrandingFeatureToggle,
         )
     }
 
@@ -165,5 +188,99 @@ class SettingsViewModelTest {
         fakeAndroidBrowserConfigFeature.newThreatProtectionSettings().setRawStoredState(State(true))
         testee.start()
         assertTrue(testee.viewState().first().isNewThreatProtectionSettingsEnabled)
+    }
+
+    @Test
+    fun whenWidgetAsProtectionFlagEnabledThenAddWidgetIsVisibleInProtectionsSection() = runTest {
+        fakeSettingsPageFeature.self().setRawStoredState(State(true))
+        fakeSettingsPageFeature.widgetAsProtection().setRawStoredState(State(true))
+        testee.start()
+        assertTrue(testee.viewState().first().isAddWidgetInProtectionsVisible)
+    }
+
+    @Test
+    fun whenWidgetAsProtectionFlagDisabledThenAddWidgetIsNotVisibleInProtectionsSection() = runTest {
+        fakeSettingsPageFeature.self().setRawStoredState(State(true))
+        fakeSettingsPageFeature.widgetAsProtection().setRawStoredState(State(false))
+        testee.start()
+        assertFalse(testee.viewState().first().isAddWidgetInProtectionsVisible)
+    }
+
+    @Test
+    fun whenUserRequestedToAddHomeScreenWidgetAndSimpleWidgetThenLaunchAddHomeScreenWidgetCommandSentWithTrue() = runTest {
+        fakePostCtaExperienceToggles.self().setRawStoredState(State(true))
+        fakePostCtaExperienceToggles.simpleSearchWidgetPrompt().setRawStoredState(State(true))
+
+        testee.userRequestedToAddHomeScreenWidget()
+
+        testee.commands().test {
+            assertEquals(LaunchAddHomeScreenWidget(true), awaitItem())
+        }
+    }
+
+    @Test
+    fun whenUserRequestedToAddHomeScreenWidgetAndNotSimpleWidgetThenLaunchAddHomeScreenWidgetCommandSentWithFalse() = runTest {
+        fakePostCtaExperienceToggles.self().setRawStoredState(State(true))
+        fakePostCtaExperienceToggles.simpleSearchWidgetPrompt().setRawStoredState(State(false))
+
+        testee.userRequestedToAddHomeScreenWidget()
+
+        testee.commands().test {
+            assertEquals(LaunchAddHomeScreenWidget(false), awaitItem())
+        }
+    }
+
+    @Test
+    fun whenRefreshWidgetsInstalledStateAndWidgetsNewlyInstalledThenViewStateUpdatedAndCapabilitiesChecked() =
+        runTest {
+            fakeSettingsPageFeature.self().setRawStoredState(State(true))
+            fakeSettingsPageFeature.widgetAsProtection().setRawStoredState(State(true))
+            whenever(mockWidgetCapabilities.hasInstalledWidgets).thenReturn(false) // Initial state for start()
+            testee.start()
+            // Ensure initial state is as expected
+            assertEquals(true, testee.viewState().value.isAddWidgetInProtectionsVisible)
+            assertEquals(false, testee.viewState().value.widgetsInstalled)
+
+            whenever(mockWidgetCapabilities.hasInstalledWidgets).thenReturn(true) // New state for refresh
+
+            testee.refreshWidgetsInstalledState()
+
+            assertEquals(true, testee.viewState().value.widgetsInstalled)
+        }
+
+    @Test
+    fun whenRefreshWidgetsInstalledStateAndWidgetsNewlyUninstalledThenViewStateUpdatedAndCapabilitiesChecked() =
+        runTest {
+            fakeSettingsPageFeature.self().setRawStoredState(State(true))
+            fakeSettingsPageFeature.widgetAsProtection().setRawStoredState(State(true))
+            whenever(mockWidgetCapabilities.hasInstalledWidgets).thenReturn(true) // Initial state for start()
+            testee.start()
+            // Ensure initial state is as expected
+            assertEquals(true, testee.viewState().value.isAddWidgetInProtectionsVisible)
+            assertEquals(true, testee.viewState().value.widgetsInstalled)
+
+            whenever(mockWidgetCapabilities.hasInstalledWidgets).thenReturn(false) // New state for refresh
+
+            testee.refreshWidgetsInstalledState()
+
+            assertEquals(false, testee.viewState().value.widgetsInstalled)
+        }
+
+    @Test
+    fun `when duck AI settings disabled then state updated`() = runTest {
+        duckAiShowSettingsFlow.value = false
+
+        testee.viewState().test {
+            assertFalse(awaitItem().isDuckChatEnabled)
+        }
+    }
+
+    @Test
+    fun `when duck AI settings enabled then state updated`() = runTest {
+        duckAiShowSettingsFlow.value = true
+
+        testee.viewState().test {
+            assertTrue(awaitItem().isDuckChatEnabled)
+        }
     }
 }

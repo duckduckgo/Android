@@ -62,16 +62,17 @@
     <string name="subscriptionStatusSubscribed">Prenumererad</string>
     <string name="privacyPolicyAndTermsOfService">Integritetspolicy och användarvillkor</string>
     <string name="subscriptionStatusFreeTrial">Gratis provperiod aktiv</string>
-    <string name="monthly">månatlig</string>
-    <string name="yearly">årligen</string>
-    <string name="freeTrialActiveSubscriptionsData" instruction="Placeholder is a date in format MMMM dd, yyyy, second is if trial is monthly or yearly">Din kostnadsfria provperiod upphör den %1$s och övergår automatiskt till ett betalt %2$s-abonnemang på den dagen.</string>
+    <string name="freeTrialMonthlyActiveSubscriptionsData" instruction="Placeholder is a date in format MMMM dd, yyyy">Din kostnadsfria provperiod upphör den %1$s och övergår automatiskt till ett betalt månadsabonnemang på den dagen.</string>
+    <string name="freeTrialYearlyActiveSubscriptionsData" instruction="Placeholder is a date in format MMMM dd, yyyy">Din kostnadsfria provperiod upphör den %1$s och övergår automatiskt till ett betalt årsabonnemang på den dagen.</string>
     <string name="freeTrialCancelledSubscriptionsData" instruction="Placeholder is a date in format MMMM dd, yyyy">Din kostnadsfria provperiod upphör den %1$s och kommer inte att övergå till ett betalt abonnemang.</string>
 
     <!--Settings Subscriptions-->
     <string name="subscriptionSetting">Abonnemangsinställningar</string>
     <string name="subscriptionSettingSubscribe">Skydda din anslutning och identitet med Privacy Pro</string>
-    <string name="subscriptionSettingSubscribeSubtitle">Det inkluderar vårt VPN, Personal Information Removal och Identity Theft Restoration.</string>
-    <string name="subscriptionSettingSubscribeSubtitleRow">Inkluderar vårt VPN och Identity Theft Restoration.</string>
+
+    <string name="subscriptionSettingSubscribeSubtitle">Abonnenter får vårt VPN, Personal Information Removal och Identity Theft Restoration.</string>
+    <string name="subscriptionSettingSubscribeSubtitleRow">Abonnenter får vårt VPN och Identity Theft Restoration.</string>
+
     <string name="subscriptionSettingGet">Skaffa Privacy Pro</string>
     <string name="subscriptionSettingTryFreeTrial">Prova Privacy Pro gratis</string>
     <string name="subscriptionSettingRestore">Jag har ett abonnemang</string>
@@ -167,4 +168,34 @@
     <string name="activityActivateSubscription">Jag har ett abonnemang</string>
     <string name="activityPir" translatable="false">Privacy Pro</string>
     <string name="activitySendFeedback">Skicka återkoppling</string>
+
+    <!-- Privacy Pro Rebranding-->
+    <string name="privacyProRebranding">DuckDuckGo Abonnemang</string>
+    <string name="subscriptionSettingExpiredRebranding">Din prenumeration på DuckDuckGo har gått ut</string>
+    <string name="privacyProFaqRebranding">Behöver du hjälp med ditt abonnemang?</string>
+    <string name="privacyProFaqSecondaryRebranding">Få svar på vanliga frågor eller kontakta prenumerationssupporten på våra hjälpsidor. Funktionstillgänglighet varierar mellan olika länder.</string>
+    <string name="restoreSubscriptionTitleRebranding">Lägg till ditt abonnemang på den här enheten</string>
+    <string name="restoreSubscriptionEmailDescriptionRebranding">Koppla en e-postadress till ditt abonnemang för att lägga till det på den här enheten.</string>
+    <string name="activateOnOtherDevicesRebranding">Lägg till ditt abonnemang på andra enheter</string>
+    <string name="addToDeviceSecondaryTextWithoutEmailRebranding">Lägg till abonnemanget på dina andra enheter via Google Play eller genom att länka en e-postadress.</string>
+    <string name="addToDeviceSecondaryTextWithEmailRebranding">Använd e-postadressen ovan för att lägga till din prenumeration på dina andra enheter i DuckDuckGo-appen. Gå till Inställningar &gt; Prenumerationsinställningar &gt; Jag har ett abonnemang.</string>
+    <string name="subscriptionSettingRebrandingMessage">Privacy Pro kallas nu bara DuckDuckGo-abonnemanget</string>
+    <string name="subscriptionSettingSubscribeRebranding">Skydda din anslutning och identitet med ett abonnemang.</string>
+    <string name="removeFromDeviceDescriptionRebranding">Du kommer inte längre att kunna komma åt ditt abonnemang på den här enheten. Det här kommer inte att avsluta ditt abonnemang utan det förblir aktivt på dina andra enheter.</string>
+
+    <string name="subscriptionSettingSubscribeWithDuckAiSubtitle">Abonnenter får vårt VPN och avancerade AI-modeller i Duck.ai, Personal Information Removal och Identity Theft Restoration.</string>
+    <string name="subscriptionSettingSubscribeWithDuckAiSubtitleRow">Abonnenter får vårt VPN, avancerade AI-modeller i Duck.ai och Identity Theft Restoration.</string>
+
+    <string name="feedbackCategoryDuckAi">Duck.ai</string>
+    <string name="feedbackSubCategoryDuckAiSubscriberModels">Det går inte att komma åt Duck.ai-modellerna för prenumeranter</string>
+    <string name="feedbackSubCategoryDuckAiLoginThirdPartyBrowser">Det går inte att komma åt Duck.ai med mitt abonnemang i andra webbläsare</string>
+    <string name="feedbackSubCategoryDuckAiOther">Annan feedback om Duck.ai</string>
+
+    <string name="subscriptionSettingSectionTitle" translatable="false">DuckDuckGo Subscription</string>
+    <string name="subscriptionSettingSubscribeSecure">Säkra ditt Wi-Fi och chatta privat med avancerade AI-modeller</string>
+
+    <string name="subscriptionSettingGetRebranding">Prenumerera på DuckDuckGo</string>
+    <string name="subscriptionSettingTryFreeTrialRebranding">Prova gratis</string>
+    <string name="feedbackGeneralSubscription">Abonnemang</string>
+
 </resources>

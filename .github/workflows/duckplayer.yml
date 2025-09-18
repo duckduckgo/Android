@@ -1,0 +1,90 @@
+name: Duck Player Tests
+
+on:
+  pull_request:
+    types:
+      - opened
+      - synchronize
+      - reopened
+    paths:
+      - 'node_modules/@duckduckgo/content-scope-scripts/**'
+
+  schedule:
+    - cron: '0 4 * * *' # run at 4 AM UTC
+
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  duckplayer_tests:
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event_name == 'schedule' || github.event_name == 'pull_request' }}
+    name: Duck Player Tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Set up JDK version
+        uses: actions/setup-java@v4
+        with:
+          java-version-file: .github/.java-version
+          distribution: 'adopt'
+
+      - name: Create folder
+        if: always()
+        run: mkdir apk
+
+      - name: Decode keys
+        uses: davidSchuppa/base64Secret-toFile-action@v2
+        with:
+          secret: ${{ secrets.FAKE_RELEASE_PROPERTIES }}
+          fileName: ddg_android_build.properties
+          destination-path: $HOME/jenkins_static/com.duckduckgo.mobile.android/
+
+      - name: Decode key file
+        uses: davidSchuppa/base64Secret-toFile-action@v2
+        with:
+          secret: ${{ secrets.FAKE_RELEASE_KEY }}
+          fileName: android
+          destination-path: $HOME/jenkins_static/com.duckduckgo.mobile.android/
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v3
+
+      - name: Assemble APK
+        run: ./gradlew assembleInternalRelease -Pforce-default-variant -Pskip-onboarding -x lint
+
+      - name: Move APK to new folder
+        if: always()
+        run: find . -name "*.apk"  -exec mv '{}' apk/internal.apk \;
+
+      - name: Duck Player Tests
+        if: always()
+        uses: mobile-dev-inc/action-maestro-cloud@v1.9.7
+        timeout-minutes: 120
+        with:
+          api-key: ${{ secrets.ROBIN_API_KEY }}
+          project-id: ${{ vars.ROBIN_ANDROID_PROJECT_ID }}
+          name: duckPlayerTest_${{ github.sha }}
+          timeout: ${{ vars.ROBIN_TIMEOUT_MINUTES }}
+          app-file: apk/internal.apk
+          android-api-level: 34
+          workspace: .maestro
+          include-tags: duckplayer
+
+      - name: Create Asana task when workflow failed
+        if: ${{ failure() && github.event_name != 'workflow_dispatch' }}
+        uses: honeycombio/gha-create-asana-task@main
+        with:
+          asana-secret: ${{ secrets.ASANA_ACCESS_TOKEN }}
+          asana-workspace-id: ${{ secrets.GH_ASANA_WORKSPACE_ID }}
+          asana-project-id: ${{ secrets.DUCK_PLAYER_AOR_PROJECT_ID }}
+          asana-section-id: ${{ secrets.DUCK_PLAYER_AOR_INCOMING_ID }}
+          asana-task-name: GH Workflow Failure - Duck Player tests
+          asana-task-description: The Duck Player workflow has failed. See https://github.com/duckduckgo/Android/actions/runs/${{ github.run_id }}

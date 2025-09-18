@@ -39,9 +39,48 @@
     <!-- Settings -->
     <string name="duck_chat_settings_activity_description">Το Duck.ai αποτελεί προαιρετική λειτουργία που σας επιτρέπει να συνομιλείτε ανώνυμα με δημοφιλή μοντέλα τρίτων για συνομιλία μέσω τεχνητής νοημοσύνης. Οι συνομιλίες σας δεν χρησιμοποιούνται για την εκπαίδευση τεχνητής συνομιλίας.\n<annotation type="learn_more_link">Μάθετε περισσότερα</annotation></string>
     <string name="duck_chat_enable_duck_ai_setting">Ενεργοποίηση του Duck.ai</string>
-    <string name="duck_chat_show_in_heading">Συντομευσεις</string>
     <string name="duck_chat_visibility_setting">Μενού προγράμματος περιήγησης</string>
     <string name="duck_chat_address_bar_visibility_setting">Γραμμή διευθύνσεων</string>
     <string name="duck_chat_assist_settings_title">Ρυθμίσεις Assist</string>
     <string name="duck_chat_assist_settings_description">Επιλέξτε πόσο συχνά θέλετε να εμφανίζονται οι απαντήσεις που υποστηρίζονται από τεχνητή νοημοσύνη στις αναζητήσεις σας</string>
+    <string name="duck_ai_shortcut_settings_title">Συντομεύσεις Duck.ai</string>
+    <string name="duck_ai_shortcut_settings_description">Επιλέξτε ποιες συντομεύσεις του Duck.ai θα εμφανίζονται</string>
+
+    <!-- Input Screen  -->
+    <string name="input_screen_search_tab">Αναζήτηση</string>
+    <string name="input_screen_search_hint">Αναζήτηση ή εισαγωγή διεύθυνσης</string>
+    <string name="input_screen_chat_tab">Duck.ai</string>
+    <string name="input_screen_chat_hint">Ρωτήστε ιδιωτικά</string>
+    <string name="input_screen_user_pref_without_ai">Αναζήτηση μόνο</string>
+    <string name="input_screen_user_pref_with_ai">Αναζήτηση και Duck.ai</string>
+    <string name="input_screen_user_pref_description">Δοκιμάστε την καινούργια επιλογή μας για να ρωτήσετε το Duck.ai απευθείας από τη Γραμμή διευθύνσεων. <annotation type="share_feedback">Κοινοποίηση σχολίων</annotation></string>
+
+    <!-- Duck.ai Pro settings -->
+    <string name="duck_ai_paid_settings_title">Duck.ai</string>
+    <string name="duck_ai_paid_settings_page_title">Duck.ai</string>
+    <string name="duck_ai_paid_settings_page_description"><![CDATA[Συνομίλησε ιδιωτικά με μοντέλα τεχνητής νοημοσύνης αποκλειστικά για συνδρομητές.\n<a href=\"\">Μάθετε περισσότερα</a>]]></string>
+    <string name="duck_ai_paid_settings_open_duck_ai">Άνοιξε το Duck.ai</string>
+    <string name="duck_ai_paid_settings_learn_more_title">Μάθετε περισσότερα</string>
+
+    <!-- Rebranding-->
+    <string name="duck_chat_title_rebranding">Λειτουργίες τεχνητής νοημοσύνης</string>
+    <string name="duck_chat_settings_activity_description_rebranding">Οι λειτουργίες τεχνητής νοημοσύνης του DuckDuckGo είναι ιδιωτικές και προαιρετικές.Τα δεδομένα σας δεν χρησιμοποιούνται για εκπαίδευση της τεχνητής νοημοσύνης.\n<annotation type="learn_more_link">Μάθετε περισσότερα</annotation></string>
+    <string name="duck_chat_enable_duck_ai_setting_rebranding">Duck.ai</string>
+    <string name="duck_chat_enable_duck_ai_setting_description_rebranding">Συνομίλησε ιδιωτικά με δημοφιλή μοντέλα τεχνητής νοημοσύνης τρίτων</string>
+    <string name="duck_chat_assist_settings_title_rebranding">Ρυθμίσεις αναζήτησης Assist</string>
+    <string name="duck_chat_assist_settings_description_rebranding">Επιλέξτε πόσο συχνά θέλετε να εμφανίζονται οι απαντήσεις που υποστηρίζονται από τεχνητή νοημοσύνη στις αναζητήσεις σας</string>
+
+    <!-- AutoComplete -->
+    <string name="autocompleteDuckAiPrompt">Ρωτήστε το Duck.ai</string>
+
+    <!-- New Address Bar Option Bottom Sheet Dialog -->
+    <string name="newAddressBarOptionBottomSheetDialogSearchText">Αναζήτηση ή εισαγωγή διεύθυνσης</string>
+    <string name="newAddressBarOptionBottomSheetDialogTitle">Εναλλαγή μεταξύ αναζήτησης και συνομιλίας τεχνητής νοημοσύνης</string>
+    <string name="newAddressBarOptionBottomSheetDialogSubTitle">Οι λειτουργίες τεχνητής νοημοσύνης είναι πάντα προαιρετικές.</string>
+    <string name="newAddressBarOptionBottomSheetDialogPrimaryButton">Επιβεβαίωση</string>
+    <string name="newAddressBarOptionBottomSheetDialogGhostButton">Όχι τώρα</string>
+    <string name="newAddressBarOptionBottomSheetDialogFooter">Προσαρμόστε στις Ρυθμίσεις &gt; Λειτουργίες τεχνητής νοημοσύνης.</string>
+    <string name="newAddressBarOptionBottomSheetDialogSearchOnly">Αναζήτηση μόνο</string>
+    <string name="newAddressBarOptionBottomSheetDialogSearchAndDuckAi">Αναζήτηση και Duck.ai</string>
+    <string name="newAddressBarOptionBottomSheetDialogHeader">Επιλογή γραμμής διευθύνσεων</string>
 </resources>

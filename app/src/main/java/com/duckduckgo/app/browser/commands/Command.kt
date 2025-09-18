@@ -26,7 +26,6 @@ import android.webkit.SslErrorHandler
 import android.webkit.ValueCallback
 import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
-import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion
 import com.duckduckgo.app.browser.BrowserTabViewModel.FileChooserRequestedParams
 import com.duckduckgo.app.browser.ErrorNavigationState
 import com.duckduckgo.app.browser.SpecialUrlDetector.UrlType.AppLink
@@ -42,6 +41,7 @@ import com.duckduckgo.app.cta.ui.DaxBubbleCta
 import com.duckduckgo.app.cta.ui.OnboardingDaxDialogCta
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteEntity
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
+import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion
 import com.duckduckgo.browser.api.brokensite.BrokenSiteData
 import com.duckduckgo.js.messaging.api.JsCallbackData
 import com.duckduckgo.js.messaging.api.SubscriptionEventData
@@ -49,6 +49,7 @@ import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.Feed
 import com.duckduckgo.privacy.dashboard.api.ui.DashboardOpener
 import com.duckduckgo.savedsites.api.models.SavedSite
 import com.duckduckgo.site.permissions.api.SitePermissionsManager.SitePermissions
+import org.json.JSONObject
 
 sealed class Command {
     class OpenInNewTab(
@@ -62,14 +63,15 @@ sealed class Command {
     ) : Command()
 
     class OpenInNewBackgroundTab(val query: String) : Command()
-    object LaunchNewTab : Command()
-    object ResetHistory : Command()
+    data object LaunchNewTab : Command()
+    data object ResetHistory : Command()
     class LaunchPrivacyPro(val uri: Uri) : Command()
     class DialNumber(val telephoneNumber: String) : Command()
     class SendSms(val telephoneNumber: String) : Command()
     class SendEmail(val emailAddress: String) : Command()
-    object ShowKeyboard : Command()
-    object HideKeyboard : Command()
+    data object ShowKeyboard : Command()
+    data object HideKeyboard : Command()
+    data object HideKeyboardForChat : Command()
     class ShowFullScreen(val view: View) : Command()
     class DownloadImage(
         val url: String,
@@ -85,7 +87,7 @@ sealed class Command {
     class DeleteFireproofConfirmation(val fireproofWebsiteEntity: FireproofWebsiteEntity) : Command()
     class RefreshAndShowPrivacyProtectionEnabledConfirmation(val domain: String) : Command()
     class RefreshAndShowPrivacyProtectionDisabledConfirmation(val domain: String) : Command()
-    object AskToDisableLoginDetection : Command()
+    data object AskToDisableLoginDetection : Command()
     class AskToFireproofWebsite(val fireproofWebsite: FireproofWebsiteEntity) : Command()
     class AskToAutomateFireproofWebsite(val fireproofWebsite: FireproofWebsiteEntity) : Command()
     class ShareLink(
@@ -107,7 +109,7 @@ sealed class Command {
     class FindInPageCommand(val searchTerm: String) : Command()
     class BrokenSiteFeedback(val data: BrokenSiteData) : Command()
     class ToggleReportFeedback(val opener: DashboardOpener) : Command()
-    object DismissFindInPage : Command()
+    data object DismissFindInPage : Command()
     class ShowFileChooser(
         val filePathCallback: ValueCallback<Array<Uri>>,
         val fileChooserParams: FileChooserRequestedParams,
@@ -147,20 +149,21 @@ sealed class Command {
     ) : Command()
 
     class SubmitUrl(val url: String) : Command()
+    class SubmitChat(val query: String) : Command()
     class LaunchPlayStore(val appPackage: String) : Command()
-    object LaunchDefaultBrowser : Command()
-    object LaunchAppTPOnboarding : Command()
-    object LaunchAddWidget : Command()
+    data object LaunchDefaultBrowser : Command()
+    data object LaunchAppTPOnboarding : Command()
+    data object LaunchAddWidget : Command()
     class RequiresAuthentication(val request: BasicAuthenticationRequest) : Command()
     class SaveCredentials(
         val request: BasicAuthenticationRequest,
         val credentials: BasicAuthenticationCredentials,
     ) : Command()
 
-    object GenerateWebViewPreviewImage : Command()
-    object LaunchTabSwitcher : Command()
-    object HideWebContent : Command()
-    object ShowWebContent : Command()
+    data object GenerateWebViewPreviewImage : Command()
+    data object LaunchTabSwitcher : Command()
+    data object HideWebContent : Command()
+    data object ShowWebContent : Command()
     class ShowWebPageTitle(
         val title: String,
         val url: String?,
@@ -189,7 +192,7 @@ sealed class Command {
         val requestUserConfirmation: Boolean,
     ) : Command()
 
-    object ChildTabClosed : Command()
+    data object ChildTabClosed : Command()
 
     class CopyAliasToClipboard(val alias: String) : Command()
     class InjectEmailAddress(
@@ -199,12 +202,12 @@ sealed class Command {
     ) : Command()
 
     class ShowEmailProtectionChooseEmailPrompt(val address: String) : Command()
-    object ShowEmailProtectionInContextSignUpPrompt : Command()
+    data object ShowEmailProtectionInContextSignUpPrompt : Command()
     class CancelIncomingAutofillRequest(val url: String) : Command()
     data class LaunchAutofillSettings(val privacyProtectionEnabled: Boolean) : Command()
     class EditWithSelectedQuery(val query: String) : Command()
     class ShowBackNavigationHistory(val history: List<NavigationHistoryEntry>) : Command()
-    object EmailSignEvent : Command()
+    data object EmailSignEvent : Command()
     class ShowSitePermissionsDialog(
         val permissionsToRequest: SitePermissions,
         val request: PermissionRequest,
@@ -248,8 +251,10 @@ sealed class Command {
     data class SendResponseToDuckPlayer(val data: JsCallbackData) : Command()
     data class SendSubscriptions(val cssData: SubscriptionEventData, val duckPlayerData: SubscriptionEventData) : Command()
     data class WebShareRequest(val data: JsCallbackData) : Command()
+    data class WebViewCompatWebShareRequest(val data: JsCallbackData, val onResponse: (JSONObject) -> Unit) : Command()
     data class ScreenLock(val data: JsCallbackData) : Command()
-    object ScreenUnlock : Command()
+    data class WebViewCompatScreenLock(val data: JsCallbackData, val onResponse: (JSONObject) -> Unit) : Command()
+    data object ScreenUnlock : Command()
     data object ShowFaviconsPrompt : Command()
     data class ShowSSLError(val handler: SslErrorHandler, val error: SslErrorResponse) : Command()
     data object HideSSLError : Command()
@@ -262,18 +267,22 @@ sealed class Command {
     data class HideOnboardingDaxBubbleCta(val daxBubbleCta: DaxBubbleCta) : Command()
     data class ShowRemoveSearchSuggestionDialog(val suggestion: AutoCompleteSuggestion) : Command()
     data object AutocompleteItemRemoved : Command()
-    object OpenDuckPlayerSettings : Command()
-    object OpenDuckPlayerOverlayInfo : Command()
-    object OpenDuckPlayerPageInfo : Command()
+    data object OpenDuckPlayerSettings : Command()
+    data object OpenDuckPlayerOverlayInfo : Command()
+    data object OpenDuckPlayerPageInfo : Command()
     class SetBrowserBackground(@DrawableRes val backgroundRes: Int) : Command()
     class SetBrowserBackgroundColor(@ColorRes val colorRes: Int) : Command()
+    class SetBubbleDialogBackground(@DrawableRes val backgroundRes: Int) : Command()
     class SetOnboardingDialogBackground(@DrawableRes val backgroundRes: Int) : Command()
     class SetOnboardingDialogBackgroundColor(@ColorRes val colorRes: Int) : Command()
     data class LaunchFireDialogFromOnboardingDialog(val onboardingCta: OnboardingDaxDialogCta) : Command()
     data class SwitchToTab(val tabId: String) : Command()
     data object CloseCustomTab : Command()
-    data class LaunchPopupMenu(val anchorToNavigationBar: Boolean) : Command()
+    data object LaunchPopupMenu : Command()
     data class ShowAutoconsentAnimation(val isCosmetic: Boolean) : Command()
     data object LaunchBookmarksActivity : Command()
-    data object StartTrackersExperimentShieldPopAnimation : Command()
+    data object RefreshOmnibar : Command()
+    data object LaunchInputScreen : Command()
+    data class ExtractSerpLogo(val currentUrl: String) : Command()
+    data class ShowSerpEasterEggLogo(val logoUrl: String) : Command()
 }

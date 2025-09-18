@@ -443,9 +443,13 @@
 
     <!-- Privacy pro upsell -->
     <string name="apptp_PproUpsellInfoDisabled">Не получается включить защиту от отслеживания в приложениях (App Tracking Protection) из-за VPN? Переходите на DuckDuckGo VPN — единственный совместимый с защитой сервис. <annotation type="ppro_upsell_link">Подробнее...</annotation></string>
+    <string name="apptp_PproUpsellInfoDisabled_freeTrial">Защита от отслеживания в приложениях не работает из-за VPN? Переходите на DuckDuckGo VPN — единственный сервис, совместимый с функцией App Tracking Protection. <annotation type="ppro_upsell_link">Ознакомление бесплатное!</annotation></string>
     <string name="apptp_PproUpsellInfoRevoked"><b>Защита App Tracking Protection отключена</b>\nVPN отключил защиту от трекеров в приложениях? Активируйте ее снова с помощью переключателя выше.\n\nИ установите DuckDuckGo VPN — единственный VPN, совместимый с App Tracking Protection. <annotation type="ppro_upsell_link">Подробнее...</annotation></string>
+    <string name="apptp_PproUpsellInfoRevoked_freeTrial"><b>Защита App Tracking Protection отключена</b>\nVPN отключил защиту от трекеров в приложениях? Активируйте ее снова с помощью переключателя выше.\n\nПереходите на DuckDuckGo VPN — единственный сервис, совместимый с функцией App Tracking Protection. <annotation type="ppro_upsell_link">Ознакомление бесплатное!</annotation></string>
     <string name="apptp_PproUpsellBannerTitle">Конфиденциальность качественно нового уровня</string>
     <string name="apptp_PproUpsellBannerMessage">DuckDuckGo предлагает единственный VPN, совместимый с защитой от отслеживания в приложениях (App Tracking Protection). Для его активации необходима платная подписка Privacy Pro.</string>
     <string name="apptp_PproUpsellBannerAction">Узнать больше</string>
+    <string name="apptp_PproUpsellBannerMessage_freeTrial">Подписка DuckDuckGo обеспечивает единственный VPN, совместимый с функцией App Tracking Protection (защита от отслеживания в приложениях).</string>
+    <string name="apptp_PproUpsellBannerAction_freeTrial">Ознакомление бесплатное!</string>
 
 </resources>
