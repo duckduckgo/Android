@@ -26,7 +26,6 @@ import android.provider.MediaStore
 import android.util.Patterns
 import android.view.ContextMenu
 import android.view.MenuItem
-import android.view.MotionEvent.ACTION_UP
 import android.view.View
 import android.webkit.MimeTypeMap
 import android.webkit.PermissionRequest
@@ -4175,40 +4174,6 @@ class BrowserTabViewModel @Inject constructor(
 
     fun isPrinting(): Boolean {
         return currentBrowserViewState().isPrinting
-    }
-
-    fun onUserTouchedOmnibarTextInput(touchAction: Int) {
-        if (touchAction == ACTION_UP) {
-            firePixelBasedOnCurrentUrl(
-                AppPixelName.ADDRESS_BAR_NEW_TAB_PAGE_CLICKED,
-                AppPixelName.ADDRESS_BAR_SERP_CLICKED,
-                AppPixelName.ADDRESS_BAR_WEBSITE_CLICKED,
-            )
-        }
-    }
-
-    fun onClearOmnibarTextInput() {
-        firePixelBasedOnCurrentUrl(
-            AppPixelName.ADDRESS_BAR_NEW_TAB_PAGE_ENTRY_CLEARED,
-            AppPixelName.ADDRESS_BAR_SERP_ENTRY_CLEARED,
-            AppPixelName.ADDRESS_BAR_WEBSITE_ENTRY_CLEARED,
-        )
-    }
-
-    fun sendPixelsOnBackKeyPressed() {
-        firePixelBasedOnCurrentUrl(
-            AppPixelName.ADDRESS_BAR_NEW_TAB_PAGE_CANCELLED,
-            AppPixelName.ADDRESS_BAR_SERP_CANCELLED,
-            AppPixelName.ADDRESS_BAR_WEBSITE_CANCELLED,
-        )
-    }
-
-    fun sendPixelsOnEnterKeyPressed() {
-        firePixelBasedOnCurrentUrl(
-            AppPixelName.KEYBOARD_GO_NEW_TAB_CLICKED,
-            AppPixelName.KEYBOARD_GO_SERP_CLICKED,
-            AppPixelName.KEYBOARD_GO_WEBSITE_CLICKED,
-        )
     }
 
     fun hasOmnibarPositionChanged(currentPosition: OmnibarPosition): Boolean = settingsDataStore.omnibarPosition != currentPosition

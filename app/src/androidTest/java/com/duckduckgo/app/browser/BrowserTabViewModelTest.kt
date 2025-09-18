@@ -26,7 +26,6 @@ import android.net.http.SslError
 import android.os.Build
 import android.print.PrintAttributes
 import android.view.MenuItem
-import android.view.MotionEvent
 import android.view.View
 import android.webkit.HttpAuthHandler
 import android.webkit.PermissionRequest
@@ -5608,110 +5607,6 @@ class BrowserTabViewModelTest {
         assertCommandIssued<Command.LaunchTabSwitcher>()
         verify(mockPixel).fire(AppPixelName.TAB_MANAGER_CLICKED)
         verify(mockPixel).fire(AppPixelName.TAB_MANAGER_CLICKED_DAILY, params, emptyMap(), Daily())
-    }
-
-    @Test
-    fun whenOnUserTouchedOmnibarTextInputWithEmptyTextAndActionUpThenPixelFired() {
-        testee.onUserTouchedOmnibarTextInput(MotionEvent.ACTION_UP)
-
-        verify(mockPixel).fire(AppPixelName.ADDRESS_BAR_NEW_TAB_PAGE_CLICKED)
-    }
-
-    @Test
-    fun whenOnUserTouchedOmnibarTextInputWithUrlAndActionUpThenPixelFired() {
-        loadUrl("https://example.com")
-        testee.onUserTouchedOmnibarTextInput(MotionEvent.ACTION_UP)
-
-        verify(mockPixel).fire(AppPixelName.ADDRESS_BAR_WEBSITE_CLICKED)
-    }
-
-    @Test
-    fun whenOnUserTouchedOmnibarTextInputWithQueryAndActionUpThenPixelFired() {
-        loadUrl("https://duckduckgo.com/?q=example")
-        testee.onUserTouchedOmnibarTextInput(MotionEvent.ACTION_UP)
-
-        verify(mockPixel).fire(AppPixelName.ADDRESS_BAR_SERP_CLICKED)
-    }
-
-    @Test
-    fun whenOnUserTouchedOmnibarTextInputWithAnyTextAndOtherActionThenPixelNotFired() {
-        loadUrl("https://duckduckgo.com/?q=example")
-        testee.onUserTouchedOmnibarTextInput(MotionEvent.ACTION_DOWN)
-
-        verify(mockPixel, never()).fire(AppPixelName.ADDRESS_BAR_NEW_TAB_PAGE_CLICKED)
-        verify(mockPixel, never()).fire(AppPixelName.ADDRESS_BAR_WEBSITE_CLICKED)
-        verify(mockPixel, never()).fire(AppPixelName.ADDRESS_BAR_SERP_CLICKED)
-    }
-
-    @Test
-    fun whenOnClearOmnibarTextInputWithEmptyTextThenPixelFired() {
-        testee.onClearOmnibarTextInput()
-
-        verify(mockPixel).fire(AppPixelName.ADDRESS_BAR_NEW_TAB_PAGE_ENTRY_CLEARED)
-    }
-
-    @Test
-    fun whenOnClearOmnibarTextInputWithUrlThenPixelFired() {
-        loadUrl("https://example.com")
-        testee.onClearOmnibarTextInput()
-
-        verify(mockPixel).fire(AppPixelName.ADDRESS_BAR_WEBSITE_ENTRY_CLEARED)
-    }
-
-    @Test
-    fun whenOnClearOmnibarTextInputWithQueryUrlThenPixelFired() {
-        loadUrl("https://duckduckgo.com/?q=example")
-        testee.onClearOmnibarTextInput()
-
-        verify(mockPixel).fire(AppPixelName.ADDRESS_BAR_SERP_ENTRY_CLEARED)
-    }
-
-    @Test
-    fun whenSendPixelsOnBackKeyPressedWithEmptyTextThenPixelFired() {
-        testee.sendPixelsOnBackKeyPressed()
-
-        verify(mockPixel).fire(AppPixelName.ADDRESS_BAR_NEW_TAB_PAGE_CANCELLED)
-    }
-
-    @Test
-    fun whenSendPixelsOnBackKeyPressedWithUrlThenPixelFired() {
-        loadUrl("https://example.com")
-        testee.sendPixelsOnBackKeyPressed()
-
-        verify(mockPixel).fire(AppPixelName.ADDRESS_BAR_WEBSITE_CANCELLED)
-    }
-
-    @Test
-    fun whenSendPixelsOnBackKeyPressedWithQueryUrlThenPixelFired() {
-        loadUrl("https://duckduckgo.com/?q=example")
-
-        testee.sendPixelsOnBackKeyPressed()
-
-        verify(mockPixel).fire(AppPixelName.ADDRESS_BAR_SERP_CANCELLED)
-    }
-
-    @Test
-    fun whenSendPixelsOnEnterKeyPressedWithEmptyTextThenPixelFired() {
-        testee.sendPixelsOnEnterKeyPressed()
-
-        verify(mockPixel).fire(AppPixelName.KEYBOARD_GO_NEW_TAB_CLICKED)
-    }
-
-    @Test
-    fun whenSendPixelsOnEnterKeyPressedWithUrlThenPixelFired() {
-        loadUrl("https://example.com")
-        testee.sendPixelsOnEnterKeyPressed()
-
-        verify(mockPixel).fire(AppPixelName.KEYBOARD_GO_WEBSITE_CLICKED)
-    }
-
-    @Test
-    fun whenSendPixelsOnEnterKeyPressedWithQueryUrlThenPixelFired() {
-        loadUrl("https://duckduckgo.com/?q=example")
-
-        testee.sendPixelsOnEnterKeyPressed()
-
-        verify(mockPixel).fire(AppPixelName.KEYBOARD_GO_SERP_CLICKED)
     }
 
     @Test
