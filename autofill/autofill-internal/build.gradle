@@ -54,6 +54,6 @@ dependencies {
     implementation "androidx.appcompat:appcompat:_"
     implementation "com.google.android.material:material:_"
     implementation "androidx.constraintlayout:constraintlayout:_"
-    implementation project(path: ':common-ui')
+    implementation project(path: ':design-system')
 
 }

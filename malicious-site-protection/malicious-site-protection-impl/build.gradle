@@ -35,7 +35,7 @@ dependencies {
     implementation project(":app-build-config-api")
     implementation project(":malicious-site-protection-api")
     implementation project(':browser-api')
-    implementation project(':common-ui')
+    implementation project(':design-system')
     implementation project(':common-utils')
     implementation project(':navigation-api')
     implementation project(':settings-api')
