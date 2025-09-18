@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.browser
 
+import android.annotation.SuppressLint
 import android.graphics.Bitmap
 import android.net.Uri
 import android.net.http.SslError
@@ -838,7 +839,8 @@ class BrowserWebViewClient @Inject constructor(
         private val activeRequestTimeoutJobs = ConcurrentHashMap<String, Job>()
         private const val REQUEST_TIMEOUT_MS = 30000L // 30 seconds
 
-        // dedicated scope for request count timeout jobs
+        // dedicated scope for request count timeout jobs (static, to be shared across all instances)
+        @SuppressLint("NoHardcodedCoroutineDispatcher")
         private val timeoutScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
     }
 }
