@@ -29,7 +29,7 @@ dependencies {
     implementation project(':common-utils')
     implementation project(':saved-sites-api')
     implementation project(':navigation-api')
-    implementation project(':common-ui')
+    implementation project(':design-system')
     implementation project(':data-store-api')
     implementation project(':statistics-api')
 

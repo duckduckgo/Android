@@ -26,34 +26,30 @@ android {
     anvil {
         generateDaggerFactories = true // default is false
     }
-    namespace 'com.duckduckgo.autofill.internal'
-    lintOptions {
-        baseline file("lint-baseline.xml")
-        abortOnError = !project.hasProperty("abortOnError") || project.property("abortOnError") != "false"
-    }
+    namespace 'com.duckduckgo.common.ui.internal'
 }
 
 dependencies {
-    implementation project(path: ':autofill-api')
-    implementation project(':autofill-impl')
-    implementation project(':internal-features-api')
-    implementation project(path: ':browser-api')
-    implementation project(path: ':navigation-api')
-
-    anvil project(path: ':anvil-compiler')
-    implementation project(path: ':anvil-annotations')
-    implementation project(':di')
-    implementation project(path: ':common-utils')
-
-    implementation AndroidX.lifecycle.runtime.ktx
-    implementation AndroidX.lifecycle.viewModelKtx
-    implementation AndroidX.lifecycle.process
-    implementation Google.dagger
 
     implementation "com.squareup.logcat:logcat:_"
-    implementation "androidx.appcompat:appcompat:_"
-    implementation "com.google.android.material:material:_"
-    implementation "androidx.constraintlayout:constraintlayout:_"
+
+    implementation project(path: ':common-utils')
     implementation project(path: ':design-system')
+
+    implementation project(path: ':di')
+    anvil project(path: ':anvil-compiler')
+    implementation project(path: ':anvil-annotations')
+    implementation project(path: ':app-build-config-api')
+    implementation project(':internal-features-api')
+    implementation project(path: ':navigation-api')
+
+    implementation AndroidX.appCompat
+    implementation Google.android.material
+    implementation AndroidX.constraintLayout
+    implementation AndroidX.core.splashscreen
+    implementation AndroidX.recyclerView
+    implementation AndroidX.lifecycle.viewModelKtx
+    // just to get the dagger annotations
+    implementation Google.dagger
 
 }

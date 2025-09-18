@@ -36,7 +36,7 @@ dependencies {
     implementation project(':subscriptions-impl')
     implementation project(':di')
     implementation project(':common-utils')
-    implementation project(':common-ui')
+    implementation project(':design-system')
     implementation project(':app-build-config-api')
     implementation project(':internal-features-api')
     implementation project(':navigation-api')

@@ -27,7 +27,7 @@ dependencies {
 	implementation project(":duckchat-api")
     implementation project(':settings-api')
     implementation project(':navigation-api')
-    implementation project(':common-ui')
+    implementation project(':design-system')
     implementation project(':common-utils')
     implementation project(':browser-api')
     implementation project(':js-messaging-api')

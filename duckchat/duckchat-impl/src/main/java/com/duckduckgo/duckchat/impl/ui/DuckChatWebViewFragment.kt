@@ -200,7 +200,8 @@ open class DuckChatWebViewFragment : DuckDuckGoFragment(R.layout.activity_duck_c
                     fileChooserParams: FileChooserParams,
                 ): Boolean {
                     return try {
-                        showFileChooser(filePathCallback, fileChooserParams)
+                        focusOnInput()
+                        // showFileChooser(filePathCallback, fileChooserParams)
                         true
                     } catch (e: Throwable) {
                         // cancel the request using the documented way
@@ -312,6 +313,13 @@ open class DuckChatWebViewFragment : DuckDuckGoFragment(R.layout.activity_duck_c
         val filePickingMode: Int,
         val acceptMimeTypes: List<String>,
     )
+
+    private fun focusOnInput() {
+        val inputFieldId = "chatMessageInput"
+        // val scriptToFocusInput = "javascript:document.getElementById('$inputFieldId').focus();"
+        val scriptToFocusInput = "document.querySelector('#react-layout > div > div:nth-child(2) > main > section > div.PSL9z2mGqO2kEMN_ZOJl > form > div.IxVvmkiX8oMjeB3nBn90 > div > div.EVDhJYnZpFz_IE5x5BBB > div > div.PpfbbqAdZ5YydaH2dEXp > textarea').focus();"
+        simpleWebview.evaluateJavascript(scriptToFocusInput, null)
+    }
 
     fun showFileChooser(
         filePathCallback: ValueCallback<Array<Uri>>,

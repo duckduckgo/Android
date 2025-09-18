@@ -264,7 +264,12 @@ dependencies {
     implementation project(':experiments-impl')
     implementation project(':common-utils')
     implementation project(':app-store')
+<<<<<<< HEAD
     implementation project(':common-ui')
+=======
+    implementation project(':design-system')
+    internalImplementation project(':common-ui-internal')
+>>>>>>> 4542f2aa21 (ADS: Rename ads module)
     implementation project(':di')
     implementation project(':app-tracking-api')
     implementation project(':vpn-impl')
