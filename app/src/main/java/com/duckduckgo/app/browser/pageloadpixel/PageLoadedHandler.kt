@@ -29,6 +29,7 @@ import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import logcat.LogPriority
 import logcat.logcat
 
 interface PageLoadedHandler {
@@ -75,8 +76,8 @@ class RealPageLoadedHandler @Inject constructor(
                     ),
                 )
             }
-            logcat {
-                "$$$: Page load time: ${end - start}, foreground: $isTabInForegroundOnFinish, " +
+            logcat(LogPriority.DEBUG) {
+                "Page load time: ${end - start}, isTabInForegroundOnFinish: $isTabInForegroundOnFinish, " +
                     "activeRequestsOnLoadStart: $activeRequestsOnLoadStart, " +
                     "concurrentRequestsOnFinish: $concurrentRequestsOnFinish"
             }

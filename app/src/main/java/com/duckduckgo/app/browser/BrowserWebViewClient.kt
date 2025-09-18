@@ -164,14 +164,14 @@ class BrowserWebViewClient @Inject constructor(
         this.currentLoadOperationId = loadId
 
         parallelRequestsOnStart = parallelRequestCounter.incrementAndGet() - 1
-        logcat(LogPriority.DEBUG) { "### Request started (ID: $loadId, URL: $urlForLog). Counter: ${parallelRequestCounter.get()}" }
+        logcat(LogPriority.DEBUG) { "Request started (ID: $loadId, URL: $urlForLog). Counter: ${parallelRequestCounter.get()}" }
 
         val job = timeoutScope.launch {
             delay(REQUEST_TIMEOUT_MS)
             // attempt to remove the job - if successful, it means it hasn't been finished/errored/cancelled yet
             if (activeRequestTimeoutJobs.remove(loadId) != null) {
                 parallelRequestCounter.decrementAndGet()
-                logcat(LogPriority.WARN) { "### Request timed out (ID: $loadId, URL: $urlForLog). Counter: ${parallelRequestCounter.get()}" }
+                logcat(LogPriority.WARN) { "Request timed out (ID: $loadId, URL: $urlForLog). Counter: ${parallelRequestCounter.get()}" }
             }
         }
         activeRequestTimeoutJobs[loadId] = job
@@ -185,7 +185,7 @@ class BrowserWebViewClient @Inject constructor(
             if (job != null) {
                 job.cancel()
                 parallelRequestCounter.decrementAndGet()
-                logcat(LogPriority.DEBUG) { "### Request $reason (ID: $loadId, URL: $urlForLog). Counter: ${parallelRequestCounter.get()}" }
+                logcat(LogPriority.DEBUG) { "Request $reason (ID: $loadId, URL: $urlForLog). Counter: ${parallelRequestCounter.get()}" }
             }
         }
         this.currentLoadOperationId = null
