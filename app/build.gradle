@@ -265,7 +265,6 @@ dependencies {
     implementation project(':common-utils')
     implementation project(':app-store')
     implementation project(':common-ui')
-    internalImplementation project(':common-ui-internal')
     implementation project(':di')
     implementation project(':app-tracking-api')
     implementation project(':vpn-impl')
