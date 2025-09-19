@@ -1247,4 +1247,17 @@ class InputScreenViewModelTest {
             clearInvocations(pixel) // Reset mock for next iteration
         }
     }
+
+    @Test
+    fun `when shouldAnimateLogoOnScroll called then returns current animateLogoOnScroll state`() {
+        val viewModel = createViewModel()
+
+        assertTrue(viewModel.shouldAnimateLogoOnScroll())
+
+        viewModel.onTabTapped()
+        assertFalse(viewModel.shouldAnimateLogoOnScroll())
+
+        viewModel.onScrollStateIdle()
+        assertTrue(viewModel.shouldAnimateLogoOnScroll())
+    }
 }
