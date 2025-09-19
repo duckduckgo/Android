@@ -34,7 +34,6 @@ interface InternalFeaturePlugin {
 
     // Every time you want to add a setting add the priority (order) to the list below and use it in the plugin
     companion object {
-        const val EXPERIMENTAL_UI_SETTINGS = 99
         const val DEVELOPER_SETTINGS_PRIO_KEY = 100
         const val FEATURE_INVENTORY_PRIO_KEY = 110
         const val SYNC_SETTINGS_PRIO_KEY = 200
