@@ -16,6 +16,7 @@
 
 package com.duckduckgo.duckchat.impl.inputscreen.ui
 
+import android.animation.ValueAnimator
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
@@ -25,7 +26,6 @@ import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
-import androidx.viewpager2.widget.ViewPager2
 import androidx.viewpager2.widget.ViewPager2.OnPageChangeCallback
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.statistics.pixels.Pixel
@@ -97,20 +97,11 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
     private val pageChangeCallback = object : OnPageChangeCallback() {
         override fun onPageSelected(position: Int) {
             binding.inputModeWidget.selectTab(position)
-            updateLogoAnimationForPosition(position)
+            animateLogoToPosition(position)
         }
 
         override fun onPageScrolled(position: Int, positionOffset: Float, positionOffsetPixels: Int) {
-            if (viewModel.shouldAnimateLogo()) {
-                updateLogoAnimationForScroll(position, positionOffset)
-            }
             updateTabIndicatorForScroll(position, positionOffset)
-        }
-
-        override fun onPageScrollStateChanged(state: Int) {
-            if (state == ViewPager2.SCROLL_STATE_IDLE) {
-                viewModel.onScrollStateIdle()
-            }
         }
     }
 
@@ -256,9 +247,6 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
         onInputFieldClicked = {
             viewModel.onInputFieldTouched()
         }
-        onTabTapped = {
-            viewModel.onTabTapped()
-        }
     }
 
     private fun submitChatQuery(query: String) {
@@ -302,17 +290,18 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
         binding.ddgLogo.setAnimation(animationResource)
     }
 
-    private fun updateLogoAnimationForPosition(position: Int) {
+    private fun animateLogoToPosition(position: Int) {
         binding.ddgLogo.apply {
-            when (position) {
-                0 -> {
-                    setMinAndMaxFrame(0, 0)
-                    progress = 0f
-                }
-                1 -> {
-                    setMinAndMaxFrame(15, 15)
-                    progress = 1f
-                }
+            setMinAndMaxFrame(0, 15)
+            val targetProgress = when (position) {
+                0 -> 0f
+                1 -> 1f
+                else -> progress
+            }
+            ValueAnimator.ofFloat(progress, targetProgress).apply {
+                duration = 200
+                addUpdateListener { progress = it.animatedValue as Float }
+                start()
             }
         }
     }

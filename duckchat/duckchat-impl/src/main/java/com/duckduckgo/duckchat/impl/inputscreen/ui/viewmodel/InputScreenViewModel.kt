@@ -124,7 +124,6 @@ class InputScreenViewModel @AssistedInject constructor(
 ) : ViewModel() {
 
     private var hasUserSeenHistoryIAM = false
-    private var animateLogo = true
 
     private val newTabPageHasContent = MutableStateFlow(false)
     private val voiceServiceAvailable = MutableStateFlow(voiceSearchAvailability.isVoiceSearchAvailable)
@@ -267,16 +266,6 @@ class InputScreenViewModel @AssistedInject constructor(
                 voiceInputButtonVisible = voiceSearchAvailability.isVoiceSearchAvailable,
             )
         }
-    }
-
-    fun shouldAnimateLogo(): Boolean = animateLogo
-
-    fun onTabTapped() {
-        animateLogo = false
-    }
-
-    fun onScrollStateIdle() {
-        animateLogo = true
     }
 
     fun userSelectedAutocomplete(suggestion: AutoCompleteSuggestion) {
