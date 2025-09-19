@@ -297,10 +297,14 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
                 1 -> 1f
                 else -> progress
             }
-            ValueAnimator.ofFloat(progress, targetProgress).apply {
-                duration = 200
-                addUpdateListener { progress = it.animatedValue as Float }
-                start()
+            if (isVisible) {
+                ValueAnimator.ofFloat(progress, targetProgress).apply {
+                    duration = 200
+                    addUpdateListener { progress = it.animatedValue as Float }
+                    start()
+                }
+            } else {
+                progress = targetProgress
             }
         }
     }
