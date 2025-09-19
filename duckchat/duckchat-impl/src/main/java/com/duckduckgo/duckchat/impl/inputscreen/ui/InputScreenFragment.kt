@@ -188,7 +188,7 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
         }.launchIn(lifecycleScope)
 
         viewModel.visibilityState.onEach {
-            binding.ddgLogo.isVisible = if (binding.viewPager.currentItem == 0) {
+            binding.ddgLogoContainer.isVisible = if (binding.viewPager.currentItem == 0) {
                 it.showSearchLogo
             } else {
                 it.showChatLogo
@@ -233,13 +233,21 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
             binding.viewPager.setCurrentItem(0, true)
             viewModel.onSearchSelected()
             viewModel.onSearchInputTextChanged(binding.inputModeWidget.text)
-            binding.ddgLogo.isVisible = viewModel.visibilityState.value.showSearchLogo
+            binding.ddgLogoContainer.isVisible = viewModel.visibilityState.value.showSearchLogo
         }
         onChatSelected = {
             binding.viewPager.setCurrentItem(1, true)
             viewModel.onChatSelected()
             viewModel.onChatInputTextChanged(binding.inputModeWidget.text)
-            binding.ddgLogo.isVisible = viewModel.visibilityState.value.showChatLogo
+            binding.ddgLogoContainer.apply {
+                val showChatLogo = viewModel.visibilityState.value.showChatLogo
+                val showSearchLogo = viewModel.visibilityState.value.showSearchLogo
+                isVisible = showChatLogo
+                if (showChatLogo && !showSearchLogo) {
+                    alpha = 0f
+                    animate().alpha(1f).setDuration(200L).start()
+                }
+            }
         }
         onSubmitMessageAvailable = { isAvailable ->
             binding.actionSend.isVisible = isAvailable
