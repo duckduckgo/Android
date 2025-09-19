@@ -98,8 +98,4 @@ class DaxPromptBrowserComparisonViewModel @Inject constructor(
         data class CloseScreen(val defaultBrowserSet: Boolean? = null) : Command()
         data class BrowserComparisonChart(val intent: Intent) : Command()
     }
-
-    companion object {
-        internal const val BROWSER_COMPARISON_MORE_URL = "https://duckduckgo.com/compare-privacy"
-    }
 }
