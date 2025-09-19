@@ -291,23 +291,27 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
     private fun updateLogoAnimationForScroll(position: Int, positionOffset: Float) {
         binding.ddgLogo.apply {
             setMinAndMaxFrame(0, 15)
-            when (position) {
-                0 -> {
-                    this.progress = positionOffset
-                }
-                1 -> {
-                    this.progress = 1f - positionOffset
+            if (!viewModel.visibilityState.value.showSearchLogo) {
+                this.progress = 1f
+            } else {
+                when (position) {
+                    0 -> {
+                        this.progress = positionOffset
+                    }
+                    1 -> {
+                        this.progress = 1f - positionOffset
+                    }
                 }
             }
         }
     }
 
     private fun updateTabIndicatorForScroll(position: Int, positionOffset: Float) {
-        val fastOffset = when {
+        val offset = when {
             positionOffset <= 0.5f -> positionOffset * positionOffset * 2f
             else -> 1f - (1f - positionOffset) * (1f - positionOffset) * 2f
         }
-        binding.inputModeWidget.setScrollPosition(position, fastOffset)
+        binding.inputModeWidget.setScrollPosition(position, offset)
     }
 
     private fun exitInputScreen() {
