@@ -257,9 +257,11 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
             viewModel.onInputFieldTouched()
         }
         onTabTapped = { index ->
-            if (viewModel.visibilityState.value.showSearchLogo) {
-                viewModel.onTabTapped()
-                animateLogoToPosition(index)
+            if (binding.viewPager.currentItem != index) {
+                if (viewModel.visibilityState.value.showSearchLogo) {
+                    viewModel.onTabTapped()
+                    animateLogoToPosition(index)
+                }
             }
         }
     }
