@@ -185,6 +185,7 @@ import com.duckduckgo.app.browser.logindetection.FireproofDialogsEventHandler.Ev
 import com.duckduckgo.app.browser.logindetection.LoginDetected
 import com.duckduckgo.app.browser.logindetection.NavigationAwareLoginDetector
 import com.duckduckgo.app.browser.logindetection.NavigationEvent
+import com.duckduckgo.app.browser.menu.VpnMenuStateProvider
 import com.duckduckgo.app.browser.model.BasicAuthenticationCredentials
 import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
 import com.duckduckgo.app.browser.model.LongPressTarget
@@ -480,6 +481,7 @@ class BrowserTabViewModel @Inject constructor(
     private val serpEasterEggLogosToggles: SerpEasterEggLogosToggles,
     private val nonHttpAppLinkChecker: NonHttpAppLinkChecker,
     private val externalIntentProcessingState: ExternalIntentProcessingState,
+    private val vpnMenuStateProvider: VpnMenuStateProvider,
 ) : WebViewClientListener,
     EditSavedSiteListener,
     DeleteBookmarkListener,
@@ -727,6 +729,13 @@ class BrowserTabViewModel @Inject constructor(
         duckPlayer.observeUserPreferences()
             .onEach { preferences ->
                 command.value = duckPlayerJSHelper.userPreferencesUpdated(preferences)
+            }
+            .flowOn(dispatchers.main())
+            .launchIn(viewModelScope)
+
+        vpnMenuStateProvider.getVpnMenuState()
+            .onEach { vpnMenuState ->
+                browserViewState.value = currentBrowserViewState().copy(vpnMenuState = vpnMenuState)
             }
             .flowOn(dispatchers.main())
             .launchIn(viewModelScope)

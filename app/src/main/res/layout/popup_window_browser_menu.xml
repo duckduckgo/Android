@@ -107,10 +107,6 @@
                 android:id="@+id/includeDefaultBrowserMenuItem"
                 layout="@layout/view_menu_item_default_browser" />
 
-            <include
-                android:id="@+id/includeVpnMenuItem"
-                layout="@layout/view_menu_item_vpn" />
-
             <com.duckduckgo.common.ui.view.MenuItemView
                 android:id="@+id/sharePageMenuItem"
                 android:layout_width="match_parent"
@@ -222,6 +218,10 @@
                 android:layout_height="wrap_content"
                 app:iconDrawable="@drawable/ic_downloads_16"
                 app:primaryText="@string/downloadsMenuTitle" />
+
+            <include
+                android:id="@+id/includeVpnMenuItem"
+                layout="@layout/view_menu_item_vpn" />
 
             <com.duckduckgo.common.ui.view.MenuItemView
                 android:id="@+id/settingsMenuItem"
