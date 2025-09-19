@@ -16,6 +16,7 @@
 
 package com.duckduckgo.duckchat.impl.inputscreen.ui
 
+import android.animation.ValueAnimator
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
@@ -25,6 +26,7 @@ import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
+import androidx.viewpager2.widget.ViewPager2
 import androidx.viewpager2.widget.ViewPager2.OnPageChangeCallback
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.statistics.pixels.Pixel
@@ -99,8 +101,16 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
         }
 
         override fun onPageScrolled(position: Int, positionOffset: Float, positionOffsetPixels: Int) {
-            updateLogoAnimationForScroll(position, positionOffset)
+            if (viewModel.shouldAnimateLogoOnScroll()) {
+                updateLogoAnimationForScroll(position, positionOffset)
+            }
             updateTabIndicatorForScroll(position, positionOffset)
+        }
+
+        override fun onPageScrollStateChanged(state: Int) {
+            if (state == ViewPager2.SCROLL_STATE_IDLE) {
+                viewModel.onScrollStateIdle()
+            }
         }
     }
 
@@ -246,6 +256,10 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
         onInputFieldClicked = {
             viewModel.onInputFieldTouched()
         }
+        onTabTapped = { index ->
+            viewModel.onTabTapped()
+            animateLogoToPosition(index)
+        }
     }
 
     private fun submitChatQuery(query: String) {
@@ -312,6 +326,22 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
             else -> 1f - (1f - positionOffset) * (1f - positionOffset) * 2f
         }
         binding.inputModeWidget.setScrollPosition(position, offset)
+    }
+
+    private fun animateLogoToPosition(position: Int) {
+        binding.ddgLogo.apply {
+            setMinAndMaxFrame(0, 15)
+            val targetProgress = when (position) {
+                0 -> 0f
+                1 -> 1f
+                else -> progress
+            }
+            ValueAnimator.ofFloat(progress, targetProgress).apply {
+                duration = 350
+                addUpdateListener { progress = it.animatedValue as Float }
+                start()
+            }
+        }
     }
 
     private fun exitInputScreen() {
