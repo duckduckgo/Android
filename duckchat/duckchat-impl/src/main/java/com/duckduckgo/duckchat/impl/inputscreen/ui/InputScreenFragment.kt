@@ -29,6 +29,7 @@ import androidx.viewpager2.widget.ViewPager2.OnPageChangeCallback
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.ui.DuckDuckGoFragment
+import com.duckduckgo.common.ui.store.AppTheme
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.extensions.hideKeyboard
 import com.duckduckgo.common.utils.extensions.showKeyboard
@@ -80,6 +81,9 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
     @Inject
     lateinit var viewModelFactory: InputScreenViewModelFactory
 
+    @Inject
+    lateinit var appTheme: AppTheme
+
     private val viewModel: InputScreenViewModel by lazy {
         val params = requireActivity().intent.getActivityParams(InputScreenActivityParams::class.java)
         val currentOmnibarText = params?.query ?: ""
@@ -92,6 +96,12 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
     private val pageChangeCallback = object : OnPageChangeCallback() {
         override fun onPageSelected(position: Int) {
             binding.inputModeWidget.selectTab(position)
+            updateLogoAnimationForPosition(position)
+        }
+
+        override fun onPageScrolled(position: Int, positionOffset: Float, positionOffsetPixels: Int) {
+            updateLogoAnimationForScroll(position, positionOffset)
+            updateTabIndicatorForScroll(position, positionOffset)
         }
     }
 
@@ -109,6 +119,7 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
         configureOmnibar()
         configureVoice()
         configureObservers()
+        configureDdgLogoAnimation()
 
         binding.inputModeWidget.init()
 
@@ -213,24 +224,18 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
             binding.viewPager.setCurrentItem(0, true)
             viewModel.onSearchSelected()
             viewModel.onSearchInputTextChanged(binding.inputModeWidget.text)
-            binding.ddgLogo.apply {
-                setImageResource(com.duckduckgo.mobile.android.R.drawable.logo_full)
-                isVisible = viewModel.visibilityState.value.showSearchLogo
+            binding.ddgLogo.isVisible = viewModel.visibilityState.value.showSearchLogo
+            if (binding.ddgLogo.isVisible) {
+                updateLogoAnimationForPosition(0)
             }
         }
         onChatSelected = {
             binding.viewPager.setCurrentItem(1, true)
             viewModel.onChatSelected()
             viewModel.onChatInputTextChanged(binding.inputModeWidget.text)
-            binding.ddgLogo.apply {
-                setImageResource(R.drawable.logo_full_ai)
-                val showChatLogo = viewModel.visibilityState.value.showChatLogo
-                val showSearchLogo = viewModel.visibilityState.value.showSearchLogo
-                isVisible = showChatLogo
-                if (showChatLogo && !showSearchLogo) {
-                    alpha = 0f
-                    animate().alpha(1f).setDuration(200L).start()
-                }
+            binding.ddgLogo.isVisible = viewModel.visibilityState.value.showChatLogo
+            if (binding.ddgLogo.isVisible) {
+                updateLogoAnimationForPosition(1)
             }
         }
         onSubmitMessageAvailable = { isAvailable ->
@@ -280,6 +285,49 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
         viewModel.visibilityState.onEach {
             binding.actionVoice.isInvisible = !it.voiceInputButtonVisible
         }.launchIn(lifecycleScope)
+    }
+
+    private fun configureDdgLogoAnimation() {
+        val animationResource = if (appTheme.isLightModeEnabled()) {
+            R.raw.duckduckgo_ai_transition_light
+        } else {
+            R.raw.duckduckgo_ai_transition_dark
+        }
+        binding.ddgLogo.setAnimation(animationResource)
+    }
+
+    private fun updateLogoAnimationForPosition(position: Int) {
+        binding.ddgLogo.apply {
+            when (position) {
+                0 -> {
+                    setMinAndMaxFrame(0, 0)
+                    progress = 0f
+                }
+                1 -> {
+                    setMinAndMaxFrame(15, 15)
+                    progress = 1f
+                }
+            }
+        }
+    }
+
+    private fun updateLogoAnimationForScroll(position: Int, positionOffset: Float) {
+        binding.ddgLogo.apply {
+            when (position) {
+                0 -> {
+                    setMinAndMaxFrame(0, 15)
+                    this.progress = positionOffset
+                }
+                1 -> {
+                    setMinAndMaxFrame(0, 15)
+                    this.progress = 1f - positionOffset
+                }
+            }
+        }
+    }
+
+    private fun updateTabIndicatorForScroll(position: Int, positionOffset: Float) {
+        binding.inputModeWidget.setScrollPosition(position, positionOffset)
     }
 
     private fun exitInputScreen() {

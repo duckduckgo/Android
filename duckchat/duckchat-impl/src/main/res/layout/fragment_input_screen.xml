@@ -30,9 +30,9 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <ImageView
+    <com.airbnb.lottie.LottieAnimationView
         android:id="@+id/ddgLogo"
-        android:layout_width="@dimen/ntpDaxLogoIconWidth"
+        android:layout_width="180dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/homeTabDdgLogoTopMargin"
         android:paddingTop="@dimen/inputScreenContentTopOffset"
@@ -42,7 +42,8 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/inputModeWidget"
-        app:srcCompat="@drawable/logo_full" />
+        app:lottie_autoPlay="false"
+        app:lottie_loop="false" />
 
     <androidx.viewpager2.widget.ViewPager2
         android:id="@+id/viewPager"

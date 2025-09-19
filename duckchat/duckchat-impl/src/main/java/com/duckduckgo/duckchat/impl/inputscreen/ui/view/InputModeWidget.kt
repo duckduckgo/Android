@@ -285,6 +285,10 @@ class InputModeWidget @JvmOverloads constructor(
         }
     }
 
+    fun setScrollPosition(position: Int, positionOffset: Float) {
+        inputModeSwitch.setScrollPosition(position, positionOffset, false)
+    }
+
     private fun fade(
         view: View,
         visible: Boolean,
