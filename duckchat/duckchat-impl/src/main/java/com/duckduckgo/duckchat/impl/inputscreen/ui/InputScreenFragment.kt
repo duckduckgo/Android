@@ -25,6 +25,7 @@ import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
+import androidx.viewpager2.widget.ViewPager2
 import androidx.viewpager2.widget.ViewPager2.OnPageChangeCallback
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.statistics.pixels.Pixel
@@ -100,8 +101,16 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
         }
 
         override fun onPageScrolled(position: Int, positionOffset: Float, positionOffsetPixels: Int) {
-            updateLogoAnimationForScroll(position, positionOffset)
+            if (viewModel.shouldAnimateLogo()) {
+                updateLogoAnimationForScroll(position, positionOffset)
+            }
             updateTabIndicatorForScroll(position, positionOffset)
+        }
+
+        override fun onPageScrollStateChanged(state: Int) {
+            if (state == ViewPager2.SCROLL_STATE_IDLE) {
+                viewModel.onScrollStateIdle()
+            }
         }
     }
 
@@ -225,18 +234,12 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
             viewModel.onSearchSelected()
             viewModel.onSearchInputTextChanged(binding.inputModeWidget.text)
             binding.ddgLogo.isVisible = viewModel.visibilityState.value.showSearchLogo
-            if (binding.ddgLogo.isVisible) {
-                updateLogoAnimationForPosition(0)
-            }
         }
         onChatSelected = {
             binding.viewPager.setCurrentItem(1, true)
             viewModel.onChatSelected()
             viewModel.onChatInputTextChanged(binding.inputModeWidget.text)
             binding.ddgLogo.isVisible = viewModel.visibilityState.value.showChatLogo
-            if (binding.ddgLogo.isVisible) {
-                updateLogoAnimationForPosition(1)
-            }
         }
         onSubmitMessageAvailable = { isAvailable ->
             binding.actionSend.isVisible = isAvailable
@@ -252,6 +255,9 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
         }
         onInputFieldClicked = {
             viewModel.onInputFieldTouched()
+        }
+        onTabTapped = {
+            viewModel.onTabTapped()
         }
     }
 
