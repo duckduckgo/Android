@@ -45,11 +45,19 @@ class RealDaxPrompts @Inject constructor(
 ) : DaxPrompts {
 
     override suspend fun evaluate(): ActionType {
-        return if (isEnabled() && isEligible() && shouldShowBrowserComparisonPrompt()) {
-            ActionType.SHOW_BROWSER_COMPARISON_PROMPT
-        } else {
-            ActionType.NONE
+        if (!isEnabled() || !isEligible()) {
+            return ActionType.NONE
         }
+
+        if (shouldShowBrowserComparisonPrompt()) {
+            return ActionType.SHOW_BROWSER_COMPARISON_PROMPT
+        }
+
+        if (dialogShownInTheLast24Hours()) {
+            return ActionType.TOO_SOON_TO_SHOW_OTHER_PROMPTS
+        }
+
+        return ActionType.NONE
     }
 
     private suspend fun isEnabled(): Boolean {
@@ -79,5 +87,9 @@ class RealDaxPrompts @Inject constructor(
 
     private suspend fun shouldShowBrowserComparisonPrompt(): Boolean = withContext(dispatchers.io()) {
         !daxPromptsRepository.getDaxPromptsBrowserComparisonShown()
+    }
+
+    private suspend fun dialogShownInTheLast24Hours(): Boolean {
+        return daxPromptsRepository.getDaxPromptsBrowserComparisonShownInTheLast24Hours()
     }
 }

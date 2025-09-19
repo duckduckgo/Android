@@ -21,12 +21,14 @@ import com.duckduckgo.daxprompts.impl.store.DaxPromptsDataStore
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
+import java.util.Date
 import javax.inject.Inject
 import kotlinx.coroutines.withContext
 
 interface DaxPromptsRepository {
     suspend fun setDaxPromptsBrowserComparisonShown()
     suspend fun getDaxPromptsBrowserComparisonShown(): Boolean
+    suspend fun getDaxPromptsBrowserComparisonShownInTheLast24Hours(): Boolean
 }
 
 @SingleInstanceIn(AppScope::class)
@@ -46,5 +48,17 @@ class RealDaxPromptsRepository @Inject constructor(
 
     override suspend fun getDaxPromptsBrowserComparisonShown(): Boolean {
         return browserComparisonShown ?: daxPromptsDataStore.getDaxPromptsBrowserComparisonShown()
+    }
+
+    override suspend fun getDaxPromptsBrowserComparisonShownInTheLast24Hours(): Boolean {
+        return withContext(dispatchers.io()) {
+            val shownTimestamp = daxPromptsDataStore.getDaxPromptsBrowserComparisonTimeStamp() ?: return@withContext false
+            val currentTime = Date().time
+            return@withContext (currentTime - shownTimestamp) <= TWENTY_FOUR_HOURS_IN_MILLIS
+        }
+    }
+
+    companion object {
+        private const val TWENTY_FOUR_HOURS_IN_MILLIS = 24 * 60 * 60 * 1000
     }
 }

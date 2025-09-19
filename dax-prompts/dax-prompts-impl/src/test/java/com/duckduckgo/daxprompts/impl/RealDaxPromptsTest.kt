@@ -62,8 +62,9 @@ class RealDaxPromptsTest {
     }
 
     @Test
-    fun whenFlagIsDisabledThenReturnNone() = runTest {
+    fun whenFlagIsDisabledAndDialogNotShownInTheLast24HoursThenReturnNone() = runTest {
         mockFlagIsDisabled()
+        mockDialogNotShownInTheLast24Hours()
 
         val result = testee.evaluate()
 
@@ -71,9 +72,10 @@ class RealDaxPromptsTest {
     }
 
     @Test
-    fun whenUserIsNotEligibleThenReturnNone() = runTest {
+    fun whenUserIsNotEligibleAndDialogNotShownInTheLast24HoursThenReturnNone() = runTest {
         mockFlagIsEnabled()
         mockUserIsNotEligible()
+        mockDialogNotShownInTheLast24Hours()
 
         val result = testee.evaluate()
 
@@ -81,9 +83,10 @@ class RealDaxPromptsTest {
     }
 
     @Test
-    fun whenShouldNotShowBrowserComparisonThenReturnNone() = runTest {
+    fun whenShouldNotShowBrowserComparisonAndDialogNotShownInTheLast24HoursThenReturnNone() = runTest {
         mockFlagIsEnabled()
         mockUserIsEligible()
+        mockDialogNotShownInTheLast24Hours()
         mockShouldNotShowBrowserComparisonPrompt()
 
         val result = testee.evaluate()
@@ -104,6 +107,7 @@ class RealDaxPromptsTest {
 
     @Test
     fun whenDaysSinceInstalledLessThanThresholdThenUserIsNotEligible() = runTest {
+        mockDialogNotShownInTheLast24Hours()
         whenever(mockUserBrowserProperties.daysSinceInstalled()).thenReturn(27)
         whenever(mockUserBrowserProperties.daysUsedSince(any())).thenReturn(0)
         whenever(mockDefaultBrowserDetector.isDefaultBrowser()).thenReturn(false)
@@ -116,6 +120,7 @@ class RealDaxPromptsTest {
 
     @Test
     fun whenUserHasUsedAppInLast7DaysThenUserIsNotEligible() = runTest {
+        mockDialogNotShownInTheLast24Hours()
         whenever(mockUserBrowserProperties.daysSinceInstalled()).thenReturn(30)
         whenever(mockUserBrowserProperties.daysUsedSince(any())).thenReturn(1)
         whenever(mockDefaultBrowserDetector.isDefaultBrowser()).thenReturn(false)
@@ -128,6 +133,7 @@ class RealDaxPromptsTest {
 
     @Test
     fun whenIsDefaultBrowserThenUserIsNotEligible() = runTest {
+        mockDialogNotShownInTheLast24Hours()
         whenever(mockUserBrowserProperties.daysSinceInstalled()).thenReturn(30)
         whenever(mockUserBrowserProperties.daysUsedSince(any())).thenReturn(0)
         whenever(mockDefaultBrowserDetector.isDefaultBrowser()).thenReturn(true)
@@ -140,6 +146,7 @@ class RealDaxPromptsTest {
 
     @Test
     fun whenShouldShowDialogIsFalseThenUserIsNotEligible() = runTest {
+        mockDialogNotShownInTheLast24Hours()
         whenever(mockUserBrowserProperties.daysSinceInstalled()).thenReturn(30)
         whenever(mockUserBrowserProperties.daysUsedSince(any())).thenReturn(0)
         whenever(mockDefaultBrowserDetector.isDefaultBrowser()).thenReturn(false)
@@ -148,6 +155,18 @@ class RealDaxPromptsTest {
         val result = testee.evaluate()
 
         assertEquals(ActionType.NONE, result)
+    }
+
+    @Test
+    fun whenDialogShownInTheLast24HoursThenTooSoonToShowOtherPrompts() = runTest {
+        mockFlagIsEnabled()
+        mockUserIsEligible()
+        mockShouldNotShowBrowserComparisonPrompt()
+        mockDialogShownInTheLast24Hours()
+
+        val result = testee.evaluate()
+
+        assertEquals(ActionType.TOO_SOON_TO_SHOW_OTHER_PROMPTS, result)
     }
 
     private fun mockUserIsEligible() = runBlocking {
@@ -180,6 +199,18 @@ class RealDaxPromptsTest {
     private fun mockShouldNotShowBrowserComparisonPrompt() {
         runBlocking {
             whenever(mockRepository.getDaxPromptsBrowserComparisonShown()).thenReturn(true)
+        }
+    }
+
+    private fun mockDialogShownInTheLast24Hours() {
+        runBlocking {
+            whenever(mockRepository.getDaxPromptsBrowserComparisonShownInTheLast24Hours()).thenReturn(true)
+        }
+    }
+
+    private fun mockDialogNotShownInTheLast24Hours() {
+        runBlocking {
+            whenever(mockRepository.getDaxPromptsBrowserComparisonShownInTheLast24Hours()).thenReturn(false)
         }
     }
 }

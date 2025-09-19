@@ -28,6 +28,7 @@ import com.duckduckgo.common.utils.SingleLiveEvent
 import com.duckduckgo.daxprompts.api.DaxPrompts
 import com.duckduckgo.daxprompts.api.DaxPrompts.ActionType.NONE
 import com.duckduckgo.daxprompts.api.DaxPrompts.ActionType.SHOW_BROWSER_COMPARISON_PROMPT
+import com.duckduckgo.daxprompts.api.DaxPrompts.ActionType.TOO_SOON_TO_SHOW_OTHER_PROMPTS
 import com.duckduckgo.di.scopes.ActivityScope
 import javax.inject.Inject
 import kotlinx.coroutines.async
@@ -70,7 +71,7 @@ class LaunchViewModel @Inject constructor(
         }
 
         when (daxPrompts.evaluate()) {
-            NONE -> {
+            NONE, TOO_SOON_TO_SHOW_OTHER_PROMPTS -> {
                 logcat { "daxPrompts evaluate: None action" }
                 showOnboardingOrHome()
             }

@@ -25,6 +25,7 @@ interface DaxPrompts {
 
     enum class ActionType {
         SHOW_BROWSER_COMPARISON_PROMPT,
+        TOO_SOON_TO_SHOW_OTHER_PROMPTS,
         NONE,
     }
 }
