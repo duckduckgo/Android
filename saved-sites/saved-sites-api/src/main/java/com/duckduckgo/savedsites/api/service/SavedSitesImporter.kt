@@ -27,9 +27,26 @@ interface SavedSitesImporter {
      * Reads a HTML based file with all [SavedSites] that the user has
      * in Netscape format.
      * @param uri of the [File] we'll read the data from
+     * @param destination where to import the bookmarks (defaults to Root)
      * @return [ImportSavedSitesResult] result of the operation
      */
-    suspend fun import(uri: Uri): ImportSavedSitesResult
+    suspend fun import(uri: Uri, importFolder: ImportFolder = ImportFolder.Root): ImportSavedSitesResult
+
+    /**
+     * Where to import bookmarks, either directly to the bookmark root or into a named folder.
+     */
+    sealed class ImportFolder {
+        /**
+         * Import bookmarks directly into the root bookmark folder structure.
+         */
+        object Root : ImportFolder()
+
+        /**
+         * Import bookmarks into a named folder.
+         * @param folderName The name of the folder
+         */
+        data class Folder(val folderName: String) : ImportFolder()
+    }
 }
 
 sealed class ImportSavedSitesResult {
