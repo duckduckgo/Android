@@ -65,7 +65,7 @@ class RealDaxPrompts @Inject constructor(
             }
 
             val sevenDaysAgo = Date(Date().time - EXISTING_USER_DAYS_INACTIVE_MILLIS)
-            if (userBrowserProperties.daysUsedSince(sevenDaysAgo) > 0L) {
+            if (userBrowserProperties.daysUsedSince(sevenDaysAgo) > 1L) {
                 return@withContext false
             }
 
@@ -78,6 +78,6 @@ class RealDaxPrompts @Inject constructor(
     }
 
     private suspend fun shouldShowBrowserComparisonPrompt(): Boolean = withContext(dispatchers.io()) {
-        daxPromptsRepository.getDaxPromptsShowBrowserComparison()
+        !daxPromptsRepository.getDaxPromptsBrowserComparisonShown()
     }
 }

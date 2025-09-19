@@ -25,8 +25,8 @@ import javax.inject.Inject
 import kotlinx.coroutines.withContext
 
 interface DaxPromptsRepository {
-    suspend fun setDaxPromptsShowBrowserComparison(show: Boolean)
-    suspend fun getDaxPromptsShowBrowserComparison(): Boolean
+    suspend fun setDaxPromptsBrowserComparisonShown()
+    suspend fun getDaxPromptsBrowserComparisonShown(): Boolean
 }
 
 @SingleInstanceIn(AppScope::class)
@@ -35,16 +35,16 @@ class RealDaxPromptsRepository @Inject constructor(
     private val daxPromptsDataStore: DaxPromptsDataStore,
     private val dispatchers: DispatcherProvider,
 ) : DaxPromptsRepository {
-    private var showBrowserComparison: Boolean? = null
+    private var browserComparisonShown: Boolean? = null
 
-    override suspend fun setDaxPromptsShowBrowserComparison(show: Boolean) {
-        showBrowserComparison = show
+    override suspend fun setDaxPromptsBrowserComparisonShown() {
+        browserComparisonShown = true
         withContext(dispatchers.io()) {
-            daxPromptsDataStore.setDaxPromptsShowBrowserComparison(show)
+            daxPromptsDataStore.setShownDaxPromptsBrowserComparison()
         }
     }
 
-    override suspend fun getDaxPromptsShowBrowserComparison(): Boolean {
-        return showBrowserComparison ?: daxPromptsDataStore.getDaxPromptsShowBrowserComparison()
+    override suspend fun getDaxPromptsBrowserComparisonShown(): Boolean {
+        return browserComparisonShown ?: daxPromptsDataStore.getDaxPromptsBrowserComparisonShown()
     }
 }

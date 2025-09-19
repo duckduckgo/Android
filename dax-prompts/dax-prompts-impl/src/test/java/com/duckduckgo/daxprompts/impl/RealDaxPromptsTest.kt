@@ -173,13 +173,13 @@ class RealDaxPromptsTest {
 
     private fun mockShouldShowBrowserComparisonPrompt() {
         runBlocking {
-            whenever(mockRepository.getDaxPromptsShowBrowserComparison()).thenReturn(true)
+            whenever(mockRepository.getDaxPromptsBrowserComparisonShown()).thenReturn(false)
         }
     }
 
     private fun mockShouldNotShowBrowserComparisonPrompt() {
         runBlocking {
-            whenever(mockRepository.getDaxPromptsShowBrowserComparison()).thenReturn(false)
+            whenever(mockRepository.getDaxPromptsBrowserComparisonShown()).thenReturn(true)
         }
     }
 }

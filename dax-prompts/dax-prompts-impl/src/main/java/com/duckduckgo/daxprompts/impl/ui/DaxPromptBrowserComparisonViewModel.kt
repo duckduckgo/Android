@@ -90,7 +90,7 @@ class DaxPromptBrowserComparisonViewModel @Inject constructor(
 
     fun markBrowserComparisonPromptAsShown() {
         viewModelScope.launch {
-            daxPromptsRepository.setDaxPromptsShowBrowserComparison(false)
+            daxPromptsRepository.setDaxPromptsBrowserComparisonShown()
         }
     }
 
