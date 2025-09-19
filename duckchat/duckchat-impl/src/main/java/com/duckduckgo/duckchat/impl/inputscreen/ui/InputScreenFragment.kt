@@ -119,7 +119,7 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
         configureOmnibar()
         configureVoice()
         configureObservers()
-        configureDdgLogoAnimation()
+        configureLogoAnimation()
 
         binding.inputModeWidget.init()
 
@@ -281,13 +281,12 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
         }.launchIn(lifecycleScope)
     }
 
-    private fun configureDdgLogoAnimation() {
-        val animationResource = if (appTheme.isLightModeEnabled()) {
-            R.raw.duckduckgo_ai_transition_light
+    private fun configureLogoAnimation() {
+        if (appTheme.isLightModeEnabled()) {
+            binding.ddgLogo.setAnimation(R.raw.duckduckgo_ai_transition_light)
         } else {
-            R.raw.duckduckgo_ai_transition_dark
+            binding.ddgLogo.setAnimation(R.raw.duckduckgo_ai_transition_dark)
         }
-        binding.ddgLogo.setAnimation(animationResource)
     }
 
     private fun animateLogoToPosition(position: Int) {
@@ -302,21 +301,6 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
                 duration = 200
                 addUpdateListener { progress = it.animatedValue as Float }
                 start()
-            }
-        }
-    }
-
-    private fun updateLogoAnimationForScroll(position: Int, positionOffset: Float) {
-        binding.ddgLogo.apply {
-            when (position) {
-                0 -> {
-                    setMinAndMaxFrame(0, 15)
-                    this.progress = positionOffset
-                }
-                1 -> {
-                    setMinAndMaxFrame(0, 15)
-                    this.progress = 1f - positionOffset
-                }
             }
         }
     }
