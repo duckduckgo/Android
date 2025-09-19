@@ -32,7 +32,7 @@ interface VpnMenuStateProvider {
 }
 
 @ContributesBinding(AppScope::class)
-class RealVpnMenuStateProvider @Inject constructor(
+class VpnMenuStateProviderImpl @Inject constructor(
     private val subscriptions: Subscriptions,
     private val networkProtectionState: NetworkProtectionState,
 ) : VpnMenuStateProvider {
