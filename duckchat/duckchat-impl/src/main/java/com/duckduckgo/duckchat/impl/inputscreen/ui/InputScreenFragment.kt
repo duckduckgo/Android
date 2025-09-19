@@ -16,7 +16,6 @@
 
 package com.duckduckgo.duckchat.impl.inputscreen.ui
 
-import android.animation.ValueAnimator
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
@@ -97,10 +96,10 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
     private val pageChangeCallback = object : OnPageChangeCallback() {
         override fun onPageSelected(position: Int) {
             binding.inputModeWidget.selectTab(position)
-            animateLogoToPosition(position)
         }
 
         override fun onPageScrolled(position: Int, positionOffset: Float, positionOffsetPixels: Int) {
+            updateLogoAnimationForScroll(position, positionOffset)
             updateTabIndicatorForScroll(position, positionOffset)
         }
     }
@@ -289,28 +288,26 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
         }
     }
 
-    private fun animateLogoToPosition(position: Int) {
+    private fun updateLogoAnimationForScroll(position: Int, positionOffset: Float) {
         binding.ddgLogo.apply {
             setMinAndMaxFrame(0, 15)
-            val targetProgress = when (position) {
-                0 -> 0f
-                1 -> 1f
-                else -> progress
-            }
-            if (isVisible) {
-                ValueAnimator.ofFloat(progress, targetProgress).apply {
-                    duration = 200
-                    addUpdateListener { progress = it.animatedValue as Float }
-                    start()
+            when (position) {
+                0 -> {
+                    this.progress = positionOffset
                 }
-            } else {
-                progress = targetProgress
+                1 -> {
+                    this.progress = 1f - positionOffset
+                }
             }
         }
     }
 
     private fun updateTabIndicatorForScroll(position: Int, positionOffset: Float) {
-        binding.inputModeWidget.setScrollPosition(position, positionOffset)
+        val fastOffset = when {
+            positionOffset <= 0.5f -> positionOffset * positionOffset * 2f
+            else -> 1f - (1f - positionOffset) * (1f - positionOffset) * 2f
+        }
+        binding.inputModeWidget.setScrollPosition(position, fastOffset)
     }
 
     private fun exitInputScreen() {
