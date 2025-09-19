@@ -55,7 +55,7 @@
         android:layout_height="wrap_content"
         android:layout_marginEnd="@dimen/keyline_2"
         android:padding="@dimen/keyline_2"
-        android:src="@drawable/ic_beta_pill"
+        android:src="@drawable/ic_try_for_free_pill"
         android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
