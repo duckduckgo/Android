@@ -111,6 +111,7 @@ import com.duckduckgo.app.browser.commands.Command.LaunchNewTab
 import com.duckduckgo.app.browser.commands.Command.LaunchPopupMenu
 import com.duckduckgo.app.browser.commands.Command.LaunchPrivacyPro
 import com.duckduckgo.app.browser.commands.Command.LaunchTabSwitcher
+import com.duckduckgo.app.browser.commands.Command.LaunchVpnManagement
 import com.duckduckgo.app.browser.commands.Command.LoadExtractedUrl
 import com.duckduckgo.app.browser.commands.Command.OpenAppLink
 import com.duckduckgo.app.browser.commands.Command.OpenBrokenSiteLearnMore
@@ -213,6 +214,7 @@ import com.duckduckgo.app.browser.viewstate.LoadingViewState
 import com.duckduckgo.app.browser.viewstate.OmnibarViewState
 import com.duckduckgo.app.browser.viewstate.PrivacyShieldViewState
 import com.duckduckgo.app.browser.viewstate.SavedSiteChangedViewState
+import com.duckduckgo.app.browser.viewstate.VpnMenuState
 import com.duckduckgo.app.browser.webview.MaliciousSiteBlockedWarningLayout
 import com.duckduckgo.app.browser.webview.MaliciousSiteBlockedWarningLayout.Action.LearnMore
 import com.duckduckgo.app.browser.webview.MaliciousSiteBlockedWarningLayout.Action.LeaveSite
@@ -4341,6 +4343,19 @@ class BrowserTabViewModel @Inject constructor(
             hasFocus && isNtp && query.isNullOrBlank() -> duckChat.openDuckChat()
             hasFocus -> duckChat.openDuckChatWithAutoPrompt(query ?: "")
             else -> duckChat.openDuckChat()
+        }
+    }
+
+    fun onVpnMenuClicked() {
+        val vpnMenuState = currentBrowserViewState().vpnMenuState
+        when (vpnMenuState) {
+            VpnMenuState.NotSubscribed -> {
+                command.value = LaunchPrivacyPro("https://duckduckgo.com/pro?origin=funnel_appmenu_android".toUri())
+            }
+            is VpnMenuState.Subscribed -> {
+                command.value = LaunchVpnManagement
+            }
+            VpnMenuState.Hidden -> {} // Should not happen as menu item should not be visible
         }
     }
 

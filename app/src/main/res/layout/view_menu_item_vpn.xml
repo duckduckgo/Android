@@ -19,11 +19,17 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/vpnMenuItem"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    android:background="?android:attr/selectableItemBackground"
+    android:clickable="true"
+    android:focusable="true">
 
     <com.duckduckgo.common.ui.view.MenuItemView
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:background="@android:color/transparent"
+        android:clickable="false"
+        android:focusable="false"
         app:iconDrawable="@drawable/ic_vpn_grayscale_color_24"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@id/trailingBarrier"
@@ -44,10 +50,10 @@
         android:layout_height="wrap_content"
         android:layout_marginEnd="@dimen/keyline_5"
         android:visibility="gone"
-        tools:visibility="visible"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        tools:visibility="visible" />
 
     <ImageView
         android:id="@+id/tryForFreePill"

@@ -307,6 +307,7 @@ import com.duckduckgo.mobile.android.R as CommonR
 import com.duckduckgo.mobile.android.app.tracking.ui.AppTrackingProtectionScreens.AppTrackerOnboardingActivityWithEmptyParamsParams
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.navigation.api.GlobalActivityStarter.DeeplinkActivityParams
+import com.duckduckgo.networkprotection.api.NetworkProtectionScreens.NetworkProtectionManagementScreenNoParams
 import com.duckduckgo.privacy.dashboard.api.ui.DashboardOpener
 import com.duckduckgo.privacy.dashboard.api.ui.PrivacyDashboardHybridScreenParams.BrokenSiteForm
 import com.duckduckgo.privacy.dashboard.api.ui.PrivacyDashboardHybridScreenParams.BrokenSiteForm.BrokenSiteFormReportFlow
@@ -1346,6 +1347,10 @@ class BrowserTabFragment :
                     pixel.fire(CustomTabPixelNames.CUSTOM_TABS_OPEN_IN_DDG)
                 }
             }
+
+            onMenuItemClicked(vpnMenuItem) {
+                viewModel.onVpnMenuClicked()
+            }
         }
     }
 
@@ -1991,6 +1996,10 @@ class BrowserTabFragment :
                 activity?.let { context ->
                     subscriptions.launchPrivacyPro(context, it.uri)
                 }
+            }
+
+            is Command.LaunchVpnManagement -> {
+                globalActivityStarter.start(requireContext(), NetworkProtectionManagementScreenNoParams)
             }
 
             is Command.DialNumber -> {
