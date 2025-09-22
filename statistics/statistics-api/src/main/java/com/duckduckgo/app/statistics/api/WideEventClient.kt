@@ -16,6 +16,8 @@
 
 package com.duckduckgo.app.statistics.api
 
+import java.time.Duration
+
 interface WideEventClient {
 
     /**
@@ -30,6 +32,7 @@ interface WideEventClient {
         name: String,
         flowEntryPoint: String? = null,
         metadata: Map<String, String> = emptyMap(),
+        cleanupPolicy: CleanupPolicy? = null,
     ): Result<Long>
 
     /**
@@ -77,6 +80,36 @@ interface WideEventClient {
      * @param name Stable flow name that was previously used with [flowStart].
      */
     suspend fun getFlowIds(name: String): Result<List<Long>>
+
+    /**
+     * Start a named interval inside the flow.
+     *
+     * If [timeout] elapses before [intervalEnd], [flowFinish] or [flowAbort], the flow auto-finishes with
+     * [FlowStatus.Unknown] and is sent. Explicit finish/abort cancels any pending timeouts.
+     *
+     * @param wideEventId ID of the wide event.
+     * @param key Interval key (e.g., "token_refresh_duration").
+     * @param timeout Optional duration for auto-finish.
+     */
+    suspend fun intervalStart(
+        wideEventId: Long,
+        key: String,
+        timeout: Duration? = null,
+    ): Result<Unit>
+
+    /**
+     * End a previously started interval.
+     *
+     * Cancels any timeout set by the corresponding [intervalStart].
+     *
+     * @param wideEventId ID of the wide event.
+     * @param key Interval key passed to [intervalStart].
+     * @return Duration of the interval.
+     */
+    suspend fun intervalEnd(
+        wideEventId: Long,
+        key: String,
+    ): Result<Duration>
 }
 
 /** Represents the final outcome status of a wide event. */
@@ -93,4 +126,42 @@ sealed class FlowStatus {
 
     /** The final status could not be determined */
     data object Unknown : FlowStatus()
+}
+
+/**
+ * Per-flow cleanup behavior applied when a flow is left open.
+ *
+ * Each policy carries a target [flowStatus] - the flow is auto-finished with that status and sent.
+ */
+sealed class CleanupPolicy {
+
+    /**
+     * The status to use when this policy triggers.
+     */
+    abstract val flowStatus: FlowStatus
+
+    /**
+     * Apply cleanup on the next (main) process start for any still-open flow.
+     *
+     * If [ignoreIfIntervalTimeoutPresent] is true and the flow has a pending interval timeout,
+     * this policy is skipped so the interval timeout can handle cleanup.
+     *
+     * @param ignoreIfIntervalTimeoutPresent When true, do not apply this policy if an interval timeout exists.
+     */
+    data class OnProcessStart(
+        val ignoreIfIntervalTimeoutPresent: Boolean,
+        override val flowStatus: FlowStatus = FlowStatus.Unknown,
+    ) : CleanupPolicy()
+
+    /**
+     * Apply cleanup after a fixed time from flow start if the flow remains open.
+     *
+     * Any explicit finish/abort cancels this timeout.
+     *
+     * @param duration Duration after flow start to trigger cleanup.
+     */
+    data class OnTimeout(
+        val duration: Duration,
+        override val flowStatus: FlowStatus = FlowStatus.Unknown,
+    ) : CleanupPolicy()
 }

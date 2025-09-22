@@ -16,11 +16,13 @@
 
 package com.duckduckgo.app.statistics.wideevents
 
+import com.duckduckgo.app.statistics.api.CleanupPolicy
 import com.duckduckgo.app.statistics.api.FlowStatus
 import com.duckduckgo.app.statistics.api.WideEventClient
 import com.duckduckgo.app.statistics.wideevents.db.WideEventRepository
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
+import java.time.Duration
 import javax.inject.Inject
 import kotlin.runCatching
 
@@ -33,6 +35,7 @@ class WideEventClientImpl @Inject constructor(
         name: String,
         flowEntryPoint: String?,
         metadata: Map<String, String>,
+        cleanupPolicy: CleanupPolicy?,
     ): Result<Long> = runCatching {
         wideEventRepository.insertWideEvent(
             name = name,
@@ -80,5 +83,20 @@ class WideEventClientImpl @Inject constructor(
 
     override suspend fun getFlowIds(name: String): Result<List<Long>> = runCatching {
         wideEventRepository.getActiveWideEventIdsByName(name)
+    }
+
+    override suspend fun intervalStart(
+        wideEventId: Long,
+        key: String,
+        timeout: Duration?,
+    ): Result<Unit> {
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun intervalEnd(
+        wideEventId: Long,
+        key: String,
+    ): Result<Duration> {
+        TODO("Not yet implemented")
     }
 }
