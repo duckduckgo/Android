@@ -46,6 +46,7 @@ interface NewAddressBarCallback {
     fun onDisplayed()
     fun onConfirmed(selection: NewAddressBarSelection)
     fun onNotNow()
+    fun onCancelled()
 }
 
 @SuppressLint("NoBottomSheetDialog")
@@ -75,6 +76,7 @@ class NewAddressBarOptionBottomSheetDialog(
         }
 
         setOnCancelListener {
+            newAddressBarCallback?.onCancelled()
             restoreOrientation()
             dismiss()
         }
