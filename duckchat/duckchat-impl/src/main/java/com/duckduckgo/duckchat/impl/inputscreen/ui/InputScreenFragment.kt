@@ -188,7 +188,8 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
         }.launchIn(lifecycleScope)
 
         viewModel.visibilityState.onEach {
-            binding.ddgLogoContainer.isVisible = if (binding.viewPager.currentItem == 0) {
+            val isSearchMode = binding.viewPager.currentItem == 0
+            binding.ddgLogoContainer.isVisible = if (isSearchMode) {
                 it.showSearchLogo
             } else {
                 it.showChatLogo
@@ -196,7 +197,7 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
 
             binding.ddgLogo.apply {
                 setMinAndMaxFrame(0, 15)
-                progress = if (it.showSearchLogo) 0f else 1f
+                progress = if (isSearchMode) 0f else 1f
             }
 
             binding.actionNewLine.isVisible = it.newLineButtonVisible
