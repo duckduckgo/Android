@@ -116,6 +116,7 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
     }
 
     private lateinit var pagerAdapter: InputScreenPagerAdapter
+    private var logoAnimator: ValueAnimator? = null
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -325,8 +326,9 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
     }
 
     private fun animateLogoToProgress(targetProgress: Float) {
+        logoAnimator?.cancel()
         binding.ddgLogo.apply {
-            ValueAnimator.ofFloat(progress, targetProgress).apply {
+            logoAnimator = ValueAnimator.ofFloat(progress, targetProgress).apply {
                 duration = LOGO_ANIMATION_DURATION
                 addUpdateListener { progress = it.animatedValue as Float }
                 start()
@@ -340,6 +342,9 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
     }
 
     override fun onDestroyView() {
+        logoAnimator?.cancel()
+        logoAnimator = null
+        binding.ddgLogo.clearAnimation()
         binding.viewPager.unregisterOnPageChangeCallback(pageChangeCallback)
         super.onDestroyView()
     }
