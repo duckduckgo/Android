@@ -7,4 +7,4 @@ appId: com.duckduckgo.mobile.android
 - pressKey: Enter
 - runFlow: handle_youtube_cookies.yaml
 - tapOn:
-      text: "DuckDuckGo vs Google: 5 Reasons You Should Switch.*"
+      text: "DuckDuckGo vs Google.*"
