@@ -15,6 +15,8 @@ import com.duckduckgo.browser.api.autocomplete.AutoCompleteSettings
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.extensions.toBinaryString
 import com.duckduckgo.duckchat.api.DuckChat
+import com.duckduckgo.duckchat.impl.inputscreen.ui.command.Command.AnimateLogoToProgress
+import com.duckduckgo.duckchat.impl.inputscreen.ui.command.Command.SetInputModeWidgetScrollPosition
 import com.duckduckgo.duckchat.impl.inputscreen.ui.command.Command.ShowKeyboard
 import com.duckduckgo.duckchat.impl.inputscreen.ui.command.Command.SubmitChat
 import com.duckduckgo.duckchat.impl.inputscreen.ui.command.Command.SubmitSearch
@@ -1249,33 +1251,43 @@ class InputScreenViewModelTest {
     }
 
     @Test
-    fun `when shouldAnimateLogoOnScroll called then returns current animateLogoOnScroll state`() {
+    fun `when onPageScrolled on first tab then input widget offset uses easing`() = runTest {
         val viewModel = createViewModel()
 
-        assertTrue(viewModel.shouldAnimateLogoOnScroll())
+        val position = 0
+        val positionOffset = 0.3f
+        val expectedEased = positionOffset * positionOffset * 2f
 
-        viewModel.onTabTapped()
-        assertFalse(viewModel.shouldAnimateLogoOnScroll())
+        viewModel.onPageScrolled(position, positionOffset)
 
-        viewModel.onScrollStateIdle()
-        assertTrue(viewModel.shouldAnimateLogoOnScroll())
+        assertEquals(
+            SetInputModeWidgetScrollPosition(position = position, offset = expectedEased),
+            viewModel.command.value,
+        )
     }
 
     @Test
-    fun `when onNewTabPageContentChanged with true then hasNewTabContent returns true`() {
+    fun `when onPageScrolled on second tab then input widget offset uses easing`() = runTest {
         val viewModel = createViewModel()
 
-        viewModel.onNewTabPageContentChanged(hasContent = true)
+        val position = 1
+        val positionOffset = 0.7f
+        val expectedEased = 1f - (1f - positionOffset) * (1f - positionOffset) * 2f
 
-        assertTrue(viewModel.hasNewTabContent())
+        viewModel.onPageScrolled(position, positionOffset)
+
+        assertEquals(
+            SetInputModeWidgetScrollPosition(position = position, offset = expectedEased),
+            viewModel.command.value,
+        )
     }
 
     @Test
-    fun `when onNewTabPageContentChanged with false then hasNewTabContent returns false`() {
+    fun `when onTabTapped to a different index and has no content then animate logo to that index`() = runTest {
         val viewModel = createViewModel()
 
-        viewModel.onNewTabPageContentChanged(hasContent = false)
+        viewModel.onTabTapped(index = 1)
 
-        assertFalse(viewModel.hasNewTabContent())
+        assertEquals(AnimateLogoToProgress(1f), viewModel.command.value)
     }
 }
