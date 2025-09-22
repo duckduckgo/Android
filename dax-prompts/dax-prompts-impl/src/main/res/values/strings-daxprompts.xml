@@ -15,22 +15,14 @@
   -->
 
 <resources>
-    <string name="dax_prompt_duck_player_title" translatable="false">Duck Player</string>
-    <string name="dax_prompt_duck_player_close" translatable="false">Close</string>
-    <string name="dax_prompt_duck_player_message_title" translatable="false">Watch YouTube with fewer ads.</string>
-    <string name="dax_prompt_duck_player_message_description" translatable="false">Duck Player blocks targeted YouTube ads, so you can focus on your favorite content.</string>
-    <string name="dax_prompt_duck_player_message_primary_button" translatable="false">Try Duck Player Now</string>
-    <string name="dax_prompt_duck_player_message_secondary_button" translatable="false">Dismiss</string>
+    <string name="dax_prompt_browser_comparison_title" instruction="Title for the Browser Comparison section">Browser Comparison</string>
+    <string name="dax_prompt_browser_comparison_close" instruction="Content description for the X button">Close</string>
+    <string name="dax_prompt_browser_comparison_message_title" instruction="Title for Dax message">DuckDuckGo has protections other browsers don’t.</string>
+    <string name="dax_prompt_browser_comparison_message_primary_button" instruction="This text is placed on a large button">Open Links With DuckDuckGo</string>
+    <string name="dax_prompt_browser_comparison_message_ghost_button" instruction="This text is placed on a large button">Maybe Later</string>
 
-    <string name="dax_prompt_browser_comparison_title" translatable="false">Browser Comparison</string>
-    <string name="dax_prompt_browser_comparison_close" translatable="false">Close</string>
-    <string name="dax_prompt_browser_comparison_message_title" translatable="false">DuckDuckGo has protections other browsers don’t.</string>
-    <string name="dax_prompt_browser_comparison_message_primary_button" translatable="false">Open Links With DuckDuckGo</string>
-    <string name="dax_prompt_browser_comparison_message_ghost_button" translatable="false">Maybe Later</string>
-    <string name="dax_prompt_browser_comparison_more_link" translatable="false"><annotation type="more_link">Plus even more protections...</annotation></string>
-
-    <string name="dax_prompt_browser_comparison_item1" translatable="false">Search privately by default</string>
-    <string name="dax_prompt_browser_comparison_item2" translatable="false">Block 3rd-party trackers</string>
-    <string name="dax_prompt_browser_comparison_item3" translatable="false">Block cookie pop-ups</string>
-    <string name="dax_prompt_browser_comparison_item4" translatable="false">Block targeted ads</string>
+    <string name="dax_prompt_browser_comparison_item1" instruction="This text is placed in a table">Search privately by default</string>
+    <string name="dax_prompt_browser_comparison_item2" instruction="This text is placed in a table">Block 3rd-party trackers</string>
+    <string name="dax_prompt_browser_comparison_item3" instruction="This text is placed in a table">Block cookie pop-ups</string>
+    <string name="dax_prompt_browser_comparison_item4" instruction="This text is placed in a table">Block targeted ads</string>
 </resources>
