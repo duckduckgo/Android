@@ -28,3 +28,38 @@ interface AddDocumentStartJavaScriptPlugin {
 
     val context: String
 }
+
+/**
+ * Strategy interface for script injection logic.
+ * Allows different implementations to provide their own injection behavior.
+ */
+interface AddDocumentStartJavaScriptScriptStrategy {
+    /**
+     * Determines whether script injection should proceed (i.e. by checking feature flags).
+     * @return true if injection is allowed, false otherwise
+     */
+    suspend fun canInject(): Boolean
+
+    /**
+     * Provides the script string to be injected.
+     * @return the JavaScript code to inject
+     */
+    suspend fun getScriptString(): String
+
+    /**
+     * Defines the allowed origin rules for script injection.
+     * @return set of allowed origin patterns
+     */
+    val allowedOriginRules: Set<String>
+
+    val context: String
+}
+
+interface AddDocumentStartScriptDelegate {
+    /**
+     * Creates an AddDocumentStartJavaScriptPlugin implementation with the given [AddDocumentStartJavaScriptScriptStrategy].
+     * @param strategy the strategy to use for determining injection behavior
+     * @return [AddDocumentStartJavaScriptPlugin] implementation
+     */
+    fun createPlugin(strategy: AddDocumentStartJavaScriptScriptStrategy): AddDocumentStartJavaScriptPlugin
+}
