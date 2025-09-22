@@ -193,6 +193,12 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
             } else {
                 it.showChatLogo
             }
+
+            binding.ddgLogo.apply {
+                setMinAndMaxFrame(0, 15)
+                progress = if (it.showSearchLogo) 0f else 1f
+            }
+
             binding.actionNewLine.isVisible = it.newLineButtonVisible
         }.launchIn(lifecycleScope)
     }
