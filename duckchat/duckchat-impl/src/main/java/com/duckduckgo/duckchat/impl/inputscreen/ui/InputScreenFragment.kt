@@ -42,8 +42,11 @@ import com.duckduckgo.duckchat.api.inputscreen.InputScreenActivityResultParams
 import com.duckduckgo.duckchat.impl.R
 import com.duckduckgo.duckchat.impl.databinding.FragmentInputScreenBinding
 import com.duckduckgo.duckchat.impl.inputscreen.ui.command.Command
+import com.duckduckgo.duckchat.impl.inputscreen.ui.command.Command.AnimateLogoToProgress
 import com.duckduckgo.duckchat.impl.inputscreen.ui.command.Command.EditWithSelectedQuery
 import com.duckduckgo.duckchat.impl.inputscreen.ui.command.Command.HideKeyboard
+import com.duckduckgo.duckchat.impl.inputscreen.ui.command.Command.SetInputModeWidgetScrollPosition
+import com.duckduckgo.duckchat.impl.inputscreen.ui.command.Command.SetLogoProgress
 import com.duckduckgo.duckchat.impl.inputscreen.ui.command.Command.ShowKeyboard
 import com.duckduckgo.duckchat.impl.inputscreen.ui.command.Command.SubmitChat
 import com.duckduckgo.duckchat.impl.inputscreen.ui.command.Command.SubmitSearch
@@ -97,14 +100,12 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
 
     private val pageChangeCallback = object : OnPageChangeCallback() {
         override fun onPageSelected(position: Int) {
+            viewModel.onPageSelected(position)
             binding.inputModeWidget.selectTab(position)
         }
 
         override fun onPageScrolled(position: Int, positionOffset: Float, positionOffsetPixels: Int) {
-            if (viewModel.shouldAnimateLogoOnScroll()) {
-                updateLogoAnimationForScroll(position, positionOffset)
-            }
-            updateTabIndicatorForScroll(position, positionOffset)
+            viewModel.onPageScrolled(position, positionOffset)
         }
 
         override fun onPageScrollStateChanged(state: Int) {
@@ -195,10 +196,7 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
                 it.showChatLogo
             }
 
-            binding.ddgLogo.apply {
-                setMinAndMaxFrame(0, 15)
-                progress = if (isSearchMode) 0f else 1f
-            }
+            binding.ddgLogo.progress = if (isSearchMode) 0f else 1f
 
             binding.actionNewLine.isVisible = it.newLineButtonVisible
         }.launchIn(lifecycleScope)
@@ -217,6 +215,9 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
             is SubmitChat -> submitChatQuery(command.query)
             is ShowKeyboard -> showKeyboard(binding.inputModeWidget.inputField)
             is HideKeyboard -> hideKeyboard(binding.inputModeWidget.inputField)
+            is SetInputModeWidgetScrollPosition -> binding.inputModeWidget.setScrollPosition(command.position, command.offset)
+            is SetLogoProgress -> setLogoProgress(command.targetProgress)
+            is AnimateLogoToProgress -> animateLogoToProgress(command.targetProgress)
         }
     }
 
@@ -252,7 +253,7 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
                 isVisible = showChatLogo
                 if (showChatLogo && !showSearchLogo) {
                     alpha = 0f
-                    animate().alpha(1f).setDuration(200L).start()
+                    animate().alpha(1f).setDuration(LOGO_FADE_DURATION).start()
                 }
             }
         }
@@ -272,12 +273,7 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
             viewModel.onInputFieldTouched()
         }
         onTabTapped = { index ->
-            if (binding.viewPager.currentItem != index) {
-                viewModel.onTabTapped()
-                if (!viewModel.hasNewTabContent()) {
-                    animateLogoToPosition(index)
-                }
-            }
+            viewModel.onTabTapped(index)
         }
     }
 
@@ -313,50 +309,25 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
         }.launchIn(lifecycleScope)
     }
 
-    private fun configureLogoAnimation() {
-        if (appTheme.isLightModeEnabled()) {
-            binding.ddgLogo.setAnimation(R.raw.duckduckgo_ai_transition_light)
-        } else {
-            binding.ddgLogo.setAnimation(R.raw.duckduckgo_ai_transition_dark)
-        }
-    }
-
-    private fun updateLogoAnimationForScroll(position: Int, positionOffset: Float) {
-        binding.ddgLogo.apply {
-            setMinAndMaxFrame(0, 15)
-            if (viewModel.hasNewTabContent()) {
-                this.progress = 1f
+    private fun configureLogoAnimation() = with(binding.ddgLogo) {
+        setMinAndMaxFrame(0, LOGO_MAX_FRAME)
+        setAnimation(
+            if (appTheme.isLightModeEnabled()) {
+                R.raw.duckduckgo_ai_transition_light
             } else {
-                when (position) {
-                    0 -> {
-                        this.progress = positionOffset
-                    }
-                    1 -> {
-                        this.progress = 1f - positionOffset
-                    }
-                }
-            }
-        }
+                R.raw.duckduckgo_ai_transition_dark
+            },
+        )
     }
 
-    private fun updateTabIndicatorForScroll(position: Int, positionOffset: Float) {
-        val offset = when {
-            positionOffset <= 0.5f -> positionOffset * positionOffset * 2f
-            else -> 1f - (1f - positionOffset) * (1f - positionOffset) * 2f
-        }
-        binding.inputModeWidget.setScrollPosition(position, offset)
+    private fun setLogoProgress(targetProgress: Float) {
+        binding.ddgLogo.progress = targetProgress
     }
 
-    private fun animateLogoToPosition(position: Int) {
+    private fun animateLogoToProgress(targetProgress: Float) {
         binding.ddgLogo.apply {
-            setMinAndMaxFrame(0, 15)
-            val targetProgress = when (position) {
-                0 -> 0f
-                1 -> 1f
-                else -> progress
-            }
             ValueAnimator.ofFloat(progress, targetProgress).apply {
-                duration = 350
+                duration = LOGO_ANIMATION_DURATION
                 addUpdateListener { progress = it.animatedValue as Float }
                 start()
             }
@@ -376,5 +347,11 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
     override fun onResume() {
         super.onResume()
         viewModel.onActivityResume()
+    }
+
+    companion object {
+        const val LOGO_ANIMATION_DURATION = 350L
+        const val LOGO_MAX_FRAME = 15
+        const val LOGO_FADE_DURATION = 200L
     }
 }

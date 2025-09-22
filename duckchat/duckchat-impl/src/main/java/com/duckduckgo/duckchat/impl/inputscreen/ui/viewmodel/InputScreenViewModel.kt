@@ -130,6 +130,7 @@ class InputScreenViewModel @AssistedInject constructor(
     private val voiceServiceAvailable = MutableStateFlow(voiceSearchAvailability.isVoiceSearchAvailable)
     private val voiceInputAllowed = MutableStateFlow(true)
     private var userSelectedMode: UserSelectedMode = NONE
+    private var currentPagePosition: Int = 0
     private val _visibilityState = MutableStateFlow(
         InputScreenVisibilityState(
             voiceInputButtonVisible = voiceServiceAvailable.value && voiceInputAllowed.value,
@@ -446,10 +447,38 @@ class InputScreenViewModel @AssistedInject constructor(
         userSelectedMode = SEARCH
     }
 
-    fun shouldAnimateLogoOnScroll(): Boolean = animateLogoOnScroll
+    fun onPageScrolled(position: Int, positionOffset: Float) {
+        if (animateLogoOnScroll) {
+            val logoProgress = calculateLogoProgress(position, positionOffset)
+            command.value = Command.SetLogoProgress(logoProgress)
+        }
+        val offset = calculateInputModeWidgetScrollPosition(positionOffset)
+        command.value = Command.SetInputModeWidgetScrollPosition(position, offset)
+    }
 
-    fun onTabTapped() {
-        animateLogoOnScroll = false
+    private fun calculateLogoProgress(position: Int, positionOffset: Float): Float {
+        if (newTabPageHasContent.value) return 1f
+        return if (position == 0) positionOffset else 1f - positionOffset
+    }
+
+    private fun calculateInputModeWidgetScrollPosition(positionOffset: Float): Float {
+        return when {
+            positionOffset <= 0.5f -> positionOffset * positionOffset * 2f
+            else -> 1f - (1f - positionOffset) * (1f - positionOffset) * 2f
+        }
+    }
+
+    fun onTabTapped(index: Int) {
+        if (currentPagePosition != index) {
+            animateLogoOnScroll = false
+            if (!newTabPageHasContent.value) {
+                command.value = Command.AnimateLogoToProgress(index.toFloat())
+            }
+        }
+    }
+
+    fun onPageSelected(position: Int) {
+        currentPagePosition = position
     }
 
     fun onScrollStateIdle() {
@@ -501,8 +530,6 @@ class InputScreenViewModel @AssistedInject constructor(
     fun onNewTabPageContentChanged(hasContent: Boolean) {
         newTabPageHasContent.value = hasContent
     }
-
-    fun hasNewTabContent(): Boolean = newTabPageHasContent.value
 
     private fun checkMovedBeyondInitialUrl(searchInput: String): Boolean {
         // check if user modified input or initial text wasn't a webpage URL
