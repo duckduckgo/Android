@@ -87,6 +87,7 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import logcat.logcat
 import org.json.JSONObject
 
 @InjectWith(FragmentScope::class)
@@ -241,6 +242,7 @@ open class DuckChatWebViewFragment : DuckDuckGoFragment(R.layout.activity_duck_c
                         id: String?,
                         data: JSONObject?,
                     ) {
+                        logcat { "jsDuckChat: $featureName $method $id $data" }
                         when (featureName) {
                             DUCK_CHAT_FEATURE_NAME -> {
                                 appCoroutineScope.launch(dispatcherProvider.io()) {
