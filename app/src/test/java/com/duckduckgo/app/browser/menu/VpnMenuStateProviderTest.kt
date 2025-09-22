@@ -19,6 +19,7 @@ package com.duckduckgo.app.browser.menu
 import app.cash.turbine.test
 import com.duckduckgo.app.browser.viewstate.VpnMenuState
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.networkprotection.api.NetworkProtectionState
 import com.duckduckgo.networkprotection.api.NetworkProtectionState.ConnectionState
 import com.duckduckgo.subscriptions.api.Product.NetP
@@ -48,11 +49,19 @@ class VpnMenuStateProviderTest {
     @Mock
     private val connectionState: ConnectionState = mock()
 
+    @Mock
+    private val vpnMenuItemFeature: VpnMenuItemFeature = mock()
+
+    @Mock
+    private val featureToggle: Toggle = mock()
+
     private lateinit var testee: VpnMenuStateProviderImpl
 
     @Before
     fun setUp() {
-        testee = VpnMenuStateProviderImpl(subscriptions, networkProtectionState)
+        whenever(vpnMenuItemFeature.self()).thenReturn(featureToggle)
+        whenever(featureToggle.isEnabled()).thenReturn(true)
+        testee = VpnMenuStateProviderImpl(subscriptions, networkProtectionState, vpnMenuItemFeature)
     }
 
     @Test
@@ -198,6 +207,36 @@ class VpnMenuStateProviderTest {
         testee.getVpnMenuState().test {
             val state = awaitItem()
             assertEquals(VpnMenuState.Subscribed(isVpnEnabled = true), state)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `when feature flag is disabled then return Hidden regardless of subscription status`() = runTest {
+        whenever(featureToggle.isEnabled()).thenReturn(false)
+        whenever(subscriptions.getSubscriptionStatusFlow()).thenReturn(flowOf(SubscriptionStatus.AUTO_RENEWABLE))
+        whenever(subscriptions.getEntitlementStatus()).thenReturn(flowOf(listOf(NetP)))
+        whenever(connectionState.isConnected()).thenReturn(true)
+        whenever(networkProtectionState.getConnectionStateFlow()).thenReturn(flowOf(connectionState))
+
+        testee.getVpnMenuState().test {
+            val state = awaitItem()
+            assertEquals(VpnMenuState.Hidden, state)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `when feature flag is disabled and user not subscribed then return Hidden`() = runTest {
+        whenever(featureToggle.isEnabled()).thenReturn(false)
+        whenever(subscriptions.getSubscriptionStatusFlow()).thenReturn(flowOf(SubscriptionStatus.INACTIVE))
+        whenever(subscriptions.getEntitlementStatus()).thenReturn(flowOf(emptyList()))
+        whenever(connectionState.isConnected()).thenReturn(false)
+        whenever(networkProtectionState.getConnectionStateFlow()).thenReturn(flowOf(connectionState))
+
+        testee.getVpnMenuState().test {
+            val state = awaitItem()
+            assertEquals(VpnMenuState.Hidden, state)
             cancelAndIgnoreRemainingEvents()
         }
     }

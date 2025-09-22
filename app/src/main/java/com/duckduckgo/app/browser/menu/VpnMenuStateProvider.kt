@@ -35,6 +35,7 @@ interface VpnMenuStateProvider {
 class VpnMenuStateProviderImpl @Inject constructor(
     private val subscriptions: Subscriptions,
     private val networkProtectionState: NetworkProtectionState,
+    private val vpnMenuItemFeature: VpnMenuItemFeature,
 ) : VpnMenuStateProvider {
 
     override fun getVpnMenuState(): Flow<VpnMenuState> {
@@ -43,6 +44,10 @@ class VpnMenuStateProviderImpl @Inject constructor(
             subscriptions.getEntitlementStatus(),
             networkProtectionState.getConnectionStateFlow(),
         ) { subscriptionStatus, entitlements, connectionState ->
+            if (!vpnMenuItemFeature.self().isEnabled()) {
+                return@combine VpnMenuState.Hidden
+            }
+
             when {
                 subscriptionStatus.isActive() && entitlements.contains(NetP) -> {
                     VpnMenuState.Subscribed(isVpnEnabled = connectionState.isConnected())

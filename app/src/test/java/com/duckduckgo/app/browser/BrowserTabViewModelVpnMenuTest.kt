@@ -23,6 +23,7 @@ import com.duckduckgo.app.browser.commands.Command
 import com.duckduckgo.app.browser.menu.VpnMenuStateProvider
 import com.duckduckgo.app.browser.viewstate.VpnMenuState
 import com.duckduckgo.common.test.CoroutineTestRule
+import kotlin.time.Duration.Companion.milliseconds
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -33,7 +34,6 @@ import org.junit.Test
 import org.mockito.Mock
 import org.mockito.MockitoAnnotations
 import org.mockito.kotlin.whenever
-import kotlin.time.Duration.Companion.milliseconds
 
 class BrowserTabViewModelVpnMenuTest {
 
@@ -180,14 +180,13 @@ class BrowserTabViewModelVpnMenuTest {
         fun onVpnMenuClicked() {
             when (currentVpnMenuState) {
                 VpnMenuState.NotSubscribed -> {
-                    // Create a mock URI for testing
                     val mockUri = org.mockito.kotlin.mock<Uri>()
                     _commands.tryEmit(Command.LaunchPrivacyPro(mockUri))
                 }
                 is VpnMenuState.Subscribed -> {
                     _commands.tryEmit(Command.LaunchVpnManagement)
                 }
-                VpnMenuState.Hidden -> {} // Should not happen as menu item should not be visible
+                VpnMenuState.Hidden -> {}
             }
         }
     }
