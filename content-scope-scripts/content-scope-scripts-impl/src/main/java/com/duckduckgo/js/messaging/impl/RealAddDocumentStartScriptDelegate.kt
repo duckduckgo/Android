@@ -45,11 +45,12 @@ class RealAddDocumentStartScriptDelegate @Inject constructor(
     private val webViewCompatWrapper: WebViewCompatWrapper,
 ) : AddDocumentStartScriptDelegate {
 
-    private var script: ScriptHandler? = null
-    private var currentScriptString: String? = null
-
     override fun createPlugin(strategy: AddDocumentStartJavaScriptScriptStrategy): AddDocumentStartJavaScriptPlugin {
         return object : AddDocumentStartJavaScriptPlugin {
+
+            private var script: ScriptHandler? = null
+            private var currentScriptString: String? = null
+
             @SuppressLint("RequiresFeature")
             override suspend fun addDocumentStartJavaScript(webView: WebView) {
                 if (!strategy.canInject() || !webViewCapabilityChecker.isSupported(
