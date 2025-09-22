@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 DuckDuckGo
+ * Copyright (c) 2025 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,68 +16,32 @@
 
 package com.duckduckgo.contentscopescripts.impl
 
-import android.annotation.SuppressLint
-import android.webkit.WebView
-import androidx.webkit.ScriptHandler
-import com.duckduckgo.app.browser.api.WebViewCapabilityChecker
-import com.duckduckgo.app.di.AppCoroutineScope
-import com.duckduckgo.browser.api.webviewcompat.WebViewCompatWrapper
-import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.contentscopescripts.api.contentscopeExperiments.ContentScopeExperiments
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.js.messaging.api.AddDocumentStartJavaScriptPlugin
+import com.duckduckgo.js.messaging.api.AddDocumentStartJavaScriptScriptStrategy
+import com.duckduckgo.js.messaging.api.AddDocumentStartScriptDelegate
 import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.SingleInstanceIn
 import javax.inject.Inject
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 @SingleInstanceIn(FragmentScope::class)
 @ContributesMultibinding(FragmentScope::class)
 class ContentScopeScriptsAddDocumentStartJavaScriptPlugin @Inject constructor(
-    private val webViewCompatContentScopeScripts: WebViewCompatContentScopeScripts,
-    private val dispatcherProvider: DispatcherProvider,
-    private val webViewCapabilityChecker: WebViewCapabilityChecker,
-    private val webViewCompatWrapper: WebViewCompatWrapper,
-    private val contentScopeExperiments: ContentScopeExperiments,
-    @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
-) : AddDocumentStartJavaScriptPlugin {
-    private var script: ScriptHandler? = null
-    private var currentScriptString: String? = null
-
-    @SuppressLint("RequiresFeature")
-    override fun addDocumentStartJavaScript(
-        webView: WebView,
-    ) {
-        appCoroutineScope.launch {
-            if (!webViewCompatContentScopeScripts.isEnabled() || !webViewCapabilityChecker.isSupported(
-                    WebViewCapabilityChecker.WebViewCapability.DocumentStartJavaScript,
-                )
-            ) {
-                return@launch
-            }
-
-            val activeExperiments = contentScopeExperiments.getActiveExperiments()
-            val scriptString = webViewCompatContentScopeScripts.getScript(activeExperiments)
-            if (scriptString == currentScriptString) {
-                return@launch
-            }
-            script?.let {
-                withContext(dispatcherProvider.main()) {
-                    it.remove()
-                }
-                script = null
-            }
-
-            webViewCompatWrapper.addDocumentStartJavaScript(
-                webView,
-                scriptString,
-                setOf("*"),
-            )?.let {
-                script = it
-                currentScriptString = scriptString
-            }
+    webViewCompatContentScopeScripts: WebViewCompatContentScopeScripts,
+    contentScopeExperiments: ContentScopeExperiments,
+    scriptInjectorDelegate: AddDocumentStartScriptDelegate,
+) : AddDocumentStartJavaScriptPlugin by scriptInjectorDelegate.createPlugin(
+    object : AddDocumentStartJavaScriptScriptStrategy {
+        override suspend fun canInject(): Boolean {
+            return webViewCompatContentScopeScripts.isEnabled()
         }
-    }
-}
+
+        override suspend fun getScriptString(): String {
+            val activeExperiments = contentScopeExperiments.getActiveExperiments()
+            return webViewCompatContentScopeScripts.getScript(activeExperiments)
+        }
+
+        override val allowedOriginRules: Set<String> = setOf("*")
+    },
+)
