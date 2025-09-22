@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (c) 2025 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+<resources>
+    <string name="dax_prompt_browser_comparison_title" instruction="Title for the Browser Comparison section">Comparación de navegadores</string>
+    <string name="dax_prompt_browser_comparison_close" instruction="Content description for the X button">Cerrar</string>
+    <string name="dax_prompt_browser_comparison_message_title" instruction="Title for Dax message">DuckDuckGo tiene protecciones de las que carecen otros navegadores.</string>
+    <string name="dax_prompt_browser_comparison_message_primary_button" instruction="This text is placed on a large button">Abrir enlaces con DuckDuckGo</string>
+    <string name="dax_prompt_browser_comparison_message_ghost_button" instruction="This text is placed on a large button">Quizá más tarde</string>
+
+    <string name="dax_prompt_browser_comparison_item1" instruction="This text is placed in a table">Búsqueda privada por defecto</string>
+    <string name="dax_prompt_browser_comparison_item2" instruction="This text is placed in a table">Bloquea rastreadores de terceros</string>
+    <string name="dax_prompt_browser_comparison_item3" instruction="This text is placed in a table">Bloqueo de ventanas emergentes de cookies</string>
+    <string name="dax_prompt_browser_comparison_item4" instruction="This text is placed in a table">Bloqueo de anuncios segmentados</string>
+</resources>
