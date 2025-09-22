@@ -172,7 +172,8 @@ open class DuckChatWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationD
         }
 
         val params = intent.getActivityParams(DuckChatWebViewActivityWithParams::class.java)
-        val url = params?.url
+        // val url = params?.url
+        val url = "https://mtsoy.duck.co/?q=DuckDuckGo+AI+Chat&ia=chat&duckai=4"
 
         simpleWebview.let {
             it.webViewClient = webViewClient

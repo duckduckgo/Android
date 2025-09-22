@@ -27,6 +27,7 @@ import com.duckduckgo.duckchat.impl.store.DuckChatDataStore
 import com.duckduckgo.js.messaging.api.JsCallbackData
 import com.squareup.anvil.annotations.ContributesBinding
 import kotlinx.coroutines.runBlocking
+import logcat.logcat
 import org.json.JSONObject
 import javax.inject.Inject
 
@@ -94,6 +95,11 @@ class RealDuckChatJSHelper @Inject constructor(
             null
         }
 
+        METHOD_OPEN_KEYBOARD -> {
+            logcat { "METHOD_OPEN_KEYBOARD data $data" }
+            null
+        }
+
         REPORT_METRIC -> {
             ReportMetric
                 .fromValue(data?.optString("metricName"))
@@ -149,6 +155,7 @@ class RealDuckChatJSHelper @Inject constructor(
         private const val METHOD_RESPONSE_STATE = "responseState"
         private const val METHOD_HIDE_CHAT_INPUT = "hideChatInput"
         private const val METHOD_SHOW_CHAT_INPUT = "showChatInput"
+        private const val METHOD_OPEN_KEYBOARD = "openKeyboard"
         private const val PAYLOAD = "aiChatPayload"
         private const val IS_HANDOFF_ENABLED = "isAIChatHandoffEnabled"
         private const val SUPPORTS_CLOSING_AI_CHAT = "supportsClosingAIChat"
