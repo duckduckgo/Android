@@ -18,6 +18,7 @@ package com.duckduckgo.app.browser.menu
 
 import app.cash.turbine.test
 import com.duckduckgo.app.browser.viewstate.VpnMenuState
+import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.networkprotection.api.NetworkProtectionState
@@ -50,7 +51,7 @@ class VpnMenuStateProviderTest {
     private val connectionState: ConnectionState = mock()
 
     @Mock
-    private val vpnMenuItemFeature: VpnMenuItemFeature = mock()
+    private val androidBrowserConfigFeature: AndroidBrowserConfigFeature = mock()
 
     @Mock
     private val featureToggle: Toggle = mock()
@@ -59,9 +60,9 @@ class VpnMenuStateProviderTest {
 
     @Before
     fun setUp() {
-        whenever(vpnMenuItemFeature.self()).thenReturn(featureToggle)
+        whenever(androidBrowserConfigFeature.vpnMenuItem()).thenReturn(featureToggle)
         whenever(featureToggle.isEnabled()).thenReturn(true)
-        testee = VpnMenuStateProviderImpl(subscriptions, networkProtectionState, vpnMenuItemFeature)
+        testee = VpnMenuStateProviderImpl(subscriptions, networkProtectionState, androidBrowserConfigFeature)
     }
 
     @Test

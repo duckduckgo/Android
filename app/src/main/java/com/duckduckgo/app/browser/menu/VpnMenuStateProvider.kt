@@ -17,6 +17,7 @@
 package com.duckduckgo.app.browser.menu
 
 import com.duckduckgo.app.browser.viewstate.VpnMenuState
+import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.networkprotection.api.NetworkProtectionState
 import com.duckduckgo.subscriptions.api.Product.NetP
@@ -35,7 +36,7 @@ interface VpnMenuStateProvider {
 class VpnMenuStateProviderImpl @Inject constructor(
     private val subscriptions: Subscriptions,
     private val networkProtectionState: NetworkProtectionState,
-    private val vpnMenuItemFeature: VpnMenuItemFeature,
+    private val androidBrowserConfigFeature: AndroidBrowserConfigFeature,
 ) : VpnMenuStateProvider {
 
     override fun getVpnMenuState(): Flow<VpnMenuState> {
@@ -44,7 +45,7 @@ class VpnMenuStateProviderImpl @Inject constructor(
             subscriptions.getEntitlementStatus(),
             networkProtectionState.getConnectionStateFlow(),
         ) { subscriptionStatus, entitlements, connectionState ->
-            if (!vpnMenuItemFeature.self().isEnabled()) {
+            if (!androidBrowserConfigFeature.vpnMenuItem().isEnabled()) {
                 return@combine VpnMenuState.Hidden
             }
 
