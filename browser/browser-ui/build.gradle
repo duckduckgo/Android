@@ -1,0 +1,73 @@
+/*
+ * Copyright (c) 2021 DuckDuckGo
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+plugins {
+    id 'com.android.library'
+    id 'kotlin-android'
+    id 'com.squareup.anvil'
+}
+
+apply from: "$rootProject.projectDir/gradle/android-library.gradle"
+
+android {
+    namespace 'com.duckduckgo.browser.ui'
+}
+
+android {
+    anvil {
+        generateDaggerFactories = true // default is false
+    }
+    lintOptions {
+        baseline file("lint-baseline.xml")
+        abortOnError = !project.hasProperty("abortOnError") || project.property("abortOnError") != "false"
+    }
+}
+
+dependencies {
+
+    implementation project(path: ':common-utils')
+    implementation project(path: ':di')
+    anvil project(path: ':anvil-compiler')
+    implementation project(path: ':anvil-annotations')
+    implementation project(path: ':app-build-config-api')
+    implementation project(':internal-features-api')
+    implementation "androidx.datastore:datastore-preferences:_"
+
+    implementation AndroidX.appCompat
+    implementation Google.android.material
+    implementation AndroidX.constraintLayout
+    implementation AndroidX.core.splashscreen
+    implementation AndroidX.recyclerView
+    implementation AndroidX.lifecycle.viewModelKtx
+    // just to get the dagger annotations
+    implementation Google.dagger
+
+    implementation "androidx.core:core-ktx:_"
+    implementation "androidx.localbroadcastmanager:localbroadcastmanager:_"
+
+    // Lottie
+    implementation "com.airbnb.android:lottie:_"
+
+    // Testing dependencies
+    testImplementation "org.mockito.kotlin:mockito-kotlin:_"
+    testImplementation project(':feature-toggles-test')
+    implementation Testing.junit4
+    testImplementation AndroidX.test.ext.junit
+    testImplementation AndroidX.archCore.testing
+    testImplementation 'app.cash.turbine:turbine:_'
+    testImplementation Testing.robolectric
+    testImplementation project(path: ':common-test')
+}
