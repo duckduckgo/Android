@@ -30,6 +30,9 @@
     <string name="ads_demo_activity_title" translatable="false">Android Design System Demo</string>
     <string name="ads_demo_header_title" translatable="false">Android Design System</string>
 
+    <!-- ADS Demo Screen -->
+    <string name="ads_demo_plugin_title" translatable="false">Android Design System Preview</string>
+    <string name="ads_demo_plugin_message" translatable="false">Set of components designed following our Design System</string>
 
     <!--Components-->
     <string name="text_headline" translatable="false">Headline</string>
