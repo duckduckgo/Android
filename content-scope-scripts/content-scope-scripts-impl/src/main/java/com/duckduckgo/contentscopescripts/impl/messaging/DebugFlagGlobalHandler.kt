@@ -17,6 +17,7 @@
 package com.duckduckgo.contentscopescripts.impl.messaging
 
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.js.messaging.api.GlobalJsMessageHandler
 import com.duckduckgo.js.messaging.api.JsMessage
 import com.duckduckgo.js.messaging.api.ProcessResult
 import com.duckduckgo.js.messaging.api.ProcessResult.SendToConsumer

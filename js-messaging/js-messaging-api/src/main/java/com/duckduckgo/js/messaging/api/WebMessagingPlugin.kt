@@ -33,3 +33,42 @@ interface WebMessagingPlugin {
 
     val context: String
 }
+
+interface WebMessagingPluginDelegate {
+
+    /**
+     * Creates a [WebMessagingPlugin] implementation with the given [WebMessagingPluginStrategy].
+     * @param strategy the strategy to use for web messaging behavior
+     * @return [WebMessagingPlugin] implementation
+     */
+    fun createPlugin(strategy: WebMessagingPluginStrategy): WebMessagingPlugin
+}
+
+/**
+ * Strategy interface for web messaging logic.
+ * Allows different implementations to provide their own behavior.
+ */
+interface WebMessagingPluginStrategy {
+    val context: String
+    val allowedDomains: Set<String>
+    val objectName: String
+
+    /**
+     * Determines whether messaging actions should proceed (i.e. by checking feature flags).
+     * @return true if messaging is allowed, false otherwise
+     */
+    suspend fun isEnabled(): Boolean
+
+    /**
+     * Provides the list of message handlers to process incoming messages.
+     * @return list of [WebViewCompatMessageHandler] implementations
+     */
+    fun getMessageHandlers(): List<WebViewCompatMessageHandler>
+
+    /**
+     * Provides the list of global message handlers that should always be processed
+     * regardless of whether a specific feature handler matches the message.
+     * @return list of [GlobalJsMessageHandler] implementations
+     */
+    fun getGlobalMessageHandler(): List<GlobalJsMessageHandler>
+}

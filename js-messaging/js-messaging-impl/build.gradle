@@ -31,6 +31,7 @@ dependencies {
     anvil project(':anvil-compiler')
     implementation project(':anvil-annotations')
 
+    implementation AndroidX.webkit
     implementation "com.squareup.logcat:logcat:_"
     implementation KotlinX.coroutines.core
     implementation Google.dagger
