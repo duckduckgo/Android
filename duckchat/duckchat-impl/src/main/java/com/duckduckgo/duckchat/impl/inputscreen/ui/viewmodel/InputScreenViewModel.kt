@@ -502,6 +502,8 @@ class InputScreenViewModel @AssistedInject constructor(
         newTabPageHasContent.value = hasContent
     }
 
+    fun hasNewTabContent(): Boolean = newTabPageHasContent.value
+
     private fun checkMovedBeyondInitialUrl(searchInput: String): Boolean {
         // check if user modified input or initial text wasn't a webpage URL
         val userHasModifiedInput = initialSearchInputText != searchInput

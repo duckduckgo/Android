@@ -273,8 +273,8 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
         }
         onTabTapped = { index ->
             if (binding.viewPager.currentItem != index) {
-                if (viewModel.visibilityState.value.showSearchLogo) {
-                    viewModel.onTabTapped()
+                viewModel.onTabTapped()
+                if (!viewModel.hasNewTabContent()) {
                     animateLogoToPosition(index)
                 }
             }
@@ -324,7 +324,7 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
     private fun updateLogoAnimationForScroll(position: Int, positionOffset: Float) {
         binding.ddgLogo.apply {
             setMinAndMaxFrame(0, 15)
-            if (!viewModel.visibilityState.value.showSearchLogo) {
+            if (viewModel.hasNewTabContent()) {
                 this.progress = 1f
             } else {
                 when (position) {

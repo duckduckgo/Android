@@ -1260,4 +1260,22 @@ class InputScreenViewModelTest {
         viewModel.onScrollStateIdle()
         assertTrue(viewModel.shouldAnimateLogoOnScroll())
     }
+
+    @Test
+    fun `when onNewTabPageContentChanged with true then hasNewTabContent returns true`() {
+        val viewModel = createViewModel()
+
+        viewModel.onNewTabPageContentChanged(hasContent = true)
+
+        assertTrue(viewModel.hasNewTabContent())
+    }
+
+    @Test
+    fun `when onNewTabPageContentChanged with false then hasNewTabContent returns false`() {
+        val viewModel = createViewModel()
+
+        viewModel.onNewTabPageContentChanged(hasContent = false)
+
+        assertFalse(viewModel.hasNewTabContent())
+    }
 }
