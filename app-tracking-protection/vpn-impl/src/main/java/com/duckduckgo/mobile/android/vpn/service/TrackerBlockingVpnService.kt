@@ -710,12 +710,17 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), V
             }
         }
 
-        ServiceCompat.startForeground(
-            this,
-            VPN_FOREGROUND_SERVICE_ID,
-            VpnEnabledNotificationBuilder.buildVpnEnabledNotification(applicationContext, vpnNotification),
-            FOREGROUND_SERVICE_TYPE_SPECIAL_USE,
-        )
+        try {
+            ServiceCompat.startForeground(
+                this,
+                VPN_FOREGROUND_SERVICE_ID,
+                VpnEnabledNotificationBuilder.buildVpnEnabledNotification(applicationContext, vpnNotification),
+                FOREGROUND_SERVICE_TYPE_SPECIAL_USE,
+            )
+        } catch (_: Throwable) {
+            // signal the error
+            return false
+        }
 
         return vpnNotification != emptyNotification
     }
