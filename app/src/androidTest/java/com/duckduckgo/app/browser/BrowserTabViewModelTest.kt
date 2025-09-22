@@ -107,6 +107,7 @@ import com.duckduckgo.app.browser.logindetection.LoginDetected
 import com.duckduckgo.app.browser.logindetection.NavigationAwareLoginDetector
 import com.duckduckgo.app.browser.logindetection.NavigationEvent
 import com.duckduckgo.app.browser.logindetection.NavigationEvent.LoginAttempt
+import com.duckduckgo.app.browser.menu.VpnMenuStateProvider
 import com.duckduckgo.app.browser.model.BasicAuthenticationCredentials
 import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
 import com.duckduckgo.app.browser.model.LongPressTarget
@@ -128,6 +129,7 @@ import com.duckduckgo.app.browser.viewstate.FindInPageViewState
 import com.duckduckgo.app.browser.viewstate.GlobalLayoutViewState
 import com.duckduckgo.app.browser.viewstate.HighlightableButton
 import com.duckduckgo.app.browser.viewstate.LoadingViewState
+import com.duckduckgo.app.browser.viewstate.VpnMenuState
 import com.duckduckgo.app.browser.webview.MaliciousSiteBlockedWarningLayout.Action.LearnMore
 import com.duckduckgo.app.browser.webview.MaliciousSiteBlockedWarningLayout.Action.LeaveSite
 import com.duckduckgo.app.browser.webview.MaliciousSiteBlockedWarningLayout.Action.ReportError
@@ -450,6 +452,8 @@ class BrowserTabViewModelTest {
 
     private val mockExternalIntentProcessingState: ExternalIntentProcessingState = mock()
 
+    private val mockVpnMenuStateProvider: VpnMenuStateProvider = mock()
+
     private val mockHasPendingTabLaunchFlow = MutableStateFlow(false)
 
     private val mockHasPendingDuckAiOpenFlow = MutableStateFlow(false)
@@ -660,6 +664,7 @@ class BrowserTabViewModelTest {
         whenever(mockDuckAiFeatureState.showInputScreenAutomaticallyOnNewTab).thenReturn(mockDuckAiFeatureStateInputScreenOpenAutomaticallyFlow)
         whenever(mockExternalIntentProcessingState.hasPendingTabLaunch).thenReturn(mockHasPendingTabLaunchFlow)
         whenever(mockExternalIntentProcessingState.hasPendingDuckAiOpen).thenReturn(mockHasPendingDuckAiOpenFlow)
+        whenever(mockVpnMenuStateProvider.getVpnMenuState()).thenReturn(flowOf(VpnMenuState.Hidden))
         whenever(mockOnboardingDesignExperimentManager.isModifiedControlEnrolledAndEnabled()).thenReturn(false)
         whenever(mockOnboardingDesignExperimentManager.isBuckEnrolledAndEnabled()).thenReturn(false)
         whenever(mockOnboardingDesignExperimentManager.isBbEnrolledAndEnabled()).thenReturn(false)
@@ -810,6 +815,7 @@ class BrowserTabViewModelTest {
             serpEasterEggLogosToggles = mockSerpEasterEggLogoToggles,
             nonHttpAppLinkChecker = nonHttpAppLinkChecker,
             externalIntentProcessingState = mockExternalIntentProcessingState,
+            vpnMenuStateProvider = mockVpnMenuStateProvider,
         )
 
         testee.loadData("abc", null, false, false)
