@@ -21,6 +21,7 @@ import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
 import android.view.WindowManager
+import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.view.ViewCompat
@@ -69,6 +70,9 @@ class DaxPromptBrowserComparisonActivity : DuckDuckGoActivity() {
 
         setupListeners()
         setupObservers()
+        setupOnBackNavigation()
+
+        viewModel.onPromptShown()
     }
 
     override fun onResume() {
@@ -129,6 +133,19 @@ class DaxPromptBrowserComparisonActivity : DuckDuckGoActivity() {
 
     private fun markAsShown() {
         viewModel.markBrowserComparisonPromptAsShown()
+    }
+
+    private fun setupOnBackNavigation() { // Added method
+        onBackPressedDispatcher.addCallback(
+            this,
+            object : OnBackPressedCallback(true) {
+                override fun handleOnBackPressed() {
+                    viewModel.onBackNavigation()
+                    isEnabled = false
+                    onBackPressedDispatcher.onBackPressed()
+                }
+            },
+        )
     }
 
     companion object {
