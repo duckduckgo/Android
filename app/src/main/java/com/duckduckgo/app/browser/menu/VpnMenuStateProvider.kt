@@ -37,6 +37,7 @@ class VpnMenuStateProviderImpl @Inject constructor(
     private val subscriptions: Subscriptions,
     private val networkProtectionState: NetworkProtectionState,
     private val androidBrowserConfigFeature: AndroidBrowserConfigFeature,
+    private val vpnMenuStore: VpnMenuStore,
 ) : VpnMenuStateProvider {
 
     override fun getVpnMenuState(): Flow<VpnMenuState> {
@@ -55,7 +56,13 @@ class VpnMenuStateProviderImpl @Inject constructor(
                 }
                 // User has subscription but no NetP entitlement
                 subscriptionStatus.isActive() -> VpnMenuState.Hidden
-                else -> VpnMenuState.NotSubscribed
+                else -> {
+                    if (vpnMenuStore.canShowVpnMenuForNotSubscribed()) {
+                        VpnMenuState.NotSubscribed
+                    } else {
+                        VpnMenuState.Hidden
+                    }
+                }
             }
         }
     }

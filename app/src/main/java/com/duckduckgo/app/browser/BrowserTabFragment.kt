@@ -138,6 +138,7 @@ import com.duckduckgo.app.browser.history.NavigationHistorySheet.NavigationHisto
 import com.duckduckgo.app.browser.httpauth.WebViewHttpAuthStore
 import com.duckduckgo.app.browser.logindetection.DOMLoginDetector
 import com.duckduckgo.app.browser.menu.BrowserPopupMenu
+import com.duckduckgo.app.browser.menu.VpnMenuStore
 import com.duckduckgo.app.browser.model.BasicAuthenticationCredentials
 import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
 import com.duckduckgo.app.browser.model.LongPressTarget
@@ -173,6 +174,7 @@ import com.duckduckgo.app.browser.viewstate.LoadingViewState
 import com.duckduckgo.app.browser.viewstate.OmnibarViewState
 import com.duckduckgo.app.browser.viewstate.PrivacyShieldViewState
 import com.duckduckgo.app.browser.viewstate.SavedSiteChangedViewState
+import com.duckduckgo.app.browser.viewstate.VpnMenuState
 import com.duckduckgo.app.browser.webauthn.WebViewPasskeyInitializer
 import com.duckduckgo.app.browser.webshare.WebShareChooser
 import com.duckduckgo.app.browser.webshare.WebViewCompatWebShareChooser
@@ -407,6 +409,9 @@ class BrowserTabFragment :
 
     @Inject
     lateinit var pixel: Pixel
+
+    @Inject
+    lateinit var vpnMenuStore: VpnMenuStore
 
     @Inject
     lateinit var ctaViewModel: CtaViewModel
@@ -1381,6 +1386,15 @@ class BrowserTabFragment :
         // small delay added to let keyboard disappear and avoid jarring transition
         binding.rootView.postDelayed(POPUP_MENU_DELAY) {
             if (isAdded) {
+                // Check if VPN menu item will be shown to non-subscribed user and increment count
+                val currentViewState = viewModel.browserViewState.value
+                if (currentViewState != null) {
+                    val shouldShowVpnMenuItem = !currentViewState.browserShowing && !isActiveCustomTab()
+                    if (currentViewState.vpnMenuState == VpnMenuState.NotSubscribed && shouldShowVpnMenuItem) {
+                        vpnMenuStore.incrementVpnMenuShownCount()
+                    }
+                }
+
                 popupMenu.show(binding.rootView, omnibar.toolbar)
                 viewModel.onPopupMenuLaunched()
                 if (isActiveCustomTab()) {

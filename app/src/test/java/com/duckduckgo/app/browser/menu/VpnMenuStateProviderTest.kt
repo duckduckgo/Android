@@ -54,6 +54,9 @@ class VpnMenuStateProviderTest {
     private val androidBrowserConfigFeature: AndroidBrowserConfigFeature = mock()
 
     @Mock
+    private val vpnMenuStore: VpnMenuStore = mock()
+
+    @Mock
     private val featureToggle: Toggle = mock()
 
     private lateinit var testee: VpnMenuStateProviderImpl
@@ -62,7 +65,8 @@ class VpnMenuStateProviderTest {
     fun setUp() {
         whenever(androidBrowserConfigFeature.vpnMenuItem()).thenReturn(featureToggle)
         whenever(featureToggle.isEnabled()).thenReturn(true)
-        testee = VpnMenuStateProviderImpl(subscriptions, networkProtectionState, androidBrowserConfigFeature)
+        whenever(vpnMenuStore.canShowVpnMenuForNotSubscribed()).thenReturn(true)
+        testee = VpnMenuStateProviderImpl(subscriptions, networkProtectionState, androidBrowserConfigFeature, vpnMenuStore)
     }
 
     @Test
@@ -234,6 +238,36 @@ class VpnMenuStateProviderTest {
         whenever(subscriptions.getEntitlementStatus()).thenReturn(flowOf(emptyList()))
         whenever(connectionState.isConnected()).thenReturn(false)
         whenever(networkProtectionState.getConnectionStateFlow()).thenReturn(flowOf(connectionState))
+
+        testee.getVpnMenuState().test {
+            val state = awaitItem()
+            assertEquals(VpnMenuState.Hidden, state)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `when user not subscribed and frequency cap not reached then return NotSubscribed`() = runTest {
+        whenever(subscriptions.getSubscriptionStatusFlow()).thenReturn(flowOf(SubscriptionStatus.INACTIVE))
+        whenever(subscriptions.getEntitlementStatus()).thenReturn(flowOf(emptyList()))
+        whenever(connectionState.isConnected()).thenReturn(false)
+        whenever(networkProtectionState.getConnectionStateFlow()).thenReturn(flowOf(connectionState))
+        whenever(vpnMenuStore.canShowVpnMenuForNotSubscribed()).thenReturn(true)
+
+        testee.getVpnMenuState().test {
+            val state = awaitItem()
+            assertEquals(VpnMenuState.NotSubscribed, state)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `when user not subscribed and frequency cap reached then return Hidden`() = runTest {
+        whenever(subscriptions.getSubscriptionStatusFlow()).thenReturn(flowOf(SubscriptionStatus.INACTIVE))
+        whenever(subscriptions.getEntitlementStatus()).thenReturn(flowOf(emptyList()))
+        whenever(connectionState.isConnected()).thenReturn(false)
+        whenever(networkProtectionState.getConnectionStateFlow()).thenReturn(flowOf(connectionState))
+        whenever(vpnMenuStore.canShowVpnMenuForNotSubscribed()).thenReturn(false)
 
         testee.getVpnMenuState().test {
             val state = awaitItem()
