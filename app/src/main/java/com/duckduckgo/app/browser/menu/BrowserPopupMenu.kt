@@ -381,9 +381,14 @@ class BrowserPopupMenu(
             TOP -> topBinding.includeVpnMenuItem.statusIndicator
             BOTTOM -> bottomBinding.includeVpnMenuItem.statusIndicator
         }
+        val menuItemView = when (popupMenuResourceType) {
+            TOP -> topBinding.includeVpnMenuItem.menuItemView
+            BOTTOM -> bottomBinding.includeVpnMenuItem.menuItemView
+        }
 
         tryForFreePill.isVisible = true
         statusIndicator.isVisible = false
+        menuItemView.setIcon(drawable.ic_vpn_unlocked_24)
     }
 
     private fun configureVpnMenuItemForSubscribed(isVpnEnabled: Boolean) {
@@ -395,10 +400,17 @@ class BrowserPopupMenu(
             TOP -> topBinding.includeVpnMenuItem.statusIndicator
             BOTTOM -> bottomBinding.includeVpnMenuItem.statusIndicator
         }
+        val menuItemView = when (popupMenuResourceType) {
+            TOP -> topBinding.includeVpnMenuItem.menuItemView
+            BOTTOM -> bottomBinding.includeVpnMenuItem.menuItemView
+        }
 
         tryForFreePill.isVisible = false
         statusIndicator.isVisible = true
         statusIndicator.setStatus(isVpnEnabled)
+
+        val iconRes = if (isVpnEnabled) drawable.ic_vpn_24 else drawable.ic_vpn_unlocked_24
+        menuItemView.setIcon(iconRes)
     }
 
     enum class ResourceType {
