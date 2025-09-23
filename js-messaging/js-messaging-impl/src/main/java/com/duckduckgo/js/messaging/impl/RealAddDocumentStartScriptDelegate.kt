@@ -23,7 +23,7 @@ import com.duckduckgo.app.browser.api.WebViewCapabilityChecker
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.browser.api.webviewcompat.WebViewCompatWrapper
 import com.duckduckgo.common.utils.DispatcherProvider
-import com.duckduckgo.di.scopes.FragmentScope
+import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.js.messaging.api.AddDocumentStartJavaScriptPlugin
 import com.duckduckgo.js.messaging.api.AddDocumentStartJavaScriptScriptStrategy
 import com.duckduckgo.js.messaging.api.AddDocumentStartScriptDelegate
@@ -33,7 +33,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-@ContributesBinding(FragmentScope::class)
+@ContributesBinding(AppScope::class)
 /**
  * Delegate class that implements AddDocumentStartJavaScriptPlugin and handles
  * the common script injection logic
