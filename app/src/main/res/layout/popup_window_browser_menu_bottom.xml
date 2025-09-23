@@ -171,6 +171,10 @@
                 app:iconDrawable="@drawable/ic_downloads_16"
                 app:primaryText="@string/downloadsMenuTitle" />
 
+            <include
+                android:id="@+id/includeVpnMenuItem"
+                layout="@layout/view_menu_item_vpn" />
+
             <com.duckduckgo.common.ui.view.MenuItemView
                 android:id="@+id/settingsMenuItem"
                 android:layout_width="match_parent"
