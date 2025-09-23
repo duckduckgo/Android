@@ -124,7 +124,7 @@ class InputScreenViewModel @AssistedInject constructor(
 ) : ViewModel() {
 
     private var hasUserSeenHistoryIAM = false
-    private var animateLogoOnScroll = true
+    private var isTapTransition = false
 
     private val newTabPageHasContent = MutableStateFlow(false)
     private val voiceServiceAvailable = MutableStateFlow(voiceSearchAvailability.isVoiceSearchAvailable)
@@ -448,12 +448,12 @@ class InputScreenViewModel @AssistedInject constructor(
     }
 
     fun onPageScrolled(position: Int, positionOffset: Float) {
-        if (animateLogoOnScroll) {
+        if (!isTapTransition) {
             val logoProgress = calculateLogoProgress(position, positionOffset)
             command.value = Command.SetLogoProgress(logoProgress)
+            val widgetOffset = calculateInputModeWidgetScrollPosition(positionOffset)
+            command.value = Command.SetInputModeWidgetScrollPosition(position, widgetOffset)
         }
-        val offset = calculateInputModeWidgetScrollPosition(positionOffset)
-        command.value = Command.SetInputModeWidgetScrollPosition(position, offset)
     }
 
     private fun calculateLogoProgress(position: Int, positionOffset: Float): Float {
@@ -470,7 +470,7 @@ class InputScreenViewModel @AssistedInject constructor(
 
     fun onTabTapped(index: Int) {
         if (currentPagePosition != index) {
-            animateLogoOnScroll = false
+            isTapTransition = true
             if (!newTabPageHasContent.value) {
                 command.value = Command.AnimateLogoToProgress(index.toFloat())
             }
@@ -482,7 +482,7 @@ class InputScreenViewModel @AssistedInject constructor(
     }
 
     fun onScrollStateIdle() {
-        animateLogoOnScroll = true
+        isTapTransition = false
     }
 
     fun onSendButtonClicked() {
