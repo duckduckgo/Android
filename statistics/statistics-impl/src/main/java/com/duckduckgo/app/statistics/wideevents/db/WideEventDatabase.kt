@@ -18,7 +18,9 @@ package com.duckduckgo.app.statistics.wideevents.db
 
 import androidx.room.Database
 import androidx.room.RoomDatabase
+import androidx.room.TypeConverter
 import androidx.room.TypeConverters
+import java.time.Instant
 
 @Database(
     exportSchema = true,
@@ -27,7 +29,20 @@ import androidx.room.TypeConverters
         WideEventEntity::class,
     ],
 )
-@TypeConverters(WideEventEntityTypeConverters::class)
+@TypeConverters(
+    WideEventEntityTypeConverters::class,
+    InstantTypeConverter::class,
+)
 abstract class WideEventDatabase : RoomDatabase() {
     abstract fun wideEventDao(): WideEventDao
+}
+
+class InstantTypeConverter {
+    @TypeConverter
+    fun fromInstant(instant: Instant?): Long? =
+        instant?.toEpochMilli()
+
+    @TypeConverter
+    fun toInstant(value: Long?): Instant? =
+        value?.let { Instant.ofEpochMilli(it) }
 }

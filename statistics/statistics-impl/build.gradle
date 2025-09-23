@@ -64,6 +64,8 @@ dependencies {
     
     implementation AndroidX.core.ktx
 
+    implementation "com.squareup.moshi:moshi-adapters:_"
+
     testImplementation Testing.junit4
     testImplementation "org.mockito.kotlin:mockito-kotlin:_"
     testImplementation "androidx.lifecycle:lifecycle-runtime-testing:_"

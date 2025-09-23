@@ -17,9 +17,11 @@
 package com.duckduckgo.app.statistics.wideevents
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.duckduckgo.app.statistics.api.CleanupPolicy
 import com.duckduckgo.app.statistics.api.FlowStatus
 import com.duckduckgo.app.statistics.wideevents.db.WideEventRepository
 import com.duckduckgo.common.test.CoroutineTestRule
+import java.time.Duration
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
@@ -50,11 +52,12 @@ class WideEventClientTest {
         val name = "subscription_purchase"
         val flowEntryPoint = "app_settings"
         val metadata = mapOf("free_trial_eligible" to "true", "user_type" to "premium")
+        val cleanupPolicy = CleanupPolicy.OnProcessStart(ignoreIfIntervalTimeoutPresent = true)
 
-        whenever(wideEventRepository.insertWideEvent(any(), any(), any()))
+        whenever(wideEventRepository.insertWideEvent(any(), any(), any(), anyOrNull()))
             .thenReturn(expectedEventId)
 
-        val result = wideEventClient.flowStart(name, flowEntryPoint, metadata)
+        val result = wideEventClient.flowStart(name, flowEntryPoint, metadata, cleanupPolicy)
 
         assertTrue(result.isSuccess)
         assertEquals(expectedEventId, result.getOrNull())
@@ -63,6 +66,11 @@ class WideEventClientTest {
             name = name,
             flowEntryPoint = flowEntryPoint,
             metadata = mapOf("free_trial_eligible" to "true", "user_type" to "premium"),
+            cleanupPolicy = WideEventRepository.CleanupPolicy.OnProcessStart(
+                ignoreIfIntervalTimeoutPresent = true,
+                status = WideEventRepository.WideEventStatus.UNKNOWN,
+                metadata = emptyMap(),
+            ),
         )
     }
 
@@ -71,7 +79,7 @@ class WideEventClientTest {
         val expectedEventId = 456L
         val name = "login_flow"
 
-        whenever(wideEventRepository.insertWideEvent(any(), anyOrNull(), any()))
+        whenever(wideEventRepository.insertWideEvent(any(), anyOrNull(), any(), anyOrNull()))
             .thenReturn(expectedEventId)
 
         val result = wideEventClient.flowStart(name)
@@ -83,13 +91,14 @@ class WideEventClientTest {
             name = name,
             flowEntryPoint = null,
             metadata = emptyMap(),
+            cleanupPolicy = null,
         )
     }
 
     @Test
     fun `when flowStart encounters repository exception then returns failure`() = runTest {
         val exception = RuntimeException("Database error")
-        whenever(wideEventRepository.insertWideEvent(any(), anyOrNull(), any()))
+        whenever(wideEventRepository.insertWideEvent(any(), anyOrNull(), any(), anyOrNull()))
             .thenThrow(exception)
 
         val result = wideEventClient.flowStart("test_flow")
@@ -282,5 +291,94 @@ class WideEventClientTest {
 
         assertTrue(result.isFailure)
         assertEquals(exception, result.exceptionOrNull())
+    }
+
+    @Test
+    fun `when intervalStart called then starts interval in repository`() = runTest {
+        val wideEventId = 101L
+        val key = "network_call"
+        val timeout = Duration.ofSeconds(5)
+
+        val result = wideEventClient.intervalStart(wideEventId, key, timeout)
+
+        assertTrue(result.isSuccess)
+        verify(wideEventRepository).startInterval(
+            eventId = wideEventId,
+            name = key,
+            timeout = timeout,
+        )
+    }
+
+    @Test
+    fun `when intervalEnd called then ends interval in repository and returns duration`() = runTest {
+        val wideEventId = 202L
+        val key = "network_call"
+        val expectedDuration = Duration.ofSeconds(3)
+
+        whenever(wideEventRepository.endInterval(wideEventId, key)).thenReturn(expectedDuration)
+
+        val result = wideEventClient.intervalEnd(wideEventId, key)
+
+        assertTrue(result.isSuccess)
+        assertEquals(expectedDuration, result.getOrNull())
+        verify(wideEventRepository).endInterval(wideEventId, key)
+    }
+
+    @Test
+    fun `when intervalStart encounters repository exception then returns failure`() = runTest {
+        val wideEventId = 303L
+        val key = "network_call"
+        val timeout = Duration.ofSeconds(5)
+        val exception = RuntimeException("Database error")
+        whenever(wideEventRepository.startInterval(any(), any(), anyOrNull())).thenThrow(exception)
+
+        val result = wideEventClient.intervalStart(wideEventId, key, timeout)
+
+        assertTrue(result.isFailure)
+        assertEquals(exception, result.exceptionOrNull())
+    }
+
+    @Test
+    fun `when intervalEnd encounters repository exception then returns failure`() = runTest {
+        val wideEventId = 404L
+        val key = "network_call"
+        val exception = RuntimeException("Database error")
+        whenever(wideEventRepository.endInterval(any(), any())).thenThrow(exception)
+
+        val result = wideEventClient.intervalEnd(wideEventId, key)
+
+        assertTrue(result.isFailure)
+        assertEquals(exception, result.exceptionOrNull())
+    }
+
+    @Test
+    fun `when flowStart called with OnTimeout cleanupPolicy then maps correctly`() = runTest {
+        val wideEventId = 505L
+        val cleanupPolicy = CleanupPolicy.OnTimeout(
+            duration = Duration.ofMinutes(5),
+            flowStatus = FlowStatus.Failure("timeout"),
+        )
+
+        whenever(wideEventRepository.insertWideEvent(any(), anyOrNull(), any(), anyOrNull()))
+            .thenReturn(wideEventId)
+
+        val result = wideEventClient.flowStart(
+            name = "timeout_flow",
+            flowEntryPoint = null,
+            metadata = emptyMap(),
+            cleanupPolicy = cleanupPolicy,
+        )
+
+        assertTrue(result.isSuccess)
+        verify(wideEventRepository).insertWideEvent(
+            name = "timeout_flow",
+            flowEntryPoint = null,
+            metadata = emptyMap(),
+            cleanupPolicy = WideEventRepository.CleanupPolicy.OnTimeout(
+                duration = Duration.ofMinutes(5),
+                status = WideEventRepository.WideEventStatus.FAILURE,
+                metadata = mapOf("failure_reason" to "timeout"),
+            ),
+        )
     }
 }
