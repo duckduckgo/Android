@@ -19,6 +19,8 @@ package com.duckduckgo.app.statistics.wideevents
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.app.statistics.wideevents.db.WideEventRepository
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
+import com.duckduckgo.feature.toggles.api.Toggle.State
 import java.time.Duration
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -39,9 +41,14 @@ class WideEventClientTest {
     val coroutineRule = CoroutineTestRule()
 
     private val wideEventRepository: WideEventRepository = mock()
+    private val wideEventFeature: WideEventFeature = FakeFeatureToggleFactory
+        .create(WideEventFeature::class.java)
+        .apply { self().setRawStoredState(State(true)) }
 
     private val wideEventClient = WideEventClientImpl(
         wideEventRepository = wideEventRepository,
+        wideEventFeature = wideEventFeature,
+        dispatcherProvider = coroutineRule.testDispatcherProvider,
     )
 
     @Test

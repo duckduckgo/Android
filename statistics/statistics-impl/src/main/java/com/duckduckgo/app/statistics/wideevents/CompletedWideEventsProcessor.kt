@@ -20,6 +20,7 @@ import androidx.lifecycle.LifecycleOwner
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
 import com.duckduckgo.app.statistics.wideevents.db.WideEventRepository
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
@@ -27,6 +28,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.conflate
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @ContributesMultibinding(AppScope::class)
@@ -34,11 +36,15 @@ class CompletedWideEventsProcessor @Inject constructor(
     private val wideEventRepository: WideEventRepository,
     private val wideEventSender: WideEventSender,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
+    private val wideEventFeature: WideEventFeature,
+    private val dispatcherProvider: DispatcherProvider,
 ) : MainProcessLifecycleObserver {
 
     override fun onCreate(owner: LifecycleOwner) {
         appCoroutineScope.launch {
             runCatching {
+                if (!isFeatureEnabled()) return@runCatching
+
                 wideEventRepository.getCompletedWideEventIdsFlow()
                     .conflate()
                     .collect { ids ->
@@ -57,4 +63,9 @@ class CompletedWideEventsProcessor @Inject constructor(
             wideEventRepository.deleteWideEvent(event.id)
         }
     }
+
+    private suspend fun isFeatureEnabled(): Boolean =
+        withContext(dispatcherProvider.io()) {
+            wideEventFeature.self().isEnabled()
+        }
 }

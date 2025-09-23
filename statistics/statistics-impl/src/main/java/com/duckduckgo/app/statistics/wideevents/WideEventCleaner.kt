@@ -21,6 +21,7 @@ import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
 import com.duckduckgo.app.statistics.wideevents.db.WideEventRepository
 import com.duckduckgo.common.utils.CurrentTimeProvider
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesMultibinding
 import java.time.Duration
@@ -28,18 +29,23 @@ import java.time.Instant
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 @ContributesMultibinding(AppScope::class)
 class WideEventCleaner @Inject constructor(
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val wideEventRepository: WideEventRepository,
     private val currentTimeProvider: CurrentTimeProvider,
+    private val wideEventFeature: WideEventFeature,
+    private val dispatcherProvider: DispatcherProvider,
 ) : MainProcessLifecycleObserver {
 
     override fun onCreate(owner: LifecycleOwner) {
         appCoroutineScope.launch {
             runCatching {
-                performWideEventCleanup()
+                if (isFeatureEnabled()) {
+                    performWideEventCleanup()
+                }
             }
         }
     }
@@ -99,4 +105,9 @@ class WideEventCleaner @Inject constructor(
         val currentTime = Instant.ofEpochMilli(currentTimeProvider.currentTimeMillis())
         return timeout <= Duration.between(startAt, currentTime)
     }
+
+    private suspend fun isFeatureEnabled(): Boolean =
+        withContext(dispatcherProvider.io()) {
+            wideEventFeature.self().isEnabled()
+        }
 }
