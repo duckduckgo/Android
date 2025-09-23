@@ -17,7 +17,6 @@
 package com.duckduckgo.autofill.internal
 
 import android.annotation.SuppressLint
-import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
@@ -32,6 +31,7 @@ import androidx.lifecycle.repeatOnLifecycle
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.tabs.BrowserNav
 import com.duckduckgo.autofill.api.AutofillFeature
+import com.duckduckgo.autofill.api.AutofillImportBookmarksLaunchSource.AutofillDevSettings
 import com.duckduckgo.autofill.api.AutofillScreenLaunchSource.InternalDevSettings
 import com.duckduckgo.autofill.api.AutofillScreens.AutofillPasswordsManagementScreen
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
@@ -55,12 +55,18 @@ import com.duckduckgo.autofill.impl.importing.gpm.webflow.ImportGooglePasswordRe
 import com.duckduckgo.autofill.impl.importing.gpm.webflow.ImportGooglePasswordResult.UserCancelled
 import com.duckduckgo.autofill.impl.importing.takeout.processor.TakeoutBookmarkImporter
 import com.duckduckgo.autofill.impl.importing.takeout.webflow.ImportGoogleBookmark.AutofillImportViaGoogleTakeoutScreen
+import com.duckduckgo.autofill.impl.importing.takeout.webflow.ImportGoogleBookmark.AutofillImportViaGoogleTakeoutScreenResultError
+import com.duckduckgo.autofill.impl.importing.takeout.webflow.ImportGoogleBookmark.AutofillImportViaGoogleTakeoutScreenResultSuccess
 import com.duckduckgo.autofill.impl.importing.takeout.webflow.ImportGoogleBookmarkResult
+import com.duckduckgo.autofill.impl.importing.takeout.webflow.UserCannotImportReason.DownloadError
+import com.duckduckgo.autofill.impl.importing.takeout.webflow.UserCannotImportReason.ErrorParsingBookmarks
+import com.duckduckgo.autofill.impl.importing.takeout.webflow.UserCannotImportReason.Unknown
 import com.duckduckgo.autofill.impl.importing.takeout.zip.TakeoutBookmarkExtractor
 import com.duckduckgo.autofill.impl.importing.takeout.zip.TakeoutBookmarkExtractor.ExtractionResult
 import com.duckduckgo.autofill.impl.reporting.AutofillSiteBreakageReportingDataStore
 import com.duckduckgo.autofill.impl.store.InternalAutofillStore
 import com.duckduckgo.autofill.impl.store.NeverSavedSiteRepository
+import com.duckduckgo.autofill.impl.ui.credential.management.importbookmark.google.preimport.ImportFromGoogleBookmarksPreImportDialog
 import com.duckduckgo.autofill.impl.ui.credential.management.survey.AutofillSurveyStore
 import com.duckduckgo.autofill.internal.databinding.ActivityAutofillInternalSettingsBinding
 import com.duckduckgo.autofill.store.AutofillPrefsStore
@@ -166,7 +172,7 @@ class AutofillInternalSettingsActivity : DuckDuckGoActivity() {
 
     private val importCsvLauncher =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-            if (result.resultCode == Activity.RESULT_OK) {
+            if (result.resultCode == RESULT_OK) {
                 val data: Intent? = result.data
                 val fileUrl = data?.data
 
@@ -241,7 +247,7 @@ class AutofillInternalSettingsActivity : DuckDuckGoActivity() {
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             logcat { "onActivityResult for Google Password Manager import flow. resultCode=${result.resultCode}" }
 
-            if (result.resultCode == Activity.RESULT_OK) {
+            if (result.resultCode == RESULT_OK) {
                 result.data?.let {
                     when (IntentCompat.getParcelableExtra(it, RESULT_KEY_DETAILS, ImportGooglePasswordResult::class.java)) {
                         is Success -> observePasswordInputUpdates()
@@ -255,27 +261,50 @@ class AutofillInternalSettingsActivity : DuckDuckGoActivity() {
 
     private val importGoogleBookmarksFlowLauncher =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-            logcat { "onActivityResult for Google Takeout bookmark import flow. resultCode=${result.resultCode}" }
+            logcat { "Bookmark-import onActivityResult for Google Bookmark import flow. resultCode=${result.resultCode}" }
 
             if (result.resultCode == RESULT_OK) {
                 result.data?.let { intent ->
-                    when (
-                        val bookmarkResult =
-                            IntentCompat.getParcelableExtra(
-                                intent,
-                                ImportGoogleBookmarkResult.RESULT_KEY_DETAILS,
-                                ImportGoogleBookmarkResult::class.java,
-                            )
-                    ) {
-                        is ImportGoogleBookmarkResult.Success -> {
-                            "Successfully imported ${bookmarkResult.importedCount} bookmarks".showSnackbar()
-                        }
-                        is ImportGoogleBookmarkResult.Error -> "Failed to import bookmarks".showSnackbar()
-                        is ImportGoogleBookmarkResult.UserCancelled, null -> {}
-                    }
+                    val bookmarkResult =
+                        IntentCompat.getParcelableExtra(
+                            intent,
+                            ImportGoogleBookmarkResult.RESULT_KEY_DETAILS,
+                            ImportGoogleBookmarkResult::class.java,
+                        )
+                    handleBookmarkImportResult(bookmarkResult)
                 }
             }
         }
+
+    private fun handleBookmarkImportResult(result: ImportGoogleBookmarkResult?) {
+        when (result) {
+            is ImportGoogleBookmarkResult.Success -> {
+                "Successfully imported ${result.importedCount} bookmarks".showSnackbar()
+                hidePreImportDialog()
+            }
+            is ImportGoogleBookmarkResult.Error -> {
+                val errorMessage =
+                    when (result.reason) {
+                        DownloadError -> "Failed to download bookmark data"
+                        ErrorParsingBookmarks -> "Failed to parse bookmark data"
+                        Unknown -> "Failed to import bookmarks"
+                    }
+                errorMessage.showSnackbar()
+                hidePreImportDialog()
+            }
+            // Don't hide pre-import dialog on cancellation
+            is ImportGoogleBookmarkResult.UserCancelled -> logcat { "Bookmark-import cancelled at stage: ${result.stage}" }
+            null -> logcat { "Bookmark-import result is null" }
+        }
+    }
+
+    private fun hidePreImportDialog() {
+        supportFragmentManager.findFragmentByTag("ImportFromGoogleBookmarksPreImportDialog")?.let { fragment ->
+            if (fragment is ImportFromGoogleBookmarksPreImportDialog) {
+                fragment.dismiss()
+            }
+        }
+    }
 
     private fun observePasswordInputUpdates() {
         passwordImportWatcher +=
@@ -383,17 +412,56 @@ class AutofillInternalSettingsActivity : DuckDuckGoActivity() {
                 startActivity(browserNav.openInNewTab(this@AutofillInternalSettingsActivity, url))
             }
         }
-        binding.importBookmarksLaunchGoogleTakeoutCustomFlow.setClickListener {
+        binding.importBookmarksLaunchGoogleTakeoutCustomFlowWithPreImportDialog.setClickListener {
             lifecycleScope.launch {
                 if (importGooglePasswordsCapabilityChecker.webViewCapableOfImporting()) {
                     try {
-                        val intent = globalActivityStarter.startIntent(this@AutofillInternalSettingsActivity, AutofillImportViaGoogleTakeoutScreen)
-                        importGoogleBookmarksFlowLauncher.launch(intent)
+                        val dialog = ImportFromGoogleBookmarksPreImportDialog.instance(AutofillDevSettings)
+                        dialog.setImportClickedCallback {
+                            // Launch the import flow from the activity when dialog's import button is clicked
+                            val intent =
+                                globalActivityStarter.startIntent(
+                                    this@AutofillInternalSettingsActivity,
+                                    AutofillImportViaGoogleTakeoutScreen(AutofillDevSettings),
+                                )
+                            importGoogleBookmarksFlowLauncher.launch(intent)
+                        }
+                        dialog.show(supportFragmentManager, "ImportFromGoogleBookmarksPreImportDialog")
                     } catch (e: Exception) {
                         val message = "Error launching bookmark import flow: ${e.message}"
                         logcat { message }
                         Toast.makeText(this@AutofillInternalSettingsActivity, message, Toast.LENGTH_LONG).show()
                     }
+                } else {
+                    Toast.makeText(this@AutofillInternalSettingsActivity, "WebView version not supported", Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
+        binding.importBookmarksShowSuccessScreenWithSimulatedData.setClickListener {
+            val intent =
+                globalActivityStarter.startIntent(
+                    this@AutofillInternalSettingsActivity,
+                    AutofillImportViaGoogleTakeoutScreenResultSuccess(AutofillDevSettings, bookmarkCount = 125),
+                )
+            importGoogleBookmarksFlowLauncher.launch(intent)
+        }
+        binding.importBookmarksShowFailureScreenWithSimulatedData.setClickListener {
+            val intent =
+                globalActivityStarter.startIntent(
+                    this@AutofillInternalSettingsActivity,
+                    AutofillImportViaGoogleTakeoutScreenResultError(AutofillDevSettings, DownloadError),
+                )
+            importGoogleBookmarksFlowLauncher.launch(intent)
+        }
+        binding.importBookmarksLaunchGoogleTakeoutCustomFlow.setClickListener {
+            lifecycleScope.launch {
+                if (importGooglePasswordsCapabilityChecker.webViewCapableOfImporting()) {
+                    val intent =
+                        globalActivityStarter.startIntent(
+                            this@AutofillInternalSettingsActivity,
+                            AutofillImportViaGoogleTakeoutScreen(AutofillDevSettings),
+                        )
+                    importGoogleBookmarksFlowLauncher.launch(intent)
                 } else {
                     Toast.makeText(this@AutofillInternalSettingsActivity, "WebView version not supported", Toast.LENGTH_SHORT).show()
                 }
@@ -664,7 +732,6 @@ class AutofillInternalSettingsActivity : DuckDuckGoActivity() {
 
     private fun onUserChoseToClearSavedLogins() {
         lifecycleScope.launch(dispatchers.io()) {
-            autofillStore.getCredentialCount()
             val deleted = autofillStore.deleteAllCredentials().size
             withContext(dispatchers.main()) {
                 Toast.makeText(this@AutofillInternalSettingsActivity, "Deleted %d logins".format(deleted), Toast.LENGTH_SHORT).show()
