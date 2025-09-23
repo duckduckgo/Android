@@ -30,9 +30,9 @@ import com.duckduckgo.js.messaging.api.ProcessResult.SendResponse
 import com.duckduckgo.js.messaging.api.ProcessResult.SendToConsumer
 import com.duckduckgo.js.messaging.api.SubscriptionEvent
 import com.duckduckgo.js.messaging.api.SubscriptionEventData
-import com.duckduckgo.js.messaging.api.WebMessagingPlugin
-import com.duckduckgo.js.messaging.api.WebMessagingPluginDelegate
-import com.duckduckgo.js.messaging.api.WebMessagingPluginStrategy
+import com.duckduckgo.js.messaging.api.WebMessaging
+import com.duckduckgo.js.messaging.api.WebMessagingDelegate
+import com.duckduckgo.js.messaging.api.WebMessagingStrategy
 import com.duckduckgo.js.messaging.api.WebViewCompatMessageCallback
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.moshi.Moshi
@@ -50,9 +50,9 @@ class RealWebMessagingDelegate @Inject constructor(
     private val webViewCompatWrapper: WebViewCompatWrapper,
     private val dispatcherProvider: DispatcherProvider,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
-) : WebMessagingPluginDelegate {
-    override fun createPlugin(strategy: WebMessagingPluginStrategy): WebMessagingPlugin {
-        return object : WebMessagingPlugin {
+) : WebMessagingDelegate {
+    override fun createPlugin(strategy: WebMessagingStrategy): WebMessaging {
+        return object : WebMessaging {
             private val moshi = Moshi.Builder().add(JSONObjectAdapter()).build()
 
             private var globalReplyProxy: JavaScriptReplyProxy? = null

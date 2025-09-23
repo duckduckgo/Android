@@ -88,7 +88,7 @@ import com.duckduckgo.history.api.NavigationHistory
 import com.duckduckgo.js.messaging.api.AddDocumentStartJavaScript
 import com.duckduckgo.js.messaging.api.PostMessageWrapperPlugin
 import com.duckduckgo.js.messaging.api.SubscriptionEventData
-import com.duckduckgo.js.messaging.api.WebMessagingPlugin
+import com.duckduckgo.js.messaging.api.WebMessaging
 import com.duckduckgo.js.messaging.api.WebViewCompatMessageCallback
 import com.duckduckgo.privacy.config.api.AmpLinks
 import com.duckduckgo.subscriptions.api.Subscriptions
@@ -1358,7 +1358,7 @@ class BrowserWebViewClientTest {
         override fun getPlugins() = listOf(plugin)
     }
 
-    class FakeWebMessagingPlugin : WebMessagingPlugin {
+    class FakeWebMessagingPlugin : WebMessaging {
         var registered = false
             private set
 
@@ -1380,10 +1380,10 @@ class BrowserWebViewClientTest {
             get() = "test"
     }
 
-    class FakeWebMessagingPluginPoint : PluginPoint<WebMessagingPlugin> {
+    class FakeWebMessagingPluginPoint : PluginPoint<WebMessaging> {
         val plugin = FakeWebMessagingPlugin()
 
-        override fun getPlugins(): Collection<WebMessagingPlugin> {
+        override fun getPlugins(): Collection<WebMessaging> {
             return listOf(plugin)
         }
     }
