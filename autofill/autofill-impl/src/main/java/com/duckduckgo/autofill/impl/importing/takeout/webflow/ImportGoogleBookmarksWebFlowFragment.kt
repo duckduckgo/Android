@@ -33,6 +33,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.withStarted
 import androidx.webkit.WebViewCompat
 import com.duckduckgo.anvil.annotations.InjectWith
+import com.duckduckgo.autofill.api.AutofillFeature
 import com.duckduckgo.autofill.api.AutofillFragmentResultsPlugin
 import com.duckduckgo.autofill.api.BrowserAutofill
 import com.duckduckgo.autofill.api.CredentialAutofillDialogFactory
@@ -66,6 +67,7 @@ import com.duckduckgo.autofill.impl.importing.takeout.webflow.ImportGoogleBookma
 import com.duckduckgo.autofill.impl.importing.takeout.webflow.UserCannotImportReason.DownloadError
 import com.duckduckgo.autofill.impl.importing.takeout.webflow.UserCannotImportReason.ErrorParsingBookmarks
 import com.duckduckgo.autofill.impl.importing.takeout.webflow.UserCannotImportReason.Unknown
+import com.duckduckgo.autofill.impl.importing.takeout.webflow.UserCannotImportReason.WebAutomationError
 import com.duckduckgo.autofill.impl.importing.takeout.webflow.UserCannotImportReason.WebViewError
 import com.duckduckgo.autofill.impl.jsbridge.request.SupportedAutofillInputSubType
 import com.duckduckgo.autofill.impl.jsbridge.request.SupportedAutofillInputSubType.PASSWORD
@@ -123,8 +125,12 @@ class ImportGoogleBookmarksWebFlowFragment :
     @Inject
     lateinit var browserAutofillConfigurator: InternalBrowserAutofillConfigurator
 
+    @Inject
+    lateinit var autofillFeature: AutofillFeature
+
     private var binding: FragmentImportGoogleBookmarksWebflowBinding? = null
     private var cancellationDialog: DaxAlertDialog? = null
+    private var webFlowIsEnding = false
 
     private val viewModel by lazy {
         ViewModelProvider(requireActivity(), viewModelFactory)[ImportGoogleBookmarksWebFlowViewModel::class.java]
@@ -195,16 +201,12 @@ class ImportGoogleBookmarksWebFlowFragment :
                         // Inject null to indicate no credentials available
                         browserAutofill.injectCredentials(null)
                     }
-                    is PromptUserToSelectFromStoredCredentials ->
-                        showCredentialChooserDialog(
-                            command.originalUrl,
-                            command.credentials,
-                            command.triggerType,
-                        )
-                    is ExitFlowWithSuccess -> {
-                        logcat { "Bookmark-import: ExitFlowWithSuccess received with count: ${command.importedCount}" }
-                        exitFlowAsSuccess(command.importedCount)
-                    }
+                    is PromptUserToSelectFromStoredCredentials -> showCredentialChooserDialog(
+                        command.originalUrl,
+                        command.credentials,
+                        command.triggerType,
+                    )
+                    is ExitFlowWithSuccess -> exitFlowAsSuccess(command.importedCount)
                     is ExitFlowAsFailure -> exitFlowAsError(command.reason)
                     is PromptUserToConfirmFlowCancellation -> askUserToConfirmCancellation()
                 }
@@ -223,12 +225,11 @@ class ImportGoogleBookmarksWebFlowFragment :
                     return@withContext
                 }
 
-                val credentials =
-                    LoginCredentials(
-                        domain = url,
-                        username = username,
-                        password = password,
-                    )
+                val credentials = LoginCredentials(
+                    domain = url,
+                    username = username,
+                    password = password,
+                )
 
                 logcat { "Injecting re-authentication credentials" }
                 browserAutofill.injectCredentials(credentials)
@@ -309,13 +310,31 @@ class ImportGoogleBookmarksWebFlowFragment :
         }
     }
 
-    @SuppressLint("RequiresFeature", "AddDocumentStartJavaScriptUsage")
+    @SuppressLint("RequiresFeature", "AddDocumentStartJavaScriptUsage", "AddWebMessageListenerUsage")
     private suspend fun configureBookmarkImportJavascript(webView: WebView) {
         if (importBookmarkConfig.getConfig().canInjectJavascript) {
             val script = googleImporterScriptLoader.getScriptForBookmarkImport()
             WebViewCompat.addDocumentStartJavaScript(webView, script, setOf("*"))
         } else {
             logcat(WARN) { "Bookmark-import: Not able to inject bookmark import JavaScript" }
+        }
+
+        val canAddMessageListener = withContext(dispatchers.io()) {
+            autofillFeature.canUseWebMessageListenerDuringBookmarkImport().isEnabled()
+        }
+
+        if (canAddMessageListener) {
+            WebViewCompat.addWebMessageListener(webView, "ddgBookmarkImport", setOf("*")) { _, message, sourceOrigin, _, _ ->
+                if (webFlowIsEnding) {
+                    logcat(WARN) { "Bookmark-import: web flow is ending, ignoring message" }
+                    return@addWebMessageListener
+                }
+
+                val data = message.data ?: return@addWebMessageListener
+                viewModel.onWebMessageReceived(data)
+            }
+        } else {
+            logcat(WARN) { "Bookmark-import: Not able to add WebMessage listener for bookmark import" }
         }
     }
 
@@ -355,6 +374,10 @@ class ImportGoogleBookmarksWebFlowFragment :
     private fun getToolbar() = (activity as ImportGoogleBookmarksWebFlowActivity).binding.includeToolbar.toolbar
 
     override fun onPageStarted(url: String?) {
+        if (webFlowIsEnding) {
+            return
+        }
+
         viewModel.onPageStarted(url)
         lifecycleScope.launch(dispatchers.main()) {
             binding?.let {
@@ -382,6 +405,8 @@ class ImportGoogleBookmarksWebFlowFragment :
 
     private fun exitFlowAsSuccess(bookmarkCount: Int) {
         logcat { "Bookmark-import: Reporting import success with bookmarkCount: $bookmarkCount" }
+        onWebFlowEnding()
+
         lifecycleScope.launch {
             lifecycle.withStarted {
                 dismissCancellationDialog()
@@ -395,6 +420,7 @@ class ImportGoogleBookmarksWebFlowFragment :
 
     private fun exitFlowAsCancellation(stage: String) {
         logcat { "Bookmark-import: Flow cancelled at stage: $stage" }
+        onWebFlowEnding()
 
         lifecycleScope.launch {
             lifecycle.withStarted {
@@ -411,6 +437,7 @@ class ImportGoogleBookmarksWebFlowFragment :
 
     private fun exitFlowAsError(reason: UserCannotImportReason) {
         logcat { "Bookmark-import: Flow error at stage: ${reason.mapToStage()}" }
+        onWebFlowEnding()
 
         lifecycleScope.launch {
             lifecycle.withStarted {
@@ -421,6 +448,17 @@ class ImportGoogleBookmarksWebFlowFragment :
                 }
                 setFragmentResult(ImportGoogleBookmarkResult.Companion.RESULT_KEY, result)
             }
+        }
+    }
+
+    /**
+     * Does a best-effort to attempt to stop the web flow from any further processing.
+     */
+    private fun onWebFlowEnding() {
+        webFlowIsEnding = true
+        binding?.webView?.run {
+            stopLoading()
+            loadUrl("about:blank")
         }
     }
 
@@ -436,13 +474,12 @@ class ImportGoogleBookmarksWebFlowFragment :
                 return@withContext
             }
 
-            val dialog =
-                credentialAutofillDialogFactory.autofillSelectCredentialsDialog(
-                    url,
-                    credentials,
-                    triggerType,
-                    CUSTOM_FLOW_TAB_ID,
-                )
+            val dialog = credentialAutofillDialogFactory.autofillSelectCredentialsDialog(
+                url,
+                credentials,
+                triggerType,
+                CUSTOM_FLOW_TAB_ID,
+            )
             dialog.show(childFragmentManager, SELECT_CREDENTIALS_FRAGMENT_TAG)
         }
     }
@@ -543,8 +580,9 @@ class ImportGoogleBookmarksWebFlowFragment :
 
 private fun UserCannotImportReason.mapToStage(): String =
     when (this) {
-        DownloadError -> "zip-download-error"
-        ErrorParsingBookmarks -> "zip-parse-error"
-        Unknown -> "import-error-unknown"
-        WebViewError -> "webview-error"
+        is DownloadError -> "zip-download-error"
+        is ErrorParsingBookmarks -> "zip-parse-error"
+        is Unknown -> "import-error-unknown"
+        is WebViewError -> "webview-error"
+        is WebAutomationError -> "web-automation-step-failure-${this.step}"
     }
