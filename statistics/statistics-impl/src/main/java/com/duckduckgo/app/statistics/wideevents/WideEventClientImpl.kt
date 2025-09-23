@@ -16,9 +16,6 @@
 
 package com.duckduckgo.app.statistics.wideevents
 
-import com.duckduckgo.app.statistics.api.CleanupPolicy
-import com.duckduckgo.app.statistics.api.FlowStatus
-import com.duckduckgo.app.statistics.api.WideEventClient
 import com.duckduckgo.app.statistics.wideevents.db.WideEventRepository
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
