@@ -73,6 +73,9 @@ class RealPageLoadedHandler @Inject constructor(
                         appVersion = deviceInfo.appVersion,
                         cpmEnabled = autoconsent.isAutoconsentEnabled(),
                         trackerOptimizationEnabled = optimizeTrackerEvaluationRCWrapper.enabled,
+                        isTabInForegroundOnFinish = isTabInForegroundOnFinish,
+                        activeRequestsOnLoadStart = activeRequestsOnLoadStart,
+                        concurrentRequestsOnFinish = concurrentRequestsOnFinish,
                     ),
                 )
             }
