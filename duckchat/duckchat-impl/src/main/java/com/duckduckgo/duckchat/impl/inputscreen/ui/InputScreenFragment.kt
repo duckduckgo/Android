@@ -16,6 +16,7 @@
 
 package com.duckduckgo.duckchat.impl.inputscreen.ui
 
+import android.animation.ValueAnimator
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
@@ -25,10 +26,12 @@ import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
+import androidx.viewpager2.widget.ViewPager2
 import androidx.viewpager2.widget.ViewPager2.OnPageChangeCallback
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.ui.DuckDuckGoFragment
+import com.duckduckgo.common.ui.store.AppTheme
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.extensions.hideKeyboard
 import com.duckduckgo.common.utils.extensions.showKeyboard
@@ -39,8 +42,11 @@ import com.duckduckgo.duckchat.api.inputscreen.InputScreenActivityResultParams
 import com.duckduckgo.duckchat.impl.R
 import com.duckduckgo.duckchat.impl.databinding.FragmentInputScreenBinding
 import com.duckduckgo.duckchat.impl.inputscreen.ui.command.Command
+import com.duckduckgo.duckchat.impl.inputscreen.ui.command.Command.AnimateLogoToProgress
 import com.duckduckgo.duckchat.impl.inputscreen.ui.command.Command.EditWithSelectedQuery
 import com.duckduckgo.duckchat.impl.inputscreen.ui.command.Command.HideKeyboard
+import com.duckduckgo.duckchat.impl.inputscreen.ui.command.Command.SetInputModeWidgetScrollPosition
+import com.duckduckgo.duckchat.impl.inputscreen.ui.command.Command.SetLogoProgress
 import com.duckduckgo.duckchat.impl.inputscreen.ui.command.Command.ShowKeyboard
 import com.duckduckgo.duckchat.impl.inputscreen.ui.command.Command.SubmitChat
 import com.duckduckgo.duckchat.impl.inputscreen.ui.command.Command.SubmitSearch
@@ -80,6 +86,9 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
     @Inject
     lateinit var viewModelFactory: InputScreenViewModelFactory
 
+    @Inject
+    lateinit var appTheme: AppTheme
+
     private val viewModel: InputScreenViewModel by lazy {
         val params = requireActivity().intent.getActivityParams(InputScreenActivityParams::class.java)
         val currentOmnibarText = params?.query ?: ""
@@ -91,11 +100,23 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
 
     private val pageChangeCallback = object : OnPageChangeCallback() {
         override fun onPageSelected(position: Int) {
+            viewModel.onPageSelected(position)
             binding.inputModeWidget.selectTab(position)
+        }
+
+        override fun onPageScrolled(position: Int, positionOffset: Float, positionOffsetPixels: Int) {
+            viewModel.onPageScrolled(position, positionOffset)
+        }
+
+        override fun onPageScrollStateChanged(state: Int) {
+            if (state == ViewPager2.SCROLL_STATE_IDLE) {
+                viewModel.onScrollStateIdle()
+            }
         }
     }
 
     private lateinit var pagerAdapter: InputScreenPagerAdapter
+    private var logoAnimator: ValueAnimator? = null
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -109,6 +130,7 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
         configureOmnibar()
         configureVoice()
         configureObservers()
+        configureLogoAnimation()
 
         binding.inputModeWidget.init()
 
@@ -168,11 +190,15 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
         }.launchIn(lifecycleScope)
 
         viewModel.visibilityState.onEach {
-            binding.ddgLogo.isVisible = if (binding.viewPager.currentItem == 0) {
+            val isSearchMode = binding.viewPager.currentItem == 0
+            binding.ddgLogoContainer.isVisible = if (isSearchMode) {
                 it.showSearchLogo
             } else {
                 it.showChatLogo
             }
+
+            binding.ddgLogo.progress = if (isSearchMode) 0f else 1f
+
             binding.actionNewLine.isVisible = it.newLineButtonVisible
         }.launchIn(lifecycleScope)
     }
@@ -190,6 +216,9 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
             is SubmitChat -> submitChatQuery(command.query)
             is ShowKeyboard -> showKeyboard(binding.inputModeWidget.inputField)
             is HideKeyboard -> hideKeyboard(binding.inputModeWidget.inputField)
+            is SetInputModeWidgetScrollPosition -> binding.inputModeWidget.setScrollPosition(command.position, command.offset)
+            is SetLogoProgress -> setLogoProgress(command.targetProgress)
+            is AnimateLogoToProgress -> animateLogoToProgress(command.targetProgress)
         }
     }
 
@@ -213,23 +242,19 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
             binding.viewPager.setCurrentItem(0, true)
             viewModel.onSearchSelected()
             viewModel.onSearchInputTextChanged(binding.inputModeWidget.text)
-            binding.ddgLogo.apply {
-                setImageResource(com.duckduckgo.mobile.android.R.drawable.logo_full)
-                isVisible = viewModel.visibilityState.value.showSearchLogo
-            }
+            binding.ddgLogoContainer.isVisible = viewModel.visibilityState.value.showSearchLogo
         }
         onChatSelected = {
             binding.viewPager.setCurrentItem(1, true)
             viewModel.onChatSelected()
             viewModel.onChatInputTextChanged(binding.inputModeWidget.text)
-            binding.ddgLogo.apply {
-                setImageResource(R.drawable.logo_full_ai)
+            binding.ddgLogoContainer.apply {
                 val showChatLogo = viewModel.visibilityState.value.showChatLogo
                 val showSearchLogo = viewModel.visibilityState.value.showSearchLogo
                 isVisible = showChatLogo
                 if (showChatLogo && !showSearchLogo) {
                     alpha = 0f
-                    animate().alpha(1f).setDuration(200L).start()
+                    animate().alpha(1f).setDuration(LOGO_FADE_DURATION).start()
                 }
             }
         }
@@ -247,6 +272,9 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
         }
         onInputFieldClicked = {
             viewModel.onInputFieldTouched()
+        }
+        onTabTapped = { index ->
+            viewModel.onTabTapped(index)
         }
     }
 
@@ -282,12 +310,41 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
         }.launchIn(lifecycleScope)
     }
 
+    private fun configureLogoAnimation() = with(binding.ddgLogo) {
+        setMinAndMaxFrame(0, LOGO_MAX_FRAME)
+        setAnimation(
+            if (appTheme.isLightModeEnabled()) {
+                R.raw.duckduckgo_ai_transition_light
+            } else {
+                R.raw.duckduckgo_ai_transition_dark
+            },
+        )
+    }
+
+    private fun setLogoProgress(targetProgress: Float) {
+        binding.ddgLogo.progress = targetProgress
+    }
+
+    private fun animateLogoToProgress(targetProgress: Float) {
+        logoAnimator?.cancel()
+        binding.ddgLogo.apply {
+            logoAnimator = ValueAnimator.ofFloat(progress, targetProgress).apply {
+                duration = LOGO_ANIMATION_DURATION
+                addUpdateListener { progress = it.animatedValue as Float }
+                start()
+            }
+        }
+    }
+
     private fun exitInputScreen() {
         hideKeyboard(binding.inputModeWidget.inputField)
         requireActivity().supportFinishAfterTransition()
     }
 
     override fun onDestroyView() {
+        logoAnimator?.cancel()
+        logoAnimator = null
+        binding.ddgLogo.clearAnimation()
         binding.viewPager.unregisterOnPageChangeCallback(pageChangeCallback)
         super.onDestroyView()
     }
@@ -295,5 +352,11 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
     override fun onResume() {
         super.onResume()
         viewModel.onActivityResume()
+    }
+
+    companion object {
+        const val LOGO_ANIMATION_DURATION = 350L
+        const val LOGO_MAX_FRAME = 15
+        const val LOGO_FADE_DURATION = 200L
     }
 }
