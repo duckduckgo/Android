@@ -1293,7 +1293,7 @@ class InputScreenViewModelTest {
     }
 
     @Test
-    fun `when onTabTapped and newTabPageHasContent true then AnimateLogoToProgress is not emitted`() = runTest {
+    fun `when onTabTapped and has content then AnimateLogoToProgress is not emitted`() = runTest {
         val viewModel = createViewModel()
         val capturedCommands = mutableListOf<Command>()
 
@@ -1355,7 +1355,7 @@ class InputScreenViewModelTest {
     }
 
     @Test
-    fun `when onPageScrolled and newTabPageHasContent true then SetLogoProgress is 1f`() = runTest {
+    fun `when onPageScrolled and has content then SetLogoProgress is 1f`() = runTest {
         val viewModel = createViewModel()
         val capturedCommands = mutableListOf<Command>()
 
@@ -1389,8 +1389,7 @@ class InputScreenViewModelTest {
             }
         }
 
-        viewModel.onPageSelected(position = 1)
-        viewModel.onTabTapped(index = 0)
+        viewModel.onTabTapped(index = 1)
         capturedCommands.clear()
 
         val position = 0
