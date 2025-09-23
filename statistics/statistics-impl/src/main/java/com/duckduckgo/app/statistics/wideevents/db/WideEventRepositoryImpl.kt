@@ -38,7 +38,7 @@ class WideEventRepositoryImpl @Inject constructor(
         name: String,
         flowEntryPoint: String?,
         metadata: Map<String, String?>,
-        cleanupPolicy: CleanupPolicy?,
+        cleanupPolicy: CleanupPolicy,
     ): Long {
         val entity = WideEventEntity(
             name = name,
@@ -47,7 +47,7 @@ class WideEventRepositoryImpl @Inject constructor(
             steps = emptyList(),
             status = null,
             createdAt = timeProvider.getCurrentTime(),
-            cleanupPolicy = cleanupPolicy?.mapToDbCleanupPolicy(),
+            cleanupPolicy = cleanupPolicy.mapToDbCleanupPolicy(),
             activeIntervals = emptyList(),
         )
 

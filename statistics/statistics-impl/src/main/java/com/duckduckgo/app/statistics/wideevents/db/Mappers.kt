@@ -24,7 +24,7 @@ fun WideEventEntity.mapToRepositoryWideEvent(): WideEventRepository.WideEvent =
         steps = steps.map { it.mapToRepositoryWideEventStep() },
         metadata = metadata.associate { it.key to it.value },
         flowEntryPoint = flowEntryPoint,
-        cleanupPolicy = cleanupPolicy?.mapToRepositoryCleanupPolicy(),
+        cleanupPolicy = cleanupPolicy.mapToRepositoryCleanupPolicy(),
         activeIntervals = activeIntervals.map { it.mapToRepositoryWideEventInterval() },
         createdAt = createdAt,
     )

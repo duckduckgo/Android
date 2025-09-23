@@ -35,13 +35,13 @@ class WideEventClientImpl @Inject constructor(
         name: String,
         flowEntryPoint: String?,
         metadata: Map<String, String>,
-        cleanupPolicy: CleanupPolicy?,
+        cleanupPolicy: CleanupPolicy,
     ): Result<Long> = runCatching {
         wideEventRepository.insertWideEvent(
             name = name,
             flowEntryPoint = flowEntryPoint,
             metadata = metadata,
-            cleanupPolicy = cleanupPolicy?.mapToRepositoryCleanupPolicy(),
+            cleanupPolicy = cleanupPolicy.mapToRepositoryCleanupPolicy(),
         )
     }
 

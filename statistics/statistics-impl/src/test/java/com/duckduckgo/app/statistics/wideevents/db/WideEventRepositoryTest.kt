@@ -76,7 +76,7 @@ class WideEventRepositoryTest {
             name = "test_event",
             flowEntryPoint = null,
             metadata = emptyMap(),
-            cleanupPolicy = null,
+            cleanupPolicy = DEFAULT_CLEANUP_POLICY,
         )
 
         assertTrue(eventId > 0)
@@ -91,7 +91,7 @@ class WideEventRepositoryTest {
                 "key1" to "value1",
                 "key2" to null,
             ),
-            cleanupPolicy = null,
+            cleanupPolicy = DEFAULT_CLEANUP_POLICY,
         )
 
         assertTrue(eventId > 0)
@@ -108,14 +108,14 @@ class WideEventRepositoryTest {
             name = "test_event",
             flowEntryPoint = null,
             metadata = emptyMap(),
-            cleanupPolicy = null,
+            cleanupPolicy = DEFAULT_CLEANUP_POLICY,
         )
 
         val activeEventId = wideEventRepository.insertWideEvent(
             name = "test_event",
             flowEntryPoint = null,
             metadata = emptyMap(),
-            cleanupPolicy = null,
+            cleanupPolicy = DEFAULT_CLEANUP_POLICY,
         )
 
         // complete wide event
@@ -137,28 +137,28 @@ class WideEventRepositoryTest {
             name = "test1",
             flowEntryPoint = null,
             metadata = emptyMap(),
-            cleanupPolicy = null,
+            cleanupPolicy = DEFAULT_CLEANUP_POLICY,
         )
 
         val eventId2 = wideEventRepository.insertWideEvent(
             name = "test2",
             flowEntryPoint = null,
             metadata = emptyMap(),
-            cleanupPolicy = null,
+            cleanupPolicy = DEFAULT_CLEANUP_POLICY,
         )
 
         val eventId3 = wideEventRepository.insertWideEvent(
             name = "test3",
             flowEntryPoint = null,
             metadata = emptyMap(),
-            cleanupPolicy = null,
+            cleanupPolicy = DEFAULT_CLEANUP_POLICY,
         )
 
         val eventId4 = wideEventRepository.insertWideEvent(
             name = "test4",
             flowEntryPoint = null,
             metadata = emptyMap(),
-            cleanupPolicy = null,
+            cleanupPolicy = DEFAULT_CLEANUP_POLICY,
         )
 
         wideEventRepository.setWideEventStatus(
@@ -186,7 +186,7 @@ class WideEventRepositoryTest {
                 "key1" to "value1",
                 "key2" to null,
             ),
-            cleanupPolicy = null,
+            cleanupPolicy = DEFAULT_CLEANUP_POLICY,
         )
 
         wideEventRepository.addWideEventStep(
@@ -238,14 +238,14 @@ class WideEventRepositoryTest {
             name = "test_event",
             flowEntryPoint = null,
             metadata = emptyMap(),
-            cleanupPolicy = null,
+            cleanupPolicy = DEFAULT_CLEANUP_POLICY,
         )
 
         val activeEventId = wideEventRepository.insertWideEvent(
             name = "test_event",
             flowEntryPoint = null,
             metadata = emptyMap(),
-            cleanupPolicy = null,
+            cleanupPolicy = DEFAULT_CLEANUP_POLICY,
         )
 
         // complete wide event
@@ -272,7 +272,7 @@ class WideEventRepositoryTest {
                 "key1" to "value1",
                 "key2" to null,
             ),
-            cleanupPolicy = null,
+            cleanupPolicy = DEFAULT_CLEANUP_POLICY,
         )
 
         assertTrue(eventId > 0)
@@ -307,7 +307,7 @@ class WideEventRepositoryTest {
             name = "interval_event",
             flowEntryPoint = null,
             metadata = emptyMap(),
-            cleanupPolicy = null,
+            cleanupPolicy = DEFAULT_CLEANUP_POLICY,
         )
 
         wideEventRepository.startInterval(
@@ -326,7 +326,7 @@ class WideEventRepositoryTest {
             name = "interval_event",
             flowEntryPoint = null,
             metadata = emptyMap(),
-            cleanupPolicy = null,
+            cleanupPolicy = DEFAULT_CLEANUP_POLICY,
         )
 
         wideEventRepository.startInterval(
@@ -343,5 +343,13 @@ class WideEventRepositoryTest {
         assertEquals(expectedDuration, duration)
         assertTrue(event.activeIntervals.isEmpty())
         assertTrue(event.metadata.containsKey("interval_1"))
+    }
+
+    companion object {
+        val DEFAULT_CLEANUP_POLICY = WideEventRepository.CleanupPolicy.OnTimeout(
+            duration = Duration.ofDays(7),
+            status = WideEventRepository.WideEventStatus.UNKNOWN,
+            metadata = emptyMap(),
+        )
     }
 }

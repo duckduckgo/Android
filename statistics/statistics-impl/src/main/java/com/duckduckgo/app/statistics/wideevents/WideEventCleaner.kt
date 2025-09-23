@@ -80,10 +80,6 @@ class WideEventCleaner @Inject constructor(
                     return
                 }
             }
-
-            null -> {
-                // no-op
-            }
         }
 
         event.activeIntervals

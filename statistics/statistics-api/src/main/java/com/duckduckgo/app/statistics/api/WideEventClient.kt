@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.statistics.api
 
+import com.duckduckgo.app.statistics.api.CleanupPolicy.OnTimeout
 import java.time.Duration
 
 interface WideEventClient {
@@ -26,13 +27,14 @@ interface WideEventClient {
      * @param name Stable flow name (e.g., "subscription_purchase").
      * @param flowEntryPoint Optional identifier of the flow entry point (e.g., "app_settings")
      * @param metadata Optional metadata (e.g., "free_trial_eligible=true").
+     * @param cleanupPolicy Strategy for dealing with abandoned events, see [CleanupPolicy] for details.
      * @return Wide event ID used for subsequent calls.
      */
     suspend fun flowStart(
         name: String,
         flowEntryPoint: String? = null,
         metadata: Map<String, String> = emptyMap(),
-        cleanupPolicy: CleanupPolicy? = null,
+        cleanupPolicy: CleanupPolicy = OnTimeout(duration = Duration.ofDays(7)),
     ): Result<Long>
 
     /**
@@ -131,6 +133,9 @@ sealed class FlowStatus {
 /**
  * Per-flow cleanup behavior applied when a flow is left open.
  *
+ * If the flow is explicitly finished or aborted before conditions defined by the policy are met,
+ * the policy has no effect.
+ *
  * Each policy carries a target [flowStatus] - the flow is auto-finished with that status and sent.
  */
 sealed class CleanupPolicy {
@@ -154,11 +159,12 @@ sealed class CleanupPolicy {
     ) : CleanupPolicy()
 
     /**
-     * Apply cleanup after a fixed time from flow start if the flow remains open.
+     * Apply cleanup if a flow stays open beyond a specified time.
      *
-     * Any explicit finish/abort cancels this timeout.
+     * - This API does not guarantee immediate cleanup as soon as the timeout expires — the event becomes eligible
+     *   for cleanup after the duration has passed, and the actual cleanup may occur later.
      *
-     * @param duration Duration after flow start to trigger cleanup.
+     * @param duration Duration after flow start for it to become eligible for cleanup.
      */
     data class OnTimeout(
         val duration: Duration,

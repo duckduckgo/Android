@@ -200,7 +200,11 @@ class WideEventCleanerTest {
             steps = emptyList(),
             metadata = emptyMap(),
             flowEntryPoint = null,
-            cleanupPolicy = null,
+            cleanupPolicy = WideEventRepository.CleanupPolicy.OnTimeout(
+                duration = Duration.ofHours(1),
+                status = WideEventRepository.WideEventStatus.UNKNOWN,
+                metadata = emptyMap(),
+            ),
             activeIntervals = listOf(
                 WideEventRepository.WideEventInterval(
                     name = "interval",
@@ -224,7 +228,7 @@ class WideEventCleanerTest {
     }
 
     @Test
-    fun `No cleanup policy and no interval timeout does nothing`() = runTest {
+    fun `Cleanup policy conditions are not met and no interval timeout does nothing`() = runTest {
         val event = WideEventRepository.WideEvent(
             id = 5L,
             name = "test",
@@ -232,7 +236,11 @@ class WideEventCleanerTest {
             steps = emptyList(),
             metadata = emptyMap(),
             flowEntryPoint = null,
-            cleanupPolicy = null,
+            cleanupPolicy = WideEventRepository.CleanupPolicy.OnTimeout(
+                duration = Duration.ofHours(1),
+                status = WideEventRepository.WideEventStatus.UNKNOWN,
+                metadata = emptyMap(),
+            ),
             activeIntervals = emptyList(),
             createdAt = timeProvider.currentTime,
         )
