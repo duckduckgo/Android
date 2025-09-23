@@ -54,10 +54,10 @@ interface WebMessagingPluginStrategy {
     val objectName: String
 
     /**
-     * Determines whether messaging actions should proceed (i.e. by checking feature flags).
-     * @return true if messaging is allowed, false otherwise
+     * Determines whether messaging can be handled (i.e. by checking feature flags).
+     * @return true if messaging can be handled for this plugin, false otherwise
      */
-    suspend fun isEnabled(): Boolean
+    suspend fun canHandleMessaging(): Boolean
 
     /**
      * Provides the list of message handlers to process incoming messages.

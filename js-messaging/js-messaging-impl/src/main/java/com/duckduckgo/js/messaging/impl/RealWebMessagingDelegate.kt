@@ -46,26 +46,6 @@ import logcat.asLog
 import logcat.logcat
 import org.json.JSONObject
 
-
-/*
-
-
-
-
-
-    override suspend fun unregister(webView: WebView) {
-        if (!webViewCompatContentScopeScripts.isEnabled()) return
-        runCatching {
-            return@runCatching webViewCompatWrapper.removeWebMessageListener(webView, JS_OBJECT_NAME)
-        }.getOrElse { exception ->
-            logcat(ERROR) {
-                "Error removing WebMessageListener for contentScopeAdsjs: ${exception.asLog()}"
-            }
-        }
-    }
-
- */
-
 @ContributesBinding(FragmentScope::class)
 class RealWebMessagingDelegate @Inject constructor(
     private val webViewCompatWrapper: WebViewCompatWrapper,
@@ -178,7 +158,8 @@ class RealWebMessagingDelegate @Inject constructor(
             override suspend fun register(
                 jsMessageCallback: WebViewCompatMessageCallback,
                 webView: WebView,
-            ) {if (!strategy.isEnabled()) {
+            ) {
+                if (!strategy.canHandleMessaging()) {
                 return
             }
 
@@ -204,7 +185,7 @@ class RealWebMessagingDelegate @Inject constructor(
             override suspend fun unregister(
                 webView: WebView,
             ) {
-                if (!strategy.isEnabled()) return
+                if (!strategy.canHandleMessaging()) return
                 runCatching {
                     return@runCatching webViewCompatWrapper.removeWebMessageListener(webView, strategy.objectName)
                 }.getOrElse { exception ->
@@ -231,11 +212,10 @@ class RealWebMessagingDelegate @Inject constructor(
                 }
             }
 
-
             @SuppressLint("RequiresFeature")
             override suspend fun postMessage(webView: WebView, subscriptionEventData: SubscriptionEventData) {
                 runCatching {
-                    if (!strategy.isEnabled()) {
+                    if (!strategy.canHandleMessaging()) {
                         return
                     }
 

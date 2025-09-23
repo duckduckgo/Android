@@ -47,7 +47,7 @@ class ContentScopeScriptsWebMessagingPlugin @Inject constructor(
         override val objectName: String
             get() = "contentScopeAdsjs"
 
-        override suspend fun isEnabled(): Boolean {
+        override suspend fun canHandleMessaging(): Boolean {
             return webViewCompatContentScopeScripts.isEnabled()
         }
 
