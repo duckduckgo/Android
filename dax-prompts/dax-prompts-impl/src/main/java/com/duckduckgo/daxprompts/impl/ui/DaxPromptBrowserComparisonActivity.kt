@@ -16,8 +16,11 @@
 
 package com.duckduckgo.daxprompts.impl.ui
 
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Intent
+import android.content.pm.ActivityInfo
+import android.content.res.Configuration
 import android.graphics.Color
 import android.os.Bundle
 import android.view.WindowManager
@@ -34,6 +37,7 @@ import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.daxprompts.api.DaxPromptBrowserComparisonNoParams
+import com.duckduckgo.daxprompts.impl.R
 import com.duckduckgo.daxprompts.impl.databinding.ActivityDaxPromptBrowserComparisonBinding
 import com.duckduckgo.daxprompts.impl.ui.DaxPromptBrowserComparisonViewModel.Command
 import com.duckduckgo.di.scopes.ActivityScope
@@ -48,6 +52,8 @@ import logcat.logcat
 class DaxPromptBrowserComparisonActivity : DuckDuckGoActivity() {
     private val viewModel: DaxPromptBrowserComparisonViewModel by bindViewModel()
     private val binding: ActivityDaxPromptBrowserComparisonBinding by viewBinding()
+
+    private var lockedInPortraitMode: Boolean = false
 
     private val startBrowserComparisonChartActivityForResult =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result: ActivityResult ->
@@ -71,6 +77,7 @@ class DaxPromptBrowserComparisonActivity : DuckDuckGoActivity() {
         setupListeners()
         setupObservers()
         setupOnBackNavigation()
+        setupOrientationMode()
 
         viewModel.onPromptShown()
     }
@@ -79,6 +86,14 @@ class DaxPromptBrowserComparisonActivity : DuckDuckGoActivity() {
         super.onResume()
         applyFullScreenFlags()
         markAsShown()
+    }
+
+    @SuppressLint("SourceLockedOrientationActivity")
+    override fun onConfigurationChanged(newConfig: Configuration) {
+        super.onConfigurationChanged(newConfig)
+        if (lockedInPortraitMode && newConfig.orientation != Configuration.ORIENTATION_PORTRAIT) {
+            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT)
+        }
     }
 
     private fun setupListeners() {
@@ -146,6 +161,16 @@ class DaxPromptBrowserComparisonActivity : DuckDuckGoActivity() {
                 }
             },
         )
+    }
+
+    @SuppressLint("SourceLockedOrientationActivity")
+    private fun setupOrientationMode() {
+        lockedInPortraitMode = resources.getBoolean(R.bool.lockedInPortraitMode)
+        if (lockedInPortraitMode) {
+            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT)
+        } else {
+            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED)
+        }
     }
 
     companion object {
