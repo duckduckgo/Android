@@ -27,6 +27,12 @@ import com.duckduckgo.autofill.impl.importing.takeout.processor.BookmarkImportPr
 import com.duckduckgo.autofill.impl.importing.takeout.store.BookmarkImportConfigStore
 import com.duckduckgo.autofill.impl.importing.takeout.webflow.ImportGoogleBookmarksWebFlowViewModel.ViewState.HideWebPage
 import com.duckduckgo.autofill.impl.importing.takeout.webflow.ImportGoogleBookmarksWebFlowViewModel.ViewState.ShowWebPage
+import com.duckduckgo.autofill.impl.importing.takeout.webflow.TakeoutMessageResult.TakeoutActionError
+import com.duckduckgo.autofill.impl.importing.takeout.webflow.TakeoutMessageResult.TakeoutActionSuccess
+import com.duckduckgo.autofill.impl.importing.takeout.webflow.TakeoutMessageResult.UnknownMessageFormat
+import com.duckduckgo.autofill.impl.importing.takeout.zip.TakeoutBookmarkExtractor
+import com.duckduckgo.autofill.impl.importing.takeout.zip.TakeoutBookmarkExtractor.ExtractionResult
+import com.duckduckgo.autofill.impl.importing.takeout.zip.TakeoutZipDownloader
 import com.duckduckgo.autofill.impl.store.ReAuthenticationDetails
 import com.duckduckgo.autofill.impl.store.ReauthenticationHandler
 import com.duckduckgo.common.utils.DispatcherProvider
@@ -38,6 +44,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import logcat.logcat
+import logcat.LogPriority.WARN
 import javax.inject.Inject
 
 @ContributesViewModel(FragmentScope::class)
@@ -47,12 +54,15 @@ class ImportGoogleBookmarksWebFlowViewModel @Inject constructor(
     private val autofillFeature: AutofillFeature,
     private val bookmarkImportProcessor: BookmarkImportProcessor,
     private val bookmarkImportConfigStore: BookmarkImportConfigStore,
+    private val takeoutWebMessageParser: TakeoutWebMessageParser,
 ) : ViewModel() {
     private val _viewState = MutableStateFlow<ViewState>(ViewState.Initializing)
     val viewState: StateFlow<ViewState> = _viewState
 
     private val _commands = MutableSharedFlow<Command>(replay = 0, extraBufferCapacity = 1)
     val commands: SharedFlow<Command> = _commands
+
+    private var latestStepInWebFlow: String = STEP_UNINITIALIZED
 
     suspend fun loadInitialWebpage() {
         withContext(dispatchers.io()) {
@@ -129,22 +139,22 @@ class ImportGoogleBookmarksWebFlowViewModel @Inject constructor(
     }
 
     fun onCloseButtonPressed() {
-        terminateFlowAsCancellation()
+        terminateFlowAsCancellation(latestStepInWebFlow)
     }
 
     fun onBackButtonPressed(canGoBack: Boolean = false) {
         // if WebView can't go back, then we're at the first stage or something's gone wrong. Either way, time to cancel out of the screen.
         if (!canGoBack) {
-            terminateFlowAsCancellation()
+            terminateFlowAsCancellation(latestStepInWebFlow)
             return
         }
 
         _viewState.value = ViewState.NavigatingBack
     }
 
-    private fun terminateFlowAsCancellation() {
+    private fun terminateFlowAsCancellation(stage: String) {
         viewModelScope.launch {
-            _viewState.value = ViewState.UserCancelledImportFlow(stage = "unknown")
+            _viewState.value = ViewState.UserCancelledImportFlow(stage)
         }
     }
 
@@ -223,10 +233,61 @@ class ImportGoogleBookmarksWebFlowViewModel @Inject constructor(
     fun onPageStarted(url: String?) {
         val host = url?.toUri()?.host ?: return
         _viewState.value = if (host.contains("takeout.google.com", ignoreCase = true)) {
+            updateLatestStepSpecificStage(GOOGLE_TAKEOUT_PAGE_REACHED)
             HideWebPage
+        } else if (host.contains("accounts.google.com", ignoreCase = true)) {
+            updateLatestStepLoginPage()
+            ShowWebPage
         } else {
             ShowWebPage
         }
+    }
+
+    private fun updateLatestStepLoginPage() {
+        // if we already have the login page as the current step, do nothing
+        if (latestStepInWebFlow == GOOGLE_ACCOUNTS_PAGE_FIRST || latestStepInWebFlow == GOOGLE_ACCOUNTS_REPEATED) {
+            return
+        }
+
+        // if uninitialized, this is the first time seeing the login page
+        if (latestStepInWebFlow == STEP_UNINITIALIZED) {
+            updateLatestStepSpecificStage(GOOGLE_ACCOUNTS_PAGE_FIRST)
+            return
+        }
+
+        // this must be a repeated visit to the login page
+        updateLatestStepSpecificStage(GOOGLE_ACCOUNTS_REPEATED)
+    }
+
+    private fun updateLatestStepSpecificStage(step: String) {
+        latestStepInWebFlow = step
+        logcat { "cdr latest step is: $step" }
+    }
+
+    fun onWebMessageReceived(data: String) {
+        viewModelScope.launch {
+            when (val result = takeoutWebMessageParser.parseMessage(data)) {
+                is TakeoutActionSuccess -> {
+                    logcat { "cdr successfully parsed message: $result" }
+                    updateLatestStepSpecificStage(result.actionID)
+                }
+
+                is TakeoutActionError -> {
+                    logcat { "cdr experienced an error in the step: $result, raw:$data" }
+                }
+
+                UnknownMessageFormat -> {
+                    logcat(WARN) { "cdr failed to parse message, unknown format: $data" }
+                }
+            }
+        }
+    }
+
+    companion object {
+        private const val GOOGLE_TAKEOUT_PAGE_REACHED = "takeout"
+        private const val GOOGLE_ACCOUNTS_PAGE_FIRST = "login-first"
+        private const val GOOGLE_ACCOUNTS_REPEATED = "login-repeat"
+        private const val STEP_UNINITIALIZED = "uninitialized"
     }
 
     sealed interface Command {

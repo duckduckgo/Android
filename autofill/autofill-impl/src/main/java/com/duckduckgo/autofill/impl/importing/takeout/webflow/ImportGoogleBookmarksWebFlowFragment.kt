@@ -48,6 +48,9 @@ import com.duckduckgo.autofill.impl.importing.gpm.webflow.autofill.NoOpAutofillE
 import com.duckduckgo.autofill.impl.importing.gpm.webflow.autofill.NoOpEmailProtectionInContextSignupFlowListener
 import com.duckduckgo.autofill.impl.importing.gpm.webflow.autofill.NoOpEmailProtectionUserPromptListener
 import com.duckduckgo.autofill.impl.importing.takeout.store.BookmarkImportConfigStore
+import com.duckduckgo.autofill.impl.importing.takeout.webflow.ImportGoogleBookmarkResult.Error
+import com.duckduckgo.autofill.impl.importing.takeout.webflow.ImportGoogleBookmarkResult.Success
+import com.duckduckgo.autofill.impl.importing.takeout.webflow.ImportGoogleBookmarkResult.UserCancelled
 import com.duckduckgo.autofill.impl.importing.takeout.webflow.ImportGoogleBookmarksWebFlowViewModel.Command.ExitFlowAsFailure
 import com.duckduckgo.autofill.impl.importing.takeout.webflow.ImportGoogleBookmarksWebFlowViewModel.Command.ExitFlowWithSuccess
 import com.duckduckgo.autofill.impl.importing.takeout.webflow.ImportGoogleBookmarksWebFlowViewModel.Command.InjectCredentialsFromReauth
@@ -201,16 +204,16 @@ class ImportGoogleBookmarksWebFlowFragment :
                         // Inject null to indicate no credentials available
                         browserAutofill.injectCredentials(null)
                     }
-                    is PromptUserToSelectFromStoredCredentials ->
-                        showCredentialChooserDialog(
-                            command.originalUrl,
-                            command.credentials,
-                            command.triggerType,
-                        )
+                    is PromptUserToSelectFromStoredCredentials -> showCredentialChooserDialog(
+                        command.originalUrl,
+                        command.credentials,
+                        command.triggerType,
+                    )
                     is ExitFlowWithSuccess -> exitFlowAsSuccess(command.importedCount)
                     is ExitFlowAsFailure -> exitFlowAsError(command.reason)
                 }
-            }.launchIn(lifecycleScope)
+            }
+            .launchIn(lifecycleScope)
     }
 
     private suspend fun injectReauthenticationCredentials(
@@ -225,12 +228,11 @@ class ImportGoogleBookmarksWebFlowFragment :
                     return@withContext
                 }
 
-                val credentials =
-                    LoginCredentials(
-                        domain = url,
-                        username = username,
-                        password = password,
-                    )
+                val credentials = LoginCredentials(
+                    domain = url,
+                    username = username,
+                    password = password,
+                )
 
                 logcat { "Injecting re-authentication credentials" }
                 browserAutofill.injectCredentials(credentials)
@@ -320,6 +322,11 @@ class ImportGoogleBookmarksWebFlowFragment :
         } else {
             logcat(WARN) { "Bookmark-import: Not able to inject bookmark import JavaScript" }
         }
+
+        WebViewCompat.addWebMessageListener(webView, "ddgBookmarkImport", setOf("*")) { _, message, sourceOrigin, _, _ ->
+            val data = message.data ?: return@addWebMessageListener
+            viewModel.onWebMessageReceived(data)
+        }
     }
 
     private fun initialiseToolbar() {
@@ -358,26 +365,26 @@ class ImportGoogleBookmarksWebFlowFragment :
     }
 
     private fun exitFlowAsSuccess(importedCount: Int = 0) {
-        val result =
-            Bundle().apply {
-                putParcelable(ImportGoogleBookmarkResult.Companion.RESULT_KEY_DETAILS, ImportGoogleBookmarkResult.Success(importedCount))
-            }
+        logcat { "cdr exiting flow as success: $importedCount bookmarks imported" }
+        val result = Bundle().apply {
+            putParcelable(ImportGoogleBookmarkResult.Companion.RESULT_KEY_DETAILS, Success(importedCount))
+        }
         setFragmentResult(ImportGoogleBookmarkResult.Companion.RESULT_KEY, result)
     }
 
     private fun exitFlowAsCancellation(stage: String) {
-        val result =
-            Bundle().apply {
-                putParcelable(ImportGoogleBookmarkResult.Companion.RESULT_KEY_DETAILS, ImportGoogleBookmarkResult.UserCancelled(stage))
-            }
+        logcat { "cdr exiting flow as cancellation at stage: $stage" }
+        val result = Bundle().apply {
+            putParcelable(ImportGoogleBookmarkResult.Companion.RESULT_KEY_DETAILS, UserCancelled(stage))
+        }
         setFragmentResult(ImportGoogleBookmarkResult.Companion.RESULT_KEY, result)
     }
 
     private fun exitFlowAsError(reason: UserCannotImportReason) {
-        val result =
-            Bundle().apply {
-                putParcelable(ImportGoogleBookmarkResult.Companion.RESULT_KEY_DETAILS, ImportGoogleBookmarkResult.Error(reason))
-            }
+        logcat { "cdr exiting flow as error: $reason" }
+        val result = Bundle().apply {
+            putParcelable(ImportGoogleBookmarkResult.Companion.RESULT_KEY_DETAILS, Error(reason))
+        }
         setFragmentResult(ImportGoogleBookmarkResult.Companion.RESULT_KEY, result)
     }
 
@@ -393,13 +400,12 @@ class ImportGoogleBookmarksWebFlowFragment :
                 return@withContext
             }
 
-            val dialog =
-                credentialAutofillDialogFactory.autofillSelectCredentialsDialog(
-                    url,
-                    credentials,
-                    triggerType,
-                    CUSTOM_FLOW_TAB_ID,
-                )
+            val dialog = credentialAutofillDialogFactory.autofillSelectCredentialsDialog(
+                url,
+                credentials,
+                triggerType,
+                CUSTOM_FLOW_TAB_ID,
+            )
             dialog.show(childFragmentManager, SELECT_CREDENTIALS_FRAGMENT_TAG)
         }
     }
