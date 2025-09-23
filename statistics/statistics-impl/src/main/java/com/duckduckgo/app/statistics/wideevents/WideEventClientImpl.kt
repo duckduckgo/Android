@@ -17,15 +17,19 @@
 package com.duckduckgo.app.statistics.wideevents
 
 import com.duckduckgo.app.statistics.wideevents.db.WideEventRepository
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import java.time.Duration
 import javax.inject.Inject
 import kotlin.runCatching
+import kotlinx.coroutines.withContext
 
 @ContributesBinding(AppScope::class)
 class WideEventClientImpl @Inject constructor(
     private val wideEventRepository: WideEventRepository,
+    private val wideEventFeature: WideEventFeature,
+    private val dispatcherProvider: DispatcherProvider,
 ) : WideEventClient {
 
     override suspend fun flowStart(
@@ -33,13 +37,17 @@ class WideEventClientImpl @Inject constructor(
         flowEntryPoint: String?,
         metadata: Map<String, String>,
         cleanupPolicy: CleanupPolicy,
-    ): Result<Long> = runCatching {
-        wideEventRepository.insertWideEvent(
-            name = name,
-            flowEntryPoint = flowEntryPoint,
-            metadata = metadata,
-            cleanupPolicy = cleanupPolicy.mapToRepositoryCleanupPolicy(),
-        )
+    ): Result<Long> {
+        if (!isFeatureEnabled()) return Result.failure(Exception("Wide events feature disabled"))
+
+        return runCatching {
+            wideEventRepository.insertWideEvent(
+                name = name,
+                flowEntryPoint = flowEntryPoint,
+                metadata = metadata,
+                cleanupPolicy = cleanupPolicy.mapToRepositoryCleanupPolicy(),
+            )
+        }
     }
 
     override suspend fun flowStep(
@@ -47,58 +55,87 @@ class WideEventClientImpl @Inject constructor(
         stepName: String,
         success: Boolean,
         metadata: Map<String, String>,
-    ): Result<Unit> = runCatching {
-        wideEventRepository.addWideEventStep(
-            eventId = wideEventId,
-            step = WideEventRepository.WideEventStep(name = stepName, success = success),
-            metadata = metadata,
-        )
+    ): Result<Unit> {
+        if (!isFeatureEnabled()) return Result.failure(Exception("Wide events feature disabled"))
+
+        return runCatching {
+            wideEventRepository.addWideEventStep(
+                eventId = wideEventId,
+                step = WideEventRepository.WideEventStep(name = stepName, success = success),
+                metadata = metadata,
+            )
+        }
     }
 
     override suspend fun flowFinish(
         wideEventId: Long,
         status: FlowStatus,
         metadata: Map<String, String>,
-    ): Result<Unit> = runCatching {
-        val (wideEventStatus, statusMetadata) = status.mapToWideEventStatus()
+    ): Result<Unit> {
+        if (!isFeatureEnabled()) return Result.failure(Exception("Wide events feature disabled"))
 
-        wideEventRepository.setWideEventStatus(
-            eventId = wideEventId,
-            status = wideEventStatus,
-            metadata = metadata + statusMetadata,
-        )
+        return runCatching {
+            val (wideEventStatus, statusMetadata) = status.mapToWideEventStatus()
+
+            wideEventRepository.setWideEventStatus(
+                eventId = wideEventId,
+                status = wideEventStatus,
+                metadata = metadata + statusMetadata,
+            )
+        }
     }
 
-    override suspend fun flowAbort(wideEventId: Long): Result<Unit> = runCatching {
-        val deleted = wideEventRepository.deleteWideEvent(wideEventId)
-        check(deleted) { "There is no event with given ID" }
+    override suspend fun flowAbort(wideEventId: Long): Result<Unit> {
+        if (!isFeatureEnabled()) return Result.failure(Exception("Wide events feature disabled"))
+
+        return runCatching {
+            val deleted = wideEventRepository.deleteWideEvent(wideEventId)
+            check(deleted) { "There is no event with given ID" }
+        }
     }
 
-    override suspend fun getFlowIds(name: String): Result<List<Long>> = runCatching {
-        wideEventRepository.getActiveWideEventIdsByName(name)
+    override suspend fun getFlowIds(name: String): Result<List<Long>> {
+        if (!isFeatureEnabled()) return Result.failure(Exception("Wide events feature disabled"))
+
+        return runCatching {
+            wideEventRepository.getActiveWideEventIdsByName(name)
+        }
     }
 
     override suspend fun intervalStart(
         wideEventId: Long,
         key: String,
         timeout: Duration?,
-    ): Result<Unit> = runCatching {
-        wideEventRepository.startInterval(
-            eventId = wideEventId,
-            name = key,
-            timeout = timeout,
-        )
+    ): Result<Unit> {
+        if (!isFeatureEnabled()) return Result.failure(Exception("Wide events feature disabled"))
+
+        return runCatching {
+            wideEventRepository.startInterval(
+                eventId = wideEventId,
+                name = key,
+                timeout = timeout,
+            )
+        }
     }
 
     override suspend fun intervalEnd(
         wideEventId: Long,
         key: String,
-    ): Result<Duration> = runCatching {
-        wideEventRepository.endInterval(
-            eventId = wideEventId,
-            name = key,
-        )
+    ): Result<Duration> {
+        if (!isFeatureEnabled()) return Result.failure(Exception("Wide events feature disabled"))
+
+        return runCatching {
+            wideEventRepository.endInterval(
+                eventId = wideEventId,
+                name = key,
+            )
+        }
     }
+
+    private suspend fun isFeatureEnabled(): Boolean =
+        withContext(dispatcherProvider.io()) {
+            wideEventFeature.self().isEnabled()
+        }
 }
 
 private fun FlowStatus.mapToWideEventStatus(): Pair<WideEventRepository.WideEventStatus, Map<String, String>> {

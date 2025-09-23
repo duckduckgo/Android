@@ -71,6 +71,7 @@ dependencies {
     testImplementation "androidx.lifecycle:lifecycle-runtime-testing:_"
     testImplementation project(path: ':common-test')
     testImplementation project(':data-store-test')
+    testImplementation project(':feature-toggles-test')
     testImplementation CashApp.turbine
     testImplementation Testing.robolectric
     testImplementation(KotlinX.coroutines.test) {

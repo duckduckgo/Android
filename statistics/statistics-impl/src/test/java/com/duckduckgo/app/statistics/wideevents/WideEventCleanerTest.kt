@@ -21,6 +21,8 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.app.statistics.wideevents.db.WideEventRepository
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.CurrentTimeProvider
+import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
+import com.duckduckgo.feature.toggles.api.Toggle.State
 import java.time.Duration
 import java.time.Instant
 import java.time.LocalDateTime
@@ -49,10 +51,16 @@ class WideEventCleanerTest {
         override fun localDateTimeNow(): LocalDateTime = throw UnsupportedOperationException()
     }
 
+    private val wideEventFeature: WideEventFeature = FakeFeatureToggleFactory
+        .create(WideEventFeature::class.java)
+        .apply { self().setRawStoredState(State(true)) }
+
     private val cleaner = WideEventCleaner(
         appCoroutineScope = coroutineRule.testScope,
         wideEventRepository = wideEventRepository,
         currentTimeProvider = timeProvider,
+        wideEventFeature = wideEventFeature,
+        dispatcherProvider = coroutineRule.testDispatcherProvider,
     )
     private val lifecycleOwner: LifecycleOwner = mock()
 
