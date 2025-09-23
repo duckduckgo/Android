@@ -154,7 +154,7 @@ class RealWebMessagingDelegate @Inject constructor(
                 webView: WebView,
             ) {
                 appCoroutineScope.launch {
-                    if (!strategy.isEnabled()) {
+                    if (!strategy.canHandleMessaging()) {
                         return@launch
                     }
 
@@ -180,7 +180,7 @@ class RealWebMessagingDelegate @Inject constructor(
                 webView: WebView,
             ) {
                 appCoroutineScope.launch {
-                    if (!strategy.isEnabled()) return@launch
+                    if (!strategy.canHandleMessaging()) return@launch
                     runCatching {
                         return@runCatching webViewCompatWrapper.removeWebMessageListener(webView, strategy.objectName)
                     }.getOrElse { exception ->
@@ -210,7 +210,7 @@ class RealWebMessagingDelegate @Inject constructor(
             override fun postMessage(subscriptionEventData: SubscriptionEventData) {
                 runCatching {
                     appCoroutineScope.launch {
-                        if (!strategy.isEnabled()) {
+                        if (!strategy.canHandleMessaging()) {
                             return@launch
                         }
 
