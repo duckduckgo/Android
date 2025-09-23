@@ -24,7 +24,7 @@ import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.browser.api.webviewcompat.WebViewCompatWrapper
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.js.messaging.api.AddDocumentStartJavaScriptPlugin
+import com.duckduckgo.js.messaging.api.AddDocumentStartJavaScript
 import com.duckduckgo.js.messaging.api.AddDocumentStartJavaScriptScriptStrategy
 import com.duckduckgo.js.messaging.api.AddDocumentStartScriptDelegate
 import com.squareup.anvil.annotations.ContributesBinding
@@ -45,8 +45,8 @@ class RealAddDocumentStartScriptDelegate @Inject constructor(
     private val webViewCompatWrapper: WebViewCompatWrapper,
 ) : AddDocumentStartScriptDelegate {
 
-    override fun createPlugin(strategy: AddDocumentStartJavaScriptScriptStrategy): AddDocumentStartJavaScriptPlugin {
-        return object : AddDocumentStartJavaScriptPlugin {
+    override fun createPlugin(strategy: AddDocumentStartJavaScriptScriptStrategy): AddDocumentStartJavaScript {
+        return object : AddDocumentStartJavaScript {
 
             private var script: ScriptHandler? = null
             private var currentScriptString: String? = null

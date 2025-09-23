@@ -84,7 +84,7 @@ import com.duckduckgo.duckplayer.api.DuckPlayer.OpenDuckPlayerInNewTab.On
 import com.duckduckgo.duckplayer.api.DuckPlayer.OpenDuckPlayerInNewTab.Unavailable
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.history.api.NavigationHistory
-import com.duckduckgo.js.messaging.api.AddDocumentStartJavaScriptPlugin
+import com.duckduckgo.js.messaging.api.AddDocumentStartJavaScript
 import com.duckduckgo.js.messaging.api.PostMessageWrapperPlugin
 import com.duckduckgo.js.messaging.api.SubscriptionEventData
 import com.duckduckgo.js.messaging.api.WebMessagingPlugin
@@ -1330,7 +1330,7 @@ class BrowserWebViewClientTest {
         const val EXAMPLE_URL = "https://example.com"
     }
 
-    class FakeAddDocumentStartJavaScriptPlugin : AddDocumentStartJavaScriptPlugin {
+    class FakeAddDocumentStartJavaScript : AddDocumentStartJavaScript {
 
         var countInitted = 0
             private set
@@ -1342,9 +1342,9 @@ class BrowserWebViewClientTest {
         }
     }
 
-    class FakeAddDocumentStartJavaScriptPluginPoint : PluginPoint<AddDocumentStartJavaScriptPlugin> {
+    class FakeAddDocumentStartJavaScriptPluginPoint : PluginPoint<AddDocumentStartJavaScript> {
 
-        val plugin = FakeAddDocumentStartJavaScriptPlugin()
+        val plugin = FakeAddDocumentStartJavaScript()
 
         override fun getPlugins() = listOf(plugin)
     }

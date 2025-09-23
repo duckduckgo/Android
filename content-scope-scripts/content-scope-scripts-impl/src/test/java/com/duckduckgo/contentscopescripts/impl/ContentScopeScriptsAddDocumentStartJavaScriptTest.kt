@@ -15,7 +15,7 @@ import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
-class ContentScopeScriptsAddDocumentStartJavaScriptPluginTest {
+class ContentScopeScriptsAddDocumentStartJavaScriptTest {
 
     @get:Rule
     var coroutineRule = CoroutineTestRule()
@@ -26,12 +26,12 @@ class ContentScopeScriptsAddDocumentStartJavaScriptPluginTest {
     private val mockWebView: WebView = mock()
     private val mockActiveContentScopeExperiments: ContentScopeExperiments = mock()
 
-    private lateinit var testee: ContentScopeScriptsAddDocumentStartJavaScriptPlugin
+    private lateinit var testee: ContentScopeScriptsAddDocumentStartJavaScript
 
     @Before
     fun setUp() = runTest {
         whenever(mockActiveContentScopeExperiments.getActiveExperiments()).thenReturn(listOf())
-        testee = ContentScopeScriptsAddDocumentStartJavaScriptPlugin(
+        testee = ContentScopeScriptsAddDocumentStartJavaScript(
             mockWebViewCompatContentScopeScripts,
             coroutineRule.testDispatcherProvider,
             mockWebViewCapabilityChecker,

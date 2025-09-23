@@ -65,6 +65,7 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.autoconsent.api.Autoconsent
 import com.duckduckgo.autofill.api.BrowserAutofill
 import com.duckduckgo.autofill.api.InternalTestUserChecker
+import com.duckduckgo.browser.api.AddDocumentStartJavaScriptPlugin
 import com.duckduckgo.browser.api.JsInjectorPlugin
 import com.duckduckgo.common.utils.AppUrl.ParamKey.QUERY
 import com.duckduckgo.common.utils.CurrentTimeProvider
@@ -79,7 +80,6 @@ import com.duckduckgo.duckplayer.api.DuckPlayer.DuckPlayerState.ENABLED
 import com.duckduckgo.duckplayer.api.DuckPlayer.OpenDuckPlayerInNewTab.On
 import com.duckduckgo.duckplayer.impl.DUCK_PLAYER_OPEN_IN_YOUTUBE_PATH
 import com.duckduckgo.history.api.NavigationHistory
-import com.duckduckgo.js.messaging.api.AddDocumentStartJavaScriptPlugin
 import com.duckduckgo.js.messaging.api.PostMessageWrapperPlugin
 import com.duckduckgo.js.messaging.api.SubscriptionEventData
 import com.duckduckgo.js.messaging.api.WebMessagingPlugin
@@ -473,7 +473,7 @@ class BrowserWebViewClient @Inject constructor(
 
     fun configureWebView(webView: DuckDuckGoWebView, callback: WebViewCompatMessageCallback?) {
         addDocumentStartJavascriptPlugins.getPlugins().forEach { plugin ->
-            plugin.addDocumentStartJavaScript(webView)
+            plugin.addDocumentStartJavaScript().addDocumentStartJavaScript(webView)
         }
 
         callback?.let {
@@ -497,7 +497,7 @@ class BrowserWebViewClient @Inject constructor(
                 )
             }
             addDocumentStartJavascriptPlugins.getPlugins().forEach {
-                it.addDocumentStartJavaScript(
+                it.addDocumentStartJavaScript().addDocumentStartJavaScript(
                     webView,
                 )
             }
