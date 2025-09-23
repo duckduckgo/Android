@@ -116,6 +116,13 @@ interface AutofillFeature {
     fun canImportFromGooglePasswordManager(): Toggle
 
     /**
+     * Remote Flag that enables the ability to import bookmarks directly from Google Takeout
+     * @return `true` when the remote config has "canImportBookmarksFromGoogleTakeout" autofill sub-feature flag enabled
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    fun canImportBookmarksFromGoogleTakeout(): Toggle
+
+    /**
      * Remote flag that enables the ability to support partial form saves. A partial form save is common with scenarios like:
      *  - a multi-step login form where username and password are entered on separate pages
      *  - password reset flow
