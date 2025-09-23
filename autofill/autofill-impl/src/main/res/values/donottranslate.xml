@@ -16,4 +16,8 @@
 
 <resources>
 
+    <!-- Import Bookmarks Strings -->
+    <string name="autofillImportBookmarksChromeFolderName">Imported from Chrome</string>
+
+
 </resources>
