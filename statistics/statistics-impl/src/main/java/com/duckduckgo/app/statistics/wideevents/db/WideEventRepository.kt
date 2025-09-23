@@ -42,6 +42,8 @@ interface WideEventRepository {
 
     suspend fun deleteWideEvent(eventId: Long): Boolean
 
+    suspend fun getActiveWideEventIds(): List<Long>
+
     suspend fun getActiveWideEventIdsByName(eventName: String): List<Long>
 
     fun getCompletedWideEventIdsFlow(): Flow<Set<Long>>
