@@ -88,6 +88,10 @@ class WideEventRepositoryImpl @Inject constructor(
         }
     }
 
+    override suspend fun getActiveWideEventIds(): List<Long> {
+        return wideEventDao.getActiveWideEventIds()
+    }
+
     override suspend fun getActiveWideEventIdsByName(eventName: String): List<Long> {
         return wideEventDao.getActiveWideEventIdsByName(eventName)
     }

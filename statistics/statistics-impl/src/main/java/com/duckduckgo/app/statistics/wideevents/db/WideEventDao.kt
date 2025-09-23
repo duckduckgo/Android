@@ -33,6 +33,9 @@ interface WideEventDao {
     @Query("SELECT * FROM wide_events WHERE id IN (:ids)")
     suspend fun getWideEventsByIds(ids: Set<Long>): List<WideEventEntity>
 
+    @Query("SELECT id FROM wide_events WHERE status is null ORDER BY id ASC")
+    suspend fun getActiveWideEventIds(): List<Long>
+
     @Query("SELECT id FROM wide_events WHERE name = :name AND status is null ORDER BY id ASC")
     suspend fun getActiveWideEventIdsByName(name: String): List<Long>
 
