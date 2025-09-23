@@ -26,15 +26,17 @@ class ImportGoogleBookmarksWebFlowViewModelTest {
     val coroutineTestRule: CoroutineTestRule = CoroutineTestRule()
 
     private val mockBookmarkImportProcessor: BookmarkImportProcessor = mock()
+    private val mockWebFlowStepTracker: BookmarkImportWebFlowStepTracker = mock()
 
-    private val testee =
-        ImportGoogleBookmarksWebFlowViewModel(
-            dispatchers = coroutineTestRule.testDispatcherProvider,
-            reauthenticationHandler = mock(),
-            autofillFeature = mock(),
-            bookmarkImportProcessor = mockBookmarkImportProcessor,
-            bookmarkImportConfigStore = mock(),
-        )
+    private val testee = ImportGoogleBookmarksWebFlowViewModel(
+        dispatchers = coroutineTestRule.testDispatcherProvider,
+        reauthenticationHandler = mock(),
+        autofillFeature = mock(),
+        bookmarkImportProcessor = mockBookmarkImportProcessor,
+        bookmarkImportConfigStore = mock(),
+        takeoutWebMessageParser = mock(),
+        webFlowStepTracker = mockWebFlowStepTracker,
+    )
 
     @Test
     fun whenOnPageStartedWithTakeoutUrlThenHideWebPage() =
@@ -141,6 +143,13 @@ class ImportGoogleBookmarksWebFlowViewModelTest {
                 triggerDownloadDetectedButNotATakeoutZip()
                 awaitItem() as Command.ExitFlowAsFailure
             }
+        }
+
+    @Test
+    fun whenUpdateLatestStepLoginPageFromUninitializedThenSetsToFirstVisit() =
+        runTest {
+            testee.onPageStarted("https://accounts.google.com")
+            assertEquals(ShowWebPage, testee.viewState.value)
         }
 
     private fun triggerDownloadDetectedWithTakeoutZip() {
