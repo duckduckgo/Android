@@ -16,6 +16,7 @@
 
 package com.duckduckgo.autofill.impl.importing.takeout.webflow
 
+import androidx.core.net.toUri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
@@ -24,6 +25,8 @@ import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.autofill.api.domain.app.LoginTriggerType
 import com.duckduckgo.autofill.impl.importing.takeout.processor.BookmarkImportProcessor
 import com.duckduckgo.autofill.impl.importing.takeout.store.BookmarkImportConfigStore
+import com.duckduckgo.autofill.impl.importing.takeout.webflow.ImportGoogleBookmarksWebFlowViewModel.ViewState.HideWebPage
+import com.duckduckgo.autofill.impl.importing.takeout.webflow.ImportGoogleBookmarksWebFlowViewModel.ViewState.ShowWebPage
 import com.duckduckgo.autofill.impl.store.ReAuthenticationDetails
 import com.duckduckgo.autofill.impl.store.ReauthenticationHandler
 import com.duckduckgo.common.utils.DispatcherProvider
@@ -146,7 +149,7 @@ class ImportGoogleBookmarksWebFlowViewModel @Inject constructor(
     }
 
     fun firstPageLoading() {
-        _viewState.value = ViewState.ShowWebPage
+        _viewState.value = ShowWebPage
     }
 
     suspend fun getReauthData(originalUrl: String): ReAuthenticationDetails? =
@@ -217,6 +220,15 @@ class ImportGoogleBookmarksWebFlowViewModel @Inject constructor(
         reauthenticationHandler.storeForReauthentication(currentUrl, credentials.password)
     }
 
+    fun onPageStarted(url: String?) {
+        val host = url?.toUri()?.host ?: return
+        _viewState.value = if (host.contains("takeout.google.com", ignoreCase = true)) {
+            HideWebPage
+        } else {
+            ShowWebPage
+        }
+    }
+
     sealed interface Command {
         data class InjectCredentialsFromReauth(
             val url: String? = null,
@@ -245,6 +257,7 @@ class ImportGoogleBookmarksWebFlowViewModel @Inject constructor(
         data object Initializing : ViewState
 
         data object ShowWebPage : ViewState
+        data object HideWebPage : ViewState
 
         data class LoadingWebPage(
             val url: String,
