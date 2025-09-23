@@ -27,14 +27,14 @@ class ImportGoogleBookmarksWebFlowViewModelTest {
 
     private val mockBookmarkImportProcessor: BookmarkImportProcessor = mock()
 
-    private val testee =
-        ImportGoogleBookmarksWebFlowViewModel(
-            dispatchers = coroutineTestRule.testDispatcherProvider,
-            reauthenticationHandler = mock(),
-            autofillFeature = mock(),
-            bookmarkImportProcessor = mockBookmarkImportProcessor,
-            bookmarkImportConfigStore = mock(),
-        )
+    private val testee = ImportGoogleBookmarksWebFlowViewModel(
+        dispatchers = coroutineTestRule.testDispatcherProvider,
+        reauthenticationHandler = mock(),
+        autofillFeature = mock(),
+        bookmarkImportProcessor = mockBookmarkImportProcessor,
+        bookmarkImportConfigStore = mock(),
+        takeoutWebMessageParser = mock(),
+    )
 
     @Test
     fun whenOnPageStartedWithTakeoutUrlThenHideWebPage() =
