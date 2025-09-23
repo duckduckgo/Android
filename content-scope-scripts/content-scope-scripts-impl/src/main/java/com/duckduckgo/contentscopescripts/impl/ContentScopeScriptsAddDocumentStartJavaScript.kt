@@ -18,20 +18,18 @@ package com.duckduckgo.contentscopescripts.impl
 
 import com.duckduckgo.contentscopescripts.api.contentscopeExperiments.ContentScopeExperiments
 import com.duckduckgo.di.scopes.FragmentScope
-import com.duckduckgo.js.messaging.api.AddDocumentStartJavaScriptPlugin
+import com.duckduckgo.js.messaging.api.AddDocumentStartJavaScript
 import com.duckduckgo.js.messaging.api.AddDocumentStartJavaScriptScriptStrategy
 import com.duckduckgo.js.messaging.api.AddDocumentStartScriptDelegate
-import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.SingleInstanceIn
 import javax.inject.Inject
 
 @SingleInstanceIn(FragmentScope::class)
-@ContributesMultibinding(FragmentScope::class)
-class ContentScopeScriptsAddDocumentStartJavaScriptPlugin @Inject constructor(
+class ContentScopeScriptsAddDocumentStartJavaScript @Inject constructor(
     webViewCompatContentScopeScripts: WebViewCompatContentScopeScripts,
     contentScopeExperiments: ContentScopeExperiments,
     scriptInjectorDelegate: AddDocumentStartScriptDelegate,
-) : AddDocumentStartJavaScriptPlugin by scriptInjectorDelegate.createPlugin(
+) : AddDocumentStartJavaScript by scriptInjectorDelegate.createPlugin(
     object : AddDocumentStartJavaScriptScriptStrategy {
         override suspend fun canInject(): Boolean {
             return webViewCompatContentScopeScripts.isEnabled()

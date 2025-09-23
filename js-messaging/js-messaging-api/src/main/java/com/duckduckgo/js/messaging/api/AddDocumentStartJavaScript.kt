@@ -23,8 +23,11 @@ import android.webkit.WebView
  * * Allows plugins to inject JavaScript that will be executed before any other scripts on the page.
  * Useful for privacy protections and that need to run as early as possible and/or on iframes.
  */
-interface AddDocumentStartJavaScriptPlugin {
-    suspend fun addDocumentStartJavaScript(webView: WebView)
+interface AddDocumentStartJavaScript {
+
+    suspend fun addDocumentStartJavaScript(
+        webView: WebView,
+    )
 
     val context: String
 }
@@ -59,7 +62,7 @@ interface AddDocumentStartScriptDelegate {
     /**
      * Creates an AddDocumentStartJavaScriptPlugin implementation with the given [AddDocumentStartJavaScriptScriptStrategy].
      * @param strategy the strategy to use for determining injection behavior
-     * @return [AddDocumentStartJavaScriptPlugin] implementation
+     * @return [AddDocumentStartJavaScript] implementation
      */
-    fun createPlugin(strategy: AddDocumentStartJavaScriptScriptStrategy): AddDocumentStartJavaScriptPlugin
+    fun createPlugin(strategy: AddDocumentStartJavaScriptScriptStrategy): AddDocumentStartJavaScript
 }
