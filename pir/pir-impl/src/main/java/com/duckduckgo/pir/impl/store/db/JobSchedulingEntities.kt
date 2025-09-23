@@ -41,3 +41,19 @@ data class OptOutJobRecordEntity(
     val optOutRequestedDate: Long = 0L,
     val optOutRemovedDate: Long = 0L,
 )
+
+@Entity(tableName = "pir_email_confirmation_job_record")
+data class EmailConfirmationJobRecordEntity(
+    @PrimaryKey val extractedProfileId: Long,
+    val brokerName: String,
+    val userProfileId: Long,
+    val email: String,
+    val attemptId: String,
+    val dateCreatedInMillis: Long,
+    val emailConfirmationLink: String = "",
+    val linkFetchAttemptCount: Int = 0,
+    val lastLinkFetchDateInMillis: Long = 0L,
+    val jobAttemptCount: Int = 0,
+    val lastJobAttemptDateInMillis: Long = 0L,
+    val deprecated: Boolean = false,
+)
