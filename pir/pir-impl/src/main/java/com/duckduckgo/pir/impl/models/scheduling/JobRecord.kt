@@ -102,4 +102,31 @@ sealed class JobRecord(
             INVALID,
         }
     }
+
+    data class EmailConfirmationJobRecord(
+        override val brokerName: String,
+        override val userProfileId: Long,
+        val extractedProfileId: Long,
+        val emailData: EmailData,
+        val linkFetchData: LinkFetchData = LinkFetchData(),
+        val jobAttemptData: JobAttemptData = JobAttemptData(),
+        val dateCreatedInMillis: Long,
+        val deprecated: Boolean = false,
+    ) : JobRecord(brokerName, userProfileId) {
+        data class EmailData(
+            val email: String,
+            val attemptId: String,
+        )
+
+        data class LinkFetchData(
+            val emailConfirmationLink: String = "",
+            val linkFetchAttemptCount: Int = 0,
+            val lastLinkFetchDateInMillis: Long = 0L,
+        )
+
+        data class JobAttemptData(
+            val jobAttemptCount: Int = 0,
+            val lastJobAttemptDateInMillis: Long = 0L,
+        )
+    }
 }
