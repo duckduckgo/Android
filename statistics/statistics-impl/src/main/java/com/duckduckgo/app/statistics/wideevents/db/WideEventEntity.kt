@@ -21,10 +21,15 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 import androidx.room.ProvidedTypeConverter
 import androidx.room.TypeConverter
+import com.squareup.moshi.FromJson
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
+import com.squareup.moshi.ToJson
 import com.squareup.moshi.Types
+import com.squareup.moshi.adapters.PolymorphicJsonAdapterFactory
+import java.time.Duration
+import java.time.Instant
 import javax.inject.Inject
 
 @Entity(tableName = "wide_events")
@@ -34,6 +39,9 @@ data class WideEventEntity(
 
     @ColumnInfo(name = "name")
     val name: String,
+
+    @ColumnInfo(name = "created_at")
+    val createdAt: Instant,
 
     @ColumnInfo(name = "flow_entry_point")
     val flowEntryPoint: String?,
@@ -46,6 +54,12 @@ data class WideEventEntity(
 
     @ColumnInfo(name = "status")
     val status: WideEventStatus?,
+
+    @ColumnInfo(name = "cleanup_policy")
+    val cleanupPolicy: CleanupPolicy?,
+
+    @ColumnInfo(name = "active_intervals")
+    val activeIntervals: List<WideEventInterval>,
 ) {
     data class MetadataEntry(
         @Json(name = "key")
@@ -69,12 +83,69 @@ data class WideEventEntity(
         CANCELLED("cancelled"),
         UNKNOWN("unknown"),
     }
+
+    sealed class CleanupPolicy {
+        abstract val status: WideEventStatus
+        abstract val metadata: Map<String, String>
+
+        data class OnProcessStart(
+            @Json(name = "ignore_if_interval_timeout_present")
+            val ignoreIfIntervalTimeoutPresent: Boolean,
+
+            @Json(name = "status")
+            override val status: WideEventStatus,
+
+            @Json(name = "metadata")
+            override val metadata: Map<String, String> = emptyMap(),
+        ) : CleanupPolicy()
+
+        data class OnTimeout(
+            @Json(name = "duration")
+            val duration: Duration,
+
+            @Json(name = "status")
+            override val status: WideEventStatus,
+
+            @Json(name = "metadata")
+            override val metadata: Map<String, String> = emptyMap(),
+        ) : CleanupPolicy()
+    }
+
+    data class WideEventInterval(
+        @Json(name = "name")
+        val name: String,
+
+        @Json(name = "started_at")
+        val startedAt: Instant,
+
+        @Json(name = "timeout")
+        val timeout: Duration?,
+    )
 }
 
 @ProvidedTypeConverter
 class WideEventEntityTypeConverters @Inject constructor(
-    private val moshi: Moshi,
+    globalMoshi: Moshi,
 ) {
+    private val moshi: Moshi by lazy {
+        globalMoshi.newBuilder()
+            .add(
+                PolymorphicJsonAdapterFactory.of(WideEventEntity.CleanupPolicy::class.java, "type")
+                    .withSubtype(
+                        WideEventEntity.CleanupPolicy.OnProcessStart::class.java,
+                        "OnProcessStart",
+                    )
+                    .withSubtype(
+                        WideEventEntity.CleanupPolicy.OnTimeout::class.java,
+                        "OnTimeout",
+                    ),
+            )
+            .add(WideEventStatusJsonAdapter())
+            .add(InstantMillisAdapter())
+            .add(DurationMillisAdapter())
+            .build()
+    }
+
     private val metadataEntryListAdapter: JsonAdapter<List<WideEventEntity.MetadataEntry>> by lazy {
         moshi.adapter(
             Types.newParameterizedType(
@@ -89,6 +160,19 @@ class WideEventEntityTypeConverters @Inject constructor(
             Types.newParameterizedType(
                 List::class.java,
                 WideEventEntity.WideEventStep::class.java,
+            ),
+        )
+    }
+
+    private val cleanupPolicyAdapter: JsonAdapter<WideEventEntity.CleanupPolicy> by lazy {
+        moshi.adapter(WideEventEntity.CleanupPolicy::class.java)
+    }
+
+    private val wideEventIntervalListAdapter: JsonAdapter<List<WideEventEntity.WideEventInterval>> by lazy {
+        moshi.adapter(
+            Types.newParameterizedType(
+                List::class.java,
+                WideEventEntity.WideEventInterval::class.java,
             ),
         )
     }
@@ -118,4 +202,45 @@ class WideEventEntityTypeConverters @Inject constructor(
         statusCode?.let { statusCode ->
             WideEventEntity.WideEventStatus.entries.first { it.statusCode == statusCode }
         }
+
+    @TypeConverter
+    fun fromCleanupPolicy(value: WideEventEntity.CleanupPolicy?): String? =
+        value?.let { cleanupPolicyAdapter.toJson(it) }
+
+    @TypeConverter
+    fun toCleanupPolicy(value: String?): WideEventEntity.CleanupPolicy? =
+        value?.let { cleanupPolicyAdapter.fromJson(it) }
+
+    @TypeConverter
+    fun fromWideEventIntervalList(value: List<WideEventEntity.WideEventInterval>): String =
+        wideEventIntervalListAdapter.toJson(value)
+
+    @TypeConverter
+    fun toWideEventIntervalList(value: String): List<WideEventEntity.WideEventInterval> =
+        wideEventIntervalListAdapter.fromJson(value) ?: emptyList()
+}
+
+private class WideEventStatusJsonAdapter {
+    @FromJson
+    fun fromJson(json: String): WideEventEntity.WideEventStatus =
+        WideEventEntity.WideEventStatus.entries.first { it.statusCode == json }
+
+    @ToJson
+    fun toJson(status: WideEventEntity.WideEventStatus): String = status.statusCode
+}
+
+private class DurationMillisAdapter {
+    @ToJson
+    fun toJson(value: Duration?): Long? = value?.toMillis()
+
+    @FromJson
+    fun fromJson(value: Long?): Duration? = value?.let { Duration.ofMillis(it) }
+}
+
+private class InstantMillisAdapter {
+    @ToJson
+    fun toJson(value: Instant?): Long? = value?.toEpochMilli()
+
+    @FromJson
+    fun fromJson(value: Long?): Instant? = value?.let { Instant.ofEpochMilli(it) }
 }

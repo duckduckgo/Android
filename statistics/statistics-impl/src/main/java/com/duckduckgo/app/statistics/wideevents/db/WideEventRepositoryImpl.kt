@@ -17,8 +17,12 @@
 package com.duckduckgo.app.statistics.wideevents.db
 
 import androidx.room.withTransaction
+import com.duckduckgo.app.statistics.wideevents.db.WideEventRepository.CleanupPolicy
+import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
+import java.time.Duration
+import java.time.Instant
 import javax.inject.Inject
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -27,12 +31,14 @@ import kotlinx.coroutines.flow.map
 class WideEventRepositoryImpl @Inject constructor(
     private val database: WideEventDatabase,
     private val wideEventDao: WideEventDao,
+    private val timeProvider: CurrentTimeProvider,
 ) : WideEventRepository {
 
     override suspend fun insertWideEvent(
         name: String,
         flowEntryPoint: String?,
         metadata: Map<String, String?>,
+        cleanupPolicy: CleanupPolicy?,
     ): Long {
         val entity = WideEventEntity(
             name = name,
@@ -40,6 +46,9 @@ class WideEventRepositoryImpl @Inject constructor(
             metadata = metadata.map { (key, value) -> WideEventEntity.MetadataEntry(key, value) },
             steps = emptyList(),
             status = null,
+            createdAt = timeProvider.getCurrentTime(),
+            cleanupPolicy = cleanupPolicy?.mapToDbCleanupPolicy(),
+            activeIntervals = emptyList(),
         )
 
         return wideEventDao.insertWideEvent(entity)
@@ -51,9 +60,7 @@ class WideEventRepositoryImpl @Inject constructor(
         metadata: Map<String, String?>,
     ) {
         updateWideEvent(eventId) { event ->
-            check(event.status == null) {
-                "Event ${event.name} is already completed"
-            }
+            checkEventIsActive(event)
 
             check(event.steps.none { it.name == step.name }) {
                 "Step ${step.name} was already recorded for event ${event.name}"
@@ -72,9 +79,7 @@ class WideEventRepositoryImpl @Inject constructor(
         metadata: Map<String, String?>,
     ) {
         updateWideEvent(eventId) { event ->
-            check(event.status == null) {
-                "Event ${event.name} is already completed"
-            }
+            checkEventIsActive(event)
 
             event.copy(
                 status = status.mapToDbWideEventStatus(),
@@ -102,6 +107,56 @@ class WideEventRepositoryImpl @Inject constructor(
             .map { it.mapToRepositoryWideEvent() }
     }
 
+    override suspend fun startInterval(
+        eventId: Long,
+        name: String,
+        timeout: Duration?,
+    ) {
+        updateWideEvent(eventId) { event ->
+            checkEventIsActive(event)
+
+            check(event.activeIntervals.none { it.name == name }) {
+                "Interval $name is already started for event ${event.name}"
+            }
+
+            val interval = WideEventEntity.WideEventInterval(
+                name = name,
+                startedAt = timeProvider.getCurrentTime(),
+                timeout = timeout,
+            )
+
+            event.copy(activeIntervals = event.activeIntervals + interval)
+        }
+    }
+
+    override suspend fun endInterval(
+        eventId: Long,
+        name: String,
+    ): Duration {
+        lateinit var duration: Duration
+
+        updateWideEvent(eventId) { event ->
+            checkEventIsActive(event)
+
+            val interval = checkNotNull(event.activeIntervals.find { it.name == name }) {
+                "There is no active interval $name for event ${event.name}"
+            }
+
+            duration = Duration.between(interval.startedAt, timeProvider.getCurrentTime())
+            val durationBucket = INTERVAL_BUCKETS.firstOrNull { it >= duration } ?: INTERVAL_BUCKETS.last()
+
+            event.copy(
+                metadata = mergeMetadata(
+                    existingMetadata = event.metadata,
+                    newMetadata = mapOf(interval.name to durationBucket.toMillis().toString()),
+                ),
+                activeIntervals = event.activeIntervals - interval,
+            )
+        }
+
+        return duration
+    }
+
     private suspend fun updateWideEvent(
         id: Long,
         updateAction: (WideEventEntity) -> WideEventEntity,
@@ -118,6 +173,18 @@ class WideEventRepositoryImpl @Inject constructor(
             }
         }
     }
+
+    private companion object {
+        val INTERVAL_BUCKETS = listOf(
+            Duration.ofSeconds(1),
+            Duration.ofSeconds(5),
+            Duration.ofSeconds(10),
+            Duration.ofSeconds(30),
+            Duration.ofMinutes(1),
+            Duration.ofMinutes(5),
+            Duration.ofMinutes(10),
+        )
+    }
 }
 
 private fun mergeMetadata(
@@ -131,3 +198,11 @@ private fun mergeMetadata(
     mergedMetadata.putAll(newMetadata)
     return mergedMetadata.map { WideEventEntity.MetadataEntry(it.key, it.value) }
 }
+
+private fun CurrentTimeProvider.getCurrentTime(): Instant =
+    Instant.ofEpochMilli(currentTimeMillis())
+
+private fun checkEventIsActive(event: WideEventEntity) =
+    check(event.status == null) {
+        "Event ${event.name} is already completed"
+    }

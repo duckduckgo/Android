@@ -24,6 +24,9 @@ fun WideEventEntity.mapToRepositoryWideEvent(): WideEventRepository.WideEvent =
         steps = steps.map { it.mapToRepositoryWideEventStep() },
         metadata = metadata.associate { it.key to it.value },
         flowEntryPoint = flowEntryPoint,
+        cleanupPolicy = cleanupPolicy?.mapToRepositoryCleanupPolicy(),
+        activeIntervals = activeIntervals.map { it.mapToRepositoryWideEventInterval() },
+        createdAt = createdAt,
     )
 
 fun WideEventRepository.WideEventStatus.mapToDbWideEventStatus(): WideEventEntity.WideEventStatus =
@@ -47,3 +50,45 @@ fun WideEventRepository.WideEventStep.mapToDbWideEventStep(): WideEventEntity.Wi
 
 fun WideEventEntity.WideEventStep.mapToRepositoryWideEventStep(): WideEventRepository.WideEventStep =
     WideEventRepository.WideEventStep(name = name, success = success)
+
+fun WideEventEntity.CleanupPolicy.mapToRepositoryCleanupPolicy(): WideEventRepository.CleanupPolicy =
+    when (this) {
+        is WideEventEntity.CleanupPolicy.OnProcessStart -> WideEventRepository.CleanupPolicy.OnProcessStart(
+            ignoreIfIntervalTimeoutPresent = ignoreIfIntervalTimeoutPresent,
+            status = status.mapToRepositoryWideEventStatus(),
+            metadata = metadata,
+        )
+        is WideEventEntity.CleanupPolicy.OnTimeout -> WideEventRepository.CleanupPolicy.OnTimeout(
+            duration = duration,
+            status = status.mapToRepositoryWideEventStatus(),
+            metadata = metadata,
+        )
+    }
+
+fun WideEventRepository.CleanupPolicy.mapToDbCleanupPolicy(): WideEventEntity.CleanupPolicy =
+    when (this) {
+        is WideEventRepository.CleanupPolicy.OnProcessStart -> WideEventEntity.CleanupPolicy.OnProcessStart(
+            ignoreIfIntervalTimeoutPresent = ignoreIfIntervalTimeoutPresent,
+            status = status.mapToDbWideEventStatus(),
+            metadata = metadata,
+        )
+        is WideEventRepository.CleanupPolicy.OnTimeout -> WideEventEntity.CleanupPolicy.OnTimeout(
+            duration = duration,
+            status = status.mapToDbWideEventStatus(),
+            metadata = metadata,
+        )
+    }
+
+fun WideEventEntity.WideEventInterval.mapToRepositoryWideEventInterval(): WideEventRepository.WideEventInterval =
+    WideEventRepository.WideEventInterval(
+        name = name,
+        startedAt = startedAt,
+        timeout = timeout,
+    )
+
+fun WideEventRepository.WideEventInterval.mapToDbWideEventInterval(): WideEventEntity.WideEventInterval =
+    WideEventEntity.WideEventInterval(
+        name = name,
+        startedAt = startedAt,
+        timeout = timeout,
+    )

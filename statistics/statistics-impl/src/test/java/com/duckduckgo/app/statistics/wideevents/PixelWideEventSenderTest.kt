@@ -23,6 +23,7 @@ import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.device.DeviceInfo
 import com.duckduckgo.feature.toggles.api.FeatureTogglesInventory
+import java.time.Instant
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
@@ -118,5 +119,8 @@ class PixelWideEventSenderTest {
         steps = steps,
         metadata = metadata,
         flowEntryPoint = flowEntryPoint,
+        activeIntervals = emptyList(),
+        cleanupPolicy = null,
+        createdAt = Instant.parse("2025-12-03T10:15:30.00Z"),
     )
 }

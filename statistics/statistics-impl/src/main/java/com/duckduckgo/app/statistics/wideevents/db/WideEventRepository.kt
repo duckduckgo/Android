@@ -16,6 +16,8 @@
 
 package com.duckduckgo.app.statistics.wideevents.db
 
+import java.time.Duration
+import java.time.Instant
 import kotlinx.coroutines.flow.Flow
 
 interface WideEventRepository {
@@ -23,6 +25,7 @@ interface WideEventRepository {
         name: String,
         flowEntryPoint: String?,
         metadata: Map<String, String?>,
+        cleanupPolicy: CleanupPolicy?,
     ): Long
 
     suspend fun addWideEventStep(
@@ -45,6 +48,17 @@ interface WideEventRepository {
 
     suspend fun getWideEvents(ids: Set<Long>): List<WideEvent>
 
+    suspend fun startInterval(
+        eventId: Long,
+        name: String,
+        timeout: Duration?,
+    )
+
+    suspend fun endInterval(
+        eventId: Long,
+        name: String,
+    ): Duration
+
     data class WideEvent(
         val id: Long,
         val name: String,
@@ -52,6 +66,9 @@ interface WideEventRepository {
         val steps: List<WideEventStep>,
         val metadata: Map<String, String?>,
         val flowEntryPoint: String?,
+        val cleanupPolicy: CleanupPolicy? = null,
+        val activeIntervals: List<WideEventInterval>,
+        val createdAt: Instant,
     )
 
     data class WideEventStep(
@@ -65,4 +82,27 @@ interface WideEventRepository {
         CANCELLED,
         UNKNOWN,
     }
+
+    sealed class CleanupPolicy {
+        abstract val status: WideEventStatus
+        abstract val metadata: Map<String, String>
+
+        data class OnProcessStart(
+            val ignoreIfIntervalTimeoutPresent: Boolean,
+            override val status: WideEventStatus,
+            override val metadata: Map<String, String> = emptyMap(),
+        ) : CleanupPolicy()
+
+        data class OnTimeout(
+            val duration: Duration,
+            override val status: WideEventStatus,
+            override val metadata: Map<String, String> = emptyMap(),
+        ) : CleanupPolicy()
+    }
+
+    data class WideEventInterval(
+        val name: String,
+        val startedAt: Instant,
+        val timeout: Duration?,
+    )
 }

@@ -41,6 +41,7 @@ class WideEventClientImpl @Inject constructor(
             name = name,
             flowEntryPoint = flowEntryPoint,
             metadata = metadata,
+            cleanupPolicy = cleanupPolicy?.mapToRepositoryCleanupPolicy(),
         )
     }
 
@@ -62,12 +63,7 @@ class WideEventClientImpl @Inject constructor(
         status: FlowStatus,
         metadata: Map<String, String>,
     ): Result<Unit> = runCatching {
-        val (wideEventStatus, statusMetadata) = when (status) {
-            FlowStatus.Cancelled -> WideEventRepository.WideEventStatus.CANCELLED to emptyMap()
-            is FlowStatus.Failure -> WideEventRepository.WideEventStatus.FAILURE to mapOf("failure_reason" to status.reason)
-            FlowStatus.Success -> WideEventRepository.WideEventStatus.SUCCESS to emptyMap()
-            FlowStatus.Unknown -> WideEventRepository.WideEventStatus.UNKNOWN to emptyMap()
-        }
+        val (wideEventStatus, statusMetadata) = status.mapToWideEventStatus()
 
         wideEventRepository.setWideEventStatus(
             eventId = wideEventId,
@@ -89,14 +85,52 @@ class WideEventClientImpl @Inject constructor(
         wideEventId: Long,
         key: String,
         timeout: Duration?,
-    ): Result<Unit> {
-        TODO("Not yet implemented")
+    ): Result<Unit> = runCatching {
+        wideEventRepository.startInterval(
+            eventId = wideEventId,
+            name = key,
+            timeout = timeout,
+        )
     }
 
     override suspend fun intervalEnd(
         wideEventId: Long,
         key: String,
-    ): Result<Duration> {
-        TODO("Not yet implemented")
+    ): Result<Duration> = runCatching {
+        wideEventRepository.endInterval(
+            eventId = wideEventId,
+            name = key,
+        )
+    }
+}
+
+private fun FlowStatus.mapToWideEventStatus(): Pair<WideEventRepository.WideEventStatus, Map<String, String>> {
+    return when (this) {
+        FlowStatus.Cancelled -> WideEventRepository.WideEventStatus.CANCELLED to emptyMap()
+        is FlowStatus.Failure -> WideEventRepository.WideEventStatus.FAILURE to mapOf("failure_reason" to reason)
+        FlowStatus.Success -> WideEventRepository.WideEventStatus.SUCCESS to emptyMap()
+        FlowStatus.Unknown -> WideEventRepository.WideEventStatus.UNKNOWN to emptyMap()
+    }
+}
+
+private fun CleanupPolicy.mapToRepositoryCleanupPolicy(): WideEventRepository.CleanupPolicy {
+    val (wideEventStatus, metadata) = flowStatus.mapToWideEventStatus()
+
+    return when (this) {
+        is CleanupPolicy.OnProcessStart -> {
+            WideEventRepository.CleanupPolicy.OnProcessStart(
+                ignoreIfIntervalTimeoutPresent = ignoreIfIntervalTimeoutPresent,
+                status = wideEventStatus,
+                metadata = metadata,
+            )
+        }
+
+        is CleanupPolicy.OnTimeout -> {
+            WideEventRepository.CleanupPolicy.OnTimeout(
+                duration = duration,
+                status = wideEventStatus,
+                metadata = metadata,
+            )
+        }
     }
 }

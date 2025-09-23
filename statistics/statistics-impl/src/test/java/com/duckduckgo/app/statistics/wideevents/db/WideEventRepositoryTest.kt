@@ -23,10 +23,15 @@ import com.duckduckgo.app.statistics.wideevents.db.WideEventRepository.WideEvent
 import com.duckduckgo.app.statistics.wideevents.db.WideEventRepository.WideEventStatus.SUCCESS
 import com.duckduckgo.app.statistics.wideevents.db.WideEventRepository.WideEventStep
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.squareup.moshi.Moshi
+import java.time.Duration
+import java.time.Instant
+import java.time.LocalDateTime
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
 import org.junit.After
+import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
@@ -46,9 +51,18 @@ class WideEventRepositoryTest {
         .addTypeConverter(WideEventEntityTypeConverters(Moshi.Builder().build()))
         .build()
 
+    private val timeProvider = object : CurrentTimeProvider {
+        var currentTime = Instant.parse("2025-12-03T10:15:30.00Z")
+
+        override fun elapsedRealtime(): Long = throw UnsupportedOperationException()
+        override fun currentTimeMillis(): Long = currentTime.toEpochMilli()
+        override fun localDateTimeNow(): LocalDateTime = throw UnsupportedOperationException()
+    }
+
     private val wideEventRepository: WideEventRepository = WideEventRepositoryImpl(
         database = database,
         wideEventDao = database.wideEventDao(),
+        timeProvider = timeProvider,
     )
 
     @After
@@ -62,6 +76,7 @@ class WideEventRepositoryTest {
             name = "test_event",
             flowEntryPoint = null,
             metadata = emptyMap(),
+            cleanupPolicy = null,
         )
 
         assertTrue(eventId > 0)
@@ -76,6 +91,7 @@ class WideEventRepositoryTest {
                 "key1" to "value1",
                 "key2" to null,
             ),
+            cleanupPolicy = null,
         )
 
         assertTrue(eventId > 0)
@@ -92,12 +108,14 @@ class WideEventRepositoryTest {
             name = "test_event",
             flowEntryPoint = null,
             metadata = emptyMap(),
+            cleanupPolicy = null,
         )
 
         val activeEventId = wideEventRepository.insertWideEvent(
             name = "test_event",
             flowEntryPoint = null,
             metadata = emptyMap(),
+            cleanupPolicy = null,
         )
 
         // complete wide event
@@ -119,24 +137,28 @@ class WideEventRepositoryTest {
             name = "test1",
             flowEntryPoint = null,
             metadata = emptyMap(),
+            cleanupPolicy = null,
         )
 
         val eventId2 = wideEventRepository.insertWideEvent(
             name = "test2",
             flowEntryPoint = null,
             metadata = emptyMap(),
+            cleanupPolicy = null,
         )
 
         val eventId3 = wideEventRepository.insertWideEvent(
             name = "test3",
             flowEntryPoint = null,
             metadata = emptyMap(),
+            cleanupPolicy = null,
         )
 
         val eventId4 = wideEventRepository.insertWideEvent(
             name = "test4",
             flowEntryPoint = null,
             metadata = emptyMap(),
+            cleanupPolicy = null,
         )
 
         wideEventRepository.setWideEventStatus(
@@ -164,6 +186,7 @@ class WideEventRepositoryTest {
                 "key1" to "value1",
                 "key2" to null,
             ),
+            cleanupPolicy = null,
         )
 
         wideEventRepository.addWideEventStep(
@@ -215,12 +238,14 @@ class WideEventRepositoryTest {
             name = "test_event",
             flowEntryPoint = null,
             metadata = emptyMap(),
+            cleanupPolicy = null,
         )
 
         val activeEventId = wideEventRepository.insertWideEvent(
             name = "test_event",
             flowEntryPoint = null,
             metadata = emptyMap(),
+            cleanupPolicy = null,
         )
 
         // complete wide event
@@ -247,6 +272,7 @@ class WideEventRepositoryTest {
                 "key1" to "value1",
                 "key2" to null,
             ),
+            cleanupPolicy = null,
         )
 
         assertTrue(eventId > 0)
@@ -254,5 +280,68 @@ class WideEventRepositoryTest {
         val events = wideEventRepository.getActiveWideEventIdsByName("some_other_event")
 
         assertTrue(events.isEmpty())
+    }
+
+    @Test
+    fun `when inserting wide event with cleanupPolicy, it is stored correctly`() = runTest {
+        val policy = WideEventRepository.CleanupPolicy.OnTimeout(
+            duration = Duration.ofHours(1),
+            status = FAILURE,
+            metadata = mapOf("reason" to "big error"),
+        )
+
+        val eventId = wideEventRepository.insertWideEvent(
+            name = "cleanup_event",
+            flowEntryPoint = null,
+            metadata = emptyMap(),
+            cleanupPolicy = policy,
+        )
+
+        val event = wideEventRepository.getWideEvents(setOf(eventId)).single()
+        assertEquals(policy, event.cleanupPolicy)
+    }
+
+    @Test
+    fun `when starting an interval, it is tracked correctly`() = runTest {
+        val eventId = wideEventRepository.insertWideEvent(
+            name = "interval_event",
+            flowEntryPoint = null,
+            metadata = emptyMap(),
+            cleanupPolicy = null,
+        )
+
+        wideEventRepository.startInterval(
+            eventId = eventId,
+            name = "interval_1",
+            timeout = Duration.ofSeconds(10),
+        )
+
+        val event = wideEventRepository.getWideEvents(setOf(eventId)).single()
+        assertTrue(event.activeIntervals.any { it.name == "interval_1" && it.timeout == Duration.ofSeconds(10) })
+    }
+
+    @Test
+    fun `when ending an interval, duration is recorded in metadata and interval removed`() = runTest {
+        val eventId = wideEventRepository.insertWideEvent(
+            name = "interval_event",
+            flowEntryPoint = null,
+            metadata = emptyMap(),
+            cleanupPolicy = null,
+        )
+
+        wideEventRepository.startInterval(
+            eventId = eventId,
+            name = "interval_1",
+            timeout = Duration.ofSeconds(10),
+        )
+
+        val expectedDuration = Duration.ofSeconds(15)
+        timeProvider.currentTime += expectedDuration
+        val duration = wideEventRepository.endInterval(eventId, "interval_1")
+        val event = wideEventRepository.getWideEvents(setOf(eventId)).single()
+
+        assertEquals(expectedDuration, duration)
+        assertTrue(event.activeIntervals.isEmpty())
+        assertTrue(event.metadata.containsKey("interval_1"))
     }
 }
