@@ -328,6 +328,31 @@ class RealJobRecordUpdaterTest {
         verify(mockSchedulingRepository, never()).saveOptOutJobRecord(any())
     }
 
+    @Test
+    fun whenMarkOptOutAsWaitingForEmailConfirmationAndJobRecordExistsThenUpdatesStatusToPendingEmailConfirmation() = runTest {
+        whenever(mockSchedulingRepository.getValidOptOutJobRecord(testExtractedProfileId))
+            .thenReturn(testOptOutJobRecord)
+
+        toTest.markOptOutAsWaitingForEmailConfirmation(testExtractedProfileId)
+
+        verify(mockSchedulingRepository).saveOptOutJobRecord(
+            testOptOutJobRecord.copy(
+                status = OptOutJobStatus.PENDING_EMAIL_CONFIRMATION,
+            ),
+        )
+    }
+
+    @Test
+    fun whenMarkOptOutAsWaitingForEmailConfirmationAndJobRecordDoesNotExistThenDoesNothing() = runTest {
+        whenever(mockSchedulingRepository.getValidOptOutJobRecord(testExtractedProfileId))
+            .thenReturn(null)
+
+        toTest.markOptOutAsWaitingForEmailConfirmation(testExtractedProfileId)
+
+        verify(mockSchedulingRepository).getValidOptOutJobRecord(testExtractedProfileId)
+        verify(mockSchedulingRepository, never()).saveOptOutJobRecord(any())
+    }
+
     companion object {
         private const val TEST_CURRENT_TIME = 5000L
     }

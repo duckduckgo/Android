@@ -68,6 +68,9 @@ sealed class JobRecord(
 
             /** The job is now invalid and should NOT be executed anymore. */
             INVALID,
+
+            /** The job is waiting for email confirmation to complete before we can move it to [REQUESTED]. */
+            PENDING_EMAIL_CONFIRMATION,
         }
     }
 
