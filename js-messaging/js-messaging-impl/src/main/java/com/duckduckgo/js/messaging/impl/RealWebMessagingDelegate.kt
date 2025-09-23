@@ -25,7 +25,7 @@ import androidx.webkit.JavaScriptReplyProxy
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.browser.api.webviewcompat.WebViewCompatWrapper
 import com.duckduckgo.common.utils.DispatcherProvider
-import com.duckduckgo.di.scopes.FragmentScope
+import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.js.messaging.api.JsCallbackData
 import com.duckduckgo.js.messaging.api.JsMessage
 import com.duckduckgo.js.messaging.api.ProcessResult.SendResponse
@@ -46,7 +46,7 @@ import logcat.asLog
 import logcat.logcat
 import org.json.JSONObject
 
-@ContributesBinding(FragmentScope::class)
+@ContributesBinding(AppScope::class)
 class RealWebMessagingDelegate @Inject constructor(
     private val webViewCompatWrapper: WebViewCompatWrapper,
 ) : WebMessagingPluginDelegate {
