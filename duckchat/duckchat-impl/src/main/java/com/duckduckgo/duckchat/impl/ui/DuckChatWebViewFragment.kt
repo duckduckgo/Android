@@ -19,6 +19,7 @@ package com.duckduckgo.duckchat.impl.ui
 import android.Manifest
 import android.annotation.SuppressLint
 import android.app.Activity.RESULT_OK
+import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
@@ -28,6 +29,7 @@ import android.os.Message
 import android.provider.MediaStore
 import android.view.View
 import android.view.ViewGroup
+import android.view.inputmethod.InputMethodManager
 import android.webkit.MimeTypeMap
 import android.webkit.ValueCallback
 import android.webkit.WebChromeClient
@@ -65,6 +67,7 @@ import com.duckduckgo.duckchat.impl.databinding.ActivityDuckChatWebviewBinding
 import com.duckduckgo.duckchat.impl.feature.AIChatDownloadFeature
 import com.duckduckgo.duckchat.impl.helper.DuckChatJSHelper
 import com.duckduckgo.duckchat.impl.helper.RealDuckChatJSHelper.Companion.DUCK_CHAT_FEATURE_NAME
+import com.duckduckgo.duckchat.impl.helper.RealDuckChatJSHelper.Companion.METHOD_OPEN_KEYBOARD
 import com.duckduckgo.duckchat.impl.ui.filechooser.FileChooserIntentBuilder
 import com.duckduckgo.duckchat.impl.ui.filechooser.capture.camera.CameraHardwareChecker
 import com.duckduckgo.duckchat.impl.ui.filechooser.capture.launcher.UploadFromExternalMediaAppLauncher
@@ -242,13 +245,18 @@ open class DuckChatWebViewFragment : DuckDuckGoFragment(R.layout.activity_duck_c
                         id: String?,
                         data: JSONObject?,
                     ) {
-                        logcat { "jsDuckChat: $featureName $method $id $data" }
+                        logcat { "Duck.ai: process $featureName $method $id $data" }
                         when (featureName) {
                             DUCK_CHAT_FEATURE_NAME -> {
                                 appCoroutineScope.launch(dispatcherProvider.io()) {
                                     duckChatJSHelper.processJsCallbackMessage(featureName, method, id, data)?.let { response ->
                                         withContext(dispatcherProvider.main()) {
-                                            contentScopeScripts.onResponse(response)
+                                            if (response.method == METHOD_OPEN_KEYBOARD) {
+                                                simpleWebview.evaluateJavascript("document.getElementsByName('user-prompt')[0]?.focus();", null)
+                                                showSoftKeyboard()
+                                            } else {
+                                                contentScopeScripts.onResponse(response)
+                                            }
                                         }
                                     }
                                 }
@@ -314,6 +322,12 @@ open class DuckChatWebViewFragment : DuckDuckGoFragment(R.layout.activity_duck_c
         val filePickingMode: Int,
         val acceptMimeTypes: List<String>,
     )
+
+    private fun showSoftKeyboard() {
+        simpleWebview.requestFocus()
+        val imm = requireContext().getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager
+        imm?.showSoftInput(simpleWebview, InputMethodManager.SHOW_IMPLICIT)
+    }
 
     fun showFileChooser(
         filePathCallback: ValueCallback<Array<Uri>>,
@@ -578,7 +592,7 @@ open class DuckChatWebViewFragment : DuckDuckGoFragment(R.layout.activity_duck_c
     companion object {
         private const val PERMISSION_REQUEST_WRITE_EXTERNAL_STORAGE = 200
         private const val CUSTOM_UA =
-            "Mozilla/5.0 (Linux; Android 12) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/124.0.0.0 Mobile DuckDuckGo/5 Safari/537.36"
+            "Mozilla/5.0 (Linux; Android 16) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/124.0.0.0 Mobile DuckDuckGo/5 Safari/537.36"
         private const val REQUEST_CODE_CHOOSE_FILE = 100
         const val KEY_DUCK_AI_URL: String = "KEY_DUCK_AI_URL"
     }

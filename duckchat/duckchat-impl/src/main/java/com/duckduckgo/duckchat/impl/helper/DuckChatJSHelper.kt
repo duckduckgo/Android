@@ -95,9 +95,10 @@ class RealDuckChatJSHelper @Inject constructor(
             null
         }
 
-        METHOD_OPEN_KEYBOARD -> {
-            logcat { "METHOD_OPEN_KEYBOARD data $data" }
-            null
+        METHOD_OPEN_KEYBOARD -> id?.let {
+            val payload = extractOpenKeyboardPayload(data)
+            logcat { "Duck.ai: keyboard payload $payload method $method" }
+            getOpenKeyboardResponse(featureName, method, it)
         }
 
         REPORT_METRIC -> {
@@ -118,7 +119,7 @@ class RealDuckChatJSHelper @Inject constructor(
         val jsonPayload = JSONObject().apply {
             put(PLATFORM, ANDROID)
             put(IS_HANDOFF_ENABLED, duckChat.isDuckChatFeatureEnabled())
-            put(PAYLOAD, runBlocking { dataStore.fetchAndClearUserPreferences() })
+            put(AI_CHAT_PAYLOAD, runBlocking { dataStore.fetchAndClearUserPreferences() })
         }
         return JsCallbackData(jsonPayload, featureName, method, id)
     }
@@ -139,10 +140,27 @@ class RealDuckChatJSHelper @Inject constructor(
         return JsCallbackData(jsonPayload, featureName, method, id)
     }
 
+    private fun getOpenKeyboardResponse(
+        featureName: String,
+        method: String,
+        id: String,
+    ): JsCallbackData {
+        val jsonPayload = JSONObject().apply {
+            put(PLATFORM, ANDROID)
+        }
+        return JsCallbackData(jsonPayload, featureName, method, id)
+    }
+
     private fun extractPayload(data: JSONObject?): String? {
         return data?.takeIf {
-            it.opt(PAYLOAD) != JSONObject.NULL
-        }?.optString(PAYLOAD)
+            it.opt(AI_CHAT_PAYLOAD) != JSONObject.NULL
+        }?.optString(AI_CHAT_PAYLOAD)
+    }
+
+    private fun extractOpenKeyboardPayload(data: JSONObject?): String? {
+        return data?.takeIf {
+            it.opt(METHOD_OPEN_KEYBOARD_PAYLOAD) != JSONObject.NULL
+        }?.optString(METHOD_OPEN_KEYBOARD_PAYLOAD)
     }
 
     companion object {
@@ -155,8 +173,9 @@ class RealDuckChatJSHelper @Inject constructor(
         private const val METHOD_RESPONSE_STATE = "responseState"
         private const val METHOD_HIDE_CHAT_INPUT = "hideChatInput"
         private const val METHOD_SHOW_CHAT_INPUT = "showChatInput"
-        private const val METHOD_OPEN_KEYBOARD = "openKeyboard"
-        private const val PAYLOAD = "aiChatPayload"
+        const val METHOD_OPEN_KEYBOARD = "openKeyboard"
+        private const val AI_CHAT_PAYLOAD = "aiChatPayload"
+        private const val METHOD_OPEN_KEYBOARD_PAYLOAD = "selector"
         private const val IS_HANDOFF_ENABLED = "isAIChatHandoffEnabled"
         private const val SUPPORTS_CLOSING_AI_CHAT = "supportsClosingAIChat"
         private const val SUPPORTS_OPENING_SETTINGS = "supportsOpeningSettings"
