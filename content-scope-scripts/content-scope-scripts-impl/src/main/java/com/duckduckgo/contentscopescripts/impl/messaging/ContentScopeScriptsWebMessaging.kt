@@ -21,12 +21,11 @@ import com.duckduckgo.contentscopescripts.api.WebViewCompatContentScopeJsMessage
 import com.duckduckgo.contentscopescripts.impl.WebViewCompatContentScopeScripts
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.js.messaging.api.GlobalJsMessageHandler
-import com.duckduckgo.js.messaging.api.WebMessagingPlugin
-import com.duckduckgo.js.messaging.api.WebMessagingPluginDelegate
-import com.duckduckgo.js.messaging.api.WebMessagingPluginStrategy
+import com.duckduckgo.js.messaging.api.WebMessaging
+import com.duckduckgo.js.messaging.api.WebMessagingDelegate
+import com.duckduckgo.js.messaging.api.WebMessagingStrategy
 import com.duckduckgo.js.messaging.api.WebViewCompatMessageHandler
 import com.squareup.anvil.annotations.ContributesBinding
-import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.SingleInstanceIn
 import javax.inject.Inject
 import javax.inject.Named
@@ -34,14 +33,13 @@ import javax.inject.Named
 @Named("contentScopeScripts")
 @SingleInstanceIn(FragmentScope::class)
 @ContributesBinding(FragmentScope::class)
-@ContributesMultibinding(scope = FragmentScope::class, ignoreQualifier = true)
-class ContentScopeScriptsWebMessagingPlugin @Inject constructor(
+class ContentScopeScriptsWebMessaging @Inject constructor(
     handlers: PluginPoint<WebViewCompatContentScopeJsMessageHandlersPlugin>,
     globalHandlers: PluginPoint<GlobalContentScopeJsMessageHandlersPlugin>,
     webViewCompatContentScopeScripts: WebViewCompatContentScopeScripts,
-    webMessagingPluginDelegate: WebMessagingPluginDelegate,
-) : WebMessagingPlugin by webMessagingPluginDelegate.createPlugin(
-    object : WebMessagingPluginStrategy {
+    webMessagingDelegate: WebMessagingDelegate,
+) : WebMessaging by webMessagingDelegate.createPlugin(
+    object : WebMessagingStrategy {
         override val context: String = "contentScopeScripts"
         override val allowedDomains: Set<String> = setOf("*")
         override val objectName: String

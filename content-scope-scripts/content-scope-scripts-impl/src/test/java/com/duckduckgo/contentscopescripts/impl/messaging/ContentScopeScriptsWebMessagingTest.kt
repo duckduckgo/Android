@@ -46,7 +46,8 @@ import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
 @RunWith(AndroidJUnit4::class)
-class ContentScopeScriptsWebMessagingPluginTest {
+class ContentScopeScriptsWebMessagingTest {
+
     @get:Rule
     val coroutineRule = CoroutineTestRule()
 
@@ -56,7 +57,7 @@ class ContentScopeScriptsWebMessagingPluginTest {
     private val globalHandlers: PluginPoint<GlobalContentScopeJsMessageHandlersPlugin> = FakeGlobalHandlersPluginPoint()
     private val mockWebViewCompatWrapper: WebViewCompatWrapper = mock()
     private val mockWebView: WebView = mock()
-    private lateinit var testee: ContentScopeScriptsWebMessagingPlugin
+    private lateinit var testee: ContentScopeScriptsWebMessaging
 
     private class FakePluginPoint : PluginPoint<WebViewCompatContentScopeJsMessageHandlersPlugin> {
         override fun getPlugins(): Collection<WebViewCompatContentScopeJsMessageHandlersPlugin> = listOf(FakePlugin())
@@ -86,17 +87,15 @@ class ContentScopeScriptsWebMessagingPluginTest {
     }
 
     @Before
-    fun setUp() =
-        runTest {
-            whenever(webViewCompatContentScopeScripts.isEnabled()).thenReturn(true)
-            testee =
-                ContentScopeScriptsWebMessagingPlugin(
-                    handlers = handlers,
-                    globalHandlers = globalHandlers,
-                    webViewCompatContentScopeScripts = webViewCompatContentScopeScripts,
-                    webViewCompatWrapper = mockWebViewCompatWrapper,
-                )
-        }
+    fun setUp() = runTest {
+        whenever(webViewCompatContentScopeScripts.isEnabled()).thenReturn(true)
+        testee = ContentScopeScriptsWebMessaging(
+            handlers = handlers,
+            globalHandlers = globalHandlers,
+            webViewCompatContentScopeScripts = webViewCompatContentScopeScripts,
+            webViewCompatWrapper = mockWebViewCompatWrapper,
+        )
+    }
 
     @Test
     fun `when process and message can be handled then execute callback`() =

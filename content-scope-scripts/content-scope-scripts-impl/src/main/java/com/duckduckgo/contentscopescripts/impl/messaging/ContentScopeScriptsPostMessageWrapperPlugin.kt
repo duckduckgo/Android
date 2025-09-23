@@ -25,14 +25,14 @@ import com.duckduckgo.js.messaging.api.JsMessageHelper
 import com.duckduckgo.js.messaging.api.PostMessageWrapperPlugin
 import com.duckduckgo.js.messaging.api.SubscriptionEvent
 import com.duckduckgo.js.messaging.api.SubscriptionEventData
-import com.duckduckgo.js.messaging.api.WebMessagingPlugin
+import com.duckduckgo.js.messaging.api.WebMessaging
 import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
 import javax.inject.Named
 
 @ContributesMultibinding(FragmentScope::class)
 class ContentScopeScriptsPostMessageWrapperPlugin @Inject constructor(
-    @Named("contentScopeScripts") private val webMessagingPlugin: WebMessagingPlugin,
+    @Named("contentScopeScripts") private val webMessaging: WebMessaging,
     private val jsMessageHelper: JsMessageHelper,
     private val coreContentScopeScripts: CoreContentScopeScripts,
     private val webViewCompatContentScopeScripts: WebViewCompatContentScopeScripts,
@@ -43,11 +43,11 @@ class ContentScopeScriptsPostMessageWrapperPlugin @Inject constructor(
         webView: WebView,
     ) {
         if (webViewCompatContentScopeScripts.isEnabled()) {
-            webMessagingPlugin.postMessage(webView, message)
+            webMessaging.postMessage(webView, message)
         } else {
             jsMessageHelper.sendSubscriptionEvent(
                 subscriptionEvent = SubscriptionEvent(
-                    context = webMessagingPlugin.context,
+                    context = webMessaging.context,
                     featureName = message.featureName,
                     subscriptionName = message.subscriptionName,
                     params = message.params,
@@ -60,5 +60,5 @@ class ContentScopeScriptsPostMessageWrapperPlugin @Inject constructor(
     }
 
     override val context: String
-        get() = webMessagingPlugin.context
+        get() = webMessaging.context
 }

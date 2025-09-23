@@ -18,7 +18,7 @@ package com.duckduckgo.js.messaging.api
 
 import android.webkit.WebView
 
-interface WebMessagingPlugin {
+interface WebMessaging {
     suspend fun register(
         jsMessageCallback: WebViewCompatMessageCallback,
         webView: WebView,
@@ -34,21 +34,21 @@ interface WebMessagingPlugin {
     val context: String
 }
 
-interface WebMessagingPluginDelegate {
+interface WebMessagingDelegate {
 
     /**
-     * Creates a [WebMessagingPlugin] implementation with the given [WebMessagingPluginStrategy].
+     * Creates a [WebMessaging] implementation with the given [WebMessagingStrategy].
      * @param strategy the strategy to use for web messaging behavior
-     * @return [WebMessagingPlugin] implementation
+     * @return [WebMessaging] implementation
      */
-    fun createPlugin(strategy: WebMessagingPluginStrategy): WebMessagingPlugin
+    fun createPlugin(strategy: WebMessagingStrategy): WebMessaging
 }
 
 /**
  * Strategy interface for web messaging logic.
  * Allows different implementations to provide their own behavior.
  */
-interface WebMessagingPluginStrategy {
+interface WebMessagingStrategy {
     val context: String
     val allowedDomains: Set<String>
     val objectName: String

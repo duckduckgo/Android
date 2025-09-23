@@ -276,6 +276,7 @@ import com.duckduckgo.brokensite.api.BrokenSitePrompt
 import com.duckduckgo.brokensite.api.RefreshPattern
 import com.duckduckgo.browser.api.AddDocumentStartJavaScriptBrowserPlugin
 import com.duckduckgo.browser.api.UserBrowserProperties
+import com.duckduckgo.browser.api.WebMessagingBrowserPlugin
 import com.duckduckgo.browser.api.autocomplete.AutoComplete
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteResult
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion
@@ -323,7 +324,6 @@ import com.duckduckgo.history.api.NavigationHistory
 import com.duckduckgo.js.messaging.api.JsCallbackData
 import com.duckduckgo.js.messaging.api.PostMessageWrapperPlugin
 import com.duckduckgo.js.messaging.api.SubscriptionEventData
-import com.duckduckgo.js.messaging.api.WebMessagingPlugin
 import com.duckduckgo.js.messaging.api.WebViewCompatMessageCallback
 import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.Feed
 import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.Feed.MALWARE
@@ -490,7 +490,7 @@ class BrowserTabViewModel @Inject constructor(
     private val vpnMenuStateProvider: VpnMenuStateProvider,
     private val webViewCompatWrapper: WebViewCompatWrapper,
     private val addDocumentStartJavascriptPlugins: PluginPoint<AddDocumentStartJavaScriptBrowserPlugin>,
-    private val webMessagingPlugins: PluginPoint<WebMessagingPlugin>,
+    private val webMessagingPlugins: PluginPoint<WebMessagingBrowserPlugin>,
     private val postMessageWrapperPlugins: PluginPoint<PostMessageWrapperPlugin>,
 ) : ViewModel(),
     WebViewClientListener,
@@ -4228,7 +4228,7 @@ class BrowserTabViewModel @Inject constructor(
 
             callback?.let {
                 webMessagingPlugins.getPlugins().forEach { plugin ->
-                    plugin.register(callback, webView)
+                    plugin.webMessaging().register(callback, webView)
                 }
             }
         }
