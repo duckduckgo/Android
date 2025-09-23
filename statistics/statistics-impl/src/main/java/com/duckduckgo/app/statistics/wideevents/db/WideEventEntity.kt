@@ -56,7 +56,7 @@ data class WideEventEntity(
     val status: WideEventStatus?,
 
     @ColumnInfo(name = "cleanup_policy")
-    val cleanupPolicy: CleanupPolicy?,
+    val cleanupPolicy: CleanupPolicy,
 
     @ColumnInfo(name = "active_intervals")
     val activeIntervals: List<WideEventInterval>,

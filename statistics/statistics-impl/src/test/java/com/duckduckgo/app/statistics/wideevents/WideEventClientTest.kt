@@ -91,7 +91,11 @@ class WideEventClientTest {
             name = name,
             flowEntryPoint = null,
             metadata = emptyMap(),
-            cleanupPolicy = null,
+            cleanupPolicy = WideEventRepository.CleanupPolicy.OnTimeout(
+                duration = Duration.ofDays(7),
+                status = WideEventRepository.WideEventStatus.UNKNOWN,
+                metadata = emptyMap(),
+            ),
         )
     }
 

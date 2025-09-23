@@ -25,7 +25,7 @@ interface WideEventRepository {
         name: String,
         flowEntryPoint: String?,
         metadata: Map<String, String?>,
-        cleanupPolicy: CleanupPolicy?,
+        cleanupPolicy: CleanupPolicy,
     ): Long
 
     suspend fun addWideEventStep(
@@ -68,7 +68,7 @@ interface WideEventRepository {
         val steps: List<WideEventStep>,
         val metadata: Map<String, String?>,
         val flowEntryPoint: String?,
-        val cleanupPolicy: CleanupPolicy? = null,
+        val cleanupPolicy: CleanupPolicy,
         val activeIntervals: List<WideEventInterval>,
         val createdAt: Instant,
     )
