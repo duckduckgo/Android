@@ -17,8 +17,6 @@
 package com.duckduckgo.app.statistics.wideevents
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.duckduckgo.app.statistics.api.CleanupPolicy
-import com.duckduckgo.app.statistics.api.FlowStatus
 import com.duckduckgo.app.statistics.wideevents.db.WideEventRepository
 import com.duckduckgo.common.test.CoroutineTestRule
 import java.time.Duration

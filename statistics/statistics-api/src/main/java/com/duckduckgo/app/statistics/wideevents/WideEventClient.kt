@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.statistics.api
+package com.duckduckgo.app.statistics.wideevents
 
-import com.duckduckgo.app.statistics.api.CleanupPolicy.OnTimeout
+import com.duckduckgo.app.statistics.wideevents.CleanupPolicy.OnTimeout
 import java.time.Duration
 
 interface WideEventClient {
