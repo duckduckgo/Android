@@ -141,6 +141,8 @@ interface JobRecordUpdater {
     suspend fun updateOptOutError(
         extractedProfileId: Long,
     )
+
+    suspend fun markOptOutAsWaitingForEmailConfirmation(extractedProfileId: Long)
 }
 
 @ContributesBinding(AppScope::class)
@@ -277,6 +279,20 @@ class RealJobRecordUpdater @Inject constructor(
                 schedulingRepository.saveOptOutJobRecord(
                     it.copy(
                         status = OptOutJobStatus.ERROR,
+                    ).also {
+                        logcat { "PIR-JOB-RECORD: Updating OptOutRecord for $extractedProfileId to $it" }
+                    },
+                )
+            }
+        }
+    }
+
+    override suspend fun markOptOutAsWaitingForEmailConfirmation(extractedProfileId: Long) {
+        withContext(dispatcherProvider.io()) {
+            schedulingRepository.getValidOptOutJobRecord(extractedProfileId)?.also {
+                schedulingRepository.saveOptOutJobRecord(
+                    it.copy(
+                        status = OptOutJobStatus.PENDING_EMAIL_CONFIRMATION,
                     ).also {
                         logcat { "PIR-JOB-RECORD: Updating OptOutRecord for $extractedProfileId to $it" }
                     },
