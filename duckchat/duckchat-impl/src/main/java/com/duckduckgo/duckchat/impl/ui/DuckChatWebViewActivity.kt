@@ -81,7 +81,6 @@ import kotlinx.coroutines.flow.cancellable
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import org.json.JSONObject
 import java.io.File
 import javax.inject.Inject
@@ -244,9 +243,7 @@ open class DuckChatWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationD
                             DUCK_CHAT_FEATURE_NAME -> {
                                 appCoroutineScope.launch(dispatcherProvider.io()) {
                                     duckChatJSHelper.processJsCallbackMessage(featureName, method, id, data)?.let { response ->
-                                        withContext(dispatcherProvider.main()) {
-                                            contentScopeScripts.onResponse(response)
-                                        }
+                                        contentScopeScripts.onResponse(response)
                                     }
                                 }
                             }
