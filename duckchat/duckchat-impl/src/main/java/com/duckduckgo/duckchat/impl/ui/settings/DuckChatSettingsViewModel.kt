@@ -126,12 +126,11 @@ class DuckChatSettingsViewModel @Inject constructor(
 
     fun duckChatSearchAISettingsClicked() {
         viewModelScope.launch {
-            val settingsLink =
-                if (settingsPageFeature.saveAndExitSerpSettings().isEnabled()) {
-                    DUCK_CHAT_SEARCH_AI_SETTINGS_LINK_WITH_RETURN_PARAM
-                } else {
-                    DUCK_CHAT_SEARCH_AI_SETTINGS_LINK
-                }
+            val settingsLink = if (settingsPageFeature.saveAndExitSerpSettings().isEnabled()) {
+                DUCK_CHAT_SEARCH_AI_SETTINGS_LINK_WITH_RETURN_PARAM
+            } else {
+                DUCK_CHAT_SEARCH_AI_SETTINGS_LINK
+            }
             commandChannel.send(OpenLinkInNewTab(settingsLink))
             pixel.fire(DuckChatPixelName.DUCK_CHAT_SEARCH_ASSIST_SETTINGS_BUTTON_CLICKED)
         }

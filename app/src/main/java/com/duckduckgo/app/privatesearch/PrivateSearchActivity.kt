@@ -112,12 +112,11 @@ class PrivateSearchActivity : DuckDuckGoActivity() {
     }
 
     private fun launchCustomizeSearchWebPage() {
-        val settingsUrl =
-            if (settingsPageFeature.saveAndExitSerpSettings().isEnabled()) {
-                DUCKDUCKGO_SETTINGS_WEB_LINK_WITH_RETURN_PARAM
-            } else {
-                DUCKDUCKGO_SETTINGS_WEB_LINK
-            }
+        val settingsUrl = if (settingsPageFeature.saveAndExitSerpSettings().isEnabled()) {
+            DUCKDUCKGO_SETTINGS_WEB_LINK_WITH_RETURN_PARAM
+        } else {
+            DUCKDUCKGO_SETTINGS_WEB_LINK
+        }
         globalActivityStarter.start(
             this,
             WebViewActivityWithParams(
