@@ -35,7 +35,7 @@ import com.duckduckgo.app.appearance.AppearanceViewModel.Command.LaunchThemeSett
 import com.duckduckgo.app.appearance.AppearanceViewModel.Command.UpdateTheme
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ActivityAppearanceBinding
-import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition
+import com.duckduckgo.browser.ui.omnibar.OmnibarPosition
 import com.duckduckgo.app.fire.FireActivity
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.DuckDuckGoTheme

@@ -16,7 +16,7 @@
 
 package com.duckduckgo.app
 
-import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition
+import com.duckduckgo.browser.ui.omnibar.OmnibarPosition
 import com.duckduckgo.app.fire.fireproofwebsite.ui.AutomaticFireproofSetting
 import com.duckduckgo.app.fire.fireproofwebsite.ui.AutomaticFireproofSetting.ASK_EVERY_TIME
 import com.duckduckgo.app.icon.api.AppIcon

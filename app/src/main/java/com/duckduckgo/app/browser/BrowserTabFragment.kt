@@ -111,8 +111,6 @@ import com.duckduckgo.app.browser.api.WebViewCapabilityChecker
 import com.duckduckgo.app.browser.api.WebViewCapabilityChecker.WebViewCapability
 import com.duckduckgo.app.browser.applinks.AppLinksLauncher
 import com.duckduckgo.app.browser.applinks.AppLinksSnackBarConfigurator
-import com.duckduckgo.app.browser.autocomplete.BrowserAutoCompleteSuggestionsAdapter
-import com.duckduckgo.app.browser.autocomplete.SuggestionItemDecoration
 import com.duckduckgo.app.browser.autofill.SystemAutofillEngagement
 import com.duckduckgo.app.browser.commands.Command
 import com.duckduckgo.app.browser.commands.Command.OpenBrokenSiteLearnMore
@@ -149,8 +147,8 @@ import com.duckduckgo.app.browser.omnibar.Omnibar.OmnibarTextState
 import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode
 import com.duckduckgo.app.browser.omnibar.OmnibarItemPressedListener
 import com.duckduckgo.app.browser.omnibar.QueryOrigin
-import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition.BOTTOM
-import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition.TOP
+import com.duckduckgo.browser.ui.omnibar.OmnibarPosition.BOTTOM
+import com.duckduckgo.browser.ui.omnibar.OmnibarPosition.TOP
 import com.duckduckgo.app.browser.print.PrintDocumentAdapterFactory
 import com.duckduckgo.app.browser.print.PrintInjector
 import com.duckduckgo.app.browser.remotemessage.SharePromoLinkRMFBroadCastReceiver
@@ -249,6 +247,8 @@ import com.duckduckgo.browser.api.brokensite.BrokenSiteData.ReportFlow.RELOAD_TH
 import com.duckduckgo.browser.api.ui.BrowserScreens.PrivateSearchScreenNoParams
 import com.duckduckgo.browser.api.ui.BrowserScreens.WebViewActivityWithParams
 import com.duckduckgo.browser.api.webviewcompat.WebViewCompatWrapper
+import com.duckduckgo.browser.ui.autocomplete.BrowserAutoCompleteSuggestionsAdapter
+import com.duckduckgo.browser.ui.autocomplete.SuggestionItemDecoration
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.DuckDuckGoFragment
 import com.duckduckgo.common.ui.store.BrowserAppTheme
@@ -306,6 +306,7 @@ import com.duckduckgo.js.messaging.api.SubscriptionEventData
 import com.duckduckgo.js.messaging.api.WebViewCompatMessageCallback
 import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.Feed
 import com.duckduckgo.mobile.android.R as CommonR
+import com.duckduckgo.browser.ui.R as BrowserUI
 import com.duckduckgo.mobile.android.app.tracking.ui.AppTrackingProtectionScreens.AppTrackerOnboardingActivityWithEmptyParamsParams
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.navigation.api.GlobalActivityStarter.DeeplinkActivityParams
@@ -2867,7 +2868,7 @@ class BrowserTabFragment :
         binding.autoCompleteSuggestionsList.adapter = autoCompleteSuggestionsAdapter
         binding.autoCompleteSuggestionsList.addItemDecoration(
             SuggestionItemDecoration(
-                divider = ContextCompat.getDrawable(context, R.drawable.suggestions_divider)!!,
+                divider = ContextCompat.getDrawable(context, BrowserUI.drawable.suggestions_divider)!!,
             ),
         )
     }

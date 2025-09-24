@@ -39,7 +39,7 @@ import com.duckduckgo.app.browser.databinding.FragmentBrowserTabBinding
 import com.duckduckgo.app.browser.databinding.IncludeOnboardingBubbleBbDialogBinding
 import com.duckduckgo.app.browser.databinding.IncludeOnboardingBubbleBuckDialogBinding
 import com.duckduckgo.app.browser.databinding.IncludeOnboardingInContextBuckDialogBinding
-import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition
+import com.duckduckgo.browser.ui.omnibar.OmnibarPosition
 import com.duckduckgo.app.cta.model.CtaId
 import com.duckduckgo.app.cta.ui.DaxBubbleCta.DaxDialogIntroOption
 import com.duckduckgo.app.cta.ui.DaxCta.Companion.MAX_DAYS_ALLOWED

@@ -40,7 +40,7 @@ import com.duckduckgo.app.browser.omnibar.OmnibarLayout.Decoration.DisableVoiceS
 import com.duckduckgo.app.browser.omnibar.OmnibarLayout.Decoration.HighlightOmnibarItem
 import com.duckduckgo.app.browser.omnibar.OmnibarLayout.Decoration.Mode
 import com.duckduckgo.app.browser.omnibar.OmnibarLayout.StateChange
-import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition
+import com.duckduckgo.browser.ui.omnibar.OmnibarPosition
 import com.duckduckgo.app.browser.viewstate.BrowserViewState
 import com.duckduckgo.app.browser.viewstate.FindInPageViewState
 import com.duckduckgo.app.browser.viewstate.LoadingViewState

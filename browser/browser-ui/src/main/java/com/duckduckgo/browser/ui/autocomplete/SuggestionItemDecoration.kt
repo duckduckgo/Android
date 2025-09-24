@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 DuckDuckGo
+ * Copyright (c) 2025 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,11 +14,12 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.browser.autocomplete
+package com.duckduckgo.browser.ui.autocomplete
 
 import android.graphics.Canvas
 import android.graphics.drawable.Drawable
-import android.view.ViewGroup.MarginLayoutParams
+import android.view.View
+import android.view.ViewGroup
 import androidx.core.graphics.withSave
 import androidx.core.view.updateLayoutParams
 import androidx.recyclerview.widget.RecyclerView
@@ -37,12 +38,12 @@ class SuggestionItemDecoration(private val divider: Drawable) : RecyclerView.Ite
 
             for (i in 0 until childCount - 1) {
                 val currentView = parent.getChildAt(i)
-                val currentParams = currentView.layoutParams as MarginLayoutParams
+                val currentParams = currentView.layoutParams as ViewGroup.MarginLayoutParams
                 val currentViewType = currentView.tag
 
                 val nextView = parent.getChildAt(i + 1)
                 val nextViewType = nextView.tag
-                val nextViewParams = nextView.layoutParams as MarginLayoutParams
+                val nextViewParams = nextView.layoutParams as ViewGroup.MarginLayoutParams
 
                 currentView.updateLayoutParams {
                     currentParams.apply {
@@ -79,8 +80,8 @@ class SuggestionItemDecoration(private val divider: Drawable) : RecyclerView.Ite
 
     private fun drawDivider(
         canvas: Canvas,
-        child: android.view.View,
-        params: MarginLayoutParams,
+        child: View,
+        params: ViewGroup.MarginLayoutParams,
         parentRight: Int,
     ) {
         val horizontalSize = parentRight

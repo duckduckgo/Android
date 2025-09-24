@@ -19,7 +19,7 @@ package com.duckduckgo.app.onboarding.ui.page
 import android.content.Context
 import android.content.Intent
 import app.cash.turbine.test
-import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition
+import com.duckduckgo.browser.ui.omnibar.OmnibarPosition
 import com.duckduckgo.app.global.DefaultRoleBrowserDialog
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.Finish

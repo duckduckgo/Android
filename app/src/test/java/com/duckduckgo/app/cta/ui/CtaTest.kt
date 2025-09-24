@@ -19,8 +19,8 @@ package com.duckduckgo.app.cta.ui
 import android.content.res.Resources
 import android.net.Uri
 import androidx.fragment.app.FragmentActivity
-import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition.BOTTOM
-import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition.TOP
+import com.duckduckgo.browser.ui.omnibar.OmnibarPosition.BOTTOM
+import com.duckduckgo.browser.ui.omnibar.OmnibarPosition.TOP
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.global.model.orderedTrackerBlockedEntities
