@@ -45,6 +45,7 @@ dependencies {
     implementation project(path: ':app-build-config-api')
     implementation project(':internal-features-api')
     implementation project(':browser-api')
+    implementation project(':design-system')
     implementation "androidx.datastore:datastore-preferences:_"
 
     implementation AndroidX.appCompat

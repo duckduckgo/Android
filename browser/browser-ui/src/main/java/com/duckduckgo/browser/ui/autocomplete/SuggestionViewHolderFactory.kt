@@ -27,18 +27,19 @@ import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggesti
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion.AutoCompleteSearchSuggestion
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion.AutoCompleteUrlSuggestion.AutoCompleteBookmarkSuggestion
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion.AutoCompleteUrlSuggestion.AutoCompleteSwitchToTabSuggestion
-import com.duckduckgo.common.ui.view.MessageCta.Message
-import com.duckduckgo.duckchat.impl.R
-import com.duckduckgo.duckchat.impl.databinding.ItemAutocompleteBookmarkSuggestionBinding
-import com.duckduckgo.duckchat.impl.databinding.ItemAutocompleteDefaultBinding
-import com.duckduckgo.duckchat.impl.databinding.ItemAutocompleteDividerBinding
-import com.duckduckgo.duckchat.impl.databinding.ItemAutocompleteDuckaiSuggestionBinding
-import com.duckduckgo.duckchat.impl.databinding.ItemAutocompleteHistorySearchSuggestionBinding
-import com.duckduckgo.duckchat.impl.databinding.ItemAutocompleteHistorySuggestionBinding
-import com.duckduckgo.duckchat.impl.databinding.ItemAutocompleteInAppMessageBinding
-import com.duckduckgo.duckchat.impl.databinding.ItemAutocompleteSearchSuggestionBinding
-import com.duckduckgo.duckchat.impl.databinding.ItemAutocompleteSwitchToTabSuggestionBinding
+import com.duckduckgo.browser.ui.R
 import com.duckduckgo.browser.ui.autocomplete.AutoCompleteViewHolder.InAppMessageViewHolder
+import com.duckduckgo.browser.ui.databinding.ItemAutocompleteBookmarkSuggestionBinding
+import com.duckduckgo.browser.ui.databinding.ItemAutocompleteDefaultBinding
+import com.duckduckgo.browser.ui.databinding.ItemAutocompleteDividerBinding
+import com.duckduckgo.browser.ui.databinding.ItemAutocompleteDuckaiSuggestionBinding
+import com.duckduckgo.browser.ui.databinding.ItemAutocompleteHistorySearchSuggestionBinding
+import com.duckduckgo.browser.ui.databinding.ItemAutocompleteHistorySuggestionBinding
+import com.duckduckgo.browser.ui.databinding.ItemAutocompleteInAppMessageBinding
+import com.duckduckgo.browser.ui.databinding.ItemAutocompleteSearchSuggestionBinding
+import com.duckduckgo.browser.ui.databinding.ItemAutocompleteSwitchToTabSuggestionBinding
+import com.duckduckgo.browser.ui.omnibar.OmnibarPosition
+import com.duckduckgo.common.ui.view.MessageCta.Message
 import com.duckduckgo.mobile.android.R as CommonR
 
 interface SuggestionViewHolderFactory {
