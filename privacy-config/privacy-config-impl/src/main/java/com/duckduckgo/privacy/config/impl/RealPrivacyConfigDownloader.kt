@@ -60,7 +60,6 @@ class RealPrivacyConfigDownloader @Inject constructor(
 
     override suspend fun download(): PrivacyConfigDownloader.ConfigDownloadResult {
         logcat { "Downloading privacy config" }
-        return Error(null) // Default to error state, only return success at the end of the method when everything has worked
 
         val response = runCatching {
             privacyConfigService.privacyConfig()
