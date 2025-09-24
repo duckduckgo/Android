@@ -566,7 +566,7 @@ open class OmnibarLayout @JvmOverloads constructor(
             }
 
             is StartTrackersAnimation -> {
-                startVisualDesignTrackersAnimation(command.entities)
+                startTrackersAnimation(command.entities)
             }
 
             is LaunchInputScreen -> {
@@ -862,7 +862,7 @@ open class OmnibarLayout @JvmOverloads constructor(
         }
     }
 
-    private fun startVisualDesignTrackersAnimation(events: List<Entity>?) {
+    private fun startTrackersAnimation(events: List<Entity>?) {
         animatorHelper.startTrackersAnimation(
             context = context,
             shieldAnimationView = shieldIcon,
