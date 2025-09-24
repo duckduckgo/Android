@@ -18,12 +18,15 @@ package com.duckduckgo.pir.impl.common
 
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerManualScanCompleted
+import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerRecordEmailConfirmationNeeded
 import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerRecordOptOutCompleted
 import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerRecordOptOutStarted
 import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerScanActionSucceeded
 import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerScheduledScanCompleted
 import com.duckduckgo.pir.impl.models.AddressCityState
 import com.duckduckgo.pir.impl.models.ExtractedProfile
+import com.duckduckgo.pir.impl.models.scheduling.JobRecord.EmailConfirmationJobRecord
+import com.duckduckgo.pir.impl.models.scheduling.JobRecord.EmailConfirmationJobRecord.EmailData
 import com.duckduckgo.pir.impl.pixels.PirPixelSender
 import com.duckduckgo.pir.impl.scheduling.JobRecordUpdater
 import com.duckduckgo.pir.impl.scripts.models.PirSuccessResponse.ExtractedResponse
@@ -32,6 +35,7 @@ import com.duckduckgo.pir.impl.scripts.models.PirSuccessResponse.ExtractedRespon
 import com.duckduckgo.pir.impl.scripts.models.PirSuccessResponse.NavigateResponse
 import com.duckduckgo.pir.impl.store.PirEventsRepository
 import com.duckduckgo.pir.impl.store.PirRepository
+import com.duckduckgo.pir.impl.store.PirSchedulingRepository
 import com.duckduckgo.pir.impl.store.db.BrokerScanEventType.BROKER_ERROR
 import com.duckduckgo.pir.impl.store.db.BrokerScanEventType.BROKER_SUCCESS
 import com.duckduckgo.pir.impl.store.db.PirBrokerScanLog
@@ -55,6 +59,7 @@ class RealPirRunStateHandlerTest {
     private val mockEventsRepository: PirEventsRepository = mock()
     private val mockPixelSender: PirPixelSender = mock()
     private val mockJobRecordUpdater: JobRecordUpdater = mock()
+    private val mockSchedulingRepository: PirSchedulingRepository = mock()
 
     @Before
     fun setUp() {
@@ -64,6 +69,7 @@ class RealPirRunStateHandlerTest {
             pixelSender = mockPixelSender,
             dispatcherProvider = coroutineRule.testDispatcherProvider,
             jobRecordUpdater = mockJobRecordUpdater,
+            schedulingRepository = mockSchedulingRepository,
         )
     }
 
@@ -412,5 +418,27 @@ class RealPirRunStateHandlerTest {
             totalTimeInMillis = testEventTimeInMillis - testStartTimeInMillis,
             isSuccess = false,
         )
+    }
+
+    @Test
+    fun whenHandleBrokerRecordEmailConfirmationNeededThenSavesEmailConfirmationJobAndMarksOptOutAsWaitingForEmailConfirmation() = runTest {
+        val state = BrokerRecordEmailConfirmationNeeded(
+            brokerName = testBrokerName,
+            extractedProfile = testExtractedProfile,
+        )
+        val expectedEmailConfirmationJobRecord = EmailConfirmationJobRecord(
+            userProfileId = testProfileQueryId,
+            extractedProfileId = testExtractedProfileId,
+            brokerName = testBrokerName,
+            emailData = EmailData(
+                email = "john@example.com",
+                attemptId = "",
+            ),
+        )
+
+        testee.handleState(state)
+
+        verify(mockSchedulingRepository).saveEmailConfirmationJobRecord(expectedEmailConfirmationJobRecord)
+        verify(mockJobRecordUpdater).markOptOutAsWaitingForEmailConfirmation(testExtractedProfileId)
     }
 }

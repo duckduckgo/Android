@@ -113,7 +113,7 @@ sealed class JobRecord(
         val emailData: EmailData,
         val linkFetchData: LinkFetchData = LinkFetchData(),
         val jobAttemptData: JobAttemptData = JobAttemptData(),
-        val dateCreatedInMillis: Long,
+        val dateCreatedInMillis: Long = 0L,
         val deprecated: Boolean = false,
     ) : JobRecord(brokerName, userProfileId) {
         data class EmailData(

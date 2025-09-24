@@ -88,7 +88,10 @@ interface PirActionsRunnerStateEngine {
             val actionRequestData: PirScriptRequestData,
         ) : Event()
 
-        data class BrokerStepCompleted(val isSuccess: Boolean) : Event()
+        data class BrokerStepCompleted(
+            val needsEmailConfirmation: Boolean,
+            val isSuccess: Boolean,
+        ) : Event()
 
         data class JsErrorReceived(
             val error: PirError.JsError,
@@ -122,14 +125,6 @@ interface PirActionsRunnerStateEngine {
             val actionId: String,
             val responseData: ResponseData?,
         ) : Event()
-
-        data class RetryGetEmailConfirmation(
-            val actionId: String,
-            val brokerName: String,
-            val extractedProfile: ExtractedProfile,
-            val pollingIntervalSeconds: Float,
-            val attempt: Int = 0,
-        ) : Event()
     }
 
     /**
@@ -157,15 +152,6 @@ interface PirActionsRunnerStateEngine {
             override val actionId: String,
             val responseData: ResponseData?,
             val isRetry: Boolean,
-        ) : SideEffect(), BrokerActionSideEffect
-
-        data class AwaitEmailConfirmation(
-            override val actionId: String,
-            val brokerName: String,
-            val extractedProfile: ExtractedProfile,
-            val pollingIntervalSeconds: Float,
-            val retries: Int = 10,
-            val attempt: Int = 0,
         ) : SideEffect(), BrokerActionSideEffect
 
         data class AwaitCaptchaSolution(

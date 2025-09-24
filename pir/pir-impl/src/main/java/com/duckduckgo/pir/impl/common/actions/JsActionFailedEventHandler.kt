@@ -112,7 +112,7 @@ class JsActionFailedEventHandler @Inject constructor(
             // If error happens we skip to next Broker as next steps will not make sense
             Next(
                 nextState = state,
-                nextEvent = BrokerStepCompleted(isSuccess = false),
+                nextEvent = BrokerStepCompleted(needsEmailConfirmation = false, isSuccess = false),
             )
         }
     }
