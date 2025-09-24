@@ -29,7 +29,7 @@ import logcat.logcat
 
 /**
  * This RemoteViewsFactory will not render any item. It's used for convenience to simplify executing background operations to show/hide empty widget CTA.
- * If this RemoteViewsFactory count is 0, SearchAndFavoritesWidget R.id.emptyfavoritesGrid will show the configured EmptyView.
+ * If this RemoteViewsFactory count is 0, SearchAndFavoritesWidget R.id.emptyFavoritesGrid will show the configured EmptyView.
  */
 class EmptyFavoritesWidgetItemFactory(
     val context: Context,

@@ -272,8 +272,8 @@ class SearchAndFavoritesWidget : AppWidgetProvider() {
         remoteViews: RemoteViews,
     ) {
         val items = buildRemoteEmptyCollectionItems(context)
-        remoteViews.setEmptyView(R.id.emptyfavoritesGrid, R.id.emptyGridViewContainer)
-        RemoteViewsCompat.setRemoteAdapter(context, remoteViews, appWidgetId, R.id.emptyfavoritesGrid, items)
+        remoteViews.setEmptyView(R.id.emptyFavoritesGrid, R.id.emptyGridViewContainer)
+        RemoteViewsCompat.setRemoteAdapter(context, remoteViews, appWidgetId, R.id.emptyFavoritesGrid, items)
     }
 
     private fun buildPendingIntent(context: Context): PendingIntent {
