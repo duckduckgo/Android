@@ -25,6 +25,7 @@ import com.duckduckgo.savedsites.api.models.SavedSite
 import com.duckduckgo.savedsites.api.models.SavedSitesNames
 import com.duckduckgo.savedsites.api.service.ImportSavedSitesResult
 import com.duckduckgo.savedsites.api.service.SavedSitesImporter
+import com.duckduckgo.savedsites.api.service.SavedSitesImporter.ImportFolder
 import com.duckduckgo.savedsites.store.Entity
 import com.duckduckgo.savedsites.store.EntityType.BOOKMARK
 import com.duckduckgo.savedsites.store.EntityType.FOLDER
@@ -62,11 +63,11 @@ class RealSavedSitesImporter(
         private const val IMPORT_BATCH_SIZE = 200
     }
 
-    override suspend fun import(uri: Uri): ImportSavedSitesResult {
+    override suspend fun import(uri: Uri, destination: ImportFolder): ImportSavedSitesResult {
         return try {
             val savedSites = contentResolver.openInputStream(uri).use { stream ->
                 val document = Jsoup.parse(stream, Charsets.UTF_8.name(), BASE_URI)
-                savedSitesParser.parseHtml(document, savedSitesRepository)
+                savedSitesParser.parseHtml(document, savedSitesRepository, destination)
             }
 
             val bookmarks = savedSites.filterIsInstance<SavedSite.Bookmark>()

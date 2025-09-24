@@ -1,5 +1,6 @@
 package com.duckduckgo.duckchat.impl.ui.inputscreen
 
+import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import app.cash.turbine.test
 import com.duckduckgo.app.statistics.pixels.Pixel
@@ -15,6 +16,10 @@ import com.duckduckgo.browser.api.autocomplete.AutoCompleteSettings
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.extensions.toBinaryString
 import com.duckduckgo.duckchat.api.DuckChat
+import com.duckduckgo.duckchat.impl.inputscreen.ui.command.Command
+import com.duckduckgo.duckchat.impl.inputscreen.ui.command.Command.AnimateLogoToProgress
+import com.duckduckgo.duckchat.impl.inputscreen.ui.command.Command.SetInputModeWidgetScrollPosition
+import com.duckduckgo.duckchat.impl.inputscreen.ui.command.Command.SetLogoProgress
 import com.duckduckgo.duckchat.impl.inputscreen.ui.command.Command.ShowKeyboard
 import com.duckduckgo.duckchat.impl.inputscreen.ui.command.Command.SubmitChat
 import com.duckduckgo.duckchat.impl.inputscreen.ui.command.Command.SubmitSearch
@@ -58,6 +63,10 @@ class InputScreenViewModelTest {
 
     @get:Rule
     val coroutineRule = CoroutineTestRule()
+
+    @get:Rule
+    @Suppress("unused")
+    var instantTaskExecutorRule = InstantTaskExecutorRule()
 
     private val autoComplete: AutoComplete = mock()
     private val history: NavigationHistory = mock()
@@ -1246,5 +1255,148 @@ class InputScreenViewModelTest {
             )
             clearInvocations(pixel) // Reset mock for next iteration
         }
+    }
+
+    @Test
+    fun `when onTabTapped to position 1 and has no content then animate logo to position 1`() = runTest {
+        val viewModel = createViewModel()
+
+        viewModel.onTabTapped(index = 1)
+
+        assertEquals(AnimateLogoToProgress(1f), viewModel.command.value)
+    }
+
+    @Test
+    fun `when onTabTapped to position 0 and has no content then animate logo to position 0`() = runTest {
+        val viewModel = createViewModel()
+
+        viewModel.onPageSelected(position = 1)
+        viewModel.onTabTapped(index = 0)
+
+        assertEquals(AnimateLogoToProgress(0f), viewModel.command.value)
+    }
+
+    @Test
+    fun `when onTabTapped at current position then AnimateLogoToProgress is not emitted`() = runTest {
+        val viewModel = createViewModel()
+        val capturedCommands = mutableListOf<Command>()
+
+        viewModel.command.observeForever { command ->
+            if (command != null) {
+                capturedCommands.add(command)
+            }
+        }
+
+        viewModel.onTabTapped(index = 0)
+
+        assertEquals(0, capturedCommands.size)
+    }
+
+    @Test
+    fun `when onTabTapped and has content then AnimateLogoToProgress is not emitted`() = runTest {
+        val viewModel = createViewModel()
+        val capturedCommands = mutableListOf<Command>()
+
+        viewModel.command.observeForever { command ->
+            if (command != null) {
+                capturedCommands.add(command)
+            }
+        }
+
+        viewModel.onNewTabPageContentChanged(hasContent = true)
+        viewModel.onTabTapped(index = 1)
+
+        assertEquals(0, capturedCommands.size)
+    }
+
+    @Test
+    fun `when onPageScrolled at position 0 and not tap transition then SetLogoProgress and SetInputModeWidgetScrollPosition emitted`() = runTest {
+        val viewModel = createViewModel()
+        val capturedCommands = mutableListOf<Command>()
+
+        viewModel.command.observeForever { command ->
+            if (command != null) {
+                capturedCommands.add(command)
+            }
+        }
+
+        val position = 0
+        val positionOffset = 0.3f
+        val easedOffset = positionOffset * positionOffset * 2f
+
+        viewModel.onPageScrolled(position, positionOffset)
+
+        assertEquals(2, capturedCommands.size)
+        assertEquals(SetLogoProgress(positionOffset), capturedCommands[0])
+        assertEquals(SetInputModeWidgetScrollPosition(position = position, offset = easedOffset), capturedCommands[1])
+    }
+
+    @Test
+    fun `when onPageScrolled at position 1 and not tap transition then SetLogoProgress and SetInputModeWidgetScrollPosition emitted`() = runTest {
+        val viewModel = createViewModel()
+        val capturedCommands = mutableListOf<Command>()
+
+        viewModel.command.observeForever { command ->
+            if (command != null) {
+                capturedCommands.add(command)
+            }
+        }
+
+        val position = 1
+        val positionOffset = 0.7f
+        val logoProgress = 1f - positionOffset
+        val easedOffset = 1f - (1f - positionOffset) * (1f - positionOffset) * 2f
+
+        viewModel.onPageScrolled(position, positionOffset)
+
+        assertEquals(2, capturedCommands.size)
+        assertEquals(SetLogoProgress(logoProgress), capturedCommands[0])
+        assertEquals(SetInputModeWidgetScrollPosition(position = position, offset = easedOffset), capturedCommands[1])
+    }
+
+    @Test
+    fun `when onPageScrolled and has content then SetLogoProgress is 1f`() = runTest {
+        val viewModel = createViewModel()
+        val capturedCommands = mutableListOf<Command>()
+
+        viewModel.command.observeForever { command ->
+            if (command != null) {
+                capturedCommands.add(command)
+            }
+        }
+
+        viewModel.onNewTabPageContentChanged(hasContent = true)
+
+        val position = 0
+        val positionOffset = 0.3f
+        val easedOffset = positionOffset * positionOffset * 2f
+
+        viewModel.onPageScrolled(position, positionOffset)
+
+        assertEquals(2, capturedCommands.size)
+        assertEquals(SetLogoProgress(1f), capturedCommands[0])
+        assertEquals(SetInputModeWidgetScrollPosition(position = position, offset = easedOffset), capturedCommands[1])
+    }
+
+    @Test
+    fun `when onPageScrolled during tap transition then SetLogoProgress and SetInputModeWidgetScrollPosition are not emitted`() = runTest {
+        val viewModel = createViewModel()
+        val capturedCommands = mutableListOf<Command>()
+
+        viewModel.command.observeForever { command ->
+            if (command != null) {
+                capturedCommands.add(command)
+            }
+        }
+
+        viewModel.onTabTapped(index = 1)
+        capturedCommands.clear()
+
+        val position = 0
+        val positionOffset = 0.3f
+
+        viewModel.onPageScrolled(position, positionOffset)
+
+        assertEquals(0, capturedCommands.size)
     }
 }

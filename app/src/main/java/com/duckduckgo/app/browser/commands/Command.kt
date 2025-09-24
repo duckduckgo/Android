@@ -66,6 +66,7 @@ sealed class Command {
     data object LaunchNewTab : Command()
     data object ResetHistory : Command()
     class LaunchPrivacyPro(val uri: Uri) : Command()
+    data object LaunchVpnManagement : Command()
     class DialNumber(val telephoneNumber: String) : Command()
     class SendSms(val telephoneNumber: String) : Command()
     class SendEmail(val emailAddress: String) : Command()

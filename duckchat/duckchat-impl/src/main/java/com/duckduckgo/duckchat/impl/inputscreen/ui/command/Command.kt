@@ -24,4 +24,7 @@ sealed class Command {
     data class SubmitChat(val query: String) : Command()
     data object ShowKeyboard : Command()
     data object HideKeyboard : Command()
+    data class SetInputModeWidgetScrollPosition(val position: Int, val offset: Float) : Command()
+    data class SetLogoProgress(val targetProgress: Float) : Command()
+    data class AnimateLogoToProgress(val targetProgress: Float) : Command()
 }

@@ -27,7 +27,7 @@ dependencies {
     implementation project(':dax-prompts-api')
     implementation project(':browser-api')
     implementation project(':common-utils')
-    implementation project(':common-ui')
+    implementation project(':design-system')
     implementation project(':navigation-api')
     implementation project(':app-build-config-api')
     implementation project(':duckplayer-api')

@@ -124,11 +124,13 @@ class InputScreenViewModel @AssistedInject constructor(
 ) : ViewModel() {
 
     private var hasUserSeenHistoryIAM = false
+    private var isTapTransition = false
 
     private val newTabPageHasContent = MutableStateFlow(false)
     private val voiceServiceAvailable = MutableStateFlow(voiceSearchAvailability.isVoiceSearchAvailable)
     private val voiceInputAllowed = MutableStateFlow(true)
     private var userSelectedMode: UserSelectedMode = NONE
+    private var currentPagePosition: Int = 0
     private val _visibilityState = MutableStateFlow(
         InputScreenVisibilityState(
             voiceInputButtonVisible = voiceServiceAvailable.value && voiceInputAllowed.value,
@@ -443,6 +445,44 @@ class InputScreenViewModel @AssistedInject constructor(
             fireModeSwitchedPixel(directionToSearch = true)
         }
         userSelectedMode = SEARCH
+    }
+
+    fun onPageScrolled(position: Int, positionOffset: Float) {
+        if (!isTapTransition) {
+            val logoProgress = calculateLogoProgress(position, positionOffset)
+            command.value = Command.SetLogoProgress(logoProgress)
+            val widgetOffset = calculateInputModeWidgetScrollPosition(positionOffset)
+            command.value = Command.SetInputModeWidgetScrollPosition(position, widgetOffset)
+        }
+    }
+
+    private fun calculateLogoProgress(position: Int, positionOffset: Float): Float {
+        if (newTabPageHasContent.value) return 1f
+        return if (position == 0) positionOffset else 1f - positionOffset
+    }
+
+    private fun calculateInputModeWidgetScrollPosition(positionOffset: Float): Float {
+        return when {
+            positionOffset <= 0.5f -> positionOffset * positionOffset * 2f
+            else -> 1f - (1f - positionOffset) * (1f - positionOffset) * 2f
+        }
+    }
+
+    fun onTabTapped(index: Int) {
+        if (currentPagePosition != index) {
+            isTapTransition = true
+            if (!newTabPageHasContent.value) {
+                command.value = Command.AnimateLogoToProgress(index.toFloat())
+            }
+        }
+    }
+
+    fun onPageSelected(position: Int) {
+        currentPagePosition = position
+    }
+
+    fun onScrollStateIdle() {
+        isTapTransition = false
     }
 
     fun onSendButtonClicked() {

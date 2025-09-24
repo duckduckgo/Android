@@ -26,7 +26,6 @@ import android.provider.MediaStore
 import android.util.Patterns
 import android.view.ContextMenu
 import android.view.MenuItem
-import android.view.MotionEvent.ACTION_UP
 import android.view.View
 import android.webkit.MimeTypeMap
 import android.webkit.PermissionRequest
@@ -111,6 +110,7 @@ import com.duckduckgo.app.browser.commands.Command.LaunchNewTab
 import com.duckduckgo.app.browser.commands.Command.LaunchPopupMenu
 import com.duckduckgo.app.browser.commands.Command.LaunchPrivacyPro
 import com.duckduckgo.app.browser.commands.Command.LaunchTabSwitcher
+import com.duckduckgo.app.browser.commands.Command.LaunchVpnManagement
 import com.duckduckgo.app.browser.commands.Command.LoadExtractedUrl
 import com.duckduckgo.app.browser.commands.Command.OpenAppLink
 import com.duckduckgo.app.browser.commands.Command.OpenBrokenSiteLearnMore
@@ -185,6 +185,7 @@ import com.duckduckgo.app.browser.logindetection.FireproofDialogsEventHandler.Ev
 import com.duckduckgo.app.browser.logindetection.LoginDetected
 import com.duckduckgo.app.browser.logindetection.NavigationAwareLoginDetector
 import com.duckduckgo.app.browser.logindetection.NavigationEvent
+import com.duckduckgo.app.browser.menu.VpnMenuStateProvider
 import com.duckduckgo.app.browser.model.BasicAuthenticationCredentials
 import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
 import com.duckduckgo.app.browser.model.LongPressTarget
@@ -212,6 +213,7 @@ import com.duckduckgo.app.browser.viewstate.LoadingViewState
 import com.duckduckgo.app.browser.viewstate.OmnibarViewState
 import com.duckduckgo.app.browser.viewstate.PrivacyShieldViewState
 import com.duckduckgo.app.browser.viewstate.SavedSiteChangedViewState
+import com.duckduckgo.app.browser.viewstate.VpnMenuState
 import com.duckduckgo.app.browser.webview.MaliciousSiteBlockedWarningLayout
 import com.duckduckgo.app.browser.webview.MaliciousSiteBlockedWarningLayout.Action.LearnMore
 import com.duckduckgo.app.browser.webview.MaliciousSiteBlockedWarningLayout.Action.LeaveSite
@@ -480,6 +482,7 @@ class BrowserTabViewModel @Inject constructor(
     private val serpEasterEggLogosToggles: SerpEasterEggLogosToggles,
     private val nonHttpAppLinkChecker: NonHttpAppLinkChecker,
     private val externalIntentProcessingState: ExternalIntentProcessingState,
+    private val vpnMenuStateProvider: VpnMenuStateProvider,
 ) : WebViewClientListener,
     EditSavedSiteListener,
     DeleteBookmarkListener,
@@ -727,6 +730,13 @@ class BrowserTabViewModel @Inject constructor(
         duckPlayer.observeUserPreferences()
             .onEach { preferences ->
                 command.value = duckPlayerJSHelper.userPreferencesUpdated(preferences)
+            }
+            .flowOn(dispatchers.main())
+            .launchIn(viewModelScope)
+
+        vpnMenuStateProvider.getVpnMenuState()
+            .onEach { vpnMenuState ->
+                browserViewState.value = currentBrowserViewState().copy(vpnMenuState = vpnMenuState)
             }
             .flowOn(dispatchers.main())
             .launchIn(viewModelScope)
@@ -4177,40 +4187,6 @@ class BrowserTabViewModel @Inject constructor(
         return currentBrowserViewState().isPrinting
     }
 
-    fun onUserTouchedOmnibarTextInput(touchAction: Int) {
-        if (touchAction == ACTION_UP) {
-            firePixelBasedOnCurrentUrl(
-                AppPixelName.ADDRESS_BAR_NEW_TAB_PAGE_CLICKED,
-                AppPixelName.ADDRESS_BAR_SERP_CLICKED,
-                AppPixelName.ADDRESS_BAR_WEBSITE_CLICKED,
-            )
-        }
-    }
-
-    fun onClearOmnibarTextInput() {
-        firePixelBasedOnCurrentUrl(
-            AppPixelName.ADDRESS_BAR_NEW_TAB_PAGE_ENTRY_CLEARED,
-            AppPixelName.ADDRESS_BAR_SERP_ENTRY_CLEARED,
-            AppPixelName.ADDRESS_BAR_WEBSITE_ENTRY_CLEARED,
-        )
-    }
-
-    fun sendPixelsOnBackKeyPressed() {
-        firePixelBasedOnCurrentUrl(
-            AppPixelName.ADDRESS_BAR_NEW_TAB_PAGE_CANCELLED,
-            AppPixelName.ADDRESS_BAR_SERP_CANCELLED,
-            AppPixelName.ADDRESS_BAR_WEBSITE_CANCELLED,
-        )
-    }
-
-    fun sendPixelsOnEnterKeyPressed() {
-        firePixelBasedOnCurrentUrl(
-            AppPixelName.KEYBOARD_GO_NEW_TAB_CLICKED,
-            AppPixelName.KEYBOARD_GO_SERP_CLICKED,
-            AppPixelName.KEYBOARD_GO_WEBSITE_CLICKED,
-        )
-    }
-
     fun hasOmnibarPositionChanged(currentPosition: OmnibarPosition): Boolean = settingsDataStore.omnibarPosition != currentPosition
 
     private fun firePixelBasedOnCurrentUrl(
@@ -4332,6 +4308,19 @@ class BrowserTabViewModel @Inject constructor(
             hasFocus && isNtp && query.isNullOrBlank() -> duckChat.openDuckChat()
             hasFocus -> duckChat.openDuckChatWithAutoPrompt(query ?: "")
             else -> duckChat.openDuckChat()
+        }
+    }
+
+    fun onVpnMenuClicked() {
+        val vpnMenuState = currentBrowserViewState().vpnMenuState
+        when (vpnMenuState) {
+            VpnMenuState.NotSubscribed -> {
+                command.value = LaunchPrivacyPro("https://duckduckgo.com/pro?origin=funnel_appmenu_android".toUri())
+            }
+            is VpnMenuState.Subscribed -> {
+                command.value = LaunchVpnManagement
+            }
+            VpnMenuState.Hidden -> {} // Should not happen as menu item should not be visible
         }
     }
 

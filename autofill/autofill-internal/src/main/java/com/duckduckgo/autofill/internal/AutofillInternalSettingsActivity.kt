@@ -36,6 +36,7 @@ import com.duckduckgo.autofill.api.AutofillScreenLaunchSource.InternalDevSetting
 import com.duckduckgo.autofill.api.AutofillScreens.AutofillPasswordsManagementScreen
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.autofill.api.email.EmailManager
+import com.duckduckgo.autofill.impl.R as autofillR
 import com.duckduckgo.autofill.impl.configuration.AutofillJavascriptEnvironmentConfiguration
 import com.duckduckgo.autofill.impl.email.incontext.store.EmailProtectionInContextDataStore
 import com.duckduckgo.autofill.impl.engagement.store.AutofillEngagementRepository
@@ -53,6 +54,9 @@ import com.duckduckgo.autofill.impl.importing.gpm.webflow.ImportGooglePasswordRe
 import com.duckduckgo.autofill.impl.importing.gpm.webflow.ImportGooglePasswordResult.Error
 import com.duckduckgo.autofill.impl.importing.gpm.webflow.ImportGooglePasswordResult.Success
 import com.duckduckgo.autofill.impl.importing.gpm.webflow.ImportGooglePasswordResult.UserCancelled
+import com.duckduckgo.autofill.impl.importing.takeout.processor.TakeoutBookmarkImporter
+import com.duckduckgo.autofill.impl.importing.takeout.zip.TakeoutBookmarkExtractor
+import com.duckduckgo.autofill.impl.importing.takeout.zip.TakeoutBookmarkExtractor.ExtractionResult
 import com.duckduckgo.autofill.impl.reporting.AutofillSiteBreakageReportingDataStore
 import com.duckduckgo.autofill.impl.store.InternalAutofillStore
 import com.duckduckgo.autofill.impl.store.NeverSavedSiteRepository
@@ -60,6 +64,7 @@ import com.duckduckgo.autofill.impl.ui.credential.management.survey.AutofillSurv
 import com.duckduckgo.autofill.internal.databinding.ActivityAutofillInternalSettingsBinding
 import com.duckduckgo.autofill.store.AutofillPrefsStore
 import com.duckduckgo.browser.api.UserBrowserProperties
+import com.duckduckgo.browser.api.ui.BrowserScreens
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.view.button.ButtonType.DESTRUCTIVE
 import com.duckduckgo.common.ui.view.button.ButtonType.GHOST_ALT
@@ -72,12 +77,15 @@ import com.duckduckgo.common.utils.extensions.launchAutofillProviderSystemSettin
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.navigation.api.GlobalActivityStarter
+import com.duckduckgo.savedsites.api.service.ImportSavedSitesResult
+import com.duckduckgo.savedsites.api.service.SavedSitesImporter.ImportFolder
 import com.google.android.material.snackbar.Snackbar
 import java.text.SimpleDateFormat
 import javax.inject.Inject
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import logcat.LogPriority
 import logcat.logcat
 
 @InjectWith(ActivityScope::class)
@@ -144,6 +152,12 @@ class AutofillInternalSettingsActivity : DuckDuckGoActivity() {
     @Inject
     lateinit var inBrowserImportPromoPreviousPromptsStore: InternalInBrowserPromoStore
 
+    @Inject
+    lateinit var takeoutBookmarkImporter: TakeoutBookmarkImporter
+
+    @Inject
+    lateinit var takeoutZipTakeoutBookmarkExtractor: TakeoutBookmarkExtractor
+
     private var passwordImportWatcher = ConflatedJob()
 
     // used to output duration of import
@@ -173,6 +187,49 @@ class AutofillInternalSettingsActivity : DuckDuckGoActivity() {
                         }
                     }
                 }
+            }
+        }
+    }
+
+    private val importBookmarksTakeoutZipLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+        if (result.resultCode == RESULT_OK) {
+            val data: Intent? = result.data
+            val fileUrl = data?.data
+
+            logcat { "onActivityResult for bookmarks zip request. uri=$fileUrl" }
+            fileUrl?.let { file ->
+                lifecycleScope.launch(dispatchers.io()) {
+                    // Extract HTML content from zip
+                    val extractionResult = takeoutZipTakeoutBookmarkExtractor.extractBookmarksHtml(file)
+                    logcat { "Bookmark extraction result: $extractionResult" }
+
+                    when (extractionResult) {
+                        is ExtractionResult.Success -> onBookmarksExtracted(extractionResult)
+                        is ExtractionResult.Error -> {
+                            "Error extracting bookmarks".showSnackbar()
+                            logcat(LogPriority.WARN) { "Error extracting bookmarks: ${extractionResult.exception.message}" }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private suspend fun onBookmarksExtracted(extractionResult: ExtractionResult.Success) {
+        when (
+            val importResult = takeoutBookmarkImporter.importBookmarks(
+                htmlContent = extractionResult.bookmarkHtmlContent,
+                destination = ImportFolder.Folder(getString(autofillR.string.autofillImportBookmarksChromeFolderName)),
+            )
+        ) {
+            is ImportSavedSitesResult.Success -> {
+                logcat { "Successfully imported ${importResult.savedSites.size} bookmarks" }
+                "Imported ${importResult.savedSites.size} bookmarks".showSnackbar()
+            }
+
+            is ImportSavedSitesResult.Error -> {
+                logcat(LogPriority.WARN) { "Error importing bookmarks: ${importResult.exception.message}" }
+                "Could not import bookmarks".showSnackbar()
             }
         }
     }
@@ -279,6 +336,7 @@ class AutofillInternalSettingsActivity : DuckDuckGoActivity() {
         configureReportBreakagesHandlers()
         configureDeclineCounterHandlers()
         configureImportPasswordsEventHandlers()
+        configureImportBookmarksEventHandlers()
     }
 
     private fun configureReportBreakagesHandlers() {
@@ -669,6 +727,27 @@ class AutofillInternalSettingsActivity : DuckDuckGoActivity() {
         cookieManager.flush()
 
         Toast.makeText(this, R.string.autofillDevSettingsGoogleLogoutSuccess, Toast.LENGTH_SHORT).show()
+    }
+
+    private fun configureImportBookmarksEventHandlers() {
+        binding.importBookmarksLaunchGoogleTakeoutWebpage.setClickListener {
+            lifecycleScope.launch(dispatchers.io()) {
+                val url = "https://takeout.google.com"
+                startActivity(browserNav.openInNewTab(this@AutofillInternalSettingsActivity, url))
+            }
+        }
+
+        binding.importBookmarksImportTakeoutZip.setClickListener {
+            val intent = Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
+                addCategory(Intent.CATEGORY_OPENABLE)
+                type = "*/*"
+            }
+            importBookmarksTakeoutZipLauncher.launch(intent)
+        }
+
+        binding.viewBookmarks.setClickListener {
+            globalActivityStarter.start(this, BrowserScreens.BookmarksScreenNoParams)
+        }
     }
 
     companion object {

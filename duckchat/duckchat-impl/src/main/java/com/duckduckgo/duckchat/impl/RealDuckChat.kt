@@ -41,6 +41,7 @@ import com.duckduckgo.duckchat.impl.inputscreen.newaddressbaroption.NewAddressBa
 import com.duckduckgo.duckchat.impl.inputscreen.newaddressbaroption.NewAddressBarSelection
 import com.duckduckgo.duckchat.impl.inputscreen.newaddressbaroption.NewAddressBarSelection.SEARCH_AND_AI
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
+import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_NEW_ADDRESS_BAR_PICKER_CANCELLED
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_NEW_ADDRESS_BAR_PICKER_CONFIRMED
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_NEW_ADDRESS_BAR_PICKER_DISPLAYED
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_NEW_ADDRESS_BAR_PICKER_NOT_NOW
@@ -556,6 +557,10 @@ class RealDuckChat @Inject constructor(
 
                 override fun onNotNow() {
                     pixel.fire(DUCK_CHAT_NEW_ADDRESS_BAR_PICKER_NOT_NOW)
+                }
+
+                override fun onCancelled() {
+                    pixel.fire(DUCK_CHAT_NEW_ADDRESS_BAR_PICKER_CANCELLED)
                 }
             },
         ).show()

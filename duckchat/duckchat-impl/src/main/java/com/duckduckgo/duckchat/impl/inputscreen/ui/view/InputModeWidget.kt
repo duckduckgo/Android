@@ -82,6 +82,8 @@ class InputModeWidget @JvmOverloads constructor(
     var onChatTextChanged: ((String) -> Unit)? = null
     var onInputFieldClicked: (() -> Unit)? = null
 
+    var onTabTapped: ((index: Int) -> Unit)? = null
+
     var text: String
         get() = inputField.text.toString()
         set(value) {
@@ -152,6 +154,22 @@ class InputModeWidget @JvmOverloads constructor(
         }
         inputField.setOnClickListener {
             onInputFieldClicked?.invoke()
+        }
+        addTabClickListeners()
+    }
+
+    private fun addTabClickListeners() {
+        val tabStrip = inputModeSwitch.getChildAt(0) as? ViewGroup ?: return
+
+        repeat(inputModeSwitch.tabCount) { index ->
+            inputModeSwitch.getTabAt(index)?.let { tab ->
+                tabStrip.getChildAt(index)?.setOnClickListener {
+                    onTabTapped?.invoke(index)
+                    if (inputModeSwitch.selectedTabPosition != index) {
+                        tab.select()
+                    }
+                }
+            }
         }
     }
 
@@ -283,6 +301,10 @@ class InputModeWidget @JvmOverloads constructor(
         inputModeSwitch.post {
             inputModeSwitch.getTabAt(index)?.select()
         }
+    }
+
+    fun setScrollPosition(position: Int, positionOffset: Float) {
+        inputModeSwitch.setScrollPosition(position, positionOffset, false)
     }
 
     private fun fade(

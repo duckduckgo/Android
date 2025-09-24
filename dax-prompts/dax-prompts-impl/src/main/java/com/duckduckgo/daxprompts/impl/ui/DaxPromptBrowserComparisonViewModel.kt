@@ -79,6 +79,12 @@ class DaxPromptBrowserComparisonViewModel @Inject constructor(
         }
     }
 
+    fun onGhostButtonClicked() {
+        viewModelScope.launch {
+            command.send(Command.CloseScreen())
+        }
+    }
+
     fun onDefaultBrowserSet() {
         defaultRoleBrowserDialog.dialogShown()
         viewModelScope.launch {

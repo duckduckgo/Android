@@ -23,7 +23,7 @@ apply from: "$rootProject.projectDir/gradle/android-library.gradle"
 
 dependencies {
     implementation project(path: ':navigation-api')
-    implementation project(path: ':common-ui')
+    implementation project(path: ':design-system')
     implementation project(path: ':common-utils')
     implementation project(':feature-toggles-api')
     implementation AndroidX.core.ktx

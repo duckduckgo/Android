@@ -148,4 +148,14 @@ class DaxPromptBrowserComparisonViewModelTest {
             cancelAndIgnoreRemainingEvents()
         }
     }
+
+    @Test
+    fun whenGhostButtonClickedThenEmitsCloseScreenCommand() = runTest {
+        testee.onGhostButtonClicked()
+
+        testee.commands().test {
+            assertEquals(DaxPromptBrowserComparisonViewModel.Command.CloseScreen(), awaitItem())
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
 }
