@@ -27,7 +27,6 @@ import com.duckduckgo.pir.impl.common.NativeBrokerActionHandler.NativeAction.Get
 import com.duckduckgo.pir.impl.common.NativeBrokerActionHandler.NativeAction.SubmitCaptchaInfo
 import com.duckduckgo.pir.impl.common.NativeBrokerActionHandler.NativeActionResult.Failure
 import com.duckduckgo.pir.impl.common.NativeBrokerActionHandler.NativeActionResult.Success
-import com.duckduckgo.pir.impl.common.NativeBrokerActionHandler.NativeActionResult.Success.NativeSuccessData
 import com.duckduckgo.pir.impl.common.NativeBrokerActionHandler.NativeActionResult.Success.NativeSuccessData.CaptchaSolutionStatus
 import com.duckduckgo.pir.impl.common.NativeBrokerActionHandler.NativeActionResult.Success.NativeSuccessData.CaptchaSolutionStatus.CaptchaStatus.Ready
 import com.duckduckgo.pir.impl.common.NativeBrokerActionHandler.NativeActionResult.Success.NativeSuccessData.CaptchaTransactionIdReceived
@@ -36,7 +35,6 @@ import com.duckduckgo.pir.impl.common.PirJob.RunType
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.Event.CaptchaInfoReceived
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.Event.CaptchaServiceFailed
-import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.Event.EmailConfirmationLinkReceived
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.Event.EmailFailed
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.Event.EmailReceived
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.Event.ExecuteBrokerStepAction
@@ -47,11 +45,9 @@ import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.Event.
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.Event.LoadUrlFailed
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.Event.RetryAwaitCaptchaSolution
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.Event.RetryGetCaptchaSolution
-import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.Event.RetryGetEmailConfirmation
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.Event.Started
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.SideEffect
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.SideEffect.AwaitCaptchaSolution
-import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.SideEffect.AwaitEmailConfirmation
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.SideEffect.CompleteExecution
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.SideEffect.EvaluateJs
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.SideEffect.GetCaptchaSolution
@@ -262,7 +258,6 @@ class RealPirActionsRunner @AssistedInject constructor(
                 detachedWebView?.evaluateJavascript(effect.callback, null)
             }
 
-            is AwaitEmailConfirmation -> handleEmailConfirmation(effect)
             is AwaitCaptchaSolution -> handleAwaitCaptchaSolution(effect)
         }
     }
@@ -373,42 +368,6 @@ class RealPirActionsRunner @AssistedInject constructor(
                 val result = it as Failure
                 onError(
                     PirError.CaptchaServiceError(
-                        error = result.message,
-                    ),
-                )
-            }
-        }
-    }
-
-    private suspend fun handleEmailConfirmation(effect: AwaitEmailConfirmation) = withContext(dispatcherProvider.io()) {
-        nativeBrokerActionHandler.pushAction(
-            NativeAction.GetEmailStatus(
-                actionId = effect.actionId,
-                brokerName = effect.brokerName,
-                email = effect.extractedProfile.email!!,
-            ),
-        ).also {
-            if (it is Success) {
-                engine?.dispatch(
-                    EmailConfirmationLinkReceived(
-                        confirmationLink = (it.data as NativeSuccessData.EmailConfirmation).link,
-                    ),
-                )
-            } else if (it is Failure && it.retryNativeAction && effect.attempt != effect.retries) {
-                delay(effect.pollingIntervalSeconds.toLong() * 1_000)
-                engine?.dispatch(
-                    RetryGetEmailConfirmation(
-                        actionId = effect.actionId,
-                        brokerName = effect.brokerName,
-                        extractedProfile = effect.extractedProfile,
-                        pollingIntervalSeconds = effect.pollingIntervalSeconds,
-                        attempt = effect.attempt + 1,
-                    ),
-                )
-            } else {
-                val result = it as Failure
-                onError(
-                    PirError.EmailError(
                         error = result.message,
                     ),
                 )

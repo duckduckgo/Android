@@ -25,7 +25,6 @@ import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.Event
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.Event.BrokerStepCompleted
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.Event.ExecuteBrokerStepAction
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.SideEffect.AwaitCaptchaSolution
-import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.SideEffect.AwaitEmailConfirmation
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.SideEffect.GetEmailForProfile
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.SideEffect.PushJsAction
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.State
@@ -72,7 +71,7 @@ class ExecuteBrokerStepActionEventHandler @Inject constructor() : EventHandler {
         return if (state.currentActionIndex == currentBrokerStep.actions.size) {
             Next(
                 nextState = state,
-                nextEvent = BrokerStepCompleted(true),
+                nextEvent = BrokerStepCompleted(needsEmailConfirmation = false, isSuccess = true),
             )
         } else {
             val actionToExecute = currentBrokerStep.actions[state.currentActionIndex]
@@ -102,11 +101,9 @@ class ExecuteBrokerStepActionEventHandler @Inject constructor() : EventHandler {
                 if (currentBrokerStep is OptOutStep && actionToExecute is EmailConfirmation) {
                     Next(
                         nextState = state,
-                        sideEffect = AwaitEmailConfirmation(
-                            actionId = actionToExecute.id,
-                            brokerName = currentBrokerStep.brokerName,
-                            extractedProfile = currentBrokerStep.profileToOptOut,
-                            pollingIntervalSeconds = actionToExecute.pollingTime.toFloat(),
+                        nextEvent = BrokerStepCompleted(
+                            needsEmailConfirmation = true,
+                            isSuccess = true,
                         ),
                     )
                 } else if (actionToExecute is SolveCaptcha && requestData !is PirScriptRequestData.SolveCaptcha) {

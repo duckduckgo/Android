@@ -262,6 +262,7 @@ class RealPirSchedulingRepository @Inject constructor(
         withContext(dispatcherProvider.io()) {
             jobSchedulingDao.deleteAllScanJobRecords()
             jobSchedulingDao.deleteAllOptOutJobRecords()
+            jobSchedulingDao.deleteAllEmailConfirmationJobRecords()
         }
     }
 
