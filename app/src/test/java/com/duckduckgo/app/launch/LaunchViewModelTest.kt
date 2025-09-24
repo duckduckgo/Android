@@ -20,7 +20,6 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.Observer
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.launch.LaunchViewModel.Command.DaxPromptBrowserComparison
-import com.duckduckgo.app.launch.LaunchViewModel.Command.DaxPromptDuckPlayer
 import com.duckduckgo.app.launch.LaunchViewModel.Command.Home
 import com.duckduckgo.app.launch.LaunchViewModel.Command.Onboarding
 import com.duckduckgo.app.onboarding.store.AppStage
@@ -172,22 +171,6 @@ class LaunchViewModelTest {
     }
 
     @Test
-    fun whenEvaluateReturnsDuckPlayerVariantThenCommandIsDaxPromptDuckPlayer() = runTest {
-        testee = LaunchViewModel(
-            userStageStore,
-            StubAppReferrerFoundStateListener("xx", mockDelayMs = Long.MAX_VALUE),
-            mockDaxPrompts,
-            mockAppInstallStore,
-            mockOnboardingExperiment,
-        )
-        whenever(mockDaxPrompts.evaluate()).thenReturn(ActionType.SHOW_VARIANT_DUCKPLAYER)
-        whenever(userStageStore.getUserAppStage()).thenReturn(AppStage.DAX_ONBOARDING)
-        testee.command.observeForever(mockCommandObserver)
-        testee.determineViewToShow()
-        verify(mockCommandObserver).onChanged(any<DaxPromptDuckPlayer>())
-    }
-
-    @Test
     fun whenEvaluateReturnsBrowserComparisonVariantThenCommandIsDaxPromptBrowserComparison() = runTest {
         testee = LaunchViewModel(
             userStageStore,
@@ -196,7 +179,7 @@ class LaunchViewModelTest {
             mockAppInstallStore,
             mockOnboardingExperiment,
         )
-        whenever(mockDaxPrompts.evaluate()).thenReturn(ActionType.SHOW_VARIANT_BROWSER_COMPARISON)
+        whenever(mockDaxPrompts.evaluate()).thenReturn(ActionType.SHOW_BROWSER_COMPARISON_PROMPT)
         whenever(userStageStore.getUserAppStage()).thenReturn(AppStage.DAX_ONBOARDING)
         testee.command.observeForever(mockCommandObserver)
         testee.determineViewToShow()

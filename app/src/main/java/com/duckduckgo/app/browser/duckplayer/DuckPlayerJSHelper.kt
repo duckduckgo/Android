@@ -44,7 +44,6 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.utils.plugins.PluginPoint
-import com.duckduckgo.daxprompts.impl.ReactivateUsersExperiment
 import com.duckduckgo.duckplayer.api.DuckPlayer
 import com.duckduckgo.duckplayer.api.DuckPlayer.DuckPlayerOrigin.AUTO
 import com.duckduckgo.duckplayer.api.DuckPlayer.DuckPlayerOrigin.OVERLAY
@@ -75,7 +74,6 @@ class DuckPlayerJSHelper @Inject constructor(
     private val pixel: Pixel,
     private val duckDuckGoUrlDetector: DuckDuckGoUrlDetector,
     private val pagesSettingPlugin: PluginPoint<DuckPlayerPageSettingsPlugin>,
-    private val reactivateUsersExperiment: ReactivateUsersExperiment,
 ) {
     private suspend fun getUserPreferences(featureName: String, method: String, id: String): JsCallbackData {
         val userValues = duckPlayer.getUserPreferences()
@@ -177,9 +175,6 @@ class DuckPlayerJSHelper @Inject constructor(
             data.getJSONObject("params").getString(it)
         }
         duckPlayer.sendDuckPlayerPixel(pixelName, paramsMap)
-        if (pixelName == "play.use") {
-            reactivateUsersExperiment.fireDuckPlayerUseIfInExperiment()
-        }
     }
 
     suspend fun processJsCallbackMessage(
