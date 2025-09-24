@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.statistics.wideevents
 
+import android.annotation.SuppressLint
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.app.statistics.wideevents.db.WideEventRepository
 import com.duckduckgo.common.test.CoroutineTestRule
@@ -41,6 +42,8 @@ class WideEventClientTest {
     val coroutineRule = CoroutineTestRule()
 
     private val wideEventRepository: WideEventRepository = mock()
+
+    @SuppressLint("DenyListedApi")
     private val wideEventFeature: WideEventFeature = FakeFeatureToggleFactory
         .create(WideEventFeature::class.java)
         .apply { self().setRawStoredState(State(true)) }
