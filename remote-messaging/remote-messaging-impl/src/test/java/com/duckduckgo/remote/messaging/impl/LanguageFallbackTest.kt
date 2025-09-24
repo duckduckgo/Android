@@ -28,8 +28,7 @@ import org.junit.Test
 
 /**
  * Tests for language fallback functionality in remote messaging translations.
- * 
- * This verifies the approved proposal behavior:
+ * * This verifies the approved proposal behavior:
  * 1. Check for full locale first (e.g., fr-CA)
  * 2. If not found, fall back to language-only match (e.g., fr)
  * 3. If neither found, show default (English)
@@ -43,22 +42,22 @@ class LanguageFallbackTest {
             id = "test1",
             content = smallJsonContent(
                 titleText = "Default Title",
-                descriptionText = "Default Description"
+                descriptionText = "Default Description",
             ),
             translations = mapOf(
                 "fr-CA" to JsonContentTranslations(
                     titleText = "Titre pour fr-CA",
-                    descriptionText = "Description pour fr-CA"
+                    descriptionText = "Description pour fr-CA",
                 ),
                 "fr" to JsonContentTranslations(
                     titleText = "Titre générique en français",
-                    descriptionText = "Description générique en français"
-                )
-            )
+                    descriptionText = "Description générique en français",
+                ),
+            ),
         )
 
         val result = listOf(jsonMessage).mapToRemoteMessage(Locale.CANADA_FRENCH, messageActionPlugins)
-        
+
         val content = result.first().content as Content.Small
         assertEquals("Titre pour fr-CA", content.titleText)
         assertEquals("Description pour fr-CA", content.descriptionText)
@@ -71,24 +70,24 @@ class LanguageFallbackTest {
             id = "test2",
             content = smallJsonContent(
                 titleText = "Default Title",
-                descriptionText = "Default Description"
+                descriptionText = "Default Description",
             ),
             translations = mapOf(
                 "fr-CA" to JsonContentTranslations(
                     titleText = "Titre pour fr-CA",
-                    descriptionText = "Description pour fr-CA"
+                    descriptionText = "Description pour fr-CA",
                 ),
                 "fr" to JsonContentTranslations(
                     titleText = "Titre générique en français",
-                    descriptionText = "Description générique en français"
-                )
-            )
+                    descriptionText = "Description générique en français",
+                ),
+            ),
         )
 
         // Create a French locale for Belgium (fr-BE)
         val frenchBelgium = Locale("fr", "BE")
         val result = listOf(jsonMessage).mapToRemoteMessage(frenchBelgium, messageActionPlugins)
-        
+
         val content = result.first().content as Content.Small
         assertEquals("Titre générique en français", content.titleText)
         assertEquals("Description générique en français", content.descriptionText)
@@ -101,20 +100,20 @@ class LanguageFallbackTest {
             id = "test3",
             content = smallJsonContent(
                 titleText = "Default Title",
-                descriptionText = "Default Description"
+                descriptionText = "Default Description",
             ),
             translations = mapOf(
                 "fr-CA" to JsonContentTranslations(
                     titleText = "Titre pour fr-CA",
-                    descriptionText = "Description pour fr-CA"
-                )
+                    descriptionText = "Description pour fr-CA",
+                ),
                 // No "fr" fallback available
-            )
+            ),
         )
 
         val frenchBelgium = Locale("fr", "BE")
         val result = listOf(jsonMessage).mapToRemoteMessage(frenchBelgium, messageActionPlugins)
-        
+
         val content = result.first().content as Content.Small
         // Should use default English text since no fr fallback exists
         assertEquals("Default Title", content.titleText)
@@ -128,19 +127,19 @@ class LanguageFallbackTest {
             id = "test4",
             content = smallJsonContent(
                 titleText = "Default Title",
-                descriptionText = "Default Description"
+                descriptionText = "Default Description",
             ),
             translations = mapOf(
                 "fr" to JsonContentTranslations(
                     titleText = "Titre générique en français",
-                    descriptionText = "Description générique en français"
-                )
+                    descriptionText = "Description générique en français",
+                ),
                 // No fr-CA exact match
-            )
+            ),
         )
 
         val result = listOf(jsonMessage).mapToRemoteMessage(Locale.CANADA_FRENCH, messageActionPlugins)
-        
+
         val content = result.first().content as Content.Small
         assertEquals("Titre générique en français", content.titleText)
         assertEquals("Description générique en français", content.descriptionText)
@@ -153,28 +152,28 @@ class LanguageFallbackTest {
             id = "test5",
             content = smallJsonContent(
                 titleText = "Default Title",
-                descriptionText = "Default Description"
+                descriptionText = "Default Description",
             ),
             translations = mapOf(
                 "es-ES" to JsonContentTranslations(
                     titleText = "Título para España",
-                    descriptionText = "Descripción para España"
+                    descriptionText = "Descripción para España",
                 ),
                 "es-MX" to JsonContentTranslations(
                     titleText = "Título para México",
-                    descriptionText = "Descripción para México"
+                    descriptionText = "Descripción para México",
                 ),
                 "es" to JsonContentTranslations(
                     titleText = "Título genérico en español",
-                    descriptionText = "Descripción genérica en español"
-                )
-            )
+                    descriptionText = "Descripción genérica en español",
+                ),
+            ),
         )
 
         // Test with Spanish Mexico locale
         val spanishMexico = Locale("es", "MX")
         val result = listOf(jsonMessage).mapToRemoteMessage(spanishMexico, messageActionPlugins)
-        
+
         val content = result.first().content as Content.Small
         assertEquals("Título para México", content.titleText)
         assertEquals("Descripción para México", content.descriptionText)
@@ -187,13 +186,13 @@ class LanguageFallbackTest {
             id = "test6",
             content = smallJsonContent(
                 titleText = "Default Title",
-                descriptionText = "Default Description"
+                descriptionText = "Default Description",
             ),
-            translations = emptyMap()
+            translations = emptyMap(),
         )
 
         val result = listOf(jsonMessage).mapToRemoteMessage(Locale.FRANCE, messageActionPlugins)
-        
+
         val content = result.first().content as Content.Small
         assertEquals("Default Title", content.titleText)
         assertEquals("Default Description", content.descriptionText)
