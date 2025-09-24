@@ -73,7 +73,8 @@ class BrowserAutoCompleteSuggestionsAdapter(
                     when {
                         items[oldItemPosition] is AutoCompleteItem.Divider && newItems[newItemPosition] is AutoCompleteItem.Divider -> true
                         items[oldItemPosition] is AutoCompleteItem.Suggestion && newItems[newItemPosition] is AutoCompleteItem.Suggestion ->
-                            (items[oldItemPosition] as AutoCompleteItem.Suggestion).value == (newItems[newItemPosition] as AutoCompleteItem.Suggestion).value
+                            (items[oldItemPosition] as AutoCompleteItem.Suggestion).value ==
+                                (newItems[newItemPosition] as AutoCompleteItem.Suggestion).value
 
                         else -> false
                     }
