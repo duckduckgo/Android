@@ -322,8 +322,8 @@ class BuckWelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welco
                             TransitionManager.beginDelayedTransition(binding.daxDialogCta.cardView, AutoTransition())
                             binding.daxDialogCta.skipOnboarding.root.isVisible = true
 
-                            val titleText = it.getString(R.string.highlightsPreOnboardingDaxDialog3Title)
-                            val descriptionText = it.getString(R.string.highlightsPreOnboardingDaxDialog3Text)
+                            val titleText = it.getString(R.string.preOnboardingDaxDialog3Title)
+                            val descriptionText = it.getString(R.string.preOnboardingDaxDialog3Text)
 
                             binding.daxDialogCta.skipOnboarding.dialogTitleInvisible.text = titleText.html(context = it)
                             binding.daxDialogCta.skipOnboarding.descriptionInvisible.text = descriptionText.html(context = it)
@@ -366,12 +366,12 @@ class BuckWelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welco
                             binding.daxDialogCta.addressBarPosition.root.isVisible = true
 
                             setAddressBarPositionOptions(true)
-                            binding.daxDialogCta.primaryCta.text = it.getString(R.string.highlightsPreOnboardingAddressBarOkButton)
+                            binding.daxDialogCta.primaryCta.text = it.getString(R.string.preOnboardingAddressBarOkButton)
                             binding.daxDialogCta.primaryCta.alpha = MIN_ALPHA
 
                             val contentViews = with(binding.daxDialogCta.addressBarPosition) { listOf(option1, option2) }
                             contentViews.forEach { view -> view.alpha = MIN_ALPHA }
-                            val titleText = getString(R.string.highlightsPreOnboardingAddressBarTitle).preventWidows()
+                            val titleText = getString(R.string.preOnboardingAddressBarTitle).preventWidows()
 
                             afterTypingAnimation = {
                                 binding.daxDialogCta.addressBarPosition.option1.setOnClickListener {

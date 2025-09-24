@@ -127,7 +127,7 @@
                         android:layout_height="wrap_content"
                         android:visibility="invisible"
                         tools:ignore="DeprecatedWidgetInXml"
-                        tools:text="@string/onboardingSearchDaxDialogDescription"
+                        tools:text="@string/onboardingBubbleExperimentSearchDaxDialogDescription"
                         tools:visibility="visible" />
 
                     <com.duckduckgo.common.ui.view.TypeAnimationTextView

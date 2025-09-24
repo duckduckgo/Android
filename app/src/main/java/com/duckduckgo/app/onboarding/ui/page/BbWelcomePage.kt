@@ -312,7 +312,7 @@ class BbWelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome
                     binding.daxDialogCta.secondaryCta.isVisible = false
                     binding.daxDialogCta.comparisonChart.root.isVisible = true
 
-                    val titleText = it.getString(R.string.highlightsPreOnboardingDaxDialog2Title)
+                    val titleText = it.getString(R.string.preOnboardingDaxDialog2Title)
                     binding.daxDialogCta.comparisonChart.titleInvisible.text = titleText.html(context = it)
 
                     val comparisonChartViews = with(binding.daxDialogCta.comparisonChart) {
@@ -347,8 +347,8 @@ class BbWelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome
                     )
                     binding.daxDialogCta.skipOnboarding.root.isVisible = true
 
-                    val titleText = it.getString(R.string.highlightsPreOnboardingDaxDialog3Title)
-                    val descriptionText = it.getString(R.string.highlightsPreOnboardingDaxDialog3Text)
+                    val titleText = it.getString(R.string.preOnboardingDaxDialog3Title)
+                    val descriptionText = it.getString(R.string.preOnboardingDaxDialog3Text)
 
                     binding.daxDialogCta.skipOnboarding.dialogTitleInvisible.text = titleText.html(context = it)
                     binding.daxDialogCta.skipOnboarding.descriptionInvisible.text = descriptionText.html(context = it)
@@ -398,12 +398,12 @@ class BbWelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome
                     )
                     binding.daxDialogCta.addressBarPosition.root.isVisible = true
 
-                    binding.daxDialogCta.primaryCta.text = it.getString(R.string.highlightsPreOnboardingAddressBarOkButton)
+                    binding.daxDialogCta.primaryCta.text = it.getString(R.string.preOnboardingAddressBarOkButton)
                     binding.daxDialogCta.primaryCta.alpha = MIN_ALPHA
 
                     val contentViews = with(binding.daxDialogCta.addressBarPosition) { listOf(option1, option2) }
                     contentViews.forEach { view -> view.alpha = MIN_ALPHA }
-                    val titleText = getString(R.string.highlightsPreOnboardingAddressBarTitle).preventWidows()
+                    val titleText = getString(R.string.preOnboardingAddressBarTitle).preventWidows()
 
                     val (topImage, bottomImage) = if (appTheme.isLightModeEnabled()) {
                         R.drawable.bb_address_bar_top_light to R.drawable.bb_address_bar_bottom_light
