@@ -840,9 +840,11 @@ open class BrowserActivity : DuckDuckGoActivity() {
         val fragment = duckAiFragment
         if (fragment?.isVisible == true) {
             animateDuckAiFragmentOut {
-                val transaction = supportFragmentManager.beginTransaction()
-                transaction.hide(fragment)
-                transaction.commit()
+                if (!supportFragmentManager.isStateSaved) {
+                    val transaction = supportFragmentManager.beginTransaction()
+                    transaction.hide(fragment)
+                    transaction.commit()
+                }
             }
         }
     }
