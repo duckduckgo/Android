@@ -35,6 +35,7 @@ import com.duckduckgo.duckchat.impl.inputscreen.newaddressbaroption.NewAddressBa
 import com.duckduckgo.duckchat.impl.inputscreen.newaddressbaroption.NewAddressBarOptionBottomSheetDialogFactory
 import com.duckduckgo.duckchat.impl.inputscreen.newaddressbaroption.NewAddressBarSelection.SEARCH_AND_AI
 import com.duckduckgo.duckchat.impl.inputscreen.newaddressbaroption.NewAddressBarSelection.SEARCH_ONLY
+import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_NEW_ADDRESS_BAR_PICKER_CANCELLED
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_NEW_ADDRESS_BAR_PICKER_CONFIRMED
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_NEW_ADDRESS_BAR_PICKER_DISPLAYED
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_NEW_ADDRESS_BAR_PICKER_NOT_NOW
@@ -967,6 +968,32 @@ class RealDuckChatTest {
 
         verify(mockDuckChatFeatureRepository, times(0)).setInputScreenUserSetting(any())
         verify(mockPixel).fire(DUCK_CHAT_NEW_ADDRESS_BAR_PICKER_NOT_NOW)
+    }
+
+    @Test
+    fun `when onCancelled called then DUCK_CHAT_NEW_ADDRESS_BAR_PICKER_CANCELLED pixel is fired`() = runTest {
+        var capturedCallback: NewAddressBarCallback? = null
+        whenever(mockNewAddressBarOptionBottomSheetDialogFactory.create(any(), any(), any())).thenAnswer { invocation ->
+            capturedCallback = invocation.getArgument<NewAddressBarCallback?>(2)
+            mockNewAddressBarOptionBottomSheetDialog
+        }
+
+        val mockContext = mock<Context>()
+        testee.showNewAddressBarOptionChoiceScreen(mockContext, true)
+
+        verify(mockNewAddressBarOptionBottomSheetDialogFactory).create(
+            any(),
+            any(),
+            any(),
+        )
+
+        verify(mockNewAddressBarOptionBottomSheetDialog).show()
+
+        assertNotNull(capturedCallback)
+        capturedCallback!!.onCancelled()
+
+        verify(mockDuckChatFeatureRepository, times(0)).setInputScreenUserSetting(any())
+        verify(mockPixel).fire(DUCK_CHAT_NEW_ADDRESS_BAR_PICKER_CANCELLED)
     }
 
     companion object {
