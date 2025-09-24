@@ -16,10 +16,10 @@
 
 package com.duckduckgo.app.browser.newaddressbaroption
 
-import com.duckduckgo.browser.ui.omnibar.OmnibarPosition
 import com.duckduckgo.app.onboarding.store.AppStage
 import com.duckduckgo.app.onboarding.store.UserStageStore
 import com.duckduckgo.app.settings.db.SettingsDataStore
+import com.duckduckgo.browser.ui.omnibar.OmnibarPosition
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
