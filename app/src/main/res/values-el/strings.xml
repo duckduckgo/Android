@@ -776,36 +776,44 @@
     <string name="sslErrorUntrustedMessage" instruction="Placeholder is domain with certificate issues">Το πιστοποιητικό ασφαλείας για τον τομέα %1$s δεν εκλαμβάνεται ως αξιόπιστο από το λειτουργικό σύστημα της συσκευής σας. Είναι πιθανόν ο ιστότοπος να μην έχει διαμορφωθεί σωστά ή κάποιος εισβολέας να έχει παραβιάσει τη σύνδεσή σας, ή το ρολόι του συστήματός σας να είναι λανθασμένο.</string>
 
     <!-- Extended Onboarding-->
-    <string name="preOnboardingDaxDialog1Title"><![CDATA[Γεια σας.<br/><br/>Έτοιμοι για ένα καλύτερο και πιο ιδιωτικό διαδίκτυο;]]></string>
+    <string name="preOnboardingDaxDialog1Title"><![CDATA[Γεια σας.<br/><br/>Είστε έτοιμοι για ένα ταχύτερο πρόγραμμα περιήγησης που σας διατηρεί προστατευμένους;]]></string>
     <string name="preOnboardingDaxDialog1Button">Ας το κάνουμε!</string>
-    <string name="preOnboardingDaxDialog2Title">H προστασία προσωπικών δεδομένων energopoi;huhke!</string>
+    <string name="preOnboardingDaxDialog1SecondaryButton">Έχω ξαναβρεθεί εδώ</string>
+    <string name="preOnboardingDaxDialog2Title">Η προστασία ενεργοποιήθηκε!</string>
     <string name="preOnboardingDaxDialog2Button">Επιλέξτε το πρόγραμμα περιήγησής σας</string>
+    <string name="preOnboardingDaxDialog3Title"><![CDATA[Το κατάλαβα! Θα παραλείψω τις άλλες συμβουλές.]]></string>
+    <string name="preOnboardingDaxDialog3Text"><![CDATA[Θυμηθείτε: μπορείτε να διαγράψετε όλες τις καρτέλες, το ιστορικό και τα δεδομένα περιήγησης με δύο πατήματα με το <b>Fire Button</b> 🔥]]></string>
+    <string name="preOnboardingDaxDialog3SecondaryButton">Εμφάνιση προγράμματος εκμάθησης</string>
     <string name="preOnboardingComparisonChartItem1">Ιδιωτική αναζήτηση βάσει προεπιλογής</string>
     <string name="preOnboardingComparisonChartItem2">Αποκλείστε εφαρμογές παρακολούθησης τρίτων</string>
     <string name="preOnboardingComparisonChartItem3">Αποκλεισμός αναδυόμενων παραθύρων cookie</string>
     <string name="preOnboardingComparisonChartItem4">Αποκλεισμός στοχευμένων διαφημίσεων</string>
     <string name="preOnboardingComparisonChartItem5">Διαγράψτε τα δεδομένα περιήγησης με ένα κουμπί</string>
-    <string name="preOnboardingDaxDialog3Title">Φανταστικά! Το Παπί σε καλωσορίζει!</string>
     <string name="preOnboardingDaxDialog3Button">Έναρξη περιήγησης</string>
+    <string name="preOnboardingAddressBarTitle">Πού πρέπει να τοποθετήσω τη γραμμή διευθύνσεών σας;</string>
+    <string name="preOnboardingAddressBarOkButton">Επόμενο</string>
+    <string name="highlightsPreOnboardingAddressBarOption1Title">Κορυφή (Προεπιλογή)</string>
+    <string name="highlightsPreOnboardingAddressBarOption1Description">Ευδιάκριτο</string>
+    <string name="highlightsPreOnboardingAddressBarOption2Title">Κάτω μέρος</string>
+    <string name="highlightsPreOnboardingAddressBarOption2Description">Εύκολη πρόσβαση</string>
     <string name="onboardingSearchDaxDialogTitle">Δοκίμασε μια αναζήτηση!</string>
-    <string name="onboardingSearchDaxDialogDescription">Οι αναζητήσεις σας στο DuckDuckGo είναι πάντα ανώνυμες.</string>
-    <string name="onboardingSearchDaxDialogOption1" instruction="translate &apos;duck&apos; too.">πώς να πείτε «πάπια» στα αγγλικά</string>
-    <string name="onboardingSearchDaxDialogOption1English" instruction="translate &apos;duck&apos; too. Don&apos;t add question mark">πώς μπορείτε να πείτε «duck» στα ισπανικά</string>
+    <string name="onboardingSearchDaxDialogDescription">Οι αναζητήσεις σας στο DuckDuckGo είναι πάντα ιδιωτικές.</string>
+    <string name="onboardingSearchDaxDialogOption1" instruction="translate &apos;duck&apos; too.">"πώς να πείτε πάπια στα αγγλικά"</string>
+    <string name="onboardingSearchDaxDialogOption1English" instruction="translate &apos;duck&apos; too. Don&apos;t add question mark">"πώς μπορείτε να πείτε πάπια στα ισπανικά"</string>
     <string name="onboardingSearchQueryOption1">πώς να πείτε πάπια στα αγγλικά</string>
     <string name="onboardingSearchQueryOption1English">πώς μπορείτε να πείτε πάπια στα ισπανικά</string>
     <string name="onboardingSearchDaxDialogOption2">οι ηθοποιοί του avatar</string>
     <string name="onboardingSearchDaxDialogOption2US">Mighty Ducks Cast</string>
     <string name="onboardingSearchDaxDialogOption3">τοπικός καιρός</string>
     <string name="onboardingSearchDaxDialogOption4">Κάνε μου έκπληξη!</string>
-    <string name="onboardingSearchQueryOption4">συνταγές για δείπνο</string>
-    <string name="onboardingSearchQueryOption4US">συνταγές για μπισκότα με κομματάκια σοκολάτας</string>
+    <string name="onboardingSearchQueryOption4">παπάκια</string>
     <string name="onboardingSitesDaxDialogTitle">Δοκιμάστε να επισκεφτείτε έναν ιστότοπο!</string>
     <string name="onboardingSitesDaxDialogDescription">Θα εμποδίσω τις εφαρμογές παρακολούθησης ώστε να μην μπορούν να σας κατασκοπεύουν.</string>
     <string name="onboardingSitesDaxDialogOption1">espn.com</string>
     <string name="onboardingSitesDaxDialogOption2">yahoo.com</string>
     <string name="onboardingSitesDaxDialogOption3">ebay.com</string>
     <string name="onboardingSitesDaxDialogOption4">Κάνε μου έκπληξη!</string>
-    <string name="onboardingSerpDaxDialogDescription">Αυτό είναι το DuckDuckGo Search. Ιδιωτικά. Γρήγορα. Λιγότερες διαφημίσεις.</string>
+    <string name="onboardingSerpDaxDialogDescription"><![CDATA[Αυτό είναι το <b>DuckDuckGo Search</b>! Ιδιωτικά. Γρήγορα. Λιγότερες διαφημίσεις.]]></string>
     <string name="onboardingSerpDaxDialogButton">Το κατάλαβα!</string>
     <string name="onboardingSitesSuggestionsDaxDialogTitle">Στη συνέχεια, δοκιμάστε να επισκεφτείτε έναν ιστότοπο!</string>
     <plurals name="onboardingTrackersBlockedDialogDescription">
@@ -818,42 +826,20 @@
     </plurals>
     <string name="onboardingTrackersBlockedDaxDialogButton">Το κατάλαβα!</string>
     <string name="onboardingFireButtonDaxDialogDescription"><![CDATA[Διαγράψτε άμεσα τη δραστηριότητα περιήγησής σας με το <b>Fire Button</b>.<br/><br/>Δοκιμάστε το! 🔥]]></string>
+    <string name="onboardingFireButtonDaxDialogOkButton">Δοκιμάστε το</string>
+    <string name="onboardingFireButtonDaxDialogCancelButton">Παράλειψη</string>
     <string name="onboardingEndDaxDialogTitle">"Το έχετε!"</string>
-    <string name="onboardingEndDaxDialogDescription">Να θυμάστε: κάθε φορά που περιηγείστε μαζί μου, μια ανατριχιαστική διαφήμιση χάνει τη δύναμή της! 👌</string>
-    <string name="onboardingEndDaxDialogButton">Όλα έτοιμα!</string>
+    <string name="onboardingEndDaxDialogDescription">Να θυμάστε: κάθε φορά που περιηγείστε μαζί μου, μια ανατριχιαστική διαφήμιση χάνει τη δύναμή της!</string>
+    <string name="onboardingInContextEndDaxDialogDescription">Να θυμάστε: κάθε φορά που περιηγείστε μαζί μου, μια ανατριχιαστική διαφήμιση χάνει τη δύναμή της! 👌</string>
+    <string name="onboardingEndDaxDialogButton">Κόλλα πέντε!</string>
     <string name="onboardingPrivacyProDaxDialogTitle">Πριν το ξεχάσω...</string>
     <string name="onboardingPrivacyProDaxDialogDescription"><![CDATA[Το DuckDuckGo διαθέτει επίσης ένα ασφαλές <b>VPN + 2 ακόμη premium προστασίες</b>, διαθέσιμες με <b>προαιρετική συνδρομή επί πληρωμή</b>.]]></string>
     <string name="onboardingPrivacyProDaxDialogOkButton">Μάθετε περισσότερα</string>
     <string name="onboardingPrivacyProDaxDialogFreeTrialOkButton">Δοκίμασε δωρεάν!</string>
     <string name="onboardingPrivacyProDaxDialogCancelButton">Παράλειψη</string>
 
-    <!-- Highlight Onboarding Experiment-->
-    <string name="highlightsPreOnboardingDaxDialog1Title"><![CDATA[Γεια σας.<br/><br/>Είστε έτοιμοι για ένα ταχύτερο πρόγραμμα περιήγησης που σας διατηρεί προστατευμένους;]]></string>
-    <string name="highlightsPreOnboardingDaxDialog2Title">Η προστασία ενεργοποιήθηκε!</string>
-    <string name="highlightsPreOnboardingComparisonChartItem2">Αποκλείστε εφαρμογές παρακολούθησης τρίτων</string>
-    <string name="highlightsPreOnboardingComparisonChartItem3">Αποκλεισμός αιτημάτων και αναδυόμενων παραθύρων για cookie</string>
-    <string name="highlightsPreOnboardingComparisonChartItem4">Αποκλεισμός στοχευμένων διαφημίσεων</string>
-    <string name="highlightsPreOnboardingComparisonChartItem5">Γρήγορη διαγραφή δεδομένων περιήγησης</string>
-    <string name="highlightsPreOnboardingSelectAppIconTitle">Ποιο χρώμα μου ταιριάζει καλύτερα;</string>
-    <string name="highlightsPreOnboardingSelectAppIconDescription">Επιλέξτε το εικονίδιο της εφαρμογής σας:</string>
-    <string name="highlightsPreOnboardingSelectAppIconOkButton">Επόμενο</string>
-    <string name="highlightsPreOnboardingAddressBarTitle">Πού πρέπει να τοποθετήσω τη γραμμή διευθύνσεών σας;</string>
-    <string name="highlightsPreOnboardingAddressBarOption1Title">Κορυφή (Προεπιλογή)</string>
-    <string name="highlightsPreOnboardingAddressBarOption1Description">Ευδιάκριτο</string>
-    <string name="highlightsPreOnboardingAddressBarOkButton">Επόμενο</string>
-    <string name="highlightsPreOnboardingAddressBarOption2Title">Κάτω μέρος</string>
-    <string name="highlightsPreOnboardingAddressBarOption2Description">Εύκολη πρόσβαση</string>
-    <string name="highlightsOnboardingSearchQueryOption4">παπάκια</string>
-    <string name="highlightsOnboardingSearchDaxDialogDescription">Οι αναζητήσεις σας στο DuckDuckGo είναι πάντα ιδιωτικές.</string>
-    <string name="highlightsOnboardingSerpDaxDialogDescription"><![CDATA[Αυτό είναι το <b>DuckDuckGo Search</b>! Ιδιωτικά. Γρήγορα. Λιγότερες διαφημίσεις.]]></string>
-    <string name="highlightsOnboardingEndDaxDialogDescription">Να θυμάστε: κάθε φορά που περιηγείστε μαζί μου, μια ανατριχιαστική διαφήμιση χάνει τη δύναμή της!</string>
-    <string name="highlightsOnboardingEndDaxDialogButton">Κόλλα πέντε!</string>
-    <string name="onboardingFireButtonDaxDialogOkButton">Δοκιμάστε το</string>
-    <string name="onboardingFireButtonDaxDialogCancelButton">Παράλειψη</string>
-    <string name="preOnboardingDaxDialog1SecondaryButton">Έχω ξαναβρεθεί εδώ</string>
-    <string name="highlightsPreOnboardingDaxDialog3Title"><![CDATA[Το κατάλαβα! Θα παραλείψω τις άλλες συμβουλές.]]></string>
-    <string name="highlightsPreOnboardingDaxDialog3Text"><![CDATA[Θυμηθείτε: μπορείτε να διαγράψετε όλες τις καρτέλες, το ιστορικό και τα δεδομένα περιήγησης με δύο πατήματα με το <b>Fire Button</b> 🔥]]></string>
-    <string name="preOnboardingDaxDialog3SecondaryButton">Εμφάνιση προγράμματος εκμάθησης</string>
+    <!-- Bubble BB & Buck experiment-->
+    <string name="onboardingBubbleExperimentSearchDaxDialogDescription">Οι αναζητήσεις σας στο DuckDuckGo είναι πάντα ανώνυμες.</string>
 
     <!-- Appearance settings -->
     <string name="settingsAddressBarPositionTitle">Γραμμή διευθύνσεων</string>
