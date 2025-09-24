@@ -66,14 +66,22 @@ class BrowserAutoCompleteSuggestionsAdapter(
             object : Callback() {
                 override fun getOldListSize() = items.size
                 override fun getNewListSize() = newItems.size
-                override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean =
+                override fun areItemsTheSame(
+                    oldItemPosition: Int,
+                    newItemPosition: Int,
+                ): Boolean =
                     when {
                         items[oldItemPosition] is AutoCompleteItem.Divider && newItems[newItemPosition] is AutoCompleteItem.Divider -> true
                         items[oldItemPosition] is AutoCompleteItem.Suggestion && newItems[newItemPosition] is AutoCompleteItem.Suggestion ->
                             (items[oldItemPosition] as AutoCompleteItem.Suggestion).value == (newItems[newItemPosition] as AutoCompleteItem.Suggestion).value
+
                         else -> false
                     }
-                override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int) = true
+
+                override fun areContentsTheSame(
+                    oldItemPosition: Int,
+                    newItemPosition: Int,
+                ) = true
             },
         )
     }
@@ -115,7 +123,10 @@ class BrowserAutoCompleteSuggestionsAdapter(
         }
     }
 
-    override fun onBindViewHolder(holder: AutoCompleteViewHolder, position: Int) {
+    override fun onBindViewHolder(
+        holder: AutoCompleteViewHolder,
+        position: Int,
+    ) {
         if (holder is EmptySuggestionViewHolder) return
 
         when (val item = items[position]) {
@@ -165,7 +176,10 @@ class BrowserAutoCompleteSuggestionsAdapter(
         if (suggestions.isNotEmpty()) add(AutoCompleteItem.Suggestion(suggestions.last()))
     }
 
-    private fun needsDivider(current: AutoCompleteSuggestion, next: AutoCompleteSuggestion): Boolean {
+    private fun needsDivider(
+        current: AutoCompleteSuggestion,
+        next: AutoCompleteSuggestion,
+    ): Boolean {
         return current.isSearchItem != next.isSearchItem
     }
 
