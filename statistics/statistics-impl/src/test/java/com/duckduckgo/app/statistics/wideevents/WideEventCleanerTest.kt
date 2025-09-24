@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.statistics.wideevents
 
+import android.annotation.SuppressLint
 import androidx.lifecycle.LifecycleOwner
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.app.statistics.wideevents.db.WideEventRepository
@@ -51,6 +52,7 @@ class WideEventCleanerTest {
         override fun localDateTimeNow(): LocalDateTime = throw UnsupportedOperationException()
     }
 
+    @SuppressLint("DenyListedApi")
     private val wideEventFeature: WideEventFeature = FakeFeatureToggleFactory
         .create(WideEventFeature::class.java)
         .apply { self().setRawStoredState(State(true)) }

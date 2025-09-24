@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.statistics.wideevents.db
 
+import android.annotation.SuppressLint
 import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -37,6 +38,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 
+@SuppressLint("DenyListedApi")
 @RunWith(AndroidJUnit4::class)
 class WideEventRepositoryTest {
 
