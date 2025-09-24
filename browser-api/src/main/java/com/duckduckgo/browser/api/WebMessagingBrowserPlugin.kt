@@ -14,21 +14,10 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.js.messaging.api
+package com.duckduckgo.browser.api
 
-import android.webkit.WebView
+import com.duckduckgo.js.messaging.api.WebMessaging
 
-interface WebMessagingPlugin {
-    fun register(
-        jsMessageCallback: WebViewCompatMessageCallback,
-        webView: WebView,
-    )
-
-    fun unregister(
-        webView: WebView,
-    )
-
-    fun postMessage(subscriptionEventData: SubscriptionEventData)
-
-    val context: String
+interface WebMessagingBrowserPlugin {
+    fun webMessaging(): WebMessaging
 }

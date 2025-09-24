@@ -67,6 +67,7 @@ import com.duckduckgo.autofill.api.BrowserAutofill
 import com.duckduckgo.autofill.api.InternalTestUserChecker
 import com.duckduckgo.browser.api.AddDocumentStartJavaScriptPlugin
 import com.duckduckgo.browser.api.JsInjectorPlugin
+import com.duckduckgo.browser.api.WebMessagingBrowserPlugin
 import com.duckduckgo.common.utils.AppUrl.ParamKey.QUERY
 import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.common.utils.DispatcherProvider
@@ -82,7 +83,6 @@ import com.duckduckgo.duckplayer.impl.DUCK_PLAYER_OPEN_IN_YOUTUBE_PATH
 import com.duckduckgo.history.api.NavigationHistory
 import com.duckduckgo.js.messaging.api.PostMessageWrapperPlugin
 import com.duckduckgo.js.messaging.api.SubscriptionEventData
-import com.duckduckgo.js.messaging.api.WebMessagingPlugin
 import com.duckduckgo.js.messaging.api.WebViewCompatMessageCallback
 import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.Feed
 import com.duckduckgo.privacy.config.api.AmpLinks
@@ -132,7 +132,7 @@ class BrowserWebViewClient @Inject constructor(
     private val duckChat: DuckChat,
     private val contentScopeExperiments: ContentScopeExperiments,
     private val addDocumentStartJavascriptPlugins: PluginPoint<AddDocumentStartJavaScriptPlugin>,
-    private val webMessagingPlugins: PluginPoint<WebMessagingPlugin>,
+    private val webMessagingPlugins: PluginPoint<WebMessagingBrowserPlugin>,
     private val postMessageWrapperPlugins: PluginPoint<PostMessageWrapperPlugin>,
 ) : WebViewClient() {
 
@@ -478,7 +478,7 @@ class BrowserWebViewClient @Inject constructor(
 
         callback?.let {
             webMessagingPlugins.getPlugins().forEach { plugin ->
-                plugin.register(callback, webView)
+                plugin.webMessaging().register(callback, webView)
             }
         }
     }
@@ -763,7 +763,7 @@ class BrowserWebViewClient @Inject constructor(
 
     fun destroy(webView: DuckDuckGoWebView) {
         webMessagingPlugins.getPlugins().forEach { plugin ->
-            plugin.unregister(webView)
+            plugin.webMessaging().unregister(webView)
         }
     }
 

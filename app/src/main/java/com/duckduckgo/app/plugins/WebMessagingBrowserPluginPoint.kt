@@ -17,12 +17,12 @@
 package com.duckduckgo.app.plugins
 
 import com.duckduckgo.anvil.annotations.ContributesPluginPoint
+import com.duckduckgo.browser.api.WebMessagingBrowserPlugin
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.js.messaging.api.WebMessagingPlugin
 
 @ContributesPluginPoint(
     scope = AppScope::class,
-    boundType = WebMessagingPlugin::class,
+    boundType = WebMessagingBrowserPlugin::class,
 )
 @Suppress("unused")
-interface UnusedWebMessagingPluginPoint
+interface UnusedWebMessagingBrowserPluginPoint

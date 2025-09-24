@@ -7,7 +7,7 @@ import com.duckduckgo.contentscopescripts.impl.WebViewCompatContentScopeScripts
 import com.duckduckgo.js.messaging.api.JsMessageHelper
 import com.duckduckgo.js.messaging.api.SubscriptionEvent
 import com.duckduckgo.js.messaging.api.SubscriptionEventData
-import com.duckduckgo.js.messaging.api.WebMessagingPlugin
+import com.duckduckgo.js.messaging.api.WebMessaging
 import kotlinx.coroutines.test.runTest
 import org.json.JSONObject
 import org.junit.Before
@@ -23,7 +23,7 @@ class ContentScopeScriptsPostMessageWrapperPluginTest {
     @get:Rule
     var coroutineRule = CoroutineTestRule()
 
-    private val mockWebMessagingPlugin: WebMessagingPlugin = mock()
+    private val mockWebMessaging: WebMessaging = mock()
     private val mockJsHelper: JsMessageHelper = mock()
     private val mockCoreContentScopeScripts: CoreContentScopeScripts = mock()
     private val mockWebViewCompatContentScopeScripts: WebViewCompatContentScopeScripts = mock()
@@ -42,7 +42,7 @@ class ContentScopeScriptsPostMessageWrapperPluginTest {
     )
 
     val testee = ContentScopeScriptsPostMessageWrapperPlugin(
-        webMessagingPlugin = mockWebMessagingPlugin,
+        webMessaging = mockWebMessaging,
         jsMessageHelper = mockJsHelper,
         coreContentScopeScripts = mockCoreContentScopeScripts,
         webViewCompatContentScopeScripts = mockWebViewCompatContentScopeScripts,
@@ -53,7 +53,7 @@ class ContentScopeScriptsPostMessageWrapperPluginTest {
     fun setup() {
         whenever(mockCoreContentScopeScripts.callbackName).thenReturn("callbackName")
         whenever(mockCoreContentScopeScripts.secret).thenReturn("secret")
-        whenever(mockWebMessagingPlugin.context).thenReturn("contentScopeScripts")
+        whenever(mockWebMessaging.context).thenReturn("contentScopeScripts")
         whenever(mockJsonObject.toString()).thenReturn("{}")
     }
 
@@ -63,7 +63,7 @@ class ContentScopeScriptsPostMessageWrapperPluginTest {
 
         testee.postMessage(subscriptionEventData, mockWebView)
 
-        verify(mockWebMessagingPlugin).postMessage(subscriptionEventData)
+        verify(mockWebMessaging).postMessage(subscriptionEventData)
     }
 
     @Test
