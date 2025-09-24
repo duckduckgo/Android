@@ -67,6 +67,7 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.autoconsent.api.Autoconsent
 import com.duckduckgo.autofill.api.BrowserAutofill
 import com.duckduckgo.autofill.api.InternalTestUserChecker
+import com.duckduckgo.browser.api.AddDocumentStartJavaScriptPlugin
 import com.duckduckgo.browser.api.JsInjectorPlugin
 import com.duckduckgo.browser.api.WebViewVersionProvider
 import com.duckduckgo.common.test.CoroutineTestRule
@@ -355,10 +356,10 @@ class BrowserWebViewClientTest {
     @UiThreadTest
     @Test
     fun whenConfigureWebViewThenInjectJsCode() {
-        assertEquals(0, fakeAddDocumentStartJavaScriptPlugins.plugin.countInitted)
+        assertEquals(0, fakeAddDocumentStartJavaScriptPlugins.plugin.addDocumentStartJavaScript().countInitted)
         val mockCallback = mock<WebViewCompatMessageCallback>()
         testee.configureWebView(DuckDuckGoWebView(context), mockCallback)
-        assertEquals(1, fakeAddDocumentStartJavaScriptPlugins.plugin.countInitted)
+        assertEquals(1, fakeAddDocumentStartJavaScriptPlugins.plugin.addDocumentStartJavaScript().countInitted)
     }
 
     @UiThreadTest
@@ -1330,8 +1331,16 @@ class BrowserWebViewClientTest {
         const val EXAMPLE_URL = "https://example.com"
     }
 
-    class FakeAddDocumentStartJavaScript : AddDocumentStartJavaScript {
+    class FakeAddDocumentStartJavaScriptPlugin : AddDocumentStartJavaScriptPlugin {
 
+        private val addDocumentStartJavaScript = FakeAddDocumentStartJavaScript()
+
+        override fun addDocumentStartJavaScript(): FakeAddDocumentStartJavaScript {
+            return addDocumentStartJavaScript
+        }
+    }
+
+    class FakeAddDocumentStartJavaScript : AddDocumentStartJavaScript {
         var countInitted = 0
             private set
 
@@ -1342,9 +1351,9 @@ class BrowserWebViewClientTest {
         }
     }
 
-    class FakeAddDocumentStartJavaScriptPluginPoint : PluginPoint<AddDocumentStartJavaScript> {
+    class FakeAddDocumentStartJavaScriptPluginPoint : PluginPoint<AddDocumentStartJavaScriptPlugin> {
 
-        val plugin = FakeAddDocumentStartJavaScript()
+        val plugin = FakeAddDocumentStartJavaScriptPlugin()
 
         override fun getPlugins() = listOf(plugin)
     }
