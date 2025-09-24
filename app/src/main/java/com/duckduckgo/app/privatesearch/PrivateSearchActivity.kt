@@ -116,6 +116,6 @@ class PrivateSearchActivity : DuckDuckGoActivity() {
     }
 
     companion object {
-        private const val DUCKDUCKGO_SETTINGS_WEB_LINK = "https://duckduckgo.com/settings"
+        private const val DUCKDUCKGO_SETTINGS_WEB_LINK = "https://duckduckgo.com/settings?return=privateSearch"
     }
 }
