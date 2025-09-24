@@ -22,10 +22,10 @@ import android.appwidget.AppWidgetProvider
 import android.content.Context
 import android.content.Intent
 import android.content.res.Configuration
-import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.widget.RemoteViews
+import androidx.core.widget.RemoteViewsCompat
 import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.di.AppCoroutineScope
@@ -35,7 +35,7 @@ import com.duckduckgo.app.pixels.AppPixelName.SEARCH_AND_FAVORITES_WIDGET_DELETE
 import com.duckduckgo.app.systemsearch.SystemSearchActivity
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.utils.DispatcherProvider
-import com.duckduckgo.widget.FavoritesWidgetService.Companion.THEME_EXTRAS
+import com.duckduckgo.widget.FavoritesWidgetItemFactory.Companion.THEME_EXTRAS
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -103,7 +103,6 @@ class SearchAndFavoritesWidget : AppWidgetProvider() {
         appWidgetManager: AppWidgetManager,
         appWidgetIds: IntArray,
     ) {
-        logcat(INFO) { "SearchAndFavoritesWidget - onUpdate" }
         appCoroutineScope.launch {
             appWidgetIds.forEach { id ->
                 updateWidget(context, appWidgetManager, id, null)
@@ -171,11 +170,9 @@ class SearchAndFavoritesWidget : AppWidgetProvider() {
                 fromFavWidget = true,
             )
             configureFavoritesGridView(context, appWidgetId, remoteViews, widgetTheme)
-            configureEmptyWidgetCta(context, appWidgetId, remoteViews, widgetTheme)
+            configureEmptyWidgetCta(context, appWidgetId, remoteViews)
 
             appWidgetManager.updateAppWidget(appWidgetId, remoteViews)
-            appWidgetManager.notifyAppWidgetViewDataChanged(appWidgetId, R.id.favoritesGrid)
-            appWidgetManager.notifyAppWidgetViewDataChanged(appWidgetId, R.id.emptyfavoritesGrid)
         }
     }
 
@@ -247,14 +244,14 @@ class SearchAndFavoritesWidget : AppWidgetProvider() {
             portraitHeight
         }
 
-        var columns = gridCalculator.calculateColumns(context, width)
-        var rows = gridCalculator.calculateRows(context, height)
+        val columns = gridCalculator.calculateColumns(context, width)
+        val rows = gridCalculator.calculateRows(context, height)
 
         logcat(INFO) { "SearchAndFavoritesWidget $portraitWidth x $portraitHeight -> $columns x $rows" }
         return Pair(columns, rows)
     }
 
-    private fun configureFavoritesGridView(
+    private suspend fun configureFavoritesGridView(
         context: Context,
         appWidgetId: Int,
         remoteViews: RemoteViews,
@@ -264,32 +261,19 @@ class SearchAndFavoritesWidget : AppWidgetProvider() {
         val pendingIntentFlags = if (appBuildConfig.sdkInt >= Build.VERSION_CODES.S) PendingIntent.FLAG_MUTABLE else 0
         val favoriteClickPendingIntent = PendingIntent.getActivity(context, 0, favoriteItemClickIntent, pendingIntentFlags)
 
-        val extras = Bundle()
-        extras.putInt(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId)
-        extras.putString(THEME_EXTRAS, widgetTheme.toString())
-
-        val adapterIntent = Intent(context, FavoritesWidgetService::class.java)
-        adapterIntent.putExtras(extras)
-        adapterIntent.data = Uri.parse(adapterIntent.toUri(Intent.URI_INTENT_SCHEME))
-        remoteViews.setRemoteAdapter(R.id.favoritesGrid, adapterIntent)
+        val items = buildRemoteCollectionItems(context, appWidgetId, widgetTheme)
+        RemoteViewsCompat.setRemoteAdapter(context, remoteViews, appWidgetId, R.id.favoritesGrid, items)
         remoteViews.setPendingIntentTemplate(R.id.favoritesGrid, favoriteClickPendingIntent)
     }
 
-    private fun configureEmptyWidgetCta(
+    private suspend fun configureEmptyWidgetCta(
         context: Context,
         appWidgetId: Int,
         remoteViews: RemoteViews,
-        widgetTheme: WidgetTheme,
     ) {
-        val extras = Bundle()
-        extras.putInt(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId)
-        extras.putString(THEME_EXTRAS, widgetTheme.toString())
-
-        val emptyAdapterIntent = Intent(context, EmptyFavoritesWidgetService::class.java)
-        emptyAdapterIntent.putExtras(extras)
-        emptyAdapterIntent.data = Uri.parse(emptyAdapterIntent.toUri(Intent.URI_INTENT_SCHEME))
+        val items = buildRemoteEmptyCollectionItems(context)
         remoteViews.setEmptyView(R.id.emptyfavoritesGrid, R.id.emptyGridViewContainer)
-        remoteViews.setRemoteAdapter(R.id.emptyfavoritesGrid, emptyAdapterIntent)
+        RemoteViewsCompat.setRemoteAdapter(context, remoteViews, appWidgetId, R.id.emptyfavoritesGrid, items)
     }
 
     private fun buildPendingIntent(context: Context): PendingIntent {
@@ -305,6 +289,52 @@ class SearchAndFavoritesWidget : AppWidgetProvider() {
     private fun inject(context: Context) {
         val application = context.applicationContext as DuckDuckGoApplication
         application.daggerAppComponent.inject(this)
+    }
+
+    private suspend fun buildRemoteCollectionItems(
+        context: Context,
+        appWidgetId: Int,
+        widgetTheme: WidgetTheme,
+    ): RemoteViewsCompat.RemoteCollectionItems {
+        val factory = FavoritesWidgetItemFactory(
+            context,
+            Intent().apply {
+                putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId)
+                putExtra(THEME_EXTRAS, widgetTheme.toString())
+            },
+        )
+        factory.onCreate()
+        factory.updateWidgetFavoritesAsync()
+
+        val builder = RemoteViewsCompat.RemoteCollectionItems.Builder()
+        val count = factory.count
+        for (i in 0 until count) {
+            val itemId = factory.getItemId(i)
+            val remoteView = factory.getViewAt(i)
+            builder.addItem(itemId, remoteView)
+        }
+        factory.onDestroy()
+        return builder.build()
+    }
+
+    private suspend fun buildRemoteEmptyCollectionItems(
+        context: Context,
+    ): RemoteViewsCompat.RemoteCollectionItems {
+        val factory = EmptyFavoritesWidgetItemFactory(
+            context,
+        )
+        factory.onCreate()
+        factory.updateEmptyWidgetFavoritesAsync()
+
+        val builder = RemoteViewsCompat.RemoteCollectionItems.Builder()
+        val count = factory.count
+        for (i in 0 until count) {
+            val itemId = factory.getItemId(i)
+            val remoteView = factory.getViewAt(i)
+            builder.addItem(itemId, remoteView)
+        }
+        factory.onDestroy()
+        return builder.build()
     }
 
     companion object {
