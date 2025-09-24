@@ -192,7 +192,7 @@
     <string name="feedbackSubCategoryDuckAiOther">Inne opinie o Duck.ai</string>
 
     <string name="subscriptionSettingSectionTitle" translatable="false">DuckDuckGo Subscription</string>
-    <string name="subscriptionSettingSubscribeSecure">Zabezpiecz Wi-Fi oraz używaj zaawansowanych modeli AI</string>
+    <string name="subscriptionSettingSubscribeSecure">Zabezpiecz Wi-Fi i czatuj prywatnie z zaawansowanymi modelami AI</string>
 
     <string name="subscriptionSettingGetRebranding">Subskrybuj DuckDuckGo</string>
     <string name="subscriptionSettingTryFreeTrialRebranding">Wypróbuj za darmo</string>
