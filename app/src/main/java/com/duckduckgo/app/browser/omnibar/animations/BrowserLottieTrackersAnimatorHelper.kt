@@ -140,19 +140,7 @@ class BrowserLottieTrackersAnimatorHelper @Inject constructor(
         }
     }
 
-    override fun startExperimentVariant1Animation(
-        context: Context,
-        shieldAnimationView: LottieAnimationView,
-        omnibarViews: List<View>,
-    ) {
-        if (isCookiesAnimationRunning) return // If cookies animation is running let it finish to avoid weird glitches with the other animations
-
-        this.shieldAnimation = shieldAnimationView
-
-        tryToStartCookiesAnimation(context, omnibarViews)
-    }
-
-    override fun startExperimentVariant2OrVariant3Animation(
+    override fun startAddressBarTrackersAnimation(
         context: Context,
         shieldAnimationView: LottieAnimationView,
         trackersBlockedAnimationView: DaxTextView,
