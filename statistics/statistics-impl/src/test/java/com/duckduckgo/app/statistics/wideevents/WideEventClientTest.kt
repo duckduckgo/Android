@@ -47,7 +47,7 @@ class WideEventClientTest {
 
     private val wideEventClient = WideEventClientImpl(
         wideEventRepository = wideEventRepository,
-        wideEventFeature = wideEventFeature,
+        wideEventFeature = { wideEventFeature },
         dispatcherProvider = coroutineRule.testDispatcherProvider,
     )
 

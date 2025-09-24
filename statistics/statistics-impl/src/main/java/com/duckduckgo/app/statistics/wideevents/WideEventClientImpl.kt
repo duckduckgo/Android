@@ -20,6 +20,7 @@ import com.duckduckgo.app.statistics.wideevents.db.WideEventRepository
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
+import dagger.Lazy
 import java.time.Duration
 import javax.inject.Inject
 import kotlin.runCatching
@@ -28,7 +29,7 @@ import kotlinx.coroutines.withContext
 @ContributesBinding(AppScope::class)
 class WideEventClientImpl @Inject constructor(
     private val wideEventRepository: WideEventRepository,
-    private val wideEventFeature: WideEventFeature,
+    private val wideEventFeature: Lazy<WideEventFeature>,
     private val dispatcherProvider: DispatcherProvider,
 ) : WideEventClient {
 
@@ -134,7 +135,7 @@ class WideEventClientImpl @Inject constructor(
 
     private suspend fun isFeatureEnabled(): Boolean =
         withContext(dispatcherProvider.io()) {
-            wideEventFeature.self().isEnabled()
+            wideEventFeature.get().self().isEnabled()
         }
 }
 
