@@ -28,6 +28,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion
 import com.duckduckgo.browser.api.ui.BrowserScreens.PrivateSearchScreenNoParams
+import com.duckduckgo.browser.ui.autocomplete.BrowserAutoCompleteSuggestionsAdapter
 import com.duckduckgo.common.ui.DuckDuckGoFragment
 import com.duckduckgo.common.ui.view.dialog.TextAlertDialogBuilder
 import com.duckduckgo.common.ui.viewbinding.viewBinding
@@ -36,8 +37,7 @@ import com.duckduckgo.common.utils.plugins.ActivePluginPoint
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.duckchat.impl.R
 import com.duckduckgo.duckchat.impl.databinding.FragmentSearchTabBinding
-import com.duckduckgo.duckchat.impl.inputscreen.autocomplete.BrowserAutoCompleteSuggestionsAdapter
-import com.duckduckgo.duckchat.impl.inputscreen.autocomplete.OmnibarPosition.TOP
+import com.duckduckgo.browser.ui.omnibar.OmnibarPosition.TOP
 import com.duckduckgo.duckchat.impl.inputscreen.ui.command.SearchCommand
 import com.duckduckgo.duckchat.impl.inputscreen.ui.command.SearchCommand.RestoreAutoCompleteScrollPosition
 import com.duckduckgo.duckchat.impl.inputscreen.ui.command.SearchCommand.ShowRemoveSearchSuggestionDialog

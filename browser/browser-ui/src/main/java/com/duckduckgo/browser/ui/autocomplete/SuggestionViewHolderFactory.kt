@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.duckchat.impl.inputscreen.autocomplete
+package com.duckduckgo.browser.ui.autocomplete
 
 import android.view.LayoutInflater
 import android.view.View
@@ -38,7 +38,7 @@ import com.duckduckgo.duckchat.impl.databinding.ItemAutocompleteHistorySuggestio
 import com.duckduckgo.duckchat.impl.databinding.ItemAutocompleteInAppMessageBinding
 import com.duckduckgo.duckchat.impl.databinding.ItemAutocompleteSearchSuggestionBinding
 import com.duckduckgo.duckchat.impl.databinding.ItemAutocompleteSwitchToTabSuggestionBinding
-import com.duckduckgo.duckchat.impl.inputscreen.autocomplete.AutoCompleteViewHolder.InAppMessageViewHolder
+import com.duckduckgo.browser.ui.autocomplete.AutoCompleteViewHolder.InAppMessageViewHolder
 import com.duckduckgo.mobile.android.R as CommonR
 
 interface SuggestionViewHolderFactory {
@@ -241,7 +241,7 @@ class DefaultSuggestionViewHolderFactory(private val omnibarPosition: OmnibarPos
 class InAppMessageViewHolderFactory : SuggestionViewHolderFactory {
     override fun onCreateViewHolder(parent: ViewGroup): AutoCompleteViewHolder {
         val inflater = LayoutInflater.from(parent.context)
-        return AutoCompleteViewHolder.InAppMessageViewHolder(ItemAutocompleteInAppMessageBinding.inflate(inflater, parent, false))
+        return InAppMessageViewHolder(ItemAutocompleteInAppMessageBinding.inflate(inflater, parent, false))
     }
 
     override fun onBindViewHolder(

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.duckchat.impl.inputscreen.autocomplete
+package com.duckduckgo.browser.ui.autocomplete
 
 import android.view.ViewGroup
 import androidx.annotation.UiThread
@@ -31,19 +31,8 @@ import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggesti
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion.AutoCompleteUrlSuggestion
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion.AutoCompleteUrlSuggestion.AutoCompleteBookmarkSuggestion
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion.AutoCompleteUrlSuggestion.AutoCompleteSwitchToTabSuggestion
-import com.duckduckgo.duckchat.impl.inputscreen.autocomplete.AutoCompleteItem.Divider
-import com.duckduckgo.duckchat.impl.inputscreen.autocomplete.AutoCompleteItem.Suggestion
-import com.duckduckgo.duckchat.impl.inputscreen.autocomplete.AutoCompleteViewHolder.EmptySuggestionViewHolder
-import com.duckduckgo.duckchat.impl.inputscreen.autocomplete.BrowserAutoCompleteSuggestionsAdapter.Type.BOOKMARK_TYPE
-import com.duckduckgo.duckchat.impl.inputscreen.autocomplete.BrowserAutoCompleteSuggestionsAdapter.Type.DEFAULT_TYPE
-import com.duckduckgo.duckchat.impl.inputscreen.autocomplete.BrowserAutoCompleteSuggestionsAdapter.Type.DIVIDER_TYPE
-import com.duckduckgo.duckchat.impl.inputscreen.autocomplete.BrowserAutoCompleteSuggestionsAdapter.Type.DUCK_AI_PROMPT_TYPE
-import com.duckduckgo.duckchat.impl.inputscreen.autocomplete.BrowserAutoCompleteSuggestionsAdapter.Type.EMPTY_TYPE
-import com.duckduckgo.duckchat.impl.inputscreen.autocomplete.BrowserAutoCompleteSuggestionsAdapter.Type.HISTORY_SEARCH_TYPE
-import com.duckduckgo.duckchat.impl.inputscreen.autocomplete.BrowserAutoCompleteSuggestionsAdapter.Type.HISTORY_TYPE
-import com.duckduckgo.duckchat.impl.inputscreen.autocomplete.BrowserAutoCompleteSuggestionsAdapter.Type.IN_APP_MESSAGE_TYPE
-import com.duckduckgo.duckchat.impl.inputscreen.autocomplete.BrowserAutoCompleteSuggestionsAdapter.Type.SUGGESTION_TYPE
-import com.duckduckgo.duckchat.impl.inputscreen.autocomplete.BrowserAutoCompleteSuggestionsAdapter.Type.SWITCH_TO_TAB_TYPE
+import com.duckduckgo.browser.ui.autocomplete.AutoCompleteViewHolder.EmptySuggestionViewHolder
+import com.duckduckgo.browser.ui.omnibar.OmnibarPosition
 
 private sealed interface AutoCompleteItem {
     data class Suggestion(val value: AutoCompleteSuggestion) : AutoCompleteItem
@@ -79,9 +68,9 @@ class BrowserAutoCompleteSuggestionsAdapter(
                 override fun getNewListSize() = newItems.size
                 override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean =
                     when {
-                        items[oldItemPosition] is Divider && newItems[newItemPosition] is Divider -> true
-                        items[oldItemPosition] is Suggestion && newItems[newItemPosition] is Suggestion ->
-                            (items[oldItemPosition] as Suggestion).value == (newItems[newItemPosition] as Suggestion).value
+                        items[oldItemPosition] is AutoCompleteItem.Divider && newItems[newItemPosition] is AutoCompleteItem.Divider -> true
+                        items[oldItemPosition] is AutoCompleteItem.Suggestion && newItems[newItemPosition] is AutoCompleteItem.Suggestion ->
+                            (items[oldItemPosition] as AutoCompleteItem.Suggestion).value == (newItems[newItemPosition] as AutoCompleteItem.Suggestion).value
                         else -> false
                     }
                 override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int) = true
@@ -90,16 +79,16 @@ class BrowserAutoCompleteSuggestionsAdapter(
     }
 
     private val viewHolderFactoryMap: Map<Int, SuggestionViewHolderFactory> = mapOf(
-        EMPTY_TYPE to EmptySuggestionViewHolderFactory(),
-        SUGGESTION_TYPE to SearchSuggestionViewHolderFactory(omnibarPosition),
-        BOOKMARK_TYPE to BookmarkSuggestionViewHolderFactory(),
-        HISTORY_TYPE to HistorySuggestionViewHolderFactory(),
-        HISTORY_SEARCH_TYPE to HistorySearchSuggestionViewHolderFactory(),
-        IN_APP_MESSAGE_TYPE to InAppMessageViewHolderFactory(),
-        DEFAULT_TYPE to DefaultSuggestionViewHolderFactory(omnibarPosition),
-        SWITCH_TO_TAB_TYPE to SwitchToTabSuggestionViewHolderFactory(),
-        DIVIDER_TYPE to DividerViewHolderFactory(),
-        DUCK_AI_PROMPT_TYPE to DuckAIPromptSuggestionViewHolderFactory(),
+        Type.EMPTY_TYPE to EmptySuggestionViewHolderFactory(),
+        Type.SUGGESTION_TYPE to SearchSuggestionViewHolderFactory(omnibarPosition),
+        Type.BOOKMARK_TYPE to BookmarkSuggestionViewHolderFactory(),
+        Type.HISTORY_TYPE to HistorySuggestionViewHolderFactory(),
+        Type.HISTORY_SEARCH_TYPE to HistorySearchSuggestionViewHolderFactory(),
+        Type.IN_APP_MESSAGE_TYPE to InAppMessageViewHolderFactory(),
+        Type.DEFAULT_TYPE to DefaultSuggestionViewHolderFactory(omnibarPosition),
+        Type.SWITCH_TO_TAB_TYPE to SwitchToTabSuggestionViewHolderFactory(),
+        Type.DIVIDER_TYPE to DividerViewHolderFactory(),
+        Type.DUCK_AI_PROMPT_TYPE to DuckAIPromptSuggestionViewHolderFactory(),
     )
 
     private var phrase = ""
@@ -112,17 +101,17 @@ class BrowserAutoCompleteSuggestionsAdapter(
         viewHolderFactoryMap.getValue(viewType).onCreateViewHolder(parent)
 
     override fun getItemViewType(position: Int): Int = when (val item = items[position]) {
-        is Divider -> DIVIDER_TYPE
-        is Suggestion -> when (item.value) {
-            is AutoCompleteBookmarkSuggestion -> BOOKMARK_TYPE
-            is AutoCompleteHistorySuggestion -> HISTORY_TYPE
-            is AutoCompleteHistorySearchSuggestion -> HISTORY_SEARCH_TYPE
-            is AutoCompleteInAppMessageSuggestion -> IN_APP_MESSAGE_TYPE
-            is AutoCompleteDefaultSuggestion -> DEFAULT_TYPE
-            is AutoCompleteSwitchToTabSuggestion -> SWITCH_TO_TAB_TYPE
-            is AutoCompleteUrlSuggestion -> SWITCH_TO_TAB_TYPE
-            is AutoCompleteSuggestion.AutoCompleteDuckAIPrompt -> DUCK_AI_PROMPT_TYPE
-            else -> SUGGESTION_TYPE
+        is AutoCompleteItem.Divider -> Type.DIVIDER_TYPE
+        is AutoCompleteItem.Suggestion -> when (item.value) {
+            is AutoCompleteBookmarkSuggestion -> Type.BOOKMARK_TYPE
+            is AutoCompleteHistorySuggestion -> Type.HISTORY_TYPE
+            is AutoCompleteHistorySearchSuggestion -> Type.HISTORY_SEARCH_TYPE
+            is AutoCompleteInAppMessageSuggestion -> Type.IN_APP_MESSAGE_TYPE
+            is AutoCompleteDefaultSuggestion -> Type.DEFAULT_TYPE
+            is AutoCompleteSwitchToTabSuggestion -> Type.SWITCH_TO_TAB_TYPE
+            is AutoCompleteUrlSuggestion -> Type.SWITCH_TO_TAB_TYPE
+            is AutoCompleteSuggestion.AutoCompleteDuckAIPrompt -> Type.DUCK_AI_PROMPT_TYPE
+            else -> Type.SUGGESTION_TYPE
         }
     }
 
@@ -130,8 +119,8 @@ class BrowserAutoCompleteSuggestionsAdapter(
         if (holder is EmptySuggestionViewHolder) return
 
         when (val item = items[position]) {
-            Divider -> return
-            is Suggestion -> {
+            AutoCompleteItem.Divider -> return
+            is AutoCompleteItem.Suggestion -> {
                 viewHolderFactoryMap.getValue(getItemViewType(position))
                     .onBindViewHolder(
                         holder,
@@ -165,15 +154,15 @@ class BrowserAutoCompleteSuggestionsAdapter(
     }
 
     private fun getSuggestions() = items
-        .filterIsInstance<Suggestion>()
+        .filterIsInstance<AutoCompleteItem.Suggestion>()
         .map { it.value }
 
     private fun createItemsWithDividers(suggestions: List<AutoCompleteSuggestion>): List<AutoCompleteItem> = buildList {
         suggestions.zipWithNext { current, next ->
-            add(Suggestion(current))
-            if (needsDivider(current, next)) add(Divider)
+            add(AutoCompleteItem.Suggestion(current))
+            if (needsDivider(current, next)) add(AutoCompleteItem.Divider)
         }
-        if (suggestions.isNotEmpty()) add(Suggestion(suggestions.last()))
+        if (suggestions.isNotEmpty()) add(AutoCompleteItem.Suggestion(suggestions.last()))
     }
 
     private fun needsDivider(current: AutoCompleteSuggestion, next: AutoCompleteSuggestion): Boolean {

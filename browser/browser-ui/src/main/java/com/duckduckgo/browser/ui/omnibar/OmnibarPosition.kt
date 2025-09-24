@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.duckchat.impl.inputscreen.autocomplete
+package com.duckduckgo.browser.ui.omnibar
 
 enum class OmnibarPosition {
     TOP, BOTTOM
