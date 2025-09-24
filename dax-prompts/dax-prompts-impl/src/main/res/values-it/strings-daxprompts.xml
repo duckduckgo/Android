@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (c) 2025 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+<resources>
+    <string name="dax_prompt_browser_comparison_title" instruction="Title for the Browser Comparison section">Confronto tra i browser</string>
+    <string name="dax_prompt_browser_comparison_close" instruction="Content description for the X button">Chiudi</string>
+    <string name="dax_prompt_browser_comparison_message_title" instruction="Title for Dax message">DuckDuckGo offre protezioni che gli altri browser non hanno.</string>
+    <string name="dax_prompt_browser_comparison_message_primary_button" instruction="This text is placed on a large button">Apri i collegamenti con DuckDuckGo</string>
+    <string name="dax_prompt_browser_comparison_message_ghost_button" instruction="This text is placed on a large button">Forse più tardi</string>
+
+    <string name="dax_prompt_browser_comparison_item1" instruction="This text is placed in a table">Cerca privatamente per impostazione predefinita</string>
+    <string name="dax_prompt_browser_comparison_item2" instruction="This text is placed in a table">Blocca i sistemi di tracciamento di terze parti</string>
+    <string name="dax_prompt_browser_comparison_item3" instruction="This text is placed in a table">Blocca i popup dei cookie</string>
+    <string name="dax_prompt_browser_comparison_item4" instruction="This text is placed in a table">Blocca gli annunci mirati</string>
+</resources>
