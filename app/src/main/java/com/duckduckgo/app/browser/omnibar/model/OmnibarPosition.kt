@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 DuckDuckGo
+ * Copyright (c) 2024 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,10 +14,8 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.browser.api.omnibar.settings
+package com.duckduckgo.app.browser.omnibar.model
 
-import com.duckduckgo.browser.api.omnibar.model.OmnibarPosition
-
-interface OmnibarSettings {
-    var omnibarPosition: OmnibarPosition
+enum class OmnibarPosition {
+    TOP, BOTTOM
 }

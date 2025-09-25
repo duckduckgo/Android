@@ -21,6 +21,7 @@ import com.duckduckgo.common.ui.store.AppTheme
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.api.R
 import com.duckduckgo.duckchat.api.inputscreen.BrowserAndInputScreenTransitionProvider
+import com.duckduckgo.duckchat.impl.DuckChatInternal
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
 
@@ -47,19 +48,19 @@ import javax.inject.Inject
 @ContributesBinding(scope = AppScope::class)
 class BrowserAndInputScreenTransitionProviderImpl @Inject constructor(
     private val appTheme: AppTheme,
-    private val inputScreenConfigResolver: InputScreenConfigResolver,
+    private val duckChatInternal: DuckChatInternal,
 ) : BrowserAndInputScreenTransitionProvider {
 
-    override fun getBrowserEnterAnimation(): Int {
+    override fun getBrowserEnterAnimation(isTopOmnibar: Boolean): Int {
         return if (VERSION.SDK_INT >= 33) {
             if (appTheme.isLightModeEnabled()) {
-                if (inputScreenConfigResolver.useTopBar()) {
+                if (useTopBar(isTopOmnibar)) {
                     R.anim.slide_in_from_bottom_fade_in_light
                 } else {
                     R.anim.fade_in_light
                 }
             } else {
-                if (inputScreenConfigResolver.useTopBar()) {
+                if (useTopBar(isTopOmnibar)) {
                     R.anim.slide_in_from_bottom_fade_in_dark
                 } else {
                     R.anim.fade_in_dark
@@ -70,16 +71,16 @@ class BrowserAndInputScreenTransitionProviderImpl @Inject constructor(
         }
     }
 
-    override fun getBrowserExitAnimation(): Int {
+    override fun getBrowserExitAnimation(isTopOmnibar: Boolean): Int {
         return if (VERSION.SDK_INT >= 33) {
             if (appTheme.isLightModeEnabled()) {
-                if (inputScreenConfigResolver.useTopBar()) {
+                if (useTopBar(isTopOmnibar)) {
                     R.anim.slide_out_to_bottom_fade_out_light
                 } else {
                     R.anim.fade_out_light
                 }
             } else {
-                if (inputScreenConfigResolver.useTopBar()) {
+                if (useTopBar(isTopOmnibar)) {
                     R.anim.slide_out_to_bottom_fade_out_dark
                 } else {
                     R.anim.fade_out_dark
@@ -90,19 +91,23 @@ class BrowserAndInputScreenTransitionProviderImpl @Inject constructor(
         }
     }
 
-    override fun getInputScreenEnterAnimation(): Int {
-        return if (VERSION.SDK_INT >= 33 && inputScreenConfigResolver.useTopBar()) {
+    override fun getInputScreenEnterAnimation(isTopOmnibar: Boolean): Int {
+        return if (VERSION.SDK_INT >= 33 && useTopBar(isTopOmnibar)) {
             R.anim.slide_in_from_top_fade_in
         } else {
             R.anim.fade_in
         }
     }
 
-    override fun getInputScreenExitAnimation(): Int {
-        return if (VERSION.SDK_INT >= 33 && inputScreenConfigResolver.useTopBar()) {
+    override fun getInputScreenExitAnimation(isTopOmnibar: Boolean): Int {
+        return if (VERSION.SDK_INT >= 33 && useTopBar(isTopOmnibar)) {
             R.anim.slide_out_to_top_fade_out
         } else {
             R.anim.fade_out
         }
+    }
+    
+    private fun useTopBar(isTopOmnibar: Boolean): Boolean {
+        return isTopOmnibar || !duckChatInternal.inputScreenBottomBarEnabled.value
     }
 }

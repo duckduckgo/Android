@@ -21,11 +21,11 @@ package com.duckduckgo.duckchat.api.inputscreen
  */
 interface BrowserAndInputScreenTransitionProvider {
 
-    fun getBrowserEnterAnimation(): Int
+    fun getBrowserEnterAnimation(isTopOmnibar: Boolean): Int
 
-    fun getBrowserExitAnimation(): Int
+    fun getBrowserExitAnimation(isTopOmnibar: Boolean): Int
 
-    fun getInputScreenEnterAnimation(): Int
+    fun getInputScreenEnterAnimation(isTopOmnibar: Boolean): Int
 
-    fun getInputScreenExitAnimation(): Int
+    fun getInputScreenExitAnimation(isTopOmnibar: Boolean): Int
 }

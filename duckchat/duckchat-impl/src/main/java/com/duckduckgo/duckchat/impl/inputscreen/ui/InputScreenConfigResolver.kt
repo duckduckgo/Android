@@ -16,26 +16,38 @@
 
 package com.duckduckgo.duckchat.impl.inputscreen.ui
 
-import com.duckduckgo.browser.api.omnibar.model.OmnibarPosition
-import com.duckduckgo.browser.api.omnibar.settings.OmnibarSettings
-import com.duckduckgo.di.scopes.AppScope
+import android.content.Intent
+import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.duckchat.api.inputscreen.InputScreenActivityParams
 import com.duckduckgo.duckchat.impl.DuckChatInternal
+import com.duckduckgo.navigation.api.getActivityParams
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
 import javax.inject.Inject
 
 interface InputScreenConfigResolver {
+    val isTopOmnibar: Boolean
+    fun onInputScreenCreated(intent: Intent)
     fun useTopBar(): Boolean
 }
 
-@ContributesBinding(scope = AppScope::class)
-@SingleInstanceIn(scope = AppScope::class)
+@ContributesBinding(scope = ActivityScope::class)
+@SingleInstanceIn(scope = ActivityScope::class)
 class InputScreenConfigResolverImpl @Inject constructor(
     private val duckChatInternal: DuckChatInternal,
-    private val omnibarSettings: OmnibarSettings,
 ) : InputScreenConfigResolver {
 
+    private var _isTopOmnibar = true
+
+    override val isTopOmnibar: Boolean
+        get() = _isTopOmnibar
+
+    override fun onInputScreenCreated(intent: Intent) {
+        val params = intent.getActivityParams(InputScreenActivityParams::class.java)
+        _isTopOmnibar = params?.isTopOmnibar ?: true
+    }
+
     override fun useTopBar(): Boolean {
-        return omnibarSettings.omnibarPosition == OmnibarPosition.TOP || !duckChatInternal.inputScreenBottomBarEnabled.value
+        return isTopOmnibar || !duckChatInternal.inputScreenBottomBarEnabled.value
     }
 }

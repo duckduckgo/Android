@@ -149,8 +149,8 @@ import com.duckduckgo.app.browser.omnibar.Omnibar.OmnibarTextState
 import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode
 import com.duckduckgo.app.browser.omnibar.OmnibarItemPressedListener
 import com.duckduckgo.app.browser.omnibar.QueryOrigin
-import com.duckduckgo.browser.api.omnibar.model.OmnibarPosition.BOTTOM
-import com.duckduckgo.browser.api.omnibar.model.OmnibarPosition.TOP
+import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition.BOTTOM
+import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition.TOP
 import com.duckduckgo.app.browser.print.PrintDocumentAdapterFactory
 import com.duckduckgo.app.browser.print.PrintInjector
 import com.duckduckgo.app.browser.remotemessage.SharePromoLinkRMFBroadCastReceiver
@@ -1107,10 +1107,10 @@ class BrowserTabFragment :
     private fun launchInputScreen(query: String) {
         val intent = globalActivityStarter.startIntent(
             requireContext(),
-            InputScreenActivityParams(query = query),
+            InputScreenActivityParams(query = query, isTopOmnibar = omnibar.omnibarPosition == TOP),
         )
-        val enterTransition = browserAndInputScreenTransitionProvider.getInputScreenEnterAnimation()
-        val exitTransition = browserAndInputScreenTransitionProvider.getBrowserExitAnimation()
+        val enterTransition = browserAndInputScreenTransitionProvider.getInputScreenEnterAnimation(omnibar.omnibarPosition == TOP)
+        val exitTransition = browserAndInputScreenTransitionProvider.getBrowserExitAnimation(omnibar.omnibarPosition == TOP)
         val options = ActivityOptionsCompat.makeCustomAnimation(
             requireActivity(),
             enterTransition,
