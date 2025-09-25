@@ -150,7 +150,7 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
         }
 
         val useTopBar = inputScreenConfigResolver.useTopBar()
-        val separatorHeightPx = resources.getDimensionPixelSize(R.dimen.contentSeparatorHeight)
+        val separatorHeightPx = resources.getDimensionPixelSize(R.dimen.inputScreenContentSeparatorHeight)
         contentSeparator =
             View(context).apply {
                 val typedValue = TypedValue()
