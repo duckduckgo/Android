@@ -245,9 +245,7 @@ import com.duckduckgo.browser.api.brokensite.BrokenSiteData.ReportFlow.RELOAD_TH
 import com.duckduckgo.browser.api.ui.BrowserScreens.PrivateSearchScreenNoParams
 import com.duckduckgo.browser.api.ui.BrowserScreens.WebViewActivityWithParams
 import com.duckduckgo.browser.api.webviewcompat.WebViewCompatWrapper
-import com.duckduckgo.browser.ui.R as BrowserUI
 import com.duckduckgo.browser.ui.autocomplete.BrowserAutoCompleteSuggestionsAdapter
-import com.duckduckgo.browser.ui.autocomplete.SuggestionItemDecoration
 import com.duckduckgo.browser.ui.omnibar.OmnibarPosition.BOTTOM
 import com.duckduckgo.browser.ui.omnibar.OmnibarPosition.TOP
 import com.duckduckgo.common.ui.DuckDuckGoActivity

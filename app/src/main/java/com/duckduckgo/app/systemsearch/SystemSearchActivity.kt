@@ -16,7 +16,6 @@
 
 package com.duckduckgo.app.systemsearch
 
-import android.R.attr.logo
 import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
@@ -32,7 +31,6 @@ import android.widget.TextView
 import android.widget.Toast
 import android.widget.Toast.LENGTH_SHORT
 import androidx.core.content.ContextCompat
-import androidx.core.content.ContextCompat.startActivity
 import androidx.core.text.toSpannable
 import androidx.core.view.isVisible
 import androidx.core.view.postDelayed
@@ -45,13 +43,10 @@ import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.BrowserActivity
-import com.duckduckgo.app.browser.BrowserTabFragment.Companion.KEYBOARD_DELAY
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.R.string
 import com.duckduckgo.app.browser.databinding.ActivitySystemSearchBinding
-import com.duckduckgo.app.browser.di.BrowserModule_GridViewColumnCalculatorFactory.gridViewColumnCalculator
 import com.duckduckgo.app.browser.favicon.FaviconManager
-import com.duckduckgo.app.browser.favicon.FaviconModule_FaviconManagerFactory.faviconManager
 import com.duckduckgo.app.browser.newtab.FavoritesQuickAccessAdapter
 import com.duckduckgo.app.browser.newtab.FavoritesQuickAccessAdapter.Companion.QUICK_ACCESS_GRID_MAX_COLUMNS
 import com.duckduckgo.app.browser.newtab.FavoritesQuickAccessAdapter.Companion.QUICK_ACCESS_ITEM_MAX_SIZE_DP
@@ -76,9 +71,7 @@ import com.duckduckgo.app.systemsearch.SystemSearchViewModel.Command.ShowRemoveS
 import com.duckduckgo.app.tabs.ui.GridViewColumnCalculator
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion
 import com.duckduckgo.browser.api.ui.BrowserScreens.PrivateSearchScreenNoParams
-import com.duckduckgo.browser.ui.R as BrowserUI
 import com.duckduckgo.browser.ui.autocomplete.BrowserAutoCompleteSuggestionsAdapter
-import com.duckduckgo.browser.ui.autocomplete.SuggestionItemDecoration
 import com.duckduckgo.browser.ui.omnibar.OmnibarPosition
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.view.KeyboardAwareEditText
