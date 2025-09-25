@@ -187,7 +187,9 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
         }
 
         configureViewPager()
-        configureOmnibar()
+        params?.tabs?.let { tabs ->
+            configureOmnibar(tabs)
+        }
         configureVoice()
         configureObservers()
         configureLogoAnimation()
@@ -306,7 +308,7 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
         binding.viewPager.registerOnPageChangeCallback(pageChangeCallback)
     }
 
-    private fun configureOmnibar() =
+    private fun configureOmnibar(tabs: Int) =
         with(inputModeWidget) {
             onSearchSent = { query ->
                 viewModel.onSearchSubmitted(query)
@@ -355,6 +357,7 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
             onTabTapped = { index ->
                 viewModel.onTabTapped(index)
             }
+            tabSwitcherButton.count = tabs
             onTabSwitcherTapped = {
                 viewModel.onTabSwitcherTapped()
             }

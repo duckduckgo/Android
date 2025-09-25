@@ -71,7 +71,7 @@ class InputModeWidget @JvmOverloads constructor(
     private val inputModeSwitch: TabLayout
     private val inputModeWidgetCard: MaterialCardView
     private val inputScreenButtonsContainer: FrameLayout
-    private val tabSwitcherButton: InputScreenTabSwitcherButton
+    val tabSwitcherButton: InputScreenTabSwitcherButton
     private val menuButton: View
     private val fireButton: View
 
