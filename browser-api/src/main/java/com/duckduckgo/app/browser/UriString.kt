@@ -34,7 +34,7 @@ class UriString {
         private const val space = " "
         private val webUrlRegex by lazy { PatternsCompat.WEB_URL.toRegex() }
         private val domainRegex by lazy { PatternsCompat.DOMAIN_NAME.toRegex() }
-        private val multiSpaceRegex by lazy { "\\s+".toRegex() }
+        private val inputQueryCleanupRegex by lazy { "['\"\n]|\\s+".toRegex() }
         private val cache = LruCache<Int, Boolean>(250_000)
 
         fun extractUrl(inputQuery: String): String? {
@@ -173,11 +173,7 @@ class UriString {
         }
 
         private fun cleanupInputQuery(text: String): String {
-            return text.replace("'", " ")
-                .replace("\"", " ")
-                .replace("\n", " ")
-                .replace(multiSpaceRegex, " ")
-                .trim()
+            return text.replace(inputQueryCleanupRegex, " ").trim()
         }
     }
 }
