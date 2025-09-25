@@ -56,9 +56,8 @@ class BrowserAndInputScreenTransitionProviderImpl @Inject constructor(
     private val appTheme: AppTheme,
     private val duckChatInternal: DuckChatInternal,
 ) : BrowserAndInputScreenTransitionProvider {
-
-    override fun getBrowserEnterAnimation(isTopOmnibar: Boolean): Int {
-        return if (VERSION.SDK_INT >= 33) {
+    override fun getBrowserEnterAnimation(isTopOmnibar: Boolean): Int =
+        if (VERSION.SDK_INT >= 33) {
             if (appTheme.isLightModeEnabled()) {
                 if (useTopBar(isTopOmnibar)) {
                     R.anim.slide_in_from_bottom_fade_in_light
@@ -75,10 +74,9 @@ class BrowserAndInputScreenTransitionProviderImpl @Inject constructor(
         } else {
             R.anim.fade_in
         }
-    }
 
-    override fun getBrowserExitAnimation(isTopOmnibar: Boolean): Int {
-        return if (VERSION.SDK_INT >= 33) {
+    override fun getBrowserExitAnimation(isTopOmnibar: Boolean): Int =
+        if (VERSION.SDK_INT >= 33) {
             if (appTheme.isLightModeEnabled()) {
                 if (useTopBar(isTopOmnibar)) {
                     R.anim.slide_out_to_bottom_fade_out_light
@@ -95,25 +93,20 @@ class BrowserAndInputScreenTransitionProviderImpl @Inject constructor(
         } else {
             R.anim.fade_out
         }
-    }
 
-    override fun getInputScreenEnterAnimation(isTopOmnibar: Boolean): Int {
-        return if (VERSION.SDK_INT >= 33 && useTopBar(isTopOmnibar)) {
+    override fun getInputScreenEnterAnimation(isTopOmnibar: Boolean): Int =
+        if (VERSION.SDK_INT >= 33 && useTopBar(isTopOmnibar)) {
             R.anim.slide_in_from_top_fade_in
         } else {
             R.anim.fade_in
         }
-    }
 
-    override fun getInputScreenExitAnimation(isTopOmnibar: Boolean): Int {
-        return if (VERSION.SDK_INT >= 33 && useTopBar(isTopOmnibar)) {
+    override fun getInputScreenExitAnimation(isTopOmnibar: Boolean): Int =
+        if (VERSION.SDK_INT >= 33 && useTopBar(isTopOmnibar)) {
             R.anim.slide_out_to_top_fade_out
         } else {
             R.anim.fade_out
         }
-    }
-    
-    private fun useTopBar(isTopOmnibar: Boolean): Boolean {
-        return isTopOmnibar || !duckChatInternal.inputScreenBottomBarEnabled.value
-    }
+
+    private fun useTopBar(isTopOmnibar: Boolean): Boolean = isTopOmnibar || !duckChatInternal.inputScreenBottomBarEnabled.value
 }

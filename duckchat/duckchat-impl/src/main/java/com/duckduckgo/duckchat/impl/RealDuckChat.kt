@@ -56,7 +56,6 @@ import com.squareup.anvil.annotations.ContributesMultibinding
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import dagger.SingleInstanceIn
-import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -66,6 +65,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import logcat.logcat
+import javax.inject.Inject
 
 interface DuckChatInternal : DuckChat {
     /**
@@ -178,7 +178,9 @@ interface DuckChatInternal : DuckChat {
     val inputScreenBottomBarEnabled: StateFlow<Boolean>
 }
 
-enum class ChatState(val value: String) {
+enum class ChatState(
+    val value: String,
+) {
     START_STREAM_NEW_PROMPT("start_stream:new_prompt"),
     LOADING("loading"),
     STREAMING("streaming"),
@@ -190,12 +192,13 @@ enum class ChatState(val value: String) {
     ;
 
     companion object {
-        fun fromValue(v: String?): ChatState? =
-            entries.firstOrNull { it.value == v }
+        fun fromValue(v: String?): ChatState? = entries.firstOrNull { it.value == v }
     }
 }
 
-enum class ReportMetric(val metric: String) {
+enum class ReportMetric(
+    val metric: String,
+) {
     USER_DID_SUBMIT_PROMPT("userDidSubmitPrompt"),
     USER_DID_SUBMIT_FIRST_PROMPT("userDidSubmitFirstPrompt"),
     USER_DID_OPEN_HISTORY("userDidOpenHistory"),
@@ -205,8 +208,7 @@ enum class ReportMetric(val metric: String) {
     ;
 
     companion object {
-        fun fromValue(v: String?): ReportMetric? =
-            ReportMetric.entries.firstOrNull { it.metric == v }
+        fun fromValue(v: String?): ReportMetric? = ReportMetric.entries.firstOrNull { it.metric == v }
     }
 }
 
@@ -219,7 +221,6 @@ data class DuckChatSettingJson(
 )
 
 @SingleInstanceIn(AppScope::class)
-
 @ContributesBinding(AppScope::class, boundType = DuckChat::class)
 @ContributesBinding(AppScope::class, boundType = DuckAiFeatureState::class)
 @ContributesBinding(AppScope::class, boundType = DuckChatInternal::class)
@@ -237,20 +238,21 @@ class RealDuckChat @Inject constructor(
     private val imageUploadFeature: AIChatImageUploadFeature,
     private val browserNav: BrowserNav,
     private val newAddressBarOptionBottomSheetDialogFactory: NewAddressBarOptionBottomSheetDialogFactory,
-) : DuckChatInternal, DuckAiFeatureState, PrivacyConfigCallbackPlugin {
-
+) : DuckChatInternal,
+    DuckAiFeatureState,
+    PrivacyConfigCallbackPlugin {
     private val closeChatFlow = MutableSharedFlow<Unit>(replay = 0)
     private val _showSettings = MutableStateFlow(false)
     private val _showInputScreen = MutableStateFlow(false)
     private val _showInputScreenAutomaticallyOnNewTab = MutableStateFlow(false)
     private val _inputScreenBottomBarEnabled = MutableStateFlow(false)
-    private val _showInBrowserMenu = MutableStateFlow(false)
-    private val _showInAddressBar = MutableStateFlow(false)
+    private val _showPopupMenuShortcut = MutableStateFlow(false)
+    private val _showOmnibarShortcutOnNtpAndOnFocus = MutableStateFlow(false)
     private val _showOmnibarShortcutInAllStates = MutableStateFlow(false)
-    private val _showNewAddressBarOptionAnnouncement = MutableStateFlow(false)
+    private val _showNewAddressBarOptionChoiceScreen = MutableStateFlow(false)
     private val _showClearDuckAIChatHistory = MutableStateFlow(true)
     private val _chatState = MutableStateFlow(ChatState.HIDE)
-    private val _keepSession = MutableStateFlow(false)
+    private val keepSession = MutableStateFlow(false)
 
     private val jsonAdapter: JsonAdapter<DuckChatSettingJson> by lazy {
         moshi.adapter(DuckChatSettingJson::class.java)
@@ -290,43 +292,31 @@ class RealDuckChat @Inject constructor(
         cacheUserSettings()
     }
 
-    override suspend fun setShowInBrowserMenuUserSetting(showDuckChat: Boolean) = withContext(dispatchers.io()) {
-        duckChatFeatureRepository.setShowInBrowserMenu(showDuckChat)
-        cacheUserSettings()
-    }
+    override suspend fun setShowInBrowserMenuUserSetting(showDuckChat: Boolean) =
+        withContext(dispatchers.io()) {
+            duckChatFeatureRepository.setShowInBrowserMenu(showDuckChat)
+            cacheUserSettings()
+        }
 
-    override suspend fun setShowInAddressBarUserSetting(showDuckChat: Boolean) = withContext(dispatchers.io()) {
-        duckChatFeatureRepository.setShowInAddressBar(showDuckChat)
-        cacheUserSettings()
-    }
+    override suspend fun setShowInAddressBarUserSetting(showDuckChat: Boolean) =
+        withContext(dispatchers.io()) {
+            duckChatFeatureRepository.setShowInAddressBar(showDuckChat)
+            cacheUserSettings()
+        }
 
-    override fun isEnabled(): Boolean {
-        return isDuckChatFeatureEnabled && isDuckChatUserEnabled
-    }
+    override fun isEnabled(): Boolean = isDuckChatFeatureEnabled && isDuckChatUserEnabled
 
-    override fun isInputScreenFeatureAvailable(): Boolean {
-        return duckAiInputScreen
-    }
+    override fun isInputScreenFeatureAvailable(): Boolean = duckAiInputScreen
 
-    override fun isDuckChatFeatureEnabled(): Boolean {
-        return isDuckChatFeatureEnabled
-    }
+    override fun isDuckChatFeatureEnabled(): Boolean = isDuckChatFeatureEnabled
 
-    override fun observeEnableDuckChatUserSetting(): Flow<Boolean> {
-        return duckChatFeatureRepository.observeDuckChatUserEnabled()
-    }
+    override fun observeEnableDuckChatUserSetting(): Flow<Boolean> = duckChatFeatureRepository.observeDuckChatUserEnabled()
 
-    override fun observeInputScreenUserSettingEnabled(): Flow<Boolean> {
-        return duckChatFeatureRepository.observeInputScreenUserSettingEnabled()
-    }
+    override fun observeInputScreenUserSettingEnabled(): Flow<Boolean> = duckChatFeatureRepository.observeInputScreenUserSettingEnabled()
 
-    override fun observeShowInBrowserMenuUserSetting(): Flow<Boolean> {
-        return duckChatFeatureRepository.observeShowInBrowserMenu()
-    }
+    override fun observeShowInBrowserMenuUserSetting(): Flow<Boolean> = duckChatFeatureRepository.observeShowInBrowserMenu()
 
-    override fun observeShowInAddressBarUserSetting(): Flow<Boolean> {
-        return duckChatFeatureRepository.observeShowInAddressBar()
-    }
+    override fun observeShowInAddressBarUserSetting(): Flow<Boolean> = duckChatFeatureRepository.observeShowInAddressBar()
 
     override fun openDuckChatSettings() {
         val intent = globalActivityStarter.startIntent(context, DuckChatSettingsNoParams)
@@ -338,7 +328,7 @@ class RealDuckChat @Inject constructor(
     }
 
     override fun closeDuckChat() {
-        if (_keepSession.value) {
+        if (keepSession.value) {
             browserNav.closeDuckChat(context).apply {
                 flags = Intent.FLAG_ACTIVITY_NEW_TASK
                 context.startActivity(this)
@@ -363,13 +353,9 @@ class RealDuckChat @Inject constructor(
         }
     }
 
-    override fun isAddressBarEntryPointEnabled(): Boolean {
-        return isAddressBarEntryPointEnabled
-    }
+    override fun isAddressBarEntryPointEnabled(): Boolean = isAddressBarEntryPointEnabled
 
-    override fun isDuckChatUserEnabled(): Boolean {
-        return isDuckChatUserEnabled
-    }
+    override fun isDuckChatUserEnabled(): Boolean = isDuckChatUserEnabled
 
     override fun updateChatState(state: ChatState) {
         _chatState.value = state
@@ -383,19 +369,20 @@ class RealDuckChat @Inject constructor(
 
     override val inputScreenBottomBarEnabled: StateFlow<Boolean> = _inputScreenBottomBarEnabled.asStateFlow()
 
-    override val showPopupMenuShortcut: StateFlow<Boolean> = _showInBrowserMenu.asStateFlow()
+    override val showPopupMenuShortcut: StateFlow<Boolean> = _showPopupMenuShortcut.asStateFlow()
 
-    override val showOmnibarShortcutOnNtpAndOnFocus: StateFlow<Boolean> = _showInAddressBar.asStateFlow()
+    override val showOmnibarShortcutOnNtpAndOnFocus: StateFlow<Boolean> = _showOmnibarShortcutOnNtpAndOnFocus.asStateFlow()
 
     override val showOmnibarShortcutInAllStates: StateFlow<Boolean> = _showOmnibarShortcutInAllStates.asStateFlow()
 
-    override val showNewAddressBarOptionChoiceScreen: StateFlow<Boolean> = _showNewAddressBarOptionAnnouncement.asStateFlow()
+    override val showNewAddressBarOptionChoiceScreen: StateFlow<Boolean> = _showNewAddressBarOptionChoiceScreen.asStateFlow()
 
     override val showClearDuckAIChatHistory: StateFlow<Boolean> = _showClearDuckAIChatHistory.asStateFlow()
 
     override val chatState: StateFlow<ChatState> = _chatState.asStateFlow()
 
     override fun isImageUploadEnabled(): Boolean = isImageUploadEnabled
+
     override fun keepSessionIntervalInMinutes() = keepSessionAliveInMinutes
 
     override fun openDuckChat() {
@@ -457,17 +444,18 @@ class RealDuckChat @Inject constructor(
             val sessionDelta = duckChatFeatureRepository.sessionDeltaInMinutes()
             val params = mapOf(DuckChatPixelParameters.DELTA_TIMESTAMP_PARAMETERS to sessionDelta.toString())
 
-            val hasSessionActive = when {
-                forceNewSession -> false
-                _keepSession.value -> hasActiveSession()
-                else -> false
-            }
+            val hasSessionActive =
+                when {
+                    forceNewSession -> false
+                    keepSession.value -> hasActiveSession()
+                    else -> false
+                }
 
             duckChatFeatureRepository.registerOpened()
 
             withContext(dispatchers.main()) {
                 pixel.fire(DuckChatPixelName.DUCK_CHAT_OPEN, parameters = params)
-                if (_keepSession.value) {
+                if (keepSession.value) {
                     logcat { "Duck.ai: restoring Duck.ai session $url hasSessionActive $hasSessionActive" }
                     openDuckChatSession(url, hasSessionActive)
                 } else {
@@ -484,7 +472,8 @@ class RealDuckChat @Inject constructor(
     ) {
         // if a new query was submitted we force a new session
         // we want to lose the context of the previous one if the user wanted a new query from outside Duck.ai
-        browserNav.openDuckChat(context, duckChatUrl = url, hasSessionActive = hasSessionActive)
+        browserNav
+            .openDuckChat(context, duckChatUrl = url, hasSessionActive = hasSessionActive)
             .apply {
                 flags = Intent.FLAG_ACTIVITY_NEW_TASK
                 context.startActivity(this)
@@ -507,15 +496,18 @@ class RealDuckChat @Inject constructor(
         if (parameters.isEmpty()) return url
         return runCatching {
             val uri = url.toUri()
-            uri.buildUpon().apply {
-                clearQuery()
-                parameters.forEach { (key, value) ->
-                    appendQueryParameter(key, value)
-                }
-                uri.queryParameterNames
-                    .filterNot { it in parameters.keys }
-                    .forEach { appendQueryParameter(it, uri.getQueryParameter(it)) }
-            }.build().toString()
+            uri
+                .buildUpon()
+                .apply {
+                    clearQuery()
+                    parameters.forEach { (key, value) ->
+                        appendQueryParameter(key, value)
+                    }
+                    uri.queryParameterNames
+                        .filterNot { it in parameters.keys }
+                        .forEach { appendQueryParameter(it, uri.getQueryParameter(it)) }
+                }.build()
+                .toString()
         }.getOrElse {
             logcat { "Duck.ai: parameters $url" }
             url
@@ -536,44 +528,45 @@ class RealDuckChat @Inject constructor(
         }.getOrDefault(false)
     }
 
-    private fun isDuckChatBang(uri: Uri): Boolean {
-        return bangRegex?.containsMatchIn(uri.toString()) == true
-    }
+    private fun isDuckChatBang(uri: Uri): Boolean = bangRegex?.containsMatchIn(uri.toString()) == true
 
-    override suspend fun wasOpenedBefore(): Boolean {
-        return duckChatFeatureRepository.wasOpenedBefore()
-    }
+    override suspend fun wasOpenedBefore(): Boolean = duckChatFeatureRepository.wasOpenedBefore()
 
-    override fun showNewAddressBarOptionChoiceScreen(context: Context, isDarkThemeEnabled: Boolean) {
-        newAddressBarOptionBottomSheetDialogFactory.create(
-            context = context,
-            isDarkThemeEnabled = isDarkThemeEnabled,
-            newAddressBarCallback = object : NewAddressBarCallback {
-                override fun onDisplayed() {
-                    pixel.fire(DUCK_CHAT_NEW_ADDRESS_BAR_PICKER_DISPLAYED)
-                }
-
-                override fun onConfirmed(selection: NewAddressBarSelection) {
-                    if (selection == SEARCH_AND_AI) {
-                        appCoroutineScope.launch {
-                            setInputScreenUserSetting(true)
+    override fun showNewAddressBarOptionChoiceScreen(
+        context: Context,
+        isDarkThemeEnabled: Boolean,
+    ) {
+        newAddressBarOptionBottomSheetDialogFactory
+            .create(
+                context = context,
+                isDarkThemeEnabled = isDarkThemeEnabled,
+                newAddressBarCallback =
+                    object : NewAddressBarCallback {
+                        override fun onDisplayed() {
+                            pixel.fire(DUCK_CHAT_NEW_ADDRESS_BAR_PICKER_DISPLAYED)
                         }
-                    }
-                    pixel.fire(
-                        pixel = DUCK_CHAT_NEW_ADDRESS_BAR_PICKER_CONFIRMED,
-                        parameters = mapOf(NEW_ADDRESS_BAR_SELECTION to selection.value),
-                    )
-                }
 
-                override fun onNotNow() {
-                    pixel.fire(DUCK_CHAT_NEW_ADDRESS_BAR_PICKER_NOT_NOW)
-                }
+                        override fun onConfirmed(selection: NewAddressBarSelection) {
+                            if (selection == SEARCH_AND_AI) {
+                                appCoroutineScope.launch {
+                                    setInputScreenUserSetting(true)
+                                }
+                            }
+                            pixel.fire(
+                                pixel = DUCK_CHAT_NEW_ADDRESS_BAR_PICKER_CONFIRMED,
+                                parameters = mapOf(NEW_ADDRESS_BAR_SELECTION to selection.value),
+                            )
+                        }
 
-                override fun onCancelled() {
-                    pixel.fire(DUCK_CHAT_NEW_ADDRESS_BAR_PICKER_CANCELLED)
-                }
-            },
-        ).show()
+                        override fun onNotNow() {
+                            pixel.fire(DUCK_CHAT_NEW_ADDRESS_BAR_PICKER_NOT_NOW)
+                        }
+
+                        override fun onCancelled() {
+                            pixel.fire(DUCK_CHAT_NEW_ADDRESS_BAR_PICKER_CANCELLED)
+                        }
+                    },
+            ).show()
     }
 
     private suspend fun hasActiveSession(): Boolean {
@@ -600,12 +593,15 @@ class RealDuckChat @Inject constructor(
             showAIChatAddressBarChoiceScreen = duckChatFeature.showAIChatAddressBarChoiceScreen().isEnabled()
 
             val settingsString = duckChatFeature.self().getSettings()
-            val settingsJson = settingsString?.let {
-                runCatching { jsonAdapter.fromJson(it) }.getOrNull()
-            }
+            val settingsJson =
+                settingsString?.let {
+                    runCatching { jsonAdapter.fromJson(it) }.getOrNull()
+                }
 
             duckChatLink = settingsJson?.aiChatURL ?: DUCK_CHAT_WEB_LINK
-            settingsJson?.aiChatBangs?.takeIf { it.isNotEmpty() }
+            settingsJson
+                ?.aiChatBangs
+                ?.takeIf { it.isNotEmpty() }
                 ?.let { bangs ->
                     val bangAlternation = bangs.joinToString("|") { it }
                     bangRegex = settingsJson.aiChatBangRegex?.replace("{bangs}", bangAlternation)?.toRegex()
@@ -613,40 +609,44 @@ class RealDuckChat @Inject constructor(
             isAddressBarEntryPointEnabled = settingsJson?.addressBarEntryPoint ?: false
             isImageUploadEnabled = imageUploadFeature.self().isEnabled()
 
-            _keepSession.value = duckChatFeature.keepSession().isEnabled()
+            keepSession.value = duckChatFeature.keepSession().isEnabled()
             keepSessionAliveInMinutes = settingsJson?.sessionTimeoutMinutes ?: DEFAULT_SESSION_ALIVE
 
             cacheUserSettings()
         }
     }
 
-    private suspend fun cacheUserSettings() = withContext(dispatchers.io()) {
-        isDuckChatUserEnabled = duckChatFeatureRepository.isDuckChatUserEnabled()
+    private suspend fun cacheUserSettings() =
+        withContext(dispatchers.io()) {
+            isDuckChatUserEnabled = duckChatFeatureRepository.isDuckChatUserEnabled()
 
-        val showInputScreen = isInputScreenFeatureAvailable() && isDuckChatFeatureEnabled && isDuckChatUserEnabled &&
-            duckChatFeatureRepository.isInputScreenUserSettingEnabled()
-        _showInputScreen.emit(showInputScreen)
+            val showInputScreen =
+                isInputScreenFeatureAvailable() && isDuckChatFeatureEnabled && isDuckChatUserEnabled &&
+                    duckChatFeatureRepository.isInputScreenUserSettingEnabled()
+            _showInputScreen.emit(showInputScreen)
 
-        _showInputScreenAutomaticallyOnNewTab.value = showInputScreen && duckAiInputScreenOpenAutomaticallyEnabled
+            _showInputScreenAutomaticallyOnNewTab.value = showInputScreen && duckAiInputScreenOpenAutomaticallyEnabled
 
-        _inputScreenBottomBarEnabled.value = showInputScreen && duckAiInputScreenBottomBarEnabled
+            _inputScreenBottomBarEnabled.value = showInputScreen && duckAiInputScreenBottomBarEnabled
 
-        val showInBrowserMenu = duckChatFeatureRepository.shouldShowInBrowserMenu() &&
-            isDuckChatFeatureEnabled && isDuckChatUserEnabled
-        _showInBrowserMenu.emit(showInBrowserMenu)
+            val showInBrowserMenu =
+                duckChatFeatureRepository.shouldShowInBrowserMenu() &&
+                    isDuckChatFeatureEnabled && isDuckChatUserEnabled
+            _showPopupMenuShortcut.emit(showInBrowserMenu)
 
-        val showInAddressBar = duckChatFeatureRepository.shouldShowInAddressBar() &&
-            isDuckChatFeatureEnabled && isDuckChatUserEnabled && isAddressBarEntryPointEnabled
-        _showInAddressBar.emit(showInAddressBar)
+            val showInAddressBar =
+                duckChatFeatureRepository.shouldShowInAddressBar() &&
+                    isDuckChatFeatureEnabled && isDuckChatUserEnabled && isAddressBarEntryPointEnabled
+            _showOmnibarShortcutOnNtpAndOnFocus.emit(showInAddressBar)
 
-        val showOmnibarShortcutInAllStates = showInAddressBar && isDuckAiInBrowserEnabled
-        _showOmnibarShortcutInAllStates.emit(showOmnibarShortcutInAllStates)
+            val showOmnibarShortcutInAllStates = showInAddressBar && isDuckAiInBrowserEnabled
+            _showOmnibarShortcutInAllStates.emit(showOmnibarShortcutInAllStates)
 
-        _showNewAddressBarOptionAnnouncement.emit(showAIChatAddressBarChoiceScreen)
+            _showNewAddressBarOptionChoiceScreen.emit(showAIChatAddressBarChoiceScreen)
 
-        val showClearChatHistory = clearChatHistory
-        _showClearDuckAIChatHistory.emit(showClearChatHistory)
-    }
+            val showClearChatHistory = clearChatHistory
+            _showClearDuckAIChatHistory.emit(showClearChatHistory)
+        }
 
     companion object {
         private const val DUCK_CHAT_WEB_LINK = "https://duckduckgo.com/?q=DuckDuckGo+AI+Chat&ia=chat&duckai=5"

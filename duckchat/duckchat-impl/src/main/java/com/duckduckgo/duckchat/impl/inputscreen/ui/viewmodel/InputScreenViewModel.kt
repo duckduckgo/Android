@@ -144,8 +144,8 @@ class InputScreenViewModel @AssistedInject constructor(
                 showSearchLogo = true,
                 newLineButtonVisible = false,
                 scrollSeparatorVisible = false,
-        ),
-    )
+            ),
+        )
     val visibilityState: StateFlow<InputScreenVisibilityState> = _visibilityState.asStateFlow()
 
     private val initialSearchInputText = currentOmnibarText.trim()

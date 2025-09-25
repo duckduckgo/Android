@@ -20,12 +20,14 @@ import android.graphics.Rect
 import android.view.View
 import androidx.recyclerview.widget.RecyclerView
 
-class RecyclerBottomSpacingDecoration(private val bottomSpace: Int) : RecyclerView.ItemDecoration() {
+class RecyclerBottomSpacingDecoration(
+    private val bottomSpace: Int,
+) : RecyclerView.ItemDecoration() {
     override fun getItemOffsets(
         outRect: Rect,
         view: View,
         parent: RecyclerView,
-        state: RecyclerView.State
+        state: RecyclerView.State,
     ) {
         if (parent.getChildAdapterPosition(view) == state.itemCount - 1) {
             outRect.bottom = bottomSpace

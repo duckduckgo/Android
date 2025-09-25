@@ -72,14 +72,13 @@ import com.duckduckgo.voice.api.VoiceSearchLauncher.Event.SearchCancelled
 import com.duckduckgo.voice.api.VoiceSearchLauncher.Event.VoiceRecognitionSuccess
 import com.duckduckgo.voice.api.VoiceSearchLauncher.Event.VoiceSearchDisabled
 import com.duckduckgo.voice.api.VoiceSearchLauncher.Source.BROWSER
-import javax.inject.Inject
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import javax.inject.Inject
 import com.duckduckgo.mobile.android.R as CommonR
 
 @InjectWith(FragmentScope::class)
 class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
-
     @Inject
     lateinit var voiceSearchLauncher: VoiceSearchLauncher
 
@@ -111,27 +110,35 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
     private lateinit var contentSeparator: View
     private lateinit var inputScreenButtons: InputScreenButtons
 
-    private val pageChangeCallback = object : OnPageChangeCallback() {
-        override fun onPageSelected(position: Int) {
-            viewModel.onPageSelected(position)
-            inputModeWidget.selectTab(position)
-        }
+    private val pageChangeCallback =
+        object : OnPageChangeCallback() {
+            override fun onPageSelected(position: Int) {
+                viewModel.onPageSelected(position)
+                inputModeWidget.selectTab(position)
+            }
 
-        override fun onPageScrolled(position: Int, positionOffset: Float, positionOffsetPixels: Int) {
-            viewModel.onPageScrolled(position, positionOffset)
-        }
+            override fun onPageScrolled(
+                position: Int,
+                positionOffset: Float,
+                positionOffsetPixels: Int,
+            ) {
+                viewModel.onPageScrolled(position, positionOffset)
+            }
 
-        override fun onPageScrollStateChanged(state: Int) {
-            if (state == ViewPager2.SCROLL_STATE_IDLE) {
-                viewModel.onScrollStateIdle()
+            override fun onPageScrollStateChanged(state: Int) {
+                if (state == ViewPager2.SCROLL_STATE_IDLE) {
+                    viewModel.onScrollStateIdle()
+                }
             }
         }
-    }
 
     private lateinit var pagerAdapter: InputScreenPagerAdapter
     private var logoAnimator: ValueAnimator? = null
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?,
+    ) {
         super.onViewCreated(view, savedInstanceState)
 
         inputModeWidget = InputModeWidget(requireContext())
@@ -144,21 +151,24 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
 
         val useTopBar = inputScreenConfigResolver.useTopBar()
         val separatorHeightPx = resources.getDimensionPixelSize(R.dimen.inputScreenContentSeparatorHeight)
-        contentSeparator = View(context).apply {
-            val typedValue = TypedValue()
-            val attributeResId = if (useTopBar) {
-                    CommonR.attr.daxColorShade
-                } else {
-                    CommonR.attr.daxColorShadeSolid
-                }
+        contentSeparator =
+            View(context).apply {
+                val typedValue = TypedValue()
+                val attributeResId =
+                    if (useTopBar) {
+                        CommonR.attr.daxColorShade
+                    } else {
+                        CommonR.attr.daxColorShadeSolid
+                    }
                 requireContext().theme.resolveAttribute(attributeResId, typedValue, true)
-            setBackgroundColor(typedValue.data)
-            layoutParams = FrameLayout.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT,
-                separatorHeightPx,
-                if (useTopBar) Gravity.BOTTOM else Gravity.TOP
-            )
-        }
+                setBackgroundColor(typedValue.data)
+                layoutParams =
+                    FrameLayout.LayoutParams(
+                        ViewGroup.LayoutParams.MATCH_PARENT,
+                        separatorHeightPx,
+                        if (useTopBar) Gravity.BOTTOM else Gravity.TOP,
+                    )
+            }
 
         if (useTopBar) {
             binding.inputModeWidgetContainerTop.addView(inputModeWidget)
@@ -206,39 +216,45 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
             processCommand(it)
         }
 
-        viewModel.inputFieldCommand.onEach { command ->
-            when (command) {
-                is InputFieldCommand.SelectAll -> {
-                    inputModeWidget.selectAllText()
+        viewModel.inputFieldCommand
+            .onEach { command ->
+                when (command) {
+                    is InputFieldCommand.SelectAll -> {
+                        inputModeWidget.selectAllText()
+                    }
                 }
-            }
-        }.launchIn(lifecycleScope)
+            }.launchIn(lifecycleScope)
 
-        viewModel.submitButtonIconState.onEach { iconState ->
-            val iconResource = when (iconState.icon) {
-                SEARCH -> com.duckduckgo.mobile.android.R.drawable.ic_find_search_24
-                SEND -> com.duckduckgo.mobile.android.R.drawable.ic_arrow_right_24
-            }
-            inputScreenButtons.setSendButtonIcon(iconResource)
-        }.launchIn(lifecycleScope)
+        viewModel.submitButtonIconState
+            .onEach { iconState ->
+                val iconResource =
+                    when (iconState.icon) {
+                        SEARCH -> com.duckduckgo.mobile.android.R.drawable.ic_find_search_24
+                        SEND -> com.duckduckgo.mobile.android.R.drawable.ic_arrow_right_24
+                    }
+                inputScreenButtons.setSendButtonIcon(iconResource)
+            }.launchIn(lifecycleScope)
 
-        viewModel.inputFieldState.onEach { inputBoxState ->
-            inputModeWidget.canExpand = inputBoxState.canExpand
-        }.launchIn(lifecycleScope)
+        viewModel.inputFieldState
+            .onEach { inputBoxState ->
+                inputModeWidget.canExpand = inputBoxState.canExpand
+            }.launchIn(lifecycleScope)
 
-        viewModel.visibilityState.onEach {
-            val isSearchMode = binding.viewPager.currentItem == 0
-            binding.ddgLogoContainer.isVisible = if (isSearchMode) {
-                it.showSearchLogo
-            } else {
-                it.showChatLogo
-            }
+        viewModel.visibilityState
+            .onEach {
+                val isSearchMode = binding.viewPager.currentItem == 0
+                binding.ddgLogoContainer.isVisible =
+                    if (isSearchMode) {
+                        it.showSearchLogo
+                    } else {
+                        it.showChatLogo
+                    }
 
-            binding.ddgLogo.progress = if (isSearchMode) 0f else 1f
+                binding.ddgLogo.progress = if (isSearchMode) 0f else 1f
 
-            inputScreenButtons.setNewLineButtonVisible(it.newLineButtonVisible)
-            contentSeparator.isVisible = it.scrollSeparatorVisible
-        }.launchIn(lifecycleScope)
+                inputScreenButtons.setNewLineButtonVisible(it.newLineButtonVisible)
+                contentSeparator.isVisible = it.scrollSeparatorVisible
+            }.launchIn(lifecycleScope)
     }
 
     private fun processCommand(command: Command) {
@@ -266,55 +282,56 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
         binding.viewPager.registerOnPageChangeCallback(pageChangeCallback)
     }
 
-    private fun configureOmnibar() = with(inputModeWidget) {
-        onSearchSent = { query ->
-            viewModel.onSearchSubmitted(query)
-        }
-        onChatSent = { query ->
-            viewModel.onChatSubmitted(query)
-        }
-        onBack = {
-            requireActivity().onBackPressed()
-        }
-        onSearchSelected = {
-            binding.viewPager.setCurrentItem(0, true)
-            viewModel.onSearchSelected()
-            viewModel.onSearchInputTextChanged(inputModeWidget.text)
-            binding.ddgLogoContainer.isVisible = viewModel.visibilityState.value.showSearchLogo
-        }
-        onChatSelected = {
-            binding.viewPager.setCurrentItem(1, true)
-            viewModel.onChatSelected()
-            viewModel.onChatInputTextChanged(inputModeWidget.text)
-            binding.ddgLogoContainer.apply {
-                val showChatLogo = viewModel.visibilityState.value.showChatLogo
-                val showSearchLogo = viewModel.visibilityState.value.showSearchLogo
-                isVisible = showChatLogo
-                if (showChatLogo && !showSearchLogo) {
-                    alpha = 0f
-                    animate().alpha(1f).setDuration(LOGO_FADE_DURATION).start()
+    private fun configureOmnibar() =
+        with(inputModeWidget) {
+            onSearchSent = { query ->
+                viewModel.onSearchSubmitted(query)
+            }
+            onChatSent = { query ->
+                viewModel.onChatSubmitted(query)
+            }
+            onBack = {
+                requireActivity().onBackPressed()
+            }
+            onSearchSelected = {
+                binding.viewPager.setCurrentItem(0, true)
+                viewModel.onSearchSelected()
+                viewModel.onSearchInputTextChanged(inputModeWidget.text)
+                binding.ddgLogoContainer.isVisible = viewModel.visibilityState.value.showSearchLogo
+            }
+            onChatSelected = {
+                binding.viewPager.setCurrentItem(1, true)
+                viewModel.onChatSelected()
+                viewModel.onChatInputTextChanged(inputModeWidget.text)
+                binding.ddgLogoContainer.apply {
+                    val showChatLogo = viewModel.visibilityState.value.showChatLogo
+                    val showSearchLogo = viewModel.visibilityState.value.showSearchLogo
+                    isVisible = showChatLogo
+                    if (showChatLogo && !showSearchLogo) {
+                        alpha = 0f
+                        animate().alpha(1f).setDuration(LOGO_FADE_DURATION).start()
+                    }
                 }
             }
+            onSubmitMessageAvailable = { isAvailable ->
+                inputScreenButtons.setSendButtonVisible(isAvailable)
+            }
+            onVoiceInputAllowed = { isAllowed ->
+                viewModel.onVoiceInputAllowedChange(isAllowed)
+            }
+            onSearchTextChanged = { text ->
+                viewModel.onSearchInputTextChanged(text)
+            }
+            onChatTextChanged = { text ->
+                viewModel.onChatInputTextChanged(text)
+            }
+            onInputFieldClicked = {
+                viewModel.onInputFieldTouched()
+            }
+            onTabTapped = { index ->
+                viewModel.onTabTapped(index)
+            }
         }
-        onSubmitMessageAvailable = { isAvailable ->
-            inputScreenButtons.setSendButtonVisible(isAvailable)
-        }
-        onVoiceInputAllowed = { isAllowed ->
-            viewModel.onVoiceInputAllowedChange(isAllowed)
-        }
-        onSearchTextChanged = { text ->
-            viewModel.onSearchInputTextChanged(text)
-        }
-        onChatTextChanged = { text ->
-            viewModel.onChatInputTextChanged(text)
-        }
-        onInputFieldClicked = {
-            viewModel.onInputFieldTouched()
-        }
-        onTabTapped = { index ->
-            viewModel.onTabTapped(index)
-        }
-    }
 
     private fun submitChatQuery(query: String) {
         val data = Intent().putExtra(InputScreenActivityResultParams.CANCELED_DRAFT_PARAM, query)
@@ -340,9 +357,10 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
                 }
             }
         }
-        viewModel.visibilityState.onEach {
-            inputScreenButtons.setVoiceButtonVisible(it.voiceInputButtonVisible)
-        }.launchIn(lifecycleScope)
+        viewModel.visibilityState
+            .onEach {
+                inputScreenButtons.setVoiceButtonVisible(it.voiceInputButtonVisible)
+            }.launchIn(lifecycleScope)
     }
 
     private fun configureInputScreenButtons() {
@@ -360,16 +378,17 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
         }
     }
 
-    private fun configureLogoAnimation() = with(binding.ddgLogo) {
-        setMinAndMaxFrame(0, LOGO_MAX_FRAME)
-        setAnimation(
-            if (appTheme.isLightModeEnabled()) {
-                R.raw.duckduckgo_ai_transition_light
-            } else {
-                R.raw.duckduckgo_ai_transition_dark
-            },
-        )
-    }
+    private fun configureLogoAnimation() =
+        with(binding.ddgLogo) {
+            setMinAndMaxFrame(0, LOGO_MAX_FRAME)
+            setAnimation(
+                if (appTheme.isLightModeEnabled()) {
+                    R.raw.duckduckgo_ai_transition_light
+                } else {
+                    R.raw.duckduckgo_ai_transition_dark
+                },
+            )
+        }
 
     private fun setLogoProgress(targetProgress: Float) {
         binding.ddgLogo.progress = targetProgress
@@ -378,11 +397,12 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
     private fun animateLogoToProgress(targetProgress: Float) {
         logoAnimator?.cancel()
         binding.ddgLogo.apply {
-            logoAnimator = ValueAnimator.ofFloat(progress, targetProgress).apply {
-                duration = LOGO_ANIMATION_DURATION
-                addUpdateListener { progress = it.animatedValue as Float }
-                start()
-            }
+            logoAnimator =
+                ValueAnimator.ofFloat(progress, targetProgress).apply {
+                    duration = LOGO_ANIMATION_DURATION
+                    addUpdateListener { progress = it.animatedValue as Float }
+                    start()
+                }
         }
     }
 
