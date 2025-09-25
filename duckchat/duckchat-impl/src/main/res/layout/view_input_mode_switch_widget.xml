@@ -131,6 +131,7 @@
         android:layout_height="@dimen/toolbarIcon"
         android:layout_marginTop="@dimen/omnibarCardMarginTop"
         android:layout_marginEnd="@dimen/keyline_1"
+        android:animateLayoutChanges="true"
         app:layout_constraintBottom_toBottomOf="@id/inputModeWidgetCard"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@id/inputModeWidgetCard"

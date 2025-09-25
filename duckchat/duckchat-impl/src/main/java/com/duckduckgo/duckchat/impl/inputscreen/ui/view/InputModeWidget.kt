@@ -71,6 +71,7 @@ class InputModeWidget @JvmOverloads constructor(
     private val inputModeSwitch: TabLayout
     private val inputModeWidgetCard: MaterialCardView
     private val inputScreenButtonsContainer: FrameLayout
+    private val inputFieldButtons: View
     val tabSwitcherButton: InputScreenTabSwitcherButton
     private val menuButton: View
     private val fireButton: View
@@ -130,6 +131,7 @@ class InputModeWidget @JvmOverloads constructor(
         fireButton = findViewById(R.id.inputFieldFireButton)
         tabSwitcherButton = findViewById(R.id.inputFieldTabsMenu)
         inputScreenButtonsContainer = findViewById(R.id.inputScreenButtonsContainer)
+        inputFieldButtons = findViewById(R.id.inputModeIconsContainer)
 
         configureClickListeners()
         configureInputBehavior()
@@ -150,6 +152,7 @@ class InputModeWidget @JvmOverloads constructor(
 
     fun init() {
         onSearchSelected?.invoke()
+        checkForButtonsVisibility()
     }
 
     private fun configureClickListeners() {
@@ -159,6 +162,7 @@ class InputModeWidget @JvmOverloads constructor(
             inputField.scrollTo(0, 0)
             beginChangeBoundsTransition()
             val params = inputScreenPixelsModeParam(isSearchMode = inputModeSwitch.selectedTabPosition == 0)
+            checkForButtonsVisibility()
             pixel.fire(DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_OMNIBAR_CLEAR_BUTTON_PRESSED, parameters = params)
         }
         inputModeWidgetBack.setOnClickListener {
@@ -266,6 +270,7 @@ class InputModeWidget @JvmOverloads constructor(
                         0 -> onSearchSelected?.invoke()
                         1 -> onChatSelected?.invoke()
                     }
+                    checkForButtonsVisibility()
                 }
 
                 override fun onTabUnselected(tab: TabLayout.Tab?) {}
@@ -273,6 +278,18 @@ class InputModeWidget @JvmOverloads constructor(
                 override fun onTabReselected(tab: TabLayout.Tab?) {}
             },
         )
+    }
+
+    private fun checkForButtonsVisibility() {
+        if (inputModeSwitch.selectedTabPosition == 0) {
+            // buttons are shown in search mode if the input field is empty
+            val text = inputField.text
+            val isNullOrEmpty = text.isNullOrEmpty()
+            fade(inputFieldButtons, isNullOrEmpty)
+        } else {
+            // buttons always hidden in chat mode
+            fade(inputFieldButtons, false)
+        }
     }
 
     private fun applyModeSpecificInputBehaviour(isSearchTab: Boolean) {
