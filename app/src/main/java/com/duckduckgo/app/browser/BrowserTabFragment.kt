@@ -2866,11 +2866,6 @@ class BrowserTabFragment :
             omnibarPosition = settingsDataStore.omnibarPosition,
         )
         binding.autoCompleteSuggestionsList.adapter = autoCompleteSuggestionsAdapter
-        binding.autoCompleteSuggestionsList.addItemDecoration(
-            SuggestionItemDecoration(
-                divider = ContextCompat.getDrawable(context, BrowserUI.drawable.suggestions_divider)!!,
-            ),
-        )
     }
 
     private fun configureNewTab() {

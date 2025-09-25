@@ -312,9 +312,6 @@ class SystemSearchActivity : DuckDuckGoActivity() {
             omnibarPosition = settingsDataStore.omnibarPosition,
         )
         binding.autocompleteSuggestions.adapter = autocompleteSuggestionsAdapter
-        binding.autocompleteSuggestions.addItemDecoration(
-            SuggestionItemDecoration(ContextCompat.getDrawable(this, BrowserUI.drawable.suggestions_divider)!!),
-        )
 
         binding.content.setOnScrollChangeListener(
             NestedScrollView.OnScrollChangeListener { _, _, scrollY, _, _ ->
