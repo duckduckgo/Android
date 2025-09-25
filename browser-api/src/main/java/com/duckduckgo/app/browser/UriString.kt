@@ -173,7 +173,7 @@ class UriString {
         }
 
         private fun cleanupInputQuery(text: String): String {
-            return text.replace("\\'", " ")
+            return text.replace("'", " ")
                 .replace("\"", " ")
                 .replace("\n", " ")
                 .replace(multiSpaceRegex, " ")
