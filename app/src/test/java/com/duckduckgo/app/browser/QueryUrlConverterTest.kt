@@ -173,6 +173,13 @@ class QueryUrlConverterTest {
     }
 
     @Test
+    fun whenQueryContainsMultipleUrlsThenFirstUrlStartingWithHttpIsExtracted() {
+        val input = "Source: MTBS.cz  https://search.app/3Uq79"
+        val result = testee.convertQueryToUrl(input, queryOrigin = QueryOrigin.FromUser, extractUrlFromQuery = true)
+        assertEquals("https://search.app/3Uq79", result)
+    }
+
+    @Test
     fun whenQueryContainsSingleUrlAndApostropheThenUrlIsExtracted() {
         val input = "Source: Tom's Guide https://search.app/ddbWi"
         val result = testee.convertQueryToUrl(input, queryOrigin = QueryOrigin.FromUser, extractUrlFromQuery = true)

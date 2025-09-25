@@ -39,10 +39,12 @@ class UriString {
 
         fun extractUrl(inputQuery: String): String? {
             val urls = webUrlRegex.findAll(inputQuery).map { it.value }.toList()
-            return if (urls.size == 1) {
-                urls.first()
-            } else {
-                null
+            return when {
+                urls.isEmpty() -> null
+                urls.size == 1 -> urls.first()
+                // If multiple URLs found and all start with http, treat this as a search.
+                urls.all { it.startsWith("http") } -> null
+                else -> urls.firstOrNull { it.startsWith("http") }
             }
         }
 
