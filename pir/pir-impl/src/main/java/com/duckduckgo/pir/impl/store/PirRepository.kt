@@ -25,10 +25,16 @@ import com.duckduckgo.pir.impl.models.ExtractedProfile
 import com.duckduckgo.pir.impl.models.MirrorSite
 import com.duckduckgo.pir.impl.models.ProfileQuery
 import com.duckduckgo.pir.impl.models.scheduling.BrokerSchedulingConfig
+import com.duckduckgo.pir.impl.models.scheduling.JobRecord.EmailConfirmationJobRecord.EmailData
 import com.duckduckgo.pir.impl.service.DbpService
+import com.duckduckgo.pir.impl.service.DbpService.PirEmailConfirmationDataRequest
 import com.duckduckgo.pir.impl.service.DbpService.PirJsonBroker
 import com.duckduckgo.pir.impl.store.PirRepository.BrokerJson
 import com.duckduckgo.pir.impl.store.PirRepository.ConfirmationStatus
+import com.duckduckgo.pir.impl.store.PirRepository.ConfirmationStatus.Error
+import com.duckduckgo.pir.impl.store.PirRepository.ConfirmationStatus.Pending
+import com.duckduckgo.pir.impl.store.PirRepository.ConfirmationStatus.Ready
+import com.duckduckgo.pir.impl.store.PirRepository.ConfirmationStatus.Unknown
 import com.duckduckgo.pir.impl.store.db.BrokerDao
 import com.duckduckgo.pir.impl.store.db.BrokerEntity
 import com.duckduckgo.pir.impl.store.db.BrokerJsonDao
@@ -131,17 +137,26 @@ interface PirRepository {
 
     suspend fun getEmailForBroker(dataBroker: String): String
 
-    suspend fun getEmailConfirmation(email: String): Pair<ConfirmationStatus, String?>
+    suspend fun getEmailConfirmationLinkStatus(emailData: List<EmailData>): Map<EmailData, ConfirmationStatus>
+
+    suspend fun deleteEmailData(emailData: List<EmailData>)
 
     data class BrokerJson(
         val fileName: String,
         val etag: String,
     )
 
-    sealed class ConfirmationStatus(open val statusName: String) {
-        data object Ready : ConfirmationStatus("ready")
-        data object Pending : ConfirmationStatus("pending")
-        data object Unknown : ConfirmationStatus("unknown")
+    sealed class ConfirmationStatus {
+        data class Ready(
+            val data: Map<String, String>,
+        ) : ConfirmationStatus()
+
+        data object Pending : ConfirmationStatus()
+        data object Unknown : ConfirmationStatus()
+        data class Error(
+            val errorCode: String,
+            val error: String,
+        ) : ConfirmationStatus()
     }
 }
 
@@ -455,19 +470,45 @@ internal class RealPirRepository(
             return@withContext dbpService.getEmail(brokerDao.getBrokerDetails(dataBroker)!!.url).emailAddress
         }
 
-    override suspend fun getEmailConfirmation(email: String): Pair<ConfirmationStatus, String?> =
+    override suspend fun getEmailConfirmationLinkStatus(emailData: List<EmailData>): Map<EmailData, ConfirmationStatus> =
         withContext(dispatcherProvider.io()) {
-            return@withContext dbpService.getEmailStatus(email).run {
-                this.status.toConfirmationStatus() to this.link
+            return@withContext dbpService.getEmailConfirmationLinkStatus(emailData.toRequest()).items.associate { response ->
+                val key = EmailData(
+                    email = response.email,
+                    attemptId = response.attemptId,
+                )
+                val value = when (response.status) {
+                    "ready" -> Ready(
+                        data = response.data.associate {
+                            it.name to it.value
+                        },
+                    )
+
+                    "error" -> Error(
+                        errorCode = response.errorCode.orEmpty(),
+                        error = response.error.orEmpty(),
+                    )
+
+                    "pending" -> Pending
+                    else -> Unknown
+                }
+                key to value
             }
         }
 
-    private fun String.toConfirmationStatus(): ConfirmationStatus {
-        return when (this) {
-            "pending" -> ConfirmationStatus.Pending
-            "ready" -> ConfirmationStatus.Ready
-            else -> ConfirmationStatus.Unknown
-        }
+    override suspend fun deleteEmailData(emailData: List<EmailData>) = withContext(dispatcherProvider.io()) {
+        dbpService.deleteEmailData(emailData.toRequest())
+    }
+
+    private fun List<EmailData>.toRequest(): PirEmailConfirmationDataRequest {
+        return PirEmailConfirmationDataRequest(
+            items = this.map {
+                PirEmailConfirmationDataRequest.RequestEmailData(
+                    email = it.email,
+                    attemptId = it.attemptId,
+                )
+            },
+        )
     }
 
     private fun StoredExtractedProfile.toExtractedProfile(): ExtractedProfile {

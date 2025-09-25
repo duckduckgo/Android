@@ -22,7 +22,6 @@ import com.duckduckgo.pir.impl.common.CaptchaResolver.CaptchaResolverResult
 import com.duckduckgo.pir.impl.common.NativeBrokerActionHandler.NativeAction
 import com.duckduckgo.pir.impl.common.NativeBrokerActionHandler.NativeAction.GetCaptchaSolutionStatus
 import com.duckduckgo.pir.impl.common.NativeBrokerActionHandler.NativeAction.GetEmail
-import com.duckduckgo.pir.impl.common.NativeBrokerActionHandler.NativeAction.GetEmailStatus
 import com.duckduckgo.pir.impl.common.NativeBrokerActionHandler.NativeAction.SubmitCaptchaInfo
 import com.duckduckgo.pir.impl.common.NativeBrokerActionHandler.NativeActionResult
 import com.duckduckgo.pir.impl.common.NativeBrokerActionHandler.NativeActionResult.Failure
@@ -32,10 +31,7 @@ import com.duckduckgo.pir.impl.common.NativeBrokerActionHandler.NativeActionResu
 import com.duckduckgo.pir.impl.service.DbpService.CaptchaSolutionMeta
 import com.duckduckgo.pir.impl.store.PirRepository
 import com.duckduckgo.pir.impl.store.PirRepository.ConfirmationStatus
-import com.duckduckgo.pir.impl.store.PirRepository.ConfirmationStatus.Ready
-import com.duckduckgo.pir.impl.store.PirRepository.ConfirmationStatus.Unknown
 import kotlinx.coroutines.withContext
-import logcat.logcat
 
 interface NativeBrokerActionHandler {
     suspend fun pushAction(nativeAction: NativeAction): NativeActionResult
@@ -44,12 +40,6 @@ interface NativeBrokerActionHandler {
         data class GetEmail(
             override val actionId: String,
             val brokerName: String,
-        ) : NativeAction(actionId)
-
-        data class GetEmailStatus(
-            override val actionId: String,
-            val brokerName: String,
-            val email: String,
         ) : NativeAction(actionId)
 
         data class SubmitCaptchaInfo(
@@ -114,46 +104,9 @@ class RealNativeBrokerActionHandler(
 ) : NativeBrokerActionHandler {
     override suspend fun pushAction(nativeAction: NativeAction): NativeActionResult = withContext(dispatcherProvider.io()) {
         when (nativeAction) {
-            is GetEmailStatus -> handleAwaitConfirmation(nativeAction)
             is GetEmail -> handleGetEmail(nativeAction)
             is SubmitCaptchaInfo -> handleSolveCaptcha(nativeAction)
             is GetCaptchaSolutionStatus -> handleGetCaptchaSolutionStatus(nativeAction)
-        }
-    }
-
-    private suspend fun handleAwaitConfirmation(action: GetEmailStatus): NativeActionResult {
-        return kotlin.runCatching {
-            // https://dub.duckduckgo.com/duckduckgo/dbp-api?tab=readme-ov-file#get-dbpemv0linkseemail_address
-            val result: Pair<ConfirmationStatus, String?> = repository.getEmailConfirmation(action.email)
-            logcat { "PIR-EMAIL: $result" }
-            return when (result.first) {
-                is Ready -> NativeActionResult.Success(
-                    data = NativeSuccessData.EmailConfirmation(
-                        email = action.email,
-                        link = result.second!!,
-                        status = result.first,
-                    ),
-                )
-
-                is Unknown -> Failure(
-                    actionId = action.actionId,
-                    message = "Unable to confirm email: ${action.email} as email doesn't exist in the backend",
-                    retryNativeAction = false,
-                )
-
-                else -> Failure(
-                    actionId = action.actionId,
-                    message = "Timeout reached to confirm email: ${action.email}. Link is still pending",
-                    retryNativeAction = true,
-                )
-            }
-        }.getOrElse { error ->
-            logcat { "PIR-EMAIL: $error" }
-            Failure(
-                actionId = action.actionId,
-                message = "Unknown error while getting email : ${error.message}",
-                retryNativeAction = false,
-            )
         }
     }
 
