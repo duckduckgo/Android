@@ -22,13 +22,13 @@ import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.feature.toggles.api.Toggle.DefaultFeatureValue
 import com.duckduckgo.feature.toggles.api.Toggle.InternalAlwaysEnabled
 
+/**
+ * This is the class that represents the aiChat feature flags
+ */
 @ContributesRemoteFeature(
     scope = AppScope::class,
     featureName = "aiChat",
 )
-/**
- * This is the class that represents the aiChat feature flags
- */
 interface DuckChatFeature {
     /**
      * @return `true` when the remote config has the global "aiChat" feature flag enabled

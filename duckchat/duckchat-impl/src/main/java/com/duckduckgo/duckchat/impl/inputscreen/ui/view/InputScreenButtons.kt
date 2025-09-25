@@ -32,7 +32,6 @@ class InputScreenButtons @JvmOverloads constructor(
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0,
 ) : LinearLayout(context, attrs, defStyleAttr) {
-
     private val binding = ViewInputScreenButtonsBinding.inflate(LayoutInflater.from(context), this, true)
 
     var onSendClick: (() -> Unit)? = null

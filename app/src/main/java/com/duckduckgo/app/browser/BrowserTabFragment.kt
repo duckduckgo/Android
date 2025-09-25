@@ -740,8 +740,8 @@ class BrowserTabFragment :
         override fun onPopUpHandled(isCosmetic: Boolean) {
             launch {
                 context?.let {
-                    // TODO uncomment when sense of protection experiment shield is enabled
-/*                    if (senseOfProtectionExperiment.isUserEnrolledInAVariantAndExperimentEnabled() &&
+                    /* TODO uncomment when sense of protection experiment shield is enabled
+                    if (senseOfProtectionExperiment.isUserEnrolledInAVariantAndExperimentEnabled() &&
                         viewModel.trackersCount().isNotEmpty()
                     ) {
                         if (isCosmetic) {
@@ -3323,9 +3323,9 @@ class BrowserTabFragment :
     private fun blobDownloadScript(): String {
         val script = """
             window.__url_to_blob_collection = {};
-        
+
             const original_createObjectURL = URL.createObjectURL;
-        
+
             URL.createObjectURL = function () {
                 const blob = arguments[0];
                 const url = original_createObjectURL.call(this, ...arguments);
@@ -3334,7 +3334,7 @@ class BrowserTabFragment :
                 }
                 return url;
             }
-            
+
             function blobToBase64DataUrl(blob) {
                 return new Promise((resolve, reject) => {
                     const reader = new FileReader();
@@ -3347,10 +3347,10 @@ class BrowserTabFragment :
                     reader.readAsDataURL(blob);
                 });
             }
-        
+
             const pingMessage = 'Ping:' + window.location.href
             ddgBlobDownloadObj.postMessage(pingMessage)
-                    
+
             ddgBlobDownloadObj.onmessage = function(event) {
                 if (event.data.startsWith('blob:')) {
                     const blob = window.__url_to_blob_collection[event.data];
@@ -3555,7 +3555,7 @@ class BrowserTabFragment :
 
     @Suppress("NewApi") // This API and the behaviour described only apply to apps with targetSdkVersion ≥ TIRAMISU.
     private fun setAlgorithmicDarkeningAllowed(settings: WebSettings) {
-        // https://developer.android.com/reference/androidx/webkit/WebSettingsCompat#setAlgorithmicDarkeningAllowed(android.webkit.WebSettings,boolean)
+        //https://developer.android.com/reference/androidx/webkit/WebSettingsCompat#setAlgorithmicDarkeningAllowed(android.webkit.WebSettings,boolean)
         if (WebViewFeature.isFeatureSupported(WebViewFeature.ALGORITHMIC_DARKENING)) {
             WebSettingsCompat.setAlgorithmicDarkeningAllowed(settings, settingsDataStore.experimentalWebsiteDarkMode)
         }

@@ -27,7 +27,9 @@ import javax.inject.Inject
 
 interface InputScreenConfigResolver {
     val isTopOmnibar: Boolean
+
     fun onInputScreenCreated(intent: Intent)
+
     fun useTopBar(): Boolean
 }
 
@@ -36,7 +38,6 @@ interface InputScreenConfigResolver {
 class InputScreenConfigResolverImpl @Inject constructor(
     private val duckChatInternal: DuckChatInternal,
 ) : InputScreenConfigResolver {
-
     private var _isTopOmnibar = true
 
     override val isTopOmnibar: Boolean
@@ -47,7 +48,5 @@ class InputScreenConfigResolverImpl @Inject constructor(
         _isTopOmnibar = params?.isTopOmnibar ?: true
     }
 
-    override fun useTopBar(): Boolean {
-        return isTopOmnibar || !duckChatInternal.inputScreenBottomBarEnabled.value
-    }
+    override fun useTopBar(): Boolean = isTopOmnibar || !duckChatInternal.inputScreenBottomBarEnabled.value
 }

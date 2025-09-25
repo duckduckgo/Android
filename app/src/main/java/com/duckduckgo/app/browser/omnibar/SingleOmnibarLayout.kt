@@ -38,11 +38,11 @@ import com.duckduckgo.common.ui.view.hide
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.view.toPx
 import com.duckduckgo.di.scopes.FragmentScope
-import com.duckduckgo.mobile.android.R as CommonR
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.google.android.material.card.MaterialCardView
 import dagger.android.support.AndroidSupportInjection
 import javax.inject.Inject
+import com.duckduckgo.mobile.android.R as CommonR
 
 @InjectWith(FragmentScope::class)
 class SingleOmnibarLayout @JvmOverloads constructor(
@@ -61,17 +61,18 @@ class SingleOmnibarLayout @JvmOverloads constructor(
     private val customTabToolbarContainerWrapper: ViewGroup by lazy { findViewById(R.id.customTabToolbarContainerWrapper) }
 
     private var isFindInPageVisible = false
-    private val findInPageLayoutVisibilityChangeListener = OnGlobalLayoutListener {
-        val isVisible = findInPage.findInPageContainer.isVisible
-        if (isFindInPageVisible != isVisible) {
-            isFindInPageVisible = isVisible
-            if (isVisible) {
-                onFindInPageShown()
-            } else {
-                onFindInPageHidden()
+    private val findInPageLayoutVisibilityChangeListener =
+        OnGlobalLayoutListener {
+            val isVisible = findInPage.findInPageContainer.isVisible
+            if (isFindInPageVisible != isVisible) {
+                isFindInPageVisible = isVisible
+                if (isVisible) {
+                    onFindInPageShown()
+                } else {
+                    onFindInPageHidden()
+                }
             }
         }
-    }
 
     private val experimentalOmnibarCardMarginTop by lazy {
         resources.getDimensionPixelSize(CommonR.dimen.omnibarCardMarginTop)

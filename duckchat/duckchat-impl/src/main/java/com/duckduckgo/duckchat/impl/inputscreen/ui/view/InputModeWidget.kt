@@ -60,7 +60,6 @@ class InputModeWidget @JvmOverloads constructor(
     attrs: AttributeSet? = null,
     defStyle: Int = 0,
 ) : ConstraintLayout(context, attrs, defStyle) {
-
     @Inject
     lateinit var pixel: Pixel
 
@@ -178,55 +177,57 @@ class InputModeWidget @JvmOverloads constructor(
         }
     }
 
-    private fun configureInputBehavior() = with(inputField) {
-        setHorizontallyScrolling(true)
+    private fun configureInputBehavior() =
+        with(inputField) {
+            setHorizontallyScrolling(true)
 
-        setOnEditorActionListener { _, actionId, _ ->
-            if (actionId == EditorInfo.IME_ACTION_GO) {
-                submitMessage()
+            setOnEditorActionListener { _, actionId, _ ->
+                if (actionId == EditorInfo.IME_ACTION_GO) {
+                    submitMessage()
 
-                val params = inputScreenPixelsModeParam(isSearchMode = inputModeSwitch.selectedTabPosition == 0)
-                pixel.fire(DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_OMNIBAR_KEYBOARD_GO_PRESSED, parameters = params)
-                true
-            } else {
-                false
+                    val params = inputScreenPixelsModeParam(isSearchMode = inputModeSwitch.selectedTabPosition == 0)
+                    pixel.fire(DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_OMNIBAR_KEYBOARD_GO_PRESSED, parameters = params)
+                    true
+                } else {
+                    false
+                }
+            }
+
+            doOnTextChanged { text, _, _, _ ->
+                if (!hasTextChangedFromOriginal) {
+                    hasTextChangedFromOriginal = text != originalText
+                }
+                onVoiceInputAllowed?.invoke(!hasTextChangedFromOriginal || inputField.text.isBlank())
+
+                val textToSubmit = inputField.text.getTextToSubmit()
+                onSubmitMessageAvailable?.invoke(textToSubmit != null)
+
+                when (inputModeSwitch.selectedTabPosition) {
+                    0 -> onSearchTextChanged?.invoke(textToSubmit?.toString().orEmpty())
+                    1 -> onChatTextChanged?.invoke(textToSubmit?.toString().orEmpty())
+                }
+
+                val isNullOrEmpty = text.isNullOrEmpty()
+                fade(inputFieldClearText, !isNullOrEmpty)
+            }
+
+            doAfterTextChanged { text ->
+                text?.let {
+                    removeFormatting(text)
+                }
             }
         }
-
-        doOnTextChanged { text, _, _, _ ->
-            if (!hasTextChangedFromOriginal) {
-                hasTextChangedFromOriginal = text != originalText
-            }
-            onVoiceInputAllowed?.invoke(!hasTextChangedFromOriginal || inputField.text.isBlank())
-
-            val textToSubmit = inputField.text.getTextToSubmit()
-            onSubmitMessageAvailable?.invoke(textToSubmit != null)
-
-            when (inputModeSwitch.selectedTabPosition) {
-                0 -> onSearchTextChanged?.invoke(textToSubmit?.toString().orEmpty())
-                1 -> onChatTextChanged?.invoke(textToSubmit?.toString().orEmpty())
-            }
-
-            val isNullOrEmpty = text.isNullOrEmpty()
-            fade(inputFieldClearText, !isNullOrEmpty)
-        }
-
-        doAfterTextChanged { text ->
-            text?.let {
-                removeFormatting(text)
-            }
-        }
-    }
 
     private fun removeFormatting(text: Editable) {
-        val spans = buildList<Any> {
-            addAll(text.getSpans(0, text.length, CharacterStyle::class.java))
-            addAll(text.getSpans(0, text.length, ParagraphStyle::class.java))
-            addAll(text.getSpans(0, text.length, URLSpan::class.java))
-            addAll(text.getSpans(0, text.length, ImageSpan::class.java))
-        }.filter { span ->
-            (text.getSpanFlags(span) and Spanned.SPAN_COMPOSING) == 0
-        }
+        val spans =
+            buildList<Any> {
+                addAll(text.getSpans(0, text.length, CharacterStyle::class.java))
+                addAll(text.getSpans(0, text.length, ParagraphStyle::class.java))
+                addAll(text.getSpans(0, text.length, URLSpan::class.java))
+                addAll(text.getSpans(0, text.length, ImageSpan::class.java))
+            }.filter { span ->
+                (text.getSpanFlags(span) and Spanned.SPAN_COMPOSING) == 0
+            }
 
         if (spans.isNotEmpty()) {
             spans.forEach(text::removeSpan)
@@ -246,7 +247,9 @@ class InputModeWidget @JvmOverloads constructor(
                         1 -> onChatSelected?.invoke()
                     }
                 }
+
                 override fun onTabUnselected(tab: TabLayout.Tab?) {}
+
                 override fun onTabReselected(tab: TabLayout.Tab?) {}
             },
         )
@@ -307,7 +310,10 @@ class InputModeWidget @JvmOverloads constructor(
         }
     }
 
-    fun setScrollPosition(position: Int, positionOffset: Float) {
+    fun setScrollPosition(
+        position: Int,
+        positionOffset: Float,
+    ) {
         inputModeSwitch.setScrollPosition(position, positionOffset, false)
     }
 
