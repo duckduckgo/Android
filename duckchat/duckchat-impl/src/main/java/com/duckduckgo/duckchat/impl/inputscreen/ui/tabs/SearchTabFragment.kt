@@ -182,7 +182,7 @@ class SearchTabFragment : DuckDuckGoFragment(R.layout.fragment_search_tab) {
     private fun configureObservers() {
         viewModel.visibilityState.onEach {
             binding.autoCompleteSuggestionsList.isVisible = it.autoCompleteSuggestionsVisible
-            binding.bottomFadeContainer.isVisible = it.autoCompleteSuggestionsVisible && inputScreenConfigResolver.useTopBar() // todo lp add to view model?
+            binding.bottomFadeContainer.isVisible = it.bottomFadeVisible
 
             if (!it.autoCompleteSuggestionsVisible) {
                 viewModel.autoCompleteSuggestionsGone()

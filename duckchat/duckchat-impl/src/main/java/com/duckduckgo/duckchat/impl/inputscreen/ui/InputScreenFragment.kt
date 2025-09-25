@@ -77,8 +77,6 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import com.duckduckgo.mobile.android.R as CommonR
 
-// todo minor movement of dax when bottom omnibar focused
-
 @InjectWith(FragmentScope::class)
 class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
 

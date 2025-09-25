@@ -44,6 +44,12 @@ import javax.inject.Inject
  *   but it's less dramatic because there's no slide animation.
  * - Cannot use themeable attributes (`?attr`) as they cause crashes of the whole launcher (on tested devices).
  *   Instead, we use fixed color values and filter resources by current theme state.
+ *
+ * ### Omnibar Position Handling
+ * If the omnibar is at the top of the screen, slide animations are used (on API ≥ 33) to reveal the Search/Duck.ai toggle.
+ *
+ * If the omnibar is at the bottom of the screen, fade animations are used as the input box positioned
+ * is anchored to the same screen coordinates in both the browser screen and input screen.
  */
 @ContributesBinding(scope = AppScope::class)
 class BrowserAndInputScreenTransitionProviderImpl @Inject constructor(

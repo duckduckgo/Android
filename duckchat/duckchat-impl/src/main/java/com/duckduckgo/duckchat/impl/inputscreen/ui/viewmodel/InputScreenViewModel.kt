@@ -137,6 +137,7 @@ class InputScreenViewModel @AssistedInject constructor(
         InputScreenVisibilityState(
             voiceInputButtonVisible = voiceServiceAvailable.value && voiceInputAllowed.value,
             autoCompleteSuggestionsVisible = false,
+            bottomFadeVisible = false,
             showChatLogo = true,
             showSearchLogo = true,
             newLineButtonVisible = false,
@@ -255,7 +256,10 @@ class InputScreenViewModel @AssistedInject constructor(
 
         shouldShowAutoComplete.onEach { showAutoComplete ->
             _visibilityState.update {
-                it.copy(autoCompleteSuggestionsVisible = showAutoComplete)
+                it.copy(
+                    autoCompleteSuggestionsVisible = showAutoComplete,
+                    bottomFadeVisible = showAutoComplete && inputScreenConfigResolver.useTopBar(),
+                )
             }
         }.launchIn(viewModelScope)
 

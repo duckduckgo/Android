@@ -19,6 +19,7 @@ package com.duckduckgo.duckchat.impl.inputscreen.ui.state
 data class InputScreenVisibilityState(
     val voiceInputButtonVisible: Boolean,
     val autoCompleteSuggestionsVisible: Boolean,
+    val bottomFadeVisible: Boolean,
     val showChatLogo: Boolean,
     val showSearchLogo: Boolean,
     val newLineButtonVisible: Boolean,
