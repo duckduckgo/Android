@@ -776,36 +776,44 @@
     <string name="sslErrorUntrustedMessage" instruction="Placeholder is domain with certificate issues">Le certificat de sécurité de %1$s n\'est pas approuvé par le système d\'exploitation de votre appareil. Il est possible que le site soit mal configuré, qu\'un pirate ait compromis votre connexion ou que l\'horloge de votre système soit incorrecte.</string>
 
     <!-- Extended Onboarding-->
-    <string name="preOnboardingDaxDialog1Title"><![CDATA[Bonjour.<br/><br/>Envie de profiter d\'Internet d\'une meilleure façon plus confidentielle ?]]></string>
+    <string name="preOnboardingDaxDialog1Title"><![CDATA[Bonjour.<br/><br/>Envie de profiter d\'un navigateur plus rapide qui vous protège ?]]></string>
     <string name="preOnboardingDaxDialog1Button">Allons-y !</string>
-    <string name="preOnboardingDaxDialog2Title">Protections de la confidentialité activées !</string>
+    <string name="preOnboardingDaxDialog1SecondaryButton">Je suis déjà venu(e) ici</string>
+    <string name="preOnboardingDaxDialog2Title">Protections activées !</string>
     <string name="preOnboardingDaxDialog2Button">Choisissez votre navigateur</string>
+    <string name="preOnboardingDaxDialog3Title"><![CDATA[J\'ai compris ! Je vais ignorer les autres conseils.]]></string>
+    <string name="preOnboardingDaxDialog3Text"><![CDATA[N\'oubliez pas : vous pouvez supprimer tous vos onglets, votre historique et vos données de navigation en deux clics avec le <b>Fire Button</b> 🔥]]></string>
+    <string name="preOnboardingDaxDialog3SecondaryButton">Afficher le tutoriel</string>
     <string name="preOnboardingComparisonChartItem1">Faire une recherche privée par défaut</string>
     <string name="preOnboardingComparisonChartItem2">Bloquer les traqueurs tiers</string>
     <string name="preOnboardingComparisonChartItem3">Bloquez les fenêtres contextuelles de cookies</string>
     <string name="preOnboardingComparisonChartItem4">Bloquez les publicités ciblées</string>
     <string name="preOnboardingComparisonChartItem5">Supprimez les données de navigation d\'un seul clic</string>
-    <string name="preOnboardingDaxDialog3Title">Génial ! Bienvenue chez DuckDuckGo.</string>
     <string name="preOnboardingDaxDialog3Button">Commencer la navigation</string>
+    <string name="preOnboardingAddressBarTitle">Où dois-je placer votre barre d\'adresse ?</string>
+    <string name="preOnboardingAddressBarOkButton">Suivant</string>
+    <string name="highlightsPreOnboardingAddressBarOption1Title">En haut (par défaut)</string>
+    <string name="highlightsPreOnboardingAddressBarOption1Description">Facile à voir</string>
+    <string name="highlightsPreOnboardingAddressBarOption2Title">En bas</string>
+    <string name="highlightsPreOnboardingAddressBarOption2Description">Facile d\'accès</string>
     <string name="onboardingSearchDaxDialogTitle">Essayez une recherche !</string>
-    <string name="onboardingSearchDaxDialogDescription">Vos recherches sur DuckDuckGo sont toujours anonymes.</string>
-    <string name="onboardingSearchDaxDialogOption1" instruction="translate &apos;duck&apos; too.">comment dire « canard » en anglais</string>
-    <string name="onboardingSearchDaxDialogOption1English" instruction="translate &apos;duck&apos; too. Don&apos;t add question mark">comment dire « duck » en espagnol</string>
+    <string name="onboardingSearchDaxDialogDescription">Vos recherches sur DuckDuckGo restent confidentielles.</string>
+    <string name="onboardingSearchDaxDialogOption1" instruction="translate &apos;duck&apos; too.">"comment dire canard en anglais"</string>
+    <string name="onboardingSearchDaxDialogOption1English" instruction="translate &apos;duck&apos; too. Don&apos;t add question mark">"comment dire « canard » en espagnol"</string>
     <string name="onboardingSearchQueryOption1">comment dire canard en anglais</string>
     <string name="onboardingSearchQueryOption1English">comment dire « canard » en espagnol</string>
     <string name="onboardingSearchDaxDialogOption2">casting d\'avatar</string>
     <string name="onboardingSearchDaxDialogOption2US">casting de mighty ducks</string>
     <string name="onboardingSearchDaxDialogOption3">météo locale</string>
     <string name="onboardingSearchDaxDialogOption4">Surprenez-moi !</string>
-    <string name="onboardingSearchQueryOption4">recettes pour le dîner</string>
-    <string name="onboardingSearchQueryOption4US">recettes de cookies aux pépites de chocolat</string>
+    <string name="onboardingSearchQueryOption4">bébés canetons</string>
     <string name="onboardingSitesDaxDialogTitle">Essayez de visiter un site !</string>
     <string name="onboardingSitesDaxDialogDescription">Je bloquerai les traqueurs afin qu\'ils ne puissent pas vous espionner.</string>
     <string name="onboardingSitesDaxDialogOption1">espn.com</string>
     <string name="onboardingSitesDaxDialogOption2">yahoo.com</string>
     <string name="onboardingSitesDaxDialogOption3">ebay.com</string>
     <string name="onboardingSitesDaxDialogOption4">Surprenez-moi !</string>
-    <string name="onboardingSerpDaxDialogDescription">C\'est DuckDuckGo Search. Privé. Rapide. Moins de publicités.</string>
+    <string name="onboardingSerpDaxDialogDescription"><![CDATA[C\'est <b>DuckDuckGo Search !</b> Privé. Rapide. Moins de publicités.]]></string>
     <string name="onboardingSerpDaxDialogButton">J\'ai compris !</string>
     <string name="onboardingSitesSuggestionsDaxDialogTitle">Ensuite, essayez de visiter un site !</string>
     <plurals name="onboardingTrackersBlockedDialogDescription">
@@ -818,42 +826,20 @@
     </plurals>
     <string name="onboardingTrackersBlockedDaxDialogButton">J\'ai compris !</string>
     <string name="onboardingFireButtonDaxDialogDescription"><![CDATA[Effacez instantanément votre activité de navigation avec le <b>Fire Button</b>.<br/><br/>Essayez par vous-même ! 🔥]]></string>
+    <string name="onboardingFireButtonDaxDialogOkButton">Essayez</string>
+    <string name="onboardingFireButtonDaxDialogCancelButton">Ignorer</string>
     <string name="onboardingEndDaxDialogTitle">"Bien joué !"</string>
-    <string name="onboardingEndDaxDialogDescription">Pensez-y : chaque fois que vous naviguez avec moi, une publicité douteuse disparaît. 👌</string>
-    <string name="onboardingEndDaxDialogButton">C\'est fait !</string>
+    <string name="onboardingEndDaxDialogDescription">Souvenez-vous : chaque fois que vous naviguez avec moi, des publicités intrusives disparaissent.</string>
+    <string name="onboardingInContextEndDaxDialogDescription">Pensez-y : chaque fois que vous naviguez avec moi, une publicité douteuse disparaît. 👌</string>
+    <string name="onboardingEndDaxDialogButton">Bien joué !</string>
     <string name="onboardingPrivacyProDaxDialogTitle">Oh, avant que j\'oublie…</string>
     <string name="onboardingPrivacyProDaxDialogDescription"><![CDATA[DuckDuckGo propose également un <b>VPN sécurisé + 2 protections supplémentaires premium</b>, disponible avec un <b>abonnement payant facultatif</b>.]]></string>
     <string name="onboardingPrivacyProDaxDialogOkButton">En savoir plus</string>
     <string name="onboardingPrivacyProDaxDialogFreeTrialOkButton">Essayez gratuitement !</string>
     <string name="onboardingPrivacyProDaxDialogCancelButton">Ignorer</string>
 
-    <!-- Highlight Onboarding Experiment-->
-    <string name="highlightsPreOnboardingDaxDialog1Title"><![CDATA[Bonjour.<br/><br/>Envie de profiter d\'un navigateur plus rapide qui vous protège ?]]></string>
-    <string name="highlightsPreOnboardingDaxDialog2Title">Protections activées !</string>
-    <string name="highlightsPreOnboardingComparisonChartItem2">Bloquer les traqueurs tiers</string>
-    <string name="highlightsPreOnboardingComparisonChartItem3">Bloquez les demandes de cookies et les fenêtres contextuelles</string>
-    <string name="highlightsPreOnboardingComparisonChartItem4">Bloquez les publicités ciblées</string>
-    <string name="highlightsPreOnboardingComparisonChartItem5">Effacez rapidement les données de navigation</string>
-    <string name="highlightsPreOnboardingSelectAppIconTitle">Quelle couleur me va le mieux ?</string>
-    <string name="highlightsPreOnboardingSelectAppIconDescription">Choisissez l\'icône de votre application :</string>
-    <string name="highlightsPreOnboardingSelectAppIconOkButton">Suivant</string>
-    <string name="highlightsPreOnboardingAddressBarTitle">Où dois-je placer votre barre d\'adresse ?</string>
-    <string name="highlightsPreOnboardingAddressBarOption1Title">En haut (par défaut)</string>
-    <string name="highlightsPreOnboardingAddressBarOption1Description">Facile à voir</string>
-    <string name="highlightsPreOnboardingAddressBarOkButton">Suivant</string>
-    <string name="highlightsPreOnboardingAddressBarOption2Title">En bas</string>
-    <string name="highlightsPreOnboardingAddressBarOption2Description">Facile d\'accès</string>
-    <string name="highlightsOnboardingSearchQueryOption4">bébés canetons</string>
-    <string name="highlightsOnboardingSearchDaxDialogDescription">Vos recherches sur DuckDuckGo restent confidentielles.</string>
-    <string name="highlightsOnboardingSerpDaxDialogDescription"><![CDATA[C\'est <b>DuckDuckGo Search !</b> Privé. Rapide. Moins de publicités.]]></string>
-    <string name="highlightsOnboardingEndDaxDialogDescription">Souvenez-vous : chaque fois que vous naviguez avec moi, des publicités intrusives disparaissent.</string>
-    <string name="highlightsOnboardingEndDaxDialogButton">Bien joué !</string>
-    <string name="onboardingFireButtonDaxDialogOkButton">Essayez</string>
-    <string name="onboardingFireButtonDaxDialogCancelButton">Ignorer</string>
-    <string name="preOnboardingDaxDialog1SecondaryButton">Je suis déjà venu(e) ici</string>
-    <string name="highlightsPreOnboardingDaxDialog3Title"><![CDATA[J\'ai compris ! Je vais ignorer les autres conseils.]]></string>
-    <string name="highlightsPreOnboardingDaxDialog3Text"><![CDATA[N\'oubliez pas : vous pouvez supprimer tous vos onglets, votre historique et vos données de navigation en deux clics avec le <b>Fire Button</b> 🔥]]></string>
-    <string name="preOnboardingDaxDialog3SecondaryButton">Afficher le tutoriel</string>
+    <!-- Bubble BB & Buck experiment-->
+    <string name="onboardingBubbleExperimentSearchDaxDialogDescription">Vos recherches sur DuckDuckGo sont toujours anonymes.</string>
 
     <!-- Appearance settings -->
     <string name="settingsAddressBarPositionTitle">Barre d\'adresse</string>

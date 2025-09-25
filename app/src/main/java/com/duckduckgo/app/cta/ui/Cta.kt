@@ -388,7 +388,7 @@ sealed class OnboardingDaxDialogCta(
         private val onboardingDesignExperimentManager: OnboardingDesignExperimentManager,
     ) : OnboardingDaxDialogCta(
         CtaId.DAX_DIALOG_SERP,
-        R.string.highlightsOnboardingSerpDaxDialogDescription,
+        R.string.onboardingSerpDaxDialogDescription,
         R.string.onboardingSerpDaxDialogButton,
         AppPixelName.ONBOARDING_DAX_CTA_SHOWN,
         AppPixelName.ONBOARDING_DAX_CTA_OK_BUTTON,
@@ -1041,8 +1041,8 @@ sealed class OnboardingDaxDialogCta(
         private val onboardingDesignExperimentManager: OnboardingDesignExperimentManager,
     ) : OnboardingDaxDialogCta(
         CtaId.DAX_END,
-        R.string.highlightsOnboardingEndDaxDialogDescription,
-        R.string.highlightsOnboardingEndDaxDialogButton,
+        R.string.onboardingEndDaxDialogDescription,
+        R.string.onboardingEndDaxDialogButton,
         AppPixelName.ONBOARDING_DAX_CTA_SHOWN,
         AppPixelName.ONBOARDING_DAX_CTA_OK_BUTTON,
         null,
@@ -1611,7 +1611,7 @@ sealed class DaxBubbleCta(
     ) : DaxBubbleCta(
         ctaId = CtaId.DAX_INTRO,
         title = R.string.onboardingSearchDaxDialogTitle,
-        description = R.string.highlightsOnboardingSearchDaxDialogDescription,
+        description = R.string.onboardingSearchDaxDialogDescription,
         options = onboardingStore.getSearchOptions(),
         shownPixel = AppPixelName.ONBOARDING_DAX_CTA_SHOWN,
         okPixel = AppPixelName.ONBOARDING_DAX_CTA_OK_BUTTON,
@@ -1641,8 +1641,8 @@ sealed class DaxBubbleCta(
     ) : DaxBubbleCta(
         ctaId = CtaId.DAX_END,
         title = R.string.onboardingEndDaxDialogTitle,
-        description = R.string.highlightsOnboardingEndDaxDialogDescription,
-        primaryCta = R.string.highlightsOnboardingEndDaxDialogButton,
+        description = R.string.onboardingEndDaxDialogDescription,
+        primaryCta = R.string.onboardingEndDaxDialogButton,
         shownPixel = AppPixelName.ONBOARDING_DAX_CTA_SHOWN,
         okPixel = AppPixelName.ONBOARDING_DAX_CTA_OK_BUTTON,
         ctaPixelParam = Pixel.PixelValues.DAX_END_CTA,

@@ -776,36 +776,44 @@
     <string name="sslErrorUntrustedMessage" instruction="Placeholder is domain with certificate issues">Sikkerhetssertifikatet for %1$s er ikke klarert av enhetens operativsystem. Det er mulig at nettstedet er feilkonfigurert, at en angriper har kompromittert tilkoblingen eller at systemklokken din er feil.</string>
 
     <!-- Extended Onboarding-->
-    <string name="preOnboardingDaxDialog1Title"><![CDATA[Heisann.<br/><br/>Klar for et bedre, mer privat internett?]]></string>
+    <string name="preOnboardingDaxDialog1Title"><![CDATA[Heisann.<br/><br/>Klar for en raskere nettleser som beskytter deg?]]></string>
     <string name="preOnboardingDaxDialog1Button">Sett i gang!</string>
-    <string name="preOnboardingDaxDialog2Title">Personvern er aktivert!</string>
+    <string name="preOnboardingDaxDialog1SecondaryButton">Jeg har vært her før</string>
+    <string name="preOnboardingDaxDialog2Title">Beskyttelser er aktivert!</string>
     <string name="preOnboardingDaxDialog2Button">Velg nettleseren din</string>
+    <string name="preOnboardingDaxDialog3Title"><![CDATA[Skjønner! Jeg hopper over de andre tipsene.]]></string>
+    <string name="preOnboardingDaxDialog3Text"><![CDATA[Husk: Du kan slette alle fanene, historikken og nettleserdataene dine på to trykk med <b>Fire Button</b> 🔥]]></string>
+    <string name="preOnboardingDaxDialog3SecondaryButton">Vis veiledning</string>
     <string name="preOnboardingComparisonChartItem1">Søk privat som standard</string>
     <string name="preOnboardingComparisonChartItem2">Blokker tredjepartssporere</string>
     <string name="preOnboardingComparisonChartItem3">Blokker popup-vinduer om informasjonskapsler</string>
     <string name="preOnboardingComparisonChartItem4">Blokker målrettede annonser</string>
     <string name="preOnboardingComparisonChartItem5">Slett nettleserdata med én knapp</string>
-    <string name="preOnboardingDaxDialog3Title">Fantastisk! Velkommen til the duck side.</string>
     <string name="preOnboardingDaxDialog3Button">Begynn å surfe</string>
+    <string name="preOnboardingAddressBarTitle">Hvor skal jeg plassere adressefeltet?</string>
+    <string name="preOnboardingAddressBarOkButton">Neste</string>
+    <string name="highlightsPreOnboardingAddressBarOption1Title">Topp (standard)</string>
+    <string name="highlightsPreOnboardingAddressBarOption1Description">Lett å se</string>
+    <string name="highlightsPreOnboardingAddressBarOption2Title">Nederst</string>
+    <string name="highlightsPreOnboardingAddressBarOption2Description">Lett å nå</string>
     <string name="onboardingSearchDaxDialogTitle">Prøv et søk!</string>
-    <string name="onboardingSearchDaxDialogDescription">DuckDuckGo-søkene dine er alltid anonyme.</string>
-    <string name="onboardingSearchDaxDialogOption1" instruction="translate &apos;duck&apos; too.">hva heter «and» på engelsk</string>
-    <string name="onboardingSearchDaxDialogOption1English" instruction="translate &apos;duck&apos; too. Don&apos;t add question mark">hvordan si «duck» på spansk</string>
+    <string name="onboardingSearchDaxDialogDescription">DuckDuckGo-søkene dine er alltid private.</string>
+    <string name="onboardingSearchDaxDialogOption1" instruction="translate &apos;duck&apos; too.">"hva heter and på engelsk"</string>
+    <string name="onboardingSearchDaxDialogOption1English" instruction="translate &apos;duck&apos; too. Don&apos;t add question mark">"hva heter and på spansk"</string>
     <string name="onboardingSearchQueryOption1">hva heter and på engelsk</string>
     <string name="onboardingSearchQueryOption1English">hva heter and på spansk</string>
     <string name="onboardingSearchDaxDialogOption2">rollebesetningen i avatar</string>
     <string name="onboardingSearchDaxDialogOption2US">mighty ducks rolleinnehavere</string>
     <string name="onboardingSearchDaxDialogOption3">lokalt vær</string>
     <string name="onboardingSearchDaxDialogOption4">Overrask meg!</string>
-    <string name="onboardingSearchQueryOption4">middagsoppskrifter</string>
-    <string name="onboardingSearchQueryOption4US">oppskrifter på sjokoladekjeks</string>
+    <string name="onboardingSearchQueryOption4">andunger</string>
     <string name="onboardingSitesDaxDialogTitle">Prøv å besøke et nettsted!</string>
     <string name="onboardingSitesDaxDialogDescription">Jeg blokkerer sporingsforsøk slik at de ikke kan spionere på deg.</string>
     <string name="onboardingSitesDaxDialogOption1">espn.com</string>
     <string name="onboardingSitesDaxDialogOption2">yahoo.com</string>
     <string name="onboardingSitesDaxDialogOption3">ebay.com</string>
     <string name="onboardingSitesDaxDialogOption4">Overrask meg!</string>
-    <string name="onboardingSerpDaxDialogDescription">Det er DuckDuckGo Search. Privat. Raskt. Færre annonser.</string>
+    <string name="onboardingSerpDaxDialogDescription"><![CDATA[Det er <b>DuckDuckGo Search</b>! Privat. Raskt. Færre annonser.]]></string>
     <string name="onboardingSerpDaxDialogButton">Skjønner!</string>
     <string name="onboardingSitesSuggestionsDaxDialogTitle">Nå kan du prøve å besøke et nettsted!</string>
     <plurals name="onboardingTrackersBlockedDialogDescription">
@@ -818,42 +826,20 @@
     </plurals>
     <string name="onboardingTrackersBlockedDaxDialogButton">Skjønner!</string>
     <string name="onboardingFireButtonDaxDialogDescription"><![CDATA[Fjern nettleseraktiviteten din umiddelbart med <b>Fire Button</b>.<br/><br/>Prøv den!️ 🔥]]></string>
+    <string name="onboardingFireButtonDaxDialogOkButton">Prøv det</string>
+    <string name="onboardingFireButtonDaxDialogCancelButton">Hopp over</string>
     <string name="onboardingEndDaxDialogTitle">"Dette går bra!"</string>
-    <string name="onboardingEndDaxDialogDescription">Husk: Hver gang du surfer med meg, klippes vingene på en uhyggelig annonse. 👌</string>
-    <string name="onboardingEndDaxDialogButton">Ferdig!</string>
+    <string name="onboardingEndDaxDialogDescription">Husk: Hver gang du surfer med meg, klippes vingene på en uhyggelig annonse.</string>
+    <string name="onboardingInContextEndDaxDialogDescription">Husk: Hver gang du surfer med meg, klippes vingene på en uhyggelig annonse. 👌</string>
+    <string name="onboardingEndDaxDialogButton">High five!</string>
     <string name="onboardingPrivacyProDaxDialogTitle">Før jeg glemmer det …</string>
     <string name="onboardingPrivacyProDaxDialogDescription"><![CDATA[DuckDuckGo har også en sikker <b>VPN + to premium-beskyttelser til</b>, som du får med et <b>valgfritt, betalt abonnement</b>.]]></string>
     <string name="onboardingPrivacyProDaxDialogOkButton">Finn ut mer</string>
     <string name="onboardingPrivacyProDaxDialogFreeTrialOkButton">Prøv gratis!</string>
     <string name="onboardingPrivacyProDaxDialogCancelButton">Hopp over</string>
 
-    <!-- Highlight Onboarding Experiment-->
-    <string name="highlightsPreOnboardingDaxDialog1Title"><![CDATA[Heisann.<br/><br/>Klar for en raskere nettleser som holder deg beskyttet?]]></string>
-    <string name="highlightsPreOnboardingDaxDialog2Title">Beskyttelser er aktivert!</string>
-    <string name="highlightsPreOnboardingComparisonChartItem2">Blokker tredjepartssporere</string>
-    <string name="highlightsPreOnboardingComparisonChartItem3">Blokker forespørsler og popup-vinduer om informasjonskapsler</string>
-    <string name="highlightsPreOnboardingComparisonChartItem4">Blokker målrettede annonser</string>
-    <string name="highlightsPreOnboardingComparisonChartItem5">Slett nettleserdata raskt</string>
-    <string name="highlightsPreOnboardingSelectAppIconTitle">Hvilken farge passer best på meg?</string>
-    <string name="highlightsPreOnboardingSelectAppIconDescription">Velg appikonet ditt:</string>
-    <string name="highlightsPreOnboardingSelectAppIconOkButton">Neste</string>
-    <string name="highlightsPreOnboardingAddressBarTitle">Hvor skal jeg plassere adressefeltet?</string>
-    <string name="highlightsPreOnboardingAddressBarOption1Title">Topp (standard)</string>
-    <string name="highlightsPreOnboardingAddressBarOption1Description">Lett å se</string>
-    <string name="highlightsPreOnboardingAddressBarOkButton">Neste</string>
-    <string name="highlightsPreOnboardingAddressBarOption2Title">Nederst</string>
-    <string name="highlightsPreOnboardingAddressBarOption2Description">Lett å nå</string>
-    <string name="highlightsOnboardingSearchQueryOption4">andunger</string>
-    <string name="highlightsOnboardingSearchDaxDialogDescription">DuckDuckGo-søkene dine er alltid private.</string>
-    <string name="highlightsOnboardingSerpDaxDialogDescription"><![CDATA[Det er <b>DuckDuckGo Search</b>! Privat. Raskt. Færre annonser.]]></string>
-    <string name="highlightsOnboardingEndDaxDialogDescription">Husk: Hver gang du surfer med meg, klippes vingene på en uhyggelig annonse.</string>
-    <string name="highlightsOnboardingEndDaxDialogButton">High five!</string>
-    <string name="onboardingFireButtonDaxDialogOkButton">Prøv det</string>
-    <string name="onboardingFireButtonDaxDialogCancelButton">Hopp over</string>
-    <string name="preOnboardingDaxDialog1SecondaryButton">Jeg har vært her før</string>
-    <string name="highlightsPreOnboardingDaxDialog3Title"><![CDATA[Skjønner! Jeg hopper over de andre tipsene.]]></string>
-    <string name="highlightsPreOnboardingDaxDialog3Text"><![CDATA[Husk: Du kan slette alle fanene, historikken og nettleserdataene dine på to trykk med <b>Fire Button</b> 🔥]]></string>
-    <string name="preOnboardingDaxDialog3SecondaryButton">Vis veiledning</string>
+    <!-- Bubble BB & Buck experiment-->
+    <string name="onboardingBubbleExperimentSearchDaxDialogDescription">DuckDuckGo-søkene dine er alltid anonyme.</string>
 
     <!-- Appearance settings -->
     <string name="settingsAddressBarPositionTitle">Adressefelt</string>

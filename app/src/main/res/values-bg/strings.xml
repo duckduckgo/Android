@@ -776,36 +776,44 @@
     <string name="sslErrorUntrustedMessage" instruction="Placeholder is domain with certificate issues">Операционната система на Вашето устройство не се доверява на сертификата за сигурност за %1$s. Възможно е уебсайтът да е конфигуриран грешно, хакер да е компрометирал връзката Ви или системният Ви часовник да е неправилно настроен.</string>
 
     <!-- Extended Onboarding-->
-    <string name="preOnboardingDaxDialog1Title"><![CDATA[Здравейте.<br/><br/>Готови ли сте за по-добро и по-поверително изживяване в интернет?]]></string>
+    <string name="preOnboardingDaxDialog1Title"><![CDATA[Здравейте.<br/><br/>Готови ли сте за по-бърз браузър, който ви осигурява защита?]]></string>
     <string name="preOnboardingDaxDialog1Button">Да го направим!</string>
-    <string name="preOnboardingDaxDialog2Title">Защитата на поверителността е активирана!</string>
+    <string name="preOnboardingDaxDialog1SecondaryButton">Вече знам за това</string>
+    <string name="preOnboardingDaxDialog2Title">Защитите са активирани!</string>
     <string name="preOnboardingDaxDialog2Button">Изберете своя браузър</string>
+    <string name="preOnboardingDaxDialog3Title"><![CDATA[Разбрах! Ще пропусна другите съвети.]]></string>
+    <string name="preOnboardingDaxDialog3Text"><![CDATA[Не забравяйте: можете да изтриете всички раздели, историята и данните от сърфирането с две докосвания на <b>Fire Button</b> 🔥]]></string>
+    <string name="preOnboardingDaxDialog3SecondaryButton">Показване на указанията</string>
     <string name="preOnboardingComparisonChartItem1">Поверително търсене по подразбиране</string>
     <string name="preOnboardingComparisonChartItem2">Блокиране на тракерите на трети страни</string>
     <string name="preOnboardingComparisonChartItem3">Блокиране на изскачащи прозорци за бисквитки</string>
     <string name="preOnboardingComparisonChartItem4">Блокиране на целеви реклами</string>
     <string name="preOnboardingComparisonChartItem5">Изтриване на данните за сърфиране с един бутон</string>
-    <string name="preOnboardingDaxDialog3Title">Страхотно! Добре дошли от страната на Duck.</string>
     <string name="preOnboardingDaxDialog3Button">Стартиране на сърфирането</string>
+    <string name="preOnboardingAddressBarTitle">Къде да сложа адресната лента?</string>
+    <string name="preOnboardingAddressBarOkButton">Следващ</string>
+    <string name="highlightsPreOnboardingAddressBarOption1Title">Горе (по подразбиране)</string>
+    <string name="highlightsPreOnboardingAddressBarOption1Description">По-добре се вижда</string>
+    <string name="highlightsPreOnboardingAddressBarOption2Title">Отдолу</string>
+    <string name="highlightsPreOnboardingAddressBarOption2Description">По-лесен достъп</string>
     <string name="onboardingSearchDaxDialogTitle">Опитайте търсене!</string>
-    <string name="onboardingSearchDaxDialogDescription">Търсенето в DuckDuckGo винаги е анонимно.</string>
-    <string name="onboardingSearchDaxDialogOption1" instruction="translate &apos;duck&apos; too.">как се казва „патица“ на английски</string>
-    <string name="onboardingSearchDaxDialogOption1English" instruction="translate &apos;duck&apos; too. Don&apos;t add question mark">как се казва „патица“ на испански</string>
+    <string name="onboardingSearchDaxDialogDescription">Търсенето в DuckDuckGo винаги е поверително.</string>
+    <string name="onboardingSearchDaxDialogOption1" instruction="translate &apos;duck&apos; too.">"как се нарича патицата на английски"</string>
+    <string name="onboardingSearchDaxDialogOption1English" instruction="translate &apos;duck&apos; too. Don&apos;t add question mark">"как се казва „патица“ на испански"</string>
     <string name="onboardingSearchQueryOption1">как се нарича патицата на английски</string>
     <string name="onboardingSearchQueryOption1English">как се казва „патица“ на испански</string>
     <string name="onboardingSearchDaxDialogOption2">актьори в аватар</string>
     <string name="onboardingSearchDaxDialogOption2US">прогнозата на мощните патици</string>
     <string name="onboardingSearchDaxDialogOption3">местното време</string>
     <string name="onboardingSearchDaxDialogOption4">Изненадайте ме!</string>
-    <string name="onboardingSearchQueryOption4">рецепти за вечеря</string>
-    <string name="onboardingSearchQueryOption4US">рецепти за бисквити с парченца шоколад</string>
+    <string name="onboardingSearchQueryOption4">патенца</string>
     <string name="onboardingSitesDaxDialogTitle">Опитайте да посетите сайт!</string>
     <string name="onboardingSitesDaxDialogDescription">Ще блокирам тракерите, за да не ви шпионират.</string>
     <string name="onboardingSitesDaxDialogOption1">espn.com</string>
     <string name="onboardingSitesDaxDialogOption2">yahoo.com</string>
     <string name="onboardingSitesDaxDialogOption3">ebay.com</string>
     <string name="onboardingSitesDaxDialogOption4">Изненадайте ме!</string>
-    <string name="onboardingSerpDaxDialogDescription">Това е DuckDuckGo Search. Поверителен. Бърз. По-малко реклами.</string>
+    <string name="onboardingSerpDaxDialogDescription"><![CDATA[Това е <b>DuckDuckGo Search</b>! Поверителен. Бърз. По-малко реклами.]]></string>
     <string name="onboardingSerpDaxDialogButton">Разбрах!</string>
     <string name="onboardingSitesSuggestionsDaxDialogTitle">Сега опитайте да посетите някой сайт!</string>
     <plurals name="onboardingTrackersBlockedDialogDescription">
@@ -818,42 +826,20 @@
     </plurals>
     <string name="onboardingTrackersBlockedDaxDialogButton">Разбрах!</string>
     <string name="onboardingFireButtonDaxDialogDescription"><![CDATA[Незабавно изчистване на дейностите при сърфиране с <b>Fire Button</b>.<br/><br/>Опитайте!️ 🔥]]></string>
+    <string name="onboardingFireButtonDaxDialogOkButton">Изпробвайте го</string>
+    <string name="onboardingFireButtonDaxDialogCancelButton">Пропускане</string>
     <string name="onboardingEndDaxDialogTitle">"Справихте се!"</string>
-    <string name="onboardingEndDaxDialogDescription">Запомнете: всеки път, когато сърфирате с мен, аз ще подрязвам крилцата на досадните реклами. 👌</string>
-    <string name="onboardingEndDaxDialogButton">Готово!</string>
+    <string name="onboardingEndDaxDialogDescription">Запомнете: Всеки път, когато сърфирате с мен, аз ще подрязвам крилцата на досадните реклами.</string>
+    <string name="onboardingInContextEndDaxDialogDescription">Запомнете: всеки път, когато сърфирате с мен, аз ще подрязвам крилцата на досадните реклами. 👌</string>
+    <string name="onboardingEndDaxDialogButton">Дай пет!</string>
     <string name="onboardingPrivacyProDaxDialogTitle">О, преди да забравя…</string>
     <string name="onboardingPrivacyProDaxDialogDescription"><![CDATA[DuckDuckGo има и защитена <b>VPN услуга + още 2 премиум защити</b>, достъпни с <b>допълнителен платен абонамент</b>.]]></string>
     <string name="onboardingPrivacyProDaxDialogOkButton">Научете повече</string>
     <string name="onboardingPrivacyProDaxDialogFreeTrialOkButton">Пробвайте безплатно!</string>
     <string name="onboardingPrivacyProDaxDialogCancelButton">Пропускане</string>
 
-    <!-- Highlight Onboarding Experiment-->
-    <string name="highlightsPreOnboardingDaxDialog1Title"><![CDATA[Здравейте.<br/><br/>Готови ли сте за по-бърз браузър, който осигурява защита?]]></string>
-    <string name="highlightsPreOnboardingDaxDialog2Title">Защитите са активирани!</string>
-    <string name="highlightsPreOnboardingComparisonChartItem2">Блокиране на тракерите на трети страни</string>
-    <string name="highlightsPreOnboardingComparisonChartItem3">Блокиране на заявки и изскачащи прозорци за бисквитки</string>
-    <string name="highlightsPreOnboardingComparisonChartItem4">Блокиране на целеви реклами</string>
-    <string name="highlightsPreOnboardingComparisonChartItem5">Бързо изтриване на данни за сърфиране</string>
-    <string name="highlightsPreOnboardingSelectAppIconTitle">Кой цвят изглежда най-добре на този фон?</string>
-    <string name="highlightsPreOnboardingSelectAppIconDescription">Изберете икона за приложенията:</string>
-    <string name="highlightsPreOnboardingSelectAppIconOkButton">Следващ</string>
-    <string name="highlightsPreOnboardingAddressBarTitle">Къде да сложа адресната лента?</string>
-    <string name="highlightsPreOnboardingAddressBarOption1Title">Горе (по подразбиране)</string>
-    <string name="highlightsPreOnboardingAddressBarOption1Description">По-добре се вижда</string>
-    <string name="highlightsPreOnboardingAddressBarOkButton">Следващ</string>
-    <string name="highlightsPreOnboardingAddressBarOption2Title">Отдолу</string>
-    <string name="highlightsPreOnboardingAddressBarOption2Description">По-лесен достъп</string>
-    <string name="highlightsOnboardingSearchQueryOption4">патенца</string>
-    <string name="highlightsOnboardingSearchDaxDialogDescription">Търсенето в DuckDuckGo винаги е поверително.</string>
-    <string name="highlightsOnboardingSerpDaxDialogDescription"><![CDATA[Това е <b>DuckDuckGo Search</b>! Поверителен. Бърз. По-малко реклами.]]></string>
-    <string name="highlightsOnboardingEndDaxDialogDescription">Запомнете: Всеки път, когато сърфирате с мен, аз ще подрязвам крилцата на досадните реклами.</string>
-    <string name="highlightsOnboardingEndDaxDialogButton">Дай пет!</string>
-    <string name="onboardingFireButtonDaxDialogOkButton">Изпробвайте го</string>
-    <string name="onboardingFireButtonDaxDialogCancelButton">Пропускане</string>
-    <string name="preOnboardingDaxDialog1SecondaryButton">Вече знам за това</string>
-    <string name="highlightsPreOnboardingDaxDialog3Title"><![CDATA[Разбрах! Ще пропусна другите съвети.]]></string>
-    <string name="highlightsPreOnboardingDaxDialog3Text"><![CDATA[Не забравяйте: можете да изтриете всички раздели, историята и данните от сърфирането с две докосвания на <b>Fire Button</b> 🔥]]></string>
-    <string name="preOnboardingDaxDialog3SecondaryButton">Показване на указанията</string>
+    <!-- Bubble BB & Buck experiment-->
+    <string name="onboardingBubbleExperimentSearchDaxDialogDescription">Търсенето в DuckDuckGo винаги е анонимно.</string>
 
     <!-- Appearance settings -->
     <string name="settingsAddressBarPositionTitle">Адресна лента</string>

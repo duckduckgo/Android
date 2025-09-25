@@ -42,7 +42,7 @@
             android:layout_height="wrap_content"
             android:textAppearance="@style/Typography.Buck.H1"
             android:textColor="@color/buckColorPrimaryText"
-            android:text="@string/highlightsPreOnboardingAddressBarTitle"
+            android:text="@string/preOnboardingAddressBarTitle"
             android:visibility="invisible"
             tools:ignore="DeprecatedWidgetInXml,InvalidColorAttribute" />
 

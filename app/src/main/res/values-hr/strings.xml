@@ -804,36 +804,44 @@
     <string name="sslErrorUntrustedMessage" instruction="Placeholder is domain with certificate issues">Operativni sustav tvog uređaja ne vjeruje sigurnosnom certifikatu za %1$s. Moguće je da je web-mjesto pogrešno konfigurirano, da je napadač ugrozio tvoju vezu ili da je sat tvog sustava netočan.</string>
 
     <!-- Extended Onboarding-->
-    <string name="preOnboardingDaxDialog1Title"><![CDATA[Bok.<br/><br/>Jesi li spreman za bolji, privatniji internet?]]></string>
+    <string name="preOnboardingDaxDialog1Title"><![CDATA[Bok.<br/><br/>Jesi li spreman za brži preglednik koji te štiti?]]></string>
     <string name="preOnboardingDaxDialog1Button">Učinimo to!</string>
-    <string name="preOnboardingDaxDialog2Title">Zaštita privatnosti aktivirana!</string>
+    <string name="preOnboardingDaxDialog1SecondaryButton">Već sam bio ovdje</string>
+    <string name="preOnboardingDaxDialog2Title">Zaštite su aktivirane!</string>
     <string name="preOnboardingDaxDialog2Button">Odaberi preglednik</string>
+    <string name="preOnboardingDaxDialog3Title"><![CDATA[Shvaćam! Preskočit ću ostale savjete.]]></string>
+    <string name="preOnboardingDaxDialog3Text"><![CDATA[Zapamti: pomoću <b>Fire Buttona</b> 🔥 u samo dva dodira možeš izbrisati sve svoje kartice, povijest i podatke pregledavanja.]]></string>
+    <string name="preOnboardingDaxDialog3SecondaryButton">Prikaži vodič</string>
     <string name="preOnboardingComparisonChartItem1">Pretražuj privatno po zadanim postavkama</string>
     <string name="preOnboardingComparisonChartItem2">Blokiraj alate za praćenje trećih strana</string>
     <string name="preOnboardingComparisonChartItem3">Blokiraj skočne prozore kolačića</string>
     <string name="preOnboardingComparisonChartItem4">Blokiraj ciljane oglase</string>
     <string name="preOnboardingComparisonChartItem5">Izbriši podatke o pregledavanju jednim gumbom</string>
-    <string name="preOnboardingDaxDialog3Title">Odlično! Dobrodošli na našu stranu!</string>
     <string name="preOnboardingDaxDialog3Button">Započni pretraživanje</string>
+    <string name="preOnboardingAddressBarTitle">Gdje trebam staviti tvoju adresnu traku?</string>
+    <string name="preOnboardingAddressBarOkButton">Dalje</string>
+    <string name="highlightsPreOnboardingAddressBarOption1Title">Vrh (zadano)</string>
+    <string name="highlightsPreOnboardingAddressBarOption1Description">Lako se vidi</string>
+    <string name="highlightsPreOnboardingAddressBarOption2Title">Dno</string>
+    <string name="highlightsPreOnboardingAddressBarOption2Description">Lako dostupno</string>
     <string name="onboardingSearchDaxDialogTitle">Isprobajte pretragu!</string>
-    <string name="onboardingSearchDaxDialogDescription">Tvoja su DuckDuckGo pretraživanja uvijek anonimna.</string>
-    <string name="onboardingSearchDaxDialogOption1" instruction="translate &apos;duck&apos; too.">kako se kaže \"patka\" na engleskom</string>
-    <string name="onboardingSearchDaxDialogOption1English" instruction="translate &apos;duck&apos; too. Don&apos;t add question mark">kako se kaže \"patka\" na španjolskom</string>
+    <string name="onboardingSearchDaxDialogDescription">Tvoja su DuckDuckGo pretraživanja uvijek privatna.</string>
+    <string name="onboardingSearchDaxDialogOption1" instruction="translate &apos;duck&apos; too.">"kako se kaže patka na engleskom"</string>
+    <string name="onboardingSearchDaxDialogOption1English" instruction="translate &apos;duck&apos; too. Don&apos;t add question mark">"kako se kaže \"patka\" na španjolskom"</string>
     <string name="onboardingSearchQueryOption1">kako se kaže patka na engleskom</string>
     <string name="onboardingSearchQueryOption1English">kako se kaže \"patka\" na španjolskom</string>
     <string name="onboardingSearchDaxDialogOption2">uloge u filmu Avatar</string>
     <string name="onboardingSearchDaxDialogOption2US">moćne patke</string>
     <string name="onboardingSearchDaxDialogOption3">lokalno vrijeme</string>
     <string name="onboardingSearchDaxDialogOption4">Iznenadi me!</string>
-    <string name="onboardingSearchQueryOption4">recepti za večeru</string>
-    <string name="onboardingSearchQueryOption4US">recepti za kolačiće s komadićima čokolade</string>
+    <string name="onboardingSearchQueryOption4">pačići</string>
     <string name="onboardingSitesDaxDialogTitle">Pokušaj posjetiti web-mjesto!</string>
     <string name="onboardingSitesDaxDialogDescription">Blokirat ću tragače kako te ne bi mogli špijunirati.</string>
     <string name="onboardingSitesDaxDialogOption1">espn.com</string>
     <string name="onboardingSitesDaxDialogOption2">yahoo.com</string>
     <string name="onboardingSitesDaxDialogOption3">ebay.com</string>
     <string name="onboardingSitesDaxDialogOption4">Iznenadi me!</string>
-    <string name="onboardingSerpDaxDialogDescription">To je DuckDuckGo Search. Privatno. Brzo. Manje oglasa.</string>
+    <string name="onboardingSerpDaxDialogDescription"><![CDATA[To je <b>DuckDuckGo Search</b>! Privatno. Brzo. Manje oglasa.]]></string>
     <string name="onboardingSerpDaxDialogButton">Shvaćam!</string>
     <string name="onboardingSitesSuggestionsDaxDialogTitle">Nakon toga pokušaj posjetiti neko web-mjesto!</string>
     <plurals name="onboardingTrackersBlockedDialogDescription">
@@ -850,42 +858,20 @@
     </plurals>
     <string name="onboardingTrackersBlockedDaxDialogButton">Shvaćam!</string>
     <string name="onboardingFireButtonDaxDialogDescription"><![CDATA[Odmah izbriši svoju aktivnost pregledavanja pomoću <b>Fire Buttona</b>.<br/><br/>Isprobaj ga! 🔥]]></string>
+    <string name="onboardingFireButtonDaxDialogOkButton">Isprobaj ga</string>
+    <string name="onboardingFireButtonDaxDialogCancelButton">Preskoči</string>
     <string name="onboardingEndDaxDialogTitle">"Možeš ti to!"</string>
-    <string name="onboardingEndDaxDialogDescription">Zapamti: svaki put kada me koristiš za pregledavanje, grozne reklame odlaze u zaborav. 👌</string>
-    <string name="onboardingEndDaxDialogButton">Gotovo!</string>
+    <string name="onboardingEndDaxDialogDescription">Zapamti: svaki put kada pregledavaš sa mnom grozna reklama gubi krila.</string>
+    <string name="onboardingInContextEndDaxDialogDescription">Zapamti: svaki put kada me koristiš za pregledavanje, grozne reklame odlaze u zaborav. 👌</string>
+    <string name="onboardingEndDaxDialogButton">Daj pet!</string>
     <string name="onboardingPrivacyProDaxDialogTitle">Oh, prije nego zaboravim...</string>
     <string name="onboardingPrivacyProDaxDialogDescription"><![CDATA[DuckDuckGo također ima siguran <b>VPN + još 2 vrhunske zaštite</b>, dostupno uz <b>neobaveznu plaćenu pretplatu</b>.]]></string>
     <string name="onboardingPrivacyProDaxDialogOkButton">Saznajte više</string>
     <string name="onboardingPrivacyProDaxDialogFreeTrialOkButton">Isprobaj besplatno!</string>
     <string name="onboardingPrivacyProDaxDialogCancelButton">Preskoči</string>
 
-    <!-- Highlight Onboarding Experiment-->
-    <string name="highlightsPreOnboardingDaxDialog1Title"><![CDATA[Bok.<br/><br/>Jesi li spreman za brži preglednik koji te štiti?]]></string>
-    <string name="highlightsPreOnboardingDaxDialog2Title">Zaštite su aktivirane!</string>
-    <string name="highlightsPreOnboardingComparisonChartItem2">Blokiraj alate za praćenje trećih strana</string>
-    <string name="highlightsPreOnboardingComparisonChartItem3">Blokiraj zahtjeve kolačića i skočne prozore</string>
-    <string name="highlightsPreOnboardingComparisonChartItem4">Blokiraj ciljane oglase</string>
-    <string name="highlightsPreOnboardingComparisonChartItem5">Brzo izbriši podatke o pregledavanju</string>
-    <string name="highlightsPreOnboardingSelectAppIconTitle">Koja boja izgleda najbolje na meni?</string>
-    <string name="highlightsPreOnboardingSelectAppIconDescription">Odaberi ikonu aplikacije:</string>
-    <string name="highlightsPreOnboardingSelectAppIconOkButton">Dalje</string>
-    <string name="highlightsPreOnboardingAddressBarTitle">Gdje trebam staviti tvoju adresnu traku?</string>
-    <string name="highlightsPreOnboardingAddressBarOption1Title">Vrh (zadano)</string>
-    <string name="highlightsPreOnboardingAddressBarOption1Description">Lako se vidi</string>
-    <string name="highlightsPreOnboardingAddressBarOkButton">Dalje</string>
-    <string name="highlightsPreOnboardingAddressBarOption2Title">Dno</string>
-    <string name="highlightsPreOnboardingAddressBarOption2Description">Lako dostupno</string>
-    <string name="highlightsOnboardingSearchQueryOption4">pačići</string>
-    <string name="highlightsOnboardingSearchDaxDialogDescription">Tvoja su DuckDuckGo pretraživanja uvijek privatna.</string>
-    <string name="highlightsOnboardingSerpDaxDialogDescription"><![CDATA[To je <b>DuckDuckGo Search</b>! Privatno. Brzo. Manje oglasa.]]></string>
-    <string name="highlightsOnboardingEndDaxDialogDescription">Zapamti: svaki put kada pregledavaš sa mnom grozna reklama gubi krila.</string>
-    <string name="highlightsOnboardingEndDaxDialogButton">Daj pet!</string>
-    <string name="onboardingFireButtonDaxDialogOkButton">Isprobaj ga</string>
-    <string name="onboardingFireButtonDaxDialogCancelButton">Preskoči</string>
-    <string name="preOnboardingDaxDialog1SecondaryButton">Već sam bio ovdje</string>
-    <string name="highlightsPreOnboardingDaxDialog3Title"><![CDATA[Shvaćam! Preskočit ću ostale savjete.]]></string>
-    <string name="highlightsPreOnboardingDaxDialog3Text"><![CDATA[Zapamti: pomoću <b>Fire Buttona</b> 🔥 u samo dva dodira možeš izbrisati sve svoje kartice, povijest i podatke pregledavanja.]]></string>
-    <string name="preOnboardingDaxDialog3SecondaryButton">Prikaži vodič</string>
+    <!-- Bubble BB & Buck experiment-->
+    <string name="onboardingBubbleExperimentSearchDaxDialogDescription">Tvoja su DuckDuckGo pretraživanja uvijek anonimna.</string>
 
     <!-- Appearance settings -->
     <string name="settingsAddressBarPositionTitle">Adresna traka</string>
