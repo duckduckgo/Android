@@ -37,7 +37,6 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 
 class VpnMenuStateProviderTest {
-
     @get:Rule
     val coroutineTestRule: CoroutineTestRule = CoroutineTestRule()
 
@@ -70,209 +69,224 @@ class VpnMenuStateProviderTest {
     }
 
     @Test
-    fun `when user has active subscription with NetP entitlement and VPN connected then return Subscribed with VPN enabled`() = runTest {
-        whenever(subscriptions.getSubscriptionStatusFlow()).thenReturn(flowOf(SubscriptionStatus.AUTO_RENEWABLE))
-        whenever(subscriptions.getEntitlementStatus()).thenReturn(flowOf(listOf(NetP)))
-        whenever(connectionState.isConnected()).thenReturn(true)
-        whenever(networkProtectionState.getConnectionStateFlow()).thenReturn(flowOf(connectionState))
+    fun `when user has active subscription with NetP entitlement and VPN connected then return Subscribed with VPN enabled`() =
+        runTest {
+            whenever(subscriptions.getSubscriptionStatusFlow()).thenReturn(flowOf(SubscriptionStatus.AUTO_RENEWABLE))
+            whenever(subscriptions.getEntitlementStatus()).thenReturn(flowOf(listOf(NetP)))
+            whenever(connectionState.isConnected()).thenReturn(true)
+            whenever(networkProtectionState.getConnectionStateFlow()).thenReturn(flowOf(connectionState))
 
-        testee.getVpnMenuState().test {
-            val state = awaitItem()
-            assertEquals(VpnMenuState.Subscribed(isVpnEnabled = true), state)
-            cancelAndIgnoreRemainingEvents()
+            testee.getVpnMenuState().test {
+                val state = awaitItem()
+                assertEquals(VpnMenuState.Subscribed(isVpnEnabled = true), state)
+                cancelAndIgnoreRemainingEvents()
+            }
         }
-    }
 
     @Test
-    fun `when user has active subscription with NetP entitlement and VPN disconnected then return Subscribed with VPN disabled`() = runTest {
-        whenever(subscriptions.getSubscriptionStatusFlow()).thenReturn(flowOf(SubscriptionStatus.AUTO_RENEWABLE))
-        whenever(subscriptions.getEntitlementStatus()).thenReturn(flowOf(listOf(NetP)))
-        whenever(connectionState.isConnected()).thenReturn(false)
-        whenever(networkProtectionState.getConnectionStateFlow()).thenReturn(flowOf(connectionState))
+    fun `when user has active subscription with NetP entitlement and VPN disconnected then return Subscribed with VPN disabled`() =
+        runTest {
+            whenever(subscriptions.getSubscriptionStatusFlow()).thenReturn(flowOf(SubscriptionStatus.AUTO_RENEWABLE))
+            whenever(subscriptions.getEntitlementStatus()).thenReturn(flowOf(listOf(NetP)))
+            whenever(connectionState.isConnected()).thenReturn(false)
+            whenever(networkProtectionState.getConnectionStateFlow()).thenReturn(flowOf(connectionState))
 
-        testee.getVpnMenuState().test {
-            val state = awaitItem()
-            assertEquals(VpnMenuState.Subscribed(isVpnEnabled = false), state)
-            cancelAndIgnoreRemainingEvents()
+            testee.getVpnMenuState().test {
+                val state = awaitItem()
+                assertEquals(VpnMenuState.Subscribed(isVpnEnabled = false), state)
+                cancelAndIgnoreRemainingEvents()
+            }
         }
-    }
 
     @Test
-    fun `when user has NOT_AUTO_RENEWABLE subscription with NetP entitlement and VPN connected then return Subscribed with VPN enabled`() = runTest {
-        whenever(subscriptions.getSubscriptionStatusFlow()).thenReturn(flowOf(SubscriptionStatus.NOT_AUTO_RENEWABLE))
-        whenever(subscriptions.getEntitlementStatus()).thenReturn(flowOf(listOf(NetP)))
-        whenever(connectionState.isConnected()).thenReturn(true)
-        whenever(networkProtectionState.getConnectionStateFlow()).thenReturn(flowOf(connectionState))
-        testee.getVpnMenuState().test {
-            val state = awaitItem()
-            assertEquals(VpnMenuState.Subscribed(isVpnEnabled = true), state)
-            cancelAndIgnoreRemainingEvents()
+    fun `when user has NOT_AUTO_RENEWABLE subscription with NetP entitlement and VPN connected then return Subscribed with VPN enabled`() =
+        runTest {
+            whenever(subscriptions.getSubscriptionStatusFlow()).thenReturn(flowOf(SubscriptionStatus.NOT_AUTO_RENEWABLE))
+            whenever(subscriptions.getEntitlementStatus()).thenReturn(flowOf(listOf(NetP)))
+            whenever(connectionState.isConnected()).thenReturn(true)
+            whenever(networkProtectionState.getConnectionStateFlow()).thenReturn(flowOf(connectionState))
+            testee.getVpnMenuState().test {
+                val state = awaitItem()
+                assertEquals(VpnMenuState.Subscribed(isVpnEnabled = true), state)
+                cancelAndIgnoreRemainingEvents()
+            }
         }
-    }
 
     @Test
-    fun `when user has GRACE_PERIOD subscription with NetP entitlement and VPN connected then return Subscribed with VPN enabled`() = runTest {
-        whenever(subscriptions.getSubscriptionStatusFlow()).thenReturn(flowOf(SubscriptionStatus.GRACE_PERIOD))
-        whenever(subscriptions.getEntitlementStatus()).thenReturn(flowOf(listOf(NetP)))
-        whenever(connectionState.isConnected()).thenReturn(true)
-        whenever(networkProtectionState.getConnectionStateFlow()).thenReturn(flowOf(connectionState))
-        testee.getVpnMenuState().test {
-            val state = awaitItem()
-            assertEquals(VpnMenuState.Subscribed(isVpnEnabled = true), state)
-            cancelAndIgnoreRemainingEvents()
+    fun `when user has GRACE_PERIOD subscription with NetP entitlement and VPN connected then return Subscribed with VPN enabled`() =
+        runTest {
+            whenever(subscriptions.getSubscriptionStatusFlow()).thenReturn(flowOf(SubscriptionStatus.GRACE_PERIOD))
+            whenever(subscriptions.getEntitlementStatus()).thenReturn(flowOf(listOf(NetP)))
+            whenever(connectionState.isConnected()).thenReturn(true)
+            whenever(networkProtectionState.getConnectionStateFlow()).thenReturn(flowOf(connectionState))
+            testee.getVpnMenuState().test {
+                val state = awaitItem()
+                assertEquals(VpnMenuState.Subscribed(isVpnEnabled = true), state)
+                cancelAndIgnoreRemainingEvents()
+            }
         }
-    }
 
     @Test
-    fun `when user has active subscription but no NetP entitlement then return Hidden`() = runTest {
-        whenever(subscriptions.getSubscriptionStatusFlow()).thenReturn(flowOf(SubscriptionStatus.AUTO_RENEWABLE))
-        whenever(subscriptions.getEntitlementStatus()).thenReturn(flowOf(emptyList()))
-        whenever(connectionState.isConnected()).thenReturn(true)
-        whenever(networkProtectionState.getConnectionStateFlow()).thenReturn(flowOf(connectionState))
-        testee.getVpnMenuState().test {
-            val state = awaitItem()
-            assertEquals(VpnMenuState.Hidden, state)
-            cancelAndIgnoreRemainingEvents()
+    fun `when user has active subscription but no NetP entitlement then return Hidden`() =
+        runTest {
+            whenever(subscriptions.getSubscriptionStatusFlow()).thenReturn(flowOf(SubscriptionStatus.AUTO_RENEWABLE))
+            whenever(subscriptions.getEntitlementStatus()).thenReturn(flowOf(emptyList()))
+            whenever(connectionState.isConnected()).thenReturn(true)
+            whenever(networkProtectionState.getConnectionStateFlow()).thenReturn(flowOf(connectionState))
+            testee.getVpnMenuState().test {
+                val state = awaitItem()
+                assertEquals(VpnMenuState.Hidden, state)
+                cancelAndIgnoreRemainingEvents()
+            }
         }
-    }
 
     @Test
-    fun `when user has no active subscription then return NotSubscribed`() = runTest {
-        whenever(subscriptions.getSubscriptionStatusFlow()).thenReturn(flowOf(SubscriptionStatus.INACTIVE))
-        whenever(subscriptions.getEntitlementStatus()).thenReturn(flowOf(emptyList()))
-        whenever(connectionState.isConnected()).thenReturn(false)
-        whenever(networkProtectionState.getConnectionStateFlow()).thenReturn(flowOf(connectionState))
-        testee.getVpnMenuState().test {
-            val state = awaitItem()
-            assertEquals(VpnMenuState.NotSubscribed, state)
-            cancelAndIgnoreRemainingEvents()
+    fun `when user has no active subscription then return NotSubscribed`() =
+        runTest {
+            whenever(subscriptions.getSubscriptionStatusFlow()).thenReturn(flowOf(SubscriptionStatus.INACTIVE))
+            whenever(subscriptions.getEntitlementStatus()).thenReturn(flowOf(emptyList()))
+            whenever(connectionState.isConnected()).thenReturn(false)
+            whenever(networkProtectionState.getConnectionStateFlow()).thenReturn(flowOf(connectionState))
+            testee.getVpnMenuState().test {
+                val state = awaitItem()
+                assertEquals(VpnMenuState.NotSubscribed, state)
+                cancelAndIgnoreRemainingEvents()
+            }
         }
-    }
 
     @Test
-    fun `when user has EXPIRED subscription then return NotSubscribed`() = runTest {
-        whenever(subscriptions.getSubscriptionStatusFlow()).thenReturn(flowOf(SubscriptionStatus.EXPIRED))
-        whenever(subscriptions.getEntitlementStatus()).thenReturn(flowOf(emptyList()))
-        whenever(connectionState.isConnected()).thenReturn(false)
-        whenever(networkProtectionState.getConnectionStateFlow()).thenReturn(flowOf(connectionState))
-        testee.getVpnMenuState().test {
-            val state = awaitItem()
-            assertEquals(VpnMenuState.NotSubscribed, state)
-            cancelAndIgnoreRemainingEvents()
+    fun `when user has EXPIRED subscription then return NotSubscribed`() =
+        runTest {
+            whenever(subscriptions.getSubscriptionStatusFlow()).thenReturn(flowOf(SubscriptionStatus.EXPIRED))
+            whenever(subscriptions.getEntitlementStatus()).thenReturn(flowOf(emptyList()))
+            whenever(connectionState.isConnected()).thenReturn(false)
+            whenever(networkProtectionState.getConnectionStateFlow()).thenReturn(flowOf(connectionState))
+            testee.getVpnMenuState().test {
+                val state = awaitItem()
+                assertEquals(VpnMenuState.NotSubscribed, state)
+                cancelAndIgnoreRemainingEvents()
+            }
         }
-    }
 
     @Test
-    fun `when user has UNKNOWN subscription status then return NotSubscribed`() = runTest {
-        whenever(subscriptions.getSubscriptionStatusFlow()).thenReturn(flowOf(SubscriptionStatus.UNKNOWN))
-        whenever(subscriptions.getEntitlementStatus()).thenReturn(flowOf(emptyList()))
-        whenever(connectionState.isConnected()).thenReturn(false)
-        whenever(networkProtectionState.getConnectionStateFlow()).thenReturn(flowOf(connectionState))
-        testee.getVpnMenuState().test {
-            val state = awaitItem()
-            assertEquals(VpnMenuState.NotSubscribed, state)
-            cancelAndIgnoreRemainingEvents()
+    fun `when user has UNKNOWN subscription status then return NotSubscribed`() =
+        runTest {
+            whenever(subscriptions.getSubscriptionStatusFlow()).thenReturn(flowOf(SubscriptionStatus.UNKNOWN))
+            whenever(subscriptions.getEntitlementStatus()).thenReturn(flowOf(emptyList()))
+            whenever(connectionState.isConnected()).thenReturn(false)
+            whenever(networkProtectionState.getConnectionStateFlow()).thenReturn(flowOf(connectionState))
+            testee.getVpnMenuState().test {
+                val state = awaitItem()
+                assertEquals(VpnMenuState.NotSubscribed, state)
+                cancelAndIgnoreRemainingEvents()
+            }
         }
-    }
 
     @Test
-    fun `when user has WAITING subscription status then return NotSubscribed`() = runTest {
-        whenever(subscriptions.getSubscriptionStatusFlow()).thenReturn(flowOf(SubscriptionStatus.WAITING))
-        whenever(subscriptions.getEntitlementStatus()).thenReturn(flowOf(emptyList()))
-        whenever(connectionState.isConnected()).thenReturn(false)
-        whenever(networkProtectionState.getConnectionStateFlow()).thenReturn(flowOf(connectionState))
-        testee.getVpnMenuState().test {
-            val state = awaitItem()
-            assertEquals(VpnMenuState.NotSubscribed, state)
-            cancelAndIgnoreRemainingEvents()
+    fun `when user has WAITING subscription status then return NotSubscribed`() =
+        runTest {
+            whenever(subscriptions.getSubscriptionStatusFlow()).thenReturn(flowOf(SubscriptionStatus.WAITING))
+            whenever(subscriptions.getEntitlementStatus()).thenReturn(flowOf(emptyList()))
+            whenever(connectionState.isConnected()).thenReturn(false)
+            whenever(networkProtectionState.getConnectionStateFlow()).thenReturn(flowOf(connectionState))
+            testee.getVpnMenuState().test {
+                val state = awaitItem()
+                assertEquals(VpnMenuState.NotSubscribed, state)
+                cancelAndIgnoreRemainingEvents()
+            }
         }
-    }
 
     @Test
-    fun `when VPN connection state is disconnected then state shows VPN disabled`() = runTest {
-        whenever(subscriptions.getSubscriptionStatusFlow()).thenReturn(flowOf(SubscriptionStatus.AUTO_RENEWABLE))
-        whenever(subscriptions.getEntitlementStatus()).thenReturn(flowOf(listOf(NetP)))
-        whenever(connectionState.isConnected()).thenReturn(false)
-        whenever(networkProtectionState.getConnectionStateFlow()).thenReturn(flowOf(connectionState))
+    fun `when VPN connection state is disconnected then state shows VPN disabled`() =
+        runTest {
+            whenever(subscriptions.getSubscriptionStatusFlow()).thenReturn(flowOf(SubscriptionStatus.AUTO_RENEWABLE))
+            whenever(subscriptions.getEntitlementStatus()).thenReturn(flowOf(listOf(NetP)))
+            whenever(connectionState.isConnected()).thenReturn(false)
+            whenever(networkProtectionState.getConnectionStateFlow()).thenReturn(flowOf(connectionState))
 
-        testee.getVpnMenuState().test {
-            val state = awaitItem()
-            assertEquals(VpnMenuState.Subscribed(isVpnEnabled = false), state)
-            cancelAndIgnoreRemainingEvents()
+            testee.getVpnMenuState().test {
+                val state = awaitItem()
+                assertEquals(VpnMenuState.Subscribed(isVpnEnabled = false), state)
+                cancelAndIgnoreRemainingEvents()
+            }
         }
-    }
 
     @Test
-    fun `when subscription status is active with entitlements then state shows subscribed`() = runTest {
-        whenever(subscriptions.getSubscriptionStatusFlow()).thenReturn(flowOf(SubscriptionStatus.AUTO_RENEWABLE))
-        whenever(subscriptions.getEntitlementStatus()).thenReturn(flowOf(listOf(NetP)))
-        whenever(connectionState.isConnected()).thenReturn(true)
-        whenever(networkProtectionState.getConnectionStateFlow()).thenReturn(flowOf(connectionState))
+    fun `when subscription status is active with entitlements then state shows subscribed`() =
+        runTest {
+            whenever(subscriptions.getSubscriptionStatusFlow()).thenReturn(flowOf(SubscriptionStatus.AUTO_RENEWABLE))
+            whenever(subscriptions.getEntitlementStatus()).thenReturn(flowOf(listOf(NetP)))
+            whenever(connectionState.isConnected()).thenReturn(true)
+            whenever(networkProtectionState.getConnectionStateFlow()).thenReturn(flowOf(connectionState))
 
-        testee.getVpnMenuState().test {
-            val state = awaitItem()
-            assertEquals(VpnMenuState.Subscribed(isVpnEnabled = true), state)
-            cancelAndIgnoreRemainingEvents()
+            testee.getVpnMenuState().test {
+                val state = awaitItem()
+                assertEquals(VpnMenuState.Subscribed(isVpnEnabled = true), state)
+                cancelAndIgnoreRemainingEvents()
+            }
         }
-    }
 
     @Test
-    fun `when feature flag is disabled then return Hidden regardless of subscription status`() = runTest {
-        whenever(featureToggle.isEnabled()).thenReturn(false)
-        whenever(subscriptions.getSubscriptionStatusFlow()).thenReturn(flowOf(SubscriptionStatus.AUTO_RENEWABLE))
-        whenever(subscriptions.getEntitlementStatus()).thenReturn(flowOf(listOf(NetP)))
-        whenever(connectionState.isConnected()).thenReturn(true)
-        whenever(networkProtectionState.getConnectionStateFlow()).thenReturn(flowOf(connectionState))
+    fun `when feature flag is disabled then return Hidden regardless of subscription status`() =
+        runTest {
+            whenever(featureToggle.isEnabled()).thenReturn(false)
+            whenever(subscriptions.getSubscriptionStatusFlow()).thenReturn(flowOf(SubscriptionStatus.AUTO_RENEWABLE))
+            whenever(subscriptions.getEntitlementStatus()).thenReturn(flowOf(listOf(NetP)))
+            whenever(connectionState.isConnected()).thenReturn(true)
+            whenever(networkProtectionState.getConnectionStateFlow()).thenReturn(flowOf(connectionState))
 
-        testee.getVpnMenuState().test {
-            val state = awaitItem()
-            assertEquals(VpnMenuState.Hidden, state)
-            cancelAndIgnoreRemainingEvents()
+            testee.getVpnMenuState().test {
+                val state = awaitItem()
+                assertEquals(VpnMenuState.Hidden, state)
+                cancelAndIgnoreRemainingEvents()
+            }
         }
-    }
 
     @Test
-    fun `when feature flag is disabled and user not subscribed then return Hidden`() = runTest {
-        whenever(featureToggle.isEnabled()).thenReturn(false)
-        whenever(subscriptions.getSubscriptionStatusFlow()).thenReturn(flowOf(SubscriptionStatus.INACTIVE))
-        whenever(subscriptions.getEntitlementStatus()).thenReturn(flowOf(emptyList()))
-        whenever(connectionState.isConnected()).thenReturn(false)
-        whenever(networkProtectionState.getConnectionStateFlow()).thenReturn(flowOf(connectionState))
+    fun `when feature flag is disabled and user not subscribed then return Hidden`() =
+        runTest {
+            whenever(featureToggle.isEnabled()).thenReturn(false)
+            whenever(subscriptions.getSubscriptionStatusFlow()).thenReturn(flowOf(SubscriptionStatus.INACTIVE))
+            whenever(subscriptions.getEntitlementStatus()).thenReturn(flowOf(emptyList()))
+            whenever(connectionState.isConnected()).thenReturn(false)
+            whenever(networkProtectionState.getConnectionStateFlow()).thenReturn(flowOf(connectionState))
 
-        testee.getVpnMenuState().test {
-            val state = awaitItem()
-            assertEquals(VpnMenuState.Hidden, state)
-            cancelAndIgnoreRemainingEvents()
+            testee.getVpnMenuState().test {
+                val state = awaitItem()
+                assertEquals(VpnMenuState.Hidden, state)
+                cancelAndIgnoreRemainingEvents()
+            }
         }
-    }
 
     @Test
-    fun `when user not subscribed and frequency cap not reached then return NotSubscribed`() = runTest {
-        whenever(subscriptions.getSubscriptionStatusFlow()).thenReturn(flowOf(SubscriptionStatus.INACTIVE))
-        whenever(subscriptions.getEntitlementStatus()).thenReturn(flowOf(emptyList()))
-        whenever(connectionState.isConnected()).thenReturn(false)
-        whenever(networkProtectionState.getConnectionStateFlow()).thenReturn(flowOf(connectionState))
-        whenever(vpnMenuStore.canShowVpnMenuForNotSubscribed()).thenReturn(true)
+    fun `when user not subscribed and frequency cap not reached then return NotSubscribed`() =
+        runTest {
+            whenever(subscriptions.getSubscriptionStatusFlow()).thenReturn(flowOf(SubscriptionStatus.INACTIVE))
+            whenever(subscriptions.getEntitlementStatus()).thenReturn(flowOf(emptyList()))
+            whenever(connectionState.isConnected()).thenReturn(false)
+            whenever(networkProtectionState.getConnectionStateFlow()).thenReturn(flowOf(connectionState))
+            whenever(vpnMenuStore.canShowVpnMenuForNotSubscribed()).thenReturn(true)
 
-        testee.getVpnMenuState().test {
-            val state = awaitItem()
-            assertEquals(VpnMenuState.NotSubscribed, state)
-            cancelAndIgnoreRemainingEvents()
+            testee.getVpnMenuState().test {
+                val state = awaitItem()
+                assertEquals(VpnMenuState.NotSubscribed, state)
+                cancelAndIgnoreRemainingEvents()
+            }
         }
-    }
 
     @Test
-    fun `when user not subscribed and frequency cap reached then return Hidden`() = runTest {
-        whenever(subscriptions.getSubscriptionStatusFlow()).thenReturn(flowOf(SubscriptionStatus.INACTIVE))
-        whenever(subscriptions.getEntitlementStatus()).thenReturn(flowOf(emptyList()))
-        whenever(connectionState.isConnected()).thenReturn(false)
-        whenever(networkProtectionState.getConnectionStateFlow()).thenReturn(flowOf(connectionState))
-        whenever(vpnMenuStore.canShowVpnMenuForNotSubscribed()).thenReturn(false)
+    fun `when user not subscribed and frequency cap reached then return NotSubscribedNoPill`() =
+        runTest {
+            whenever(subscriptions.getSubscriptionStatusFlow()).thenReturn(flowOf(SubscriptionStatus.INACTIVE))
+            whenever(subscriptions.getEntitlementStatus()).thenReturn(flowOf(emptyList()))
+            whenever(connectionState.isConnected()).thenReturn(false)
+            whenever(networkProtectionState.getConnectionStateFlow()).thenReturn(flowOf(connectionState))
+            whenever(vpnMenuStore.canShowVpnMenuForNotSubscribed()).thenReturn(false)
 
-        testee.getVpnMenuState().test {
-            val state = awaitItem()
-            assertEquals(VpnMenuState.Hidden, state)
-            cancelAndIgnoreRemainingEvents()
+            testee.getVpnMenuState().test {
+                val state = awaitItem()
+                assertEquals(VpnMenuState.NotSubscribedNoPill, state)
+                cancelAndIgnoreRemainingEvents()
+            }
         }
-    }
 }
