@@ -39,7 +39,6 @@ class VpnMenuStateProviderImpl @Inject constructor(
     private val androidBrowserConfigFeature: AndroidBrowserConfigFeature,
     private val vpnMenuStore: VpnMenuStore,
 ) : VpnMenuStateProvider {
-
     override fun getVpnMenuState(): Flow<VpnMenuState> {
         return combine(
             subscriptions.getSubscriptionStatusFlow(),
@@ -68,12 +67,11 @@ class VpnMenuStateProviderImpl @Inject constructor(
     }
 }
 
-private fun SubscriptionStatus.isActive(): Boolean {
-    return when (this) {
+private fun SubscriptionStatus.isActive(): Boolean =
+    when (this) {
         SubscriptionStatus.AUTO_RENEWABLE,
         SubscriptionStatus.NOT_AUTO_RENEWABLE,
         SubscriptionStatus.GRACE_PERIOD,
         -> true
         else -> false
     }
-}
