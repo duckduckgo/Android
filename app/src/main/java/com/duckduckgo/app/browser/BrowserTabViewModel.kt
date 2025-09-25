@@ -4416,6 +4416,9 @@ class BrowserTabViewModel @Inject constructor(
             VpnMenuState.NotSubscribed -> {
                 command.value = LaunchPrivacyPro("https://duckduckgo.com/pro?origin=funnel_appmenu_android".toUri())
             }
+            VpnMenuState.NotSubscribedNoPill -> {
+                command.value = LaunchPrivacyPro("https://duckduckgo.com/pro?origin=funnel_appmenu_android".toUri())
+            }
             is VpnMenuState.Subscribed -> {
                 command.value = LaunchVpnManagement
             }

@@ -66,6 +66,7 @@ data class BrowserViewState(
 sealed class VpnMenuState {
     data object Hidden : VpnMenuState()
     data object NotSubscribed : VpnMenuState()
+    data object NotSubscribedNoPill : VpnMenuState()
     data class Subscribed(val isVpnEnabled: Boolean) : VpnMenuState()
 }
 
