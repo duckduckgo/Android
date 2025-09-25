@@ -68,7 +68,7 @@ import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnRunningState
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnState
 import com.duckduckgo.mobile.android.vpn.ui.AppBreakageCategory
 import com.duckduckgo.mobile.android.vpn.ui.alwayson.AlwaysOnAlertDialogFragment
-import com.duckduckgo.mobile.android.vpn.ui.report.DeviceShieldAppTrackersInfo
+import com.duckduckgo.mobile.android.vpn.ui.privacyreport.DeviceShieldAppTrackersInfo
 import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.DeviceShieldTrackerActivityViewModel.ViewEvent
 import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.DeviceShieldTrackerActivityViewModel.ViewEvent.StartVpn
 import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.view.DisableVpnDialogOptions
@@ -76,9 +76,6 @@ import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.view.message.AppTPS
 import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.view.message.AppTPStateMessagePlugin.DefaultAppTPMessageAction
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.google.android.material.snackbar.Snackbar
-import java.util.concurrent.TimeUnit
-import javax.inject.Inject
-import javax.inject.Provider
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.flow.combine
@@ -88,13 +85,15 @@ import kotlinx.coroutines.launch
 import logcat.logcat
 import nl.dionsegijn.konfetti.models.Shape
 import nl.dionsegijn.konfetti.models.Size
+import java.util.concurrent.TimeUnit
+import javax.inject.Inject
+import javax.inject.Provider
 
 @InjectWith(ActivityScope::class)
 @ContributeToActivityStarter(AppTrackerActivityWithEmptyParams::class, screenName = "apptp.main")
 class DeviceShieldTrackerActivity :
     DuckDuckGoActivity(),
     DeviceShieldActivityFeedFragment.DeviceShieldActivityFeedListener {
-
     @Inject
     lateinit var deviceShieldPixels: DeviceShieldPixels
 
@@ -125,20 +124,22 @@ class DeviceShieldTrackerActivity :
     // we might get an update before options menu has been populated; temporarily cache value to use when menu populated
     private var vpnCachedState: VpnState? = null
 
-    private val feedConfig = DeviceShieldActivityFeedFragment.ActivityFeedConfig(
-        maxRows = MIN_ROWS_FOR_ALL_ACTIVITY,
-        timeWindow = 7,
-        timeWindowUnits = TimeUnit.DAYS,
-        showTimeWindowHeadings = false,
-    )
+    private val feedConfig =
+        DeviceShieldActivityFeedFragment.ActivityFeedConfig(
+            maxRows = MIN_ROWS_FOR_ALL_ACTIVITY,
+            timeWindow = 7,
+            timeWindowUnits = TimeUnit.DAYS,
+            showTimeWindowHeadings = false,
+        )
 
     private val viewModel: DeviceShieldTrackerActivityViewModel by bindViewModel()
 
     private lateinit var reportBreakage: ActivityResultLauncher<ReportBreakageScreen>
 
-    private val enableAppTPSwitchListener = CompoundButton.OnCheckedChangeListener { _, isChecked ->
-        viewModel.onAppTPToggleSwitched(isChecked)
-    }
+    private val enableAppTPSwitchListener =
+        CompoundButton.OnCheckedChangeListener { _, isChecked ->
+            viewModel.onAppTPToggleSwitched(isChecked)
+        }
 
     private val onInfoMessageClick = fun(action: DefaultAppTPMessageAction) {
         when (action) {
@@ -153,11 +154,12 @@ class DeviceShieldTrackerActivity :
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        reportBreakage = registerForActivityResult(reportBreakageContract.get()) {
-            if (!it.isEmpty()) {
-                Snackbar.make(binding.root, R.string.atp_ReportBreakageSent, Snackbar.LENGTH_LONG).show()
+        reportBreakage =
+            registerForActivityResult(reportBreakageContract.get()) {
+                if (!it.isEmpty()) {
+                    Snackbar.make(binding.root, R.string.atp_ReportBreakageSent, Snackbar.LENGTH_LONG).show()
+                }
             }
-        }
 
         setContentView(binding.root)
         setupToolbar(binding.includeToolbar.trackersToolbar)
@@ -231,31 +233,31 @@ class DeviceShieldTrackerActivity :
     }
 
     private fun showDeviceShieldActivity() {
-        supportFragmentManager.beginTransaction()
+        supportFragmentManager
+            .beginTransaction()
             .replace(
                 R.id.activity_list,
                 DeviceShieldActivityFeedFragment.newInstance(feedConfig),
-            )
-            .commitNow()
+            ).commitNow()
     }
 
     @OptIn(FlowPreview::class)
     private fun observeViewModel() {
         lifecycleScope.launch {
-            viewModel.getBlockedTrackersCount()
+            viewModel
+                .getBlockedTrackersCount()
                 .combine(viewModel.getTrackingAppsCount()) { trackers, apps ->
                     DeviceShieldTrackerActivityViewModel.TrackerCountInfo(trackers, apps)
-                }
-                .combine(viewModel.getRunningState()) { trackerCountInfo, runningState ->
+                }.combine(viewModel.getRunningState()) { trackerCountInfo, runningState ->
                     DeviceShieldTrackerActivityViewModel.TrackerActivityViewState(trackerCountInfo, runningState)
-                }
-                .flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
+                }.flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
                 .collect { renderViewState(it) }
         }
 
         lifecycleScope.launch {
             // This is a one-shot check as soon as the screen is shown
-            viewModel.getRunningState()
+            viewModel
+                .getRunningState()
                 .map { it.alwaysOnState }
                 .debounce(500) // give a bit of time so that pop doesn't just suddenly pops up
                 .take(1)
@@ -266,7 +268,8 @@ class DeviceShieldTrackerActivity :
                 }
         }
 
-        viewModel.commands()
+        viewModel
+            .commands()
             .flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
             .onEach { processCommand(it) }
             .launchIn(lifecycleScope)
@@ -348,8 +351,7 @@ class DeviceShieldTrackerActivity :
                         }
                     }
                 },
-            )
-            .show()
+            ).show()
     }
 
     private fun launchRemoveFeatureConfirmationDialog() {
@@ -370,8 +372,7 @@ class DeviceShieldTrackerActivity :
                         deviceShieldPixels.didChooseToCancelRemoveTrakcingProtectionDialog()
                     }
                 },
-            )
-            .show()
+            ).show()
     }
 
     private fun showVpnConflictDialog() {
@@ -392,8 +393,7 @@ class DeviceShieldTrackerActivity :
                         onVpnConflictDialogDismiss()
                     }
                 },
-            )
-            .show()
+            ).show()
     }
 
     private fun showAlwaysOnConflictDialog() {
@@ -413,42 +413,43 @@ class DeviceShieldTrackerActivity :
                         onVpnConflictDialogDismiss()
                     }
                 },
-            )
-            .show()
+            ).show()
     }
 
     private fun launchAlwaysOnPromotionDialog() {
         val dialog = supportFragmentManager.findFragmentByTag(TAG_APPTP_PROMOTE_ALWAYS_ON_DIALOG) as? AlwaysOnAlertDialogFragment
         dialog?.dismiss()
 
-        AlwaysOnAlertDialogFragment.newAlwaysOnDialog(
-            object : AlwaysOnAlertDialogFragment.Listener {
-                override fun onGoToSettingsClicked() {
-                    viewModel.onViewEvent(ViewEvent.PromoteAlwaysOnOpenSettings)
-                }
+        AlwaysOnAlertDialogFragment
+            .newAlwaysOnDialog(
+                object : AlwaysOnAlertDialogFragment.Listener {
+                    override fun onGoToSettingsClicked() {
+                        viewModel.onViewEvent(ViewEvent.PromoteAlwaysOnOpenSettings)
+                    }
 
-                override fun onCanceled() {
-                    viewModel.onViewEvent(ViewEvent.PromoteAlwaysOnCancelled)
-                }
-            },
-        ).show(supportFragmentManager, TAG_APPTP_PROMOTE_ALWAYS_ON_DIALOG)
+                    override fun onCanceled() {
+                        viewModel.onViewEvent(ViewEvent.PromoteAlwaysOnCancelled)
+                    }
+                },
+            ).show(supportFragmentManager, TAG_APPTP_PROMOTE_ALWAYS_ON_DIALOG)
     }
 
     private fun launchAlwaysOnLockdownEnabledDialog() {
         val dialog = supportFragmentManager.findFragmentByTag(TAG_APPTP_PROMOTE_ALWAYS_ON_DIALOG) as? AlwaysOnAlertDialogFragment
         dialog?.dismiss()
 
-        AlwaysOnAlertDialogFragment.newAlwaysOnLockdownDialog(
-            object : AlwaysOnAlertDialogFragment.Listener {
-                override fun onGoToSettingsClicked() {
-                    viewModel.onViewEvent(ViewEvent.PromoteAlwaysOnOpenSettings)
-                }
+        AlwaysOnAlertDialogFragment
+            .newAlwaysOnLockdownDialog(
+                object : AlwaysOnAlertDialogFragment.Listener {
+                    override fun onGoToSettingsClicked() {
+                        viewModel.onViewEvent(ViewEvent.PromoteAlwaysOnOpenSettings)
+                    }
 
-                override fun onCanceled() {
-                    viewModel.onViewEvent(ViewEvent.PromoteAlwaysOnCancelled)
-                }
-            },
-        ).show(supportFragmentManager, TAG_APPTP_PROMOTE_ALWAYS_ON_DIALOG)
+                    override fun onCanceled() {
+                        viewModel.onViewEvent(ViewEvent.PromoteAlwaysOnCancelled)
+                    }
+                },
+            ).show(supportFragmentManager, TAG_APPTP_PROMOTE_ALWAYS_ON_DIALOG)
     }
 
     fun onOpenAppProtection() {
@@ -562,18 +563,20 @@ class DeviceShieldTrackerActivity :
     private suspend fun updateRunningState(runningState: VpnState) {
         if (!binding.deviceShieldTrackerNotifyMe.isVisible) {
             var newActivePlugin: ActivePlugin? = null
-            appTPStateMessagePluginPoint.getPlugins().firstNotNullOfOrNull {
-                it.getView(this, runningState, onInfoMessageClick)?.apply {
-                    newActivePlugin = it
-                }
-            }?.let {
-                if (currenActivePlugin == null || newActivePlugin != currenActivePlugin) {
-                    currenActivePlugin = newActivePlugin
-                    binding.deviceShieldTrackerMessageContainer.show()
-                    binding.deviceShieldTrackerMessageContainer.removeAllViews()
-                    binding.deviceShieldTrackerMessageContainer.addView(it)
-                }
-            } ?: {
+            appTPStateMessagePluginPoint
+                .getPlugins()
+                .firstNotNullOfOrNull {
+                    it.getView(this, runningState, onInfoMessageClick)?.apply {
+                        newActivePlugin = it
+                    }
+                }?.let {
+                    if (currenActivePlugin == null || newActivePlugin != currenActivePlugin) {
+                        currenActivePlugin = newActivePlugin
+                        binding.deviceShieldTrackerMessageContainer.show()
+                        binding.deviceShieldTrackerMessageContainer.removeAllViews()
+                        binding.deviceShieldTrackerMessageContainer.addView(it)
+                    }
+                } ?: {
                 currenActivePlugin = null
                 binding.deviceShieldTrackerMessageContainer.gone()
             }
@@ -626,7 +629,10 @@ class DeviceShieldTrackerActivity :
 
     private sealed class VpnPermissionStatus {
         data object Granted : VpnPermissionStatus()
-        data class Denied(val intent: Intent) : VpnPermissionStatus()
+
+        data class Denied(
+            val intent: Intent,
+        ) : VpnPermissionStatus()
     }
 
     private fun showAppTpEnabledCta() {
@@ -634,11 +640,12 @@ class DeviceShieldTrackerActivity :
             return
         }
 
-        val dialog = TypewriterDaxDialog.newInstance(
-            daxText = getString(R.string.atp_ActivityAppTpEnabledCtaText),
-            primaryButtonText = getString(R.string.atp_ActivityAppTpEnabledCtaButtonLabel),
-            hideButtonText = "",
-        )
+        val dialog =
+            TypewriterDaxDialog.newInstance(
+                daxText = getString(R.string.atp_ActivityAppTpEnabledCtaText),
+                primaryButtonText = getString(R.string.atp_ActivityAppTpEnabledCtaButtonLabel),
+                hideButtonText = "",
+            )
 
         dialog.setDaxDialogListener(
             object : DaxDialogListener {
@@ -674,7 +681,8 @@ class DeviceShieldTrackerActivity :
 
         val displayWidth = resources.displayMetrics.widthPixels
 
-        binding.appTpEnabledKonfetti.build()
+        binding.appTpEnabledKonfetti
+            .build()
             .addColors(magenta, blue, purple, green, yellow)
             .setDirection(0.0, 359.0)
             .setSpeed(4f, 9f)
@@ -699,10 +707,9 @@ class DeviceShieldTrackerActivity :
         internal fun intent(
             context: Context,
             onLaunchCallback: ResultReceiver? = null,
-        ): Intent {
-            return Intent(context, DeviceShieldTrackerActivity::class.java).apply {
+        ): Intent =
+            Intent(context, DeviceShieldTrackerActivity::class.java).apply {
                 putExtra(RESULT_RECEIVER_EXTRA, onLaunchCallback)
             }
-        }
     }
 }
