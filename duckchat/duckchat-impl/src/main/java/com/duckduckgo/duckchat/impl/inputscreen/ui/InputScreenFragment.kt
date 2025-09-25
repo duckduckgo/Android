@@ -22,9 +22,11 @@ import android.content.Intent
 import android.os.Bundle
 import android.util.TypedValue
 import android.view.Gravity
+import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
+import android.view.ViewGroup
 import androidx.activity.OnBackPressedCallback
 import androidx.core.view.isVisible
 import androidx.lifecycle.ViewModelProvider
@@ -44,6 +46,7 @@ import com.duckduckgo.duckchat.api.inputscreen.InputScreenActivityResultCodes
 import com.duckduckgo.duckchat.api.inputscreen.InputScreenActivityResultParams
 import com.duckduckgo.duckchat.impl.R
 import com.duckduckgo.duckchat.impl.databinding.FragmentInputScreenBinding
+import com.duckduckgo.duckchat.impl.databinding.FragmentInputScreenButtonsTopBinding
 import com.duckduckgo.duckchat.impl.inputscreen.ui.command.Command
 import com.duckduckgo.duckchat.impl.inputscreen.ui.command.Command.AnimateLogoToProgress
 import com.duckduckgo.duckchat.impl.inputscreen.ui.command.Command.EditWithSelectedQuery
@@ -136,6 +139,28 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
 
     private lateinit var pagerAdapter: InputScreenPagerAdapter
     private var logoAnimator: ValueAnimator? = null
+
+    private var topBinding: FragmentInputScreenButtonsTopBinding? = null
+    private var inputFieldBinding: FragmentInputScreenBinding? = null
+
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?,
+    ): View? {
+        val params = requireActivity().intent.getActivityParams(InputScreenActivityParams::class.java)
+        val rootView = params?.showButtonsOnTop?.let { bindToTop ->
+            if (bindToTop) {
+                topBinding = FragmentInputScreenButtonsTopBinding.inflate(inflater, container, false)
+                return topBinding?.root
+            } else {
+                inputFieldBinding = FragmentInputScreenBinding.inflate(inflater, container, false)
+                return inputFieldBinding?.root
+            }
+        }
+
+        return rootView
+    }
 
     override fun onViewCreated(
         view: View,

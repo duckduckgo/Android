@@ -198,7 +198,7 @@
                 android:id="@+id/userEnabledButtonsInputScreen"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:primaryText="Show 3 buttons next to input field"
+                app:primaryText="Show 3 buttons on top of input field"
                 app:showSwitch="true"/>
 
             <com.duckduckgo.common.ui.view.listitem.TwoLineListItem

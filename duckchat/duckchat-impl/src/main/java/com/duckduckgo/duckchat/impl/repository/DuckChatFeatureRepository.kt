@@ -31,16 +31,19 @@ interface DuckChatFeatureRepository {
     suspend fun setInputScreenUserSetting(enabled: Boolean)
     suspend fun setShowInBrowserMenu(showDuckChat: Boolean)
     suspend fun setShowInAddressBar(showDuckChat: Boolean)
+    suspend fun setShowButtonsOnTop(showOnTop: Boolean)
 
     fun observeDuckChatUserEnabled(): Flow<Boolean>
     fun observeInputScreenUserSettingEnabled(): Flow<Boolean>
     fun observeShowInBrowserMenu(): Flow<Boolean>
     fun observeShowInAddressBar(): Flow<Boolean>
+    fun observeShowButtonsOnTop(): Flow<Boolean>
 
     suspend fun isDuckChatUserEnabled(): Boolean
     suspend fun isInputScreenUserSettingEnabled(): Boolean
     suspend fun shouldShowInBrowserMenu(): Boolean
     suspend fun shouldShowInAddressBar(): Boolean
+    suspend fun shouldShowButtonsOnTop(): Boolean
 
     suspend fun registerOpened()
     suspend fun wasOpenedBefore(): Boolean
@@ -70,6 +73,10 @@ class RealDuckChatFeatureRepository @Inject constructor(
         duckChatDataStore.setShowInAddressBar(showDuckChat)
     }
 
+    override suspend fun setShowButtonsOnTop(showOnTop: Boolean) {
+        duckChatDataStore.setShowButtonsOnTop(showOnTop)
+    }
+
     override fun observeDuckChatUserEnabled(): Flow<Boolean> {
         return duckChatDataStore.observeDuckChatUserEnabled()
     }
@@ -86,6 +93,10 @@ class RealDuckChatFeatureRepository @Inject constructor(
         return duckChatDataStore.observeShowInAddressBar()
     }
 
+    override fun observeShowButtonsOnTop(): Flow<Boolean> {
+        return duckChatDataStore.observeShowButtonsOnTop()
+    }
+
     override suspend fun isDuckChatUserEnabled(): Boolean {
         return duckChatDataStore.isDuckChatUserEnabled()
     }
@@ -100,6 +111,10 @@ class RealDuckChatFeatureRepository @Inject constructor(
 
     override suspend fun shouldShowInAddressBar(): Boolean {
         return duckChatDataStore.getShowInAddressBar()
+    }
+
+    override suspend fun shouldShowButtonsOnTop(): Boolean {
+        return duckChatDataStore.getShowButtonsOnTop()
     }
 
     override suspend fun registerOpened() {

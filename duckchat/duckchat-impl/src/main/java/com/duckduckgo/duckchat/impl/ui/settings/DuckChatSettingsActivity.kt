@@ -66,11 +66,6 @@ class DuckChatSettingsActivity : DuckDuckGoActivity() {
             updateWidgets()
         }
 
-    private val userEnabled3ButtonsInputFieldToggleListener =
-        CompoundButton.OnCheckedChangeListener { _, isChecked ->
-            viewModel.onDuckChatUserEnabledToggled(isChecked)
-        }
-
     @Inject
     lateinit var globalActivityStarter: GlobalActivityStarter
 
