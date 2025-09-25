@@ -40,6 +40,10 @@ data object InputScreenActivityResultCodes {
 
     /** User requested to switch to an existing tab */
     const val SWITCH_TO_TAB_REQUESTED = 2
+
+    const val FIRE_BUTTON_REQUESTED = 3
+    const val TAB_SWITCHER_REQUESTED = 4
+    const val MENU_REQUESTED = 5
 }
 
 /**

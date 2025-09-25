@@ -27,4 +27,7 @@ sealed class Command {
     data class SetInputModeWidgetScrollPosition(val position: Int, val offset: Float) : Command()
     data class SetLogoProgress(val targetProgress: Float) : Command()
     data class AnimateLogoToProgress(val targetProgress: Float) : Command()
+    data object FireButtonRequested : Command()
+    data object TabSwitcherRequested : Command()
+    data object MenuRequested : Command()
 }

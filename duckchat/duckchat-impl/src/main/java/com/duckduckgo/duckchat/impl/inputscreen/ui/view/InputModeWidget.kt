@@ -71,6 +71,9 @@ class InputModeWidget @JvmOverloads constructor(
     private val inputModeSwitch: TabLayout
     private val inputModeWidgetCard: MaterialCardView
     private val inputScreenButtonsContainer: FrameLayout
+    private val tabSwitcherButton: InputScreenTabSwitcherButton
+    private val menuButton: View
+    private val fireButton: View
 
     var onBack: (() -> Unit)? = null
     var onSearchSent: ((String) -> Unit)? = null
@@ -88,6 +91,9 @@ class InputModeWidget @JvmOverloads constructor(
     var onInputFieldClicked: (() -> Unit)? = null
 
     var onTabTapped: ((index: Int) -> Unit)? = null
+    var onFireButtonTapped: (() -> Unit)? = null
+    var onTabSwitcherTapped: (() -> Unit)? = null
+    var onMenuTapped: (() -> Unit)? = null
 
     var text: String
         get() = inputField.text.toString()
@@ -120,6 +126,9 @@ class InputModeWidget @JvmOverloads constructor(
         inputModeWidgetBack = findViewById(R.id.InputModeWidgetBack)
         inputModeSwitch = findViewById(R.id.inputModeSwitch)
         inputModeWidgetCard = findViewById(R.id.inputModeWidgetCard)
+        menuButton = findViewById(R.id.inputFieldBrowserMenu)
+        fireButton = findViewById(R.id.inputFieldFireButton)
+        tabSwitcherButton = findViewById(R.id.inputFieldTabsMenu)
         inputScreenButtonsContainer = findViewById(R.id.inputScreenButtonsContainer)
 
         configureClickListeners()
@@ -160,6 +169,15 @@ class InputModeWidget @JvmOverloads constructor(
         }
         inputField.setOnClickListener {
             onInputFieldClicked?.invoke()
+        }
+        menuButton.setOnClickListener {
+            onMenuTapped?.invoke()
+        }
+        tabSwitcherButton.setOnClickListener {
+            onTabSwitcherTapped?.invoke()
+        }
+        fireButton.setOnClickListener {
+            onFireButtonTapped?.invoke()
         }
         addTabClickListeners()
     }

@@ -609,6 +609,18 @@ class InputScreenViewModel @AssistedInject constructor(
             else -> "very_long"
         }
 
+    fun onTabSwitcherTapped() {
+        command.value = Command.TabSwitcherRequested
+    }
+
+    fun onFireButtonTapped() {
+        command.value = Command.FireButtonRequested
+    }
+
+    fun onBrowserMenuTapped() {
+        command.value = Command.MenuRequested
+    }
+
     class InputScreenViewModelProviderFactory(
         private val assistedFactory: InputScreenViewModelFactory,
         private val currentOmnibarText: String,
