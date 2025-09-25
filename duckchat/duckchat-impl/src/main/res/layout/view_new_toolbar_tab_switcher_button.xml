@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Copyright (c) 2025 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/tabsButton"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/selectable_item_experimental_background"
+    tools:layout_height="@dimen/toolbarIcon"
+    tools:layout_width="@dimen/toolbarIcon">
+
+    <ImageView
+        android:id="@+id/tabsImageView"
+        android:layout_width="@dimen/bottomNavIcon"
+        android:layout_height="@dimen/bottomNavIcon"
+        android:layout_gravity="center"
+        android:scaleType="center"
+        android:src="@drawable/ic_tab_24" />
+
+    <!--
+         Below TextViews aren't a DaxTextView, special case for the Tabs icon.
+         They also uses DP instead of SP, because the background icon can't resize to accommodate
+         different font sizes.
+         The "∞" character is separated into its own view because the horizontal center-line
+         of that character is at a different height than numbers' horizontal center-line.
+    -->
+
+    <TextView
+        android:id="@+id/tabCount"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="7.5dp"
+        android:fontFamily="sans-serif-condensed"
+        android:gravity="center"
+        android:textColor="?attr/daxColorPrimaryIcon"
+        android:textSize="12dp"
+        android:textStyle="bold"
+        tools:ignore="DeprecatedWidgetInXml,SpUsage"
+        tools:text="99" />
+
+    <TextView
+        android:id="@+id/tabCountInfinite"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="6.5dp"
+        android:fontFamily="sans-serif-condensed"
+        android:gravity="center"
+        android:text="∞"
+        android:textColor="?attr/daxColorPrimaryIcon"
+        android:textSize="13dp"
+        android:textStyle="bold"
+        android:visibility="gone"
+        tools:ignore="DeprecatedWidgetInXml,HardcodedText,SpUsage" />
+
+</FrameLayout>
