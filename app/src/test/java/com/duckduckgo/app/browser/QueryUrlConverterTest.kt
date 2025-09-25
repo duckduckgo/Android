@@ -38,20 +38,20 @@ import org.mockito.kotlin.whenever
 @RunWith(AndroidJUnit4::class)
 @SuppressLint("DenyListedApi") // fake toggle store
 class QueryUrlConverterTest {
-
     private var mockStatisticsStore: StatisticsDataStore = mock()
     private val variantManager: VariantManager = mock()
     private val mockAppReferrerDataStore: AppReferrerDataStore = mock()
     private val duckChat: DuckChat = mock()
     private val androidBrowserConfigFeature: AndroidBrowserConfigFeature = FakeFeatureToggleFactory.create(AndroidBrowserConfigFeature::class.java)
-    private val requestRewriter = DuckDuckGoRequestRewriter(
-        DuckDuckGoUrlDetectorImpl(),
-        mockStatisticsStore,
-        variantManager,
-        mockAppReferrerDataStore,
-        duckChat,
-        androidBrowserConfigFeature,
-    )
+    private val requestRewriter =
+        DuckDuckGoRequestRewriter(
+            DuckDuckGoUrlDetectorImpl(),
+            mockStatisticsStore,
+            variantManager,
+            mockAppReferrerDataStore,
+            duckChat,
+            androidBrowserConfigFeature,
+        )
     private val testee: QueryUrlConverter = QueryUrlConverter(requestRewriter)
 
     @Before
@@ -173,6 +173,41 @@ class QueryUrlConverterTest {
     }
 
     @Test
+    fun whenQueryContainsMultipleUrlsThenFirstUrlStartingWithHttpIsExtracted() {
+        val input = "Source: MTBS.cz  https://search.app/3Uq79"
+        val result = testee.convertQueryToUrl(input, queryOrigin = QueryOrigin.FromUser, extractUrlFromQuery = true)
+        assertEquals("https://search.app/3Uq79", result)
+    }
+
+    @Test
+    fun whenQueryContainsSingleUrlAndApostropheThenUrlIsExtracted() {
+        val input = "Source: Tom's Guide https://search.app/ddbWi"
+        val result = testee.convertQueryToUrl(input, queryOrigin = QueryOrigin.FromUser, extractUrlFromQuery = true)
+        assertEquals("https://search.app/ddbWi", result)
+    }
+
+    @Test
+    fun whenQueryContainsSingleUrlAndDoubleQuotesThenUrlIsExtracted() {
+        val input =
+            """
+            Source: "Guide" https://search.app/ddbWi
+            """.trimIndent()
+        val result = testee.convertQueryToUrl(input, queryOrigin = QueryOrigin.FromUser, extractUrlFromQuery = true)
+        assertEquals("https://search.app/ddbWi", result)
+    }
+
+    @Test
+    fun whenQueryContainsSingleUrlAndNewLineThenUrlIsExtracted() {
+        val input =
+            """
+            Source:
+            Tom Guide https://search.app/ddbWi
+            """.trimIndent()
+        val result = testee.convertQueryToUrl(input, queryOrigin = QueryOrigin.FromUser, extractUrlFromQuery = true)
+        assertEquals("https://search.app/ddbWi", result)
+    }
+
+    @Test
     fun whenQueryContainsSingleUrlWithNoSchemeThenUrlIsExtractedAndSchemeAdded() {
         val input = "pre text duckduckgo.com post text"
         val result = testee.convertQueryToUrl(input, queryOrigin = QueryOrigin.FromUser, extractUrlFromQuery = true)
@@ -194,6 +229,7 @@ class QueryUrlConverterTest {
         val result = testee.convertQueryToUrl(input, queryOrigin = QueryOrigin.FromUser, extractUrlFromQuery = false)
         assertDuckDuckGoSearchQuery(expected, result)
     }
+
     private fun assertDuckDuckGoSearchQuery(
         query: String,
         url: String,
