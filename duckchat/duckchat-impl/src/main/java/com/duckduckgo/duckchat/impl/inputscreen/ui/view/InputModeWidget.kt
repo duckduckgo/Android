@@ -38,6 +38,7 @@ import android.widget.EditText
 import android.widget.FrameLayout
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.isNotEmpty
+import androidx.core.content.withStyledAttributes
 import androidx.core.view.isVisible
 import androidx.core.view.updateLayoutParams
 import androidx.core.widget.doAfterTextChanged
@@ -121,7 +122,20 @@ class InputModeWidget @JvmOverloads constructor(
 
     init {
 
-        LayoutInflater.from(context).inflate(R.layout.view_input_mode_switch_widget_hp, this, true)
+        var localLayoutType = R.layout.view_input_mode_switch_widget_input_field
+
+        attrs?.let {
+            context.withStyledAttributes(it, R.styleable.InputModeWidget, 0, 0) {
+                val layoutTypeInt = getInt(R.styleable.InputModeWidget_layout_type, 0)
+                localLayoutType = when (layoutTypeInt) {
+                    0 -> R.layout.view_input_mode_switch_widget_input_field
+                    // else -> R.layout.view_input_mode_switch_widget_top // Create this layout file
+                    else -> R.layout.view_input_mode_switch_widget_hp // Create this layout file
+                }
+            }
+        }
+
+        LayoutInflater.from(context).inflate(localLayoutType, this, true)
 
         inputField = findViewById(R.id.inputField)
         inputFieldClearText = findViewById(R.id.inputFieldClearText)
