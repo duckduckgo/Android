@@ -14,8 +14,21 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.duckchat.impl.inputscreen.autocomplete
+package com.duckduckgo.duckchat.impl.inputscreen.ui.view
 
-enum class OmnibarPosition {
-    TOP, BOTTOM
+import android.graphics.Rect
+import android.view.View
+import androidx.recyclerview.widget.RecyclerView
+
+class RecyclerBottomSpacingDecoration(private val bottomSpace: Int) : RecyclerView.ItemDecoration() {
+    override fun getItemOffsets(
+        outRect: Rect,
+        view: View,
+        parent: RecyclerView,
+        state: RecyclerView.State
+    ) {
+        if (parent.getChildAdapterPosition(view) == state.itemCount - 1) {
+            outRect.bottom = bottomSpace
+        }
+    }
 }

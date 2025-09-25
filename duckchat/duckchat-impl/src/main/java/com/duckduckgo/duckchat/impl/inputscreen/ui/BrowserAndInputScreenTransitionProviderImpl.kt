@@ -47,14 +47,23 @@ import javax.inject.Inject
 @ContributesBinding(scope = AppScope::class)
 class BrowserAndInputScreenTransitionProviderImpl @Inject constructor(
     private val appTheme: AppTheme,
+    private val inputScreenConfigResolver: InputScreenConfigResolver,
 ) : BrowserAndInputScreenTransitionProvider {
 
     override fun getBrowserEnterAnimation(): Int {
         return if (VERSION.SDK_INT >= 33) {
             if (appTheme.isLightModeEnabled()) {
-                R.anim.slide_in_from_bottom_fade_in_light
+                if (inputScreenConfigResolver.useTopBar()) {
+                    R.anim.slide_in_from_bottom_fade_in_light
+                } else {
+                    R.anim.fade_in_light
+                }
             } else {
-                R.anim.slide_in_from_bottom_fade_in_dark
+                if (inputScreenConfigResolver.useTopBar()) {
+                    R.anim.slide_in_from_bottom_fade_in_dark
+                } else {
+                    R.anim.fade_in_dark
+                }
             }
         } else {
             R.anim.fade_in
@@ -64,9 +73,17 @@ class BrowserAndInputScreenTransitionProviderImpl @Inject constructor(
     override fun getBrowserExitAnimation(): Int {
         return if (VERSION.SDK_INT >= 33) {
             if (appTheme.isLightModeEnabled()) {
-                R.anim.slide_out_to_bottom_fade_out_light
+                if (inputScreenConfigResolver.useTopBar()) {
+                    R.anim.slide_out_to_bottom_fade_out_light
+                } else {
+                    R.anim.fade_out_light
+                }
             } else {
-                R.anim.slide_out_to_bottom_fade_out_dark
+                if (inputScreenConfigResolver.useTopBar()) {
+                    R.anim.slide_out_to_bottom_fade_out_dark
+                } else {
+                    R.anim.fade_out_dark
+                }
             }
         } else {
             R.anim.fade_out
@@ -74,7 +91,7 @@ class BrowserAndInputScreenTransitionProviderImpl @Inject constructor(
     }
 
     override fun getInputScreenEnterAnimation(): Int {
-        return if (VERSION.SDK_INT >= 33) {
+        return if (VERSION.SDK_INT >= 33 && inputScreenConfigResolver.useTopBar()) {
             R.anim.slide_in_from_top_fade_in
         } else {
             R.anim.fade_in
@@ -82,7 +99,7 @@ class BrowserAndInputScreenTransitionProviderImpl @Inject constructor(
     }
 
     override fun getInputScreenExitAnimation(): Int {
-        return if (VERSION.SDK_INT >= 33) {
+        return if (VERSION.SDK_INT >= 33 && inputScreenConfigResolver.useTopBar()) {
             R.anim.slide_out_to_top_fade_out
         } else {
             R.anim.fade_out

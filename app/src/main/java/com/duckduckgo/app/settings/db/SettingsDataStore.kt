@@ -19,7 +19,7 @@ package com.duckduckgo.app.settings.db
 import android.content.Context
 import android.content.SharedPreferences
 import androidx.core.content.edit
-import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition
+import com.duckduckgo.browser.api.omnibar.model.OmnibarPosition
 import com.duckduckgo.app.fire.fireproofwebsite.ui.AutomaticFireproofSetting
 import com.duckduckgo.app.fire.fireproofwebsite.ui.AutomaticFireproofSetting.ASK_EVERY_TIME
 import com.duckduckgo.app.fire.fireproofwebsite.ui.AutomaticFireproofSetting.NEVER
@@ -29,12 +29,13 @@ import com.duckduckgo.app.settings.clear.ClearWhenOption
 import com.duckduckgo.app.settings.clear.FireAnimation
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.browser.api.autocomplete.AutoCompleteSettings
+import com.duckduckgo.browser.api.omnibar.settings.OmnibarSettings
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
 import javax.inject.Inject
 
-interface SettingsDataStore {
+interface SettingsDataStore : OmnibarSettings {
 
     var lastExecutedJobId: String?
 
@@ -67,7 +68,6 @@ interface SettingsDataStore {
     var appLinksEnabled: Boolean
     var showAppLinksPrompt: Boolean
     var showAutomaticFireproofDialog: Boolean
-    var omnibarPosition: OmnibarPosition
 
     /**
      * This will be checked upon app startup and used to decide whether it should perform a clear or not.
@@ -100,6 +100,10 @@ interface SettingsDataStore {
 @ContributesBinding(
     scope = AppScope::class,
     boundType = AutoCompleteSettings::class,
+)
+@ContributesBinding(
+    scope = AppScope::class,
+    boundType = OmnibarSettings::class,
 )
 @SingleInstanceIn(AppScope::class)
 class SettingsSharedPreferences @Inject constructor(

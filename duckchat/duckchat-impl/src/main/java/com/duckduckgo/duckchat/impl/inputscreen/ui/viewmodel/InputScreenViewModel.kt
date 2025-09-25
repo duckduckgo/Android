@@ -35,10 +35,12 @@ import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggesti
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion.AutoCompleteUrlSuggestion.AutoCompleteBookmarkSuggestion
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion.AutoCompleteUrlSuggestion.AutoCompleteSwitchToTabSuggestion
 import com.duckduckgo.browser.api.autocomplete.AutoCompleteSettings
+import com.duckduckgo.browser.api.omnibar.model.OmnibarPosition
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.SingleLiveEvent
 import com.duckduckgo.common.utils.extensions.toBinaryString
 import com.duckduckgo.duckchat.api.DuckChat
+import com.duckduckgo.duckchat.impl.inputscreen.ui.InputScreenConfigResolver
 import com.duckduckgo.duckchat.impl.inputscreen.ui.command.Command
 import com.duckduckgo.duckchat.impl.inputscreen.ui.command.Command.EditWithSelectedQuery
 import com.duckduckgo.duckchat.impl.inputscreen.ui.command.Command.SwitchToTab
@@ -121,6 +123,7 @@ class InputScreenViewModel @AssistedInject constructor(
     private val sessionStore: InputScreenSessionStore,
     private val inputScreenDiscoveryFunnel: InputScreenDiscoveryFunnel,
     private val inputScreenSessionUsageMetric: InputScreenSessionUsageMetric,
+    private val inputScreenConfigResolver: InputScreenConfigResolver,
 ) : ViewModel() {
 
     private var hasUserSeenHistoryIAM = false
@@ -138,6 +141,7 @@ class InputScreenViewModel @AssistedInject constructor(
             showChatLogo = true,
             showSearchLogo = true,
             newLineButtonVisible = false,
+            scrollSeparatorVisible = false,
         ),
     )
     val visibilityState: StateFlow<InputScreenVisibilityState> = _visibilityState.asStateFlow()
@@ -217,6 +221,10 @@ class InputScreenViewModel @AssistedInject constructor(
 
     private val _inputFieldCommand = Channel<InputFieldCommand>(capacity = Channel.CONFLATED)
     val inputFieldCommand: Flow<InputFieldCommand> = _inputFieldCommand.receiveAsFlow()
+    private val canScrollUpAutocomplete = MutableStateFlow(false)
+    private val canScrollUpNtp = MutableStateFlow(false)
+    private val canScrollDownAutocomplete = MutableStateFlow(false)
+    private val canScrollDownNtp = MutableStateFlow(false)
 
     init {
         combine(voiceServiceAvailable, voiceInputAllowed) { serviceAvailable, inputAllowed ->
@@ -257,6 +265,28 @@ class InputScreenViewModel @AssistedInject constructor(
         }.onEach { shouldShowSearchLogo ->
             _visibilityState.update {
                 it.copy(showSearchLogo = shouldShowSearchLogo)
+            }
+        }.launchIn(viewModelScope)
+
+        if (inputScreenConfigResolver.useTopBar()) {
+            shouldShowAutoComplete.flatMapLatest {
+                if (it) {
+                    canScrollUpAutocomplete
+                } else {
+                    canScrollUpNtp
+                }
+            }
+        } else {
+            shouldShowAutoComplete.flatMapLatest {
+                if (it) {
+                    canScrollDownAutocomplete
+                } else {
+                    canScrollDownNtp
+                }
+            }
+        }.onEach { scrollSeparatorVisible ->
+            _visibilityState.update {
+                it.copy(scrollSeparatorVisible = scrollSeparatorVisible)
             }
         }.launchIn(viewModelScope)
     }
@@ -573,6 +603,22 @@ class InputScreenViewModel @AssistedInject constructor(
         this <= 40 -> "medium"
         this <= 100 -> "long"
         else -> "very_long"
+    }
+
+    fun canScrollUpAutocomplete(canScrollUp: Boolean) {
+        canScrollUpAutocomplete.value = canScrollUp
+    }
+
+    fun canScrollUpNtp(canScrollUp: Boolean) {
+        canScrollUpNtp.value = canScrollUp
+    }
+
+    fun canScrollDownAutocomplete(canScrollDown: Boolean) {
+        canScrollDownAutocomplete.value = canScrollDown
+    }
+
+    fun canScrollDownNtp(canScrollDown: Boolean) {
+        canScrollDownNtp.value = canScrollDown
     }
 
     class InputScreenViewModelProviderFactory(

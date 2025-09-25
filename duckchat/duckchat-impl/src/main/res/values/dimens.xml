@@ -23,4 +23,7 @@
     <dimen name="inputScreenContentTopOffset">12dp</dimen>
     <dimen name="inputScreenOmnibarCardMarginHorizontal">@dimen/omnibarCardMarginHorizontal</dimen>
     <dimen name="inputScreenMarginHorizontal">0dp</dimen>
+    <dimen name="inputScreenAutocompleteListBottomSpace">64dp</dimen>
+    <dimen name="contentSeparatorHeight">0.5dp</dimen>
+    <dimen name="inputScreenBottomButtonMarginEnd">6dp</dimen>
 </resources>

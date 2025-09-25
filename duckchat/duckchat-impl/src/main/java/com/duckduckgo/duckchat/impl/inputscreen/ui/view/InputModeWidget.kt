@@ -35,8 +35,11 @@ import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
+import android.widget.FrameLayout
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.isVisible
+import androidx.core.view.marginEnd
+import androidx.core.view.updateLayoutParams
 import androidx.core.widget.doAfterTextChanged
 import androidx.core.widget.doOnTextChanged
 import com.duckduckgo.anvil.annotations.InjectWith
@@ -66,6 +69,7 @@ class InputModeWidget @JvmOverloads constructor(
     private val inputModeWidgetBack: View
     private val inputModeSwitch: TabLayout
     private val inputModeWidgetCard: MaterialCardView
+    private val inputScreenButtonsContainer: FrameLayout
 
     var onBack: (() -> Unit)? = null
     var onSearchSent: ((String) -> Unit)? = null
@@ -115,6 +119,7 @@ class InputModeWidget @JvmOverloads constructor(
         inputModeWidgetBack = findViewById(R.id.InputModeWidgetBack)
         inputModeSwitch = findViewById(R.id.inputModeSwitch)
         inputModeWidgetCard = findViewById(R.id.inputModeWidgetCard)
+        inputScreenButtonsContainer = findViewById(R.id.inputScreenButtonsContainer)
 
         configureClickListeners()
         configureInputBehavior()
@@ -276,9 +281,8 @@ class InputModeWidget @JvmOverloads constructor(
                 root,
                 ChangeBounds().apply {
                     duration = EXPAND_COLLAPSE_TRANSITION_DURATION
-                    excludeTarget(R.id.actionSend, true)
-                    excludeTarget(R.id.actionNewLine, true)
-                    excludeTarget(R.id.actionVoice, true)
+                    excludeTarget(R.id.inputScreenButtonsContainer, true)
+                    excludeTarget(inputScreenButtonsContainer, true)
                 },
             )
         }
@@ -333,6 +337,14 @@ class InputModeWidget @JvmOverloads constructor(
 
     fun selectAllText() {
         inputField.selectAll()
+    }
+
+    fun setInputScreenButtons(inputScreenButtons: InputScreenButtons) {
+        inputScreenButtonsContainer.isVisible = true
+        inputScreenButtonsContainer.addView(inputScreenButtons)
+        inputFieldClearText.updateLayoutParams<MarginLayoutParams> {
+            marginEnd = resources.getDimensionPixelSize(R.dimen.inputScreenBottomButtonMarginEnd)
+        }
     }
 
     private fun CharSequence.getTextToSubmit(): CharSequence? {

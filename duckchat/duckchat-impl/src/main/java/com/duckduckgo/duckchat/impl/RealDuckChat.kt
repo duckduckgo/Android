@@ -170,6 +170,12 @@ interface DuckChatInternal : DuckChat {
      * Checks whether DuckChat is enabled based on remote config flag.
      */
     fun isDuckChatFeatureEnabled(): Boolean
+
+    /**
+     * Indicates whether Input Screen will present the input box at the bottom, if user has the omnibar also set to the bottom position.
+     * Otherwise, the input box will be at the top.
+     */
+    val inputScreenBottomBarEnabled: StateFlow<Boolean>
 }
 
 enum class ChatState(val value: String) {
@@ -237,6 +243,7 @@ class RealDuckChat @Inject constructor(
     private val _showSettings = MutableStateFlow(false)
     private val _showInputScreen = MutableStateFlow(false)
     private val _showInputScreenAutomaticallyOnNewTab = MutableStateFlow(false)
+    private val _inputScreenBottomBarEnabled = MutableStateFlow(false)
     private val _showInBrowserMenu = MutableStateFlow(false)
     private val _showInAddressBar = MutableStateFlow(false)
     private val _showOmnibarShortcutInAllStates = MutableStateFlow(false)
@@ -253,6 +260,7 @@ class RealDuckChat @Inject constructor(
     private var isDuckAiInBrowserEnabled = false
     private var duckAiInputScreen = false
     private var duckAiInputScreenOpenAutomaticallyEnabled = false
+    private var duckAiInputScreenBottomBarEnabled = false
     private var showAIChatAddressBarChoiceScreen = false
     private var isDuckChatUserEnabled = false
     private var duckChatLink = DUCK_CHAT_WEB_LINK
@@ -372,6 +380,8 @@ class RealDuckChat @Inject constructor(
     override val showInputScreen: StateFlow<Boolean> = _showInputScreen.asStateFlow()
 
     override val showInputScreenAutomaticallyOnNewTab: StateFlow<Boolean> = _showInputScreenAutomaticallyOnNewTab.asStateFlow()
+
+    override val inputScreenBottomBarEnabled: StateFlow<Boolean> = _inputScreenBottomBarEnabled.asStateFlow()
 
     override val showPopupMenuShortcut: StateFlow<Boolean> = _showInBrowserMenu.asStateFlow()
 
@@ -585,6 +595,7 @@ class RealDuckChat @Inject constructor(
             isDuckAiInBrowserEnabled = duckChatFeature.duckAiButtonInBrowser().isEnabled()
             duckAiInputScreen = duckChatFeature.duckAiInputScreen().isEnabled()
             duckAiInputScreenOpenAutomaticallyEnabled = duckChatFeature.showInputScreenAutomaticallyOnNewTab().isEnabled()
+            duckAiInputScreenBottomBarEnabled = duckChatFeature.inputScreenBottomBarSupport().isEnabled()
             clearChatHistory = duckChatFeature.clearHistory().isEnabled()
             showAIChatAddressBarChoiceScreen = duckChatFeature.showAIChatAddressBarChoiceScreen().isEnabled()
 
@@ -617,6 +628,8 @@ class RealDuckChat @Inject constructor(
         _showInputScreen.emit(showInputScreen)
 
         _showInputScreenAutomaticallyOnNewTab.value = showInputScreen && duckAiInputScreenOpenAutomaticallyEnabled
+
+        _inputScreenBottomBarEnabled.value = showInputScreen && duckAiInputScreenBottomBarEnabled
 
         val showInBrowserMenu = duckChatFeatureRepository.shouldShowInBrowserMenu() &&
             isDuckChatFeatureEnabled && isDuckChatUserEnabled

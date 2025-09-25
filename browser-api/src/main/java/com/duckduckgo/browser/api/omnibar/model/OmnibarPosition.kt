@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 DuckDuckGo
+ * Copyright (c) 2024 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,13 +14,8 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.duckchat.impl.inputscreen.ui.state
+package com.duckduckgo.browser.api.omnibar.model
 
-data class InputScreenVisibilityState(
-    val voiceInputButtonVisible: Boolean,
-    val autoCompleteSuggestionsVisible: Boolean,
-    val showChatLogo: Boolean,
-    val showSearchLogo: Boolean,
-    val newLineButtonVisible: Boolean,
-    val scrollSeparatorVisible: Boolean,
-)
+enum class OmnibarPosition {
+    TOP, BOTTOM
+}
