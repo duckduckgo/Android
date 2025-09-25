@@ -25,9 +25,11 @@ import com.duckduckgo.navigation.api.GlobalActivityStarter
  *
  * @param query The initial query text to pre-populate in the input field
  * @param isTopOmnibar whether the omnibar is positioned at the top of the screen
+ * @param tabs number of tabs to display
  */
 data class InputScreenActivityParams(
     val query: String,
+    val tabs: Int,
     val isTopOmnibar: Boolean,
 ) : GlobalActivityStarter.ActivityParams
 

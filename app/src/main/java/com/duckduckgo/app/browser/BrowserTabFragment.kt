@@ -902,17 +902,16 @@ class BrowserTabFragment :
 
     private val inputScreenLauncher =
         registerForActivityResult(StartActivityForResult()) { result ->
-            val data = result.data ?: return@registerForActivityResult
-
+            val data = result.data
             when (result.resultCode) {
                 InputScreenActivityResultCodes.NEW_SEARCH_REQUESTED -> {
-                    data.getStringExtra(InputScreenActivityResultParams.SEARCH_QUERY_PARAM)?.let { query ->
+                    data?.getStringExtra(InputScreenActivityResultParams.SEARCH_QUERY_PARAM)?.let { query ->
                         submitQuery(query)
                     }
                 }
 
                 InputScreenActivityResultCodes.SWITCH_TO_TAB_REQUESTED -> {
-                    data.getStringExtra(InputScreenActivityResultParams.TAB_ID_PARAM)?.let { tabId ->
+                    data?.getStringExtra(InputScreenActivityResultParams.TAB_ID_PARAM)?.let { tabId ->
                         browserActivity?.openExistingTab(tabId)
                     }
                 }
@@ -931,7 +930,7 @@ class BrowserTabFragment :
 
 
                 RESULT_CANCELED -> {
-                    data.getStringExtra(InputScreenActivityResultParams.CANCELED_DRAFT_PARAM)?.let { query ->
+                    data?.getStringExtra(InputScreenActivityResultParams.CANCELED_DRAFT_PARAM)?.let { query ->
                         omnibar.setDraftTextIfNtpOrSerp(query)
                     }
                 }
@@ -1119,7 +1118,7 @@ class BrowserTabFragment :
         val intent =
             globalActivityStarter.startIntent(
                 requireContext(),
-                InputScreenActivityParams(query = query, isTopOmnibar = omnibar.omnibarPosition == TOP),
+                InputScreenActivityParams(query = query, isTopOmnibar = omnibar.omnibarPosition == TOP, tabs = viewModel.tabs.value?.size ?: 0),
             )
         val enterTransition = browserAndInputScreenTransitionProvider.getInputScreenEnterAnimation(omnibar.omnibarPosition == TOP)
         val exitTransition = browserAndInputScreenTransitionProvider.getBrowserExitAnimation(omnibar.omnibarPosition == TOP)
