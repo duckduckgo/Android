@@ -60,7 +60,7 @@ class VpnMenuStateProviderImpl @Inject constructor(
                     if (vpnMenuStore.canShowVpnMenuForNotSubscribed()) {
                         VpnMenuState.NotSubscribed
                     } else {
-                        VpnMenuState.Hidden
+                        VpnMenuState.NotSubscribedNoPill
                     }
                 }
             }
