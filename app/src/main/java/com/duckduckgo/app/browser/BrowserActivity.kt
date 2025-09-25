@@ -844,7 +844,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
             animateDuckAiFragmentOut {
                 val transaction = supportFragmentManager.beginTransaction()
                 transaction.hide(fragment)
-                transaction.commit()
+                transaction.commitAllowingStateLoss() // allow state loss in case the transition finishes after onSaveInstanceState
             }
         }
     }
@@ -891,6 +891,9 @@ open class BrowserActivity : DuckDuckGoActivity() {
             } else {
                 showDuckAiFragmentImmediately()
             }
+        } else if (!binding.duckAiFragmentContainer.isVisible) {
+            // in case of lost fragment manager state, ensure the container is visible and show it immediately if not
+            showDuckAiFragmentImmediately()
         }
     }
 
