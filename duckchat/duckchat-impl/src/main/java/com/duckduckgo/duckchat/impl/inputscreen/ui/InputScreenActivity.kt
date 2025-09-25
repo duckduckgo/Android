@@ -16,6 +16,7 @@
 
 package com.duckduckgo.duckchat.impl.inputscreen.ui
 
+import android.content.Intent
 import android.content.res.Configuration
 import android.os.Build.VERSION
 import android.os.Bundle
@@ -44,8 +45,12 @@ class InputScreenActivity : DuckDuckGoActivity() {
     @Inject
     lateinit var pixel: Pixel
 
+    @Inject
+    lateinit var inputScreenConfigResolver: InputScreenConfigResolver
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        inputScreenConfigResolver.onInputScreenCreated(intent)
         setContentView(R.layout.activity_input_screen)
         inputScreenDiscoveryFunnel.onInputScreenOpened()
         val params = mapOf(
@@ -64,8 +69,8 @@ class InputScreenActivity : DuckDuckGoActivity() {
     }
 
     private fun applyExitTransition() {
-        val enterTransition = browserAndInputScreenTransitionProvider.getBrowserEnterAnimation()
-        val exitTransition = browserAndInputScreenTransitionProvider.getInputScreenExitAnimation()
+        val enterTransition = browserAndInputScreenTransitionProvider.getBrowserEnterAnimation(inputScreenConfigResolver.isTopOmnibar)
+        val exitTransition = browserAndInputScreenTransitionProvider.getInputScreenExitAnimation(inputScreenConfigResolver.isTopOmnibar)
 
         if (VERSION.SDK_INT >= 34) {
             overrideActivityTransition(

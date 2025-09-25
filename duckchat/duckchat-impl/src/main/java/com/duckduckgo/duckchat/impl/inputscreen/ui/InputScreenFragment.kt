@@ -20,9 +20,12 @@ import android.animation.ValueAnimator
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
+import android.util.TypedValue
+import android.view.Gravity
 import android.view.View
+import android.view.ViewGroup
+import android.widget.FrameLayout
 import androidx.activity.OnBackPressedCallback
-import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
@@ -56,6 +59,8 @@ import com.duckduckgo.duckchat.impl.inputscreen.ui.command.InputFieldCommand
 import com.duckduckgo.duckchat.impl.inputscreen.ui.state.SubmitButtonIcon.SEARCH
 import com.duckduckgo.duckchat.impl.inputscreen.ui.state.SubmitButtonIcon.SEND
 import com.duckduckgo.duckchat.impl.inputscreen.ui.tabs.InputScreenPagerAdapter
+import com.duckduckgo.duckchat.impl.inputscreen.ui.view.InputModeWidget
+import com.duckduckgo.duckchat.impl.inputscreen.ui.view.InputScreenButtons
 import com.duckduckgo.duckchat.impl.inputscreen.ui.viewmodel.InputScreenViewModel
 import com.duckduckgo.duckchat.impl.inputscreen.ui.viewmodel.InputScreenViewModel.InputScreenViewModelFactory
 import com.duckduckgo.duckchat.impl.inputscreen.ui.viewmodel.InputScreenViewModel.InputScreenViewModelProviderFactory
@@ -70,6 +75,7 @@ import com.duckduckgo.voice.api.VoiceSearchLauncher.Source.BROWSER
 import javax.inject.Inject
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import com.duckduckgo.mobile.android.R as CommonR
 
 @InjectWith(FragmentScope::class)
 class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
@@ -89,6 +95,9 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
     @Inject
     lateinit var appTheme: AppTheme
 
+    @Inject
+    lateinit var inputScreenConfigResolver: InputScreenConfigResolver
+
     private val viewModel: InputScreenViewModel by lazy {
         val params = requireActivity().intent.getActivityParams(InputScreenActivityParams::class.java)
         val currentOmnibarText = params?.query ?: ""
@@ -98,10 +107,14 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
 
     private val binding: FragmentInputScreenBinding by viewBinding()
 
+    private lateinit var inputModeWidget: InputModeWidget
+    private lateinit var contentSeparator: View
+    private lateinit var inputScreenButtons: InputScreenButtons
+
     private val pageChangeCallback = object : OnPageChangeCallback() {
         override fun onPageSelected(position: Int) {
             viewModel.onPageSelected(position)
-            binding.inputModeWidget.selectTab(position)
+            inputModeWidget.selectTab(position)
         }
 
         override fun onPageScrolled(position: Int, positionOffset: Float, positionOffsetPixels: Int) {
@@ -121,9 +134,41 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        inputModeWidget = InputModeWidget(requireContext())
+        inputScreenButtons = InputScreenButtons(requireContext())
+
         val params = requireActivity().intent.getActivityParams(InputScreenActivityParams::class.java)
         params?.query?.let { query ->
-            binding.inputModeWidget.provideInitialText(query)
+            inputModeWidget.provideInitialText(query)
+        }
+
+        val useTopBar = inputScreenConfigResolver.useTopBar()
+        val separatorHeightPx = resources.getDimensionPixelSize(R.dimen.inputScreenContentSeparatorHeight)
+        contentSeparator = View(context).apply {
+            val typedValue = TypedValue()
+            val attributeResId = if (useTopBar) {
+                    CommonR.attr.daxColorShade
+                } else {
+                    CommonR.attr.daxColorShadeSolid
+                }
+                requireContext().theme.resolveAttribute(attributeResId, typedValue, true)
+            setBackgroundColor(typedValue.data)
+            layoutParams = FrameLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                separatorHeightPx,
+                if (useTopBar) Gravity.BOTTOM else Gravity.TOP
+            )
+        }
+
+        if (useTopBar) {
+            binding.inputModeWidgetContainerTop.addView(inputModeWidget)
+            binding.inputModeWidgetContainerTop.addView(contentSeparator)
+            binding.inputScreenButtonsContainer.addView(inputScreenButtons)
+            inputScreenButtons.transformButtonsToFloating()
+        } else {
+            inputModeWidget.setInputScreenButtons(inputScreenButtons)
+            binding.inputModeWidgetContainerBottom.addView(inputModeWidget)
+            binding.inputModeWidgetContainerBottom.addView(contentSeparator)
         }
 
         configureViewPager()
@@ -132,13 +177,13 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
         configureObservers()
         configureLogoAnimation()
 
-        binding.inputModeWidget.init()
+        inputModeWidget.init()
 
         requireActivity().onBackPressedDispatcher.addCallback(
             viewLifecycleOwner,
             object : OnBackPressedCallback(true) {
                 override fun handleOnBackPressed() {
-                    val query = binding.inputModeWidget.text
+                    val query = inputModeWidget.text
                     val data = Intent().putExtra(InputScreenActivityResultParams.CANCELED_DRAFT_PARAM, query)
                     requireActivity().setResult(Activity.RESULT_CANCELED, data)
                     exitInputScreen()
@@ -146,17 +191,9 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
             },
         )
 
-        binding.actionSend.setOnClickListener {
-            // todo remove round-tripping through the input mode widget - actions should go directly to the view model
-            binding.inputModeWidget.submitMessage()
-            viewModel.onSendButtonClicked()
-        }
-        binding.inputModeWidget.inputField.post {
-            showKeyboard(binding.inputModeWidget.inputField)
-        }
-        binding.actionNewLine.setOnClickListener {
-            binding.inputModeWidget.printNewLine()
-            pixel.fire(DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_OMNIBAR_FLOATING_RETURN_PRESSED)
+        configureInputScreenButtons()
+        inputModeWidget.inputField.post {
+            showKeyboard(inputModeWidget.inputField)
         }
 
         viewModel.fireShownPixel()
@@ -172,7 +209,7 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
         viewModel.inputFieldCommand.onEach { command ->
             when (command) {
                 is InputFieldCommand.SelectAll -> {
-                    binding.inputModeWidget.selectAllText()
+                    inputModeWidget.selectAllText()
                 }
             }
         }.launchIn(lifecycleScope)
@@ -182,11 +219,11 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
                 SEARCH -> com.duckduckgo.mobile.android.R.drawable.ic_find_search_24
                 SEND -> com.duckduckgo.mobile.android.R.drawable.ic_arrow_right_24
             }
-            binding.actionSend.setImageResource(iconResource)
+            inputScreenButtons.setSendButtonIcon(iconResource)
         }.launchIn(lifecycleScope)
 
         viewModel.inputFieldState.onEach { inputBoxState ->
-            binding.inputModeWidget.canExpand = inputBoxState.canExpand
+            inputModeWidget.canExpand = inputBoxState.canExpand
         }.launchIn(lifecycleScope)
 
         viewModel.visibilityState.onEach {
@@ -199,14 +236,15 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
 
             binding.ddgLogo.progress = if (isSearchMode) 0f else 1f
 
-            binding.actionNewLine.isVisible = it.newLineButtonVisible
+            inputScreenButtons.setNewLineButtonVisible(it.newLineButtonVisible)
+            contentSeparator.isVisible = it.scrollSeparatorVisible
         }.launchIn(lifecycleScope)
     }
 
     private fun processCommand(command: Command) {
         when (command) {
-            is UserSubmittedQuery -> binding.inputModeWidget.submitMessage(command.query)
-            is EditWithSelectedQuery -> binding.inputModeWidget.text = command.query
+            is UserSubmittedQuery -> inputModeWidget.submitMessage(command.query)
+            is EditWithSelectedQuery -> inputModeWidget.text = command.query
             is SwitchToTab -> {
                 val data = Intent().putExtra(InputScreenActivityResultParams.TAB_ID_PARAM, command.tabId)
                 requireActivity().setResult(InputScreenActivityResultCodes.SWITCH_TO_TAB_REQUESTED, data)
@@ -214,9 +252,9 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
             }
             is SubmitSearch -> submitSearchQuery(command.query)
             is SubmitChat -> submitChatQuery(command.query)
-            is ShowKeyboard -> showKeyboard(binding.inputModeWidget.inputField)
-            is HideKeyboard -> hideKeyboard(binding.inputModeWidget.inputField)
-            is SetInputModeWidgetScrollPosition -> binding.inputModeWidget.setScrollPosition(command.position, command.offset)
+            is ShowKeyboard -> showKeyboard(inputModeWidget.inputField)
+            is HideKeyboard -> hideKeyboard(inputModeWidget.inputField)
+            is SetInputModeWidgetScrollPosition -> inputModeWidget.setScrollPosition(command.position, command.offset)
             is SetLogoProgress -> setLogoProgress(command.targetProgress)
             is AnimateLogoToProgress -> animateLogoToProgress(command.targetProgress)
         }
@@ -228,7 +266,7 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
         binding.viewPager.registerOnPageChangeCallback(pageChangeCallback)
     }
 
-    private fun configureOmnibar() = with(binding.inputModeWidget) {
+    private fun configureOmnibar() = with(inputModeWidget) {
         onSearchSent = { query ->
             viewModel.onSearchSubmitted(query)
         }
@@ -241,13 +279,13 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
         onSearchSelected = {
             binding.viewPager.setCurrentItem(0, true)
             viewModel.onSearchSelected()
-            viewModel.onSearchInputTextChanged(binding.inputModeWidget.text)
+            viewModel.onSearchInputTextChanged(inputModeWidget.text)
             binding.ddgLogoContainer.isVisible = viewModel.visibilityState.value.showSearchLogo
         }
         onChatSelected = {
             binding.viewPager.setCurrentItem(1, true)
             viewModel.onChatSelected()
-            viewModel.onChatInputTextChanged(binding.inputModeWidget.text)
+            viewModel.onChatInputTextChanged(inputModeWidget.text)
             binding.ddgLogoContainer.apply {
                 val showChatLogo = viewModel.visibilityState.value.showChatLogo
                 val showSearchLogo = viewModel.visibilityState.value.showSearchLogo
@@ -259,7 +297,7 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
             }
         }
         onSubmitMessageAvailable = { isAvailable ->
-            binding.actionSend.isVisible = isAvailable
+            inputScreenButtons.setSendButtonVisible(isAvailable)
         }
         onVoiceInputAllowed = { isAllowed ->
             viewModel.onVoiceInputAllowedChange(isAllowed)
@@ -281,7 +319,7 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
     private fun submitChatQuery(query: String) {
         val data = Intent().putExtra(InputScreenActivityResultParams.CANCELED_DRAFT_PARAM, query)
         requireActivity().setResult(Activity.RESULT_CANCELED, data)
-        requireActivity().finish()
+        exitInputScreen()
     }
 
     private fun submitSearchQuery(query: String) {
@@ -291,13 +329,10 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
     }
 
     private fun configureVoice() {
-        binding.actionVoice.setOnClickListener {
-            voiceSearchLauncher.launch(requireActivity())
-        }
         voiceSearchLauncher.registerResultsCallback(this, requireActivity(), BROWSER) {
             when (it) {
                 is VoiceRecognitionSuccess -> {
-                    binding.inputModeWidget.submitMessage(it.result)
+                    inputModeWidget.submitMessage(it.result)
                 }
                 is SearchCancelled -> {}
                 is VoiceSearchDisabled -> {
@@ -306,8 +341,23 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
             }
         }
         viewModel.visibilityState.onEach {
-            binding.actionVoice.isInvisible = !it.voiceInputButtonVisible
+            inputScreenButtons.setVoiceButtonVisible(it.voiceInputButtonVisible)
         }.launchIn(lifecycleScope)
+    }
+
+    private fun configureInputScreenButtons() {
+        inputScreenButtons.onSendClick = {
+            // todo remove round-tripping through the input mode widget - actions should go directly to the view model
+            inputModeWidget.submitMessage()
+            viewModel.onSendButtonClicked()
+        }
+        inputScreenButtons.onNewLineClick = {
+            inputModeWidget.printNewLine()
+            pixel.fire(DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_OMNIBAR_FLOATING_RETURN_PRESSED)
+        }
+        inputScreenButtons.onVoiceClick = {
+            voiceSearchLauncher.launch(requireActivity())
+        }
     }
 
     private fun configureLogoAnimation() = with(binding.ddgLogo) {
@@ -337,8 +387,7 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
     }
 
     private fun exitInputScreen() {
-        hideKeyboard(binding.inputModeWidget.inputField)
-        requireActivity().supportFinishAfterTransition()
+        requireActivity().finish()
     }
 
     override fun onDestroyView() {

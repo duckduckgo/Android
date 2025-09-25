@@ -1117,10 +1117,10 @@ class BrowserTabFragment :
         val intent =
             globalActivityStarter.startIntent(
                 requireContext(),
-                InputScreenActivityParams(query = query),
+                InputScreenActivityParams(query = query, isTopOmnibar = omnibar.omnibarPosition == TOP),
             )
-        val enterTransition = browserAndInputScreenTransitionProvider.getInputScreenEnterAnimation()
-        val exitTransition = browserAndInputScreenTransitionProvider.getBrowserExitAnimation()
+        val enterTransition = browserAndInputScreenTransitionProvider.getInputScreenEnterAnimation(omnibar.omnibarPosition == TOP)
+        val exitTransition = browserAndInputScreenTransitionProvider.getBrowserExitAnimation(omnibar.omnibarPosition == TOP)
         val options =
             ActivityOptionsCompat.makeCustomAnimation(
                 requireActivity(),

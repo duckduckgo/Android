@@ -40,7 +40,6 @@ import com.duckduckgo.common.ui.view.toPx
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.google.android.material.card.MaterialCardView
-import com.google.android.material.color.MaterialColors.*
 import dagger.android.support.AndroidSupportInjection
 import javax.inject.Inject
 import com.duckduckgo.mobile.android.R as CommonR

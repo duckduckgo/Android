@@ -14,18 +14,21 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.duckchat.api.inputscreen
+package com.duckduckgo.duckchat.impl.inputscreen.ui.view
 
-/**
- * Provides animation resources for activity transitions between browser and input screen.
- */
-interface BrowserAndInputScreenTransitionProvider {
+import android.graphics.Rect
+import android.view.View
+import androidx.recyclerview.widget.RecyclerView
 
-    fun getBrowserEnterAnimation(isTopOmnibar: Boolean): Int
-
-    fun getBrowserExitAnimation(isTopOmnibar: Boolean): Int
-
-    fun getInputScreenEnterAnimation(isTopOmnibar: Boolean): Int
-
-    fun getInputScreenExitAnimation(isTopOmnibar: Boolean): Int
+class RecyclerBottomSpacingDecoration(private val bottomSpace: Int) : RecyclerView.ItemDecoration() {
+    override fun getItemOffsets(
+        outRect: Rect,
+        view: View,
+        parent: RecyclerView,
+        state: RecyclerView.State
+    ) {
+        if (parent.getChildAdapterPosition(view) == state.itemCount - 1) {
+            outRect.bottom = bottomSpace
+        }
+    }
 }

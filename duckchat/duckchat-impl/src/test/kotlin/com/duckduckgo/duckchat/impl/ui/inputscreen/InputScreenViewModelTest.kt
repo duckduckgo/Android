@@ -16,6 +16,7 @@ import com.duckduckgo.browser.api.autocomplete.AutoCompleteSettings
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.extensions.toBinaryString
 import com.duckduckgo.duckchat.api.DuckChat
+import com.duckduckgo.duckchat.impl.inputscreen.ui.InputScreenConfigResolver
 import com.duckduckgo.duckchat.impl.inputscreen.ui.command.Command
 import com.duckduckgo.duckchat.impl.inputscreen.ui.command.Command.AnimateLogoToProgress
 import com.duckduckgo.duckchat.impl.inputscreen.ui.command.Command.SetInputModeWidgetScrollPosition
@@ -76,6 +77,7 @@ class InputScreenViewModelTest {
     private val duckChat: DuckChat = mock()
     private val inputScreenDiscoveryFunnel: InputScreenDiscoveryFunnel = mock()
     private val inputScreenSessionUsageMetric: InputScreenSessionUsageMetric = mock()
+    private val inputScreenConfigResolver: InputScreenConfigResolver = mock()
 
     @Before
     fun setup() =
@@ -85,6 +87,7 @@ class InputScreenViewModelTest {
                 flowOf(AutoCompleteResult("", listOf(AutoCompleteDefaultSuggestion("suggestion")))),
             )
             whenever(duckChat.wasOpenedBefore()).thenReturn(false)
+            whenever(inputScreenConfigResolver.useTopBar()).thenReturn(true)
         }
 
     private fun createViewModel(currentOmnibarText: String = ""): InputScreenViewModel =
@@ -101,6 +104,7 @@ class InputScreenViewModelTest {
             duckChat = duckChat,
             inputScreenDiscoveryFunnel = inputScreenDiscoveryFunnel,
             inputScreenSessionUsageMetric = inputScreenSessionUsageMetric,
+            inputScreenConfigResolver = inputScreenConfigResolver,
         )
 
     @Test
@@ -1533,5 +1537,96 @@ class InputScreenViewModelTest {
             viewModel.onPageScrolled(position, positionOffset)
 
             assertEquals(0, capturedCommands.size)
+        }
+
+    @Test
+    fun `when using top bar and autocomplete suggestions are visible then bottomFadeVisible should be true`() =
+        runTest {
+            whenever(inputScreenConfigResolver.useTopBar()).thenReturn(true)
+            val viewModel = createViewModel("search query")
+
+            assertTrue(viewModel.visibilityState.value.bottomFadeVisible)
+        }
+
+    @Test
+    fun `when using bottom bar and autocomplete suggestions are visible then bottomFadeVisible should be false`() =
+        runTest {
+            whenever(inputScreenConfigResolver.useTopBar()).thenReturn(false)
+            val viewModel = createViewModel("search query")
+
+            assertFalse(viewModel.visibilityState.value.bottomFadeVisible)
+        }
+
+    @Test
+    fun `when using top bar and autocomplete suggestions are hidden then bottomFadeVisible should be false`() =
+        runTest {
+            whenever(inputScreenConfigResolver.useTopBar()).thenReturn(true)
+            val viewModel = createViewModel("https://example.com")
+
+            assertFalse(viewModel.visibilityState.value.bottomFadeVisible)
+        }
+
+    @Test
+    fun `when canScrollUpAutocomplete is called then scroll separator visibility is updated for top bar`() =
+        runTest {
+            whenever(inputScreenConfigResolver.useTopBar()).thenReturn(true)
+            val viewModel = createViewModel("search query")
+
+            // Initially false
+            assertFalse(viewModel.visibilityState.value.scrollSeparatorVisible)
+
+            // Set can scroll up to true
+            viewModel.canScrollUpAutocomplete(true)
+            advanceUntilIdle()
+
+            assertTrue(viewModel.visibilityState.value.scrollSeparatorVisible)
+        }
+
+    @Test
+    fun `when canScrollDownAutocomplete is called then scroll separator visibility is updated for bottom bar`() =
+        runTest {
+            whenever(inputScreenConfigResolver.useTopBar()).thenReturn(false)
+            val viewModel = createViewModel("search query")
+
+            // Initially false
+            assertFalse(viewModel.visibilityState.value.scrollSeparatorVisible)
+
+            // Set can scroll down to true
+            viewModel.canScrollDownAutocomplete(true)
+            advanceUntilIdle()
+
+            assertTrue(viewModel.visibilityState.value.scrollSeparatorVisible)
+        }
+
+    @Test
+    fun `when canScrollUpNtp is called and no autocomplete suggestions then scroll separator visibility is updated for top bar`() =
+        runTest {
+            whenever(inputScreenConfigResolver.useTopBar()).thenReturn(true)
+            val viewModel = createViewModel("https://example.com")
+
+            // Initially false
+            assertFalse(viewModel.visibilityState.value.scrollSeparatorVisible)
+
+            // Set can scroll up to true
+            viewModel.canScrollUpNtp(true)
+            advanceUntilIdle()
+
+            assertTrue(viewModel.visibilityState.value.scrollSeparatorVisible)
+        }
+
+    @Test
+    fun `when canScrollDownNtp is called and no autocomplete suggestions then scroll separator visibility is updated for bottom bar`() =
+        runTest {
+            whenever(inputScreenConfigResolver.useTopBar()).thenReturn(false)
+            val viewModel = createViewModel("https://example.com")
+
+            // Initially false
+            assertFalse(viewModel.visibilityState.value.scrollSeparatorVisible)
+
+            // Set can scroll down to true
+            viewModel.canScrollDownNtp(true)
+            advanceUntilIdle()
+
+            assertTrue(viewModel.visibilityState.value.scrollSeparatorVisible)
         }
 }
