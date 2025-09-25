@@ -34,6 +34,7 @@ class UriString {
         private const val space = " "
         private val webUrlRegex by lazy { PatternsCompat.WEB_URL.toRegex() }
         private val domainRegex by lazy { PatternsCompat.DOMAIN_NAME.toRegex() }
+        private val multiSpaceRegex by lazy { "\\s+".toRegex() }
         private val cache = LruCache<Int, Boolean>(250_000)
 
         fun extractUrl(inputQuery: String): String? {
@@ -106,15 +107,16 @@ class UriString {
         }
 
         fun isWebUrl(inputQuery: String, extractUrlQuery: Boolean = false): Boolean {
-            if (inputQuery.contains("\"") || inputQuery.contains("'")) {
-                return false
-            }
-
             if (extractUrlQuery) {
-                val extractedUrl = extractUrl(inputQuery)
+                val cleanInputQuery = cleanupInputQuery(inputQuery)
+                val extractedUrl = extractUrl(cleanInputQuery)
                 if (extractedUrl != null) {
                     return isWebUrl(extractedUrl)
                 }
+            }
+
+            if (inputQuery.contains("\"") || inputQuery.contains("'")) {
+                return false
             }
 
             if (inputQuery.contains(space)) return false
@@ -168,6 +170,14 @@ class UriString {
         private fun Uri.hasDuckScheme(): Boolean {
             val normalized = normalizeScheme()
             return normalized.scheme == UrlScheme.duck
+        }
+
+        private fun cleanupInputQuery(text: String): String {
+            return text.replace("\\'", " ")
+                .replace("\"", " ")
+                .replace("\n", " ")
+                .replace(multiSpaceRegex, " ")
+                .trim()
         }
     }
 }

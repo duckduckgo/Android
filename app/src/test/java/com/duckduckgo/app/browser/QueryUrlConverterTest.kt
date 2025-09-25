@@ -173,6 +173,32 @@ class QueryUrlConverterTest {
     }
 
     @Test
+    fun whenQueryContainsSingleUrlAndApostropheThenUrlIsExtracted() {
+        val input = "Source: Tom's Guide https://search.app/ddbWi"
+        val result = testee.convertQueryToUrl(input, queryOrigin = QueryOrigin.FromUser, extractUrlFromQuery = true)
+        assertEquals("https://search.app/ddbWi", result)
+    }
+
+    @Test
+    fun whenQueryContainsSingleUrlAndDoubleQuotesThenUrlIsExtracted() {
+        val input = """
+            Source: "Guide" https://search.app/ddbWi
+        """.trimIndent()
+        val result = testee.convertQueryToUrl(input, queryOrigin = QueryOrigin.FromUser, extractUrlFromQuery = true)
+        assertEquals("https://search.app/ddbWi", result)
+    }
+
+    @Test
+    fun whenQueryContainsSingleUrlAndNewLineThenUrlIsExtracted() {
+        val input = """
+            Source: 
+            Tom Guide https://search.app/ddbWi
+        """.trimIndent()
+        val result = testee.convertQueryToUrl(input, queryOrigin = QueryOrigin.FromUser, extractUrlFromQuery = true)
+        assertEquals("https://search.app/ddbWi", result)
+    }
+
+    @Test
     fun whenQueryContainsSingleUrlWithNoSchemeThenUrlIsExtractedAndSchemeAdded() {
         val input = "pre text duckduckgo.com post text"
         val result = testee.convertQueryToUrl(input, queryOrigin = QueryOrigin.FromUser, extractUrlFromQuery = true)
