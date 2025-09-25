@@ -131,19 +131,18 @@
         android:layout_height="@dimen/toolbarIcon"
         android:layout_marginTop="@dimen/omnibarCardMarginTop"
         android:layout_marginEnd="@dimen/keyline_1"
-        android:layout_marginBottom="@dimen/omnibarCardMarginBottom"
         app:layout_constraintBottom_toBottomOf="@id/inputModeWidgetCard"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@id/inputModeWidgetCard"
         app:layout_constraintTop_toTopOf="@id/inputModeWidgetCard">
 
         <FrameLayout
-            android:id="@+id/fireIconMenu"
+            android:id="@+id/inputFieldFireButton"
             android:layout_width="@dimen/toolbarIcon"
             android:layout_height="@dimen/toolbarIcon"
             android:background="@drawable/selectable_item_experimental_background"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@id/tabsMenu"
+            app:layout_constraintEnd_toStartOf="@id/inputFieldTabsMenu"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent">
 
@@ -157,22 +156,22 @@
         </FrameLayout>
 
         <com.duckduckgo.duckchat.impl.inputscreen.ui.view.InputScreenTabSwitcherButton
-            android:id="@+id/tabsMenu"
+            android:id="@+id/inputFieldTabsMenu"
             android:layout_width="@dimen/toolbarIcon"
             android:layout_height="@dimen/toolbarIcon"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@id/browserMenu"
-            app:layout_constraintStart_toEndOf="@id/fireIconMenu"
+            app:layout_constraintEnd_toStartOf="@id/inputFieldBrowserMenu"
+            app:layout_constraintStart_toEndOf="@id/inputFieldFireButton"
             app:layout_constraintTop_toTopOf="parent" />
 
         <FrameLayout
-            android:id="@+id/browserMenu"
+            android:id="@+id/inputFieldBrowserMenu"
             android:layout_width="@dimen/toolbarIcon"
             android:layout_height="@dimen/toolbarIcon"
             android:background="@drawable/selectable_item_experimental_background"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@id/tabsMenu"
+            app:layout_constraintStart_toEndOf="@id/inputFieldTabsMenu"
             app:layout_constraintTop_toTopOf="parent">
 
         <ImageView

@@ -917,6 +917,19 @@ class BrowserTabFragment :
                     }
                 }
 
+                InputScreenActivityResultCodes.MENU_REQUESTED -> {
+                    launchPopupMenu()
+                }
+
+                InputScreenActivityResultCodes.TAB_SWITCHER_REQUESTED -> {
+                    launchTabSwitcher()
+                }
+
+                InputScreenActivityResultCodes.FIRE_BUTTON_REQUESTED -> {
+                    onFireButtonPressed()
+                }
+
+
                 RESULT_CANCELED -> {
                     data.getStringExtra(InputScreenActivityResultParams.CANCELED_DRAFT_PARAM)?.let { query ->
                         omnibar.setDraftTextIfNtpOrSerp(query)

@@ -285,6 +285,18 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
             is SetInputModeWidgetScrollPosition -> inputModeWidget.setScrollPosition(command.position, command.offset)
             is SetLogoProgress -> setLogoProgress(command.targetProgress)
             is AnimateLogoToProgress -> animateLogoToProgress(command.targetProgress)
+            is Command.FireButtonRequested -> {
+                requireActivity().setResult(InputScreenActivityResultCodes.FIRE_BUTTON_REQUESTED)
+                exitInputScreen()
+            }
+            is Command.MenuRequested -> {
+                requireActivity().setResult(InputScreenActivityResultCodes.MENU_REQUESTED)
+                exitInputScreen()
+            }
+            is Command.TabSwitcherRequested -> {
+                requireActivity().setResult(InputScreenActivityResultCodes.TAB_SWITCHER_REQUESTED)
+                exitInputScreen()
+            }
         }
     }
 
@@ -342,6 +354,15 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
             }
             onTabTapped = { index ->
                 viewModel.onTabTapped(index)
+            }
+            onTabSwitcherTapped = {
+                viewModel.onTabSwitcherTapped()
+            }
+            onFireButtonTapped = {
+                viewModel.onFireButtonTapped()
+            }
+            onMenuTapped = {
+                viewModel.onBrowserMenuTapped()
             }
         }
 
