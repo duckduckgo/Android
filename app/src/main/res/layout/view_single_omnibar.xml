@@ -439,7 +439,6 @@
                         android:scaleType="center"
                         android:src="@drawable/ic_menu_vertical_24" />
 
-
                     <View
                         android:id="@+id/browserMenuHighlight"
                         android:layout_width="7dp"
