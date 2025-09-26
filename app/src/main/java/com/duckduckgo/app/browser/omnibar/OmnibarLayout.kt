@@ -79,15 +79,14 @@ import com.duckduckgo.app.browser.omnibar.animations.BrowserTrackersAnimatorHelp
 import com.duckduckgo.app.browser.omnibar.animations.PrivacyShieldAnimationHelper
 import com.duckduckgo.app.browser.omnibar.animations.TrackersAnimatorListener
 import com.duckduckgo.app.browser.omnibar.animations.omnibaranimation.OmnibarAnimationManager
-import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition
 import com.duckduckgo.app.browser.tabswitcher.TabSwitcherButton
 import com.duckduckgo.app.browser.viewstate.LoadingViewState
 import com.duckduckgo.app.browser.viewstate.OmnibarViewState
-import com.duckduckgo.app.global.model.PrivacyShield as PrivacyShieldState
 import com.duckduckgo.app.global.view.renderIfChanged
 import com.duckduckgo.app.onboardingdesignexperiment.OnboardingDesignExperimentManager
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.trackerdetection.model.Entity
+import com.duckduckgo.browser.ui.omnibar.OmnibarPosition
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.view.KeyboardAwareEditText
 import com.duckduckgo.common.ui.view.KeyboardAwareEditText.ShowSuggestionsListener
@@ -102,47 +101,73 @@ import com.duckduckgo.common.utils.text.TextChangedWatcher
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.api.DuckChat
-import com.duckduckgo.mobile.android.R as CommonR
 import com.duckduckgo.serp.logos.api.SerpEasterEggLogosToggles
 import com.duckduckgo.serp.logos.api.SerpLogos
 import com.google.android.material.appbar.AppBarLayout
-import javax.inject.Inject
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import logcat.logcat
+import javax.inject.Inject
+import com.duckduckgo.app.global.model.PrivacyShield as PrivacyShieldState
+import com.duckduckgo.mobile.android.R as CommonR
 
 @InjectWith(FragmentScope::class)
 open class OmnibarLayout @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyle: Int = 0,
-) : AppBarLayout(context, attrs, defStyle), OmnibarBehaviour, TrackersAnimatorListener {
-
+) : AppBarLayout(context, attrs, defStyle),
+    OmnibarBehaviour,
+    TrackersAnimatorListener {
     sealed class Decoration {
-        data class Mode(val viewMode: ViewMode) : Decoration()
-        data class LaunchTrackersAnimation(val entities: List<Entity>?) : Decoration()
-        data class LaunchCookiesAnimation(val isCosmetic: Boolean) : Decoration()
-        data class QueueCookiesAnimation(val isCosmetic: Boolean) : Decoration()
+        data class Mode(
+            val viewMode: ViewMode,
+        ) : Decoration()
+
+        data class LaunchTrackersAnimation(
+            val entities: List<Entity>?,
+        ) : Decoration()
+
+        data class LaunchCookiesAnimation(
+            val isCosmetic: Boolean,
+        ) : Decoration()
+
+        data class QueueCookiesAnimation(
+            val isCosmetic: Boolean,
+        ) : Decoration()
+
         data object CancelAnimations : Decoration()
+
         data class ChangeCustomTabTitle(
             val title: String,
             val domain: String?,
             val showDuckPlayerIcon: Boolean,
         ) : Decoration()
 
-        data class PrivacyShieldChanged(val privacyShield: com.duckduckgo.app.global.model.PrivacyShield) : Decoration()
+        data class PrivacyShieldChanged(
+            val privacyShield: com.duckduckgo.app.global.model.PrivacyShield,
+        ) : Decoration()
+
         data class HighlightOmnibarItem(
             val fireButton: Boolean,
             val privacyShield: Boolean,
         ) : Decoration()
 
-        data class DisableVoiceSearch(val url: String) : Decoration()
+        data class DisableVoiceSearch(
+            val url: String,
+        ) : Decoration()
     }
 
     sealed class StateChange {
-        data class OmnibarStateChange(val omnibarViewState: OmnibarViewState, val forceRender: Boolean = false) : StateChange()
-        data class LoadingStateChange(val loadingViewState: LoadingViewState) : StateChange()
+        data class OmnibarStateChange(
+            val omnibarViewState: OmnibarViewState,
+            val forceRender: Boolean = false,
+        ) : StateChange()
+
+        data class LoadingStateChange(
+            val loadingViewState: LoadingViewState,
+        ) : StateChange()
     }
 
     data class TransitionState(
@@ -265,15 +290,17 @@ open class OmnibarLayout @JvmOverloads constructor(
     }
     private val omnibarTextInputClickCatcher: View by lazy { findViewById(R.id.omnibarTextInputClickCatcher) }
 
-    internal fun omnibarViews(): List<View> = listOf(
-        clearTextButton,
-        omnibarTextInput,
-        searchIcon,
-    )
+    internal fun omnibarViews(): List<View> =
+        listOf(
+            clearTextButton,
+            omnibarTextInput,
+            searchIcon,
+        )
 
-    internal fun shieldViews(): List<View> = listOf(
-        shieldIcon,
-    )
+    internal fun shieldViews(): List<View> =
+        listOf(
+            shieldIcon,
+        )
 
     var isScrollingEnabled: Boolean
         get() {
@@ -325,17 +352,19 @@ open class OmnibarLayout @JvmOverloads constructor(
 
         val coroutineScope = requireNotNull(findViewTreeLifecycleOwner()?.lifecycleScope)
 
-        conflatedStateJob += coroutineScope.launch {
-            viewModel.viewState.flowWithLifecycle(lifecycleOwner.lifecycle).collectLatest {
-                render(it)
+        conflatedStateJob +=
+            coroutineScope.launch {
+                viewModel.viewState.flowWithLifecycle(lifecycleOwner.lifecycle).collectLatest {
+                    render(it)
+                }
             }
-        }
 
-        conflatedCommandJob += coroutineScope.launch {
-            viewModel.commands().flowWithLifecycle(lifecycleOwner.lifecycle).collectLatest {
-                processCommand(it)
+        conflatedCommandJob +=
+            coroutineScope.launch {
+                viewModel.commands().flowWithLifecycle(lifecycleOwner.lifecycle).collectLatest {
+                    processCommand(it)
+                }
             }
-        }
 
         if (lastViewMode != null) {
             logcat { "Omnibar: onAttachedToWindow lastViewMode $lastViewMode" }
@@ -377,15 +406,16 @@ open class OmnibarLayout @JvmOverloads constructor(
                 }
             }
 
-        omnibarTextInput.onBackKeyListener = object : KeyboardAwareEditText.OnBackKeyListener {
-            override fun onBackKey(): Boolean {
-                if (isAttachedToWindow) {
-                    viewModel.onBackKeyPressed()
-                    omnibarTextListener?.onBackKeyPressed()
+        omnibarTextInput.onBackKeyListener =
+            object : KeyboardAwareEditText.OnBackKeyListener {
+                override fun onBackKey(): Boolean {
+                    if (isAttachedToWindow) {
+                        viewModel.onBackKeyPressed()
+                        omnibarTextListener?.onBackKeyPressed()
+                    }
+                    return false
                 }
-                return false
             }
-        }
 
         omnibarTextInput.setOnEditorActionListener(
             TextView.OnEditorActionListener { _, actionId, keyEvent ->
@@ -411,6 +441,7 @@ open class OmnibarLayout @JvmOverloads constructor(
             object : TextChangedWatcher() {
                 var clearQuery = false
                 var deleteLastCharacter = false
+
                 override fun afterTextChanged(editable: Editable) {
                     if (isAttachedToWindow) {
                         viewModel.onInputStateChanged(
@@ -441,16 +472,17 @@ open class OmnibarLayout @JvmOverloads constructor(
             },
         )
 
-        omnibarTextInput.showSuggestionsListener = object : ShowSuggestionsListener {
-            override fun showSuggestions() {
-                omnibarTextListener?.onShowSuggestions(
-                    OmnibarTextState(
-                        omnibarTextInput.text.toString(),
-                        omnibarTextInput.hasFocus(),
-                    ),
-                )
+        omnibarTextInput.showSuggestionsListener =
+            object : ShowSuggestionsListener {
+                override fun showSuggestions() {
+                    omnibarTextListener?.onShowSuggestions(
+                        OmnibarTextState(
+                            omnibarTextInput.text.toString(),
+                            omnibarTextInput.hasFocus(),
+                        ),
+                    )
+                }
             }
-        }
     }
 
     fun setOmnibarItemPressedListener(itemPressedListener: Omnibar.ItemPressedListener) {
@@ -583,7 +615,8 @@ open class OmnibarLayout @JvmOverloads constructor(
                     with(daxIcon) {
                         setOnClickListener(null)
                         show()
-                        Glide.with(this)
+                        Glide
+                            .with(this)
                             .load(CommonR.drawable.ic_ddg_logo)
                             .transition(withCrossFade())
                             .placeholder(daxIcon.drawable)
@@ -616,7 +649,8 @@ open class OmnibarLayout @JvmOverloads constructor(
 
             is EasterEggLogo -> {
                 daxIcon.show()
-                Glide.with(daxIcon)
+                Glide
+                    .with(daxIcon)
                     .load(leadingIconState.logoUrl)
                     .placeholder(daxIcon.drawable)
                     .transition(withCrossFade())
@@ -633,16 +667,17 @@ open class OmnibarLayout @JvmOverloads constructor(
     }
 
     open fun renderButtons(viewState: ViewState) {
-        val newTransitionState = TransitionState(
-            showClearButton = viewState.showClearButton,
-            showVoiceSearch = viewState.showVoiceSearch,
-            showTabsMenu = viewState.showTabsMenu && !viewState.showFindInPage,
-            showFireIcon = viewState.showFireIcon && !viewState.showFindInPage,
-            showBrowserMenu = viewState.showBrowserMenu && !viewState.showFindInPage,
-            showBrowserMenuHighlight = viewState.showBrowserMenuHighlight,
-            showChatMenu = viewState.showChatMenu,
-            showSpacer = viewState.showClearButton || viewState.showVoiceSearch,
-        )
+        val newTransitionState =
+            TransitionState(
+                showClearButton = viewState.showClearButton,
+                showVoiceSearch = viewState.showVoiceSearch,
+                showTabsMenu = viewState.showTabsMenu && !viewState.showFindInPage,
+                showFireIcon = viewState.showFireIcon && !viewState.showFindInPage,
+                showBrowserMenu = viewState.showBrowserMenu && !viewState.showFindInPage,
+                showBrowserMenuHighlight = viewState.showBrowserMenuHighlight,
+                showChatMenu = viewState.showChatMenu,
+                showSpacer = viewState.showClearButton || viewState.showVoiceSearch,
+            )
 
         if (omnibarAnimationManager.isFeatureEnabled() &&
             previousTransitionState != null &&
@@ -780,13 +815,14 @@ open class OmnibarLayout @JvmOverloads constructor(
     }
 
     private fun renderPulseAnimation(viewState: ViewState) {
-        val targetView = if (viewState.highlightFireButton.isHighlighted() && viewState.showFireIcon) {
-            fireIconImageView
-        } else if (viewState.highlightPrivacyShield.isHighlighted() && viewState.leadingIconState == PrivacyShield) {
-            placeholder
-        } else {
-            null
-        }
+        val targetView =
+            if (viewState.highlightFireButton.isHighlighted() && viewState.showFireIcon) {
+                fireIconImageView
+            } else if (viewState.highlightPrivacyShield.isHighlighted() && viewState.leadingIconState == PrivacyShield) {
+                placeholder
+            } else {
+                null
+            }
 
         if (targetView != null) {
             if (pulseAnimation.isActive) {
@@ -842,11 +878,12 @@ open class OmnibarLayout @JvmOverloads constructor(
     ) {
         renderIfChanged(privacyShieldState, lastSeenPrivacyShield) {
             lastSeenPrivacyShield = privacyShieldState
-            val shieldIconView = if (viewMode is ViewMode.Browser) {
-                shieldIcon
-            } else {
-                customTabToolbarContainer.customTabShieldIcon
-            }
+            val shieldIconView =
+                if (viewMode is ViewMode.Browser) {
+                    shieldIcon
+                } else {
+                    customTabToolbarContainer.customTabShieldIcon
+                }
 
             privacyShieldView.setAnimationView(shieldIconView, privacyShieldState, viewMode)
         }
@@ -926,36 +963,25 @@ open class OmnibarLayout @JvmOverloads constructor(
         omnibarLogoClickedListener?.onClick(url)
     }
 
-    override fun measuredHeight(): Int {
-        return measuredHeight
-    }
+    override fun measuredHeight(): Int = measuredHeight
 
-    override fun height(): Int {
-        return height
-    }
+    override fun height(): Int = height
 
-    override fun getTranslation(): Float {
-        return translationY
-    }
+    override fun getTranslation(): Float = translationY
 
     override fun setTranslation(y: Float) {
         translationY = y
     }
 
-    override fun isOmnibarScrollingEnabled(): Boolean {
-        return isScrollingEnabled
-    }
+    override fun isOmnibarScrollingEnabled(): Boolean = isScrollingEnabled
 
-    override fun isBottomNavEnabled(): Boolean {
-        return false
-    }
+    override fun isBottomNavEnabled(): Boolean = false
 
-    override fun getBehavior(): CoordinatorLayout.Behavior<AppBarLayout> {
-        return when (omnibarPosition) {
+    override fun getBehavior(): CoordinatorLayout.Behavior<AppBarLayout> =
+        when (omnibarPosition) {
             OmnibarPosition.TOP -> TopAppBarBehavior(context, this)
             OmnibarPosition.BOTTOM -> BottomAppBarBehavior(context, this)
         }
-    }
 
     override fun setExpanded(expanded: Boolean) {
         when (omnibarPosition) {

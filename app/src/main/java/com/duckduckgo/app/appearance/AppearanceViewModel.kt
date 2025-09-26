@@ -20,7 +20,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.webkit.WebViewFeature
 import com.duckduckgo.anvil.annotations.ContributesViewModel
-import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition
 import com.duckduckgo.app.icon.api.AppIcon
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_THEME_TOGGLED_DARK
@@ -29,6 +28,7 @@ import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_THEME_TOGGLED_SYSTEM_DEFA
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.tabs.store.TabSwitcherDataStore
+import com.duckduckgo.browser.ui.omnibar.OmnibarPosition
 import com.duckduckgo.common.ui.DuckDuckGoTheme
 import com.duckduckgo.common.ui.DuckDuckGoTheme.DARK
 import com.duckduckgo.common.ui.DuckDuckGoTheme.LIGHT
@@ -36,8 +36,6 @@ import com.duckduckgo.common.ui.DuckDuckGoTheme.SYSTEM_DEFAULT
 import com.duckduckgo.common.ui.store.ThemingDataStore
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
-import javax.inject.Inject
-import kotlin.to
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
@@ -49,6 +47,8 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import logcat.logcat
+import javax.inject.Inject
+import kotlin.to
 
 @ContributesViewModel(ActivityScope::class)
 class AppearanceViewModel @Inject constructor(
@@ -58,7 +58,6 @@ class AppearanceViewModel @Inject constructor(
     private val dispatcherProvider: DispatcherProvider,
     private val tabSwitcherDataStore: TabSwitcherDataStore,
 ) : ViewModel() {
-
     data class ViewState(
         val theme: DuckDuckGoTheme = DuckDuckGoTheme.LIGHT,
         val appIcon: AppIcon = AppIcon.DEFAULT,
@@ -71,39 +70,43 @@ class AppearanceViewModel @Inject constructor(
     )
 
     sealed class Command {
-        data class LaunchThemeSettings(val theme: DuckDuckGoTheme) : Command()
+        data class LaunchThemeSettings(
+            val theme: DuckDuckGoTheme,
+        ) : Command()
+
         data object LaunchAppIcon : Command()
+
         data object UpdateTheme : Command()
-        data class LaunchOmnibarPositionSettings(val position: OmnibarPosition) : Command()
+
+        data class LaunchOmnibarPositionSettings(
+            val position: OmnibarPosition,
+        ) : Command()
     }
 
     private val viewState = MutableStateFlow(ViewState())
     private val command = Channel<Command>(1, BufferOverflow.DROP_OLDEST)
 
-    fun viewState(): Flow<ViewState> = viewState.onStart {
-        viewModelScope.launch {
-            viewState.update {
-                currentViewState().copy(
-                    theme = themingDataStore.theme,
-                    appIcon = settingsDataStore.appIcon,
-                    forceDarkModeEnabled = settingsDataStore.experimentalWebsiteDarkMode,
-                    canForceDarkMode = canForceDarkMode(),
-                    supportsForceDarkMode = WebViewFeature.isFeatureSupported(WebViewFeature.ALGORITHMIC_DARKENING),
-                    omnibarPosition = settingsDataStore.omnibarPosition,
-                    isFullUrlEnabled = settingsDataStore.isFullUrlEnabled,
-                    isTrackersCountInTabSwitcherEnabled = tabSwitcherDataStore.isTrackersAnimationInfoTileHidden().firstOrNull() != true,
-                )
+    fun viewState(): Flow<ViewState> =
+        viewState.onStart {
+            viewModelScope.launch {
+                viewState.update {
+                    currentViewState().copy(
+                        theme = themingDataStore.theme,
+                        appIcon = settingsDataStore.appIcon,
+                        forceDarkModeEnabled = settingsDataStore.experimentalWebsiteDarkMode,
+                        canForceDarkMode = canForceDarkMode(),
+                        supportsForceDarkMode = WebViewFeature.isFeatureSupported(WebViewFeature.ALGORITHMIC_DARKENING),
+                        omnibarPosition = settingsDataStore.omnibarPosition,
+                        isFullUrlEnabled = settingsDataStore.isFullUrlEnabled,
+                        isTrackersCountInTabSwitcherEnabled = tabSwitcherDataStore.isTrackersAnimationInfoTileHidden().firstOrNull() != true,
+                    )
+                }
             }
         }
-    }
 
-    fun commands(): Flow<Command> {
-        return command.receiveAsFlow()
-    }
+    fun commands(): Flow<Command> = command.receiveAsFlow()
 
-    private fun canForceDarkMode(): Boolean {
-        return themingDataStore.theme != DuckDuckGoTheme.LIGHT
-    }
+    private fun canForceDarkMode(): Boolean = themingDataStore.theme != DuckDuckGoTheme.LIGHT
 
     fun userRequestedToChangeTheme() {
         viewModelScope.launch { command.send(Command.LaunchThemeSettings(viewState.value.theme)) }
@@ -155,9 +158,7 @@ class AppearanceViewModel @Inject constructor(
         }
     }
 
-    private fun currentViewState(): ViewState {
-        return viewState.value
-    }
+    private fun currentViewState(): ViewState = viewState.value
 
     fun onForceDarkModeSettingChanged(checked: Boolean) {
         viewModelScope.launch(dispatcherProvider.io()) {

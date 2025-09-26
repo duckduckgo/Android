@@ -30,6 +30,7 @@ dependencies {
     implementation project(':design-system')
     implementation project(':common-utils')
     implementation project(':browser-api')
+    implementation project(':browser-ui')
     implementation project(':js-messaging-api')
     implementation project(':downloads-api')
     implementation project(':content-scope-scripts-api')

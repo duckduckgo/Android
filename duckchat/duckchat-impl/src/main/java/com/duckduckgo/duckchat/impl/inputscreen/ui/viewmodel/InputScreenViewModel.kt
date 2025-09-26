@@ -105,7 +105,9 @@ import logcat.asLog
 import logcat.logcat
 
 enum class UserSelectedMode {
-    SEARCH, CHAT, NONE
+    SEARCH,
+    CHAT,
+    NONE,
 }
 
 class InputScreenViewModel @AssistedInject constructor(
@@ -122,7 +124,6 @@ class InputScreenViewModel @AssistedInject constructor(
     private val inputScreenDiscoveryFunnel: InputScreenDiscoveryFunnel,
     private val inputScreenSessionUsageMetric: InputScreenSessionUsageMetric,
 ) : ViewModel() {
-
     private var hasUserSeenHistoryIAM = false
     private var isTapTransition = false
 
@@ -131,15 +132,16 @@ class InputScreenViewModel @AssistedInject constructor(
     private val voiceInputAllowed = MutableStateFlow(true)
     private var userSelectedMode: UserSelectedMode = NONE
     private var currentPagePosition: Int = 0
-    private val _visibilityState = MutableStateFlow(
-        InputScreenVisibilityState(
-            voiceInputButtonVisible = voiceServiceAvailable.value && voiceInputAllowed.value,
-            autoCompleteSuggestionsVisible = false,
-            showChatLogo = true,
-            showSearchLogo = true,
-            newLineButtonVisible = false,
-        ),
-    )
+    private val _visibilityState =
+        MutableStateFlow(
+            InputScreenVisibilityState(
+                voiceInputButtonVisible = voiceServiceAvailable.value && voiceInputAllowed.value,
+                autoCompleteSuggestionsVisible = false,
+                showChatLogo = true,
+                showSearchLogo = true,
+                newLineButtonVisible = false,
+            ),
+        )
     val visibilityState: StateFlow<InputScreenVisibilityState> = _visibilityState.asStateFlow()
 
     private val initialSearchInputText = currentOmnibarText.trim()
@@ -175,37 +177,38 @@ class InputScreenViewModel @AssistedInject constructor(
      * it represents the current webpage, so we suppress autocomplete. If the user is on SERP,
      * the initial text will be the search query (not URL), so we show autocomplete immediately.
      */
-    private val shouldShowAutoComplete = combine(
-        autoCompleteSuggestionsEnabled,
-        searchInputTextState,
-        hasMovedBeyondInitialUrl,
-    ) { autoCompleteEnabled, searchInput, hasMovedBeyondInitialUrl ->
-        autoCompleteEnabled &&
-            searchInput.isNotEmpty() &&
-            hasMovedBeyondInitialUrl
-    }.stateIn(viewModelScope, SharingStarted.Eagerly, initialValue = false)
+    private val shouldShowAutoComplete =
+        combine(
+            autoCompleteSuggestionsEnabled,
+            searchInputTextState,
+            hasMovedBeyondInitialUrl,
+        ) { autoCompleteEnabled, searchInput, hasMovedBeyondInitialUrl ->
+            autoCompleteEnabled &&
+                searchInput.isNotEmpty() &&
+                hasMovedBeyondInitialUrl
+        }.stateIn(viewModelScope, SharingStarted.Eagerly, initialValue = false)
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    val autoCompleteSuggestionResults: StateFlow<AutoCompleteResult> = shouldShowAutoComplete
-        .flatMapLatest { shouldShow ->
-            if (shouldShow) {
-                merge(
-                    searchInputTextState.debounceExceptFirst(timeoutMillis = 100),
-                    refreshSuggestions.map { searchInputTextState.value },
-                ).flatMapLatest { autoComplete.autoComplete(it) }
-            } else {
-                flowOf(AutoCompleteResult("", emptyList()))
-            }
-        }
-        .flowOn(dispatchers.io())
-        .onEach { result ->
-            if (result.suggestions.contains(AutoCompleteInAppMessageSuggestion)) {
-                hasUserSeenHistoryIAM = true
-            }
-        }
-        .flowOn(dispatchers.main())
-        .catch { t: Throwable? -> logcat(WARN) { "Failed to get search results: ${t?.asLog()}" } }
-        .stateIn(viewModelScope, SharingStarted.Eagerly, AutoCompleteResult("", emptyList()))
+    val autoCompleteSuggestionResults: StateFlow<AutoCompleteResult> =
+        shouldShowAutoComplete
+            .flatMapLatest { shouldShow ->
+                if (shouldShow) {
+                    merge(
+                        searchInputTextState.debounceExceptFirst(timeoutMillis = 100),
+                        refreshSuggestions.map { searchInputTextState.value },
+                    ).flatMapLatest { autoComplete.autoComplete(it) }
+                } else {
+                    flowOf(AutoCompleteResult("", emptyList()))
+                }
+            }.flowOn(dispatchers.io())
+            .onEach { result ->
+                logcat { "Autocomplete: ${result.suggestions}" }
+                if (result.suggestions.contains(AutoCompleteInAppMessageSuggestion)) {
+                    hasUserSeenHistoryIAM = true
+                }
+            }.flowOn(dispatchers.main())
+            .catch { t: Throwable? -> logcat(WARN) { "Failed to get search results: ${t?.asLog()}" } }
+            .stateIn(viewModelScope, SharingStarted.Eagerly, AutoCompleteResult("", emptyList()))
 
     private val _inputFieldState = MutableStateFlow(InputFieldState(canExpand = false))
     val inputFieldState: StateFlow<InputFieldState> = _inputFieldState.asStateFlow()
@@ -229,28 +232,31 @@ class InputScreenViewModel @AssistedInject constructor(
             }
         }.launchIn(viewModelScope)
 
-        searchInputTextState.onEach { searchInput ->
-            if (!hasMovedBeyondInitialUrl.value) {
-                hasMovedBeyondInitialUrl.value = checkMovedBeyondInitialUrl(searchInput)
-            }
-        }.launchIn(viewModelScope)
+        searchInputTextState
+            .onEach { searchInput ->
+                if (!hasMovedBeyondInitialUrl.value) {
+                    hasMovedBeyondInitialUrl.value = checkMovedBeyondInitialUrl(searchInput)
+                }
+            }.launchIn(viewModelScope)
 
-        hasMovedBeyondInitialUrl.onEach { hasMovedBeyondInitialUrl ->
-            _inputFieldState.update {
-                it.copy(canExpand = hasMovedBeyondInitialUrl)
-            }
-        }.launchIn(viewModelScope)
+        hasMovedBeyondInitialUrl
+            .onEach { hasMovedBeyondInitialUrl ->
+                _inputFieldState.update {
+                    it.copy(canExpand = hasMovedBeyondInitialUrl)
+                }
+            }.launchIn(viewModelScope)
 
         if (!hasMovedBeyondInitialUrl.value) {
             // If the initial text is a URL, we select all text in the input box
             _inputFieldCommand.trySend(InputFieldCommand.SelectAll)
         }
 
-        shouldShowAutoComplete.onEach { showAutoComplete ->
-            _visibilityState.update {
-                it.copy(autoCompleteSuggestionsVisible = showAutoComplete)
-            }
-        }.launchIn(viewModelScope)
+        shouldShowAutoComplete
+            .onEach { showAutoComplete ->
+                _visibilityState.update {
+                    it.copy(autoCompleteSuggestionsVisible = showAutoComplete)
+                }
+            }.launchIn(viewModelScope)
 
         combine(newTabPageHasContent, shouldShowAutoComplete) { newTabPageHasContent, shouldShowAutoComplete ->
             !newTabPageHasContent && !shouldShowAutoComplete
@@ -319,9 +325,7 @@ class InputScreenViewModel @AssistedInject constructor(
         command.value = EditWithSelectedQuery(query)
     }
 
-    fun onRemoveSearchSuggestionConfirmed(
-        suggestion: AutoCompleteSuggestion,
-    ) {
+    fun onRemoveSearchSuggestionConfirmed(suggestion: AutoCompleteSuggestion) {
         appCoroutineScope.launch(dispatchers.io()) {
             when (suggestion) {
                 is AutoCompleteHistorySuggestion -> {
@@ -366,9 +370,10 @@ class InputScreenViewModel @AssistedInject constructor(
     fun onSearchSubmitted(query: String) {
         val sanitizedQuery = query.replace(oldValue = "\n", newValue = " ")
         command.value = Command.SubmitSearch(sanitizedQuery)
-        val params = mapOf(
-            DuckChatPixelParameters.TEXT_LENGTH_BUCKET to sanitizedQuery.length.toQueryLengthBucket(),
-        )
+        val params =
+            mapOf(
+                DuckChatPixelParameters.TEXT_LENGTH_BUCKET to sanitizedQuery.length.toQueryLengthBucket(),
+            )
         pixel.fire(pixel = DUCK_CHAT_EXPERIMENTAL_OMNIBAR_QUERY_SUBMITTED, parameters = params)
         pixel.fire(DUCK_CHAT_EXPERIMENTAL_OMNIBAR_QUERY_SUBMITTED_DAILY, type = Daily())
         inputScreenDiscoveryFunnel.onSearchSubmitted()
@@ -390,10 +395,11 @@ class InputScreenViewModel @AssistedInject constructor(
                 duckChat.openDuckChatWithAutoPrompt(query)
             }
 
-            val params = mapOf(
-                DuckChatPixelParameters.WAS_USED_BEFORE to wasDuckAiOpenedBefore.toBinaryString(),
-                DuckChatPixelParameters.TEXT_LENGTH_BUCKET to query.length.toQueryLengthBucket(),
-            )
+            val params =
+                mapOf(
+                    DuckChatPixelParameters.WAS_USED_BEFORE to wasDuckAiOpenedBefore.toBinaryString(),
+                    DuckChatPixelParameters.TEXT_LENGTH_BUCKET to query.length.toQueryLengthBucket(),
+                )
             pixel.fire(pixel = DUCK_CHAT_EXPERIMENTAL_OMNIBAR_PROMPT_SUBMITTED, parameters = params)
             pixel.fire(DUCK_CHAT_EXPERIMENTAL_OMNIBAR_PROMPT_SUBMITTED_DAILY, type = Daily())
 
@@ -447,7 +453,10 @@ class InputScreenViewModel @AssistedInject constructor(
         userSelectedMode = SEARCH
     }
 
-    fun onPageScrolled(position: Int, positionOffset: Float) {
+    fun onPageScrolled(
+        position: Int,
+        positionOffset: Float,
+    ) {
         if (!isTapTransition) {
             val logoProgress = calculateLogoProgress(position, positionOffset)
             command.value = Command.SetLogoProgress(logoProgress)
@@ -456,17 +465,19 @@ class InputScreenViewModel @AssistedInject constructor(
         }
     }
 
-    private fun calculateLogoProgress(position: Int, positionOffset: Float): Float {
+    private fun calculateLogoProgress(
+        position: Int,
+        positionOffset: Float,
+    ): Float {
         if (newTabPageHasContent.value) return 1f
         return if (position == 0) positionOffset else 1f - positionOffset
     }
 
-    private fun calculateInputModeWidgetScrollPosition(positionOffset: Float): Float {
-        return when {
+    private fun calculateInputModeWidgetScrollPosition(positionOffset: Float): Float =
+        when {
             positionOffset <= 0.5f -> positionOffset * positionOffset * 2f
             else -> 1f - (1f - positionOffset) * (1f - positionOffset) * 2f
         }
-    }
 
     fun onTabTapped(index: Int) {
         if (currentPagePosition != index) {
@@ -512,18 +523,23 @@ class InputScreenViewModel @AssistedInject constructor(
         }
     }
 
-    fun storeAutoCompleteScrollPosition(firstVisibleItemPosition: Int, itemOffsetTop: Int) {
-        autoCompleteScrollState = autoCompleteScrollState.copy(
-            firstVisibleItemPosition = firstVisibleItemPosition,
-            itemOffsetTop = itemOffsetTop,
-        )
+    fun storeAutoCompleteScrollPosition(
+        firstVisibleItemPosition: Int,
+        itemOffsetTop: Int,
+    ) {
+        autoCompleteScrollState =
+            autoCompleteScrollState.copy(
+                firstVisibleItemPosition = firstVisibleItemPosition,
+                itemOffsetTop = itemOffsetTop,
+            )
     }
 
     fun restoreAutoCompleteScrollPosition() {
-        searchTabCommand.value = SearchCommand.RestoreAutoCompleteScrollPosition(
-            firstVisibleItemPosition = autoCompleteScrollState.firstVisibleItemPosition,
-            itemOffsetTop = autoCompleteScrollState.itemOffsetTop,
-        )
+        searchTabCommand.value =
+            SearchCommand.RestoreAutoCompleteScrollPosition(
+                firstVisibleItemPosition = autoCompleteScrollState.firstVisibleItemPosition,
+                itemOffsetTop = autoCompleteScrollState.itemOffsetTop,
+            )
         showKeyboard()
     }
 
@@ -545,19 +561,22 @@ class InputScreenViewModel @AssistedInject constructor(
     }
 
     private fun fireModeSwitchedPixel(directionToSearch: Boolean) {
-        val hadText = if (directionToSearch) {
-            chatInputTextState.value.isNotBlank()
-        } else {
-            searchInputTextState.value.isNotBlank()
-        }
-        val params = mapOf(
-            "direction" to if (directionToSearch) {
-                "to_search"
+        val hadText =
+            if (directionToSearch) {
+                chatInputTextState.value.isNotBlank()
             } else {
-                "to_duckai"
-            },
-            "had_text" to hadText.toString(),
-        )
+                searchInputTextState.value.isNotBlank()
+            }
+        val params =
+            mapOf(
+                "direction" to
+                    if (directionToSearch) {
+                        "to_search"
+                    } else {
+                        "to_duckai"
+                    },
+                "had_text" to hadText.toString(),
+            )
         pixel.fire(pixel = DUCK_CHAT_EXPERIMENTAL_OMNIBAR_MODE_SWITCHED, parameters = params)
     }
 
@@ -568,29 +587,25 @@ class InputScreenViewModel @AssistedInject constructor(
         }
     }
 
-    private fun Int.toQueryLengthBucket(): String = when {
-        this <= 15 -> "short"
-        this <= 40 -> "medium"
-        this <= 100 -> "long"
-        else -> "very_long"
-    }
+    private fun Int.toQueryLengthBucket(): String =
+        when {
+            this <= 15 -> "short"
+            this <= 40 -> "medium"
+            this <= 100 -> "long"
+            else -> "very_long"
+        }
 
     class InputScreenViewModelProviderFactory(
         private val assistedFactory: InputScreenViewModelFactory,
         private val currentOmnibarText: String,
     ) : ViewModelProvider.Factory {
-
         @Suppress("UNCHECKED_CAST")
-        override fun <T : ViewModel> create(modelClass: Class<T>): T {
-            return assistedFactory.create(currentOmnibarText) as T
-        }
+        override fun <T : ViewModel> create(modelClass: Class<T>): T = assistedFactory.create(currentOmnibarText) as T
     }
 
     @AssistedFactory
     interface InputScreenViewModelFactory {
-        fun create(
-            currentOmnibarText: String,
-        ): InputScreenViewModel
+        fun create(currentOmnibarText: String): InputScreenViewModel
     }
 
     companion object {
@@ -599,9 +614,8 @@ class InputScreenViewModel @AssistedInject constructor(
 }
 
 @OptIn(FlowPreview::class)
-private fun <T> Flow<T>.debounceExceptFirst(timeoutMillis: Long): Flow<T> {
-    return merge(
+private fun <T> Flow<T>.debounceExceptFirst(timeoutMillis: Long): Flow<T> =
+    merge(
         take(1),
         drop(1).debounce(timeoutMillis),
     )
-}

@@ -35,8 +35,8 @@ import com.duckduckgo.app.appearance.AppearanceViewModel.Command.LaunchThemeSett
 import com.duckduckgo.app.appearance.AppearanceViewModel.Command.UpdateTheme
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ActivityAppearanceBinding
-import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition
 import com.duckduckgo.app.fire.FireActivity
+import com.duckduckgo.browser.ui.omnibar.OmnibarPosition
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.DuckDuckGoTheme
 import com.duckduckgo.common.ui.DuckDuckGoTheme.DARK
@@ -57,45 +57,47 @@ import logcat.logcat
 @ContributeToActivityStarter(Default::class, screenName = "appearance")
 @ContributeToActivityStarter(HighlightedItem::class, screenName = "appearance")
 class AppearanceActivity : DuckDuckGoActivity() {
-
     private val viewModel: AppearanceViewModel by bindViewModel()
     private val binding: ActivityAppearanceBinding by viewBinding()
 
-    private val forceDarkModeToggleListener = CompoundButton.OnCheckedChangeListener { _, isChecked ->
-        viewModel.onForceDarkModeSettingChanged(isChecked)
+    private val forceDarkModeToggleListener =
+        CompoundButton.OnCheckedChangeListener { _, isChecked ->
+            viewModel.onForceDarkModeSettingChanged(isChecked)
 
-        TextAlertDialogBuilder(this)
-            .setTitle(R.string.appearanceNightModeDialogTitle)
-            .setMessage(R.string.appearanceNightModeDialogMessage)
-            .setPositiveButton(R.string.appearanceNightModeDialogPrimaryCTA)
-            .setNegativeButton(R.string.appearanceNightModeDialogSecondaryCTA)
-            .addEventListener(
-                object : TextAlertDialogBuilder.EventListener() {
-                    override fun onPositiveButtonClicked() {
-                        FireActivity.triggerRestart(baseContext, false)
-                    }
+            TextAlertDialogBuilder(this)
+                .setTitle(R.string.appearanceNightModeDialogTitle)
+                .setMessage(R.string.appearanceNightModeDialogMessage)
+                .setPositiveButton(R.string.appearanceNightModeDialogPrimaryCTA)
+                .setNegativeButton(R.string.appearanceNightModeDialogSecondaryCTA)
+                .addEventListener(
+                    object : TextAlertDialogBuilder.EventListener() {
+                        override fun onPositiveButtonClicked() {
+                            FireActivity.triggerRestart(baseContext, false)
+                        }
 
-                    override fun onNegativeButtonClicked() {
-                        // no-op
-                    }
-                },
-            )
-            .show()
-    }
-
-    private val showFullUrlToggleListener = CompoundButton.OnCheckedChangeListener { _, isChecked ->
-        viewModel.onFullUrlSettingChanged(isChecked)
-    }
-
-    private val showTrackersCountInTabSwitcher = CompoundButton.OnCheckedChangeListener { _, isChecked ->
-        viewModel.onShowTrackersCountInTabSwitcherChanged(isChecked)
-    }
-
-    private val changeIconFlow = registerForActivityResult(ChangeIconContract()) { resultOk ->
-        if (resultOk) {
-            logcat { "Icon changed." }
+                        override fun onNegativeButtonClicked() {
+                            // no-op
+                        }
+                    },
+                ).show()
         }
-    }
+
+    private val showFullUrlToggleListener =
+        CompoundButton.OnCheckedChangeListener { _, isChecked ->
+            viewModel.onFullUrlSettingChanged(isChecked)
+        }
+
+    private val showTrackersCountInTabSwitcher =
+        CompoundButton.OnCheckedChangeListener { _, isChecked ->
+            viewModel.onShowTrackersCountInTabSwitcherChanged(isChecked)
+        }
+
+    private val changeIconFlow =
+        registerForActivityResult(ChangeIconContract()) { resultOk ->
+            if (resultOk) {
+                logcat { "Icon changed." }
+            }
+        }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -115,7 +117,8 @@ class AppearanceActivity : DuckDuckGoActivity() {
     }
 
     private fun observeViewModel() {
-        viewModel.viewState()
+        viewModel
+            .viewState()
             .flowWithLifecycle(lifecycle, Lifecycle.State.RESUMED)
             .onEach { viewState ->
                 viewState.let {
@@ -133,30 +136,33 @@ class AppearanceActivity : DuckDuckGoActivity() {
                 }
             }.launchIn(lifecycleScope)
 
-        viewModel.commands()
+        viewModel
+            .commands()
             .flowWithLifecycle(lifecycle, Lifecycle.State.CREATED)
             .onEach { processCommand(it) }
             .launchIn(lifecycleScope)
     }
 
     private fun updateSelectedTheme(selectedTheme: DuckDuckGoTheme) {
-        val subtitle = getString(
-            when (selectedTheme) {
-                DARK -> R.string.settingsDarkTheme
-                LIGHT -> R.string.settingsLightTheme
-                SYSTEM_DEFAULT -> R.string.settingsSystemTheme
-            },
-        )
+        val subtitle =
+            getString(
+                when (selectedTheme) {
+                    DARK -> R.string.settingsDarkTheme
+                    LIGHT -> R.string.settingsLightTheme
+                    SYSTEM_DEFAULT -> R.string.settingsSystemTheme
+                },
+            )
         binding.selectedThemeSetting.setSecondaryText(subtitle)
     }
 
     private fun updateSelectedOmnibarPosition(position: OmnibarPosition) {
-        val subtitle = getString(
-            when (position) {
-                OmnibarPosition.TOP -> R.string.settingsAddressBarPositionTop
-                OmnibarPosition.BOTTOM -> R.string.settingsAddressBarPositionBottom
-            },
-        )
+        val subtitle =
+            getString(
+                when (position) {
+                    OmnibarPosition.TOP -> R.string.settingsAddressBarPositionTop
+                    OmnibarPosition.BOTTOM -> R.string.settingsAddressBarPositionBottom
+                },
+            )
         binding.addressBarPositionSetting.setSecondaryText(subtitle)
     }
 
@@ -184,22 +190,21 @@ class AppearanceActivity : DuckDuckGoActivity() {
                     R.string.settingsDarkTheme,
                 ),
                 currentTheme,
-            )
-            .setPositiveButton(R.string.settingsThemeDialogSave)
+            ).setPositiveButton(R.string.settingsThemeDialogSave)
             .setNegativeButton(R.string.cancel)
             .addEventListener(
                 object : RadioListAlertDialogBuilder.EventListener() {
                     override fun onPositiveButtonClicked(selectedItem: Int) {
-                        val selectedTheme = when (selectedItem) {
-                            2 -> DuckDuckGoTheme.LIGHT
-                            3 -> DuckDuckGoTheme.DARK
-                            else -> DuckDuckGoTheme.SYSTEM_DEFAULT
-                        }
+                        val selectedTheme =
+                            when (selectedItem) {
+                                2 -> DuckDuckGoTheme.LIGHT
+                                3 -> DuckDuckGoTheme.DARK
+                                else -> DuckDuckGoTheme.SYSTEM_DEFAULT
+                            }
                         viewModel.onThemeSelected(selectedTheme)
                     }
                 },
-            )
-            .show()
+            ).show()
     }
 
     private fun launchOmnibarPositionSelector(position: OmnibarPosition) {
@@ -211,8 +216,7 @@ class AppearanceActivity : DuckDuckGoActivity() {
                     R.string.settingsAddressBarPositionBottom,
                 ),
                 OmnibarPosition.entries.indexOf(position) + 1,
-            )
-            .setPositiveButton(com.duckduckgo.mobile.android.R.string.dialogSave)
+            ).setPositiveButton(com.duckduckgo.mobile.android.R.string.dialogSave)
             .setNegativeButton(R.string.cancel)
             .addEventListener(
                 object : RadioListAlertDialogBuilder.EventListener() {
@@ -221,8 +225,7 @@ class AppearanceActivity : DuckDuckGoActivity() {
                         viewModel.onOmnibarPositionUpdated(newPosition)
                     }
                 },
-            )
-            .show()
+            ).show()
     }
 
     private fun scrollToHighlightedItem() {
