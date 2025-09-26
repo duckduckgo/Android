@@ -438,9 +438,7 @@ class RealDuckChat @Inject constructor(
         parameters: Map<String, String>,
         forceNewSession: Boolean = false,
     ) {
-        // val url = appendParameters(parameters, duckChatLink)
-        val url = "https://mtsoy.duck.co/?q=DuckDuckGo+AI+Chat&ia=chat&duckai=5"
-
+        val url = appendParameters(parameters, duckChatLink)
         appCoroutineScope.launch(dispatchers.io()) {
             val sessionDelta = duckChatFeatureRepository.sessionDeltaInMinutes()
             val params = mapOf(DuckChatPixelParameters.DELTA_TIMESTAMP_PARAMETERS to sessionDelta.toString())
@@ -650,7 +648,8 @@ class RealDuckChat @Inject constructor(
         }
 
     companion object {
-        private const val DUCK_CHAT_WEB_LINK = "https://duckduckgo.com/?q=DuckDuckGo+AI+Chat&ia=chat&duckai=5"
+        // private const val DUCK_CHAT_WEB_LINK = "https://duckduckgo.com/?q=DuckDuckGo+AI+Chat&ia=chat&duckai=5"
+        private const val DUCK_CHAT_WEB_LINK = "https://mtsoy.duck.co/?q=DuckDuckGo+AI+Chat&ia=chat&duckai=5"
         private const val DUCKDUCKGO_HOST = "duckduckgo.com"
         private const val CHAT_QUERY_NAME = "ia"
         private const val CHAT_QUERY_VALUE = "chat"
