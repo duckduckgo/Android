@@ -253,7 +253,8 @@ open class DuckChatWebViewFragment : DuckDuckGoFragment(R.layout.activity_duck_c
                                     duckChatJSHelper.processJsCallbackMessage(featureName, method, id, data)?.let { response ->
                                         withContext(dispatcherProvider.main()) {
                                             if (response.method == METHOD_OPEN_KEYBOARD) {
-                                                simpleWebview.evaluateJavascript(response.params.get(SELECTOR).toString(), null,
+                                                simpleWebview.evaluateJavascript(
+                                                    response.params.get(SELECTOR).toString(), null,
                                                 )
                                                 showSoftKeyboard()
                                             } else {
