@@ -149,6 +149,7 @@ import com.duckduckgo.app.browser.omnibar.Omnibar.OmnibarTextState
 import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode
 import com.duckduckgo.app.browser.omnibar.OmnibarItemPressedListener
 import com.duckduckgo.app.browser.omnibar.QueryOrigin
+import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition
 import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition.BOTTOM
 import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition.TOP
 import com.duckduckgo.app.browser.print.PrintDocumentAdapterFactory
@@ -158,6 +159,7 @@ import com.duckduckgo.app.browser.session.WebViewSessionStorage
 import com.duckduckgo.app.browser.shortcut.ShortcutBuilder
 import com.duckduckgo.app.browser.tabpreview.WebViewPreviewGenerator
 import com.duckduckgo.app.browser.tabpreview.WebViewPreviewPersister
+import com.duckduckgo.app.browser.ui.InsetsWithKeyboardAnimationCallback
 import com.duckduckgo.app.browser.ui.dialogs.AutomaticFireproofDialogOptions
 import com.duckduckgo.app.browser.ui.dialogs.LaunchInExternalAppOptions
 import com.duckduckgo.app.browser.ui.dialogs.widgetprompt.AlternativeHomeScreenWidgetBottomSheetDialog
@@ -1050,6 +1052,11 @@ class BrowserTabFragment :
         }
 
         launchDownloadMessagesJob()
+
+        if (omnibar.omnibarPosition == OmnibarPosition.BOTTOM) {
+            val insetsWithKeyboardAnimationCallback = InsetsWithKeyboardAnimationCallback(omnibar.newOmnibar)
+            ViewCompat.setWindowInsetsAnimationCallback(omnibar.newOmnibar, insetsWithKeyboardAnimationCallback)
+        }
     }
 
     private fun updateOrDeleteWebViewPreview() {
