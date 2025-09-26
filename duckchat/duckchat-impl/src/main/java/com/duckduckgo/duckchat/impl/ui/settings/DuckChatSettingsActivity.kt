@@ -203,7 +203,7 @@ class DuckChatSettingsActivity : DuckDuckGoActivity() {
                     this,
                     WebViewActivityWithParams(
                         url = command.link,
-                        screenTitle = getString(R.string.duck_chat_title),
+                        screenTitle = getString(command.titleRes),
                     ),
                 )
             }
