@@ -44,7 +44,6 @@ import com.duckduckgo.user.agent.api.UserAgentProvider
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import org.json.JSONObject
-import java.lang.System.exit
 import javax.inject.Inject
 import javax.inject.Named
 
@@ -133,8 +132,23 @@ class WebViewActivity : DuckDuckGoActivity() {
         return Pair(url, supportNewWindows)
     }
 
+    @SuppressLint("SetJavaScriptEnabled")
     private fun setupWebView(supportNewWindows: Boolean) {
         binding.simpleWebview.let {
+            contentScopeScripts.register(
+                it,
+                object : JsMessageCallback() {
+                    override fun process(
+                        featureName: String,
+                        method: String,
+                        id: String?,
+                        data: JSONObject?,
+                    ) {
+                        viewModel.processJsCallbackMessage(featureName, method, id, data)
+                    }
+                },
+            )
+
             it.webViewClient = webViewClient
 
             if (supportNewWindows) {
@@ -170,20 +184,6 @@ class WebViewActivity : DuckDuckGoActivity() {
                 databaseEnabled = false
                 setSupportZoom(true)
             }
-
-            contentScopeScripts.register(
-                it,
-                object : JsMessageCallback() {
-                    override fun process(
-                        featureName: String,
-                        method: String,
-                        id: String?,
-                        data: JSONObject?,
-                    ) {
-                        viewModel.processJsCallbackMessage(featureName, method, id, data)
-                    }
-                },
-            )
         }
     }
 
