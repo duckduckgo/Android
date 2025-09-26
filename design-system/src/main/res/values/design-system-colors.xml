@@ -69,6 +69,7 @@
     <attr name="daxColorRipple" format="color"/>
     <attr name="daxLogoTitleText" format="color"/>
     <attr name="daxOmnibarTextColorHighlight" format="color"/>
+    <attr name="daxColorShadowTertiary" format="color"/>
 
     <!-- Component Specific Colors -->
     <attr name="daxColorToolbar" format="color"/>
@@ -337,6 +338,8 @@
 
     <!-- Shadows -->
     <color name="background_omnibar_shadow">#FF000000</color>
+    <color name="shadow_tertiary_light">#29000000</color>
+    <color name="shadow_tertiary_dark">#52000000</color>
 
 </resources>
 
