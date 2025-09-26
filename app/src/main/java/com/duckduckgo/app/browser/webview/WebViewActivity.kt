@@ -23,6 +23,9 @@ import android.view.MenuItem
 import android.webkit.WebChromeClient
 import android.webkit.WebSettings
 import android.webkit.WebView
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.flowWithLifecycle
+import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.BrowserActivity
@@ -33,9 +36,15 @@ import com.duckduckgo.browser.api.ui.BrowserScreens.WebViewActivityWithParams
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.js.messaging.api.JsMessageCallback
+import com.duckduckgo.js.messaging.api.JsMessaging
 import com.duckduckgo.navigation.api.getActivityParams
 import com.duckduckgo.user.agent.api.UserAgentProvider
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
+import org.json.JSONObject
 import javax.inject.Inject
+import javax.inject.Named
 
 @InjectWith(ActivityScope::class)
 @ContributeToActivityStarter(WebViewActivityWithParams::class)
@@ -50,6 +59,12 @@ class WebViewActivity : DuckDuckGoActivity() {
     @Inject
     lateinit var pixel: Pixel
 
+    private val viewModel: WebViewViewModel by bindViewModel()
+
+    @Inject
+    @Named("ContentScopeScripts")
+    lateinit var contentScopeScripts: JsMessaging
+
     private val binding: ActivityWebviewBinding by viewBinding()
 
     private val toolbar
@@ -62,11 +77,41 @@ class WebViewActivity : DuckDuckGoActivity() {
         setContentView(binding.root)
         setupToolbar(toolbar)
 
+        val (url, supportNewWindows) = extractParameters()
+
+        setupWebView(supportNewWindows)
+        setupCollectors()
+
+        viewModel.onStart(url)
+    }
+
+    private fun setupCollectors() {
+        viewModel.commands
+            .flowWithLifecycle(lifecycle, Lifecycle.State.CREATED)
+            .onEach { processCommand(it) }
+            .launchIn(lifecycleScope)
+    }
+
+    private fun processCommand(command: WebViewViewModel.Command) {
+        when (command) {
+            is WebViewViewModel.Command.LoadUrl -> {
+                binding.simpleWebview.loadUrl(command.url)
+            }
+            WebViewViewModel.Command.Exit -> {
+                finish()
+            }
+        }
+    }
+
+    private fun extractParameters(): Pair<String?, Boolean> {
         val params = intent.getActivityParams(WebViewActivityWithParams::class.java)
         val url = params?.url
         title = params?.screenTitle.orEmpty()
         val supportNewWindows = params?.supportNewWindows ?: false
+        return Pair(url, supportNewWindows)
+    }
 
+    private fun setupWebView(supportNewWindows: Boolean) {
         binding.simpleWebview.let {
             it.webViewClient = webViewClient
 
@@ -102,10 +147,20 @@ class WebViewActivity : DuckDuckGoActivity() {
                 databaseEnabled = false
                 setSupportZoom(true)
             }
-        }
 
-        url?.let {
-            binding.simpleWebview.loadUrl(it)
+            contentScopeScripts.register(
+                it,
+                object : JsMessageCallback() {
+                    override fun process(
+                        featureName: String,
+                        method: String,
+                        id: String?,
+                        data: JSONObject?,
+                    ) {
+                        viewModel.processJsCallbackMessage(featureName, method, id, data)
+                    }
+                },
+            )
         }
     }
 
