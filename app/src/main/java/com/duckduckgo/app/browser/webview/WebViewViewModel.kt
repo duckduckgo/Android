@@ -19,6 +19,7 @@ package com.duckduckgo.app.browser.webview
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.settings.api.SettingsConstants
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
@@ -31,7 +32,9 @@ import org.json.JSONObject
 import javax.inject.Inject
 
 @ContributesViewModel(ActivityScope::class)
-class WebViewViewModel @Inject constructor() : ViewModel() {
+class WebViewViewModel @Inject constructor(
+    private val dispatcherProvider: DispatcherProvider,
+) : ViewModel() {
     private val commandChannel = Channel<Command>(capacity = 1, onBufferOverflow = DROP_OLDEST)
     val commands = commandChannel.receiveAsFlow()
 
@@ -58,14 +61,16 @@ class WebViewViewModel @Inject constructor() : ViewModel() {
         id: String?,
         data: JSONObject?,
     ) {
-        when (featureName) {
-            SettingsConstants.FEATURE_SERP_SETTINGS ->
-                when (method) {
-                    SettingsConstants.METHOD_OPEN_NATIVE_SETTINGS -> {
-                        val returnParam = data?.optString(SettingsConstants.PARAM_RETURN)
-                        openNativeSettings(returnParam)
+        viewModelScope.launch(dispatcherProvider.io()) {
+            when (featureName) {
+                SettingsConstants.FEATURE_SERP_SETTINGS ->
+                    when (method) {
+                        SettingsConstants.METHOD_OPEN_NATIVE_SETTINGS -> {
+                            val returnParam = data?.optString(SettingsConstants.PARAM_RETURN)
+                            openNativeSettings(returnParam)
+                        }
                     }
-                }
+            }
         }
     }
 
