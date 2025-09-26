@@ -53,6 +53,7 @@ import com.duckduckgo.autofill.impl.importing.takeout.webflow.ImportGoogleBookma
 import com.duckduckgo.autofill.impl.importing.takeout.webflow.ImportGoogleBookmarksWebFlowViewModel.Command.InjectCredentialsFromReauth
 import com.duckduckgo.autofill.impl.importing.takeout.webflow.ImportGoogleBookmarksWebFlowViewModel.Command.NoCredentialsAvailable
 import com.duckduckgo.autofill.impl.importing.takeout.webflow.ImportGoogleBookmarksWebFlowViewModel.Command.PromptUserToSelectFromStoredCredentials
+import com.duckduckgo.autofill.impl.importing.takeout.webflow.ImportGoogleBookmarksWebFlowViewModel.ViewState.HideWebPage
 import com.duckduckgo.autofill.impl.importing.takeout.webflow.ImportGoogleBookmarksWebFlowViewModel.ViewState.Initializing
 import com.duckduckgo.autofill.impl.importing.takeout.webflow.ImportGoogleBookmarksWebFlowViewModel.ViewState.LoadingWebPage
 import com.duckduckgo.autofill.impl.importing.takeout.webflow.ImportGoogleBookmarksWebFlowViewModel.ViewState.NavigatingBack
@@ -64,6 +65,8 @@ import com.duckduckgo.autofill.impl.jsbridge.request.SupportedAutofillInputSubTy
 import com.duckduckgo.autofill.impl.jsbridge.request.SupportedAutofillInputSubType.PASSWORD
 import com.duckduckgo.autofill.impl.store.ReAuthenticationDetails
 import com.duckduckgo.common.ui.DuckDuckGoFragment
+import com.duckduckgo.common.ui.view.hide
+import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.FragmentViewModelFactory
 import com.duckduckgo.common.utils.plugins.PluginPoint
@@ -173,7 +176,14 @@ class ImportGoogleBookmarksWebFlowFragment :
                     is LoadingWebPage -> loadFirstWebpage(viewState.url)
                     is NavigatingBack -> binding?.webView?.goBack()
                     is Initializing -> {}
-                    is ShowWebPage -> {}
+                    is ShowWebPage -> {
+                        binding?.webView?.show()
+                        logcat { "cdr showing webview ${Thread.currentThread().name}" }
+                    }
+                    is HideWebPage -> {
+                        binding?.webView?.hide()
+                        logcat { "cdr hiding webview ${Thread.currentThread().name}" }
+                    }
                 }
             }.launchIn(lifecycleScope)
     }
@@ -327,6 +337,7 @@ class ImportGoogleBookmarksWebFlowFragment :
     private fun getToolbar() = (activity as ImportGoogleBookmarksWebFlowActivity).binding.includeToolbar.toolbar
 
     override fun onPageStarted(url: String?) {
+        viewModel.onPageStarted(url)
         lifecycleScope.launch(dispatchers.main()) {
             binding?.let {
                 val reauthDetails = url?.let { viewModel.getReauthData(url) } ?: ReAuthenticationDetails()

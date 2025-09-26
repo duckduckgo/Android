@@ -4,6 +4,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import app.cash.turbine.test
 import com.duckduckgo.autofill.impl.importing.takeout.processor.BookmarkImportProcessor
 import com.duckduckgo.autofill.impl.importing.takeout.webflow.ImportGoogleBookmarksWebFlowViewModel.Command
+import com.duckduckgo.autofill.impl.importing.takeout.webflow.ImportGoogleBookmarksWebFlowViewModel.ViewState.HideWebPage
 import com.duckduckgo.autofill.impl.importing.takeout.webflow.ImportGoogleBookmarksWebFlowViewModel.ViewState.NavigatingBack
 import com.duckduckgo.autofill.impl.importing.takeout.webflow.ImportGoogleBookmarksWebFlowViewModel.ViewState.ShowWebPage
 import com.duckduckgo.autofill.impl.importing.takeout.webflow.ImportGoogleBookmarksWebFlowViewModel.ViewState.UserCancelledImportFlow
@@ -36,57 +37,95 @@ class ImportGoogleBookmarksWebFlowViewModelTest {
         )
 
     @Test
-    fun whenFirstPageLoadingThenShowWebPageState() =
-        runTest {
-            testee.firstPageLoading()
-            assertEquals(ShowWebPage, testee.viewState.value)
-        }
+    fun whenOnPageStartedWithTakeoutUrlThenHideWebPage() = runTest {
+        testee.onPageStarted("https://takeout.google.com")
+        assertEquals(HideWebPage, testee.viewState.value)
+    }
 
     @Test
-    fun whenBackButtonPressedAndCannotGoBackThenUserCancelledState() =
-        runTest {
-            testee.onBackButtonPressed(canGoBack = false)
-            assertTrue(testee.viewState.value is UserCancelledImportFlow)
-        }
+    fun whenOnPageStartedWithUppercaseTakeoutUrlThenHideWebPage() = runTest {
+        testee.onPageStarted("https://TAKEOUT.GOOGLE.COM")
+        assertEquals(HideWebPage, testee.viewState.value)
+    }
 
     @Test
-    fun whenBackButtonPressedAndCanGoBackThenNavigatingBackState() =
-        runTest {
-            testee.onBackButtonPressed(canGoBack = true)
-            assertEquals(NavigatingBack, testee.viewState.value)
-        }
+    fun whenOnPageStartedWithAccountsGoogleUrlThenShowWebPage() = runTest {
+        testee.onPageStarted("https://accounts.google.com/signin")
+        assertEquals(ShowWebPage, testee.viewState.value)
+    }
 
     @Test
-    fun whenDownloadDetectedWithValidZipThenProcessorCalled() =
-        runTest {
-            configureImportSuccessful()
-
-            testee.commands.test {
-                triggerDownloadDetectedWithTakeoutZip()
-                awaitItem()
-                verify(mockBookmarkImportProcessor).downloadAndImportFromTakeoutZipUrl(any(), any(), any())
-            }
-        }
+    fun whenOnPageStartedWithExampleUrlThenShowWebPage() = runTest {
+        testee.onPageStarted("https://example.com/page")
+        assertEquals(ShowWebPage, testee.viewState.value)
+    }
 
     @Test
-    fun whenDownloadDetectedWithValidZipButFailsToDownloadThenExitFlowAsFailureCommandEmitted() =
-        runTest {
-            configureImportFailure()
-
-            testee.commands.test {
-                triggerDownloadDetectedWithTakeoutZip()
-                awaitItem() as Command.ExitFlowAsFailure
-            }
-        }
+    fun whenOnPageStartedWithAccountsGoogleUrlContainingTakeoutInPathThenShowWebPage() = runTest {
+        testee.onPageStarted("https://accounts.google.com/signin?continue=https://takeout.google.com")
+        assertEquals(ShowWebPage, testee.viewState.value)
+    }
 
     @Test
-    fun whenDownloadDetectedWithInvalidTypeThenExitFlowAsFailureCommandEmitted() =
-        runTest {
-            testee.commands.test {
-                triggerDownloadDetectedButNotATakeoutZip()
-                awaitItem() as Command.ExitFlowAsFailure
-            }
+    fun whenOnPageStartedWithNullUrlThenViewStateRemainsUnchanged() = runTest {
+        val initialState = testee.viewState.value
+        testee.onPageStarted(null)
+        assertEquals(initialState, testee.viewState.value)
+    }
+
+    @Test
+    fun whenOnPageStartedWithMalformedUrlThenViewStateRemainsUnchanged() = runTest {
+        val initialState = testee.viewState.value
+        testee.onPageStarted("not-a-valid-url")
+        assertEquals(initialState, testee.viewState.value)
+    }
+
+    @Test
+    fun whenFirstPageLoadingThenShowWebPageState() = runTest {
+        testee.firstPageLoading()
+        assertEquals(ShowWebPage, testee.viewState.value)
+    }
+
+    @Test
+    fun whenBackButtonPressedAndCannotGoBackThenUserCancelledState() = runTest {
+        testee.onBackButtonPressed(canGoBack = false)
+        assertTrue(testee.viewState.value is UserCancelledImportFlow)
+    }
+
+    @Test
+    fun whenBackButtonPressedAndCanGoBackThenNavigatingBackState() = runTest {
+        testee.onBackButtonPressed(canGoBack = true)
+        assertEquals(NavigatingBack, testee.viewState.value)
+    }
+
+    @Test
+    fun whenDownloadDetectedWithValidZipThenProcessorCalled() = runTest {
+        configureImportSuccessful()
+
+        testee.commands.test {
+            triggerDownloadDetectedWithTakeoutZip()
+            awaitItem()
+            verify(mockBookmarkImportProcessor).downloadAndImportFromTakeoutZipUrl(any(), any(), any())
         }
+    }
+
+    @Test
+    fun whenDownloadDetectedWithValidZipButFailsToDownloadThenExitFlowAsFailureCommandEmitted() = runTest {
+        configureImportFailure()
+
+        testee.commands.test {
+            triggerDownloadDetectedWithTakeoutZip()
+            awaitItem() as Command.ExitFlowAsFailure
+        }
+    }
+
+    @Test
+    fun whenDownloadDetectedWithInvalidTypeThenExitFlowAsFailureCommandEmitted() = runTest {
+        testee.commands.test {
+            triggerDownloadDetectedButNotATakeoutZip()
+            awaitItem() as Command.ExitFlowAsFailure
+        }
+    }
 
     private fun triggerDownloadDetectedWithTakeoutZip() {
         testee.onDownloadDetected(
