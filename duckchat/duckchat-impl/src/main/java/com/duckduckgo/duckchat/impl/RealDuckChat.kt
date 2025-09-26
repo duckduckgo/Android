@@ -439,7 +439,7 @@ class RealDuckChat @Inject constructor(
         forceNewSession: Boolean = false,
     ) {
         // val url = appendParameters(parameters, duckChatLink)
-        val url = "https://mtsoy.duck.co/?q=DuckDuckGo+AI+Chat&ia=chat&duckai=4 "
+        val url = "https://mtsoy.duck.co/?q=DuckDuckGo+AI+Chat&ia=chat&duckai=5"
 
         appCoroutineScope.launch(dispatchers.io()) {
             val sessionDelta = duckChatFeatureRepository.sessionDeltaInMinutes()

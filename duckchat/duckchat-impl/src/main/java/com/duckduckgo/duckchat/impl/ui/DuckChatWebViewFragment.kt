@@ -68,6 +68,7 @@ import com.duckduckgo.duckchat.impl.feature.AIChatDownloadFeature
 import com.duckduckgo.duckchat.impl.helper.DuckChatJSHelper
 import com.duckduckgo.duckchat.impl.helper.RealDuckChatJSHelper.Companion.DUCK_CHAT_FEATURE_NAME
 import com.duckduckgo.duckchat.impl.helper.RealDuckChatJSHelper.Companion.METHOD_OPEN_KEYBOARD
+import com.duckduckgo.duckchat.impl.helper.RealDuckChatJSHelper.Companion.SELECTOR
 import com.duckduckgo.duckchat.impl.ui.filechooser.FileChooserIntentBuilder
 import com.duckduckgo.duckchat.impl.ui.filechooser.capture.camera.CameraHardwareChecker
 import com.duckduckgo.duckchat.impl.ui.filechooser.capture.launcher.UploadFromExternalMediaAppLauncher
@@ -252,7 +253,8 @@ open class DuckChatWebViewFragment : DuckDuckGoFragment(R.layout.activity_duck_c
                                     duckChatJSHelper.processJsCallbackMessage(featureName, method, id, data)?.let { response ->
                                         withContext(dispatcherProvider.main()) {
                                             if (response.method == METHOD_OPEN_KEYBOARD) {
-                                                simpleWebview.evaluateJavascript("document.getElementsByName('user-prompt')[0]?.focus();", null)
+                                                simpleWebview.evaluateJavascript(response.params.get(SELECTOR).toString(), null,
+                                                )
                                                 showSoftKeyboard()
                                             } else {
                                                 contentScopeScripts.onResponse(response)
@@ -325,7 +327,7 @@ open class DuckChatWebViewFragment : DuckDuckGoFragment(R.layout.activity_duck_c
 
     private fun showSoftKeyboard() {
         simpleWebview.requestFocus()
-        val imm = requireContext().getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager
+        val imm = context?.getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager
         imm?.showSoftInput(simpleWebview, InputMethodManager.SHOW_IMPLICIT)
     }
 
