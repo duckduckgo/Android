@@ -34,7 +34,6 @@ import com.duckduckgo.app.trackerdetection.model.TrackerType
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 import com.duckduckgo.browser.ui.omnibar.OmnibarPosition.BOTTOM
 import com.duckduckgo.browser.ui.omnibar.OmnibarPosition.TOP
-import java.util.concurrent.TimeUnit
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
@@ -45,9 +44,9 @@ import org.mockito.MockitoAnnotations
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
+import java.util.concurrent.TimeUnit
 
 class CtaTest {
-
     @Mock
     private lateinit var mockOnboardingStore: OnboardingStore
 
@@ -285,19 +284,21 @@ class CtaTest {
 
     @Test
     fun whenMoreThanTwoTrackersBlockedReturnFirstTwoWithMultipleString() {
-        val trackers = listOf(
-            TestingEntity("Facebook", "Facebook", 9.0),
-            TestingEntity("Other", "Other", 9.0),
-            TestingEntity("Amazon", "Amazon", 9.0),
-        )
+        val trackers =
+            listOf(
+                TestingEntity("Facebook", "Facebook", 9.0),
+                TestingEntity("Other", "Other", 9.0),
+                TestingEntity("Amazon", "Amazon", 9.0),
+            )
 
-        val testee = OnboardingDaxDialogCta.DaxTrackersBlockedCta(
-            mockOnboardingStore,
-            mockAppInstallStore,
-            trackers,
-            mockSettingsDataStore,
-            mockOnboardingDesignExperimentManager,
-        )
+        val testee =
+            OnboardingDaxDialogCta.DaxTrackersBlockedCta(
+                mockOnboardingStore,
+                mockAppInstallStore,
+                trackers,
+                mockSettingsDataStore,
+                mockOnboardingDesignExperimentManager,
+            )
         val value = testee.getTrackersDescription(mockActivity, trackers)
 
         assertEquals("<b>Facebook, Other</b>withMultiple", value)
@@ -307,19 +308,21 @@ class CtaTest {
     fun whenMoreThanTwoTrackersBlockedAndBBExperimentEnabledReturnFirstTwoWithMultipleString() {
         whenever(mockOnboardingDesignExperimentManager.isBbEnrolledAndEnabled()).thenReturn(true)
 
-        val trackers = listOf(
-            TestingEntity("Facebook", "Facebook", 9.0),
-            TestingEntity("Other", "Other", 9.0),
-            TestingEntity("Amazon", "Amazon", 9.0),
-        )
+        val trackers =
+            listOf(
+                TestingEntity("Facebook", "Facebook", 9.0),
+                TestingEntity("Other", "Other", 9.0),
+                TestingEntity("Amazon", "Amazon", 9.0),
+            )
 
-        val testee = OnboardingDaxDialogCta.DaxTrackersBlockedCta(
-            mockOnboardingStore,
-            mockAppInstallStore,
-            trackers,
-            mockSettingsDataStore,
-            mockOnboardingDesignExperimentManager,
-        )
+        val testee =
+            OnboardingDaxDialogCta.DaxTrackersBlockedCta(
+                mockOnboardingStore,
+                mockAppInstallStore,
+                trackers,
+                mockSettingsDataStore,
+                mockOnboardingDesignExperimentManager,
+            )
         val value = testee.getTrackersDescription(mockActivity, trackers)
 
         assertEquals("Facebook, OtherwithMultiple", value)
@@ -327,18 +330,20 @@ class CtaTest {
 
     @Test
     fun whenTwoTrackersBlockedReturnThemWithZeroString() {
-        val trackers = listOf(
-            TestingEntity("Facebook", "Facebook", 9.0),
-            TestingEntity("Other", "Other", 9.0),
-        )
+        val trackers =
+            listOf(
+                TestingEntity("Facebook", "Facebook", 9.0),
+                TestingEntity("Other", "Other", 9.0),
+            )
 
-        val testee = OnboardingDaxDialogCta.DaxTrackersBlockedCta(
-            mockOnboardingStore,
-            mockAppInstallStore,
-            trackers,
-            mockSettingsDataStore,
-            mockOnboardingDesignExperimentManager,
-        )
+        val testee =
+            OnboardingDaxDialogCta.DaxTrackersBlockedCta(
+                mockOnboardingStore,
+                mockAppInstallStore,
+                trackers,
+                mockSettingsDataStore,
+                mockOnboardingDesignExperimentManager,
+            )
         val value = testee.getTrackersDescription(mockActivity, trackers)
 
         assertEquals("<b>Facebook, Other</b>withZero", value)
@@ -348,18 +353,20 @@ class CtaTest {
     fun whenTwoTrackersBlockedAndBBExperimentEnabledReturnThemWithZeroString() {
         whenever(mockOnboardingDesignExperimentManager.isBbEnrolledAndEnabled()).thenReturn(true)
 
-        val trackers = listOf(
-            TestingEntity("Facebook", "Facebook", 9.0),
-            TestingEntity("Other", "Other", 9.0),
-        )
+        val trackers =
+            listOf(
+                TestingEntity("Facebook", "Facebook", 9.0),
+                TestingEntity("Other", "Other", 9.0),
+            )
 
-        val testee = OnboardingDaxDialogCta.DaxTrackersBlockedCta(
-            mockOnboardingStore,
-            mockAppInstallStore,
-            trackers,
-            mockSettingsDataStore,
-            mockOnboardingDesignExperimentManager,
-        )
+        val testee =
+            OnboardingDaxDialogCta.DaxTrackersBlockedCta(
+                mockOnboardingStore,
+                mockAppInstallStore,
+                trackers,
+                mockSettingsDataStore,
+                mockOnboardingDesignExperimentManager,
+            )
         val value = testee.getTrackersDescription(mockActivity, trackers)
 
         assertEquals("Facebook, OtherwithZero", value)
@@ -367,26 +374,27 @@ class CtaTest {
 
     @Test
     fun whenTrackersBlockedReturnThemSortingByPrevalence() {
-        val trackers = listOf(
-            TrackingEvent(
-                documentUrl = "facebook.com",
-                trackerUrl = "facebook.com",
-                status = TrackerStatus.BLOCKED,
-                type = TrackerType.OTHER,
-                entity = TestingEntity("Facebook", "Facebook", 3.0),
-                categories = null,
-                surrogateId = null,
-            ),
-            TrackingEvent(
-                documentUrl = "other.com",
-                trackerUrl = "other.com",
-                status = TrackerStatus.BLOCKED,
-                type = TrackerType.OTHER,
-                entity = TestingEntity("Other", "Other", 9.0),
-                categories = null,
-                surrogateId = null,
-            ),
-        )
+        val trackers =
+            listOf(
+                TrackingEvent(
+                    documentUrl = "facebook.com",
+                    trackerUrl = "facebook.com",
+                    status = TrackerStatus.BLOCKED,
+                    type = TrackerType.OTHER,
+                    entity = TestingEntity("Facebook", "Facebook", 3.0),
+                    categories = null,
+                    surrogateId = null,
+                ),
+                TrackingEvent(
+                    documentUrl = "other.com",
+                    trackerUrl = "other.com",
+                    status = TrackerStatus.BLOCKED,
+                    type = TrackerType.OTHER,
+                    entity = TestingEntity("Other", "Other", 9.0),
+                    categories = null,
+                    surrogateId = null,
+                ),
+            )
         val site = site(events = trackers)
 
         val testee =
@@ -406,26 +414,27 @@ class CtaTest {
     fun whenTrackersBlockedAndBBExperimentEnabledReturnThemSortingByPrevalence() {
         whenever(mockOnboardingDesignExperimentManager.isBbEnrolledAndEnabled()).thenReturn(true)
 
-        val trackers = listOf(
-            TrackingEvent(
-                documentUrl = "facebook.com",
-                trackerUrl = "facebook.com",
-                status = TrackerStatus.BLOCKED,
-                type = TrackerType.OTHER,
-                entity = TestingEntity("Facebook", "Facebook", 3.0),
-                categories = null,
-                surrogateId = null,
-            ),
-            TrackingEvent(
-                documentUrl = "other.com",
-                trackerUrl = "other.com",
-                status = TrackerStatus.BLOCKED,
-                type = TrackerType.OTHER,
-                entity = TestingEntity("Other", "Other", 9.0),
-                categories = null,
-                surrogateId = null,
-            ),
-        )
+        val trackers =
+            listOf(
+                TrackingEvent(
+                    documentUrl = "facebook.com",
+                    trackerUrl = "facebook.com",
+                    status = TrackerStatus.BLOCKED,
+                    type = TrackerType.OTHER,
+                    entity = TestingEntity("Facebook", "Facebook", 3.0),
+                    categories = null,
+                    surrogateId = null,
+                ),
+                TrackingEvent(
+                    documentUrl = "other.com",
+                    trackerUrl = "other.com",
+                    status = TrackerStatus.BLOCKED,
+                    type = TrackerType.OTHER,
+                    entity = TestingEntity("Other", "Other", 9.0),
+                    categories = null,
+                    surrogateId = null,
+                ),
+            )
         val site = site(events = trackers)
 
         val testee =
@@ -443,35 +452,37 @@ class CtaTest {
 
     @Test
     fun whenTrackersBlockedReturnOnlyTrackersWithDisplayName() {
-        val trackers = listOf(
-            TrackingEvent(
-                documentUrl = "facebook.com",
-                trackerUrl = "facebook.com",
-                status = TrackerStatus.BLOCKED,
-                type = TrackerType.OTHER,
-                entity = TestingEntity("Facebook", "Facebook", 3.0),
-                categories = null,
-                surrogateId = null,
-            ),
-            TrackingEvent(
-                documentUrl = "other.com",
-                trackerUrl = "other.com",
-                status = TrackerStatus.BLOCKED,
-                type = TrackerType.OTHER,
-                entity = TestingEntity("Other", "", 9.0),
-                categories = null,
-                surrogateId = null,
-            ),
-        )
+        val trackers =
+            listOf(
+                TrackingEvent(
+                    documentUrl = "facebook.com",
+                    trackerUrl = "facebook.com",
+                    status = TrackerStatus.BLOCKED,
+                    type = TrackerType.OTHER,
+                    entity = TestingEntity("Facebook", "Facebook", 3.0),
+                    categories = null,
+                    surrogateId = null,
+                ),
+                TrackingEvent(
+                    documentUrl = "other.com",
+                    trackerUrl = "other.com",
+                    status = TrackerStatus.BLOCKED,
+                    type = TrackerType.OTHER,
+                    entity = TestingEntity("Other", "", 9.0),
+                    categories = null,
+                    surrogateId = null,
+                ),
+            )
         val site = site(events = trackers)
 
-        val testee = OnboardingDaxDialogCta.DaxTrackersBlockedCta(
-            mockOnboardingStore,
-            mockAppInstallStore,
-            site.orderedTrackerBlockedEntities(),
-            mockSettingsDataStore,
-            mockOnboardingDesignExperimentManager,
-        )
+        val testee =
+            OnboardingDaxDialogCta.DaxTrackersBlockedCta(
+                mockOnboardingStore,
+                mockAppInstallStore,
+                site.orderedTrackerBlockedEntities(),
+                mockSettingsDataStore,
+                mockOnboardingDesignExperimentManager,
+            )
         val value = testee.getTrackersDescription(mockActivity, site.orderedTrackerBlockedEntities())
 
         assertEquals("<b>Facebook</b>withZero", value)
@@ -481,35 +492,37 @@ class CtaTest {
     fun whenTrackersBlockedAndBBExperimentEnabledReturnOnlyTrackersWithDisplayName() {
         whenever(mockOnboardingDesignExperimentManager.isBbEnrolledAndEnabled()).thenReturn(true)
 
-        val trackers = listOf(
-            TrackingEvent(
-                documentUrl = "facebook.com",
-                trackerUrl = "facebook.com",
-                status = TrackerStatus.BLOCKED,
-                type = TrackerType.OTHER,
-                entity = TestingEntity("Facebook", "Facebook", 3.0),
-                categories = null,
-                surrogateId = null,
-            ),
-            TrackingEvent(
-                documentUrl = "other.com",
-                trackerUrl = "other.com",
-                status = TrackerStatus.BLOCKED,
-                type = TrackerType.OTHER,
-                entity = TestingEntity("Other", "", 9.0),
-                categories = null,
-                surrogateId = null,
-            ),
-        )
+        val trackers =
+            listOf(
+                TrackingEvent(
+                    documentUrl = "facebook.com",
+                    trackerUrl = "facebook.com",
+                    status = TrackerStatus.BLOCKED,
+                    type = TrackerType.OTHER,
+                    entity = TestingEntity("Facebook", "Facebook", 3.0),
+                    categories = null,
+                    surrogateId = null,
+                ),
+                TrackingEvent(
+                    documentUrl = "other.com",
+                    trackerUrl = "other.com",
+                    status = TrackerStatus.BLOCKED,
+                    type = TrackerType.OTHER,
+                    entity = TestingEntity("Other", "", 9.0),
+                    categories = null,
+                    surrogateId = null,
+                ),
+            )
         val site = site(events = trackers)
 
-        val testee = OnboardingDaxDialogCta.DaxTrackersBlockedCta(
-            mockOnboardingStore,
-            mockAppInstallStore,
-            site.orderedTrackerBlockedEntities(),
-            mockSettingsDataStore,
-            mockOnboardingDesignExperimentManager,
-        )
+        val testee =
+            OnboardingDaxDialogCta.DaxTrackersBlockedCta(
+                mockOnboardingStore,
+                mockAppInstallStore,
+                site.orderedTrackerBlockedEntities(),
+                mockSettingsDataStore,
+                mockOnboardingDesignExperimentManager,
+            )
         val value = testee.getTrackersDescription(mockActivity, site.orderedTrackerBlockedEntities())
 
         assertEquals("FacebookwithZero", value)
@@ -517,35 +530,37 @@ class CtaTest {
 
     @Test
     fun whenTrackersBlockedReturnOnlyTrackersBlocked() {
-        val trackers = listOf(
-            TrackingEvent(
-                documentUrl = "facebook.com",
-                trackerUrl = "facebook.com",
-                status = TrackerStatus.ALLOWED,
-                type = TrackerType.OTHER,
-                entity = TestingEntity("Facebook", "Facebook", 3.0),
-                categories = null,
-                surrogateId = null,
-            ),
-            TrackingEvent(
-                documentUrl = "other.com",
-                trackerUrl = "other.com",
-                status = TrackerStatus.BLOCKED,
-                type = TrackerType.OTHER,
-                entity = TestingEntity("Other", "Other", 9.0),
-                categories = null,
-                surrogateId = null,
-            ),
-        )
+        val trackers =
+            listOf(
+                TrackingEvent(
+                    documentUrl = "facebook.com",
+                    trackerUrl = "facebook.com",
+                    status = TrackerStatus.ALLOWED,
+                    type = TrackerType.OTHER,
+                    entity = TestingEntity("Facebook", "Facebook", 3.0),
+                    categories = null,
+                    surrogateId = null,
+                ),
+                TrackingEvent(
+                    documentUrl = "other.com",
+                    trackerUrl = "other.com",
+                    status = TrackerStatus.BLOCKED,
+                    type = TrackerType.OTHER,
+                    entity = TestingEntity("Other", "Other", 9.0),
+                    categories = null,
+                    surrogateId = null,
+                ),
+            )
         val site = site(events = trackers)
 
-        val testee = OnboardingDaxDialogCta.DaxTrackersBlockedCta(
-            mockOnboardingStore,
-            mockAppInstallStore,
-            site.orderedTrackerBlockedEntities(),
-            mockSettingsDataStore,
-            mockOnboardingDesignExperimentManager,
-        )
+        val testee =
+            OnboardingDaxDialogCta.DaxTrackersBlockedCta(
+                mockOnboardingStore,
+                mockAppInstallStore,
+                site.orderedTrackerBlockedEntities(),
+                mockSettingsDataStore,
+                mockOnboardingDesignExperimentManager,
+            )
         val value = testee.getTrackersDescription(mockActivity, site.orderedTrackerBlockedEntities())
 
         assertEquals("<b>Other</b>withZero", value)
@@ -555,35 +570,37 @@ class CtaTest {
     fun whenTrackersBlockedAndBBExperimentEnabledReturnOnlyTrackersBlocked() {
         whenever(mockOnboardingDesignExperimentManager.isBbEnrolledAndEnabled()).thenReturn(true)
 
-        val trackers = listOf(
-            TrackingEvent(
-                documentUrl = "facebook.com",
-                trackerUrl = "facebook.com",
-                status = TrackerStatus.ALLOWED,
-                type = TrackerType.OTHER,
-                entity = TestingEntity("Facebook", "Facebook", 3.0),
-                categories = null,
-                surrogateId = null,
-            ),
-            TrackingEvent(
-                documentUrl = "other.com",
-                trackerUrl = "other.com",
-                status = TrackerStatus.BLOCKED,
-                type = TrackerType.OTHER,
-                entity = TestingEntity("Other", "Other", 9.0),
-                categories = null,
-                surrogateId = null,
-            ),
-        )
+        val trackers =
+            listOf(
+                TrackingEvent(
+                    documentUrl = "facebook.com",
+                    trackerUrl = "facebook.com",
+                    status = TrackerStatus.ALLOWED,
+                    type = TrackerType.OTHER,
+                    entity = TestingEntity("Facebook", "Facebook", 3.0),
+                    categories = null,
+                    surrogateId = null,
+                ),
+                TrackingEvent(
+                    documentUrl = "other.com",
+                    trackerUrl = "other.com",
+                    status = TrackerStatus.BLOCKED,
+                    type = TrackerType.OTHER,
+                    entity = TestingEntity("Other", "Other", 9.0),
+                    categories = null,
+                    surrogateId = null,
+                ),
+            )
         val site = site(events = trackers)
 
-        val testee = OnboardingDaxDialogCta.DaxTrackersBlockedCta(
-            mockOnboardingStore,
-            mockAppInstallStore,
-            site.orderedTrackerBlockedEntities(),
-            mockSettingsDataStore,
-            mockOnboardingDesignExperimentManager,
-        )
+        val testee =
+            OnboardingDaxDialogCta.DaxTrackersBlockedCta(
+                mockOnboardingStore,
+                mockAppInstallStore,
+                site.orderedTrackerBlockedEntities(),
+                mockSettingsDataStore,
+                mockOnboardingDesignExperimentManager,
+            )
         val value = testee.getTrackersDescription(mockActivity, site.orderedTrackerBlockedEntities())
 
         assertEquals("OtherwithZero", value)
@@ -591,19 +608,21 @@ class CtaTest {
 
     @Test
     fun whenMultipleTrackersFromSameNetworkBlockedReturnOnlyOneWithZeroString() {
-        val trackers = listOf(
-            TestingEntity("Facebook", "Facebook", 9.0),
-            TestingEntity("Facebook", "Facebook", 9.0),
-            TestingEntity("Facebook", "Facebook", 9.0),
-        )
+        val trackers =
+            listOf(
+                TestingEntity("Facebook", "Facebook", 9.0),
+                TestingEntity("Facebook", "Facebook", 9.0),
+                TestingEntity("Facebook", "Facebook", 9.0),
+            )
 
-        val testee = OnboardingDaxDialogCta.DaxTrackersBlockedCta(
-            mockOnboardingStore,
-            mockAppInstallStore,
-            trackers,
-            mockSettingsDataStore,
-            mockOnboardingDesignExperimentManager,
-        )
+        val testee =
+            OnboardingDaxDialogCta.DaxTrackersBlockedCta(
+                mockOnboardingStore,
+                mockAppInstallStore,
+                trackers,
+                mockSettingsDataStore,
+                mockOnboardingDesignExperimentManager,
+            )
         val value = testee.getTrackersDescription(mockActivity, trackers)
 
         assertEquals("<b>Facebook</b>withZero", value)
@@ -613,19 +632,21 @@ class CtaTest {
     fun whenMultipleTrackersFromSameNetworkBlockedAndBBExperimentEnabledReturnOnlyOneWithZeroString() {
         whenever(mockOnboardingDesignExperimentManager.isBbEnrolledAndEnabled()).thenReturn(true)
 
-        val trackers = listOf(
-            TestingEntity("Facebook", "Facebook", 9.0),
-            TestingEntity("Facebook", "Facebook", 9.0),
-            TestingEntity("Facebook", "Facebook", 9.0),
-        )
+        val trackers =
+            listOf(
+                TestingEntity("Facebook", "Facebook", 9.0),
+                TestingEntity("Facebook", "Facebook", 9.0),
+                TestingEntity("Facebook", "Facebook", 9.0),
+            )
 
-        val testee = OnboardingDaxDialogCta.DaxTrackersBlockedCta(
-            mockOnboardingStore,
-            mockAppInstallStore,
-            trackers,
-            mockSettingsDataStore,
-            mockOnboardingDesignExperimentManager,
-        )
+        val testee =
+            OnboardingDaxDialogCta.DaxTrackersBlockedCta(
+                mockOnboardingStore,
+                mockAppInstallStore,
+                trackers,
+                mockSettingsDataStore,
+                mockOnboardingDesignExperimentManager,
+            )
         val value = testee.getTrackersDescription(mockActivity, trackers)
 
         assertEquals("FacebookwithZero", value)

@@ -43,7 +43,6 @@ import com.duckduckgo.common.ui.view.MessageCta.Message
 import com.duckduckgo.mobile.android.R as CommonR
 
 interface SuggestionViewHolderFactory {
-
     fun onCreateViewHolder(parent: ViewGroup): AutoCompleteViewHolder
 
     fun onBindViewHolder(
@@ -57,9 +56,9 @@ interface SuggestionViewHolderFactory {
     )
 }
 
-class SearchSuggestionViewHolderFactory(private val omnibarPosition: OmnibarPosition) :
-    SuggestionViewHolderFactory {
-
+class SearchSuggestionViewHolderFactory(
+    private val omnibarPosition: OmnibarPosition,
+) : SuggestionViewHolderFactory {
     override fun onCreateViewHolder(parent: ViewGroup): AutoCompleteViewHolder {
         val inflater = LayoutInflater.from(parent.context)
         val binding = ItemAutocompleteSearchSuggestionBinding.inflate(inflater, parent, false)
@@ -85,8 +84,7 @@ class SearchSuggestionViewHolderFactory(private val omnibarPosition: OmnibarPosi
     }
 }
 
-class HistorySuggestionViewHolderFactory() : SuggestionViewHolderFactory {
-
+class HistorySuggestionViewHolderFactory : SuggestionViewHolderFactory {
     override fun onCreateViewHolder(parent: ViewGroup): AutoCompleteViewHolder {
         val inflater = LayoutInflater.from(parent.context)
         val binding = ItemAutocompleteHistorySuggestionBinding.inflate(inflater, parent, false)
@@ -111,8 +109,7 @@ class HistorySuggestionViewHolderFactory() : SuggestionViewHolderFactory {
     }
 }
 
-class HistorySearchSuggestionViewHolderFactory() : SuggestionViewHolderFactory {
-
+class HistorySearchSuggestionViewHolderFactory : SuggestionViewHolderFactory {
     override fun onCreateViewHolder(parent: ViewGroup): AutoCompleteViewHolder {
         val inflater = LayoutInflater.from(parent.context)
         val binding = ItemAutocompleteHistorySearchSuggestionBinding.inflate(inflater, parent, false)
@@ -138,7 +135,6 @@ class HistorySearchSuggestionViewHolderFactory() : SuggestionViewHolderFactory {
 }
 
 class BookmarkSuggestionViewHolderFactory : SuggestionViewHolderFactory {
-
     override fun onCreateViewHolder(parent: ViewGroup): AutoCompleteViewHolder {
         val inflater = LayoutInflater.from(parent.context)
         val binding = ItemAutocompleteBookmarkSuggestionBinding.inflate(inflater, parent, false)
@@ -163,7 +159,6 @@ class BookmarkSuggestionViewHolderFactory : SuggestionViewHolderFactory {
 }
 
 class SwitchToTabSuggestionViewHolderFactory : SuggestionViewHolderFactory {
-
     override fun onCreateViewHolder(parent: ViewGroup): AutoCompleteViewHolder {
         val inflater = LayoutInflater.from(parent.context)
         val binding = ItemAutocompleteSwitchToTabSuggestionBinding.inflate(inflater, parent, false)
@@ -188,13 +183,13 @@ class SwitchToTabSuggestionViewHolderFactory : SuggestionViewHolderFactory {
 }
 
 class EmptySuggestionViewHolderFactory : SuggestionViewHolderFactory {
-
     override fun onCreateViewHolder(parent: ViewGroup): AutoCompleteViewHolder {
         val view = View(parent.context)
-        view.layoutParams = RecyclerView.LayoutParams(
-            RecyclerView.LayoutParams.MATCH_PARENT,
-            RecyclerView.LayoutParams.WRAP_CONTENT,
-        )
+        view.layoutParams =
+            RecyclerView.LayoutParams(
+                RecyclerView.LayoutParams.MATCH_PARENT,
+                RecyclerView.LayoutParams.WRAP_CONTENT,
+            )
         return AutoCompleteViewHolder.EmptySuggestionViewHolder(view)
     }
 
@@ -211,9 +206,9 @@ class EmptySuggestionViewHolderFactory : SuggestionViewHolderFactory {
     }
 }
 
-class DefaultSuggestionViewHolderFactory(private val omnibarPosition: OmnibarPosition) :
-    SuggestionViewHolderFactory {
-
+class DefaultSuggestionViewHolderFactory(
+    private val omnibarPosition: OmnibarPosition,
+) : SuggestionViewHolderFactory {
     override fun onCreateViewHolder(parent: ViewGroup): AutoCompleteViewHolder {
         val inflater = LayoutInflater.from(parent.context)
         return AutoCompleteViewHolder.DefaultSuggestionViewHolder(
@@ -280,7 +275,6 @@ class DividerViewHolderFactory : SuggestionViewHolderFactory {
 }
 
 class DuckAIPromptSuggestionViewHolderFactory : SuggestionViewHolderFactory {
-
     override fun onCreateViewHolder(parent: ViewGroup): AutoCompleteViewHolder {
         val inflater = LayoutInflater.from(parent.context)
         val binding = ItemAutocompleteDuckaiSuggestionBinding.inflate(inflater, parent, false)
@@ -304,9 +298,12 @@ class DuckAIPromptSuggestionViewHolderFactory : SuggestionViewHolderFactory {
     }
 }
 
-sealed class AutoCompleteViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-
-    class SearchSuggestionViewHolder(val binding: ItemAutocompleteSearchSuggestionBinding) : AutoCompleteViewHolder(binding.root) {
+sealed class AutoCompleteViewHolder(
+    itemView: View,
+) : RecyclerView.ViewHolder(itemView) {
+    class SearchSuggestionViewHolder(
+        val binding: ItemAutocompleteSearchSuggestionBinding,
+    ) : AutoCompleteViewHolder(binding.root) {
         fun bind(
             item: AutoCompleteSearchSuggestion,
             immediateSearchListener: (AutoCompleteSuggestion) -> Unit,
@@ -328,7 +325,9 @@ sealed class AutoCompleteViewHolder(itemView: View) : RecyclerView.ViewHolder(it
         }
     }
 
-    class HistorySearchSuggestionViewHolder(val binding: ItemAutocompleteHistorySearchSuggestionBinding) : AutoCompleteViewHolder(binding.root) {
+    class HistorySearchSuggestionViewHolder(
+        val binding: ItemAutocompleteHistorySearchSuggestionBinding,
+    ) : AutoCompleteViewHolder(binding.root) {
         fun bind(
             item: AutoCompleteHistorySearchSuggestion,
             immediateSearchListener: (AutoCompleteSuggestion) -> Unit,
@@ -344,7 +343,9 @@ sealed class AutoCompleteViewHolder(itemView: View) : RecyclerView.ViewHolder(it
         }
     }
 
-    class BookmarkSuggestionViewHolder(val binding: ItemAutocompleteBookmarkSuggestionBinding) : AutoCompleteViewHolder(binding.root) {
+    class BookmarkSuggestionViewHolder(
+        val binding: ItemAutocompleteBookmarkSuggestionBinding,
+    ) : AutoCompleteViewHolder(binding.root) {
         fun bind(
             item: AutoCompleteBookmarkSuggestion,
             immediateSearchListener: (AutoCompleteSuggestion) -> Unit,
@@ -357,7 +358,9 @@ sealed class AutoCompleteViewHolder(itemView: View) : RecyclerView.ViewHolder(it
         }
     }
 
-    class HistorySuggestionViewHolder(val binding: ItemAutocompleteHistorySuggestionBinding) : AutoCompleteViewHolder(binding.root) {
+    class HistorySuggestionViewHolder(
+        val binding: ItemAutocompleteHistorySuggestionBinding,
+    ) : AutoCompleteViewHolder(binding.root) {
         fun bind(
             item: AutoCompleteHistorySuggestion,
             immediateSearchListener: (AutoCompleteSuggestion) -> Unit,
@@ -374,7 +377,9 @@ sealed class AutoCompleteViewHolder(itemView: View) : RecyclerView.ViewHolder(it
         }
     }
 
-    class SwitchToTabSuggestionViewHolder(val binding: ItemAutocompleteSwitchToTabSuggestionBinding) : AutoCompleteViewHolder(binding.root) {
+    class SwitchToTabSuggestionViewHolder(
+        val binding: ItemAutocompleteSwitchToTabSuggestionBinding,
+    ) : AutoCompleteViewHolder(binding.root) {
         fun bind(
             item: AutoCompleteSwitchToTabSuggestion,
             immediateSearchListener: (AutoCompleteSuggestion) -> Unit,
@@ -386,11 +391,17 @@ sealed class AutoCompleteViewHolder(itemView: View) : RecyclerView.ViewHolder(it
         }
     }
 
-    class EmptySuggestionViewHolder(view: View) : AutoCompleteViewHolder(view)
+    class EmptySuggestionViewHolder(
+        view: View,
+    ) : AutoCompleteViewHolder(view)
 
-    class DividerViewHolder(val binding: ItemAutocompleteDividerBinding) : AutoCompleteViewHolder(binding.root)
+    class DividerViewHolder(
+        val binding: ItemAutocompleteDividerBinding,
+    ) : AutoCompleteViewHolder(binding.root)
 
-    class DefaultSuggestionViewHolder(val binding: ItemAutocompleteDefaultBinding) : AutoCompleteViewHolder(binding.root) {
+    class DefaultSuggestionViewHolder(
+        val binding: ItemAutocompleteDefaultBinding,
+    ) : AutoCompleteViewHolder(binding.root) {
         fun bind(
             item: AutoCompleteDefaultSuggestion,
             immediateSearchListener: (AutoCompleteSuggestion) -> Unit,
@@ -405,7 +416,9 @@ sealed class AutoCompleteViewHolder(itemView: View) : RecyclerView.ViewHolder(it
         }
     }
 
-    class InAppMessageViewHolder(val binding: ItemAutocompleteInAppMessageBinding) : AutoCompleteViewHolder(binding.root) {
+    class InAppMessageViewHolder(
+        val binding: ItemAutocompleteInAppMessageBinding,
+    ) : AutoCompleteViewHolder(binding.root) {
         fun bind(
             item: AutoCompleteSuggestion,
             deleteClickListener: (AutoCompleteSuggestion) -> Unit,
@@ -423,7 +436,9 @@ sealed class AutoCompleteViewHolder(itemView: View) : RecyclerView.ViewHolder(it
         }
     }
 
-    class DuckAIPromptViewHolder(val binding: ItemAutocompleteDuckaiSuggestionBinding) : AutoCompleteViewHolder(binding.root) {
+    class DuckAIPromptViewHolder(
+        val binding: ItemAutocompleteDuckaiSuggestionBinding,
+    ) : AutoCompleteViewHolder(binding.root) {
         fun bind(
             item: AutoCompleteSuggestion.AutoCompleteDuckAIPrompt,
             itemClickListener: (AutoCompleteSuggestion) -> Unit,

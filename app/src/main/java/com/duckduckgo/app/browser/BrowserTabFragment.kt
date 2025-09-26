@@ -739,8 +739,8 @@ class BrowserTabFragment :
         override fun onPopUpHandled(isCosmetic: Boolean) {
             launch {
                 context?.let {
-                    // TODO uncomment when sense of protection experiment shield is enabled
-/*                    if (senseOfProtectionExperiment.isUserEnrolledInAVariantAndExperimentEnabled() &&
+                    /* TODO uncomment when sense of protection experiment shield is enabled
+                     if (senseOfProtectionExperiment.isUserEnrolledInAVariantAndExperimentEnabled() &&
                         viewModel.trackersCount().isNotEmpty()
                     ) {
                         if (isCosmetic) {
@@ -1233,7 +1233,11 @@ class BrowserTabFragment :
         voiceSearchLauncher.launch(requireActivity())
     }
 
-    private fun onOmnibarDuckChatPressed(query: String, hasFocus: Boolean, isNtp: Boolean) {
+    private fun onOmnibarDuckChatPressed(
+        query: String,
+        hasFocus: Boolean,
+        isNtp: Boolean
+    ) {
         viewModel.onDuckChatOmnibarButtonClicked(query = query, hasFocus = hasFocus, isNtp = isNtp)
     }
 
@@ -2180,6 +2184,7 @@ class BrowserTabFragment :
                 currentWebShareReplyCallback = it.onResponse
                 webViewCompatWebShareLauncher.launch(it.data)
             }
+
             is Command.ScreenLock -> screenLock(it.data)
             is Command.WebViewCompatScreenLock -> webViewCompatScreenLock(it.data, it.onResponse)
             is Command.ScreenUnlock -> screenUnlock()
@@ -2249,6 +2254,7 @@ class BrowserTabFragment :
                     launchInputScreen(query = "")
                 }
             }
+
             is Command.ExtractSerpLogo -> extractSerpLogo(webView, it.currentUrl)
             is Command.ShowSerpEasterEggLogo -> launchSerpEasterEggLogoActivity(it.logoUrl)
             null -> {
@@ -2259,7 +2265,10 @@ class BrowserTabFragment :
         }
     }
 
-    private fun extractSerpLogo(webView: WebView?, url: String) {
+    private fun extractSerpLogo(
+        webView: WebView?,
+        url: String
+    ) {
         lifecycleScope.launch {
             webView?.let {
                 val serpLogo = serpLogos.extractSerpLogo(webView = webView)
@@ -3232,9 +3241,11 @@ class BrowserTabFragment :
             onboardingDesignExperimentManager.isBuckEnrolledAndEnabled() -> {
                 onboardingCta.hideBuckOnboardingCta(binding)
             }
+
             onboardingDesignExperimentManager.isBbEnrolledAndEnabled() -> {
                 onboardingCta.hideBBOnboardingCta(binding)
             }
+
             else -> {
                 onboardingCta.hideOnboardingCta(binding)
             }
@@ -3317,9 +3328,9 @@ class BrowserTabFragment :
     private fun blobDownloadScript(): String {
         val script = """
             window.__url_to_blob_collection = {};
-        
+
             const original_createObjectURL = URL.createObjectURL;
-        
+
             URL.createObjectURL = function () {
                 const blob = arguments[0];
                 const url = original_createObjectURL.call(this, ...arguments);
@@ -3328,7 +3339,7 @@ class BrowserTabFragment :
                 }
                 return url;
             }
-            
+
             function blobToBase64DataUrl(blob) {
                 return new Promise((resolve, reject) => {
                     const reader = new FileReader();
@@ -3341,10 +3352,10 @@ class BrowserTabFragment :
                     reader.readAsDataURL(blob);
                 });
             }
-        
+
             const pingMessage = 'Ping:' + window.location.href
             ddgBlobDownloadObj.postMessage(pingMessage)
-                    
+
             ddgBlobDownloadObj.onmessage = function(event) {
                 if (event.data.startsWith('blob:')) {
                     const blob = window.__url_to_blob_collection[event.data];
@@ -4558,6 +4569,7 @@ class BrowserTabFragment :
                             }
                         }
                     }
+
                     onboardingDesignExperimentManager.isBbEnrolledAndEnabled() -> {
                         showBBCta(binding = bbDialogIntroBubble, configuration = configuration) {
                             setOnOptionClicked(
@@ -4569,6 +4581,7 @@ class BrowserTabFragment :
                             }
                         }
                     }
+
                     else -> {
                         showCta(daxDialogIntroBubble.daxCtaContainer) {
                             setOnOptionClicked(

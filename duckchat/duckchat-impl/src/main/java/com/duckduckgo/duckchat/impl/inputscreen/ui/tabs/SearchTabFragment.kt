@@ -28,7 +28,6 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion
 import com.duckduckgo.browser.api.ui.BrowserScreens.PrivateSearchScreenNoParams
-import com.duckduckgo.browser.ui.R as BrowserUI
 import com.duckduckgo.browser.ui.autocomplete.BrowserAutoCompleteSuggestionsAdapter
 import com.duckduckgo.browser.ui.omnibar.OmnibarPosition.TOP
 import com.duckduckgo.common.ui.DuckDuckGoFragment
@@ -46,14 +45,14 @@ import com.duckduckgo.duckchat.impl.inputscreen.ui.view.BottomBlurView
 import com.duckduckgo.duckchat.impl.inputscreen.ui.viewmodel.InputScreenViewModel
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.newtabpage.api.NewTabPagePlugin
-import javax.inject.Inject
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
+import javax.inject.Inject
+import com.duckduckgo.browser.ui.R as BrowserUI
 
 @InjectWith(FragmentScope::class)
 class SearchTabFragment : DuckDuckGoFragment(R.layout.fragment_search_tab) {
-
     @Inject
     lateinit var newTabPagePlugins: ActivePluginPoint<NewTabPagePlugin>
 
@@ -90,12 +89,13 @@ class SearchTabFragment : DuckDuckGoFragment(R.layout.fragment_search_tab) {
             bottomBlurView.setTargetView(binding.autoCompleteSuggestionsList)
             binding.bottomFadeContainer.addView(bottomBlurView)
 
-            ViewTreeObserver.OnPreDrawListener {
-                bottomBlurView.invalidate()
-                true
-            }.also { listener ->
-                bottomBlurView.viewTreeObserver.addOnPreDrawListener(listener)
-            }
+            ViewTreeObserver
+                .OnPreDrawListener {
+                    bottomBlurView.invalidate()
+                    true
+                }.also { listener ->
+                    bottomBlurView.viewTreeObserver.addOnPreDrawListener(listener)
+                }
         }
     }
 
@@ -103,10 +103,11 @@ class SearchTabFragment : DuckDuckGoFragment(R.layout.fragment_search_tab) {
         // TODO: fix favorites click source to "focused state" instead of "new tab page"
         lifecycleScope.launch {
             newTabPagePlugins.getPlugins().firstOrNull()?.let { plugin ->
-                val newTabPageView = plugin.getView(requireContext(), showLogo = false) { hasContent ->
-                    viewModel.onNewTabPageContentChanged(hasContent)
-                    binding.newTabContainerLayout.isVisible = hasContent
-                }
+                val newTabPageView =
+                    plugin.getView(requireContext(), showLogo = false) { hasContent ->
+                        viewModel.onNewTabPageContentChanged(hasContent)
+                        binding.newTabContainerLayout.isVisible = hasContent
+                    }
                 binding.newTabContainerLayout.addView(newTabPageView)
             }
         }
@@ -115,41 +116,44 @@ class SearchTabFragment : DuckDuckGoFragment(R.layout.fragment_search_tab) {
     private fun configureAutoComplete() {
         val context = context ?: return
         binding.autoCompleteSuggestionsList.layoutManager = LinearLayoutManager(context)
-        autoCompleteSuggestionsAdapter = BrowserAutoCompleteSuggestionsAdapter(
-            immediateSearchClickListener = {
-                viewModel.userSelectedAutocomplete(it)
-            },
-            editableSearchClickListener = {
-                viewModel.onUserSelectedToEditQuery(it.phrase)
-            },
-            autoCompleteInAppMessageDismissedListener = {
-                viewModel.onUserDismissedAutoCompleteInAppMessage()
-            },
-            autoCompleteOpenSettingsClickListener = {
-                viewModel.onUserDismissedAutoCompleteInAppMessage()
-                globalActivityStarter.start(context, PrivateSearchScreenNoParams)
-            },
-            autoCompleteLongPressClickListener = {
-                viewModel.userLongPressedAutocomplete(it)
-            },
-            omnibarPosition = TOP,
-        )
+        autoCompleteSuggestionsAdapter =
+            BrowserAutoCompleteSuggestionsAdapter(
+                immediateSearchClickListener = {
+                    viewModel.userSelectedAutocomplete(it)
+                },
+                editableSearchClickListener = {
+                    viewModel.onUserSelectedToEditQuery(it.phrase)
+                },
+                autoCompleteInAppMessageDismissedListener = {
+                    viewModel.onUserDismissedAutoCompleteInAppMessage()
+                },
+                autoCompleteOpenSettingsClickListener = {
+                    viewModel.onUserDismissedAutoCompleteInAppMessage()
+                    globalActivityStarter.start(context, PrivateSearchScreenNoParams)
+                },
+                autoCompleteLongPressClickListener = {
+                    viewModel.userLongPressedAutocomplete(it)
+                },
+                omnibarPosition = TOP,
+            )
         binding.autoCompleteSuggestionsList.adapter = autoCompleteSuggestionsAdapter
     }
 
     private fun configureObservers() {
-        viewModel.visibilityState.onEach {
-            binding.autoCompleteSuggestionsList.isVisible = it.autoCompleteSuggestionsVisible
-            binding.bottomFadeContainer.isVisible = it.autoCompleteSuggestionsVisible
+        viewModel.visibilityState
+            .onEach {
+                binding.autoCompleteSuggestionsList.isVisible = it.autoCompleteSuggestionsVisible
+                binding.bottomFadeContainer.isVisible = it.autoCompleteSuggestionsVisible
 
-            if (!it.autoCompleteSuggestionsVisible) {
-                viewModel.autoCompleteSuggestionsGone()
-            }
-        }.launchIn(lifecycleScope)
+                if (!it.autoCompleteSuggestionsVisible) {
+                    viewModel.autoCompleteSuggestionsGone()
+                }
+            }.launchIn(lifecycleScope)
 
-        viewModel.autoCompleteSuggestionResults.onEach {
-            autoCompleteSuggestionsAdapter.updateData(it.query, it.suggestions)
-        }.launchIn(lifecycleScope)
+        viewModel.autoCompleteSuggestionResults
+            .onEach {
+                autoCompleteSuggestionsAdapter.updateData(it.query, it.suggestions)
+            }.launchIn(lifecycleScope)
 
         viewModel.searchTabCommand.observe(viewLifecycleOwner) {
             processCommand(it)
@@ -159,10 +163,11 @@ class SearchTabFragment : DuckDuckGoFragment(R.layout.fragment_search_tab) {
     private fun processCommand(command: SearchCommand) {
         when (command) {
             is ShowRemoveSearchSuggestionDialog -> showRemoveSearchSuggestionDialog(command.suggestion)
-            is RestoreAutoCompleteScrollPosition -> restoreAutoCompleteScrollPosition(
-                command.firstVisibleItemPosition,
-                command.itemOffsetTop,
-            )
+            is RestoreAutoCompleteScrollPosition ->
+                restoreAutoCompleteScrollPosition(
+                    command.firstVisibleItemPosition,
+                    command.itemOffsetTop,
+                )
         }
     }
 
@@ -199,17 +204,24 @@ class SearchTabFragment : DuckDuckGoFragment(R.layout.fragment_search_tab) {
         viewModel.storeAutoCompleteScrollPosition(firstVisibleItemPosition, itemOffsetTop)
     }
 
-    private fun restoreAutoCompleteScrollPosition(position: Int, offset: Int) {
-        val layoutListener = object : ViewTreeObserver.OnGlobalLayoutListener {
-            override fun onGlobalLayout() {
-                binding.autoCompleteSuggestionsList.viewTreeObserver.removeOnGlobalLayoutListener(this)
-                scrollToPositionWithOffset(position, offset)
+    private fun restoreAutoCompleteScrollPosition(
+        position: Int,
+        offset: Int,
+    ) {
+        val layoutListener =
+            object : ViewTreeObserver.OnGlobalLayoutListener {
+                override fun onGlobalLayout() {
+                    binding.autoCompleteSuggestionsList.viewTreeObserver.removeOnGlobalLayoutListener(this)
+                    scrollToPositionWithOffset(position, offset)
+                }
             }
-        }
         binding.autoCompleteSuggestionsList.viewTreeObserver.addOnGlobalLayoutListener(layoutListener)
     }
 
-    private fun scrollToPositionWithOffset(position: Int, offset: Int) {
+    private fun scrollToPositionWithOffset(
+        position: Int,
+        offset: Int,
+    ) {
         val layoutManager = binding.autoCompleteSuggestionsList.layoutManager as LinearLayoutManager
         layoutManager.scrollToPositionWithOffset(position, offset)
     }

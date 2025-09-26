@@ -17,5 +17,6 @@
 package com.duckduckgo.browser.ui.omnibar
 
 enum class OmnibarPosition {
-    TOP, BOTTOM
+    TOP,
+    BOTTOM,
 }

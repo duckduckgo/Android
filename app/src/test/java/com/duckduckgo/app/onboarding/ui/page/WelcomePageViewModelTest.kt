@@ -57,7 +57,6 @@ import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
 class WelcomePageViewModelTest {
-
     @get:Rule
     @Suppress("unused")
     val coroutineRule = CoroutineTestRule()
@@ -115,81 +114,91 @@ class WelcomePageViewModelTest {
     }
 
     @Test
-    fun givenInitialDialogWhenOnPrimaryCtaClickedThenShowComparisonChart() = runTest {
-        testee.onPrimaryCtaClicked(PreOnboardingDialogType.INITIAL)
+    fun givenInitialDialogWhenOnPrimaryCtaClickedThenShowComparisonChart() =
+        runTest {
+            testee.onPrimaryCtaClicked(PreOnboardingDialogType.INITIAL)
 
-        testee.commands.test {
-            val command = awaitItem()
-            Assert.assertTrue(command is ShowComparisonChart)
+            testee.commands.test {
+                val command = awaitItem()
+                Assert.assertTrue(command is ShowComparisonChart)
+            }
         }
-    }
 
     @Test
-    fun whenInitialDialogIsShownThenFireIntroScreenDisplayedPixel() = runTest {
-        testee.onDialogShown(PreOnboardingDialogType.INITIAL)
+    fun whenInitialDialogIsShownThenFireIntroScreenDisplayedPixel() =
+        runTest {
+            testee.onDialogShown(PreOnboardingDialogType.INITIAL)
 
-        verify(mockOnboardingDesignExperimentManager).fireIntroScreenDisplayedPixel()
-    }
-
-    @Test
-    fun whenComparisonChartDialogIsShownThenFireComparisonScreenDisplayedPixel() = runTest {
-        testee.onDialogShown(PreOnboardingDialogType.COMPARISON_CHART)
-
-        verify(mockOnboardingDesignExperimentManager).fireComparisonScreenDisplayedPixel()
-    }
+            verify(mockOnboardingDesignExperimentManager).fireIntroScreenDisplayedPixel()
+        }
 
     @Test
-    fun whenAddressBarPositionDialogIsShownThenFireSetAddressBarDisplayedPixel() = runTest {
-        testee.onDialogShown(PreOnboardingDialogType.ADDRESS_BAR_POSITION)
+    fun whenComparisonChartDialogIsShownThenFireComparisonScreenDisplayedPixel() =
+        runTest {
+            testee.onDialogShown(PreOnboardingDialogType.COMPARISON_CHART)
 
-        verify(mockOnboardingDesignExperimentManager).fireSetAddressBarDisplayedPixel()
-    }
-
-    @Test
-    fun givenComparisonChartDialogWhenOnPrimaryCtaClickedThenFireChooseBrowserPixel() = runTest {
-        whenever(mockDefaultRoleBrowserDialog.shouldShowDialog()).thenReturn(true)
-        testee.onPrimaryCtaClicked(PreOnboardingDialogType.COMPARISON_CHART)
-
-        verify(mockOnboardingDesignExperimentManager).fireChooseBrowserPixel()
-    }
+            verify(mockOnboardingDesignExperimentManager).fireComparisonScreenDisplayedPixel()
+        }
 
     @Test
-    fun givenComparisonChartDialogWhenDDGIsDefaultBrowserThenFireChooseBrowserPixel() = runTest {
-        whenever(mockDefaultRoleBrowserDialog.shouldShowDialog()).thenReturn(false)
-        testee.onPrimaryCtaClicked(PreOnboardingDialogType.COMPARISON_CHART)
+    fun whenAddressBarPositionDialogIsShownThenFireSetAddressBarDisplayedPixel() =
+        runTest {
+            testee.onDialogShown(PreOnboardingDialogType.ADDRESS_BAR_POSITION)
 
-        verify(mockOnboardingDesignExperimentManager).fireChooseBrowserPixel()
-    }
-
-    @Test
-    fun whenDefaultBrowserIsSetThenFireSetDefaultRatePixel() = runTest {
-        testee.onDefaultBrowserSet()
-
-        verify(mockOnboardingDesignExperimentManager).fireSetDefaultRatePixel()
-    }
+            verify(mockOnboardingDesignExperimentManager).fireSetAddressBarDisplayedPixel()
+        }
 
     @Test
-    fun whenBottomAddressBarIsSelectedAndPrimaryCtaClickedThenFireAddressBarSetBottomPixel() = runTest {
-        testee.onAddressBarPositionOptionSelected(false)
-        testee.onPrimaryCtaClicked(PreOnboardingDialogType.ADDRESS_BAR_POSITION)
+    fun givenComparisonChartDialogWhenOnPrimaryCtaClickedThenFireChooseBrowserPixel() =
+        runTest {
+            whenever(mockDefaultRoleBrowserDialog.shouldShowDialog()).thenReturn(true)
+            testee.onPrimaryCtaClicked(PreOnboardingDialogType.COMPARISON_CHART)
 
-        verify(mockOnboardingDesignExperimentManager).fireAddressBarSetBottomPixel()
-    }
-
-    @Test
-    fun whenTopAddressBarIsSelectedAndPrimaryCtaClickedThenFireAddressBarSetTopPixel() = runTest {
-        testee.onAddressBarPositionOptionSelected(true)
-        testee.onPrimaryCtaClicked(PreOnboardingDialogType.ADDRESS_BAR_POSITION)
-
-        verify(mockOnboardingDesignExperimentManager).fireAddressBarSetTopPixel()
-    }
+            verify(mockOnboardingDesignExperimentManager).fireChooseBrowserPixel()
+        }
 
     @Test
-    fun whenDefaultAddressBarPositionIsKeptAndPrimaryCtaClickedThenFireAddressBarSetTopPixel() = runTest {
-        testee.onPrimaryCtaClicked(PreOnboardingDialogType.ADDRESS_BAR_POSITION)
+    fun givenComparisonChartDialogWhenDDGIsDefaultBrowserThenFireChooseBrowserPixel() =
+        runTest {
+            whenever(mockDefaultRoleBrowserDialog.shouldShowDialog()).thenReturn(false)
+            testee.onPrimaryCtaClicked(PreOnboardingDialogType.COMPARISON_CHART)
 
-        verify(mockOnboardingDesignExperimentManager).fireAddressBarSetTopPixel()
-    }
+            verify(mockOnboardingDesignExperimentManager).fireChooseBrowserPixel()
+        }
+
+    @Test
+    fun whenDefaultBrowserIsSetThenFireSetDefaultRatePixel() =
+        runTest {
+            testee.onDefaultBrowserSet()
+
+            verify(mockOnboardingDesignExperimentManager).fireSetDefaultRatePixel()
+        }
+
+    @Test
+    fun whenBottomAddressBarIsSelectedAndPrimaryCtaClickedThenFireAddressBarSetBottomPixel() =
+        runTest {
+            testee.onAddressBarPositionOptionSelected(false)
+            testee.onPrimaryCtaClicked(PreOnboardingDialogType.ADDRESS_BAR_POSITION)
+
+            verify(mockOnboardingDesignExperimentManager).fireAddressBarSetBottomPixel()
+        }
+
+    @Test
+    fun whenTopAddressBarIsSelectedAndPrimaryCtaClickedThenFireAddressBarSetTopPixel() =
+        runTest {
+            testee.onAddressBarPositionOptionSelected(true)
+            testee.onPrimaryCtaClicked(PreOnboardingDialogType.ADDRESS_BAR_POSITION)
+
+            verify(mockOnboardingDesignExperimentManager).fireAddressBarSetTopPixel()
+        }
+
+    @Test
+    fun whenDefaultAddressBarPositionIsKeptAndPrimaryCtaClickedThenFireAddressBarSetTopPixel() =
+        runTest {
+            testee.onPrimaryCtaClicked(PreOnboardingDialogType.ADDRESS_BAR_POSITION)
+
+            verify(mockOnboardingDesignExperimentManager).fireAddressBarSetTopPixel()
+        }
 
     @Test
     fun givenComparisonChartDialogWhenOnPrimaryCtaClickedThenSendPixel() {
@@ -203,28 +212,30 @@ class WelcomePageViewModelTest {
     }
 
     @Test
-    fun whenChooseBrowserClickedIfDDGNotSetAsDefaultThenShowChooseBrowserDialog() = runTest {
-        val mockIntent: Intent = mock()
-        whenever(mockDefaultRoleBrowserDialog.createIntent(mockContext)).thenReturn(mockIntent)
-        whenever(mockDefaultRoleBrowserDialog.shouldShowDialog()).thenReturn(true)
-        testee.onPrimaryCtaClicked(PreOnboardingDialogType.COMPARISON_CHART)
+    fun whenChooseBrowserClickedIfDDGNotSetAsDefaultThenShowChooseBrowserDialog() =
+        runTest {
+            val mockIntent: Intent = mock()
+            whenever(mockDefaultRoleBrowserDialog.createIntent(mockContext)).thenReturn(mockIntent)
+            whenever(mockDefaultRoleBrowserDialog.shouldShowDialog()).thenReturn(true)
+            testee.onPrimaryCtaClicked(PreOnboardingDialogType.COMPARISON_CHART)
 
-        testee.commands.test {
-            val command = awaitItem()
-            Assert.assertTrue(command is ShowDefaultBrowserDialog)
+            testee.commands.test {
+                val command = awaitItem()
+                Assert.assertTrue(command is ShowDefaultBrowserDialog)
+            }
         }
-    }
 
     @Test
-    fun whenChooseBrowserClickedIfDDGSetAsDefaultThenFinishFlow() = runTest {
-        whenever(mockDefaultRoleBrowserDialog.shouldShowDialog()).thenReturn(false)
-        testee.onPrimaryCtaClicked(PreOnboardingDialogType.COMPARISON_CHART)
+    fun whenChooseBrowserClickedIfDDGSetAsDefaultThenFinishFlow() =
+        runTest {
+            whenever(mockDefaultRoleBrowserDialog.shouldShowDialog()).thenReturn(false)
+            testee.onPrimaryCtaClicked(PreOnboardingDialogType.COMPARISON_CHART)
 
-        testee.commands.test {
-            val command = awaitItem()
-            Assert.assertTrue(command is Finish)
+            testee.commands.test {
+                val command = awaitItem()
+                Assert.assertTrue(command is Finish)
+            }
         }
-    }
 
     @Test
     fun whenDDGIsNOTSetAsDefaultBrowserFromSystemDialogThenSetPreferenceAndSendPixel() {
@@ -251,52 +262,57 @@ class WelcomePageViewModelTest {
     }
 
     @Test
-    fun whenDDGIsSetAsDefaultBrowserFromOnboardingThenShowAddressBarPositionDialog() = runTest {
-        testee.onDefaultBrowserSet()
+    fun whenDDGIsSetAsDefaultBrowserFromOnboardingThenShowAddressBarPositionDialog() =
+        runTest {
+            testee.onDefaultBrowserSet()
 
-        testee.commands.test {
-            val command = awaitItem()
-            Assert.assertTrue(command is ShowAddressBarPositionDialog)
+            testee.commands.test {
+                val command = awaitItem()
+                Assert.assertTrue(command is ShowAddressBarPositionDialog)
+            }
         }
-    }
 
     @Test
-    fun whenOnPrimaryCtaClickedThenFinishFlow() = runTest {
-        testee.onPrimaryCtaClicked(PreOnboardingDialogType.ADDRESS_BAR_POSITION)
+    fun whenOnPrimaryCtaClickedThenFinishFlow() =
+        runTest {
+            testee.onPrimaryCtaClicked(PreOnboardingDialogType.ADDRESS_BAR_POSITION)
 
-        testee.commands.test {
-            val command = awaitItem()
-            Assert.assertTrue(command is Finish)
+            testee.commands.test {
+                val command = awaitItem()
+                Assert.assertTrue(command is Finish)
+            }
         }
-    }
 
     @Test
-    fun whenBottomAddressBarIsSelectedThenSendPixel() = runTest {
-        testee.onAddressBarPositionOptionSelected(false)
-        testee.onPrimaryCtaClicked(PreOnboardingDialogType.ADDRESS_BAR_POSITION)
+    fun whenBottomAddressBarIsSelectedThenSendPixel() =
+        runTest {
+            testee.onAddressBarPositionOptionSelected(false)
+            testee.onPrimaryCtaClicked(PreOnboardingDialogType.ADDRESS_BAR_POSITION)
 
-        verify(mockPixel).fire(PREONBOARDING_BOTTOM_ADDRESS_BAR_SELECTED_UNIQUE)
-    }
-
-    @Test
-    fun whenBottomAddressBarIsSelectedThenSetUserSetting() = runTest {
-        testee.onAddressBarPositionOptionSelected(false)
-        testee.onPrimaryCtaClicked(PreOnboardingDialogType.ADDRESS_BAR_POSITION)
-
-        verify(mockSettingsDataStore).omnibarPosition = OmnibarPosition.BOTTOM
-    }
-
-    @Test
-    fun whenLoadingInitialDaxDialogWithReinstallFalseThenShowDaxInitialCta() = runTest {
-        whenever(mockAppBuildConfig.isAppReinstall()).thenReturn(false)
-
-        testee.loadDaxDialog()
-
-        testee.commands.test {
-            val command = awaitItem()
-            Assert.assertTrue(command is ShowInitialDialog)
+            verify(mockPixel).fire(PREONBOARDING_BOTTOM_ADDRESS_BAR_SELECTED_UNIQUE)
         }
-    }
+
+    @Test
+    fun whenBottomAddressBarIsSelectedThenSetUserSetting() =
+        runTest {
+            testee.onAddressBarPositionOptionSelected(false)
+            testee.onPrimaryCtaClicked(PreOnboardingDialogType.ADDRESS_BAR_POSITION)
+
+            verify(mockSettingsDataStore).omnibarPosition = OmnibarPosition.BOTTOM
+        }
+
+    @Test
+    fun whenLoadingInitialDaxDialogWithReinstallFalseThenShowDaxInitialCta() =
+        runTest {
+            whenever(mockAppBuildConfig.isAppReinstall()).thenReturn(false)
+
+            testee.loadDaxDialog()
+
+            testee.commands.test {
+                val command = awaitItem()
+                Assert.assertTrue(command is ShowInitialDialog)
+            }
+        }
 
     @Test
     fun whenInitialReinstallUserDialogIsShownThenSendPixel() {
@@ -313,57 +329,62 @@ class WelcomePageViewModelTest {
     }
 
     @Test
-    fun whenLoadingInitialDaxDialogWithReinstallTrueThenShowDaxInitialReinstallUserCta() = runTest {
-        whenever(mockAppBuildConfig.isAppReinstall()).thenReturn(true)
+    fun whenLoadingInitialDaxDialogWithReinstallTrueThenShowDaxInitialReinstallUserCta() =
+        runTest {
+            whenever(mockAppBuildConfig.isAppReinstall()).thenReturn(true)
 
-        testee.loadDaxDialog()
+            testee.loadDaxDialog()
 
-        testee.commands.test {
-            val command = awaitItem()
-            Assert.assertTrue(command is ShowInitialReinstallUserDialog)
+            testee.commands.test {
+                val command = awaitItem()
+                Assert.assertTrue(command is ShowInitialReinstallUserDialog)
+            }
         }
-    }
 
     @Test
-    fun givenInitialReinstallUserDialogWhenOnPrimaryCtaClickedThenShowComparisonChart() = runTest {
-        testee.onPrimaryCtaClicked(PreOnboardingDialogType.INITIAL_REINSTALL_USER)
+    fun givenInitialReinstallUserDialogWhenOnPrimaryCtaClickedThenShowComparisonChart() =
+        runTest {
+            testee.onPrimaryCtaClicked(PreOnboardingDialogType.INITIAL_REINSTALL_USER)
 
-        testee.commands.test {
-            val command = awaitItem()
-            Assert.assertTrue(command is ShowComparisonChart)
+            testee.commands.test {
+                val command = awaitItem()
+                Assert.assertTrue(command is ShowComparisonChart)
+            }
         }
-    }
 
     @Test
-    fun givenSkipOnboardingDialogWhenOnPrimaryCtaClickedThenShowOnboardingSkippedAndSendPixel() = runTest {
-        testee.onPrimaryCtaClicked(PreOnboardingDialogType.SKIP_ONBOARDING_OPTION)
+    fun givenSkipOnboardingDialogWhenOnPrimaryCtaClickedThenShowOnboardingSkippedAndSendPixel() =
+        runTest {
+            testee.onPrimaryCtaClicked(PreOnboardingDialogType.SKIP_ONBOARDING_OPTION)
 
-        testee.commands.test {
-            val command = awaitItem()
-            Assert.assertTrue(command is OnboardingSkipped)
+            testee.commands.test {
+                val command = awaitItem()
+                Assert.assertTrue(command is OnboardingSkipped)
+            }
+            verify(mockPixel).fire(PREONBOARDING_CONFIRM_SKIP_ONBOARDING_PRESSED)
         }
-        verify(mockPixel).fire(PREONBOARDING_CONFIRM_SKIP_ONBOARDING_PRESSED)
-    }
 
     @Test
-    fun givenInitialReinstallUserDialogWhenOnSecondaryCtaClickedThenShowSkipOnboardingOptionAndSendPixel() = runTest {
-        testee.onSecondaryCtaClicked(PreOnboardingDialogType.INITIAL_REINSTALL_USER)
+    fun givenInitialReinstallUserDialogWhenOnSecondaryCtaClickedThenShowSkipOnboardingOptionAndSendPixel() =
+        runTest {
+            testee.onSecondaryCtaClicked(PreOnboardingDialogType.INITIAL_REINSTALL_USER)
 
-        testee.commands.test {
-            val command = awaitItem()
-            Assert.assertTrue(command is ShowSkipOnboardingOption)
+            testee.commands.test {
+                val command = awaitItem()
+                Assert.assertTrue(command is ShowSkipOnboardingOption)
+            }
+            verify(mockPixel).fire(PREONBOARDING_SKIP_ONBOARDING_PRESSED)
         }
-        verify(mockPixel).fire(PREONBOARDING_SKIP_ONBOARDING_PRESSED)
-    }
 
     @Test
-    fun givenSkipOnboardingDialogWhenOnSecondaryCtaClickedThenShowComparisonChartAndSendPixel() = runTest {
-        testee.onSecondaryCtaClicked(PreOnboardingDialogType.SKIP_ONBOARDING_OPTION)
+    fun givenSkipOnboardingDialogWhenOnSecondaryCtaClickedThenShowComparisonChartAndSendPixel() =
+        runTest {
+            testee.onSecondaryCtaClicked(PreOnboardingDialogType.SKIP_ONBOARDING_OPTION)
 
-        testee.commands.test {
-            val command = awaitItem()
-            Assert.assertTrue(command is ShowComparisonChart)
+            testee.commands.test {
+                val command = awaitItem()
+                Assert.assertTrue(command is ShowComparisonChart)
+            }
+            verify(mockPixel).fire(PREONBOARDING_RESUME_ONBOARDING_PRESSED)
         }
-        verify(mockPixel).fire(PREONBOARDING_RESUME_ONBOARDING_PRESSED)
-    }
 }

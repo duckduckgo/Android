@@ -591,10 +591,10 @@ class BrowserTabViewModelTest {
 
     private val nonHttpAppLinkChecker: NonHttpAppLinkChecker = mock()
 
-    private val EXAMPLE_URL = "http://example.com"
-    private val SHORT_EXAMPLE_URL = "example.com"
+    private val exampleUrl = "http://example.com"
+    private val shortExampleUrl = "example.com"
 
-    private val selectedTab = TabEntity("TAB_ID", EXAMPLE_URL, position = 0, sourceTabId = "TAB_ID_SOURCE")
+    private val selectedTab = TabEntity("TAB_ID", exampleUrl, position = 0, sourceTabId = "TAB_ID_SOURCE")
     private val flowSelectedTab = MutableStateFlow(selectedTab)
 
     private var isFullSiteAddressEnabled = true
@@ -818,7 +818,7 @@ class BrowserTabViewModelTest {
         testee.command.observeForever(mockCommandObserver)
         val mockWebHistoryItem: WebHistoryItem = mock()
         whenever(mockWebHistoryItem.title).thenReturn("title")
-        whenever(mockWebHistoryItem.url).thenReturn(EXAMPLE_URL)
+        whenever(mockWebHistoryItem.url).thenReturn(exampleUrl)
         whenever(mockStack.getItemAtIndex(any())).thenReturn(mockWebHistoryItem)
     }
 
@@ -1168,7 +1168,7 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenDeleteQuickAccessItemCalledWithFavoriteThenRepositoryUpdated() = runTest {
-        val savedSite = Favorite(UUID.randomUUID().toString(), "title", EXAMPLE_URL, lastModified = "timestamp", 0)
+        val savedSite = Favorite(UUID.randomUUID().toString(), "title", exampleUrl, lastModified = "timestamp", 0)
 
         testee.onDeleteFavoriteSnackbarDismissed(savedSite)
 
@@ -1177,7 +1177,7 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenDeleteQuickAccessItemCalledWithBookmarkThenRepositoryUpdated() = runTest {
-        val savedSite = Bookmark(UUID.randomUUID().toString(), "title", EXAMPLE_URL, lastModified = "timestamp")
+        val savedSite = Bookmark(UUID.randomUUID().toString(), "title", exampleUrl, lastModified = "timestamp")
 
         testee.onDeleteFavoriteSnackbarDismissed(savedSite)
 
@@ -1186,7 +1186,7 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenDeleteSavedSiteCalledThenRepositoryUpdated() = runTest {
-        val savedSite = Favorite(UUID.randomUUID().toString(), "title", EXAMPLE_URL, lastModified = "timestamp", 0)
+        val savedSite = Favorite(UUID.randomUUID().toString(), "title", exampleUrl, lastModified = "timestamp", 0)
 
         testee.onDeleteSavedSiteSnackbarDismissed(savedSite)
 
@@ -1195,7 +1195,7 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenQuickAccessListChangedThenRepositoryUpdated() {
-        val savedSite = Favorite(UUID.randomUUID().toString(), "title", EXAMPLE_URL, lastModified = "timestamp", 0)
+        val savedSite = Favorite(UUID.randomUUID().toString(), "title", exampleUrl, lastModified = "timestamp", 0)
         val savedSites = listOf(QuickAccessFavorite(savedSite))
 
         testee.onQuickAccessListChanged(savedSites)
@@ -1296,7 +1296,7 @@ class BrowserTabViewModelTest {
         val exampleTitle = "Title"
         loadUrl(exampleUrl, title = exampleTitle, isBrowserShowing = true)
         assertEquals(exampleUrl, testee.url)
-        assertEquals(SHORT_EXAMPLE_URL, omnibarViewState().omnibarText)
+        assertEquals(shortExampleUrl, omnibarViewState().omnibarText)
         assertEquals(exampleTitle, testee.title)
     }
 
@@ -1322,10 +1322,10 @@ class BrowserTabViewModelTest {
     fun whenBrowsingAndUrlIsUpdatedAndFullUrlDisabledThenUrlAndOmnibarTextUpdatedToMatch() {
         isFullSiteAddressEnabled = false
         val currentUrl = "http://example.com/current"
-        loadUrl(EXAMPLE_URL, isBrowserShowing = true)
-        updateUrl(EXAMPLE_URL, currentUrl, true)
+        loadUrl(exampleUrl, isBrowserShowing = true)
+        updateUrl(exampleUrl, currentUrl, true)
         assertEquals(currentUrl, testee.url)
-        assertEquals(SHORT_EXAMPLE_URL, omnibarViewState().omnibarText)
+        assertEquals(shortExampleUrl, omnibarViewState().omnibarText)
     }
 
     @Test
@@ -1342,10 +1342,10 @@ class BrowserTabViewModelTest {
     fun whenNotBrowsingAndUrlIsUpdatedAndFullUrlDisabledThenUrlAndOmnibarTextRemainUnchanged() {
         isFullSiteAddressEnabled = false
         val currentUrl = "http://example.com/current"
-        loadUrl(EXAMPLE_URL, isBrowserShowing = true)
-        updateUrl(EXAMPLE_URL, currentUrl, false)
-        assertEquals(EXAMPLE_URL, testee.url)
-        assertEquals(SHORT_EXAMPLE_URL, omnibarViewState().omnibarText)
+        loadUrl(exampleUrl, isBrowserShowing = true)
+        updateUrl(exampleUrl, currentUrl, false)
+        assertEquals(exampleUrl, testee.url)
+        assertEquals(shortExampleUrl, omnibarViewState().omnibarText)
     }
 
     @Test
@@ -1366,7 +1366,7 @@ class BrowserTabViewModelTest {
         loadUrl("http://duckduckgo.com")
         testee.progressChanged(50, WebViewNavigationState(mockStack, 50))
 
-        overrideUrl(EXAMPLE_URL)
+        overrideUrl(exampleUrl)
         advanceTimeBy(2000)
 
         assertCommandIssued<Command.HideWebContent>()
@@ -1377,7 +1377,7 @@ class BrowserTabViewModelTest {
         loadUrl("http://duckduckgo.com")
         testee.progressChanged(100, WebViewNavigationState(mockStack, 100))
 
-        overrideUrl(EXAMPLE_URL)
+        overrideUrl(exampleUrl)
         advanceTimeBy(2000)
 
         assertCommandNotIssued<Command.HideWebContent>()
@@ -1388,19 +1388,19 @@ class BrowserTabViewModelTest {
         loadUrl("http://duckduckgo.com")
         testee.progressChanged(100, WebViewNavigationState(mockStack, 100))
 
-        overrideUrl(EXAMPLE_URL)
+        overrideUrl(exampleUrl)
 
-        verify(mockNavigationAwareLoginDetector).onEvent(NavigationEvent.Redirect(EXAMPLE_URL))
+        verify(mockNavigationAwareLoginDetector).onEvent(NavigationEvent.Redirect(exampleUrl))
     }
 
     @Test
     fun whenLoadingProgressReaches50ThenShowWebContent() = runTest {
         loadUrl("http://duckduckgo.com")
         testee.progressChanged(50, WebViewNavigationState(mockStack, 50))
-        overrideUrl(EXAMPLE_URL)
+        overrideUrl(exampleUrl)
         advanceTimeBy(2000)
 
-        onProgressChanged(url = EXAMPLE_URL, newProgress = 50)
+        onProgressChanged(url = exampleUrl, newProgress = 50)
 
         assertCommandIssued<Command.ShowWebContent>()
     }
@@ -1431,15 +1431,15 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenNonDuckDuckGoUrlLoadedThenFullUrlShown() {
-        loadUrl(EXAMPLE_URL)
-        assertEquals(EXAMPLE_URL, omnibarViewState().omnibarText)
+        loadUrl(exampleUrl)
+        assertEquals(exampleUrl, omnibarViewState().omnibarText)
     }
 
     @Test
     fun whenNonDuckDuckGoUrlLoadedAndFullUrlDisabledThenShortUrlShown() {
         isFullSiteAddressEnabled = false
-        loadUrl(EXAMPLE_URL)
-        assertEquals(SHORT_EXAMPLE_URL, omnibarViewState().omnibarText)
+        loadUrl(exampleUrl)
+        assertEquals(shortExampleUrl, omnibarViewState().omnibarText)
     }
 
     @Test
@@ -1569,7 +1569,7 @@ class BrowserTabViewModelTest {
                         Favorite(
                             UUID.randomUUID().toString(),
                             "title",
-                            EXAMPLE_URL,
+                            exampleUrl,
                             lastModified = "timestamp",
                             1,
                         ),
@@ -1736,7 +1736,7 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenUserSelectsDesktopSiteThenDesktopModeStateUpdated() {
-        loadUrl(EXAMPLE_URL)
+        loadUrl(exampleUrl)
         setDesktopBrowsingMode(false)
         testee.onChangeBrowserModeClicked()
         verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
@@ -1748,7 +1748,7 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenUserSelectsMobileSiteThenMobileModeStateUpdated() {
-        loadUrl(EXAMPLE_URL)
+        loadUrl(exampleUrl)
         setDesktopBrowsingMode(true)
         testee.onChangeBrowserModeClicked()
         verify(mockPixel).fire(AppPixelName.MENU_ACTION_DESKTOP_SITE_DISABLE_PRESSED)
@@ -1991,12 +1991,12 @@ class BrowserTabViewModelTest {
         testee.onChangeBrowserModeClicked()
         verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
         val ultimateCommand = commandCaptor.lastValue as Navigate
-        assertEquals(EXAMPLE_URL, ultimateCommand.url)
+        assertEquals(exampleUrl, ultimateCommand.url)
     }
 
     @Test
     fun whenUserSelectsDesktopSiteWhenNotOnMobileSpecificSiteThenUrlNotModified() {
-        loadUrl(EXAMPLE_URL)
+        loadUrl(exampleUrl)
         setDesktopBrowsingMode(false)
         testee.onChangeBrowserModeClicked()
         verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
@@ -2016,7 +2016,7 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenUserSelectsMobileSiteWhenNotOnMobileSpecificSiteThenUrlNotModified() {
-        loadUrl(EXAMPLE_URL)
+        loadUrl(exampleUrl)
         setDesktopBrowsingMode(true)
         testee.onChangeBrowserModeClicked()
         verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
@@ -2026,11 +2026,11 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenUserSelectsOpenTabAndItIsPrivacyProThenLaunchPrivacyProCommandSent() {
-        whenever(mockLongPressHandler.userSelectedMenuItem(any(), any())).thenReturn(OpenInNewTab(EXAMPLE_URL))
+        whenever(mockLongPressHandler.userSelectedMenuItem(any(), any())).thenReturn(OpenInNewTab(exampleUrl))
         whenever(subscriptions.shouldLaunchPrivacyProForUrl(any())).thenReturn(true)
 
         val mockMenItem: MenuItem = mock()
-        val longPressTarget = LongPressTarget(url = EXAMPLE_URL, type = WebView.HitTestResult.SRC_ANCHOR_TYPE)
+        val longPressTarget = LongPressTarget(url = exampleUrl, type = WebView.HitTestResult.SRC_ANCHOR_TYPE)
         testee.userSelectedItemFromLongPressMenu(longPressTarget, mockMenItem)
 
         assertCommandIssued<LaunchPrivacyPro>()
@@ -2039,11 +2039,11 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenUserSelectsOpenInBackgroundTabAndItIsPrivacyProThenLaunchPrivacyProCommandSent() {
-        whenever(mockLongPressHandler.userSelectedMenuItem(any(), any())).thenReturn(RequiredAction.OpenInNewBackgroundTab(EXAMPLE_URL))
+        whenever(mockLongPressHandler.userSelectedMenuItem(any(), any())).thenReturn(RequiredAction.OpenInNewBackgroundTab(exampleUrl))
         whenever(subscriptions.shouldLaunchPrivacyProForUrl(any())).thenReturn(true)
 
         val mockMenItem: MenuItem = mock()
-        val longPressTarget = LongPressTarget(url = EXAMPLE_URL, type = WebView.HitTestResult.SRC_ANCHOR_TYPE)
+        val longPressTarget = LongPressTarget(url = exampleUrl, type = WebView.HitTestResult.SRC_ANCHOR_TYPE)
         testee.userSelectedItemFromLongPressMenu(longPressTarget, mockMenItem)
 
         assertCommandIssued<LaunchPrivacyPro>()
@@ -2052,12 +2052,12 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenUserSelectsOpenTabThenTabCommandSent() {
-        whenever(mockLongPressHandler.userSelectedMenuItem(any(), any())).thenReturn(OpenInNewTab(EXAMPLE_URL))
+        whenever(mockLongPressHandler.userSelectedMenuItem(any(), any())).thenReturn(OpenInNewTab(exampleUrl))
         val mockMenItem: MenuItem = mock()
-        val longPressTarget = LongPressTarget(url = EXAMPLE_URL, type = WebView.HitTestResult.SRC_ANCHOR_TYPE)
+        val longPressTarget = LongPressTarget(url = exampleUrl, type = WebView.HitTestResult.SRC_ANCHOR_TYPE)
         testee.userSelectedItemFromLongPressMenu(longPressTarget, mockMenItem)
         val command = captureCommands().lastValue as Command.OpenInNewTab
-        assertEquals(EXAMPLE_URL, command.query)
+        assertEquals(exampleUrl, command.query)
 
         assertCommandIssued<Command.OpenInNewTab> {
             assertNotNull(sourceTabId)
@@ -2388,11 +2388,11 @@ class BrowserTabViewModelTest {
         val siteURL = "http://example.com/requires-auth"
         val authenticationRequest = BasicAuthenticationRequest(mockHandler, "example.com", "test realm", siteURL)
 
-        loadUrl(url = EXAMPLE_URL, isBrowserShowing = true)
+        loadUrl(url = exampleUrl, isBrowserShowing = true)
         testee.requiresAuthentication(authenticationRequest)
 
         assertCommandNotIssued<Command.HideWebContent>()
-        assertEquals(EXAMPLE_URL, omnibarViewState().omnibarText)
+        assertEquals(exampleUrl, omnibarViewState().omnibarText)
     }
 
     @Test
@@ -2403,11 +2403,11 @@ class BrowserTabViewModelTest {
         val siteURL = "http://example.com/requires-auth"
         val authenticationRequest = BasicAuthenticationRequest(mockHandler, "example.com", "test realm", siteURL)
 
-        loadUrl(url = EXAMPLE_URL, isBrowserShowing = true)
+        loadUrl(url = exampleUrl, isBrowserShowing = true)
         testee.requiresAuthentication(authenticationRequest)
 
         assertCommandNotIssued<Command.HideWebContent>()
-        assertEquals(SHORT_EXAMPLE_URL, omnibarViewState().omnibarText)
+        assertEquals(shortExampleUrl, omnibarViewState().omnibarText)
     }
 
     @Test
@@ -2434,7 +2434,7 @@ class BrowserTabViewModelTest {
         testee.requiresAuthentication(authenticationRequest)
 
         assertCommandIssued<Command.HideWebContent>()
-        assertEquals(SHORT_EXAMPLE_URL, omnibarViewState().omnibarText)
+        assertEquals(shortExampleUrl, omnibarViewState().omnibarText)
     }
 
     @Test
@@ -3270,7 +3270,7 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenBookmarkAddedThenPersistFavicon() = runTest {
-        val url = EXAMPLE_URL
+        val url = exampleUrl
         val title = "A title"
         val bookmark = Bookmark(
             id = UUID.randomUUID().toString(),
@@ -3298,7 +3298,7 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenFireproofWebsiteAddedThenPersistFavicon() = runTest {
-        val url = EXAMPLE_URL
+        val url = exampleUrl
         loadUrl(url, isBrowserShowing = true)
 
         testee.onFireproofWebsiteMenuClicked()
@@ -3310,7 +3310,7 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenOnPinPageToHomeSelectedThenAddHomeShortcutCommandIssuedWithFavicon() = runTest {
-        val url = EXAMPLE_URL
+        val url = exampleUrl
         val bitmap: Bitmap = Bitmap.createBitmap(1, 1, Bitmap.Config.RGB_565)
         whenever(mockFaviconManager.loadFromDisk(any(), any())).thenReturn(bitmap)
         loadUrl(url, "A title")
@@ -3326,7 +3326,7 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenOnPinPageToHomeSelectedAndFaviconDoesNotExistThenAddHomeShortcutCommandIssuedWithoutFavicon() = runTest {
-        val url = EXAMPLE_URL
+        val url = exampleUrl
         whenever(mockFaviconManager.loadFromDisk(any(), any())).thenReturn(null)
         loadUrl(url, "A title")
 
@@ -3632,11 +3632,11 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenHandleAppLinkCalledAndShowAppLinksPromptIsTrueThenShowAppLinkPromptAndUserQueryStateSetToFalse() {
-        val urlType = SpecialUrlDetector.UrlType.AppLink(uriString = EXAMPLE_URL)
+        val urlType = SpecialUrlDetector.UrlType.AppLink(uriString = exampleUrl)
         testee.handleAppLink(urlType, isForMainFrame = true)
         whenever(mockAppLinksHandler.isUserQuery()).thenReturn(false)
         whenever(ctaViewModelMockSettingsStore.showAppLinksPrompt).thenReturn(true)
-        verify(mockAppLinksHandler).handleAppLink(eq(true), eq(EXAMPLE_URL), eq(false), eq(true), appLinkCaptor.capture())
+        verify(mockAppLinksHandler).handleAppLink(eq(true), eq(exampleUrl), eq(false), eq(true), appLinkCaptor.capture())
         appLinkCaptor.lastValue.invoke()
         assertCommandIssued<Command.ShowAppLinkPrompt>()
         verify(mockAppLinksHandler).setUserQueryState(false)
@@ -3644,11 +3644,11 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenHandleAppLinkCalledAndIsUserQueryThenShowAppLinkPromptAndUserQueryStateSetToFalse() {
-        val urlType = SpecialUrlDetector.UrlType.AppLink(uriString = EXAMPLE_URL)
+        val urlType = SpecialUrlDetector.UrlType.AppLink(uriString = exampleUrl)
         testee.handleAppLink(urlType, isForMainFrame = true)
         whenever(mockAppLinksHandler.isUserQuery()).thenReturn(true)
         whenever(ctaViewModelMockSettingsStore.showAppLinksPrompt).thenReturn(false)
-        verify(mockAppLinksHandler).handleAppLink(eq(true), eq(EXAMPLE_URL), eq(false), eq(true), appLinkCaptor.capture())
+        verify(mockAppLinksHandler).handleAppLink(eq(true), eq(exampleUrl), eq(false), eq(true), appLinkCaptor.capture())
         appLinkCaptor.lastValue.invoke()
         assertCommandIssued<Command.ShowAppLinkPrompt>()
         verify(mockAppLinksHandler).setUserQueryState(false)
@@ -3656,18 +3656,18 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenHandleAppLinkCalledAndIsNotUserQueryAndShowAppLinksPromptIsFalseThenOpenAppLink() {
-        val urlType = SpecialUrlDetector.UrlType.AppLink(uriString = EXAMPLE_URL)
+        val urlType = SpecialUrlDetector.UrlType.AppLink(uriString = exampleUrl)
         testee.handleAppLink(urlType, isForMainFrame = true)
         whenever(mockAppLinksHandler.isUserQuery()).thenReturn(false)
         whenever(ctaViewModelMockSettingsStore.showAppLinksPrompt).thenReturn(false)
-        verify(mockAppLinksHandler).handleAppLink(eq(true), eq(EXAMPLE_URL), eq(false), eq(true), appLinkCaptor.capture())
+        verify(mockAppLinksHandler).handleAppLink(eq(true), eq(exampleUrl), eq(false), eq(true), appLinkCaptor.capture())
         appLinkCaptor.lastValue.invoke()
         assertCommandIssued<Command.OpenAppLink>()
     }
 
     @Test
     fun whenHandleNonHttpAppLinkCalledThenHandleNonHttpAppLink() {
-        val urlType = SpecialUrlDetector.UrlType.NonHttpAppLink("market://details?id=com.example", Intent(), EXAMPLE_URL)
+        val urlType = SpecialUrlDetector.UrlType.NonHttpAppLink("market://details?id=com.example", Intent(), exampleUrl)
         assertTrue(testee.handleNonHttpAppLink(urlType))
         assertCommandIssued<Command.HandleNonHttpAppLink>()
     }
@@ -3675,7 +3675,7 @@ class BrowserTabViewModelTest {
     @Test
     fun whenHandleNonHttpAppLinkCalledWithUnpermittedIntentThenDoNotHandleNonHttpAppLink() {
         whenever(nonHttpAppLinkChecker.isPermitted(any())).thenReturn(false)
-        val urlType = SpecialUrlDetector.UrlType.NonHttpAppLink("market://details?id=com.example", Intent(), EXAMPLE_URL)
+        val urlType = SpecialUrlDetector.UrlType.NonHttpAppLink("market://details?id=com.example", Intent(), exampleUrl)
         assertTrue(testee.handleNonHttpAppLink(urlType))
         assertCommandNotIssued<Command.HandleNonHttpAppLink>()
     }
@@ -4110,11 +4110,11 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenUrlExtractedThenIssueLoadExtractedUrlCommand() {
-        whenever(mockAmpLinks.processDestinationUrl(anyString(), anyOrNull())).thenReturn(EXAMPLE_URL)
-        testee.onUrlExtracted("http://foo.com", EXAMPLE_URL)
+        whenever(mockAmpLinks.processDestinationUrl(anyString(), anyOrNull())).thenReturn(exampleUrl)
+        testee.onUrlExtracted("http://foo.com", exampleUrl)
         verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
         val issuedCommand = commandCaptor.allValues.find { it is LoadExtractedUrl }
-        assertEquals(EXAMPLE_URL, (issuedCommand as LoadExtractedUrl).extractedUrl)
+        assertEquals(exampleUrl, (issuedCommand as LoadExtractedUrl).extractedUrl)
     }
 
     @Test
@@ -4409,7 +4409,7 @@ class BrowserTabViewModelTest {
 
         val expectedUrls = listOf(
             "https://example.com",
-            EXAMPLE_URL,
+            exampleUrl,
             "ftp://example.com",
             "https://example.com",
             "https://sub.example.com",
@@ -4595,7 +4595,7 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenWebViewRefreshedWithErrorThenBrowserErrorStateIsLoading() {
-        testee.onReceivedError(BAD_URL, EXAMPLE_URL)
+        testee.onReceivedError(BAD_URL, exampleUrl)
         testee.onWebViewRefreshed()
 
         assertEquals(LOADING, browserViewState().browserError)
@@ -4603,7 +4603,7 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenResetBrowserErrorThenBrowserErrorStateIsLoading() {
-        testee.onReceivedError(BAD_URL, EXAMPLE_URL)
+        testee.onReceivedError(BAD_URL, exampleUrl)
         assertEquals(BAD_URL, browserViewState().browserError)
         testee.resetBrowserError()
         assertEquals(OMITTED, browserViewState().browserError)
@@ -5066,7 +5066,7 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenRefreshIsTriggeredByUserThenIncrementRefreshCount() = runTest {
-        val url = EXAMPLE_URL
+        val url = exampleUrl
         givenCurrentSite(url)
 
         testee.onRefreshRequested(triggeredByUser = false)
@@ -5169,7 +5169,7 @@ class BrowserTabViewModelTest {
     fun whenAllowBypassSSLCertificatesFeatureDisabledThenSSLCertificateErrorsAreIgnored() {
         whenever(mockEnabledToggle.isEnabled()).thenReturn(false)
 
-        val url = EXAMPLE_URL
+        val url = exampleUrl
         givenCurrentSite(url)
 
         val certificate = aRSASslCertificate()
@@ -5184,7 +5184,7 @@ class BrowserTabViewModelTest {
     fun whenSslCertificateIssueReceivedForLoadingSiteThenShowSslWarningCommandSentAndViewStatesUpdated() {
         whenever(mockEnabledToggle.isEnabled()).thenReturn(true)
 
-        val url = EXAMPLE_URL
+        val url = exampleUrl
         givenCurrentSite(url)
 
         val certificate = aRSASslCertificate()
@@ -5202,7 +5202,7 @@ class BrowserTabViewModelTest {
     @SdkSuppress(minSdkVersion = Build.VERSION_CODES.Q)
     fun whenSslCertificateIssueReceivedForAnotherSiteThenShowSslWarningCommandNotSentAndViewStatesNotUpdated() {
         whenever(mockEnabledToggle.isEnabled()).thenReturn(true)
-        val url = EXAMPLE_URL
+        val url = exampleUrl
         givenCurrentSite(url)
 
         val certificate = aRSASslCertificate()
@@ -5218,7 +5218,7 @@ class BrowserTabViewModelTest {
     @SdkSuppress(minSdkVersion = Build.VERSION_CODES.Q)
     fun whenInFreshStartAndSslCertificateIssueReceivedThenShowSslWarningCommandSentAndViewStatesUpdated() = runTest {
         whenever(mockEnabledToggle.isEnabled()).thenReturn(true)
-        val url = EXAMPLE_URL
+        val url = exampleUrl
         val site: Site = mock()
         whenever(site.url).thenReturn(url)
         whenever(site.nextUrl).thenReturn(null)
@@ -5238,7 +5238,7 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenSslCertificateBypassedThenUrlAddedToRepository() {
-        val url = EXAMPLE_URL
+        val url = exampleUrl
 
         testee.onSSLCertificateWarningAction(Action.Proceed, url)
 
@@ -5249,7 +5249,7 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenSslCertificateActionShownThenPixelsFired() {
-        val url = EXAMPLE_URL
+        val url = exampleUrl
 
         testee.onSSLCertificateWarningAction(Action.Shown(EXPIRED), url)
         verify(mockPixel).fire(AppPixelName.SSL_CERTIFICATE_WARNING_EXPIRED_SHOWN)
@@ -5266,7 +5266,7 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenSslCertificateActionAdvanceThenPixelsFired() {
-        val url = EXAMPLE_URL
+        val url = exampleUrl
         testee.onSSLCertificateWarningAction(Action.Advance, url)
 
         verify(mockPixel).fire(AppPixelName.SSL_CERTIFICATE_WARNING_ADVANCED_PRESSED)
@@ -5274,7 +5274,7 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenSslCertificateActionLeaveSiteThenPixelsFiredAndViewStatesUpdated() {
-        val url = EXAMPLE_URL
+        val url = exampleUrl
         testee.onSSLCertificateWarningAction(Action.LeaveSite, url)
 
         verify(mockPixel).fire(AppPixelName.SSL_CERTIFICATE_WARNING_CLOSE_PRESSED)
@@ -5283,7 +5283,7 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenSslCertificateActionLeaveSiteAndCustomTabThenClose() {
-        val url = EXAMPLE_URL
+        val url = exampleUrl
         testee.onSSLCertificateWarningAction(Action.LeaveSite, url, true)
 
         verify(mockPixel).fire(AppPixelName.SSL_CERTIFICATE_WARNING_CLOSE_PRESSED)
@@ -5293,7 +5293,7 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenSslCertificateActionLeaveSiteAndCustomTabFalseThenHideSSLError() {
-        val url = EXAMPLE_URL
+        val url = exampleUrl
         testee.onSSLCertificateWarningAction(Action.LeaveSite, url, false)
 
         verify(mockPixel).fire(AppPixelName.SSL_CERTIFICATE_WARNING_CLOSE_PRESSED)
@@ -5303,7 +5303,7 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenMaliciousSiteActionLeaveSiteAndCustomTabThenClose() {
-        val url = EXAMPLE_URL.toUri()
+        val url = exampleUrl.toUri()
         testee.onMaliciousSiteUserAction(LeaveSite, url, MALWARE, true)
         verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
         assertTrue(commandCaptor.allValues.any { it is Command.CloseCustomTab })
@@ -5311,7 +5311,7 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenMaliciousSiteActionLeaveSiteAndCustomTabFalseThenHideSSLError() {
-        val url = EXAMPLE_URL.toUri()
+        val url = exampleUrl.toUri()
         testee.onMaliciousSiteUserAction(LeaveSite, url, MALWARE, false)
         verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
         assertTrue(commandCaptor.allValues.any { it is Command.EscapeMaliciousSite })
@@ -5321,7 +5321,7 @@ class BrowserTabViewModelTest {
     @SdkSuppress(minSdkVersion = Build.VERSION_CODES.Q)
     fun whenSslCertificateActionProceedThenPixelsFiredAndViewStatesUpdated() {
         whenever(mockEnabledToggle.isEnabled()).thenReturn(true)
-        val url = EXAMPLE_URL
+        val url = exampleUrl
         val certificate = aRSASslCertificate()
         val sslErrorResponse = SslErrorResponse(SslError(SslError.SSL_EXPIRED, certificate, url), EXPIRED, url)
 
@@ -5340,7 +5340,7 @@ class BrowserTabViewModelTest {
     @SdkSuppress(minSdkVersion = Build.VERSION_CODES.Q)
     fun whenWebViewRefreshedThenSSLErrorStateIsNone() {
         whenever(mockEnabledToggle.isEnabled()).thenReturn(true)
-        val url = EXAMPLE_URL
+        val url = exampleUrl
         val certificate = aRSASslCertificate()
         val sslErrorResponse = SslErrorResponse(SslError(SslError.SSL_EXPIRED, certificate, url), EXPIRED, url)
 
@@ -5355,7 +5355,7 @@ class BrowserTabViewModelTest {
     @SdkSuppress(minSdkVersion = Build.VERSION_CODES.Q)
     fun whenResetSSLErrorThenBrowserErrorStateIsLoading() {
         whenever(mockEnabledToggle.isEnabled()).thenReturn(true)
-        val url = EXAMPLE_URL
+        val url = exampleUrl
         val certificate = aRSASslCertificate()
         val sslErrorResponse = SslErrorResponse(SslError(SslError.SSL_EXPIRED, certificate, url), EXPIRED, url)
 
@@ -5721,7 +5721,7 @@ class BrowserTabViewModelTest {
     fun whenUrlUpdatedWithUrlYouTubeNoCookieThenReplaceUrlWithDuckPlayer() = runTest {
         whenever(mockDuckPlayer.isSimulatedYoutubeNoCookie("https://youtube-nocookie.com/?videoID=1234".toUri())).thenReturn(true)
         whenever(mockDuckPlayer.isSimulatedYoutubeNoCookie("duck://player/1234".toUri())).thenReturn(false)
-        whenever(mockDuckPlayer.isSimulatedYoutubeNoCookie(EXAMPLE_URL.toUri())).thenReturn(false)
+        whenever(mockDuckPlayer.isSimulatedYoutubeNoCookie(exampleUrl.toUri())).thenReturn(false)
         whenever(mockDuckPlayer.createDuckPlayerUriFromYoutubeNoCookie("https://youtube-nocookie.com/?videoID=1234".toUri())).thenReturn(
             "duck://player/1234",
         )
@@ -5729,7 +5729,7 @@ class BrowserTabViewModelTest {
 
         testee.browserViewState.value = browserViewState().copy(browserShowing = true)
 
-        testee.navigationStateChanged(buildWebNavigation(EXAMPLE_URL))
+        testee.navigationStateChanged(buildWebNavigation(exampleUrl))
         testee.navigationStateChanged(buildWebNavigation("https://youtube-nocookie.com/?videoID=1234"))
 
         assertEquals("duck://player/1234", omnibarViewState().omnibarText)
@@ -5740,7 +5740,7 @@ class BrowserTabViewModelTest {
         isFullSiteAddressEnabled = false
         whenever(mockDuckPlayer.isSimulatedYoutubeNoCookie("https://youtube-nocookie.com/?videoID=1234".toUri())).thenReturn(true)
         whenever(mockDuckPlayer.isSimulatedYoutubeNoCookie("duck://player/1234".toUri())).thenReturn(false)
-        whenever(mockDuckPlayer.isSimulatedYoutubeNoCookie(EXAMPLE_URL.toUri())).thenReturn(false)
+        whenever(mockDuckPlayer.isSimulatedYoutubeNoCookie(exampleUrl.toUri())).thenReturn(false)
         whenever(mockDuckPlayer.createDuckPlayerUriFromYoutubeNoCookie("https://youtube-nocookie.com/?videoID=1234".toUri())).thenReturn(
             "duck://player/1234",
         )
@@ -5748,7 +5748,7 @@ class BrowserTabViewModelTest {
 
         testee.browserViewState.value = browserViewState().copy(browserShowing = true)
 
-        testee.navigationStateChanged(buildWebNavigation(EXAMPLE_URL))
+        testee.navigationStateChanged(buildWebNavigation(exampleUrl))
         testee.navigationStateChanged(buildWebNavigation("https://youtube-nocookie.com/?videoID=1234"))
 
         assertEquals("Duck Player", omnibarViewState().omnibarText)
@@ -6076,7 +6076,7 @@ class BrowserTabViewModelTest {
         whenever(site.maliciousSiteStatus).thenReturn(PHISHING)
         testee.siteLiveData.value = site
 
-        testee.pageFinished(WebViewNavigationState(mockStack, 100), EXAMPLE_URL)
+        testee.pageFinished(WebViewNavigationState(mockStack, 100), exampleUrl)
 
         assertEquals("http://malicious.com", testee.siteLiveData.value?.url)
         assertEquals(PHISHING, testee.siteLiveData.value?.maliciousSiteStatus)
@@ -6094,7 +6094,7 @@ class BrowserTabViewModelTest {
         whenever(site.maliciousSiteStatus).thenReturn(PHISHING)
         testee.siteLiveData.value = site
 
-        testee.onPageCommitVisible(WebViewNavigationState(mockStack, 100), EXAMPLE_URL)
+        testee.onPageCommitVisible(WebViewNavigationState(mockStack, 100), exampleUrl)
 
         assertEquals("http://malicious.com", testee.siteLiveData.value?.url)
         assertEquals(PHISHING, testee.siteLiveData.value?.maliciousSiteStatus)
@@ -6155,20 +6155,20 @@ class BrowserTabViewModelTest {
         testee.loadingViewState.value = loadingViewState().copy(isLoading = false)
         testee.omnibarViewState.value = omnibarViewState().copy(isEditing = true)
 
-        testee.onMaliciousSiteUserAction(VisitSite, EXAMPLE_URL.toUri(), Feed.PHISHING, false)
+        testee.onMaliciousSiteUserAction(VisitSite, exampleUrl.toUri(), Feed.PHISHING, false)
 
         assertEquals(
             loadingViewState().copy(
                 isLoading = true,
                 trackersAnimationEnabled = true,
                 progress = 20,
-                url = EXAMPLE_URL,
+                url = exampleUrl,
             ),
             loadingViewState(),
         )
         assertEquals(
             omnibarViewState().copy(
-                omnibarText = EXAMPLE_URL,
+                omnibarText = exampleUrl,
                 isEditing = false,
                 navigationChange = true,
             ),
@@ -6189,20 +6189,20 @@ class BrowserTabViewModelTest {
         testee.loadingViewState.value = loadingViewState().copy(isLoading = false)
         testee.omnibarViewState.value = omnibarViewState().copy(isEditing = true)
 
-        testee.onMaliciousSiteUserAction(VisitSite, EXAMPLE_URL.toUri(), Feed.PHISHING, false)
+        testee.onMaliciousSiteUserAction(VisitSite, exampleUrl.toUri(), Feed.PHISHING, false)
 
         assertEquals(
             loadingViewState().copy(
                 isLoading = true,
                 trackersAnimationEnabled = true,
                 progress = 20,
-                url = EXAMPLE_URL,
+                url = exampleUrl,
             ),
             loadingViewState(),
         )
         assertEquals(
             omnibarViewState().copy(
-                omnibarText = SHORT_EXAMPLE_URL,
+                omnibarText = shortExampleUrl,
                 isEditing = false,
                 navigationChange = true,
             ),
@@ -6212,7 +6212,7 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenLeaveSiteAndCustomTabThenEmitCloseCustomTab() {
-        testee.onMaliciousSiteUserAction(LeaveSite, EXAMPLE_URL.toUri(), Feed.PHISHING, true)
+        testee.onMaliciousSiteUserAction(LeaveSite, exampleUrl.toUri(), Feed.PHISHING, true)
         assertCommandIssued<CloseCustomTab>()
     }
 
@@ -6222,7 +6222,7 @@ class BrowserTabViewModelTest {
         whenever(mockLiveSelectedTab.value).thenReturn(TabEntity("ID"))
         whenever(mockTabRepository.liveSelectedTab).thenReturn(mockLiveSelectedTab)
 
-        testee.onMaliciousSiteUserAction(LeaveSite, EXAMPLE_URL.toUri(), Feed.PHISHING, false)
+        testee.onMaliciousSiteUserAction(LeaveSite, exampleUrl.toUri(), Feed.PHISHING, false)
 
         assertCommandIssued<EscapeMaliciousSite>()
         assertCommandIssued<LaunchNewTab>()
@@ -6231,13 +6231,13 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenLearnMoreThenEmitOpenBrokenSiteLearnMore() {
-        testee.onMaliciousSiteUserAction(LearnMore, EXAMPLE_URL.toUri(), Feed.PHISHING, false)
+        testee.onMaliciousSiteUserAction(LearnMore, exampleUrl.toUri(), Feed.PHISHING, false)
         assertCommandIssued<OpenBrokenSiteLearnMore>()
     }
 
     @Test
     fun whenReportErrorThenEmitOpenBrokenSiteLearnMore() {
-        testee.onMaliciousSiteUserAction(ReportError, EXAMPLE_URL.toUri(), Feed.PHISHING, false)
+        testee.onMaliciousSiteUserAction(ReportError, exampleUrl.toUri(), Feed.PHISHING, false)
         assertCommandIssued<ReportBrokenSiteError>()
     }
 
@@ -6514,14 +6514,14 @@ class BrowserTabViewModelTest {
         loadUrl(initialUrl)
 
         // Then navigate to a new URL with title
-        testee.navigationStateChanged(buildWebNavigation(originalUrl = initialUrl, currentUrl = EXAMPLE_URL, title = title))
+        testee.navigationStateChanged(buildWebNavigation(originalUrl = initialUrl, currentUrl = exampleUrl, title = title))
 
         // Verify browser view state is updated
         assertTrue(browserViewState().browserShowing)
 
         // Verify omnibar state is updated with the new URL
-        assertEquals(SHORT_EXAMPLE_URL, omnibarViewState().omnibarText)
-        assertEquals(EXAMPLE_URL, omnibarViewState().queryOrFullUrl)
+        assertEquals(shortExampleUrl, omnibarViewState().omnibarText)
+        assertEquals(exampleUrl, omnibarViewState().queryOrFullUrl)
 
         // Verify loading state reflects the completed navigation
         assertFalse(loadingViewState().isLoading)
@@ -6529,22 +6529,22 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenNavigatingThenQueryOrFullUrlIsPreserved() = runTest {
-        loadUrl(EXAMPLE_URL)
+        loadUrl(exampleUrl)
 
-        testee.navigationStateChanged(buildWebNavigation(EXAMPLE_URL))
+        testee.navigationStateChanged(buildWebNavigation(exampleUrl))
 
-        assertEquals(EXAMPLE_URL, omnibarViewState().queryOrFullUrl)
+        assertEquals(exampleUrl, omnibarViewState().queryOrFullUrl)
     }
 
     @Test
     fun whenNavigatingAndFullUrlDisabledThenQueryOrFullUrlIsPreserved() = runTest {
         isFullSiteAddressEnabled = false
 
-        loadUrl(EXAMPLE_URL)
+        loadUrl(exampleUrl)
 
-        testee.navigationStateChanged(buildWebNavigation(EXAMPLE_URL))
+        testee.navigationStateChanged(buildWebNavigation(exampleUrl))
 
-        assertEquals(EXAMPLE_URL, omnibarViewState().queryOrFullUrl)
+        assertEquals(exampleUrl, omnibarViewState().queryOrFullUrl)
     }
 
     @Test
@@ -6566,9 +6566,9 @@ class BrowserTabViewModelTest {
         testee.loadingViewState.value = loadingViewState().copy(isLoading = false)
         testee.omnibarViewState.value = omnibarViewState().copy(isEditing = true)
 
-        testee.onMaliciousSiteUserAction(VisitSite, EXAMPLE_URL.toUri(), Feed.PHISHING, false)
+        testee.onMaliciousSiteUserAction(VisitSite, exampleUrl.toUri(), Feed.PHISHING, false)
 
-        assertEquals(EXAMPLE_URL, omnibarViewState().queryOrFullUrl)
+        assertEquals(exampleUrl, omnibarViewState().queryOrFullUrl)
     }
 
     @Test
@@ -6582,9 +6582,9 @@ class BrowserTabViewModelTest {
         testee.loadingViewState.value = loadingViewState().copy(isLoading = false)
         testee.omnibarViewState.value = omnibarViewState().copy(isEditing = true)
 
-        testee.onMaliciousSiteUserAction(VisitSite, EXAMPLE_URL.toUri(), Feed.PHISHING, false)
+        testee.onMaliciousSiteUserAction(VisitSite, exampleUrl.toUri(), Feed.PHISHING, false)
 
-        assertEquals(EXAMPLE_URL, omnibarViewState().queryOrFullUrl)
+        assertEquals(exampleUrl, omnibarViewState().queryOrFullUrl)
     }
 
     @Test

@@ -67,7 +67,6 @@ class Omnibar(
     val omnibarPosition: OmnibarPosition,
     private val binding: FragmentBrowserTabBinding,
 ) {
-
     init {
         when (omnibarPosition) {
             OmnibarPosition.TOP -> {
@@ -86,13 +85,21 @@ class Omnibar(
 
     interface ItemPressedListener {
         fun onTabsButtonPressed()
+
         fun onTabsButtonLongPressed()
+
         fun onFireButtonPressed()
+
         fun onBrowserMenuPressed()
+
         fun onPrivacyShieldPressed()
+
         fun onCustomTabClosePressed()
+
         fun onCustomTabPrivacyDashboardPressed()
+
         fun onVoiceSearchPressed()
+
         fun onDuckChatButtonPressed()
     }
 
@@ -103,8 +110,11 @@ class Omnibar(
         )
 
         fun onPreviousSearchItemPressed()
+
         fun onNextSearchItemPressed()
+
         fun onClosePressed()
+
         fun onFindInPageTextChanged(query: String)
     }
 
@@ -115,17 +125,20 @@ class Omnibar(
         )
 
         fun onBackKeyPressed()
+
         fun onEnterPressed()
+
         fun onTouchEvent(event: MotionEvent)
+
         fun onOmnibarTextChanged(state: OmnibarTextState)
+
         fun onShowSuggestions(state: OmnibarTextState)
+
         fun onTrackersCountFinished()
     }
 
     fun interface InputScreenLaunchListener {
-        fun launchInputScreen(
-            query: String,
-        )
+        fun launchInputScreen(query: String)
     }
 
     interface LogoClickListener {
@@ -139,10 +152,17 @@ class Omnibar(
 
     sealed class ViewMode {
         data object Error : ViewMode()
+
         data object SSLWarning : ViewMode()
+
         data object MaliciousSiteWarning : ViewMode()
+
         data object NewTab : ViewMode()
-        data class Browser(val url: String?) : ViewMode()
+
+        data class Browser(
+            val url: String?,
+        ) : ViewMode()
+
         data class CustomTab(
             val toolbarColor: Int,
             val title: String?,
@@ -302,7 +322,10 @@ class Omnibar(
         newOmnibar.reduce(StateChange.LoadingStateChange(viewState))
     }
 
-    fun renderOmnibarViewState(viewState: OmnibarViewState, forceRender: Boolean = false) {
+    fun renderOmnibarViewState(
+        viewState: OmnibarViewState,
+        forceRender: Boolean = false,
+    ) {
         logcat { "Omnibar: renderOmnibarViewState $viewState" }
         newOmnibar.reduce(StateChange.OmnibarStateChange(viewState, forceRender))
     }
@@ -311,9 +334,7 @@ class Omnibar(
         newOmnibar.decorate(Decoration.PrivacyShieldChanged(privacyShield))
     }
 
-    fun isPulseAnimationPlaying(): Boolean {
-        return newOmnibar.isPulseAnimationPlaying()
-    }
+    fun isPulseAnimationPlaying(): Boolean = newOmnibar.isPulseAnimationPlaying()
 
     fun hideFindInPage() {
         if (findInPage.findInPageContainer.visibility != GONE) {
@@ -345,9 +366,7 @@ class Omnibar(
         omnibarTextInput.setText(text)
     }
 
-    fun getText(): String {
-        return omnibarTextInput.text.toString()
-    }
+    fun getText(): String = omnibarTextInput.text.toString()
 
     fun setTextSelection(index: Int) {
         omnibarTextInput.setSelection(index)
@@ -357,13 +376,9 @@ class Omnibar(
         omniBarContainer.isPressed = pressed
     }
 
-    fun isOutlineShown(): Boolean {
-        return omniBarContainer.isPressed
-    }
+    fun isOutlineShown(): Boolean = omniBarContainer.isPressed
 
-    fun isEditing(): Boolean {
-        return newOmnibar.isEditing
-    }
+    fun isEditing(): Boolean = newOmnibar.isEditing
 
     fun renderBrowserViewState(viewState: BrowserViewState) {
         newOmnibar.decorate(

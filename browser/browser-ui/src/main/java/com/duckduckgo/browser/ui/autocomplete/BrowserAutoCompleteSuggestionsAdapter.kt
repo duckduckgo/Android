@@ -35,7 +35,10 @@ import com.duckduckgo.browser.ui.autocomplete.AutoCompleteViewHolder.EmptySugges
 import com.duckduckgo.browser.ui.omnibar.OmnibarPosition
 
 private sealed interface AutoCompleteItem {
-    data class Suggestion(val value: AutoCompleteSuggestion) : AutoCompleteItem
+    data class Suggestion(
+        val value: AutoCompleteSuggestion,
+    ) : AutoCompleteItem
+
     data object Divider : AutoCompleteItem
 }
 
@@ -50,7 +53,6 @@ class BrowserAutoCompleteSuggestionsAdapter(
     private val autoCompleteLongPressClickListener: (AutoCompleteSuggestion) -> Unit,
     omnibarPosition: OmnibarPosition,
 ) : RecyclerView.Adapter<AutoCompleteViewHolder>() {
-
     private val deleteClickListener: (AutoCompleteSuggestion) -> Unit = {
         val suggestions = getSuggestions().filter { suggestion -> suggestion != it }
         val newItems = createItemsWithDividers(suggestions)
@@ -61,11 +63,13 @@ class BrowserAutoCompleteSuggestionsAdapter(
         autoCompleteInAppMessageDismissedListener()
     }
 
-    private fun calculateDiff(newItems: List<AutoCompleteItem>): DiffResult {
-        return DiffUtil.calculateDiff(
+    private fun calculateDiff(newItems: List<AutoCompleteItem>): DiffResult =
+        DiffUtil.calculateDiff(
             object : Callback() {
                 override fun getOldListSize() = items.size
+
                 override fun getNewListSize() = newItems.size
+
                 override fun areItemsTheSame(
                     oldItemPosition: Int,
                     newItemPosition: Int,
@@ -85,20 +89,20 @@ class BrowserAutoCompleteSuggestionsAdapter(
                 ) = true
             },
         )
-    }
 
-    private val viewHolderFactoryMap: Map<Int, SuggestionViewHolderFactory> = mapOf(
-        Type.EMPTY_TYPE to EmptySuggestionViewHolderFactory(),
-        Type.SUGGESTION_TYPE to SearchSuggestionViewHolderFactory(omnibarPosition),
-        Type.BOOKMARK_TYPE to BookmarkSuggestionViewHolderFactory(),
-        Type.HISTORY_TYPE to HistorySuggestionViewHolderFactory(),
-        Type.HISTORY_SEARCH_TYPE to HistorySearchSuggestionViewHolderFactory(),
-        Type.IN_APP_MESSAGE_TYPE to InAppMessageViewHolderFactory(),
-        Type.DEFAULT_TYPE to DefaultSuggestionViewHolderFactory(omnibarPosition),
-        Type.SWITCH_TO_TAB_TYPE to SwitchToTabSuggestionViewHolderFactory(),
-        Type.DIVIDER_TYPE to DividerViewHolderFactory(),
-        Type.DUCK_AI_PROMPT_TYPE to DuckAIPromptSuggestionViewHolderFactory(),
-    )
+    private val viewHolderFactoryMap: Map<Int, SuggestionViewHolderFactory> =
+        mapOf(
+            Type.EMPTY_TYPE to EmptySuggestionViewHolderFactory(),
+            Type.SUGGESTION_TYPE to SearchSuggestionViewHolderFactory(omnibarPosition),
+            Type.BOOKMARK_TYPE to BookmarkSuggestionViewHolderFactory(),
+            Type.HISTORY_TYPE to HistorySuggestionViewHolderFactory(),
+            Type.HISTORY_SEARCH_TYPE to HistorySearchSuggestionViewHolderFactory(),
+            Type.IN_APP_MESSAGE_TYPE to InAppMessageViewHolderFactory(),
+            Type.DEFAULT_TYPE to DefaultSuggestionViewHolderFactory(omnibarPosition),
+            Type.SWITCH_TO_TAB_TYPE to SwitchToTabSuggestionViewHolderFactory(),
+            Type.DIVIDER_TYPE to DividerViewHolderFactory(),
+            Type.DUCK_AI_PROMPT_TYPE to DuckAIPromptSuggestionViewHolderFactory(),
+        )
 
     private var phrase = ""
     private var items: List<AutoCompleteItem> = emptyList()
@@ -106,23 +110,24 @@ class BrowserAutoCompleteSuggestionsAdapter(
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int,
-    ): AutoCompleteViewHolder =
-        viewHolderFactoryMap.getValue(viewType).onCreateViewHolder(parent)
+    ): AutoCompleteViewHolder = viewHolderFactoryMap.getValue(viewType).onCreateViewHolder(parent)
 
-    override fun getItemViewType(position: Int): Int = when (val item = items[position]) {
-        is AutoCompleteItem.Divider -> Type.DIVIDER_TYPE
-        is AutoCompleteItem.Suggestion -> when (item.value) {
-            is AutoCompleteBookmarkSuggestion -> Type.BOOKMARK_TYPE
-            is AutoCompleteHistorySuggestion -> Type.HISTORY_TYPE
-            is AutoCompleteHistorySearchSuggestion -> Type.HISTORY_SEARCH_TYPE
-            is AutoCompleteInAppMessageSuggestion -> Type.IN_APP_MESSAGE_TYPE
-            is AutoCompleteDefaultSuggestion -> Type.DEFAULT_TYPE
-            is AutoCompleteSwitchToTabSuggestion -> Type.SWITCH_TO_TAB_TYPE
-            is AutoCompleteUrlSuggestion -> Type.SWITCH_TO_TAB_TYPE
-            is AutoCompleteSuggestion.AutoCompleteDuckAIPrompt -> Type.DUCK_AI_PROMPT_TYPE
-            else -> Type.SUGGESTION_TYPE
+    override fun getItemViewType(position: Int): Int =
+        when (val item = items[position]) {
+            is AutoCompleteItem.Divider -> Type.DIVIDER_TYPE
+            is AutoCompleteItem.Suggestion ->
+                when (item.value) {
+                    is AutoCompleteBookmarkSuggestion -> Type.BOOKMARK_TYPE
+                    is AutoCompleteHistorySuggestion -> Type.HISTORY_TYPE
+                    is AutoCompleteHistorySearchSuggestion -> Type.HISTORY_SEARCH_TYPE
+                    is AutoCompleteInAppMessageSuggestion -> Type.IN_APP_MESSAGE_TYPE
+                    is AutoCompleteDefaultSuggestion -> Type.DEFAULT_TYPE
+                    is AutoCompleteSwitchToTabSuggestion -> Type.SWITCH_TO_TAB_TYPE
+                    is AutoCompleteUrlSuggestion -> Type.SWITCH_TO_TAB_TYPE
+                    is AutoCompleteSuggestion.AutoCompleteDuckAIPrompt -> Type.DUCK_AI_PROMPT_TYPE
+                    else -> Type.SUGGESTION_TYPE
+                }
         }
-    }
 
     override fun onBindViewHolder(
         holder: AutoCompleteViewHolder,
@@ -133,7 +138,8 @@ class BrowserAutoCompleteSuggestionsAdapter(
         when (val item = items[position]) {
             AutoCompleteItem.Divider -> return
             is AutoCompleteItem.Suggestion -> {
-                viewHolderFactoryMap.getValue(getItemViewType(position))
+                viewHolderFactoryMap
+                    .getValue(getItemViewType(position))
                     .onBindViewHolder(
                         holder,
                         item.value,
@@ -165,24 +171,24 @@ class BrowserAutoCompleteSuggestionsAdapter(
         notifyDataSetChanged()
     }
 
-    private fun getSuggestions() = items
-        .filterIsInstance<AutoCompleteItem.Suggestion>()
-        .map { it.value }
+    private fun getSuggestions() =
+        items
+            .filterIsInstance<AutoCompleteItem.Suggestion>()
+            .map { it.value }
 
-    private fun createItemsWithDividers(suggestions: List<AutoCompleteSuggestion>): List<AutoCompleteItem> = buildList {
-        suggestions.zipWithNext { current, next ->
-            add(AutoCompleteItem.Suggestion(current))
-            if (needsDivider(current, next)) add(AutoCompleteItem.Divider)
+    private fun createItemsWithDividers(suggestions: List<AutoCompleteSuggestion>): List<AutoCompleteItem> =
+        buildList {
+            suggestions.zipWithNext { current, next ->
+                add(AutoCompleteItem.Suggestion(current))
+                if (needsDivider(current, next)) add(AutoCompleteItem.Divider)
+            }
+            if (suggestions.isNotEmpty()) add(AutoCompleteItem.Suggestion(suggestions.last()))
         }
-        if (suggestions.isNotEmpty()) add(AutoCompleteItem.Suggestion(suggestions.last()))
-    }
 
     private fun needsDivider(
         current: AutoCompleteSuggestion,
         next: AutoCompleteSuggestion,
-    ): Boolean {
-        return current.isSearchItem != next.isSearchItem
-    }
+    ): Boolean = current.isSearchItem != next.isSearchItem
 
     object Type {
         const val EMPTY_TYPE = 1
