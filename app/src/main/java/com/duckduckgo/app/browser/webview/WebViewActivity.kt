@@ -49,7 +49,6 @@ import javax.inject.Named
 @InjectWith(ActivityScope::class)
 @ContributeToActivityStarter(WebViewActivityWithParams::class)
 class WebViewActivity : DuckDuckGoActivity() {
-
     @Inject
     lateinit var userAgentProvider: UserAgentProvider
 
@@ -116,22 +115,23 @@ class WebViewActivity : DuckDuckGoActivity() {
             it.webViewClient = webViewClient
 
             if (supportNewWindows) {
-                it.webChromeClient = object : WebChromeClient() {
-                    override fun onCreateWindow(
-                        view: WebView?,
-                        isDialog: Boolean,
-                        isUserGesture: Boolean,
-                        resultMsg: Message?,
-                    ): Boolean {
-                        view?.requestFocusNodeHref(resultMsg)
-                        val newWindowUrl = resultMsg?.data?.getString("url")
-                        if (newWindowUrl != null) {
-                            startActivity(BrowserActivity.intent(this@WebViewActivity, newWindowUrl))
-                            return true
+                it.webChromeClient =
+                    object : WebChromeClient() {
+                        override fun onCreateWindow(
+                            view: WebView?,
+                            isDialog: Boolean,
+                            isUserGesture: Boolean,
+                            resultMsg: Message?,
+                        ): Boolean {
+                            view?.requestFocusNodeHref(resultMsg)
+                            val newWindowUrl = resultMsg?.data?.getString("url")
+                            if (newWindowUrl != null) {
+                                startActivity(BrowserActivity.intent(this@WebViewActivity, newWindowUrl))
+                                return true
+                            }
+                            return false
                         }
-                        return false
                     }
-                }
             }
 
             it.settings.apply {

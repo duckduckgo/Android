@@ -29,18 +29,25 @@ import javax.inject.Inject
 
 @ContributesMultibinding(AppScope::class)
 class SettingsContentScopeJsMessageHandler @Inject constructor() : ContentScopeJsMessageHandlersPlugin {
-    override fun getJsMessageHandler(): JsMessageHandler = object : JsMessageHandler {
-        override fun process(jsMessage: JsMessage, jsMessaging: JsMessaging, jsMessageCallback: JsMessageCallback?) {
-            jsMessageCallback?.process(featureName, jsMessage.method, jsMessage.id ?: "", jsMessage.params)
+    override fun getJsMessageHandler(): JsMessageHandler =
+        object : JsMessageHandler {
+            override fun process(
+                jsMessage: JsMessage,
+                jsMessaging: JsMessaging,
+                jsMessageCallback: JsMessageCallback?,
+            ) {
+                jsMessageCallback?.process(featureName, jsMessage.method, jsMessage.id ?: "", jsMessage.params)
+            }
+
+            override val allowedDomains: List<String> =
+                listOf(
+                    AppUrl.Url.HOST,
+                )
+
+            override val featureName: String = SettingsConstants.FEATURE_SERP_SETTINGS
+            override val methods: List<String> =
+                listOf(
+                    SettingsConstants.METHOD_OPEN_NATIVE_SETTINGS,
+                )
         }
-
-        override val allowedDomains: List<String> = listOf(
-            AppUrl.Url.HOST,
-        )
-
-        override val featureName: String = SettingsConstants.FEATURE_SERP_SETTINGS
-        override val methods: List<String> = listOf(
-            SettingsConstants.METHOD_OPEN_NATIVE_SETTINGS,
-        )
-    }
 }

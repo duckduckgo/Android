@@ -31,14 +31,15 @@ import org.json.JSONObject
 import javax.inject.Inject
 
 @ContributesViewModel(ActivityScope::class)
-class WebViewViewModel @Inject constructor(
-) : ViewModel() {
-
+class WebViewViewModel @Inject constructor() : ViewModel() {
     private val commandChannel = Channel<Command>(capacity = 1, onBufferOverflow = DROP_OLDEST)
     val commands = commandChannel.receiveAsFlow()
 
     sealed class Command {
-        data class LoadUrl(val url: String) : Command()
+        data class LoadUrl(
+            val url: String,
+        ) : Command()
+
         data object Exit : Command()
     }
 
@@ -58,19 +59,21 @@ class WebViewViewModel @Inject constructor(
         data: JSONObject?,
     ) {
         when (featureName) {
-            SettingsConstants.FEATURE_SERP_SETTINGS -> when (method) {
-                SettingsConstants.METHOD_OPEN_NATIVE_SETTINGS -> {
-                    val returnParam = data?.optString(SettingsConstants.PARAM_RETURN)
-                    openNativeSettings(returnParam)
+            SettingsConstants.FEATURE_SERP_SETTINGS ->
+                when (method) {
+                    SettingsConstants.METHOD_OPEN_NATIVE_SETTINGS -> {
+                        val returnParam = data?.optString(SettingsConstants.PARAM_RETURN)
+                        openNativeSettings(returnParam)
+                    }
                 }
-            }
         }
     }
 
     private fun openNativeSettings(returnParam: String?) {
         when (returnParam) {
             SettingsConstants.ID_AI_FEATURES,
-            SettingsConstants.ID_PRIVATE_SEARCH -> {
+            SettingsConstants.ID_PRIVATE_SEARCH,
+            -> {
                 sendCommand(Command.Exit)
             }
             else -> {
