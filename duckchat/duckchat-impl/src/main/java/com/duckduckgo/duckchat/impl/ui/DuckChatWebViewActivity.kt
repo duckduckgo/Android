@@ -84,7 +84,6 @@ import kotlinx.coroutines.flow.cancellable
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import org.json.JSONObject
 
 internal data class DuckChatWebViewActivityWithParams(
@@ -172,7 +171,8 @@ open class DuckChatWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationD
         }
 
         val params = intent.getActivityParams(DuckChatWebViewActivityWithParams::class.java)
-        val url = params?.url
+        // val url = params?.url
+        val url = "https://mtsoy.duck.co/?q=DuckDuckGo+AI+Chat&ia=chat&duckai=5"
 
         simpleWebview.let {
             it.webViewClient = webViewClient
@@ -243,9 +243,7 @@ open class DuckChatWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationD
                             DUCK_CHAT_FEATURE_NAME -> {
                                 appCoroutineScope.launch(dispatcherProvider.io()) {
                                     duckChatJSHelper.processJsCallbackMessage(featureName, method, id, data)?.let { response ->
-                                        withContext(dispatcherProvider.main()) {
-                                            contentScopeScripts.onResponse(response)
-                                        }
+                                        contentScopeScripts.onResponse(response)
                                     }
                                 }
                             }
