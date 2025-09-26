@@ -75,8 +75,15 @@ class DuckChatSettingsViewModel @Inject constructor(
         }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), ViewState())
 
     sealed class Command {
-        data class OpenLink(val link: String, @StringRes val titleRes: Int) : Command()
-        data class OpenLinkInNewTab(val link: String) : Command()
+        data class OpenLink(
+            val link: String,
+            @StringRes val titleRes: Int,
+        ) : Command()
+
+        data class OpenLinkInNewTab(
+            val link: String,
+        ) : Command()
+
         data object OpenShortcutSettings : Command()
 
         data object LaunchFeedback : Command()
@@ -123,11 +130,12 @@ class DuckChatSettingsViewModel @Inject constructor(
 
     fun duckChatSearchAISettingsClicked() {
         viewModelScope.launch {
-            val settingsLink = if (settingsPageFeature.saveAndExitSerpSettings().isEnabled()) {
-                DUCK_CHAT_SEARCH_AI_SETTINGS_LINK_WITH_RETURN_PARAM
-            } else {
-                DUCK_CHAT_SEARCH_AI_SETTINGS_LINK
-            }
+            val settingsLink =
+                if (settingsPageFeature.saveAndExitSerpSettings().isEnabled()) {
+                    DUCK_CHAT_SEARCH_AI_SETTINGS_LINK_WITH_RETURN_PARAM
+                } else {
+                    DUCK_CHAT_SEARCH_AI_SETTINGS_LINK
+                }
             commandChannel.send(OpenLink(settingsLink, R.string.duck_chat_search_assist_settings_title))
             pixel.fire(DuckChatPixelName.DUCK_CHAT_SEARCH_ASSIST_SETTINGS_BUTTON_CLICKED)
         }
@@ -164,6 +172,8 @@ class DuckChatSettingsViewModel @Inject constructor(
     companion object {
         const val DUCK_CHAT_LEARN_MORE_LINK = "https://duckduckgo.com/duckduckgo-help-pages/aichat/"
         const val DUCK_CHAT_SEARCH_AI_SETTINGS_LINK = "https://duckduckgo.com/settings?ko=-1#aifeatures"
-        const val DUCK_CHAT_SEARCH_AI_SETTINGS_LINK_WITH_RETURN_PARAM = "https://duckduckgo.com/settings?ko=-1&return=${SettingsConstants.ID_AI_FEATURES}#aifeatures"
+        const val DUCK_CHAT_SEARCH_AI_SETTINGS_LINK_WITH_RETURN_PARAM =
+            "https://duckduckgo.com/settings?ko=-1&return=" +
+                "${SettingsConstants.ID_AI_FEATURES}#aifeatures"
     }
 }
