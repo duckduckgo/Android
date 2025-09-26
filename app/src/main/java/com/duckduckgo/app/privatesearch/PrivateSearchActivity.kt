@@ -41,7 +41,6 @@ import javax.inject.Inject
 @InjectWith(ActivityScope::class)
 @ContributeToActivityStarter(PrivateSearchScreenNoParams::class)
 class PrivateSearchActivity : DuckDuckGoActivity() {
-
     @Inject
     lateinit var globalActivityStarter: GlobalActivityStarter
 
@@ -51,13 +50,15 @@ class PrivateSearchActivity : DuckDuckGoActivity() {
     private val viewModel: PrivateSearchViewModel by bindViewModel()
     private val binding: ActivityPrivateSearchBinding by viewBinding()
 
-    private val autocompleteToggleListener = CompoundButton.OnCheckedChangeListener { _, isChecked ->
-        viewModel.onAutocompleteSettingChanged(isChecked)
-    }
+    private val autocompleteToggleListener =
+        CompoundButton.OnCheckedChangeListener { _, isChecked ->
+            viewModel.onAutocompleteSettingChanged(isChecked)
+        }
 
-    private val autocompleteRecentlyVisitedSitesToggleListener = CompoundButton.OnCheckedChangeListener { _, isChecked ->
-        viewModel.onAutocompleteRecentlyVisitedSitesSettingChanged(isChecked)
-    }
+    private val autocompleteRecentlyVisitedSitesToggleListener =
+        CompoundButton.OnCheckedChangeListener { _, isChecked ->
+            viewModel.onAutocompleteRecentlyVisitedSitesSettingChanged(isChecked)
+        }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -97,7 +98,8 @@ class PrivateSearchActivity : DuckDuckGoActivity() {
                 }
             }.launchIn(lifecycleScope)
 
-        viewModel.commands()
+        viewModel
+            .commands()
             .flowWithLifecycle(lifecycle, Lifecycle.State.CREATED)
             .onEach { processCommand(it) }
             .launchIn(lifecycleScope)
@@ -110,11 +112,12 @@ class PrivateSearchActivity : DuckDuckGoActivity() {
     }
 
     private fun launchCustomizeSearchWebPage() {
-        val settingsUrl = if (settingsPageFeature.saveAndExitSerpSettings().isEnabled()) {
-            DUCKDUCKGO_SETTINGS_WEB_LINK_WITH_RETURN_PARAM
-        } else {
-            DUCKDUCKGO_SETTINGS_WEB_LINK
-        }
+        val settingsUrl =
+            if (settingsPageFeature.saveAndExitSerpSettings().isEnabled()) {
+                DUCKDUCKGO_SETTINGS_WEB_LINK_WITH_RETURN_PARAM
+            } else {
+                DUCKDUCKGO_SETTINGS_WEB_LINK
+            }
         globalActivityStarter.start(
             this,
             WebViewActivityWithParams(

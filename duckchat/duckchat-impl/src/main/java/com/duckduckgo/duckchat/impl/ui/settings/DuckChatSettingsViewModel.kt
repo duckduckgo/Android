@@ -46,7 +46,6 @@ class DuckChatSettingsViewModel @Inject constructor(
     private val inputScreenDiscoveryFunnel: InputScreenDiscoveryFunnel,
     private val settingsPageFeature: SettingsPageFeature,
 ) : ViewModel() {
-
     private val commandChannel = Channel<Command>(capacity = 1, onBufferOverflow = DROP_OLDEST)
     val commands = commandChannel.receiveAsFlow()
 
@@ -58,23 +57,31 @@ class DuckChatSettingsViewModel @Inject constructor(
         val isRebrandingAiFeaturesEnabled: Boolean = false,
     )
 
-    val viewState = combine(
-        duckChat.observeEnableDuckChatUserSetting(),
-        duckChat.observeInputScreenUserSettingEnabled(),
-    ) { isDuckChatUserEnabled, isInputScreenEnabled ->
-        ViewState(
-            isDuckChatUserEnabled = isDuckChatUserEnabled,
-            isInputScreenEnabled = isInputScreenEnabled,
-            shouldShowShortcuts = isDuckChatUserEnabled,
-            shouldShowInputScreenToggle = isDuckChatUserEnabled && duckChat.isInputScreenFeatureAvailable(),
-            isRebrandingAiFeaturesEnabled = rebrandingAiFeaturesEnabled.isAIFeaturesRebrandingEnabled(),
-        )
-    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), ViewState())
+    val viewState =
+        combine(
+            duckChat.observeEnableDuckChatUserSetting(),
+            duckChat.observeInputScreenUserSettingEnabled(),
+        ) { isDuckChatUserEnabled, isInputScreenEnabled ->
+            ViewState(
+                isDuckChatUserEnabled = isDuckChatUserEnabled,
+                isInputScreenEnabled = isInputScreenEnabled,
+                shouldShowShortcuts = isDuckChatUserEnabled,
+                shouldShowInputScreenToggle = isDuckChatUserEnabled && duckChat.isInputScreenFeatureAvailable(),
+                isRebrandingAiFeaturesEnabled = rebrandingAiFeaturesEnabled.isAIFeaturesRebrandingEnabled(),
+            )
+        }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), ViewState())
 
     sealed class Command {
-        data class OpenLink(val link: String) : Command()
-        data class OpenLinkInNewTab(val link: String) : Command()
+        data class OpenLink(
+            val link: String,
+        ) : Command()
+
+        data class OpenLinkInNewTab(
+            val link: String,
+        ) : Command()
+
         data object OpenShortcutSettings : Command()
+
         data object LaunchFeedback : Command()
     }
 
@@ -119,11 +126,12 @@ class DuckChatSettingsViewModel @Inject constructor(
 
     fun duckChatSearchAISettingsClicked() {
         viewModelScope.launch {
-            val settingsLink = if (settingsPageFeature.saveAndExitSerpSettings().isEnabled()) {
-                DUCK_CHAT_SEARCH_AI_SETTINGS_LINK_WITH_RETURN_PARAM
-            } else {
-                DUCK_CHAT_SEARCH_AI_SETTINGS_LINK
-            }
+            val settingsLink =
+                if (settingsPageFeature.saveAndExitSerpSettings().isEnabled()) {
+                    DUCK_CHAT_SEARCH_AI_SETTINGS_LINK_WITH_RETURN_PARAM
+                } else {
+                    DUCK_CHAT_SEARCH_AI_SETTINGS_LINK
+                }
             commandChannel.send(OpenLinkInNewTab(settingsLink))
             pixel.fire(DuckChatPixelName.DUCK_CHAT_SEARCH_ASSIST_SETTINGS_BUTTON_CLICKED)
         }
