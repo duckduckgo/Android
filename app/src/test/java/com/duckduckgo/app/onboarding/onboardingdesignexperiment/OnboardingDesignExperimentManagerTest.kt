@@ -51,7 +51,6 @@ import org.mockito.kotlin.whenever
 
 @RunWith(AndroidJUnit4::class)
 class OnboardingDesignExperimentManagerTest {
-
     @get:Rule
     val coroutineRule = CoroutineTestRule()
 
@@ -70,401 +69,440 @@ class OnboardingDesignExperimentManagerTest {
 
     @Before
     fun before() {
-        testee = RealOnboardingDesignExperimentManager(
-            coroutineScope = coroutineRule.testScope,
-            dispatcherProvider = coroutineRule.testDispatcherProvider,
-            onboardingDesignExperimentToggles = onboardingDesignExperimentToggles,
-            onboardingExperimentMetricsPixelPlugin = onboardingExperimentMetricsPixelPlugin,
-            onboardingDesignExperimentCountDataStore = onboardingDesignExperimentCountDataStore,
-            pixel = pixel,
-            appBuildConfig = appBuildConfig,
-            deviceInfo = deviceInfo,
-            duckDuckGoUrlDetector = duckDuckGoUrlDetector,
-        )
+        testee =
+            RealOnboardingDesignExperimentManager(
+                coroutineScope = coroutineRule.testScope,
+                dispatcherProvider = coroutineRule.testDispatcherProvider,
+                onboardingDesignExperimentToggles = onboardingDesignExperimentToggles,
+                onboardingExperimentMetricsPixelPlugin = onboardingExperimentMetricsPixelPlugin,
+                onboardingDesignExperimentCountDataStore = onboardingDesignExperimentCountDataStore,
+                pixel = pixel,
+                appBuildConfig = appBuildConfig,
+                deviceInfo = deviceInfo,
+                duckDuckGoUrlDetector = duckDuckGoUrlDetector,
+            )
     }
 
     @Test
-    fun whenPrivacyConfigPersistedCreatedThenCachedPropertiesAreSet() = runTest {
-        val mockToggle = mock<Toggle>()
-        val mockCohort = mock<Toggle.State.Cohort>()
+    fun whenPrivacyConfigPersistedCreatedThenCachedPropertiesAreSet() =
+        runTest {
+            val mockToggle = mock<Toggle>()
+            val mockCohort = mock<Toggle.State.Cohort>()
 
-        whenever(onboardingDesignExperimentToggles.onboardingDesignExperimentOct25()).thenReturn(mockToggle)
-        whenever(mockToggle.isEnabled()).thenReturn(true)
-        whenever(mockToggle.getCohort()).thenReturn(mockCohort)
-        whenever(mockToggle.getCohort()!!.name).thenReturn(OnboardingDesignExperimentToggles.OnboardingDesignExperimentCohort.BUCK.cohortName)
+            whenever(onboardingDesignExperimentToggles.onboardingDesignExperimentOct25()).thenReturn(mockToggle)
+            whenever(mockToggle.isEnabled()).thenReturn(true)
+            whenever(mockToggle.getCohort()).thenReturn(mockCohort)
+            whenever(mockToggle.getCohort()!!.name).thenReturn(OnboardingDesignExperimentToggles.OnboardingDesignExperimentCohort.BUCK.cohortName)
 
-        val lifecycleObserver = testee as PrivacyConfigCallbackPlugin
-        lifecycleObserver.onPrivacyConfigPersisted()
+            val lifecycleObserver = testee as PrivacyConfigCallbackPlugin
+            lifecycleObserver.onPrivacyConfigPersisted()
 
-        coroutineRule.testScope.testScheduler.advanceUntilIdle()
+            coroutineRule.testScope.testScheduler.advanceUntilIdle()
 
-        assertTrue(testee.isAnyExperimentEnrolledAndEnabled())
-        assertTrue(testee.isBuckEnrolledAndEnabled())
-    }
-
-    @Test
-    fun whenPrivacyConfigPersistedWithDisabledExperimentThenCachedPropertiesReflectDisabledState() = runTest {
-        val mockToggle = mock<Toggle>()
-
-        whenever(onboardingDesignExperimentToggles.onboardingDesignExperimentOct25()).thenReturn(mockToggle)
-        whenever(mockToggle.isEnabled()).thenReturn(false)
-
-        val lifecycleObserver = testee as PrivacyConfigCallbackPlugin
-        lifecycleObserver.onPrivacyConfigPersisted()
-
-        coroutineRule.testScope.testScheduler.advanceUntilIdle()
-
-        assertFalse(testee.isAnyExperimentEnrolledAndEnabled())
-        assertFalse(testee.isBuckEnrolledAndEnabled())
-        assertFalse(testee.isBbEnrolledAndEnabled())
-        assertFalse(testee.isModifiedControlEnrolledAndEnabled())
-    }
+            assertTrue(testee.isAnyExperimentEnrolledAndEnabled())
+            assertTrue(testee.isBuckEnrolledAndEnabled())
+        }
 
     @Test
-    fun whenOnPrivacyConfigDownloadedThenCachedPropertiesAreSet() = runTest {
-        val mockToggle = mock<Toggle>()
-        val mockCohort = mock<Toggle.State.Cohort>()
+    fun whenPrivacyConfigPersistedWithDisabledExperimentThenCachedPropertiesReflectDisabledState() =
+        runTest {
+            val mockToggle = mock<Toggle>()
 
-        whenever(onboardingDesignExperimentToggles.onboardingDesignExperimentOct25()).thenReturn(mockToggle)
-        whenever(mockToggle.isEnabled()).thenReturn(true)
-        whenever(mockToggle.getCohort()).thenReturn(mockCohort)
-        whenever(mockToggle.getCohort()!!.name).thenReturn(OnboardingDesignExperimentToggles.OnboardingDesignExperimentCohort.BB.cohortName)
+            whenever(onboardingDesignExperimentToggles.onboardingDesignExperimentOct25()).thenReturn(mockToggle)
+            whenever(mockToggle.isEnabled()).thenReturn(false)
 
-        val privacyConfigCallback = testee as PrivacyConfigCallbackPlugin
-        privacyConfigCallback.onPrivacyConfigDownloaded()
+            val lifecycleObserver = testee as PrivacyConfigCallbackPlugin
+            lifecycleObserver.onPrivacyConfigPersisted()
 
-        coroutineRule.testScope.testScheduler.advanceUntilIdle()
+            coroutineRule.testScope.testScheduler.advanceUntilIdle()
 
-        assertTrue(testee.isAnyExperimentEnrolledAndEnabled())
-        assertTrue(testee.isBbEnrolledAndEnabled())
-    }
-
-    @Test
-    fun whenOnPrivacyConfigDownloadedWithDisabledExperimentThenCachedPropertiesReflectDisabledState() = runTest {
-        val mockToggle = mock<Toggle>()
-
-        whenever(onboardingDesignExperimentToggles.onboardingDesignExperimentOct25()).thenReturn(mockToggle)
-        whenever(mockToggle.isEnabled()).thenReturn(false)
-
-        val privacyConfigCallback = testee as PrivacyConfigCallbackPlugin
-        privacyConfigCallback.onPrivacyConfigDownloaded()
-
-        coroutineRule.testScope.testScheduler.advanceUntilIdle()
-
-        assertFalse(testee.isAnyExperimentEnrolledAndEnabled())
-        assertFalse(testee.isBuckEnrolledAndEnabled())
-        assertFalse(testee.isBbEnrolledAndEnabled())
-        assertFalse(testee.isModifiedControlEnrolledAndEnabled())
-    }
+            assertFalse(testee.isAnyExperimentEnrolledAndEnabled())
+            assertFalse(testee.isBuckEnrolledAndEnabled())
+            assertFalse(testee.isBbEnrolledAndEnabled())
+            assertFalse(testee.isModifiedControlEnrolledAndEnabled())
+        }
 
     @Test
-    fun whenModifiedControlEnabledThenAnyExperimentEnrolledAndEnabledReturnsTrue() = runTest {
-        val mockToggle = mock<Toggle>()
-        val mockCohort = mock<Toggle.State.Cohort>()
+    fun whenOnPrivacyConfigDownloadedThenCachedPropertiesAreSet() =
+        runTest {
+            val mockToggle = mock<Toggle>()
+            val mockCohort = mock<Toggle.State.Cohort>()
 
-        whenever(onboardingDesignExperimentToggles.onboardingDesignExperimentOct25()).thenReturn(mockToggle)
-        whenever(mockToggle.isEnabled()).thenReturn(true)
-        whenever(mockToggle.getCohort()).thenReturn(mockCohort)
-        whenever(mockToggle.getCohort()!!.name).thenReturn(
-            OnboardingDesignExperimentToggles.OnboardingDesignExperimentCohort.MODIFIED_CONTROL.cohortName,
-        )
+            whenever(onboardingDesignExperimentToggles.onboardingDesignExperimentOct25()).thenReturn(mockToggle)
+            whenever(mockToggle.isEnabled()).thenReturn(true)
+            whenever(mockToggle.getCohort()).thenReturn(mockCohort)
+            whenever(mockToggle.getCohort()!!.name).thenReturn(OnboardingDesignExperimentToggles.OnboardingDesignExperimentCohort.BB.cohortName)
 
-        whenever(appBuildConfig.sdkInt).thenReturn(33)
-        whenever(appBuildConfig.isAppReinstall()).thenReturn(false)
-        whenever(deviceInfo.formFactor()).thenReturn(PHONE)
+            val privacyConfigCallback = testee as PrivacyConfigCallbackPlugin
+            privacyConfigCallback.onPrivacyConfigDownloaded()
 
-        testee.enroll()
+            coroutineRule.testScope.testScheduler.advanceUntilIdle()
 
-        assertTrue(testee.isAnyExperimentEnrolledAndEnabled())
-    }
-
-    @Test
-    fun whenBuckEnabledThenAnyExperimentEnrolledAndEnabledReturnsTrue() = runTest {
-        val mockToggle = mock<Toggle>()
-        val mockCohort = mock<Toggle.State.Cohort>()
-
-        whenever(onboardingDesignExperimentToggles.onboardingDesignExperimentOct25()).thenReturn(mockToggle)
-        whenever(mockToggle.isEnabled()).thenReturn(true)
-        whenever(mockToggle.getCohort()).thenReturn(mockCohort)
-        whenever(mockToggle.getCohort()!!.name).thenReturn(OnboardingDesignExperimentToggles.OnboardingDesignExperimentCohort.BUCK.cohortName)
-
-        whenever(appBuildConfig.sdkInt).thenReturn(33)
-        whenever(appBuildConfig.isAppReinstall()).thenReturn(false)
-        whenever(deviceInfo.formFactor()).thenReturn(PHONE)
-
-        testee.enroll()
-
-        assertTrue(testee.isAnyExperimentEnrolledAndEnabled())
-    }
+            assertTrue(testee.isAnyExperimentEnrolledAndEnabled())
+            assertTrue(testee.isBbEnrolledAndEnabled())
+        }
 
     @Test
-    fun whenBBEnabledThenAnyExperimentEnrolledAndEnabledReturnsTrue() = runTest {
-        val mockToggle = mock<Toggle>()
-        val mockCohort = mock<Toggle.State.Cohort>()
+    fun whenOnPrivacyConfigDownloadedWithDisabledExperimentThenCachedPropertiesReflectDisabledState() =
+        runTest {
+            val mockToggle = mock<Toggle>()
 
-        whenever(onboardingDesignExperimentToggles.onboardingDesignExperimentOct25()).thenReturn(mockToggle)
-        whenever(mockToggle.isEnabled()).thenReturn(true)
-        whenever(mockToggle.getCohort()).thenReturn(mockCohort)
-        whenever(mockToggle.getCohort()!!.name).thenReturn(OnboardingDesignExperimentToggles.OnboardingDesignExperimentCohort.BB.cohortName)
+            whenever(onboardingDesignExperimentToggles.onboardingDesignExperimentOct25()).thenReturn(mockToggle)
+            whenever(mockToggle.isEnabled()).thenReturn(false)
 
-        whenever(appBuildConfig.sdkInt).thenReturn(33)
-        whenever(appBuildConfig.isAppReinstall()).thenReturn(false)
-        whenever(deviceInfo.formFactor()).thenReturn(PHONE)
+            val privacyConfigCallback = testee as PrivacyConfigCallbackPlugin
+            privacyConfigCallback.onPrivacyConfigDownloaded()
 
-        testee.enroll()
+            coroutineRule.testScope.testScheduler.advanceUntilIdle()
 
-        assertTrue(testee.isAnyExperimentEnrolledAndEnabled())
-    }
-
-    @Test
-    fun whenDeviceIsEligibleThenUserIsAttemptedToBeEnrolled() = runTest {
-        val mockToggle = mock<Toggle>()
-        whenever(onboardingDesignExperimentToggles.onboardingDesignExperimentOct25()).thenReturn(mockToggle)
-        whenever(appBuildConfig.sdkInt).thenReturn(35)
-        whenever(appBuildConfig.isAppReinstall()).thenReturn(false)
-        whenever(deviceInfo.formFactor()).thenReturn(PHONE)
-
-        testee.enroll()
-
-        verify(mockToggle).enroll()
-    }
+            assertFalse(testee.isAnyExperimentEnrolledAndEnabled())
+            assertFalse(testee.isBuckEnrolledAndEnabled())
+            assertFalse(testee.isBbEnrolledAndEnabled())
+            assertFalse(testee.isModifiedControlEnrolledAndEnabled())
+        }
 
     @Test
-    fun whenDeviceIsTabletThenUserIsNotEnrolled() = runTest {
-        val mockToggle = mock<Toggle>()
-        whenever(onboardingDesignExperimentToggles.onboardingDesignExperimentOct25()).thenReturn(mockToggle)
-        whenever(appBuildConfig.sdkInt).thenReturn(35)
-        whenever(appBuildConfig.isAppReinstall()).thenReturn(false)
-        whenever(deviceInfo.formFactor()).thenReturn(TABLET)
+    fun whenModifiedControlEnabledThenAnyExperimentEnrolledAndEnabledReturnsTrue() =
+        runTest {
+            val mockToggle = mock<Toggle>()
+            val mockCohort = mock<Toggle.State.Cohort>()
 
-        testee.enroll()
+            whenever(onboardingDesignExperimentToggles.onboardingDesignExperimentOct25()).thenReturn(mockToggle)
+            whenever(mockToggle.isEnabled()).thenReturn(true)
+            whenever(mockToggle.getCohort()).thenReturn(mockCohort)
+            whenever(mockToggle.getCohort()!!.name).thenReturn(
+                OnboardingDesignExperimentToggles.OnboardingDesignExperimentCohort.MODIFIED_CONTROL.cohortName,
+            )
 
-        verify(mockToggle, never()).enroll()
-    }
+            whenever(appBuildConfig.sdkInt).thenReturn(33)
+            whenever(appBuildConfig.isAppReinstall()).thenReturn(false)
+            whenever(deviceInfo.formFactor()).thenReturn(PHONE)
 
-    @Test
-    fun whenDeviceIsOlderThanAndroid11ThenUserIsNotEnrolled() = runTest {
-        val mockToggle = mock<Toggle>()
-        whenever(onboardingDesignExperimentToggles.onboardingDesignExperimentOct25()).thenReturn(mockToggle)
-        whenever(appBuildConfig.sdkInt).thenReturn(29)
-        whenever(appBuildConfig.isAppReinstall()).thenReturn(false)
-        whenever(deviceInfo.formFactor()).thenReturn(PHONE)
+            testee.enroll()
 
-        testee.enroll()
-
-        verify(mockToggle, never()).enroll()
-    }
+            assertTrue(testee.isAnyExperimentEnrolledAndEnabled())
+        }
 
     @Test
-    fun whenInstallIsReinstallThenUserIsNotEnrolled() = runTest {
-        val mockToggle = mock<Toggle>()
-        whenever(onboardingDesignExperimentToggles.onboardingDesignExperimentOct25()).thenReturn(mockToggle)
-        whenever(appBuildConfig.sdkInt).thenReturn(29)
-        whenever(appBuildConfig.isAppReinstall()).thenReturn(true)
-        whenever(deviceInfo.formFactor()).thenReturn(PHONE)
+    fun whenBuckEnabledThenAnyExperimentEnrolledAndEnabledReturnsTrue() =
+        runTest {
+            val mockToggle = mock<Toggle>()
+            val mockCohort = mock<Toggle.State.Cohort>()
 
-        testee.enroll()
+            whenever(onboardingDesignExperimentToggles.onboardingDesignExperimentOct25()).thenReturn(mockToggle)
+            whenever(mockToggle.isEnabled()).thenReturn(true)
+            whenever(mockToggle.getCohort()).thenReturn(mockCohort)
+            whenever(mockToggle.getCohort()!!.name).thenReturn(OnboardingDesignExperimentToggles.OnboardingDesignExperimentCohort.BUCK.cohortName)
 
-        verify(mockToggle, never()).enroll()
-    }
+            whenever(appBuildConfig.sdkInt).thenReturn(33)
+            whenever(appBuildConfig.isAppReinstall()).thenReturn(false)
+            whenever(deviceInfo.formFactor()).thenReturn(PHONE)
 
-    @Test
-    fun whenWebPageFinishedLoadingWithDDGUrlThenSecondSerpVisitPixelFired() = runTest {
-        whenever(duckDuckGoUrlDetector.isDuckDuckGoUrl(any())).thenReturn(true)
-        whenever(onboardingDesignExperimentCountDataStore.getSerpVisitCount()).thenReturn(1)
-        whenever(onboardingDesignExperimentCountDataStore.increaseSerpVisitCount()).thenReturn(2)
+            testee.enroll()
 
-        testee.onWebPageFinishedLoading("https://duckduckgo.com")
-
-        verify(onboardingExperimentMetricsPixelPlugin).getSecondSerpVisitMetric()
-    }
+            assertTrue(testee.isAnyExperimentEnrolledAndEnabled())
+        }
 
     @Test
-    fun whenWebPageFinishedLoadingWithNonDDGUrlThenSecondSiteVisitPixelFired() = runTest {
-        whenever(duckDuckGoUrlDetector.isDuckDuckGoUrl(any())).thenReturn(false)
-        whenever(onboardingDesignExperimentCountDataStore.getSiteVisitCount()).thenReturn(1)
-        whenever(onboardingDesignExperimentCountDataStore.increaseSiteVisitCount()).thenReturn(2)
+    fun whenBBEnabledThenAnyExperimentEnrolledAndEnabledReturnsTrue() =
+        runTest {
+            val mockToggle = mock<Toggle>()
+            val mockCohort = mock<Toggle.State.Cohort>()
 
-        testee.onWebPageFinishedLoading("https://example.com")
+            whenever(onboardingDesignExperimentToggles.onboardingDesignExperimentOct25()).thenReturn(mockToggle)
+            whenever(mockToggle.isEnabled()).thenReturn(true)
+            whenever(mockToggle.getCohort()).thenReturn(mockCohort)
+            whenever(mockToggle.getCohort()!!.name).thenReturn(OnboardingDesignExperimentToggles.OnboardingDesignExperimentCohort.BB.cohortName)
 
-        verify(onboardingExperimentMetricsPixelPlugin).getSecondSiteVisitMetric()
-    }
+            whenever(appBuildConfig.sdkInt).thenReturn(33)
+            whenever(appBuildConfig.isAppReinstall()).thenReturn(false)
+            whenever(deviceInfo.formFactor()).thenReturn(PHONE)
 
-    @Test
-    fun whenWebPageFinishedLoadingWithNullUrlThenNoPixelFired() = runTest {
-        testee.onWebPageFinishedLoading(null)
+            testee.enroll()
 
-        verify(onboardingExperimentMetricsPixelPlugin, never()).getSecondSerpVisitMetric()
-        verify(onboardingExperimentMetricsPixelPlugin, never()).getSecondSiteVisitMetric()
-    }
-
-    @Test
-    fun whenWebPageFinishedLoadingWithDDGUrlAndSerpVisitCountIsTwoThenNoPixelFired() = runTest {
-        whenever(duckDuckGoUrlDetector.isDuckDuckGoUrl(any())).thenReturn(true)
-        whenever(onboardingDesignExperimentCountDataStore.getSerpVisitCount()).thenReturn(2)
-
-        testee.onWebPageFinishedLoading("https://duckduckgo.com")
-
-        verify(onboardingExperimentMetricsPixelPlugin, never()).getSecondSerpVisitMetric()
-    }
+            assertTrue(testee.isAnyExperimentEnrolledAndEnabled())
+        }
 
     @Test
-    fun whenWebPageFinishedLoadingWithNonDDGUrlAndSiteVisitCountIsTwoThenNoPixelFired() = runTest {
-        whenever(duckDuckGoUrlDetector.isDuckDuckGoUrl(any())).thenReturn(false)
-        whenever(onboardingDesignExperimentCountDataStore.getSiteVisitCount()).thenReturn(2)
+    fun whenDeviceIsEligibleThenUserIsAttemptedToBeEnrolled() =
+        runTest {
+            val mockToggle = mock<Toggle>()
+            whenever(onboardingDesignExperimentToggles.onboardingDesignExperimentOct25()).thenReturn(mockToggle)
+            whenever(appBuildConfig.sdkInt).thenReturn(35)
+            whenever(appBuildConfig.isAppReinstall()).thenReturn(false)
+            whenever(deviceInfo.formFactor()).thenReturn(PHONE)
 
-        testee.onWebPageFinishedLoading("https://example.com")
+            testee.enroll()
 
-        verify(onboardingExperimentMetricsPixelPlugin, never()).getSecondSiteVisitMetric()
-    }
-
-    @Test
-    fun whenFireSiteSuggestionOptionSelectedPixelForFirstOptionThenCorrectPixelFired() = runTest {
-        testee.fireSiteSuggestionOptionSelectedPixel(0)
-        verify(onboardingExperimentMetricsPixelPlugin).getFirstSiteSuggestionMetric()
-    }
+            verify(mockToggle).enroll()
+        }
 
     @Test
-    fun whenFireSiteSuggestionOptionSelectedPixelForSecondOptionThenCorrectPixelFired() = runTest {
-        testee.fireSiteSuggestionOptionSelectedPixel(1)
-        verify(onboardingExperimentMetricsPixelPlugin).getSecondSiteSuggestionMetric()
-    }
+    fun whenDeviceIsTabletThenUserIsNotEnrolled() =
+        runTest {
+            val mockToggle = mock<Toggle>()
+            whenever(onboardingDesignExperimentToggles.onboardingDesignExperimentOct25()).thenReturn(mockToggle)
+            whenever(appBuildConfig.sdkInt).thenReturn(35)
+            whenever(appBuildConfig.isAppReinstall()).thenReturn(false)
+            whenever(deviceInfo.formFactor()).thenReturn(TABLET)
+
+            testee.enroll()
+
+            verify(mockToggle, never()).enroll()
+        }
 
     @Test
-    fun whenFireSiteSuggestionOptionSelectedPixelForThirdOptionThenCorrectPixelFired() = runTest {
-        testee.fireSiteSuggestionOptionSelectedPixel(2)
-        verify(onboardingExperimentMetricsPixelPlugin).getThirdSiteSuggestionMetric()
-    }
+    fun whenDeviceIsOlderThanAndroid11ThenUserIsNotEnrolled() =
+        runTest {
+            val mockToggle = mock<Toggle>()
+            whenever(onboardingDesignExperimentToggles.onboardingDesignExperimentOct25()).thenReturn(mockToggle)
+            whenever(appBuildConfig.sdkInt).thenReturn(29)
+            whenever(appBuildConfig.isAppReinstall()).thenReturn(false)
+            whenever(deviceInfo.formFactor()).thenReturn(PHONE)
+
+            testee.enroll()
+
+            verify(mockToggle, never()).enroll()
+        }
 
     @Test
-    fun whenFireSiteSuggestionOptionSelectedPixelForInvalidOptionThenNoPixelFired() = runTest {
-        testee.fireSiteSuggestionOptionSelectedPixel(3)
-        verify(onboardingExperimentMetricsPixelPlugin, never()).getFirstSiteSuggestionMetric()
-        verify(onboardingExperimentMetricsPixelPlugin, never()).getSecondSiteSuggestionMetric()
-        verify(onboardingExperimentMetricsPixelPlugin, never()).getThirdSiteSuggestionMetric()
-    }
+    fun whenInstallIsReinstallThenUserIsNotEnrolled() =
+        runTest {
+            val mockToggle = mock<Toggle>()
+            whenever(onboardingDesignExperimentToggles.onboardingDesignExperimentOct25()).thenReturn(mockToggle)
+            whenever(appBuildConfig.sdkInt).thenReturn(29)
+            whenever(appBuildConfig.isAppReinstall()).thenReturn(true)
+            whenever(deviceInfo.formFactor()).thenReturn(PHONE)
+
+            testee.enroll()
+
+            verify(mockToggle, never()).enroll()
+        }
 
     @Test
-    fun whenFireInContextDialogShownPixelWithDaxIntroSearchOptionsCtaThenCorrectPixelFired() = runTest {
-        testee.fireInContextDialogShownPixel(DaxBubbleCta.DaxIntroSearchOptionsCta(onboardingStore, appInstallStore))
-        verify(onboardingExperimentMetricsPixelPlugin).getTryASearchDisplayedMetric()
-    }
+    fun whenWebPageFinishedLoadingWithDDGUrlThenSecondSerpVisitPixelFired() =
+        runTest {
+            whenever(duckDuckGoUrlDetector.isDuckDuckGoUrl(any())).thenReturn(true)
+            whenever(onboardingDesignExperimentCountDataStore.getSerpVisitCount()).thenReturn(1)
+            whenever(onboardingDesignExperimentCountDataStore.increaseSerpVisitCount()).thenReturn(2)
+
+            testee.onWebPageFinishedLoading("https://duckduckgo.com")
+
+            verify(onboardingExperimentMetricsPixelPlugin).getSecondSerpVisitMetric()
+        }
 
     @Test
-    fun whenFireInContextDialogShownPixelWithDaxIntroVisitSiteOptionsCtaThenCorrectPixelFired() = runTest {
-        testee.fireInContextDialogShownPixel(DaxBubbleCta.DaxIntroVisitSiteOptionsCta(onboardingStore, appInstallStore))
-        verify(onboardingExperimentMetricsPixelPlugin).getVisitSitePromptDisplayedNewTabMetric()
-    }
+    fun whenWebPageFinishedLoadingWithNonDDGUrlThenSecondSiteVisitPixelFired() =
+        runTest {
+            whenever(duckDuckGoUrlDetector.isDuckDuckGoUrl(any())).thenReturn(false)
+            whenever(onboardingDesignExperimentCountDataStore.getSiteVisitCount()).thenReturn(1)
+            whenever(onboardingDesignExperimentCountDataStore.increaseSiteVisitCount()).thenReturn(2)
+
+            testee.onWebPageFinishedLoading("https://example.com")
+
+            verify(onboardingExperimentMetricsPixelPlugin).getSecondSiteVisitMetric()
+        }
 
     @Test
-    fun whenFireInContextDialogShownPixelWithDaxBubbleDaxEndCtaThenCorrectPixelFired() = runTest {
-        testee.fireInContextDialogShownPixel(DaxBubbleCta.DaxEndCta(onboardingStore, appInstallStore))
-        verify(onboardingExperimentMetricsPixelPlugin).getFinalOnboardingScreenDisplayedMetric()
-    }
+    fun whenWebPageFinishedLoadingWithNullUrlThenNoPixelFired() =
+        runTest {
+            testee.onWebPageFinishedLoading(null)
+
+            verify(onboardingExperimentMetricsPixelPlugin, never()).getSecondSerpVisitMetric()
+            verify(onboardingExperimentMetricsPixelPlugin, never()).getSecondSiteVisitMetric()
+        }
 
     @Test
-    fun whenFireInContextDialogShownPixelWithDaxPrivacyProCtaThenNoPixelFired() = runTest {
-        testee.fireInContextDialogShownPixel(DaxBubbleCta.DaxPrivacyProCta(onboardingStore, appInstallStore, 0, 0, 0))
-        verify(onboardingExperimentMetricsPixelPlugin, never()).getTryASearchDisplayedMetric()
-        verify(onboardingExperimentMetricsPixelPlugin, never()).getVisitSitePromptDisplayedNewTabMetric()
-        verify(onboardingExperimentMetricsPixelPlugin, never()).getFinalOnboardingScreenDisplayedMetric()
-    }
+    fun whenWebPageFinishedLoadingWithDDGUrlAndSerpVisitCountIsTwoThenNoPixelFired() =
+        runTest {
+            whenever(duckDuckGoUrlDetector.isDuckDuckGoUrl(any())).thenReturn(true)
+            whenever(onboardingDesignExperimentCountDataStore.getSerpVisitCount()).thenReturn(2)
+
+            testee.onWebPageFinishedLoading("https://duckduckgo.com")
+
+            verify(onboardingExperimentMetricsPixelPlugin, never()).getSecondSerpVisitMetric()
+        }
 
     @Test
-    fun whenFireInContextDialogShownPixelWithDaxSerpCtaThenCorrectPixelFired() = runTest {
-        testee.fireInContextDialogShownPixel(OnboardingDaxDialogCta.DaxSerpCta(onboardingStore, appInstallStore, testee))
-        verify(onboardingExperimentMetricsPixelPlugin).getMessageOnSerpDisplayedMetric()
-    }
+    fun whenWebPageFinishedLoadingWithNonDDGUrlAndSiteVisitCountIsTwoThenNoPixelFired() =
+        runTest {
+            whenever(duckDuckGoUrlDetector.isDuckDuckGoUrl(any())).thenReturn(false)
+            whenever(onboardingDesignExperimentCountDataStore.getSiteVisitCount()).thenReturn(2)
+
+            testee.onWebPageFinishedLoading("https://example.com")
+
+            verify(onboardingExperimentMetricsPixelPlugin, never()).getSecondSiteVisitMetric()
+        }
 
     @Test
-    fun whenFireInContextDialogShownPixelWithDaxSiteSuggestionsCtaThenCorrectPixelFired() = runTest {
-        testee.fireInContextDialogShownPixel(OnboardingDaxDialogCta.DaxSiteSuggestionsCta(onboardingStore, appInstallStore, testee) {})
-        verify(onboardingExperimentMetricsPixelPlugin).getVisitSitePromptDisplayedAdjacentMetric()
-    }
+    fun whenFireSiteSuggestionOptionSelectedPixelForFirstOptionThenCorrectPixelFired() =
+        runTest {
+            testee.fireSiteSuggestionOptionSelectedPixel(0)
+            verify(onboardingExperimentMetricsPixelPlugin).getFirstSiteSuggestionMetric()
+        }
 
     @Test
-    fun whenFireInContextDialogShownPixelWithDaxTrackersBlockedCtaThenCorrectPixelFired() = runTest {
-        testee.fireInContextDialogShownPixel(
-            OnboardingDaxDialogCta.DaxTrackersBlockedCta(onboardingStore, appInstallStore, emptyList(), settingsDataStore, testee),
-        )
-        verify(onboardingExperimentMetricsPixelPlugin).getTrackersBlockedMessageDisplayedMetric()
-    }
+    fun whenFireSiteSuggestionOptionSelectedPixelForSecondOptionThenCorrectPixelFired() =
+        runTest {
+            testee.fireSiteSuggestionOptionSelectedPixel(1)
+            verify(onboardingExperimentMetricsPixelPlugin).getSecondSiteSuggestionMetric()
+        }
 
     @Test
-    fun whenFireInContextDialogShownPixelWithDaxNoTrackersCtaThenCorrectPixelFired() = runTest {
-        testee.fireInContextDialogShownPixel(OnboardingDaxDialogCta.DaxNoTrackersCta(onboardingStore, appInstallStore, testee))
-        verify(onboardingExperimentMetricsPixelPlugin).getNoTrackersMessageDisplayedMetric()
-    }
+    fun whenFireSiteSuggestionOptionSelectedPixelForThirdOptionThenCorrectPixelFired() =
+        runTest {
+            testee.fireSiteSuggestionOptionSelectedPixel(2)
+            verify(onboardingExperimentMetricsPixelPlugin).getThirdSiteSuggestionMetric()
+        }
 
     @Test
-    fun whenFireInContextDialogShownPixelWithDaxMainNetworkCtaThenCorrectPixelFired() = runTest {
-        testee.fireInContextDialogShownPixel(
-            OnboardingDaxDialogCta.DaxMainNetworkCta(onboardingStore, appInstallStore, "Facebook", "facebook.com", testee),
-        )
-        verify(onboardingExperimentMetricsPixelPlugin).getTrackerNetworkMessageDisplayedMetric()
-    }
+    fun whenFireSiteSuggestionOptionSelectedPixelForInvalidOptionThenNoPixelFired() =
+        runTest {
+            testee.fireSiteSuggestionOptionSelectedPixel(3)
+            verify(onboardingExperimentMetricsPixelPlugin, never()).getFirstSiteSuggestionMetric()
+            verify(onboardingExperimentMetricsPixelPlugin, never()).getSecondSiteSuggestionMetric()
+            verify(onboardingExperimentMetricsPixelPlugin, never()).getThirdSiteSuggestionMetric()
+        }
 
     @Test
-    fun whenFireInContextDialogShownPixelWithDaxFireButtonCtaThenCorrectPixelFired() = runTest {
-        testee.fireInContextDialogShownPixel(OnboardingDaxDialogCta.DaxFireButtonCta(onboardingStore, appInstallStore, testee))
-        verify(onboardingExperimentMetricsPixelPlugin).getFireButtonPromptDisplayedMetric()
-    }
+    fun whenFireInContextDialogShownPixelWithDaxIntroSearchOptionsCtaThenCorrectPixelFired() =
+        runTest {
+            testee.fireInContextDialogShownPixel(DaxBubbleCta.DaxIntroSearchOptionsCta(onboardingStore, appInstallStore))
+            verify(onboardingExperimentMetricsPixelPlugin).getTryASearchDisplayedMetric()
+        }
 
     @Test
-    fun whenFireInContextDialogShownPixelWithOnboardingDaxEndCtaThenCorrectPixelFired() = runTest {
-        testee.fireInContextDialogShownPixel(OnboardingDaxDialogCta.DaxEndCta(onboardingStore, appInstallStore, testee))
-        verify(onboardingExperimentMetricsPixelPlugin).getFinalOnboardingScreenDisplayedMetric()
-    }
+    fun whenFireInContextDialogShownPixelWithDaxIntroVisitSiteOptionsCtaThenCorrectPixelFired() =
+        runTest {
+            testee.fireInContextDialogShownPixel(DaxBubbleCta.DaxIntroVisitSiteOptionsCta(onboardingStore, appInstallStore))
+            verify(onboardingExperimentMetricsPixelPlugin).getVisitSitePromptDisplayedNewTabMetric()
+        }
 
     @Test
-    fun whenFireInContextDialogShownPixelWithNullCtaThenNoPixelFired() = runTest {
-        testee.fireInContextDialogShownPixel(null)
-        verify(onboardingExperimentMetricsPixelPlugin, never()).getTryASearchDisplayedMetric()
-        verify(onboardingExperimentMetricsPixelPlugin, never()).getVisitSitePromptDisplayedNewTabMetric()
-        verify(onboardingExperimentMetricsPixelPlugin, never()).getFinalOnboardingScreenDisplayedMetric()
-        verify(onboardingExperimentMetricsPixelPlugin, never()).getMessageOnSerpDisplayedMetric()
-        verify(onboardingExperimentMetricsPixelPlugin, never()).getVisitSitePromptDisplayedAdjacentMetric()
-        verify(onboardingExperimentMetricsPixelPlugin, never()).getTrackersBlockedMessageDisplayedMetric()
-        verify(onboardingExperimentMetricsPixelPlugin, never()).getNoTrackersMessageDisplayedMetric()
-        verify(onboardingExperimentMetricsPixelPlugin, never()).getTrackerNetworkMessageDisplayedMetric()
-        verify(onboardingExperimentMetricsPixelPlugin, never()).getFireButtonPromptDisplayedMetric()
-    }
+    fun whenFireInContextDialogShownPixelWithDaxBubbleDaxEndCtaThenCorrectPixelFired() =
+        runTest {
+            testee.fireInContextDialogShownPixel(DaxBubbleCta.DaxEndCta(onboardingStore, appInstallStore))
+            verify(onboardingExperimentMetricsPixelPlugin).getFinalOnboardingScreenDisplayedMetric()
+        }
 
     @Test
-    fun whenFireOptionSelectedPixelWithDaxIntroSearchOptionsCtaAndFirstOptionThenCorrectPixelFired() = runTest {
-        testee.fireOptionSelectedPixel(DaxBubbleCta.DaxIntroSearchOptionsCta(onboardingStore, appInstallStore), 0)
-        verify(onboardingExperimentMetricsPixelPlugin).getFirstSearchSuggestionMetric()
-    }
+    fun whenFireInContextDialogShownPixelWithDaxPrivacyProCtaThenNoPixelFired() =
+        runTest {
+            testee.fireInContextDialogShownPixel(DaxBubbleCta.DaxPrivacyProCta(onboardingStore, appInstallStore, 0, 0, 0))
+            verify(onboardingExperimentMetricsPixelPlugin, never()).getTryASearchDisplayedMetric()
+            verify(onboardingExperimentMetricsPixelPlugin, never()).getVisitSitePromptDisplayedNewTabMetric()
+            verify(onboardingExperimentMetricsPixelPlugin, never()).getFinalOnboardingScreenDisplayedMetric()
+        }
 
     @Test
-    fun whenFireOptionSelectedPixelWithDaxIntroSearchOptionsCtaAndSecondOptionThenCorrectPixelFired() = runTest {
-        testee.fireOptionSelectedPixel(DaxBubbleCta.DaxIntroSearchOptionsCta(onboardingStore, appInstallStore), 1)
-        verify(onboardingExperimentMetricsPixelPlugin).getSecondSearchSuggestionMetric()
-    }
+    fun whenFireInContextDialogShownPixelWithDaxSerpCtaThenCorrectPixelFired() =
+        runTest {
+            testee.fireInContextDialogShownPixel(OnboardingDaxDialogCta.DaxSerpCta(onboardingStore, appInstallStore, testee))
+            verify(onboardingExperimentMetricsPixelPlugin).getMessageOnSerpDisplayedMetric()
+        }
 
     @Test
-    fun whenFireOptionSelectedPixelWithDaxIntroSearchOptionsCtaAndThirdOptionThenCorrectPixelFired() = runTest {
-        testee.fireOptionSelectedPixel(DaxBubbleCta.DaxIntroSearchOptionsCta(onboardingStore, appInstallStore), 2)
-        verify(onboardingExperimentMetricsPixelPlugin).getThirdSearchSuggestionMetric()
-    }
+    fun whenFireInContextDialogShownPixelWithDaxSiteSuggestionsCtaThenCorrectPixelFired() =
+        runTest {
+            testee.fireInContextDialogShownPixel(OnboardingDaxDialogCta.DaxSiteSuggestionsCta(onboardingStore, appInstallStore, testee) {})
+            verify(onboardingExperimentMetricsPixelPlugin).getVisitSitePromptDisplayedAdjacentMetric()
+        }
 
     @Test
-    fun whenFireOptionSelectedPixelWithDaxIntroSearchOptionsCtaAndInvalidOptionThenNoPixelFired() = runTest {
-        testee.fireOptionSelectedPixel(DaxBubbleCta.DaxIntroSearchOptionsCta(onboardingStore, appInstallStore), 3)
-        verify(onboardingExperimentMetricsPixelPlugin, never()).getFirstSearchSuggestionMetric()
-        verify(onboardingExperimentMetricsPixelPlugin, never()).getSecondSearchSuggestionMetric()
-        verify(onboardingExperimentMetricsPixelPlugin, never()).getThirdSearchSuggestionMetric()
-    }
+    fun whenFireInContextDialogShownPixelWithDaxTrackersBlockedCtaThenCorrectPixelFired() =
+        runTest {
+            testee.fireInContextDialogShownPixel(
+                OnboardingDaxDialogCta.DaxTrackersBlockedCta(onboardingStore, appInstallStore, emptyList(), settingsDataStore, testee),
+            )
+            verify(onboardingExperimentMetricsPixelPlugin).getTrackersBlockedMessageDisplayedMetric()
+        }
 
     @Test
-    fun whenFireOptionSelectedPixelWithDaxIntroVisitSiteOptionsCtaThenCorrectPixelFired() = runTest {
-        testee.fireOptionSelectedPixel(DaxBubbleCta.DaxIntroVisitSiteOptionsCta(onboardingStore, appInstallStore), 0)
-        verify(onboardingExperimentMetricsPixelPlugin).getFirstSiteSuggestionMetric()
-    }
+    fun whenFireInContextDialogShownPixelWithDaxNoTrackersCtaThenCorrectPixelFired() =
+        runTest {
+            testee.fireInContextDialogShownPixel(OnboardingDaxDialogCta.DaxNoTrackersCta(onboardingStore, appInstallStore, testee))
+            verify(onboardingExperimentMetricsPixelPlugin).getNoTrackersMessageDisplayedMetric()
+        }
 
     @Test
-    fun whenFireOptionSelectedPixelWithDaxSiteSuggestionsCtaThenCorrectPixelFired() = runTest {
-        testee.fireOptionSelectedPixel(OnboardingDaxDialogCta.DaxSiteSuggestionsCta(onboardingStore, appInstallStore, testee) {}, 1)
-        verify(onboardingExperimentMetricsPixelPlugin).getSecondSiteSuggestionMetric()
-    }
+    fun whenFireInContextDialogShownPixelWithDaxMainNetworkCtaThenCorrectPixelFired() =
+        runTest {
+            testee.fireInContextDialogShownPixel(
+                OnboardingDaxDialogCta.DaxMainNetworkCta(onboardingStore, appInstallStore, "Facebook", "facebook.com", testee),
+            )
+            verify(onboardingExperimentMetricsPixelPlugin).getTrackerNetworkMessageDisplayedMetric()
+        }
+
+    @Test
+    fun whenFireInContextDialogShownPixelWithDaxFireButtonCtaThenCorrectPixelFired() =
+        runTest {
+            testee.fireInContextDialogShownPixel(OnboardingDaxDialogCta.DaxFireButtonCta(onboardingStore, appInstallStore, testee))
+            verify(onboardingExperimentMetricsPixelPlugin).getFireButtonPromptDisplayedMetric()
+        }
+
+    @Test
+    fun whenFireInContextDialogShownPixelWithOnboardingDaxEndCtaThenCorrectPixelFired() =
+        runTest {
+            testee.fireInContextDialogShownPixel(OnboardingDaxDialogCta.DaxEndCta(onboardingStore, appInstallStore, testee))
+            verify(onboardingExperimentMetricsPixelPlugin).getFinalOnboardingScreenDisplayedMetric()
+        }
+
+    @Test
+    fun whenFireInContextDialogShownPixelWithNullCtaThenNoPixelFired() =
+        runTest {
+            testee.fireInContextDialogShownPixel(null)
+            verify(onboardingExperimentMetricsPixelPlugin, never()).getTryASearchDisplayedMetric()
+            verify(onboardingExperimentMetricsPixelPlugin, never()).getVisitSitePromptDisplayedNewTabMetric()
+            verify(onboardingExperimentMetricsPixelPlugin, never()).getFinalOnboardingScreenDisplayedMetric()
+            verify(onboardingExperimentMetricsPixelPlugin, never()).getMessageOnSerpDisplayedMetric()
+            verify(onboardingExperimentMetricsPixelPlugin, never()).getVisitSitePromptDisplayedAdjacentMetric()
+            verify(onboardingExperimentMetricsPixelPlugin, never()).getTrackersBlockedMessageDisplayedMetric()
+            verify(onboardingExperimentMetricsPixelPlugin, never()).getNoTrackersMessageDisplayedMetric()
+            verify(onboardingExperimentMetricsPixelPlugin, never()).getTrackerNetworkMessageDisplayedMetric()
+            verify(onboardingExperimentMetricsPixelPlugin, never()).getFireButtonPromptDisplayedMetric()
+        }
+
+    @Test
+    fun whenFireOptionSelectedPixelWithDaxIntroSearchOptionsCtaAndFirstOptionThenCorrectPixelFired() =
+        runTest {
+            testee.fireOptionSelectedPixel(DaxBubbleCta.DaxIntroSearchOptionsCta(onboardingStore, appInstallStore), 0)
+            verify(onboardingExperimentMetricsPixelPlugin).getFirstSearchSuggestionMetric()
+        }
+
+    @Test
+    fun whenFireOptionSelectedPixelWithDaxIntroSearchOptionsCtaAndSecondOptionThenCorrectPixelFired() =
+        runTest {
+            testee.fireOptionSelectedPixel(DaxBubbleCta.DaxIntroSearchOptionsCta(onboardingStore, appInstallStore), 1)
+            verify(onboardingExperimentMetricsPixelPlugin).getSecondSearchSuggestionMetric()
+        }
+
+    @Test
+    fun whenFireOptionSelectedPixelWithDaxIntroSearchOptionsCtaAndThirdOptionThenCorrectPixelFired() =
+        runTest {
+            testee.fireOptionSelectedPixel(DaxBubbleCta.DaxIntroSearchOptionsCta(onboardingStore, appInstallStore), 2)
+            verify(onboardingExperimentMetricsPixelPlugin).getThirdSearchSuggestionMetric()
+        }
+
+    @Test
+    fun whenFireOptionSelectedPixelWithDaxIntroSearchOptionsCtaAndInvalidOptionThenNoPixelFired() =
+        runTest {
+            testee.fireOptionSelectedPixel(DaxBubbleCta.DaxIntroSearchOptionsCta(onboardingStore, appInstallStore), 3)
+            verify(onboardingExperimentMetricsPixelPlugin, never()).getFirstSearchSuggestionMetric()
+            verify(onboardingExperimentMetricsPixelPlugin, never()).getSecondSearchSuggestionMetric()
+            verify(onboardingExperimentMetricsPixelPlugin, never()).getThirdSearchSuggestionMetric()
+        }
+
+    @Test
+    fun whenFireOptionSelectedPixelWithDaxIntroVisitSiteOptionsCtaThenCorrectPixelFired() =
+        runTest {
+            testee.fireOptionSelectedPixel(DaxBubbleCta.DaxIntroVisitSiteOptionsCta(onboardingStore, appInstallStore), 0)
+            verify(onboardingExperimentMetricsPixelPlugin).getFirstSiteSuggestionMetric()
+        }
+
+    @Test
+    fun whenFireOptionSelectedPixelWithDaxSiteSuggestionsCtaThenCorrectPixelFired() =
+        runTest {
+            testee.fireOptionSelectedPixel(OnboardingDaxDialogCta.DaxSiteSuggestionsCta(onboardingStore, appInstallStore, testee) {}, 1)
+            verify(onboardingExperimentMetricsPixelPlugin).getSecondSiteSuggestionMetric()
+        }
 }

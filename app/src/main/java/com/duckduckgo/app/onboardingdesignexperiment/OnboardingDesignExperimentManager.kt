@@ -36,34 +36,58 @@ import com.duckduckgo.privacy.config.api.PrivacyConfigCallbackPlugin
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.SingleInstanceIn
-import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import javax.inject.Inject
 
 interface OnboardingDesignExperimentManager {
     suspend fun enroll()
+
     fun isAnyExperimentEnrolledAndEnabled(): Boolean
+
     fun isModifiedControlEnrolledAndEnabled(): Boolean
+
     fun isBuckEnrolledAndEnabled(): Boolean
+
     fun isBbEnrolledAndEnabled(): Boolean
+
     suspend fun fireIntroScreenDisplayedPixel()
+
     suspend fun fireComparisonScreenDisplayedPixel()
+
     suspend fun fireChooseBrowserPixel()
+
     suspend fun fireSetDefaultRatePixel()
+
     suspend fun fireSetAddressBarDisplayedPixel()
+
     suspend fun fireAddressBarSetTopPixel()
+
     suspend fun fireAddressBarSetBottomPixel()
+
     suspend fun fireSearchOrNavCustomPixel()
+
     suspend fun firePrivacyDashClickedFromOnboardingPixel()
+
     suspend fun fireFireButtonClickedFromOnboardingPixel()
+
     suspend fun fireInContextDialogShownPixel(cta: Cta?)
-    suspend fun fireOptionSelectedPixel(cta: Cta, index: Int)
+
+    suspend fun fireOptionSelectedPixel(
+        cta: Cta,
+        index: Int,
+    )
+
     suspend fun fireSiteSuggestionOptionSelectedPixel(index: Int)
+
     suspend fun onWebPageFinishedLoading(url: String?)
+
     fun getCohort(): String?
+
     suspend fun waitForPrivacyConfig(): Boolean
+
     suspend fun isWaitForLocalPrivacyConfigEnabled(): Boolean
 }
 
@@ -86,8 +110,8 @@ class RealOnboardingDesignExperimentManager @Inject constructor(
     private val appBuildConfig: AppBuildConfig,
     private val deviceInfo: DeviceInfo,
     private val duckDuckGoUrlDetector: DuckDuckGoUrlDetector,
-) : OnboardingDesignExperimentManager, PrivacyConfigCallbackPlugin {
-
+) : OnboardingDesignExperimentManager,
+    PrivacyConfigCallbackPlugin {
     private var isExperimentEnabled: Boolean? = null
     private var onboardingDesignExperimentCohort: OnboardingDesignExperimentCohort? = null
 
@@ -100,9 +124,7 @@ class RealOnboardingDesignExperimentManager @Inject constructor(
         return true
     }
 
-    override suspend fun isWaitForLocalPrivacyConfigEnabled(): Boolean {
-        return onboardingDesignExperimentToggles.waitForLocalPrivacyConfig().isEnabled()
-    }
+    override suspend fun isWaitForLocalPrivacyConfigEnabled(): Boolean = onboardingDesignExperimentToggles.waitForLocalPrivacyConfig().isEnabled()
 
     override fun onPrivacyConfigPersisted() {
         privacyPersisted = true
@@ -117,9 +139,7 @@ class RealOnboardingDesignExperimentManager @Inject constructor(
         }
     }
 
-    override fun getCohort(): String? {
-        return onboardingDesignExperimentCohort?.cohortName
-    }
+    override fun getCohort(): String? = onboardingDesignExperimentCohort?.cohortName
 
     /**
      * Enrolls the user in the onboarding design experiment if they are eligible.
@@ -134,18 +154,22 @@ class RealOnboardingDesignExperimentManager @Inject constructor(
         }
     }
 
-    override fun isAnyExperimentEnrolledAndEnabled() = isModifiedControlEnrolledAndEnabled() ||
-        isBuckEnrolledAndEnabled() ||
-        isBbEnrolledAndEnabled()
+    override fun isAnyExperimentEnrolledAndEnabled() =
+        isModifiedControlEnrolledAndEnabled() ||
+            isBuckEnrolledAndEnabled() ||
+            isBbEnrolledAndEnabled()
 
-    override fun isModifiedControlEnrolledAndEnabled(): Boolean = isExperimentEnabled == true &&
-        onboardingDesignExperimentCohort == MODIFIED_CONTROL
+    override fun isModifiedControlEnrolledAndEnabled(): Boolean =
+        isExperimentEnabled == true &&
+            onboardingDesignExperimentCohort == MODIFIED_CONTROL
 
-    override fun isBuckEnrolledAndEnabled(): Boolean = isExperimentEnabled == true &&
-        onboardingDesignExperimentCohort == BUCK
+    override fun isBuckEnrolledAndEnabled(): Boolean =
+        isExperimentEnabled == true &&
+            onboardingDesignExperimentCohort == BUCK
 
-    override fun isBbEnrolledAndEnabled(): Boolean = isExperimentEnabled == true &&
-        onboardingDesignExperimentCohort == BB
+    override fun isBbEnrolledAndEnabled(): Boolean =
+        isExperimentEnabled == true &&
+            onboardingDesignExperimentCohort == BB
 
     override suspend fun fireIntroScreenDisplayedPixel() {
         onboardingExperimentMetricsPixelPlugin.getIntroScreenDisplayedMetric()?.fire()
@@ -326,14 +350,11 @@ class RealOnboardingDesignExperimentManager @Inject constructor(
 
     private suspend fun isEligibleForEnrolment(): Boolean = isAtLeastAndroid11() && !isTablet() && !isReturningUser()
 
-    private fun isTablet(): Boolean =
-        deviceInfo.formFactor() == TABLET
+    private fun isTablet(): Boolean = deviceInfo.formFactor() == TABLET
 
-    private suspend fun isReturningUser(): Boolean =
-        appBuildConfig.isAppReinstall()
+    private suspend fun isReturningUser(): Boolean = appBuildConfig.isAppReinstall()
 
-    private fun isAtLeastAndroid11(): Boolean =
-        appBuildConfig.sdkInt >= 30
+    private fun isAtLeastAndroid11(): Boolean = appBuildConfig.sdkInt >= 30
 
     private suspend fun setCachedProperties() {
         withContext(dispatcherProvider.io()) {
@@ -353,7 +374,8 @@ class RealOnboardingDesignExperimentManager @Inject constructor(
         }
     }
 
-    private fun MetricsPixel.fire() = getPixelDefinitions().forEach {
-        pixel.fire(it.pixelName, it.params)
-    }
+    private fun MetricsPixel.fire() =
+        getPixelDefinitions().forEach {
+            pixel.fire(it.pixelName, it.params)
+        }
 }
