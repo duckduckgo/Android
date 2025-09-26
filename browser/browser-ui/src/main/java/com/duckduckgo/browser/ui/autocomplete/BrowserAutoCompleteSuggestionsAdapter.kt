@@ -132,6 +132,7 @@ class BrowserAutoCompleteSuggestionsAdapter(
                     else -> Type.SUGGESTION_TYPE
                 }
         }
+    }
 
     override fun onBindViewHolder(
         holder: AutoCompleteViewHolder,
