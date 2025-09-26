@@ -57,6 +57,7 @@ class DuckChatSettingsViewModelTest {
 
     @Before
     fun setUp() = runTest {
+        @Suppress("DenyListedApi")
         settingsPageFeature.saveAndExitSerpSettings().setRawStoredState(State(enable = false))
         whenever(duckChat.observeEnableDuckChatUserSetting()).thenReturn(flowOf(true))
         whenever(duckChat.observeShowInBrowserMenuUserSetting()).thenReturn(flowOf(false))
