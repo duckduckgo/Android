@@ -69,13 +69,13 @@ import com.duckduckgo.common.utils.FragmentViewModelFactory
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.user.agent.api.UserAgentProvider
-import javax.inject.Inject
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import logcat.LogPriority.WARN
 import logcat.logcat
+import javax.inject.Inject
 
 @InjectWith(FragmentScope::class)
 class ImportGoogleBookmarksWebFlowFragment :
@@ -85,7 +85,6 @@ class ImportGoogleBookmarksWebFlowFragment :
     NoOpEmailProtectionUserPromptListener,
     NoOpAutofillEventListener,
     ImportGoogleBookmarksWebFlowWebViewClient.NewPageCallback {
-
     @Inject
     lateinit var userAgentProvider: UserAgentProvider
 
@@ -192,16 +191,16 @@ class ImportGoogleBookmarksWebFlowFragment :
                         // Inject null to indicate no credentials available
                         browserAutofill.injectCredentials(null)
                     }
-                    is PromptUserToSelectFromStoredCredentials -> showCredentialChooserDialog(
-                        command.originalUrl,
-                        command.credentials,
-                        command.triggerType,
-                    )
+                    is PromptUserToSelectFromStoredCredentials ->
+                        showCredentialChooserDialog(
+                            command.originalUrl,
+                            command.credentials,
+                            command.triggerType,
+                        )
                     is ExitFlowWithSuccess -> exitFlowAsSuccess(command.importedCount)
                     is ExitFlowAsFailure -> exitFlowAsError(command.reason)
                 }
-            }
-            .launchIn(lifecycleScope)
+            }.launchIn(lifecycleScope)
     }
 
     private suspend fun injectReauthenticationCredentials(
@@ -216,11 +215,12 @@ class ImportGoogleBookmarksWebFlowFragment :
                     return@withContext
                 }
 
-                val credentials = LoginCredentials(
-                    domain = url,
-                    username = username,
-                    password = password,
-                )
+                val credentials =
+                    LoginCredentials(
+                        domain = url,
+                        username = username,
+                        password = password,
+                    )
 
                 logcat { "Injecting re-authentication credentials" }
                 browserAutofill.injectCredentials(credentials)
@@ -302,7 +302,7 @@ class ImportGoogleBookmarksWebFlowFragment :
         }
     }
 
-    @SuppressLint("RequiresFeature")
+    @SuppressLint("RequiresFeature", "AddDocumentStartJavaScriptUsage")
     private suspend fun configureBookmarkImportJavascript(webView: WebView) {
         if (importBookmarkConfig.getConfig().canInjectJavascript) {
             val script = googleImporterScriptLoader.getScriptForBookmarkImport()
@@ -336,33 +336,37 @@ class ImportGoogleBookmarksWebFlowFragment :
     }
 
     private fun configureBackButtonHandler() {
-        val onBackPressedCallback = object : OnBackPressedCallback(true) {
-            override fun handleOnBackPressed() {
-                val canGoBack = binding?.webView?.canGoBack() ?: false
-                viewModel.onBackButtonPressed(canGoBack)
+        val onBackPressedCallback =
+            object : OnBackPressedCallback(true) {
+                override fun handleOnBackPressed() {
+                    val canGoBack = binding?.webView?.canGoBack() ?: false
+                    viewModel.onBackButtonPressed(canGoBack)
+                }
             }
-        }
         requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner, onBackPressedCallback)
     }
 
     private fun exitFlowAsSuccess(importedCount: Int = 0) {
-        val result = Bundle().apply {
-            putParcelable(ImportGoogleBookmarkResult.Companion.RESULT_KEY_DETAILS, ImportGoogleBookmarkResult.Success(importedCount))
-        }
+        val result =
+            Bundle().apply {
+                putParcelable(ImportGoogleBookmarkResult.Companion.RESULT_KEY_DETAILS, ImportGoogleBookmarkResult.Success(importedCount))
+            }
         setFragmentResult(ImportGoogleBookmarkResult.Companion.RESULT_KEY, result)
     }
 
     private fun exitFlowAsCancellation(stage: String) {
-        val result = Bundle().apply {
-            putParcelable(ImportGoogleBookmarkResult.Companion.RESULT_KEY_DETAILS, ImportGoogleBookmarkResult.UserCancelled(stage))
-        }
+        val result =
+            Bundle().apply {
+                putParcelable(ImportGoogleBookmarkResult.Companion.RESULT_KEY_DETAILS, ImportGoogleBookmarkResult.UserCancelled(stage))
+            }
         setFragmentResult(ImportGoogleBookmarkResult.Companion.RESULT_KEY, result)
     }
 
     private fun exitFlowAsError(reason: UserCannotImportReason) {
-        val result = Bundle().apply {
-            putParcelable(ImportGoogleBookmarkResult.Companion.RESULT_KEY_DETAILS, ImportGoogleBookmarkResult.Error(reason))
-        }
+        val result =
+            Bundle().apply {
+                putParcelable(ImportGoogleBookmarkResult.Companion.RESULT_KEY_DETAILS, ImportGoogleBookmarkResult.Error(reason))
+            }
         setFragmentResult(ImportGoogleBookmarkResult.Companion.RESULT_KEY, result)
     }
 
@@ -378,12 +382,13 @@ class ImportGoogleBookmarksWebFlowFragment :
                 return@withContext
             }
 
-            val dialog = credentialAutofillDialogFactory.autofillSelectCredentialsDialog(
-                url,
-                credentials,
-                triggerType,
-                CUSTOM_FLOW_TAB_ID,
-            )
+            val dialog =
+                credentialAutofillDialogFactory.autofillSelectCredentialsDialog(
+                    url,
+                    credentials,
+                    triggerType,
+                    CUSTOM_FLOW_TAB_ID,
+                )
             dialog.show(childFragmentManager, SELECT_CREDENTIALS_FRAGMENT_TAG)
         }
     }

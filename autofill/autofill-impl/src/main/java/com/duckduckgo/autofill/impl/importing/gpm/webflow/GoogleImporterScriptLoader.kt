@@ -21,12 +21,13 @@ import com.duckduckgo.autofill.impl.importing.takeout.store.BookmarkImportConfig
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.FragmentScope
 import com.squareup.anvil.annotations.ContributesBinding
+import kotlinx.coroutines.withContext
 import java.io.BufferedReader
 import javax.inject.Inject
-import kotlinx.coroutines.withContext
 
 interface GoogleImporterScriptLoader {
     suspend fun getScriptForPasswordImport(): String
+
     suspend fun getScriptForBookmarkImport(): String
 }
 
@@ -36,33 +37,30 @@ class GoogleImporterScriptLoaderImpl @Inject constructor(
     private val passwordConfigStore: AutofillImportPasswordConfigStore,
     private val bookmarkConfigStore: BookmarkImportConfigStore,
 ) : GoogleImporterScriptLoader {
-
     private lateinit var contentScopeJS: String
 
-    override suspend fun getScriptForPasswordImport(): String {
-        return withContext(dispatchers.io()) {
+    override suspend fun getScriptForPasswordImport(): String =
+        withContext(dispatchers.io()) {
             getContentScopeJS()
                 .replace(CONTENT_SCOPE_PLACEHOLDER, getContentScopeScriptJson(loadSettingsJsonPassword()))
                 .replace(USER_UNPROTECTED_DOMAINS_PLACEHOLDER, getUnprotectedDomainsJson())
                 .replace(USER_PREFERENCES_PLACEHOLDER, getUserPreferencesJson())
         }
-    }
 
-    override suspend fun getScriptForBookmarkImport(): String {
-        return withContext(dispatchers.io()) {
+    override suspend fun getScriptForBookmarkImport(): String =
+        withContext(dispatchers.io()) {
             getContentScopeJS()
                 .replace(CONTENT_SCOPE_PLACEHOLDER, getContentScopeScriptJson(loadSettingsJsonBookmark()))
                 .replace(USER_UNPROTECTED_DOMAINS_PLACEHOLDER, getUnprotectedDomainsJson())
                 .replace(USER_PREFERENCES_PLACEHOLDER, getUserPreferencesJson())
         }
-    }
 
     /**
      * This enables the password import hints feature in C-S-S.
      * These settings are for enabling it; the check for whether it should be enabled or not is done elsewhere.
      */
-    private fun getContentScopeScriptJson(settingsJson: String): String {
-        return """{
+    private fun getContentScopeScriptJson(settingsJson: String): String =
+        """{
             "features":{
                 "autofillImport" : {
                     "state": "enabled",
@@ -72,20 +70,15 @@ class GoogleImporterScriptLoaderImpl @Inject constructor(
             },
             "unprotectedTemporary":[]
         }
-            
+
         """.trimMargin()
-    }
 
-    private suspend fun loadSettingsJsonPassword(): String {
-        return passwordConfigStore.getConfig().javascriptConfigGooglePasswords
-    }
+    private suspend fun loadSettingsJsonPassword(): String = passwordConfigStore.getConfig().javascriptConfigGooglePasswords
 
-    private suspend fun loadSettingsJsonBookmark(): String {
-        return bookmarkConfigStore.getConfig().javascriptConfigGoogleTakeout
-    }
+    private suspend fun loadSettingsJsonBookmark(): String = bookmarkConfigStore.getConfig().javascriptConfigGoogleTakeout
 
-    private fun getUserPreferencesJson(): String {
-        return """
+    private fun getUserPreferencesJson(): String =
+        """
             {
                 "platform":{
                     "name":"android"
@@ -94,7 +87,6 @@ class GoogleImporterScriptLoaderImpl @Inject constructor(
                 "javascriptInterface": ''
              }
         """.trimMargin()
-    }
 
     private fun getUnprotectedDomainsJson(): String = "[]"
 
@@ -113,7 +105,9 @@ class GoogleImporterScriptLoaderImpl @Inject constructor(
 
     private fun loadJs(resourceName: String): String = readResource(resourceName).use { it?.readText() }.orEmpty()
 
-    private fun readResource(resourceName: String): BufferedReader? {
-        return javaClass.classLoader?.getResource(resourceName)?.openStream()?.bufferedReader()
-    }
+    private fun readResource(resourceName: String): BufferedReader? =
+        javaClass.classLoader
+            ?.getResource(resourceName)
+            ?.openStream()
+            ?.bufferedReader()
 }

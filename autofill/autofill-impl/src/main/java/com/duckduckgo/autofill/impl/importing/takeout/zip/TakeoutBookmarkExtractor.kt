@@ -22,23 +22,25 @@ import com.duckduckgo.autofill.impl.importing.takeout.zip.TakeoutBookmarkExtract
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
+import kotlinx.coroutines.withContext
+import logcat.LogPriority.WARN
+import logcat.logcat
 import java.io.File
 import java.util.zip.ZipEntry
 import java.util.zip.ZipInputStream
 import javax.inject.Inject
-import kotlinx.coroutines.withContext
-import logcat.LogPriority.WARN
-import logcat.logcat
 
 interface TakeoutBookmarkExtractor {
-
     sealed class ExtractionResult {
-        data class Success(val tempFileUri: Uri) : ExtractionResult() {
-            override fun toString(): String {
-                return "ExtractionResult=success"
-            }
+        data class Success(
+            val tempFileUri: Uri,
+        ) : ExtractionResult() {
+            override fun toString(): String = "ExtractionResult=success"
         }
-        data class Error(val exception: Exception) : ExtractionResult()
+
+        data class Error(
+            val exception: Exception,
+        ) : ExtractionResult()
     }
 
     /**
@@ -47,7 +49,6 @@ interface TakeoutBookmarkExtractor {
      * @return ExtractionResult containing either a temp file URI with bookmark HTML content or an error.
      */
     suspend fun extractBookmarksFromFile(takeoutZipUri: Uri): ExtractionResult
-
 }
 
 @ContributesBinding(AppScope::class)
@@ -55,9 +56,8 @@ class TakeoutZipBookmarkExtractor @Inject constructor(
     private val context: Context,
     private val dispatchers: DispatcherProvider,
 ) : TakeoutBookmarkExtractor {
-
-    override suspend fun extractBookmarksFromFile(takeoutZipUri: Uri): ExtractionResult {
-        return withContext(dispatchers.io()) {
+    override suspend fun extractBookmarksFromFile(takeoutZipUri: Uri): ExtractionResult =
+        withContext(dispatchers.io()) {
             runCatching {
                 context.contentResolver.openInputStream(takeoutZipUri)?.use { inputStream ->
                     ZipInputStream(inputStream).use { zipInputStream ->
@@ -66,7 +66,6 @@ class TakeoutZipBookmarkExtractor @Inject constructor(
                 } ?: ExtractionResult.Error(Exception("Unable to open file: $takeoutZipUri"))
             }.getOrElse { ExtractionResult.Error(Exception(it)) }
         }
-    }
 
     private fun extractFromZipStreamToTempFile(zipInputStream: ZipInputStream): ExtractionResult {
         var entry = zipInputStream.nextEntry
@@ -90,11 +89,12 @@ class TakeoutZipBookmarkExtractor @Inject constructor(
         return ExtractionResult.Error(Exception("Chrome/Bookmarks.html not found in file"))
     }
 
-    private fun isBookmarkEntry(entry: ZipEntry): Boolean {
-        return !entry.isDirectory && entry.name.endsWith(EXPECTED_BOOKMARKS_FILENAME, ignoreCase = true)
-    }
+    private fun isBookmarkEntry(entry: ZipEntry): Boolean = !entry.isDirectory && entry.name.endsWith(EXPECTED_BOOKMARKS_FILENAME, ignoreCase = true)
 
-    private fun streamEntryToTempFile(zipInputStream: ZipInputStream, entryName: String): ExtractionResult {
+    private fun streamEntryToTempFile(
+        zipInputStream: ZipInputStream,
+        entryName: String,
+    ): ExtractionResult {
         cleanupOldTempFiles()
         val tempFile = createTempFile()
 
@@ -109,11 +109,12 @@ class TakeoutZipBookmarkExtractor @Inject constructor(
         }
     }
 
-    private fun createTempFile(): File {
-        return File.createTempFile(TEMP_FILE_PREFIX, TEMP_FILE_SUFFIX, context.cacheDir)
-    }
+    private fun createTempFile(): File = File.createTempFile(TEMP_FILE_PREFIX, TEMP_FILE_SUFFIX, context.cacheDir)
 
-    private fun streamAndValidateContent(zipInputStream: ZipInputStream, tempFile: File): Long {
+    private fun streamAndValidateContent(
+        zipInputStream: ZipInputStream,
+        tempFile: File,
+    ): Long {
         var totalBytesRead = 0L
         val buffer = ByteArray(BUFFER_SIZE)
         val validator = ContentValidator()
@@ -141,7 +142,10 @@ class TakeoutZipBookmarkExtractor @Inject constructor(
         private val validationBuffer = StringBuilder()
         private var validationResult: Boolean? = null
 
-        fun processChunk(buffer: ByteArray, bytesRead: Int) {
+        fun processChunk(
+            buffer: ByteArray,
+            bytesRead: Int,
+        ) {
             if (validationResult == null && validationBuffer.length < VALIDATION_BUFFER_MAX_SIZE) {
                 val chunkText = String(buffer, 0, bytesRead, Charsets.UTF_8)
                 validationBuffer.append(chunkText)
@@ -154,12 +158,11 @@ class TakeoutZipBookmarkExtractor @Inject constructor(
             }
         }
 
-        fun isValid(): Boolean {
-            return validationResult ?: run {
+        fun isValid(): Boolean =
+            validationResult ?: run {
                 val content = validationBuffer.toString()
                 isValidBookmarkContent(content)
             }
-        }
     }
 
     private fun isValidBookmarkContent(content: String): Boolean {
@@ -173,13 +176,14 @@ class TakeoutZipBookmarkExtractor @Inject constructor(
 
     private fun cleanupOldTempFiles() {
         try {
-            context.cacheDir.listFiles { file ->
-                file.name.startsWith(TEMP_FILE_PREFIX) && file.name.endsWith(TEMP_FILE_SUFFIX)
-            }?.forEach { file ->
-                if (file.delete()) {
-                    logcat { "Cleaned up old temp file: ${file.name}" }
+            context.cacheDir
+                .listFiles { file ->
+                    file.name.startsWith(TEMP_FILE_PREFIX) && file.name.endsWith(TEMP_FILE_SUFFIX)
+                }?.forEach { file ->
+                    if (file.delete()) {
+                        logcat { "Cleaned up old temp file: ${file.name}" }
+                    }
                 }
-            }
         } catch (e: Exception) {
             logcat(WARN) { "Error cleaning up old temp files: ${e.message}" }
         }

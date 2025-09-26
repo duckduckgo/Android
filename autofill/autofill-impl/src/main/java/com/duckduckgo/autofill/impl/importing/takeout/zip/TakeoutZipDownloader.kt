@@ -72,7 +72,8 @@ class RealTakeoutZipDownloader @Inject constructor(
         url: String,
         userAgent: String,
     ): Request.Builder {
-        val requestBuilder = Request
+        val requestBuilder =
+            Request
                 .Builder()
                 .url(url)
                 .addHeader(HEADER_USER_AGENT, userAgent)

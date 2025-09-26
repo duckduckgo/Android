@@ -20,7 +20,6 @@ import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
 class BookmarkImportConfigStoreImplTest {
-
     @get:Rule
     val coroutineTestRule: CoroutineTestRule = CoroutineTestRule()
 
@@ -28,54 +27,65 @@ class BookmarkImportConfigStoreImplTest {
     private val adapter: JsonAdapter<Config> = moshi.adapter(Config::class.java)
 
     private val autofillFeature = FakeFeatureToggleFactory.create(AutofillFeature::class.java)
-    private val testee = BookmarkImportConfigStoreImpl(
-        autofillFeature = autofillFeature,
-        dispatchers = coroutineTestRule.testDispatcherProvider,
-        moshi = moshi,
-    )
-
-    @Test
-    fun whenFeatureFlagEnabledThenCanImportGoogleTakeoutConfigIsEnabled() = runTest {
-        configureFeature(true)
-        assertTrue(testee.getConfig().canImportFromGoogleTakeout)
-    }
-
-    @Test
-    fun whenFeatureFlagDisabledThenCanImportGoogleTakeoutConfigIsDisabled() = runTest {
-        configureFeature(false)
-        assertFalse(testee.getConfig().canImportFromGoogleTakeout)
-    }
-
-    @Test
-    fun whenLaunchUrlNotSpecifiedInConfigThenDefaultUsed() = runTest {
-        configureFeature(config = Config())
-        assertEquals(LAUNCH_URL_DEFAULT, testee.getConfig().launchUrlGoogleTakeout)
-    }
-
-    @Test
-    fun whenLaunchUrlSpecifiedInConfigThenOverridesDefault() = runTest {
-        configureFeature(config = Config(launchUrl = "https://example.com"))
-        assertEquals("https://example.com", testee.getConfig().launchUrlGoogleTakeout)
-    }
-
-    @Test
-    fun whenJavascriptConfigNotSpecifiedInConfigThenDefaultUsed() = runTest {
-        configureFeature(config = Config())
-        assertEquals(JAVASCRIPT_CONFIG_DEFAULT, testee.getConfig().javascriptConfigGoogleTakeout)
-    }
-
-    @Test
-    fun whenJavascriptConfigSpecifiedInConfigThenOverridesDefault() = runTest {
-        configureFeature(
-            config = Config(
-                javascriptConfig = JavaScriptConfig(key = "value", domains = listOf("foo, bar")),
-            ),
+    private val testee =
+        BookmarkImportConfigStoreImpl(
+            autofillFeature = autofillFeature,
+            dispatchers = coroutineTestRule.testDispatcherProvider,
+            moshi = moshi,
         )
-        assertEquals("""{"domains":["foo, bar"],"key":"value"}""", testee.getConfig().javascriptConfigGoogleTakeout)
-    }
+
+    @Test
+    fun whenFeatureFlagEnabledThenCanImportGoogleTakeoutConfigIsEnabled() =
+        runTest {
+            configureFeature(true)
+            assertTrue(testee.getConfig().canImportFromGoogleTakeout)
+        }
+
+    @Test
+    fun whenFeatureFlagDisabledThenCanImportGoogleTakeoutConfigIsDisabled() =
+        runTest {
+            configureFeature(false)
+            assertFalse(testee.getConfig().canImportFromGoogleTakeout)
+        }
+
+    @Test
+    fun whenLaunchUrlNotSpecifiedInConfigThenDefaultUsed() =
+        runTest {
+            configureFeature(config = Config())
+            assertEquals(LAUNCH_URL_DEFAULT, testee.getConfig().launchUrlGoogleTakeout)
+        }
+
+    @Test
+    fun whenLaunchUrlSpecifiedInConfigThenOverridesDefault() =
+        runTest {
+            configureFeature(config = Config(launchUrl = "https://example.com"))
+            assertEquals("https://example.com", testee.getConfig().launchUrlGoogleTakeout)
+        }
+
+    @Test
+    fun whenJavascriptConfigNotSpecifiedInConfigThenDefaultUsed() =
+        runTest {
+            configureFeature(config = Config())
+            assertEquals(JAVASCRIPT_CONFIG_DEFAULT, testee.getConfig().javascriptConfigGoogleTakeout)
+        }
+
+    @Test
+    fun whenJavascriptConfigSpecifiedInConfigThenOverridesDefault() =
+        runTest {
+            configureFeature(
+                config =
+                    Config(
+                        javascriptConfig = JavaScriptConfig(key = "value", domains = listOf("foo, bar")),
+                    ),
+            )
+            assertEquals("""{"domains":["foo, bar"],"key":"value"}""", testee.getConfig().javascriptConfigGoogleTakeout)
+        }
 
     @SuppressLint("DenyListedApi")
-    private fun configureFeature(enabled: Boolean = true, config: Config = Config()) {
+    private fun configureFeature(
+        enabled: Boolean = true,
+        config: Config = Config(),
+    ) {
         autofillFeature.canImportBookmarksFromGoogleTakeout().setRawStoredState(
             State(
                 remoteEnableState = enabled,
@@ -83,6 +93,7 @@ class BookmarkImportConfigStoreImplTest {
             ),
         )
     }
+
     private data class Config(
         val launchUrl: String? = null,
         val canInjectJavascript: Boolean = true,

@@ -24,9 +24,9 @@ import javax.inject.Inject
 class ImportGoogleBookmarksWebFlowWebViewClient @Inject constructor(
     private val callback: NewPageCallback,
 ) : WebViewClient() {
-
     interface NewPageCallback {
         fun onPageStarted(url: String?) {}
+
         fun onPageFinished(url: String?) {}
     }
 

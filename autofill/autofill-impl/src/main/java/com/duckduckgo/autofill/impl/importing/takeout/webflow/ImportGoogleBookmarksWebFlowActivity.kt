@@ -32,7 +32,6 @@ import com.duckduckgo.navigation.api.GlobalActivityStarter.ActivityParams
 @InjectWith(ActivityScope::class)
 @ContributeToActivityStarter(AutofillImportViaGoogleTakeoutScreen::class)
 class ImportGoogleBookmarksWebFlowActivity : DuckDuckGoActivity() {
-
     val binding: ActivityImportGoogleBookmarksWebflowBinding by viewBinding()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -60,12 +59,13 @@ class ImportGoogleBookmarksWebFlowActivity : DuckDuckGoActivity() {
     }
 
     fun exitUserCancelled(stage: String) {
-        val result = Bundle().apply {
-            putParcelable(
-                ImportGoogleBookmarkResult.Companion.RESULT_KEY_DETAILS,
-                ImportGoogleBookmarkResult.UserCancelled(stage),
-            )
-        }
+        val result =
+            Bundle().apply {
+                putParcelable(
+                    ImportGoogleBookmarkResult.Companion.RESULT_KEY_DETAILS,
+                    ImportGoogleBookmarkResult.UserCancelled(stage),
+                )
+            }
         exitWithResult(result)
     }
 }

@@ -22,9 +22,9 @@ import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
-import javax.inject.Inject
 import kotlinx.coroutines.withContext
 import org.json.JSONObject
+import javax.inject.Inject
 
 interface BookmarkImportConfigStore {
     suspend fun getConfig(): BookmarkImportSettings
@@ -43,18 +43,18 @@ class BookmarkImportConfigStoreImpl @Inject constructor(
     private val dispatchers: DispatcherProvider,
     private val moshi: Moshi,
 ) : BookmarkImportConfigStore {
-
     private val jsonAdapter: JsonAdapter<ImportConfigJson> by lazy {
         moshi.adapter(ImportConfigJson::class.java)
     }
 
-    override suspend fun getConfig(): BookmarkImportSettings {
-        return withContext(dispatchers.io()) {
-            val config = autofillFeature.canImportBookmarksFromGoogleTakeout().getSettings()?.let {
-                runCatching {
-                    jsonAdapter.fromJson(it)
-                }.getOrNull()
-            }
+    override suspend fun getConfig(): BookmarkImportSettings =
+        withContext(dispatchers.io()) {
+            val config =
+                autofillFeature.canImportBookmarksFromGoogleTakeout().getSettings()?.let {
+                    runCatching {
+                        jsonAdapter.fromJson(it)
+                    }.getOrNull()
+                }
 
             BookmarkImportSettings(
                 canImportFromGoogleTakeout = autofillFeature.canImportBookmarksFromGoogleTakeout().isEnabled(),
@@ -63,7 +63,6 @@ class BookmarkImportConfigStoreImpl @Inject constructor(
                 javascriptConfigGoogleTakeout = config?.javascriptConfig?.toString() ?: JAVASCRIPT_CONFIG_DEFAULT,
             )
         }
-    }
 
     companion object {
         internal const val JAVASCRIPT_CONFIG_DEFAULT = "\"{}\""

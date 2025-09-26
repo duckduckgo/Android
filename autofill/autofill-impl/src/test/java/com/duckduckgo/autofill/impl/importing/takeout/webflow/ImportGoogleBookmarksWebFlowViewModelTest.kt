@@ -21,66 +21,72 @@ import org.mockito.kotlin.whenever
 
 @RunWith(AndroidJUnit4::class)
 class ImportGoogleBookmarksWebFlowViewModelTest {
-
     @get:Rule
     val coroutineTestRule: CoroutineTestRule = CoroutineTestRule()
 
     private val mockBookmarkImportProcessor: BookmarkImportProcessor = mock()
 
-    private val testee = ImportGoogleBookmarksWebFlowViewModel(
-        dispatchers = coroutineTestRule.testDispatcherProvider,
-        reauthenticationHandler = mock(),
-        autofillFeature = mock(),
-        bookmarkImportProcessor = mockBookmarkImportProcessor,
-        bookmarkImportConfigStore = mock(),
-    )
+    private val testee =
+        ImportGoogleBookmarksWebFlowViewModel(
+            dispatchers = coroutineTestRule.testDispatcherProvider,
+            reauthenticationHandler = mock(),
+            autofillFeature = mock(),
+            bookmarkImportProcessor = mockBookmarkImportProcessor,
+            bookmarkImportConfigStore = mock(),
+        )
 
     @Test
-    fun whenFirstPageLoadingThenShowWebPageState() = runTest {
-        testee.firstPageLoading()
-        assertEquals(ShowWebPage, testee.viewState.value)
-    }
-
-    @Test
-    fun whenBackButtonPressedAndCannotGoBackThenUserCancelledState() = runTest {
-        testee.onBackButtonPressed(canGoBack = false)
-        assertTrue(testee.viewState.value is UserCancelledImportFlow)
-    }
-
-    @Test
-    fun whenBackButtonPressedAndCanGoBackThenNavigatingBackState() = runTest {
-        testee.onBackButtonPressed(canGoBack = true)
-        assertEquals(NavigatingBack, testee.viewState.value)
-    }
-
-    @Test
-    fun whenDownloadDetectedWithValidZipThenProcessorCalled() = runTest {
-        configureImportSuccessful()
-
-        testee.commands.test {
-            triggerDownloadDetectedWithTakeoutZip()
-            awaitItem()
-            verify(mockBookmarkImportProcessor).downloadAndImportFromTakeoutZipUrl(any(), any(), any())
+    fun whenFirstPageLoadingThenShowWebPageState() =
+        runTest {
+            testee.firstPageLoading()
+            assertEquals(ShowWebPage, testee.viewState.value)
         }
-    }
 
     @Test
-    fun whenDownloadDetectedWithValidZipButFailsToDownloadThenExitFlowAsFailureCommandEmitted() = runTest {
-        configureImportFailure()
-
-        testee.commands.test {
-            triggerDownloadDetectedWithTakeoutZip()
-            awaitItem() as Command.ExitFlowAsFailure
+    fun whenBackButtonPressedAndCannotGoBackThenUserCancelledState() =
+        runTest {
+            testee.onBackButtonPressed(canGoBack = false)
+            assertTrue(testee.viewState.value is UserCancelledImportFlow)
         }
-    }
 
     @Test
-    fun whenDownloadDetectedWithInvalidTypeThenExitFlowAsFailureCommandEmitted() = runTest {
-        testee.commands.test {
-            triggerDownloadDetectedButNotATakeoutZip()
-            awaitItem() as Command.ExitFlowAsFailure
+    fun whenBackButtonPressedAndCanGoBackThenNavigatingBackState() =
+        runTest {
+            testee.onBackButtonPressed(canGoBack = true)
+            assertEquals(NavigatingBack, testee.viewState.value)
         }
-    }
+
+    @Test
+    fun whenDownloadDetectedWithValidZipThenProcessorCalled() =
+        runTest {
+            configureImportSuccessful()
+
+            testee.commands.test {
+                triggerDownloadDetectedWithTakeoutZip()
+                awaitItem()
+                verify(mockBookmarkImportProcessor).downloadAndImportFromTakeoutZipUrl(any(), any(), any())
+            }
+        }
+
+    @Test
+    fun whenDownloadDetectedWithValidZipButFailsToDownloadThenExitFlowAsFailureCommandEmitted() =
+        runTest {
+            configureImportFailure()
+
+            testee.commands.test {
+                triggerDownloadDetectedWithTakeoutZip()
+                awaitItem() as Command.ExitFlowAsFailure
+            }
+        }
+
+    @Test
+    fun whenDownloadDetectedWithInvalidTypeThenExitFlowAsFailureCommandEmitted() =
+        runTest {
+            testee.commands.test {
+                triggerDownloadDetectedButNotATakeoutZip()
+                awaitItem() as Command.ExitFlowAsFailure
+            }
+        }
 
     private fun triggerDownloadDetectedWithTakeoutZip() {
         testee.onDownloadDetected(

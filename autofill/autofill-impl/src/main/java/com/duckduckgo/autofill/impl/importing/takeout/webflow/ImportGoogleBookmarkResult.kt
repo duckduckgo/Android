@@ -20,15 +20,20 @@ import android.os.Parcelable
 import kotlinx.parcelize.Parcelize
 
 sealed interface ImportGoogleBookmarkResult : Parcelable {
+    @Parcelize
+    data class Success(
+        val importedCount: Int,
+    ) : ImportGoogleBookmarkResult
 
     @Parcelize
-    data class Success(val importedCount: Int) : ImportGoogleBookmarkResult
+    data class UserCancelled(
+        val stage: String,
+    ) : ImportGoogleBookmarkResult
 
     @Parcelize
-    data class UserCancelled(val stage: String) : ImportGoogleBookmarkResult
-
-    @Parcelize
-    data class Error(val reason: UserCannotImportReason) : ImportGoogleBookmarkResult
+    data class Error(
+        val reason: UserCannotImportReason,
+    ) : ImportGoogleBookmarkResult
 
     companion object {
         const val RESULT_KEY = "importBookmarkResult"

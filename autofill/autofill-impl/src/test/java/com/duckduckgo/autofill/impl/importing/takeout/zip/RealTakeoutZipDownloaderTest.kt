@@ -65,51 +65,56 @@ class RealTakeoutZipDownloaderTest {
     }
 
     @Test
-    fun whenDownloadSucceedsThenReturnsFileUri() = runTest {
-        val expectedResponseBody = "zip file content"
-        configureRequestWithCookies()
-        configureSuccessfulResponse(expectedResponseBody)
+    fun whenDownloadSucceedsThenReturnsFileUri() =
+        runTest {
+            val expectedResponseBody = "zip file content"
+            configureRequestWithCookies()
+            configureSuccessfulResponse(expectedResponseBody)
 
-        val result = testee.downloadZip(TEST_URL, TEST_USER_AGENT)
-        val resultFile = File(result.path!!)
+            val result = testee.downloadZip(TEST_URL, TEST_USER_AGENT)
+            val resultFile = File(result.path!!)
 
-        assertEquals(expectedResponseBody, resultFile.readText())
-        assertEquals("file", result.scheme)
-    }
-
-    @Test(expected = IOException::class)
-    fun whenDownloadFailsWithHttpErrorThenThrowsIOException() = runTest {
-        whenever(mockResponse.isSuccessful).thenReturn(false)
-        whenever(mockResponse.code).thenReturn(404)
-        whenever(mockResponse.message).thenReturn("Not Found")
-        testee.downloadZip(TEST_URL, TEST_USER_AGENT)
-    }
+            assertEquals(expectedResponseBody, resultFile.readText())
+            assertEquals("file", result.scheme)
+        }
 
     @Test(expected = IOException::class)
-    fun whenResponseBodyIsNullThenThrowsIOException() = runTest {
-        whenever(mockResponse.isSuccessful).thenReturn(true)
-        whenever(mockResponse.body).thenReturn(null)
-        testee.downloadZip(TEST_URL, TEST_USER_AGENT)
-    }
+    fun whenDownloadFailsWithHttpErrorThenThrowsIOException() =
+        runTest {
+            whenever(mockResponse.isSuccessful).thenReturn(false)
+            whenever(mockResponse.code).thenReturn(404)
+            whenever(mockResponse.message).thenReturn("Not Found")
+            testee.downloadZip(TEST_URL, TEST_USER_AGENT)
+        }
+
+    @Test(expected = IOException::class)
+    fun whenResponseBodyIsNullThenThrowsIOException() =
+        runTest {
+            whenever(mockResponse.isSuccessful).thenReturn(true)
+            whenever(mockResponse.body).thenReturn(null)
+            testee.downloadZip(TEST_URL, TEST_USER_AGENT)
+        }
 
     @Test
-    fun whenNoCookiesAvailableThenStillMakesRequest() = runTest {
-        val expectedResponseBody = "zip file content"
-        configureRequestWithNoCookies()
-        configureSuccessfulResponse(expectedResponseBody)
+    fun whenNoCookiesAvailableThenStillMakesRequest() =
+        runTest {
+            val expectedResponseBody = "zip file content"
+            configureRequestWithNoCookies()
+            configureSuccessfulResponse(expectedResponseBody)
 
-        val result = testee.downloadZip(TEST_URL, TEST_USER_AGENT)
-        val resultFile = File(result.path!!)
+            val result = testee.downloadZip(TEST_URL, TEST_USER_AGENT)
+            val resultFile = File(result.path!!)
 
-        assertEquals(expectedResponseBody, resultFile.readText())
-    }
+            assertEquals(expectedResponseBody, resultFile.readText())
+        }
 
     @Test(expected = IOException::class)
-    fun whenExceptionThrownDuringExecuteThenPropagatesException() = runTest {
-        val expectedException = IOException("Network error")
-        whenever(mockCall.execute()).thenThrow(expectedException)
-        testee.downloadZip(TEST_URL, TEST_USER_AGENT)
-    }
+    fun whenExceptionThrownDuringExecuteThenPropagatesException() =
+        runTest {
+            val expectedException = IOException("Network error")
+            whenever(mockCall.execute()).thenThrow(expectedException)
+            testee.downloadZip(TEST_URL, TEST_USER_AGENT)
+        }
 
     @Suppress("SameParameterValue")
     private fun configureSuccessfulResponse(responseBody: String) {

@@ -8,11 +8,6 @@ import com.duckduckgo.autofill.impl.importing.takeout.zip.TakeoutBookmarkExtract
 import com.duckduckgo.autofill.impl.importing.takeout.zip.TakeoutZipBookmarkExtractor
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.test.FileUtilities
-import java.io.ByteArrayInputStream
-import java.io.ByteArrayOutputStream
-import java.io.InputStream
-import java.util.zip.ZipEntry
-import java.util.zip.ZipOutputStream
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
@@ -22,20 +17,25 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
+import java.io.ByteArrayInputStream
+import java.io.ByteArrayOutputStream
 import java.io.File
+import java.io.InputStream
+import java.util.zip.ZipEntry
+import java.util.zip.ZipOutputStream
 
 @RunWith(AndroidJUnit4::class)
 class TakeoutZipBookmarkExtractorTest {
-
     @get:Rule
     val coroutineTestRule: CoroutineTestRule = CoroutineTestRule()
 
     private val mockContext = mock<Context>()
     private val mockUri = mock<Uri>()
-    private val testee = TakeoutZipBookmarkExtractor(
-        context = mockContext,
-        dispatchers = coroutineTestRule.testDispatcherProvider,
-    )
+    private val testee =
+        TakeoutZipBookmarkExtractor(
+            context = mockContext,
+            dispatchers = coroutineTestRule.testDispatcherProvider,
+        )
 
     @Before
     fun setup() {
@@ -49,127 +49,137 @@ class TakeoutZipBookmarkExtractorTest {
     }
 
     @Test
-    fun whenValidZipWithBookmarksHtmlThenExtractionSucceeds() = runTest {
-        val bookmarkContent = loadHtmlFile("valid_chrome_bookmarks_netscape")
-        val zipData = createZipWithEntry("Takeout/Chrome/Bookmarks.html", bookmarkContent)
-        mockFileUri(mockUri, zipData)
+    fun whenValidZipWithBookmarksHtmlThenExtractionSucceeds() =
+        runTest {
+            val bookmarkContent = loadHtmlFile("valid_chrome_bookmarks_netscape")
+            val zipData = createZipWithEntry("Takeout/Chrome/Bookmarks.html", bookmarkContent)
+            mockFileUri(mockUri, zipData)
 
-        val result = testee.extractBookmarksFromFile(mockUri)
+            val result = testee.extractBookmarksFromFile(mockUri)
 
-        assertTrue(result is Success)
-        val tempFileUri = (result as Success).tempFileUri
-        val actualContent = File(tempFileUri.path!!).readText()
-        assertEquals(bookmarkContent, actualContent)
-    }
-
-    @Test
-    fun whenZipContainsMultipleEntriesButOnlyOneBookmarkThenCorrectFileExtracted() = runTest {
-        val bookmarkContent = loadHtmlFile("valid_chrome_bookmarks_netscape")
-        val zipData = createZipWithMultipleEntries(
-            mapOf(
-                "Takeout/Gmail/contacts.csv" to "email data",
-                "Takeout/Chrome/History" to "history data",
-                "Takeout/Chrome/Bookmarks.html" to bookmarkContent,
-                "Takeout/YouTube/subscriptions.json" to "youtube data",
-            ),
-        )
-        mockFileUri(mockUri, zipData)
-
-        val result = testee.extractBookmarksFromFile(mockUri)
-
-        assertTrue(result is Success)
-        val tempFileUri = (result as Success).tempFileUri
-        val actualContent = File(tempFileUri.path!!).readText()
-        assertEquals(bookmarkContent, actualContent)
-    }
+            assertTrue(result is Success)
+            val tempFileUri = (result as Success).tempFileUri
+            val actualContent = File(tempFileUri.path!!).readText()
+            assertEquals(bookmarkContent, actualContent)
+        }
 
     @Test
-    fun whenBookmarksFileFoundButContentInvalidThenExtractionFails() = runTest {
-        val invalidContent = loadHtmlFile("invalid_bookmark_content")
-        val zipData = createZipWithEntry("Takeout/Chrome/Bookmarks.html", invalidContent)
-        mockFileUri(mockUri, zipData)
+    fun whenZipContainsMultipleEntriesButOnlyOneBookmarkThenCorrectFileExtracted() =
+        runTest {
+            val bookmarkContent = loadHtmlFile("valid_chrome_bookmarks_netscape")
+            val zipData =
+                createZipWithMultipleEntries(
+                    mapOf(
+                        "Takeout/Gmail/contacts.csv" to "email data",
+                        "Takeout/Chrome/History" to "history data",
+                        "Takeout/Chrome/Bookmarks.html" to bookmarkContent,
+                        "Takeout/YouTube/subscriptions.json" to "youtube data",
+                    ),
+                )
+            mockFileUri(mockUri, zipData)
 
-        val result = testee.extractBookmarksFromFile(mockUri)
+            val result = testee.extractBookmarksFromFile(mockUri)
 
-        assertTrue(result is TakeoutBookmarkExtractor.ExtractionResult.Error)
-    }
-
-    @Test
-    fun whenZipDoesNotContainBookmarksFileThenExtractionFails() = runTest {
-        val zipData = createZipWithEntry("Takeout/Gmail/contacts.csv", "email data")
-        mockFileUri(mockUri, zipData)
-
-        val result = testee.extractBookmarksFromFile(mockUri)
-
-        assertTrue(result is TakeoutBookmarkExtractor.ExtractionResult.Error)
-    }
-
-    @Test
-    fun whenEmptyZipThenExtractionFails() = runTest {
-        val emptyZipData = createEmptyZip()
-        mockFileUri(mockUri, emptyZipData)
-
-        val result = testee.extractBookmarksFromFile(mockUri)
-
-        assertTrue(result is TakeoutBookmarkExtractor.ExtractionResult.Error)
-    }
+            assertTrue(result is Success)
+            val tempFileUri = (result as Success).tempFileUri
+            val actualContent = File(tempFileUri.path!!).readText()
+            assertEquals(bookmarkContent, actualContent)
+        }
 
     @Test
-    fun whenFileCannotBeOpenedThenExtractionFails() = runTest {
-        whenever(mockContext.contentResolver.openInputStream(mockUri)).thenReturn(null)
+    fun whenBookmarksFileFoundButContentInvalidThenExtractionFails() =
+        runTest {
+            val invalidContent = loadHtmlFile("invalid_bookmark_content")
+            val zipData = createZipWithEntry("Takeout/Chrome/Bookmarks.html", invalidContent)
+            mockFileUri(mockUri, zipData)
 
-        val result = testee.extractBookmarksFromFile(mockUri)
+            val result = testee.extractBookmarksFromFile(mockUri)
 
-        assertTrue(result is TakeoutBookmarkExtractor.ExtractionResult.Error)
-    }
-
-    @Test
-    fun whenBookmarkHtmlHasNetscapeHeaderThenValidationPasses() = runTest {
-        val content = loadHtmlFile("valid_chrome_bookmarks_netscape")
-        val zipData = createZipWithEntry("Takeout/Chrome/Bookmarks.html", content)
-        mockFileUri(mockUri, zipData)
-
-        val result = testee.extractBookmarksFromFile(mockUri)
-
-        assertTrue(result is Success)
-    }
+            assertTrue(result is TakeoutBookmarkExtractor.ExtractionResult.Error)
+        }
 
     @Test
-    fun whenBookmarkHtmlHasBookmarkTitleThenValidationPasses() = runTest {
-        val content = loadHtmlFile("valid_chrome_bookmarks_title_only")
-        val zipData = createZipWithEntry("Takeout/Chrome/Bookmarks.html", content)
-        mockFileUri(mockUri, zipData)
+    fun whenZipDoesNotContainBookmarksFileThenExtractionFails() =
+        runTest {
+            val zipData = createZipWithEntry("Takeout/Gmail/contacts.csv", "email data")
+            mockFileUri(mockUri, zipData)
 
-        val result = testee.extractBookmarksFromFile(mockUri)
+            val result = testee.extractBookmarksFromFile(mockUri)
 
-        assertTrue(result is Success)
-    }
+            assertTrue(result is TakeoutBookmarkExtractor.ExtractionResult.Error)
+        }
 
     @Test
-    fun whenBookmarkHtmlContainsMixedValidAndInvalidBookmarksThenValidationStillPasses() = runTest {
-        val content = loadHtmlFile("mixed_valid_invalid_bookmarks")
-        val zipData = createZipWithEntry("Takeout/Chrome/Bookmarks.html", content)
-        mockFileUri(mockUri, zipData)
+    fun whenEmptyZipThenExtractionFails() =
+        runTest {
+            val emptyZipData = createEmptyZip()
+            mockFileUri(mockUri, emptyZipData)
 
-        val result = testee.extractBookmarksFromFile(mockUri)
+            val result = testee.extractBookmarksFromFile(mockUri)
 
-        // Should still pass validation because it has valid bookmark structure
-        assertTrue(result is Success)
-        val tempFileUri = (result as Success).tempFileUri
-        val actualContent = File(tempFileUri.path!!).readText()
-        assertEquals(content, actualContent)
-    }
+            assertTrue(result is TakeoutBookmarkExtractor.ExtractionResult.Error)
+        }
 
-    private fun loadHtmlFile(filename: String): String {
-        return FileUtilities.loadText(
+    @Test
+    fun whenFileCannotBeOpenedThenExtractionFails() =
+        runTest {
+            whenever(mockContext.contentResolver.openInputStream(mockUri)).thenReturn(null)
+
+            val result = testee.extractBookmarksFromFile(mockUri)
+
+            assertTrue(result is TakeoutBookmarkExtractor.ExtractionResult.Error)
+        }
+
+    @Test
+    fun whenBookmarkHtmlHasNetscapeHeaderThenValidationPasses() =
+        runTest {
+            val content = loadHtmlFile("valid_chrome_bookmarks_netscape")
+            val zipData = createZipWithEntry("Takeout/Chrome/Bookmarks.html", content)
+            mockFileUri(mockUri, zipData)
+
+            val result = testee.extractBookmarksFromFile(mockUri)
+
+            assertTrue(result is Success)
+        }
+
+    @Test
+    fun whenBookmarkHtmlHasBookmarkTitleThenValidationPasses() =
+        runTest {
+            val content = loadHtmlFile("valid_chrome_bookmarks_title_only")
+            val zipData = createZipWithEntry("Takeout/Chrome/Bookmarks.html", content)
+            mockFileUri(mockUri, zipData)
+
+            val result = testee.extractBookmarksFromFile(mockUri)
+
+            assertTrue(result is Success)
+        }
+
+    @Test
+    fun whenBookmarkHtmlContainsMixedValidAndInvalidBookmarksThenValidationStillPasses() =
+        runTest {
+            val content = loadHtmlFile("mixed_valid_invalid_bookmarks")
+            val zipData = createZipWithEntry("Takeout/Chrome/Bookmarks.html", content)
+            mockFileUri(mockUri, zipData)
+
+            val result = testee.extractBookmarksFromFile(mockUri)
+
+            // Should still pass validation because it has valid bookmark structure
+            assertTrue(result is Success)
+            val tempFileUri = (result as Success).tempFileUri
+            val actualContent = File(tempFileUri.path!!).readText()
+            assertEquals(content, actualContent)
+        }
+
+    private fun loadHtmlFile(filename: String): String =
+        FileUtilities.loadText(
             TakeoutZipBookmarkExtractorTest::class.java.classLoader!!,
             "html/$filename.html",
         )
-    }
 
-    private fun createZipWithEntry(entryName: String, content: String): ByteArray {
-        return createZipWithMultipleEntries(mapOf(entryName to content))
-    }
+    private fun createZipWithEntry(
+        entryName: String,
+        content: String,
+    ): ByteArray = createZipWithMultipleEntries(mapOf(entryName to content))
 
     private fun createZipWithMultipleEntries(entries: Map<String, String>): ByteArray {
         val baos = ByteArrayOutputStream()
@@ -190,7 +200,10 @@ class TakeoutZipBookmarkExtractorTest {
         return baos.toByteArray()
     }
 
-    private fun mockFileUri(uri: Uri, zipData: ByteArray) {
+    private fun mockFileUri(
+        uri: Uri,
+        zipData: ByteArray,
+    ) {
         val inputStream: InputStream = ByteArrayInputStream(zipData)
         whenever(mockContext.contentResolver.openInputStream(uri)).thenReturn(inputStream)
     }
