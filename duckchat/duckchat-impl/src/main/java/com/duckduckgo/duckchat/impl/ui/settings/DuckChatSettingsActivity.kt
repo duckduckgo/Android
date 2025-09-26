@@ -57,7 +57,6 @@ import com.duckduckgo.mobile.android.R as CommonR
 @InjectWith(ActivityScope::class)
 @ContributeToActivityStarter(DuckChatSettingsNoParams::class, screenName = "duckai.settings")
 class DuckChatSettingsActivity : DuckDuckGoActivity() {
-
     private val viewModel: DuckChatSettingsViewModel by bindViewModel()
     private val binding: ActivityDuckChatSettingsBinding by viewBinding()
 
@@ -119,15 +118,17 @@ class DuckChatSettingsActivity : DuckDuckGoActivity() {
             binding.showDuckChatSearchSettingsLink.setSecondaryText(getString(R.string.duck_chat_assist_settings_description_rebranding))
 
             // align content with the main Duck.ai toggle's text
-            val offset = resources.getDimensionPixelSize(CommonR.dimen.listItemImageContainerSize) +
-                resources.getDimensionPixelSize(CommonR.dimen.keyline_4)
+            val offset =
+                resources.getDimensionPixelSize(CommonR.dimen.listItemImageContainerSize) +
+                    resources.getDimensionPixelSize(CommonR.dimen.keyline_4)
             val orientation = resources.configuration.orientation
             binding.duckAiInputScreenToggleContainer.updatePadding(
-                left = if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
-                    0
-                } else {
-                    offset
-                },
+                left =
+                    if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
+                        0
+                    } else {
+                        offset
+                    },
             )
             binding.duckAiInputScreenDescription.updatePadding(left = offset)
             binding.duckAiShortcuts.updatePadding(left = offset)
@@ -148,18 +149,21 @@ class DuckChatSettingsActivity : DuckDuckGoActivity() {
         }
 
         binding.duckChatSettingsText.addClickableSpan(
-            textSequence = if (viewState.isRebrandingAiFeaturesEnabled) {
-                getText(R.string.duck_chat_settings_activity_description_rebranding)
-            } else {
-                getText(R.string.duck_chat_settings_activity_description)
-            },
-            spans = listOf(
-                "learn_more_link" to object : DuckDuckGoClickableSpan() {
-                    override fun onClick(widget: View) {
-                        viewModel.duckChatLearnMoreClicked()
-                    }
+            textSequence =
+                if (viewState.isRebrandingAiFeaturesEnabled) {
+                    getText(R.string.duck_chat_settings_activity_description_rebranding)
+                } else {
+                    getText(R.string.duck_chat_settings_activity_description)
                 },
-            ),
+            spans =
+                listOf(
+                    "learn_more_link" to
+                        object : DuckDuckGoClickableSpan() {
+                            override fun onClick(widget: View) {
+                                viewModel.duckChatLearnMoreClicked()
+                            }
+                        },
+                ),
         )
 
         binding.duckAiInputScreenToggleContainer.isVisible = viewState.shouldShowInputScreenToggle
@@ -171,13 +175,15 @@ class DuckChatSettingsActivity : DuckDuckGoActivity() {
         binding.duckAiInputScreenDescription.isVisible = viewState.shouldShowInputScreenToggle
         binding.duckAiInputScreenDescription.addClickableSpan(
             textSequence = getText(R.string.input_screen_user_pref_description),
-            spans = listOf(
-                "share_feedback" to object : DuckDuckGoClickableSpan() {
-                    override fun onClick(widget: View) {
-                        viewModel.duckAiInputScreenShareFeedbackClicked()
-                    }
-                },
-            ),
+            spans =
+                listOf(
+                    "share_feedback" to
+                        object : DuckDuckGoClickableSpan() {
+                            override fun onClick(widget: View) {
+                                viewModel.duckAiInputScreenShareFeedbackClicked()
+                            }
+                        },
+                ),
         )
 
         binding.duckAiShortcuts.isVisible = viewState.shouldShowShortcuts
@@ -234,31 +240,42 @@ class DuckChatSettingsActivity : DuckDuckGoActivity() {
         duckAiInputScreenToggleWithAiCheck.setImageDrawable(ContextCompat.getDrawable(context, withAi.checkRes))
     }
 
-    private sealed class InputScreenToggleButton(isActive: Boolean) {
+    private sealed class InputScreenToggleButton(
+        isActive: Boolean,
+    ) {
         abstract val imageRes: Int
 
-        val checkRes: Int = if (isActive) {
-            CommonR.drawable.ic_check_accent_24
-        } else {
-            CommonR.drawable.ic_shape_circle_disabled_24
+        val checkRes: Int =
+            if (isActive) {
+                CommonR.drawable.ic_check_accent_24
+            } else {
+                CommonR.drawable.ic_shape_circle_disabled_24
+            }
+
+        class WithoutAi(
+            isActive: Boolean,
+            isLightMode: Boolean,
+        ) : InputScreenToggleButton(isActive) {
+            override val imageRes: Int =
+                when {
+                    isActive && isLightMode -> R.drawable.searchbox_withoutai_active
+                    isActive && !isLightMode -> R.drawable.searchbox_withoutai_active_dark
+                    !isActive && isLightMode -> R.drawable.searchbox_withoutai_inactive
+                    else -> R.drawable.searchbox_withoutai_inactive_dark
+                }
         }
 
-        class WithoutAi(isActive: Boolean, isLightMode: Boolean) : InputScreenToggleButton(isActive) {
-            override val imageRes: Int = when {
-                isActive && isLightMode -> R.drawable.searchbox_withoutai_active
-                isActive && !isLightMode -> R.drawable.searchbox_withoutai_active_dark
-                !isActive && isLightMode -> R.drawable.searchbox_withoutai_inactive
-                else -> R.drawable.searchbox_withoutai_inactive_dark
-            }
-        }
-
-        class WithAi(isActive: Boolean, isLightMode: Boolean) : InputScreenToggleButton(isActive) {
-            override val imageRes: Int = when {
-                isActive && isLightMode -> R.drawable.searchbox_withai_active
-                isActive && !isLightMode -> R.drawable.searchbox_withai_active_dark
-                !isActive && isLightMode -> R.drawable.searchbox_withai_inactive
-                else -> R.drawable.searchbox_withai_inactive_dark
-            }
+        class WithAi(
+            isActive: Boolean,
+            isLightMode: Boolean,
+        ) : InputScreenToggleButton(isActive) {
+            override val imageRes: Int =
+                when {
+                    isActive && isLightMode -> R.drawable.searchbox_withai_active
+                    isActive && !isLightMode -> R.drawable.searchbox_withai_active_dark
+                    !isActive && isLightMode -> R.drawable.searchbox_withai_inactive
+                    else -> R.drawable.searchbox_withai_inactive_dark
+                }
         }
     }
 
