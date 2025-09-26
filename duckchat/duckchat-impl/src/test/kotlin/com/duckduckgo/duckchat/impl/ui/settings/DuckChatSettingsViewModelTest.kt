@@ -27,9 +27,9 @@ import com.duckduckgo.duckchat.impl.ui.settings.DuckChatSettingsViewModel.Comman
 import com.duckduckgo.duckchat.impl.ui.settings.DuckChatSettingsViewModel.Command.OpenLinkInNewTab
 import com.duckduckgo.duckchat.impl.ui.settings.DuckChatSettingsViewModel.Command.OpenShortcutSettings
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
-import com.duckduckgo.feature.toggles.api.Toggle.State
-import com.duckduckgo.settings.api.SettingsPageFeature
 import com.duckduckgo.subscriptions.api.SubscriptionRebrandingFeatureToggle
+import com.duckduckgo.settings.api.SettingsPageFeature
+import com.duckduckgo.feature.toggles.api.Toggle.State
 import junit.framework.TestCase.assertEquals
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
@@ -56,16 +56,14 @@ class DuckChatSettingsViewModelTest {
     private val settingsPageFeature = FakeFeatureToggleFactory.create(SettingsPageFeature::class.java)
 
     @Before
-    fun setUp() =
-        runTest {
-            @Suppress("DenyListedApi")
-            settingsPageFeature.saveAndExitSerpSettings().setRawStoredState(State(enable = false))
-            whenever(duckChat.observeEnableDuckChatUserSetting()).thenReturn(flowOf(true))
-            whenever(duckChat.observeShowInBrowserMenuUserSetting()).thenReturn(flowOf(false))
-            whenever(duckChat.observeShowInAddressBarUserSetting()).thenReturn(flowOf(false))
-            whenever(duckChat.observeInputScreenUserSettingEnabled()).thenReturn(flowOf(false))
-            testee = DuckChatSettingsViewModel(duckChat, mockPixel, mockRebrandingFeatureToggle, mockInputScreenDiscoveryFunnel, settingsPageFeature)
-        }
+    fun setUp() = runTest {
+        settingsPageFeature.saveAndExitSerpSettings().setRawStoredState(State(enable = false))
+        whenever(duckChat.observeEnableDuckChatUserSetting()).thenReturn(flowOf(true))
+        whenever(duckChat.observeShowInBrowserMenuUserSetting()).thenReturn(flowOf(false))
+        whenever(duckChat.observeShowInAddressBarUserSetting()).thenReturn(flowOf(false))
+        whenever(duckChat.observeInputScreenUserSettingEnabled()).thenReturn(flowOf(false))
+        testee = DuckChatSettingsViewModel(duckChat, mockPixel, mockRebrandingFeatureToggle, mockInputScreenDiscoveryFunnel, settingsPageFeature)
+    }
 
     @Test
     fun whenDuckChatUserEnabledToggledDisabledThenSetUserSetting() =
@@ -138,10 +136,9 @@ class DuckChatSettingsViewModelTest {
         }
 
     @Test
-    fun `input screen - user preference enabled then set correct state`() =
-        runTest {
-            whenever(duckChat.observeInputScreenUserSettingEnabled()).thenReturn(flowOf(true))
-            testee = DuckChatSettingsViewModel(duckChat, mockPixel, mockRebrandingFeatureToggle, mockInputScreenDiscoveryFunnel, settingsPageFeature)
+    fun `input screen - user preference enabled then set correct state`() = runTest {
+        whenever(duckChat.observeInputScreenUserSettingEnabled()).thenReturn(flowOf(true))
+        testee = DuckChatSettingsViewModel(duckChat, mockPixel, mockRebrandingFeatureToggle, mockInputScreenDiscoveryFunnel, settingsPageFeature)
 
             testee.viewState.test {
                 assertTrue(awaitItem().isInputScreenEnabled)
@@ -149,10 +146,9 @@ class DuckChatSettingsViewModelTest {
         }
 
     @Test
-    fun `input screen - user preference disabled then set correct state`() =
-        runTest {
-            whenever(duckChat.observeInputScreenUserSettingEnabled()).thenReturn(flowOf(false))
-            testee = DuckChatSettingsViewModel(duckChat, mockPixel, mockRebrandingFeatureToggle, mockInputScreenDiscoveryFunnel, settingsPageFeature)
+    fun `input screen - user preference disabled then set correct state`() = runTest {
+        whenever(duckChat.observeInputScreenUserSettingEnabled()).thenReturn(flowOf(false))
+        testee = DuckChatSettingsViewModel(duckChat, mockPixel, mockRebrandingFeatureToggle, mockInputScreenDiscoveryFunnel, settingsPageFeature)
 
             testee.viewState.test {
                 assertFalse(awaitItem().isInputScreenEnabled)
@@ -160,11 +156,10 @@ class DuckChatSettingsViewModelTest {
         }
 
     @Test
-    fun `input screen - when duck chat enabled and flag enabled, then emit enabled`() =
-        runTest {
-            whenever(duckChat.observeEnableDuckChatUserSetting()).thenReturn(flowOf(true))
-            whenever(duckChat.isInputScreenFeatureAvailable()).thenReturn(true)
-            testee = DuckChatSettingsViewModel(duckChat, mockPixel, mockRebrandingFeatureToggle, mockInputScreenDiscoveryFunnel, settingsPageFeature)
+    fun `input screen - when duck chat enabled and flag enabled, then emit enabled`() = runTest {
+        whenever(duckChat.observeEnableDuckChatUserSetting()).thenReturn(flowOf(true))
+        whenever(duckChat.isInputScreenFeatureAvailable()).thenReturn(true)
+        testee = DuckChatSettingsViewModel(duckChat, mockPixel, mockRebrandingFeatureToggle, mockInputScreenDiscoveryFunnel, settingsPageFeature)
 
             testee.viewState.test {
                 val state = awaitItem()
@@ -173,11 +168,10 @@ class DuckChatSettingsViewModelTest {
         }
 
     @Test
-    fun `input screen - when flag disabled, then emit disabled`() =
-        runTest {
-            whenever(duckChat.observeEnableDuckChatUserSetting()).thenReturn(flowOf(true))
-            whenever(duckChat.isInputScreenFeatureAvailable()).thenReturn(false)
-            testee = DuckChatSettingsViewModel(duckChat, mockPixel, mockRebrandingFeatureToggle, mockInputScreenDiscoveryFunnel, settingsPageFeature)
+    fun `input screen - when flag disabled, then emit disabled`() = runTest {
+        whenever(duckChat.observeEnableDuckChatUserSetting()).thenReturn(flowOf(true))
+        whenever(duckChat.isInputScreenFeatureAvailable()).thenReturn(false)
+        testee = DuckChatSettingsViewModel(duckChat, mockPixel, mockRebrandingFeatureToggle, mockInputScreenDiscoveryFunnel, settingsPageFeature)
 
             testee.viewState.test {
                 val state = awaitItem()
@@ -186,11 +180,10 @@ class DuckChatSettingsViewModelTest {
         }
 
     @Test
-    fun whenDuckChatDisabledThenNoSubTogglesShown() =
-        runTest {
-            whenever(duckChat.observeEnableDuckChatUserSetting()).thenReturn(flowOf(false))
-            whenever(duckChat.observeInputScreenUserSettingEnabled()).thenReturn(flowOf(true))
-            testee = DuckChatSettingsViewModel(duckChat, mockPixel, mockRebrandingFeatureToggle, mockInputScreenDiscoveryFunnel, settingsPageFeature)
+    fun whenDuckChatDisabledThenNoSubTogglesShown() = runTest {
+        whenever(duckChat.observeEnableDuckChatUserSetting()).thenReturn(flowOf(false))
+        whenever(duckChat.observeInputScreenUserSettingEnabled()).thenReturn(flowOf(true))
+        testee = DuckChatSettingsViewModel(duckChat, mockPixel, mockRebrandingFeatureToggle, mockInputScreenDiscoveryFunnel, settingsPageFeature)
 
             testee.viewState.test {
                 val state = awaitItem()
