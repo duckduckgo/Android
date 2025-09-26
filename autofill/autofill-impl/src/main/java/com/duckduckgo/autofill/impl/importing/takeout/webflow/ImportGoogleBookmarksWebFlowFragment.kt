@@ -302,7 +302,7 @@ class ImportGoogleBookmarksWebFlowFragment :
         }
     }
 
-    @SuppressLint("RequiresFeature")
+    @SuppressLint("RequiresFeature", "AddDocumentStartJavaScriptUsage")
     private suspend fun configureBookmarkImportJavascript(webView: WebView) {
         if (importBookmarkConfig.getConfig().canInjectJavascript) {
             val script = googleImporterScriptLoader.getScriptForBookmarkImport()
