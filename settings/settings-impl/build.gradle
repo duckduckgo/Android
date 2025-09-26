@@ -37,6 +37,8 @@ dependencies {
     implementation project(path: ':di')
     implementation project(path: ':settings-api')
     implementation project(path: ':common-utils')
+    implementation project(path: ':js-messaging-api')
+    implementation project(path: ':content-scope-scripts-api')
 
     implementation AndroidX.core.ktx
 
