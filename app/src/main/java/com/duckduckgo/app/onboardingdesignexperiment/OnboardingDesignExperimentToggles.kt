@@ -45,7 +45,7 @@ interface OnboardingDesignExperimentToggles {
     fun self(): Toggle
 
     @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
-    fun onboardingDesignExperimentAug25(): Toggle
+    fun onboardingDesignExperimentOct25(): Toggle
 
     @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun waitForLocalPrivacyConfig(): Toggle
@@ -67,7 +67,7 @@ class OnboardingExperimentMetricsPixelPlugin @Inject constructor(
 ) : MetricsPixelPlugin {
 
     override suspend fun getMetrics(): List<MetricsPixel> {
-        val toggle = onboardingDesignExperimentToggles.onboardingDesignExperimentAug25()
+        val toggle = onboardingDesignExperimentToggles.onboardingDesignExperimentOct25()
         val conversionWindow = listOf(
             ConversionWindow(lowerWindow = 0, upperWindow = 0),
             ConversionWindow(lowerWindow = 1, upperWindow = 1),

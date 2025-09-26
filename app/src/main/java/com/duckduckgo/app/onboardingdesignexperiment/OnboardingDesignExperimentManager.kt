@@ -128,7 +128,7 @@ class RealOnboardingDesignExperimentManager @Inject constructor(
     override suspend fun enroll() {
         withContext(dispatcherProvider.io()) {
             if (isEligibleForEnrolment()) {
-                onboardingDesignExperimentToggles.onboardingDesignExperimentAug25().enroll()
+                onboardingDesignExperimentToggles.onboardingDesignExperimentOct25().enroll()
                 setCachedProperties()
             }
         }
@@ -338,12 +338,12 @@ class RealOnboardingDesignExperimentManager @Inject constructor(
     private suspend fun setCachedProperties() {
         withContext(dispatcherProvider.io()) {
             onboardingDesignExperimentCohort = getEnrolledAndEnabledExperimentCohort()
-            isExperimentEnabled = onboardingDesignExperimentToggles.onboardingDesignExperimentAug25().isEnabled()
+            isExperimentEnabled = onboardingDesignExperimentToggles.onboardingDesignExperimentOct25().isEnabled()
         }
     }
 
     private suspend fun getEnrolledAndEnabledExperimentCohort(): OnboardingDesignExperimentCohort? {
-        val cohort = onboardingDesignExperimentToggles.onboardingDesignExperimentAug25().getCohort()
+        val cohort = onboardingDesignExperimentToggles.onboardingDesignExperimentOct25().getCohort()
 
         return when (cohort?.name) {
             MODIFIED_CONTROL.cohortName -> MODIFIED_CONTROL
