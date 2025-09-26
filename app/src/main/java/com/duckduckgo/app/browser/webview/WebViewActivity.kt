@@ -23,6 +23,7 @@ import android.view.MenuItem
 import android.webkit.WebChromeClient
 import android.webkit.WebSettings
 import android.webkit.WebView
+import androidx.activity.OnBackPressedCallback
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
@@ -43,6 +44,7 @@ import com.duckduckgo.user.agent.api.UserAgentProvider
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import org.json.JSONObject
+import java.lang.System.exit
 import javax.inject.Inject
 import javax.inject.Named
 
@@ -80,8 +82,24 @@ class WebViewActivity : DuckDuckGoActivity() {
 
         setupWebView(supportNewWindows)
         setupCollectors()
+        setupBackPressedDispatcher()
 
         viewModel.onStart(url)
+    }
+
+    private fun setupBackPressedDispatcher() {
+        onBackPressedDispatcher.addCallback(
+            this,
+            object : OnBackPressedCallback(true) {
+                override fun handleOnBackPressed() {
+                    if (binding.simpleWebview.canGoBack()) {
+                        binding.simpleWebview.goBack()
+                    } else {
+                        exit()
+                    }
+                }
+            },
+        )
     }
 
     private fun setupCollectors() {
@@ -93,13 +111,18 @@ class WebViewActivity : DuckDuckGoActivity() {
 
     private fun processCommand(command: WebViewViewModel.Command) {
         when (command) {
-            is WebViewViewModel.Command.LoadUrl -> {
-                binding.simpleWebview.loadUrl(command.url)
-            }
-            WebViewViewModel.Command.Exit -> {
-                finish()
-            }
+            is WebViewViewModel.Command.LoadUrl -> binding.simpleWebview.loadUrl(command.url)
+            WebViewViewModel.Command.Exit -> exit()
         }
+    }
+
+    private fun exit() {
+        binding.simpleWebview.stopLoading()
+        binding.simpleWebview.removeJavascriptInterface(contentScopeScripts.context)
+        binding.root.removeView(binding.simpleWebview)
+        binding.simpleWebview.destroy()
+
+        finish()
     }
 
     private fun extractParameters(): Pair<String?, Boolean> {
@@ -167,18 +190,10 @@ class WebViewActivity : DuckDuckGoActivity() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             android.R.id.home -> {
-                super.onBackPressed()
+                onBackPressedDispatcher.onBackPressed()
                 return true
             }
         }
         return super.onOptionsItemSelected(item)
-    }
-
-    override fun onBackPressed() {
-        if (binding.simpleWebview.canGoBack()) {
-            binding.simpleWebview.goBack()
-        } else {
-            super.onBackPressed()
-        }
     }
 }
