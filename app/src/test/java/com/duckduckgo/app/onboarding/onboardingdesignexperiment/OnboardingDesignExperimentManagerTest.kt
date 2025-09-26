@@ -88,7 +88,7 @@ class OnboardingDesignExperimentManagerTest {
         val mockToggle = mock<Toggle>()
         val mockCohort = mock<Toggle.State.Cohort>()
 
-        whenever(onboardingDesignExperimentToggles.onboardingDesignExperimentAug25()).thenReturn(mockToggle)
+        whenever(onboardingDesignExperimentToggles.onboardingDesignExperimentOct25()).thenReturn(mockToggle)
         whenever(mockToggle.isEnabled()).thenReturn(true)
         whenever(mockToggle.getCohort()).thenReturn(mockCohort)
         whenever(mockToggle.getCohort()!!.name).thenReturn(OnboardingDesignExperimentToggles.OnboardingDesignExperimentCohort.BUCK.cohortName)
@@ -106,7 +106,7 @@ class OnboardingDesignExperimentManagerTest {
     fun whenPrivacyConfigPersistedWithDisabledExperimentThenCachedPropertiesReflectDisabledState() = runTest {
         val mockToggle = mock<Toggle>()
 
-        whenever(onboardingDesignExperimentToggles.onboardingDesignExperimentAug25()).thenReturn(mockToggle)
+        whenever(onboardingDesignExperimentToggles.onboardingDesignExperimentOct25()).thenReturn(mockToggle)
         whenever(mockToggle.isEnabled()).thenReturn(false)
 
         val lifecycleObserver = testee as PrivacyConfigCallbackPlugin
@@ -125,7 +125,7 @@ class OnboardingDesignExperimentManagerTest {
         val mockToggle = mock<Toggle>()
         val mockCohort = mock<Toggle.State.Cohort>()
 
-        whenever(onboardingDesignExperimentToggles.onboardingDesignExperimentAug25()).thenReturn(mockToggle)
+        whenever(onboardingDesignExperimentToggles.onboardingDesignExperimentOct25()).thenReturn(mockToggle)
         whenever(mockToggle.isEnabled()).thenReturn(true)
         whenever(mockToggle.getCohort()).thenReturn(mockCohort)
         whenever(mockToggle.getCohort()!!.name).thenReturn(OnboardingDesignExperimentToggles.OnboardingDesignExperimentCohort.BB.cohortName)
@@ -143,7 +143,7 @@ class OnboardingDesignExperimentManagerTest {
     fun whenOnPrivacyConfigDownloadedWithDisabledExperimentThenCachedPropertiesReflectDisabledState() = runTest {
         val mockToggle = mock<Toggle>()
 
-        whenever(onboardingDesignExperimentToggles.onboardingDesignExperimentAug25()).thenReturn(mockToggle)
+        whenever(onboardingDesignExperimentToggles.onboardingDesignExperimentOct25()).thenReturn(mockToggle)
         whenever(mockToggle.isEnabled()).thenReturn(false)
 
         val privacyConfigCallback = testee as PrivacyConfigCallbackPlugin
@@ -162,7 +162,7 @@ class OnboardingDesignExperimentManagerTest {
         val mockToggle = mock<Toggle>()
         val mockCohort = mock<Toggle.State.Cohort>()
 
-        whenever(onboardingDesignExperimentToggles.onboardingDesignExperimentAug25()).thenReturn(mockToggle)
+        whenever(onboardingDesignExperimentToggles.onboardingDesignExperimentOct25()).thenReturn(mockToggle)
         whenever(mockToggle.isEnabled()).thenReturn(true)
         whenever(mockToggle.getCohort()).thenReturn(mockCohort)
         whenever(mockToggle.getCohort()!!.name).thenReturn(
@@ -183,7 +183,7 @@ class OnboardingDesignExperimentManagerTest {
         val mockToggle = mock<Toggle>()
         val mockCohort = mock<Toggle.State.Cohort>()
 
-        whenever(onboardingDesignExperimentToggles.onboardingDesignExperimentAug25()).thenReturn(mockToggle)
+        whenever(onboardingDesignExperimentToggles.onboardingDesignExperimentOct25()).thenReturn(mockToggle)
         whenever(mockToggle.isEnabled()).thenReturn(true)
         whenever(mockToggle.getCohort()).thenReturn(mockCohort)
         whenever(mockToggle.getCohort()!!.name).thenReturn(OnboardingDesignExperimentToggles.OnboardingDesignExperimentCohort.BUCK.cohortName)
@@ -202,7 +202,7 @@ class OnboardingDesignExperimentManagerTest {
         val mockToggle = mock<Toggle>()
         val mockCohort = mock<Toggle.State.Cohort>()
 
-        whenever(onboardingDesignExperimentToggles.onboardingDesignExperimentAug25()).thenReturn(mockToggle)
+        whenever(onboardingDesignExperimentToggles.onboardingDesignExperimentOct25()).thenReturn(mockToggle)
         whenever(mockToggle.isEnabled()).thenReturn(true)
         whenever(mockToggle.getCohort()).thenReturn(mockCohort)
         whenever(mockToggle.getCohort()!!.name).thenReturn(OnboardingDesignExperimentToggles.OnboardingDesignExperimentCohort.BB.cohortName)
@@ -219,7 +219,7 @@ class OnboardingDesignExperimentManagerTest {
     @Test
     fun whenDeviceIsEligibleThenUserIsAttemptedToBeEnrolled() = runTest {
         val mockToggle = mock<Toggle>()
-        whenever(onboardingDesignExperimentToggles.onboardingDesignExperimentAug25()).thenReturn(mockToggle)
+        whenever(onboardingDesignExperimentToggles.onboardingDesignExperimentOct25()).thenReturn(mockToggle)
         whenever(appBuildConfig.sdkInt).thenReturn(35)
         whenever(appBuildConfig.isAppReinstall()).thenReturn(false)
         whenever(deviceInfo.formFactor()).thenReturn(PHONE)
@@ -232,7 +232,7 @@ class OnboardingDesignExperimentManagerTest {
     @Test
     fun whenDeviceIsTabletThenUserIsNotEnrolled() = runTest {
         val mockToggle = mock<Toggle>()
-        whenever(onboardingDesignExperimentToggles.onboardingDesignExperimentAug25()).thenReturn(mockToggle)
+        whenever(onboardingDesignExperimentToggles.onboardingDesignExperimentOct25()).thenReturn(mockToggle)
         whenever(appBuildConfig.sdkInt).thenReturn(35)
         whenever(appBuildConfig.isAppReinstall()).thenReturn(false)
         whenever(deviceInfo.formFactor()).thenReturn(TABLET)
@@ -245,7 +245,7 @@ class OnboardingDesignExperimentManagerTest {
     @Test
     fun whenDeviceIsOlderThanAndroid11ThenUserIsNotEnrolled() = runTest {
         val mockToggle = mock<Toggle>()
-        whenever(onboardingDesignExperimentToggles.onboardingDesignExperimentAug25()).thenReturn(mockToggle)
+        whenever(onboardingDesignExperimentToggles.onboardingDesignExperimentOct25()).thenReturn(mockToggle)
         whenever(appBuildConfig.sdkInt).thenReturn(29)
         whenever(appBuildConfig.isAppReinstall()).thenReturn(false)
         whenever(deviceInfo.formFactor()).thenReturn(PHONE)
@@ -258,7 +258,7 @@ class OnboardingDesignExperimentManagerTest {
     @Test
     fun whenInstallIsReinstallThenUserIsNotEnrolled() = runTest {
         val mockToggle = mock<Toggle>()
-        whenever(onboardingDesignExperimentToggles.onboardingDesignExperimentAug25()).thenReturn(mockToggle)
+        whenever(onboardingDesignExperimentToggles.onboardingDesignExperimentOct25()).thenReturn(mockToggle)
         whenever(appBuildConfig.sdkInt).thenReturn(29)
         whenever(appBuildConfig.isAppReinstall()).thenReturn(true)
         whenever(deviceInfo.formFactor()).thenReturn(PHONE)
