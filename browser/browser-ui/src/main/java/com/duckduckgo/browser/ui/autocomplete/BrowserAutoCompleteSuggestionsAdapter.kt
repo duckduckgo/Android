@@ -112,8 +112,12 @@ class BrowserAutoCompleteSuggestionsAdapter(
         viewType: Int,
     ): AutoCompleteViewHolder = viewHolderFactoryMap.getValue(viewType).onCreateViewHolder(parent)
 
-    override fun getItemViewType(position: Int): Int =
-        when (val item = items[position]) {
+    override fun getItemViewType(position: Int): Int {
+        if (items.isEmpty() && phrase.isNotBlank()) {
+            return Type.EMPTY_TYPE
+        }
+
+        return when (val item = items[position]) {
             is AutoCompleteItem.Divider -> Type.DIVIDER_TYPE
             is AutoCompleteItem.Suggestion ->
                 when (item.value) {
