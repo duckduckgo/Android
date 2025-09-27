@@ -65,8 +65,14 @@ data class BrowserViewState(
 
 sealed class VpnMenuState {
     data object Hidden : VpnMenuState()
+
     data object NotSubscribed : VpnMenuState()
-    data class Subscribed(val isVpnEnabled: Boolean) : VpnMenuState()
+
+    data object NotSubscribedNoPill : VpnMenuState()
+
+    data class Subscribed(
+        val isVpnEnabled: Boolean,
+    ) : VpnMenuState()
 }
 
 sealed class HighlightableButton {
@@ -77,17 +83,15 @@ sealed class HighlightableButton {
 
     data object Gone : HighlightableButton()
 
-    fun isHighlighted(): Boolean {
-        return when (this) {
+    fun isHighlighted(): Boolean =
+        when (this) {
             is Visible -> this.highlighted
             is Gone -> false
         }
-    }
 
-    fun isEnabled(): Boolean {
-        return when (this) {
+    fun isEnabled(): Boolean =
+        when (this) {
             is Visible -> this.enabled
             is Gone -> false
         }
-    }
 }
