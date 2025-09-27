@@ -4663,6 +4663,16 @@
       return deviceInfo;
     }
     /**
+     * Helper to wrap a promise with timeout
+     * @param {Promise} promise - Promise to wrap
+     * @param {number} timeoutMs - Timeout in milliseconds
+     * @returns {Promise} Promise that rejects on timeout
+     */
+    withTimeout(promise, timeoutMs) {
+      const timeout = new Promise((_resolve, reject) => setTimeout(() => reject(new Error("Request timeout")), timeoutMs));
+      return Promise.race([promise, timeout]);
+    }
+    /**
      * Fixes device enumeration to handle permission prompts gracefully
      */
     deviceEnumerationFix() {
@@ -4677,8 +4687,12 @@
          * @returns {Promise<MediaDeviceInfo[]>}
          */
         apply: async (target, thisArg, args) => {
+          const settings = this.getFeatureSetting("enumerateDevices") || {};
+          const timeoutEnabled = settings.timeoutEnabled !== false;
+          const timeoutMs = settings.timeoutMs ?? 2e3;
           try {
-            const response = await this.messaging.request(MSG_DEVICE_ENUMERATION, {});
+            const messagingPromise = this.messaging.request(MSG_DEVICE_ENUMERATION, {});
+            const response = timeoutEnabled ? await this.withTimeout(messagingPromise, timeoutMs) : await messagingPromise;
             if (response.willPrompt) {
               const devices = [];
               if (response.videoInput) {
