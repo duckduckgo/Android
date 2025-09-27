@@ -17,10 +17,13 @@
 package com.duckduckgo.pir.impl.store
 
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.common.utils.CurrentTimeProvider
+import com.duckduckgo.pir.impl.models.scheduling.JobRecord.EmailConfirmationJobRecord
 import com.duckduckgo.pir.impl.models.scheduling.JobRecord.OptOutJobRecord
 import com.duckduckgo.pir.impl.models.scheduling.JobRecord.OptOutJobRecord.OptOutJobStatus
 import com.duckduckgo.pir.impl.models.scheduling.JobRecord.ScanJobRecord
 import com.duckduckgo.pir.impl.models.scheduling.JobRecord.ScanJobRecord.ScanJobStatus
+import com.duckduckgo.pir.impl.store.db.EmailConfirmationJobRecordEntity
 import com.duckduckgo.pir.impl.store.db.JobSchedulingDao
 import com.duckduckgo.pir.impl.store.db.OptOutJobRecordEntity
 import com.duckduckgo.pir.impl.store.db.ScanJobRecordEntity
@@ -42,13 +45,17 @@ class RealPirSchedulingRepositoryTest {
     private lateinit var testee: RealPirSchedulingRepository
 
     private val mockJobSchedulingDao: JobSchedulingDao = mock()
+    private val mockCurrentTimeProvider: CurrentTimeProvider = mock()
 
     @Before
     fun setUp() {
         testee = RealPirSchedulingRepository(
             dispatcherProvider = coroutineRule.testDispatcherProvider,
             jobSchedulingDao = mockJobSchedulingDao,
+            currentTimeProvider = mockCurrentTimeProvider,
         )
+
+        whenever(mockCurrentTimeProvider.currentTimeMillis()).thenReturn(9000L)
     }
 
     // Test data
@@ -104,6 +111,58 @@ class RealPirSchedulingRepositoryTest {
         lastOptOutAttemptDateInMillis = 1000L,
         optOutRequestedDateInMillis = 2000L,
         optOutRemovedDateInMillis = 0L,
+    )
+
+    // Email confirmation test data
+    private val emailConfirmationJobEntity = EmailConfirmationJobRecordEntity(
+        extractedProfileId = 1001L,
+        brokerName = "email-broker",
+        userProfileId = 123L,
+        email = "test@example.com",
+        attemptId = "attempt-123",
+        dateCreatedInMillis = 5000L,
+        emailConfirmationLink = "",
+        linkFetchAttemptCount = 0,
+        lastLinkFetchDateInMillis = 0L,
+        jobAttemptCount = 0,
+        lastJobAttemptDateInMillis = 0L,
+        deprecated = false,
+    )
+
+    private val emailConfirmationJobEntityWithLink = EmailConfirmationJobRecordEntity(
+        extractedProfileId = 1002L,
+        brokerName = "email-broker-2",
+        userProfileId = 456L,
+        email = "test2@example.com",
+        attemptId = "attempt-456",
+        dateCreatedInMillis = 6000L,
+        emailConfirmationLink = "https://example.com/confirm?token=abc123",
+        linkFetchAttemptCount = 1,
+        lastLinkFetchDateInMillis = 7000L,
+        jobAttemptCount = 0,
+        lastJobAttemptDateInMillis = 0L,
+        deprecated = false,
+    )
+
+    private val emailConfirmationJobRecord = EmailConfirmationJobRecord(
+        extractedProfileId = 1001L,
+        brokerName = "email-broker",
+        userProfileId = 123L,
+        emailData = EmailConfirmationJobRecord.EmailData(
+            email = "test@example.com",
+            attemptId = "attempt-123",
+        ),
+        linkFetchData = EmailConfirmationJobRecord.LinkFetchData(
+            emailConfirmationLink = "",
+            linkFetchAttemptCount = 0,
+            lastLinkFetchDateInMillis = 0L,
+        ),
+        jobAttemptData = EmailConfirmationJobRecord.JobAttemptData(
+            jobAttemptCount = 0,
+            lastJobAttemptDateInMillis = 0L,
+        ),
+        dateCreatedInMillis = 5000L,
+        deprecated = false,
     )
 
     // ScanJobRecord tests
@@ -479,5 +538,275 @@ class RealPirSchedulingRepositoryTest {
         assertTrue(result.any { it.status == OptOutJobStatus.REQUESTED })
         assertTrue(result.any { it.status == OptOutJobStatus.REMOVED })
         assertTrue(result.any { it.status == OptOutJobStatus.ERROR })
+    }
+
+    // Email confirmation job tests
+    @Test
+    fun whenSaveEmailConfirmationJobRecordThenConvertAndSaveToDao() = runTest {
+        testee.saveEmailConfirmationJobRecord(emailConfirmationJobRecord.copy(dateCreatedInMillis = 0L))
+
+        verify(mockJobSchedulingDao).saveEmailConfirmationJobRecord(
+            EmailConfirmationJobRecordEntity(
+                extractedProfileId = 1001L,
+                brokerName = "email-broker",
+                userProfileId = 123L,
+                email = "test@example.com",
+                attemptId = "attempt-123",
+                dateCreatedInMillis = 9000L,
+                emailConfirmationLink = "",
+                linkFetchAttemptCount = 0,
+                lastLinkFetchDateInMillis = 0L,
+                jobAttemptCount = 0,
+                lastJobAttemptDateInMillis = 0L,
+                deprecated = false,
+            ),
+        )
+    }
+
+    @Test
+    fun whenSaveEmailConfirmationJobRecordWithLinkDataThenConvertAndSaveToDao() = runTest {
+        val emailJobRecordWithLink = emailConfirmationJobRecord.copy(
+            linkFetchData = EmailConfirmationJobRecord.LinkFetchData(
+                emailConfirmationLink = "https://example.com/confirm?token=xyz",
+                linkFetchAttemptCount = 2,
+                lastLinkFetchDateInMillis = 9000L,
+            ),
+            jobAttemptData = EmailConfirmationJobRecord.JobAttemptData(
+                jobAttemptCount = 1,
+                lastJobAttemptDateInMillis = 10000L,
+            ),
+        )
+
+        testee.saveEmailConfirmationJobRecord(emailJobRecordWithLink)
+
+        verify(mockJobSchedulingDao).saveEmailConfirmationJobRecord(
+            EmailConfirmationJobRecordEntity(
+                extractedProfileId = 1001L,
+                brokerName = "email-broker",
+                userProfileId = 123L,
+                email = "test@example.com",
+                attemptId = "attempt-123",
+                dateCreatedInMillis = 5000L,
+                emailConfirmationLink = "https://example.com/confirm?token=xyz",
+                linkFetchAttemptCount = 2,
+                lastLinkFetchDateInMillis = 9000L,
+                jobAttemptCount = 1,
+                lastJobAttemptDateInMillis = 10000L,
+                deprecated = false,
+            ),
+        )
+    }
+
+    @Test
+    fun whenGetEmailConfirmationJobsWithNoLinkThenReturnOnlyJobsWithoutLink() = runTest {
+        whenever(mockJobSchedulingDao.getAllActiveEmailConfirmationJobRecordsWithNoLink()).thenReturn(
+            listOf(emailConfirmationJobEntity),
+        )
+
+        val result = testee.getEmailConfirmationJobsWithNoLink()
+
+        assertEquals(1, result.size)
+        assertEquals(1001L, result[0].extractedProfileId)
+        assertEquals("email-broker", result[0].brokerName)
+        assertEquals(123L, result[0].userProfileId)
+        assertEquals("test@example.com", result[0].emailData.email)
+        assertEquals("attempt-123", result[0].emailData.attemptId)
+        assertEquals("", result[0].linkFetchData.emailConfirmationLink)
+        assertEquals(0, result[0].linkFetchData.linkFetchAttemptCount)
+        assertEquals(0L, result[0].linkFetchData.lastLinkFetchDateInMillis)
+        assertEquals(0, result[0].jobAttemptData.jobAttemptCount)
+        assertEquals(0L, result[0].jobAttemptData.lastJobAttemptDateInMillis)
+        assertEquals(5000L, result[0].dateCreatedInMillis)
+        assertEquals(false, result[0].deprecated)
+    }
+
+    @Test
+    fun whenGetEmailConfirmationJobsWithNoLinkAndNoneExistThenReturnEmptyList() = runTest {
+        whenever(mockJobSchedulingDao.getAllActiveEmailConfirmationJobRecordsWithNoLink()).thenReturn(emptyList())
+
+        val result = testee.getEmailConfirmationJobsWithNoLink()
+
+        assertTrue(result.isEmpty())
+    }
+
+    @Test
+    fun whenGetEmailConfirmationJobsWithLinkThenReturnOnlyJobsWithLink() = runTest {
+        whenever(mockJobSchedulingDao.getAllActiveEmailConfirmationJobRecordsWithLink()).thenReturn(
+            listOf(emailConfirmationJobEntityWithLink),
+        )
+
+        val result = testee.getEmailConfirmationJobsWithLink()
+
+        assertEquals(1, result.size)
+        assertEquals(1002L, result[0].extractedProfileId)
+        assertEquals("email-broker-2", result[0].brokerName)
+        assertEquals(456L, result[0].userProfileId)
+        assertEquals("test2@example.com", result[0].emailData.email)
+        assertEquals("attempt-456", result[0].emailData.attemptId)
+        assertEquals("https://example.com/confirm?token=abc123", result[0].linkFetchData.emailConfirmationLink)
+        assertEquals(1, result[0].linkFetchData.linkFetchAttemptCount)
+        assertEquals(7000L, result[0].linkFetchData.lastLinkFetchDateInMillis)
+        assertEquals(0, result[0].jobAttemptData.jobAttemptCount)
+        assertEquals(0L, result[0].jobAttemptData.lastJobAttemptDateInMillis)
+        assertEquals(6000L, result[0].dateCreatedInMillis)
+        assertEquals(false, result[0].deprecated)
+    }
+
+    @Test
+    fun whenGetEmailConfirmationJobsWithLinkAndNoneExistThenReturnEmptyList() = runTest {
+        whenever(mockJobSchedulingDao.getAllActiveEmailConfirmationJobRecordsWithLink()).thenReturn(emptyList())
+
+        val result = testee.getEmailConfirmationJobsWithLink()
+
+        assertTrue(result.isEmpty())
+    }
+
+    @Test
+    fun whenGetEmailConfirmationJobsWithLinkAndMultipleExistThenReturnAll() = runTest {
+        val anotherJobWithLink = emailConfirmationJobEntityWithLink.copy(
+            extractedProfileId = 1004L,
+            brokerName = "another-email-broker",
+            userProfileId = 789L,
+            email = "another@example.com",
+            attemptId = "attempt-789",
+            emailConfirmationLink = "https://example.com/confirm?token=def456",
+            linkFetchAttemptCount = 3,
+            lastLinkFetchDateInMillis = 8000L,
+            jobAttemptCount = 2,
+            lastJobAttemptDateInMillis = 9000L,
+        )
+
+        whenever(mockJobSchedulingDao.getAllActiveEmailConfirmationJobRecordsWithLink()).thenReturn(
+            listOf(emailConfirmationJobEntityWithLink, anotherJobWithLink),
+        )
+
+        val result = testee.getEmailConfirmationJobsWithLink()
+
+        assertEquals(2, result.size)
+        assertTrue(result.any { it.extractedProfileId == 1002L })
+        assertTrue(result.any { it.extractedProfileId == 1004L })
+        assertTrue(result.all { it.linkFetchData.emailConfirmationLink.isNotEmpty() })
+    }
+
+    @Test
+    fun whenGetEmailConfirmationJobAndJobExistsThenReturnJob() = runTest {
+        whenever(mockJobSchedulingDao.getEmailConfirmationJobRecord(1001L)).thenReturn(emailConfirmationJobEntity)
+
+        val result = testee.getEmailConfirmationJob(1001L)
+
+        assertEquals(1001L, result?.extractedProfileId)
+        assertEquals("email-broker", result?.brokerName)
+        assertEquals(123L, result?.userProfileId)
+        assertEquals("test@example.com", result?.emailData?.email)
+        assertEquals("attempt-123", result?.emailData?.attemptId)
+        assertEquals("", result?.linkFetchData?.emailConfirmationLink)
+        assertEquals(0, result?.linkFetchData?.linkFetchAttemptCount)
+        assertEquals(0L, result?.linkFetchData?.lastLinkFetchDateInMillis)
+        assertEquals(0, result?.jobAttemptData?.jobAttemptCount)
+        assertEquals(0L, result?.jobAttemptData?.lastJobAttemptDateInMillis)
+        assertEquals(5000L, result?.dateCreatedInMillis)
+        assertEquals(false, result?.deprecated)
+    }
+
+    @Test
+    fun whenGetEmailConfirmationJobAndJobNotFoundThenReturnNull() = runTest {
+        whenever(mockJobSchedulingDao.getEmailConfirmationJobRecord(9999L)).thenReturn(null)
+
+        val result = testee.getEmailConfirmationJob(9999L)
+
+        assertEquals(null, result)
+    }
+
+    @Test
+    fun whenGetEmailConfirmationJobWithComplexDataThenReturnCorrectJob() = runTest {
+        whenever(mockJobSchedulingDao.getEmailConfirmationJobRecord(1002L)).thenReturn(emailConfirmationJobEntityWithLink)
+
+        val result = testee.getEmailConfirmationJob(1002L)
+
+        assertEquals(1002L, result?.extractedProfileId)
+        assertEquals("email-broker-2", result?.brokerName)
+        assertEquals(456L, result?.userProfileId)
+        assertEquals("test2@example.com", result?.emailData?.email)
+        assertEquals("attempt-456", result?.emailData?.attemptId)
+        assertEquals("https://example.com/confirm?token=abc123", result?.linkFetchData?.emailConfirmationLink)
+        assertEquals(1, result?.linkFetchData?.linkFetchAttemptCount)
+        assertEquals(7000L, result?.linkFetchData?.lastLinkFetchDateInMillis)
+        assertEquals(0, result?.jobAttemptData?.jobAttemptCount)
+        assertEquals(0L, result?.jobAttemptData?.lastJobAttemptDateInMillis)
+        assertEquals(6000L, result?.dateCreatedInMillis)
+        assertEquals(false, result?.deprecated)
+    }
+
+    @Test
+    fun whenDeleteEmailConfirmationJobRecordThenCallDao() = runTest {
+        val extractedProfileId = 1001L
+
+        testee.deleteEmailConfirmationJobRecord(extractedProfileId)
+
+        verify(mockJobSchedulingDao).deleteEmailConfirmationJobRecord(extractedProfileId)
+    }
+
+    @Test
+    fun whenDeleteAllEmailConfirmationJobRecordsThenCallDao() = runTest {
+        testee.deleteAllEmailConfirmationJobRecords()
+
+        verify(mockJobSchedulingDao).deleteAllEmailConfirmationJobRecords()
+    }
+
+    // Entity to model conversion tests
+    @Test
+    fun whenConvertEmailConfirmationJobEntityToRecordThenMapCorrectly() = runTest {
+        whenever(mockJobSchedulingDao.getEmailConfirmationJobRecord(1001L)).thenReturn(emailConfirmationJobEntity)
+
+        val result = testee.getEmailConfirmationJob(1001L)
+
+        // Verify all fields are correctly mapped
+        assertEquals(emailConfirmationJobEntity.extractedProfileId, result?.extractedProfileId)
+        assertEquals(emailConfirmationJobEntity.brokerName, result?.brokerName)
+        assertEquals(emailConfirmationJobEntity.userProfileId, result?.userProfileId)
+        assertEquals(emailConfirmationJobEntity.email, result?.emailData?.email)
+        assertEquals(emailConfirmationJobEntity.attemptId, result?.emailData?.attemptId)
+        assertEquals(emailConfirmationJobEntity.emailConfirmationLink, result?.linkFetchData?.emailConfirmationLink)
+        assertEquals(emailConfirmationJobEntity.linkFetchAttemptCount, result?.linkFetchData?.linkFetchAttemptCount)
+        assertEquals(emailConfirmationJobEntity.lastLinkFetchDateInMillis, result?.linkFetchData?.lastLinkFetchDateInMillis)
+        assertEquals(emailConfirmationJobEntity.jobAttemptCount, result?.jobAttemptData?.jobAttemptCount)
+        assertEquals(emailConfirmationJobEntity.lastJobAttemptDateInMillis, result?.jobAttemptData?.lastJobAttemptDateInMillis)
+        assertEquals(emailConfirmationJobEntity.dateCreatedInMillis, result?.dateCreatedInMillis)
+        assertEquals(emailConfirmationJobEntity.deprecated, result?.deprecated)
+    }
+
+    @Test
+    fun whenConvertEmailConfirmationJobRecordToEntityThenMapCorrectly() = runTest {
+        val emailJobWithComplexData = emailConfirmationJobRecord.copy(
+            linkFetchData = EmailConfirmationJobRecord.LinkFetchData(
+                emailConfirmationLink = "https://test.com/confirm",
+                linkFetchAttemptCount = 5,
+                lastLinkFetchDateInMillis = 12000L,
+            ),
+            jobAttemptData = EmailConfirmationJobRecord.JobAttemptData(
+                jobAttemptCount = 3,
+                lastJobAttemptDateInMillis = 13000L,
+            ),
+            deprecated = true,
+        )
+
+        testee.saveEmailConfirmationJobRecord(emailJobWithComplexData)
+
+        verify(mockJobSchedulingDao).saveEmailConfirmationJobRecord(
+            EmailConfirmationJobRecordEntity(
+                extractedProfileId = emailJobWithComplexData.extractedProfileId,
+                brokerName = emailJobWithComplexData.brokerName,
+                userProfileId = emailJobWithComplexData.userProfileId,
+                email = emailJobWithComplexData.emailData.email,
+                attemptId = emailJobWithComplexData.emailData.attemptId,
+                dateCreatedInMillis = emailJobWithComplexData.dateCreatedInMillis,
+                emailConfirmationLink = emailJobWithComplexData.linkFetchData.emailConfirmationLink,
+                linkFetchAttemptCount = emailJobWithComplexData.linkFetchData.linkFetchAttemptCount,
+                lastLinkFetchDateInMillis = emailJobWithComplexData.linkFetchData.lastLinkFetchDateInMillis,
+                jobAttemptCount = emailJobWithComplexData.jobAttemptData.jobAttemptCount,
+                lastJobAttemptDateInMillis = emailJobWithComplexData.jobAttemptData.lastJobAttemptDateInMillis,
+                deprecated = emailJobWithComplexData.deprecated,
+            ),
+        )
     }
 }

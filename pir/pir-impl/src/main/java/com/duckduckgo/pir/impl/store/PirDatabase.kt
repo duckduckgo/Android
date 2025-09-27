@@ -28,6 +28,7 @@ import com.duckduckgo.pir.impl.store.db.BrokerJsonEtag
 import com.duckduckgo.pir.impl.store.db.BrokerOptOut
 import com.duckduckgo.pir.impl.store.db.BrokerScan
 import com.duckduckgo.pir.impl.store.db.BrokerSchedulingConfigEntity
+import com.duckduckgo.pir.impl.store.db.EmailConfirmationJobRecordEntity
 import com.duckduckgo.pir.impl.store.db.ExtractedProfileDao
 import com.duckduckgo.pir.impl.store.db.JobSchedulingDao
 import com.duckduckgo.pir.impl.store.db.MirrorSiteEntity
@@ -50,7 +51,7 @@ import com.squareup.moshi.Types
 
 @Database(
     exportSchema = true,
-    version = 8,
+    version = 9,
     entities = [
         BrokerJsonEtag::class,
         BrokerEntity::class,
@@ -67,6 +68,7 @@ import com.squareup.moshi.Types
         ScanJobRecordEntity::class,
         OptOutJobRecordEntity::class,
         MirrorSiteEntity::class,
+        EmailConfirmationJobRecordEntity::class,
     ],
 )
 @TypeConverters(PirDatabaseConverters::class)

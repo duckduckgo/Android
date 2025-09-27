@@ -16,12 +16,15 @@
 
 package com.duckduckgo.pir.impl.store
 
+import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.pir.impl.models.scheduling.JobRecord.EmailConfirmationJobRecord
 import com.duckduckgo.pir.impl.models.scheduling.JobRecord.OptOutJobRecord
 import com.duckduckgo.pir.impl.models.scheduling.JobRecord.OptOutJobRecord.OptOutJobStatus
 import com.duckduckgo.pir.impl.models.scheduling.JobRecord.ScanJobRecord
 import com.duckduckgo.pir.impl.models.scheduling.JobRecord.ScanJobRecord.ScanJobStatus
+import com.duckduckgo.pir.impl.store.db.EmailConfirmationJobRecordEntity
 import com.duckduckgo.pir.impl.store.db.JobSchedulingDao
 import com.duckduckgo.pir.impl.store.db.OptOutJobRecordEntity
 import com.duckduckgo.pir.impl.store.db.ScanJobRecordEntity
@@ -70,6 +73,13 @@ interface PirSchedulingRepository {
     suspend fun deleteAllJobRecords()
     suspend fun deleteAllScanJobRecords()
     suspend fun deleteAllOptOutJobRecords()
+
+    suspend fun saveEmailConfirmationJobRecord(emailConfirmationJobRecord: EmailConfirmationJobRecord)
+    suspend fun getEmailConfirmationJobsWithNoLink(): List<EmailConfirmationJobRecord>
+    suspend fun getEmailConfirmationJobsWithLink(): List<EmailConfirmationJobRecord>
+    suspend fun getEmailConfirmationJob(extractedProfileId: Long): EmailConfirmationJobRecord?
+    suspend fun deleteEmailConfirmationJobRecord(extractedProfileId: Long)
+    suspend fun deleteAllEmailConfirmationJobRecords()
 }
 
 @ContributesBinding(
@@ -80,6 +90,7 @@ interface PirSchedulingRepository {
 class RealPirSchedulingRepository @Inject constructor(
     private val dispatcherProvider: DispatcherProvider,
     private val jobSchedulingDao: JobSchedulingDao,
+    private val currentTimeProvider: CurrentTimeProvider,
 ) : PirSchedulingRepository {
 
     override suspend fun getAllValidScanJobRecords(): List<ScanJobRecord> = withContext(dispatcherProvider.io()) {
@@ -242,5 +253,83 @@ class RealPirSchedulingRepository @Inject constructor(
         withContext(dispatcherProvider.io()) {
             jobSchedulingDao.deleteAllOptOutJobRecords()
         }
+    }
+
+    override suspend fun saveEmailConfirmationJobRecord(emailConfirmationJobRecord: EmailConfirmationJobRecord) {
+        withContext(dispatcherProvider.io()) {
+            jobSchedulingDao.saveEmailConfirmationJobRecord(emailConfirmationJobRecord.toEntity())
+        }
+    }
+
+    override suspend fun getEmailConfirmationJobsWithNoLink(): List<EmailConfirmationJobRecord> = withContext(dispatcherProvider.io()) {
+        return@withContext jobSchedulingDao.getAllActiveEmailConfirmationJobRecordsWithNoLink().map {
+            it.toRecord()
+        }
+    }
+
+    override suspend fun getEmailConfirmationJobsWithLink(): List<EmailConfirmationJobRecord> = withContext(dispatcherProvider.io()) {
+        return@withContext jobSchedulingDao.getAllActiveEmailConfirmationJobRecordsWithLink().map {
+            it.toRecord()
+        }
+    }
+
+    override suspend fun getEmailConfirmationJob(extractedProfileId: Long): EmailConfirmationJobRecord? = withContext(dispatcherProvider.io()) {
+        return@withContext jobSchedulingDao.getEmailConfirmationJobRecord(extractedProfileId)?.toRecord()
+    }
+
+    override suspend fun deleteEmailConfirmationJobRecord(extractedProfileId: Long) {
+        withContext(dispatcherProvider.io()) {
+            jobSchedulingDao.deleteEmailConfirmationJobRecord(extractedProfileId)
+        }
+    }
+
+    override suspend fun deleteAllEmailConfirmationJobRecords() {
+        withContext(dispatcherProvider.io()) {
+            jobSchedulingDao.deleteAllEmailConfirmationJobRecords()
+        }
+    }
+
+    private fun EmailConfirmationJobRecord.toEntity(): EmailConfirmationJobRecordEntity {
+        return EmailConfirmationJobRecordEntity(
+            extractedProfileId = this.extractedProfileId,
+            brokerName = this.brokerName,
+            userProfileId = this.userProfileId,
+            email = this.emailData.email,
+            attemptId = this.emailData.attemptId,
+            dateCreatedInMillis = if (this.dateCreatedInMillis != 0L) {
+                this.dateCreatedInMillis
+            } else {
+                currentTimeProvider.currentTimeMillis()
+            },
+            emailConfirmationLink = this.linkFetchData.emailConfirmationLink,
+            linkFetchAttemptCount = this.linkFetchData.linkFetchAttemptCount,
+            lastLinkFetchDateInMillis = this.linkFetchData.lastLinkFetchDateInMillis,
+            jobAttemptCount = this.jobAttemptData.jobAttemptCount,
+            lastJobAttemptDateInMillis = this.jobAttemptData.lastJobAttemptDateInMillis,
+            deprecated = this.deprecated,
+        )
+    }
+
+    private fun EmailConfirmationJobRecordEntity.toRecord(): EmailConfirmationJobRecord {
+        return EmailConfirmationJobRecord(
+            extractedProfileId = this.extractedProfileId,
+            brokerName = this.brokerName,
+            userProfileId = this.userProfileId,
+            emailData = EmailConfirmationJobRecord.EmailData(
+                email = this.email,
+                attemptId = this.attemptId,
+            ),
+            linkFetchData = EmailConfirmationJobRecord.LinkFetchData(
+                emailConfirmationLink = this.emailConfirmationLink,
+                linkFetchAttemptCount = this.linkFetchAttemptCount,
+                lastLinkFetchDateInMillis = this.lastLinkFetchDateInMillis,
+            ),
+            jobAttemptData = EmailConfirmationJobRecord.JobAttemptData(
+                jobAttemptCount = this.jobAttemptCount,
+                lastJobAttemptDateInMillis = this.lastJobAttemptDateInMillis,
+            ),
+            dateCreatedInMillis = this.dateCreatedInMillis,
+            deprecated = this.deprecated,
+        )
     }
 }
