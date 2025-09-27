@@ -14,18 +14,10 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.js.messaging.api
+package com.duckduckgo.browser.api
 
-import android.webkit.WebView
+import com.duckduckgo.js.messaging.api.AddDocumentStartJavaScript
 
-/**
- * Plugin interface for injecting JavaScript code that executes at document start.
- * * Allows plugins to inject JavaScript that will be executed before any other scripts on the page.
- * Useful for privacy protections and that need to run as early as possible and/or on iframes.
- */
 interface AddDocumentStartJavaScriptPlugin {
-
-    fun addDocumentStartJavaScript(
-        webView: WebView,
-    )
+    fun addDocumentStartJavaScript(): AddDocumentStartJavaScript
 }

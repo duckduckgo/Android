@@ -35,6 +35,7 @@ dependencies {
     implementation KotlinX.coroutines.core
     implementation Google.dagger
     implementation Square.retrofit2.converter.moshi
+    implementation AndroidX.webkit
 
     // Testing dependencies
     testImplementation "org.mockito.kotlin:mockito-kotlin:_"

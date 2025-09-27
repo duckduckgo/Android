@@ -67,6 +67,7 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.autoconsent.api.Autoconsent
 import com.duckduckgo.autofill.api.BrowserAutofill
 import com.duckduckgo.autofill.api.InternalTestUserChecker
+import com.duckduckgo.browser.api.AddDocumentStartJavaScriptPlugin
 import com.duckduckgo.browser.api.JsInjectorPlugin
 import com.duckduckgo.browser.api.WebViewVersionProvider
 import com.duckduckgo.common.test.CoroutineTestRule
@@ -84,7 +85,7 @@ import com.duckduckgo.duckplayer.api.DuckPlayer.OpenDuckPlayerInNewTab.On
 import com.duckduckgo.duckplayer.api.DuckPlayer.OpenDuckPlayerInNewTab.Unavailable
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.history.api.NavigationHistory
-import com.duckduckgo.js.messaging.api.AddDocumentStartJavaScriptPlugin
+import com.duckduckgo.js.messaging.api.AddDocumentStartJavaScript
 import com.duckduckgo.js.messaging.api.PostMessageWrapperPlugin
 import com.duckduckgo.js.messaging.api.SubscriptionEventData
 import com.duckduckgo.js.messaging.api.WebMessagingPlugin
@@ -355,10 +356,10 @@ class BrowserWebViewClientTest {
     @UiThreadTest
     @Test
     fun whenConfigureWebViewThenInjectJsCode() {
-        assertEquals(0, fakeAddDocumentStartJavaScriptPlugins.plugin.countInitted)
+        assertEquals(0, fakeAddDocumentStartJavaScriptPlugins.plugin.addDocumentStartJavaScript().countInitted)
         val mockCallback = mock<WebViewCompatMessageCallback>()
         testee.configureWebView(DuckDuckGoWebView(context), mockCallback)
-        assertEquals(1, fakeAddDocumentStartJavaScriptPlugins.plugin.countInitted)
+        assertEquals(1, fakeAddDocumentStartJavaScriptPlugins.plugin.addDocumentStartJavaScript().countInitted)
     }
 
     @UiThreadTest
@@ -1332,6 +1333,14 @@ class BrowserWebViewClientTest {
 
     class FakeAddDocumentStartJavaScriptPlugin : AddDocumentStartJavaScriptPlugin {
 
+        private val addDocumentStartJavaScript = FakeAddDocumentStartJavaScript()
+
+        override fun addDocumentStartJavaScript(): FakeAddDocumentStartJavaScript {
+            return addDocumentStartJavaScript
+        }
+    }
+
+    class FakeAddDocumentStartJavaScript : AddDocumentStartJavaScript {
         var countInitted = 0
             private set
 
