@@ -29,10 +29,19 @@ import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import logcat.LogPriority
 import logcat.logcat
 
 interface PageLoadedHandler {
-    fun onPageLoaded(url: String, title: String?, start: Long, end: Long, isTabInForeground: Boolean)
+    fun onPageLoaded(
+        url: String,
+        title: String?,
+        start: Long,
+        end: Long,
+        isTabInForegroundOnFinish: Boolean,
+        activeRequestsOnLoadStart: Int,
+        concurrentRequestsOnFinish: Int,
+    )
 }
 
 @ContributesBinding(AppScope::class)
@@ -46,7 +55,15 @@ class RealPageLoadedHandler @Inject constructor(
     private val optimizeTrackerEvaluationRCWrapper: OptimizeTrackerEvaluationRCWrapper,
 ) : PageLoadedHandler {
 
-    override fun onPageLoaded(url: String, title: String?, start: Long, end: Long, isTabInForeground: Boolean) {
+    override fun onPageLoaded(
+        url: String,
+        title: String?,
+        start: Long,
+        end: Long,
+        isTabInForegroundOnFinish: Boolean,
+        activeRequestsOnLoadStart: Int,
+        concurrentRequestsOnFinish: Int,
+    ) {
         appCoroutineScope.launch(dispatcherProvider.io()) {
             if (sites.any { UriString.sameOrSubdomain(url, it) }) {
                 pageLoadedPixelDao.add(
@@ -56,10 +73,17 @@ class RealPageLoadedHandler @Inject constructor(
                         appVersion = deviceInfo.appVersion,
                         cpmEnabled = autoconsent.isAutoconsentEnabled(),
                         trackerOptimizationEnabled = optimizeTrackerEvaluationRCWrapper.enabled,
+                        isTabInForegroundOnFinish = isTabInForegroundOnFinish,
+                        activeRequestsOnLoadStart = activeRequestsOnLoadStart,
+                        concurrentRequestsOnFinish = concurrentRequestsOnFinish,
                     ),
                 )
             }
-            logcat { "$$$: Page load time: ${end - start}, foreground: $isTabInForeground" }
+            logcat(LogPriority.DEBUG) {
+                "Page load time: ${end - start}, isTabInForegroundOnFinish: $isTabInForegroundOnFinish, " +
+                    "activeRequestsOnLoadStart: $activeRequestsOnLoadStart, " +
+                    "concurrentRequestsOnFinish: $concurrentRequestsOnFinish"
+            }
         }
     }
 }
