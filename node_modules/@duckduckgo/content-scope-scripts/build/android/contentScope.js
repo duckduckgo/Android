@@ -1362,7 +1362,7 @@
       "brokerProtection",
       "performanceMetrics",
       "breakageReporting",
-      "autofillPasswordImport",
+      "autofillImport",
       "favicon",
       "webTelemetry",
       "pageContext"
@@ -1381,7 +1381,7 @@
     ],
     android: [...baseFeatures, "webCompat", "breakageReporting", "duckPlayer", "messageBridge"],
     "android-broker-protection": ["brokerProtection"],
-    "android-autofill-password-import": ["autofillPasswordImport"],
+    "android-autofill-import": ["autofillImport"],
     "android-adsjs": [
       "apiManipulation",
       "webCompat",

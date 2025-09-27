@@ -36,7 +36,6 @@ import com.duckduckgo.autofill.api.AutofillScreenLaunchSource.InternalDevSetting
 import com.duckduckgo.autofill.api.AutofillScreens.AutofillPasswordsManagementScreen
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.autofill.api.email.EmailManager
-import com.duckduckgo.autofill.impl.R as autofillR
 import com.duckduckgo.autofill.impl.configuration.AutofillJavascriptEnvironmentConfiguration
 import com.duckduckgo.autofill.impl.email.incontext.store.EmailProtectionInContextDataStore
 import com.duckduckgo.autofill.impl.engagement.store.AutofillEngagementRepository
@@ -55,6 +54,8 @@ import com.duckduckgo.autofill.impl.importing.gpm.webflow.ImportGooglePasswordRe
 import com.duckduckgo.autofill.impl.importing.gpm.webflow.ImportGooglePasswordResult.Success
 import com.duckduckgo.autofill.impl.importing.gpm.webflow.ImportGooglePasswordResult.UserCancelled
 import com.duckduckgo.autofill.impl.importing.takeout.processor.TakeoutBookmarkImporter
+import com.duckduckgo.autofill.impl.importing.takeout.webflow.ImportGoogleBookmark.AutofillImportViaGoogleTakeoutScreen
+import com.duckduckgo.autofill.impl.importing.takeout.webflow.ImportGoogleBookmarkResult
 import com.duckduckgo.autofill.impl.importing.takeout.zip.TakeoutBookmarkExtractor
 import com.duckduckgo.autofill.impl.importing.takeout.zip.TakeoutBookmarkExtractor.ExtractionResult
 import com.duckduckgo.autofill.impl.reporting.AutofillSiteBreakageReportingDataStore
@@ -80,17 +81,17 @@ import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.savedsites.api.service.ImportSavedSitesResult
 import com.duckduckgo.savedsites.api.service.SavedSitesImporter.ImportFolder
 import com.google.android.material.snackbar.Snackbar
-import java.text.SimpleDateFormat
-import javax.inject.Inject
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import logcat.LogPriority
 import logcat.logcat
+import java.text.SimpleDateFormat
+import javax.inject.Inject
+import com.duckduckgo.autofill.impl.R as autofillR
 
 @InjectWith(ActivityScope::class)
 class AutofillInternalSettingsActivity : DuckDuckGoActivity() {
-
     private val binding: ActivityAutofillInternalSettingsBinding by viewBinding()
 
     @Inject
@@ -163,64 +164,66 @@ class AutofillInternalSettingsActivity : DuckDuckGoActivity() {
     // used to output duration of import
     private var importStartTime: Long = 0
 
-    private val importCsvLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-        if (result.resultCode == Activity.RESULT_OK) {
-            val data: Intent? = result.data
-            val fileUrl = data?.data
+    private val importCsvLauncher =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            if (result.resultCode == Activity.RESULT_OK) {
+                val data: Intent? = result.data
+                val fileUrl = data?.data
 
-            logcat { "onActivityResult for CSV file request. resultCode=${result.resultCode}. uri=$fileUrl" }
-            if (fileUrl != null) {
-                lifecycleScope.launch(dispatchers.io()) {
-                    when (val parseResult = csvCredentialConverter.readCsv(fileUrl)) {
-                        is CsvCredentialImportResult.Success -> {
-                            importStartTime = System.currentTimeMillis()
+                logcat { "onActivityResult for CSV file request. resultCode=${result.resultCode}. uri=$fileUrl" }
+                if (fileUrl != null) {
+                    lifecycleScope.launch(dispatchers.io()) {
+                        when (val parseResult = csvCredentialConverter.readCsv(fileUrl)) {
+                            is CsvCredentialImportResult.Success -> {
+                                importStartTime = System.currentTimeMillis()
 
-                            credentialImporter.import(
-                                parseResult.loginCredentialsToImport,
-                                parseResult.numberCredentialsInSource,
-                            )
-                            observePasswordInputUpdates()
-                        }
+                                credentialImporter.import(
+                                    parseResult.loginCredentialsToImport,
+                                    parseResult.numberCredentialsInSource,
+                                )
+                                observePasswordInputUpdates()
+                            }
 
-                        is CsvCredentialImportResult.Error -> {
-                            FAILED_IMPORT_GENERIC_ERROR.showSnackbar()
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    private val importBookmarksTakeoutZipLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-        if (result.resultCode == RESULT_OK) {
-            val data: Intent? = result.data
-            val fileUrl = data?.data
-
-            logcat { "onActivityResult for bookmarks zip request. uri=$fileUrl" }
-            fileUrl?.let { file ->
-                lifecycleScope.launch(dispatchers.io()) {
-                    // Extract HTML content from zip
-                    val extractionResult = takeoutZipTakeoutBookmarkExtractor.extractBookmarksHtml(file)
-                    logcat { "Bookmark extraction result: $extractionResult" }
-
-                    when (extractionResult) {
-                        is ExtractionResult.Success -> onBookmarksExtracted(extractionResult)
-                        is ExtractionResult.Error -> {
-                            "Error extracting bookmarks".showSnackbar()
-                            logcat(LogPriority.WARN) { "Error extracting bookmarks: ${extractionResult.exception.message}" }
+                            is CsvCredentialImportResult.Error -> {
+                                FAILED_IMPORT_GENERIC_ERROR.showSnackbar()
+                            }
                         }
                     }
                 }
             }
         }
-    }
+
+    private val importBookmarksTakeoutZipLauncher =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            if (result.resultCode == RESULT_OK) {
+                val data: Intent? = result.data
+                val fileUrl = data?.data
+
+                logcat { "onActivityResult for bookmarks zip request. uri=$fileUrl" }
+                fileUrl?.let { file ->
+                    lifecycleScope.launch(dispatchers.io()) {
+                        val extractionResult = takeoutZipTakeoutBookmarkExtractor.extractBookmarksFromFile(file)
+                        logcat { "Bookmark extraction result: $extractionResult" }
+
+                        when (extractionResult) {
+                            is ExtractionResult.Success -> onBookmarksExtracted(extractionResult)
+                            is ExtractionResult.Error -> {
+                                "Error extracting bookmarks".showSnackbar()
+                                logcat(LogPriority.WARN) { "Error extracting bookmarks: ${extractionResult.exception.message}" }
+                            }
+                        }
+                    }
+                }
+            }
+        }
 
     private suspend fun onBookmarksExtracted(extractionResult: ExtractionResult.Success) {
         when (
-            val importResult = takeoutBookmarkImporter.importBookmarks(
-                htmlContent = extractionResult.bookmarkHtmlContent,
-                destination = ImportFolder.Folder(getString(autofillR.string.autofillImportBookmarksChromeFolderName)),
-            )
+            val importResult =
+                takeoutBookmarkImporter.importBookmarks(
+                    extractionResult.tempFileUri,
+                    ImportFolder.Folder(getString(autofillR.string.autofillImportBookmarksChromeFolderName)),
+                )
         ) {
             is ImportSavedSitesResult.Success -> {
                 logcat { "Successfully imported ${importResult.savedSites.size} bookmarks" }
@@ -234,38 +237,64 @@ class AutofillInternalSettingsActivity : DuckDuckGoActivity() {
         }
     }
 
-    private val importGooglePasswordsFlowLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-        logcat { "onActivityResult for Google Password Manager import flow. resultCode=${result.resultCode}" }
+    private val importGooglePasswordsFlowLauncher =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            logcat { "onActivityResult for Google Password Manager import flow. resultCode=${result.resultCode}" }
 
-        if (result.resultCode == Activity.RESULT_OK) {
-            result.data?.let {
-                when (IntentCompat.getParcelableExtra(it, RESULT_KEY_DETAILS, ImportGooglePasswordResult::class.java)) {
-                    is Success -> observePasswordInputUpdates()
-                    is Error -> FAILED_IMPORT_GENERIC_ERROR.showSnackbar()
-                    is UserCancelled, null -> {
+            if (result.resultCode == Activity.RESULT_OK) {
+                result.data?.let {
+                    when (IntentCompat.getParcelableExtra(it, RESULT_KEY_DETAILS, ImportGooglePasswordResult::class.java)) {
+                        is Success -> observePasswordInputUpdates()
+                        is Error -> FAILED_IMPORT_GENERIC_ERROR.showSnackbar()
+                        is UserCancelled, null -> {
+                        }
                     }
                 }
             }
         }
-    }
+
+    private val importGoogleBookmarksFlowLauncher =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            logcat { "onActivityResult for Google Takeout bookmark import flow. resultCode=${result.resultCode}" }
+
+            if (result.resultCode == RESULT_OK) {
+                result.data?.let { intent ->
+                    when (
+                        val bookmarkResult =
+                            IntentCompat.getParcelableExtra(
+                                intent,
+                                ImportGoogleBookmarkResult.RESULT_KEY_DETAILS,
+                                ImportGoogleBookmarkResult::class.java,
+                            )
+                    ) {
+                        is ImportGoogleBookmarkResult.Success -> {
+                            "Successfully imported ${bookmarkResult.importedCount} bookmarks".showSnackbar()
+                        }
+                        is ImportGoogleBookmarkResult.Error -> "Failed to import bookmarks".showSnackbar()
+                        is ImportGoogleBookmarkResult.UserCancelled, null -> {}
+                    }
+                }
+            }
+        }
 
     private fun observePasswordInputUpdates() {
-        passwordImportWatcher += lifecycleScope.launch {
-            credentialImporter.getImportStatus().collect {
-                when (it) {
-                    is InProgress -> {
-                        logcat { "import status: $it" }
-                    }
+        passwordImportWatcher +=
+            lifecycleScope.launch {
+                credentialImporter.getImportStatus().collect {
+                    when (it) {
+                        is InProgress -> {
+                            logcat { "import status: $it" }
+                        }
 
-                    is Finished -> {
-                        passwordImportWatcher.cancel()
-                        val duration = System.currentTimeMillis() - importStartTime
-                        logcat { "Imported ${it.savedCredentials} passwords, skipped ${it.numberSkipped}. Took ${duration}ms" }
-                        "Imported ${it.savedCredentials} passwords".showSnackbar()
+                        is Finished -> {
+                            passwordImportWatcher.cancel()
+                            val duration = System.currentTimeMillis() - importStartTime
+                            logcat { "Imported ${it.savedCredentials} passwords, skipped ${it.numberSkipped}. Took ${duration}ms" }
+                            "Imported ${it.savedCredentials} passwords".showSnackbar()
+                        }
                     }
                 }
             }
-        }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -305,13 +334,12 @@ class AutofillInternalSettingsActivity : DuckDuckGoActivity() {
         }
     }
 
-    private fun Toggle.description(includeRawState: Boolean = false): String {
-        return if (includeRawState) {
+    private fun Toggle.description(includeRawState: Boolean = false): String =
+        if (includeRawState) {
             "${isEnabled()} ${getRawStoredState()}"
         } else {
             isEnabled().toString()
         }
-    }
 
     private fun refreshAutofillJsConfigSettings() {
         lifecycleScope.launch(dispatchers.io()) {
@@ -348,6 +376,44 @@ class AutofillInternalSettingsActivity : DuckDuckGoActivity() {
         }
     }
 
+    private fun configureImportBookmarksEventHandlers() {
+        binding.importBookmarksLaunchGoogleTakeoutWebpage.setClickListener {
+            lifecycleScope.launch(dispatchers.io()) {
+                val url = "https://takeout.google.com"
+                startActivity(browserNav.openInNewTab(this@AutofillInternalSettingsActivity, url))
+            }
+        }
+        binding.importBookmarksLaunchGoogleTakeoutCustomFlow.setClickListener {
+            lifecycleScope.launch {
+                if (importGooglePasswordsCapabilityChecker.webViewCapableOfImporting()) {
+                    try {
+                        val intent = globalActivityStarter.startIntent(this@AutofillInternalSettingsActivity, AutofillImportViaGoogleTakeoutScreen)
+                        importGoogleBookmarksFlowLauncher.launch(intent)
+                    } catch (e: Exception) {
+                        val message = "Error launching bookmark import flow: ${e.message}"
+                        logcat { message }
+                        Toast.makeText(this@AutofillInternalSettingsActivity, message, Toast.LENGTH_LONG).show()
+                    }
+                } else {
+                    Toast.makeText(this@AutofillInternalSettingsActivity, "WebView version not supported", Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
+
+        binding.importBookmarksImportTakeoutZip.setClickListener {
+            val intent =
+                Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
+                    addCategory(Intent.CATEGORY_OPENABLE)
+                    type = "*/*"
+                }
+            importBookmarksTakeoutZipLauncher.launch(intent)
+        }
+
+        binding.viewBookmarks.setClickListener {
+            globalActivityStarter.start(this, BrowserScreens.BookmarksScreenNoParams)
+        }
+    }
+
     @SuppressLint("QueryPermissionsNeeded")
     private fun configureImportPasswordsEventHandlers() {
         binding.importPasswordsLaunchGooglePasswordWebpage.setClickListener {
@@ -369,10 +435,11 @@ class AutofillInternalSettingsActivity : DuckDuckGoActivity() {
         }
 
         binding.importPasswordsImportCsv.setClickListener {
-            val intent = Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
-                addCategory(Intent.CATEGORY_OPENABLE)
-                type = "*/*"
-            }
+            val intent =
+                Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
+                    addCategory(Intent.CATEGORY_OPENABLE)
+                    type = "*/*"
+                }
             importCsvLauncher.launch(intent)
         }
 
@@ -389,22 +456,24 @@ class AutofillInternalSettingsActivity : DuckDuckGoActivity() {
                 autofillStore.inBrowserImportPromoShownCount = 0
                 inBrowserImportPromoPreviousPromptsStore.clear()
             }
-            Toast.makeText(
-                this@AutofillInternalSettingsActivity,
-                getString(R.string.autofillDevSettingsResetGooglePasswordsImportFlagConfirmation),
-                Toast.LENGTH_SHORT,
-            ).show()
+            Toast
+                .makeText(
+                    this@AutofillInternalSettingsActivity,
+                    getString(R.string.autofillDevSettingsResetGooglePasswordsImportFlagConfirmation),
+                    Toast.LENGTH_SHORT,
+                ).show()
         }
 
         binding.markPasswordsAsPreviouslyImportedButton.setClickListener {
             lifecycleScope.launch(dispatchers.io()) {
                 autofillStore.hasEverImportedPasswords = true
             }
-            Toast.makeText(
-                this@AutofillInternalSettingsActivity,
-                getString(R.string.autofillDevSettingsSimulatePasswordsImportedConfirmation),
-                Toast.LENGTH_SHORT,
-            ).show()
+            Toast
+                .makeText(
+                    this@AutofillInternalSettingsActivity,
+                    getString(R.string.autofillDevSettingsSimulatePasswordsImportedConfirmation),
+                    Toast.LENGTH_SHORT,
+                ).show()
         }
     }
 
@@ -438,48 +507,49 @@ class AutofillInternalSettingsActivity : DuckDuckGoActivity() {
         }
     }
 
-    private fun configureNeverSavedSitesEventHandlers() = with(binding) {
-        numberNeverSavedSitesCount.setClickListener {
-            lifecycleScope.launch(dispatchers.io()) {
-                neverSavedSiteRepository.clearNeverSaveList()
+    private fun configureNeverSavedSitesEventHandlers() =
+        with(binding) {
+            numberNeverSavedSitesCount.setClickListener {
+                lifecycleScope.launch(dispatchers.io()) {
+                    neverSavedSiteRepository.clearNeverSaveList()
+                }
+            }
+            addSampleNeverSavedSiteButton.setClickListener {
+                lifecycleScope.launch(dispatchers.io()) {
+                    // should only actually add one entry for all these attempts
+                    neverSavedSiteRepository.addToNeverSaveList("https://fill.dev")
+                    neverSavedSiteRepository.addToNeverSaveList("fill.dev")
+                    neverSavedSiteRepository.addToNeverSaveList("foo.fill.dev")
+                    neverSavedSiteRepository.addToNeverSaveList("fill.dev/?q=123")
+                }
             }
         }
-        addSampleNeverSavedSiteButton.setClickListener {
-            lifecycleScope.launch(dispatchers.io()) {
-                // should only actually add one entry for all these attempts
-                neverSavedSiteRepository.addToNeverSaveList("https://fill.dev")
-                neverSavedSiteRepository.addToNeverSaveList("fill.dev")
-                neverSavedSiteRepository.addToNeverSaveList("foo.fill.dev")
-                neverSavedSiteRepository.addToNeverSaveList("fill.dev/?q=123")
-            }
-        }
-    }
 
-    private fun configureAutofillJsConfigEventHandlers() = with(binding) {
-        val options = listOf(R.string.autofillDevSettingsConfigDebugOptionProduction, R.string.autofillDevSettingsConfigDebugOptionDebug)
+    private fun configureAutofillJsConfigEventHandlers() =
+        with(binding) {
+            val options = listOf(R.string.autofillDevSettingsConfigDebugOptionProduction, R.string.autofillDevSettingsConfigDebugOptionDebug)
 
-        changeAutofillJsConfigButton.setClickListener {
-            RadioListAlertDialogBuilder(this@AutofillInternalSettingsActivity)
-                .setTitle(R.string.autofillDevSettingsConfigSectionTitle)
-                .setOptions(options)
-                .setPositiveButton(R.string.autofillDevSettingsOverrideMaxInstallDialogOkButtonText)
-                .setNegativeButton(R.string.autofillDevSettingsOverrideMaxInstallDialogCancelButtonText)
-                .addEventListener(
-                    object : RadioListAlertDialogBuilder.EventListener() {
-                        override fun onPositiveButtonClicked(selectedItem: Int) {
-                            lifecycleScope.launch(dispatchers.io()) {
-                                when (selectedItem) {
-                                    1 -> autofillJavascriptEnvironmentConfiguration.useProductionConfig()
-                                    2 -> autofillJavascriptEnvironmentConfiguration.useDebugConfig()
+            changeAutofillJsConfigButton.setClickListener {
+                RadioListAlertDialogBuilder(this@AutofillInternalSettingsActivity)
+                    .setTitle(R.string.autofillDevSettingsConfigSectionTitle)
+                    .setOptions(options)
+                    .setPositiveButton(R.string.autofillDevSettingsOverrideMaxInstallDialogOkButtonText)
+                    .setNegativeButton(R.string.autofillDevSettingsOverrideMaxInstallDialogCancelButtonText)
+                    .addEventListener(
+                        object : RadioListAlertDialogBuilder.EventListener() {
+                            override fun onPositiveButtonClicked(selectedItem: Int) {
+                                lifecycleScope.launch(dispatchers.io()) {
+                                    when (selectedItem) {
+                                        1 -> autofillJavascriptEnvironmentConfiguration.useProductionConfig()
+                                        2 -> autofillJavascriptEnvironmentConfiguration.useDebugConfig()
+                                    }
+                                    refreshAutofillJsConfigSettings()
                                 }
-                                refreshAutofillJsConfigSettings()
                             }
-                        }
-                    },
-                )
-                .show()
+                        },
+                    ).show()
+            }
         }
-    }
 
     private fun configureLoginsUiEventHandlers() {
         binding.accessAutofillSystemSettingsButton.setOnClickListener {
@@ -589,8 +659,7 @@ class AutofillInternalSettingsActivity : DuckDuckGoActivity() {
                         onUserChoseToClearSavedLogins()
                     }
                 },
-            )
-            .show()
+            ).show()
     }
 
     private fun onUserChoseToClearSavedLogins() {
@@ -636,20 +705,20 @@ class AutofillInternalSettingsActivity : DuckDuckGoActivity() {
                             }
                         }
                     },
-                )
-                .show()
+                ).show()
         }
 
         lifecycleScope.launch(dispatchers.main()) {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
-                emailManager.signedInFlow().collect() { signedIn ->
+                emailManager.signedInFlow().collect { signedIn ->
                     binding.emailProtectionSignOutButton.isEnabled = signedIn
 
-                    val text = if (signedIn) {
-                        getString(R.string.autofillDevSettingsEmailProtectionSignedInAs, emailManager.getEmailAddress())
-                    } else {
-                        getString(R.string.autofillDevSettingsEmailProtectionNotSignedIn)
-                    }
+                    val text =
+                        if (signedIn) {
+                            getString(R.string.autofillDevSettingsEmailProtectionSignedInAs, emailManager.getEmailAddress())
+                        } else {
+                            getString(R.string.autofillDevSettingsEmailProtectionNotSignedIn)
+                        }
 
                     binding.emailProtectionSignOutButton.setSecondaryText(text)
                 }
@@ -662,11 +731,12 @@ class AutofillInternalSettingsActivity : DuckDuckGoActivity() {
             val installDays = inContextDataStore.getMaximumPermittedDaysSinceInstallation()
 
             withContext(dispatchers.main()) {
-                val formatted = when {
-                    (installDays < 0) -> getString(R.string.autofillDevSettingsOverrideMaxInstalledDaysNeverShow)
-                    (installDays == Int.MAX_VALUE) -> getString(R.string.autofillDevSettingsOverrideMaxInstalledDaysAlwaysShow)
-                    else -> getString(R.string.autofillDevSettingsOverrideMaxInstalledDaysSetting, installDays)
-                }
+                val formatted =
+                    when {
+                        (installDays < 0) -> getString(R.string.autofillDevSettingsOverrideMaxInstalledDaysNeverShow)
+                        (installDays == Int.MAX_VALUE) -> getString(R.string.autofillDevSettingsOverrideMaxInstalledDaysAlwaysShow)
+                        else -> getString(R.string.autofillDevSettingsOverrideMaxInstalledDaysSetting, installDays)
+                    }
                 binding.configureDaysFromInstallValue.setPrimaryText(formatted)
             }
         }
@@ -692,13 +762,12 @@ class AutofillInternalSettingsActivity : DuckDuckGoActivity() {
         Snackbar.make(binding.root, this, duration).show()
     }
 
-    private fun Context.daysInstalledOverrideOptions(): List<Pair<String, Int>> {
-        return listOf(
+    private fun Context.daysInstalledOverrideOptions(): List<Pair<String, Int>> =
+        listOf(
             Pair(getString(R.string.autofillDevSettingsOverrideMaxInstalledOptionNever), -1),
             Pair(getString(R.string.autofillDevSettingsOverrideMaxInstalledOptionNumberDays, 21), 21),
             Pair(getString(R.string.autofillDevSettingsOverrideMaxInstalledOptionAlways), Int.MAX_VALUE),
         )
-    }
 
     private suspend fun List<LoginCredentials>.save() {
         withContext(dispatchers.io()) {
@@ -710,9 +779,7 @@ class AutofillInternalSettingsActivity : DuckDuckGoActivity() {
         domain: String = "fill.dev",
         username: String,
         password: String = "password-123",
-    ): LoginCredentials {
-        return LoginCredentials(username = username, password = password, domain = domain)
-    }
+    ): LoginCredentials = LoginCredentials(username = username, password = password, domain = domain)
 
     private fun clearGoogleCookies() {
         val cookieManager = CookieManager.getInstance()
@@ -729,39 +796,17 @@ class AutofillInternalSettingsActivity : DuckDuckGoActivity() {
         Toast.makeText(this, R.string.autofillDevSettingsGoogleLogoutSuccess, Toast.LENGTH_SHORT).show()
     }
 
-    private fun configureImportBookmarksEventHandlers() {
-        binding.importBookmarksLaunchGoogleTakeoutWebpage.setClickListener {
-            lifecycleScope.launch(dispatchers.io()) {
-                val url = "https://takeout.google.com"
-                startActivity(browserNav.openInNewTab(this@AutofillInternalSettingsActivity, url))
-            }
-        }
-
-        binding.importBookmarksImportTakeoutZip.setClickListener {
-            val intent = Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
-                addCategory(Intent.CATEGORY_OPENABLE)
-                type = "*/*"
-            }
-            importBookmarksTakeoutZipLauncher.launch(intent)
-        }
-
-        binding.viewBookmarks.setClickListener {
-            globalActivityStarter.start(this, BrowserScreens.BookmarksScreenNoParams)
-        }
-    }
-
     companion object {
-        fun intent(context: Context): Intent {
-            return Intent(context, AutofillInternalSettingsActivity::class.java)
-        }
+        fun intent(context: Context): Intent = Intent(context, AutofillInternalSettingsActivity::class.java)
 
         private const val FAILED_IMPORT_GENERIC_ERROR = "Failed to import passwords due to an error"
 
-        private val sampleUrlList = listOf(
-            "fill.dev",
-            "duckduckgo.com",
-            "spreadprivacy.com",
-            "duck.com",
-        )
+        private val sampleUrlList =
+            listOf(
+                "fill.dev",
+                "duckduckgo.com",
+                "spreadprivacy.com",
+                "duck.com",
+            )
     }
 }
