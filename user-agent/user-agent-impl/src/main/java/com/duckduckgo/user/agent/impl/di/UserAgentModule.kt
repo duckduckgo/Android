@@ -18,10 +18,11 @@ package com.duckduckgo.user.agent.impl.di
 
 import android.content.Context
 import android.webkit.WebSettings
-import androidx.room.Room
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.di.IsMainProcess
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.data.store.api.DatabaseProvider
+import com.duckduckgo.data.store.api.RoomDatabaseConfig
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.user.agent.impl.RealUserAgentProvider
 import com.duckduckgo.user.agent.store.ALL_MIGRATIONS
@@ -85,10 +86,14 @@ class UserAgentModule {
 
     @SingleInstanceIn(AppScope::class)
     @Provides
-    fun provideDatabase(context: Context): UserAgentDatabase {
-        return Room.databaseBuilder(context, UserAgentDatabase::class.java, "user_agent.db")
-            .fallbackToDestructiveMigration()
-            .addMigrations(*ALL_MIGRATIONS)
-            .build()
+    fun provideUserAgentDatabase(databaseProvider: DatabaseProvider): UserAgentDatabase {
+        return databaseProvider.buildRoomDatabase(
+            UserAgentDatabase::class.java,
+            "user_agent.db",
+            config = RoomDatabaseConfig(
+                fallbackToDestructiveMigration = true,
+                migrations = ALL_MIGRATIONS,
+            ),
+        )
     }
 }
