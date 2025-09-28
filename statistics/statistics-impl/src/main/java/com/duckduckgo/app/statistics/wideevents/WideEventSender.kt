@@ -40,22 +40,23 @@ class PixelWideEventSender @Inject constructor(
     private val deviceInfo: DeviceInfo,
     private val featureTogglesInventory: FeatureTogglesInventory,
 ) : WideEventSender {
-
     override suspend fun sendWideEvent(event: WideEventRepository.WideEvent) {
         requireNotNull(event.status) { "Attempting to send wide event with null status" }
 
-        val parameters = mutableMapOf<String, String>().apply {
-            putAll(getCommonPixelParameters())
-            put(PARAM_STATUS, event.status.toParamValue())
+        val parameters =
+            mutableMapOf<String, String>().apply {
+                putAll(getCommonPixelParameters())
+                put(PARAM_STATUS, event.status.toParamValue())
 
-            if (event.flowEntryPoint != null) {
-                put(PARAM_CONTEXT_NAME, event.flowEntryPoint)
+                if (event.flowEntryPoint != null) {
+                    put(PARAM_CONTEXT_NAME, event.flowEntryPoint)
+                }
             }
-        }
 
-        val encodedParameters = event.metadata
-            .filterValues { it != null }
-            .mapValues { it.value!! }
+        val encodedParameters =
+            event.metadata
+                .filterValues { it != null }
+                .mapValues { it.value!! }
 
         val basePixelName = PIXEL_NAME_PREFIX + event.name
 
@@ -75,8 +76,10 @@ class PixelWideEventSender @Inject constructor(
     }
 
     private suspend fun getCommonPixelParameters(): Map<String, String> {
-        val activeNaExperimentNames = featureTogglesInventory.getAllActiveExperimentToggles()
-            .map { it.featureName() }
+        val activeNaExperimentNames =
+            featureTogglesInventory
+                .getAllActiveExperimentToggles()
+                .map { it.featureName() }
 
         return mapOf(
             PARAM_PLATFORM to "Android",
@@ -108,9 +111,10 @@ class PixelWideEventSender @Inject constructor(
     }
 }
 
-private fun WideEventRepository.WideEventStatus.toParamValue(): String = when (this) {
-    SUCCESS -> "SUCCESS"
-    FAILURE -> "FAILURE"
-    CANCELLED -> "CANCELLED"
-    UNKNOWN -> "UNKNOWN"
-}
+private fun WideEventRepository.WideEventStatus.toParamValue(): String =
+    when (this) {
+        SUCCESS -> "SUCCESS"
+        FAILURE -> "FAILURE"
+        CANCELLED -> "CANCELLED"
+        UNKNOWN -> "UNKNOWN"
+    }

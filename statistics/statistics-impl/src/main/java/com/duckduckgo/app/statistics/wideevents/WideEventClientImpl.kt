@@ -21,10 +21,10 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.Lazy
+import kotlinx.coroutines.withContext
 import java.time.Duration
 import javax.inject.Inject
 import kotlin.runCatching
-import kotlinx.coroutines.withContext
 
 @ContributesBinding(AppScope::class)
 class WideEventClientImpl @Inject constructor(
@@ -32,7 +32,6 @@ class WideEventClientImpl @Inject constructor(
     private val wideEventFeature: Lazy<WideEventFeature>,
     private val dispatcherProvider: DispatcherProvider,
 ) : WideEventClient {
-
     override suspend fun flowStart(
         name: String,
         flowEntryPoint: String?,
@@ -139,14 +138,13 @@ class WideEventClientImpl @Inject constructor(
         }
 }
 
-private fun FlowStatus.mapToWideEventStatus(): Pair<WideEventRepository.WideEventStatus, Map<String, String>> {
-    return when (this) {
+private fun FlowStatus.mapToWideEventStatus(): Pair<WideEventRepository.WideEventStatus, Map<String, String>> =
+    when (this) {
         FlowStatus.Cancelled -> WideEventRepository.WideEventStatus.CANCELLED to emptyMap()
         is FlowStatus.Failure -> WideEventRepository.WideEventStatus.FAILURE to mapOf("failure_reason" to reason)
         FlowStatus.Success -> WideEventRepository.WideEventStatus.SUCCESS to emptyMap()
         FlowStatus.Unknown -> WideEventRepository.WideEventStatus.UNKNOWN to emptyMap()
     }
-}
 
 private fun CleanupPolicy.mapToRepositoryCleanupPolicy(): WideEventRepository.CleanupPolicy {
     val (wideEventStatus, metadata) = flowStatus.mapToWideEventStatus()

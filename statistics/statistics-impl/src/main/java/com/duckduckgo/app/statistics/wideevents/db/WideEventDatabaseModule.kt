@@ -38,13 +38,11 @@ class WideEventDatabaseModule {
                 context = context,
                 klass = WideEventDatabase::class.java,
                 name = "wide_events.db",
-            )
-            .fallbackToDestructiveMigration()
+            ).fallbackToDestructiveMigration()
             .addTypeConverter(wideEventEntityTypeConverters)
             .build()
 
     @Provides
     @SingleInstanceIn(AppScope::class)
-    fun provideWideEventDao(db: WideEventDatabase): WideEventDao =
-        db.wideEventDao()
+    fun provideWideEventDao(db: WideEventDatabase): WideEventDao = db.wideEventDao()
 }

@@ -21,11 +21,11 @@ import com.duckduckgo.app.statistics.wideevents.db.WideEventRepository.CleanupPo
 import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 import java.time.Duration
 import java.time.Instant
 import javax.inject.Inject
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.map
 
 @ContributesBinding(AppScope::class)
 class WideEventRepositoryImpl @Inject constructor(
@@ -33,23 +33,23 @@ class WideEventRepositoryImpl @Inject constructor(
     private val wideEventDao: WideEventDao,
     private val timeProvider: CurrentTimeProvider,
 ) : WideEventRepository {
-
     override suspend fun insertWideEvent(
         name: String,
         flowEntryPoint: String?,
         metadata: Map<String, String?>,
         cleanupPolicy: CleanupPolicy,
     ): Long {
-        val entity = WideEventEntity(
-            name = name,
-            flowEntryPoint = flowEntryPoint,
-            metadata = metadata.map { (key, value) -> WideEventEntity.MetadataEntry(key, value) },
-            steps = emptyList(),
-            status = null,
-            createdAt = timeProvider.getCurrentTime(),
-            cleanupPolicy = cleanupPolicy.mapToDbCleanupPolicy(),
-            activeIntervals = emptyList(),
-        )
+        val entity =
+            WideEventEntity(
+                name = name,
+                flowEntryPoint = flowEntryPoint,
+                metadata = metadata.map { (key, value) -> WideEventEntity.MetadataEntry(key, value) },
+                steps = emptyList(),
+                status = null,
+                createdAt = timeProvider.getCurrentTime(),
+                cleanupPolicy = cleanupPolicy.mapToDbCleanupPolicy(),
+                activeIntervals = emptyList(),
+            )
 
         return wideEventDao.insertWideEvent(entity)
     }
@@ -88,26 +88,19 @@ class WideEventRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun getActiveWideEventIds(): List<Long> {
-        return wideEventDao.getActiveWideEventIds()
-    }
+    override suspend fun getActiveWideEventIds(): List<Long> = wideEventDao.getActiveWideEventIds()
 
-    override suspend fun getActiveWideEventIdsByName(eventName: String): List<Long> {
-        return wideEventDao.getActiveWideEventIdsByName(eventName)
-    }
+    override suspend fun getActiveWideEventIdsByName(eventName: String): List<Long> = wideEventDao.getActiveWideEventIdsByName(eventName)
 
-    override suspend fun deleteWideEvent(eventId: Long): Boolean {
-        return wideEventDao.deleteWideEvent(eventId) > 0
-    }
+    override suspend fun deleteWideEvent(eventId: Long): Boolean = wideEventDao.deleteWideEvent(eventId) > 0
 
-    override fun getCompletedWideEventIdsFlow(): Flow<Set<Long>> {
-        return wideEventDao.getCompletedWideEventIdsFlow().map { it.toSet() }
-    }
+    override fun getCompletedWideEventIdsFlow(): Flow<Set<Long>> = wideEventDao.getCompletedWideEventIdsFlow().map { it.toSet() }
 
     override suspend fun getWideEvents(ids: Set<Long>): List<WideEventRepository.WideEvent> {
         if (ids.isEmpty()) return emptyList()
 
-        return wideEventDao.getWideEventsByIds(ids)
+        return wideEventDao
+            .getWideEventsByIds(ids)
             .map { it.mapToRepositoryWideEvent() }
     }
 
@@ -123,11 +116,12 @@ class WideEventRepositoryImpl @Inject constructor(
                 "Interval $name is already started for event ${event.name}"
             }
 
-            val interval = WideEventEntity.WideEventInterval(
-                name = name,
-                startedAt = timeProvider.getCurrentTime(),
-                timeout = timeout,
-            )
+            val interval =
+                WideEventEntity.WideEventInterval(
+                    name = name,
+                    startedAt = timeProvider.getCurrentTime(),
+                    timeout = timeout,
+                )
 
             event.copy(activeIntervals = event.activeIntervals + interval)
         }
@@ -142,18 +136,20 @@ class WideEventRepositoryImpl @Inject constructor(
         updateWideEvent(eventId) { event ->
             checkEventIsActive(event)
 
-            val interval = checkNotNull(event.activeIntervals.find { it.name == name }) {
-                "There is no active interval $name for event ${event.name}"
-            }
+            val interval =
+                checkNotNull(event.activeIntervals.find { it.name == name }) {
+                    "There is no active interval $name for event ${event.name}"
+                }
 
             duration = Duration.between(interval.startedAt, timeProvider.getCurrentTime())
             val durationBucket = INTERVAL_BUCKETS.firstOrNull { it >= duration } ?: INTERVAL_BUCKETS.last()
 
             event.copy(
-                metadata = mergeMetadata(
-                    existingMetadata = event.metadata,
-                    newMetadata = mapOf(interval.name to durationBucket.toMillis().toString()),
-                ),
+                metadata =
+                    mergeMetadata(
+                        existingMetadata = event.metadata,
+                        newMetadata = mapOf(interval.name to durationBucket.toMillis().toString()),
+                    ),
                 activeIntervals = event.activeIntervals - interval,
             )
         }
@@ -166,8 +162,9 @@ class WideEventRepositoryImpl @Inject constructor(
         updateAction: (WideEventEntity) -> WideEventEntity,
     ) {
         database.withTransaction {
-            val event = wideEventDao.getWideEventById(id)
-                ?: throw NoSuchElementException("There is no event with given ID")
+            val event =
+                wideEventDao.getWideEventById(id)
+                    ?: throw NoSuchElementException("There is no event with given ID")
 
             val updatedEvent = updateAction(event)
 
@@ -179,15 +176,16 @@ class WideEventRepositoryImpl @Inject constructor(
     }
 
     private companion object {
-        val INTERVAL_BUCKETS = listOf(
-            Duration.ofSeconds(1),
-            Duration.ofSeconds(5),
-            Duration.ofSeconds(10),
-            Duration.ofSeconds(30),
-            Duration.ofMinutes(1),
-            Duration.ofMinutes(5),
-            Duration.ofMinutes(10),
-        )
+        val INTERVAL_BUCKETS =
+            listOf(
+                Duration.ofSeconds(1),
+                Duration.ofSeconds(5),
+                Duration.ofSeconds(10),
+                Duration.ofSeconds(30),
+                Duration.ofMinutes(1),
+                Duration.ofMinutes(5),
+                Duration.ofMinutes(10),
+            )
     }
 }
 
@@ -203,8 +201,7 @@ private fun mergeMetadata(
     return mergedMetadata.map { WideEventEntity.MetadataEntry(it.key, it.value) }
 }
 
-private fun CurrentTimeProvider.getCurrentTime(): Instant =
-    Instant.ofEpochMilli(currentTimeMillis())
+private fun CurrentTimeProvider.getCurrentTime(): Instant = Instant.ofEpochMilli(currentTimeMillis())
 
 private fun checkEventIsActive(event: WideEventEntity) =
     check(event.status == null) {

@@ -20,7 +20,6 @@ import com.duckduckgo.app.statistics.wideevents.CleanupPolicy.OnTimeout
 import java.time.Duration
 
 interface WideEventClient {
-
     /**
      * Begin a new flow.
      *
@@ -116,12 +115,13 @@ interface WideEventClient {
 
 /** Represents the final outcome status of a wide event. */
 sealed class FlowStatus {
-
     /** The operation completed successfully */
     data object Success : FlowStatus()
 
     /** The operation failed */
-    data class Failure(val reason: String) : FlowStatus()
+    data class Failure(
+        val reason: String,
+    ) : FlowStatus()
 
     /** The operation was cancelled by the user */
     data object Cancelled : FlowStatus()
@@ -139,7 +139,6 @@ sealed class FlowStatus {
  * Each policy carries a target [flowStatus] - the flow is auto-finished with that status and sent.
  */
 sealed class CleanupPolicy {
-
     /**
      * The status to use when this policy triggers.
      */

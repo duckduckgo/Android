@@ -36,35 +36,26 @@ import javax.inject.Inject
 data class WideEventEntity(
     @PrimaryKey(autoGenerate = true)
     val id: Long = 0,
-
     @ColumnInfo(name = "name")
     val name: String,
-
     @ColumnInfo(name = "created_at")
     val createdAt: Instant,
-
     @ColumnInfo(name = "flow_entry_point")
     val flowEntryPoint: String?,
-
     @ColumnInfo(name = "metadata")
     val metadata: List<MetadataEntry>,
-
     @ColumnInfo(name = "steps")
     val steps: List<WideEventStep>,
-
     @ColumnInfo(name = "status")
     val status: WideEventStatus?,
-
     @ColumnInfo(name = "cleanup_policy")
     val cleanupPolicy: CleanupPolicy,
-
     @ColumnInfo(name = "active_intervals")
     val activeIntervals: List<WideEventInterval>,
 ) {
     data class MetadataEntry(
         @Json(name = "key")
         val key: String,
-
         @Json(name = "value")
         val value: String?,
     )
@@ -72,12 +63,13 @@ data class WideEventEntity(
     data class WideEventStep(
         @Json(name = "name")
         val name: String,
-
         @Json(name = "success")
         val success: Boolean,
     )
 
-    enum class WideEventStatus(val statusCode: String) {
+    enum class WideEventStatus(
+        val statusCode: String,
+    ) {
         SUCCESS("success"),
         FAILURE("failure"),
         CANCELLED("cancelled"),
@@ -91,10 +83,8 @@ data class WideEventEntity(
         data class OnProcessStart(
             @Json(name = "ignore_if_interval_timeout_present")
             val ignoreIfIntervalTimeoutPresent: Boolean,
-
             @Json(name = "status")
             override val status: WideEventStatus,
-
             @Json(name = "metadata")
             override val metadata: Map<String, String> = emptyMap(),
         ) : CleanupPolicy()
@@ -102,10 +92,8 @@ data class WideEventEntity(
         data class OnTimeout(
             @Json(name = "duration")
             val duration: Duration,
-
             @Json(name = "status")
             override val status: WideEventStatus,
-
             @Json(name = "metadata")
             override val metadata: Map<String, String> = emptyMap(),
         ) : CleanupPolicy()
@@ -114,10 +102,8 @@ data class WideEventEntity(
     data class WideEventInterval(
         @Json(name = "name")
         val name: String,
-
         @Json(name = "started_at")
         val startedAt: Instant,
-
         @Json(name = "timeout")
         val timeout: Duration?,
     )
@@ -128,19 +114,19 @@ class WideEventEntityTypeConverters @Inject constructor(
     globalMoshi: Moshi,
 ) {
     private val moshi: Moshi by lazy {
-        globalMoshi.newBuilder()
+        globalMoshi
+            .newBuilder()
             .add(
-                PolymorphicJsonAdapterFactory.of(WideEventEntity.CleanupPolicy::class.java, "type")
+                PolymorphicJsonAdapterFactory
+                    .of(WideEventEntity.CleanupPolicy::class.java, "type")
                     .withSubtype(
                         WideEventEntity.CleanupPolicy.OnProcessStart::class.java,
                         "OnProcessStart",
-                    )
-                    .withSubtype(
+                    ).withSubtype(
                         WideEventEntity.CleanupPolicy.OnTimeout::class.java,
                         "OnTimeout",
                     ),
-            )
-            .add(WideEventStatusJsonAdapter())
+            ).add(WideEventStatusJsonAdapter())
             .add(InstantMillisAdapter())
             .add(DurationMillisAdapter())
             .build()
@@ -178,24 +164,19 @@ class WideEventEntityTypeConverters @Inject constructor(
     }
 
     @TypeConverter
-    fun fromMetadataEntryList(value: List<WideEventEntity.MetadataEntry>): String =
-        metadataEntryListAdapter.toJson(value)
+    fun fromMetadataEntryList(value: List<WideEventEntity.MetadataEntry>): String = metadataEntryListAdapter.toJson(value)
 
     @TypeConverter
-    fun toMetadataEntryList(value: String): List<WideEventEntity.MetadataEntry> =
-        metadataEntryListAdapter.fromJson(value) ?: emptyList()
+    fun toMetadataEntryList(value: String): List<WideEventEntity.MetadataEntry> = metadataEntryListAdapter.fromJson(value) ?: emptyList()
 
     @TypeConverter
-    fun fromWideEventStepList(value: List<WideEventEntity.WideEventStep>): String =
-        wideEventStepListAdapter.toJson(value)
+    fun fromWideEventStepList(value: List<WideEventEntity.WideEventStep>): String = wideEventStepListAdapter.toJson(value)
 
     @TypeConverter
-    fun toWideEventStepList(value: String): List<WideEventEntity.WideEventStep> =
-        wideEventStepListAdapter.fromJson(value) ?: emptyList()
+    fun toWideEventStepList(value: String): List<WideEventEntity.WideEventStep> = wideEventStepListAdapter.fromJson(value) ?: emptyList()
 
     @TypeConverter
-    fun fromWideEventStatus(status: WideEventEntity.WideEventStatus?): String? =
-        status?.statusCode
+    fun fromWideEventStatus(status: WideEventEntity.WideEventStatus?): String? = status?.statusCode
 
     @TypeConverter
     fun toWideEventStatus(statusCode: String?): WideEventEntity.WideEventStatus? =
@@ -204,26 +185,21 @@ class WideEventEntityTypeConverters @Inject constructor(
         }
 
     @TypeConverter
-    fun fromCleanupPolicy(value: WideEventEntity.CleanupPolicy?): String? =
-        value?.let { cleanupPolicyAdapter.toJson(it) }
+    fun fromCleanupPolicy(value: WideEventEntity.CleanupPolicy?): String? = value?.let { cleanupPolicyAdapter.toJson(it) }
 
     @TypeConverter
-    fun toCleanupPolicy(value: String?): WideEventEntity.CleanupPolicy? =
-        value?.let { cleanupPolicyAdapter.fromJson(it) }
+    fun toCleanupPolicy(value: String?): WideEventEntity.CleanupPolicy? = value?.let { cleanupPolicyAdapter.fromJson(it) }
 
     @TypeConverter
-    fun fromWideEventIntervalList(value: List<WideEventEntity.WideEventInterval>): String =
-        wideEventIntervalListAdapter.toJson(value)
+    fun fromWideEventIntervalList(value: List<WideEventEntity.WideEventInterval>): String = wideEventIntervalListAdapter.toJson(value)
 
     @TypeConverter
-    fun toWideEventIntervalList(value: String): List<WideEventEntity.WideEventInterval> =
-        wideEventIntervalListAdapter.fromJson(value) ?: emptyList()
+    fun toWideEventIntervalList(value: String): List<WideEventEntity.WideEventInterval> = wideEventIntervalListAdapter.fromJson(value) ?: emptyList()
 }
 
 private class WideEventStatusJsonAdapter {
     @FromJson
-    fun fromJson(json: String): WideEventEntity.WideEventStatus =
-        WideEventEntity.WideEventStatus.entries.first { it.statusCode == json }
+    fun fromJson(json: String): WideEventEntity.WideEventStatus = WideEventEntity.WideEventStatus.entries.first { it.statusCode == json }
 
     @ToJson
     fun toJson(status: WideEventEntity.WideEventStatus): String = status.statusCode

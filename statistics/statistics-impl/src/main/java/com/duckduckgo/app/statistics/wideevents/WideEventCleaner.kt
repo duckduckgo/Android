@@ -24,12 +24,12 @@ import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesMultibinding
-import java.time.Duration
-import java.time.Instant
-import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.time.Duration
+import java.time.Instant
+import javax.inject.Inject
 
 @ContributesMultibinding(AppScope::class)
 class WideEventCleaner @Inject constructor(
@@ -39,7 +39,6 @@ class WideEventCleaner @Inject constructor(
     private val wideEventFeature: WideEventFeature,
     private val dispatcherProvider: DispatcherProvider,
 ) : MainProcessLifecycleObserver {
-
     override fun onCreate(owner: LifecycleOwner) {
         appCoroutineScope.launch {
             runCatching {
@@ -51,10 +50,12 @@ class WideEventCleaner @Inject constructor(
     }
 
     private suspend fun performWideEventCleanup() {
-        wideEventRepository.getActiveWideEventIds()
+        wideEventRepository
+            .getActiveWideEventIds()
             .chunked(100)
             .forEach { idsChunk ->
-                wideEventRepository.getWideEvents(idsChunk.toSet())
+                wideEventRepository
+                    .getWideEvents(idsChunk.toSet())
                     .forEach { event ->
                         processWideEvent(event)
                     }
@@ -91,8 +92,7 @@ class WideEventCleaner @Inject constructor(
         event.activeIntervals
             .firstOrNull { interval ->
                 interval.timeout != null && isTimeoutReached(event.createdAt, interval.timeout)
-            }
-            ?.let { interval ->
+            }?.let { interval ->
                 wideEventRepository.setWideEventStatus(
                     eventId = event.id,
                     status = WideEventRepository.WideEventStatus.UNKNOWN,
@@ -101,7 +101,10 @@ class WideEventCleaner @Inject constructor(
             }
     }
 
-    private fun isTimeoutReached(startAt: Instant, timeout: Duration): Boolean {
+    private fun isTimeoutReached(
+        startAt: Instant,
+        timeout: Duration,
+    ): Boolean {
         val currentTime = Instant.ofEpochMilli(currentTimeProvider.currentTimeMillis())
         return timeout <= Duration.between(startAt, currentTime)
     }

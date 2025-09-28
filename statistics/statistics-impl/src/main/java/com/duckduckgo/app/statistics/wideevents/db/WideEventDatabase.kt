@@ -39,10 +39,8 @@ abstract class WideEventDatabase : RoomDatabase() {
 
 class InstantTypeConverter {
     @TypeConverter
-    fun fromInstant(instant: Instant?): Long? =
-        instant?.toEpochMilli()
+    fun fromInstant(instant: Instant?): Long? = instant?.toEpochMilli()
 
     @TypeConverter
-    fun toInstant(value: Long?): Instant? =
-        value?.let { Instant.ofEpochMilli(it) }
+    fun toInstant(value: Long?): Instant? = value?.let { Instant.ofEpochMilli(it) }
 }

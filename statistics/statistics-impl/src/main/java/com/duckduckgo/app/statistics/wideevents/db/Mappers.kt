@@ -53,30 +53,34 @@ fun WideEventEntity.WideEventStep.mapToRepositoryWideEventStep(): WideEventRepos
 
 fun WideEventEntity.CleanupPolicy.mapToRepositoryCleanupPolicy(): WideEventRepository.CleanupPolicy =
     when (this) {
-        is WideEventEntity.CleanupPolicy.OnProcessStart -> WideEventRepository.CleanupPolicy.OnProcessStart(
-            ignoreIfIntervalTimeoutPresent = ignoreIfIntervalTimeoutPresent,
-            status = status.mapToRepositoryWideEventStatus(),
-            metadata = metadata,
-        )
-        is WideEventEntity.CleanupPolicy.OnTimeout -> WideEventRepository.CleanupPolicy.OnTimeout(
-            duration = duration,
-            status = status.mapToRepositoryWideEventStatus(),
-            metadata = metadata,
-        )
+        is WideEventEntity.CleanupPolicy.OnProcessStart ->
+            WideEventRepository.CleanupPolicy.OnProcessStart(
+                ignoreIfIntervalTimeoutPresent = ignoreIfIntervalTimeoutPresent,
+                status = status.mapToRepositoryWideEventStatus(),
+                metadata = metadata,
+            )
+        is WideEventEntity.CleanupPolicy.OnTimeout ->
+            WideEventRepository.CleanupPolicy.OnTimeout(
+                duration = duration,
+                status = status.mapToRepositoryWideEventStatus(),
+                metadata = metadata,
+            )
     }
 
 fun WideEventRepository.CleanupPolicy.mapToDbCleanupPolicy(): WideEventEntity.CleanupPolicy =
     when (this) {
-        is WideEventRepository.CleanupPolicy.OnProcessStart -> WideEventEntity.CleanupPolicy.OnProcessStart(
-            ignoreIfIntervalTimeoutPresent = ignoreIfIntervalTimeoutPresent,
-            status = status.mapToDbWideEventStatus(),
-            metadata = metadata,
-        )
-        is WideEventRepository.CleanupPolicy.OnTimeout -> WideEventEntity.CleanupPolicy.OnTimeout(
-            duration = duration,
-            status = status.mapToDbWideEventStatus(),
-            metadata = metadata,
-        )
+        is WideEventRepository.CleanupPolicy.OnProcessStart ->
+            WideEventEntity.CleanupPolicy.OnProcessStart(
+                ignoreIfIntervalTimeoutPresent = ignoreIfIntervalTimeoutPresent,
+                status = status.mapToDbWideEventStatus(),
+                metadata = metadata,
+            )
+        is WideEventRepository.CleanupPolicy.OnTimeout ->
+            WideEventEntity.CleanupPolicy.OnTimeout(
+                duration = duration,
+                status = status.mapToDbWideEventStatus(),
+                metadata = metadata,
+            )
     }
 
 fun WideEventEntity.WideEventInterval.mapToRepositoryWideEventInterval(): WideEventRepository.WideEventInterval =
