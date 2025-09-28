@@ -172,8 +172,8 @@ class WideEventRepositoryImpl @Inject constructor(
             val updatedEvent = updateAction(event)
 
             if (event != updatedEvent) {
-                val updated = wideEventDao.updateWideEvent(updatedEvent) == 1
-                check(updated) { "Failed to update wide event" }
+                val updateSuccessful = wideEventDao.updateWideEvent(updatedEvent) == 1
+                check(updateSuccessful) { "Failed to update wide event" }
             }
         }
     }

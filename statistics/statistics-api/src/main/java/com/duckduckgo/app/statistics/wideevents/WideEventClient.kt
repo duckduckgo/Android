@@ -48,7 +48,7 @@ interface WideEventClient {
     suspend fun flowStep(
         wideEventId: Long,
         stepName: String,
-        success: Boolean,
+        success: Boolean = true,
         metadata: Map<String, String> = emptyMap(),
     ): Result<Unit>
 
