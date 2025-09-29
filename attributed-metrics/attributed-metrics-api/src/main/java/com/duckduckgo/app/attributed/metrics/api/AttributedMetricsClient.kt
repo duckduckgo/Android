@@ -25,7 +25,10 @@ interface AttributedMetricClient {
     fun collectEvent(eventName: String)
 
     // return events stored in the last days, and precalculated stats
-    suspend fun getEventStats(eventName: String, days: Int): EventStats
+    suspend fun getEventStats(
+        eventName: String,
+        days: Int,
+    ): EventStats
 
     // if in monitoring window will emit the metric
     // this part owns adding common params to all metrics (e.g. origin, removing default params)
@@ -39,13 +42,14 @@ data class EventStats(
     // rolling average of events based on days timeframe
     val rollingAverage: Double,
     // total number of events in the timeframe
-    val totalEvents: Int
+    val totalEvents: Int,
 )
 
 // interface for each metric
 interface AttributedMetric {
     // Metric owns the pixel name value
     fun getPixelName(): String
+
     // Metric owns adding metric specific parameters
     suspend fun getMetricParameters(): Map<String, String>
 }

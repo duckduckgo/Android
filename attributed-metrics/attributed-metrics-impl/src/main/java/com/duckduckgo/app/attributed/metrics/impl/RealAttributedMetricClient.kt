@@ -18,16 +18,19 @@ package com.duckduckgo.app.attributed.metrics.impl
 
 import com.duckduckgo.app.attributed.metrics.api.AttributedMetric
 import com.duckduckgo.app.attributed.metrics.api.AttributedMetricClient
-import com.duckduckgo.app.statistics.api.AtbLifecyclePlugin
 import com.duckduckgo.app.attributed.metrics.api.EventStats
+import com.duckduckgo.app.attributed.metrics.store.EventRepository
 import com.duckduckgo.app.di.AppCoroutineScope
+import com.duckduckgo.app.statistics.api.AtbLifecyclePlugin
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.SingleInstanceIn
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @ContributesMultibinding(AppScope::class, AtbLifecyclePlugin::class)
@@ -35,9 +38,11 @@ import javax.inject.Inject
 @SingleInstanceIn(AppScope::class)
 class RealAttributedMetricClient @Inject constructor(
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
+    private val dispatcherProvider: DispatcherProvider,
     private val appBuildConfig: AppBuildConfig,
-): AttributedMetricClient, AtbLifecyclePlugin {
-
+    private val eventRepository: EventRepository,
+) : AttributedMetricClient,
+    AtbLifecyclePlugin {
     override fun onAppAtbInitialized() {
         appCoroutineScope.launch {
             if (appBuildConfig.isAppReinstall()) {
@@ -50,15 +55,18 @@ class RealAttributedMetricClient @Inject constructor(
     }
 
     override fun collectEvent(eventName: String) {
-        TODO("Not yet implemented")
+        appCoroutineScope.launch(dispatcherProvider.io()) {
+            eventRepository.collectEvent(eventName)
+        }
     }
 
     override suspend fun getEventStats(
         eventName: String,
-        days: Int
-    ): EventStats {
-        TODO("Not yet implemented")
-    }
+        days: Int,
+    ): EventStats =
+        withContext(dispatcherProvider.io()) {
+            eventRepository.getEventStats(eventName, days)
+        }
 
     override fun emitMetric(metric: AttributedMetric) {
         TODO("Not yet implemented")
