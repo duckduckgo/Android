@@ -29,14 +29,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        app:layout_constraintGuide_percent="0.26" />
-
-    <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/daxPromptDaxGuideline"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        app:layout_constraintGuide_percent="0.62" />
+        app:layout_constraintGuide_percent="0.3" />
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/daxPromptBrowserComparisonVerticalGuidelineStart"
@@ -69,10 +62,10 @@
         android:id="@+id/daxShape"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="@dimen/daxShapeMarginBottom"
+        android:layout_marginTop="-190dp"
         android:scaleType="fitCenter"
         android:src="@drawable/dax_with_magnifying_glass"
-        app:layout_constraintBottom_toBottomOf="@id/daxPromptDaxGuideline"
+        app:layout_constraintTop_toTopOf="@id/daxPromptBrowserComparisonMessageContainer"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 
@@ -82,15 +75,14 @@
         android:layout_height="0dp"
         android:layout_marginStart="@dimen/messageMargin"
         android:layout_marginEnd="@dimen/messageMargin"
-        android:layout_marginBottom="36dp"
+        android:layout_marginBottom="48dp"
         android:background="@drawable/background_dax_message"
         android:elevation="2dp"
         android:orientation="vertical"
         android:padding="@dimen/keyline_5"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="@id/daxPromptBrowserComparisonVerticalGuidelineEnd"
-        app:layout_constraintHeight_max="@dimen/daxPromptMessageConstraintMaxHeight"
-        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintHeight_max="540dp"
         app:layout_constraintStart_toStartOf="@id/daxPromptBrowserComparisonVerticalGuidelineStart"
         app:layout_constraintTop_toTopOf="@id/daxPromptBrowserComparisonMessageGuideline">
 
