@@ -2633,6 +2633,16 @@ class BrowserTabViewModelTest {
     }
 
     @Test
+    fun whenUserPressesBackAndGoesToHomeWithInputScreenEnabledThenKeyboardNotShown() {
+        whenever(mockDuckAiFeatureState.showInputScreen).thenReturn(MutableStateFlow(true))
+
+        setupNavigation(isBrowsing = true, canGoBack = false, skipHome = false)
+        testee.onUserPressedBack()
+
+        assertCommandNotIssued<ShowKeyboard>()
+    }
+
+    @Test
     fun whenUserPressesBackOnATabWithASourceTabThenDeleteCurrentAndSelectSource() =
         runTest {
             selectedTabLiveData.value = TabEntity("TAB_ID", "https://example.com", position = 0, sourceTabId = "TAB_ID_SOURCE")
