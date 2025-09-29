@@ -67,7 +67,8 @@ class BrokerStepCompletedEventHandler @Inject constructor(
         }
 
         return Next(
-            nextState = state.copy(
+            nextState =
+            state.copy(
                 currentBrokerStepIndex = state.currentBrokerStepIndex + 1,
                 actionRetryCount = 0,
             ),
@@ -95,16 +96,17 @@ class BrokerStepCompletedEventHandler @Inject constructor(
                     ),
                 )
 
-            RunType.SCHEDULED -> pirRunStateHandler.handleState(
-                BrokerScheduledScanCompleted(
-                    brokerName = currentBrokerStep.brokerName,
-                    profileQueryId = state.profileQuery.id,
-                    eventTimeInMillis = currentTimeProvider.currentTimeMillis(),
-                    totalTimeMillis = totalTimeMillis,
-                    isSuccess = isSuccess,
-                    startTimeInMillis = brokerStartTime,
-                ),
-            )
+            RunType.SCHEDULED ->
+                pirRunStateHandler.handleState(
+                    BrokerScheduledScanCompleted(
+                        brokerName = currentBrokerStep.brokerName,
+                        profileQueryId = state.profileQuery.id,
+                        eventTimeInMillis = currentTimeProvider.currentTimeMillis(),
+                        totalTimeMillis = totalTimeMillis,
+                        isSuccess = isSuccess,
+                        startTimeInMillis = brokerStartTime,
+                    ),
+                )
 
             RunType.OPTOUT -> {
                 val currentOptOutStep = currentBrokerStep as OptOutStep

@@ -79,7 +79,8 @@ class ExecuteBrokerStepActionEventHandler @Inject constructor() : EventHandler {
             if (currentBrokerStep is OptOutStep && actionToExecute.needsEmail && !hasEmail(currentBrokerStep)) {
                 Next(
                     nextState = state,
-                    sideEffect = GetEmailForProfile(
+                    sideEffect =
+                    GetEmailForProfile(
                         actionId = actionToExecute.id,
                         brokerName = currentBrokerStep.brokerName,
                         extractedProfile = currentBrokerStep.profileToOptOut,
@@ -101,7 +102,8 @@ class ExecuteBrokerStepActionEventHandler @Inject constructor() : EventHandler {
                 if (currentBrokerStep is OptOutStep && actionToExecute is EmailConfirmation) {
                     Next(
                         nextState = state,
-                        nextEvent = BrokerStepCompleted(
+                        nextEvent =
+                        BrokerStepCompleted(
                             needsEmailConfirmation = true,
                             isSuccess = true,
                         ),
@@ -109,7 +111,8 @@ class ExecuteBrokerStepActionEventHandler @Inject constructor() : EventHandler {
                 } else if (actionToExecute is SolveCaptcha && requestData !is PirScriptRequestData.SolveCaptcha) {
                     Next(
                         nextState = state,
-                        sideEffect = AwaitCaptchaSolution(
+                        sideEffect =
+                        AwaitCaptchaSolution(
                             actionId = actionToExecute.id,
                             brokerName = currentBrokerStep.brokerName,
                             transactionID = state.transactionID,
@@ -119,7 +122,8 @@ class ExecuteBrokerStepActionEventHandler @Inject constructor() : EventHandler {
                 } else {
                     Next(
                         nextState = state,
-                        sideEffect = PushJsAction(
+                        sideEffect =
+                        PushJsAction(
                             actionToExecute.id,
                             actionToExecute,
                             pushDelay,
@@ -131,17 +135,15 @@ class ExecuteBrokerStepActionEventHandler @Inject constructor() : EventHandler {
         }
     }
 
-    private fun hasEmail(optOutStep: OptOutStep): Boolean {
-        return optOutStep.profileToOptOut.email.isNotEmpty()
-    }
+    private fun hasEmail(optOutStep: OptOutStep): Boolean = optOutStep.profileToOptOut.email.isNotEmpty()
 
     private fun completeRequestData(
         brokerStep: BrokerStep,
         actionToExecute: BrokerAction,
         profileQuery: ProfileQuery,
         requestData: PirScriptRequestData,
-    ): PirScriptRequestData {
-        return if (brokerStep is OptOutStep && actionToExecute.dataSource == EXTRACTED_PROFILE &&
+    ): PirScriptRequestData =
+        if (brokerStep is OptOutStep && actionToExecute.dataSource == EXTRACTED_PROFILE &&
             (requestData as UserProfile).extractedProfile == null
         ) {
             val extractedProfile = brokerStep.profileToOptOut
@@ -153,5 +155,4 @@ class ExecuteBrokerStepActionEventHandler @Inject constructor() : EventHandler {
         } else {
             requestData
         }
-    }
 }

@@ -28,7 +28,6 @@ import com.duckduckgo.pir.impl.scripts.models.PirSuccessResponse.GetCaptchaInfoR
 import kotlinx.coroutines.flow.Flow
 
 interface PirActionsRunnerStateEngine {
-
     /**
      * Flow that emits effects that should be handled outside of this engine
      */
@@ -60,6 +59,7 @@ interface PirActionsRunnerStateEngine {
      */
     sealed class Event {
         data object Idle : Event()
+
         data object Started : Event()
 
         data class LoadUrlComplete(
@@ -133,26 +133,31 @@ interface PirActionsRunnerStateEngine {
      */
     sealed class SideEffect {
         data object None : SideEffect()
+
         data object CompleteExecution : SideEffect()
+
         data class PushJsAction(
             override val actionId: String,
             val action: BrokerAction,
             val pushDelay: Long = 0L,
             val requestParamsData: PirScriptRequestData,
-        ) : SideEffect(), BrokerActionSideEffect
+        ) : SideEffect(),
+            BrokerActionSideEffect
 
         data class GetEmailForProfile(
             override val actionId: String,
             val brokerName: String,
             val extractedProfile: ExtractedProfile,
             val profileQuery: ProfileQuery?,
-        ) : SideEffect(), BrokerActionSideEffect
+        ) : SideEffect(),
+            BrokerActionSideEffect
 
         data class GetCaptchaSolution(
             override val actionId: String,
             val responseData: ResponseData?,
             val isRetry: Boolean,
-        ) : SideEffect(), BrokerActionSideEffect
+        ) : SideEffect(),
+            BrokerActionSideEffect
 
         data class AwaitCaptchaSolution(
             override val actionId: String,
@@ -161,7 +166,8 @@ interface PirActionsRunnerStateEngine {
             val pollingIntervalSeconds: Int = 5,
             val retries: Int = 50,
             val attempt: Int = 0,
-        ) : SideEffect(), BrokerActionSideEffect
+        ) : SideEffect(),
+            BrokerActionSideEffect
 
         data class LoadUrl(
             val url: String,

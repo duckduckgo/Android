@@ -51,7 +51,8 @@ class LoadUrlFailedEventHandler @Inject constructor() : EventHandler {
 
         if (actualEvent.url == RECOVERY_URL) {
             return Next(
-                nextState = state.copy(
+                nextState =
+                state.copy(
                     pendingUrl = null,
                 ),
                 nextEvent = BrokerStepCompleted(needsEmailConfirmation = false, isSuccess = false),
@@ -59,10 +60,12 @@ class LoadUrlFailedEventHandler @Inject constructor() : EventHandler {
         }
 
         return Next(
-            nextState = state.copy(
+            nextState =
+            state.copy(
                 pendingUrl = RECOVERY_URL,
             ),
-            sideEffect = LoadUrl(
+            sideEffect =
+            LoadUrl(
                 RECOVERY_URL,
             ),
         )

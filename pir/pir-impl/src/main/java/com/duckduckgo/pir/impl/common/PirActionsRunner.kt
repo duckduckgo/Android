@@ -115,7 +115,8 @@ class RealPirActionsRunner @AssistedInject constructor(
     @Assisted private val runType: RunType,
     @Assisted private val context: Context,
     @Assisted private val pirScriptToLoad: String,
-) : PirActionsRunner, ActionResultListener {
+) : PirActionsRunner,
+    ActionResultListener {
     @AssistedFactory
     interface Factory {
         fun create(
@@ -147,16 +148,17 @@ class RealPirActionsRunner @AssistedInject constructor(
                     "profile=$profileQuery " +
                     "Brokers to execute $brokerSteps"
             }
-            detachedWebView = pirDetachedWebViewProvider.createInstance(
-                context,
-                pirScriptToLoad,
-                onPageLoaded = {
-                    onLoadingComplete(it)
-                },
-                onPageLoadFailed = {
-                    onLoadingFailed(it)
-                },
-            )
+            detachedWebView =
+                pirDetachedWebViewProvider.createInstance(
+                    context,
+                    pirScriptToLoad,
+                    onPageLoaded = {
+                        onLoadingComplete(it)
+                    },
+                    onPageLoadFailed = {
+                        onLoadingFailed(it)
+                    },
+                )
 
             brokerActionProcessor.register(detachedWebView!!, this@RealPirActionsRunner)
         }
@@ -180,16 +182,17 @@ class RealPirActionsRunner @AssistedInject constructor(
         withContext(dispatcherProvider.main()) {
             logcat { "PIR-RUNNER (${this@RealPirActionsRunner}): ${Thread.currentThread().name} Brokers to execute $brokerSteps" }
             logcat { "PIR-RUNNER (${this@RealPirActionsRunner}): ${Thread.currentThread().name} Brokers size: ${brokerSteps.size}" }
-            detachedWebView = pirDetachedWebViewProvider.setupWebView(
-                webView,
-                pirScriptToLoad,
-                onPageLoaded = {
-                    onLoadingComplete(it)
-                },
-                onPageLoadFailed = {
-                    onLoadingFailed(it)
-                },
-            )
+            detachedWebView =
+                pirDetachedWebViewProvider.setupWebView(
+                    webView,
+                    pirScriptToLoad,
+                    onPageLoaded = {
+                        onLoadingComplete(it)
+                    },
+                    onPageLoadFailed = {
+                        onLoadingFailed(it)
+                    },
+                )
 
             brokerActionProcessor.register(detachedWebView!!, this@RealPirActionsRunner)
         }
@@ -225,56 +228,59 @@ class RealPirActionsRunner @AssistedInject constructor(
         )
     }
 
-    private suspend fun awaitResult(): Result<Unit> {
-        return suspendCancellableCoroutine { continuation ->
-            engineJob += coroutineScope.launch {
-                engine!!.sideEffect.collect { effect ->
-                    if (effect is CompleteExecution) {
-                        continuation.resume(Result.success(Unit))
-                    } else {
-                        handleEffect(effect)
+    private suspend fun awaitResult(): Result<Unit> =
+        suspendCancellableCoroutine { continuation ->
+            engineJob +=
+                coroutineScope.launch {
+                    engine!!.sideEffect.collect { effect ->
+                        if (effect is CompleteExecution) {
+                            continuation.resume(Result.success(Unit))
+                        } else {
+                            handleEffect(effect)
+                        }
                     }
                 }
-            }
 
             continuation.invokeOnCancellation {
                 engineJob.cancel()
             }
         }
-    }
 
     private suspend fun handleEffect(effect: SideEffect) {
         logcat { "PIR-RUNNER: Received SideFffect from engine: $effect" }
         when (effect) {
             None, CompleteExecution -> {}
-            is LoadUrl -> withContext(dispatcherProvider.main()) {
-                detachedWebView!!.loadUrl(effect.url)
-            }
+            is LoadUrl ->
+                withContext(dispatcherProvider.main()) {
+                    detachedWebView!!.loadUrl(effect.url)
+                }
 
             is PushJsAction -> pushJsAction(effect)
             is GetEmailForProfile -> handleGetEmail(effect)
             is GetCaptchaSolution -> handleGetCaptchaSolution(effect)
-            is EvaluateJs -> withContext(dispatcherProvider.main()) {
-                detachedWebView?.evaluateJavascript(effect.callback, null)
-            }
+            is EvaluateJs ->
+                withContext(dispatcherProvider.main()) {
+                    detachedWebView?.evaluateJavascript(effect.callback, null)
+                }
 
             is AwaitCaptchaSolution -> handleAwaitCaptchaSolution(effect)
         }
     }
 
     private suspend fun pushJsAction(effect: PushJsAction) {
-        timerJob += coroutineScope.launch(dispatcherProvider.io()) {
-            delay(60000) // 1 minute
-            // IF this timer completes, then timeout was reached
-            kotlin.runCatching {
-                onError(
-                    PirError.ActionFailed(
-                        actionID = effect.actionId,
-                        message = "Local timeout",
-                    ),
-                )
+        timerJob +=
+            coroutineScope.launch(dispatcherProvider.io()) {
+                delay(60000) // 1 minute
+                // IF this timer completes, then timeout was reached
+                kotlin.runCatching {
+                    onError(
+                        PirError.ActionFailed(
+                            actionID = effect.actionId,
+                            message = "Local timeout",
+                        ),
+                    )
+                }
             }
-        }
 
         if (effect.pushDelay != 0L) {
             delay(effect.pushDelay)
@@ -286,118 +292,126 @@ class RealPirActionsRunner @AssistedInject constructor(
         )
     }
 
-    private suspend fun handleAwaitCaptchaSolution(effect: AwaitCaptchaSolution) = withContext(dispatcherProvider.io()) {
-        if (effect.transactionID.isEmpty()) {
-            onError(
-                PirError.CaptchaServiceError(
-                    "Unable to solve captcha",
-                ),
-            )
-        } else {
-            nativeBrokerActionHandler.pushAction(
-                GetCaptchaSolutionStatus(
-                    actionId = effect.actionId,
-                    transactionID = effect.transactionID,
-                ),
-            ).run {
-                if (this is Success) {
-                    when (val status = (this.data as CaptchaSolutionStatus).status) {
-                        is Ready -> engine?.dispatch(
-                            ExecuteBrokerStepAction(
-                                actionRequestData = PirScriptRequestData.SolveCaptcha(
-                                    token = status.token,
-                                ),
-                            ),
-                        )
-
-                        else -> {
-                            if (effect.attempt == effect.retries) {
-                                onError(
-                                    PirError.CaptchaServiceError(
-                                        "Unable to solve captcha",
-                                    ),
-                                )
-                            } else {
-                                delay(effect.pollingIntervalSeconds * 1000L)
-                                engine?.dispatch(
-                                    RetryAwaitCaptchaSolution(
-                                        actionId = effect.actionId,
-                                        brokerName = effect.brokerName,
-                                        transactionID = effect.transactionID,
-                                        attempt = effect.attempt,
-                                    ),
-                                )
-                            }
-                        }
-                    }
-                } else {
-                    onError(
-                        PirError.CaptchaServiceError(
-                            "Unable to solve captcha",
-                        ),
-                    )
-                }
-            }
-        }
-    }
-
-    private suspend fun handleGetCaptchaSolution(effect: GetCaptchaSolution) = withContext(dispatcherProvider.io()) {
-        nativeBrokerActionHandler.pushAction(
-            SubmitCaptchaInfo(
-                actionId = effect.actionId,
-                siteKey = effect.responseData!!.siteKey,
-                url = effect.responseData.url,
-                type = effect.responseData.type,
-            ),
-        ).also {
-            if (it is Success) {
-                engine?.dispatch(
-                    CaptchaInfoReceived(
-                        transactionID = (it.data as CaptchaTransactionIdReceived).transactionID,
-                    ),
-                )
-            } else if (it is Failure && !effect.isRetry && it.retryNativeAction) {
-                delay(60_000)
-                engine?.dispatch(
-                    RetryGetCaptchaSolution(
-                        actionId = effect.actionId,
-                        responseData = effect.responseData,
-                    ),
-                )
-            } else {
-                val result = it as Failure
+    private suspend fun handleAwaitCaptchaSolution(effect: AwaitCaptchaSolution) =
+        withContext(dispatcherProvider.io()) {
+            if (effect.transactionID.isEmpty()) {
                 onError(
                     PirError.CaptchaServiceError(
-                        error = result.message,
-                    ),
-                )
-            }
-        }
-    }
-
-    private suspend fun handleGetEmail(effect: GetEmailForProfile) = withContext(dispatcherProvider.io()) {
-        nativeBrokerActionHandler.pushAction(
-            NativeAction.GetEmail(
-                actionId = effect.actionId,
-                brokerName = effect.brokerName,
-            ),
-        ).also {
-            if (it is Success) {
-                engine?.dispatch(
-                    EmailReceived(
-                        email = (it.data as Email).email,
+                        "Unable to solve captcha",
                     ),
                 )
             } else {
-                val result = it as Failure
-                onError(
-                    PirError.EmailError(
-                        error = result.message,
-                    ),
-                )
+                nativeBrokerActionHandler
+                    .pushAction(
+                        GetCaptchaSolutionStatus(
+                            actionId = effect.actionId,
+                            transactionID = effect.transactionID,
+                        ),
+                    ).run {
+                        if (this is Success) {
+                            when (val status = (this.data as CaptchaSolutionStatus).status) {
+                                is Ready ->
+                                    engine?.dispatch(
+                                        ExecuteBrokerStepAction(
+                                            actionRequestData =
+                                            PirScriptRequestData.SolveCaptcha(
+                                                token = status.token,
+                                            ),
+                                        ),
+                                    )
+
+                                else -> {
+                                    if (effect.attempt == effect.retries) {
+                                        onError(
+                                            PirError.CaptchaServiceError(
+                                                "Unable to solve captcha",
+                                            ),
+                                        )
+                                    } else {
+                                        delay(effect.pollingIntervalSeconds * 1000L)
+                                        engine?.dispatch(
+                                            RetryAwaitCaptchaSolution(
+                                                actionId = effect.actionId,
+                                                brokerName = effect.brokerName,
+                                                transactionID = effect.transactionID,
+                                                attempt = effect.attempt,
+                                            ),
+                                        )
+                                    }
+                                }
+                            }
+                        } else {
+                            onError(
+                                PirError.CaptchaServiceError(
+                                    "Unable to solve captcha",
+                                ),
+                            )
+                        }
+                    }
             }
         }
-    }
+
+    private suspend fun handleGetCaptchaSolution(effect: GetCaptchaSolution) =
+        withContext(dispatcherProvider.io()) {
+            nativeBrokerActionHandler
+                .pushAction(
+                    SubmitCaptchaInfo(
+                        actionId = effect.actionId,
+                        siteKey = effect.responseData!!.siteKey,
+                        url = effect.responseData.url,
+                        type = effect.responseData.type,
+                    ),
+                ).also {
+                    if (it is Success) {
+                        engine?.dispatch(
+                            CaptchaInfoReceived(
+                                transactionID = (it.data as CaptchaTransactionIdReceived).transactionID,
+                            ),
+                        )
+                    } else if (it is Failure && !effect.isRetry && it.retryNativeAction) {
+                        delay(60_000)
+                        engine?.dispatch(
+                            RetryGetCaptchaSolution(
+                                actionId = effect.actionId,
+                                responseData = effect.responseData,
+                            ),
+                        )
+                    } else {
+                        val result = it as Failure
+                        onError(
+                            PirError.CaptchaServiceError(
+                                error = result.message,
+                            ),
+                        )
+                    }
+                }
+        }
+
+    private suspend fun handleGetEmail(effect: GetEmailForProfile) =
+        withContext(dispatcherProvider.io()) {
+            nativeBrokerActionHandler
+                .pushAction(
+                    NativeAction.GetEmail(
+                        actionId = effect.actionId,
+                        brokerName = effect.brokerName,
+                    ),
+                ).also {
+                    if (it is Success) {
+                        engine?.dispatch(
+                            EmailReceived(
+                                email = (it.data as Email).email,
+                            ),
+                        )
+                    } else {
+                        val result = it as Failure
+                        onError(
+                            PirError.EmailError(
+                                error = result.message,
+                            ),
+                        )
+                    }
+                }
+        }
 
     private fun cleanUpRunner() {
         if (timerJob.isActive) {
@@ -439,22 +453,26 @@ class RealPirActionsRunner @AssistedInject constructor(
         }
 
         when (pirError) {
-            is PirError.ActionFailed -> JsActionFailed(
-                error = pirError,
-                allowRetry = true,
-            )
+            is PirError.ActionFailed ->
+                JsActionFailed(
+                    error = pirError,
+                    allowRetry = true,
+                )
 
-            is PirError.CaptchaServiceError -> CaptchaServiceFailed(
-                error = pirError,
-            )
+            is PirError.CaptchaServiceError ->
+                CaptchaServiceFailed(
+                    error = pirError,
+                )
 
-            is PirError.EmailError -> EmailFailed(
-                error = pirError,
-            )
+            is PirError.EmailError ->
+                EmailFailed(
+                    error = pirError,
+                )
 
-            is PirError.JsError -> JsErrorReceived(
-                error = pirError,
-            )
+            is PirError.JsError ->
+                JsErrorReceived(
+                    error = pirError,
+                )
 
             else -> null
         }?.also {
