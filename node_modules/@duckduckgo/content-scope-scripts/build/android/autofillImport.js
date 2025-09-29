@@ -1530,7 +1530,7 @@
     }
   });
 
-  // entry-points/android.js
+  // entry-points/android-adsjs.js
   init_define_import_meta_trackerLookup();
 
   // src/content-scope-features.js
@@ -1997,6 +1997,34 @@
       createCustomEvent("sendMessageProxy" + messageSecret, { detail: JSON.stringify({ messageType, options }) })
     );
   }
+  function withRetry(fn, maxAttempts = 4, delay = 500, strategy = "exponential") {
+    return new Promise((resolve, reject) => {
+      let attempts = 0;
+      const tryFn = () => {
+        attempts += 1;
+        const error = new Error3("Result is invalid or max attempts reached");
+        try {
+          const result = fn();
+          if (result) {
+            resolve(result);
+          } else if (attempts < maxAttempts) {
+            const retryDelay = strategy === "linear" ? delay : delay * Math.pow(2, attempts);
+            setTimeout(tryFn, retryDelay);
+          } else {
+            reject(error);
+          }
+        } catch {
+          if (attempts < maxAttempts) {
+            const retryDelay = strategy === "linear" ? delay : delay * Math.pow(2, attempts);
+            setTimeout(tryFn, retryDelay);
+          } else {
+            reject(error);
+          }
+        }
+      };
+      tryFn();
+    });
+  }
 
   // src/features.js
   init_define_import_meta_trackerLookup();
@@ -2125,6 +2153,9 @@
   };
 
   // ddg:platformFeatures:ddg:platformFeatures
+  init_define_import_meta_trackerLookup();
+
+  // src/features/autofill-import.js
   init_define_import_meta_trackerLookup();
 
   // src/features/broker-protection.js
@@ -8934,42 +8965,595 @@
       this.log.error("unimplemented method: retryConfigFor:", action);
     }
   };
-  var BrokerProtection = class extends ActionExecutorBase {
-    init() {
-      this.messaging.subscribe("onActionReceived", async (params) => {
-        const { action, data: data2 } = params.state;
-        return await this.processActionAndNotify(action, data2);
-      });
+
+  // src/features/autofill-import.js
+  var ANIMATION_DURATION_MS = 1e3;
+  var ANIMATION_ITERATIONS = Infinity;
+  var BACKGROUND_COLOR_START = "rgba(85, 127, 243, 0.10)";
+  var BACKGROUND_COLOR_END = "rgba(85, 127, 243, 0.25)";
+  var OVERLAY_ID = "ddg-password-import-overlay";
+  var TAKEOUT_DOWNLOAD_URL_BASE = "/takeout/download";
+  var _exportButtonSettings, _settingsButtonSettings, _signInButtonSettings, _exportConfirmButtonSettings, _elementToCenterOn, _currentOverlay, _currentElementConfig, _domLoaded, _exportId, _processingBookmark, _isBookmarkModalVisible, _tappedElements;
+  var AutofillImport = class extends ActionExecutorBase {
+    constructor() {
+      super(...arguments);
+      __privateAdd(this, _exportButtonSettings);
+      __privateAdd(this, _settingsButtonSettings);
+      __privateAdd(this, _signInButtonSettings);
+      __privateAdd(this, _exportConfirmButtonSettings);
+      /** @type {HTMLElement|Element|SVGElement|null} */
+      __privateAdd(this, _elementToCenterOn);
+      /** @type {HTMLElement|null} */
+      __privateAdd(this, _currentOverlay);
+      /** @type {ElementConfig|null} */
+      __privateAdd(this, _currentElementConfig);
+      __privateAdd(this, _domLoaded);
+      __privateAdd(this, _exportId);
+      __privateAdd(this, _processingBookmark);
+      __privateAdd(this, _isBookmarkModalVisible, false);
+      /** @type {WeakSet<Element>} */
+      __privateAdd(this, _tappedElements, /* @__PURE__ */ new WeakSet());
     }
     /**
-     * Define default retry configurations for certain actions
-     *
-     * @param {any} action
-     * @returns
+     * @returns {ButtonAnimationStyle}
      */
-    retryConfigFor(action) {
-      const retryConfig = action.retry?.environment === "web" ? action.retry : void 0;
-      if (!retryConfig && action.actionType === "extract") {
-        return {
-          interval: { ms: 1e3 },
-          maxAttempts: 30
-        };
+    get settingsButtonAnimationStyle() {
+      return {
+        transform: {
+          start: "scale(0.90)",
+          mid: "scale(0.96)"
+        },
+        zIndex: "984",
+        borderRadius: "100%",
+        offsetLeftEm: 0.01,
+        offsetTopEm: 0
+      };
+    }
+    /**
+     * @returns {ButtonAnimationStyle}
+     */
+    get exportButtonAnimationStyle() {
+      return {
+        transform: {
+          start: "scale(1)",
+          mid: "scale(1.01)"
+        },
+        zIndex: "984",
+        borderRadius: "100%",
+        offsetLeftEm: 0,
+        offsetTopEm: 0
+      };
+    }
+    /**
+     * @returns {ButtonAnimationStyle}
+     */
+    get signInButtonAnimationStyle() {
+      return {
+        transform: {
+          start: "scale(1)",
+          mid: "scale(1.3, 1.5)"
+        },
+        zIndex: "999",
+        borderRadius: "2px",
+        offsetLeftEm: 0,
+        offsetTopEm: -0.05
+      };
+    }
+    /**
+     * @param {HTMLElement|null} overlay
+     */
+    set currentOverlay(overlay) {
+      __privateSet(this, _currentOverlay, overlay);
+    }
+    /**
+     * @returns {HTMLElement|null}
+     */
+    get currentOverlay() {
+      return __privateGet(this, _currentOverlay) ?? null;
+    }
+    /**
+     * @returns {ElementConfig|null}
+     */
+    get currentElementConfig() {
+      return __privateGet(this, _currentElementConfig);
+    }
+    /**
+     * @returns {Promise<void>}
+     */
+    get domLoaded() {
+      return __privateGet(this, _domLoaded);
+    }
+    /**
+     * @returns {Promise<Element|HTMLElement|null>}
+     */
+    async runWithRetry(fn, maxAttempts = 4, delay = 500, strategy = "exponential") {
+      try {
+        return await withRetry(fn, maxAttempts, delay, strategy);
+      } catch (error) {
+        return null;
       }
-      if (!retryConfig && (action.actionType === "expectation" || action.actionType === "condition")) {
-        if (action.expectations.some((x2) => x2.type === "element")) {
-          return {
-            interval: { ms: 1e3 },
-            maxAttempts: 30
-          };
+    }
+    /**
+     * @returns {Promise<ElementConfig | null>}
+     */
+    async getExportConfirmElementAndStyle() {
+      const exportConfirmElement = await this.findExportConfirmElement();
+      const shouldAutotap = __privateGet(this, _exportConfirmButtonSettings)?.shouldAutotap && exportConfirmElement != null;
+      return shouldAutotap ? {
+        animationStyle: null,
+        element: exportConfirmElement,
+        shouldTap: true,
+        shouldWatchForRemoval: false,
+        tapOnce: false
+      } : null;
+    }
+    /**
+     * @returns {Promise<ElementConfig | null>}
+     */
+    async getExportElementAndStyle() {
+      const element = await this.findExportElement();
+      return element != null ? {
+        animationStyle: this.exportButtonAnimationStyle,
+        element,
+        shouldTap: __privateGet(this, _exportButtonSettings)?.shouldAutotap ?? false,
+        shouldWatchForRemoval: true,
+        tapOnce: true
+      } : null;
+    }
+    /**
+     * Takes a path and returns the element and style to animate.
+     * @param {string} path
+     * @returns {Promise<ElementConfig | null>}
+     */
+    async getElementAndStyleFromPath(path) {
+      if (path === "/") {
+        const element = await this.findSettingsElement();
+        return element != null ? {
+          animationStyle: this.settingsButtonAnimationStyle,
+          element,
+          shouldTap: __privateGet(this, _settingsButtonSettings)?.shouldAutotap ?? false,
+          shouldWatchForRemoval: false,
+          tapOnce: false
+        } : null;
+      } else if (path === "/options") {
+        const isExportButtonTapped = this.currentElementConfig?.element != null && __privateGet(this, _tappedElements).has(this.currentElementConfig?.element);
+        if (isExportButtonTapped) {
+          return await this.getExportConfirmElementAndStyle();
+        } else {
+          return await this.getExportElementAndStyle();
+        }
+      } else if (path === "/intro") {
+        const element = await this.findSignInButton();
+        return element != null ? {
+          animationStyle: this.signInButtonAnimationStyle,
+          element,
+          shouldTap: __privateGet(this, _signInButtonSettings)?.shouldAutotap ?? false,
+          shouldWatchForRemoval: false,
+          tapOnce: false
+        } : null;
+      } else {
+        return null;
+      }
+    }
+    /**
+     * Removes the overlay if it exists.
+     */
+    removeOverlayIfNeeded() {
+      if (this.currentOverlay != null) {
+        this.currentOverlay.style.display = "none";
+        this.currentOverlay.remove();
+        this.currentOverlay = null;
+        document.removeEventListener("scroll", this);
+        if (this.currentElementConfig?.element) {
+          __privateGet(this, _tappedElements).delete(this.currentElementConfig?.element);
         }
       }
-      return retryConfig;
+    }
+    /**
+     * Updates the position of the overlay based on the element to center on.
+     */
+    updateOverlayPosition() {
+      if (this.currentOverlay != null && this.currentElementConfig?.animationStyle != null && this.elementToCenterOn != null) {
+        const animations = this.currentOverlay.getAnimations();
+        animations.forEach((animation) => animation.pause());
+        const { top, left, width, height } = this.elementToCenterOn.getBoundingClientRect();
+        this.currentOverlay.style.position = "absolute";
+        const { animationStyle } = this.currentElementConfig;
+        const isRound = animationStyle.borderRadius === "100%";
+        const widthOffset = isRound ? width / 2 : 0;
+        const heightOffset = isRound ? height / 2 : 0;
+        this.currentOverlay.style.top = `calc(${top}px + ${window.scrollY}px - ${widthOffset}px - 1px - ${animationStyle.offsetTopEm}em)`;
+        this.currentOverlay.style.left = `calc(${left}px + ${window.scrollX}px - ${heightOffset}px - 1px - ${animationStyle.offsetLeftEm}em)`;
+        this.currentOverlay.style.pointerEvents = "none";
+        animations.forEach((animation) => animation.play());
+      }
+    }
+    /**
+     * Creates an overlay element to animate, by adding a div to the body
+     * and styling it based on the found element.
+     * @param {HTMLElement|Element} mainElement
+     * @param {any} style
+     */
+    createOverlayElement(mainElement, style) {
+      this.removeOverlayIfNeeded();
+      const overlay = document.createElement("div");
+      overlay.setAttribute("id", OVERLAY_ID);
+      if (this.elementToCenterOn != null) {
+        this.currentOverlay = overlay;
+        this.updateOverlayPosition();
+        const mainElementRect = mainElement.getBoundingClientRect();
+        overlay.style.width = `${mainElementRect.width}px`;
+        overlay.style.height = `${mainElementRect.height}px`;
+        overlay.style.zIndex = style.zIndex;
+        overlay.style.pointerEvents = "none";
+        document.body.appendChild(overlay);
+        document.addEventListener("scroll", this, { passive: true });
+      } else {
+        this.currentOverlay = null;
+      }
+    }
+    /**
+     * Observes the removal of an element from the DOM.
+     * @param {HTMLElement|Element} element
+     * @param {any} onRemoveCallback
+     */
+    observeElementRemoval(element, onRemoveCallback) {
+      const observer = new MutationObserver((mutations) => {
+        mutations.forEach((mutation) => {
+          if (mutation.type === "childList" && !document.contains(element)) {
+            onRemoveCallback();
+            observer.disconnect();
+          }
+        });
+      });
+      observer.observe(document.body, { childList: true, subtree: true });
+    }
+    /**
+     *
+     * @param {HTMLElement|Element|SVGElement} element
+     * @param {ButtonAnimationStyle} style
+     */
+    setElementToCenterOn(element, style) {
+      const svgElement = element.parentNode?.querySelector("svg") ?? element.querySelector("svg");
+      __privateSet(this, _elementToCenterOn, style.borderRadius === "100%" && svgElement != null ? svgElement : element);
+    }
+    /**
+     * @returns {HTMLElement|Element|SVGElement|null}
+     */
+    get elementToCenterOn() {
+      return __privateGet(this, _elementToCenterOn);
+    }
+    /**
+     * Moves the element into view and animates it.
+     * @param {HTMLElement|Element} element
+     * @param {ButtonAnimationStyle} style
+     */
+    animateElement(element, style) {
+      this.createOverlayElement(element, style);
+      if (this.currentOverlay != null) {
+        this.currentOverlay.scrollIntoView({
+          behavior: "smooth",
+          block: "center",
+          inline: "center"
+        });
+        const keyframes = [
+          {
+            backgroundColor: BACKGROUND_COLOR_START,
+            offset: 0,
+            borderRadius: style.borderRadius,
+            border: `1px solid ${BACKGROUND_COLOR_START}`,
+            transform: style.transform.start
+          },
+          // Start: 10% blue
+          {
+            backgroundColor: BACKGROUND_COLOR_END,
+            offset: 0.5,
+            borderRadius: style.borderRadius,
+            border: `1px solid ${BACKGROUND_COLOR_END}`,
+            transform: style.transform.mid,
+            transformOrigin: "center"
+          },
+          // Middle: 25% blue
+          {
+            backgroundColor: BACKGROUND_COLOR_START,
+            offset: 1,
+            borderRadius: style.borderRadius,
+            border: `1px solid ${BACKGROUND_COLOR_START}`,
+            transform: style.transform.start
+          }
+          // End: 10% blue
+        ];
+        const options = {
+          duration: ANIMATION_DURATION_MS,
+          iterations: ANIMATION_ITERATIONS
+        };
+        this.currentOverlay.animate(keyframes, options);
+      }
+    }
+    autotapElement(element) {
+      element.click();
+    }
+    async findExportConfirmElement() {
+      return await this.runWithRetry(() => document.querySelector(this.exportConfirmButtonSelector));
+    }
+    /**
+     * On passwords.google.com the export button is in a container that is quite ambiguious.
+     * To solve for that we first try to find the container and then the button inside it.
+     * If that fails, we look for the button based on it's label.
+     * @returns {Promise<HTMLElement|Element|null>}
+     */
+    async findExportElement() {
+      const findInContainer = () => {
+        const exportButtonContainer = document.querySelector(this.exportButtonContainerSelector);
+        return exportButtonContainer && exportButtonContainer.querySelectorAll("button")[1];
+      };
+      const findWithLabel = () => {
+        return document.querySelector(this.exportButtonLabelTextSelector);
+      };
+      return await this.runWithRetry(() => findInContainer() ?? findWithLabel());
+    }
+    /**
+     * @returns {Promise<HTMLElement|Element|null>}
+     */
+    async findSettingsElement() {
+      const fn = () => {
+        const settingsButton = document.querySelector(this.settingsButtonSelector);
+        return settingsButton;
+      };
+      return await this.runWithRetry(fn);
+    }
+    /**
+     * @returns {Promise<HTMLElement|Element|null>}
+     */
+    async findSignInButton() {
+      return await this.runWithRetry(() => document.querySelector(this.signinButtonSelector));
+    }
+    /**
+     * @param {Event} event
+     */
+    handleEvent(event) {
+      if (event.type === "scroll") {
+        requestAnimationFrame(() => this.updateOverlayPosition());
+      }
+    }
+    /**
+     * @param {ElementConfig|null} config
+     */
+    setCurrentElementConfig(config) {
+      if (config != null) {
+        __privateSet(this, _currentElementConfig, config);
+        if (config.animationStyle != null) this.setElementToCenterOn(config.element, config.animationStyle);
+      }
+    }
+    /**
+     * Checks if the path is supported for animation.
+     * @param {string} path
+     * @returns {boolean}
+     */
+    isSupportedPath(path) {
+      return [
+        __privateGet(this, _exportButtonSettings)?.path,
+        __privateGet(this, _settingsButtonSettings)?.path,
+        __privateGet(this, _signInButtonSettings)?.path,
+        __privateGet(this, _exportConfirmButtonSettings)?.path
+      ].includes(path);
+    }
+    async handlePasswordManagerPath(pathname) {
+      this.removeOverlayIfNeeded();
+      if (this.isSupportedPath(pathname)) {
+        try {
+          this.setCurrentElementConfig(await this.getElementAndStyleFromPath(pathname));
+          if (this.currentElementConfig?.element && !__privateGet(this, _tappedElements).has(this.currentElementConfig?.element)) {
+            await this.animateOrTapElement();
+            if (this.currentElementConfig?.shouldTap && this.currentElementConfig?.tapOnce) {
+              __privateGet(this, _tappedElements).add(this.currentElementConfig.element);
+            }
+          }
+        } catch {
+          console.error("password-import: failed for path:", pathname);
+        }
+      }
+    }
+    /**
+     * @returns {Array<Record<string, any>>}
+     */
+    get bookmarkImportActionSettings() {
+      return this.getFeatureSetting("actions") || [];
+    }
+    /**
+     * @returns {Record<string, string>}
+     */
+    get bookmarkImportSelectorSettings() {
+      return this.getFeatureSetting("selectors");
+    }
+    /**
+     * @param {Location} location
+     *
+     */
+    async handleLocation(location2) {
+      const { pathname } = location2;
+      if (this.bookmarkImportActionSettings.length > 0) {
+        if (__privateGet(this, _processingBookmark)) {
+          return;
+        }
+        __privateSet(this, _processingBookmark, true);
+        await this.handleBookmarkImportPath(pathname);
+      } else if (this.getFeatureSetting("settingsButton")) {
+        await this.handlePasswordManagerPath(pathname);
+      } else {
+      }
+    }
+    /**
+     * Based on the current element config, animates the element or taps it.
+     * If the element should be watched for removal, it sets up a mutation observer.
+     */
+    async animateOrTapElement() {
+      const { element, animationStyle, shouldTap, shouldWatchForRemoval } = this.currentElementConfig ?? {};
+      if (element != null) {
+        if (shouldTap) {
+          this.autotapElement(element);
+        } else {
+          if (animationStyle != null) {
+            await this.domLoaded;
+            this.animateElement(element, animationStyle);
+          }
+        }
+        if (shouldWatchForRemoval) {
+          this.observeElementRemoval(element, () => {
+            this.removeOverlayIfNeeded();
+          });
+        }
+      }
+    }
+    /**
+     * @returns {string}
+     */
+    get exportButtonContainerSelector() {
+      return __privateGet(this, _exportButtonSettings)?.selectors?.join(",");
+    }
+    /**
+     * @returns {string}
+     */
+    get exportConfirmButtonSelector() {
+      return __privateGet(this, _exportConfirmButtonSettings)?.selectors?.join(",");
+    }
+    /**
+     * @returns {string}
+     */
+    get exportButtonLabelTextSelector() {
+      return __privateGet(this, _exportButtonSettings)?.labelTexts.map((text) => `button[aria-label="${text}"]`).join(",");
+    }
+    /**
+     * @returns {string}
+     */
+    get signinLabelTextSelector() {
+      return __privateGet(this, _signInButtonSettings)?.labelTexts.map((text) => `a[aria-label="${text}"]:not([target="_top"])`).join(",");
+    }
+    /**
+     * @returns {string}
+     */
+    get signinButtonSelector() {
+      return `${__privateGet(this, _signInButtonSettings)?.selectors?.join(",")}, ${this.signinLabelTextSelector}`;
+    }
+    /**
+     * @returns {string}
+     */
+    get settingsLabelTextSelector() {
+      return __privateGet(this, _settingsButtonSettings)?.labelTexts.map((text) => `a[aria-label="${text}"]`).join(",");
+    }
+    /**
+     * @returns {string}
+     */
+    get settingsButtonSelector() {
+      return `${__privateGet(this, _settingsButtonSettings)?.selectors?.join(",")}, ${this.settingsLabelTextSelector}`;
+    }
+    /** Bookmark import code */
+    async downloadData() {
+      await new Promise((resolve) => setTimeout(resolve, 1e3));
+      const userId = document.querySelector(this.bookmarkImportSelectorSettings.userIdLink)?.getAttribute("href")?.split("&user=")[1];
+      await this.runWithRetry(() => document.querySelector(`a[href="./manage/archive/${__privateGet(this, _exportId)}"]`), 15, 2e3, "linear");
+      if (userId != null && __privateGet(this, _exportId) != null) {
+        const downloadURL = `${TAKEOUT_DOWNLOAD_URL_BASE}?j=${__privateGet(this, _exportId)}&i=0&user=${userId}`;
+        window.location.href = downloadURL;
+      } else {
+        this.postBookmarkImportMessage("actionCompleted", {
+          result: new ErrorResponse({
+            actionID: "download-data",
+            message: "No user id or export id found"
+          })
+        });
+      }
+    }
+    /**
+     * Here we ignore the action and return a default retry config
+     * as for now the retry doesn't need to be per action.
+     */
+    retryConfigFor(_2) {
+      return {
+        interval: { ms: 1e3 },
+        maxAttempts: 30
+      };
+    }
+    postBookmarkImportMessage(name, data2) {
+      globalThis.ddgBookmarkImport?.postMessage(
+        JSON.stringify({
+          name,
+          data: data2
+        })
+      );
+    }
+    patchMessagingAndProcessAction(action) {
+      this.messaging.notify = this.postBookmarkImportMessage.bind(this);
+      return this.processActionAndNotify(action, {});
+    }
+    async handleBookmarkImportPath(pathname) {
+      if (pathname === "/" && !__privateGet(this, _isBookmarkModalVisible)) {
+        for (const action of this.bookmarkImportActionSettings) {
+          if (action.id === "manage-button-click") {
+            await this.storeExportId();
+          }
+          await this.patchMessagingAndProcessAction(action);
+        }
+        await this.downloadData();
+      }
+    }
+    setPasswordImportSettings() {
+      __privateSet(this, _exportButtonSettings, this.getFeatureSetting("exportButton"));
+      __privateSet(this, _signInButtonSettings, this.getFeatureSetting("signInButton"));
+      __privateSet(this, _settingsButtonSettings, this.getFeatureSetting("settingsButton"));
+      __privateSet(this, _exportConfirmButtonSettings, this.getFeatureSetting("exportConfirmButton"));
+    }
+    findExportId() {
+      const panels = document.querySelectorAll(this.bookmarkImportSelectorSettings.tabPanel);
+      const exportPanel = panels[panels.length - 1];
+      return exportPanel.querySelector("div[data-archive-id]")?.getAttribute("data-archive-id");
+    }
+    async storeExportId() {
+      __privateSet(this, _exportId, await this.runWithRetry(() => this.findExportId(), 30, 1e3, "linear"));
+    }
+    urlChanged() {
+      this.handleLocation(window.location);
+    }
+    init() {
+      if (isBeingFramed()) {
+        return;
+      }
+      if (this.getFeatureSetting("settingsButton")) {
+        this.setPasswordImportSettings();
+      }
+      const handleLocation = this.handleLocation.bind(this);
+      __privateSet(this, _domLoaded, new Promise((resolve) => {
+        if (document.readyState !== "loading") {
+          resolve();
+          return;
+        }
+        document.addEventListener(
+          "DOMContentLoaded",
+          async () => {
+            resolve();
+            await handleLocation(window.location);
+          },
+          { once: true }
+        );
+      }));
     }
   };
+  _exportButtonSettings = new WeakMap();
+  _settingsButtonSettings = new WeakMap();
+  _signInButtonSettings = new WeakMap();
+  _exportConfirmButtonSettings = new WeakMap();
+  _elementToCenterOn = new WeakMap();
+  _currentOverlay = new WeakMap();
+  _currentElementConfig = new WeakMap();
+  _domLoaded = new WeakMap();
+  _exportId = new WeakMap();
+  _processingBookmark = new WeakMap();
+  _isBookmarkModalVisible = new WeakMap();
+  _tappedElements = new WeakMap();
 
   // ddg:platformFeatures:ddg:platformFeatures
   var ddg_platformFeatures_default = {
-    ddg_feature_brokerProtection: BrokerProtection
+    ddg_feature_autofillImport: AutofillImport
   };
 
   // src/url-change.js
@@ -9038,7 +9622,7 @@
     }
     const importConfig = {
       trackerLookup: define_import_meta_trackerLookup_default,
-      injectName: "android-broker-protection"
+      injectName: "android-autofill-import"
     };
     const bundledFeatureNames = typeof importConfig.injectName === "string" ? platformSupport[importConfig.injectName] : [];
     const featuresToLoad = isGloballyDisabled(args) ? platformSpecificFeatures : args.site.enabledFeatures || bundledFeatureNames;
@@ -9087,6 +9671,22 @@
       performanceMonitor.measureAll();
     }
   }
+  async function updateFeatureArgs(updatedArgs) {
+    if (!isHTMLDocument) {
+      return;
+    }
+    const resolvedFeatures = await Promise.all(features);
+    resolvedFeatures.forEach(({ featureInstance }) => {
+      if (featureInstance && featureInstance.listenForConfigUpdates) {
+        if (typeof featureInstance.setArgs === "function") {
+          featureInstance.setArgs(updatedArgs);
+        }
+        if (typeof featureInstance.onUserPreferencesMerged === "function") {
+          featureInstance.onUserPreferencesMerged(updatedArgs);
+        }
+      }
+    });
+  }
   function alwaysInitExtensionFeatures(args, featureName) {
     return args.platform.name === "extension" && alwaysInitFeatures.has(featureName);
   }
@@ -9099,23 +9699,45 @@
     });
   }
 
-  // entry-points/android.js
+  // entry-points/android-adsjs.js
+  async function sendInitialPingAndUpdate(messagingConfig, processedConfig) {
+    if (isBeingFramed()) {
+      return;
+    }
+    try {
+      const messagingContext = new MessagingContext({
+        context: "contentScopeScripts",
+        env: processedConfig.debug ? "development" : "production",
+        featureName: "messaging"
+      });
+      const messaging = new Messaging(messagingContext, messagingConfig);
+      if (processedConfig.debug) {
+        console.log("AndroidAdsjs: Sending initial ping...");
+      }
+      const response = await messaging.request("initialPing", {});
+      if (response && typeof response === "object") {
+        const updatedConfig = { ...processedConfig, ...response };
+        await updateFeatureArgs(updatedConfig);
+      }
+    } catch (error) {
+      if (processedConfig.debug) {
+        console.error("AndroidAdsjs: Initial ping failed:", error);
+      }
+    }
+  }
   function initCode() {
     const config = $CONTENT_SCOPE$;
     const userUnprotectedDomains = $USER_UNPROTECTED_DOMAINS$;
     const userPreferences = $USER_PREFERENCES$;
     const processedConfig = processConfig(config, userUnprotectedDomains, userPreferences);
     const configConstruct = processedConfig;
-    const messageCallback = configConstruct.messageCallback;
-    const messageSecret2 = configConstruct.messageSecret;
-    const javascriptInterface = configConstruct.javascriptInterface;
-    processedConfig.messagingConfig = new AndroidMessagingConfig({
-      messageSecret: messageSecret2,
-      messageCallback,
-      javascriptInterface,
+    const objectName = configConstruct.objectName || "contentScopeAdsjs";
+    processedConfig.messagingConfig = new AndroidAdsjsMessagingConfig({
+      objectName,
       target: globalThis,
       debug: processedConfig.debug
     });
+    sendInitialPingAndUpdate(processedConfig.messagingConfig, processedConfig);
     load({
       platform: processedConfig.platform,
       site: processedConfig.site,
