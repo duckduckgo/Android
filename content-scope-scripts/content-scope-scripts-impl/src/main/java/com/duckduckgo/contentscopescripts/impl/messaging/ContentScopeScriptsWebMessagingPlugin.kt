@@ -39,8 +39,6 @@ import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.anvil.annotations.ContributesMultibinding
 import com.squareup.moshi.Moshi
 import dagger.SingleInstanceIn
-import javax.inject.Inject
-import javax.inject.Named
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -48,6 +46,8 @@ import logcat.LogPriority.ERROR
 import logcat.asLog
 import logcat.logcat
 import org.json.JSONObject
+import javax.inject.Inject
+import javax.inject.Named
 
 private const val JS_OBJECT_NAME = "contentScopeAdsjs"
 
@@ -60,10 +60,8 @@ class ContentScopeScriptsWebMessagingPlugin @Inject constructor(
     private val globalHandlers: PluginPoint<GlobalContentScopeJsMessageHandlersPlugin>,
     private val webViewCompatContentScopeScripts: WebViewCompatContentScopeScripts,
     private val webViewCompatWrapper: WebViewCompatWrapper,
-    private val dispatcherProvider: DispatcherProvider,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
 ) : WebMessagingPlugin {
-
     private val moshi = Moshi.Builder().add(JSONObjectAdapter()).build()
 
     override val context: String = "contentScopeScripts"
@@ -73,6 +71,7 @@ class ContentScopeScriptsWebMessagingPlugin @Inject constructor(
 
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
     internal fun process(
+        webView: WebView,
         message: String,
         jsMessageCallback: WebViewCompatMessageCallback,
         replyProxy: JavaScriptReplyProxy,
@@ -89,35 +88,40 @@ class ContentScopeScriptsWebMessagingPlugin @Inject constructor(
                     }
 
                     // Process global handlers first (always processed regardless of feature handlers)
-                    globalHandlers.getPlugins()
+                    globalHandlers
+                        .getPlugins()
                         .map { it.getGlobalJsMessageHandler() }
                         .filter { it.method == jsMessage.method }
                         .forEach { handler ->
                             handler.process(jsMessage)?.let { processResult ->
                                 when (processResult) {
                                     is SendToConsumer -> {
-                                        sendToConsumer(jsMessageCallback, jsMessage, replyProxy)
+                                        sendToConsumer(webView, jsMessageCallback, jsMessage, replyProxy)
                                     }
                                     is SendResponse -> {
-                                        onResponse(jsMessage, replyProxy)
+                                        onResponse(webView, jsMessage, replyProxy)
                                     }
                                 }
                             }
                         }
 
                     // Process with feature handlers
-                    handlers.getPlugins().map { it.getJsMessageHandler() }.firstOrNull {
-                        it.methods.contains(jsMessage.method) && it.featureName == jsMessage.featureName
-                    }?.process(jsMessage)?.let { processResult ->
-                        when (processResult) {
-                            is SendToConsumer -> {
-                                sendToConsumer(jsMessageCallback, jsMessage, replyProxy)
-                            }
-                            is SendResponse -> {
-                                onResponse(jsMessage, replyProxy)
+                    handlers
+                        .getPlugins()
+                        .map { it.getJsMessageHandler() }
+                        .firstOrNull {
+                            it.methods.contains(jsMessage.method) && it.featureName == jsMessage.featureName
+                        }?.process(jsMessage)
+                        ?.let { processResult ->
+                            when (processResult) {
+                                is SendToConsumer -> {
+                                    sendToConsumer(webView, jsMessageCallback, jsMessage, replyProxy)
+                                }
+                                is SendResponse -> {
+                                    onResponse(webView, jsMessage, replyProxy)
+                                }
                             }
                         }
-                    }
                 }
             }
         } catch (e: Exception) {
@@ -126,19 +130,22 @@ class ContentScopeScriptsWebMessagingPlugin @Inject constructor(
     }
 
     private fun onResponse(
+        webView: WebView,
         jsMessage: JsMessage,
         replyProxy: JavaScriptReplyProxy,
     ) {
-        val callbackData = JsCallbackData(
-            id = jsMessage.id ?: "",
-            params = jsMessage.params,
-            featureName = jsMessage.featureName,
-            method = jsMessage.method,
-        )
-        onResponse(callbackData, replyProxy)
+        val callbackData =
+            JsCallbackData(
+                id = jsMessage.id ?: "",
+                params = jsMessage.params,
+                featureName = jsMessage.featureName,
+                method = jsMessage.method,
+            )
+        onResponse(webView, callbackData, replyProxy)
     }
 
     private fun sendToConsumer(
+        webView: WebView,
         jsMessageCallback: WebViewCompatMessageCallback,
         jsMessage: JsMessage,
         replyProxy: JavaScriptReplyProxy,
@@ -150,13 +157,14 @@ class ContentScopeScriptsWebMessagingPlugin @Inject constructor(
             id = jsMessage.id ?: "",
             data = jsMessage.params,
             onResponse = { response: JSONObject ->
-                val callbackData = JsCallbackData(
-                    id = jsMessage.id ?: "",
-                    params = response,
-                    featureName = jsMessage.featureName,
-                    method = jsMessage.method,
-                )
-                onResponse(callbackData, replyProxy)
+                val callbackData =
+                    JsCallbackData(
+                        id = jsMessage.id ?: "",
+                        params = response,
+                        featureName = jsMessage.featureName,
+                        method = jsMessage.method,
+                    )
+                onResponse(webView, callbackData, replyProxy)
             },
         )
     }
@@ -177,6 +185,7 @@ class ContentScopeScriptsWebMessagingPlugin @Inject constructor(
                     allowedDomains,
                 ) { _, message, _, _, replyProxy ->
                     process(
+                        webView,
                         message.data ?: "",
                         jsMessageCallback,
                         replyProxy,
@@ -188,9 +197,7 @@ class ContentScopeScriptsWebMessagingPlugin @Inject constructor(
         }
     }
 
-    override fun unregister(
-        webView: WebView,
-    ) {
+    override fun unregister(webView: WebView) {
         appCoroutineScope.launch {
             if (!webViewCompatContentScopeScripts.isEnabled()) return@launch
             runCatching {
@@ -204,40 +211,47 @@ class ContentScopeScriptsWebMessagingPlugin @Inject constructor(
     }
 
     @SuppressLint("RequiresFeature")
-    private fun onResponse(response: JsCallbackData, replyProxy: JavaScriptReplyProxy) {
+    private fun onResponse(
+        webView: WebView,
+        response: JsCallbackData,
+        replyProxy: JavaScriptReplyProxy,
+    ) {
         runCatching {
-            val responseWithId = JSONObject().apply {
-                put("id", response.id)
-                put("result", response.params)
-                put("featureName", response.featureName)
-                put("context", context)
-            }
-            appCoroutineScope.launch(dispatcherProvider.main()) {
-                replyProxy.postMessage(responseWithId.toString())
+            val responseWithId =
+                JSONObject().apply {
+                    put("id", response.id)
+                    put("result", response.params)
+                    put("featureName", response.featureName)
+                    put("context", context)
+                }
+            appCoroutineScope.launch {
+                webViewCompatWrapper.postMessage(webView, replyProxy, responseWithId.toString())
             }
         }
     }
 
     @SuppressLint("RequiresFeature")
-    override fun postMessage(subscriptionEventData: SubscriptionEventData) {
+    override fun postMessage(
+        webView: WebView,
+        subscriptionEventData: SubscriptionEventData,
+    ) {
         runCatching {
             appCoroutineScope.launch {
                 if (!webViewCompatContentScopeScripts.isEnabled()) {
                     return@launch
                 }
 
-                val subscriptionEvent = SubscriptionEvent(
-                    context = context,
-                    featureName = subscriptionEventData.featureName,
-                    subscriptionName = subscriptionEventData.subscriptionName,
-                    params = subscriptionEventData.params,
-                ).let {
-                    moshi.adapter(SubscriptionEvent::class.java).toJson(it)
-                }
+                val subscriptionEvent =
+                    SubscriptionEvent(
+                        context = context,
+                        featureName = subscriptionEventData.featureName,
+                        subscriptionName = subscriptionEventData.subscriptionName,
+                        params = subscriptionEventData.params,
+                    ).let {
+                        moshi.adapter(SubscriptionEvent::class.java).toJson(it)
+                    }
 
-                withContext(dispatcherProvider.main()) {
-                    globalReplyProxy?.postMessage(subscriptionEvent)
-                }
+                webViewCompatWrapper.postMessage(webView, globalReplyProxy, subscriptionEvent)
             }
         }
     }

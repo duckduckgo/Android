@@ -24,11 +24,12 @@ interface WebMessagingPlugin {
         webView: WebView,
     )
 
-    fun unregister(
-        webView: WebView,
-    )
+    fun unregister(webView: WebView)
 
-    fun postMessage(subscriptionEventData: SubscriptionEventData)
+    fun postMessage(
+        webView: WebView,
+        subscriptionEventData: SubscriptionEventData,
+    )
 
     val context: String
 }

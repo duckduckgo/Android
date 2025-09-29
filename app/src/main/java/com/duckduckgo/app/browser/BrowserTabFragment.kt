@@ -3139,7 +3139,7 @@ class BrowserTabFragment :
 
             it.setDownloadListener { url, _, contentDisposition, mimeType, _ ->
                 lifecycleScope.launch(dispatchers.main()) {
-                    viewModel.requestFileDownload(url, contentDisposition, mimeType, true, isBlobDownloadWebViewFeatureEnabled(it))
+                    viewModel.requestFileDownload(it, url, contentDisposition, mimeType, true, isBlobDownloadWebViewFeatureEnabled(it))
                 }
             }
 
@@ -3361,6 +3361,7 @@ class BrowserTabFragment :
             } else {
                 blobConverterInjector.addJsInterface(webView) { url, mimeType ->
                     viewModel.requestFileDownload(
+                        webView = webView,
                         url = url,
                         contentDisposition = null,
                         mimeType = mimeType,

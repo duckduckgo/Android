@@ -47,7 +47,6 @@ import org.mockito.kotlin.whenever
 
 @RunWith(AndroidJUnit4::class)
 class ContentScopeScriptsWebMessagingPluginTest {
-
     @get:Rule
     val coroutineRule = CoroutineTestRule()
 
@@ -60,231 +59,237 @@ class ContentScopeScriptsWebMessagingPluginTest {
     private lateinit var testee: ContentScopeScriptsWebMessagingPlugin
 
     private class FakePluginPoint : PluginPoint<WebViewCompatContentScopeJsMessageHandlersPlugin> {
-        override fun getPlugins(): Collection<WebViewCompatContentScopeJsMessageHandlersPlugin> {
-            return listOf(FakePlugin())
-        }
+        override fun getPlugins(): Collection<WebViewCompatContentScopeJsMessageHandlersPlugin> = listOf(FakePlugin())
 
         inner class FakePlugin : WebViewCompatContentScopeJsMessageHandlersPlugin {
-            override fun getJsMessageHandler(): WebViewCompatMessageHandler {
-                return object : WebViewCompatMessageHandler {
-                    override fun process(
-                        jsMessage: JsMessage,
-                    ): ProcessResult {
-                        return SendToConsumer
-                    }
+            override fun getJsMessageHandler(): WebViewCompatMessageHandler =
+                object : WebViewCompatMessageHandler {
+                    override fun process(jsMessage: JsMessage): ProcessResult = SendToConsumer
 
                     override val featureName: String = "webCompat"
                     override val methods: List<String> = listOf("webShare", "permissionsQuery")
                 }
-            }
         }
     }
 
     private class FakeGlobalHandlersPluginPoint : PluginPoint<GlobalContentScopeJsMessageHandlersPlugin> {
-        override fun getPlugins(): Collection<GlobalContentScopeJsMessageHandlersPlugin> {
-            return listOf(FakeGlobalHandlerPlugin())
-        }
+        override fun getPlugins(): Collection<GlobalContentScopeJsMessageHandlersPlugin> = listOf(FakeGlobalHandlerPlugin())
 
         inner class FakeGlobalHandlerPlugin : GlobalContentScopeJsMessageHandlersPlugin {
-
-            override fun getGlobalJsMessageHandler(): GlobalJsMessageHandler {
-                return object : GlobalJsMessageHandler {
-
-                    override fun process(
-                        jsMessage: JsMessage,
-                    ): ProcessResult {
-                        return SendToConsumer
-                    }
+            override fun getGlobalJsMessageHandler(): GlobalJsMessageHandler =
+                object : GlobalJsMessageHandler {
+                    override fun process(jsMessage: JsMessage): ProcessResult = SendToConsumer
 
                     override val method: String = "addDebugFlag"
                 }
-            }
         }
     }
 
     @Before
-    fun setUp() = runTest {
-        whenever(webViewCompatContentScopeScripts.isEnabled()).thenReturn(true)
-        testee = ContentScopeScriptsWebMessagingPlugin(
-            handlers = handlers,
-            globalHandlers = globalHandlers,
-            webViewCompatContentScopeScripts = webViewCompatContentScopeScripts,
-            webViewCompatWrapper = mockWebViewCompatWrapper,
-            dispatcherProvider = coroutineRule.testDispatcherProvider,
-            appCoroutineScope = coroutineRule.testScope,
-        )
-    }
-
-    @Test
-    fun `when process and message can be handled then execute callback`() = runTest {
-        givenInterfaceIsRegistered()
-
-        val message = """
-            {"context":"contentScopeScripts","featureName":"webCompat","id":"myId","method":"webShare","params":{}}
-        """.trimIndent()
-
-        testee.process(message, callback, mockReplyProxy)
-
-        assertEquals(1, callback.counter)
-    }
-
-    @Test
-    fun `when processing unknown message do nothing`() = runTest {
-        givenInterfaceIsRegistered()
-
-        testee.process("", callback, mockReplyProxy)
-
-        assertEquals(0, callback.counter)
-    }
-
-    @Test
-    fun `when feature does not match do nothing`() = runTest {
-        givenInterfaceIsRegistered()
-
-        val message = """
-            {"context":"contentScopeScripts","featureName":"test","id":"myId","method":"webShare","params":{}}
-        """.trimIndent()
-
-        testee.process(message, callback, mockReplyProxy)
-
-        assertEquals(0, callback.counter)
-    }
-
-    @Test
-    fun `when id does not exist do nothing`() = runTest {
-        givenInterfaceIsRegistered()
-
-        val message = """
-            {"context":"contentScopeScripts","webCompat":"test","method":"webShare","params":{}}
-        """.trimIndent()
-
-        testee.process(message, callback, mockReplyProxy)
-
-        assertEquals(0, callback.counter)
-    }
-
-    @Test
-    fun `when processing addDebugFlag message then process message`() = runTest {
-        givenInterfaceIsRegistered()
-
-        val message = """
-            {"context":"contentScopeScripts","featureName":"debugFeature","id":"debugId","method":"addDebugFlag","params":{}}
-        """.trimIndent()
-
-        testee.process(message, callback, mockReplyProxy)
-
-        assertEquals(1, callback.counter)
-    }
-
-    @Test
-    fun `when registering and adsjs is disabled then do not register`() = runTest {
-        whenever(webViewCompatContentScopeScripts.isEnabled()).thenReturn(false)
-
-        testee.register(callback, mockWebView)
-
-        verify(mockWebViewCompatWrapper, never())
-            .addWebMessageListener(any(), any(), any(), any())
-    }
-
-    @Test
-    fun `when registering and adsjs is enabled then register`() = runTest {
-        whenever(webViewCompatContentScopeScripts.isEnabled()).thenReturn(true)
-
-        testee.register(callback, mockWebView)
-
-        verify(mockWebViewCompatWrapper).addWebMessageListener(
-            eq(mockWebView),
-            eq("contentScopeAdsjs"),
-            eq(setOf("*")),
-            any(),
-        )
-    }
-
-    @Test
-    fun `when unregistering and adsjs is disabled then do not unregister`() = runTest {
-        whenever(webViewCompatContentScopeScripts.isEnabled()).thenReturn(false)
-
-        testee.unregister(mockWebView)
-
-        verify(mockWebViewCompatWrapper, never())
-            .removeWebMessageListener(any(), any())
-    }
-
-    @Test
-    fun `when unregistering and adsjs is enabled then unregister`() = runTest {
-        whenever(webViewCompatContentScopeScripts.isEnabled()).thenReturn(true)
-
-        testee.unregister(mockWebView)
-
-        verify(mockWebViewCompatWrapper).removeWebMessageListener(mockWebView, "contentScopeAdsjs")
-    }
-
-    @Test
-    fun `when posting message and adsjs is disabled then do not post message`() = runTest {
-        whenever(webViewCompatContentScopeScripts.isEnabled()).thenReturn(false)
-        val eventData = SubscriptionEventData("feature", "subscription", JSONObject())
-        givenInterfaceIsRegistered()
-
-        testee.postMessage(eventData)
-
-        verify(mockReplyProxy, never()).postMessage(anyString())
-    }
-
-    @Test
-    fun `when posting message and adsjs is enabled but webView not registered then do not post message`() = runTest {
-        whenever(webViewCompatContentScopeScripts.isEnabled()).thenReturn(true)
-        val eventData = SubscriptionEventData("feature", "subscription", JSONObject())
-
-        testee.postMessage(eventData)
-
-        verify(mockReplyProxy, never()).postMessage(anyString())
-    }
-
-    @Test
-    fun `when posting message and adsjs is enabled but initialPing not processes then do not post message`() = runTest {
-        whenever(webViewCompatContentScopeScripts.isEnabled()).thenReturn(true)
-        val eventData = SubscriptionEventData("feature", "subscription", JSONObject())
-
-        testee.postMessage(eventData)
-
-        verify(mockReplyProxy, never()).postMessage(anyString())
-    }
-
-    @Test
-    fun `when posting message after getting initialPing and adsjs is enabled then post message`() = runTest {
-        whenever(webViewCompatContentScopeScripts.isEnabled()).thenReturn(true)
-        val eventData = SubscriptionEventData("feature", "subscription", JSONObject())
-        givenInterfaceIsRegistered()
-        val expectedMessage = """
-            {"context":"contentScopeScripts","featureName":"feature","params":{},"subscriptionName":"subscription"}
-        """.trimIndent()
-
-        verify(mockWebView, never()).postWebMessage(any(), any())
-
-        testee.postMessage(eventData)
-        verify(mockReplyProxy).postMessage(expectedMessage)
-    }
-
-    private val callback = object : WebViewCompatMessageCallback {
-        var counter = 0
-        override fun process(
-            context: String,
-            featureName: String,
-            method: String,
-            id: String?,
-            data: JSONObject?,
-            onResponse: (params: JSONObject) -> Unit,
-        ) {
-            counter++
+    fun setUp() =
+        runTest {
+            whenever(webViewCompatContentScopeScripts.isEnabled()).thenReturn(true)
+            testee =
+                ContentScopeScriptsWebMessagingPlugin(
+                    handlers = handlers,
+                    globalHandlers = globalHandlers,
+                    webViewCompatContentScopeScripts = webViewCompatContentScopeScripts,
+                    webViewCompatWrapper = mockWebViewCompatWrapper,
+                    appCoroutineScope = coroutineRule.testScope,
+                )
         }
-    }
 
-    private fun givenInterfaceIsRegistered() = runTest {
-        testee.register(callback, mockWebView)
-        val initialPingMessage =
-            """
+    @Test
+    fun `when process and message can be handled then execute callback`() =
+        runTest {
+            givenInterfaceIsRegistered()
+
+            val message =
+                """
+                {"context":"contentScopeScripts","featureName":"webCompat","id":"myId","method":"webShare","params":{}}
+                """.trimIndent()
+
+            testee.process(mockWebView, message, callback, mockReplyProxy)
+
+            assertEquals(1, callback.counter)
+        }
+
+    @Test
+    fun `when processing unknown message do nothing`() =
+        runTest {
+            givenInterfaceIsRegistered()
+
+            testee.process(mockWebView, "", callback, mockReplyProxy)
+
+            assertEquals(0, callback.counter)
+        }
+
+    @Test
+    fun `when feature does not match do nothing`() =
+        runTest {
+            givenInterfaceIsRegistered()
+
+            val message =
+                """
+                {"context":"contentScopeScripts","featureName":"test","id":"myId","method":"webShare","params":{}}
+                """.trimIndent()
+
+            testee.process(mockWebView, message, callback, mockReplyProxy)
+
+            assertEquals(0, callback.counter)
+        }
+
+    @Test
+    fun `when id does not exist do nothing`() =
+        runTest {
+            givenInterfaceIsRegistered()
+
+            val message =
+                """
+                {"context":"contentScopeScripts","webCompat":"test","method":"webShare","params":{}}
+                """.trimIndent()
+
+            testee.process(mockWebView, message, callback, mockReplyProxy)
+
+            assertEquals(0, callback.counter)
+        }
+
+    @Test
+    fun `when processing addDebugFlag message then process message`() =
+        runTest {
+            givenInterfaceIsRegistered()
+
+            val message =
+                """
+                {"context":"contentScopeScripts","featureName":"debugFeature","id":"debugId","method":"addDebugFlag","params":{}}
+                """.trimIndent()
+
+            testee.process(mockWebView, message, callback, mockReplyProxy)
+
+            assertEquals(1, callback.counter)
+        }
+
+    @Test
+    fun `when registering and adsjs is disabled then do not register`() =
+        runTest {
+            whenever(webViewCompatContentScopeScripts.isEnabled()).thenReturn(false)
+
+            testee.register(callback, mockWebView)
+
+            verify(mockWebViewCompatWrapper, never())
+                .addWebMessageListener(any(), any(), any(), any())
+        }
+
+    @Test
+    fun `when registering and adsjs is enabled then register`() =
+        runTest {
+            whenever(webViewCompatContentScopeScripts.isEnabled()).thenReturn(true)
+
+            testee.register(callback, mockWebView)
+
+            verify(mockWebViewCompatWrapper).addWebMessageListener(
+                eq(mockWebView),
+                eq("contentScopeAdsjs"),
+                eq(setOf("*")),
+                any(),
+            )
+        }
+
+    @Test
+    fun `when unregistering and adsjs is disabled then do not unregister`() =
+        runTest {
+            whenever(webViewCompatContentScopeScripts.isEnabled()).thenReturn(false)
+
+            testee.unregister(mockWebView)
+
+            verify(mockWebViewCompatWrapper, never())
+                .removeWebMessageListener(any(), any())
+        }
+
+    @Test
+    fun `when unregistering and adsjs is enabled then unregister`() =
+        runTest {
+            whenever(webViewCompatContentScopeScripts.isEnabled()).thenReturn(true)
+
+            testee.unregister(mockWebView)
+
+            verify(mockWebViewCompatWrapper).removeWebMessageListener(mockWebView, "contentScopeAdsjs")
+        }
+
+    @Test
+    fun `when posting message and adsjs is disabled then do not post message`() =
+        runTest {
+            whenever(webViewCompatContentScopeScripts.isEnabled()).thenReturn(false)
+            val eventData = SubscriptionEventData("feature", "subscription", JSONObject())
+            givenInterfaceIsRegistered()
+
+            testee.postMessage(mockWebView, eventData)
+
+            verify(mockWebViewCompatWrapper, never()).postMessage(any(), any(), anyString())
+        }
+
+    @Test
+    fun `when posting message and adsjs is enabled but webView not registered then do not post message`() =
+        runTest {
+            whenever(webViewCompatContentScopeScripts.isEnabled()).thenReturn(true)
+            val eventData = SubscriptionEventData("feature", "subscription", JSONObject())
+
+            testee.postMessage(mockWebView, eventData)
+
+            verify(mockWebViewCompatWrapper, never()).postMessage(any(), any(), anyString())
+        }
+
+    @Test
+    fun `when posting message and adsjs is enabled but initialPing not processes then do not post message`() =
+        runTest {
+            whenever(webViewCompatContentScopeScripts.isEnabled()).thenReturn(true)
+            val eventData = SubscriptionEventData("feature", "subscription", JSONObject())
+
+            testee.postMessage(mockWebView, eventData)
+
+            verify(mockWebViewCompatWrapper, never()).postMessage(any(), any(), anyString())
+        }
+
+    @Test
+    fun `when posting message after getting initialPing and adsjs is enabled then post message`() =
+        runTest {
+            whenever(webViewCompatContentScopeScripts.isEnabled()).thenReturn(true)
+            val eventData = SubscriptionEventData("feature", "subscription", JSONObject())
+            givenInterfaceIsRegistered()
+            val expectedMessage =
+                """
+                {"context":"contentScopeScripts","featureName":"feature","params":{},"subscriptionName":"subscription"}
+                """.trimIndent()
+
+            verify(mockWebView, never()).postWebMessage(any(), any())
+
+            testee.postMessage(mockWebView, eventData)
+            verify(mockWebViewCompatWrapper).postMessage(mockWebView, mockReplyProxy, expectedMessage)
+        }
+
+    private val callback =
+        object : WebViewCompatMessageCallback {
+            var counter = 0
+
+            override fun process(
+                context: String,
+                featureName: String,
+                method: String,
+                id: String?,
+                data: JSONObject?,
+                onResponse: (params: JSONObject) -> Unit,
+            ) {
+                counter++
+            }
+        }
+
+    private fun givenInterfaceIsRegistered() =
+        runTest {
+            testee.register(callback, mockWebView)
+            val initialPingMessage =
+                """
                 {"context":"contentScopeScripts","featureName":"messaging","id":"debugId","method":"initialPing","params":{}}
-            """.trimIndent()
-        testee.process(initialPingMessage, callback, mockReplyProxy)
-    }
+                """.trimIndent()
+            testee.process(mockWebView, initialPingMessage, callback, mockReplyProxy)
+        }
 }

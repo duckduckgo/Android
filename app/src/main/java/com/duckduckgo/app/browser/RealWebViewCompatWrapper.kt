@@ -18,6 +18,7 @@ package com.duckduckgo.app.browser
 
 import android.annotation.SuppressLint
 import android.webkit.WebView
+import androidx.webkit.JavaScriptReplyProxy
 import androidx.webkit.ScriptHandler
 import androidx.webkit.WebViewCompat
 import com.duckduckgo.app.browser.api.WebViewCapabilityChecker
@@ -113,6 +114,28 @@ class RealWebViewCompatWrapper @Inject constructor(
         }
         return withContext(dispatcherProvider.main()) {
             WebViewCompat.addWebMessageListener(webView, jsObjectName, allowedOriginRules, listener)
+        }
+    }
+
+    @SuppressLint("PostMessageUsage")
+    override suspend fun postMessage(
+        webView: WebView,
+        globalReplyProxy: JavaScriptReplyProxy?,
+        subscriptionEvent: String,
+    ) {
+        if (!webView.isAttachedToWindow) {
+            logcat(ERROR) { "Error calling addWebMessageListener on detached WebView" }
+            return
+        }
+
+        if (webView is DuckDuckGoWebView) {
+            globalReplyProxy?.let {
+                webView.safePostMessage(globalReplyProxy, subscriptionEvent)
+            }
+            return
+        }
+        withContext(dispatcherProvider.main()) {
+            globalReplyProxy?.postMessage(subscriptionEvent)
         }
     }
 }

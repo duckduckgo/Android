@@ -215,6 +215,7 @@ import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggesti
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion.AutoCompleteUrlSuggestion.AutoCompleteSwitchToTabSuggestion
 import com.duckduckgo.browser.api.autocomplete.AutoCompleteSettings
 import com.duckduckgo.browser.api.brokensite.BrokenSiteContext
+import com.duckduckgo.browser.api.webviewcompat.WebViewCompatWrapper
 import com.duckduckgo.browser.ui.omnibar.OmnibarPosition.BOTTOM
 import com.duckduckgo.browser.ui.omnibar.OmnibarPosition.TOP
 import com.duckduckgo.common.test.CoroutineTestRule
@@ -600,6 +601,8 @@ class BrowserTabViewModelTest {
 
     private var isFullSiteAddressEnabled = true
 
+    private val mockWebViewCompatWrapper: WebViewCompatWrapper = mock()
+
     @Before
     fun before() =
         runTest {
@@ -823,6 +826,7 @@ class BrowserTabViewModelTest {
                     nonHttpAppLinkChecker = nonHttpAppLinkChecker,
                     externalIntentProcessingState = mockExternalIntentProcessingState,
                     vpnMenuStateProvider = mockVpnMenuStateProvider,
+                    webViewCompatWrapper = mockWebViewCompatWrapper,
                 )
 
             testee.loadData("abc", null, false, false)
