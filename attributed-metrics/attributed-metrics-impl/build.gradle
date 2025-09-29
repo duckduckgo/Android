@@ -46,6 +46,9 @@ dependencies {
 
     implementation Google.dagger
 
+    // DataStore
+    api AndroidX.dataStore.preferences
+
     // Room
     implementation AndroidX.room.ktx
     ksp AndroidX.room.compiler
