@@ -143,7 +143,6 @@ class InputScreenViewModel @AssistedInject constructor(
                 showChatLogo = true,
                 showSearchLogo = true,
                 newLineButtonVisible = false,
-                scrollSeparatorVisible = false,
             ),
         )
     val visibilityState: StateFlow<InputScreenVisibilityState> = _visibilityState.asStateFlow()
@@ -224,10 +223,6 @@ class InputScreenViewModel @AssistedInject constructor(
 
     private val _inputFieldCommand = Channel<InputFieldCommand>(capacity = Channel.CONFLATED)
     val inputFieldCommand: Flow<InputFieldCommand> = _inputFieldCommand.receiveAsFlow()
-    private val canScrollUpAutocomplete = MutableStateFlow(false)
-    private val canScrollUpNtp = MutableStateFlow(false)
-    private val canScrollDownAutocomplete = MutableStateFlow(false)
-    private val canScrollDownNtp = MutableStateFlow(false)
 
     init {
         combine(voiceServiceAvailable, voiceInputAllowed) { serviceAvailable, inputAllowed ->
@@ -274,28 +269,6 @@ class InputScreenViewModel @AssistedInject constructor(
         }.onEach { shouldShowSearchLogo ->
             _visibilityState.update {
                 it.copy(showSearchLogo = shouldShowSearchLogo)
-            }
-        }.launchIn(viewModelScope)
-
-        if (inputScreenConfigResolver.useTopBar()) {
-            shouldShowAutoComplete.flatMapLatest {
-                if (it) {
-                    canScrollUpAutocomplete
-                } else {
-                    canScrollUpNtp
-                }
-            }
-        } else {
-            shouldShowAutoComplete.flatMapLatest {
-                if (it) {
-                    canScrollDownAutocomplete
-                } else {
-                    canScrollDownNtp
-                }
-            }
-        }.onEach { scrollSeparatorVisible ->
-            _visibilityState.update {
-                it.copy(scrollSeparatorVisible = scrollSeparatorVisible)
             }
         }.launchIn(viewModelScope)
     }
@@ -630,22 +603,6 @@ class InputScreenViewModel @AssistedInject constructor(
             this <= 100 -> "long"
             else -> "very_long"
         }
-
-    fun canScrollUpAutocomplete(canScrollUp: Boolean) {
-        canScrollUpAutocomplete.value = canScrollUp
-    }
-
-    fun canScrollUpNtp(canScrollUp: Boolean) {
-        canScrollUpNtp.value = canScrollUp
-    }
-
-    fun canScrollDownAutocomplete(canScrollDown: Boolean) {
-        canScrollDownAutocomplete.value = canScrollDown
-    }
-
-    fun canScrollDownNtp(canScrollDown: Boolean) {
-        canScrollDownNtp.value = canScrollDown
-    }
 
     class InputScreenViewModelProviderFactory(
         private val assistedFactory: InputScreenViewModelFactory,

@@ -253,7 +253,6 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
                 binding.ddgLogo.progress = if (isSearchMode) 0f else 1f
 
                 inputScreenButtons.setNewLineButtonVisible(it.newLineButtonVisible)
-                contentSeparator.isVisible = it.scrollSeparatorVisible
             }.launchIn(lifecycleScope)
     }
 

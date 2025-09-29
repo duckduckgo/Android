@@ -23,5 +23,4 @@ data class InputScreenVisibilityState(
     val showChatLogo: Boolean,
     val showSearchLogo: Boolean,
     val newLineButtonVisible: Boolean,
-    val scrollSeparatorVisible: Boolean,
 )

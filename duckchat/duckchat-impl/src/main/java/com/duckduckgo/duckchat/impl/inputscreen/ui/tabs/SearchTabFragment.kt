@@ -25,8 +25,6 @@ import androidx.core.view.isVisible
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
-import androidx.recyclerview.widget.RecyclerView.OnScrollListener
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion
 import com.duckduckgo.browser.api.ui.BrowserScreens.PrivateSearchScreenNoParams
@@ -107,16 +105,6 @@ class SearchTabFragment : DuckDuckGoFragment(R.layout.fragment_search_tab) {
 
     private fun configureNewTabPage() {
         // TODO: fix favorites click source to "focused state" instead of "new tab page"
-        fun canScrollNtp(v: View) {
-            viewModel.canScrollUpNtp(canScrollUp = v.canScrollVertically(-1))
-            viewModel.canScrollDownNtp(canScrollDown = v.canScrollVertically(1))
-        }
-        binding.newTabContainerScrollView.addOnLayoutChangeListener { v, _, _, _, _, _, _, _, _ ->
-            canScrollNtp(v)
-        }
-        binding.newTabContainerScrollView.setOnScrollChangeListener { v, _, _, _, _ ->
-            canScrollNtp(v)
-        }
         lifecycleScope.launch {
             newTabPagePlugins.getPlugins().firstOrNull()?.let { plugin ->
                 val newTabPageView =
@@ -130,24 +118,6 @@ class SearchTabFragment : DuckDuckGoFragment(R.layout.fragment_search_tab) {
     }
 
     private fun configureAutoComplete() {
-        fun canScrollAutocomplete(v: View) {
-            viewModel.canScrollUpAutocomplete(v.canScrollVertically(-1))
-            viewModel.canScrollDownAutocomplete(v.canScrollVertically(1))
-        }
-        binding.autoCompleteSuggestionsList.addOnLayoutChangeListener { v, _, _, _, _, _, _, _, _ ->
-            canScrollAutocomplete(v)
-        }
-        binding.autoCompleteSuggestionsList.addOnScrollListener(
-            object : OnScrollListener() {
-                override fun onScrolled(
-                    recyclerView: RecyclerView,
-                    dx: Int,
-                    dy: Int,
-                ) {
-                    canScrollAutocomplete(recyclerView)
-                }
-            },
-        )
         val context = context ?: return
         binding.autoCompleteSuggestionsList.layoutManager = LinearLayoutManager(context)
         if (inputScreenConfigResolver.useTopBar()) {
