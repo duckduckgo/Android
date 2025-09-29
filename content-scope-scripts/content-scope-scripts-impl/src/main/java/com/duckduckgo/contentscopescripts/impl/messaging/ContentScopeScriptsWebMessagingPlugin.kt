@@ -99,7 +99,9 @@ class ContentScopeScriptsWebMessagingPlugin @Inject constructor(
                                         sendToConsumer(webView, jsMessageCallback, jsMessage, replyProxy)
                                     }
                                     is SendResponse -> {
-                                        onResponse(webView, jsMessage, replyProxy)
+                                        appCoroutineScope.launch {
+                                            onResponse(webView, jsMessage, replyProxy)
+                                        }
                                     }
                                 }
                             }
@@ -118,7 +120,9 @@ class ContentScopeScriptsWebMessagingPlugin @Inject constructor(
                                     sendToConsumer(webView, jsMessageCallback, jsMessage, replyProxy)
                                 }
                                 is SendResponse -> {
-                                    onResponse(webView, jsMessage, replyProxy)
+                                    appCoroutineScope.launch {
+                                        onResponse(webView, jsMessage, replyProxy)
+                                    }
                                 }
                             }
                         }
@@ -129,7 +133,7 @@ class ContentScopeScriptsWebMessagingPlugin @Inject constructor(
         }
     }
 
-    private fun onResponse(
+    private suspend fun onResponse(
         webView: WebView,
         jsMessage: JsMessage,
         replyProxy: JavaScriptReplyProxy,
@@ -169,49 +173,45 @@ class ContentScopeScriptsWebMessagingPlugin @Inject constructor(
         )
     }
 
-    override fun register(
+    override suspend fun register(
         jsMessageCallback: WebViewCompatMessageCallback,
         webView: WebView,
     ) {
-        appCoroutineScope.launch {
-            if (!webViewCompatContentScopeScripts.isEnabled()) {
-                return@launch
-            }
+        if (!webViewCompatContentScopeScripts.isEnabled()) {
+            return
+        }
 
-            runCatching {
-                return@runCatching webViewCompatWrapper.addWebMessageListener(
+        runCatching {
+            return@runCatching webViewCompatWrapper.addWebMessageListener(
+                webView,
+                JS_OBJECT_NAME,
+                allowedDomains,
+            ) { _, message, _, _, replyProxy ->
+                process(
                     webView,
-                    JS_OBJECT_NAME,
-                    allowedDomains,
-                ) { _, message, _, _, replyProxy ->
-                    process(
-                        webView,
-                        message.data ?: "",
-                        jsMessageCallback,
-                        replyProxy,
-                    )
-                }
-            }.getOrElse { exception ->
-                logcat(ERROR) { "Error adding WebMessageListener for contentScopeAdsjs: ${exception.asLog()}" }
+                    message.data ?: "",
+                    jsMessageCallback,
+                    replyProxy,
+                )
             }
+        }.getOrElse { exception ->
+            logcat(ERROR) { "Error adding WebMessageListener for contentScopeAdsjs: ${exception.asLog()}" }
         }
     }
 
-    override fun unregister(webView: WebView) {
-        appCoroutineScope.launch {
-            if (!webViewCompatContentScopeScripts.isEnabled()) return@launch
-            runCatching {
-                return@runCatching webViewCompatWrapper.removeWebMessageListener(webView, JS_OBJECT_NAME)
-            }.getOrElse { exception ->
-                logcat(ERROR) {
-                    "Error removing WebMessageListener for contentScopeAdsjs: ${exception.asLog()}"
-                }
+    override suspend fun unregister(webView: WebView) {
+        if (!webViewCompatContentScopeScripts.isEnabled()) return
+        runCatching {
+            return@runCatching webViewCompatWrapper.removeWebMessageListener(webView, JS_OBJECT_NAME)
+        }.getOrElse { exception ->
+            logcat(ERROR) {
+                "Error removing WebMessageListener for contentScopeAdsjs: ${exception.asLog()}"
             }
         }
     }
 
     @SuppressLint("RequiresFeature")
-    private fun onResponse(
+    private suspend fun onResponse(
         webView: WebView,
         response: JsCallbackData,
         replyProxy: JavaScriptReplyProxy,
@@ -224,35 +224,31 @@ class ContentScopeScriptsWebMessagingPlugin @Inject constructor(
                     put("featureName", response.featureName)
                     put("context", context)
                 }
-            appCoroutineScope.launch {
-                webViewCompatWrapper.postMessage(webView, replyProxy, responseWithId.toString())
-            }
+            webViewCompatWrapper.postMessage(webView, replyProxy, responseWithId.toString())
         }
     }
 
     @SuppressLint("RequiresFeature")
-    override fun postMessage(
+    override suspend fun postMessage(
         webView: WebView,
         subscriptionEventData: SubscriptionEventData,
     ) {
         runCatching {
-            appCoroutineScope.launch {
-                if (!webViewCompatContentScopeScripts.isEnabled()) {
-                    return@launch
+            if (!webViewCompatContentScopeScripts.isEnabled()) {
+                return
+            }
+
+            val subscriptionEvent =
+                SubscriptionEvent(
+                    context = context,
+                    featureName = subscriptionEventData.featureName,
+                    subscriptionName = subscriptionEventData.subscriptionName,
+                    params = subscriptionEventData.params,
+                ).let {
+                    moshi.adapter(SubscriptionEvent::class.java).toJson(it)
                 }
 
-                val subscriptionEvent =
-                    SubscriptionEvent(
-                        context = context,
-                        featureName = subscriptionEventData.featureName,
-                        subscriptionName = subscriptionEventData.subscriptionName,
-                        params = subscriptionEventData.params,
-                    ).let {
-                        moshi.adapter(SubscriptionEvent::class.java).toJson(it)
-                    }
-
-                webViewCompatWrapper.postMessage(webView, globalReplyProxy, subscriptionEvent)
-            }
+            webViewCompatWrapper.postMessage(webView, globalReplyProxy, subscriptionEvent)
         }
     }
 }

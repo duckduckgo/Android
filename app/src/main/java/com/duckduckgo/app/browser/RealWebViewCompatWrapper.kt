@@ -27,6 +27,8 @@ import com.duckduckgo.browser.api.webviewcompat.WebViewCompatWrapper
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
+import kotlinx.coroutines.ensureActive
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.withContext
 import logcat.LogPriority.ERROR
 import logcat.asLog
@@ -63,7 +65,8 @@ class RealWebViewCompatWrapper @Inject constructor(
                 return webView.safeAddDocumentStartJavaScript(script, allowedOriginRules)
             }
             return withContext(dispatcherProvider.main()) {
-                WebViewCompat.addDocumentStartJavaScript(webView, script, allowedOriginRules)
+                if (!isActive) return@withContext null
+                return@withContext WebViewCompat.addDocumentStartJavaScript(webView, script, allowedOriginRules)
             }
         }.getOrElse { e ->
             logcat(ERROR) { "Error calling addDocumentStartJavaScript: ${e.asLog()}" }
@@ -89,6 +92,7 @@ class RealWebViewCompatWrapper @Inject constructor(
             return
         }
         return withContext(dispatcherProvider.main()) {
+            if (!isActive) return@withContext
             WebViewCompat.removeWebMessageListener(webView, jsObjectName)
         }
     }
@@ -113,6 +117,7 @@ class RealWebViewCompatWrapper @Inject constructor(
             return
         }
         return withContext(dispatcherProvider.main()) {
+            if (!isActive) return@withContext
             WebViewCompat.addWebMessageListener(webView, jsObjectName, allowedOriginRules, listener)
         }
     }
@@ -135,6 +140,7 @@ class RealWebViewCompatWrapper @Inject constructor(
             return
         }
         withContext(dispatcherProvider.main()) {
+            if (!isActive) return@withContext
             globalReplyProxy?.postMessage(subscriptionEvent)
         }
     }

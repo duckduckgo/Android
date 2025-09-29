@@ -3714,7 +3714,7 @@ class BrowserTabViewModel @Inject constructor(
         method: String,
         id: String?,
         data: JSONObject?,
-        onResponse: (JSONObject) -> Unit,
+        onResponse: suspend (JSONObject) -> Unit,
     ) {
         processGlobalMessages(
             featureName = featureName,
@@ -3741,7 +3741,7 @@ class BrowserTabViewModel @Inject constructor(
         method: String,
         id: String?,
         data: JSONObject?,
-        onResponse: (JSONObject) -> Unit,
+        onResponse: suspend (JSONObject) -> Unit,
     ) {
         when (method) {
             "addDebugFlag" -> {
@@ -3759,7 +3759,7 @@ class BrowserTabViewModel @Inject constructor(
         method: String,
         id: String?,
         data: JSONObject?,
-        onResponse: (JSONObject) -> Unit,
+        onResponse: suspend (JSONObject) -> Unit,
     ) {
         when (featureName) {
             "webCompat" -> {
@@ -3800,7 +3800,9 @@ class BrowserTabViewModel @Inject constructor(
                                     "forcedZoomEnabled" to (accessibilityViewState.value?.forceZoom ?: false),
                                 ),
                             )
-                        onResponse(response)
+                        viewModelScope.launch {
+                            onResponse(response)
+                        }
                     }
                 }
         }
@@ -3901,7 +3903,7 @@ class BrowserTabViewModel @Inject constructor(
         method: String,
         id: String,
         data: JSONObject,
-        onResponse: (JSONObject) -> Unit,
+        onResponse: suspend (JSONObject) -> Unit,
     ) {
         viewModelScope.launch(dispatchers.main()) {
             command.value = WebViewCompatWebShareRequest(JsCallbackData(data, featureName, method, id), onResponse)
@@ -3934,7 +3936,7 @@ class BrowserTabViewModel @Inject constructor(
         method: String,
         id: String,
         data: JSONObject,
-        onResponse: (JSONObject) -> Unit,
+        onResponse: suspend (JSONObject) -> Unit,
     ) {
         viewModelScope.launch(dispatchers.io()) {
             val response =
@@ -3971,9 +3973,9 @@ class BrowserTabViewModel @Inject constructor(
         method: String,
         id: String,
         data: JSONObject,
-        onResponse: (JSONObject) -> Unit,
+        onResponse: suspend (JSONObject) -> Unit,
     ) {
-        viewModelScope.launch(dispatchers.main()) {
+        viewModelScope.launch(dispatchers.io()) {
             if (androidBrowserConfig.screenLock().isEnabled()) {
                 withContext(dispatchers.main()) {
                     command.value = WebViewCompatScreenLock(JsCallbackData(data, featureName, method, id), onResponse)
@@ -3983,7 +3985,7 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     private fun screenUnlock() {
-        viewModelScope.launch(dispatchers.main()) {
+        viewModelScope.launch(dispatchers.io()) {
             if (androidBrowserConfig.screenLock().isEnabled()) {
                 withContext(dispatchers.main()) {
                     command.value = ScreenUnlock
