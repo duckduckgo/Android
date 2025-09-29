@@ -20,9 +20,9 @@ import com.duckduckgo.autofill.impl.importing.gpm.feature.AutofillImportPassword
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.FragmentScope
 import com.squareup.anvil.annotations.ContributesBinding
+import kotlinx.coroutines.withContext
 import java.io.BufferedReader
 import javax.inject.Inject
-import kotlinx.coroutines.withContext
 
 interface PasswordImporterScriptLoader {
     suspend fun getScript(): String
@@ -33,26 +33,24 @@ class PasswordImporterCssScriptLoader @Inject constructor(
     private val dispatchers: DispatcherProvider,
     private val configStore: AutofillImportPasswordConfigStore,
 ) : PasswordImporterScriptLoader {
-
     private lateinit var contentScopeJS: String
 
-    override suspend fun getScript(): String {
-        return withContext(dispatchers.io()) {
+    override suspend fun getScript(): String =
+        withContext(dispatchers.io()) {
             getContentScopeJS()
                 .replace(CONTENT_SCOPE_PLACEHOLDER, getContentScopeJson(loadSettingsJson()))
                 .replace(USER_UNPROTECTED_DOMAINS_PLACEHOLDER, getUnprotectedDomainsJson())
                 .replace(USER_PREFERENCES_PLACEHOLDER, getUserPreferencesJson())
         }
-    }
 
     /**
      * This enables the password import hints feature in C-S-S.
      * These settings are for enabling it; the check for whether it should be enabled or not is done elsewhere.
      */
-    private fun getContentScopeJson(settingsJson: String): String {
-        return """{
+    private fun getContentScopeJson(settingsJson: String): String =
+        """{
             "features":{
-                "autofillPasswordImport" : {
+                "autofillImport" : {
                     "state": "enabled",
                     "exceptions": [],
                     "settings": $settingsJson
@@ -60,16 +58,13 @@ class PasswordImporterCssScriptLoader @Inject constructor(
             },
             "unprotectedTemporary":[]
         }
-            
+
         """.trimMargin()
-    }
 
-    private suspend fun loadSettingsJson(): String {
-        return configStore.getConfig().javascriptConfigGooglePasswords
-    }
+    private suspend fun loadSettingsJson(): String = configStore.getConfig().javascriptConfigGooglePasswords
 
-    private fun getUserPreferencesJson(): String {
-        return """
+    private fun getUserPreferencesJson(): String =
+        """
             {
                 "platform":{
                     "name":"android"
@@ -78,13 +73,12 @@ class PasswordImporterCssScriptLoader @Inject constructor(
                 "javascriptInterface": ''
              }
         """.trimMargin()
-    }
 
     private fun getUnprotectedDomainsJson(): String = "[]"
 
     private fun getContentScopeJS(): String {
         if (!this::contentScopeJS.isInitialized) {
-            contentScopeJS = loadJs("autofillPasswordImport.js")
+            contentScopeJS = loadJs("autofillImport.js")
         }
         return contentScopeJS
     }
@@ -97,7 +91,9 @@ class PasswordImporterCssScriptLoader @Inject constructor(
 
     private fun loadJs(resourceName: String): String = readResource(resourceName).use { it?.readText() }.orEmpty()
 
-    private fun readResource(resourceName: String): BufferedReader? {
-        return javaClass.classLoader?.getResource(resourceName)?.openStream()?.bufferedReader()
-    }
+    private fun readResource(resourceName: String): BufferedReader? =
+        javaClass.classLoader
+            ?.getResource(resourceName)
+            ?.openStream()
+            ?.bufferedReader()
 }
