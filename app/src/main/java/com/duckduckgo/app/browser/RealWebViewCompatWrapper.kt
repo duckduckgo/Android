@@ -26,11 +26,11 @@ import com.duckduckgo.browser.api.webviewcompat.WebViewCompatWrapper
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
-import javax.inject.Inject
 import kotlinx.coroutines.withContext
 import logcat.LogPriority.ERROR
 import logcat.asLog
 import logcat.logcat
+import javax.inject.Inject
 
 @SuppressLint(
     "RequiresFeature",
@@ -53,6 +53,11 @@ class RealWebViewCompatWrapper @Inject constructor(
                 return null
             }
 
+            if (!webView.isAttachedToWindow) {
+                logcat(ERROR) { "Error calling addDocumentStartJavaScript on detached WebView" }
+                return null
+            }
+
             if (webView is DuckDuckGoWebView) {
                 return webView.safeAddDocumentStartJavaScript(script, allowedOriginRules)
             }
@@ -65,8 +70,16 @@ class RealWebViewCompatWrapper @Inject constructor(
         }
     }
 
-    override suspend fun removeWebMessageListener(webView: WebView, jsObjectName: String) {
+    override suspend fun removeWebMessageListener(
+        webView: WebView,
+        jsObjectName: String,
+    ) {
         if (!webViewCapabilityChecker.isSupported(WebViewCapability.WebMessageListener)) {
+            return
+        }
+
+        if (!webView.isAttachedToWindow) {
+            logcat(ERROR) { "Error calling removeWebMessageListener on detached WebView" }
             return
         }
 
@@ -86,6 +99,11 @@ class RealWebViewCompatWrapper @Inject constructor(
         listener: WebViewCompat.WebMessageListener,
     ) {
         if (!webViewCapabilityChecker.isSupported(WebViewCapability.WebMessageListener)) {
+            return
+        }
+
+        if (!webView.isAttachedToWindow) {
+            logcat(ERROR) { "Error calling addWebMessageListener on detached WebView" }
             return
         }
 
