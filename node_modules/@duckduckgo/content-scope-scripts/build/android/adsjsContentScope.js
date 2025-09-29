@@ -4052,18 +4052,19 @@
       if (this.getFeatureSettingEnabled("enumerateDevices")) {
         this.deviceEnumerationFix();
       }
+      if (this.getFeatureSettingEnabled("viewportWidthLegacy", "disabled")) {
+        this.viewportWidthFix();
+      }
     }
     /**
      * Handle user preference updates when merged during initialization.
      * Re-applies viewport fixes if viewport configuration has changed.
+     * Used in the injectName='android-adsjs' instead of 'viewportWidthLegacy' from init.
      * @param {object} _updatedConfig - The configuration with merged user preferences
      */
     onUserPreferencesMerged(_updatedConfig) {
       if (this.getFeatureSettingEnabled("viewportWidth")) {
-        if (!this._viewportWidthFixApplied) {
-          this.viewportWidthFix();
-          this._viewportWidthFixApplied = true;
-        }
+        this.viewportWidthFix();
       }
     }
     /** Shim Web Share API in Android WebView */
@@ -4526,6 +4527,10 @@
       };
     }
     viewportWidthFix() {
+      if (this._viewportWidthFixApplied) {
+        return;
+      }
+      this._viewportWidthFixApplied = true;
       if (document.readyState === "loading") {
         document.addEventListener("DOMContentLoaded", () => this.viewportWidthFixInner());
       } else {
