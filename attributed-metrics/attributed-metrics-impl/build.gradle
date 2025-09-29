@@ -1,0 +1,100 @@
+/*
+ * Copyright (c) 2024 DuckDuckGo
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+plugins {
+    id 'com.android.library'
+    id 'kotlin-android'
+    id 'com.google.devtools.ksp'
+    id 'com.squareup.anvil'
+}
+
+apply from: "$rootProject.projectDir/gradle/android-library.gradle"
+
+dependencies {
+    anvil project(path: ':anvil-compiler')
+
+    implementation project(path: ':anvil-annotations')
+    implementation project(path: ':attributed-metrics-api')
+    implementation project(path: ':common-utils')
+    implementation project(path: ':di')
+    implementation project(path: ':app-build-config-api')
+    implementation project(path: ':statistics-api')
+
+    implementation KotlinX.coroutines.core
+    implementation KotlinX.coroutines.android
+
+    implementation "io.reactivex.rxjava2:rxjava:_"
+    implementation "io.reactivex.rxjava2:rxandroid:_"
+
+    implementation Square.retrofit2.retrofit
+    implementation Square.retrofit2.converter.moshi
+    implementation Square.retrofit2.adapter.rxJava2
+    implementation Square.retrofit2.converter.scalars
+
+    implementation Google.dagger
+
+    // Room
+    implementation AndroidX.room.ktx
+    ksp AndroidX.room.compiler
+
+    // WorkManager
+    implementation AndroidX.work.runtimeKtx
+    androidTestImplementation AndroidX.work.testing
+    implementation AndroidX.work.rxJava2
+
+    implementation "com.squareup.logcat:logcat:_"
+    
+    implementation AndroidX.core.ktx
+
+    testImplementation Testing.junit4
+    testImplementation "org.mockito.kotlin:mockito-kotlin:_"
+    testImplementation "androidx.lifecycle:lifecycle-runtime-testing:_"
+    testImplementation project(path: ':common-test')
+    testImplementation project(':data-store-test')
+    testImplementation CashApp.turbine
+    testImplementation Testing.robolectric
+    testImplementation(KotlinX.coroutines.test) {
+        // https://github.com/Kotlin/kotlinx.coroutines/issues/2023
+        // conflicts with mockito due to direct inclusion of byte buddy
+        exclude group: "org.jetbrains.kotlinx", module: "kotlinx-coroutines-debug"
+    }
+    testImplementation AndroidX.test.ext.junit
+    testImplementation AndroidX.archCore.testing
+    testImplementation AndroidX.room.testing
+    testImplementation AndroidX.room.rxJava2
+
+    androidTestImplementation AndroidX.test.runner
+    androidTestImplementation AndroidX.test.rules
+
+    coreLibraryDesugaring Android.tools.desugarJdkLibs
+}
+
+android {
+    anvil {
+        generateDaggerFactories = true // default is false
+    }
+    lintOptions {
+        baseline file("lint-baseline.xml")
+        abortOnError = !project.hasProperty("abortOnError") || project.property("abortOnError") != "false"
+    }
+    namespace 'com.duckduckgo.app.attributed.metrics'
+    compileOptions {
+        coreLibraryDesugaringEnabled = true
+    }
+    buildFeatures {
+        buildConfig = true
+    }
+}
