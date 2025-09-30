@@ -21,6 +21,7 @@ import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.appbuildconfig.api.isInternalBuild
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.contentscopescripts.api.ContentScopeConfigPlugin
+import com.duckduckgo.contentscopescripts.api.CoreContentScopeScripts
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.FeatureException
 import com.duckduckgo.feature.toggles.api.Toggle
@@ -36,19 +37,6 @@ import java.util.Locale
 import java.util.UUID
 import java.util.concurrent.CopyOnWriteArrayList
 import javax.inject.Inject
-
-interface CoreContentScopeScripts {
-    fun getScript(
-        isDesktopMode: Boolean?,
-        activeExperiments: List<Toggle>,
-    ): String
-
-    fun isEnabled(): Boolean
-
-    val secret: String
-    val javascriptInterface: String
-    val callbackName: String
-}
 
 @SingleInstanceIn(AppScope::class)
 @ContributesBinding(AppScope::class)
