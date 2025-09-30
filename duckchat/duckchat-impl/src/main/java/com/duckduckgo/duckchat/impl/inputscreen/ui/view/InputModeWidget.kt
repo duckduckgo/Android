@@ -37,6 +37,7 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import android.widget.FrameLayout
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.view.isNotEmpty
 import androidx.core.view.isVisible
 import androidx.core.view.updateLayoutParams
 import androidx.core.widget.doAfterTextChanged
@@ -358,7 +359,6 @@ class InputModeWidget @JvmOverloads constructor(
     }
 
     fun setInputScreenButtons(inputScreenButtons: InputScreenButtons) {
-        inputScreenButtonsContainer.isVisible = true
         inputScreenButtonsContainer.addView(inputScreenButtons)
         inputFieldClearText.updateLayoutParams<MarginLayoutParams> {
             // align the clear text button with the center of the submit button
@@ -367,8 +367,10 @@ class InputModeWidget @JvmOverloads constructor(
     }
 
     fun setInputScreenButtonsVisible(buttonsVisible: Boolean) {
-        beginInputScreenButtonsVisibilityTransition()
-        inputScreenButtonsContainer.isVisible = buttonsVisible
+        if (inputScreenButtonsContainer.isNotEmpty()) {
+            beginInputScreenButtonsVisibilityTransition()
+            inputScreenButtonsContainer.isVisible = buttonsVisible
+        }
     }
 
     private fun CharSequence.getTextToSubmit(): CharSequence? {
