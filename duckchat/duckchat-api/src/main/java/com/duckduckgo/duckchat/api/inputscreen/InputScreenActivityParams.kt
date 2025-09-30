@@ -31,6 +31,7 @@ data class InputScreenActivityParams(
     val query: String,
     val tabs: Int,
     val showButtonsOnTop: Boolean = false,
+    val comesFromNTP: Boolean = false,
 ) : GlobalActivityStarter.ActivityParams
 
 /**
@@ -60,4 +61,6 @@ data object InputScreenActivityResultParams {
 
     /** Key for any canceled draft content when result is [Activity.RESULT_CANCELED] */
     const val CANCELED_DRAFT_PARAM = "draft"
+
+    const val BACK_PRESSED_PARAM = "back_pressed"
 }
