@@ -137,6 +137,7 @@ class InputScreenViewModel @AssistedInject constructor(
     private val _visibilityState =
         MutableStateFlow(
             InputScreenVisibilityState(
+                submitButtonVisible = false,
                 voiceInputButtonVisible = voiceServiceAvailable.value && voiceInputAllowed.value,
                 autoCompleteSuggestionsVisible = false,
                 bottomFadeVisible = false,
@@ -275,11 +276,7 @@ class InputScreenViewModel @AssistedInject constructor(
 
     fun onActivityResume() {
         autoCompleteSuggestionsEnabled.value = autoCompleteSettings.autoCompleteSuggestionsEnabled
-        _visibilityState.update {
-            it.copy(
-                voiceInputButtonVisible = voiceSearchAvailability.isVoiceSearchAvailable,
-            )
-        }
+        voiceServiceAvailable.value = voiceSearchAvailability.isVoiceSearchAvailable
     }
 
     fun userSelectedAutocomplete(suggestion: AutoCompleteSuggestion) {
@@ -529,6 +526,14 @@ class InputScreenViewModel @AssistedInject constructor(
     fun onInputFieldTouched() {
         _inputFieldState.update {
             it.copy(canExpand = true)
+        }
+    }
+
+    fun onSubmitMessageAvailableChange(available: Boolean) {
+        _visibilityState.update {
+            it.copy(
+                submitButtonVisible = available,
+            )
         }
     }
 

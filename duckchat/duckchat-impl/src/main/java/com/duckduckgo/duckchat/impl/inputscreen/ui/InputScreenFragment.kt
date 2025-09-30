@@ -72,7 +72,9 @@ import com.duckduckgo.voice.api.VoiceSearchLauncher.Event.SearchCancelled
 import com.duckduckgo.voice.api.VoiceSearchLauncher.Event.VoiceRecognitionSuccess
 import com.duckduckgo.voice.api.VoiceSearchLauncher.Event.VoiceSearchDisabled
 import com.duckduckgo.voice.api.VoiceSearchLauncher.Source.BROWSER
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import javax.inject.Inject
 import com.duckduckgo.mobile.android.R as CommonR
@@ -252,7 +254,15 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
 
                 binding.ddgLogo.progress = if (isSearchMode) 0f else 1f
 
+                inputScreenButtons.setSendButtonVisible(it.submitButtonVisible)
                 inputScreenButtons.setNewLineButtonVisible(it.newLineButtonVisible)
+            }.launchIn(lifecycleScope)
+
+        viewModel.visibilityState
+            .map { it.actionButtonsContainerVisible }
+            .distinctUntilChanged()
+            .onEach {
+                inputModeWidget.setInputScreenButtonsVisible(it)
             }.launchIn(lifecycleScope)
     }
 
@@ -313,7 +323,7 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
                 }
             }
             onSubmitMessageAvailable = { isAvailable ->
-                inputScreenButtons.setSendButtonVisible(isAvailable)
+                viewModel.onSubmitMessageAvailableChange(isAvailable)
             }
             onVoiceInputAllowed = { isAllowed ->
                 viewModel.onVoiceInputAllowedChange(isAllowed)

@@ -198,10 +198,10 @@ class InputModeWidget @JvmOverloads constructor(
                 if (!hasTextChangedFromOriginal) {
                     hasTextChangedFromOriginal = text != originalText
                 }
-                onVoiceInputAllowed?.invoke(!hasTextChangedFromOriginal || inputField.text.isBlank())
 
                 val textToSubmit = inputField.text.getTextToSubmit()
                 onSubmitMessageAvailable?.invoke(textToSubmit != null)
+                onVoiceInputAllowed?.invoke(!hasTextChangedFromOriginal || inputField.text.isBlank())
 
                 when (inputModeSwitch.selectedTabPosition) {
                     0 -> onSearchTextChanged?.invoke(textToSubmit?.toString().orEmpty())
@@ -292,6 +292,17 @@ class InputModeWidget @JvmOverloads constructor(
         }
     }
 
+    private fun beginInputScreenButtonsVisibilityTransition() {
+        (parent as? ViewGroup ?: this).let { root ->
+            TransitionManager.beginDelayedTransition(
+                root,
+                ChangeBounds().apply {
+                    duration = EXPAND_COLLAPSE_TRANSITION_DURATION
+                },
+            )
+        }
+    }
+
     fun submitMessage(message: String? = null) {
         val text = message?.also { text = it } ?: inputField.text
         val textToSubmit = text.getTextToSubmit()?.toString()
@@ -353,6 +364,11 @@ class InputModeWidget @JvmOverloads constructor(
             // align the clear text button with the center of the submit button
             marginEnd = 4f.toPx(context).roundToInt()
         }
+    }
+
+    fun setInputScreenButtonsVisible(buttonsVisible: Boolean) {
+        beginInputScreenButtonsVisibilityTransition()
+        inputScreenButtonsContainer.isVisible = buttonsVisible
     }
 
     private fun CharSequence.getTextToSubmit(): CharSequence? {
