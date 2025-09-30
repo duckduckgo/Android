@@ -22,6 +22,7 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.api.R
 import com.duckduckgo.duckchat.api.inputscreen.BrowserAndInputScreenTransitionProvider
 import com.duckduckgo.duckchat.impl.DuckChatInternal
+import com.duckduckgo.duckchat.impl.inputscreen.ui.InputScreenConfigResolverImpl.Companion.useTopBar
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
 
@@ -59,13 +60,13 @@ class BrowserAndInputScreenTransitionProviderImpl @Inject constructor(
     override fun getBrowserEnterAnimation(isTopOmnibar: Boolean): Int =
         if (VERSION.SDK_INT >= 33) {
             if (appTheme.isLightModeEnabled()) {
-                if (useTopBar(isTopOmnibar)) {
+                if (useTopBar(isTopOmnibar, duckChatInternal)) {
                     R.anim.slide_in_from_bottom_fade_in_light
                 } else {
                     R.anim.fade_in_light
                 }
             } else {
-                if (useTopBar(isTopOmnibar)) {
+                if (useTopBar(isTopOmnibar, duckChatInternal)) {
                     R.anim.slide_in_from_bottom_fade_in_dark
                 } else {
                     R.anim.fade_in_dark
@@ -78,13 +79,13 @@ class BrowserAndInputScreenTransitionProviderImpl @Inject constructor(
     override fun getBrowserExitAnimation(isTopOmnibar: Boolean): Int =
         if (VERSION.SDK_INT >= 33) {
             if (appTheme.isLightModeEnabled()) {
-                if (useTopBar(isTopOmnibar)) {
+                if (useTopBar(isTopOmnibar, duckChatInternal)) {
                     R.anim.slide_out_to_bottom_fade_out_light
                 } else {
                     R.anim.fade_out_light
                 }
             } else {
-                if (useTopBar(isTopOmnibar)) {
+                if (useTopBar(isTopOmnibar, duckChatInternal)) {
                     R.anim.slide_out_to_bottom_fade_out_dark
                 } else {
                     R.anim.fade_out_dark
@@ -95,18 +96,16 @@ class BrowserAndInputScreenTransitionProviderImpl @Inject constructor(
         }
 
     override fun getInputScreenEnterAnimation(isTopOmnibar: Boolean): Int =
-        if (VERSION.SDK_INT >= 33 && useTopBar(isTopOmnibar)) {
+        if (VERSION.SDK_INT >= 33 && useTopBar(isTopOmnibar, duckChatInternal)) {
             R.anim.slide_in_from_top_fade_in
         } else {
             R.anim.fade_in
         }
 
     override fun getInputScreenExitAnimation(isTopOmnibar: Boolean): Int =
-        if (VERSION.SDK_INT >= 33 && useTopBar(isTopOmnibar)) {
+        if (VERSION.SDK_INT >= 33 && useTopBar(isTopOmnibar, duckChatInternal)) {
             R.anim.slide_out_to_top_fade_out
         } else {
             R.anim.fade_out
         }
-
-    private fun useTopBar(isTopOmnibar: Boolean): Boolean = isTopOmnibar || !duckChatInternal.inputScreenBottomBarEnabled.value
 }
