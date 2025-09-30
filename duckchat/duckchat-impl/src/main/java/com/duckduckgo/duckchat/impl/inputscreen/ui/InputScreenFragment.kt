@@ -190,7 +190,7 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
                         logcat { "inputScreenLauncher: Keyboard shown (GlobalLayout)" }
                     } else {
                         logcat { "inputScreenLauncher: Keyboard hidden (GlobalLayout)" }
-                        binding.inputModeWidget.inputField.clearFocus()
+                        binding.inputModeWidget.clearInputFocus()
                     }
                 }
             }

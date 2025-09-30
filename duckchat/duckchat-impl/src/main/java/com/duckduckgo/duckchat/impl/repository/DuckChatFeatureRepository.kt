@@ -28,26 +28,41 @@ import javax.inject.Inject
 
 interface DuckChatFeatureRepository {
     suspend fun setDuckChatUserEnabled(enabled: Boolean)
+
     suspend fun setInputScreenUserSetting(enabled: Boolean)
+
     suspend fun setShowInBrowserMenu(showDuckChat: Boolean)
+
     suspend fun setShowInAddressBar(showDuckChat: Boolean)
+
     suspend fun setShowButtonsOnTop(showOnTop: Boolean)
 
     fun observeDuckChatUserEnabled(): Flow<Boolean>
+
     fun observeInputScreenUserSettingEnabled(): Flow<Boolean>
+
     fun observeShowInBrowserMenu(): Flow<Boolean>
+
     fun observeShowInAddressBar(): Flow<Boolean>
+
     fun observeShowButtonsOnTop(): Flow<Boolean>
 
     suspend fun isDuckChatUserEnabled(): Boolean
+
     suspend fun isInputScreenUserSettingEnabled(): Boolean
+
     suspend fun shouldShowInBrowserMenu(): Boolean
+
     suspend fun shouldShowInAddressBar(): Boolean
+
     suspend fun shouldShowButtonsOnTop(): Boolean
 
     suspend fun registerOpened()
+
     suspend fun wasOpenedBefore(): Boolean
+
     suspend fun lastSessionTimestamp(): Long
+
     suspend fun sessionDeltaInMinutes(): Long
 }
 
@@ -77,45 +92,25 @@ class RealDuckChatFeatureRepository @Inject constructor(
         duckChatDataStore.setShowButtonsOnTop(showOnTop)
     }
 
-    override fun observeDuckChatUserEnabled(): Flow<Boolean> {
-        return duckChatDataStore.observeDuckChatUserEnabled()
-    }
+    override fun observeDuckChatUserEnabled(): Flow<Boolean> = duckChatDataStore.observeDuckChatUserEnabled()
 
-    override fun observeInputScreenUserSettingEnabled(): Flow<Boolean> {
-        return duckChatDataStore.observeInputScreenUserSettingEnabled()
-    }
+    override fun observeInputScreenUserSettingEnabled(): Flow<Boolean> = duckChatDataStore.observeInputScreenUserSettingEnabled()
 
-    override fun observeShowInBrowserMenu(): Flow<Boolean> {
-        return duckChatDataStore.observeShowInBrowserMenu()
-    }
+    override fun observeShowInBrowserMenu(): Flow<Boolean> = duckChatDataStore.observeShowInBrowserMenu()
 
-    override fun observeShowInAddressBar(): Flow<Boolean> {
-        return duckChatDataStore.observeShowInAddressBar()
-    }
+    override fun observeShowInAddressBar(): Flow<Boolean> = duckChatDataStore.observeShowInAddressBar()
 
-    override fun observeShowButtonsOnTop(): Flow<Boolean> {
-        return duckChatDataStore.observeShowButtonsOnTop()
-    }
+    override fun observeShowButtonsOnTop(): Flow<Boolean> = duckChatDataStore.observeShowButtonsOnTop()
 
-    override suspend fun isDuckChatUserEnabled(): Boolean {
-        return duckChatDataStore.isDuckChatUserEnabled()
-    }
+    override suspend fun isDuckChatUserEnabled(): Boolean = duckChatDataStore.isDuckChatUserEnabled()
 
-    override suspend fun isInputScreenUserSettingEnabled(): Boolean {
-        return duckChatDataStore.isInputScreenUserSettingEnabled()
-    }
+    override suspend fun isInputScreenUserSettingEnabled(): Boolean = duckChatDataStore.isInputScreenUserSettingEnabled()
 
-    override suspend fun shouldShowInBrowserMenu(): Boolean {
-        return duckChatDataStore.getShowInBrowserMenu()
-    }
+    override suspend fun shouldShowInBrowserMenu(): Boolean = duckChatDataStore.getShowInBrowserMenu()
 
-    override suspend fun shouldShowInAddressBar(): Boolean {
-        return duckChatDataStore.getShowInAddressBar()
-    }
+    override suspend fun shouldShowInAddressBar(): Boolean = duckChatDataStore.getShowInAddressBar()
 
-    override suspend fun shouldShowButtonsOnTop(): Boolean {
-        return duckChatDataStore.getShowButtonsOnTop()
-    }
+    override suspend fun shouldShowButtonsOnTop(): Boolean = duckChatDataStore.getShowButtonsOnTop()
 
     override suspend fun registerOpened() {
         if (!duckChatDataStore.wasOpenedBefore()) {
@@ -124,17 +119,11 @@ class RealDuckChatFeatureRepository @Inject constructor(
         duckChatDataStore.registerOpened()
     }
 
-    override suspend fun wasOpenedBefore(): Boolean {
-        return duckChatDataStore.wasOpenedBefore()
-    }
+    override suspend fun wasOpenedBefore(): Boolean = duckChatDataStore.wasOpenedBefore()
 
-    override suspend fun lastSessionTimestamp(): Long {
-        return duckChatDataStore.lastSessionTimestamp()
-    }
+    override suspend fun lastSessionTimestamp(): Long = duckChatDataStore.lastSessionTimestamp()
 
-    override suspend fun sessionDeltaInMinutes(): Long {
-        return duckChatDataStore.sessionDeltaTimestamp() / MS_TO_MINUTES
-    }
+    override suspend fun sessionDeltaInMinutes(): Long = duckChatDataStore.sessionDeltaTimestamp() / MS_TO_MINUTES
 
     private fun updateWidgets() {
         val intent = Intent(AppWidgetManager.ACTION_APPWIDGET_UPDATE)

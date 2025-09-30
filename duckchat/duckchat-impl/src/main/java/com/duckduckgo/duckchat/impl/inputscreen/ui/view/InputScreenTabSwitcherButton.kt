@@ -33,7 +33,6 @@ class InputScreenTabSwitcherButton @JvmOverloads constructor(
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0,
 ) : FrameLayout(context, attrs, defStyleAttr) {
-
     internal val tabCount: FrameLayout by lazy { findViewById(R.id.tabCount) }
 
     fun increment(callback: () -> Unit) {
@@ -45,15 +44,17 @@ class InputScreenTabSwitcherButton @JvmOverloads constructor(
     }
 
     private fun fadeOutCount(callback: () -> Unit) {
-        val listener = object : AnimatorListenerAdapter() {
-            override fun onAnimationEnd(animation: Animator) {
-                // otherwise on end keeps being called repeatedly
-                tabCount.animate().setListener(null)
-                callback()
+        val listener =
+            object : AnimatorListenerAdapter() {
+                override fun onAnimationEnd(animation: Animator) {
+                    // otherwise on end keeps being called repeatedly
+                    tabCount.animate().setListener(null)
+                    callback()
+                }
             }
-        }
 
-        tabCount.animate()
+        tabCount
+            .animate()
             .setDuration(300)
             .alpha(0.0f)
             .setListener(listener)
@@ -61,7 +62,8 @@ class InputScreenTabSwitcherButton @JvmOverloads constructor(
     }
 
     private fun fadeInCount() {
-        tabCount.animate()
+        tabCount
+            .animate()
             .setDuration(300)
             .alpha(1.0f)
             .start()
