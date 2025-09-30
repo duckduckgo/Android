@@ -19,14 +19,15 @@ package com.duckduckgo.duckchat.impl.inputscreen.ui
 import android.animation.ValueAnimator
 import android.app.Activity
 import android.content.Intent
+import android.graphics.Rect
 import android.os.Bundle
 import android.util.TypedValue
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import android.widget.FrameLayout
 import android.view.ViewGroup
+import android.view.ViewTreeObserver
 import androidx.activity.OnBackPressedCallback
 import androidx.core.view.isVisible
 import androidx.lifecycle.ViewModelProvider
@@ -81,6 +82,8 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import javax.inject.Inject
 import com.duckduckgo.mobile.android.R as CommonR
+import logcat.logcat
+import javax.inject.Inject
 
 @InjectWith(FragmentScope::class)
 class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
@@ -114,6 +117,9 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
     private lateinit var inputModeWidget: InputModeWidget
     private lateinit var contentSeparator: View
     private lateinit var inputScreenButtons: InputScreenButtons
+
+    private var isKeyboardCurrentlyVisible: Boolean = false
+    private var globalLayoutListener: ViewTreeObserver.OnGlobalLayoutListener? = null
 
     private val pageChangeCallback =
         object : OnPageChangeCallback() {
@@ -149,15 +155,16 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
         savedInstanceState: Bundle?,
     ): View? {
         val params = requireActivity().intent.getActivityParams(InputScreenActivityParams::class.java)
-        val rootView = params?.showButtonsOnTop?.let { bindToTop ->
-            if (bindToTop) {
-                topBinding = FragmentInputScreenButtonsTopBinding.inflate(inflater, container, false)
-                return topBinding?.root
-            } else {
-                inputFieldBinding = FragmentInputScreenBinding.inflate(inflater, container, false)
-                return inputFieldBinding?.root
+        val rootView =
+            params?.showButtonsOnTop?.let { bindToTop ->
+                if (bindToTop) {
+                    topBinding = FragmentInputScreenButtonsTopBinding.inflate(inflater, container, false)
+                    return topBinding?.root
+                } else {
+                    inputFieldBinding = FragmentInputScreenBinding.inflate(inflater, container, false)
+                    return inputFieldBinding?.root
+                }
             }
-        }
 
         return rootView
     }
@@ -167,6 +174,27 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
         savedInstanceState: Bundle?,
     ) {
         super.onViewCreated(view, savedInstanceState)
+
+        globalLayoutListener =
+            ViewTreeObserver.OnGlobalLayoutListener {
+                val r = Rect()
+                binding.root.getWindowVisibleDisplayFrame(r)
+                val screenHeight = binding.root.rootView.height
+                val keypadHeight = screenHeight - r.bottom
+
+                val previouslyVisible = isKeyboardCurrentlyVisible
+                isKeyboardCurrentlyVisible = keypadHeight > screenHeight * 0.15 // 15% of screen height
+
+                if (previouslyVisible != isKeyboardCurrentlyVisible) {
+                    if (isKeyboardCurrentlyVisible) {
+                        logcat { "inputScreenLauncher: Keyboard shown (GlobalLayout)" }
+                    } else {
+                        logcat { "inputScreenLauncher: Keyboard hidden (GlobalLayout)" }
+                        binding.inputModeWidget.inputField.clearFocus()
+                    }
+                }
+            }
+        binding.root.viewTreeObserver.addOnGlobalLayoutListener(globalLayoutListener)
 
         inputModeWidget =
             InputModeWidget(requireContext()).also {
@@ -240,6 +268,19 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
 
         viewModel.fireShownPixel()
     }
+
+    override fun onDestroyView() {
+        logoAnimator?.cancel()
+        logoAnimator = null
+        binding.ddgLogo.clearAnimation()
+        binding.viewPager.unregisterOnPageChangeCallback(pageChangeCallback)
+        globalLayoutListener?.let {
+            binding.root.viewTreeObserver.removeOnGlobalLayoutListener(it)
+        }
+        globalLayoutListener = null
+        super.onDestroyView()
+    }
+
 
     private fun configureObservers() {
         viewModel.command.observe(
@@ -469,14 +510,6 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
 
     private fun exitInputScreen() {
         requireActivity().finish()
-    }
-
-    override fun onDestroyView() {
-        logoAnimator?.cancel()
-        logoAnimator = null
-        binding.ddgLogo.clearAnimation()
-        binding.viewPager.unregisterOnPageChangeCallback(pageChangeCallback)
-        super.onDestroyView()
     }
 
     override fun onResume() {
