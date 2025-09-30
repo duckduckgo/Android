@@ -1018,9 +1018,9 @@ class BrowserTabFragment :
 
         webViewContainer = binding.webViewContainer
         configureObservers()
+        viewModel.registerWebViewListener(webViewClient, webChromeClient)
         configureWebView()
         configureSwipeRefresh()
-        viewModel.registerWebViewListener(webViewClient, webChromeClient)
         configureAutoComplete()
         configureNewTab()
         initPrivacyProtectionsPopup()
@@ -1993,9 +1993,9 @@ class BrowserTabFragment :
             is Command.ShowFireproofWebSiteConfirmation -> fireproofWebsiteConfirmation(it.fireproofWebsiteEntity)
             is Command.DeleteFireproofConfirmation -> removeFireproofWebsiteConfirmation(it.fireproofWebsiteEntity)
             is Command.RefreshAndShowPrivacyProtectionEnabledConfirmation -> {
-                webView?.let { webView ->
+                webView?.let { safeWebView ->
                     lifecycleScope.launch {
-                        webViewClient.configureWebView(webView, null)
+                        webViewClient.configureWebView(safeWebView, null)
                         refresh()
                         privacyProtectionEnabledConfirmation(it.domain)
                     }
@@ -2006,9 +2006,9 @@ class BrowserTabFragment :
             }
 
             is Command.RefreshAndShowPrivacyProtectionDisabledConfirmation -> {
-                webView?.let { webView ->
+                webView?.let { safeWebView ->
                     lifecycleScope.launch {
-                        webViewClient.configureWebView(webView, null)
+                        webViewClient.configureWebView(safeWebView, null)
                         refresh()
                         privacyProtectionDisabledConfirmation(it.domain)
                     }

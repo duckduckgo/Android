@@ -131,7 +131,6 @@ class BrowserWebViewClient @Inject constructor(
     private val androidFeaturesHeaderPlugin: AndroidFeaturesHeaderPlugin,
     private val duckChat: DuckChat,
     private val contentScopeExperiments: ContentScopeExperiments,
-    private val addDocumentStartJavascriptPlugins: PluginPoint<AddDocumentStartJavaScriptPlugin>,
     private val webMessagingPlugins: PluginPoint<WebMessagingPlugin>,
     private val postMessageWrapperPlugins: PluginPoint<PostMessageWrapperPlugin>,
 ) : WebViewClient() {
@@ -477,9 +476,7 @@ class BrowserWebViewClient @Inject constructor(
         webView: DuckDuckGoWebView,
         callback: WebViewCompatMessageCallback?,
     ) {
-        addDocumentStartJavascriptPlugins.getPlugins().forEach { plugin ->
-            plugin.addDocumentStartJavaScript(webView)
-        }
+        webViewClientListener?.addDocumentStartJavaScript(webView)
 
         callback?.let {
             webMessagingPlugins.getPlugins().forEach { plugin ->
@@ -504,13 +501,8 @@ class BrowserWebViewClient @Inject constructor(
                     webViewClientListener?.getSite(),
                 )
             }
-            appCoroutineScope.launch {
-                addDocumentStartJavascriptPlugins.getPlugins().forEach {
-                    it.addDocumentStartJavaScript(
-                        webView,
-                    )
-                }
-            }
+
+            webViewClientListener?.addDocumentStartJavaScript(webView)
 
             url?.let {
                 // We call this for any url but it will only be processed for an internal tester verification url

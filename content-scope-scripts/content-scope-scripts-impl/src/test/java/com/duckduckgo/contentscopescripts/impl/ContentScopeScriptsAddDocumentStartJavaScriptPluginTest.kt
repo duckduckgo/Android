@@ -16,7 +16,6 @@ import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
 class ContentScopeScriptsAddDocumentStartJavaScriptPluginTest {
-
     @get:Rule
     var coroutineRule = CoroutineTestRule()
 
@@ -29,48 +28,52 @@ class ContentScopeScriptsAddDocumentStartJavaScriptPluginTest {
     private lateinit var testee: ContentScopeScriptsAddDocumentStartJavaScriptPlugin
 
     @Before
-    fun setUp() = runTest {
-        whenever(mockActiveContentScopeExperiments.getActiveExperiments()).thenReturn(listOf())
-        testee = ContentScopeScriptsAddDocumentStartJavaScriptPlugin(
-            mockWebViewCompatContentScopeScripts,
-            coroutineRule.testDispatcherProvider,
-            mockWebViewCapabilityChecker,
-            mockWebViewCompatWrapper,
-            mockActiveContentScopeExperiments,
-            coroutineRule.testScope,
-        )
-    }
+    fun setUp() =
+        runTest {
+            whenever(mockActiveContentScopeExperiments.getActiveExperiments()).thenReturn(listOf())
+            testee =
+                ContentScopeScriptsAddDocumentStartJavaScriptPlugin(
+                    mockWebViewCompatContentScopeScripts,
+                    coroutineRule.testDispatcherProvider,
+                    mockWebViewCapabilityChecker,
+                    mockWebViewCompatWrapper,
+                    mockActiveContentScopeExperiments,
+                )
+        }
 
     @Test
-    fun whenFeatureIsEnabledAndCapabilitySupportedThenCallScriptInjectionWithCorrectParams() = runTest {
-        whenever(mockWebViewCompatContentScopeScripts.isEnabled()).thenReturn(true)
-        whenever(mockWebViewCapabilityChecker.isSupported(any())).thenReturn(true)
-        whenever(mockWebViewCompatContentScopeScripts.getScript(any())).thenReturn("script")
+    fun whenFeatureIsEnabledAndCapabilitySupportedThenCallScriptInjectionWithCorrectParams() =
+        runTest {
+            whenever(mockWebViewCompatContentScopeScripts.isEnabled()).thenReturn(true)
+            whenever(mockWebViewCapabilityChecker.isSupported(any())).thenReturn(true)
+            whenever(mockWebViewCompatContentScopeScripts.getScript(any())).thenReturn("script")
 
-        testee.addDocumentStartJavaScript(mockWebView)
+            testee.addDocumentStartJavaScript(mockWebView)
 
-        verify(mockWebViewCompatWrapper).addDocumentStartJavaScript(mockWebView, "script", setOf("*"))
-    }
-
-    @Test
-    fun whenFeatureIsDisabledAndCapabilitySupportedThenDoNotCallScriptInjection() = runTest {
-        whenever(mockWebViewCompatContentScopeScripts.isEnabled()).thenReturn(false)
-        whenever(mockWebViewCapabilityChecker.isSupported(any())).thenReturn(true)
-        whenever(mockWebViewCompatContentScopeScripts.getScript(any())).thenReturn("script")
-
-        testee.addDocumentStartJavaScript(mockWebView)
-
-        verify(mockWebViewCompatWrapper, never()).addDocumentStartJavaScript(any(), any(), any())
-    }
+            verify(mockWebViewCompatWrapper).addDocumentStartJavaScript(mockWebView, "script", setOf("*"))
+        }
 
     @Test
-    fun whenFeatureIsEnabledAndCapabilityNotSupportedThenDoNotCallScriptInjection() = runTest {
-        whenever(mockWebViewCompatContentScopeScripts.isEnabled()).thenReturn(true)
-        whenever(mockWebViewCapabilityChecker.isSupported(any())).thenReturn(false)
-        whenever(mockWebViewCompatContentScopeScripts.getScript(any())).thenReturn("script")
+    fun whenFeatureIsDisabledAndCapabilitySupportedThenDoNotCallScriptInjection() =
+        runTest {
+            whenever(mockWebViewCompatContentScopeScripts.isEnabled()).thenReturn(false)
+            whenever(mockWebViewCapabilityChecker.isSupported(any())).thenReturn(true)
+            whenever(mockWebViewCompatContentScopeScripts.getScript(any())).thenReturn("script")
 
-        testee.addDocumentStartJavaScript(mockWebView)
+            testee.addDocumentStartJavaScript(mockWebView)
 
-        verify(mockWebViewCompatWrapper, never()).addDocumentStartJavaScript(any(), any(), any())
-    }
+            verify(mockWebViewCompatWrapper, never()).addDocumentStartJavaScript(any(), any(), any())
+        }
+
+    @Test
+    fun whenFeatureIsEnabledAndCapabilityNotSupportedThenDoNotCallScriptInjection() =
+        runTest {
+            whenever(mockWebViewCompatContentScopeScripts.isEnabled()).thenReturn(true)
+            whenever(mockWebViewCapabilityChecker.isSupported(any())).thenReturn(false)
+            whenever(mockWebViewCompatContentScopeScripts.getScript(any())).thenReturn("script")
+
+            testee.addDocumentStartJavaScript(mockWebView)
+
+            verify(mockWebViewCompatWrapper, never()).addDocumentStartJavaScript(any(), any(), any())
+        }
 }

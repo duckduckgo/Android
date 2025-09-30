@@ -27,7 +27,6 @@ import com.duckduckgo.browser.api.webviewcompat.WebViewCompatWrapper
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
-import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.withContext
 import logcat.LogPriority.ERROR
@@ -61,11 +60,13 @@ class RealWebViewCompatWrapper @Inject constructor(
                 return null
             }
 
-            if (webView is DuckDuckGoWebView) {
-                return webView.safeAddDocumentStartJavaScript(script, allowedOriginRules)
-            }
             return withContext(dispatcherProvider.main()) {
                 if (!isActive) return@withContext null
+
+                if (webView is DuckDuckGoWebView) {
+                    return@withContext webView.safeAddDocumentStartJavaScript(script, allowedOriginRules)
+                }
+
                 return@withContext WebViewCompat.addDocumentStartJavaScript(webView, script, allowedOriginRules)
             }
         }.getOrElse { e ->
@@ -125,23 +126,23 @@ class RealWebViewCompatWrapper @Inject constructor(
     @SuppressLint("PostMessageUsage")
     override suspend fun postMessage(
         webView: WebView,
-        globalReplyProxy: JavaScriptReplyProxy?,
+        replyProxy: JavaScriptReplyProxy?,
         subscriptionEvent: String,
     ) {
         if (!webView.isAttachedToWindow) {
-            logcat(ERROR) { "Error calling addWebMessageListener on detached WebView" }
+            logcat(ERROR) { "Error calling postMessage on detached WebView" }
             return
         }
 
         if (webView is DuckDuckGoWebView) {
-            globalReplyProxy?.let {
-                webView.safePostMessage(globalReplyProxy, subscriptionEvent)
+            replyProxy?.let {
+                webView.safePostMessage(replyProxy, subscriptionEvent)
             }
             return
         }
         withContext(dispatcherProvider.main()) {
             if (!isActive) return@withContext
-            globalReplyProxy?.postMessage(subscriptionEvent)
+            replyProxy?.postMessage(subscriptionEvent)
         }
     }
 }

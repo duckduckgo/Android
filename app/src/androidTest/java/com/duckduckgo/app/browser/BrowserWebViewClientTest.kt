@@ -166,7 +166,6 @@ class BrowserWebViewClientTest {
     private val mockUriLoadedManager: UriLoadedManager = mock()
     private val mockAndroidBrowserConfigFeature: AndroidBrowserConfigFeature = mock()
     private val mockContentScopeExperiments: ContentScopeExperiments = mock()
-    private val fakeAddDocumentStartJavaScriptPlugins = FakeAddDocumentStartJavaScriptPluginPoint()
     private val fakeMessagingPlugins = FakeWebMessagingPluginPoint()
     private val fakePostMessageWrapperPlugins = FakePostMessageWrapperPluginPoint()
     private val mockAndroidFeaturesHeaderPlugin =
@@ -220,7 +219,6 @@ class BrowserWebViewClientTest {
                     mockAndroidFeaturesHeaderPlugin,
                     mockDuckChat,
                     mockContentScopeExperiments,
-                    fakeAddDocumentStartJavaScriptPlugins,
                     fakeMessagingPlugins,
                     fakePostMessageWrapperPlugins,
                 )
@@ -358,21 +356,36 @@ class BrowserWebViewClientTest {
 
     @UiThreadTest
     @Test
-    fun whenConfigureWebViewThenInjectJsCode() {
-        assertEquals(0, fakeAddDocumentStartJavaScriptPlugins.plugin.countInitted)
-        val mockCallback = mock<WebViewCompatMessageCallback>()
-        testee.configureWebView(DuckDuckGoWebView(context), mockCallback)
-        assertEquals(1, fakeAddDocumentStartJavaScriptPlugins.plugin.countInitted)
-    }
+    fun whenConfigureWebViewThenInjectJsCode() =
+        runTest {
+            val mockCallback = mock<WebViewCompatMessageCallback>()
+            val webView = DuckDuckGoWebView(context)
+
+            testee.configureWebView(webView, mockCallback)
+
+            verify(listener).addDocumentStartJavaScript(webView)
+        }
 
     @UiThreadTest
     @Test
-    fun whenConfigureWebViewThenAddWebMessageListener() {
-        assertFalse(fakeMessagingPlugins.plugin.registered)
-        val mockCallback = mock<WebViewCompatMessageCallback>()
-        testee.configureWebView(DuckDuckGoWebView(context), mockCallback)
-        assertTrue(fakeMessagingPlugins.plugin.registered)
-    }
+    fun whenPageFinishedThenInjectJsCode() =
+        runTest {
+            val webView = DuckDuckGoWebView(context)
+
+            testee.onPageFinished(webView, "example.com")
+
+            verify(listener).addDocumentStartJavaScript(webView)
+        }
+
+    @UiThreadTest
+    @Test
+    fun whenConfigureWebViewThenAddWebMessageListener() =
+        runTest {
+            assertFalse(fakeMessagingPlugins.plugin.registered)
+            val mockCallback = mock<WebViewCompatMessageCallback>()
+            testee.configureWebView(DuckDuckGoWebView(context), mockCallback)
+            assertTrue(fakeMessagingPlugins.plugin.registered)
+        }
 
     @UiThreadTest
     @Test
@@ -1342,37 +1355,22 @@ class BrowserWebViewClientTest {
         const val EXAMPLE_URL = "https://example.com"
     }
 
-    class FakeAddDocumentStartJavaScriptPlugin : AddDocumentStartJavaScriptPlugin {
-        var countInitted = 0
-            private set
-
-        override fun addDocumentStartJavaScript(webView: WebView) {
-            countInitted++
-        }
-    }
-
-    class FakeAddDocumentStartJavaScriptPluginPoint : PluginPoint<AddDocumentStartJavaScriptPlugin> {
-        val plugin = FakeAddDocumentStartJavaScriptPlugin()
-
-        override fun getPlugins() = listOf(plugin)
-    }
-
     class FakeWebMessagingPlugin : WebMessagingPlugin {
         var registered = false
             private set
 
-        override fun unregister(webView: WebView) {
+        override suspend fun unregister(webView: WebView) {
             registered = false
         }
 
-        override fun register(
+        override suspend fun register(
             jsMessageCallback: WebViewCompatMessageCallback,
             webView: WebView,
         ) {
             registered = true
         }
 
-        override fun postMessage(
+        override suspend fun postMessage(
             webView: WebView,
             subscriptionEventData: SubscriptionEventData,
         ) {

@@ -42,7 +42,7 @@ interface WebViewCompatWrapper {
 
     suspend fun postMessage(
         webView: WebView,
-        globalReplyProxy: JavaScriptReplyProxy?,
+        replyProxy: JavaScriptReplyProxy?,
         subscriptionEvent: String,
     )
 }

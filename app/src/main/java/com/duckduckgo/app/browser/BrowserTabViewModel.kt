@@ -319,6 +319,7 @@ import com.duckduckgo.duckplayer.api.DuckPlayer
 import com.duckduckgo.duckplayer.api.DuckPlayer.DuckPlayerState.ENABLED
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.history.api.NavigationHistory
+import com.duckduckgo.js.messaging.api.AddDocumentStartJavaScriptPlugin
 import com.duckduckgo.js.messaging.api.JsCallbackData
 import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.Feed
 import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.Feed.MALWARE
@@ -484,6 +485,7 @@ class BrowserTabViewModel @Inject constructor(
     private val externalIntentProcessingState: ExternalIntentProcessingState,
     private val vpnMenuStateProvider: VpnMenuStateProvider,
     private val webViewCompatWrapper: WebViewCompatWrapper,
+    private val addDocumentStartJavascriptPlugins: PluginPoint<AddDocumentStartJavaScriptPlugin>,
 ) : ViewModel(),
     WebViewClientListener,
     EditSavedSiteListener,
@@ -4193,6 +4195,16 @@ class BrowserTabViewModel @Inject constructor(
         val cta = currentCtaViewState().cta
         if (cta is OnboardingDaxDialogCta) {
             onDismissOnboardingDaxDialog(cta)
+        }
+    }
+
+    override fun addDocumentStartJavaScript(webView: WebView) {
+        viewModelScope.launch {
+            addDocumentStartJavascriptPlugins.getPlugins().forEach {
+                it.addDocumentStartJavaScript(
+                    webView,
+                )
+            }
         }
     }
 

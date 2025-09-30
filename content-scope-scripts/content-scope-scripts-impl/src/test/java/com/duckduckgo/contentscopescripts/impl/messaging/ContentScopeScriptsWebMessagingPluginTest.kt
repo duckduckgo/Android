@@ -277,7 +277,7 @@ class ContentScopeScriptsWebMessagingPluginTest {
                 method: String,
                 id: String?,
                 data: JSONObject?,
-                onResponse: (params: JSONObject) -> Unit,
+                onResponse: suspend (params: JSONObject) -> Unit,
             ) {
                 counter++
             }
