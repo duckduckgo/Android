@@ -22,6 +22,7 @@ import android.view.View
 import android.view.View.OVER_SCROLL_NEVER
 import android.view.ViewTreeObserver
 import androidx.core.view.isVisible
+import androidx.core.view.updatePadding
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -32,6 +33,7 @@ import com.duckduckgo.browser.ui.autocomplete.BrowserAutoCompleteSuggestionsAdap
 import com.duckduckgo.browser.ui.omnibar.OmnibarPosition
 import com.duckduckgo.common.ui.DuckDuckGoFragment
 import com.duckduckgo.common.ui.view.dialog.TextAlertDialogBuilder
+import com.duckduckgo.common.ui.view.toPx
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.FragmentViewModelFactory
 import com.duckduckgo.common.utils.plugins.ActivePluginPoint
@@ -51,6 +53,7 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import kotlin.math.roundToInt
 import com.duckduckgo.browser.ui.R as BrowserUI
 
 @InjectWith(FragmentScope::class)
@@ -124,6 +127,7 @@ class SearchTabFragment : DuckDuckGoFragment(R.layout.fragment_search_tab) {
             val spacing = resources.getDimensionPixelSize(R.dimen.inputScreenAutocompleteListBottomSpace)
             val decoration = RecyclerBottomSpacingDecoration(spacing)
             binding.autoCompleteSuggestionsList.addItemDecoration(decoration)
+            binding.autoCompleteSuggestionsList.updatePadding(top = 12f.toPx(context).roundToInt())
         }
         autoCompleteSuggestionsAdapter =
             BrowserAutoCompleteSuggestionsAdapter(
