@@ -47,6 +47,7 @@ import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.ui.view.addBottomShadow
 import com.duckduckgo.common.ui.view.toPx
+import com.duckduckgo.common.ui.view.hide
 import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.duckchat.impl.R
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
@@ -54,6 +55,7 @@ import com.duckduckgo.duckchat.impl.pixel.inputScreenPixelsModeParam
 import com.google.android.material.card.MaterialCardView
 import com.google.android.material.tabs.TabLayout
 import dagger.android.support.AndroidSupportInjection
+import logcat.logcat
 import javax.inject.Inject
 import kotlin.math.roundToInt
 
@@ -168,6 +170,10 @@ class InputModeWidget @JvmOverloads constructor(
     fun init() {
         onSearchSelected?.invoke()
         checkForButtonsVisibility()
+    }
+
+    fun clearInputFocus() {
+        inputField.clearFocus()
     }
 
     private fun configureClickListeners() {
@@ -385,6 +391,7 @@ class InputModeWidget @JvmOverloads constructor(
         visible: Boolean,
         duration: Long = FADE_DURATION,
     ) {
+        logcat { "inputScreenLauncher: fade $view" }
         if (view.isVisible == visible) return
         (view.parent as? ViewGroup)?.let { root ->
             TransitionManager.beginDelayedTransition(
