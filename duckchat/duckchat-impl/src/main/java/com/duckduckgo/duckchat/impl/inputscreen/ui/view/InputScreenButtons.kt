@@ -22,8 +22,8 @@ import android.view.LayoutInflater
 import android.widget.LinearLayout
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
+import androidx.core.view.setPadding
 import androidx.core.view.updateLayoutParams
-import androidx.core.view.updatePadding
 import com.duckduckgo.common.ui.view.toPx
 import com.duckduckgo.duckchat.impl.R
 import com.duckduckgo.duckchat.impl.databinding.ViewInputScreenButtonsBinding
@@ -92,11 +92,8 @@ class InputScreenButtons @JvmOverloads constructor(
         binding.actionNewLine.elevation = elevation
         binding.actionVoice.elevation = elevation
         binding.actionSend.elevation = elevation
-        binding.root.updatePadding(
-            left = elevation.roundToInt(),
-            right = elevation.roundToInt(),
-            bottom = elevation.times(2).roundToInt(),
-        )
+        val padding = elevation.times(2).roundToInt()
+        binding.root.setPadding(padding)
 
         // add circular background and click ripple to all remaining buttons
         val backgroundRes = R.drawable.background_input_screen_button
