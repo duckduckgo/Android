@@ -34,6 +34,7 @@ import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.settings.api.SettingsPageFeature
+import com.duckduckgo.settings.api.SettingsWebViewScreenWithParams
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import javax.inject.Inject
@@ -120,7 +121,7 @@ class PrivateSearchActivity : DuckDuckGoActivity() {
             }
         globalActivityStarter.start(
             this,
-            WebViewActivityWithParams(
+            SettingsWebViewScreenWithParams(
                 url = settingsUrl,
                 getString(R.string.privateSearchMoreSearchSettingsTitle),
             ),
