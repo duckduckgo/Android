@@ -363,7 +363,10 @@ class InputScreenViewModel @AssistedInject constructor(
     fun onChatInputTextChanged(query: String) {
         chatInputTextState.value = query.trim()
         _visibilityState.update {
-            it.copy(showChatLogo = (query == initialSearchInputText && !it.autoCompleteSuggestionsVisible) || query.isEmpty())
+            it.copy(
+                showChatLogo = (query == initialSearchInputText && !it.autoCompleteSuggestionsVisible) || query.isEmpty(),
+                newLineButtonVisible = query.isNotBlank(),
+            )
         }
     }
 
