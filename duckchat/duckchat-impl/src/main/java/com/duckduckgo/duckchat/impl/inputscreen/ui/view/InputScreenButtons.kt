@@ -22,9 +22,12 @@ import android.view.LayoutInflater
 import android.widget.LinearLayout
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
-import com.duckduckgo.common.ui.view.toDp
+import androidx.core.view.updateLayoutParams
+import androidx.core.view.updatePadding
+import com.duckduckgo.common.ui.view.toPx
 import com.duckduckgo.duckchat.impl.R
 import com.duckduckgo.duckchat.impl.databinding.ViewInputScreenButtonsBinding
+import kotlin.math.roundToInt
 import com.duckduckgo.mobile.android.R as CommonR
 
 class InputScreenButtons @JvmOverloads constructor(
@@ -69,17 +72,38 @@ class InputScreenButtons @JvmOverloads constructor(
     }
 
     fun transformButtonsToFloating() {
-        val backgroundRes = R.drawable.background_input_screen_button
-        binding.actionNewLine.setBackgroundResource(backgroundRes)
-        binding.actionVoice.setBackgroundResource(backgroundRes)
+        // enlarge buttons if they are floating
+        val buttonSizePx = 40f.toPx(context).roundToInt()
+        binding.actionSend.updateLayoutParams {
+            width = buttonSizePx
+            height = buttonSizePx
+        }
+        binding.actionNewLine.updateLayoutParams {
+            width = buttonSizePx
+            height = buttonSizePx
+        }
+        binding.actionVoice.updateLayoutParams {
+            width = buttonSizePx
+            height = buttonSizePx
+        }
 
-        val circularRippleDrawable = ContextCompat.getDrawable(context, CommonR.drawable.selectable_circular_ripple)
-        binding.actionNewLine.foreground = circularRippleDrawable
-        binding.actionVoice.foreground = circularRippleDrawable
-
-        val elevation = 16.toDp(context).toFloat()
+        // add shadows via elevation and add padding to the container to avoid clipping
+        val elevation = 6f.toPx(context)
         binding.actionNewLine.elevation = elevation
         binding.actionVoice.elevation = elevation
         binding.actionSend.elevation = elevation
+        binding.root.updatePadding(
+            left = elevation.roundToInt(),
+            right = elevation.roundToInt(),
+            bottom = elevation.times(2).roundToInt(),
+        )
+
+        // add circular background and click ripple to all remaining buttons
+        val backgroundRes = R.drawable.background_input_screen_button
+        binding.actionNewLine.setBackgroundResource(backgroundRes)
+        binding.actionVoice.setBackgroundResource(backgroundRes)
+        val circularRippleDrawable = ContextCompat.getDrawable(context, CommonR.drawable.selectable_circular_ripple)
+        binding.actionNewLine.foreground = circularRippleDrawable
+        binding.actionVoice.foreground = circularRippleDrawable
     }
 }

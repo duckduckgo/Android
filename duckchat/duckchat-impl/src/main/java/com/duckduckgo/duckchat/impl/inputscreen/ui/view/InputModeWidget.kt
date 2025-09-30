@@ -38,13 +38,13 @@ import android.widget.EditText
 import android.widget.FrameLayout
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.isVisible
-import androidx.core.view.marginEnd
 import androidx.core.view.updateLayoutParams
 import androidx.core.widget.doAfterTextChanged
 import androidx.core.widget.doOnTextChanged
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.ui.view.addBottomShadow
+import com.duckduckgo.common.ui.view.toPx
 import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.duckchat.impl.R
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
@@ -53,6 +53,7 @@ import com.google.android.material.card.MaterialCardView
 import com.google.android.material.tabs.TabLayout
 import dagger.android.support.AndroidSupportInjection
 import javax.inject.Inject
+import kotlin.math.roundToInt
 
 @InjectWith(ViewScope::class)
 class InputModeWidget @JvmOverloads constructor(
@@ -349,7 +350,8 @@ class InputModeWidget @JvmOverloads constructor(
         inputScreenButtonsContainer.isVisible = true
         inputScreenButtonsContainer.addView(inputScreenButtons)
         inputFieldClearText.updateLayoutParams<MarginLayoutParams> {
-            marginEnd = resources.getDimensionPixelSize(R.dimen.inputScreenBottomButtonMarginEnd)
+            // align the clear text button with the center of the submit button
+            marginEnd = 4f.toPx(context).roundToInt()
         }
     }
 
