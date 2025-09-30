@@ -65,6 +65,7 @@
         android:id="@+id/inputScreenButtonsContainer"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:elevation="1dp"
         android:layout_marginEnd="12dp"
         android:layout_marginBottom="4dp"
         app:layout_constraintBottom_toBottomOf="parent"
