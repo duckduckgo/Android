@@ -27,9 +27,10 @@ import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.browser.api.ui.BrowserScreens.WebViewActivityWithParams
+import com.duckduckgo.browser.api.webviewcompat.WebViewCompatWrapper
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.viewbinding.viewBinding
+import com.duckduckgo.contentscopescripts.api.CoreContentScopeScripts
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.js.messaging.api.JsMessageCallback
 import com.duckduckgo.js.messaging.api.JsMessaging
@@ -39,6 +40,7 @@ import com.duckduckgo.settings.impl.databinding.ActivitySettingsWebviewBinding
 import com.duckduckgo.user.agent.api.UserAgentProvider
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
 import org.json.JSONObject
 import javax.inject.Inject
 import javax.inject.Named
@@ -54,9 +56,15 @@ class SettingsWebViewActivity : DuckDuckGoActivity() {
     lateinit var webViewClient: SettingsWebViewClient
 
     @Inject
+    lateinit var webViewCompat: WebViewCompatWrapper
+
+    @Inject
     lateinit var pixel: Pixel
 
     private val viewModel: SettingsWebViewViewModel by bindViewModel()
+
+    @Inject
+    lateinit var css: CoreContentScopeScripts
 
     @Inject
     @Named("ContentScopeScripts")
@@ -78,11 +86,13 @@ class SettingsWebViewActivity : DuckDuckGoActivity() {
         setContentView(binding.root)
         setupToolbar(toolbar)
 
-        setupWebView()
-        setupCollectors()
-        setupBackPressedDispatcher()
+        lifecycleScope.launch {
+            setupWebView()
+            setupCollectors()
+            setupBackPressedDispatcher()
 
-        viewModel.onStart(url)
+            viewModel.onStart(url)
+        }
     }
 
     private fun setupBackPressedDispatcher() {
@@ -124,7 +134,7 @@ class SettingsWebViewActivity : DuckDuckGoActivity() {
     }
 
     @SuppressLint("SetJavaScriptEnabled")
-    private fun setupWebView() {
+    private suspend fun setupWebView() {
         binding.settingsWebView.let {
             contentScopeScripts.register(
                 it,
@@ -138,6 +148,15 @@ class SettingsWebViewActivity : DuckDuckGoActivity() {
                         viewModel.processJsCallbackMessage(featureName, method, id, data)
                     }
                 },
+            )
+
+            webViewCompat.addDocumentStartJavaScript(
+                it,
+                "javascript:${css.getScript(false, emptyList())}",
+                setOf(
+                    "https://duckduckgo.com", // exact origin
+                    "https://*.duckduckgo.com", // any subdomain
+                ),
             )
 
             it.webViewClient = webViewClient
