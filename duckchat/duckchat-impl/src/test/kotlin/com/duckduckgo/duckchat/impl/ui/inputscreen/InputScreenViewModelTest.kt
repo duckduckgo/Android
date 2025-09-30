@@ -88,6 +88,7 @@ class InputScreenViewModelTest {
             )
             whenever(duckChat.wasOpenedBefore()).thenReturn(false)
             whenever(inputScreenConfigResolver.useTopBar()).thenReturn(true)
+            whenever(voiceSearchAvailability.isVoiceSearchAvailable).thenReturn(true)
         }
 
     private fun createViewModel(currentOmnibarText: String = ""): InputScreenViewModel =
@@ -1564,5 +1565,72 @@ class InputScreenViewModelTest {
             val viewModel = createViewModel("https://example.com")
 
             assertFalse(viewModel.visibilityState.value.bottomFadeVisible)
+        }
+
+    @Test
+    fun `when onSubmitMessageAvailableChange called then submitButtonVisible is updated correctly`() =
+        runTest {
+            val viewModel = createViewModel()
+
+            // Initially false
+            assertFalse(viewModel.visibilityState.value.submitButtonVisible)
+
+            // Set to true
+            viewModel.onSubmitMessageAvailableChange(true)
+            assertTrue(viewModel.visibilityState.value.submitButtonVisible)
+
+            // Set to false
+            viewModel.onSubmitMessageAvailableChange(false)
+            assertFalse(viewModel.visibilityState.value.submitButtonVisible)
+        }
+
+    @Test
+    fun `when any button is visible then actionButtonsContainerVisible should be true`() =
+        runTest {
+            data class TestCase(
+                val name: String,
+                val setup: (InputScreenViewModel) -> Unit,
+                val expectedVisible: Boolean,
+            )
+
+            val testCases =
+                listOf(
+                    TestCase(
+                        name = "submit button visible",
+                        setup = { it.onSubmitMessageAvailableChange(true) },
+                        expectedVisible = true,
+                    ),
+                    TestCase(
+                        name = "voice input button visible (default)",
+                        setup = { /* voice input is visible by default in the test setup */ },
+                        expectedVisible = true,
+                    ),
+                    TestCase(
+                        name = "new line button visible",
+                        setup = { it.onChatInputTextChanged("test") },
+                        expectedVisible = true,
+                    ),
+                    TestCase(
+                        name = "no buttons visible",
+                        setup = {
+                            // Disable voice input
+                            whenever(voiceSearchAvailability.isVoiceSearchAvailable).thenReturn(false)
+                            it.onActivityResume()
+                            it.onSubmitMessageAvailableChange(false)
+                            // newLineButtonVisible is false by default
+                        },
+                        expectedVisible = false,
+                    ),
+                )
+
+            testCases.forEach { testCase ->
+                val viewModel = createViewModel()
+                testCase.setup(viewModel)
+                assertEquals(
+                    "Failed for test case: ${testCase.name}",
+                    testCase.expectedVisible,
+                    viewModel.visibilityState.value.actionButtonsContainerVisible,
+                )
+            }
         }
 }
