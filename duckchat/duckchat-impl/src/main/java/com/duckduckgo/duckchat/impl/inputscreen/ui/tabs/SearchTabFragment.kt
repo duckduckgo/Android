@@ -127,7 +127,7 @@ class SearchTabFragment : DuckDuckGoFragment(R.layout.fragment_search_tab) {
             val spacing = resources.getDimensionPixelSize(R.dimen.inputScreenAutocompleteListBottomSpace)
             val decoration = RecyclerBottomSpacingDecoration(spacing)
             binding.autoCompleteSuggestionsList.addItemDecoration(decoration)
-            binding.autoCompleteSuggestionsList.updatePadding(top = 12f.toPx(context).roundToInt())
+            binding.autoCompleteSuggestionsList.updatePadding(top = 8f.toPx(context).roundToInt())
         }
         autoCompleteSuggestionsAdapter =
             BrowserAutoCompleteSuggestionsAdapter(
