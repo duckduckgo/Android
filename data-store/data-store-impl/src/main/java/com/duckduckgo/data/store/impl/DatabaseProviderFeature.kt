@@ -14,21 +14,19 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.contentscopescripts.impl.features.messagebridge.store
+package com.duckduckgo.data.store.impl
 
-import androidx.room.Database
-import androidx.room.RoomDatabase
-import androidx.room.migration.Migration
+import com.duckduckgo.anvil.annotations.ContributesRemoteFeature
+import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.feature.toggles.api.Toggle
+import com.duckduckgo.feature.toggles.api.Toggle.DefaultFeatureValue
 
-@Database(
-    exportSchema = true,
-    version = 1,
-    entities = [
-        MessageBridgeEntity::class,
-    ],
+@ContributesRemoteFeature(
+    scope = AppScope::class,
+    featureName = "databaseProvider",
 )
-abstract class MessageBridgeDatabase : RoomDatabase() {
-    abstract fun messageBridgeDao(): MessageBridgeDao
-}
+interface DatabaseProviderFeature {
 
-val ALL_MIGRATIONS = emptyList<Migration>()
+    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    fun self(): Toggle
+}

@@ -31,4 +31,4 @@ abstract class BrokenSiteDatabase : RoomDatabase() {
     abstract fun brokenSiteDao(): BrokenSiteDao
 }
 
-val ALL_MIGRATIONS = emptyArray<Migration>()
+val ALL_MIGRATIONS = emptyList<Migration>()

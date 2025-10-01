@@ -36,6 +36,7 @@ dependencies {
     implementation project(':feature-toggles-api')
     implementation project(':app-build-config-api')
     implementation project(':statistics-api')
+    implementation project(':data-store-api')
 
     implementation KotlinX.coroutines.android
     implementation AndroidX.core.ktx

@@ -34,6 +34,7 @@ dependencies {
     implementation project(':statistics-api')
     implementation project(':httpsupgrade-api')
     implementation project(':httpsupgrade-store')
+    implementation project(path: ':data-store-api')
 
     implementation AndroidX.room.runtime
     implementation Google.dagger

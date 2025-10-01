@@ -16,12 +16,12 @@
 
 package com.duckduckgo.remote.messaging.impl.di
 
-import android.content.Context
-import androidx.room.Room
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.browser.api.AppProperties
 import com.duckduckgo.browser.api.UserBrowserProperties
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.data.store.api.DatabaseProvider
+import com.duckduckgo.data.store.api.RoomDatabaseConfig
 import com.duckduckgo.di.DaggerSet
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.remote.messaging.api.AttributeMatcherPlugin
@@ -159,11 +159,15 @@ object DataSourceModule {
 
     @Provides
     @SingleInstanceIn(AppScope::class)
-    fun providesRemoteMessagingDatabase(context: Context): RemoteMessagingDatabase {
-        return Room.databaseBuilder(context, RemoteMessagingDatabase::class.java, "remote_messaging.db")
-            .fallbackToDestructiveMigration()
-            .addMigrations(*ALL_MIGRATIONS)
-            .build()
+    fun provideRemoteMessagingDatabase(databaseProvider: DatabaseProvider): RemoteMessagingDatabase {
+        return databaseProvider.buildRoomDatabase(
+            RemoteMessagingDatabase::class.java,
+            "remote_messaging.db",
+            config = RoomDatabaseConfig(
+                fallbackToDestructiveMigration = true,
+                migrations = ALL_MIGRATIONS,
+            ),
+        )
     }
 
     @Provides
