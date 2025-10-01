@@ -29,7 +29,7 @@
 
     <!-- Onboarding Activity -->
     <string name="onboardingDefaultBrowserDescription">Posjetite Postavke kako biste svaki put pretraživali i pregledavali uz DuckDuckGo.</string>
-    <string name="onboardingDefaultBrowserTitle">Postavi DuckDuckGo kao zadanu tražilicu</string>
+    <string name="onboardingDefaultBrowserTitle">Postavi DuckDuckGo kao zadani preglednik</string>
 
     <!-- Default Browser -->
     <string name="cannotLaunchDefaultAppSettings">Ne mogu pokrenuti zaslon zadanih postavki u aplikaciji</string>
