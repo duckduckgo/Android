@@ -16,6 +16,7 @@ import com.duckduckgo.browser.api.autocomplete.AutoCompleteSettings
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.extensions.toBinaryString
 import com.duckduckgo.duckchat.api.DuckChat
+import com.duckduckgo.duckchat.impl.inputscreen.ui.InputScreenConfigResolver
 import com.duckduckgo.duckchat.impl.inputscreen.ui.command.Command
 import com.duckduckgo.duckchat.impl.inputscreen.ui.command.Command.AnimateLogoToProgress
 import com.duckduckgo.duckchat.impl.inputscreen.ui.command.Command.SetInputModeWidgetScrollPosition
@@ -76,6 +77,7 @@ class InputScreenViewModelTest {
     private val duckChat: DuckChat = mock()
     private val inputScreenDiscoveryFunnel: InputScreenDiscoveryFunnel = mock()
     private val inputScreenSessionUsageMetric: InputScreenSessionUsageMetric = mock()
+    private val inputScreenConfigResolver: InputScreenConfigResolver = mock()
 
     @Before
     fun setup() =
@@ -85,6 +87,8 @@ class InputScreenViewModelTest {
                 flowOf(AutoCompleteResult("", listOf(AutoCompleteDefaultSuggestion("suggestion")))),
             )
             whenever(duckChat.wasOpenedBefore()).thenReturn(false)
+            whenever(inputScreenConfigResolver.useTopBar()).thenReturn(true)
+            whenever(voiceSearchAvailability.isVoiceSearchAvailable).thenReturn(true)
         }
 
     private fun createViewModel(currentOmnibarText: String = ""): InputScreenViewModel =
@@ -101,6 +105,7 @@ class InputScreenViewModelTest {
             duckChat = duckChat,
             inputScreenDiscoveryFunnel = inputScreenDiscoveryFunnel,
             inputScreenSessionUsageMetric = inputScreenSessionUsageMetric,
+            inputScreenConfigResolver = inputScreenConfigResolver,
         )
 
     @Test
@@ -1533,5 +1538,99 @@ class InputScreenViewModelTest {
             viewModel.onPageScrolled(position, positionOffset)
 
             assertEquals(0, capturedCommands.size)
+        }
+
+    @Test
+    fun `when using top bar and autocomplete suggestions are visible then bottomFadeVisible should be true`() =
+        runTest {
+            whenever(inputScreenConfigResolver.useTopBar()).thenReturn(true)
+            val viewModel = createViewModel("search query")
+
+            assertTrue(viewModel.visibilityState.value.bottomFadeVisible)
+        }
+
+    @Test
+    fun `when using bottom bar and autocomplete suggestions are visible then bottomFadeVisible should be false`() =
+        runTest {
+            whenever(inputScreenConfigResolver.useTopBar()).thenReturn(false)
+            val viewModel = createViewModel("search query")
+
+            assertFalse(viewModel.visibilityState.value.bottomFadeVisible)
+        }
+
+    @Test
+    fun `when using top bar and autocomplete suggestions are hidden then bottomFadeVisible should be false`() =
+        runTest {
+            whenever(inputScreenConfigResolver.useTopBar()).thenReturn(true)
+            val viewModel = createViewModel("https://example.com")
+
+            assertFalse(viewModel.visibilityState.value.bottomFadeVisible)
+        }
+
+    @Test
+    fun `when onSubmitMessageAvailableChange called then submitButtonVisible is updated correctly`() =
+        runTest {
+            val viewModel = createViewModel()
+
+            // Initially false
+            assertFalse(viewModel.visibilityState.value.submitButtonVisible)
+
+            // Set to true
+            viewModel.onSubmitMessageAvailableChange(true)
+            assertTrue(viewModel.visibilityState.value.submitButtonVisible)
+
+            // Set to false
+            viewModel.onSubmitMessageAvailableChange(false)
+            assertFalse(viewModel.visibilityState.value.submitButtonVisible)
+        }
+
+    @Test
+    fun `when any button is visible then actionButtonsContainerVisible should be true`() =
+        runTest {
+            data class TestCase(
+                val name: String,
+                val setup: (InputScreenViewModel) -> Unit,
+                val expectedVisible: Boolean,
+            )
+
+            val testCases =
+                listOf(
+                    TestCase(
+                        name = "submit button visible",
+                        setup = { it.onSubmitMessageAvailableChange(true) },
+                        expectedVisible = true,
+                    ),
+                    TestCase(
+                        name = "voice input button visible (default)",
+                        setup = { /* voice input is visible by default in the test setup */ },
+                        expectedVisible = true,
+                    ),
+                    TestCase(
+                        name = "new line button visible",
+                        setup = { it.onChatInputTextChanged("test") },
+                        expectedVisible = true,
+                    ),
+                    TestCase(
+                        name = "no buttons visible",
+                        setup = {
+                            // Disable voice input
+                            whenever(voiceSearchAvailability.isVoiceSearchAvailable).thenReturn(false)
+                            it.onActivityResume()
+                            it.onSubmitMessageAvailableChange(false)
+                            // newLineButtonVisible is false by default
+                        },
+                        expectedVisible = false,
+                    ),
+                )
+
+            testCases.forEach { testCase ->
+                val viewModel = createViewModel()
+                testCase.setup(viewModel)
+                assertEquals(
+                    "Failed for test case: ${testCase.name}",
+                    testCase.expectedVisible,
+                    viewModel.visibilityState.value.actionButtonsContainerVisible,
+                )
+            }
         }
 }

@@ -14,14 +14,14 @@
   ~ limitations under the License.
   -->
 
-<resources>
-    <dimen name="inputModeSwitchHeight">38dp</dimen>
-    <dimen name="inputModeTabIndicatorHeight">34dp</dimen>
-    <dimen name="inputModeTabIndicatorHorizontalInset">2dp</dimen>
-    <dimen name="inputModeTabIndicatorElevation">5dp</dimen>
-    <dimen name="inputScreenUserPrefToggleSpacing">16dp</dimen>
-    <dimen name="inputScreenOmnibarCardMarginHorizontal">@dimen/omnibarCardMarginHorizontal</dimen>
-    <dimen name="inputScreenMarginHorizontal">0dp</dimen>
-    <dimen name="inputScreenAutocompleteListBottomSpace">64dp</dimen>
-    <dimen name="inputScreenContentSeparatorHeight">0.5dp</dimen>
-</resources>
+<set xmlns:android="http://schemas.android.com/apk/res/android"
+    android:backdropColor="@color/background_background_dark"
+    android:duration="@integer/input_screen_slide_animation_duration_ms"
+    android:showBackdrop="true">
+
+    <alpha
+        android:fromAlpha="1.0"
+        android:interpolator="@android:anim/decelerate_interpolator"
+        android:toAlpha="0.0" />
+
+</set>

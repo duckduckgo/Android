@@ -22,6 +22,7 @@ import android.view.View
 import android.view.View.OVER_SCROLL_NEVER
 import android.view.ViewTreeObserver
 import androidx.core.view.isVisible
+import androidx.core.view.updatePadding
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -29,19 +30,22 @@ import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion
 import com.duckduckgo.browser.api.ui.BrowserScreens.PrivateSearchScreenNoParams
 import com.duckduckgo.browser.ui.autocomplete.BrowserAutoCompleteSuggestionsAdapter
-import com.duckduckgo.browser.ui.omnibar.OmnibarPosition.TOP
+import com.duckduckgo.browser.ui.omnibar.OmnibarPosition
 import com.duckduckgo.common.ui.DuckDuckGoFragment
 import com.duckduckgo.common.ui.view.dialog.TextAlertDialogBuilder
+import com.duckduckgo.common.ui.view.toPx
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.FragmentViewModelFactory
 import com.duckduckgo.common.utils.plugins.ActivePluginPoint
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.duckchat.impl.R
 import com.duckduckgo.duckchat.impl.databinding.FragmentSearchTabBinding
+import com.duckduckgo.duckchat.impl.inputscreen.ui.InputScreenConfigResolver
 import com.duckduckgo.duckchat.impl.inputscreen.ui.command.SearchCommand
 import com.duckduckgo.duckchat.impl.inputscreen.ui.command.SearchCommand.RestoreAutoCompleteScrollPosition
 import com.duckduckgo.duckchat.impl.inputscreen.ui.command.SearchCommand.ShowRemoveSearchSuggestionDialog
 import com.duckduckgo.duckchat.impl.inputscreen.ui.view.BottomBlurView
+import com.duckduckgo.duckchat.impl.inputscreen.ui.view.RecyclerBottomSpacingDecoration
 import com.duckduckgo.duckchat.impl.inputscreen.ui.viewmodel.InputScreenViewModel
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.newtabpage.api.NewTabPagePlugin
@@ -49,6 +53,7 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import kotlin.math.roundToInt
 import com.duckduckgo.browser.ui.R as BrowserUI
 
 @InjectWith(FragmentScope::class)
@@ -59,6 +64,8 @@ class SearchTabFragment : DuckDuckGoFragment(R.layout.fragment_search_tab) {
     @Inject lateinit var viewModelFactory: FragmentViewModelFactory
 
     @Inject lateinit var globalActivityStarter: GlobalActivityStarter
+
+    @Inject lateinit var inputScreenConfigResolver: InputScreenConfigResolver
 
     private val viewModel: InputScreenViewModel by lazy {
         ViewModelProvider(requireParentFragment(), viewModelFactory)[InputScreenViewModel::class.java]
@@ -81,7 +88,7 @@ class SearchTabFragment : DuckDuckGoFragment(R.layout.fragment_search_tab) {
     }
 
     private fun configureBottomBlur() {
-        if (VERSION.SDK_INT >= 33) {
+        if (VERSION.SDK_INT >= 33 && inputScreenConfigResolver.useTopBar()) {
             // TODO: Handle overscroll when blurring
             binding.autoCompleteSuggestionsList.overScrollMode = OVER_SCROLL_NEVER
 
@@ -116,6 +123,12 @@ class SearchTabFragment : DuckDuckGoFragment(R.layout.fragment_search_tab) {
     private fun configureAutoComplete() {
         val context = context ?: return
         binding.autoCompleteSuggestionsList.layoutManager = LinearLayoutManager(context)
+        if (inputScreenConfigResolver.useTopBar()) {
+            val spacing = resources.getDimensionPixelSize(R.dimen.inputScreenAutocompleteListBottomSpace)
+            val decoration = RecyclerBottomSpacingDecoration(spacing)
+            binding.autoCompleteSuggestionsList.addItemDecoration(decoration)
+            binding.autoCompleteSuggestionsList.updatePadding(top = 8f.toPx(context).roundToInt())
+        }
         autoCompleteSuggestionsAdapter =
             BrowserAutoCompleteSuggestionsAdapter(
                 immediateSearchClickListener = {
@@ -134,7 +147,12 @@ class SearchTabFragment : DuckDuckGoFragment(R.layout.fragment_search_tab) {
                 autoCompleteLongPressClickListener = {
                     viewModel.userLongPressedAutocomplete(it)
                 },
-                omnibarPosition = TOP,
+                omnibarPosition =
+                    if (inputScreenConfigResolver.useTopBar()) {
+                        OmnibarPosition.TOP
+                    } else {
+                        OmnibarPosition.BOTTOM
+                    },
             )
         binding.autoCompleteSuggestionsList.adapter = autoCompleteSuggestionsAdapter
     }
@@ -143,7 +161,7 @@ class SearchTabFragment : DuckDuckGoFragment(R.layout.fragment_search_tab) {
         viewModel.visibilityState
             .onEach {
                 binding.autoCompleteSuggestionsList.isVisible = it.autoCompleteSuggestionsVisible
-                binding.bottomFadeContainer.isVisible = it.autoCompleteSuggestionsVisible
+                binding.bottomFadeContainer.isVisible = it.bottomFadeVisible
 
                 if (!it.autoCompleteSuggestionsVisible) {
                     viewModel.autoCompleteSuggestionsGone()

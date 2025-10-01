@@ -39,6 +39,7 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.SingleLiveEvent
 import com.duckduckgo.common.utils.extensions.toBinaryString
 import com.duckduckgo.duckchat.api.DuckChat
+import com.duckduckgo.duckchat.impl.inputscreen.ui.InputScreenConfigResolver
 import com.duckduckgo.duckchat.impl.inputscreen.ui.command.Command
 import com.duckduckgo.duckchat.impl.inputscreen.ui.command.Command.EditWithSelectedQuery
 import com.duckduckgo.duckchat.impl.inputscreen.ui.command.Command.SwitchToTab
@@ -123,6 +124,7 @@ class InputScreenViewModel @AssistedInject constructor(
     private val sessionStore: InputScreenSessionStore,
     private val inputScreenDiscoveryFunnel: InputScreenDiscoveryFunnel,
     private val inputScreenSessionUsageMetric: InputScreenSessionUsageMetric,
+    private val inputScreenConfigResolver: InputScreenConfigResolver,
 ) : ViewModel() {
     private var hasUserSeenHistoryIAM = false
     private var isTapTransition = false
@@ -135,8 +137,10 @@ class InputScreenViewModel @AssistedInject constructor(
     private val _visibilityState =
         MutableStateFlow(
             InputScreenVisibilityState(
+                submitButtonVisible = false,
                 voiceInputButtonVisible = voiceServiceAvailable.value && voiceInputAllowed.value,
                 autoCompleteSuggestionsVisible = false,
+                bottomFadeVisible = false,
                 showChatLogo = true,
                 showSearchLogo = true,
                 newLineButtonVisible = false,
@@ -254,7 +258,10 @@ class InputScreenViewModel @AssistedInject constructor(
         shouldShowAutoComplete
             .onEach { showAutoComplete ->
                 _visibilityState.update {
-                    it.copy(autoCompleteSuggestionsVisible = showAutoComplete)
+                    it.copy(
+                        autoCompleteSuggestionsVisible = showAutoComplete,
+                        bottomFadeVisible = showAutoComplete && inputScreenConfigResolver.useTopBar(),
+                    )
                 }
             }.launchIn(viewModelScope)
 
@@ -269,11 +276,7 @@ class InputScreenViewModel @AssistedInject constructor(
 
     fun onActivityResume() {
         autoCompleteSuggestionsEnabled.value = autoCompleteSettings.autoCompleteSuggestionsEnabled
-        _visibilityState.update {
-            it.copy(
-                voiceInputButtonVisible = voiceSearchAvailability.isVoiceSearchAvailable,
-            )
-        }
+        voiceServiceAvailable.value = voiceSearchAvailability.isVoiceSearchAvailable
     }
 
     fun userSelectedAutocomplete(suggestion: AutoCompleteSuggestion) {
@@ -523,6 +526,14 @@ class InputScreenViewModel @AssistedInject constructor(
     fun onInputFieldTouched() {
         _inputFieldState.update {
             it.copy(canExpand = true)
+        }
+    }
+
+    fun onSubmitMessageAvailableChange(available: Boolean) {
+        _visibilityState.update {
+            it.copy(
+                submitButtonVisible = available,
+            )
         }
     }
 

@@ -1117,10 +1117,10 @@ class BrowserTabFragment :
         val intent =
             globalActivityStarter.startIntent(
                 requireContext(),
-                InputScreenActivityParams(query = query),
+                InputScreenActivityParams(query = query, isTopOmnibar = omnibar.omnibarPosition == TOP),
             )
-        val enterTransition = browserAndInputScreenTransitionProvider.getInputScreenEnterAnimation()
-        val exitTransition = browserAndInputScreenTransitionProvider.getBrowserExitAnimation()
+        val enterTransition = browserAndInputScreenTransitionProvider.getInputScreenEnterAnimation(omnibar.omnibarPosition == TOP)
+        val exitTransition = browserAndInputScreenTransitionProvider.getBrowserExitAnimation(omnibar.omnibarPosition == TOP)
         val options =
             ActivityOptionsCompat.makeCustomAnimation(
                 requireActivity(),
@@ -1638,8 +1638,10 @@ class BrowserTabFragment :
                             val result = downloadsFileActions.openFile(it, File(command.filePath))
                             if (!result) {
                                 view
-                                    .makeSnackbarWithNoBottomInset(getString(R.string.downloadsCannotOpenFileErrorMessage), Snackbar.LENGTH_LONG)
-                                    .show()
+                                    .makeSnackbarWithNoBottomInset(
+                                        text = getString(R.string.downloadsCannotOpenFileErrorMessage),
+                                        duration = Snackbar.LENGTH_LONG,
+                                    ).show()
                             }
                         }
                     }
