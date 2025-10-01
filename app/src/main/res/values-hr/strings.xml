@@ -67,7 +67,6 @@
     <plurals name="trackersBlockedAnimationMessage" tools:ignore="ImpliedQuantity">
         <item quantity="one">Blokirani alat za praćenje</item>
         <item quantity="few">Blokirana alata za praćenje</item>
-        <item quantity="many">Blokiranih alata za praćenje</item>
         <item quantity="other">Blokiranih alata za praćenje</item>
     </plurals>
 
@@ -687,27 +686,23 @@
     <plurals name="shareLinksMenuItem" tools:ignore="ImpliedQuantity,MissingInstruction">
         <item quantity="one">Podijeli poveznice</item>
         <item quantity="few">Podijeli %1$d poveznice</item>
-        <item quantity="many">Podijeli %1$d poveznica</item>
         <item quantity="other">Podijeli %1$d poveznica</item>
     </plurals>
 
     <plurals name="tabSwitcherBookmarkDialogTitle" tools:ignore="ImpliedQuantity,MissingInstruction">
         <item quantity="one">Označiti odabranu karticu?</item>
         <item quantity="few">Označiti %1$d kartice?</item>
-        <item quantity="many">Označiti %1$d kartica?</item>
         <item quantity="other">Označiti %1$d kartica?</item>
     </plurals>
     <plurals name="tabSwitcherBookmarkToast" tools:ignore="ImpliedQuantity,MissingInstruction">
         <item quantity="one">Dodana je knjižna oznaka</item>
         <item quantity="few">Dodane su %1$d knjižne oznake</item>
-        <item quantity="many">Dodano je %1$d knjižnih oznaka</item>
         <item quantity="other">Dodano je %1$d knjižnih oznaka</item>
     </plurals>
     <string name="tabSwitcherBookmarkDialogPositiveButton">Knjižna oznaka</string>
     <plurals name="bookmarkTabsMenuItem" tools:ignore="ImpliedQuantity,MissingInstruction">
         <item quantity="one">Označi karticu</item>
         <item quantity="few">Označi %1$d kartice</item>
-        <item quantity="many">Označi %1$d kartica</item>
         <item quantity="other">Označi %1$d kartica</item>
     </plurals>
     <string name="tabSwitcherBookmarkDialogDescription">Postojeće knjižne oznake neće se duplicirati.</string>
@@ -715,57 +710,48 @@
     <plurals name="tabSwitcherCloseAllTabsDialogTitle" tools:ignore="ImpliedQuantity,MissingInstruction">
         <item quantity="one">Zatvoriti karticu?</item>
         <item quantity="few">Zatvoriti sve %1$d kartice?</item>
-        <item quantity="many">Zatvoriti svih %1$d kartica?</item>
         <item quantity="other">Zatvoriti svih %1$d kartica?</item>
     </plurals>
     <plurals name="tabSwitcherCloseOtherTabsDialogTitle" tools:ignore="ImpliedQuantity,MissingInstruction">
         <item quantity="one">Zatvoriti drugu karticu?</item>
         <item quantity="few">Zatvoriti %1$d druge kartice?</item>
-        <item quantity="many">Zatvoriti %1$d drugih kartica?</item>
         <item quantity="other">Zatvoriti %1$d drugih kartica?</item>
     </plurals>
     <plurals name="tabSwitcherCloseTabsDialogTitle" tools:ignore="ImpliedQuantity,MissingInstruction">
         <item quantity="one">Zatvoriti karticu?</item>
         <item quantity="few">Zatvoriti %1$d kartice?</item>
-        <item quantity="many">Zatvoriti %1$d kartica?</item>
         <item quantity="other">Zatvoriti %1$d kartica?</item>
     </plurals>
     <plurals name="tabSwitcherCloseAllTabsDialogDescription" tools:ignore="ImpliedQuantity,MissingInstruction">
         <item quantity="one">Jesi li siguran da želiš zatvoriti ovu karticu?</item>
         <item quantity="few">Jesi li siguran da želiš zatvoriti sve kartice?</item>
-        <item quantity="many">Jesi li siguran da želiš zatvoriti sve kartice?</item>
         <item quantity="other">Jesi li siguran da želiš zatvoriti sve kartice?</item>
     </plurals>
     <plurals name="tabSwitcherCloseTabsDialogDescription" tools:ignore="ImpliedQuantity,MissingInstruction">
         <item quantity="one">Jesi li siguran da želiš zatvoriti karticu?</item>
         <item quantity="few">Sigurno želiš zatvoriti ove kartice?</item>
-        <item quantity="many">Sigurno želiš zatvoriti ove kartice?</item>
         <item quantity="other">Sigurno želiš zatvoriti ove kartice?</item>
     </plurals>
     <plurals name="closeTabsConfirmationDialogCloseTabs" tools:ignore="ImpliedQuantity,MissingInstruction">
         <item quantity="one">Zatvori karticu</item>
         <item quantity="few">Zatvori kartice</item>
-        <item quantity="many">Zatvori kartica</item>
         <item quantity="other">Zatvori kartica</item>
     </plurals>
     <plurals name="closeTabsMenuItem" tools:ignore="ImpliedQuantity,MissingInstruction">
         <item quantity="one">Zatvori karticu</item>
         <item quantity="few">Zatvori %1$d kartice</item>
-        <item quantity="many">Zatvori %1$d kartica</item>
         <item quantity="other">Zatvori %1$d kartica</item>
     </plurals>
     <string name="closeOtherTabsMenuItem">Zatvori druge kartice</string>
     <plurals name="tabSwitcherCloseTabsSnackbar" tools:ignore="ImpliedQuantity,MissingInstruction">
         <item quantity="one">Kartica zatvorena</item>
         <item quantity="few">%1$d kartice zatvoreno</item>
-        <item quantity="many">%1$d kartica zatvoreno</item>
         <item quantity="other">%1$d kartica zatvoreno</item>
     </plurals>
 
     <plurals name="tabSwitcherTitle" tools:ignore="ImpliedQuantity,MissingInstruction">
         <item quantity="one">1 kartica</item>
         <item quantity="few">%1$d kartice</item>
-        <item quantity="many">%1$d kartica</item>
         <item quantity="other">%1$d kartice</item>
     </plurals>
 
@@ -847,13 +833,11 @@
     <plurals name="onboardingTrackersBlockedDialogDescription">
         <item quantity="one"><![CDATA[ I <b>još %1$d drugih</b> pokušavalo te ovdje pratiti. Blokirani su!<br/><br/>☝️ Dodirni štit za više informacija.️]]></item>
         <item quantity="few"><![CDATA[ I <b>još %1$d drugih</b> pokušavalo te ovdje pratiti. Blokirani su!<br/><br/>☝️ Dodirni štit za više informacija.️]]></item>
-        <item quantity="many"><![CDATA[ I <b>još %1$d drugih</b> pokušavalo te ovdje pratiti. Blokirani su!<br/><br/>☝️ Dodirni štit za više informacija.️]]></item>
         <item quantity="other"><![CDATA[ I <b>još %1$d drugih</b> pokušavalo te ovdje pratiti. Blokirani su!<br/><br/>☝️ Dodirni štit za više informacija.️]]></item>
     </plurals>
     <plurals name="onboardingTrackersBlockedZeroDialogDescription" tools:ignore="ImpliedQuantity">
         <item quantity="one"><![CDATA[ pokušavali su te ovdje pratiti. Blokirani su!<br/><br/>☝️ Dodirni štit za više informacija.️]]></item>
         <item quantity="few"><![CDATA[ pokušavali su te ovdje pratiti. Blokirani su!<br/><br/>☝️ Dodirni štit za više informacija.️]]></item>
-        <item quantity="many"><![CDATA[ pokušavali su te ovdje pratiti. Blokirani su!<br/><br/>☝️ Dodirni štit za više informacija.️]]></item>
         <item quantity="other"><![CDATA[ pokušavali su te ovdje pratiti. Blokirani su!<br/><br/>☝️ Dodirni štit za više informacija.️]]></item>
     </plurals>
     <string name="onboardingTrackersBlockedDaxDialogButton">Shvaćam!</string>
@@ -947,13 +931,11 @@
     <plurals name="bbOnboardingTrackersBlockedDialogTitle">
         <item quantity="one"><![CDATA[ i još %1$d druga stranica pokušavala te pratiti ovdje. <font color=\"#F05C2B\">Blokirao sam ih!</font>]]></item>
         <item quantity="few"><![CDATA[ i još %1$d druge stranice pokušavalo te pratiti ovdje. <font color=\"#F05C2B\">Blokirao sam ih!</font>]]></item>
-        <item quantity="many"><![CDATA[ i još %1$d drugih stranica pokušavalo te pratiti ovdje. <font color=\"#F05C2B\">Blokirao sam ih!</font>]]></item>
         <item quantity="other"><![CDATA[ i još %1$d drugih stranica pokušavalo te pratiti ovdje. <font color=\"#F05C2B\">Blokirao sam ih!</font>]]></item>
     </plurals>
     <plurals name="bbOnboardingTrackersBlockedZeroDialogTitle" tools:ignore="ImpliedQuantity">
         <item quantity="one"><![CDATA[ pokušavala te ovdje pratiti. <font color=\"#F05C2B\">Blokirao sam ih!</font>]]></item>
         <item quantity="few"><![CDATA[ pokušavale su te ovdje pratiti. <font color=\"#F05C2B\">Blokirao sam ih!</font>]]></item>
-        <item quantity="many"><![CDATA[ pokušavalo te ovdje pratiti. <font color=\"#F05C2B\">Blokirao sam ih!</font>]]></item>
         <item quantity="other"><![CDATA[ pokušavala te ovdje pratiti. <font color=\"#F05C2B\">Blokirao sam ih!</font>]]></item>
     </plurals>
 
