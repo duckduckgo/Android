@@ -31,9 +31,7 @@ class ContentScopeScriptsAddDocumentStartJavaScript @Inject constructor(
     scriptInjectorDelegate: AddDocumentStartScriptDelegate,
 ) : AddDocumentStartJavaScript by scriptInjectorDelegate.createPlugin(
     object : AddDocumentStartJavaScriptScriptStrategy {
-        override suspend fun canInject(): Boolean {
-            return webViewCompatContentScopeScripts.isEnabled()
-        }
+        override suspend fun canInject(): Boolean = webViewCompatContentScopeScripts.isEnabled()
 
         override suspend fun getScriptString(): String {
             val activeExperiments = contentScopeExperiments.getActiveExperiments()

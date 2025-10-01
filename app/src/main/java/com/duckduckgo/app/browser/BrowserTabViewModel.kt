@@ -274,6 +274,7 @@ import com.duckduckgo.autofill.api.passwordgeneration.AutomaticSavedLoginsMonito
 import com.duckduckgo.autofill.impl.AutofillFireproofDialogSuppressor
 import com.duckduckgo.brokensite.api.BrokenSitePrompt
 import com.duckduckgo.brokensite.api.RefreshPattern
+import com.duckduckgo.browser.api.AddDocumentStartJavaScriptBrowserPlugin
 import com.duckduckgo.browser.api.UserBrowserProperties
 import com.duckduckgo.browser.api.autocomplete.AutoComplete
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteResult
@@ -319,7 +320,6 @@ import com.duckduckgo.duckplayer.api.DuckPlayer
 import com.duckduckgo.duckplayer.api.DuckPlayer.DuckPlayerState.ENABLED
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.history.api.NavigationHistory
-import com.duckduckgo.js.messaging.api.AddDocumentStartJavaScriptPlugin
 import com.duckduckgo.js.messaging.api.JsCallbackData
 import com.duckduckgo.js.messaging.api.PostMessageWrapperPlugin
 import com.duckduckgo.js.messaging.api.SubscriptionEventData
@@ -489,7 +489,7 @@ class BrowserTabViewModel @Inject constructor(
     private val externalIntentProcessingState: ExternalIntentProcessingState,
     private val vpnMenuStateProvider: VpnMenuStateProvider,
     private val webViewCompatWrapper: WebViewCompatWrapper,
-    private val addDocumentStartJavascriptPlugins: PluginPoint<AddDocumentStartJavaScriptPlugin>,
+    private val addDocumentStartJavascriptPlugins: PluginPoint<AddDocumentStartJavaScriptBrowserPlugin>,
     private val webMessagingPlugins: PluginPoint<WebMessagingPlugin>,
     private val postMessageWrapperPlugins: PluginPoint<PostMessageWrapperPlugin>,
 ) : ViewModel(),
@@ -4247,7 +4247,7 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     private suspend fun addDocumentStartJavaScript(webView: WebView) {
-        addDocumentStartJavascriptPlugins.getPlugins().forEach {
+        addDocumentStartJavascriptPlugins.getPlugins().addDocumentStartJavaScript().forEach {
             it.addDocumentStartJavaScript(
                 webView,
             )
@@ -4258,6 +4258,7 @@ class BrowserTabViewModel @Inject constructor(
         if (withContext(dispatchers.io()) { !androidBrowserConfig.updateScriptOnPageFinished().isEnabled() }) {
             addDocumentStartJavascriptPlugins
                 .getPlugins()
+                .addDocumentStartJavaScript()
                 .filter { plugin ->
                     (plugin.context == "contentScopeScripts")
                 }.forEach {

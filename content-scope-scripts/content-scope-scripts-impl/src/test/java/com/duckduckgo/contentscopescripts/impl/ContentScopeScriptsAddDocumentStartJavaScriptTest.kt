@@ -27,25 +27,29 @@ class ContentScopeScriptsAddDocumentStartJavaScriptTest {
     private lateinit var testee: ContentScopeScriptsAddDocumentStartJavaScript
 
     @Before
-    fun setUp() = runTest {
-        whenever(mockActiveContentScopeExperiments.getActiveExperiments()).thenReturn(listOf())
-        whenever(mockAddDocumentStartScriptDelegate.createPlugin(any())).thenReturn(mockAddDocumentStartJavaScript)
-        testee = ContentScopeScriptsAddDocumentStartJavaScript(
-            mockWebViewCompatContentScopeScripts,
-            mockActiveContentScopeExperiments,
-            mockAddDocumentStartScriptDelegate,
-        )
-    }
+    fun setUp() =
+        runTest {
+            whenever(mockActiveContentScopeExperiments.getActiveExperiments()).thenReturn(listOf())
+            whenever(mockAddDocumentStartScriptDelegate.createPlugin(any())).thenReturn(mockAddDocumentStartJavaScript)
+            testee =
+                ContentScopeScriptsAddDocumentStartJavaScript(
+                    mockWebViewCompatContentScopeScripts,
+                    mockActiveContentScopeExperiments,
+                    mockAddDocumentStartScriptDelegate,
+                )
+        }
 
     @Test
-    fun whenAddDocumentStartJavaScriptCalledThenDelegateToCreatedPlugin() = runTest {
-        testee.addDocumentStartJavaScript(mockWebView)
+    fun whenAddDocumentStartJavaScriptCalledThenDelegateToCreatedPlugin() =
+        runTest {
+            testee.addDocumentStartJavaScript(mockWebView)
 
-        verify(mockAddDocumentStartJavaScript).addDocumentStartJavaScript(mockWebView)
-    }
+            verify(mockAddDocumentStartJavaScript).addDocumentStartJavaScript(mockWebView)
+        }
 
     @Test
-    fun whenConstructedThenCreatePluginWithCorrectStrategy() = runTest {
-        verify(mockAddDocumentStartScriptDelegate).createPlugin(any())
-    }
+    fun whenConstructedThenCreatePluginWithCorrectStrategy() =
+        runTest {
+            verify(mockAddDocumentStartScriptDelegate).createPlugin(any())
+        }
 }

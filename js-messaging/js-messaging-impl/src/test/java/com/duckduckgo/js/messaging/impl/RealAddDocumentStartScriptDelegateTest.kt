@@ -19,7 +19,6 @@ import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
 class RealAddDocumentStartScriptDelegateTest {
-
     @get:Rule
     var coroutineRule = CoroutineTestRule()
 
@@ -33,88 +32,99 @@ class RealAddDocumentStartScriptDelegateTest {
     private lateinit var plugin: AddDocumentStartJavaScript
 
     @Before
-    fun setUp() = runTest {
-        whenever(mockDispatcherProvider.main()).thenReturn(coroutineRule.testDispatcher)
-        testee = RealAddDocumentStartScriptDelegate(
-            mockWebViewCapabilityChecker,
-            coroutineRule.testScope,
-            mockDispatcherProvider,
-            mockWebViewCompatWrapper,
-        )
-    }
+    fun setUp() =
+        runTest {
+            whenever(mockDispatcherProvider.main()).thenReturn(coroutineRule.testDispatcher)
+            testee =
+                RealAddDocumentStartScriptDelegate(
+                    mockWebViewCapabilityChecker,
+                    coroutineRule.testScope,
+                    mockDispatcherProvider,
+                    mockWebViewCompatWrapper,
+                )
+        }
 
     @Test
-    fun whenFeatureEnabledAndCapabilitySupportedThenInjectScript() = runTest {
-        val mockStrategy = createMockStrategy(canInject = true, scriptString = "test script")
-        plugin = testee.createPlugin(mockStrategy)
-        whenever(mockWebViewCapabilityChecker.isSupported(any())).thenReturn(true)
-        whenever(mockWebViewCompatWrapper.addDocumentStartJavaScript(any(), any(), any())).thenReturn(mockScriptHandler)
+    fun whenFeatureEnabledAndCapabilitySupportedThenInjectScript() =
+        runTest {
+            val mockStrategy = createMockStrategy(canInject = true, scriptString = "test script")
+            plugin = testee.createPlugin(mockStrategy)
+            whenever(mockWebViewCapabilityChecker.isSupported(any())).thenReturn(true)
+            whenever(mockWebViewCompatWrapper.addDocumentStartJavaScript(any(), any(), any())).thenReturn(mockScriptHandler)
 
-        plugin.addDocumentStartJavaScript(mockWebView)
+            plugin.addDocumentStartJavaScript(mockWebView)
 
-        verify(mockWebViewCompatWrapper).addDocumentStartJavaScript(mockWebView, "test script", setOf("*"))
-    }
-
-    @Test
-    fun whenFeatureDisabledThenDoNotInjectScript() = runTest {
-        val mockStrategy = createMockStrategy(canInject = false, scriptString = "test script")
-        plugin = testee.createPlugin(mockStrategy)
-        whenever(mockWebViewCapabilityChecker.isSupported(any())).thenReturn(true)
-
-        plugin.addDocumentStartJavaScript(mockWebView)
-
-        verify(mockWebViewCompatWrapper, never()).addDocumentStartJavaScript(any(), any(), any())
-    }
+            verify(mockWebViewCompatWrapper).addDocumentStartJavaScript(mockWebView, "test script", setOf("*"))
+        }
 
     @Test
-    fun whenCapabilityNotSupportedThenDoNotInjectScript() = runTest {
-        val mockStrategy = createMockStrategy(canInject = true, scriptString = "test script")
-        plugin = testee.createPlugin(mockStrategy)
-        whenever(mockWebViewCapabilityChecker.isSupported(any())).thenReturn(false)
+    fun whenFeatureDisabledThenDoNotInjectScript() =
+        runTest {
+            val mockStrategy = createMockStrategy(canInject = false, scriptString = "test script")
+            plugin = testee.createPlugin(mockStrategy)
+            whenever(mockWebViewCapabilityChecker.isSupported(any())).thenReturn(true)
 
-        plugin.addDocumentStartJavaScript(mockWebView)
+            plugin.addDocumentStartJavaScript(mockWebView)
 
-        verify(mockWebViewCompatWrapper, never()).addDocumentStartJavaScript(any(), any(), any())
-    }
-
-    @Test
-    fun whenScriptStringSameAsCurrentThenDoNotReinject() = runTest {
-        val mockStrategy = createMockStrategy(canInject = true, scriptString = "test script")
-        plugin = testee.createPlugin(mockStrategy)
-        whenever(mockWebViewCapabilityChecker.isSupported(any())).thenReturn(true)
-        whenever(mockWebViewCompatWrapper.addDocumentStartJavaScript(any(), any(), any())).thenReturn(mockScriptHandler)
-
-        plugin.addDocumentStartJavaScript(mockWebView)
-        plugin.addDocumentStartJavaScript(mockWebView)
-
-        verify(mockWebViewCompatWrapper).addDocumentStartJavaScript(mockWebView, "test script", setOf("*"))
-    }
+            verify(mockWebViewCompatWrapper, never()).addDocumentStartJavaScript(any(), any(), any())
+        }
 
     @Test
-    fun whenScriptStringDifferentThenRemoveOldAndInjectNew() = runTest {
-        val mockStrategy: AddDocumentStartJavaScriptScriptStrategy = mock()
-        whenever(mockStrategy.canInject()).thenReturn(true)
-        whenever(mockStrategy.getScriptString()).thenReturn("script 1")
-        whenever(mockStrategy.allowedOriginRules).thenReturn(setOf("*"))
-        plugin = testee.createPlugin(mockStrategy)
-        whenever(mockWebViewCapabilityChecker.isSupported(any())).thenReturn(true)
-        whenever(mockWebViewCompatWrapper.addDocumentStartJavaScript(any(), any(), any())).thenReturn(mockScriptHandler)
+    fun whenCapabilityNotSupportedThenDoNotInjectScript() =
+        runTest {
+            val mockStrategy = createMockStrategy(canInject = true, scriptString = "test script")
+            plugin = testee.createPlugin(mockStrategy)
+            whenever(mockWebViewCapabilityChecker.isSupported(any())).thenReturn(false)
 
-        plugin.addDocumentStartJavaScript(mockWebView)
+            plugin.addDocumentStartJavaScript(mockWebView)
 
-        whenever(mockStrategy.getScriptString()).thenReturn("script 2")
+            verify(mockWebViewCompatWrapper, never()).addDocumentStartJavaScript(any(), any(), any())
+        }
 
-        plugin.addDocumentStartJavaScript(mockWebView)
+    @Test
+    fun whenScriptStringSameAsCurrentThenDoNotReinject() =
+        runTest {
+            val mockStrategy = createMockStrategy(canInject = true, scriptString = "test script")
+            plugin = testee.createPlugin(mockStrategy)
+            whenever(mockWebViewCapabilityChecker.isSupported(any())).thenReturn(true)
+            whenever(mockWebViewCompatWrapper.addDocumentStartJavaScript(any(), any(), any())).thenReturn(mockScriptHandler)
 
-        verify(mockScriptHandler).remove()
-        verify(mockWebViewCompatWrapper).addDocumentStartJavaScript(mockWebView, "script 2", setOf("*"))
-    }
+            plugin.addDocumentStartJavaScript(mockWebView)
+            plugin.addDocumentStartJavaScript(mockWebView)
 
-    private fun createMockStrategy(canInject: Boolean, scriptString: String): AddDocumentStartJavaScriptScriptStrategy {
-        return object : AddDocumentStartJavaScriptScriptStrategy {
+            verify(mockWebViewCompatWrapper).addDocumentStartJavaScript(mockWebView, "test script", setOf("*"))
+        }
+
+    @Test
+    fun whenScriptStringDifferentThenRemoveOldAndInjectNew() =
+        runTest {
+            val mockStrategy: AddDocumentStartJavaScriptScriptStrategy = mock()
+            whenever(mockStrategy.canInject()).thenReturn(true)
+            whenever(mockStrategy.getScriptString()).thenReturn("script 1")
+            whenever(mockStrategy.allowedOriginRules).thenReturn(setOf("*"))
+            plugin = testee.createPlugin(mockStrategy)
+            whenever(mockWebViewCapabilityChecker.isSupported(any())).thenReturn(true)
+            whenever(mockWebViewCompatWrapper.addDocumentStartJavaScript(any(), any(), any())).thenReturn(mockScriptHandler)
+
+            plugin.addDocumentStartJavaScript(mockWebView)
+
+            whenever(mockStrategy.getScriptString()).thenReturn("script 2")
+
+            plugin.addDocumentStartJavaScript(mockWebView)
+
+            verify(mockScriptHandler).remove()
+            verify(mockWebViewCompatWrapper).addDocumentStartJavaScript(mockWebView, "script 2", setOf("*"))
+        }
+
+    private fun createMockStrategy(
+        canInject: Boolean,
+        scriptString: String,
+    ): AddDocumentStartJavaScriptScriptStrategy =
+        object : AddDocumentStartJavaScriptScriptStrategy {
             override suspend fun canInject(): Boolean = canInject
+
             override suspend fun getScriptString(): String = scriptString
+
             override val allowedOriginRules: Set<String> = setOf("*")
         }
-    }
 }

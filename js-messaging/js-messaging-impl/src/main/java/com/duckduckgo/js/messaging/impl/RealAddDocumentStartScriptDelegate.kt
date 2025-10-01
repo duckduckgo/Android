@@ -28,32 +28,30 @@ import com.duckduckgo.js.messaging.api.AddDocumentStartJavaScript
 import com.duckduckgo.js.messaging.api.AddDocumentStartJavaScriptScriptStrategy
 import com.duckduckgo.js.messaging.api.AddDocumentStartScriptDelegate
 import com.squareup.anvil.annotations.ContributesBinding
-import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import javax.inject.Inject
 
-@ContributesBinding(AppScope::class)
 /**
  * Delegate class that implements AddDocumentStartJavaScriptPlugin and handles
  * the common script injection logic
  */
+@ContributesBinding(AppScope::class)
 class RealAddDocumentStartScriptDelegate @Inject constructor(
     private val webViewCapabilityChecker: WebViewCapabilityChecker,
     @AppCoroutineScope private val coroutineScope: CoroutineScope,
     private val dispatcherProvider: DispatcherProvider,
     private val webViewCompatWrapper: WebViewCompatWrapper,
 ) : AddDocumentStartScriptDelegate {
-
     override fun createPlugin(strategy: AddDocumentStartJavaScriptScriptStrategy): AddDocumentStartJavaScript {
         return object : AddDocumentStartJavaScript {
-
             private var script: ScriptHandler? = null
             private var currentScriptString: String? = null
 
             @SuppressLint("RequiresFeature")
             override suspend fun addDocumentStartJavaScript(webView: WebView) {
-                if (!strategy.canInject() || !webViewCapabilityChecker.isSupported(
+                if (!strategy.canInject() ||
+                    !webViewCapabilityChecker.isSupported(
                         WebViewCapabilityChecker.WebViewCapability.DocumentStartJavaScript,
                     )
                 ) {
@@ -71,14 +69,15 @@ class RealAddDocumentStartScriptDelegate @Inject constructor(
                     script = null
                 }
 
-                webViewCompatWrapper.addDocumentStartJavaScript(
-                    webView,
-                    scriptString,
-                    strategy.allowedOriginRules,
-                )?.let {
-                    script = it
-                    currentScriptString = scriptString
-                }
+                webViewCompatWrapper
+                    .addDocumentStartJavaScript(
+                        webView,
+                        scriptString,
+                        strategy.allowedOriginRules,
+                    )?.let {
+                        script = it
+                        currentScriptString = scriptString
+                    }
             }
 
             override val context: String

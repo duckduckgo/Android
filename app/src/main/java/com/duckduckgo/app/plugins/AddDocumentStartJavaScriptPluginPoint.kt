@@ -17,12 +17,12 @@
 package com.duckduckgo.app.plugins
 
 import com.duckduckgo.anvil.annotations.ContributesPluginPoint
-import com.duckduckgo.browser.api.AddDocumentStartJavaScriptPlugin
+import com.duckduckgo.browser.api.AddDocumentStartJavaScriptBrowserPlugin
 import com.duckduckgo.di.scopes.AppScope
 
 @ContributesPluginPoint(
     scope = AppScope::class,
-    boundType = AddDocumentStartJavaScriptPlugin::class,
+    boundType = AddDocumentStartJavaScriptBrowserPlugin::class,
 )
 @Suppress("unused")
 interface UnusedJAddDocumentStartJavaScriptPluginPoint

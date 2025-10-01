@@ -18,6 +18,6 @@ package com.duckduckgo.browser.api
 
 import com.duckduckgo.js.messaging.api.AddDocumentStartJavaScript
 
-interface AddDocumentStartJavaScriptPlugin {
+interface AddDocumentStartJavaScriptBrowserPlugin {
     fun addDocumentStartJavaScript(): AddDocumentStartJavaScript
 }

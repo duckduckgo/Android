@@ -16,7 +16,7 @@
 
 package com.duckduckgo.app.browser
 
-import com.duckduckgo.browser.api.AddDocumentStartJavaScriptPlugin
+import com.duckduckgo.browser.api.AddDocumentStartJavaScriptBrowserPlugin
 import com.duckduckgo.contentscopescripts.impl.ContentScopeScriptsAddDocumentStartJavaScript
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.js.messaging.api.AddDocumentStartJavaScript
@@ -24,10 +24,8 @@ import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
 
 @ContributesMultibinding(FragmentScope::class)
-class ContentScopeScriptsAddDocumentStartJavaScriptPlugin @Inject constructor(
+class ContentScopeScriptsAddDocumentStartJavaScriptBrowserPlugin @Inject constructor(
     private val contentScopeScriptsAddDocumentStartJavaScript: ContentScopeScriptsAddDocumentStartJavaScript,
-) : AddDocumentStartJavaScriptPlugin {
-    override fun addDocumentStartJavaScript(): AddDocumentStartJavaScript {
-        return contentScopeScriptsAddDocumentStartJavaScript
-    }
+) : AddDocumentStartJavaScriptBrowserPlugin {
+    override fun addDocumentStartJavaScript(): AddDocumentStartJavaScript = contentScopeScriptsAddDocumentStartJavaScript
 }

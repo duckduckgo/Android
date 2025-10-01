@@ -65,7 +65,6 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.autoconsent.api.Autoconsent
 import com.duckduckgo.autofill.api.BrowserAutofill
 import com.duckduckgo.autofill.api.InternalTestUserChecker
-import com.duckduckgo.browser.api.AddDocumentStartJavaScriptPlugin
 import com.duckduckgo.browser.api.JsInjectorPlugin
 import com.duckduckgo.common.utils.AppUrl.ParamKey.QUERY
 import com.duckduckgo.common.utils.CurrentTimeProvider
