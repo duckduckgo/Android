@@ -35,8 +35,6 @@ import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupViewSta
 import com.duckduckgo.privacyprotectionspopup.impl.PrivacyProtectionsPopupExperimentVariant.CONTROL
 import com.duckduckgo.privacyprotectionspopup.impl.PrivacyProtectionsPopupExperimentVariant.TEST
 import com.duckduckgo.privacyprotectionspopup.impl.db.PopupDismissDomainRepository
-import java.time.Duration
-import java.time.Instant
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -61,6 +59,8 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
+import java.time.Duration
+import java.time.Instant
 
 @ExperimentalCoroutinesApi
 @RunWith(AndroidJUnit4::class)

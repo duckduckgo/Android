@@ -32,11 +32,11 @@ import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ServiceScope
 import dagger.android.AndroidInjection
-import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import logcat.LogPriority.VERBOSE
 import logcat.logcat
+import javax.inject.Inject
 
 @InjectWith(scope = ServiceScope::class)
 class RealAutofillService : AutofillService() {

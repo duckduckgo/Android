@@ -26,9 +26,9 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.pir.impl.checker.PirWorkHandler
 import com.duckduckgo.pir.impl.scheduling.PirExecutionType
 import com.duckduckgo.pir.impl.scheduling.PirJobsRunner
-import javax.inject.Inject
 import kotlinx.coroutines.flow.firstOrNull
 import logcat.logcat
+import javax.inject.Inject
 
 @ContributesWorker(AppScope::class)
 class PirScheduledScanRemoteWorker(

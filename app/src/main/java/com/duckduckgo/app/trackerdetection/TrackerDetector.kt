@@ -33,11 +33,11 @@ import com.duckduckgo.privacy.config.api.ContentBlocking
 import com.duckduckgo.privacy.config.api.TrackerAllowlist
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
+import logcat.LogPriority.VERBOSE
+import logcat.logcat
 import java.net.URI
 import java.util.concurrent.CopyOnWriteArrayList
 import javax.inject.Inject
-import logcat.LogPriority.VERBOSE
-import logcat.logcat
 
 interface TrackerDetector {
     fun addClient(client: Client)

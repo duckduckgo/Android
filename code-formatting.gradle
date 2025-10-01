@@ -4,7 +4,8 @@ spotless {
     ratchetFrom 'origin/develop'
     kotlin {
         target 'src/*/kotlin/**/*.kt', 'src/*/java/**/*.kt'
-        ktlint()
+        ktlint("0.50.0")
+            .setEditorConfigPath("$rootDir/.editorconfig")
         trimTrailingWhitespace()
         leadingTabsToSpaces()
     }

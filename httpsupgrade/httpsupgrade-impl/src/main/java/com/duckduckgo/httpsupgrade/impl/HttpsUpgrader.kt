@@ -31,10 +31,10 @@ import com.duckduckgo.privacy.config.api.PrivacyFeatureName
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.SingleInstanceIn
+import logcat.logcat
 import java.util.concurrent.locks.ReentrantLock
 import javax.inject.Inject
 import kotlin.concurrent.thread
-import logcat.logcat
 
 @SingleInstanceIn(AppScope::class)
 @ContributesBinding(

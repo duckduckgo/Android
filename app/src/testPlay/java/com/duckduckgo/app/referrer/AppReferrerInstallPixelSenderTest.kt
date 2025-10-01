@@ -11,7 +11,6 @@ import com.duckduckgo.referral.AppReferrerInstallPixelSender.Companion.PIXEL_PAR
 import com.duckduckgo.referral.AppReferrerInstallPixelSender.Companion.PIXEL_PARAM_ORIGIN
 import com.duckduckgo.referral.AppReferrerInstallPixelSender.Companion.PIXEL_PARAM_RETURNING_USER
 import com.duckduckgo.verifiedinstallation.installsource.VerificationCheckPlayStoreInstall
-import java.util.*
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.*
 import org.junit.Before
@@ -25,6 +24,7 @@ import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.verifyNoMoreInteractions
 import org.mockito.kotlin.whenever
+import java.util.*
 
 class AppReferrerInstallPixelSenderTest {
 

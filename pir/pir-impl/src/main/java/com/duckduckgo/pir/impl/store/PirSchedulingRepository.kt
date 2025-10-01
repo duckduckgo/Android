@@ -27,8 +27,8 @@ import com.duckduckgo.pir.impl.store.db.OptOutJobRecordEntity
 import com.duckduckgo.pir.impl.store.db.ScanJobRecordEntity
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
-import javax.inject.Inject
 import kotlinx.coroutines.withContext
+import javax.inject.Inject
 
 interface PirSchedulingRepository {
     /**

@@ -32,12 +32,12 @@ import com.duckduckgo.privacyprotectionspopup.impl.store.PrivacyProtectionsPopup
 import com.duckduckgo.privacyprotectionspopup.impl.store.PrivacyProtectionsPopupDataStoreImpl.Values.EXPERIMENT_VARIANT_CONTROL
 import com.duckduckgo.privacyprotectionspopup.impl.store.PrivacyProtectionsPopupDataStoreImpl.Values.EXPERIMENT_VARIANT_TEST
 import com.squareup.anvil.annotations.ContributesBinding
-import java.time.Instant
-import javax.inject.Inject
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
+import java.time.Instant
+import javax.inject.Inject
 
 interface PrivacyProtectionsPopupDataStore {
     val data: Flow<PrivacyProtectionsPopupData>

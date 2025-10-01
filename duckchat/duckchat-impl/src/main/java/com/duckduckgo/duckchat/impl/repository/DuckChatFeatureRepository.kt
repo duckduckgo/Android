@@ -23,8 +23,8 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.impl.store.DuckChatDataStore
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
-import javax.inject.Inject
 import kotlinx.coroutines.flow.Flow
+import javax.inject.Inject
 
 interface DuckChatFeatureRepository {
     suspend fun setDuckChatUserEnabled(enabled: Boolean)

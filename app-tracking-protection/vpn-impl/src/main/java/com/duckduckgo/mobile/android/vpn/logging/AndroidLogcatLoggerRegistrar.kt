@@ -22,11 +22,11 @@ import com.duckduckgo.app.lifecycle.VpnProcessLifecycleObserver
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.mobile.android.vpn.feature.AppTpLocalFeature
 import com.squareup.anvil.annotations.ContributesMultibinding
-import javax.inject.Inject
 import logcat.AndroidLogcatLogger
 import logcat.LogPriority
 import logcat.LogcatLogger
 import logcat.logcat
+import javax.inject.Inject
 
 @ContributesMultibinding(
     scope = AppScope::class,

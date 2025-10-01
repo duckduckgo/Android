@@ -17,8 +17,8 @@
 package com.duckduckgo.remote.messaging.store
 
 import com.duckduckgo.common.utils.DispatcherProvider
-import kotlin.random.Random
 import kotlinx.coroutines.withContext
+import kotlin.random.Random
 
 interface RemoteMessagingCohortStore {
     suspend fun getPercentile(remoteMessageId: String): Float

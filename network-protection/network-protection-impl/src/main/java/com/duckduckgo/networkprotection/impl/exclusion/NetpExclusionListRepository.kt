@@ -27,8 +27,8 @@ import com.duckduckgo.networkprotection.store.db.NetPManuallyExcludedApp
 import com.duckduckgo.networkprotection.store.db.VpnIncompatibleApp
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
-import javax.inject.Inject
 import kotlinx.coroutines.withContext
+import javax.inject.Inject
 
 interface NetPExclusionListRepository {
     suspend fun getExcludedAppPackages(): List<String>

@@ -25,8 +25,8 @@ import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesMultibinding
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
-import javax.inject.Inject
 import logcat.logcat
+import javax.inject.Inject
 
 @ContributesMultibinding(AppScope::class)
 class PopUpFoundMessageHandlerPlugin @Inject constructor(private val repository: AutoconsentSettingsRepository) : MessageHandlerPlugin {

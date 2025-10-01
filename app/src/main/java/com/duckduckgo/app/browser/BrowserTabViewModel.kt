@@ -2125,14 +2125,13 @@ class BrowserTabViewModel @Inject constructor(
                     )
                 omnibarViewState.value =
                     currentOmnibarViewState().copy(
-                        omnibarText =
-                            if (settingsDataStore.isFullUrlEnabled) {
-                                documentUrlString
-                            } else {
-                                addressDisplayFormatter.getShortUrl(
-                                    documentUrlString,
-                                )
-                            },
+                        omnibarText = if (settingsDataStore.isFullUrlEnabled) {
+                            documentUrlString
+                        } else {
+                            addressDisplayFormatter.getShortUrl(
+                                documentUrlString,
+                            )
+                        },
                         queryOrFullUrl = documentUrlString,
                         isEditing = false,
                         navigationChange = true,

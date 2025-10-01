@@ -23,9 +23,9 @@ import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.global.DuckDuckGoApplication
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.savedsites.api.SavedSitesRepository
-import javax.inject.Inject
 import kotlinx.coroutines.withContext
 import logcat.logcat
+import javax.inject.Inject
 
 /**
  * This RemoteViewsFactory will not render any item. It's used for convenience to simplify executing background operations to show/hide empty widget CTA.

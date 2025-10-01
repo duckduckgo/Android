@@ -802,13 +802,13 @@ class BrowserTabViewModelTest {
                     duckChat = mockDuckChat,
                     duckAiFeatureState = mockDuckAiFeatureState,
                     duckPlayerJSHelper =
-                        DuckPlayerJSHelper(
-                            mockDuckPlayer,
-                            mockAppBuildConfig,
-                            mockPixel,
-                            mockDuckDuckGoUrlDetector,
-                            mockPagesSettingPlugin,
-                        ),
+                    DuckPlayerJSHelper(
+                        mockDuckPlayer,
+                        mockAppBuildConfig,
+                        mockPixel,
+                        mockDuckDuckGoUrlDetector,
+                        mockPagesSettingPlugin,
+                    ),
                     duckChatJSHelper = mockDuckChatJSHelper,
                     refreshPixelSender = refreshPixelSender,
                     privacyProtectionTogglePlugin = protectionTogglePluginPoint,
@@ -1635,18 +1635,17 @@ class BrowserTabViewModelTest {
     fun whenTriggeringAutocompleteWithUrlAndUserHasFavoritesThenAutoCompleteShowsFavorites() {
         testee.autoCompleteViewState.value =
             autoCompleteViewState().copy(
-                favorites =
-                    listOf(
-                        QuickAccessFavorite(
-                            Favorite(
-                                UUID.randomUUID().toString(),
-                                "title",
-                                exampleUrl,
-                                lastModified = "timestamp",
-                                1,
-                            ),
+                favorites = listOf(
+                    QuickAccessFavorite(
+                        Favorite(
+                            UUID.randomUUID().toString(),
+                            "title",
+                            exampleUrl,
+                            lastModified = "timestamp",
+                            1,
                         ),
                     ),
+                ),
             )
         doReturn(true).whenever(mockAutoCompleteSettings).autoCompleteSuggestionsEnabled
         testee.triggerAutocomplete("https://example.com", true, hasQueryChanged = false)

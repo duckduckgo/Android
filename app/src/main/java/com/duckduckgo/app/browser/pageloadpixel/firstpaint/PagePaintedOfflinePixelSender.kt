@@ -23,9 +23,9 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesMultibinding
 import io.reactivex.Completable
-import javax.inject.Inject
 import logcat.LogPriority.VERBOSE
 import logcat.logcat
+import javax.inject.Inject
 
 @ContributesMultibinding(AppScope::class)
 class PagePaintedOfflinePixelSender @Inject constructor(

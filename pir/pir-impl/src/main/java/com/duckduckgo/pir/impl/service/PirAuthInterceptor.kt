@@ -20,13 +20,13 @@ import com.duckduckgo.app.global.api.ApiInterceptorPlugin
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.subscriptions.api.Subscriptions
 import com.squareup.anvil.annotations.ContributesMultibinding
-import java.io.IOException
-import javax.inject.Inject
 import kotlinx.coroutines.runBlocking
 import okhttp3.Interceptor
 import okhttp3.Interceptor.Chain
 import okhttp3.Response
 import retrofit2.Invocation
+import java.io.IOException
+import javax.inject.Inject
 
 @ContributesMultibinding(
     scope = AppScope::class,

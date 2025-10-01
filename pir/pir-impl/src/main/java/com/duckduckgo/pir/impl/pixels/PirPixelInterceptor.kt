@@ -23,10 +23,10 @@ import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.utils.plugins.pixel.PixelInterceptorPlugin
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesMultibinding
-import javax.inject.Inject
 import okhttp3.Interceptor
 import okhttp3.Response
 import org.json.JSONObject
+import javax.inject.Inject
 
 @ContributesMultibinding(
     scope = AppScope::class,

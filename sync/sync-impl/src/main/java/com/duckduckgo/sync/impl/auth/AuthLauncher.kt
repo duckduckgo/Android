@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+@file:Suppress("ktlint:standard:filename")
 
 package com.duckduckgo.sync.impl.auth
 
@@ -30,9 +31,9 @@ import com.duckduckgo.sync.impl.auth.DeviceAuthenticator.AuthResult.Error
 import com.duckduckgo.sync.impl.auth.DeviceAuthenticator.AuthResult.Success
 import com.duckduckgo.sync.impl.auth.DeviceAuthenticator.AuthResult.UserCancelled
 import com.squareup.anvil.annotations.ContributesBinding
-import javax.inject.Inject
 import logcat.LogPriority.VERBOSE
 import logcat.logcat
+import javax.inject.Inject
 
 interface AuthLauncher {
 

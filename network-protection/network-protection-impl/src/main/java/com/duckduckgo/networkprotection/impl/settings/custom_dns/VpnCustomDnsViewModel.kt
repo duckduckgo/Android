@@ -40,13 +40,13 @@ import com.duckduckgo.networkprotection.impl.settings.custom_dns.VpnCustomDnsAct
 import com.duckduckgo.networkprotection.impl.settings.custom_dns.VpnCustomDnsViewModel.InitialState.CustomDns
 import com.duckduckgo.networkprotection.impl.settings.custom_dns.VpnCustomDnsViewModel.InitialState.DefaultDns
 import com.wireguard.config.InetAddresses
-import java.net.Inet4Address
-import javax.inject.Inject
 import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
+import java.net.Inet4Address
+import javax.inject.Inject
 
 @ContributesViewModel(ActivityScope::class)
 class VpnCustomDnsViewModel @Inject constructor(

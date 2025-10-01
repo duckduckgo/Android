@@ -20,9 +20,9 @@ import com.duckduckgo.app.surrogates.ResourceSurrogateLoader
 import com.duckduckgo.app.surrogates.store.ResourceSurrogateDataStore
 import com.duckduckgo.common.utils.extensions.isCached
 import io.reactivex.Completable
+import logcat.logcat
 import java.io.IOException
 import javax.inject.Inject
-import logcat.logcat
 
 class ResourceSurrogateListDownloader @Inject constructor(
     private val service: ResourceSurrogateListService,

@@ -32,11 +32,11 @@ import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi.Builder
 import com.squareup.moshi.Types
 import dagger.SingleInstanceIn
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
 import java.util.*
 import java.util.concurrent.CopyOnWriteArrayList
 import javax.inject.Inject
-import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.withContext
 
 interface WebViewCompatContentScopeScripts {
     suspend fun getScript(

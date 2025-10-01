@@ -30,11 +30,11 @@ import com.duckduckgo.daxprompts.api.DaxPrompts.ActionType.NONE
 import com.duckduckgo.daxprompts.api.DaxPrompts.ActionType.SHOW_BROWSER_COMPARISON_PROMPT
 import com.duckduckgo.daxprompts.api.DaxPrompts.ActionType.TOO_SOON_TO_SHOW_OTHER_PROMPTS
 import com.duckduckgo.di.scopes.ActivityScope
-import javax.inject.Inject
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.withTimeoutOrNull
 import logcat.logcat
+import javax.inject.Inject
 
 @ContributesViewModel(ActivityScope::class)
 class LaunchViewModel @Inject constructor(

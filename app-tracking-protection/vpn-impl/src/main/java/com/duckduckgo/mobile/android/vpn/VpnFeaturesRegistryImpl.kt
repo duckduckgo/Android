@@ -25,11 +25,11 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.mobile.android.vpn.service.TrackerBlockingVpnService
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
-import java.util.UUID
-import javax.inject.Inject
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.withContext
 import logcat.logcat
+import java.util.UUID
+import javax.inject.Inject
 
 private const val PREFS_FILENAME = "com.duckduckgo.mobile.android.vpn.feature.registry.v1"
 private const val IS_INITIALIZED = "IS_INITIALIZED"

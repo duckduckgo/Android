@@ -38,11 +38,11 @@ import com.duckduckgo.remote.messaging.fixtures.messageActionPlugins
 import com.duckduckgo.remote.messaging.impl.mappers.mapToRemoteMessage
 import com.duckduckgo.remote.messaging.impl.models.JsonContentTranslations
 import com.duckduckgo.remote.messaging.impl.models.JsonRemoteMessage
-import java.util.*
 import org.junit.Assert.assertEquals
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.Parameterized
+import java.util.*
 
 @RunWith(Parameterized::class)
 class JsonRemoteMessageMapperTest(private val testCase: TestCase) {

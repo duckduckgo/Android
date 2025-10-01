@@ -25,7 +25,6 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.library.loader.LibraryLoader
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
-import javax.inject.Inject
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
@@ -33,6 +32,7 @@ import logcat.LogPriority.ERROR
 import logcat.asLog
 import logcat.logcat
 import net.zetetic.database.sqlcipher.SupportOpenHelperFactory
+import javax.inject.Inject
 
 interface SecureStorageDatabaseFactory {
     suspend fun getDatabase(): SecureStorageDatabase?

@@ -18,10 +18,10 @@ package com.duckduckgo.app.browser.filechooser
 
 import android.content.Intent
 import android.net.Uri
-import java.util.*
-import javax.inject.Inject
 import logcat.LogPriority.WARN
 import logcat.logcat
+import java.util.*
+import javax.inject.Inject
 
 class FileChooserIntentBuilder @Inject constructor() {
 

@@ -32,8 +32,6 @@ import com.duckduckgo.privacy.config.internal.PrivacyConfigInternalViewModel.Com
 import com.duckduckgo.privacy.config.internal.store.DevPrivacyConfigSettingsDataStore
 import com.duckduckgo.privacy.config.store.PrivacyConfig
 import com.duckduckgo.privacy.config.store.PrivacyConfigRepository
-import java.net.URI
-import javax.inject.Inject
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
@@ -41,6 +39,8 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
+import java.net.URI
+import javax.inject.Inject
 
 @ContributesViewModel(ActivityScope::class)
 class PrivacyConfigInternalViewModel @Inject constructor(

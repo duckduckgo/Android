@@ -23,8 +23,8 @@ import com.duckduckgo.brokensite.api.RefreshPattern
 import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
-import javax.inject.Inject
 import logcat.logcat
+import javax.inject.Inject
 
 @ContributesBinding(AppScope::class)
 class RealBrokenSitePrompt @Inject constructor(

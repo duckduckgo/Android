@@ -32,11 +32,11 @@ import com.duckduckgo.pir.impl.dashboard.messaging.model.PirWebMessageResponse.S
 import com.duckduckgo.pir.impl.dashboard.state.PirDashboardMaintenanceScanDataProvider
 import com.duckduckgo.pir.impl.dashboard.state.PirDashboardMaintenanceScanDataProvider.DashboardBrokerMatch
 import com.squareup.anvil.annotations.ContributesMultibinding
-import java.util.concurrent.TimeUnit
-import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import logcat.logcat
+import java.util.concurrent.TimeUnit
+import javax.inject.Inject
 
 @ContributesMultibinding(
     scope = ActivityScope::class,

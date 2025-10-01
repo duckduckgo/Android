@@ -71,10 +71,10 @@ import com.duckduckgo.networkprotection.impl.settings.geoswitching.NetpGeoswitch
 import com.duckduckgo.networkprotection.store.db.VpnIncompatibleApp
 import com.duckduckgo.subscriptions.api.PrivacyProFeedbackScreens.PrivacyProFeedbackScreenWithParams
 import com.duckduckgo.subscriptions.api.PrivacyProUnifiedFeedback.PrivacyProFeedbackSource.VPN_MANAGEMENT
-import javax.inject.Inject
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 @InjectWith(ActivityScope::class)
 @ContributeToActivityStarter(NetworkProtectionManagementScreenNoParams::class, screenName = "vpn.main")

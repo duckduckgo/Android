@@ -27,13 +27,13 @@ import com.duckduckgo.request.filterer.api.RequestFilterer
 import com.duckduckgo.request.filterer.api.RequestFiltererFeatureName
 import com.duckduckgo.request.filterer.store.RequestFiltererRepository
 import com.squareup.anvil.annotations.ContributesBinding
-import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import logcat.logcat
 import okhttp3.HttpUrl.Companion.toHttpUrl
+import javax.inject.Inject
 
 @ContributesBinding(AppScope::class)
 class RequestFiltererImpl @Inject constructor(

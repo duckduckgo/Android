@@ -26,9 +26,9 @@ import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
 import com.duckduckgo.duckchat.impl.store.DuckChatDataStore
 import com.duckduckgo.js.messaging.api.JsCallbackData
 import com.squareup.anvil.annotations.ContributesBinding
-import javax.inject.Inject
 import kotlinx.coroutines.runBlocking
 import org.json.JSONObject
+import javax.inject.Inject
 
 interface DuckChatJSHelper {
     suspend fun processJsCallbackMessage(

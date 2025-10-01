@@ -20,10 +20,10 @@ import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.privacyprotectionspopup.impl.db.PopupDismissDomainRepository
 import com.duckduckgo.privacyprotectionspopup.impl.store.PrivacyProtectionsPopupDataStore
 import com.squareup.anvil.annotations.ContributesBinding
-import java.time.Instant
-import javax.inject.Inject
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
+import java.time.Instant
+import javax.inject.Inject
 
 interface PrivacyProtectionsPopupManagerDataProvider {
     fun getData(domain: String): Flow<PrivacyProtectionsPopupManagerData>

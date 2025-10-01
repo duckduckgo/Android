@@ -33,12 +33,12 @@ import com.duckduckgo.app.global.DuckDuckGoApplication
 import com.duckduckgo.app.global.view.generateDefaultDrawable
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.domain
-import com.duckduckgo.mobile.android.R as CommonR
 import com.duckduckgo.savedsites.api.SavedSitesRepository
-import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.withContext
 import logcat.logcat
+import javax.inject.Inject
+import com.duckduckgo.mobile.android.R as CommonR
 
 class FavoritesWidgetItemFactory(
     val context: Context,

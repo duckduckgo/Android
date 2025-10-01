@@ -71,8 +71,6 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.feature.toggles.api.Toggle.DefaultFeatureValue
-import javax.inject.Inject
-import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.Flow
@@ -85,6 +83,8 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import logcat.LogPriority.INFO
 import logcat.logcat
+import javax.inject.Inject
+import kotlin.coroutines.CoroutineContext
 
 @OptIn(FlowPreview::class)
 @ContributesViewModel(ActivityScope::class)

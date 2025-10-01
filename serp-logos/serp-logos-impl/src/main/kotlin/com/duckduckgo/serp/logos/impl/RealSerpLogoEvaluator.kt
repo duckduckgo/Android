@@ -22,11 +22,11 @@ import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.serp.logos.api.SerpLogo
 import com.duckduckgo.serp.logos.api.SerpLogos
 import com.squareup.anvil.annotations.ContributesBinding
-import javax.inject.Inject
-import kotlin.coroutines.resume
 import kotlinx.coroutines.suspendCancellableCoroutine
 import logcat.LogPriority
 import logcat.logcat
+import javax.inject.Inject
+import kotlin.coroutines.resume
 
 private const val LOGO_DELIMITER = "|"
 

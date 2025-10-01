@@ -22,9 +22,9 @@ import com.duckduckgo.savedsites.api.models.BookmarkFolder
 import com.duckduckgo.savedsites.api.models.SavedSite
 import com.duckduckgo.savedsites.api.models.SavedSitesNames
 import com.duckduckgo.savedsites.api.service.SavedSitesImporter.ImportFolder
-import java.util.UUID
 import org.jsoup.nodes.Document
 import org.jsoup.nodes.Element
+import java.util.UUID
 
 interface SavedSitesParser {
     fun generateHtml(

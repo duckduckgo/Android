@@ -26,7 +26,6 @@ import com.duckduckgo.feature.toggles.api.Toggle.DefaultFeatureValue
     featureName = "clientBrandHint",
     settingsStore = ClientBrandHintFeatureSettingsStore::class,
 )
-
 interface ClientBrandHintFeature {
     @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun self(): Toggle

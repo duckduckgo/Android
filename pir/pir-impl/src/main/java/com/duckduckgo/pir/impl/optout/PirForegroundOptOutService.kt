@@ -27,12 +27,12 @@ import com.duckduckgo.pir.impl.R
 import com.duckduckgo.pir.impl.checker.PirWorkHandler
 import com.duckduckgo.pir.impl.notifications.PirNotificationManager
 import dagger.android.AndroidInjection
-import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 import logcat.logcat
+import javax.inject.Inject
 
 @InjectWith(scope = ServiceScope::class)
 class PirForegroundOptOutService : Service(), CoroutineScope by MainScope() {

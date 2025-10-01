@@ -16,9 +16,9 @@
 
 package com.duckduckgo.common.test
 
+import org.json.JSONObject
 import java.io.BufferedReader
 import java.io.InputStream
-import org.json.JSONObject
 
 object FileUtilities {
 

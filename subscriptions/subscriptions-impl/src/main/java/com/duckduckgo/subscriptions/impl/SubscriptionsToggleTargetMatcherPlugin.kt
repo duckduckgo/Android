@@ -21,8 +21,8 @@ import com.duckduckgo.feature.toggles.api.Toggle.State.Target
 import com.duckduckgo.feature.toggles.api.Toggle.TargetMatcherPlugin
 import com.duckduckgo.subscriptions.api.Subscriptions
 import com.squareup.anvil.annotations.ContributesMultibinding
-import javax.inject.Inject
 import kotlinx.coroutines.runBlocking
+import javax.inject.Inject
 
 @ContributesMultibinding(AppScope::class)
 class SubscriptionsToggleTargetMatcherPlugin @Inject constructor(

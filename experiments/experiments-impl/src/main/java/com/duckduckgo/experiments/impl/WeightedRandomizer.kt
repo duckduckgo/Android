@@ -18,8 +18,8 @@ package com.duckduckgo.experiments.impl
 
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
-import javax.inject.Inject
 import org.apache.commons.math3.distribution.EnumeratedIntegerDistribution
+import javax.inject.Inject
 
 interface IndexRandomizer {
     fun random(items: List<Probabilistic>): Int

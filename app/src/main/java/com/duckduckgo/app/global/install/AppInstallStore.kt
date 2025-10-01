@@ -23,10 +23,10 @@ import androidx.annotation.VisibleForTesting
 import androidx.core.content.edit
 import androidx.lifecycle.LifecycleOwner
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
-import java.util.concurrent.TimeUnit
-import javax.inject.Inject
 import logcat.LogPriority.INFO
 import logcat.logcat
+import java.util.concurrent.TimeUnit
+import javax.inject.Inject
 
 interface AppInstallStore : MainProcessLifecycleObserver {
     var installTimestamp: Long

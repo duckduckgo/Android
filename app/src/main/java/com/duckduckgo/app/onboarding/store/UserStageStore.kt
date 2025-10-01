@@ -18,12 +18,12 @@ package com.duckduckgo.app.onboarding.store
 
 import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.common.utils.DispatcherProvider
-import javax.inject.Inject
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 import logcat.LogPriority.DEBUG
 import logcat.logcat
+import javax.inject.Inject
 
 interface UserStageStore {
     fun userAppStageFlow(): Flow<AppStage>

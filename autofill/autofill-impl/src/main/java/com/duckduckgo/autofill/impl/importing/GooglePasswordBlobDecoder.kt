@@ -21,8 +21,8 @@ import android.util.Base64.DEFAULT
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
-import javax.inject.Inject
 import kotlinx.coroutines.withContext
+import javax.inject.Inject
 
 interface GooglePasswordBlobDecoder {
     suspend fun decode(data: String): String

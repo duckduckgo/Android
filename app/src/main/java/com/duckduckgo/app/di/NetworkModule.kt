@@ -38,13 +38,6 @@ import dagger.Lazy
 import dagger.Module
 import dagger.Provides
 import dagger.SingleInstanceIn
-import java.io.File
-import java.io.IOException
-import java.net.Proxy
-import java.net.ProxySelector
-import java.net.SocketAddress
-import java.net.URI
-import javax.inject.Named
 import kotlinx.coroutines.CoroutineScope
 import logcat.LogPriority.VERBOSE
 import logcat.logcat
@@ -55,6 +48,13 @@ import retrofit2.Retrofit
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import retrofit2.converter.moshi.MoshiConverterFactory
 import retrofit2.converter.scalars.ScalarsConverterFactory
+import java.io.File
+import java.io.IOException
+import java.net.Proxy
+import java.net.ProxySelector
+import java.net.SocketAddress
+import java.net.URI
+import javax.inject.Named
 
 @Module
 class NetworkModule {

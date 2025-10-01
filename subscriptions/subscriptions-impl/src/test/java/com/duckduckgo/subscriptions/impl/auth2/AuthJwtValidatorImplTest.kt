@@ -19,12 +19,12 @@ package com.duckduckgo.subscriptions.impl.auth2
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.subscriptions.impl.model.Entitlement
-import java.time.Instant
-import java.time.LocalDateTime
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Test
 import org.junit.runner.RunWith
+import java.time.Instant
+import java.time.LocalDateTime
 
 @RunWith(AndroidJUnit4::class)
 class AuthJwtValidatorImplTest {

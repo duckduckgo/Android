@@ -31,11 +31,11 @@ import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi.Builder
 import com.squareup.moshi.Types
 import dagger.SingleInstanceIn
+import kotlinx.coroutines.runBlocking
 import java.util.Locale
 import java.util.UUID
 import java.util.concurrent.CopyOnWriteArrayList
 import javax.inject.Inject
-import kotlinx.coroutines.runBlocking
 
 interface CoreContentScopeScripts {
     fun getScript(

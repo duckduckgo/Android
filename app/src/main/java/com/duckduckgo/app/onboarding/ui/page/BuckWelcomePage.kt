@@ -72,11 +72,11 @@ import com.duckduckgo.common.utils.FragmentViewModelFactory
 import com.duckduckgo.common.utils.extensions.html
 import com.duckduckgo.common.utils.extensions.preventWidows
 import com.duckduckgo.di.scopes.FragmentScope
-import javax.inject.Inject
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 @InjectWith(FragmentScope::class)
 class BuckWelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome_page_buck) {
@@ -228,7 +228,7 @@ class BuckWelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welco
                                     descriptionText,
                                     afterAnimation = { afterTypingAnimation() },
                                 )
-                            },)
+                            })
                         },
                     )
 
@@ -268,7 +268,7 @@ class BuckWelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welco
                                     descriptionText,
                                     afterAnimation = { afterTypingAnimation() },
                                 )
-                            },)
+                            })
                         },
                     )
 
@@ -352,7 +352,7 @@ class BuckWelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welco
                                     descriptionText,
                                     afterAnimation = { afterTypingAnimation() },
                                 )
-                            },)
+                            })
                         },
                     )
                 }

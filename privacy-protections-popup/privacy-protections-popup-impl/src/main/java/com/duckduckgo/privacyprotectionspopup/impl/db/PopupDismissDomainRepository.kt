@@ -18,10 +18,10 @@ package com.duckduckgo.privacyprotectionspopup.impl.db
 
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
-import java.time.Instant
-import javax.inject.Inject
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import java.time.Instant
+import javax.inject.Inject
 
 interface PopupDismissDomainRepository {
     fun getPopupDismissTime(domain: String): Flow<Instant?>

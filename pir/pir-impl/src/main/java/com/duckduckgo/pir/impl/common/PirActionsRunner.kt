@@ -69,13 +69,13 @@ import com.duckduckgo.pir.impl.scripts.models.PirSuccessResponse
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
-import kotlin.coroutines.resume
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
 import logcat.logcat
+import kotlin.coroutines.resume
 
 interface PirActionsRunner {
     /**

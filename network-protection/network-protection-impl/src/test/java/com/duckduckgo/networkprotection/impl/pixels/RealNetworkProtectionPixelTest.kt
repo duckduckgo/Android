@@ -21,8 +21,6 @@ import com.duckduckgo.common.test.api.InMemorySharedPreferences
 import com.duckduckgo.data.store.api.SharedPreferencesProvider
 import com.duckduckgo.networkprotection.impl.cohort.NetpCohortStore
 import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixelNames.NETP_ENABLE_UNIQUE
-import java.time.LocalDate
-import java.time.temporal.ChronoUnit
 import org.junit.Before
 import org.junit.Test
 import org.mockito.Mock
@@ -31,6 +29,8 @@ import org.mockito.kotlin.eq
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
+import java.time.LocalDate
+import java.time.temporal.ChronoUnit
 
 class RealNetworkProtectionPixelTest {
     @Mock

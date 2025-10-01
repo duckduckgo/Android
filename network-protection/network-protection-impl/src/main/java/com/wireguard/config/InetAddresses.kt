@@ -95,7 +95,7 @@ object InetAddresses {
             if (cause is IllegalArgumentException) throw ParseException(InetAddress::class.java, address, null, cause)
             try {
                 if (WONT_TOUCH_RESOLVER.matcher(address)
-                    .matches()
+                        .matches()
                 ) {
                     InetAddress.getByName(address)
                 } else {

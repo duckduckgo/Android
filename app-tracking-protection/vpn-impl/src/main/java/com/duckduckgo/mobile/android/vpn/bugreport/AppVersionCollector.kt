@@ -20,8 +20,8 @@ import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.mobile.android.vpn.state.VpnStateCollectorPlugin
 import com.squareup.anvil.annotations.ContributesMultibinding
-import javax.inject.Inject
 import org.json.JSONObject
+import javax.inject.Inject
 
 @ContributesMultibinding(ActivityScope::class)
 class AppVersionCollector @Inject constructor(

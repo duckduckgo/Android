@@ -23,12 +23,12 @@ import com.duckduckgo.cookies.api.DuckDuckGoCookieManager
 import com.duckduckgo.cookies.api.RemoveCookiesStrategy
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
-import javax.inject.Inject
-import kotlin.coroutines.resume
-import kotlin.coroutines.suspendCoroutine
 import kotlinx.coroutines.withContext
 import logcat.LogPriority.VERBOSE
 import logcat.logcat
+import javax.inject.Inject
+import kotlin.coroutines.resume
+import kotlin.coroutines.suspendCoroutine
 
 @ContributesBinding(AppScope::class)
 class WebViewCookieManager @Inject constructor(

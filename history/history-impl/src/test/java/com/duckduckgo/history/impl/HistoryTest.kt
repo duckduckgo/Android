@@ -21,8 +21,6 @@ import com.duckduckgo.app.browser.DuckDuckGoUrlDetector
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.history.impl.remoteconfig.HistoryFeature
-import java.time.LocalDateTime
-import java.time.Month.JANUARY
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule
@@ -34,6 +32,8 @@ import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
+import java.time.LocalDateTime
+import java.time.Month.JANUARY
 
 @RunWith(AndroidJUnit4::class)
 class HistoryTest {

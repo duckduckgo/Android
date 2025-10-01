@@ -23,7 +23,6 @@ import com.duckduckgo.app.browser.commands.Command
 import com.duckduckgo.app.browser.menu.VpnMenuStateProvider
 import com.duckduckgo.app.browser.viewstate.VpnMenuState
 import com.duckduckgo.common.test.CoroutineTestRule
-import kotlin.time.Duration.Companion.milliseconds
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -34,6 +33,7 @@ import org.junit.Test
 import org.mockito.Mock
 import org.mockito.MockitoAnnotations
 import org.mockito.kotlin.whenever
+import kotlin.time.Duration.Companion.milliseconds
 
 class BrowserTabViewModelVpnMenuTest {
 

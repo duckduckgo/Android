@@ -22,10 +22,10 @@ import com.duckduckgo.sync.impl.API_CODE
 import com.duckduckgo.sync.impl.SyncService
 import com.duckduckgo.sync.impl.error.SyncUnavailableRepository
 import com.squareup.anvil.annotations.ContributesMultibinding
-import javax.inject.Inject
 import okhttp3.Interceptor
 import okhttp3.Interceptor.Chain
 import okhttp3.Response
+import javax.inject.Inject
 
 @ContributesMultibinding(
     scope = AppScope::class,

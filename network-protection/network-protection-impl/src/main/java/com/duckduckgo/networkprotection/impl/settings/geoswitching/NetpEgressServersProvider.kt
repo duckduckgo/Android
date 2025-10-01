@@ -24,8 +24,8 @@ import com.duckduckgo.networkprotection.impl.settings.geoswitching.NetpEgressSer
 import com.duckduckgo.networkprotection.store.NetPGeoswitchingRepository
 import com.duckduckgo.networkprotection.store.db.NetPGeoswitchingLocation
 import com.squareup.anvil.annotations.ContributesBinding
-import javax.inject.Inject
 import kotlinx.coroutines.withContext
+import javax.inject.Inject
 
 interface NetpEgressServersProvider {
     suspend fun updateServerLocationsAndReturnPreferred(eligibleLocations: List<EligibleLocation>): PreferredLocation?

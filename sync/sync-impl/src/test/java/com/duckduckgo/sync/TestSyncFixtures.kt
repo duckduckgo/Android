@@ -35,9 +35,9 @@ import com.duckduckgo.sync.impl.Logout
 import com.duckduckgo.sync.impl.Result
 import com.duckduckgo.sync.impl.Signup
 import com.duckduckgo.sync.impl.encodeB64
-import java.io.File
 import okhttp3.ResponseBody.Companion.toResponseBody
 import retrofit2.Response
+import java.io.File
 
 object TestSyncFixtures {
     const val userId = "userId"

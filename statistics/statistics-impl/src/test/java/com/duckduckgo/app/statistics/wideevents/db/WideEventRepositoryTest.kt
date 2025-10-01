@@ -97,10 +97,10 @@ class WideEventRepositoryTest {
                     name = "test_event",
                     flowEntryPoint = "app_settings",
                     metadata =
-                        mapOf(
-                            "key1" to "value1",
-                            "key2" to null,
-                        ),
+                    mapOf(
+                        "key1" to "value1",
+                        "key2" to null,
+                    ),
                     cleanupPolicy = DEFAULT_CLEANUP_POLICY,
                 )
 
@@ -203,10 +203,10 @@ class WideEventRepositoryTest {
                     name = "test_event",
                     flowEntryPoint = "app_settings",
                     metadata =
-                        mapOf(
-                            "key1" to "value1",
-                            "key2" to null,
-                        ),
+                    mapOf(
+                        "key1" to "value1",
+                        "key2" to null,
+                    ),
                     cleanupPolicy = DEFAULT_CLEANUP_POLICY,
                 )
 
@@ -297,10 +297,10 @@ class WideEventRepositoryTest {
                     name = "test_event",
                     flowEntryPoint = "app_settings",
                     metadata =
-                        mapOf(
-                            "key1" to "value1",
-                            "key2" to null,
-                        ),
+                    mapOf(
+                        "key1" to "value1",
+                        "key2" to null,
+                    ),
                     cleanupPolicy = DEFAULT_CLEANUP_POLICY,
                 )
 

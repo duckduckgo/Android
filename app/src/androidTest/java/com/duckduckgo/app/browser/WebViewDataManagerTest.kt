@@ -35,7 +35,6 @@ import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.cookies.api.DuckDuckGoCookieManager
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle.State
-import java.io.File
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runTest
@@ -47,6 +46,7 @@ import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
+import java.io.File
 
 @Suppress("RemoveExplicitTypeArguments")
 @SuppressLint("NoHardcodedCoroutineDispatcher")

@@ -146,10 +146,10 @@ class WideEventRepositoryImpl @Inject constructor(
 
             event.copy(
                 metadata =
-                    mergeMetadata(
-                        existingMetadata = event.metadata,
-                        newMetadata = mapOf(interval.name to durationBucket.toMillis().toString()),
-                    ),
+                mergeMetadata(
+                    existingMetadata = event.metadata,
+                    newMetadata = mapOf(interval.name to durationBucket.toMillis().toString()),
+                ),
                 activeIntervals = event.activeIntervals - interval,
             )
         }

@@ -29,8 +29,6 @@ import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.feature.toggles.api.Toggle.Experiment
 import com.duckduckgo.feature.toggles.api.Toggle.InternalAlwaysEnabled
 import com.squareup.moshi.Moshi
-import kotlin.reflect.KClass
-import kotlin.reflect.full.functions
 import kotlinx.coroutines.CoroutineScope
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
@@ -38,6 +36,8 @@ import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
+import kotlin.reflect.KClass
+import kotlin.reflect.full.functions
 
 class ContributesActivePluginPointCodeGeneratorTest {
 

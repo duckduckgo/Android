@@ -31,7 +31,6 @@ import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.surrogates.SurrogateResponse
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 import com.duckduckgo.feature.toggles.api.Toggle
-import com.duckduckgo.js.messaging.api.AddDocumentStartJavaScriptPlugin
 import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.Feed
 import com.duckduckgo.site.permissions.api.SitePermissionsManager.SitePermissions
 

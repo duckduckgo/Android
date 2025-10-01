@@ -30,9 +30,9 @@ import com.duckduckgo.app.generalsettings.showonapplaunch.store.ShowOnAppLaunchO
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
-import javax.inject.Inject
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import javax.inject.Inject
 
 interface ShowOnAppLaunchOptionDataStore {
     val optionFlow: Flow<ShowOnAppLaunchOption>

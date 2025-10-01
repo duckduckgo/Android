@@ -23,9 +23,9 @@ import androidx.datastore.preferences.core.longPreferencesKey
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.sync.impl.di.SyncPromotion
 import com.squareup.anvil.annotations.ContributesBinding
-import javax.inject.Inject
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
+import javax.inject.Inject
 
 interface SyncPromotionDataStore {
     suspend fun hasBookmarksPromoBeenDismissed(): Boolean

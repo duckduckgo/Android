@@ -125,11 +125,11 @@ class PixelWideEventSenderTest {
         flowEntryPoint = flowEntryPoint,
         activeIntervals = emptyList(),
         cleanupPolicy =
-            WideEventRepository.CleanupPolicy.OnTimeout(
-                duration = Duration.ofHours(1),
-                status = WideEventRepository.WideEventStatus.UNKNOWN,
-                metadata = emptyMap(),
-            ),
+        WideEventRepository.CleanupPolicy.OnTimeout(
+            duration = Duration.ofHours(1),
+            status = WideEventRepository.WideEventStatus.UNKNOWN,
+            metadata = emptyMap(),
+        ),
         createdAt = Instant.parse("2025-12-03T10:15:30.00Z"),
     )
 }

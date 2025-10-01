@@ -39,10 +39,10 @@ import com.duckduckgo.savedsites.impl.sync.SavedSiteInvalidItemsViewModel.Comman
 import com.duckduckgo.savedsites.impl.sync.SavedSiteInvalidItemsViewModel.Command.NavigateToBookmarks
 import com.duckduckgo.savedsites.impl.sync.SavedSiteInvalidItemsViewModel.ViewState
 import dagger.android.support.AndroidSupportInjection
-import javax.inject.Inject
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import javax.inject.Inject
 
 @InjectWith(ViewScope::class)
 class SavedSiteInvalidItemsView @JvmOverloads constructor(

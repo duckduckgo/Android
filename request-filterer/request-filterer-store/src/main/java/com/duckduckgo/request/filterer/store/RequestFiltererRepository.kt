@@ -18,9 +18,9 @@ package com.duckduckgo.request.filterer.store
 
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.feature.toggles.api.FeatureException
-import java.util.concurrent.CopyOnWriteArrayList
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import java.util.concurrent.CopyOnWriteArrayList
 
 interface RequestFiltererRepository {
     fun updateAll(exceptions: List<RequestFiltererExceptionEntity>, settings: SettingsEntity)

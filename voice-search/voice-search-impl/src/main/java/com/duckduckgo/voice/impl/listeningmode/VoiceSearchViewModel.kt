@@ -27,7 +27,6 @@ import com.duckduckgo.voice.impl.listeningmode.OnDeviceSpeechRecognizer.Event.Re
 import com.duckduckgo.voice.impl.listeningmode.OnDeviceSpeechRecognizer.Event.VolumeUpdateReceived
 import com.duckduckgo.voice.impl.listeningmode.VoiceSearchViewModel.Command.HandleSpeechRecognitionSuccess
 import com.duckduckgo.voice.impl.listeningmode.VoiceSearchViewModel.Command.UpdateVoiceIndicator
-import javax.inject.Inject
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
@@ -35,6 +34,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 @ContributesViewModel(ActivityScope::class)
 class VoiceSearchViewModel @Inject constructor(

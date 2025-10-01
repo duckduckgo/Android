@@ -38,11 +38,11 @@ import com.duckduckgo.common.utils.isHttps
 import com.duckduckgo.duckplayer.api.DuckPlayer
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.privacy.config.api.ContentBlocking
-import java.util.concurrent.CopyOnWriteArrayList
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import logcat.LogPriority.INFO
 import logcat.logcat
+import java.util.concurrent.CopyOnWriteArrayList
 
 class SiteMonitor(
     url: String,

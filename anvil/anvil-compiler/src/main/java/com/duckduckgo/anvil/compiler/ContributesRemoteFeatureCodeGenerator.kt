@@ -34,12 +34,12 @@ import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
 import dagger.BindsOptionalOf
 import dagger.Provides
 import dagger.multibindings.IntoSet
-import java.io.File
-import javax.inject.Inject
 import org.jetbrains.kotlin.descriptors.ModuleDescriptor
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.psi.KtFile
 import org.jetbrains.kotlin.utils.addToStdlib.ifFalse
+import java.io.File
+import javax.inject.Inject
 
 @OptIn(ExperimentalAnvilApi::class)
 @AutoService(CodeGenerator::class)
@@ -401,7 +401,7 @@ class ContributesRemoteFeatureCodeGenerator : CodeGenerator {
                             val hash = %T().writeUtf8(concatMethodNames).md5().hex()
                             return hash
                         } catch(e: Throwable) {
-                            // fallback to just featureName 
+                            // fallback to just featureName
                             return this.featureName
                         }
                     """.trimIndent(),
@@ -420,7 +420,7 @@ class ContributesRemoteFeatureCodeGenerator : CodeGenerator {
                 """
                 if (featureName == this.featureName) {
                     val feature = parseJson(jsonString) ?: return false
-                    
+
                     // feature hash is the hash of the feature + hash coming from remote config
                     // this way we evaluate either when remote config has changes OR when feature changes
                     // when the feature.hash (remote config) is null we always re-evaluate
@@ -428,9 +428,9 @@ class ContributesRemoteFeatureCodeGenerator : CodeGenerator {
                         val _hash = hash() + feature.hash
                         if (compareAndSetHash(_hash)) return true
                     }
-        
+
                     val exceptions = parseExceptions(feature.exceptions)
-        
+
                     val isEnabled = (feature.state == "enabled") || (appBuildConfig.flavor == %T && feature.state == "internal")
                     this.feature.get().invokeMethod("self").setRawStoredState(
                         Toggle.State(
@@ -443,7 +443,7 @@ class ContributesRemoteFeatureCodeGenerator : CodeGenerator {
                             exceptions = exceptions,
                         )
                     )
-        
+
                     // Handle sub-features
                     feature.features?.forEach { subfeature ->
                         subfeature.value.let { jsonToggle ->
@@ -454,9 +454,9 @@ class ContributesRemoteFeatureCodeGenerator : CodeGenerator {
                                 // we try to honour the previous state
                                 // else we resort to compute it using isEnabled()
                                 val previousStateValue = previousState?.enable ?: this.feature.get().invokeMethod(subfeature.key).isEnabled()
-                                
-                                val previousRolloutThreshold = previousState?.rolloutThreshold 
-                                val previousAssignedCohort = previousState?.assignedCohort 
+
+                                val previousRolloutThreshold = previousState?.rolloutThreshold
+                                val previousAssignedCohort = previousState?.assignedCohort
                                 val newStateValue = (jsonToggle.state == "enabled" || (appBuildConfig.flavor == %T && jsonToggle.state == "internal"))
                                 val targets = jsonToggle?.targets?.map { target ->
                                     Toggle.State.Target(
@@ -486,8 +486,8 @@ class ContributesRemoteFeatureCodeGenerator : CodeGenerator {
                                         assignedCohort = previousAssignedCohort,
                                         targets = targets,
                                         cohorts = cohorts,
-                                        settings = settings,                                        
-                                        exceptions = subFeatureExceptions,                                        
+                                        settings = settings,
+                                        exceptions = subFeatureExceptions,
                                     ),
                                 )
                             } catch(e: Throwable) {
@@ -495,12 +495,12 @@ class ContributesRemoteFeatureCodeGenerator : CodeGenerator {
                             }
                         }
                     }
-        
+
                     // handle settings
                     feature.settings?.let {
                         settingsStore.store(it.toString())
                     }
-        
+
                     return true
                 }
                 return false
@@ -553,7 +553,7 @@ class ContributesRemoteFeatureCodeGenerator : CodeGenerator {
                 CodeBlock.builder()
                     .add(
                         """
-                            if (hash == null) return false 
+                            if (hash == null) return false
                             val currentHash = preferences.getString("hash", null)
                             if (hash == currentHash) return true
                             preferences.edit().putString("hash", hash).apply()
@@ -1009,7 +1009,7 @@ class ContributesRemoteFeatureCodeGenerator : CodeGenerator {
             if (this != null) {
                 // check that the Store is actually a [FeatureSettings.Store]
                 if (this.directSuperTypeReferences()
-                    .none { it.asClassReferenceOrNull()?.fqName == FeatureSettings.Store::class.fqName }
+                        .none { it.asClassReferenceOrNull()?.fqName == FeatureSettings.Store::class.fqName }
                 ) {
                     throw AnvilCompilationException(
                         "${vmClass.fqName} [settingsStore] must extend [FeatureSettings.Store]",

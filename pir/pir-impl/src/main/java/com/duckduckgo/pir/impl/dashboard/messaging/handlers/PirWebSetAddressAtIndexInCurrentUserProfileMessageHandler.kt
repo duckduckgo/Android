@@ -25,8 +25,8 @@ import com.duckduckgo.pir.impl.dashboard.messaging.model.PirWebMessageRequest
 import com.duckduckgo.pir.impl.dashboard.messaging.model.PirWebMessageResponse
 import com.duckduckgo.pir.impl.dashboard.state.PirWebOnboardingStateHolder
 import com.squareup.anvil.annotations.ContributesMultibinding
-import javax.inject.Inject
 import logcat.logcat
+import javax.inject.Inject
 
 @ContributesMultibinding(
     scope = ActivityScope::class,

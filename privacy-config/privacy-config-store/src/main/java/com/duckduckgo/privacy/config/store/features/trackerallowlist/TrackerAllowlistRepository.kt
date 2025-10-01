@@ -19,9 +19,9 @@ package com.duckduckgo.privacy.config.store.features.trackerallowlist
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.privacy.config.store.PrivacyConfigDatabase
 import com.duckduckgo.privacy.config.store.TrackerAllowlistEntity
-import java.util.concurrent.CopyOnWriteArrayList
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import java.util.concurrent.CopyOnWriteArrayList
 
 interface TrackerAllowlistRepository {
     fun updateAll(exceptions: List<TrackerAllowlistEntity>)

@@ -974,11 +974,10 @@ class InputScreenViewModelTest {
 
             verify(pixel).fire(
                 pixel = DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_OMNIBAR_PROMPT_SUBMITTED,
-                parameters =
-                    mapOf(
-                        DuckChatPixelParameters.WAS_USED_BEFORE to "0",
-                        "text_length_bucket" to "short",
-                    ),
+                parameters = mapOf(
+                    DuckChatPixelParameters.WAS_USED_BEFORE to "0",
+                    "text_length_bucket" to "short",
+                ),
             )
             verify(pixel).fire(DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_OMNIBAR_PROMPT_SUBMITTED_DAILY, type = Daily())
         }

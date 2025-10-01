@@ -32,12 +32,12 @@ import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason
 import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository
 import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.SingleInstanceIn
-import java.time.LocalDateTime
-import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import logcat.logcat
+import java.time.LocalDateTime
+import javax.inject.Inject
 
 /**
  * This receiver allows sending fake trackers, to do so, in the command line:

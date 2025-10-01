@@ -24,11 +24,11 @@ import com.duckduckgo.app.di.ProcessName
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
-import javax.inject.Inject
 import kotlinx.coroutines.withContext
 import logcat.LogPriority.ERROR
 import logcat.asLog
 import logcat.logcat
+import javax.inject.Inject
 
 @ContributesWorker(AppScope::class)
 class CPUMonitorWorker(

@@ -20,7 +20,6 @@ import android.annotation.SuppressLint
 import android.webkit.WebView
 import androidx.webkit.ScriptHandler
 import com.duckduckgo.app.browser.api.WebViewCapabilityChecker
-import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.browser.api.webviewcompat.WebViewCompatWrapper
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.contentscopescripts.api.contentscopeExperiments.ContentScopeExperiments
@@ -28,8 +27,6 @@ import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.js.messaging.api.AddDocumentStartJavaScriptPlugin
 import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.SingleInstanceIn
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 

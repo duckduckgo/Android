@@ -76,12 +76,11 @@ class WideEventClientTest {
                 name = name,
                 flowEntryPoint = flowEntryPoint,
                 metadata = mapOf("free_trial_eligible" to "true", "user_type" to "premium"),
-                cleanupPolicy =
-                    WideEventRepository.CleanupPolicy.OnProcessStart(
-                        ignoreIfIntervalTimeoutPresent = true,
-                        status = WideEventRepository.WideEventStatus.UNKNOWN,
-                        metadata = emptyMap(),
-                    ),
+                cleanupPolicy = WideEventRepository.CleanupPolicy.OnProcessStart(
+                    ignoreIfIntervalTimeoutPresent = true,
+                    status = WideEventRepository.WideEventStatus.UNKNOWN,
+                    metadata = emptyMap(),
+                ),
             )
         }
 
@@ -103,12 +102,11 @@ class WideEventClientTest {
                 name = name,
                 flowEntryPoint = null,
                 metadata = emptyMap(),
-                cleanupPolicy =
-                    WideEventRepository.CleanupPolicy.OnTimeout(
-                        duration = Duration.ofDays(7),
-                        status = WideEventRepository.WideEventStatus.UNKNOWN,
-                        metadata = emptyMap(),
-                    ),
+                cleanupPolicy = WideEventRepository.CleanupPolicy.OnTimeout(
+                    duration = Duration.ofDays(7),
+                    status = WideEventRepository.WideEventStatus.UNKNOWN,
+                    metadata = emptyMap(),
+                ),
             )
         }
 
@@ -228,11 +226,10 @@ class WideEventClientTest {
             verify(wideEventRepository).setWideEventStatus(
                 eventId = wideEventId,
                 status = expectedWideEventStatus,
-                metadata =
-                    mapOf(
-                        "failure_reason" to "Payment declined",
-                        "error_code" to "PAYMENT_DECLINED",
-                    ),
+                metadata = mapOf(
+                    "failure_reason" to "Payment declined",
+                    "error_code" to "PAYMENT_DECLINED",
+                ),
             )
         }
 
@@ -412,12 +409,11 @@ class WideEventClientTest {
                 name = "timeout_flow",
                 flowEntryPoint = null,
                 metadata = emptyMap(),
-                cleanupPolicy =
-                    WideEventRepository.CleanupPolicy.OnTimeout(
-                        duration = Duration.ofMinutes(5),
-                        status = WideEventRepository.WideEventStatus.FAILURE,
-                        metadata = mapOf("failure_reason" to "timeout"),
-                    ),
+                cleanupPolicy = WideEventRepository.CleanupPolicy.OnTimeout(
+                    duration = Duration.ofMinutes(5),
+                    status = WideEventRepository.WideEventStatus.FAILURE,
+                    metadata = mapOf("failure_reason" to "timeout"),
+                ),
             )
         }
 }

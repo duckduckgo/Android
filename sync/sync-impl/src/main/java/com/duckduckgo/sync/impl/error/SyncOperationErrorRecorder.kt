@@ -21,8 +21,8 @@ import com.duckduckgo.sync.impl.pixels.SyncPixels
 import com.duckduckgo.sync.store.model.SyncOperationErrorType
 import com.duckduckgo.sync.store.model.SyncOperationErrorType.TIMESTAMP_CONFLICT
 import com.squareup.anvil.annotations.ContributesBinding
-import javax.inject.Inject
 import logcat.logcat
+import javax.inject.Inject
 
 interface SyncOperationErrorRecorder {
 

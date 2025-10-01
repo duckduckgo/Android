@@ -3728,10 +3728,9 @@ class BrowserTabFragment :
                                 pixel.fire(AppPixelName.ADD_BOOKMARK_CONFIRM_EDITED)
                                 editSavedSite(
                                     savedSiteChangedViewState.copy(
-                                        savedSite =
-                                            savedSiteChangedViewState.savedSite.copy(
-                                                isFavorite = viewModel.browserViewState.value?.favorite != null,
-                                            ),
+                                        savedSite = savedSiteChangedViewState.savedSite.copy(
+                                            isFavorite = viewModel.browserViewState.value?.favorite != null,
+                                        ),
                                     ),
                                 )
                                 dismissHandler.removeCallbacks(dismissRunnable)

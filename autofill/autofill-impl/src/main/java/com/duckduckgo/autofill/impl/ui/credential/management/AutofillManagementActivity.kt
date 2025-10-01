@@ -75,10 +75,10 @@ import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.navigation.api.getActivityParams
 import com.google.android.material.snackbar.Snackbar
-import javax.inject.Inject
 import kotlinx.coroutines.launch
 import logcat.LogPriority.VERBOSE
 import logcat.logcat
+import javax.inject.Inject
 
 @InjectWith(ActivityScope::class)
 @ContributeToActivityStarter(AutofillPasswordsManagementScreen::class)

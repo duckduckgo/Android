@@ -22,9 +22,9 @@ import com.duckduckgo.savedsites.api.models.BookmarkFolder
 import com.duckduckgo.savedsites.api.models.SavedSite.Bookmark
 import com.duckduckgo.savedsites.impl.sync.SyncSavedSitesRepository
 import com.squareup.anvil.annotations.ContributesBinding
+import logcat.logcat
 import javax.inject.Inject
 import javax.inject.Named
-import logcat.logcat
 
 @ContributesBinding(AppScope::class)
 @Named("localWinsStrategy")

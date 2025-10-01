@@ -86,7 +86,7 @@ class Key private constructor(key: ByteArray) {
      * The supported formats for encoding a WireGuard key.
      */
     enum class Format(val length: Int) {
-        BASE64(44), BINARY(32), HEX(64);
+        BASE64(44), BINARY(32), HEX(64)
     }
 
     companion object {

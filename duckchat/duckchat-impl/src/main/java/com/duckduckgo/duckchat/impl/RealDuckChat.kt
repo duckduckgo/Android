@@ -541,31 +541,31 @@ class RealDuckChat @Inject constructor(
                 context = context,
                 isDarkThemeEnabled = isDarkThemeEnabled,
                 newAddressBarCallback =
-                    object : NewAddressBarCallback {
-                        override fun onDisplayed() {
-                            pixel.fire(DUCK_CHAT_NEW_ADDRESS_BAR_PICKER_DISPLAYED)
-                        }
+                object : NewAddressBarCallback {
+                    override fun onDisplayed() {
+                        pixel.fire(DUCK_CHAT_NEW_ADDRESS_BAR_PICKER_DISPLAYED)
+                    }
 
-                        override fun onConfirmed(selection: NewAddressBarSelection) {
-                            if (selection == SEARCH_AND_AI) {
-                                appCoroutineScope.launch {
-                                    setInputScreenUserSetting(true)
-                                }
+                    override fun onConfirmed(selection: NewAddressBarSelection) {
+                        if (selection == SEARCH_AND_AI) {
+                            appCoroutineScope.launch {
+                                setInputScreenUserSetting(true)
                             }
-                            pixel.fire(
-                                pixel = DUCK_CHAT_NEW_ADDRESS_BAR_PICKER_CONFIRMED,
-                                parameters = mapOf(NEW_ADDRESS_BAR_SELECTION to selection.value),
-                            )
                         }
+                        pixel.fire(
+                            pixel = DUCK_CHAT_NEW_ADDRESS_BAR_PICKER_CONFIRMED,
+                            parameters = mapOf(NEW_ADDRESS_BAR_SELECTION to selection.value),
+                        )
+                    }
 
-                        override fun onNotNow() {
-                            pixel.fire(DUCK_CHAT_NEW_ADDRESS_BAR_PICKER_NOT_NOW)
-                        }
+                    override fun onNotNow() {
+                        pixel.fire(DUCK_CHAT_NEW_ADDRESS_BAR_PICKER_NOT_NOW)
+                    }
 
-                        override fun onCancelled() {
-                            pixel.fire(DUCK_CHAT_NEW_ADDRESS_BAR_PICKER_CANCELLED)
-                        }
-                    },
+                    override fun onCancelled() {
+                        pixel.fire(DUCK_CHAT_NEW_ADDRESS_BAR_PICKER_CANCELLED)
+                    }
+                },
             ).show()
     }
 

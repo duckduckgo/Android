@@ -24,13 +24,13 @@ import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import de.siegmar.fastcsv.reader.CsvReader
 import de.siegmar.fastcsv.reader.CsvRow
-import javax.inject.Inject
 import kotlinx.coroutines.withContext
 import logcat.LogPriority.ERROR
 import logcat.LogPriority.INFO
 import logcat.LogPriority.WARN
 import logcat.asLog
 import logcat.logcat
+import javax.inject.Inject
 
 interface CsvCredentialParser {
     suspend fun parseCsv(csv: String): ParseResult

@@ -23,10 +23,10 @@ import com.duckduckgo.app.trackerdetection.db.TdsMetadataDao
 import com.duckduckgo.common.utils.extensions.extractETag
 import com.duckduckgo.common.utils.store.BinaryDataStore
 import io.reactivex.Completable
-import java.io.IOException
-import javax.inject.Inject
 import logcat.logcat
 import okhttp3.Headers
+import java.io.IOException
+import javax.inject.Inject
 
 class TrackerDataDownloader @Inject constructor(
     private val trackerListService: TrackerListService,

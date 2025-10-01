@@ -26,11 +26,11 @@ import com.duckduckgo.downloads.api.model.DownloadItem
 import com.duckduckgo.downloads.impl.DataUriParser.GeneratedFilename
 import com.duckduckgo.downloads.impl.DataUriParser.ParseResult
 import com.duckduckgo.downloads.store.DownloadStatus.STARTED
+import logcat.asLog
+import logcat.logcat
 import java.io.File
 import java.io.IOException
 import javax.inject.Inject
-import logcat.asLog
-import logcat.logcat
 
 class DataUriDownloader @Inject constructor(
     private val dataUriParser: DataUriParser,

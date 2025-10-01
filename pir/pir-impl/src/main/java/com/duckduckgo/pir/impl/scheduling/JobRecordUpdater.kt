@@ -33,9 +33,9 @@ import com.duckduckgo.pir.impl.models.scheduling.JobRecord.ScanJobRecord.ScanJob
 import com.duckduckgo.pir.impl.store.PirRepository
 import com.duckduckgo.pir.impl.store.PirSchedulingRepository
 import com.squareup.anvil.annotations.ContributesBinding
-import javax.inject.Inject
 import kotlinx.coroutines.withContext
 import logcat.logcat
+import javax.inject.Inject
 
 /**
  * This class contains logic for updating any existing [JobRecord]

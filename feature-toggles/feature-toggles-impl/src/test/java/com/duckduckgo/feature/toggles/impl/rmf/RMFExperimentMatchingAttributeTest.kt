@@ -28,8 +28,6 @@ import com.duckduckgo.feature.toggles.api.Toggle.DefaultValue
 import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.feature.toggles.impl.RealFeatureTogglesInventory
 import com.duckduckgo.remote.messaging.api.JsonMatchingAttribute
-import java.time.ZoneId
-import java.time.ZonedDateTime
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -38,6 +36,8 @@ import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import java.time.ZoneId
+import java.time.ZonedDateTime
 
 @SuppressLint("DenyListedApi")
 class RMFExperimentMatchingAttributeTest {

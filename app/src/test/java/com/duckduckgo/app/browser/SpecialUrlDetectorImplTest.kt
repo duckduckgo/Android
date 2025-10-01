@@ -41,7 +41,6 @@ import com.duckduckgo.privacy.config.api.AmpLinkType
 import com.duckduckgo.privacy.config.api.AmpLinks
 import com.duckduckgo.privacy.config.api.TrackingParameters
 import com.duckduckgo.subscriptions.api.Subscriptions
-import java.net.URISyntaxException
 import junit.framework.TestCase.assertNull
 import junit.framework.TestCase.assertTrue
 import kotlinx.coroutines.test.runTest
@@ -52,6 +51,7 @@ import org.junit.runner.RunWith
 import org.mockito.ArgumentMatchers.anyInt
 import org.mockito.ArgumentMatchers.anyString
 import org.mockito.kotlin.*
+import java.net.URISyntaxException
 
 @RunWith(AndroidJUnit4::class)
 class SpecialUrlDetectorImplTest {

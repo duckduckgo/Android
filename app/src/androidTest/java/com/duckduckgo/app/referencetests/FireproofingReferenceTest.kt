@@ -38,8 +38,6 @@ import com.duckduckgo.cookies.impl.WebViewCookieManager
 import com.duckduckgo.privacy.config.impl.network.JSONObjectAdapter
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
-import kotlin.coroutines.resume
-import kotlin.coroutines.suspendCoroutine
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.withContext
@@ -50,6 +48,8 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.Parameterized
 import org.mockito.kotlin.mock
+import kotlin.coroutines.resume
+import kotlin.coroutines.suspendCoroutine
 
 @RunWith(Parameterized::class)
 @SuppressLint("NoHardcodedCoroutineDispatcher")

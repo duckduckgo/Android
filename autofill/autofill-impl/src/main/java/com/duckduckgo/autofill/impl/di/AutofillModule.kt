@@ -26,7 +26,6 @@ import com.duckduckgo.autofill.api.promotion.PasswordsScreenPromotionPlugin
 import com.duckduckgo.autofill.impl.encoding.UrlUnicodeNormalizer
 import com.duckduckgo.autofill.impl.urlmatcher.AutofillDomainNameUrlMatcher
 import com.duckduckgo.autofill.impl.urlmatcher.AutofillUrlMatcher
-import com.duckduckgo.autofill.store.ALL_MIGRATIONS as AutofillMigrations
 import com.duckduckgo.autofill.store.AutofillDatabase
 import com.duckduckgo.autofill.store.AutofillPrefsStore
 import com.duckduckgo.autofill.store.CredentialsSyncMetadataDao
@@ -47,6 +46,7 @@ import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides
 import dagger.SingleInstanceIn
+import com.duckduckgo.autofill.store.ALL_MIGRATIONS as AutofillMigrations
 
 @Module
 @ContributesTo(AppScope::class)

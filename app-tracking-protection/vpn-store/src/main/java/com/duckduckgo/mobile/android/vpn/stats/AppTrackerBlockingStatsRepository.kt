@@ -21,9 +21,9 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.formatters.time.DatabaseDateFormatter
 import com.duckduckgo.mobile.android.vpn.model.*
 import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
+import kotlinx.coroutines.flow.*
 import java.time.LocalDateTime
 import java.util.concurrent.TimeUnit
-import kotlinx.coroutines.flow.*
 
 interface AppTrackerBlockingStatsRepository {
 

@@ -23,7 +23,6 @@ import com.duckduckgo.app.statistics.pixels.RxBasedPixelTest.TestPixels.TEST
 import com.duckduckgo.common.test.InstantSchedulersRule
 import io.reactivex.Completable
 import io.reactivex.Single
-import java.util.concurrent.TimeoutException
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.Mock
@@ -31,6 +30,7 @@ import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
+import java.util.concurrent.TimeoutException
 
 class RxBasedPixelTest {
 

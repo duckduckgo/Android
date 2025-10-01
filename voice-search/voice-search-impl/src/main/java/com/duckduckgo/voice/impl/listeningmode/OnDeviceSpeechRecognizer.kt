@@ -27,10 +27,10 @@ import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.voice.impl.listeningmode.OnDeviceSpeechRecognizer.Companion
 import com.duckduckgo.voice.impl.listeningmode.OnDeviceSpeechRecognizer.Event
 import com.squareup.anvil.annotations.ContributesBinding
-import javax.inject.Inject
 import logcat.LogPriority.ERROR
 import logcat.asLog
 import logcat.logcat
+import javax.inject.Inject
 
 interface OnDeviceSpeechRecognizer {
     companion object {

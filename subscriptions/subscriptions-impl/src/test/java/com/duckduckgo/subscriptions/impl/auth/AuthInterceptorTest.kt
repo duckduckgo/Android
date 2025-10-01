@@ -3,8 +3,6 @@ package com.duckduckgo.subscriptions.impl.auth
 import com.duckduckgo.common.test.api.FakeChain
 import com.duckduckgo.subscriptions.impl.AccessTokenResult
 import com.duckduckgo.subscriptions.impl.SubscriptionsManager
-import java.io.IOException
-import java.lang.reflect.Method
 import kotlinx.coroutines.test.runTest
 import okhttp3.Interceptor.Chain
 import okhttp3.Request
@@ -14,6 +12,8 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 import retrofit2.Invocation
+import java.io.IOException
+import java.lang.reflect.Method
 
 class AuthInterceptorTest {
 

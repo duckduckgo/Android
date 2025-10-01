@@ -21,13 +21,13 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.feature.toggles.api.Toggle.DefaultFeatureValue
 
+/**
+ * This is the class that represents the autoconsent feature flags
+ */
 @ContributesRemoteFeature(
     scope = AppScope::class,
     featureName = "autoconsent",
 )
-/**
- * This is the class that represents the autoconsent feature flags
- */
 interface AutoconsentFeature {
     /**
      * @return `true` when the remote config has the global "voiceSearch" feature flag enabled

@@ -25,7 +25,6 @@ import com.duckduckgo.feature.toggles.api.Toggle.DefaultFeatureValue
     scope = AppScope::class,
     featureName = "clientContentFeatures",
 )
-
 interface ContentScopeScriptsFeature {
     @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun self(): Toggle

@@ -61,10 +61,10 @@ import com.duckduckgo.mobile.android.R.styleable
 import com.duckduckgo.mobile.android.databinding.ViewNotifyMeViewBinding
 import com.google.android.material.button.MaterialButton.ICON_GRAVITY_TEXT_START
 import dagger.android.support.AndroidSupportInjection
-import javax.inject.Inject
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import javax.inject.Inject
 
 @InjectWith(ViewScope::class)
 class NotifyMeView @JvmOverloads constructor(

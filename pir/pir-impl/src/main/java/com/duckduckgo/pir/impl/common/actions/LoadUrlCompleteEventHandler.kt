@@ -28,9 +28,9 @@ import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.Event.
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.State
 import com.duckduckgo.pir.impl.scripts.models.PirScriptRequestData.UserProfile
 import com.squareup.anvil.annotations.ContributesMultibinding
+import logcat.logcat
 import javax.inject.Inject
 import kotlin.reflect.KClass
-import logcat.logcat
 
 @ContributesMultibinding(
     scope = AppScope::class,

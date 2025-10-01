@@ -82,11 +82,11 @@ class WideEventCleanerTest {
                     metadata = emptyMap(),
                     flowEntryPoint = null,
                     cleanupPolicy =
-                        WideEventRepository.CleanupPolicy.OnProcessStart(
-                            ignoreIfIntervalTimeoutPresent = false,
-                            status = WideEventRepository.WideEventStatus.CANCELLED,
-                            metadata = mapOf("reason" to "test"),
-                        ),
+                    WideEventRepository.CleanupPolicy.OnProcessStart(
+                        ignoreIfIntervalTimeoutPresent = false,
+                        status = WideEventRepository.WideEventStatus.CANCELLED,
+                        metadata = mapOf("reason" to "test"),
+                    ),
                     activeIntervals = emptyList(),
                     createdAt = timeProvider.currentTime,
                 )
@@ -116,19 +116,19 @@ class WideEventCleanerTest {
                     metadata = emptyMap(),
                     flowEntryPoint = null,
                     cleanupPolicy =
-                        WideEventRepository.CleanupPolicy.OnProcessStart(
-                            ignoreIfIntervalTimeoutPresent = true,
-                            status = WideEventRepository.WideEventStatus.CANCELLED,
-                            metadata = mapOf("reason" to "test"),
-                        ),
+                    WideEventRepository.CleanupPolicy.OnProcessStart(
+                        ignoreIfIntervalTimeoutPresent = true,
+                        status = WideEventRepository.WideEventStatus.CANCELLED,
+                        metadata = mapOf("reason" to "test"),
+                    ),
                     activeIntervals =
-                        listOf(
-                            WideEventRepository.WideEventInterval(
-                                name = "interval",
-                                startedAt = start,
-                                timeout = Duration.ofMinutes(5),
-                            ),
+                    listOf(
+                        WideEventRepository.WideEventInterval(
+                            name = "interval",
+                            startedAt = start,
+                            timeout = Duration.ofMinutes(5),
                         ),
+                    ),
                     createdAt = start,
                 )
             whenever(wideEventRepository.getActiveWideEventIds()).thenReturn(listOf(6L))
@@ -154,19 +154,19 @@ class WideEventCleanerTest {
                     metadata = emptyMap(),
                     flowEntryPoint = null,
                     cleanupPolicy =
-                        WideEventRepository.CleanupPolicy.OnProcessStart(
-                            ignoreIfIntervalTimeoutPresent = false,
-                            status = WideEventRepository.WideEventStatus.CANCELLED,
-                            metadata = mapOf("reason" to "test"),
-                        ),
+                    WideEventRepository.CleanupPolicy.OnProcessStart(
+                        ignoreIfIntervalTimeoutPresent = false,
+                        status = WideEventRepository.WideEventStatus.CANCELLED,
+                        metadata = mapOf("reason" to "test"),
+                    ),
                     activeIntervals =
-                        listOf(
-                            WideEventRepository.WideEventInterval(
-                                name = "interval",
-                                startedAt = start,
-                                timeout = Duration.ofMinutes(5),
-                            ),
+                    listOf(
+                        WideEventRepository.WideEventInterval(
+                            name = "interval",
+                            startedAt = start,
+                            timeout = Duration.ofMinutes(5),
                         ),
+                    ),
                     createdAt = start,
                 )
             whenever(wideEventRepository.getActiveWideEventIds()).thenReturn(listOf(7L))
@@ -197,11 +197,11 @@ class WideEventCleanerTest {
                     metadata = emptyMap(),
                     flowEntryPoint = null,
                     cleanupPolicy =
-                        WideEventRepository.CleanupPolicy.OnTimeout(
-                            duration = timeout,
-                            status = WideEventRepository.WideEventStatus.FAILURE,
-                            metadata = mapOf("cleanup" to "timeout"),
-                        ),
+                    WideEventRepository.CleanupPolicy.OnTimeout(
+                        duration = timeout,
+                        status = WideEventRepository.WideEventStatus.FAILURE,
+                        metadata = mapOf("cleanup" to "timeout"),
+                    ),
                     activeIntervals = emptyList(),
                     createdAt = createdAt,
                 )
@@ -231,19 +231,19 @@ class WideEventCleanerTest {
                     metadata = emptyMap(),
                     flowEntryPoint = null,
                     cleanupPolicy =
-                        WideEventRepository.CleanupPolicy.OnTimeout(
-                            duration = Duration.ofHours(1),
-                            status = WideEventRepository.WideEventStatus.UNKNOWN,
-                            metadata = emptyMap(),
-                        ),
+                    WideEventRepository.CleanupPolicy.OnTimeout(
+                        duration = Duration.ofHours(1),
+                        status = WideEventRepository.WideEventStatus.UNKNOWN,
+                        metadata = emptyMap(),
+                    ),
                     activeIntervals =
-                        listOf(
-                            WideEventRepository.WideEventInterval(
-                                name = "interval",
-                                startedAt = start,
-                                timeout = Duration.ofMinutes(5),
-                            ),
+                    listOf(
+                        WideEventRepository.WideEventInterval(
+                            name = "interval",
+                            startedAt = start,
+                            timeout = Duration.ofMinutes(5),
                         ),
+                    ),
                     createdAt = start,
                 )
             whenever(wideEventRepository.getActiveWideEventIds()).thenReturn(listOf(4L))
@@ -271,11 +271,11 @@ class WideEventCleanerTest {
                     metadata = emptyMap(),
                     flowEntryPoint = null,
                     cleanupPolicy =
-                        WideEventRepository.CleanupPolicy.OnTimeout(
-                            duration = Duration.ofHours(1),
-                            status = WideEventRepository.WideEventStatus.UNKNOWN,
-                            metadata = emptyMap(),
-                        ),
+                    WideEventRepository.CleanupPolicy.OnTimeout(
+                        duration = Duration.ofHours(1),
+                        status = WideEventRepository.WideEventStatus.UNKNOWN,
+                        metadata = emptyMap(),
+                    ),
                     activeIntervals = emptyList(),
                     createdAt = timeProvider.currentTime,
                 )

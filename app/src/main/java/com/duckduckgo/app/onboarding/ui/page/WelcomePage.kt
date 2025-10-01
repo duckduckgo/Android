@@ -61,9 +61,9 @@ import com.duckduckgo.common.utils.FragmentViewModelFactory
 import com.duckduckgo.common.utils.extensions.html
 import com.duckduckgo.common.utils.extensions.preventWidows
 import com.duckduckgo.di.scopes.FragmentScope
-import javax.inject.Inject
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import javax.inject.Inject
 
 @InjectWith(FragmentScope::class)
 class WelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome_page) {

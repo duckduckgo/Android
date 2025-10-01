@@ -31,13 +31,13 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.history.impl.InternalNavigationHistory
 import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.SingleInstanceIn
-import java.util.concurrent.TimeUnit
-import java.util.concurrent.TimeUnit.DAYS
-import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import logcat.LogPriority.VERBOSE
 import logcat.logcat
+import java.util.concurrent.TimeUnit
+import java.util.concurrent.TimeUnit.DAYS
+import javax.inject.Inject
 
 @ContributesMultibinding(
     scope = AppScope::class,

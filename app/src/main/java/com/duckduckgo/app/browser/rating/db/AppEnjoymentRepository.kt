@@ -17,11 +17,11 @@
 package com.duckduckgo.app.browser.rating.db
 
 import com.duckduckgo.app.global.rating.PromptCount
-import java.util.*
-import java.util.concurrent.Executors
 import kotlinx.coroutines.asCoroutineDispatcher
 import kotlinx.coroutines.withContext
 import logcat.logcat
+import java.util.*
+import java.util.concurrent.Executors
 
 interface AppEnjoymentRepository {
 

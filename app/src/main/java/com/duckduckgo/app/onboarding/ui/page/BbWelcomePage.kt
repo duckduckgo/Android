@@ -68,12 +68,12 @@ import com.duckduckgo.common.utils.FragmentViewModelFactory
 import com.duckduckgo.common.utils.extensions.html
 import com.duckduckgo.common.utils.extensions.preventWidows
 import com.duckduckgo.di.scopes.FragmentScope
-import javax.inject.Inject
-import kotlin.time.Duration.Companion.milliseconds
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
+import javax.inject.Inject
+import kotlin.time.Duration.Companion.milliseconds
 
 @InjectWith(FragmentScope::class)
 class BbWelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome_page_bb) {
@@ -752,7 +752,6 @@ class BbWelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome
                 drawableLight = R.drawable.bb_onboarding_background_04_light,
                 drawableDark = R.drawable.bb_onboarding_background_04_dark,
             ),
-            ;
         }
 
         private companion object {

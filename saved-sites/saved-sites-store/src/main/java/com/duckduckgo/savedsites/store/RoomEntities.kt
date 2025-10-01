@@ -35,7 +35,6 @@ data class Entity(
 enum class EntityType {
     BOOKMARK,
     FOLDER,
-    ;
 }
 
 class EntityTypeConverter {
