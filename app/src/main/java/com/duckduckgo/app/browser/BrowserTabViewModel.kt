@@ -584,6 +584,7 @@ class BrowserTabViewModel @Inject constructor(
     private var isProcessingTrackingLink = false
     private var isLinkOpenedInNewTab = false
     private var allowlistRefreshTriggerJob: Job? = null
+    private var isCustomTabScreen: Boolean = false
 
     private val fireproofWebsitesObserver =
         Observer<List<FireproofWebsiteEntity>> {
@@ -796,6 +797,10 @@ class BrowserTabViewModel @Inject constructor(
         site = siteLiveData.value
 
         initialUrl?.let { buildSiteFactory(it, stillExternal = isExternal) }
+    }
+
+    fun setIsCustomTab(isCustomTab: Boolean) {
+        this.isCustomTabScreen = isCustomTab
     }
 
     fun onViewReady() {
@@ -3058,11 +3063,16 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     private fun appLinkClicked(appLink: AppLink) {
-        if (appSettingsPreferencesStore.showAppLinksPrompt || appLinksHandler.isUserQuery()) {
-            command.value = ShowAppLinkPrompt(appLink)
-            appLinksHandler.setUserQueryState(false)
-        } else {
-            command.value = OpenAppLink(appLink)
+        when {
+            // When in custom tab, always open the app link directly, without prompting.
+            isCustomTabScreen -> command.value = OpenAppLink(appLink)
+
+            appSettingsPreferencesStore.showAppLinksPrompt || appLinksHandler.isUserQuery() -> {
+                command.value = ShowAppLinkPrompt(appLink)
+                appLinksHandler.setUserQueryState(false)
+            }
+
+            else -> command.value = OpenAppLink(appLink)
         }
     }
 
