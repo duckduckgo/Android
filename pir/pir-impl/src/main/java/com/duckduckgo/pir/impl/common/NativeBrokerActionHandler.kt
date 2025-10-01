@@ -36,7 +36,9 @@ import kotlinx.coroutines.withContext
 interface NativeBrokerActionHandler {
     suspend fun pushAction(nativeAction: NativeAction): NativeActionResult
 
-    sealed class NativeAction(open val actionId: String) {
+    sealed class NativeAction(
+        open val actionId: String,
+    ) {
         data class GetEmail(
             override val actionId: String,
             val brokerName: String,
@@ -102,100 +104,110 @@ class RealNativeBrokerActionHandler(
     private val dispatcherProvider: DispatcherProvider,
     private val captchaResolver: CaptchaResolver,
 ) : NativeBrokerActionHandler {
-    override suspend fun pushAction(nativeAction: NativeAction): NativeActionResult = withContext(dispatcherProvider.io()) {
-        when (nativeAction) {
-            is GetEmail -> handleGetEmail(nativeAction)
-            is SubmitCaptchaInfo -> handleSolveCaptcha(nativeAction)
-            is GetCaptchaSolutionStatus -> handleGetCaptchaSolutionStatus(nativeAction)
-        }
-    }
-
-    private suspend fun handleGetEmail(action: GetEmail): NativeActionResult {
-        return kotlin.runCatching {
-            repository.getEmailForBroker(action.brokerName).run {
-                NativeActionResult.Success(
-                    data = NativeSuccessData.Email(this),
-                )
-            }
-        }.getOrElse { error ->
-            Failure(
-                actionId = action.actionId,
-                message = "Unknown error while getting email : ${error.message}",
-            )
-        }
-    }
-
-    private suspend fun handleSolveCaptcha(nativeAction: SubmitCaptchaInfo): NativeActionResult {
-        return captchaResolver.submitCaptchaInformation(
-            siteKey = nativeAction.siteKey,
-            url = nativeAction.url,
-            type = nativeAction.type,
-        ).run {
-            when (this) {
-                is CaptchaResolverResult.CaptchaSubmitSuccess -> NativeActionResult.Success(
-                    CaptchaTransactionIdReceived(
-                        this.transactionID,
-                    ),
-                )
-
-                is CaptchaResolverResult.CaptchaFailure -> if (this.type == CaptchaResolverError.TransientFailure) {
-                    // Transient failures mean that client should retry after a minute
-                    Failure(
-                        actionId = nativeAction.actionId,
-                        message = this.message,
-                        retryNativeAction = true,
-                    )
-                } else {
-                    Failure(
-                        actionId = nativeAction.actionId,
-                        message = this.message,
-                        retryNativeAction = false,
-                    )
-                }
-
-                else -> Failure(
-                    actionId = nativeAction.actionId,
-                    message = "Invalid scenario",
-                    retryNativeAction = false,
-                )
+    override suspend fun pushAction(nativeAction: NativeAction): NativeActionResult =
+        withContext(dispatcherProvider.io()) {
+            when (nativeAction) {
+                is GetEmail -> handleGetEmail(nativeAction)
+                is SubmitCaptchaInfo -> handleSolveCaptcha(nativeAction)
+                is GetCaptchaSolutionStatus -> handleGetCaptchaSolutionStatus(nativeAction)
             }
         }
-    }
 
-    private suspend fun handleGetCaptchaSolutionStatus(nativeAction: GetCaptchaSolutionStatus): NativeActionResult {
-        return captchaResolver.getCaptchaSolution(
-            transactionID = nativeAction.transactionID,
-        ).run {
-            when (this) {
-                is CaptchaResolverResult.SolveCaptchaSuccess -> NativeActionResult.Success(
-                    data = CaptchaSolutionStatus(
-                        status = CaptchaSolutionStatus.CaptchaStatus.Ready(
-                            token = this.token,
-                            meta = this.meta,
-                        ),
-                    ),
-                )
-
-                is CaptchaResolverResult.CaptchaFailure -> if (this.type == CaptchaResolverError.SolutionNotReady) {
+    private suspend fun handleGetEmail(action: GetEmail): NativeActionResult =
+        kotlin
+            .runCatching {
+                repository.getEmailForBroker(action.brokerName).run {
                     NativeActionResult.Success(
-                        data = CaptchaSolutionStatus(
-                            status = CaptchaSolutionStatus.CaptchaStatus.InProgress,
-                        ),
-                    )
-                } else {
-                    Failure(
-                        actionId = nativeAction.actionId,
-                        message = "Failed to resolve captcha",
-                        retryNativeAction = false,
+                        data = NativeSuccessData.Email(this),
                     )
                 }
-
-                else -> Failure(
-                    actionId = nativeAction.actionId,
-                    message = "Invalid scenario",
-                    retryNativeAction = false,
+            }.getOrElse { error ->
+                Failure(
+                    actionId = action.actionId,
+                    message = "Unknown error while getting email : ${error.message}",
                 )
             }
-        }
-    }
+
+    private suspend fun handleSolveCaptcha(nativeAction: SubmitCaptchaInfo): NativeActionResult =
+        captchaResolver
+            .submitCaptchaInformation(
+                siteKey = nativeAction.siteKey,
+                url = nativeAction.url,
+                type = nativeAction.type,
+            ).run {
+                when (this) {
+                    is CaptchaResolverResult.CaptchaSubmitSuccess ->
+                        NativeActionResult.Success(
+                            CaptchaTransactionIdReceived(
+                                this.transactionID,
+                            ),
+                        )
+
+                    is CaptchaResolverResult.CaptchaFailure ->
+                        if (this.type == CaptchaResolverError.TransientFailure) {
+                            // Transient failures mean that client should retry after a minute
+                            Failure(
+                                actionId = nativeAction.actionId,
+                                message = this.message,
+                                retryNativeAction = true,
+                            )
+                        } else {
+                            Failure(
+                                actionId = nativeAction.actionId,
+                                message = this.message,
+                                retryNativeAction = false,
+                            )
+                        }
+
+                    else ->
+                        Failure(
+                            actionId = nativeAction.actionId,
+                            message = "Invalid scenario",
+                            retryNativeAction = false,
+                        )
+                }
+            }
+
+    private suspend fun handleGetCaptchaSolutionStatus(nativeAction: GetCaptchaSolutionStatus): NativeActionResult =
+        captchaResolver
+            .getCaptchaSolution(
+                transactionID = nativeAction.transactionID,
+            ).run {
+                when (this) {
+                    is CaptchaResolverResult.SolveCaptchaSuccess ->
+                        NativeActionResult.Success(
+                            data =
+                            CaptchaSolutionStatus(
+                                status =
+                                CaptchaSolutionStatus.CaptchaStatus.Ready(
+                                    token = this.token,
+                                    meta = this.meta,
+                                ),
+                            ),
+                        )
+
+                    is CaptchaResolverResult.CaptchaFailure ->
+                        if (this.type == CaptchaResolverError.SolutionNotReady) {
+                            NativeActionResult.Success(
+                                data =
+                                CaptchaSolutionStatus(
+                                    status = CaptchaSolutionStatus.CaptchaStatus.InProgress,
+                                ),
+                            )
+                        } else {
+                            Failure(
+                                actionId = nativeAction.actionId,
+                                message = "Failed to resolve captcha",
+                                retryNativeAction = false,
+                            )
+                        }
+
+                    else ->
+                        Failure(
+                            actionId = nativeAction.actionId,
+                            message = "Invalid scenario",
+                            retryNativeAction = false,
+                        )
+                }
+            }
 }

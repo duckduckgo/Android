@@ -106,9 +106,7 @@ interface PirRepository {
      * This method saves the new extracted profiles to the database.
      * Any existing profiles (see indices of the table), we ignore them
      */
-    suspend fun saveNewExtractedProfiles(
-        extractedProfiles: List<ExtractedProfile>,
-    )
+    suspend fun saveNewExtractedProfiles(extractedProfiles: List<ExtractedProfile>)
 
     /**
      * Returns a list of all [ExtractedProfile] found for this particular broker.
@@ -152,7 +150,9 @@ interface PirRepository {
         ) : ConfirmationStatus()
 
         data object Pending : ConfirmationStatus()
+
         data object Unknown : ConfirmationStatus()
+
         data class Error(
             val errorCode: String,
             val error: String,
@@ -170,7 +170,6 @@ internal class RealPirRepository(
     private val dbpService: DbpService,
     private val extractedProfileDao: ExtractedProfileDao,
 ) : PirRepository {
-
     private val addressCityStateAdapter by lazy { Moshi.Builder().build().adapter(AddressCityState::class.java) }
 
     override suspend fun getCurrentMainEtag(): String? = pirDataStore.mainConfigEtag
@@ -181,14 +180,15 @@ internal class RealPirRepository(
 
     override suspend fun updateBrokerJsons(brokers: List<BrokerJson>) {
         withContext(dispatcherProvider.io()) {
-            brokers.map {
-                BrokerJsonEtag(
-                    fileName = it.fileName,
-                    etag = it.etag,
-                )
-            }.also {
-                brokerJsonDao.insertBrokerJsonEtags(it)
-            }
+            brokers
+                .map {
+                    BrokerJsonEtag(
+                        fileName = it.fileName,
+                        etag = it.etag,
+                    )
+                }.also {
+                    brokerJsonDao.insertBrokerJsonEtags(it)
+                }
         }
     }
 
@@ -202,9 +202,10 @@ internal class RealPirRepository(
             }
         }
 
-    override suspend fun getStoredBrokersCount(): Int = withContext(dispatcherProvider.io()) {
-        return@withContext brokerJsonDao.getAllBrokersCount()
-    }
+    override suspend fun getStoredBrokersCount(): Int =
+        withContext(dispatcherProvider.io()) {
+            return@withContext brokerJsonDao.getAllBrokersCount()
+        }
 
     override suspend fun getAllActiveBrokers(): List<String> =
         withContext(dispatcherProvider.io()) {
@@ -228,8 +229,8 @@ internal class RealPirRepository(
             }
         }
 
-    override suspend fun getAllMirrorSitesForBroker(brokerName: String): List<MirrorSite> {
-        return brokerDao.getAllMirrorSitesForBroker(brokerName).map {
+    override suspend fun getAllMirrorSitesForBroker(brokerName: String): List<MirrorSite> =
+        brokerDao.getAllMirrorSitesForBroker(brokerName).map {
             MirrorSite(
                 name = it.name,
                 url = it.url,
@@ -239,10 +240,9 @@ internal class RealPirRepository(
                 parentSite = it.parentSite,
             )
         }
-    }
 
-    override suspend fun getAllMirrorSites(): List<MirrorSite> {
-        return brokerDao.getAllMirrorSites().map {
+    override suspend fun getAllMirrorSites(): List<MirrorSite> =
+        brokerDao.getAllMirrorSites().map {
             MirrorSite(
                 name = it.name,
                 url = it.url,
@@ -252,7 +252,6 @@ internal class RealPirRepository(
                 parentSite = it.parentSite,
             )
         }
-    }
 
     override suspend fun getAllBrokersForScan(): List<String> =
         withContext(dispatcherProvider.io()) {
@@ -276,7 +275,8 @@ internal class RealPirRepository(
     ) {
         withContext(dispatcherProvider.io()) {
             brokerDao.upsert(
-                broker = BrokerEntity(
+                broker =
+                BrokerEntity(
                     name = broker.name,
                     fileName = fileName,
                     url = broker.url,
@@ -285,23 +285,27 @@ internal class RealPirRepository(
                     addedDatetime = broker.addedDatetime,
                     removedAt = broker.removedAt ?: 0L,
                 ),
-                brokerScan = BrokerScan(
+                brokerScan =
+                BrokerScan(
                     brokerName = broker.name,
                     stepsJson = broker.steps.first { it.contains("\"stepType\":\"scan\"") },
                 ),
-                brokerOptOut = BrokerOptOut(
+                brokerOptOut =
+                BrokerOptOut(
                     brokerName = broker.name,
                     stepsJson = broker.steps.first { it.contains("\"stepType\":\"optOut\"") },
                     optOutUrl = broker.optOutUrl,
                 ),
-                schedulingConfig = BrokerSchedulingConfigEntity(
+                schedulingConfig =
+                BrokerSchedulingConfigEntity(
                     brokerName = broker.name,
                     retryError = broker.schedulingConfig.retryError,
                     confirmOptOutScan = broker.schedulingConfig.confirmOptOutScan,
                     maintenanceScan = broker.schedulingConfig.maintenanceScan,
                     maxAttempts = broker.schedulingConfig.maxAttempts,
                 ),
-                mirrorSiteEntity = broker.mirrorSites.map {
+                mirrorSiteEntity =
+                broker.mirrorSites.map {
                     MirrorSiteEntity(
                         name = it.name,
                         url = it.url,
@@ -353,51 +357,55 @@ internal class RealPirRepository(
 
     override suspend fun getBrokersForOptOut(formOptOutOnly: Boolean): List<String> =
         withContext(dispatcherProvider.io()) {
-            extractedProfileDao.getAllExtractedProfiles().map {
-                it.brokerName
-            }.distinct().run {
-                if (formOptOutOnly) {
-                    this.filter {
-                        brokerDao.getOptOutJson(it)
-                            ?.contains("\"optOutType\":\"formOptOut\"") == true
+            extractedProfileDao
+                .getAllExtractedProfiles()
+                .map {
+                    it.brokerName
+                }.distinct()
+                .run {
+                    if (formOptOutOnly) {
+                        this.filter {
+                            brokerDao
+                                .getOptOutJson(it)
+                                ?.contains("\"optOutType\":\"formOptOut\"") == true
+                        }
+                    } else {
+                        this
                     }
-                } else {
-                    this
                 }
-            }
         }
 
-    override suspend fun saveNewExtractedProfiles(
-        extractedProfiles: List<ExtractedProfile>,
-    ) {
+    override suspend fun saveNewExtractedProfiles(extractedProfiles: List<ExtractedProfile>) {
         withContext(dispatcherProvider.io()) {
-            extractedProfiles.map {
-                it.toStoredExtractedProfile()
-            }.also {
-                extractedProfileDao.insertNewExtractedProfiles(it)
-            }
+            extractedProfiles
+                .map {
+                    it.toStoredExtractedProfile()
+                }.also {
+                    extractedProfileDao.insertNewExtractedProfiles(it)
+                }
         }
     }
 
     override suspend fun getExtractedProfiles(
         brokerName: String,
         profileQueryId: Long,
-    ): List<ExtractedProfile> = withContext(dispatcherProvider.io()) {
-        return@withContext extractedProfileDao.getExtractedProfilesForBrokerAndProfile(
-            brokerName,
-            profileQueryId,
-        ).map {
-            it.toExtractedProfile()
+    ): List<ExtractedProfile> =
+        withContext(dispatcherProvider.io()) {
+            return@withContext extractedProfileDao
+                .getExtractedProfilesForBrokerAndProfile(
+                    brokerName,
+                    profileQueryId,
+                ).map {
+                    it.toExtractedProfile()
+                }
         }
-    }
 
-    override fun getAllExtractedProfilesFlow(): Flow<List<ExtractedProfile>> {
-        return extractedProfileDao.getAllExtractedProfileFlow().map { list ->
+    override fun getAllExtractedProfilesFlow(): Flow<List<ExtractedProfile>> =
+        extractedProfileDao.getAllExtractedProfileFlow().map { list ->
             list.map {
                 it.toExtractedProfile()
             }
         }
-    }
 
     override suspend fun getAllExtractedProfiles(): List<ExtractedProfile> =
         withContext(dispatcherProvider.io()) {
@@ -427,27 +435,28 @@ internal class RealPirRepository(
         }
     }
 
-    private fun UserProfile.toProfileQuery(): ProfileQuery {
-        return ProfileQuery(
+    private fun UserProfile.toProfileQuery(): ProfileQuery =
+        ProfileQuery(
             id = this.id,
             firstName = this.userName.firstName,
             lastName = this.userName.lastName,
             city = this.addresses.city,
             state = this.addresses.state,
-            addresses = listOf(
+            addresses =
+            listOf(
                 Address(
                     city = this.addresses.city,
                     state = this.addresses.state,
                 ),
             ),
             birthYear = this.birthYear,
-            fullName = this.userName.middleName?.let { middleName ->
+            fullName =
+            this.userName.middleName?.let { middleName ->
                 "${this.userName.firstName} $middleName ${this.userName.lastName}"
             } ?: "${this.userName.firstName} ${this.userName.lastName}",
             age = currentTimeProvider.localDateTimeNow().year - this.birthYear,
             deprecated = false,
         )
-    }
 
     override suspend fun replaceUserProfile(profileQuery: ProfileQuery) {
         withContext(dispatcherProvider.io()) {
@@ -458,9 +467,10 @@ internal class RealPirRepository(
 
     override suspend fun saveProfileQueries(profileQueries: List<ProfileQuery>): Boolean =
         withContext(dispatcherProvider.io()) {
-            val userProfiles = profileQueries.map { query ->
-                query.toUserProfile()
-            }
+            val userProfiles =
+                profileQueries.map { query ->
+                    query.toUserProfile()
+                }
             val insertResult = userProfileDao.insertUserProfiles(userProfiles)
             insertResult.size == userProfiles.size
         }
@@ -473,46 +483,52 @@ internal class RealPirRepository(
     override suspend fun getEmailConfirmationLinkStatus(emailData: List<EmailData>): Map<EmailData, ConfirmationStatus> =
         withContext(dispatcherProvider.io()) {
             return@withContext dbpService.getEmailConfirmationLinkStatus(emailData.toRequest()).items.associate { response ->
-                val key = EmailData(
-                    email = response.email,
-                    attemptId = response.attemptId,
-                )
-                val value = when (response.status) {
-                    "ready" -> Ready(
-                        data = response.data.associate {
-                            it.name to it.value
-                        },
+                val key =
+                    EmailData(
+                        email = response.email,
+                        attemptId = response.attemptId,
                     )
+                val value =
+                    when (response.status) {
+                        "ready" ->
+                            Ready(
+                                data =
+                                response.data.associate {
+                                    it.name to it.value
+                                },
+                            )
 
-                    "error" -> Error(
-                        errorCode = response.errorCode.orEmpty(),
-                        error = response.error.orEmpty(),
-                    )
+                        "error" ->
+                            Error(
+                                errorCode = response.errorCode.orEmpty(),
+                                error = response.error.orEmpty(),
+                            )
 
-                    "pending" -> Pending
-                    else -> Unknown
-                }
+                        "pending" -> Pending
+                        else -> Unknown
+                    }
                 key to value
             }
         }
 
-    override suspend fun deleteEmailData(emailData: List<EmailData>) = withContext(dispatcherProvider.io()) {
-        dbpService.deleteEmailData(emailData.toRequest())
-    }
+    override suspend fun deleteEmailData(emailData: List<EmailData>) =
+        withContext(dispatcherProvider.io()) {
+            dbpService.deleteEmailData(emailData.toRequest())
+        }
 
-    private fun List<EmailData>.toRequest(): PirEmailConfirmationDataRequest {
-        return PirEmailConfirmationDataRequest(
-            items = this.map {
+    private fun List<EmailData>.toRequest(): PirEmailConfirmationDataRequest =
+        PirEmailConfirmationDataRequest(
+            items =
+            this.map {
                 PirEmailConfirmationDataRequest.RequestEmailData(
                     email = it.email,
                     attemptId = it.attemptId,
                 )
             },
         )
-    }
 
-    private fun StoredExtractedProfile.toExtractedProfile(): ExtractedProfile {
-        return ExtractedProfile(
+    private fun StoredExtractedProfile.toExtractedProfile(): ExtractedProfile =
+        ExtractedProfile(
             dbId = this.id,
             profileUrl = this.profileUrl,
             profileQueryId = this.profileQueryId,
@@ -520,7 +536,8 @@ internal class RealPirRepository(
             name = this.name,
             alternativeNames = this.alternativeNames,
             age = this.age,
-            addresses = this.addresses.mapNotNull {
+            addresses =
+            this.addresses.mapNotNull {
                 addressCityStateAdapter.fromJson(it)
             },
             phoneNumbers = this.phoneNumbers,
@@ -532,17 +549,17 @@ internal class RealPirRepository(
             dateAddedInMillis = this.dateAddedInMillis,
             deprecated = this.deprecated,
         )
-    }
 
-    private fun ExtractedProfile.toStoredExtractedProfile(): StoredExtractedProfile {
-        return StoredExtractedProfile(
+    private fun ExtractedProfile.toStoredExtractedProfile(): StoredExtractedProfile =
+        StoredExtractedProfile(
             id = this.dbId,
             profileQueryId = this.profileQueryId,
             brokerName = this.brokerName,
             name = this.name,
             alternativeNames = this.alternativeNames,
             age = this.age,
-            addresses = this.addresses.mapNotNull {
+            addresses =
+            this.addresses.mapNotNull {
                 addressCityStateAdapter.toJson(it)
             },
             phoneNumbers = this.phoneNumbers,
@@ -552,27 +569,28 @@ internal class RealPirRepository(
             fullName = this.fullName,
             profileUrl = this.profileUrl,
             identifier = this.identifier,
-            dateAddedInMillis = if (this.dateAddedInMillis == 0L) {
+            dateAddedInMillis =
+            if (this.dateAddedInMillis == 0L) {
                 currentTimeProvider.currentTimeMillis()
             } else {
                 this.dateAddedInMillis
             },
             deprecated = this.deprecated,
         )
-    }
 
-    private fun ProfileQuery.toUserProfile(): UserProfile {
-        return UserProfile(
-            userName = UserName(
+    private fun ProfileQuery.toUserProfile(): UserProfile =
+        UserProfile(
+            userName =
+            UserName(
                 firstName = this.firstName,
                 lastName = this.lastName,
                 middleName = this.middleName,
             ),
-            addresses = com.duckduckgo.pir.impl.store.db.Address(
+            addresses =
+            com.duckduckgo.pir.impl.store.db.Address(
                 city = this.city,
                 state = this.state,
             ),
             birthYear = this.birthYear,
         )
-    }
 }
