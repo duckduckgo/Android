@@ -38,6 +38,31 @@
             android:layout_height="wrap_content"
             android:background="?attr/daxColorToolbar">
 
+            <com.duckduckgo.duckchat.impl.inputscreen.ui.view.InputModeTabLayout
+                android:id="@+id/inputModeSwitch"
+                style="@style/Widget.DuckChat.TabLayout.Rounded"
+                android:layout_width="wrap_content"
+                android:layout_height="@dimen/inputModeSwitchHeight"
+                android:layout_marginTop="@dimen/keyline_2"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constrainedWidth="true">
+
+                <com.google.android.material.tabs.TabItem
+                    android:id="@+id/tabSearch"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout="@layout/view_search_tab_indicator"/>
+
+                <com.google.android.material.tabs.TabItem
+                    android:id="@+id/tabDuckAi"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout="@layout/view_chat_tab_indicator"/>
+
+            </com.duckduckgo.duckchat.impl.inputscreen.ui.view.InputModeTabLayout>
+
             <androidx.appcompat.widget.Toolbar
                 android:id="@+id/toolbar"
                 android:layout_width="0dp"
@@ -50,7 +75,7 @@
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toStartOf="@id/iconsContainer"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/inputModeSwitch"
                 app:popupTheme="@style/Widget.DuckDuckGo.PopUpOverflowMenu">
 
                 <com.google.android.material.card.MaterialCardView
@@ -409,7 +434,7 @@
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toEndOf="@id/toolbar"
-                app:layout_constraintTop_toTopOf="parent">
+                app:layout_constraintTop_toBottomOf="@+id/inputModeSwitch">
 
                 <com.duckduckgo.browser.ui.tabs.NewTabSwitcherButton
                     android:id="@+id/tabsMenu"
