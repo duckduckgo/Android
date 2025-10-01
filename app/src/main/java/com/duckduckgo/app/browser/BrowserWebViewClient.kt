@@ -766,12 +766,6 @@ class BrowserWebViewClient @Inject constructor(
         requestInterceptor.addExemptedMaliciousSite(url, feed)
     }
 
-    suspend fun destroy(webView: DuckDuckGoWebView) {
-        webMessagingPlugins.getPlugins().forEach { plugin ->
-            plugin.unregister(webView)
-        }
-    }
-
     fun postContentScopeMessage(
         eventData: SubscriptionEventData,
         webView: WebView,

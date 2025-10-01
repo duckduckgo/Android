@@ -387,18 +387,6 @@ class BrowserWebViewClientTest {
             assertTrue(fakeMessagingPlugins.plugin.registered)
         }
 
-    @UiThreadTest
-    @Test
-    fun whenDestroyThenRemoveWebMessageListener() =
-        runTest {
-            val mockCallback = mock<WebViewCompatMessageCallback>()
-            val webView = DuckDuckGoWebView(context)
-            testee.configureWebView(webView, mockCallback)
-            assertTrue(fakeMessagingPlugins.plugin.registered)
-            testee.destroy(webView)
-            assertFalse(fakeMessagingPlugins.plugin.registered)
-        }
-
     @Test
     fun whenPostMessageThenCallPostContentScopeMessage() =
         runTest {
