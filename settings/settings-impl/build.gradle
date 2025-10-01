@@ -27,6 +27,11 @@ android {
     anvil {
         generateDaggerFactories = true // default is false
     }
+    testOptions {
+        unitTests {
+            includeAndroidResources = true
+        }
+    }
 }
 
 
@@ -54,4 +59,16 @@ dependencies {
 
     // Dagger
     implementation Google.dagger
+
+    testImplementation Testing.junit4
+    testImplementation "org.mockito.kotlin:mockito-kotlin:_"
+    testImplementation project(path: ':common-test')
+    testImplementation CashApp.turbine
+    testImplementation(KotlinX.coroutines.test) {
+        exclude group: "org.jetbrains.kotlinx", module: "kotlinx-coroutines-debug"
+    }
+    testImplementation "androidx.test.ext:junit-ktx:_"
+    testImplementation AndroidX.lifecycle.runtime.testing
+    testImplementation AndroidX.archCore.testing
+    testImplementation Testing.robolectric
 }
