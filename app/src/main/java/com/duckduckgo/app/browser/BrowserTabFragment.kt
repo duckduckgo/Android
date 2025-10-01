@@ -1121,7 +1121,7 @@ class BrowserTabFragment :
                 InputScreenActivityParams(
                     query = query,
                     tabs = viewModel.tabs.value?.size ?: 0,
-                    isTopOmnibar = omnibar.omnibarPosition == TOP
+                    isTopOmnibar = omnibar.omnibarPosition == TOP,
                 ),
             )
         val enterTransition = browserAndInputScreenTransitionProvider.getInputScreenEnterAnimation(omnibar.omnibarPosition == TOP)

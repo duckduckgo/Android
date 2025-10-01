@@ -315,10 +315,11 @@ class RealDuckChat @Inject constructor(
             cacheUserSettings()
         }
 
-    override suspend fun setEnable3ButtonsOnTopSetting(buttonsOnTop: Boolean) = withContext(dispatchers.io()) {
-        duckChatFeatureRepository.setShowButtonsOnTop(buttonsOnTop)
-        cacheUserSettings()
-    }
+    override suspend fun setEnable3ButtonsOnTopSetting(buttonsOnTop: Boolean) =
+        withContext(dispatchers.io()) {
+            duckChatFeatureRepository.setShowButtonsOnTop(buttonsOnTop)
+            cacheUserSettings()
+        }
 
     override fun isEnabled(): Boolean = isDuckChatFeatureEnabled && isDuckChatUserEnabled
 
@@ -334,9 +335,7 @@ class RealDuckChat @Inject constructor(
 
     override fun observeShowInAddressBarUserSetting(): Flow<Boolean> = duckChatFeatureRepository.observeShowInAddressBar()
 
-    override fun observeShowButtonsOnTopUserSetting(): Flow<Boolean> {
-        return duckChatFeatureRepository.observeShowButtonsOnTop()
-    }
+    override fun observeShowButtonsOnTopUserSetting(): Flow<Boolean> = duckChatFeatureRepository.observeShowButtonsOnTop()
 
     override fun openDuckChatSettings() {
         val intent = globalActivityStarter.startIntent(context, DuckChatSettingsNoParams)
