@@ -51,13 +51,12 @@ class ContentScopeScriptsPostMessageWrapperPlugin @Inject constructor(
                 webMessagingPlugin.postMessage(webView, message)
             } else {
                 jsMessageHelper.sendSubscriptionEvent(
-                    subscriptionEvent =
-                        SubscriptionEvent(
-                            context = webMessagingPlugin.context,
-                            featureName = message.featureName,
-                            subscriptionName = message.subscriptionName,
-                            params = message.params,
-                        ),
+                    subscriptionEvent = SubscriptionEvent(
+                        context = webMessagingPlugin.context,
+                        featureName = message.featureName,
+                        subscriptionName = message.subscriptionName,
+                        params = message.params,
+                    ),
                     callbackName = coreContentScopeScripts.callbackName,
                     secret = coreContentScopeScripts.secret,
                     webView = webView,

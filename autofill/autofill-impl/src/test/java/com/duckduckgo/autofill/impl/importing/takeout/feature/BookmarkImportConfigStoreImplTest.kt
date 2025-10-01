@@ -73,10 +73,9 @@ class BookmarkImportConfigStoreImplTest {
     fun whenJavascriptConfigSpecifiedInConfigThenOverridesDefault() =
         runTest {
             configureFeature(
-                config =
-                    Config(
-                        javascriptConfig = JavaScriptConfig(key = "value", domains = listOf("foo, bar")),
-                    ),
+                config = Config(
+                    javascriptConfig = JavaScriptConfig(key = "value", domains = listOf("foo, bar")),
+                ),
             )
             assertEquals("""{"domains":["foo, bar"],"key":"value"}""", testee.getConfig().javascriptConfigGoogleTakeout)
         }

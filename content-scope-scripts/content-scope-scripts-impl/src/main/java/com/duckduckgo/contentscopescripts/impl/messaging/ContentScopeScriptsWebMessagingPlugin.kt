@@ -22,7 +22,6 @@ import androidx.annotation.VisibleForTesting
 import androidx.lifecycle.findViewTreeLifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import androidx.webkit.JavaScriptReplyProxy
-import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.browser.api.webviewcompat.WebViewCompatWrapper
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.contentscopescripts.api.WebViewCompatContentScopeJsMessageHandlersPlugin
