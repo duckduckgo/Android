@@ -25,4 +25,6 @@ import android.webkit.WebView
  */
 interface AddDocumentStartJavaScriptPlugin {
     suspend fun addDocumentStartJavaScript(webView: WebView)
+
+    val context: String
 }

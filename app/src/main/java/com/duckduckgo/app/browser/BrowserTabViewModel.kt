@@ -321,6 +321,10 @@ import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.history.api.NavigationHistory
 import com.duckduckgo.js.messaging.api.AddDocumentStartJavaScriptPlugin
 import com.duckduckgo.js.messaging.api.JsCallbackData
+import com.duckduckgo.js.messaging.api.PostMessageWrapperPlugin
+import com.duckduckgo.js.messaging.api.SubscriptionEventData
+import com.duckduckgo.js.messaging.api.WebMessagingPlugin
+import com.duckduckgo.js.messaging.api.WebViewCompatMessageCallback
 import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.Feed
 import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.Feed.MALWARE
 import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.Feed.PHISHING
@@ -486,6 +490,8 @@ class BrowserTabViewModel @Inject constructor(
     private val vpnMenuStateProvider: VpnMenuStateProvider,
     private val webViewCompatWrapper: WebViewCompatWrapper,
     private val addDocumentStartJavascriptPlugins: PluginPoint<AddDocumentStartJavaScriptPlugin>,
+    private val webMessagingPlugins: PluginPoint<WebMessagingPlugin>,
+    private val postMessageWrapperPlugins: PluginPoint<PostMessageWrapperPlugin>,
 ) : ViewModel(),
     WebViewClientListener,
     EditSavedSiteListener,
@@ -1913,6 +1919,7 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     override fun pageFinished(
+        webView: WebView,
         webViewNavigationState: WebViewNavigationState,
         url: String?,
     ) {
@@ -1925,6 +1932,11 @@ class BrowserTabViewModel @Inject constructor(
             }
 
             evaluateSerpLogoState(url)
+        }
+        viewModelScope.launch(dispatchers.io()) {
+            if (!androidBrowserConfig.onlyUpdateScriptOnProtectionsChanged().isEnabled()) {
+                addDocumentStartJavaScript(webView)
+            }
         }
     }
 
@@ -4207,13 +4219,54 @@ class BrowserTabViewModel @Inject constructor(
         }
     }
 
-    override fun addDocumentStartJavaScript(webView: WebView) {
+    fun configureWebView(
+        webView: DuckDuckGoWebView,
+        callback: WebViewCompatMessageCallback?,
+    ) {
         viewModelScope.launch {
-            addDocumentStartJavascriptPlugins.getPlugins().forEach {
-                it.addDocumentStartJavaScript(
-                    webView,
-                )
+            addDocumentStartJavaScript(webView)
+
+            callback?.let {
+                webMessagingPlugins.getPlugins().forEach { plugin ->
+                    plugin.register(callback, webView)
+                }
             }
+        }
+    }
+
+    fun postContentScopeMessage(
+        eventData: SubscriptionEventData,
+        webView: WebView,
+    ) {
+        postMessageWrapperPlugins
+            .getPlugins()
+            .firstOrNull { it.context == "contentScopeScripts" }
+            ?.postMessage(eventData, webView)
+    }
+
+    private suspend fun addDocumentStartJavaScript(webView: WebView) {
+        addDocumentStartJavascriptPlugins.getPlugins().forEach {
+            it.addDocumentStartJavaScript(
+                webView,
+            )
+        }
+    }
+
+    override suspend fun destroy(webView: DuckDuckGoWebView) {
+        webMessagingPlugins.getPlugins().forEach { plugin ->
+            plugin.unregister(webView)
+        }
+    }
+
+    suspend fun privacyProtectionsUpdated(webView: WebView) {
+        if (withContext(dispatchers.io()) { androidBrowserConfig.onlyUpdateScriptOnProtectionsChanged().isEnabled() }) {
+            addDocumentStartJavascriptPlugins
+                .getPlugins()
+                .filter { plugin ->
+                    (plugin.context == "contentScopeScripts")
+                }.forEach {
+                    it.addDocumentStartJavaScript(webView)
+                }
         }
     }
 

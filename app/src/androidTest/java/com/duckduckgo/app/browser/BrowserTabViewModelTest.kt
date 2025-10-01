@@ -41,6 +41,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import androidx.room.Room
+import androidx.test.annotation.UiThreadTest
 import androidx.test.filters.SdkSuppress
 import androidx.test.platform.app.InstrumentationRegistry.getInstrumentation
 import com.duckduckgo.adclick.api.AdClickManager
@@ -256,6 +257,10 @@ import com.duckduckgo.history.api.HistoryEntry.VisitedPage
 import com.duckduckgo.history.api.NavigationHistory
 import com.duckduckgo.js.messaging.api.AddDocumentStartJavaScriptPlugin
 import com.duckduckgo.js.messaging.api.JsCallbackData
+import com.duckduckgo.js.messaging.api.PostMessageWrapperPlugin
+import com.duckduckgo.js.messaging.api.SubscriptionEventData
+import com.duckduckgo.js.messaging.api.WebMessagingPlugin
+import com.duckduckgo.js.messaging.api.WebViewCompatMessageCallback
 import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.Feed
 import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.Feed.MALWARE
 import com.duckduckgo.newtabpage.impl.pixels.NewTabPixels
@@ -607,6 +612,8 @@ class BrowserTabViewModelTest {
     private val mockWebView: WebView = mock()
 
     private val fakeAddDocumentStartJavaScriptPlugins = FakeAddDocumentStartJavaScriptPluginPoint()
+    private val fakeMessagingPlugins = FakeWebMessagingPluginPoint()
+    private val fakePostMessageWrapperPlugins = FakePostMessageWrapperPluginPoint()
 
     @Before
     fun before() =
@@ -833,6 +840,8 @@ class BrowserTabViewModelTest {
                     vpnMenuStateProvider = mockVpnMenuStateProvider,
                     webViewCompatWrapper = mockWebViewCompatWrapper,
                     addDocumentStartJavascriptPlugins = fakeAddDocumentStartJavaScriptPlugins,
+                    webMessagingPlugins = fakeMessagingPlugins,
+                    postMessageWrapperPlugins = fakePostMessageWrapperPlugins,
                 )
 
             testee.loadData("abc", null, false, false)
@@ -6354,7 +6363,7 @@ class BrowserTabViewModelTest {
         whenever(site.maliciousSiteStatus).thenReturn(PHISHING)
         testee.siteLiveData.value = site
 
-        testee.pageFinished(WebViewNavigationState(mockStack, 100), exampleUrl)
+        testee.pageFinished(mockWebView, WebViewNavigationState(mockStack, 100), exampleUrl)
 
         assertEquals("http://malicious.com", testee.siteLiveData.value?.url)
         assertEquals(PHISHING, testee.siteLiveData.value?.maliciousSiteStatus)
@@ -6964,9 +6973,35 @@ class BrowserTabViewModelTest {
             val url = "https://example.com"
             val webViewNavState = WebViewNavigationState(mockStack, 100)
 
-            testee.pageFinished(webViewNavState, url)
+            testee.pageFinished(mockWebView, webViewNavState, url)
 
             verify(mockOnboardingDesignExperimentManager).onWebPageFinishedLoading(url)
+        }
+
+    @Test
+    fun whenPageFinishedAndOnlyUpdateScriptOnProtectionsChangedDisabledThenAddDocumentStartJavaScriptOnlyToCSS() =
+        runTest {
+            val url = "https://example.com"
+            val webViewNavState = WebViewNavigationState(mockStack, 100)
+            fakeAndroidConfigBrowserFeature.onlyUpdateScriptOnProtectionsChanged().setRawStoredState(State(false))
+
+            testee.pageFinished(mockWebView, webViewNavState, url)
+
+            assertEquals(1, fakeAddDocumentStartJavaScriptPlugins.cssPlugin.countInitted)
+            assertEquals(1, fakeAddDocumentStartJavaScriptPlugins.otherPlugin.countInitted)
+        }
+
+    @Test
+    fun whenPageFinishedAndOnlyUpdateScriptOnProtectionsChangedEnabledThenDoNotCallAddDocumentStartJavaScript() =
+        runTest {
+            val url = "https://example.com"
+            val webViewNavState = WebViewNavigationState(mockStack, 100)
+            fakeAndroidConfigBrowserFeature.onlyUpdateScriptOnProtectionsChanged().setRawStoredState(State(true))
+
+            testee.pageFinished(mockWebView, webViewNavState, url)
+
+            assertEquals(0, fakeAddDocumentStartJavaScriptPlugins.cssPlugin.countInitted)
+            assertEquals(0, fakeAddDocumentStartJavaScriptPlugins.otherPlugin.countInitted)
         }
 
     @Test
@@ -7397,7 +7432,7 @@ class BrowserTabViewModelTest {
         val ddgUrl = "https://duckduckgo.com/?q=test"
         val webViewNavState = WebViewNavigationState(mockStack, 100)
 
-        testee.pageFinished(webViewNavState, ddgUrl)
+        testee.pageFinished(mockWebView, webViewNavState, ddgUrl)
 
         verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
         val commands = commandCaptor.allValues
@@ -7413,7 +7448,7 @@ class BrowserTabViewModelTest {
         val ddgUrl = "https://duckduckgo.com/?q=test"
         val webViewNavState = WebViewNavigationState(mockStack, 100)
 
-        testee.pageFinished(webViewNavState, ddgUrl)
+        testee.pageFinished(mockWebView, webViewNavState, ddgUrl)
 
         val commands = commandCaptor.allValues
         assertFalse(
@@ -7428,7 +7463,7 @@ class BrowserTabViewModelTest {
         val nonDdgUrl = "https://example.com/search?q=test"
         val webViewNavState = WebViewNavigationState(mockStack, 100)
 
-        testee.pageFinished(webViewNavState, nonDdgUrl)
+        testee.pageFinished(mockWebView, webViewNavState, nonDdgUrl)
 
         val commands = commandCaptor.allValues
         assertFalse(
@@ -7444,19 +7479,62 @@ class BrowserTabViewModelTest {
         val webViewNavState = WebViewNavigationState(mockStack, 100)
 
         testee.omnibarViewState.value = omnibarViewState().copy(serpLogo = SerpLogo.EasterEgg("some-logo-url"))
-        testee.pageFinished(webViewNavState, nonDdgUrl)
+        testee.pageFinished(mockWebView, webViewNavState, nonDdgUrl)
 
         assertNull("SERP logo should be cleared when navigating to non-DuckDuckGo URL", omnibarViewState().serpLogo)
     }
 
+    @UiThreadTest
     @Test
-    fun whenConfigureWebViewThenCallAddDocumentStartJavaScript() {
-        assertEquals(0, fakeAddDocumentStartJavaScriptPlugins.plugin.countInitted)
+    fun whenConfigureWebViewThenCallAddDocumentStartJavaScript() =
+        runTest {
+            val mockCallback = mock<WebViewCompatMessageCallback>()
+            val webView = DuckDuckGoWebView(context)
+            assertEquals(0, fakeAddDocumentStartJavaScriptPlugins.cssPlugin.countInitted)
 
-        testee.addDocumentStartJavaScript(mockWebView)
+            testee.configureWebView(webView, mockCallback)
 
-        assertEquals(1, fakeAddDocumentStartJavaScriptPlugins.plugin.countInitted)
-    }
+            assertEquals(1, fakeAddDocumentStartJavaScriptPlugins.cssPlugin.countInitted)
+        }
+
+    @UiThreadTest
+    @Test
+    fun whenConfigureWebViewThenCallAddMessageListener() =
+        runTest {
+            val mockCallback = mock<WebViewCompatMessageCallback>()
+            val webView = DuckDuckGoWebView(context)
+            assertFalse(fakeMessagingPlugins.plugin.registered)
+
+            testee.configureWebView(webView, mockCallback)
+
+            assertTrue(fakeMessagingPlugins.plugin.registered)
+        }
+
+    @UiThreadTest
+    @Test
+    fun whenDestroyThenRemoveWebMessageListener() =
+        runTest {
+            val mockCallback = mock<WebViewCompatMessageCallback>()
+            val webView = DuckDuckGoWebView(context)
+            testee.configureWebView(webView, mockCallback)
+            assertTrue(fakeMessagingPlugins.plugin.registered)
+            testee.destroy(webView)
+            assertFalse(fakeMessagingPlugins.plugin.registered)
+        }
+
+    @UiThreadTest
+    @Test
+    fun whenPostMessageThenCallPostContentScopeMessage() =
+        runTest {
+            val data = SubscriptionEventData("feature", "method", JSONObject())
+            val webView = DuckDuckGoWebView(context)
+
+            assertFalse(fakePostMessageWrapperPlugins.plugin.postMessageCalled)
+
+            testee.postContentScopeMessage(data, webView)
+
+            assertTrue(fakePostMessageWrapperPlugins.plugin.postMessageCalled)
+        }
 
     private fun aCredential(): LoginCredentials = LoginCredentials(domain = null, username = null, password = null)
 
@@ -7745,7 +7823,9 @@ class BrowserTabViewModelTest {
         override fun getCustomHeaders(url: String): Map<String, String> = headers
     }
 
-    class FakeAddDocumentStartJavaScriptPlugin : AddDocumentStartJavaScriptPlugin {
+    class FakeAddDocumentStartJavaScriptPlugin(
+        override val context: String,
+    ) : AddDocumentStartJavaScriptPlugin {
         var countInitted = 0
             private set
 
@@ -7755,8 +7835,61 @@ class BrowserTabViewModelTest {
     }
 
     class FakeAddDocumentStartJavaScriptPluginPoint : PluginPoint<AddDocumentStartJavaScriptPlugin> {
-        val plugin = FakeAddDocumentStartJavaScriptPlugin()
+        val cssPlugin = FakeAddDocumentStartJavaScriptPlugin("contentScopeScripts")
+        val otherPlugin = FakeAddDocumentStartJavaScriptPlugin("test")
 
-        override fun getPlugins() = listOf(plugin)
+        override fun getPlugins() = listOf(cssPlugin, otherPlugin)
+    }
+
+    class FakeWebMessagingPlugin : WebMessagingPlugin {
+        var registered = false
+            private set
+
+        override suspend fun unregister(webView: WebView) {
+            registered = false
+        }
+
+        override suspend fun register(
+            jsMessageCallback: WebViewCompatMessageCallback,
+            webView: WebView,
+        ) {
+            registered = true
+        }
+
+        override suspend fun postMessage(
+            webView: WebView,
+            subscriptionEventData: SubscriptionEventData,
+        ) {
+        }
+
+        override val context: String
+            get() = "test"
+    }
+
+    class FakeWebMessagingPluginPoint : PluginPoint<WebMessagingPlugin> {
+        val plugin = FakeWebMessagingPlugin()
+
+        override fun getPlugins(): Collection<WebMessagingPlugin> = listOf(plugin)
+    }
+
+    class FakePostMessageWrapperPlugin : PostMessageWrapperPlugin {
+        var postMessageCalled = false
+            private set
+
+        override fun postMessage(
+            message: SubscriptionEventData,
+            webView: WebView,
+        ) {
+            postMessageCalled = true
+        }
+
+        override val context: String
+            get() = "contentScopeScripts"
+    }
+
+    class FakePostMessageWrapperPluginPoint : PluginPoint<PostMessageWrapperPlugin> {
+        val plugin = FakePostMessageWrapperPlugin()
+
+        override fun getPlugins(): Collection<PostMessageWrapperPlugin> = listOf(plugin)
     }
 }

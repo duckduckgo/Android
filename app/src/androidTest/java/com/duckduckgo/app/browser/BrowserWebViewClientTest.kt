@@ -165,8 +165,6 @@ class BrowserWebViewClientTest {
     private val mockUriLoadedManager: UriLoadedManager = mock()
     private val mockAndroidBrowserConfigFeature: AndroidBrowserConfigFeature = mock()
     private val mockContentScopeExperiments: ContentScopeExperiments = mock()
-    private val fakeMessagingPlugins = FakeWebMessagingPluginPoint()
-    private val fakePostMessageWrapperPlugins = FakePostMessageWrapperPluginPoint()
     private val mockAndroidFeaturesHeaderPlugin =
         AndroidFeaturesHeaderPlugin(
             mockDuckDuckGoUrlDetector,
@@ -218,8 +216,6 @@ class BrowserWebViewClientTest {
                     mockAndroidFeaturesHeaderPlugin,
                     mockDuckChat,
                     mockContentScopeExperiments,
-                    fakeMessagingPlugins,
-                    fakePostMessageWrapperPlugins,
                 )
             testee.webViewClientListener = listener
             whenever(webResourceRequest.url).thenReturn(Uri.EMPTY)
@@ -332,7 +328,7 @@ class BrowserWebViewClientTest {
     @Test
     fun whenOnPageFinishedCalledThenListenerNotified() {
         testee.onPageFinished(webView, EXAMPLE_URL)
-        verify(listener).pageFinished(any(), eq(EXAMPLE_URL))
+        verify(listener).pageFinished(eq(webView), any(), eq(EXAMPLE_URL))
     }
 
     @UiThreadTest
@@ -355,47 +351,13 @@ class BrowserWebViewClientTest {
 
     @UiThreadTest
     @Test
-    fun whenConfigureWebViewThenInjectJsCode() =
-        runTest {
-            val mockCallback = mock<WebViewCompatMessageCallback>()
-            val webView = DuckDuckGoWebView(context)
-
-            testee.configureWebView(webView, mockCallback)
-
-            verify(listener).addDocumentStartJavaScript(webView)
-        }
-
-    @UiThreadTest
-    @Test
-    fun whenPageFinishedThenInjectJsCode() =
+    fun whenPageFinishedThenCallListenerMethod() =
         runTest {
             val webView = DuckDuckGoWebView(context)
 
             testee.onPageFinished(webView, "example.com")
 
-            verify(listener).addDocumentStartJavaScript(webView)
-        }
-
-    @UiThreadTest
-    @Test
-    fun whenConfigureWebViewThenAddWebMessageListener() =
-        runTest {
-            assertFalse(fakeMessagingPlugins.plugin.registered)
-            val mockCallback = mock<WebViewCompatMessageCallback>()
-            testee.configureWebView(DuckDuckGoWebView(context), mockCallback)
-            assertTrue(fakeMessagingPlugins.plugin.registered)
-        }
-
-    @Test
-    fun whenPostMessageThenCallPostContentScopeMessage() =
-        runTest {
-            val data = SubscriptionEventData("feature", "method", JSONObject())
-
-            assertFalse(fakePostMessageWrapperPlugins.plugin.postMessageCalled)
-
-            testee.postContentScopeMessage(data, webView)
-
-            assertTrue(fakePostMessageWrapperPlugins.plugin.postMessageCalled)
+            verify(listener).pageFinished(eq(webView), any(), eq("example.com"))
         }
 
     @UiThreadTest
@@ -1340,57 +1302,5 @@ class BrowserWebViewClientTest {
 
     companion object {
         const val EXAMPLE_URL = "https://example.com"
-    }
-
-    class FakeWebMessagingPlugin : WebMessagingPlugin {
-        var registered = false
-            private set
-
-        override suspend fun unregister(webView: WebView) {
-            registered = false
-        }
-
-        override suspend fun register(
-            jsMessageCallback: WebViewCompatMessageCallback,
-            webView: WebView,
-        ) {
-            registered = true
-        }
-
-        override suspend fun postMessage(
-            webView: WebView,
-            subscriptionEventData: SubscriptionEventData,
-        ) {
-        }
-
-        override val context: String
-            get() = "test"
-    }
-
-    class FakeWebMessagingPluginPoint : PluginPoint<WebMessagingPlugin> {
-        val plugin = FakeWebMessagingPlugin()
-
-        override fun getPlugins(): Collection<WebMessagingPlugin> = listOf(plugin)
-    }
-
-    class FakePostMessageWrapperPlugin : PostMessageWrapperPlugin {
-        var postMessageCalled = false
-            private set
-
-        override fun postMessage(
-            message: SubscriptionEventData,
-            webView: WebView,
-        ) {
-            postMessageCalled = true
-        }
-
-        override val context: String
-            get() = "contentScopeScripts"
-    }
-
-    class FakePostMessageWrapperPluginPoint : PluginPoint<PostMessageWrapperPlugin> {
-        val plugin = FakePostMessageWrapperPlugin()
-
-        override fun getPlugins(): Collection<PostMessageWrapperPlugin> = listOf(plugin)
     }
 }

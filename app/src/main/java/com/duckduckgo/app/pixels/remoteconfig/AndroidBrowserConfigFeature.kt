@@ -20,6 +20,8 @@ import com.duckduckgo.anvil.annotations.ContributesRemoteFeature
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.feature.toggles.api.Toggle.DefaultFeatureValue
+import com.duckduckgo.feature.toggles.api.Toggle.DefaultFeatureValue.FALSE
+import com.duckduckgo.feature.toggles.api.Toggle.DefaultFeatureValue.TRUE
 
 /**
  * This is the class that represents the browser feature flags
@@ -29,7 +31,6 @@ import com.duckduckgo.feature.toggles.api.Toggle.DefaultFeatureValue
     featureName = "androidBrowserConfig",
 )
 interface AndroidBrowserConfigFeature {
-
     /**
      * @return `true` when the remote config has the global "androidBrowserConfig" feature flag enabled
      * If the remote feature is not present defaults to `false`
@@ -187,4 +188,7 @@ interface AndroidBrowserConfigFeature {
      */
     @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
     fun vpnMenuItem(): Toggle
+
+    @Toggle.DefaultValue(FALSE)
+    fun onlyUpdateScriptOnProtectionsChanged(): Toggle
 }
