@@ -91,8 +91,6 @@ interface DuckChatInternal : DuckChat {
     /**
      * Temporary setting to enable 3 buttons in input screen
      */
-    suspend fun setEnable3ButtonsOnTopSetting(enabled: Boolean)
-
     /**
      * Observes whether DuckChat is user enabled or disabled.
      */
@@ -112,11 +110,6 @@ interface DuckChatInternal : DuckChat {
      * Observes whether DuckChat should be shown in address bar based on user settings only.
      */
     fun observeShowInAddressBarUserSetting(): Flow<Boolean>
-
-    /**
-     * Observes whether DuckChat should be shown in address bar based on user settings only.
-     */
-    fun observeShowButtonsOnTopUserSetting(): Flow<Boolean>
 
     /**
      * Opens DuckChat settings.
@@ -261,7 +254,6 @@ class RealDuckChat @Inject constructor(
     private val _showOmnibarShortcutInAllStates = MutableStateFlow(false)
     private val _showNewAddressBarOptionChoiceScreen = MutableStateFlow(false)
     private val _showClearDuckAIChatHistory = MutableStateFlow(true)
-    private val _showButtonsOnTop = MutableStateFlow(true)
     private val _chatState = MutableStateFlow(ChatState.HIDE)
     private val keepSession = MutableStateFlow(false)
 
@@ -315,12 +307,6 @@ class RealDuckChat @Inject constructor(
             cacheUserSettings()
         }
 
-    override suspend fun setEnable3ButtonsOnTopSetting(buttonsOnTop: Boolean) =
-        withContext(dispatchers.io()) {
-            duckChatFeatureRepository.setShowButtonsOnTop(buttonsOnTop)
-            cacheUserSettings()
-        }
-
     override fun isEnabled(): Boolean = isDuckChatFeatureEnabled && isDuckChatUserEnabled
 
     override fun isInputScreenFeatureAvailable(): Boolean = duckAiInputScreen
@@ -334,8 +320,6 @@ class RealDuckChat @Inject constructor(
     override fun observeShowInBrowserMenuUserSetting(): Flow<Boolean> = duckChatFeatureRepository.observeShowInBrowserMenu()
 
     override fun observeShowInAddressBarUserSetting(): Flow<Boolean> = duckChatFeatureRepository.observeShowInAddressBar()
-
-    override fun observeShowButtonsOnTopUserSetting(): Flow<Boolean> = duckChatFeatureRepository.observeShowButtonsOnTop()
 
     override fun openDuckChatSettings() {
         val intent = globalActivityStarter.startIntent(context, DuckChatSettingsNoParams)
@@ -397,8 +381,6 @@ class RealDuckChat @Inject constructor(
     override val showNewAddressBarOptionChoiceScreen: StateFlow<Boolean> = _showNewAddressBarOptionChoiceScreen.asStateFlow()
 
     override val showClearDuckAIChatHistory: StateFlow<Boolean> = _showClearDuckAIChatHistory.asStateFlow()
-
-    override val showButtonsOnTop: StateFlow<Boolean> = _showButtonsOnTop.asStateFlow()
 
     override val chatState: StateFlow<ChatState> = _chatState.asStateFlow()
 
@@ -666,9 +648,6 @@ class RealDuckChat @Inject constructor(
 
             val showClearChatHistory = clearChatHistory
             _showClearDuckAIChatHistory.emit(showClearChatHistory)
-
-            val showButtonsOnTop = duckChatFeatureRepository.shouldShowButtonsOnTop()
-            _showButtonsOnTop.emit(showButtonsOnTop)
         }
 
     companion object {
