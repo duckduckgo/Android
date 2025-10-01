@@ -4252,12 +4252,6 @@ class BrowserTabViewModel @Inject constructor(
         }
     }
 
-    override suspend fun destroy(webView: DuckDuckGoWebView) {
-        webMessagingPlugins.getPlugins().forEach { plugin ->
-            plugin.unregister(webView)
-        }
-    }
-
     suspend fun privacyProtectionsUpdated(webView: WebView) {
         if (withContext(dispatchers.io()) { androidBrowserConfig.onlyUpdateScriptOnProtectionsChanged().isEnabled() }) {
             addDocumentStartJavascriptPlugins
