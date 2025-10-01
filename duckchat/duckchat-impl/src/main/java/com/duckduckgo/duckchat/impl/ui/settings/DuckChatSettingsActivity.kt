@@ -33,7 +33,6 @@ import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.tabs.BrowserNav
 import com.duckduckgo.browser.api.ui.BrowserScreens.FeedbackActivityWithEmptyParams
-import com.duckduckgo.browser.api.ui.BrowserScreens.WebViewActivityWithParams
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.spans.DuckDuckGoClickableSpan
 import com.duckduckgo.common.ui.store.AppTheme
@@ -125,11 +124,11 @@ class DuckChatSettingsActivity : DuckDuckGoActivity() {
             val orientation = resources.configuration.orientation
             binding.duckAiInputScreenToggleContainer.updatePadding(
                 left =
-                    if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
-                        0
-                    } else {
-                        offset
-                    },
+                if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
+                    0
+                } else {
+                    offset
+                },
             )
             binding.duckAiInputScreenDescription.updatePadding(left = offset)
             binding.duckAiShortcuts.updatePadding(left = offset)
@@ -151,20 +150,20 @@ class DuckChatSettingsActivity : DuckDuckGoActivity() {
 
         binding.duckChatSettingsText.addClickableSpan(
             textSequence =
-                if (viewState.isRebrandingAiFeaturesEnabled) {
-                    getText(R.string.duck_chat_settings_activity_description_rebranding)
-                } else {
-                    getText(R.string.duck_chat_settings_activity_description)
-                },
+            if (viewState.isRebrandingAiFeaturesEnabled) {
+                getText(R.string.duck_chat_settings_activity_description_rebranding)
+            } else {
+                getText(R.string.duck_chat_settings_activity_description)
+            },
             spans =
-                listOf(
-                    "learn_more_link" to
-                        object : DuckDuckGoClickableSpan() {
-                            override fun onClick(widget: View) {
-                                viewModel.duckChatLearnMoreClicked()
-                            }
-                        },
-                ),
+            listOf(
+                "learn_more_link" to
+                    object : DuckDuckGoClickableSpan() {
+                        override fun onClick(widget: View) {
+                            viewModel.duckChatLearnMoreClicked()
+                        }
+                    },
+            ),
         )
 
         binding.duckAiInputScreenToggleContainer.isVisible = viewState.shouldShowInputScreenToggle
@@ -177,14 +176,14 @@ class DuckChatSettingsActivity : DuckDuckGoActivity() {
         binding.duckAiInputScreenDescription.addClickableSpan(
             textSequence = getText(R.string.input_screen_user_pref_description),
             spans =
-                listOf(
-                    "share_feedback" to
-                        object : DuckDuckGoClickableSpan() {
-                            override fun onClick(widget: View) {
-                                viewModel.duckAiInputScreenShareFeedbackClicked()
-                            }
-                        },
-                ),
+            listOf(
+                "share_feedback" to
+                    object : DuckDuckGoClickableSpan() {
+                        override fun onClick(widget: View) {
+                            viewModel.duckAiInputScreenShareFeedbackClicked()
+                        }
+                    },
+            ),
         )
 
         binding.duckAiShortcuts.isVisible = viewState.shouldShowShortcuts
