@@ -99,7 +99,7 @@
     <!-- Opening external apps -->
     <string name="openExternalApp">Otvori vanjsku aplikaciju</string>
     <string name="launchingExternalApp">Otvori u drugoj aplikaciji</string>
-    <string name="confirmOpenExternalApp">Želiš li napustiti DuckDuckGo da bi predledao/la ovaj sadržaj?</string>
+    <string name="confirmOpenExternalApp">Želiš li napustiti DuckDuckGo da bi pregledao/la ovaj sadržaj?</string>
     <string name="unableToOpenLink">Nije moguće otvoriti ovu vrstu poveznice</string>
 
     <!-- Tabs -->
