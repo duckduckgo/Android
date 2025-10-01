@@ -143,7 +143,7 @@ class RealPirDetachedWebViewProvider @Inject constructor() :
                     ) {
                         logcat {
                             """
-                            PIR-SCAN: webview onReceivedError requestedUrl $requestedUrl for url ${request.url} 
+                            PIR-SCAN: webview onReceivedError requestedUrl $requestedUrl for url ${request.url}
                             mainframe ${request.isForMainFrame}
                             """.trimIndent()
                         }

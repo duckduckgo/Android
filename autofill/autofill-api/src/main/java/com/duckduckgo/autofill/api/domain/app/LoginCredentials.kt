@@ -37,7 +37,7 @@ data class LoginCredentials(
     override fun toString(): String {
         return """
             LoginCredentials(
-                id=$id, domain=$domain, username=$username, password=********, domainTitle=$domainTitle, 
+                id=$id, domain=$domain, username=$username, password=********, domainTitle=$domainTitle,
                 lastUpdatedMillis=$lastUpdatedMillis, lastUsedMillis=$lastUsedMillis, notesLength=${notes?.length ?: 0}
             )
         """.trimIndent()

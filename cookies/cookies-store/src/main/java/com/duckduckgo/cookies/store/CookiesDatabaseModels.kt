@@ -1,4 +1,4 @@
-// ktlint-disable filename
+
 /*
  * Copyright (c) 2022 DuckDuckGo
  *
@@ -14,6 +14,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+@file:Suppress("ktlint:standard:filename")
+
 package com.duckduckgo.cookies.store
 
 import androidx.room.Entity

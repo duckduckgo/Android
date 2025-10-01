@@ -226,7 +226,8 @@ class TrackingProtectionExclusionListActivity :
             )
 
             is Command.LaunchFeedback -> reportBreakage.launch(command.reportBreakageScreen)
-            else -> { /* noop */
+            else -> {
+                /* noop */
             }
         }
     }

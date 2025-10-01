@@ -133,7 +133,7 @@ class SavedSitesSyncPersister @Inject constructor(
         }
         logcat(INFO) {
             """
-            Sync-Bookmarks: updating client last_modified from ${savedSitesSyncStore.clientModifiedSince} 
+            Sync-Bookmarks: updating client last_modified from ${savedSitesSyncStore.clientModifiedSince}
             to ${savedSitesSyncStore.startTimeStamp}
             """.trimIndent()
         }

@@ -85,7 +85,7 @@ class RealAutofillProviderSuggestions @Inject constructor(
             val credentials = loginCredentials(nodeToAutofill)
             logcat(INFO) {
                 """
-                    DDGAutofillService suggesting credentials for ${fieldsToAutofill.autofillId}credentials: 
+                    DDGAutofillService suggesting credentials for ${fieldsToAutofill.autofillId}credentials:
                     ${credentials.joinToString(separator = "\n")}
                 """.trimIndent()
             }

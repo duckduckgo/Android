@@ -162,7 +162,7 @@ class ContributeToActivityStarterCodeGenerator : CodeGenerator {
             )
             .addCode(
                 """
-                    return null            
+                    return null
                 """.trimIndent(),
             )
             .build()
@@ -184,12 +184,12 @@ class ContributeToActivityStarterCodeGenerator : CodeGenerator {
                     if (screenName.isNullOrEmpty()) {
                         return null
                     }
-                    
+
                     val definedScreenName = %S
                     if (definedScreenName.isNullOrEmpty()) {
                         return null
                     }
-                    
+
                     return if (screenName == definedScreenName) {
                         if (deeplinkActivityParams.jsonArguments.isEmpty()) {
                             val instance = tryCreateObjectInstance(%T::class.java)

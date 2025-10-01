@@ -41,7 +41,7 @@ class WgTunnelTest {
         DNS = ${serverData.gateway}
         MTU = 1280
         PrivateKey = ${keys.privateKey.toBase64()}
-        
+
         [Peer]
         AllowedIPs = 0.0.0.0/0, ::/0
         Endpoint = ${serverData.publicEndpoint}

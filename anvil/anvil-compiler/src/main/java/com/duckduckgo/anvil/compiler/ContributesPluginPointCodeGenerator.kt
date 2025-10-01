@@ -107,7 +107,7 @@ class ContributesPluginPointCodeGenerator : CodeGenerator {
                                             .map { it.value }
                                             .toMutableList()
                                             .apply {
-                                                addAll(setPlugins.toList().sortedBy { it.javaClass.name })                                            
+                                                addAll(setPlugins.toList().sortedBy { it.javaClass.name })
                                             }
                                         """.trimIndent(),
                                     )

@@ -38,7 +38,7 @@ class RealNetworkProtectionRepositoryTest {
         DNS = 1.1.1.1
         MTU = 1280
         PrivateKey = ${keys.privateKey.toBase64()}
-        
+
         [Peer]
         AllowedIPs = 0.0.0.0/0, 0.0.0.0/5, 8.0.0.0/7
         Endpoint = 1.1.1.1:443

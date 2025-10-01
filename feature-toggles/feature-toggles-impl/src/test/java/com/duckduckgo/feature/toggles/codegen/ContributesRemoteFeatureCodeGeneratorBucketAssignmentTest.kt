@@ -94,7 +94,7 @@ class ContributesRemoteFeatureCodeGeneratorBucketAssignmentTest(private val test
                                 "steps": [
                                     {
                                         "percent": ${testCase.rollout}
-                                    }                    
+                                    }
                                 ]
                             }
                         }

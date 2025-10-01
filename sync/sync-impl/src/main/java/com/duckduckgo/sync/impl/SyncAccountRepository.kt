@@ -491,9 +491,9 @@ class AppSyncAccountRepository @Inject constructor(
 
                 logcat(VERBOSE) {
                     """
-                    Sync-exchange: We have received the other device's details. 
-                    name:${response.deviceName}, 
-                    keyId:${response.keyId}, 
+                    Sync-exchange: We have received the other device's details.
+                    name:${response.deviceName},
+                    keyId:${response.keyId},
                     public key: ${response.publicKey}
                     """.trimIndent()
                 }

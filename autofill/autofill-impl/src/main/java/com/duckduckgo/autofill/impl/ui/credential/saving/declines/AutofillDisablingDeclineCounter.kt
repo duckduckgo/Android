@@ -126,8 +126,8 @@ class AutofillDisablingDeclineCounter @Inject constructor(
 
             logcat {
                 """
-                    User declined to save credentials ${autofillPrefsStore.autofillDeclineCount} times globally from all sessions. 
-                    Prompted to disable before: $promptedToDisablePreviously. 
+                    User declined to save credentials ${autofillPrefsStore.autofillDeclineCount} times globally from all sessions.
+                    Prompted to disable before: $promptedToDisablePreviously.
                     Should prompt to disable: $shouldOffer
                 """.trimIndent()
             }
@@ -141,8 +141,8 @@ class AutofillDisablingDeclineCounter @Inject constructor(
     private suspend fun determineIfDeclineCounterIsActive(): Boolean {
         logcat {
             """
-                Autofill: declineCounterIsActive? 
-                monitorDeclineCounts = ${autofillPrefsStore.monitorDeclineCounts}, 
+                Autofill: declineCounterIsActive?
+                monitorDeclineCounts = ${autofillPrefsStore.monitorDeclineCounts},
                 autofillStateSetByUser = ${autofillPrefsStore.autofillStateSetByUser}
             """.trimIndent()
         }

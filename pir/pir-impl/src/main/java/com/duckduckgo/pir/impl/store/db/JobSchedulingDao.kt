@@ -47,8 +47,8 @@ interface JobSchedulingDao {
 
     @Query(
         """
-        UPDATE pir_scan_job_record 
-        SET status = :newStatus, lastScanDateInMillis = :newLastScanDateMillis 
+        UPDATE pir_scan_job_record
+        SET status = :newStatus, lastScanDateInMillis = :newLastScanDateMillis
         WHERE brokerName = :brokerName AND userProfileId = :profileQueryId
     """,
     )

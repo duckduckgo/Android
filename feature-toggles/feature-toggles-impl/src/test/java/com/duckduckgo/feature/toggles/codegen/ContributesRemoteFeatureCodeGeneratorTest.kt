@@ -529,16 +529,16 @@ class ContributesRemoteFeatureCodeGeneratorTest {
                     "features": {
                         "internalDefaultTrue": {
                             "state": "enabled"
-                        }, 
+                        },
                         "defaultTrue": {
                             "state": "enabled"
                         },
                         "internalDefaultFalse": {
                             "state": "enabled"
-                        }, 
+                        },
                         "defaultFalse": {
                             "state": "enabled"
-                        }, 
+                        },
                         "defaultValueInternal": {
                             "state": "enabled"
                         }
@@ -568,16 +568,16 @@ class ContributesRemoteFeatureCodeGeneratorTest {
                     "features": {
                         "internalDefaultTrue": {
                             "state": "disabled"
-                        }, 
+                        },
                         "defaultTrue": {
                             "state": "disabled"
                         },
                         "internalDefaultFalse": {
                             "state": "disabled"
-                        }, 
+                        },
                         "defaultFalse": {
                             "state": "disabled"
-                        }, 
+                        },
                         "defaultValueInternal": {
                             "state": "disabled"
                         }
@@ -606,16 +606,16 @@ class ContributesRemoteFeatureCodeGeneratorTest {
                     "features": {
                         "internalDefaultTrue": {
                             "state": "internal"
-                        }, 
+                        },
                         "defaultTrue": {
                             "state": "internal"
                         },
                         "internalDefaultFalse": {
                             "state": "internal"
-                        }, 
+                        },
                         "defaultFalse": {
                             "state": "internal"
-                        }, 
+                        },
                         "defaultValueInternal": {
                             "state": "internal"
                         }
@@ -714,7 +714,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
                                 "steps": [
                                     {
                                         "percent": 0.1
-                                    }                    
+                                    }
                                 ]
                             }
                         }
@@ -746,7 +746,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
                                 "steps": [
                                     {
                                         "percent": 0
-                                    }                    
+                                    }
                                 ]
                             }
                         }
@@ -771,7 +771,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
                                 "steps": [
                                     {
                                         "percent": 100
-                                    }                    
+                                    }
                                 ]
                             }
                         }
@@ -796,7 +796,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
                         "steps": [
                             {
                                 "percent": 0
-                            }                    
+                            }
                         ]
                     }
                 }
@@ -824,7 +824,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
                         "steps": [
                             {
                                 "percent": 100
-                            }                    
+                            }
                         ]
                     }
                 }
@@ -854,7 +854,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
                         "steps": [
                             {
                                 "percent": 0
-                            }                    
+                            }
                         ]
                     }
                 }
@@ -883,10 +883,10 @@ class ContributesRemoteFeatureCodeGeneratorTest {
                         "steps": [
                             {
                                 "percent": 1
-                            },                    
+                            },
                             {
                                 "percent": 2
-                            },                    
+                            },
                             {
                                 "percent": 100
                             }
@@ -918,13 +918,13 @@ class ContributesRemoteFeatureCodeGeneratorTest {
                         "steps": [
                             {
                                 "percent": 0.5
-                            },                    
+                            },
                             {
                                 "percent": 1.5
-                            },                    
+                            },
                             {
                                 "percent": 2
-                            },                    
+                            },
                             {
                                 "percent": 100
                             }
@@ -2580,7 +2580,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
                                 "steps": [
                                     {
                                         "percent": 100
-                                    }                    
+                                    }
                                 ]
                             }
                         }
@@ -2612,7 +2612,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
                                 "steps": [
                                     {
                                         "percent": 0
-                                    }                    
+                                    }
                                 ]
                             }
                         }
@@ -2639,7 +2639,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
                                 "steps": [
                                     {
                                         "percent": 0
-                                    }                    
+                                    }
                                 ]
                             }
                         }
@@ -2666,7 +2666,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
                                 "steps": [
                                     {
                                         "percent": 100
-                                    }                    
+                                    }
                                 ]
                             }
                         }
@@ -2693,7 +2693,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
                                 "steps": [
                                     {
                                         "percent": 100
-                                    }                    
+                                    }
                                 ]
                             }
                         }
@@ -2720,7 +2720,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
                                 "steps": [
                                     {
                                         "percent": 100
-                                    }                    
+                                    }
                                 ]
                             }
                         }
@@ -2747,7 +2747,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
                                 "steps": [
                                     {
                                         "percent": $justDisabledRollout
-                                    }                    
+                                    }
                                 ]
                             }
                         }
@@ -2774,7 +2774,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
                                 "steps": [
                                     {
                                         "percent": $justEnableRollout
-                                    }                    
+                                    }
                                 ]
                             }
                         }
@@ -2812,7 +2812,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
                                 "steps": [
                                     {
                                         "percent": 100
-                                    }                    
+                                    }
                                 ]
                             },
                             "cohorts": [
@@ -2865,7 +2865,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
                                 "steps": [
                                     {
                                         "percent": 100
-                                    }                    
+                                    }
                                 ]
                             },
                             "cohorts": [
@@ -3264,7 +3264,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
                                 "steps": [
                                     {
                                         "percent": 100
-                                    }                    
+                                    }
                                 ]
                             },
                             "cohorts": [
@@ -3302,7 +3302,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
                                 "steps": [
                                     {
                                         "percent": ${rolloutThreshold + 1}
-                                    }                    
+                                    }
                                 ]
                             },
                             "cohorts": [
@@ -3378,7 +3378,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
                                 "steps": [
                                     {
                                         "percent": 100
-                                    }                    
+                                    }
                                 ]
                             },
                             "cohorts": [
@@ -3416,7 +3416,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
                                 "steps": [
                                     {
                                         "percent": ${rolloutThreshold + 1}
-                                    }                    
+                                    }
                                 ]
                             },
                             "cohorts": [
@@ -3484,7 +3484,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
                                 "steps": [
                                     {
                                         "percent": ${rolloutThreshold - 1}
-                                    }                    
+                                    }
                                 ]
                             },
                             "cohorts": [
@@ -3537,7 +3537,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
                                 "steps": [
                                     {
                                         "percent": 100
-                                    }                    
+                                    }
                                 ]
                             },
                             "cohorts": [
@@ -3574,7 +3574,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
                                 "steps": [
                                     {
                                         "percent": ${rolloutThreshold - 1}
-                                    }                    
+                                    }
                                 ]
                             },
                             "cohorts": [
@@ -3657,7 +3657,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
                                 "steps": [
                                     {
                                         "percent": 100
-                                    }                    
+                                    }
                                 ]
                             },
                             "targets": [
@@ -3738,7 +3738,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
                                 "steps": [
                                     {
                                         "percent": 100
-                                    }                    
+                                    }
                                 ]
                             },
                             "targets": [
@@ -3792,7 +3792,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
                                 "steps": [
                                     {
                                         "percent": 100
-                                    }                    
+                                    }
                                 ]
                             },
                             "targets": [
@@ -3849,7 +3849,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
                                 "steps": [
                                     {
                                         "percent": 100
-                                    }                    
+                                    }
                                 ]
                             },
                             "cohorts": [
@@ -3891,7 +3891,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
                                 "steps": [
                                     {
                                         "percent": 100
-                                    }                    
+                                    }
                                 ]
                             },
                             "cohorts": [
@@ -3926,7 +3926,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
                                 "steps": [
                                     {
                                         "percent": 100
-                                    }                    
+                                    }
                                 ]
                             }
                         }
@@ -3971,7 +3971,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
                                 "steps": [
                                     {
                                         "percent": 100
-                                    }                    
+                                    }
                                 ]
                             },
                             "cohorts": [
@@ -4010,7 +4010,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
                                 "steps": [
                                     {
                                         "percent": 100
-                                    }                    
+                                    }
                                 ]
                             },
                             "cohorts": [
@@ -4046,7 +4046,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
                                 "steps": [
                                     {
                                         "percent": 100
-                                    }                    
+                                    }
                                 ]
                             },
                             "cohorts": [
@@ -4083,7 +4083,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
                                 "steps": [
                                     {
                                         "percent": 100
-                                    }                    
+                                    }
                                 ]
                             },
                             "cohorts": [
@@ -4132,7 +4132,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
                                 "steps": [
                                     {
                                         "percent": 100
-                                    }                    
+                                    }
                                 ]
                             },
                             "targets": [
@@ -4192,7 +4192,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
                                 "steps": [
                                     {
                                         "percent": 100
-                                    }                    
+                                    }
                                 ]
                             },
                             "targets": [
@@ -4236,7 +4236,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
                                 "steps": [
                                     {
                                         "percent": 100
-                                    }                    
+                                    }
                                 ]
                             },
                             "targets": [
@@ -4279,7 +4279,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
                                 "steps": [
                                     {
                                         "percent": 100
-                                    }                    
+                                    }
                                 ]
                             },
                             "targets": [
@@ -4345,7 +4345,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
                                 "steps": [
                                     {
                                         "percent": 100
-                                    }                    
+                                    }
                                 ]
                             },
                             "targets": [
@@ -4390,7 +4390,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
                                 "steps": [
                                     {
                                         "percent": 100
-                                    }                    
+                                    }
                                 ]
                             },
                             "targets": [
@@ -4435,7 +4435,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
                                 "steps": [
                                     {
                                         "percent": 100
-                                    }                    
+                                    }
                                 ]
                             },
                             "targets": [
@@ -4479,7 +4479,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
                                 "steps": [
                                     {
                                         "percent": 100
-                                    }                    
+                                    }
                                 ]
                             },
                             "targets": [
@@ -4533,7 +4533,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
                                 "steps": [
                                     {
                                         "percent": 100
-                                    }                    
+                                    }
                                 ]
                             },
                             "cohorts": [
@@ -4586,7 +4586,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
                                 "steps": [
                                     {
                                         "percent": 100
-                                    }                    
+                                    }
                                 ]
                             },
                             "cohorts": [
@@ -4635,7 +4635,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
                                 "steps": [
                                     {
                                         "percent": 100
-                                    }                    
+                                    }
                                 ]
                             },
                             "cohorts": [
@@ -4675,7 +4675,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
                                 "steps": [
                                     {
                                         "percent": ${rolloutThreshold - 1}
-                                    }                    
+                                    }
                                 ]
                             },
                             "cohorts": [
@@ -4723,7 +4723,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
                                 "steps": [
                                     {
                                         "percent": 100
-                                    }                    
+                                    }
                                 ]
                             },
                             "cohorts": [
@@ -4768,7 +4768,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
                                 "steps": [
                                     {
                                         "percent": 100
-                                    }                    
+                                    }
                                 ]
                             },
                             "cohorts": [
@@ -4814,7 +4814,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
                                 "steps": [
                                     {
                                         "percent": 100
-                                    }                    
+                                    }
                                 ]
                             },
                             "cohorts": [
@@ -4855,7 +4855,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
                                 "steps": [
                                     {
                                         "percent": 0
-                                    }                    
+                                    }
                                 ]
                             },
                             "cohorts": [
@@ -4950,7 +4950,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
                                 "steps": [
                                     {
                                         "percent": 100
-                                    }                    
+                                    }
                                 ]
                             },
                             "cohorts": [
@@ -5010,13 +5010,13 @@ class ContributesRemoteFeatureCodeGeneratorTest {
                         "fooFeature": {
                             "state": "enabled",
                             "settings": {
-                                "foo": "foo/value"                                
+                                "foo": "foo/value"
                             },
                             "rollout": {
                                 "steps": [
                                     {
                                         "percent": 100
-                                    }                    
+                                    }
                                 ]
                             },
                             "cohorts": [
@@ -5057,12 +5057,12 @@ class ContributesRemoteFeatureCodeGeneratorTest {
                     "state": "disabled",
                     "features": {
                         "fooFeature": {
-                            "state": "enabled",                           
+                            "state": "enabled",
                             "rollout": {
                                 "steps": [
                                     {
                                         "percent": 100
-                                    }                    
+                                    }
                                 ]
                             },
                             "cohorts": [
@@ -5114,7 +5114,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
                                 "steps": [
                                     {
                                         "percent": 0
-                                    }                    
+                                    }
                                 ]
                             },
                             "cohorts": [

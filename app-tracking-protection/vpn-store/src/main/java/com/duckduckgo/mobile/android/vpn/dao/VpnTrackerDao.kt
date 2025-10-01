@@ -74,9 +74,9 @@ internal interface VpnTrackerDao {
 
     @Query(
         """
-            SELECT COALESCE(sum(count), 0) 
-            FROM vpn_tracker 
-            JOIN vpn_app_tracker_entities ON vpn_tracker.trackerCompanyId = vpn_app_tracker_entities.trackerCompanyId 
+            SELECT COALESCE(sum(count), 0)
+            FROM vpn_tracker
+            JOIN vpn_app_tracker_entities ON vpn_tracker.trackerCompanyId = vpn_app_tracker_entities.trackerCompanyId
             WHERE timestamp >= :startTime AND timestamp < :endTime
         """,
     )
@@ -87,9 +87,9 @@ internal interface VpnTrackerDao {
 
     @Query(
         """
-            SELECT COUNT(DISTINCT packageId) 
-            FROM vpn_tracker 
-            JOIN vpn_app_tracker_entities ON vpn_tracker.trackerCompanyId = vpn_app_tracker_entities.trackerCompanyId 
+            SELECT COUNT(DISTINCT packageId)
+            FROM vpn_tracker
+            JOIN vpn_app_tracker_entities ON vpn_tracker.trackerCompanyId = vpn_app_tracker_entities.trackerCompanyId
             WHERE timestamp >= :startTime AND timestamp < :endTime
         """,
     )

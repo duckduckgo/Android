@@ -92,7 +92,7 @@ class WgVpnNetworkStackTest {
         DNS = 1.2.3.4
         MTU = 1280
         PrivateKey = yD1fKxCG/HFbxOy4YfR6zG86YQ1nOswlsv8n7uypb14=
-        
+
         [Peer]
         AllowedIPs = 0.0.0.0/0
         Endpoint = 10.10.10.10:443
