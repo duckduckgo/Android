@@ -74,12 +74,19 @@ import com.squareup.moshi.Types
 @TypeConverters(PirDatabaseConverters::class)
 abstract class PirDatabase : RoomDatabase() {
     abstract fun brokerJsonDao(): BrokerJsonDao
+
     abstract fun brokerDao(): BrokerDao
+
     abstract fun scanResultsDao(): ScanResultsDao
+
     abstract fun userProfileDao(): UserProfileDao
+
     abstract fun scanLogDao(): ScanLogDao
+
     abstract fun optOutResultsDao(): OptOutResultsDao
+
     abstract fun jobSchedulingDao(): JobSchedulingDao
+
     abstract fun extractedProfileDao(): ExtractedProfileDao
 
     companion object {
@@ -88,19 +95,14 @@ abstract class PirDatabase : RoomDatabase() {
 }
 
 object PirDatabaseConverters {
-
     private val stringListType = Types.newParameterizedType(List::class.java, String::class.java)
     private val stringListAdapter: JsonAdapter<List<String>> = Moshi.Builder().build().adapter(stringListType)
 
     @TypeConverter
     @JvmStatic
-    fun toStringList(value: String): List<String> {
-        return stringListAdapter.fromJson(value)!!
-    }
+    fun toStringList(value: String): List<String> = stringListAdapter.fromJson(value)!!
 
     @TypeConverter
     @JvmStatic
-    fun fromStringList(value: List<String>): String {
-        return stringListAdapter.toJson(value)
-    }
+    fun fromStringList(value: List<String>): String = stringListAdapter.toJson(value)
 }
