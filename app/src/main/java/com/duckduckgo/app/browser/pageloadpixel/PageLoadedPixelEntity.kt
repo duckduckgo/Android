@@ -27,4 +27,7 @@ class PageLoadedPixelEntity(
     val webviewVersion: String,
     val trackerOptimizationEnabled: Boolean,
     val cpmEnabled: Boolean,
+    val isTabInForegroundOnFinish: Boolean,
+    val activeRequestsOnLoadStart: Int,
+    val concurrentRequestsOnFinish: Int,
 )
