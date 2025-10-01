@@ -156,6 +156,7 @@ class RealDuckChatJSHelper @Inject constructor(
             JSONObject().apply {
                 val jsCall = "document.getElementsByName($selector)[0]?.focus();"
                 put(SELECTOR, jsCall)
+                put(SUCCESS, true)
             }
         return JsCallbackData(jsonPayload, featureName, method, id)
     }
@@ -206,5 +207,6 @@ class RealDuckChatJSHelper @Inject constructor(
         private const val ANDROID = "android"
         const val SELECTOR = "selector"
         private const val DEFAULT_SELECTOR = "'user-prompt'"
+        private const val SUCCESS = "success"
     }
 }

@@ -257,9 +257,8 @@ open class DuckChatWebViewFragment : DuckDuckGoFragment(R.layout.activity_duck_c
                                                     response.params.get(SELECTOR).toString(), null,
                                                 )
                                                 showSoftKeyboard()
-                                            } else {
-                                                contentScopeScripts.onResponse(response)
                                             }
+                                            contentScopeScripts.onResponse(response)
                                         }
                                     }
                                 }
