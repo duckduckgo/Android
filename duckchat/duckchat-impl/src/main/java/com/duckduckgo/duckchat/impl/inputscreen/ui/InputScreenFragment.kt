@@ -143,9 +143,10 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
     ) {
         super.onViewCreated(view, savedInstanceState)
 
-        inputModeWidget = InputModeWidget(requireContext()).also {
-            it.id = R.id.inputModeWidget
-        }
+        inputModeWidget =
+            InputModeWidget(requireContext()).also {
+                it.id = R.id.inputModeWidget
+            }
         inputScreenButtons = InputScreenButtons(requireContext())
 
         val params = requireActivity().intent.getActivityParams(InputScreenActivityParams::class.java)
