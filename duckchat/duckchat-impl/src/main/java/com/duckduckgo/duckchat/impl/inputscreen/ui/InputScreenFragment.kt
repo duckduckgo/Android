@@ -47,7 +47,6 @@ import com.duckduckgo.duckchat.api.inputscreen.InputScreenActivityResultCodes
 import com.duckduckgo.duckchat.api.inputscreen.InputScreenActivityResultParams
 import com.duckduckgo.duckchat.impl.R
 import com.duckduckgo.duckchat.impl.databinding.FragmentInputScreenBinding
-import com.duckduckgo.duckchat.impl.databinding.FragmentInputScreenButtonsTopBinding
 import com.duckduckgo.duckchat.impl.inputscreen.ui.command.Command
 import com.duckduckgo.duckchat.impl.inputscreen.ui.command.Command.AnimateLogoToProgress
 import com.duckduckgo.duckchat.impl.inputscreen.ui.command.Command.EditWithSelectedQuery
@@ -80,7 +79,6 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
-import javax.inject.Inject
 import com.duckduckgo.mobile.android.R as CommonR
 import logcat.logcat
 import javax.inject.Inject
@@ -146,29 +144,6 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
     private lateinit var pagerAdapter: InputScreenPagerAdapter
     private var logoAnimator: ValueAnimator? = null
 
-    private var topBinding: FragmentInputScreenButtonsTopBinding? = null
-    private var inputFieldBinding: FragmentInputScreenBinding? = null
-
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?,
-    ): View? {
-        val params = requireActivity().intent.getActivityParams(InputScreenActivityParams::class.java)
-        val rootView =
-            params?.showButtonsOnTop?.let { bindToTop ->
-                if (bindToTop) {
-                    topBinding = FragmentInputScreenButtonsTopBinding.inflate(inflater, container, false)
-                    return topBinding?.root
-                } else {
-                    inputFieldBinding = FragmentInputScreenBinding.inflate(inflater, container, false)
-                    return inputFieldBinding?.root
-                }
-            }
-
-        return rootView
-    }
-
     override fun onViewCreated(
         view: View,
         savedInstanceState: Bundle?,
@@ -190,7 +165,7 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
                         logcat { "inputScreenLauncher: Keyboard shown (GlobalLayout)" }
                     } else {
                         logcat { "inputScreenLauncher: Keyboard hidden (GlobalLayout)" }
-                        binding.inputModeWidget.clearInputFocus()
+                        inputModeWidget.clearInputFocus()
                     }
                 }
             }
@@ -208,6 +183,7 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
         }
 
         val useTopBar = inputScreenConfigResolver.useTopBar()
+        logcat { "inputScreenLauncher: useTopBar $useTopBar" }
         val separatorHeightPx = resources.getDimensionPixelSize(R.dimen.inputScreenContentSeparatorHeight)
         contentSeparator =
             View(context).apply {
