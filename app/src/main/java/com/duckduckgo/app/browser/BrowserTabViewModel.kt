@@ -3255,7 +3255,7 @@ class BrowserTabViewModel @Inject constructor(
 
     @SuppressLint("RequiresFeature", "PostMessageUsage") // it's already checked in isBlobDownloadWebViewFeatureEnabled
     private fun postMessageToConvertBlobToDataUri(webView: WebView, url: String) {
-        appCoroutineScope.launch(dispatchers.main()) {
+        viewModelScope.launch(dispatchers.main()) {
             // main because postMessage is not always safe in another thread
             for ((key, proxies) in fixedReplyProxyMap) {
                 if (sameOrigin(url.removePrefix("blob:"), key)) {

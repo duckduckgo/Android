@@ -1999,9 +1999,6 @@ class BrowserTabFragment :
                         refresh()
                         privacyProtectionEnabledConfirmation(it.domain)
                     }
-                } ?: run {
-                    refresh()
-                    privacyProtectionEnabledConfirmation(it.domain)
                 }
             }
 
@@ -2012,9 +2009,6 @@ class BrowserTabFragment :
                         refresh()
                         privacyProtectionDisabledConfirmation(it.domain)
                     }
-                } ?: run {
-                    refresh()
-                    privacyProtectionDisabledConfirmation(it.domain)
                 }
             }
 
@@ -4023,12 +4017,9 @@ class BrowserTabFragment :
         if (::webViewContainer.isInitialized) webViewContainer.removeAllViews()
         webView?.let {
             it.removeSystemAutofillCallback()
-            lifecycleScope.launch {
-                webViewClient.destroy(it)
-                it.destroy()
-                webView = null
-            }
-        } ?: run { webView = null }
+            it.destroy()
+        }
+        webView = null
     }
 
     private fun convertBlobToDataUri(blob: Command.ConvertBlobToDataUri) {

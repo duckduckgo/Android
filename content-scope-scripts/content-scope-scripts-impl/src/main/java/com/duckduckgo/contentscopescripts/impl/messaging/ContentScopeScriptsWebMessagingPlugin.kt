@@ -19,10 +19,11 @@ package com.duckduckgo.contentscopescripts.impl.messaging
 import android.annotation.SuppressLint
 import android.webkit.WebView
 import androidx.annotation.VisibleForTesting
+import androidx.lifecycle.findViewTreeLifecycleOwner
+import androidx.lifecycle.lifecycleScope
 import androidx.webkit.JavaScriptReplyProxy
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.browser.api.webviewcompat.WebViewCompatWrapper
-import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.contentscopescripts.api.WebViewCompatContentScopeJsMessageHandlersPlugin
 import com.duckduckgo.contentscopescripts.impl.WebViewCompatContentScopeScripts
@@ -39,9 +40,7 @@ import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.anvil.annotations.ContributesMultibinding
 import com.squareup.moshi.Moshi
 import dagger.SingleInstanceIn
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import logcat.LogPriority.ERROR
 import logcat.asLog
 import logcat.logcat
@@ -60,7 +59,6 @@ class ContentScopeScriptsWebMessagingPlugin @Inject constructor(
     private val globalHandlers: PluginPoint<GlobalContentScopeJsMessageHandlersPlugin>,
     private val webViewCompatContentScopeScripts: WebViewCompatContentScopeScripts,
     private val webViewCompatWrapper: WebViewCompatWrapper,
-    @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
 ) : WebMessagingPlugin {
     private val moshi = Moshi.Builder().add(JSONObjectAdapter()).build()
 
@@ -99,7 +97,7 @@ class ContentScopeScriptsWebMessagingPlugin @Inject constructor(
                                         sendToConsumer(webView, jsMessageCallback, jsMessage, replyProxy)
                                     }
                                     is SendResponse -> {
-                                        appCoroutineScope.launch {
+                                        webView.findViewTreeLifecycleOwner()?.lifecycleScope?.launch {
                                             onResponse(webView, jsMessage, replyProxy)
                                         }
                                     }
@@ -120,7 +118,7 @@ class ContentScopeScriptsWebMessagingPlugin @Inject constructor(
                                     sendToConsumer(webView, jsMessageCallback, jsMessage, replyProxy)
                                 }
                                 is SendResponse -> {
-                                    appCoroutineScope.launch {
+                                    webView.findViewTreeLifecycleOwner()?.lifecycleScope?.launch {
                                         onResponse(webView, jsMessage, replyProxy)
                                     }
                                 }

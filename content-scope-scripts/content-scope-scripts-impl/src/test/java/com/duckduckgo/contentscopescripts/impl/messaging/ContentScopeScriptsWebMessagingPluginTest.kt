@@ -95,7 +95,6 @@ class ContentScopeScriptsWebMessagingPluginTest {
                     globalHandlers = globalHandlers,
                     webViewCompatContentScopeScripts = webViewCompatContentScopeScripts,
                     webViewCompatWrapper = mockWebViewCompatWrapper,
-                    appCoroutineScope = coroutineRule.testScope,
                 )
         }
 
