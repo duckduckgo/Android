@@ -55,7 +55,7 @@ interface AuthLauncher {
 }
 
 @ContributesBinding(AppScope::class)
-class f @Inject constructor(
+class RealAuthLauncher @Inject constructor(
     private val context: Context,
     private val appBuildConfig: AppBuildConfig,
     private val autofillAuthorizationGracePeriod: AutofillAuthorizationGracePeriod,
