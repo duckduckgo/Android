@@ -7886,7 +7886,7 @@ class BrowserTabViewModelTest {
         var postMessageCalled = false
             private set
 
-        override fun postMessage(
+        override suspend fun postMessage(
             message: SubscriptionEventData,
             webView: WebView,
         ) {

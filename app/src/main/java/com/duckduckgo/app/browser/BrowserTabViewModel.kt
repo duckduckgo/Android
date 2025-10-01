@@ -4238,10 +4238,12 @@ class BrowserTabViewModel @Inject constructor(
         eventData: SubscriptionEventData,
         webView: WebView,
     ) {
-        postMessageWrapperPlugins
-            .getPlugins()
-            .firstOrNull { it.context == "contentScopeScripts" }
-            ?.postMessage(eventData, webView)
+        viewModelScope.launch {
+            postMessageWrapperPlugins
+                .getPlugins()
+                .firstOrNull { it.context == "contentScopeScripts" }
+                ?.postMessage(eventData, webView)
+        }
     }
 
     private suspend fun addDocumentStartJavaScript(webView: WebView) {
