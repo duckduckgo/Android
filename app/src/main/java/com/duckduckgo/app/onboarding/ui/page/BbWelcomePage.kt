@@ -752,7 +752,6 @@ class BbWelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome
                 drawableLight = R.drawable.bb_onboarding_background_04_light,
                 drawableDark = R.drawable.bb_onboarding_background_04_dark,
             ),
-            ;
         }
 
         private companion object {

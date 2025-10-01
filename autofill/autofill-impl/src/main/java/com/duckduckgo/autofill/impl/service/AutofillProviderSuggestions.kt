@@ -72,9 +72,9 @@ class RealAutofillProviderSuggestions @Inject constructor(
         val fillableFields = nodeToAutofill.parsedAutofillFields.filter { it.type != UNKNOWN }
         logcat(INFO) {
             "DDGAutofillService Fillable Request for rootNode: ${nodeToAutofill.website} and ${nodeToAutofill.packageId} for fields:\n${
-            fillableFields.joinToString(
-                separator = "\n",
-            )
+                fillableFields.joinToString(
+                    separator = "\n",
+                )
             }"
         }
 

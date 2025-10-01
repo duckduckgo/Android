@@ -228,7 +228,7 @@ class BuckWelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welco
                                     descriptionText,
                                     afterAnimation = { afterTypingAnimation() },
                                 )
-                            },)
+                            })
                         },
                     )
 
@@ -268,7 +268,7 @@ class BuckWelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welco
                                     descriptionText,
                                     afterAnimation = { afterTypingAnimation() },
                                 )
-                            },)
+                            })
                         },
                     )
 
@@ -352,7 +352,7 @@ class BuckWelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welco
                                     descriptionText,
                                     afterAnimation = { afterTypingAnimation() },
                                 )
-                            },)
+                            })
                         },
                     )
                 }

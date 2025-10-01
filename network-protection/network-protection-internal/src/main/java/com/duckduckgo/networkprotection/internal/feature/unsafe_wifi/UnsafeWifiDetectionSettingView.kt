@@ -118,7 +118,8 @@ class UnsafeWifiDetectionSettingView @JvmOverloads constructor(
         when (state) {
             Disable -> binding.unsafeWifiDetection.quietlySetIsChecked(false, toggleListener)
             Enable -> binding.unsafeWifiDetection.quietlySetIsChecked(true, toggleListener)
-            Idle -> { /* no-op */
+            Idle -> {
+                /* no-op */
             }
         }
     }

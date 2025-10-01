@@ -162,7 +162,6 @@ class ShortcutsNewTabSectionView @JvmOverloads constructor(
     boundType = NewTabPageSectionPlugin::class,
     priority = NewTabPageSectionPlugin.PRIORITY_SHORTCUTS,
 )
-
 class ShortcutsNewTabSectionPlugin @Inject constructor(
     private val setting: NewTabShortcutDataStore,
 ) : NewTabPageSectionPlugin {

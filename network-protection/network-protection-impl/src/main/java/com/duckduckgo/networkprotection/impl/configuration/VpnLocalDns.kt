@@ -104,7 +104,7 @@ private class VpnLocalDnsImpl(
             ]
         }
     }
-    */
+     */
 
     private data class LocalDnsSettings(
         val domains: Map<String, List<DnsEntry>>,

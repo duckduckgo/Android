@@ -162,6 +162,7 @@ data class CredentialsSyncRemoteUpdates(
     val credentials: credentialsSyncEntries,
 )
 
+@Suppress("ktlint:standard:class-naming")
 data class credentialsSyncEntries(
     val entries: List<CredentialsSyncEntryResponse>,
     val last_modified: String,

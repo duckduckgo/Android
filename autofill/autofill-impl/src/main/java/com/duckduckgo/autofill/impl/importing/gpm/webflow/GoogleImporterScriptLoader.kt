@@ -21,9 +21,9 @@ import com.duckduckgo.autofill.impl.importing.takeout.store.BookmarkImportConfig
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.FragmentScope
 import com.squareup.anvil.annotations.ContributesBinding
-import kotlinx.coroutines.withContext
 import java.io.BufferedReader
 import javax.inject.Inject
+import kotlinx.coroutines.withContext
 
 interface GoogleImporterScriptLoader {
     suspend fun getScriptForPasswordImport(): String

@@ -22,6 +22,7 @@ import com.duckduckgo.app.statistics.wideevents.db.WideEventRepository
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle.State
+import java.time.Duration
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
@@ -33,7 +34,6 @@ import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
-import java.time.Duration
 
 @RunWith(AndroidJUnit4::class)
 class WideEventClientTest {
@@ -76,12 +76,11 @@ class WideEventClientTest {
                 name = name,
                 flowEntryPoint = flowEntryPoint,
                 metadata = mapOf("free_trial_eligible" to "true", "user_type" to "premium"),
-                cleanupPolicy =
-                    WideEventRepository.CleanupPolicy.OnProcessStart(
-                        ignoreIfIntervalTimeoutPresent = true,
-                        status = WideEventRepository.WideEventStatus.UNKNOWN,
-                        metadata = emptyMap(),
-                    ),
+                cleanupPolicy = WideEventRepository.CleanupPolicy.OnProcessStart(
+                    ignoreIfIntervalTimeoutPresent = true,
+                    status = WideEventRepository.WideEventStatus.UNKNOWN,
+                    metadata = emptyMap(),
+                ),
             )
         }
 
@@ -103,12 +102,11 @@ class WideEventClientTest {
                 name = name,
                 flowEntryPoint = null,
                 metadata = emptyMap(),
-                cleanupPolicy =
-                    WideEventRepository.CleanupPolicy.OnTimeout(
-                        duration = Duration.ofDays(7),
-                        status = WideEventRepository.WideEventStatus.UNKNOWN,
-                        metadata = emptyMap(),
-                    ),
+                cleanupPolicy = WideEventRepository.CleanupPolicy.OnTimeout(
+                    duration = Duration.ofDays(7),
+                    status = WideEventRepository.WideEventStatus.UNKNOWN,
+                    metadata = emptyMap(),
+                ),
             )
         }
 
@@ -228,11 +226,10 @@ class WideEventClientTest {
             verify(wideEventRepository).setWideEventStatus(
                 eventId = wideEventId,
                 status = expectedWideEventStatus,
-                metadata =
-                    mapOf(
-                        "failure_reason" to "Payment declined",
-                        "error_code" to "PAYMENT_DECLINED",
-                    ),
+                metadata = mapOf(
+                    "failure_reason" to "Payment declined",
+                    "error_code" to "PAYMENT_DECLINED",
+                ),
             )
         }
 
@@ -412,12 +409,11 @@ class WideEventClientTest {
                 name = "timeout_flow",
                 flowEntryPoint = null,
                 metadata = emptyMap(),
-                cleanupPolicy =
-                    WideEventRepository.CleanupPolicy.OnTimeout(
-                        duration = Duration.ofMinutes(5),
-                        status = WideEventRepository.WideEventStatus.FAILURE,
-                        metadata = mapOf("failure_reason" to "timeout"),
-                    ),
+                cleanupPolicy = WideEventRepository.CleanupPolicy.OnTimeout(
+                    duration = Duration.ofMinutes(5),
+                    status = WideEventRepository.WideEventStatus.FAILURE,
+                    metadata = mapOf("failure_reason" to "timeout"),
+                ),
             )
         }
 }

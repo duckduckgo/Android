@@ -187,6 +187,7 @@ class RealVpnNetwork @Inject constructor(
             """.trimIndent()
         }
 
+        @Suppress("ktlint:standard:comment-wrapping")
         if (protocol != 6 /* TCP */ && protocol != 17 /* UDP */) return Process.INVALID_UID
 
         val cm = context.getSystemService(VpnService.CONNECTIVITY_SERVICE) as ConnectivityManager? ?: return Process.INVALID_UID

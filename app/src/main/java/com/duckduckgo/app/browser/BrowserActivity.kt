@@ -118,6 +118,7 @@ import com.duckduckgo.savedsites.impl.bookmarks.BookmarksActivity.Companion.SAVE
 import com.duckduckgo.site.permissions.impl.ui.SitePermissionScreenNoParams
 import com.duckduckgo.sync.api.SyncActivityFromSetupUrl
 import com.duckduckgo.sync.api.setup.SyncUrlIdentifier
+import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -130,7 +131,6 @@ import logcat.LogPriority.VERBOSE
 import logcat.LogPriority.WARN
 import logcat.asLog
 import logcat.logcat
-import javax.inject.Inject
 
 // open class so that we can test BrowserApplicationStateInfo
 @InjectWith(ActivityScope::class)
@@ -1119,15 +1119,14 @@ open class BrowserActivity : DuckDuckGoActivity() {
         lifecycleScope.launch(dispatcherProvider.io()) {
             newAddressBarOptionManager.showChoiceScreen(
                 activity = this@BrowserActivity,
-                isLaunchedFromExternal =
-                    intent.getBooleanExtra(LAUNCH_FROM_EXTERNAL_EXTRA, false) ||
-                        intent.getBooleanExtra(LAUNCH_FROM_CLEAR_DATA_ACTION, false) ||
-                        intent.getBooleanExtra(NOTIFY_DATA_CLEARED_EXTRA, false) ||
-                        intent.getBooleanExtra(LAUNCH_FROM_INTERSTITIAL_EXTRA, false) ||
-                        intent.getBooleanExtra(OPEN_DUCK_CHAT, false) ||
-                        intent.getBooleanExtra(LAUNCH_FROM_FAVORITES_WIDGET, false) ||
-                        intent.getBooleanExtra(LAUNCH_FROM_BOOKMARKS_APP_SHORTCUT_EXTRA, false) ||
-                        intent.getBooleanExtra(NEW_SEARCH_EXTRA, false),
+                isLaunchedFromExternal = intent.getBooleanExtra(LAUNCH_FROM_EXTERNAL_EXTRA, false) ||
+                    intent.getBooleanExtra(LAUNCH_FROM_CLEAR_DATA_ACTION, false) ||
+                    intent.getBooleanExtra(NOTIFY_DATA_CLEARED_EXTRA, false) ||
+                    intent.getBooleanExtra(LAUNCH_FROM_INTERSTITIAL_EXTRA, false) ||
+                    intent.getBooleanExtra(OPEN_DUCK_CHAT, false) ||
+                    intent.getBooleanExtra(LAUNCH_FROM_FAVORITES_WIDGET, false) ||
+                    intent.getBooleanExtra(LAUNCH_FROM_BOOKMARKS_APP_SHORTCUT_EXTRA, false) ||
+                    intent.getBooleanExtra(NEW_SEARCH_EXTRA, false),
             )
         }
     }

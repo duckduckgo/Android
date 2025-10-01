@@ -1158,8 +1158,8 @@ class ContributesRemoteFeatureCodeGeneratorTest {
         assertEquals(rolloutThreshold < 50.0, testFeature.fooFeature().isEnabled())
     }
 
-    @Test
     // see https://app.asana.com/0/488551667048375/1206413338208929
+    @Test
     fun `backwards compatibility test - feature was disabled set rollout threshold`() = runTest {
         whenever(appBuildConfig.versionCode).thenReturn(1)
         val feature = generatedFeatureNewInstance()
@@ -1203,8 +1203,8 @@ class ContributesRemoteFeatureCodeGeneratorTest {
         assertEquals(step >= threshold!!, testFeature.fooFeature().isEnabled())
     }
 
-    @Test
     // see https://app.asana.com/0/488551667048375/1206413338208929
+    @Test
     fun `backwards compatibility test - feature was null set rollout threshold`() = runTest {
         whenever(appBuildConfig.versionCode).thenReturn(1)
         val feature = generatedFeatureNewInstance()

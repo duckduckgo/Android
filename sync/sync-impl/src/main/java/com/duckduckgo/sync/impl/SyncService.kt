@@ -181,6 +181,7 @@ data class ErrorResponse(
     val error: String,
 )
 
+@Suppress("ktlint:standard:class-naming")
 enum class API_CODE(val code: Int) {
     INVALID_LOGIN_CREDENTIALS(401),
     NOT_MODIFIED(304),

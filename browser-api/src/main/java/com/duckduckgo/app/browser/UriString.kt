@@ -22,10 +22,10 @@ import androidx.core.util.PatternsCompat
 import com.duckduckgo.common.utils.UrlScheme
 import com.duckduckgo.common.utils.baseHost
 import com.duckduckgo.common.utils.withScheme
+import java.lang.IllegalArgumentException
 import logcat.LogPriority.INFO
 import logcat.logcat
 import okhttp3.HttpUrl.Companion.toHttpUrl
-import java.lang.IllegalArgumentException
 
 class UriString {
     companion object {

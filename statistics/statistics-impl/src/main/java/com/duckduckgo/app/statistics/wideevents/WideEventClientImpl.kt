@@ -21,10 +21,10 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.Lazy
-import kotlinx.coroutines.withContext
 import java.time.Duration
 import javax.inject.Inject
 import kotlin.runCatching
+import kotlinx.coroutines.withContext
 
 @ContributesBinding(AppScope::class)
 class WideEventClientImpl @Inject constructor(

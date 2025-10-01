@@ -154,7 +154,8 @@ class TrackingProtectionExclusionListActivity :
             }
 
             R.id.reportIssue -> {
-                launchFeedback(); true
+                launchFeedback()
+                true
             }
 
             else -> super.onOptionsItemSelected(item)

@@ -52,9 +52,9 @@ class DeviceInfoCollector @Inject constructor(
 @Module
 @ContributesTo(AppScope::class)
 object DeviceInfoCollectorModule {
+    // this convenience class is just to allow testing
     @Provides
     @BatteryOptimizationState
-    // this convenience class is just to allow testing
     fun provideIsIgnoringBatteryOptimizations(context: Context): Boolean {
         return runCatching {
             context.packageName?.let {

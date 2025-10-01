@@ -258,6 +258,7 @@ import com.duckduckgo.js.messaging.api.AddDocumentStartJavaScriptPlugin
 import com.duckduckgo.js.messaging.api.JsCallbackData
 import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.Feed
 import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.Feed.MALWARE
+import com.duckduckgo.mobile.android.R as CommonR
 import com.duckduckgo.newtabpage.impl.pixels.NewTabPixels
 import com.duckduckgo.privacy.config.api.AmpLinkInfo
 import com.duckduckgo.privacy.config.api.AmpLinks
@@ -292,6 +293,13 @@ import com.duckduckgo.subscriptions.api.SubscriptionsJSHelper
 import com.duckduckgo.sync.api.favicons.FaviconsFetchingPrompt
 import com.duckduckgo.voice.api.VoiceSearchAvailabilityPixelLogger
 import dagger.Lazy
+import java.io.File
+import java.math.BigInteger
+import java.security.cert.X509Certificate
+import java.security.interfaces.RSAPublicKey
+import java.time.LocalDateTime
+import java.util.UUID
+import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
@@ -334,14 +342,6 @@ import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
-import java.io.File
-import java.math.BigInteger
-import java.security.cert.X509Certificate
-import java.security.interfaces.RSAPublicKey
-import java.time.LocalDateTime
-import java.util.UUID
-import java.util.concurrent.TimeUnit
-import com.duckduckgo.mobile.android.R as CommonR
 
 @SuppressLint("DenyListedApi")
 @FlowPreview
@@ -802,13 +802,13 @@ class BrowserTabViewModelTest {
                     duckChat = mockDuckChat,
                     duckAiFeatureState = mockDuckAiFeatureState,
                     duckPlayerJSHelper =
-                        DuckPlayerJSHelper(
-                            mockDuckPlayer,
-                            mockAppBuildConfig,
-                            mockPixel,
-                            mockDuckDuckGoUrlDetector,
-                            mockPagesSettingPlugin,
-                        ),
+                    DuckPlayerJSHelper(
+                        mockDuckPlayer,
+                        mockAppBuildConfig,
+                        mockPixel,
+                        mockDuckDuckGoUrlDetector,
+                        mockPagesSettingPlugin,
+                    ),
                     duckChatJSHelper = mockDuckChatJSHelper,
                     refreshPixelSender = refreshPixelSender,
                     privacyProtectionTogglePlugin = protectionTogglePluginPoint,
@@ -1635,18 +1635,17 @@ class BrowserTabViewModelTest {
     fun whenTriggeringAutocompleteWithUrlAndUserHasFavoritesThenAutoCompleteShowsFavorites() {
         testee.autoCompleteViewState.value =
             autoCompleteViewState().copy(
-                favorites =
-                    listOf(
-                        QuickAccessFavorite(
-                            Favorite(
-                                UUID.randomUUID().toString(),
-                                "title",
-                                exampleUrl,
-                                lastModified = "timestamp",
-                                1,
-                            ),
+                favorites = listOf(
+                    QuickAccessFavorite(
+                        Favorite(
+                            UUID.randomUUID().toString(),
+                            "title",
+                            exampleUrl,
+                            lastModified = "timestamp",
+                            1,
                         ),
                     ),
+                ),
             )
         doReturn(true).whenever(mockAutoCompleteSettings).autoCompleteSuggestionsEnabled
         testee.triggerAutocomplete("https://example.com", true, hasQueryChanged = false)

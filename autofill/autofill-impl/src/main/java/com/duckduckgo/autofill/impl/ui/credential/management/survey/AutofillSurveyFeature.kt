@@ -30,15 +30,15 @@ import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
+/**
+ * This is the class that represents the feature flag for showing autofill user-surveys.
+ */
 @ContributesRemoteFeature(
     scope = AppScope::class,
     boundType = AutofillSurveysFeature::class,
     featureName = "autofillSurveys",
     settingsStore = AutofillSurveyFeatureSettingsStore::class,
 )
-/**
- * This is the class that represents the feature flag for showing autofill user-surveys.
- */
 interface AutofillSurveysFeature {
     /**
      * @return `true` when the remote config has the global "autofillSurveys" feature flag enabled

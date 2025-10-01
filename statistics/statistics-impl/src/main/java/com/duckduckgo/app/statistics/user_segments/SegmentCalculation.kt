@@ -41,7 +41,6 @@ interface SegmentCalculation {
 
     enum class ActivityType {
         APP_USE, SEARCH
-        ;
     }
 
     data class UserSegment(

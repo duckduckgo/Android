@@ -1009,7 +1009,7 @@ class ContributesRemoteFeatureCodeGenerator : CodeGenerator {
             if (this != null) {
                 // check that the Store is actually a [FeatureSettings.Store]
                 if (this.directSuperTypeReferences()
-                    .none { it.asClassReferenceOrNull()?.fqName == FeatureSettings.Store::class.fqName }
+                        .none { it.asClassReferenceOrNull()?.fqName == FeatureSettings.Store::class.fqName }
                 ) {
                     throw AnvilCompilationException(
                         "${vmClass.fqName} [settingsStore] must extend [FeatureSettings.Store]",

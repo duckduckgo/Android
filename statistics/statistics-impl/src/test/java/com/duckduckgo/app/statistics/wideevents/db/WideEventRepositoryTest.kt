@@ -26,6 +26,9 @@ import com.duckduckgo.app.statistics.wideevents.db.WideEventRepository.WideEvent
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.squareup.moshi.Moshi
+import java.time.Duration
+import java.time.Instant
+import java.time.LocalDateTime
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
 import org.junit.After
@@ -34,9 +37,6 @@ import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import java.time.Duration
-import java.time.Instant
-import java.time.LocalDateTime
 
 @SuppressLint("DenyListedApi")
 @RunWith(AndroidJUnit4::class)
@@ -97,10 +97,10 @@ class WideEventRepositoryTest {
                     name = "test_event",
                     flowEntryPoint = "app_settings",
                     metadata =
-                        mapOf(
-                            "key1" to "value1",
-                            "key2" to null,
-                        ),
+                    mapOf(
+                        "key1" to "value1",
+                        "key2" to null,
+                    ),
                     cleanupPolicy = DEFAULT_CLEANUP_POLICY,
                 )
 
@@ -203,10 +203,10 @@ class WideEventRepositoryTest {
                     name = "test_event",
                     flowEntryPoint = "app_settings",
                     metadata =
-                        mapOf(
-                            "key1" to "value1",
-                            "key2" to null,
-                        ),
+                    mapOf(
+                        "key1" to "value1",
+                        "key2" to null,
+                    ),
                     cleanupPolicy = DEFAULT_CLEANUP_POLICY,
                 )
 
@@ -297,10 +297,10 @@ class WideEventRepositoryTest {
                     name = "test_event",
                     flowEntryPoint = "app_settings",
                     metadata =
-                        mapOf(
-                            "key1" to "value1",
-                            "key2" to null,
-                        ),
+                    mapOf(
+                        "key1" to "value1",
+                        "key2" to null,
+                    ),
                     cleanupPolicy = DEFAULT_CLEANUP_POLICY,
                 )
 

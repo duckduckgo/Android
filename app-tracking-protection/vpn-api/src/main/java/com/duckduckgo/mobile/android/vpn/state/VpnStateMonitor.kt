@@ -63,6 +63,7 @@ interface VpnStateMonitor {
         data object INVALID : VpnRunningState()
     }
 
+    @Suppress("ktlint:standard:class-naming")
     sealed class VpnStopReason {
         data class SELF_STOP(val snoozedTriggerAtMillis: Long = 0L) : VpnStopReason()
         data object ERROR : VpnStopReason()

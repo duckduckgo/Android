@@ -23,6 +23,8 @@ import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.device.DeviceInfo
 import com.duckduckgo.feature.toggles.api.FeatureTogglesInventory
+import java.time.Duration
+import java.time.Instant
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
@@ -34,8 +36,6 @@ import org.mockito.kotlin.any
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
-import java.time.Duration
-import java.time.Instant
 
 @RunWith(AndroidJUnit4::class)
 class PixelWideEventSenderTest {
@@ -125,11 +125,11 @@ class PixelWideEventSenderTest {
         flowEntryPoint = flowEntryPoint,
         activeIntervals = emptyList(),
         cleanupPolicy =
-            WideEventRepository.CleanupPolicy.OnTimeout(
-                duration = Duration.ofHours(1),
-                status = WideEventRepository.WideEventStatus.UNKNOWN,
-                metadata = emptyMap(),
-            ),
+        WideEventRepository.CleanupPolicy.OnTimeout(
+            duration = Duration.ofHours(1),
+            status = WideEventRepository.WideEventStatus.UNKNOWN,
+            metadata = emptyMap(),
+        ),
         createdAt = Instant.parse("2025-12-03T10:15:30.00Z"),
     )
 }

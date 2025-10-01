@@ -98,7 +98,6 @@ interface DuckPlayerInternal : DuckPlayer {
 }
 
 @SingleInstanceIn(AppScope::class)
-
 @ContributesBinding(AppScope::class, boundType = DuckPlayer::class)
 @ContributesBinding(AppScope::class, boundType = DuckPlayerInternal::class)
 @ContributesMultibinding(AppScope::class, boundType = PrivacyConfigCallbackPlugin::class)

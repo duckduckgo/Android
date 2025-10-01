@@ -122,7 +122,8 @@ class NetpAppExclusionListActivity :
             }
 
             R.id.netp_exclusion_menu_report -> {
-                viewModel.launchFeedback(); true
+                viewModel.launchFeedback()
+                true
             }
 
             else -> super.onOptionsItemSelected(item)
@@ -240,7 +241,8 @@ class NetpAppExclusionListActivity :
             is Command.ShowSystemAppsExclusionWarning -> showSystemAppsWarning(command.category)
 
             is Command.ShowAutoExcludePrompt -> showAutoExcludePrompt(command.apps)
-            else -> { /* noop */
+            else -> {
+                /* noop */
             }
         }
     }

@@ -35,6 +35,7 @@ import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelParameters
 import com.duckduckgo.history.api.NavigationHistory
 import com.duckduckgo.voice.api.VoiceSearchAvailability
+import java.io.IOException
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.flow
@@ -56,7 +57,6 @@ import org.mockito.kotlin.never
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
-import java.io.IOException
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @RunWith(AndroidJUnit4::class)
@@ -974,11 +974,10 @@ class InputScreenViewModelTest {
 
             verify(pixel).fire(
                 pixel = DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_OMNIBAR_PROMPT_SUBMITTED,
-                parameters =
-                    mapOf(
-                        DuckChatPixelParameters.WAS_USED_BEFORE to "0",
-                        "text_length_bucket" to "short",
-                    ),
+                parameters = mapOf(
+                    DuckChatPixelParameters.WAS_USED_BEFORE to "0",
+                    "text_length_bucket" to "short",
+                ),
             )
             verify(pixel).fire(DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_OMNIBAR_PROMPT_SUBMITTED_DAILY, type = Daily())
         }

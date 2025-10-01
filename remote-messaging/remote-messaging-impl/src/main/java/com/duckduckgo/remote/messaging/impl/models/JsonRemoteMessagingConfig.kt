@@ -65,6 +65,7 @@ data class JsonTargetPercentile(
     val before: Float?,
 )
 
+@Suppress("ktlint:standard:class-naming")
 sealed class JsonMessageType(val jsonValue: String) {
     data object SMALL : JsonMessageType("small")
     data object MEDIUM : JsonMessageType("medium")

@@ -592,7 +592,7 @@ class RealSubscriptionsManager @Inject constructor(
         /*
             Get jwks before refreshing the token, just in case getting jwks fails. We don't want to end up in a situation where
             a new token has been fetched (potentially invalidating the old one), but we can't validate and store it.
-        */
+         */
         val jwks = authClient.getJwks()
 
         val newTokens = try {

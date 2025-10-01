@@ -97,6 +97,7 @@ class GoBackend @Inject constructor(
             """.trimIndent()
         }
 
+        @Suppress("ktlint:standard:comment-wrapping")
         if (protocol != 6 /* TCP */ && protocol != 17 /* UDP */) return true
 
         @Suppress("NAME_SHADOWING")
