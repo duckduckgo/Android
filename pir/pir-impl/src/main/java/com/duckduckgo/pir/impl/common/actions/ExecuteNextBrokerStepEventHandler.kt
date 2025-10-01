@@ -69,40 +69,42 @@ class ExecuteNextBrokerStepEventHandler @Inject constructor(
             emitBrokerStartPixel(state)
 
             Next(
-                nextState = state.copy(
-                    currentActionIndex = 0,
-                    brokerStepStartTime = currentTimeProvider.currentTimeMillis(),
-                    actionRetryCount = 0,
-                ),
-                nextEvent = ExecuteBrokerStepAction(
-                    UserProfile(
-                        userProfile = state.profileQuery,
+                nextState =
+                    state.copy(
+                        currentActionIndex = 0,
+                        brokerStepStartTime = currentTimeProvider.currentTimeMillis(),
+                        actionRetryCount = 0,
                     ),
-                ),
+                nextEvent =
+                    ExecuteBrokerStepAction(
+                        UserProfile(
+                            userProfile = state.profileQuery,
+                        ),
+                    ),
             )
         }
     }
 
-    private suspend fun emitBrokerStartPixel(
-        state: State,
-    ) {
+    private suspend fun emitBrokerStartPixel(state: State) {
         val runType = state.runType
         val currentBrokerStep = state.brokerStepsToExecute[state.currentBrokerStepIndex]
 
         when (runType) {
-            MANUAL -> pirRunStateHandler.handleState(
-                BrokerManualScanStarted(
-                    currentBrokerStep.brokerName,
-                    currentTimeProvider.currentTimeMillis(),
-                ),
-            )
+            MANUAL ->
+                pirRunStateHandler.handleState(
+                    BrokerManualScanStarted(
+                        currentBrokerStep.brokerName,
+                        currentTimeProvider.currentTimeMillis(),
+                    ),
+                )
 
-            SCHEDULED -> pirRunStateHandler.handleState(
-                BrokerScheduledScanStarted(
-                    currentBrokerStep.brokerName,
-                    currentTimeProvider.currentTimeMillis(),
-                ),
-            )
+            SCHEDULED ->
+                pirRunStateHandler.handleState(
+                    BrokerScheduledScanStarted(
+                        currentBrokerStep.brokerName,
+                        currentTimeProvider.currentTimeMillis(),
+                    ),
+                )
 
             OPTOUT -> {
                 // It also means we are starting it for the first profile. Succeeding profiles are handled in HandleNextProfileForBroker
@@ -112,6 +114,9 @@ class ExecuteNextBrokerStepEventHandler @Inject constructor(
                         (currentBrokerStep as OptOutStep).profileToOptOut,
                     ),
                 )
+            }
+            else -> {
+                // No-op
             }
         }
     }

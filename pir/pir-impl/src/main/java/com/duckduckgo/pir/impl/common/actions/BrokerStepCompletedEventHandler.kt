@@ -120,6 +120,9 @@ class BrokerStepCompletedEventHandler @Inject constructor(
                     ),
                 )
             }
+            else -> {
+                // No op
+            }
         }
     }
 }
