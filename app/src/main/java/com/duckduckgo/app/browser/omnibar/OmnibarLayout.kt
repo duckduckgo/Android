@@ -295,6 +295,7 @@ open class OmnibarLayout @JvmOverloads constructor(
             )
         }
     }
+
     private val omnibarTextInputClickCatcher: View by lazy { findViewById(R.id.omnibarTextInputClickCatcher) }
 
     internal fun omnibarViews(): List<View> =
