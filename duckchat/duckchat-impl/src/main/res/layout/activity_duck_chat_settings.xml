@@ -194,13 +194,6 @@
                 app:textType="secondary"
                 app:typography="body2" />
 
-            <com.duckduckgo.common.ui.view.listitem.OneLineListItem
-                android:id="@+id/userEnabledButtonsInputScreen"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:primaryText="Show 3 buttons on top of input field"
-                app:showSwitch="true"/>
-
             <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
                 android:id="@+id/duckAiShortcuts"
                 android:layout_width="match_parent"
