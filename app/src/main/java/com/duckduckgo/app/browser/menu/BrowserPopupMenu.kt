@@ -38,10 +38,10 @@ class BrowserPopupMenu(
     layoutInflater: LayoutInflater,
     private val popupMenuResourceType: ResourceType,
 ) : PopupMenu(
-        layoutInflater,
-        resourceId = if (popupMenuResourceType == TOP) R.layout.popup_window_browser_menu else R.layout.popup_window_browser_menu_bottom,
-        width = context.resources.getDimensionPixelSize(R.dimen.browserPopupMenuWidth),
-    ) {
+    layoutInflater,
+    resourceId = if (popupMenuResourceType == TOP) R.layout.popup_window_browser_menu else R.layout.popup_window_browser_menu_bottom,
+    width = context.resources.getDimensionPixelSize(R.dimen.browserPopupMenuWidth),
+) {
     private val topBinding = PopupWindowBrowserMenuBinding.bind(contentView)
     private val bottomBinding = PopupWindowBrowserMenuBottomBinding.bind(contentView)
 
