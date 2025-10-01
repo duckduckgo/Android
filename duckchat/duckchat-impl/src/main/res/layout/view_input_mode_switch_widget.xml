@@ -123,18 +123,28 @@
 
             </LinearLayout>
 
+            <FrameLayout
+                android:id="@+id/inputScreenButtonsContainer"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="8dp"
+                android:layout_marginTop="6dp"
+                android:layout_marginBottom="8dp"
+                android:visibility="gone"
+                android:layout_gravity="end" />
+
+        </LinearLayout>
+
     </com.google.android.material.card.MaterialCardView>
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/inputModeIconsContainer"
         android:layout_width="wrap_content"
         android:layout_height="@dimen/toolbarIcon"
-        android:layout_marginTop="@dimen/omnibarCardMarginTop"
-        android:layout_marginEnd="@dimen/keyline_1"
+        android:layout_marginEnd="@dimen/inputScreenOmnibarCardMarginHorizontal"
         android:animateLayoutChanges="true"
         app:layout_constraintBottom_toBottomOf="@id/inputModeWidgetCard"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@id/inputModeWidgetCard"
         app:layout_constraintTop_toTopOf="@id/inputModeWidgetCard">
 
         <FrameLayout
@@ -175,13 +185,13 @@
             app:layout_constraintStart_toEndOf="@id/inputFieldTabsMenu"
             app:layout_constraintTop_toTopOf="parent">
 
-        <ImageView
-            android:id="@+id/browserMenuImageView"
-            android:layout_width="@dimen/bottomNavIcon"
-            android:layout_height="@dimen/bottomNavIcon"
-            android:layout_gravity="center"
-            android:scaleType="center"
-            android:src="@drawable/ic_menu_vertical_24" />
+            <ImageView
+                android:id="@+id/browserMenuImageView"
+                android:layout_width="@dimen/bottomNavIcon"
+                android:layout_height="@dimen/bottomNavIcon"
+                android:layout_gravity="center"
+                android:scaleType="center"
+                android:src="@drawable/ic_menu_vertical_24" />
 
         </FrameLayout>
 

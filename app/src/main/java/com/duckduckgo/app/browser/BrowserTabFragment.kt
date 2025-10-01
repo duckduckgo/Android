@@ -1118,7 +1118,11 @@ class BrowserTabFragment :
         val intent =
             globalActivityStarter.startIntent(
                 requireContext(),
-                InputScreenActivityParams(query = query, tabs = viewModel.tabs.value?.size ?: 0, duckAiFeatureState.showButtonsOnTop.value),
+                InputScreenActivityParams(
+                    query = query,
+                    tabs = viewModel.tabs.value?.size ?: 0,
+                    isTopOmnibar = omnibar.omnibarPosition == TOP
+                ),
             )
         val enterTransition = browserAndInputScreenTransitionProvider.getInputScreenEnterAnimation(omnibar.omnibarPosition == TOP)
         val exitTransition = browserAndInputScreenTransitionProvider.getBrowserExitAnimation(omnibar.omnibarPosition == TOP)
