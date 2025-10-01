@@ -27,11 +27,11 @@ import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.JsonClass
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
-import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import logcat.asLog
 import logcat.logcat
+import javax.inject.Inject
 
 @ContributesBinding(AppScope::class)
 @RemoteFeatureStoreNamed(DuckPlayerFeature::class)

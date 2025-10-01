@@ -23,10 +23,10 @@ import com.duckduckgo.pir.impl.service.DbpService.PirMainConfig
 import com.duckduckgo.pir.impl.store.PirRepository
 import com.duckduckgo.pir.impl.store.PirRepository.BrokerJson
 import com.squareup.anvil.annotations.ContributesBinding
-import javax.inject.Inject
 import kotlinx.coroutines.withContext
 import logcat.LogPriority.ERROR
 import logcat.logcat
+import javax.inject.Inject
 
 interface BrokerJsonUpdater {
     /**

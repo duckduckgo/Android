@@ -22,9 +22,9 @@ import com.duckduckgo.remote.messaging.fixtures.JsonRemoteMessageOM.smallJsonCon
 import com.duckduckgo.remote.messaging.fixtures.messageActionPlugins
 import com.duckduckgo.remote.messaging.impl.mappers.mapToRemoteMessage
 import com.duckduckgo.remote.messaging.impl.models.JsonContentTranslations
-import java.util.*
 import org.junit.Assert.assertEquals
 import org.junit.Test
+import java.util.*
 
 /**
  * Tests for language fallback functionality in remote messaging translations.

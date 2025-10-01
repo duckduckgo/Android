@@ -24,7 +24,6 @@ import com.duckduckgo.networkprotection.store.db.AutoExcludeDao
 import com.duckduckgo.networkprotection.store.db.FlaggedIncompatibleApp
 import com.duckduckgo.networkprotection.store.db.VpnIncompatibleApp
 import com.squareup.anvil.annotations.ContributesBinding
-import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.Deferred
@@ -33,6 +32,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import javax.inject.Inject
 
 interface AutoExcludeAppsRepository {
     /**

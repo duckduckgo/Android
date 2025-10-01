@@ -21,12 +21,12 @@ import com.duckduckgo.networkprotection.store.NetworkProtectionPrefs
 import com.duckduckgo.networkprotection.store.RealNetworkProtectionPrefs
 import com.wireguard.config.Config
 import com.wireguard.crypto.KeyPair
-import java.io.BufferedReader
-import java.io.StringReader
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
 import org.mockito.MockitoAnnotations
+import java.io.BufferedReader
+import java.io.StringReader
 
 class RealNetworkProtectionRepositoryTest {
     private lateinit var networkProtectionPrefs: NetworkProtectionPrefs

@@ -25,8 +25,8 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.installation.impl.installer.InstallSourceExtractor
 import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.SingleInstanceIn
-import javax.inject.Inject
 import kotlinx.coroutines.withContext
+import javax.inject.Inject
 
 @ContributesMultibinding(AppScope::class)
 @PriorityKey(AtbInitializerListener.PRIORITY_AURA_EXPERIMENT_MANAGER)

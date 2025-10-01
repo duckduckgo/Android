@@ -33,9 +33,9 @@ import com.duckduckgo.remote.messaging.internal.feature.RmfSettingPlugin
 import com.duckduckgo.remotemessaging.internal.databinding.RmfSimpleViewBinding
 import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.android.support.AndroidSupportInjection
-import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 @InjectWith(ViewScope::class)
 class RmfStagingEndpointSettingView @JvmOverloads constructor(

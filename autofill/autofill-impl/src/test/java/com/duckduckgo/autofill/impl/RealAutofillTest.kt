@@ -20,13 +20,13 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.autofill.impl.feature.plugin.AutofillFeatureRepository
 import com.duckduckgo.feature.toggles.api.FeatureException
 import com.duckduckgo.privacy.config.api.UnprotectedTemporary
-import java.util.concurrent.CopyOnWriteArrayList
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
+import java.util.concurrent.CopyOnWriteArrayList
 
 @RunWith(AndroidJUnit4::class)
 class RealAutofillTest {

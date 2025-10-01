@@ -98,10 +98,6 @@ import com.duckduckgo.subscriptions.impl.ui.SubscriptionsWebViewActivityWithPara
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionsWebViewActivityWithParams.ToolbarConfig.DaxPrivacyPro
 import com.duckduckgo.user.agent.api.UserAgentProvider
 import com.google.android.material.snackbar.Snackbar
-import java.io.File
-import java.io.Serializable
-import javax.inject.Inject
-import javax.inject.Named
 import kotlinx.coroutines.flow.cancellable
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.launchIn
@@ -109,6 +105,10 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import logcat.logcat
 import org.json.JSONObject
+import java.io.File
+import java.io.Serializable
+import javax.inject.Inject
+import javax.inject.Named
 
 data class SubscriptionsWebViewActivityWithParams(
     val url: String,

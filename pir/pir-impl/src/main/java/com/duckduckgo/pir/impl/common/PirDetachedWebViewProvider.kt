@@ -29,8 +29,8 @@ import android.webkit.WebViewClient
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.pir.impl.common.PirJobConstants.DBP_INITIAL_URL
 import com.squareup.anvil.annotations.ContributesBinding
-import javax.inject.Inject
 import logcat.logcat
+import javax.inject.Inject
 
 interface PirDetachedWebViewProvider {
     /**

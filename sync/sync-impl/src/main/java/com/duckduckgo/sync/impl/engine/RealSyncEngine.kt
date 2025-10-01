@@ -49,11 +49,11 @@ import com.duckduckgo.sync.store.model.SyncOperationErrorType.DATA_PROVIDER_ERRO
 import com.duckduckgo.sync.store.model.SyncOperationErrorType.ORPHANS_PRESENT
 import com.duckduckgo.sync.store.model.SyncOperationErrorType.TIMESTAMP_CONFLICT
 import com.squareup.anvil.annotations.ContributesBinding
+import logcat.LogPriority.INFO
+import logcat.logcat
 import java.time.Duration
 import java.time.OffsetDateTime
 import javax.inject.Inject
-import logcat.LogPriority.INFO
-import logcat.logcat
 
 @ContributesBinding(scope = AppScope::class)
 class RealSyncEngine @Inject constructor(

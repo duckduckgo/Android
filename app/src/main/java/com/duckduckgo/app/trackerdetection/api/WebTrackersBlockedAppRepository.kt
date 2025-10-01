@@ -21,11 +21,11 @@ import com.duckduckgo.app.trackerdetection.db.WebTrackerBlocked
 import com.duckduckgo.common.utils.formatters.time.DatabaseDateFormatter
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
-import java.time.LocalDateTime
-import javax.inject.Inject
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
+import java.time.LocalDateTime
+import javax.inject.Inject
 
 @ContributesBinding(AppScope::class)
 class WebTrackersBlockedAppRepository @Inject constructor(appDatabase: AppDatabase) : WebTrackersBlockedRepository {

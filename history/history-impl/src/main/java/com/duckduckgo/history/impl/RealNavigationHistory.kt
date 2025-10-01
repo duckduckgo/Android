@@ -24,10 +24,10 @@ import com.duckduckgo.history.api.HistoryEntry
 import com.duckduckgo.history.api.NavigationHistory
 import com.duckduckgo.history.impl.remoteconfig.HistoryFeature
 import com.squareup.anvil.annotations.ContributesBinding
-import javax.inject.Inject
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
+import javax.inject.Inject
 
 interface InternalNavigationHistory : NavigationHistory {
     suspend fun clearOldEntries()

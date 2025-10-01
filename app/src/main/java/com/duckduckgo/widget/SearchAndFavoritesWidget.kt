@@ -36,12 +36,12 @@ import com.duckduckgo.app.systemsearch.SystemSearchActivity
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.widget.FavoritesWidgetItemFactory.Companion.THEME_EXTRAS
-import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import logcat.LogPriority.INFO
 import logcat.logcat
+import javax.inject.Inject
 
 enum class WidgetTheme {
     LIGHT,

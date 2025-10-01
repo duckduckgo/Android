@@ -25,13 +25,13 @@ import com.duckduckgo.feature.toggles.impl.MetricsPixelStore
 import com.duckduckgo.feature.toggles.impl.RetentionMetric.APP_USE
 import com.duckduckgo.feature.toggles.impl.RetentionMetric.SEARCH
 import com.squareup.anvil.annotations.ContributesMultibinding
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.time.ZoneId
 import java.time.ZonedDateTime
 import java.time.temporal.ChronoUnit
 import javax.inject.Inject
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.launch
 
 @ContributesMultibinding(AppScope::class)
 class RetentionMetricsAtbLifecyclePlugin @Inject constructor(

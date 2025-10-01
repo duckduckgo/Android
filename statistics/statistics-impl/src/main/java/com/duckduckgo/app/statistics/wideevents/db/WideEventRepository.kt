@@ -16,9 +16,9 @@
 
 package com.duckduckgo.app.statistics.wideevents.db
 
+import kotlinx.coroutines.flow.Flow
 import java.time.Duration
 import java.time.Instant
-import kotlinx.coroutines.flow.Flow
 
 interface WideEventRepository {
     suspend fun insertWideEvent(

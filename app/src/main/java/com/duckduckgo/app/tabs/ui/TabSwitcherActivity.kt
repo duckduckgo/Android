@@ -95,10 +95,6 @@ import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.duckchat.api.DuckChat
-import java.util.ArrayList
-import javax.inject.Inject
-import kotlin.coroutines.CoroutineContext
-import kotlin.math.max
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.collectLatest
@@ -107,6 +103,10 @@ import kotlinx.coroutines.launch
 import logcat.LogPriority.WARN
 import logcat.asLog
 import logcat.logcat
+import java.util.ArrayList
+import javax.inject.Inject
+import kotlin.coroutines.CoroutineContext
+import kotlin.math.max
 
 @InjectWith(ActivityScope::class)
 class TabSwitcherActivity :

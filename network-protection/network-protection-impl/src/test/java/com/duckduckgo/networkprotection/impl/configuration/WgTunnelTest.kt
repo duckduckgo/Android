@@ -7,9 +7,6 @@ import com.duckduckgo.networkprotection.impl.config.NetPDefaultConfigProvider
 import com.duckduckgo.networkprotection.impl.configuration.WgServerApi.Mode.FailureRecovery
 import com.wireguard.config.Config
 import com.wireguard.crypto.KeyPair
-import java.io.BufferedReader
-import java.io.StringReader
-import java.lang.reflect.Field
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -18,6 +15,9 @@ import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.*
+import java.io.BufferedReader
+import java.io.StringReader
+import java.lang.reflect.Field
 
 @RunWith(AndroidJUnit4::class)
 class WgTunnelTest {

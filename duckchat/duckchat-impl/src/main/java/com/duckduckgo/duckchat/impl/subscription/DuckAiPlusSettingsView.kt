@@ -38,9 +38,9 @@ import com.duckduckgo.duckchat.impl.subscription.DuckAiPlusSettingsViewModel.Vie
 import com.duckduckgo.duckchat.impl.subscription.DuckAiPlusSettingsViewModel.ViewState.SettingState
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import dagger.android.support.AndroidSupportInjection
-import javax.inject.Inject
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import javax.inject.Inject
 
 @InjectWith(ViewScope::class)
 class DuckAiPlusSettingsView @JvmOverloads constructor(

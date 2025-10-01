@@ -26,9 +26,9 @@ import com.duckduckgo.daxprompts.impl.repository.DaxPromptsRepository
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
+import kotlinx.coroutines.withContext
 import java.util.Date
 import javax.inject.Inject
-import kotlinx.coroutines.withContext
 
 private const val EXISTING_USER_DAY_COUNT_THRESHOLD = 28
 private const val EXISTING_USER_DAYS_INACTIVE_MILLIS = 7 * 24 * 60 * 60 * 1000 // 7 days

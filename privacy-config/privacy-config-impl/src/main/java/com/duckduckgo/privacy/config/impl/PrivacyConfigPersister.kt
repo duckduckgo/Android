@@ -39,12 +39,12 @@ import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides
 import dagger.SingleInstanceIn
+import logcat.LogPriority.VERBOSE
+import logcat.logcat
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import javax.inject.Inject
 import javax.inject.Qualifier
-import logcat.LogPriority.VERBOSE
-import logcat.logcat
 
 interface PrivacyConfigPersister {
     suspend fun persistPrivacyConfig(

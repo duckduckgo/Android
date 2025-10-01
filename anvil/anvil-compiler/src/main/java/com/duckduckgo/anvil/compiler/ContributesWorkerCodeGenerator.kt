@@ -40,12 +40,12 @@ import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
 import com.squareup.kotlinpoet.PropertySpec
 import com.squareup.kotlinpoet.TypeSpec
 import com.squareup.kotlinpoet.TypeVariableName
-import java.io.File
-import java.lang.StringBuilder
-import javax.inject.Inject
 import org.jetbrains.kotlin.descriptors.ModuleDescriptor
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.psi.KtFile
+import java.io.File
+import java.lang.StringBuilder
+import javax.inject.Inject
 
 /**
  * This Anvil code generator allows injection dependencies into the Workers (WorkerInjectorPlugin) without manually creating a WorkerInjectorPlugin

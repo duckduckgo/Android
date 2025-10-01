@@ -6,7 +6,6 @@ import com.duckduckgo.remote.messaging.api.JsonMatchingAttribute
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.AUTO_RENEWABLE
 import com.duckduckgo.subscriptions.impl.SubscriptionsManager
 import com.duckduckgo.subscriptions.impl.repository.Subscription
-import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -19,6 +18,7 @@ import org.junit.Test
 import org.mockito.Mock
 import org.mockito.MockitoAnnotations
 import org.mockito.kotlin.whenever
+import java.util.concurrent.TimeUnit
 
 class RMFPProDaysSinceSubscribedMatchingAttributeTest {
     @get:Rule

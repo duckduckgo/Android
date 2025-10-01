@@ -36,10 +36,10 @@ import com.duckduckgo.pir.impl.dashboard.messaging.handlers.PirWebJsMessageHandl
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
-import javax.inject.Inject
-import javax.inject.Named
 import kotlinx.coroutines.runBlocking
 import logcat.logcat
+import javax.inject.Inject
+import javax.inject.Named
 
 @ContributesBinding(ActivityScope::class)
 @Named("PirDashboardWebMessaging")

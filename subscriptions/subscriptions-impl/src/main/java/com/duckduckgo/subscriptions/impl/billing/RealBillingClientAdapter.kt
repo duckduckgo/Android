@@ -39,14 +39,14 @@ import com.duckduckgo.subscriptions.impl.billing.BillingInitResult.Failure
 import com.duckduckgo.subscriptions.impl.billing.BillingInitResult.Success
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
-import java.lang.IllegalArgumentException
-import javax.inject.Inject
-import kotlin.coroutines.resume
-import kotlin.coroutines.suspendCoroutine
 import kotlinx.coroutines.withContext
 import logcat.LogPriority.WARN
 import logcat.asLog
 import logcat.logcat
+import java.lang.IllegalArgumentException
+import javax.inject.Inject
+import kotlin.coroutines.resume
+import kotlin.coroutines.suspendCoroutine
 
 @ContributesBinding(AppScope::class)
 @SingleInstanceIn(AppScope::class)

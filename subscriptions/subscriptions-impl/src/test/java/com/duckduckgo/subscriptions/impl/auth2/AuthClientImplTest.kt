@@ -8,9 +8,6 @@ import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.subscriptions.impl.PrivacyProFeature
-import java.time.Duration
-import java.time.Instant
-import java.time.LocalDateTime
 import kotlinx.coroutines.test.runTest
 import okhttp3.Headers
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
@@ -29,6 +26,9 @@ import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import retrofit2.HttpException
 import retrofit2.Response
+import java.time.Duration
+import java.time.Instant
+import java.time.LocalDateTime
 
 @RunWith(AndroidJUnit4::class)
 class AuthClientImplTest {

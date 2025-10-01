@@ -48,10 +48,10 @@ import com.duckduckgo.subscriptions.impl.feedback.SubscriptionFeedbackViewModel.
 import com.duckduckgo.subscriptions.impl.feedback.SubscriptionFeedbackViewModel.ViewState
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionsWebViewActivityWithParams
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionsWebViewActivityWithParams.ToolbarConfig.CustomTitle
-import javax.inject.Inject
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import javax.inject.Inject
 
 @InjectWith(ActivityScope::class)
 @ContributeToActivityStarter(PrivacyProFeedbackScreenWithParams::class)

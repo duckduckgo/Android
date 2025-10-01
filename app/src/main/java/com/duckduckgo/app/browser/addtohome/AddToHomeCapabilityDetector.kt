@@ -18,9 +18,9 @@ package com.duckduckgo.app.browser.addtohome
 
 import android.content.Context
 import androidx.core.content.pm.ShortcutManagerCompat
-import javax.inject.Inject
 import logcat.LogPriority.VERBOSE
 import logcat.logcat
+import javax.inject.Inject
 
 interface AddToHomeCapabilityDetector {
     fun isAddToHomeSupported(): Boolean

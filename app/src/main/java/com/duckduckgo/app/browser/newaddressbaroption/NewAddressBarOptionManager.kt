@@ -30,12 +30,12 @@ import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.remote.messaging.api.RemoteMessagingRepository
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
-import javax.inject.Inject
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import logcat.LogPriority.DEBUG
 import logcat.logcat
+import javax.inject.Inject
 
 interface NewAddressBarOptionManager {
     suspend fun showChoiceScreen(

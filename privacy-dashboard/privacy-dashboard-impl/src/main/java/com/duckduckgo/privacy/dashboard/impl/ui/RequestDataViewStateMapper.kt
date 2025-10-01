@@ -38,8 +38,8 @@ import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.RequestState.Allowed
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.RequestState.Blocked
 import com.squareup.anvil.annotations.ContributesBinding
-import javax.inject.Inject
 import okhttp3.internal.publicsuffix.PublicSuffixDatabase
+import javax.inject.Inject
 
 interface RequestDataViewStateMapper {
     fun mapFromSite(site: Site): RequestDataViewState

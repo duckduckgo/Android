@@ -25,8 +25,8 @@ import com.duckduckgo.remote.messaging.api.RemoteMessageModel
 import com.duckduckgo.remote.messaging.api.RemoteMessagingRepository
 import com.duckduckgo.remote.messaging.impl.pixels.RemoteMessagingPixels
 import com.squareup.anvil.annotations.ContributesBinding
-import javax.inject.Inject
 import kotlinx.coroutines.withContext
+import javax.inject.Inject
 
 @ContributesBinding(AppScope::class)
 class RealRemoteMessageModel @Inject constructor(

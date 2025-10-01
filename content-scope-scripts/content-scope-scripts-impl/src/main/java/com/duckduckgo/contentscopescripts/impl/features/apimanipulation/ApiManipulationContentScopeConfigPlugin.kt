@@ -19,8 +19,8 @@ package com.duckduckgo.contentscopescripts.impl.features.apimanipulation
 import com.duckduckgo.contentscopescripts.api.ContentScopeConfigPlugin
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesMultibinding
-import javax.inject.Inject
 import kotlinx.coroutines.runBlocking
+import javax.inject.Inject
 
 const val API_MANIPULATION_FEATURE_NAME = "apiManipulation"
 

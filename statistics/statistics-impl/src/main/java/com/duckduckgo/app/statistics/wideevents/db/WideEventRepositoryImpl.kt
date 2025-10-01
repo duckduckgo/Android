@@ -21,11 +21,11 @@ import com.duckduckgo.app.statistics.wideevents.db.WideEventRepository.CleanupPo
 import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 import java.time.Duration
 import java.time.Instant
 import javax.inject.Inject
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.map
 
 @ContributesBinding(AppScope::class)
 class WideEventRepositoryImpl @Inject constructor(

@@ -26,9 +26,6 @@ import com.duckduckgo.networkprotection.impl.configuration.WgTunnelConfig
 import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixels
 import com.wireguard.config.Config
 import com.wireguard.crypto.KeyPair
-import java.io.BufferedReader
-import java.io.StringReader
-import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
@@ -40,6 +37,9 @@ import org.mockito.kotlin.any
 import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
+import java.io.BufferedReader
+import java.io.StringReader
+import java.util.concurrent.TimeUnit
 
 @RunWith(AndroidJUnit4::class)
 class RealNetPRekeyerTest {

@@ -35,13 +35,13 @@ import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides
 import dagger.multibindings.IntoSet
-import java.time.LocalDateTime
-import java.util.concurrent.TimeUnit
-import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import logcat.LogPriority.INFO
 import logcat.LogPriority.VERBOSE
 import logcat.logcat
+import java.time.LocalDateTime
+import java.util.concurrent.TimeUnit
+import javax.inject.Inject
 
 @Module
 @ContributesTo(AppScope::class)

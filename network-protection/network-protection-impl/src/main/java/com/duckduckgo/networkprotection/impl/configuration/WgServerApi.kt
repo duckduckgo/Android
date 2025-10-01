@@ -25,8 +25,8 @@ import com.duckduckgo.networkprotection.impl.configuration.WgServerApi.Mode.Fail
 import com.duckduckgo.networkprotection.impl.configuration.WgServerApi.WgServerData
 import com.duckduckgo.networkprotection.impl.settings.geoswitching.NetpEgressServersProvider
 import com.squareup.anvil.annotations.ContributesBinding
-import javax.inject.Inject
 import logcat.logcat
+import javax.inject.Inject
 
 interface WgServerApi {
     data class WgServerData(

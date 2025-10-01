@@ -31,9 +31,9 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ReceiverScope
 import dagger.android.AndroidInjection
-import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 @InjectWith(ReceiverScope::class)
 class ShortcutReceiver : BroadcastReceiver() {

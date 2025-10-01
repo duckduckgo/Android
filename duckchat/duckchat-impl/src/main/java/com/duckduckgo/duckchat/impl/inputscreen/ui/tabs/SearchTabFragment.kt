@@ -148,11 +148,11 @@ class SearchTabFragment : DuckDuckGoFragment(R.layout.fragment_search_tab) {
                     viewModel.userLongPressedAutocomplete(it)
                 },
                 omnibarPosition =
-                    if (inputScreenConfigResolver.useTopBar()) {
-                        OmnibarPosition.TOP
-                    } else {
-                        OmnibarPosition.BOTTOM
-                    },
+                if (inputScreenConfigResolver.useTopBar()) {
+                    OmnibarPosition.TOP
+                } else {
+                    OmnibarPosition.BOTTOM
+                },
             )
         binding.autoCompleteSuggestionsList.adapter = autoCompleteSuggestionsAdapter
     }

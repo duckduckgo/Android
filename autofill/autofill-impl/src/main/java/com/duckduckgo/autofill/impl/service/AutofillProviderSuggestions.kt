@@ -37,10 +37,10 @@ import com.duckduckgo.autofill.impl.service.AutofillProviderChooseActivity.Compa
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
-import javax.inject.Inject
-import kotlin.random.Random
 import logcat.LogPriority.INFO
 import logcat.logcat
+import javax.inject.Inject
+import kotlin.random.Random
 
 interface AutofillProviderSuggestions {
     suspend fun buildSuggestionsResponse(

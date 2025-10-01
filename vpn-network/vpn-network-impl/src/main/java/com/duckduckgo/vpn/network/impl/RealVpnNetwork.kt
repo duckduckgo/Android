@@ -33,16 +33,16 @@ import com.duckduckgo.vpn.network.impl.models.ResourceRecord
 import com.duckduckgo.vpn.network.impl.models.Usage
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
-import java.net.InetSocketAddress
-import java.util.concurrent.atomic.AtomicReference
-import javax.inject.Inject
-import kotlin.system.exitProcess
 import logcat.LogPriority.ERROR
 import logcat.LogPriority.INFO
 import logcat.LogPriority.VERBOSE
 import logcat.LogPriority.WARN
 import logcat.asLog
 import logcat.logcat
+import java.net.InetSocketAddress
+import java.util.concurrent.atomic.AtomicReference
+import javax.inject.Inject
+import kotlin.system.exitProcess
 
 @ContributesBinding(VpnScope::class)
 @SingleInstanceIn(VpnScope::class)

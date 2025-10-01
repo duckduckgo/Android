@@ -16,7 +16,6 @@
 
 package com.duckduckgo.duckchat.impl.inputscreen.ui
 
-import android.content.Intent
 import android.content.res.Configuration
 import android.os.Build.VERSION
 import android.os.Bundle

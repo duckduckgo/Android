@@ -43,10 +43,10 @@ import com.duckduckgo.pir.impl.store.db.UserName
 import com.duckduckgo.pir.impl.store.db.UserProfile
 import com.duckduckgo.pir.impl.store.db.UserProfileDao
 import com.squareup.moshi.Moshi
-import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
+import java.util.concurrent.TimeUnit
 
 interface PirRepository {
     suspend fun getCurrentMainEtag(): String?

@@ -28,15 +28,15 @@ import dagger.Lazy
 import dagger.Module
 import dagger.Provides
 import dagger.SingleInstanceIn
-import java.io.File
-import java.nio.charset.StandardCharsets
-import javax.inject.Inject
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import logcat.logcat
 import org.iq80.leveldb.DB
 import org.iq80.leveldb.Options
 import org.iq80.leveldb.impl.Iq80DBFactory.factory
+import java.io.File
+import java.nio.charset.StandardCharsets
+import javax.inject.Inject
 
 interface WebLocalStorageManager {
     fun clearWebLocalStorage()

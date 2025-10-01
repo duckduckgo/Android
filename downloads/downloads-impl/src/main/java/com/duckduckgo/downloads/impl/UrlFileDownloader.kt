@@ -24,16 +24,16 @@ import com.duckduckgo.downloads.api.FileDownloader
 import com.duckduckgo.downloads.api.model.DownloadItem
 import com.duckduckgo.downloads.impl.feature.FileDownloadFeature
 import com.duckduckgo.downloads.store.DownloadStatus.STARTED
-import java.io.File
-import javax.inject.Inject
-import kotlin.math.exp
-import kotlin.math.floor
-import kotlin.random.Random
 import logcat.asLog
 import logcat.logcat
 import okhttp3.ResponseBody
 import okio.Buffer
 import okio.sink
+import java.io.File
+import javax.inject.Inject
+import kotlin.math.exp
+import kotlin.math.floor
+import kotlin.random.Random
 
 class UrlFileDownloader @Inject constructor(
     private val downloadFileService: DownloadFileService,

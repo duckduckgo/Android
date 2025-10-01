@@ -27,9 +27,9 @@ import com.duckduckgo.daxprompts.impl.store.SharedPreferencesDaxPromptsDataStore
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
+import kotlinx.coroutines.flow.firstOrNull
 import java.util.Date
 import javax.inject.Inject
-import kotlinx.coroutines.flow.firstOrNull
 
 interface DaxPromptsDataStore {
     suspend fun setShownDaxPromptsBrowserComparison()

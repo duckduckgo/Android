@@ -41,9 +41,6 @@ import com.frybits.harmony.getHarmonySharedPreferences
 import com.squareup.anvil.annotations.ContributesMultibinding
 import com.squareup.moshi.Moshi
 import dagger.SingleInstanceIn
-import java.util.concurrent.Executors
-import java.util.concurrent.TimeUnit
-import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.asCoroutineDispatcher
 import kotlinx.coroutines.launch
@@ -51,6 +48,9 @@ import logcat.LogPriority.ERROR
 import logcat.LogPriority.WARN
 import logcat.asLog
 import logcat.logcat
+import java.util.concurrent.Executors
+import java.util.concurrent.TimeUnit
+import javax.inject.Inject
 
 @ContributesMultibinding(scope = VpnScope::class)
 @SingleInstanceIn(VpnScope::class)

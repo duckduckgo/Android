@@ -76,9 +76,6 @@ import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.view.message.AppTPS
 import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.view.message.AppTPStateMessagePlugin.DefaultAppTPMessageAction
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.google.android.material.snackbar.Snackbar
-import java.util.concurrent.TimeUnit
-import javax.inject.Inject
-import javax.inject.Provider
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.flow.combine
@@ -88,6 +85,9 @@ import kotlinx.coroutines.launch
 import logcat.logcat
 import nl.dionsegijn.konfetti.models.Shape
 import nl.dionsegijn.konfetti.models.Size
+import java.util.concurrent.TimeUnit
+import javax.inject.Inject
+import javax.inject.Provider
 
 @InjectWith(ActivityScope::class)
 @ContributeToActivityStarter(AppTrackerActivityWithEmptyParams::class, screenName = "apptp.main")

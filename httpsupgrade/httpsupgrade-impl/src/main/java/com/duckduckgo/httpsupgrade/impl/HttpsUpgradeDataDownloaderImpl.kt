@@ -23,8 +23,8 @@ import com.duckduckgo.httpsupgrade.store.HttpsBloomFilterSpec
 import com.duckduckgo.httpsupgrade.store.HttpsFalsePositivesDao
 import io.reactivex.Completable
 import io.reactivex.Completable.fromAction
-import java.io.IOException
 import logcat.logcat
+import java.io.IOException
 
 internal class HttpsUpgradeDataDownloaderImpl constructor(
     private val service: HttpsUpgradeService,

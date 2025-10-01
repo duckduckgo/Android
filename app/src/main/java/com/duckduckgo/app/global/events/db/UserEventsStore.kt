@@ -17,8 +17,8 @@
 package com.duckduckgo.app.global.events.db
 
 import com.duckduckgo.common.utils.DispatcherProvider
-import javax.inject.Inject
 import kotlinx.coroutines.withContext
+import javax.inject.Inject
 
 interface UserEventsStore {
     suspend fun getUserEvent(userEventKey: UserEventKey): UserEventEntity?

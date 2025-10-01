@@ -22,12 +22,12 @@ import com.duckduckgo.anvil.annotations.ContributesWorker
 import com.duckduckgo.app.job.ConfigurationDownloader
 import com.duckduckgo.di.scopes.AppScope
 import io.reactivex.Single
-import java.util.concurrent.TimeUnit
-import javax.inject.Inject
 import logcat.LogPriority.INFO
 import logcat.LogPriority.WARN
 import logcat.asLog
 import logcat.logcat
+import java.util.concurrent.TimeUnit
+import javax.inject.Inject
 
 class AppConfigurationSyncWorkRequestBuilder @Inject constructor() {
 

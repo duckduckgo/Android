@@ -27,9 +27,9 @@ import com.squareup.anvil.annotations.ContributesMultibinding
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides
+import org.json.JSONObject
 import javax.inject.Inject
 import javax.inject.Provider
-import org.json.JSONObject
 
 @ContributesMultibinding(ActivityScope::class)
 class DeviceInfoCollector @Inject constructor(

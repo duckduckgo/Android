@@ -79,13 +79,6 @@ import com.squareup.moshi.JsonEncodingException
 import com.squareup.moshi.Moshi
 import dagger.Lazy
 import dagger.SingleInstanceIn
-import java.io.IOException
-import java.time.Duration
-import java.time.Instant
-import java.time.Period
-import java.time.format.DateTimeParseException
-import javax.inject.Inject
-import kotlin.time.Duration.Companion.milliseconds
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
@@ -101,6 +94,13 @@ import logcat.LogPriority.ERROR
 import logcat.asLog
 import logcat.logcat
 import retrofit2.HttpException
+import java.io.IOException
+import java.time.Duration
+import java.time.Instant
+import java.time.Period
+import java.time.format.DateTimeParseException
+import javax.inject.Inject
+import kotlin.time.Duration.Companion.milliseconds
 
 interface SubscriptionsManager {
 

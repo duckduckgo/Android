@@ -33,8 +33,6 @@ import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
 import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerEntity
 import com.duckduckgo.mobile.android.vpn.ui.onboarding.VpnStore
 import com.duckduckgo.mobile.android.vpn.ui.privacyreport.PrivacyReportViewModel
-import java.time.LocalDateTime
-import kotlin.time.ExperimentalTime
 import kotlinx.coroutines.runBlocking
 import org.junit.After
 import org.junit.Assert.assertEquals
@@ -43,6 +41,8 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.mock
+import java.time.LocalDateTime
+import kotlin.time.ExperimentalTime
 
 @ExperimentalTime
 @RunWith(AndroidJUnit4::class)

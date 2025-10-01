@@ -20,9 +20,9 @@ import androidx.lifecycle.LiveData
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.common.utils.DispatcherProvider
 import dagger.Lazy
-import javax.inject.Inject
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.withContext
+import javax.inject.Inject
 
 interface LocationPermissionsRepository {
     fun getLocationPermissionsSync(): List<LocationPermissionEntity>

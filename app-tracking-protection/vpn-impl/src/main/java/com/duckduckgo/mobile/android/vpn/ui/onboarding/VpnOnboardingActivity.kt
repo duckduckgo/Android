@@ -49,10 +49,10 @@ import com.duckduckgo.mobile.android.vpn.ui.onboarding.Command.ShowVpnAlwaysOnCo
 import com.duckduckgo.mobile.android.vpn.ui.onboarding.Command.ShowVpnConflictDialog
 import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.DeviceShieldTrackerActivity
 import com.duckduckgo.navigation.api.GlobalActivityStarter
-import javax.inject.Inject
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 @InjectWith(ActivityScope::class)
 @ContributeToActivityStarter(AppTrackerOnboardingActivityWithEmptyParamsParams::class)

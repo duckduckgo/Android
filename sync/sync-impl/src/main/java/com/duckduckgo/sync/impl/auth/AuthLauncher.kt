@@ -31,9 +31,9 @@ import com.duckduckgo.sync.impl.auth.DeviceAuthenticator.AuthResult.Error
 import com.duckduckgo.sync.impl.auth.DeviceAuthenticator.AuthResult.Success
 import com.duckduckgo.sync.impl.auth.DeviceAuthenticator.AuthResult.UserCancelled
 import com.squareup.anvil.annotations.ContributesBinding
-import javax.inject.Inject
 import logcat.LogPriority.VERBOSE
 import logcat.logcat
+import javax.inject.Inject
 
 interface AuthLauncher {
 

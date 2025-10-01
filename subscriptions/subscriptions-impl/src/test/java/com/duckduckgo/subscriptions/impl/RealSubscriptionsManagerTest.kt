@@ -57,9 +57,6 @@ import com.duckduckgo.subscriptions.impl.services.SubscriptionResponse
 import com.duckduckgo.subscriptions.impl.services.SubscriptionsService
 import com.duckduckgo.subscriptions.impl.services.ValidateTokenResponse
 import com.duckduckgo.subscriptions.impl.store.SubscriptionsDataStore
-import java.time.Duration
-import java.time.Instant
-import java.time.LocalDateTime
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOf
@@ -92,6 +89,9 @@ import org.mockito.kotlin.verifyNoMoreInteractions
 import org.mockito.kotlin.whenever
 import retrofit2.HttpException
 import retrofit2.Response
+import java.time.Duration
+import java.time.Instant
+import java.time.LocalDateTime
 
 @RunWith(Parameterized::class)
 class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {

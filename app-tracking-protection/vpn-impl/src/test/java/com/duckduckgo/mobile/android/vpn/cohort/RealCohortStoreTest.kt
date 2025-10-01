@@ -24,7 +24,6 @@ import com.duckduckgo.data.store.api.SharedPreferencesProvider
 import com.duckduckgo.mobile.android.vpn.AppTpVpnFeature
 import com.duckduckgo.mobile.android.vpn.FakeVpnFeaturesRegistry
 import com.duckduckgo.mobile.android.vpn.VpnFeaturesRegistry
-import java.time.LocalDate
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.*
@@ -36,6 +35,7 @@ import org.mockito.MockitoAnnotations
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
+import java.time.LocalDate
 
 class RealCohortStoreTest {
     @get:Rule

@@ -19,10 +19,10 @@ package com.duckduckgo.app.anr
 import com.duckduckgo.anrs.api.CrashLogger
 import com.duckduckgo.app.anrs.store.AnrEntity
 import com.duckduckgo.app.anrs.store.ExceptionEntity
-import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter
 import logcat.asLog
 import okio.ByteString.Companion.encode
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 
 internal data class ProcessThread(
     val name: String,

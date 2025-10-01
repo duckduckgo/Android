@@ -22,10 +22,10 @@ import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides
 import dagger.SingleInstanceIn
-import javax.inject.Named
-import javax.inject.Provider
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
+import javax.inject.Named
+import javax.inject.Provider
 
 @Module
 @ContributesTo(AppScope::class)

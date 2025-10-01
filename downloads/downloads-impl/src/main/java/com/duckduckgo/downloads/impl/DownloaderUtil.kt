@@ -18,13 +18,13 @@ package com.duckduckgo.downloads.impl
 
 import android.net.Uri
 import android.webkit.MimeTypeMap
+import logcat.logcat
 import java.io.UnsupportedEncodingException
 import java.net.URLDecoder
 import java.util.Locale
 import java.util.regex.Matcher
 import java.util.regex.Pattern
 import kotlin.jvm.Throws
-import logcat.logcat
 
 object DownloaderUtil {
 

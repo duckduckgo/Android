@@ -34,12 +34,12 @@ import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
 import dagger.BindsOptionalOf
 import dagger.Provides
 import dagger.multibindings.IntoSet
-import java.io.File
-import javax.inject.Inject
 import org.jetbrains.kotlin.descriptors.ModuleDescriptor
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.psi.KtFile
 import org.jetbrains.kotlin.utils.addToStdlib.ifFalse
+import java.io.File
+import javax.inject.Inject
 
 @OptIn(ExperimentalAnvilApi::class)
 @AutoService(CodeGenerator::class)

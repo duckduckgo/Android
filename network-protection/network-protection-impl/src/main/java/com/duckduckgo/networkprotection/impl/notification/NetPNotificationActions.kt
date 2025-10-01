@@ -30,9 +30,9 @@ import com.duckduckgo.subscriptions.api.PrivacyProFeedbackScreens.PrivacyProFeed
 import com.duckduckgo.subscriptions.api.PrivacyProUnifiedFeedback
 import com.duckduckgo.subscriptions.api.PrivacyProUnifiedFeedback.PrivacyProFeedbackSource.VPN_MANAGEMENT
 import com.squareup.anvil.annotations.ContributesBinding
+import kotlinx.coroutines.runBlocking
 import javax.inject.Inject
 import javax.inject.Provider
-import kotlinx.coroutines.runBlocking
 
 interface NetPNotificationActions {
     fun getReportIssueNotificationAction(context: Context): NotificationCompat.Action

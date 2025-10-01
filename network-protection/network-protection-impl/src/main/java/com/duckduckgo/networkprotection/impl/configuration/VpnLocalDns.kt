@@ -23,11 +23,11 @@ import com.squareup.moshi.Moshi
 import dagger.Module
 import dagger.Provides
 import dagger.SingleInstanceIn
-import java.net.InetAddress
-import javax.inject.Qualifier
 import logcat.asLog
 import logcat.logcat
 import okhttp3.Dns
+import java.net.InetAddress
+import javax.inject.Qualifier
 
 interface VpnLocalDns : Dns
 

@@ -33,9 +33,9 @@ import com.duckduckgo.sync.impl.ui.setup.SyncDeviceConnectedViewModel.Command
 import com.duckduckgo.sync.impl.ui.setup.SyncDeviceConnectedViewModel.Command.FinishSetupFlow
 import com.duckduckgo.sync.impl.ui.setup.SyncDeviceConnectedViewModel.Command.LaunchSyncGetOnOtherPlatforms
 import com.google.android.material.snackbar.Snackbar
-import javax.inject.*
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import javax.inject.*
 
 @InjectWith(FragmentScope::class)
 class SyncDeviceConnectedFragment : DuckDuckGoFragment(R.layout.fragment_device_connected) {

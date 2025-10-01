@@ -34,13 +34,13 @@ import com.duckduckgo.sync.store.SyncUnavailableStore
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.SingleInstanceIn
+import kotlinx.coroutines.withContext
+import logcat.logcat
 import java.time.Instant
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
-import kotlinx.coroutines.withContext
-import logcat.logcat
 
 interface SyncUnavailableRepository {
     fun onServerAvailable()

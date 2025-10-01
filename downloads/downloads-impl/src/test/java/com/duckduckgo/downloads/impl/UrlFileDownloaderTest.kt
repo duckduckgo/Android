@@ -23,7 +23,6 @@ import com.duckduckgo.downloads.api.FileDownloader
 import com.duckduckgo.downloads.impl.feature.FileDownloadFeature
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle
-import java.io.File
 import kotlinx.coroutines.test.runTest
 import okhttp3.ResponseBody
 import okhttp3.ResponseBody.Companion.toResponseBody
@@ -34,6 +33,7 @@ import org.mockito.ArgumentMatchers.anyString
 import org.mockito.kotlin.*
 import retrofit2.Call
 import retrofit2.Response
+import java.io.File
 
 @SuppressLint("DenyListedApi")
 class UrlFileDownloaderTest {

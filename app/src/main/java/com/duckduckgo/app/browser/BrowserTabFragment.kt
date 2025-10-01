@@ -304,7 +304,6 @@ import com.duckduckgo.js.messaging.api.JsMessaging
 import com.duckduckgo.js.messaging.api.SubscriptionEventData
 import com.duckduckgo.js.messaging.api.WebViewCompatMessageCallback
 import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.Feed
-import com.duckduckgo.mobile.android.R as CommonR
 import com.duckduckgo.mobile.android.app.tracking.ui.AppTrackingProtectionScreens.AppTrackerOnboardingActivityWithEmptyParamsParams
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.navigation.api.GlobalActivityStarter.DeeplinkActivityParams
@@ -339,12 +338,6 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.Snackbar
-import java.io.File
-import javax.inject.Inject
-import javax.inject.Named
-import javax.inject.Provider
-import kotlin.coroutines.CoroutineContext
-import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
@@ -363,6 +356,13 @@ import logcat.asLog
 import logcat.logcat
 import okio.ByteString.Companion.encode
 import org.json.JSONObject
+import java.io.File
+import javax.inject.Inject
+import javax.inject.Named
+import javax.inject.Provider
+import kotlin.coroutines.CoroutineContext
+import kotlin.time.Duration.Companion.seconds
+import com.duckduckgo.mobile.android.R as CommonR
 
 @InjectWith(FragmentScope::class)
 class BrowserTabFragment :

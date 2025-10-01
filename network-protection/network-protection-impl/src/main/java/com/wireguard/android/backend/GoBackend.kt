@@ -28,12 +28,12 @@ import com.duckduckgo.mobile.android.app.tracking.AppTrackerDetector
 import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixels
 import dagger.Lazy
 import dagger.SingleInstanceIn
-import java.net.InetSocketAddress
-import javax.inject.Inject
-import kotlin.system.exitProcess
 import logcat.LogPriority.ERROR
 import logcat.asLog
 import logcat.logcat
+import java.net.InetSocketAddress
+import javax.inject.Inject
+import kotlin.system.exitProcess
 
 @SingleInstanceIn(VpnScope::class)
 class GoBackend @Inject constructor(

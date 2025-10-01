@@ -19,7 +19,6 @@ package com.duckduckgo.app.global.rating
 import com.duckduckgo.app.browser.rating.db.AppEnjoymentRepository
 import com.duckduckgo.app.usage.app.AppDaysUsedRepository
 import com.duckduckgo.common.test.CoroutineTestRule
-import java.util.*
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
@@ -29,6 +28,7 @@ import org.junit.Test
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
+import java.util.*
 
 @Suppress("RemoveExplicitTypeArguments")
 class SecondaryPromptDeciderTest {

@@ -21,13 +21,13 @@ import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.subscriptions.api.Subscriptions
-import javax.inject.Inject
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
+import javax.inject.Inject
 
 @ContributesViewModel(FragmentScope::class)
 class DuckChatWebViewViewModel @Inject constructor(

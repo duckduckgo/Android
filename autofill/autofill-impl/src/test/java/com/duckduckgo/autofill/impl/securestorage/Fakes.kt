@@ -20,8 +20,8 @@ import com.duckduckgo.autofill.impl.securestorage.SecureStorageKeyGenerator
 import com.duckduckgo.autofill.impl.securestorage.encryption.EncryptionHelper
 import com.duckduckgo.autofill.impl.securestorage.encryption.EncryptionHelper.EncryptedBytes
 import com.duckduckgo.autofill.store.SecureStorageKeyRepository
-import java.security.Key
 import okio.ByteString.Companion.decodeBase64
+import java.security.Key
 
 class FakeSecureStorageKeyRepository(private val canUseEncryption: Boolean) :
     SecureStorageKeyRepository {

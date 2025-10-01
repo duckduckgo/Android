@@ -40,16 +40,16 @@ import com.duckduckgo.mobile.android.vpn.ui.AppBreakageCategory
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides
-import java.util.concurrent.TimeUnit.DAYS
-import javax.inject.Inject
-import javax.inject.Qualifier
-import kotlin.coroutines.coroutineContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import java.util.concurrent.TimeUnit.DAYS
+import javax.inject.Inject
+import javax.inject.Qualifier
+import kotlin.coroutines.coroutineContext
 
 @SuppressLint("NoLifecycleObserver") // we don't observe app lifecycle
 @ContributesViewModel(ActivityScope::class)

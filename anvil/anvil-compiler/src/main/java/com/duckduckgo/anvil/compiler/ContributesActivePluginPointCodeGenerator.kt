@@ -51,12 +51,12 @@ import com.squareup.kotlinpoet.PropertySpec
 import com.squareup.kotlinpoet.TypeSpec
 import com.squareup.kotlinpoet.asClassName
 import dagger.Binds
-import java.io.File
-import java.util.concurrent.ConcurrentHashMap
-import javax.inject.Inject
 import org.jetbrains.kotlin.descriptors.ModuleDescriptor
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.psi.KtFile
+import java.io.File
+import java.util.concurrent.ConcurrentHashMap
+import javax.inject.Inject
 
 /**
  * This Anvil code generator generates Active Plugins, ie. those that can be controlled via remote feature flag.

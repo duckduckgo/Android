@@ -25,14 +25,14 @@ import android.text.style.ForegroundColorSpan
 import android.util.AttributeSet
 import androidx.appcompat.widget.AppCompatTextView
 import com.duckduckgo.common.utils.extensions.html
-import java.text.BreakIterator
-import java.text.StringCharacterIterator
-import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import java.text.BreakIterator
+import java.text.StringCharacterIterator
+import kotlin.coroutines.CoroutineContext
 
 @Suppress("NoHardcodedCoroutineDispatcher")
 class TypeAnimationTextView @JvmOverloads constructor(

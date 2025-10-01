@@ -42,10 +42,10 @@ import com.duckduckgo.daxprompts.impl.databinding.ActivityDaxPromptBrowserCompar
 import com.duckduckgo.daxprompts.impl.ui.DaxPromptBrowserComparisonViewModel.Command
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter
-import javax.inject.Inject
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import logcat.logcat
+import javax.inject.Inject
 
 @InjectWith(ActivityScope::class)
 @ContributeToActivityStarter(DaxPromptBrowserComparisonNoParams::class)

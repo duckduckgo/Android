@@ -42,10 +42,6 @@ import com.squareup.moshi.Moshi
 import com.squareup.moshi.Types
 import dagger.Lazy
 import dagger.SingleInstanceIn
-import java.time.ZoneId
-import java.time.ZonedDateTime
-import java.time.temporal.ChronoUnit
-import java.util.Locale
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -59,6 +55,10 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
+import java.time.ZoneId
+import java.time.ZonedDateTime
+import java.time.temporal.ChronoUnit
+import java.util.Locale
 
 @RunWith(AndroidJUnit4::class)
 @SuppressLint("DenyListedApi")

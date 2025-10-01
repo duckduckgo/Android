@@ -26,9 +26,9 @@ import com.duckduckgo.savedsites.store.*
 import com.duckduckgo.sync.api.*
 import com.squareup.anvil.annotations.*
 import io.reactivex.*
+import kotlinx.coroutines.flow.*
 import java.util.*
 import javax.inject.Inject
-import kotlinx.coroutines.flow.*
 
 interface FavoritesDelegate {
     fun getFavoritesSync(): List<SavedSite.Favorite>

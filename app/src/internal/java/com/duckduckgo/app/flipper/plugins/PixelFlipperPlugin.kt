@@ -26,12 +26,12 @@ import dagger.Binds
 import dagger.Module
 import dagger.SingleInstanceIn
 import dagger.multibindings.IntoSet
-import java.time.LocalTime
-import javax.inject.Inject
 import logcat.LogPriority.VERBOSE
 import logcat.logcat
 import okhttp3.Interceptor
 import okhttp3.Response
+import java.time.LocalTime
+import javax.inject.Inject
 
 @SingleInstanceIn(AppScope::class)
 class PixelFlipperPlugin @Inject constructor() :

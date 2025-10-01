@@ -27,14 +27,14 @@ import com.duckduckgo.networkprotection.impl.configuration.WgVpnControllerServic
 import com.duckduckgo.networkprotection.impl.configuration.asServerDetails
 import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixels
 import com.squareup.anvil.annotations.ContributesMultibinding
-import javax.inject.Inject
-import kotlin.time.Duration.Companion.minutes
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import logcat.logcat
+import javax.inject.Inject
+import kotlin.time.Duration.Companion.minutes
 
 @ContributesMultibinding(VpnScope::class)
 class ServerMigrationMonitor @Inject constructor(

@@ -19,14 +19,14 @@ package com.duckduckgo.history.impl.store
 import androidx.room.Room
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
-import java.time.LocalDateTime
-import java.time.Month.JANUARY
 import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Assert
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
+import java.time.LocalDateTime
+import java.time.Month.JANUARY
 
 @RunWith(AndroidJUnit4::class)
 class HistoryDaoTest {

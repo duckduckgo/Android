@@ -21,12 +21,12 @@ import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.feature.toggles.api.Toggle.State.Cohort
 import com.duckduckgo.feature.toggles.api.Toggle.State.CohortName
 import com.duckduckgo.feature.toggles.internal.api.FeatureTogglesCallback
+import org.apache.commons.math3.distribution.EnumeratedIntegerDistribution
 import java.lang.reflect.Method
 import java.lang.reflect.Proxy
 import java.time.ZoneId
 import java.time.ZonedDateTime
 import kotlin.random.Random
-import org.apache.commons.math3.distribution.EnumeratedIntegerDistribution
 
 class FeatureToggles private constructor(
     private val store: Toggle.Store,

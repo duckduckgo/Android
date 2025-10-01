@@ -34,11 +34,11 @@ import com.duckduckgo.app.global.intentText
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.di.scopes.ActivityScope
-import java.util.UUID
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import logcat.logcat
+import java.util.UUID
 
 @InjectWith(ActivityScope::class)
 class CustomTabActivity : DuckDuckGoActivity() {
