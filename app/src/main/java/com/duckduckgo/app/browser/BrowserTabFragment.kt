@@ -1031,6 +1031,7 @@ class BrowserTabFragment :
 
         if (savedInstanceState == null) {
             viewModel.onViewReady()
+            viewModel.setIsCustomTab(tabDisplayedInCustomTabScreen)
             messageFromPreviousTab?.let {
                 processMessage(it)
             }

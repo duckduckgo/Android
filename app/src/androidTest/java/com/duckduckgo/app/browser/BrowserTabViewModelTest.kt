@@ -3821,6 +3821,18 @@ class BrowserTabViewModelTest {
     }
 
     @Test
+    fun whenHandleAppLinkCalledAndCustomTabIsTrueThenOpenAppLink() {
+        val urlType = SpecialUrlDetector.UrlType.AppLink(uriString = exampleUrl)
+        testee.setIsCustomTab(true)
+        testee.handleAppLink(urlType, isForMainFrame = true)
+        whenever(mockAppLinksHandler.isUserQuery()).thenReturn(false)
+        whenever(ctaViewModelMockSettingsStore.showAppLinksPrompt).thenReturn(false)
+        verify(mockAppLinksHandler).handleAppLink(eq(true), eq(exampleUrl), eq(false), eq(true), appLinkCaptor.capture())
+        appLinkCaptor.lastValue.invoke()
+        assertCommandIssued<Command.OpenAppLink>()
+    }
+
+    @Test
     fun whenHandleNonHttpAppLinkCalledThenHandleNonHttpAppLink() {
         val urlType = SpecialUrlDetector.UrlType.NonHttpAppLink("market://details?id=com.example", Intent(), exampleUrl)
         assertTrue(testee.handleNonHttpAppLink(urlType))
