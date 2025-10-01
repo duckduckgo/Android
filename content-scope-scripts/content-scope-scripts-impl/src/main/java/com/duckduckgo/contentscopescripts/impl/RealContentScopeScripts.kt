@@ -224,7 +224,7 @@ class RealContentScopeScripts @Inject constructor(
     ): String =
         (
             "{\"features\":{$config},\"unprotectedTemporary\":${getUnprotectedTemporaryJson(unprotectedTemporaryExceptions)}}"
-        )
+            )
 
     companion object {
         const val EMPTY_JSON_LIST = "[]"
