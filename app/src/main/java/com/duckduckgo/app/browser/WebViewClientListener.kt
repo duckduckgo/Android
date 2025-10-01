@@ -183,6 +183,4 @@ interface WebViewClientListener {
         webViewNavigationState: WebViewNavigationState,
         activeExperiments: List<Toggle>,
     )
-
-    suspend fun destroy(webView: DuckDuckGoWebView)
 }

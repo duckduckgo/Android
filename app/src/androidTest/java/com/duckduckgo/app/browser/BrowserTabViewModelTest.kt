@@ -6979,11 +6979,11 @@ class BrowserTabViewModelTest {
         }
 
     @Test
-    fun whenPageFinishedAndOnlyUpdateScriptOnProtectionsChangedDisabledThenAddDocumentStartJavaScriptOnlyToCSS() =
+    fun whenPageFinishedAndUpdateScriptOnPageFinishedEnabledThenAddDocumentStartJavaScript() =
         runTest {
             val url = "https://example.com"
             val webViewNavState = WebViewNavigationState(mockStack, 100)
-            fakeAndroidConfigBrowserFeature.onlyUpdateScriptOnProtectionsChanged().setRawStoredState(State(false))
+            fakeAndroidConfigBrowserFeature.updateScriptOnPageFinished().setRawStoredState(State(true))
 
             testee.pageFinished(mockWebView, webViewNavState, url)
 
@@ -6992,15 +6992,37 @@ class BrowserTabViewModelTest {
         }
 
     @Test
-    fun whenPageFinishedAndOnlyUpdateScriptOnProtectionsChangedEnabledThenDoNotCallAddDocumentStartJavaScript() =
+    fun whenPageFinishedAndUpdateScriptOnPageFinishedDisabledThenDoNotCallAddDocumentStartJavaScript() =
         runTest {
             val url = "https://example.com"
             val webViewNavState = WebViewNavigationState(mockStack, 100)
-            fakeAndroidConfigBrowserFeature.onlyUpdateScriptOnProtectionsChanged().setRawStoredState(State(true))
+            fakeAndroidConfigBrowserFeature.updateScriptOnPageFinished().setRawStoredState(State(false))
 
             testee.pageFinished(mockWebView, webViewNavState, url)
 
             assertEquals(0, fakeAddDocumentStartJavaScriptPlugins.cssPlugin.countInitted)
+            assertEquals(0, fakeAddDocumentStartJavaScriptPlugins.otherPlugin.countInitted)
+        }
+
+    @Test
+    fun whenPrivacyProtectionsUpdatedAndAndUpdateScriptOnPageFinishedEnabledThenAddDocumentStartJavaScript() =
+        runTest {
+            fakeAndroidConfigBrowserFeature.updateScriptOnPageFinished().setRawStoredState(State(true))
+
+            testee.privacyProtectionsUpdated(mockWebView)
+
+            assertEquals(1, fakeAddDocumentStartJavaScriptPlugins.cssPlugin.countInitted)
+            assertEquals(1, fakeAddDocumentStartJavaScriptPlugins.otherPlugin.countInitted)
+        }
+
+    @Test
+    fun whenPrivacyProtectionsUpdatedAndAndUpdateScriptOnPageFinishedDisabledThenAddDocumentStartJavaScriptOnlyOnCSS() =
+        runTest {
+            fakeAndroidConfigBrowserFeature.updateScriptOnPageFinished().setRawStoredState(State(false))
+
+            testee.privacyProtectionsUpdated(mockWebView)
+
+            assertEquals(1, fakeAddDocumentStartJavaScriptPlugins.cssPlugin.countInitted)
             assertEquals(0, fakeAddDocumentStartJavaScriptPlugins.otherPlugin.countInitted)
         }
 

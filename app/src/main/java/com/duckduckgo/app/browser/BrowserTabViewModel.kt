@@ -1934,7 +1934,7 @@ class BrowserTabViewModel @Inject constructor(
             evaluateSerpLogoState(url)
         }
         viewModelScope.launch(dispatchers.io()) {
-            if (!androidBrowserConfig.onlyUpdateScriptOnProtectionsChanged().isEnabled()) {
+            if (androidBrowserConfig.updateScriptOnPageFinished().isEnabled()) {
                 addDocumentStartJavaScript(webView)
             }
         }
@@ -4253,7 +4253,7 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     suspend fun privacyProtectionsUpdated(webView: WebView) {
-        if (withContext(dispatchers.io()) { androidBrowserConfig.onlyUpdateScriptOnProtectionsChanged().isEnabled() }) {
+        if (withContext(dispatchers.io()) { !androidBrowserConfig.updateScriptOnPageFinished().isEnabled() }) {
             addDocumentStartJavascriptPlugins
                 .getPlugins()
                 .filter { plugin ->
@@ -4261,6 +4261,8 @@ class BrowserTabViewModel @Inject constructor(
                 }.forEach {
                     it.addDocumentStartJavaScript(webView)
                 }
+        } else {
+            addDocumentStartJavaScript(webView)
         }
     }
 
