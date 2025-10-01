@@ -289,6 +289,7 @@ import com.duckduckgo.browser.api.autocomplete.AutoCompleteSettings
 import com.duckduckgo.browser.api.brokensite.BrokenSiteData
 import com.duckduckgo.browser.api.brokensite.BrokenSiteData.ReportFlow.MENU
 import com.duckduckgo.browser.api.brokensite.BrokenSiteData.ReportFlow.RELOAD_THREE_TIMES_WITHIN_20_SECONDS
+import com.duckduckgo.browser.api.webviewcompat.WebViewCompatWrapper
 import com.duckduckgo.browser.ui.omnibar.OmnibarPosition
 import com.duckduckgo.browser.ui.omnibar.OmnibarPosition.TOP
 import com.duckduckgo.common.ui.tabs.SwipingTabsFeatureProvider
@@ -318,6 +319,7 @@ import com.duckduckgo.duckplayer.api.DuckPlayer
 import com.duckduckgo.duckplayer.api.DuckPlayer.DuckPlayerState.ENABLED
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.history.api.NavigationHistory
+import com.duckduckgo.js.messaging.api.AddDocumentStartJavaScriptPlugin
 import com.duckduckgo.js.messaging.api.JsCallbackData
 import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.Feed
 import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.Feed.MALWARE
@@ -482,6 +484,8 @@ class BrowserTabViewModel @Inject constructor(
     private val nonHttpAppLinkChecker: NonHttpAppLinkChecker,
     private val externalIntentProcessingState: ExternalIntentProcessingState,
     private val vpnMenuStateProvider: VpnMenuStateProvider,
+    private val webViewCompatWrapper: WebViewCompatWrapper,
+    private val addDocumentStartJavascriptPlugins: PluginPoint<AddDocumentStartJavaScriptPlugin>,
 ) : ViewModel(),
     WebViewClientListener,
     EditSavedSiteListener,
@@ -3222,6 +3226,7 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     fun requestFileDownload(
+        webView: WebView,
         url: String,
         contentDisposition: String?,
         mimeType: String,
@@ -3230,7 +3235,7 @@ class BrowserTabViewModel @Inject constructor(
     ) {
         if (url.startsWith("blob:")) {
             if (isBlobDownloadWebViewFeatureEnabled) {
-                postMessageToConvertBlobToDataUri(url)
+                postMessageToConvertBlobToDataUri(webView, url)
             } else {
                 command.value = ConvertBlobToDataUri(url, mimeType)
             }
@@ -3248,14 +3253,14 @@ class BrowserTabViewModel @Inject constructor(
         command.postValue(RequestFileDownload(url, contentDisposition, mimeType, requestUserConfirmation))
     }
 
-    @SuppressLint("RequiresFeature") // it's already checked in isBlobDownloadWebViewFeatureEnabled
-    private fun postMessageToConvertBlobToDataUri(url: String) {
-        appCoroutineScope.launch(dispatchers.main()) {
+    @SuppressLint("RequiresFeature", "PostMessageUsage") // it's already checked in isBlobDownloadWebViewFeatureEnabled
+    private fun postMessageToConvertBlobToDataUri(webView: WebView, url: String) {
+        viewModelScope.launch(dispatchers.main()) {
             // main because postMessage is not always safe in another thread
             for ((key, proxies) in fixedReplyProxyMap) {
                 if (sameOrigin(url.removePrefix("blob:"), key)) {
                     for (replyProxy in proxies.values) {
-                        replyProxy.postMessage(url)
+                        webViewCompatWrapper.postMessage(webView, replyProxy, url)
                     }
                     return@launch
                 }
@@ -3711,7 +3716,7 @@ class BrowserTabViewModel @Inject constructor(
         method: String,
         id: String?,
         data: JSONObject?,
-        onResponse: (JSONObject) -> Unit,
+        onResponse: suspend (JSONObject) -> Unit,
     ) {
         processGlobalMessages(
             featureName = featureName,
@@ -3738,7 +3743,7 @@ class BrowserTabViewModel @Inject constructor(
         method: String,
         id: String?,
         data: JSONObject?,
-        onResponse: (JSONObject) -> Unit,
+        onResponse: suspend (JSONObject) -> Unit,
     ) {
         when (method) {
             "addDebugFlag" -> {
@@ -3756,7 +3761,7 @@ class BrowserTabViewModel @Inject constructor(
         method: String,
         id: String?,
         data: JSONObject?,
-        onResponse: (JSONObject) -> Unit,
+        onResponse: suspend (JSONObject) -> Unit,
     ) {
         when (featureName) {
             "webCompat" -> {
@@ -3797,7 +3802,9 @@ class BrowserTabViewModel @Inject constructor(
                                     "forcedZoomEnabled" to (accessibilityViewState.value?.forceZoom ?: false),
                                 ),
                             )
-                        onResponse(response)
+                        viewModelScope.launch {
+                            onResponse(response)
+                        }
                     }
                 }
         }
@@ -3898,7 +3905,7 @@ class BrowserTabViewModel @Inject constructor(
         method: String,
         id: String,
         data: JSONObject,
-        onResponse: (JSONObject) -> Unit,
+        onResponse: suspend (JSONObject) -> Unit,
     ) {
         viewModelScope.launch(dispatchers.main()) {
             command.value = WebViewCompatWebShareRequest(JsCallbackData(data, featureName, method, id), onResponse)
@@ -3931,7 +3938,7 @@ class BrowserTabViewModel @Inject constructor(
         method: String,
         id: String,
         data: JSONObject,
-        onResponse: (JSONObject) -> Unit,
+        onResponse: suspend (JSONObject) -> Unit,
     ) {
         viewModelScope.launch(dispatchers.io()) {
             val response =
@@ -3968,9 +3975,9 @@ class BrowserTabViewModel @Inject constructor(
         method: String,
         id: String,
         data: JSONObject,
-        onResponse: (JSONObject) -> Unit,
+        onResponse: suspend (JSONObject) -> Unit,
     ) {
-        viewModelScope.launch(dispatchers.main()) {
+        viewModelScope.launch(dispatchers.io()) {
             if (androidBrowserConfig.screenLock().isEnabled()) {
                 withContext(dispatchers.main()) {
                     command.value = WebViewCompatScreenLock(JsCallbackData(data, featureName, method, id), onResponse)
@@ -3980,7 +3987,7 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     private fun screenUnlock() {
-        viewModelScope.launch(dispatchers.main()) {
+        viewModelScope.launch(dispatchers.io()) {
             if (androidBrowserConfig.screenLock().isEnabled()) {
                 withContext(dispatchers.main()) {
                     command.value = ScreenUnlock
@@ -4188,6 +4195,16 @@ class BrowserTabViewModel @Inject constructor(
         val cta = currentCtaViewState().cta
         if (cta is OnboardingDaxDialogCta) {
             onDismissOnboardingDaxDialog(cta)
+        }
+    }
+
+    override fun addDocumentStartJavaScript(webView: WebView) {
+        viewModelScope.launch {
+            addDocumentStartJavascriptPlugins.getPlugins().forEach {
+                it.addDocumentStartJavaScript(
+                    webView,
+                )
+            }
         }
     }
 

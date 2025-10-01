@@ -28,10 +28,10 @@ import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.js.messaging.api.AddDocumentStartJavaScriptPlugin
 import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.SingleInstanceIn
-import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import javax.inject.Inject
 
 @SingleInstanceIn(FragmentScope::class)
 @ContributesMultibinding(FragmentScope::class)
@@ -41,36 +41,34 @@ class ContentScopeScriptsAddDocumentStartJavaScriptPlugin @Inject constructor(
     private val webViewCapabilityChecker: WebViewCapabilityChecker,
     private val webViewCompatWrapper: WebViewCompatWrapper,
     private val contentScopeExperiments: ContentScopeExperiments,
-    @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
 ) : AddDocumentStartJavaScriptPlugin {
     private var script: ScriptHandler? = null
     private var currentScriptString: String? = null
 
     @SuppressLint("RequiresFeature")
-    override fun addDocumentStartJavaScript(
-        webView: WebView,
-    ) {
-        appCoroutineScope.launch {
-            if (!webViewCompatContentScopeScripts.isEnabled() || !webViewCapabilityChecker.isSupported(
-                    WebViewCapabilityChecker.WebViewCapability.DocumentStartJavaScript,
-                )
-            ) {
-                return@launch
-            }
+    override suspend fun addDocumentStartJavaScript(webView: WebView) {
+        if (!webViewCompatContentScopeScripts.isEnabled() ||
+            !webViewCapabilityChecker.isSupported(
+                WebViewCapabilityChecker.WebViewCapability.DocumentStartJavaScript,
+            )
+        ) {
+            return
+        }
 
-            val activeExperiments = contentScopeExperiments.getActiveExperiments()
-            val scriptString = webViewCompatContentScopeScripts.getScript(activeExperiments)
-            if (scriptString == currentScriptString) {
-                return@launch
+        val activeExperiments = contentScopeExperiments.getActiveExperiments()
+        val scriptString = webViewCompatContentScopeScripts.getScript(activeExperiments)
+        if (scriptString == currentScriptString) {
+            return
+        }
+        script?.let {
+            withContext(dispatcherProvider.main()) {
+                it.remove()
             }
-            script?.let {
-                withContext(dispatcherProvider.main()) {
-                    it.remove()
-                }
-                script = null
-            }
+            script = null
+        }
 
-            webViewCompatWrapper.addDocumentStartJavaScript(
+        webViewCompatWrapper
+            .addDocumentStartJavaScript(
                 webView,
                 scriptString,
                 setOf("*"),
@@ -78,6 +76,5 @@ class ContentScopeScriptsAddDocumentStartJavaScriptPlugin @Inject constructor(
                 script = it
                 currentScriptString = scriptString
             }
-        }
     }
 }

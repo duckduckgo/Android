@@ -72,13 +72,13 @@ import com.duckduckgo.common.utils.FragmentViewModelFactory
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.user.agent.api.UserAgentProvider
-import javax.inject.Inject
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import logcat.LogPriority.WARN
 import logcat.logcat
+import javax.inject.Inject
 
 @InjectWith(FragmentScope::class)
 class ImportGooglePasswordsWebFlowFragment :
@@ -89,7 +89,6 @@ class ImportGooglePasswordsWebFlowFragment :
     NoOpEmailProtectionUserPromptListener,
     NoOpAutofillEventListener,
     GooglePasswordBlobConsumer.Callback {
-
     @Inject
     lateinit var userAgentProvider: UserAgentProvider
 
@@ -179,8 +178,7 @@ class ImportGooglePasswordsWebFlowFragment :
                         // no-op
                     }
                 }
-            }
-            .launchIn(lifecycleScope)
+            }.launchIn(lifecycleScope)
     }
 
     private fun observeCommands() {
@@ -201,8 +199,7 @@ class ImportGooglePasswordsWebFlowFragment :
                         showCredentialChooserDialog(command.originalUrl, command.credentials, command.triggerType)
                     }
                 }
-            }
-            .launchIn(lifecycleScope)
+            }.launchIn(lifecycleScope)
     }
 
     private suspend fun injectReauthenticationCredentials(
@@ -217,11 +214,12 @@ class ImportGooglePasswordsWebFlowFragment :
                     return@withContext
                 }
 
-                val credentials = LoginCredentials(
-                    domain = url,
-                    username = username,
-                    password = password,
-                )
+                val credentials =
+                    LoginCredentials(
+                        domain = url,
+                        username = username,
+                        password = password,
+                    )
 
                 logcat { "Injecting re-authentication credentials" }
                 browserAutofill.injectCredentials(credentials)
@@ -234,16 +232,18 @@ class ImportGooglePasswordsWebFlowFragment :
     }
 
     private fun exitFlowAsSuccess() {
-        val resultBundle = Bundle().also {
-            it.putParcelable(RESULT_KEY_DETAILS, ImportGooglePasswordResult.Success)
-        }
+        val resultBundle =
+            Bundle().also {
+                it.putParcelable(RESULT_KEY_DETAILS, ImportGooglePasswordResult.Success)
+            }
         setFragmentResult(RESULT_KEY, resultBundle)
     }
 
     private fun exitFlowAsImpossibleToImport(reason: UserCannotImportReason) {
-        val resultBundle = Bundle().also {
-            it.putParcelable(RESULT_KEY_DETAILS, ImportGooglePasswordResult.Error(reason))
-        }
+        val resultBundle =
+            Bundle().also {
+                it.putParcelable(RESULT_KEY_DETAILS, ImportGooglePasswordResult.Error(reason))
+            }
         setFragmentResult(RESULT_KEY, resultBundle)
     }
 
@@ -334,7 +334,7 @@ class ImportGooglePasswordsWebFlowFragment :
         it.setDownloadListener { url, _, _, _, _ ->
             if (url.startsWith("blob:")) {
                 lifecycleScope.launch {
-                    passwordBlobConsumer.postMessageToConvertBlobToDataUri(url)
+                    passwordBlobConsumer.postMessageToConvertBlobToDataUri(it, url)
                 }
             }
         }
@@ -371,12 +371,13 @@ class ImportGooglePasswordsWebFlowFragment :
                 return@withContext
             }
 
-            val dialog = credentialAutofillDialogFactory.autofillSelectCredentialsDialog(
-                url,
-                credentials,
-                triggerType,
-                CUSTOM_FLOW_TAB_ID,
-            )
+            val dialog =
+                credentialAutofillDialogFactory.autofillSelectCredentialsDialog(
+                    url,
+                    credentials,
+                    triggerType,
+                    CUSTOM_FLOW_TAB_ID,
+                )
             dialog.show(childFragmentManager, SELECT_CREDENTIALS_FRAGMENT_TAG)
         }
     }

@@ -28,10 +28,10 @@ import com.duckduckgo.js.messaging.api.SubscriptionEvent
 import com.duckduckgo.js.messaging.api.SubscriptionEventData
 import com.duckduckgo.js.messaging.api.WebMessagingPlugin
 import com.squareup.anvil.annotations.ContributesMultibinding
-import javax.inject.Inject
-import javax.inject.Named
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import javax.inject.Inject
+import javax.inject.Named
 
 @ContributesMultibinding(FragmentScope::class)
 class ContentScopeScriptsPostMessageWrapperPlugin @Inject constructor(
@@ -42,18 +42,22 @@ class ContentScopeScriptsPostMessageWrapperPlugin @Inject constructor(
     @AppCoroutineScope private val coroutineScope: CoroutineScope,
 ) : PostMessageWrapperPlugin {
     @SuppressLint("PostMessageUsage")
-    override fun postMessage(message: SubscriptionEventData, webView: WebView) {
+    override fun postMessage(
+        message: SubscriptionEventData,
+        webView: WebView,
+    ) {
         coroutineScope.launch {
             if (webViewCompatContentScopeScripts.isEnabled()) {
-                webMessagingPlugin.postMessage(message)
+                webMessagingPlugin.postMessage(webView, message)
             } else {
                 jsMessageHelper.sendSubscriptionEvent(
-                    subscriptionEvent = SubscriptionEvent(
-                        context = webMessagingPlugin.context,
-                        featureName = message.featureName,
-                        subscriptionName = message.subscriptionName,
-                        params = message.params,
-                    ),
+                    subscriptionEvent =
+                        SubscriptionEvent(
+                            context = webMessagingPlugin.context,
+                            featureName = message.featureName,
+                            subscriptionName = message.subscriptionName,
+                            params = message.params,
+                        ),
                     callbackName = coreContentScopeScripts.callbackName,
                     secret = coreContentScopeScripts.secret,
                     webView = webView,

@@ -898,12 +898,14 @@ class BrowserTabFragment :
             contentScopeScripts.onResponse(it)
         }
 
-    private var currentWebShareReplyCallback: ((JSONObject) -> Unit)? = null
+    private var currentWebShareReplyCallback: (suspend (JSONObject) -> Unit)? = null
 
     private val webViewCompatWebShareLauncher =
         registerForActivityResult(WebViewCompatWebShareChooser()) { result ->
-            currentWebShareReplyCallback?.invoke(result)
-            currentWebShareReplyCallback = null
+            lifecycleScope.launch {
+                currentWebShareReplyCallback?.invoke(result)
+                currentWebShareReplyCallback = null
+            }
         }
 
     // Instantiating a private class that contains an implementation detail of BrowserTabFragment but is separated for tidiness
@@ -1016,9 +1018,9 @@ class BrowserTabFragment :
 
         webViewContainer = binding.webViewContainer
         configureObservers()
+        viewModel.registerWebViewListener(webViewClient, webChromeClient)
         configureWebView()
         configureSwipeRefresh()
-        viewModel.registerWebViewListener(webViewClient, webChromeClient)
         configureAutoComplete()
         configureNewTab()
         initPrivacyProtectionsPopup()
@@ -1991,19 +1993,23 @@ class BrowserTabFragment :
             is Command.ShowFireproofWebSiteConfirmation -> fireproofWebsiteConfirmation(it.fireproofWebsiteEntity)
             is Command.DeleteFireproofConfirmation -> removeFireproofWebsiteConfirmation(it.fireproofWebsiteEntity)
             is Command.RefreshAndShowPrivacyProtectionEnabledConfirmation -> {
-                webView?.let {
-                    webViewClient.configureWebView(it, null)
+                webView?.let { safeWebView ->
+                    lifecycleScope.launch {
+                        webViewClient.configureWebView(safeWebView, null)
+                        refresh()
+                        privacyProtectionEnabledConfirmation(it.domain)
+                    }
                 }
-                refresh()
-                privacyProtectionEnabledConfirmation(it.domain)
             }
 
             is Command.RefreshAndShowPrivacyProtectionDisabledConfirmation -> {
-                webView?.let {
-                    webViewClient.configureWebView(it, null)
+                webView?.let { safeWebView ->
+                    lifecycleScope.launch {
+                        webViewClient.configureWebView(safeWebView, null)
+                        refresh()
+                        privacyProtectionDisabledConfirmation(it.domain)
+                    }
                 }
-                refresh()
-                privacyProtectionDisabledConfirmation(it.domain)
             }
 
             is NavigationCommand.Navigate -> {
@@ -3139,7 +3145,7 @@ class BrowserTabFragment :
 
             it.setDownloadListener { url, _, contentDisposition, mimeType, _ ->
                 lifecycleScope.launch(dispatchers.main()) {
-                    viewModel.requestFileDownload(url, contentDisposition, mimeType, true, isBlobDownloadWebViewFeatureEnabled(it))
+                    viewModel.requestFileDownload(it, url, contentDisposition, mimeType, true, isBlobDownloadWebViewFeatureEnabled(it))
                 }
             }
 
@@ -3201,28 +3207,31 @@ class BrowserTabFragment :
                     }
                 },
             )
-            webViewClient.configureWebView(
-                it,
-                object : WebViewCompatMessageCallback {
-                    override fun process(
-                        context: String,
-                        featureName: String,
-                        method: String,
-                        id: String?,
-                        data: JSONObject?,
-                        onResponse: (JSONObject) -> Unit,
-                    ) {
-                        viewModel.webViewCompatProcessJsCallbackMessage(
-                            context = context,
-                            featureName = featureName,
-                            method = method,
-                            id = id,
-                            data = data,
-                            onResponse = onResponse,
-                        )
-                    }
-                },
-            )
+            lifecycleScope.launch {
+                webViewClient.configureWebView(
+                    it,
+                    object : WebViewCompatMessageCallback {
+                        override fun process(
+                            context: String,
+                            featureName: String,
+                            method: String,
+                            id: String?,
+                            data: JSONObject?,
+                            onResponse: suspend (JSONObject) -> Unit,
+                        ) {
+                            viewModel.webViewCompatProcessJsCallbackMessage(
+                                context = context,
+                                featureName = featureName,
+                                method = method,
+                                id = id,
+                                data = data,
+                                onResponse = onResponse,
+                            )
+                        }
+                    },
+                )
+            }
+
             duckPlayerScripts.register(
                 it,
                 object : JsMessageCallback() {
@@ -3254,10 +3263,12 @@ class BrowserTabFragment :
 
     private fun webViewCompatScreenLock(
         data: JsCallbackData,
-        onResponse: (JSONObject) -> Unit,
+        onResponse: suspend (JSONObject) -> Unit,
     ) {
         val returnData = jsOrientationHandler.updateOrientation(data, this)
-        onResponse(returnData.params)
+        lifecycleScope.launch {
+            onResponse(returnData.params)
+        }
     }
 
     private fun screenUnlock() {
@@ -3361,6 +3372,7 @@ class BrowserTabFragment :
             } else {
                 blobConverterInjector.addJsInterface(webView) { url, mimeType ->
                     viewModel.requestFileDownload(
+                        webView = webView,
                         url = url,
                         contentDisposition = null,
                         mimeType = mimeType,
@@ -4005,7 +4017,6 @@ class BrowserTabFragment :
         if (::webViewContainer.isInitialized) webViewContainer.removeAllViews()
         webView?.let {
             it.removeSystemAutofillCallback()
-            webViewClient.destroy(it)
             it.destroy()
         }
         webView = null

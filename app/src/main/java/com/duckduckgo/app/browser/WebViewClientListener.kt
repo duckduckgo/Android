@@ -25,23 +25,28 @@ import android.webkit.PermissionRequest
 import android.webkit.SslErrorHandler
 import android.webkit.ValueCallback
 import android.webkit.WebChromeClient
+import android.webkit.WebView
 import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
 import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.surrogates.SurrogateResponse
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 import com.duckduckgo.feature.toggles.api.Toggle
+import com.duckduckgo.js.messaging.api.AddDocumentStartJavaScriptPlugin
 import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.Feed
 import com.duckduckgo.site.permissions.api.SitePermissionsManager.SitePermissions
 
 interface WebViewClientListener {
-
     fun onPageContentStart(url: String)
+
     fun pageRefreshed(refreshedUrl: String)
+
     fun progressChanged(
         newProgress: Int,
         webViewNavigationState: WebViewNavigationState,
     )
+
     fun willOverrideUrl(newUrl: String)
+
     fun redirectTriggeredByGpc()
 
     fun onSitePermissionRequested(
@@ -50,16 +55,25 @@ interface WebViewClientListener {
     )
 
     fun titleReceived(newTitle: String)
+
     fun trackerDetected(event: TrackingEvent)
+
     fun pageHasHttpResources(page: String)
+
     fun pageHasHttpResources(page: Uri)
+
     fun onCertificateReceived(certificate: SslCertificate?)
 
     fun sendEmailRequested(emailAddress: String)
+
     fun sendSmsRequested(telephoneNumber: String)
+
     fun dialTelephoneNumberRequested(telephoneNumber: String)
+
     fun goFullScreen(view: View)
+
     fun exitFullScreen()
+
     fun showFileChooser(
         filePathCallback: ValueCallback<Array<Uri>>,
         fileChooserParams: WebChromeClient.FileChooserParams,
@@ -71,22 +85,35 @@ interface WebViewClientListener {
     ): Boolean
 
     fun handleNonHttpAppLink(nonHttpAppLink: SpecialUrlDetector.UrlType.NonHttpAppLink): Boolean
+
     fun handleCloakedAmpLink(initialUrl: String)
+
     fun startProcessingTrackingLink()
+
     fun openMessageInNewTab(message: Message)
+
     fun openLinkInNewTab(uri: Uri)
+
     fun recoverFromRenderProcessGone()
+
     fun requiresAuthentication(request: BasicAuthenticationRequest)
+
     fun closeCurrentTab()
+
     fun closeAndSelectSourceTab()
+
     fun upgradedToHttps()
+
     fun surrogateDetected(surrogate: SurrogateResponse)
+
     fun isDesktopSiteEnabled(): Boolean
 
     fun isTabInForeground(): Boolean
 
     fun loginDetected()
+
     fun dosAttackDetected()
+
     fun iconReceived(
         url: String,
         icon: Bitmap,
@@ -98,9 +125,16 @@ interface WebViewClientListener {
     )
 
     fun prefetchFavicon(url: String)
+
     fun linkOpenedInNewTab(): Boolean
+
     fun isActiveTab(): Boolean
-    fun onReceivedError(errorType: WebViewErrorResponse, url: String)
+
+    fun onReceivedError(
+        errorType: WebViewErrorResponse,
+        url: String,
+    )
+
     fun onReceivedMaliciousSiteWarning(
         url: Uri,
         feed: Feed,
@@ -108,21 +142,33 @@ interface WebViewClientListener {
         clientSideHit: Boolean,
         isMainframe: Boolean,
     )
+
     fun onReceivedMaliciousSiteSafe(
         url: Uri,
         isForMainFrame: Boolean,
     )
-    fun recordErrorCode(error: String, url: String)
-    fun recordHttpErrorCode(statusCode: Int, url: String)
+
+    fun recordErrorCode(
+        error: String,
+        url: String,
+    )
+
+    fun recordHttpErrorCode(
+        statusCode: Int,
+        url: String,
+    )
 
     fun getCurrentTabId(): String
 
     fun getSite(): Site?
+
     fun onReceivedSslError(
         handler: SslErrorHandler,
         errorResponse: SslErrorResponse,
     )
+
     fun onShouldOverride()
+
     fun pageFinished(
         webViewNavigationState: WebViewNavigationState,
         url: String?,
@@ -137,4 +183,6 @@ interface WebViewClientListener {
         webViewNavigationState: WebViewNavigationState,
         activeExperiments: List<Toggle>,
     )
+
+    fun addDocumentStartJavaScript(webView: WebView)
 }

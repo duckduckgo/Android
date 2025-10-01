@@ -215,6 +215,7 @@ import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggesti
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion.AutoCompleteUrlSuggestion.AutoCompleteSwitchToTabSuggestion
 import com.duckduckgo.browser.api.autocomplete.AutoCompleteSettings
 import com.duckduckgo.browser.api.brokensite.BrokenSiteContext
+import com.duckduckgo.browser.api.webviewcompat.WebViewCompatWrapper
 import com.duckduckgo.browser.ui.omnibar.OmnibarPosition.BOTTOM
 import com.duckduckgo.browser.ui.omnibar.OmnibarPosition.TOP
 import com.duckduckgo.common.test.CoroutineTestRule
@@ -253,6 +254,7 @@ import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.history.api.HistoryEntry.VisitedPage
 import com.duckduckgo.history.api.NavigationHistory
+import com.duckduckgo.js.messaging.api.AddDocumentStartJavaScriptPlugin
 import com.duckduckgo.js.messaging.api.JsCallbackData
 import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.Feed
 import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.Feed.MALWARE
@@ -600,6 +602,12 @@ class BrowserTabViewModelTest {
 
     private var isFullSiteAddressEnabled = true
 
+    private val mockWebViewCompatWrapper: WebViewCompatWrapper = mock()
+
+    private val mockWebView: WebView = mock()
+
+    private val fakeAddDocumentStartJavaScriptPlugins = FakeAddDocumentStartJavaScriptPluginPoint()
+
     @Before
     fun before() =
         runTest {
@@ -823,6 +831,8 @@ class BrowserTabViewModelTest {
                     nonHttpAppLinkChecker = nonHttpAppLinkChecker,
                     externalIntentProcessingState = mockExternalIntentProcessingState,
                     vpnMenuStateProvider = mockVpnMenuStateProvider,
+                    webViewCompatWrapper = mockWebViewCompatWrapper,
+                    addDocumentStartJavascriptPlugins = fakeAddDocumentStartJavaScriptPlugins,
                 )
 
             testee.loadData("abc", null, false, false)
@@ -3594,6 +3604,7 @@ class BrowserTabViewModelTest {
         val enabled = false
 
         testee.requestFileDownload(
+            webView = mockWebView,
             url = blobUrl,
             contentDisposition = null,
             mimeType = mime,
@@ -3614,6 +3625,7 @@ class BrowserTabViewModelTest {
         val enabled = true
 
         testee.requestFileDownload(
+            webView = mockWebView,
             url = blobUrl,
             contentDisposition = null,
             mimeType = mime,
@@ -3630,6 +3642,7 @@ class BrowserTabViewModelTest {
         val mime = "application/plain"
 
         testee.requestFileDownload(
+            webView = mockWebView,
             url = normalUrl,
             contentDisposition = null,
             mimeType = mime,
@@ -7425,6 +7438,15 @@ class BrowserTabViewModelTest {
         assertNull("SERP logo should be cleared when navigating to non-DuckDuckGo URL", omnibarViewState().serpLogo)
     }
 
+    @Test
+    fun whenConfigureWebViewThenCallAddDocumentStartJavaScript() {
+        assertEquals(0, fakeAddDocumentStartJavaScriptPlugins.plugin.countInitted)
+
+        testee.addDocumentStartJavaScript(mockWebView)
+
+        assertEquals(1, fakeAddDocumentStartJavaScriptPlugins.plugin.countInitted)
+    }
+
     private fun aCredential(): LoginCredentials = LoginCredentials(domain = null, username = null, password = null)
 
     private fun assertShowHistoryCommandSent(expectedStackSize: Int) {
@@ -7710,5 +7732,20 @@ class BrowserTabViewModelTest {
         var headers: Map<String, String>,
     ) : CustomHeadersProvider {
         override fun getCustomHeaders(url: String): Map<String, String> = headers
+    }
+
+    class FakeAddDocumentStartJavaScriptPlugin : AddDocumentStartJavaScriptPlugin {
+        var countInitted = 0
+            private set
+
+        override suspend fun addDocumentStartJavaScript(webView: WebView) {
+            countInitted++
+        }
+    }
+
+    class FakeAddDocumentStartJavaScriptPluginPoint : PluginPoint<AddDocumentStartJavaScriptPlugin> {
+        val plugin = FakeAddDocumentStartJavaScriptPlugin()
+
+        override fun getPlugins() = listOf(plugin)
     }
 }
