@@ -20,7 +20,6 @@ import android.annotation.SuppressLint
 import android.webkit.WebView
 import androidx.webkit.ScriptHandler
 import com.duckduckgo.app.browser.api.WebViewCapabilityChecker
-import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.browser.api.webviewcompat.WebViewCompatWrapper
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
@@ -28,7 +27,6 @@ import com.duckduckgo.js.messaging.api.AddDocumentStartJavaScript
 import com.duckduckgo.js.messaging.api.AddDocumentStartJavaScriptScriptStrategy
 import com.duckduckgo.js.messaging.api.AddDocumentStartScriptDelegate
 import com.squareup.anvil.annotations.ContributesBinding
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
@@ -39,7 +37,6 @@ import javax.inject.Inject
 @ContributesBinding(AppScope::class)
 class RealAddDocumentStartScriptDelegate @Inject constructor(
     private val webViewCapabilityChecker: WebViewCapabilityChecker,
-    @AppCoroutineScope private val coroutineScope: CoroutineScope,
     private val dispatcherProvider: DispatcherProvider,
     private val webViewCompatWrapper: WebViewCompatWrapper,
 ) : AddDocumentStartScriptDelegate {

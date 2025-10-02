@@ -5,7 +5,6 @@ import androidx.webkit.ScriptHandler
 import com.duckduckgo.app.browser.api.WebViewCapabilityChecker
 import com.duckduckgo.browser.api.webviewcompat.WebViewCompatWrapper
 import com.duckduckgo.common.test.CoroutineTestRule
-import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.js.messaging.api.AddDocumentStartJavaScript
 import com.duckduckgo.js.messaging.api.AddDocumentStartJavaScriptScriptStrategy
 import kotlinx.coroutines.test.runTest
@@ -26,20 +25,16 @@ class RealAddDocumentStartScriptDelegateTest {
     private val mockWebViewCompatWrapper: WebViewCompatWrapper = mock()
     private val mockWebView: WebView = mock()
     private val mockScriptHandler: ScriptHandler = mock()
-    private val mockDispatcherProvider: DispatcherProvider = mock()
-
     private lateinit var testee: RealAddDocumentStartScriptDelegate
     private lateinit var plugin: AddDocumentStartJavaScript
 
     @Before
     fun setUp() =
         runTest {
-            whenever(mockDispatcherProvider.main()).thenReturn(coroutineRule.testDispatcher)
             testee =
                 RealAddDocumentStartScriptDelegate(
                     mockWebViewCapabilityChecker,
-                    coroutineRule.testScope,
-                    mockDispatcherProvider,
+                    coroutineRule.testDispatcherProvider,
                     mockWebViewCompatWrapper,
                 )
         }
