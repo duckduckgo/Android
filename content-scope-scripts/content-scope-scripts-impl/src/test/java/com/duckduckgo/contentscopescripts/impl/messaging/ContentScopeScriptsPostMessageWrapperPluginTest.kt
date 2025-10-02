@@ -1,7 +1,6 @@
 package com.duckduckgo.contentscopescripts.impl.messaging
 
 import android.webkit.WebView
-import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.contentscopescripts.impl.CoreContentScopeScripts
 import com.duckduckgo.contentscopescripts.impl.WebViewCompatContentScopeScripts
 import com.duckduckgo.js.messaging.api.JsMessageHelper
@@ -11,7 +10,6 @@ import com.duckduckgo.js.messaging.api.WebMessagingPlugin
 import kotlinx.coroutines.test.runTest
 import org.json.JSONObject
 import org.junit.Before
-import org.junit.Rule
 import org.junit.Test
 import org.mockito.Mockito.mock
 import org.mockito.kotlin.eq
@@ -19,9 +17,6 @@ import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
 class ContentScopeScriptsPostMessageWrapperPluginTest {
-    @get:Rule
-    var coroutineRule = CoroutineTestRule()
-
     private val mockWebMessagingPlugin: WebMessagingPlugin = mock()
     private val mockJsHelper: JsMessageHelper = mock()
     private val mockCoreContentScopeScripts: CoreContentScopeScripts = mock()
@@ -48,7 +43,6 @@ class ContentScopeScriptsPostMessageWrapperPluginTest {
             jsMessageHelper = mockJsHelper,
             coreContentScopeScripts = mockCoreContentScopeScripts,
             webViewCompatContentScopeScripts = mockWebViewCompatContentScopeScripts,
-            coroutineScope = coroutineRule.testScope,
         )
 
     @Before

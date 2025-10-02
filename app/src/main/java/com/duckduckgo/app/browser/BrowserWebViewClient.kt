@@ -79,10 +79,6 @@ import com.duckduckgo.duckplayer.api.DuckPlayer.DuckPlayerState.ENABLED
 import com.duckduckgo.duckplayer.api.DuckPlayer.OpenDuckPlayerInNewTab.On
 import com.duckduckgo.duckplayer.impl.DUCK_PLAYER_OPEN_IN_YOUTUBE_PATH
 import com.duckduckgo.history.api.NavigationHistory
-import com.duckduckgo.js.messaging.api.PostMessageWrapperPlugin
-import com.duckduckgo.js.messaging.api.SubscriptionEventData
-import com.duckduckgo.js.messaging.api.WebMessagingPlugin
-import com.duckduckgo.js.messaging.api.WebViewCompatMessageCallback
 import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.Feed
 import com.duckduckgo.privacy.config.api.AmpLinks
 import com.duckduckgo.subscriptions.api.Subscriptions
@@ -130,8 +126,6 @@ class BrowserWebViewClient @Inject constructor(
     private val androidFeaturesHeaderPlugin: AndroidFeaturesHeaderPlugin,
     private val duckChat: DuckChat,
     private val contentScopeExperiments: ContentScopeExperiments,
-    private val webMessagingPlugins: PluginPoint<WebMessagingPlugin>,
-    private val postMessageWrapperPlugins: PluginPoint<PostMessageWrapperPlugin>,
 ) : WebViewClient() {
     var webViewClientListener: WebViewClientListener? = null
     var clientProvider: ClientBrandHintProvider? = null
@@ -187,6 +181,7 @@ class BrowserWebViewClient @Inject constructor(
                     subscriptions.launchPrivacyPro(webView.context, url)
                     true
                 }
+
                 is SpecialUrlDetector.UrlType.Email -> {
                     webViewClientListener?.sendEmailRequested(urlType.emailAddress)
                     true
@@ -209,6 +204,7 @@ class BrowserWebViewClient @Inject constructor(
                     }
                     false
                 }
+
                 is SpecialUrlDetector.UrlType.ShouldLaunchDuckChatLink -> {
                     runCatching {
                         val query = url.getQueryParameter(QUERY)
@@ -219,6 +215,7 @@ class BrowserWebViewClient @Inject constructor(
                         }
                     }.isSuccess
                 }
+
                 is SpecialUrlDetector.UrlType.ShouldLaunchDuckPlayerLink -> {
                     if (isRedirect && isForMainFrame) {
                         /*
@@ -239,6 +236,7 @@ class BrowserWebViewClient @Inject constructor(
                         )
                     }
                 }
+
                 is SpecialUrlDetector.UrlType.NonHttpAppLink -> {
                     logcat(INFO) { "Found non-http app link for ${urlType.uriString}" }
                     if (isForMainFrame) {
@@ -315,6 +313,7 @@ class BrowserWebViewClient @Inject constructor(
                     }
                     false
                 }
+
                 is SpecialUrlDetector.UrlType.DuckScheme -> {
                     webViewClientListener?.let { listener ->
                         if (
@@ -471,19 +470,6 @@ class BrowserWebViewClient @Inject constructor(
         webView.settings.mediaPlaybackRequiresUserGesture = mediaPlayback.doesMediaPlaybackRequireUserGestureForUrl(url)
     }
 
-    suspend fun configureWebView(
-        webView: DuckDuckGoWebView,
-        callback: WebViewCompatMessageCallback?,
-    ) {
-        webViewClientListener?.addDocumentStartJavaScript(webView)
-
-        callback?.let {
-            webMessagingPlugins.getPlugins().forEach { plugin ->
-                plugin.register(callback, webView)
-            }
-        }
-    }
-
     @UiThread
     override fun onPageFinished(
         webView: WebView,
@@ -501,8 +487,6 @@ class BrowserWebViewClient @Inject constructor(
                 )
             }
 
-            webViewClientListener?.addDocumentStartJavaScript(webView)
-
             url?.let {
                 // We call this for any url but it will only be processed for an internal tester verification url
                 internalTestUserChecker.verifyVerificationCompleted(it)
@@ -510,7 +494,7 @@ class BrowserWebViewClient @Inject constructor(
 
             val navigationList = webView.safeCopyBackForwardList() ?: return
             webViewClientListener?.run {
-                pageFinished(WebViewNavigationState(navigationList), url)
+                pageFinished(webView, WebViewNavigationState(navigationList), url)
             }
             flushCookies()
             printInjector.injectPrint(webView)
@@ -763,16 +747,6 @@ class BrowserWebViewClient @Inject constructor(
         feed: Feed,
     ) {
         requestInterceptor.addExemptedMaliciousSite(url, feed)
-    }
-
-    fun postContentScopeMessage(
-        eventData: SubscriptionEventData,
-        webView: WebView,
-    ) {
-        postMessageWrapperPlugins
-            .getPlugins()
-            .firstOrNull { it.context == "contentScopeScripts" }
-            ?.postMessage(eventData, webView)
     }
 }
 

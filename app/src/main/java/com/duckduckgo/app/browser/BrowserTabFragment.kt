@@ -1224,7 +1224,7 @@ class BrowserTabFragment :
     private fun postBreakageReportingEvent() {
         val eventData = createBreakageReportingEventData()
         webView?.let {
-            webViewClient.postContentScopeMessage(eventData, it)
+            viewModel.postContentScopeMessage(eventData, it)
         }
     }
 
@@ -1996,7 +1996,7 @@ class BrowserTabFragment :
             is Command.RefreshAndShowPrivacyProtectionEnabledConfirmation -> {
                 webView?.let { safeWebView ->
                     lifecycleScope.launch {
-                        webViewClient.configureWebView(safeWebView, null)
+                        viewModel.privacyProtectionsUpdated(safeWebView)
                         refresh()
                         privacyProtectionEnabledConfirmation(it.domain)
                     }
@@ -2006,7 +2006,7 @@ class BrowserTabFragment :
             is Command.RefreshAndShowPrivacyProtectionDisabledConfirmation -> {
                 webView?.let { safeWebView ->
                     lifecycleScope.launch {
-                        webViewClient.configureWebView(safeWebView, null)
+                        viewModel.privacyProtectionsUpdated(safeWebView)
                         refresh()
                         privacyProtectionDisabledConfirmation(it.domain)
                     }
@@ -3208,30 +3208,28 @@ class BrowserTabFragment :
                     }
                 },
             )
-            lifecycleScope.launch {
-                webViewClient.configureWebView(
-                    it,
-                    object : WebViewCompatMessageCallback {
-                        override fun process(
-                            context: String,
-                            featureName: String,
-                            method: String,
-                            id: String?,
-                            data: JSONObject?,
-                            onResponse: suspend (JSONObject) -> Unit,
-                        ) {
-                            viewModel.webViewCompatProcessJsCallbackMessage(
-                                context = context,
-                                featureName = featureName,
-                                method = method,
-                                id = id,
-                                data = data,
-                                onResponse = onResponse,
-                            )
-                        }
-                    },
-                )
-            }
+            viewModel.configureWebView(
+                it,
+                object : WebViewCompatMessageCallback {
+                    override fun process(
+                        context: String,
+                        featureName: String,
+                        method: String,
+                        id: String?,
+                        data: JSONObject?,
+                        onResponse: suspend (JSONObject) -> Unit,
+                    ) {
+                        viewModel.webViewCompatProcessJsCallbackMessage(
+                            context = context,
+                            featureName = featureName,
+                            method = method,
+                            id = id,
+                            data = data,
+                            onResponse = onResponse,
+                        )
+                    }
+                },
+            )
 
             duckPlayerScripts.register(
                 it,

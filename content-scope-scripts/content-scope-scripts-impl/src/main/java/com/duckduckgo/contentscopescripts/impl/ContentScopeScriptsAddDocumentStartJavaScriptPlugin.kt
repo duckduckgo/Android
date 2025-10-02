@@ -20,6 +20,7 @@ import android.annotation.SuppressLint
 import android.webkit.WebView
 import androidx.webkit.ScriptHandler
 import com.duckduckgo.app.browser.api.WebViewCapabilityChecker
+import com.duckduckgo.app.browser.api.WebViewCapabilityChecker.WebViewCapability.DocumentStartJavaScript
 import com.duckduckgo.browser.api.webviewcompat.WebViewCompatWrapper
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.contentscopescripts.api.contentscopeExperiments.ContentScopeExperiments
@@ -46,7 +47,7 @@ class ContentScopeScriptsAddDocumentStartJavaScriptPlugin @Inject constructor(
     override suspend fun addDocumentStartJavaScript(webView: WebView) {
         if (!webViewCompatContentScopeScripts.isEnabled() ||
             !webViewCapabilityChecker.isSupported(
-                WebViewCapabilityChecker.WebViewCapability.DocumentStartJavaScript,
+                DocumentStartJavaScript,
             )
         ) {
             return
@@ -74,4 +75,7 @@ class ContentScopeScriptsAddDocumentStartJavaScriptPlugin @Inject constructor(
                 currentScriptString = scriptString
             }
     }
+
+    override val context: String
+        get() = "contentScopeScripts"
 }

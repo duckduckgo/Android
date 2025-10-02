@@ -169,6 +169,7 @@ interface WebViewClientListener {
     fun onShouldOverride()
 
     fun pageFinished(
+        webView: WebView,
         webViewNavigationState: WebViewNavigationState,
         url: String?,
     )
@@ -182,6 +183,4 @@ interface WebViewClientListener {
         webViewNavigationState: WebViewNavigationState,
         activeExperiments: List<Toggle>,
     )
-
-    fun addDocumentStartJavaScript(webView: WebView)
 }

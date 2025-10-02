@@ -84,10 +84,6 @@ import com.duckduckgo.duckplayer.api.DuckPlayer.OpenDuckPlayerInNewTab.On
 import com.duckduckgo.duckplayer.api.DuckPlayer.OpenDuckPlayerInNewTab.Unavailable
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.history.api.NavigationHistory
-import com.duckduckgo.js.messaging.api.PostMessageWrapperPlugin
-import com.duckduckgo.js.messaging.api.SubscriptionEventData
-import com.duckduckgo.js.messaging.api.WebMessagingPlugin
-import com.duckduckgo.js.messaging.api.WebViewCompatMessageCallback
 import com.duckduckgo.privacy.config.api.AmpLinks
 import com.duckduckgo.subscriptions.api.Subscriptions
 import com.duckduckgo.user.agent.api.ClientBrandHintProvider
@@ -98,7 +94,6 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runTest
-import org.json.JSONObject
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -165,8 +160,6 @@ class BrowserWebViewClientTest {
     private val mockUriLoadedManager: UriLoadedManager = mock()
     private val mockAndroidBrowserConfigFeature: AndroidBrowserConfigFeature = mock()
     private val mockContentScopeExperiments: ContentScopeExperiments = mock()
-    private val fakeMessagingPlugins = FakeWebMessagingPluginPoint()
-    private val fakePostMessageWrapperPlugins = FakePostMessageWrapperPluginPoint()
     private val mockAndroidFeaturesHeaderPlugin =
         AndroidFeaturesHeaderPlugin(
             mockDuckDuckGoUrlDetector,
@@ -218,8 +211,6 @@ class BrowserWebViewClientTest {
                     mockAndroidFeaturesHeaderPlugin,
                     mockDuckChat,
                     mockContentScopeExperiments,
-                    fakeMessagingPlugins,
-                    fakePostMessageWrapperPlugins,
                 )
             testee.webViewClientListener = listener
             whenever(webResourceRequest.url).thenReturn(Uri.EMPTY)
@@ -332,7 +323,7 @@ class BrowserWebViewClientTest {
     @Test
     fun whenOnPageFinishedCalledThenListenerNotified() {
         testee.onPageFinished(webView, EXAMPLE_URL)
-        verify(listener).pageFinished(any(), eq(EXAMPLE_URL))
+        verify(listener).pageFinished(eq(webView), any(), eq(EXAMPLE_URL))
     }
 
     @UiThreadTest
@@ -355,47 +346,13 @@ class BrowserWebViewClientTest {
 
     @UiThreadTest
     @Test
-    fun whenConfigureWebViewThenInjectJsCode() =
-        runTest {
-            val mockCallback = mock<WebViewCompatMessageCallback>()
-            val webView = DuckDuckGoWebView(context)
-
-            testee.configureWebView(webView, mockCallback)
-
-            verify(listener).addDocumentStartJavaScript(webView)
-        }
-
-    @UiThreadTest
-    @Test
-    fun whenPageFinishedThenInjectJsCode() =
+    fun whenPageFinishedThenCallListenerMethod() =
         runTest {
             val webView = DuckDuckGoWebView(context)
 
             testee.onPageFinished(webView, "example.com")
 
-            verify(listener).addDocumentStartJavaScript(webView)
-        }
-
-    @UiThreadTest
-    @Test
-    fun whenConfigureWebViewThenAddWebMessageListener() =
-        runTest {
-            assertFalse(fakeMessagingPlugins.plugin.registered)
-            val mockCallback = mock<WebViewCompatMessageCallback>()
-            testee.configureWebView(DuckDuckGoWebView(context), mockCallback)
-            assertTrue(fakeMessagingPlugins.plugin.registered)
-        }
-
-    @Test
-    fun whenPostMessageThenCallPostContentScopeMessage() =
-        runTest {
-            val data = SubscriptionEventData("feature", "method", JSONObject())
-
-            assertFalse(fakePostMessageWrapperPlugins.plugin.postMessageCalled)
-
-            testee.postContentScopeMessage(data, webView)
-
-            assertTrue(fakePostMessageWrapperPlugins.plugin.postMessageCalled)
+            verify(listener).pageFinished(eq(webView), any(), eq("example.com"))
         }
 
     @UiThreadTest
@@ -1340,57 +1297,5 @@ class BrowserWebViewClientTest {
 
     companion object {
         const val EXAMPLE_URL = "https://example.com"
-    }
-
-    class FakeWebMessagingPlugin : WebMessagingPlugin {
-        var registered = false
-            private set
-
-        override suspend fun unregister(webView: WebView) {
-            registered = false
-        }
-
-        override suspend fun register(
-            jsMessageCallback: WebViewCompatMessageCallback,
-            webView: WebView,
-        ) {
-            registered = true
-        }
-
-        override suspend fun postMessage(
-            webView: WebView,
-            subscriptionEventData: SubscriptionEventData,
-        ) {
-        }
-
-        override val context: String
-            get() = "test"
-    }
-
-    class FakeWebMessagingPluginPoint : PluginPoint<WebMessagingPlugin> {
-        val plugin = FakeWebMessagingPlugin()
-
-        override fun getPlugins(): Collection<WebMessagingPlugin> = listOf(plugin)
-    }
-
-    class FakePostMessageWrapperPlugin : PostMessageWrapperPlugin {
-        var postMessageCalled = false
-            private set
-
-        override fun postMessage(
-            message: SubscriptionEventData,
-            webView: WebView,
-        ) {
-            postMessageCalled = true
-        }
-
-        override val context: String
-            get() = "contentScopeScripts"
-    }
-
-    class FakePostMessageWrapperPluginPoint : PluginPoint<PostMessageWrapperPlugin> {
-        val plugin = FakePostMessageWrapperPlugin()
-
-        override fun getPlugins(): Collection<PostMessageWrapperPlugin> = listOf(plugin)
     }
 }
