@@ -27,9 +27,9 @@ import com.duckduckgo.subscriptions.impl.repository.isActive
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.Lazy
 import dagger.SingleInstanceIn
+import kotlinx.coroutines.withContext
 import java.time.Duration
 import javax.inject.Inject
-import kotlinx.coroutines.withContext
 
 interface SubscriptionPurchaseWideEvent {
     suspend fun onPurchaseFlowStarted(
@@ -92,6 +92,7 @@ class SubscriptionPurchaseWideEventImpl @Inject constructor(
                 wideEventId = wideEventId,
                 status = FlowStatus.Unknown,
             )
+            cachedFlowId = null
         }
 
         cachedFlowId = wideEventClient
@@ -132,6 +133,7 @@ class SubscriptionPurchaseWideEventImpl @Inject constructor(
             wideEventId = wideEventId,
             status = FlowStatus.Failure(reason = e.toErrorString()),
         )
+        cachedFlowId = null
     }
 
     override suspend fun onAccountCreationStarted() {
@@ -201,6 +203,7 @@ class SubscriptionPurchaseWideEventImpl @Inject constructor(
             wideEventId = wideEventId,
             status = FlowStatus.Failure(reason = error),
         )
+        cachedFlowId = null
     }
 
     override suspend fun onBillingFlowPurchaseSuccess() {
@@ -234,6 +237,7 @@ class SubscriptionPurchaseWideEventImpl @Inject constructor(
             wideEventId = wideEventId,
             status = FlowStatus.Failure(reason = error),
         )
+        cachedFlowId = null
     }
 
     override suspend fun onPurchaseConfirmationSuccess() {
