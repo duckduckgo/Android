@@ -218,6 +218,20 @@
                                 app:layout_constraintTop_toTopOf="parent"
                                 app:lottie_loop="false" />
 
+                            <com.airbnb.lottie.LottieAnimationView
+                                android:id="@+id/addressBarTrackersBlockedAnimationShieldIcon"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="start|center_vertical"
+                                android:saveEnabled="false"
+                                android:visibility="gone"
+                                app:layout_constraintBottom_toBottomOf="parent"
+                                app:layout_constraintStart_toStartOf="@id/omniBarContentContainer"
+                                app:layout_constraintTop_toTopOf="parent"
+                                app:lottie_autoPlay="false"
+                                app:lottie_loop="false"
+                                app:lottie_rawRes="@raw/address_bar_trackers_animation_shield" />
+
                             <com.duckduckgo.common.ui.view.KeyboardAwareEditText
                                 android:id="@+id/omnibarTextInput"
                                 style="@style/Base.V7.Widget.AppCompat.EditText"
@@ -319,39 +333,6 @@
                                 app:layout_constraintEnd_toEndOf="@id/omnibarTextInput"
                                 app:layout_constraintStart_toStartOf="@id/omnibarTextInput"
                                 app:layout_constraintTop_toTopOf="@id/omnibarTextInput" />
-
-                            <com.duckduckgo.common.ui.view.text.DaxTextView
-                                android:id="@+id/trackersBlockedCountView"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_gravity="center_vertical"
-                                android:paddingStart="0dp"
-                                android:paddingEnd="2dp"
-                                android:visibility="gone"
-                                app:textType="primary"
-                                app:typography="body1_bold"
-                                app:layout_constraintStart_toEndOf="@id/omnibarIconContainer"
-                                app:layout_constraintBottom_toBottomOf="parent"
-                                app:layout_constraintTop_toTopOf="parent" />
-
-                            <com.duckduckgo.common.ui.view.text.DaxTextView
-                                android:id="@+id/trackersBlockedTextView"
-                                android:layout_width="0dp"
-                                android:layout_height="wrap_content"
-                                android:layout_gravity="center_vertical"
-                                android:paddingStart="2dp"
-                                android:paddingEnd="2dp"
-                                tools:text="5 Trackers Blocked"
-                                android:ellipsize="end"
-                                android:maxLines="1"
-                                android:singleLine="true"
-                                android:visibility="gone"
-                                app:typography="body1"
-                                app:textType="secondary"
-                                app:layout_constraintStart_toEndOf="@id/trackersBlockedCountView"
-                                app:layout_constraintEnd_toEndOf="parent"
-                                app:layout_constraintBottom_toBottomOf="parent"
-                                app:layout_constraintTop_toTopOf="parent" />
 
                         </androidx.constraintlayout.widget.ConstraintLayout>
 
