@@ -21,11 +21,13 @@ import android.animation.ValueAnimator
 import android.content.Context
 import android.view.animation.AccelerateDecelerateInterpolator
 import android.widget.TextView
+import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.view.text.DaxTextView
 import javax.inject.Inject
 import kotlin.math.roundToInt
 import kotlin.time.Duration.Companion.seconds
 
+private const val TRACKER_COUNT_MINIMUM_ANIMATION_TRIGGER_THRESHOLD = 5
 private const val TRACKER_COUNT_LOWER_THRESHOLD_PERCENTAGE = 0.75f
 private const val TRACKER_COUNT_UPPER_THRESHOLD_PERCENTAGE = 0.85f
 private const val TRACKER_COUNT_UPPER_THRESHOLD = 40
@@ -55,23 +57,28 @@ class TrackerCountAnimator @Inject constructor() {
         this.context = context
         this.trackerTextView = trackerTextView
 
-        val endCount = totalTrackerCount.coerceAtMost(TRACKER_TOTAL_MAX_LIMIT)
+        val endCount = getTrackerAnimationEndCount(totalTrackerCount = totalTrackerCount)
 
-        val startPercentage = if (endCount >= TRACKER_COUNT_UPPER_THRESHOLD) {
-            TRACKER_COUNT_UPPER_THRESHOLD_PERCENTAGE
-        } else {
-            TRACKER_COUNT_LOWER_THRESHOLD_PERCENTAGE
+        val animationDuration =
+            if (endCount >= TRACKER_COUNT_UPPER_THRESHOLD) {
+                TRACKER_COUNT_UPPER_THRESHOLD_ANIMATION_DURATION
+            } else {
+                TRACKER_COUNT_LOWER_THRESHOLD_ANIMATION_DURATION
+            }
+
+        if (endCount < TRACKER_COUNT_MINIMUM_ANIMATION_TRIGGER_THRESHOLD) {
+            trackerTextView.text = endCount.toString()
+            trackerTextView.show()
+            trackerTextView.postDelayed({
+                onAnimationEnd()
+            }, animationDuration.inWholeMilliseconds)
+            return
         }
 
-        val startCount = (endCount * startPercentage).roundToInt()
-
-        val animationDuration = if (endCount >= TRACKER_COUNT_UPPER_THRESHOLD) {
-            TRACKER_COUNT_UPPER_THRESHOLD_ANIMATION_DURATION
-        } else {
-            TRACKER_COUNT_LOWER_THRESHOLD_ANIMATION_DURATION
-        }
+        val startCount = getTrackerAnimationStartCount(totalTrackerCount = totalTrackerCount)
 
         trackerTextView.text = startCount.toString()
+        trackerTextView.show()
 
         animator.removeAllListeners()
         animator.addListener(
@@ -90,4 +97,19 @@ class TrackerCountAnimator @Inject constructor() {
         animator.duration = animationDuration.inWholeMilliseconds
         animator.start()
     }
+
+    fun getTrackerAnimationStartCount(totalTrackerCount: Int): Int {
+        val endCount = totalTrackerCount.coerceAtMost(TRACKER_TOTAL_MAX_LIMIT)
+
+        val startPercentage =
+            if (endCount >= TRACKER_COUNT_UPPER_THRESHOLD) {
+                TRACKER_COUNT_UPPER_THRESHOLD_PERCENTAGE
+            } else {
+                TRACKER_COUNT_LOWER_THRESHOLD_PERCENTAGE
+            }
+
+        return (endCount * startPercentage).roundToInt()
+    }
+
+    fun getTrackerAnimationEndCount(totalTrackerCount: Int): Int = totalTrackerCount.coerceAtMost(TRACKER_TOTAL_MAX_LIMIT)
 }
