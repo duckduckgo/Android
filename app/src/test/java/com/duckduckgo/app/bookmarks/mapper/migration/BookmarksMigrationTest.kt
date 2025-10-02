@@ -33,13 +33,13 @@ import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.savedsites.api.models.SavedSitesNames
 import com.duckduckgo.savedsites.store.*
 import com.duckduckgo.savedsites.store.EntityType.BOOKMARK
-import java.util.UUID
 import junit.framework.Assert.*
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.test.runTest
 import org.junit.*
 import org.junit.runner.RunWith
 import org.mockito.kotlin.*
+import java.util.UUID
 
 @RunWith(AndroidJUnit4::class)
 class BookmarksMigrationTest {

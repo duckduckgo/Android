@@ -790,36 +790,44 @@
     <string name="sslErrorUntrustedMessage" instruction="Placeholder is domain with certificate issues">Tavas ierīces operētājsistēma neuzticas %1$s drošības sertifikātam. Iespējams, ka vietne ir nepareizi konfigurēta, ka tavu savienojumu ir apdraudējis kāds uzbrucējs vai ka tavas sistēmas pulkstenis ir nepareizs.</string>
 
     <!-- Extended Onboarding-->
-    <string name="preOnboardingDaxDialog1Title"><![CDATA[Sveiks.<br/><br/>Vai esi gatavs labākam, privātākam Internetam?]]></string>
+    <string name="preOnboardingDaxDialog1Title"><![CDATA[Sveiks.<br/><br/>Vai esi gatavs ātrākai pārlūkprogrammai, kas tevi aizsargā?]]></string>
     <string name="preOnboardingDaxDialog1Button">Aiziet!</string>
-    <string name="preOnboardingDaxDialog2Title">Privātuma aizsardzība ir aktivizēta!</string>
+    <string name="preOnboardingDaxDialog1SecondaryButton">Es jau esmu bijis/-usi šeit agrāk</string>
+    <string name="preOnboardingDaxDialog2Title">Aizsardzība ir aktivizēta!</string>
     <string name="preOnboardingDaxDialog2Button">Izvēlies pārlūku</string>
+    <string name="preOnboardingDaxDialog3Title"><![CDATA[Sapratu! Es izlaidīšu pārējos padomus.]]></string>
+    <string name="preOnboardingDaxDialog3Text"><![CDATA[Atceries: tu vari dzēst visas savas cilnes, vēsturi un pārlūkošanas datus ar diviem pieskārieniem, izmantojot <b>Fire Button</b> 🔥]]></string>
+    <string name="preOnboardingDaxDialog3SecondaryButton">Parādīt pamācību</string>
     <string name="preOnboardingComparisonChartItem1">Meklē privāti pēc noklusējuma</string>
     <string name="preOnboardingComparisonChartItem2">Bloķē trešo pušu izsekotājus</string>
     <string name="preOnboardingComparisonChartItem3">Bloķē sīkfailu uznirstošos logus</string>
     <string name="preOnboardingComparisonChartItem4">Bloķē mērķtiecīgas reklāmas</string>
     <string name="preOnboardingComparisonChartItem5">Dzēst pārlūkošanas datus ar vienu pogu</string>
-    <string name="preOnboardingDaxDialog3Title">Lieliski! Apsveicam ar pievienošanos pīļu komandai.</string>
     <string name="preOnboardingDaxDialog3Button">Sākt pārlūkošanu</string>
+    <string name="preOnboardingAddressBarTitle">Kur novietot adreses joslu?</string>
+    <string name="preOnboardingAddressBarOkButton">Nākamais</string>
+    <string name="highlightsPreOnboardingAddressBarOption1Title">Augšpusē (pēc noklusējuma)</string>
+    <string name="highlightsPreOnboardingAddressBarOption1Description">Viegli pamanāma</string>
+    <string name="highlightsPreOnboardingAddressBarOption2Title">Apakšā</string>
+    <string name="highlightsPreOnboardingAddressBarOption2Description">Viegli pieejama</string>
     <string name="onboardingSearchDaxDialogTitle">Izmēģini meklēt!</string>
-    <string name="onboardingSearchDaxDialogDescription">Tavi DuckDuckGo meklējumi vienmēr ir anonīmi.</string>
-    <string name="onboardingSearchDaxDialogOption1" instruction="translate &apos;duck&apos; too.">kā angliski pateikt “pīle”</string>
-    <string name="onboardingSearchDaxDialogOption1English" instruction="translate &apos;duck&apos; too. Don&apos;t add question mark">kā spāniski pateikt “pīle”</string>
+    <string name="onboardingSearchDaxDialogDescription">Tavi DuckDuckGo meklējumi vienmēr ir privāti.</string>
+    <string name="onboardingSearchDaxDialogOption1" instruction="translate &apos;duck&apos; too.">"kā angliski pateikt “pīle”"</string>
+    <string name="onboardingSearchDaxDialogOption1English" instruction="translate &apos;duck&apos; too. Don&apos;t add question mark">"kā spāniski pateikt “pīle”"</string>
     <string name="onboardingSearchQueryOption1">kā angliski pateikt “pīle”</string>
     <string name="onboardingSearchQueryOption1English">kā spāniski pateikt “pīle”</string>
     <string name="onboardingSearchDaxDialogOption2">avatara aktieru sastāvs</string>
     <string name="onboardingSearchDaxDialogOption2US">mighty ducks aktieri</string>
     <string name="onboardingSearchDaxDialogOption3">vietējie laikapstākļi</string>
     <string name="onboardingSearchDaxDialogOption4">Pārsteidz mani!</string>
-    <string name="onboardingSearchQueryOption4">vakariņu receptes</string>
-    <string name="onboardingSearchQueryOption4US">cepumu ar šokolādes gabaliņiem receptes</string>
+    <string name="onboardingSearchQueryOption4">mazi pīlēni</string>
     <string name="onboardingSitesDaxDialogTitle">Pamēģini apmeklēt kādu vietni!</string>
     <string name="onboardingSitesDaxDialogDescription">Es nobloķēšu izsekotājus, lai tie nevarētu tevi izspiegot.</string>
     <string name="onboardingSitesDaxDialogOption1">espn.com</string>
     <string name="onboardingSitesDaxDialogOption2">yahoo.com</string>
     <string name="onboardingSitesDaxDialogOption3">ebay.com</string>
     <string name="onboardingSitesDaxDialogOption4">Pārsteidz mani!</string>
-    <string name="onboardingSerpDaxDialogDescription">Tas ir DuckDuckGo Search. Privāti. Ātri. Mazāk reklāmu.</string>
+    <string name="onboardingSerpDaxDialogDescription"><![CDATA[Tas ir <b>DuckDuckGo Search</b>! Privāti. Ātri. Mazāk reklāmu.]]></string>
     <string name="onboardingSerpDaxDialogButton">Sapratu!</string>
     <string name="onboardingSitesSuggestionsDaxDialogTitle">Tagad pamēģini atvērt kādu vietni!</string>
     <plurals name="onboardingTrackersBlockedDialogDescription">
@@ -834,42 +842,20 @@
     </plurals>
     <string name="onboardingTrackersBlockedDaxDialogButton">Sapratu!</string>
     <string name="onboardingFireButtonDaxDialogDescription"><![CDATA[Nekavējoties notīri savu pārlūkošanas vēsturi, izmantojot <b>Fire Button</b>.<br/><br/>Izmēģini! 🔥]]></string>
+    <string name="onboardingFireButtonDaxDialogOkButton">Izmēģini</string>
+    <string name="onboardingFireButtonDaxDialogCancelButton">Izlaist</string>
     <string name="onboardingEndDaxDialogTitle">"Izdevās!"</string>
-    <string name="onboardingEndDaxDialogDescription">Atceries: katru reizi, kad pārlūkosi kopā ar mani, uzmācīgās reklāmas zaudēs savu spēku! 👌</string>
-    <string name="onboardingEndDaxDialogButton">Viss pabeigts!</string>
+    <string name="onboardingEndDaxDialogDescription">Atceries: katru reizi, kad pārlūkosi kopā ar mani, kaitinošās reklāmas zaudēs savu spēku!</string>
+    <string name="onboardingInContextEndDaxDialogDescription">Atceries: katru reizi, kad pārlūkosi kopā ar mani, uzmācīgās reklāmas zaudēs savu spēku! 👌</string>
+    <string name="onboardingEndDaxDialogButton">Dod pieci!</string>
     <string name="onboardingPrivacyProDaxDialogTitle">Ak, pirms es aizmirsu...</string>
     <string name="onboardingPrivacyProDaxDialogDescription"><![CDATA[DuckDuckGo piedāvā arī drošu <b>VPN + vēl 2 premium aizsardzības</b>, pieejamu ar <b>izvēles maksas abonementu</b>.]]></string>
     <string name="onboardingPrivacyProDaxDialogOkButton">Uzzināt vairāk</string>
     <string name="onboardingPrivacyProDaxDialogFreeTrialOkButton">Izmēģini bez maksas!</string>
     <string name="onboardingPrivacyProDaxDialogCancelButton">Izlaist</string>
 
-    <!-- Highlight Onboarding Experiment-->
-    <string name="highlightsPreOnboardingDaxDialog1Title"><![CDATA[Sveiks.<br/><br/>Vai esi gatavs ātrākai pārlūkprogrammai, kas tevi aizsargā?]]></string>
-    <string name="highlightsPreOnboardingDaxDialog2Title">Aizsardzība ir aktivizēta!</string>
-    <string name="highlightsPreOnboardingComparisonChartItem2">Bloķē trešo pušu izsekotājus</string>
-    <string name="highlightsPreOnboardingComparisonChartItem3">Bloķē sīkfailu pieprasījumus un uznirstošos logus</string>
-    <string name="highlightsPreOnboardingComparisonChartItem4">Bloķē mērķtiecīgas reklāmas</string>
-    <string name="highlightsPreOnboardingComparisonChartItem5">Ātri izdzēs pārlūkošanas datus</string>
-    <string name="highlightsPreOnboardingSelectAppIconTitle">Kura krāsa man ir vispiemērotākā?</string>
-    <string name="highlightsPreOnboardingSelectAppIconDescription">Izvēlies lietotnes ikonu:</string>
-    <string name="highlightsPreOnboardingSelectAppIconOkButton">Nākamais</string>
-    <string name="highlightsPreOnboardingAddressBarTitle">Kur novietot adreses joslu?</string>
-    <string name="highlightsPreOnboardingAddressBarOption1Title">Augšpusē (pēc noklusējuma)</string>
-    <string name="highlightsPreOnboardingAddressBarOption1Description">Viegli pamanāma</string>
-    <string name="highlightsPreOnboardingAddressBarOkButton">Nākamais</string>
-    <string name="highlightsPreOnboardingAddressBarOption2Title">Apakšā</string>
-    <string name="highlightsPreOnboardingAddressBarOption2Description">Viegli pieejama</string>
-    <string name="highlightsOnboardingSearchQueryOption4">mazi pīlēni</string>
-    <string name="highlightsOnboardingSearchDaxDialogDescription">Tavi DuckDuckGo meklējumi vienmēr ir privāti.</string>
-    <string name="highlightsOnboardingSerpDaxDialogDescription"><![CDATA[Tas ir <b>DuckDuckGo Search</b>! Privāti. Ātri. Mazāk reklāmu.]]></string>
-    <string name="highlightsOnboardingEndDaxDialogDescription">Atceries: katru reizi, kad pārlūkosi kopā ar mani, kaitinošās reklāmas zaudēs savu spēku!</string>
-    <string name="highlightsOnboardingEndDaxDialogButton">Dod pieci!</string>
-    <string name="onboardingFireButtonDaxDialogOkButton">Izmēģini</string>
-    <string name="onboardingFireButtonDaxDialogCancelButton">Izlaist</string>
-    <string name="preOnboardingDaxDialog1SecondaryButton">Es jau esmu bijis/-usi šeit agrāk</string>
-    <string name="highlightsPreOnboardingDaxDialog3Title"><![CDATA[Sapratu! Es izlaidīšu pārējos padomus.]]></string>
-    <string name="highlightsPreOnboardingDaxDialog3Text"><![CDATA[Atceries: tu vari dzēst visas savas cilnes, vēsturi un pārlūkošanas datus ar diviem pieskārieniem, izmantojot <b>Fire Button</b> 🔥]]></string>
-    <string name="preOnboardingDaxDialog3SecondaryButton">Parādīt pamācību</string>
+    <!-- Bubble BB & Buck experiment-->
+    <string name="onboardingBubbleExperimentSearchDaxDialogDescription">Tavi DuckDuckGo meklējumi vienmēr ir anonīmi.</string>
 
     <!-- Appearance settings -->
     <string name="settingsAddressBarPositionTitle">Adreses josla</string>

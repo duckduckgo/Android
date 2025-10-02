@@ -18,9 +18,9 @@ package com.duckduckgo.app.tabs.ui
 
 import android.view.View
 import android.widget.TextView
-import com.google.android.material.R as materialR
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.Snackbar
+import com.google.android.material.R as materialR
 
 class DefaultSnackbar(
     parentView: View,

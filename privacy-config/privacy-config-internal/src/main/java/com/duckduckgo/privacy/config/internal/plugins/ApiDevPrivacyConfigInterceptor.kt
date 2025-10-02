@@ -22,10 +22,10 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.privacy.config.api.PRIVACY_REMOTE_CONFIG_URL
 import com.duckduckgo.privacy.config.internal.store.DevPrivacyConfigSettingsDataStore
 import com.squareup.anvil.annotations.ContributesMultibinding
-import java.net.URI
-import javax.inject.Inject
 import okhttp3.Interceptor
 import okhttp3.Response
+import java.net.URI
+import javax.inject.Inject
 
 @ContributesMultibinding(
     scope = AppScope::class,

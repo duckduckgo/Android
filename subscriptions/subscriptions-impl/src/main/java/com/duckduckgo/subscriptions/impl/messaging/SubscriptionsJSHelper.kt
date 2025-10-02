@@ -24,10 +24,10 @@ import com.duckduckgo.subscriptions.impl.AccessTokenResult
 import com.duckduckgo.subscriptions.impl.PrivacyProFeature
 import com.duckduckgo.subscriptions.impl.SubscriptionsManager
 import com.squareup.anvil.annotations.ContributesBinding
-import javax.inject.Inject
 import kotlinx.coroutines.withContext
 import org.json.JSONArray
 import org.json.JSONObject
+import javax.inject.Inject
 
 @ContributesBinding(AppScope::class)
 class RealSubscriptionsJSHelper @Inject constructor(

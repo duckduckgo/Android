@@ -24,11 +24,11 @@ import com.duckduckgo.app.statistics.pixels.Pixel.PixelType
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import io.reactivex.schedulers.Schedulers
-import javax.inject.Inject
 import logcat.LogPriority.VERBOSE
 import logcat.LogPriority.WARN
 import logcat.asLog
 import logcat.logcat
+import javax.inject.Inject
 
 @ContributesBinding(AppScope::class)
 class RxBasedPixel @Inject constructor(

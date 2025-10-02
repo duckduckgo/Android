@@ -37,12 +37,12 @@ import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.navigation.api.GlobalActivityStarter.ActivityParams
 import com.google.android.material.snackbar.Snackbar
-import javax.inject.Inject
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import logcat.LogPriority.WARN
 import logcat.asLog
 import logcat.logcat
+import javax.inject.Inject
 
 data object GetDesktopAppParams : ActivityParams {
     private fun readResolve(): Any = GetDesktopAppParams

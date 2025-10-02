@@ -776,36 +776,44 @@
     <string name="sslErrorUntrustedMessage" instruction="Placeholder is domain with certificate issues">Laitteesi käyttöjärjestelmä ei luota verkkotunnuksen %1$s suojausvarmenteeseen. Verkkosivusto on ehkä väärin määritetty, hyökkäys on saattanut vaarantaa yhteytesi tai järjestelmäsi kellossa on virhe.</string>
 
     <!-- Extended Onboarding-->
-    <string name="preOnboardingDaxDialog1Title"><![CDATA[Hei!<br/><br/>Oletko valmis parempaan ja yksityisempään internetiin?]]></string>
+    <string name="preOnboardingDaxDialog1Title"><![CDATA[Hei!<br/><br/>Oletko valmis käyttämään nopeampaa selainta, joka pitää sinut suojattuna?]]></string>
     <string name="preOnboardingDaxDialog1Button">Aloitetaan!</string>
-    <string name="preOnboardingDaxDialog2Title">Yksityisyyden suoja aktivoitu!</string>
+    <string name="preOnboardingDaxDialog1SecondaryButton">Tämä on jo entuudestaan tuttua</string>
+    <string name="preOnboardingDaxDialog2Title">Suojaukset aktivoitu!</string>
     <string name="preOnboardingDaxDialog2Button">Valitse selaimesi</string>
+    <string name="preOnboardingDaxDialog3Title"><![CDATA[Selvä! Ohitan muut vinkit.]]></string>
+    <string name="preOnboardingDaxDialog3Text"><![CDATA[Muista: voit poistaa kaikki välilehdet, historian ja selaustiedot kahdella napautuksella <b>Fire Button</b> ‑painikkeella 🔥]]></string>
+    <string name="preOnboardingDaxDialog3SecondaryButton">Näytä opetusohjelma</string>
     <string name="preOnboardingComparisonChartItem1">Yksityinen selaus oletuksena</string>
     <string name="preOnboardingComparisonChartItem2">Estä kolmannen osapuolen seuraimet</string>
     <string name="preOnboardingComparisonChartItem3">Estä evästeponnahdusikkunat</string>
     <string name="preOnboardingComparisonChartItem4">Estä kohdennetut mainokset</string>
     <string name="preOnboardingComparisonChartItem5">Poista selaustiedot yhdellä painikkeella</string>
-    <string name="preOnboardingDaxDialog3Title">Mahtavaa! Tervetuloa käyttämään Duckia.</string>
     <string name="preOnboardingDaxDialog3Button">Aloita selailu</string>
+    <string name="preOnboardingAddressBarTitle">Mihin osoitepalkki pitäisi sijoittaa?</string>
+    <string name="preOnboardingAddressBarOkButton">Seuraava</string>
+    <string name="highlightsPreOnboardingAddressBarOption1Title">Yläosa (oletus)</string>
+    <string name="highlightsPreOnboardingAddressBarOption1Description">Helppo nähdä</string>
+    <string name="highlightsPreOnboardingAddressBarOption2Title">Alareuna</string>
+    <string name="highlightsPreOnboardingAddressBarOption2Description">Helppo tavoittaa</string>
     <string name="onboardingSearchDaxDialogTitle">Kokeile hakua!</string>
-    <string name="onboardingSearchDaxDialogDescription">DuckDuckGo-hakusi ovat aina nimettömiä.</string>
-    <string name="onboardingSearchDaxDialogOption1" instruction="translate &apos;duck&apos; too.">miten sanotaan \"ankka\" englanniksi</string>
-    <string name="onboardingSearchDaxDialogOption1English" instruction="translate &apos;duck&apos; too. Don&apos;t add question mark">kuinka sanotaan \"duck\" espanjaksi</string>
+    <string name="onboardingSearchDaxDialogDescription">DuckDuckGo-hakusi ovat aina yksityisiä.</string>
+    <string name="onboardingSearchDaxDialogOption1" instruction="translate &apos;duck&apos; too.">"miten sanotaan ankka englanniksi"</string>
+    <string name="onboardingSearchDaxDialogOption1English" instruction="translate &apos;duck&apos; too. Don&apos;t add question mark">"miten sanotaan ankka espanjaksi"</string>
     <string name="onboardingSearchQueryOption1">miten sanotaan ankka englanniksi</string>
     <string name="onboardingSearchQueryOption1English">miten sanotaan ankka espanjaksi</string>
     <string name="onboardingSearchDaxDialogOption2">avatarmuotti</string>
     <string name="onboardingSearchDaxDialogOption2US">mighty ducks cast</string>
     <string name="onboardingSearchDaxDialogOption3">paikallissää</string>
     <string name="onboardingSearchDaxDialogOption4">Yllätä minut!</string>
-    <string name="onboardingSearchQueryOption4">illallisreseptejä</string>
-    <string name="onboardingSearchQueryOption4US">suklaakeksireseptit</string>
+    <string name="onboardingSearchQueryOption4">ankanpoikaset</string>
     <string name="onboardingSitesDaxDialogTitle">Siirry sivustolle!</string>
     <string name="onboardingSitesDaxDialogDescription">Estän jäljittäjät, jotta ne eivät voi vakoilla sinua.</string>
     <string name="onboardingSitesDaxDialogOption1">espn.com</string>
     <string name="onboardingSitesDaxDialogOption2">yahoo.com</string>
     <string name="onboardingSitesDaxDialogOption3">ebay.com</string>
     <string name="onboardingSitesDaxDialogOption4">Yllätä minut!</string>
-    <string name="onboardingSerpDaxDialogDescription">Tällainen on DuckDuckGo Search. Yksityinen. Nopea. Vähemmän mainoksia.</string>
+    <string name="onboardingSerpDaxDialogDescription"><![CDATA[Tällainen on <b>**DuckDuckGo Search**!</b> Yksityinen. Nopea. Vähemmän mainoksia.]]></string>
     <string name="onboardingSerpDaxDialogButton">Selvä!</string>
     <string name="onboardingSitesSuggestionsDaxDialogTitle">Siirry seuraavaksi sivustolle!</string>
     <plurals name="onboardingTrackersBlockedDialogDescription">
@@ -818,42 +826,20 @@
     </plurals>
     <string name="onboardingTrackersBlockedDaxDialogButton">Selvä!</string>
     <string name="onboardingFireButtonDaxDialogDescription"><![CDATA[Tyhjennä selaustoimintasi välittömästi <b>Fire Button</b> -painikkeella.<br/><br/>Kokeile nyt!️ 🔥]]></string>
+    <string name="onboardingFireButtonDaxDialogOkButton">Kokeile sitä</string>
+    <string name="onboardingFireButtonDaxDialogCancelButton">Ohita</string>
     <string name="onboardingEndDaxDialogTitle">"Hyvin menee!"</string>
-    <string name="onboardingEndDaxDialogDescription">Muista, että joka kerta kun käytät minua selaamiseen, rasittavat mainokset katoavat. 👌</string>
-    <string name="onboardingEndDaxDialogButton">Valmista!</string>
+    <string name="onboardingEndDaxDialogDescription">Muista, että joka kerta kun käytät minua selaamiseen, rasittavat mainokset katoavat.</string>
+    <string name="onboardingInContextEndDaxDialogDescription">Muista, että joka kerta kun käytät minua selaamiseen, rasittavat mainokset katoavat. 👌</string>
+    <string name="onboardingEndDaxDialogButton">Ylävitonen!</string>
     <string name="onboardingPrivacyProDaxDialogTitle">Ai niin...</string>
     <string name="onboardingPrivacyProDaxDialogDescription"><![CDATA[DuckDuckGossa on myös turvallinen <b>VPN + 2 muuta premium-suojausta</b>, jotka ovat saatavilla <b>valinnaisen maksullisen tilauksen</b> kautta.]]></string>
     <string name="onboardingPrivacyProDaxDialogOkButton">Lue lisää</string>
     <string name="onboardingPrivacyProDaxDialogFreeTrialOkButton">Kokeile ilmaiseksi!</string>
     <string name="onboardingPrivacyProDaxDialogCancelButton">Ohita</string>
 
-    <!-- Highlight Onboarding Experiment-->
-    <string name="highlightsPreOnboardingDaxDialog1Title"><![CDATA[Hei!<br/><br/>Oletko valmis käyttämään nopeampaa selainta, joka pitää sinut suojattuna?]]></string>
-    <string name="highlightsPreOnboardingDaxDialog2Title">Suojaukset aktivoitu!</string>
-    <string name="highlightsPreOnboardingComparisonChartItem2">Estä kolmannen osapuolen seuraimet</string>
-    <string name="highlightsPreOnboardingComparisonChartItem3">Estä evästepyynnöt ja ponnahdusikkunat</string>
-    <string name="highlightsPreOnboardingComparisonChartItem4">Estä kohdennetut mainokset</string>
-    <string name="highlightsPreOnboardingComparisonChartItem5">Poista selaustiedot nopeasti</string>
-    <string name="highlightsPreOnboardingSelectAppIconTitle">Mikä väri sopii minulle parhaiten?</string>
-    <string name="highlightsPreOnboardingSelectAppIconDescription">Valitse sovelluskuvake:</string>
-    <string name="highlightsPreOnboardingSelectAppIconOkButton">Seuraava</string>
-    <string name="highlightsPreOnboardingAddressBarTitle">Mihin osoitepalkki pitäisi sijoittaa?</string>
-    <string name="highlightsPreOnboardingAddressBarOption1Title">Yläosa (oletus)</string>
-    <string name="highlightsPreOnboardingAddressBarOption1Description">Helppo nähdä</string>
-    <string name="highlightsPreOnboardingAddressBarOkButton">Seuraava</string>
-    <string name="highlightsPreOnboardingAddressBarOption2Title">Alareuna</string>
-    <string name="highlightsPreOnboardingAddressBarOption2Description">Helppo tavoittaa</string>
-    <string name="highlightsOnboardingSearchQueryOption4">ankanpoikaset</string>
-    <string name="highlightsOnboardingSearchDaxDialogDescription">DuckDuckGo-hakusi ovat aina yksityisiä.</string>
-    <string name="highlightsOnboardingSerpDaxDialogDescription"><![CDATA[Tällainen on <b>**DuckDuckGo Search**!</b> Yksityinen. Nopea. Vähemmän mainoksia.]]></string>
-    <string name="highlightsOnboardingEndDaxDialogDescription">Muista, että joka kerta kun käytät minua selaamiseen, rasittavat mainokset katoavat.</string>
-    <string name="highlightsOnboardingEndDaxDialogButton">Ylävitonen!</string>
-    <string name="onboardingFireButtonDaxDialogOkButton">Kokeile sitä</string>
-    <string name="onboardingFireButtonDaxDialogCancelButton">Ohita</string>
-    <string name="preOnboardingDaxDialog1SecondaryButton">Tämä on jo entuudestaan tuttua</string>
-    <string name="highlightsPreOnboardingDaxDialog3Title"><![CDATA[Selvä! Ohitan muut vinkit.]]></string>
-    <string name="highlightsPreOnboardingDaxDialog3Text"><![CDATA[Muista: voit poistaa kaikki välilehdet, historian ja selaustiedot kahdella napautuksella <b>Fire Button</b> ‑painikkeella 🔥]]></string>
-    <string name="preOnboardingDaxDialog3SecondaryButton">Näytä opetusohjelma</string>
+    <!-- Bubble BB & Buck experiment-->
+    <string name="onboardingBubbleExperimentSearchDaxDialogDescription">DuckDuckGo-hakusi ovat aina nimettömiä.</string>
 
     <!-- Appearance settings -->
     <string name="settingsAddressBarPositionTitle">Osoitekenttä</string>

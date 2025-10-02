@@ -24,13 +24,11 @@ import com.duckduckgo.daxprompts.api.DaxPrompts
 import com.duckduckgo.daxprompts.api.DaxPrompts.ActionType
 import com.duckduckgo.daxprompts.impl.repository.DaxPromptsRepository
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.duckplayer.api.DuckPlayer
-import com.duckduckgo.duckplayer.api.PrivatePlayerMode.AlwaysAsk
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
+import kotlinx.coroutines.withContext
 import java.util.Date
 import javax.inject.Inject
-import kotlinx.coroutines.withContext
 
 private const val EXISTING_USER_DAY_COUNT_THRESHOLD = 28
 private const val EXISTING_USER_DAYS_INACTIVE_MILLIS = 7 * 24 * 60 * 60 * 1000 // 7 days
@@ -39,31 +37,32 @@ private const val EXISTING_USER_DAYS_INACTIVE_MILLIS = 7 * 24 * 60 * 60 * 1000 /
 @ContributesBinding(AppScope::class, boundType = DaxPrompts::class)
 class RealDaxPrompts @Inject constructor(
     private val daxPromptsRepository: DaxPromptsRepository,
-    private val reactivateUsersExperiment: ReactivateUsersExperiment,
+    private val reactivateUsersToggles: ReactivateUsersToggles,
     private val userBrowserProperties: UserBrowserProperties,
     private val defaultBrowserDetector: DefaultBrowserDetector,
     private val defaultRoleBrowserDialog: DefaultRoleBrowserDialog,
-    private val duckPlayer: DuckPlayer,
     private val dispatchers: DispatcherProvider,
 ) : DaxPrompts {
 
     override suspend fun evaluate(): ActionType {
+        if (!isEnabled() || !isEligible()) {
+            return ActionType.NONE
+        }
+
+        if (shouldShowBrowserComparisonPrompt()) {
+            return ActionType.SHOW_BROWSER_COMPARISON_PROMPT
+        }
+
+        if (dialogShownInTheLast24Hours()) {
+            return ActionType.TOO_SOON_TO_SHOW_OTHER_PROMPTS
+        }
+
+        return ActionType.NONE
+    }
+
+    private suspend fun isEnabled(): Boolean {
         return withContext(dispatchers.io()) {
-            if (!isEligible()) {
-                return@withContext ActionType.NONE
-            }
-
-            reactivateUsersExperiment.enrol()
-
-            if (reactivateUsersExperiment.isControl()) {
-                ActionType.SHOW_CONTROL
-            } else if (reactivateUsersExperiment.isDuckPlayerPrompt()) {
-                if (shouldShowDuckPlayerPrompt()) ActionType.SHOW_VARIANT_DUCKPLAYER else ActionType.NONE
-            } else if (reactivateUsersExperiment.isBrowserComparisonPrompt()) {
-                if (shouldShowBrowserComparisonPrompt()) ActionType.SHOW_VARIANT_BROWSER_COMPARISON else ActionType.NONE
-            } else {
-                ActionType.NONE
-            }
+            reactivateUsersToggles.self().isEnabled() && reactivateUsersToggles.browserComparisonPrompt().isEnabled()
         }
     }
 
@@ -74,15 +73,7 @@ class RealDaxPrompts @Inject constructor(
             }
 
             val sevenDaysAgo = Date(Date().time - EXISTING_USER_DAYS_INACTIVE_MILLIS)
-            if (userBrowserProperties.daysUsedSince(sevenDaysAgo) > 0L) {
-                return@withContext false
-            }
-
-            if (duckPlayer.getDuckPlayerState() != DuckPlayer.DuckPlayerState.ENABLED) {
-                return@withContext false
-            }
-
-            if (duckPlayer.getUserPreferences().privatePlayerMode != AlwaysAsk) {
+            if (userBrowserProperties.daysUsedSince(sevenDaysAgo) > 1L) {
                 return@withContext false
             }
 
@@ -94,11 +85,11 @@ class RealDaxPrompts @Inject constructor(
         }
     }
 
-    private suspend fun shouldShowDuckPlayerPrompt(): Boolean = withContext(dispatchers.io()) {
-        daxPromptsRepository.getDaxPromptsShowDuckPlayer()
+    private suspend fun shouldShowBrowserComparisonPrompt(): Boolean = withContext(dispatchers.io()) {
+        !daxPromptsRepository.getDaxPromptsBrowserComparisonShown()
     }
 
-    private suspend fun shouldShowBrowserComparisonPrompt(): Boolean = withContext(dispatchers.io()) {
-        daxPromptsRepository.getDaxPromptsShowBrowserComparison()
+    private suspend fun dialogShownInTheLast24Hours(): Boolean {
+        return daxPromptsRepository.getDaxPromptsBrowserComparisonShownInTheLast24Hours()
     }
 }

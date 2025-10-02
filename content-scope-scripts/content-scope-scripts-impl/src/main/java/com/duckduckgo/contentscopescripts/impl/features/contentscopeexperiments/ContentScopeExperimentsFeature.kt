@@ -26,7 +26,6 @@ import com.duckduckgo.feature.toggles.api.Toggle.State.CohortName
     scope = AppScope::class,
     featureName = "contentScopeExperiments",
 )
-
 interface ContentScopeExperimentsFeature {
     @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun self(): Toggle

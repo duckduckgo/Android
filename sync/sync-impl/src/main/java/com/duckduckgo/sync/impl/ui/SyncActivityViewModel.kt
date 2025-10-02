@@ -57,8 +57,6 @@ import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.ShowError
 import com.duckduckgo.sync.impl.ui.SyncDeviceListItem.LoadingItem
 import com.duckduckgo.sync.impl.ui.SyncDeviceListItem.SyncedDevice
 import com.duckduckgo.sync.impl.ui.qrcode.SyncBarcodeUrl
-import java.io.File
-import javax.inject.Inject
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
@@ -73,6 +71,8 @@ import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import logcat.logcat
+import java.io.File
+import javax.inject.Inject
 
 @ContributesViewModel(ActivityScope::class)
 class SyncActivityViewModel @Inject constructor(

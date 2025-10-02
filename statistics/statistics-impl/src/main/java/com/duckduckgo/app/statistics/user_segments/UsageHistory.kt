@@ -102,7 +102,6 @@ private class RealUsageHistory(
     private enum class SegmentKey(name: String) {
         KEY_SEARCH_DATES("search.usage"),
         KEY_APP_USE_DATES("app_use.usage"),
-        ;
     }
 }
 

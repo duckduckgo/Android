@@ -45,12 +45,12 @@ import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.google.android.material.snackbar.Snackbar
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.anvil.annotations.ContributesMultibinding
-import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import logcat.LogPriority.INFO
 import logcat.logcat
+import javax.inject.Inject
 
 @ContributesMultibinding(AppScope::class)
 class ResultHandlerPromptToDisableCredentialSaving @Inject constructor(

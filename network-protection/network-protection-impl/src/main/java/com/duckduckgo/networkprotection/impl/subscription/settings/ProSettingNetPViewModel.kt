@@ -34,7 +34,6 @@ import com.duckduckgo.networkprotection.impl.subscription.settings.ProSettingNet
 import com.duckduckgo.subscriptions.api.Product.NetP
 import com.duckduckgo.subscriptions.api.SubscriptionStatus
 import com.duckduckgo.subscriptions.api.Subscriptions
-import javax.inject.Inject
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
@@ -48,6 +47,7 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import logcat.logcat
+import javax.inject.Inject
 
 @SuppressLint("NoLifecycleObserver") // we don't observe app lifecycle
 class ProSettingNetPViewModel(

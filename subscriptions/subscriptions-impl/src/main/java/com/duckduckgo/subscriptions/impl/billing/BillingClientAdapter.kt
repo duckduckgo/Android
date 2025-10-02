@@ -70,7 +70,7 @@ sealed class SubscriptionsPurchaseHistoryResult {
 
 sealed class LaunchBillingFlowResult {
     data object Success : LaunchBillingFlowResult()
-    data object Failure : LaunchBillingFlowResult()
+    data class Failure(val error: BillingError) : LaunchBillingFlowResult()
 }
 
 sealed class PurchasesUpdateResult {
@@ -99,7 +99,6 @@ enum class BillingError {
     NETWORK_ERROR,
     UNKNOWN_ERROR, // for when billing returns something we don't understand
     BILLING_CRASH_ERROR, // This is our own error
-    ;
 }
 
 /**

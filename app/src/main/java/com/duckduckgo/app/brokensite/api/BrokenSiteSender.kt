@@ -55,14 +55,14 @@ import com.duckduckgo.privacy.config.api.PrivacyFeatureName
 import com.duckduckgo.privacy.config.api.UnprotectedTemporary
 import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupExperimentExternalPixels
 import com.squareup.anvil.annotations.ContributesBinding
-import java.util.*
-import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import logcat.LogPriority.VERBOSE
 import logcat.LogPriority.WARN
 import logcat.asLog
 import logcat.logcat
+import java.util.*
+import javax.inject.Inject
 
 @ContributesBinding(AppScope::class)
 class BrokenSiteSubmitter @Inject constructor(

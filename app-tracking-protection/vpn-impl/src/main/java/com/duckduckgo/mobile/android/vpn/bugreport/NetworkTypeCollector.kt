@@ -26,10 +26,10 @@ import com.duckduckgo.mobile.android.vpn.state.VpnStateCollectorPlugin
 import com.frybits.harmony.getHarmonySharedPreferences
 import com.squareup.anvil.annotations.ContributesMultibinding
 import com.squareup.moshi.Moshi
-import java.util.concurrent.TimeUnit
-import javax.inject.Inject
 import kotlinx.coroutines.withContext
 import org.json.JSONObject
+import java.util.concurrent.TimeUnit
+import javax.inject.Inject
 
 @ContributesMultibinding(ActivityScope::class)
 class NetworkTypeCollector @Inject constructor(

@@ -21,9 +21,9 @@ import com.duckduckgo.feature.toggles.api.FeatureException
 import com.duckduckgo.privacy.config.store.PrivacyConfigDatabase
 import com.duckduckgo.privacy.config.store.UnprotectedTemporaryEntity
 import com.duckduckgo.privacy.config.store.toFeatureException
-import java.util.concurrent.CopyOnWriteArrayList
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import java.util.concurrent.CopyOnWriteArrayList
 
 interface UnprotectedTemporaryRepository {
     fun updateAll(exceptions: List<UnprotectedTemporaryEntity>)

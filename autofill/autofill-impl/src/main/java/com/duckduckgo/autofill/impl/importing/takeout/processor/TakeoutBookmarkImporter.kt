@@ -23,23 +23,25 @@ import com.duckduckgo.savedsites.api.service.ImportSavedSitesResult
 import com.duckduckgo.savedsites.api.service.SavedSitesImporter
 import com.duckduckgo.savedsites.api.service.SavedSitesImporter.ImportFolder
 import com.squareup.anvil.annotations.ContributesBinding
+import kotlinx.coroutines.withContext
 import java.io.File
 import javax.inject.Inject
-import kotlinx.coroutines.withContext
 
 /**
  * Interface for importing bookmarks with flexible destination handling.
  * Supports both root-level imports and folder-based imports while preserving structure.
  */
 interface TakeoutBookmarkImporter {
-
     /**
-     * Imports bookmarks from HTML content to the specified destination.
-     * @param htmlContent The HTML bookmark content to import (in Netscape format)
+     * Imports bookmarks from a temporary HTML file to the specified destination. The file will be deleted after import.
+     * @param tempFileUri URI of the temporary HTML file containing bookmark content (in Netscape format)
      * @param destination Where to import the bookmarks (Root or named Folder within bookmarks root)
      * @return ImportSavedSitesResult indicating success with imported items or error
      */
-    suspend fun importBookmarks(htmlContent: String, destination: ImportFolder): ImportSavedSitesResult
+    suspend fun importBookmarks(
+        tempFileUri: Uri,
+        destination: ImportFolder,
+    ): ImportSavedSitesResult
 }
 
 @ContributesBinding(AppScope::class)
@@ -47,26 +49,24 @@ class RealTakeoutBookmarkImporter @Inject constructor(
     private val savedSitesImporter: SavedSitesImporter,
     private val dispatchers: DispatcherProvider,
 ) : TakeoutBookmarkImporter {
-
-    override suspend fun importBookmarks(htmlContent: String, destination: ImportFolder): ImportSavedSitesResult {
-        return withContext(dispatchers.io()) {
-            import(htmlContent = htmlContent, destination = destination)
-        }
-    }
-
-    private suspend fun import(htmlContent: String, destination: ImportFolder = ImportFolder.Root): ImportSavedSitesResult {
-        return try {
-            // saved sites importer needs a file uri, so we create a temp file here
-            val tempFile = File.createTempFile("bookmark_import_", ".html")
+    override suspend fun importBookmarks(
+        tempFileUri: Uri,
+        destination: ImportFolder,
+    ): ImportSavedSitesResult =
+        withContext(dispatchers.io()) {
             try {
-                tempFile.writeText(htmlContent)
-                return savedSitesImporter.import(Uri.fromFile(tempFile), destination)
+                savedSitesImporter.import(tempFileUri, destination)
+            } catch (exception: Exception) {
+                ImportSavedSitesResult.Error(exception)
             } finally {
-                // delete the temp file after import
-                tempFile.takeIf { it.exists() }?.delete()
+                cleanupTempFile(tempFileUri)
             }
-        } catch (exception: Exception) {
-            ImportSavedSitesResult.Error(exception)
+        }
+
+    private fun cleanupTempFile(tempFileUri: Uri) {
+        runCatching {
+            val filePath = tempFileUri.path ?: return
+            File(filePath).delete()
         }
     }
 }

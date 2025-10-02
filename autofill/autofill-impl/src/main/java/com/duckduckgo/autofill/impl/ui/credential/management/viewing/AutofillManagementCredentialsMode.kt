@@ -71,7 +71,6 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.FragmentViewModelFactory
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.mobile.android.R.dimen
-import javax.inject.Inject
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -80,6 +79,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import logcat.LogPriority.VERBOSE
 import logcat.logcat
+import javax.inject.Inject
 
 @InjectWith(FragmentScope::class)
 class AutofillManagementCredentialsMode : DuckDuckGoFragment(R.layout.fragment_autofill_management_edit_mode), MenuProvider {

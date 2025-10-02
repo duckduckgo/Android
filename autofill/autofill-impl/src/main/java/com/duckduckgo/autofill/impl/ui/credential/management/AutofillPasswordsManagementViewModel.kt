@@ -102,10 +102,6 @@ import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.sync.api.engine.SyncEngine
 import com.duckduckgo.sync.api.engine.SyncEngine.SyncTrigger.FEATURE_READ
 import com.squareup.anvil.annotations.ContributesBinding
-import java.util.UUID
-import javax.inject.Inject
-import kotlin.contracts.ExperimentalContracts
-import kotlin.contracts.contract
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -117,6 +113,10 @@ import kotlinx.coroutines.withContext
 import logcat.LogPriority.INFO
 import logcat.LogPriority.VERBOSE
 import logcat.logcat
+import java.util.UUID
+import javax.inject.Inject
+import kotlin.contracts.ExperimentalContracts
+import kotlin.contracts.contract
 
 @ContributesViewModel(ActivityScope::class)
 class AutofillPasswordsManagementViewModel @Inject constructor(

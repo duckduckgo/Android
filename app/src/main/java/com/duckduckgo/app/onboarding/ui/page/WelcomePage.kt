@@ -61,10 +61,9 @@ import com.duckduckgo.common.utils.FragmentViewModelFactory
 import com.duckduckgo.common.utils.extensions.html
 import com.duckduckgo.common.utils.extensions.preventWidows
 import com.duckduckgo.di.scopes.FragmentScope
-import javax.inject.Inject
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 @InjectWith(FragmentScope::class)
 class WelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome_page) {
@@ -204,7 +203,7 @@ class WelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome_p
                     binding.daxDialogCta.descriptionCta.gone()
                     binding.daxDialogCta.secondaryCta.show()
 
-                    val ctaText = it.getString(R.string.highlightsPreOnboardingDaxDialog1Title)
+                    val ctaText = it.getString(R.string.preOnboardingDaxDialog1Title)
                     binding.daxDialogCta.hiddenTextCta.text = ctaText.html(it)
                     binding.daxDialogCta.daxDialogContentImage.gone()
                     afterAnimation = {
@@ -226,7 +225,7 @@ class WelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome_p
                     binding.daxDialogCta.descriptionCta.gone()
                     binding.daxDialogCta.secondaryCta.gone()
 
-                    val ctaText = it.getString(R.string.highlightsPreOnboardingDaxDialog1Title)
+                    val ctaText = it.getString(R.string.preOnboardingDaxDialog1Title)
                     binding.daxDialogCta.hiddenTextCta.text = ctaText.html(it)
                     binding.daxDialogCta.daxDialogContentImage.gone()
                     afterAnimation = {
@@ -247,7 +246,7 @@ class WelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome_p
                     binding.daxDialogCta.progressBarText.text = "1 / 2"
                     binding.daxDialogCta.progressBar.show()
                     binding.daxDialogCta.progressBar.progress = 1
-                    val ctaText = it.getString(R.string.highlightsPreOnboardingDaxDialog2Title)
+                    val ctaText = it.getString(R.string.preOnboardingDaxDialog2Title)
                     binding.daxDialogCta.hiddenTextCta.text = ctaText.html(it)
                     binding.daxDialogCta.primaryCta.alpha = MIN_ALPHA
                     binding.daxDialogCta.comparisonChart.root.show()
@@ -273,9 +272,9 @@ class WelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome_p
 
                     TransitionManager.beginDelayedTransition(binding.daxDialogCta.cardView, AutoTransition())
 
-                    val ctaDialog3Text = it.getString(R.string.highlightsPreOnboardingDaxDialog3Title)
+                    val ctaDialog3Text = it.getString(R.string.preOnboardingDaxDialog3Title)
                     binding.daxDialogCta.hiddenTextCta.text = ctaDialog3Text.html(it)
-                    val ctaDialog3Description = it.getString(R.string.highlightsPreOnboardingDaxDialog3Text)
+                    val ctaDialog3Description = it.getString(R.string.preOnboardingDaxDialog3Text)
                     binding.daxDialogCta.descriptionCta.text = ctaDialog3Description.html(it)
                     afterAnimation = {
                         binding.daxDialogCta.dialogTextCta.finishAnimation()
@@ -300,7 +299,7 @@ class WelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome_p
                     binding.daxDialogCta.progressBarText.text = "2 / 2"
                     binding.daxDialogCta.progressBar.show()
                     binding.daxDialogCta.progressBar.progress = 2
-                    val ctaText = it.getString(R.string.highlightsPreOnboardingAddressBarTitle).run {
+                    val ctaText = it.getString(R.string.preOnboardingAddressBarTitle).run {
                         if (onboardingDesignExperimentManager.isModifiedControlEnrolledAndEnabled()) {
                             preventWidows()
                         } else {
@@ -315,7 +314,7 @@ class WelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome_p
                     afterAnimation = {
                         binding.daxDialogCta.dialogTextCta.finishAnimation()
                         setAddressBarPositionOptions(true)
-                        binding.daxDialogCta.primaryCta.text = it.getString(R.string.highlightsPreOnboardingAddressBarOkButton)
+                        binding.daxDialogCta.primaryCta.text = it.getString(R.string.preOnboardingAddressBarOkButton)
                         binding.daxDialogCta.primaryCta.setOnClickListener { viewModel.onPrimaryCtaClicked(ADDRESS_BAR_POSITION) }
                         binding.daxDialogCta.primaryCta.animate().alpha(MAX_ALPHA).duration = ANIMATION_DURATION
                         binding.daxDialogCta.addressBarPosition.option1.setOnClickListener {

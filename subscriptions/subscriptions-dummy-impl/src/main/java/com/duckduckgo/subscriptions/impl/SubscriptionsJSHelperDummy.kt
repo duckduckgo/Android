@@ -19,8 +19,8 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.js.messaging.api.JsCallbackData
 import com.duckduckgo.subscriptions.api.SubscriptionsJSHelper
 import com.squareup.anvil.annotations.ContributesBinding
-import javax.inject.Inject
 import org.json.JSONObject
+import javax.inject.Inject
 
 @ContributesBinding(AppScope::class)
 class SubscriptionsJSHelperDummy @Inject constructor() : SubscriptionsJSHelper {

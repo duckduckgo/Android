@@ -18,6 +18,7 @@ package com.duckduckgo.app.browser
 
 import android.annotation.SuppressLint
 import android.webkit.WebView
+import androidx.webkit.JavaScriptReplyProxy
 import androidx.webkit.ScriptHandler
 import androidx.webkit.WebViewCompat
 import com.duckduckgo.app.browser.api.WebViewCapabilityChecker
@@ -26,11 +27,12 @@ import com.duckduckgo.browser.api.webviewcompat.WebViewCompatWrapper
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
-import javax.inject.Inject
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.withContext
 import logcat.LogPriority.ERROR
 import logcat.asLog
 import logcat.logcat
+import javax.inject.Inject
 
 @SuppressLint(
     "RequiresFeature",
@@ -53,11 +55,19 @@ class RealWebViewCompatWrapper @Inject constructor(
                 return null
             }
 
-            if (webView is DuckDuckGoWebView) {
-                return webView.safeAddDocumentStartJavaScript(script, allowedOriginRules)
+            if (!webView.isAttachedToWindow) {
+                logcat(ERROR) { "Error calling addDocumentStartJavaScript on detached WebView" }
+                return null
             }
+
             return withContext(dispatcherProvider.main()) {
-                WebViewCompat.addDocumentStartJavaScript(webView, script, allowedOriginRules)
+                if (!isActive) return@withContext null
+
+                if (webView is DuckDuckGoWebView) {
+                    return@withContext webView.safeAddDocumentStartJavaScript(script, allowedOriginRules)
+                }
+
+                return@withContext WebViewCompat.addDocumentStartJavaScript(webView, script, allowedOriginRules)
             }
         }.getOrElse { e ->
             logcat(ERROR) { "Error calling addDocumentStartJavaScript: ${e.asLog()}" }
@@ -65,8 +75,16 @@ class RealWebViewCompatWrapper @Inject constructor(
         }
     }
 
-    override suspend fun removeWebMessageListener(webView: WebView, jsObjectName: String) {
+    override suspend fun removeWebMessageListener(
+        webView: WebView,
+        jsObjectName: String,
+    ) {
         if (!webViewCapabilityChecker.isSupported(WebViewCapability.WebMessageListener)) {
+            return
+        }
+
+        if (!webView.isAttachedToWindow) {
+            logcat(ERROR) { "Error calling removeWebMessageListener on detached WebView" }
             return
         }
 
@@ -75,6 +93,7 @@ class RealWebViewCompatWrapper @Inject constructor(
             return
         }
         return withContext(dispatcherProvider.main()) {
+            if (!isActive) return@withContext
             WebViewCompat.removeWebMessageListener(webView, jsObjectName)
         }
     }
@@ -89,12 +108,41 @@ class RealWebViewCompatWrapper @Inject constructor(
             return
         }
 
+        if (!webView.isAttachedToWindow) {
+            logcat(ERROR) { "Error calling addWebMessageListener on detached WebView" }
+            return
+        }
+
         if (webView is DuckDuckGoWebView) {
             webView.safeAddWebMessageListener(jsObjectName, allowedOriginRules, listener)
             return
         }
         return withContext(dispatcherProvider.main()) {
+            if (!isActive) return@withContext
             WebViewCompat.addWebMessageListener(webView, jsObjectName, allowedOriginRules, listener)
+        }
+    }
+
+    @SuppressLint("PostMessageUsage")
+    override suspend fun postMessage(
+        webView: WebView,
+        replyProxy: JavaScriptReplyProxy?,
+        subscriptionEvent: String,
+    ) {
+        if (!webView.isAttachedToWindow) {
+            logcat(ERROR) { "Error calling postMessage on detached WebView" }
+            return
+        }
+
+        if (webView is DuckDuckGoWebView) {
+            replyProxy?.let {
+                webView.safePostMessage(replyProxy, subscriptionEvent)
+            }
+            return
+        }
+        withContext(dispatcherProvider.main()) {
+            if (!isActive) return@withContext
+            replyProxy?.postMessage(subscriptionEvent)
         }
     }
 }

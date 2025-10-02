@@ -32,7 +32,6 @@ enum class AppStage {
     NEW,
     DAX_ONBOARDING,
     ESTABLISHED,
-    ;
 }
 
 class StageTypeConverter {

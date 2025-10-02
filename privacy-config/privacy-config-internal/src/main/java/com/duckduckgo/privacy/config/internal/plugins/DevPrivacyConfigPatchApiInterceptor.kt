@@ -24,13 +24,13 @@ import com.duckduckgo.privacy.config.internal.BuildConfig
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.flipkart.zjsonpatch.JsonPatch
 import com.squareup.anvil.annotations.ContributesMultibinding
-import javax.inject.Inject
 import logcat.LogPriority.ERROR
 import logcat.logcat
 import okhttp3.Interceptor
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.Response
 import okhttp3.ResponseBody.Companion.toResponseBody
+import javax.inject.Inject
 
 @ContributesMultibinding(
     scope = AppScope::class,

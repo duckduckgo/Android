@@ -29,10 +29,10 @@ import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.view.getColorFromAttr
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter
-import javax.inject.Inject
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import logcat.logcat
+import javax.inject.Inject
 
 @InjectWith(ActivityScope::class)
 class IntentDispatcherActivity : DuckDuckGoActivity() {

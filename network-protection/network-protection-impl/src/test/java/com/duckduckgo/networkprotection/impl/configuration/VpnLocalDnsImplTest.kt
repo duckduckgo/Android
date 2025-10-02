@@ -6,11 +6,11 @@ import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.networkprotection.impl.VpnRemoteFeatures
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
-import java.net.InetAddress
 import junit.framework.TestCase.assertEquals
 import okhttp3.Dns
 import org.junit.Assert
 import org.junit.Test
+import java.net.InetAddress
 
 @SuppressLint("DenyListedApi") // setRawStoredState
 class VpnLocalDnsImplTest {

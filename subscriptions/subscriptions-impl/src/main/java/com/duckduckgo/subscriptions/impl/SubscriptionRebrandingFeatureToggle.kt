@@ -26,10 +26,10 @@ import com.duckduckgo.subscriptions.api.SubscriptionRebrandingFeatureToggle
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.SingleInstanceIn
-import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import logcat.logcat
+import javax.inject.Inject
 
 @ContributesBinding(
     scope = AppScope::class,

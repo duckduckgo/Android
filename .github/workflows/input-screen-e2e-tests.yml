@@ -1,8 +1,6 @@
 name: Input Screen End-to-End tests
 
 on:
-  schedule:
-    - cron: '0 5 * * *' # run at 5 AM UTC
   workflow_dispatch:
 
 concurrency:
@@ -48,11 +46,11 @@ jobs:
         uses: gradle/actions/setup-gradle@v3
 
       - name: Assemble the project
-        run: ./gradlew assembleInternalRelease -Pforce-default-variant
+        run: ./gradlew assemblePlayRelease -Pforce-default-variant
 
       - name: Move APK to new folder
         if: always()
-        run: find . -name "*.apk"  -exec mv '{}' apk/internalRelease.apk \;
+        run: find . -name "*.apk"  -exec mv '{}' apk/playRelease.apk \;
 
       - name: Input Screen Maestro run
         uses: mobile-dev-inc/action-maestro-cloud@v1.9.8
@@ -62,7 +60,7 @@ jobs:
           project-id: ${{ vars.ROBIN_ANDROID_PROJECT_ID }}
           name: inputScreen_${{ github.sha }}
           timeout: ${{ vars.ROBIN_TIMEOUT_MINUTES }}
-          app-file: apk/internalRelease.apk
+          app-file: apk/playRelease.apk
           android-api-level: 30
           workspace: .maestro
           include-tags: inputScreenTest

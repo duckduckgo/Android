@@ -44,32 +44,32 @@ class BottomBlurView @JvmOverloads constructor(
         uniform shader inputShader;
         uniform vec2 size;
         uniform float maxBlurRadius;
-        
+
         const float TAU = 6.28318530718;
         const int DIRECTIONS = 16;
         const int QUALITY = 3;
         const float SAMPLES = float(DIRECTIONS * QUALITY + 1);
-        
+
         vec2 mirrorCoord(vec2 coord) {
             if (coord.x < 0.0) coord.x = -coord.x;
             else if (coord.x > size.x) coord.x = 2.0 * size.x - coord.x;
-            
+
             if (coord.y < 0.0) coord.y = -coord.y;
             else if (coord.y > size.y) coord.y = 2.0 * size.y - coord.y;
-            
+
             return coord;
         }
-        
+
         vec4 main(vec2 fragCoord) {
             vec2 uv = fragCoord.xy / size.xy;
             float radius = maxBlurRadius * uv.y;
-            
+
             vec4 pixel = inputShader.eval(mirrorCoord(fragCoord));
-            
+
             for (int i = 0; i < DIRECTIONS; i++) {
                 float angle = (TAU * float(i)) / float(DIRECTIONS);
                 vec2 dir = vec2(cos(angle), sin(angle));
-                
+
                 for (int j = 1; j <= QUALITY; j++) {
                     float frac = float(j) / float(QUALITY);
                     vec2 offset = dir * radius * frac;

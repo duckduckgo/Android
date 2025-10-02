@@ -109,7 +109,6 @@ import com.duckduckgo.savedsites.store.SavedSitesRelationsDao
         DefaultBrowserPromptsAppUsageEntity::class,
     ],
 )
-
 @TypeConverters(
     Survey.StatusTypeConverter::class,
     DismissedCta.IdTypeConverter::class,

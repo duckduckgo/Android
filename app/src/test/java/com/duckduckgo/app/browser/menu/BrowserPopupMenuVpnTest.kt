@@ -26,7 +26,6 @@ import org.junit.Test
  * and what state it should be in, without requiring complex UI mocking.
  */
 class BrowserPopupMenuVpnTest {
-
     @Test
     fun `when VPN state is Hidden then menu item should not be visible regardless of browser state`() {
         val vpnMenuState = VpnMenuState.Hidden
@@ -164,11 +163,13 @@ class BrowserPopupMenuVpnTest {
     ) {
         val shouldShowVpnMenuItem = !browserShowing && !displayedInCustomTabScreen
 
-        val actualVisible = when (vpnMenuState) {
-            VpnMenuState.Hidden -> false
-            VpnMenuState.NotSubscribed -> shouldShowVpnMenuItem
-            is VpnMenuState.Subscribed -> shouldShowVpnMenuItem
-        }
+        val actualVisible =
+            when (vpnMenuState) {
+                VpnMenuState.Hidden -> false
+                VpnMenuState.NotSubscribed -> shouldShowVpnMenuItem
+                VpnMenuState.NotSubscribedNoPill -> shouldShowVpnMenuItem
+                is VpnMenuState.Subscribed -> shouldShowVpnMenuItem
+            }
 
         assertEquals(
             "VPN menu visibility should be $expectedVisible for state $vpnMenuState, " +
@@ -178,25 +179,33 @@ class BrowserPopupMenuVpnTest {
         )
     }
 
-    private fun getVpnMenuConfiguration(vpnMenuState: VpnMenuState): VpnMenuConfiguration {
-        return when (vpnMenuState) {
-            VpnMenuState.Hidden -> VpnMenuConfiguration(
-                showTryForFreePill = false,
-                showStatusIndicator = false,
-                statusIndicatorOn = false,
-            )
-            VpnMenuState.NotSubscribed -> VpnMenuConfiguration(
-                showTryForFreePill = true,
-                showStatusIndicator = false,
-                statusIndicatorOn = false,
-            )
-            is VpnMenuState.Subscribed -> VpnMenuConfiguration(
-                showTryForFreePill = false,
-                showStatusIndicator = true,
-                statusIndicatorOn = vpnMenuState.isVpnEnabled,
-            )
+    private fun getVpnMenuConfiguration(vpnMenuState: VpnMenuState): VpnMenuConfiguration =
+        when (vpnMenuState) {
+            VpnMenuState.Hidden ->
+                VpnMenuConfiguration(
+                    showTryForFreePill = false,
+                    showStatusIndicator = false,
+                    statusIndicatorOn = false,
+                )
+            VpnMenuState.NotSubscribed ->
+                VpnMenuConfiguration(
+                    showTryForFreePill = true,
+                    showStatusIndicator = false,
+                    statusIndicatorOn = false,
+                )
+            VpnMenuState.NotSubscribedNoPill ->
+                VpnMenuConfiguration(
+                    showTryForFreePill = false,
+                    showStatusIndicator = false,
+                    statusIndicatorOn = false,
+                )
+            is VpnMenuState.Subscribed ->
+                VpnMenuConfiguration(
+                    showTryForFreePill = false,
+                    showStatusIndicator = true,
+                    statusIndicatorOn = vpnMenuState.isVpnEnabled,
+                )
         }
-    }
 
     private data class VpnMenuConfiguration(
         val showTryForFreePill: Boolean,

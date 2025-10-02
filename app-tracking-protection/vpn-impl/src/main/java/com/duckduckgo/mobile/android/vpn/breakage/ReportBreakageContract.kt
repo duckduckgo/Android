@@ -25,8 +25,8 @@ import com.duckduckgo.mobile.android.vpn.ui.AppBreakageCategory
 import com.duckduckgo.mobile.android.vpn.ui.OpenVpnBreakageCategoryWithBrokenApp
 import com.duckduckgo.mobile.android.vpn.ui.OpenVpnReportBreakageFrom
 import com.duckduckgo.navigation.api.GlobalActivityStarter
-import javax.inject.Inject
 import kotlinx.android.parcel.Parcelize
+import javax.inject.Inject
 
 class ReportBreakageContract @Inject constructor(
     private val globalActivityStarter: GlobalActivityStarter,

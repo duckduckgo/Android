@@ -33,11 +33,11 @@ import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerRepository
 import com.duckduckgo.networkprotection.api.NetworkProtectionExclusionList
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
-import javax.inject.Inject
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import logcat.logcat
+import javax.inject.Inject
 
 interface TrackingProtectionAppsRepository {
 

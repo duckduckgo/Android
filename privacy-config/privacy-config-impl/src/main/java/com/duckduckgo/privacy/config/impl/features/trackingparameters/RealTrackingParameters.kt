@@ -32,11 +32,11 @@ import com.duckduckgo.privacy.config.store.features.trackingparameters.TrackingP
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
 import dagger.WrongScope
-import java.lang.UnsupportedOperationException
-import javax.inject.Inject
 import logcat.LogPriority.ERROR
 import logcat.asLog
 import logcat.logcat
+import java.lang.UnsupportedOperationException
+import javax.inject.Inject
 
 @WrongScope("This should be one instance per BrowserTabFragment", FragmentScope::class)
 @ContributesBinding(AppScope::class)

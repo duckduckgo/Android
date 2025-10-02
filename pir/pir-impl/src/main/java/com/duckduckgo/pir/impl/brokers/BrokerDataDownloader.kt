@@ -25,16 +25,16 @@ import com.duckduckgo.pir.impl.store.PirRepository
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
-import java.io.File
-import java.io.FileOutputStream
-import java.util.zip.ZipInputStream
-import javax.inject.Inject
 import kotlinx.coroutines.withContext
 import logcat.LogPriority.ERROR
 import logcat.logcat
 import okhttp3.ResponseBody
 import okio.FileSystem.Companion.SYSTEM
 import okio.Path.Companion.toPath
+import java.io.File
+import java.io.FileOutputStream
+import java.util.zip.ZipInputStream
+import javax.inject.Inject
 
 interface BrokerDataDownloader {
     /**

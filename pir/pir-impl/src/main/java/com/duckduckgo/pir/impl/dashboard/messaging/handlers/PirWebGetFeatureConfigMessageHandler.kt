@@ -27,10 +27,10 @@ import com.duckduckgo.pir.impl.dashboard.messaging.model.PirWebMessageResponse
 import com.duckduckgo.subscriptions.api.PrivacyProUnifiedFeedback
 import com.duckduckgo.subscriptions.api.PrivacyProUnifiedFeedback.PrivacyProFeedbackSource.DDG_SETTINGS
 import com.squareup.anvil.annotations.ContributesMultibinding
-import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import logcat.logcat
+import javax.inject.Inject
 
 /**
  * Handles the getFeatureConfig message from Web which is used to retrieve the client capabilities.

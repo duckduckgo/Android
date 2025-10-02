@@ -40,7 +40,6 @@ import com.duckduckgo.malicioussiteprotection.impl.remoteconfig.MaliciousSitePro
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.Types
-import java.security.MessageDigest
 import junit.framework.TestCase.assertEquals
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
@@ -51,6 +50,7 @@ import org.mockito.Mockito.mock
 import org.mockito.kotlin.any
 import org.mockito.kotlin.whenever
 import org.robolectric.ParameterizedRobolectricTestRunner
+import java.security.MessageDigest
 
 @RunWith(ParameterizedRobolectricTestRunner::class)
 class MaliciousSiteProtectionReferenceTest(private val testCase: TestCase) {

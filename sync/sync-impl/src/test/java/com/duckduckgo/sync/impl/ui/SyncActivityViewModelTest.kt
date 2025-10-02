@@ -49,8 +49,6 @@ import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.RequestSetupAut
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.SetupFlows.CreateAccountFlow
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.SetupFlows.SignInFlow
 import com.duckduckgo.sync.impl.ui.SyncDeviceListItem.SyncedDevice
-import java.lang.String.format
-import kotlin.reflect.KClass
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.emptyFlow
@@ -68,6 +66,8 @@ import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
+import java.lang.String.format
+import kotlin.reflect.KClass
 
 @RunWith(AndroidJUnit4::class)
 class SyncActivityViewModelTest {

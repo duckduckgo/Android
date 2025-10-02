@@ -29,7 +29,6 @@ import com.duckduckgo.pir.impl.models.scheduling.JobRecord.ScanJobRecord
 import com.duckduckgo.pir.impl.models.scheduling.JobRecord.ScanJobRecord.ScanJobStatus
 import com.duckduckgo.pir.impl.store.PirRepository
 import com.duckduckgo.pir.impl.store.PirSchedulingRepository
-import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Before
@@ -37,6 +36,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
+import java.util.concurrent.TimeUnit
 
 class RealPirDashboardMaintenanceScanDataProviderTest {
 

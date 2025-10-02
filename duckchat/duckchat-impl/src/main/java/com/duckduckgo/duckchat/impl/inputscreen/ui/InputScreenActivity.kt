@@ -34,7 +34,6 @@ import javax.inject.Inject
 @InjectWith(ActivityScope::class)
 @ContributeToActivityStarter(InputScreenActivityParams::class)
 class InputScreenActivity : DuckDuckGoActivity() {
-
     @Inject
     lateinit var browserAndInputScreenTransitionProvider: BrowserAndInputScreenTransitionProvider
 
@@ -44,17 +43,23 @@ class InputScreenActivity : DuckDuckGoActivity() {
     @Inject
     lateinit var pixel: Pixel
 
+    @Inject
+    lateinit var inputScreenConfigResolver: InputScreenConfigResolver
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        inputScreenConfigResolver.onInputScreenCreated(intent)
         setContentView(R.layout.activity_input_screen)
         inputScreenDiscoveryFunnel.onInputScreenOpened()
-        val params = mapOf(
-            "orientation" to if (resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
-                "landscape"
-            } else {
-                "portrait"
-            },
-        )
+        val params =
+            mapOf(
+                "orientation" to
+                    if (resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+                        "landscape"
+                    } else {
+                        "portrait"
+                    },
+            )
         pixel.fire(pixel = DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_OMNIBAR_TEXT_AREA_FOCUSED, parameters = params)
     }
 
@@ -64,8 +69,8 @@ class InputScreenActivity : DuckDuckGoActivity() {
     }
 
     private fun applyExitTransition() {
-        val enterTransition = browserAndInputScreenTransitionProvider.getBrowserEnterAnimation()
-        val exitTransition = browserAndInputScreenTransitionProvider.getInputScreenExitAnimation()
+        val enterTransition = browserAndInputScreenTransitionProvider.getBrowserEnterAnimation(inputScreenConfigResolver.isTopOmnibar)
+        val exitTransition = browserAndInputScreenTransitionProvider.getInputScreenExitAnimation(inputScreenConfigResolver.isTopOmnibar)
 
         if (VERSION.SDK_INT >= 34) {
             overrideActivityTransition(

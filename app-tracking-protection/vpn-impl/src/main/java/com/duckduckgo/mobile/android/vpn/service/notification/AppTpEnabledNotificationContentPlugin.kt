@@ -39,9 +39,9 @@ import com.duckduckgo.networkprotection.api.NetworkProtectionState
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.SingleInstanceIn
-import javax.inject.Inject
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.runBlocking
+import javax.inject.Inject
 
 @ContributesMultibinding(VpnScope::class)
 @SingleInstanceIn(VpnScope::class)

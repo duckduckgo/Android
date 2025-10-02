@@ -28,7 +28,6 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.SingleInstanceIn
-import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.drop
@@ -36,6 +35,7 @@ import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.launch
 import logcat.logcat
 import okio.ByteString.Companion.encode
+import javax.inject.Inject
 
 @ContributesMultibinding(
     scope = AppScope::class,

@@ -24,10 +24,10 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
-import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.withContext
 import logcat.logcat
+import javax.inject.Inject
 
 /**
  * Repeated prompts to use Autofill (e.g., save login credentials) might annoy a user who doesn't want to use Autofill.
@@ -126,8 +126,8 @@ class AutofillDisablingDeclineCounter @Inject constructor(
 
             logcat {
                 """
-                    User declined to save credentials ${autofillPrefsStore.autofillDeclineCount} times globally from all sessions. 
-                    Prompted to disable before: $promptedToDisablePreviously. 
+                    User declined to save credentials ${autofillPrefsStore.autofillDeclineCount} times globally from all sessions.
+                    Prompted to disable before: $promptedToDisablePreviously.
                     Should prompt to disable: $shouldOffer
                 """.trimIndent()
             }
@@ -141,8 +141,8 @@ class AutofillDisablingDeclineCounter @Inject constructor(
     private suspend fun determineIfDeclineCounterIsActive(): Boolean {
         logcat {
             """
-                Autofill: declineCounterIsActive? 
-                monitorDeclineCounts = ${autofillPrefsStore.monitorDeclineCounts}, 
+                Autofill: declineCounterIsActive?
+                monitorDeclineCounts = ${autofillPrefsStore.monitorDeclineCounts},
                 autofillStateSetByUser = ${autofillPrefsStore.autofillStateSetByUser}
             """.trimIndent()
         }

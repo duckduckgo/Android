@@ -37,12 +37,12 @@ import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixels
 import com.duckduckgo.networkprotection.impl.quickaccess.VpnTileStateProvider.VpnTileState
 import dagger.android.AndroidInjection
 import dagger.binding.VpnTileServiceBindingKey
-import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 @Suppress("NoHardcodedCoroutineDispatcher")
 @InjectWith(

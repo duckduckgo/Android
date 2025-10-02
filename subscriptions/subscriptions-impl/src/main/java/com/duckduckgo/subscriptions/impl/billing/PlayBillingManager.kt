@@ -40,13 +40,10 @@ import com.duckduckgo.subscriptions.impl.billing.PurchasesUpdateResult.PurchaseA
 import com.duckduckgo.subscriptions.impl.billing.PurchasesUpdateResult.PurchasePresent
 import com.duckduckgo.subscriptions.impl.billing.PurchasesUpdateResult.UserCancelled
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
+import com.duckduckgo.subscriptions.impl.wideevents.SubscriptionPurchaseWideEvent
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.SingleInstanceIn
-import java.util.EnumSet
-import javax.inject.Inject
-import kotlin.time.Duration.Companion.minutes
-import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
@@ -59,6 +56,10 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import logcat.logcat
+import java.util.EnumSet
+import javax.inject.Inject
+import kotlin.time.Duration.Companion.minutes
+import kotlin.time.Duration.Companion.seconds
 
 interface PlayBillingManager {
     val products: List<ProductDetails>
@@ -100,6 +101,7 @@ class RealPlayBillingManager @Inject constructor(
     private val pixelSender: SubscriptionPixelSender,
     private val billingClient: BillingClientAdapter,
     private val dispatcherProvider: DispatcherProvider,
+    private val subscriptionPurchaseWideEvent: SubscriptionPurchaseWideEvent,
 ) : PlayBillingManager, MainProcessLifecycleObserver {
 
     private val connectionMutex = Mutex()
@@ -202,6 +204,7 @@ class RealPlayBillingManager @Inject constructor(
             ?.offerToken
 
         if (productDetails == null || offerToken == null) {
+            subscriptionPurchaseWideEvent.onBillingFlowInitFailure(error = "Missing product details")
             _purchaseState.emit(Canceled)
             return@withContext
         }
@@ -215,11 +218,14 @@ class RealPlayBillingManager @Inject constructor(
 
         when (launchBillingFlowResult) {
             LaunchBillingFlowResult.Success -> {
+                subscriptionPurchaseWideEvent.onBillingFlowInitSuccess()
                 _purchaseState.emit(InProgress)
                 billingFlowInProgress = true
             }
 
-            LaunchBillingFlowResult.Failure -> {
+            is LaunchBillingFlowResult.Failure -> {
+                val error = "Billing error: ${launchBillingFlowResult.error.name}"
+                subscriptionPurchaseWideEvent.onBillingFlowInitFailure(error)
                 _purchaseState.emit(Canceled)
             }
         }
@@ -266,7 +272,7 @@ class RealPlayBillingManager @Inject constructor(
                 billingFlowInProgress = true
             }
 
-            LaunchBillingFlowResult.Failure -> {
+            is LaunchBillingFlowResult.Failure -> {
                 _purchaseState.emit(Canceled)
             }
         }
@@ -296,11 +302,13 @@ class RealPlayBillingManager @Inject constructor(
 
                 PurchaseAbsent -> {}
                 UserCancelled -> {
+                    subscriptionPurchaseWideEvent.onPurchaseCancelledByUser()
                     _purchaseState.emit(Canceled)
                     // Handle an error caused by a user cancelling the purchase flow.
                 }
 
                 is PurchasesUpdateResult.Failure -> {
+                    subscriptionPurchaseWideEvent.onBillingFlowPurchaseFailure(result.errorType)
                     pixelSender.reportPurchaseFailureStore(result.errorType)
                     _purchaseState.emit(Canceled)
                 }

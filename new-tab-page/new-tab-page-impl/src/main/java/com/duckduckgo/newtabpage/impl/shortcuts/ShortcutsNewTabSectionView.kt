@@ -47,9 +47,9 @@ import com.duckduckgo.newtabpage.impl.shortcuts.ShortcutsAdapter.Companion.SHORT
 import com.duckduckgo.newtabpage.impl.shortcuts.ShortcutsAdapter.Companion.SHORTCUT_ITEM_MAX_SIZE_DP
 import com.duckduckgo.newtabpage.impl.shortcuts.ShortcutsViewModel.ViewState
 import dagger.android.support.AndroidSupportInjection
-import javax.inject.Inject
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import javax.inject.Inject
 
 @InjectWith(ViewScope::class)
 class ShortcutsNewTabSectionView @JvmOverloads constructor(
@@ -162,7 +162,6 @@ class ShortcutsNewTabSectionView @JvmOverloads constructor(
     boundType = NewTabPageSectionPlugin::class,
     priority = NewTabPageSectionPlugin.PRIORITY_SHORTCUTS,
 )
-
 class ShortcutsNewTabSectionPlugin @Inject constructor(
     private val setting: NewTabShortcutDataStore,
 ) : NewTabPageSectionPlugin {

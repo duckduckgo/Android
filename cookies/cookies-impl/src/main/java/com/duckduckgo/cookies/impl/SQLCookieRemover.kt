@@ -28,14 +28,14 @@ import com.duckduckgo.cookies.api.CookieRemover
 import com.duckduckgo.cookies.impl.CookiesPixelName.COOKIE_DELETE_ERROR
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
-import javax.inject.Inject
-import javax.inject.Named
-import kotlin.coroutines.resume
-import kotlin.coroutines.suspendCoroutine
 import kotlinx.coroutines.withContext
 import logcat.LogPriority.VERBOSE
 import logcat.asLog
 import logcat.logcat
+import javax.inject.Inject
+import javax.inject.Named
+import kotlin.coroutines.resume
+import kotlin.coroutines.suspendCoroutine
 
 @ContributesBinding(AppScope::class)
 @Named("cookieManagerRemover")

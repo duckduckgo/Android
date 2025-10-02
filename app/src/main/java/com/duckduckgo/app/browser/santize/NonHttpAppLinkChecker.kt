@@ -20,9 +20,9 @@ import android.content.Intent
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.di.scopes.FragmentScope
 import com.squareup.anvil.annotations.ContributesBinding
-import javax.inject.Inject
 import logcat.LogPriority.WARN
 import logcat.logcat
+import javax.inject.Inject
 
 interface NonHttpAppLinkChecker {
     fun isPermitted(intent: Intent): Boolean

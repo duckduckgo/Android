@@ -24,15 +24,15 @@ import com.duckduckgo.brokensite.store.BrokenSiteLastSentReportEntity
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.formatters.time.DatabaseDateFormatter
 import com.duckduckgo.common.utils.sha256
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.time.Instant
 import java.time.LocalDateTime
 import java.time.OffsetDateTime
 import java.time.ZoneId
 import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 interface BrokenSiteReportRepository {
     suspend fun getLastSentDay(hostname: String): String?

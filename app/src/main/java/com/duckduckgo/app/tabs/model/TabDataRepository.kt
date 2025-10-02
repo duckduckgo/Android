@@ -40,8 +40,6 @@ import com.duckduckgo.di.scopes.AppScope
 import dagger.SingleInstanceIn
 import io.reactivex.Scheduler
 import io.reactivex.schedulers.Schedulers
-import java.util.UUID
-import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -54,6 +52,8 @@ import kotlinx.coroutines.withContext
 import logcat.LogPriority.INFO
 import logcat.LogPriority.WARN
 import logcat.logcat
+import java.util.UUID
+import javax.inject.Inject
 
 @SingleInstanceIn(AppScope::class)
 class TabDataRepository @Inject constructor(

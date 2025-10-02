@@ -19,8 +19,8 @@ package com.duckduckgo.autofill.impl.encoding
 import android.icu.text.IDNA
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
-import javax.inject.Inject
 import logcat.logcat
+import javax.inject.Inject
 
 interface UrlUnicodeNormalizer {
     fun normalizeAscii(url: String?): String?

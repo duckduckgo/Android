@@ -23,13 +23,13 @@ import androidx.annotation.WorkerThread
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
+import logcat.logcat
 import java.io.BufferedReader
 import java.io.File
 import java.io.FileReader
 import java.util.InvalidPropertiesFormatException
 import javax.inject.Inject
 import kotlin.time.Duration.Companion.seconds
-import logcat.logcat
 
 interface CPUUsageReader {
     fun readCPUUsage(): Double

@@ -31,8 +31,8 @@ import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.view.message.AppTPS
 import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.view.message.AppTPStateMessagePlugin.DefaultAppTPMessageAction
 import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.view.message.PproUpsellRevokedMessagePlugin.Companion.PRIORITY_PPRO_REVOKED
 import com.duckduckgo.subscriptions.api.Subscriptions
-import javax.inject.Inject
 import kotlinx.coroutines.runBlocking
+import javax.inject.Inject
 
 @ContributesActivePlugin(
     scope = AppScope::class,

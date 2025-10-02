@@ -19,8 +19,8 @@ package com.duckduckgo.app.pixels.campaign.params
 import com.duckduckgo.autofill.impl.store.InternalAutofillStore
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesMultibinding
-import javax.inject.Inject
 import kotlinx.coroutines.flow.firstOrNull
+import javax.inject.Inject
 
 @ContributesMultibinding(AppScope::class)
 class AutofillUserAdditionalPixelParamPlugin @Inject constructor(

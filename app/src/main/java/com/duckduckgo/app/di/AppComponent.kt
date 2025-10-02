@@ -27,8 +27,8 @@ import com.duckduckgo.app.onboarding.di.OnboardingModule
 import com.duckduckgo.app.surrogates.di.ResourceSurrogateModule
 import com.duckduckgo.app.usage.di.AppUsageModule
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.widget.EmptyFavoritesWidgetService
-import com.duckduckgo.widget.FavoritesWidgetService
+import com.duckduckgo.widget.EmptyFavoritesWidgetItemFactory
+import com.duckduckgo.widget.FavoritesWidgetItemFactory
 import com.duckduckgo.widget.SearchAndFavoritesWidget
 import com.duckduckgo.widget.SearchOnlyWidget
 import com.duckduckgo.widget.SearchWidget
@@ -37,9 +37,9 @@ import dagger.BindsInstance
 import dagger.Component
 import dagger.SingleInstanceIn
 import dagger.android.AndroidInjector
-import javax.inject.Named
 import kotlinx.coroutines.CoroutineScope
 import retrofit2.Retrofit
+import javax.inject.Named
 
 @SingleInstanceIn(AppScope::class)
 @MergeComponent(
@@ -88,11 +88,11 @@ interface AppComponent : AndroidInjector<DuckDuckGoApplication> {
 
     fun inject(searchOnlyWidget: SearchOnlyWidget)
 
-    fun inject(searchAndFavsWidget: SearchAndFavoritesWidget)
+    fun inject(searchAndFavoritesWidget: SearchAndFavoritesWidget)
 
-    fun inject(favoritesWidgetItemFactory: FavoritesWidgetService.FavoritesWidgetItemFactory)
+    fun inject(favoritesWidgetItemFactory: FavoritesWidgetItemFactory)
 
-    fun inject(emptyFavoritesWidgetItemFactory: EmptyFavoritesWidgetService.EmptyFavoritesWidgetItemFactory)
+    fun inject(emptyFavoritesWidgetItemFactory: EmptyFavoritesWidgetItemFactory)
 
     // accessor to Retrofit instance for test only only for test
     @Named("api")

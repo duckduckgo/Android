@@ -26,8 +26,6 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
-import java.time.ZoneId
-import java.time.ZonedDateTime
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
@@ -40,6 +38,8 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
+import java.time.ZoneId
+import java.time.ZonedDateTime
 
 class InputScreenRetentionMonitorTest {
 

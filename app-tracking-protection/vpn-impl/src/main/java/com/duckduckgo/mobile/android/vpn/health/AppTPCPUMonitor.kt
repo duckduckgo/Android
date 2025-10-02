@@ -26,10 +26,10 @@ import com.duckduckgo.mobile.android.vpn.service.VpnServiceCallbacks
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason
 import com.duckduckgo.mobile.android.vpn.worker.boundToVpnProcess
 import com.squareup.anvil.annotations.ContributesMultibinding
-import java.util.concurrent.TimeUnit
-import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import logcat.logcat
+import java.util.concurrent.TimeUnit
+import javax.inject.Inject
 
 @ContributesMultibinding(VpnScope::class)
 class AppTPCPUMonitor @Inject constructor(

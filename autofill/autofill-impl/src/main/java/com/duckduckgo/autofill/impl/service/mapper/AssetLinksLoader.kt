@@ -20,11 +20,11 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.normalizeScheme
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
-import javax.inject.Inject
 import kotlinx.coroutines.withContext
 import logcat.LogPriority.ERROR
 import logcat.asLog
 import logcat.logcat
+import javax.inject.Inject
 
 interface AssetLinksLoader {
     /**

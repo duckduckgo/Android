@@ -59,6 +59,5 @@ interface DeviceSyncState {
         MOBILE,
         UNKNOWN,
         DESKTOP,
-        ;
     }
 }

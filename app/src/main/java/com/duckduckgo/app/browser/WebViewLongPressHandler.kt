@@ -27,9 +27,9 @@ import com.duckduckgo.app.browser.model.LongPressTarget
 import com.duckduckgo.app.pixels.AppPixelName.*
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.customtabs.api.CustomTabDetector
-import javax.inject.Inject
 import logcat.LogPriority.VERBOSE
 import logcat.logcat
+import javax.inject.Inject
 
 interface LongPressHandler {
     fun handleLongPress(

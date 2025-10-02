@@ -22,8 +22,8 @@ import com.duckduckgo.httpsupgrade.store.HttpsBloomFilterSpecDao
 import com.duckduckgo.httpsupgrade.store.HttpsFalsePositiveDomain
 import com.duckduckgo.httpsupgrade.store.HttpsFalsePositivesDao
 import com.duckduckgo.httpsupgrade.store.HttpsUpgradeDatabase
-import java.io.IOException
 import logcat.logcat
+import java.io.IOException
 
 class HttpsDataPersister constructor(
     private val binaryDataStore: BinaryDataStore,

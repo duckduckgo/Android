@@ -23,13 +23,13 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.mobile.android.vpn.trackers.*
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
-import javax.inject.Provider
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import logcat.logcat
+import javax.inject.Provider
 
 @OptIn(ExperimentalCoroutinesApi::class)
 internal class VpnDatabaseCallback(

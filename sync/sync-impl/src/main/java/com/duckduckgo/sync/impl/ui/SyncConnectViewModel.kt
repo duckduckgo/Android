@@ -51,7 +51,6 @@ import com.duckduckgo.sync.impl.ui.SyncConnectViewModel.Command.LoginSuccess
 import com.duckduckgo.sync.impl.ui.SyncConnectViewModel.Command.ReadTextCode
 import com.duckduckgo.sync.impl.ui.SyncConnectViewModel.Command.ShowError
 import com.duckduckgo.sync.impl.ui.SyncConnectViewModel.Command.ShowMessage
-import javax.inject.Inject
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
@@ -62,6 +61,7 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import logcat.logcat
+import javax.inject.Inject
 
 @ContributesViewModel(ActivityScope::class)
 class SyncConnectViewModel @Inject constructor(

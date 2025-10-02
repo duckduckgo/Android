@@ -30,7 +30,6 @@ import com.duckduckgo.sync.api.SyncStateMonitor
 import com.duckduckgo.sync.api.engine.SyncEngine
 import com.duckduckgo.sync.api.engine.SyncEngine.SyncTrigger.DATA_CHANGE
 import com.squareup.anvil.annotations.ContributesMultibinding
-import javax.inject.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.flowOn
@@ -39,6 +38,7 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import logcat.LogPriority.INFO
 import logcat.logcat
+import javax.inject.*
 
 @ContributesMultibinding(
     scope = AppScope::class,

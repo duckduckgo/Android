@@ -72,8 +72,6 @@ import com.duckduckgo.networkprotection.store.NetPGeoswitchingRepository.UserPre
 import com.duckduckgo.networkprotection.store.db.VpnIncompatibleApp
 import com.duckduckgo.subscriptions.api.PrivacyProUnifiedFeedback
 import com.wireguard.config.Config
-import java.io.BufferedReader
-import java.io.StringReader
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
@@ -90,6 +88,8 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
+import java.io.BufferedReader
+import java.io.StringReader
 
 class NetworkProtectionManagementViewModelTest {
     @get:Rule
@@ -140,7 +140,7 @@ class NetworkProtectionManagementViewModelTest {
         DNS = 1.2.3.4
         MTU = 1280
         PrivateKey = yD1fKxCG/HFbxOy4YfR6zG86YQ1nOswlsv8n7uypb14=
-        
+
         [Peer]
         AllowedIPs = 0.0.0.0/0
         Endpoint = 10.10.10.10:443

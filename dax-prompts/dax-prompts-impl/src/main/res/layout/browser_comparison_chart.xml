@@ -16,60 +16,13 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/browserComparisonChart"
+    android:id="@+id/browserComparisonChartContainer"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginTop="8dp"
-    android:layout_marginBottom="8dp"
+    android:paddingBottom="8dp"
     tools:ignore="ContentDescription">
 
-    <ImageView
-        android:id="@+id/ddgLogo"
-        android:layout_width="wrap_content"
-        android:layout_height="55dp"
-        android:adjustViewBounds="true"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/ic_ddg_comparison_chart" />
-
-    <ImageView
-        android:id="@+id/chromeLogo"
-        android:layout_width="wrap_content"
-        android:layout_height="55dp"
-        android:layout_marginEnd="@dimen/keyline_2"
-        android:adjustViewBounds="true"
-        app:layout_constraintEnd_toStartOf="@id/ddgLogo"
-        app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/ic_chrome_comparison_chart" />
-
-    <com.duckduckgo.common.ui.view.divider.VerticalDivider
-        android:layout_width="wrap_content"
-        android:layout_height="0dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@id/ddgLogo"
-        app:layout_constraintStart_toEndOf="@id/chromeLogo"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <ImageView
-        android:id="@+id/check1"
-        android:layout_width="20dp"
-        android:layout_height="20dp"
-        app:layout_constraintBottom_toBottomOf="@id/feature1"
-        app:layout_constraintEnd_toEndOf="@id/ddgLogo"
-        app:layout_constraintStart_toStartOf="@id/ddgLogo"
-        app:layout_constraintTop_toTopOf="@id/feature1"
-        app:srcCompat="@drawable/ic_check_green_24" />
-
-    <ImageView
-        android:id="@+id/cross1"
-        android:layout_width="@dimen/keyline_5"
-        android:layout_height="@dimen/keyline_5"
-        app:layout_constraintBottom_toBottomOf="@id/feature1"
-        app:layout_constraintEnd_toEndOf="@id/chromeLogo"
-        app:layout_constraintStart_toStartOf="@id/chromeLogo"
-        app:layout_constraintTop_toTopOf="@id/feature1"
-        app:srcCompat="@drawable/ic_cross_recolorable_gray_24" />
-
+    <!-- First row -->
     <ImageView
         android:id="@+id/featureIcon1"
         android:layout_width="@dimen/keyline_5"
@@ -87,39 +40,49 @@
         android:layout_height="wrap_content"
         android:paddingVertical="@dimen/keyline_3"
         android:text="@string/dax_prompt_browser_comparison_item1"
-        app:layout_constraintEnd_toStartOf="@id/chromeLogo"
+        app:layout_constraintEnd_toStartOf="@id/cross1"
         app:layout_constraintStart_toEndOf="@id/featureIcon1"
-        app:layout_constraintTop_toBottomOf="@+id/chromeLogo"
+        app:layout_constraintTop_toTopOf="parent"
         app:typography="body1" />
+
+    <ImageView
+        android:id="@+id/cross1"
+        android:layout_width="55dp"
+        android:layout_height="20dp"
+        android:layout_marginEnd="@dimen/keyline_2"
+        app:layout_constraintBottom_toBottomOf="@id/feature1"
+        app:layout_constraintEnd_toStartOf="@id/check1"
+        app:layout_constraintStart_toEndOf="@id/feature1"
+        app:layout_constraintTop_toTopOf="@id/feature1"
+        app:srcCompat="@drawable/ic_cross" />
+
+    <ImageView
+        android:id="@+id/check1"
+        android:layout_width="55dp"
+        android:layout_height="20dp"
+        app:layout_constraintBottom_toBottomOf="@id/feature1"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/cross1"
+        app:layout_constraintTop_toTopOf="@id/feature1"
+        app:srcCompat="@drawable/ic_check" />
 
     <com.duckduckgo.common.ui.view.divider.HorizontalDivider
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        app:layout_constraintBottom_toTopOf="@id/feature2"
+        app:defaultPadding="false"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/feature1" />
 
-    <ImageView
-        android:id="@+id/check2"
-        android:layout_width="20dp"
-        android:layout_height="20dp"
-        app:layout_constraintBottom_toBottomOf="@id/feature2"
-        app:layout_constraintEnd_toEndOf="@id/ddgLogo"
-        app:layout_constraintStart_toStartOf="@id/ddgLogo"
-        app:layout_constraintTop_toTopOf="@id/feature2"
-        app:srcCompat="@drawable/ic_check_green_24" />
+    <com.duckduckgo.common.ui.view.divider.VerticalDivider
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/check1"
+        app:layout_constraintStart_toEndOf="@id/cross1"
+        app:layout_constraintTop_toTopOf="parent" />
 
-    <ImageView
-        android:id="@+id/cross2"
-        android:layout_width="@dimen/keyline_5"
-        android:layout_height="@dimen/keyline_5"
-        app:layout_constraintBottom_toBottomOf="@id/feature2"
-        app:layout_constraintEnd_toEndOf="@id/chromeLogo"
-        app:layout_constraintStart_toStartOf="@id/chromeLogo"
-        app:layout_constraintTop_toTopOf="@id/feature2"
-        app:srcCompat="@drawable/ic_cross_recolorable_gray_24" />
-
+    <!-- Second row -->
     <ImageView
         android:id="@+id/featureIcon2"
         android:layout_width="@dimen/keyline_5"
@@ -137,39 +100,41 @@
         android:layout_height="wrap_content"
         android:paddingVertical="@dimen/keyline_3"
         android:text="@string/dax_prompt_browser_comparison_item2"
-        app:layout_constraintEnd_toStartOf="@id/chromeLogo"
+        app:layout_constraintEnd_toStartOf="@id/cross2"
         app:layout_constraintStart_toEndOf="@id/featureIcon2"
         app:layout_constraintTop_toBottomOf="@+id/feature1"
         app:typography="body1" />
 
+    <ImageView
+        android:id="@+id/cross2"
+        android:layout_width="55dp"
+        android:layout_height="20dp"
+        android:layout_marginEnd="@dimen/keyline_2"
+        app:layout_constraintBottom_toBottomOf="@id/feature2"
+        app:layout_constraintEnd_toStartOf="@id/check2"
+        app:layout_constraintStart_toEndOf="@id/feature2"
+        app:layout_constraintTop_toTopOf="@id/feature2"
+        app:srcCompat="@drawable/ic_cross" />
+
+    <ImageView
+        android:id="@+id/check2"
+        android:layout_width="55dp"
+        android:layout_height="20dp"
+        app:layout_constraintBottom_toBottomOf="@id/feature2"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/cross2"
+        app:layout_constraintTop_toTopOf="@id/feature2"
+        app:srcCompat="@drawable/ic_check" />
+
     <com.duckduckgo.common.ui.view.divider.HorizontalDivider
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        app:layout_constraintBottom_toTopOf="@id/feature3"
+        app:defaultPadding="false"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/feature2" />
 
-    <ImageView
-        android:id="@+id/check3"
-        android:layout_width="20dp"
-        android:layout_height="20dp"
-        app:layout_constraintBottom_toBottomOf="@id/feature3"
-        app:layout_constraintEnd_toEndOf="@id/ddgLogo"
-        app:layout_constraintStart_toStartOf="@id/ddgLogo"
-        app:layout_constraintTop_toTopOf="@id/feature3"
-        app:srcCompat="@drawable/ic_check_green_24" />
-
-    <ImageView
-        android:id="@+id/cross3"
-        android:layout_width="@dimen/keyline_5"
-        android:layout_height="@dimen/keyline_5"
-        app:layout_constraintBottom_toBottomOf="@id/feature3"
-        app:layout_constraintEnd_toEndOf="@id/chromeLogo"
-        app:layout_constraintStart_toStartOf="@id/chromeLogo"
-        app:layout_constraintTop_toTopOf="@id/feature3"
-        app:srcCompat="@drawable/ic_cross_recolorable_gray_24" />
-
+    <!-- Third row -->
     <ImageView
         android:id="@+id/featureIcon3"
         android:layout_width="@dimen/keyline_5"
@@ -187,39 +152,49 @@
         android:layout_height="wrap_content"
         android:paddingVertical="@dimen/keyline_3"
         android:text="@string/dax_prompt_browser_comparison_item3"
-        app:layout_constraintEnd_toStartOf="@id/chromeLogo"
+        app:layout_constraintEnd_toStartOf="@id/cross3"
         app:layout_constraintStart_toEndOf="@id/featureIcon3"
         app:layout_constraintTop_toBottomOf="@+id/feature2"
         app:typography="body1" />
 
+    <ImageView
+        android:id="@+id/cross3"
+        android:layout_width="55dp"
+        android:layout_height="20dp"
+        android:layout_marginEnd="@dimen/keyline_2"
+        app:layout_constraintBottom_toBottomOf="@id/feature3"
+        app:layout_constraintEnd_toStartOf="@id/check3"
+        app:layout_constraintStart_toEndOf="@id/feature3"
+        app:layout_constraintTop_toTopOf="@id/feature3"
+        app:srcCompat="@drawable/ic_cross" />
+
+    <ImageView
+        android:id="@+id/check3"
+        android:layout_width="55dp"
+        android:layout_height="20dp"
+        app:layout_constraintBottom_toBottomOf="@id/feature3"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/cross3"
+        app:layout_constraintTop_toTopOf="@id/feature3"
+        app:srcCompat="@drawable/ic_check" />
+
     <com.duckduckgo.common.ui.view.divider.HorizontalDivider
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        app:layout_constraintBottom_toTopOf="@id/feature4"
+        app:defaultPadding="false"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/feature3" />
 
-    <ImageView
-        android:id="@+id/check4"
-        android:layout_width="20dp"
-        android:layout_height="20dp"
-        app:layout_constraintBottom_toBottomOf="@id/feature4"
-        app:layout_constraintEnd_toEndOf="@id/ddgLogo"
-        app:layout_constraintStart_toStartOf="@id/ddgLogo"
-        app:layout_constraintTop_toTopOf="@id/feature4"
-        app:srcCompat="@drawable/ic_check_green_24" />
+    <com.duckduckgo.common.ui.view.divider.HorizontalDivider
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:defaultPadding="false"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/feature3" />
 
-    <ImageView
-        android:id="@+id/cross4"
-        android:layout_width="@dimen/keyline_5"
-        android:layout_height="@dimen/keyline_5"
-        app:layout_constraintBottom_toBottomOf="@id/feature4"
-        app:layout_constraintEnd_toEndOf="@id/chromeLogo"
-        app:layout_constraintStart_toStartOf="@id/chromeLogo"
-        app:layout_constraintTop_toTopOf="@id/feature4"
-        app:srcCompat="@drawable/ic_cross_recolorable_gray_24" />
-
+    <!-- Fourth row -->
     <ImageView
         android:id="@+id/featureIcon4"
         android:layout_width="@dimen/keyline_5"
@@ -237,16 +212,36 @@
         android:layout_height="wrap_content"
         android:paddingVertical="@dimen/keyline_3"
         android:text="@string/dax_prompt_browser_comparison_item4"
-        app:layout_constraintEnd_toStartOf="@id/chromeLogo"
+        app:layout_constraintEnd_toStartOf="@id/cross4"
         app:layout_constraintStart_toEndOf="@id/featureIcon4"
         app:layout_constraintTop_toBottomOf="@+id/feature3"
         app:typography="body1" />
+
+    <ImageView
+        android:id="@+id/cross4"
+        android:layout_width="55dp"
+        android:layout_height="20dp"
+        android:layout_marginEnd="@dimen/keyline_2"
+        app:layout_constraintBottom_toBottomOf="@id/feature4"
+        app:layout_constraintEnd_toStartOf="@id/check4"
+        app:layout_constraintStart_toEndOf="@id/feature4"
+        app:layout_constraintTop_toTopOf="@id/feature4"
+        app:srcCompat="@drawable/ic_cross" />
+
+    <ImageView
+        android:id="@+id/check4"
+        android:layout_width="55dp"
+        android:layout_height="20dp"
+        app:layout_constraintBottom_toBottomOf="@id/feature4"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/cross4"
+        app:layout_constraintTop_toTopOf="@id/feature4"
+        app:srcCompat="@drawable/ic_check" />
 
     <com.duckduckgo.common.ui.view.divider.HorizontalDivider
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         app:defaultPadding="false"
-        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/feature4" />

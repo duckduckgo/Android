@@ -39,7 +39,6 @@ import com.duckduckgo.mobile.android.vpn.service.VpnReminderReceiverManager
 import com.duckduckgo.mobile.android.vpn.service.notification.getHighestPriorityPluginForType
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason.REVOKED
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason.SELF_STOP
-import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.test.runTest
 import org.junit.*
 import org.junit.runner.RunWith
@@ -48,6 +47,7 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
+import java.util.concurrent.TimeUnit
 
 @RunWith(AndroidJUnit4::class)
 class AppTPReminderNotificationSchedulerTest {

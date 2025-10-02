@@ -45,9 +45,6 @@ import com.duckduckgo.duckplayer.api.DuckPlayer
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.privacy.config.api.ContentBlocking
-import java.time.Instant
-import java.time.LocalDateTime
-import java.time.ZoneOffset
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.consumeAsFlow
 import kotlinx.coroutines.flow.first
@@ -70,6 +67,9 @@ import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
+import java.time.Instant
+import java.time.LocalDateTime
+import java.time.ZoneOffset
 
 @RunWith(AndroidJUnit4::class)
 class TabDataRepositoryTest {

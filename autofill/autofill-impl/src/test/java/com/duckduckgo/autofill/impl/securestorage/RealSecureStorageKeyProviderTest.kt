@@ -20,7 +20,6 @@ import com.duckduckgo.autofill.api.AutofillFeature
 import com.duckduckgo.autofill.impl.securestorage.RealSecureStorageKeyProvider
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.securestorage.impl.encryption.RandomBytesGenerator
-import java.security.Key
 import kotlinx.coroutines.test.runTest
 import okio.ByteString.Companion.toByteString
 import org.junit.Assert.assertEquals
@@ -30,6 +29,7 @@ import org.junit.Before
 import org.junit.Test
 import org.mockito.Mockito.mock
 import org.mockito.kotlin.whenever
+import java.security.Key
 
 class RealSecureStorageKeyProviderTest {
     private lateinit var testee: RealSecureStorageKeyProvider

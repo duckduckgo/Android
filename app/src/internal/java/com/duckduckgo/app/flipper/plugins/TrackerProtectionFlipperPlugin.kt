@@ -25,14 +25,14 @@ import com.facebook.flipper.core.FlipperConnection
 import com.facebook.flipper.core.FlipperObject
 import com.facebook.flipper.core.FlipperPlugin
 import com.squareup.anvil.annotations.ContributesMultibinding
-import java.util.concurrent.CopyOnWriteArrayList
-import java.util.concurrent.Executors
-import javax.inject.Inject
-import kotlin.random.Random
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import logcat.LogPriority.VERBOSE
 import logcat.logcat
+import java.util.concurrent.CopyOnWriteArrayList
+import java.util.concurrent.Executors
+import javax.inject.Inject
+import kotlin.random.Random
 
 @ContributesMultibinding(AppScope::class)
 class TrackerProtectionFlipperPlugin @Inject constructor(

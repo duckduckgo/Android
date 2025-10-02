@@ -28,9 +28,9 @@ import com.duckduckgo.common.ui.view.MessageCta.Message
 import com.duckduckgo.common.utils.extensions.preventWidows
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
-import javax.inject.Inject
 import kotlinx.coroutines.flow.firstOrNull
 import logcat.logcat
+import javax.inject.Inject
 
 @ContributesBinding(AppScope::class)
 class LowPriorityMessagingModelImpl @Inject constructor(

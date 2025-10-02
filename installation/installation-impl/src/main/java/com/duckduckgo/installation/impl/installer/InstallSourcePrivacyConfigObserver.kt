@@ -34,12 +34,12 @@ import com.duckduckgo.installation.impl.installer.fullpackage.feature.InstallSou
 import com.duckduckgo.privacy.config.api.PrivacyConfigCallbackPlugin
 import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.SingleInstanceIn
-import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import logcat.LogPriority.INFO
 import logcat.LogPriority.VERBOSE
 import logcat.logcat
+import javax.inject.Inject
 
 @SuppressLint("DenyListedApi")
 @ContributesMultibinding(

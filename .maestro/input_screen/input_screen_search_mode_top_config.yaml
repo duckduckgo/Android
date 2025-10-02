@@ -1,0 +1,15 @@
+appId: com.duckduckgo.mobile.android
+name: "Input Screen Search Mode test (top config)"
+tags:
+  - inputScreenTest
+  - releaseTest
+---
+- retry:
+    maxRetries: 3
+    commands:
+      - launchApp:
+          clearState: true
+          stopApp: true
+      - runFlow: ../shared/skip_all_onboarding.yaml
+      - runFlow: ./shared/input_screen_enable_flow.yaml
+      - runFlow: ./shared/input_screen_search_mode_flow.yaml

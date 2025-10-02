@@ -35,10 +35,10 @@ import com.duckduckgo.downloads.impl.pixels.DownloadsPixelName.DOWNLOAD_REQUEST_
 import com.duckduckgo.downloads.store.DownloadStatus.STARTED
 import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.SingleInstanceIn
-import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import logcat.logcat
+import javax.inject.Inject
 
 @ContributesMultibinding(
     scope = AppScope::class,

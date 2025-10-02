@@ -28,9 +28,9 @@ import com.duckduckgo.sync.impl.SyncApi
 import com.duckduckgo.sync.impl.error.SyncApiErrorRecorder
 import com.duckduckgo.sync.store.SyncStore
 import com.squareup.anvil.annotations.ContributesBinding
-import javax.inject.Inject
 import logcat.logcat
 import org.json.JSONObject
+import javax.inject.Inject
 
 interface SyncApiClient {
 

@@ -19,7 +19,6 @@ package com.duckduckgo.app.settings.db
 import android.content.Context
 import android.content.SharedPreferences
 import androidx.core.content.edit
-import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition
 import com.duckduckgo.app.fire.fireproofwebsite.ui.AutomaticFireproofSetting
 import com.duckduckgo.app.fire.fireproofwebsite.ui.AutomaticFireproofSetting.ASK_EVERY_TIME
 import com.duckduckgo.app.fire.fireproofwebsite.ui.AutomaticFireproofSetting.NEVER
@@ -29,13 +28,13 @@ import com.duckduckgo.app.settings.clear.ClearWhenOption
 import com.duckduckgo.app.settings.clear.FireAnimation
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.browser.api.autocomplete.AutoCompleteSettings
+import com.duckduckgo.browser.ui.omnibar.OmnibarPosition
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
 import javax.inject.Inject
 
 interface SettingsDataStore {
-
     var lastExecutedJobId: String?
 
     @Deprecated(message = "hideTips variable is deprecated and no longer available in onboarding")
@@ -87,9 +86,13 @@ interface SettingsDataStore {
     var clearDuckAiData: Boolean
 
     fun isCurrentlySelected(clearWhatOption: ClearWhatOption): Boolean
+
     fun isCurrentlySelected(clearWhenOption: ClearWhenOption): Boolean
+
     fun isCurrentlySelected(fireAnimation: FireAnimation): Boolean
+
     fun hasBackgroundTimestampRecorded(): Boolean
+
     fun clearAppBackgroundTimestamp()
 }
 
@@ -105,8 +108,8 @@ interface SettingsDataStore {
 class SettingsSharedPreferences @Inject constructor(
     private val context: Context,
     private val appBuildConfig: AppBuildConfig,
-) : SettingsDataStore, AutoCompleteSettings {
-
+) : SettingsDataStore,
+    AutoCompleteSettings {
     private val fireAnimationMapper = FireAnimationPrefsMapper()
 
     override var lastExecutedJobId: String?
@@ -223,6 +226,7 @@ class SettingsSharedPreferences @Inject constructor(
         set(enabled) = preferences.edit { putBoolean(KEY_CLEAR_DUCK_AI_DATA, enabled) }
 
     override fun hasBackgroundTimestampRecorded(): Boolean = preferences.contains(KEY_APP_BACKGROUNDED_TIMESTAMP)
+
     override fun clearAppBackgroundTimestamp() = preferences.edit { remove(KEY_APP_BACKGROUNDED_TIMESTAMP) }
 
     override fun isCurrentlySelected(clearWhatOption: ClearWhatOption): Boolean {
@@ -235,9 +239,7 @@ class SettingsSharedPreferences @Inject constructor(
         return currentlySelected == clearWhenOption
     }
 
-    override fun isCurrentlySelected(fireAnimation: FireAnimation): Boolean {
-        return selectedFireAnimationSavedValue() == fireAnimation
-    }
+    override fun isCurrentlySelected(fireAnimation: FireAnimation): Boolean = selectedFireAnimationSavedValue() == fireAnimation
 
     override var notifyMeInDownloadsDismissed: Boolean
         get() = preferences.getBoolean(KEY_NOTIFY_ME_IN_DOWNLOADS_DISMISSED, false)
@@ -260,13 +262,12 @@ class SettingsSharedPreferences @Inject constructor(
 
     private val preferences: SharedPreferences by lazy { context.getSharedPreferences(FILENAME, Context.MODE_PRIVATE) }
 
-    private fun defaultIcon(): AppIcon {
-        return if (appBuildConfig.isDebug) {
+    private fun defaultIcon(): AppIcon =
+        if (appBuildConfig.isDebug) {
             AppIcon.BLUE
         } else {
             AppIcon.DEFAULT
         }
-    }
 
     override var experimentalWebsiteDarkMode: Boolean
         get() = preferences.getBoolean(KEY_EXPERIMENTAL_SITE_DARK_MODE, false)
@@ -309,12 +310,13 @@ class SettingsSharedPreferences @Inject constructor(
             private const val NONE_PREFS_VALUE = "NONE"
         }
 
-        fun prefValue(fireAnimation: FireAnimation) = when (fireAnimation) {
-            FireAnimation.HeroFire -> HERO_FIRE_PREFS_VALUE
-            FireAnimation.HeroWater -> HERO_WATER_PREFS_VALUE
-            FireAnimation.HeroAbstract -> HERO_ABSTRACT_PREFS_VALUE
-            FireAnimation.None -> NONE_PREFS_VALUE
-        }
+        fun prefValue(fireAnimation: FireAnimation) =
+            when (fireAnimation) {
+                FireAnimation.HeroFire -> HERO_FIRE_PREFS_VALUE
+                FireAnimation.HeroWater -> HERO_WATER_PREFS_VALUE
+                FireAnimation.HeroAbstract -> HERO_ABSTRACT_PREFS_VALUE
+                FireAnimation.None -> NONE_PREFS_VALUE
+            }
 
         fun fireAnimationFrom(
             value: String?,
@@ -329,11 +331,10 @@ class SettingsSharedPreferences @Inject constructor(
     }
 
     class LoginDetectorPrefsMapper {
-        fun mapToAutomaticFireproofSetting(oldLoginDetectorValue: Boolean): AutomaticFireproofSetting {
-            return when (oldLoginDetectorValue) {
+        fun mapToAutomaticFireproofSetting(oldLoginDetectorValue: Boolean): AutomaticFireproofSetting =
+            when (oldLoginDetectorValue) {
                 false -> NEVER
                 else -> ASK_EVERY_TIME
             }
-        }
     }
 }

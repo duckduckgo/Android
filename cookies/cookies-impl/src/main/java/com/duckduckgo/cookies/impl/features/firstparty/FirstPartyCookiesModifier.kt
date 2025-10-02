@@ -33,10 +33,10 @@ import com.duckduckgo.cookies.store.CookiesRepository
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.privacy.config.api.UnprotectedTemporary
 import com.squareup.anvil.annotations.ContributesBinding
-import javax.inject.Inject
-import javax.inject.Named
 import kotlinx.coroutines.withContext
 import logcat.asLog
+import javax.inject.Inject
+import javax.inject.Named
 
 interface FirstPartyCookiesModifier {
     suspend fun expireFirstPartyCookies()

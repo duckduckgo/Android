@@ -21,6 +21,8 @@ import com.duckduckgo.common.ui.store.AppTheme
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.api.R
 import com.duckduckgo.duckchat.api.inputscreen.BrowserAndInputScreenTransitionProvider
+import com.duckduckgo.duckchat.impl.DuckChatInternal
+import com.duckduckgo.duckchat.impl.inputscreen.ui.InputScreenConfigResolverImpl.Companion.useTopBar
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
 
@@ -43,49 +45,67 @@ import javax.inject.Inject
  *   but it's less dramatic because there's no slide animation.
  * - Cannot use themeable attributes (`?attr`) as they cause crashes of the whole launcher (on tested devices).
  *   Instead, we use fixed color values and filter resources by current theme state.
+ *
+ * ### Omnibar Position Handling
+ * If the omnibar is at the top of the screen, slide animations are used (on API ≥ 33) to reveal the Search/Duck.ai toggle.
+ *
+ * If the omnibar is at the bottom of the screen, fade animations are used as the input box positioned
+ * is anchored to the same screen coordinates in both the browser screen and input screen.
  */
 @ContributesBinding(scope = AppScope::class)
 class BrowserAndInputScreenTransitionProviderImpl @Inject constructor(
     private val appTheme: AppTheme,
+    private val duckChatInternal: DuckChatInternal,
 ) : BrowserAndInputScreenTransitionProvider {
-
-    override fun getBrowserEnterAnimation(): Int {
-        return if (VERSION.SDK_INT >= 33) {
+    override fun getBrowserEnterAnimation(isTopOmnibar: Boolean): Int =
+        if (VERSION.SDK_INT >= 33) {
             if (appTheme.isLightModeEnabled()) {
-                R.anim.slide_in_from_bottom_fade_in_light
+                if (useTopBar(isTopOmnibar, duckChatInternal)) {
+                    R.anim.slide_in_from_bottom_fade_in_light
+                } else {
+                    R.anim.fade_in_light
+                }
             } else {
-                R.anim.slide_in_from_bottom_fade_in_dark
+                if (useTopBar(isTopOmnibar, duckChatInternal)) {
+                    R.anim.slide_in_from_bottom_fade_in_dark
+                } else {
+                    R.anim.fade_in_dark
+                }
             }
         } else {
             R.anim.fade_in
         }
-    }
 
-    override fun getBrowserExitAnimation(): Int {
-        return if (VERSION.SDK_INT >= 33) {
+    override fun getBrowserExitAnimation(isTopOmnibar: Boolean): Int =
+        if (VERSION.SDK_INT >= 33) {
             if (appTheme.isLightModeEnabled()) {
-                R.anim.slide_out_to_bottom_fade_out_light
+                if (useTopBar(isTopOmnibar, duckChatInternal)) {
+                    R.anim.slide_out_to_bottom_fade_out_light
+                } else {
+                    R.anim.fade_out_light
+                }
             } else {
-                R.anim.slide_out_to_bottom_fade_out_dark
+                if (useTopBar(isTopOmnibar, duckChatInternal)) {
+                    R.anim.slide_out_to_bottom_fade_out_dark
+                } else {
+                    R.anim.fade_out_dark
+                }
             }
         } else {
             R.anim.fade_out
         }
-    }
 
-    override fun getInputScreenEnterAnimation(): Int {
-        return if (VERSION.SDK_INT >= 33) {
+    override fun getInputScreenEnterAnimation(isTopOmnibar: Boolean): Int =
+        if (VERSION.SDK_INT >= 33 && useTopBar(isTopOmnibar, duckChatInternal)) {
             R.anim.slide_in_from_top_fade_in
         } else {
             R.anim.fade_in
         }
-    }
 
-    override fun getInputScreenExitAnimation(): Int {
-        return if (VERSION.SDK_INT >= 33) {
+    override fun getInputScreenExitAnimation(isTopOmnibar: Boolean): Int =
+        if (VERSION.SDK_INT >= 33 && useTopBar(isTopOmnibar, duckChatInternal)) {
             R.anim.slide_out_to_top_fade_out
         } else {
             R.anim.fade_out
         }
-    }
 }

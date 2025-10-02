@@ -262,5 +262,4 @@ enum class DeviceShieldPixelNames(override val pixelName: String, val enqueue: B
     APPTP_PPRO_UPSELL_REVOKED_INFO_LINK_CLICKED("m_atp_ppro-upsell_info-apptp-revoked_link_clicked_c"),
     APPTP_PPRO_UPSELL_REVOKED_INFO_LINK_CLICKED_DAILY("m_atp_ppro-upsell_info-apptp-revoked_link_clicked_d"),
     APPTP_PPRO_UPSELL_REVOKED_INFO_LINK_CLICKED_UNIQUE("m_atp_ppro-upsell_info-apptp-revoked_link_clicked_u"),
-    ;
 }

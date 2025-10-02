@@ -35,7 +35,6 @@ import com.duckduckgo.duckplayer.impl.SharedPreferencesDuckPlayerDataStore.Keys.
 import com.duckduckgo.duckplayer.impl.SharedPreferencesDuckPlayerDataStore.Keys.PRIVATE_PLAYER_MODE
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
-import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
@@ -44,6 +43,7 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
+import javax.inject.Inject
 
 interface DuckPlayerDataStore {
     fun getDuckPlayerRemoteConfigJson(): String

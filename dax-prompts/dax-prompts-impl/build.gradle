@@ -30,7 +30,6 @@ dependencies {
     implementation project(':design-system')
     implementation project(':navigation-api')
     implementation project(':app-build-config-api')
-    implementation project(':duckplayer-api')
 
     anvil project(':anvil-compiler')
     implementation project(':anvil-annotations')
@@ -80,6 +79,7 @@ dependencies {
     testImplementation 'app.cash.turbine:turbine:_'
     testImplementation Testing.robolectric
     testImplementation project(path: ':common-test')
+    testImplementation project(path: ':feature-toggles-test')
 
     coreLibraryDesugaring Android.tools.desugarJdkLibs
 }

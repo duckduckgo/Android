@@ -24,9 +24,9 @@ import com.duckduckgo.savedsites.api.models.SavedSite.Favorite
 import com.duckduckgo.savedsites.impl.bookmarks.BookmarksAdapter.BookmarkFolderItem
 import com.duckduckgo.savedsites.impl.bookmarks.BookmarksAdapter.BookmarkItem
 import com.duckduckgo.savedsites.impl.bookmarks.BookmarksAdapter.BookmarksItemTypes
-import java.util.*
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import java.util.*
 
 class BookmarksQueryListener(
     private val viewModel: BookmarksViewModel,

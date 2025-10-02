@@ -23,9 +23,9 @@ import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
-import javax.inject.Inject
 import logcat.LogPriority.VERBOSE
 import logcat.logcat
+import javax.inject.Inject
 
 @ContributesBinding(AppScope::class)
 @RemoteFeatureStoreNamed(ClientBrandHintFeature::class)

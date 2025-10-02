@@ -62,12 +62,12 @@ import com.duckduckgo.remote.messaging.impl.newtab.RemoteMessageViewModel.Comman
 import com.duckduckgo.remote.messaging.impl.newtab.RemoteMessageViewModel.Command.SubmitUrl
 import com.duckduckgo.remote.messaging.impl.newtab.RemoteMessageViewModel.ViewState
 import dagger.android.support.AndroidSupportInjection
-import javax.inject.Inject
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import logcat.LogPriority.WARN
 import logcat.asLog
 import logcat.logcat
+import javax.inject.Inject
 
 @InjectWith(ViewScope::class)
 class RemoteMessageView @JvmOverloads constructor(

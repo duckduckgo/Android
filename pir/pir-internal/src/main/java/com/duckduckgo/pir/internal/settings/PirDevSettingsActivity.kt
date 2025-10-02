@@ -31,9 +31,9 @@ import com.duckduckgo.pir.impl.notifications.PirNotificationManager
 import com.duckduckgo.pir.impl.store.PirRepository
 import com.duckduckgo.pir.internal.databinding.ActivityPirInternalSettingsBinding
 import com.duckduckgo.pir.internal.settings.PirResultsScreenParams.PirEventsResultsScreen
-import javax.inject.Inject
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 @InjectWith(ActivityScope::class)
 @ContributeToActivityStarter(PirSettingsScreenNoParams::class)

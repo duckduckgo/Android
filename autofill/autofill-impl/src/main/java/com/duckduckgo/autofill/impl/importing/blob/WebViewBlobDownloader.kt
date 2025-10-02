@@ -23,17 +23,17 @@ import androidx.webkit.JavaScriptReplyProxy
 import androidx.webkit.WebViewCompat
 import com.duckduckgo.app.browser.api.WebViewCapabilityChecker
 import com.duckduckgo.app.browser.api.WebViewCapabilityChecker.WebViewCapability
+import com.duckduckgo.browser.api.webviewcompat.WebViewCompatWrapper
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.FragmentScope
 import com.squareup.anvil.annotations.ContributesBinding
-import javax.inject.Inject
 import kotlinx.coroutines.withContext
+import javax.inject.Inject
 
 /**
  * This interface provides the ability to add modern blob download support to a WebView.
  */
 interface WebViewBlobDownloader {
-
     /**
      * Configures a web view to support blob downloads, including in iframes.
      */
@@ -42,7 +42,10 @@ interface WebViewBlobDownloader {
     /**
      * Requests the WebView to convert a blob URL to a data URI.
      */
-    suspend fun convertBlobToDataUri(blobUrl: String)
+    suspend fun convertBlobToDataUri(
+        webView: WebView,
+        blobUrl: String,
+    )
 
     /**
      * Stores a reply proxy for a given location.
@@ -63,8 +66,8 @@ interface WebViewBlobDownloader {
 class WebViewBlobDownloaderModernImpl @Inject constructor(
     private val webViewCapabilityChecker: WebViewCapabilityChecker,
     private val dispatchers: DispatcherProvider,
+    private val webViewCompatWrapper: WebViewCompatWrapper,
 ) : WebViewBlobDownloader {
-
     private val fixedReplyProxyMap = mutableMapOf<String, Map<String, JavaScriptReplyProxy>>()
 
     @SuppressLint("RequiresFeature", "AddDocumentStartJavaScriptUsage")
@@ -77,13 +80,16 @@ class WebViewBlobDownloaderModernImpl @Inject constructor(
     }
 
     @SuppressLint("RequiresFeature")
-    override suspend fun convertBlobToDataUri(blobUrl: String) {
+    override suspend fun convertBlobToDataUri(
+        webView: WebView,
+        blobUrl: String,
+    ) {
         withContext(dispatchers.io()) {
             for ((key, proxies) in fixedReplyProxyMap) {
                 if (sameOrigin(blobUrl.removePrefix("blob:"), key)) {
                     withContext(dispatchers.main()) {
                         for (replyProxy in proxies.values) {
-                            replyProxy.postMessage(blobUrl)
+                            webViewCompatWrapper.postMessage(webView, replyProxy, blobUrl)
                         }
                     }
                     return@withContext
@@ -108,29 +114,30 @@ class WebViewBlobDownloaderModernImpl @Inject constructor(
         firstUrl: String,
         secondUrl: String,
     ): Boolean {
-        return kotlin.runCatching {
-            val firstUri = Uri.parse(firstUrl)
-            val secondUri = Uri.parse(secondUrl)
+        return kotlin
+            .runCatching {
+                val firstUri = Uri.parse(firstUrl)
+                val secondUri = Uri.parse(secondUrl)
 
-            firstUri.host == secondUri.host && firstUri.scheme == secondUri.scheme && firstUri.port == secondUri.port
-        }.getOrNull() ?: return false
+                firstUri.host == secondUri.host && firstUri.scheme == secondUri.scheme && firstUri.port == secondUri.port
+            }.getOrNull() ?: return false
     }
 
     override fun clearReplyProxies() {
         fixedReplyProxyMap.clear()
     }
 
-    private suspend fun isBlobDownloadWebViewFeatureEnabled(): Boolean {
-        return webViewCapabilityChecker.isSupported(WebViewCapability.WebMessageListener) &&
+    private suspend fun isBlobDownloadWebViewFeatureEnabled(): Boolean =
+        webViewCapabilityChecker.isSupported(WebViewCapability.WebMessageListener) &&
             webViewCapabilityChecker.isSupported(WebViewCapability.DocumentStartJavaScript)
-    }
 
     companion object {
-        private val script = """
+        private val script =
+            """
             window.__url_to_blob_collection = {};
-        
+
             const original_createObjectURL = URL.createObjectURL;
-        
+
             URL.createObjectURL = function () {
                 const blob = arguments[0];
                 const url = original_createObjectURL.call(this, ...arguments);
@@ -139,7 +146,7 @@ class WebViewBlobDownloaderModernImpl @Inject constructor(
                 }
                 return url;
             }
-            
+
             function blobToBase64DataUrl(blob) {
                 return new Promise((resolve, reject) => {
                     const reader = new FileReader();
@@ -152,10 +159,10 @@ class WebViewBlobDownloaderModernImpl @Inject constructor(
                     reader.readAsDataURL(blob);
                 });
             }
-        
+
             const pingMessage = 'Ping:' + window.location.href
             ddgBlobDownloadObj.postMessage(pingMessage)
-                    
+
             ddgBlobDownloadObj.onmessage = function(event) {
                 if (event.data.startsWith('blob:')) {
                     const blob = window.__url_to_blob_collection[event.data];
@@ -166,6 +173,6 @@ class WebViewBlobDownloaderModernImpl @Inject constructor(
                     }
                 }
             }
-        """.trimIndent()
+            """.trimIndent()
     }
 }

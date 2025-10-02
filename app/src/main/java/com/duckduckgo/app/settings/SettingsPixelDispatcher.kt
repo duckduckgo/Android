@@ -30,10 +30,10 @@ import com.duckduckgo.sync.api.SyncState.OFF
 import com.duckduckgo.sync.api.SyncStateMonitor
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
-import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 /**
  * Utility to dispatch pixels triggered by interactions on the settings screen.

@@ -33,8 +33,6 @@ import com.duckduckgo.downloads.impl.pixels.DownloadsPixelName.DOWNLOAD_REQUEST_
 import com.duckduckgo.downloads.store.DownloadStatus.FINISHED
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
-import java.io.File
-import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
@@ -42,6 +40,8 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import logcat.logcat
+import java.io.File
+import javax.inject.Inject
 
 interface DownloadCallback {
     /**

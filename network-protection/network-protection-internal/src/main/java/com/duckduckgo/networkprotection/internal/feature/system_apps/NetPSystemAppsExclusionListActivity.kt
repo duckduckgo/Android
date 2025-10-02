@@ -32,9 +32,9 @@ import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.networkprotection.api.NetworkProtectionState
 import com.duckduckgo.networkprotection.internal.databinding.ActivityNetpInternalSystemAppsExclusionBinding
 import com.duckduckgo.networkprotection.internal.network.NetPInternalExclusionListProvider
-import javax.inject.Inject
 import kotlinx.coroutines.flow.*
 import logcat.logcat
+import javax.inject.Inject
 
 @InjectWith(ActivityScope::class)
 class NetPSystemAppsExclusionListActivity : DuckDuckGoActivity(), SystemAppView.SystemAppListener {

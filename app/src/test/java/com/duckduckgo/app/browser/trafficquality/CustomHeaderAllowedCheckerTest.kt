@@ -20,13 +20,13 @@ import com.duckduckgo.app.browser.trafficquality.Result.Allowed
 import com.duckduckgo.app.browser.trafficquality.Result.NotAllowed
 import com.duckduckgo.app.browser.trafficquality.remote.FeaturesRequestHeaderStore
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
-import java.time.LocalDateTime
-import java.time.ZoneId
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
+import java.time.LocalDateTime
+import java.time.ZoneId
 
 class CustomHeaderAllowedCheckerTest {
 

@@ -19,9 +19,9 @@ package com.duckduckgo.sync.impl.engine
 import com.duckduckgo.sync.store.dao.SyncAttemptDao
 import com.duckduckgo.sync.store.model.SyncAttempt
 import com.duckduckgo.sync.store.model.SyncAttemptState
-import javax.inject.Inject
 import kotlinx.coroutines.flow.Flow
 import logcat.logcat
+import javax.inject.Inject
 
 interface SyncStateRepository {
 

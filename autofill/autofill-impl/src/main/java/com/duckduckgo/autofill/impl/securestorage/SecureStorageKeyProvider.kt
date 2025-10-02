@@ -23,12 +23,12 @@ import com.duckduckgo.autofill.store.SecureStorageKeyRepository
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.securestorage.impl.encryption.RandomBytesGenerator
 import com.squareup.anvil.annotations.ContributesBinding
-import java.security.Key
-import javax.inject.Inject
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import okio.ByteString.Companion.toByteString
+import java.security.Key
+import javax.inject.Inject
 
 /**
  * This class provides the usable decrypted keys to be used in various levels on encryption

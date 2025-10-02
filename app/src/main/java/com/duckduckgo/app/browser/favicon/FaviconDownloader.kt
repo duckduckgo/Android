@@ -28,11 +28,11 @@ import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.transition.Transition
 import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.common.utils.DispatcherProvider
-import java.io.File
-import javax.inject.Inject
 import kotlinx.coroutines.CancellableContinuation
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
+import java.io.File
+import javax.inject.Inject
 
 interface FaviconDownloader {
     suspend fun getFaviconFromDisk(file: File): Bitmap?

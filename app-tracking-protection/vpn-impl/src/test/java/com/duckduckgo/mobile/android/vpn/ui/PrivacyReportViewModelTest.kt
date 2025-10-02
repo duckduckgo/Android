@@ -32,9 +32,7 @@ import com.duckduckgo.mobile.android.vpn.stats.RealAppTrackerBlockingStatsReposi
 import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
 import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerEntity
 import com.duckduckgo.mobile.android.vpn.ui.onboarding.VpnStore
-import com.duckduckgo.mobile.android.vpn.ui.report.PrivacyReportViewModel
-import java.time.LocalDateTime
-import kotlin.time.ExperimentalTime
+import com.duckduckgo.mobile.android.vpn.ui.privacyreport.PrivacyReportViewModel
 import kotlinx.coroutines.runBlocking
 import org.junit.After
 import org.junit.Assert.assertEquals
@@ -43,11 +41,12 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.mock
+import java.time.LocalDateTime
+import kotlin.time.ExperimentalTime
 
 @ExperimentalTime
 @RunWith(AndroidJUnit4::class)
 class PrivacyReportViewModelTest {
-
     @get:Rule
     @Suppress("unused")
     var instantTaskExecutorRule = InstantTaskExecutorRule()
@@ -74,9 +73,11 @@ class PrivacyReportViewModelTest {
     }
 
     private fun prepareDb() {
-        db = Room.inMemoryDatabaseBuilder(InstrumentationRegistry.getInstrumentation().targetContext, VpnDatabase::class.java)
-            .allowMainThreadQueries()
-            .build()
+        db =
+            Room
+                .inMemoryDatabaseBuilder(InstrumentationRegistry.getInstrumentation().targetContext, VpnDatabase::class.java)
+                .allowMainThreadQueries()
+                .build()
     }
 
     @After
@@ -85,39 +86,42 @@ class PrivacyReportViewModelTest {
     }
 
     @Test
-    fun whenTrackersBlockedThenReportHasTrackers() = runBlocking {
-        trackerFound("dax.com")
-        trackerFound("dax.com")
-        trackerFound("dax.com")
+    fun whenTrackersBlockedThenReportHasTrackers() =
+        runBlocking {
+            trackerFound("dax.com")
+            trackerFound("dax.com")
+            trackerFound("dax.com")
 
-        testee.getReport().test {
-            val result = awaitItem()
-            assertEquals(3, result.trackers)
-            cancelAndConsumeRemainingEvents()
+            testee.getReport().test {
+                val result = awaitItem()
+                assertEquals(3, result.trackers)
+                cancelAndConsumeRemainingEvents()
+            }
         }
-    }
 
     @Test
-    fun whenTrackersBlockedOutsideTimeWindowThenReturnEmpty() = runBlocking {
-        trackerFoundYesterday("dax.com")
-        trackerFoundYesterday("dax.com")
-        trackerFoundYesterday("dax.com")
+    fun whenTrackersBlockedOutsideTimeWindowThenReturnEmpty() =
+        runBlocking {
+            trackerFoundYesterday("dax.com")
+            trackerFoundYesterday("dax.com")
+            trackerFoundYesterday("dax.com")
 
-        testee.getReport().test {
-            val result = awaitItem()
-            assertEquals(0, result.trackers)
-            cancelAndConsumeRemainingEvents()
+            testee.getReport().test {
+                val result = awaitItem()
+                assertEquals(0, result.trackers)
+                cancelAndConsumeRemainingEvents()
+            }
         }
-    }
 
     @Test
-    fun whenNoTrackersBlockedThenReportIsEmpty() = runBlocking {
-        testee.getReport().test {
-            val result = awaitItem()
-            assertEquals(0, result.trackers)
-            cancelAndConsumeRemainingEvents()
+    fun whenNoTrackersBlockedThenReportIsEmpty() =
+        runBlocking {
+            testee.getReport().test {
+                val result = awaitItem()
+                assertEquals(0, result.trackers)
+                cancelAndConsumeRemainingEvents()
+            }
         }
-    }
 
     private fun trackerFoundYesterday(trackerDomain: String = "example.com") {
         trackerFound(trackerDomain, timestamp = yesterday())
@@ -129,14 +133,15 @@ class PrivacyReportViewModelTest {
         timestamp: String = DatabaseDateFormatter.bucketByHour(),
     ) {
         val defaultTrackingApp = TrackingApp("app.foo.com", "Foo App")
-        val tracker = VpnTracker(
-            trackerCompanyId = trackerCompanyId,
-            domain = domain,
-            timestamp = timestamp,
-            company = "",
-            companyDisplayName = "",
-            trackingApp = defaultTrackingApp,
-        )
+        val tracker =
+            VpnTracker(
+                trackerCompanyId = trackerCompanyId,
+                domain = domain,
+                timestamp = timestamp,
+                company = "",
+                companyDisplayName = "",
+                trackingApp = defaultTrackingApp,
+            )
         val trackers = listOf(tracker)
         repository.insert(trackers)
         db.vpnAppTrackerBlockingDao().insertTrackerEntities(trackers.map { it.asEntity() })
@@ -148,12 +153,11 @@ class PrivacyReportViewModelTest {
         return DatabaseDateFormatter.bucketByHour(yesterday)
     }
 
-    private fun VpnTracker.asEntity(): AppTrackerEntity {
-        return AppTrackerEntity(
+    private fun VpnTracker.asEntity(): AppTrackerEntity =
+        AppTrackerEntity(
             trackerCompanyId = this.trackerCompanyId,
             entityName = "name",
             score = 0,
             signals = emptyList(),
         )
-    }
 }

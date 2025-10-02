@@ -24,11 +24,6 @@ import com.duckduckgo.feature.toggles.api.METRICS_PIXEL_PREFIX
 import com.duckduckgo.feature.toggles.api.MetricsPixel
 import com.duckduckgo.feature.toggles.api.MetricsPixelPlugin
 import com.squareup.anvil.annotations.ContributesMultibinding
-import java.time.LocalDate
-import java.time.ZoneId
-import java.time.ZonedDateTime
-import java.time.temporal.ChronoUnit
-import javax.inject.Inject
 import kotlinx.coroutines.runBlocking
 import logcat.logcat
 import okhttp3.Interceptor
@@ -36,6 +31,11 @@ import okhttp3.Protocol
 import okhttp3.Response
 import okhttp3.ResponseBody.Companion.toResponseBody
 import okio.ByteString.Companion.encode
+import java.time.LocalDate
+import java.time.ZoneId
+import java.time.ZonedDateTime
+import java.time.temporal.ChronoUnit
+import javax.inject.Inject
 
 @ContributesMultibinding(
     scope = AppScope::class,

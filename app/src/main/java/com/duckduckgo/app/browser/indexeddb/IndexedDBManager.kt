@@ -27,10 +27,10 @@ import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
-import java.io.File
-import javax.inject.Inject
 import kotlinx.coroutines.withContext
 import logcat.logcat
+import java.io.File
+import javax.inject.Inject
 
 interface IndexedDBManager {
     suspend fun clearIndexedDB()

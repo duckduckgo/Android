@@ -47,10 +47,10 @@ import com.duckduckgo.downloads.api.DownloadsFileActions
 import com.duckduckgo.downloads.api.model.DownloadItem
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.Snackbar
-import java.io.File
-import javax.inject.Inject
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
+import java.io.File
+import javax.inject.Inject
 
 @InjectWith(ActivityScope::class)
 @ContributeToActivityStarter(DownloadsScreenNoParams::class)

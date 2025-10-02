@@ -58,8 +58,6 @@ import com.duckduckgo.app.browser.defaultbrowsing.prompts.ui.DefaultBrowserBotto
 import com.duckduckgo.app.browser.defaultbrowsing.prompts.ui.DefaultBrowserBottomSheetDialog.EventListener
 import com.duckduckgo.app.browser.newaddressbaroption.NewAddressBarOptionManager
 import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
-import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition.BOTTOM
-import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition.TOP
 import com.duckduckgo.app.browser.shortcut.ShortcutBuilder
 import com.duckduckgo.app.browser.tabs.TabManager
 import com.duckduckgo.app.browser.tabs.TabManager.TabModel
@@ -96,6 +94,8 @@ import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.autofill.api.emailprotection.EmailProtectionLinkVerifier
 import com.duckduckgo.browser.api.ui.BrowserScreens.BookmarksScreenNoParams
 import com.duckduckgo.browser.api.ui.BrowserScreens.SettingsScreenNoParams
+import com.duckduckgo.browser.ui.omnibar.OmnibarPosition.BOTTOM
+import com.duckduckgo.browser.ui.omnibar.OmnibarPosition.TOP
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.tabs.SwipingTabsFeatureProvider
 import com.duckduckgo.common.ui.view.addBottomShadow
@@ -438,11 +438,11 @@ open class BrowserActivity : DuckDuckGoActivity() {
         super.onDestroy()
     }
 
-    override fun onNewIntent(intent: Intent?) {
+    override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
         logcat(INFO) { "onNewIntent: $intent" }
 
-        intent?.sanitize()
+        intent.sanitize()
 
         dataClearerForegroundAppRestartPixel.registerIntent(intent)
 
@@ -831,7 +831,9 @@ open class BrowserActivity : DuckDuckGoActivity() {
     }
 
     fun launchBookmarks() {
-        startBookmarksActivityForResult.launch(globalActivityStarter.startIntent(this, BookmarksScreenNoParams))
+        globalActivityStarter.startIntent(this, BookmarksScreenNoParams)?.let { intent ->
+            startBookmarksActivityForResult.launch(intent)
+        } ?: logcat(ERROR) { "Could not create intent to launch bookmarks" }
     }
 
     fun launchDownloads() {
@@ -1117,15 +1119,14 @@ open class BrowserActivity : DuckDuckGoActivity() {
         lifecycleScope.launch(dispatcherProvider.io()) {
             newAddressBarOptionManager.showChoiceScreen(
                 activity = this@BrowserActivity,
-                isLaunchedFromExternal =
-                    intent.getBooleanExtra(LAUNCH_FROM_EXTERNAL_EXTRA, false) ||
-                        intent.getBooleanExtra(LAUNCH_FROM_CLEAR_DATA_ACTION, false) ||
-                        intent.getBooleanExtra(NOTIFY_DATA_CLEARED_EXTRA, false) ||
-                        intent.getBooleanExtra(LAUNCH_FROM_INTERSTITIAL_EXTRA, false) ||
-                        intent.getBooleanExtra(OPEN_DUCK_CHAT, false) ||
-                        intent.getBooleanExtra(LAUNCH_FROM_FAVORITES_WIDGET, false) ||
-                        intent.getBooleanExtra(LAUNCH_FROM_BOOKMARKS_APP_SHORTCUT_EXTRA, false) ||
-                        intent.getBooleanExtra(NEW_SEARCH_EXTRA, false),
+                isLaunchedFromExternal = intent.getBooleanExtra(LAUNCH_FROM_EXTERNAL_EXTRA, false) ||
+                    intent.getBooleanExtra(LAUNCH_FROM_CLEAR_DATA_ACTION, false) ||
+                    intent.getBooleanExtra(NOTIFY_DATA_CLEARED_EXTRA, false) ||
+                    intent.getBooleanExtra(LAUNCH_FROM_INTERSTITIAL_EXTRA, false) ||
+                    intent.getBooleanExtra(OPEN_DUCK_CHAT, false) ||
+                    intent.getBooleanExtra(LAUNCH_FROM_FAVORITES_WIDGET, false) ||
+                    intent.getBooleanExtra(LAUNCH_FROM_BOOKMARKS_APP_SHORTCUT_EXTRA, false) ||
+                    intent.getBooleanExtra(NEW_SEARCH_EXTRA, false),
             )
         }
     }

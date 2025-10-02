@@ -39,8 +39,6 @@ import com.duckduckgo.sync.impl.ui.setup.SaveRecoveryCodeViewModel.Command.Recov
 import com.duckduckgo.sync.impl.ui.setup.SaveRecoveryCodeViewModel.Command.ShowMessage
 import com.duckduckgo.sync.impl.ui.setup.SaveRecoveryCodeViewModel.ViewMode.CreatingAccount
 import com.duckduckgo.sync.impl.ui.setup.SaveRecoveryCodeViewModel.ViewMode.SignedIn
-import java.io.File
-import javax.inject.*
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
@@ -48,6 +46,8 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
+import java.io.File
+import javax.inject.*
 
 @ContributesViewModel(ActivityScope::class)
 class SaveRecoveryCodeViewModel @Inject constructor(

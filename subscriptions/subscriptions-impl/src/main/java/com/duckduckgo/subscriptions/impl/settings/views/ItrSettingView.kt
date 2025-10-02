@@ -42,10 +42,10 @@ import com.duckduckgo.subscriptions.impl.settings.views.ItrSettingViewModel.View
 import com.duckduckgo.subscriptions.impl.settings.views.ItrSettingViewModel.ViewState.ItrState
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionsWebViewActivityWithParams
 import dagger.android.support.AndroidSupportInjection
-import javax.inject.Inject
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import javax.inject.Inject
 
 @InjectWith(ViewScope::class)
 class ItrSettingView @JvmOverloads constructor(

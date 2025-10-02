@@ -31,14 +31,14 @@ import com.duckduckgo.sync.store.SyncDatabase
 import com.duckduckgo.sync.store.model.GENERIC_FEATURE
 import com.duckduckgo.sync.store.model.SyncOperationErrorType
 import com.duckduckgo.sync.store.model.SyncOperationErrorType.DATA_PERSISTER_ERROR
-import java.time.LocalDate
-import java.time.format.DateTimeFormatter
-import java.util.Locale
 import org.junit.After
 import org.junit.Assert
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
+import java.util.Locale
 
 @RunWith(AndroidJUnit4::class)
 class SyncOperationErrorRepositoryTest {

@@ -776,36 +776,44 @@
     <string name="sslErrorUntrustedMessage" instruction="Placeholder is domain with certificate issues">Din enhets operativsystem litar inte på säkerhetscertifikatet för %1$s. Det är möjligt att webbplatsen är felkonfigurerad, att en angripare har gjort intrång i din anslutning eller att din systemklocka är felaktig.</string>
 
     <!-- Extended Onboarding-->
-    <string name="preOnboardingDaxDialog1Title"><![CDATA[Hej!<br/><br/>Är du redo för ett bättre, mer privat internet?]]></string>
+    <string name="preOnboardingDaxDialog1Title"><![CDATA[Hej!<br/><br/>Är du redo för en snabbare webbläsare som också skyddar dig?]]></string>
     <string name="preOnboardingDaxDialog1Button">Vi gör det!</string>
-    <string name="preOnboardingDaxDialog2Title">Integritetsskydd aktiverat!</string>
+    <string name="preOnboardingDaxDialog1SecondaryButton">Jag har varit här förut</string>
+    <string name="preOnboardingDaxDialog2Title">Skydd aktiverat!</string>
     <string name="preOnboardingDaxDialog2Button">Välj din webbläsare</string>
+    <string name="preOnboardingDaxDialog3Title"><![CDATA[Jag förstår! Jag hoppar över de andra tipsen.]]></string>
+    <string name="preOnboardingDaxDialog3Text"><![CDATA[Kom ihåg att du kan radera alla dina flikar, din historik och dina surfdata med två tryck på <b>Fire Button</b> 🔥]]></string>
+    <string name="preOnboardingDaxDialog3SecondaryButton">Visa handledning</string>
     <string name="preOnboardingComparisonChartItem1">Sök privat som standard</string>
     <string name="preOnboardingComparisonChartItem2">Blockera spårare från tredje part</string>
     <string name="preOnboardingComparisonChartItem3">Blockera popup-fönster för cookies</string>
     <string name="preOnboardingComparisonChartItem4">Blockera riktade annonser</string>
     <string name="preOnboardingComparisonChartItem5">Radera surfdata med en knapp</string>
-    <string name="preOnboardingDaxDialog3Title">Fantastiskt! Välkommen till Duck-sidan.</string>
     <string name="preOnboardingDaxDialog3Button">Börja bläddra</string>
+    <string name="preOnboardingAddressBarTitle">Var ska jag placera adressfältet?</string>
+    <string name="preOnboardingAddressBarOkButton">Nästa</string>
+    <string name="highlightsPreOnboardingAddressBarOption1Title">Överst (standard)</string>
+    <string name="highlightsPreOnboardingAddressBarOption1Description">Lätt att se</string>
+    <string name="highlightsPreOnboardingAddressBarOption2Title">Botten</string>
+    <string name="highlightsPreOnboardingAddressBarOption2Description">Lätt att nå</string>
     <string name="onboardingSearchDaxDialogTitle">Pröva att söka!</string>
-    <string name="onboardingSearchDaxDialogDescription">Dina DuckDuckGo-sökningar är alltid anonyma.</string>
-    <string name="onboardingSearchDaxDialogOption1" instruction="translate &apos;duck&apos; too.">hur säger man ”anka” på engelska</string>
-    <string name="onboardingSearchDaxDialogOption1English" instruction="translate &apos;duck&apos; too. Don&apos;t add question mark">vad heter ”anka” på spanska</string>
+    <string name="onboardingSearchDaxDialogDescription">Dina DuckDuckGo-sökningar är alltid privata.</string>
+    <string name="onboardingSearchDaxDialogOption1" instruction="translate &apos;duck&apos; too.">"hur säger man anka på engelska"</string>
+    <string name="onboardingSearchDaxDialogOption1English" instruction="translate &apos;duck&apos; too. Don&apos;t add question mark">"hur säger man anka på spanska"</string>
     <string name="onboardingSearchQueryOption1">hur säger man anka på engelska</string>
     <string name="onboardingSearchQueryOption1English">hur säger man anka på spanska</string>
     <string name="onboardingSearchDaxDialogOption2">rollbesättningen för avatar</string>
     <string name="onboardingSearchDaxDialogOption2US">medverkande i mighty ducks</string>
     <string name="onboardingSearchDaxDialogOption3">lokalt väder</string>
     <string name="onboardingSearchDaxDialogOption4">Överraska mig!</string>
-    <string name="onboardingSearchQueryOption4">middagsrecept</string>
-    <string name="onboardingSearchQueryOption4US">recept på chokladkakor</string>
+    <string name="onboardingSearchQueryOption4">ankungar</string>
     <string name="onboardingSitesDaxDialogTitle">Prova att besöka en webbplats!</string>
     <string name="onboardingSitesDaxDialogDescription">Jag blockerar spårare så att de inte kan spionera på dig.</string>
     <string name="onboardingSitesDaxDialogOption1">espn.com</string>
     <string name="onboardingSitesDaxDialogOption2">yahoo.com</string>
     <string name="onboardingSitesDaxDialogOption3">ebay.com</string>
     <string name="onboardingSitesDaxDialogOption4">Överraska mig!</string>
-    <string name="onboardingSerpDaxDialogDescription">Det är DuckDuckGo Search. Privat. Snabbt. Färre annonser.</string>
+    <string name="onboardingSerpDaxDialogDescription"><![CDATA[Det är <b>DuckDuckGo Search</b>! Privat. Snabbt. Färre annonser.]]></string>
     <string name="onboardingSerpDaxDialogButton">Jag förstår!</string>
     <string name="onboardingSitesSuggestionsDaxDialogTitle">Prova sedan att besöka en webbplats!</string>
     <plurals name="onboardingTrackersBlockedDialogDescription">
@@ -818,42 +826,20 @@
     </plurals>
     <string name="onboardingTrackersBlockedDaxDialogButton">Jag förstår!</string>
     <string name="onboardingFireButtonDaxDialogDescription"><![CDATA[Rensa omedelbart din surfaktivitet med <b>Fire Button</b>.<br/><br/>Prova!️ 🔥]]></string>
+    <string name="onboardingFireButtonDaxDialogOkButton">Prova</string>
+    <string name="onboardingFireButtonDaxDialogCancelButton">Hoppa över</string>
     <string name="onboardingEndDaxDialogTitle">"Du klarar det här!"</string>
-    <string name="onboardingEndDaxDialogDescription">Kom ihåg: varje gång du surfar med mig förlorar en läskig annons sina vingar. 👌</string>
-    <string name="onboardingEndDaxDialogButton">Allt klart!</string>
+    <string name="onboardingEndDaxDialogDescription">Kom ihåg: varje gång du surfar med mig förlorar en läskig annons sina vingar.</string>
+    <string name="onboardingInContextEndDaxDialogDescription">Kom ihåg: varje gång du surfar med mig förlorar en läskig annons sina vingar. 👌</string>
+    <string name="onboardingEndDaxDialogButton">High Five!</string>
     <string name="onboardingPrivacyProDaxDialogTitle">Innan jag glömmer det ...</string>
     <string name="onboardingPrivacyProDaxDialogDescription"><![CDATA[DuckDuckGo har också ett säkert <b>VPN + 2 premiumskydd till</b> som är tillgängliga med <b>valfritt betalt abonnemang</b>.]]></string>
     <string name="onboardingPrivacyProDaxDialogOkButton">Läs mer</string>
     <string name="onboardingPrivacyProDaxDialogFreeTrialOkButton">Prova gratis!</string>
     <string name="onboardingPrivacyProDaxDialogCancelButton">Hoppa över</string>
 
-    <!-- Highlight Onboarding Experiment-->
-    <string name="highlightsPreOnboardingDaxDialog1Title"><![CDATA[Hej!<br/><br/>Är du redo för en snabbare webbläsare som också skyddar dig?]]></string>
-    <string name="highlightsPreOnboardingDaxDialog2Title">Skydd aktiverat!</string>
-    <string name="highlightsPreOnboardingComparisonChartItem2">Blockera spårare från tredje part</string>
-    <string name="highlightsPreOnboardingComparisonChartItem3">Blockera cookieförfrågningar och popup-fönster</string>
-    <string name="highlightsPreOnboardingComparisonChartItem4">Blockera riktade annonser</string>
-    <string name="highlightsPreOnboardingComparisonChartItem5">Radera webbläsardata snabbt</string>
-    <string name="highlightsPreOnboardingSelectAppIconTitle">Vilken färg passar bäst på mig?</string>
-    <string name="highlightsPreOnboardingSelectAppIconDescription">Välj appikon:</string>
-    <string name="highlightsPreOnboardingSelectAppIconOkButton">Nästa</string>
-    <string name="highlightsPreOnboardingAddressBarTitle">Var ska jag placera adressfältet?</string>
-    <string name="highlightsPreOnboardingAddressBarOption1Title">Överst (standard)</string>
-    <string name="highlightsPreOnboardingAddressBarOption1Description">Lätt att se</string>
-    <string name="highlightsPreOnboardingAddressBarOkButton">Nästa</string>
-    <string name="highlightsPreOnboardingAddressBarOption2Title">Botten</string>
-    <string name="highlightsPreOnboardingAddressBarOption2Description">Lätt att nå</string>
-    <string name="highlightsOnboardingSearchQueryOption4">ankungar</string>
-    <string name="highlightsOnboardingSearchDaxDialogDescription">Dina DuckDuckGo-sökningar är alltid privata.</string>
-    <string name="highlightsOnboardingSerpDaxDialogDescription"><![CDATA[Det är <b>DuckDuckGo Search</b>! Privat. Snabbt. Färre annonser.]]></string>
-    <string name="highlightsOnboardingEndDaxDialogDescription">Kom ihåg: varje gång du surfar med mig förlorar en läskig annons sina vingar.</string>
-    <string name="highlightsOnboardingEndDaxDialogButton">High Five!</string>
-    <string name="onboardingFireButtonDaxDialogOkButton">Prova</string>
-    <string name="onboardingFireButtonDaxDialogCancelButton">Hoppa över</string>
-    <string name="preOnboardingDaxDialog1SecondaryButton">Jag har varit här förut</string>
-    <string name="highlightsPreOnboardingDaxDialog3Title"><![CDATA[Jag förstår! Jag hoppar över de andra tipsen.]]></string>
-    <string name="highlightsPreOnboardingDaxDialog3Text"><![CDATA[Kom ihåg att du kan radera alla dina flikar, din historik och dina surfdata med två tryck på <b>Fire Button</b> 🔥]]></string>
-    <string name="preOnboardingDaxDialog3SecondaryButton">Visa handledning</string>
+    <!-- Bubble BB & Buck experiment-->
+    <string name="onboardingBubbleExperimentSearchDaxDialogDescription">Dina DuckDuckGo-sökningar är alltid anonyma.</string>
 
     <!-- Appearance settings -->
     <string name="settingsAddressBarPositionTitle">Adressfält</string>

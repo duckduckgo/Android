@@ -26,9 +26,9 @@ import com.duckduckgo.navigation.api.GlobalActivityStarter.ActivityParams
 import com.duckduckgo.navigation.api.GlobalActivityStarter.DeeplinkActivityParams
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
+import logcat.logcat
 import java.lang.IllegalArgumentException
 import javax.inject.Inject
-import logcat.logcat
 
 @ContributesBinding(AppScope::class)
 @SingleInstanceIn(AppScope::class)

@@ -25,8 +25,8 @@ import com.duckduckgo.remote.messaging.api.Content
 import com.duckduckgo.remote.messaging.api.RemoteMessage
 import com.duckduckgo.remote.messaging.api.RemoteMessagingRepository
 import dagger.SingleInstanceIn
-import javax.inject.Inject
 import kotlinx.coroutines.withContext
+import javax.inject.Inject
 
 @SingleInstanceIn(ViewScope::class)
 class RemoteMessagingViewModel @Inject constructor(

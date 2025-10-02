@@ -27,9 +27,9 @@ import com.duckduckgo.site.permissions.api.SitePermissionsManager.LocationPermis
 import com.duckduckgo.site.permissions.api.SitePermissionsManager.SitePermissionQueryResponse
 import com.duckduckgo.site.permissions.api.SitePermissionsManager.SitePermissions
 import com.squareup.anvil.annotations.ContributesBinding
-import javax.inject.Inject
 import kotlinx.coroutines.withContext
 import logcat.logcat
+import javax.inject.Inject
 
 // Cannot be a Singleton
 @ContributesBinding(AppScope::class)

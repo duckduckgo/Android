@@ -29,10 +29,10 @@ import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.adapters.PolymorphicJsonAdapterFactory
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
-import javax.inject.Inject
 import kotlinx.coroutines.withContext
 import logcat.LogPriority.ERROR
 import logcat.logcat
+import javax.inject.Inject
 
 interface BrokerStepsParser {
     /**

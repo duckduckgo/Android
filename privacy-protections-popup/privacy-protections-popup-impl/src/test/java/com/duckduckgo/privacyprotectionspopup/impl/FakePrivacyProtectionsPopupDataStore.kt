@@ -18,10 +18,10 @@ package com.duckduckgo.privacyprotectionspopup.impl
 
 import com.duckduckgo.privacyprotectionspopup.impl.store.PrivacyProtectionsPopupData
 import com.duckduckgo.privacyprotectionspopup.impl.store.PrivacyProtectionsPopupDataStore
-import java.time.Instant
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
+import java.time.Instant
 
 class FakePrivacyProtectionsPopupDataStore : PrivacyProtectionsPopupDataStore {
 

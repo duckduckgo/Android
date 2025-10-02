@@ -35,9 +35,9 @@ import com.squareup.anvil.annotations.ContributesMultibinding
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
-import javax.inject.*
 import logcat.LogPriority.INFO
 import logcat.logcat
+import javax.inject.*
 
 @ContributesMultibinding(scope = AppScope::class, boundType = SyncableDataPersister::class)
 class CredentialsSyncDataPersister @Inject constructor(
@@ -162,6 +162,7 @@ data class CredentialsSyncRemoteUpdates(
     val credentials: credentialsSyncEntries,
 )
 
+@Suppress("ktlint:standard:class-naming")
 data class credentialsSyncEntries(
     val entries: List<CredentialsSyncEntryResponse>,
     val last_modified: String,

@@ -32,14 +32,14 @@ import com.wireguard.config.Peer
 import com.wireguard.crypto.KeyPair
 import dagger.Module
 import dagger.Provides
+import logcat.LogPriority.ERROR
+import logcat.asLog
+import logcat.logcat
 import java.io.BufferedReader
 import java.io.StringReader
 import java.net.InetAddress
 import javax.inject.Inject
 import javax.inject.Qualifier
-import logcat.LogPriority.ERROR
-import logcat.asLog
-import logcat.logcat
 
 /**
  * This class exposes a read-write version of the WG config

@@ -32,7 +32,6 @@ import com.duckduckgo.pir.impl.models.ProfileQuery
 import com.duckduckgo.pir.impl.scan.PirForegroundScanService
 import com.duckduckgo.pir.impl.scan.PirScanScheduler
 import com.duckduckgo.pir.impl.store.PirRepository
-import java.time.LocalDateTime
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -46,6 +45,7 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
+import java.time.LocalDateTime
 
 @RunWith(AndroidJUnit4::class)
 class PirWebSaveProfileMessageHandlerTest {

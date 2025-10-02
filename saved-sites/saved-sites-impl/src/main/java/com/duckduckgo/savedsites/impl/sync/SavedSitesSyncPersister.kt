@@ -31,9 +31,9 @@ import com.squareup.anvil.annotations.ContributesMultibinding
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
-import javax.inject.Inject
 import logcat.LogPriority.INFO
 import logcat.logcat
+import javax.inject.Inject
 
 @ContributesMultibinding(scope = AppScope::class, boundType = SyncableDataPersister::class)
 class SavedSitesSyncPersister @Inject constructor(
@@ -133,7 +133,7 @@ class SavedSitesSyncPersister @Inject constructor(
         }
         logcat(INFO) {
             """
-            Sync-Bookmarks: updating client last_modified from ${savedSitesSyncStore.clientModifiedSince} 
+            Sync-Bookmarks: updating client last_modified from ${savedSitesSyncStore.clientModifiedSince}
             to ${savedSitesSyncStore.startTimeStamp}
             """.trimIndent()
         }

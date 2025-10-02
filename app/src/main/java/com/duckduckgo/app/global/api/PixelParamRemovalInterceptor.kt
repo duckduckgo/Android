@@ -32,9 +32,9 @@ import com.duckduckgo.common.utils.plugins.pixel.PixelParamRemovalPlugin.PixelPa
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.site.permissions.impl.SitePermissionsPixelName
 import com.squareup.anvil.annotations.ContributesMultibinding
-import javax.inject.Inject
 import okhttp3.Interceptor
 import okhttp3.Response
+import javax.inject.Inject
 
 @ContributesMultibinding(
     scope = AppScope::class,

@@ -34,9 +34,9 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import dagger.android.support.AndroidSupportInjection
+import logcat.logcat
 import java.io.File
 import javax.inject.Inject
-import logcat.logcat
 
 @InjectWith(FragmentScope::class)
 class DownloadConfirmationFragment : BottomSheetDialogFragment() {

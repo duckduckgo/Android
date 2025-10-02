@@ -1,0 +1,9 @@
+appId: com.duckduckgo.mobile.android
+---
+# enable bottom address bar
+- runFlow: ../../shared/open_appearance_settings_screen.yaml
+- tapOn: "Address Bar"
+- tapOn: "Bottom"
+- tapOn: "Save"
+- action: back
+- action: back

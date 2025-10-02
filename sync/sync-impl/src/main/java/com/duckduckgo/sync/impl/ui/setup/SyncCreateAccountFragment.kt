@@ -43,9 +43,9 @@ import com.duckduckgo.sync.impl.ui.setup.SyncCreateAccountViewModel.ViewMode.Cre
 import com.duckduckgo.sync.impl.ui.setup.SyncCreateAccountViewModel.ViewMode.SignedIn
 import com.duckduckgo.sync.impl.ui.setup.SyncCreateAccountViewModel.ViewState
 import com.google.android.material.snackbar.Snackbar
-import javax.inject.*
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import javax.inject.*
 
 @InjectWith(FragmentScope::class)
 class SyncCreateAccountFragment : DuckDuckGoFragment(R.layout.fragment_create_account) {

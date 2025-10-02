@@ -25,8 +25,8 @@ import com.duckduckgo.feature.toggles.api.Toggle.DefaultValue
 import com.duckduckgo.pir.api.PirFeature
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
-import javax.inject.Inject
 import kotlinx.coroutines.withContext
+import javax.inject.Inject
 
 @ContributesRemoteFeature(
     scope = AppScope::class,

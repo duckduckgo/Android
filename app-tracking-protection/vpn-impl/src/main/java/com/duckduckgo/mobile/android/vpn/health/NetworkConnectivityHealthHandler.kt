@@ -30,11 +30,6 @@ import com.duckduckgo.mobile.android.vpn.service.VpnServiceCallbacks
 import com.duckduckgo.mobile.android.vpn.service.connectivity.VpnConnectivityLossListenerPlugin
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor
 import com.squareup.anvil.annotations.ContributesMultibinding
-import java.net.InetSocketAddress
-import java.net.Socket
-import java.nio.channels.SocketChannel
-import javax.inject.Inject
-import javax.inject.Provider
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
@@ -42,6 +37,11 @@ import kotlinx.coroutines.launch
 import logcat.LogPriority.ERROR
 import logcat.asLog
 import logcat.logcat
+import java.net.InetSocketAddress
+import java.net.Socket
+import java.nio.channels.SocketChannel
+import javax.inject.Inject
+import javax.inject.Provider
 
 // We use an IP address instead of a domain name to skip DNS resolution
 private const val PROBED_ADDRESS = "1.1.1.1"

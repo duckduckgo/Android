@@ -17,14 +17,14 @@
 package com.duckduckgo.networkprotection.impl.connectionclass
 
 import com.duckduckgo.app.di.AppCoroutineScope
-import java.util.concurrent.atomic.AtomicReference
-import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
+import java.util.concurrent.atomic.AtomicReference
+import javax.inject.Inject
 
 class ConnectionClassManager @Inject constructor(
     private val latencyMeasurements: ExponentialGeometricAverage,

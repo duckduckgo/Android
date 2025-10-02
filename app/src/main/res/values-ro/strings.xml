@@ -790,36 +790,44 @@
     <string name="sslErrorUntrustedMessage" instruction="Placeholder is domain with certificate issues">Sistemul de operare al dispozitivului tău nu are încredere în certificatul de securitate pentru %1$s. Este posibil ca site-ul web să fie configurat greșit, ca un atacator să-ți fi compromis conexiunea sau ca ceasul sistemului tău să fie incorect.</string>
 
     <!-- Extended Onboarding-->
-    <string name="preOnboardingDaxDialog1Title"><![CDATA[Salut!<br/><br/>Ești gata pentru un internet mai bun și mai privat?]]></string>
+    <string name="preOnboardingDaxDialog1Title"><![CDATA[Salut!<br/><br/>Ești gata pentru un browser mai rapid care îți asigură protecție?]]></string>
     <string name="preOnboardingDaxDialog1Button">Hai să o facem!</string>
-    <string name="preOnboardingDaxDialog2Title">Măsurile de protecție a confidențialității au fost activate!</string>
+    <string name="preOnboardingDaxDialog1SecondaryButton">Am mai fost aici</string>
+    <string name="preOnboardingDaxDialog2Title">Mecanismele de protecție au fost activate!</string>
     <string name="preOnboardingDaxDialog2Button">Alege browserul</string>
+    <string name="preOnboardingDaxDialog3Title"><![CDATA[Am înțeles! Voi omite celelalte sfaturi.]]></string>
+    <string name="preOnboardingDaxDialog3Text"><![CDATA[Nu uita: poți șterge toate filele, istoricul și datele de navigare în doar două atingeri, cu <b>Fire Button</b> 🔥]]></string>
+    <string name="preOnboardingDaxDialog3SecondaryButton">Afișează tutorialul</string>
     <string name="preOnboardingComparisonChartItem1">Caută implicit în mod privat</string>
     <string name="preOnboardingComparisonChartItem2">Blochează tehnologiile de urmărire terțe</string>
     <string name="preOnboardingComparisonChartItem3">Blochează ferestrele pop-up privind modulele cookie</string>
     <string name="preOnboardingComparisonChartItem4">Blochează reclamele direcționate</string>
     <string name="preOnboardingComparisonChartItem5">Șterge datele de navigare cu un singur buton</string>
-    <string name="preOnboardingDaxDialog3Title">Super! Bine ai venit de cealaltă parte!</string>
     <string name="preOnboardingDaxDialog3Button">Începe navigarea</string>
+    <string name="preOnboardingAddressBarTitle">Unde ar trebui să îți pun bara de adrese?</string>
+    <string name="preOnboardingAddressBarOkButton">Următorul</string>
+    <string name="highlightsPreOnboardingAddressBarOption1Title">Sus (implicit)</string>
+    <string name="highlightsPreOnboardingAddressBarOption1Description">Ușor de văzut</string>
+    <string name="highlightsPreOnboardingAddressBarOption2Title">Partea de jos</string>
+    <string name="highlightsPreOnboardingAddressBarOption2Description">Ușor de accesat</string>
     <string name="onboardingSearchDaxDialogTitle">Încearcă o căutare!</string>
-    <string name="onboardingSearchDaxDialogDescription">Căutările tale DuckDuckGo sunt întotdeauna anonime.</string>
-    <string name="onboardingSearchDaxDialogOption1" instruction="translate &apos;duck&apos; too.">cum se spune „rață” în engleză</string>
-    <string name="onboardingSearchDaxDialogOption1English" instruction="translate &apos;duck&apos; too. Don&apos;t add question mark">cum se spune „rață” în spaniolă</string>
+    <string name="onboardingSearchDaxDialogDescription">Căutările tale DuckDuckGo sunt întotdeauna private.</string>
+    <string name="onboardingSearchDaxDialogOption1" instruction="translate &apos;duck&apos; too.">"cum se spune rață în engleză"</string>
+    <string name="onboardingSearchDaxDialogOption1English" instruction="translate &apos;duck&apos; too. Don&apos;t add question mark">"cum se spune rață în spaniolă"</string>
     <string name="onboardingSearchQueryOption1">cum se spune rață în engleză</string>
     <string name="onboardingSearchQueryOption1English">cum se spune rață în spaniolă</string>
     <string name="onboardingSearchDaxDialogOption2">distribuția din avatar</string>
     <string name="onboardingSearchDaxDialogOption2US">distribuție mighty ducks</string>
     <string name="onboardingSearchDaxDialogOption3">vremea locală</string>
     <string name="onboardingSearchDaxDialogOption4">Surprinde-mă!</string>
-    <string name="onboardingSearchQueryOption4">rețete pentru cină</string>
-    <string name="onboardingSearchQueryOption4US">rețete de fursecuri cu fulgi de ciocolată</string>
+    <string name="onboardingSearchQueryOption4">rățuște</string>
     <string name="onboardingSitesDaxDialogTitle">Încearcă să vizitezi un site!</string>
     <string name="onboardingSitesDaxDialogDescription">Voi bloca instrumentele de urmărire ca să nu te mai spioneze.</string>
     <string name="onboardingSitesDaxDialogOption1">espn.com</string>
     <string name="onboardingSitesDaxDialogOption2">yahoo.com</string>
     <string name="onboardingSitesDaxDialogOption3">ebay.com</string>
     <string name="onboardingSitesDaxDialogOption4">Surprinde-mă!</string>
-    <string name="onboardingSerpDaxDialogDescription">Acesta este DuckDuckGo Search. Privat. Rapid. Mai puține reclame.</string>
+    <string name="onboardingSerpDaxDialogDescription"><![CDATA[Acesta este <b>DuckDuckGo Search</b>! Privat. Rapid. Mai puține reclame.]]></string>
     <string name="onboardingSerpDaxDialogButton">Am înțeles!</string>
     <string name="onboardingSitesSuggestionsDaxDialogTitle">Apoi, încearcă să vizitezi un site!</string>
     <plurals name="onboardingTrackersBlockedDialogDescription">
@@ -834,42 +842,20 @@
     </plurals>
     <string name="onboardingTrackersBlockedDaxDialogButton">Am înțeles!</string>
     <string name="onboardingFireButtonDaxDialogDescription"><![CDATA[Șterge-ți instantaneu activitatea de navigare cu <b>Fire Button</b>.<br/><br/>Încearcă! 🔥]]></string>
+    <string name="onboardingFireButtonDaxDialogOkButton">Încearcă-l</string>
+    <string name="onboardingFireButtonDaxDialogCancelButton">Ignorare</string>
     <string name="onboardingEndDaxDialogTitle">"Ai ghicit!"</string>
-    <string name="onboardingEndDaxDialogDescription">Reține: de fiecare dată când navighezi cu mine, o reclamă terifiantă își pierde aripile. 👌</string>
-    <string name="onboardingEndDaxDialogButton">Gata!</string>
+    <string name="onboardingEndDaxDialogDescription">Reține: de fiecare dată când navighezi cu mine, o reclamă terifiantă își pierde aripile.</string>
+    <string name="onboardingInContextEndDaxDialogDescription">Reține: de fiecare dată când navighezi cu mine, o reclamă terifiantă își pierde aripile. 👌</string>
+    <string name="onboardingEndDaxDialogButton">Bate palma!</string>
     <string name="onboardingPrivacyProDaxDialogTitle">Oh, înainte să uit...</string>
     <string name="onboardingPrivacyProDaxDialogDescription"><![CDATA[DuckDuckGo are și un <b>VPN securizat + 2 protecții premium suplimentare</b>, disponibile cu un <b>abonament opțional cu plată</b>.]]></string>
     <string name="onboardingPrivacyProDaxDialogOkButton">Află mai multe</string>
     <string name="onboardingPrivacyProDaxDialogFreeTrialOkButton">Încearcă gratuit!</string>
     <string name="onboardingPrivacyProDaxDialogCancelButton">Ignorare</string>
 
-    <!-- Highlight Onboarding Experiment-->
-    <string name="highlightsPreOnboardingDaxDialog1Title"><![CDATA[Salut!<br/><br/>Ești gata pentru un browser mai rapid care îți asigură protecția?]]></string>
-    <string name="highlightsPreOnboardingDaxDialog2Title">Mecanismele de protecție au fost activate!</string>
-    <string name="highlightsPreOnboardingComparisonChartItem2">Blochează tehnologiile de urmărire externe</string>
-    <string name="highlightsPreOnboardingComparisonChartItem3">Blochează solicitările modulelor cookie și ferestrele pop-up</string>
-    <string name="highlightsPreOnboardingComparisonChartItem4">Blochează reclamele direcționate</string>
-    <string name="highlightsPreOnboardingComparisonChartItem5">Șterge rapid datele de navigare</string>
-    <string name="highlightsPreOnboardingSelectAppIconTitle">Care culoare arată cel mai bine pentru mine?</string>
-    <string name="highlightsPreOnboardingSelectAppIconDescription">Alege pictograma aplicației:</string>
-    <string name="highlightsPreOnboardingSelectAppIconOkButton">Următorul</string>
-    <string name="highlightsPreOnboardingAddressBarTitle">Unde ar trebui să îți pun bara de adrese?</string>
-    <string name="highlightsPreOnboardingAddressBarOption1Title">Sus (implicit)</string>
-    <string name="highlightsPreOnboardingAddressBarOption1Description">Ușor de văzut</string>
-    <string name="highlightsPreOnboardingAddressBarOkButton">Următorul</string>
-    <string name="highlightsPreOnboardingAddressBarOption2Title">Partea de jos</string>
-    <string name="highlightsPreOnboardingAddressBarOption2Description">Ușor de accesat</string>
-    <string name="highlightsOnboardingSearchQueryOption4">rățuște</string>
-    <string name="highlightsOnboardingSearchDaxDialogDescription">Căutările tale DuckDuckGo sunt întotdeauna private.</string>
-    <string name="highlightsOnboardingSerpDaxDialogDescription"><![CDATA[Acesta este <b>DuckDuckGo Search</b>! Privat. Rapid. Mai puține reclame.]]></string>
-    <string name="highlightsOnboardingEndDaxDialogDescription">Reține: de fiecare dată când navighezi cu mine, o reclamă terifiantă își pierde aripile.</string>
-    <string name="highlightsOnboardingEndDaxDialogButton">Bate palma!</string>
-    <string name="onboardingFireButtonDaxDialogOkButton">Încearcă-l</string>
-    <string name="onboardingFireButtonDaxDialogCancelButton">Ignorare</string>
-    <string name="preOnboardingDaxDialog1SecondaryButton">Am mai fost aici</string>
-    <string name="highlightsPreOnboardingDaxDialog3Title"><![CDATA[Am înțeles! Voi omite celelalte sfaturi.]]></string>
-    <string name="highlightsPreOnboardingDaxDialog3Text"><![CDATA[Nu uita: poți șterge toate filele, istoricul și datele de navigare în doar două atingeri, cu <b>Fire Button</b> 🔥]]></string>
-    <string name="preOnboardingDaxDialog3SecondaryButton">Afișează tutorialul</string>
+    <!-- Bubble BB & Buck experiment-->
+    <string name="onboardingBubbleExperimentSearchDaxDialogDescription">Căutările tale DuckDuckGo sunt întotdeauna anonime.</string>
 
     <!-- Appearance settings -->
     <string name="settingsAddressBarPositionTitle">Bara de adrese</string>

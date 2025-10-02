@@ -20,9 +20,9 @@ import android.content.Context
 import com.duckduckgo.anvil.annotations.PriorityKey
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.internal.features.api.InternalFeaturePlugin
-import com.duckduckgo.mobile.android.R as CommonR
 import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
+import com.duckduckgo.mobile.android.R as CommonR
 
 @ContributesMultibinding(AppScope::class)
 @PriorityKey(InternalFeaturePlugin.ADS_SETTINGS_PRIO_KEY)

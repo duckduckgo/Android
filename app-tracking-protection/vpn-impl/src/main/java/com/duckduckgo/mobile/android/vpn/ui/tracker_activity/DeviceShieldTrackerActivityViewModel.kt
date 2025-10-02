@@ -32,15 +32,15 @@ import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnState
 import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository
 import com.duckduckgo.mobile.android.vpn.ui.onboarding.VpnStore
-import java.util.*
-import java.util.concurrent.TimeUnit
-import javax.inject.Inject
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.util.*
+import java.util.concurrent.TimeUnit
+import javax.inject.Inject
 
 @ContributesViewModel(ActivityScope::class)
 class DeviceShieldTrackerActivityViewModel @Inject constructor(

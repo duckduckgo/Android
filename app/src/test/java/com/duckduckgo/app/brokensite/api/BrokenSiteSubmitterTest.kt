@@ -45,9 +45,6 @@ import com.duckduckgo.privacy.config.api.PrivacyFeatureName
 import com.duckduckgo.privacy.config.api.UnprotectedTemporary
 import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupExperimentExternalPixels
 import com.squareup.moshi.Moshi
-import java.time.ZoneId
-import java.time.ZonedDateTime
-import java.util.*
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runTest
@@ -63,6 +60,9 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
+import java.time.ZoneId
+import java.time.ZonedDateTime
+import java.util.*
 
 @RunWith(AndroidJUnit4::class)
 @SuppressLint("DenyListedApi")

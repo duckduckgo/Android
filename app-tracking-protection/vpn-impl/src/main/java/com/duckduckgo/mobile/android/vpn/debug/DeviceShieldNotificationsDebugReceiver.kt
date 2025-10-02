@@ -31,10 +31,10 @@ import com.duckduckgo.common.utils.notification.checkPermissionAndNotify
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.mobile.android.vpn.ui.notification.*
 import com.squareup.anvil.annotations.ContributesMultibinding
-import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import logcat.logcat
+import javax.inject.Inject
 
 /**
  * This receiver allows to trigger appTP notifications, to do so, in the command line:
