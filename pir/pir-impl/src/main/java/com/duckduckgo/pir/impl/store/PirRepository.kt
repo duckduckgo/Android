@@ -49,9 +49,12 @@ import com.duckduckgo.pir.impl.store.db.UserName
 import com.duckduckgo.pir.impl.store.db.UserProfile
 import com.duckduckgo.pir.impl.store.db.UserProfileDao
 import com.squareup.moshi.Moshi
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
+import logcat.logcat
 import java.util.concurrent.TimeUnit
 
 interface PirRepository {
@@ -482,38 +485,52 @@ internal class RealPirRepository(
 
     override suspend fun getEmailConfirmationLinkStatus(emailData: List<EmailData>): Map<EmailData, ConfirmationStatus> =
         withContext(dispatcherProvider.io()) {
-            return@withContext dbpService.getEmailConfirmationLinkStatus(emailData.toRequest()).items.associate { response ->
-                val key =
-                    EmailData(
-                        email = response.email,
-                        attemptId = response.attemptId,
-                    )
-                val value =
-                    when (response.status) {
-                        "ready" ->
-                            Ready(
-                                data =
-                                response.data.associate {
-                                    it.name to it.value
-                                },
+            val batchedEmailData = emailData.chunked(EMAIL_DATA_BATCH_SIZE)
+            logcat { "PIR-EMAIL-CONFIRMATION: total size to fetch: ${emailData.size}" }
+            return@withContext batchedEmailData.map { emailDataSubList ->
+                logcat { "PIR-EMAIL-CONFIRMATION: batch size to fetch: ${emailDataSubList.size}" }
+                async {
+                    dbpService.getEmailConfirmationLinkStatus(emailDataSubList.toRequest()).items.associate { response ->
+                        val key =
+                            EmailData(
+                                email = response.email,
+                                attemptId = response.attemptId,
                             )
+                        val value =
+                            when (response.status) {
+                                "ready" ->
+                                    Ready(
+                                        data =
+                                        response.data.associate {
+                                            it.name to it.value
+                                        },
+                                    )
 
-                        "error" ->
-                            Error(
-                                errorCode = response.errorCode.orEmpty(),
-                                error = response.error.orEmpty(),
-                            )
+                                "error" ->
+                                    Error(
+                                        errorCode = response.errorCode.orEmpty(),
+                                        error = response.error.orEmpty(),
+                                    )
 
-                        "pending" -> Pending
-                        else -> Unknown
+                                "pending" -> Pending
+                                else -> Unknown
+                            }
+                        key to value
                     }
-                key to value
-            }
+                }
+            }.awaitAll().reduce { acc, map -> acc + map }
         }
 
     override suspend fun deleteEmailData(emailData: List<EmailData>) =
         withContext(dispatcherProvider.io()) {
-            dbpService.deleteEmailData(emailData.toRequest())
+            logcat { "PIR-EMAIL-CONFIRMATION: total size to delete: ${emailData.size}" }
+            emailData
+                .chunked(EMAIL_DATA_BATCH_SIZE)
+                .forEach { batch ->
+                    logcat { "PIR-EMAIL-CONFIRMATION: batch size to delete: ${batch.size}" }
+                    dbpService.deleteEmailData(batch.toRequest())
+                }
+            return@withContext
         }
 
     private fun List<EmailData>.toRequest(): PirEmailConfirmationDataRequest =
@@ -593,4 +610,8 @@ internal class RealPirRepository(
             ),
             birthYear = this.birthYear,
         )
+
+    companion object {
+        private const val EMAIL_DATA_BATCH_SIZE = 100
+    }
 }
