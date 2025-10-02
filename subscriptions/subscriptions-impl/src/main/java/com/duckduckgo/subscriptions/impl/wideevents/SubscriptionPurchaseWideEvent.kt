@@ -271,6 +271,7 @@ class SubscriptionPurchaseWideEventImpl @Inject constructor(
 
         if (oldStatus == SubscriptionStatus.WAITING && newStatus?.isActive() == true) {
             val wideEventId = getCurrentWideEventId() ?: return
+            wideEventClient.intervalEnd(wideEventId = wideEventId, key = KEY_ACTIVATION_LATENCY_MS_BUCKETED)
             wideEventClient.flowFinish(wideEventId = wideEventId, status = FlowStatus.Success)
             cachedFlowId = null
         }
