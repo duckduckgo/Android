@@ -137,6 +137,13 @@ interface JobRecordUpdater {
     suspend fun updateOptOutError(extractedProfileId: Long)
 
     suspend fun markOptOutAsWaitingForEmailConfirmation(extractedProfileId: Long)
+
+    suspend fun recordEmailConfirmationFetchAttempt(extractedProfileId: Long)
+
+    suspend fun markEmailConfirmationWithLink(
+        extractedProfileId: Long,
+        link: String,
+    )
 }
 
 @ContributesBinding(AppScope::class)
@@ -297,6 +304,42 @@ class RealJobRecordUpdater @Inject constructor(
                         },
                 )
             }
+        }
+    }
+
+    override suspend fun recordEmailConfirmationFetchAttempt(extractedProfileId: Long) {
+        schedulingRepository.getEmailConfirmationJob(extractedProfileId)?.also {
+            schedulingRepository.saveEmailConfirmationJobRecord(
+                it
+                    .copy(
+                        linkFetchData =
+                        it.linkFetchData.copy(
+                            linkFetchAttemptCount = it.linkFetchData.linkFetchAttemptCount + 1,
+                            lastLinkFetchDateInMillis = currentTimeProvider.currentTimeMillis(),
+                        ),
+                    ).also {
+                        logcat { "PIR-JOB-RECORD: Updating EmailConfirmation for $extractedProfileId to $it" }
+                    },
+            )
+        }
+    }
+
+    override suspend fun markEmailConfirmationWithLink(
+        extractedProfileId: Long,
+        link: String,
+    ) {
+        schedulingRepository.getEmailConfirmationJob(extractedProfileId)?.also {
+            schedulingRepository.saveEmailConfirmationJobRecord(
+                it
+                    .copy(
+                        linkFetchData =
+                        it.linkFetchData.copy(
+                            emailConfirmationLink = link,
+                        ),
+                    ).also {
+                        logcat { "PIR-JOB-RECORD: Updating EmailConfirmation for $extractedProfileId to $it" }
+                    },
+            )
         }
     }
 

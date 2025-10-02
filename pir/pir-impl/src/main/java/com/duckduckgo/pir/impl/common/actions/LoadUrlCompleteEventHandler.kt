@@ -59,7 +59,8 @@ class LoadUrlCompleteEventHandler @Inject constructor() : EventHandler {
         return when (actualEvent.url) {
             DBP_INITIAL_URL -> {
                 Next(
-                    nextState = state.copy(
+                    nextState =
+                    state.copy(
                         currentBrokerStepIndex = 0,
                         currentActionIndex = 0,
                         pendingUrl = null,
@@ -72,10 +73,11 @@ class LoadUrlCompleteEventHandler @Inject constructor() : EventHandler {
                 logcat { "PIR-RUNNER ($this): Completing broker due to recovery" }
                 // nextCommand(BrokerCompleted(commandsFlow.value.state, isSuccess = false))
                 Next(
-                    nextState = state.copy(
+                    nextState =
+                    state.copy(
                         pendingUrl = null,
                     ),
-                    nextEvent = BrokerStepCompleted(false),
+                    nextEvent = BrokerStepCompleted(needsEmailConfirmation = false, isSuccess = false),
                 )
             }
 
@@ -84,12 +86,14 @@ class LoadUrlCompleteEventHandler @Inject constructor() : EventHandler {
                 // Sometimes the loaded url gets redirected to another url (could be different domain too) so we can't really check here.
                 logcat { "PIR-RUNNER ($this): Completed loading for ${event.url}" }
                 Next(
-                    nextState = state.copy(
+                    nextState =
+                    state.copy(
                         currentActionIndex = state.currentActionIndex + 1,
                         actionRetryCount = 0,
                         pendingUrl = null,
                     ),
-                    nextEvent = ExecuteBrokerStepAction(
+                    nextEvent =
+                    ExecuteBrokerStepAction(
                         UserProfile(
                             userProfile = state.profileQuery,
                         ),

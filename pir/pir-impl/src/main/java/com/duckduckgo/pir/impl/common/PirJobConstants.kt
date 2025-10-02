@@ -21,4 +21,5 @@ object PirJobConstants {
     const val RECOVERY_URL = "https://duckduckgo.com/"
     const val MAX_DETACHED_WEBVIEW_COUNT = 20
     const val SCHEDULED_SCAN_INTERVAL_HOURS = 12L
+    const val EMAIL_CONFIRMATION_INTERVAL_HOURS = 8L
 }
