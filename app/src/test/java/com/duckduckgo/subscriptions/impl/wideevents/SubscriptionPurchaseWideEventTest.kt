@@ -31,7 +31,6 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.*
-import java.time.Duration
 
 class SubscriptionPurchaseWideEventTest {
     @get:Rule
@@ -68,11 +67,10 @@ class SubscriptionPurchaseWideEventTest {
             verify(wideEventClient).flowStart(
                 name = "subscription-purchase",
                 flowEntryPoint = "app_settings",
-                metadata =
-                    mapOf(
-                        "subscription_identifier" to "sub_id",
-                        "free_trial_eligible" to "true",
-                    ),
+                metadata = mapOf(
+                    "subscription_identifier" to "sub_id",
+                    "free_trial_eligible" to "true",
+                ),
                 cleanupPolicy = CleanupPolicy.OnProcessStart(ignoreIfIntervalTimeoutPresent = true),
             )
         }
