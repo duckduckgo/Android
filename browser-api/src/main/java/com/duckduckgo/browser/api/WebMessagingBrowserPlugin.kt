@@ -16,8 +16,17 @@
 
 package com.duckduckgo.browser.api
 
+import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.js.messaging.api.WebMessaging
 
+/**
+ * Interface to provide implementations of [WebMessaging] to the browser, through
+ * [PluginPoint]<[WebMessaging]>
+ */
 interface WebMessagingBrowserPlugin {
+    /**
+     * Provides an implementation of [WebMessaging] to be used by the browser.
+     * @return an instance of [WebMessaging]
+     */
     fun webMessaging(): WebMessaging
 }

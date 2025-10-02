@@ -19,18 +19,43 @@ package com.duckduckgo.js.messaging.api
 import android.webkit.WebView
 
 interface WebMessaging {
+    /**
+     * Registers the given [jsMessageCallback] to handle messages from the provided [webView].
+     * @param jsMessageCallback the callback to handle incoming messages
+     * @param webView the WebView to register the callback with
+     * Notes:
+     * - It's not recommended to unregister and then register again on the same WebView instance.
+     */
     suspend fun register(
         jsMessageCallback: WebViewCompatMessageCallback,
         webView: WebView,
     )
 
+    /**
+     * Unregisters any previously registered message handlers from the given [webView].
+     * Notes:
+     * - This does not remove the JavaScript interface from the WebView, just the handlers.
+     * - It's not required to call this when the WebView is being destroyed.
+     * - It's not recommended to unregister and then register again on the same WebView instance.
+     * @param webView the WebView to unregister the handlers from
+     */
     suspend fun unregister(webView: WebView)
 
+    /**
+     * Posts a message to the given [webView] using the provided [subscriptionEventData].
+     * @param webView the WebView to which the message should be posted
+     * @param subscriptionEventData the data to be sent in the message
+     */
     suspend fun postMessage(
         webView: WebView,
         subscriptionEventData: SubscriptionEventData,
     )
 
+    /**
+     * The context for this instance.
+     * This can be used to differentiate between different messaging implementations.
+     * @return context string
+     */
     val context: String
 }
 
