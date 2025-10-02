@@ -27,10 +27,8 @@ import com.duckduckgo.duckchat.impl.store.DuckChatDataStore
 import com.duckduckgo.js.messaging.api.JsCallbackData
 import com.squareup.anvil.annotations.ContributesBinding
 import kotlinx.coroutines.runBlocking
-import logcat.logcat
 import org.json.JSONObject
 import java.util.regex.Pattern
-import javax.inject.Inject
 import javax.inject.Inject
 
 interface DuckChatJSHelper {
@@ -157,6 +155,7 @@ class RealDuckChatJSHelper @Inject constructor(
                 val jsCall = "document.getElementsByName($selector)[0]?.focus();"
                 put(SELECTOR, jsCall)
                 put(SUCCESS, true)
+                put(ERROR, "")
             }
         return JsCallbackData(jsonPayload, featureName, method, id)
     }
@@ -208,5 +207,6 @@ class RealDuckChatJSHelper @Inject constructor(
         const val SELECTOR = "selector"
         private const val DEFAULT_SELECTOR = "'user-prompt'"
         private const val SUCCESS = "success"
+        private const val ERROR = "error"
     }
 }
