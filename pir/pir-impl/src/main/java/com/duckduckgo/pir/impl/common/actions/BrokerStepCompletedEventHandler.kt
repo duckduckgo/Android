@@ -55,6 +55,7 @@ class BrokerStepCompletedEventHandler @Inject constructor(
                 PirRunStateHandler.PirRunState.BrokerRecordEmailConfirmationNeeded(
                     brokerName = currentBrokerStep.brokerName,
                     extractedProfile = (currentBrokerStep as OptOutStep).profileToOptOut,
+                    attemptId = state.attemptId ?: "no-attempt-id",
                 ),
             )
         } else {
@@ -119,6 +120,9 @@ class BrokerStepCompletedEventHandler @Inject constructor(
                         isSubmitSuccess = isSuccess,
                     ),
                 )
+            }
+            else -> {
+                // No op
             }
         }
     }
