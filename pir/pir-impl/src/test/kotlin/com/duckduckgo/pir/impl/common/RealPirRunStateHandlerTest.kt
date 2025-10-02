@@ -456,6 +456,7 @@ class RealPirRunStateHandlerTest {
                 BrokerRecordEmailConfirmationNeeded(
                     brokerName = testBrokerName,
                     extractedProfile = testExtractedProfile,
+                    attemptId = "c9982ded-021a-4251-9e03-2c58b130410f",
                 )
             val expectedEmailConfirmationJobRecord =
                 EmailConfirmationJobRecord(
@@ -465,7 +466,7 @@ class RealPirRunStateHandlerTest {
                     emailData =
                     EmailData(
                         email = "john@example.com",
-                        attemptId = "",
+                        attemptId = "c9982ded-021a-4251-9e03-2c58b130410f",
                     ),
                 )
 
