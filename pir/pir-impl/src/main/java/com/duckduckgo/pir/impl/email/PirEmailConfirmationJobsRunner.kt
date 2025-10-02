@@ -24,7 +24,7 @@ import com.duckduckgo.pir.impl.models.scheduling.JobRecord.EmailConfirmationJobR
 import com.duckduckgo.pir.impl.models.scheduling.JobRecord.EmailConfirmationJobRecord.EmailData
 import com.duckduckgo.pir.impl.scheduling.JobRecordUpdater
 import com.duckduckgo.pir.impl.store.PirRepository
-import com.duckduckgo.pir.impl.store.PirRepository.ConfirmationStatus
+import com.duckduckgo.pir.impl.store.PirRepository.EmailConfirmationLinkFetchStatus
 import com.duckduckgo.pir.impl.store.PirSchedulingRepository
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
@@ -93,25 +93,25 @@ class RealPirEmailConfirmationJobsRunner @Inject constructor(
 
                 logcat { "PIR-EMAIL-CONFIRMATION: For ${record.emailData} result is ${it.value}" }
                 when (val status = it.value) {
-                    is ConfirmationStatus.Ready -> {
+                    is EmailConfirmationLinkFetchStatus.Ready -> {
                         status.data[KEY_LINK]?.let { link ->
                             jobRecordUpdater.markEmailConfirmationWithLink(record.extractedProfileId, link)
                             emailDataForDeletion.add(it.key)
                         }
                     }
 
-                    is ConfirmationStatus.Error -> {
+                    is EmailConfirmationLinkFetchStatus.Error -> {
                         pirSchedulingRepository.deleteEmailConfirmationJobRecord(record.extractedProfileId)
                         jobRecordUpdater.updateOptOutError(record.extractedProfileId)
                         emailDataForDeletion.add(it.key)
                     }
 
-                    is ConfirmationStatus.Unknown -> {
+                    is EmailConfirmationLinkFetchStatus.Unknown -> {
                         pirSchedulingRepository.deleteEmailConfirmationJobRecord(record.extractedProfileId)
                         jobRecordUpdater.updateOptOutError(record.extractedProfileId)
                     }
 
-                    is ConfirmationStatus.Pending -> {
+                    is EmailConfirmationLinkFetchStatus.Pending -> {
                         // no-op, still pending
                     }
                 }

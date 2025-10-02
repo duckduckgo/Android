@@ -22,7 +22,7 @@ import com.duckduckgo.pir.impl.models.scheduling.JobRecord.EmailConfirmationJobR
 import com.duckduckgo.pir.impl.service.DbpService
 import com.duckduckgo.pir.impl.service.DbpService.PirEmailConfirmationDataRequest
 import com.duckduckgo.pir.impl.service.DbpService.PirGetEmailConfirmationLinkResponse
-import com.duckduckgo.pir.impl.store.PirRepository.ConfirmationStatus
+import com.duckduckgo.pir.impl.store.PirRepository.EmailConfirmationLinkFetchStatus
 import com.duckduckgo.pir.impl.store.db.BrokerDao
 import com.duckduckgo.pir.impl.store.db.BrokerJsonDao
 import com.duckduckgo.pir.impl.store.db.ExtractedProfileDao
@@ -97,7 +97,7 @@ class RealPirRepositoryTest {
 
         // Then
         assertEquals(1, result.size)
-        val status = result[testEmailData1] as ConfirmationStatus.Ready
+        val status = result[testEmailData1] as EmailConfirmationLinkFetchStatus.Ready
         assertEquals("https://example.com/confirm", status.data["link"])
         assertEquals("abc123", status.data["token"])
     }
@@ -123,7 +123,7 @@ class RealPirRepositoryTest {
 
         // Then
         assertEquals(1, result.size)
-        assertEquals(ConfirmationStatus.Pending, result[testEmailData1])
+        assertEquals(EmailConfirmationLinkFetchStatus.Pending, result[testEmailData1])
     }
 
     @Test
@@ -149,7 +149,7 @@ class RealPirRepositoryTest {
 
         // Then
         assertEquals(1, result.size)
-        val status = result[testEmailData1] as ConfirmationStatus.Error
+        val status = result[testEmailData1] as EmailConfirmationLinkFetchStatus.Error
         assertEquals("EMAIL_NOT_FOUND", status.errorCode)
         assertEquals("Email not found in inbox", status.error)
     }
@@ -175,7 +175,7 @@ class RealPirRepositoryTest {
 
         // Then
         assertEquals(1, result.size)
-        assertEquals(ConfirmationStatus.Unknown, result[testEmailData1])
+        assertEquals(EmailConfirmationLinkFetchStatus.Unknown, result[testEmailData1])
     }
 
     @Test
@@ -214,9 +214,9 @@ class RealPirRepositoryTest {
 
         // Then
         assertEquals(3, result.size)
-        assertEquals(ConfirmationStatus.Ready::class, result[testEmailData1]!!::class)
-        assertEquals(ConfirmationStatus.Pending, result[testEmailData2])
-        assertEquals(ConfirmationStatus.Error::class, result[testEmailData3]!!::class)
+        assertEquals(EmailConfirmationLinkFetchStatus.Ready::class, result[testEmailData1]!!::class)
+        assertEquals(EmailConfirmationLinkFetchStatus.Pending, result[testEmailData2])
+        assertEquals(EmailConfirmationLinkFetchStatus.Error::class, result[testEmailData3]!!::class)
     }
 
     @Test

@@ -30,11 +30,11 @@ import com.duckduckgo.pir.impl.service.DbpService
 import com.duckduckgo.pir.impl.service.DbpService.PirEmailConfirmationDataRequest
 import com.duckduckgo.pir.impl.service.DbpService.PirJsonBroker
 import com.duckduckgo.pir.impl.store.PirRepository.BrokerJson
-import com.duckduckgo.pir.impl.store.PirRepository.ConfirmationStatus
-import com.duckduckgo.pir.impl.store.PirRepository.ConfirmationStatus.Error
-import com.duckduckgo.pir.impl.store.PirRepository.ConfirmationStatus.Pending
-import com.duckduckgo.pir.impl.store.PirRepository.ConfirmationStatus.Ready
-import com.duckduckgo.pir.impl.store.PirRepository.ConfirmationStatus.Unknown
+import com.duckduckgo.pir.impl.store.PirRepository.EmailConfirmationLinkFetchStatus
+import com.duckduckgo.pir.impl.store.PirRepository.EmailConfirmationLinkFetchStatus.Error
+import com.duckduckgo.pir.impl.store.PirRepository.EmailConfirmationLinkFetchStatus.Pending
+import com.duckduckgo.pir.impl.store.PirRepository.EmailConfirmationLinkFetchStatus.Ready
+import com.duckduckgo.pir.impl.store.PirRepository.EmailConfirmationLinkFetchStatus.Unknown
 import com.duckduckgo.pir.impl.store.db.BrokerDao
 import com.duckduckgo.pir.impl.store.db.BrokerEntity
 import com.duckduckgo.pir.impl.store.db.BrokerJsonDao
@@ -138,7 +138,7 @@ interface PirRepository {
 
     suspend fun getEmailForBroker(dataBroker: String): String
 
-    suspend fun getEmailConfirmationLinkStatus(emailData: List<EmailData>): Map<EmailData, ConfirmationStatus>
+    suspend fun getEmailConfirmationLinkStatus(emailData: List<EmailData>): Map<EmailData, EmailConfirmationLinkFetchStatus>
 
     suspend fun deleteEmailData(emailData: List<EmailData>)
 
@@ -147,19 +147,23 @@ interface PirRepository {
         val etag: String,
     )
 
-    sealed class ConfirmationStatus {
+    sealed class EmailConfirmationLinkFetchStatus {
         data class Ready(
+            /**
+             * This represents the data we receive from the backend where the key could be "link" or "verification_code"
+             * And the value is the actual link or code.
+             */
             val data: Map<String, String>,
-        ) : ConfirmationStatus()
+        ) : EmailConfirmationLinkFetchStatus()
 
-        data object Pending : ConfirmationStatus()
+        data object Pending : EmailConfirmationLinkFetchStatus()
 
-        data object Unknown : ConfirmationStatus()
+        data object Unknown : EmailConfirmationLinkFetchStatus()
 
         data class Error(
             val errorCode: String,
             val error: String,
-        ) : ConfirmationStatus()
+        ) : EmailConfirmationLinkFetchStatus()
     }
 }
 
@@ -483,13 +487,14 @@ internal class RealPirRepository(
             return@withContext dbpService.getEmail(brokerDao.getBrokerDetails(dataBroker)!!.url).emailAddress
         }
 
-    override suspend fun getEmailConfirmationLinkStatus(emailData: List<EmailData>): Map<EmailData, ConfirmationStatus> =
+    override suspend fun getEmailConfirmationLinkStatus(emailData: List<EmailData>): Map<EmailData, EmailConfirmationLinkFetchStatus> =
         withContext(dispatcherProvider.io()) {
             val batchedEmailData = emailData.chunked(EMAIL_DATA_BATCH_SIZE)
             logcat { "PIR-EMAIL-CONFIRMATION: total size to fetch: ${emailData.size}" }
             return@withContext batchedEmailData.map { emailDataSubList ->
                 logcat { "PIR-EMAIL-CONFIRMATION: batch size to fetch: ${emailDataSubList.size}" }
                 async {
+                    // For more information https://github.com/duckduckgo/Android/pull/6847#discussion_r2395023539
                     dbpService.getEmailConfirmationLinkStatus(emailDataSubList.toRequest()).items.associate { response ->
                         val key =
                             EmailData(
