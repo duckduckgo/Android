@@ -24,6 +24,7 @@ import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.Event.
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.SideEffect.LoadUrl
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.State
 import com.squareup.anvil.annotations.ContributesMultibinding
+import java.util.UUID
 import javax.inject.Inject
 import kotlin.reflect.KClass
 
@@ -41,6 +42,7 @@ class StartedEventHandler @Inject constructor() : EventHandler {
         return Next(
             nextState = state.copy(
                 pendingUrl = DBP_INITIAL_URL,
+                attemptId = UUID.randomUUID().toString(),
             ),
             sideEffect = LoadUrl(
                 url = DBP_INITIAL_URL,

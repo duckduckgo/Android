@@ -30,7 +30,7 @@ import com.duckduckgo.pir.impl.common.NativeBrokerActionHandler.NativeActionResu
 import com.duckduckgo.pir.impl.common.NativeBrokerActionHandler.NativeActionResult.Success.NativeSuccessData.CaptchaTransactionIdReceived
 import com.duckduckgo.pir.impl.service.DbpService.CaptchaSolutionMeta
 import com.duckduckgo.pir.impl.store.PirRepository
-import com.duckduckgo.pir.impl.store.PirRepository.ConfirmationStatus
+import com.duckduckgo.pir.impl.store.PirRepository.EmailConfirmationLinkFetchStatus
 import kotlinx.coroutines.withContext
 
 interface NativeBrokerActionHandler {
@@ -69,7 +69,7 @@ interface NativeBrokerActionHandler {
                 data class EmailConfirmation(
                     val email: String,
                     val link: String,
-                    val status: ConfirmationStatus,
+                    val status: EmailConfirmationLinkFetchStatus,
                 ) : NativeSuccessData()
 
                 data class CaptchaTransactionIdReceived(
