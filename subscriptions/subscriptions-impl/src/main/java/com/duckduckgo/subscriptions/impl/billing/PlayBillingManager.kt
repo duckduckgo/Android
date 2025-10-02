@@ -247,6 +247,12 @@ class RealPlayBillingManager @Inject constructor(
 
         logcat { "Billing: Using provided old purchase token: ${oldPurchaseToken.take(10)}..." }
 
+        if (oldPurchaseToken.isEmpty()) {
+            logcat(logcat.LogPriority.ERROR) { "Billing: Cannot launch subscription update - empty purchase token" }
+            _purchaseState.emit(Canceled)
+            return@withContext
+        }
+
         val productDetails = products.find { it.productId == BASIC_SUBSCRIPTION }
 
         val offerToken = productDetails

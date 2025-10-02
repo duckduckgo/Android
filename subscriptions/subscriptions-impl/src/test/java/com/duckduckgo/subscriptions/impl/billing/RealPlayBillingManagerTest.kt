@@ -235,6 +235,7 @@ class RealPlayBillingManagerTest {
                 newPlanId = MONTHLY_PLAN_US,
                 externalId = externalId,
                 newOfferId = null,
+                oldPurchaseToken = oldPurchaseToken,
                 replacementMode = replacementMode,
             )
 
@@ -264,6 +265,7 @@ class RealPlayBillingManagerTest {
         runCurrent() // Ensure purchase history is loaded
 
         val externalId = "test_external_id"
+        val oldPurchaseToken = "old_purchase_token"
 
         subject.purchaseState.test {
             expectNoEvents()
@@ -273,6 +275,8 @@ class RealPlayBillingManagerTest {
                 newPlanId = "invalid_plan_id",
                 externalId = externalId,
                 newOfferId = null,
+                oldPurchaseToken = oldPurchaseToken,
+                replacementMode = SubscriptionReplacementMode.DEFERRED,
             )
 
             assertEquals(Canceled, awaitItem())
@@ -300,6 +304,7 @@ class RealPlayBillingManagerTest {
         val offerDetails = productDetails.subscriptionOfferDetails!!.first()
         val externalId = "test_external_id"
         val oldPurchaseToken = "old_purchase_token" // This is what getCurrentPurchaseToken() will return
+        val replacementMode = SubscriptionReplacementMode.DEFERRED
 
         subject.purchaseState.test {
             expectNoEvents()
@@ -309,6 +314,8 @@ class RealPlayBillingManagerTest {
                 newPlanId = MONTHLY_PLAN_US,
                 externalId = externalId,
                 newOfferId = null,
+                oldPurchaseToken = oldPurchaseToken,
+                replacementMode = replacementMode,
             )
 
             assertEquals(Canceled, awaitItem())
@@ -324,14 +331,15 @@ class RealPlayBillingManagerTest {
     }
 
     @Test
-    fun `when launchSubscriptionUpdate called with no purchase history then emits canceled state`() = runTest {
-        // No purchase history set up, so getCurrentPurchaseToken() will return null
+    fun `when launchSubscriptionUpdate called with empty purchase token then emits canceled state`() = runTest {
+        // Test with empty purchase token to simulate no valid token scenario
         billingClientAdapter.subscriptionsPurchaseHistory = emptyList()
 
         processLifecycleOwner.currentState = RESUMED
         runCurrent() // Ensure purchase history is loaded
 
         val externalId = "test_external_id"
+        val oldPurchaseToken = "" // Empty token to simulate no valid purchase token
 
         subject.purchaseState.test {
             expectNoEvents()
@@ -341,6 +349,8 @@ class RealPlayBillingManagerTest {
                 newPlanId = MONTHLY_PLAN_US,
                 externalId = externalId,
                 newOfferId = null,
+                oldPurchaseToken = oldPurchaseToken,
+                replacementMode = SubscriptionReplacementMode.DEFERRED,
             )
 
             assertEquals(Canceled, awaitItem())
