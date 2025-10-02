@@ -20,17 +20,6 @@
     android:viewportWidth="24"
     android:viewportHeight="24">
   <path
-      android:pathData="M6.5,19L3.207,15.707C2.816,15.317 2.816,14.683 3.207,14.293L6.5,11"
-      android:strokeLineJoin="round"
-      android:strokeWidth="1.5"
-      android:fillColor="#00000000"
-      android:strokeColor="?attr/daxColorPrimaryIcon"
-      android:strokeLineCap="round"/>
-  <path
-      android:pathData="M4,15H17.25C19.459,15 21.25,13.209 21.25,11V9.75C21.25,7.541 19.459,5.75 17.25,5.75H11.75"
-      android:strokeLineJoin="round"
-      android:strokeWidth="1.5"
-      android:fillColor="#00000000"
-      android:strokeColor="?attr/daxColorPrimaryIcon"
-      android:strokeLineCap="round"/>
+      android:pathData="M14.469,3.031a6.5,6.5 0,0 1,0.001 13H5.354l3.511,3.399a0.75,0.75 0,0 1,-1.043 1.078L3.588,16.41a1.57,1.57 0,0 1,0 -2.257l4.234,-4.098 0.029,-0.026a0.75,0.75 0,0 1,1.014 1.104L5.354,14.53h9.116a5,5 0,0 0,-0.001 -10h-1.688a0.75,0.75 0,0 1,0 -1.5z"
+      android:fillColor="?attr/daxColorPrimaryIcon"/>
 </vector>
