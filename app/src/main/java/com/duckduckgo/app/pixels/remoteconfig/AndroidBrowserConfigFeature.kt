@@ -189,6 +189,6 @@ interface AndroidBrowserConfigFeature {
     @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
     fun vpnMenuItem(): Toggle
 
-    @Toggle.DefaultValue(FALSE)
+    @Toggle.DefaultValue(TRUE)
     fun updateScriptOnPageFinished(): Toggle
 }
