@@ -39,7 +39,7 @@
         android:background="@drawable/selectable_item_experimental_background"
         android:importantForAccessibility="no"
         android:scaleType="centerInside"
-        android:src="@drawable/ic_return_24"
+        android:src="@drawable/ic_enter_24"
         android:visibility="visible" />
 
     <ImageView
