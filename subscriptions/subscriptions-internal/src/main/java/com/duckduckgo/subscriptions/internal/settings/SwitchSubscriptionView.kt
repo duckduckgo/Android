@@ -21,7 +21,6 @@ import android.util.AttributeSet
 import android.view.View
 import android.widget.FrameLayout
 import android.widget.Toast
-import androidx.appcompat.app.AlertDialog
 import androidx.lifecycle.findViewTreeLifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.InjectWith
@@ -129,7 +128,7 @@ class SwitchSubscriptionView @JvmOverloads constructor(
                 launch(dispatcherProvider.main()) {
                     val options = availablePlans.map { it.displayName }
                     val currentPlanIndex = availablePlans.indexOfFirst { it.isCurrentPlan }
-                    
+
                     RadioListAlertDialogBuilder(context)
                         .setTitle("Switch Subscription Plan")
                         .setOptions(options, currentPlanIndex)
@@ -138,12 +137,12 @@ class SwitchSubscriptionView @JvmOverloads constructor(
                         .addEventListener(object : RadioListAlertDialogBuilder.EventListener() {
                             override fun onPositiveButtonClicked(selectedItem: Int) {
                                 val selectedPlan = availablePlans[selectedItem - 1]
-                                
+
                                 if (selectedPlan.isCurrentPlan) {
                                     Toast.makeText(context, "You are already subscribed to this plan", Toast.LENGTH_SHORT).show()
                                     return
                                 }
-                                
+
                                 showReplacementModeDialog(selectedPlan, lifecycleOwner)
                             }
                         })
@@ -190,7 +189,7 @@ class SwitchSubscriptionView @JvmOverloads constructor(
                     }
                 }
             }
-            
+
             planOptions.add(PlanOption(offer.planId, displayText, offer.offerId, isCurrentPlan))
         }
 
@@ -205,23 +204,23 @@ class SwitchSubscriptionView @JvmOverloads constructor(
             ReplacementModeOption(
                 mode = SubscriptionReplacementMode.CHARGE_PRORATED_PRICE,
                 displayName = "Charge Prorated Price",
-                description = "New plan starts immediately. You'll be charged a prorated amount for the remaining period."
+                description = "New plan starts immediately. You'll be charged a prorated amount for the remaining period.",
             ),
             ReplacementModeOption(
                 mode = SubscriptionReplacementMode.DEFERRED,
                 displayName = "Deferred",
-                description = "New plan starts when current subscription expires. No immediate charge."
+                description = "New plan starts when current subscription expires. No immediate charge.",
             ),
             ReplacementModeOption(
                 mode = SubscriptionReplacementMode.WITHOUT_PRORATION,
-                displayName = "Without Proration", 
-                description = "New plan starts immediately. New price charged on next billing cycle."
+                displayName = "Without Proration",
+                description = "New plan starts immediately. New price charged on next billing cycle.",
             ),
             ReplacementModeOption(
                 mode = SubscriptionReplacementMode.CHARGE_FULL_PRICE,
                 displayName = "Charge Full Price",
-                description = "New plan starts immediately. You'll be charged the full price plus remaining time from old plan."
-            )
+                description = "New plan starts immediately. You'll be charged the full price plus remaining time from old plan.",
+            ),
         )
 
         val defaultIndex = replacementModes.indexOfFirst { it.mode == SubscriptionReplacementMode.WITHOUT_PRORATION }
@@ -234,7 +233,7 @@ class SwitchSubscriptionView @JvmOverloads constructor(
             .setNegativeButton(android.R.string.cancel)
             .addEventListener(object : RadioListAlertDialogBuilder.EventListener() {
                 override fun onPositiveButtonClicked(selectedItem: Int) {
-                    val selectedReplacementMode = replacementModes[selectedItem-1].mode
+                    val selectedReplacementMode = replacementModes[selectedItem - 1].mode
                     switchToPlan(planOption, lifecycleOwner, selectedReplacementMode)
                 }
             })

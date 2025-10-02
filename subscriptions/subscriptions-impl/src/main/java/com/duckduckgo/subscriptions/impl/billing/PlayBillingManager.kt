@@ -255,7 +255,9 @@ class RealPlayBillingManager @Inject constructor(
             ?.offerToken
 
         if (productDetails == null || offerToken == null) {
-            logcat(logcat.LogPriority.ERROR) { "Billing: Cannot launch subscription update - productDetails: ${productDetails != null}, offerToken: ${offerToken != null}" }
+            logcat(logcat.LogPriority.ERROR) {
+                "Billing: Cannot launch subscription update - productDetails: ${productDetails != null}, offerToken: ${offerToken != null}"
+            }
             _purchaseState.emit(Canceled)
             return@withContext
         }
@@ -280,7 +282,6 @@ class RealPlayBillingManager @Inject constructor(
             }
         }
     }
-
 
     private fun onPurchasesUpdated(result: PurchasesUpdateResult) {
         coroutineScope.launch {

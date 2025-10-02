@@ -111,17 +111,20 @@ enum class SubscriptionReplacementMode(val value: Int) {
      * The billing cycle remains the same, and the user is charged a prorated amount for the remaining period.
      */
     CHARGE_PRORATED_PRICE(2),
+
     /**
      * The new plan takes effect immediately.
      * The new price will be charged on the next recurrence time, and the billing cycle stays the same.
      */
     WITHOUT_PRORATION(3),
+
     /**
      * The new plan takes effect immediately.
      * The user is charged the full price of the new plan and is given a full billing cycle of subscription,
      * plus remaining prorated time from the old plan.
      */
     CHARGE_FULL_PRICE(5),
+
     /**
      * New subscription starts after current subscription expires.
      * Best for: When you want to avoid billing complications or user requested delayed switch.

@@ -84,6 +84,7 @@ import dagger.SingleInstanceIn
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -92,7 +93,6 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.onSubscription
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import kotlinx.coroutines.delay
 import logcat.LogPriority.ERROR
 import logcat.asLog
 import logcat.logcat
@@ -237,7 +237,7 @@ interface SubscriptionsManager {
 
     /**
      * Switches the current subscription plan to a new one
-     * 
+     *
      * @param activity The activity context required for launching Google Play billing flow
      * @param planId The new plan ID to switch to
      * @param offerId The offer ID for the new plan (optional)
@@ -430,7 +430,7 @@ class RealSubscriptionsManager @Inject constructor(
 
                 // Launch Google Play billing flow for subscription update
                 logcat { "Subs: Launching subscription update flow for plan: $planId" }
-                
+
                 // Launch the subscription update flow using PlayBillingManager
                 withContext(dispatcherProvider.main()) {
                     playBillingManager.launchSubscriptionUpdate(
@@ -469,11 +469,11 @@ class RealSubscriptionsManager @Inject constructor(
                 // Wait for purchase completion with timeout
                 val timeoutMs = 60_000L // 60 seconds timeout
                 val startTime = System.currentTimeMillis()
-                
+
                 while (!purchaseCompleted && (System.currentTimeMillis() - startTime) < timeoutMs) {
                     delay(500) // Check every 500ms
                 }
-                
+
                 purchaseStateJob.cancel()
 
                 val newPurchaseToken = purchaseToken
