@@ -742,21 +742,7 @@ class BrowserTabFragment :
             override fun onFirstPopUpHandled() {}
 
             override fun onPopUpHandled(isCosmetic: Boolean) {
-                launch {
-                    context?.let {
-                    /* TODO uncomment when sense of protection experiment shield is enabled
-                     if (senseOfProtectionExperiment.isUserEnrolledInAVariantAndExperimentEnabled() &&
-                        viewModel.trackersCount().isNotEmpty()
-                    ) {
-                        if (isCosmetic) {
-                            delay(COOKIES_ANIMATION_DELAY)
-                        }
-                        omnibar.enqueueCookiesAnimation(isCosmetic)
-                    } else {*/
-                        viewModel.onAutoConsentPopUpHandled(isCosmetic)
-                        // }
-                    }
-                }
+                viewModel.onAutoConsentPopUpHandled(isCosmetic)
             }
 
             override fun onResultReceived(
