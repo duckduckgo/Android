@@ -44,6 +44,7 @@ interface PirActionsRunnerStateEngine {
      */
     data class State(
         val runType: RunType,
+        val attemptId: String? = null,
         val brokerStepsToExecute: List<BrokerStep>,
         val profileQuery: ProfileQuery,
         val currentBrokerStepIndex: Int = 0,

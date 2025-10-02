@@ -108,6 +108,7 @@ interface PirRunStateHandler {
         data class BrokerRecordEmailConfirmationNeeded(
             override val brokerName: String,
             val extractedProfile: ExtractedProfile,
+            val attemptId: String,
         ) : PirRunState(brokerName)
 
         data class BrokerRecordOptOutStarted(
@@ -197,7 +198,7 @@ class RealPirRunStateHandler @Inject constructor(
                 emailData =
                 EmailData(
                     email = pirRunState.extractedProfile.email,
-                    attemptId = "",
+                    attemptId = pirRunState.attemptId,
                 ),
             ),
         )
