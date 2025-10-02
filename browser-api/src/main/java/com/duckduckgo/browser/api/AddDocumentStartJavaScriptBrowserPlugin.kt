@@ -16,8 +16,17 @@
 
 package com.duckduckgo.browser.api
 
+import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.js.messaging.api.AddDocumentStartJavaScript
 
+/**
+* Interface to provide implementations of [AddDocumentStartJavaScript] to the browser, through
+* [PluginPoint]<[AddDocumentStartJavaScript]>
+ */
 interface AddDocumentStartJavaScriptBrowserPlugin {
+    /**
+     * Provides an implementation of [AddDocumentStartJavaScript] to be used by the browser.
+     * @return an instance of [AddDocumentStartJavaScript]
+     */
     fun addDocumentStartJavaScript(): AddDocumentStartJavaScript
 }

@@ -19,11 +19,19 @@ package com.duckduckgo.js.messaging.api
 import android.webkit.WebView
 
 /**
- * Plugin interface for injecting JavaScript code that executes at document start.
- * * Allows plugins to inject JavaScript that will be executed before any other scripts on the page.
+ * Interface for adding JavaScript code that executes at document start, before any other scripts on the page.
  * Useful for privacy protections and that need to run as early as possible and/or on iframes.
  */
 interface AddDocumentStartJavaScript {
+    /**
+     * Adds JavaScript code into the provided [WebView] to be executed at document start.
+     * Notes:
+     * - If a different script already exists in this instance, it will be replaced.
+     * - It's not recommended to call this multiple times on the same WebView instance.
+     * If possible, we should rely on messaging to update the script behavior instead.
+     *
+     * @param webView the WebView where the script will be added
+     */
     suspend fun addDocumentStartJavaScript(webView: WebView)
 
     val context: String
@@ -52,12 +60,16 @@ interface AddDocumentStartJavaScriptScriptStrategy {
      */
     val allowedOriginRules: Set<String>
 
+    /**
+     * The context of the script
+     * @return context string
+     */
     val context: String
 }
 
 interface AddDocumentStartScriptDelegate {
     /**
-     * Creates an AddDocumentStartJavaScriptPlugin implementation with the given [AddDocumentStartJavaScriptScriptStrategy].
+     * Creates an [AddDocumentStartJavaScript] implementation with the given [AddDocumentStartJavaScriptScriptStrategy].
      * @param strategy the strategy to use for determining injection behavior
      * @return [AddDocumentStartJavaScript] implementation
      */
