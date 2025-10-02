@@ -4247,10 +4247,8 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     private suspend fun addDocumentStartJavaScript(webView: WebView) {
-        addDocumentStartJavascriptPlugins.getPlugins().addDocumentStartJavaScript().forEach {
-            it.addDocumentStartJavaScript(
-                webView,
-            )
+        addDocumentStartJavascriptPlugins.getPlugins().forEach {
+            it.addDocumentStartJavaScript().addDocumentStartJavaScript(webView)
         }
     }
 
@@ -4258,7 +4256,7 @@ class BrowserTabViewModel @Inject constructor(
         if (withContext(dispatchers.io()) { !androidBrowserConfig.updateScriptOnPageFinished().isEnabled() }) {
             addDocumentStartJavascriptPlugins
                 .getPlugins()
-                .addDocumentStartJavaScript()
+                .map { it.addDocumentStartJavaScript() }
                 .filter { plugin ->
                     (plugin.context == "contentScopeScripts")
                 }.forEach {

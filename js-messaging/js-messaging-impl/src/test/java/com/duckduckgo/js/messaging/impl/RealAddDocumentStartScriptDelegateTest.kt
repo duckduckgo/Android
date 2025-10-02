@@ -126,5 +126,8 @@ class RealAddDocumentStartScriptDelegateTest {
             override suspend fun getScriptString(): String = scriptString
 
             override val allowedOriginRules: Set<String> = setOf("*")
+
+            override val context: String
+                get() = "test"
         }
 }
