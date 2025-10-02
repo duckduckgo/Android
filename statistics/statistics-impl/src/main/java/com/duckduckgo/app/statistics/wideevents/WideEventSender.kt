@@ -79,7 +79,7 @@ class PixelWideEventSender @Inject constructor(
         val activeNaExperimentNames =
             featureTogglesInventory
                 .getAllActiveExperimentToggles()
-                .map { it.featureName() }
+                .map { it.featureName().name }
 
         return mapOf(
             PARAM_PLATFORM to "Android",

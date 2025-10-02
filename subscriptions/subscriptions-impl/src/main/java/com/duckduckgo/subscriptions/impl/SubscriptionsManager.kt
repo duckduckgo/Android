@@ -73,6 +73,7 @@ import com.duckduckgo.subscriptions.impl.services.StoreLoginBody
 import com.duckduckgo.subscriptions.impl.services.SubscriptionsService
 import com.duckduckgo.subscriptions.impl.services.ValidateTokenResponse
 import com.duckduckgo.subscriptions.impl.services.toEntitlements
+import com.duckduckgo.subscriptions.impl.wideevents.SubscriptionPurchaseWideEvent
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.moshi.JsonDataException
 import com.squareup.moshi.JsonEncodingException
@@ -118,6 +119,7 @@ interface SubscriptionsManager {
         offerId: String?,
         experimentName: String?,
         experimentCohort: String?,
+        origin: String?,
     )
 
     /**
@@ -251,6 +253,7 @@ class RealSubscriptionsManager @Inject constructor(
     private val pkceGenerator: PkceGenerator,
     private val timeProvider: CurrentTimeProvider,
     private val backgroundTokenRefresh: BackgroundTokenRefresh,
+    private val subscriptionPurchaseWideEvent: SubscriptionPurchaseWideEvent,
 ) : SubscriptionsManager {
 
     private val adapter = Moshi.Builder().build().adapter(ResponseError::class.java)
@@ -326,7 +329,10 @@ class RealSubscriptionsManager @Inject constructor(
         purchaseStateJob = coroutineScope.launch(dispatcherProvider.io()) {
             playBillingManager.purchaseState.collect {
                 when (it) {
-                    is PurchaseState.Purchased -> checkPurchase(it.packageName, it.purchaseToken)
+                    is PurchaseState.Purchased -> {
+                        subscriptionPurchaseWideEvent.onBillingFlowPurchaseSuccess()
+                        checkPurchase(it.packageName, it.purchaseToken)
+                    }
                     is PurchaseState.Canceled -> {
                         _currentPurchaseState.emit(CurrentPurchase.Canceled)
                         if (removeExpiredSubscriptionOnCancelledPurchase) {
@@ -495,6 +501,7 @@ class RealSubscriptionsManager @Inject constructor(
                 pixelSender.reportSubscriptionActivated()
                 emitEntitlementsValues()
                 _currentPurchaseState.emit(CurrentPurchase.Success)
+                subscriptionPurchaseWideEvent.onPurchaseConfirmationSuccess()
             } else {
                 handlePurchaseFailed()
             }
@@ -640,6 +647,13 @@ class RealSubscriptionsManager @Inject constructor(
     override suspend fun refreshSubscriptionData() {
         val subscription = subscriptionsService.subscription()
 
+        val oldStatus =
+            try {
+                authRepository.getSubscription()?.status
+            } catch (_: Exception) {
+                null
+            }
+
         authRepository.setSubscription(
             Subscription(
                 productId = subscription.productId,
@@ -651,6 +665,8 @@ class RealSubscriptionsManager @Inject constructor(
                 activeOffers = subscription.activeOffers.map { it.type.toActiveOfferType() },
             ),
         )
+
+        subscriptionPurchaseWideEvent.onSubscriptionUpdated(oldStatus = oldStatus, newStatus = subscription.status.toStatus())
 
         _subscriptionStatus.emit(subscription.status.toStatus())
     }
@@ -828,9 +844,16 @@ class RealSubscriptionsManager @Inject constructor(
         offerId: String?,
         experimentName: String?,
         experimentCohort: String?,
+        origin: String?,
     ) {
         try {
             _currentPurchaseState.emit(CurrentPurchase.PreFlowInProgress)
+
+            subscriptionPurchaseWideEvent.onPurchaseFlowStarted(
+                subscriptionIdentifier = offerId ?: planId,
+                freeTrialEligible = isFreeTrialEligible(),
+                origin = origin,
+            )
 
             // refresh any existing account / subscription data
             when {
@@ -840,12 +863,20 @@ class RealSubscriptionsManager @Inject constructor(
                     when (e.code()) {
                         400, 404 -> {} // expected if this is a first ever purchase using this account - ignore
                         401 -> signOut() // access token was rejected even though it's not expired - can happen if the account was removed from BE
-                        else -> throw e
+                        else -> {
+                            subscriptionPurchaseWideEvent.onSubscriptionRefreshFailure(e)
+                            throw e
+                        }
                     }
+                } catch (e: Exception) {
+                    subscriptionPurchaseWideEvent.onSubscriptionRefreshFailure(e)
+                    throw e
                 }
 
                 isSignedInV1() -> fetchAndStoreAllData()
             }
+
+            subscriptionPurchaseWideEvent.onSubscriptionRefreshSuccess()
 
             if (!isSignedIn()) {
                 recoverSubscriptionFromStore()
@@ -867,6 +898,7 @@ class RealSubscriptionsManager @Inject constructor(
                 pixelSender.reportSubscriptionActivated()
                 pixelSender.reportRestoreAfterPurchaseAttemptSuccess()
                 _currentPurchaseState.emit(CurrentPurchase.Recovered)
+                subscriptionPurchaseWideEvent.onExistingSubscriptionRestored()
                 return
             }
 
@@ -896,6 +928,7 @@ class RealSubscriptionsManager @Inject constructor(
             logcat(ERROR) { "Subs: $error" }
             pixelSender.reportPurchaseFailureOther(SubscriptionFailureErrorType.PURCHASE_EXCEPTION.name, error)
             _currentPurchaseState.emit(CurrentPurchase.Failure(error))
+            subscriptionPurchaseWideEvent.onPurchaseFailed(error)
         }
     }
 
@@ -1016,6 +1049,7 @@ class RealSubscriptionsManager @Inject constructor(
     private suspend fun createAccount() {
         try {
             if (shouldUseAuthV2()) {
+                subscriptionPurchaseWideEvent.onAccountCreationStarted()
                 val codeVerifier = pkceGenerator.generateCodeVerifier()
                 val codeChallenge = pkceGenerator.generateCodeChallenge(codeVerifier)
                 val jwks = authClient.getJwks()
@@ -1023,6 +1057,7 @@ class RealSubscriptionsManager @Inject constructor(
                 val authorizationCode = authClient.createAccount(sessionId)
                 val tokens = authClient.getTokens(sessionId, authorizationCode, codeVerifier)
                 saveTokens(validateTokens(tokens, jwks))
+                subscriptionPurchaseWideEvent.onAccountCreationSuccess()
             } else {
                 val account = authService.createAccount("Bearer ${emailManager.getToken()}")
                 if (account.authToken.isEmpty()) {
@@ -1033,6 +1068,7 @@ class RealSubscriptionsManager @Inject constructor(
                 }
             }
         } catch (e: Exception) {
+            subscriptionPurchaseWideEvent.onAccountCreationFailure(e)
             when (e) {
                 is JsonDataException, is JsonEncodingException, is HttpException -> {
                     pixelSender.reportPurchaseFailureAccountCreation()

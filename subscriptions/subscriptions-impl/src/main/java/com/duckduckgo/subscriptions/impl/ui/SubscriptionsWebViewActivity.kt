@@ -582,7 +582,7 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationD
         experimentName: String?,
         experimentCohort: String?,
     ) {
-        viewModel.purchaseSubscription(this, id, offerId, experimentName, experimentCohort)
+        viewModel.purchaseSubscription(this, id, offerId, experimentName, experimentCohort, params.origin)
     }
 
     private fun sendResponseToJs(data: JsCallbackData) {

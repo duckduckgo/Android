@@ -261,9 +261,10 @@ class SubscriptionWebViewViewModel @Inject constructor(
         offerId: String?,
         experimentName: String?,
         experimentCohort: String?,
+        origin: String?,
     ) {
         viewModelScope.launch(dispatcherProvider.io()) {
-            subscriptionsManager.purchase(activity, planId, offerId, experimentName, experimentCohort)
+            subscriptionsManager.purchase(activity, planId, offerId, experimentName, experimentCohort, origin)
         }
     }
 

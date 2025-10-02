@@ -70,7 +70,7 @@ sealed class SubscriptionsPurchaseHistoryResult {
 
 sealed class LaunchBillingFlowResult {
     data object Success : LaunchBillingFlowResult()
-    data object Failure : LaunchBillingFlowResult()
+    data class Failure(val error: BillingError) : LaunchBillingFlowResult()
 }
 
 sealed class PurchasesUpdateResult {

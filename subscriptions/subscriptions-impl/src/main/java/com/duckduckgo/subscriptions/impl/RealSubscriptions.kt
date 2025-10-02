@@ -258,6 +258,9 @@ interface PrivacyProFeature {
 
     @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun supportsAlternateStripePaymentFlow(): Toggle
+
+    @Toggle.DefaultValue(defaultValue = DefaultFeatureValue.TRUE)
+    fun sendSubscriptionPurchaseWideEvent(): Toggle
 }
 
 @ContributesBinding(AppScope::class)
