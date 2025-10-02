@@ -60,7 +60,10 @@ interface SubscriptionPurchaseWideEvent {
 
     suspend fun onPurchaseConfirmationSuccess()
 
-    suspend fun onSubscriptionUpdated(status: SubscriptionStatus?)
+    suspend fun onSubscriptionUpdated(
+        oldStatus: SubscriptionStatus?,
+        newStatus: SubscriptionStatus?,
+    )
 
     suspend fun onPurchaseCancelledByUser()
 
@@ -256,14 +259,14 @@ class SubscriptionPurchaseWideEventImpl @Inject constructor(
         cachedFlowId = null
     }
 
-    override suspend fun onSubscriptionUpdated(status: SubscriptionStatus?) {
+    override suspend fun onSubscriptionUpdated(
+        oldStatus: SubscriptionStatus?,
+        newStatus: SubscriptionStatus?,
+    ) {
         if (!isFeatureEnabled()) return
-        val wideEventId = getCurrentWideEventId() ?: return
 
-        if (status == null) {
-            wideEventClient.flowFinish(wideEventId = wideEventId, status = FlowStatus.Unknown)
-            cachedFlowId = null
-        } else if (status.isActive()) {
+        if (oldStatus == SubscriptionStatus.WAITING && newStatus?.isActive() == true) {
+            val wideEventId = getCurrentWideEventId() ?: return
             wideEventClient.flowFinish(wideEventId = wideEventId, status = FlowStatus.Success)
             cachedFlowId = null
         }

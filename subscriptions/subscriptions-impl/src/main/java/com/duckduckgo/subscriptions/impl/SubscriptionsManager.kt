@@ -422,7 +422,6 @@ class RealSubscriptionsManager @Inject constructor(
         _isSignedIn.emit(false)
         _subscriptionStatus.emit(UNKNOWN)
         _entitlements.emit(emptyList())
-        subscriptionPurchaseWideEvent.onSubscriptionUpdated(status = null)
     }
 
     private suspend fun checkPurchase(
@@ -648,6 +647,13 @@ class RealSubscriptionsManager @Inject constructor(
     override suspend fun refreshSubscriptionData() {
         val subscription = subscriptionsService.subscription()
 
+        val oldStatus =
+            try {
+                authRepository.getSubscription()?.status
+            } catch (_: Exception) {
+                null
+            }
+
         authRepository.setSubscription(
             Subscription(
                 productId = subscription.productId,
@@ -660,7 +666,7 @@ class RealSubscriptionsManager @Inject constructor(
             ),
         )
 
-        subscriptionPurchaseWideEvent.onSubscriptionUpdated(subscription.status.toStatus())
+        subscriptionPurchaseWideEvent.onSubscriptionUpdated(oldStatus = oldStatus, newStatus = subscription.status.toStatus())
 
         _subscriptionStatus.emit(subscription.status.toStatus())
     }

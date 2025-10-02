@@ -135,12 +135,15 @@ class SubscriptionPurchaseWideEventTest {
         }
 
     @Test
-    fun `onSubscriptionUpdated with active status finishes with Success`() =
+    fun `onSubscriptionUpdated from WAITING to active finishes with Success`() =
         runTest {
             whenever(wideEventClient.getFlowIds(any()))
                 .thenReturn(Result.success(listOf(200L)))
 
-            subscriptionPurchaseWideEvent.onSubscriptionUpdated(SubscriptionStatus.AUTO_RENEWABLE)
+            subscriptionPurchaseWideEvent.onSubscriptionUpdated(
+                oldStatus = SubscriptionStatus.WAITING,
+                newStatus = SubscriptionStatus.AUTO_RENEWABLE,
+            )
 
             verify(wideEventClient).flowFinish(
                 wideEventId = 200L,
@@ -235,17 +238,21 @@ class SubscriptionPurchaseWideEventTest {
         }
 
     @Test
-    fun `onSubscriptionUpdated with null status finishes flow with Unknown`() =
+    fun `onSubscriptionUpdated with null statuses does nothing`() =
         runTest {
-            whenever(wideEventClient.getFlowIds(any()))
-                .thenReturn(Result.success(listOf(666L)))
+            subscriptionPurchaseWideEvent.onSubscriptionUpdated(oldStatus = null, newStatus = null)
 
-            subscriptionPurchaseWideEvent.onSubscriptionUpdated(null)
+            verifyNoInteractions(wideEventClient)
+        }
 
-            verify(wideEventClient).flowFinish(
-                wideEventId = 666L,
-                status = FlowStatus.Unknown,
-                metadata = emptyMap(),
+    @Test
+    fun `onSubscriptionUpdated from non-WAITING to active does nothing`() =
+        runTest {
+            subscriptionPurchaseWideEvent.onSubscriptionUpdated(
+                oldStatus = SubscriptionStatus.UNKNOWN,
+                newStatus = SubscriptionStatus.AUTO_RENEWABLE,
             )
+
+            verifyNoInteractions(wideEventClient)
         }
 }
