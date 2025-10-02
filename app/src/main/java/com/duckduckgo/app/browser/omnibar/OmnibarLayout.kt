@@ -102,6 +102,7 @@ import com.duckduckgo.common.utils.text.TextChangedWatcher
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.api.DuckChat
+import com.duckduckgo.duckchat.impl.inputscreen.ui.view.InputModeTabLayout
 import com.duckduckgo.serp.logos.api.SerpEasterEggLogosToggles
 import com.duckduckgo.serp.logos.api.SerpLogos
 import com.google.android.material.appbar.AppBarLayout
@@ -296,6 +297,8 @@ open class OmnibarLayout @JvmOverloads constructor(
         }
     }
 
+
+    private val duckAiToggle: InputModeTabLayout by lazy { findViewById(R.id.inputModeSwitch) }
     private val omnibarTextInputClickCatcher: View by lazy { findViewById(R.id.omnibarTextInputClickCatcher) }
 
     internal fun omnibarViews(): List<View> =
@@ -710,6 +713,7 @@ open class OmnibarLayout @JvmOverloads constructor(
         previousTransitionState = newTransitionState
 
         enableTextInputClickCatcher(viewState.showTextInputClickCatcher)
+        duckAiToggle.isVisible = viewState.viewMode == ViewMode.NewTab
     }
 
     private fun renderBrowserMode(viewState: ViewState) {
