@@ -254,7 +254,8 @@ open class DuckChatWebViewFragment : DuckDuckGoFragment(R.layout.activity_duck_c
                                         withContext(dispatcherProvider.main()) {
                                             if (response.method == METHOD_OPEN_KEYBOARD) {
                                                 simpleWebview.evaluateJavascript(
-                                                    response.params.get(SELECTOR).toString(), null,
+                                                    response.params.get(SELECTOR).toString(),
+                                                    null,
                                                 )
                                                 showSoftKeyboard()
                                             }
@@ -329,6 +330,11 @@ open class DuckChatWebViewFragment : DuckDuckGoFragment(R.layout.activity_duck_c
         simpleWebview.requestFocus()
         val imm = context?.getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager
         imm?.showSoftInput(simpleWebview, InputMethodManager.SHOW_IMPLICIT)
+    }
+
+    private fun hideSoftKeyboard() {
+        val imm = context?.getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager
+        imm?.hideSoftInputFromWindow(simpleWebview.windowToken, 0)
     }
 
     fun showFileChooser(
@@ -454,6 +460,7 @@ open class DuckChatWebViewFragment : DuckDuckGoFragment(R.layout.activity_duck_c
             if (simpleWebview.canGoBack()) {
                 simpleWebview.goBack()
             } else {
+                hideSoftKeyboard()
                 duckChat.closeDuckChat()
             }
             return true
