@@ -7902,7 +7902,7 @@ class BrowserTabViewModelTest {
             webView: WebView,
         ) {
             postMessageCalled = true
-         }
+        }
         override val context: String
             get() = "contentScopeScripts"
     }
