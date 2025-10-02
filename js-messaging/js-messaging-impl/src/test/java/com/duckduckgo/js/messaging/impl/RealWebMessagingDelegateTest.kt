@@ -22,8 +22,6 @@ import androidx.webkit.JavaScriptReplyProxy
 import androidx.webkit.WebMessageCompat
 import androidx.webkit.WebViewCompat.WebMessageListener
 import com.duckduckgo.browser.api.webviewcompat.WebViewCompatWrapper
-import com.duckduckgo.common.test.CoroutineTestRule
-import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.js.messaging.api.GlobalJsMessageHandler
 import com.duckduckgo.js.messaging.api.JsMessage
 import com.duckduckgo.js.messaging.api.ProcessResult
@@ -35,7 +33,6 @@ import com.duckduckgo.js.messaging.api.WebViewCompatMessageHandler
 import kotlinx.coroutines.test.runTest
 import org.json.JSONObject
 import org.junit.Before
-import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.ArgumentMatchers.anyString
@@ -45,18 +42,12 @@ import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
-import org.mockito.kotlin.whenever
 
 @RunWith(AndroidJUnit4::class)
 class RealWebMessagingDelegateTest {
-
-    @get:Rule
-    val coroutineRule = CoroutineTestRule()
-
     private val mockWebViewCompatWrapper: WebViewCompatWrapper = mock()
     private val mockWebView: WebView = mock()
     private val mockReplyProxy: JavaScriptReplyProxy = mock()
-    private val mockDispatcherProvider: DispatcherProvider = mock()
     private val mockWebViewCompatMessageCallback: WebViewCompatMessageCallback = mock()
 
     private lateinit var testee: RealWebMessagingDelegate
@@ -64,11 +55,8 @@ class RealWebMessagingDelegateTest {
 
     @Before
     fun setUp() = runTest {
-        whenever(mockDispatcherProvider.main()).thenReturn(coroutineRule.testDispatcher)
         testee = RealWebMessagingDelegate(
             webViewCompatWrapper = mockWebViewCompatWrapper,
-            dispatcherProvider = mockDispatcherProvider,
-            appCoroutineScope = coroutineRule.testScope,
         )
     }
 

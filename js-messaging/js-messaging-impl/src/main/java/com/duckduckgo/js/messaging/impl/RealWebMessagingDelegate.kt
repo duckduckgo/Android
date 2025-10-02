@@ -22,9 +22,7 @@ import androidx.annotation.VisibleForTesting
 import androidx.lifecycle.findViewTreeLifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import androidx.webkit.JavaScriptReplyProxy
-import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.browser.api.webviewcompat.WebViewCompatWrapper
-import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.js.messaging.api.JsCallbackData
 import com.duckduckgo.js.messaging.api.JsMessage
@@ -38,7 +36,6 @@ import com.duckduckgo.js.messaging.api.WebMessagingStrategy
 import com.duckduckgo.js.messaging.api.WebViewCompatMessageCallback
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.moshi.Moshi
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import logcat.LogPriority.ERROR
 import logcat.asLog
@@ -49,8 +46,6 @@ import javax.inject.Inject
 @ContributesBinding(AppScope::class)
 class RealWebMessagingDelegate @Inject constructor(
     private val webViewCompatWrapper: WebViewCompatWrapper,
-    private val dispatcherProvider: DispatcherProvider,
-    @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
 ) : WebMessagingDelegate {
     override fun createPlugin(strategy: WebMessagingStrategy): WebMessaging {
         return object : WebMessaging {
