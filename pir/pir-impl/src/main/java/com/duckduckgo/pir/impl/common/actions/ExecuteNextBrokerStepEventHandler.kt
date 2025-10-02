@@ -70,17 +70,17 @@ class ExecuteNextBrokerStepEventHandler @Inject constructor(
 
             Next(
                 nextState =
-                    state.copy(
-                        currentActionIndex = 0,
-                        brokerStepStartTime = currentTimeProvider.currentTimeMillis(),
-                        actionRetryCount = 0,
-                    ),
+                state.copy(
+                    currentActionIndex = 0,
+                    brokerStepStartTime = currentTimeProvider.currentTimeMillis(),
+                    actionRetryCount = 0,
+                ),
                 nextEvent =
-                    ExecuteBrokerStepAction(
-                        UserProfile(
-                            userProfile = state.profileQuery,
-                        ),
+                ExecuteBrokerStepAction(
+                    UserProfile(
+                        userProfile = state.profileQuery,
                     ),
+                ),
             )
         }
     }

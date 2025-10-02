@@ -313,10 +313,10 @@ class RealJobRecordUpdater @Inject constructor(
                 it
                     .copy(
                         linkFetchData =
-                            it.linkFetchData.copy(
-                                linkFetchAttemptCount = it.linkFetchData.linkFetchAttemptCount + 1,
-                                lastLinkFetchDateInMillis = currentTimeProvider.currentTimeMillis(),
-                            ),
+                        it.linkFetchData.copy(
+                            linkFetchAttemptCount = it.linkFetchData.linkFetchAttemptCount + 1,
+                            lastLinkFetchDateInMillis = currentTimeProvider.currentTimeMillis(),
+                        ),
                     ).also {
                         logcat { "PIR-JOB-RECORD: Updating EmailConfirmation for $extractedProfileId to $it" }
                     },
@@ -333,9 +333,9 @@ class RealJobRecordUpdater @Inject constructor(
                 it
                     .copy(
                         linkFetchData =
-                            it.linkFetchData.copy(
-                                emailConfirmationLink = link,
-                            ),
+                        it.linkFetchData.copy(
+                            emailConfirmationLink = link,
+                        ),
                     ).also {
                         logcat { "PIR-JOB-RECORD: Updating EmailConfirmation for $extractedProfileId to $it" }
                     },

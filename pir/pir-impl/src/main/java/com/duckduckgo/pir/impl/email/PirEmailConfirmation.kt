@@ -28,7 +28,6 @@ import com.duckduckgo.pir.impl.common.PirJob
 import com.duckduckgo.pir.impl.common.PirJob.RunType
 import com.duckduckgo.pir.impl.common.RealPirActionsRunner
 import com.duckduckgo.pir.impl.models.scheduling.JobRecord.EmailConfirmationJobRecord
-import com.duckduckgo.pir.impl.scan.PirScan
 import com.duckduckgo.pir.impl.scripts.PirCssScriptLoader
 import com.duckduckgo.pir.impl.store.PirEventsRepository
 import com.duckduckgo.pir.impl.store.PirRepository
