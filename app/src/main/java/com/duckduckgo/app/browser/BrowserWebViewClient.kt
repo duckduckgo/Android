@@ -95,7 +95,6 @@ import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.atomic.AtomicInteger
 import javax.inject.Inject
 import kotlinx.coroutines.*
-import logcat.LogPriority
 import logcat.LogPriority.INFO
 import logcat.LogPriority.VERBOSE
 import logcat.LogPriority.WARN
@@ -159,26 +158,24 @@ class BrowserWebViewClient @Inject constructor(
         }
     }
 
-    private fun incrementAndTrackLoad(urlForLog: String) {
+    private fun incrementAndTrackLoad() {
         // a new load operation is starting for this WebView instance.
         val loadId = UUID.randomUUID().toString()
         this.currentLoadOperationId = loadId
 
         parallelRequestsOnStart = parallelRequestCounter.incrementAndGet() - 1
-        logcat(LogPriority.DEBUG) { "Request started (ID: $loadId, URL: $urlForLog). Counter: ${parallelRequestCounter.get()}" }
 
         val job = timeoutScope.launch {
             delay(REQUEST_TIMEOUT_MS)
             // attempt to remove the job - if successful, it means it hasn't been finished/errored/cancelled yet
             if (activeRequestTimeoutJobs.remove(loadId) != null) {
                 parallelRequestCounter.decrementAndGet()
-                logcat(LogPriority.WARN) { "Request timed out (ID: $loadId, URL: $urlForLog). Counter: ${parallelRequestCounter.get()}" }
             }
         }
         activeRequestTimeoutJobs[loadId] = job
     }
 
-    private fun decrementAndUntrackLoad(reason: String, urlForLog: String?) {
+    private fun decrementLoadCountAndGet(): Int {
         this.currentLoadOperationId?.let { loadId ->
             val job = activeRequestTimeoutJobs.remove(loadId)
 
@@ -186,10 +183,10 @@ class BrowserWebViewClient @Inject constructor(
             if (job != null) {
                 job.cancel()
                 parallelRequestCounter.decrementAndGet()
-                logcat(LogPriority.DEBUG) { "Request $reason (ID: $loadId, URL: $urlForLog). Counter: ${parallelRequestCounter.get()}" }
             }
         }
         this.currentLoadOperationId = null
+        return parallelRequestCounter.get()
     }
 
     /**
@@ -478,7 +475,7 @@ class BrowserWebViewClient @Inject constructor(
             // See https://app.asana.com/0/0/1206159443951489/f (WebView limitations)
             if (it != ABOUT_BLANK && start == null) {
                 start = currentTimeProvider.elapsedRealtime()
-                incrementAndTrackLoad(it) // increment the request counter
+                incrementAndTrackLoad() // increment the request counter
                 requestInterceptor.onPageStarted(url)
             }
             handleMediaPlayback(webView, it)
@@ -568,7 +565,7 @@ class BrowserWebViewClient @Inject constructor(
                             end = currentTimeProvider.elapsedRealtime(),
                             isTabInForegroundOnFinish = webViewClientListener?.isTabInForeground() ?: true,
                             activeRequestsOnLoadStart = parallelRequestsOnStart,
-                            concurrentRequestsOnFinish = parallelRequestCounter.get() - 1,
+                            concurrentRequestsOnFinish = decrementLoadCountAndGet(),
                         )
                         shouldSendPagePaintedPixel(webView = webView, url = it)
                         appCoroutineScope.launch(dispatcherProvider.io()) {
@@ -587,9 +584,6 @@ class BrowserWebViewClient @Inject constructor(
                             }
                         }
                         uriLoadedManager.sendUriLoadedPixel()
-
-                        // conclude the tracked load operation
-                        decrementAndUntrackLoad("finished", url)
 
                         start = null
                     }
@@ -636,8 +630,7 @@ class BrowserWebViewClient @Inject constructor(
         }
 
         if (this.start != null) {
-            val currentUrl = view?.url
-            decrementAndUntrackLoad("render_process_gone", currentUrl)
+            decrementLoadCountAndGet()
             this.start = null
         }
 
@@ -741,7 +734,7 @@ class BrowserWebViewClient @Inject constructor(
             if (request?.isForMainFrame == true) {
                 if (parsedError != OMITTED) {
                     if (this.start != null) {
-                        decrementAndUntrackLoad("errored", request.url.toString())
+                        decrementLoadCountAndGet()
                         this.start = null
                     }
                     webViewClientListener?.onReceivedError(parsedError, request.url.toString())
