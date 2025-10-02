@@ -38,13 +38,13 @@ import com.duckduckgo.js.messaging.api.WebMessagingStrategy
 import com.duckduckgo.js.messaging.api.WebViewCompatMessageCallback
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.moshi.Moshi
-import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import logcat.LogPriority.ERROR
 import logcat.asLog
 import logcat.logcat
 import org.json.JSONObject
+import javax.inject.Inject
 
 @ContributesBinding(AppScope::class)
 class RealWebMessagingDelegate @Inject constructor(
@@ -162,8 +162,8 @@ class RealWebMessagingDelegate @Inject constructor(
                 webView: WebView,
             ) {
                 if (!strategy.canHandleMessaging()) {
-                return
-            }
+                    return
+                }
 
                 runCatching {
                     return@runCatching webViewCompatWrapper.addWebMessageListener(
@@ -181,7 +181,6 @@ class RealWebMessagingDelegate @Inject constructor(
                 }.getOrElse { exception ->
                     logcat(ERROR) { "Error adding WebMessageListener for ${strategy.objectName}: ${exception.asLog()}" }
                 }
-
             }
 
             override suspend fun unregister(

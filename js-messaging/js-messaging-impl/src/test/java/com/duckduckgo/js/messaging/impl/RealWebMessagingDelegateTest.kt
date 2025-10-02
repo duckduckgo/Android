@@ -240,24 +240,28 @@ class RealWebMessagingDelegateTest {
             override suspend fun canHandleMessaging(): Boolean = canHandleMessaging
 
             override fun getMessageHandlers(): List<WebViewCompatMessageHandler> {
-                return listOf(object : WebViewCompatMessageHandler {
-                    override fun process(jsMessage: JsMessage): ProcessResult {
-                        return SendToConsumer
-                    }
+                return listOf(
+                    object : WebViewCompatMessageHandler {
+                        override fun process(jsMessage: JsMessage): ProcessResult {
+                            return SendToConsumer
+                        }
 
-                    override val featureName: String = "testFeature"
-                    override val methods: List<String> = listOf("testMethod")
-                },)
+                        override val featureName: String = "testFeature"
+                        override val methods: List<String> = listOf("testMethod")
+                    },
+                )
             }
 
             override fun getGlobalMessageHandler(): List<GlobalJsMessageHandler> {
-                return listOf(object : GlobalJsMessageHandler {
-                    override fun process(jsMessage: JsMessage): ProcessResult {
-                        return SendToConsumer
-                    }
+                return listOf(
+                    object : GlobalJsMessageHandler {
+                        override fun process(jsMessage: JsMessage): ProcessResult {
+                            return SendToConsumer
+                        }
 
-                    override val method: String = "globalMethod"
-                },)
+                        override val method: String = "globalMethod"
+                    },
+                )
             }
         }
     }

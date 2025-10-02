@@ -60,8 +60,8 @@ class ContentScopeScriptsPostMessageWrapperPluginTest {
 
             testee.postMessage(subscriptionEventData, mockWebView)
 
-        verify(mockWebMessaging).postMessage(mockWebView, subscriptionEventData)
-    }
+            verify(mockWebMessaging).postMessage(mockWebView, subscriptionEventData)
+        }
 
     @Test
     fun whenWebViewCompatContentScopeScriptsIsNotEnabledThenPostMessageToContentScopeScriptsJsMessaging() =
