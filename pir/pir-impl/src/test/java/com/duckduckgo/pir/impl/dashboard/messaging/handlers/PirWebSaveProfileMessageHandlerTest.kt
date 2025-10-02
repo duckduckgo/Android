@@ -26,7 +26,7 @@ import com.duckduckgo.js.messaging.api.JsMessaging
 import com.duckduckgo.pir.impl.dashboard.messaging.PirDashboardWebMessages.SAVE_PROFILE
 import com.duckduckgo.pir.impl.dashboard.messaging.handlers.PirMessageHandlerUtils.createJsMessage
 import com.duckduckgo.pir.impl.dashboard.messaging.handlers.PirMessageHandlerUtils.verifyResponse
-import com.duckduckgo.pir.impl.dashboard.state.PirWebOnboardingStateHolder
+import com.duckduckgo.pir.impl.dashboard.state.PirWebProfileStateHolder
 import com.duckduckgo.pir.impl.models.Address
 import com.duckduckgo.pir.impl.models.ProfileQuery
 import com.duckduckgo.pir.impl.scan.PirForegroundScanService
@@ -55,7 +55,7 @@ class PirWebSaveProfileMessageHandlerTest {
 
     private lateinit var testee: PirWebSaveProfileMessageHandler
 
-    private val mockPirWebOnboardingStateHolder: PirWebOnboardingStateHolder = mock()
+    private val mockPirWebProfileStateHolder: PirWebProfileStateHolder = mock()
     private val mockRepository: PirRepository = mock()
     private val mockContext: Context = mock()
     private val mockScanScheduler: PirScanScheduler = mock()
@@ -67,7 +67,7 @@ class PirWebSaveProfileMessageHandlerTest {
     @Before
     fun setUp() {
         testee = PirWebSaveProfileMessageHandler(
-            pirWebOnboardingStateHolder = mockPirWebOnboardingStateHolder,
+            pirWebProfileStateHolder = mockPirWebProfileStateHolder,
             repository = mockRepository,
             dispatcherProvider = coroutineRule.testDispatcherProvider,
             context = mockContext,
@@ -86,17 +86,17 @@ class PirWebSaveProfileMessageHandlerTest {
     fun whenProcessWithIncompleteProfileThenSendsErrorResponse() = runTest {
         // Given
         val jsMessage = createJsMessage("""""", SAVE_PROFILE)
-        whenever(mockPirWebOnboardingStateHolder.isProfileComplete).thenReturn(false)
+        whenever(mockPirWebProfileStateHolder.isProfileComplete).thenReturn(false)
 
         // When
         testee.process(jsMessage, mockJsMessaging, mockJsMessageCallback)
 
         // Then
-        verify(mockPirWebOnboardingStateHolder).isProfileComplete
+        verify(mockPirWebProfileStateHolder).isProfileComplete
         verify(mockRepository, never()).saveProfileQueries(any())
         verify(mockContext, never()).startForegroundService(any())
         verify(mockScanScheduler, never()).scheduleScans()
-        verify(mockPirWebOnboardingStateHolder, never()).clear()
+        verify(mockPirWebProfileStateHolder, never()).clear()
         verifyResponse(jsMessage, false, mockJsMessaging)
     }
 
@@ -108,9 +108,9 @@ class PirWebSaveProfileMessageHandlerTest {
         val currentDateTime = LocalDateTime.of(currentYear, 1, 1, 0, 0)
         val profileQueries = listOf(createProfileQuery())
 
-        whenever(mockPirWebOnboardingStateHolder.isProfileComplete).thenReturn(true)
+        whenever(mockPirWebProfileStateHolder.isProfileComplete).thenReturn(true)
         whenever(mockCurrentTimeProvider.localDateTimeNow()).thenReturn(currentDateTime)
-        whenever(mockPirWebOnboardingStateHolder.toProfileQueries(currentYear)).thenReturn(
+        whenever(mockPirWebProfileStateHolder.toProfileQueries(currentYear)).thenReturn(
             profileQueries,
         )
         whenever(mockRepository.saveProfileQueries(profileQueries)).thenReturn(false)
@@ -119,11 +119,11 @@ class PirWebSaveProfileMessageHandlerTest {
         testee.process(jsMessage, mockJsMessaging, mockJsMessageCallback)
 
         // Then
-        verify(mockPirWebOnboardingStateHolder).isProfileComplete
+        verify(mockPirWebProfileStateHolder).isProfileComplete
         verify(mockRepository).saveProfileQueries(profileQueries)
         verify(mockContext, never()).startForegroundService(any())
         verify(mockScanScheduler, never()).scheduleScans()
-        verify(mockPirWebOnboardingStateHolder, never()).clear()
+        verify(mockPirWebProfileStateHolder, never()).clear()
         verifyResponse(jsMessage, false, mockJsMessaging)
     }
 
@@ -136,9 +136,9 @@ class PirWebSaveProfileMessageHandlerTest {
             val currentDateTime = LocalDateTime.of(currentYear, 6, 15, 10, 30)
             val profileQueries = listOf(createProfileQuery())
 
-            whenever(mockPirWebOnboardingStateHolder.isProfileComplete).thenReturn(true)
+            whenever(mockPirWebProfileStateHolder.isProfileComplete).thenReturn(true)
             whenever(mockCurrentTimeProvider.localDateTimeNow()).thenReturn(currentDateTime)
-            whenever(mockPirWebOnboardingStateHolder.toProfileQueries(currentYear)).thenReturn(
+            whenever(mockPirWebProfileStateHolder.toProfileQueries(currentYear)).thenReturn(
                 profileQueries,
             )
             whenever(mockRepository.saveProfileQueries(profileQueries)).thenReturn(true)
@@ -147,11 +147,11 @@ class PirWebSaveProfileMessageHandlerTest {
             testee.process(jsMessage, mockJsMessaging, mockJsMessageCallback)
 
             // Then
-            verify(mockPirWebOnboardingStateHolder).isProfileComplete
+            verify(mockPirWebProfileStateHolder).isProfileComplete
             verify(mockRepository).saveProfileQueries(profileQueries)
             verifyResponse(jsMessage, true, mockJsMessaging)
             verifyStartAndScheduleInitialScan()
-            verify(mockPirWebOnboardingStateHolder).clear()
+            verify(mockPirWebProfileStateHolder).clear()
         }
 
     @Test
@@ -164,9 +164,9 @@ class PirWebSaveProfileMessageHandlerTest {
         val profileQuery2 = createProfileQuery(firstName = "Jane", lastName = "Smith")
         val profileQueries = listOf(profileQuery1, profileQuery2)
 
-        whenever(mockPirWebOnboardingStateHolder.isProfileComplete).thenReturn(true)
+        whenever(mockPirWebProfileStateHolder.isProfileComplete).thenReturn(true)
         whenever(mockCurrentTimeProvider.localDateTimeNow()).thenReturn(currentDateTime)
-        whenever(mockPirWebOnboardingStateHolder.toProfileQueries(currentYear)).thenReturn(
+        whenever(mockPirWebProfileStateHolder.toProfileQueries(currentYear)).thenReturn(
             profileQueries,
         )
         whenever(mockRepository.saveProfileQueries(profileQueries)).thenReturn(true)
@@ -175,11 +175,11 @@ class PirWebSaveProfileMessageHandlerTest {
         testee.process(jsMessage, mockJsMessaging, mockJsMessageCallback)
 
         // Then
-        verify(mockPirWebOnboardingStateHolder).isProfileComplete
+        verify(mockPirWebProfileStateHolder).isProfileComplete
         verify(mockRepository).saveProfileQueries(profileQueries)
         verifyResponse(jsMessage, true, mockJsMessaging)
         verifyStartAndScheduleInitialScan()
-        verify(mockPirWebOnboardingStateHolder).clear()
+        verify(mockPirWebProfileStateHolder).clear()
     }
 
     @Test
@@ -190,9 +190,9 @@ class PirWebSaveProfileMessageHandlerTest {
         val currentDateTime = LocalDateTime.of(currentYear, 7, 4, 12, 0)
         val emptyProfileQueries = emptyList<ProfileQuery>()
 
-        whenever(mockPirWebOnboardingStateHolder.isProfileComplete).thenReturn(true)
+        whenever(mockPirWebProfileStateHolder.isProfileComplete).thenReturn(true)
         whenever(mockCurrentTimeProvider.localDateTimeNow()).thenReturn(currentDateTime)
-        whenever(mockPirWebOnboardingStateHolder.toProfileQueries(currentYear)).thenReturn(
+        whenever(mockPirWebProfileStateHolder.toProfileQueries(currentYear)).thenReturn(
             emptyProfileQueries,
         )
         whenever(mockRepository.saveProfileQueries(emptyProfileQueries)).thenReturn(true)
@@ -201,11 +201,11 @@ class PirWebSaveProfileMessageHandlerTest {
         testee.process(jsMessage, mockJsMessaging, mockJsMessageCallback)
 
         // Then
-        verify(mockPirWebOnboardingStateHolder).isProfileComplete
+        verify(mockPirWebProfileStateHolder).isProfileComplete
         verify(mockRepository).saveProfileQueries(emptyProfileQueries)
         verifyResponse(jsMessage, true, mockJsMessaging)
         verifyStartAndScheduleInitialScan()
-        verify(mockPirWebOnboardingStateHolder).clear()
+        verify(mockPirWebProfileStateHolder).clear()
     }
 
     @Test
@@ -216,9 +216,9 @@ class PirWebSaveProfileMessageHandlerTest {
         val currentDateTime = LocalDateTime.of(currentYear, 3, 15, 8, 45)
         val profileQueries = listOf(createProfileQuery())
 
-        whenever(mockPirWebOnboardingStateHolder.isProfileComplete).thenReturn(true)
+        whenever(mockPirWebProfileStateHolder.isProfileComplete).thenReturn(true)
         whenever(mockCurrentTimeProvider.localDateTimeNow()).thenReturn(currentDateTime)
-        whenever(mockPirWebOnboardingStateHolder.toProfileQueries(currentYear)).thenReturn(
+        whenever(mockPirWebProfileStateHolder.toProfileQueries(currentYear)).thenReturn(
             profileQueries,
         )
         whenever(mockRepository.saveProfileQueries(profileQueries)).thenReturn(true)
@@ -230,7 +230,7 @@ class PirWebSaveProfileMessageHandlerTest {
         verify(mockRepository).saveProfileQueries(profileQueries)
         verifyResponse(jsMessage, true, mockJsMessaging)
         verifyStartAndScheduleInitialScan()
-        verify(mockPirWebOnboardingStateHolder).clear()
+        verify(mockPirWebProfileStateHolder).clear()
     }
 
     @Test
@@ -241,9 +241,9 @@ class PirWebSaveProfileMessageHandlerTest {
         val currentDateTime = LocalDateTime.of(currentYear, 1, 1, 0, 0)
         val profileQueries = listOf(createProfileQuery())
 
-        whenever(mockPirWebOnboardingStateHolder.isProfileComplete).thenReturn(true)
+        whenever(mockPirWebProfileStateHolder.isProfileComplete).thenReturn(true)
         whenever(mockCurrentTimeProvider.localDateTimeNow()).thenReturn(currentDateTime)
-        whenever(mockPirWebOnboardingStateHolder.toProfileQueries(currentYear)).thenReturn(
+        whenever(mockPirWebProfileStateHolder.toProfileQueries(currentYear)).thenReturn(
             profileQueries,
         )
         whenever(mockRepository.saveProfileQueries(profileQueries)).thenReturn(true)
@@ -252,11 +252,11 @@ class PirWebSaveProfileMessageHandlerTest {
         testee.process(jsMessage, mockJsMessaging, null)
 
         // Then
-        verify(mockPirWebOnboardingStateHolder).isProfileComplete
+        verify(mockPirWebProfileStateHolder).isProfileComplete
         verify(mockRepository).saveProfileQueries(profileQueries)
         verifyResponse(jsMessage, true, mockJsMessaging)
         verifyStartAndScheduleInitialScan()
-        verify(mockPirWebOnboardingStateHolder).clear()
+        verify(mockPirWebProfileStateHolder).clear()
     }
 
     private fun createProfileQuery(

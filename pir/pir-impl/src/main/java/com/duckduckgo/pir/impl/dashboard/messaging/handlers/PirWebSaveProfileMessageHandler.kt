@@ -27,7 +27,7 @@ import com.duckduckgo.js.messaging.api.JsMessageCallback
 import com.duckduckgo.js.messaging.api.JsMessaging
 import com.duckduckgo.pir.impl.dashboard.messaging.PirDashboardWebMessages
 import com.duckduckgo.pir.impl.dashboard.messaging.model.PirWebMessageResponse
-import com.duckduckgo.pir.impl.dashboard.state.PirWebOnboardingStateHolder
+import com.duckduckgo.pir.impl.dashboard.state.PirWebProfileStateHolder
 import com.duckduckgo.pir.impl.scan.PirForegroundScanService
 import com.duckduckgo.pir.impl.scan.PirScanScheduler
 import com.duckduckgo.pir.impl.store.PirRepository
@@ -45,7 +45,7 @@ import javax.inject.Inject
     boundType = PirWebJsMessageHandler::class,
 )
 class PirWebSaveProfileMessageHandler @Inject constructor(
-    private val pirWebOnboardingStateHolder: PirWebOnboardingStateHolder,
+    private val pirWebProfileStateHolder: PirWebProfileStateHolder,
     private val repository: PirRepository,
     private val dispatcherProvider: DispatcherProvider,
     private val context: Context,
@@ -64,7 +64,7 @@ class PirWebSaveProfileMessageHandler @Inject constructor(
         logcat { "PIR-WEB: PirWebSaveProfileMessageHandler: process $jsMessage" }
 
         // validate that we have the complete profile information
-        if (!pirWebOnboardingStateHolder.isProfileComplete) {
+        if (!pirWebProfileStateHolder.isProfileComplete) {
             logcat { "PIR-WEB: PirWebSaveProfileMessageHandler: incomplete profile information" }
             jsMessaging.sendResponse(
                 jsMessage = jsMessage,
@@ -74,7 +74,7 @@ class PirWebSaveProfileMessageHandler @Inject constructor(
         }
 
         appCoroutineScope.launch(dispatcherProvider.io()) {
-            val profileQueries = pirWebOnboardingStateHolder.toProfileQueries(currentTimeProvider.localDateTimeNow().year)
+            val profileQueries = pirWebProfileStateHolder.toProfileQueries(currentTimeProvider.localDateTimeNow().year)
             if (!repository.saveProfileQueries(profileQueries)) {
                 logcat { "PIR-WEB: PirWebSaveProfileMessageHandler: failed to save all user profiles" }
                 jsMessaging.sendResponse(
@@ -92,7 +92,7 @@ class PirWebSaveProfileMessageHandler @Inject constructor(
             // start the initial scan at this point as startScanAndOptOut message is not reliable
             startAndScheduleInitialScan()
 
-            pirWebOnboardingStateHolder.clear()
+            pirWebProfileStateHolder.clear()
         }
     }
 

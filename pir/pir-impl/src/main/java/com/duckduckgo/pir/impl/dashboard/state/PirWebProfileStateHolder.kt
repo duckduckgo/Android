@@ -23,8 +23,10 @@ import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
 import javax.inject.Inject
 
-interface PirWebOnboardingStateHolder {
+interface PirWebProfileStateHolder {
     val isProfileComplete: Boolean
+
+    fun setLoadedProfileQueries(profileQueries: List<ProfileQuery>)
 
     fun addAddress(
         city: String,
@@ -59,7 +61,7 @@ interface PirWebOnboardingStateHolder {
 
 @ContributesBinding(ActivityScope::class)
 @SingleInstanceIn(ActivityScope::class)
-class RealPirWebOnboardingStateHolder @Inject constructor() : PirWebOnboardingStateHolder {
+class RealPirWebProfileStateHolder @Inject constructor() : PirWebProfileStateHolder {
 
     private val names: MutableList<Name> = mutableListOf()
     private val addresses: MutableList<Address> = mutableListOf()
@@ -67,6 +69,24 @@ class RealPirWebOnboardingStateHolder @Inject constructor() : PirWebOnboardingSt
 
     override val isProfileComplete: Boolean
         get() = names.isNotEmpty() && addresses.isNotEmpty() && birthYear > 0
+
+    override fun setLoadedProfileQueries(profileQueries: List<ProfileQuery>) {
+        clear()
+        profileQueries.forEach { profileQuery ->
+            addName(
+                firstName = profileQuery.firstName,
+                middleName = profileQuery.middleName,
+                lastName = profileQuery.lastName,
+            )
+            addAddress(
+                city = profileQuery.city,
+                state = profileQuery.state,
+            )
+            if (birthYear == 0 && profileQuery.birthYear > 0) {
+                setBirthYear(profileQuery.birthYear)
+            }
+        }
+    }
 
     override fun addAddress(
         city: String,

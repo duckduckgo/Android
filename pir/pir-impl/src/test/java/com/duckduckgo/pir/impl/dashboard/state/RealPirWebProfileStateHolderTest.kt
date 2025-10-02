@@ -22,13 +22,13 @@ import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 
-class RealPirWebOnboardingStateHolderTest {
+class RealPirWebProfileStateHolderTest {
 
-    private lateinit var testee: RealPirWebOnboardingStateHolder
+    private lateinit var testee: RealPirWebProfileStateHolder
 
     @Before
     fun setUp() {
-        testee = RealPirWebOnboardingStateHolder()
+        testee = RealPirWebProfileStateHolder()
     }
 
     @Test
