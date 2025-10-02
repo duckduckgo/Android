@@ -1,4 +1,6 @@
+
 appId: com.duckduckgo.mobile.android
+androidWebViewHierarchy: devtools
 ---
 # Navigate to a YouTube video
 - tapOn:
