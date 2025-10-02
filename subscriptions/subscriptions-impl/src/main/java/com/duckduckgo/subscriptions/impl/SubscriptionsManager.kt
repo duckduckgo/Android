@@ -55,6 +55,7 @@ import com.duckduckgo.subscriptions.impl.auth2.TokenPair
 import com.duckduckgo.subscriptions.impl.billing.PlayBillingManager
 import com.duckduckgo.subscriptions.impl.billing.PurchaseState
 import com.duckduckgo.subscriptions.impl.billing.RetryPolicy
+import com.duckduckgo.subscriptions.impl.billing.SubscriptionReplacementMode
 import com.duckduckgo.subscriptions.impl.billing.retry
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionFailureErrorType
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
@@ -91,6 +92,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.onSubscription
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import kotlinx.coroutines.delay
 import logcat.LogPriority.ERROR
 import logcat.asLog
 import logcat.logcat
@@ -104,7 +106,6 @@ import javax.inject.Inject
 import kotlin.time.Duration.Companion.milliseconds
 
 interface SubscriptionsManager {
-
     /**
      * Returns available purchase options retrieved from Play Store
      */
@@ -233,6 +234,22 @@ interface SubscriptionsManager {
      * @return `true` if a Free Trial offer is available for the user, `false` otherwise
      */
     suspend fun isFreeTrialEligible(): Boolean
+
+    /**
+     * Switches the current subscription plan to a new one
+     * 
+     * @param activity The activity context required for launching Google Play billing flow
+     * @param planId The new plan ID to switch to
+     * @param offerId The offer ID for the new plan (optional)
+     * @param replacementMode The replacement mode for the subscription switch
+     * @return `true` if the switch was successful, `false` otherwise
+     */
+    suspend fun switchSubscriptionPlan(
+        activity: Activity,
+        planId: String,
+        offerId: String? = null,
+        replacementMode: SubscriptionReplacementMode,
+    ): Boolean
 }
 
 @SingleInstanceIn(AppScope::class)
@@ -255,7 +272,6 @@ class RealSubscriptionsManager @Inject constructor(
     private val backgroundTokenRefresh: BackgroundTokenRefresh,
     private val subscriptionPurchaseWideEvent: SubscriptionPurchaseWideEvent,
 ) : SubscriptionsManager {
-
     private val adapter = Moshi.Builder().build().adapter(ResponseError::class.java)
 
     private val _currentPurchaseState = MutableSharedFlow<CurrentPurchase>()
@@ -364,6 +380,159 @@ class RealSubscriptionsManager @Inject constructor(
         }
         return !userHadFreeTrial && privacyProFeature.get().privacyProFreeTrial().isEnabled() && freeTrialProductsAvailableInGooglePlay
     }
+
+    override suspend fun switchSubscriptionPlan(
+        activity: Activity,
+        planId: String,
+        offerId: String?,
+        replacementMode: SubscriptionReplacementMode,
+    ): Boolean =
+        withContext(dispatcherProvider.io()) {
+            return@withContext try {
+                if (!isSignedIn()) {
+                    logcat { "Subs: Cannot switch plan - user not signed in" }
+                    return@withContext false
+                }
+
+                val currentSubscription = authRepository.getSubscription()
+                if (currentSubscription == null || !currentSubscription.isActive()) {
+                    logcat { "Subs: Cannot switch plan - no active subscription found" }
+                    return@withContext false
+                }
+
+                // fixme: Replace purchaseHistory with queryPurchasesAsync() to fetch the current purchase token.
+                // This aligns with Billing v8 and avoids using the deprecated Purchase History API.
+                val currentPurchaseToken =
+                    playBillingManager.purchaseHistory
+                        .filter { it.products.contains(BASIC_SUBSCRIPTION) }
+                        .maxByOrNull { it.purchaseTime }
+                        ?.purchaseToken
+
+                if (currentPurchaseToken == null) {
+                    logcat { "Subs: Cannot switch plan - no current purchase token found" }
+                    return@withContext false
+                }
+
+                // Get account details for external ID
+                val account = authRepository.getAccount()
+                if (account == null) {
+                    logcat { "Subs: Cannot switch plan - no account found" }
+                    return@withContext false
+                }
+
+                // Validate the new plan exists
+                val availableOffers = getSubscriptionOffer()
+                val targetOffer = availableOffers.find { it.planId == planId && it.offerId == offerId }
+                if (targetOffer == null) {
+                    logcat { "Subs: Cannot switch plan - target plan not found: $planId with offer $offerId" }
+                    return@withContext false
+                }
+
+                // Launch Google Play billing flow for subscription update
+                logcat { "Subs: Launching subscription update flow for plan: $planId" }
+                
+                // Launch the subscription update flow using PlayBillingManager
+                withContext(dispatcherProvider.main()) {
+                    playBillingManager.launchSubscriptionUpdate(
+                        activity = activity,
+                        newPlanId = planId,
+                        externalId = account.externalId,
+                        newOfferId = offerId,
+                        oldPurchaseToken = currentPurchaseToken,
+                        replacementMode = replacementMode,
+                    )
+                }
+
+                // Wait for the purchase to complete by observing the purchase state
+                var purchaseCompleted = false
+                var purchaseToken: String? = null
+
+                val purchaseStateJob = launch {
+                    playBillingManager.purchaseState.collect { state ->
+                        when (state) {
+                            is PurchaseState.Purchased -> {
+                                logcat { "Subs: Purchase completed successfully" }
+                                purchaseToken = state.purchaseToken
+                                purchaseCompleted = true
+                            }
+                            is PurchaseState.Canceled -> {
+                                logcat { "Subs: Purchase was canceled" }
+                                purchaseCompleted = true
+                            }
+                            is PurchaseState.InProgress -> {
+                                logcat { "Subs: Purchase in progress..." }
+                            }
+                        }
+                    }
+                }
+
+                // Wait for purchase completion with timeout
+                val timeoutMs = 60_000L // 60 seconds timeout
+                val startTime = System.currentTimeMillis()
+                
+                while (!purchaseCompleted && (System.currentTimeMillis() - startTime) < timeoutMs) {
+                    delay(500) // Check every 500ms
+                }
+                
+                purchaseStateJob.cancel()
+
+                val newPurchaseToken = purchaseToken
+                if (newPurchaseToken == null) {
+                    logcat { "Subs: Plan switch failed - no new purchase token received" }
+                    return@withContext false
+                }
+
+                // Confirm the plan switch with backend using the new purchase token
+                val packageName = context.packageName
+                val experimentName: String? = experimentAssigned?.name
+                val cohort: String? = experimentAssigned?.cohort
+
+                val confirmationResponse =
+                    subscriptionsService.confirm(
+                        ConfirmationBody(
+                            packageName = packageName,
+                            purchaseToken = newPurchaseToken,
+                            experimentName = experimentName,
+                            experimentCohort = cohort,
+                            oldPurchaseToken = currentPurchaseToken,
+                            replacementMode = replacementMode.name,
+                        ),
+                    )
+
+                // Update subscription data
+                val subscription =
+                    Subscription(
+                        productId = confirmationResponse.subscription.productId,
+                        billingPeriod = confirmationResponse.subscription.billingPeriod,
+                        startedAt = confirmationResponse.subscription.startedAt,
+                        expiresOrRenewsAt = confirmationResponse.subscription.expiresOrRenewsAt,
+                        status = confirmationResponse.subscription.status.toStatus(),
+                        platform = confirmationResponse.subscription.platform,
+                        activeOffers = confirmationResponse.subscription.activeOffers.map { it.type.toActiveOfferType() },
+                    )
+
+                authRepository.setSubscription(subscription)
+
+                if (shouldUseAuthV2()) {
+                    // Invalidate access token and refresh
+                    authRepository.setAccessTokenV2(null)
+                    refreshAccessToken()
+                } else {
+                    authRepository
+                        .getAccount()
+                        ?.copy(email = confirmationResponse.email)
+                        ?.let { authRepository.setAccount(it) }
+
+                    authRepository.setEntitlements(confirmationResponse.entitlements.toEntitlements())
+                }
+
+                logcat { "Subs: Successfully switched subscription plan to $planId" }
+                true
+            } catch (e: Exception) {
+                logcat(ERROR) { "Subs: Failed to switch subscription plan: ${e.asLog()}" }
+                false
+            }
+        }
 
     override suspend fun getAccount(): Account? = authRepository.getAccount()
 

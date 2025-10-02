@@ -89,7 +89,8 @@ interface PlayBillingManager {
         newPlanId: String,
         externalId: String,
         newOfferId: String?,
-        replacementMode: SubscriptionReplacementMode = SubscriptionReplacementMode.DEFERRED,
+        oldPurchaseToken: String,
+        replacementMode: SubscriptionReplacementMode,
     )
 }
 
@@ -236,6 +237,7 @@ class RealPlayBillingManager @Inject constructor(
         newPlanId: String,
         externalId: String,
         newOfferId: String?,
+        oldPurchaseToken: String,
         replacementMode: SubscriptionReplacementMode,
     ) = withContext(dispatcherProvider.io()) {
         if (!billingClient.ready) {
@@ -243,7 +245,7 @@ class RealPlayBillingManager @Inject constructor(
             connect()
         }
 
-        val oldPurchaseToken: String? = getCurrentPurchaseToken()
+        logcat { "Billing: Using provided old purchase token: ${oldPurchaseToken.take(10)}..." }
 
         val productDetails = products.find { it.productId == BASIC_SUBSCRIPTION }
 
@@ -252,7 +254,8 @@ class RealPlayBillingManager @Inject constructor(
             ?.find { it.basePlanId == newPlanId && it.offerId == newOfferId }
             ?.offerToken
 
-        if (productDetails == null || offerToken == null || oldPurchaseToken == null) {
+        if (productDetails == null || offerToken == null) {
+            logcat(logcat.LogPriority.ERROR) { "Billing: Cannot launch subscription update - productDetails: ${productDetails != null}, offerToken: ${offerToken != null}" }
             _purchaseState.emit(Canceled)
             return@withContext
         }
@@ -278,15 +281,6 @@ class RealPlayBillingManager @Inject constructor(
         }
     }
 
-    /**
-     * Gets the current purchase token for the active subscription
-     */
-    private suspend fun getCurrentPurchaseToken(): String? = withContext(dispatcherProvider.io()) {
-        return@withContext purchaseHistory
-            .filter { it.products.contains(BASIC_SUBSCRIPTION) }
-            .maxByOrNull { it.purchaseTime }
-            ?.purchaseToken
-    }
 
     private fun onPurchasesUpdated(result: PurchasesUpdateResult) {
         coroutineScope.launch {
