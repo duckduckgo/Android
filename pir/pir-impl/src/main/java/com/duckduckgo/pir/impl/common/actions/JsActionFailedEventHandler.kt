@@ -86,11 +86,13 @@ class JsActionFailedEventHandler @Inject constructor(
         // If failure is on Any captcha action, we proceed to next action
         return if (shouldRetryFailedAction(state, event, currentAction)) {
             Next(
-                nextState = state.copy(
+                nextState =
+                state.copy(
                     currentActionIndex = state.currentActionIndex,
                     actionRetryCount = state.actionRetryCount + 1,
                 ),
-                nextEvent = ExecuteBrokerStepAction(
+                nextEvent =
+                ExecuteBrokerStepAction(
                     UserProfile(
                         userProfile = state.profileQuery,
                     ),
@@ -98,11 +100,13 @@ class JsActionFailedEventHandler @Inject constructor(
             )
         } else if (currentAction is GetCaptchaInfo || currentAction is SolveCaptcha) {
             Next(
-                nextState = state.copy(
+                nextState =
+                state.copy(
                     currentActionIndex = state.currentActionIndex + 1,
                     actionRetryCount = 0,
                 ),
-                nextEvent = ExecuteBrokerStepAction(
+                nextEvent =
+                ExecuteBrokerStepAction(
                     UserProfile(
                         userProfile = state.profileQuery,
                     ),
@@ -112,7 +116,7 @@ class JsActionFailedEventHandler @Inject constructor(
             // If error happens we skip to next Broker as next steps will not make sense
             Next(
                 nextState = state,
-                nextEvent = BrokerStepCompleted(isSuccess = false),
+                nextEvent = BrokerStepCompleted(needsEmailConfirmation = false, isSuccess = false),
             )
         }
     }

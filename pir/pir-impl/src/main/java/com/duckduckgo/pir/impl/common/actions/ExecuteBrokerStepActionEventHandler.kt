@@ -25,7 +25,6 @@ import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.Event
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.Event.BrokerStepCompleted
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.Event.ExecuteBrokerStepAction
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.SideEffect.AwaitCaptchaSolution
-import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.SideEffect.AwaitEmailConfirmation
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.SideEffect.GetEmailForProfile
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.SideEffect.PushJsAction
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.State
@@ -72,7 +71,7 @@ class ExecuteBrokerStepActionEventHandler @Inject constructor() : EventHandler {
         return if (state.currentActionIndex == currentBrokerStep.actions.size) {
             Next(
                 nextState = state,
-                nextEvent = BrokerStepCompleted(true),
+                nextEvent = BrokerStepCompleted(needsEmailConfirmation = false, isSuccess = true),
             )
         } else {
             val actionToExecute = currentBrokerStep.actions[state.currentActionIndex]
@@ -80,7 +79,8 @@ class ExecuteBrokerStepActionEventHandler @Inject constructor() : EventHandler {
             if (currentBrokerStep is OptOutStep && actionToExecute.needsEmail && !hasEmail(currentBrokerStep)) {
                 Next(
                     nextState = state,
-                    sideEffect = GetEmailForProfile(
+                    sideEffect =
+                    GetEmailForProfile(
                         actionId = actionToExecute.id,
                         brokerName = currentBrokerStep.brokerName,
                         extractedProfile = currentBrokerStep.profileToOptOut,
@@ -102,17 +102,17 @@ class ExecuteBrokerStepActionEventHandler @Inject constructor() : EventHandler {
                 if (currentBrokerStep is OptOutStep && actionToExecute is EmailConfirmation) {
                     Next(
                         nextState = state,
-                        sideEffect = AwaitEmailConfirmation(
-                            actionId = actionToExecute.id,
-                            brokerName = currentBrokerStep.brokerName,
-                            extractedProfile = currentBrokerStep.profileToOptOut,
-                            pollingIntervalSeconds = actionToExecute.pollingTime.toFloat(),
+                        nextEvent =
+                        BrokerStepCompleted(
+                            needsEmailConfirmation = true,
+                            isSuccess = true,
                         ),
                     )
                 } else if (actionToExecute is SolveCaptcha && requestData !is PirScriptRequestData.SolveCaptcha) {
                     Next(
                         nextState = state,
-                        sideEffect = AwaitCaptchaSolution(
+                        sideEffect =
+                        AwaitCaptchaSolution(
                             actionId = actionToExecute.id,
                             brokerName = currentBrokerStep.brokerName,
                             transactionID = state.transactionID,
@@ -122,7 +122,8 @@ class ExecuteBrokerStepActionEventHandler @Inject constructor() : EventHandler {
                 } else {
                     Next(
                         nextState = state,
-                        sideEffect = PushJsAction(
+                        sideEffect =
+                        PushJsAction(
                             actionToExecute.id,
                             actionToExecute,
                             pushDelay,
@@ -134,17 +135,15 @@ class ExecuteBrokerStepActionEventHandler @Inject constructor() : EventHandler {
         }
     }
 
-    private fun hasEmail(optOutStep: OptOutStep): Boolean {
-        return optOutStep.profileToOptOut.email.isNotEmpty()
-    }
+    private fun hasEmail(optOutStep: OptOutStep): Boolean = optOutStep.profileToOptOut.email.isNotEmpty()
 
     private fun completeRequestData(
         brokerStep: BrokerStep,
         actionToExecute: BrokerAction,
         profileQuery: ProfileQuery,
         requestData: PirScriptRequestData,
-    ): PirScriptRequestData {
-        return if (brokerStep is OptOutStep && actionToExecute.dataSource == EXTRACTED_PROFILE &&
+    ): PirScriptRequestData =
+        if (brokerStep is OptOutStep && actionToExecute.dataSource == EXTRACTED_PROFILE &&
             (requestData as UserProfile).extractedProfile == null
         ) {
             val extractedProfile = brokerStep.profileToOptOut
@@ -156,5 +155,4 @@ class ExecuteBrokerStepActionEventHandler @Inject constructor() : EventHandler {
         } else {
             requestData
         }
-    }
 }

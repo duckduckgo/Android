@@ -112,9 +112,7 @@ interface JobRecordUpdater {
      *
      * @param extractedProfileId The id stored in our database for the [ExtractedProfile]
      */
-    suspend fun markOptOutAsAttempted(
-        extractedProfileId: Long,
-    )
+    suspend fun markOptOutAsAttempted(extractedProfileId: Long)
 
     /**
      * Updates the [OptOutJobRecord] associated with a given [extractedProfileId].
@@ -125,9 +123,7 @@ interface JobRecordUpdater {
      *
      * @param extractedProfileId The id stored in our database for the [ExtractedProfile]
      */
-    suspend fun updateOptOutRequested(
-        extractedProfileId: Long,
-    )
+    suspend fun updateOptOutRequested(extractedProfileId: Long)
 
     /**
      * Updates the [OptOutJobRecord] associated with a given [extractedProfileId].
@@ -138,8 +134,15 @@ interface JobRecordUpdater {
      *
      * @param extractedProfileId The id stored in our database for the [ExtractedProfile]
      */
-    suspend fun updateOptOutError(
+    suspend fun updateOptOutError(extractedProfileId: Long)
+
+    suspend fun markOptOutAsWaitingForEmailConfirmation(extractedProfileId: Long)
+
+    suspend fun recordEmailConfirmationFetchAttempt(extractedProfileId: Long)
+
+    suspend fun markEmailConfirmationWithLink(
         extractedProfileId: Long,
+        link: String,
     )
 }
 
@@ -189,12 +192,13 @@ class RealJobRecordUpdater @Inject constructor(
         withContext(dispatcherProvider.io()) {
             schedulingRepository.getValidOptOutJobRecord(extractedProfileId)?.also {
                 schedulingRepository.saveOptOutJobRecord(
-                    it.copy(
-                        attemptCount = it.attemptCount + 1,
-                        lastOptOutAttemptDateInMillis = currentTimeProvider.currentTimeMillis(),
-                    ).also {
-                        logcat { "PIR-JOB-RECORD: Updating OptOutRecord for $extractedProfileId to $it" }
-                    },
+                    it
+                        .copy(
+                            attemptCount = it.attemptCount + 1,
+                            lastOptOutAttemptDateInMillis = currentTimeProvider.currentTimeMillis(),
+                        ).also {
+                            logcat { "PIR-JOB-RECORD: Updating OptOutRecord for $extractedProfileId to $it" }
+                        },
                 )
             }
         }
@@ -211,16 +215,20 @@ class RealJobRecordUpdater @Inject constructor(
                 repository.getExtractedProfiles(brokerName, profileQueryId)
 
             if (storedExtractedProfiles.isNotEmpty()) {
-                val newKeys = newExtractedProfiles.asSequence()
-                    .map { it.toKey() }
-                    .toHashSet()
+                val newKeys =
+                    newExtractedProfiles
+                        .asSequence()
+                        .map { it.toKey() }
+                        .toHashSet()
 
                 logcat { "PIR-JOB-RECORD: New Profiles ${newExtractedProfiles.size} : $newExtractedProfiles" }
                 logcat { "PIR-JOB-RECORD: Stored Profiles ${storedExtractedProfiles.size} : $storedExtractedProfiles" }
 
-                val removedExtractedProfiles = storedExtractedProfiles.asSequence()
-                    .filter { it.toKey() !in newKeys }
-                    .toList()
+                val removedExtractedProfiles =
+                    storedExtractedProfiles
+                        .asSequence()
+                        .filter { it.toKey() !in newKeys }
+                        .toList()
 
                 logcat { "PIR-JOB-RECORD: Removed Profiles $removedExtractedProfiles" }
 
@@ -241,47 +249,97 @@ class RealJobRecordUpdater @Inject constructor(
         withContext(dispatcherProvider.io()) {
             schedulingRepository.getValidOptOutJobRecord(extractedProfileId)?.also {
                 schedulingRepository.saveOptOutJobRecord(
-                    it.copy(
-                        status = OptOutJobStatus.REMOVED,
-                        optOutRemovedDateInMillis = removedDateInMillis,
-                    ).also {
-                        logcat { "PIR-JOB-RECORD: Updating OptOutRecord for $extractedProfileId to $it" }
-                    },
+                    it
+                        .copy(
+                            status = OptOutJobStatus.REMOVED,
+                            optOutRemovedDateInMillis = removedDateInMillis,
+                        ).also {
+                            logcat { "PIR-JOB-RECORD: Updating OptOutRecord for $extractedProfileId to $it" }
+                        },
                 )
             }
         }
     }
 
-    override suspend fun updateOptOutRequested(
-        extractedProfileId: Long,
-    ) {
+    override suspend fun updateOptOutRequested(extractedProfileId: Long) {
         withContext(dispatcherProvider.io()) {
             schedulingRepository.getValidOptOutJobRecord(extractedProfileId)?.also {
                 schedulingRepository.saveOptOutJobRecord(
-                    it.copy(
-                        status = OptOutJobStatus.REQUESTED,
-                        optOutRequestedDateInMillis = currentTimeProvider.currentTimeMillis(),
-                    ).also {
-                        logcat { "PIR-JOB-RECORD: Updating OptOutRecord for $extractedProfileId to $it" }
-                    },
+                    it
+                        .copy(
+                            status = OptOutJobStatus.REQUESTED,
+                            optOutRequestedDateInMillis = currentTimeProvider.currentTimeMillis(),
+                        ).also {
+                            logcat { "PIR-JOB-RECORD: Updating OptOutRecord for $extractedProfileId to $it" }
+                        },
                 )
             }
         }
     }
 
-    override suspend fun updateOptOutError(
-        extractedProfileId: Long,
-    ) {
+    override suspend fun updateOptOutError(extractedProfileId: Long) {
         withContext(dispatcherProvider.io()) {
             schedulingRepository.getValidOptOutJobRecord(extractedProfileId)?.also {
                 schedulingRepository.saveOptOutJobRecord(
-                    it.copy(
-                        status = OptOutJobStatus.ERROR,
-                    ).also {
-                        logcat { "PIR-JOB-RECORD: Updating OptOutRecord for $extractedProfileId to $it" }
-                    },
+                    it
+                        .copy(
+                            status = OptOutJobStatus.ERROR,
+                        ).also {
+                            logcat { "PIR-JOB-RECORD: Updating OptOutRecord for $extractedProfileId to $it" }
+                        },
                 )
             }
+        }
+    }
+
+    override suspend fun markOptOutAsWaitingForEmailConfirmation(extractedProfileId: Long) {
+        withContext(dispatcherProvider.io()) {
+            schedulingRepository.getValidOptOutJobRecord(extractedProfileId)?.also {
+                schedulingRepository.saveOptOutJobRecord(
+                    it
+                        .copy(
+                            status = OptOutJobStatus.PENDING_EMAIL_CONFIRMATION,
+                        ).also {
+                            logcat { "PIR-JOB-RECORD: Updating OptOutRecord for $extractedProfileId to $it" }
+                        },
+                )
+            }
+        }
+    }
+
+    override suspend fun recordEmailConfirmationFetchAttempt(extractedProfileId: Long) {
+        schedulingRepository.getEmailConfirmationJob(extractedProfileId)?.also {
+            schedulingRepository.saveEmailConfirmationJobRecord(
+                it
+                    .copy(
+                        linkFetchData =
+                        it.linkFetchData.copy(
+                            linkFetchAttemptCount = it.linkFetchData.linkFetchAttemptCount + 1,
+                            lastLinkFetchDateInMillis = currentTimeProvider.currentTimeMillis(),
+                        ),
+                    ).also {
+                        logcat { "PIR-JOB-RECORD: Updating EmailConfirmation for $extractedProfileId to $it" }
+                    },
+            )
+        }
+    }
+
+    override suspend fun markEmailConfirmationWithLink(
+        extractedProfileId: Long,
+        link: String,
+    ) {
+        schedulingRepository.getEmailConfirmationJob(extractedProfileId)?.also {
+            schedulingRepository.saveEmailConfirmationJobRecord(
+                it
+                    .copy(
+                        linkFetchData =
+                        it.linkFetchData.copy(
+                            emailConfirmationLink = link,
+                        ),
+                    ).also {
+                        logcat { "PIR-JOB-RECORD: Updating EmailConfirmation for $extractedProfileId to $it" }
+                    },
+            )
         }
     }
 
@@ -301,8 +359,8 @@ class RealJobRecordUpdater @Inject constructor(
         val identifier: String,
     )
 
-    private fun ExtractedProfile.toKey(): ExtractedProfileComparisonKey {
-        return ExtractedProfileComparisonKey(
+    private fun ExtractedProfile.toKey(): ExtractedProfileComparisonKey =
+        ExtractedProfileComparisonKey(
             profileQueryId = profileQueryId,
             brokerName = brokerName,
             name = name,
@@ -317,5 +375,4 @@ class RealJobRecordUpdater @Inject constructor(
             profileUrl = profileUrl,
             identifier = identifier,
         )
-    }
 }
