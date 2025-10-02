@@ -44,7 +44,6 @@
             android:id="@+id/tabUnread"
             android:layout_width="9dp"
             android:layout_height="9dp"
-            android:elevation="30dp"
             android:importantForAccessibility="no"
             android:src="@drawable/tab_unread_indicator"
             app:layout_constraintCircle="@id/favicon"
@@ -78,7 +77,7 @@
 
         <com.duckduckgo.common.ui.view.text.DaxTextView
             android:id="@+id/title"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:ellipsize="end"
             android:lines="1"
@@ -86,6 +85,7 @@
             android:textIsSelectable="false"
             android:layout_marginStart="@dimen/keyline_2"
             android:layout_marginEnd="6dp"
+            android:breakStrategy="simple"
             app:layout_constrainedWidth="true"
             app:layout_constraintEnd_toStartOf="@+id/selectionIndicator"
             app:layout_constraintStart_toEndOf="@id/favicon"
