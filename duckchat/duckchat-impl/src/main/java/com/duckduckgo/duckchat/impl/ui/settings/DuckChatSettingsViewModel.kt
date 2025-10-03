@@ -27,6 +27,7 @@ import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
 import com.duckduckgo.duckchat.impl.ui.settings.DuckChatSettingsViewModel.Command.OpenLink
 import com.duckduckgo.duckchat.impl.ui.settings.DuckChatSettingsViewModel.Command.OpenLinkInNewTab
 import com.duckduckgo.duckchat.impl.ui.settings.DuckChatSettingsViewModel.Command.OpenShortcutSettings
+import com.duckduckgo.settings.api.SettingsPageFeature
 import com.duckduckgo.subscriptions.api.SubscriptionRebrandingFeatureToggle
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
 import kotlinx.coroutines.channels.Channel
@@ -43,8 +44,8 @@ class DuckChatSettingsViewModel @Inject constructor(
     private val pixel: Pixel,
     private val rebrandingAiFeaturesEnabled: SubscriptionRebrandingFeatureToggle,
     private val inputScreenDiscoveryFunnel: InputScreenDiscoveryFunnel,
+    private val settingsPageFeature: SettingsPageFeature,
 ) : ViewModel() {
-
     private val commandChannel = Channel<Command>(capacity = 1, onBufferOverflow = DROP_OLDEST)
     val commands = commandChannel.receiveAsFlow()
 
@@ -56,23 +57,31 @@ class DuckChatSettingsViewModel @Inject constructor(
         val isRebrandingAiFeaturesEnabled: Boolean = false,
     )
 
-    val viewState = combine(
-        duckChat.observeEnableDuckChatUserSetting(),
-        duckChat.observeInputScreenUserSettingEnabled(),
-    ) { isDuckChatUserEnabled, isInputScreenEnabled ->
-        ViewState(
-            isDuckChatUserEnabled = isDuckChatUserEnabled,
-            isInputScreenEnabled = isInputScreenEnabled,
-            shouldShowShortcuts = isDuckChatUserEnabled,
-            shouldShowInputScreenToggle = isDuckChatUserEnabled && duckChat.isInputScreenFeatureAvailable(),
-            isRebrandingAiFeaturesEnabled = rebrandingAiFeaturesEnabled.isAIFeaturesRebrandingEnabled(),
-        )
-    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), ViewState())
+    val viewState =
+        combine(
+            duckChat.observeEnableDuckChatUserSetting(),
+            duckChat.observeInputScreenUserSettingEnabled(),
+        ) { isDuckChatUserEnabled, isInputScreenEnabled ->
+            ViewState(
+                isDuckChatUserEnabled = isDuckChatUserEnabled,
+                isInputScreenEnabled = isInputScreenEnabled,
+                shouldShowShortcuts = isDuckChatUserEnabled,
+                shouldShowInputScreenToggle = isDuckChatUserEnabled && duckChat.isInputScreenFeatureAvailable(),
+                isRebrandingAiFeaturesEnabled = rebrandingAiFeaturesEnabled.isAIFeaturesRebrandingEnabled(),
+            )
+        }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), ViewState())
 
     sealed class Command {
-        data class OpenLink(val link: String) : Command()
-        data class OpenLinkInNewTab(val link: String) : Command()
+        data class OpenLink(
+            val link: String,
+        ) : Command()
+
+        data class OpenLinkInNewTab(
+            val link: String,
+        ) : Command()
+
         data object OpenShortcutSettings : Command()
+
         data object LaunchFeedback : Command()
     }
 
@@ -117,7 +126,13 @@ class DuckChatSettingsViewModel @Inject constructor(
 
     fun duckChatSearchAISettingsClicked() {
         viewModelScope.launch {
-            commandChannel.send(OpenLinkInNewTab(DUCK_CHAT_SEARCH_AI_SETTINGS_LINK))
+            val settingsLink =
+                if (settingsPageFeature.saveAndExitSerpSettings().isEnabled()) {
+                    DUCK_CHAT_SEARCH_AI_SETTINGS_LINK_WITH_RETURN_PARAM
+                } else {
+                    DUCK_CHAT_SEARCH_AI_SETTINGS_LINK
+                }
+            commandChannel.send(OpenLinkInNewTab(settingsLink))
             pixel.fire(DuckChatPixelName.DUCK_CHAT_SEARCH_ASSIST_SETTINGS_BUTTON_CLICKED)
         }
     }
@@ -153,5 +168,6 @@ class DuckChatSettingsViewModel @Inject constructor(
     companion object {
         const val DUCK_CHAT_LEARN_MORE_LINK = "https://duckduckgo.com/duckduckgo-help-pages/aichat/"
         const val DUCK_CHAT_SEARCH_AI_SETTINGS_LINK = "https://duckduckgo.com/settings?ko=-1#aifeatures"
+        const val DUCK_CHAT_SEARCH_AI_SETTINGS_LINK_WITH_RETURN_PARAM = "https://duckduckgo.com/settings?ko=-1&return=aiFeatures#aifeatures"
     }
 }
