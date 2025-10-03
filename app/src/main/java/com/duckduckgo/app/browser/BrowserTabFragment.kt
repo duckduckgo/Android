@@ -107,6 +107,7 @@ import com.duckduckgo.app.browser.R.string
 import com.duckduckgo.app.browser.SSLErrorType.NONE
 import com.duckduckgo.app.browser.WebViewErrorResponse.LOADING
 import com.duckduckgo.app.browser.WebViewErrorResponse.OMITTED
+import com.duckduckgo.app.browser.animations.AddressBarTrackersAnimationFeatureToggle
 import com.duckduckgo.app.browser.api.WebViewCapabilityChecker
 import com.duckduckgo.app.browser.api.WebViewCapabilityChecker.WebViewCapability
 import com.duckduckgo.app.browser.applinks.AppLinksLauncher
@@ -2282,6 +2283,7 @@ class BrowserTabFragment :
             }
 
             is Command.SubmitChat -> duckChat.openDuckChatWithAutoPrompt(it.query)
+            is Command.EnqueueCookiesAnimation -> enqueueCookiesAnimation(it.isCosmetic)
         }
     }
 
@@ -2305,6 +2307,17 @@ class BrowserTabFragment :
             }
             context?.let {
                 omnibar.createCookiesAnimation(isCosmetic)
+            }
+        }
+    }
+
+    private fun enqueueCookiesAnimation(isCosmetic: Boolean) {
+        launch {
+            if (isCosmetic) {
+                delay(COOKIES_ANIMATION_DELAY)
+            }
+            context?.let {
+                omnibar.enqueueCookiesAnimation(isCosmetic)
             }
         }
     }

@@ -498,4 +498,8 @@ sealed class Command {
     data class ShowSerpEasterEggLogo(
         val logoUrl: String,
     ) : Command()
+
+    data class EnqueueCookiesAnimation(
+        val isCosmetic: Boolean,
+    ) : Command()
 }
