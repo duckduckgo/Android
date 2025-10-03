@@ -15,14 +15,50 @@
   -->
 
 <resources>
+    <string name="importToDuckDuckGo">Import to DuckDuckGo</string>
 
     <!-- Import Bookmarks Strings -->
     <string name="autofillImportBookmarksChromeFolderName">Imported from Chrome</string>
-
-
-    <!-- Import Bookmarks Strings -->
     <string name="autofillManagementImportBookmarks">Import Bookmarks</string>
     <string name="autofillManagementImportBookmarksTitle">Import Your Bookmarks</string>
+    <string name="importBookmarksFromGooglePreImportDialogTitle">Import Bookmarks From Google</string>
+    <string name="importBookmarksFromGooglePreImportDialogInstruction">Google may ask you to sign in or enter your password to confirm.</string>
+    <string name="importBookmarksFromGooglePreImportDialogImportButton">Import Now</string>
 
+    <string name="importBookmarksFromGoogleImportInProgressDialogTitle">@string/importToDuckDuckGo</string>
+    <string name="importBookmarksFromGoogleImportInProgressDialogInstruction">Your bookmarks are being imported. This may take a few moments.</string>
+    <string name="importBookmarksFromGoogleImportInProgressDialogCancelButton">Cancel Import</string>
+
+    <string name="importBookmarksFromGoogleWebFlowTitle">Import Bookmarks</string>
+
+    <!-- Progress Fragment Strings -->
+    <string name="importBookmarksProgressTitle">@string/importToDuckDuckGo</string>
+    <string name="importBookmarksProgressInfoMessage1">Google may ask you to sign in or enter your password to confirm.</string>
+    <string name="importBookmarksProgressInfoMessage2">Google may send you an email confirming your bookmarks are being exported.</string>
+    <string name="importBookmarksProgressStatus">Importing bookmarks…</string>
+    <string name="importBookmarksIconDescription">Import bookmarks icon</string>
+
+    <string name="importBookmarksFromGoogleCancelConfirmationDialogTitle">Cancel Import?</string>
+    <string name="importBookmarksFromGoogleCancelConfirmationDialogMessage">Your bookmarks won\'t be imported if you cancel now.</string>
+    <string name="importBookmarksFromGoogleCancelConfirmationDialogCancelImport">Cancel</string>
+    <string name="importBookmarksFromGoogleCancelConfirmationDialogContinue">Continue</string>
+
+    <string name="importBookmarksFromGoogleSuccessBookmarksCount">Bookmarks: %d</string>
+    <string name="importBookmarksFromGoogleFailedBookmarksCount">Failed: %d</string>
+    <string name="importBookmarksFromGoogleSuccessGotItButton">Got it</string>
+    <string name="importBookmarksFromGoogleErrorGenericMessage">Something went wrong. You can try again.</string>
+
+    <!-- Success Fragment Strings -->
+    <string name="importBookmarksSuccessTitle">@string/importToDuckDuckGo</string>
+    <string name="importBookmarksSuccessSubtitle">Your bookmarks have been successfully imported to DuckDuckGo.</string>
+    <string name="importBookmarksSuccessDoneButton">@string/importBookmarksFromGoogleSuccessGotItButton</string>
+    <string name="importBookmarksSuccessIconDescription">Import success icon</string>
+    <string name="bookmarkIconDescription">Bookmark icon</string>
+
+    <!-- Error Fragment Strings -->
+    <string name="importBookmarksErrorTitle">@string/importToDuckDuckGo</string>
+    <string name="importBookmarksErrorGenericMessage">Something went wrong during import. Please try again.</string>
+    <string name="importBookmarksErrorDownloadMessage">Unable to download bookmarks from Google. Please check your internet connection and try again.</string>
+    <string name="importBookmarksErrorParsingMessage">Unable to process bookmarks data. Please try again.</string>
 
 </resources>

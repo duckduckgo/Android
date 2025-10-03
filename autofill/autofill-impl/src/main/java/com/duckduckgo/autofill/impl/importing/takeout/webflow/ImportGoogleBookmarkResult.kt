@@ -41,10 +41,14 @@ sealed interface ImportGoogleBookmarkResult : Parcelable {
     }
 }
 
+@Parcelize
 sealed interface UserCannotImportReason : Parcelable {
     @Parcelize
     data object ErrorParsingBookmarks : UserCannotImportReason
 
     @Parcelize
     data object DownloadError : UserCannotImportReason
+
+    @Parcelize
+    data object Unknown : UserCannotImportReason
 }
