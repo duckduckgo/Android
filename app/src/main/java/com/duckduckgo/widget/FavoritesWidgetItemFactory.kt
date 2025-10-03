@@ -20,11 +20,13 @@ import android.appwidget.AppWidgetManager
 import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.view.View
 import android.widget.RemoteViews
 import android.widget.RemoteViewsService
+import androidx.core.content.FileProvider
 import androidx.core.graphics.drawable.toBitmap
 import androidx.core.net.toUri
 import com.duckduckgo.app.browser.BrowserActivity
@@ -83,9 +85,21 @@ class FavoritesWidgetItemFactory(
         val bitmap: Bitmap?,
     )
 
-    private val _widgetFavoritesFlow = MutableStateFlow<List<WidgetFavorite>>(emptyList())
+    // New data class returning a Uri reference instead of an in-memory Bitmap
+    /**
+     * Represents a widget favorite whose favicon is exposed as a Uri rather than an in-memory Bitmap.
+     * If the favicon file cannot be found locally, [bitmapUri] will be null and callers should
+     * fallback to a placeholder (as done for the Bitmap variant).
+     */
+    data class WidgetFavoriteUri(
+        val title: String,
+        val url: String,
+        val bitmapUri: Uri?,
+    )
 
-    private val currentFavorites: List<WidgetFavorite>
+    private val _widgetFavoritesFlow = MutableStateFlow<List<WidgetFavoriteUri>>(emptyList())
+
+    private val currentFavorites: List<WidgetFavoriteUri>
         get() = _widgetFavoritesFlow.value
 
     override fun onCreate() {
@@ -98,7 +112,7 @@ class FavoritesWidgetItemFactory(
 
     suspend fun updateWidgetFavoritesAsync() {
         runCatching {
-            val latestWidgetFavorites = fetchFavoritesWithBitmaps()
+            val latestWidgetFavorites = fetchFavoritesWithBitmapUris()
             _widgetFavoritesFlow.value = latestWidgetFavorites
         }.onFailure { error ->
             logcat { "Failed to update favorites in Search and Favorites widget: ${error.message}" }
@@ -125,6 +139,23 @@ class FavoritesWidgetItemFactory(
         }
     }
 
+    // New function to fetch favorites with bitmap URIs
+    suspend fun fetchFavoritesWithBitmapUris(): List<WidgetFavoriteUri> {
+        return withContext(dispatchers.io()) {
+            savedSitesRepository.getFavoritesSync().take(maxItems).map { favorite ->
+                val file = runCatching { faviconManager.tryFetchFaviconForUrl(favorite.url) }.getOrNull()
+                val uri = runCatching {
+                    file?.let { FileProvider.getUriForFile(context, "${context.packageName}.favicons", it) }
+                }.getOrNull()
+                WidgetFavoriteUri(
+                    title = favorite.title,
+                    url = favorite.url,
+                    bitmapUri = uri,
+                )
+            }
+        }
+    }
+
     override fun onDestroy() {
         // no-op
     }
@@ -143,12 +174,22 @@ class FavoritesWidgetItemFactory(
 
     override fun getViewAt(position: Int): RemoteViews {
         val item = if (position >= currentFavorites.size) null else currentFavorites[position]
+
         val remoteViews = RemoteViews(context.packageName, getItemLayout())
         if (item != null) {
             // This item has a favorite. Show the favorite view.
-            if (item.bitmap != null) {
+            if (item.bitmapUri != null) {
                 remoteViews.setViewVisibility(R.id.quickAccessFavicon, View.VISIBLE)
-                remoteViews.setImageViewBitmap(R.id.quickAccessFavicon, item.bitmap)
+                remoteViews.setImageViewUri(R.id.quickAccessFavicon, item.bitmapUri)
+            } else {
+                // Fallback to generated placeholder bitmap if we couldn't obtain a content URI
+                val placeholder = generateDefaultDrawable(
+                    context = context,
+                    domain = item.url.extractDomain().orEmpty(),
+                    cornerRadius = faviconItemCornerRadius,
+                ).toBitmap(faviconItemSize, faviconItemSize)
+                remoteViews.setViewVisibility(R.id.quickAccessFavicon, View.VISIBLE)
+                remoteViews.setImageViewBitmap(R.id.quickAccessFavicon, placeholder)
             }
             remoteViews.setViewVisibility(R.id.quickAccessFaviconContainer, View.VISIBLE)
             remoteViews.setTextViewText(R.id.quickAccessTitle, item.title)
@@ -156,16 +197,7 @@ class FavoritesWidgetItemFactory(
             remoteViews.setViewVisibility(R.id.placeholderFavicon, View.GONE)
             configureClickListener(remoteViews, item.url)
         } else {
-            if (currentFavorites.isEmpty()) {
-                // We don't have any favorites, show placeholder view.
-                remoteViews.setViewVisibility(R.id.quickAccessFaviconContainer, View.VISIBLE)
-                remoteViews.setViewVisibility(R.id.quickAccessFavicon, View.GONE)
-                remoteViews.setViewVisibility(R.id.placeholderFavicon, View.VISIBLE)
-            } else {
-                // We had at least one favorite, but not in this view. Don't show anything.
-                remoteViews.setViewVisibility(R.id.quickAccessFaviconContainer, View.INVISIBLE)
-            }
-            remoteViews.setViewVisibility(R.id.quickAccessTitle, View.GONE)
+            return RemoteViews(context.packageName, R.layout.empty_view)
         }
 
         return remoteViews
@@ -194,7 +226,7 @@ class FavoritesWidgetItemFactory(
     }
 
     override fun getLoadingView(): RemoteViews {
-        return RemoteViews(context.packageName, getItemLayout())
+        return RemoteViews(context.packageName, R.layout.empty_view)
     }
 
     override fun getViewTypeCount(): Int {
