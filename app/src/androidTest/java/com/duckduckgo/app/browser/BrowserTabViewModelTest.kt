@@ -210,6 +210,7 @@ import com.duckduckgo.brokensite.api.BrokenSitePrompt
 import com.duckduckgo.brokensite.api.RefreshPattern
 import com.duckduckgo.browser.api.AddDocumentStartJavaScriptBrowserPlugin
 import com.duckduckgo.browser.api.UserBrowserProperties
+import com.duckduckgo.browser.api.WebMessagingBrowserPlugin
 import com.duckduckgo.browser.api.autocomplete.AutoComplete
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion.AutoCompleteDefaultSuggestion
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion.AutoCompleteHistoryRelatedSuggestion.AutoCompleteHistorySearchSuggestion
@@ -260,7 +261,7 @@ import com.duckduckgo.js.messaging.api.AddDocumentStartJavaScript
 import com.duckduckgo.js.messaging.api.JsCallbackData
 import com.duckduckgo.js.messaging.api.PostMessageWrapperPlugin
 import com.duckduckgo.js.messaging.api.SubscriptionEventData
-import com.duckduckgo.js.messaging.api.WebMessagingPlugin
+import com.duckduckgo.js.messaging.api.WebMessaging
 import com.duckduckgo.js.messaging.api.WebViewCompatMessageCallback
 import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.Feed
 import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.Feed.MALWARE
@@ -613,7 +614,7 @@ class BrowserTabViewModelTest {
     private val mockWebView: WebView = mock()
 
     private val fakeAddDocumentStartJavaScriptPlugins = FakeAddDocumentStartJavaScriptPluginPoint()
-    private val fakeMessagingPlugins = FakeWebMessagingPluginPoint()
+    private val fakeMessagingPlugins = FakeWebMessagingBrowserPluginPoint()
     private val fakePostMessageWrapperPlugins = FakePostMessageWrapperPluginPoint()
 
     @Before
@@ -7526,11 +7527,11 @@ class BrowserTabViewModelTest {
         runTest {
             val mockCallback = mock<WebViewCompatMessageCallback>()
             val webView = DuckDuckGoWebView(context)
-            assertFalse(fakeMessagingPlugins.plugin.registered)
+            assertFalse(fakeMessagingPlugins.plugin.webMessaging().registered)
 
             testee.configureWebView(webView, mockCallback)
 
-            assertTrue(fakeMessagingPlugins.plugin.registered)
+            assertTrue(fakeMessagingPlugins.plugin.webMessaging().registered)
         }
 
     @UiThreadTest
@@ -7862,35 +7863,40 @@ class BrowserTabViewModelTest {
         override fun getPlugins(): Collection<PostMessageWrapperPlugin> = listOf(plugin)
     }
 
-    class FakeWebMessagingPlugin : WebMessagingPlugin {
+    class FakeWebMessaging : WebMessaging {
         var registered = false
             private set
 
         override suspend fun unregister(webView: WebView) {
             registered = false
         }
-
         override suspend fun register(
             jsMessageCallback: WebViewCompatMessageCallback,
             webView: WebView,
         ) {
             registered = true
         }
-
         override suspend fun postMessage(
             webView: WebView,
             subscriptionEventData: SubscriptionEventData,
         ) {
         }
-
         override val context: String
             get() = "test"
     }
 
-    class FakeWebMessagingPluginPoint : PluginPoint<WebMessagingPlugin> {
-        val plugin = FakeWebMessagingPlugin()
+    class FakeWebMessagingBrowserPlugin : WebMessagingBrowserPlugin {
+        private val webMessaging = FakeWebMessaging()
 
-        override fun getPlugins(): Collection<WebMessagingPlugin> = listOf(plugin)
+        override fun webMessaging(): FakeWebMessaging = webMessaging
+    }
+
+    class FakeWebMessagingBrowserPluginPoint : PluginPoint<WebMessagingBrowserPlugin> {
+        val plugin = FakeWebMessagingBrowserPlugin()
+
+        override fun getPlugins(): Collection<WebMessagingBrowserPlugin> {
+            return listOf(plugin)
+        }
     }
 
     class FakePostMessageWrapperPlugin : PostMessageWrapperPlugin {

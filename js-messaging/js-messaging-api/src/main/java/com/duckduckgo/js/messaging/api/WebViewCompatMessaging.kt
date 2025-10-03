@@ -73,3 +73,26 @@ interface WebViewCompatMessageHandler {
      */
     val methods: List<String>
 }
+
+/**
+ * Handler for global messages that should be processed for all features.
+ */
+interface GlobalJsMessageHandler {
+
+    /**
+     * Processes a global message received by the WebView.
+     *
+     * This method is responsible for handling a [JsMessage] and optionally
+     * invoking a callback so consumers can also process the message if needed.
+     *
+     * @param jsMessage The JavaScript message to be processed.
+     */
+    fun process(
+        jsMessage: JsMessage,
+    ): ProcessResult?
+
+    /**
+     * Method this handler can process.
+     */
+    val method: String
+}
