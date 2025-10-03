@@ -28,6 +28,7 @@ import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ActivityPrivateSearchBinding
 import com.duckduckgo.app.privatesearch.PrivateSearchViewModel.Command
 import com.duckduckgo.browser.api.ui.BrowserScreens.PrivateSearchScreenNoParams
+import com.duckduckgo.browser.api.ui.BrowserScreens.WebViewActivityWithParams
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.di.scopes.ActivityScope
@@ -112,23 +113,27 @@ class PrivateSearchActivity : DuckDuckGoActivity() {
     }
 
     private fun launchCustomizeSearchWebPage() {
-        val settingsUrl =
-            if (settingsPageFeature.saveAndExitSerpSettings().isEnabled()) {
-                DUCKDUCKGO_SETTINGS_WEB_LINK_WITH_RETURN_PARAM
-            } else {
-                DUCKDUCKGO_SETTINGS_WEB_LINK
-            }
-        globalActivityStarter.start(
-            this,
-            SettingsWebViewScreenWithParams(
-                url = settingsUrl,
-                getString(R.string.privateSearchMoreSearchSettingsTitle),
-            ),
-        )
+        if (settingsPageFeature.saveAndExitSerpSettings().isEnabled()) {
+            globalActivityStarter.start(
+                this,
+                SettingsWebViewScreenWithParams(
+                    url = DUCKDUCKGO_SETTINGS_WEB_LINK_WITH_RETURN_PARAM,
+                    getString(R.string.privateSearchMoreSearchSettingsTitle),
+                ),
+            )
+        } else {
+            globalActivityStarter.start(
+                this,
+                WebViewActivityWithParams(
+                    url = DUCKDUCKGO_SETTINGS_WEB_LINK,
+                    getString(R.string.privateSearchMoreSearchSettingsTitle),
+                ),
+            )
+        }
     }
 
     companion object {
         private const val DUCKDUCKGO_SETTINGS_WEB_LINK = "https://duckduckgo.com/settings"
-        private const val DUCKDUCKGO_SETTINGS_WEB_LINK_WITH_RETURN_PARAM = "https://duckduckgo.com/settings?return=privateSearch"
+        private const val DUCKDUCKGO_SETTINGS_WEB_LINK_WITH_RETURN_PARAM = "https://duckduckgo.com/settings?ko=-1&return=privateSearch"
     }
 }
