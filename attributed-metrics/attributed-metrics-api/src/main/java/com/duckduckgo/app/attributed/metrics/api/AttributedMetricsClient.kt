@@ -16,40 +16,65 @@
 
 package com.duckduckgo.app.attributed.metrics.api
 
-// owns storing events, providing stats and emitting metrics
-// owns collection and monitoring windows (6mo monitoring)
-// owns new user / returning user logic
-// owns adding common params to all metrics (e.g. origin, removing default params)
+/**
+ * Client for collecting and emitting attributed metrics.
+ */
 interface AttributedMetricClient {
-    // will store an event in the data base, keep the counter per day
+    /**
+     * Stores an event occurrence for later analysis.
+     * Does nothing if the client is not active.
+     *
+     * @param eventName Name of the event to collect
+     */
     fun collectEvent(eventName: String)
 
-    // return events stored in the last days, and precalculated stats
+    /**
+     * Calculates statistics for a specific event over a time period.
+     * Returns zero stats if the client is not active.
+     *
+     * @param eventName Name of the event to analyze
+     * @param days Number of days to look back
+     * @return Statistics about the event's occurrences
+     */
     suspend fun getEventStats(
         eventName: String,
         days: Int,
     ): EventStats
 
-    // if in monitoring window will emit the metric
-    // this part owns adding common params to all metrics (e.g. origin, removing default params)
+    /**
+     * Emits a metric with its parameters if the client is active.
+     * Does nothing if the client is not active.
+     *
+     * @param metric The metric to emit
+     */
     fun emitMetric(metric: AttributedMetric)
 }
 
-// stats about events collected
+/**
+ * Statistics about collected events over a time period.
+ *
+ * @property daysWithEvents Number of days that had at least one event
+ * @property rollingAverage Average number of events per day over the period
+ * @property totalEvents Total number of events in the period
+ */
 data class EventStats(
-    // number of days with at least one event
     val daysWithEvents: Int,
-    // rolling average of events based on days timeframe
     val rollingAverage: Double,
-    // total number of events in the timeframe
     val totalEvents: Int,
 )
 
-// interface for each metric
+/**
+ * Interface for defining an attributed metric.
+ * Each metric implementation should provide its name and parameters.
+ */
 interface AttributedMetric {
-    // Metric owns the pixel name value
+    /**
+     * @return The name used to identify this metric
+     */
     fun getPixelName(): String
 
-    // Metric owns adding metric specific parameters
+    /**
+     * @return Parameters to be included with this metric
+     */
     suspend fun getMetricParameters(): Map<String, String>
 }
