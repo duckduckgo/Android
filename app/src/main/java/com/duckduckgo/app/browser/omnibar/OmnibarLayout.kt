@@ -297,7 +297,6 @@ open class OmnibarLayout @JvmOverloads constructor(
         }
     }
 
-
     private val duckAiToggle: InputModeTabLayout by lazy { findViewById(R.id.inputModeSwitch) }
     private val omnibarTextInputClickCatcher: View by lazy { findViewById(R.id.omnibarTextInputClickCatcher) }
 
