@@ -51,20 +51,14 @@ class StatusIndicatorView @JvmOverloads constructor(
             Status.ALWAYS_ON -> {
                 binding.icon.isEnabled = true
                 binding.label.text = context.getString(R.string.alwaysOn)
-                show()
             }
             Status.ON -> {
                 binding.icon.isEnabled = true
                 binding.label.text = context.getString(R.string.on)
-                show()
             }
             Status.OFF -> {
                 binding.icon.isEnabled = false
                 binding.label.text = context.getString(R.string.off)
-                show()
-            }
-            Status.NONE -> {
-                gone()
             }
         }
     }
@@ -78,7 +72,6 @@ class StatusIndicatorView @JvmOverloads constructor(
         ALWAYS_ON,
         ON,
         OFF,
-        NONE,
         ;
 
         companion object {
@@ -87,7 +80,6 @@ class StatusIndicatorView @JvmOverloads constructor(
                 0 -> ALWAYS_ON
                 1 -> ON
                 2 -> OFF
-                3 -> NONE
                 else -> OFF
             }
         }

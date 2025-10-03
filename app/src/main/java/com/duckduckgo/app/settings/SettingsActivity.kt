@@ -370,7 +370,7 @@ class SettingsActivity : DuckDuckGoActivity() {
             }
             viewsMain.includeDuckChatSetting.duckChatSetting.show()
             viewsMain.includeDuckChatSetting.duckChatSetting.setLeadingIconResource(imageRes)
-            viewsMain.includeDuckChatSetting.duckChatSetting.setPrimaryText(getString(titleRes))
+            viewsMain.includeDuckChatSetting.duckChatSetting.setPrimaryTextResource(titleRes)
         } else {
             viewsMain.includeDuckChatSetting.duckChatSetting.gone()
         }
