@@ -439,7 +439,6 @@ class RealDuckChat @Inject constructor(
         forceNewSession: Boolean = false,
     ) {
         val url = appendParameters(parameters, duckChatLink)
-
         appCoroutineScope.launch(dispatchers.io()) {
             val sessionDelta = duckChatFeatureRepository.sessionDeltaInMinutes()
             val params = mapOf(DuckChatPixelParameters.DELTA_TIMESTAMP_PARAMETERS to sessionDelta.toString())
