@@ -19,6 +19,7 @@ package com.duckduckgo.app.launch
 import androidx.lifecycle.ViewModel
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.global.install.AppInstallStore
+import com.duckduckgo.app.notificationpromptexperiment.NotificationPromptExperimentManager
 import com.duckduckgo.app.onboarding.store.UserStageStore
 import com.duckduckgo.app.onboarding.store.isNewUser
 import com.duckduckgo.app.onboardingdesignexperiment.OnboardingDesignExperimentManager
@@ -43,6 +44,7 @@ class LaunchViewModel @Inject constructor(
     private val daxPrompts: DaxPrompts,
     private val appInstallStore: AppInstallStore,
     private val onboardingDesignExperimentManager: OnboardingDesignExperimentManager,
+    private val notificationPromptExperimentManager: NotificationPromptExperimentManager,
 ) :
     ViewModel() {
 
@@ -56,13 +58,20 @@ class LaunchViewModel @Inject constructor(
     }
 
     suspend fun determineViewToShow() {
-        if (onboardingDesignExperimentManager.isWaitForLocalPrivacyConfigEnabled()) {
+        val waitForLocalPrivacyOnboardingExperiment = onboardingDesignExperimentManager.isWaitForLocalPrivacyConfigEnabled()
+        val waitForLocalPrivacyNotificationExperiment = notificationPromptExperimentManager.isWaitForLocalPrivacyConfigEnabled()
+        if (waitForLocalPrivacyOnboardingExperiment || waitForLocalPrivacyNotificationExperiment) {
             withTimeoutOrNull(MAX_REFERRER_WAIT_TIME_MS) {
                 val referrerJob = async {
                     waitForReferrerData()
                 }
                 val configJob = async {
-                    onboardingDesignExperimentManager.waitForPrivacyConfig()
+                    if (waitForLocalPrivacyOnboardingExperiment) {
+                        onboardingDesignExperimentManager.waitForPrivacyConfig()
+                    }
+                    if (waitForLocalPrivacyNotificationExperiment) {
+                        notificationPromptExperimentManager.waitForPrivacyConfig()
+                    }
                 }
                 awaitAll(referrerJob, configJob)
             }
