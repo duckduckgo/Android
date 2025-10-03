@@ -56,7 +56,7 @@ class OneLineListItem @JvmOverloads constructor(
     override val betaPill: ImageView?
         get() = null
 
-    val newPill: ImageView?
+    override val newPill: ImageView
         get() = binding.newPill
 
     override val itemContainer: View
