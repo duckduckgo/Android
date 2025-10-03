@@ -66,6 +66,7 @@ class RealAttributedMetricClient @Inject constructor(
             eventRepository.getEventStats(eventName, days)
         }
 
+    // TODO: Pending adding default attributed metrics and removing default prefix from pixel names
     override fun emitMetric(metric: AttributedMetric) {
         appCoroutineScope.launch(dispatcherProvider.io()) {
             if (!metricsState.isActive()) return@launch
