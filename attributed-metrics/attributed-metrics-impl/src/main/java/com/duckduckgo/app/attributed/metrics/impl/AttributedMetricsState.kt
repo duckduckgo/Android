@@ -111,6 +111,7 @@ class RealAttributedMetricsState @Inject constructor(
                     dataStore.setActive(true)
                 }
             }
+            logClientStatus()
         }
     }
 
@@ -118,10 +119,10 @@ class RealAttributedMetricsState @Inject constructor(
         appCoroutineScope.launch(dispatcherProvider.io()) {
             val toggleEnabledState = attributedMetricsConfigFeature.self().isEnabled()
             logcat(tag = "AttributedMetrics") {
-                "Privacy config downloaded, attributed metrics enabled: $toggleEnabledState," +
-                    " client state: ${dataStore.isActive()}-${dataStore.getInitializationDate()}"
+                "Privacy config downloaded, update client toggle state: $toggleEnabledState"
             }
             dataStore.setEnabled(toggleEnabledState)
+            logClientStatus()
         }
     }
 
@@ -139,12 +140,18 @@ class RealAttributedMetricsState @Inject constructor(
 
         val daysSinceInit = attributedMetricsDateUtils.daysSince(initDate)
         val isWithinPeriod = daysSinceInit <= COLLECTION_PERIOD_DAYS
-        val isClientActive = isWithinPeriod && dataStore.isActive()
+        val newClientActiveState = isWithinPeriod && dataStore.isActive()
 
         logcat(tag = "AttributedMetrics") {
-            "Updating client state to $isClientActive, within period? $isWithinPeriod, is client active? ${dataStore.isActive()}"
+            "Updating client state to $newClientActiveState result of -> within period? $isWithinPeriod, client active? ${dataStore.isActive()}"
         }
-        dataStore.setActive(isClientActive)
+        dataStore.setActive(newClientActiveState)
+        logClientStatus()
+    }
+
+    private suspend fun logClientStatus() = logcat(tag = "AttributedMetrics") {
+        "Client status running: ${isActive()} -> isActive: ${dataStore.isActive()}, isEnabled: ${dataStore.isEnabled()}," +
+            " initializationDate: ${dataStore.getInitializationDate()}"
     }
 
     companion object {
