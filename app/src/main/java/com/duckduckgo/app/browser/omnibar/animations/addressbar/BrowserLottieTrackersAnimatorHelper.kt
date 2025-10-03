@@ -246,7 +246,12 @@ class BrowserLottieTrackersAnimatorHelper @Inject constructor(
                                     AnimatorSet().apply {
                                         TransitionManager.go(firstScene, slideOutCookiesTransition)
                                         play(commonAddressBarAnimationHelper.animateFadeOut(cookieView, COOKIES_ANIMATION_FADE_OUT_DURATION))
-                                            .with(commonAddressBarAnimationHelper.animateFadeOut(cookieViewBackground, COOKIES_ANIMATION_FADE_OUT_DURATION))
+                                            .with(
+                                                commonAddressBarAnimationHelper.animateFadeOut(
+                                                    cookieViewBackground,
+                                                    COOKIES_ANIMATION_FADE_OUT_DURATION,
+                                                ),
+                                            )
                                         addListener(
                                             doOnEnd {
                                                 cookieView.gone()

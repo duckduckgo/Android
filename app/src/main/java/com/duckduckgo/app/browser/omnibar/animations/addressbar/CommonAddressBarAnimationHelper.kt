@@ -42,8 +42,8 @@ class CommonAddressBarAnimationHelper @Inject constructor() {
     }
 
     fun animateFadeOut(
-            view: View,
-            durationInMs: Long = DEFAULT_ANIMATION_DURATION,
+        view: View,
+        durationInMs: Long = DEFAULT_ANIMATION_DURATION,
     ): ObjectAnimator {
         return ObjectAnimator.ofFloat(view, "alpha", 1f, 0f).apply {
             duration = durationInMs
@@ -51,8 +51,8 @@ class CommonAddressBarAnimationHelper @Inject constructor() {
     }
 
     fun animateFadeIn(
-            view: View,
-            durationInMs: Long = DEFAULT_ANIMATION_DURATION,
+        view: View,
+        durationInMs: Long = DEFAULT_ANIMATION_DURATION,
     ): ObjectAnimator {
         if (view.alpha == 1f) {
             return ObjectAnimator.ofFloat(view, "alpha", 1f, 1f).apply {
