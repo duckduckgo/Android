@@ -122,6 +122,10 @@ interface PirRepository {
         profileQueryId: Long,
     ): List<ExtractedProfile>
 
+    suspend fun getExtractedProfiles(
+        extractedProfileId: Long,
+    ): ExtractedProfile?
+
     fun getAllExtractedProfilesFlow(): Flow<List<ExtractedProfile>>
 
     suspend fun getAllExtractedProfiles(): List<ExtractedProfile>
@@ -409,6 +413,13 @@ internal class RealPirRepository(
                 ).map {
                     it.toExtractedProfile()
                 }
+        }
+
+    override suspend fun getExtractedProfiles(
+        extractedProfileId: Long,
+    ): ExtractedProfile? =
+        withContext(dispatcherProvider.io()) {
+            return@withContext extractedProfileDao.getExtractedProfile(extractedProfileId)?.toExtractedProfile()
         }
 
     override fun getAllExtractedProfilesFlow(): Flow<List<ExtractedProfile>> =

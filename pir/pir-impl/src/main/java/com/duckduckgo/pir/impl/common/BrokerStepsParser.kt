@@ -88,6 +88,7 @@ interface BrokerStepsParser {
             override val stepType: String,
             override val actions: List<BrokerAction>, // Actions will be a subset already starting from emailConfirmationStep
             val emailConfirmationJob: EmailConfirmationJobRecord,
+            val profileToOptOut: ExtractedProfile,
         ) : BrokerStep(brokerName, stepType, actions)
     }
 }
@@ -153,13 +154,19 @@ class RealBrokerStepsParser @Inject constructor(
         emailConfirmationJob: EmailConfirmationJobRecord,
     ): BrokerStep? = withContext(dispatcherProvider.io()) {
         return@withContext runCatching {
-            adapter.fromJson(optOutStepJson)?.run {
-                EmailConfirmationStep(
-                    brokerName = emailConfirmationJob.brokerName,
-                    stepType = this.stepType,
-                    actions = actions.dropWhile { it !is BrokerAction.EmailConfirmation },
-                    emailConfirmationJob = emailConfirmationJob,
-                )
+            val profile = repository.getExtractedProfiles(emailConfirmationJob.extractedProfileId)
+            if (profile != null) {
+                adapter.fromJson(optOutStepJson)?.run {
+                    EmailConfirmationStep(
+                        brokerName = emailConfirmationJob.brokerName,
+                        stepType = this.stepType,
+                        actions = actions.dropWhile { it !is BrokerAction.EmailConfirmation },
+                        emailConfirmationJob = emailConfirmationJob,
+                        profileToOptOut = profile,
+                    )
+                }
+            } else {
+                null
             }
         }.onFailure {
             logcat(ERROR) { "PIR-SCAN: Parsing the steps failed due to: $it" }
