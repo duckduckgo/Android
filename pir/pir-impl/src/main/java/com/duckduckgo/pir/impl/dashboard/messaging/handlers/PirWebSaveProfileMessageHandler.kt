@@ -28,6 +28,7 @@ import com.duckduckgo.js.messaging.api.JsMessaging
 import com.duckduckgo.pir.impl.dashboard.messaging.PirDashboardWebMessages
 import com.duckduckgo.pir.impl.dashboard.messaging.model.PirWebMessageResponse
 import com.duckduckgo.pir.impl.dashboard.state.PirWebProfileStateHolder
+import com.duckduckgo.pir.impl.models.ProfileQuery
 import com.duckduckgo.pir.impl.scan.PirForegroundScanService
 import com.duckduckgo.pir.impl.scan.PirScanScheduler
 import com.duckduckgo.pir.impl.store.PirRepository
@@ -74,8 +75,9 @@ class PirWebSaveProfileMessageHandler @Inject constructor(
         }
 
         appCoroutineScope.launch(dispatcherProvider.io()) {
-            val profileQueries = pirWebProfileStateHolder.toProfileQueries(currentTimeProvider.localDateTimeNow().year)
-            if (!repository.saveProfileQueries(profileQueries)) {
+            val isProfileUpdateSuccess = handleProfileQueryUpdates()
+
+            if (!isProfileUpdateSuccess) {
                 logcat { "PIR-WEB: PirWebSaveProfileMessageHandler: failed to save all user profiles" }
                 jsMessaging.sendResponse(
                     jsMessage = jsMessage,
@@ -94,6 +96,64 @@ class PirWebSaveProfileMessageHandler @Inject constructor(
 
             pirWebProfileStateHolder.clear()
         }
+    }
+
+    /**
+     * Storing the profile queries is a bit more complex than just replacing them as we need to consider
+     * that some profile queries might have already extracted profiles associated to them. In that case,
+     * we cannot delete those profile queries but we need to mark them as deprecated instead.
+     *
+     * This is so that the opt-outs for those deprecated profiles can be completed.
+     *
+     * https://app.asana.com/1/137249556945/project/481882893211075/task/1211369193255074?focus=true
+     */
+    private suspend fun handleProfileQueryUpdates(): Boolean {
+        // profiles queries that already exist in the database
+        // TODO consider moving the deprecated filtering to the DB layer when updating job handling for new profiles
+        val existingProfileQueries = repository.getUserProfileQueries().filterNot { it.deprecated }
+
+        // new profile queries that are the result of user changes (editing names or addresses)
+        val newProfileQueries = pirWebProfileStateHolder.toProfileQueries(currentTimeProvider.localDateTimeNow().year)
+
+        // the profile queries we need to create are the one that exist in the new ones but not in the database
+        val profileQueriesToCreate = newProfileQueries.filter { newProfileQuery ->
+            existingProfileQueries.none { existingProfileQuery ->
+                // ignore ID when comparing as database profile queries will have an actual id
+                newProfileQuery == existingProfileQuery.copy(id = 0)
+            }
+        }
+
+        // the ones that we need to remove are the ones that exist in the database but not in the new ones
+        val profileQueriesToRemove = existingProfileQueries.filter { existingProfileQuery ->
+            newProfileQueries.none { newProfileQuery ->
+                // ignore ID when comparing as database profile queries will have an actual id
+                newProfileQuery == existingProfileQuery.copy(id = 0)
+            }
+        }.toMutableList()
+
+        // if profile query has extracted profiles associated to it, do not delete it but mark it as deprecated
+        val profileQueriesToUpdate = mutableListOf<ProfileQuery>()
+        val extractedProfileQueryIds = repository.getAllExtractedProfiles().map { it.profileQueryId }.toSet()
+        profileQueriesToRemove.removeAll { profileQueryToRemove ->
+            if (profileQueryToRemove.id in extractedProfileQueryIds) {
+                profileQueriesToUpdate.add(profileQueryToRemove.copy(deprecated = true))
+                true
+            } else {
+                false
+            }
+        }
+
+        if (profileQueriesToCreate.isEmpty() && profileQueriesToUpdate.isEmpty() && profileQueriesToRemove.isEmpty()) {
+            // nothing to do
+            return true
+        }
+
+        // store the changes in a single transaction to ensure data consistency
+        return repository.updateProfileQueries(
+            profileQueriesToAdd = profileQueriesToCreate,
+            profileQueriesToUpdate = profileQueriesToUpdate,
+            profileQueryIdsToDelete = profileQueriesToRemove.map { it.id },
+        )
     }
 
     private fun startAndScheduleInitialScan() {

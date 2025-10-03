@@ -75,7 +75,7 @@ class RealPirWebProfileStateHolder @Inject constructor() : PirWebProfileStateHol
         profileQueries.forEach { profileQuery ->
             addName(
                 firstName = profileQuery.firstName,
-                middleName = profileQuery.middleName,
+                middleName = profileQuery.middleName?.takeIf { it.isNotBlank() },
                 lastName = profileQuery.lastName,
             )
             addAddress(
@@ -111,7 +111,7 @@ class RealPirWebProfileStateHolder @Inject constructor() : PirWebProfileStateHol
             Name(
                 firstName = firstName,
                 lastName = lastName,
-                middleName = middleName,
+                middleName = middleName?.takeIf { it.isNotBlank() },
             ),
         )
         return true
@@ -140,7 +140,7 @@ class RealPirWebProfileStateHolder @Inject constructor() : PirWebProfileStateHol
         names[index] = Name(
             firstName = firstName,
             lastName = lastName,
-            middleName = middleName,
+            middleName = middleName?.takeIf { it.isNotBlank() },
         )
         return true
     }
@@ -188,12 +188,12 @@ class RealPirWebProfileStateHolder @Inject constructor() : PirWebProfileStateHol
                         id = 0, // ID is auto-generated in the database
                         firstName = name.firstName,
                         lastName = name.lastName,
-                        middleName = name.middleName,
+                        middleName = name.middleName?.takeIf { it.isNotBlank() },
                         city = address.city,
                         state = address.state,
                         addresses = listOf(address),
                         birthYear = birthYear,
-                        fullName = name.middleName?.let { middleName ->
+                        fullName = name.middleName?.takeIf { it.isNotBlank() }?.let { middleName ->
                             "${name.firstName} $middleName ${name.lastName}"
                         } ?: "${name.firstName} ${name.lastName}",
                         age = currentYear - birthYear,
