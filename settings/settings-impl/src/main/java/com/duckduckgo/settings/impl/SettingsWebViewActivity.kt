@@ -44,16 +44,12 @@ import kotlinx.coroutines.launch
 import org.json.JSONObject
 import javax.inject.Inject
 import javax.inject.Named
-import kotlin.jvm.java
 
 @InjectWith(ActivityScope::class)
 @ContributeToActivityStarter(SettingsWebViewScreenWithParams::class)
 class SettingsWebViewActivity : DuckDuckGoActivity() {
     @Inject
     lateinit var userAgentProvider: UserAgentProvider
-
-    @Inject
-    lateinit var webViewClient: SettingsWebViewClient
 
     @Inject
     lateinit var webViewCompat: WebViewCompatWrapper
@@ -158,8 +154,6 @@ class SettingsWebViewActivity : DuckDuckGoActivity() {
                     "https://*.duckduckgo.com", // any subdomain
                 ),
             )
-
-            it.webViewClient = webViewClient
 
             it.settings.apply {
                 userAgentString = userAgentProvider.userAgent()
