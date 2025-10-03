@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 DuckDuckGo
+ * Copyright (c) 2025 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.browser.omnibar.animations
+package com.duckduckgo.app.browser.omnibar.animations.addressbar
 
 import android.content.Context
 import android.graphics.Bitmap
@@ -29,9 +29,6 @@ import androidx.core.graphics.drawable.toBitmap
 import com.airbnb.lottie.ImageAssetDelegate
 import com.airbnb.lottie.LottieImageAsset
 import com.duckduckgo.app.browser.R
-import com.duckduckgo.app.browser.omnibar.animations.TrackerLogo.ImageLogo
-import com.duckduckgo.app.browser.omnibar.animations.TrackerLogo.LetterLogo
-import com.duckduckgo.app.browser.omnibar.animations.TrackerLogo.StackedLogo
 import com.duckduckgo.common.ui.view.getColorFromAttr
 import com.duckduckgo.common.ui.view.toPx
 
@@ -43,28 +40,28 @@ internal class TrackersLottieAssetDelegate(
     override fun fetchBitmap(asset: LottieImageAsset?): Bitmap? {
         return when (asset?.id) {
             "image_0" -> {
-                kotlin.runCatching { logos[0].asDrawable(context) }
+                runCatching { logos[0].asDrawable(context) }
                     .getOrDefault(
                         ContextCompat.getDrawable(context, R.drawable.network_logo_blank)!!.toBitmap(),
                     )
             }
 
             "image_1" -> {
-                kotlin.runCatching { logos[1].asDrawable(context) }
+                runCatching { logos[1].asDrawable(context) }
                     .getOrDefault(
                         ContextCompat.getDrawable(context, R.drawable.network_logo_blank)!!.toBitmap(),
                     )
             }
 
             "image_2" -> {
-                kotlin.runCatching { logos[2].asDrawable(context) }
+                runCatching { logos[2].asDrawable(context) }
                     .getOrDefault(
                         ContextCompat.getDrawable(context, R.drawable.network_logo_blank)!!.toBitmap(),
                     )
             }
 
             "image_3" ->
-                kotlin.runCatching { logos[3].asDrawable(context) }
+                runCatching { logos[3].asDrawable(context) }
                     .getOrNull()
 
             else -> null
@@ -72,11 +69,11 @@ internal class TrackersLottieAssetDelegate(
     }
 
     private fun TrackerLogo.asDrawable(context: Context): Bitmap {
-        return kotlin.runCatching {
+        return runCatching {
             when (this) {
-                is ImageLogo -> ContextCompat.getDrawable(context, resId)!!.toBitmap()
-                is LetterLogo -> generateDefaultDrawable(context, this.trackerLetter).toBitmap(24.toPx(), 24.toPx())
-                is StackedLogo -> ContextCompat.getDrawable(context, this.resId)!!.toBitmap()
+                is TrackerLogo.ImageLogo -> ContextCompat.getDrawable(context, resId)!!.toBitmap()
+                is TrackerLogo.LetterLogo -> generateDefaultDrawable(context, this.trackerLetter).toBitmap(24.toPx(), 24.toPx())
+                is TrackerLogo.StackedLogo -> ContextCompat.getDrawable(context, this.resId)!!.toBitmap()
             }
         }.getOrThrow()
     }
