@@ -54,6 +54,7 @@ import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.PulseAnimation
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.SmoothProgressAnimator
+import com.duckduckgo.app.browser.animations.AddressBarTrackersAnimationFeatureToggle
 import com.duckduckgo.app.browser.databinding.IncludeCustomTabToolbarBinding
 import com.duckduckgo.app.browser.databinding.IncludeFindInPageBinding
 import com.duckduckgo.app.browser.omnibar.Omnibar.OmnibarTextState
@@ -214,6 +215,9 @@ open class OmnibarLayout @JvmOverloads constructor(
     @Inject
     lateinit var serpEasterEggLogosToggles: SerpEasterEggLogosToggles
 
+    @Inject
+    lateinit var addressBarTrackersAnimationFeatureToggle: AddressBarTrackersAnimationFeatureToggle
+
     private var previousTransitionState: TransitionState? = null
 
     private val lifecycleOwner: LifecycleOwner by lazy {
@@ -256,6 +260,9 @@ open class OmnibarLayout @JvmOverloads constructor(
     }
     internal val browserMenuImageView: ImageView by lazy { findViewById(R.id.browserMenuImageView) }
     internal val shieldIcon: LottieAnimationView by lazy { findViewById(R.id.shieldIcon) }
+    internal val addressBarTrackersBlockedAnimationShieldIcon: LottieAnimationView by lazy {
+        findViewById(R.id.addressBarTrackersBlockedAnimationShieldIcon)
+    }
     internal val pageLoadingIndicator: ProgressBar by lazy { findViewById(R.id.pageLoadingIndicator) }
     internal val searchIcon: ImageView by lazy { findViewById(R.id.searchIcon) }
     internal val daxIcon: ImageView by lazy { findViewById(R.id.daxIcon) }
@@ -863,13 +870,25 @@ open class OmnibarLayout @JvmOverloads constructor(
     }
 
     private fun startTrackersAnimation(events: List<Entity>?) {
-        animatorHelper.startTrackersAnimation(
-            context = context,
-            shieldAnimationView = shieldIcon,
-            trackersAnimationView = trackersAnimation,
-            omnibarViews = omnibarViews(),
-            entities = events,
-        )
+        if (addressBarTrackersAnimationFeatureToggle.feature().isEnabled()) {
+            animatorHelper.startAddressBarTrackersAnimation(
+                context = context,
+                addressBarTrackersBlockedAnimationShieldIcon = addressBarTrackersBlockedAnimationShieldIcon,
+                sceneRoot = sceneRoot,
+                cookieBackground = cookieDummyView,
+                omnibarViews = omnibarViews(),
+                shieldViews = shieldViews(),
+                entities = events,
+            )
+        } else {
+            animatorHelper.startTrackersAnimation(
+                context = context,
+                shieldAnimationView = shieldIcon,
+                trackersAnimationView = trackersAnimation,
+                omnibarViews = omnibarViews(),
+                entities = events,
+            )
+        }
     }
 
     private fun renderPrivacyShield(
