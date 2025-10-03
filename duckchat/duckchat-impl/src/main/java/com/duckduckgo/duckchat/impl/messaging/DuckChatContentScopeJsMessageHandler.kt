@@ -41,7 +41,6 @@ class DuckChatContentScopeJsMessageHandler @Inject constructor() : ContentScopeJ
             override val allowedDomains: List<String> =
                 listOf(
                     AppUrl.Url.HOST,
-                    "mtsoy.duck.co",
                 )
 
             override val featureName: String = "aiChat"

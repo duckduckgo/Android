@@ -454,4 +454,22 @@ class RealDuckChatJSHelperTest {
 
         verify(mockDuckChatPixels).sendReportMetricPixel(USER_DID_TAP_KEYBOARD_RETURN_KEY)
     }
+
+    @Test
+    fun whenOpenKeyboardThenResponseSent() = runTest {
+        val featureName = "aiChat"
+        val method = "openKeyboard"
+        val id = "123"
+        val data = JSONObject(mapOf("selector" to "user-prompt"))
+
+        val result = testee.processJsCallbackMessage(featureName, method, id, data)
+
+        val expectedPayload = JSONObject().apply {
+            put("selector", "document.getElementsByName('user-prompt')[0]?.focus();")
+            put("success", true)
+            put("error", "")
+        }
+
+        assertEquals(expectedPayload.toString(), result!!.params.toString())
+    }
 }
