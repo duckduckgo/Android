@@ -19,7 +19,7 @@ package com.duckduckgo.app.attributed.metrics.impl
 import androidx.lifecycle.LifecycleOwner
 import com.duckduckgo.app.attributed.metrics.AttributedMetricsConfigFeature
 import com.duckduckgo.app.attributed.metrics.store.AttributedMetricsDataStore
-import com.duckduckgo.app.attributed.metrics.store.DateProvider
+import com.duckduckgo.app.attributed.metrics.store.AttributedMetricsDateUtils
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
 import com.duckduckgo.app.statistics.api.AtbLifecyclePlugin
@@ -33,9 +33,6 @@ import dagger.SingleInstanceIn
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import logcat.logcat
-import java.time.LocalDate
-import java.time.format.DateTimeFormatter
-import java.time.temporal.ChronoUnit
 import javax.inject.Inject
 
 /**
@@ -72,7 +69,7 @@ class RealAttributedMetricsState @Inject constructor(
     private val dataStore: AttributedMetricsDataStore,
     private val attributedMetricsConfigFeature: AttributedMetricsConfigFeature,
     private val appBuildConfig: AppBuildConfig,
-    private val dateProvider: DateProvider,
+    private val attributedMetricsDateUtils: AttributedMetricsDateUtils,
 ) : AttributedMetricsState, MainProcessLifecycleObserver, AtbLifecyclePlugin, PrivacyConfigCallbackPlugin {
 
     override fun onCreate(owner: LifecycleOwner) {
@@ -99,7 +96,7 @@ class RealAttributedMetricsState @Inject constructor(
                 logcat(tag = "AttributedMetrics") {
                     "Setting initialization date for Attributed Metrics"
                 }
-                val currentDate = dateProvider.getCurrentDate()
+                val currentDate = attributedMetricsDateUtils.getCurrentDate()
                 dataStore.setInitializationDate(currentDate)
                 if (appBuildConfig.isAppReinstall()) {
                     logcat(tag = "AttributedMetrics") {
@@ -140,10 +137,7 @@ class RealAttributedMetricsState @Inject constructor(
             return
         }
 
-        val initLocalDate = LocalDate.parse(initDate, DATE_FORMATTER)
-        val currentDate = LocalDate.now()
-
-        val daysSinceInit = ChronoUnit.DAYS.between(initLocalDate, currentDate)
+        val daysSinceInit = attributedMetricsDateUtils.daysSince(initDate)
         val isWithinPeriod = daysSinceInit <= COLLECTION_PERIOD_DAYS
         val isClientActive = isWithinPeriod && dataStore.isActive()
 
@@ -154,7 +148,6 @@ class RealAttributedMetricsState @Inject constructor(
     }
 
     companion object {
-        private val DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd")
         private const val COLLECTION_PERIOD_DAYS = 168 // 24 weeks * 7 days (6 months in weeks)
     }
 }
