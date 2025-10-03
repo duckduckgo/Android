@@ -45,11 +45,17 @@ class RealAttributedMetricClient @Inject constructor(
 
     override fun collectEvent(eventName: String) {
         appCoroutineScope.launch(dispatcherProvider.io()) {
-            if (!metricsState.isActive()) return@launch
-            logcat(tag = "AttributedMetrics") {
-                "Collecting event $eventName"
+            if (!metricsState.isActive()) {
+                logcat(tag = "AttributedMetrics") {
+                    "Discard collect event $eventName, client not active"
+                }
+                return@launch
             }
-            eventRepository.collectEvent(eventName)
+            eventRepository.collectEvent(eventName).also {
+                logcat(tag = "AttributedMetrics") {
+                    "Collected event $eventName"
+                }
+            }
         }
     }
 
@@ -59,25 +65,36 @@ class RealAttributedMetricClient @Inject constructor(
     ): EventStats =
         withContext(dispatcherProvider.io()) {
             if (!metricsState.isActive()) {
+                logcat(tag = "AttributedMetrics") {
+                    "Discard get stats for event $eventName, client not active"
+                }
                 return@withContext EventStats(daysWithEvents = 0, rollingAverage = 0.0, totalEvents = 0)
             }
-            logcat(tag = "AttributedMetrics") {
-                "Calculating stats for event $eventName over $days days"
+            eventRepository.getEventStats(eventName, days).also {
+                logcat(tag = "AttributedMetrics") {
+                    "Returning Stats for Event $eventName($days days): $it"
+                }
             }
-            eventRepository.getEventStats(eventName, days)
         }
 
     // TODO: Pending adding default attributed metrics and removing default prefix from pixel names
     override fun emitMetric(metric: AttributedMetric) {
         appCoroutineScope.launch(dispatcherProvider.io()) {
-            if (!metricsState.isActive()) return@launch
-            val pixelName = metric.getPixelName()
-            val tag = metric.getTag()
-            logcat(tag = "AttributedMetrics") {
-                "Firing pixel for $pixelName"
+            if (!metricsState.isActive()) {
+                logcat(tag = "AttributedMetrics") {
+                    "Discard pixel, client not active"
+                }
+                return@launch
             }
+            val pixelName = metric.getPixelName()
+            val params = metric.getMetricParameters()
+            val tag = metric.getTag()
             val pixelTag = "${pixelName}_$tag"
-            pixel.fire(pixelName = pixelName, parameters = metric.getMetricParameters(), type = Unique(pixelTag))
+            pixel.fire(pixelName = pixelName, parameters = params, type = Unique(pixelTag)).also {
+                logcat(tag = "AttributedMetrics") {
+                    "Fired pixel $pixelName with params $params"
+                }
+            }
         }
     }
 }

@@ -18,7 +18,11 @@ package com.duckduckgo.app.attributed.metrics.store
 
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
-import java.time.*
+import java.time.Instant
+import java.time.LocalDate
+import java.time.LocalTime
+import java.time.ZoneId
+import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
 import javax.inject.Inject
@@ -74,6 +78,18 @@ interface AttributedMetricsDateUtils {
     fun daysSince(date: String): Int
 
     /**
+     * Calculates the number of days between a given timestamp and the current date in Eastern Time.
+     * Day boundaries are determined using midnight ET.
+     *
+     * @param timestamp The reference timestamp in milliseconds since epoch (Unix timestamp)
+     * @return The number of days between the reference timestamp and current date.
+     *         Positive if the reference timestamp is in the past,
+     *         negative if it's in the future,
+     *         zero if it's today.
+     */
+    fun daysSince(timestamp: Long): Int
+
+    /**
      * Gets a date that is a specified number of days before the current date in Eastern Time.
      * Day boundaries are determined using midnight ET.
      *
@@ -95,6 +111,17 @@ class RealAttributedMetricsDateUtils @Inject constructor() : AttributedMetricsDa
             ET_ZONE,
         )
         return ChronoUnit.DAYS.between(initDate, getCurrentZonedDateTime()).toInt()
+    }
+
+    override fun daysSince(timestamp: Long): Int {
+        val etZone = ZoneId.of("America/New_York")
+        val installInstant = Instant.ofEpochMilli(timestamp)
+        val nowInstant = Instant.now()
+
+        val installInEt = installInstant.atZone(etZone)
+        val nowInEt = nowInstant.atZone(etZone)
+
+        return ChronoUnit.DAYS.between(installInEt.toLocalDate(), nowInEt.toLocalDate()).toInt()
     }
 
     override fun getDateMinusDays(days: Int): String = getCurrentZonedDateTime().minusDays(days.toLong()).format(DATE_FORMATTER)
