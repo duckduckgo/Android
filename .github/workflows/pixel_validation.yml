@@ -1,0 +1,72 @@
+name: Pixel Schema Validation
+
+on:
+    push:
+        branches: [develop]
+    pull_request:
+
+jobs:
+    pixel-validation:
+        runs-on: ubuntu-latest
+        permissions:
+            contents: write
+        steps:
+            - name: Checkout repository
+              uses: actions/checkout@v4
+              with:
+                token: ${{ secrets.GT_DAXMOBILE }}
+                ref: ${{ github.head_ref || github.ref }}
+
+            - name: Use Node.js 20
+              uses: actions/setup-node@v4
+              with:
+                node-version: 20.x
+
+            - uses: actions/cache@v4
+              with:
+                path: ~/.npm
+                key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+                restore-keys: |
+                  ${{ runner.os }}-node-
+
+            - name: Checkout internal-github-asana-utils repo
+              uses: actions/checkout@v4
+              with:
+                  token: ${{ secrets.GT_DAXMOBILE  }}
+                  path: internal-github-asana-utils
+                  repository: duckduckgo/internal-github-asana-utils
+
+            - name: Install dependencies
+              run: npm ci --verbose
+              working-directory: PixelDefinitions
+
+            # Lint step for push (fail on error), for PRs run fix instead
+            - name: Check or Fix lint
+              id: lint
+              run: |
+                if [[ "${{ github.event_name }}" == "pull_request" ]]; then
+                  npm run lint.fix || true
+                else
+                  npm run lint
+                fi
+              working-directory: PixelDefinitions
+
+            # Commit and push changes if lint.fix was run and made changes
+            - name: Commit and push linter fixes (PRs only)
+              if: github.event_name == 'pull_request'
+              run: |
+                git config --global user.name "github-actions[bot]"
+                git config --global user.email "github-actions[bot]@users.noreply.github.com"
+                git add PixelDefinitions/
+                if ! git diff --cached --quiet; then
+                  git commit -m "chore: auto-fix lint errors"
+                  git push
+                fi
+
+            - name: Run pixel validation
+              run: npm run validate-defs-without-formatting -- -g ../internal-github-asana-utils/user_map.yml
+              working-directory: PixelDefinitions
+
+
+
+
