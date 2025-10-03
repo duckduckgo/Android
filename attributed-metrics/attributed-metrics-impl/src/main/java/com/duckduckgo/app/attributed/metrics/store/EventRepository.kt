@@ -38,11 +38,11 @@ interface EventRepository {
 @ContributesBinding(AppScope::class)
 class RealEventRepository @Inject constructor(
     private val eventDao: EventDao,
-    private val dateProvider: DateProvider,
+    private val attributedMetricsDateUtils: AttributedMetricsDateUtils,
     @AppCoroutineScope private val coroutineScope: CoroutineScope,
 ) : EventRepository {
     override suspend fun collectEvent(eventName: String) {
-        val today = dateProvider.getCurrentDate()
+        val today = attributedMetricsDateUtils.getCurrentDate()
         val currentCount = eventDao.getEventCount(eventName, today)
 
         if (currentCount == null) {
@@ -56,7 +56,7 @@ class RealEventRepository @Inject constructor(
         eventName: String,
         days: Int,
     ): EventStats {
-        val startDay = dateProvider.getDateMinusDays(days)
+        val startDay = attributedMetricsDateUtils.getDateMinusDays(days)
 
         val daysWithEvents = eventDao.getDaysWithEvents(eventName, startDay)
         val totalEvents = eventDao.getTotalEvents(eventName, startDay) ?: 0
@@ -71,7 +71,7 @@ class RealEventRepository @Inject constructor(
 
     override suspend fun deleteOldEvents(olderThanDays: Int) {
         coroutineScope.launch {
-            val cutoffDay = dateProvider.getDateMinusDays(olderThanDays)
+            val cutoffDay = attributedMetricsDateUtils.getDateMinusDays(olderThanDays)
             eventDao.deleteEventsOlderThan(cutoffDay)
         }
     }
