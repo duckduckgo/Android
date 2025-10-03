@@ -23,22 +23,25 @@ import androidx.room.Query
 
 @Dao
 interface EventDao {
-    @Query("SELECT * FROM event_metrics WHERE eventName = :eventName AND day >= :startDay ORDER BY day DESC")
+    @Query("SELECT * FROM event_metrics WHERE eventName = :eventName AND day >= :startDay AND day <= :endDay ORDER BY day DESC")
     suspend fun getEventsByNameAndTimeframe(
         eventName: String,
         startDay: String,
+        endDay: String,
     ): List<EventEntity>
 
-    @Query("SELECT COUNT(DISTINCT day) FROM event_metrics WHERE eventName = :eventName AND day >= :startDay")
+    @Query("SELECT COUNT(DISTINCT day) FROM event_metrics WHERE eventName = :eventName AND day >= :startDay AND day <= :endDay")
     suspend fun getDaysWithEvents(
         eventName: String,
         startDay: String,
+        endDay: String,
     ): Int
 
-    @Query("SELECT SUM(count) FROM event_metrics WHERE eventName = :eventName AND day >= :startDay")
+    @Query("SELECT SUM(count) FROM event_metrics WHERE eventName = :eventName AND day >= :startDay AND day <= :endDay")
     suspend fun getTotalEvents(
         eventName: String,
         startDay: String,
+        endDay: String,
     ): Int
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)

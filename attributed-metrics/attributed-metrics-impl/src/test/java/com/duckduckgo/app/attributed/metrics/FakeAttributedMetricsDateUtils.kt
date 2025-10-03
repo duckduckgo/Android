@@ -17,6 +17,7 @@
 package com.duckduckgo.app.attributed.metrics
 
 import com.duckduckgo.app.attributed.metrics.store.AttributedMetricsDateUtils
+import java.time.Instant
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
@@ -28,6 +29,11 @@ class FakeAttributedMetricsDateUtils(var testDate: LocalDate) : AttributedMetric
     override fun daysSince(date: String): Int {
         val initDate = LocalDate.parse(date, DATE_FORMATTER)
         return ChronoUnit.DAYS.between(initDate, getCurrentLocalDate()).toInt()
+    }
+
+    override fun daysSince(timestamp: Long): Int {
+        val installDate = Instant.ofEpochMilli(timestamp)
+        return ChronoUnit.DAYS.between(installDate, getCurrentLocalDate()).toInt()
     }
 
     override fun getDateMinusDays(days: Int): String = getCurrentLocalDate().minusDays(days.toLong()).format(DATE_FORMATTER)

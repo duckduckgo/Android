@@ -57,9 +57,10 @@ class RealEventRepository @Inject constructor(
         days: Int,
     ): EventStats {
         val startDay = attributedMetricsDateUtils.getDateMinusDays(days)
+        val yesterday = attributedMetricsDateUtils.getDateMinusDays(1)
 
-        val daysWithEvents = eventDao.getDaysWithEvents(eventName, startDay)
-        val totalEvents = eventDao.getTotalEvents(eventName, startDay) ?: 0
+        val daysWithEvents = eventDao.getDaysWithEvents(eventName, startDay, yesterday)
+        val totalEvents = eventDao.getTotalEvents(eventName, startDay, yesterday) ?: 0
         val rollingAverage = if (days > 0) totalEvents.toDouble() / days else 0.0
 
         return EventStats(
