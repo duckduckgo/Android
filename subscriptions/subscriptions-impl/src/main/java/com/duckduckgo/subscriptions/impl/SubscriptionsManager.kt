@@ -84,15 +84,19 @@ import dagger.SingleInstanceIn
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.filterNot
+import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.onSubscription
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import kotlinx.coroutines.withTimeoutOrNull
 import logcat.LogPriority.ERROR
 import logcat.asLog
 import logcat.logcat
@@ -104,6 +108,7 @@ import java.time.Period
 import java.time.format.DateTimeParseException
 import javax.inject.Inject
 import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Duration.Companion.seconds
 
 interface SubscriptionsManager {
     /**
@@ -444,39 +449,19 @@ class RealSubscriptionsManager @Inject constructor(
                 }
 
                 // Wait for the purchase to complete by observing the purchase state
-                var purchaseCompleted = false
-                var purchaseToken: String? = null
-
-                val purchaseStateJob = launch {
-                    playBillingManager.purchaseState.collect { state ->
-                        when (state) {
-                            is PurchaseState.Purchased -> {
-                                logcat { "Subs: Purchase completed successfully" }
-                                purchaseToken = state.purchaseToken
-                                purchaseCompleted = true
-                            }
-                            is PurchaseState.Canceled -> {
-                                logcat { "Subs: Purchase was canceled" }
-                                purchaseCompleted = true
-                            }
-                            is PurchaseState.InProgress -> {
-                                logcat { "Subs: Purchase in progress..." }
+                val newPurchaseToken = withTimeoutOrNull(timeout = 60.seconds) {
+                    playBillingManager.purchaseState
+                        .onEach { state ->
+                            when (state) {
+                                is PurchaseState.Purchased -> logcat { "Subs: Purchase completed successfully" }
+                                is PurchaseState.Canceled -> logcat { "Subs: Purchase was canceled" }
+                                is PurchaseState.InProgress -> logcat { "Subs: Purchase in progress..." }
                             }
                         }
-                    }
+                        .filterNot { it is PurchaseState.InProgress }
+                        .map { (it as? PurchaseState.Purchased)?.purchaseToken }
+                        .firstOrNull()
                 }
-
-                // Wait for purchase completion with timeout
-                val timeoutMs = 60_000L // 60 seconds timeout
-                val startTime = System.currentTimeMillis()
-
-                while (!purchaseCompleted && (System.currentTimeMillis() - startTime) < timeoutMs) {
-                    delay(500) // Check every 500ms
-                }
-
-                purchaseStateJob.cancel()
-
-                val newPurchaseToken = purchaseToken
                 if (newPurchaseToken == null) {
                     logcat { "Subs: Plan switch failed - no new purchase token received" }
                     return@withContext false
