@@ -19,6 +19,7 @@ package com.duckduckgo.app.attributed.metrics.store
 import androidx.room.Room
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
+import com.duckduckgo.app.attributed.metrics.FakeAttributedMetricsDateUtils
 import com.duckduckgo.common.test.CoroutineTestRule
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runTest
@@ -28,7 +29,6 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import java.time.LocalDate
-import java.time.format.DateTimeFormatter
 
 @RunWith(AndroidJUnit4::class)
 class RealEventRepositoryTest {
@@ -37,7 +37,7 @@ class RealEventRepositoryTest {
 
     private lateinit var db: AttributedMetricsDatabase
     private lateinit var eventDao: EventDao
-    private lateinit var testDateProvider: FakeDateProvider
+    private lateinit var testDateProvider: FakeAttributedMetricsDateUtils
     private lateinit var repository: RealEventRepository
 
     @Before
@@ -49,11 +49,11 @@ class RealEventRepositoryTest {
                     AttributedMetricsDatabase::class.java,
                 ).build()
         eventDao = db.eventDao()
-        testDateProvider = FakeDateProvider()
+        testDateProvider = FakeAttributedMetricsDateUtils(LocalDate.of(2025, 10, 3))
         repository =
             RealEventRepository(
                 eventDao = eventDao,
-                dateProvider = testDateProvider,
+                attributedMetricsDateUtils = testDateProvider,
                 coroutineScope = TestScope(coroutineTestRule.testDispatcher),
             )
     }
@@ -66,27 +66,27 @@ class RealEventRepositoryTest {
     @Test
     fun whenCollectEventFirstTimeForTodayThenInsertNewRecord() =
         runTest {
-            testDateProvider.setCurrentDate("2024-01-01")
+            testDateProvider.testDate = LocalDate.of(2025, 10, 3)
 
             repository.collectEvent("test_event")
 
-            val events = eventDao.getEventsByNameAndTimeframe("test_event", "2024-01-01")
+            val events = eventDao.getEventsByNameAndTimeframe("test_event", "2025-10-03")
             assert(events.size == 1)
             assert(events[0].count == 1)
             assert(events[0].eventName == "test_event")
-            assert(events[0].day == "2024-01-01")
+            assert(events[0].day == "2025-10-03")
         }
 
     @Test
     fun whenCollectEventMultipleTimesForTodayThenIncrementCount() =
         runTest {
-            testDateProvider.setCurrentDate("2024-01-01")
+            testDateProvider.testDate = LocalDate.of(2025, 10, 3)
 
             repository.collectEvent("test_event")
             repository.collectEvent("test_event")
             repository.collectEvent("test_event")
 
-            val events = eventDao.getEventsByNameAndTimeframe("test_event", "2024-01-01")
+            val events = eventDao.getEventsByNameAndTimeframe("test_event", "2025-10-03")
             assert(events.size == 1)
             assert(events[0].count == 3)
         }
@@ -94,7 +94,7 @@ class RealEventRepositoryTest {
     @Test
     fun whenGetEventStatsWithNoEventsThenReturnZeros() =
         runTest {
-            testDateProvider.setCurrentDate("2024-01-01")
+            testDateProvider.testDate = LocalDate.of(2025, 10, 3)
 
             val stats = repository.getEventStats("test_event", days = 7)
 
@@ -107,10 +107,10 @@ class RealEventRepositoryTest {
     fun whenGetEventStatsThenCalculateCorrectly() =
         runTest {
             // Setup data for 3 days
-            testDateProvider.setCurrentDate("2024-01-01")
-            eventDao.insertEvent(EventEntity("test_event", count = 2, day = "2024-01-01"))
-            eventDao.insertEvent(EventEntity("test_event", count = 3, day = "2023-12-31"))
-            eventDao.insertEvent(EventEntity("test_event", count = 1, day = "2023-12-30"))
+            testDateProvider.testDate = LocalDate.of(2025, 10, 3)
+            eventDao.insertEvent(EventEntity("test_event", count = 2, day = "2025-10-03"))
+            eventDao.insertEvent(EventEntity("test_event", count = 3, day = "2025-10-02"))
+            eventDao.insertEvent(EventEntity("test_event", count = 1, day = "2025-10-01"))
 
             val stats = repository.getEventStats("test_event", days = 7)
 
@@ -123,28 +123,15 @@ class RealEventRepositoryTest {
     fun whenDeleteOldEventsThenRemoveOnlyOlderThanSpecified() =
         runTest {
             // Setup data
-            eventDao.insertEvent(EventEntity("test_event", count = 1, day = "2024-01-01"))
-            eventDao.insertEvent(EventEntity("test_event", count = 1, day = "2023-12-31"))
-            eventDao.insertEvent(EventEntity("test_event", count = 1, day = "2023-12-25"))
+            eventDao.insertEvent(EventEntity("test_event", count = 1, day = "2025-10-03"))
+            eventDao.insertEvent(EventEntity("test_event", count = 1, day = "2025-10-02"))
+            eventDao.insertEvent(EventEntity("test_event", count = 1, day = "2025-09-03"))
 
-            testDateProvider.setCurrentDate("2024-01-01")
+            testDateProvider.testDate = LocalDate.of(2025, 10, 3)
             repository.deleteOldEvents(olderThanDays = 5)
 
-            val remainingEvents = eventDao.getEventsByNameAndTimeframe("test_event", "2023-12-25")
+            val remainingEvents = eventDao.getEventsByNameAndTimeframe("test_event", "2025-09-03")
             assert(remainingEvents.size == 2)
-            assert(remainingEvents.none { it.day == "2023-12-25" })
+            assert(remainingEvents.none { it.day == "2025-09-03" })
         }
-}
-
-class FakeDateProvider : DateProvider {
-    private var currentDate = "2024-01-01"
-
-    fun setCurrentDate(date: String) {
-        currentDate = date
-    }
-
-    override fun getCurrentDate(): String = currentDate
-
-    override fun getDateMinusDays(days: Int): String =
-        LocalDate.parse(currentDate).minusDays(days.toLong()).format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))
 }
