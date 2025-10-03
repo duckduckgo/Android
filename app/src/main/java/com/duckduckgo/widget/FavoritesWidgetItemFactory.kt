@@ -20,6 +20,7 @@ import android.appwidget.AppWidgetManager
 import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
+import android.os.Build
 import android.os.Bundle
 import android.view.View
 import android.widget.RemoteViews
@@ -64,7 +65,11 @@ class FavoritesWidgetItemFactory(
         AppWidgetManager.INVALID_APPWIDGET_ID,
     )
 
-    private val faviconItemSize = context.resources.getDimension(CommonR.dimen.savedSiteGridItemFavicon).toInt()
+    private val faviconItemSize = if (Build.VERSION.SDK_INT >= 32) {
+        context.resources.getDimension(CommonR.dimen.savedSiteGridItemFavicon).toInt()
+    } else {
+        context.resources.getDimension(CommonR.dimen.savedSiteGridItemFavicon).toInt() / 2
+    }
     private val faviconItemCornerRadius = CommonR.dimen.searchWidgetFavoritesCornerRadius
 
     private val maxItems: Int
