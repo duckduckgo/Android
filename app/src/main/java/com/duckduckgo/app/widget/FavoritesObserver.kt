@@ -19,9 +19,9 @@ package com.duckduckgo.app.widget
 import android.appwidget.AppWidgetManager
 import android.content.ComponentName
 import android.content.Context
+import android.content.Intent
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.coroutineScope
-import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
@@ -33,7 +33,7 @@ import javax.inject.Inject
 
 @SingleInstanceIn(AppScope::class)
 class FavoritesObserver @Inject constructor(
-    context: Context,
+    private val context: Context,
     private val savedSitesRepository: SavedSitesRepository,
     private val dispatcherProvider: DispatcherProvider,
 ) : MainProcessLifecycleObserver {
@@ -47,8 +47,13 @@ class FavoritesObserver @Inject constructor(
         owner.lifecycle.coroutineScope.launch(dispatcherProvider.io()) {
             appWidgetManager?.let { instance ->
                 savedSitesRepository.getFavorites().collect {
-                    instance.notifyAppWidgetViewDataChanged(instance.getAppWidgetIds(componentName), R.id.favoritesGrid)
-                    instance.notifyAppWidgetViewDataChanged(instance.getAppWidgetIds(componentName), R.id.emptyfavoritesGrid)
+                    val appWidgetIds = instance.getAppWidgetIds(componentName)
+                    if (appWidgetIds.isNotEmpty()) {
+                        val updateIntent = Intent(context, SearchAndFavoritesWidget::class.java)
+                        updateIntent.action = AppWidgetManager.ACTION_APPWIDGET_UPDATE
+                        updateIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, appWidgetIds)
+                        context.sendBroadcast(updateIntent)
+                    }
                 }
             }
         }
