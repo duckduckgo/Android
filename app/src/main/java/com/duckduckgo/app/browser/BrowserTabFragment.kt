@@ -2282,6 +2282,7 @@ class BrowserTabFragment :
             }
 
             is Command.SubmitChat -> duckChat.openDuckChatWithAutoPrompt(it.query)
+            is Command.EnqueueCookiesAnimation -> enqueueCookiesAnimation(it.isCosmetic)
         }
     }
 
@@ -2305,6 +2306,17 @@ class BrowserTabFragment :
             }
             context?.let {
                 omnibar.createCookiesAnimation(isCosmetic)
+            }
+        }
+    }
+
+    private fun enqueueCookiesAnimation(isCosmetic: Boolean) {
+        launch {
+            if (isCosmetic) {
+                delay(COOKIES_ANIMATION_DELAY)
+            }
+            context?.let {
+                omnibar.enqueueCookiesAnimation(isCosmetic)
             }
         }
     }
