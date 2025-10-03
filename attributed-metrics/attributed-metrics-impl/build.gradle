@@ -36,14 +36,6 @@ dependencies {
     implementation KotlinX.coroutines.core
     implementation KotlinX.coroutines.android
 
-    implementation "io.reactivex.rxjava2:rxjava:_"
-    implementation "io.reactivex.rxjava2:rxandroid:_"
-
-    implementation Square.retrofit2.retrofit
-    implementation Square.retrofit2.converter.moshi
-    implementation Square.retrofit2.adapter.rxJava2
-    implementation Square.retrofit2.converter.scalars
-
     implementation Google.dagger
 
     // DataStore
@@ -52,11 +44,6 @@ dependencies {
     // Room
     implementation AndroidX.room.ktx
     ksp AndroidX.room.compiler
-
-    // WorkManager
-    implementation AndroidX.work.runtimeKtx
-    androidTestImplementation AndroidX.work.testing
-    implementation AndroidX.work.rxJava2
 
     implementation "com.squareup.logcat:logcat:_"
     

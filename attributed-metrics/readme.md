@@ -1,5 +1,5 @@
 # Attributed Metrics
-This module contains utility code for collecting attributed metrics.
+This module contains code for collecting attributed metrics.
 
 ## Who can help you better understand this feature?
 - Cristian Monforte

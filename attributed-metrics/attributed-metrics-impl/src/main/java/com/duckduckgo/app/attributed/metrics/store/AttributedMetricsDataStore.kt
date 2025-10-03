@@ -35,6 +35,10 @@ interface AttributedMetricsDataStore {
 
     suspend fun setEnabled(enabled: Boolean)
 
+    suspend fun isActive(): Boolean
+
+    suspend fun setActive(active: Boolean)
+
     suspend fun getInitializationDate(): String?
 
     suspend fun setInitializationDate(date: String?)
@@ -50,6 +54,7 @@ class RealAttributedMetricsDataStore @Inject constructor(
 ) : AttributedMetricsDataStore {
     private object Keys {
         val IS_ENABLED = booleanPreferencesKey("is_enabled")
+        val IS_ACTIVE = booleanPreferencesKey("is_active")
         val INIT_DATE = stringPreferencesKey("client_init_date")
     }
 
@@ -76,6 +81,14 @@ class RealAttributedMetricsDataStore @Inject constructor(
             } else {
                 preferences.remove(Keys.INIT_DATE)
             }
+        }
+    }
+
+    override suspend fun isActive(): Boolean = store.data.firstOrNull()?.get(Keys.IS_ACTIVE) ?: false
+
+    override suspend fun setActive(active: Boolean) {
+        store.edit { preferences ->
+            preferences[Keys.IS_ACTIVE] = active
         }
     }
 
