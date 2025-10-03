@@ -16,6 +16,7 @@
 
 package com.duckduckgo.widget
 
+import android.annotation.SuppressLint
 import android.appwidget.AppWidgetManager
 import android.content.Context
 import android.content.Intent
@@ -41,6 +42,7 @@ import logcat.logcat
 import javax.inject.Inject
 import com.duckduckgo.mobile.android.R as CommonR
 
+@SuppressLint("DenyListedApi")
 class FavoritesWidgetItemFactory(
     val context: Context,
     intent: Intent,
