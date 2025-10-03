@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.browser.omnibar.animations
+package com.duckduckgo.app.browser.omnibar.animations.addressbar
 
 import android.content.Context
 import android.view.View

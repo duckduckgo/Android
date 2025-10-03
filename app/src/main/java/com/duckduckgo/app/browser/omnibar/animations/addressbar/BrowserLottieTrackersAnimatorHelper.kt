@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 DuckDuckGo
+ * Copyright (c) 2025 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.browser.omnibar.animations
+package com.duckduckgo.app.browser.omnibar.animations.addressbar
 
 import android.animation.Animator
 import android.animation.Animator.AnimatorListener
@@ -32,11 +32,6 @@ import androidx.core.animation.addListener
 import androidx.core.animation.doOnEnd
 import com.airbnb.lottie.LottieAnimationView
 import com.duckduckgo.app.browser.R
-import com.duckduckgo.app.browser.omnibar.animations.TrackerLogo.ImageLogo
-import com.duckduckgo.app.browser.omnibar.animations.TrackerLogo.LetterLogo
-import com.duckduckgo.app.browser.omnibar.animations.TrackerLogo.StackedLogo
-import com.duckduckgo.app.browser.omnibar.animations.addressbar.AddressBarTrackersAnimator
-import com.duckduckgo.app.browser.omnibar.animations.addressbar.CommonAddressBarAnimationHelper
 import com.duckduckgo.app.trackerdetection.model.Entity
 import com.duckduckgo.common.ui.store.AppTheme
 import com.duckduckgo.common.ui.view.gone
@@ -373,9 +368,9 @@ class BrowserLottieTrackersAnimatorHelper @Inject constructor(
             .map {
                 val resId = TrackersRenderer().networkLogoIcon(context, it.name)
                 if (resId == null) {
-                    LetterLogo(it.displayName.take(1))
+                    TrackerLogo.LetterLogo(it.displayName.take(1))
                 } else {
-                    ImageLogo(resId)
+                    TrackerLogo.ImageLogo(resId)
                 }
             }.toMutableList()
 
@@ -384,7 +379,7 @@ class BrowserLottieTrackersAnimatorHelper @Inject constructor(
         } else {
             trackerLogoList.take(MAX_LOGOS_SHOWN)
                 .toMutableList()
-                .apply { add(StackedLogo()) }
+                .apply { add(TrackerLogo.StackedLogo()) }
         }
     }
 

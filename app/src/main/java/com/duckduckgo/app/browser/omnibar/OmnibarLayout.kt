@@ -76,9 +76,9 @@ import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.Command.StartTr
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.LeadingIconState.EasterEggLogo
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.LeadingIconState.PrivacyShield
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.ViewState
-import com.duckduckgo.app.browser.omnibar.animations.BrowserTrackersAnimatorHelper
-import com.duckduckgo.app.browser.omnibar.animations.PrivacyShieldAnimationHelper
-import com.duckduckgo.app.browser.omnibar.animations.TrackersAnimatorListener
+import com.duckduckgo.app.browser.omnibar.animations.addressbar.BrowserTrackersAnimatorHelper
+import com.duckduckgo.app.browser.omnibar.animations.addressbar.PrivacyShieldAnimationHelper
+import com.duckduckgo.app.browser.omnibar.animations.addressbar.TrackersAnimatorListener
 import com.duckduckgo.app.browser.omnibar.animations.omnibaranimation.OmnibarAnimationManager
 import com.duckduckgo.app.browser.tabswitcher.TabSwitcherButton
 import com.duckduckgo.app.browser.viewstate.LoadingViewState
