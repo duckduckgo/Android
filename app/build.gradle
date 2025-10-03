@@ -409,6 +409,9 @@ dependencies {
     implementation project(':survey-api')
     implementation project(':survey-impl')
 
+    implementation project(':attributed-metrics-api')
+    implementation project(':attributed-metrics-impl')
+
     implementation project(':breakage-reporting-impl')
 
     implementation project(':dax-prompts-api')
