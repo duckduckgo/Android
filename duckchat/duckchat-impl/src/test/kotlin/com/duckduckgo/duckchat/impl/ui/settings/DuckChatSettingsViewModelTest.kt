@@ -20,6 +20,7 @@ import app.cash.turbine.test
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.duckchat.impl.DuckChatInternal
+import com.duckduckgo.duckchat.impl.R
 import com.duckduckgo.duckchat.impl.inputscreen.ui.metrics.discovery.InputScreenDiscoveryFunnel
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
 import com.duckduckgo.duckchat.impl.ui.settings.DuckChatSettingsViewModel.Command.LaunchFeedback
@@ -237,6 +238,27 @@ class DuckChatSettingsViewModelTest {
         runTest {
             testee.duckChatSearchAISettingsClicked()
             verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_SEARCH_ASSIST_SETTINGS_BUTTON_CLICKED)
+        }
+
+    @Test
+    fun whenDuckChatSearchAISettingsClickedAndSaveAndExitEnabledThenOpenSettingsLinkWithReturnParamEmitted() =
+        runTest {
+            @Suppress("DenyListedApi")
+            settingsPageFeature.saveAndExitSerpSettings().setRawStoredState(State(enable = true))
+
+            testee.duckChatSearchAISettingsClicked()
+
+            testee.commands.test {
+                val command = awaitItem()
+                assertTrue(command is OpenLink)
+                command as OpenLink
+                assertEquals(
+                    DuckChatSettingsViewModel.DUCK_CHAT_SEARCH_AI_SETTINGS_LINK_WITH_RETURN_PARAM,
+                    command.link,
+                )
+                assertEquals(R.string.duck_chat_search_assist_settings_title, command.titleRes)
+                cancelAndIgnoreRemainingEvents()
+            }
         }
 
     @Test
