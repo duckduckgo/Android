@@ -22,6 +22,9 @@ import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.settings.api.SettingsConstants
+import com.duckduckgo.settings.impl.messaging.SettingsContentScopeJsMessageHandler.Companion.FEATURE_SERP_SETTINGS
+import com.duckduckgo.settings.impl.messaging.SettingsContentScopeJsMessageHandler.Companion.METHOD_OPEN_NATIVE_SETTINGS
+import com.duckduckgo.settings.impl.messaging.SettingsContentScopeJsMessageHandler.Companion.PARAM_RETURN
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.receiveAsFlow
@@ -63,10 +66,10 @@ class SettingsWebViewViewModel @Inject constructor(
     ) {
         viewModelScope.launch(dispatcherProvider.io()) {
             when (featureName) {
-                SettingsConstants.FEATURE_SERP_SETTINGS ->
+                FEATURE_SERP_SETTINGS ->
                     when (method) {
-                        SettingsConstants.METHOD_OPEN_NATIVE_SETTINGS -> {
-                            val returnParam = data?.optString(SettingsConstants.PARAM_RETURN)
+                        METHOD_OPEN_NATIVE_SETTINGS -> {
+                            val returnParam = data?.optString(PARAM_RETURN)
                             openNativeSettings(returnParam)
                         }
                     }
