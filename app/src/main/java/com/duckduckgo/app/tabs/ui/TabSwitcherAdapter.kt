@@ -469,6 +469,8 @@ class TabSwitcherAdapter(
             const val TRACKER_ANIMATION_TILE_INFO_PANEL = 2
 
             const val EXTRA_CLOSE_BUTTON_TOUCH_AREA = 6 // dp
+
+            const val MAX_TITLE_LENGTH = 50
         }
 
         interface TabViewHolder {
