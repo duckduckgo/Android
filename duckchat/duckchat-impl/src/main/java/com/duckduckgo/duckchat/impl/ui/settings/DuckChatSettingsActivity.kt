@@ -33,6 +33,7 @@ import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.tabs.BrowserNav
 import com.duckduckgo.browser.api.ui.BrowserScreens.FeedbackActivityWithEmptyParams
+import com.duckduckgo.browser.api.ui.BrowserScreens.WebViewActivityWithParams
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.spans.DuckDuckGoClickableSpan
 import com.duckduckgo.common.ui.store.AppTheme
@@ -48,6 +49,7 @@ import com.duckduckgo.duckchat.impl.inputscreen.ui.metrics.discovery.InputScreen
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_SETTINGS_DISPLAYED
 import com.duckduckgo.duckchat.impl.ui.settings.DuckChatSettingsViewModel.ViewState
 import com.duckduckgo.navigation.api.GlobalActivityStarter
+import com.duckduckgo.settings.api.SettingsPageFeature
 import com.duckduckgo.settings.api.SettingsWebViewScreenWithParams
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -77,6 +79,9 @@ class DuckChatSettingsActivity : DuckDuckGoActivity() {
 
     @Inject
     lateinit var appTheme: AppTheme
+
+    @Inject
+    lateinit var settingsPageFeature: SettingsPageFeature
 
     @Inject
     lateinit var inputScreenDiscoveryFunnel: InputScreenDiscoveryFunnel
@@ -205,13 +210,23 @@ class DuckChatSettingsActivity : DuckDuckGoActivity() {
     private fun processCommand(command: DuckChatSettingsViewModel.Command) {
         when (command) {
             is DuckChatSettingsViewModel.Command.OpenLink -> {
-                globalActivityStarter.start(
-                    this,
-                    SettingsWebViewScreenWithParams(
-                        url = command.link,
-                        screenTitle = getString(command.titleRes),
-                    ),
-                )
+                if (settingsPageFeature.saveAndExitSerpSettings().isEnabled()) {
+                    globalActivityStarter.start(
+                        this,
+                        SettingsWebViewScreenWithParams(
+                            url = command.link,
+                            screenTitle = getString(command.titleRes),
+                        ),
+                    )
+                } else {
+                    globalActivityStarter.start(
+                        this,
+                        WebViewActivityWithParams(
+                            url = command.link,
+                            screenTitle = getString(R.string.duck_chat_title),
+                        ),
+                    )
+                }
             }
             is DuckChatSettingsViewModel.Command.OpenLinkInNewTab -> {
                 startActivity(browserNav.openInNewTab(this@DuckChatSettingsActivity, command.link))
