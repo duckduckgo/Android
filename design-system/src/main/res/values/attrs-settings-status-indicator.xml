@@ -19,6 +19,7 @@
         <enum name="alwaysOn" value="0" />
         <enum name="on" value="1" />
         <enum name="off" value="2" />
+        <enum name="none" value="3" />
     </attr>
     <attr name="labelText" format="string" />
 
