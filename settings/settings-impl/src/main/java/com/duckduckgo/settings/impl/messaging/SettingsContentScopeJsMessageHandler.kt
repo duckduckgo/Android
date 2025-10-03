@@ -23,7 +23,6 @@ import com.duckduckgo.js.messaging.api.JsMessage
 import com.duckduckgo.js.messaging.api.JsMessageCallback
 import com.duckduckgo.js.messaging.api.JsMessageHandler
 import com.duckduckgo.js.messaging.api.JsMessaging
-import com.duckduckgo.settings.api.SettingsConstants
 import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
 
@@ -44,10 +43,16 @@ class SettingsContentScopeJsMessageHandler @Inject constructor() : ContentScopeJ
                     AppUrl.Url.HOST,
                 )
 
-            override val featureName: String = SettingsConstants.FEATURE_SERP_SETTINGS
+            override val featureName: String = FEATURE_SERP_SETTINGS
             override val methods: List<String> =
                 listOf(
-                    SettingsConstants.METHOD_OPEN_NATIVE_SETTINGS,
+                    METHOD_OPEN_NATIVE_SETTINGS,
                 )
         }
+
+    companion object {
+        internal const val FEATURE_SERP_SETTINGS = "serpSettings"
+        internal const val METHOD_OPEN_NATIVE_SETTINGS = "openNativeSettings"
+        internal const val PARAM_RETURN = "return"
+    }
 }

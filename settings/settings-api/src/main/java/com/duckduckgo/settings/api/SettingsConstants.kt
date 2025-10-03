@@ -17,9 +17,6 @@
 package com.duckduckgo.settings.api
 
 object SettingsConstants {
-    const val FEATURE_SERP_SETTINGS = "serpSettings"
-    const val METHOD_OPEN_NATIVE_SETTINGS = "openNativeSettings"
-    const val PARAM_RETURN = "return"
     const val ID_AI_FEATURES = "aiFeatures"
     const val ID_PRIVATE_SEARCH = "privateSearch"
 }
