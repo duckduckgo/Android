@@ -19,7 +19,6 @@ package com.duckduckgo.app.browser.omnibar.animations
 import android.animation.Animator
 import android.animation.Animator.AnimatorListener
 import android.animation.AnimatorSet
-import android.animation.ObjectAnimator
 import android.content.Context
 import android.transition.Scene
 import android.transition.Slide
@@ -27,17 +26,17 @@ import android.transition.Transition
 import android.transition.Transition.TransitionListener
 import android.transition.TransitionManager
 import android.view.Gravity
-import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.animation.addListener
 import androidx.core.animation.doOnEnd
-import androidx.core.transition.addListener
 import com.airbnb.lottie.LottieAnimationView
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.omnibar.animations.TrackerLogo.ImageLogo
 import com.duckduckgo.app.browser.omnibar.animations.TrackerLogo.LetterLogo
 import com.duckduckgo.app.browser.omnibar.animations.TrackerLogo.StackedLogo
+import com.duckduckgo.app.browser.omnibar.animations.addressbar.AddressBarTrackersAnimator
+import com.duckduckgo.app.browser.omnibar.animations.addressbar.CommonAddressBarAnimationHelper
 import com.duckduckgo.app.trackerdetection.model.Entity
 import com.duckduckgo.common.ui.store.AppTheme
 import com.duckduckgo.common.ui.view.gone
@@ -46,15 +45,13 @@ import com.duckduckgo.common.ui.view.text.DaxTextView
 import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.di.scopes.FragmentScope
 import com.squareup.anvil.annotations.ContributesBinding
-import kotlinx.coroutines.MainScope
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @ContributesBinding(FragmentScope::class)
 class BrowserLottieTrackersAnimatorHelper @Inject constructor(
     private val theme: AppTheme,
-    private val trackerCountAnimator: TrackerCountAnimator,
+    private val addressBarTrackersAnimator: AddressBarTrackersAnimator,
+    private val commonAddressBarAnimationHelper: CommonAddressBarAnimationHelper,
 ) : BrowserTrackersAnimatorHelper {
 
     private var listener: TrackersAnimatorListener? = null
@@ -71,7 +68,6 @@ class BrowserLottieTrackersAnimatorHelper @Inject constructor(
 
     private var enqueueCookiesAnimation = false
     private var isCookiesAnimationRunning = false
-    private var isTrackersAnimationRunning = false
     private var hasCookiesAnimationBeenCanceled = false
 
     private val conflatedJob = ConflatedJob()
@@ -114,11 +110,11 @@ class BrowserLottieTrackersAnimatorHelper @Inject constructor(
             this.addAnimatorListener(
                 object : AnimatorListener {
                     override fun onAnimationStart(animation: Animator) {
-                        animateOmnibarOut(omnibarViews).start()
+                        commonAddressBarAnimationHelper.animateViewsOut(omnibarViews).start()
                     }
 
                     override fun onAnimationEnd(animation: Animator) {
-                        animateOmnibarIn(omnibarViews).start()
+                        commonAddressBarAnimationHelper.animateViewsIn(omnibarViews).start()
                         tryToStartCookiesAnimation(context, omnibarViews)
                         listener?.onAnimationFinished()
                     }
@@ -147,132 +143,20 @@ class BrowserLottieTrackersAnimatorHelper @Inject constructor(
         shieldViews: List<View>,
         entities: List<Entity>?,
     ) {
-        if (isCookiesAnimationRunning || isTrackersAnimationRunning) return
+        if (isCookiesAnimationRunning || addressBarTrackersAnimator.isAnimationRunning) return
 
-        isTrackersAnimationRunning = true
-
-        if (entities.isNullOrEmpty()) {
-            tryToStartCookiesAnimation(context, omnibarViews + shieldViews)
-            return
-        }
-
-        addressBarTrackersBlockedAnimationShieldIcon.show()
-        addressBarTrackersBlockedAnimationShieldIcon.progress = 0F
-
-        val slideInTrackersTransition: Transition = createSlideTransition()
-        val slideOutTrackersTransition: Transition = createSlideTransition()
-
-        val inflater = LayoutInflater.from(context)
-        val scene1Layout = inflater.inflate(R.layout.address_bar_trackers_animation_scene_1, sceneRoot, false)
-        val scene2Layout = inflater.inflate(R.layout.address_bar_trackers_animation_scene_2, sceneRoot, false)
-
-        val trackersBlockedTextViewScene1 = scene1Layout.findViewById<DaxTextView>(R.id.trackersBlockedTextView)
-        val trackersBlockedCountTextViewScene1 = scene1Layout.findViewById<DaxTextView>(R.id.trackersBlockedCountView)
-        trackersBlockedTextViewScene1.text =
-            context.resources.getQuantityString(
-                R.plurals.trackersBlockedAnimationMessage,
-                entities.size,
-            )
-
-        val trackersBlockedTextViewScene2 = scene2Layout.findViewById<DaxTextView>(R.id.trackersBlockedTextView)
-        val trackersBlockedCountTextViewScene2 = scene2Layout.findViewById<DaxTextView>(R.id.trackersBlockedCountView)
-        trackersBlockedTextViewScene2.text =
-            context.resources.getQuantityString(
-                R.plurals.trackersBlockedAnimationMessage,
-                entities.size,
-            )
-
-        val trackerAnimationStartCount = trackerCountAnimator.getTrackerAnimationStartCount(entities.size)
-        val trackerAnimationEndCount = trackerCountAnimator.getTrackerAnimationEndCount(entities.size)
-        trackersBlockedCountTextViewScene1.text = trackerAnimationStartCount.toString()
-        trackersBlockedCountTextViewScene2.text = trackerAnimationEndCount.toString()
-
-        val scene1 = Scene(sceneRoot, scene1Layout)
-        val scene2 = Scene(sceneRoot, scene2Layout)
-
-        slideInTrackersTransition.addListener(
-            onStart = {
-                AnimatorSet().apply {
-                    play((animateFadeIn(trackersBlockedTextViewScene2, TRACKERS_ANIMATION_TEXT_FADE_IN_DURATION)))
-                        .with(animateFadeIn(trackersBlockedCountTextViewScene2, TRACKERS_ANIMATION_TEXT_FADE_IN_DURATION))
-                        .with(animateFadeIn(cookieBackground, DEFAULT_ANIMATION_DURATION))
-                    start()
-                }
-            },
-            onEnd = {
-                trackerCountAnimator.animateTrackersBlockedCountView(
-                    context = context,
-                    totalTrackerCount = entities.size,
-                    trackerTextView = trackersBlockedCountTextViewScene2,
-                    onAnimationEnd = {
-                        AnimatorSet().apply {
-                            startDelay = TRACKERS_ANIMATION_SLIDE_OUT_DELAY
-                            addListener(
-                                onEnd = {
-                                    TransitionManager.go(scene1, slideOutTrackersTransition)
-                                },
-                            )
-                            start()
-                        }
-                    },
-                )
+        addressBarTrackersAnimator.startAnimation(
+            context = context,
+            sceneRoot = sceneRoot,
+            cookieBackground = cookieBackground,
+            addressBarTrackersBlockedAnimationShieldIcon = addressBarTrackersBlockedAnimationShieldIcon,
+            omnibarViews = omnibarViews,
+            shieldViews = shieldViews,
+            entities = entities,
+            onAnimationComplete = {
+                tryToStartCookiesAnimation(context, omnibarViews + shieldViews)
             },
         )
-
-        slideOutTrackersTransition.addListener(
-            onStart = {
-                AnimatorSet().apply {
-                    play(animateFadeOut(trackersBlockedTextViewScene2, TRACKERS_ANIMATION_TEXT_FADE_OUT_DURATION))
-                        .with(animateFadeOut(trackersBlockedCountTextViewScene2, TRACKERS_ANIMATION_TEXT_FADE_OUT_DURATION))
-                    start()
-                }
-            },
-            onEnd = {
-                AnimatorSet().apply {
-                    play(animateOmnibarIn(omnibarViews + shieldViews))
-                    play(animateFadeOut(cookieBackground, DEFAULT_ANIMATION_DURATION))
-                    addListener(
-                        onEnd = {
-                            addressBarTrackersBlockedAnimationShieldIcon.addAnimatorListener(
-                                object : AnimatorListener {
-                                    override fun onAnimationStart(p0: Animator) {}
-
-                                    override fun onAnimationEnd(p0: Animator) {
-                                        addressBarTrackersBlockedAnimationShieldIcon.gone()
-                                        addressBarTrackersBlockedAnimationShieldIcon.progress = 0F
-                                        isTrackersAnimationRunning = false
-                                        conflatedJob +=
-                                            MainScope().launch {
-                                                delay(1500L)
-                                                tryToStartCookiesAnimation(context, omnibarViews + shieldViews)
-                                            }
-                                    }
-
-                                    override fun onAnimationCancel(p0: Animator) {}
-
-                                    override fun onAnimationRepeat(p0: Animator) {}
-                                },
-                            )
-                            addressBarTrackersBlockedAnimationShieldIcon.playAnimation()
-                        },
-                    )
-                    start()
-                }
-                sceneRoot.gone()
-            },
-        )
-
-        AnimatorSet().apply {
-            play(animateOmnibarOut(omnibarViews))
-            addListener(
-                onEnd = {
-                    sceneRoot.show()
-                    sceneRoot.alpha = 1F
-                    TransitionManager.go(scene2, slideInTrackersTransition)
-                },
-            )
-            start()
-        }
     }
 
     override fun createCookiesAnimation(
@@ -292,7 +176,7 @@ class BrowserLottieTrackersAnimatorHelper @Inject constructor(
 
         if (enqueueCookieAnimation) {
             this.enqueueCookiesAnimation = true
-        } else if (this.trackersAnimation?.isAnimating != true && !isTrackersAnimationRunning) {
+        } else if (this.trackersAnimation?.isAnimating != true && !addressBarTrackersAnimator.isAnimationRunning) {
             startCookiesAnimation(context, omnibarViews + shieldViews)
         } else {
             enqueueCookiesAnimation = false
@@ -359,15 +243,15 @@ class BrowserLottieTrackersAnimatorHelper @Inject constructor(
             object : TransitionListener {
                 override fun onTransitionEnd(transition: Transition) {
                     AnimatorSet().apply {
-                        play(animateFadeIn(cookieView, 0L)) // Fake animation because the delay doesn't really work
+                        play(commonAddressBarAnimationHelper.animateFadeIn(cookieView, 0L)) // Fake animation because the delay doesn't really work
                         startDelay = COOKIES_ANIMATION_DELAY
                         addListener(
                             doOnEnd {
                                 if (!hasCookiesAnimationBeenCanceled) {
                                     AnimatorSet().apply {
                                         TransitionManager.go(firstScene, slideOutCookiesTransition)
-                                        play(animateFadeOut(cookieView, COOKIES_ANIMATION_FADE_OUT_DURATION))
-                                            .with(animateFadeOut(cookieViewBackground, COOKIES_ANIMATION_FADE_OUT_DURATION))
+                                        play(commonAddressBarAnimationHelper.animateFadeOut(cookieView, COOKIES_ANIMATION_FADE_OUT_DURATION))
+                                            .with(commonAddressBarAnimationHelper.animateFadeOut(cookieViewBackground, COOKIES_ANIMATION_FADE_OUT_DURATION))
                                         addListener(
                                             doOnEnd {
                                                 cookieView.gone()
@@ -400,7 +284,7 @@ class BrowserLottieTrackersAnimatorHelper @Inject constructor(
                 override fun onTransitionEnd(transition: Transition) {
                     if (!hasCookiesAnimationBeenCanceled) {
                         AnimatorSet().apply {
-                            play(animateOmnibarIn(allOmnibarViews))
+                            play(commonAddressBarAnimationHelper.animateViewsIn(allOmnibarViews))
                             start()
                         }
                         cookieScene.gone()
@@ -432,7 +316,9 @@ class BrowserLottieTrackersAnimatorHelper @Inject constructor(
 
         // Here the animations begins. Fade out omnibar, fade in dummy view and after that start lottie animation
         AnimatorSet().apply {
-            play(animateOmnibarOut(allOmnibarViews)).with(animateFadeIn(cookieViewBackground)).with(animateFadeIn(cookieView))
+            play(commonAddressBarAnimationHelper.animateViewsOut(allOmnibarViews))
+                .with(commonAddressBarAnimationHelper.animateFadeIn(cookieViewBackground))
+                .with(commonAddressBarAnimationHelper.animateFadeIn(cookieView))
             addListener(
                 onEnd = {
                     cookieScene.show()
@@ -526,61 +412,15 @@ class BrowserLottieTrackersAnimatorHelper @Inject constructor(
         cookieView.gone()
     }
 
-    private fun animateOmnibarOut(views: List<View>): AnimatorSet {
-        val animators = views.map {
-            animateFadeOut(it)
-        }
-        return AnimatorSet().apply {
-            playTogether(animators)
-        }
-    }
-
-    private fun animateOmnibarIn(views: List<View>): AnimatorSet {
-        val animators = views.map {
-            animateFadeIn(it)
-        }
-        return AnimatorSet().apply {
-            playTogether(animators)
-        }
-    }
-
-    private fun animateFadeOut(
-        view: View,
-        durationInMs: Long = DEFAULT_ANIMATION_DURATION,
-    ): ObjectAnimator {
-        return ObjectAnimator.ofFloat(view, "alpha", 1f, 0f).apply {
-            duration = durationInMs
-        }
-    }
-
-    private fun animateFadeIn(
-        view: View,
-        durationInMs: Long = DEFAULT_ANIMATION_DURATION,
-    ): ObjectAnimator {
-        if (view.alpha == 1f) {
-            return ObjectAnimator.ofFloat(view, "alpha", 1f, 1f).apply {
-                duration = durationInMs
-            }
-        }
-
-        return ObjectAnimator.ofFloat(view, "alpha", 0f, 1f).apply {
-            duration = durationInMs
-        }
-    }
-
     private fun Sequence<Entity>.sortedWithDisplayNamesStartingWithVowelsToTheEnd(): Sequence<Entity> {
         return sortedWith(compareBy { "AEIOU".contains(it.displayName.take(1)) })
     }
 
     companion object {
-        private const val DEFAULT_ANIMATION_DURATION = 150L
         private const val MAX_LOGOS_SHOWN = 3
         private const val COOKIES_ANIMATION_DELAY = 1000L
         private const val COOKIES_ANIMATION_DURATION = 300L
         private const val COOKIES_ANIMATION_FADE_OUT_DURATION = 800L
-        private const val TRACKERS_ANIMATION_SLIDE_OUT_DELAY = 1000L
-        private const val TRACKERS_ANIMATION_TEXT_FADE_IN_DURATION = 900L
-        private const val TRACKERS_ANIMATION_TEXT_FADE_OUT_DURATION = 300L
     }
 }
 
