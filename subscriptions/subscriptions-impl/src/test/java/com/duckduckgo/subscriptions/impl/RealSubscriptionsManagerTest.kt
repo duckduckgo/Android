@@ -38,11 +38,15 @@ import com.duckduckgo.subscriptions.impl.auth2.RefreshTokenClaims
 import com.duckduckgo.subscriptions.impl.auth2.TokenPair
 import com.duckduckgo.subscriptions.impl.billing.PlayBillingManager
 import com.duckduckgo.subscriptions.impl.billing.PurchaseState
+import com.duckduckgo.subscriptions.impl.billing.PurchaseState.Canceled
+import com.duckduckgo.subscriptions.impl.billing.PurchaseState.Purchased
+import com.duckduckgo.subscriptions.impl.billing.SubscriptionReplacementMode
 import com.duckduckgo.subscriptions.impl.model.Entitlement
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
 import com.duckduckgo.subscriptions.impl.repository.AuthRepository
 import com.duckduckgo.subscriptions.impl.repository.FakeSubscriptionsDataStore
 import com.duckduckgo.subscriptions.impl.repository.RealAuthRepository
+import com.duckduckgo.subscriptions.impl.repository.Subscription
 import com.duckduckgo.subscriptions.impl.serp_promo.FakeSerpPromo
 import com.duckduckgo.subscriptions.impl.services.AccessTokenResponse
 import com.duckduckgo.subscriptions.impl.services.AccountResponse
@@ -650,20 +654,20 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
         )
 
         manager.currentPurchaseState.test {
-            flowTest.emit(PurchaseState.Purchased("validToken", "packageName"))
+            flowTest.emit(Purchased("validToken", "packageName"))
             assertTrue(awaitItem() is CurrentPurchase.InProgress)
             assertTrue(awaitItem() is CurrentPurchase.Success)
             cancelAndConsumeRemainingEvents()
         }
 
         manager.entitlements.test {
-            flowTest.emit(PurchaseState.Purchased("validToken", "packageName"))
+            flowTest.emit(Purchased("validToken", "packageName"))
             assertTrue(awaitItem().size == 1)
             cancelAndConsumeRemainingEvents()
         }
 
         manager.subscriptionStatus.test {
-            flowTest.emit(PurchaseState.Purchased("validToken", "packageName"))
+            flowTest.emit(Purchased("validToken", "packageName"))
             assertEquals(AUTO_RENEWABLE, awaitItem())
             cancelAndConsumeRemainingEvents()
         }
@@ -698,14 +702,14 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
         )
 
         manager.currentPurchaseState.test {
-            flowTest.emit(PurchaseState.Purchased("validateToken", "packageName"))
+            flowTest.emit(Purchased("validateToken", "packageName"))
             assertTrue(awaitItem() is CurrentPurchase.InProgress)
             assertTrue(awaitItem() is CurrentPurchase.Waiting)
             cancelAndConsumeRemainingEvents()
         }
 
         manager.subscriptionStatus.test {
-            flowTest.emit(PurchaseState.Purchased("validateToken", "packageName"))
+            flowTest.emit(Purchased("validateToken", "packageName"))
             assertEquals(WAITING, awaitItem())
             cancelAndConsumeRemainingEvents()
         }
@@ -736,7 +740,7 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
         )
 
         manager.currentPurchaseState.test {
-            flowTest.emit(PurchaseState.Canceled)
+            flowTest.emit(Canceled)
             assertTrue(awaitItem() is CurrentPurchase.Canceled)
             cancelAndConsumeRemainingEvents()
         }
@@ -1159,7 +1163,7 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
         givenConfirmPurchaseSucceeds()
         givenV2AccessTokenRefreshSucceeds()
 
-        whenever(playBillingManager.purchaseState).thenReturn(flowOf(PurchaseState.Purchased("any", "any")))
+        whenever(playBillingManager.purchaseState).thenReturn(flowOf(Purchased("any", "any")))
 
         subscriptionsManager.currentPurchaseState.test {
             assertTrue(awaitItem() is CurrentPurchase.InProgress)
@@ -1200,7 +1204,7 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
         givenValidateTokenFails("failure")
         givenConfirmPurchaseFails()
 
-        whenever(playBillingManager.purchaseState).thenReturn(flowOf(PurchaseState.Purchased("validateToken", "packageName")))
+        whenever(playBillingManager.purchaseState).thenReturn(flowOf(Purchased("validateToken", "packageName")))
 
         subscriptionsManager.currentPurchaseState.test {
             assertTrue(awaitItem() is CurrentPurchase.InProgress)
@@ -1742,6 +1746,65 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
         whenever(playBillingManager.products).thenReturn(listOf(productDetails))
     }
 
+    @Test
+    fun whenSwitchSubscriptionPlanWithNoActiveSubscriptionThenReturnFalse() = runTest {
+        givenUserIsSignedIn()
+        givenNoActiveSubscription()
+
+        val result = subscriptionsManager.switchSubscriptionPlan(
+            activity = mock(),
+            planId = YEARLY_PLAN_US,
+            offerId = null,
+            replacementMode = SubscriptionReplacementMode.DEFERRED,
+        )
+
+        assertFalse(result)
+    }
+
+    @Test
+    fun whenSwitchSubscriptionPlanWithNoPurchaseTokenThenReturnFalse() = runTest {
+        givenUserIsSignedIn()
+        givenActiveSubscription()
+        givenNoPurchaseHistory()
+
+        val result = subscriptionsManager.switchSubscriptionPlan(
+            activity = mock(),
+            planId = YEARLY_PLAN_US,
+            offerId = null,
+            replacementMode = SubscriptionReplacementMode.DEFERRED,
+        )
+
+        assertFalse(result)
+    }
+
+    @Test
+    fun whenSwitchSubscriptionPlanWithNoAccountThenReturnFalse() = runTest {
+        givenUserIsNotSignedIn()
+        givenActiveSubscription()
+        givenPurchaseStored()
+
+        val result = subscriptionsManager.switchSubscriptionPlan(
+            activity = mock(),
+            planId = YEARLY_PLAN_US,
+            offerId = null,
+            replacementMode = SubscriptionReplacementMode.DEFERRED,
+        )
+
+        assertFalse(result)
+    }
+
+    @Test
+    fun whenSwitchSubscriptionPlanWithUserNotSignedInThenReturnFalse() = runTest {
+        val result = subscriptionsManager.switchSubscriptionPlan(
+            activity = mock(),
+            planId = YEARLY_PLAN_US,
+            offerId = null,
+            replacementMode = SubscriptionReplacementMode.DEFERRED,
+        )
+
+        assertFalse(result)
+    }
+
     private suspend fun purchase(
         planId: String = "",
         offerId: String? = null,
@@ -1761,6 +1824,28 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
     @SuppressLint("DenyListedApi")
     private fun givenIsLaunchedRow(value: Boolean) {
         privacyProFeature.isLaunchedROW().setRawStoredState(State(remoteEnableState = value))
+    }
+
+    private suspend fun givenActiveSubscription() {
+        authRepository.setSubscription(
+            Subscription(
+                productId = "ddg_privacy_pro",
+                billingPeriod = "P1M",
+                startedAt = 1234L,
+                expiresOrRenewsAt = 1234L,
+                status = AUTO_RENEWABLE,
+                platform = "android",
+                activeOffers = emptyList(),
+            ),
+        )
+    }
+
+    private suspend fun givenNoActiveSubscription() {
+        authRepository.setSubscription(null)
+    }
+
+    private fun givenNoPurchaseHistory() {
+        whenever(playBillingManager.purchaseHistory).thenReturn(emptyList())
     }
 
     private class FakeTimeProvider : CurrentTimeProvider {

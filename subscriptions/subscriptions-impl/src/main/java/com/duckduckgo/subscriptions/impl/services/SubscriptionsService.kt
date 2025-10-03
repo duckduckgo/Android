@@ -76,6 +76,8 @@ data class ConfirmationBody(
     val purchaseToken: String,
     val experimentName: String?,
     val experimentCohort: String?,
+    val oldPurchaseToken: String? = null,
+    val replacementMode: String? = null,
 )
 
 data class ConfirmationResponse(
