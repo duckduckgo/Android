@@ -1,0 +1,28 @@
+{
+    "name": "@duckduckgo/windows-browser",
+    "version": "1.0.0",
+    "dependencies": {
+        "@duckduckgo/pixel-schema": "github:duckduckgo/pixel-schema#v1.0.8",
+        "prettier": "^3.5.1"
+    },
+    "scripts": {
+        "validate-defs-without-formatting": "validate-ddg-pixel-defs .",
+        "validate-defs": "validate-ddg-pixel-defs .  && prettier . --check",
+        "lint": "prettier . --check",
+        "lint.fix": "prettier . --write"
+    },
+    "prettier": {
+        "singleQuote": true,
+        "printWidth": 140,
+        "tabWidth": 4,
+        "overrides": [
+            {
+                "files": "*.json5",
+                "options": {
+                    "parser": "json",
+                    "tabWidth": 4
+                }
+            }
+        ]
+    }
+}
