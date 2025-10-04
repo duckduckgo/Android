@@ -53,7 +53,7 @@
     <string name="input_screen_chat_hint">Spýtaj sa súkromne</string>
     <string name="input_screen_user_pref_without_ai">Len vyhľadávanie</string>
     <string name="input_screen_user_pref_with_ai">Vyhľadávanie &amp; Duck.ai</string>
-    <string name="input_screen_user_pref_description">Vyskúšaj našu novú možnosť pýtať sa Duck.ai priamo z panela s adresou. <annotation type="share_feedback">Zdieľaj spätnú väzbu</annotation></string>
+    <string name="input_screen_user_pref_description">Vyskúšaj novú možnosť pýtať sa Duck.ai priamo z panela s adresou. <annotation type="share_feedback">Zdieľaj spätnú väzbu</annotation></string>
 
     <!-- Duck.ai Pro settings -->
     <string name="duck_ai_paid_settings_title">Duck.ai</string>
