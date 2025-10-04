@@ -23,7 +23,7 @@ import com.duckduckgo.js.messaging.api.JsMessaging
 import com.duckduckgo.pir.impl.dashboard.messaging.PirDashboardWebMessages
 import com.duckduckgo.pir.impl.dashboard.messaging.model.PirWebMessageRequest
 import com.duckduckgo.pir.impl.dashboard.messaging.model.PirWebMessageResponse
-import com.duckduckgo.pir.impl.dashboard.state.PirWebOnboardingStateHolder
+import com.duckduckgo.pir.impl.dashboard.state.PirWebProfileStateHolder
 import com.squareup.anvil.annotations.ContributesMultibinding
 import logcat.logcat
 import javax.inject.Inject
@@ -36,7 +36,7 @@ import javax.inject.Inject
     boundType = PirWebJsMessageHandler::class,
 )
 class PirWebSetBirthYearForCurrentUserProfile @Inject constructor(
-    private val pirWebOnboardingStateHolder: PirWebOnboardingStateHolder,
+    private val pirWebProfileStateHolder: PirWebProfileStateHolder,
 ) : PirWebJsMessageHandler() {
 
     override val message = PirDashboardWebMessages.SET_BIRTH_YEAR_FOR_CURRENT_USER_PROFILE
@@ -53,7 +53,7 @@ class PirWebSetBirthYearForCurrentUserProfile @Inject constructor(
         )?.year ?: 0
 
         // store the new birth year in the current user profile
-        pirWebOnboardingStateHolder.setBirthYear(birthYear)
+        pirWebProfileStateHolder.setBirthYear(birthYear)
 
         jsMessaging.sendResponse(
             jsMessage = jsMessage,

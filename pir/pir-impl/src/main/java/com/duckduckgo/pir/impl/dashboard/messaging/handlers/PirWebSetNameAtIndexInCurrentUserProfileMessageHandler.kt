@@ -23,7 +23,7 @@ import com.duckduckgo.js.messaging.api.JsMessaging
 import com.duckduckgo.pir.impl.dashboard.messaging.PirDashboardWebMessages
 import com.duckduckgo.pir.impl.dashboard.messaging.model.PirWebMessageRequest
 import com.duckduckgo.pir.impl.dashboard.messaging.model.PirWebMessageResponse
-import com.duckduckgo.pir.impl.dashboard.state.PirWebOnboardingStateHolder
+import com.duckduckgo.pir.impl.dashboard.state.PirWebProfileStateHolder
 import com.squareup.anvil.annotations.ContributesMultibinding
 import logcat.logcat
 import javax.inject.Inject
@@ -33,7 +33,7 @@ import javax.inject.Inject
     boundType = PirWebJsMessageHandler::class,
 )
 class PirWebSetNameAtIndexInCurrentUserProfileMessageHandler @Inject constructor(
-    private val pirWebOnboardingStateHolder: PirWebOnboardingStateHolder,
+    private val pirWebProfileStateHolder: PirWebProfileStateHolder,
 ) : PirWebJsMessageHandler() {
 
     override val message: PirDashboardWebMessages =
@@ -64,7 +64,7 @@ class PirWebSetNameAtIndexInCurrentUserProfileMessageHandler @Inject constructor
         }
 
         // attempting to add a duplicate address should return success=false
-        if (!pirWebOnboardingStateHolder.setNameAtIndex(
+        if (!pirWebProfileStateHolder.setNameAtIndex(
                 index = index,
                 firstName = firstName,
                 middleName = middleName,

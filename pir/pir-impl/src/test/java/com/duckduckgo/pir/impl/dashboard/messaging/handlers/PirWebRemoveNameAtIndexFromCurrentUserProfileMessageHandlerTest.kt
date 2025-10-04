@@ -22,7 +22,7 @@ import com.duckduckgo.js.messaging.api.JsMessaging
 import com.duckduckgo.pir.impl.dashboard.messaging.PirDashboardWebMessages
 import com.duckduckgo.pir.impl.dashboard.messaging.handlers.PirMessageHandlerUtils.createJsMessage
 import com.duckduckgo.pir.impl.dashboard.messaging.handlers.PirMessageHandlerUtils.verifyResponse
-import com.duckduckgo.pir.impl.dashboard.state.PirWebOnboardingStateHolder
+import com.duckduckgo.pir.impl.dashboard.state.PirWebProfileStateHolder
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
@@ -37,14 +37,14 @@ class PirWebRemoveNameAtIndexFromCurrentUserProfileMessageHandlerTest {
 
     private lateinit var testee: PirWebRemoveNameAtIndexFromCurrentUserProfileMessageHandler
 
-    private val mockPirWebOnboardingStateHolder: PirWebOnboardingStateHolder = mock()
+    private val mockPirWebProfileStateHolder: PirWebProfileStateHolder = mock()
     private val mockJsMessaging: JsMessaging = mock()
     private val mockJsMessageCallback: JsMessageCallback = mock()
 
     @Before
     fun setUp() {
         testee = PirWebRemoveNameAtIndexFromCurrentUserProfileMessageHandler(
-            pirWebOnboardingStateHolder = mockPirWebOnboardingStateHolder,
+            pirWebProfileStateHolder = mockPirWebProfileStateHolder,
         )
     }
 
@@ -60,13 +60,13 @@ class PirWebRemoveNameAtIndexFromCurrentUserProfileMessageHandlerTest {
             paramsJson = """{"index": 0}""",
             method = PirDashboardWebMessages.REMOVE_NAME_AT_INDEX_FROM_CURRENT_USER_PROFILE,
         )
-        whenever(mockPirWebOnboardingStateHolder.removeNameAtIndex(0)).thenReturn(true)
+        whenever(mockPirWebProfileStateHolder.removeNameAtIndex(0)).thenReturn(true)
 
         // When
         testee.process(jsMessage, mockJsMessaging, mockJsMessageCallback)
 
         // Then
-        verify(mockPirWebOnboardingStateHolder).removeNameAtIndex(0)
+        verify(mockPirWebProfileStateHolder).removeNameAtIndex(0)
         verifyResponse(jsMessage, true, mockJsMessaging)
     }
 
@@ -77,13 +77,13 @@ class PirWebRemoveNameAtIndexFromCurrentUserProfileMessageHandlerTest {
             paramsJson = """{"index": 2}""",
             method = PirDashboardWebMessages.REMOVE_NAME_AT_INDEX_FROM_CURRENT_USER_PROFILE,
         )
-        whenever(mockPirWebOnboardingStateHolder.removeNameAtIndex(2)).thenReturn(true)
+        whenever(mockPirWebProfileStateHolder.removeNameAtIndex(2)).thenReturn(true)
 
         // When
         testee.process(jsMessage, mockJsMessaging, mockJsMessageCallback)
 
         // Then
-        verify(mockPirWebOnboardingStateHolder).removeNameAtIndex(2)
+        verify(mockPirWebProfileStateHolder).removeNameAtIndex(2)
         verifyResponse(jsMessage, true, mockJsMessaging)
     }
 
@@ -94,13 +94,13 @@ class PirWebRemoveNameAtIndexFromCurrentUserProfileMessageHandlerTest {
             paramsJson = """{"index": 5}""",
             method = PirDashboardWebMessages.REMOVE_NAME_AT_INDEX_FROM_CURRENT_USER_PROFILE,
         )
-        whenever(mockPirWebOnboardingStateHolder.removeNameAtIndex(5)).thenReturn(false)
+        whenever(mockPirWebProfileStateHolder.removeNameAtIndex(5)).thenReturn(false)
 
         // When
         testee.process(jsMessage, mockJsMessaging, mockJsMessageCallback)
 
         // Then
-        verify(mockPirWebOnboardingStateHolder).removeNameAtIndex(5)
+        verify(mockPirWebProfileStateHolder).removeNameAtIndex(5)
         verifyResponse(jsMessage, false, mockJsMessaging)
     }
 
@@ -111,13 +111,13 @@ class PirWebRemoveNameAtIndexFromCurrentUserProfileMessageHandlerTest {
             paramsJson = """{"index": -1}""",
             method = PirDashboardWebMessages.REMOVE_NAME_AT_INDEX_FROM_CURRENT_USER_PROFILE,
         )
-        whenever(mockPirWebOnboardingStateHolder.removeNameAtIndex(-1)).thenReturn(false)
+        whenever(mockPirWebProfileStateHolder.removeNameAtIndex(-1)).thenReturn(false)
 
         // When
         testee.process(jsMessage, mockJsMessaging, mockJsMessageCallback)
 
         // Then
-        verify(mockPirWebOnboardingStateHolder).removeNameAtIndex(-1)
+        verify(mockPirWebProfileStateHolder).removeNameAtIndex(-1)
         verifyResponse(jsMessage, false, mockJsMessaging)
     }
 
@@ -128,13 +128,13 @@ class PirWebRemoveNameAtIndexFromCurrentUserProfileMessageHandlerTest {
             paramsJson = """{"index": 0}""",
             method = PirDashboardWebMessages.REMOVE_NAME_AT_INDEX_FROM_CURRENT_USER_PROFILE,
         )
-        whenever(mockPirWebOnboardingStateHolder.removeNameAtIndex(0)).thenReturn(false)
+        whenever(mockPirWebProfileStateHolder.removeNameAtIndex(0)).thenReturn(false)
 
         // When
         testee.process(jsMessage, mockJsMessaging, mockJsMessageCallback)
 
         // Then
-        verify(mockPirWebOnboardingStateHolder).removeNameAtIndex(0)
+        verify(mockPirWebProfileStateHolder).removeNameAtIndex(0)
         verifyResponse(jsMessage, false, mockJsMessaging)
     }
 
@@ -150,7 +150,7 @@ class PirWebRemoveNameAtIndexFromCurrentUserProfileMessageHandlerTest {
         testee.process(jsMessage, mockJsMessaging, mockJsMessageCallback)
 
         // Then
-        verify(mockPirWebOnboardingStateHolder, org.mockito.kotlin.never()).removeNameAtIndex(any())
+        verify(mockPirWebProfileStateHolder, org.mockito.kotlin.never()).removeNameAtIndex(any())
         verifyResponse(jsMessage, false, mockJsMessaging)
     }
 
@@ -166,7 +166,7 @@ class PirWebRemoveNameAtIndexFromCurrentUserProfileMessageHandlerTest {
         testee.process(jsMessage, mockJsMessaging, mockJsMessageCallback)
 
         // Then
-        verify(mockPirWebOnboardingStateHolder, org.mockito.kotlin.never()).removeNameAtIndex(any())
+        verify(mockPirWebProfileStateHolder, org.mockito.kotlin.never()).removeNameAtIndex(any())
         verifyResponse(jsMessage, false, mockJsMessaging)
     }
 
@@ -182,7 +182,7 @@ class PirWebRemoveNameAtIndexFromCurrentUserProfileMessageHandlerTest {
         testee.process(jsMessage, mockJsMessaging, mockJsMessageCallback)
 
         // Then
-        verify(mockPirWebOnboardingStateHolder, org.mockito.kotlin.never()).removeNameAtIndex(any())
+        verify(mockPirWebProfileStateHolder, org.mockito.kotlin.never()).removeNameAtIndex(any())
         verifyResponse(jsMessage, false, mockJsMessaging)
     }
 
@@ -198,7 +198,7 @@ class PirWebRemoveNameAtIndexFromCurrentUserProfileMessageHandlerTest {
         testee.process(jsMessage, mockJsMessaging, mockJsMessageCallback)
 
         // Then
-        verify(mockPirWebOnboardingStateHolder, org.mockito.kotlin.never()).removeNameAtIndex(any())
+        verify(mockPirWebProfileStateHolder, org.mockito.kotlin.never()).removeNameAtIndex(any())
         verifyResponse(jsMessage, false, mockJsMessaging)
     }
 
@@ -214,7 +214,7 @@ class PirWebRemoveNameAtIndexFromCurrentUserProfileMessageHandlerTest {
         testee.process(jsMessage, mockJsMessaging, mockJsMessageCallback)
 
         // Then
-        verify(mockPirWebOnboardingStateHolder, org.mockito.kotlin.never()).removeNameAtIndex(any())
+        verify(mockPirWebProfileStateHolder, org.mockito.kotlin.never()).removeNameAtIndex(any())
         verifyResponse(jsMessage, false, mockJsMessaging)
     }
 
@@ -230,7 +230,7 @@ class PirWebRemoveNameAtIndexFromCurrentUserProfileMessageHandlerTest {
         testee.process(jsMessage, mockJsMessaging, mockJsMessageCallback)
 
         // Then
-        verify(mockPirWebOnboardingStateHolder, org.mockito.kotlin.never()).removeNameAtIndex(any())
+        verify(mockPirWebProfileStateHolder, org.mockito.kotlin.never()).removeNameAtIndex(any())
         verifyResponse(jsMessage, false, mockJsMessaging)
     }
 
@@ -246,7 +246,7 @@ class PirWebRemoveNameAtIndexFromCurrentUserProfileMessageHandlerTest {
         testee.process(jsMessage, mockJsMessaging, mockJsMessageCallback)
 
         // Then
-        verify(mockPirWebOnboardingStateHolder, org.mockito.kotlin.never()).removeNameAtIndex(any())
+        verify(mockPirWebProfileStateHolder, org.mockito.kotlin.never()).removeNameAtIndex(any())
         verifyResponse(jsMessage, false, mockJsMessaging)
     }
 
@@ -257,13 +257,13 @@ class PirWebRemoveNameAtIndexFromCurrentUserProfileMessageHandlerTest {
             paramsJson = """{"index": 999}""",
             method = PirDashboardWebMessages.REMOVE_NAME_AT_INDEX_FROM_CURRENT_USER_PROFILE,
         )
-        whenever(mockPirWebOnboardingStateHolder.removeNameAtIndex(999)).thenReturn(false)
+        whenever(mockPirWebProfileStateHolder.removeNameAtIndex(999)).thenReturn(false)
 
         // When
         testee.process(jsMessage, mockJsMessaging, mockJsMessageCallback)
 
         // Then
-        verify(mockPirWebOnboardingStateHolder).removeNameAtIndex(999)
+        verify(mockPirWebProfileStateHolder).removeNameAtIndex(999)
         verifyResponse(jsMessage, false, mockJsMessaging)
     }
 }

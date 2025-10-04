@@ -23,7 +23,7 @@ import com.duckduckgo.js.messaging.api.JsMessaging
 import com.duckduckgo.pir.impl.dashboard.messaging.PirDashboardWebMessages
 import com.duckduckgo.pir.impl.dashboard.messaging.model.PirWebMessageRequest
 import com.duckduckgo.pir.impl.dashboard.messaging.model.PirWebMessageResponse
-import com.duckduckgo.pir.impl.dashboard.state.PirWebOnboardingStateHolder
+import com.duckduckgo.pir.impl.dashboard.state.PirWebProfileStateHolder
 import com.squareup.anvil.annotations.ContributesMultibinding
 import logcat.logcat
 import javax.inject.Inject
@@ -33,7 +33,7 @@ import javax.inject.Inject
     boundType = PirWebJsMessageHandler::class,
 )
 class PirWebRemoveAddressAtIndexFromCurrentUserProfileMessageHandler @Inject constructor(
-    private val pirWebOnboardingStateHolder: PirWebOnboardingStateHolder,
+    private val pirWebProfileStateHolder: PirWebProfileStateHolder,
 ) : PirWebJsMessageHandler() {
 
     override val message: PirDashboardWebMessages = PirDashboardWebMessages.REMOVE_ADDRESS_AT_INDEX_FROM_CURRENT_USER_PROFILE
@@ -46,7 +46,7 @@ class PirWebRemoveAddressAtIndexFromCurrentUserProfileMessageHandler @Inject con
         logcat { "PIR-WEB: PirWebRemoveAddressAtIndexFromCurrentUserProfileMessageHandler: process $message" }
 
         val request = jsMessage.toRequestMessage(PirWebMessageRequest.RemoveAddressAtIndexFromCurrentUserProfileRequest::class)
-        if (request == null || !pirWebOnboardingStateHolder.removeAddressAtIndex(request.index)) {
+        if (request == null || !pirWebProfileStateHolder.removeAddressAtIndex(request.index)) {
             logcat { "PIR-WEB: PirWebRemoveAddressAtIndexFromCurrentUserProfileMessageHandler: failed to remove address at index ${request?.index}" }
             jsMessaging.sendResponse(
                 jsMessage = jsMessage,
