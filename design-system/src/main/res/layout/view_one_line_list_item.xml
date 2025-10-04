@@ -41,20 +41,37 @@
 
     </FrameLayout>
 
-    <com.duckduckgo.common.ui.view.text.DaxTextView
-        android:id="@+id/primaryText"
+    <LinearLayout
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/keyline_4"
         android:layout_marginEnd="@dimen/keyline_1"
-        android:textColor="@color/primary_text_color_selector"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/trailingBarrier"
         app:layout_constraintStart_toEndOf="@id/leadingIconBackground"
-        app:layout_constraintTop_toTopOf="parent"
-        app:typography="body1"
-        tools:ignore="InvalidColorAttribute"
-        tools:text="Title" />
+        app:layout_constraintTop_toTopOf="parent">
+
+        <com.duckduckgo.common.ui.view.text.DaxTextView
+            android:id="@+id/primaryText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/primary_text_color_selector"
+            app:typography="body1"
+            tools:ignore="InvalidColorAttribute"
+            tools:text="Title" />
+
+        <ImageView
+            android:id="@+id/newPill"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/keyline_2"
+            android:src="@drawable/ic_new_pill"
+            android:visibility="gone"
+            tools:visibility="visible" />
+
+    </LinearLayout>
 
     <androidx.constraintlayout.widget.Barrier
         android:id="@+id/trailingBarrier"

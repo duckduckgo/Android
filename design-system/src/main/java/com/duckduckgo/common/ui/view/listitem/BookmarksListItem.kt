@@ -53,6 +53,8 @@ class BookmarksListItem @JvmOverloads constructor(
         get() = binding.trailingSwitch
     override val betaPill: ImageView?
         get() = null
+    override val newPill: ImageView?
+        get() = null
 
     override val itemContainer: View
         get() = binding.itemContainer

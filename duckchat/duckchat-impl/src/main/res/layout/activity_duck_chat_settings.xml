@@ -157,14 +157,28 @@
                         android:scaleType="fitCenter"
                         android:src="@drawable/searchbox_withai_inactive" />
 
-                    <com.duckduckgo.common.ui.view.text.DaxTextView
+                    <LinearLayout
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="6dp"
                         android:gravity="center"
-                        android:text="@string/input_screen_user_pref_with_ai"
-                        app:textType="primary"
-                        app:typography="caption" />
+                        android:orientation="horizontal">
+
+                        <com.duckduckgo.common.ui.view.text.DaxTextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:gravity="center"
+                            android:text="@string/input_screen_user_pref_with_ai"
+                            app:textType="primary"
+                            app:typography="caption" />
+
+                        <ImageView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="6dp"
+                            android:src="@drawable/ic_new_pill" />
+
+                    </LinearLayout>
 
                     <ImageView
                         android:id="@+id/duckAiInputScreenToggleWithAiCheck"

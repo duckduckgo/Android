@@ -42,6 +42,7 @@
         <!-- New Pill -->
         <enum name="newPill" value="2" />
     </attr>
+    <attr name="showNewPill" format="boolean"/>
     <attr name="showSwitch" format="boolean"/>
     <attr name="switchEnabled" format="boolean"/>
     <attr name="leadingIconBackground">
@@ -89,6 +90,7 @@
         <attr name="trailingIconTint"/>
         <attr name="showSwitch"/>
         <attr name="switchEnabled"/>
+        <attr name="showNewPill"/>
     </declare-styleable>
 
     <!--Two Line Item view-->
