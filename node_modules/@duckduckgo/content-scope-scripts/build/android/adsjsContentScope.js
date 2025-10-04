@@ -5556,17 +5556,111 @@
     const firstPaint = paintResources.find((entry) => entry.name === "first-contentful-paint");
     return firstPaint ? [firstPaint.startTime] : [];
   }
+  function returnError(errorMessage) {
+    return { error: errorMessage, success: false };
+  }
+  function waitForLCP(timeoutMs = 500) {
+    return new Promise((resolve) => {
+      let timeoutId;
+      let observer;
+      const cleanup = () => {
+        if (observer) observer.disconnect();
+        if (timeoutId) clearTimeout(timeoutId);
+      };
+      timeoutId = setTimeout(() => {
+        cleanup();
+        resolve(null);
+      }, timeoutMs);
+      observer = new PerformanceObserver((list) => {
+        const entries = list.getEntries();
+        const lastEntry = entries[entries.length - 1];
+        if (lastEntry) {
+          cleanup();
+          resolve(lastEntry.startTime);
+        }
+      });
+      try {
+        observer.observe({ type: "largest-contentful-paint", buffered: true });
+      } catch (error) {
+        cleanup();
+        resolve(null);
+      }
+    });
+  }
+  async function getExpandedPerformanceMetrics() {
+    try {
+      if (document.readyState !== "complete") {
+        return returnError("Document not ready");
+      }
+      const navigation = (
+        /** @type {PerformanceNavigationTiming} */
+        performance.getEntriesByType("navigation")[0]
+      );
+      const paint = performance.getEntriesByType("paint");
+      const resources = (
+        /** @type {PerformanceResourceTiming[]} */
+        performance.getEntriesByType("resource")
+      );
+      const fcp = paint.find((p) => p.name === "first-contentful-paint");
+      let largestContentfulPaint = null;
+      if (PerformanceObserver.supportedEntryTypes.includes("largest-contentful-paint")) {
+        largestContentfulPaint = await waitForLCP();
+      }
+      const totalResourceSize = resources.reduce((sum, r) => sum + (r.transferSize || 0), 0);
+      if (navigation) {
+        return {
+          success: true,
+          metrics: {
+            // Core timing metrics (in milliseconds)
+            loadComplete: navigation.loadEventEnd - navigation.fetchStart,
+            domComplete: navigation.domComplete - navigation.fetchStart,
+            domContentLoaded: navigation.domContentLoadedEventEnd - navigation.fetchStart,
+            domInteractive: navigation.domInteractive - navigation.fetchStart,
+            // Paint metrics
+            firstContentfulPaint: fcp ? fcp.startTime : null,
+            largestContentfulPaint,
+            // Network metrics
+            timeToFirstByte: navigation.responseStart - navigation.fetchStart,
+            responseTime: navigation.responseEnd - navigation.responseStart,
+            serverTime: navigation.responseStart - navigation.requestStart,
+            // Size metrics (in octets)
+            transferSize: navigation.transferSize,
+            encodedBodySize: navigation.encodedBodySize,
+            decodedBodySize: navigation.decodedBodySize,
+            // Resource metrics
+            resourceCount: resources.length,
+            totalResourcesSize: totalResourceSize,
+            // Additional metadata
+            protocol: navigation.nextHopProtocol,
+            redirectCount: navigation.redirectCount,
+            navigationType: navigation.type
+          }
+        };
+      }
+      return returnError("No navigation timing found");
+    } catch (e) {
+      return returnError("JavaScript execution error: " + e.message);
+    }
+  }
 
   // src/features/breakage-reporting.js
   var BreakageReporting = class extends ContentFeature {
     init() {
-      this.messaging.subscribe("getBreakageReportValues", () => {
+      const isExpandedPerformanceMetricsEnabled = this.getFeatureSettingEnabled("expandedPerformanceMetrics", "enabled");
+      this.messaging.subscribe("getBreakageReportValues", async () => {
         const jsPerformance = getJsPerformanceMetrics();
         const referrer = document.referrer;
-        this.messaging.notify("breakageReportResult", {
+        const result = {
           jsPerformance,
           referrer
-        });
+        };
+        if (isExpandedPerformanceMetricsEnabled) {
+          const expandedPerformanceMetrics = await getExpandedPerformanceMetrics();
+          if (expandedPerformanceMetrics.success) {
+            result.expandedPerformanceMetrics = expandedPerformanceMetrics.metrics;
+          }
+        }
+        this.messaging.notify("breakageReportResult", result);
       });
     }
   };
