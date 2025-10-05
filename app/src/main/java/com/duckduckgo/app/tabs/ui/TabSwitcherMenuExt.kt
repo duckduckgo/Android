@@ -141,7 +141,10 @@ fun Menu.createDynamicInterface(
         }
     }
 
-    findItem(R.id.popupMenuToolbarButton).isEnabled = dynamicMenu.isMenuButtonEnabled
+    findItem(R.id.popupMenuToolbarButton).apply {
+        isEnabled = dynamicMenu.isMenuButtonEnabled
+        isVisible = true // Always show the menu button regardless of enabled state
+    }
     findItem(R.id.fireToolbarButton).isVisible = dynamicMenu.isFireButtonVisible
     findItem(R.id.duckAIToolbarButton).isVisible = dynamicMenu.isDuckAIButtonVisible
     findItem(R.id.newTabToolbarButton).isVisible = dynamicMenu.isNewTabButtonVisible
