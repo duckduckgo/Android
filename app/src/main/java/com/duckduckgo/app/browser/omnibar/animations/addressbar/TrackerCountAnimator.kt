@@ -48,6 +48,17 @@ class TrackerCountAnimator @Inject constructor() {
         }
     }
 
+    /**
+     * Animates the tracker count from a start value to an end value in the provided text view.
+     *
+     * For counts below [TRACKER_COUNT_MINIMUM_ANIMATION_TRIGGER_THRESHOLD], the final count is displayed immediately
+     * without animation. For higher counts, the animation starts from a percentage of the final count and animates up.
+     *
+     * @param context Android context for resources
+     * @param totalTrackerCount The total number of trackers blocked
+     * @param trackerTextView The text view that will display the animated count
+     * @param onAnimationEnd Callback invoked when the animation completes
+     */
     fun animateTrackersBlockedCountView(
         context: Context,
         totalTrackerCount: Int,
@@ -98,6 +109,16 @@ class TrackerCountAnimator @Inject constructor() {
         animator.start()
     }
 
+    /**
+     * Calculates the starting count for the tracker animation.
+     *
+     * The start count is a percentage of the end count to create a smooth counting effect:
+     * - For counts >= [TRACKER_COUNT_UPPER_THRESHOLD]: starts at 85% of final count
+     * - For counts < [TRACKER_COUNT_UPPER_THRESHOLD]: starts at 75% of final count
+     *
+     * @param totalTrackerCount The total number of trackers blocked
+     * @return The calculated starting count for the animation
+     */
     fun getTrackerAnimationStartCount(totalTrackerCount: Int): Int {
         val endCount = totalTrackerCount.coerceAtMost(TRACKER_TOTAL_MAX_LIMIT)
 
@@ -111,5 +132,13 @@ class TrackerCountAnimator @Inject constructor() {
         return (endCount * startPercentage).roundToInt()
     }
 
+    /**
+     * Calculates the ending count for the tracker animation.
+     *
+     * The end count is capped at [TRACKER_TOTAL_MAX_LIMIT] to prevent excessively large numbers from being displayed.
+     *
+     * @param totalTrackerCount The total number of trackers blocked
+     * @return The calculated ending count, capped at [TRACKER_TOTAL_MAX_LIMIT]
+     */
     fun getTrackerAnimationEndCount(totalTrackerCount: Int): Int = totalTrackerCount.coerceAtMost(TRACKER_TOTAL_MAX_LIMIT)
 }
