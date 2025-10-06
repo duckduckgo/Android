@@ -19,6 +19,8 @@ package com.duckduckgo.pir.impl.scheduling
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.pir.impl.models.ExtractedProfile
+import com.duckduckgo.pir.impl.models.scheduling.JobRecord.EmailConfirmationJobRecord
+import com.duckduckgo.pir.impl.models.scheduling.JobRecord.EmailConfirmationJobRecord.EmailData
 import com.duckduckgo.pir.impl.models.scheduling.JobRecord.OptOutJobRecord
 import com.duckduckgo.pir.impl.models.scheduling.JobRecord.OptOutJobRecord.OptOutJobStatus
 import com.duckduckgo.pir.impl.models.scheduling.JobRecord.ScanJobRecord.ScanJobStatus
@@ -353,11 +355,28 @@ class RealJobRecordUpdaterTest {
             whenever(mockSchedulingRepository.getValidOptOutJobRecord(testExtractedProfileId))
                 .thenReturn(testOptOutJobRecord)
 
-            toTest.markOptOutAsWaitingForEmailConfirmation(testExtractedProfileId)
+            toTest.markOptOutAsWaitingForEmailConfirmation(
+                profileQueryId = testProfileQueryId,
+                extractedProfileId = testExtractedProfileId,
+                brokerName = testBrokerName,
+                email = "test@duck.com",
+                attemptId = "attemptId",
+            )
 
             verify(mockSchedulingRepository).saveOptOutJobRecord(
                 testOptOutJobRecord.copy(
                     status = OptOutJobStatus.PENDING_EMAIL_CONFIRMATION,
+                ),
+            )
+            verify(mockSchedulingRepository).saveEmailConfirmationJobRecord(
+                EmailConfirmationJobRecord(
+                    brokerName = testBrokerName,
+                    userProfileId = testProfileQueryId,
+                    extractedProfileId = testExtractedProfileId,
+                    emailData = EmailData(
+                        email = "test@duck.com",
+                        attemptId = "attemptId",
+                    ),
                 ),
             )
         }
@@ -368,9 +387,14 @@ class RealJobRecordUpdaterTest {
             whenever(mockSchedulingRepository.getValidOptOutJobRecord(testExtractedProfileId))
                 .thenReturn(null)
 
-            toTest.markOptOutAsWaitingForEmailConfirmation(testExtractedProfileId)
+            toTest.markOptOutAsWaitingForEmailConfirmation(
+                profileQueryId = testProfileQueryId,
+                extractedProfileId = testExtractedProfileId,
+                brokerName = testBrokerName,
+                email = "test@duck.com",
+                attemptId = "attemptId",
+            )
 
-            verify(mockSchedulingRepository).getValidOptOutJobRecord(testExtractedProfileId)
             verify(mockSchedulingRepository, never()).saveOptOutJobRecord(any())
         }
 
