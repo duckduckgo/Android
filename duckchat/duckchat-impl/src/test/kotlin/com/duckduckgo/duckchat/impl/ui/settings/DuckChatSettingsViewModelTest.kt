@@ -253,7 +253,7 @@ class DuckChatSettingsViewModelTest {
                 assertTrue(command is OpenLink)
                 command as OpenLink
                 assertEquals(
-                    DuckChatSettingsViewModel.DUCK_CHAT_SEARCH_AI_SETTINGS_LINK_WITH_RETURN_PARAM,
+                    DuckChatSettingsViewModel.DUCK_CHAT_SEARCH_AI_SETTINGS_LINK_EMBEDDED,
                     command.link,
                 )
                 assertEquals(R.string.duck_chat_search_assist_settings_title, command.titleRes)

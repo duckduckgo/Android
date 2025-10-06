@@ -29,7 +29,6 @@ import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
 import com.duckduckgo.duckchat.impl.ui.settings.DuckChatSettingsViewModel.Command.OpenLink
 import com.duckduckgo.duckchat.impl.ui.settings.DuckChatSettingsViewModel.Command.OpenLinkInNewTab
 import com.duckduckgo.duckchat.impl.ui.settings.DuckChatSettingsViewModel.Command.OpenShortcutSettings
-import com.duckduckgo.settings.api.SettingsConstants
 import com.duckduckgo.settings.api.SettingsPageFeature
 import com.duckduckgo.subscriptions.api.SubscriptionRebrandingFeatureToggle
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
@@ -133,7 +132,7 @@ class DuckChatSettingsViewModel @Inject constructor(
             if (settingsPageFeature.settingsWebView().isEnabled()) {
                 commandChannel.send(
                     OpenLink(
-                        DUCK_CHAT_SEARCH_AI_SETTINGS_LINK_WITH_RETURN_PARAM,
+                        DUCK_CHAT_SEARCH_AI_SETTINGS_LINK_EMBEDDED,
                         R.string.duck_chat_search_assist_settings_title,
                     ),
                 )
@@ -175,8 +174,6 @@ class DuckChatSettingsViewModel @Inject constructor(
     companion object {
         const val DUCK_CHAT_LEARN_MORE_LINK = "https://duckduckgo.com/duckduckgo-help-pages/aichat/"
         const val DUCK_CHAT_SEARCH_AI_SETTINGS_LINK = "https://duckduckgo.com/settings?ko=-1#aifeatures"
-        const val DUCK_CHAT_SEARCH_AI_SETTINGS_LINK_WITH_RETURN_PARAM =
-            "https://duckduckgo.com/settings?ko=-1&return=" +
-                "${SettingsConstants.ID_AI_FEATURES}#aifeatures"
+        const val DUCK_CHAT_SEARCH_AI_SETTINGS_LINK_EMBEDDED = "https://duckduckgo.com/settings?ko=-1&embedded=1&highlight=kbj#aifeatures"
     }
 }

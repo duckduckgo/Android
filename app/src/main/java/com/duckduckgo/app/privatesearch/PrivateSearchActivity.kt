@@ -117,7 +117,7 @@ class PrivateSearchActivity : DuckDuckGoActivity() {
             globalActivityStarter.start(
                 this,
                 SettingsWebViewScreenWithParams(
-                    url = DUCKDUCKGO_SETTINGS_WEB_LINK_WITH_RETURN_PARAM,
+                    url = DUCKDUCKGO_SETTINGS_WEB_LINK_EMBEDDED,
                     getString(R.string.privateSearchMoreSearchSettingsTitle),
                 ),
             )
@@ -134,6 +134,6 @@ class PrivateSearchActivity : DuckDuckGoActivity() {
 
     companion object {
         private const val DUCKDUCKGO_SETTINGS_WEB_LINK = "https://duckduckgo.com/settings"
-        private const val DUCKDUCKGO_SETTINGS_WEB_LINK_WITH_RETURN_PARAM = "https://duckduckgo.com/settings?ko=-1&return=privateSearch"
+        private const val DUCKDUCKGO_SETTINGS_WEB_LINK_EMBEDDED = "https://duckduckgo.com/settings?ko=-1&embedded=1&highlight=privateSearch"
     }
 }
