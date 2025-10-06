@@ -18,12 +18,15 @@ package com.duckduckgo.pir.impl.common.actions
 
 import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.pir.impl.common.BrokerStepsParser.BrokerStep.EmailConfirmationStep
 import com.duckduckgo.pir.impl.common.BrokerStepsParser.BrokerStep.OptOutStep
+import com.duckduckgo.pir.impl.common.PirJob.RunType.EMAIL_CONFIRMATION
 import com.duckduckgo.pir.impl.common.PirJob.RunType.MANUAL
 import com.duckduckgo.pir.impl.common.PirJob.RunType.OPTOUT
 import com.duckduckgo.pir.impl.common.PirJob.RunType.SCHEDULED
 import com.duckduckgo.pir.impl.common.PirRunStateHandler
 import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerManualScanStarted
+import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerRecordEmailConfirmationStarted
 import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerRecordOptOutStarted
 import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerScheduledScanStarted
 import com.duckduckgo.pir.impl.common.actions.EventHandler.Next
@@ -112,6 +115,15 @@ class ExecuteNextBrokerStepEventHandler @Inject constructor(
                     BrokerRecordOptOutStarted(
                         currentBrokerStep.brokerName,
                         (currentBrokerStep as OptOutStep).profileToOptOut,
+                    ),
+                )
+            }
+
+            EMAIL_CONFIRMATION -> {
+                pirRunStateHandler.handleState(
+                    BrokerRecordEmailConfirmationStarted(
+                        brokerName = currentBrokerStep.brokerName,
+                        emailConfirmationJobRecord = (currentBrokerStep as EmailConfirmationStep).emailConfirmationJob,
                     ),
                 )
             }

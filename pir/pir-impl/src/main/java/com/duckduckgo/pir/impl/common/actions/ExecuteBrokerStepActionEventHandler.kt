@@ -18,6 +18,7 @@ package com.duckduckgo.pir.impl.common.actions
 
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.pir.impl.common.BrokerStepsParser.BrokerStep
+import com.duckduckgo.pir.impl.common.BrokerStepsParser.BrokerStep.EmailConfirmationStep
 import com.duckduckgo.pir.impl.common.BrokerStepsParser.BrokerStep.OptOutStep
 import com.duckduckgo.pir.impl.common.PirJob
 import com.duckduckgo.pir.impl.common.actions.EventHandler.Next
@@ -26,6 +27,7 @@ import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.Event.
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.Event.ExecuteBrokerStepAction
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.SideEffect.AwaitCaptchaSolution
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.SideEffect.GetEmailForProfile
+import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.SideEffect.LoadUrl
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.SideEffect.PushJsAction
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.State
 import com.duckduckgo.pir.impl.common.toParams
@@ -76,14 +78,27 @@ class ExecuteBrokerStepActionEventHandler @Inject constructor() : EventHandler {
         } else {
             val actionToExecute = currentBrokerStep.actions[state.currentActionIndex]
 
-            if (currentBrokerStep is OptOutStep && actionToExecute.needsEmail && !hasEmail(currentBrokerStep)) {
+            if ((currentBrokerStep is OptOutStep || currentBrokerStep is EmailConfirmationStep) &&
+                actionToExecute.needsEmail &&
+                !hasEmail(currentBrokerStep)
+            ) {
+                val extractedProfile = when (currentBrokerStep) {
+                    is OptOutStep -> {
+                        currentBrokerStep.profileToOptOut
+                    }
+                    is EmailConfirmationStep -> {
+                        currentBrokerStep.profileToOptOut
+                    }
+                    else -> null // Invalid state
+                }
+
                 Next(
                     nextState = state,
                     sideEffect =
                     GetEmailForProfile(
                         actionId = actionToExecute.id,
                         brokerName = currentBrokerStep.brokerName,
-                        extractedProfile = currentBrokerStep.profileToOptOut,
+                        extractedProfile = extractedProfile!!,
                         profileQuery = state.profileQuery,
                     ),
                 )
@@ -95,7 +110,9 @@ class ExecuteBrokerStepActionEventHandler @Inject constructor() : EventHandler {
                 }
 
                 // Adding a temporary delay to potentially workaround captcha for optouts
-                if (state.runType == PirJob.RunType.OPTOUT && actionToExecute is BrokerAction.FillForm) {
+                if ((state.runType == PirJob.RunType.OPTOUT || state.runType == PirJob.RunType.EMAIL_CONFIRMATION) &&
+                    actionToExecute is BrokerAction.FillForm
+                ) {
                     pushDelay = 5_000
                 }
 
@@ -108,6 +125,28 @@ class ExecuteBrokerStepActionEventHandler @Inject constructor() : EventHandler {
                             isSuccess = true,
                         ),
                     )
+                } else if (currentBrokerStep is EmailConfirmationStep && actionToExecute is EmailConfirmation) {
+                    val confirmationLink = currentBrokerStep.emailConfirmationJob.linkFetchData.emailConfirmationLink
+                    if (confirmationLink.isEmpty()) {
+                        // This is an invalid state. We should not be here if we don't have a confirmation link
+                        Next(
+                            nextState = state,
+                            nextEvent =
+                            BrokerStepCompleted(
+                                needsEmailConfirmation = true,
+                                isSuccess = false,
+                            ),
+                        )
+                    } else {
+                        Next(
+                            nextState = state.copy(
+                                pendingUrl = confirmationLink,
+                            ),
+                            sideEffect = LoadUrl(
+                                url = confirmationLink,
+                            ),
+                        )
+                    }
                 } else if (actionToExecute is SolveCaptcha && requestData !is PirScriptRequestData.SolveCaptcha) {
                     Next(
                         nextState = state,
@@ -135,19 +174,35 @@ class ExecuteBrokerStepActionEventHandler @Inject constructor() : EventHandler {
         }
     }
 
-    private fun hasEmail(optOutStep: OptOutStep): Boolean = optOutStep.profileToOptOut.email.isNotEmpty()
+    private fun hasEmail(brokerStep: BrokerStep): Boolean {
+        return if (brokerStep is OptOutStep) {
+            brokerStep.profileToOptOut.email.isNotEmpty()
+        } else if (brokerStep is EmailConfirmationStep) {
+            brokerStep.profileToOptOut.email.isNotEmpty()
+        } else {
+            false
+        }
+    }
 
     private fun completeRequestData(
         brokerStep: BrokerStep,
         actionToExecute: BrokerAction,
         profileQuery: ProfileQuery,
         requestData: PirScriptRequestData,
-    ): PirScriptRequestData =
-        if (brokerStep is OptOutStep && actionToExecute.dataSource == EXTRACTED_PROFILE &&
+    ): PirScriptRequestData {
+        val extractedProfile = if (brokerStep is OptOutStep && actionToExecute.dataSource == EXTRACTED_PROFILE &&
             (requestData as UserProfile).extractedProfile == null
         ) {
-            val extractedProfile = brokerStep.profileToOptOut
+            brokerStep.profileToOptOut
+        } else if (brokerStep is EmailConfirmationStep && actionToExecute.dataSource == EXTRACTED_PROFILE &&
+            (requestData as UserProfile).extractedProfile == null
+        ) {
+            brokerStep.profileToOptOut
+        } else {
+            null
+        }
 
+        return if (extractedProfile != null && requestData is UserProfile) {
             UserProfile(
                 userProfile = requestData.userProfile,
                 extractedProfile = extractedProfile.toParams(profileQuery.fullName),
@@ -155,4 +210,5 @@ class ExecuteBrokerStepActionEventHandler @Inject constructor() : EventHandler {
         } else {
             requestData
         }
+    }
 }
