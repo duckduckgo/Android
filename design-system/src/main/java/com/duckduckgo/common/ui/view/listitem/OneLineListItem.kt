@@ -128,10 +128,10 @@ class OneLineListItem @JvmOverloads constructor(
             setSwitchEnabled(switchEnabled)
 
             if (getBoolean(R.styleable.OneLineListItem_showNewPill, false)) {
-                newPill?.setImageResource(R.drawable.ic_new_pill)
-                newPill?.show()
+                newPill.setImageResource(R.drawable.ic_new_pill)
+                newPill.show()
             } else {
-                newPill?.gone()
+                newPill.gone()
             }
 
             recycle()
