@@ -17,6 +17,7 @@
 package com.duckduckgo.feature.toggles.api
 
 import android.annotation.SuppressLint
+import app.cash.turbine.test
 import com.duckduckgo.appbuildconfig.api.BuildFlavor
 import com.duckduckgo.feature.toggles.api.Cohorts.CONTROL
 import com.duckduckgo.feature.toggles.api.Cohorts.TREATMENT
@@ -24,7 +25,9 @@ import com.duckduckgo.feature.toggles.api.Toggle.DefaultFeatureValue
 import com.duckduckgo.feature.toggles.api.Toggle.FeatureName
 import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.feature.toggles.api.Toggle.State.CohortName
+import com.duckduckgo.feature.toggles.api.internal.CachedToggleStore
 import com.duckduckgo.feature.toggles.internal.api.FeatureTogglesCallback
+import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -41,13 +44,13 @@ class FeatureTogglesTest {
 
     private lateinit var feature: TestFeature
     private lateinit var provider: FakeProvider
-    private lateinit var toggleStore: FakeToggleStore
+    private lateinit var toggleStore: Toggle.Store
     private lateinit var callback: FakeFeatureTogglesCallback
 
     @Before
     fun setup() {
         provider = FakeProvider()
-        toggleStore = FakeToggleStore()
+        toggleStore = CachedToggleStore(FakeToggleStore())
         callback = FakeFeatureTogglesCallback()
         feature = FeatureToggles.Builder()
             .store(toggleStore)
@@ -119,6 +122,40 @@ class FeatureTogglesTest {
     @Test(expected = IllegalStateException::class)
     fun whenNoDefaultValueThenThrow() {
         feature.noDefaultValue().isEnabled()
+    }
+
+    @Test
+    fun whenEnabledByDefaultThenEmitEnabled() = runTest {
+        feature.enabledByDefault().enabled().test {
+            assertTrue(awaitItem())
+            expectNoEvents()
+        }
+    }
+
+    @Test
+    fun whenEnabledByDefaultAndSetEnabledThenEmitTwoEnables() = runTest {
+        feature.enabledByDefault().enabled().test {
+            assertTrue(awaitItem())
+            feature.enabledByDefault().setRawStoredState(Toggle.State(enable = false))
+            assertFalse(awaitItem())
+            expectNoEvents()
+        }
+    }
+
+    @Test
+    fun enableValuesSetBeforeRegistrationGetLost() = runTest {
+        feature.enabledByDefault().setRawStoredState(Toggle.State(enable = false))
+        feature.enabledByDefault().enabled().test {
+            assertFalse(awaitItem())
+            expectNoEvents()
+        }
+    }
+
+    @Test
+    fun whenDroppingEmissionThenNoValueEmitted() = runTest {
+        feature.enabledByDefault().enabled().drop(1).test {
+            expectNoEvents()
+        }
     }
 
     @Test(expected = IllegalArgumentException::class)

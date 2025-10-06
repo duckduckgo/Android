@@ -36,5 +36,9 @@ dependencies {
 
     implementation Google.dagger
     implementation "org.apache.commons:commons-math3:_"
+    implementation("com.google.guava:guava:_") {
+        exclude group: 'com.google.guava', module: 'listenablefuture'
+    }
+    implementation KotlinX.coroutines.core
 }
 

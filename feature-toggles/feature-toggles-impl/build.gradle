@@ -52,10 +52,24 @@ dependencies {
     testImplementation project(':data-store-test')
     testImplementation "org.mockito.kotlin:mockito-kotlin:_"
     testImplementation "com.squareup.moshi:moshi-kotlin:_"
+    testImplementation CashApp.turbine
     testImplementation Testing.robolectric
     testImplementation AndroidX.test.ext.junit
     testImplementation Square.retrofit2.converter.moshi
     testImplementation Testing.junit4
+    androidTestImplementation AndroidX.test.runner
+    androidTestImplementation AndroidX.test.ext.junit
+    androidTestImplementation Square.retrofit2.converter.moshi
+
+    coreLibraryDesugaring Android.tools.desugarJdkLibs
+}
+
+configurations.all {
+    exclude(group: "com.google.guava", module: "listenablefuture")
+}
+
+tasks.register('androidTestsBuild') {
+    dependsOn 'assembleDebugAndroidTest'
 }
 
 anvil {
@@ -67,5 +81,8 @@ android {
   namespace 'com.duckduckgo.feature.impl'
   lintOptions {
       baseline file("lint-baseline.xml")
+  }
+  compileOptions {
+    coreLibraryDesugaringEnabled = true
   }
 }
