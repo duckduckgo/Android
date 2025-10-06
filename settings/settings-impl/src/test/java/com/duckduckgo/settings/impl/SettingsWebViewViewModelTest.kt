@@ -19,8 +19,12 @@ package com.duckduckgo.settings.impl
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import app.cash.turbine.test
 import com.duckduckgo.common.test.CoroutineTestRule
-import com.duckduckgo.settings.api.SettingsConstants
+import com.duckduckgo.settings.api.SettingsConstants.ID_AI_FEATURES
+import com.duckduckgo.settings.api.SettingsConstants.ID_PRIVATE_SEARCH
 import com.duckduckgo.settings.impl.SettingsWebViewViewModel.Command
+import com.duckduckgo.settings.impl.messaging.SettingsContentScopeJsMessageHandler.Companion.FEATURE_SERP_SETTINGS
+import com.duckduckgo.settings.impl.messaging.SettingsContentScopeJsMessageHandler.Companion.METHOD_OPEN_NATIVE_SETTINGS
+import com.duckduckgo.settings.impl.messaging.SettingsContentScopeJsMessageHandler.Companion.PARAM_RETURN
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
@@ -71,10 +75,10 @@ class SettingsWebViewViewModelTest {
     @Test
     fun whenProcessOpenNativeSettingsAiFeaturesReturnThenExitCommandEmitted() = runTest {
         viewModel.commands.test {
-            val data = JSONObject().put(SettingsConstants.PARAM_RETURN, SettingsConstants.ID_AI_FEATURES)
+            val data = JSONObject().put(PARAM_RETURN, ID_AI_FEATURES)
             viewModel.processJsCallbackMessage(
-                featureName = SettingsConstants.FEATURE_SERP_SETTINGS,
-                method = SettingsConstants.METHOD_OPEN_NATIVE_SETTINGS,
+                featureName = FEATURE_SERP_SETTINGS,
+                method = METHOD_OPEN_NATIVE_SETTINGS,
                 id = null,
                 data = data,
             )
@@ -87,10 +91,10 @@ class SettingsWebViewViewModelTest {
     @Test
     fun whenProcessOpenNativeSettingsPrivateSearchReturnThenExitCommandEmitted() = runTest {
         viewModel.commands.test {
-            val data = JSONObject().put(SettingsConstants.PARAM_RETURN, SettingsConstants.ID_PRIVATE_SEARCH)
+            val data = JSONObject().put(PARAM_RETURN, ID_PRIVATE_SEARCH)
             viewModel.processJsCallbackMessage(
-                featureName = SettingsConstants.FEATURE_SERP_SETTINGS,
-                method = SettingsConstants.METHOD_OPEN_NATIVE_SETTINGS,
+                featureName = FEATURE_SERP_SETTINGS,
+                method = METHOD_OPEN_NATIVE_SETTINGS,
                 id = null,
                 data = data,
             )
@@ -103,10 +107,10 @@ class SettingsWebViewViewModelTest {
     @Test
     fun whenProcessOpenNativeSettingsUnknownReturnThenNoCommandEmitted() = runTest {
         viewModel.commands.test {
-            val data = JSONObject().put(SettingsConstants.PARAM_RETURN, "unknownSection")
+            val data = JSONObject().put(PARAM_RETURN, "unknownSection")
             viewModel.processJsCallbackMessage(
-                featureName = SettingsConstants.FEATURE_SERP_SETTINGS,
-                method = SettingsConstants.METHOD_OPEN_NATIVE_SETTINGS,
+                featureName = FEATURE_SERP_SETTINGS,
+                method = METHOD_OPEN_NATIVE_SETTINGS,
                 id = null,
                 data = data,
             )
@@ -119,10 +123,10 @@ class SettingsWebViewViewModelTest {
     @Test
     fun whenProcessDifferentFeatureNameThenNoCommandEmitted() = runTest {
         viewModel.commands.test {
-            val data = JSONObject().put(SettingsConstants.PARAM_RETURN, SettingsConstants.ID_AI_FEATURES)
+            val data = JSONObject().put(PARAM_RETURN, ID_AI_FEATURES)
             viewModel.processJsCallbackMessage(
                 featureName = "otherFeature",
-                method = SettingsConstants.METHOD_OPEN_NATIVE_SETTINGS,
+                method = METHOD_OPEN_NATIVE_SETTINGS,
                 id = null,
                 data = data,
             )
@@ -134,9 +138,9 @@ class SettingsWebViewViewModelTest {
     @Test
     fun whenProcessDifferentMethodThenNoCommandEmitted() = runTest {
         viewModel.commands.test {
-            val data = JSONObject().put(SettingsConstants.PARAM_RETURN, SettingsConstants.ID_AI_FEATURES)
+            val data = JSONObject().put(PARAM_RETURN, ID_AI_FEATURES)
             viewModel.processJsCallbackMessage(
-                featureName = SettingsConstants.FEATURE_SERP_SETTINGS,
+                featureName = FEATURE_SERP_SETTINGS,
                 method = "someOtherMethod",
                 id = null,
                 data = data,
