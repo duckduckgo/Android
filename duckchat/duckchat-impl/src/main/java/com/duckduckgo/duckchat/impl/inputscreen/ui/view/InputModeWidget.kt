@@ -79,6 +79,14 @@ class InputModeWidget @JvmOverloads constructor(
     private val fireButton: View
     private val voiceInputButton: View
 
+    private val inputModeCardExtendedEndMargin: Int by lazy {
+        resources.getDimensionPixelSize(R.dimen.inputScreenOmnibarCardExtendedMarginHorizontal)
+    }
+
+    private val inputModeCardEndMargin: Int by lazy {
+        resources.getDimensionPixelSize(R.dimen.inputScreenOmnibarCardMarginHorizontal)
+    }
+
     var onBack: (() -> Unit)? = null
     var onSearchSent: ((String) -> Unit)? = null
     var onChatSent: ((String) -> Unit)? = null
@@ -303,12 +311,12 @@ class InputModeWidget @JvmOverloads constructor(
             fade(inputModeIconsContainer, isNullOrEmpty)
 
             inputModeWidgetLayout.updateLayoutParams<MarginLayoutParams> {
-                if (isNullOrEmpty) {
-                    marginEnd = 4f.toPx(context).roundToInt()
+                marginEnd = if (isNullOrEmpty) {
+                    inputModeCardEndMargin
                 } else {
-                    marginEnd = 16f.toPx(context).roundToInt()
+                    inputModeCardExtendedEndMargin
                 }
-                marginStart = 16f.toPx(context).roundToInt()
+                marginStart = inputModeCardExtendedEndMargin
             }
 
             // change padding to make the buttons visible
