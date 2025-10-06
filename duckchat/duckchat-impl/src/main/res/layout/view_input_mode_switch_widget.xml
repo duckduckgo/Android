@@ -162,7 +162,9 @@
             android:id="@+id/inputModeIconsContainer"
             android:layout_width="wrap_content"
             android:layout_height="@dimen/toolbarIcon"
+            android:layout_marginStart="@dimen/keyline_2"
             app:layout_constraintBottom_toBottomOf="@id/inputModeWidgetCard"
+            app:layout_constraintStart_toEndOf="@id/inputModeWidgetCard"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="@id/inputModeWidgetCard">
 
