@@ -20,6 +20,7 @@ import android.annotation.SuppressLint
 import android.os.Bundle
 import android.view.MenuItem
 import android.webkit.WebSettings
+import android.webkit.WebView
 import androidx.activity.OnBackPressedCallback
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
@@ -132,28 +133,8 @@ class SettingsWebViewActivity : DuckDuckGoActivity() {
     @SuppressLint("SetJavaScriptEnabled")
     private suspend fun setupWebView() {
         binding.settingsWebView.let {
-            contentScopeScripts.register(
-                it,
-                object : JsMessageCallback() {
-                    override fun process(
-                        featureName: String,
-                        method: String,
-                        id: String?,
-                        data: JSONObject?,
-                    ) {
-                        viewModel.processJsCallbackMessage(featureName, method, id, data)
-                    }
-                },
-            )
-
-            webViewCompat.addDocumentStartJavaScript(
-                it,
-                "javascript:${css.getScript(false, emptyList())}",
-                setOf(
-                    "https://duckduckgo.com", // exact origin
-                    "https://*.duckduckgo.com", // any subdomain
-                ),
-            )
+            // temporary disable CSS until it's needed
+            // configureCssMessaging(it)
 
             it.settings.apply {
                 userAgentString = userAgentProvider.userAgent()
@@ -168,6 +149,31 @@ class SettingsWebViewActivity : DuckDuckGoActivity() {
                 setSupportZoom(true)
             }
         }
+    }
+
+    private suspend fun configureCssMessaging(webView: WebView) {
+        contentScopeScripts.register(
+            webView,
+            object : JsMessageCallback() {
+                override fun process(
+                    featureName: String,
+                    method: String,
+                    id: String?,
+                    data: JSONObject?,
+                ) {
+                    viewModel.processJsCallbackMessage(featureName, method, id, data)
+                }
+            },
+        )
+
+        webViewCompat.addDocumentStartJavaScript(
+            webView,
+            "javascript:${css.getScript(false, emptyList())}",
+            setOf(
+                "https://duckduckgo.com", // exact origin
+                "https://*.duckduckgo.com", // any subdomain
+            ),
+        )
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
