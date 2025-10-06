@@ -134,7 +134,11 @@ interface PirRepository {
 
     suspend fun replaceUserProfile(profileQuery: ProfileQuery)
 
-    suspend fun saveProfileQueries(profileQueries: List<ProfileQuery>): Boolean
+    suspend fun updateProfileQueries(
+        profileQueriesToAdd: List<ProfileQuery>,
+        profileQueriesToUpdate: List<ProfileQuery>,
+        profileQueryIdsToDelete: List<Long>,
+    ): Boolean
 
     suspend fun getEmailForBroker(dataBroker: String): String
 
@@ -462,7 +466,7 @@ internal class RealPirRepository(
                 "${this.userName.firstName} $middleName ${this.userName.lastName}"
             } ?: "${this.userName.firstName} ${this.userName.lastName}",
             age = currentTimeProvider.localDateTimeNow().year - this.birthYear,
-            deprecated = false,
+            deprecated = this.deprecated,
         )
 
     override suspend fun replaceUserProfile(profileQuery: ProfileQuery) {
@@ -472,15 +476,22 @@ internal class RealPirRepository(
         }
     }
 
-    override suspend fun saveProfileQueries(profileQueries: List<ProfileQuery>): Boolean =
-        withContext(dispatcherProvider.io()) {
-            val userProfiles =
-                profileQueries.map { query ->
-                    query.toUserProfile()
-                }
-            val insertResult = userProfileDao.insertUserProfiles(userProfiles)
-            insertResult.size == userProfiles.size
+    override suspend fun updateProfileQueries(
+        profileQueriesToAdd: List<ProfileQuery>,
+        profileQueriesToUpdate: List<ProfileQuery>,
+        profileQueryIdsToDelete: List<Long>,
+    ): Boolean = withContext(dispatcherProvider.io()) {
+        try {
+            userProfileDao.updateUserProfiles(
+                profilesToAdd = profileQueriesToAdd.map { query -> query.toUserProfile() },
+                profilesToUpdate = profileQueriesToUpdate.map { query -> query.toUserProfile() },
+                profileIdsToDelete = profileQueryIdsToDelete,
+            )
+            true
+        } catch (_: Exception) {
+            false
         }
+    }
 
     override suspend fun getEmailForBroker(dataBroker: String): String =
         withContext(dispatcherProvider.io()) {
@@ -602,6 +613,7 @@ internal class RealPirRepository(
 
     private fun ProfileQuery.toUserProfile(): UserProfile =
         UserProfile(
+            id = this.id,
             userName =
             UserName(
                 firstName = this.firstName,
@@ -614,6 +626,7 @@ internal class RealPirRepository(
                 state = this.state,
             ),
             birthYear = this.birthYear,
+            deprecated = this.deprecated,
         )
 
     companion object {

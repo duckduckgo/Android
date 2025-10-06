@@ -16,19 +16,235 @@
 
 package com.duckduckgo.pir.impl.dashboard.state
 
+import com.duckduckgo.pir.impl.models.Address
+import com.duckduckgo.pir.impl.models.ProfileQuery
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 
-class RealPirWebOnboardingStateHolderTest {
+class RealPirWebProfileStateHolderTest {
 
-    private lateinit var testee: RealPirWebOnboardingStateHolder
+    private lateinit var testee: RealPirWebProfileStateHolder
 
     @Before
     fun setUp() {
-        testee = RealPirWebOnboardingStateHolder()
+        testee = RealPirWebProfileStateHolder()
+    }
+
+    // Tests for setLoadedProfileQueries method
+    @Test
+    fun whenSetLoadedProfileQueriesWithSingleProfileThenLoadsCorrectly() {
+        // Given
+        val profileQuery = createProfileQuery(
+            firstName = "John",
+            middleName = "Michael",
+            lastName = "Doe",
+            city = "New York",
+            state = "NY",
+            birthYear = 1990,
+        )
+
+        // When
+        testee.setLoadedProfileQueries(listOf(profileQuery))
+
+        // Then
+        assertTrue(testee.isProfileComplete)
+        val resultProfiles = testee.toProfileQueries(2025)
+        assertEquals(1, resultProfiles.size)
+        with(resultProfiles[0]) {
+            assertEquals("John", firstName)
+            assertEquals("Michael", middleName)
+            assertEquals("Doe", lastName)
+            assertEquals("New York", city)
+            assertEquals("NY", state)
+            assertEquals(1990, birthYear)
+        }
+    }
+
+    @Test
+    fun whenSetLoadedProfileQueriesWithMultipleProfilesThenDeduplicatesNamesAndAddresses() {
+        // Given
+        val profile1 = createProfileQuery(
+            firstName = "John",
+            middleName = "Michael",
+            lastName = "Doe",
+            city = "New York",
+            state = "NY",
+            birthYear = 1990,
+        )
+        val profile2 = createProfileQuery(
+            firstName = "John", // Same name
+            middleName = "Michael",
+            lastName = "Doe",
+            city = "Los Angeles", // Different address
+            state = "CA",
+            birthYear = 1990,
+        )
+        val profile3 = createProfileQuery(
+            firstName = "Jane", // Different name
+            middleName = null,
+            lastName = "Smith",
+            city = "New York", // Same address as profile1
+            state = "NY",
+            birthYear = 1985,
+        )
+
+        // When
+        testee.setLoadedProfileQueries(listOf(profile1, profile2, profile3))
+
+        // Then
+        assertTrue(testee.isProfileComplete)
+        val resultProfiles = testee.toProfileQueries(2025)
+        assertEquals(4, resultProfiles.size) // 2 names × 2 addresses
+
+        // Verify combinations
+        val combinations = resultProfiles.map { "${it.firstName} ${it.lastName} - ${it.city}, ${it.state}" }
+        assertTrue(combinations.contains("John Doe - New York, NY"))
+        assertTrue(combinations.contains("John Doe - Los Angeles, CA"))
+        assertTrue(combinations.contains("Jane Smith - New York, NY"))
+        assertTrue(combinations.contains("Jane Smith - Los Angeles, CA"))
+    }
+
+    @Test
+    fun whenSetLoadedProfileQueriesWithBlankMiddleNameThenIgnoresMiddleName() {
+        // Given
+        val profileWithBlankMiddle = createProfileQuery(
+            firstName = "John",
+            middleName = "   ", // Blank middle name
+            lastName = "Doe",
+            city = "Boston",
+            state = "MA",
+            birthYear = 1990,
+        )
+
+        // When
+        testee.setLoadedProfileQueries(listOf(profileWithBlankMiddle))
+
+        // Then
+        val resultProfiles = testee.toProfileQueries(2025)
+        assertEquals(1, resultProfiles.size)
+        assertEquals(null, resultProfiles[0].middleName) // Should be null, not blank
+        assertEquals("John Doe", resultProfiles[0].fullName) // Should not include middle name
+    }
+
+    @Test
+    fun whenSetLoadedProfileQueriesWithMultipleBirthYearsThenUsesFirstNonZero() {
+        // Given
+        val profile1 = createProfileQuery(
+            firstName = "John",
+            lastName = "Doe",
+            city = "City1",
+            state = "ST",
+            birthYear = 0, // Zero birth year
+        )
+        val profile2 = createProfileQuery(
+            firstName = "Jane",
+            lastName = "Smith",
+            city = "City2",
+            state = "ST",
+            birthYear = 1990, // First non-zero
+        )
+        val profile3 = createProfileQuery(
+            firstName = "Bob",
+            lastName = "Johnson",
+            city = "City3",
+            state = "ST",
+            birthYear = 1985, // Second non-zero, should be ignored
+        )
+
+        // When
+        testee.setLoadedProfileQueries(listOf(profile1, profile2, profile3))
+
+        // Then
+        val resultProfiles = testee.toProfileQueries(2025)
+        resultProfiles.forEach { profile ->
+            assertEquals(1990, profile.birthYear) // All should have the first non-zero birth year
+            assertEquals(35, profile.age) // Age calculated from 1990
+        }
+    }
+
+    @Test
+    fun whenSetLoadedProfileQueriesCalledThenClearsExistingData() {
+        // Given - Add some initial data
+        testee.addName("Initial", null, "Name")
+        testee.addAddress("Initial City", "IC")
+        testee.setBirthYear(2000)
+        assertTrue(testee.isProfileComplete)
+
+        val newProfile = createProfileQuery(
+            firstName = "New",
+            lastName = "Profile",
+            city = "New City",
+            state = "NC",
+            birthYear = 1995,
+        )
+
+        // When
+        testee.setLoadedProfileQueries(listOf(newProfile))
+
+        // Then - Only new data should exist
+        val resultProfiles = testee.toProfileQueries(2025)
+        assertEquals(1, resultProfiles.size)
+        with(resultProfiles[0]) {
+            assertEquals("New", firstName)
+            assertEquals("Profile", lastName)
+            assertEquals("New City", city)
+            assertEquals("NC", state)
+            assertEquals(1995, birthYear)
+        }
+    }
+
+    @Test
+    fun whenSetLoadedProfileQueriesWithEmptyListThenClearsAll() {
+        // Given - Add some initial data
+        testee.addName("Test", null, "User")
+        testee.addAddress("Test City", "TC")
+        testee.setBirthYear(1990)
+        assertTrue(testee.isProfileComplete)
+
+        // When
+        testee.setLoadedProfileQueries(emptyList())
+
+        // Then
+        assertFalse(testee.isProfileComplete)
+        assertEquals(0, testee.toProfileQueries(2025).size)
+    }
+
+    @Test
+    fun whenSetLoadedProfileQueriesWithDuplicateProfilesThenDeduplicates() {
+        // Given - Identical profiles
+        val profile1 = createProfileQuery(
+            firstName = "John",
+            middleName = "Michael",
+            lastName = "Doe",
+            city = "New York",
+            state = "NY",
+            birthYear = 1990,
+        )
+        val profile2 = createProfileQuery(
+            firstName = "John",
+            middleName = "Michael",
+            lastName = "Doe",
+            city = "New York",
+            state = "NY",
+            birthYear = 1990,
+        )
+
+        // When
+        testee.setLoadedProfileQueries(listOf(profile1, profile2))
+
+        // Then - Should only have one combination since name and address are identical
+        val resultProfiles = testee.toProfileQueries(2025)
+        assertEquals(1, resultProfiles.size)
+        with(resultProfiles[0]) {
+            assertEquals("John", firstName)
+            assertEquals("Michael", middleName)
+            assertEquals("Doe", lastName)
+            assertEquals("New York", city)
+            assertEquals("NY", state)
+        }
     }
 
     @Test
@@ -453,5 +669,28 @@ class RealPirWebOnboardingStateHolderTest {
         assertTrue(addressResult)
         assertTrue(birthYearResult)
         assertTrue(testee.isProfileComplete)
+    }
+
+    private fun createProfileQuery(
+        firstName: String,
+        middleName: String? = null,
+        lastName: String,
+        city: String,
+        state: String,
+        birthYear: Int,
+    ): ProfileQuery {
+        return ProfileQuery(
+            id = 1L,
+            firstName = firstName,
+            middleName = middleName,
+            lastName = lastName,
+            city = city,
+            state = state,
+            addresses = listOf(Address(city, state)),
+            birthYear = birthYear,
+            fullName = if (middleName != null) "$firstName $middleName $lastName" else "$firstName $lastName",
+            age = 2025 - birthYear,
+            deprecated = false,
+        )
     }
 }
