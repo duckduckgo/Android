@@ -30,7 +30,7 @@ interface InputScreenConfigResolver {
 
     fun onInputScreenCreated(intent: Intent)
 
-    fun useTopBar(): Boolean
+    fun useTopBar(isLandscape: Boolean = false): Boolean
 }
 
 @ContributesBinding(scope = ActivityScope::class)
@@ -55,9 +55,9 @@ class InputScreenConfigResolverImpl @Inject constructor(
         _isTopOmnibar = params?.isTopOmnibar ?: true
     }
 
-    override fun useTopBar(): Boolean =
+    override fun useTopBar(isLandscape: Boolean): Boolean =
         useTopBar(
-            isTopOmnibar = isTopOmnibar,
+            isTopOmnibar = isTopOmnibar || isLandscape,
             duckChatInternal = duckChatInternal,
         )
 }

@@ -19,6 +19,7 @@ package com.duckduckgo.duckchat.impl.inputscreen.ui
 import android.animation.ValueAnimator
 import android.app.Activity
 import android.content.Intent
+import android.content.res.Configuration
 import android.os.Bundle
 import android.util.TypedValue
 import android.view.Gravity
@@ -154,7 +155,8 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
             inputModeWidget.provideInitialText(query)
         }
 
-        val useTopBar = inputScreenConfigResolver.useTopBar()
+        val isLandscape = resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
+        val useTopBar = inputScreenConfigResolver.useTopBar(isLandscape)
         val separatorHeightPx = resources.getDimensionPixelSize(R.dimen.inputScreenContentSeparatorHeight)
         contentSeparator =
             View(context).apply {
