@@ -38,10 +38,10 @@ import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.view.text.DaxTextView
 import com.duckduckgo.common.utils.ConflatedJob
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.FragmentScope
 import com.squareup.anvil.annotations.ContributesBinding
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -49,6 +49,7 @@ import javax.inject.Inject
 
 @ContributesBinding(FragmentScope::class)
 class BrowserLottieTrackersAnimatorHelper @Inject constructor(
+    dispatcherProvider: DispatcherProvider,
     private val theme: AppTheme,
     private val addressBarTrackersAnimator: AddressBarTrackersAnimator,
     private val commonAddressBarAnimationHelper: CommonAddressBarAnimationHelper,
@@ -68,6 +69,7 @@ class BrowserLottieTrackersAnimatorHelper @Inject constructor(
     private var hasCookiesAnimationBeenCanceled = false
 
     private val conflatedJob = ConflatedJob()
+    private val coroutineScope = CoroutineScope(SupervisorJob() + dispatcherProvider.main())
 
     lateinit var firstScene: Scene
     lateinit var secondScene: Scene
@@ -152,7 +154,7 @@ class BrowserLottieTrackersAnimatorHelper @Inject constructor(
             entities = entities,
             onAnimationComplete = {
                 conflatedJob +=
-                    MainScope().launch {
+                    coroutineScope.launch {
                         delay(DELAY_BETWEEN_ANIMATIONS_DURATION)
                         tryToStartCookiesAnimation(context, omnibarViews + shieldViews)
                     }
@@ -195,6 +197,7 @@ class BrowserLottieTrackersAnimatorHelper @Inject constructor(
     override fun cancelAnimations(
         omnibarViews: List<View>,
     ) {
+        conflatedJob.cancel()
         stopTrackersAnimation()
         stopCookiesAnimation()
         omnibarViews.forEach { it.alpha = 1f }
