@@ -23,7 +23,9 @@ import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerManua
 import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerManualScanStarted
 import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerOptOutActionFailed
 import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerOptOutActionSucceeded
+import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerRecordEmailConfirmationCompleted
 import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerRecordEmailConfirmationNeeded
+import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerRecordEmailConfirmationStarted
 import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerRecordOptOutCompleted
 import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerRecordOptOutStarted
 import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerScanActionFailed
@@ -33,7 +35,6 @@ import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerSched
 import com.duckduckgo.pir.impl.models.AddressCityState
 import com.duckduckgo.pir.impl.models.ExtractedProfile
 import com.duckduckgo.pir.impl.models.scheduling.JobRecord.EmailConfirmationJobRecord
-import com.duckduckgo.pir.impl.models.scheduling.JobRecord.EmailConfirmationJobRecord.EmailData
 import com.duckduckgo.pir.impl.pixels.PirPixelSender
 import com.duckduckgo.pir.impl.scheduling.JobRecordUpdater
 import com.duckduckgo.pir.impl.scripts.models.PirSuccessResponse
@@ -46,7 +47,6 @@ import com.duckduckgo.pir.impl.scripts.models.PirSuccessResponse.NavigateRespons
 import com.duckduckgo.pir.impl.scripts.models.PirSuccessResponse.SolveCaptchaResponse
 import com.duckduckgo.pir.impl.store.PirEventsRepository
 import com.duckduckgo.pir.impl.store.PirRepository
-import com.duckduckgo.pir.impl.store.PirSchedulingRepository
 import com.duckduckgo.pir.impl.store.db.BrokerScanEventType.BROKER_ERROR
 import com.duckduckgo.pir.impl.store.db.BrokerScanEventType.BROKER_STARTED
 import com.duckduckgo.pir.impl.store.db.BrokerScanEventType.BROKER_SUCCESS
@@ -111,6 +111,17 @@ interface PirRunStateHandler {
             val attemptId: String,
         ) : PirRunState(brokerName)
 
+        data class BrokerRecordEmailConfirmationStarted(
+            override val brokerName: String,
+            val emailConfirmationJobRecord: EmailConfirmationJobRecord,
+        ) : PirRunState(brokerName)
+
+        data class BrokerRecordEmailConfirmationCompleted(
+            override val brokerName: String,
+            val emailConfirmationJobRecord: EmailConfirmationJobRecord,
+            val isSuccess: Boolean,
+        ) : PirRunState(brokerName)
+
         data class BrokerRecordOptOutStarted(
             override val brokerName: String,
             val extractedProfile: ExtractedProfile,
@@ -150,7 +161,6 @@ class RealPirRunStateHandler @Inject constructor(
     private val pixelSender: PirPixelSender,
     private val dispatcherProvider: DispatcherProvider,
     private val jobRecordUpdater: JobRecordUpdater,
-    private val schedulingRepository: PirSchedulingRepository,
 ) : PirRunStateHandler {
     private val moshi: Moshi by lazy {
         Moshi
@@ -185,24 +195,32 @@ class RealPirRunStateHandler @Inject constructor(
                 is BrokerOptOutActionSucceeded -> handleBrokerOptOutActionSucceeded(pirRunState)
                 is BrokerOptOutActionFailed -> handleBrokerOptOutActionFailed(pirRunState)
                 is BrokerRecordEmailConfirmationNeeded -> handleBrokerRecordEmailConfirmationNeeded(pirRunState)
+                is BrokerRecordEmailConfirmationStarted -> handleBrokerRecordEmailConfirmationStarted(pirRunState)
+                is BrokerRecordEmailConfirmationCompleted -> handleBrokerRecordEmailConfirmationCompleted(pirRunState)
                 else -> {}
             }
         }
 
+    private suspend fun handleBrokerRecordEmailConfirmationStarted(pirRunState: BrokerRecordEmailConfirmationStarted) {
+        jobRecordUpdater.recordEmailConfirmationAttempt(pirRunState.emailConfirmationJobRecord)
+    }
+
+    private suspend fun handleBrokerRecordEmailConfirmationCompleted(pirRunState: BrokerRecordEmailConfirmationCompleted) {
+        // If the attempt failed, We don't do anything. If the job has still attempts left it will be retried.
+        // If the attempts are maxed, it will be cleaned up in the next run. (Higher chance of being executed)
+        if (pirRunState.isSuccess) {
+            jobRecordUpdater.recordEmailConfirmationCompleted(pirRunState.emailConfirmationJobRecord)
+        }
+    }
+
     private suspend fun handleBrokerRecordEmailConfirmationNeeded(pirRunState: BrokerRecordEmailConfirmationNeeded) {
-        schedulingRepository.saveEmailConfirmationJobRecord(
-            EmailConfirmationJobRecord(
-                userProfileId = pirRunState.extractedProfile.profileQueryId,
-                extractedProfileId = pirRunState.extractedProfile.dbId,
-                brokerName = pirRunState.brokerName,
-                emailData =
-                EmailData(
-                    email = pirRunState.extractedProfile.email,
-                    attemptId = pirRunState.attemptId,
-                ),
-            ),
+        jobRecordUpdater.markOptOutAsWaitingForEmailConfirmation(
+            profileQueryId = pirRunState.extractedProfile.profileQueryId,
+            extractedProfileId = pirRunState.extractedProfile.dbId,
+            brokerName = pirRunState.brokerName,
+            email = pirRunState.extractedProfile.email,
+            attemptId = pirRunState.attemptId,
         )
-        jobRecordUpdater.markOptOutAsWaitingForEmailConfirmation(pirRunState.extractedProfile.dbId)
     }
 
     private suspend fun handleBrokerManualScanStarted(state: BrokerManualScanStarted) {

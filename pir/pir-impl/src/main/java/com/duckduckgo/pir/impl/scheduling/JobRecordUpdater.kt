@@ -23,6 +23,9 @@ import com.duckduckgo.pir.impl.models.AddressCityState
 import com.duckduckgo.pir.impl.models.ExtractedProfile
 import com.duckduckgo.pir.impl.models.ProfileQuery
 import com.duckduckgo.pir.impl.models.scheduling.JobRecord
+import com.duckduckgo.pir.impl.models.scheduling.JobRecord.EmailConfirmationJobRecord
+import com.duckduckgo.pir.impl.models.scheduling.JobRecord.EmailConfirmationJobRecord.EmailData
+import com.duckduckgo.pir.impl.models.scheduling.JobRecord.EmailConfirmationJobRecord.JobAttemptData
 import com.duckduckgo.pir.impl.models.scheduling.JobRecord.OptOutJobRecord
 import com.duckduckgo.pir.impl.models.scheduling.JobRecord.OptOutJobRecord.OptOutJobStatus
 import com.duckduckgo.pir.impl.models.scheduling.JobRecord.ScanJobRecord
@@ -136,14 +139,76 @@ interface JobRecordUpdater {
      */
     suspend fun updateOptOutError(extractedProfileId: Long)
 
-    suspend fun markOptOutAsWaitingForEmailConfirmation(extractedProfileId: Long)
-
-    suspend fun recordEmailConfirmationFetchAttempt(extractedProfileId: Long)
-
-    suspend fun markEmailConfirmationWithLink(
+    /**
+     * Updates the [OptOutJobRecord] associated with the given [extractedProfileId].
+     *
+     * This method should be called when the opt-out attempt requires email confirmation.
+     * Ir updates the [OptOutJobStatus] accordingly and also creates a corresponding [EmailConfirmationJobRecord].
+     *
+     * @param extractedProfileId The id stored in our database for the [ExtractedProfile]
+     * @param profileQueryId  The ID of the [ProfileQuery] related to the scan job.
+     * @param brokerName The name of the broker associated with the scan job.
+     * @param email Email used during the opt-out flow, where the link is expected to be sent.
+     * @param attemptId  Locally generated ID to identify this opt out attempt.
+     */
+    suspend fun markOptOutAsWaitingForEmailConfirmation(
+        profileQueryId: Long,
         extractedProfileId: Long,
+        brokerName: String,
+        email: String,
+        attemptId: String,
+    )
+
+    /**
+     * Updates the [EmailConfirmationJobRecord] when the fetch of the email confirmation link has failed.
+     *
+     * @param emailConfirmationJobRecord Record to be updated
+     */
+    suspend fun markEmailConfirmationLinkFetchFailed(emailConfirmationJobRecord: EmailConfirmationJobRecord)
+
+    /**
+     * Updates the [EmailConfirmationJobRecord] when the fetch of the email confirmation link has been attempted.
+     * This should be called before the actual fetch is attempted.
+     *
+     * @param emailConfirmationJobRecord Record to be updated
+     */
+    suspend fun recordEmailConfirmationFetchAttempt(emailConfirmationJobRecord: EmailConfirmationJobRecord)
+
+    /**
+     * Updates the [EmailConfirmationJobRecord] when the email confirmation link has been fetched successfully.
+     *
+     * @param emailConfirmationJobRecord Record to be updated
+     * @param link The fetched email confirmation link
+     */
+    suspend fun markEmailConfirmationWithLink(
+        emailConfirmationJobRecord: EmailConfirmationJobRecord,
         link: String,
     )
+
+    /**
+     * Updates the [EmailConfirmationJobRecord] when the succeeding email confirmation steps has been attempted.
+     *
+     * @param emailConfirmationJobRecord Record to be updated
+     */
+    suspend fun recordEmailConfirmationAttempt(emailConfirmationJobRecord: EmailConfirmationJobRecord)
+
+    /**
+     * Updates the [EmailConfirmationJobRecord] when email confirmation attempts have been maxed out.
+     * This method deletes the corresponding [EmailConfirmationJobRecord] and marks the associated [OptOutJobRecord]
+     * as [ERROR]
+     *
+     * @param emailConfirmationJobRecord Record to be updated
+     */
+    suspend fun recordEmailConfirmationAttemptMaxed(emailConfirmationJobRecord: EmailConfirmationJobRecord)
+
+    /**
+     * Updates the [EmailConfirmationJobRecord] when email confirmation attempt has been successfully completed.
+     * This method deletes the corresponding [EmailConfirmationJobRecord] and marks the associated [OptOutJobRecord]
+     * as [OptOutJobStatus.REQUESTED]
+     *
+     * @param emailConfirmationJobRecord Record to be updated
+     */
+    suspend fun recordEmailConfirmationCompleted(emailConfirmationJobRecord: EmailConfirmationJobRecord)
 }
 
 @ContributesBinding(AppScope::class)
@@ -292,8 +357,27 @@ class RealJobRecordUpdater @Inject constructor(
         }
     }
 
-    override suspend fun markOptOutAsWaitingForEmailConfirmation(extractedProfileId: Long) {
+    override suspend fun markOptOutAsWaitingForEmailConfirmation(
+        profileQueryId: Long,
+        extractedProfileId: Long,
+        brokerName: String,
+        email: String,
+        attemptId: String,
+    ) {
         withContext(dispatcherProvider.io()) {
+            schedulingRepository.saveEmailConfirmationJobRecord(
+                EmailConfirmationJobRecord(
+                    userProfileId = profileQueryId,
+                    extractedProfileId = extractedProfileId,
+                    brokerName = brokerName,
+                    emailData =
+                    EmailData(
+                        email = email,
+                        attemptId = attemptId,
+                    ),
+                ),
+            )
+
             schedulingRepository.getValidOptOutJobRecord(extractedProfileId)?.also {
                 schedulingRepository.saveOptOutJobRecord(
                     it
@@ -304,42 +388,6 @@ class RealJobRecordUpdater @Inject constructor(
                         },
                 )
             }
-        }
-    }
-
-    override suspend fun recordEmailConfirmationFetchAttempt(extractedProfileId: Long) {
-        schedulingRepository.getEmailConfirmationJob(extractedProfileId)?.also {
-            schedulingRepository.saveEmailConfirmationJobRecord(
-                it
-                    .copy(
-                        linkFetchData =
-                        it.linkFetchData.copy(
-                            linkFetchAttemptCount = it.linkFetchData.linkFetchAttemptCount + 1,
-                            lastLinkFetchDateInMillis = currentTimeProvider.currentTimeMillis(),
-                        ),
-                    ).also {
-                        logcat { "PIR-JOB-RECORD: Updating EmailConfirmation for $extractedProfileId to $it" }
-                    },
-            )
-        }
-    }
-
-    override suspend fun markEmailConfirmationWithLink(
-        extractedProfileId: Long,
-        link: String,
-    ) {
-        schedulingRepository.getEmailConfirmationJob(extractedProfileId)?.also {
-            schedulingRepository.saveEmailConfirmationJobRecord(
-                it
-                    .copy(
-                        linkFetchData =
-                        it.linkFetchData.copy(
-                            emailConfirmationLink = link,
-                        ),
-                    ).also {
-                        logcat { "PIR-JOB-RECORD: Updating EmailConfirmation for $extractedProfileId to $it" }
-                    },
-            )
         }
     }
 
@@ -375,4 +423,65 @@ class RealJobRecordUpdater @Inject constructor(
             profileUrl = profileUrl,
             identifier = identifier,
         )
+
+    override suspend fun markEmailConfirmationLinkFetchFailed(emailConfirmationJobRecord: EmailConfirmationJobRecord) {
+        schedulingRepository.deleteEmailConfirmationJobRecord(emailConfirmationJobRecord.extractedProfileId)
+        updateOptOutError(emailConfirmationJobRecord.extractedProfileId)
+    }
+
+    override suspend fun recordEmailConfirmationFetchAttempt(emailConfirmationJobRecord: EmailConfirmationJobRecord) {
+        schedulingRepository.saveEmailConfirmationJobRecord(
+            emailConfirmationJobRecord
+                .copy(
+                    linkFetchData =
+                    emailConfirmationJobRecord.linkFetchData.copy(
+                        linkFetchAttemptCount = emailConfirmationJobRecord.linkFetchData.linkFetchAttemptCount + 1,
+                        lastLinkFetchDateInMillis = currentTimeProvider.currentTimeMillis(),
+                    ),
+                ).also {
+                    logcat { "PIR-JOB-RECORD: Updating EmailConfirmation for $emailConfirmationJobRecord to $it" }
+                },
+        )
+    }
+
+    override suspend fun markEmailConfirmationWithLink(
+        emailConfirmationJobRecord: EmailConfirmationJobRecord,
+        link: String,
+    ) {
+        schedulingRepository.saveEmailConfirmationJobRecord(
+            emailConfirmationJobRecord
+                .copy(
+                    linkFetchData =
+                    emailConfirmationJobRecord.linkFetchData.copy(
+                        emailConfirmationLink = link,
+                    ),
+                ).also {
+                    logcat { "PIR-JOB-RECORD: Updating EmailConfirmation for $emailConfirmationJobRecord to $it" }
+                },
+        )
+    }
+
+    override suspend fun recordEmailConfirmationAttempt(emailConfirmationJobRecord: EmailConfirmationJobRecord) {
+        schedulingRepository.saveEmailConfirmationJobRecord(
+            emailConfirmationJobRecord
+                .copy(
+                    jobAttemptData = JobAttemptData(
+                        jobAttemptCount = emailConfirmationJobRecord.jobAttemptData.jobAttemptCount + 1,
+                        lastJobAttemptDateInMillis = currentTimeProvider.currentTimeMillis(),
+                    ),
+                ).also {
+                    logcat { "PIR-JOB-RECORD: Updating EmailConfirmation for $emailConfirmationJobRecord to $it" }
+                },
+        )
+    }
+
+    override suspend fun recordEmailConfirmationAttemptMaxed(emailConfirmationJobRecord: EmailConfirmationJobRecord) {
+        schedulingRepository.deleteEmailConfirmationJobRecord(emailConfirmationJobRecord.extractedProfileId)
+        updateOptOutError(emailConfirmationJobRecord.extractedProfileId)
+    }
+
+    override suspend fun recordEmailConfirmationCompleted(emailConfirmationJobRecord: EmailConfirmationJobRecord) {
+        schedulingRepository.deleteEmailConfirmationJobRecord(emailConfirmationJobRecord.extractedProfileId)
+        updateOptOutRequested(emailConfirmationJobRecord.extractedProfileId)
+    }
 }
