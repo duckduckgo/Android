@@ -76,6 +76,7 @@ class InputModeWidget @JvmOverloads constructor(
     val tabSwitcherButton: InputScreenTabSwitcherButton
     private val menuButton: View
     private val fireButton: View
+    private val voiceInputButton: View
 
     var onBack: (() -> Unit)? = null
     var onSearchSent: ((String) -> Unit)? = null
@@ -91,6 +92,7 @@ class InputModeWidget @JvmOverloads constructor(
     var onSearchTextChanged: ((String) -> Unit)? = null
     var onChatTextChanged: ((String) -> Unit)? = null
     var onInputFieldClicked: (() -> Unit)? = null
+    var onVoiceClick: (() -> Unit)? = null
 
     var onTabTapped: ((index: Int) -> Unit)? = null
     var onFireButtonTapped: (() -> Unit)? = null
@@ -131,6 +133,7 @@ class InputModeWidget @JvmOverloads constructor(
         menuButton = findViewById(R.id.inputFieldBrowserMenu)
         fireButton = findViewById(R.id.inputFieldFireButton)
         tabSwitcherButton = findViewById(R.id.inputFieldTabsMenu)
+        voiceInputButton = findViewById(R.id.inputFieldVoiceSearchButton)
         inputScreenButtonsContainer = findViewById(R.id.inputScreenButtonsContainer)
         inputFieldButtons = findViewById(R.id.inputModeIconsContainer)
 
@@ -187,6 +190,9 @@ class InputModeWidget @JvmOverloads constructor(
         }
         fireButton.setOnClickListener {
             onFireButtonTapped?.invoke()
+        }
+        voiceInputButton.setOnClickListener {
+            onVoiceClick?.invoke()
         }
         addTabClickListeners()
     }
@@ -400,7 +406,7 @@ class InputModeWidget @JvmOverloads constructor(
         inputField.selectAll()
     }
 
-    fun setInputScreenButtons(inputScreenButtons: InputScreenButtons) {
+    fun setInputScreenBottomButtons(inputScreenButtons: InputScreenButtons) {
         inputScreenButtonsContainer.addView(inputScreenButtons)
         inputFieldClearText.updateLayoutParams<MarginLayoutParams> {
             // align the clear text button with the center of the submit button
@@ -424,6 +430,10 @@ class InputModeWidget @JvmOverloads constructor(
         if (Build.VERSION.SDK_INT >= 28) {
             inputModeWidgetCard.addBottomShadow()
         }
+    }
+
+    fun setVoiceButtonVisible(visible: Boolean) {
+        voiceInputButton.isVisible = visible
     }
 
     companion object {

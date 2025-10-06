@@ -24,6 +24,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.core.view.setPadding
 import androidx.core.view.updateLayoutParams
+import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.toPx
 import com.duckduckgo.duckchat.impl.R
 import com.duckduckgo.duckchat.impl.databinding.ViewInputScreenButtonsBinding
@@ -34,6 +35,7 @@ class InputScreenButtons @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0,
+    useTopBar: Boolean = true,
 ) : LinearLayout(context, attrs, defStyleAttr) {
     private val binding = ViewInputScreenButtonsBinding.inflate(LayoutInflater.from(context), this, true)
 
@@ -55,6 +57,16 @@ class InputScreenButtons @JvmOverloads constructor(
             binding.actionVoice.setOnClickListener { value?.invoke() }
         }
 
+    init {
+        if (useTopBar) {
+            // when used in top bar we want to transform the buttons to floating
+            transformButtonsToFloating()
+        } else {
+            // when in bottom bar mode, the voice icon is shown in the input field
+            binding.actionVoice.gone()
+        }
+    }
+
     fun setSendButtonIcon(iconResId: Int) {
         binding.actionSend.setImageResource(iconResId)
     }
@@ -71,7 +83,7 @@ class InputScreenButtons @JvmOverloads constructor(
         binding.actionVoice.isVisible = visible
     }
 
-    fun transformButtonsToFloating() {
+    private fun transformButtonsToFloating() {
         // enlarge buttons if they are floating
         val buttonSizePx = 40f.toPx(context).roundToInt()
         binding.actionSend.updateLayoutParams {
