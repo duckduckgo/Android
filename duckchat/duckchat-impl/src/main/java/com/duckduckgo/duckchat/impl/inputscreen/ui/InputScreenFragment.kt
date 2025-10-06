@@ -23,7 +23,6 @@ import android.graphics.Rect
 import android.os.Bundle
 import android.util.TypedValue
 import android.view.Gravity
-import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.ViewTreeObserver
@@ -175,7 +174,6 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
             InputModeWidget(requireContext()).also {
                 it.id = R.id.inputModeWidget
             }
-        inputScreenButtons = InputScreenButtons(requireContext())
 
         val params = requireActivity().intent.getActivityParams(InputScreenActivityParams::class.java)
         params?.query?.let { query ->
@@ -204,13 +202,14 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
                     )
             }
 
+        inputScreenButtons = InputScreenButtons(requireContext(), useTopBar = useTopBar)
+
         if (useTopBar) {
             binding.inputModeWidgetContainerTop.addView(inputModeWidget)
             binding.inputModeWidgetContainerTop.addView(contentSeparator)
             binding.inputScreenButtonsContainer.addView(inputScreenButtons)
-            inputScreenButtons.transformButtonsToFloating()
         } else {
-            inputModeWidget.setInputScreenButtons(inputScreenButtons)
+            inputModeWidget.setInputScreenBottomButtons(inputScreenButtons)
             binding.inputModeWidgetContainerBottom.addView(inputModeWidget)
             binding.inputModeWidgetContainerBottom.addView(contentSeparator)
         }
@@ -219,7 +218,7 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
         params?.tabs?.let { tabs ->
             configureOmnibar(tabs)
         }
-        configureVoice()
+        configureVoice(useTopBar)
         configureObservers()
         configureLogoAnimation()
 
@@ -408,6 +407,9 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
             onMenuTapped = {
                 viewModel.onBrowserMenuTapped()
             }
+            onVoiceClick = {
+                voiceSearchLauncher.launch(requireActivity())
+            }
         }
 
     private fun submitChatQuery(query: String) {
@@ -422,7 +424,7 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
         exitInputScreen()
     }
 
-    private fun configureVoice() {
+    private fun configureVoice(useTopBar: Boolean) {
         voiceSearchLauncher.registerResultsCallback(this, requireActivity(), BROWSER) {
             when (it) {
                 is VoiceRecognitionSuccess -> {
@@ -436,7 +438,11 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
         }
         viewModel.visibilityState
             .onEach {
-                inputScreenButtons.setVoiceButtonVisible(it.voiceInputButtonVisible)
+                if (useTopBar) {
+                    inputScreenButtons.setVoiceButtonVisible(it.voiceInputButtonVisible)
+                } else {
+                    inputModeWidget.setVoiceButtonVisible(it.voiceInputButtonVisible)
+                }
             }.launchIn(lifecycleScope)
     }
 
