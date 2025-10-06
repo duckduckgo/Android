@@ -19,25 +19,17 @@ package com.duckduckgo.settings.impl
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
-import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
-import com.duckduckgo.settings.api.SettingsConstants
-import com.duckduckgo.settings.impl.messaging.SettingsContentScopeJsMessageHandler.Companion.FEATURE_SERP_SETTINGS
-import com.duckduckgo.settings.impl.messaging.SettingsContentScopeJsMessageHandler.Companion.METHOD_OPEN_NATIVE_SETTINGS
-import com.duckduckgo.settings.impl.messaging.SettingsContentScopeJsMessageHandler.Companion.PARAM_RETURN
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import logcat.LogPriority
 import logcat.logcat
-import org.json.JSONObject
 import javax.inject.Inject
 
 @ContributesViewModel(ActivityScope::class)
-class SettingsWebViewViewModel @Inject constructor(
-    private val dispatcherProvider: DispatcherProvider,
-) : ViewModel() {
+class SettingsWebViewViewModel @Inject constructor() : ViewModel() {
     private val commandChannel = Channel<Command>(capacity = 1, onBufferOverflow = DROP_OLDEST)
     val commands = commandChannel.receiveAsFlow()
 
@@ -55,38 +47,6 @@ class SettingsWebViewViewModel @Inject constructor(
         } else {
             logcat(LogPriority.ERROR) { "No URL provided to WebViewActivity" }
             sendCommand(Command.Exit)
-        }
-    }
-
-    fun processJsCallbackMessage(
-        featureName: String,
-        method: String,
-        id: String?,
-        data: JSONObject?,
-    ) {
-        viewModelScope.launch(dispatcherProvider.io()) {
-            when (featureName) {
-                FEATURE_SERP_SETTINGS ->
-                    when (method) {
-                        METHOD_OPEN_NATIVE_SETTINGS -> {
-                            val returnParam = data?.optString(PARAM_RETURN)
-                            openNativeSettings(returnParam)
-                        }
-                    }
-            }
-        }
-    }
-
-    private fun openNativeSettings(returnParam: String?) {
-        when (returnParam) {
-            SettingsConstants.ID_AI_FEATURES,
-            SettingsConstants.ID_PRIVATE_SEARCH,
-            -> {
-                sendCommand(Command.Exit)
-            }
-            else -> {
-                logcat(LogPriority.WARN) { "Unknown settings return value: $returnParam" }
-            }
         }
     }
 
