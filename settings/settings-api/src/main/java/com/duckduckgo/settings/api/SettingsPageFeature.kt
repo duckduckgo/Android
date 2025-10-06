@@ -29,5 +29,5 @@ interface SettingsPageFeature {
 
     @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
     @Toggle.InternalAlwaysEnabled
-    fun settingsWebView(): Toggle
+    fun embeddedSettingsWebView(): Toggle
 }

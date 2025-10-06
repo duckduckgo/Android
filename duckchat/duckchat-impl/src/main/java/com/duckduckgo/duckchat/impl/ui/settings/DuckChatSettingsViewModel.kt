@@ -129,7 +129,7 @@ class DuckChatSettingsViewModel @Inject constructor(
 
     fun duckChatSearchAISettingsClicked() {
         viewModelScope.launch {
-            if (settingsPageFeature.settingsWebView().isEnabled()) {
+            if (settingsPageFeature.embeddedSettingsWebView().isEnabled()) {
                 commandChannel.send(
                     OpenLink(
                         DUCK_CHAT_SEARCH_AI_SETTINGS_LINK_EMBEDDED,
