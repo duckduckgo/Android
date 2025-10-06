@@ -18,8 +18,13 @@ tags:
 
       - runFlow: common/assert_duckplayer_visible.yaml
 
-      - tapOn:
-          id: app
+      - runFlow:
+          when:
+            notVisible:
+              text: "Duck Player can't load this video"
+          commands:
+            - tapOn:
+                id: app
 
       - tapOn:
           text: "Watch on YouTube"
