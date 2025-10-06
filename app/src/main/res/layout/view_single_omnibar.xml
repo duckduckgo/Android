@@ -195,13 +195,13 @@
                             </FrameLayout>
 
                             <View
-                                android:id="@+id/cookieDummyView"
+                                android:id="@+id/animatedIconBackgroundView"
                                 android:layout_width="@dimen/omnibarCookieAnimationBannerHeight"
                                 android:layout_height="?attr/cookiesAnimationHeight"
                                 android:layout_gravity="start|center_vertical"
                                 android:layout_marginStart="@dimen/keyline_1"
                                 android:alpha="0"
-                                android:background="@drawable/cookies_dummy_background"
+                                android:background="@drawable/animated_icon_dummy_background"
                                 app:layout_constraintBottom_toBottomOf="parent"
                                 app:layout_constraintStart_toStartOf="@id/omniBarContentContainer"
                                 app:layout_constraintTop_toTopOf="parent" />

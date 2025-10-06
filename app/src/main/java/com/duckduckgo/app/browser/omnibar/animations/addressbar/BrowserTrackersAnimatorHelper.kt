@@ -49,7 +49,7 @@ interface BrowserTrackersAnimatorHelper {
      * When animation finishes, view in [omnibarViews] and [shieldViews] will fade in.
      *
      * @param sceneRoot viewgroup where the scene for the animation will be placed.
-     * @param cookieBackground holder of the cookie consent animation background.
+     * @param animatedIconBackgroundView the icon background that will be animated.
      * @param addressBarTrackersBlockedAnimationShieldIcon holder of the address bar trackers blocked shield animation.
      * @param omnibarViews are the views that should be hidden while the animation is running.
      * @param shieldViews are the views that should be hidden while the animation is running.
@@ -58,7 +58,7 @@ interface BrowserTrackersAnimatorHelper {
     fun startAddressBarTrackersAnimation(
         context: Context,
         sceneRoot: ViewGroup,
-        cookieBackground: View,
+        animatedIconBackgroundView: View,
         addressBarTrackersBlockedAnimationShieldIcon: LottieAnimationView,
         omnibarViews: List<View>,
         shieldViews: List<View>,

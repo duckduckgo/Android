@@ -247,7 +247,7 @@ open class OmnibarLayout @JvmOverloads constructor(
     private val aiChatDivider: View by lazy { findViewById(R.id.verticalDivider) }
     internal val browserMenu: FrameLayout by lazy { findViewById(R.id.browserMenu) }
     internal val browserMenuHighlight: View by lazy { findViewById(R.id.browserMenuHighlight) }
-    internal val cookieDummyView: View by lazy { findViewById(R.id.cookieDummyView) }
+    internal val animatedIconBackgroundView: View by lazy { findViewById(R.id.animatedIconBackgroundView) }
     internal val cookieAnimation: LottieAnimationView by lazy { findViewById(R.id.cookieAnimation) }
     internal val sceneRoot: ViewGroup by lazy { findViewById(R.id.sceneRoot) }
     internal val omniBarContainer: View by lazy { findViewById(R.id.omniBarContainer) }
@@ -854,7 +854,7 @@ open class OmnibarLayout @JvmOverloads constructor(
                 context,
                 omnibarViews(),
                 shieldViews(),
-                cookieDummyView,
+                animatedIconBackgroundView,
                 cookieAnimation,
                 sceneRoot,
                 isCosmetic,
@@ -875,7 +875,7 @@ open class OmnibarLayout @JvmOverloads constructor(
                 context = context,
                 addressBarTrackersBlockedAnimationShieldIcon = addressBarTrackersBlockedAnimationShieldIcon,
                 sceneRoot = sceneRoot,
-                cookieBackground = cookieDummyView,
+                animatedIconBackgroundView = animatedIconBackgroundView,
                 omnibarViews = omnibarViews(),
                 shieldViews = shieldViews(),
                 entities = events,
