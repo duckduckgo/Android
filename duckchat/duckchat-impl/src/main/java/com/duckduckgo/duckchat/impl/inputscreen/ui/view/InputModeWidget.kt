@@ -72,7 +72,8 @@ class InputModeWidget @JvmOverloads constructor(
     private val inputModeSwitch: TabLayout
     private val inputModeWidgetCard: MaterialCardView
     private val inputScreenButtonsContainer: FrameLayout
-    private val inputFieldButtons: View
+    private val inputModeIconsContainer: View
+    private val inputModeWidgetLayout: View
     val tabSwitcherButton: InputScreenTabSwitcherButton
     private val menuButton: View
     private val fireButton: View
@@ -135,7 +136,8 @@ class InputModeWidget @JvmOverloads constructor(
         tabSwitcherButton = findViewById(R.id.inputFieldTabsMenu)
         voiceInputButton = findViewById(R.id.inputFieldVoiceSearchButton)
         inputScreenButtonsContainer = findViewById(R.id.inputScreenButtonsContainer)
-        inputFieldButtons = findViewById(R.id.inputModeIconsContainer)
+        inputModeIconsContainer = findViewById(R.id.inputModeIconsContainer)
+        inputModeWidgetLayout = findViewById(R.id.inputModeWidgetLayout)
 
         configureClickListeners()
         configureInputBehavior()
@@ -298,10 +300,24 @@ class InputModeWidget @JvmOverloads constructor(
             val text = inputField.text
             val isNullOrEmpty = text.isNullOrEmpty()
             logcat { "inputScreenLauncher: show 3 buttons  $isNullOrEmpty" }
-            fade(inputFieldButtons, isNullOrEmpty)
+            fade(inputModeIconsContainer, isNullOrEmpty)
+
+            inputModeWidgetLayout.updateLayoutParams<MarginLayoutParams> {
+                if (isNullOrEmpty) {
+                    marginEnd = 4f.toPx(context).roundToInt()
+                } else {
+                    marginEnd = 16f.toPx(context).roundToInt()
+                }
+                marginStart = 16f.toPx(context).roundToInt()
+            }
+
+            // change padding to make the buttons visible
+            // when portrait and buttons visible -> 4dp
+            // when portrait and buttons not visible -> 16dp
+            // when landsape -> always 170dp
         } else {
             // buttons always hidden in chat mode
-            fade(inputFieldButtons, false)
+            fade(inputModeIconsContainer, false)
         }
     }
 

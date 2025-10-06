@@ -63,10 +63,10 @@
         app:layout_constraintTop_toBottomOf="@id/inputModeSwitch" />
 
     <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/inputModeWidget"
+        android:id="@+id/inputModeWidgetLayout"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginHorizontal="@dimen/inputScreenOmnibarCardMarginHorizontal"
+        android:layout_marginStart="@dimen/inputScreenOmnibarCardMarginHorizontal"
         android:layout_marginTop="@dimen/omnibarCardMarginTop"
         android:orientation="horizontal"
         app:layout_constraintEnd_toEndOf="parent"
@@ -226,6 +226,6 @@
         android:layout_height="@dimen/omnibarCardMarginBottom"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/inputModeWidget" />
+        app:layout_constraintTop_toBottomOf="@id/inputModeWidgetLayout" />
 
 </merge>
