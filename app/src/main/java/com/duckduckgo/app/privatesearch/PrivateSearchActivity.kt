@@ -113,7 +113,7 @@ class PrivateSearchActivity : DuckDuckGoActivity() {
     }
 
     private fun launchCustomizeSearchWebPage() {
-        if (settingsPageFeature.saveAndExitSerpSettings().isEnabled()) {
+        if (settingsPageFeature.settingsWebView().isEnabled()) {
             globalActivityStarter.start(
                 this,
                 SettingsWebViewScreenWithParams(

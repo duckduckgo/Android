@@ -210,7 +210,7 @@ class DuckChatSettingsActivity : DuckDuckGoActivity() {
     private fun processCommand(command: DuckChatSettingsViewModel.Command) {
         when (command) {
             is DuckChatSettingsViewModel.Command.OpenLink -> {
-                if (settingsPageFeature.saveAndExitSerpSettings().isEnabled()) {
+                if (settingsPageFeature.settingsWebView().isEnabled()) {
                     globalActivityStarter.start(
                         this,
                         SettingsWebViewScreenWithParams(

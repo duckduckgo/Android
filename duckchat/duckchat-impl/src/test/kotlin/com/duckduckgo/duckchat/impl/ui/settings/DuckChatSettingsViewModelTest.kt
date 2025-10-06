@@ -60,7 +60,7 @@ class DuckChatSettingsViewModelTest {
     fun setUp() =
         runTest {
             @Suppress("DenyListedApi")
-            settingsPageFeature.saveAndExitSerpSettings().setRawStoredState(State(enable = false))
+            settingsPageFeature.settingsWebView().setRawStoredState(State(enable = false))
             whenever(duckChat.observeEnableDuckChatUserSetting()).thenReturn(flowOf(true))
             whenever(duckChat.observeShowInBrowserMenuUserSetting()).thenReturn(flowOf(false))
             whenever(duckChat.observeShowInAddressBarUserSetting()).thenReturn(flowOf(false))
@@ -244,7 +244,7 @@ class DuckChatSettingsViewModelTest {
     fun whenDuckChatSearchAISettingsClickedAndSaveAndExitEnabledThenOpenSettingsLinkWithReturnParamEmitted() =
         runTest {
             @Suppress("DenyListedApi")
-            settingsPageFeature.saveAndExitSerpSettings().setRawStoredState(State(enable = true))
+            settingsPageFeature.settingsWebView().setRawStoredState(State(enable = true))
 
             testee.duckChatSearchAISettingsClicked()
 

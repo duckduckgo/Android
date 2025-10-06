@@ -29,5 +29,5 @@ interface SettingsPageFeature {
 
     @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
     @Toggle.InternalAlwaysEnabled
-    fun saveAndExitSerpSettings(): Toggle
+    fun settingsWebView(): Toggle
 }
