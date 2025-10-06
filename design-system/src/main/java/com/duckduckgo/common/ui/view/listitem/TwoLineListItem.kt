@@ -54,6 +54,8 @@ class TwoLineListItem @JvmOverloads constructor(
         get() = binding.trailingSwitch
     override val betaPill: ImageView
         get() = binding.betaPill
+    override val newPill: ImageView?
+        get() = null
 
     override val itemContainer: View
         get() = binding.itemContainer
