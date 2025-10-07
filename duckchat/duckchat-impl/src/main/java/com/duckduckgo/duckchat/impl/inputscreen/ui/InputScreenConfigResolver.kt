@@ -40,6 +40,7 @@ interface InputScreenConfigResolver {
 @SingleInstanceIn(scope = ActivityScope::class)
 class InputScreenConfigResolverImpl @Inject constructor(
     private val duckChatInternal: DuckChatInternal,
+    @ActivityContext private val activityContext: Context,
 ) : InputScreenConfigResolver {
     companion object {
         fun useTopBar(
@@ -47,10 +48,6 @@ class InputScreenConfigResolverImpl @Inject constructor(
             duckChatInternal: DuckChatInternal,
         ): Boolean = isTopOmnibar || !duckChatInternal.inputScreenBottomBarEnabled.value
     }
-
-    @Inject
-    @ActivityContext
-    lateinit var activityContext: Context
 
     private var _isTopOmnibar = true
 
