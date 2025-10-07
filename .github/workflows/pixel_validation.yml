@@ -14,7 +14,7 @@ jobs:
             - name: Checkout repository
               uses: actions/checkout@v4
               with:
-                token: ${{ secrets.LADAMSKI_TEST }}
+                token: ${{ secrets.DAXMOBILE_ANDROID_AUTOMATION }}
                 ref: ${{ github.head_ref || github.ref }}
 
             - name: Use Node.js 20
@@ -32,7 +32,7 @@ jobs:
             - name: Checkout internal-github-asana-utils repo
               uses: actions/checkout@v4
               with:
-                  token: ${{ secrets.LADAMSKI_TEST }}
+                  token: ${{ secrets.DAXMOBILE_ANDROID_AUTOMATION }}
                   path: internal-github-asana-utils
                   repository: duckduckgo/internal-github-asana-utils
 
