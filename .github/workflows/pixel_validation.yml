@@ -32,7 +32,7 @@ jobs:
             - name: Checkout internal-github-asana-utils repo
               uses: actions/checkout@v4
               with:
-                  token: ${{ secrets.LADAMSKI_TEST  }}
+                  token: ${{ secrets.LADAMSKI_TEST }}
                   path: internal-github-asana-utils
                   repository: duckduckgo/internal-github-asana-utils
 
@@ -63,35 +63,7 @@ jobs:
                   git push
                 fi
 
-            - name: Run pixel validation (with annotations)
-              id: validate
-              shell: bash
-              run: |
-                set -o pipefail
-                LOG=validation.log
-                npm run validate-defs-without-formatting -- -g ../internal-github-asana-utils/user_map.yml 2>&1 | tee "$LOG"
-                status=$?
-                if [ $status -ne 0 ]; then
-                  echo "::group::Pixel validation errors"
-                  sed -n '1,200p' "$LOG"
-                  echo "::endgroup::"
-                  # Annotate lines that look like errors
-                  grep -i -E "error|fail" "$LOG" | sed 's/%/%25/g;s/\r/%0D/g;s/\n/%0A/g' | while read -r line; do
-                    echo "::error title=Pixel validation failed::${line}"
-                  done
-                  exit $status
-                fi
+            - name: Run pixel validation
+              run: npm run validate-defs-without-formatting -- -g ../internal-github-asana-utils/user_map.yml
               working-directory: PixelDefinitions
-
-            - name: Upload validation log
-              if: always()
-              uses: actions/upload-artifact@v4
-              with:
-                name: pixel-validation-log
-                path: PixelDefinitions/validation.log
-                if-no-files-found: ignore
-                retention-days: 5
-
-
-
 

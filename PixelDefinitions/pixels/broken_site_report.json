@@ -1,7 +1,7 @@
 {
     "epbf_android": {
         "description": "User sent broken site report",
-        "owners": [""],
+        "owners": [],
         "triggers": ["user_submitted"],
         "parameters": [
             "atb",
@@ -150,7 +150,7 @@
     },
     "protection-toggled-off-breakage-report_android": {
         "description": "User agreed to send broken site report after disabling protections",
-        "owners": [""],
+        "owners": [],
         "triggers": ["user_submitted"],
         "parameters": [
             "atb",
@@ -289,31 +289,31 @@
     },
     "m_report-broken-site_shown_android": {
         "description": "User opened the broken site report UI.",
-        "owners": ["mgurgel"],
+        "owners": [],
         "triggers": ["other"],
         "parameters": ["appVersion"]
     },
     "m_report-broken-site_sent_android": {
         "description": "User sent a broken site report.",
-        "owners": ["mgurgel"],
+        "owners": [],
         "triggers": ["other"],
         "parameters": ["appVersion"]
     },
     "m_reload-three-times-within-20-seconds_android": {
         "description": "User reloaded a tab three times in a 20 second window (indicating the site could be broken).",
-        "owners": [""],
+        "owners": [],
         "triggers": ["other"],
         "parameters": ["appVersion", "channel"]
     },
     "m_site-not-working_shown_android": {
         "description": "User was shown the prompt to send a broken site report after reloading a website three times in 20 seconds.",
-        "owners": [""],
+        "owners": [],
         "triggers": ["other"],
         "parameters": ["appVersion", "channel"]
     },
     "m_site-not-working_website-is-broken_android": {
         "description": "User agreed to send a broken site report when prompted, after they reloaded a website three times in 20 seconds.",
-        "owners": [""],
+        "owners": [],
         "triggers": ["other"],
         "parameters": ["appVersion", "channel"]
     }
