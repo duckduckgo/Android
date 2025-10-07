@@ -133,7 +133,7 @@ class DuckChatSettingsViewModel @Inject constructor(
                 commandChannel.send(
                     OpenLink(
                         DUCK_CHAT_SEARCH_AI_SETTINGS_LINK_EMBEDDED,
-                        R.string.duck_chat_search_assist_settings_title,
+                        R.string.duck_chat_assist_settings_title_rebranding,
                     ),
                 )
             } else {
