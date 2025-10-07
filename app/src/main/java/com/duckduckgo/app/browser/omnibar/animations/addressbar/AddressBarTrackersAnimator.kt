@@ -117,7 +117,7 @@ class AddressBarTrackersAnimator @Inject constructor(
                         .with(
                             commonAddressBarAnimationHelper.animateFadeIn(
                                 animatedIconBackgroundView,
-                                CommonAddressBarAnimationHelper.Companion.DEFAULT_ANIMATION_DURATION,
+                                CommonAddressBarAnimationHelper.DEFAULT_ANIMATION_DURATION,
                             ),
                         )
                     runningAnimators.add(this)
