@@ -561,7 +561,7 @@ open class OmnibarLayout @JvmOverloads constructor(
     open fun processCommand(command: OmnibarLayoutViewModel.Command) {
         when (command) {
             Command.CancelAnimations -> {
-                cancelTrackersAnimation()
+                cancelAddressBarAnimations()
             }
 
             is StartCookiesAnimation -> {
@@ -779,7 +779,7 @@ open class OmnibarLayout @JvmOverloads constructor(
             }
 
             Decoration.CancelAnimations -> {
-                cancelTrackersAnimation()
+                cancelAddressBarAnimations()
             }
 
             is LaunchTrackersAnimation -> {
@@ -863,7 +863,7 @@ open class OmnibarLayout @JvmOverloads constructor(
         }
     }
 
-    private fun cancelTrackersAnimation() {
+    private fun cancelAddressBarAnimations() {
         if (this::animatorHelper.isInitialized) {
             animatorHelper.cancelAnimations(omnibarViews())
         }
