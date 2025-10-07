@@ -79,10 +79,6 @@ interface PirActionsRunnerStateEngine {
             val email: String,
         ) : Event()
 
-        data class EmailConfirmationLinkReceived(
-            val confirmationLink: String,
-        ) : Event()
-
         data object ExecuteNextBrokerStep : Event()
 
         data class ExecuteBrokerStepAction(

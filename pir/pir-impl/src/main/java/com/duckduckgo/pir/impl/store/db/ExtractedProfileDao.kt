@@ -31,7 +31,7 @@ interface ExtractedProfileDao {
     fun getAllExtractedProfiles(): List<StoredExtractedProfile>
 
     @Query("SELECT * FROM pir_extracted_profiles WHERE id = :id ORDER BY dateAddedInMillis")
-    fun getExtractedProfile(id: Long): StoredExtractedProfile
+    fun getExtractedProfile(id: Long): StoredExtractedProfile?
 
     @Query("SELECT * FROM pir_extracted_profiles WHERE profileQueryId = :profileQueryId ORDER BY dateAddedInMillis")
     fun getExtractedProfilesForProfile(profileQueryId: Long): List<StoredExtractedProfile>

@@ -25,8 +25,6 @@ import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerScanA
 import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerScheduledScanCompleted
 import com.duckduckgo.pir.impl.models.AddressCityState
 import com.duckduckgo.pir.impl.models.ExtractedProfile
-import com.duckduckgo.pir.impl.models.scheduling.JobRecord.EmailConfirmationJobRecord
-import com.duckduckgo.pir.impl.models.scheduling.JobRecord.EmailConfirmationJobRecord.EmailData
 import com.duckduckgo.pir.impl.pixels.PirPixelSender
 import com.duckduckgo.pir.impl.scheduling.JobRecordUpdater
 import com.duckduckgo.pir.impl.scripts.models.PirSuccessResponse.ExtractedResponse
@@ -35,7 +33,6 @@ import com.duckduckgo.pir.impl.scripts.models.PirSuccessResponse.ExtractedRespon
 import com.duckduckgo.pir.impl.scripts.models.PirSuccessResponse.NavigateResponse
 import com.duckduckgo.pir.impl.store.PirEventsRepository
 import com.duckduckgo.pir.impl.store.PirRepository
-import com.duckduckgo.pir.impl.store.PirSchedulingRepository
 import com.duckduckgo.pir.impl.store.db.BrokerScanEventType.BROKER_ERROR
 import com.duckduckgo.pir.impl.store.db.BrokerScanEventType.BROKER_SUCCESS
 import com.duckduckgo.pir.impl.store.db.PirBrokerScanLog
@@ -58,7 +55,6 @@ class RealPirRunStateHandlerTest {
     private val mockEventsRepository: PirEventsRepository = mock()
     private val mockPixelSender: PirPixelSender = mock()
     private val mockJobRecordUpdater: JobRecordUpdater = mock()
-    private val mockSchedulingRepository: PirSchedulingRepository = mock()
 
     @Before
     fun setUp() {
@@ -69,7 +65,6 @@ class RealPirRunStateHandlerTest {
                 pixelSender = mockPixelSender,
                 dispatcherProvider = coroutineRule.testDispatcherProvider,
                 jobRecordUpdater = mockJobRecordUpdater,
-                schedulingRepository = mockSchedulingRepository,
             )
     }
 
@@ -458,21 +453,15 @@ class RealPirRunStateHandlerTest {
                     extractedProfile = testExtractedProfile,
                     attemptId = "c9982ded-021a-4251-9e03-2c58b130410f",
                 )
-            val expectedEmailConfirmationJobRecord =
-                EmailConfirmationJobRecord(
-                    userProfileId = testProfileQueryId,
-                    extractedProfileId = testExtractedProfileId,
-                    brokerName = testBrokerName,
-                    emailData =
-                    EmailData(
-                        email = "john@example.com",
-                        attemptId = "c9982ded-021a-4251-9e03-2c58b130410f",
-                    ),
-                )
 
             testee.handleState(state)
 
-            verify(mockSchedulingRepository).saveEmailConfirmationJobRecord(expectedEmailConfirmationJobRecord)
-            verify(mockJobRecordUpdater).markOptOutAsWaitingForEmailConfirmation(testExtractedProfileId)
+            verify(mockJobRecordUpdater).markOptOutAsWaitingForEmailConfirmation(
+                profileQueryId = testProfileQueryId,
+                extractedProfileId = testExtractedProfileId,
+                brokerName = testBrokerName,
+                email = "john@example.com",
+                attemptId = "c9982ded-021a-4251-9e03-2c58b130410f",
+            )
         }
 }

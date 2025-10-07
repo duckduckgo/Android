@@ -51,6 +51,7 @@ class RealPirEmailConfirmationJobsRunner @Inject constructor(
     private val emailConfirmation: PirEmailConfirmation,
 ) : PirEmailConfirmationJobsRunner {
     override suspend fun runEligibleJobs(context: Context): Result<Unit> {
+        logcat { "PIR-EMAIL-CONFIRMATION: Starting run." }
         val activeBrokers = pirRepository.getAllActiveBrokers()
         runEmailConfirmationFetch(activeBrokers)
         runEmailConfirmationJobs(context, activeBrokers)
@@ -81,7 +82,7 @@ class RealPirEmailConfirmationJobsRunner @Inject constructor(
             val emailDataForDeletion = mutableListOf<EmailData>()
 
             eligibleJobRecordsMap.forEach {
-                jobRecordUpdater.recordEmailConfirmationFetchAttempt(it.value.extractedProfileId)
+                jobRecordUpdater.recordEmailConfirmationFetchAttempt(it.value)
             }
 
             pirRepository.getEmailConfirmationLinkStatus(eligibleJobRecordsMap.values.map { it.emailData }).forEach {
@@ -95,20 +96,18 @@ class RealPirEmailConfirmationJobsRunner @Inject constructor(
                 when (val status = it.value) {
                     is EmailConfirmationLinkFetchStatus.Ready -> {
                         status.data[KEY_LINK]?.let { link ->
-                            jobRecordUpdater.markEmailConfirmationWithLink(record.extractedProfileId, link)
+                            jobRecordUpdater.markEmailConfirmationWithLink(record, link)
                             emailDataForDeletion.add(it.key)
                         }
                     }
 
                     is EmailConfirmationLinkFetchStatus.Error -> {
-                        pirSchedulingRepository.deleteEmailConfirmationJobRecord(record.extractedProfileId)
-                        jobRecordUpdater.updateOptOutError(record.extractedProfileId)
+                        jobRecordUpdater.markEmailConfirmationLinkFetchFailed(record)
                         emailDataForDeletion.add(it.key)
                     }
 
                     is EmailConfirmationLinkFetchStatus.Unknown -> {
-                        pirSchedulingRepository.deleteEmailConfirmationJobRecord(record.extractedProfileId)
-                        jobRecordUpdater.updateOptOutError(record.extractedProfileId)
+                        jobRecordUpdater.markEmailConfirmationLinkFetchFailed(record)
                     }
 
                     is EmailConfirmationLinkFetchStatus.Pending -> {
@@ -155,8 +154,7 @@ class RealPirEmailConfirmationJobsRunner @Inject constructor(
         if (toDelete.isNotEmpty()) {
             logcat { "PIR-EMAIL-CONFIRMATION: Cleaning up ${toDelete.size} records that maxed attempts" }
             toDelete.forEach {
-                pirSchedulingRepository.deleteEmailConfirmationJobRecord(it.extractedProfileId)
-                jobRecordUpdater.updateOptOutError(it.extractedProfileId)
+                jobRecordUpdater.recordEmailConfirmationAttemptMaxed(it)
             }
         } else {
             logcat { "PIR-EMAIL-CONFIRMATION: Nothing to clean" }

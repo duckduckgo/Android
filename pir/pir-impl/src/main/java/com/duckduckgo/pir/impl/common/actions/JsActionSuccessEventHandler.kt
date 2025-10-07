@@ -18,6 +18,7 @@ package com.duckduckgo.pir.impl.common.actions
 
 import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.pir.impl.common.BrokerStepsParser.BrokerStep.EmailConfirmationStep
 import com.duckduckgo.pir.impl.common.BrokerStepsParser.BrokerStep.OptOutStep
 import com.duckduckgo.pir.impl.common.PirRunStateHandler
 import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerOptOutActionSucceeded
@@ -70,6 +71,16 @@ class JsActionSuccessEventHandler @Inject constructor(
         )
 
         if (currentBrokerStep is OptOutStep) {
+            pirRunStateHandler.handleState(
+                BrokerOptOutActionSucceeded(
+                    brokerName = currentBrokerStep.brokerName,
+                    extractedProfile = currentBrokerStep.profileToOptOut,
+                    completionTimeInMillis = currentTimeProvider.currentTimeMillis(),
+                    actionType = pirSuccessResponse.actionType,
+                    result = pirSuccessResponse,
+                ),
+            )
+        } else if (currentBrokerStep is EmailConfirmationStep) {
             pirRunStateHandler.handleState(
                 BrokerOptOutActionSucceeded(
                     brokerName = currentBrokerStep.brokerName,
