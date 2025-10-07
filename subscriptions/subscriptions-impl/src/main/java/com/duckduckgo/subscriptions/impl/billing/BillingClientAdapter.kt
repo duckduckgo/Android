@@ -79,7 +79,7 @@ sealed class QueryPurchasesResult {
     data class Success(val purchases: List<Purchase>) : QueryPurchasesResult()
     data class Failure(
         val billingError: BillingError? = null,
-        val debugMessage: String? = null
+        val debugMessage: String? = null,
     ) : QueryPurchasesResult()
 }
 

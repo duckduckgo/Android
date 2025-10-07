@@ -154,7 +154,7 @@ class RealBillingClientAdapter @Inject constructor(
         if (client == null || !client.isReady) {
             return@withContext QueryPurchasesResult.Failure(
                 billingError = BillingError.SERVICE_DISCONNECTED,
-                debugMessage = "BillingClient is not ready"
+                debugMessage = "BillingClient is not ready",
             )
         }
 
@@ -173,7 +173,7 @@ class RealBillingClientAdapter @Inject constructor(
                     val billingError = billingResult.responseCode.toBillingError()
                     QueryPurchasesResult.Failure(
                         billingError = billingError,
-                        debugMessage = billingResult.debugMessage
+                        debugMessage = billingResult.debugMessage,
                     )
                 }
             }
@@ -181,7 +181,7 @@ class RealBillingClientAdapter @Inject constructor(
             logcat(WARN) { "Error querying purchases: ${e.asLog()}" }
             QueryPurchasesResult.Failure(
                 billingError = BILLING_CRASH_ERROR,
-                debugMessage = e.message
+                debugMessage = e.message,
             )
         }
     }

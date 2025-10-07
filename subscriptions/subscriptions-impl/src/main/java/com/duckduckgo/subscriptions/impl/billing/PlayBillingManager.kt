@@ -380,11 +380,11 @@ class RealPlayBillingManager @Inject constructor(
     override suspend fun getLatestPurchaseToken(): String? = withContext(dispatcherProvider.io()) {
         val activePurchases = purchases.filter { purchase: Purchase ->
             purchase.products.contains(BASIC_SUBSCRIPTION) &&
-            purchase.purchaseState == Purchase.PurchaseState.PURCHASED
+                purchase.purchaseState == Purchase.PurchaseState.PURCHASED
         }
 
         val latestPurchase = activePurchases.maxByOrNull { it.purchaseTime }
-        
+
         return@withContext if (latestPurchase != null) {
             val tokenPreview = latestPurchase.purchaseToken.take(10) + "..."
             logcat { "Billing: Latest active purchase token preview: $tokenPreview" }
