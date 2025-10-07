@@ -25,6 +25,7 @@ import com.duckduckgo.js.messaging.api.JsMessaging
 import com.duckduckgo.pir.impl.dashboard.messaging.PirDashboardWebMessages
 import com.duckduckgo.pir.impl.dashboard.messaging.handlers.PirMessageHandlerUtils.createJsMessage
 import com.duckduckgo.pir.impl.dashboard.messaging.handlers.PirMessageHandlerUtils.verifyResponse
+import com.duckduckgo.pir.impl.dashboard.state.PirWebProfileStateHolder
 import com.duckduckgo.pir.impl.models.Address
 import com.duckduckgo.pir.impl.models.ProfileQuery
 import com.duckduckgo.pir.impl.store.PirRepository
@@ -53,6 +54,7 @@ class PirWebGetCurrentUserProfileMessageHandlerTest {
     private val mockJsMessaging: JsMessaging = mock()
     private val mockJsMessageCallback: JsMessageCallback = mock()
     private val testScope = TestScope()
+    private val mockPirWebProfileStateHolder: PirWebProfileStateHolder = mock()
 
     @Before
     fun setUp() {
@@ -60,6 +62,7 @@ class PirWebGetCurrentUserProfileMessageHandlerTest {
             repository = mockRepository,
             dispatcherProvider = coroutineRule.testDispatcherProvider,
             appCoroutineScope = testScope,
+            pirWebProfileStateHolder = mockPirWebProfileStateHolder,
         )
     }
 
@@ -79,6 +82,7 @@ class PirWebGetCurrentUserProfileMessageHandlerTest {
 
         // Then
         verify(mockRepository).getUserProfileQueries()
+        verify(mockPirWebProfileStateHolder).setLoadedProfileQueries(emptyList())
         verifyResponse(jsMessage, true, mockJsMessaging)
     }
 
@@ -100,6 +104,7 @@ class PirWebGetCurrentUserProfileMessageHandlerTest {
 
         // Then
         verify(mockRepository).getUserProfileQueries()
+        verify(mockPirWebProfileStateHolder).setLoadedProfileQueries(listOf(profileQuery))
         verifyProfileResponse(
             jsMessage,
             expectedNames = listOf(ExpectedName("John", "Michael", "Doe")),
@@ -123,6 +128,7 @@ class PirWebGetCurrentUserProfileMessageHandlerTest {
 
         // Then
         verify(mockRepository).getUserProfileQueries()
+        verify(mockPirWebProfileStateHolder).setLoadedProfileQueries(listOf(profile1, profile2))
         verifyProfileResponse(
             jsMessage,
             expectedNames = listOf(ExpectedName("John", "Michael", "Doe")),
@@ -148,6 +154,7 @@ class PirWebGetCurrentUserProfileMessageHandlerTest {
 
         // Then
         verify(mockRepository).getUserProfileQueries()
+        verify(mockPirWebProfileStateHolder).setLoadedProfileQueries(listOf(profile1, profile2))
         verifyProfileResponse(
             jsMessage,
             expectedNames = listOf(
@@ -177,6 +184,7 @@ class PirWebGetCurrentUserProfileMessageHandlerTest {
 
         // Then
         verify(mockRepository).getUserProfileQueries()
+        verify(mockPirWebProfileStateHolder).setLoadedProfileQueries(listOf(profileQuery))
         verifyProfileResponse(
             jsMessage,
             expectedNames = listOf(ExpectedName("Jane", "", "Smith")),
@@ -201,6 +209,7 @@ class PirWebGetCurrentUserProfileMessageHandlerTest {
 
         // Then
         verify(mockRepository).getUserProfileQueries()
+        verify(mockPirWebProfileStateHolder).setLoadedProfileQueries(listOf(profile))
         verifyProfileResponse(
             jsMessage,
             expectedNames = listOf(ExpectedName("Bob", "", "Johnson")),
@@ -225,6 +234,7 @@ class PirWebGetCurrentUserProfileMessageHandlerTest {
 
         // Then
         verify(mockRepository).getUserProfileQueries()
+        verify(mockPirWebProfileStateHolder).setLoadedProfileQueries(listOf(profileQuery))
         verifyProfileResponse(
             jsMessage,
             expectedNames = listOf(ExpectedName("Test", "", "User")),
@@ -233,12 +243,54 @@ class PirWebGetCurrentUserProfileMessageHandlerTest {
         )
     }
 
+    @Test
+    fun whenProcessWithDeprecatedProfilesThenFiltersThemOut() = runTest {
+        // Given
+        val jsMessage = createJsMessage("""""", PirDashboardWebMessages.GET_CURRENT_USER_PROFILE)
+        val activeProfile = createProfileQuery("Active", null, "User", 1990, listOf(Address("Active City", "AC")))
+        val deprecatedProfile = createProfileQuery("Deprecated", null, "User", 1985, listOf(Address("Deprecated City", "DC")), deprecated = true)
+
+        whenever(mockRepository.getUserProfileQueries()).thenReturn(listOf(activeProfile, deprecatedProfile))
+
+        // When
+        testee.process(jsMessage, mockJsMessaging, mockJsMessageCallback)
+
+        // Then
+        verify(mockRepository).getUserProfileQueries()
+        verify(mockPirWebProfileStateHolder).setLoadedProfileQueries(listOf(activeProfile)) // Only active profile
+        verifyProfileResponse(
+            jsMessage,
+            expectedNames = listOf(ExpectedName("Active", "", "User")),
+            expectedAddresses = listOf(ExpectedAddress("Active City", "AC")),
+            expectedBirthYear = 1990,
+        )
+    }
+
+    @Test
+    fun whenProcessWithAllDeprecatedProfilesThenReturnsEmptySuccess() = runTest {
+        // Given
+        val jsMessage = createJsMessage("""""", PirDashboardWebMessages.GET_CURRENT_USER_PROFILE)
+        val deprecatedProfile1 = createProfileQuery("Deprecated1", null, "User", 1990, listOf(Address("City1", "C1")), deprecated = true)
+        val deprecatedProfile2 = createProfileQuery("Deprecated2", null, "User", 1985, listOf(Address("City2", "C2")), deprecated = true)
+
+        whenever(mockRepository.getUserProfileQueries()).thenReturn(listOf(deprecatedProfile1, deprecatedProfile2))
+
+        // When
+        testee.process(jsMessage, mockJsMessaging, mockJsMessageCallback)
+
+        // Then
+        verify(mockRepository).getUserProfileQueries()
+        verify(mockPirWebProfileStateHolder).setLoadedProfileQueries(emptyList()) // No active profiles
+        verifyResponse(jsMessage, true, mockJsMessaging)
+    }
+
     private fun createProfileQuery(
         firstName: String,
         middleName: String?,
         lastName: String,
         birthYear: Int,
         addresses: List<Address>,
+        deprecated: Boolean = false,
     ): ProfileQuery {
         return ProfileQuery(
             id = 1,
@@ -251,7 +303,7 @@ class PirWebGetCurrentUserProfileMessageHandlerTest {
             birthYear = birthYear,
             fullName = if (middleName != null) "$firstName $middleName $lastName" else "$firstName $lastName",
             age = 2025 - birthYear,
-            deprecated = false,
+            deprecated = deprecated,
         )
     }
 

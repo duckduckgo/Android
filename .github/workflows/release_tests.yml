@@ -140,7 +140,7 @@ jobs:
         if: always()
         run: |
           echo "Console URL: ${{ steps.release-tests.outputs.MAESTRO_CLOUD_CONSOLE_URL }}"
-          echo "Flow Results (JSON): ${{ steps.release-tests.outputs.MAESTRO_CLOUD_FLOW_RESULTS }}"
+          echo 'Flow Results (JSON): ${{ steps.release-tests.outputs.MAESTRO_CLOUD_FLOW_RESULTS }}'
           echo "Release Tests Step Conclusion: ${{ steps.release-tests.conclusion }}" # From Maestro action itself
           echo "Analyzed Flow Summary Status: ${{ steps.analyze-flow-results.outputs.flow_summary_status }}" # From our script
 

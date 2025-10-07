@@ -22,7 +22,7 @@ import com.duckduckgo.js.messaging.api.JsMessaging
 import com.duckduckgo.pir.impl.dashboard.messaging.PirDashboardWebMessages.SET_NAME_AT_INDEX_IN_CURRENT_USER_PROFILE
 import com.duckduckgo.pir.impl.dashboard.messaging.handlers.PirMessageHandlerUtils.createJsMessage
 import com.duckduckgo.pir.impl.dashboard.messaging.handlers.PirMessageHandlerUtils.verifyResponse
-import com.duckduckgo.pir.impl.dashboard.state.PirWebOnboardingStateHolder
+import com.duckduckgo.pir.impl.dashboard.state.PirWebProfileStateHolder
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
@@ -37,14 +37,14 @@ class PirWebSetNameAtIndexInCurrentUserProfileMessageHandlerTest {
 
     private lateinit var testee: PirWebSetNameAtIndexInCurrentUserProfileMessageHandler
 
-    private val mockPirWebOnboardingStateHolder: PirWebOnboardingStateHolder = mock()
+    private val mockPirWebProfileStateHolder: PirWebProfileStateHolder = mock()
     private val mockJsMessaging: JsMessaging = mock()
     private val mockJsMessageCallback: JsMessageCallback = mock()
 
     @Before
     fun setUp() {
         testee = PirWebSetNameAtIndexInCurrentUserProfileMessageHandler(
-            pirWebOnboardingStateHolder = mockPirWebOnboardingStateHolder,
+            pirWebProfileStateHolder = mockPirWebProfileStateHolder,
         )
     }
 
@@ -61,7 +61,7 @@ class PirWebSetNameAtIndexInCurrentUserProfileMessageHandlerTest {
             method = SET_NAME_AT_INDEX_IN_CURRENT_USER_PROFILE,
         )
         whenever(
-            mockPirWebOnboardingStateHolder.setNameAtIndex(
+            mockPirWebProfileStateHolder.setNameAtIndex(
                 0,
                 "John",
                 "Michael",
@@ -73,7 +73,7 @@ class PirWebSetNameAtIndexInCurrentUserProfileMessageHandlerTest {
         testee.process(jsMessage, mockJsMessaging, mockJsMessageCallback)
 
         // Then
-        verify(mockPirWebOnboardingStateHolder).setNameAtIndex(0, "John", "Michael", "Doe")
+        verify(mockPirWebProfileStateHolder).setNameAtIndex(0, "John", "Michael", "Doe")
         verifyResponse(jsMessage, true, mockJsMessaging)
     }
 
@@ -84,7 +84,7 @@ class PirWebSetNameAtIndexInCurrentUserProfileMessageHandlerTest {
             paramsJson = """{"index": 1, "name": {"first": "Jane", "last": "Smith"}}""",
             method = SET_NAME_AT_INDEX_IN_CURRENT_USER_PROFILE,
         )
-        whenever(mockPirWebOnboardingStateHolder.setNameAtIndex(1, "Jane", "", "Smith")).thenReturn(
+        whenever(mockPirWebProfileStateHolder.setNameAtIndex(1, "Jane", "", "Smith")).thenReturn(
             true,
         )
 
@@ -92,7 +92,7 @@ class PirWebSetNameAtIndexInCurrentUserProfileMessageHandlerTest {
         testee.process(jsMessage, mockJsMessaging, mockJsMessageCallback)
 
         // Then
-        verify(mockPirWebOnboardingStateHolder).setNameAtIndex(1, "Jane", "", "Smith")
+        verify(mockPirWebProfileStateHolder).setNameAtIndex(1, "Jane", "", "Smith")
         verifyResponse(jsMessage, true, mockJsMessaging)
     }
 
@@ -104,7 +104,7 @@ class PirWebSetNameAtIndexInCurrentUserProfileMessageHandlerTest {
             method = SET_NAME_AT_INDEX_IN_CURRENT_USER_PROFILE,
         )
         whenever(
-            mockPirWebOnboardingStateHolder.setNameAtIndex(
+            mockPirWebProfileStateHolder.setNameAtIndex(
                 0,
                 "Bob",
                 "",
@@ -116,7 +116,7 @@ class PirWebSetNameAtIndexInCurrentUserProfileMessageHandlerTest {
         testee.process(jsMessage, mockJsMessaging, mockJsMessageCallback)
 
         // Then
-        verify(mockPirWebOnboardingStateHolder).setNameAtIndex(0, "Bob", "", "Johnson")
+        verify(mockPirWebProfileStateHolder).setNameAtIndex(0, "Bob", "", "Johnson")
         verifyResponse(jsMessage, true, mockJsMessaging)
     }
 
@@ -128,7 +128,7 @@ class PirWebSetNameAtIndexInCurrentUserProfileMessageHandlerTest {
             method = SET_NAME_AT_INDEX_IN_CURRENT_USER_PROFILE,
         )
         whenever(
-            mockPirWebOnboardingStateHolder.setNameAtIndex(
+            mockPirWebProfileStateHolder.setNameAtIndex(
                 2,
                 "Alice",
                 "Marie",
@@ -140,7 +140,7 @@ class PirWebSetNameAtIndexInCurrentUserProfileMessageHandlerTest {
         testee.process(jsMessage, mockJsMessaging, mockJsMessageCallback)
 
         // Then
-        verify(mockPirWebOnboardingStateHolder).setNameAtIndex(2, "Alice", "Marie", "Brown")
+        verify(mockPirWebProfileStateHolder).setNameAtIndex(2, "Alice", "Marie", "Brown")
         verifyResponse(jsMessage, true, mockJsMessaging)
     }
 
@@ -152,7 +152,7 @@ class PirWebSetNameAtIndexInCurrentUserProfileMessageHandlerTest {
             method = SET_NAME_AT_INDEX_IN_CURRENT_USER_PROFILE,
         )
         whenever(
-            mockPirWebOnboardingStateHolder.setNameAtIndex(
+            mockPirWebProfileStateHolder.setNameAtIndex(
                 0,
                 "Charlie",
                 "",
@@ -164,7 +164,7 @@ class PirWebSetNameAtIndexInCurrentUserProfileMessageHandlerTest {
         testee.process(jsMessage, mockJsMessaging, mockJsMessageCallback)
 
         // Then
-        verify(mockPirWebOnboardingStateHolder, org.mockito.kotlin.never()).setNameAtIndex(
+        verify(mockPirWebProfileStateHolder, org.mockito.kotlin.never()).setNameAtIndex(
             any(),
             any(),
             any(),
@@ -185,7 +185,7 @@ class PirWebSetNameAtIndexInCurrentUserProfileMessageHandlerTest {
         testee.process(jsMessage, mockJsMessaging, mockJsMessageCallback)
 
         // Then
-        verify(mockPirWebOnboardingStateHolder, org.mockito.kotlin.never()).setNameAtIndex(
+        verify(mockPirWebProfileStateHolder, org.mockito.kotlin.never()).setNameAtIndex(
             any(),
             any(),
             any(),
@@ -206,7 +206,7 @@ class PirWebSetNameAtIndexInCurrentUserProfileMessageHandlerTest {
         testee.process(jsMessage, mockJsMessaging, mockJsMessageCallback)
 
         // Then
-        verify(mockPirWebOnboardingStateHolder, org.mockito.kotlin.never()).setNameAtIndex(
+        verify(mockPirWebProfileStateHolder, org.mockito.kotlin.never()).setNameAtIndex(
             any(),
             any(),
             any(),
@@ -227,7 +227,7 @@ class PirWebSetNameAtIndexInCurrentUserProfileMessageHandlerTest {
         testee.process(jsMessage, mockJsMessaging, mockJsMessageCallback)
 
         // Then
-        verify(mockPirWebOnboardingStateHolder, org.mockito.kotlin.never()).setNameAtIndex(
+        verify(mockPirWebProfileStateHolder, org.mockito.kotlin.never()).setNameAtIndex(
             any(),
             any(),
             any(),
@@ -248,7 +248,7 @@ class PirWebSetNameAtIndexInCurrentUserProfileMessageHandlerTest {
         testee.process(jsMessage, mockJsMessaging, mockJsMessageCallback)
 
         // Then
-        verify(mockPirWebOnboardingStateHolder, org.mockito.kotlin.never()).setNameAtIndex(
+        verify(mockPirWebProfileStateHolder, org.mockito.kotlin.never()).setNameAtIndex(
             any(),
             any(),
             any(),
@@ -269,7 +269,7 @@ class PirWebSetNameAtIndexInCurrentUserProfileMessageHandlerTest {
         testee.process(jsMessage, mockJsMessaging, mockJsMessageCallback)
 
         // Then
-        verify(mockPirWebOnboardingStateHolder, org.mockito.kotlin.never()).setNameAtIndex(
+        verify(mockPirWebProfileStateHolder, org.mockito.kotlin.never()).setNameAtIndex(
             any(),
             any(),
             any(),
@@ -290,7 +290,7 @@ class PirWebSetNameAtIndexInCurrentUserProfileMessageHandlerTest {
         testee.process(jsMessage, mockJsMessaging, mockJsMessageCallback)
 
         // Then
-        verify(mockPirWebOnboardingStateHolder, org.mockito.kotlin.never()).setNameAtIndex(
+        verify(mockPirWebProfileStateHolder, org.mockito.kotlin.never()).setNameAtIndex(
             any(),
             any(),
             any(),
@@ -311,7 +311,7 @@ class PirWebSetNameAtIndexInCurrentUserProfileMessageHandlerTest {
         testee.process(jsMessage, mockJsMessaging, mockJsMessageCallback)
 
         // Then
-        verify(mockPirWebOnboardingStateHolder, org.mockito.kotlin.never()).setNameAtIndex(
+        verify(mockPirWebProfileStateHolder, org.mockito.kotlin.never()).setNameAtIndex(
             any(),
             any(),
             any(),
@@ -332,7 +332,7 @@ class PirWebSetNameAtIndexInCurrentUserProfileMessageHandlerTest {
         testee.process(jsMessage, mockJsMessaging, mockJsMessageCallback)
 
         // Then
-        verify(mockPirWebOnboardingStateHolder, org.mockito.kotlin.never()).setNameAtIndex(
+        verify(mockPirWebProfileStateHolder, org.mockito.kotlin.never()).setNameAtIndex(
             any(),
             any(),
             any(),
@@ -349,7 +349,7 @@ class PirWebSetNameAtIndexInCurrentUserProfileMessageHandlerTest {
             method = SET_NAME_AT_INDEX_IN_CURRENT_USER_PROFILE,
         )
         whenever(
-            mockPirWebOnboardingStateHolder.setNameAtIndex(
+            mockPirWebProfileStateHolder.setNameAtIndex(
                 0,
                 "John",
                 "Michael",
@@ -361,7 +361,7 @@ class PirWebSetNameAtIndexInCurrentUserProfileMessageHandlerTest {
         testee.process(jsMessage, mockJsMessaging, mockJsMessageCallback)
 
         // Then
-        verify(mockPirWebOnboardingStateHolder).setNameAtIndex(0, "John", "Michael", "Doe")
+        verify(mockPirWebProfileStateHolder).setNameAtIndex(0, "John", "Michael", "Doe")
         verifyResponse(jsMessage, false, mockJsMessaging)
     }
 
@@ -372,7 +372,7 @@ class PirWebSetNameAtIndexInCurrentUserProfileMessageHandlerTest {
             paramsJson = """{"index": 5, "name": {"first": "John", "last": "Doe"}}""",
             method = SET_NAME_AT_INDEX_IN_CURRENT_USER_PROFILE,
         )
-        whenever(mockPirWebOnboardingStateHolder.setNameAtIndex(5, "John", "", "Doe")).thenReturn(
+        whenever(mockPirWebProfileStateHolder.setNameAtIndex(5, "John", "", "Doe")).thenReturn(
             false,
         )
 
@@ -380,7 +380,7 @@ class PirWebSetNameAtIndexInCurrentUserProfileMessageHandlerTest {
         testee.process(jsMessage, mockJsMessaging, mockJsMessageCallback)
 
         // Then
-        verify(mockPirWebOnboardingStateHolder).setNameAtIndex(5, "John", "", "Doe")
+        verify(mockPirWebProfileStateHolder).setNameAtIndex(5, "John", "", "Doe")
         verifyResponse(jsMessage, false, mockJsMessaging)
     }
 
@@ -396,7 +396,7 @@ class PirWebSetNameAtIndexInCurrentUserProfileMessageHandlerTest {
         testee.process(jsMessage, mockJsMessaging, mockJsMessageCallback)
 
         // Then
-        verify(mockPirWebOnboardingStateHolder, org.mockito.kotlin.never()).setNameAtIndex(
+        verify(mockPirWebProfileStateHolder, org.mockito.kotlin.never()).setNameAtIndex(
             any(),
             any(),
             any(),
@@ -417,7 +417,7 @@ class PirWebSetNameAtIndexInCurrentUserProfileMessageHandlerTest {
         testee.process(jsMessage, mockJsMessaging, mockJsMessageCallback)
 
         // Then
-        verify(mockPirWebOnboardingStateHolder, org.mockito.kotlin.never()).setNameAtIndex(
+        verify(mockPirWebProfileStateHolder, org.mockito.kotlin.never()).setNameAtIndex(
             any(),
             any(),
             any(),
@@ -438,7 +438,7 @@ class PirWebSetNameAtIndexInCurrentUserProfileMessageHandlerTest {
         testee.process(jsMessage, mockJsMessaging, mockJsMessageCallback)
 
         // Then
-        verify(mockPirWebOnboardingStateHolder, org.mockito.kotlin.never()).setNameAtIndex(
+        verify(mockPirWebProfileStateHolder, org.mockito.kotlin.never()).setNameAtIndex(
             any(),
             any(),
             any(),

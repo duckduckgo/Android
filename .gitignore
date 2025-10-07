@@ -46,6 +46,9 @@ captures/
 !.idea/copyright/
 .idea/workspace.xml
 
+# VSCode
+.vscode/*
+
 # Keystore files
 *.jks
 

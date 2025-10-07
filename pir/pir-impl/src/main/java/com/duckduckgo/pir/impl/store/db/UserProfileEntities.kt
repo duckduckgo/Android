@@ -29,6 +29,7 @@ data class UserProfile(
     val addresses: Address,
     val birthYear: Int,
     val phone: String? = null,
+    val deprecated: Boolean = false, // This should tell us if the profile is irrelevant for PIR (this is not me, profile edits)
 )
 
 data class UserName(

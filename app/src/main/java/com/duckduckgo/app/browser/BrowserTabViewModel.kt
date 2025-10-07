@@ -3839,6 +3839,8 @@ class BrowserTabViewModel @Inject constructor(
         isActiveCustomTab: Boolean = false,
         getWebViewUrl: () -> String?,
     ) {
+        logcat { "jsCallback $featureName $method $data" }
+
         when (method) {
             "webShare" ->
                 if (id != null && data != null) {

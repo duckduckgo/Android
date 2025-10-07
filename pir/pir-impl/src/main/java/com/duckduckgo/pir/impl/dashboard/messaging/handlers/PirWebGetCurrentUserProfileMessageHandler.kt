@@ -24,6 +24,7 @@ import com.duckduckgo.js.messaging.api.JsMessageCallback
 import com.duckduckgo.js.messaging.api.JsMessaging
 import com.duckduckgo.pir.impl.dashboard.messaging.PirDashboardWebMessages
 import com.duckduckgo.pir.impl.dashboard.messaging.model.PirWebMessageResponse
+import com.duckduckgo.pir.impl.dashboard.state.PirWebProfileStateHolder
 import com.duckduckgo.pir.impl.store.PirRepository
 import com.duckduckgo.pir.impl.store.db.UserName
 import com.squareup.anvil.annotations.ContributesMultibinding
@@ -44,6 +45,7 @@ class PirWebGetCurrentUserProfileMessageHandler @Inject constructor(
     private val repository: PirRepository,
     private val dispatcherProvider: DispatcherProvider,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
+    private val pirWebProfileStateHolder: PirWebProfileStateHolder,
 ) : PirWebJsMessageHandler() {
 
     override val message = PirDashboardWebMessages.GET_CURRENT_USER_PROFILE
@@ -56,7 +58,10 @@ class PirWebGetCurrentUserProfileMessageHandler @Inject constructor(
         logcat { "PIR-WEB: PirWebGetCurrentUserProfileMessageHandler: process $jsMessage" }
 
         appCoroutineScope.launch(dispatcherProvider.io()) {
+            // TODO consider moving the deprecated filtering to the DB layer when updating job handling for new profiles
             val profiles = repository.getUserProfileQueries()
+                .filter { !it.deprecated }
+                .also { pirWebProfileStateHolder.setLoadedProfileQueries(it) }
 
             if (profiles.isEmpty()) {
                 logcat { "PIR-WEB: GetCurrentUserProfileMessageHandler: no user profiles found" }
