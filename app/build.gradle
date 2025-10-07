@@ -415,6 +415,7 @@ dependencies {
 
     implementation project(':attributed-metrics-api')
     implementation project(':attributed-metrics-impl')
+    internalImplementation project(':attributed-metrics-internal')
 
     implementation project(':breakage-reporting-impl')
 
