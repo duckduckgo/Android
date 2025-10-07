@@ -1,22 +1,24 @@
 // See https://app.asana.com/1/137249556945/project/392891325557410/task/1210882421460693
 {
-    m_autocomplete_displayed_bookmark_android_phone: {
-        description: 'TBD',
-        owners: [],
-        suffixes: ['platform', 'form_factor'],
-        parameters: ['appVersion'],
+    "m_autocomplete_displayed_bookmark_android_phone": {
+        "description": "TBD",
+        "owners": [],
+        "triggers": [],
+        "suffixes": ["platform", "form_factor"],
+        "parameters": ["appVersion"]
     },
-    m_autocomplete_displayed_bookmark_android_tablet: {
-        description: 'TBD',
-        owners: [],
-        suffixes: ['platform', 'form_factor'],
-        parameters: ['appVersion'],
+    "m_autocomplete_displayed_bookmark_android_tablet": {
+        "description": "TBD",
+        "owners": [],
+        "triggers": [],
+        "suffixes": ["platform", "form_factor"],
+        "parameters": ["appVersion"]
     },
-    m_autocomplete_displayed_favorite_android_phone: {
-        description: 'TBD',
-        owners: [],
-        suffixes: ['platform', 'form_factor'],
-        parameters: ['appVersion'],
+    "m_autocomplete_displayed_favorite_android_phone": {
+        "description": "TBD",
+        "owners": [],
+        "triggers": [],
+        "suffixes": ["platform", "form_factor"],
+        "parameters": ["appVersion"]
     }
 }
-

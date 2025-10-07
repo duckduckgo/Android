@@ -291,18 +291,13 @@
         "description": "User opened the broken site report UI.",
         "owners": ["mgurgel"],
         "triggers": ["other"],
-        "parameters": [
-            "appVersion"
-
-        ]
+        "parameters": ["appVersion"]
     },
     "m_report-broken-site_sent_android": {
         "description": "User sent a broken site report.",
         "owners": ["mgurgel"],
         "triggers": ["other"],
-        "parameters": [
-            "appVersion"
-        ]
+        "parameters": ["appVersion"]
     },
     "m_reload-three-times-within-20-seconds_android": {
         "description": "User reloaded a tab three times in a 20 second window (indicating the site could be broken).",
