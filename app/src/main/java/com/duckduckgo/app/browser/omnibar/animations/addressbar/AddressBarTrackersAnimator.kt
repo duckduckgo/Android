@@ -44,6 +44,12 @@ class AddressBarTrackersAnimator @Inject constructor(
     var isAnimationRunning = false
         private set
 
+    private val runningAnimators = mutableListOf<Animator>()
+    private var sceneRoot: ViewGroup? = null
+    private var animatedIconBackgroundView: View? = null
+    private var addressBarTrackersBlockedAnimationShieldIcon: LottieAnimationView? = null
+    private var onAnimationComplete: (() -> Unit)? = null
+
     fun startAnimation(
         context: Context,
         sceneRoot: ViewGroup,
@@ -62,6 +68,11 @@ class AddressBarTrackersAnimator @Inject constructor(
         }
 
         isAnimationRunning = true
+
+        this.sceneRoot = sceneRoot
+        this.animatedIconBackgroundView = animatedIconBackgroundView
+        this.addressBarTrackersBlockedAnimationShieldIcon = addressBarTrackersBlockedAnimationShieldIcon
+        this.onAnimationComplete = onAnimationComplete
 
         addressBarTrackersBlockedAnimationShieldIcon.show()
         addressBarTrackersBlockedAnimationShieldIcon.progress = 0F
@@ -109,6 +120,7 @@ class AddressBarTrackersAnimator @Inject constructor(
                                 CommonAddressBarAnimationHelper.Companion.DEFAULT_ANIMATION_DURATION,
                             ),
                         )
+                    runningAnimators.add(this)
                     start()
                 }
             },
@@ -125,6 +137,7 @@ class AddressBarTrackersAnimator @Inject constructor(
                                     TransitionManager.go(scene1, slideOutTrackersTransition)
                                 },
                             )
+                            runningAnimators.add(this)
                             start()
                         }
                     },
@@ -142,6 +155,7 @@ class AddressBarTrackersAnimator @Inject constructor(
                                 TRACKERS_ANIMATION_TEXT_FADE_OUT_DURATION,
                             ),
                         )
+                    runningAnimators.add(this)
                     start()
                 }
             },
@@ -175,6 +189,7 @@ class AddressBarTrackersAnimator @Inject constructor(
                             addressBarTrackersBlockedAnimationShieldIcon.playAnimation()
                         },
                     )
+                    runningAnimators.add(this)
                     start()
                 }
                 sceneRoot.gone()
@@ -190,8 +205,42 @@ class AddressBarTrackersAnimator @Inject constructor(
                     TransitionManager.go(scene2, slideInTrackersTransition)
                 },
             )
+            runningAnimators.add(this)
             start()
         }
+    }
+
+    fun cancelAnimation() {
+        if (!isAnimationRunning) return
+
+        trackerCountAnimator.cancelAnimation()
+        runningAnimators.forEach { animator ->
+            animator.cancel()
+        }
+        runningAnimators.clear()
+
+        sceneRoot?.let {
+            TransitionManager.endTransitions(it)
+            it.gone()
+        }
+
+        animatedIconBackgroundView?.let {
+            it.alpha = 0f
+        }
+
+        addressBarTrackersBlockedAnimationShieldIcon?.let {
+            it.cancelAnimation()
+            it.removeAllAnimatorListeners()
+            it.gone()
+            it.progress = 0F
+        }
+
+        isAnimationRunning = false
+
+        sceneRoot = null
+        animatedIconBackgroundView = null
+        addressBarTrackersBlockedAnimationShieldIcon = null
+        onAnimationComplete = null
     }
 
     private fun createSlideTransition(): Transition {

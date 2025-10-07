@@ -109,6 +109,12 @@ class TrackerCountAnimator @Inject constructor() {
         animator.start()
     }
 
+    fun cancelAnimation() {
+        animator.cancel()
+        trackerTextView?.handler?.removeCallbacksAndMessages(null)
+        trackerTextView = null
+    }
+
     /**
      * Calculates the starting count for the tracker animation.
      *

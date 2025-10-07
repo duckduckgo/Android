@@ -36,7 +36,6 @@ import com.duckduckgo.app.trackerdetection.model.Entity
 import com.duckduckgo.common.ui.store.AppTheme
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.show
-import com.duckduckgo.common.ui.view.text.DaxTextView
 import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.FragmentScope
@@ -198,6 +197,7 @@ class BrowserLottieTrackersAnimatorHelper @Inject constructor(
         omnibarViews: List<View>,
     ) {
         conflatedJob.cancel()
+        addressBarTrackersAnimator.cancelAnimation()
         stopTrackersAnimation()
         stopCookiesAnimation()
         omnibarViews.forEach { it.alpha = 1f }
