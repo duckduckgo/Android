@@ -117,7 +117,7 @@ class AddressBarTrackersAnimator @Inject constructor(
                         .with(
                             commonAddressBarAnimationHelper.animateFadeIn(
                                 animatedIconBackgroundView,
-                                CommonAddressBarAnimationHelper.DEFAULT_ANIMATION_DURATION,
+                                TRACKERS_ANIMATION_ICON_BACKGROUND_FADE_IN_DURATION,
                             ),
                         )
                     runningAnimators.add(this)
@@ -155,6 +155,12 @@ class AddressBarTrackersAnimator @Inject constructor(
                                 TRACKERS_ANIMATION_TEXT_FADE_OUT_DURATION,
                             ),
                         )
+                    play(
+                        commonAddressBarAnimationHelper.animateFadeOut(
+                            animatedIconBackgroundView,
+                            CommonAddressBarAnimationHelper.DEFAULT_ANIMATION_DURATION,
+                        ),
+                    ).after(TRACKERS_ANIMATION_ICON_BACKGROUND_FADE_OUT_DELAY)
                     runningAnimators.add(this)
                     start()
                 }
@@ -162,12 +168,6 @@ class AddressBarTrackersAnimator @Inject constructor(
             onEnd = {
                 AnimatorSet().apply {
                     play(commonAddressBarAnimationHelper.animateViewsIn(omnibarViews + shieldViews))
-                    play(
-                        commonAddressBarAnimationHelper.animateFadeOut(
-                            animatedIconBackgroundView,
-                            CommonAddressBarAnimationHelper.Companion.DEFAULT_ANIMATION_DURATION,
-                        ),
-                    )
                     addListener(
                         onEnd = {
                             addressBarTrackersBlockedAnimationShieldIcon.addAnimatorListener(
@@ -254,5 +254,7 @@ class AddressBarTrackersAnimator @Inject constructor(
         private const val TRACKERS_ANIMATION_SLIDE_OUT_DELAY = 1000L
         private const val TRACKERS_ANIMATION_TEXT_FADE_IN_DURATION = 900L
         private const val TRACKERS_ANIMATION_TEXT_FADE_OUT_DURATION = 300L
+        private const val TRACKERS_ANIMATION_ICON_BACKGROUND_FADE_IN_DURATION = 50L
+        private const val TRACKERS_ANIMATION_ICON_BACKGROUND_FADE_OUT_DELAY = 300L
     }
 }
