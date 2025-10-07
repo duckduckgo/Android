@@ -7,6 +7,7 @@ import androidx.lifecycle.Lifecycle.State.RESUMED
 import androidx.lifecycle.testing.TestLifecycleOwner
 import app.cash.turbine.test
 import com.android.billingclient.api.ProductDetails
+import com.android.billingclient.api.Purchase
 import com.android.billingclient.api.PurchaseHistoryRecord
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.BASIC_SUBSCRIPTION
@@ -19,6 +20,7 @@ import com.duckduckgo.subscriptions.impl.billing.BillingError.SERVICE_UNAVAILABL
 import com.duckduckgo.subscriptions.impl.billing.FakeBillingClientAdapter.FakeMethodInvocation.Connect
 import com.duckduckgo.subscriptions.impl.billing.FakeBillingClientAdapter.FakeMethodInvocation.GetSubscriptions
 import com.duckduckgo.subscriptions.impl.billing.FakeBillingClientAdapter.FakeMethodInvocation.GetSubscriptionsPurchaseHistory
+import com.duckduckgo.subscriptions.impl.billing.FakeBillingClientAdapter.FakeMethodInvocation.QueryPurchases
 import com.duckduckgo.subscriptions.impl.billing.FakeBillingClientAdapter.FakeMethodInvocation.LaunchBillingFlow
 import com.duckduckgo.subscriptions.impl.billing.FakeBillingClientAdapter.FakeMethodInvocation.LaunchSubscriptionUpdate
 import com.duckduckgo.subscriptions.impl.billing.PurchaseState.Canceled
@@ -384,6 +386,7 @@ class FakeBillingClientAdapter : BillingClientAdapter {
     )
 
     var subscriptionsPurchaseHistory: List<PurchaseHistoryRecord> = emptyList()
+    var activePurchases: List<Purchase> = emptyList()
     var launchBillingFlowResult: LaunchBillingFlowResult = LaunchBillingFlowResult.Failure(error = SERVICE_UNAVAILABLE)
     var billingInitResult: BillingInitResult = BillingInitResult.Success
 
@@ -430,6 +433,15 @@ class FakeBillingClientAdapter : BillingClientAdapter {
             SubscriptionsPurchaseHistoryResult.Success(subscriptionsPurchaseHistory)
         } else {
             SubscriptionsPurchaseHistoryResult.Failure
+        }
+    }
+
+    override suspend fun queryPurchases(): QueryPurchasesResult {
+        methodInvocations.add(QueryPurchases)
+        return if (ready) {
+            QueryPurchasesResult.Success(activePurchases)
+        } else {
+            QueryPurchasesResult.Failure(BillingError.SERVICE_DISCONNECTED, "Service not connected")
         }
     }
 
@@ -520,6 +532,7 @@ class FakeBillingClientAdapter : BillingClientAdapter {
         data object Connect : FakeMethodInvocation()
         data class GetSubscriptions(val productIds: List<String>) : FakeMethodInvocation()
         data object GetSubscriptionsPurchaseHistory : FakeMethodInvocation()
+        data object QueryPurchases : FakeMethodInvocation()
 
         data class LaunchBillingFlow(
             val productDetails: ProductDetails,
