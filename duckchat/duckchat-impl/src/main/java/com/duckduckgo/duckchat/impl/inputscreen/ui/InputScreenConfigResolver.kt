@@ -16,7 +16,10 @@
 
 package com.duckduckgo.duckchat.impl.inputscreen.ui
 
+import android.content.Context
 import android.content.Intent
+import android.content.res.Configuration
+import com.duckduckgo.app.di.ActivityContext
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.duckchat.api.inputscreen.InputScreenActivityParams
 import com.duckduckgo.duckchat.impl.DuckChatInternal
@@ -30,7 +33,7 @@ interface InputScreenConfigResolver {
 
     fun onInputScreenCreated(intent: Intent)
 
-    fun useTopBar(isLandscape: Boolean = false): Boolean
+    fun useTopBar(): Boolean
 }
 
 @ContributesBinding(scope = ActivityScope::class)
@@ -45,6 +48,10 @@ class InputScreenConfigResolverImpl @Inject constructor(
         ): Boolean = isTopOmnibar || !duckChatInternal.inputScreenBottomBarEnabled.value
     }
 
+    @Inject
+    @ActivityContext
+    lateinit var activityContext: Context
+
     private var _isTopOmnibar = true
 
     override val isTopOmnibar: Boolean
@@ -55,9 +62,9 @@ class InputScreenConfigResolverImpl @Inject constructor(
         _isTopOmnibar = params?.isTopOmnibar ?: true
     }
 
-    override fun useTopBar(isLandscape: Boolean): Boolean =
+    override fun useTopBar(): Boolean =
         useTopBar(
-            isTopOmnibar = isTopOmnibar || isLandscape,
+            isTopOmnibar = isTopOmnibar,
             duckChatInternal = duckChatInternal,
-        )
+        ) || activityContext.resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
 }
