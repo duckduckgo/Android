@@ -122,7 +122,7 @@ interface PirRepository {
         profileQueryId: Long,
     ): List<ExtractedProfile>
 
-    suspend fun getExtractedProfiles(
+    suspend fun getExtractedProfile(
         extractedProfileId: Long,
     ): ExtractedProfile?
 
@@ -415,7 +415,7 @@ internal class RealPirRepository(
                 }
         }
 
-    override suspend fun getExtractedProfiles(
+    override suspend fun getExtractedProfile(
         extractedProfileId: Long,
     ): ExtractedProfile? =
         withContext(dispatcherProvider.io()) {

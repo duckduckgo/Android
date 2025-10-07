@@ -154,7 +154,7 @@ class RealBrokerStepsParser @Inject constructor(
         emailConfirmationJob: EmailConfirmationJobRecord,
     ): BrokerStep? = withContext(dispatcherProvider.io()) {
         return@withContext runCatching {
-            val profile = repository.getExtractedProfiles(emailConfirmationJob.extractedProfileId)
+            val profile = repository.getExtractedProfile(emailConfirmationJob.extractedProfileId)
             if (profile != null) {
                 adapter.fromJson(optOutStepJson)?.run {
                     EmailConfirmationStep(

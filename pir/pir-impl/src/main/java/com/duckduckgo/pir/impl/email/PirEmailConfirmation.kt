@@ -74,7 +74,6 @@ class RealPirEmailConfirmation @Inject constructor(
         context: Context,
         runType: RunType,
     ): Result<Unit> = withContext(dispatcherProvider.io()) {
-        // onJobStarted()
         if (jobRecords.isEmpty()) {
             logcat { "PIR-EMAIL-CONFIRMATION: Nothing to scan here." }
             return@withContext Result.success(Unit)
@@ -104,14 +103,14 @@ class RealPirEmailConfirmation @Inject constructor(
 
         jobRecordsParts.mapIndexed { index, partSteps ->
             logcat { "PIR-EMAIL-CONFIRMATION:: Record part [$index] -> ${partSteps.size}" }
-            logcat { "PIR-SCAN: Record part [$index] breakdown -> ${partSteps.map { it.first.id to it.second.brokerName }}" }
+            logcat { "PIR-EMAIL-CONFIRMATION: Record part [$index] breakdown -> ${partSteps.map { it.first.id to it.second.brokerName }}" }
             // We want to run the runners in parallel but wait for everything to complete before we proceed
             async {
                 partSteps.forEach { (profile, step) ->
-                    logcat { "PIR-SCAN: Start scan on runner=$index for profile=$profile with step=$step" }
+                    logcat { "PIR-EMAIL-CONFIRMATION: Resuming opt-out on runner=$index for profile=$profile with step=$step" }
                     runners[index].start(profile, listOf(step))
                     runners[index].stop()
-                    logcat { "PIR-SCAN: Finish scan on runner=$index for profile=$profile with step=$step" }
+                    logcat { "PIR-EMAIL-CONFIRMATION: Finished resuming opt-out on runner=$index for profile=$profile with step=$step" }
                 }
             }
         }.awaitAll()
@@ -175,7 +174,6 @@ class RealPirEmailConfirmation @Inject constructor(
             it.stop()
         }
         runners.clear()
-        // onJobStopped()
     }
 
     private fun cleanPreviousRun() {
