@@ -246,7 +246,6 @@
     <string name="settingsAutomaticallyClearWhenAppExit30Minutes">Sovelluksesta poistuttaessa, 30 minuutin toimettomuuden jälkeen</string>
     <string name="settingsAutomaticallyClearWhenAppExit60Minutes">Sovelluksesta poistuttaessa, 1 tunnin toimettomuuden jälkeen</string>
     <string name="settingsClearAiDataTitle">Tyhjennä Duck.ai-keskustelut</string>
-    <string name="settingsClearAiDataMessage">Fire Button poistaa myös Duck.ai-historian</string>
 
     <!-- About Activity -->
     <string name="aboutActivityTitle">Tietoa DuckDuckGo:sta</string>

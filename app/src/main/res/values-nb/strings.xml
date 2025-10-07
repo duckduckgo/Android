@@ -246,7 +246,6 @@
     <string name="settingsAutomaticallyClearWhenAppExit30Minutes">når appen lukkes eller har vært inaktiv i 30 minutter</string>
     <string name="settingsAutomaticallyClearWhenAppExit60Minutes">når appen lukkes eller har vært inaktiv i 1 time</string>
     <string name="settingsClearAiDataTitle">Fjern Duck.ai-chatter</string>
-    <string name="settingsClearAiDataMessage">Fire Button sletter også Duck.ai-historikk</string>
 
     <!-- About Activity -->
     <string name="aboutActivityTitle">Om DuckDuckGo</string>

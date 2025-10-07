@@ -248,7 +248,6 @@
     <string name="settingsAutomaticallyClearWhenAppExit30Minutes">Ukončení aplikace, neaktivní po dobu 30 minut</string>
     <string name="settingsAutomaticallyClearWhenAppExit60Minutes">Ukončení aplikace, neaktivní po dobu 1 hodiny</string>
     <string name="settingsClearAiDataTitle">Vymazat chaty Duck.ai</string>
-    <string name="settingsClearAiDataMessage">Tlačítko Fire Button taky smaže historii Duck.ai</string>
 
     <!-- About Activity -->
     <string name="aboutActivityTitle">O DuckDuckGo</string>
