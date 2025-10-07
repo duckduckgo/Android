@@ -84,6 +84,39 @@ enum class PirPixel(
     PIR_INTERNAL_CPU_USAGE(
         baseName = "pir_internal_cpu_usage",
         type = Count,
+    ),
+
+    PIR_EMAIL_CONFIRMATION_LINK_RECEIVED(
+        baseName = "pir_email-confirmation-link_client-received",
+        type = Count,
+    ),
+    PIR_EMAIL_CONFIRMATION_LINK_BE_ERROR(
+        baseName = "pir_email-confirmation-link_backend-status_error",
+        type = Count,
+    ),
+    PIR_OPTOUT_STAGE_PENDING_EMAIL_CONFIRMATION(
+        baseName = "pir_optout_stage_submit-awaiting-email-confirmation",
+        type = Count,
+    ),
+    PIR_EMAIL_CONFIRMATION_ATTEMPT_START(
+        baseName = "pir_email-confirmation_attempt-start",
+        type = Count,
+    ),
+    PIR_EMAIL_CONFIRMATION_ATTEMPT_SUCCESS(
+        baseName = "pir_email-confirmation_attempt-success",
+        type = Count,
+    ),
+    PIR_EMAIL_CONFIRMATION_ATTEMPT_FAILED(
+        baseName = "pir_email-confirmation_attempt-failure",
+        type = Count,
+    ),
+    PIR_EMAIL_CONFIRMATION_MAX_RETRIES_EXCEEDED(
+        baseName = "pir_email-confirmation_max-retries-exceeded",
+        type = Count,
+    ),
+    PIR_EMAIL_CONFIRMATION_JOB_SUCCESS(
+        baseName = "pir_email-confirmation_max-retries-exceeded",
+        type = Count,
     ), ;
 
     constructor(
