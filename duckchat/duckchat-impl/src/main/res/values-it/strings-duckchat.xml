@@ -53,7 +53,7 @@
     <string name="input_screen_chat_hint">Chiedi in privato</string>
     <string name="input_screen_user_pref_without_ai">Solo ricerca</string>
     <string name="input_screen_user_pref_with_ai">Ricerca e Duck.ai</string>
-    <string name="input_screen_user_pref_description">Prova la nostra nuova opzione per chiedere a Duck.ai direttamente dalla barra degli indirizzi. <annotation type="share_feedback">Condividi feedback</annotation></string>
+    <string name="input_screen_user_pref_description">Prova la nuova opzione per chiedere a Duck.ai direttamente dalla barra degli indirizzi. <annotation type="share_feedback">Condividi feedback</annotation></string>
 
     <!-- Duck.ai Pro settings -->
     <string name="duck_ai_paid_settings_title">Duck.ai</string>
