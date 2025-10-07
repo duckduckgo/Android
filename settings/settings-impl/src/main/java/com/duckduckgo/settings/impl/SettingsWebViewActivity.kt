@@ -34,7 +34,6 @@ import com.duckduckgo.js.messaging.api.JsMessaging
 import com.duckduckgo.navigation.api.getActivityParams
 import com.duckduckgo.settings.api.SettingsWebViewScreenWithParams
 import com.duckduckgo.settings.impl.databinding.ActivitySettingsWebviewBinding
-import com.duckduckgo.user.agent.api.UserAgentProvider
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
@@ -44,9 +43,6 @@ import javax.inject.Named
 @InjectWith(ActivityScope::class)
 @ContributeToActivityStarter(SettingsWebViewScreenWithParams::class)
 class SettingsWebViewActivity : DuckDuckGoActivity() {
-    @Inject
-    lateinit var userAgentProvider: UserAgentProvider
-
     @Inject
     lateinit var pixel: Pixel
 
@@ -122,7 +118,7 @@ class SettingsWebViewActivity : DuckDuckGoActivity() {
     private fun setupWebView() {
         binding.settingsWebView.let {
             it.settings.apply {
-                userAgentString = userAgentProvider.userAgent()
+                userAgentString = CUSTOM_USER_AGENT
                 javaScriptEnabled = true
                 domStorageEnabled = true
                 loadWithOverviewMode = true
@@ -144,5 +140,10 @@ class SettingsWebViewActivity : DuckDuckGoActivity() {
             }
         }
         return super.onOptionsItemSelected(item)
+    }
+
+    companion object {
+        private const val CUSTOM_USER_AGENT = "Mozilla/5.0 (Linux; Android 15) AppleWebKit/537.36 (KHTML, like Gecko) " +
+            "Version/4.0 Chrome/140.0.0.0 Mobile DuckDuckGo/5 Safari/537.36"
     }
 }
