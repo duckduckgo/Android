@@ -253,7 +253,7 @@ class InputModeWidget @JvmOverloads constructor(
                 }
 
                 val isNullOrEmpty = text.isNullOrEmpty()
-                fade(inputFieldClearText, !isNullOrEmpty)
+                inputFieldClearText.isVisible = !isNullOrEmpty
                 checkForButtonsVisibility()
             }
 
@@ -318,14 +318,12 @@ class InputModeWidget @JvmOverloads constructor(
                 }
                 marginStart = inputModeCardExtendedEndMargin
             }
-
-            // change padding to make the buttons visible
-            // when portrait and buttons visible -> 4dp
-            // when portrait and buttons not visible -> 16dp
-            // when landsape -> always 170dp
         } else {
-            // buttons always hidden in chat mode
             fade(inputModeIconsContainer, false)
+            inputModeWidgetLayout.updateLayoutParams<MarginLayoutParams> {
+                marginEnd = inputModeCardExtendedEndMargin
+                marginStart = inputModeCardExtendedEndMargin
+            }
         }
     }
 
