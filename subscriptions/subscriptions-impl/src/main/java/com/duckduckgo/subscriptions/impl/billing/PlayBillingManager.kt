@@ -99,7 +99,7 @@ interface PlayBillingManager {
      * Gets the current purchase token from active purchases (queryPurchasesAsync)
      * This is the preferred method over purchase history for getting current tokens
      */
-    suspend fun getLatestPurchaseToken(): String?
+    fun getLatestPurchaseToken(): String?
 }
 
 @SingleInstanceIn(AppScope::class)
@@ -377,7 +377,7 @@ class RealPlayBillingManager @Inject constructor(
         }
     }
 
-    override suspend fun getLatestPurchaseToken(): String? = withContext(dispatcherProvider.io()) {
+    override fun getLatestPurchaseToken(): String? {
         val activePurchases = purchases.filter { purchase: Purchase ->
             purchase.products.contains(BASIC_SUBSCRIPTION) &&
                 purchase.purchaseState == Purchase.PurchaseState.PURCHASED
@@ -385,7 +385,7 @@ class RealPlayBillingManager @Inject constructor(
 
         val latestPurchase = activePurchases.maxByOrNull { it.purchaseTime }
 
-        return@withContext if (latestPurchase != null) {
+        return if (latestPurchase != null) {
             val tokenPreview = latestPurchase.purchaseToken.take(10) + "..."
             logcat { "Billing: Latest active purchase token preview: $tokenPreview" }
             latestPurchase.purchaseToken
