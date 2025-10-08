@@ -28,8 +28,6 @@ import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import logcat.LogPriority
-import logcat.logcat
 import javax.inject.Inject
 
 interface PageLoadedHandler {
@@ -78,11 +76,6 @@ class RealPageLoadedHandler @Inject constructor(
                         concurrentRequestsOnFinish = concurrentRequestsOnFinish,
                     ),
                 )
-            }
-            logcat(LogPriority.DEBUG) {
-                "Page load time: ${end - start}, isTabInForegroundOnFinish: $isTabInForegroundOnFinish, " +
-                    "activeRequestsOnLoadStart: $activeRequestsOnLoadStart, " +
-                    "concurrentRequestsOnFinish: $concurrentRequestsOnFinish"
             }
         }
     }
