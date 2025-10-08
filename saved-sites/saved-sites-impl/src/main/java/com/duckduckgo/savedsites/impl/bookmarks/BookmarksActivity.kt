@@ -29,8 +29,10 @@ import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.view.ContextThemeWrapper
+import androidx.core.os.BundleCompat
 import androidx.core.view.children
 import androidx.core.view.isVisible
+import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.SimpleItemAnimator
@@ -38,6 +40,10 @@ import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.tabs.BrowserNav
+import com.duckduckgo.autofill.api.AutofillImportBookmarksLaunchSource
+import com.duckduckgo.autofill.api.AutofillScreens.ImportBookmarksViaGoogleTakeoutScreen
+import com.duckduckgo.autofill.api.CredentialAutofillDialogFactory
+import com.duckduckgo.autofill.api.ImportBookmarksPreImportDialog
 import com.duckduckgo.browser.api.ui.BrowserScreens.BookmarksScreenNoParams
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.menu.PopupMenu
@@ -72,11 +78,12 @@ import com.duckduckgo.savedsites.impl.bookmarks.BookmarksViewModel.Command.Expor
 import com.duckduckgo.savedsites.impl.bookmarks.BookmarksViewModel.Command.ImportedSavedSites
 import com.duckduckgo.savedsites.impl.bookmarks.BookmarksViewModel.Command.LaunchAddFolder
 import com.duckduckgo.savedsites.impl.bookmarks.BookmarksViewModel.Command.LaunchBookmarkExport
-import com.duckduckgo.savedsites.impl.bookmarks.BookmarksViewModel.Command.LaunchBookmarkImport
+import com.duckduckgo.savedsites.impl.bookmarks.BookmarksViewModel.Command.LaunchBookmarkImportFile
 import com.duckduckgo.savedsites.impl.bookmarks.BookmarksViewModel.Command.LaunchSyncSettings
 import com.duckduckgo.savedsites.impl.bookmarks.BookmarksViewModel.Command.OpenBookmarkFolder
 import com.duckduckgo.savedsites.impl.bookmarks.BookmarksViewModel.Command.OpenSavedSite
 import com.duckduckgo.savedsites.impl.bookmarks.BookmarksViewModel.Command.ReevalutePromotions
+import com.duckduckgo.savedsites.impl.bookmarks.BookmarksViewModel.Command.ShowBookmarkImportDialog
 import com.duckduckgo.savedsites.impl.bookmarks.BookmarksViewModel.Command.ShowBrowserMenu
 import com.duckduckgo.savedsites.impl.bookmarks.BookmarksViewModel.Command.ShowEditBookmarkFolder
 import com.duckduckgo.savedsites.impl.bookmarks.BookmarksViewModel.Command.ShowEditSavedSite
@@ -99,6 +106,7 @@ import java.util.Date
 import java.util.Locale
 import java.util.TimeZone
 import javax.inject.Inject
+import com.duckduckgo.autofill.api.ImportBookmarksPreImportDialog.ImportBookmarksPreImportResult as ImportResult
 import com.duckduckgo.mobile.android.R as commonR
 
 @InjectWith(ActivityScope::class)
@@ -122,6 +130,9 @@ class BookmarksActivity : DuckDuckGoActivity(), BookmarksScreenPromotionPlugin.C
 
     @Inject
     lateinit var bookmarksSortingFeature: BookmarksSortingFeature
+
+    @Inject
+    lateinit var credentialAutofillDialogFactory: CredentialAutofillDialogFactory
 
     private lateinit var bookmarksAdapter: BookmarksAdapter
     private lateinit var searchListener: BookmarksQueryListener
@@ -167,6 +178,11 @@ class BookmarksActivity : DuckDuckGoActivity(), BookmarksScreenPromotionPlugin.C
         viewModel.userReturnedFromSyncSettings()
     }
 
+    private val importGoogleBookmarksFlowLauncher =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            handleBookmarkImportResult(result.resultCode)
+        }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         contentBookmarksBinding = ContentBookmarksBinding.bind(binding.root)
@@ -177,6 +193,7 @@ class BookmarksActivity : DuckDuckGoActivity(), BookmarksScreenPromotionPlugin.C
         observeViewModel()
         observeItemsToDisplay()
         initializeSearchBar()
+        setupImportBookmarksResultListener()
 
         viewModel.fetchBookmarksAndFolders(getParentFolderId())
     }
@@ -266,6 +283,7 @@ class BookmarksActivity : DuckDuckGoActivity(), BookmarksScreenPromotionPlugin.C
                 if (resultCode == RESULT_OK) {
                     val selectedFile = data?.data
                     if (selectedFile != null) {
+                        dismissImportBookmarksDialog()
                         viewModel.importBookmarks(selectedFile)
                     }
                 }
@@ -389,9 +407,49 @@ class BookmarksActivity : DuckDuckGoActivity(), BookmarksScreenPromotionPlugin.C
                 is LaunchSyncSettings -> launchSyncSettings()
                 is ReevalutePromotions -> configurePromotionsContainer()
                 is ShowBrowserMenu -> showBookmarksPopupMenu(it.buttonsDisabled, it.sortingMode)
-                is LaunchBookmarkImport -> launchBookmarkImport()
+                is LaunchBookmarkImportFile -> launchBookmarkImportChooseFile()
+                is ShowBookmarkImportDialog -> showBookmarkImportDialog()
                 is LaunchBookmarkExport -> launchBookmarkExport()
                 is LaunchAddFolder -> launchAddFolder()
+            }
+        }
+    }
+
+    private fun setupImportBookmarksResultListener() {
+        val fragmentResultKey = ImportBookmarksPreImportDialog.FRAGMENT_RESULT_KEY
+        val bundleResultKey = ImportBookmarksPreImportDialog.BUNDLE_RESULT_KEY
+        supportFragmentManager.setFragmentResultListener(fragmentResultKey, this) { _, bundle ->
+            val result = BundleCompat.getParcelable(bundle, bundleResultKey, ImportResult::class.java)
+
+            when (result) {
+                ImportResult.ImportBookmarksFromGoogle -> launchBookmarkImportTakeoutFlow()
+                ImportResult.SelectBookmarksFile -> launchBookmarkImportChooseFile()
+                ImportResult.Cancel, null -> dismissImportBookmarksDialog()
+            }
+        }
+    }
+
+    private fun showBookmarkImportDialog() {
+        val dialog = credentialAutofillDialogFactory.autofillImportBookmarksPreImportDialog(
+            importSource = AutofillImportBookmarksLaunchSource.BookmarksScreen,
+        )
+        dialog.show(supportFragmentManager, DIALOG_TAG_IMPORT_BOOKMARKS)
+    }
+
+    private fun handleBookmarkImportResult(resultCode: Int) {
+        when (resultCode) {
+            RESULT_OK -> dismissImportBookmarksDialog()
+            else -> {
+                // no-op
+            }
+        }
+    }
+
+    private fun dismissImportBookmarksDialog() {
+        val dialog = supportFragmentManager.findFragmentByTag(DIALOG_TAG_IMPORT_BOOKMARKS)
+        dialog?.let {
+            if (it is DialogFragment) {
+                it.dismiss()
             }
         }
     }
@@ -425,7 +483,14 @@ class BookmarksActivity : DuckDuckGoActivity(), BookmarksScreenPromotionPlugin.C
         faviconPrompt.show()
     }
 
-    private fun launchBookmarkImport() {
+    private fun launchBookmarkImportTakeoutFlow() {
+        val intent = globalActivityStarter.startIntent(
+            this,
+            ImportBookmarksViaGoogleTakeoutScreen(AutofillImportBookmarksLaunchSource.BookmarksScreen),
+        )
+        importGoogleBookmarksFlowLauncher.launch(intent)
+    }
+    private fun launchBookmarkImportChooseFile() {
         val intent = Intent()
             .setType("text/html")
             .setAction(Intent.ACTION_GET_CONTENT)
@@ -828,5 +893,7 @@ class BookmarksActivity : DuckDuckGoActivity(), BookmarksScreenPromotionPlugin.C
         private val formatter: SimpleDateFormat = SimpleDateFormat("yyyyMMdd", Locale.US).apply {
             timeZone = TimeZone.getTimeZone("UTC")
         }
+
+        private const val DIALOG_TAG_IMPORT_BOOKMARKS = "ImportBookmarksPreImportDialog"
     }
 }

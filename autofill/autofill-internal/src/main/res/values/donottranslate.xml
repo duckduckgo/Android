@@ -56,6 +56,7 @@
     <string name="autofillDevSettingsImportBookmarksViewBookmarksTitle">View Bookmarks</string>
     <string name="importBookmarksDevSettingLaunchErrorScreen">Show bookmark import failure screen (simulated data)</string>
     <string name="importBookmarksDevSettingLaunchSuccessScreen">Show bookmark import success screen (simulated data)</string>
+    <string name="autofillDevSettingsSelectBookmarksFile">Select Bookmarks File</string>
 
     <string name="autofillDevSettingsResetGooglePasswordsImportFlagTitle">Clear Previous Google Imports interactions</string>
     <string name="autofillDevSettingsResetGooglePasswordsImportFlagInstruction">Tap to forget whether we\'ve previously imported, what we chose when previously prompted etc…</string>

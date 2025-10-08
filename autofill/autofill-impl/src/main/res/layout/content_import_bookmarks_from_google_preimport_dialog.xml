@@ -79,14 +79,25 @@
         <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
             android:id="@+id/importButton"
             android:layout_width="0dp"
-            android:layout_marginTop="@dimen/keyline_5"
-            app:layout_constraintTop_toBottomOf="@id/onboardingSubtitle"
             android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="@dimen/keyline_5"
+            android:text="@string/importBookmarksFromGooglePreImportDialogImportButton"
+            app:daxButtonSize="large"
             app:layout_constraintEnd_toEndOf="@id/guidelineEnd"
             app:layout_constraintStart_toStartOf="@id/guidelineStart"
+            app:layout_constraintTop_toBottomOf="@id/onboardingSubtitle" />
+
+        <com.duckduckgo.common.ui.view.button.DaxButtonGhost
+            android:id="@+id/selectFileButton"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:text="@string/importBookmarksFromGooglePreImportDialogImportButton"
-            app:daxButtonSize="large" />
+            android:text="@string/importBookmarksFromGooglePreImportDialogSelectFileButton"
+            app:daxButtonSize="large"
+            app:layout_constraintEnd_toEndOf="@id/guidelineEnd"
+            app:layout_constraintStart_toStartOf="@id/guidelineStart"
+            app:layout_constraintTop_toBottomOf="@id/importButton" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

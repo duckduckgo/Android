@@ -185,6 +185,59 @@ interface EmailProtectionInContextSignUpDialog {
 }
 
 /**
+ * Dialog which prompts the user to import bookmarks from Google
+ * Results should be handled by defining a fragmentResultListener with key [ImportBookmarksPreImportDialog.FRAGMENT_RESULT_KEY]
+ * e.g.,
+ *     supportFragmentManager.setFragmentResultListener(ImportBookmarksPreImportDialog.RESULT_KEY, this) { _, result ->
+ *         val choice = ImportBookmarksPreImportDialog.extractResult(result)
+ *     }
+ */
+interface ImportBookmarksPreImportDialog {
+
+    /**
+     * Result of the dialog, as determined by which button the user pressed or if they cancelled the dialog
+     * This is available in the `Bundle` with key=BUNDLE_RESULT_KEY
+     *
+     * Example usage:
+     * ```
+     * supportFragmentManager.setFragmentResultListener(FRAGMENT_RESULT_KEY, this) { _, bundle ->
+     *     val result = BundleCompat.getParcelable(bundle, BUNDLE_RESULT_KEY, ImportBookmarksPreImportResult::class.java)
+     *     when (result) {
+     *         ImportBookmarksPreImportResult.ImportBookmarksFromGoogle -> // Handle Google import
+     *         ImportBookmarksPreImportResult.SelectBookmarksFile -> // Handle file selection
+     *         ImportBookmarksPreImportResult.Cancel -> // Handle cancellation
+     *     }
+     * }
+     * ```
+     */
+    sealed interface ImportBookmarksPreImportResult : Parcelable {
+
+        /**
+         * User chose to proceed with the Google import
+         */
+        @Parcelize
+        data object ImportBookmarksFromGoogle : ImportBookmarksPreImportResult
+
+        /**
+         * User chose to select a bookmarks file
+         */
+        @Parcelize
+        data object SelectBookmarksFile : ImportBookmarksPreImportResult
+
+        /**
+         * User cancelled the dialog
+         */
+        @Parcelize
+        data object Cancel : ImportBookmarksPreImportResult
+    }
+
+    companion object {
+        const val FRAGMENT_RESULT_KEY = "ImportBookmarksPreImportDialog"
+        const val BUNDLE_RESULT_KEY = "result"
+    }
+}
+
+/**
  * Factory used to get instances of the various autofill dialogs
  */
 interface CredentialAutofillDialogFactory {
@@ -258,6 +311,11 @@ interface CredentialAutofillDialogFactory {
         tabId: String,
         url: String,
     ): DialogFragment
+
+    /**
+     * Creates a dialog which prompts the user to import bookmarks from Google
+     */
+    fun autofillImportBookmarksPreImportDialog(importSource: AutofillImportBookmarksLaunchSource): DialogFragment
 }
 
 private fun prefix(
@@ -280,4 +338,5 @@ enum class AutofillImportLaunchSource(val value: String) : Parcelable {
 enum class AutofillImportBookmarksLaunchSource(val value: String) : Parcelable {
     Unknown("unknown"),
     AutofillDevSettings("autofill_dev_settings"),
+    BookmarksScreen("bookmarks_screen"),
 }
