@@ -43,7 +43,6 @@ dependencies {
     implementation project(':browser-api')
     implementation project(':design-system')
     implementation project(':navigation-api')
-    implementation project(':user-agent-api')
     implementation project(':settings-api')
     implementation project(':common-utils')
     implementation project(':js-messaging-api')
