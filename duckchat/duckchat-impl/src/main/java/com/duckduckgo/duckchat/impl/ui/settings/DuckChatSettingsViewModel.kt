@@ -16,17 +16,20 @@
 
 package com.duckduckgo.duckchat.impl.ui.settings
 
+import androidx.annotation.StringRes
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.duckchat.impl.DuckChatInternal
+import com.duckduckgo.duckchat.impl.R
 import com.duckduckgo.duckchat.impl.inputscreen.ui.metrics.discovery.InputScreenDiscoveryFunnel
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
 import com.duckduckgo.duckchat.impl.ui.settings.DuckChatSettingsViewModel.Command.OpenLink
 import com.duckduckgo.duckchat.impl.ui.settings.DuckChatSettingsViewModel.Command.OpenLinkInNewTab
 import com.duckduckgo.duckchat.impl.ui.settings.DuckChatSettingsViewModel.Command.OpenShortcutSettings
+import com.duckduckgo.settings.api.SettingsConstants
 import com.duckduckgo.settings.api.SettingsPageFeature
 import com.duckduckgo.subscriptions.api.SubscriptionRebrandingFeatureToggle
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
@@ -74,6 +77,7 @@ class DuckChatSettingsViewModel @Inject constructor(
     sealed class Command {
         data class OpenLink(
             val link: String,
+            @StringRes val titleRes: Int,
         ) : Command()
 
         data class OpenLinkInNewTab(
@@ -120,19 +124,22 @@ class DuckChatSettingsViewModel @Inject constructor(
 
     fun duckChatLearnMoreClicked() {
         viewModelScope.launch {
-            commandChannel.send(OpenLink(DUCK_CHAT_LEARN_MORE_LINK))
+            commandChannel.send(OpenLink(DUCK_CHAT_LEARN_MORE_LINK, R.string.duck_chat_title))
         }
     }
 
     fun duckChatSearchAISettingsClicked() {
         viewModelScope.launch {
-            val settingsLink =
-                if (settingsPageFeature.saveAndExitSerpSettings().isEnabled()) {
-                    DUCK_CHAT_SEARCH_AI_SETTINGS_LINK_WITH_RETURN_PARAM
-                } else {
-                    DUCK_CHAT_SEARCH_AI_SETTINGS_LINK
-                }
-            commandChannel.send(OpenLinkInNewTab(settingsLink))
+            if (settingsPageFeature.saveAndExitSerpSettings().isEnabled()) {
+                commandChannel.send(
+                    OpenLink(
+                        DUCK_CHAT_SEARCH_AI_SETTINGS_LINK_WITH_RETURN_PARAM,
+                        R.string.duck_chat_search_assist_settings_title,
+                    ),
+                )
+            } else {
+                commandChannel.send(OpenLinkInNewTab(DUCK_CHAT_SEARCH_AI_SETTINGS_LINK))
+            }
             pixel.fire(DuckChatPixelName.DUCK_CHAT_SEARCH_ASSIST_SETTINGS_BUTTON_CLICKED)
         }
     }
@@ -168,6 +175,8 @@ class DuckChatSettingsViewModel @Inject constructor(
     companion object {
         const val DUCK_CHAT_LEARN_MORE_LINK = "https://duckduckgo.com/duckduckgo-help-pages/aichat/"
         const val DUCK_CHAT_SEARCH_AI_SETTINGS_LINK = "https://duckduckgo.com/settings?ko=-1#aifeatures"
-        const val DUCK_CHAT_SEARCH_AI_SETTINGS_LINK_WITH_RETURN_PARAM = "https://duckduckgo.com/settings?ko=-1&return=aiFeatures#aifeatures"
+        const val DUCK_CHAT_SEARCH_AI_SETTINGS_LINK_WITH_RETURN_PARAM =
+            "https://duckduckgo.com/settings?ko=-1&return=" +
+                "${SettingsConstants.ID_AI_FEATURES}#aifeatures"
     }
 }

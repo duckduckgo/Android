@@ -32,13 +32,25 @@ android {
 
 dependencies {
     anvil project(path: ':anvil-compiler')
-    implementation project(path: ':anvil-annotations')
+    implementation project(':anvil-annotations')
 
-    implementation project(path: ':di')
-    implementation project(path: ':settings-api')
-    implementation project(path: ':common-utils')
+    implementation project(':di')
+    implementation project(':browser-api')
+    implementation project(':design-system')
+    implementation project(':navigation-api')
+    implementation project(':user-agent-api')
+    implementation project(':settings-api')
+    implementation project(':common-utils')
+    implementation project(':js-messaging-api')
+    implementation project(':statistics-api')
+    implementation project(':content-scope-scripts-api')
 
+    implementation "com.squareup.logcat:logcat:_"
+
+    implementation AndroidX.appCompat
     implementation AndroidX.core.ktx
+    implementation AndroidX.webkit
+    implementation KotlinX.coroutines.android
 
     // Dagger
     implementation Google.dagger

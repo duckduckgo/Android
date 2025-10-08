@@ -18,7 +18,7 @@ package com.duckduckgo.contentscopescripts.impl.messaging
 
 import android.annotation.SuppressLint
 import android.webkit.WebView
-import com.duckduckgo.contentscopescripts.impl.CoreContentScopeScripts
+import com.duckduckgo.contentscopescripts.api.CoreContentScopeScripts
 import com.duckduckgo.contentscopescripts.impl.WebViewCompatContentScopeScripts
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.js.messaging.api.JsMessageHelper

@@ -21,6 +21,7 @@ import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.appbuildconfig.api.isInternalBuild
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.contentscopescripts.api.ContentScopeConfigPlugin
+import com.duckduckgo.contentscopescripts.api.CoreContentScopeScripts
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.FeatureException
 import com.duckduckgo.feature.toggles.api.Toggle
@@ -37,19 +38,6 @@ import java.util.UUID
 import java.util.concurrent.CopyOnWriteArrayList
 import javax.inject.Inject
 
-interface CoreContentScopeScripts {
-    fun getScript(
-        isDesktopMode: Boolean?,
-        activeExperiments: List<Toggle>,
-    ): String
-
-    fun isEnabled(): Boolean
-
-    val secret: String
-    val javascriptInterface: String
-    val callbackName: String
-}
-
 @SingleInstanceIn(AppScope::class)
 @ContributesBinding(AppScope::class)
 class RealContentScopeScripts @Inject constructor(
@@ -61,16 +49,15 @@ class RealContentScopeScripts @Inject constructor(
     private val fingerprintProtectionManager: FingerprintProtectionManager,
     private val contentScopeScriptsFeature: ContentScopeScriptsFeature,
 ) : CoreContentScopeScripts {
-
     private var cachedContentScopeJson: String = getContentScopeJson("", emptyList())
 
     private var cachedUserUnprotectedDomains = CopyOnWriteArrayList<String>()
-    private var cachedUserUnprotectedDomainsJson: String = emptyJsonList
+    private var cachedUserUnprotectedDomainsJson: String = EMPTY_JSON_LIST
 
-    private var cachedUserPreferencesJson: String = emptyJson
+    private var cachedUserPreferencesJson: String = EMPTY_JSON
 
     private var cachedUnprotectTemporaryExceptions = CopyOnWriteArrayList<FeatureException>()
-    private var cachedUnprotectTemporaryExceptionsJson: String = emptyJsonList
+    private var cachedUnprotectTemporaryExceptionsJson: String = EMPTY_JSON_LIST
 
     private lateinit var cachedContentScopeJS: String
 
@@ -114,12 +101,12 @@ class RealContentScopeScripts @Inject constructor(
         return cachedContentScopeJS
     }
 
-    override fun isEnabled(): Boolean {
-        return contentScopeScriptsFeature.self().isEnabled()
-    }
+    override fun isEnabled(): Boolean = contentScopeScriptsFeature.self().isEnabled()
 
     private fun getSecretKeyValuePair() = "\"messageSecret\":\"$secret\""
+
     private fun getCallbackKeyValuePair() = "\"messageCallback\":\"$callbackName\""
+
     private fun getInterfaceKeyValuePair() = "\"javascriptInterface\":\"$javascriptInterface\""
 
     private fun getPluginParameters(): PluginParameters {
@@ -145,7 +132,7 @@ class RealContentScopeScripts @Inject constructor(
     private fun cacheUserUnprotectedDomains(userUnprotectedDomains: List<String>) {
         cachedUserUnprotectedDomains.clear()
         if (userUnprotectedDomains.isEmpty()) {
-            cachedUserUnprotectedDomainsJson = emptyJsonList
+            cachedUserUnprotectedDomainsJson = EMPTY_JSON_LIST
         } else {
             cachedUserUnprotectedDomainsJson = getUserUnprotectedDomainsJson(userUnprotectedDomains)
             cachedUserUnprotectedDomains.addAll(userUnprotectedDomains)
@@ -155,7 +142,7 @@ class RealContentScopeScripts @Inject constructor(
     private fun cacheUserUnprotectedTemporaryExceptions(unprotectedTemporaryExceptions: List<FeatureException>) {
         cachedUnprotectTemporaryExceptions.clear()
         if (unprotectedTemporaryExceptions.isEmpty()) {
-            cachedUnprotectTemporaryExceptionsJson = emptyJsonList
+            cachedUnprotectTemporaryExceptionsJson = EMPTY_JSON_LIST
         } else {
             cachedUnprotectTemporaryExceptionsJson = getUnprotectedTemporaryJson(unprotectedTemporaryExceptions)
             cachedUnprotectTemporaryExceptions.addAll(unprotectedTemporaryExceptions)
@@ -165,11 +152,12 @@ class RealContentScopeScripts @Inject constructor(
     private fun cacheContentScopeJS() {
         val contentScopeJS = contentScopeJSReader.getContentScopeJS()
 
-        cachedContentScopeJS = contentScopeJS
-            .replace(contentScope, cachedContentScopeJson)
-            .replace(userUnprotectedDomains, cachedUserUnprotectedDomainsJson)
-            .replace(userPreferences, cachedUserPreferencesJson)
-            .replace(messagingParameters, "${getSecretKeyValuePair()},${getCallbackKeyValuePair()},${getInterfaceKeyValuePair()}")
+        cachedContentScopeJS =
+            contentScopeJS
+                .replace(CONTENT_SCOPE, cachedContentScopeJson)
+                .replace(USER_UNPROTECTED_DOMAINS, cachedUserUnprotectedDomainsJson)
+                .replace(USER_PREFERENCES, cachedUserPreferencesJson)
+                .replace(MESSAGING_PARAMETERS, "${getSecretKeyValuePair()},${getCallbackKeyValuePair()},${getInterfaceKeyValuePair()}")
     }
 
     private fun getUserUnprotectedDomainsJson(userUnprotectedDomains: List<String>): String {
@@ -192,8 +180,9 @@ class RealContentScopeScripts @Inject constructor(
         activeExperiments: List<Toggle>,
     ): String {
         val experiments = getExperimentsKeyValuePair(activeExperiments)
-        val defaultParameters = "${getVersionNumberKeyValuePair()},${getPlatformKeyValuePair()},${getLanguageKeyValuePair()}," +
-            "${getSessionKeyValuePair()},${getDesktopModeKeyValuePair(isDesktopMode ?: false)},$messagingParameters"
+        val defaultParameters =
+            "${getVersionNumberKeyValuePair()},${getPlatformKeyValuePair()},${getLanguageKeyValuePair()}," +
+                "${getSessionKeyValuePair()},${getDesktopModeKeyValuePair(isDesktopMode ?: false)},$MESSAGING_PARAMETERS"
         if (userPreferences.isEmpty()) {
             return "{$experiments,$defaultParameters}"
         }
@@ -201,10 +190,15 @@ class RealContentScopeScripts @Inject constructor(
     }
 
     private fun getVersionNumberKeyValuePair() = "\"versionNumber\":${appBuildConfig.versionCode}"
+
     private fun getPlatformKeyValuePair() = "\"platform\":{\"name\":\"android\",\"internal\":${appBuildConfig.isInternalBuild()}}"
+
     private fun getLanguageKeyValuePair() = "\"locale\":\"${Locale.getDefault().language}\""
+
     private fun getDesktopModeKeyValuePair(isDesktopMode: Boolean) = "\"desktopModeEnabled\":$isDesktopMode"
+
     private fun getSessionKeyValuePair() = "\"sessionKey\":\"${fingerprintProtectionManager.getSeed()}\""
+
     private fun getExperimentsKeyValuePair(activeExperiments: List<Toggle>): String {
         return runBlocking {
             val type = Types.newParameterizedType(List::class.java, Experiment::class.java)
@@ -224,21 +218,23 @@ class RealContentScopeScripts @Inject constructor(
         }
     }
 
-    private fun getContentScopeJson(config: String, unprotectedTemporaryExceptions: List<FeatureException>): String = (
-        "{\"features\":{$config},\"unprotectedTemporary\":${getUnprotectedTemporaryJson(unprotectedTemporaryExceptions)}}"
-        )
+    private fun getContentScopeJson(
+        config: String,
+        unprotectedTemporaryExceptions: List<FeatureException>,
+    ): String =
+        (
+            "{\"features\":{$config},\"unprotectedTemporary\":${getUnprotectedTemporaryJson(unprotectedTemporaryExceptions)}}"
+            )
 
     companion object {
-        const val emptyJsonList = "[]"
-        const val emptyJson = "{}"
-        const val contentScope = "\$CONTENT_SCOPE$"
-        const val userUnprotectedDomains = "\$USER_UNPROTECTED_DOMAINS$"
-        const val userPreferences = "\$USER_PREFERENCES$"
-        const val messagingParameters = "\$ANDROID_MESSAGING_PARAMETERS$"
+        const val EMPTY_JSON_LIST = "[]"
+        const val EMPTY_JSON = "{}"
+        const val CONTENT_SCOPE = "\$CONTENT_SCOPE$"
+        const val USER_UNPROTECTED_DOMAINS = "\$USER_UNPROTECTED_DOMAINS$"
+        const val USER_PREFERENCES = "\$USER_PREFERENCES$"
+        const val MESSAGING_PARAMETERS = "\$ANDROID_MESSAGING_PARAMETERS$"
 
-        private fun getSecret(): String {
-            return UUID.randomUUID().toString().replace("-", "")
-        }
+        private fun getSecret(): String = UUID.randomUUID().toString().replace("-", "")
     }
 }
 

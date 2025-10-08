@@ -22,7 +22,7 @@ import androidx.core.net.toUri
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.contentscopescripts.api.ContentScopeJsMessageHandlersPlugin
-import com.duckduckgo.contentscopescripts.impl.CoreContentScopeScripts
+import com.duckduckgo.contentscopescripts.api.CoreContentScopeScripts
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.js.messaging.api.JsCallbackData
 import com.duckduckgo.js.messaging.api.JsMessage
@@ -49,7 +49,6 @@ class ContentScopeScriptsJsMessaging @Inject constructor(
     private val coreContentScopeScripts: CoreContentScopeScripts,
     private val handlers: PluginPoint<ContentScopeJsMessageHandlersPlugin>,
 ) : JsMessaging {
-
     private val moshi = Moshi.Builder().add(JSONObjectAdapter()).build()
 
     private lateinit var webView: WebView
@@ -61,13 +60,17 @@ class ContentScopeScriptsJsMessaging @Inject constructor(
     override val allowedDomains: List<String> = emptyList()
 
     @JavascriptInterface
-    override fun process(message: String, secret: String) {
+    override fun process(
+        message: String,
+        secret: String,
+    ) {
         try {
             val adapter = moshi.adapter(JsMessage::class.java)
             val jsMessage = adapter.fromJson(message)
-            val domain = runBlocking(dispatcherProvider.main()) {
-                webView.url?.toUri()?.host
-            }
+            val domain =
+                runBlocking(dispatcherProvider.main()) {
+                    webView.url?.toUri()?.host
+                }
             jsMessage?.let {
                 if (this.secret == secret && context == jsMessage.context && (allowedDomains.isEmpty() || allowedDomains.contains(domain))) {
                     if (jsMessage.method == "addDebugFlag") {
@@ -79,10 +82,13 @@ class ContentScopeScriptsJsMessaging @Inject constructor(
                             data = jsMessage.params,
                         )
                     }
-                    handlers.getPlugins().map { it.getJsMessageHandler() }.firstOrNull {
-                        it.methods.contains(jsMessage.method) && it.featureName == jsMessage.featureName &&
-                            (it.allowedDomains.isEmpty() || it.allowedDomains.contains(domain))
-                    }?.process(jsMessage, this, jsMessageCallback)
+                    handlers
+                        .getPlugins()
+                        .map { it.getJsMessageHandler() }
+                        .firstOrNull {
+                            it.methods.contains(jsMessage.method) && it.featureName == jsMessage.featureName &&
+                                (it.allowedDomains.isEmpty() || it.allowedDomains.contains(domain))
+                        }?.process(jsMessage, this, jsMessageCallback)
                 }
             }
         } catch (e: Exception) {
@@ -90,7 +96,10 @@ class ContentScopeScriptsJsMessaging @Inject constructor(
         }
     }
 
-    override fun register(webView: WebView, jsMessageCallback: JsMessageCallback?) {
+    override fun register(
+        webView: WebView,
+        jsMessageCallback: JsMessageCallback?,
+    ) {
         if (jsMessageCallback == null) throw Exception("Callback cannot be null")
         this.webView = webView
         this.jsMessageCallback = jsMessageCallback
@@ -98,25 +107,27 @@ class ContentScopeScriptsJsMessaging @Inject constructor(
     }
 
     override fun sendSubscriptionEvent(subscriptionEventData: SubscriptionEventData) {
-        val subscriptionEvent = SubscriptionEvent(
-            context,
-            subscriptionEventData.featureName,
-            subscriptionEventData.subscriptionName,
-            subscriptionEventData.params,
-        )
+        val subscriptionEvent =
+            SubscriptionEvent(
+                context,
+                subscriptionEventData.featureName,
+                subscriptionEventData.subscriptionName,
+                subscriptionEventData.params,
+            )
         if (::webView.isInitialized) {
             jsMessageHelper.sendSubscriptionEvent(subscriptionEvent, callbackName, secret, webView)
         }
     }
 
     override fun onResponse(response: JsCallbackData) {
-        val jsResponse = JsRequestResponse.Success(
-            context = context,
-            featureName = response.featureName,
-            method = response.method,
-            id = response.id,
-            result = response.params,
-        )
+        val jsResponse =
+            JsRequestResponse.Success(
+                context = context,
+                featureName = response.featureName,
+                method = response.method,
+                id = response.id,
+                result = response.params,
+            )
         jsMessageHelper.sendJsResponse(jsResponse, callbackName, secret, webView)
     }
 }
