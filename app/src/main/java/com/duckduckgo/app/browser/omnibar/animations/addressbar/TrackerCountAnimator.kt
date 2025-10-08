@@ -27,6 +27,8 @@ import javax.inject.Inject
 import kotlin.math.roundToInt
 import kotlin.time.Duration.Companion.seconds
 
+// The minimum threshold for triggering tracker count animation is set to 5 as the animation
+// can seem to slow with low numbers
 private const val TRACKER_COUNT_MINIMUM_ANIMATION_TRIGGER_THRESHOLD = 5
 private const val TRACKER_COUNT_LOWER_THRESHOLD_PERCENTAGE = 0.75f
 private const val TRACKER_COUNT_UPPER_THRESHOLD_PERCENTAGE = 0.85f

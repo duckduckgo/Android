@@ -422,6 +422,9 @@ class BrowserLottieTrackersAnimatorHelper @Inject constructor(
         private const val COOKIES_ANIMATION_DELAY = 1000L
         private const val COOKIES_ANIMATION_DURATION = 300L
         private const val COOKIES_ANIMATION_FADE_OUT_DURATION = 800L
+
+        // Allows enough time for the tracker animation to finish and the address bar to settle
+        // before starting the cookies animation
         private const val DELAY_BETWEEN_ANIMATIONS_DURATION = 1500L
     }
 }
