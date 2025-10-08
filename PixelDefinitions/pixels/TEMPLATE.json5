@@ -17,8 +17,6 @@
         "parameters": [
             // Commonly used param, defined in params_dictionary.json.
             "appVersion",
-            // Commonly used param, defined in params_dictionary.json.
-            "channel",
             {
                 "key": "paramKey",
                 "description": "Describe the parameter and its purpose"

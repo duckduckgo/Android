@@ -1,8 +1,9 @@
 {
-    "epbf_android": {
+    "epbf": {
         "description": "User sent broken site report",
         "owners": [],
         "triggers": ["user_submitted"],
+        "suffixes": ["form_factor"],
         "parameters": [
             "atb",
             "appVersion",
@@ -148,10 +149,11 @@
             }
         ]
     },
-    "protection-toggled-off-breakage-report_android": {
+    "protection-toggled-off-breakage-report": {
         "description": "User agreed to send broken site report after disabling protections",
         "owners": [],
         "triggers": ["user_submitted"],
+        "suffixes": ["form_factor"],
         "parameters": [
             "atb",
             "appVersion",
@@ -287,34 +289,39 @@
             }
         ]
     },
-    "m_report-broken-site_shown_android": {
+    "m_report-broken-site_shown": {
         "description": "User opened the broken site report UI.",
         "owners": [],
         "triggers": ["other"],
+        "suffixes": ["form_factor"],
         "parameters": ["appVersion"]
     },
-    "m_report-broken-site_sent_android": {
+    "m_report-broken-site_sent": {
         "description": "User sent a broken site report.",
         "owners": [],
         "triggers": ["other"],
+        "suffixes": ["form_factor"],
         "parameters": ["appVersion"]
     },
-    "m_reload-three-times-within-20-seconds_android": {
+    "m_reload-three-times-within-20-seconds": {
         "description": "User reloaded a tab three times in a 20 second window (indicating the site could be broken).",
         "owners": [],
         "triggers": ["other"],
-        "parameters": ["appVersion", "channel"]
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
     },
-    "m_site-not-working_shown_android": {
+    "m_site-not-working_shown": {
         "description": "User was shown the prompt to send a broken site report after reloading a website three times in 20 seconds.",
         "owners": [],
         "triggers": ["other"],
-        "parameters": ["appVersion", "channel"]
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
     },
-    "m_site-not-working_website-is-broken_android": {
+    "m_site-not-working_website-is-broken": {
         "description": "User agreed to send a broken site report when prompted, after they reloaded a website three times in 20 seconds.",
         "owners": [],
         "triggers": ["other"],
-        "parameters": ["appVersion", "channel"]
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
     }
 }

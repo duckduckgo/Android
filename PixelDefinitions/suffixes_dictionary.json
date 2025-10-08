@@ -9,17 +9,8 @@
     },
     "form_factor": {
         "type": "string",
-        "description": "Device form-factor",
+        "description": "Platform and device form-factor",
+        "key": "android",
         "enum": ["phone", "tablet"]
-    },
-    "platform": {
-        "type": "string",
-        "description": "Device platform",
-        "enum": ["android"]
-    },
-    "channel": {
-        "type": "string",
-        "description": "The channel the user is on",
-        "enum": ["stable", "beta", "dev", "canary", "stable-store", "stable-beta", "preview", "unknown"]
     }
 }

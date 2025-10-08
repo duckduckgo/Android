@@ -1,5 +1,5 @@
 {
-    "name": "@duckduckgo/windows-browser",
+    "name": "@duckduckgo/android-browser",
     "version": "1.0.0",
     "dependencies": {
         "@duckduckgo/pixel-schema": "github:duckduckgo/pixel-schema#v1.0.8",

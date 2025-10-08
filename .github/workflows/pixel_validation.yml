@@ -13,9 +13,6 @@ jobs:
         steps:
             - name: Checkout repository
               uses: actions/checkout@v4
-              with:
-                token: ${{ secrets.DAXMOBILE_ANDROID_AUTOMATION }}
-                ref: ${{ github.head_ref || github.ref }}
 
             - name: Use Node.js 20
               uses: actions/setup-node@v4
