@@ -60,7 +60,7 @@ class DuckChatSettingsViewModelTest {
     fun setUp() =
         runTest {
             @Suppress("DenyListedApi")
-            settingsPageFeature.saveAndExitSerpSettings().setRawStoredState(State(enable = false))
+            settingsPageFeature.embeddedSettingsWebView().setRawStoredState(State(enable = false))
             whenever(duckChat.observeEnableDuckChatUserSetting()).thenReturn(flowOf(true))
             whenever(duckChat.observeShowInBrowserMenuUserSetting()).thenReturn(flowOf(false))
             whenever(duckChat.observeShowInAddressBarUserSetting()).thenReturn(flowOf(false))
@@ -244,7 +244,7 @@ class DuckChatSettingsViewModelTest {
     fun whenDuckChatSearchAISettingsClickedAndSaveAndExitEnabledThenOpenSettingsLinkWithReturnParamEmitted() =
         runTest {
             @Suppress("DenyListedApi")
-            settingsPageFeature.saveAndExitSerpSettings().setRawStoredState(State(enable = true))
+            settingsPageFeature.embeddedSettingsWebView().setRawStoredState(State(enable = true))
 
             testee.duckChatSearchAISettingsClicked()
 
@@ -253,10 +253,10 @@ class DuckChatSettingsViewModelTest {
                 assertTrue(command is OpenLink)
                 command as OpenLink
                 assertEquals(
-                    DuckChatSettingsViewModel.DUCK_CHAT_SEARCH_AI_SETTINGS_LINK_WITH_RETURN_PARAM,
+                    DuckChatSettingsViewModel.DUCK_CHAT_SEARCH_AI_SETTINGS_LINK_EMBEDDED,
                     command.link,
                 )
-                assertEquals(R.string.duck_chat_search_assist_settings_title, command.titleRes)
+                assertEquals(R.string.duck_chat_assist_settings_title_rebranding, command.titleRes)
                 cancelAndIgnoreRemainingEvents()
             }
         }

@@ -27,21 +27,16 @@ import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.browser.api.webviewcompat.WebViewCompatWrapper
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.viewbinding.viewBinding
-import com.duckduckgo.contentscopescripts.api.CoreContentScopeScripts
 import com.duckduckgo.di.scopes.ActivityScope
-import com.duckduckgo.js.messaging.api.JsMessageCallback
 import com.duckduckgo.js.messaging.api.JsMessaging
 import com.duckduckgo.navigation.api.getActivityParams
 import com.duckduckgo.settings.api.SettingsWebViewScreenWithParams
 import com.duckduckgo.settings.impl.databinding.ActivitySettingsWebviewBinding
-import com.duckduckgo.user.agent.api.UserAgentProvider
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
-import org.json.JSONObject
 import javax.inject.Inject
 import javax.inject.Named
 
@@ -49,18 +44,9 @@ import javax.inject.Named
 @ContributeToActivityStarter(SettingsWebViewScreenWithParams::class)
 class SettingsWebViewActivity : DuckDuckGoActivity() {
     @Inject
-    lateinit var userAgentProvider: UserAgentProvider
-
-    @Inject
-    lateinit var webViewCompat: WebViewCompatWrapper
-
-    @Inject
     lateinit var pixel: Pixel
 
     private val viewModel: SettingsWebViewViewModel by bindViewModel()
-
-    @Inject
-    lateinit var css: CoreContentScopeScripts
 
     @Inject
     @Named("ContentScopeScripts")
@@ -122,7 +108,6 @@ class SettingsWebViewActivity : DuckDuckGoActivity() {
 
     private fun exit() {
         binding.settingsWebView.stopLoading()
-        binding.settingsWebView.removeJavascriptInterface(contentScopeScripts.context)
         binding.root.removeView(binding.settingsWebView)
         binding.settingsWebView.destroy()
 
@@ -130,33 +115,10 @@ class SettingsWebViewActivity : DuckDuckGoActivity() {
     }
 
     @SuppressLint("SetJavaScriptEnabled")
-    private suspend fun setupWebView() {
+    private fun setupWebView() {
         binding.settingsWebView.let {
-            contentScopeScripts.register(
-                it,
-                object : JsMessageCallback() {
-                    override fun process(
-                        featureName: String,
-                        method: String,
-                        id: String?,
-                        data: JSONObject?,
-                    ) {
-                        viewModel.processJsCallbackMessage(featureName, method, id, data)
-                    }
-                },
-            )
-
-            webViewCompat.addDocumentStartJavaScript(
-                it,
-                "javascript:${css.getScript(false, emptyList())}",
-                setOf(
-                    "https://duckduckgo.com", // exact origin
-                    "https://*.duckduckgo.com", // any subdomain
-                ),
-            )
-
             it.settings.apply {
-                userAgentString = userAgentProvider.userAgent()
+                userAgentString = CUSTOM_USER_AGENT
                 javaScriptEnabled = true
                 domStorageEnabled = true
                 loadWithOverviewMode = true
@@ -178,5 +140,10 @@ class SettingsWebViewActivity : DuckDuckGoActivity() {
             }
         }
         return super.onOptionsItemSelected(item)
+    }
+
+    companion object {
+        private const val CUSTOM_USER_AGENT = "Mozilla/5.0 (Linux; Android 15) AppleWebKit/537.36 (KHTML, like Gecko) " +
+            "Version/4.0 Chrome/140.0.0.0 Mobile DuckDuckGo/5 Safari/537.36"
     }
 }
