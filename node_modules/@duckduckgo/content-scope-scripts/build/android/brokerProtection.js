@@ -2027,6 +2027,7 @@
       "duckPlayer",
       "duckPlayerNative",
       "duckAiListener",
+      "duckAiDataClearing",
       "harmfulApis",
       "webCompat",
       "windowsPermissionUsage",
@@ -2040,11 +2041,12 @@
     ]
   );
   var platformSupport = {
-    apple: ["webCompat", "duckPlayerNative", ...baseFeatures, "duckAiListener", "pageContext"],
+    apple: ["webCompat", "duckPlayerNative", ...baseFeatures, "duckAiListener", "duckAiDataClearing", "pageContext"],
     "apple-isolated": [
       "duckPlayer",
       "duckPlayerNative",
       "brokerProtection",
+      "breakageReporting",
       "performanceMetrics",
       "clickToLoad",
       "messageBridge",
@@ -2075,7 +2077,8 @@
       "messageBridge",
       "webCompat",
       "pageContext",
-      "duckAiListener"
+      "duckAiListener",
+      "duckAiDataClearing"
     ],
     firefox: ["cookie", ...baseFeatures, "clickToLoad"],
     chrome: ["cookie", ...baseFeatures, "clickToLoad"],
