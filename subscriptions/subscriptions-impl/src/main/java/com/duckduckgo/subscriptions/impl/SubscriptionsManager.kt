@@ -405,13 +405,7 @@ class RealSubscriptionsManager @Inject constructor(
                     return@withContext false
                 }
 
-                // fixme: Replace purchaseHistory with queryPurchasesAsync() to fetch the current purchase token.
-                // This aligns with Billing v8 and avoids using the deprecated Purchase History API.
-                val currentPurchaseToken =
-                    playBillingManager.purchaseHistory
-                        .filter { it.products.contains(BASIC_SUBSCRIPTION) }
-                        .maxByOrNull { it.purchaseTime }
-                        ?.purchaseToken
+                val currentPurchaseToken = playBillingManager.getLatestPurchaseToken()
 
                 if (currentPurchaseToken == null) {
                     logcat { "Subs: Cannot switch plan - no current purchase token found" }
