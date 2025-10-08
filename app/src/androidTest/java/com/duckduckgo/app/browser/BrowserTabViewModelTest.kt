@@ -7902,4 +7902,46 @@ class BrowserTabViewModelTest {
 
         override fun getPlugins(): Collection<PostMessageWrapperPlugin> = listOf(plugin)
     }
+
+    @Test
+    fun whenVpnMenuClickedWithNotSubscribedStateThenPixelFiredWithPillStatus() {
+        testee.browserViewState.value = browserViewState().copy(
+            vpnMenuState = VpnMenuState.NotSubscribed,
+        )
+
+        testee.onVpnMenuClicked()
+
+        verify(mockPixel).fire(
+            AppPixelName.MENU_ACTION_VPN_PRESSED,
+            mapOf(PixelParameter.STATUS to "pill"),
+        )
+    }
+
+    @Test
+    fun whenVpnMenuClickedWithNotSubscribedNoPillStateThenPixelFiredWithNoPillStatus() {
+        testee.browserViewState.value = browserViewState().copy(
+            vpnMenuState = VpnMenuState.NotSubscribedNoPill,
+        )
+
+        testee.onVpnMenuClicked()
+
+        verify(mockPixel).fire(
+            AppPixelName.MENU_ACTION_VPN_PRESSED,
+            mapOf(PixelParameter.STATUS to "no_pill"),
+        )
+    }
+
+    @Test
+    fun whenVpnMenuClickedWithSubscribedStateThenPixelFiredWithSubscribedStatus() {
+        testee.browserViewState.value = browserViewState().copy(
+            vpnMenuState = VpnMenuState.Subscribed(isVpnEnabled = true),
+        )
+
+        testee.onVpnMenuClicked()
+
+        verify(mockPixel).fire(
+            AppPixelName.MENU_ACTION_VPN_PRESSED,
+            mapOf(PixelParameter.STATUS to "subscribed"),
+        )
+    }
 }
