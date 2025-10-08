@@ -246,6 +246,7 @@
     <string name="settingsAutomaticallyClearWhenAppExit30Minutes">Kilépés az alkalmazásból 30 perc inaktivitás után</string>
     <string name="settingsAutomaticallyClearWhenAppExit60Minutes">Kilépés az alkalmazásból 1 óra inaktivitás után</string>
     <string name="settingsClearAiDataTitle">Duck.ai-csevegések törlése</string>
+    <string name="settingsClearAiDataDeleteMessage">A Fire Button a Duck.ai-előzményeket is törli, a rögzített csevegéseket is beleértve.</string>
 
     <!-- About Activity -->
     <string name="aboutActivityTitle">A DuckDuckGóról</string>
