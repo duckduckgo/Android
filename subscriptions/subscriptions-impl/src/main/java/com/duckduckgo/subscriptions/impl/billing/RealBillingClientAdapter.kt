@@ -149,16 +149,16 @@ class RealBillingClientAdapter @Inject constructor(
         }
     }
 
-    override suspend fun queryPurchases(): QueryPurchasesResult = withContext(coroutineDispatchers.io()) {
+    override suspend fun queryPurchases(): QueryPurchasesResult {
         val client = billingClient
         if (client == null || !client.isReady) {
-            return@withContext QueryPurchasesResult.Failure(
+            return QueryPurchasesResult.Failure(
                 billingError = BillingError.SERVICE_DISCONNECTED,
                 debugMessage = "BillingClient is not ready",
             )
         }
 
-        return@withContext try {
+        return try {
             val queryParams = QueryPurchasesParams.newBuilder()
                 .setProductType(ProductType.SUBS)
                 .build()
