@@ -248,6 +248,7 @@
     <string name="settingsAutomaticallyClearWhenAppExit30Minutes">После выхода из приложения, через 30 минут бездействия</string>
     <string name="settingsAutomaticallyClearWhenAppExit60Minutes">После выхода из приложения, через 1 час бездействия</string>
     <string name="settingsClearAiDataTitle">Очистить чаты Duck.ai</string>
+    <string name="settingsClearAiDataDeleteMessage">Нажатие кнопки Fire Button также сотрет историю Duck.ai, включая закрепленные чаты.</string>
 
     <!-- About Activity -->
     <string name="aboutActivityTitle">Несколько слов о DuckDuckGo</string>
