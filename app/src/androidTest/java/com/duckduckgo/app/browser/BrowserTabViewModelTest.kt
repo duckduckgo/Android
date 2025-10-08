@@ -692,6 +692,7 @@ class BrowserTabViewModelTest {
             whenever(mockSerpEasterEggLogoToggles.feature()).thenReturn(mockDisabledToggle)
             whenever(nonHttpAppLinkChecker.isPermitted(anyOrNull())).thenReturn(true)
             remoteMessagingModel = givenRemoteMessagingModel(mockRemoteMessagingRepository, mockPixel, coroutineRule.testDispatcherProvider)
+            whenever(mockAddressBarTrackersAnimationFeatureToggle.feature()).thenReturn(mockDisabledToggle)
 
             ctaViewModel =
                 CtaViewModel(
@@ -6441,8 +6442,7 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenAutoConsentPopupHandledWithFeatureToggleEnabledAndTrackersBlockedThenEnqueueCookiesAnimation() {
-        val mockToggle: Toggle = mock { on { it.isEnabled() } doReturn true }
-        whenever(mockAddressBarTrackersAnimationFeatureToggle.feature()).thenReturn(mockToggle)
+        whenever(mockAddressBarTrackersAnimationFeatureToggle.feature()).thenReturn(mockEnabledToggle)
 
         testee.browserViewState.value =
             testee.browserViewState.value?.copy(
@@ -6453,6 +6453,7 @@ class BrowserTabViewModelTest {
 
         val site = givenCurrentSite("https://example.com")
         whenever(site.trackerCount).thenReturn(5)
+        testee.siteLiveData.value = site
 
         testee.onAutoConsentPopUpHandled(true)
 
@@ -6463,8 +6464,7 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenAutoConsentPopupHandledWithFeatureToggleDisabledThenShowAutoconsentAnimation() {
-        val mockToggle: Toggle = mock { on { it.isEnabled() } doReturn false }
-        whenever(mockAddressBarTrackersAnimationFeatureToggle.feature()).thenReturn(mockToggle)
+        whenever(mockAddressBarTrackersAnimationFeatureToggle.feature()).thenReturn(mockDisabledToggle)
 
         testee.browserViewState.value =
             testee.browserViewState.value?.copy(
@@ -6473,9 +6473,6 @@ class BrowserTabViewModelTest {
                 maliciousSiteStatus = null,
             )
 
-        val site = givenCurrentSite("https://example.com")
-        whenever(site.trackerCount).thenReturn(5)
-
         testee.onAutoConsentPopUpHandled(true)
 
         assertCommandIssued<ShowAutoconsentAnimation>()
@@ -6483,8 +6480,7 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenAutoConsentPopupHandledWithFeatureToggleEnabledButNoTrackersThenShowAutoconsentAnimation() {
-        val mockToggle: Toggle = mock { on { it.isEnabled() } doReturn true }
-        whenever(mockAddressBarTrackersAnimationFeatureToggle.feature()).thenReturn(mockToggle)
+        whenever(mockAddressBarTrackersAnimationFeatureToggle.feature()).thenReturn(mockEnabledToggle)
 
         testee.browserViewState.value =
             testee.browserViewState.value?.copy(
@@ -6495,6 +6491,7 @@ class BrowserTabViewModelTest {
 
         val site = givenCurrentSite("https://example.com")
         whenever(site.trackerCount).thenReturn(0)
+        testee.siteLiveData.value = site
 
         testee.onAutoConsentPopUpHandled(true)
 

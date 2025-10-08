@@ -4542,7 +4542,8 @@ class BrowserTabViewModel @Inject constructor(
         command.value = Command.ShowSerpEasterEggLogo(url)
     }
 
-    private fun trackersCount(): String = site?.trackerCount?.takeIf { it > 0 }?.toString() ?: ""
+    private fun trackersCount(): String =
+        siteLiveData.value?.trackerCount?.takeIf { it > 0 }?.toString() ?: ""
 
     companion object {
         private const val FIXED_PROGRESS = 50
