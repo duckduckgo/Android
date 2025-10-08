@@ -18,7 +18,7 @@ package com.duckduckgo.app.attributed.metrics.store
 
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
-import java.time.LocalDate
+import java.time.*
 import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
 import javax.inject.Inject
@@ -31,33 +31,41 @@ import javax.inject.Inject
  * - Calculating days between dates
  * - Generating dates relative to the current date
  *
- * All dates are handled in the format "yyyy-MM-dd" for consistency across the feature.
- * This format is used for both storage and calculations.
+ * All dates are handled in Eastern Time (ET) and formatted as "yyyy-MM-dd" for consistency.
+ * This format is used for both storage and calculations. The timezone ensures that day
+ * boundaries align with business operations in ET.
  *
  * Example usage:
  * ```
- * // Get today's date
- * val today = dateUtils.getCurrentDate() // returns "2025-10-03"
+ * // Get today's date in ET
+ * val today = dateUtils.getCurrentDate() // returns "2025-10-03" (if it's Oct 3rd in ET)
  *
- * // Get a date 7 days ago
+ * // Get a date 7 days ago in ET
  * val lastWeek = dateUtils.getDateMinusDays(7) // returns "2025-09-26"
  *
- * // Calculate days since a specific date
+ * // Calculate days since a specific date in ET
+ * // Note: The calculation uses ET midnight as the boundary for day changes
  * val daysSince = dateUtils.daysSince("2025-09-01") // returns number of days
  * ```
+ *
+ * Note: All date operations use Eastern Time (ET) timezone. This means:
+ * - Day changes occur at midnight ET
+ * - Date comparisons and calculations are based on ET dates
+ * - The returned date strings represent dates in ET
  */
 interface AttributedMetricsDateUtils {
     /**
-     * Gets the current date formatted as "yyyy-MM-dd".
+     * Gets the current date in Eastern Time formatted as "yyyy-MM-dd".
      *
-     * @return The current date as a string in the format "yyyy-MM-dd"
+     * @return The current date in ET as a string in the format "yyyy-MM-dd"
      */
     fun getCurrentDate(): String
 
     /**
-     * Calculates the number of days between a given date and the current date.
+     * Calculates the number of days between a given date and the current date in Eastern Time.
+     * Day boundaries are determined using midnight ET.
      *
-     * @param date The reference date in "yyyy-MM-dd" format
+     * @param date The reference date in "yyyy-MM-dd" format (interpreted in ET)
      * @return The number of days between the reference date and current date.
      *         Positive if the reference date is in the past,
      *         negative if it's in the future,
@@ -66,28 +74,35 @@ interface AttributedMetricsDateUtils {
     fun daysSince(date: String): Int
 
     /**
-     * Gets a date that is a specified number of days before the current date.
+     * Gets a date that is a specified number of days before the current date in Eastern Time.
+     * Day boundaries are determined using midnight ET.
      *
      * @param days The number of days to subtract from the current date
-     * @return The calculated date as a string in "yyyy-MM-dd" format
+     * @return The calculated date as a string in "yyyy-MM-dd" format (in ET)
      */
     fun getDateMinusDays(days: Int): String
 }
 
 @ContributesBinding(AppScope::class)
 class RealAttributedMetricsDateUtils @Inject constructor() : AttributedMetricsDateUtils {
-    override fun getCurrentDate(): String = getCurrentLocalDate().format(DATE_FORMATTER)
+    override fun getCurrentDate(): String = getCurrentZonedDateTime().format(DATE_FORMATTER)
 
     override fun daysSince(date: String): Int {
-        val initDate = LocalDate.parse(date, DATE_FORMATTER)
-        return ChronoUnit.DAYS.between(initDate, getCurrentLocalDate()).toInt()
+        // Parse the input date and set it to start of day (midnight) in ET
+        val initDate = ZonedDateTime.of(
+            LocalDate.parse(date, DATE_FORMATTER),
+            LocalTime.MIDNIGHT,
+            ET_ZONE,
+        )
+        return ChronoUnit.DAYS.between(initDate, getCurrentZonedDateTime()).toInt()
     }
 
-    override fun getDateMinusDays(days: Int): String = getCurrentLocalDate().minusDays(days.toLong()).format(DATE_FORMATTER)
+    override fun getDateMinusDays(days: Int): String = getCurrentZonedDateTime().minusDays(days.toLong()).format(DATE_FORMATTER)
 
-    private fun getCurrentLocalDate(): LocalDate = LocalDate.now()
+    private fun getCurrentZonedDateTime(): ZonedDateTime = ZonedDateTime.now(ET_ZONE)
 
     companion object {
         private val DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd")
+        private val ET_ZONE = ZoneId.of("America/New_York")
     }
 }
