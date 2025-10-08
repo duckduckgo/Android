@@ -155,23 +155,52 @@ interface PirRepository {
         val etag: String,
     )
 
-    sealed class EmailConfirmationLinkFetchStatus {
+    sealed class EmailConfirmationLinkFetchStatus(val statusString: String) {
+
         data class Ready(
             /**
              * This represents the data we receive from the backend where the key could be "link" or "verification_code"
              * And the value is the actual link or code.
              */
             val data: Map<String, String>,
-        ) : EmailConfirmationLinkFetchStatus()
+            val emailReceivedAtMs: Long,
+        ) : EmailConfirmationLinkFetchStatus(STATUS_READY)
 
-        data object Pending : EmailConfirmationLinkFetchStatus()
+        data object Pending : EmailConfirmationLinkFetchStatus(STATUS_PENDING)
 
-        data object Unknown : EmailConfirmationLinkFetchStatus()
+        data class Unknown(
+            val errorCode: String = "unknown_error",
+        ) : EmailConfirmationLinkFetchStatus(STATUS_UNKNOWN)
 
         data class Error(
             val errorCode: String,
             val error: String,
-        ) : EmailConfirmationLinkFetchStatus()
+        ) : EmailConfirmationLinkFetchStatus(STATUS_ERROR)
+
+        companion object {
+            const val STATUS_READY = "ready"
+            const val STATUS_PENDING = "pending"
+            const val STATUS_UNKNOWN = "unknown"
+            const val STATUS_ERROR = "error"
+
+            fun fromString(
+                status: String,
+                emailReceivedAtMs: Long = 0L,
+                data: Map<String, String>? = null,
+                errorCode: String? = null,
+                error: String? = null,
+            ): EmailConfirmationLinkFetchStatus = when (status.lowercase()) {
+                STATUS_READY -> Ready(
+                    data = data ?: emptyMap(),
+                    emailReceivedAtMs = emailReceivedAtMs,
+                )
+
+                STATUS_PENDING -> Pending
+                STATUS_UNKNOWN -> if (errorCode != null) Unknown(errorCode) else Unknown()
+                STATUS_ERROR -> Error(errorCode ?: "unknown_error", error ?: "Unknown error")
+                else -> Unknown()
+            }
+        }
     }
 }
 
@@ -523,25 +552,15 @@ internal class RealPirRepository(
                                 email = response.email,
                                 attemptId = response.attemptId,
                             )
-                        val value =
-                            when (response.status) {
-                                "ready" ->
-                                    Ready(
-                                        data =
-                                        response.data.associate {
-                                            it.name to it.value
-                                        },
-                                    )
-
-                                "error" ->
-                                    Error(
-                                        errorCode = response.errorCode.orEmpty(),
-                                        error = response.error.orEmpty(),
-                                    )
-
-                                "pending" -> Pending
-                                else -> Unknown
-                            }
+                        val value = EmailConfirmationLinkFetchStatus.fromString(
+                            status = response.status,
+                            emailReceivedAtMs = TimeUnit.SECONDS.toMillis(response.emailReceivedAt),
+                            data = response.data.associate {
+                                it.name to it.value
+                            },
+                            errorCode = response.errorCode,
+                            error = response.error,
+                        )
                         key to value
                     }
                 }

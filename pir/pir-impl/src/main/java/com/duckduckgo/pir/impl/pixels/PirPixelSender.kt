@@ -150,7 +150,7 @@ interface PirPixelSender {
      *
      * @param brokerUrl The URL of the data broker that this action was operating on
      * @param brokerVersion The version of the broker JSON file
-     * @param linkAgeMs Time from when the link was requested till it's retrieved on the client (in milliseconds)
+     * @param linkAgeMs Time from when the link was received by the BE (returned in the response) to when it was fetched by the client
      */
     fun reportEmailConfirmationLinkFetched(
         brokerUrl: String,
