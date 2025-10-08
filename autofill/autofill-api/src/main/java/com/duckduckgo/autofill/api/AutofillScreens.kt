@@ -54,6 +54,12 @@ sealed interface AutofillScreens {
         val loginCredentials: LoginCredentials,
         val source: AutofillScreenLaunchSource,
     ) : ActivityParams
+
+    /**
+     * Launch the Google Bookmarks import flow
+     * @param importSource is used to indicate from where in the app the import was launched
+     */
+    data class ImportBookmarksViaGoogleTakeoutScreen(val importSource: AutofillImportBookmarksLaunchSource) : ActivityParams
 }
 
 enum class AutofillScreenLaunchSource {

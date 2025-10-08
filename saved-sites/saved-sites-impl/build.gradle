@@ -37,6 +37,7 @@ dependencies {
     implementation project(path: ':navigation-api')
     implementation project(path: ':new-tab-page-api')
     implementation project(path: ':data-store-api')
+    implementation project(path: ':autofill-api')
     implementation project(path: ':saved-sites-store')
 
     anvil project(path: ':anvil-compiler')

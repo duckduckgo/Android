@@ -65,7 +65,7 @@
         </FrameLayout>
 
         <com.duckduckgo.common.ui.view.text.DaxTextView
-            android:id="@+id/dialogTitle"
+            android:id="@+id/inProgressTitle"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/keyline_5"
@@ -76,6 +76,19 @@
             app:layout_constraintStart_toStartOf="@id/guidelineStart"
             app:layout_constraintTop_toBottomOf="@id/progressContainer"
             app:typography="h1" />
+
+        <com.duckduckgo.common.ui.view.text.DaxTextView
+            android:id="@+id/inProgressSubtitle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/keyline_4"
+            android:breakStrategy="balanced"
+            android:gravity="center_horizontal"
+            android:text="@string/importBookmarksProgressSubtitle"
+            app:layout_constraintEnd_toEndOf="@id/guidelineEnd"
+            app:layout_constraintStart_toStartOf="@id/guidelineStart"
+            app:layout_constraintTop_toBottomOf="@id/inProgressTitle"
+            app:typography="body1" />
 
         <LinearLayout
             android:id="@+id/infoMessagesContainer"
@@ -88,7 +101,7 @@
             android:layout_marginBottom="@dimen/keyline_5"
             app:layout_constraintEnd_toEndOf="@id/guidelineEnd"
             app:layout_constraintStart_toStartOf="@id/guidelineStart"
-            app:layout_constraintTop_toBottomOf="@id/dialogTitle">
+            app:layout_constraintTop_toBottomOf="@id/inProgressSubtitle">
 
             <com.duckduckgo.common.ui.view.listitem.OneLineListItem
                 android:layout_width="match_parent"
