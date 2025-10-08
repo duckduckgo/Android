@@ -16,11 +16,13 @@
 
 package com.duckduckgo.app.attributed.metrics.store
 
-import androidx.room.*
+import androidx.room.Dao
+import androidx.room.Insert
+import androidx.room.OnConflictStrategy
+import androidx.room.Query
 
 @Dao
 interface EventDao {
-    @Transaction
     @Query("SELECT * FROM event_metrics WHERE eventName = :eventName AND day >= :startDay ORDER BY day DESC")
     suspend fun getEventsByNameAndTimeframe(
         eventName: String,
