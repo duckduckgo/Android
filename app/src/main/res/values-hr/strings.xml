@@ -248,6 +248,7 @@
     <string name="settingsAutomaticallyClearWhenAppExit30Minutes">Izlaz iz aplikacije, neaktivna 30 minuta</string>
     <string name="settingsAutomaticallyClearWhenAppExit60Minutes">Izlaz iz aplikacije, neaktivna 1 sat</string>
     <string name="settingsClearAiDataTitle">Izbriši razgovore s Duck.ai</string>
+    <string name="settingsClearAiDataDeleteMessage">Fire Button će također izbrisati povijest Duck.ai, uključujući prikvačene razgovore.</string>
 
     <!-- About Activity -->
     <string name="aboutActivityTitle">O DuckDuckGou</string>
