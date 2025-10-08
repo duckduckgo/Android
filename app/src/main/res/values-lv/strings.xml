@@ -247,6 +247,7 @@
     <string name="settingsAutomaticallyClearWhenAppExit30Minutes">Iziešana no lietotnes, neaktīva 30 minūtes</string>
     <string name="settingsAutomaticallyClearWhenAppExit60Minutes">Iziešana no lietotnes, neaktīva 1 stundu</string>
     <string name="settingsClearAiDataTitle">Notīrīt Duck.ai tērzēšanas sarunas</string>
+    <string name="settingsClearAiDataDeleteMessage">Fire Button izdzēsīs arī Duck.ai vēsturi, ieskaitot piespraustās tērzēšanas.</string>
 
     <!-- About Activity -->
     <string name="aboutActivityTitle">Par DuckDuckGo</string>
