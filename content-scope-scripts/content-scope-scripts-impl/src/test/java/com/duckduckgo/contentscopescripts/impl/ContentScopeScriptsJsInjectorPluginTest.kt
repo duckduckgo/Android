@@ -1,7 +1,6 @@
 package com.duckduckgo.contentscopescripts.impl
 
 import android.webkit.WebView
-import com.duckduckgo.contentscopescripts.api.CoreContentScopeScripts
 import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.any

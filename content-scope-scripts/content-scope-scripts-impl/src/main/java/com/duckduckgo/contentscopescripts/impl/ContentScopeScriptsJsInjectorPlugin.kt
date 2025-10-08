@@ -19,7 +19,6 @@ package com.duckduckgo.contentscopescripts.impl
 import android.webkit.WebView
 import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.browser.api.JsInjectorPlugin
-import com.duckduckgo.contentscopescripts.api.CoreContentScopeScripts
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.squareup.anvil.annotations.ContributesMultibinding
