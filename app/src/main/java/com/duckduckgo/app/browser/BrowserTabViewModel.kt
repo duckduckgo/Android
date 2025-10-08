@@ -4263,6 +4263,17 @@ class BrowserTabViewModel @Inject constructor(
             return
         }
 
+        val pauseWebViewBeforeUpdatingScript = withContext(dispatchers.io()) {
+            androidBrowserConfig.pauseWebViewBeforeUpdatingScript().isEnabled()
+        }
+
+        if (pauseWebViewBeforeUpdatingScript) {
+            withContext(dispatchers.main()) {
+                webView.stopLoading()
+                webView.pauseTimers()
+            }
+        }
+
         if (withContext(dispatchers.io()) { !androidBrowserConfig.updateScriptOnPageFinished().isEnabled() }) {
             addDocumentStartJavascriptPlugins
                 .getPlugins()
@@ -4273,6 +4284,10 @@ class BrowserTabViewModel @Inject constructor(
                 }
         } else {
             addDocumentStartJavaScript(webView)
+        }
+
+        if (pauseWebViewBeforeUpdatingScript) {
+            webView.resumeTimers()
         }
     }
 

@@ -186,4 +186,7 @@ interface AndroidBrowserConfigFeature {
 
     @Toggle.DefaultValue(TRUE)
     fun updateScriptOnProtectionsChanged(): Toggle
+
+    @Toggle.DefaultValue(TRUE)
+    fun pauseWebViewBeforeUpdatingScript(): Toggle
 }
