@@ -2,42 +2,42 @@
 {
     "m_autocomplete_displayed_bookmark": {
         "description": "An autocomplete suggestion originating from a local bookmark was rendered to the user.",
-        "owners": [ "CrisBarreiro" ],
+        "owners": ["CrisBarreiro"],
         "triggers": [],
         "suffixes": ["form_factor"],
         "parameters": ["appVersion"]
     },
     "m_autocomplete_displayed_favorite": {
         "description": "An autocomplete suggestion originating from a local favorite was rendered to the user.",
-        "owners": [ "CrisBarreiro" ],
+        "owners": ["CrisBarreiro"],
         "triggers": [],
         "suffixes": ["form_factor"],
         "parameters": ["appVersion"]
     },
     "m_autocomplete_displayed_website": {
         "description": "A local (non-history) website autocomplete suggestion (e.g. stored/known site) was rendered to the user.",
-        "owners": [ "CrisBarreiro" ],
+        "owners": ["CrisBarreiro"],
         "triggers": [],
         "suffixes": ["form_factor"],
         "parameters": ["appVersion"]
     },
     "m_autocomplete_displayed_history_site": {
         "description": "A site (URL/domain) suggestion sourced from browsing history was rendered to the user.",
-        "owners": [ "CrisBarreiro" ],
+        "owners": ["CrisBarreiro"],
         "triggers": [],
         "suffixes": ["form_factor"],
         "parameters": ["appVersion"]
     },
     "m_autocomplete_displayed_history_search": {
         "description": "A search query suggestion sourced from browsing history was rendered to the user.",
-        "owners": [ "CrisBarreiro" ],
+        "owners": ["CrisBarreiro"],
         "triggers": [],
         "suffixes": ["form_factor"],
         "parameters": ["appVersion"]
     },
     "m_autocomplete_displayed_switch_to_tab": {
         "description": "A 'switch to tab' suggestion (indicating an already open tab) was rendered to the user.",
-        "owners": [ "CrisBarreiro" ],
+        "owners": ["CrisBarreiro"],
         "triggers": [],
         "suffixes": ["form_factor"],
         "parameters": ["appVersion"]
