@@ -31,4 +31,7 @@ interface ContentScopeScriptsFeature {
 
     @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
     fun useNewWebCompatApis(): Toggle
+
+    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
+    fun useWebMessageListener(): Toggle
 }

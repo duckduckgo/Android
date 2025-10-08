@@ -45,6 +45,8 @@ interface WebViewCompatContentScopeScripts {
 
     suspend fun isEnabled(): Boolean
 
+    suspend fun isWebMessagingEnabled(): Boolean
+
     val secret: String
     val javascriptInterface: String
     val callbackName: String
@@ -122,6 +124,14 @@ class RealWebViewCompatContentScopeScripts @Inject constructor(
         }
     }
 
+    override suspend fun isWebMessagingEnabled(): Boolean {
+        return withContext(dispatcherProvider.io()) {
+            contentScopeScriptsFeature.self().isEnabled() &&
+                contentScopeScriptsFeature.useNewWebCompatApis().isEnabled() &&
+                contentScopeScriptsFeature.useWebMessageListener().isEnabled()
+        }
+    }
+
     private fun getSecretKeyValuePair() = "\"messageSecret\":\"$secret\""
     private fun getCallbackKeyValuePair() = "\"messageCallback\":\"$callbackName\""
     private fun getInterfaceKeyValuePair() = "\"javascriptInterface\":\"$javascriptInterface\""
@@ -167,7 +177,11 @@ class RealWebViewCompatContentScopeScripts @Inject constructor(
     }
 
     private suspend fun cacheJs() {
-        val adsContentScopeJs = webViewCompatContentScopeJSReader.getContentScopeJS()
+        val adsContentScopeJs = if (isWebMessagingEnabled()) {
+            webViewCompatContentScopeJSReader.getContentScopeJS()
+        } else {
+            webViewCompatContentScopeJSReader.getNoWebMessagingContentScopeJS()
+        }
 
         cachedAdsJS = adsContentScopeJs
             .replace(contentScope, cachedContentScopeJson)

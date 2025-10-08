@@ -174,7 +174,7 @@ class ContentScopeScriptsWebMessagingPlugin @Inject constructor(
         jsMessageCallback: WebViewCompatMessageCallback,
         webView: WebView,
     ) {
-        if (!webViewCompatContentScopeScripts.isEnabled()) {
+        if (!webViewCompatContentScopeScripts.isWebMessagingEnabled()) {
             return
         }
 
