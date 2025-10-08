@@ -26,11 +26,11 @@ import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.duckchat.impl.R
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_PAID_OPEN_DUCK_AI_CLICKED
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_PAID_SETTINGS_OPENED
-import javax.inject.Inject
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 @ContributesViewModel(ActivityScope::class)
 class DuckAiPaidSettingsViewModel @Inject constructor(

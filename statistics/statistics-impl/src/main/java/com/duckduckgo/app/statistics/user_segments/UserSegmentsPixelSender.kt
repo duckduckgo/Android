@@ -27,9 +27,9 @@ import com.duckduckgo.app.statistics.user_segments.SegmentCalculation.ActivityTy
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesMultibinding
-import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 @ContributesMultibinding(AppScope::class)
 class UserSegmentsPixelSender @Inject constructor(

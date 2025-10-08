@@ -40,10 +40,10 @@ import com.duckduckgo.sync.impl.ui.setup.SyncSetupIntroViewModel.Command.StartSe
 import com.duckduckgo.sync.impl.ui.setup.SyncSetupIntroViewModel.ViewMode.CreateAccountIntro
 import com.duckduckgo.sync.impl.ui.setup.SyncSetupIntroViewModel.ViewMode.RecoverAccountIntro
 import com.duckduckgo.sync.impl.ui.setup.SyncSetupIntroViewModel.ViewState
-import javax.inject.*
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import logcat.logcat
+import javax.inject.*
 
 @InjectWith(FragmentScope::class)
 class SyncSetupIntroFragment : DuckDuckGoFragment(R.layout.fragment_intro_sync) {

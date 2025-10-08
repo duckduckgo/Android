@@ -27,13 +27,13 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.experiments.api.VariantManager
 import com.squareup.anvil.annotations.ContributesBinding
 import io.reactivex.schedulers.Schedulers
-import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import logcat.LogPriority.INFO
 import logcat.LogPriority.VERBOSE
 import logcat.LogPriority.WARN
 import logcat.logcat
+import javax.inject.Inject
 
 interface StatisticsUpdater {
     fun initializeAtb()

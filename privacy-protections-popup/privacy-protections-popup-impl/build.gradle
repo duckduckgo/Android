@@ -29,7 +29,7 @@ dependencies {
     implementation project(':privacy-protections-popup-api')
     implementation project(':anvil-annotations')
     implementation project(':di')
-    implementation project(':common-ui')
+    implementation project(':design-system')
     implementation project(':common-utils')
     implementation project(':browser-api')
     implementation project(':privacy-config-api')

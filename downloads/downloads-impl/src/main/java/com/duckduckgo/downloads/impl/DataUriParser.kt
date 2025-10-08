@@ -18,10 +18,10 @@ package com.duckduckgo.downloads.impl
 
 import android.webkit.MimeTypeMap
 import com.duckduckgo.downloads.impl.DataUriParser.ParseResult.ParsedDataUri
+import okio.ByteString.Companion.decodeBase64
 import java.nio.charset.StandardCharsets
 import java.util.*
 import javax.inject.Inject
-import okio.ByteString.Companion.decodeBase64
 
 class DataUriParser @Inject constructor() {
 

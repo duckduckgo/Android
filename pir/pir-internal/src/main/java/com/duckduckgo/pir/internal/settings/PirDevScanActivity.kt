@@ -44,11 +44,11 @@ import com.duckduckgo.pir.impl.store.PirRepository
 import com.duckduckgo.pir.impl.store.PirSchedulingRepository
 import com.duckduckgo.pir.internal.R
 import com.duckduckgo.pir.internal.databinding.ActivityPirInternalScanBinding
-import javax.inject.Inject
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import logcat.logcat
+import javax.inject.Inject
 
 @InjectWith(ActivityScope::class)
 @ContributeToActivityStarter(PirDevScanScreenNoParams::class)

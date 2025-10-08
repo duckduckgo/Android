@@ -28,9 +28,9 @@ import com.duckduckgo.di.scopes.AppScope
 import com.frybits.harmony.getHarmonySharedPreferences
 import com.frybits.harmony.secure.getEncryptedHarmonySharedPreferences
 import com.squareup.anvil.annotations.ContributesBinding
-import javax.inject.Inject
 import logcat.LogPriority.WARN
 import logcat.logcat
+import javax.inject.Inject
 
 private const val MIGRATED_TO_HARMONY = "migrated_to_harmony"
 

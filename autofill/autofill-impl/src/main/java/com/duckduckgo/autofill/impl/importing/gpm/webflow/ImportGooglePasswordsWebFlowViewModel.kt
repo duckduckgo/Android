@@ -37,7 +37,6 @@ import com.duckduckgo.autofill.impl.store.ReAuthenticationDetails
 import com.duckduckgo.autofill.impl.store.ReauthenticationHandler
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.FragmentScope
-import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -48,6 +47,7 @@ import kotlinx.coroutines.withContext
 import kotlinx.parcelize.Parcelize
 import logcat.LogPriority.WARN
 import logcat.logcat
+import javax.inject.Inject
 
 @ContributesViewModel(FragmentScope::class)
 class ImportGooglePasswordsWebFlowViewModel @Inject constructor(

@@ -26,6 +26,7 @@ data class JsonMessageAction(
     val additionalParameters: Map<String, String>?,
 )
 
+@Suppress("ktlint:standard:class-naming")
 sealed class JsonActionType(val jsonValue: String) {
     data object URL : JsonActionType("url")
     data object PLAYSTORE : JsonActionType("playstore")

@@ -47,8 +47,8 @@ interface JobSchedulingDao {
 
     @Query(
         """
-        UPDATE pir_scan_job_record 
-        SET status = :newStatus, lastScanDateInMillis = :newLastScanDateMillis 
+        UPDATE pir_scan_job_record
+        SET status = :newStatus, lastScanDateInMillis = :newLastScanDateMillis
         WHERE brokerName = :brokerName AND userProfileId = :profileQueryId
     """,
     )
@@ -58,6 +58,18 @@ interface JobSchedulingDao {
         newStatus: String,
         newLastScanDateMillis: Long,
     )
+
+    @Query("SELECT * FROM pir_email_confirmation_job_record WHERE emailConfirmationLink = '' AND deprecated == 0 ORDER BY linkFetchAttemptCount")
+    fun getAllActiveEmailConfirmationJobRecordsWithNoLink(): List<EmailConfirmationJobRecordEntity>
+
+    @Query("SELECT * FROM pir_email_confirmation_job_record WHERE emailConfirmationLink != '' AND deprecated == 0 order BY jobAttemptCount")
+    fun getAllActiveEmailConfirmationJobRecordsWithLink(): List<EmailConfirmationJobRecordEntity>
+
+    @Query("SELECT * FROM pir_email_confirmation_job_record WHERE extractedProfileId = :extractedProfileId")
+    fun getEmailConfirmationJobRecord(extractedProfileId: Long): EmailConfirmationJobRecordEntity?
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    fun saveEmailConfirmationJobRecord(emailConfirmationJobRecordEntity: EmailConfirmationJobRecordEntity)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun saveOptOutJobRecord(optOutJobRecord: OptOutJobRecordEntity)
@@ -71,9 +83,15 @@ interface JobSchedulingDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun saveScanJobRecords(scanJobRecords: List<ScanJobRecordEntity>)
 
+    @Query("DELETE FROM pir_email_confirmation_job_record WHERE extractedProfileId = :extractedProfileId")
+    fun deleteEmailConfirmationJobRecord(extractedProfileId: Long)
+
     @Query("DELETE from pir_scan_job_record")
     fun deleteAllScanJobRecords()
 
     @Query("DELETE from pir_optout_job_record")
     fun deleteAllOptOutJobRecords()
+
+    @Query("DELETE from pir_email_confirmation_job_record")
+    fun deleteAllEmailConfirmationJobRecords()
 }

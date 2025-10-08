@@ -20,7 +20,6 @@ import androidx.work.ListenableWorker.Result
 import androidx.work.testing.TestListenableWorkerBuilder
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.privacyprotectionspopup.impl.db.PopupDismissDomainRepository
-import java.time.Instant
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -29,6 +28,7 @@ import org.junit.Test
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.only
 import org.mockito.kotlin.verify
+import java.time.Instant
 
 @ExperimentalCoroutinesApi
 class PrivacyProtectionsPopupDomainsCleanupWorkerTest {

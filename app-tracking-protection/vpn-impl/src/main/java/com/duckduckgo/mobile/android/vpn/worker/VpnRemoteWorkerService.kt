@@ -21,8 +21,8 @@ import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.di.ProcessName
 import com.duckduckgo.di.scopes.VpnScope
 import dagger.android.AndroidInjection
-import javax.inject.Inject
 import logcat.logcat
+import javax.inject.Inject
 
 @InjectWith(VpnScope::class)
 class VpnRemoteWorkerService constructor() : RemoteWorkerService() {

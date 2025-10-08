@@ -15,6 +15,7 @@ import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.MONTHLY_PLAN_US
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.YEARLY_PLAN_US
 import com.duckduckgo.subscriptions.impl.billing.BillingError.BILLING_UNAVAILABLE
 import com.duckduckgo.subscriptions.impl.billing.BillingError.NETWORK_ERROR
+import com.duckduckgo.subscriptions.impl.billing.BillingError.SERVICE_UNAVAILABLE
 import com.duckduckgo.subscriptions.impl.billing.FakeBillingClientAdapter.FakeMethodInvocation.Connect
 import com.duckduckgo.subscriptions.impl.billing.FakeBillingClientAdapter.FakeMethodInvocation.GetSubscriptions
 import com.duckduckgo.subscriptions.impl.billing.FakeBillingClientAdapter.FakeMethodInvocation.GetSubscriptionsPurchaseHistory
@@ -22,8 +23,6 @@ import com.duckduckgo.subscriptions.impl.billing.FakeBillingClientAdapter.FakeMe
 import com.duckduckgo.subscriptions.impl.billing.FakeBillingClientAdapter.FakeMethodInvocation.LaunchSubscriptionUpdate
 import com.duckduckgo.subscriptions.impl.billing.PurchaseState.Canceled
 import com.duckduckgo.subscriptions.impl.billing.PurchaseState.InProgress
-import kotlin.time.Duration.Companion.minutes
-import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.runCurrent
@@ -35,6 +34,8 @@ import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
+import kotlin.time.Duration.Companion.minutes
+import kotlin.time.Duration.Companion.seconds
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class RealPlayBillingManagerTest {
@@ -51,6 +52,7 @@ class RealPlayBillingManagerTest {
         pixelSender = mock(),
         billingClient = billingClientAdapter,
         dispatcherProvider = coroutineRule.testDispatcherProvider,
+        subscriptionPurchaseWideEvent = mock(),
     )
 
     @Before
@@ -119,7 +121,7 @@ class RealPlayBillingManagerTest {
     fun `when can't connect to service then launching billing flow is cancelled`() = runTest {
         billingClientAdapter.billingInitResult = BillingInitResult.Failure(BILLING_UNAVAILABLE)
         processLifecycleOwner.currentState = RESUMED
-        billingClientAdapter.launchBillingFlowResult = LaunchBillingFlowResult.Failure
+        billingClientAdapter.launchBillingFlowResult = LaunchBillingFlowResult.Failure(error = SERVICE_UNAVAILABLE)
         billingClientAdapter.methodInvocations.clear()
 
         val externalId = "external_id"
@@ -233,6 +235,7 @@ class RealPlayBillingManagerTest {
                 newPlanId = MONTHLY_PLAN_US,
                 externalId = externalId,
                 newOfferId = null,
+                oldPurchaseToken = oldPurchaseToken,
                 replacementMode = replacementMode,
             )
 
@@ -262,6 +265,7 @@ class RealPlayBillingManagerTest {
         runCurrent() // Ensure purchase history is loaded
 
         val externalId = "test_external_id"
+        val oldPurchaseToken = "old_purchase_token"
 
         subject.purchaseState.test {
             expectNoEvents()
@@ -271,6 +275,8 @@ class RealPlayBillingManagerTest {
                 newPlanId = "invalid_plan_id",
                 externalId = externalId,
                 newOfferId = null,
+                oldPurchaseToken = oldPurchaseToken,
+                replacementMode = SubscriptionReplacementMode.DEFERRED,
             )
 
             assertEquals(Canceled, awaitItem())
@@ -292,12 +298,13 @@ class RealPlayBillingManagerTest {
         processLifecycleOwner.currentState = RESUMED
         runCurrent() // Ensure purchase history is loaded
 
-        billingClientAdapter.launchBillingFlowResult = LaunchBillingFlowResult.Failure
+        billingClientAdapter.launchBillingFlowResult = LaunchBillingFlowResult.Failure(error = SERVICE_UNAVAILABLE)
 
         val productDetails = billingClientAdapter.subscriptions.first()
         val offerDetails = productDetails.subscriptionOfferDetails!!.first()
         val externalId = "test_external_id"
         val oldPurchaseToken = "old_purchase_token" // This is what getCurrentPurchaseToken() will return
+        val replacementMode = SubscriptionReplacementMode.DEFERRED
 
         subject.purchaseState.test {
             expectNoEvents()
@@ -307,6 +314,8 @@ class RealPlayBillingManagerTest {
                 newPlanId = MONTHLY_PLAN_US,
                 externalId = externalId,
                 newOfferId = null,
+                oldPurchaseToken = oldPurchaseToken,
+                replacementMode = replacementMode,
             )
 
             assertEquals(Canceled, awaitItem())
@@ -322,14 +331,15 @@ class RealPlayBillingManagerTest {
     }
 
     @Test
-    fun `when launchSubscriptionUpdate called with no purchase history then emits canceled state`() = runTest {
-        // No purchase history set up, so getCurrentPurchaseToken() will return null
+    fun `when launchSubscriptionUpdate called with empty purchase token then emits canceled state`() = runTest {
+        // Test with empty purchase token to simulate no valid token scenario
         billingClientAdapter.subscriptionsPurchaseHistory = emptyList()
 
         processLifecycleOwner.currentState = RESUMED
         runCurrent() // Ensure purchase history is loaded
 
         val externalId = "test_external_id"
+        val oldPurchaseToken = "" // Empty token to simulate no valid purchase token
 
         subject.purchaseState.test {
             expectNoEvents()
@@ -339,6 +349,8 @@ class RealPlayBillingManagerTest {
                 newPlanId = MONTHLY_PLAN_US,
                 externalId = externalId,
                 newOfferId = null,
+                oldPurchaseToken = oldPurchaseToken,
+                replacementMode = SubscriptionReplacementMode.DEFERRED,
             )
 
             assertEquals(Canceled, awaitItem())
@@ -372,7 +384,7 @@ class FakeBillingClientAdapter : BillingClientAdapter {
     )
 
     var subscriptionsPurchaseHistory: List<PurchaseHistoryRecord> = emptyList()
-    var launchBillingFlowResult: LaunchBillingFlowResult = LaunchBillingFlowResult.Failure
+    var launchBillingFlowResult: LaunchBillingFlowResult = LaunchBillingFlowResult.Failure(error = SERVICE_UNAVAILABLE)
     var billingInitResult: BillingInitResult = BillingInitResult.Success
 
     var purchasesListener: ((PurchasesUpdateResult) -> Unit)? = null

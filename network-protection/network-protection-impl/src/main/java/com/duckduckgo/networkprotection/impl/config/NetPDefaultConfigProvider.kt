@@ -26,11 +26,11 @@ import com.duckduckgo.networkprotection.impl.exclusion.systemapps.SystemAppsExcl
 import com.duckduckgo.networkprotection.impl.settings.NetPSettingsLocalConfig
 import com.duckduckgo.networkprotection.impl.settings.NetpVpnSettingsDataStore
 import com.squareup.anvil.annotations.ContributesBinding
+import kotlinx.coroutines.withContext
+import logcat.logcat
 import java.net.Inet4Address
 import java.net.InetAddress
 import javax.inject.Inject
-import kotlinx.coroutines.withContext
-import logcat.logcat
 
 interface NetPDefaultConfigProvider {
     fun mtu(): Int = 1280

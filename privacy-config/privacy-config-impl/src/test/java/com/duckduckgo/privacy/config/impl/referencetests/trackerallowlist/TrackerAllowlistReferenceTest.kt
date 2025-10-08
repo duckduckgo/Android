@@ -25,8 +25,6 @@ import com.duckduckgo.privacy.config.store.features.trackerallowlist.TrackerAllo
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.Types
-import java.lang.reflect.ParameterizedType
-import java.util.concurrent.CopyOnWriteArrayList
 import org.json.JSONObject
 import org.junit.Assert.*
 import org.junit.Test
@@ -34,6 +32,8 @@ import org.junit.runner.RunWith
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 import org.robolectric.ParameterizedRobolectricTestRunner
+import java.lang.reflect.ParameterizedType
+import java.util.concurrent.CopyOnWriteArrayList
 
 @RunWith(ParameterizedRobolectricTestRunner::class)
 class TrackerAllowlistReferenceTest(private val testCase: TestCase) {

@@ -29,7 +29,7 @@ dependencies {
     anvil project(':anvil-compiler')
     implementation project(':anvil-annotations')
     implementation project(':browser-api')
-    implementation project(':common-ui')
+    implementation project(':design-system')
     implementation project(':common-utils')
     implementation project(':di')
     implementation project(':data-store-api')

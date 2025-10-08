@@ -39,14 +39,14 @@ import com.duckduckgo.subscriptions.impl.billing.BillingInitResult.Failure
 import com.duckduckgo.subscriptions.impl.billing.BillingInitResult.Success
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
-import java.lang.IllegalArgumentException
-import javax.inject.Inject
-import kotlin.coroutines.resume
-import kotlin.coroutines.suspendCoroutine
 import kotlinx.coroutines.withContext
 import logcat.LogPriority.WARN
 import logcat.asLog
 import logcat.logcat
+import java.lang.IllegalArgumentException
+import javax.inject.Inject
+import kotlin.coroutines.resume
+import kotlin.coroutines.suspendCoroutine
 
 @ContributesBinding(AppScope::class)
 @SingleInstanceIn(AppScope::class)
@@ -153,7 +153,7 @@ class RealBillingClientAdapter @Inject constructor(
         externalId: String,
     ): LaunchBillingFlowResult {
         val client = billingClient
-        if (client == null || !client.isReady) return LaunchBillingFlowResult.Failure
+        if (client == null || !client.isReady) return LaunchBillingFlowResult.Failure(error = BillingError.SERVICE_DISCONNECTED)
 
         val billingFlowParams = BillingFlowParams.newBuilder()
             .setProductDetailsParamsList(
@@ -174,7 +174,7 @@ class RealBillingClientAdapter @Inject constructor(
 
         return when (result.responseCode) {
             BillingResponseCode.OK -> LaunchBillingFlowResult.Success
-            else -> LaunchBillingFlowResult.Failure
+            else -> LaunchBillingFlowResult.Failure(result.responseCode.toBillingError())
         }
     }
 
@@ -187,7 +187,7 @@ class RealBillingClientAdapter @Inject constructor(
         replacementMode: SubscriptionReplacementMode,
     ): LaunchBillingFlowResult {
         val client = billingClient
-        if (client == null || !client.isReady) return LaunchBillingFlowResult.Failure
+        if (client == null || !client.isReady) return LaunchBillingFlowResult.Failure(BillingError.SERVICE_DISCONNECTED)
 
         val subscriptionUpdateParams = BillingFlowParams.SubscriptionUpdateParams.newBuilder()
             .setOldPurchaseToken(oldPurchaseToken)
@@ -214,7 +214,7 @@ class RealBillingClientAdapter @Inject constructor(
 
         return when (result.responseCode) {
             BillingResponseCode.OK -> LaunchBillingFlowResult.Success
-            else -> LaunchBillingFlowResult.Failure
+            else -> LaunchBillingFlowResult.Failure(error = result.responseCode.toBillingError())
         }
     }
 

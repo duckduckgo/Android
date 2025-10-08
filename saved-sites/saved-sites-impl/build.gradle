@@ -29,7 +29,7 @@ dependencies {
     implementation project(path: ':di')
     implementation project(path: ':statistics-api')
     implementation project(path: ':common-utils')
-    implementation project(path: ':common-ui')
+    implementation project(path: ':design-system')
     implementation project(path: ':saved-sites-api')
     implementation project(path: ':sync-api')
     implementation project(path: ':sync-settings-api')

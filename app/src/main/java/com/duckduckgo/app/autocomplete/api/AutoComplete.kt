@@ -58,8 +58,6 @@ import com.duckduckgo.savedsites.api.models.SavedSite
 import com.duckduckgo.savedsites.api.models.SavedSite.Bookmark
 import com.duckduckgo.savedsites.api.models.SavedSite.Favorite
 import com.squareup.anvil.annotations.ContributesBinding
-import javax.inject.Inject
-import kotlin.math.max
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -67,6 +65,8 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
+import javax.inject.Inject
+import kotlin.math.max
 
 const val maximumNumberOfSuggestions = 12
 const val maximumNumberOfTopHits = 2

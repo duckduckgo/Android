@@ -37,9 +37,9 @@ import com.duckduckgo.mobile.android.vpn.VpnFeaturesRegistry
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
 import dagger.android.AndroidInjection
 import dagger.binding.TileServiceBingingKey
-import javax.inject.Inject
 import kotlinx.coroutines.*
 import logcat.logcat
+import javax.inject.Inject
 
 @Suppress("NoHardcodedCoroutineDispatcher")
 // We don't use the DeviceShieldTileService::class as binding key because TileService (Android) class does not

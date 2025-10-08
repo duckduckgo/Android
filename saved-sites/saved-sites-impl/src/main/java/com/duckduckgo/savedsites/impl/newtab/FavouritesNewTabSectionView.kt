@@ -86,9 +86,9 @@ import com.google.android.material.shape.ShapeAppearanceModel
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.Snackbar
 import dagger.android.support.AndroidSupportInjection
-import javax.inject.Inject
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import javax.inject.Inject
 
 @InjectWith(ViewScope::class)
 class FavouritesNewTabSectionView @JvmOverloads constructor(

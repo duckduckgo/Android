@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Copyright (c) 2022 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/item_container"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="?attr/selectableItemBackground"
+    android:minHeight="@dimen/oneLineItemHeight">
+
+    <FrameLayout
+        android:id="@+id/leadingIconBackground"
+        android:layout_width="@dimen/listItemImageContainerSize"
+        android:layout_height="@dimen/listItemImageContainerSize"
+        android:layout_marginStart="@dimen/keyline_4"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <ImageView
+            android:id="@+id/leadingIcon"
+            android:layout_width="@dimen/listItemImageMediumSize"
+            android:layout_height="@dimen/listItemImageMediumSize"
+            android:layout_gravity="center"
+            android:importantForAccessibility="no" />
+
+    </FrameLayout>
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/keyline_4"
+        android:layout_marginEnd="@dimen/keyline_1"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/trailingBarrier"
+        app:layout_constraintStart_toEndOf="@id/leadingIconBackground"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <com.duckduckgo.common.ui.view.text.DaxTextView
+            android:id="@+id/primaryText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/primary_text_color_selector"
+            app:typography="body1"
+            tools:ignore="InvalidColorAttribute"
+            tools:text="Title" />
+
+        <ImageView
+            android:id="@+id/newPill"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/keyline_2"
+            android:src="@drawable/ic_new_pill"
+            android:visibility="gone"
+            tools:visibility="visible" />
+
+    </LinearLayout>
+
+    <androidx.constraintlayout.widget.Barrier
+        android:id="@+id/trailingBarrier"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:barrierDirection="start"
+        app:constraint_referenced_ids="trailingSwitch,trailingIconContainer,endTrailingPadding" />
+
+    <com.duckduckgo.common.ui.view.DaxSwitch
+        android:id="@+id/trailingSwitch"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/keyline_1"
+        android:layout_marginEnd="@dimen/keyline_4"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/trailingBarrier"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:ignore="SpeakableTextPresentCheck" />
+
+    <FrameLayout
+        android:id="@+id/trailingIconContainer"
+        android:layout_width="@dimen/listItemTrailingIconWidth"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <ImageView
+            android:id="@+id/trailingIcon"
+            android:layout_width="@dimen/listItemImageMediumSize"
+            android:layout_height="@dimen/listItemImageMediumSize"
+            android:layout_gravity="center"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            app:srcCompat="@drawable/ic_menu_vertical_24"
+            tools:ignore="ContentDescription" />
+    </FrameLayout>
+
+    <View
+        android:id="@+id/endTrailingPadding"
+        android:layout_width="@dimen/keyline_0"
+        android:layout_height="0dp"
+        android:layout_marginEnd="@dimen/keyline_4"
+        android:orientation="vertical"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

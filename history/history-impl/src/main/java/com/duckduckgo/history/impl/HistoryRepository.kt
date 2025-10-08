@@ -20,13 +20,13 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.history.api.HistoryEntry
 import com.duckduckgo.history.impl.store.HistoryDao
 import com.duckduckgo.history.impl.store.HistoryDataStore
-import java.time.LocalDateTime
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.withContext
+import java.time.LocalDateTime
 
 interface HistoryRepository {
     fun getHistory(): Flow<List<HistoryEntry>>

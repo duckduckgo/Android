@@ -23,17 +23,17 @@ import com.duckduckgo.js.messaging.api.JsMessaging
 import com.duckduckgo.pir.impl.dashboard.messaging.PirDashboardWebMessages
 import com.duckduckgo.pir.impl.dashboard.messaging.model.PirWebMessageRequest
 import com.duckduckgo.pir.impl.dashboard.messaging.model.PirWebMessageResponse
-import com.duckduckgo.pir.impl.dashboard.state.PirWebOnboardingStateHolder
+import com.duckduckgo.pir.impl.dashboard.state.PirWebProfileStateHolder
 import com.squareup.anvil.annotations.ContributesMultibinding
-import javax.inject.Inject
 import logcat.logcat
+import javax.inject.Inject
 
 @ContributesMultibinding(
     scope = ActivityScope::class,
     boundType = PirWebJsMessageHandler::class,
 )
 class PirWebRemoveNameAtIndexFromCurrentUserProfileMessageHandler @Inject constructor(
-    private val pirWebOnboardingStateHolder: PirWebOnboardingStateHolder,
+    private val pirWebProfileStateHolder: PirWebProfileStateHolder,
 ) : PirWebJsMessageHandler() {
 
     override val message: PirDashboardWebMessages = PirDashboardWebMessages.REMOVE_NAME_AT_INDEX_FROM_CURRENT_USER_PROFILE
@@ -46,7 +46,7 @@ class PirWebRemoveNameAtIndexFromCurrentUserProfileMessageHandler @Inject constr
         logcat { "PIR-WEB: PirWebRemoveNameAtIndexFromCurrentUserProfileMessageHandler: process $message" }
 
         val request = jsMessage.toRequestMessage(PirWebMessageRequest.RemoveNameAtIndexFromCurrentUserProfileRequest::class)
-        if (request == null || !pirWebOnboardingStateHolder.removeNameAtIndex(request.index)) {
+        if (request == null || !pirWebProfileStateHolder.removeNameAtIndex(request.index)) {
             logcat { "PIR-WEB: PirWebRemoveNameAtIndexFromCurrentUserProfileMessageHandler: failed to remove name at index ${request?.index}" }
             jsMessaging.sendResponse(
                 jsMessage = jsMessage,

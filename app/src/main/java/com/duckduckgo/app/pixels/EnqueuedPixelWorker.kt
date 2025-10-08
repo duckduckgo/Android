@@ -38,14 +38,14 @@ import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupExperim
 import com.duckduckgo.verifiedinstallation.IsVerifiedPlayStoreInstall
 import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.SingleInstanceIn
-import java.util.concurrent.TimeUnit
-import javax.inject.Inject
-import javax.inject.Provider
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import logcat.LogPriority.INFO
 import logcat.LogPriority.VERBOSE
 import logcat.logcat
+import java.util.concurrent.TimeUnit
+import javax.inject.Inject
+import javax.inject.Provider
 
 @ContributesMultibinding(
     scope = AppScope::class,

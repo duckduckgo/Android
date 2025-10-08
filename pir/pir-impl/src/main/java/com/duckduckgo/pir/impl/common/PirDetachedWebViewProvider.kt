@@ -29,8 +29,8 @@ import android.webkit.WebViewClient
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.pir.impl.common.PirJobConstants.DBP_INITIAL_URL
 import com.squareup.anvil.annotations.ContributesBinding
-import javax.inject.Inject
 import logcat.logcat
+import javax.inject.Inject
 
 interface PirDetachedWebViewProvider {
     /**
@@ -143,7 +143,7 @@ class RealPirDetachedWebViewProvider @Inject constructor() :
                     ) {
                         logcat {
                             """
-                            PIR-SCAN: webview onReceivedError requestedUrl $requestedUrl for url ${request.url} 
+                            PIR-SCAN: webview onReceivedError requestedUrl $requestedUrl for url ${request.url}
                             mainframe ${request.isForMainFrame}
                             """.trimIndent()
                         }

@@ -19,8 +19,8 @@ package com.duckduckgo.app.referral
 import com.duckduckgo.app.statistics.AtbInitializerListener
 import com.duckduckgo.di.scopes.AppScope
 import dagger.SingleInstanceIn
-import javax.inject.Inject
 import logcat.logcat
+import javax.inject.Inject
 
 interface AppInstallationReferrerStateListener {
 

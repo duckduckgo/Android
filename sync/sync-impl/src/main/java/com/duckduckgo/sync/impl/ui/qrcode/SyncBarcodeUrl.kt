@@ -18,9 +18,9 @@ package com.duckduckgo.sync.impl.ui.qrcode
 
 import android.os.Parcelable
 import androidx.core.net.toUri
+import kotlinx.parcelize.Parcelize
 import java.net.URLDecoder
 import java.net.URLEncoder
-import kotlinx.parcelize.Parcelize
 
 @Parcelize
 data class SyncBarcodeUrl(

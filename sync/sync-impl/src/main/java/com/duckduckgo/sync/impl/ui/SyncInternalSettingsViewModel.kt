@@ -34,7 +34,6 @@ import com.duckduckgo.sync.impl.ui.SyncInternalSettingsViewModel.Command.ReadQR
 import com.duckduckgo.sync.impl.ui.SyncInternalSettingsViewModel.Command.ShowMessage
 import com.duckduckgo.sync.impl.ui.SyncInternalSettingsViewModel.Command.ShowQR
 import com.duckduckgo.sync.store.*
-import javax.inject.Inject
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
@@ -44,6 +43,7 @@ import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import logcat.logcat
+import javax.inject.Inject
 
 @ContributesViewModel(ActivityScope::class)
 class SyncInternalSettingsViewModel

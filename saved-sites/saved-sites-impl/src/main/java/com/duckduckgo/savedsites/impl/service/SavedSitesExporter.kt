@@ -27,10 +27,10 @@ import com.duckduckgo.savedsites.api.models.SavedSitesNames
 import com.duckduckgo.savedsites.api.models.TreeNode
 import com.duckduckgo.savedsites.api.service.ExportSavedSitesResult
 import com.duckduckgo.savedsites.api.service.SavedSitesExporter
+import kotlinx.coroutines.withContext
 import java.io.FileNotFoundException
 import java.io.FileOutputStream
 import java.io.IOException
-import kotlinx.coroutines.withContext
 
 class RealSavedSitesExporter(
     private val contentResolver: ContentResolver,

@@ -46,12 +46,12 @@ import com.nhaarman.mockitokotlin2.eq
 import com.nhaarman.mockitokotlin2.spy
 import com.nhaarman.mockitokotlin2.verify
 import com.squareup.moshi.Moshi
-import java.util.*
 import org.junit.Assert.assertNotNull
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.argumentCaptor
 import org.mockito.kotlin.times
+import java.util.*
 
 @RunWith(AndroidJUnit4::class)
 class PrivacyDashboardRendererTest {

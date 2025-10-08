@@ -9,7 +9,6 @@ import com.duckduckgo.autofill.impl.urlmatcher.AutofillDomainNameUrlMatcher
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle.State
-import java.util.concurrent.TimeUnit.DAYS
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
@@ -20,6 +19,7 @@ import org.junit.runner.RunWith
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
+import java.util.concurrent.TimeUnit.DAYS
 
 @RunWith(AndroidJUnit4::class)
 class AutofillBreakageReportCanShowRulesImplTest {

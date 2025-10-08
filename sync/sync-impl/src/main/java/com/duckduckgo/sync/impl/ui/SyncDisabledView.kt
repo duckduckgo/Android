@@ -32,10 +32,10 @@ import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.sync.impl.databinding.ViewSyncDisabledWarningBinding
 import com.duckduckgo.sync.impl.ui.SyncDisabledViewModel.ViewState
 import dagger.android.support.AndroidSupportInjection
-import javax.inject.Inject
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import javax.inject.Inject
 
 @InjectWith(ViewScope::class)
 class SyncDisabledView @JvmOverloads constructor(

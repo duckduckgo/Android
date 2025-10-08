@@ -99,6 +99,10 @@
             app:primaryText="@string/autofillDevSettingsClearLogins"
             tools:secondaryText="@string/autofillDevSettingsClearLoginsSubtitle" />
 
+        <com.duckduckgo.common.ui.view.divider.HorizontalDivider
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
         <com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
             android:id="@+id/importPasswordsSectionTitle"
             android:layout_width="match_parent"
@@ -145,10 +149,40 @@
             app:primaryText="@string/autofillDevSettingsSimulatePasswordsImportedTitle"
             app:secondaryText="@string/autofillDevSettingsSimulatePasswordsImportedInstruction" />
 
-
         <com.duckduckgo.common.ui.view.divider.HorizontalDivider
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
+
+        <com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
+            android:id="@+id/importBookmarksSectionTitle"
+            android:layout_width="match_parent"
+            android:layout_marginTop="20dp"
+            android:layout_height="wrap_content"
+            app:primaryText="@string/autofillDevSettingsImportBookmarksTitle" />
+
+        <com.duckduckgo.common.ui.view.listitem.OneLineListItem
+            android:id="@+id/importBookmarksLaunchGoogleTakeoutCustomFlow"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:primaryText="@string/autofillDevSettingsImportBookmarksGoogleTakeoutImportFlowTitle" />
+
+        <com.duckduckgo.common.ui.view.listitem.OneLineListItem
+            android:id="@+id/importBookmarksLaunchGoogleTakeoutWebpage"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:primaryText="@string/autofillDevSettingsImportBookmarksGoogleTakeoutOurAppTitle" />
+
+        <com.duckduckgo.common.ui.view.listitem.OneLineListItem
+            android:id="@+id/importBookmarksImportTakeoutZip"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:primaryText="@string/autofillDevSettingsImportBookmarksGoogleTakeoutImportZipDirectlyTitle" />
+
+        <com.duckduckgo.common.ui.view.listitem.OneLineListItem
+            android:id="@+id/viewBookmarks"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:primaryText="@string/autofillDevSettingsImportBookmarksViewBookmarksTitle" />
 
         <com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
             android:layout_width="match_parent"

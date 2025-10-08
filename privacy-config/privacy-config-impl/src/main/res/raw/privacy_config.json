@@ -5,20 +5,20 @@
         "onboardingDesignExperiment": {
             "state": "enabled",
             "features": {
-                "onboardingDesignExperimentAug25": {
+                "onboardingDesignExperimentOct25": {
                     "state": "enabled",
                     "cohorts": [
                         {
                             "name": "modifiedControl",
-                            "weight": 0
+                            "weight": 1
                         },
                         {
                             "name": "bb",
-                            "weight": 0
+                            "weight": 1
                         },
                         {
                             "name": "buck",
-                            "weight": 0
+                            "weight": 1
                         }
                     ]
                 }

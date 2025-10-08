@@ -24,9 +24,9 @@ import com.duckduckgo.networkprotection.impl.settings.NetpVpnSettingsDataStore
 import com.duckduckgo.networkprotection.impl.settings.custom_dns.VpnCustomDnsSettingView.Event
 import com.duckduckgo.networkprotection.impl.settings.custom_dns.VpnCustomDnsSettingView.Event.Init
 import com.duckduckgo.networkprotection.impl.settings.custom_dns.VpnCustomDnsSettingView.State
-import javax.inject.Inject
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
+import javax.inject.Inject
 
 class VpnCustomDnsViewSettingViewModel(
     private val netpVpnSettingsDataStore: NetpVpnSettingsDataStore,

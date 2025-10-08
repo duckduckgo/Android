@@ -36,15 +36,15 @@ import com.duckduckgo.sync.impl.engine.FakeNotificationBuilder
 import com.duckduckgo.sync.impl.error.RealSyncUnavailableRepository.Companion.SYNC_ERROR_NOTIFICATION_ID
 import com.duckduckgo.sync.impl.error.SchedulableErrorNotificationWorker.Companion.SYNC_ERROR_NOTIFICATION_TAG
 import com.duckduckgo.sync.store.SyncUnavailableSharedPrefsStore
-import java.time.LocalDateTime
-import java.time.OffsetDateTime
-import java.time.format.DateTimeFormatter
 import org.junit.After
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import java.time.LocalDateTime
+import java.time.OffsetDateTime
+import java.time.format.DateTimeFormatter
 
 @RunWith(AndroidJUnit4::class)
 class RealSyncUnavailableRepositoryTest {

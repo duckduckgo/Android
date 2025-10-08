@@ -22,9 +22,9 @@ import com.duckduckgo.autofill.impl.partialsave.UsernameBackFiller.BackFillResul
 import com.duckduckgo.autofill.impl.partialsave.UsernameBackFiller.BackFillResult.BackFillSupported
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
-import javax.inject.Inject
 import logcat.LogPriority.VERBOSE
 import logcat.logcat
+import javax.inject.Inject
 
 interface UsernameBackFiller {
     suspend fun isBackFillingUsernameSupported(

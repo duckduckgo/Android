@@ -33,6 +33,8 @@ import com.duckduckgo.mobile.android.vpn.feature.getSelectedDisableProtection
 import com.duckduckgo.mobile.android.vpn.feature.getSelectedRemoveAppTP
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneOffset
@@ -41,8 +43,6 @@ import java.time.temporal.ChronoUnit
 import java.util.*
 import javax.inject.Inject
 import kotlin.math.absoluteValue
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.launch
 
 interface DeviceShieldPixels {
     /** This pixel will be unique on a given day, no matter how many times we call this fun */

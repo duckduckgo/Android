@@ -36,10 +36,10 @@ import com.duckduckgo.privacy.config.api.AmpLinkType
 import com.duckduckgo.privacy.config.api.AmpLinks
 import com.duckduckgo.privacy.config.api.TrackingParameters
 import com.duckduckgo.subscriptions.api.Subscriptions
-import java.net.URISyntaxException
 import logcat.LogPriority.WARN
 import logcat.asLog
 import logcat.logcat
+import java.net.URISyntaxException
 
 class SpecialUrlDetectorImpl(
     private val packageManager: PackageManager,

@@ -80,25 +80,20 @@ import com.duckduckgo.duckplayer.api.DuckPlayer.DuckPlayerState.ENABLED
 import com.duckduckgo.duckplayer.api.DuckPlayer.OpenDuckPlayerInNewTab.On
 import com.duckduckgo.duckplayer.impl.DUCK_PLAYER_OPEN_IN_YOUTUBE_PATH
 import com.duckduckgo.history.api.NavigationHistory
-import com.duckduckgo.js.messaging.api.AddDocumentStartJavaScriptPlugin
-import com.duckduckgo.js.messaging.api.PostMessageWrapperPlugin
-import com.duckduckgo.js.messaging.api.SubscriptionEventData
-import com.duckduckgo.js.messaging.api.WebMessagingPlugin
-import com.duckduckgo.js.messaging.api.WebViewCompatMessageCallback
 import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.Feed
 import com.duckduckgo.privacy.config.api.AmpLinks
 import com.duckduckgo.subscriptions.api.Subscriptions
 import com.duckduckgo.user.agent.api.ClientBrandHintProvider
-import java.net.URI
 import java.util.UUID
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.atomic.AtomicInteger
-import javax.inject.Inject
 import kotlinx.coroutines.*
 import logcat.LogPriority.INFO
 import logcat.LogPriority.VERBOSE
 import logcat.LogPriority.WARN
 import logcat.logcat
+import java.net.URI
+import javax.inject.Inject
 
 private const val ABOUT_BLANK = "about:blank"
 
@@ -135,11 +130,7 @@ class BrowserWebViewClient @Inject constructor(
     private val androidFeaturesHeaderPlugin: AndroidFeaturesHeaderPlugin,
     private val duckChat: DuckChat,
     private val contentScopeExperiments: ContentScopeExperiments,
-    private val addDocumentStartJavascriptPlugins: PluginPoint<AddDocumentStartJavaScriptPlugin>,
-    private val webMessagingPlugins: PluginPoint<WebMessagingPlugin>,
-    private val postMessageWrapperPlugins: PluginPoint<PostMessageWrapperPlugin>,
 ) : WebViewClient() {
-
     var webViewClientListener: WebViewClientListener? = null
     var clientProvider: ClientBrandHintProvider? = null
     private var lastPageStarted: String? = null
@@ -228,6 +219,7 @@ class BrowserWebViewClient @Inject constructor(
                     subscriptions.launchPrivacyPro(webView.context, url)
                     true
                 }
+
                 is SpecialUrlDetector.UrlType.Email -> {
                     webViewClientListener?.sendEmailRequested(urlType.emailAddress)
                     true
@@ -250,6 +242,7 @@ class BrowserWebViewClient @Inject constructor(
                     }
                     false
                 }
+
                 is SpecialUrlDetector.UrlType.ShouldLaunchDuckChatLink -> {
                     runCatching {
                         val query = url.getQueryParameter(QUERY)
@@ -260,6 +253,7 @@ class BrowserWebViewClient @Inject constructor(
                         }
                     }.isSuccess
                 }
+
                 is SpecialUrlDetector.UrlType.ShouldLaunchDuckPlayerLink -> {
                     if (isRedirect && isForMainFrame) {
                         /*
@@ -280,6 +274,7 @@ class BrowserWebViewClient @Inject constructor(
                         )
                     }
                 }
+
                 is SpecialUrlDetector.UrlType.NonHttpAppLink -> {
                     logcat(INFO) { "Found non-http app link for ${urlType.uriString}" }
                     if (isForMainFrame) {
@@ -356,6 +351,7 @@ class BrowserWebViewClient @Inject constructor(
                     }
                     false
                 }
+
                 is SpecialUrlDetector.UrlType.DuckScheme -> {
                     webViewClientListener?.let { listener ->
                         if (
@@ -434,7 +430,10 @@ class BrowserWebViewClient @Inject constructor(
     }
 
     @UiThread
-    override fun onPageCommitVisible(webView: WebView, url: String) {
+    override fun onPageCommitVisible(
+        webView: WebView,
+        url: String,
+    ) {
         logcat(VERBOSE) { "onPageCommitVisible webViewUrl: ${webView.url} URL: $url progress: ${webView.progress}" }
         // Show only when the commit matches the tab state
         if (webView.url == url) {
@@ -510,20 +509,11 @@ class BrowserWebViewClient @Inject constructor(
         webView.settings.mediaPlaybackRequiresUserGesture = mediaPlayback.doesMediaPlaybackRequireUserGestureForUrl(url)
     }
 
-    fun configureWebView(webView: DuckDuckGoWebView, callback: WebViewCompatMessageCallback?) {
-        addDocumentStartJavascriptPlugins.getPlugins().forEach { plugin ->
-            plugin.addDocumentStartJavaScript(webView)
-        }
-
-        callback?.let {
-            webMessagingPlugins.getPlugins().forEach { plugin ->
-                plugin.register(callback, webView)
-            }
-        }
-    }
-
     @UiThread
-    override fun onPageFinished(webView: WebView, url: String?) {
+    override fun onPageFinished(
+        webView: WebView,
+        url: String?,
+    ) {
         logcat(VERBOSE) { "onPageFinished webViewUrl: ${webView.url} URL: $url progress: ${webView.progress}" }
 
         // See https://app.asana.com/0/0/1206159443951489/f (WebView limitations)
@@ -535,11 +525,6 @@ class BrowserWebViewClient @Inject constructor(
                     webViewClientListener?.getSite(),
                 )
             }
-            addDocumentStartJavascriptPlugins.getPlugins().forEach {
-                it.addDocumentStartJavaScript(
-                    webView,
-                )
-            }
 
             url?.let {
                 // We call this for any url but it will only be processed for an internal tester verification url
@@ -548,7 +533,7 @@ class BrowserWebViewClient @Inject constructor(
 
             val navigationList = webView.safeCopyBackForwardList() ?: return
             webViewClientListener?.run {
-                pageFinished(WebViewNavigationState(navigationList), url)
+                pageFinished(webView, WebViewNavigationState(navigationList), url)
             }
             flushCookies()
             printInjector.injectPrint(webView)
@@ -602,8 +587,8 @@ class BrowserWebViewClient @Inject constructor(
     override fun shouldInterceptRequest(
         webView: WebView,
         request: WebResourceRequest,
-    ): WebResourceResponse? {
-        return runBlocking {
+    ): WebResourceResponse? =
+        runBlocking {
             val documentUrl = withContext(dispatcherProvider.main()) { webView.url }
             withContext(dispatcherProvider.main()) {
                 loginDetector.onEvent(WebNavigationEvent.ShouldInterceptRequest(webView, request))
@@ -616,7 +601,6 @@ class BrowserWebViewClient @Inject constructor(
                 webViewClientListener,
             )
         }
-    }
 
     override fun onRenderProcessGone(
         view: WebView?,
@@ -649,9 +633,10 @@ class BrowserWebViewClient @Inject constructor(
         if (handler != null) {
             logcat(VERBOSE) { "onReceivedHttpAuthRequest - useHttpAuthUsernamePassword [${handler.useHttpAuthUsernamePassword()}]" }
             if (handler.useHttpAuthUsernamePassword()) {
-                val credentials = view?.let {
-                    webViewHttpAuthStore.getHttpAuthUsernamePassword(it, host.orEmpty(), realm.orEmpty())
-                }
+                val credentials =
+                    view?.let {
+                        webViewHttpAuthStore.getHttpAuthUsernamePassword(it, host.orEmpty(), realm.orEmpty())
+                    }
 
                 if (credentials != null) {
                     handler.proceed(credentials.username, credentials.password)
@@ -692,13 +677,14 @@ class BrowserWebViewClient @Inject constructor(
 
     private fun parseSSlErrorResponse(sslError: SslError): SslErrorResponse {
         logcat { "SSL Certificate: parseSSlErrorResponse ${sslError.primaryError}" }
-        val sslErrorType = when (sslError.primaryError) {
-            SSL_UNTRUSTED -> UNTRUSTED_HOST
-            SSL_EXPIRED -> EXPIRED
-            SSL_DATE_INVALID -> EXPIRED
-            SSL_IDMISMATCH -> WRONG_HOST
-            else -> GENERIC
-        }
+        val sslErrorType =
+            when (sslError.primaryError) {
+                SSL_UNTRUSTED -> UNTRUSTED_HOST
+                SSL_EXPIRED -> EXPIRED
+                SSL_DATE_INVALID -> EXPIRED
+                SSL_IDMISMATCH -> WRONG_HOST
+                else -> GENERIC
+            }
         return SslErrorResponse(sslError, sslErrorType, sslError.url)
     }
 
@@ -713,12 +699,13 @@ class BrowserWebViewClient @Inject constructor(
 
             val siteURL = if (view?.url != null) "${URI(view.url).scheme}://$host" else host.orEmpty()
 
-            val request = BasicAuthenticationRequest(
-                handler = handler,
-                host = host.orEmpty(),
-                realm = realm.orEmpty(),
-                site = siteURL,
-            )
+            val request =
+                BasicAuthenticationRequest(
+                    handler = handler,
+                    host = host.orEmpty(),
+                    realm = realm.orEmpty(),
+                    site = siteURL,
+                )
 
             it.requiresAuthentication(request)
         }
@@ -749,8 +736,8 @@ class BrowserWebViewClient @Inject constructor(
         super.onReceivedError(view, request, error)
     }
 
-    private fun parseErrorResponse(error: WebResourceError): WebViewErrorResponse {
-        return if (error.errorCode == ERROR_HOST_LOOKUP) {
+    private fun parseErrorResponse(error: WebResourceError): WebViewErrorResponse =
+        if (error.errorCode == ERROR_HOST_LOOKUP) {
             when (error.description) {
                 "net::ERR_NAME_NOT_RESOLVED" -> BAD_URL
                 "net::ERR_INTERNET_DISCONNECTED" -> CONNECTION
@@ -761,7 +748,6 @@ class BrowserWebViewClient @Inject constructor(
         } else {
             OMITTED
         }
-    }
 
     override fun onReceivedHttpError(
         view: WebView?,
@@ -781,8 +767,8 @@ class BrowserWebViewClient @Inject constructor(
         }
     }
 
-    private fun Int.asStringErrorCode(): String {
-        return when (this) {
+    private fun Int.asStringErrorCode(): String =
+        when (this) {
             ERROR_AUTHENTICATION -> "ERROR_AUTHENTICATION"
             ERROR_BAD_URL -> "ERROR_BAD_URL"
             ERROR_CONNECT -> "ERROR_CONNECT"
@@ -806,25 +792,12 @@ class BrowserWebViewClient @Inject constructor(
             SAFE_BROWSING_THREAT_UNWANTED_SOFTWARE -> "SAFE_BROWSING_THREAT_UNWANTED_SOFTWARE"
             else -> "ERROR_OTHER"
         }
-    }
 
-    fun addExemptedMaliciousSite(url: Uri, feed: Feed) {
-        requestInterceptor.addExemptedMaliciousSite(url, feed)
-    }
-
-    fun destroy(webView: DuckDuckGoWebView) {
-        webMessagingPlugins.getPlugins().forEach { plugin ->
-            plugin.unregister(webView)
-        }
-    }
-
-    fun postContentScopeMessage(
-        eventData: SubscriptionEventData,
-        webView: WebView,
+    fun addExemptedMaliciousSite(
+        url: Uri,
+        feed: Feed,
     ) {
-        postMessageWrapperPlugins.getPlugins()
-            .firstOrNull { it.context == "contentScopeScripts" }
-            ?.postMessage(eventData, webView)
+        requestInterceptor.addExemptedMaliciousSite(url, feed)
     }
 
     companion object {
@@ -845,7 +818,9 @@ enum class WebViewPixelName(override val pixelName: String) : Pixel.PixelName {
     WEB_PAGE_PAINTED("m_web_view_page_painted"),
 }
 
-enum class WebViewErrorResponse(@StringRes val errorId: Int) {
+enum class WebViewErrorResponse(
+    @StringRes val errorId: Int,
+) {
     BAD_URL(R.string.webViewErrorBadUrl),
     CONNECTION(R.string.webViewErrorNoConnection),
     OMITTED(R.string.webViewErrorNoConnection),
@@ -853,8 +828,15 @@ enum class WebViewErrorResponse(@StringRes val errorId: Int) {
     SSL_PROTOCOL_ERROR(R.string.webViewErrorSslProtocol),
 }
 
-data class SslErrorResponse(val error: SslError, val errorType: SSLErrorType, val url: String)
-enum class SSLErrorType(@StringRes val errorId: Int) {
+data class SslErrorResponse(
+    val error: SslError,
+    val errorType: SSLErrorType,
+    val url: String,
+)
+
+enum class SSLErrorType(
+    @StringRes val errorId: Int,
+) {
     EXPIRED(R.string.sslErrorExpiredMessage),
     WRONG_HOST(R.string.sslErrorWrongHostMessage),
     UNTRUSTED_HOST(R.string.sslErrorUntrustedMessage),

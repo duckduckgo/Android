@@ -55,7 +55,6 @@ import com.duckduckgo.experiments.api.VariantManager
 import com.duckduckgo.experiments.impl.VariantManagerImpl.Companion.RESERVED_EU_BROWSER_CHOICE_AUCTION_VARIANT
 import com.duckduckgo.experiments.impl.VariantManagerImpl.Companion.RESERVED_EU_SEARCH_CHOICE_AUCTION_VARIANT
 import dagger.SingleInstanceIn
-import javax.inject.Inject
 import kotlinx.coroutines.delay
 import logcat.LogPriority.ERROR
 import logcat.LogPriority.INFO
@@ -63,6 +62,7 @@ import logcat.LogPriority.VERBOSE
 import logcat.LogPriority.WARN
 import logcat.asLog
 import logcat.logcat
+import javax.inject.Inject
 
 @SingleInstanceIn(AppScope::class)
 class PlayStoreAppReferrerStateListener @Inject constructor(

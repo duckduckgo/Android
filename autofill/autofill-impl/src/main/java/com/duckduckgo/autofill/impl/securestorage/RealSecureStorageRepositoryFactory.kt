@@ -21,10 +21,10 @@ import com.duckduckgo.autofill.store.SecureStorageRepository
 import com.duckduckgo.autofill.store.db.SecureStorageDatabase
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
-import javax.inject.Inject
 import kotlinx.coroutines.flow.firstOrNull
 import logcat.LogPriority.ERROR
 import logcat.logcat
+import javax.inject.Inject
 
 @ContributesBinding(AppScope::class)
 class RealSecureStorageRepositoryFactory @Inject constructor(

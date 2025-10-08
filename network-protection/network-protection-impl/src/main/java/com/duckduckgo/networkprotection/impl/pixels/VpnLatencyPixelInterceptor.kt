@@ -26,11 +26,11 @@ import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixelNames.
 import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixelNames.NETP_REPORT_TERRIBLE_LATENCY
 import com.duckduckgo.networkprotection.store.NetPGeoswitchingRepository
 import com.squareup.anvil.annotations.ContributesMultibinding
-import javax.inject.Inject
 import kotlinx.coroutines.runBlocking
 import okhttp3.Interceptor
 import okhttp3.Interceptor.Chain
 import okhttp3.Response
+import javax.inject.Inject
 
 @ContributesMultibinding(
     scope = AppScope::class,

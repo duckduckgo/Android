@@ -32,10 +32,10 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.FeatureToggle
 import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.SingleInstanceIn
+import kotlinx.coroutines.withContext
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.TimeUnit.DAYS
 import javax.inject.Inject
-import kotlinx.coroutines.withContext
 
 @ContributesWorker(AppScope::class)
 class FirstPartyCookiesModifierWorker(

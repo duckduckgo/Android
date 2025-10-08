@@ -23,7 +23,6 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import app.cash.turbine.test
 import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.common.test.CoroutineTestRule
-import java.io.IOException
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
 import org.junit.After
@@ -33,6 +32,7 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import java.io.IOException
 
 @RunWith(AndroidJUnit4::class)
 class AppUserStageStoreTest {

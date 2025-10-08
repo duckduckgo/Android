@@ -24,9 +24,9 @@ import com.duckduckgo.subscriptions.api.SubscriptionStatus
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.UNKNOWN
 import com.duckduckgo.subscriptions.api.Subscriptions
 import com.squareup.anvil.annotations.ContributesBinding
-import javax.inject.Inject
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
+import javax.inject.Inject
 
 @ContributesBinding(AppScope::class)
 class SubscriptionsDummy @Inject constructor() : Subscriptions {

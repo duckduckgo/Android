@@ -18,7 +18,6 @@ package com.duckduckgo.contentscopescripts.impl.messaging
 
 import android.annotation.SuppressLint
 import android.webkit.WebView
-import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.contentscopescripts.impl.CoreContentScopeScripts
 import com.duckduckgo.contentscopescripts.impl.WebViewCompatContentScopeScripts
 import com.duckduckgo.di.scopes.FragmentScope
@@ -30,8 +29,6 @@ import com.duckduckgo.js.messaging.api.WebMessagingPlugin
 import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
 import javax.inject.Named
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.launch
 
 @ContributesMultibinding(FragmentScope::class)
 class ContentScopeScriptsPostMessageWrapperPlugin @Inject constructor(
@@ -39,26 +36,26 @@ class ContentScopeScriptsPostMessageWrapperPlugin @Inject constructor(
     private val jsMessageHelper: JsMessageHelper,
     private val coreContentScopeScripts: CoreContentScopeScripts,
     private val webViewCompatContentScopeScripts: WebViewCompatContentScopeScripts,
-    @AppCoroutineScope private val coroutineScope: CoroutineScope,
 ) : PostMessageWrapperPlugin {
     @SuppressLint("PostMessageUsage")
-    override fun postMessage(message: SubscriptionEventData, webView: WebView) {
-        coroutineScope.launch {
-            if (webViewCompatContentScopeScripts.isEnabled()) {
-                webMessagingPlugin.postMessage(message)
-            } else {
-                jsMessageHelper.sendSubscriptionEvent(
-                    subscriptionEvent = SubscriptionEvent(
-                        context = webMessagingPlugin.context,
-                        featureName = message.featureName,
-                        subscriptionName = message.subscriptionName,
-                        params = message.params,
-                    ),
-                    callbackName = coreContentScopeScripts.callbackName,
-                    secret = coreContentScopeScripts.secret,
-                    webView = webView,
-                )
-            }
+    override suspend fun postMessage(
+        message: SubscriptionEventData,
+        webView: WebView,
+    ) {
+        if (webViewCompatContentScopeScripts.isEnabled()) {
+            webMessagingPlugin.postMessage(webView, message)
+        } else {
+            jsMessageHelper.sendSubscriptionEvent(
+                subscriptionEvent = SubscriptionEvent(
+                    context = webMessagingPlugin.context,
+                    featureName = message.featureName,
+                    subscriptionName = message.subscriptionName,
+                    params = message.params,
+                ),
+                callbackName = coreContentScopeScripts.callbackName,
+                secret = coreContentScopeScripts.secret,
+                webView = webView,
+            )
         }
     }
 

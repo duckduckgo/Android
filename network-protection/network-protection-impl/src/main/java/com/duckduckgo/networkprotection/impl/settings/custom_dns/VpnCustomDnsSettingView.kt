@@ -44,13 +44,13 @@ import com.duckduckgo.networkprotection.impl.settings.custom_dns.VpnCustomDnsSet
 import com.duckduckgo.networkprotection.impl.settings.custom_dns.VpnCustomDnsViewSettingViewModel.Factory
 import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.android.support.AndroidSupportInjection
-import javax.inject.Inject
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 @InjectWith(ViewScope::class)
 class VpnCustomDnsSettingView @JvmOverloads constructor(

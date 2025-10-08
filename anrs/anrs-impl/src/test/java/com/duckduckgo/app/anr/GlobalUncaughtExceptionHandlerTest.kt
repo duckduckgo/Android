@@ -18,7 +18,6 @@ package com.duckduckgo.app.anr
 
 import com.duckduckgo.anrs.api.CrashLogger
 import com.duckduckgo.common.test.CoroutineTestRule
-import java.io.InterruptedIOException
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.advanceUntilIdle
@@ -27,6 +26,7 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.*
+import java.io.InterruptedIOException
 
 @ExperimentalCoroutinesApi
 class GlobalUncaughtExceptionHandlerTest {

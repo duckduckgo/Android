@@ -18,8 +18,8 @@ package com.duckduckgo.app.browser.cookies.db
 
 import com.duckduckgo.app.browser.UriString
 import com.duckduckgo.common.utils.DispatcherProvider
-import javax.inject.Inject
 import kotlinx.coroutines.withContext
+import javax.inject.Inject
 
 class AuthCookiesAllowedDomainsRepository @Inject constructor(
     private val authCookiesAllowedDomainsDao: AuthCookiesAllowedDomainsDao,

@@ -23,9 +23,9 @@ import com.duckduckgo.sync.settings.api.SyncSettingsListener
 import com.duckduckgo.sync.settings.api.SyncableSetting
 import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.SingleInstanceIn
-import javax.inject.Inject
 import logcat.LogPriority.INFO
 import logcat.logcat
+import javax.inject.Inject
 
 @SingleInstanceIn(AppScope::class)
 @ContributesMultibinding(scope = AppScope::class, boundType = SyncableSetting::class)

@@ -41,8 +41,8 @@ import com.squareup.moshi.Types
 import dagger.Module
 import dagger.Provides
 import dagger.SingleInstanceIn
-import java.time.Instant
 import kotlinx.coroutines.withContext
+import java.time.Instant
 
 interface AuthRepository {
     suspend fun setAccessTokenV2(accessToken: AccessToken?)

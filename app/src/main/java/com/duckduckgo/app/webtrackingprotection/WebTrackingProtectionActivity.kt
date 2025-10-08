@@ -45,11 +45,11 @@ import com.duckduckgo.common.ui.view.getColorFromAttr
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.extensions.html
 import com.duckduckgo.di.scopes.ActivityScope
-import com.duckduckgo.mobile.android.R as CommonR
 import com.duckduckgo.navigation.api.GlobalActivityStarter
-import javax.inject.Inject
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import javax.inject.Inject
+import com.duckduckgo.mobile.android.R as CommonR
 
 @InjectWith(ActivityScope::class)
 @ContributeToActivityStarter(WebTrackingProtectionScreenNoParams::class)

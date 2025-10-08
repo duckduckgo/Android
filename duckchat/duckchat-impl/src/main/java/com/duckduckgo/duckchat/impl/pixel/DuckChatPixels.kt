@@ -68,6 +68,7 @@ import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_IS_ENABLED
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_KEYBOARD_RETURN_PRESSED
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_MENU_SETTING_OFF
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_MENU_SETTING_ON
+import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_NEW_ADDRESS_BAR_PICKER_CANCELLED
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_NEW_ADDRESS_BAR_PICKER_CONFIRMED
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_NEW_ADDRESS_BAR_PICKER_DISPLAYED
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_NEW_ADDRESS_BAR_PICKER_NOT_NOW
@@ -93,10 +94,10 @@ import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_USER_ENABL
 import com.duckduckgo.duckchat.impl.repository.DuckChatFeatureRepository
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.anvil.annotations.ContributesMultibinding
-import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import javax.inject.Inject
 
 interface DuckChatPixels {
     fun sendReportMetricPixel(reportMetric: ReportMetric)
@@ -195,6 +196,7 @@ enum class DuckChatPixelName(override val pixelName: String) : Pixel.PixelName {
     DUCK_CHAT_NEW_ADDRESS_BAR_PICKER_DISPLAYED("m_aichat_new_address_bar_picker_displayed"),
     DUCK_CHAT_NEW_ADDRESS_BAR_PICKER_CONFIRMED("m_aichat_new_address_bar_picker_confirmed"),
     DUCK_CHAT_NEW_ADDRESS_BAR_PICKER_NOT_NOW("m_aichat_new_address_bar_picker_not_now"),
+    DUCK_CHAT_NEW_ADDRESS_BAR_PICKER_CANCELLED("m_aichat_new_address_bar_picker_cancelled"),
 }
 
 object DuckChatPixelParameters {
@@ -269,6 +271,7 @@ class DuckChatParamRemovalPlugin @Inject constructor() : PixelParamRemovalPlugin
             DUCK_CHAT_NEW_ADDRESS_BAR_PICKER_DISPLAYED.pixelName to PixelParameter.removeAtb(),
             DUCK_CHAT_NEW_ADDRESS_BAR_PICKER_CONFIRMED.pixelName to PixelParameter.removeAtb(),
             DUCK_CHAT_NEW_ADDRESS_BAR_PICKER_NOT_NOW.pixelName to PixelParameter.removeAtb(),
+            DUCK_CHAT_NEW_ADDRESS_BAR_PICKER_CANCELLED.pixelName to PixelParameter.removeAtb(),
         )
     }
 }

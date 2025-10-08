@@ -27,9 +27,10 @@ dependencies {
 	implementation project(":duckchat-api")
     implementation project(':settings-api')
     implementation project(':navigation-api')
-    implementation project(':common-ui')
+    implementation project(':design-system')
     implementation project(':common-utils')
     implementation project(':browser-api')
+    implementation project(':browser-ui')
     implementation project(':js-messaging-api')
     implementation project(':downloads-api')
     implementation project(':content-scope-scripts-api')
@@ -71,6 +72,7 @@ dependencies {
         exclude group: "org.jetbrains.kotlinx", module: "kotlinx-coroutines-debug"
     }
     testImplementation AndroidX.lifecycle.runtime.testing
+    testImplementation AndroidX.archCore.testing
 
     coreLibraryDesugaring Android.tools.desugarJdkLibs
 }

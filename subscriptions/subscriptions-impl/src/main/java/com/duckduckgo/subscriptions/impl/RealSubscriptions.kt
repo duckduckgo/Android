@@ -52,13 +52,13 @@ import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import dagger.Lazy
 import dagger.SingleInstanceIn
-import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
+import javax.inject.Inject
 
 @ContributesBinding(AppScope::class)
 class RealSubscriptions @Inject constructor(
@@ -192,7 +192,7 @@ interface PrivacyProFeature {
     @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
     fun serpPromoCookie(): Toggle
 
-    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
+    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun authApiV2(): Toggle
 
     @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
@@ -227,7 +227,7 @@ interface PrivacyProFeature {
      * This flag will be used to select FE subscription messaging mode.
      * The value is added into GetFeatureConfig to allow FE to select the mode.
      */
-    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun enableSubscriptionFlowsV2(): Toggle
 
     /**
@@ -258,6 +258,9 @@ interface PrivacyProFeature {
 
     @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun supportsAlternateStripePaymentFlow(): Toggle
+
+    @Toggle.DefaultValue(defaultValue = DefaultFeatureValue.TRUE)
+    fun sendSubscriptionPurchaseWideEvent(): Toggle
 }
 
 @ContributesBinding(AppScope::class)

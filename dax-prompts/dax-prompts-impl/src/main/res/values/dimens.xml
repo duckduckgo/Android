@@ -17,8 +17,8 @@
 <resources>
     <fraction name="daxPromptVerticalGuidelinePercentStart">0</fraction>
     <fraction name="daxPromptVerticalGuidelinePercentEnd">1</fraction>
+
+    <bool name="lockedInPortraitMode">true</bool>
+
     <dimen name="messageMargin">16dp</dimen>
-    <dimen name="daxShapeMarginBottom">24dp</dimen>
-    <dimen name="messageWidth">0dp</dimen>
-    <dimen name="daxPromptMessageConstraintMaxHeight">520dp</dimen>
 </resources>

@@ -29,7 +29,6 @@ import com.duckduckgo.newtabpage.api.NewTabPageSection.SHORTCUTS
 import com.duckduckgo.newtabpage.api.NewTabPageSectionPlugin
 import com.duckduckgo.newtabpage.api.NewTabPageSectionProvider
 import com.duckduckgo.newtabpage.impl.pixels.NewTabPixels
-import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -38,6 +37,7 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.update
+import javax.inject.Inject
 
 @SuppressLint("NoLifecycleObserver") // we don't observe app lifecycle
 @ContributesViewModel(ViewScope::class)

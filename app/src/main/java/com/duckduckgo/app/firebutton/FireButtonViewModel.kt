@@ -30,7 +30,6 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.api.DuckChat
-import javax.inject.Inject
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
@@ -40,6 +39,7 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import logcat.LogPriority.VERBOSE
 import logcat.logcat
+import javax.inject.Inject
 
 @ContributesViewModel(ActivityScope::class)
 class FireButtonViewModel @Inject constructor(

@@ -21,10 +21,10 @@ import android.net.Uri
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
+import kotlinx.coroutines.withContext
 import java.io.BufferedReader
 import java.io.InputStreamReader
 import javax.inject.Inject
-import kotlinx.coroutines.withContext
 
 interface CsvFileReader {
     suspend fun readCsvFile(fileUri: Uri): String

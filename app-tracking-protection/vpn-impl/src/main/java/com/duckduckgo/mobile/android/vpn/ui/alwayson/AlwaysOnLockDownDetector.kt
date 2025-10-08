@@ -37,13 +37,13 @@ import com.duckduckgo.networkprotection.api.NetworkProtectionScreens.NetworkProt
 import com.duckduckgo.networkprotection.api.NetworkProtectionState
 import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.SingleInstanceIn
-import javax.inject.Inject
-import kotlin.random.Random
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.cancellable
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.launch
+import javax.inject.Inject
+import kotlin.random.Random
 
 @ContributesMultibinding(
     scope = VpnScope::class,

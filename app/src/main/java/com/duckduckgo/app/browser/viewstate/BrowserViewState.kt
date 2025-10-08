@@ -60,7 +60,20 @@ data class BrowserViewState(
     val privacyProtectionsPopupViewState: PrivacyProtectionsPopupViewState = PrivacyProtectionsPopupViewState.Gone,
     val showDuckChatOption: Boolean = false,
     val lastQueryOrigin: QueryOrigin = QueryOrigin.FromUser,
+    val vpnMenuState: VpnMenuState = VpnMenuState.Hidden,
 )
+
+sealed class VpnMenuState {
+    data object Hidden : VpnMenuState()
+
+    data object NotSubscribed : VpnMenuState()
+
+    data object NotSubscribedNoPill : VpnMenuState()
+
+    data class Subscribed(
+        val isVpnEnabled: Boolean,
+    ) : VpnMenuState()
+}
 
 sealed class HighlightableButton {
     data class Visible(
@@ -70,17 +83,15 @@ sealed class HighlightableButton {
 
     data object Gone : HighlightableButton()
 
-    fun isHighlighted(): Boolean {
-        return when (this) {
+    fun isHighlighted(): Boolean =
+        when (this) {
             is Visible -> this.highlighted
             is Gone -> false
         }
-    }
 
-    fun isEnabled(): Boolean {
-        return when (this) {
+    fun isEnabled(): Boolean =
+        when (this) {
             is Visible -> this.enabled
             is Gone -> false
         }
-    }
 }

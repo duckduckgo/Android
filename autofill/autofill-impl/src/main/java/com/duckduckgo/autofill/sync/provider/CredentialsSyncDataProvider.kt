@@ -30,8 +30,8 @@ import com.squareup.anvil.annotations.ContributesMultibinding
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
-import javax.inject.*
 import kotlinx.coroutines.runBlocking
+import javax.inject.*
 
 @ContributesMultibinding(scope = AppScope::class, boundType = SyncableDataProvider::class)
 class CredentialsSyncDataProvider @Inject constructor(

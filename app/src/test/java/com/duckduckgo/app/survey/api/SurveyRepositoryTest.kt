@@ -8,13 +8,13 @@ import com.duckduckgo.app.survey.db.SurveyDao
 import com.duckduckgo.app.survey.model.Survey
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.browser.api.UserBrowserProperties
-import java.util.*
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
+import java.util.*
 
 @RunWith(AndroidJUnit4::class)
 class SurveyRepositoryTest {

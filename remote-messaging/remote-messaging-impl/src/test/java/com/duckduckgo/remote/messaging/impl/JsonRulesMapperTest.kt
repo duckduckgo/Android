@@ -22,11 +22,11 @@ import com.duckduckgo.remote.messaging.fixtures.FakeMatchingAttribute
 import com.duckduckgo.remote.messaging.fixtures.jsonMatchingAttributeMappers
 import com.duckduckgo.remote.messaging.impl.mappers.mapToMatchingRules
 import com.duckduckgo.remote.messaging.impl.models.*
-import java.text.SimpleDateFormat
 import org.junit.Assert.assertEquals
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.Parameterized
+import java.text.SimpleDateFormat
 
 @RunWith(Parameterized::class)
 class JsonRulesMapperTest(private val testCase: TestCase) {

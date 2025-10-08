@@ -23,9 +23,9 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.mobile.android.vpn.VpnFeaturesRegistry
 import com.duckduckgo.networkprotection.impl.NetPVpnFeature
 import com.squareup.anvil.annotations.ContributesBinding
-import javax.inject.Inject
 import kotlinx.coroutines.withContext
 import logcat.logcat
+import javax.inject.Inject
 
 interface NetPFeatureRemover {
 

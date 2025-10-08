@@ -31,8 +31,8 @@ import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_INTERNAL_SCHEDULED_SCAN_COMPL
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_INTERNAL_SCHEDULED_SCAN_SCHEDULED
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_INTERNAL_SCHEDULED_SCAN_STARTED
 import com.squareup.anvil.annotations.ContributesBinding
-import javax.inject.Inject
 import logcat.logcat
+import javax.inject.Inject
 
 interface PirPixelSender {
     /**

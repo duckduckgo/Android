@@ -21,8 +21,8 @@ import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import com.duckduckgo.anvil.annotations.ContributesWorker
 import com.duckduckgo.di.scopes.AppScope
-import javax.inject.Inject
 import logcat.logcat
+import javax.inject.Inject
 
 @ContributesWorker(AppScope::class)
 class VpnFeatureRemoverWorker(

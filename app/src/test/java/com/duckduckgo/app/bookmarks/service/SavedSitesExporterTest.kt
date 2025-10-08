@@ -40,11 +40,11 @@ import com.duckduckgo.savedsites.impl.service.RealSavedSitesExporter
 import com.duckduckgo.savedsites.impl.service.RealSavedSitesParser
 import com.duckduckgo.savedsites.store.SavedSitesEntitiesDao
 import com.duckduckgo.savedsites.store.SavedSitesRelationsDao
-import java.io.File
 import kotlinx.coroutines.test.runTest
 import org.junit.*
 import org.junit.Assert.assertTrue
 import org.junit.runner.RunWith
+import java.io.File
 
 @RunWith(AndroidJUnit4::class)
 class SavedSitesExporterTest {

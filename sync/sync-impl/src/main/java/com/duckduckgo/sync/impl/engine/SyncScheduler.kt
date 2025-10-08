@@ -22,10 +22,10 @@ import com.duckduckgo.sync.impl.engine.SyncOperation.EXECUTE
 import com.duckduckgo.sync.store.model.SyncAttemptState.FAIL
 import com.duckduckgo.sync.store.model.SyncAttemptState.IN_PROGRESS
 import com.squareup.anvil.annotations.ContributesBinding
+import logcat.logcat
 import java.time.Duration
 import java.time.OffsetDateTime
 import javax.inject.Inject
-import logcat.logcat
 
 interface SyncScheduler {
 

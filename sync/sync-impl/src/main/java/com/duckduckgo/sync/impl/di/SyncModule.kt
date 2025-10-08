@@ -54,8 +54,8 @@ import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides
 import dagger.SingleInstanceIn
-import javax.inject.Qualifier
 import kotlinx.coroutines.CoroutineScope
+import javax.inject.Qualifier
 
 @Module
 @ContributesTo(AppScope::class)

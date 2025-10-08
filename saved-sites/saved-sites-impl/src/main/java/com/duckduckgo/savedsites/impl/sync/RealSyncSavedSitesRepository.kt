@@ -29,10 +29,10 @@ import com.duckduckgo.savedsites.store.EntityType.FOLDER
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.Types
-import java.time.OffsetDateTime
-import java.util.*
 import logcat.LogPriority.INFO
 import logcat.logcat
+import java.time.OffsetDateTime
+import java.util.*
 
 class RealSyncSavedSitesRepository(
     private val savedSitesEntitiesDao: SavedSitesEntitiesDao,

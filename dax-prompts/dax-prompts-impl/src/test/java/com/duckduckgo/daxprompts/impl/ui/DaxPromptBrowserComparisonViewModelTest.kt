@@ -22,10 +22,16 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import app.cash.turbine.test
 import com.duckduckgo.app.global.DefaultRoleBrowserDialog
+import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.test.CoroutineTestRule
-import com.duckduckgo.daxprompts.impl.ReactivateUsersExperiment
+import com.duckduckgo.daxprompts.impl.pixels.DaxPromptBrowserComparisonPixelName.REACTIVATE_USERS_BROWSER_COMPARISON_PROMPT_CLOSED
+import com.duckduckgo.daxprompts.impl.pixels.DaxPromptBrowserComparisonPixelName.REACTIVATE_USERS_BROWSER_COMPARISON_PROMPT_DEFAULT_BROWSER_SET
+import com.duckduckgo.daxprompts.impl.pixels.DaxPromptBrowserComparisonPixelName.REACTIVATE_USERS_BROWSER_COMPARISON_PROMPT_PRIMARY_BUTTON_CLICKED
+import com.duckduckgo.daxprompts.impl.pixels.DaxPromptBrowserComparisonPixelParameter.PARAM_NAME_INTERACTION_TYPE
+import com.duckduckgo.daxprompts.impl.pixels.DaxPromptBrowserComparisonPixelParameter.PARAM_VALUE_MAYBE_LATER_BUTTON_TAPPED
+import com.duckduckgo.daxprompts.impl.pixels.DaxPromptBrowserComparisonPixelParameter.PARAM_VALUE_SYSTEM_DIALOG_DISMISSED
+import com.duckduckgo.daxprompts.impl.pixels.DaxPromptBrowserComparisonPixelParameter.PARAM_VALUE_X_BUTTON_TAPPED
 import com.duckduckgo.daxprompts.impl.repository.DaxPromptsRepository
-import com.duckduckgo.daxprompts.impl.ui.DaxPromptBrowserComparisonViewModel.Companion.BROWSER_COMPARISON_MORE_URL
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -49,7 +55,8 @@ class DaxPromptBrowserComparisonViewModelTest {
 
     private val mockDefaultRoleBrowserDialog: DefaultRoleBrowserDialog = mock()
     private val mockDaxPromptsRepository: DaxPromptsRepository = mock()
-    private val mockReactivateUsersExperiment: ReactivateUsersExperiment = mock()
+
+    private val mockPixel: Pixel = mock()
     private val mockApplicationContext: Context = InstrumentationRegistry.getInstrumentation().targetContext
 
     @Before
@@ -57,20 +64,9 @@ class DaxPromptBrowserComparisonViewModelTest {
         testee = DaxPromptBrowserComparisonViewModel(
             mockDefaultRoleBrowserDialog,
             mockDaxPromptsRepository,
-            mockReactivateUsersExperiment,
+            mockPixel,
             mockApplicationContext,
         )
-    }
-
-    @Test
-    fun whenMoreLinkClickedThenEmitsOpenDetailsPageCommand() = runTest {
-        testee.onMoreLinkClicked()
-
-        testee.commands().test {
-            assertEquals(DaxPromptBrowserComparisonViewModel.Command.OpenDetailsPage(BROWSER_COMPARISON_MORE_URL), awaitItem())
-            cancelAndIgnoreRemainingEvents()
-        }
-        verify(mockReactivateUsersExperiment).firePlusEvenMoreProtectionsLinkClick()
     }
 
     @Test
@@ -81,7 +77,10 @@ class DaxPromptBrowserComparisonViewModelTest {
             assertEquals(DaxPromptBrowserComparisonViewModel.Command.CloseScreen(), awaitItem())
             cancelAndIgnoreRemainingEvents()
         }
-        verify(mockReactivateUsersExperiment).fireCloseScreen()
+        verify(mockPixel).fire(
+            pixel = REACTIVATE_USERS_BROWSER_COMPARISON_PROMPT_CLOSED,
+            parameters = mapOf(PARAM_NAME_INTERACTION_TYPE to PARAM_VALUE_X_BUTTON_TAPPED),
+        )
     }
 
     @Test
@@ -96,7 +95,7 @@ class DaxPromptBrowserComparisonViewModelTest {
             assertEquals(DaxPromptBrowserComparisonViewModel.Command.BrowserComparisonChart(mockIntent), awaitItem())
             cancelAndIgnoreRemainingEvents()
         }
-        verify(mockReactivateUsersExperiment).fireChooseYourBrowserClick()
+        verify(mockPixel).fire(REACTIVATE_USERS_BROWSER_COMPARISON_PROMPT_PRIMARY_BUTTON_CLICKED)
     }
 
     @Test
@@ -110,7 +109,7 @@ class DaxPromptBrowserComparisonViewModelTest {
             assertEquals(DaxPromptBrowserComparisonViewModel.Command.CloseScreen(), awaitItem())
             cancelAndIgnoreRemainingEvents()
         }
-        verify(mockReactivateUsersExperiment, never()).fireChooseYourBrowserClick()
+        verify(mockPixel, never()).fire(REACTIVATE_USERS_BROWSER_COMPARISON_PROMPT_PRIMARY_BUTTON_CLICKED)
     }
 
     @Test
@@ -123,7 +122,7 @@ class DaxPromptBrowserComparisonViewModelTest {
             assertEquals(DaxPromptBrowserComparisonViewModel.Command.CloseScreen(), awaitItem())
             cancelAndIgnoreRemainingEvents()
         }
-        verify(mockReactivateUsersExperiment, never()).fireChooseYourBrowserClick()
+        verify(mockPixel, never()).fire(REACTIVATE_USERS_BROWSER_COMPARISON_PROMPT_PRIMARY_BUTTON_CLICKED)
     }
 
     @Test
@@ -135,7 +134,7 @@ class DaxPromptBrowserComparisonViewModelTest {
             assertEquals(DaxPromptBrowserComparisonViewModel.Command.CloseScreen(true), awaitItem())
             cancelAndIgnoreRemainingEvents()
         }
-        verify(mockReactivateUsersExperiment).fireSetBrowserAsDefault()
+        verify(mockPixel).fire(REACTIVATE_USERS_BROWSER_COMPARISON_PROMPT_DEFAULT_BROWSER_SET)
     }
 
     @Test
@@ -147,6 +146,10 @@ class DaxPromptBrowserComparisonViewModelTest {
             assertEquals(DaxPromptBrowserComparisonViewModel.Command.CloseScreen(false), awaitItem())
             cancelAndIgnoreRemainingEvents()
         }
+        verify(mockPixel).fire(
+            pixel = REACTIVATE_USERS_BROWSER_COMPARISON_PROMPT_CLOSED,
+            parameters = mapOf(PARAM_NAME_INTERACTION_TYPE to PARAM_VALUE_SYSTEM_DIALOG_DISMISSED),
+        )
     }
 
     @Test
@@ -157,5 +160,9 @@ class DaxPromptBrowserComparisonViewModelTest {
             assertEquals(DaxPromptBrowserComparisonViewModel.Command.CloseScreen(), awaitItem())
             cancelAndIgnoreRemainingEvents()
         }
+        verify(mockPixel).fire(
+            pixel = REACTIVATE_USERS_BROWSER_COMPARISON_PROMPT_CLOSED,
+            parameters = mapOf(PARAM_NAME_INTERACTION_TYPE to PARAM_VALUE_MAYBE_LATER_BUTTON_TAPPED),
+        )
     }
 }

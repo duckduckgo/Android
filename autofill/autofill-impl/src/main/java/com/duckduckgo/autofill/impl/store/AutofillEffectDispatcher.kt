@@ -20,9 +20,9 @@ import com.duckduckgo.autofill.api.AutofillImportLaunchSource
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
-import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
+import javax.inject.Inject
 
 interface AutofillEffectDispatcher {
     val effects: SharedFlow<AutofillEffect>

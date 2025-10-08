@@ -21,9 +21,9 @@ import com.duckduckgo.autofill.impl.encoding.UrlUnicodeNormalizer
 import com.duckduckgo.autofill.impl.urlmatcher.AutofillUrlMatcher.ExtractedUrlParts
 import com.duckduckgo.common.utils.extractDomain
 import com.duckduckgo.common.utils.normalizeScheme
-import javax.inject.Inject
 import logcat.logcat
 import okhttp3.HttpUrl.Companion.toHttpUrl
+import javax.inject.Inject
 
 /**
  * This interface is used to clean and match URLs for autofill purposes. It can offer support for:

@@ -35,13 +35,17 @@ import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
+import android.widget.FrameLayout
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.view.isNotEmpty
 import androidx.core.view.isVisible
+import androidx.core.view.updateLayoutParams
 import androidx.core.widget.doAfterTextChanged
 import androidx.core.widget.doOnTextChanged
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.ui.view.addBottomShadow
+import com.duckduckgo.common.ui.view.toPx
 import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.duckchat.impl.R
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
@@ -50,6 +54,7 @@ import com.google.android.material.card.MaterialCardView
 import com.google.android.material.tabs.TabLayout
 import dagger.android.support.AndroidSupportInjection
 import javax.inject.Inject
+import kotlin.math.roundToInt
 
 @InjectWith(ViewScope::class)
 class InputModeWidget @JvmOverloads constructor(
@@ -57,7 +62,6 @@ class InputModeWidget @JvmOverloads constructor(
     attrs: AttributeSet? = null,
     defStyle: Int = 0,
 ) : ConstraintLayout(context, attrs, defStyle) {
-
     @Inject
     lateinit var pixel: Pixel
 
@@ -66,6 +70,7 @@ class InputModeWidget @JvmOverloads constructor(
     private val inputModeWidgetBack: View
     private val inputModeSwitch: TabLayout
     private val inputModeWidgetCard: MaterialCardView
+    private val inputScreenButtonsContainer: FrameLayout
 
     var onBack: (() -> Unit)? = null
     var onSearchSent: ((String) -> Unit)? = null
@@ -81,6 +86,8 @@ class InputModeWidget @JvmOverloads constructor(
     var onSearchTextChanged: ((String) -> Unit)? = null
     var onChatTextChanged: ((String) -> Unit)? = null
     var onInputFieldClicked: (() -> Unit)? = null
+
+    var onTabTapped: ((index: Int) -> Unit)? = null
 
     var text: String
         get() = inputField.text.toString()
@@ -113,6 +120,7 @@ class InputModeWidget @JvmOverloads constructor(
         inputModeWidgetBack = findViewById(R.id.InputModeWidgetBack)
         inputModeSwitch = findViewById(R.id.inputModeSwitch)
         inputModeWidgetCard = findViewById(R.id.inputModeWidgetCard)
+        inputScreenButtonsContainer = findViewById(R.id.inputScreenButtonsContainer)
 
         configureClickListeners()
         configureInputBehavior()
@@ -153,57 +161,75 @@ class InputModeWidget @JvmOverloads constructor(
         inputField.setOnClickListener {
             onInputFieldClicked?.invoke()
         }
+        addTabClickListeners()
     }
 
-    private fun configureInputBehavior() = with(inputField) {
-        setHorizontallyScrolling(true)
+    private fun addTabClickListeners() {
+        val tabStrip = inputModeSwitch.getChildAt(0) as? ViewGroup ?: return
 
-        setOnEditorActionListener { _, actionId, _ ->
-            if (actionId == EditorInfo.IME_ACTION_GO) {
-                submitMessage()
-
-                val params = inputScreenPixelsModeParam(isSearchMode = inputModeSwitch.selectedTabPosition == 0)
-                pixel.fire(DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_OMNIBAR_KEYBOARD_GO_PRESSED, parameters = params)
-                true
-            } else {
-                false
-            }
-        }
-
-        doOnTextChanged { text, _, _, _ ->
-            if (!hasTextChangedFromOriginal) {
-                hasTextChangedFromOriginal = text != originalText
-            }
-            onVoiceInputAllowed?.invoke(!hasTextChangedFromOriginal || inputField.text.isBlank())
-
-            val textToSubmit = inputField.text.getTextToSubmit()
-            onSubmitMessageAvailable?.invoke(textToSubmit != null)
-
-            when (inputModeSwitch.selectedTabPosition) {
-                0 -> onSearchTextChanged?.invoke(textToSubmit?.toString().orEmpty())
-                1 -> onChatTextChanged?.invoke(textToSubmit?.toString().orEmpty())
-            }
-
-            val isNullOrEmpty = text.isNullOrEmpty()
-            fade(inputFieldClearText, !isNullOrEmpty)
-        }
-
-        doAfterTextChanged { text ->
-            text?.let {
-                removeFormatting(text)
+        repeat(inputModeSwitch.tabCount) { index ->
+            inputModeSwitch.getTabAt(index)?.let { tab ->
+                tabStrip.getChildAt(index)?.setOnClickListener {
+                    onTabTapped?.invoke(index)
+                    if (inputModeSwitch.selectedTabPosition != index) {
+                        tab.select()
+                    }
+                }
             }
         }
     }
+
+    private fun configureInputBehavior() =
+        with(inputField) {
+            setHorizontallyScrolling(true)
+
+            setOnEditorActionListener { _, actionId, _ ->
+                if (actionId == EditorInfo.IME_ACTION_GO) {
+                    submitMessage()
+
+                    val params = inputScreenPixelsModeParam(isSearchMode = inputModeSwitch.selectedTabPosition == 0)
+                    pixel.fire(DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_OMNIBAR_KEYBOARD_GO_PRESSED, parameters = params)
+                    true
+                } else {
+                    false
+                }
+            }
+
+            doOnTextChanged { text, _, _, _ ->
+                if (!hasTextChangedFromOriginal) {
+                    hasTextChangedFromOriginal = text != originalText
+                }
+
+                val textToSubmit = inputField.text.getTextToSubmit()
+                onSubmitMessageAvailable?.invoke(textToSubmit != null)
+                onVoiceInputAllowed?.invoke(!hasTextChangedFromOriginal || inputField.text.isBlank())
+
+                when (inputModeSwitch.selectedTabPosition) {
+                    0 -> onSearchTextChanged?.invoke(textToSubmit?.toString().orEmpty())
+                    1 -> onChatTextChanged?.invoke(textToSubmit?.toString().orEmpty())
+                }
+
+                val isNullOrEmpty = text.isNullOrEmpty()
+                fade(inputFieldClearText, !isNullOrEmpty)
+            }
+
+            doAfterTextChanged { text ->
+                text?.let {
+                    removeFormatting(text)
+                }
+            }
+        }
 
     private fun removeFormatting(text: Editable) {
-        val spans = buildList<Any> {
-            addAll(text.getSpans(0, text.length, CharacterStyle::class.java))
-            addAll(text.getSpans(0, text.length, ParagraphStyle::class.java))
-            addAll(text.getSpans(0, text.length, URLSpan::class.java))
-            addAll(text.getSpans(0, text.length, ImageSpan::class.java))
-        }.filter { span ->
-            (text.getSpanFlags(span) and Spanned.SPAN_COMPOSING) == 0
-        }
+        val spans =
+            buildList<Any> {
+                addAll(text.getSpans(0, text.length, CharacterStyle::class.java))
+                addAll(text.getSpans(0, text.length, ParagraphStyle::class.java))
+                addAll(text.getSpans(0, text.length, URLSpan::class.java))
+                addAll(text.getSpans(0, text.length, ImageSpan::class.java))
+            }.filter { span ->
+                (text.getSpanFlags(span) and Spanned.SPAN_COMPOSING) == 0
+            }
 
         if (spans.isNotEmpty()) {
             spans.forEach(text::removeSpan)
@@ -223,7 +249,9 @@ class InputModeWidget @JvmOverloads constructor(
                         1 -> onChatSelected?.invoke()
                     }
                 }
+
                 override fun onTabUnselected(tab: TabLayout.Tab?) {}
+
                 override fun onTabReselected(tab: TabLayout.Tab?) {}
             },
         )
@@ -258,9 +286,19 @@ class InputModeWidget @JvmOverloads constructor(
                 root,
                 ChangeBounds().apply {
                     duration = EXPAND_COLLAPSE_TRANSITION_DURATION
-                    excludeTarget(R.id.actionSend, true)
-                    excludeTarget(R.id.actionNewLine, true)
-                    excludeTarget(R.id.actionVoice, true)
+                    excludeTarget(R.id.inputScreenButtonsContainer, true)
+                    excludeTarget(inputScreenButtonsContainer, true)
+                },
+            )
+        }
+    }
+
+    private fun beginInputScreenButtonsVisibilityTransition() {
+        (parent as? ViewGroup ?: this).let { root ->
+            TransitionManager.beginDelayedTransition(
+                root,
+                ChangeBounds().apply {
+                    duration = EXPAND_COLLAPSE_TRANSITION_DURATION
                 },
             )
         }
@@ -283,6 +321,13 @@ class InputModeWidget @JvmOverloads constructor(
         inputModeSwitch.post {
             inputModeSwitch.getTabAt(index)?.select()
         }
+    }
+
+    fun setScrollPosition(
+        position: Int,
+        positionOffset: Float,
+    ) {
+        inputModeSwitch.setScrollPosition(position, positionOffset, false)
     }
 
     private fun fade(
@@ -311,6 +356,21 @@ class InputModeWidget @JvmOverloads constructor(
 
     fun selectAllText() {
         inputField.selectAll()
+    }
+
+    fun setInputScreenButtons(inputScreenButtons: InputScreenButtons) {
+        inputScreenButtonsContainer.addView(inputScreenButtons)
+        inputFieldClearText.updateLayoutParams<MarginLayoutParams> {
+            // align the clear text button with the center of the submit button
+            marginEnd = 4f.toPx(context).roundToInt()
+        }
+    }
+
+    fun setInputScreenButtonsVisible(buttonsVisible: Boolean) {
+        if (inputScreenButtonsContainer.isNotEmpty()) {
+            beginInputScreenButtonsVisibilityTransition()
+            inputScreenButtonsContainer.isVisible = buttonsVisible
+        }
     }
 
     private fun CharSequence.getTextToSubmit(): CharSequence? {

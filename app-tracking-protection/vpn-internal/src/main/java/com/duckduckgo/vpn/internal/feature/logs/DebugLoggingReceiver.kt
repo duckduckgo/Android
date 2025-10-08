@@ -26,9 +26,9 @@ import com.duckduckgo.mobile.android.vpn.service.VpnServiceCallbacks
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason
 import com.duckduckgo.vpn.internal.feature.InternalFeatureReceiver
 import com.squareup.anvil.annotations.ContributesMultibinding
-import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import logcat.logcat
+import javax.inject.Inject
 
 class DebugLoggingReceiver(
     context: Context,

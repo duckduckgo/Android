@@ -34,9 +34,9 @@ import com.duckduckgo.remote.messaging.impl.models.JsonMessageType.MEDIUM
 import com.duckduckgo.remote.messaging.impl.models.JsonMessageType.PROMO_SINGLE_ACTION
 import com.duckduckgo.remote.messaging.impl.models.JsonMessageType.SMALL
 import com.duckduckgo.remote.messaging.impl.models.asJsonFormat
-import java.util.Locale
 import logcat.LogPriority.ERROR
 import logcat.logcat
+import java.util.Locale
 
 private val smallMapper: (JsonContent, Set<MessageActionMapperPlugin>) -> Content = { jsonContent, _ ->
     Small(

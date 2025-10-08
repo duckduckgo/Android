@@ -30,10 +30,10 @@ import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason.UNK
 import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
 import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.SingleInstanceIn
-import java.util.concurrent.TimeUnit
-import javax.inject.Inject
 import kotlinx.coroutines.*
 import logcat.logcat
+import java.util.concurrent.TimeUnit
+import javax.inject.Inject
 
 @ContributesMultibinding(
     scope = VpnScope::class,

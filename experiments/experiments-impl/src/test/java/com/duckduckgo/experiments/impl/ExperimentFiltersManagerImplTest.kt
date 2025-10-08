@@ -21,7 +21,6 @@ import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.experiments.api.VariantConfig
 import com.duckduckgo.experiments.api.VariantFilters
 import com.duckduckgo.subscriptions.api.Subscriptions
-import java.util.Locale
 import junit.framework.TestCase.assertFalse
 import junit.framework.TestCase.assertTrue
 import kotlinx.coroutines.test.runTest
@@ -30,6 +29,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
+import java.util.Locale
 
 class ExperimentFiltersManagerImplTest {
 

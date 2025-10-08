@@ -22,12 +22,12 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.js.messaging.api.JsCallbackData
 import com.duckduckgo.js.messaging.api.SubscriptionEventData
-import javax.inject.Inject
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.receiveAsFlow
 import org.json.JSONObject
+import javax.inject.Inject
 
 @ContributesViewModel(ActivityScope::class)
 class PirDashboardWebViewViewModel @Inject constructor(

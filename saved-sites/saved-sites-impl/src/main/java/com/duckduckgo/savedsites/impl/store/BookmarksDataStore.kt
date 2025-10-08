@@ -26,13 +26,13 @@ import com.duckduckgo.savedsites.impl.store.SharedPreferencesBookmarksDataStore.
 import com.duckduckgo.savedsites.impl.store.SortingMode.MANUAL
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
-import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
+import javax.inject.Inject
 
 interface BookmarksDataStore {
     fun getSortingMode(): SortingMode

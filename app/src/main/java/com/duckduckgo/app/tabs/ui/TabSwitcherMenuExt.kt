@@ -30,9 +30,9 @@ import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.SelectionViewState.FabTyp
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.SelectionViewState.LayoutMode.GRID
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.SelectionViewState.LayoutMode.HIDDEN
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.SelectionViewState.LayoutMode.LIST
-import com.duckduckgo.mobile.android.R as commonR
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
 import com.google.android.material.floatingactionbutton.FloatingActionButton
+import com.duckduckgo.mobile.android.R as commonR
 
 fun Menu.createDynamicInterface(
     numSelectedTabs: Int,

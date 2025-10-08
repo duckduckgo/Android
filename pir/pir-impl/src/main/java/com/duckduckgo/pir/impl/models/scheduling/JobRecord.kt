@@ -68,6 +68,9 @@ sealed class JobRecord(
 
             /** The job is now invalid and should NOT be executed anymore. */
             INVALID,
+
+            /** The job is waiting for email confirmation to complete before we can move it to [REQUESTED]. */
+            PENDING_EMAIL_CONFIRMATION,
         }
     }
 
@@ -101,5 +104,32 @@ sealed class JobRecord(
             /** The job is now invalid and should NOT be executed anymore. */
             INVALID,
         }
+    }
+
+    data class EmailConfirmationJobRecord(
+        override val brokerName: String,
+        override val userProfileId: Long,
+        val extractedProfileId: Long,
+        val emailData: EmailData,
+        val linkFetchData: LinkFetchData = LinkFetchData(),
+        val jobAttemptData: JobAttemptData = JobAttemptData(),
+        val dateCreatedInMillis: Long = 0L,
+        val deprecated: Boolean = false,
+    ) : JobRecord(brokerName, userProfileId) {
+        data class EmailData(
+            val email: String,
+            val attemptId: String,
+        )
+
+        data class LinkFetchData(
+            val emailConfirmationLink: String = "",
+            val linkFetchAttemptCount: Int = 0,
+            val lastLinkFetchDateInMillis: Long = 0L,
+        )
+
+        data class JobAttemptData(
+            val jobAttemptCount: Int = 0,
+            val lastJobAttemptDateInMillis: Long = 0L,
+        )
     }
 }

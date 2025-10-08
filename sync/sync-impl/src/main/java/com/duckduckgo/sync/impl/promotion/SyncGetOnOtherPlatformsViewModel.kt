@@ -27,11 +27,11 @@ import com.duckduckgo.sync.impl.pixels.SyncPixelName
 import com.duckduckgo.sync.impl.pixels.SyncPixelParameters.GET_OTHER_DEVICES_SCREEN_LAUNCH_SOURCE
 import com.duckduckgo.sync.impl.promotion.SyncGetOnOtherPlatformsViewModel.Command.ShareLink
 import com.duckduckgo.sync.impl.promotion.SyncGetOnOtherPlatformsViewModel.Command.ShowCopiedNotification
-import javax.inject.Inject
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 @ContributesViewModel(ActivityScope::class)
 class SyncGetOnOtherPlatformsViewModel @Inject constructor(

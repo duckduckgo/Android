@@ -29,10 +29,10 @@ import com.duckduckgo.app.global.DuckDuckGoApplication
 import com.duckduckgo.app.pixels.AppPixelName.SEARCH_ONLY_WIDGET_ADDED
 import com.duckduckgo.app.pixels.AppPixelName.SEARCH_ONLY_WIDGET_DELETED
 import com.duckduckgo.app.systemsearch.SystemSearchActivity
-import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import logcat.logcat
+import javax.inject.Inject
 
 class SearchOnlyWidget : AppWidgetProvider() {
 

@@ -34,8 +34,6 @@ import com.duckduckgo.privacyprotectionspopup.impl.PrivacyProtectionsPopupExperi
 import com.duckduckgo.privacyprotectionspopup.impl.db.PopupDismissDomainRepository
 import com.duckduckgo.privacyprotectionspopup.impl.store.PrivacyProtectionsPopupDataStore
 import com.squareup.anvil.annotations.ContributesBinding
-import java.time.Duration
-import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.Job
@@ -55,6 +53,8 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.flow.updateAndGet
 import kotlinx.coroutines.launch
 import logcat.logcat
+import java.time.Duration
+import javax.inject.Inject
 
 @ContributesBinding(FragmentScope::class)
 class PrivacyProtectionsPopupManagerImpl @Inject constructor(

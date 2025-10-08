@@ -20,8 +20,8 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.contentscopescripts.impl.features.apimanipulation.store.ApiManipulationStore
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
-import javax.inject.Inject
 import kotlinx.coroutines.withContext
+import javax.inject.Inject
 
 /*
  * Copyright (c) 2025 DuckDuckGo

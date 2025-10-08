@@ -31,10 +31,10 @@ import com.duckduckgo.pir.impl.service.DbpService
 import com.duckduckgo.pir.impl.service.DbpService.CaptchaSolutionMeta
 import com.duckduckgo.pir.impl.service.DbpService.PirStartCaptchaSolutionBody
 import com.squareup.anvil.annotations.ContributesBinding
-import javax.inject.Inject
 import kotlinx.coroutines.withContext
 import logcat.logcat
 import retrofit2.HttpException
+import javax.inject.Inject
 
 interface CaptchaResolver {
     /**

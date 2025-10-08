@@ -9,11 +9,11 @@ import com.duckduckgo.subscriptions.api.SubscriptionStatus.NOT_AUTO_RENEWABLE
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.UNKNOWN
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.WAITING
 import com.duckduckgo.subscriptions.impl.serp_promo.FakeSerpPromo
-import java.time.Instant
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.*
 import org.junit.Rule
 import org.junit.Test
+import java.time.Instant
 
 class RealAuthRepositoryTest {
     @get:Rule

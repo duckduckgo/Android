@@ -23,14 +23,14 @@ import com.duckduckgo.app.global.file.FileDeleter
 import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.sha256
-import java.io.File
-import java.io.FileOutputStream
 import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import logcat.LogPriority.INFO
 import logcat.logcat
+import java.io.File
+import java.io.FileOutputStream
 
 interface FaviconPersister {
     fun faviconFile(

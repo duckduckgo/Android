@@ -21,14 +21,14 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.feature.toggles.api.Toggle.DefaultFeatureValue
 
+/**
+ * This is the class that represents the voiceSearch feature flags
+ */
 @ContributesRemoteFeature(
     scope = AppScope::class,
     featureName = "voiceSearch",
     settingsStore = VoiceSearchFeatureSettingStore::class,
 )
-/**
- * This is the class that represents the voiceSearch feature flags
- */
 interface VoiceSearchFeature {
     /**
      * @return `true` when the remote config has the global "voiceSearch" feature flag enabled

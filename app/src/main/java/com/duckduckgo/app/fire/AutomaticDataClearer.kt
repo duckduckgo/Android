@@ -38,15 +38,15 @@ import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.SingleInstanceIn
-import java.util.concurrent.TimeUnit
-import javax.inject.Inject
-import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import logcat.LogPriority.WARN
 import logcat.logcat
+import java.util.concurrent.TimeUnit
+import javax.inject.Inject
+import kotlin.coroutines.CoroutineContext
 
 interface DataClearer {
     val dataClearerState: LiveData<ApplicationClearDataState>

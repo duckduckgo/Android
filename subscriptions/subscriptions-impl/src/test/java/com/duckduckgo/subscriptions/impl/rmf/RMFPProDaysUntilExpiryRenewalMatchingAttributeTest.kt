@@ -7,7 +7,6 @@ import com.duckduckgo.subscriptions.api.SubscriptionStatus.AUTO_RENEWABLE
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.EXPIRED
 import com.duckduckgo.subscriptions.impl.SubscriptionsManager
 import com.duckduckgo.subscriptions.impl.repository.Subscription
-import java.util.concurrent.TimeUnit.DAYS
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.*
 import org.junit.Before
@@ -16,6 +15,7 @@ import org.junit.Test
 import org.mockito.Mock
 import org.mockito.MockitoAnnotations
 import org.mockito.kotlin.whenever
+import java.util.concurrent.TimeUnit.DAYS
 
 class RMFPProDaysUntilExpiryRenewalMatchingAttributeTest {
     @get:Rule

@@ -26,8 +26,8 @@ import com.duckduckgo.sync.store.model.SyncApiErrorType.REQUEST_SIZE_LIMIT_EXCEE
 import com.duckduckgo.sync.store.model.SyncApiErrorType.TOO_MANY_REQUESTS
 import com.duckduckgo.sync.store.model.SyncApiErrorType.VALIDATION_ERROR
 import com.squareup.anvil.annotations.ContributesBinding
-import javax.inject.Inject
 import logcat.logcat
+import javax.inject.Inject
 
 interface SyncApiErrorRecorder {
 

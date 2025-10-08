@@ -48,8 +48,6 @@ import com.duckduckgo.sync.store.*
 import com.squareup.anvil.annotations.*
 import com.squareup.moshi.*
 import dagger.*
-import java.util.UUID
-import javax.inject.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import logcat.LogPriority.ERROR
@@ -58,6 +56,8 @@ import logcat.LogPriority.VERBOSE
 import logcat.LogPriority.WARN
 import logcat.asLog
 import logcat.logcat
+import java.util.UUID
+import javax.inject.*
 
 interface SyncAccountRepository {
 
@@ -491,9 +491,9 @@ class AppSyncAccountRepository @Inject constructor(
 
                 logcat(VERBOSE) {
                     """
-                    Sync-exchange: We have received the other device's details. 
-                    name:${response.deviceName}, 
-                    keyId:${response.keyId}, 
+                    Sync-exchange: We have received the other device's details.
+                    name:${response.deviceName},
+                    keyId:${response.keyId},
                     public key: ${response.publicKey}
                     """.trimIndent()
                 }

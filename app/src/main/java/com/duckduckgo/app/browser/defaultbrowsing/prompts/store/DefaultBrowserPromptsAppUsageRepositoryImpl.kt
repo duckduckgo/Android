@@ -26,6 +26,7 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
+import kotlinx.coroutines.withContext
 import java.time.LocalDate
 import java.time.ZoneId
 import java.time.ZonedDateTime
@@ -33,7 +34,6 @@ import java.time.format.DateTimeFormatter
 import java.time.format.DateTimeParseException
 import java.time.temporal.ChronoUnit
 import javax.inject.Inject
-import kotlinx.coroutines.withContext
 
 @ContributesBinding(scope = AppScope::class)
 @SingleInstanceIn(scope = AppScope::class)

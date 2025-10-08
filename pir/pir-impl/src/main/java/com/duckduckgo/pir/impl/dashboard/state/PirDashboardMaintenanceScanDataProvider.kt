@@ -32,9 +32,9 @@ import com.duckduckgo.pir.impl.store.PirRepository
 import com.duckduckgo.pir.impl.store.PirSchedulingRepository
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
+import kotlinx.coroutines.withContext
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
-import kotlinx.coroutines.withContext
 
 interface PirDashboardMaintenanceScanDataProvider {
     /**

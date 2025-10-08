@@ -40,13 +40,13 @@ import com.duckduckgo.savedsites.impl.sync.store.SavedSitesSyncMetadataDao
 import com.duckduckgo.savedsites.impl.sync.store.SavedSitesSyncMetadataDatabase
 import com.duckduckgo.savedsites.store.SavedSitesEntitiesDao
 import com.duckduckgo.savedsites.store.SavedSitesRelationsDao
-import java.time.OffsetDateTime
-import java.time.ZoneOffset
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import java.time.OffsetDateTime
+import java.time.ZoneOffset
 
 @RunWith(AndroidJUnit4::class)
 class SavedSitesLocalWinsPersisterTest {

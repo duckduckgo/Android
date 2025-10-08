@@ -30,15 +30,15 @@ import dagger.Lazy
 import dagger.Module
 import dagger.Provides
 import dagger.SingleInstanceIn
+import okhttp3.Cache
+import okhttp3.OkHttpClient
+import retrofit2.Retrofit
 import java.io.File
 import java.security.MessageDigest
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit.SECONDS
 import javax.inject.Named
 import javax.inject.Qualifier
-import okhttp3.Cache
-import okhttp3.OkHttpClient
-import retrofit2.Retrofit
 
 @Module
 @ContributesTo(AppScope::class)

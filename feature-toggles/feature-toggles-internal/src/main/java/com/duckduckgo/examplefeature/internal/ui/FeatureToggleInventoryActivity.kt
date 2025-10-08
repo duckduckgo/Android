@@ -45,7 +45,6 @@ import com.duckduckgo.navigation.api.GlobalActivityStarter.ActivityParams
 import com.squareup.anvil.annotations.ContributesMultibinding
 import com.squareup.moshi.JsonWriter
 import com.squareup.moshi.Moshi
-import javax.inject.Inject
 import kotlinx.coroutines.CoroutineStart.LAZY
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.async
@@ -53,6 +52,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import okio.Buffer
+import javax.inject.Inject
 
 @InjectWith(ActivityScope::class)
 @ContributeToActivityStarter(LaunchFeatureToggleInventoryActivityNoParams::class)

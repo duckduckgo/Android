@@ -27,12 +27,12 @@ import com.duckduckgo.app.settings.clear.ClearWhatOption
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
-import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.withContext
 import logcat.LogPriority.INFO
 import logcat.LogPriority.WARN
 import logcat.logcat
+import javax.inject.Inject
 
 @ContributesWorker(AppScope::class)
 class DataClearingWorker(

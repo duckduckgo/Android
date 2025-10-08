@@ -22,7 +22,7 @@ import com.duckduckgo.js.messaging.api.JsMessaging
 import com.duckduckgo.pir.impl.dashboard.messaging.PirDashboardWebMessages
 import com.duckduckgo.pir.impl.dashboard.messaging.handlers.PirMessageHandlerUtils.createJsMessage
 import com.duckduckgo.pir.impl.dashboard.messaging.handlers.PirMessageHandlerUtils.verifyResponse
-import com.duckduckgo.pir.impl.dashboard.state.PirWebOnboardingStateHolder
+import com.duckduckgo.pir.impl.dashboard.state.PirWebProfileStateHolder
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
@@ -35,14 +35,14 @@ class PirWebSetBirthYearForCurrentUserProfileTest {
 
     private lateinit var testee: PirWebSetBirthYearForCurrentUserProfile
 
-    private val mockPirWebOnboardingStateHolder: PirWebOnboardingStateHolder = mock()
+    private val mockPirWebProfileStateHolder: PirWebProfileStateHolder = mock()
     private val mockJsMessaging: JsMessaging = mock()
     private val mockJsMessageCallback: JsMessageCallback = mock()
 
     @Before
     fun setUp() {
         testee = PirWebSetBirthYearForCurrentUserProfile(
-            pirWebOnboardingStateHolder = mockPirWebOnboardingStateHolder,
+            pirWebProfileStateHolder = mockPirWebProfileStateHolder,
         )
     }
 
@@ -66,7 +66,7 @@ class PirWebSetBirthYearForCurrentUserProfileTest {
         testee.process(jsMessage, mockJsMessaging, mockJsMessageCallback)
 
         // Then
-        verify(mockPirWebOnboardingStateHolder).setBirthYear(1990)
+        verify(mockPirWebProfileStateHolder).setBirthYear(1990)
         verifyResponse(jsMessage, true, mockJsMessaging)
     }
 
@@ -82,7 +82,7 @@ class PirWebSetBirthYearForCurrentUserProfileTest {
         testee.process(jsMessage, mockJsMessaging, mockJsMessageCallback)
 
         // Then
-        verify(mockPirWebOnboardingStateHolder).setBirthYear(1985)
+        verify(mockPirWebProfileStateHolder).setBirthYear(1985)
         verifyResponse(jsMessage, true, mockJsMessaging)
     }
 
@@ -98,7 +98,7 @@ class PirWebSetBirthYearForCurrentUserProfileTest {
         testee.process(jsMessage, mockJsMessaging, mockJsMessageCallback)
 
         // Then
-        verify(mockPirWebOnboardingStateHolder).setBirthYear(0)
+        verify(mockPirWebProfileStateHolder).setBirthYear(0)
         verifyResponse(jsMessage, true, mockJsMessaging)
     }
 
@@ -114,7 +114,7 @@ class PirWebSetBirthYearForCurrentUserProfileTest {
         testee.process(jsMessage, mockJsMessaging, mockJsMessageCallback)
 
         // Then
-        verify(mockPirWebOnboardingStateHolder).setBirthYear(-1)
+        verify(mockPirWebProfileStateHolder).setBirthYear(-1)
         verifyResponse(jsMessage, true, mockJsMessaging)
     }
 
@@ -130,7 +130,7 @@ class PirWebSetBirthYearForCurrentUserProfileTest {
         testee.process(jsMessage, mockJsMessaging, mockJsMessageCallback)
 
         // Then
-        verify(mockPirWebOnboardingStateHolder).setBirthYear(2030)
+        verify(mockPirWebProfileStateHolder).setBirthYear(2030)
         verifyResponse(jsMessage, true, mockJsMessaging)
     }
 
@@ -146,7 +146,7 @@ class PirWebSetBirthYearForCurrentUserProfileTest {
         testee.process(jsMessage, mockJsMessaging, mockJsMessageCallback)
 
         // Then
-        verify(mockPirWebOnboardingStateHolder).setBirthYear(0)
+        verify(mockPirWebProfileStateHolder).setBirthYear(0)
         verifyResponse(jsMessage, true, mockJsMessaging)
     }
 
@@ -162,7 +162,7 @@ class PirWebSetBirthYearForCurrentUserProfileTest {
         testee.process(jsMessage, mockJsMessaging, mockJsMessageCallback)
 
         // Then
-        verify(mockPirWebOnboardingStateHolder).setBirthYear(0)
+        verify(mockPirWebProfileStateHolder).setBirthYear(0)
         verifyResponse(jsMessage, true, mockJsMessaging)
     }
 
@@ -178,7 +178,7 @@ class PirWebSetBirthYearForCurrentUserProfileTest {
         testee.process(jsMessage, mockJsMessaging, mockJsMessageCallback)
 
         // Then - The exact behavior depends on JSON parsing, but it should set some value
-        verify(mockPirWebOnboardingStateHolder).setBirthYear(org.mockito.kotlin.any())
+        verify(mockPirWebProfileStateHolder).setBirthYear(org.mockito.kotlin.any())
         verifyResponse(jsMessage, true, mockJsMessaging)
     }
 
@@ -194,7 +194,7 @@ class PirWebSetBirthYearForCurrentUserProfileTest {
         testee.process(jsMessage, mockJsMessaging, mockJsMessageCallback)
 
         // Then
-        verify(mockPirWebOnboardingStateHolder).setBirthYear(0)
+        verify(mockPirWebProfileStateHolder).setBirthYear(0)
         verifyResponse(jsMessage, true, mockJsMessaging)
     }
 
@@ -210,7 +210,7 @@ class PirWebSetBirthYearForCurrentUserProfileTest {
         testee.process(jsMessage, mockJsMessaging, mockJsMessageCallback)
 
         // Then
-        verify(mockPirWebOnboardingStateHolder).setBirthYear(0)
+        verify(mockPirWebProfileStateHolder).setBirthYear(0)
         verifyResponse(jsMessage, true, mockJsMessaging)
     }
 
@@ -226,7 +226,7 @@ class PirWebSetBirthYearForCurrentUserProfileTest {
         testee.process(jsMessage, mockJsMessaging, mockJsMessageCallback)
 
         // Then
-        verify(mockPirWebOnboardingStateHolder).setBirthYear(0)
+        verify(mockPirWebProfileStateHolder).setBirthYear(0)
         verifyResponse(jsMessage, true, mockJsMessaging)
     }
 }

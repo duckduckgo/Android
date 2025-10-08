@@ -18,8 +18,8 @@ package com.duckduckgo.downloads.impl
 
 import com.duckduckgo.downloads.api.DownloadFailReason.ConnectionRefused
 import com.duckduckgo.downloads.api.FileDownloader.PendingFileDownload
-import javax.inject.Inject
 import logcat.logcat
+import javax.inject.Inject
 
 class NetworkFileDownloader @Inject constructor(
     private val filenameExtractor: FilenameExtractor,

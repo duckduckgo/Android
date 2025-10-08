@@ -46,6 +46,7 @@ import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.browser.api.UserBrowserProperties
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.daxprompts.api.DaxPrompts
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.privacy.config.api.PrivacyConfigCallbackPlugin
@@ -53,7 +54,6 @@ import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.anvil.annotations.ContributesMultibinding
 import com.squareup.moshi.Moshi
 import dagger.SingleInstanceIn
-import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.async
@@ -73,6 +73,7 @@ import kotlinx.coroutines.withContext
 import logcat.LogPriority.ERROR
 import logcat.asLog
 import logcat.logcat
+import javax.inject.Inject
 
 /**
  * Introduced by [this Asana task](https://app.asana.com/0/1208671518894266/1207295380941379/f).
@@ -104,6 +105,7 @@ class AdditionalDefaultBrowserPromptsImpl @Inject constructor(
     private val defaultBrowserPromptsDataStore: DefaultBrowserPromptsDataStore,
     private val stageEvaluator: DefaultBrowserPromptsFlowStageEvaluator,
     private val userBrowserProperties: UserBrowserProperties,
+    private val daxPrompts: DaxPrompts,
     private val pixel: Pixel,
     moshi: Moshi,
 ) : AdditionalDefaultBrowserPrompts, MainProcessLifecycleObserver, PrivacyConfigCallbackPlugin {
@@ -211,6 +213,11 @@ class AdditionalDefaultBrowserPromptsImpl @Inject constructor(
     }
 
     private suspend fun evaluate() = evaluationMutex.withLock {
+        if (daxPrompts.evaluate() != DaxPrompts.ActionType.NONE) {
+            logcat { "evaluate: DaxPrompts will show a prompt or has recently shown a prompt, skipping evaluation this time" }
+            return
+        }
+
         val isEnabled =
             defaultBrowserPromptsFeatureToggles.self().isEnabled() && defaultBrowserPromptsFeatureToggles.defaultBrowserPrompts25().isEnabled()
         logcat { "evaluate: default browser remote flag enabled = $isEnabled" }

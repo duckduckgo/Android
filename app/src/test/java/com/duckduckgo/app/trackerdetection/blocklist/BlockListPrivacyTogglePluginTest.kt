@@ -13,8 +13,6 @@ import com.duckduckgo.privacy.dashboard.api.PrivacyToggleOrigin.BREAKAGE_FORM
 import com.duckduckgo.privacy.dashboard.api.PrivacyToggleOrigin.DASHBOARD
 import com.duckduckgo.privacy.dashboard.api.PrivacyToggleOrigin.MENU
 import com.squareup.moshi.Moshi
-import java.time.ZoneId
-import java.time.ZonedDateTime
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule
@@ -22,6 +20,8 @@ import org.junit.Test
 import org.mockito.Mockito.verify
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verifyNoInteractions
+import java.time.ZoneId
+import java.time.ZonedDateTime
 
 @SuppressLint("DenyListedApi")
 class BlockListPrivacyTogglePluginTest {

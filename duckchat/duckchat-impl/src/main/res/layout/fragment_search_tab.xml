@@ -25,8 +25,7 @@
     <androidx.core.widget.NestedScrollView
         android:id="@+id/newTabContainerScrollView"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_marginTop="@dimen/inputScreenContentTopOffset">
+        android:layout_height="match_parent">
 
         <FrameLayout
             android:id="@+id/newTabContainerLayout"
@@ -45,20 +44,27 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"/>
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/autoCompleteSuggestionsList"
+    <!-- The frame around the recycler ensures proper clipping without using additional paddings -->
+    <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="?attr/daxColorBrowserOverlay"
-        android:clipToPadding="false"
-        android:paddingTop="@dimen/keyline_3"
-        android:paddingBottom="64dp"
-        tools:itemCount="3"
-        tools:listitem="@layout/item_autocomplete_search_suggestion"
-        tools:visibility="visible"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"/>
+        android:clipChildren="true"
+        android:clipToPadding="true">
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/autoCompleteSuggestionsList"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="?attr/daxColorBrowserOverlay"
+            android:clipToPadding="false"
+            tools:itemCount="3"
+            tools:listitem="@layout/item_autocomplete_search_suggestion"
+            tools:visibility="visible"
+            app:layout_behavior="@string/appbar_scrolling_view_behavior"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"/>
+
+    </FrameLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

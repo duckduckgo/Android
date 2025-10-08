@@ -31,13 +31,6 @@ import com.duckduckgo.cookies.store.CookiesRepository
 import com.duckduckgo.cookies.store.FirstPartyCookiePolicyEntity
 import com.duckduckgo.feature.toggles.api.FeatureException
 import com.duckduckgo.privacy.config.api.UnprotectedTemporary
-import java.time.Instant
-import java.time.ZoneOffset
-import java.time.format.DateTimeFormatter
-import java.time.temporal.ChronoUnit
-import java.util.Locale
-import kotlin.coroutines.resume
-import kotlin.coroutines.suspendCoroutine
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.withContext
@@ -47,6 +40,13 @@ import org.junit.Assert.assertNotNull
 import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.*
+import java.time.Instant
+import java.time.ZoneOffset
+import java.time.format.DateTimeFormatter
+import java.time.temporal.ChronoUnit
+import java.util.Locale
+import kotlin.coroutines.resume
+import kotlin.coroutines.suspendCoroutine
 
 @SuppressLint("NoHardcodedCoroutineDispatcher")
 class RealFirstPartyCookiesModifierTest {

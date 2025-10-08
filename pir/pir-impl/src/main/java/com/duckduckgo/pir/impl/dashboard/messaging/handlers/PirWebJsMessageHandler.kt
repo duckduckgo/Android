@@ -29,10 +29,10 @@ import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.adapters.PolymorphicJsonAdapterFactory
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
-import kotlin.reflect.KClass
 import logcat.LogPriority.ERROR
 import logcat.logcat
 import org.json.JSONObject
+import kotlin.reflect.KClass
 
 /**
  * Implement this class and contribute it as a multibinding to handle specific messages that are received from the PIR webview.

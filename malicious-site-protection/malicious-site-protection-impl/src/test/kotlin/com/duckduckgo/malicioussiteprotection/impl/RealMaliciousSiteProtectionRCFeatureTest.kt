@@ -16,7 +16,6 @@ import org.mockito.Mockito.mock
 import org.mockito.kotlin.whenever
 
 @SuppressLint("DenyListedApi")
-
 class RealMaliciousSiteProtectionRCFeatureTest {
 
     @get:Rule

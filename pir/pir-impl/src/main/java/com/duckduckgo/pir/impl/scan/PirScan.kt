@@ -40,11 +40,11 @@ import com.duckduckgo.pir.impl.store.db.EventType
 import com.duckduckgo.pir.impl.store.db.PirEventLog
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
-import javax.inject.Inject
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.withContext
 import logcat.logcat
+import javax.inject.Inject
 
 /**
  * This class is the main entry point for any scan execution (manual or scheduled)

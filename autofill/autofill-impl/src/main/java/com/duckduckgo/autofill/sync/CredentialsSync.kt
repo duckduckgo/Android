@@ -29,9 +29,9 @@ import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.sync.api.SyncCrypto
 import dagger.SingleInstanceIn
-import javax.inject.*
 import kotlinx.coroutines.flow.firstOrNull
 import logcat.logcat
+import javax.inject.*
 
 typealias Iso8601String = String
 

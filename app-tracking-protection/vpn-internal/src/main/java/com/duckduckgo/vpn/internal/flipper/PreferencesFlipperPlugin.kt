@@ -29,10 +29,10 @@ import com.facebook.flipper.core.FlipperPlugin
 import com.facebook.flipper.core.FlipperReceiver
 import com.frybits.harmony.getHarmonySharedPreferences
 import com.squareup.anvil.annotations.ContributesMultibinding
-import java.io.File
-import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import java.io.File
+import javax.inject.Inject
 
 private const val XML_SUFFIX = ".xml"
 private const val SHARED_PREFS_DIR = "shared_prefs"

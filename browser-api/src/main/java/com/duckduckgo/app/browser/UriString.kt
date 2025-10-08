@@ -22,32 +22,32 @@ import androidx.core.util.PatternsCompat
 import com.duckduckgo.common.utils.UrlScheme
 import com.duckduckgo.common.utils.baseHost
 import com.duckduckgo.common.utils.withScheme
-import java.lang.IllegalArgumentException
 import logcat.LogPriority.INFO
 import logcat.logcat
 import okhttp3.HttpUrl.Companion.toHttpUrl
+import java.lang.IllegalArgumentException
 
 class UriString {
-
     companion object {
-        private const val localhost = "localhost"
-        private const val space = " "
+        private const val LOCALHOST = "localhost"
+        private const val SPACE = " "
         private val webUrlRegex by lazy { PatternsCompat.WEB_URL.toRegex() }
         private val domainRegex by lazy { PatternsCompat.DOMAIN_NAME.toRegex() }
+        private val inputQueryCleanupRegex by lazy { "['\"\n]|\\s+".toRegex() }
         private val cache = LruCache<Int, Boolean>(250_000)
 
         fun extractUrl(inputQuery: String): String? {
             val urls = webUrlRegex.findAll(inputQuery).map { it.value }.toList()
-            return if (urls.size == 1) {
-                urls.first()
-            } else {
-                null
+            return when {
+                urls.isEmpty() -> null
+                urls.size == 1 -> urls.first()
+                // If multiple URLs found and all start with http, treat this as a search.
+                urls.all { it.startsWith("http") } -> null
+                else -> urls.firstOrNull { it.startsWith("http") }
             }
         }
 
-        fun host(uriString: String): String? {
-            return Uri.parse(uriString).baseHost
-        }
+        fun host(uriString: String): String? = Uri.parse(uriString).baseHost
 
         fun sameOrSubdomain(
             child: String,
@@ -105,19 +105,23 @@ class UriString {
             return parentHost == childHost || (childHost.endsWith(".$parentHost") || parentHost.endsWith(".$childHost"))
         }
 
-        fun isWebUrl(inputQuery: String, extractUrlQuery: Boolean = false): Boolean {
-            if (inputQuery.contains("\"") || inputQuery.contains("'")) {
-                return false
-            }
-
+        fun isWebUrl(
+            inputQuery: String,
+            extractUrlQuery: Boolean = false,
+        ): Boolean {
             if (extractUrlQuery) {
-                val extractedUrl = extractUrl(inputQuery)
+                val cleanInputQuery = cleanupInputQuery(inputQuery)
+                val extractedUrl = extractUrl(cleanInputQuery)
                 if (extractedUrl != null) {
                     return isWebUrl(extractedUrl)
                 }
             }
 
-            if (inputQuery.contains(space)) return false
+            if (inputQuery.contains("\"") || inputQuery.contains("'")) {
+                return false
+            }
+
+            if (inputQuery.contains(SPACE)) return false
             val rawUri = Uri.parse(inputQuery)
 
             val uri = rawUri.withScheme()
@@ -125,7 +129,7 @@ class UriString {
             if (uri.userInfo != null) return false
 
             val host = uri.host ?: return false
-            if (host == localhost) return true
+            if (host == LOCALHOST) return true
             if (host.contains("!")) return false
 
             if (webUrlRegex.containsMatchIn(host)) return true
@@ -144,9 +148,7 @@ class UriString {
             }
         }
 
-        fun isValidDomain(domain: String): Boolean {
-            return domainRegex.matches(domain)
-        }
+        fun isValidDomain(domain: String): Boolean = domainRegex.matches(domain)
 
         fun isDuckUri(inputQuery: String): Boolean {
             val uri = Uri.parse(inputQuery)
@@ -169,5 +171,7 @@ class UriString {
             val normalized = normalizeScheme()
             return normalized.scheme == UrlScheme.duck
         }
+
+        private fun cleanupInputQuery(text: String): String = text.replace(inputQueryCleanupRegex, " ").trim()
     }
 }

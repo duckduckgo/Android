@@ -21,8 +21,8 @@ import com.duckduckgo.app.browser.certificates.CertificateType
 import com.duckduckgo.app.browser.certificates.CertificateTypes
 import com.duckduckgo.app.browser.certificates.LetsEncryptCertificateProvider
 import com.duckduckgo.app.browser.certificates.toX509Certificate
-import java.security.cert.*
 import logcat.logcat
+import java.security.cert.*
 
 interface TrustedCertificateStore {
     fun validateSslCertificateChain(sslCertificate: SslCertificate): CertificateValidationState

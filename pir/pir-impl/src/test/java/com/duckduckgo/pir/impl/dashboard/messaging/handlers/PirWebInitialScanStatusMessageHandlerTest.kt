@@ -32,7 +32,6 @@ import com.duckduckgo.pir.impl.models.ExtractedProfile
 import com.duckduckgo.pir.impl.store.PirRepository
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
-import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runTest
 import org.json.JSONObject
@@ -44,6 +43,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
+import java.util.concurrent.TimeUnit
 
 @RunWith(AndroidJUnit4::class)
 class PirWebInitialScanStatusMessageHandlerTest {

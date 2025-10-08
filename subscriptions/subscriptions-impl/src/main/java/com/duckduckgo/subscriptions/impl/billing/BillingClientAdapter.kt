@@ -45,7 +45,7 @@ interface BillingClientAdapter {
         offerToken: String,
         externalId: String,
         oldPurchaseToken: String,
-        replacementMode: SubscriptionReplacementMode = SubscriptionReplacementMode.DEFERRED,
+        replacementMode: SubscriptionReplacementMode,
     ): LaunchBillingFlowResult
 }
 
@@ -70,7 +70,7 @@ sealed class SubscriptionsPurchaseHistoryResult {
 
 sealed class LaunchBillingFlowResult {
     data object Success : LaunchBillingFlowResult()
-    data object Failure : LaunchBillingFlowResult()
+    data class Failure(val error: BillingError) : LaunchBillingFlowResult()
 }
 
 sealed class PurchasesUpdateResult {
@@ -99,18 +99,32 @@ enum class BillingError {
     NETWORK_ERROR,
     UNKNOWN_ERROR, // for when billing returns something we don't understand
     BILLING_CRASH_ERROR, // This is our own error
-    ;
 }
 
 /**
  * Defines supported replacement modes for Google Play Billing subscription updates.
- *
- * Currently, we only use the [DEFERRED] mode in our implementation.
- *
- * For a complete list of available values, refer to the official documentation:
- * https://developer.android.com/reference/com/android/billingclient/api/BillingFlowParams.SubscriptionUpdateParams.ReplacementMode
+ * Currently, we only use the [WITHOUT_PRORATION] mode in our implementation.
  */
 enum class SubscriptionReplacementMode(val value: Int) {
+    /**
+     * The new plan takes effect immediately.
+     * The billing cycle remains the same, and the user is charged a prorated amount for the remaining period.
+     */
+    CHARGE_PRORATED_PRICE(2),
+
+    /**
+     * The new plan takes effect immediately.
+     * The new price will be charged on the next recurrence time, and the billing cycle stays the same.
+     */
+    WITHOUT_PRORATION(3),
+
+    /**
+     * The new plan takes effect immediately.
+     * The user is charged the full price of the new plan and is given a full billing cycle of subscription,
+     * plus remaining prorated time from the old plan.
+     */
+    CHARGE_FULL_PRICE(5),
+
     /**
      * New subscription starts after current subscription expires.
      * Best for: When you want to avoid billing complications or user requested delayed switch.

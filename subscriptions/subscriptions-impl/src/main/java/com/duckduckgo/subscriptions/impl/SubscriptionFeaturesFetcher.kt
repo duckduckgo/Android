@@ -27,12 +27,12 @@ import com.duckduckgo.subscriptions.impl.repository.AuthRepository
 import com.duckduckgo.subscriptions.impl.services.SubscriptionsCachedService
 import com.duckduckgo.subscriptions.impl.services.SubscriptionsService
 import com.squareup.anvil.annotations.ContributesMultibinding
-import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import logcat.logcat
+import javax.inject.Inject
 
 @ContributesMultibinding(
     scope = AppScope::class,

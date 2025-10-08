@@ -29,7 +29,6 @@ import com.duckduckgo.sync.api.SyncState.OFF
 import com.duckduckgo.sync.api.SyncStateMonitor
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
-import javax.inject.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
@@ -37,6 +36,7 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 import logcat.LogPriority.INFO
 import logcat.logcat
+import javax.inject.*
 
 interface FavoritesDisplayModeSettingsRepository {
     var favoritesDisplayMode: FavoritesDisplayMode

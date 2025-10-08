@@ -26,13 +26,13 @@ import com.duckduckgo.mobile.android.vpn.VpnFeaturesRegistry
 import com.duckduckgo.networkprotection.impl.NetPVpnFeature
 import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixels
 import dagger.android.AndroidInjection
-import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import logcat.LogPriority.WARN
 import logcat.logcat
+import javax.inject.Inject
 
 @InjectWith(ReceiverScope::class)
 class NetPEnableReceiver : BroadcastReceiver() {

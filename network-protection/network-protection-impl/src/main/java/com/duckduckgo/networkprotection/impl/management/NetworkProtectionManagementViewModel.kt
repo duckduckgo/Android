@@ -75,14 +75,14 @@ import com.duckduckgo.networkprotection.store.NetPGeoswitchingRepository.UserPre
 import com.duckduckgo.networkprotection.store.db.VpnIncompatibleApp
 import com.duckduckgo.subscriptions.api.PrivacyProUnifiedFeedback
 import com.duckduckgo.subscriptions.api.PrivacyProUnifiedFeedback.PrivacyProFeedbackSource.VPN_MANAGEMENT
-import java.util.concurrent.TimeUnit
-import javax.inject.Inject
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.util.concurrent.TimeUnit
+import javax.inject.Inject
 
 @SuppressLint("NoLifecycleObserver") // does not subscribe to app lifecycle
 @ContributesViewModel(ActivityScope::class)

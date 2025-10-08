@@ -16,10 +16,10 @@
 
 package com.duckduckgo.remote.messaging.store
 
-import java.time.LocalDateTime
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
+import java.time.LocalDateTime
 
 class LocalRemoteMessagingConfigRepositoryTest {
 

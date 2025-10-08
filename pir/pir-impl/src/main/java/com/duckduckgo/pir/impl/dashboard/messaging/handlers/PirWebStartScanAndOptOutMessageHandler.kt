@@ -23,8 +23,8 @@ import com.duckduckgo.js.messaging.api.JsMessaging
 import com.duckduckgo.pir.impl.dashboard.messaging.PirDashboardWebMessages
 import com.duckduckgo.pir.impl.dashboard.messaging.model.PirWebMessageResponse
 import com.squareup.anvil.annotations.ContributesMultibinding
-import javax.inject.Inject
 import logcat.logcat
+import javax.inject.Inject
 
 /**
  * Handles the message from Web to start the initial scan.

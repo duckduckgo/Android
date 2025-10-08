@@ -33,12 +33,6 @@ import com.duckduckgo.networkprotection.api.NetworkProtectionState
 import com.duckduckgo.networkprotection.impl.WgProtocol
 import com.duckduckgo.networkprotection.impl.pixels.WireguardHandshakeMonitor.Listener
 import com.squareup.anvil.annotations.ContributesMultibinding
-import java.time.Instant
-import java.util.concurrent.atomic.AtomicBoolean
-import java.util.concurrent.atomic.AtomicInteger
-import javax.inject.Inject
-import kotlin.time.Duration.Companion.minutes
-import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
@@ -46,6 +40,12 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import logcat.LogPriority.WARN
 import logcat.logcat
+import java.time.Instant
+import java.util.concurrent.atomic.AtomicBoolean
+import java.util.concurrent.atomic.AtomicInteger
+import javax.inject.Inject
+import kotlin.time.Duration.Companion.minutes
+import kotlin.time.Duration.Companion.seconds
 
 @ContributesMultibinding(VpnScope::class)
 class WireguardHandshakeMonitor @Inject constructor(

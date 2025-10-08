@@ -46,9 +46,6 @@ import com.duckduckgo.privacy.config.impl.network.JSONObjectAdapter
 import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupExperimentExternalPixels
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
-import java.net.URLEncoder
-import java.util.*
-import java.util.regex.Pattern
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runTest
@@ -66,6 +63,9 @@ import org.mockito.kotlin.reset
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import org.robolectric.ParameterizedRobolectricTestRunner
+import java.net.URLEncoder
+import java.util.*
+import java.util.regex.Pattern
 
 @RunWith(ParameterizedRobolectricTestRunner::class)
 class BrokenSitesMultipleReportReferenceTest(private val testCase: MultipleReportTestCase) {

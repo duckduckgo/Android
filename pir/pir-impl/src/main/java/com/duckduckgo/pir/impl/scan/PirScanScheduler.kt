@@ -30,21 +30,25 @@ import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.pir.impl.common.PirJobConstants.EMAIL_CONFIRMATION_INTERVAL_HOURS
 import com.duckduckgo.pir.impl.common.PirJobConstants.SCHEDULED_SCAN_INTERVAL_HOURS
+import com.duckduckgo.pir.impl.email.PirEmailConfirmationRemoteWorker
+import com.duckduckgo.pir.impl.email.PirEmailConfirmationRemoteWorker.Companion.TAG_EMAIL_CONFIRMATION
 import com.duckduckgo.pir.impl.pixels.PirPixelSender
 import com.duckduckgo.pir.impl.scan.PirScheduledScanRemoteWorker.Companion.TAG_SCHEDULED_SCAN
 import com.duckduckgo.pir.impl.store.PirEventsRepository
 import com.duckduckgo.pir.impl.store.db.EventType
 import com.duckduckgo.pir.impl.store.db.PirEventLog
 import com.squareup.anvil.annotations.ContributesBinding
-import java.util.concurrent.TimeUnit
-import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import logcat.logcat
+import java.util.concurrent.TimeUnit
+import javax.inject.Inject
 
 interface PirScanScheduler {
     fun scheduleScans()
+
     fun cancelScheduledScans(context: Context)
 }
 
@@ -60,18 +64,25 @@ class RealPirScanScheduler @Inject constructor(
     override fun scheduleScans() {
         logcat { "PIR-SCHEDULED: Scheduling periodic scan appId: ${appBuildConfig.applicationId}" }
 
-        val constraints = Constraints.Builder()
-            .setRequiresCharging(true)
-            .setRequiredNetworkType(NetworkType.CONNECTED)
-            .build()
+        schedulePirScans()
+        scheduleEmailConfirmation()
+    }
+
+    private fun schedulePirScans() {
+        val constraints =
+            Constraints
+                .Builder()
+                .setRequiresCharging(true)
+                .setRequiredNetworkType(NetworkType.CONNECTED)
+                .build()
 
         val periodicWorkRequest =
-            PeriodicWorkRequest.Builder(
-                PirScheduledScanRemoteWorker::class.java,
-                SCHEDULED_SCAN_INTERVAL_HOURS,
-                TimeUnit.HOURS,
-            )
-                .boundToPirProcess(appBuildConfig.applicationId)
+            PeriodicWorkRequest
+                .Builder(
+                    PirScheduledScanRemoteWorker::class.java,
+                    SCHEDULED_SCAN_INTERVAL_HOURS,
+                    TimeUnit.HOURS,
+                ).boundToPirProcess(appBuildConfig.applicationId)
                 .setConstraints(constraints)
                 .setInitialDelay(SCHEDULED_SCAN_INTERVAL_HOURS, TimeUnit.HOURS)
                 .build()
@@ -93,17 +104,45 @@ class RealPirScanScheduler @Inject constructor(
         )
     }
 
+    private fun scheduleEmailConfirmation() {
+        val constraints =
+            Constraints
+                .Builder()
+                .setRequiredNetworkType(NetworkType.CONNECTED)
+                .build()
+
+        val periodicWorkRequest =
+            PeriodicWorkRequest
+                .Builder(
+                    PirEmailConfirmationRemoteWorker::class.java,
+                    EMAIL_CONFIRMATION_INTERVAL_HOURS,
+                    TimeUnit.HOURS,
+                ).boundToPirProcess(appBuildConfig.applicationId)
+                .setConstraints(constraints)
+                .setInitialDelay(EMAIL_CONFIRMATION_INTERVAL_HOURS, TimeUnit.HOURS)
+                .build()
+
+        workManager.enqueueUniquePeriodicWork(
+            TAG_EMAIL_CONFIRMATION,
+            ExistingPeriodicWorkPolicy.UPDATE,
+            periodicWorkRequest,
+        )
+    }
+
     override fun cancelScheduledScans(context: Context) {
         workManager.cancelUniqueWork(TAG_SCHEDULED_SCAN)
+        workManager.cancelUniqueWork(TAG_EMAIL_CONFIRMATION)
         context.stopService(Intent(context, PirRemoteWorkerService::class.java))
     }
 
     private fun PeriodicWorkRequest.Builder.boundToPirProcess(applicationId: String): PeriodicWorkRequest.Builder {
         val componentName = ComponentName(applicationId, PirRemoteWorkerService::class.java.name)
-        val data = Data.Builder()
-            .putString(RemoteListenableWorker.ARGUMENT_PACKAGE_NAME, componentName.packageName)
-            .putString(RemoteListenableWorker.ARGUMENT_CLASS_NAME, componentName.className)
-            .build()
+        val data =
+            Data
+                .Builder()
+                .putString(RemoteListenableWorker.ARGUMENT_PACKAGE_NAME, componentName.packageName)
+                .putString(RemoteListenableWorker.ARGUMENT_CLASS_NAME, componentName.className)
+                .build()
 
         return this.setInputData(data)
     }

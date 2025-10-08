@@ -24,12 +24,12 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
-import java.util.concurrent.TimeUnit
-import javax.inject.Inject
 import kotlinx.coroutines.withContext
 import logcat.LogPriority.VERBOSE
 import logcat.LogPriority.WARN
 import logcat.logcat
+import java.util.concurrent.TimeUnit
+import javax.inject.Inject
 
 interface PartialCredentialSaveStore {
     suspend fun saveUsername(

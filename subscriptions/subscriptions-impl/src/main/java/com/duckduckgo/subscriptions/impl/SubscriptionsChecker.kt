@@ -36,11 +36,11 @@ import com.duckduckgo.subscriptions.api.SubscriptionStatus.UNKNOWN
 import com.duckduckgo.subscriptions.impl.RealSubscriptionsChecker.Companion.TAG_WORKER_SUBSCRIPTION_CHECK
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.anvil.annotations.ContributesMultibinding
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 import java.time.Duration
 import java.time.Instant
 import javax.inject.Inject
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.launch
 
 interface SubscriptionsChecker {
     suspend fun runChecker()

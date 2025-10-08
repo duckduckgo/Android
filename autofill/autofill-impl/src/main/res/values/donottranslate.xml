@@ -16,4 +16,13 @@
 
 <resources>
 
+    <!-- Import Bookmarks Strings -->
+    <string name="autofillImportBookmarksChromeFolderName">Imported from Chrome</string>
+
+
+    <!-- Import Bookmarks Strings -->
+    <string name="autofillManagementImportBookmarks">Import Bookmarks</string>
+    <string name="autofillManagementImportBookmarksTitle">Import Your Bookmarks</string>
+
+
 </resources>

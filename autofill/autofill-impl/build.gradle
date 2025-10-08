@@ -34,7 +34,7 @@ dependencies {
     implementation project(path: ':feature-toggles-api')
     implementation project(path: ':di')
     implementation project(path: ':common-utils')
-    implementation project(path: ':common-ui')
+    implementation project(path: ':design-system')
     implementation project(path: ':autofill-api')
     implementation project(path: ':browser-api')
     implementation project(path: ':statistics-api')
@@ -47,6 +47,8 @@ dependencies {
     testImplementation project(':feature-toggles-test')
     implementation project(path: ':settings-api') // temporary until we release new settings
     implementation project(':library-loader-api')
+    implementation project(':saved-sites-api')
+    implementation project(':cookies-api')
 
     anvil project(path: ':anvil-compiler')
     implementation project(path: ':anvil-annotations')

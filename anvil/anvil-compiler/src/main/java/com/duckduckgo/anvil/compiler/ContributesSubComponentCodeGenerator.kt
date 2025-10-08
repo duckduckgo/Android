@@ -36,10 +36,10 @@ import dagger.BindsInstance
 import dagger.Subcomponent
 import dagger.multibindings.ClassKey
 import dagger.multibindings.IntoMap
-import java.io.File
 import org.jetbrains.kotlin.descriptors.ModuleDescriptor
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.psi.KtFile
+import java.io.File
 
 /**
  * This Anvil code generator allows inject ViewModel without manually creating the ViewModel factory

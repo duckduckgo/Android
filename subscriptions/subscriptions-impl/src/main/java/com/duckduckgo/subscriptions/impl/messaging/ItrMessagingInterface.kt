@@ -35,11 +35,11 @@ import com.duckduckgo.subscriptions.impl.JSONObjectAdapter
 import com.duckduckgo.subscriptions.impl.SubscriptionsManager
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.moshi.Moshi
-import javax.inject.Inject
-import javax.inject.Named
 import kotlinx.coroutines.runBlocking
 import logcat.logcat
 import org.json.JSONObject
+import javax.inject.Inject
+import javax.inject.Named
 
 @ContributesBinding(ActivityScope::class)
 @Named("Itr")

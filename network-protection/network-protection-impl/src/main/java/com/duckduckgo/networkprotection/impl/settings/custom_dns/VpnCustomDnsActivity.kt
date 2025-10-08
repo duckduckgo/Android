@@ -55,13 +55,13 @@ import com.duckduckgo.networkprotection.impl.settings.custom_dns.VpnCustomDnsAct
 import com.duckduckgo.networkprotection.impl.settings.custom_dns.VpnCustomDnsActivity.State.DefaultDnsNoBlockMalware
 import com.duckduckgo.networkprotection.impl.settings.custom_dns.VpnCustomDnsActivity.State.Done
 import com.duckduckgo.networkprotection.impl.settings.custom_dns.VpnCustomDnsScreen.Default
-import javax.inject.Inject
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 @InjectWith(ActivityScope::class)
 @ContributeToActivityStarter(Default::class)

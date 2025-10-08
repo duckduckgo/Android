@@ -8,7 +8,6 @@ import com.duckduckgo.autofill.impl.email.remoteconfig.EmailProtectionInContextE
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle.State
-import java.util.*
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertFalse
@@ -19,6 +18,7 @@ import org.junit.Test
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
+import java.util.*
 
 class RealEmailProtectionInContextAvailabilityRulesTest {
 

@@ -22,9 +22,9 @@ import com.duckduckgo.subscriptions.api.PrivacyProUnifiedFeedback.PrivacyProFeed
 import com.duckduckgo.subscriptions.impl.services.FeedbackBody
 import com.duckduckgo.subscriptions.impl.services.SubscriptionsService
 import com.squareup.anvil.annotations.ContributesBinding
-import javax.inject.Inject
 import kotlinx.coroutines.withContext
 import logcat.logcat
+import javax.inject.Inject
 
 interface SubscriptionSupportInbox {
     /**

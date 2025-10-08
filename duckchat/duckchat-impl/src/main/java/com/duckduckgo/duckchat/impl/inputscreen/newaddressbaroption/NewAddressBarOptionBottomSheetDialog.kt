@@ -46,6 +46,7 @@ interface NewAddressBarCallback {
     fun onDisplayed()
     fun onConfirmed(selection: NewAddressBarSelection)
     fun onNotNow()
+    fun onCancelled()
 }
 
 @SuppressLint("NoBottomSheetDialog")
@@ -75,6 +76,7 @@ class NewAddressBarOptionBottomSheetDialog(
         }
 
         setOnCancelListener {
+            newAddressBarCallback?.onCancelled()
             restoreOrientation()
             dismiss()
         }
@@ -173,7 +175,7 @@ class NewAddressBarOptionBottomSheetDialog(
 
             if (pendingShow) {
                 pendingShow = false
-                show()
+                if (isWindowValid()) { super.show() }
             }
         }
     }
@@ -244,7 +246,7 @@ class NewAddressBarOptionBottomSheetDialog(
                     playIntroThenLoop(lottieView, it.durationFrames.toInt())
                 }
             }
-            super.show()
+            if (isWindowValid()) { super.show() }
         } else {
             pendingShow = true
         }
@@ -254,6 +256,10 @@ class NewAddressBarOptionBottomSheetDialog(
         super.onDetachedFromWindow()
         restoreOrientation()
     }
+
+    private fun isWindowValid(): Boolean = (context as? Activity)?.let { activity ->
+        !activity.isFinishing && !activity.isDestroyed && activity.window?.decorView?.isAttachedToWindow == true
+    } ?: false
 
     companion object {
         const val MAX_HEIGHT_DP = 900

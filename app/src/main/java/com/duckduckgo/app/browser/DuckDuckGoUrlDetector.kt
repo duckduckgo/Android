@@ -22,8 +22,8 @@ import com.duckduckgo.common.utils.AppUrl.ParamKey
 import com.duckduckgo.common.utils.AppUrl.ParamValue
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
-import javax.inject.Inject
 import okhttp3.HttpUrl.Companion.toHttpUrl
+import javax.inject.Inject
 
 @ContributesBinding(AppScope::class)
 class DuckDuckGoUrlDetectorImpl @Inject constructor() : DuckDuckGoUrlDetector {

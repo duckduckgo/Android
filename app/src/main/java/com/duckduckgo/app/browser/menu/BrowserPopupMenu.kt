@@ -27,8 +27,10 @@ import com.duckduckgo.app.browser.databinding.PopupWindowBrowserMenuBottomBindin
 import com.duckduckgo.app.browser.menu.BrowserPopupMenu.ResourceType.BOTTOM
 import com.duckduckgo.app.browser.menu.BrowserPopupMenu.ResourceType.TOP
 import com.duckduckgo.app.browser.viewstate.BrowserViewState
+import com.duckduckgo.app.browser.viewstate.VpnMenuState
 import com.duckduckgo.common.ui.menu.PopupMenu
 import com.duckduckgo.common.ui.view.MenuItemView
+import com.duckduckgo.common.ui.view.StatusIndicatorView
 import com.duckduckgo.mobile.android.R.drawable
 
 class BrowserPopupMenu(
@@ -44,10 +46,11 @@ class BrowserPopupMenu(
     private val bottomBinding = PopupWindowBrowserMenuBottomBinding.bind(contentView)
 
     init {
-        contentView = when (popupMenuResourceType) {
-            TOP -> topBinding.root
-            BOTTOM -> bottomBinding.root
-        }
+        contentView =
+            when (popupMenuResourceType) {
+                TOP -> topBinding.root
+                BOTTOM -> bottomBinding.root
+            }
     }
 
     internal val backMenuItem: View by lazy {
@@ -89,6 +92,13 @@ class BrowserPopupMenu(
         when (popupMenuResourceType) {
             TOP -> topBinding.includeDefaultBrowserMenuItem.defaultBrowserMenuItem
             BOTTOM -> bottomBinding.includeDefaultBrowserMenuItem.defaultBrowserMenuItem
+        }
+    }
+
+    internal val vpnMenuItem: View by lazy {
+        when (popupMenuResourceType) {
+            TOP -> topBinding.includeVpnMenuItem.vpnMenuItem
+            BOTTOM -> bottomBinding.includeVpnMenuItem.vpnMenuItem
         }
     }
 
@@ -256,6 +266,8 @@ class BrowserPopupMenu(
 
         defaultBrowserMenuItem.isVisible = viewState.showSelectDefaultBrowserMenuItem
 
+        configureVpnMenuItem(viewState, browserShowing, displayedInCustomTabScreen)
+
         bookmarksMenuItem.isVisible = !displayedInCustomTabScreen
         downloadsMenuItem.isVisible = !displayedInCustomTabScreen
         settingsMenuItem.isVisible = !displayedInCustomTabScreen
@@ -300,13 +312,14 @@ class BrowserPopupMenu(
         addToHomeMenuItem.isVisible = viewState.addToHomeVisible && viewState.addToHomeEnabled && !displayedInCustomTabScreen
         privacyProtectionMenuItem.isVisible = viewState.canChangePrivacyProtection
         privacyProtectionMenuItem.label {
-            context.getText(
-                if (viewState.isPrivacyProtectionDisabled) {
-                    R.string.enablePrivacyProtection
-                } else {
-                    R.string.disablePrivacyProtection
-                },
-            ).toString()
+            context
+                .getText(
+                    if (viewState.isPrivacyProtectionDisabled) {
+                        R.string.enablePrivacyProtection
+                    } else {
+                        R.string.disablePrivacyProtection
+                    },
+                ).toString()
         }
         privacyProtectionMenuItem.setIcon(
             if (viewState.isPrivacyProtectionDisabled) drawable.ic_shield_16 else drawable.ic_shield_disabled_16,
@@ -333,6 +346,92 @@ class BrowserPopupMenu(
             newTabMenuItem.isVisible = true
             siteOptionsMenuDivider.isVisible = true
         }
+    }
+
+    private fun configureVpnMenuItem(
+        viewState: BrowserViewState,
+        browserShowing: Boolean,
+        displayedInCustomTabScreen: Boolean,
+    ) {
+        // Only show VPN menu item in new tab page overflow menu
+        val shouldShowVpnMenuItem = !browserShowing && !displayedInCustomTabScreen
+
+        when (viewState.vpnMenuState) {
+            VpnMenuState.Hidden -> {
+                vpnMenuItem.isVisible = false
+            }
+            VpnMenuState.NotSubscribed -> {
+                vpnMenuItem.isVisible = shouldShowVpnMenuItem
+                if (shouldShowVpnMenuItem) {
+                    val (tryForFreePill, statusIndicator, menuItemView) = getVpnMenuViews()
+                    configureVpnMenuItemForNotSubscribed(tryForFreePill, statusIndicator, menuItemView)
+                }
+            }
+            VpnMenuState.NotSubscribedNoPill -> {
+                vpnMenuItem.isVisible = shouldShowVpnMenuItem
+                if (shouldShowVpnMenuItem) {
+                    val (tryForFreePill, statusIndicator, menuItemView) = getVpnMenuViews()
+                    configureVpnMenuItemForNotSubscribedNoPill(tryForFreePill, statusIndicator, menuItemView)
+                }
+            }
+            is VpnMenuState.Subscribed -> {
+                vpnMenuItem.isVisible = shouldShowVpnMenuItem
+                if (shouldShowVpnMenuItem) {
+                    val (tryForFreePill, statusIndicator, menuItemView) = getVpnMenuViews()
+                    configureVpnMenuItemForSubscribed(tryForFreePill, statusIndicator, menuItemView, viewState.vpnMenuState.isVpnEnabled)
+                }
+            }
+        }
+    }
+
+    private fun getVpnMenuViews() =
+        when (popupMenuResourceType) {
+            TOP ->
+                Triple(
+                    topBinding.includeVpnMenuItem.tryForFreePill,
+                    topBinding.includeVpnMenuItem.statusIndicator,
+                    topBinding.includeVpnMenuItem.menuItemView,
+                )
+            BOTTOM ->
+                Triple(
+                    bottomBinding.includeVpnMenuItem.tryForFreePill,
+                    bottomBinding.includeVpnMenuItem.statusIndicator,
+                    bottomBinding.includeVpnMenuItem.menuItemView,
+                )
+        }
+
+    private fun configureVpnMenuItemForNotSubscribed(
+        tryForFreePill: View,
+        statusIndicator: StatusIndicatorView,
+        menuItemView: MenuItemView,
+    ) {
+        tryForFreePill.isVisible = true
+        statusIndicator.isVisible = false
+        menuItemView.setIcon(drawable.ic_vpn_unlocked_24)
+    }
+
+    private fun configureVpnMenuItemForNotSubscribedNoPill(
+        tryForFreePill: View,
+        statusIndicator: StatusIndicatorView,
+        menuItemView: MenuItemView,
+    ) {
+        tryForFreePill.isVisible = false
+        statusIndicator.isVisible = false
+        menuItemView.setIcon(drawable.ic_vpn_unlocked_24)
+    }
+
+    private fun configureVpnMenuItemForSubscribed(
+        tryForFreePill: View,
+        statusIndicator: StatusIndicatorView,
+        menuItemView: MenuItemView,
+        isVpnEnabled: Boolean,
+    ) {
+        tryForFreePill.isVisible = false
+        statusIndicator.isVisible = true
+        statusIndicator.setStatus(isVpnEnabled)
+
+        val iconRes = if (isVpnEnabled) drawable.ic_vpn_24 else drawable.ic_vpn_unlocked_24
+        menuItemView.setIcon(iconRes)
     }
 
     enum class ResourceType {
