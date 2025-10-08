@@ -3870,6 +3870,24 @@ class BrowserTabViewModel @Inject constructor(
                 site?.debugFlags = (site?.debugFlags ?: listOf()).toMutableList().plus(featureName)?.toList()
             }
 
+            "initialPing" -> {
+                if (id != null) {
+                    command.value = SendResponseToJs(
+                        JsCallbackData(
+                            params = JSONObject(
+                                mapOf(
+                                    "desktopModeEnabled" to (getSite()?.isDesktopMode ?: false),
+                                    "forcedZoomEnabled" to (accessibilityViewState.value?.forceZoom ?: false),
+                                ),
+                            ),
+                            featureName = featureName,
+                            method = method,
+                            id = id,
+                        ),
+                    )
+                }
+            }
+
             else -> {
                 // NOOP
             }
