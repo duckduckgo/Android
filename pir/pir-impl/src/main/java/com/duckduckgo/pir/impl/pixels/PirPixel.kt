@@ -115,7 +115,7 @@ enum class PirPixel(
         type = Count,
     ),
     PIR_EMAIL_CONFIRMATION_JOB_SUCCESS(
-        baseName = "pir_email-confirmation_max-retries-exceeded",
+        baseName = "pir_email-confirmation_job-success",
         type = Count,
     ), ;
 

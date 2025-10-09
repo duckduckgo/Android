@@ -263,7 +263,7 @@ interface PirPixelSender {
     )
 
     /**
-     * Emits a pixel when the email confirmation job finishes successfully (after any number of attempts).
+     * Emits a pixel when the email confirmation job and everything else have been completely updated accordingly.
      *
      * @param brokerUrl The URL of the data broker that this action was operating on
      * @param brokerVersion The version of the broker JSON file
