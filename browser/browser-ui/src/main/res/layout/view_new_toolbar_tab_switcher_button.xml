@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?><!--
-  ~ Copyright (c) 2018 DuckDuckGo
+  ~ Copyright (c) 2025 DuckDuckGo
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
@@ -20,15 +20,15 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/selectable_item_experimental_background"
-    tools:layout_height="@dimen/bottomNavIconContainer"
-    tools:layout_width="@dimen/bottomNavIconContainer">
+    tools:layout_height="@dimen/toolbarIcon"
+    tools:layout_width="@dimen/toolbarIcon">
 
     <ImageView
         android:id="@+id/tabsImageView"
         android:layout_width="@dimen/bottomNavIcon"
         android:layout_height="@dimen/bottomNavIcon"
         android:layout_gravity="center"
-        android:contentDescription="@string/tabsMenuItem"
+        android:contentDescription="@string/tabSwitcherContentDescription"
         android:scaleType="center"
         android:src="@drawable/ic_tab_24" />
 
@@ -44,12 +44,12 @@
         android:id="@+id/tabCount"
         android:layout_width="24dp"
         android:layout_height="24dp"
-        android:layout_marginStart="11.75dp"
+        android:layout_marginStart="8dp"
         android:layout_marginTop="7.5dp"
         android:fontFamily="sans-serif-condensed"
         android:gravity="center"
         android:textColor="?attr/daxColorPrimaryIcon"
-        android:textSize="9dp"
+        android:textSize="12dp"
         android:textStyle="bold"
         tools:ignore="DeprecatedWidgetInXml,SpUsage"
         tools:text="99" />
@@ -58,13 +58,13 @@
         android:id="@+id/tabCountInfinite"
         android:layout_width="24dp"
         android:layout_height="24dp"
-        android:layout_marginStart="12dp"
-        android:layout_marginTop="6dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="6.5dp"
         android:fontFamily="sans-serif-condensed"
         android:gravity="center"
         android:text="∞"
         android:textColor="?attr/daxColorPrimaryIcon"
-        android:textSize="11dp"
+        android:textSize="13dp"
         android:textStyle="bold"
         android:visibility="gone"
         tools:ignore="DeprecatedWidgetInXml,HardcodedText,SpUsage" />

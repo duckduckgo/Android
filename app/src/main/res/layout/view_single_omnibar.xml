@@ -411,7 +411,7 @@
                 app:layout_constraintStart_toEndOf="@id/toolbar"
                 app:layout_constraintTop_toTopOf="parent">
 
-                <com.duckduckgo.app.browser.tabswitcher.NewTabSwitcherButton
+                <com.duckduckgo.browser.ui.tabs.NewTabSwitcherButton
                     android:id="@+id/tabsMenu"
                     android:layout_width="@dimen/toolbarIcon"
                     android:layout_height="@dimen/toolbarIcon"
