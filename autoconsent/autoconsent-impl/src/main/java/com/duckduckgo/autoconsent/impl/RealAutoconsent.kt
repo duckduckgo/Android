@@ -18,6 +18,7 @@ package com.duckduckgo.autoconsent.impl
 
 import android.webkit.WebView
 import com.duckduckgo.app.browser.UriString
+import com.duckduckgo.app.di.IsMainProcess
 import com.duckduckgo.app.privacy.db.UserAllowListRepository
 import com.duckduckgo.autoconsent.api.Autoconsent
 import com.duckduckgo.autoconsent.api.AutoconsentCallback
@@ -57,10 +58,16 @@ class RealAutoconsent @Inject constructor(
     private val autoconsent: AutoconsentFeature,
     private val userAllowlistRepository: UserAllowListRepository,
     private val unprotectedTemporary: UnprotectedTemporary,
+    @IsMainProcess isMainProcess: Boolean,
 ) : Autoconsent, PrivacyConfigCallbackPlugin {
 
     private lateinit var autoconsentJs: String
-    private val moshi = Moshi.Builder().add(JSONObjectAdapter()).build()
+
+    init {
+        if (isMainProcess) {
+            onPrivacyConfigDownloaded()
+        }
+    }
 
     override fun injectAutoconsent(webView: WebView, url: String) {
         if (isAutoconsentEnabled() && !urlInUserAllowList(url) && !isAnException(url)) {
@@ -131,8 +138,17 @@ class RealAutoconsent @Inject constructor(
         settingsRepository.invalidateCache()
         val settingsJson = autoconsent.self().getSettings()
         if (SettingsCache.hash != settingsJson.hashCode()) {
+            settingsJson?.let {
+                updateSettingsCache(it)
+            }
+        }
+    }
+
+    companion object {
+        fun updateSettingsCache(settingsJson: String) {
+            val moshi = Moshi.Builder().add(JSONObjectAdapter()).build()
             val settingsAdapter = moshi.adapter(AutoconsentSettings::class.java)
-            SettingsCache.settings = settingsJson?.let { settingsAdapter.fromJson(it) }
+            SettingsCache.settings = settingsAdapter.fromJson(settingsJson)
             SettingsCache.hash = settingsJson.hashCode()
         }
     }

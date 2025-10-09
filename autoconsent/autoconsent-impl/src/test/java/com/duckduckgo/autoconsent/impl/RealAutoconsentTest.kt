@@ -59,6 +59,7 @@ class RealAutoconsentTest {
             mockAutoconsentFeature,
             userAllowlist,
             unprotected,
+            isMainProcess = true,
         )
     }
 
