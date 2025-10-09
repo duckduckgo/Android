@@ -22,7 +22,6 @@ import android.view.ViewTreeObserver
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
-import logcat.logcat
 
 class KeyboardVisibilityUtil(private val rootView: View) {
 
@@ -38,7 +37,6 @@ class KeyboardVisibilityUtil(private val rootView: View) {
             },
         )
     }
-
 }
 
 fun View.keyboardVisibilityFlow(): Flow<Boolean> = callbackFlow {

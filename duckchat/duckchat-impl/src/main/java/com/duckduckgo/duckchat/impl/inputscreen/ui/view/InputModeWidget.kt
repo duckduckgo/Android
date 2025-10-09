@@ -44,6 +44,7 @@ import androidx.core.widget.doAfterTextChanged
 import androidx.core.widget.doOnTextChanged
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.browser.ui.tabs.TabSwitcherButton
 import com.duckduckgo.common.ui.view.addBottomShadow
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.show
@@ -55,7 +56,6 @@ import com.duckduckgo.duckchat.impl.pixel.inputScreenPixelsModeParam
 import com.google.android.material.card.MaterialCardView
 import com.google.android.material.tabs.TabLayout
 import dagger.android.support.AndroidSupportInjection
-import logcat.logcat
 import javax.inject.Inject
 import kotlin.math.roundToInt
 
@@ -77,7 +77,7 @@ class InputModeWidget @JvmOverloads constructor(
     private val inputScreenButtonsContainer: FrameLayout
     private val inputModeIconsContainer: View
     private val inputModeWidgetLayout: View
-    val tabSwitcherButton: InputScreenTabSwitcherButton
+    val tabSwitcherButton: TabSwitcherButton
     private val menuButton: View
     private val fireButton: View
     private val voiceInputButton: View
@@ -306,8 +306,8 @@ class InputModeWidget @JvmOverloads constructor(
         )
     }
 
-    private fun configureMainButtons(){
-        if (shouldShowMainButtons){
+    private fun configureMainButtons() {
+        if (shouldShowMainButtons) {
             inputModeIconsContainer.show()
         } else {
             inputModeIconsContainer.gone()

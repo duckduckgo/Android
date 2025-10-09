@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.browser.tabswitcher
+package com.duckduckgo.browser.ui.tabs
 
 import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
 import android.content.Context
 import android.util.AttributeSet
 import android.widget.FrameLayout
-import com.duckduckgo.app.browser.R
+import com.duckduckgo.browser.ui.R
 
 open class TabSwitcherButton @JvmOverloads constructor(
     context: Context,
