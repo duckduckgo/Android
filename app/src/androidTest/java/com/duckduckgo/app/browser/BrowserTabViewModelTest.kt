@@ -208,6 +208,7 @@ import com.duckduckgo.autofill.api.passwordgeneration.AutomaticSavedLoginsMonito
 import com.duckduckgo.autofill.impl.AutofillFireproofDialogSuppressor
 import com.duckduckgo.brokensite.api.BrokenSitePrompt
 import com.duckduckgo.brokensite.api.RefreshPattern
+import com.duckduckgo.browser.api.AddDocumentStartJavaScriptBrowserPlugin
 import com.duckduckgo.browser.api.UserBrowserProperties
 import com.duckduckgo.browser.api.autocomplete.AutoComplete
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion.AutoCompleteDefaultSuggestion
@@ -255,7 +256,7 @@ import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.history.api.HistoryEntry.VisitedPage
 import com.duckduckgo.history.api.NavigationHistory
-import com.duckduckgo.js.messaging.api.AddDocumentStartJavaScriptPlugin
+import com.duckduckgo.js.messaging.api.AddDocumentStartJavaScript
 import com.duckduckgo.js.messaging.api.JsCallbackData
 import com.duckduckgo.js.messaging.api.PostMessageWrapperPlugin
 import com.duckduckgo.js.messaging.api.SubscriptionEventData
@@ -6987,8 +6988,8 @@ class BrowserTabViewModelTest {
 
             testee.pageFinished(mockWebView, webViewNavState, url)
 
-            assertEquals(1, fakeAddDocumentStartJavaScriptPlugins.cssPlugin.countInitted)
-            assertEquals(1, fakeAddDocumentStartJavaScriptPlugins.otherPlugin.countInitted)
+            assertEquals(1, fakeAddDocumentStartJavaScriptPlugins.cssPlugin.addDocumentStartJavaScript().countInitted)
+            assertEquals(1, fakeAddDocumentStartJavaScriptPlugins.otherPlugin.addDocumentStartJavaScript().countInitted)
         }
 
     @Test
@@ -7000,8 +7001,8 @@ class BrowserTabViewModelTest {
 
             testee.pageFinished(mockWebView, webViewNavState, url)
 
-            assertEquals(0, fakeAddDocumentStartJavaScriptPlugins.cssPlugin.countInitted)
-            assertEquals(0, fakeAddDocumentStartJavaScriptPlugins.otherPlugin.countInitted)
+            assertEquals(0, fakeAddDocumentStartJavaScriptPlugins.cssPlugin.addDocumentStartJavaScript().countInitted)
+            assertEquals(0, fakeAddDocumentStartJavaScriptPlugins.otherPlugin.addDocumentStartJavaScript().countInitted)
         }
 
     @Test
@@ -7012,8 +7013,8 @@ class BrowserTabViewModelTest {
 
             testee.privacyProtectionsUpdated(mockWebView)
 
-            assertEquals(1, fakeAddDocumentStartJavaScriptPlugins.cssPlugin.countInitted)
-            assertEquals(1, fakeAddDocumentStartJavaScriptPlugins.otherPlugin.countInitted)
+            assertEquals(1, fakeAddDocumentStartJavaScriptPlugins.cssPlugin.addDocumentStartJavaScript().countInitted)
+            assertEquals(1, fakeAddDocumentStartJavaScriptPlugins.otherPlugin.addDocumentStartJavaScript().countInitted)
         }
 
     @Test
@@ -7036,8 +7037,8 @@ class BrowserTabViewModelTest {
 
             testee.privacyProtectionsUpdated(mockWebView)
 
-            assertEquals(1, fakeAddDocumentStartJavaScriptPlugins.cssPlugin.countInitted)
-            assertEquals(0, fakeAddDocumentStartJavaScriptPlugins.otherPlugin.countInitted)
+            assertEquals(1, fakeAddDocumentStartJavaScriptPlugins.cssPlugin.addDocumentStartJavaScript().countInitted)
+            assertEquals(0, fakeAddDocumentStartJavaScriptPlugins.otherPlugin.addDocumentStartJavaScript().countInitted)
         }
 
     @Test
@@ -7538,11 +7539,11 @@ class BrowserTabViewModelTest {
         runTest {
             val mockCallback = mock<WebViewCompatMessageCallback>()
             val webView = DuckDuckGoWebView(context)
-            assertEquals(0, fakeAddDocumentStartJavaScriptPlugins.cssPlugin.countInitted)
+            assertEquals(0, fakeAddDocumentStartJavaScriptPlugins.cssPlugin.addDocumentStartJavaScript().countInitted)
 
             testee.configureWebView(webView, mockCallback)
 
-            assertEquals(1, fakeAddDocumentStartJavaScriptPlugins.cssPlugin.countInitted)
+            assertEquals(1, fakeAddDocumentStartJavaScriptPlugins.cssPlugin.addDocumentStartJavaScript().countInitted)
         }
 
     @UiThreadTest
@@ -7859,9 +7860,13 @@ class BrowserTabViewModelTest {
         override fun getCustomHeaders(url: String): Map<String, String> = headers
     }
 
-    class FakeAddDocumentStartJavaScriptPlugin(
-        override val context: String,
-    ) : AddDocumentStartJavaScriptPlugin {
+    class FakeAddDocumentStartJavaScriptBrowserPlugin(val context: String) : AddDocumentStartJavaScriptBrowserPlugin {
+        private val addDocumentStartJavaScript = FakeAddDocumentStartJavaScript(context)
+
+        override fun addDocumentStartJavaScript(): FakeAddDocumentStartJavaScript = addDocumentStartJavaScript
+    }
+
+    class FakeAddDocumentStartJavaScript(override val context: String) : AddDocumentStartJavaScript {
         var countInitted = 0
             private set
 
@@ -7870,11 +7875,17 @@ class BrowserTabViewModelTest {
         }
     }
 
-    class FakeAddDocumentStartJavaScriptPluginPoint : PluginPoint<AddDocumentStartJavaScriptPlugin> {
-        val cssPlugin = FakeAddDocumentStartJavaScriptPlugin("contentScopeScripts")
-        val otherPlugin = FakeAddDocumentStartJavaScriptPlugin("test")
+    class FakeAddDocumentStartJavaScriptPluginPoint : PluginPoint<AddDocumentStartJavaScriptBrowserPlugin> {
+        val cssPlugin = FakeAddDocumentStartJavaScriptBrowserPlugin("contentScopeScripts")
+        val otherPlugin = FakeAddDocumentStartJavaScriptBrowserPlugin("test")
 
         override fun getPlugins() = listOf(cssPlugin, otherPlugin)
+    }
+
+    class FakePostMessageWrapperPluginPoint : PluginPoint<PostMessageWrapperPlugin> {
+        val plugin = FakePostMessageWrapperPlugin()
+
+        override fun getPlugins(): Collection<PostMessageWrapperPlugin> = listOf(plugin)
     }
 
     class FakeWebMessagingPlugin : WebMessagingPlugin {
@@ -7918,14 +7929,7 @@ class BrowserTabViewModelTest {
         ) {
             postMessageCalled = true
         }
-
         override val context: String
             get() = "contentScopeScripts"
-    }
-
-    class FakePostMessageWrapperPluginPoint : PluginPoint<PostMessageWrapperPlugin> {
-        val plugin = FakePostMessageWrapperPlugin()
-
-        override fun getPlugins(): Collection<PostMessageWrapperPlugin> = listOf(plugin)
     }
 }

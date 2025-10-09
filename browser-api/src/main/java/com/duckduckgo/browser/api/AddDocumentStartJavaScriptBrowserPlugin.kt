@@ -14,17 +14,19 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.js.messaging.api
+package com.duckduckgo.browser.api
 
-import android.webkit.WebView
+import com.duckduckgo.common.utils.plugins.PluginPoint
+import com.duckduckgo.js.messaging.api.AddDocumentStartJavaScript
 
 /**
- * Plugin interface for injecting JavaScript code that executes at document start.
- * * Allows plugins to inject JavaScript that will be executed before any other scripts on the page.
- * Useful for privacy protections and that need to run as early as possible and/or on iframes.
+* Interface to provide implementations of [AddDocumentStartJavaScript] to the browser, through
+* [PluginPoint]<[AddDocumentStartJavaScript]>
  */
-interface AddDocumentStartJavaScriptPlugin {
-    suspend fun addDocumentStartJavaScript(webView: WebView)
-
-    val context: String
+interface AddDocumentStartJavaScriptBrowserPlugin {
+    /**
+     * Provides an implementation of [AddDocumentStartJavaScript] to be used by the browser.
+     * @return an instance of [AddDocumentStartJavaScript]
+     */
+    fun addDocumentStartJavaScript(): AddDocumentStartJavaScript
 }
