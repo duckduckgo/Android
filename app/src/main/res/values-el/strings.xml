@@ -246,6 +246,7 @@
     <string name="settingsAutomaticallyClearWhenAppExit30Minutes">Έξοδος εφαρμογής, ανενεργή για 30 λεπτά</string>
     <string name="settingsAutomaticallyClearWhenAppExit60Minutes">Έξοδος εφαρμογής, ανενεργή για 1 ώρα</string>
     <string name="settingsClearAiDataTitle">Εκκαθάριση συνομιλιών Duck.ai</string>
+    <string name="settingsClearAiDataDeleteMessage">Το Fire Button θα διαγράψει επίσης το ιστορικό του Duck.ai, συμπεριλαμβανομένων των καρφιτσωμένων συνομιλιών.</string>
 
     <!-- About Activity -->
     <string name="aboutActivityTitle">Σχετικά με το DuckDuckGo</string>
