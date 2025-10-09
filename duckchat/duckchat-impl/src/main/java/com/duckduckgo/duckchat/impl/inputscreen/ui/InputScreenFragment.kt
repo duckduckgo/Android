@@ -441,7 +441,15 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
                 if (useTopBar) {
                     inputScreenButtons.setVoiceButtonVisible(it.voiceInputButtonVisible)
                 } else {
-                    inputModeWidget.setVoiceButtonVisible(it.voiceInputButtonVisible)
+                    val inputText = inputModeWidget.text
+                    logcat { "inputScreenLauncher: text is empty ${inputText.isEmpty()} " }
+                    if (inputText.isEmpty()) {
+                        inputModeWidget.setVoiceButtonVisible(it.voiceInputButtonVisible)
+                        inputScreenButtons.setVoiceButtonVisible(false)
+                    } else {
+                        inputScreenButtons.setVoiceButtonVisible(it.voiceInputButtonVisible)
+                        inputModeWidget.setVoiceButtonVisible(false)
+                    }
                 }
             }.launchIn(lifecycleScope)
     }
