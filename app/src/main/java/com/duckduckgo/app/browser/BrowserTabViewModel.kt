@@ -4257,6 +4257,10 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     suspend fun privacyProtectionsUpdated(webView: WebView) {
+        if (withContext(dispatchers.io()) { !androidBrowserConfig.updateScriptOnProtectionsChanged().isEnabled() }) {
+            return
+        }
+
         if (withContext(dispatchers.io()) { !androidBrowserConfig.updateScriptOnPageFinished().isEnabled() }) {
             addDocumentStartJavascriptPlugins
                 .getPlugins()

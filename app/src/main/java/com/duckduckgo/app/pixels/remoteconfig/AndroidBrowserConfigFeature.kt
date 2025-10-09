@@ -191,4 +191,7 @@ interface AndroidBrowserConfigFeature {
 
     @Toggle.DefaultValue(TRUE)
     fun updateScriptOnPageFinished(): Toggle
+
+    @Toggle.DefaultValue(TRUE)
+    fun updateScriptOnProtectionsChanged(): Toggle
 }
