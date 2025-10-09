@@ -130,6 +130,7 @@ sealed class JobRecord(
         data class JobAttemptData(
             val jobAttemptCount: Int = 0,
             val lastJobAttemptDateInMillis: Long = 0L,
+            val lastJobAttemptActionId: String = "",
         )
     }
 }
