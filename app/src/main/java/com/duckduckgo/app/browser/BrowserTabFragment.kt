@@ -902,7 +902,7 @@ class BrowserTabFragment :
 
     private val inputScreenLauncher =
         registerForActivityResult(StartActivityForResult()) { result ->
-            val data = result.data
+            val data = result.data ?: return@registerForActivityResult
             when (result.resultCode) {
                 InputScreenActivityResultCodes.NEW_SEARCH_REQUESTED -> {
                     data?.getStringExtra(InputScreenActivityResultParams.SEARCH_QUERY_PARAM)?.let { query ->

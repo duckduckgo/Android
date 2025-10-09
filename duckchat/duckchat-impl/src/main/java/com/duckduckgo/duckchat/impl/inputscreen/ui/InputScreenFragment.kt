@@ -38,6 +38,7 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.ui.DuckDuckGoFragment
 import com.duckduckgo.common.ui.store.AppTheme
 import com.duckduckgo.common.ui.viewbinding.viewBinding
+import com.duckduckgo.common.utils.KeyboardVisibilityUtil
 import com.duckduckgo.common.utils.extensions.hideKeyboard
 import com.duckduckgo.common.utils.extensions.showKeyboard
 import com.duckduckgo.di.scopes.FragmentScope
@@ -171,7 +172,6 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
         binding.root.viewTreeObserver.addOnGlobalLayoutListener(globalLayoutListener)
 
         val showMainButtons = inputScreenConfigResolver.showMainButtons()
-
         inputModeWidget =
             InputModeWidget(requireContext(), shouldShowMainButtons = showMainButtons).also {
                 it.id = R.id.inputModeWidget
@@ -183,7 +183,6 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
         }
 
         val useTopBar = inputScreenConfigResolver.useTopBar()
-        logcat { "inputScreenLauncher: useTopBar $useTopBar" }
         val separatorHeightPx = resources.getDimensionPixelSize(R.dimen.inputScreenContentSeparatorHeight)
         contentSeparator =
             View(context).apply {
@@ -444,7 +443,6 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
                     inputScreenButtons.setVoiceButtonVisible(it.voiceInputButtonVisible)
                 } else {
                     val inputText = inputModeWidget.text
-                    logcat { "inputScreenLauncher: text is empty ${inputText.isEmpty()} " }
                     if (inputText.isEmpty()) {
                         inputModeWidget.setVoiceButtonVisible(it.voiceInputButtonVisible)
                         inputScreenButtons.setVoiceButtonVisible(false)
