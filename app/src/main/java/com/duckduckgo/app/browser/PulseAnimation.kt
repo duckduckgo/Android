@@ -29,6 +29,7 @@ import androidx.core.view.doOnLayout
 import androidx.core.view.isVisible
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
+import com.duckduckgo.app.browser.animations.AddressBarTrackersAnimationFeatureToggle
 import com.duckduckgo.app.onboardingdesignexperiment.OnboardingDesignExperimentManager
 import com.duckduckgo.common.ui.view.setAllParentsClip
 import com.duckduckgo.common.utils.ConflatedJob
@@ -87,16 +88,6 @@ class PulseAnimation(
             val pulse = getPulseObjectAnimator(view)
             pulse.repeatCount = ObjectAnimator.INFINITE
             pulse.duration = 1100L
-
-            // TODO renable when sense of protection animated shield is implemented
-/*            if (false) {
-                pulse.startDelay = 1000L
-                view.alpha = 0.0f
-                conflatedJob += CoroutineScope(Dispatchers.Main).launch {
-                    delay(1000L)
-                    view.alpha = 1.0f
-                }
-            }*/
 
             pulseAnimation = AnimatorSet().apply {
                 play(pulse)
