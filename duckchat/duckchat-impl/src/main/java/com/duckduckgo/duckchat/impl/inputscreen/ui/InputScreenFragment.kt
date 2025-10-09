@@ -170,8 +170,10 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
             }
         binding.root.viewTreeObserver.addOnGlobalLayoutListener(globalLayoutListener)
 
+        val showMainButtons = inputScreenConfigResolver.showMainButtons()
+
         inputModeWidget =
-            InputModeWidget(requireContext()).also {
+            InputModeWidget(requireContext(), shouldShowMainButtons = showMainButtons).also {
                 it.id = R.id.inputModeWidget
             }
 

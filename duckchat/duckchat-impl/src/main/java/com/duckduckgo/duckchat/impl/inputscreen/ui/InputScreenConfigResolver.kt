@@ -34,6 +34,8 @@ interface InputScreenConfigResolver {
     fun onInputScreenCreated(intent: Intent)
 
     fun useTopBar(): Boolean
+
+    fun showMainButtons(): Boolean
 }
 
 @ContributesBinding(scope = ActivityScope::class)
@@ -64,4 +66,8 @@ class InputScreenConfigResolverImpl @Inject constructor(
             isTopOmnibar = isTopOmnibar,
             duckChatInternal = duckChatInternal,
         ) || activityContext.resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
+
+    override fun showMainButtons(): Boolean {
+        return duckChatInternal.showMainButtonsInInputScreen.value
+    }
 }

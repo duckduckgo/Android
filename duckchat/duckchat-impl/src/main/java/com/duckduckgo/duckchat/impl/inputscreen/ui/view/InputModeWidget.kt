@@ -62,6 +62,7 @@ class InputModeWidget @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyle: Int = 0,
+    val shouldShowMainButtons: Boolean = false,
 ) : ConstraintLayout(context, attrs, defStyle) {
     @Inject
     lateinit var pixel: Pixel
@@ -303,23 +304,30 @@ class InputModeWidget @JvmOverloads constructor(
     }
 
     private fun checkForButtonsVisibility() {
-        if (inputModeSwitch.selectedTabPosition == 0) {
-            // buttons are shown in search mode if the input field is empty
-            val text = inputField.text
-            val isNullOrEmpty = text.isNullOrEmpty()
-            logcat { "inputScreenLauncher: show 3 buttons  $isNullOrEmpty" }
-            fade(inputModeIconsContainer, isNullOrEmpty)
+        if (shouldShowMainButtons) {
+            if (inputModeSwitch.selectedTabPosition == 0) {
+                // buttons are shown in search mode if the input field is empty
+                val text = inputField.text
+                val isNullOrEmpty = text.isNullOrEmpty()
+                logcat { "inputScreenLauncher: show 3 buttons  $isNullOrEmpty" }
+                fade(inputModeIconsContainer, isNullOrEmpty)
 
-            inputModeWidgetLayout.updateLayoutParams<MarginLayoutParams> {
-                marginEnd = if (isNullOrEmpty) {
-                    inputModeCardEndMargin
-                } else {
-                    inputModeCardExtendedEndMargin
+                inputModeWidgetLayout.updateLayoutParams<MarginLayoutParams> {
+                    marginEnd = if (isNullOrEmpty) {
+                        inputModeCardEndMargin
+                    } else {
+                        inputModeCardExtendedEndMargin
+                    }
+                    marginStart = inputModeCardExtendedEndMargin
                 }
-                marginStart = inputModeCardExtendedEndMargin
+            } else {
+                fade(inputModeIconsContainer, false)
+                inputModeWidgetLayout.updateLayoutParams<MarginLayoutParams> {
+                    marginEnd = inputModeCardExtendedEndMargin
+                    marginStart = inputModeCardExtendedEndMargin
+                }
             }
         } else {
-            fade(inputModeIconsContainer, false)
             inputModeWidgetLayout.updateLayoutParams<MarginLayoutParams> {
                 marginEnd = inputModeCardExtendedEndMargin
                 marginStart = inputModeCardExtendedEndMargin
