@@ -185,6 +185,7 @@ class RealPlayBillingManager @Inject constructor(
                 Success -> {
                     loadProducts()
                     loadPurchaseHistory()
+                    loadPurchases()
                     true // success, don't retry
                 }
 
