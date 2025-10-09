@@ -167,7 +167,7 @@ class RealPirOptOutTest {
     @Test
     fun whenNoUserProfilesAvailableThenDontCreateRunners() = runTest {
         // Given
-        whenever(mockRepository.getUserProfileQueries()).thenReturn(emptyList())
+        whenever(mockRepository.getAllUserProfileQueries()).thenReturn(emptyList())
         whenever(mockCurrentTimeProvider.currentTimeMillis()).thenReturn(testCurrentTime)
 
         // When
@@ -183,7 +183,7 @@ class RealPirOptOutTest {
     @Test
     fun whenNoUserProfilesUsesDefaultProfileQueries() = runTest {
         // Given
-        whenever(mockRepository.getUserProfileQueries()).thenReturn(emptyList())
+        whenever(mockRepository.getAllUserProfileQueries()).thenReturn(emptyList())
         whenever(mockRepository.getBrokerOptOutSteps(testBrokerName)).thenReturn(testStepsJson)
         whenever(
             mockBrokerStepsParser.parseStep(
@@ -216,7 +216,7 @@ class RealPirOptOutTest {
     @Test
     fun whenNoBrokerOptOutStepsThenDontCreateRunner() = runTest {
         // Given
-        whenever(mockRepository.getUserProfileQueries()).thenReturn(testUserProfileQueries)
+        whenever(mockRepository.getAllUserProfileQueries()).thenReturn(testUserProfileQueries)
         whenever(mockRepository.getBrokerOptOutSteps(testBrokerName)).thenReturn(null)
         whenever(mockCurrentTimeProvider.currentTimeMillis()).thenReturn(testCurrentTime)
 
@@ -234,7 +234,7 @@ class RealPirOptOutTest {
     fun whenJobRecordHasNoMatchingProfileQueryThenSkipsRecordAndDontCreateRunner() = runTest {
         // Given
         val unknownProfileJobRecord = testOptOutJobRecord.copy(userProfileId = 999L)
-        whenever(mockRepository.getUserProfileQueries()).thenReturn(testUserProfileQueries)
+        whenever(mockRepository.getAllUserProfileQueries()).thenReturn(testUserProfileQueries)
         whenever(mockRepository.getBrokerOptOutSteps(testBrokerName)).thenReturn(testStepsJson)
         whenever(mockCurrentTimeProvider.currentTimeMillis()).thenReturn(testCurrentTime)
 
@@ -251,7 +251,7 @@ class RealPirOptOutTest {
     @Test
     fun whenBrokerStepsParsingFailsThenSkipsRecordAndDontCreateRunner() = runTest {
         // Given
-        whenever(mockRepository.getUserProfileQueries()).thenReturn(testUserProfileQueries)
+        whenever(mockRepository.getAllUserProfileQueries()).thenReturn(testUserProfileQueries)
         whenever(mockRepository.getBrokerOptOutSteps(testBrokerName)).thenReturn(testStepsJson)
         whenever(
             mockBrokerStepsParser.parseStep(
@@ -276,7 +276,7 @@ class RealPirOptOutTest {
         // Given
         val stepWithDifferentProfile =
             testOptOutStep.copy(profileToOptOut = testExtractedProfile.copy(dbId = 999L))
-        whenever(mockRepository.getUserProfileQueries()).thenReturn(testUserProfileQueries)
+        whenever(mockRepository.getAllUserProfileQueries()).thenReturn(testUserProfileQueries)
         whenever(mockRepository.getBrokerOptOutSteps(testBrokerName)).thenReturn(testStepsJson)
         whenever(
             mockBrokerStepsParser.parseStep(
@@ -299,7 +299,7 @@ class RealPirOptOutTest {
     @Test
     fun whenValidJobRecordThenExecutesOptOut() = runTest {
         // Given
-        whenever(mockRepository.getUserProfileQueries()).thenReturn(testUserProfileQueries)
+        whenever(mockRepository.getAllUserProfileQueries()).thenReturn(testUserProfileQueries)
         whenever(mockRepository.getBrokerOptOutSteps(testBrokerName)).thenReturn(testStepsJson)
         whenever(
             mockBrokerStepsParser.parseStep(
@@ -336,7 +336,7 @@ class RealPirOptOutTest {
         val duplicateOptOutStep =
             testOptOutStep.copy(profileToOptOut = testExtractedProfile.copy(dbId = testExtractedProfile.dbId + 1))
 
-        whenever(mockRepository.getUserProfileQueries()).thenReturn(testUserProfileQueries)
+        whenever(mockRepository.getAllUserProfileQueries()).thenReturn(testUserProfileQueries)
         whenever(mockRepository.getBrokerOptOutSteps(testBrokerName)).thenReturn(testStepsJson)
         whenever(
             mockBrokerStepsParser.parseStep(

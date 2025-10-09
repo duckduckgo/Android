@@ -82,7 +82,7 @@ class PirWebInitialScanStatusMessageHandlerTest {
     fun whenProcessWithNoDataThenSendsEmptyResponse() = runTest {
         // Given
         val jsMessage = createJsMessage("", PirDashboardWebMessages.INITIAL_SCAN_STATUS)
-        whenever(mockRepository.getUserProfileQueries()).thenReturn(listOf(mock()))
+        whenever(mockRepository.getValidUserProfileQueries()).thenReturn(listOf(mock()))
         whenever(mockStateProvider.getScanResults()).thenReturn(emptyList())
         whenever(mockStateProvider.getFullyCompletedBrokersTotal()).thenReturn(0)
         whenever(mockStateProvider.getActiveBrokersAndMirrorSitesTotal()).thenReturn(0)
@@ -123,7 +123,7 @@ class PirWebInitialScanStatusMessageHandlerTest {
             ),
         )
 
-        whenever(mockRepository.getUserProfileQueries()).thenReturn(emptyList())
+        whenever(mockRepository.getValidUserProfileQueries()).thenReturn(emptyList())
         whenever(mockStateProvider.getScanResults()).thenReturn(scanResults)
         whenever(mockStateProvider.getFullyCompletedBrokersTotal()).thenReturn(5)
         whenever(mockStateProvider.getActiveBrokersAndMirrorSitesTotal()).thenReturn(10)
@@ -164,7 +164,7 @@ class PirWebInitialScanStatusMessageHandlerTest {
             ),
         )
 
-        whenever(mockRepository.getUserProfileQueries()).thenReturn(listOf(mock()))
+        whenever(mockRepository.getValidUserProfileQueries()).thenReturn(listOf(mock()))
         whenever(mockStateProvider.getScanResults()).thenReturn(scanResults)
         whenever(mockStateProvider.getFullyCompletedBrokersTotal()).thenReturn(5)
         whenever(mockStateProvider.getActiveBrokersAndMirrorSitesTotal()).thenReturn(10)
@@ -221,7 +221,7 @@ class PirWebInitialScanStatusMessageHandlerTest {
             ),
         )
 
-        whenever(mockRepository.getUserProfileQueries()).thenReturn(listOf(mock()))
+        whenever(mockRepository.getValidUserProfileQueries()).thenReturn(listOf(mock()))
         whenever(mockStateProvider.getScanResults()).thenReturn(scanResults)
         whenever(mockStateProvider.getFullyCompletedBrokersTotal()).thenReturn(2)
         whenever(mockStateProvider.getActiveBrokersAndMirrorSitesTotal()).thenReturn(5)
@@ -295,7 +295,7 @@ class PirWebInitialScanStatusMessageHandlerTest {
             ),
         )
 
-        whenever(mockRepository.getUserProfileQueries()).thenReturn(listOf(mock()))
+        whenever(mockRepository.getValidUserProfileQueries()).thenReturn(listOf(mock()))
         whenever(mockStateProvider.getScanResults()).thenReturn(emptyList())
         whenever(mockStateProvider.getFullyCompletedBrokersTotal()).thenReturn(1)
         whenever(mockStateProvider.getActiveBrokersAndMirrorSitesTotal()).thenReturn(2)

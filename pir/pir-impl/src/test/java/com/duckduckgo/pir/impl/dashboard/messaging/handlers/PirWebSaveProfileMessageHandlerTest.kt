@@ -32,6 +32,7 @@ import com.duckduckgo.pir.impl.models.ExtractedProfile
 import com.duckduckgo.pir.impl.models.ProfileQuery
 import com.duckduckgo.pir.impl.scan.PirForegroundScanService
 import com.duckduckgo.pir.impl.scan.PirScanScheduler
+import com.duckduckgo.pir.impl.scheduling.JobRecordUpdater
 import com.duckduckgo.pir.impl.store.PirRepository
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runTest
@@ -63,6 +64,7 @@ class PirWebSaveProfileMessageHandlerTest {
     private val mockCurrentTimeProvider: CurrentTimeProvider = mock()
     private val mockJsMessaging: JsMessaging = mock()
     private val mockJsMessageCallback: JsMessageCallback = mock()
+    private val mockJobRecordUpdater: JobRecordUpdater = mock()
     private val testScope = TestScope()
 
     @Before
@@ -75,6 +77,7 @@ class PirWebSaveProfileMessageHandlerTest {
             scanScheduler = mockScanScheduler,
             currentTimeProvider = mockCurrentTimeProvider,
             appCoroutineScope = testScope,
+            jobRecordUpdater = mockJobRecordUpdater,
         )
     }
 
@@ -114,7 +117,7 @@ class PirWebSaveProfileMessageHandlerTest {
         whenever(mockPirWebProfileStateHolder.toProfileQueries(currentYear)).thenReturn(
             profileQueries,
         )
-        whenever(mockRepository.getUserProfileQueries()).thenReturn(emptyList())
+        whenever(mockRepository.getValidUserProfileQueries()).thenReturn(emptyList())
         whenever(mockRepository.getAllExtractedProfiles()).thenReturn(emptyList())
         whenever(mockRepository.updateProfileQueries(any(), any(), any())).thenReturn(false)
 
@@ -148,7 +151,7 @@ class PirWebSaveProfileMessageHandlerTest {
             whenever(mockPirWebProfileStateHolder.toProfileQueries(currentYear)).thenReturn(
                 profileQueries,
             )
-            whenever(mockRepository.getUserProfileQueries()).thenReturn(emptyList())
+            whenever(mockRepository.getValidUserProfileQueries()).thenReturn(emptyList())
             whenever(mockRepository.getAllExtractedProfiles()).thenReturn(emptyList())
             whenever(mockRepository.updateProfileQueries(any(), any(), any())).thenReturn(true)
 
@@ -182,7 +185,7 @@ class PirWebSaveProfileMessageHandlerTest {
         whenever(mockPirWebProfileStateHolder.toProfileQueries(currentYear)).thenReturn(
             profileQueries,
         )
-        whenever(mockRepository.getUserProfileQueries()).thenReturn(emptyList())
+        whenever(mockRepository.getValidUserProfileQueries()).thenReturn(emptyList())
         whenever(mockRepository.getAllExtractedProfiles()).thenReturn(emptyList())
         whenever(mockRepository.updateProfileQueries(any(), any(), any())).thenReturn(true)
 
@@ -214,7 +217,7 @@ class PirWebSaveProfileMessageHandlerTest {
         whenever(mockPirWebProfileStateHolder.toProfileQueries(currentYear)).thenReturn(
             profileQueries,
         )
-        whenever(mockRepository.getUserProfileQueries()).thenReturn(emptyList())
+        whenever(mockRepository.getValidUserProfileQueries()).thenReturn(emptyList())
         whenever(mockRepository.getAllExtractedProfiles()).thenReturn(emptyList())
         whenever(mockRepository.updateProfileQueries(any(), any(), any())).thenReturn(true)
 
@@ -245,7 +248,7 @@ class PirWebSaveProfileMessageHandlerTest {
         whenever(mockPirWebProfileStateHolder.toProfileQueries(currentYear)).thenReturn(
             profileQueries,
         )
-        whenever(mockRepository.getUserProfileQueries()).thenReturn(emptyList())
+        whenever(mockRepository.getValidUserProfileQueries()).thenReturn(emptyList())
         whenever(mockRepository.getAllExtractedProfiles()).thenReturn(emptyList())
         whenever(mockRepository.updateProfileQueries(any(), any(), any())).thenReturn(true)
 
@@ -276,7 +279,7 @@ class PirWebSaveProfileMessageHandlerTest {
         whenever(mockPirWebProfileStateHolder.isProfileComplete).thenReturn(true)
         whenever(mockCurrentTimeProvider.localDateTimeNow()).thenReturn(currentDateTime)
         whenever(mockPirWebProfileStateHolder.toProfileQueries(currentYear)).thenReturn(listOf(newProfileQuery))
-        whenever(mockRepository.getUserProfileQueries()).thenReturn(listOf(existingProfileQuery))
+        whenever(mockRepository.getValidUserProfileQueries()).thenReturn(listOf(existingProfileQuery))
         whenever(mockRepository.getAllExtractedProfiles()).thenReturn(emptyList())
 
         // When
@@ -301,7 +304,7 @@ class PirWebSaveProfileMessageHandlerTest {
         whenever(mockPirWebProfileStateHolder.toProfileQueries(currentYear)).thenReturn(
             listOf(existingProfileQuery.copy(id = 0), newProfileQuery1, newProfileQuery2),
         )
-        whenever(mockRepository.getUserProfileQueries()).thenReturn(listOf(existingProfileQuery))
+        whenever(mockRepository.getValidUserProfileQueries()).thenReturn(listOf(existingProfileQuery))
         whenever(mockRepository.getAllExtractedProfiles()).thenReturn(emptyList())
         whenever(mockRepository.updateProfileQueries(any(), any(), any())).thenReturn(true)
 
@@ -334,7 +337,7 @@ class PirWebSaveProfileMessageHandlerTest {
         whenever(mockPirWebProfileStateHolder.isProfileComplete).thenReturn(true)
         whenever(mockCurrentTimeProvider.localDateTimeNow()).thenReturn(currentDateTime)
         whenever(mockPirWebProfileStateHolder.toProfileQueries(currentYear)).thenReturn(emptyList()) // No new profiles
-        whenever(mockRepository.getUserProfileQueries()).thenReturn(listOf(profileQueryToDeprecate))
+        whenever(mockRepository.getValidUserProfileQueries()).thenReturn(listOf(profileQueryToDeprecate))
         whenever(mockRepository.getAllExtractedProfiles()).thenReturn(listOf(extractedProfile))
         whenever(mockRepository.updateProfileQueries(any(), any(), any())).thenReturn(true)
 
@@ -361,7 +364,7 @@ class PirWebSaveProfileMessageHandlerTest {
         whenever(mockPirWebProfileStateHolder.isProfileComplete).thenReturn(true)
         whenever(mockCurrentTimeProvider.localDateTimeNow()).thenReturn(currentDateTime)
         whenever(mockPirWebProfileStateHolder.toProfileQueries(currentYear)).thenReturn(emptyList()) // No new profiles
-        whenever(mockRepository.getUserProfileQueries()).thenReturn(listOf(profileQueryToDelete))
+        whenever(mockRepository.getValidUserProfileQueries()).thenReturn(listOf(profileQueryToDelete))
         whenever(mockRepository.getAllExtractedProfiles()).thenReturn(emptyList()) // No extracted profiles
         whenever(mockRepository.updateProfileQueries(any(), any(), any())).thenReturn(true)
 
@@ -375,6 +378,7 @@ class PirWebSaveProfileMessageHandlerTest {
             profileQueryIdsToDelete = listOf(1L),
         )
         verifyResponse(jsMessage, true, mockJsMessaging)
+        verify(mockJobRecordUpdater).removeJobRecordsForProfile(1L, emptyList())
     }
 
     private fun createProfileQuery(

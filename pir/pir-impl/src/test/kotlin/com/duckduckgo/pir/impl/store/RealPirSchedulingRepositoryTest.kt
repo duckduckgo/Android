@@ -467,6 +467,7 @@ class RealPirSchedulingRepositoryTest {
                 newLastScanDateMillis = newLastScanDateMillis,
                 brokerName = brokerName,
                 profileQueryId = profileQueryId,
+                deprecated = false,
             )
 
             verify(mockJobSchedulingDao).updateScanJobRecordStatus(
@@ -474,6 +475,7 @@ class RealPirSchedulingRepositoryTest {
                 profileQueryId,
                 newStatus.name,
                 newLastScanDateMillis,
+                deprecated = false,
             )
         }
 
@@ -490,6 +492,7 @@ class RealPirSchedulingRepositoryTest {
                 newLastScanDateMillis = newLastScanDateMillis,
                 brokerName = brokerName,
                 profileQueryId = profileQueryId,
+                deprecated = false,
             )
 
             verify(mockJobSchedulingDao).updateScanJobRecordStatus(
@@ -497,6 +500,7 @@ class RealPirSchedulingRepositoryTest {
                 profileQueryId,
                 "ERROR",
                 newLastScanDateMillis,
+                false,
             )
         }
 
@@ -513,6 +517,7 @@ class RealPirSchedulingRepositoryTest {
                 newLastScanDateMillis = newLastScanDateMillis,
                 brokerName = brokerName,
                 profileQueryId = profileQueryId,
+                deprecated = false,
             )
 
             verify(mockJobSchedulingDao).updateScanJobRecordStatus(
@@ -520,6 +525,7 @@ class RealPirSchedulingRepositoryTest {
                 profileQueryId,
                 "NO_MATCH_FOUND",
                 newLastScanDateMillis,
+                false,
             )
         }
 

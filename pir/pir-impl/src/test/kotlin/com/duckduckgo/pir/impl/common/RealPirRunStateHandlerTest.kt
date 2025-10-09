@@ -376,7 +376,11 @@ class RealPirRunStateHandlerTest {
                 profileQueryId = testProfileQueryId,
             )
             inOrder.verify(mockRepository).saveNewExtractedProfiles(listOf(expectedExtractedProfile))
-            inOrder.verify(mockJobRecordUpdater).updateScanMatchesFound(testBrokerName, testProfileQueryId)
+            inOrder.verify(mockJobRecordUpdater).updateScanMatchesFound(
+                listOf(expectedExtractedProfile),
+                testBrokerName,
+                testProfileQueryId,
+            )
         }
 
     @Test
