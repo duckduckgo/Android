@@ -106,6 +106,15 @@ class SingleOmnibarLayout @JvmOverloads constructor(
                 if (Build.VERSION.SDK_INT < 28) {
                     omnibarCardShadow.cardElevation = 2f.toPx(context)
                 }
+
+                shieldIconPulseAnimationContainer.updateLayoutParams {
+                    (this as MarginLayoutParams).apply {
+                        if (addressBarTrackersAnimationFeatureToggle.feature().isEnabled()) {
+                            // TODO when the animation is made permanent we should add this adjustment to the actual layout
+                            marginStart = 1.toPx()
+                        }
+                    }
+                }
             }
             OmnibarPosition.BOTTOM -> {
                 // When omnibar is at the bottom, we're adding an additional space at the top
@@ -127,8 +136,19 @@ class SingleOmnibarLayout @JvmOverloads constructor(
                     (this as MarginLayoutParams).apply {
                         topMargin = experimentalOmnibarCardMarginBottom
                         bottomMargin = experimentalOmnibarCardMarginTop
+                        if (addressBarTrackersAnimationFeatureToggle.feature().isEnabled()) {
+                            // TODO when the animation is made permanent we should add this adjustment to the actual layout
+                            marginStart = 1.toPx()
+                        }
                     }
                 }
+
+                shieldIconPulseAnimationContainer.setPadding(
+                    shieldIconPulseAnimationContainer.paddingLeft,
+                    shieldIconPulseAnimationContainer.paddingTop,
+                    shieldIconPulseAnimationContainer.paddingRight,
+                    6.toPx(),
+                )
 
                 // Try to reduce the bottom omnibar material shadow when not using the custom shadow
                 if (Build.VERSION.SDK_INT < 28) {

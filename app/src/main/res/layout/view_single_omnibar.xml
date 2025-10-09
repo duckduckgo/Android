@@ -45,6 +45,8 @@
                 android:clipChildren="false"
                 app:contentInsetEnd="0dp"
                 app:contentInsetStart="0dp"
+                android:paddingLeft="0dp"
+                android:paddingRight="0dp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toStartOf="@id/iconsContainer"
                 app:layout_constraintStart_toStartOf="parent"
