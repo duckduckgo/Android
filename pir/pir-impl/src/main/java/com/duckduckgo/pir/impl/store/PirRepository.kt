@@ -31,10 +31,6 @@ import com.duckduckgo.pir.impl.service.DbpService.PirEmailConfirmationDataReques
 import com.duckduckgo.pir.impl.service.DbpService.PirJsonBroker
 import com.duckduckgo.pir.impl.store.PirRepository.BrokerJson
 import com.duckduckgo.pir.impl.store.PirRepository.EmailConfirmationLinkFetchStatus
-import com.duckduckgo.pir.impl.store.PirRepository.EmailConfirmationLinkFetchStatus.Error
-import com.duckduckgo.pir.impl.store.PirRepository.EmailConfirmationLinkFetchStatus.Pending
-import com.duckduckgo.pir.impl.store.PirRepository.EmailConfirmationLinkFetchStatus.Ready
-import com.duckduckgo.pir.impl.store.PirRepository.EmailConfirmationLinkFetchStatus.Unknown
 import com.duckduckgo.pir.impl.store.db.BrokerDao
 import com.duckduckgo.pir.impl.store.db.BrokerEntity
 import com.duckduckgo.pir.impl.store.db.BrokerJsonDao
@@ -71,6 +67,8 @@ interface PirRepository {
     suspend fun getAllActiveBrokers(): List<String>
 
     suspend fun getAllActiveBrokerObjects(): List<Broker>
+
+    suspend fun getBrokerForName(name: String): Broker?
 
     suspend fun getAllMirrorSitesForBroker(brokerName: String): List<MirrorSite>
 
@@ -261,6 +259,21 @@ internal class RealPirRepository(
     override suspend fun getAllActiveBrokerObjects(): List<Broker> =
         withContext(dispatcherProvider.io()) {
             return@withContext brokerDao.getAllActiveBrokers().map {
+                Broker(
+                    name = it.name,
+                    fileName = it.fileName,
+                    url = it.url,
+                    version = it.version,
+                    parent = it.parent,
+                    addedDatetime = it.addedDatetime,
+                    removedAt = it.removedAt,
+                )
+            }
+        }
+
+    override suspend fun getBrokerForName(name: String): Broker? =
+        withContext(dispatcherProvider.io()) {
+            return@withContext brokerDao.getBrokerDetails(name)?.let {
                 Broker(
                     name = it.name,
                     fileName = it.fileName,

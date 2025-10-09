@@ -88,7 +88,7 @@ class RealPirEmailConfirmationJobsRunner @Inject constructor(
             val emailDataForDeletion = mutableListOf<EmailData>()
 
             eligibleJobRecordsMap.forEach {
-                jobRecordUpdater.recordEmailConfirmationFetchAttempt(it.value)
+                jobRecordUpdater.recordEmailConfirmationFetchAttempt(it.value.extractedProfileId)
             }
 
             pirRepository.getEmailConfirmationLinkStatus(eligibleJobRecordsMap.values.map { it.emailData }).forEach {
@@ -102,18 +102,18 @@ class RealPirEmailConfirmationJobsRunner @Inject constructor(
                 when (val status = it.value) {
                     is EmailConfirmationLinkFetchStatus.Ready -> {
                         status.data[KEY_LINK]?.let { link ->
-                            handleLinkReady(record, status.emailReceivedAtMs, link, activeBrokersMap[record.brokerName]!!)
+                            handleLinkReady(record.extractedProfileId, status.emailReceivedAtMs, link, activeBrokersMap[record.brokerName]!!)
                             emailDataForDeletion.add(it.key)
                         }
                     }
 
                     is EmailConfirmationLinkFetchStatus.Error -> {
-                        handleLinkFetchFailed(record, status, activeBrokersMap[record.brokerName]!!)
+                        handleLinkFetchFailed(record.extractedProfileId, status, activeBrokersMap[record.brokerName]!!)
                         emailDataForDeletion.add(it.key)
                     }
 
                     is EmailConfirmationLinkFetchStatus.Unknown -> {
-                        handleLinkFetchFailed(record, status, activeBrokersMap[record.brokerName]!!)
+                        handleLinkFetchFailed(record.extractedProfileId, status, activeBrokersMap[record.brokerName]!!)
                     }
 
                     is EmailConfirmationLinkFetchStatus.Pending -> {
@@ -125,12 +125,12 @@ class RealPirEmailConfirmationJobsRunner @Inject constructor(
         }
 
     private suspend fun handleLinkReady(
-        record: EmailConfirmationJobRecord,
+        extractedProfileId: Long,
         emailReceivedAtMs: Long,
         link: String,
         broker: Broker,
     ) {
-        jobRecordUpdater.markEmailConfirmationWithLink(record, link)
+        jobRecordUpdater.markEmailConfirmationWithLink(extractedProfileId, link)
         pirPixelSender.reportEmailConfirmationLinkFetched(
             brokerUrl = broker.url,
             brokerVersion = broker.version,
@@ -139,11 +139,11 @@ class RealPirEmailConfirmationJobsRunner @Inject constructor(
     }
 
     private suspend fun handleLinkFetchFailed(
-        record: EmailConfirmationJobRecord,
+        extractedProfileId: Long,
         status: EmailConfirmationLinkFetchStatus,
         broker: Broker,
     ) {
-        jobRecordUpdater.markEmailConfirmationLinkFetchFailed(record)
+        jobRecordUpdater.markEmailConfirmationLinkFetchFailed(extractedProfileId)
 
         when (status) {
             is EmailConfirmationLinkFetchStatus.Error -> {
@@ -189,14 +189,17 @@ class RealPirEmailConfirmationJobsRunner @Inject constructor(
             }
 
         if (jobsWithLink.isNotEmpty()) {
-            handleRecordsWithMaxAttempt(jobsWithLink)
+            handleRecordsWithMaxAttempt(activeBrokersMap, jobsWithLink)
             handleEligibleJobRecords(context, jobsWithLink)
         } else {
             logcat { "PIR-EMAIL-CONFIRMATION: No jobs to run." }
         }
     }
 
-    private suspend fun handleRecordsWithMaxAttempt(jobsWithLink: List<EmailConfirmationJobRecord>) {
+    private suspend fun handleRecordsWithMaxAttempt(
+        activeBrokersMap: Map<String, Broker>,
+        jobsWithLink: List<EmailConfirmationJobRecord>,
+    ) {
         logcat { "PIR-EMAIL-CONFIRMATION: Attempting to cleanup records that maxed attempts" }
         val toDelete =
             jobsWithLink.filter {
@@ -206,7 +209,15 @@ class RealPirEmailConfirmationJobsRunner @Inject constructor(
         if (toDelete.isNotEmpty()) {
             logcat { "PIR-EMAIL-CONFIRMATION: Cleaning up ${toDelete.size} records that maxed attempts" }
             toDelete.forEach {
-                jobRecordUpdater.recordEmailConfirmationAttemptMaxed(it)
+                val broker = activeBrokersMap[it.brokerName]!!
+                pirPixelSender.reportEmailConfirmationAttemptRetriesExceeded(
+                    brokerUrl = broker.url,
+                    brokerVersion = broker.version,
+                    actionId = it.jobAttemptData.lastJobAttemptActionId,
+                    attemptId = it.emailData.attemptId,
+                )
+
+                jobRecordUpdater.recordEmailConfirmationAttemptMaxed(it.extractedProfileId)
             }
         } else {
             logcat { "PIR-EMAIL-CONFIRMATION: Nothing to clean" }
