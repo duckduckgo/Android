@@ -263,6 +263,7 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     MENU_ACTION_APP_LINKS_OPEN_PRESSED("m_nav_app_links_open_menu_item_pressed"),
     MENU_ACTION_DOWNLOADS_PRESSED("m_nav_downloads_menu_item_pressed"),
     MENU_ACTION_AUTOFILL_PRESSED("m_nav_autofill_menu_item_pressed"),
+    MENU_ACTION_VPN_PRESSED("m_nav_vpn_menu_item_pressed"),
 
     FIREPROOF_WEBSITE_ADDED("m_fw_a"),
     FIREPROOF_WEBSITE_REMOVE("m_fw_r"),
