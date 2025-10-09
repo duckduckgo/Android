@@ -21,12 +21,16 @@ import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.pir.impl.models.ExtractedProfile
 import com.duckduckgo.pir.impl.models.scheduling.JobRecord.EmailConfirmationJobRecord
 import com.duckduckgo.pir.impl.models.scheduling.JobRecord.EmailConfirmationJobRecord.EmailData
+import com.duckduckgo.pir.impl.models.scheduling.JobRecord.EmailConfirmationJobRecord.JobAttemptData
+import com.duckduckgo.pir.impl.models.scheduling.JobRecord.EmailConfirmationJobRecord.LinkFetchData
 import com.duckduckgo.pir.impl.models.scheduling.JobRecord.OptOutJobRecord
 import com.duckduckgo.pir.impl.models.scheduling.JobRecord.OptOutJobRecord.OptOutJobStatus
 import com.duckduckgo.pir.impl.models.scheduling.JobRecord.ScanJobRecord.ScanJobStatus
 import com.duckduckgo.pir.impl.store.PirRepository
 import com.duckduckgo.pir.impl.store.PirSchedulingRepository
 import kotlinx.coroutines.test.runTest
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNull
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -108,6 +112,36 @@ class RealJobRecordUpdaterTest {
             name = "Bob Johnson",
             profileUrl = "https://example.com/profile/300",
             identifier = "id300",
+        )
+
+    private val testEmailConfirmationJobRecord =
+        EmailConfirmationJobRecord(
+            brokerName = testBrokerName,
+            userProfileId = testProfileQueryId,
+            extractedProfileId = testExtractedProfileId,
+            emailData = EmailData(
+                email = "test@example.com",
+                attemptId = "test-attempt-123",
+            ),
+            linkFetchData = LinkFetchData(
+                emailConfirmationLink = "",
+                linkFetchAttemptCount = 0,
+                lastLinkFetchDateInMillis = 0L,
+            ),
+            jobAttemptData = JobAttemptData(
+                jobAttemptCount = 0,
+                lastJobAttemptDateInMillis = 0L,
+            ),
+            dateCreatedInMillis = 1000L,
+        )
+
+    private val testEmailConfirmationJobRecordWithLink =
+        testEmailConfirmationJobRecord.copy(
+            linkFetchData = LinkFetchData(
+                emailConfirmationLink = "https://example.com/confirm?token=abc123",
+                linkFetchAttemptCount = 2,
+                lastLinkFetchDateInMillis = 2000L,
+            ),
         )
 
     @Test
@@ -396,6 +430,247 @@ class RealJobRecordUpdaterTest {
             )
 
             verify(mockSchedulingRepository, never()).saveOptOutJobRecord(any())
+        }
+
+    @Test
+    fun whenMarkEmailConfirmationLinkFetchFailedThenDeletesEmailJobAndMarksOptOutAsError() =
+        runTest {
+            toTest.markEmailConfirmationLinkFetchFailed(testExtractedProfileId)
+
+            verify(mockSchedulingRepository).deleteEmailConfirmationJobRecord(testExtractedProfileId)
+            verify(mockSchedulingRepository).getValidOptOutJobRecord(testExtractedProfileId)
+        }
+
+    @Test
+    fun whenRecordEmailConfirmationFetchAttemptAndJobExistsThenIncrementsCountAndUpdatesTimestamp() =
+        runTest {
+            whenever(mockSchedulingRepository.getEmailConfirmationJob(testExtractedProfileId))
+                .thenReturn(testEmailConfirmationJobRecord)
+
+            val result = toTest.recordEmailConfirmationFetchAttempt(testExtractedProfileId)
+
+            val expectedRecord = testEmailConfirmationJobRecord.copy(
+                linkFetchData = testEmailConfirmationJobRecord.linkFetchData.copy(
+                    linkFetchAttemptCount = testEmailConfirmationJobRecord.linkFetchData.linkFetchAttemptCount + 1,
+                    lastLinkFetchDateInMillis = TEST_CURRENT_TIME,
+                ),
+            )
+
+            verify(mockSchedulingRepository).saveEmailConfirmationJobRecord(expectedRecord)
+            assertEquals(expectedRecord, result)
+        }
+
+    @Test
+    fun whenRecordEmailConfirmationFetchAttemptAndJobDoesNotExistThenReturnsNull() =
+        runTest {
+            whenever(mockSchedulingRepository.getEmailConfirmationJob(testExtractedProfileId))
+                .thenReturn(null)
+
+            val result = toTest.recordEmailConfirmationFetchAttempt(testExtractedProfileId)
+
+            verify(mockSchedulingRepository).getEmailConfirmationJob(testExtractedProfileId)
+            verify(mockSchedulingRepository, never()).saveEmailConfirmationJobRecord(any())
+            assertNull(result)
+        }
+
+    @Test
+    fun whenMarkEmailConfirmationWithLinkAndJobExistsThenUpdatesLinkField() =
+        runTest {
+            val testLink = "https://example.com/confirm?token=xyz789"
+            whenever(mockSchedulingRepository.getEmailConfirmationJob(testExtractedProfileId))
+                .thenReturn(testEmailConfirmationJobRecord)
+
+            val result = toTest.markEmailConfirmationWithLink(testExtractedProfileId, testLink)
+
+            val expectedRecord = testEmailConfirmationJobRecord.copy(
+                linkFetchData = testEmailConfirmationJobRecord.linkFetchData.copy(
+                    emailConfirmationLink = testLink,
+                ),
+            )
+
+            verify(mockSchedulingRepository).saveEmailConfirmationJobRecord(expectedRecord)
+            assertEquals(expectedRecord, result)
+        }
+
+    @Test
+    fun whenMarkEmailConfirmationWithLinkAndJobDoesNotExistThenReturnsNull() =
+        runTest {
+            whenever(mockSchedulingRepository.getEmailConfirmationJob(testExtractedProfileId))
+                .thenReturn(null)
+
+            val result = toTest.markEmailConfirmationWithLink(testExtractedProfileId, "test-link")
+
+            verify(mockSchedulingRepository).getEmailConfirmationJob(testExtractedProfileId)
+            verify(mockSchedulingRepository, never()).saveEmailConfirmationJobRecord(any())
+            assertNull(result)
+        }
+
+    // Email confirmation attempt tests
+    @Test
+    fun whenRecordEmailConfirmationAttemptAndJobExistsThenIncrementsAttemptCountAndUpdatesTimestamp() =
+        runTest {
+            whenever(mockSchedulingRepository.getEmailConfirmationJob(testExtractedProfileId))
+                .thenReturn(testEmailConfirmationJobRecord)
+
+            val result = toTest.recordEmailConfirmationAttempt(testExtractedProfileId)
+
+            val expectedRecord = testEmailConfirmationJobRecord.copy(
+                jobAttemptData = testEmailConfirmationJobRecord.jobAttemptData.copy(
+                    jobAttemptCount = testEmailConfirmationJobRecord.jobAttemptData.jobAttemptCount + 1,
+                    lastJobAttemptDateInMillis = TEST_CURRENT_TIME,
+                ),
+            )
+
+            verify(mockSchedulingRepository).saveEmailConfirmationJobRecord(expectedRecord)
+            assertEquals(expectedRecord, result)
+        }
+
+    @Test
+    fun whenRecordEmailConfirmationAttemptAndJobDoesNotExistThenReturnsNull() =
+        runTest {
+            whenever(mockSchedulingRepository.getEmailConfirmationJob(testExtractedProfileId))
+                .thenReturn(null)
+
+            val result = toTest.recordEmailConfirmationAttempt(testExtractedProfileId)
+
+            verify(mockSchedulingRepository).getEmailConfirmationJob(testExtractedProfileId)
+            verify(mockSchedulingRepository, never()).saveEmailConfirmationJobRecord(any())
+            assertNull(result)
+        }
+
+    @Test
+    fun whenRecordEmailConfirmationAttemptMaxedThenDeletesEmailJobAndMarksOptOutAsError() =
+        runTest {
+            whenever(mockSchedulingRepository.getValidOptOutJobRecord(testExtractedProfileId))
+                .thenReturn(testOptOutJobRecord)
+            toTest.recordEmailConfirmationAttemptMaxed(testExtractedProfileId)
+
+            verify(mockSchedulingRepository).deleteEmailConfirmationJobRecord(testExtractedProfileId)
+            verify(mockSchedulingRepository).saveOptOutJobRecord(
+                testOptOutJobRecord.copy(
+                    status = OptOutJobStatus.ERROR,
+                ),
+            )
+        }
+
+    // Email confirmation completion tests
+    @Test
+    fun whenRecordEmailConfirmationCompletedThenDeletesEmailJobAndMarksOptOutAsRequested() =
+        runTest {
+            whenever(mockSchedulingRepository.getValidOptOutJobRecord(testExtractedProfileId))
+                .thenReturn(testOptOutJobRecord)
+
+            toTest.recordEmailConfirmationCompleted(testExtractedProfileId)
+
+            verify(mockSchedulingRepository).deleteEmailConfirmationJobRecord(testExtractedProfileId)
+            verify(mockSchedulingRepository).saveOptOutJobRecord(
+                testOptOutJobRecord.copy(
+                    status = OptOutJobStatus.REQUESTED,
+                    optOutRequestedDateInMillis = TEST_CURRENT_TIME,
+                ),
+            )
+        }
+
+    @Test
+    fun whenRecordEmailConfirmationFailedAndJobExistsThenUpdatesLastActionId() =
+        runTest {
+            val testActionId = "action-123"
+            whenever(mockSchedulingRepository.getEmailConfirmationJob(testExtractedProfileId))
+                .thenReturn(testEmailConfirmationJobRecord)
+
+            val result = toTest.recordEmailConfirmationFailed(testExtractedProfileId, testActionId)
+
+            val expectedRecord = testEmailConfirmationJobRecord.copy(
+                jobAttemptData = testEmailConfirmationJobRecord.jobAttemptData.copy(
+                    lastJobAttemptActionId = testActionId,
+                ),
+            )
+
+            verify(mockSchedulingRepository).saveEmailConfirmationJobRecord(expectedRecord)
+            assertEquals(expectedRecord, result)
+        }
+
+    @Test
+    fun whenRecordEmailConfirmationFailedAndJobDoesNotExistThenReturnsNull() =
+        runTest {
+            whenever(mockSchedulingRepository.getEmailConfirmationJob(testExtractedProfileId))
+                .thenReturn(null)
+
+            val result = toTest.recordEmailConfirmationFailed(testExtractedProfileId, "action-123")
+
+            verify(mockSchedulingRepository).getEmailConfirmationJob(testExtractedProfileId)
+            verify(mockSchedulingRepository, never()).saveEmailConfirmationJobRecord(any())
+            assertNull(result)
+        }
+
+    // Edge case tests for multiple operations
+    @Test
+    fun whenRecordEmailConfirmationFetchAttemptWithExistingAttemptsThenIncrementsCorrectly() =
+        runTest {
+            val recordWithExistingAttempts = testEmailConfirmationJobRecord.copy(
+                linkFetchData = testEmailConfirmationJobRecord.linkFetchData.copy(
+                    linkFetchAttemptCount = 5,
+                    lastLinkFetchDateInMillis = 3000L,
+                ),
+            )
+            whenever(mockSchedulingRepository.getEmailConfirmationJob(testExtractedProfileId))
+                .thenReturn(recordWithExistingAttempts)
+
+            val result = toTest.recordEmailConfirmationFetchAttempt(testExtractedProfileId)
+
+            val expectedRecord = recordWithExistingAttempts.copy(
+                linkFetchData = recordWithExistingAttempts.linkFetchData.copy(
+                    linkFetchAttemptCount = 6,
+                    lastLinkFetchDateInMillis = TEST_CURRENT_TIME,
+                ),
+            )
+
+            verify(mockSchedulingRepository).saveEmailConfirmationJobRecord(expectedRecord)
+            assertEquals(expectedRecord, result)
+        }
+
+    @Test
+    fun whenRecordEmailConfirmationAttemptWithExistingAttemptsThenIncrementsCorrectly() =
+        runTest {
+            val recordWithExistingAttempts = testEmailConfirmationJobRecord.copy(
+                jobAttemptData = testEmailConfirmationJobRecord.jobAttemptData.copy(
+                    jobAttemptCount = 3,
+                    lastJobAttemptDateInMillis = 4000L,
+                ),
+            )
+            whenever(mockSchedulingRepository.getEmailConfirmationJob(testExtractedProfileId))
+                .thenReturn(recordWithExistingAttempts)
+
+            val result = toTest.recordEmailConfirmationAttempt(testExtractedProfileId)
+
+            val expectedRecord = recordWithExistingAttempts.copy(
+                jobAttemptData = recordWithExistingAttempts.jobAttemptData.copy(
+                    jobAttemptCount = 4,
+                    lastJobAttemptDateInMillis = TEST_CURRENT_TIME,
+                ),
+            )
+
+            verify(mockSchedulingRepository).saveEmailConfirmationJobRecord(expectedRecord)
+            assertEquals(expectedRecord, result)
+        }
+
+    @Test
+    fun whenMarkEmailConfirmationWithLinkOverwritesExistingLink() =
+        runTest {
+            val newLink = "https://example.com/new-confirm?token=new123"
+            whenever(mockSchedulingRepository.getEmailConfirmationJob(testExtractedProfileId))
+                .thenReturn(testEmailConfirmationJobRecordWithLink)
+
+            val result = toTest.markEmailConfirmationWithLink(testExtractedProfileId, newLink)
+
+            val expectedRecord = testEmailConfirmationJobRecordWithLink.copy(
+                linkFetchData = testEmailConfirmationJobRecordWithLink.linkFetchData.copy(
+                    emailConfirmationLink = newLink,
+                ),
+            )
+
+            verify(mockSchedulingRepository).saveEmailConfirmationJobRecord(expectedRecord)
+            assertEquals(expectedRecord, result)
         }
 
     companion object {

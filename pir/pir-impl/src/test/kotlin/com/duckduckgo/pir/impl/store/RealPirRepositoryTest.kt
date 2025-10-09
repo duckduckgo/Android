@@ -175,7 +175,7 @@ class RealPirRepositoryTest {
 
         // Then
         assertEquals(1, result.size)
-        assertEquals(EmailConfirmationLinkFetchStatus.Unknown, result[testEmailData1])
+        assertEquals(EmailConfirmationLinkFetchStatus.Unknown(), result[testEmailData1])
     }
 
     @Test
