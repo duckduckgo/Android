@@ -29,6 +29,7 @@ import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.di.scopes.ViewScope
+import com.duckduckgo.subscriptions.impl.CurrentPurchase
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.MONTHLY_PLAN_ROW
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.MONTHLY_PLAN_US
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.YEARLY_PLAN_ROW
@@ -40,6 +41,7 @@ import com.duckduckgo.subscriptions.internal.databinding.SubsSimpleViewBinding
 import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.android.support.AndroidSupportInjection
 import kotlinx.coroutines.launch
+import logcat.logcat
 import javax.inject.Inject
 
 @InjectWith(ViewScope::class)
@@ -62,6 +64,35 @@ class SwitchSubscriptionView @JvmOverloads constructor(
 
         binding.root.setPrimaryText("Switch subscription")
         binding.root.setSecondaryText("If you have an active subscription, you can switch plans here")
+
+        // Subscribe to purchase state to ensure billing manager is connected and purchases are loaded
+        val lifecycleOwner = findViewTreeLifecycleOwner()
+        lifecycleOwner?.lifecycleScope?.launch(dispatcherProvider.io()) {
+            subscriptionsManager.currentPurchaseState.collect {
+                when (it) {
+                    is CurrentPurchase.Success -> {
+                        launch(dispatcherProvider.main()) {
+                            Toast.makeText(context, "Successfully switched to new plan", Toast.LENGTH_LONG).show()
+                        }
+                    }
+
+                    is CurrentPurchase.Failure -> {
+                        launch(dispatcherProvider.main()) {
+                            Toast.makeText(context, "Failed to switch subscription plan: ${it.message}", Toast.LENGTH_LONG).show()
+                        }
+                    }
+
+                    is CurrentPurchase.Canceled -> {
+                        launch(dispatcherProvider.main()) {
+                            Toast.makeText(context, "Subscription switch canceled", Toast.LENGTH_LONG).show()
+                        }
+                    }
+
+                    else -> {}
+
+                }
+            }
+        }
 
         checkSubscriptionStatusAndConfigureView()
     }
@@ -134,18 +165,20 @@ class SwitchSubscriptionView @JvmOverloads constructor(
                         .setOptions(options, currentPlanIndex)
                         .setPositiveButton(android.R.string.ok)
                         .setNegativeButton(android.R.string.cancel)
-                        .addEventListener(object : RadioListAlertDialogBuilder.EventListener() {
-                            override fun onPositiveButtonClicked(selectedItem: Int) {
-                                val selectedPlan = availablePlans[selectedItem - 1]
+                        .addEventListener(
+                            object : RadioListAlertDialogBuilder.EventListener() {
+                                override fun onPositiveButtonClicked(selectedItem: Int) {
+                                    val selectedPlan = availablePlans[selectedItem - 1]
 
-                                if (selectedPlan.isCurrentPlan) {
-                                    Toast.makeText(context, "You are already subscribed to this plan", Toast.LENGTH_SHORT).show()
-                                    return
+                                    if (selectedPlan.isCurrentPlan) {
+                                        Toast.makeText(context, "You are already subscribed to this plan", Toast.LENGTH_SHORT).show()
+                                        return
+                                    }
+
+                                    showReplacementModeDialog(selectedPlan, lifecycleOwner)
                                 }
-
-                                showReplacementModeDialog(selectedPlan, lifecycleOwner)
-                            }
-                        })
+                            },
+                        )
                         .show()
                 }
             } catch (e: Exception) {
@@ -180,6 +213,7 @@ class SwitchSubscriptionView @JvmOverloads constructor(
                         else -> "${offer.planId} (current)"
                     }
                 }
+
                 else -> {
                     val price = offer.pricingPhases.firstOrNull()?.formattedPrice ?: "N/A"
                     when (offer.planId) {
@@ -231,12 +265,14 @@ class SwitchSubscriptionView @JvmOverloads constructor(
             .setOptions(options, defaultIndex + 1)
             .setPositiveButton(android.R.string.ok)
             .setNegativeButton(android.R.string.cancel)
-            .addEventListener(object : RadioListAlertDialogBuilder.EventListener() {
-                override fun onPositiveButtonClicked(selectedItem: Int) {
-                    val selectedReplacementMode = replacementModes[selectedItem - 1].mode
-                    switchToPlan(planOption, lifecycleOwner, selectedReplacementMode)
-                }
-            })
+            .addEventListener(
+                object : RadioListAlertDialogBuilder.EventListener() {
+                    override fun onPositiveButtonClicked(selectedItem: Int) {
+                        val selectedReplacementMode = replacementModes[selectedItem - 1].mode
+                        switchToPlan(planOption, lifecycleOwner, selectedReplacementMode)
+                    }
+                },
+            )
             .show()
     }
 
@@ -244,7 +280,6 @@ class SwitchSubscriptionView @JvmOverloads constructor(
         planOption: PlanOption,
         lifecycleOwner: androidx.lifecycle.LifecycleOwner,
         replacementMode: SubscriptionReplacementMode,
-        onComplete: () -> Unit = {},
     ) {
         lifecycleOwner.lifecycleScope.launch(dispatcherProvider.io()) {
             try {
@@ -256,32 +291,20 @@ class SwitchSubscriptionView @JvmOverloads constructor(
                 if (activity == null) {
                     launch(dispatcherProvider.main()) {
                         Toast.makeText(context, "Error: Activity context required for billing flow", Toast.LENGTH_SHORT).show()
-                        onComplete()
                     }
                     return@launch
                 }
 
                 // Call the subscription switch logic
-                val success =
-                    subscriptionsManager.switchSubscriptionPlan(
-                        activity = activity,
-                        planId = planOption.planId,
-                        offerId = planOption.offerId,
-                        replacementMode = replacementMode,
-                    )
-
-                launch(dispatcherProvider.main()) {
-                    if (success) {
-                        Toast.makeText(context, "Successfully switched to ${planOption.displayName}", Toast.LENGTH_LONG).show()
-                    } else {
-                        Toast.makeText(context, "Failed to switch subscription plan", Toast.LENGTH_LONG).show()
-                    }
-                    onComplete()
-                }
+                subscriptionsManager.switchSubscriptionPlan(
+                    activity = activity,
+                    planId = planOption.planId,
+                    offerId = planOption.offerId,
+                    replacementMode = replacementMode,
+                )
             } catch (e: Exception) {
                 launch(dispatcherProvider.main()) {
                     Toast.makeText(context, "Error switching plan: ${e.message}", Toast.LENGTH_LONG).show()
-                    onComplete()
                 }
             }
         }
