@@ -1584,6 +1584,36 @@ class InputScreenViewModelTest {
         }
 
     @Test
+    fun `when onTabSwitcherTapped then emit TabSwitcherRequested Command`() =
+        runTest {
+            val viewModel = createViewModel()
+
+            viewModel.onTabSwitcherTapped()
+
+            assertEquals(Command.TabSwitcherRequested, viewModel.command.value)
+        }
+
+    @Test
+    fun `when onFireButtonTapped then emit FireButtonRequested Command`() =
+        runTest {
+            val viewModel = createViewModel()
+
+            viewModel.onFireButtonTapped()
+
+            assertEquals(Command.FireButtonRequested, viewModel.command.value)
+        }
+
+    @Test
+    fun `when onBrowserMenuTapped then emit MenuRequested Command`() =
+        runTest {
+            val viewModel = createViewModel()
+
+            viewModel.onBrowserMenuTapped()
+
+            assertEquals(Command.MenuRequested, viewModel.command.value)
+        }
+
+    @Test
     fun `when any button is visible then actionButtonsContainerVisible should be true`() =
         runTest {
             data class TestCase(

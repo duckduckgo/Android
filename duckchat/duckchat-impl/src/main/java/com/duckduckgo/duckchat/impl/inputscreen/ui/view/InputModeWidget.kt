@@ -45,6 +45,8 @@ import androidx.core.widget.doOnTextChanged
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.ui.view.addBottomShadow
+import com.duckduckgo.common.ui.view.gone
+import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.view.toPx
 import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.duckchat.impl.R
@@ -151,6 +153,7 @@ class InputModeWidget @JvmOverloads constructor(
         configureClickListeners()
         configureInputBehavior()
         configureTabBehavior()
+        configureMainButtons()
         applyModeSpecificInputBehaviour(isSearchTab = true)
         configureShadow()
     }
@@ -303,13 +306,20 @@ class InputModeWidget @JvmOverloads constructor(
         )
     }
 
+    private fun configureMainButtons(){
+        if (shouldShowMainButtons){
+            inputModeIconsContainer.show()
+        } else {
+            inputModeIconsContainer.gone()
+        }
+    }
+
     private fun checkForButtonsVisibility() {
         if (shouldShowMainButtons) {
             if (inputModeSwitch.selectedTabPosition == 0) {
                 // buttons are shown in search mode if the input field is empty
                 val text = inputField.text
                 val isNullOrEmpty = text.isNullOrEmpty()
-                logcat { "inputScreenLauncher: show 3 buttons  $isNullOrEmpty" }
                 fade(inputModeIconsContainer, isNullOrEmpty)
 
                 inputModeWidgetLayout.updateLayoutParams<MarginLayoutParams> {
@@ -321,6 +331,7 @@ class InputModeWidget @JvmOverloads constructor(
                     marginStart = inputModeCardExtendedEndMargin
                 }
             } else {
+                // in duck.ai mode buttons are never visible but we need to adjust the layout margins
                 fade(inputModeIconsContainer, false)
                 inputModeWidgetLayout.updateLayoutParams<MarginLayoutParams> {
                     marginEnd = inputModeCardExtendedEndMargin

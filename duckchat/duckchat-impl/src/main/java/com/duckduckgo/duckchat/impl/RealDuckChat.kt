@@ -89,9 +89,6 @@ interface DuckChatInternal : DuckChat {
     suspend fun setShowInAddressBarUserSetting(showDuckChat: Boolean)
 
     /**
-     * Temporary setting to enable 3 buttons in input screen
-     */
-    /**
      * Observes whether DuckChat is user enabled or disabled.
      */
     fun observeEnableDuckChatUserSetting(): Flow<Boolean>
