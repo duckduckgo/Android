@@ -57,41 +57,43 @@ class DuckDuckGoWebLocalStorageManager @Inject constructor(
     private var matchingRegex = emptyList<String>()
 
     override fun clearWebLocalStorage() = runBlocking {
-        val settings = androidBrowserConfigFeature.webLocalStorage().getSettings()
-        val webLocalStorageSettings = webLocalStorageSettingsJsonParser.parseJson(settings)
+        withContext(dispatcherProvider.io()) {
+            val settings = androidBrowserConfigFeature.webLocalStorage().getSettings()
+            val webLocalStorageSettings = webLocalStorageSettingsJsonParser.parseJson(settings)
 
-        val fireproofedDomains = if (androidBrowserConfigFeature.fireproofedWebLocalStorage().isEnabled()) {
-            withContext(dispatcherProvider.io()) {
-                fireproofWebsiteRepository.fireproofWebsitesSync().map { it.domain }
+            val fireproofedDomains = if (androidBrowserConfigFeature.fireproofedWebLocalStorage().isEnabled()) {
+                withContext(dispatcherProvider.io()) {
+                    fireproofWebsiteRepository.fireproofWebsitesSync().map { it.domain }
+                }
+            } else {
+                emptyList()
             }
-        } else {
-            emptyList()
-        }
 
-        domains = webLocalStorageSettings.domains.list + fireproofedDomains
-        keysToDelete = webLocalStorageSettings.keysToDelete.list
-        matchingRegex = webLocalStorageSettings.matchingRegex.list
+            domains = webLocalStorageSettings.domains.list + fireproofedDomains
+            keysToDelete = webLocalStorageSettings.keysToDelete.list
+            matchingRegex = webLocalStorageSettings.matchingRegex.list
 
-        logcat { "WebLocalStorageManager: Allowed domains: $domains" }
-        logcat { "WebLocalStorageManager: Keys to delete: $keysToDelete" }
-        logcat { "WebLocalStorageManager: Matching regex: $matchingRegex" }
+            logcat { "WebLocalStorageManager: Allowed domains: $domains" }
+            logcat { "WebLocalStorageManager: Keys to delete: $keysToDelete" }
+            logcat { "WebLocalStorageManager: Matching regex: $matchingRegex" }
 
-        val db = databaseProvider.get()
-        db.iterator().use { iterator ->
-            iterator.seekToFirst()
+            val db = databaseProvider.get()
+            db.iterator().use { iterator ->
+                iterator.seekToFirst()
 
-            while (iterator.hasNext()) {
-                val entry = iterator.next()
-                val key = String(entry.key, StandardCharsets.UTF_8)
+                while (iterator.hasNext()) {
+                    val entry = iterator.next()
+                    val key = String(entry.key, StandardCharsets.UTF_8)
 
-                val domainForMatchingAllowedKey = getDomainForMatchingAllowedKey(key)
-                if (domainForMatchingAllowedKey == null) {
-                    db.delete(entry.key)
-                    logcat { "WebLocalStorageManager: Deleted key: $key" }
-                } else if (settingsDataStore.clearDuckAiData && domainForMatchingAllowedKey == DUCKDUCKGO_DOMAIN) {
-                    if (keysToDelete.any { key.endsWith(it) }) {
+                    val domainForMatchingAllowedKey = getDomainForMatchingAllowedKey(key)
+                    if (domainForMatchingAllowedKey == null) {
                         db.delete(entry.key)
                         logcat { "WebLocalStorageManager: Deleted key: $key" }
+                    } else if (settingsDataStore.clearDuckAiData && domainForMatchingAllowedKey == DUCKDUCKGO_DOMAIN) {
+                        if (keysToDelete.any { key.endsWith(it) }) {
+                            db.delete(entry.key)
+                            logcat { "WebLocalStorageManager: Deleted key: $key" }
+                        }
                     }
                 }
             }
