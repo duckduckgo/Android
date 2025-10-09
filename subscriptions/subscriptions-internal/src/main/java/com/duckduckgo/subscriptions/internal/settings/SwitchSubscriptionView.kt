@@ -41,7 +41,6 @@ import com.duckduckgo.subscriptions.internal.databinding.SubsSimpleViewBinding
 import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.android.support.AndroidSupportInjection
 import kotlinx.coroutines.launch
-import logcat.logcat
 import javax.inject.Inject
 
 @InjectWith(ViewScope::class)
@@ -89,7 +88,6 @@ class SwitchSubscriptionView @JvmOverloads constructor(
                     }
 
                     else -> {}
-
                 }
             }
         }
