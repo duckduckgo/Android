@@ -300,6 +300,7 @@ import com.duckduckgo.sync.api.favicons.FaviconsFetchingPrompt
 import com.duckduckgo.voice.api.VoiceSearchAvailabilityPixelLogger
 import dagger.Lazy
 import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -7084,6 +7085,24 @@ class BrowserTabViewModelTest {
         runTest {
             fakeAndroidConfigBrowserFeature.updateScriptOnPageFinished().setRawStoredState(State(true))
             fakeAndroidConfigBrowserFeature.pauseWebViewBeforeUpdatingScript().setRawStoredState(State(true))
+            fakeAndroidConfigBrowserFeature.updateScriptOnProtectionsChanged().setRawStoredState(State(true))
+
+            testee.privacyProtectionsUpdated(mockWebView)
+
+            verify(mockWebView).stopLoading()
+            verify(mockWebView).pauseTimers()
+            verify(mockWebView).resumeTimers()
+        }
+
+    @Test
+    fun whenPrivacyProtectionsUpdatedAndPauseWebViewBeforeUpdatingScriptEnabledAndCoroutineScopeCanceledBeforeResumingStillResumesTimers() =
+        runTest {
+            fakeAndroidConfigBrowserFeature.updateScriptOnPageFinished().setRawStoredState(State(true))
+            fakeAndroidConfigBrowserFeature.pauseWebViewBeforeUpdatingScript().setRawStoredState(State(true))
+            fakeAndroidConfigBrowserFeature.updateScriptOnProtectionsChanged().setRawStoredState(State(true))
+            whenever(mockWebView.pauseTimers()).then {
+                coroutineRule.testScope.cancel()
+            }
 
             testee.privacyProtectionsUpdated(mockWebView)
 
@@ -7955,6 +7974,7 @@ class BrowserTabViewModelTest {
             private set
 
         override suspend fun addDocumentStartJavaScript(webView: WebView) {
+            delay(0) // This creates a suspension point for cancellation
             countInitted++
         }
     }
