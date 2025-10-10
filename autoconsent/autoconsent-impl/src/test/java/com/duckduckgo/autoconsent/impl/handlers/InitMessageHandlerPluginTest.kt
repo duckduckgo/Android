@@ -312,21 +312,6 @@ class InitMessageHandlerPluginTest {
         return method.invoke(initHandlerPlugin, rules, url) as InitMessageHandlerPlugin.AutoconsentRuleset
     }
 
-    private fun rule(stepVersion: Double, regex: String, disabled: Double, usedStringIds: List<Int>): List<Any> {
-        return listOf(
-            stepVersion, // [0] step version
-            0, // [1]
-            0, // [2]
-            regex, // [3] regex
-            disabled, // [4] disabled flag (1 => disabled)
-            usedStringIds, // [5] directly referenced strings
-            emptyList<Map<String, Any>>(), // [6] then
-            emptyList<Map<String, Any>>(), // [7] else
-            emptyList<Map<String, Any>>(), // [8] any
-            emptyList<Map<String, Any>>(), // [9] extra
-        )
-    }
-
     private fun message(): String {
         return """
             {"type":"${initHandlerPlugin.supportedTypes.first()}", "url": "http://www.example.com"}
