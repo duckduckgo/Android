@@ -132,7 +132,7 @@ class BrokerStepCompletedEventHandler @Inject constructor(
                     BrokerRecordEmailConfirmationCompleted(
                         brokerName = currentOptOutStep.brokerName,
                         isSuccess = isSuccess,
-                        // Success means we finished all steps and reaching her mean that index has been incremented. If error, we don't increment.
+                        // Success means we finished all steps and reaching here means that index has been incremented. If error, we don't increment.
                         lastActionId = if (isSuccess) {
                             currentOptOutStep.actions[state.currentActionIndex - 1]
                         } else {
