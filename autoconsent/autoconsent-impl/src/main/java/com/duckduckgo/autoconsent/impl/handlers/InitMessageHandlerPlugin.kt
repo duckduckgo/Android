@@ -87,9 +87,6 @@ class InitMessageHandlerPlugin @Inject constructor(
                     val initResp = InitResp(config = config, rules = filterCompactRules(settings.compactRuleList, url))
 
                     val response = ReplyHandler.constructReply(getMessage(initResp))
-                    logcat {
-                        "init size: ${response.length}, from ${settings.compactRuleList.r.size} rules"
-                    }
 
                     withContext(dispatcherProvider.main()) {
                         webView.evaluateJavascript("javascript:$response", null)
