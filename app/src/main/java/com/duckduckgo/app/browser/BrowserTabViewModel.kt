@@ -4267,27 +4267,31 @@ class BrowserTabViewModel @Inject constructor(
             androidBrowserConfig.pauseWebViewBeforeUpdatingScript().isEnabled()
         }
 
-        if (pauseWebViewBeforeUpdatingScript) {
-            withContext(dispatchers.main()) {
-                webView.stopLoading()
-                webView.pauseTimers()
-            }
-        }
-
-        if (withContext(dispatchers.io()) { !androidBrowserConfig.updateScriptOnPageFinished().isEnabled() }) {
-            addDocumentStartJavascriptPlugins
-                .getPlugins()
-                .filter { plugin ->
-                    (plugin.context == "contentScopeScripts")
-                }.forEach {
-                    it.addDocumentStartJavaScript(webView)
+        try {
+            if (pauseWebViewBeforeUpdatingScript) {
+                withContext(dispatchers.main()) {
+                    webView.stopLoading()
+                    webView.pauseTimers()
                 }
-        } else {
-            addDocumentStartJavaScript(webView)
-        }
+            }
 
-        if (pauseWebViewBeforeUpdatingScript) {
-            webView.resumeTimers()
+            if (withContext(dispatchers.io()) { !androidBrowserConfig.updateScriptOnPageFinished().isEnabled() }) {
+                addDocumentStartJavascriptPlugins
+                    .getPlugins()
+                    .filter { plugin ->
+                        (plugin.context == "contentScopeScripts")
+                    }.forEach {
+                        it.addDocumentStartJavaScript(webView)
+                    }
+            } else {
+                addDocumentStartJavaScript(webView)
+            }
+        } finally {
+            if (pauseWebViewBeforeUpdatingScript) {
+                appCoroutineScope.launch(dispatchers.main()) {
+                    webView.resumeTimers()
+                }
+            }
         }
     }
 
