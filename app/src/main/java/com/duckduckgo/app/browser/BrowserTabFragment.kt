@@ -902,7 +902,7 @@ class BrowserTabFragment :
 
     private val inputScreenLauncher =
         registerForActivityResult(StartActivityForResult()) { result ->
-            val data = result.data ?: return@registerForActivityResult
+            val data = result.data
             when (result.resultCode) {
                 InputScreenActivityResultCodes.NEW_SEARCH_REQUESTED -> {
                     data?.getStringExtra(InputScreenActivityResultParams.SEARCH_QUERY_PARAM)?.let { query ->
@@ -927,7 +927,6 @@ class BrowserTabFragment :
                 InputScreenActivityResultCodes.FIRE_BUTTON_REQUESTED -> {
                     onFireButtonPressed()
                 }
-
 
                 RESULT_CANCELED -> {
                     data?.getStringExtra(InputScreenActivityResultParams.CANCELED_DRAFT_PARAM)?.let { query ->
