@@ -248,7 +248,7 @@
     <string name="settingsAutomaticallyClearWhenAppExit30Minutes">Izhod iz aplikacije, neaktivnost 30 minut</string>
     <string name="settingsAutomaticallyClearWhenAppExit60Minutes">Izhod iz aplikacije, neaktivnost 1 ura</string>
     <string name="settingsClearAiDataTitle">Počisti klepete Duck.ai</string>
-    <string name="settingsClearAiDataMessage">Gumb Fire Button bo izbrisal tudi zgodovino Duck.ai.</string>
+    <string name="settingsClearAiDataDeleteMessage">Fire Button bo izbrisal tudi zgodovino Duck.ai, vključno s pripetimi klepeti.</string>
 
     <!-- About Activity -->
     <string name="aboutActivityTitle">O DuckDuckGo</string>

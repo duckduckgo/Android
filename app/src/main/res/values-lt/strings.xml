@@ -248,7 +248,7 @@
     <string name="settingsAutomaticallyClearWhenAppExit30Minutes">Išeinant iš programos, po 30 min. neveikimo</string>
     <string name="settingsAutomaticallyClearWhenAppExit60Minutes">Išeinant iš programos, po 1 val. neveikimo</string>
     <string name="settingsClearAiDataTitle">Išvalyti „Duck.ai“ pokalbius</string>
-    <string name="settingsClearAiDataMessage">Mygtukas „Fire Button“ taip pat ištrins „Duck.ai“ istoriją.</string>
+    <string name="settingsClearAiDataDeleteMessage">„Fire Button“ taip pat ištrins „Duck.ai“ istoriją, įskaitant prisegtus pokalbius.</string>
 
     <!-- About Activity -->
     <string name="aboutActivityTitle">Apie „DuckDuckGo“</string>

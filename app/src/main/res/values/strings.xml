@@ -245,7 +245,7 @@
     <string name="settingsAutomaticallyClearWhenAppExit30Minutes">App exit, inactive for 30 minutes</string>
     <string name="settingsAutomaticallyClearWhenAppExit60Minutes">App exit, inactive for 1 hour</string>
     <string name="settingsClearAiDataTitle">Clear Duck.ai Chats</string>
-    <string name="settingsClearAiDataMessage">Fire Button will also delete Duck.ai history</string>
+    <string name="settingsClearAiDataDeleteMessage">Fire Button will also delete Duck.ai history, including pinned chats.</string>
 
     <!-- About Activity -->
     <string name="aboutActivityTitle">About DuckDuckGo</string>

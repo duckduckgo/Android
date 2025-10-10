@@ -247,7 +247,7 @@
     <string name="settingsAutomaticallyClearWhenAppExit30Minutes">Ieșire din aplicație, inactiv timp de 30 de minute</string>
     <string name="settingsAutomaticallyClearWhenAppExit60Minutes">Ieșire din aplicație, inactiv timp de 1 oră</string>
     <string name="settingsClearAiDataTitle">Șterge chaturile Duck.ai</string>
-    <string name="settingsClearAiDataMessage">Fire Button va șterge și istoricul Duck.ai</string>
+    <string name="settingsClearAiDataDeleteMessage">Fire Button va șterge și istoricul Duck.ai, inclusiv chaturile fixate.</string>
 
     <!-- About Activity -->
     <string name="aboutActivityTitle">Despre DuckDuckGo</string>

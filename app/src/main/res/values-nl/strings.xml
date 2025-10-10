@@ -246,7 +246,7 @@
     <string name="settingsAutomaticallyClearWhenAppExit30Minutes">App afsluiten, 30 minuten inactief</string>
     <string name="settingsAutomaticallyClearWhenAppExit60Minutes">App afsluiten, 1 uur inactief</string>
     <string name="settingsClearAiDataTitle">Duck.ai chats wissen</string>
-    <string name="settingsClearAiDataMessage">De Fire Button verwijdert ook de Duck.ai-geschiedenis</string>
+    <string name="settingsClearAiDataDeleteMessage">Fire Button verwijdert ook de Duck.ai-geschiedenis, inclusief vastgepinde chats.</string>
 
     <!-- About Activity -->
     <string name="aboutActivityTitle">Over DuckDuckGo</string>

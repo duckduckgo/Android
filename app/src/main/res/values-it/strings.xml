@@ -246,7 +246,7 @@
     <string name="settingsAutomaticallyClearWhenAppExit30Minutes">Uscita dall\'app, inattività di 30 minuti</string>
     <string name="settingsAutomaticallyClearWhenAppExit60Minutes">Uscita dall\'app, inattività di 1 ora</string>
     <string name="settingsClearAiDataTitle">Cancella le chat di Duck.ai</string>
-    <string name="settingsClearAiDataMessage">Fire Button eliminerà anche la cronologia di Duck.ai</string>
+    <string name="settingsClearAiDataDeleteMessage">Fire Button eliminerà anche la cronologia di Duck.ai, incluse le chat fissate.</string>
 
     <!-- About Activity -->
     <string name="aboutActivityTitle">Info su DuckDuckGo</string>
