@@ -405,8 +405,8 @@ class RealPirRunStateHandler @Inject constructor(
                         jobRecordUpdater.markRemovedOptOutJobRecords(it, state.brokerName, state.profileQueryId)
 
                         if (it.isNotEmpty()) {
-                            repository.saveNewExtractedProfiles(it)
                             jobRecordUpdater.updateScanMatchesFound(it, state.brokerName, state.profileQueryId)
+                            repository.saveNewExtractedProfiles(it)
                         } else {
                             jobRecordUpdater.updateScanNoMatchFound(state.brokerName, state.profileQueryId)
                         }

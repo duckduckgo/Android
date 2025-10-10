@@ -50,6 +50,8 @@ interface JobRecordUpdater {
      * broker and profile query combination. It updates the corresponding [ScanJobRecord]'s
      * status and also sets the latest scan time.
      *
+     * This method should be called before we store [newExtractedProfiles] locally.
+     *
      * @param newExtractedProfiles Newly found [ExtractedProfile]s for the [brokerName] and [profileQueryId]
      * @param brokerName The name of the broker associated with the scan job.
      * @param profileQueryId The ID of the [ProfileQuery] related to the scan job.
