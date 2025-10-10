@@ -43,8 +43,13 @@ data object InputScreenActivityResultCodes {
     /** User requested to switch to an existing tab */
     const val SWITCH_TO_TAB_REQUESTED = 2
 
+    /** User requested to launch the Fire Button */
     const val FIRE_BUTTON_REQUESTED = 3
+
+    /** User requested to launch the Tab Switcher */
     const val TAB_SWITCHER_REQUESTED = 4
+
+    /** User requested to launch the Browser Menu */
     const val MENU_REQUESTED = 5
 }
 
