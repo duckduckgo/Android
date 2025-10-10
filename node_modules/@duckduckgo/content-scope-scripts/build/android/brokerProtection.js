@@ -8901,7 +8901,7 @@
           return this.messaging.notify("actionError", { error: "No response found, exceptions: " + exceptions.join(", ") });
         }
       } catch (e) {
-        console.log("unhandled exception: ", e);
+        this.log.error("unhandled exception: ", e);
         return this.messaging.notify("actionError", { error: e.toString() });
       }
     }
