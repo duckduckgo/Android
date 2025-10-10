@@ -65,7 +65,7 @@ class RealAutoconsent @Inject constructor(
 
     init {
         if (isMainProcess) {
-            onPrivacyConfigDownloaded()
+            cacheSettingsFromConfig()
         }
     }
 
@@ -136,6 +136,10 @@ class RealAutoconsent @Inject constructor(
 
     override fun onPrivacyConfigDownloaded() {
         settingsRepository.invalidateCache()
+        cacheSettingsFromConfig()
+    }
+
+    private fun cacheSettingsFromConfig() {
         appCoroutineScope.launch(dispatcherProvider.io()) {
             val settingsJson = autoconsent.self().getSettings()
             if (settingsCache.getHash() != settingsJson.hashCode()) {
