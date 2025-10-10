@@ -657,7 +657,7 @@ class RealDuckChat @Inject constructor(
             val showClearChatHistory = clearChatHistory
             _showClearDuckAIChatHistory.emit(showClearChatHistory)
 
-            val showMainButtons = duckChatFeature.showMainButtonsInInputScreen().isEnabled() && showInputScreen
+            val showMainButtons = duckChatFeature.showMainButtonsInInputScreen().isEnabled()
             _showMainButtonsInInputScreen.emit(showMainButtons)
         }
 

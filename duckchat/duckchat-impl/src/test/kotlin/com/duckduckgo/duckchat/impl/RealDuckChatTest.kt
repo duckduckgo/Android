@@ -824,6 +824,24 @@ class RealDuckChatTest {
     }
 
     @Test
+    fun `when showMainButtonsInInputScreen enabled then showMainButtonsInInputScreen emits true`() = runTest {
+        duckChatFeature.showMainButtonsInInputScreen().setRawStoredState(State(enable = true))
+
+        testee.onPrivacyConfigDownloaded()
+
+        assertTrue(testee.showMainButtonsInInputScreen.value)
+    }
+
+    @Test
+    fun `when showMainButtonsInInputScreen disabled then showMainButtonsInInputScreen emits false`() = runTest {
+        duckChatFeature.showMainButtonsInInputScreen().setRawStoredState(State(enable = false))
+
+        testee.onPrivacyConfigDownloaded()
+
+        assertFalse(testee.showMainButtonsInInputScreen.value)
+    }
+
+    @Test
     fun `when showNewAddressBarOptionChoiceScreen called with dark theme then show dialog with dark theme`() = runTest {
         val mockContext = mock<Context>()
         testee.showNewAddressBarOptionChoiceScreen(mockContext, true)
