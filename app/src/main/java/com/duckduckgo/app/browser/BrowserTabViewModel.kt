@@ -60,6 +60,7 @@ import com.duckduckgo.app.browser.SpecialUrlDetector.UrlType.ShouldLaunchPrivacy
 import com.duckduckgo.app.browser.WebViewErrorResponse.LOADING
 import com.duckduckgo.app.browser.WebViewErrorResponse.OMITTED
 import com.duckduckgo.app.browser.addtohome.AddToHomeCapabilityDetector
+import com.duckduckgo.app.browser.animations.AddressBarTrackersAnimationFeatureToggle
 import com.duckduckgo.app.browser.applinks.AppLinksHandler
 import com.duckduckgo.app.browser.camera.CameraHardwareChecker
 import com.duckduckgo.app.browser.certificates.BypassedSSLCertificatesRepository
@@ -492,6 +493,7 @@ class BrowserTabViewModel @Inject constructor(
     private val addDocumentStartJavascriptPlugins: PluginPoint<AddDocumentStartJavaScriptPlugin>,
     private val webMessagingPlugins: PluginPoint<WebMessagingPlugin>,
     private val postMessageWrapperPlugins: PluginPoint<PostMessageWrapperPlugin>,
+    private val addressBarTrackersAnimationFeatureToggle: AddressBarTrackersAnimationFeatureToggle,
 ) : ViewModel(),
     WebViewClientListener,
     EditSavedSiteListener,
@@ -4489,7 +4491,11 @@ class BrowserTabViewModel @Inject constructor(
 
     fun onAutoConsentPopUpHandled(isCosmetic: Boolean) {
         if (!currentBrowserViewState().maliciousSiteBlocked) {
-            command.postValue(ShowAutoconsentAnimation(isCosmetic))
+            if (addressBarTrackersAnimationFeatureToggle.feature().isEnabled() && trackersCount().isNotEmpty()) {
+                command.postValue(Command.EnqueueCookiesAnimation(isCosmetic))
+            } else {
+                command.postValue(ShowAutoconsentAnimation(isCosmetic))
+            }
         }
     }
 
@@ -4509,8 +4515,6 @@ class BrowserTabViewModel @Inject constructor(
     private fun launchBookmarksActivity() {
         command.value = LaunchBookmarksActivity
     }
-
-    fun trackersCount(): String = site?.trackerCount?.takeIf { it > 0 }?.toString() ?: ""
 
     fun resetTrackersCount() {
         site?.resetTrackingEvents()
@@ -4547,6 +4551,9 @@ class BrowserTabViewModel @Inject constructor(
     fun onDynamicLogoClicked(url: String) {
         command.value = Command.ShowSerpEasterEggLogo(url)
     }
+
+    private fun trackersCount(): String =
+        siteLiveData.value?.trackerCount?.takeIf { it > 0 }?.toString() ?: ""
 
     companion object {
         private const val FIXED_PROGRESS = 50

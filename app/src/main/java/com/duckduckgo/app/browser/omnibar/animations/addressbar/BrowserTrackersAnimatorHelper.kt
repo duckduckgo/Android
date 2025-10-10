@@ -14,14 +14,13 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.browser.omnibar.animations
+package com.duckduckgo.app.browser.omnibar.animations.addressbar
 
 import android.content.Context
 import android.view.View
 import android.view.ViewGroup
 import com.airbnb.lottie.LottieAnimationView
 import com.duckduckgo.app.trackerdetection.model.Entity
-import com.duckduckgo.common.ui.view.text.DaxTextView
 
 /** Public interface for the Browser URL Bar Privacy and Trackers animations */
 interface BrowserTrackersAnimatorHelper {
@@ -44,17 +43,23 @@ interface BrowserTrackersAnimatorHelper {
         entities: List<Entity>?,
     )
 
-    fun startExperimentVariant1Animation(
+    /**
+     * This method starts the address bar trackers animation.
+     * When the animation starts, views in [omnibarViews] and [shieldViews] will fade out.
+     * When animation finishes, view in [omnibarViews] and [shieldViews] will fade in.
+     *
+     * @param sceneRoot viewgroup where the scene for the animation will be placed.
+     * @param animatedIconBackgroundView the icon background that will be animated.
+     * @param addressBarTrackersBlockedAnimationShieldIcon holder of the address bar trackers blocked shield animation.
+     * @param omnibarViews are the views that should be hidden while the animation is running.
+     * @param shieldViews are the views that should be hidden while the animation is running.
+     * @param entities are the tracker entities detected on the current site
+     */
+    fun startAddressBarTrackersAnimation(
         context: Context,
-        shieldAnimationView: LottieAnimationView,
-        omnibarViews: List<View>,
-    )
-
-    fun startExperimentVariant2OrVariant3Animation(
-        context: Context,
-        shieldAnimationView: LottieAnimationView,
-        trackersBlockedAnimationView: DaxTextView,
-        trackersBlockedCountAnimationView: DaxTextView,
+        sceneRoot: ViewGroup,
+        animatedIconBackgroundView: View,
+        addressBarTrackersBlockedAnimationShieldIcon: LottieAnimationView,
         omnibarViews: List<View>,
         shieldViews: List<View>,
         entities: List<Entity>?,

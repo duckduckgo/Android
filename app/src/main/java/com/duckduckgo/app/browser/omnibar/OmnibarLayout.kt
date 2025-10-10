@@ -54,6 +54,7 @@ import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.PulseAnimation
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.SmoothProgressAnimator
+import com.duckduckgo.app.browser.animations.AddressBarTrackersAnimationFeatureToggle
 import com.duckduckgo.app.browser.databinding.IncludeCustomTabToolbarBinding
 import com.duckduckgo.app.browser.databinding.IncludeFindInPageBinding
 import com.duckduckgo.app.browser.omnibar.Omnibar.OmnibarTextState
@@ -75,9 +76,9 @@ import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.Command.StartTr
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.LeadingIconState.EasterEggLogo
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.LeadingIconState.PrivacyShield
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.ViewState
-import com.duckduckgo.app.browser.omnibar.animations.BrowserTrackersAnimatorHelper
-import com.duckduckgo.app.browser.omnibar.animations.PrivacyShieldAnimationHelper
-import com.duckduckgo.app.browser.omnibar.animations.TrackersAnimatorListener
+import com.duckduckgo.app.browser.omnibar.animations.addressbar.BrowserTrackersAnimatorHelper
+import com.duckduckgo.app.browser.omnibar.animations.addressbar.PrivacyShieldAnimationHelper
+import com.duckduckgo.app.browser.omnibar.animations.addressbar.TrackersAnimatorListener
 import com.duckduckgo.app.browser.omnibar.animations.omnibaranimation.OmnibarAnimationManager
 import com.duckduckgo.app.browser.tabswitcher.TabSwitcherButton
 import com.duckduckgo.app.browser.viewstate.LoadingViewState
@@ -214,6 +215,9 @@ open class OmnibarLayout @JvmOverloads constructor(
     @Inject
     lateinit var serpEasterEggLogosToggles: SerpEasterEggLogosToggles
 
+    @Inject
+    lateinit var addressBarTrackersAnimationFeatureToggle: AddressBarTrackersAnimationFeatureToggle
+
     private var previousTransitionState: TransitionState? = null
 
     private val lifecycleOwner: LifecycleOwner by lazy {
@@ -243,7 +247,7 @@ open class OmnibarLayout @JvmOverloads constructor(
     private val aiChatDivider: View by lazy { findViewById(R.id.verticalDivider) }
     internal val browserMenu: FrameLayout by lazy { findViewById(R.id.browserMenu) }
     internal val browserMenuHighlight: View by lazy { findViewById(R.id.browserMenuHighlight) }
-    internal val cookieDummyView: View by lazy { findViewById(R.id.cookieDummyView) }
+    internal val animatedIconBackgroundView: View by lazy { findViewById(R.id.animatedIconBackgroundView) }
     internal val cookieAnimation: LottieAnimationView by lazy { findViewById(R.id.cookieAnimation) }
     internal val sceneRoot: ViewGroup by lazy { findViewById(R.id.sceneRoot) }
     internal val omniBarContainer: View by lazy { findViewById(R.id.omniBarContainer) }
@@ -256,6 +260,9 @@ open class OmnibarLayout @JvmOverloads constructor(
     }
     internal val browserMenuImageView: ImageView by lazy { findViewById(R.id.browserMenuImageView) }
     internal val shieldIcon: LottieAnimationView by lazy { findViewById(R.id.shieldIcon) }
+    internal val addressBarTrackersBlockedAnimationShieldIcon: LottieAnimationView by lazy {
+        findViewById(R.id.addressBarTrackersBlockedAnimationShieldIcon)
+    }
     internal val pageLoadingIndicator: ProgressBar by lazy { findViewById(R.id.pageLoadingIndicator) }
     internal val searchIcon: ImageView by lazy { findViewById(R.id.searchIcon) }
     internal val daxIcon: ImageView by lazy { findViewById(R.id.daxIcon) }
@@ -554,7 +561,7 @@ open class OmnibarLayout @JvmOverloads constructor(
     open fun processCommand(command: OmnibarLayoutViewModel.Command) {
         when (command) {
             Command.CancelAnimations -> {
-                cancelTrackersAnimation()
+                cancelAddressBarAnimations()
             }
 
             is StartCookiesAnimation -> {
@@ -566,7 +573,7 @@ open class OmnibarLayout @JvmOverloads constructor(
             }
 
             is StartTrackersAnimation -> {
-                startVisualDesignTrackersAnimation(command.entities)
+                startTrackersAnimation(command.entities)
             }
 
             is LaunchInputScreen -> {
@@ -772,7 +779,7 @@ open class OmnibarLayout @JvmOverloads constructor(
             }
 
             Decoration.CancelAnimations -> {
-                cancelTrackersAnimation()
+                cancelAddressBarAnimations()
             }
 
             is LaunchTrackersAnimation -> {
@@ -847,7 +854,7 @@ open class OmnibarLayout @JvmOverloads constructor(
                 context,
                 omnibarViews(),
                 shieldViews(),
-                cookieDummyView,
+                animatedIconBackgroundView,
                 cookieAnimation,
                 sceneRoot,
                 isCosmetic,
@@ -856,20 +863,32 @@ open class OmnibarLayout @JvmOverloads constructor(
         }
     }
 
-    private fun cancelTrackersAnimation() {
+    private fun cancelAddressBarAnimations() {
         if (this::animatorHelper.isInitialized) {
             animatorHelper.cancelAnimations(omnibarViews())
         }
     }
 
-    private fun startVisualDesignTrackersAnimation(events: List<Entity>?) {
-        animatorHelper.startTrackersAnimation(
-            context = context,
-            shieldAnimationView = shieldIcon,
-            trackersAnimationView = trackersAnimation,
-            omnibarViews = omnibarViews(),
-            entities = events,
-        )
+    private fun startTrackersAnimation(events: List<Entity>?) {
+        if (addressBarTrackersAnimationFeatureToggle.feature().isEnabled()) {
+            animatorHelper.startAddressBarTrackersAnimation(
+                context = context,
+                addressBarTrackersBlockedAnimationShieldIcon = addressBarTrackersBlockedAnimationShieldIcon,
+                sceneRoot = sceneRoot,
+                animatedIconBackgroundView = animatedIconBackgroundView,
+                omnibarViews = omnibarViews(),
+                shieldViews = shieldViews(),
+                entities = events,
+            )
+        } else {
+            animatorHelper.startTrackersAnimation(
+                context = context,
+                shieldAnimationView = shieldIcon,
+                trackersAnimationView = trackersAnimation,
+                omnibarViews = omnibarViews(),
+                entities = events,
+            )
+        }
     }
 
     private fun renderPrivacyShield(

@@ -742,21 +742,7 @@ class BrowserTabFragment :
             override fun onFirstPopUpHandled() {}
 
             override fun onPopUpHandled(isCosmetic: Boolean) {
-                launch {
-                    context?.let {
-                    /* TODO uncomment when sense of protection experiment shield is enabled
-                     if (senseOfProtectionExperiment.isUserEnrolledInAVariantAndExperimentEnabled() &&
-                        viewModel.trackersCount().isNotEmpty()
-                    ) {
-                        if (isCosmetic) {
-                            delay(COOKIES_ANIMATION_DELAY)
-                        }
-                        omnibar.enqueueCookiesAnimation(isCosmetic)
-                    } else {*/
-                        viewModel.onAutoConsentPopUpHandled(isCosmetic)
-                        // }
-                    }
-                }
+                viewModel.onAutoConsentPopUpHandled(isCosmetic)
             }
 
             override fun onResultReceived(
@@ -2296,6 +2282,7 @@ class BrowserTabFragment :
             }
 
             is Command.SubmitChat -> duckChat.openDuckChatWithAutoPrompt(it.query)
+            is Command.EnqueueCookiesAnimation -> enqueueCookiesAnimation(it.isCosmetic)
         }
     }
 
@@ -2319,6 +2306,17 @@ class BrowserTabFragment :
             }
             context?.let {
                 omnibar.createCookiesAnimation(isCosmetic)
+            }
+        }
+    }
+
+    private fun enqueueCookiesAnimation(isCosmetic: Boolean) {
+        launch {
+            if (isCosmetic) {
+                delay(COOKIES_ANIMATION_DELAY)
+            }
+            context?.let {
+                omnibar.enqueueCookiesAnimation(isCosmetic)
             }
         }
     }
