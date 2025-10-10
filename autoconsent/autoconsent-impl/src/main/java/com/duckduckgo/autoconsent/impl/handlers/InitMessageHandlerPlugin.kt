@@ -21,9 +21,8 @@ import androidx.core.net.toUri
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.autoconsent.api.AutoconsentCallback
 import com.duckduckgo.autoconsent.impl.MessageHandlerPlugin
-import com.duckduckgo.autoconsent.impl.SettingsCache
 import com.duckduckgo.autoconsent.impl.adapters.JSONObjectAdapter
-import com.duckduckgo.autoconsent.impl.remoteconfig.AutoconsentFeatureModels.AutoconsentSettings
+import com.duckduckgo.autoconsent.impl.cache.AutoconsentSettingsCache
 import com.duckduckgo.autoconsent.impl.store.AutoconsentSettingsRepository
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.isHttp
@@ -43,13 +42,10 @@ class InitMessageHandlerPlugin @Inject constructor(
     @AppCoroutineScope val appCoroutineScope: CoroutineScope,
     private val dispatcherProvider: DispatcherProvider,
     private val settingsRepository: AutoconsentSettingsRepository,
+    private val settingsCache: AutoconsentSettingsCache,
 ) : MessageHandlerPlugin {
 
     private val moshi = Moshi.Builder().add(JSONObjectAdapter()).build()
-
-    fun getSettings(): AutoconsentSettings? {
-        return SettingsCache.settings
-    }
 
     override fun process(messageType: String, jsonString: String, webView: WebView, autoconsentCallback: AutoconsentCallback) {
         if (supportedTypes.contains(messageType)) {
@@ -73,7 +69,7 @@ class InitMessageHandlerPlugin @Inject constructor(
                     // Reset site
                     autoconsentCallback.onResultReceived(consentManaged = false, optOutFailed = false, selfTestFailed = false, isCosmetic = false)
 
-                    val settings = getSettings() ?: return@launch
+                    val settings = settingsCache.getSettings() ?: return@launch
                     val autoAction = getAutoAction()
                     val enablePreHide = settingsRepository.userSetting
                     val detectRetries = 20
