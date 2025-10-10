@@ -37,11 +37,13 @@
     <string name="audioCaptureSoundRecorderPermissionDeniedMessage">Saidid saavad helisalvestit kasutada ainult siis, kui lubad DuckDuckGo’l küsida sellele juurdepääsu.</string>
 
     <!-- Settings -->
-    <string name="duck_chat_settings_activity_description">Duck.ai on valikuline funktsioon, mis võimaldab anonüümselt vestelda populaarsete kolmanda poole AI vestlusmudelitega. Teie vestlusi ei kasutata tehisintellekti treenimiseks.\n<annotation type="learn_more_link">Lisateave</annotation></string>
-    <string name="duck_chat_enable_duck_ai_setting">Luba Duck.ai</string>
+    <string name="duck_chat_ai_features_title">AI funktsioonid</string>
+    <string name="duck_chat_settings_activity_description">DuckDuckGo tehisintellekti funktsioonid on privaatsed ja valikulised.Sinu andmeid ei kasutata tehisintellekti treenimiseks.\n<annotation type="learn_more_link">Lisateave</annotation></string>
+    <string name="duck_chat_enable_duck_ai_setting">Duck.ai</string>
+    <string name="duck_chat_enable_duck_ai_setting_description">Vestle privaatselt populaarsete kolmanda osapoole tehisintellekti mudelitega</string>
     <string name="duck_chat_visibility_setting">Brauseri menüü</string>
     <string name="duck_chat_address_bar_visibility_setting">Aadressiriba</string>
-    <string name="duck_chat_assist_settings_title">Assisti seaded</string>
+    <string name="duck_chat_assist_settings_title">Otsingu Assist seaded</string>
     <string name="duck_chat_assist_settings_description">Vali, kui tihti soovid, et AI-toega vastused ilmuksid sinu otsingutesse</string>
     <string name="duck_ai_shortcut_settings_title">Duck.ai otseteed</string>
     <string name="duck_ai_shortcut_settings_description">Vali, milliseid Duck.ai otseteid kuvada</string>
@@ -61,14 +63,6 @@
     <string name="duck_ai_paid_settings_page_description"><![CDATA[Vestle privaatselt tellijatele mõeldud eksklusiivsete AI-mudelitega.\n<a href=\"\">Loe edasi</a>]]></string>
     <string name="duck_ai_paid_settings_open_duck_ai">Ava Duck.ai</string>
     <string name="duck_ai_paid_settings_learn_more_title">Loe edasi</string>
-
-    <!-- Rebranding-->
-    <string name="duck_chat_title_rebranding">AI funktsioonid</string>
-    <string name="duck_chat_settings_activity_description_rebranding">DuckDuckGo tehisintellekti funktsioonid on privaatsed ja valikulised.Sinu andmeid ei kasutata tehisintellekti treenimiseks.\n<annotation type="learn_more_link">Lisateave</annotation></string>
-    <string name="duck_chat_enable_duck_ai_setting_rebranding">Duck.ai</string>
-    <string name="duck_chat_enable_duck_ai_setting_description_rebranding">Vestle privaatselt populaarsete kolmanda osapoole tehisintellekti mudelitega</string>
-    <string name="duck_chat_assist_settings_title_rebranding">Otsingu Assist seaded</string>
-    <string name="duck_chat_assist_settings_description_rebranding">Vali, kui tihti soovid, et AI-toega vastused ilmuksid sinu otsingutesse</string>
 
     <!-- AutoComplete -->
     <string name="autocompleteDuckAiPrompt">Küsi Duck.ai käest</string>
