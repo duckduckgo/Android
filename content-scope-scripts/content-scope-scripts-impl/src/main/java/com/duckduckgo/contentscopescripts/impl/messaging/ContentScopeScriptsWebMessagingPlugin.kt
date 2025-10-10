@@ -197,7 +197,7 @@ class ContentScopeScriptsWebMessagingPlugin @Inject constructor(
     }
 
     override suspend fun unregister(webView: WebView) {
-        if (!webViewCompatContentScopeScripts.isEnabled()) return
+        if (!webViewCompatContentScopeScripts.isWebMessagingEnabled()) return
         runCatching {
             return@runCatching webViewCompatWrapper.removeWebMessageListener(webView, JS_OBJECT_NAME)
         }.getOrElse { exception ->
@@ -231,7 +231,7 @@ class ContentScopeScriptsWebMessagingPlugin @Inject constructor(
         subscriptionEventData: SubscriptionEventData,
     ) {
         runCatching {
-            if (!webViewCompatContentScopeScripts.isEnabled()) {
+            if (!webViewCompatContentScopeScripts.isWebMessagingEnabled()) {
                 return
             }
 
