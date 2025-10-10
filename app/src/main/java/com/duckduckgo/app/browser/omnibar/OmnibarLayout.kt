@@ -712,7 +712,7 @@ open class OmnibarLayout @JvmOverloads constructor(
         previousTransitionState = newTransitionState
 
         enableTextInputClickCatcher(viewState.showTextInputClickCatcher)
-        duckAiToggle.isVisible = viewState.viewMode == ViewMode.NewTab
+        duckAiToggle.isVisible = viewState.showDuckAIToggle
     }
 
     private fun renderBrowserMode(viewState: ViewState) {
