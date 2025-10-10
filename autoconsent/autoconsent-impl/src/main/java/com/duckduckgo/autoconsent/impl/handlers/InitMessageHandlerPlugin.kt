@@ -124,12 +124,12 @@ class InitMessageHandlerPlugin @Inject constructor(
         url: String
     ): AutoconsentRuleset {
         // If rule format is unsupported, send an empty ruleset.
-        if (rules.v > MAX_SUPPORTED_RULES_VERSION) {
+        if (rules.v > MAX_SUPPORTED_RULES_VERSION || rules.r == null || rules.s == null || rules.r.isEmpty()) {
             return AutoconsentRuleset(compact = CompactRules(v = MAX_SUPPORTED_RULES_VERSION, s = emptyList(), r = emptyList(), index = null))
         }
 
         // if an index is available, we can use it to filter more efficiently.
-        if (rules.index !== null) {
+        if (rules.index != null) {
             val genericRules = rules.r.slice(IntRange(rules.index.genericRuleRange[0], rules.index.genericRuleRange[1] - 1))
             val specificRules = rules.r.slice(IntRange(rules.index.specificRuleRange[0], rules.index.specificRuleRange[1] - 1)).filter {
                 (it[0] as Double).toInt() <= MAX_SUPPORTED_STEP_VERSION && (it[4] as Double).toInt() != 1 && (it[3] == "" || url.matches((it[3] as String).toRegex()))

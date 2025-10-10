@@ -31,7 +31,7 @@ class AutoconsentFeatureModels {
         val v: Int,
         val r: List<List<Any>>,
         val s: List<String>,
-        val index: CompactRuleIndex?
+        val index: CompactRuleIndex?,
     )
 
     data class CompactRuleIndex(
@@ -39,6 +39,6 @@ class AutoconsentFeatureModels {
         val frameRuleRange: List<Int>,
         val specificRuleRange: List<Int>,
         val genericStringEnd: Int,
-        val frameStringEnd: Int
+        val frameStringEnd: Int,
     )
 }
