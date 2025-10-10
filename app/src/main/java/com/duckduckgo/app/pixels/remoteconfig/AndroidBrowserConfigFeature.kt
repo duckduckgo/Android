@@ -21,6 +21,7 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.feature.toggles.api.Toggle.DefaultFeatureValue
 import com.duckduckgo.feature.toggles.api.Toggle.DefaultFeatureValue.FALSE
+import com.duckduckgo.feature.toggles.api.Toggle.DefaultFeatureValue.INTERNAL
 import com.duckduckgo.feature.toggles.api.Toggle.DefaultFeatureValue.TRUE
 
 /**
@@ -187,6 +188,6 @@ interface AndroidBrowserConfigFeature {
     @Toggle.DefaultValue(TRUE)
     fun updateScriptOnProtectionsChanged(): Toggle
 
-    @Toggle.DefaultValue(TRUE)
+    @Toggle.DefaultValue(INTERNAL)
     fun pauseWebViewBeforeUpdatingScript(): Toggle
 }
