@@ -55,7 +55,7 @@ class InitMessageHandlerPlugin @Inject constructor(
         messageType: String,
         jsonString: String,
         webView: WebView,
-        autoconsentCallback: AutoconsentCallback
+        autoconsentCallback: AutoconsentCallback,
     ) {
         if (supportedTypes.contains(messageType)) {
             appCoroutineScope.launch(dispatcherProvider.io()) {
@@ -118,7 +118,7 @@ class InitMessageHandlerPlugin @Inject constructor(
 
     private fun filterCompactRules(
         rules: CompactRules,
-        url: String
+        url: String,
     ): AutoconsentRuleset {
         // If rule format is unsupported, send an empty ruleset.
         if (rules.v > MAX_SUPPORTED_RULES_VERSION || rules.r == null || rules.s == null || rules.r.isEmpty()) {
@@ -129,7 +129,9 @@ class InitMessageHandlerPlugin @Inject constructor(
         if (rules.index != null) {
             val genericRules = rules.r.slice(IntRange(rules.index.genericRuleRange[0], rules.index.genericRuleRange[1] - 1))
             val specificRules = rules.r.slice(IntRange(rules.index.specificRuleRange[0], rules.index.specificRuleRange[1] - 1)).filter {
-                (it[0] as Double).toInt() <= MAX_SUPPORTED_STEP_VERSION && (it[4] as Double).toInt() != 1 && (it[3] == "" || url.matches((it[3] as String).toRegex()))
+                (it[0] as Double).toInt() <= MAX_SUPPORTED_STEP_VERSION &&
+                    (it[4] as Double).toInt() != 1 &&
+                    (it[3] == "" || url.matches((it[3] as String).toRegex()))
             }
             if (specificRules.isEmpty()) {
                 // no specific rules, return generic rules + strings up to genericStringEnd
@@ -149,14 +151,20 @@ class InitMessageHandlerPlugin @Inject constructor(
         }
         // No index: run rule and string filtering over the entire ruleset.
         val filteredRules = rules.r.filter {
-            (it[0] as Double).toInt() <= MAX_SUPPORTED_STEP_VERSION && (it[4] as Double).toInt() != 1 && (it[3] == "" || url.matches((it[3] as String).toRegex()))
+            (it[0] as Double).toInt() <= MAX_SUPPORTED_STEP_VERSION &&
+                (it[4] as Double).toInt() != 1 &&
+                (it[3] == "" || url.matches((it[3] as String).toRegex()))
         }
         val filteredStrings = filterUnusedStrings(filteredRules, rules.s, 0)
         return AutoconsentRuleset(compact = CompactRules(v = rules.v, s = filteredStrings, r = filteredRules, index = null))
     }
 
-    private fun filterUnusedStrings(rules: List<List<Any>>, strings: List<String>, offset: Int = 0): List<String> {
-        val usedStringIndices = HashSet<Int>();
+    private fun filterUnusedStrings(
+        rules: List<List<Any>>,
+        strings: List<String>,
+        offset: Int = 0,
+    ): List<String> {
+        val usedStringIndices = HashSet<Int>()
         val shortKeys = arrayOf("v", "e", "c", "h", "k", "cc", "w", "wv")
         val nestedKeys = arrayOf("then", "else", "any")
         fun addStringIdsFromRuleSteps(steps: List<Map<String, Any>>) {
@@ -168,16 +176,17 @@ class InitMessageHandlerPlugin @Inject constructor(
                     addStringIdsFromRuleSteps(listOf(s["if"] as Map<String, Any>))
                 }
                 for (k in nestedKeys) {
-                    if (s.contains(k))
+                    if (s.contains(k)) {
                         addStringIdsFromRuleSteps(s[k] as List<Map<String, Any>>)
+                    }
                 }
             }
         }
         rules.forEach {
-            addStringIdsFromRuleSteps(it[6] as List<Map<String, Any>>);
-            addStringIdsFromRuleSteps(it[7] as List<Map<String, Any>>);
-            addStringIdsFromRuleSteps(it[8] as List<Map<String, Any>>);
-            addStringIdsFromRuleSteps(it[9] as List<Map<String, Any>>);
+            addStringIdsFromRuleSteps(it[6] as List<Map<String, Any>>)
+            addStringIdsFromRuleSteps(it[7] as List<Map<String, Any>>)
+            addStringIdsFromRuleSteps(it[8] as List<Map<String, Any>>)
+            addStringIdsFromRuleSteps(it[9] as List<Map<String, Any>>)
             (it[5] as List<Int>).forEach { usedStringIndices.add(it) }
         }
         return strings.slice(IntRange(start = 0, endInclusive = usedStringIndices.max())).mapIndexed { index, str ->
@@ -187,7 +196,7 @@ class InitMessageHandlerPlugin @Inject constructor(
 
     data class InitMessage(
         val type: String,
-        val url: String
+        val url: String,
     )
 
     data class Config(
@@ -204,6 +213,6 @@ class InitMessageHandlerPlugin @Inject constructor(
     data class InitResp(
         val type: String = "initResp",
         val config: Config,
-        val rules: AutoconsentRuleset
+        val rules: AutoconsentRuleset,
     )
 }
