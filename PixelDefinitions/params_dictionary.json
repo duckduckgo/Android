@@ -12,12 +12,13 @@
     "atb": {
         "key": "atb",
         "type": "string",
-        "pattern": "v[0-9]{1,3}-[0-7]([a-z]{2})?",
+        "pattern": "^$|v[0-9]{1,3}-[0-7]([a-z]{2})?",
         "description": "Add to browser value, corresponding to the users install week and day"
     },
     "remoteConfigEtag": {
         "key": "remoteConfigEtag",
+        "type": "string",
         "description": "ETag for the remote config used when the pixel was sent.  Can be empty string.",
-        "pattern": "^$|\"[-0-9a-f]{32}\""
+        "pattern": "^$|^[-0-9a-f]{32}$"
     }
 }

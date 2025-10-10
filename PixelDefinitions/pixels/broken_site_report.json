@@ -1,7 +1,7 @@
 {
     "epbf": {
         "description": "User sent broken site report",
-        "owners": [],
+        "owners": ["laghee"],
         "triggers": ["user_submitted"],
         "suffixes": ["form_factor"],
         "parameters": [
@@ -90,12 +90,33 @@
             {
                 "key": "openerContext",
                 "description": "Reported page's opener context",
-                "enum": ["external", "navigation", "serp"]
+                "enum": ["external", "navigation", "serp", ""]
             },
             {
                 "key": "os",
                 "description": "User's operating system version",
                 "type": "string"
+            },
+            {
+                "key": "manufacturer",
+                "description": "Device manufacturer.",
+                "type": "string"
+            },
+            {
+                "key": "model",
+                "description": "Device model.",
+                "type": "string"
+            },
+            {
+                "key": "siteType",
+                "description": "Type of site version loaded.",
+                "enum": ["desktop", "mobile"]
+            },
+            {
+                "key": "loginSite",
+                "description": "Login site/domain if detected.",
+                "type": "string",
+                "enum": [""]
             },
             {
                 "key": "remoteConfigVersion",
@@ -105,7 +126,14 @@
             {
                 "key": "reportFlow",
                 "description": "The UI flow that the user used to trigger this breakage report.",
-                "enum": ["dashboard", "native", "on_protections_off_dashboard_main", "reload-three-times-within-20-seconds"]
+                "enum": [
+                    "dashboard",
+                    "menu",
+                    "on_protections_off_dashboard_main",
+                    "on_protections_off_menu",
+                    "reload-three-times-within-20-seconds",
+                    "prompt"
+                ]
             },
             {
                 "key": "siteUrl",
@@ -146,12 +174,39 @@
                 "key": "vpnOn",
                 "description": "True if the user has the DuckDuckGo VPN enabled.",
                 "enum": ["false", "true"]
+            },
+            {
+                "key": "blockListExperiment",
+                "description": "Block list experiment cohort identifier.",
+                "type": "string",
+                "pattern": "^tdsNextExperiment.*_(control|treatment)$",
+                "examples": [
+                    "tdsNextExperiment003_control",
+                    "tdsNextExperiment003_treatment",
+                    "tdsNextExperimentBaseline_control",
+                    "tdsNextExperiment002_control"
+                ]
+            },
+            {
+                "key": "debugFlags",
+                "description": "Enabled debug flags, comma-separated (may be URL-encoded).",
+                "type": "string"
+            },
+            {
+                "key": "gpc",
+                "description": "Global Privacy Control value reported.",
+                "enum": ["false", "true"]
+            },
+            {
+                "key": "urlParametersRemoved",
+                "description": "Number of removed URL parameters.",
+                "enum": ["0", "1"]
             }
         ]
     },
     "protection-toggled-off-breakage-report": {
         "description": "User agreed to send broken site report after disabling protections",
-        "owners": [],
+        "owners": ["laghee"],
         "triggers": ["user_submitted"],
         "suffixes": ["form_factor"],
         "parameters": [
@@ -291,37 +346,67 @@
     },
     "m_report-broken-site_shown": {
         "description": "User opened the broken site report UI.",
-        "owners": [],
+        "owners": ["laghee"],
         "triggers": ["other"],
         "suffixes": ["form_factor"],
-        "parameters": ["appVersion"]
+        "parameters": [
+            "appVersion",
+            "atb",
+            {
+                "key": "opener",
+                "description": "Where the report UI was opened from.",
+                "enum": [
+                    "dashboard",
+                    "menu",
+                    "on_protections_off_dashboard_main",
+                    "on_protections_off_menu",
+                    "reload-three-times-within-20-seconds",
+                    "prompt"
+                ]
+            }
+        ]
     },
     "m_report-broken-site_sent": {
         "description": "User sent a broken site report.",
-        "owners": [],
+        "owners": ["laghee"],
         "triggers": ["other"],
         "suffixes": ["form_factor"],
-        "parameters": ["appVersion"]
+        "parameters": [
+            "appVersion",
+            "atb",
+            {
+                "key": "opener",
+                "description": "Where the report UI was opened from.",
+                "enum": [
+                    "dashboard",
+                    "menu",
+                    "on_protections_off_dashboard_main",
+                    "on_protections_off_menu",
+                    "reload-three-times-within-20-seconds",
+                    "prompt"
+                ]
+            }
+        ]
     },
     "m_reload-three-times-within-20-seconds": {
         "description": "User reloaded a tab three times in a 20 second window (indicating the site could be broken).",
-        "owners": [],
+        "owners": ["laghee"],
         "triggers": ["other"],
         "suffixes": ["form_factor"],
-        "parameters": ["appVersion"]
+        "parameters": ["appVersion", "atb"]
     },
     "m_site-not-working_shown": {
         "description": "User was shown the prompt to send a broken site report after reloading a website three times in 20 seconds.",
-        "owners": [],
+        "owners": ["laghee"],
         "triggers": ["other"],
         "suffixes": ["form_factor"],
-        "parameters": ["appVersion"]
+        "parameters": ["appVersion", "atb"]
     },
     "m_site-not-working_website-is-broken": {
         "description": "User agreed to send a broken site report when prompted, after they reloaded a website three times in 20 seconds.",
-        "owners": [],
+        "owners": ["laghee"],
         "triggers": ["other"],
         "suffixes": ["form_factor"],
-        "parameters": ["appVersion"]
+        "parameters": ["appVersion", "atb"]
     }
 }
