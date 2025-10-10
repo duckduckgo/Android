@@ -254,7 +254,7 @@ class DuckChatSettingsViewModelTest {
                     DuckChatSettingsViewModel.DUCK_CHAT_SEARCH_AI_SETTINGS_LINK_EMBEDDED,
                     command.link,
                 )
-                assertEquals(R.string.duck_chat_assist_settings_title_rebranding, command.titleRes)
+                assertEquals(R.string.duck_chat_assist_settings_title, command.titleRes)
                 cancelAndIgnoreRemainingEvents()
             }
         }
