@@ -356,6 +356,7 @@ class RealPirSchedulingRepository @Inject constructor(
             EmailConfirmationJobRecord.JobAttemptData(
                 jobAttemptCount = this.jobAttemptCount,
                 lastJobAttemptDateInMillis = this.lastJobAttemptDateInMillis,
+                lastJobAttemptActionId = this.lastJobAttemptActionId,
             ),
             dateCreatedInMillis = this.dateCreatedInMillis,
             deprecated = this.deprecated,

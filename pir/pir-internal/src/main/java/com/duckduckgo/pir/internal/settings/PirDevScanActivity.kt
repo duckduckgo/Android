@@ -190,6 +190,7 @@ class PirDevScanActivity : DuckDuckGoActivity() {
         }
 
         binding.scheduleScan.setOnClickListener {
+            pirScanScheduler.cancelScheduledScans(this)
             pirScanScheduler.scheduleScans()
             Toast.makeText(this, getString(R.string.pirMessageSchedule), Toast.LENGTH_SHORT).show()
         }

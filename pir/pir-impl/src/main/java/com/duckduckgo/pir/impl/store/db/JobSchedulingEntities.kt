@@ -55,5 +55,6 @@ data class EmailConfirmationJobRecordEntity(
     val lastLinkFetchDateInMillis: Long = 0L,
     val jobAttemptCount: Int = 0,
     val lastJobAttemptDateInMillis: Long = 0L,
+    val lastJobAttemptActionId: String = "",
     val deprecated: Boolean = false,
 )
