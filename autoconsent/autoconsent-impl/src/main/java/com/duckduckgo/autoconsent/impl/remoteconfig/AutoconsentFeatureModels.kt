@@ -24,6 +24,12 @@ class AutoconsentFeatureModels {
         @field:Json(name = "disabledCMPs")
         val disabledCMPs: List<String>,
         @field:Json(name = "compactRuleList")
-        val compactRuleList: Any?,
+        val compactRuleList: CompactRules,
+    )
+
+    data class CompactRules(
+        val v: Int,
+        val r: List<List<Any>>,
+        val s: List<String>,
     )
 }

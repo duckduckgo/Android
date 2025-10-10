@@ -23,6 +23,7 @@ import com.duckduckgo.autoconsent.api.AutoconsentCallback
 import com.duckduckgo.autoconsent.impl.MessageHandlerPlugin
 import com.duckduckgo.autoconsent.impl.adapters.JSONObjectAdapter
 import com.duckduckgo.autoconsent.impl.cache.AutoconsentSettingsCache
+import com.duckduckgo.autoconsent.impl.remoteconfig.AutoconsentFeatureModels.CompactRules
 import com.duckduckgo.autoconsent.impl.store.AutoconsentSettingsRepository
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.isHttp
@@ -75,9 +76,13 @@ class InitMessageHandlerPlugin @Inject constructor(
                     val detectRetries = 20
                     val disabledCmps = settings.disabledCMPs
                     val config = Config(enabled = true, autoAction, disabledCmps, enablePreHide, detectRetries, enableCosmeticRules = true)
-                    val initResp = InitResp(config = config, rules = AutoconsentRuleset(settings.compactRuleList))
+                    val initResp = InitResp(config = config, rules = filterCompactRules(settings.compactRuleList, url))
+
 
                     val response = ReplyHandler.constructReply(getMessage(initResp))
+                    logcat {
+                        "init size: ${response.length}, from ${settings.compactRuleList.r.size} rules"
+                    }
 
                     withContext(dispatcherProvider.main()) {
                         webView.evaluateJavascript("javascript:$response", null)
@@ -105,6 +110,47 @@ class InitMessageHandlerPlugin @Inject constructor(
     private fun getMessage(initResp: InitResp): String {
         val jsonAdapter: JsonAdapter<InitResp> = moshi.adapter(InitResp::class.java).serializeNulls()
         return jsonAdapter.toJson(initResp).toString()
+    }
+
+    private fun filterCompactRules(rules: CompactRules, url: String): AutoconsentRuleset {
+        val MAX_SUPPORTED_RULES_VERSION = 1
+        val MAX_SUPPORTED_STEP_VERSON = 1
+        // If rule format is unsupported, send an empty ruleset.
+        if (rules.v > MAX_SUPPORTED_RULES_VERSION) {
+            return AutoconsentRuleset(compact = CompactRules(v = MAX_SUPPORTED_RULES_VERSION, s = emptyList(), r = emptyList()))
+        }
+
+        val filteredRules = rules.r.filter {
+            (it[0] as Double).toInt() <= MAX_SUPPORTED_STEP_VERSON && (it[4] as Double).toInt() != 1 && (it[3] == "" || url.matches((it[3] as String).toRegex()))
+        }
+        val usedStringIndices = HashSet<Int>();
+        val shortKeys = arrayOf("v", "e", "c", "h", "k", "cc", "w", "wv")
+        val nestedKeys = arrayOf("then", "else", "any")
+        fun addStringIdsFromRuleSteps (steps: List<Map<String, Any>>) {
+            for (s in steps) {
+                for (k in shortKeys) {
+                    if (s.contains(k)) usedStringIndices.add((s[k] as Double).toInt())
+                }
+                if (s.contains("if")) {
+                    addStringIdsFromRuleSteps(listOf(s["if"] as Map<String, Any>))
+                }
+                for (k in nestedKeys) {
+                    if (s.contains(k))
+                        addStringIdsFromRuleSteps(s[k] as List<Map<String, Any>>)
+                }
+            }
+        }
+        filteredRules.forEach {
+            addStringIdsFromRuleSteps(it[6] as List<Map<String, Any>>);
+            addStringIdsFromRuleSteps(it[7] as List<Map<String, Any>>);
+            addStringIdsFromRuleSteps(it[8] as List<Map<String, Any>>);
+            addStringIdsFromRuleSteps(it[9] as List<Map<String, Any>>);
+            (it[5] as List<Int>).forEach { usedStringIndices.add(it) }
+        }
+        val filteredStrings: List<String> = rules.s.slice(IntRange(start=0, endInclusive = usedStringIndices.max())).mapIndexed { index, str ->
+            if (usedStringIndices.contains(index)) str else ""
+        }
+        return AutoconsentRuleset(compact = CompactRules(v = rules.v, s = filteredStrings, r = filteredRules))
     }
 
     data class InitMessage(val type: String, val url: String)
