@@ -22,10 +22,4 @@ interface SubscriptionRebrandingFeatureToggle {
      * @return true if the subscription rebranding feature is enabled, false otherwise
      */
     fun isSubscriptionRebrandingEnabled(): Boolean
-
-    /**
-     * This method is safe to call from the main thread.
-     * @return true if the AI Features rebranding feature is enabled, false otherwise
-     */
-    fun isAIFeaturesRebrandingEnabled(): Boolean
 }

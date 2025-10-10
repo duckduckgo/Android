@@ -20,6 +20,6 @@
     android:id="@+id/duckChatSetting"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    app:primaryText="@string/settingsDuckAiRebranding"
+    app:primaryText="@string/settingsDuckAi"
     app:leadingIcon="@drawable/ai_general_color_24"
     app:showNewPill="true" />

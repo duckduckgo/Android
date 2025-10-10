@@ -38,8 +38,6 @@ import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.spans.DuckDuckGoClickableSpan
 import com.duckduckgo.common.ui.store.AppTheme
 import com.duckduckgo.common.ui.view.addClickableSpan
-import com.duckduckgo.common.ui.view.gone
-import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.duckchat.api.DuckChatSettingsNoParams
@@ -121,11 +119,11 @@ class DuckChatSettingsActivity : DuckDuckGoActivity() {
         val orientation = resources.configuration.orientation
         binding.duckAiInputScreenToggleContainer.updatePadding(
             left =
-                if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
-                    0
-                } else {
-                    offset
-                },
+            if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
+                0
+            } else {
+                offset
+            },
         )
         binding.duckAiInputScreenDescription.updatePadding(left = offset)
         binding.duckAiShortcuts.updatePadding(left = offset)

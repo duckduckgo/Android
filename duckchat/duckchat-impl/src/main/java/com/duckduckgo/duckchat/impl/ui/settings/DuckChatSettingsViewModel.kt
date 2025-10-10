@@ -30,7 +30,6 @@ import com.duckduckgo.duckchat.impl.ui.settings.DuckChatSettingsViewModel.Comman
 import com.duckduckgo.duckchat.impl.ui.settings.DuckChatSettingsViewModel.Command.OpenLinkInNewTab
 import com.duckduckgo.duckchat.impl.ui.settings.DuckChatSettingsViewModel.Command.OpenShortcutSettings
 import com.duckduckgo.settings.api.SettingsPageFeature
-import com.duckduckgo.subscriptions.api.SubscriptionRebrandingFeatureToggle
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.SharingStarted
