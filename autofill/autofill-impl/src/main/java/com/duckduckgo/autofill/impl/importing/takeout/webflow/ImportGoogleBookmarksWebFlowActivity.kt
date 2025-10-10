@@ -245,7 +245,7 @@ class ImportGoogleBookmarksWebFlowActivity :
     }
 
     override fun showLoadingState() {
-        showProgressOverlay()
+        //showProgressOverlay()
     }
 
     override fun hideLoadingState() {
