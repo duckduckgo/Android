@@ -112,54 +112,26 @@ class DuckChatSettingsActivity : DuckDuckGoActivity() {
     }
 
     private fun renderViewState(viewState: ViewState) {
-        if (viewState.isRebrandingAiFeaturesEnabled) {
-            binding.includeToolbar.toolbar.title = getString(R.string.duck_chat_title_rebranding)
-            binding.duckChatSettingsIcon.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_ai_128))
-            binding.userEnabledDuckChatToggleRebranding.quietlySetIsChecked(viewState.isDuckChatUserEnabled, userEnabledDuckChatToggleListener)
-            binding.duckChatSettingsTitle.setText(R.string.duck_chat_title_rebranding)
-            binding.userEnabledDuckChatToggle.gone()
-            binding.userEnabledDuckChatToggleRebranding.show()
-            binding.showDuckChatSearchSettingsLink.setPrimaryText(getString(R.string.duck_chat_assist_settings_title_rebranding))
-            binding.showDuckChatSearchSettingsLink.setSecondaryText(getString(R.string.duck_chat_assist_settings_description_rebranding))
+        binding.userEnabledDuckChatToggle.quietlySetIsChecked(viewState.isDuckChatUserEnabled, userEnabledDuckChatToggleListener)
 
-            // align content with the main Duck.ai toggle's text
-            val offset =
-                resources.getDimensionPixelSize(CommonR.dimen.listItemImageContainerSize) +
-                    resources.getDimensionPixelSize(CommonR.dimen.keyline_4)
-            val orientation = resources.configuration.orientation
-            binding.duckAiInputScreenToggleContainer.updatePadding(
-                left =
+        // align content with the main Duck.ai toggle's text
+        val offset =
+            resources.getDimensionPixelSize(CommonR.dimen.listItemImageContainerSize) +
+                resources.getDimensionPixelSize(CommonR.dimen.keyline_4)
+        val orientation = resources.configuration.orientation
+        binding.duckAiInputScreenToggleContainer.updatePadding(
+            left =
                 if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
                     0
                 } else {
                     offset
                 },
-            )
-            binding.duckAiInputScreenDescription.updatePadding(left = offset)
-            binding.duckAiShortcuts.updatePadding(left = offset)
-        } else {
-            binding.includeToolbar.toolbar.title = getString(R.string.duck_ai_paid_settings_title)
-            binding.duckChatSettingsIcon.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.chat_private_128))
-            binding.userEnabledDuckChatToggle.quietlySetIsChecked(viewState.isDuckChatUserEnabled, userEnabledDuckChatToggleListener)
-            binding.duckChatSettingsTitle.setText(R.string.duck_chat_title)
-            binding.userEnabledDuckChatToggle.show()
-            binding.userEnabledDuckChatToggleRebranding.gone()
-            binding.showDuckChatSearchSettingsLink.setPrimaryText(getString(R.string.duck_chat_assist_settings_title))
-            binding.showDuckChatSearchSettingsLink.setSecondaryText(getString(R.string.duck_chat_assist_settings_description))
-
-            val offset = 0
-            binding.duckAiInputScreenToggleContainer.updatePadding(left = offset)
-            binding.duckAiInputScreenDescription.updatePadding(left = offset)
-            binding.duckAiShortcuts.updatePadding(left = offset)
-        }
+        )
+        binding.duckAiInputScreenDescription.updatePadding(left = offset)
+        binding.duckAiShortcuts.updatePadding(left = offset)
 
         binding.duckChatSettingsText.addClickableSpan(
-            textSequence =
-            if (viewState.isRebrandingAiFeaturesEnabled) {
-                getText(R.string.duck_chat_settings_activity_description_rebranding)
-            } else {
-                getText(R.string.duck_chat_settings_activity_description)
-            },
+            textSequence = getText(R.string.duck_chat_settings_activity_description),
             spans =
             listOf(
                 "learn_more_link" to
