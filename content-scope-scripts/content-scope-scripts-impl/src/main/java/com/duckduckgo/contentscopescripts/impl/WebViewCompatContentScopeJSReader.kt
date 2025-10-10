@@ -26,7 +26,6 @@ import javax.inject.Inject
 
 interface WebViewCompatContentScopeJSReader {
     suspend fun getContentScopeJS(): String
-    suspend fun getNoWebMessagingContentScopeJS(): String
 }
 
 @SingleInstanceIn(AppScope::class)
@@ -42,13 +41,6 @@ class RealWebViewCompatContentScopeJSReader @Inject constructor(
             contentScopeJS = loadJs("adsjsContentScope.js")
         }
         return contentScopeJS
-    }
-
-    override suspend fun getNoWebMessagingContentScopeJS(): String {
-        if (!this@RealWebViewCompatContentScopeJSReader::noWebMessagingContentScopeJS.isInitialized) {
-            noWebMessagingContentScopeJS = loadJs("adsjsContentScopeLM.js")
-        }
-        return noWebMessagingContentScopeJS
     }
 
     private suspend fun loadJs(resourceName: String): String = readResource(resourceName).use { it?.readText() }.orEmpty()

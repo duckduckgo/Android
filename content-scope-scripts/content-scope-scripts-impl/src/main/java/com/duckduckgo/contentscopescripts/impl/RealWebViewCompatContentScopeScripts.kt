@@ -177,11 +177,7 @@ class RealWebViewCompatContentScopeScripts @Inject constructor(
     }
 
     private suspend fun cacheJs() {
-        val adsContentScopeJs = if (isWebMessagingEnabled()) {
-            webViewCompatContentScopeJSReader.getContentScopeJS()
-        } else {
-            webViewCompatContentScopeJSReader.getNoWebMessagingContentScopeJS()
-        }
+        val adsContentScopeJs = webViewCompatContentScopeJSReader.getContentScopeJS()
 
         cachedAdsJS = adsContentScopeJs
             .replace(contentScope, cachedContentScopeJson)
