@@ -38,6 +38,9 @@ import kotlinx.coroutines.withContext
 import logcat.logcat
 import javax.inject.Inject
 
+const val MAX_SUPPORTED_RULES_VERSION = 1
+const val MAX_SUPPORTED_STEP_VERSION = 1
+
 @ContributesMultibinding(AppScope::class)
 class InitMessageHandlerPlugin @Inject constructor(
     @AppCoroutineScope val appCoroutineScope: CoroutineScope,
@@ -48,7 +51,12 @@ class InitMessageHandlerPlugin @Inject constructor(
 
     private val moshi = Moshi.Builder().add(JSONObjectAdapter()).build()
 
-    override fun process(messageType: String, jsonString: String, webView: WebView, autoconsentCallback: AutoconsentCallback) {
+    override fun process(
+        messageType: String,
+        jsonString: String,
+        webView: WebView,
+        autoconsentCallback: AutoconsentCallback
+    ) {
         if (supportedTypes.contains(messageType)) {
             appCoroutineScope.launch(dispatcherProvider.io()) {
                 try {
@@ -77,7 +85,6 @@ class InitMessageHandlerPlugin @Inject constructor(
                     val disabledCmps = settings.disabledCMPs
                     val config = Config(enabled = true, autoAction, disabledCmps, enablePreHide, detectRetries, enableCosmeticRules = true)
                     val initResp = InitResp(config = config, rules = filterCompactRules(settings.compactRuleList, url))
-
 
                     val response = ReplyHandler.constructReply(getMessage(initResp))
                     logcat {
@@ -112,21 +119,50 @@ class InitMessageHandlerPlugin @Inject constructor(
         return jsonAdapter.toJson(initResp).toString()
     }
 
-    private fun filterCompactRules(rules: CompactRules, url: String): AutoconsentRuleset {
-        val MAX_SUPPORTED_RULES_VERSION = 1
-        val MAX_SUPPORTED_STEP_VERSON = 1
+    private fun filterCompactRules(
+        rules: CompactRules,
+        url: String
+    ): AutoconsentRuleset {
         // If rule format is unsupported, send an empty ruleset.
         if (rules.v > MAX_SUPPORTED_RULES_VERSION) {
-            return AutoconsentRuleset(compact = CompactRules(v = MAX_SUPPORTED_RULES_VERSION, s = emptyList(), r = emptyList()))
+            return AutoconsentRuleset(compact = CompactRules(v = MAX_SUPPORTED_RULES_VERSION, s = emptyList(), r = emptyList(), index = null))
         }
 
-        val filteredRules = rules.r.filter {
-            (it[0] as Double).toInt() <= MAX_SUPPORTED_STEP_VERSON && (it[4] as Double).toInt() != 1 && (it[3] == "" || url.matches((it[3] as String).toRegex()))
+        // if an index is available, we can use it to filter more efficiently.
+        if (rules.index !== null) {
+            val genericRules = rules.r.slice(IntRange(rules.index.genericRuleRange[0], rules.index.genericRuleRange[1] - 1))
+            val specificRules = rules.r.slice(IntRange(rules.index.specificRuleRange[0], rules.index.specificRuleRange[1] - 1)).filter {
+                (it[0] as Double).toInt() <= MAX_SUPPORTED_STEP_VERSION && (it[4] as Double).toInt() != 1 && (it[3] == "" || url.matches((it[3] as String).toRegex()))
+            }
+            if (specificRules.isEmpty()) {
+                // no specific rules, return generic rules + strings up to genericStringEnd
+                return AutoconsentRuleset(
+                    compact = CompactRules(
+                        v = rules.v,
+                        s = rules.s.slice(IntRange(0, rules.index.genericStringEnd - 1)),
+                        r = genericRules,
+                        index = null,
+                    ),
+                )
+            }
+            // combine generic and specific rules, then filter out strings after genericStringEnd that are not used by matched specificRules.
+            val filteredRules = genericRules + specificRules
+            val filteredStrings = filterUnusedStrings(specificRules, rules.s, rules.index.genericStringEnd)
+            return AutoconsentRuleset(compact = CompactRules(v = rules.v, s = filteredStrings, r = filteredRules, index = null))
         }
+        // No index: run rule and string filtering over the entire ruleset.
+        val filteredRules = rules.r.filter {
+            (it[0] as Double).toInt() <= MAX_SUPPORTED_STEP_VERSION && (it[4] as Double).toInt() != 1 && (it[3] == "" || url.matches((it[3] as String).toRegex()))
+        }
+        val filteredStrings = filterUnusedStrings(filteredRules, rules.s, 0)
+        return AutoconsentRuleset(compact = CompactRules(v = rules.v, s = filteredStrings, r = filteredRules, index = null))
+    }
+
+    private fun filterUnusedStrings(rules: List<List<Any>>, strings: List<String>, offset: Int = 0): List<String> {
         val usedStringIndices = HashSet<Int>();
         val shortKeys = arrayOf("v", "e", "c", "h", "k", "cc", "w", "wv")
         val nestedKeys = arrayOf("then", "else", "any")
-        fun addStringIdsFromRuleSteps (steps: List<Map<String, Any>>) {
+        fun addStringIdsFromRuleSteps(steps: List<Map<String, Any>>) {
             for (s in steps) {
                 for (k in shortKeys) {
                     if (s.contains(k)) usedStringIndices.add((s[k] as Double).toInt())
@@ -140,20 +176,22 @@ class InitMessageHandlerPlugin @Inject constructor(
                 }
             }
         }
-        filteredRules.forEach {
+        rules.forEach {
             addStringIdsFromRuleSteps(it[6] as List<Map<String, Any>>);
             addStringIdsFromRuleSteps(it[7] as List<Map<String, Any>>);
             addStringIdsFromRuleSteps(it[8] as List<Map<String, Any>>);
             addStringIdsFromRuleSteps(it[9] as List<Map<String, Any>>);
             (it[5] as List<Int>).forEach { usedStringIndices.add(it) }
         }
-        val filteredStrings: List<String> = rules.s.slice(IntRange(start=0, endInclusive = usedStringIndices.max())).mapIndexed { index, str ->
-            if (usedStringIndices.contains(index)) str else ""
+        return strings.slice(IntRange(start = 0, endInclusive = usedStringIndices.max())).mapIndexed { index, str ->
+            if (index <= offset || usedStringIndices.contains(index)) str else ""
         }
-        return AutoconsentRuleset(compact = CompactRules(v = rules.v, s = filteredStrings, r = filteredRules))
     }
 
-    data class InitMessage(val type: String, val url: String)
+    data class InitMessage(
+        val type: String,
+        val url: String
+    )
 
     data class Config(
         val enabled: Boolean,
@@ -166,5 +204,9 @@ class InitMessageHandlerPlugin @Inject constructor(
 
     data class AutoconsentRuleset(val compact: Any?)
 
-    data class InitResp(val type: String = "initResp", val config: Config, val rules: AutoconsentRuleset)
+    data class InitResp(
+        val type: String = "initResp",
+        val config: Config,
+        val rules: AutoconsentRuleset
+    )
 }
