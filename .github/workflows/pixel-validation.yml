@@ -1,9 +1,9 @@
 name: Pixel Schema Validation
 
 on:
-    push:
-        branches: [develop]
     pull_request:
+      paths:
+      - 'PixelDefinitions/**'
 
 jobs:
     pixel-validation:
