@@ -15,6 +15,7 @@ import com.duckduckgo.autofill.impl.importing.gpm.feature.AutofillImportPassword
 import com.duckduckgo.autofill.impl.importing.gpm.webflow.ImportGooglePasswordsWebFlowViewModel.Command.InjectCredentialsFromReauth
 import com.duckduckgo.autofill.impl.importing.gpm.webflow.ImportGooglePasswordsWebFlowViewModel.Command.NoCredentialsAvailable
 import com.duckduckgo.autofill.impl.importing.gpm.webflow.ImportGooglePasswordsWebFlowViewModel.Command.PromptUserToSelectFromStoredCredentials
+import com.duckduckgo.autofill.impl.importing.gpm.webflow.ImportGooglePasswordsWebFlowViewModel.UserCannotImportReason.WebViewCrash
 import com.duckduckgo.autofill.impl.importing.gpm.webflow.ImportGooglePasswordsWebFlowViewModel.ViewState.LoadStartPage
 import com.duckduckgo.autofill.impl.importing.gpm.webflow.ImportGooglePasswordsWebFlowViewModel.ViewState.NavigatingBack
 import com.duckduckgo.autofill.impl.importing.gpm.webflow.ImportGooglePasswordsWebFlowViewModel.ViewState.UserCancelledImportFlow
@@ -317,6 +318,15 @@ class ImportGooglePasswordsWebFlowViewModelTest {
         val result = testee.getReauthData(url)
 
         assertEquals(expectedReauthData, result)
+    }
+
+    @Test
+    fun whenOnWebViewCrashThenUserFinishedCannotImportWithWebViewCrash() = runTest {
+        testee.onWebViewCrash()
+        testee.viewState.test {
+            val viewState = awaitItem() as UserFinishedCannotImport
+            assertEquals(WebViewCrash, viewState.reason)
+        }
     }
 
     private fun configureReAuthenticationFeatureFlagEnabled() {

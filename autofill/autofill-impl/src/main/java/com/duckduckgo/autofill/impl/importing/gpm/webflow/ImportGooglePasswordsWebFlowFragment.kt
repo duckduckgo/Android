@@ -58,7 +58,7 @@ import com.duckduckgo.autofill.impl.importing.gpm.webflow.ImportGooglePasswordsW
 import com.duckduckgo.autofill.impl.importing.gpm.webflow.ImportGooglePasswordsWebFlowViewModel.ViewState.UserFinishedCannotImport
 import com.duckduckgo.autofill.impl.importing.gpm.webflow.ImportGooglePasswordsWebFlowViewModel.ViewState.UserFinishedImportFlow
 import com.duckduckgo.autofill.impl.importing.gpm.webflow.ImportGooglePasswordsWebFlowViewModel.ViewState.WebContentShowing
-import com.duckduckgo.autofill.impl.importing.gpm.webflow.ImportGooglePasswordsWebFlowWebViewClient.NewPageCallback
+import com.duckduckgo.autofill.impl.importing.gpm.webflow.ImportGooglePasswordsWebFlowWebViewClient.WebFlowCallback
 import com.duckduckgo.autofill.impl.importing.gpm.webflow.autofill.NoOpAutofillEventListener
 import com.duckduckgo.autofill.impl.importing.gpm.webflow.autofill.NoOpEmailProtectionInContextSignupFlowListener
 import com.duckduckgo.autofill.impl.importing.gpm.webflow.autofill.NoOpEmailProtectionUserPromptListener
@@ -82,7 +82,7 @@ import javax.inject.Inject
 @InjectWith(FragmentScope::class)
 class ImportGooglePasswordsWebFlowFragment :
     DuckDuckGoFragment(R.layout.fragment_import_google_passwords_webflow),
-    NewPageCallback,
+    WebFlowCallback,
     InternalCallback,
     NoOpEmailProtectionInContextSignupFlowListener,
     NoOpEmailProtectionUserPromptListener,
@@ -353,6 +353,10 @@ class ImportGooglePasswordsWebFlowFragment :
                 browserAutofillConfigurator.configureAutofillForCurrentPage(it.webView, url, reauthDetails)
             }
         }
+    }
+
+    override fun onWebViewCrash() {
+        viewModel.onWebViewCrash()
     }
 
     private suspend fun showCredentialChooserDialog(
