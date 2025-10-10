@@ -134,7 +134,7 @@
             android:layout_height="match_parent"
             android:layout_weight="1" />
 
-        <com.duckduckgo.app.browser.tabswitcher.ExperimentalTabSwitcherButton
+        <com.duckduckgo.browser.ui.tabs.TabSwitcherButton
             android:id="@+id/tabsButton"
             android:layout_width="@dimen/bottomNavIconContainer"
             android:layout_height="@dimen/bottomNavIconContainer" />
