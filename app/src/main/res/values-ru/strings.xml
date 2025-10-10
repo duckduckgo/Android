@@ -169,6 +169,7 @@
     <string name="settingsAddressBarPosition">Настроить положение адресной строки</string>
     <string name="settingsEnableVoiceSearch">Включить конфиденциальный голосовой поиск</string>
     <string name="settingsDDGOnOtherPlatforms">DuckDuckGo для других платформ</string>
+    <string name="settingsDuckAi">Функции ИИ</string>
 
     <!-- Private Search -->
     <string name="privateSearchActivityTitle">Частный поиск</string>
@@ -962,8 +963,6 @@
     <!-- Privacy Pro Rebranding-->
     <string name="aboutDescriptionBrandUpdate2025Rebranding">Welcome to the Duck Side!\n\nDuckDuckGo — независимая компания, которая обеспечивает защиту личной информации в интернете тем, кто хочет вернуть себе контроль над собственными данными.\n\nМы считаем, что лучший способ защитить личную информацию от хакеров, мошенников и навязчивых компаний — полностью пресечь ее сбор. Вот почему миллионы людей <annotation type="chart_comparison">выбирают DuckDuckGo вместо Chrome и других браузеров</annotation> для поиска и просмотра сайтов. Наша встроенная поисковая система работает точно так же, как Google, только не отслеживает ваши запросы. А попытки других компаний собрать ваши данные пресекаются такими защитными функциями, как блокировка рекламных трекеров и куки-файлов. К тому же наш браузер работает бесплатно: мы получаем доход от <annotation type="privacy_respecting_ads">показа рекламных объявлений</annotation>, а не от продажи ваших персональных данных.\n\nВдобавок мы предлагаем подписку <annotation type="ppro_help_page">DuckDuckGo</annotation>, интегрированную прямо в наш браузер. Ее обладателям открываются расширенные возможности — быстрая и удобная служба <annotation type="vpn_help_page">VPN</annotation> для защиты онлайн-активности, передовые ИИ-модели в чат-сервисе Duck.ai, услуга по обнаружению и удалению личной информации с сайтов поиска людей, а также восстановление данных после «кражи личности».\n\nЕсли вы хотите вернуть себе контроль над личной информацией, выбирайте браузер, созданный для защиты, а не сбора данных.</string>
     <string name="onboardingPrivacyProDaxDialogDescriptionRebranding"><![CDATA[DuckDuckGo также предлагает <b>платную подписку</b> с надежной службой <b>VPN</b> и <b>современными приватными ИИ-моделями</b>.]]></string>
-    <string name="settingsDuckAiRebranding">Функции ИИ</string>
-    <string name="settingsDuckAi">Duck.ai</string>
 
     <!--TabSwitcher Trackers Animation-->
     <string name="showTrackerCountInTabSwitcher">Показывать счетчик трекеров в переключателе вкладок</string>
