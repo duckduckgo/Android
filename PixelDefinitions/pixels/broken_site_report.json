@@ -22,9 +22,7 @@
                     "blocked",
                     "dislike",
                     "empty-spaces",
-                    "images",
                     "layout",
-                    "links",
                     "login",
                     "other",
                     "paywall",
@@ -113,7 +111,7 @@
             },
             {
                 "key": "loginSite",
-                "description": "Login site/domain if detected.",
+                "description": "Login site/domain if supplied.",
                 "type": "string",
                 "enum": [""]
             },
@@ -161,7 +159,7 @@
             },
             {
                 "key": "wvVersion",
-                "description": "User's runtime WebView2 version",
+                "description": "User's runtime WebView version",
                 "type": "string"
             },
             {
@@ -198,7 +196,7 @@
             },
             {
                 "key": "urlParametersRemoved",
-                "description": "Number of removed URL parameters.",
+                "description": "Whether URL parameters were removed.",
                 "enum": ["0", "1"]
             }
         ]
@@ -269,7 +267,7 @@
             {
                 "key": "openerContext",
                 "description": "Reported page's opener context",
-                "enum": ["external", "navigation", "serp"]
+                "enum": ["external", "navigation", "serp", ""]
             },
             {
                 "key": "os",
@@ -289,7 +287,7 @@
             {
                 "key": "reportFlow",
                 "description": "The UI flow that the user used to trigger this breakage report.",
-                "enum": ["dashboard", "native", "on_protections_off_dashboard_main"]
+                "enum": ["on_protections_off_menu", "on_protections_off_dashboard_main"]
             },
             {
                 "key": "siteUrl",
@@ -323,23 +321,8 @@
             },
             {
                 "key": "wvVersion",
-                "description": "User's runtime WebView2 version",
+                "description": "User's runtime WebView version",
                 "type": "string"
-            },
-            {
-                "key": "wvEvents",
-                "description": "List of WebView events related to the page loading. URL encoded JSON array.",
-                "type": "string"
-            },
-            {
-                "key": "wvFailures",
-                "description": "List of WebView failures that happened during the tab lifetime. URL encoded JSON array.",
-                "type": "string"
-            },
-            {
-                "key": "isPirEnabled",
-                "description": "True if the user has the DuckDuckGo Personal Information Retrieval enabled.",
-                "enum": ["false", "true"]
             }
         ]
     },
@@ -379,10 +362,9 @@
                 "enum": [
                     "dashboard",
                     "menu",
-                    "on_protections_off_dashboard_main",
-                    "on_protections_off_menu",
                     "reload-three-times-within-20-seconds",
-                    "prompt"
+                    "prompt",
+                    ""
                 ]
             }
         ]
