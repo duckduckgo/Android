@@ -160,22 +160,13 @@ class PirWebSaveProfileMessageHandler @Inject constructor(
             profileQueryIdsToDelete = profileQueriesToRemove.map { it.id },
         ).also {
             // remove all job records for the profile queries that have been removed as they are no longer needed
-            profileQueriesToRemove.forEach { profileQuery ->
-                jobRecordUpdater.removeJobRecordsForProfile(profileQuery.id, emptyList())
+            if (profileQueriesToRemove.isNotEmpty()) {
+                jobRecordUpdater.removeAllJobRecordsForProfiles(profileQueriesToRemove.map { it.id })
             }
 
+            // keep only job records for brokers that have extracted profiles for the given profile query
             if (profileQueriesToUpdate.isNotEmpty()) {
-                // keep only job records for brokers that have extracted profiles for the given profile query
-                profileQueriesToUpdate.forEach { profileQuery ->
-                    val brokersToExclude = extractedProfilesMap[profileQuery.id]
-                        ?.map { it.brokerName }
-                        ?.distinct()
-                        .orEmpty()
-
-                    if (brokersToExclude.isNotEmpty()) {
-                        jobRecordUpdater.removeJobRecordsForProfile(profileQuery.id, brokersToExclude)
-                    }
-                }
+                jobRecordUpdater.removeScanJobRecordsWithNoMatchesForProfiles(profileQueriesToUpdate.map { it.id })
             }
         }
     }

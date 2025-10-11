@@ -306,10 +306,10 @@ class RealEligibleOptOutJobProviderTest {
     }
 
     @Test
-    fun whenGetAllEligibleOptOutJobsWithInvalidStatusThenReturnEmpty() = runTest {
-        val invalidOptOutRecord = optOutJobRecordNotExecuted.copy(status = OptOutJobStatus.INVALID)
+    fun whenGetAllEligibleOptOutJobsWithDeprecatedStatusThenReturnEmpty() = runTest {
         whenever(mockPirRepository.getAllBrokerSchedulingConfigs()).thenReturn(listOf(brokerSchedulingConfig))
-        whenever(mockPirSchedulingRepository.getAllValidOptOutJobRecords()).thenReturn(listOf(invalidOptOutRecord))
+        // deprecated records get filtered out at the repository level
+        whenever(mockPirSchedulingRepository.getAllValidOptOutJobRecords()).thenReturn(emptyList())
 
         val result = testee.getAllEligibleOptOutJobs(currentTimeMillis)
 

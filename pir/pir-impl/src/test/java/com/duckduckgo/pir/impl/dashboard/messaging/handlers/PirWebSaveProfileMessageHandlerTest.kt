@@ -378,7 +378,7 @@ class PirWebSaveProfileMessageHandlerTest {
             profileQueryIdsToDelete = listOf(1L),
         )
         verifyResponse(jsMessage, true, mockJsMessaging)
-        verify(mockJobRecordUpdater).removeJobRecordsForProfile(1L, emptyList())
+        verify(mockJobRecordUpdater).removeAllJobRecordsForProfiles(listOf(1L))
     }
 
     private fun createProfileQuery(

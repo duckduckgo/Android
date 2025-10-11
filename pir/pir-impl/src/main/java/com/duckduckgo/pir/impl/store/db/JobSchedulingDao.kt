@@ -91,25 +91,28 @@ interface JobSchedulingDao {
     @Query("DELETE from pir_scan_job_record")
     fun deleteAllScanJobRecords()
 
-    @Query("DELETE from pir_scan_job_record WHERE userProfileId = :profileQueryId AND brokerName NOT IN (:brokersToExclude)")
-    fun deleteScanJobRecordsForProfile(profileQueryId: Long, brokersToExclude: List<String>)
+    @Query("DELETE from pir_scan_job_record WHERE userProfileId IN (:profileQueryIds)")
+    fun deleteScanJobRecordsForProfiles(profileQueryIds: List<Long>)
+
+    @Query("DELETE from pir_scan_job_record WHERE userProfileId IN (:profileQueryIds) AND status != 'MATCHES_FOUND'")
+    fun deleteScanJobRecordsWithoutMatchesForProfiles(profileQueryIds: List<Long>)
 
     @Query("DELETE from pir_optout_job_record")
     fun deleteAllOptOutJobRecords()
 
-    @Query("DELETE from pir_optout_job_record WHERE userProfileId = :profileQueryId AND brokerName NOT IN (:brokersToExclude)")
-    fun deleteOptOutJobRecordsForProfile(profileQueryId: Long, brokersToExclude: List<String>)
+    @Query("DELETE from pir_optout_job_record WHERE userProfileId IN (:profileQueryIds)")
+    fun deleteOptOutJobRecordsForProfiles(profileQueryIds: List<Long>)
 
     @Query("DELETE from pir_email_confirmation_job_record")
     fun deleteAllEmailConfirmationJobRecords()
 
-    @Query("DELETE from pir_email_confirmation_job_record WHERE userProfileId = :profileQueryId AND brokerName NOT IN (:brokersToExclude)")
-    fun deleteEmailConfirmationJobRecordsForProfile(profileQueryId: Long, brokersToExclude: List<String>)
+    @Query("DELETE from pir_email_confirmation_job_record WHERE userProfileId IN (:profileQueryIds)")
+    fun deleteEmailConfirmationJobRecordsForProfiles(profileQueryIds: List<Long>)
 
     @Transaction
-    fun deleteJobRecordsForProfile(profileQueryId: Long, brokersToExclude: List<String>) {
-        deleteScanJobRecordsForProfile(profileQueryId, brokersToExclude)
-        deleteOptOutJobRecordsForProfile(profileQueryId, brokersToExclude)
-        deleteEmailConfirmationJobRecordsForProfile(profileQueryId, brokersToExclude)
+    fun deleteJobRecordsForProfiles(profileQueryIds: List<Long>) {
+        deleteScanJobRecordsForProfiles(profileQueryIds)
+        deleteOptOutJobRecordsForProfiles(profileQueryIds)
+        deleteEmailConfirmationJobRecordsForProfiles(profileQueryIds)
     }
 }

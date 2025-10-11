@@ -80,15 +80,20 @@ interface PirSchedulingRepository {
     suspend fun deleteAllScanJobRecords()
 
     /**
-     * Deletes all job records for the given [profileQueryId] except the ones that belong to the brokers in [brokersToExclude].
+     * Deletes all job records for the given [profileQueryIds].
      *
-     * This is used when a profile is deleted by the user, but we want to keep the job records for the brokers
-     * that have an extracted profile associated to it to continue running jobs on them.
+     * This is used when a profile is deleted by the user and doesn't have any extracted profile associated to it
+     * and we should no longer run any jobs on it.
      */
-    suspend fun deleteJobRecordsForProfile(
-        profileQueryId: Long,
-        brokersToExclude: List<String>,
-    )
+    suspend fun deleteJobRecordsForProfiles(profileQueryIds: List<Long>)
+
+    /**
+     * Deletes all scan job records for the given [profileQueryIds] that are do not have status MATCHES_FOUND.
+     *
+     * This is used when a profile is deleted by the user, but we want to keep the scan job records for the brokers
+     * that have an extracted profile associated to it to continue running scan jobs on them.
+     */
+    suspend fun deleteScanJobRecordsWithoutMatchesForProfiles(profileQueryIds: List<Long>)
 
     suspend fun deleteAllOptOutJobRecords()
 
@@ -120,8 +125,8 @@ class RealPirSchedulingRepository @Inject constructor(
             return@withContext jobSchedulingDao
                 .getAllScanJobRecords()
                 .map { it.toRecord() }
-                // do not pick-up deprecated jobs as they belong to invalid/removed profiles
-                .filter { it.status != ScanJobStatus.INVALID && !it.deprecated }
+                // do not pick-up deprecated jobs as they belong to removed profiles
+                .filter { !it.deprecated }
         }
 
     override suspend fun getValidScanJobRecord(
@@ -132,8 +137,8 @@ class RealPirSchedulingRepository @Inject constructor(
             return@withContext jobSchedulingDao
                 .getScanJobRecord(brokerName, userProfileId)
                 ?.run { this.toRecord() }
-                // do not pick-up deprecated jobs as they belong to invalid/removed profiles
-                ?.takeIf { it.status != ScanJobStatus.INVALID && !it.deprecated }
+                // do not pick-up deprecated jobs as they belong to removed profiles
+                ?.takeIf { !it.deprecated }
         }
 
     override suspend fun getValidOptOutJobRecord(
@@ -144,8 +149,8 @@ class RealPirSchedulingRepository @Inject constructor(
             return@withContext jobSchedulingDao
                 .getOptOutJobRecord(extractedProfileId)
                 ?.run { this.toRecord() }
-                // do not pick-up deprecated jobs as they belong to invalid/removed profiles
-                ?.takeIf { it.status != OptOutJobStatus.INVALID && (includeDeprecated || !it.deprecated) }
+                // do not pick-up deprecated jobs as they belong to removed profiles
+                ?.takeIf { includeDeprecated || !it.deprecated }
         }
 
     override suspend fun getAllValidOptOutJobRecords(): List<OptOutJobRecord> =
@@ -153,8 +158,8 @@ class RealPirSchedulingRepository @Inject constructor(
             return@withContext jobSchedulingDao
                 .getAllOptOutJobRecords()
                 .map { record -> record.toRecord() }
-                // do not pick-up deprecated jobs as they belong to invalid/removed profiles
-                .filter { it.status != OptOutJobStatus.INVALID && !it.deprecated }
+                // do not pick-up deprecated jobs as they belong to removed profiles
+                .filter { !it.deprecated }
         }
 
     override suspend fun saveScanJobRecord(scanJobRecord: ScanJobRecord) {
@@ -225,12 +230,15 @@ class RealPirSchedulingRepository @Inject constructor(
         }
     }
 
-    override suspend fun deleteJobRecordsForProfile(
-        profileQueryId: Long,
-        brokersToExclude: List<String>,
-    ) {
+    override suspend fun deleteJobRecordsForProfiles(profileQueryIds: List<Long>) {
         withContext(dispatcherProvider.io()) {
-            jobSchedulingDao.deleteJobRecordsForProfile(profileQueryId, brokersToExclude)
+            jobSchedulingDao.deleteJobRecordsForProfiles(profileQueryIds)
+        }
+    }
+
+    override suspend fun deleteScanJobRecordsWithoutMatchesForProfiles(profileQueryIds: List<Long>) {
+        withContext(dispatcherProvider.io()) {
+            jobSchedulingDao.deleteScanJobRecordsWithoutMatchesForProfiles(profileQueryIds)
         }
     }
 
@@ -281,7 +289,7 @@ class RealPirSchedulingRepository @Inject constructor(
         ScanJobRecord(
             brokerName = this.brokerName,
             userProfileId = this.userProfileId,
-            status = ScanJobStatus.entries.find { it.name == this.status } ?: ScanJobStatus.INVALID,
+            status = ScanJobStatus.entries.find { it.name == this.status } ?: ScanJobStatus.ERROR,
             lastScanDateInMillis = this.lastScanDateInMillis ?: 0L,
             deprecated = this.deprecated,
         )
@@ -300,7 +308,7 @@ class RealPirSchedulingRepository @Inject constructor(
             extractedProfileId = this.extractedProfileId,
             brokerName = this.brokerName,
             userProfileId = this.userProfileId,
-            status = OptOutJobStatus.entries.find { it.name == this.status } ?: OptOutJobStatus.INVALID,
+            status = OptOutJobStatus.entries.find { it.name == this.status } ?: OptOutJobStatus.ERROR,
             attemptCount = this.attemptCount,
             lastOptOutAttemptDateInMillis = this.lastOptOutAttemptDate ?: 0L,
             optOutRequestedDateInMillis = this.optOutRequestedDate,

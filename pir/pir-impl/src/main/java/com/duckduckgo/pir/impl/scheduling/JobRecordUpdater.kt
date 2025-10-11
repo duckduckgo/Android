@@ -220,20 +220,20 @@ interface JobRecordUpdater {
     ): EmailConfirmationJobRecord?
 
     /**
-     * Removes all [ScanJobRecord], [OptOutJobRecord] and [EmailConfirmationJobRecord] associated with the given [profileQueryId].
-     * Any job records that are associated with brokers in [brokersToExclude] will be retained.
+     * Removes all [ScanJobRecord], [OptOutJobRecord] and [EmailConfirmationJobRecord] associated with the given [profileQueryIds].
      *
-     * This method should be called when a [ProfileQuery] is deleted or set to deprecated, to ensure that
-     * no stale job records remain in the system or get picked up. However, we still want to retain job records
-     * for brokers that have associated [ExtractedProfile] instances, as those profiles still need to be managed.
-     *
-     * @param profileQueryId The ID of the [ProfileQuery] whose associated job records should be removed.
-     * @param brokersToExclude List of broker names for which records should not be deleted. Job records associated with these brokers will be retained.
+     * This function should be called when a [ProfileQuery] is deleted or set to deprecated, to ensure that
+     * no stale job records remain in the system or get picked up.
      */
-    suspend fun removeJobRecordsForProfile(
-        profileQueryId: Long,
-        brokersToExclude: List<String>,
-    )
+    suspend fun removeAllJobRecordsForProfiles(profileQueryIds: List<Long>)
+
+    /**
+     * Deletes all scan job records for the given [profileQueryIds] that are do not have status MATCHES_FOUND.
+     *
+     * This is used when a profile is deleted by the user, but we want to keep the scan job records for the brokers
+     * that have an extracted profile associated to it to continue running scan jobs on them.
+     */
+    suspend fun removeScanJobRecordsWithNoMatchesForProfiles(profileQueryIds: List<Long>)
 }
 
 @ContributesBinding(AppScope::class)
@@ -466,12 +466,15 @@ class RealJobRecordUpdater @Inject constructor(
         return@withContext newRecord
     }
 
-    override suspend fun removeJobRecordsForProfile(
-        profileQueryId: Long,
-        brokersToExclude: List<String>,
-    ) {
+    override suspend fun removeAllJobRecordsForProfiles(profileQueryIds: List<Long>) {
         withContext(dispatcherProvider.io()) {
-            schedulingRepository.deleteJobRecordsForProfile(profileQueryId, brokersToExclude)
+            schedulingRepository.deleteJobRecordsForProfiles(profileQueryIds)
+        }
+    }
+
+    override suspend fun removeScanJobRecordsWithNoMatchesForProfiles(profileQueryIds: List<Long>) {
+        withContext(dispatcherProvider.io()) {
+            schedulingRepository.deleteScanJobRecordsWithoutMatchesForProfiles(profileQueryIds)
         }
     }
 
