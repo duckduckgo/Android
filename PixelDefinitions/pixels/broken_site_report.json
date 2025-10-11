@@ -340,10 +340,9 @@
                 "enum": [
                     "dashboard",
                     "menu",
-                    "on_protections_off_dashboard_main",
-                    "on_protections_off_menu",
                     "reload-three-times-within-20-seconds",
-                    "prompt"
+                    "prompt",
+                    ""
                 ]
             }
         ]
