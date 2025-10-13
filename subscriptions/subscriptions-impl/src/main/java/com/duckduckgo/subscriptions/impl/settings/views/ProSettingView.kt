@@ -164,12 +164,7 @@ class ProSettingView @JvmOverloads constructor(
 
                     subscriptionSettingContainer.isVisible = true
                     subscriptionSetting.isVisible = true
-                    val subscriptionExpiredRes = if (viewState.rebrandingEnabled) {
-                        R.string.subscriptionSettingExpiredRebranding
-                    } else {
-                        R.string.subscriptionSettingExpired
-                    }
-                    subscriptionSetting.setSecondaryText(context.getString(subscriptionExpiredRes))
+                    subscriptionSetting.setSecondaryText(context.getString(R.string.subscriptionSettingExpired))
                     subscriptionSetting.setTrailingIconResource(CommonR.drawable.ic_exclamation_recolorable_16)
                 }
             }
@@ -193,21 +188,8 @@ class ProSettingView @JvmOverloads constructor(
     }
 
     private fun getActionButtonText(viewState: ViewState) = when (viewState.freeTrialEligible) {
-        true -> {
-            if (viewState.rebrandingEnabled) {
-                R.string.subscriptionSettingTryFreeTrialRebranding
-            } else {
-                R.string.subscriptionSettingTryFreeTrial
-            }
-        }
-
-        false -> {
-            if (viewState.rebrandingEnabled) {
-                R.string.subscriptionSettingGetRebranding
-            } else {
-                R.string.subscriptionSettingGet
-            }
-        }
+        true -> R.string.subscriptionSettingTryFreeTrial
+        false -> R.string.subscriptionSettingGet
     }
 
     private fun getSubscriptionSecondaryText(viewState: ViewState) = if (viewState.duckAiPlusAvailable) {

@@ -6,7 +6,6 @@ import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.subscriptions.api.Product
-import com.duckduckgo.subscriptions.api.SubscriptionRebrandingFeatureToggle
 import com.duckduckgo.subscriptions.api.SubscriptionStatus
 import com.duckduckgo.subscriptions.impl.PrivacyProFeature
 import com.duckduckgo.subscriptions.impl.SubscriptionOffer
@@ -17,7 +16,9 @@ import com.duckduckgo.subscriptions.impl.settings.views.ProSettingViewModel.Comm
 import com.duckduckgo.subscriptions.impl.settings.views.ProSettingViewModel.Command.OpenSettings
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
-import org.junit.Assert.*
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -33,14 +34,12 @@ class ProSettingViewModelTest {
 
     private val subscriptionsManager: SubscriptionsManager = mock()
     private val pixelSender: SubscriptionPixelSender = mock()
-    private val subscriptionRebrandingFeatureToggle: SubscriptionRebrandingFeatureToggle = mock()
     private lateinit var viewModel: ProSettingViewModel
     private val privacyProFeature = FakeFeatureToggleFactory.create(PrivacyProFeature::class.java)
 
     @Before
     fun before() {
         viewModel = ProSettingViewModel(
-            subscriptionRebrandingFeatureToggle,
             subscriptionsManager,
             pixelSender,
             privacyProFeature,
@@ -157,28 +156,24 @@ class ProSettingViewModelTest {
 
     @Test
     fun whenRebrandingEnabledThenRebrandingEnabledViewStateTrue() = runTest {
-        whenever(subscriptionRebrandingFeatureToggle.isSubscriptionRebrandingEnabled()).thenReturn(true)
         whenever(subscriptionsManager.subscriptionStatus).thenReturn(flowOf(SubscriptionStatus.AUTO_RENEWABLE))
         whenever(subscriptionsManager.getSubscriptionOffer()).thenReturn(emptyList())
         whenever(subscriptionsManager.isFreeTrialEligible()).thenReturn(true)
 
         viewModel.onCreate(mock())
         viewModel.viewState.test {
-            assertTrue(awaitItem().rebrandingEnabled)
             cancelAndConsumeRemainingEvents()
         }
     }
 
     @Test
     fun whenRebrandingDisabledThenRebrandingEnabledViewStateFalse() = runTest {
-        whenever(subscriptionRebrandingFeatureToggle.isSubscriptionRebrandingEnabled()).thenReturn(false)
         whenever(subscriptionsManager.subscriptionStatus).thenReturn(flowOf(SubscriptionStatus.AUTO_RENEWABLE))
         whenever(subscriptionsManager.getSubscriptionOffer()).thenReturn(emptyList())
         whenever(subscriptionsManager.isFreeTrialEligible()).thenReturn(true)
 
         viewModel.onCreate(mock())
         viewModel.viewState.test {
-            assertFalse(awaitItem().rebrandingEnabled)
             cancelAndConsumeRemainingEvents()
         }
     }

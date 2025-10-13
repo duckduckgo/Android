@@ -72,10 +72,10 @@
     <string name="subscriptionSettingSubscribeSubtitle">Subscribers get our VPN, Personal Information Removal, and Identity Theft Restoration.</string>
     <string name="subscriptionSettingSubscribeSubtitleRow">Subscribers get our VPN and Identity Theft Restoration.</string>
 
-    <string name="subscriptionSettingGet">Get Privacy Pro</string>
-    <string name="subscriptionSettingTryFreeTrial">Try Privacy Pro Free</string>
+    <string name="subscriptionSettingGet">Subscribe to DuckDuckGo</string>
+    <string name="subscriptionSettingTryFreeTrial">Try Free</string>
     <string name="subscriptionSettingRestore">I Have a Subscription</string>
-    <string name="subscriptionSettingExpired">Your Privacy Pro subscription expired</string>
+    <string name="subscriptionSettingExpired">Your DuckDuckGo subscription expired</string>
     <string name="subscriptionSettingExpiredViewPlans">View Plans</string>
     <string name="subscriptionSettingSectionSubscription">Subscription</string>
     <string name="subscriptionSettingRemoveFromDevice">Remove From This Device</string>
@@ -170,7 +170,6 @@
 
     <!-- Privacy Pro Rebranding-->
     <string name="privacyProRebranding">DuckDuckGo Subscription</string>
-    <string name="subscriptionSettingExpiredRebranding">Your DuckDuckGo subscription expired</string>
     <string name="privacyProFaqRebranding">Need help with your subscription?</string>
     <string name="privacyProFaqSecondaryRebranding">Get answers to frequently asked questions or contact subscription support from our help pages. Feature availability varies by country.</string>
     <string name="restoreSubscriptionTitleRebranding">Add your subscription to this device</string>
@@ -193,8 +192,6 @@
     <string name="subscriptionSettingSectionTitle" translatable="false">DuckDuckGo Subscription</string>
     <string name="subscriptionSettingSubscribeSecure">Secure your Wi-Fi, and chat privately with advanced AI models</string>
 
-    <string name="subscriptionSettingGetRebranding">Subscribe to DuckDuckGo</string>
-    <string name="subscriptionSettingTryFreeTrialRebranding">Try Free</string>
     <string name="feedbackGeneralSubscription">Subscription</string>
 
 </resources>
