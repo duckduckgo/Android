@@ -170,11 +170,7 @@ class ProSettingView @JvmOverloads constructor(
             }
             else -> {
                 with(binding) {
-                    if (viewState.duckAiPlusAvailable) {
-                        subscriptionBuy.setPrimaryText(context.getString(R.string.subscriptionSettingSubscribeSecure))
-                    } else {
-                        subscriptionBuy.setPrimaryText(context.getString(R.string.subscriptionSettingSubscribeRebranding))
-                    }
+                    subscriptionBuy.setPrimaryText(context.getString(R.string.subscriptionSettingSubscribeSecure))
                     subscriptionBuy.setSecondaryText(getSubscriptionSecondaryText(viewState))
                     subscriptionGet.setText(getActionButtonText(viewState))
 

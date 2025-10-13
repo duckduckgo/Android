@@ -457,7 +457,7 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationD
                 binding.includeToolbar.titleToolbar.show()
                 title = null
                 binding.includeToolbar.titleToolbar.text = if (viewState.rebrandingEnabled) {
-                    getString(string.privacyProRebranding)
+                    getString(string.ddg_subscription)
                 } else {
                     getString(string.privacyPro)
                 }
