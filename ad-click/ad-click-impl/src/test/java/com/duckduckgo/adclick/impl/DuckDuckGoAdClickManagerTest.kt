@@ -18,6 +18,7 @@ package com.duckduckgo.adclick.impl
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.adclick.api.AdClickManager
+import com.duckduckgo.adclick.impl.metrics.AdClickCollector
 import com.duckduckgo.adclick.impl.pixels.AdClickPixelName
 import com.duckduckgo.adclick.impl.pixels.AdClickPixels
 import org.junit.Assert.assertFalse
@@ -40,11 +41,12 @@ class DuckDuckGoAdClickManagerTest {
     private val mockAdClickData: AdClickData = mock()
     private val mockAdClickAttribution: AdClickAttribution = mock()
     private val mockAdClickPixels: AdClickPixels = mock()
+    private val mockAdClickCollector: AdClickCollector = mock()
     private lateinit var testee: AdClickManager
 
     @Before
     fun before() {
-        testee = DuckDuckGoAdClickManager(mockAdClickData, mockAdClickAttribution, mockAdClickPixels)
+        testee = DuckDuckGoAdClickManager(mockAdClickData, mockAdClickAttribution, mockAdClickPixels, mockAdClickCollector)
     }
 
     @Test
