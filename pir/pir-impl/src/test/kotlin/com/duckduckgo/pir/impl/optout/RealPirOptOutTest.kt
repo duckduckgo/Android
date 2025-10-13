@@ -362,4 +362,383 @@ class RealPirOptOutTest {
         verify(mockPirCssScriptLoader).getScript()
         verify(mockEventsRepository, times(2)).saveEventLog(any())
     }
+
+    @Test
+    fun whenDeprecatedProfileWithExtractedProfileThenExecutesOptOut() = runTest {
+        // Given - deprecated profile with extracted profile should still process opt-out
+        val deprecatedProfile = testProfileQuery.copy(deprecated = true)
+        whenever(mockRepository.getAllUserProfileQueries()).thenReturn(listOf(deprecatedProfile))
+        whenever(mockRepository.getBrokerOptOutSteps(testBrokerName)).thenReturn(testStepsJson)
+        whenever(
+            mockBrokerStepsParser.parseStep(
+                testBrokerName,
+                testStepsJson,
+                deprecatedProfile.id,
+            ),
+        ).thenReturn(listOf(testOptOutStep))
+        whenever(mockPirCssScriptLoader.getScript()).thenReturn(testScript)
+        whenever(mockPirActionsRunnerFactory.create(mockContext, testScript, OPTOUT)).thenReturn(
+            mockPirActionsRunner,
+        )
+        whenever(mockPirActionsRunner.start(deprecatedProfile, listOf(testOptOutStep))).thenReturn(
+            Result.success(Unit),
+        )
+        whenever(mockCurrentTimeProvider.currentTimeMillis()).thenReturn(testCurrentTime)
+
+        // When
+        testee.executeOptOutForJobs(listOf(testOptOutJobRecord), mockContext)
+
+        // Then
+        verify(mockBrokerStepsParser).parseStep(testBrokerName, testStepsJson, deprecatedProfile.id)
+        verify(mockPirActionsRunner).start(deprecatedProfile, listOf(testOptOutStep))
+        verify(mockPirActionsRunner).stop()
+        verify(mockEventsRepository, times(2)).saveScanLog(any())
+    }
+
+    @Test
+    fun whenMixOfDeprecatedAndNonDeprecatedProfilesThenExecutesOptOutForBoth() = runTest {
+        // Given
+        val deprecatedProfile = testProfileQuery.copy(deprecated = true)
+        val nonDeprecatedProfile = testProfileQuery2.copy(deprecated = false)
+        val extractedProfileDeprecated = testExtractedProfile.copy(
+            dbId = 800L,
+            profileQueryId = deprecatedProfile.id,
+        )
+        val extractedProfileNonDeprecated = testExtractedProfile.copy(
+            dbId = 801L,
+            profileQueryId = nonDeprecatedProfile.id,
+        )
+        val optOutStepDeprecated = testOptOutStep.copy(profileToOptOut = extractedProfileDeprecated)
+        val optOutStepNonDeprecated = testOptOutStep.copy(profileToOptOut = extractedProfileNonDeprecated)
+        val jobRecordDeprecated = testOptOutJobRecord.copy(
+            userProfileId = deprecatedProfile.id,
+            extractedProfileId = extractedProfileDeprecated.dbId,
+        )
+        val jobRecordNonDeprecated = testOptOutJobRecord.copy(
+            userProfileId = nonDeprecatedProfile.id,
+            extractedProfileId = extractedProfileNonDeprecated.dbId,
+        )
+
+        whenever(mockRepository.getAllUserProfileQueries()).thenReturn(
+            listOf(deprecatedProfile, nonDeprecatedProfile),
+        )
+        whenever(mockRepository.getBrokerOptOutSteps(testBrokerName)).thenReturn(testStepsJson)
+        whenever(
+            mockBrokerStepsParser.parseStep(
+                testBrokerName,
+                testStepsJson,
+                deprecatedProfile.id,
+            ),
+        ).thenReturn(listOf(optOutStepDeprecated))
+        whenever(
+            mockBrokerStepsParser.parseStep(
+                testBrokerName,
+                testStepsJson,
+                nonDeprecatedProfile.id,
+            ),
+        ).thenReturn(listOf(optOutStepNonDeprecated))
+        whenever(mockPirCssScriptLoader.getScript()).thenReturn(testScript)
+        whenever(mockPirActionsRunnerFactory.create(mockContext, testScript, OPTOUT))
+            .thenReturn(mockPirActionsRunner)
+        whenever(mockPirActionsRunner.start(any(), any())).thenReturn(Result.success(Unit))
+        whenever(mockCurrentTimeProvider.currentTimeMillis()).thenReturn(testCurrentTime)
+
+        // When
+        testee.executeOptOutForJobs(
+            listOf(jobRecordDeprecated, jobRecordNonDeprecated),
+            mockContext,
+        )
+
+        // Then - both deprecated and non-deprecated profiles should execute
+        verify(mockBrokerStepsParser).parseStep(testBrokerName, testStepsJson, deprecatedProfile.id)
+        verify(mockBrokerStepsParser).parseStep(testBrokerName, testStepsJson, nonDeprecatedProfile.id)
+        verify(mockPirActionsRunner, times(2)).start(any(), any())
+        verify(mockPirActionsRunner, times(2)).stop()
+        verify(mockEventsRepository, times(2)).saveScanLog(any())
+    }
+
+    @Test
+    fun whenMultipleJobRecordsForDifferentBrokersThenExecutesAllOptOuts() = runTest {
+        // Given
+        val extractedProfile2 = testExtractedProfile.copy(
+            dbId = 888L,
+            brokerName = testBrokerName2,
+        )
+        val optOutStep2 = testOptOutStep.copy(
+            brokerName = testBrokerName2,
+            profileToOptOut = extractedProfile2,
+        )
+        val jobRecord2 = testOptOutJobRecord.copy(
+            brokerName = testBrokerName2,
+            extractedProfileId = extractedProfile2.dbId,
+        )
+        val stepsJson2 = """{"stepType":"optOut","actions":[]}"""
+
+        whenever(mockRepository.getAllUserProfileQueries()).thenReturn(testUserProfileQueries)
+        whenever(mockRepository.getBrokerOptOutSteps(testBrokerName)).thenReturn(testStepsJson)
+        whenever(mockRepository.getBrokerOptOutSteps(testBrokerName2)).thenReturn(stepsJson2)
+        whenever(
+            mockBrokerStepsParser.parseStep(
+                testBrokerName,
+                testStepsJson,
+                testProfileQuery.id,
+            ),
+        ).thenReturn(listOf(testOptOutStep))
+        whenever(
+            mockBrokerStepsParser.parseStep(
+                testBrokerName2,
+                stepsJson2,
+                testProfileQuery.id,
+            ),
+        ).thenReturn(listOf(optOutStep2))
+        whenever(mockPirCssScriptLoader.getScript()).thenReturn(testScript)
+        whenever(mockPirActionsRunnerFactory.create(mockContext, testScript, OPTOUT))
+            .thenReturn(mockPirActionsRunner)
+        whenever(mockPirActionsRunner.start(any(), any())).thenReturn(Result.success(Unit))
+        whenever(mockCurrentTimeProvider.currentTimeMillis()).thenReturn(testCurrentTime)
+
+        // When
+        testee.executeOptOutForJobs(listOf(testOptOutJobRecord, jobRecord2), mockContext)
+
+        // Then
+        verify(mockRepository).getBrokerOptOutSteps(testBrokerName)
+        verify(mockRepository).getBrokerOptOutSteps(testBrokerName2)
+        verify(mockBrokerStepsParser).parseStep(testBrokerName, testStepsJson, testProfileQuery.id)
+        verify(mockBrokerStepsParser).parseStep(testBrokerName2, stepsJson2, testProfileQuery.id)
+        verify(mockPirActionsRunner, times(2)).start(any(), any())
+        verify(mockPirActionsRunner, times(2)).stop()
+        verify(mockEventsRepository, times(2)).saveScanLog(any())
+    }
+
+    @Test
+    fun whenMultipleJobRecordsForSameBrokerDifferentProfilesThenExecutesAllOptOuts() = runTest {
+        // Given
+        val extractedProfile2 = testExtractedProfile.copy(
+            dbId = 890L,
+            profileQueryId = testProfileQuery2.id,
+        )
+        val optOutStep2 = testOptOutStep.copy(profileToOptOut = extractedProfile2)
+        val jobRecord2 = testOptOutJobRecord.copy(
+            userProfileId = testProfileQuery2.id,
+            extractedProfileId = extractedProfile2.dbId,
+        )
+
+        whenever(mockRepository.getAllUserProfileQueries()).thenReturn(testUserProfileQueries)
+        whenever(mockRepository.getBrokerOptOutSteps(testBrokerName)).thenReturn(testStepsJson)
+        whenever(
+            mockBrokerStepsParser.parseStep(
+                testBrokerName,
+                testStepsJson,
+                testProfileQuery.id,
+            ),
+        ).thenReturn(listOf(testOptOutStep))
+        whenever(
+            mockBrokerStepsParser.parseStep(
+                testBrokerName,
+                testStepsJson,
+                testProfileQuery2.id,
+            ),
+        ).thenReturn(listOf(optOutStep2))
+        whenever(mockPirCssScriptLoader.getScript()).thenReturn(testScript)
+        whenever(mockPirActionsRunnerFactory.create(mockContext, testScript, OPTOUT))
+            .thenReturn(mockPirActionsRunner)
+        whenever(mockPirActionsRunner.start(any(), any())).thenReturn(Result.success(Unit))
+        whenever(mockCurrentTimeProvider.currentTimeMillis()).thenReturn(testCurrentTime)
+
+        // When
+        testee.executeOptOutForJobs(listOf(testOptOutJobRecord, jobRecord2), mockContext)
+
+        // Then
+        verify(mockBrokerStepsParser).parseStep(testBrokerName, testStepsJson, testProfileQuery.id)
+        verify(mockBrokerStepsParser).parseStep(testBrokerName, testStepsJson, testProfileQuery2.id)
+        verify(mockPirActionsRunner, times(2)).start(any(), any())
+        verify(mockPirActionsRunner, times(2)).stop()
+        verify(mockEventsRepository, times(2)).saveScanLog(any())
+    }
+
+    @Test
+    fun whenStopCalledThenCleansUpRunners() = runTest {
+        // Given
+        whenever(mockRepository.getAllUserProfileQueries()).thenReturn(testUserProfileQueries)
+        whenever(mockRepository.getBrokerOptOutSteps(testBrokerName)).thenReturn(testStepsJson)
+        whenever(
+            mockBrokerStepsParser.parseStep(
+                testBrokerName,
+                testStepsJson,
+                testProfileQuery.id,
+            ),
+        ).thenReturn(listOf(testOptOutStep))
+        whenever(mockPirCssScriptLoader.getScript()).thenReturn(testScript)
+        whenever(mockPirActionsRunnerFactory.create(mockContext, testScript, OPTOUT)).thenReturn(
+            mockPirActionsRunner,
+        )
+        whenever(mockPirActionsRunner.start(any(), any())).thenReturn(Result.success(Unit))
+        whenever(mockCurrentTimeProvider.currentTimeMillis()).thenReturn(testCurrentTime)
+
+        // Execute opt-out to create runners
+        testee.executeOptOutForJobs(listOf(testOptOutJobRecord), mockContext)
+
+        // When
+        testee.stop()
+
+        // Then - stop should be called twice: once during execution, once during stop()
+        verify(mockPirActionsRunner, times(2)).stop()
+    }
+
+    @Test
+    fun whenExecuteWithBrokersListThenExecutesOptOut() = runTest {
+        // Given
+        whenever(mockRepository.getAllUserProfileQueries()).thenReturn(testUserProfileQueries)
+        whenever(mockRepository.getBrokerOptOutSteps(testBrokerName)).thenReturn(testStepsJson)
+        whenever(
+            mockBrokerStepsParser.parseStep(
+                testBrokerName,
+                testStepsJson,
+                testProfileQuery.id,
+            ),
+        ).thenReturn(listOf(testOptOutStep))
+        whenever(
+            mockBrokerStepsParser.parseStep(
+                testBrokerName,
+                testStepsJson,
+                testProfileQuery2.id,
+            ),
+        ).thenReturn(emptyList())
+        whenever(mockPirCssScriptLoader.getScript()).thenReturn(testScript)
+        whenever(mockPirActionsRunnerFactory.create(mockContext, testScript, OPTOUT)).thenReturn(
+            mockPirActionsRunner,
+        )
+        whenever(mockPirActionsRunner.start(any(), any())).thenReturn(Result.success(Unit))
+        whenever(mockCurrentTimeProvider.currentTimeMillis()).thenReturn(testCurrentTime)
+
+        // When
+        testee.execute(listOf(testBrokerName), mockContext)
+
+        // Then
+        verify(mockRepository).getAllUserProfileQueries()
+        verify(mockRepository).getBrokerOptOutSteps(testBrokerName)
+        verify(mockBrokerStepsParser).parseStep(testBrokerName, testStepsJson, testProfileQuery.id)
+        verify(mockBrokerStepsParser).parseStep(testBrokerName, testStepsJson, testProfileQuery2.id)
+        verify(mockPirActionsRunner).start(any(), any())
+        verify(mockPirActionsRunner).stop()
+        verify(mockEventsRepository, times(2)).saveScanLog(any())
+    }
+
+    @Test
+    fun whenExecuteWithNoBrokersListThenDoesNothing() = runTest {
+        // Given
+        whenever(mockRepository.getAllUserProfileQueries()).thenReturn(testUserProfileQueries)
+        whenever(mockCurrentTimeProvider.currentTimeMillis()).thenReturn(testCurrentTime)
+        whenever(mockPirCssScriptLoader.getScript()).thenReturn(testScript)
+
+        // When
+        testee.execute(emptyList(), mockContext)
+
+        // Then
+        verify(mockRepository).getAllUserProfileQueries()
+        verify(mockEventsRepository, times(2)).saveScanLog(any())
+        verify(mockPirCssScriptLoader).getScript()
+        verifyNoInteractions(mockBrokerStepsParser)
+        verifyNoInteractions(mockPirActionsRunnerFactory)
+    }
+
+    @Test
+    fun whenExecuteForBrokersWithRecordsThenDelegatestoExecute() = runTest {
+        // Given
+        val brokers = listOf(testBrokerName, testBrokerName2)
+        whenever(mockRepository.getBrokersForOptOut(formOptOutOnly = true)).thenReturn(brokers)
+        whenever(mockRepository.getAllUserProfileQueries()).thenReturn(testUserProfileQueries)
+        whenever(mockRepository.getBrokerOptOutSteps(testBrokerName)).thenReturn(testStepsJson)
+        whenever(mockRepository.getBrokerOptOutSteps(testBrokerName2)).thenReturn(testStepsJson)
+        whenever(mockBrokerStepsParser.parseStep(any(), any(), any())).thenReturn(emptyList())
+        whenever(mockCurrentTimeProvider.currentTimeMillis()).thenReturn(testCurrentTime)
+
+        // When
+        testee.executeForBrokersWithRecords(mockContext)
+
+        // Then
+        verify(mockRepository).getBrokersForOptOut(formOptOutOnly = true)
+        verify(mockRepository).getAllUserProfileQueries()
+        verify(mockEventsRepository, times(2)).saveScanLog(any())
+    }
+
+    @Test
+    fun whenDeprecatedProfileWithNoExtractedProfileThenSkipsOptOut() = runTest {
+        // Given - deprecated profile but no matching extracted profile in steps
+        val deprecatedProfile = testProfileQuery.copy(deprecated = true)
+        whenever(mockRepository.getAllUserProfileQueries()).thenReturn(listOf(deprecatedProfile))
+        whenever(mockRepository.getBrokerOptOutSteps(testBrokerName)).thenReturn(testStepsJson)
+        whenever(
+            mockBrokerStepsParser.parseStep(
+                testBrokerName,
+                testStepsJson,
+                deprecatedProfile.id,
+            ),
+        ).thenReturn(emptyList()) // No extracted profiles found
+        whenever(mockCurrentTimeProvider.currentTimeMillis()).thenReturn(testCurrentTime)
+
+        // When
+        testee.executeOptOutForJobs(listOf(testOptOutJobRecord), mockContext)
+
+        // Then
+        verify(mockEventsRepository, times(2)).saveScanLog(any())
+        verifyNoInteractions(mockPirCssScriptLoader)
+        verifyNoInteractions(mockPirActionsRunnerFactory)
+    }
+
+    @Test
+    fun whenAllDeprecatedProfilesWithExtractedProfilesThenExecutesOptOut() = runTest {
+        // Given
+        val deprecatedProfile1 = testProfileQuery.copy(deprecated = true)
+        val deprecatedProfile2 = testProfileQuery2.copy(deprecated = true)
+        val extractedProfile1 = testExtractedProfile.copy(profileQueryId = deprecatedProfile1.id)
+        val extractedProfile2 = testExtractedProfile.copy(
+            dbId = 891L,
+            profileQueryId = deprecatedProfile2.id,
+        )
+        val optOutStep1 = testOptOutStep.copy(profileToOptOut = extractedProfile1)
+        val optOutStep2 = testOptOutStep.copy(profileToOptOut = extractedProfile2)
+        val jobRecord1 = testOptOutJobRecord.copy(
+            userProfileId = deprecatedProfile1.id,
+            extractedProfileId = extractedProfile1.dbId,
+        )
+        val jobRecord2 = testOptOutJobRecord.copy(
+            userProfileId = deprecatedProfile2.id,
+            extractedProfileId = extractedProfile2.dbId,
+        )
+
+        whenever(mockRepository.getAllUserProfileQueries()).thenReturn(
+            listOf(deprecatedProfile1, deprecatedProfile2),
+        )
+        whenever(mockRepository.getBrokerOptOutSteps(testBrokerName)).thenReturn(testStepsJson)
+        whenever(
+            mockBrokerStepsParser.parseStep(
+                testBrokerName,
+                testStepsJson,
+                deprecatedProfile1.id,
+            ),
+        ).thenReturn(listOf(optOutStep1))
+        whenever(
+            mockBrokerStepsParser.parseStep(
+                testBrokerName,
+                testStepsJson,
+                deprecatedProfile2.id,
+            ),
+        ).thenReturn(listOf(optOutStep2))
+        whenever(mockPirCssScriptLoader.getScript()).thenReturn(testScript)
+        whenever(mockPirActionsRunnerFactory.create(mockContext, testScript, OPTOUT))
+            .thenReturn(mockPirActionsRunner)
+        whenever(mockPirActionsRunner.start(any(), any())).thenReturn(Result.success(Unit))
+        whenever(mockCurrentTimeProvider.currentTimeMillis()).thenReturn(testCurrentTime)
+
+        // When
+        testee.executeOptOutForJobs(listOf(jobRecord1, jobRecord2), mockContext)
+
+        // Then - all deprecated profiles with extracted profiles should execute
+        verify(mockBrokerStepsParser).parseStep(testBrokerName, testStepsJson, deprecatedProfile1.id)
+        verify(mockBrokerStepsParser).parseStep(testBrokerName, testStepsJson, deprecatedProfile2.id)
+        verify(mockPirActionsRunner, times(2)).start(any(), any())
+        verify(mockPirActionsRunner, times(2)).stop()
+        verify(mockEventsRepository, times(2)).saveScanLog(any())
+    }
 }

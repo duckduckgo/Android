@@ -381,6 +381,205 @@ class PirWebSaveProfileMessageHandlerTest {
         verify(mockJobRecordUpdater).removeAllJobRecordsForProfiles(listOf(1L))
     }
 
+    @Test
+    fun whenProcessWithDeprecatedProfileQueryThenRemovesJobRecordsExceptForBrokersWithExtractedProfiles() = runTest {
+        // Given
+        val jsMessage = createJsMessage("""""", SAVE_PROFILE)
+        val currentYear = 2025
+        val currentDateTime = LocalDateTime.of(currentYear, 1, 1, 0, 0)
+        val profileQueryToDeprecate = createProfileQuery(id = 2, firstName = "ToDeprecate", lastName = "User")
+        val extractedProfile1 = ExtractedProfile(
+            dbId = 1L,
+            profileQueryId = 2L,
+            brokerName = "Broker1",
+            name = "ToDeprecate User",
+        )
+        val extractedProfile2 = ExtractedProfile(
+            dbId = 2L,
+            profileQueryId = 2L,
+            brokerName = "Broker2",
+            name = "ToDeprecate User",
+        )
+
+        whenever(mockPirWebProfileStateHolder.isProfileComplete).thenReturn(true)
+        whenever(mockCurrentTimeProvider.localDateTimeNow()).thenReturn(currentDateTime)
+        whenever(mockPirWebProfileStateHolder.toProfileQueries(currentYear)).thenReturn(emptyList())
+        whenever(mockRepository.getValidUserProfileQueries()).thenReturn(listOf(profileQueryToDeprecate))
+        whenever(mockRepository.getAllExtractedProfiles()).thenReturn(listOf(extractedProfile1, extractedProfile2))
+        whenever(mockRepository.updateProfileQueries(any(), any(), any())).thenReturn(true)
+
+        // When
+        testee.process(jsMessage, mockJsMessaging, mockJsMessageCallback)
+
+        // Then
+        verify(mockRepository).updateProfileQueries(
+            profileQueriesToAdd = emptyList(),
+            profileQueriesToUpdate = listOf(profileQueryToDeprecate.copy(deprecated = true)),
+            profileQueryIdsToDelete = emptyList(),
+        )
+        verify(mockJobRecordUpdater).removeScanJobRecordsWithNoMatchesForProfiles(listOf(2L))
+        verifyResponse(jsMessage, true, mockJsMessaging)
+    }
+
+    @Test
+    fun whenProcessWithMultipleProfileQueriesToDeleteThenRemovesAllJobRecords() = runTest {
+        // Given
+        val jsMessage = createJsMessage("""""", SAVE_PROFILE)
+        val currentYear = 2025
+        val currentDateTime = LocalDateTime.of(currentYear, 1, 1, 0, 0)
+        val profileQueryToDelete1 = createProfileQuery(id = 1, firstName = "Delete1", lastName = "User")
+        val profileQueryToDelete2 = createProfileQuery(id = 2, firstName = "Delete2", lastName = "User")
+
+        whenever(mockPirWebProfileStateHolder.isProfileComplete).thenReturn(true)
+        whenever(mockCurrentTimeProvider.localDateTimeNow()).thenReturn(currentDateTime)
+        whenever(mockPirWebProfileStateHolder.toProfileQueries(currentYear)).thenReturn(emptyList())
+        whenever(mockRepository.getValidUserProfileQueries()).thenReturn(listOf(profileQueryToDelete1, profileQueryToDelete2))
+        whenever(mockRepository.getAllExtractedProfiles()).thenReturn(emptyList())
+        whenever(mockRepository.updateProfileQueries(any(), any(), any())).thenReturn(true)
+
+        // When
+        testee.process(jsMessage, mockJsMessaging, mockJsMessageCallback)
+
+        // Then
+        verify(mockRepository).updateProfileQueries(
+            profileQueriesToAdd = emptyList(),
+            profileQueriesToUpdate = emptyList(),
+            profileQueryIdsToDelete = listOf(1L, 2L),
+        )
+        verify(mockJobRecordUpdater).removeAllJobRecordsForProfiles(listOf(1L, 2L))
+        verifyResponse(jsMessage, true, mockJsMessaging)
+    }
+
+    @Test
+    fun whenProcessWithMultipleDeprecatedProfileQueriesThenRemovesJobRecordsForEach() = runTest {
+        // Given
+        val jsMessage = createJsMessage("""""", SAVE_PROFILE)
+        val currentYear = 2025
+        val currentDateTime = LocalDateTime.of(currentYear, 1, 1, 0, 0)
+        val profileQuery1 = createProfileQuery(id = 1, firstName = "Deprecated1", lastName = "User")
+        val profileQuery2 = createProfileQuery(id = 2, firstName = "Deprecated2", lastName = "User")
+
+        val extractedProfile1 = ExtractedProfile(
+            dbId = 1L,
+            profileQueryId = 1L,
+            brokerName = "Broker1",
+            name = "Deprecated1 User",
+        )
+        val extractedProfile2 = ExtractedProfile(
+            dbId = 2L,
+            profileQueryId = 2L,
+            brokerName = "Broker2",
+            name = "Deprecated2 User",
+        )
+        val extractedProfile3 = ExtractedProfile(
+            dbId = 3L,
+            profileQueryId = 2L,
+            brokerName = "Broker3",
+            name = "Deprecated2 User",
+        )
+
+        whenever(mockPirWebProfileStateHolder.isProfileComplete).thenReturn(true)
+        whenever(mockCurrentTimeProvider.localDateTimeNow()).thenReturn(currentDateTime)
+        whenever(mockPirWebProfileStateHolder.toProfileQueries(currentYear)).thenReturn(emptyList())
+        whenever(mockRepository.getValidUserProfileQueries()).thenReturn(listOf(profileQuery1, profileQuery2))
+        whenever(mockRepository.getAllExtractedProfiles()).thenReturn(listOf(extractedProfile1, extractedProfile2, extractedProfile3))
+        whenever(mockRepository.updateProfileQueries(any(), any(), any())).thenReturn(true)
+
+        // When
+        testee.process(jsMessage, mockJsMessaging, mockJsMessageCallback)
+
+        // Then
+        verify(mockRepository).updateProfileQueries(
+            profileQueriesToAdd = emptyList(),
+            profileQueriesToUpdate = listOf(
+                profileQuery1.copy(deprecated = true),
+                profileQuery2.copy(deprecated = true),
+            ),
+            profileQueryIdsToDelete = emptyList(),
+        )
+        verify(mockJobRecordUpdater).removeScanJobRecordsWithNoMatchesForProfiles(listOf(1L, 2L))
+        verifyResponse(jsMessage, true, mockJsMessaging)
+    }
+
+    @Test
+    fun whenProcessWithMixOfDeletedAndDeprecatedProfileQueriesThenHandlesJobRecordsCorrectly() = runTest {
+        // Given
+        val jsMessage = createJsMessage("""""", SAVE_PROFILE)
+        val currentYear = 2025
+        val currentDateTime = LocalDateTime.of(currentYear, 1, 1, 0, 0)
+        val profileQueryToDelete = createProfileQuery(id = 1, firstName = "Delete", lastName = "User")
+        val profileQueryToDeprecate = createProfileQuery(id = 2, firstName = "Deprecate", lastName = "User")
+
+        val extractedProfile = ExtractedProfile(
+            dbId = 1L,
+            profileQueryId = 2L,
+            brokerName = "TestBroker",
+            name = "Deprecate User",
+        )
+
+        whenever(mockPirWebProfileStateHolder.isProfileComplete).thenReturn(true)
+        whenever(mockCurrentTimeProvider.localDateTimeNow()).thenReturn(currentDateTime)
+        whenever(mockPirWebProfileStateHolder.toProfileQueries(currentYear)).thenReturn(emptyList())
+        whenever(mockRepository.getValidUserProfileQueries()).thenReturn(listOf(profileQueryToDelete, profileQueryToDeprecate))
+        whenever(mockRepository.getAllExtractedProfiles()).thenReturn(listOf(extractedProfile))
+        whenever(mockRepository.updateProfileQueries(any(), any(), any())).thenReturn(true)
+
+        // When
+        testee.process(jsMessage, mockJsMessaging, mockJsMessageCallback)
+
+        // Then
+        verify(mockRepository).updateProfileQueries(
+            profileQueriesToAdd = emptyList(),
+            profileQueriesToUpdate = listOf(profileQueryToDeprecate.copy(deprecated = true)),
+            profileQueryIdsToDelete = listOf(1L),
+        )
+        verify(mockJobRecordUpdater).removeAllJobRecordsForProfiles(listOf(1L))
+        verify(mockJobRecordUpdater).removeScanJobRecordsWithNoMatchesForProfiles(listOf(2L))
+        verifyResponse(jsMessage, true, mockJsMessaging)
+    }
+
+    @Test
+    fun whenProcessWithDeprecatedProfileQueryWithDuplicateBrokerNamesThenDeduplicatesBrokerList() = runTest {
+        // Given
+        val jsMessage = createJsMessage("""""", SAVE_PROFILE)
+        val currentYear = 2025
+        val currentDateTime = LocalDateTime.of(currentYear, 1, 1, 0, 0)
+        val profileQueryToDeprecate = createProfileQuery(id = 1, firstName = "Deprecate", lastName = "User")
+
+        val extractedProfile1 = ExtractedProfile(
+            dbId = 1L,
+            profileQueryId = 1L,
+            brokerName = "SameBroker",
+            name = "Deprecate User",
+        )
+        val extractedProfile2 = ExtractedProfile(
+            dbId = 2L,
+            profileQueryId = 1L,
+            brokerName = "SameBroker",
+            name = "Deprecate User",
+        )
+
+        whenever(mockPirWebProfileStateHolder.isProfileComplete).thenReturn(true)
+        whenever(mockCurrentTimeProvider.localDateTimeNow()).thenReturn(currentDateTime)
+        whenever(mockPirWebProfileStateHolder.toProfileQueries(currentYear)).thenReturn(emptyList())
+        whenever(mockRepository.getValidUserProfileQueries()).thenReturn(listOf(profileQueryToDeprecate))
+        whenever(mockRepository.getAllExtractedProfiles()).thenReturn(listOf(extractedProfile1, extractedProfile2))
+        whenever(mockRepository.updateProfileQueries(any(), any(), any())).thenReturn(true)
+
+        // When
+        testee.process(jsMessage, mockJsMessaging, mockJsMessageCallback)
+
+        // Then
+        verify(mockRepository).updateProfileQueries(
+            profileQueriesToAdd = emptyList(),
+            profileQueriesToUpdate = listOf(profileQueryToDeprecate.copy(deprecated = true)),
+            profileQueryIdsToDelete = emptyList(),
+        )
+        verify(mockJobRecordUpdater).removeScanJobRecordsWithNoMatchesForProfiles(listOf(1L))
+        verify(mockJobRecordUpdater, never()).removeAllJobRecordsForProfiles(any())
+        verifyResponse(jsMessage, true, mockJsMessaging)
+    }
+
     private fun createProfileQuery(
         id: Long = 1,
         firstName: String = "Test",

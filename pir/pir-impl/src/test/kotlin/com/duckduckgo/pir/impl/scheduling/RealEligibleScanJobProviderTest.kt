@@ -443,4 +443,193 @@ class RealEligibleScanJobProviderTest {
         val uniqueRecords = result.toSet()
         assertEquals(result.size, uniqueRecords.size)
     }
+
+    @Test
+    fun whenGetAllEligibleScanJobsWithDeprecatedScanRecordThenFilterOut() = runTest {
+        val deprecatedScanRecord = scanJobRecordNotExecuted.copy(deprecated = true)
+        whenever(mockPirRepository.getAllBrokerSchedulingConfigs()).thenReturn(listOf(brokerSchedulingConfig))
+        whenever(mockPirSchedulingRepository.getAllValidOptOutJobRecords()).thenReturn(emptyList())
+        whenever(mockPirSchedulingRepository.getAllValidScanJobRecords()).thenReturn(listOf(deprecatedScanRecord))
+
+        val result = testee.getAllEligibleScanJobs(currentTimeMillis)
+
+        assertTrue(result.isEmpty())
+    }
+
+    @Test
+    fun whenGetAllEligibleScanJobsWithMixOfDeprecatedAndNonDeprecatedScanRecordsThenReturnOnlyNonDeprecated() = runTest {
+        val deprecatedScanRecord = scanJobRecordNotExecuted.copy(deprecated = true, userProfileId = 999L)
+        val nonDeprecatedScanRecord = scanJobRecordNotExecuted.copy(deprecated = false, userProfileId = 1000L)
+
+        whenever(mockPirRepository.getAllBrokerSchedulingConfigs()).thenReturn(listOf(brokerSchedulingConfig))
+        whenever(mockPirSchedulingRepository.getAllValidOptOutJobRecords()).thenReturn(emptyList())
+        whenever(mockPirSchedulingRepository.getAllValidScanJobRecords()).thenReturn(
+            listOf(deprecatedScanRecord, nonDeprecatedScanRecord),
+        )
+
+        val result = testee.getAllEligibleScanJobs(currentTimeMillis)
+
+        assertEquals(1, result.size)
+        assertEquals(nonDeprecatedScanRecord, result[0])
+        assertTrue(result.none { it.deprecated })
+    }
+
+    @Test
+    fun whenGetAllEligibleScanJobsWithDeprecatedOptOutRemovedRecordThenFilterOut() = runTest {
+        val deprecatedOptOutRecord = optOutJobRecordRemoved.copy(deprecated = true)
+        val expectedScanRecord = scanJobRecordNotExecuted.copy(userProfileId = 124L)
+
+        whenever(mockPirRepository.getAllBrokerSchedulingConfigs()).thenReturn(listOf(brokerSchedulingConfig))
+        whenever(mockPirSchedulingRepository.getAllValidOptOutJobRecords()).thenReturn(listOf(deprecatedOptOutRecord))
+        whenever(mockPirSchedulingRepository.getAllValidScanJobRecords()).thenReturn(emptyList())
+        whenever(mockPirSchedulingRepository.getValidScanJobRecord("test-broker", 124L)).thenReturn(expectedScanRecord)
+
+        val result = testee.getAllEligibleScanJobs(currentTimeMillis)
+
+        // Should not return scan record for deprecated opt-out record
+        assertTrue(result.isEmpty())
+    }
+
+    @Test
+    fun whenGetAllEligibleScanJobsWithNonDeprecatedOptOutRemovedRecordThenInclude() = runTest {
+        val nonDeprecatedOptOutRecord = optOutJobRecordRemoved.copy(deprecated = false)
+        val expectedScanRecord = scanJobRecordNotExecuted.copy(userProfileId = 124L)
+
+        whenever(mockPirRepository.getAllBrokerSchedulingConfigs()).thenReturn(listOf(brokerSchedulingConfig))
+        whenever(mockPirSchedulingRepository.getAllValidOptOutJobRecords()).thenReturn(listOf(nonDeprecatedOptOutRecord))
+        whenever(mockPirSchedulingRepository.getAllValidScanJobRecords()).thenReturn(emptyList())
+        whenever(mockPirSchedulingRepository.getValidScanJobRecord("test-broker", 124L)).thenReturn(expectedScanRecord)
+
+        val result = testee.getAllEligibleScanJobs(currentTimeMillis)
+
+        assertEquals(1, result.size)
+        assertEquals(expectedScanRecord, result[0])
+    }
+
+    @Test
+    fun whenGetAllEligibleScanJobsWithMixOfDeprecatedAndNonDeprecatedOptOutRecordsThenReturnOnlyNonDeprecated() = runTest {
+        val deprecatedOptOutRemoved = optOutJobRecordRemoved.copy(
+            deprecated = true,
+            extractedProfileId = 800L,
+            userProfileId = 800L,
+        )
+        val nonDeprecatedOptOutRemoved = optOutJobRecordRemoved.copy(
+            deprecated = false,
+            extractedProfileId = 801L,
+            userProfileId = 801L,
+        )
+
+        val scanForDeprecated = scanJobRecordNotExecuted.copy(userProfileId = 800L)
+        val scanForNonDeprecated = scanJobRecordNotExecuted.copy(userProfileId = 801L)
+
+        whenever(mockPirRepository.getAllBrokerSchedulingConfigs()).thenReturn(listOf(brokerSchedulingConfig))
+        whenever(mockPirSchedulingRepository.getAllValidOptOutJobRecords()).thenReturn(
+            listOf(deprecatedOptOutRemoved, nonDeprecatedOptOutRemoved),
+        )
+        whenever(mockPirSchedulingRepository.getAllValidScanJobRecords()).thenReturn(emptyList())
+        whenever(mockPirSchedulingRepository.getValidScanJobRecord("test-broker", 800L)).thenReturn(scanForDeprecated)
+        whenever(mockPirSchedulingRepository.getValidScanJobRecord("test-broker", 801L)).thenReturn(scanForNonDeprecated)
+
+        val result = testee.getAllEligibleScanJobs(currentTimeMillis)
+
+        // Should only return scan record for non-deprecated opt-out
+        assertEquals(1, result.size)
+        assertEquals(scanForNonDeprecated, result[0])
+    }
+
+    @Test
+    fun whenGetAllEligibleScanJobsWithDeprecatedOptOutRequestedRecordThenInclude() = runTest {
+        // Deprecated flag only affects REMOVED opt-out records for maintenance scans,
+        // REQUESTED opt-out records should still trigger confirmation scans
+        val deprecatedOptOutRequested = optOutJobRecordRequested.copy(deprecated = true)
+        val expectedScanRecord = scanJobRecordNotExecuted
+
+        whenever(mockPirRepository.getAllBrokerSchedulingConfigs()).thenReturn(listOf(brokerSchedulingConfig))
+        whenever(mockPirSchedulingRepository.getAllValidOptOutJobRecords()).thenReturn(listOf(deprecatedOptOutRequested))
+        whenever(mockPirSchedulingRepository.getAllValidScanJobRecords()).thenReturn(emptyList())
+        whenever(mockPirSchedulingRepository.getValidScanJobRecord("test-broker", 123L)).thenReturn(expectedScanRecord)
+
+        val result = testee.getAllEligibleScanJobs(currentTimeMillis)
+
+        // Should include because deprecated flag only filters REMOVED status for maintenance
+        assertEquals(1, result.size)
+        assertEquals(expectedScanRecord, result[0])
+    }
+
+    @Test
+    fun whenGetAllEligibleScanJobsWithAllDeprecatedRecordsThenReturnEmpty() = runTest {
+        val deprecatedScanRecord1 = scanJobRecordNotExecuted.copy(deprecated = true, userProfileId = 1001L)
+        val deprecatedScanRecord2 = scanJobRecordNoMatch.copy(deprecated = true, userProfileId = 1002L)
+        val deprecatedOptOutRemoved = optOutJobRecordRemoved.copy(deprecated = true, userProfileId = 1003L)
+
+        val scanForOptOut = scanJobRecordNotExecuted.copy(userProfileId = 1003L)
+
+        whenever(mockPirRepository.getAllBrokerSchedulingConfigs()).thenReturn(listOf(brokerSchedulingConfig))
+        whenever(mockPirSchedulingRepository.getAllValidOptOutJobRecords()).thenReturn(listOf(deprecatedOptOutRemoved))
+        whenever(mockPirSchedulingRepository.getAllValidScanJobRecords()).thenReturn(
+            listOf(deprecatedScanRecord1, deprecatedScanRecord2),
+        )
+        whenever(mockPirSchedulingRepository.getValidScanJobRecord("test-broker", 1003L)).thenReturn(scanForOptOut)
+
+        val result = testee.getAllEligibleScanJobs(currentTimeMillis)
+
+        assertTrue(result.isEmpty())
+    }
+
+    @Test
+    fun whenGetAllEligibleScanJobsWithComplexMixOfDeprecatedRecordsThenReturnCorrectResults() = runTest {
+        // Mix of deprecated and non-deprecated scan records
+        val deprecatedScanRecord = scanJobRecordNotExecuted.copy(deprecated = true, userProfileId = 1001L)
+        val nonDeprecatedScanRecord = scanJobRecordNoMatch.copy(deprecated = false, userProfileId = 1002L)
+
+        // Mix of deprecated REMOVED and non-deprecated REMOVED opt-out records
+        val deprecatedOptOutRemoved = optOutJobRecordRemoved.copy(
+            deprecated = true,
+            extractedProfileId = 2001L,
+            userProfileId = 2001L,
+        )
+        val nonDeprecatedOptOutRemoved = optOutJobRecordRemoved.copy(
+            deprecated = false,
+            extractedProfileId = 2002L,
+            userProfileId = 2002L,
+        )
+
+        // REQUESTED opt-out (deprecated flag shouldn't matter for REQUESTED)
+        val deprecatedOptOutRequested = optOutJobRecordRequested.copy(
+            deprecated = true,
+            extractedProfileId = 3001L,
+            userProfileId = 3001L,
+        )
+
+        val scanForDeprecatedRemoved = scanJobRecordNotExecuted.copy(userProfileId = 2001L)
+        val scanForNonDeprecatedRemoved = scanJobRecordNotExecuted.copy(userProfileId = 2002L)
+        val scanForRequested = scanJobRecordNotExecuted.copy(userProfileId = 3001L)
+
+        whenever(mockPirRepository.getAllBrokerSchedulingConfigs()).thenReturn(listOf(brokerSchedulingConfig))
+        whenever(mockPirSchedulingRepository.getAllValidOptOutJobRecords()).thenReturn(
+            listOf(deprecatedOptOutRemoved, nonDeprecatedOptOutRemoved, deprecatedOptOutRequested),
+        )
+        whenever(mockPirSchedulingRepository.getAllValidScanJobRecords()).thenReturn(
+            listOf(deprecatedScanRecord, nonDeprecatedScanRecord),
+        )
+        whenever(mockPirSchedulingRepository.getValidScanJobRecord("test-broker", 2001L)).thenReturn(scanForDeprecatedRemoved)
+        whenever(mockPirSchedulingRepository.getValidScanJobRecord("test-broker", 2002L)).thenReturn(scanForNonDeprecatedRemoved)
+        whenever(mockPirSchedulingRepository.getValidScanJobRecord("test-broker", 3001L)).thenReturn(scanForRequested)
+
+        val result = testee.getAllEligibleScanJobs(currentTimeMillis)
+
+        // Should return:
+        // - nonDeprecatedScanRecord (scan record that's not deprecated)
+        // - scanForNonDeprecatedRemoved (from non-deprecated REMOVED opt-out)
+        // - scanForRequested (from REQUESTED opt-out - deprecated flag doesn't matter)
+        // Should NOT return:
+        // - deprecatedScanRecord (deprecated scan record)
+        // - scanForDeprecatedRemoved (from deprecated REMOVED opt-out)
+        assertEquals(3, result.size)
+        assertTrue(result.any { it.userProfileId == 1002L }) // nonDeprecatedScanRecord
+        assertTrue(result.any { it.userProfileId == 2002L }) // scanForNonDeprecatedRemoved
+        assertTrue(result.any { it.userProfileId == 3001L }) // scanForRequested
+        assertTrue(result.none { it.userProfileId == 1001L }) // deprecated scan record filtered
+        assertTrue(result.none { it.userProfileId == 2001L }) // deprecated removed opt-out filtered
+    }
 }
