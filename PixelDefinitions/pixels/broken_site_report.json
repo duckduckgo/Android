@@ -16,19 +16,7 @@
             {
                 "key": "category",
                 "description": "User chosen breakage category",
-                "enum": [
-                    "",
-                    "comments",
-                    "blocked",
-                    "dislike",
-                    "empty-spaces",
-                    "layout",
-                    "login",
-                    "other",
-                    "paywall",
-                    "shopping",
-                    "videos"
-                ]
+                "enum": ["", "comments", "blocked", "dislike", "empty-spaces", "layout", "login", "other", "paywall", "shopping", "videos"]
             },
             {
                 "key": "consentManaged",
@@ -337,13 +325,7 @@
             {
                 "key": "opener",
                 "description": "Where the report UI was opened from.",
-                "enum": [
-                    "dashboard",
-                    "menu",
-                    "reload-three-times-within-20-seconds",
-                    "prompt",
-                    ""
-                ]
+                "enum": ["dashboard", "menu", "reload-three-times-within-20-seconds", "prompt", ""]
             }
         ]
     },
@@ -358,13 +340,7 @@
             {
                 "key": "opener",
                 "description": "Where the report UI was opened from.",
-                "enum": [
-                    "dashboard",
-                    "menu",
-                    "reload-three-times-within-20-seconds",
-                    "prompt",
-                    ""
-                ]
+                "enum": ["dashboard", "menu", "reload-three-times-within-20-seconds", "prompt", ""]
             }
         ]
     },
