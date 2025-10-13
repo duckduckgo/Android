@@ -108,7 +108,9 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
     private val viewModel: InputScreenViewModel by lazy {
         val params = requireActivity().intent.getActivityParams(InputScreenActivityParams::class.java)
         val currentOmnibarText = params?.query ?: ""
-        val providerFactory = InputScreenViewModelProviderFactory(viewModelFactory, currentOmnibarText = currentOmnibarText)
+        val inSearchMode = params?.isSearchMode ?: true
+        val providerFactory =
+            InputScreenViewModelProviderFactory(viewModelFactory, currentOmnibarText = currentOmnibarText, inSearchMode = inSearchMode)
         ViewModelProvider(owner = this, factory = providerFactory)[InputScreenViewModel::class.java]
     }
 
@@ -181,7 +183,8 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
         val params = requireActivity().intent.getActivityParams(InputScreenActivityParams::class.java)
         val initialText = params?.query ?: ""
         val showMainButtons = inputScreenConfigResolver.mainButtonsEnabled()
-        inputModeWidget.provideInitialInputState(initialText, showMainButtons)
+        val searchMode = params?.isSearchMode ?: true
+        inputModeWidget.provideInitialInputState(initialText, showMainButtons, searchMode)
 
         val useTopBar = inputScreenConfigResolver.useTopBar()
         val separatorHeightPx = resources.getDimensionPixelSize(R.dimen.inputScreenContentSeparatorHeight)
@@ -227,8 +230,6 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
         configureVoice(useTopBar)
         configureObservers()
         configureLogoAnimation()
-
-        inputModeWidget.init()
 
         requireActivity().onBackPressedDispatcher.addCallback(
             viewLifecycleOwner,

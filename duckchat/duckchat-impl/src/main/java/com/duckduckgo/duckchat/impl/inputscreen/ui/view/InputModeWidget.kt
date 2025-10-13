@@ -170,6 +170,7 @@ class InputModeWidget @JvmOverloads constructor(
     fun provideInitialInputState(
         text: String,
         canShowMainButtons: Boolean,
+        isSearchMode: Boolean,
     ) {
         if (text.isNotEmpty()) {
             provideInitialText(text)
@@ -180,10 +181,12 @@ class InputModeWidget @JvmOverloads constructor(
         } else {
             inputModeMainButtonsContainer.gone()
         }
-    }
 
-    fun init() {
-        onSearchSelected?.invoke()
+        if (isSearchMode) {
+            onSearchSelected?.invoke()
+        } else {
+            onChatSelected?.invoke()
+        }
     }
 
     fun clearInputFocus() {

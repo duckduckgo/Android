@@ -1110,21 +1110,21 @@ class BrowserTabFragment :
 
     private fun configureInputScreenLauncher() {
         omnibar.configureInputScreenLaunchListener(object : Omnibar.InputScreenLaunchListener {
-            override fun onLaunchInputScreen(query: String) {
-                launchInputScreen(query)
+            override fun onLaunchInputScreen(query: String, searchMode: Boolean) {
+                launchInputScreen(query, searchMode)
             }
 
             override fun onDuckAiToggleSelected() {
-                launchInputScreen("")
+                launchInputScreen("", false)
             }
 
             override fun onSearchToggleSelected() {
-                launchInputScreen("")
+                launchInputScreen("", true)
             }
         })
     }
 
-    private fun launchInputScreen(query: String) {
+    private fun launchInputScreen(query: String, searchMode: Boolean) {
         val intent =
             globalActivityStarter.startIntent(
                 requireContext(),
@@ -1132,6 +1132,7 @@ class BrowserTabFragment :
                     query = query,
                     isTopOmnibar = omnibar.omnibarPosition == TOP,
                     browserButtonsConfig = InputScreenBrowserButtonsConfig.Enabled(tabs = viewModel.tabs.value?.size ?: 0),
+                    isSearchMode = searchMode,
                 ),
             )
         val enterTransition = browserAndInputScreenTransitionProvider.getInputScreenEnterAnimation(omnibar.omnibarPosition == TOP)
@@ -2305,7 +2306,7 @@ class BrowserTabFragment :
             is Command.LaunchInputScreen -> {
                 // if the fire button is used, prevent automatically launching the input screen until the process reloads
                 if ((requireActivity() as? BrowserActivity)?.isDataClearingInProgress == false) {
-                    launchInputScreen(query = "")
+                    launchInputScreen(query = "", true)
                 }
             }
 

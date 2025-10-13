@@ -29,6 +29,7 @@ import java.io.Serializable
  * @param browserButtonsConfig configuration for displaying browser buttons (Fire Button, Tab Switcher, Menu)
  * @param showInstalledApps whether apps installed on the device should appear in autocomplete results
  * @param launchWithVoice whether to immediately launch voice input on activity start, if supported and enabled
+ * @param isSearchMode whether to set the Duck.ai toggle on Search mode or not
  */
 data class InputScreenActivityParams(
     val query: String,
@@ -36,6 +37,7 @@ data class InputScreenActivityParams(
     val browserButtonsConfig: InputScreenBrowserButtonsConfig,
     val showInstalledApps: Boolean = false,
     val launchWithVoice: Boolean = false,
+    val isSearchMode: Boolean = true,
 ) : GlobalActivityStarter.ActivityParams
 
 /**

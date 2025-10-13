@@ -581,7 +581,7 @@ open class OmnibarLayout @JvmOverloads constructor(
             }
 
             is LaunchInputScreen -> {
-                omnibarInputScreenLaunchListener?.onLaunchInputScreen(query = command.query)
+                omnibarInputScreenLaunchListener?.onLaunchInputScreen(query = command.query, duckAiToggle.selectedTabPosition == 0)
             }
 
             is Command.EasterEggLogoClicked -> {
