@@ -169,6 +169,7 @@
     <string name="settingsAddressBarPosition">Nastavenie polohy panela s adresou</string>
     <string name="settingsEnableVoiceSearch">Povoliť súkromné hlasové vyhľadávanie</string>
     <string name="settingsDDGOnOtherPlatforms">DuckDuckGo na iných platformách</string>
+    <string name="settingsDuckAi">Funkcie AI</string>
 
     <!-- Private Search -->
     <string name="privateSearchActivityTitle">Súkromné vyhľadávanie</string>
@@ -962,8 +963,6 @@
     <!-- Privacy Pro Rebranding-->
     <string name="aboutDescriptionBrandUpdate2025Rebranding">Welcome to the Duck Side!\n\nDuckDuckGo je nezávislá spoločnosť na ochranu súkromia online pre každého, kto chce získať späť kontrolu nad svojimi osobnými údajmi.\n\nVeríme, že najlepším spôsobom, ako chrániť tvoje osobné údaje pred hackermi, podvodníkmi a spoločnosťami, ktoré narušujú súkromie, je zabrániť ich zhromažďovaniu. Preto si milióny ľudí <annotation type="chart_comparison">vyberajú DuckDuckGo pred prehliadačom Chrome a inými prehliadačmi</annotation> na online vyhľadávanie a prehliadanie. Náš vstavaný vyhľadávač je ako Google, ale nikdy nesleduje tvoje vyhľadávania. Naše ochrany prehliadania, ako je blokovanie sledovania reklám a blokovanie súborov cookie, pomáhajú zastaviť iné spoločnosti v zhromažďovaní tvojich údajov. A náš prehliadač je zadarmo – zarábame na <annotation type="privacy_respecting_ads">reklamách vo vyhľadávaní, ktoré rešpektujú súkromie</annotation>, a nie využívaním tvojich údajov.\n\nOkrem toho ponúkame aj <annotation type="ppro_help_page">predplatné DuckDuckGo</annotation>, integrované do nášho prehliadača. Predplatitelia získajú ešte väčšiu ochranu súkromia vďaka rýchlej a jednoduchej <annotation type="vpn_help_page">VPN</annotation>, ktorá pomáha zabezpečiť tvoju online aktivitu, prístup k pokročilým modelom AI v našej súkromnej chatovacej službe AI Duck.ai, ktorá nájde a odstráni tvoje osobné údaje zo stránok na vyhľadávanie ľudí, a službu, ktorá obnoví tvoju identitu v prípade krádeže.\n\nZískaj späť kontrolu nad svojimi osobnými údajmi s prehliadačom, ktorý je určený na ochranu údajov a nie na ich zhromažďovanie.</string>
     <string name="onboardingPrivacyProDaxDialogDescriptionRebranding"><![CDATA[DuckDuckGo má tiež <b>voliteľné platené</b> predplatné, ktoré zahŕňa bezpečnú <b>VPN</b> a <b>pokročilú súkromnú umelú</b> inteligenciu.]]></string>
-    <string name="settingsDuckAiRebranding">Funkcie AI</string>
-    <string name="settingsDuckAi">Duck.ai</string>
 
     <!--TabSwitcher Trackers Animation-->
     <string name="showTrackerCountInTabSwitcher">Zobraziť počet sledovačov v prepínači kariet</string>

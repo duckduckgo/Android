@@ -37,11 +37,13 @@
     <string name="audioCaptureSoundRecorderPermissionDeniedMessage">A webhelyek csak akkor használhatják a hangrögzítőt, ha engedélyezed, hogy a DuckDuckGo hozzáférést kérhessen.</string>
 
     <!-- Settings -->
-    <string name="duck_chat_settings_activity_description">A Duck.ai egy opcionális funkció, amely lehetővé teszi a harmadik féltől származó népszerű AI-csevegési modellekkel való névtelen csevegést. A csevegéseidet nem használjuk fel az AI tanítására.\n<annotation type="learn_more_link">További részletek</annotation></string>
-    <string name="duck_chat_enable_duck_ai_setting">Duck.ai engedélyezése</string>
+    <string name="duck_chat_ai_features_title">AI funkciók</string>
+    <string name="duck_chat_settings_activity_description">A DuckDuckGo AI-funkciói privátak és opcionálisak.\nAz adataidat nem használjuk fel az AI tanítására.\n<annotation type="learn_more_link">További részletek</annotation></string>
+    <string name="duck_chat_enable_duck_ai_setting">Duck.ai</string>
+    <string name="duck_chat_enable_duck_ai_setting_description">Privát csevegés harmadik féltől származó népszerű AI-modellekkel</string>
     <string name="duck_chat_visibility_setting">Böngészési menü</string>
     <string name="duck_chat_address_bar_visibility_setting">Címsor</string>
-    <string name="duck_chat_assist_settings_title">Assist-beállítások</string>
+    <string name="duck_chat_assist_settings_title">Keresési asszisztens beállításai</string>
     <string name="duck_chat_assist_settings_description">Válaszd ki, milyen gyakran szeretnél mesterséges intelligenciával generált válaszokat látni a kereséseid során</string>
     <string name="duck_ai_shortcut_settings_title">Duck.ai-gyorsparancsok</string>
     <string name="duck_ai_shortcut_settings_description">Válaszd ki a megjelenítendő Duck.ai-gyorsparancsokat</string>
@@ -61,14 +63,6 @@
     <string name="duck_ai_paid_settings_page_description"><![CDATA[Privát csevegés a csak előfizetőknek szánt AI-modellekkel.\n<a href=\"\">További részletek</a>]]></string>
     <string name="duck_ai_paid_settings_open_duck_ai">Duck.ai megnyitása</string>
     <string name="duck_ai_paid_settings_learn_more_title">További részletek</string>
-
-    <!-- Rebranding-->
-    <string name="duck_chat_title_rebranding">AI funkciók</string>
-    <string name="duck_chat_settings_activity_description_rebranding">A DuckDuckGo AI-funkciói privátak és opcionálisak.\nAz adataidat nem használjuk fel az AI tanítására.\n<annotation type="learn_more_link">További részletek</annotation></string>
-    <string name="duck_chat_enable_duck_ai_setting_rebranding">Duck.ai</string>
-    <string name="duck_chat_enable_duck_ai_setting_description_rebranding">Privát csevegés harmadik féltől származó népszerű AI-modellekkel</string>
-    <string name="duck_chat_assist_settings_title_rebranding">Keresési asszisztens beállításai</string>
-    <string name="duck_chat_assist_settings_description_rebranding">Válaszd ki, milyen gyakran szeretnél mesterséges intelligenciával generált válaszokat látni a kereséseid során</string>
 
     <!-- AutoComplete -->
     <string name="autocompleteDuckAiPrompt">Duck.ai kérdezése</string>

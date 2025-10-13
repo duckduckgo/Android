@@ -37,11 +37,13 @@
     <string name="audioCaptureSoundRecorderPermissionDeniedMessage">Websites können deinen Audiorekorder nur verwenden, wenn du DuckDuckGo erlaubst, um Zugriff zu bitten.</string>
 
     <!-- Settings -->
-    <string name="duck_chat_settings_activity_description">Duck.ai ist eine optionale Funktion, mit der du anonym mit beliebten KI-Chatmodellen von Drittanbietern chatten kannst. Deine Chats werden nicht zum Trainieren von KI verwendet.\n<annotation type="learn_more_link">Mehr erfahren</annotation></string>
-    <string name="duck_chat_enable_duck_ai_setting">Aktiviere Duck.ai</string>
+    <string name="duck_chat_ai_features_title">KI-Funktionen</string>
+    <string name="duck_chat_settings_activity_description">Die KI-Funktionen von DuckDuckGo sind privat und optional.\nIhre Daten werden nicht zum Trainieren von KI verwendet.\n<annotation type="learn_more_link">Mehr erfahren</annotation></string>
+    <string name="duck_chat_enable_duck_ai_setting">Duck.ai</string>
+    <string name="duck_chat_enable_duck_ai_setting_description">Privat mit beliebten KI-Modellen von Drittanbietern chatten</string>
     <string name="duck_chat_visibility_setting">Browsermenü</string>
     <string name="duck_chat_address_bar_visibility_setting">Adresszeile</string>
-    <string name="duck_chat_assist_settings_title">Assist-Einstellungen</string>
+    <string name="duck_chat_assist_settings_title">Such-Assist-Einstellungen</string>
     <string name="duck_chat_assist_settings_description">Du kannst auswählen, wie oft KI-gestützte Antworten in deinen Suchergebnissen angezeigt werden sollen.</string>
     <string name="duck_ai_shortcut_settings_title">Duck.ai-Shortcuts</string>
     <string name="duck_ai_shortcut_settings_description">Wähle aus, welche Duck.ai-Shortcuts angezeigt werden sollen</string>
@@ -61,14 +63,6 @@
     <string name="duck_ai_paid_settings_page_description"><![CDATA[Chatte privat mit exklusiven KI-Modellen für Abonnenten.\n<a href=\"\">Mehr erfahren</a>]]></string>
     <string name="duck_ai_paid_settings_open_duck_ai">Duck.ai öffnen</string>
     <string name="duck_ai_paid_settings_learn_more_title">Mehr erfahren</string>
-
-    <!-- Rebranding-->
-    <string name="duck_chat_title_rebranding">KI-Funktionen</string>
-    <string name="duck_chat_settings_activity_description_rebranding">Die KI-Funktionen von DuckDuckGo sind privat und optional.\nIhre Daten werden nicht zum Trainieren von KI verwendet.\n<annotation type="learn_more_link">Mehr erfahren</annotation></string>
-    <string name="duck_chat_enable_duck_ai_setting_rebranding">Duck.ai</string>
-    <string name="duck_chat_enable_duck_ai_setting_description_rebranding">Privat mit beliebten KI-Modellen von Drittanbietern chatten</string>
-    <string name="duck_chat_assist_settings_title_rebranding">Such-Assist-Einstellungen</string>
-    <string name="duck_chat_assist_settings_description_rebranding">Du kannst auswählen, wie oft KI-gestützte Antworten in deinen Suchergebnissen angezeigt werden sollen.</string>
 
     <!-- AutoComplete -->
     <string name="autocompleteDuckAiPrompt">Frag Duck.ai</string>

@@ -37,11 +37,13 @@
     <string name="audioCaptureSoundRecorderPermissionDeniedMessage">Sites kunnen de geluidsrecorder alleen gebruiken als je DuckDuckGo toestaat om toegang te vragen.</string>
 
     <!-- Settings -->
-    <string name="duck_chat_settings_activity_description">Duck.ai is een optionele functie waarmee je anoniem kunt chatten met populaire AI-chatmodellen van derden. Je chats worden niet gebruikt om AI te trainen.\n<annotation type="learn_more_link">Meer informatie</annotation></string>
-    <string name="duck_chat_enable_duck_ai_setting">Duck.ai inschakelen</string>
+    <string name="duck_chat_ai_features_title">AI-functies</string>
+    <string name="duck_chat_settings_activity_description">DuckDuckGo AI-functies zijn privé en optioneel.\nJe gegevens worden niet gebruikt om AI te trainen.\n<annotation type="learn_more_link">Meer informatie</annotation></string>
+    <string name="duck_chat_enable_duck_ai_setting">Duck.ai</string>
+    <string name="duck_chat_enable_duck_ai_setting_description">Chat privé met populaire AI-modellen van derden</string>
     <string name="duck_chat_visibility_setting">Browsermenu</string>
     <string name="duck_chat_address_bar_visibility_setting">Adresbalk</string>
-    <string name="duck_chat_assist_settings_title">Assist-instellingen</string>
+    <string name="duck_chat_assist_settings_title">Instellingen voor zoek Assist</string>
     <string name="duck_chat_assist_settings_description">Kies hoe vaak antwoorden op basis van AI in je zoekresultaten moeten worden weergegeven</string>
     <string name="duck_ai_shortcut_settings_title">Duck.ai-snelkoppelingen</string>
     <string name="duck_ai_shortcut_settings_description">Kies welke Duck.ai-snelkoppelingen je wilt weergeven</string>
@@ -61,14 +63,6 @@
     <string name="duck_ai_paid_settings_page_description"><![CDATA[Chat privé met AI-modellen die exclusief voor abonnees zijn.\n<a href=\"\">Meer informatie</a>]]></string>
     <string name="duck_ai_paid_settings_open_duck_ai">Duck.ai openen</string>
     <string name="duck_ai_paid_settings_learn_more_title">Meer informatie</string>
-
-    <!-- Rebranding-->
-    <string name="duck_chat_title_rebranding">AI-functies</string>
-    <string name="duck_chat_settings_activity_description_rebranding">DuckDuckGo AI-functies zijn privé en optioneel.\nJe gegevens worden niet gebruikt om AI te trainen.\n<annotation type="learn_more_link">Meer informatie</annotation></string>
-    <string name="duck_chat_enable_duck_ai_setting_rebranding">Duck.ai</string>
-    <string name="duck_chat_enable_duck_ai_setting_description_rebranding">Chat privé met populaire AI-modellen van derden</string>
-    <string name="duck_chat_assist_settings_title_rebranding">Instellingen voor zoek Assist</string>
-    <string name="duck_chat_assist_settings_description_rebranding">Kies hoe vaak antwoorden op basis van AI in je zoekresultaten moeten worden weergegeven</string>
 
     <!-- AutoComplete -->
     <string name="autocompleteDuckAiPrompt">Vraag stellen aan Duck.ai</string>

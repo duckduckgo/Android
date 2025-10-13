@@ -40,18 +40,21 @@ import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.mobile.android.app.tracking.AppTrackingProtection
 import com.duckduckgo.settings.api.SettingsPageFeature
 import com.duckduckgo.subscriptions.api.PrivacyProUnifiedFeedback
-import com.duckduckgo.subscriptions.api.SubscriptionRebrandingFeatureToggle
 import com.duckduckgo.subscriptions.api.Subscriptions
 import com.duckduckgo.sync.api.DeviceSyncState
 import com.duckduckgo.voice.api.VoiceSearchAvailability
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
-import org.junit.Assert.*
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import org.mockito.kotlin.*
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.verify
+import org.mockito.kotlin.whenever
 
 @SuppressLint("DenyListedApi")
 class SettingsViewModelTest {
@@ -101,7 +104,6 @@ class SettingsViewModelTest {
     private val duckAiShowSettingsFlow = MutableStateFlow(false)
 
     private val fakePostCtaExperienceToggles = FakeFeatureToggleFactory.create(PostCtaExperienceToggles::class.java)
-    private val mockRebrandingFeatureToggle: SubscriptionRebrandingFeatureToggle = mock()
 
     @Before
     fun before() = runTest {
@@ -132,7 +134,6 @@ class SettingsViewModelTest {
             settingsPageFeature = fakeSettingsPageFeature,
             widgetCapabilities = mockWidgetCapabilities,
             postCtaExperienceToggles = fakePostCtaExperienceToggles,
-            rebrandingFeatureToggle = mockRebrandingFeatureToggle,
         )
     }
 

@@ -167,6 +167,7 @@
     <string name="settingsAddressBarPosition">Establece la posición de la barra de direcciones</string>
     <string name="settingsEnableVoiceSearch">Activar la búsqueda privada por voz</string>
     <string name="settingsDDGOnOtherPlatforms">DuckDuckGo en otras plataformas</string>
+    <string name="settingsDuckAi">Características de la IA</string>
 
     <!-- Private Search -->
     <string name="privateSearchActivityTitle">Búsqueda Privada</string>
@@ -926,8 +927,6 @@
     <!-- Privacy Pro Rebranding-->
     <string name="aboutDescriptionBrandUpdate2025Rebranding">Welcome to the Duck Side!\n\nDuckDuckGo es la empresa independiente de protección en Internet para quienes quieren recuperar el control de su información personal.\n\nCreemos que la mejor manera de proteger tu información personal contra hackers, estafadores y empresas que invaden la privacidad es evitar que se recopile. Por eso, millones de personas <annotation type="chart_comparison">eligen DuckDuckGo en lugar de Chrome y otros navegadores</annotation> para buscar y navegar en línea. Nuestro motor de búsqueda integrado es como Google, pero nunca rastrea tus búsquedas. Y nuestras protecciones de navegación, como el bloqueo de rastreadores de anuncios y el bloqueo de cookies, ayudan a impedir que otras empresas recopilen tus datos. ¡Ah! Y nuestro navegador es gratuito: ganamos dinero con <annotation type="privacy_respecting_ads">anuncios de búsqueda que respetan la privacidad</annotation>, no explotando tus datos.Además, también ofrecemos <annotation type="ppro_help_page">la suscripción a DuckDuckGo</annotation> integrada en nuestro navegador. Los suscriptores obtienen aún más protección de privacidad con una <annotation type="vpn_help_page">VPN</annotation> rápida y sencilla que ayuda a proteger tu actividad en línea, acceso a modelos avanzados de IA en nuestro servicio privado de chat de IA Duck.ai, un servicio que encuentra y elimina tu información personal de los sitios de búsqueda de personas, y un servicio que restaura tu identidad en caso de robo.\n\nRecupera el control de tu información personal con el navegador diseñado para proteger tus datos, no para recopilarlos.</string>
     <string name="onboardingPrivacyProDaxDialogDescriptionRebranding"><![CDATA[DuckDuckGo también ofrece una <b>suscripción opcional de pago</b>, con una <b>VPN</b> segura y <b>una IA privada avanzada</b>.]]></string>
-    <string name="settingsDuckAiRebranding">Características de la IA</string>
-    <string name="settingsDuckAi">Duck.ai</string>
 
     <!--TabSwitcher Trackers Animation-->
     <string name="showTrackerCountInTabSwitcher">Mostrar recuento de rastreadores en el selector de pestañas</string>

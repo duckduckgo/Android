@@ -30,7 +30,6 @@ import com.duckduckgo.duckchat.impl.ui.settings.DuckChatSettingsViewModel.Comman
 import com.duckduckgo.duckchat.impl.ui.settings.DuckChatSettingsViewModel.Command.OpenLinkInNewTab
 import com.duckduckgo.duckchat.impl.ui.settings.DuckChatSettingsViewModel.Command.OpenShortcutSettings
 import com.duckduckgo.settings.api.SettingsPageFeature
-import com.duckduckgo.subscriptions.api.SubscriptionRebrandingFeatureToggle
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.SharingStarted
@@ -44,7 +43,6 @@ import javax.inject.Inject
 class DuckChatSettingsViewModel @Inject constructor(
     private val duckChat: DuckChatInternal,
     private val pixel: Pixel,
-    private val rebrandingAiFeaturesEnabled: SubscriptionRebrandingFeatureToggle,
     private val inputScreenDiscoveryFunnel: InputScreenDiscoveryFunnel,
     private val settingsPageFeature: SettingsPageFeature,
 ) : ViewModel() {
@@ -56,7 +54,6 @@ class DuckChatSettingsViewModel @Inject constructor(
         val isInputScreenEnabled: Boolean = false,
         val shouldShowShortcuts: Boolean = false,
         val shouldShowInputScreenToggle: Boolean = false,
-        val isRebrandingAiFeaturesEnabled: Boolean = false,
     )
 
     val viewState =
@@ -69,7 +66,6 @@ class DuckChatSettingsViewModel @Inject constructor(
                 isInputScreenEnabled = isInputScreenEnabled,
                 shouldShowShortcuts = isDuckChatUserEnabled,
                 shouldShowInputScreenToggle = isDuckChatUserEnabled && duckChat.isInputScreenFeatureAvailable(),
-                isRebrandingAiFeaturesEnabled = rebrandingAiFeaturesEnabled.isAIFeaturesRebrandingEnabled(),
             )
         }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), ViewState())
 
@@ -133,7 +129,7 @@ class DuckChatSettingsViewModel @Inject constructor(
                 commandChannel.send(
                     OpenLink(
                         DUCK_CHAT_SEARCH_AI_SETTINGS_LINK_EMBEDDED,
-                        R.string.duck_chat_assist_settings_title_rebranding,
+                        R.string.duck_chat_assist_settings_title,
                     ),
                 )
             } else {
