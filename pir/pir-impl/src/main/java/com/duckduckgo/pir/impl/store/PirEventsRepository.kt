@@ -21,10 +21,13 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.pir.impl.models.ExtractedProfile
 import com.duckduckgo.pir.impl.store.db.BrokerScanEventType.BROKER_ERROR
 import com.duckduckgo.pir.impl.store.db.BrokerScanEventType.BROKER_SUCCESS
+import com.duckduckgo.pir.impl.store.db.EmailConfirmationEventType
+import com.duckduckgo.pir.impl.store.db.EmailConfirmationLogDao
 import com.duckduckgo.pir.impl.store.db.OptOutActionLog
 import com.duckduckgo.pir.impl.store.db.OptOutCompletedBroker
 import com.duckduckgo.pir.impl.store.db.OptOutResultsDao
 import com.duckduckgo.pir.impl.store.db.PirBrokerScanLog
+import com.duckduckgo.pir.impl.store.db.PirEmailConfirmationLog
 import com.duckduckgo.pir.impl.store.db.PirEventLog
 import com.duckduckgo.pir.impl.store.db.ScanCompletedBroker
 import com.duckduckgo.pir.impl.store.db.ScanLogDao
@@ -88,6 +91,16 @@ interface PirEventsRepository {
     )
 
     suspend fun deleteAllOptOutData()
+
+    suspend fun saveEmailConfirmationLog(
+        eventTimeInMillis: Long,
+        type: EmailConfirmationEventType,
+        detail: String,
+    )
+
+    fun getAllEmailConfirmationLogFlow(): Flow<List<PirEmailConfirmationLog>>
+
+    suspend fun deleteAllEmailConfirmationsLogs()
 }
 
 @ContributesBinding(
@@ -101,6 +114,7 @@ class RealPirEventsRepository @Inject constructor(
     private val scanResultsDao: ScanResultsDao,
     private val scanLogDao: ScanLogDao,
     private val optOutResultsDao: OptOutResultsDao,
+    private val emailConfirmationLogDao: EmailConfirmationLogDao,
 ) : PirEventsRepository {
     private val extractedProfileAdapter by lazy { moshi.adapter(ExtractedProfile::class.java) }
 
@@ -229,5 +243,27 @@ class RealPirEventsRepository @Inject constructor(
     override suspend fun deleteAllOptOutData() = withContext(dispatcherProvider.io()) {
         optOutResultsDao.deleteAllOptOutActionLog()
         optOutResultsDao.deleteAllOptOutCompletedBroker()
+    }
+
+    override suspend fun saveEmailConfirmationLog(
+        eventTimeInMillis: Long,
+        type: EmailConfirmationEventType,
+        detail: String,
+    ) = withContext(dispatcherProvider.io()) {
+        emailConfirmationLogDao.insertEmailConfirmationLog(
+            PirEmailConfirmationLog(
+                eventTimeInMillis = eventTimeInMillis,
+                eventType = type,
+                value = detail,
+            ),
+        )
+    }
+
+    override fun getAllEmailConfirmationLogFlow(): Flow<List<PirEmailConfirmationLog>> {
+        return emailConfirmationLogDao.getAllEmailConfirmationLogsFlow()
+    }
+
+    override suspend fun deleteAllEmailConfirmationsLogs() = withContext(dispatcherProvider.io()) {
+        emailConfirmationLogDao.deleteAllEmailConfirmationLogs()
     }
 }

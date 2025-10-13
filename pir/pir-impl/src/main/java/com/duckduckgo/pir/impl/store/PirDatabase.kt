@@ -29,6 +29,7 @@ import com.duckduckgo.pir.impl.store.db.BrokerOptOut
 import com.duckduckgo.pir.impl.store.db.BrokerScan
 import com.duckduckgo.pir.impl.store.db.BrokerSchedulingConfigEntity
 import com.duckduckgo.pir.impl.store.db.EmailConfirmationJobRecordEntity
+import com.duckduckgo.pir.impl.store.db.EmailConfirmationLogDao
 import com.duckduckgo.pir.impl.store.db.ExtractedProfileDao
 import com.duckduckgo.pir.impl.store.db.JobSchedulingDao
 import com.duckduckgo.pir.impl.store.db.MirrorSiteEntity
@@ -37,6 +38,7 @@ import com.duckduckgo.pir.impl.store.db.OptOutCompletedBroker
 import com.duckduckgo.pir.impl.store.db.OptOutJobRecordEntity
 import com.duckduckgo.pir.impl.store.db.OptOutResultsDao
 import com.duckduckgo.pir.impl.store.db.PirBrokerScanLog
+import com.duckduckgo.pir.impl.store.db.PirEmailConfirmationLog
 import com.duckduckgo.pir.impl.store.db.PirEventLog
 import com.duckduckgo.pir.impl.store.db.ScanCompletedBroker
 import com.duckduckgo.pir.impl.store.db.ScanJobRecordEntity
@@ -51,7 +53,7 @@ import com.squareup.moshi.Types
 
 @Database(
     exportSchema = true,
-    version = 12,
+    version = 13,
     entities = [
         BrokerJsonEtag::class,
         BrokerEntity::class,
@@ -69,6 +71,7 @@ import com.squareup.moshi.Types
         OptOutJobRecordEntity::class,
         MirrorSiteEntity::class,
         EmailConfirmationJobRecordEntity::class,
+        PirEmailConfirmationLog::class,
     ],
 )
 @TypeConverters(PirDatabaseConverters::class)
@@ -82,6 +85,8 @@ abstract class PirDatabase : RoomDatabase() {
     abstract fun userProfileDao(): UserProfileDao
 
     abstract fun scanLogDao(): ScanLogDao
+
+    abstract fun emailConfirmationLogDao(): EmailConfirmationLogDao
 
     abstract fun optOutResultsDao(): OptOutResultsDao
 

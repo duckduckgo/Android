@@ -17,6 +17,7 @@
 package com.duckduckgo.pir.impl.common
 
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerManualScanCompleted
 import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerRecordEmailConfirmationCompleted
 import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerRecordEmailConfirmationNeeded
@@ -43,6 +44,8 @@ import com.duckduckgo.pir.impl.store.PirRepository
 import com.duckduckgo.pir.impl.store.PirSchedulingRepository
 import com.duckduckgo.pir.impl.store.db.BrokerScanEventType.BROKER_ERROR
 import com.duckduckgo.pir.impl.store.db.BrokerScanEventType.BROKER_SUCCESS
+import com.duckduckgo.pir.impl.store.db.EmailConfirmationEventType.EMAIL_CONFIRMATION_FAILED
+import com.duckduckgo.pir.impl.store.db.EmailConfirmationEventType.EMAIL_CONFIRMATION_SUCCESS
 import com.duckduckgo.pir.impl.store.db.PirBrokerScanLog
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
@@ -67,6 +70,7 @@ class RealPirRunStateHandlerTest {
     private val mockPixelSender: PirPixelSender = mock()
     private val mockJobRecordUpdater: JobRecordUpdater = mock()
     private val mockSchedulingRepository: PirSchedulingRepository = mock()
+    private val mockCurrentTimeProvider: CurrentTimeProvider = mock()
 
     @Before
     fun setUp() {
@@ -78,7 +82,10 @@ class RealPirRunStateHandlerTest {
                 dispatcherProvider = coroutineRule.testDispatcherProvider,
                 jobRecordUpdater = mockJobRecordUpdater,
                 pirSchedulingRepository = mockSchedulingRepository,
+                currentTimeProvider = mockCurrentTimeProvider,
             )
+
+        whenever(mockCurrentTimeProvider.currentTimeMillis()).thenReturn(testEventTimeInMillis)
     }
 
     // Test data
@@ -580,6 +587,11 @@ class RealPirRunStateHandlerTest {
                 brokerUrl = testBroker.url,
                 brokerVersion = testBroker.version,
             )
+            verify(mockEventsRepository).saveEmailConfirmationLog(
+                testEventTimeInMillis,
+                EMAIL_CONFIRMATION_SUCCESS,
+                testBrokerName,
+            )
             verifyNoMoreInteractions(mockPixelSender)
             verifyNoMoreInteractions(mockJobRecordUpdater)
         }
@@ -612,6 +624,11 @@ class RealPirRunStateHandlerTest {
                 actionId = state.lastActionId,
                 attemptNumber = testEmailConfirmationJob.jobAttemptData.jobAttemptCount,
                 durationMs = state.totalTimeMillis,
+            )
+            verify(mockEventsRepository).saveEmailConfirmationLog(
+                testEventTimeInMillis,
+                EMAIL_CONFIRMATION_FAILED,
+                testBrokerName,
             )
             verifyNoMoreInteractions(mockPixelSender)
             verifyNoMoreInteractions(mockJobRecordUpdater)
