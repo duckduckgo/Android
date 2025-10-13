@@ -55,13 +55,28 @@ class RealPirEmailConfirmationJobsRunner @Inject constructor(
     private val pirPixelSender: PirPixelSender,
     private val currentTimeProvider: CurrentTimeProvider,
 ) : PirEmailConfirmationJobsRunner {
+    private var startedTimeMs: Long = 0L
+    private var totalFetchAttempts: Int = 0
+    private var totalEmailConfirmationJobs: Int = 0
+
     override suspend fun runEligibleJobs(context: Context): Result<Unit> {
+        startedTimeMs = currentTimeProvider.currentTimeMillis()
+        pirPixelSender.reportEmailConfirmationStarted()
+
         logcat { "PIR-EMAIL-CONFIRMATION: Starting run." }
         val activeBrokersMap = pirRepository.getAllActiveBrokerObjects().associateBy { it.name }
+
+        if (activeBrokersMap.isEmpty()) {
+            logcat { "PIR-EMAIL-CONFIRMATION: NO active brokers." }
+            handleJobCompleted()
+            return Result.success(Unit)
+        }
 
         runEmailConfirmationFetch(activeBrokersMap)
         runEmailConfirmationJobs(context, activeBrokersMap)
         logcat { "PIR-EMAIL-CONFIRMATION: Completed run." }
+
+        handleJobCompleted()
         return Result.success(Unit)
     }
 
@@ -81,6 +96,7 @@ class RealPirEmailConfirmationJobsRunner @Inject constructor(
                     }.associateBy { it.emailData.email }
             if (eligibleJobRecordsMap.isEmpty()) {
                 logcat { "PIR-EMAIL-CONFIRMATION: No fetch to run" }
+                handleJobCompleted()
                 return@withContext
             }
 
@@ -90,6 +106,8 @@ class RealPirEmailConfirmationJobsRunner @Inject constructor(
             eligibleJobRecordsMap.forEach {
                 jobRecordUpdater.recordEmailConfirmationFetchAttempt(it.value.extractedProfileId)
             }
+
+            totalFetchAttempts = eligibleJobRecordsMap.size
 
             pirRepository.getEmailConfirmationLinkStatus(eligibleJobRecordsMap.values.map { it.emailData }).forEach {
                 val record = eligibleJobRecordsMap[it.key.email]
@@ -234,6 +252,8 @@ class RealPirEmailConfirmationJobsRunner @Inject constructor(
                 it.jobAttemptData.jobAttemptCount < EMAIL_CONFIRMATION_JOB_MAX_ATTEMPTS
             }
 
+        totalEmailConfirmationJobs = eligibleJobs.size
+
         if (eligibleJobs.isNotEmpty()) {
             logcat { "PIR-EMAIL-CONFIRMATION: Running ${eligibleJobs.size} email confirmation jobs" }
             emailConfirmation.executeForEmailConfirmationJobs(
@@ -244,6 +264,14 @@ class RealPirEmailConfirmationJobsRunner @Inject constructor(
         } else {
             logcat { "PIR-EMAIL-CONFIRMATION: No email confirmation jobs to run." }
         }
+    }
+
+    private fun handleJobCompleted() {
+        pirPixelSender.reportEmailConfirmationCompleted(
+            totalTimeInMillis = currentTimeProvider.currentTimeMillis() - startedTimeMs,
+            totalFetchAttempts = totalFetchAttempts,
+            totalEmailConfirmationJobs = totalEmailConfirmationJobs,
+        )
     }
 
     companion object {

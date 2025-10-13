@@ -25,6 +25,8 @@ import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_EMAIL_CONFIRMATION_JOB_SUCCES
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_EMAIL_CONFIRMATION_LINK_BE_ERROR
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_EMAIL_CONFIRMATION_LINK_RECEIVED
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_EMAIL_CONFIRMATION_MAX_RETRIES_EXCEEDED
+import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_EMAIL_CONFIRMATION_RUN_COMPLETED
+import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_EMAIL_CONFIRMATION_RUN_STARTED
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_INTERNAL_BROKER_OPT_OUT_COMPLETED
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_INTERNAL_BROKER_OPT_OUT_STARTED
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_INTERNAL_BROKER_SCAN_COMPLETED
@@ -272,6 +274,14 @@ interface PirPixelSender {
         brokerUrl: String,
         brokerVersion: String,
     )
+
+    fun reportEmailConfirmationStarted()
+
+    fun reportEmailConfirmationCompleted(
+        totalTimeInMillis: Long,
+        totalFetchAttempts: Int,
+        totalEmailConfirmationJobs: Int,
+    )
 }
 
 @ContributesBinding(AppScope::class)
@@ -499,6 +509,23 @@ class RealPirPixelSender @Inject constructor(
         fire(PIR_EMAIL_CONFIRMATION_JOB_SUCCESS, params)
     }
 
+    override fun reportEmailConfirmationStarted() {
+        fire(PIR_EMAIL_CONFIRMATION_RUN_STARTED)
+    }
+
+    override fun reportEmailConfirmationCompleted(
+        totalTimeInMillis: Long,
+        totalFetchAttempts: Int,
+        totalEmailConfirmationJobs: Int,
+    ) {
+        val params = mapOf(
+            PARAM_KEY_TOTAL_TIME to totalTimeInMillis.toString(),
+            PARAM_TOTAL_FETCH to totalFetchAttempts.toString(),
+            PARAM_TOTAL_EMAIL_CONFIRMATION to totalEmailConfirmationJobs.toString(),
+        )
+        fire(PIR_EMAIL_CONFIRMATION_RUN_COMPLETED, params)
+    }
+
     private fun fire(
         pixel: PirPixel,
         params: Map<String, String> = emptyMap(),
@@ -526,5 +553,7 @@ class RealPirPixelSender @Inject constructor(
         private const val PARAM_DURATION = "duration"
         private const val PARAM_TRIES = "tries"
         private const val PARAM_ATTEMPT_NUMBER = "attempt_number"
+        private const val PARAM_TOTAL_FETCH = "totalFetchAttempts"
+        private const val PARAM_TOTAL_EMAIL_CONFIRMATION = "totalEmailConfirmationJobs"
     }
 }

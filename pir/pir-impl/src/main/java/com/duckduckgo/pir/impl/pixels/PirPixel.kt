@@ -117,6 +117,14 @@ enum class PirPixel(
     PIR_EMAIL_CONFIRMATION_JOB_SUCCESS(
         baseName = "pir_email-confirmation_job-success",
         type = Count,
+    ),
+    PIR_EMAIL_CONFIRMATION_RUN_STARTED(
+        baseName = "pir_email-confirmation_started",
+        type = Count,
+    ),
+    PIR_EMAIL_CONFIRMATION_RUN_COMPLETED(
+        baseName = "pir_email-confirmation_completed",
+        type = Count,
     ), ;
 
     constructor(
