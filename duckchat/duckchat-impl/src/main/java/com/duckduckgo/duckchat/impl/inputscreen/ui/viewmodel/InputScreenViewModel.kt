@@ -144,6 +144,9 @@ class InputScreenViewModel @AssistedInject constructor(
                 showChatLogo = true,
                 showSearchLogo = true,
                 newLineButtonVisible = false,
+                mainButtonsEnabled = inputScreenConfigResolver.mainButtonsEnabled(),
+                mainButtonsVisible = false,
+                searchMode = true,
             ),
         )
     val visibilityState: StateFlow<InputScreenVisibilityState> = _visibilityState.asStateFlow()
@@ -361,6 +364,9 @@ class InputScreenViewModel @AssistedInject constructor(
         _submitButtonIconState.update {
             it.copy(icon = if (isWebUrl(query)) SubmitButtonIcon.SEND else SubmitButtonIcon.SEARCH)
         }
+        _visibilityState.update {
+            it.copy(searchMode = true, mainButtonsVisible = query.isEmpty())
+        }
     }
 
     fun onChatInputTextChanged(query: String) {
@@ -438,7 +444,7 @@ class InputScreenViewModel @AssistedInject constructor(
                 it.copy(icon = SubmitButtonIcon.SEND)
             }
             _visibilityState.update {
-                it.copy(newLineButtonVisible = true)
+                it.copy(newLineButtonVisible = true, searchMode = false, mainButtonsVisible = false)
             }
         }
         if (userSelectedMode == SEARCH) {
@@ -619,6 +625,15 @@ class InputScreenViewModel @AssistedInject constructor(
 
     fun onBrowserMenuTapped() {
         command.value = Command.MenuRequested
+    }
+
+    fun onClearTextTapped() {
+        val params = inputScreenPixelsModeParam(isSearchMode = visibilityState.value.searchMode)
+        pixel.fire(DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_OMNIBAR_CLEAR_BUTTON_PRESSED, parameters = params)
+
+        _visibilityState.update {
+            it.copy(mainButtonsVisible = true)
+        }
     }
 
     class InputScreenViewModelProviderFactory(

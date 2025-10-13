@@ -56,6 +56,7 @@ import com.duckduckgo.duckchat.impl.pixel.inputScreenPixelsModeParam
 import com.google.android.material.card.MaterialCardView
 import com.google.android.material.tabs.TabLayout
 import dagger.android.support.AndroidSupportInjection
+import logcat.logcat
 import javax.inject.Inject
 import kotlin.math.roundToInt
 
@@ -64,7 +65,6 @@ class InputModeWidget @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyle: Int = 0,
-    val shouldShowMainButtons: Boolean = false,
 ) : ConstraintLayout(context, attrs, defStyle) {
     @Inject
     lateinit var pixel: Pixel
@@ -75,7 +75,7 @@ class InputModeWidget @JvmOverloads constructor(
     private val inputModeSwitch: TabLayout
     private val inputModeWidgetCard: MaterialCardView
     private val inputScreenButtonsContainer: FrameLayout
-    private val inputModeIconsContainer: View
+    private val inputModeMainButtonsContainer: View
     private val inputModeWidgetLayout: View
     val tabSwitcherButton: TabSwitcherButton
     private val menuButton: View
@@ -110,6 +110,7 @@ class InputModeWidget @JvmOverloads constructor(
     var onFireButtonTapped: (() -> Unit)? = null
     var onTabSwitcherTapped: (() -> Unit)? = null
     var onMenuTapped: (() -> Unit)? = null
+    var onClearTextTapped: (() -> Unit)? = null
 
     var text: String
         get() = inputField.text.toString()
@@ -145,15 +146,14 @@ class InputModeWidget @JvmOverloads constructor(
         menuButton = findViewById(R.id.inputFieldBrowserMenu)
         fireButton = findViewById(R.id.inputFieldFireButton)
         tabSwitcherButton = findViewById(R.id.inputFieldTabsMenu)
-        voiceInputButton = findViewById(R.id.inputFieldVoiceSearchButton)
+        voiceInputButton = findViewById(R.id.inputFieldVoiceInputButton)
         inputScreenButtonsContainer = findViewById(R.id.inputScreenButtonsContainer)
-        inputModeIconsContainer = findViewById(R.id.inputModeIconsContainer)
+        inputModeMainButtonsContainer = findViewById(R.id.inputModeMainButtonsContainer)
         inputModeWidgetLayout = findViewById(R.id.inputModeWidgetLayout)
 
         configureClickListeners()
         configureInputBehavior()
         configureTabBehavior()
-        configureMainButtons()
         applyModeSpecificInputBehaviour(isSearchTab = true)
         configureShadow()
     }
@@ -163,14 +163,28 @@ class InputModeWidget @JvmOverloads constructor(
         super.onAttachedToWindow()
     }
 
-    fun provideInitialText(text: String) {
+    private fun provideInitialText(text: String) {
         originalText = text
         this.text = text
     }
 
+    fun provideInitialInputState(
+        text: String,
+        canShowMainButtons: Boolean,
+    ) {
+        if (text.isNotEmpty()) {
+            provideInitialText(text)
+        }
+
+        if (canShowMainButtons && text.isNotEmpty()) {
+            inputModeMainButtonsContainer.show()
+        } else {
+            inputModeMainButtonsContainer.gone()
+        }
+    }
+
     fun init() {
         onSearchSelected?.invoke()
-        checkForButtonsVisibility()
     }
 
     fun clearInputFocus() {
@@ -182,10 +196,9 @@ class InputModeWidget @JvmOverloads constructor(
             inputField.text.clear()
             inputField.setSelection(0)
             inputField.scrollTo(0, 0)
+
             beginChangeBoundsTransition()
-            val params = inputScreenPixelsModeParam(isSearchMode = inputModeSwitch.selectedTabPosition == 0)
-            checkForButtonsVisibility()
-            pixel.fire(DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_OMNIBAR_CLEAR_BUTTON_PRESSED, parameters = params)
+            onClearTextTapped?.invoke()
         }
         inputModeWidgetBack.setOnClickListener {
             onBack?.invoke()
@@ -257,8 +270,7 @@ class InputModeWidget @JvmOverloads constructor(
                 }
 
                 val isNullOrEmpty = text.isNullOrEmpty()
-                inputFieldClearText.isVisible = !isNullOrEmpty
-                checkForButtonsVisibility()
+                fade(inputFieldClearText, !isNullOrEmpty)
             }
 
             doAfterTextChanged { text ->
@@ -296,7 +308,6 @@ class InputModeWidget @JvmOverloads constructor(
                         0 -> onSearchSelected?.invoke()
                         1 -> onChatSelected?.invoke()
                     }
-                    checkForButtonsVisibility()
                 }
 
                 override fun onTabUnselected(tab: TabLayout.Tab?) {}
@@ -304,46 +315,6 @@ class InputModeWidget @JvmOverloads constructor(
                 override fun onTabReselected(tab: TabLayout.Tab?) {}
             },
         )
-    }
-
-    private fun configureMainButtons() {
-        if (shouldShowMainButtons) {
-            inputModeIconsContainer.show()
-        } else {
-            inputModeIconsContainer.gone()
-        }
-    }
-
-    private fun checkForButtonsVisibility() {
-        if (shouldShowMainButtons) {
-            if (inputModeSwitch.selectedTabPosition == 0) {
-                // buttons are shown in search mode if the input field is empty
-                val text = inputField.text
-                val isNullOrEmpty = text.isNullOrEmpty()
-                fade(inputModeIconsContainer, isNullOrEmpty)
-
-                inputModeWidgetLayout.updateLayoutParams<MarginLayoutParams> {
-                    marginEnd = if (isNullOrEmpty) {
-                        inputModeCardEndMargin
-                    } else {
-                        inputModeCardExtendedEndMargin
-                    }
-                    marginStart = inputModeCardExtendedEndMargin
-                }
-            } else {
-                // in duck.ai mode buttons are never visible but we need to adjust the layout margins
-                fade(inputModeIconsContainer, false)
-                inputModeWidgetLayout.updateLayoutParams<MarginLayoutParams> {
-                    marginEnd = inputModeCardExtendedEndMargin
-                    marginStart = inputModeCardExtendedEndMargin
-                }
-            }
-        } else {
-            inputModeWidgetLayout.updateLayoutParams<MarginLayoutParams> {
-                marginEnd = inputModeCardExtendedEndMargin
-                marginStart = inputModeCardExtendedEndMargin
-            }
-        }
     }
 
     private fun applyModeSpecificInputBehaviour(isSearchTab: Boolean) {
@@ -475,6 +446,42 @@ class InputModeWidget @JvmOverloads constructor(
 
     fun setVoiceButtonVisible(visible: Boolean) {
         voiceInputButton.isVisible = visible
+    }
+
+    fun setMainButtonsVisible(
+        searchMode: Boolean,
+        mainButtonsVisible: Boolean,
+        mainButtonsEnabled: Boolean,
+    ) {
+        logcat { "inputScreen: setMainButtonsVisible searchMode $searchMode mainButtonsVisible $mainButtonsEnabled, mainButtonsEnabled" }
+        if (mainButtonsEnabled) {
+            if (searchMode) {
+                // buttons are shown in search mode if the input field is empty
+                fade(inputModeMainButtonsContainer, mainButtonsVisible)
+
+                inputModeWidgetLayout.updateLayoutParams<MarginLayoutParams> {
+                    marginEnd = if (mainButtonsVisible) {
+                        inputModeCardEndMargin
+                    } else {
+                        inputModeCardExtendedEndMargin
+                    }
+                    marginStart = inputModeCardExtendedEndMargin
+                }
+            } else {
+                // in duck.ai mode buttons are never visible but we need to adjust the layout margins
+                fade(inputModeMainButtonsContainer, false)
+                inputModeWidgetLayout.updateLayoutParams<MarginLayoutParams> {
+                    marginEnd = inputModeCardExtendedEndMargin
+                    marginStart = inputModeCardExtendedEndMargin
+                }
+            }
+        } else {
+            fade(inputModeMainButtonsContainer, false)
+            inputModeWidgetLayout.updateLayoutParams<MarginLayoutParams> {
+                marginEnd = inputModeCardExtendedEndMargin
+                marginStart = inputModeCardExtendedEndMargin
+            }
+        }
     }
 
     companion object {

@@ -83,7 +83,7 @@
             app:strokeWidth="@dimen/omnibarOutlineWidth"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toStartOf="@id/inputModeIconsContainer">
+            app:layout_constraintEnd_toStartOf="@id/inputModeMainButtonsContainer">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -120,7 +120,7 @@
                         android:textStyle="normal" />
 
                     <ImageView
-                        android:id="@+id/inputFieldVoiceSearchButton"
+                        android:id="@+id/inputFieldVoiceInputButton"
                         android:layout_width="@dimen/toolbarIcon"
                         android:layout_height="@dimen/toolbarIcon"
                         android:layout_gravity="top"
@@ -159,7 +159,7 @@
         </com.google.android.material.card.MaterialCardView>
 
         <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/inputModeIconsContainer"
+            android:id="@+id/inputModeMainButtonsContainer"
             android:layout_width="wrap_content"
             android:layout_height="@dimen/toolbarIcon"
             android:layout_marginStart="@dimen/keyline_2"
