@@ -23,9 +23,9 @@ import com.duckduckgo.adclick.impl.store.AdClickAttributionLinkFormatEntity
 import com.duckduckgo.adclick.impl.store.AdClickDao
 import com.duckduckgo.adclick.impl.store.AdClickDatabase
 import com.duckduckgo.common.utils.DispatcherProvider
-import java.util.concurrent.CopyOnWriteArrayList
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import java.util.concurrent.CopyOnWriteArrayList
 
 interface AdClickAttributionRepository {
     fun updateAll(

@@ -19,9 +19,9 @@ package com.duckduckgo.sync.impl.auth
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
-import javax.inject.Inject
 import logcat.LogPriority.VERBOSE
 import logcat.logcat
+import javax.inject.Inject
 
 /**
  * A grace period for local device authorization.

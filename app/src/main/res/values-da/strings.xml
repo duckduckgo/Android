@@ -167,6 +167,7 @@
     <string name="settingsAddressBarPosition">Angiv placeringen af adresselinjen</string>
     <string name="settingsEnableVoiceSearch">Aktiver privat stemmesøgning</string>
     <string name="settingsDDGOnOtherPlatforms">DuckDuckGo på andre platforme</string>
+    <string name="settingsDuckAi">AI-funktioner</string>
 
     <!-- Private Search -->
     <string name="privateSearchActivityTitle">Privat søgning</string>
@@ -246,7 +247,7 @@
     <string name="settingsAutomaticallyClearWhenAppExit30Minutes">App-afslutning, inaktiv i 30 minutter</string>
     <string name="settingsAutomaticallyClearWhenAppExit60Minutes">App-afslutning, inaktiv i 1 time</string>
     <string name="settingsClearAiDataTitle">Ryd Duck.ai-chats</string>
-    <string name="settingsClearAiDataMessage">Fire Button sletter også Duck.ai-historik</string>
+    <string name="settingsClearAiDataDeleteMessage">Fire Button sletter også Duck.ai-historik, inklusive fastgjorte chats.</string>
 
     <!-- About Activity -->
     <string name="aboutActivityTitle">Om DuckDuckGo</string>
@@ -776,36 +777,44 @@
     <string name="sslErrorUntrustedMessage" instruction="Placeholder is domain with certificate issues">Enhedens operativsystem har ikke tillid til sikkerhedscertifikatet for %1$s. Det er muligt, at webstedet er forkert konfigureret, eller at en angriber har kompromitteret din forbindelse, eller at dit systemur er forkert.</string>
 
     <!-- Extended Onboarding-->
-    <string name="preOnboardingDaxDialog1Title"><![CDATA[Hej<br/><br/>Er du klar til et bedre og mere privat internet?]]></string>
+    <string name="preOnboardingDaxDialog1Title"><![CDATA[Hej<br/><br/>Er du klar til en hurtigere browser, der holder dig beskyttet?]]></string>
     <string name="preOnboardingDaxDialog1Button">Lad os gøre det!</string>
-    <string name="preOnboardingDaxDialog2Title">Beskyttelse af privatlivet er aktiveret!</string>
+    <string name="preOnboardingDaxDialog1SecondaryButton">Jeg har været her før</string>
+    <string name="preOnboardingDaxDialog2Title">Beskyttelse aktiveret!</string>
     <string name="preOnboardingDaxDialog2Button">Vælg din browser</string>
+    <string name="preOnboardingDaxDialog3Title"><![CDATA[Forstået! Jeg springer de andre tips over.]]></string>
+    <string name="preOnboardingDaxDialog3Text"><![CDATA[Husk: Du kan slette alle dine faner, historik og browserdata med to tryk på <b>Fire Button</b> 🔥]]></string>
+    <string name="preOnboardingDaxDialog3SecondaryButton">Vis vejledning</string>
     <string name="preOnboardingComparisonChartItem1">Søg fortroligt som standard</string>
     <string name="preOnboardingComparisonChartItem2">Bloker tredjeparts-trackere</string>
     <string name="preOnboardingComparisonChartItem3">Bloker pop op-vinduer om cookies</string>
     <string name="preOnboardingComparisonChartItem4">Bloker målrettede annoncer</string>
     <string name="preOnboardingComparisonChartItem5">Slet browsingdata med én knap</string>
-    <string name="preOnboardingDaxDialog3Title">Fantastisk! Velkommen til den \"anden\" side.</string>
     <string name="preOnboardingDaxDialog3Button">Start søgning</string>
+    <string name="preOnboardingAddressBarTitle">Hvor skal jeg placere din adresselinje?</string>
+    <string name="preOnboardingAddressBarOkButton">Næste</string>
+    <string name="highlightsPreOnboardingAddressBarOption1Title">Top (standard)</string>
+    <string name="highlightsPreOnboardingAddressBarOption1Description">Let at se</string>
+    <string name="highlightsPreOnboardingAddressBarOption2Title">Nederst</string>
+    <string name="highlightsPreOnboardingAddressBarOption2Description">Let at komme til</string>
     <string name="onboardingSearchDaxDialogTitle">Prøv at søge!</string>
-    <string name="onboardingSearchDaxDialogDescription">Dine DuckDuckGo-søgninger er altid anonyme.</string>
-    <string name="onboardingSearchDaxDialogOption1" instruction="translate &apos;duck&apos; too.">hvordan siger man \"and\" på engelsk</string>
-    <string name="onboardingSearchDaxDialogOption1English" instruction="translate &apos;duck&apos; too. Don&apos;t add question mark">hvordan siger man \"and\" på spansk</string>
+    <string name="onboardingSearchDaxDialogDescription">Dine DuckDuckGo-søgninger er altid private.</string>
+    <string name="onboardingSearchDaxDialogOption1" instruction="translate &apos;duck&apos; too.">"hvordan siger man and på engelsk"</string>
+    <string name="onboardingSearchDaxDialogOption1English" instruction="translate &apos;duck&apos; too. Don&apos;t add question mark">"hvordan siger man \"and\" på spansk"</string>
     <string name="onboardingSearchQueryOption1">hvordan siger man and på engelsk</string>
     <string name="onboardingSearchQueryOption1English">hvordan siger man \"and\" på spansk</string>
     <string name="onboardingSearchDaxDialogOption2">skuespillere i avatar</string>
     <string name="onboardingSearchDaxDialogOption2US">mighty ducks film</string>
     <string name="onboardingSearchDaxDialogOption3">lokalt vejr</string>
     <string name="onboardingSearchDaxDialogOption4">Overrask mig!</string>
-    <string name="onboardingSearchQueryOption4">middagsopskrifter</string>
-    <string name="onboardingSearchQueryOption4US">opskrift på chocolate chip cookie</string>
+    <string name="onboardingSearchQueryOption4">ællinger</string>
     <string name="onboardingSitesDaxDialogTitle">Prøv at besøge en hjemmeside!</string>
     <string name="onboardingSitesDaxDialogDescription">Jeg blokerer trackere, så de ikke kan udspionere dig.</string>
     <string name="onboardingSitesDaxDialogOption1">espn.com</string>
     <string name="onboardingSitesDaxDialogOption2">yahoo.com</string>
     <string name="onboardingSitesDaxDialogOption3">ebay.com</string>
     <string name="onboardingSitesDaxDialogOption4">Overrask mig!</string>
-    <string name="onboardingSerpDaxDialogDescription">Det er DuckDuckGo Search. Privat. Hurtig. Færre annoncer.</string>
+    <string name="onboardingSerpDaxDialogDescription"><![CDATA[Det er <b>DuckDuckGo Search</b>! Privat. Hurtig. Færre annoncer.]]></string>
     <string name="onboardingSerpDaxDialogButton">Forstået</string>
     <string name="onboardingSitesSuggestionsDaxDialogTitle">Prøv nu at besøge en hjemmeside!</string>
     <plurals name="onboardingTrackersBlockedDialogDescription">
@@ -818,42 +827,20 @@
     </plurals>
     <string name="onboardingTrackersBlockedDaxDialogButton">Forstået</string>
     <string name="onboardingFireButtonDaxDialogDescription"><![CDATA[Ryd øjeblikkeligt din browseraktivitet med <b>Fire Button</b>.<br/><br/>Prøv det! 🔥]]></string>
+    <string name="onboardingFireButtonDaxDialogOkButton">Prøv det</string>
+    <string name="onboardingFireButtonDaxDialogCancelButton">Spring over</string>
     <string name="onboardingEndDaxDialogTitle">"Du har forstået det!"</string>
-    <string name="onboardingEndDaxDialogDescription">Husk: hver gang du browser med mig, mister en uhyggelig annonce sine vinger. 👌</string>
-    <string name="onboardingEndDaxDialogButton">Helt færdig!</string>
+    <string name="onboardingEndDaxDialogDescription">Husk: hver gang du browser med mig, mister en uhyggelig annonce sine vinger.</string>
+    <string name="onboardingInContextEndDaxDialogDescription">Husk: hver gang du browser med mig, mister en uhyggelig annonce sine vinger. 👌</string>
+    <string name="onboardingEndDaxDialogButton">Giv mig fem!</string>
     <string name="onboardingPrivacyProDaxDialogTitle">Åh, før jeg glemmer det...</string>
     <string name="onboardingPrivacyProDaxDialogDescription"><![CDATA[DuckDuckGo har også en sikker <b>VPN + 2 ekstra premium-beskyttelser</b>, tilgængelige med et <b>valgfrit betalt abonnement</b>.]]></string>
     <string name="onboardingPrivacyProDaxDialogOkButton">Mere info</string>
     <string name="onboardingPrivacyProDaxDialogFreeTrialOkButton">Prøv gratis!</string>
     <string name="onboardingPrivacyProDaxDialogCancelButton">Spring over</string>
 
-    <!-- Highlight Onboarding Experiment-->
-    <string name="highlightsPreOnboardingDaxDialog1Title"><![CDATA[Hej<br/><br/>Er du klar til en hurtigere browser, der holder dig beskyttet?]]></string>
-    <string name="highlightsPreOnboardingDaxDialog2Title">Beskyttelse aktiveret!</string>
-    <string name="highlightsPreOnboardingComparisonChartItem2">Bloker tredjeparts-trackere</string>
-    <string name="highlightsPreOnboardingComparisonChartItem3">Bloker cookie-anmodninger og popups</string>
-    <string name="highlightsPreOnboardingComparisonChartItem4">Bloker målrettede annoncer</string>
-    <string name="highlightsPreOnboardingComparisonChartItem5">Slet browserdata hurtigt</string>
-    <string name="highlightsPreOnboardingSelectAppIconTitle">Hvilken farve klæder mig bedst?</string>
-    <string name="highlightsPreOnboardingSelectAppIconDescription">Vælg dit app-ikon:</string>
-    <string name="highlightsPreOnboardingSelectAppIconOkButton">Næste</string>
-    <string name="highlightsPreOnboardingAddressBarTitle">Hvor skal jeg placere din adresselinje?</string>
-    <string name="highlightsPreOnboardingAddressBarOption1Title">Top (standard)</string>
-    <string name="highlightsPreOnboardingAddressBarOption1Description">Let at se</string>
-    <string name="highlightsPreOnboardingAddressBarOkButton">Næste</string>
-    <string name="highlightsPreOnboardingAddressBarOption2Title">Nederst</string>
-    <string name="highlightsPreOnboardingAddressBarOption2Description">Let at komme til</string>
-    <string name="highlightsOnboardingSearchQueryOption4">ællinger</string>
-    <string name="highlightsOnboardingSearchDaxDialogDescription">Dine DuckDuckGo-søgninger er altid private.</string>
-    <string name="highlightsOnboardingSerpDaxDialogDescription"><![CDATA[Det er <b>DuckDuckGo Search</b>! Privat. Hurtig. Færre annoncer.]]></string>
-    <string name="highlightsOnboardingEndDaxDialogDescription">Husk: hver gang du browser med mig, mister en uhyggelig annonce sine vinger.</string>
-    <string name="highlightsOnboardingEndDaxDialogButton">Giv mig fem!</string>
-    <string name="onboardingFireButtonDaxDialogOkButton">Prøv det</string>
-    <string name="onboardingFireButtonDaxDialogCancelButton">Spring over</string>
-    <string name="preOnboardingDaxDialog1SecondaryButton">Jeg har været her før</string>
-    <string name="highlightsPreOnboardingDaxDialog3Title"><![CDATA[Forstået! Jeg springer de andre tips over.]]></string>
-    <string name="highlightsPreOnboardingDaxDialog3Text"><![CDATA[Husk: Du kan slette alle dine faner, historik og browserdata med to tryk på <b>Fire Button</b> 🔥]]></string>
-    <string name="preOnboardingDaxDialog3SecondaryButton">Vis vejledning</string>
+    <!-- Bubble BB & Buck experiment-->
+    <string name="onboardingBubbleExperimentSearchDaxDialogDescription">Dine DuckDuckGo-søgninger er altid anonyme.</string>
 
     <!-- Appearance settings -->
     <string name="settingsAddressBarPositionTitle">Adresselinje</string>
@@ -940,8 +927,6 @@
     <!-- Privacy Pro Rebranding-->
     <string name="aboutDescriptionBrandUpdate2025Rebranding">Welcome to the Duck Side!\n\nDuckDuckGo er den uafhængige online-beskyttelsesvirksomhed for alle, der vil tage kontrollen over deres personlige oplysninger tilbage.\n\nVi mener, at den bedste måde at beskytte dine personlige oplysninger mod hackere, svindlere og virksomheder, der krænker privatlivets fred, er at forhindre, at de overhovedet bliver indsamlet. Derfor vælger millioner af mennesker <annotation type="chart_comparison">DuckDuckGo frem for Chrome og andre browsere</annotation> til at søge og surfe på nettet. Vores indbyggede søgemaskine er som Google, men sporer aldrig dine søgninger. Og vores browserbeskyttelse, som f.eks. blokering af reklametrackere og cookies, hjælper med at forhindre andre virksomheder i at indsamle dine data. Forresten er vores browser gratis — vi tjener penge på <annotation type="privacy_respecting_ads">søgeannoncer, der respekterer privatlivets fred</annotation>, ikke ved at udnytte dine data.Derudover tilbyder vi også et <annotation type="ppro_help_page">DuckDuckGo-abonnement</annotation>, der er integreret i vores browser. Abonnenter får endnu mere beskyttelse af privatlivet med en hurtig og enkel <annotation type="vpn_help_page">VPN</annotation>, der hjælper med at sikre din onlineaktivitet, adgang til avancerede AI-modeller i vores private AI-chattjeneste Duck.ai, en tjeneste, der finder og fjerner dine personlige oplysninger fra personfinderwebsteder, og en tjeneste, der gendanner din identitet, hvis den bliver stjålet.\n\nTag kontrollen over dine personlige oplysninger tilbage med browseren, der er designet til databeskyttelse, ikke dataindsamling.</string>
     <string name="onboardingPrivacyProDaxDialogDescriptionRebranding"><![CDATA[DuckDuckGo har også et <b>valgfrit betalt abonnement</b> med en sikker <b>VPN</b> og <b>avanceret, privat AI</b>.]]></string>
-    <string name="settingsDuckAiRebranding">AI-funktioner</string>
-    <string name="settingsDuckAi">Duck.ai</string>
 
     <!--TabSwitcher Trackers Animation-->
     <string name="showTrackerCountInTabSwitcher">Vis tracker-antal i faneomskifteren</string>

@@ -167,6 +167,7 @@
     <string name="settingsAddressBarPosition">Állítsd be a címsor elhelyezkedését</string>
     <string name="settingsEnableVoiceSearch">Privát beszédhangalapú keresés engedélyezése</string>
     <string name="settingsDDGOnOtherPlatforms">DuckDuckGo más platformokhoz</string>
+    <string name="settingsDuckAi">AI funkciók</string>
 
     <!-- Private Search -->
     <string name="privateSearchActivityTitle">Privát Keresés</string>
@@ -246,7 +247,7 @@
     <string name="settingsAutomaticallyClearWhenAppExit30Minutes">Kilépés az alkalmazásból 30 perc inaktivitás után</string>
     <string name="settingsAutomaticallyClearWhenAppExit60Minutes">Kilépés az alkalmazásból 1 óra inaktivitás után</string>
     <string name="settingsClearAiDataTitle">Duck.ai-csevegések törlése</string>
-    <string name="settingsClearAiDataMessage">A Fire Button használatával a Duck.ai-előzmények is törlődnek</string>
+    <string name="settingsClearAiDataDeleteMessage">A Fire Button a Duck.ai-előzményeket is törli, a rögzített csevegéseket is beleértve.</string>
 
     <!-- About Activity -->
     <string name="aboutActivityTitle">A DuckDuckGóról</string>
@@ -776,36 +777,44 @@
     <string name="sslErrorUntrustedMessage" instruction="Placeholder is domain with certificate issues">A megnyitni kívánt %1$s biztonsági tanúsítványát az eszköz operációs rendszere nem ítéli meg biztonságosnak. Lehetséges, hogy a webhely nincs megfelelően konfigurálva, esetleg egy támadó feltörte a kapcsolatodat, vagy a rendszeróra beállítása helytelen.</string>
 
     <!-- Extended Onboarding-->
-    <string name="preOnboardingDaxDialog1Title"><![CDATA[Szia!<br/><br/>Készen állsz egy jobb, privátabb internetre?]]></string>
+    <string name="preOnboardingDaxDialog1Title"><![CDATA[Szia!<br/><br/>Felkészültél egy gyorsabb böngészőre, amely védelmet is nyújt számodra?]]></string>
     <string name="preOnboardingDaxDialog1Button">Csináljuk!</string>
-    <string name="preOnboardingDaxDialog2Title">Adatvédelem aktiválva!</string>
+    <string name="preOnboardingDaxDialog1SecondaryButton">Már jártam itt korábban</string>
+    <string name="preOnboardingDaxDialog2Title">Védelem aktiválva!</string>
     <string name="preOnboardingDaxDialog2Button">Böngésző kiválasztása</string>
+    <string name="preOnboardingDaxDialog3Title"><![CDATA[Értem! Kihagyom a többi tippet.]]></string>
+    <string name="preOnboardingDaxDialog3Text"><![CDATA[Ne feledd: a <b>Fire Button</b> 🔥 segítségével két érintéssel törölheted az összes lapodat, előzményedet és böngészési adatodat]]></string>
+    <string name="preOnboardingDaxDialog3SecondaryButton">Útmutató megjelenítése</string>
     <string name="preOnboardingComparisonChartItem1">Privát keresés alapértelmezés szerint</string>
     <string name="preOnboardingComparisonChartItem2">Harmadik féltől származó nyomkövetők blokkolása</string>
     <string name="preOnboardingComparisonChartItem3">Felugró sütiablakok blokkolása</string>
     <string name="preOnboardingComparisonChartItem4">Célzott hirdetések blokkolása</string>
     <string name="preOnboardingComparisonChartItem5">Böngészési adatok törlése gombnyomásra</string>
-    <string name="preOnboardingDaxDialog3Title">Nagyszerű! Üdvözlünk a kacsa világában!</string>
     <string name="preOnboardingDaxDialog3Button">Böngészés indítása</string>
+    <string name="preOnboardingAddressBarTitle">Hol helyezzem el a címsort?</string>
+    <string name="preOnboardingAddressBarOkButton">Következő</string>
+    <string name="highlightsPreOnboardingAddressBarOption1Title">Felül (alapértelmezett)</string>
+    <string name="highlightsPreOnboardingAddressBarOption1Description">Könnyen látható</string>
+    <string name="highlightsPreOnboardingAddressBarOption2Title">Alul</string>
+    <string name="highlightsPreOnboardingAddressBarOption2Description">Könnyen elérhető</string>
     <string name="onboardingSearchDaxDialogTitle">Keress rá!</string>
-    <string name="onboardingSearchDaxDialogDescription">A DuckDuckGo-kereséseid mindig névtelenek.</string>
-    <string name="onboardingSearchDaxDialogOption1" instruction="translate &apos;duck&apos; too.">hogyan mondják angolul, hogy „kacsa”</string>
-    <string name="onboardingSearchDaxDialogOption1English" instruction="translate &apos;duck&apos; too. Don&apos;t add question mark">hogyan mondják spanyolul, hogy „kacsa”</string>
+    <string name="onboardingSearchDaxDialogDescription">A DuckDuckGo-kereséseid mindig privátak maradnak.</string>
+    <string name="onboardingSearchDaxDialogOption1" instruction="translate &apos;duck&apos; too.">"hogyan mondják angolul, hogy kacsa"</string>
+    <string name="onboardingSearchDaxDialogOption1English" instruction="translate &apos;duck&apos; too. Don&apos;t add question mark">"hogyan mondják spanyolul, hogy kacsa"</string>
     <string name="onboardingSearchQueryOption1">hogyan mondják angolul, hogy kacsa</string>
     <string name="onboardingSearchQueryOption1English">hogyan mondják spanyolul, hogy kacsa</string>
     <string name="onboardingSearchDaxDialogOption2">avatar szereposztása</string>
     <string name="onboardingSearchDaxDialogOption2US">kerge kacsák szereposztása</string>
     <string name="onboardingSearchDaxDialogOption3">helyi időjárás</string>
     <string name="onboardingSearchDaxDialogOption4">Lepj meg!</string>
-    <string name="onboardingSearchQueryOption4">vacsorareceptek</string>
-    <string name="onboardingSearchQueryOption4US">csokisütireceptek</string>
+    <string name="onboardingSearchQueryOption4">kiskacsák</string>
     <string name="onboardingSitesDaxDialogTitle">Próbálj meg ellátogatni egy webhelyre!</string>
     <string name="onboardingSitesDaxDialogDescription">Én blokkolom a nyomkövetőket, hogy ne tudjanak kémkedni utánad.</string>
     <string name="onboardingSitesDaxDialogOption1">espn.com</string>
     <string name="onboardingSitesDaxDialogOption2">yahoo.com</string>
     <string name="onboardingSitesDaxDialogOption3">ebay.com</string>
     <string name="onboardingSitesDaxDialogOption4">Lepj meg!</string>
-    <string name="onboardingSerpDaxDialogDescription">Ez a DuckDuckGo Search. Privát. Gyors. Kevesebb hirdetés.</string>
+    <string name="onboardingSerpDaxDialogDescription"><![CDATA[Ez a <b>DuckDuckGo Search</b>! Privát. Gyors. Kevesebb hirdetés.]]></string>
     <string name="onboardingSerpDaxDialogButton">Megvan!</string>
     <string name="onboardingSitesSuggestionsDaxDialogTitle">A következő lépésben próbálj meg ellátogatni egy webhelyre!</string>
     <plurals name="onboardingTrackersBlockedDialogDescription">
@@ -818,42 +827,20 @@
     </plurals>
     <string name="onboardingTrackersBlockedDaxDialogButton">Megvan!</string>
     <string name="onboardingFireButtonDaxDialogDescription"><![CDATA[Töröld azonnal böngészési tevékenységedet a <b>Fire Button</b> használatával.<br/><br/>Próbáld ki!️ 🔥]]></string>
+    <string name="onboardingFireButtonDaxDialogOkButton">Kipróbálom</string>
+    <string name="onboardingFireButtonDaxDialogCancelButton">Kihagyás</string>
     <string name="onboardingEndDaxDialogTitle">"Megvan, ez az!"</string>
-    <string name="onboardingEndDaxDialogDescription">Ne feledd: minden alkalommal, amikor velem böngészel, egy undok hirdetés elveszíti az erejét. 👌</string>
-    <string name="onboardingEndDaxDialogButton">Minden kész!</string>
+    <string name="onboardingEndDaxDialogDescription">Ne feledd: minden alkalommal, amikor velem böngészel, egy undok hirdetés elveszíti az erejét.</string>
+    <string name="onboardingInContextEndDaxDialogDescription">Ne feledd: minden alkalommal, amikor velem böngészel, egy undok hirdetés elveszíti az erejét. 👌</string>
+    <string name="onboardingEndDaxDialogButton">Pacsi!</string>
     <string name="onboardingPrivacyProDaxDialogTitle">Ó, mielőtt elfelejtem...</string>
     <string name="onboardingPrivacyProDaxDialogDescription"><![CDATA[A DuckDuckGo funkciói között <b>opcionális előfizetés</b> mellett igénybe vehető biztonságos <b>VPN és további két prémium védelem</b> is szerepel.]]></string>
     <string name="onboardingPrivacyProDaxDialogOkButton">További részletek</string>
     <string name="onboardingPrivacyProDaxDialogFreeTrialOkButton">Próbáld ki ingyen!</string>
     <string name="onboardingPrivacyProDaxDialogCancelButton">Kihagyás</string>
 
-    <!-- Highlight Onboarding Experiment-->
-    <string name="highlightsPreOnboardingDaxDialog1Title"><![CDATA[Szia!<br/><br/>Felkészültél egy gyorsabb böngészőre, amely védelmet nyújt neked?]]></string>
-    <string name="highlightsPreOnboardingDaxDialog2Title">Védelem aktiválva!</string>
-    <string name="highlightsPreOnboardingComparisonChartItem2">Harmadik féltől származó nyomkövetők blokkolása</string>
-    <string name="highlightsPreOnboardingComparisonChartItem3">Sütikérelmek és felugró ablakok blokkolása</string>
-    <string name="highlightsPreOnboardingComparisonChartItem4">Célzott hirdetések blokkolása</string>
-    <string name="highlightsPreOnboardingComparisonChartItem5">Böngészési adatok gyors törlése</string>
-    <string name="highlightsPreOnboardingSelectAppIconTitle">Melyik szín áll nekem a legjobban?</string>
-    <string name="highlightsPreOnboardingSelectAppIconDescription">Válaszd ki az alkalmazás ikonját:</string>
-    <string name="highlightsPreOnboardingSelectAppIconOkButton">Következő</string>
-    <string name="highlightsPreOnboardingAddressBarTitle">Hol helyezzem el a címsort?</string>
-    <string name="highlightsPreOnboardingAddressBarOption1Title">Felül (alapértelmezett)</string>
-    <string name="highlightsPreOnboardingAddressBarOption1Description">Könnyen látható</string>
-    <string name="highlightsPreOnboardingAddressBarOkButton">Következő</string>
-    <string name="highlightsPreOnboardingAddressBarOption2Title">Alul</string>
-    <string name="highlightsPreOnboardingAddressBarOption2Description">Könnyen elérhető</string>
-    <string name="highlightsOnboardingSearchQueryOption4">kiskacsák</string>
-    <string name="highlightsOnboardingSearchDaxDialogDescription">A DuckDuckGo-kereséseid mindig privátak maradnak.</string>
-    <string name="highlightsOnboardingSerpDaxDialogDescription"><![CDATA[Ez a <b>DuckDuckGo Search</b>! Privát. Gyors. Kevesebb hirdetés.]]></string>
-    <string name="highlightsOnboardingEndDaxDialogDescription">Ne feledd: minden alkalommal, amikor velem böngészel, egy undok hirdetés elveszíti az erejét.</string>
-    <string name="highlightsOnboardingEndDaxDialogButton">Pacsi!</string>
-    <string name="onboardingFireButtonDaxDialogOkButton">Kipróbálom</string>
-    <string name="onboardingFireButtonDaxDialogCancelButton">Kihagyás</string>
-    <string name="preOnboardingDaxDialog1SecondaryButton">Már jártam itt korábban</string>
-    <string name="highlightsPreOnboardingDaxDialog3Title"><![CDATA[Értem! Kihagyom a többi tippet.]]></string>
-    <string name="highlightsPreOnboardingDaxDialog3Text"><![CDATA[Ne feledd: a <b>Fire Button</b> 🔥 segítségével két érintéssel törölheted az összes lapodat, előzményedet és böngészési adatodat]]></string>
-    <string name="preOnboardingDaxDialog3SecondaryButton">Útmutató megjelenítése</string>
+    <!-- Bubble BB & Buck experiment-->
+    <string name="onboardingBubbleExperimentSearchDaxDialogDescription">A DuckDuckGo-kereséseid mindig névtelenek.</string>
 
     <!-- Appearance settings -->
     <string name="settingsAddressBarPositionTitle">Címsor</string>
@@ -940,8 +927,6 @@
     <!-- Privacy Pro Rebranding-->
     <string name="aboutDescriptionBrandUpdate2025Rebranding">Welcome to the Duck Side!\n\nA DuckDuckGo egy független online adatvédelmi cég, amely azoknak kínál megoldást, akik vissza kívánják venni az irányítást a személyes adataik felett.\n\nÚgy gondoljuk, hogy a legjobb módja annak, hogy megvédjük a személyes adataidat a hekkerektől, a csalóktól és az adatvédelmet sértő cégektől az, ha egyáltalán nem gyűjtjük őket. Ezért <annotation type="chart_comparison">választják emberek milliói a DuckDuckGót a Chrome és más böngészők helyett</annotation> az online kereséshez és böngészéshez. Beépített keresőmotorunk olyan, mint a Google, de sosem követi a kereséseidet. Böngészési védelmeink, mint például a hirdetéskövetők és a sütik blokkolása, segítenek megakadályozni, hogy más cégek összegyűjtsék az adataidat. Ja, és a böngészőnk ingyenes – a bevételünket az <annotation type="privacy_respecting_ads">adatvédelmet tiszteletben tartó keresési hirdetésekből</annotation> szerezzük, nem az adataid kihasználásából.\n\nEzenkívül <annotation type="ppro_help_page">DuckDuckGo-előfizetést</annotation> is kínálunk, a böngészőnkbe integrálva. Az előfizetők még nagyobb adatvédelmet élvezhetnek a következőknek köszönhetően: gyors és egyszerű <annotation type="vpn_help_page">VPN</annotation>, melynek segítségével biztonságossá tehető az online tevékenység; hozzáférés a fejlett MI-modellekhez (a privát MI alapú csevegőszolgáltatásunkban, a Duck.ai-ban); egy szolgáltatás, amely felkutatja és eltávolítja a személyes adatokat a kereshető személyadatbázis-oldalakról; illetve egy másik szolgáltatás, amely segít helyreállítani a személyazonosságot annak ellopása esetén.\n\nVedd vissza az irányítást a személyes adataid felett az adatgyűjtés helyett adatvédelemre tervezett böngészővel.</string>
     <string name="onboardingPrivacyProDaxDialogDescriptionRebranding"><![CDATA[A DuckDuckGo emellett <b>opcionális előfizetési lehetőséget</b> is kínál, amelyhez biztonságos <b>VPN</b> és <b>fejlett, privát AI-szolgáltatás</b> tartozik.]]></string>
-    <string name="settingsDuckAiRebranding">AI funkciók</string>
-    <string name="settingsDuckAi">Duck.ai</string>
 
     <!--TabSwitcher Trackers Animation-->
     <string name="showTrackerCountInTabSwitcher">Nyomkövető-számláló megjelenítése a lapváltóban</string>

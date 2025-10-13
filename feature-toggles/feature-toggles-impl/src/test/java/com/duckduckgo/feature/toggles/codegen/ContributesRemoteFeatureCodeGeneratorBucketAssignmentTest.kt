@@ -26,7 +26,6 @@ import com.duckduckgo.feature.toggles.api.FeatureSettings
 import com.duckduckgo.feature.toggles.api.FeatureToggles
 import com.duckduckgo.privacy.config.api.PrivacyFeaturePlugin
 import dagger.Lazy
-import kotlin.math.abs
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
@@ -34,6 +33,7 @@ import org.junit.runner.RunWith
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 import org.robolectric.ParameterizedRobolectricTestRunner
+import kotlin.math.abs
 
 private var enables = 0
 private var disables = 0
@@ -94,7 +94,7 @@ class ContributesRemoteFeatureCodeGeneratorBucketAssignmentTest(private val test
                                 "steps": [
                                     {
                                         "percent": ${testCase.rollout}
-                                    }                    
+                                    }
                                 ]
                             }
                         }

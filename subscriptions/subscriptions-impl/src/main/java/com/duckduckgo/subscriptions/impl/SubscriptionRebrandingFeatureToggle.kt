@@ -26,10 +26,10 @@ import com.duckduckgo.subscriptions.api.SubscriptionRebrandingFeatureToggle
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.SingleInstanceIn
-import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import logcat.logcat
+import javax.inject.Inject
 
 @ContributesBinding(
     scope = AppScope::class,
@@ -51,14 +51,9 @@ class SubscriptionRebrandingFeatureToggleImpl @Inject constructor(
 ) : SubscriptionRebrandingFeatureToggle, PrivacyConfigCallbackPlugin, MainProcessLifecycleObserver {
 
     private var cachedPrivacyProRebrandingValue: Boolean = false
-    private var cachedAIFeaturesRebrandingValue: Boolean = false
 
     override fun isSubscriptionRebrandingEnabled(): Boolean {
         return cachedPrivacyProRebrandingValue
-    }
-
-    override fun isAIFeaturesRebrandingEnabled(): Boolean {
-        return cachedAIFeaturesRebrandingValue
     }
 
     override fun onCreate(owner: LifecycleOwner) {
@@ -77,9 +72,6 @@ class SubscriptionRebrandingFeatureToggleImpl @Inject constructor(
             val isEnabled = privacyProFeature.subscriptionRebranding().isEnabled()
             cachedPrivacyProRebrandingValue = isEnabled
             logcat { "SubscriptionRebrandingFeatureToggle: Feature flag cached, value = $isEnabled" }
-            val isAIFeaturesEnabled = privacyProFeature.subscriptionAIFeaturesRebranding().isEnabled()
-            cachedAIFeaturesRebrandingValue = isAIFeaturesEnabled
-            logcat { "SubscriptionAIFeaturesRebrandingFeatureToggle: Feature flag cached, value = $isAIFeaturesEnabled" }
         }
     }
 }

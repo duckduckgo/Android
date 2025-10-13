@@ -45,6 +45,8 @@
                 android:clipChildren="false"
                 app:contentInsetEnd="0dp"
                 app:contentInsetStart="0dp"
+                android:paddingLeft="0dp"
+                android:paddingRight="0dp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toStartOf="@id/iconsContainer"
                 app:layout_constraintStart_toStartOf="parent"
@@ -119,7 +121,10 @@
                                 android:layout_marginStart="@dimen/keyline_0"
                                 android:layout_marginEnd="@dimen/keyline_0"
                                 android:minWidth="@dimen/toolbarIcon"
+                                app:layout_constrainedWidth="true"
                                 app:layout_constraintBottom_toBottomOf="parent"
+                                app:layout_constraintEnd_toStartOf="@+id/endIconsContainer"
+                                app:layout_constraintHorizontal_bias="0"
                                 app:layout_constraintStart_toStartOf="parent"
                                 app:layout_constraintTop_toTopOf="parent">
 
@@ -195,13 +200,13 @@
                             </FrameLayout>
 
                             <View
-                                android:id="@+id/cookieDummyView"
+                                android:id="@+id/animatedIconBackgroundView"
                                 android:layout_width="@dimen/omnibarCookieAnimationBannerHeight"
                                 android:layout_height="?attr/cookiesAnimationHeight"
                                 android:layout_gravity="start|center_vertical"
                                 android:layout_marginStart="@dimen/keyline_1"
                                 android:alpha="0"
-                                android:background="@drawable/cookies_dummy_background"
+                                android:background="@drawable/animated_icon_dummy_background"
                                 app:layout_constraintBottom_toBottomOf="parent"
                                 app:layout_constraintStart_toStartOf="@id/omniBarContentContainer"
                                 app:layout_constraintTop_toTopOf="parent" />
@@ -217,6 +222,20 @@
                                 app:layout_constraintStart_toStartOf="@id/omniBarContentContainer"
                                 app:layout_constraintTop_toTopOf="parent"
                                 app:lottie_loop="false" />
+
+                            <com.airbnb.lottie.LottieAnimationView
+                                android:id="@+id/addressBarTrackersBlockedAnimationShieldIcon"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="start|center_vertical"
+                                android:saveEnabled="false"
+                                android:visibility="gone"
+                                app:layout_constraintBottom_toBottomOf="parent"
+                                app:layout_constraintStart_toStartOf="@id/omniBarContentContainer"
+                                app:layout_constraintTop_toTopOf="parent"
+                                app:lottie_autoPlay="false"
+                                app:lottie_loop="false"
+                                app:lottie_rawRes="@raw/address_bar_trackers_animation_shield" />
 
                             <com.duckduckgo.common.ui.view.KeyboardAwareEditText
                                 android:id="@+id/omnibarTextInput"

@@ -272,7 +272,10 @@ class RealSubscriptionsTest {
         subscriptions.launchPrivacyPro(context, "https://duckduckgo.com/pro?featurePage=duckai".toUri())
 
         verify(globalActivityStarter, times(2)).startIntent(eq(context), captor.capture())
-        assertEquals("${subscriptionsUrlProvider.buyUrl}?featurePage=duckai", (captor.lastValue as SubscriptionsWebViewActivityWithParams).url)
+        assertEquals(
+            subscriptionsUrlProvider.buyUrl.appendQueryParams("featurePage=duckai"),
+            (captor.lastValue as SubscriptionsWebViewActivityWithParams).url,
+        )
     }
 
     @Test
@@ -285,7 +288,7 @@ class RealSubscriptionsTest {
 
         verify(globalActivityStarter, times(2)).startIntent(eq(context), captor.capture())
         assertEquals(
-            "${subscriptionsUrlProvider.buyUrl}?usePaidDuckAi=true&featurePage=duckai",
+            subscriptionsUrlProvider.buyUrl.appendQueryParams("usePaidDuckAi=true&featurePage=duckai"),
             (captor.lastValue as SubscriptionsWebViewActivityWithParams).url,
         )
     }
@@ -299,7 +302,10 @@ class RealSubscriptionsTest {
         subscriptions.launchPrivacyPro(context, "https://duckduckgo.com/subscriptions?featurePage=duckai".toUri())
 
         verify(globalActivityStarter, times(2)).startIntent(eq(context), captor.capture())
-        assertEquals("${subscriptionsUrlProvider.buyUrl}?featurePage=duckai", (captor.lastValue as SubscriptionsWebViewActivityWithParams).url)
+        assertEquals(
+            subscriptionsUrlProvider.buyUrl.appendQueryParams("featurePage=duckai"),
+            (captor.lastValue as SubscriptionsWebViewActivityWithParams).url,
+        )
     }
 
     @Test
@@ -312,7 +318,7 @@ class RealSubscriptionsTest {
 
         verify(globalActivityStarter, times(2)).startIntent(eq(context), captor.capture())
         assertEquals(
-            "${subscriptionsUrlProvider.buyUrl}?usePaidDuckAi=true&featurePage=duckai",
+            subscriptionsUrlProvider.buyUrl.appendQueryParams("usePaidDuckAi=true&featurePage=duckai"),
             (captor.lastValue as SubscriptionsWebViewActivityWithParams).url,
         )
     }
@@ -341,5 +347,10 @@ class RealSubscriptionsTest {
 
     private fun fakeIntent(): Intent {
         return Intent().also { it.addFlags(FLAG_ACTIVITY_NEW_TASK) }
+    }
+
+    private fun String.appendQueryParams(queryParams: String): String {
+        val separator = if (this.contains("?")) "&" else "?"
+        return this + separator + queryParams
     }
 }

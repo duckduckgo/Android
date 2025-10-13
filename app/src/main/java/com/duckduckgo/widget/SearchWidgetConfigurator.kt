@@ -27,9 +27,9 @@ import com.duckduckgo.app.systemsearch.SystemSearchActivity
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.voice.api.VoiceSearchAvailability
-import javax.inject.Inject
 import kotlinx.coroutines.withContext
 import logcat.logcat
+import javax.inject.Inject
 
 class SearchWidgetConfigurator @Inject constructor(
     private val voiceSearchAvailability: VoiceSearchAvailability,

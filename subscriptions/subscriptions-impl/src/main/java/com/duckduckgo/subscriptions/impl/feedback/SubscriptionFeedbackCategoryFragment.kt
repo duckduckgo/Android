@@ -38,9 +38,9 @@ import com.duckduckgo.subscriptions.impl.feedback.SubscriptionFeedbackCategory.S
 import com.duckduckgo.subscriptions.impl.feedback.SubscriptionFeedbackCategory.VPN
 import com.duckduckgo.subscriptions.impl.repository.AuthRepository
 import com.duckduckgo.subscriptions.impl.repository.toProductList
-import javax.inject.Inject
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import javax.inject.Inject
 
 @InjectWith(FragmentScope::class)
 class SubscriptionFeedbackCategoryFragment : SubscriptionFeedbackFragment(R.layout.content_feedback_category) {

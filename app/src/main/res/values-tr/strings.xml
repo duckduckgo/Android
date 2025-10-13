@@ -167,6 +167,7 @@
     <string name="settingsAddressBarPosition">Adres Çubuğu Konumunuzu Ayarlayın</string>
     <string name="settingsEnableVoiceSearch">Özel Sesli Aramayı Etkinleştir</string>
     <string name="settingsDDGOnOtherPlatforms">Diğer Platformlarda DuckDuckGo</string>
+    <string name="settingsDuckAi">AI Özellikleri</string>
 
     <!-- Private Search -->
     <string name="privateSearchActivityTitle">Gizli Arama</string>
@@ -246,7 +247,7 @@
     <string name="settingsAutomaticallyClearWhenAppExit30Minutes">Uygulamadan çık, 30 dakika boyunca inaktif</string>
     <string name="settingsAutomaticallyClearWhenAppExit60Minutes">1 saat boyunca hareket yoksa uygulamadan çık</string>
     <string name="settingsClearAiDataTitle">Duck.ai Sohbetlerini Temizle</string>
-    <string name="settingsClearAiDataMessage">Fire Button ayrıca Duck.ai geçmişini de silecektir</string>
+    <string name="settingsClearAiDataDeleteMessage">Fire Button, sabitlenmiş sohbetler dahil olmak üzere Duck.ai geçmişini de silecektir.</string>
 
     <!-- About Activity -->
     <string name="aboutActivityTitle">DuckDuckGo Hakkında</string>
@@ -776,36 +777,44 @@
     <string name="sslErrorUntrustedMessage" instruction="Placeholder is domain with certificate issues">Cihazınızın işletim sistemi, %1$s güvenlik sertifikasına güvenmiyor. Web sitesi yanlış yapılandırılmış, bir saldırgan bağlantınızı tehlikeye atmış veya sistem saatiniz yanlış ayarlanmış olabilir.</string>
 
     <!-- Extended Onboarding-->
-    <string name="preOnboardingDaxDialog1Title"><![CDATA[Merhaba.<br/><br/>Daha iyi, daha özel bir internete hazır mısınız?]]></string>
+    <string name="preOnboardingDaxDialog1Title"><![CDATA[Merhaba.<br/><br/>Sizi koruyan daha hızlı bir tarayıcıya hazır mısınız?]]></string>
     <string name="preOnboardingDaxDialog1Button">Hadi başlayalım!</string>
-    <string name="preOnboardingDaxDialog2Title">Gizlilik korumaları etkinleştirildi!</string>
+    <string name="preOnboardingDaxDialog1SecondaryButton">Daha önce buradaydım</string>
+    <string name="preOnboardingDaxDialog2Title">Korumalar etkinleştirildi!</string>
     <string name="preOnboardingDaxDialog2Button">Tarayıcınızı Seçin</string>
+    <string name="preOnboardingDaxDialog3Title"><![CDATA[Anladım! Diğer ipuçlarını atlayacağım.]]></string>
+    <string name="preOnboardingDaxDialog3Text"><![CDATA[Unutmayın: <b>Fire Button</b> 🔥 ile tüm sekmelerinizi, geçmişinizi ve tarama verilerinizi iki dokunuşla silebilirsiniz]]></string>
+    <string name="preOnboardingDaxDialog3SecondaryButton">Eğitimi Göster</string>
     <string name="preOnboardingComparisonChartItem1">Varsayılan olarak gizli arama yapın</string>
     <string name="preOnboardingComparisonChartItem2">Üçüncü taraf izleyicileri engelleyin</string>
     <string name="preOnboardingComparisonChartItem3">Çerez açılır pencerelerini engelle</string>
     <string name="preOnboardingComparisonChartItem4">Hedefli reklamları engelleyin</string>
     <string name="preOnboardingComparisonChartItem5">Tarama verilerini tek bir düğmeyle silin</string>
-    <string name="preOnboardingDaxDialog3Title">Harika! Duck Side\'a hoş geldiniz.</string>
     <string name="preOnboardingDaxDialog3Button">Gezinmeye Başla</string>
+    <string name="preOnboardingAddressBarTitle">Adres çubuğu nereye yerleştirilsin?</string>
+    <string name="preOnboardingAddressBarOkButton">Sonraki</string>
+    <string name="highlightsPreOnboardingAddressBarOption1Title">Üst (Varsayılan)</string>
+    <string name="highlightsPreOnboardingAddressBarOption1Description">Görmesi kolay</string>
+    <string name="highlightsPreOnboardingAddressBarOption2Title">Alt</string>
+    <string name="highlightsPreOnboardingAddressBarOption2Description">Ulaşması kolay</string>
     <string name="onboardingSearchDaxDialogTitle">Bir şeyler arayın!</string>
-    <string name="onboardingSearchDaxDialogDescription">DuckDuckGo aramalarınız her zaman anonimdir.</string>
-    <string name="onboardingSearchDaxDialogOption1" instruction="translate &apos;duck&apos; too.">ingilizcede \"ördek\" nasıl denir</string>
-    <string name="onboardingSearchDaxDialogOption1English" instruction="translate &apos;duck&apos; too. Don&apos;t add question mark">ispanyolca \"ördek\" nasıl denir</string>
+    <string name="onboardingSearchDaxDialogDescription">DuckDuckGo aramalarınız her zaman gizlidir.</string>
+    <string name="onboardingSearchDaxDialogOption1" instruction="translate &apos;duck&apos; too.">"ingilizcede ördek nasıl denir"</string>
+    <string name="onboardingSearchDaxDialogOption1English" instruction="translate &apos;duck&apos; too. Don&apos;t add question mark">"ispanyolcada ördek nasıl denir"</string>
     <string name="onboardingSearchQueryOption1">ingilizcede ördek nasıl denir</string>
     <string name="onboardingSearchQueryOption1English">ispanyolcada ördek nasıl denir</string>
     <string name="onboardingSearchDaxDialogOption2">avatar oyuncu kadrosu</string>
     <string name="onboardingSearchDaxDialogOption2US">mighty ducks oyuncu kadrosu</string>
     <string name="onboardingSearchDaxDialogOption3">yerel hava durumu</string>
     <string name="onboardingSearchDaxDialogOption4">Şaşırt beni!</string>
-    <string name="onboardingSearchQueryOption4">akşam yemeği tarifleri</string>
-    <string name="onboardingSearchQueryOption4US">çikolata parçacıklı kurabiye tarifleri</string>
+    <string name="onboardingSearchQueryOption4">ördek yavruları</string>
     <string name="onboardingSitesDaxDialogTitle">Bir siteyi ziyaret etmeyi deneyin!</string>
     <string name="onboardingSitesDaxDialogDescription">Sizi gözetlemelerini önlemek için izleyicileri engelleyeceğim.</string>
     <string name="onboardingSitesDaxDialogOption1">espn.com</string>
     <string name="onboardingSitesDaxDialogOption2">yahoo.com</string>
     <string name="onboardingSitesDaxDialogOption3">ebay.com</string>
     <string name="onboardingSitesDaxDialogOption4">Şaşırt beni!</string>
-    <string name="onboardingSerpDaxDialogDescription">DuckDuckGo Search bu işte. Özel. Hızlı. Daha az reklam.</string>
+    <string name="onboardingSerpDaxDialogDescription"><![CDATA[<b>DuckDuckGo Search</b> işte bu! Özel. Hızlı. Daha az reklam.]]></string>
     <string name="onboardingSerpDaxDialogButton">Anladım!</string>
     <string name="onboardingSitesSuggestionsDaxDialogTitle">Sonra, bir siteyi ziyaret etmeyi deneyin!</string>
     <plurals name="onboardingTrackersBlockedDialogDescription">
@@ -818,42 +827,20 @@
     </plurals>
     <string name="onboardingTrackersBlockedDaxDialogButton">Anladım!</string>
     <string name="onboardingFireButtonDaxDialogDescription"><![CDATA[<b>Fire Button</b> ile göz atma etkinliğinizi anında temizleyin.<br/><br/>Hemen deneyin!️ 🔥]]></string>
+    <string name="onboardingFireButtonDaxDialogOkButton">Deneyin</string>
+    <string name="onboardingFireButtonDaxDialogCancelButton">Atla</string>
     <string name="onboardingEndDaxDialogTitle">"İşte bu kadar!"</string>
-    <string name="onboardingEndDaxDialogDescription">Unutmayın: İnterneti benimle ne kadar çok gezerseniz rahatsız edici reklamları da o kadar az görürsünüz. 👌</string>
-    <string name="onboardingEndDaxDialogButton">Hepsi tamam!</string>
+    <string name="onboardingEndDaxDialogDescription">Unutmayın: İnterneti benimle ne kadar çok gezerseniz rahatsız edici reklamları da o kadar az görürsünüz.</string>
+    <string name="onboardingInContextEndDaxDialogDescription">Unutmayın: İnterneti benimle ne kadar çok gezerseniz rahatsız edici reklamları da o kadar az görürsünüz. 👌</string>
+    <string name="onboardingEndDaxDialogButton">Çak Bir Beşlik!</string>
     <string name="onboardingPrivacyProDaxDialogTitle">Ah, unutmadan...</string>
     <string name="onboardingPrivacyProDaxDialogDescription"><![CDATA[DuckDuckGo ayrıca <b>isteğe bağlı ücretli abonelikle</b> kullanılabilen güvenli bir <b>VPN + 2 premium koruma daha</b> sunuyor.]]></string>
     <string name="onboardingPrivacyProDaxDialogOkButton">Daha Fazla Bilgi</string>
     <string name="onboardingPrivacyProDaxDialogFreeTrialOkButton">Ücretsiz deneyin!</string>
     <string name="onboardingPrivacyProDaxDialogCancelButton">Atla</string>
 
-    <!-- Highlight Onboarding Experiment-->
-    <string name="highlightsPreOnboardingDaxDialog1Title"><![CDATA[Merhaba.<br/><br/>Sizi koruyan daha hızlı bir tarayıcıya hazır mısınız?]]></string>
-    <string name="highlightsPreOnboardingDaxDialog2Title">Korumalar etkinleştirildi!</string>
-    <string name="highlightsPreOnboardingComparisonChartItem2">Üçüncü taraf izleyicileri engelleyin</string>
-    <string name="highlightsPreOnboardingComparisonChartItem3">Çerez isteklerini ve açılır pencereleri engelleyin</string>
-    <string name="highlightsPreOnboardingComparisonChartItem4">Hedefli reklamları engelleyin</string>
-    <string name="highlightsPreOnboardingComparisonChartItem5">Tarama verilerini hızlıca silin</string>
-    <string name="highlightsPreOnboardingSelectAppIconTitle">Bana hangi renk daha çok yakışıyor?</string>
-    <string name="highlightsPreOnboardingSelectAppIconDescription">Uygulama simgenizi seçin:</string>
-    <string name="highlightsPreOnboardingSelectAppIconOkButton">Sonraki</string>
-    <string name="highlightsPreOnboardingAddressBarTitle">Adres çubuğu nereye yerleştirilsin?</string>
-    <string name="highlightsPreOnboardingAddressBarOption1Title">Üst (Varsayılan)</string>
-    <string name="highlightsPreOnboardingAddressBarOption1Description">Görmesi kolay</string>
-    <string name="highlightsPreOnboardingAddressBarOkButton">Sonraki</string>
-    <string name="highlightsPreOnboardingAddressBarOption2Title">Alt</string>
-    <string name="highlightsPreOnboardingAddressBarOption2Description">Ulaşması kolay</string>
-    <string name="highlightsOnboardingSearchQueryOption4">ördek yavruları</string>
-    <string name="highlightsOnboardingSearchDaxDialogDescription">DuckDuckGo aramalarınız her zaman gizlidir.</string>
-    <string name="highlightsOnboardingSerpDaxDialogDescription"><![CDATA[<b>DuckDuckGo Search</b> işte bu! Gizli. Hızlı. Daha az reklam.]]></string>
-    <string name="highlightsOnboardingEndDaxDialogDescription">Unutmayın: İnterneti benimle ne kadar çok gezerseniz rahatsız edici reklamları da o kadar az görürsünüz.</string>
-    <string name="highlightsOnboardingEndDaxDialogButton">Çak Bir Beşlik!</string>
-    <string name="onboardingFireButtonDaxDialogOkButton">Deneyin</string>
-    <string name="onboardingFireButtonDaxDialogCancelButton">Atla</string>
-    <string name="preOnboardingDaxDialog1SecondaryButton">Daha önce buradaydım</string>
-    <string name="highlightsPreOnboardingDaxDialog3Title"><![CDATA[Anladım! Diğer ipuçlarını atlayacağım.]]></string>
-    <string name="highlightsPreOnboardingDaxDialog3Text"><![CDATA[Unutmayın: <b>Fire Button</b> 🔥 ile tüm sekmelerinizi, geçmişinizi ve tarama verilerinizi iki dokunuşla silebilirsiniz]]></string>
-    <string name="preOnboardingDaxDialog3SecondaryButton">Eğitimi Göster</string>
+    <!-- Bubble BB & Buck experiment-->
+    <string name="onboardingBubbleExperimentSearchDaxDialogDescription">DuckDuckGo aramalarınız her zaman anonimdir.</string>
 
     <!-- Appearance settings -->
     <string name="settingsAddressBarPositionTitle">Adres Çubuğu</string>
@@ -940,8 +927,6 @@
     <!-- Privacy Pro Rebranding-->
     <string name="aboutDescriptionBrandUpdate2025Rebranding">Welcome to the Duck Side!\n\nDuckDuckGo, kişisel bilgilerinin kontrolünü geri almak isteyen herkes için bağımsız bir online koruma şirketidir.\n\nKişisel bilgilerinizi bilgisayar korsanlarından, dolandırıcılardan ve gizliliğinizi ihlal eden şirketlerden korumanın en iyi yolunun, bu bilgilerin toplanmasını tamamen durdurmak olduğuna inanıyoruz. Bu yüzden milyonlarca insan internette arama yapmak ve gezinmek için <annotation type="chart_comparison">Chrome ve diğer tarayıcılar yerine DuckDuckGo\'yu tercih ediyor</annotation>. Yerleşik arama motorumuz Google gibidir ancak aramalarınızı asla izlemez. Reklam izleyici ve çerezleri engelleme gibi tarama korumalarımız, diğer şirketlerin verilerinizi toplamasını önlemeye de yardımcı olur. Ayrıca, tarayıcımız ücretsizdir. Verilerinizi kullanarak değil, <annotation type="privacy_respecting_ads">gizliliğe saygılı arama reklamlarından</annotation> para kazanıyoruz.\n\nBuna ek olarak, tarayıcımıza entegre edilmiş <annotation type="ppro_help_page">DuckDuckGo aboneliği</annotation> sunuyoruz. Aboneler, internetteki etkinliklerinizi güvence altına alan hızlı ve basit bir <annotation type="vpn_help_page">VPN</annotation>, özel yapay zeka sohbet hizmetimiz Duck.ai\'daki gelişmiş yapay zeka modellerine erişim, kişisel bilgilerinizi kişi bulma sitelerinden bulan ve kaldıran ve çalınması durumunda kimliğinizi geri yükleyen bir hizmet ile daha fazla gizlilik koruması elde eder.\n\nVeri koruma için tasarlanmış, veri toplama amacı gütmeyen tarayıcıyla kişisel bilgilerinizin kontrolünü geri alın.</string>
     <string name="onboardingPrivacyProDaxDialogDescriptionRebranding"><![CDATA[DuckDuckGo\'nun ayrıca güvenli bir <b>VPN</b> ve <b>gelişmiş, gizli yapay zeka</b> içeren <b>isteğe bağlı ücretli bir aboneliği</b> var.]]></string>
-    <string name="settingsDuckAiRebranding">AI Özellikleri</string>
-    <string name="settingsDuckAi">Duck.ai</string>
 
     <!--TabSwitcher Trackers Animation-->
     <string name="showTrackerCountInTabSwitcher">Sekme Değiştiricide İzleyici sayısını göster</string>

@@ -169,6 +169,7 @@
     <string name="settingsAddressBarPosition">Nastavte pozici adresního řádku</string>
     <string name="settingsEnableVoiceSearch">Povolit soukromé hlasové vyhledávání</string>
     <string name="settingsDDGOnOtherPlatforms">DuckDuckGo na jiných platformách</string>
+    <string name="settingsDuckAi">Funkce AI</string>
 
     <!-- Private Search -->
     <string name="privateSearchActivityTitle">Soukromé vyhledávání</string>
@@ -248,7 +249,7 @@
     <string name="settingsAutomaticallyClearWhenAppExit30Minutes">Ukončení aplikace, neaktivní po dobu 30 minut</string>
     <string name="settingsAutomaticallyClearWhenAppExit60Minutes">Ukončení aplikace, neaktivní po dobu 1 hodiny</string>
     <string name="settingsClearAiDataTitle">Vymazat chaty Duck.ai</string>
-    <string name="settingsClearAiDataMessage">Tlačítko Fire Button taky smaže historii Duck.ai</string>
+    <string name="settingsClearAiDataDeleteMessage">Tlačítko Fire Button taky smaže historii Duck.ai, včetně připnutých chatů.</string>
 
     <!-- About Activity -->
     <string name="aboutActivityTitle">O DuckDuckGo</string>
@@ -804,36 +805,44 @@
     <string name="sslErrorUntrustedMessage" instruction="Placeholder is domain with certificate issues">Operační systém tvého zařízení nedůvěřuje bezpečnostnímu certifikátu %1$s. Je možné, že web je nesprávně nakonfigurovaný, že útočník prolomil tvoje připojení nebo že tvoje systémové hodiny jsou nesprávné.</string>
 
     <!-- Extended Onboarding-->
-    <string name="preOnboardingDaxDialog1Title"><![CDATA[Zdravíme tě.<br/><br/>Těšíš se na lepší internet s větší ochranou soukromí?]]></string>
+    <string name="preOnboardingDaxDialog1Title"><![CDATA[Zdravíme tě.<br/><br/>Už se těšíš na rychlejší prohlížeč, který tě ochrání?]]></string>
     <string name="preOnboardingDaxDialog1Button">Pojďme na to!</string>
-    <string name="preOnboardingDaxDialog2Title">Ochrana osobních údajů je aktivní!</string>
+    <string name="preOnboardingDaxDialog1SecondaryButton">Tohle už znám</string>
+    <string name="preOnboardingDaxDialog2Title">Ochrana je aktivní!</string>
     <string name="preOnboardingDaxDialog2Button">Vyber si prohlížeč</string>
+    <string name="preOnboardingDaxDialog3Title"><![CDATA[Jasně! Ostatní tipy přeskočím.]]></string>
+    <string name="preOnboardingDaxDialog3Text"><![CDATA[Pamatuj: všechny karty, historii a údaje o prohlížení můžeš smazat dvěma klepnutími na <b>Fire Button</b> 🔥]]></string>
+    <string name="preOnboardingDaxDialog3SecondaryButton">Zobrazit návod</string>
     <string name="preOnboardingComparisonChartItem1">Soukromé vyhledávání ve výchozím nastavení</string>
     <string name="preOnboardingComparisonChartItem2">Blokuj trackery třetích stran</string>
     <string name="preOnboardingComparisonChartItem3">Blokování vyskakovacích oken ohledně cookies</string>
     <string name="preOnboardingComparisonChartItem4">Blokování cílených reklam</string>
     <string name="preOnboardingComparisonChartItem5">Vymaž údaje o prohlížení jedním tlačítkem</string>
-    <string name="preOnboardingDaxDialog3Title">Bezva! Vítej v Kačerově.</string>
     <string name="preOnboardingDaxDialog3Button">Spustit procházení</string>
+    <string name="preOnboardingAddressBarTitle">Kam mám umístit váš adresní řádek?</string>
+    <string name="preOnboardingAddressBarOkButton">Další</string>
+    <string name="highlightsPreOnboardingAddressBarOption1Title">Nahoře (výchozí)</string>
+    <string name="highlightsPreOnboardingAddressBarOption1Description">Snadno viditelné</string>
+    <string name="highlightsPreOnboardingAddressBarOption2Title">Dole</string>
+    <string name="highlightsPreOnboardingAddressBarOption2Description">Vždy po ruce</string>
     <string name="onboardingSearchDaxDialogTitle">Vyzkoušejte vyhledávání!</string>
-    <string name="onboardingSearchDaxDialogDescription">Tvoje vyhledávání v DuckDuckGo je vždycky anonymní.</string>
-    <string name="onboardingSearchDaxDialogOption1" instruction="translate &apos;duck&apos; too.">jak se řekne anglicky „kachna“</string>
-    <string name="onboardingSearchDaxDialogOption1English" instruction="translate &apos;duck&apos; too. Don&apos;t add question mark">jak se řekne „kachna“ španělsky</string>
+    <string name="onboardingSearchDaxDialogDescription">Tvoje vyhledávání v DuckDuckGo je vždycky soukromé.</string>
+    <string name="onboardingSearchDaxDialogOption1" instruction="translate &apos;duck&apos; too.">"jak se řekne anglicky kachna"</string>
+    <string name="onboardingSearchDaxDialogOption1English" instruction="translate &apos;duck&apos; too. Don&apos;t add question mark">"jak se řekne španělsky „kachna“"</string>
     <string name="onboardingSearchQueryOption1">jak se řekne anglicky kachna</string>
     <string name="onboardingSearchQueryOption1English">jak se řekne španělsky „kachna“</string>
     <string name="onboardingSearchDaxDialogOption2">obsazení avatara</string>
     <string name="onboardingSearchDaxDialogOption2US">herci z filmu Šampióni</string>
     <string name="onboardingSearchDaxDialogOption3">aktuální počasí</string>
     <string name="onboardingSearchDaxDialogOption4">Překvap mě!</string>
-    <string name="onboardingSearchQueryOption4">recepty na večeři</string>
-    <string name="onboardingSearchQueryOption4US">recepty na čokoládové sušenky</string>
+    <string name="onboardingSearchQueryOption4">malá káčátka</string>
     <string name="onboardingSitesDaxDialogTitle">Zkus přejít na nějaký web!</string>
     <string name="onboardingSitesDaxDialogDescription">Zablokuju trackery, aby tě nemohly šmírovat.</string>
     <string name="onboardingSitesDaxDialogOption1">espn.com</string>
     <string name="onboardingSitesDaxDialogOption2">yahoo.com</string>
     <string name="onboardingSitesDaxDialogOption3">ebay.com</string>
     <string name="onboardingSitesDaxDialogOption4">Překvap mě!</string>
-    <string name="onboardingSerpDaxDialogDescription">Tohle je vyhledávač DuckDuckGo Search. Soukromý. Rychlý. S méně reklamami.</string>
+    <string name="onboardingSerpDaxDialogDescription"><![CDATA[To je vyhledávač <b>DuckDuckGo Search</b>! Soukromý. Rychlý. S méně reklamami.]]></string>
     <string name="onboardingSerpDaxDialogButton">Mám to!</string>
     <string name="onboardingSitesSuggestionsDaxDialogTitle">A teď zkus přejít na nějaký web!</string>
     <plurals name="onboardingTrackersBlockedDialogDescription">
@@ -850,42 +859,20 @@
     </plurals>
     <string name="onboardingTrackersBlockedDaxDialogButton">Mám to!</string>
     <string name="onboardingFireButtonDaxDialogDescription"><![CDATA[Vcukuletu můžeš smazat svou aktivitu při prohlížení pomocí funkce <b>Fire Button</b>.<br/><br/>Zkus ji! 🔥]]></string>
+    <string name="onboardingFireButtonDaxDialogOkButton">Vyzkoušejte ho</string>
+    <string name="onboardingFireButtonDaxDialogCancelButton">Přeskočit</string>
     <string name="onboardingEndDaxDialogTitle">"A je to!"</string>
-    <string name="onboardingEndDaxDialogDescription">Pamatuj: Když se mnou na webu surfuješ, příšerné reklamy zaženeš. 👌</string>
-    <string name="onboardingEndDaxDialogButton">Všechno je hotové!</string>
+    <string name="onboardingEndDaxDialogDescription">Pamatujte: pokaždé, když internet procházíte s námi, příšerným reklamám přistřihneme křídla.</string>
+    <string name="onboardingInContextEndDaxDialogDescription">Pamatuj: Když se mnou na webu surfuješ, příšerné reklamy zaženeš. 👌</string>
+    <string name="onboardingEndDaxDialogButton">Plácnutí!</string>
     <string name="onboardingPrivacyProDaxDialogTitle">Než to zapomenu...</string>
     <string name="onboardingPrivacyProDaxDialogDescription"><![CDATA[DuckDuckGo má taky bezpečnou <b>VPN a dvě další prémiové ochranné funkce</b>, které jsou dostupné v rámci <b>volitelného předplatného</b>.]]></string>
     <string name="onboardingPrivacyProDaxDialogOkButton">Více informací</string>
     <string name="onboardingPrivacyProDaxDialogFreeTrialOkButton">Vyzkoušej to zdarma!</string>
     <string name="onboardingPrivacyProDaxDialogCancelButton">Přeskočit</string>
 
-    <!-- Highlight Onboarding Experiment-->
-    <string name="highlightsPreOnboardingDaxDialog1Title"><![CDATA[Zdravíme tě.<br/><br/>Jsi připravený na rychlejší prohlížeč, který tě ochrání?]]></string>
-    <string name="highlightsPreOnboardingDaxDialog2Title">Ochrana je aktivní!</string>
-    <string name="highlightsPreOnboardingComparisonChartItem2">Blokovat trackery třetích stran</string>
-    <string name="highlightsPreOnboardingComparisonChartItem3">Blokování vyskakovacích oken a požadavků na soubory cookie</string>
-    <string name="highlightsPreOnboardingComparisonChartItem4">Blokování cílených reklam</string>
-    <string name="highlightsPreOnboardingComparisonChartItem5">Rychle vymazání údajů o prohlížení</string>
-    <string name="highlightsPreOnboardingSelectAppIconTitle">Která barva mi sluší nejvíc?</string>
-    <string name="highlightsPreOnboardingSelectAppIconDescription">Vyberte si ikonu aplikace:</string>
-    <string name="highlightsPreOnboardingSelectAppIconOkButton">Další</string>
-    <string name="highlightsPreOnboardingAddressBarTitle">Kam mám umístit váš adresní řádek?</string>
-    <string name="highlightsPreOnboardingAddressBarOption1Title">Nahoře (výchozí)</string>
-    <string name="highlightsPreOnboardingAddressBarOption1Description">Snadno viditelné</string>
-    <string name="highlightsPreOnboardingAddressBarOkButton">Další</string>
-    <string name="highlightsPreOnboardingAddressBarOption2Title">Dole</string>
-    <string name="highlightsPreOnboardingAddressBarOption2Description">Vždy po ruce</string>
-    <string name="highlightsOnboardingSearchQueryOption4">malá káčátka</string>
-    <string name="highlightsOnboardingSearchDaxDialogDescription">Tvoje vyhledávání v DuckDuckGo je vždycky soukromé.</string>
-    <string name="highlightsOnboardingSerpDaxDialogDescription"><![CDATA[To je vyhledávač <b>DuckDuckGo Search</b>! Soukromý. Rychlý. S méně reklamami.]]></string>
-    <string name="highlightsOnboardingEndDaxDialogDescription">Pamatujte: pokaždé, když internet procházíte s námi, příšerným reklamám přistřihneme křídla.</string>
-    <string name="highlightsOnboardingEndDaxDialogButton">Plácnutí!</string>
-    <string name="onboardingFireButtonDaxDialogOkButton">Vyzkoušejte ho</string>
-    <string name="onboardingFireButtonDaxDialogCancelButton">Přeskočit</string>
-    <string name="preOnboardingDaxDialog1SecondaryButton">Tohle už znám</string>
-    <string name="highlightsPreOnboardingDaxDialog3Title"><![CDATA[Jasně! Ostatní tipy přeskočím.]]></string>
-    <string name="highlightsPreOnboardingDaxDialog3Text"><![CDATA[Pamatuj: všechny karty, historii a údaje o prohlížení můžeš smazat dvěma klepnutími na <b>Fire Button</b> 🔥]]></string>
-    <string name="preOnboardingDaxDialog3SecondaryButton">Zobrazit návod</string>
+    <!-- Bubble BB & Buck experiment-->
+    <string name="onboardingBubbleExperimentSearchDaxDialogDescription">Tvoje vyhledávání v DuckDuckGo je vždycky anonymní.</string>
 
     <!-- Appearance settings -->
     <string name="settingsAddressBarPositionTitle">Adresní řádek</string>
@@ -976,8 +963,6 @@
     <!-- Privacy Pro Rebranding-->
     <string name="aboutDescriptionBrandUpdate2025Rebranding">Welcome to the Duck Side!\n\nDuckDuckGo je nezávislá společnost zaměřená na ochranu soukromí na internetu pro každého, kdo chce mít své osobní údaje zase pod kontrolou.\n\nVěříme, že nejlepší způsob, jak ochránit tvoje osobní údaje před hackery, podvodníky a společnostmi, co jim soukromí moc neříká, je vůbec jim přístup k tvým údajům neumožnit. Proto milióny lidí při prohlížení webu <annotation type="chart_comparison">dávají přednost DuckDuckGo před Chromem a dalšími prohlížeči</annotation>. Náš vyhledávač integrovaný v prohlížeči je jako Google, ale nikdy nesleduje, co hledáš. A naše sada funkcí na ochranu soukromí, která zahrnuje blokování reklamních trackerů a cookies, brání firmám ve sběru tvých dat. Náš prohlížeč je navíc zdarma – vyděláváme na <annotation type="privacy_respecting_ads">reklamách ve vyhledávání, které respektují soukromí</annotation> a nezneužívají tvé údaje.\n\nKromě toho nabízíme také <annotation type="ppro_help_page">předplatné DuckDuckGo</annotation>, které je integrované v našem prohlížeči. Předplatitelé získají ještě větší ochranu soukromí díky rychlé a jednoduché <annotation type="vpn_help_page">VPN</annotation>, která pomáhá zabezpečit tvoje online aktivity, přístup k pokročilým modelům umělé inteligence v naší soukromé chatovací službě Duck.ai, službu, která vyhledává a odstraňuje tvoje osobní údaje ze stránek pro vyhledávání lidí, a službě, která obnoví tvoji identitu, pokud by byla odcizena.\n\nPřevezmi kontrolu nad svými osobními údaji a pořiď si prohlížeč navržený tak, aby tvoje data neshromažďoval, ale chránil.</string>
     <string name="onboardingPrivacyProDaxDialogDescriptionRebranding"><![CDATA[DuckDuckGo má také <b>volitelné předplatné</b> s bezpečnou <b>VPN</b> a <b>špičkovou soukromou umělou inteligencí</b>.]]></string>
-    <string name="settingsDuckAiRebranding">Funkce AI</string>
-    <string name="settingsDuckAi">Duck.ai</string>
 
     <!--TabSwitcher Trackers Animation-->
     <string name="showTrackerCountInTabSwitcher">Zobrazit počet trackerů v přepínači karet</string>

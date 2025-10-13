@@ -240,8 +240,8 @@ class DownloaderUtilTest {
             "中文文件名测试.txt",
             DownloaderUtil.fileNameFromContentDisposition(
                 """
-                    attachment; 
-                    filename*=utf-8''%E4%B8%AD%E6%96%87%E6%96%87%E4%BB%B6%E5%90%8D%E6%B5%8B%E8%AF%95.txt; 
+                    attachment;
+                    filename*=utf-8''%E4%B8%AD%E6%96%87%E6%96%87%E4%BB%B6%E5%90%8D%E6%B5%8B%E8%AF%95.txt;
                     filename= "%E4%B8%AD%E6%96%87%E6%96%87%E4%BB%B6%E5%90%8D%E6%B5%8B%E8%AF%95.txt
                 """.trimIndent(),
             ),
@@ -254,8 +254,8 @@ class DownloaderUtilTest {
             "中文文件名测试.txt",
             DownloaderUtil.fileNameFromContentDisposition(
                 """
-                    attachment; 
-                    filename= "%E4%B8%AD%E6%96%87%E6%96%87%E4%BB%B6%E5%90%8D%E6%B5%8B%E8%AF%95.txt; 
+                    attachment;
+                    filename= "%E4%B8%AD%E6%96%87%E6%96%87%E4%BB%B6%E5%90%8D%E6%B5%8B%E8%AF%95.txt;
                     filename*=utf-8''%E4%B8%AD%E6%96%87%E6%96%87%E4%BB%B6%E5%90%8D%E6%B5%8B%E8%AF%95.txt;
                 """.trimIndent(),
             ),
@@ -268,8 +268,8 @@ class DownloaderUtilTest {
             "%E4%B8%AD%E6%96%87%E6%96%87%E4%BB%B6%E5%90%8D%E6%B5%8B%E8%AF%95.txt",
             DownloaderUtil.fileNameFromContentDisposition(
                 """
-                    attachment; 
-                    filename*=%E4%B8%AD%E6%96%87%E6%96%87%E4%BB%B6%E5%90%8D%E6%B5%8B%E8%AF%95.txt; 
+                    attachment;
+                    filename*=%E4%B8%AD%E6%96%87%E6%96%87%E4%BB%B6%E5%90%8D%E6%B5%8B%E8%AF%95.txt;
                     filename= "%E4%B8%AD%E6%96%87%E6%96%87%E4%BB%B6%E5%90%8D%E6%B5%8B%E8%AF%95.txt
                 """.trimIndent(),
             ),
@@ -282,8 +282,8 @@ class DownloaderUtilTest {
             "中文文件名测试.txt",
             DownloaderUtil.fileNameFromContentDisposition(
                 """
-                    inline; 
-                    filename= "%E4%B8%AD%E6%96%87%E6%96%87%E4%BB%B6%E5%90%8D%E6%B5%8B%E8%AF%95.txt; 
+                    inline;
+                    filename= "%E4%B8%AD%E6%96%87%E6%96%87%E4%BB%B6%E5%90%8D%E6%B5%8B%E8%AF%95.txt;
                     filename*=utf-8''%E4%B8%AD%E6%96%87%E6%96%87%E4%BB%B6%E5%90%8D%E6%B5%8B%E8%AF%95.txt;
                 """.trimIndent(),
             ),

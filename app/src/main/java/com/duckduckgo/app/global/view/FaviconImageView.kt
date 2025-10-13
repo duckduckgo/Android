@@ -28,14 +28,14 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.duckduckgo.common.utils.baseHost
-import com.duckduckgo.mobile.android.R as CommonR
-import java.io.File
-import java.util.*
-import kotlin.math.absoluteValue
 import logcat.LogPriority.ERROR
 import logcat.asLog
 import logcat.logcat
 import okio.ByteString.Companion.encodeUtf8
+import java.io.File
+import java.util.*
+import kotlin.math.absoluteValue
+import com.duckduckgo.mobile.android.R as CommonR
 
 fun ImageView.loadFavicon(
     file: File,

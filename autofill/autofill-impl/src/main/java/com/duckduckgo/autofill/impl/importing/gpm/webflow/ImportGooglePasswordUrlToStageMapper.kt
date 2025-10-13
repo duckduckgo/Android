@@ -19,8 +19,8 @@ package com.duckduckgo.autofill.impl.importing.gpm.webflow
 import com.duckduckgo.autofill.impl.importing.gpm.feature.AutofillImportPasswordConfigStore
 import com.duckduckgo.di.scopes.FragmentScope
 import com.squareup.anvil.annotations.ContributesBinding
-import javax.inject.Inject
 import logcat.logcat
+import javax.inject.Inject
 
 interface ImportGooglePasswordUrlToStageMapper {
     suspend fun getStage(url: String?): String

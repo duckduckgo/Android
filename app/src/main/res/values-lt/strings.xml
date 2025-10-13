@@ -169,6 +169,7 @@
     <string name="settingsAddressBarPosition">Nustatykite adreso juostos padėtį</string>
     <string name="settingsEnableVoiceSearch">Įjungti privačią paiešką balsu</string>
     <string name="settingsDDGOnOtherPlatforms">„DuckDuckGo“ kitose platformose</string>
+    <string name="settingsDuckAi">DI funkcijos</string>
 
     <!-- Private Search -->
     <string name="privateSearchActivityTitle">privati paieška</string>
@@ -248,7 +249,7 @@
     <string name="settingsAutomaticallyClearWhenAppExit30Minutes">Išeinant iš programos, po 30 min. neveikimo</string>
     <string name="settingsAutomaticallyClearWhenAppExit60Minutes">Išeinant iš programos, po 1 val. neveikimo</string>
     <string name="settingsClearAiDataTitle">Išvalyti „Duck.ai“ pokalbius</string>
-    <string name="settingsClearAiDataMessage">Mygtukas „Fire Button“ taip pat ištrins „Duck.ai“ istoriją.</string>
+    <string name="settingsClearAiDataDeleteMessage">„Fire Button“ taip pat ištrins „Duck.ai“ istoriją, įskaitant prisegtus pokalbius.</string>
 
     <!-- About Activity -->
     <string name="aboutActivityTitle">Apie „DuckDuckGo“</string>
@@ -804,36 +805,44 @@
     <string name="sslErrorUntrustedMessage" instruction="Placeholder is domain with certificate issues">%1$s saugos sertifikatu nepasitiki jūsų įrenginio operacinė sistema. Gali būti, kad svetainė neteisingai sukonfigūruota arba atakos vykdytojas pakenkė jūsų ryšiui arba kad jūsų sistemos laikrodžio rodomas laikas yra neteisingas.</string>
 
     <!-- Extended Onboarding-->
-    <string name="preOnboardingDaxDialog1Title"><![CDATA[Sveiki.<br/><br/>Ar esate pasiruošę geresniam ir privatesniam internetui?]]></string>
+    <string name="preOnboardingDaxDialog1Title"><![CDATA[Sveiki.<br/><br/>Pasiruošę greitesnei naršyklei, kuri jus apsaugo?]]></string>
     <string name="preOnboardingDaxDialog1Button">Padarykime tai!</string>
-    <string name="preOnboardingDaxDialog2Title">Privatumo apsaugos priemonės įjungtos!</string>
+    <string name="preOnboardingDaxDialog1SecondaryButton">Aš jau čia buvau.</string>
+    <string name="preOnboardingDaxDialog2Title">Apsaugos priemonės įjungtos!</string>
     <string name="preOnboardingDaxDialog2Button">Pasirinkite naršyklę</string>
+    <string name="preOnboardingDaxDialog3Title"><![CDATA[Supratau! Praleisiu kitus patarimus.]]></string>
+    <string name="preOnboardingDaxDialog3Text"><![CDATA[Atminkite: visus skirtukus, istoriją ir naršymo duomenis galite ištrinti dviem <b>„Fire Button“</b> 🔥 bakstelėjimais.]]></string>
+    <string name="preOnboardingDaxDialog3SecondaryButton">Rodyti mokymo priemonę</string>
     <string name="preOnboardingComparisonChartItem1">Vykdykite paiešką privačiai pagal numatytąjį nustatymą</string>
     <string name="preOnboardingComparisonChartItem2">Blokuoja trečiųjų šalių stebėjimo priemones</string>
     <string name="preOnboardingComparisonChartItem3">Blokuoti slapukų iššokančiuosius langus</string>
     <string name="preOnboardingComparisonChartItem4">Blokuoti tikslines reklamas</string>
     <string name="preOnboardingComparisonChartItem5">Vienu mygtuku ištrink naršymo duomenis</string>
-    <string name="preOnboardingDaxDialog3Title">Nuostabu! Sveiki prisijungę prie „Duck“!</string>
     <string name="preOnboardingDaxDialog3Button">Pradėti naršyti</string>
+    <string name="preOnboardingAddressBarTitle">Kur turėčiau nustatyti jūsų adreso juostą?</string>
+    <string name="preOnboardingAddressBarOkButton">Kitas</string>
+    <string name="highlightsPreOnboardingAddressBarOption1Title">Viršuje (numatytasis nustatymas)</string>
+    <string name="highlightsPreOnboardingAddressBarOption1Description">Lengva pamatyti</string>
+    <string name="highlightsPreOnboardingAddressBarOption2Title">Apačia</string>
+    <string name="highlightsPreOnboardingAddressBarOption2Description">Lengvai pasiekiama</string>
     <string name="onboardingSearchDaxDialogTitle">Išmėgink paiešką!</string>
-    <string name="onboardingSearchDaxDialogDescription">Jūsų „DuckDuckGo“ paieškos visada yra anoniminės.</string>
-    <string name="onboardingSearchDaxDialogOption1" instruction="translate &apos;duck&apos; too.">kaip pasakyti „antis“ anglų kalba</string>
-    <string name="onboardingSearchDaxDialogOption1English" instruction="translate &apos;duck&apos; too. Don&apos;t add question mark">kaip pasakyti „antis“ ispanų kalba</string>
+    <string name="onboardingSearchDaxDialogDescription">Jūsų „DuckDuckGo“ paieškos visada yra privačios.</string>
+    <string name="onboardingSearchDaxDialogOption1" instruction="translate &apos;duck&apos; too.">"kaip pasakyti antis anglų kalba"</string>
+    <string name="onboardingSearchDaxDialogOption1English" instruction="translate &apos;duck&apos; too. Don&apos;t add question mark">"kaip pasakyti antis ispanų kalba"</string>
     <string name="onboardingSearchQueryOption1">kaip pasakyti antis anglų kalba</string>
     <string name="onboardingSearchQueryOption1English">kaip pasakyti antis ispanų kalba</string>
     <string name="onboardingSearchDaxDialogOption2">įsikūnijimo aktoriai</string>
     <string name="onboardingSearchDaxDialogOption2US">mighty ducks aktoriai</string>
     <string name="onboardingSearchDaxDialogOption3">vietinis oras</string>
     <string name="onboardingSearchDaxDialogOption4">Nustebink mane!</string>
-    <string name="onboardingSearchQueryOption4">vakarienės receptai</string>
-    <string name="onboardingSearchQueryOption4US">šokolado drožlių sausainių receptai</string>
+    <string name="onboardingSearchQueryOption4">kūdikių ančiukai</string>
     <string name="onboardingSitesDaxDialogTitle">Pabandyk apsilankyti svetainėje!</string>
     <string name="onboardingSitesDaxDialogDescription">Užblokuosiu stebėjimo priemones, kad jos negalėtų tavęs šnipinėti.</string>
     <string name="onboardingSitesDaxDialogOption1">espn.com</string>
     <string name="onboardingSitesDaxDialogOption2">yahoo.com</string>
     <string name="onboardingSitesDaxDialogOption3">ebay.com</string>
     <string name="onboardingSitesDaxDialogOption4">Nustebink mane!</string>
-    <string name="onboardingSerpDaxDialogDescription">Tai „DuckDuckGo Search“. Privati. Sparti. Mažiau reklamų.</string>
+    <string name="onboardingSerpDaxDialogDescription"><![CDATA[Tai „<b>DuckDuckGo Search</b>“! Privati. Sparti. Mažiau reklamų.]]></string>
     <string name="onboardingSerpDaxDialogButton">Supratau!</string>
     <string name="onboardingSitesSuggestionsDaxDialogTitle">Pabandyk apsilankyti svetainėje!</string>
     <plurals name="onboardingTrackersBlockedDialogDescription">
@@ -850,42 +859,20 @@
     </plurals>
     <string name="onboardingTrackersBlockedDaxDialogButton">Supratau!</string>
     <string name="onboardingFireButtonDaxDialogDescription"><![CDATA[Akimirksniu išvalykite naršymo veiklą naudodami <b>Fire Button</b>.<br/><br/>Išbandykite!️ 🔥]]></string>
+    <string name="onboardingFireButtonDaxDialogOkButton">Išbandykite</string>
+    <string name="onboardingFireButtonDaxDialogCancelButton">Praleisti</string>
     <string name="onboardingEndDaxDialogTitle">"Atlikote!"</string>
-    <string name="onboardingEndDaxDialogDescription">Įsidėmėkite: kiekvieną kartą, kai naršai su manimi, bauginantis skelbimas praranda galią. 👌</string>
-    <string name="onboardingEndDaxDialogButton">Viskas!</string>
+    <string name="onboardingEndDaxDialogDescription">Įsidėmėk: kiekvieną kartą, kai naršai su manimi, bauginantis skelbimas praranda galią.</string>
+    <string name="onboardingInContextEndDaxDialogDescription">Įsidėmėkite: kiekvieną kartą, kai naršai su manimi, bauginantis skelbimas praranda galią. 👌</string>
+    <string name="onboardingEndDaxDialogButton">Duok penkis!</string>
     <string name="onboardingPrivacyProDaxDialogTitle">Oi, kol nepamiršau...</string>
     <string name="onboardingPrivacyProDaxDialogDescription"><![CDATA[„DuckDuckGo“ taip pat turi saugų <b>VPN + dar 2 aukščiausios kokybės apsaugas</b>, kurias galima įsigyti su <b>pasirenkama mokama prenumerata</b>.]]></string>
     <string name="onboardingPrivacyProDaxDialogOkButton">Sužinoti daugiau</string>
     <string name="onboardingPrivacyProDaxDialogFreeTrialOkButton">Išbandyk nemokamai!</string>
     <string name="onboardingPrivacyProDaxDialogCancelButton">Praleisti</string>
 
-    <!-- Highlight Onboarding Experiment-->
-    <string name="highlightsPreOnboardingDaxDialog1Title"><![CDATA[Sveiki.<br/><br/>Pasiruošę greitesnei naršyklei, kuri jus apsaugo?]]></string>
-    <string name="highlightsPreOnboardingDaxDialog2Title">Apsaugos priemonės įjungtos!</string>
-    <string name="highlightsPreOnboardingComparisonChartItem2">Blokuoja trečiųjų šalių stebėjimo priemones</string>
-    <string name="highlightsPreOnboardingComparisonChartItem3">Blokuoti slapukų užklausas ir iššokančiuosius langus</string>
-    <string name="highlightsPreOnboardingComparisonChartItem4">Blokuoti tikslines reklamas</string>
-    <string name="highlightsPreOnboardingComparisonChartItem5">Greitai ištrinkite naršymo duomenis</string>
-    <string name="highlightsPreOnboardingSelectAppIconTitle">Kuri spalva man labiausiai tinka?</string>
-    <string name="highlightsPreOnboardingSelectAppIconDescription">Pasirinkti programos piktogramą:</string>
-    <string name="highlightsPreOnboardingSelectAppIconOkButton">Kitas</string>
-    <string name="highlightsPreOnboardingAddressBarTitle">Kur turėčiau nustatyti jūsų adreso juostą?</string>
-    <string name="highlightsPreOnboardingAddressBarOption1Title">Viršuje (numatytasis nustatymas)</string>
-    <string name="highlightsPreOnboardingAddressBarOption1Description">Lengva pamatyti</string>
-    <string name="highlightsPreOnboardingAddressBarOkButton">Kitas</string>
-    <string name="highlightsPreOnboardingAddressBarOption2Title">Apačia</string>
-    <string name="highlightsPreOnboardingAddressBarOption2Description">Lengvai pasiekiama</string>
-    <string name="highlightsOnboardingSearchQueryOption4">kūdikių ančiukai</string>
-    <string name="highlightsOnboardingSearchDaxDialogDescription">Jūsų „DuckDuckGo“ paieškos visada yra privačios.</string>
-    <string name="highlightsOnboardingSerpDaxDialogDescription"><![CDATA[Tai „<b>DuckDuckGo Search</b>“! Privati. Sparti. Mažiau reklamų.]]></string>
-    <string name="highlightsOnboardingEndDaxDialogDescription">Įsidėmėk: kiekvieną kartą, kai naršai su manimi, bauginantis skelbimas praranda galią.</string>
-    <string name="highlightsOnboardingEndDaxDialogButton">Duok penkis!</string>
-    <string name="onboardingFireButtonDaxDialogOkButton">Išbandykite</string>
-    <string name="onboardingFireButtonDaxDialogCancelButton">Praleisti</string>
-    <string name="preOnboardingDaxDialog1SecondaryButton">Aš jau čia buvau.</string>
-    <string name="highlightsPreOnboardingDaxDialog3Title"><![CDATA[Supratau! Praleisiu kitus patarimus.]]></string>
-    <string name="highlightsPreOnboardingDaxDialog3Text"><![CDATA[Atminkite: visus skirtukus, istoriją ir naršymo duomenis galite ištrinti dviem <b>„Fire Button“</b> 🔥 bakstelėjimais.]]></string>
-    <string name="preOnboardingDaxDialog3SecondaryButton">Rodyti mokymo priemonę</string>
+    <!-- Bubble BB & Buck experiment-->
+    <string name="onboardingBubbleExperimentSearchDaxDialogDescription">Jūsų „DuckDuckGo“ paieškos visada yra anoniminės.</string>
 
     <!-- Appearance settings -->
     <string name="settingsAddressBarPositionTitle">Adreso juosta</string>
@@ -976,8 +963,6 @@
     <!-- Privacy Pro Rebranding-->
     <string name="aboutDescriptionBrandUpdate2025Rebranding">Sveiki atvykę į „Duck Side“!\n\n„DuckDuckGo“ yra nepriklausoma interneto apsaugos bendrovė, skirta visiems, norintiems susigrąžinti savo asmeninės informacijos kontrolę.\n\nManome, kad geriausias būdas apsaugoti jūsų asmeninę informaciją nuo įsilaužėlių, sukčių ir į privatumą pasikėsinančių įmonių – visiškai sustabdyti jos rinkimą. Štai kodėl milijonai žmonių <annotation type="chart_comparison">pasirenka „DuckDuckGo“, o ne „Chrome“ ir kitas naršykles</annotation> ieškoti ir naršyti internete. Mūsų integruota paieškos sistema yra kaip „Google“, bet niekada nestebi jūsų paieškų. O mūsų naršymo apsaugos priemonės, tokios kaip skelbimų sekimo ir slapukų blokavimas, padeda neleisti kitoms įmonėms rinkti jūsų duomenų. O, ir mūsų naršyklė nemokama – mes uždirbame pinigus iš <annotation type="privacy_respecting_ads">privatumo paisančių paieškos skelbimų</annotation>, o ne išnaudodami jūsų duomenis.Be to, mes taip pat siūlome <annotation type="ppro_help_page">„DuckDuckGo“ prenumeratą</annotation>, integruotą į mūsų naršyklę. Prenumeratoriai gauna dar daugiau privatumo apsaugos su greitu ir paprastu naudoti <annotation type="vpn_help_page">VPN</annotation>, kuris padeda apsaugoti naršymą internete, prieigą prie pažangių DI modelių mūsų privačioje DI pokalbių paslaugoje „Duck.ai“, paslaugą, kuri randa ir pašalina asmeninę informaciją iš žmonių paieškos svetainių, ir paslaugą, kuri atkuria tapatybę, jei ji būtų pavogta.\n\nSusigrąžinkite savo asmeninės informacijos kontrolę naudodami naršyklę, sukurtą duomenų apsaugai, o ne jų rinkimui.</string>
     <string name="onboardingPrivacyProDaxDialogDescriptionRebranding"><![CDATA[„DuckDuckGo“ taip pat turi <b>pasirenkamą mokamą prenumeratą</b> su saugiu <b>VPN</b> ir <b>pažangiu, privačiu dirbtiniu intelektu</b>.]]></string>
-    <string name="settingsDuckAiRebranding">DI funkcijos</string>
-    <string name="settingsDuckAi">Duck.ai</string>
 
     <!--TabSwitcher Trackers Animation-->
     <string name="showTrackerCountInTabSwitcher">Rodyti sekiklių skaičių skirtukų perjungiklyje</string>

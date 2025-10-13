@@ -98,12 +98,12 @@ import com.duckduckgo.settings.api.ThreatProtectionSettingsPlugin
 import com.duckduckgo.subscriptions.api.PrivacyProFeedbackScreens.GeneralPrivacyProFeedbackScreenNoParams
 import com.duckduckgo.sync.api.SyncActivityWithEmptyParams
 import com.google.android.material.snackbar.Snackbar
-import javax.inject.Inject
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import logcat.LogPriority.VERBOSE
 import logcat.logcat
+import javax.inject.Inject
 
 private const val OTHER_PLATFORMS_URL = "https://duckduckgo.com/app"
 
@@ -319,7 +319,7 @@ class SettingsActivity : DuckDuckGoActivity() {
                     updatePrivacyPro(it.isPrivacyProEnabled)
                     updateDuckPlayer(it.isDuckPlayerEnabled)
                     updateThreatProtection(it.isNewThreatProtectionSettingsEnabled)
-                    updateDuckChat(it.isDuckChatEnabled, it.isAiFeaturesRebrandingEnabled)
+                    updateDuckChat(it.isDuckChatEnabled)
                     updateVoiceSearchVisibility(it.isVoiceSearchVisible)
                     updateAddWidgetInProtections(it.isAddWidgetInProtectionsVisible, it.widgetsInstalled)
                     sortSettingItemsAlphabetically()
@@ -357,20 +357,9 @@ class SettingsActivity : DuckDuckGoActivity() {
         }
     }
 
-    private fun updateDuckChat(isDuckChatEnabled: Boolean, isAiFeaturesRebrandingEnabled: Boolean) {
+    private fun updateDuckChat(isDuckChatEnabled: Boolean) {
         if (isDuckChatEnabled) {
-            val imageRes: Int
-            val titleRes: Int
-            if (isAiFeaturesRebrandingEnabled) {
-                imageRes = com.duckduckgo.mobile.android.R.drawable.ai_general_color_24
-                titleRes = R.string.settingsDuckAiRebranding
-            } else {
-                imageRes = com.duckduckgo.mobile.android.R.drawable.ic_ai_chat_color_24
-                titleRes = R.string.settingsDuckAi
-            }
             viewsMain.includeDuckChatSetting.duckChatSetting.show()
-            viewsMain.includeDuckChatSetting.duckChatSetting.setLeadingIconResource(imageRes)
-            viewsMain.includeDuckChatSetting.duckChatSetting.setPrimaryTextResource(titleRes)
         } else {
             viewsMain.includeDuckChatSetting.duckChatSetting.gone()
         }

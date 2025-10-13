@@ -66,13 +66,13 @@ import com.duckduckgo.privacy.config.api.PrivacyConfigCallbackPlugin
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.SingleInstanceIn
-import java.io.InputStream
-import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.io.InputStream
+import javax.inject.Inject
 
 private const val DUCK_PLAYER_VIDEO_ID_QUERY_PARAM = "videoID"
 const val DUCK_PLAYER_OPEN_IN_YOUTUBE_PATH = "openInYoutube"
@@ -98,7 +98,6 @@ interface DuckPlayerInternal : DuckPlayer {
 }
 
 @SingleInstanceIn(AppScope::class)
-
 @ContributesBinding(AppScope::class, boundType = DuckPlayer::class)
 @ContributesBinding(AppScope::class, boundType = DuckPlayerInternal::class)
 @ContributesMultibinding(AppScope::class, boundType = PrivacyConfigCallbackPlugin::class)

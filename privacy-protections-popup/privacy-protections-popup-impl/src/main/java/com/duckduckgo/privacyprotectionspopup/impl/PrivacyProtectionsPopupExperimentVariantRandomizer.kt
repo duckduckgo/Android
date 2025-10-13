@@ -20,8 +20,8 @@ import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.privacyprotectionspopup.impl.PrivacyProtectionsPopupExperimentVariant.CONTROL
 import com.squareup.anvil.annotations.ContributesBinding
-import javax.inject.Inject
 import org.apache.commons.math3.random.RandomDataGenerator
+import javax.inject.Inject
 
 interface PrivacyProtectionsPopupExperimentVariantRandomizer {
     fun getRandomVariant(): PrivacyProtectionsPopupExperimentVariant

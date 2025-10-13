@@ -22,9 +22,9 @@ import com.duckduckgo.voice.store.ManufacturerEntity
 import com.duckduckgo.voice.store.MinVersionEntity
 import com.duckduckgo.voice.store.VoiceSearchDao
 import com.duckduckgo.voice.store.VoiceSearchDatabase
-import java.util.concurrent.CopyOnWriteArrayList
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import java.util.concurrent.CopyOnWriteArrayList
 
 interface VoiceSearchFeatureRepository {
     fun updateAllExceptions(manufacturerExceptions: List<Manufacturer>, localeExceptions: List<Locale>, minVersion: Int)

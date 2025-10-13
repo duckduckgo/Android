@@ -70,15 +70,15 @@ import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.view.toPx
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.swap
-import com.duckduckgo.mobile.android.R as AndroidR
-import com.duckduckgo.mobile.android.R as CommonR
-import java.io.File
-import java.security.MessageDigest
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import logcat.LogPriority.ERROR
 import logcat.LogPriority.VERBOSE
 import logcat.logcat
+import java.io.File
+import java.security.MessageDigest
+import com.duckduckgo.mobile.android.R as AndroidR
+import com.duckduckgo.mobile.android.R as CommonR
 
 class TabSwitcherAdapter(
     private val itemClickListener: TabSwitcherListener,
@@ -469,6 +469,8 @@ class TabSwitcherAdapter(
             const val TRACKER_ANIMATION_TILE_INFO_PANEL = 2
 
             const val EXTRA_CLOSE_BUTTON_TOUCH_AREA = 6 // dp
+
+            const val MAX_TITLE_LENGTH = 50
         }
 
         interface TabViewHolder {

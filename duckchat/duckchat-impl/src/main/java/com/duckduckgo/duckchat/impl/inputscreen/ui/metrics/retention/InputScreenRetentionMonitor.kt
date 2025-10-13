@@ -30,8 +30,6 @@ import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
 import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.SingleInstanceIn
-import java.time.ZonedDateTime
-import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
@@ -40,6 +38,8 @@ import kotlinx.coroutines.sync.withLock
 import logcat.LogPriority.ERROR
 import logcat.asLog
 import logcat.logcat
+import java.time.ZonedDateTime
+import javax.inject.Inject
 
 @ContributesMultibinding(
     scope = AppScope::class,

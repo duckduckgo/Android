@@ -20,6 +20,7 @@ import android.app.Activity
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import com.android.billingclient.api.ProductDetails
+import com.android.billingclient.api.Purchase
 import com.android.billingclient.api.PurchaseHistoryRecord
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
@@ -40,13 +41,10 @@ import com.duckduckgo.subscriptions.impl.billing.PurchasesUpdateResult.PurchaseA
 import com.duckduckgo.subscriptions.impl.billing.PurchasesUpdateResult.PurchasePresent
 import com.duckduckgo.subscriptions.impl.billing.PurchasesUpdateResult.UserCancelled
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
+import com.duckduckgo.subscriptions.impl.wideevents.SubscriptionPurchaseWideEvent
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.SingleInstanceIn
-import java.util.EnumSet
-import javax.inject.Inject
-import kotlin.time.Duration.Companion.minutes
-import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
@@ -59,11 +57,16 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import logcat.logcat
+import java.util.EnumSet
+import javax.inject.Inject
+import kotlin.time.Duration.Companion.minutes
+import kotlin.time.Duration.Companion.seconds
 
 interface PlayBillingManager {
     val products: List<ProductDetails>
     val productsFlow: Flow<List<ProductDetails>>
     val purchaseHistory: List<PurchaseHistoryRecord>
+    val purchases: List<Purchase>
     val purchaseState: Flow<PurchaseState>
 
     /**
@@ -88,8 +91,15 @@ interface PlayBillingManager {
         newPlanId: String,
         externalId: String,
         newOfferId: String?,
-        replacementMode: SubscriptionReplacementMode = SubscriptionReplacementMode.DEFERRED,
+        oldPurchaseToken: String,
+        replacementMode: SubscriptionReplacementMode,
     )
+
+    /**
+     * Gets the current purchase token from active purchases (queryPurchasesAsync)
+     * This is the preferred method over purchase history for getting current tokens
+     */
+    fun getLatestPurchaseToken(): String?
 }
 
 @SingleInstanceIn(AppScope::class)
@@ -100,6 +110,7 @@ class RealPlayBillingManager @Inject constructor(
     private val pixelSender: SubscriptionPixelSender,
     private val billingClient: BillingClientAdapter,
     private val dispatcherProvider: DispatcherProvider,
+    private val subscriptionPurchaseWideEvent: SubscriptionPurchaseWideEvent,
 ) : PlayBillingManager, MainProcessLifecycleObserver {
 
     private val connectionMutex = Mutex()
@@ -120,7 +131,14 @@ class RealPlayBillingManager @Inject constructor(
         get() = _products.asStateFlow()
 
     // Purchase History
+    @Deprecated(
+        message = "purchaseHistory is deprecated",
+        replaceWith = ReplaceWith("purchases"),
+    )
     override var purchaseHistory = emptyList<PurchaseHistoryRecord>()
+
+    // Active Purchases
+    override var purchases = emptyList<Purchase>()
 
     override fun onCreate(owner: LifecycleOwner) {
         connectAsyncWithRetry()
@@ -133,6 +151,7 @@ class RealPlayBillingManager @Inject constructor(
                 owner.lifecycleScope.launch(dispatcherProvider.io()) {
                     loadProducts()
                     loadPurchaseHistory()
+                    loadPurchases()
                 }
             }
         }
@@ -166,6 +185,7 @@ class RealPlayBillingManager @Inject constructor(
                 Success -> {
                     loadProducts()
                     loadPurchaseHistory()
+                    loadPurchases()
                     true // success, don't retry
                 }
 
@@ -202,6 +222,7 @@ class RealPlayBillingManager @Inject constructor(
             ?.offerToken
 
         if (productDetails == null || offerToken == null) {
+            subscriptionPurchaseWideEvent.onBillingFlowInitFailure(error = "Missing product details")
             _purchaseState.emit(Canceled)
             return@withContext
         }
@@ -215,11 +236,14 @@ class RealPlayBillingManager @Inject constructor(
 
         when (launchBillingFlowResult) {
             LaunchBillingFlowResult.Success -> {
+                subscriptionPurchaseWideEvent.onBillingFlowInitSuccess()
                 _purchaseState.emit(InProgress)
                 billingFlowInProgress = true
             }
 
-            LaunchBillingFlowResult.Failure -> {
+            is LaunchBillingFlowResult.Failure -> {
+                val error = "Billing error: ${launchBillingFlowResult.error.name}"
+                subscriptionPurchaseWideEvent.onBillingFlowInitFailure(error)
                 _purchaseState.emit(Canceled)
             }
         }
@@ -230,6 +254,7 @@ class RealPlayBillingManager @Inject constructor(
         newPlanId: String,
         externalId: String,
         newOfferId: String?,
+        oldPurchaseToken: String,
         replacementMode: SubscriptionReplacementMode,
     ) = withContext(dispatcherProvider.io()) {
         if (!billingClient.ready) {
@@ -237,7 +262,13 @@ class RealPlayBillingManager @Inject constructor(
             connect()
         }
 
-        val oldPurchaseToken: String? = getCurrentPurchaseToken()
+        logcat { "Billing: Using provided old purchase token: ${oldPurchaseToken.take(10)}..." }
+
+        if (oldPurchaseToken.isEmpty()) {
+            logcat(logcat.LogPriority.ERROR) { "Billing: Cannot launch subscription update - empty purchase token" }
+            _purchaseState.emit(Canceled)
+            return@withContext
+        }
 
         val productDetails = products.find { it.productId == BASIC_SUBSCRIPTION }
 
@@ -246,7 +277,10 @@ class RealPlayBillingManager @Inject constructor(
             ?.find { it.basePlanId == newPlanId && it.offerId == newOfferId }
             ?.offerToken
 
-        if (productDetails == null || offerToken == null || oldPurchaseToken == null) {
+        if (productDetails == null || offerToken == null) {
+            logcat(logcat.LogPriority.ERROR) {
+                "Billing: Cannot launch subscription update - productDetails: ${productDetails != null}, offerToken: ${offerToken != null}"
+            }
             _purchaseState.emit(Canceled)
             return@withContext
         }
@@ -266,20 +300,10 @@ class RealPlayBillingManager @Inject constructor(
                 billingFlowInProgress = true
             }
 
-            LaunchBillingFlowResult.Failure -> {
+            is LaunchBillingFlowResult.Failure -> {
                 _purchaseState.emit(Canceled)
             }
         }
-    }
-
-    /**
-     * Gets the current purchase token for the active subscription
-     */
-    private suspend fun getCurrentPurchaseToken(): String? = withContext(dispatcherProvider.io()) {
-        return@withContext purchaseHistory
-            .filter { it.products.contains(BASIC_SUBSCRIPTION) }
-            .maxByOrNull { it.purchaseTime }
-            ?.purchaseToken
     }
 
     private fun onPurchasesUpdated(result: PurchasesUpdateResult) {
@@ -296,11 +320,13 @@ class RealPlayBillingManager @Inject constructor(
 
                 PurchaseAbsent -> {}
                 UserCancelled -> {
+                    subscriptionPurchaseWideEvent.onPurchaseCancelledByUser()
                     _purchaseState.emit(Canceled)
                     // Handle an error caused by a user cancelling the purchase flow.
                 }
 
                 is PurchasesUpdateResult.Failure -> {
+                    subscriptionPurchaseWideEvent.onBillingFlowPurchaseFailure(result.errorType)
                     pixelSender.reportPurchaseFailureStore(result.errorType)
                     _purchaseState.emit(Canceled)
                 }
@@ -337,6 +363,36 @@ class RealPlayBillingManager @Inject constructor(
             }
             SubscriptionsPurchaseHistoryResult.Failure -> {
             }
+        }
+    }
+
+    private suspend fun loadPurchases() {
+        when (val result = billingClient.queryPurchases()) {
+            is QueryPurchasesResult.Success -> {
+                purchases = result.purchases
+                logcat { "Billing: Loaded ${result.purchases.size} active purchases" }
+            }
+            is QueryPurchasesResult.Failure -> {
+                logcat { "Billing: Failed to load purchases: ${result.billingError} - ${result.debugMessage}" }
+            }
+        }
+    }
+
+    override fun getLatestPurchaseToken(): String? {
+        val activePurchases = purchases.filter { purchase: Purchase ->
+            purchase.products.contains(BASIC_SUBSCRIPTION) &&
+                purchase.purchaseState == Purchase.PurchaseState.PURCHASED
+        }
+
+        val latestPurchase = activePurchases.maxByOrNull { it.purchaseTime }
+
+        return if (latestPurchase != null) {
+            val tokenPreview = latestPurchase.purchaseToken.take(10) + "..."
+            logcat { "Billing: Latest active purchase token preview: $tokenPreview" }
+            latestPurchase.purchaseToken
+        } else {
+            logcat { "Billing: No active purchase token found" }
+            null
         }
     }
 }

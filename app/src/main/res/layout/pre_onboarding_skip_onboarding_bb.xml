@@ -32,7 +32,7 @@
             android:layout_height="wrap_content"
             android:textAppearance="@style/Typography.Buck.H1"
             android:textColor="@color/buckColorPrimaryText"
-            tools:text="@string/highlightsPreOnboardingDaxDialog3Title"
+            tools:text="@string/preOnboardingDaxDialog3Title"
             tools:ignore="InvalidColorAttribute" />
 
         <TextView
@@ -57,7 +57,7 @@
             android:layout_height="wrap_content"
             android:textAppearance="@style/Typography.Buck.Body1"
             android:textColor="@color/buckColorPrimaryText"
-            tools:text="@string/highlightsPreOnboardingDaxDialog3Text"
+            tools:text="@string/preOnboardingDaxDialog3Text"
             tools:ignore="InvalidColorAttribute" />
 
         <TextView

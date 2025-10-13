@@ -55,9 +55,9 @@ import com.duckduckgo.duckplayer.api.PrivatePlayerMode
 import com.duckduckgo.duckplayer.api.PrivatePlayerMode.Enabled
 import com.duckduckgo.js.messaging.api.JsCallbackData
 import com.duckduckgo.js.messaging.api.SubscriptionEventData
-import javax.inject.Inject
 import logcat.logcat
 import org.json.JSONObject
+import javax.inject.Inject
 
 const val DUCK_PLAYER_PAGE_FEATURE_NAME = "duckPlayerPage"
 const val DUCK_PLAYER_FEATURE_NAME = "duckPlayer"

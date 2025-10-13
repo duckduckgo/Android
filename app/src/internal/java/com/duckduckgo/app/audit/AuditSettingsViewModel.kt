@@ -22,12 +22,12 @@ import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.privacy.db.UserAllowListDao
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
-import javax.inject.Inject
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import javax.inject.Inject
 
 @ContributesViewModel(ActivityScope::class)
 class AuditSettingsViewModel @Inject constructor(

@@ -34,13 +34,13 @@
             android:layout_height="wrap_content"
             android:textAppearance="@style/Typography.BB.H1"
             android:textColor="@color/bbColorPrimaryText"
-            tools:text="@string/highlightsPreOnboardingAddressBarTitle"
+            tools:text="@string/preOnboardingAddressBarTitle"
             tools:ignore="InvalidColorAttribute" />
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/highlightsPreOnboardingAddressBarTitle"
+            android:text="@string/preOnboardingAddressBarTitle"
             android:textAppearance="@style/Typography.BB.H1"
             android:visibility="invisible"
             tools:ignore="DeprecatedWidgetInXml" />

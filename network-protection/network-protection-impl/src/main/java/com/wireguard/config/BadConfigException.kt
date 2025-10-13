@@ -57,7 +57,6 @@ class BadConfigException private constructor(
         PRE_SHARED_KEY("PresharedKey"),
         PRIVATE_KEY("PrivateKey"),
         PUBLIC_KEY("PublicKey"),
-        ;
     }
 
     enum class Reason {
@@ -75,6 +74,5 @@ class BadConfigException private constructor(
         CONFIG("Config"),
         INTERFACE("Interface"),
         PEER("Peer"),
-        ;
     }
 }

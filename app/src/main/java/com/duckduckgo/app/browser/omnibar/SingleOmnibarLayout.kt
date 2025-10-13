@@ -31,19 +31,18 @@ import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.ViewState
-import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition
+import com.duckduckgo.browser.ui.omnibar.OmnibarPosition
 import com.duckduckgo.common.ui.view.addBottomShadow
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.hide
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.view.toPx
 import com.duckduckgo.di.scopes.FragmentScope
-import com.duckduckgo.mobile.android.R as CommonR
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.google.android.material.card.MaterialCardView
-import com.google.android.material.color.MaterialColors.*
 import dagger.android.support.AndroidSupportInjection
 import javax.inject.Inject
+import com.duckduckgo.mobile.android.R as CommonR
 
 @InjectWith(FragmentScope::class)
 class SingleOmnibarLayout @JvmOverloads constructor(
@@ -62,17 +61,18 @@ class SingleOmnibarLayout @JvmOverloads constructor(
     private val customTabToolbarContainerWrapper: ViewGroup by lazy { findViewById(R.id.customTabToolbarContainerWrapper) }
 
     private var isFindInPageVisible = false
-    private val findInPageLayoutVisibilityChangeListener = OnGlobalLayoutListener {
-        val isVisible = findInPage.findInPageContainer.isVisible
-        if (isFindInPageVisible != isVisible) {
-            isFindInPageVisible = isVisible
-            if (isVisible) {
-                onFindInPageShown()
-            } else {
-                onFindInPageHidden()
+    private val findInPageLayoutVisibilityChangeListener =
+        OnGlobalLayoutListener {
+            val isVisible = findInPage.findInPageContainer.isVisible
+            if (isFindInPageVisible != isVisible) {
+                isFindInPageVisible = isVisible
+                if (isVisible) {
+                    onFindInPageShown()
+                } else {
+                    onFindInPageHidden()
+                }
             }
         }
-    }
 
     private val experimentalOmnibarCardMarginTop by lazy {
         resources.getDimensionPixelSize(CommonR.dimen.omnibarCardMarginTop)
@@ -106,6 +106,15 @@ class SingleOmnibarLayout @JvmOverloads constructor(
                 if (Build.VERSION.SDK_INT < 28) {
                     omnibarCardShadow.cardElevation = 2f.toPx(context)
                 }
+
+                shieldIconPulseAnimationContainer.updateLayoutParams {
+                    (this as MarginLayoutParams).apply {
+                        if (addressBarTrackersAnimationFeatureToggle.feature().isEnabled()) {
+                            // TODO when the animation is made permanent we should add this adjustment to the actual layout
+                            marginStart = 1.toPx()
+                        }
+                    }
+                }
             }
             OmnibarPosition.BOTTOM -> {
                 // When omnibar is at the bottom, we're adding an additional space at the top
@@ -127,8 +136,19 @@ class SingleOmnibarLayout @JvmOverloads constructor(
                     (this as MarginLayoutParams).apply {
                         topMargin = experimentalOmnibarCardMarginBottom
                         bottomMargin = experimentalOmnibarCardMarginTop
+                        if (addressBarTrackersAnimationFeatureToggle.feature().isEnabled()) {
+                            // TODO when the animation is made permanent we should add this adjustment to the actual layout
+                            marginStart = 1.toPx()
+                        }
                     }
                 }
+
+                shieldIconPulseAnimationContainer.setPadding(
+                    shieldIconPulseAnimationContainer.paddingLeft,
+                    shieldIconPulseAnimationContainer.paddingTop,
+                    shieldIconPulseAnimationContainer.paddingRight,
+                    6.toPx(),
+                )
 
                 // Try to reduce the bottom omnibar material shadow when not using the custom shadow
                 if (Build.VERSION.SDK_INT < 28) {

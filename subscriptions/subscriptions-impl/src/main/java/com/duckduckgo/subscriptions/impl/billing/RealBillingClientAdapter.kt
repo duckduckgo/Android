@@ -30,8 +30,10 @@ import com.android.billingclient.api.Purchase.PurchaseState
 import com.android.billingclient.api.QueryProductDetailsParams
 import com.android.billingclient.api.QueryProductDetailsParams.Product
 import com.android.billingclient.api.QueryPurchaseHistoryParams
+import com.android.billingclient.api.QueryPurchasesParams
 import com.android.billingclient.api.queryProductDetails
 import com.android.billingclient.api.queryPurchaseHistory
+import com.android.billingclient.api.queryPurchasesAsync
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.subscriptions.impl.billing.BillingError.BILLING_CRASH_ERROR
@@ -39,14 +41,14 @@ import com.duckduckgo.subscriptions.impl.billing.BillingInitResult.Failure
 import com.duckduckgo.subscriptions.impl.billing.BillingInitResult.Success
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
-import java.lang.IllegalArgumentException
-import javax.inject.Inject
-import kotlin.coroutines.resume
-import kotlin.coroutines.suspendCoroutine
 import kotlinx.coroutines.withContext
 import logcat.LogPriority.WARN
 import logcat.asLog
 import logcat.logcat
+import java.lang.IllegalArgumentException
+import javax.inject.Inject
+import kotlin.coroutines.resume
+import kotlin.coroutines.suspendCoroutine
 
 @ContributesBinding(AppScope::class)
 @SingleInstanceIn(AppScope::class)
@@ -130,6 +132,7 @@ class RealBillingClientAdapter @Inject constructor(
         }
     }
 
+    @Deprecated(message = "check interface")
     override suspend fun getSubscriptionsPurchaseHistory(): SubscriptionsPurchaseHistoryResult {
         val client = billingClient
         if (client == null || !client.isReady) return SubscriptionsPurchaseHistoryResult.Failure
@@ -146,6 +149,43 @@ class RealBillingClientAdapter @Inject constructor(
         }
     }
 
+    override suspend fun queryPurchases(): QueryPurchasesResult {
+        val client = billingClient
+        if (client == null || !client.isReady) {
+            return QueryPurchasesResult.Failure(
+                billingError = BillingError.SERVICE_DISCONNECTED,
+                debugMessage = "BillingClient is not ready",
+            )
+        }
+
+        return try {
+            val queryParams = QueryPurchasesParams.newBuilder()
+                .setProductType(ProductType.SUBS)
+                .build()
+
+            val (billingResult, purchases) = client.queryPurchasesAsync(queryParams)
+
+            when (billingResult.responseCode) {
+                BillingResponseCode.OK -> {
+                    QueryPurchasesResult.Success(purchases = purchases)
+                }
+                else -> {
+                    val billingError = billingResult.responseCode.toBillingError()
+                    QueryPurchasesResult.Failure(
+                        billingError = billingError,
+                        debugMessage = billingResult.debugMessage,
+                    )
+                }
+            }
+        } catch (e: Exception) {
+            logcat(WARN) { "Error querying purchases: ${e.asLog()}" }
+            QueryPurchasesResult.Failure(
+                billingError = BILLING_CRASH_ERROR,
+                debugMessage = e.message,
+            )
+        }
+    }
+
     override suspend fun launchBillingFlow(
         activity: Activity,
         productDetails: ProductDetails,
@@ -153,7 +193,7 @@ class RealBillingClientAdapter @Inject constructor(
         externalId: String,
     ): LaunchBillingFlowResult {
         val client = billingClient
-        if (client == null || !client.isReady) return LaunchBillingFlowResult.Failure
+        if (client == null || !client.isReady) return LaunchBillingFlowResult.Failure(error = BillingError.SERVICE_DISCONNECTED)
 
         val billingFlowParams = BillingFlowParams.newBuilder()
             .setProductDetailsParamsList(
@@ -174,7 +214,7 @@ class RealBillingClientAdapter @Inject constructor(
 
         return when (result.responseCode) {
             BillingResponseCode.OK -> LaunchBillingFlowResult.Success
-            else -> LaunchBillingFlowResult.Failure
+            else -> LaunchBillingFlowResult.Failure(result.responseCode.toBillingError())
         }
     }
 
@@ -187,7 +227,7 @@ class RealBillingClientAdapter @Inject constructor(
         replacementMode: SubscriptionReplacementMode,
     ): LaunchBillingFlowResult {
         val client = billingClient
-        if (client == null || !client.isReady) return LaunchBillingFlowResult.Failure
+        if (client == null || !client.isReady) return LaunchBillingFlowResult.Failure(BillingError.SERVICE_DISCONNECTED)
 
         val subscriptionUpdateParams = BillingFlowParams.SubscriptionUpdateParams.newBuilder()
             .setOldPurchaseToken(oldPurchaseToken)
@@ -214,7 +254,7 @@ class RealBillingClientAdapter @Inject constructor(
 
         return when (result.responseCode) {
             BillingResponseCode.OK -> LaunchBillingFlowResult.Success
-            else -> LaunchBillingFlowResult.Failure
+            else -> LaunchBillingFlowResult.Failure(error = result.responseCode.toBillingError())
         }
     }
 

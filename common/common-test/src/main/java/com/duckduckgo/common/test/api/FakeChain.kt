@@ -16,10 +16,10 @@
 
 package com.duckduckgo.common.test.api
 
-import java.lang.reflect.Method
-import java.util.concurrent.TimeUnit
 import okhttp3.*
 import retrofit2.Invocation
+import java.lang.reflect.Method
+import java.util.concurrent.TimeUnit
 
 open class FakeChain(
     private val url: String,

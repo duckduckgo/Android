@@ -37,11 +37,13 @@
     <string name="audioCaptureSoundRecorderPermissionDeniedMessage">Svetainės gali naudoti garso įrašymo įrenginį tik tuo atveju, jei leisite „DuckDuckGo“ prašyti prieigos.</string>
 
     <!-- Settings -->
-    <string name="duck_chat_settings_activity_description">„Duck.ai“ yra pasirenkama funkcija, leidžianti anonimiškai kalbėtis su populiariais trečiųjų šalių DI pokalbių modeliais. Tavo pokalbiai nenaudojami dirbtinio intelekto mokymui.\n<annotation type="learn_more_link">Sužinok daugiau</annotation></string>
-    <string name="duck_chat_enable_duck_ai_setting">Įjungti „Duck.ai“</string>
+    <string name="duck_chat_ai_features_title">DI funkcijos</string>
+    <string name="duck_chat_settings_activity_description">„DuckDuckGo“ DI funkcijos yra privačios ir neprivalomos.Nenaudojame jūsų duomenų dirbtinio intelekto mokymui.\n<annotation type="learn_more_link">Sužinokite daugiau</annotation></string>
+    <string name="duck_chat_enable_duck_ai_setting">Duck.ai</string>
+    <string name="duck_chat_enable_duck_ai_setting_description">Kalbėkis privačiai su populiariais trečiųjų šalių DI modeliais</string>
     <string name="duck_chat_visibility_setting">Naršyklės meniu</string>
     <string name="duck_chat_address_bar_visibility_setting">Adreso juosta</string>
-    <string name="duck_chat_assist_settings_title">„Assist“ nustatymai</string>
+    <string name="duck_chat_assist_settings_title">„Assist“ paieškos nustatymai</string>
     <string name="duck_chat_assist_settings_description">Pasirink, kaip dažnai nori, kad tavo paieškose būtų rodomi DI generuojami atsakymai</string>
     <string name="duck_ai_shortcut_settings_title">„Duck.ai“ spartieji klavišai</string>
     <string name="duck_ai_shortcut_settings_description">Pasirinkite, kuriuos „Duck.ai“ sparčiuosius klavišus rodyti</string>
@@ -53,7 +55,7 @@
     <string name="input_screen_chat_hint">Klauskite privačiai</string>
     <string name="input_screen_user_pref_without_ai">Tik paieška</string>
     <string name="input_screen_user_pref_with_ai">Paieška ir „Duck.ai“</string>
-    <string name="input_screen_user_pref_description">Išbandykite mūsų eksperimentinę parinktį ir užduokite klausimus „Duck.ai“ tiesiai iš adreso juostos. <annotation type="share_feedback">Bendrinti atsiliepimą</annotation></string>
+    <string name="input_screen_user_pref_description">Išbandykite naują parinktį ir užduokite klausimus „Duck.ai“ tiesiai iš adresų juostos. <annotation type="share_feedback">Bendrinti atsiliepimą</annotation></string>
 
     <!-- Duck.ai Pro settings -->
     <string name="duck_ai_paid_settings_title">Duck.ai</string>
@@ -61,14 +63,6 @@
     <string name="duck_ai_paid_settings_page_description"><![CDATA[Kalbėkis privačiai su išskirtiniais abonentams skirtais DI modeliais.\n<a href=\"\">Sužinoti daugiau</a>]]></string>
     <string name="duck_ai_paid_settings_open_duck_ai">Atidaryti „Duck.ai“</string>
     <string name="duck_ai_paid_settings_learn_more_title">Sužinoti daugiau</string>
-
-    <!-- Rebranding-->
-    <string name="duck_chat_title_rebranding">DI funkcijos</string>
-    <string name="duck_chat_settings_activity_description_rebranding">„DuckDuckGo“ DI funkcijos yra privačios ir neprivalomos.Nenaudojame jūsų duomenų dirbtinio intelekto mokymui.\n<annotation type="learn_more_link">Sužinokite daugiau</annotation></string>
-    <string name="duck_chat_enable_duck_ai_setting_rebranding">Duck.ai</string>
-    <string name="duck_chat_enable_duck_ai_setting_description_rebranding">Kalbėkis privačiai su populiariais trečiųjų šalių DI modeliais</string>
-    <string name="duck_chat_assist_settings_title_rebranding">„Assist“ paieškos nustatymai</string>
-    <string name="duck_chat_assist_settings_description_rebranding">Pasirink, kaip dažnai nori, kad tavo paieškose būtų rodomi DI generuojami atsakymai</string>
 
     <!-- AutoComplete -->
     <string name="autocompleteDuckAiPrompt">Paklausk „Duck.ai“</string>

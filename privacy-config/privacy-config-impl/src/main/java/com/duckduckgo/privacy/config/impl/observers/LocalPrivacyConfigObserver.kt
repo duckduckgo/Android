@@ -31,9 +31,9 @@ import com.duckduckgo.privacy.config.impl.network.JSONObjectAdapter
 import com.squareup.anvil.annotations.ContributesMultibinding
 import com.squareup.moshi.Moshi
 import dagger.SingleInstanceIn
-import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 @WorkerThread
 @SingleInstanceIn(AppScope::class)

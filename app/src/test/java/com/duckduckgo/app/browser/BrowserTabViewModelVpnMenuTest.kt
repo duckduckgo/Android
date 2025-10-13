@@ -23,7 +23,6 @@ import com.duckduckgo.app.browser.commands.Command
 import com.duckduckgo.app.browser.menu.VpnMenuStateProvider
 import com.duckduckgo.app.browser.viewstate.VpnMenuState
 import com.duckduckgo.common.test.CoroutineTestRule
-import kotlin.time.Duration.Companion.milliseconds
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -34,9 +33,9 @@ import org.junit.Test
 import org.mockito.Mock
 import org.mockito.MockitoAnnotations
 import org.mockito.kotlin.whenever
+import kotlin.time.Duration.Companion.milliseconds
 
 class BrowserTabViewModelVpnMenuTest {
-
     @get:Rule
     var coroutinesTestRule = CoroutineTestRule()
 
@@ -55,114 +54,123 @@ class BrowserTabViewModelVpnMenuTest {
     }
 
     @Test
-    fun `when VPN menu state changes to NotSubscribed then flow emits NotSubscribed`() = runTest {
-        val vpnMenuStateFlow = flowOf(VpnMenuState.NotSubscribed)
-        whenever(mockVpnMenuStateProvider.getVpnMenuState()).thenReturn(vpnMenuStateFlow)
+    fun `when VPN menu state changes to NotSubscribed then flow emits NotSubscribed`() =
+        runTest {
+            val vpnMenuStateFlow = flowOf(VpnMenuState.NotSubscribed)
+            whenever(mockVpnMenuStateProvider.getVpnMenuState()).thenReturn(vpnMenuStateFlow)
 
-        mockVpnMenuStateProvider.getVpnMenuState().test {
-            val state = awaitItem()
-            assertEquals(VpnMenuState.NotSubscribed, state)
-            awaitComplete()
+            mockVpnMenuStateProvider.getVpnMenuState().test {
+                val state = awaitItem()
+                assertEquals(VpnMenuState.NotSubscribed, state)
+                awaitComplete()
+            }
         }
-    }
 
     @Test
-    fun `when VPN menu state changes to Subscribed with VPN enabled then flow emits correct state`() = runTest {
-        val vpnMenuStateFlow = flowOf(VpnMenuState.Subscribed(isVpnEnabled = true))
-        whenever(mockVpnMenuStateProvider.getVpnMenuState()).thenReturn(vpnMenuStateFlow)
+    fun `when VPN menu state changes to Subscribed with VPN enabled then flow emits correct state`() =
+        runTest {
+            val vpnMenuStateFlow = flowOf(VpnMenuState.Subscribed(isVpnEnabled = true))
+            whenever(mockVpnMenuStateProvider.getVpnMenuState()).thenReturn(vpnMenuStateFlow)
 
-        mockVpnMenuStateProvider.getVpnMenuState().test {
-            val state = awaitItem()
-            assertEquals(VpnMenuState.Subscribed(isVpnEnabled = true), state)
-            awaitComplete()
+            mockVpnMenuStateProvider.getVpnMenuState().test {
+                val state = awaitItem()
+                assertEquals(VpnMenuState.Subscribed(isVpnEnabled = true), state)
+                awaitComplete()
+            }
         }
-    }
 
     @Test
-    fun `when VPN menu state changes to Subscribed with VPN disabled then flow emits correct state`() = runTest {
-        val vpnMenuStateFlow = flowOf(VpnMenuState.Subscribed(isVpnEnabled = false))
-        whenever(mockVpnMenuStateProvider.getVpnMenuState()).thenReturn(vpnMenuStateFlow)
+    fun `when VPN menu state changes to Subscribed with VPN disabled then flow emits correct state`() =
+        runTest {
+            val vpnMenuStateFlow = flowOf(VpnMenuState.Subscribed(isVpnEnabled = false))
+            whenever(mockVpnMenuStateProvider.getVpnMenuState()).thenReturn(vpnMenuStateFlow)
 
-        mockVpnMenuStateProvider.getVpnMenuState().test {
-            val state = awaitItem()
-            assertEquals(VpnMenuState.Subscribed(isVpnEnabled = false), state)
-            awaitComplete()
+            mockVpnMenuStateProvider.getVpnMenuState().test {
+                val state = awaitItem()
+                assertEquals(VpnMenuState.Subscribed(isVpnEnabled = false), state)
+                awaitComplete()
+            }
         }
-    }
 
     @Test
-    fun `when VPN menu state changes to Hidden then flow emits Hidden`() = runTest {
-        val vpnMenuStateFlow = flowOf(VpnMenuState.Hidden)
-        whenever(mockVpnMenuStateProvider.getVpnMenuState()).thenReturn(vpnMenuStateFlow)
+    fun `when VPN menu state changes to Hidden then flow emits Hidden`() =
+        runTest {
+            val vpnMenuStateFlow = flowOf(VpnMenuState.Hidden)
+            whenever(mockVpnMenuStateProvider.getVpnMenuState()).thenReturn(vpnMenuStateFlow)
 
-        mockVpnMenuStateProvider.getVpnMenuState().test {
-            val state = awaitItem()
-            assertEquals(VpnMenuState.Hidden, state)
-            awaitComplete()
+            mockVpnMenuStateProvider.getVpnMenuState().test {
+                val state = awaitItem()
+                assertEquals(VpnMenuState.Hidden, state)
+                awaitComplete()
+            }
         }
-    }
 
     @Test
-    fun `when VPN menu state provider is called then it returns the expected flow`() = runTest {
-        val vpnMenuStateFlow = flowOf(VpnMenuState.Hidden)
-        whenever(mockVpnMenuStateProvider.getVpnMenuState()).thenReturn(vpnMenuStateFlow)
+    fun `when VPN menu state provider is called then it returns the expected flow`() =
+        runTest {
+            val vpnMenuStateFlow = flowOf(VpnMenuState.Hidden)
+            whenever(mockVpnMenuStateProvider.getVpnMenuState()).thenReturn(vpnMenuStateFlow)
 
-        mockVpnMenuStateProvider.getVpnMenuState().test {
-            val state = awaitItem()
-            assertEquals(VpnMenuState.Hidden, state)
-            awaitComplete()
+            mockVpnMenuStateProvider.getVpnMenuState().test {
+                val state = awaitItem()
+                assertEquals(VpnMenuState.Hidden, state)
+                awaitComplete()
+            }
         }
-    }
 
     @Test
-    fun `when VPN menu clicked and user not subscribed then launches Privacy Pro command`() = runTest {
-        testee.setVpnMenuState(VpnMenuState.NotSubscribed)
+    fun `when VPN menu clicked and user not subscribed then launches Privacy Pro command`() =
+        runTest {
+            testee.setVpnMenuState(VpnMenuState.NotSubscribed)
 
-        testee.onVpnMenuClicked()
+            testee.onVpnMenuClicked()
 
-        testee.commands.test {
-            val command = awaitItem()
-            assertTrue("Expected LaunchPrivacyPro command", command is Command.LaunchPrivacyPro)
-            cancelAndIgnoreRemainingEvents()
+            testee.commands.test {
+                val command = awaitItem()
+                assertTrue("Expected LaunchPrivacyPro command", command is Command.LaunchPrivacyPro)
+                cancelAndIgnoreRemainingEvents()
+            }
         }
-    }
 
     @Test
-    fun `when VPN menu clicked and user subscribed with VPN enabled then launches VPN management`() = runTest {
-        testee.setVpnMenuState(VpnMenuState.Subscribed(isVpnEnabled = true))
+    fun `when VPN menu clicked and user subscribed with VPN enabled then launches VPN management`() =
+        runTest {
+            testee.setVpnMenuState(VpnMenuState.Subscribed(isVpnEnabled = true))
 
-        testee.onVpnMenuClicked()
+            testee.onVpnMenuClicked()
 
-        testee.commands.test {
-            val command = awaitItem()
-            assertEquals(Command.LaunchVpnManagement, command)
-            cancelAndIgnoreRemainingEvents()
+            testee.commands.test {
+                val command = awaitItem()
+                assertEquals(Command.LaunchVpnManagement, command)
+                cancelAndIgnoreRemainingEvents()
+            }
         }
-    }
 
     @Test
-    fun `when VPN menu clicked and user subscribed with VPN disabled then launches VPN management`() = runTest {
-        testee.setVpnMenuState(VpnMenuState.Subscribed(isVpnEnabled = false))
+    fun `when VPN menu clicked and user subscribed with VPN disabled then launches VPN management`() =
+        runTest {
+            testee.setVpnMenuState(VpnMenuState.Subscribed(isVpnEnabled = false))
 
-        testee.onVpnMenuClicked()
+            testee.onVpnMenuClicked()
 
-        testee.commands.test {
-            val command = awaitItem()
-            assertEquals(Command.LaunchVpnManagement, command)
-            cancelAndIgnoreRemainingEvents()
+            testee.commands.test {
+                val command = awaitItem()
+                assertEquals(Command.LaunchVpnManagement, command)
+                cancelAndIgnoreRemainingEvents()
+            }
         }
-    }
 
     @Test
-    fun `when VPN menu clicked and state is hidden then no command is emitted`() = runTest {
-        testee.setVpnMenuState(VpnMenuState.Hidden)
+    fun `when VPN menu clicked and state is hidden then no command is emitted`() =
+        runTest {
+            testee.setVpnMenuState(VpnMenuState.Hidden)
 
-        testee.onVpnMenuClicked()
+            testee.onVpnMenuClicked()
 
-        testee.commands.test(timeout = 1000.milliseconds) {
-            expectNoEvents()
+            testee.commands.test(timeout = 1000.milliseconds) {
+                expectNoEvents()
+            }
         }
-    }
 
     /**
      * Test implementation of BrowserTabViewModel that only includes the parts needed for VPN menu testing
@@ -180,6 +188,10 @@ class BrowserTabViewModelVpnMenuTest {
         fun onVpnMenuClicked() {
             when (currentVpnMenuState) {
                 VpnMenuState.NotSubscribed -> {
+                    val mockUri = org.mockito.kotlin.mock<Uri>()
+                    _commands.tryEmit(Command.LaunchPrivacyPro(mockUri))
+                }
+                VpnMenuState.NotSubscribedNoPill -> {
                     val mockUri = org.mockito.kotlin.mock<Uri>()
                     _commands.tryEmit(Command.LaunchPrivacyPro(mockUri))
                 }

@@ -63,7 +63,7 @@ class RealRuntimeConfigurationWriterTest {
                   "state": "enabled",
                   "exceptions": [],
                   "features": {
-                    
+
                   }
                 }
               },
@@ -214,7 +214,7 @@ class RealRuntimeConfigurationWriterTest {
     private fun populatedJsConfig(): String {
         return """
             {
-                "some": "javascript", 
+                "some": "javascript",
                 "config": "in here"
             }
         """.trimIndent()

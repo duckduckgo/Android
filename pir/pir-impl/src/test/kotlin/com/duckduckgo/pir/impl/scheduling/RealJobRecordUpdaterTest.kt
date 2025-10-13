@@ -19,12 +19,18 @@ package com.duckduckgo.pir.impl.scheduling
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.pir.impl.models.ExtractedProfile
+import com.duckduckgo.pir.impl.models.scheduling.JobRecord.EmailConfirmationJobRecord
+import com.duckduckgo.pir.impl.models.scheduling.JobRecord.EmailConfirmationJobRecord.EmailData
+import com.duckduckgo.pir.impl.models.scheduling.JobRecord.EmailConfirmationJobRecord.JobAttemptData
+import com.duckduckgo.pir.impl.models.scheduling.JobRecord.EmailConfirmationJobRecord.LinkFetchData
 import com.duckduckgo.pir.impl.models.scheduling.JobRecord.OptOutJobRecord
 import com.duckduckgo.pir.impl.models.scheduling.JobRecord.OptOutJobRecord.OptOutJobStatus
 import com.duckduckgo.pir.impl.models.scheduling.JobRecord.ScanJobRecord.ScanJobStatus
 import com.duckduckgo.pir.impl.store.PirRepository
 import com.duckduckgo.pir.impl.store.PirSchedulingRepository
 import kotlinx.coroutines.test.runTest
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNull
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -37,7 +43,6 @@ import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 
 class RealJobRecordUpdaterTest {
-
     @get:Rule
     val coroutineRule = CoroutineTestRule()
 
@@ -49,12 +54,13 @@ class RealJobRecordUpdaterTest {
 
     @Before
     fun setUp() {
-        toTest = RealJobRecordUpdater(
-            dispatcherProvider = coroutineRule.testDispatcherProvider,
-            currentTimeProvider = mockCurrentTimeProvider,
-            schedulingRepository = mockSchedulingRepository,
-            repository = mockRepository,
-        )
+        toTest =
+            RealJobRecordUpdater(
+                dispatcherProvider = coroutineRule.testDispatcherProvider,
+                currentTimeProvider = mockCurrentTimeProvider,
+                schedulingRepository = mockSchedulingRepository,
+                repository = mockRepository,
+            )
 
         // Set up default behavior for current time
         whenever(mockCurrentTimeProvider.currentTimeMillis()).thenReturn(TEST_CURRENT_TIME)
@@ -66,267 +72,606 @@ class RealJobRecordUpdaterTest {
     private val testExtractedProfileId = 456L
     private val testAttemptCount = 2
 
-    private val testOptOutJobRecord = OptOutJobRecord(
-        brokerName = testBrokerName,
-        userProfileId = testProfileQueryId,
-        extractedProfileId = testExtractedProfileId,
-        status = OptOutJobStatus.NOT_EXECUTED,
-        attemptCount = testAttemptCount,
-        lastOptOutAttemptDateInMillis = 1000L,
-        optOutRequestedDateInMillis = 2000L,
-        optOutRemovedDateInMillis = 0L,
-    )
-
-    private val testExtractedProfile1 = ExtractedProfile(
-        dbId = 100L,
-        profileQueryId = testProfileQueryId,
-        brokerName = testBrokerName,
-        name = "John Doe",
-        profileUrl = "https://example.com/profile/100",
-        identifier = "id100",
-    )
-
-    private val testExtractedProfile2 = ExtractedProfile(
-        dbId = 200L,
-        profileQueryId = testProfileQueryId,
-        brokerName = testBrokerName,
-        name = "Jane Smith",
-        profileUrl = "https://example.com/profile/200",
-        identifier = "id200",
-    )
-
-    private val testExtractedProfile3 = ExtractedProfile(
-        dbId = 300L,
-        profileQueryId = testProfileQueryId,
-        brokerName = testBrokerName,
-        name = "Bob Johnson",
-        profileUrl = "https://example.com/profile/300",
-        identifier = "id300",
-    )
-
-    @Test
-    fun whenUpdateScanMatchesFoundThenUpdatesJobRecordWithCorrectStatus() = runTest {
-        toTest.updateScanMatchesFound(testBrokerName, testProfileQueryId)
-
-        verify(mockSchedulingRepository).updateScanJobRecordStatus(
-            newStatus = ScanJobStatus.MATCHES_FOUND,
-            newLastScanDateMillis = TEST_CURRENT_TIME,
+    private val testOptOutJobRecord =
+        OptOutJobRecord(
             brokerName = testBrokerName,
-            profileQueryId = testProfileQueryId,
+            userProfileId = testProfileQueryId,
+            extractedProfileId = testExtractedProfileId,
+            status = OptOutJobStatus.NOT_EXECUTED,
+            attemptCount = testAttemptCount,
+            lastOptOutAttemptDateInMillis = 1000L,
+            optOutRequestedDateInMillis = 2000L,
+            optOutRemovedDateInMillis = 0L,
         )
-    }
 
-    @Test
-    fun whenUpdateScanNoMatchFoundThenUpdatesJobRecordWithCorrectStatus() = runTest {
-        toTest.updateScanNoMatchFound(testBrokerName, testProfileQueryId)
-
-        verify(mockSchedulingRepository).updateScanJobRecordStatus(
-            newStatus = ScanJobStatus.NO_MATCH_FOUND,
-            newLastScanDateMillis = TEST_CURRENT_TIME,
+    private val testExtractedProfile1 =
+        ExtractedProfile(
+            dbId = 100L,
+            profileQueryId = testProfileQueryId,
             brokerName = testBrokerName,
-            profileQueryId = testProfileQueryId,
+            name = "John Doe",
+            profileUrl = "https://example.com/profile/100",
+            identifier = "id100",
         )
-    }
 
-    @Test
-    fun whenUpdateScanErrorThenUpdatesJobRecordWithCorrectStatus() = runTest {
-        toTest.updateScanError(testBrokerName, testProfileQueryId)
-
-        verify(mockSchedulingRepository).updateScanJobRecordStatus(
-            newStatus = ScanJobStatus.ERROR,
-            newLastScanDateMillis = TEST_CURRENT_TIME,
+    private val testExtractedProfile2 =
+        ExtractedProfile(
+            dbId = 200L,
+            profileQueryId = testProfileQueryId,
             brokerName = testBrokerName,
+            name = "Jane Smith",
+            profileUrl = "https://example.com/profile/200",
+            identifier = "id200",
+        )
+
+    private val testExtractedProfile3 =
+        ExtractedProfile(
+            dbId = 300L,
             profileQueryId = testProfileQueryId,
+            brokerName = testBrokerName,
+            name = "Bob Johnson",
+            profileUrl = "https://example.com/profile/300",
+            identifier = "id300",
         )
-    }
 
-    @Test
-    fun whenMarkOptOutAsAttemptedAndJobRecordExistsThenIncrementsAttemptCountAndUpdatesTimestamp() = runTest {
-        whenever(mockSchedulingRepository.getValidOptOutJobRecord(testExtractedProfileId))
-            .thenReturn(testOptOutJobRecord)
+    private val testEmailConfirmationJobRecord =
+        EmailConfirmationJobRecord(
+            brokerName = testBrokerName,
+            userProfileId = testProfileQueryId,
+            extractedProfileId = testExtractedProfileId,
+            emailData = EmailData(
+                email = "test@example.com",
+                attemptId = "test-attempt-123",
+            ),
+            linkFetchData = LinkFetchData(
+                emailConfirmationLink = "",
+                linkFetchAttemptCount = 0,
+                lastLinkFetchDateInMillis = 0L,
+            ),
+            jobAttemptData = JobAttemptData(
+                jobAttemptCount = 0,
+                lastJobAttemptDateInMillis = 0L,
+            ),
+            dateCreatedInMillis = 1000L,
+        )
 
-        toTest.markOptOutAsAttempted(testExtractedProfileId)
-
-        verify(mockSchedulingRepository).saveOptOutJobRecord(
-            testOptOutJobRecord.copy(
-                attemptCount = testAttemptCount + 1,
-                lastOptOutAttemptDateInMillis = TEST_CURRENT_TIME,
+    private val testEmailConfirmationJobRecordWithLink =
+        testEmailConfirmationJobRecord.copy(
+            linkFetchData = LinkFetchData(
+                emailConfirmationLink = "https://example.com/confirm?token=abc123",
+                linkFetchAttemptCount = 2,
+                lastLinkFetchDateInMillis = 2000L,
             ),
         )
-    }
 
     @Test
-    fun whenMarkOptOutAsAttemptedAndJobRecordDoesNotExistThenDoesNothing() = runTest {
-        whenever(mockSchedulingRepository.getValidOptOutJobRecord(testExtractedProfileId))
-            .thenReturn(null)
+    fun whenUpdateScanMatchesFoundThenUpdatesJobRecordWithCorrectStatus() =
+        runTest {
+            toTest.updateScanMatchesFound(testBrokerName, testProfileQueryId)
 
-        toTest.markOptOutAsAttempted(testExtractedProfileId)
-
-        verify(mockSchedulingRepository).getValidOptOutJobRecord(testExtractedProfileId)
-        verifyNoInteractions(mockCurrentTimeProvider)
-    }
-
-    @Test
-    fun whenUpdateOptOutRequestedAndJobRecordExistsThenUpdatesStatusAndTimestamp() = runTest {
-        whenever(mockSchedulingRepository.getValidOptOutJobRecord(testExtractedProfileId))
-            .thenReturn(testOptOutJobRecord)
-
-        toTest.updateOptOutRequested(testExtractedProfileId)
-
-        verify(mockSchedulingRepository).saveOptOutJobRecord(
-            testOptOutJobRecord.copy(
-                status = OptOutJobStatus.REQUESTED,
-                optOutRequestedDateInMillis = TEST_CURRENT_TIME,
-            ),
-        )
-    }
+            verify(mockSchedulingRepository).updateScanJobRecordStatus(
+                newStatus = ScanJobStatus.MATCHES_FOUND,
+                newLastScanDateMillis = TEST_CURRENT_TIME,
+                brokerName = testBrokerName,
+                profileQueryId = testProfileQueryId,
+            )
+        }
 
     @Test
-    fun whenUpdateOptOutRequestedAndJobRecordDoesNotExistThenDoesNothing() = runTest {
-        whenever(mockSchedulingRepository.getValidOptOutJobRecord(testExtractedProfileId))
-            .thenReturn(null)
+    fun whenUpdateScanNoMatchFoundThenUpdatesJobRecordWithCorrectStatus() =
+        runTest {
+            toTest.updateScanNoMatchFound(testBrokerName, testProfileQueryId)
 
-        toTest.updateOptOutRequested(testExtractedProfileId)
-
-        verify(mockSchedulingRepository).getValidOptOutJobRecord(testExtractedProfileId)
-        verifyNoInteractions(mockCurrentTimeProvider)
-    }
-
-    @Test
-    fun whenUpdateOptOutErrorAndJobRecordExistsThenUpdatesStatusToError() = runTest {
-        whenever(mockSchedulingRepository.getValidOptOutJobRecord(testExtractedProfileId))
-            .thenReturn(testOptOutJobRecord)
-
-        toTest.updateOptOutError(testExtractedProfileId)
-
-        verify(mockSchedulingRepository).saveOptOutJobRecord(
-            testOptOutJobRecord.copy(
-                status = OptOutJobStatus.ERROR,
-            ),
-        )
-    }
+            verify(mockSchedulingRepository).updateScanJobRecordStatus(
+                newStatus = ScanJobStatus.NO_MATCH_FOUND,
+                newLastScanDateMillis = TEST_CURRENT_TIME,
+                brokerName = testBrokerName,
+                profileQueryId = testProfileQueryId,
+            )
+        }
 
     @Test
-    fun whenUpdateOptOutErrorAndJobRecordDoesNotExistThenDoesNothing() = runTest {
-        whenever(mockSchedulingRepository.getValidOptOutJobRecord(testExtractedProfileId))
-            .thenReturn(null)
+    fun whenUpdateScanErrorThenUpdatesJobRecordWithCorrectStatus() =
+        runTest {
+            toTest.updateScanError(testBrokerName, testProfileQueryId)
 
-        toTest.updateOptOutError(testExtractedProfileId)
-
-        verify(mockSchedulingRepository).getValidOptOutJobRecord(testExtractedProfileId)
-        verifyNoInteractions(mockCurrentTimeProvider)
-    }
-
-    @Test
-    fun whenMarkRemovedProfilesWithSomeRemovedProfilesThenMarksThemAsRemovedInCorrectOrder() = runTest {
-        // Setup: stored profiles [profile1, profile2, profile3] but new profiles only [profile1, profile3]
-        // Result: profile2 should be marked as removed
-        val storedProfiles = listOf(testExtractedProfile1, testExtractedProfile2, testExtractedProfile3)
-
-        // New profiles come from the script so dbId is not set
-        val newProfiles = listOf(
-            testExtractedProfile1.copy(dbId = 0L),
-            testExtractedProfile3.copy(dbId = 0L),
-        ) // profile2 is missing
-
-        val optOutJobRecord2 = testOptOutJobRecord.copy(extractedProfileId = 200L)
-
-        whenever(mockRepository.getExtractedProfiles(testBrokerName, testProfileQueryId))
-            .thenReturn(storedProfiles)
-        whenever(mockSchedulingRepository.getValidOptOutJobRecord(200L))
-            .thenReturn(optOutJobRecord2)
-
-        toTest.markRemovedOptOutJobRecords(newProfiles, testBrokerName, testProfileQueryId)
-
-        // Verify the order of operations:
-        // 1. Get current time first
-        // 2. Get stored profiles from repository
-        // 3. Update the removed profile's job record
-        val inOrder = inOrder(mockCurrentTimeProvider, mockRepository, mockSchedulingRepository)
-        inOrder.verify(mockCurrentTimeProvider).currentTimeMillis()
-        inOrder.verify(mockRepository).getExtractedProfiles(testBrokerName, testProfileQueryId)
-        inOrder.verify(mockSchedulingRepository).getValidOptOutJobRecord(200L)
-        inOrder.verify(mockSchedulingRepository).saveOptOutJobRecord(
-            optOutJobRecord2.copy(
-                status = OptOutJobStatus.REMOVED,
-                optOutRemovedDateInMillis = TEST_CURRENT_TIME,
-            ),
-        )
-    }
+            verify(mockSchedulingRepository).updateScanJobRecordStatus(
+                newStatus = ScanJobStatus.ERROR,
+                newLastScanDateMillis = TEST_CURRENT_TIME,
+                brokerName = testBrokerName,
+                profileQueryId = testProfileQueryId,
+            )
+        }
 
     @Test
-    fun whenMarkRemovedProfilesWithNoRemovedProfilesThenDoesNotUpdateAnyRecords() = runTest {
-        // Setup: stored profiles [profile1, profile2] and new profiles [profile1, profile2]
-        // Result: no profiles should be marked as removed
-        val storedProfiles = listOf(testExtractedProfile1, testExtractedProfile2)
+    fun whenMarkOptOutAsAttemptedAndJobRecordExistsThenIncrementsAttemptCountAndUpdatesTimestamp() =
+        runTest {
+            whenever(mockSchedulingRepository.getValidOptOutJobRecord(testExtractedProfileId))
+                .thenReturn(testOptOutJobRecord)
 
-        // New profiles come from the script so dbId is not set
-        val newProfiles = listOf(
-            testExtractedProfile1.copy(dbId = 0L),
-            testExtractedProfile2.copy(dbId = 0L),
-        )
+            toTest.markOptOutAsAttempted(testExtractedProfileId)
 
-        whenever(mockRepository.getExtractedProfiles(testBrokerName, testProfileQueryId))
-            .thenReturn(storedProfiles)
-
-        toTest.markRemovedOptOutJobRecords(newProfiles, testBrokerName, testProfileQueryId)
-
-        verify(mockRepository).getExtractedProfiles(testBrokerName, testProfileQueryId)
-        // Should not call getValidOptOutJobRecord or saveOptOutJobRecord since no profiles were removed
-        verify(mockSchedulingRepository, never()).getValidOptOutJobRecord(any())
-        verify(mockSchedulingRepository, never()).saveOptOutJobRecord(any())
-    }
+            verify(mockSchedulingRepository).saveOptOutJobRecord(
+                testOptOutJobRecord.copy(
+                    attemptCount = testAttemptCount + 1,
+                    lastOptOutAttemptDateInMillis = TEST_CURRENT_TIME,
+                ),
+            )
+        }
 
     @Test
-    fun whenMarkRemovedProfilesWithAllProfilesRemovedThenMarksAllAsRemoved() = runTest {
-        // Setup: stored profiles [profile1, profile2] but new profiles is empty
-        // Result: both profiles should be marked as removed
-        val storedProfiles = listOf(testExtractedProfile1, testExtractedProfile2)
-        val newProfiles = emptyList<ExtractedProfile>()
+    fun whenMarkOptOutAsAttemptedAndJobRecordDoesNotExistThenDoesNothing() =
+        runTest {
+            whenever(mockSchedulingRepository.getValidOptOutJobRecord(testExtractedProfileId))
+                .thenReturn(null)
 
-        val optOutJobRecord1 = testOptOutJobRecord.copy(extractedProfileId = 100L)
-        val optOutJobRecord2 = testOptOutJobRecord.copy(extractedProfileId = 200L)
+            toTest.markOptOutAsAttempted(testExtractedProfileId)
 
-        whenever(mockRepository.getExtractedProfiles(testBrokerName, testProfileQueryId))
-            .thenReturn(storedProfiles)
-        whenever(mockSchedulingRepository.getValidOptOutJobRecord(100L))
-            .thenReturn(optOutJobRecord1)
-        whenever(mockSchedulingRepository.getValidOptOutJobRecord(200L))
-            .thenReturn(optOutJobRecord2)
-
-        toTest.markRemovedOptOutJobRecords(newProfiles, testBrokerName, testProfileQueryId)
-
-        verify(mockSchedulingRepository).saveOptOutJobRecord(
-            optOutJobRecord1.copy(
-                status = OptOutJobStatus.REMOVED,
-                optOutRemovedDateInMillis = TEST_CURRENT_TIME,
-            ),
-        )
-        verify(mockSchedulingRepository).saveOptOutJobRecord(
-            optOutJobRecord2.copy(
-                status = OptOutJobStatus.REMOVED,
-                optOutRemovedDateInMillis = TEST_CURRENT_TIME,
-            ),
-        )
-    }
+            verify(mockSchedulingRepository).getValidOptOutJobRecord(testExtractedProfileId)
+            verifyNoInteractions(mockCurrentTimeProvider)
+        }
 
     @Test
-    fun whenMarkRemovedProfilesWithRemovedProfileButNoJobRecordThenSkipsThatProfile() = runTest {
-        // Setup: stored profile exists but no job record for it
-        val storedProfiles = listOf(testExtractedProfile1)
-        val newProfiles = emptyList<ExtractedProfile>()
+    fun whenUpdateOptOutRequestedAndJobRecordExistsThenUpdatesStatusAndTimestamp() =
+        runTest {
+            whenever(mockSchedulingRepository.getValidOptOutJobRecord(testExtractedProfileId))
+                .thenReturn(testOptOutJobRecord)
 
-        whenever(mockRepository.getExtractedProfiles(testBrokerName, testProfileQueryId))
-            .thenReturn(storedProfiles)
-        whenever(mockSchedulingRepository.getValidOptOutJobRecord(100L))
-            .thenReturn(null) // No job record exists
+            toTest.updateOptOutRequested(testExtractedProfileId)
 
-        toTest.markRemovedOptOutJobRecords(newProfiles, testBrokerName, testProfileQueryId)
+            verify(mockSchedulingRepository).saveOptOutJobRecord(
+                testOptOutJobRecord.copy(
+                    status = OptOutJobStatus.REQUESTED,
+                    optOutRequestedDateInMillis = TEST_CURRENT_TIME,
+                ),
+            )
+        }
 
-        verify(mockSchedulingRepository).getValidOptOutJobRecord(100L)
-        // Should not call saveOptOutJobRecord since no job record exists
-        verify(mockSchedulingRepository, never()).saveOptOutJobRecord(any())
-    }
+    @Test
+    fun whenUpdateOptOutRequestedAndJobRecordDoesNotExistThenDoesNothing() =
+        runTest {
+            whenever(mockSchedulingRepository.getValidOptOutJobRecord(testExtractedProfileId))
+                .thenReturn(null)
+
+            toTest.updateOptOutRequested(testExtractedProfileId)
+
+            verify(mockSchedulingRepository).getValidOptOutJobRecord(testExtractedProfileId)
+            verifyNoInteractions(mockCurrentTimeProvider)
+        }
+
+    @Test
+    fun whenUpdateOptOutErrorAndJobRecordExistsThenUpdatesStatusToError() =
+        runTest {
+            whenever(mockSchedulingRepository.getValidOptOutJobRecord(testExtractedProfileId))
+                .thenReturn(testOptOutJobRecord)
+
+            toTest.updateOptOutError(testExtractedProfileId)
+
+            verify(mockSchedulingRepository).saveOptOutJobRecord(
+                testOptOutJobRecord.copy(
+                    status = OptOutJobStatus.ERROR,
+                ),
+            )
+        }
+
+    @Test
+    fun whenUpdateOptOutErrorAndJobRecordDoesNotExistThenDoesNothing() =
+        runTest {
+            whenever(mockSchedulingRepository.getValidOptOutJobRecord(testExtractedProfileId))
+                .thenReturn(null)
+
+            toTest.updateOptOutError(testExtractedProfileId)
+
+            verify(mockSchedulingRepository).getValidOptOutJobRecord(testExtractedProfileId)
+            verifyNoInteractions(mockCurrentTimeProvider)
+        }
+
+    @Test
+    fun whenMarkRemovedProfilesWithSomeRemovedProfilesThenMarksThemAsRemovedInCorrectOrder() =
+        runTest {
+            // Setup: stored profiles [profile1, profile2, profile3] but new profiles only [profile1, profile3]
+            // Result: profile2 should be marked as removed
+            val storedProfiles = listOf(testExtractedProfile1, testExtractedProfile2, testExtractedProfile3)
+
+            // New profiles come from the script so dbId is not set
+            val newProfiles =
+                listOf(
+                    testExtractedProfile1.copy(dbId = 0L),
+                    testExtractedProfile3.copy(dbId = 0L),
+                ) // profile2 is missing
+
+            val optOutJobRecord2 = testOptOutJobRecord.copy(extractedProfileId = 200L)
+
+            whenever(mockRepository.getExtractedProfiles(testBrokerName, testProfileQueryId))
+                .thenReturn(storedProfiles)
+            whenever(mockSchedulingRepository.getValidOptOutJobRecord(200L))
+                .thenReturn(optOutJobRecord2)
+
+            toTest.markRemovedOptOutJobRecords(newProfiles, testBrokerName, testProfileQueryId)
+
+            // Verify the order of operations:
+            // 1. Get current time first
+            // 2. Get stored profiles from repository
+            // 3. Update the removed profile's job record
+            val inOrder = inOrder(mockCurrentTimeProvider, mockRepository, mockSchedulingRepository)
+            inOrder.verify(mockCurrentTimeProvider).currentTimeMillis()
+            inOrder.verify(mockRepository).getExtractedProfiles(testBrokerName, testProfileQueryId)
+            inOrder.verify(mockSchedulingRepository).getValidOptOutJobRecord(200L)
+            inOrder.verify(mockSchedulingRepository).saveOptOutJobRecord(
+                optOutJobRecord2.copy(
+                    status = OptOutJobStatus.REMOVED,
+                    optOutRemovedDateInMillis = TEST_CURRENT_TIME,
+                ),
+            )
+        }
+
+    @Test
+    fun whenMarkRemovedProfilesWithNoRemovedProfilesThenDoesNotUpdateAnyRecords() =
+        runTest {
+            // Setup: stored profiles [profile1, profile2] and new profiles [profile1, profile2]
+            // Result: no profiles should be marked as removed
+            val storedProfiles = listOf(testExtractedProfile1, testExtractedProfile2)
+
+            // New profiles come from the script so dbId is not set
+            val newProfiles =
+                listOf(
+                    testExtractedProfile1.copy(dbId = 0L),
+                    testExtractedProfile2.copy(dbId = 0L),
+                )
+
+            whenever(mockRepository.getExtractedProfiles(testBrokerName, testProfileQueryId))
+                .thenReturn(storedProfiles)
+
+            toTest.markRemovedOptOutJobRecords(newProfiles, testBrokerName, testProfileQueryId)
+
+            verify(mockRepository).getExtractedProfiles(testBrokerName, testProfileQueryId)
+            // Should not call getValidOptOutJobRecord or saveOptOutJobRecord since no profiles were removed
+            verify(mockSchedulingRepository, never()).getValidOptOutJobRecord(any())
+            verify(mockSchedulingRepository, never()).saveOptOutJobRecord(any())
+        }
+
+    @Test
+    fun whenMarkRemovedProfilesWithAllProfilesRemovedThenMarksAllAsRemoved() =
+        runTest {
+            // Setup: stored profiles [profile1, profile2] but new profiles is empty
+            // Result: both profiles should be marked as removed
+            val storedProfiles = listOf(testExtractedProfile1, testExtractedProfile2)
+            val newProfiles = emptyList<ExtractedProfile>()
+
+            val optOutJobRecord1 = testOptOutJobRecord.copy(extractedProfileId = 100L)
+            val optOutJobRecord2 = testOptOutJobRecord.copy(extractedProfileId = 200L)
+
+            whenever(mockRepository.getExtractedProfiles(testBrokerName, testProfileQueryId))
+                .thenReturn(storedProfiles)
+            whenever(mockSchedulingRepository.getValidOptOutJobRecord(100L))
+                .thenReturn(optOutJobRecord1)
+            whenever(mockSchedulingRepository.getValidOptOutJobRecord(200L))
+                .thenReturn(optOutJobRecord2)
+
+            toTest.markRemovedOptOutJobRecords(newProfiles, testBrokerName, testProfileQueryId)
+
+            verify(mockSchedulingRepository).saveOptOutJobRecord(
+                optOutJobRecord1.copy(
+                    status = OptOutJobStatus.REMOVED,
+                    optOutRemovedDateInMillis = TEST_CURRENT_TIME,
+                ),
+            )
+            verify(mockSchedulingRepository).saveOptOutJobRecord(
+                optOutJobRecord2.copy(
+                    status = OptOutJobStatus.REMOVED,
+                    optOutRemovedDateInMillis = TEST_CURRENT_TIME,
+                ),
+            )
+        }
+
+    @Test
+    fun whenMarkRemovedProfilesWithRemovedProfileButNoJobRecordThenSkipsThatProfile() =
+        runTest {
+            // Setup: stored profile exists but no job record for it
+            val storedProfiles = listOf(testExtractedProfile1)
+            val newProfiles = emptyList<ExtractedProfile>()
+
+            whenever(mockRepository.getExtractedProfiles(testBrokerName, testProfileQueryId))
+                .thenReturn(storedProfiles)
+            whenever(mockSchedulingRepository.getValidOptOutJobRecord(100L))
+                .thenReturn(null) // No job record exists
+
+            toTest.markRemovedOptOutJobRecords(newProfiles, testBrokerName, testProfileQueryId)
+
+            verify(mockSchedulingRepository).getValidOptOutJobRecord(100L)
+            // Should not call saveOptOutJobRecord since no job record exists
+            verify(mockSchedulingRepository, never()).saveOptOutJobRecord(any())
+        }
+
+    @Test
+    fun whenMarkOptOutAsWaitingForEmailConfirmationAndJobRecordExistsThenUpdatesStatusToPendingEmailConfirmation() =
+        runTest {
+            whenever(mockSchedulingRepository.getValidOptOutJobRecord(testExtractedProfileId))
+                .thenReturn(testOptOutJobRecord)
+
+            toTest.markOptOutAsWaitingForEmailConfirmation(
+                profileQueryId = testProfileQueryId,
+                extractedProfileId = testExtractedProfileId,
+                brokerName = testBrokerName,
+                email = "test@duck.com",
+                attemptId = "attemptId",
+            )
+
+            verify(mockSchedulingRepository).saveOptOutJobRecord(
+                testOptOutJobRecord.copy(
+                    status = OptOutJobStatus.PENDING_EMAIL_CONFIRMATION,
+                ),
+            )
+            verify(mockSchedulingRepository).saveEmailConfirmationJobRecord(
+                EmailConfirmationJobRecord(
+                    brokerName = testBrokerName,
+                    userProfileId = testProfileQueryId,
+                    extractedProfileId = testExtractedProfileId,
+                    emailData = EmailData(
+                        email = "test@duck.com",
+                        attemptId = "attemptId",
+                    ),
+                ),
+            )
+        }
+
+    @Test
+    fun whenMarkOptOutAsWaitingForEmailConfirmationAndJobRecordDoesNotExistThenDoesNothing() =
+        runTest {
+            whenever(mockSchedulingRepository.getValidOptOutJobRecord(testExtractedProfileId))
+                .thenReturn(null)
+
+            toTest.markOptOutAsWaitingForEmailConfirmation(
+                profileQueryId = testProfileQueryId,
+                extractedProfileId = testExtractedProfileId,
+                brokerName = testBrokerName,
+                email = "test@duck.com",
+                attemptId = "attemptId",
+            )
+
+            verify(mockSchedulingRepository, never()).saveOptOutJobRecord(any())
+        }
+
+    @Test
+    fun whenMarkEmailConfirmationLinkFetchFailedThenDeletesEmailJobAndMarksOptOutAsError() =
+        runTest {
+            toTest.markEmailConfirmationLinkFetchFailed(testExtractedProfileId)
+
+            verify(mockSchedulingRepository).deleteEmailConfirmationJobRecord(testExtractedProfileId)
+            verify(mockSchedulingRepository).getValidOptOutJobRecord(testExtractedProfileId)
+        }
+
+    @Test
+    fun whenRecordEmailConfirmationFetchAttemptAndJobExistsThenIncrementsCountAndUpdatesTimestamp() =
+        runTest {
+            whenever(mockSchedulingRepository.getEmailConfirmationJob(testExtractedProfileId))
+                .thenReturn(testEmailConfirmationJobRecord)
+
+            val result = toTest.recordEmailConfirmationFetchAttempt(testExtractedProfileId)
+
+            val expectedRecord = testEmailConfirmationJobRecord.copy(
+                linkFetchData = testEmailConfirmationJobRecord.linkFetchData.copy(
+                    linkFetchAttemptCount = testEmailConfirmationJobRecord.linkFetchData.linkFetchAttemptCount + 1,
+                    lastLinkFetchDateInMillis = TEST_CURRENT_TIME,
+                ),
+            )
+
+            verify(mockSchedulingRepository).saveEmailConfirmationJobRecord(expectedRecord)
+            assertEquals(expectedRecord, result)
+        }
+
+    @Test
+    fun whenRecordEmailConfirmationFetchAttemptAndJobDoesNotExistThenReturnsNull() =
+        runTest {
+            whenever(mockSchedulingRepository.getEmailConfirmationJob(testExtractedProfileId))
+                .thenReturn(null)
+
+            val result = toTest.recordEmailConfirmationFetchAttempt(testExtractedProfileId)
+
+            verify(mockSchedulingRepository).getEmailConfirmationJob(testExtractedProfileId)
+            verify(mockSchedulingRepository, never()).saveEmailConfirmationJobRecord(any())
+            assertNull(result)
+        }
+
+    @Test
+    fun whenMarkEmailConfirmationWithLinkAndJobExistsThenUpdatesLinkField() =
+        runTest {
+            val testLink = "https://example.com/confirm?token=xyz789"
+            whenever(mockSchedulingRepository.getEmailConfirmationJob(testExtractedProfileId))
+                .thenReturn(testEmailConfirmationJobRecord)
+
+            val result = toTest.markEmailConfirmationWithLink(testExtractedProfileId, testLink)
+
+            val expectedRecord = testEmailConfirmationJobRecord.copy(
+                linkFetchData = testEmailConfirmationJobRecord.linkFetchData.copy(
+                    emailConfirmationLink = testLink,
+                ),
+            )
+
+            verify(mockSchedulingRepository).saveEmailConfirmationJobRecord(expectedRecord)
+            assertEquals(expectedRecord, result)
+        }
+
+    @Test
+    fun whenMarkEmailConfirmationWithLinkAndJobDoesNotExistThenReturnsNull() =
+        runTest {
+            whenever(mockSchedulingRepository.getEmailConfirmationJob(testExtractedProfileId))
+                .thenReturn(null)
+
+            val result = toTest.markEmailConfirmationWithLink(testExtractedProfileId, "test-link")
+
+            verify(mockSchedulingRepository).getEmailConfirmationJob(testExtractedProfileId)
+            verify(mockSchedulingRepository, never()).saveEmailConfirmationJobRecord(any())
+            assertNull(result)
+        }
+
+    // Email confirmation attempt tests
+    @Test
+    fun whenRecordEmailConfirmationAttemptAndJobExistsThenIncrementsAttemptCountAndUpdatesTimestamp() =
+        runTest {
+            whenever(mockSchedulingRepository.getEmailConfirmationJob(testExtractedProfileId))
+                .thenReturn(testEmailConfirmationJobRecord)
+
+            val result = toTest.recordEmailConfirmationAttempt(testExtractedProfileId)
+
+            val expectedRecord = testEmailConfirmationJobRecord.copy(
+                jobAttemptData = testEmailConfirmationJobRecord.jobAttemptData.copy(
+                    jobAttemptCount = testEmailConfirmationJobRecord.jobAttemptData.jobAttemptCount + 1,
+                    lastJobAttemptDateInMillis = TEST_CURRENT_TIME,
+                ),
+            )
+
+            verify(mockSchedulingRepository).saveEmailConfirmationJobRecord(expectedRecord)
+            assertEquals(expectedRecord, result)
+        }
+
+    @Test
+    fun whenRecordEmailConfirmationAttemptAndJobDoesNotExistThenReturnsNull() =
+        runTest {
+            whenever(mockSchedulingRepository.getEmailConfirmationJob(testExtractedProfileId))
+                .thenReturn(null)
+
+            val result = toTest.recordEmailConfirmationAttempt(testExtractedProfileId)
+
+            verify(mockSchedulingRepository).getEmailConfirmationJob(testExtractedProfileId)
+            verify(mockSchedulingRepository, never()).saveEmailConfirmationJobRecord(any())
+            assertNull(result)
+        }
+
+    @Test
+    fun whenRecordEmailConfirmationAttemptMaxedThenDeletesEmailJobAndMarksOptOutAsError() =
+        runTest {
+            whenever(mockSchedulingRepository.getValidOptOutJobRecord(testExtractedProfileId))
+                .thenReturn(testOptOutJobRecord)
+            toTest.recordEmailConfirmationAttemptMaxed(testExtractedProfileId)
+
+            verify(mockSchedulingRepository).deleteEmailConfirmationJobRecord(testExtractedProfileId)
+            verify(mockSchedulingRepository).saveOptOutJobRecord(
+                testOptOutJobRecord.copy(
+                    status = OptOutJobStatus.ERROR,
+                ),
+            )
+        }
+
+    // Email confirmation completion tests
+    @Test
+    fun whenRecordEmailConfirmationCompletedThenDeletesEmailJobAndMarksOptOutAsRequested() =
+        runTest {
+            whenever(mockSchedulingRepository.getValidOptOutJobRecord(testExtractedProfileId))
+                .thenReturn(testOptOutJobRecord)
+
+            toTest.recordEmailConfirmationCompleted(testExtractedProfileId)
+
+            verify(mockSchedulingRepository).deleteEmailConfirmationJobRecord(testExtractedProfileId)
+            verify(mockSchedulingRepository).saveOptOutJobRecord(
+                testOptOutJobRecord.copy(
+                    status = OptOutJobStatus.REQUESTED,
+                    optOutRequestedDateInMillis = TEST_CURRENT_TIME,
+                ),
+            )
+        }
+
+    @Test
+    fun whenRecordEmailConfirmationFailedAndJobExistsThenUpdatesLastActionId() =
+        runTest {
+            val testActionId = "action-123"
+            whenever(mockSchedulingRepository.getEmailConfirmationJob(testExtractedProfileId))
+                .thenReturn(testEmailConfirmationJobRecord)
+
+            val result = toTest.recordEmailConfirmationFailed(testExtractedProfileId, testActionId)
+
+            val expectedRecord = testEmailConfirmationJobRecord.copy(
+                jobAttemptData = testEmailConfirmationJobRecord.jobAttemptData.copy(
+                    lastJobAttemptActionId = testActionId,
+                ),
+            )
+
+            verify(mockSchedulingRepository).saveEmailConfirmationJobRecord(expectedRecord)
+            assertEquals(expectedRecord, result)
+        }
+
+    @Test
+    fun whenRecordEmailConfirmationFailedAndJobDoesNotExistThenReturnsNull() =
+        runTest {
+            whenever(mockSchedulingRepository.getEmailConfirmationJob(testExtractedProfileId))
+                .thenReturn(null)
+
+            val result = toTest.recordEmailConfirmationFailed(testExtractedProfileId, "action-123")
+
+            verify(mockSchedulingRepository).getEmailConfirmationJob(testExtractedProfileId)
+            verify(mockSchedulingRepository, never()).saveEmailConfirmationJobRecord(any())
+            assertNull(result)
+        }
+
+    // Edge case tests for multiple operations
+    @Test
+    fun whenRecordEmailConfirmationFetchAttemptWithExistingAttemptsThenIncrementsCorrectly() =
+        runTest {
+            val recordWithExistingAttempts = testEmailConfirmationJobRecord.copy(
+                linkFetchData = testEmailConfirmationJobRecord.linkFetchData.copy(
+                    linkFetchAttemptCount = 5,
+                    lastLinkFetchDateInMillis = 3000L,
+                ),
+            )
+            whenever(mockSchedulingRepository.getEmailConfirmationJob(testExtractedProfileId))
+                .thenReturn(recordWithExistingAttempts)
+
+            val result = toTest.recordEmailConfirmationFetchAttempt(testExtractedProfileId)
+
+            val expectedRecord = recordWithExistingAttempts.copy(
+                linkFetchData = recordWithExistingAttempts.linkFetchData.copy(
+                    linkFetchAttemptCount = 6,
+                    lastLinkFetchDateInMillis = TEST_CURRENT_TIME,
+                ),
+            )
+
+            verify(mockSchedulingRepository).saveEmailConfirmationJobRecord(expectedRecord)
+            assertEquals(expectedRecord, result)
+        }
+
+    @Test
+    fun whenRecordEmailConfirmationAttemptWithExistingAttemptsThenIncrementsCorrectly() =
+        runTest {
+            val recordWithExistingAttempts = testEmailConfirmationJobRecord.copy(
+                jobAttemptData = testEmailConfirmationJobRecord.jobAttemptData.copy(
+                    jobAttemptCount = 3,
+                    lastJobAttemptDateInMillis = 4000L,
+                ),
+            )
+            whenever(mockSchedulingRepository.getEmailConfirmationJob(testExtractedProfileId))
+                .thenReturn(recordWithExistingAttempts)
+
+            val result = toTest.recordEmailConfirmationAttempt(testExtractedProfileId)
+
+            val expectedRecord = recordWithExistingAttempts.copy(
+                jobAttemptData = recordWithExistingAttempts.jobAttemptData.copy(
+                    jobAttemptCount = 4,
+                    lastJobAttemptDateInMillis = TEST_CURRENT_TIME,
+                ),
+            )
+
+            verify(mockSchedulingRepository).saveEmailConfirmationJobRecord(expectedRecord)
+            assertEquals(expectedRecord, result)
+        }
+
+    @Test
+    fun whenMarkEmailConfirmationWithLinkOverwritesExistingLink() =
+        runTest {
+            val newLink = "https://example.com/new-confirm?token=new123"
+            whenever(mockSchedulingRepository.getEmailConfirmationJob(testExtractedProfileId))
+                .thenReturn(testEmailConfirmationJobRecordWithLink)
+
+            val result = toTest.markEmailConfirmationWithLink(testExtractedProfileId, newLink)
+
+            val expectedRecord = testEmailConfirmationJobRecordWithLink.copy(
+                linkFetchData = testEmailConfirmationJobRecordWithLink.linkFetchData.copy(
+                    emailConfirmationLink = newLink,
+                ),
+            )
+
+            verify(mockSchedulingRepository).saveEmailConfirmationJobRecord(expectedRecord)
+            assertEquals(expectedRecord, result)
+        }
 
     companion object {
         private const val TEST_CURRENT_TIME = 5000L

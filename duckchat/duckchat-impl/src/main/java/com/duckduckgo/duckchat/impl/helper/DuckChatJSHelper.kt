@@ -26,9 +26,10 @@ import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
 import com.duckduckgo.duckchat.impl.store.DuckChatDataStore
 import com.duckduckgo.js.messaging.api.JsCallbackData
 import com.squareup.anvil.annotations.ContributesBinding
-import javax.inject.Inject
 import kotlinx.coroutines.runBlocking
 import org.json.JSONObject
+import java.util.regex.Pattern
+import javax.inject.Inject
 
 interface DuckChatJSHelper {
     suspend fun processJsCallbackMessage(
@@ -45,75 +46,84 @@ class RealDuckChatJSHelper @Inject constructor(
     private val duckChatPixels: DuckChatPixels,
     private val dataStore: DuckChatDataStore,
 ) : DuckChatJSHelper {
-
     override suspend fun processJsCallbackMessage(
         featureName: String,
         method: String,
         id: String?,
         data: JSONObject?,
-    ): JsCallbackData? = when (method) {
-        METHOD_GET_AI_CHAT_NATIVE_HANDOFF_DATA -> id?.let {
-            getAIChatNativeHandoffData(featureName, method, it)
-        }
+    ): JsCallbackData? =
+        when (method) {
+            METHOD_GET_AI_CHAT_NATIVE_HANDOFF_DATA ->
+                id?.let {
+                    getAIChatNativeHandoffData(featureName, method, it)
+                }
 
-        METHOD_GET_AI_CHAT_NATIVE_CONFIG_VALUES -> id?.let {
-            getAIChatNativeConfigValues(featureName, method, it)
-        }
+            METHOD_GET_AI_CHAT_NATIVE_CONFIG_VALUES ->
+                id?.let {
+                    getAIChatNativeConfigValues(featureName, method, it)
+                }
 
-        METHOD_OPEN_AI_CHAT -> {
-            val payload = extractPayload(data)
-            dataStore.updateUserPreferences(payload)
-            duckChat.openNewDuckChatSession()
-            null
-        }
+            METHOD_OPEN_AI_CHAT -> {
+                val payload = extractPayload(data)
+                dataStore.updateUserPreferences(payload)
+                duckChat.openNewDuckChatSession()
+                null
+            }
 
-        METHOD_CLOSE_AI_CHAT -> {
-            duckChat.closeDuckChat()
-            null
-        }
+            METHOD_CLOSE_AI_CHAT -> {
+                duckChat.closeDuckChat()
+                null
+            }
 
-        METHOD_OPEN_AI_CHAT_SETTINGS -> {
-            duckChat.openDuckChatSettings()
-            null
-        }
+            METHOD_OPEN_AI_CHAT_SETTINGS -> {
+                duckChat.openDuckChatSettings()
+                null
+            }
 
-        METHOD_RESPONSE_STATE -> {
-            ChatState
-                .fromValue(data?.optString("status"))
-                ?.let { status -> duckChat.updateChatState(status) }
-            null
-        }
+            METHOD_RESPONSE_STATE -> {
+                ChatState
+                    .fromValue(data?.optString("status"))
+                    ?.let { status -> duckChat.updateChatState(status) }
+                null
+            }
 
-        METHOD_HIDE_CHAT_INPUT -> {
-            duckChat.updateChatState(HIDE)
-            null
-        }
+            METHOD_HIDE_CHAT_INPUT -> {
+                duckChat.updateChatState(HIDE)
+                null
+            }
 
-        METHOD_SHOW_CHAT_INPUT -> {
-            duckChat.updateChatState(SHOW)
-            null
-        }
+            METHOD_SHOW_CHAT_INPUT -> {
+                duckChat.updateChatState(SHOW)
+                null
+            }
 
-        REPORT_METRIC -> {
-            ReportMetric
-                .fromValue(data?.optString("metricName"))
-                ?.let { reportMetric -> duckChatPixels.sendReportMetricPixel(reportMetric) }
-            null
-        }
+            METHOD_OPEN_KEYBOARD ->
+                id?.let {
+                    val selector = extractOpenKeyboardSelector(data) ?: DEFAULT_SELECTOR
+                    getOpenKeyboardResponse(featureName, method, it, selector)
+                }
 
-        else -> null
-    }
+            REPORT_METRIC -> {
+                ReportMetric
+                    .fromValue(data?.optString("metricName"))
+                    ?.let { reportMetric -> duckChatPixels.sendReportMetricPixel(reportMetric) }
+                null
+            }
+
+            else -> null
+        }
 
     private fun getAIChatNativeHandoffData(
         featureName: String,
         method: String,
         id: String,
     ): JsCallbackData {
-        val jsonPayload = JSONObject().apply {
-            put(PLATFORM, ANDROID)
-            put(IS_HANDOFF_ENABLED, duckChat.isDuckChatFeatureEnabled())
-            put(PAYLOAD, runBlocking { dataStore.fetchAndClearUserPreferences() })
-        }
+        val jsonPayload =
+            JSONObject().apply {
+                put(PLATFORM, ANDROID)
+                put(IS_HANDOFF_ENABLED, duckChat.isDuckChatFeatureEnabled())
+                put(AI_CHAT_PAYLOAD, runBlocking { dataStore.fetchAndClearUserPreferences() })
+            }
         return JsCallbackData(jsonPayload, featureName, method, id)
     }
 
@@ -122,21 +132,55 @@ class RealDuckChatJSHelper @Inject constructor(
         method: String,
         id: String,
     ): JsCallbackData {
-        val jsonPayload = JSONObject().apply {
-            put(PLATFORM, ANDROID)
-            put(IS_HANDOFF_ENABLED, duckChat.isDuckChatFeatureEnabled())
-            put(SUPPORTS_CLOSING_AI_CHAT, true)
-            put(SUPPORTS_OPENING_SETTINGS, true)
-            put(SUPPORTS_NATIVE_CHAT_INPUT, false)
-            put(SUPPORTS_IMAGE_UPLOAD, duckChat.isImageUploadEnabled())
-        }
+        val jsonPayload =
+            JSONObject().apply {
+                put(PLATFORM, ANDROID)
+                put(IS_HANDOFF_ENABLED, duckChat.isDuckChatFeatureEnabled())
+                put(SUPPORTS_CLOSING_AI_CHAT, true)
+                put(SUPPORTS_OPENING_SETTINGS, true)
+                put(SUPPORTS_NATIVE_CHAT_INPUT, false)
+                put(SUPPORTS_IMAGE_UPLOAD, duckChat.isImageUploadEnabled())
+            }
         return JsCallbackData(jsonPayload, featureName, method, id)
     }
 
-    private fun extractPayload(data: JSONObject?): String? {
-        return data?.takeIf {
-            it.opt(PAYLOAD) != JSONObject.NULL
-        }?.optString(PAYLOAD)
+    private fun getOpenKeyboardResponse(
+        featureName: String,
+        method: String,
+        id: String,
+        selector: String,
+    ): JsCallbackData {
+        val jsonPayload =
+            JSONObject().apply {
+                val jsCall = "document.getElementsByName($selector)[0]?.focus();"
+                put(SELECTOR, jsCall)
+                put(SUCCESS, true)
+                put(ERROR, "")
+            }
+        return JsCallbackData(jsonPayload, featureName, method, id)
+    }
+
+    private fun extractPayload(data: JSONObject?): String? =
+        data
+            ?.takeIf {
+                it.opt(AI_CHAT_PAYLOAD) != JSONObject.NULL
+            }?.optString(AI_CHAT_PAYLOAD)
+
+    private fun extractOpenKeyboardSelector(data: JSONObject?): String? {
+        val fullSelector =
+            data
+                ?.takeIf {
+                    it.opt(METHOD_OPEN_KEYBOARD_PAYLOAD) != JSONObject.NULL
+                }?.optString(METHOD_OPEN_KEYBOARD_PAYLOAD)
+        return fullSelector?.let {
+            val pattern = Pattern.compile("""\[name="([^"]*)"\]""")
+            val matcher = pattern.matcher(it)
+            if (matcher.find()) {
+                matcher.group(1)
+            } else {
+                null
+            }
+        }
     }
 
     companion object {
@@ -149,7 +193,9 @@ class RealDuckChatJSHelper @Inject constructor(
         private const val METHOD_RESPONSE_STATE = "responseState"
         private const val METHOD_HIDE_CHAT_INPUT = "hideChatInput"
         private const val METHOD_SHOW_CHAT_INPUT = "showChatInput"
-        private const val PAYLOAD = "aiChatPayload"
+        const val METHOD_OPEN_KEYBOARD = "openKeyboard"
+        private const val AI_CHAT_PAYLOAD = "aiChatPayload"
+        private const val METHOD_OPEN_KEYBOARD_PAYLOAD = "selector"
         private const val IS_HANDOFF_ENABLED = "isAIChatHandoffEnabled"
         private const val SUPPORTS_CLOSING_AI_CHAT = "supportsClosingAIChat"
         private const val SUPPORTS_OPENING_SETTINGS = "supportsOpeningSettings"
@@ -158,5 +204,9 @@ class RealDuckChatJSHelper @Inject constructor(
         private const val REPORT_METRIC = "reportMetric"
         private const val PLATFORM = "platform"
         private const val ANDROID = "android"
+        const val SELECTOR = "selector"
+        private const val DEFAULT_SELECTOR = "'user-prompt'"
+        private const val SUCCESS = "success"
+        private const val ERROR = "error"
     }
 }

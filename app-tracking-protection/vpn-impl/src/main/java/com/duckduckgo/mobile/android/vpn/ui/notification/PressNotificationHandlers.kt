@@ -21,9 +21,9 @@ import android.os.Handler
 import android.os.Looper
 import android.os.ResultReceiver
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
-import javax.inject.Inject
 import logcat.LogPriority.ERROR
 import logcat.logcat
+import javax.inject.Inject
 
 private const val INVALID_NOTIFICATION_VARIANT = -1
 

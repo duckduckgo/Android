@@ -27,11 +27,11 @@ import com.squareup.anvil.annotations.ContributesMultibinding
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides
-import javax.inject.Inject
-import javax.inject.Qualifier
 import kotlinx.coroutines.launch
 import logcat.asLog
 import logcat.logcat
+import javax.inject.Inject
+import javax.inject.Qualifier
 
 private const val HTTPS_WWW_REDDIT_COM = ".reddit.com"
 private const val REDDIT_SESSION_ = "reddit_session=;"

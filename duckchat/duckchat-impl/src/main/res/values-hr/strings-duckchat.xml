@@ -37,11 +37,13 @@
     <string name="audioCaptureSoundRecorderPermissionDeniedMessage">Mrežne lokacije mogu koristiti snimač zvuka samo ako dopustiš DuckDuckGou da zatraži pristup.</string>
 
     <!-- Settings -->
-    <string name="duck_chat_settings_activity_description">Duck.ai izborna je značajka koja ti omogućuje anonimno čavrljanje s popularnim AI modelima \'chata\' trećih strana. Tvoja čavrljanja se ne koriste za obuku AI-a.\n<annotation type="learn_more_link">Saznaj više</annotation></string>
-    <string name="duck_chat_enable_duck_ai_setting">Omogući Duck.ai</string>
+    <string name="duck_chat_ai_features_title">AI značajke</string>
+    <string name="duck_chat_settings_activity_description">DuckDuckGo AI značajke privatne su i neobavezne.Tvoji podaci se ne koriste za obuku umjetne inteligencije.\n<annotation type="learn_more_link">Saznaj više</annotation></string>
+    <string name="duck_chat_enable_duck_ai_setting">Duck.ai</string>
+    <string name="duck_chat_enable_duck_ai_setting_description">Privatno čavrljaj s popularnim modelima umjetne inteligencije trećih strana</string>
     <string name="duck_chat_visibility_setting">Izbornik preglednika</string>
     <string name="duck_chat_address_bar_visibility_setting">Adresna traka</string>
-    <string name="duck_chat_assist_settings_title">Postavke Assista</string>
+    <string name="duck_chat_assist_settings_title">Pretraži postavke Assista</string>
     <string name="duck_chat_assist_settings_description">Odaberi koliko često želiš da se odgovori potpomognuti umjetnom inteligencijom pojavljuju u tvojim pretraživanjima</string>
     <string name="duck_ai_shortcut_settings_title">Duck.ai prečaci</string>
     <string name="duck_ai_shortcut_settings_description">Odaberi koje Duck.ai prečace želiš prikazati</string>
@@ -53,7 +55,7 @@
     <string name="input_screen_chat_hint">Pitaj privatno</string>
     <string name="input_screen_user_pref_without_ai">Samo pretraživanje</string>
     <string name="input_screen_user_pref_with_ai">Pretraživanje i Duck.ai</string>
-    <string name="input_screen_user_pref_description">Isprobaj našu novu opciju za izravno postavljanje pitanja s adresne trake usluzi Duck.ai. <annotation type="share_feedback">Podijeli povratne informacije</annotation></string>
+    <string name="input_screen_user_pref_description">Isprobaj novu opciju za izravno postavljanje pitanja s adresne trake usluzi Duck.ai. <annotation type="share_feedback">Podijeli povratne informacije</annotation></string>
 
     <!-- Duck.ai Pro settings -->
     <string name="duck_ai_paid_settings_title">Duck.ai</string>
@@ -61,14 +63,6 @@
     <string name="duck_ai_paid_settings_page_description"><![CDATA[Privatno čavrljaj s AI modelima ekskluzivnim za pretplatnike.\n<a href=\"\">Saznaj više</a>]]></string>
     <string name="duck_ai_paid_settings_open_duck_ai">Otvori Duck.ai</string>
     <string name="duck_ai_paid_settings_learn_more_title">Saznajte više</string>
-
-    <!-- Rebranding-->
-    <string name="duck_chat_title_rebranding">AI značajke</string>
-    <string name="duck_chat_settings_activity_description_rebranding">DuckDuckGo AI značajke privatne su i neobavezne.Tvoji podaci se ne koriste za obuku umjetne inteligencije.\n<annotation type="learn_more_link">Saznaj više</annotation></string>
-    <string name="duck_chat_enable_duck_ai_setting_rebranding">Duck.ai</string>
-    <string name="duck_chat_enable_duck_ai_setting_description_rebranding">Privatno čavrljaj s popularnim modelima umjetne inteligencije trećih strana</string>
-    <string name="duck_chat_assist_settings_title_rebranding">Pretraži postavke Assista</string>
-    <string name="duck_chat_assist_settings_description_rebranding">Odaberi koliko često želiš da se odgovori potpomognuti umjetnom inteligencijom pojavljuju u tvojim pretraživanjima</string>
 
     <!-- AutoComplete -->
     <string name="autocompleteDuckAiPrompt">Pitaj Duck.ai</string>

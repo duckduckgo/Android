@@ -2,12 +2,12 @@ package com.duckduckgo.feature.toggles.impl
 
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.feature.toggles.api.Toggle
-import java.util.Locale
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
+import java.util.Locale
 
 class LocaleToggleTargetMatcherTest {
     private val appBuildConfig: AppBuildConfig = mock()

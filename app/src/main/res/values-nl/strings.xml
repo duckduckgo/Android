@@ -167,6 +167,7 @@
     <string name="settingsAddressBarPosition">Positie van adresbalk instellen</string>
     <string name="settingsEnableVoiceSearch">Privé voice search inschakelen</string>
     <string name="settingsDDGOnOtherPlatforms">DuckDuckGo op andere platforms</string>
+    <string name="settingsDuckAi">AI-functies</string>
 
     <!-- Private Search -->
     <string name="privateSearchActivityTitle">Privé-zoekopdracht</string>
@@ -246,7 +247,7 @@
     <string name="settingsAutomaticallyClearWhenAppExit30Minutes">App afsluiten, 30 minuten inactief</string>
     <string name="settingsAutomaticallyClearWhenAppExit60Minutes">App afsluiten, 1 uur inactief</string>
     <string name="settingsClearAiDataTitle">Duck.ai chats wissen</string>
-    <string name="settingsClearAiDataMessage">De Fire Button verwijdert ook de Duck.ai-geschiedenis</string>
+    <string name="settingsClearAiDataDeleteMessage">Fire Button verwijdert ook de Duck.ai-geschiedenis, inclusief vastgepinde chats.</string>
 
     <!-- About Activity -->
     <string name="aboutActivityTitle">Over DuckDuckGo</string>
@@ -776,36 +777,44 @@
     <string name="sslErrorUntrustedMessage" instruction="Placeholder is domain with certificate issues">Het besturingssysteem van je apparaat vertrouwt het beveiligingscertificaat voor %1$s niet. Mogelijk is de website verkeerd geconfigureerd, heeft een aanvaller je verbinding gecompromitteerd of staat de klok van je systeem niet goed.</string>
 
     <!-- Extended Onboarding-->
-    <string name="preOnboardingDaxDialog1Title"><![CDATA[Hoi.<br/><br/>Klaar voor een beter internet met meer privacy?]]></string>
+    <string name="preOnboardingDaxDialog1Title"><![CDATA[Hoi.<br/><br/>Klaar voor een snellere browser die je beschermt?]]></string>
     <string name="preOnboardingDaxDialog1Button">Laten we het doen!</string>
-    <string name="preOnboardingDaxDialog2Title">Privacybescherming geactiveerd!</string>
+    <string name="preOnboardingDaxDialog1SecondaryButton">Overslaan</string>
+    <string name="preOnboardingDaxDialog2Title">Bescherming geactiveerd!</string>
     <string name="preOnboardingDaxDialog2Button">Kies je browser</string>
+    <string name="preOnboardingDaxDialog3Title"><![CDATA[Ik snap het! Ik sla de andere tips over.]]></string>
+    <string name="preOnboardingDaxDialog3Text"><![CDATA[Onthoud: je kunt al je tabbladen, geschiedenis en browsegegevens in twee tikken wissen met de <b>Fire Button</b> 🔥.]]></string>
+    <string name="preOnboardingDaxDialog3SecondaryButton">Tutorial weergeven</string>
     <string name="preOnboardingComparisonChartItem1">Standaard privé zoeken</string>
     <string name="preOnboardingComparisonChartItem2">Blokkeer trackers van derden</string>
     <string name="preOnboardingComparisonChartItem3">Blokkeer cookiepop-ups</string>
     <string name="preOnboardingComparisonChartItem4">Blokkeer gerichte advertenties</string>
     <string name="preOnboardingComparisonChartItem5">Verwijder browsegegevens met één knop</string>
-    <string name="preOnboardingDaxDialog3Title">Geweldig! Welkom aan de Duck-kant.</string>
     <string name="preOnboardingDaxDialog3Button">Beginnen met browsen</string>
+    <string name="preOnboardingAddressBarTitle">Waar moet ik je adresbalk plaatsen?</string>
+    <string name="preOnboardingAddressBarOkButton">Volgende</string>
+    <string name="highlightsPreOnboardingAddressBarOption1Title">Bovenaan (standaard)</string>
+    <string name="highlightsPreOnboardingAddressBarOption1Description">Gemakkelijk te zien</string>
+    <string name="highlightsPreOnboardingAddressBarOption2Title">Onderkant</string>
+    <string name="highlightsPreOnboardingAddressBarOption2Description">Gemakkelijk te bereiken</string>
     <string name="onboardingSearchDaxDialogTitle">Probeer een zoekopdracht!</string>
-    <string name="onboardingSearchDaxDialogDescription">Je DuckDuckGo-zoekopdrachten zijn altijd anoniem.</string>
-    <string name="onboardingSearchDaxDialogOption1" instruction="translate &apos;duck&apos; too.">hoe zeg je \'eend\' in het Engels?</string>
-    <string name="onboardingSearchDaxDialogOption1English" instruction="translate &apos;duck&apos; too. Don&apos;t add question mark">hoe zeg je \'eend\' in het Spaans?</string>
+    <string name="onboardingSearchDaxDialogDescription">Je DuckDuckGo-zoekopdrachten zijn altijd privé.</string>
+    <string name="onboardingSearchDaxDialogOption1" instruction="translate &apos;duck&apos; too.">"hoe zeg je 'eend' in het Engels?"</string>
+    <string name="onboardingSearchDaxDialogOption1English" instruction="translate &apos;duck&apos; too. Don&apos;t add question mark">"hoe zeg je 'eend' in het Spaans?"</string>
     <string name="onboardingSearchQueryOption1">hoe zeg je \'eend\' in het Engels?</string>
     <string name="onboardingSearchQueryOption1English">hoe zeg je \'eend\' in het Spaans?</string>
     <string name="onboardingSearchDaxDialogOption2">cast van avatar</string>
     <string name="onboardingSearchDaxDialogOption2US">cast van Mighty Ducks</string>
     <string name="onboardingSearchDaxDialogOption3">lokaal weer</string>
     <string name="onboardingSearchDaxDialogOption4">Verras me!</string>
-    <string name="onboardingSearchQueryOption4">recepten voor het avondeten</string>
-    <string name="onboardingSearchQueryOption4US">Recepten voor chocoladekoekjes</string>
+    <string name="onboardingSearchQueryOption4">baby-eendjes</string>
     <string name="onboardingSitesDaxDialogTitle">Bezoek eens een site!</string>
     <string name="onboardingSitesDaxDialogDescription">Ik blokkeer trackers zodat ze je niet kunnen bespioneren.</string>
     <string name="onboardingSitesDaxDialogOption1">espn.com</string>
     <string name="onboardingSitesDaxDialogOption2">yahoo.com</string>
     <string name="onboardingSitesDaxDialogOption3">ebay.com</string>
     <string name="onboardingSitesDaxDialogOption4">Verras me!</string>
-    <string name="onboardingSerpDaxDialogDescription">Dat is DuckDuckGo Search. Privé. Snel. Minder advertenties.</string>
+    <string name="onboardingSerpDaxDialogDescription"><![CDATA[Dat is <b>DuckDuckGo Search</b>! Privé. Snel. Minder advertenties.]]></string>
     <string name="onboardingSerpDaxDialogButton">Ik snap het!</string>
     <string name="onboardingSitesSuggestionsDaxDialogTitle">Probeer nu een site te bezoeken!</string>
     <plurals name="onboardingTrackersBlockedDialogDescription">
@@ -818,42 +827,20 @@
     </plurals>
     <string name="onboardingTrackersBlockedDaxDialogButton">Ik snap het!</string>
     <string name="onboardingFireButtonDaxDialogDescription"><![CDATA[Wis je browse-activiteit direct met de <b>Fire Button</b>.<br/><br/>Probeer het maar! 🔥]]></string>
+    <string name="onboardingFireButtonDaxDialogOkButton">Probeer het zelf</string>
+    <string name="onboardingFireButtonDaxDialogCancelButton">Overslaan</string>
     <string name="onboardingEndDaxDialogTitle">"Je kunt het!"</string>
-    <string name="onboardingEndDaxDialogDescription">Denk eraan: elke keer als je met mij browset, verliest een enge advertentie zijn vleugels. 👌</string>
-    <string name="onboardingEndDaxDialogButton">Helemaal klaar!</string>
+    <string name="onboardingEndDaxDialogDescription">Denk eraan: elke keer als je met mij browset, verliest een enge advertentie zijn vleugels.</string>
+    <string name="onboardingInContextEndDaxDialogDescription">Denk eraan: elke keer als je met mij browset, verliest een enge advertentie zijn vleugels. 👌</string>
+    <string name="onboardingEndDaxDialogButton">High five!</string>
     <string name="onboardingPrivacyProDaxDialogTitle">Oh, voordat ik het vergeet...</string>
     <string name="onboardingPrivacyProDaxDialogDescription"><![CDATA[DuckDuckGo biedt ook beveiligde <b>VPN + nog 2 premiumbeveiligingen</b>, beschikbaar met een <b>optioneel betaald abonnement</b>.]]></string>
     <string name="onboardingPrivacyProDaxDialogOkButton">Meer informatie</string>
     <string name="onboardingPrivacyProDaxDialogFreeTrialOkButton">Probeer het gratis!</string>
     <string name="onboardingPrivacyProDaxDialogCancelButton">Overslaan</string>
 
-    <!-- Highlight Onboarding Experiment-->
-    <string name="highlightsPreOnboardingDaxDialog1Title"><![CDATA[Hoi.<br/><br/>Klaar voor een snellere browser die je beschermt?]]></string>
-    <string name="highlightsPreOnboardingDaxDialog2Title">Bescherming geactiveerd!</string>
-    <string name="highlightsPreOnboardingComparisonChartItem2">Blokkeer trackers van derden</string>
-    <string name="highlightsPreOnboardingComparisonChartItem3">Cookieverzoeken en pop-ups blokkeren</string>
-    <string name="highlightsPreOnboardingComparisonChartItem4">Blokkeer gerichte advertenties</string>
-    <string name="highlightsPreOnboardingComparisonChartItem5">Wis browsegegevens snel</string>
-    <string name="highlightsPreOnboardingSelectAppIconTitle">Welke kleur staat mij het beste?</string>
-    <string name="highlightsPreOnboardingSelectAppIconDescription">Kies het app-pictogram:</string>
-    <string name="highlightsPreOnboardingSelectAppIconOkButton">Volgende</string>
-    <string name="highlightsPreOnboardingAddressBarTitle">Waar moet ik je adresbalk plaatsen?</string>
-    <string name="highlightsPreOnboardingAddressBarOption1Title">Bovenaan (standaard)</string>
-    <string name="highlightsPreOnboardingAddressBarOption1Description">Gemakkelijk te zien</string>
-    <string name="highlightsPreOnboardingAddressBarOkButton">Volgende</string>
-    <string name="highlightsPreOnboardingAddressBarOption2Title">Onderkant</string>
-    <string name="highlightsPreOnboardingAddressBarOption2Description">Gemakkelijk te bereiken</string>
-    <string name="highlightsOnboardingSearchQueryOption4">baby-eendjes</string>
-    <string name="highlightsOnboardingSearchDaxDialogDescription">Je DuckDuckGo-zoekopdrachten zijn altijd privé.</string>
-    <string name="highlightsOnboardingSerpDaxDialogDescription"><![CDATA[Dat is <b>DuckDuckGo Search</b>! Privé. Snel. Minder advertenties.]]></string>
-    <string name="highlightsOnboardingEndDaxDialogDescription">Denk eraan: elke keer als je met mij browset, verliest een enge advertentie zijn vleugels.</string>
-    <string name="highlightsOnboardingEndDaxDialogButton">High five!</string>
-    <string name="onboardingFireButtonDaxDialogOkButton">Probeer het zelf</string>
-    <string name="onboardingFireButtonDaxDialogCancelButton">Overslaan</string>
-    <string name="preOnboardingDaxDialog1SecondaryButton">Overslaan</string>
-    <string name="highlightsPreOnboardingDaxDialog3Title"><![CDATA[Ik snap het! Ik sla de andere tips over.]]></string>
-    <string name="highlightsPreOnboardingDaxDialog3Text"><![CDATA[Onthoud: je kunt al je tabbladen, geschiedenis en browsegegevens in twee tikken wissen met de <b>Fire Button</b> 🔥.]]></string>
-    <string name="preOnboardingDaxDialog3SecondaryButton">Tutorial weergeven</string>
+    <!-- Bubble BB & Buck experiment-->
+    <string name="onboardingBubbleExperimentSearchDaxDialogDescription">Je DuckDuckGo-zoekopdrachten zijn altijd anoniem.</string>
 
     <!-- Appearance settings -->
     <string name="settingsAddressBarPositionTitle">Adresbalk</string>
@@ -940,8 +927,6 @@
     <!-- Privacy Pro Rebranding-->
     <string name="aboutDescriptionBrandUpdate2025Rebranding">Welcome to the Duck Side!\n\nDuckDuckGo is het onafhankelijke online beveiligingsbedrijf voor iedereen die weer controle wil krijgen over zijn of haar persoonlijke gegevens.\n\nWij zijn ervan overtuigd dat de beste manier om je persoonlijke gegevens te beschermen tegen hackers, oplichters en bedrijven die je privacy schenden is om te voorkomen dat ze worden verzameld. Daarom kiezen miljoenen mensen <annotation type="chart_comparison">voor DuckDuckGo boven Chrome en andere browsers</annotation> om online te zoeken en te surfen. Onze ingebouwde zoekmachine is zoals Google, maar volgt je zoekopdrachten nooit. En met onze browsebescherming, zoals blokkering van advertentietrackers en cookieblokkering, voorkom je dat andere bedrijven je gegevens verzamelen. Bovendien is onze browser gratis - we verdienen geld met <annotation type="privacy_respecting_ads"> zoekadvertenties die de privacy respecteren</annotation>, niet door je gegevens uit te buiten.\n\nDaarnaast bieden we ook een <annotation type="ppro_help_page">DuckDuckGo-abonnement</annotation> aan dat geïntegreerd is in onze browser. Abonnees krijgen nog meer privacybescherming met een snel en eenvoudig <annotation type="vpn_help_page">VPN</annotation> die je online activiteiten helpt beveiligen, toegang tot geavanceerde AI-modellen in onze privé AI-chatservice Duck.ai, een dienst die je persoonlijke gegevens opspoort en verwijdert van zoeksites om mensen op internet te vinden, en een dienst die je identiteit herstelt als deze wordt gestolen.\n\nKrijg weer de controle over je persoonlijke gegevens met de browser die is ontworpen voor gegevensbescherming, niet voor gegevensverzameling.</string>
     <string name="onboardingPrivacyProDaxDialogDescriptionRebranding"><![CDATA[DuckDuckGo heeft ook een <b>optioneel betaald abonnement</b>, met een veilig <b>VPN</b> en <b>geavanceerde, privé-AI</b>.]]></string>
-    <string name="settingsDuckAiRebranding">AI-functies</string>
-    <string name="settingsDuckAi">Duck.ai</string>
 
     <!--TabSwitcher Trackers Animation-->
     <string name="showTrackerCountInTabSwitcher">Aantal trackers in tabbladwisselaar</string>

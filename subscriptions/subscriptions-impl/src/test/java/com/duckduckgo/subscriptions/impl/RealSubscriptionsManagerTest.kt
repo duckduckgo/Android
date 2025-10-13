@@ -38,11 +38,16 @@ import com.duckduckgo.subscriptions.impl.auth2.RefreshTokenClaims
 import com.duckduckgo.subscriptions.impl.auth2.TokenPair
 import com.duckduckgo.subscriptions.impl.billing.PlayBillingManager
 import com.duckduckgo.subscriptions.impl.billing.PurchaseState
+import com.duckduckgo.subscriptions.impl.billing.PurchaseState.Canceled
+import com.duckduckgo.subscriptions.impl.billing.PurchaseState.Purchased
+import com.duckduckgo.subscriptions.impl.billing.SubscriptionReplacementMode
 import com.duckduckgo.subscriptions.impl.model.Entitlement
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
+import com.duckduckgo.subscriptions.impl.repository.Account
 import com.duckduckgo.subscriptions.impl.repository.AuthRepository
 import com.duckduckgo.subscriptions.impl.repository.FakeSubscriptionsDataStore
 import com.duckduckgo.subscriptions.impl.repository.RealAuthRepository
+import com.duckduckgo.subscriptions.impl.repository.Subscription
 import com.duckduckgo.subscriptions.impl.serp_promo.FakeSerpPromo
 import com.duckduckgo.subscriptions.impl.services.AccessTokenResponse
 import com.duckduckgo.subscriptions.impl.services.AccountResponse
@@ -57,9 +62,7 @@ import com.duckduckgo.subscriptions.impl.services.SubscriptionResponse
 import com.duckduckgo.subscriptions.impl.services.SubscriptionsService
 import com.duckduckgo.subscriptions.impl.services.ValidateTokenResponse
 import com.duckduckgo.subscriptions.impl.store.SubscriptionsDataStore
-import java.time.Duration
-import java.time.Instant
-import java.time.LocalDateTime
+import com.duckduckgo.subscriptions.impl.wideevents.SubscriptionPurchaseWideEvent
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOf
@@ -92,6 +95,9 @@ import org.mockito.kotlin.verifyNoMoreInteractions
 import org.mockito.kotlin.whenever
 import retrofit2.HttpException
 import retrofit2.Response
+import java.time.Duration
+import java.time.Instant
+import java.time.LocalDateTime
 
 @RunWith(Parameterized::class)
 class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
@@ -108,6 +114,7 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
     private val playBillingManager: PlayBillingManager = mock()
     private val context: Context = mock()
     private val pixelSender: SubscriptionPixelSender = mock()
+    private val subscriptionPurchaseWideEvent: SubscriptionPurchaseWideEvent = mock()
 
     @SuppressLint("DenyListedApi")
     private val privacyProFeature: PrivacyProFeature = FakeFeatureToggleFactory.create(PrivacyProFeature::class.java)
@@ -139,6 +146,7 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
             pkceGenerator,
             timeProvider,
             backgroundTokenRefresh,
+            subscriptionPurchaseWideEvent,
         )
     }
 
@@ -580,6 +588,7 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
             pkceGenerator,
             timeProvider,
             backgroundTokenRefresh,
+            subscriptionPurchaseWideEvent,
         )
 
         manager.subscriptionStatus.test {
@@ -608,6 +617,7 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
             pkceGenerator,
             timeProvider,
             backgroundTokenRefresh,
+            subscriptionPurchaseWideEvent,
         )
 
         manager.subscriptionStatus.test {
@@ -641,23 +651,24 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
             pkceGenerator,
             timeProvider,
             backgroundTokenRefresh,
+            subscriptionPurchaseWideEvent,
         )
 
         manager.currentPurchaseState.test {
-            flowTest.emit(PurchaseState.Purchased("validToken", "packageName"))
+            flowTest.emit(Purchased("validToken", "packageName"))
             assertTrue(awaitItem() is CurrentPurchase.InProgress)
             assertTrue(awaitItem() is CurrentPurchase.Success)
             cancelAndConsumeRemainingEvents()
         }
 
         manager.entitlements.test {
-            flowTest.emit(PurchaseState.Purchased("validToken", "packageName"))
+            flowTest.emit(Purchased("validToken", "packageName"))
             assertTrue(awaitItem().size == 1)
             cancelAndConsumeRemainingEvents()
         }
 
         manager.subscriptionStatus.test {
-            flowTest.emit(PurchaseState.Purchased("validToken", "packageName"))
+            flowTest.emit(Purchased("validToken", "packageName"))
             assertEquals(AUTO_RENEWABLE, awaitItem())
             cancelAndConsumeRemainingEvents()
         }
@@ -688,17 +699,18 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
             pkceGenerator,
             timeProvider,
             backgroundTokenRefresh,
+            subscriptionPurchaseWideEvent,
         )
 
         manager.currentPurchaseState.test {
-            flowTest.emit(PurchaseState.Purchased("validateToken", "packageName"))
+            flowTest.emit(Purchased("validateToken", "packageName"))
             assertTrue(awaitItem() is CurrentPurchase.InProgress)
             assertTrue(awaitItem() is CurrentPurchase.Waiting)
             cancelAndConsumeRemainingEvents()
         }
 
         manager.subscriptionStatus.test {
-            flowTest.emit(PurchaseState.Purchased("validateToken", "packageName"))
+            flowTest.emit(Purchased("validateToken", "packageName"))
             assertEquals(WAITING, awaitItem())
             cancelAndConsumeRemainingEvents()
         }
@@ -725,10 +737,11 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
             pkceGenerator,
             timeProvider,
             backgroundTokenRefresh,
+            subscriptionPurchaseWideEvent,
         )
 
         manager.currentPurchaseState.test {
-            flowTest.emit(PurchaseState.Canceled)
+            flowTest.emit(Canceled)
             assertTrue(awaitItem() is CurrentPurchase.Canceled)
             cancelAndConsumeRemainingEvents()
         }
@@ -1074,6 +1087,7 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
             pkceGenerator,
             timeProvider,
             backgroundTokenRefresh,
+            subscriptionPurchaseWideEvent,
         )
         manager.signOut()
         verify(mockRepo).setSubscription(null)
@@ -1119,6 +1133,7 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
             pkceGenerator,
             timeProvider,
             backgroundTokenRefresh,
+            subscriptionPurchaseWideEvent,
         )
 
         manager.subscriptionStatus.test {
@@ -1149,7 +1164,7 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
         givenConfirmPurchaseSucceeds()
         givenV2AccessTokenRefreshSucceeds()
 
-        whenever(playBillingManager.purchaseState).thenReturn(flowOf(PurchaseState.Purchased("any", "any")))
+        whenever(playBillingManager.purchaseState).thenReturn(flowOf(Purchased("any", "any")))
 
         subscriptionsManager.currentPurchaseState.test {
             assertTrue(awaitItem() is CurrentPurchase.InProgress)
@@ -1190,7 +1205,7 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
         givenValidateTokenFails("failure")
         givenConfirmPurchaseFails()
 
-        whenever(playBillingManager.purchaseState).thenReturn(flowOf(PurchaseState.Purchased("validateToken", "packageName")))
+        whenever(playBillingManager.purchaseState).thenReturn(flowOf(Purchased("validateToken", "packageName")))
 
         subscriptionsManager.currentPurchaseState.test {
             assertTrue(awaitItem() is CurrentPurchase.InProgress)
@@ -1300,6 +1315,7 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
             pkceGenerator,
             timeProvider,
             backgroundTokenRefresh,
+            subscriptionPurchaseWideEvent,
         )
 
         assertFalse(subscriptionsManager.canSupportEncryption())
@@ -1731,6 +1747,139 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
         whenever(playBillingManager.products).thenReturn(listOf(productDetails))
     }
 
+    @Test
+    fun whenSwitchSubscriptionPlanWithNoActiveSubscriptionThenEmitFailure() = runTest {
+        givenUserIsSignedIn()
+        givenNoActiveSubscription()
+
+        subscriptionsManager.currentPurchaseState.test {
+            subscriptionsManager.switchSubscriptionPlan(
+                activity = mock(),
+                planId = YEARLY_PLAN_US,
+                offerId = null,
+                replacementMode = SubscriptionReplacementMode.DEFERRED,
+            )
+
+            val item = awaitItem()
+            assertTrue(item is CurrentPurchase.Failure)
+            assertEquals("No active subscription found for switch", (item as CurrentPurchase.Failure).message)
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenSwitchSubscriptionPlanWithNoPurchaseTokenThenEmitFailure() = runTest {
+        givenUserIsSignedIn()
+        givenActiveSubscription()
+        givenNoPurchaseHistory()
+
+        subscriptionsManager.currentPurchaseState.test {
+            subscriptionsManager.switchSubscriptionPlan(
+                activity = mock(),
+                planId = YEARLY_PLAN_US,
+                offerId = null,
+                replacementMode = SubscriptionReplacementMode.DEFERRED,
+            )
+
+            val item = awaitItem()
+            assertTrue(item is CurrentPurchase.Failure)
+            assertEquals("No current purchase token found for switch", (item as CurrentPurchase.Failure).message)
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenSwitchSubscriptionPlanWithNoAccountThenEmitFailure() = runTest {
+        givenUserIsSignedIn()
+        givenActiveSubscription()
+        givenPurchaseStored()
+        whenever(playBillingManager.getLatestPurchaseToken()).thenReturn("validToken")
+        authRepository.setAccount(null) // No account despite being signed in
+
+        subscriptionsManager.currentPurchaseState.test {
+            subscriptionsManager.switchSubscriptionPlan(
+                activity = mock(),
+                planId = YEARLY_PLAN_US,
+                offerId = null,
+                replacementMode = SubscriptionReplacementMode.DEFERRED,
+            )
+
+            val item = awaitItem()
+            assertTrue(item is CurrentPurchase.Failure)
+            assertEquals("No account found for switch", (item as CurrentPurchase.Failure).message)
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenSwitchSubscriptionPlanWithUserNotSignedInThenEmitFailure() = runTest {
+        subscriptionsManager.currentPurchaseState.test {
+            subscriptionsManager.switchSubscriptionPlan(
+                activity = mock(),
+                planId = YEARLY_PLAN_US,
+                offerId = null,
+                replacementMode = SubscriptionReplacementMode.DEFERRED,
+            )
+
+            val item = awaitItem()
+            assertTrue(item is CurrentPurchase.Failure)
+            assertEquals("User not signed in for switch", (item as CurrentPurchase.Failure).message)
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenSwitchSubscriptionPlanWithInvalidPlanIdThenEmitFailure() = runTest {
+        givenUserIsSignedIn()
+        givenActiveSubscription()
+        givenPurchaseStored()
+        whenever(playBillingManager.getLatestPurchaseToken()).thenReturn("validToken")
+        authRepository.setAccount(Account("test@test.com", "1234"))
+        authRepository.setFeatures(MONTHLY_PLAN_US, setOf(NETP))
+        givenPlansAvailable(MONTHLY_PLAN_US)
+
+        subscriptionsManager.currentPurchaseState.test {
+            subscriptionsManager.switchSubscriptionPlan(
+                activity = mock(),
+                planId = "invalid_plan",
+                offerId = null,
+                replacementMode = SubscriptionReplacementMode.DEFERRED,
+            )
+
+            val item = awaitItem()
+            assertTrue(item is CurrentPurchase.Failure)
+            assertTrue((item as CurrentPurchase.Failure).message.contains("Target plan not found"))
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenSwitchSubscriptionPlanWithValidDataThenLaunchesSubscriptionUpdate() = runTest {
+        givenUserIsSignedIn()
+        givenActiveSubscription()
+        givenPurchaseStored()
+        whenever(playBillingManager.getLatestPurchaseToken()).thenReturn("validToken")
+        authRepository.setAccount(Account("test@test.com", "1234"))
+        authRepository.setFeatures(YEARLY_PLAN_US, setOf(NETP))
+        givenPlansAvailable(YEARLY_PLAN_US)
+
+        subscriptionsManager.switchSubscriptionPlan(
+            activity = mock(),
+            planId = YEARLY_PLAN_US,
+            offerId = null,
+            replacementMode = SubscriptionReplacementMode.DEFERRED,
+        )
+
+        verify(playBillingManager).launchSubscriptionUpdate(
+            activity = any(),
+            newPlanId = eq(YEARLY_PLAN_US),
+            externalId = eq("1234"),
+            newOfferId = isNull(),
+            oldPurchaseToken = eq("validToken"),
+            replacementMode = eq(SubscriptionReplacementMode.DEFERRED),
+        )
+    }
+
     private suspend fun purchase(
         planId: String = "",
         offerId: String? = null,
@@ -1743,12 +1892,35 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
             offerId = offerId,
             experimentCohort = experimentCohort,
             experimentName = experimentName,
+            origin = null,
         )
     }
 
     @SuppressLint("DenyListedApi")
     private fun givenIsLaunchedRow(value: Boolean) {
         privacyProFeature.isLaunchedROW().setRawStoredState(State(remoteEnableState = value))
+    }
+
+    private suspend fun givenActiveSubscription() {
+        authRepository.setSubscription(
+            Subscription(
+                productId = "ddg_privacy_pro",
+                billingPeriod = "P1M",
+                startedAt = 1234L,
+                expiresOrRenewsAt = 1234L,
+                status = AUTO_RENEWABLE,
+                platform = "android",
+                activeOffers = emptyList(),
+            ),
+        )
+    }
+
+    private suspend fun givenNoActiveSubscription() {
+        authRepository.setSubscription(null)
+    }
+
+    private fun givenNoPurchaseHistory() {
+        whenever(playBillingManager.purchaseHistory).thenReturn(emptyList())
     }
 
     private class FakeTimeProvider : CurrentTimeProvider {

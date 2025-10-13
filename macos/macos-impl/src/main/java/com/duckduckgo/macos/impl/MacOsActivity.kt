@@ -37,12 +37,12 @@ import com.duckduckgo.macos.impl.R.string
 import com.duckduckgo.macos.impl.databinding.ActivityMacosBinding
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.windows.api.ui.WindowsScreenWithEmptyParams
-import javax.inject.Inject
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import logcat.LogPriority.WARN
 import logcat.asLog
 import logcat.logcat
+import javax.inject.Inject
 
 @InjectWith(ActivityScope::class)
 @ContributeToActivityStarter(MacOsScreenWithEmptyParams::class)

@@ -53,6 +53,7 @@ abstract class DaxListItem(
     internal abstract val trailingIconContainer: View
     internal abstract val trailingSwitch: DaxSwitch
     internal abstract val betaPill: ImageView?
+    internal abstract val newPill: ImageView?
     internal abstract val itemContainer: View
     internal abstract val verticalPadding: Int
 

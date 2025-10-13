@@ -23,8 +23,8 @@ import androidx.core.view.drawToBitmap
 import com.duckduckgo.common.ui.view.toPx
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.mobile.android.R
-import kotlin.math.roundToInt
 import kotlinx.coroutines.withContext
+import kotlin.math.roundToInt
 
 interface WebViewPreviewGenerator {
     suspend fun generatePreview(webView: WebView): Bitmap

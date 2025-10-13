@@ -18,9 +18,9 @@ package com.duckduckgo.widget
 
 import android.content.Context
 import com.duckduckgo.common.ui.view.toDp
-import com.duckduckgo.mobile.android.R as CommonR
 import logcat.LogPriority.INFO
 import logcat.logcat
+import com.duckduckgo.mobile.android.R as CommonR
 
 class SearchAndFavoritesGridCalculator {
     fun calculateColumns(

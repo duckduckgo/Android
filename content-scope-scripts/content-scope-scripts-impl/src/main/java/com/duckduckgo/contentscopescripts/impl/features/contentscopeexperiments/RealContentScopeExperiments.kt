@@ -22,8 +22,8 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.FeatureTogglesInventory
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.squareup.anvil.annotations.ContributesBinding
-import javax.inject.Inject
 import kotlinx.coroutines.withContext
+import javax.inject.Inject
 
 @ContributesBinding(AppScope::class)
 class RealContentScopeExperiments @Inject constructor(
@@ -31,15 +31,15 @@ class RealContentScopeExperiments @Inject constructor(
     private val featureTogglesInventory: FeatureTogglesInventory,
     private val dispatcherProvider: DispatcherProvider,
 ) : ContentScopeExperiments {
-
-    override suspend fun getActiveExperiments(): List<Toggle> {
-        val featureName = contentScopeExperimentsFeature.self().featureName().name
-        return withContext(dispatcherProvider.io()) {
-            val experiments = if (contentScopeExperimentsFeature.self().isEnabled()) {
-                featureTogglesInventory.getAllTogglesForParent(featureName)
-            } else {
-                emptyList()
-            }
+    override suspend fun getActiveExperiments(): List<Toggle> =
+        withContext(dispatcherProvider.io()) {
+            val featureName = contentScopeExperimentsFeature.self().featureName().name
+            val experiments =
+                if (contentScopeExperimentsFeature.self().isEnabled()) {
+                    featureTogglesInventory.getAllTogglesForParent(featureName)
+                } else {
+                    emptyList()
+                }
             experiments.mapNotNull {
                 it.enroll()
                 if (it.isEnabled()) {
@@ -49,5 +49,4 @@ class RealContentScopeExperiments @Inject constructor(
                 }
             }
         }
-    }
 }

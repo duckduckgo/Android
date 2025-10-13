@@ -30,13 +30,13 @@ import com.duckduckgo.app.browser.indonesiamessage.RealIndonesiaNewTabSectionDat
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
-import java.time.Instant
-import java.util.concurrent.TimeUnit
-import javax.inject.Inject
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
+import java.time.Instant
+import java.util.concurrent.TimeUnit
+import javax.inject.Inject
 
 interface IndonesiaNewTabSectionDataStore {
 

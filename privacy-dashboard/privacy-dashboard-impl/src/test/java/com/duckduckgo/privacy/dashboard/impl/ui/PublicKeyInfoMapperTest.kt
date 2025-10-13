@@ -22,6 +22,8 @@ import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.privacy.dashboard.impl.ui.PublicKeyInfoMapper.PublicKeyInfo
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.whenever
+import org.junit.Assert.*
+import org.junit.Test
 import java.math.BigInteger
 import java.security.cert.X509Certificate
 import java.security.interfaces.DSAParams
@@ -30,8 +32,6 @@ import java.security.interfaces.ECPublicKey
 import java.security.interfaces.RSAPublicKey
 import java.security.spec.ECParameterSpec
 import java.util.*
-import org.junit.Assert.*
-import org.junit.Test
 
 class PublicKeyInfoMapperTest {
 

@@ -6,7 +6,6 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.verifiedinstallation.installsource.VerificationCheckPlayStoreInstall
-import java.util.*
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -14,6 +13,7 @@ import org.mockito.kotlin.argumentCaptor
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
+import java.util.*
 
 class ReferrerOriginAttributeHandlerImplTest {
 

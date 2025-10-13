@@ -29,15 +29,15 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.experiments.api.VariantManager
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.Lazy
-import java.io.File
-import java.lang.IllegalStateException
-import java.util.*
-import javax.inject.Inject
 import kotlinx.coroutines.withContext
 import logcat.LogPriority.ERROR
 import logcat.LogPriority.INFO
 import logcat.LogPriority.WARN
 import logcat.logcat
+import java.io.File
+import java.lang.IllegalStateException
+import java.util.*
+import javax.inject.Inject
 
 @ContributesBinding(AppScope::class)
 class RealAppBuildConfig @Inject constructor(

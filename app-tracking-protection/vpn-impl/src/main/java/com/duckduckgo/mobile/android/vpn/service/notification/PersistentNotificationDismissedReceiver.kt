@@ -22,9 +22,9 @@ import android.content.Intent
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.di.scopes.ReceiverScope
 import dagger.android.AndroidInjection
-import javax.inject.Inject
 import logcat.LogPriority.WARN
 import logcat.logcat
+import javax.inject.Inject
 
 @InjectWith(ReceiverScope::class)
 class PersistentNotificationDismissedReceiver : BroadcastReceiver() {

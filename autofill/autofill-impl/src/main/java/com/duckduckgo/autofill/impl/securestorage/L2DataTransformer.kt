@@ -25,13 +25,13 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
-import java.security.Key
-import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.async
 import okio.ByteString.Companion.decodeBase64
 import okio.ByteString.Companion.toByteString
+import java.security.Key
+import javax.inject.Inject
 
 interface L2DataTransformer {
     suspend fun canProcessData(): Boolean

@@ -24,8 +24,8 @@ import com.duckduckgo.remote.messaging.api.JsonMessageAction
 import com.duckduckgo.remote.messaging.api.MessageActionMapperPlugin
 import com.duckduckgo.survey.api.SurveyParameterManager
 import com.squareup.anvil.annotations.ContributesMultibinding
-import javax.inject.Inject
 import kotlinx.coroutines.runBlocking
+import javax.inject.Inject
 
 @ContributesMultibinding(AppScope::class)
 class SurveyActionMapper @Inject constructor(

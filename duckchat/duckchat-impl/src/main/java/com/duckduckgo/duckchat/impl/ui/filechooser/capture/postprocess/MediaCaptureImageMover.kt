@@ -21,10 +21,10 @@ import android.net.Uri
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.squareup.anvil.annotations.ContributesBinding
+import kotlinx.coroutines.withContext
 import java.io.File
 import java.io.FileOutputStream
 import javax.inject.Inject
-import kotlinx.coroutines.withContext
 
 interface MediaCaptureImageMover {
     suspend fun moveInternal(contentUri: Uri): File?

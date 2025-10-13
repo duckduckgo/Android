@@ -25,11 +25,11 @@ import com.squareup.anvil.annotations.ContributesBinding
 import com.wireguard.android.backend.GoBackend
 import com.wireguard.crypto.Key
 import dagger.SingleInstanceIn
-import javax.inject.Inject
-import javax.inject.Provider
 import logcat.LogPriority.ERROR
 import logcat.LogPriority.VERBOSE
 import logcat.logcat
+import javax.inject.Inject
+import javax.inject.Provider
 
 interface WgProtocol {
     fun startWg(

@@ -71,7 +71,7 @@ class RedactDomainTest {
                     at java.net.AbstractPlainSocketImpl.doConnect(AbstractPlainSocketImpl.java:357)
                     at java.net.AbstractPlainSocketImpl.connectToAddress(AbstractPlainSocketImpl.java:201)
                     at java.net.AbstractPlainSocketImpl.connect(AbstractPlainSocketImpl.java:183)
-                    at java.net.SocksSocketImpl.connect(SocksSocketImpl.java:356)        
+                    at java.net.SocksSocketImpl.connect(SocksSocketImpl.java:356)
                     ... 6 more
         """.trimIndent()
 

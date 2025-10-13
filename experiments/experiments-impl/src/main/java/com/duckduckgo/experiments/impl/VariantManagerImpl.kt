@@ -23,10 +23,10 @@ import com.duckduckgo.experiments.api.VariantConfig
 import com.duckduckgo.experiments.api.VariantManager
 import com.duckduckgo.experiments.impl.reinstalls.REINSTALL_VARIANT
 import com.squareup.anvil.annotations.ContributesBinding
-import javax.inject.Inject
 import logcat.LogPriority.INFO
 import logcat.LogPriority.VERBOSE
 import logcat.logcat
+import javax.inject.Inject
 
 @WorkerThread
 @ContributesBinding(AppScope::class)

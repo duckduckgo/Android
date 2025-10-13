@@ -19,12 +19,12 @@ package com.duckduckgo.sync.crypto
 import android.content.Context
 import android.util.Base64
 import com.duckduckgo.library.loader.LibraryLoader
-import java.util.*
-import kotlin.system.exitProcess
 import logcat.LogPriority.ERROR
 import logcat.LogPriority.VERBOSE
 import logcat.asLog
 import logcat.logcat
+import java.util.*
+import kotlin.system.exitProcess
 
 interface SyncLib {
     fun generateAccountKeys(

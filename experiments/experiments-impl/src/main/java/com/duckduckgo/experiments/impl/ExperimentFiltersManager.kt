@@ -25,9 +25,9 @@ import com.duckduckgo.experiments.impl.ExperimentFiltersManagerImpl.ExperimentFi
 import com.duckduckgo.experiments.impl.ExperimentFiltersManagerImpl.ExperimentFilterType.PRIVACY_PRO_ELIGIBLE
 import com.duckduckgo.subscriptions.api.Subscriptions
 import com.squareup.anvil.annotations.ContributesBinding
+import kotlinx.coroutines.runBlocking
 import java.util.Locale
 import javax.inject.Inject
-import kotlinx.coroutines.runBlocking
 
 interface ExperimentFiltersManager {
     /**

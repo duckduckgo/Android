@@ -54,14 +54,14 @@ import com.duckduckgo.networkprotection.store.NetPGeoswitchingRepository.UserPre
 import com.duckduckgo.networkprotection.store.remote_config.NetPServerRepository
 import com.google.android.material.snackbar.Snackbar
 import com.wireguard.crypto.KeyPair
-import java.io.FileInputStream
-import java.text.SimpleDateFormat
-import java.util.*
-import javax.inject.Inject
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.io.FileInputStream
+import java.text.SimpleDateFormat
+import java.util.*
+import javax.inject.Inject
 
 @InjectWith(ActivityScope::class)
 class NetPInternalSettingsActivity : DuckDuckGoActivity() {

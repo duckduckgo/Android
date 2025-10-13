@@ -23,8 +23,8 @@ import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
-import javax.inject.Inject
 import kotlinx.coroutines.withContext
+import javax.inject.Inject
 
 interface SegmentCalculation {
 
@@ -41,7 +41,6 @@ interface SegmentCalculation {
 
     enum class ActivityType {
         APP_USE, SEARCH
-        ;
     }
 
     data class UserSegment(

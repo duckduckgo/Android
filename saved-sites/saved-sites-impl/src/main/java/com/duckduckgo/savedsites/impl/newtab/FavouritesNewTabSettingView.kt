@@ -42,10 +42,10 @@ import com.duckduckgo.saved.sites.impl.databinding.ViewFavouritesSettingsItemBin
 import com.duckduckgo.savedsites.impl.newtab.FavouritesNewTabSettingsViewModel.ViewState
 import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.android.support.AndroidSupportInjection
-import javax.inject.Inject
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import javax.inject.Inject
 
 @InjectWith(ViewScope::class)
 class FavouritesNewTabSettingView @JvmOverloads constructor(

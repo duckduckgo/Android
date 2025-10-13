@@ -22,7 +22,6 @@ import android.content.Intent
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
-import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition
 import com.duckduckgo.app.global.DefaultRoleBrowserDialog
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.ADDRESS_BAR_POSITION
@@ -57,15 +56,16 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Unique
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.browser.ui.omnibar.OmnibarPosition
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.FragmentScope
-import javax.inject.Inject
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import javax.inject.Inject
 
 @SuppressLint("StaticFieldLeak")
 @ContributesViewModel(FragmentScope::class)
@@ -79,7 +79,6 @@ class WelcomePageViewModel @Inject constructor(
     private val appBuildConfig: AppBuildConfig,
     private val onboardingDesignExperimentManager: OnboardingDesignExperimentManager,
 ) : ViewModel() {
-
     private val _commands = Channel<Command>(1, DROP_OLDEST)
     val commands: Flow<Command> = _commands.receiveAsFlow()
 
@@ -87,14 +86,26 @@ class WelcomePageViewModel @Inject constructor(
 
     sealed interface Command {
         data object ShowInitialReinstallUserDialog : Command
+
         data object ShowInitialDialog : Command
+
         data object ShowComparisonChart : Command
+
         data object ShowSkipOnboardingOption : Command
-        data class ShowDefaultBrowserDialog(val intent: Intent) : Command
+
+        data class ShowDefaultBrowserDialog(
+            val intent: Intent,
+        ) : Command
+
         data object ShowAddressBarPositionDialog : Command
+
         data object Finish : Command
+
         data object OnboardingSkipped : Command
-        data class SetAddressBarPositionOptions(val defaultOption: Boolean) : Command
+
+        data class SetAddressBarPositionOptions(
+            val defaultOption: Boolean,
+        ) : Command
     }
 
     fun onPrimaryCtaClicked(currentDialog: PreOnboardingDialogType) {
@@ -265,9 +276,8 @@ class WelcomePageViewModel @Inject constructor(
         }
     }
 
-    private suspend fun isAppReinstall(): Boolean {
-        return withContext(dispatchers.io()) {
+    private suspend fun isAppReinstall(): Boolean =
+        withContext(dispatchers.io()) {
             appBuildConfig.isAppReinstall()
         }
-    }
 }

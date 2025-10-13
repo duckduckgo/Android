@@ -26,9 +26,6 @@ import com.duckduckgo.networkprotection.impl.configuration.WgTunnelConfig
 import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixels
 import com.wireguard.config.Config
 import com.wireguard.crypto.KeyPair
-import java.io.BufferedReader
-import java.io.StringReader
-import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule
@@ -43,6 +40,9 @@ import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.verifyNoMoreInteractions
 import org.mockito.kotlin.whenever
+import java.io.BufferedReader
+import java.io.StringReader
+import java.util.concurrent.TimeUnit
 
 class FailureRecoveryHandlerTest {
 
@@ -283,7 +283,7 @@ class FailureRecoveryHandlerTest {
                     DNS = ${serverData.gateway}
                     MTU = 1280
                     PrivateKey = ${keys.privateKey.toBase64()}
-                    
+
                     [Peer]
                     AllowedIPs = 0.0.0.0/0
                     Endpoint = ${serverData.publicEndpoint}

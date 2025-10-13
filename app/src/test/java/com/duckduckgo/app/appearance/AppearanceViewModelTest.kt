@@ -21,14 +21,14 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import app.cash.turbine.test
 import com.duckduckgo.app.appearance.AppearanceViewModel.Command
-import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition.BOTTOM
-import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition.TOP
 import com.duckduckgo.app.icon.api.AppIcon
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.settings.clear.FireAnimation
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.tabs.store.TabSwitcherDataStore
+import com.duckduckgo.browser.ui.omnibar.OmnibarPosition.BOTTOM
+import com.duckduckgo.browser.ui.omnibar.OmnibarPosition.TOP
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.ui.DuckDuckGoTheme
 import com.duckduckgo.common.ui.store.AppTheme
@@ -83,26 +83,28 @@ internal class AppearanceViewModelTest {
         whenever(mockAppSettingsDataStore.omnibarPosition).thenReturn(TOP)
         whenever(mockTabSwitcherDataStore.isTrackersAnimationInfoTileHidden()).thenReturn(flowOf(false))
 
-        testee = AppearanceViewModel(
-            mockThemeSettingsDataStore,
-            mockAppSettingsDataStore,
-            mockPixel,
-            coroutineTestRule.testDispatcherProvider,
-            mockTabSwitcherDataStore,
-        )
+        testee =
+            AppearanceViewModel(
+                mockThemeSettingsDataStore,
+                mockAppSettingsDataStore,
+                mockPixel,
+                coroutineTestRule.testDispatcherProvider,
+                mockTabSwitcherDataStore,
+            )
     }
 
     @Test
-    fun whenInitialisedThenViewStateEmittedWithDefaultValues() = runTest {
-        testee.viewState().test {
-            val value = awaitItem()
+    fun whenInitialisedThenViewStateEmittedWithDefaultValues() =
+        runTest {
+            testee.viewState().test {
+                val value = awaitItem()
 
-            assertEquals(DuckDuckGoTheme.SYSTEM_DEFAULT, value.theme)
-            assertEquals(AppIcon.DEFAULT, value.appIcon)
+                assertEquals(DuckDuckGoTheme.SYSTEM_DEFAULT, value.theme)
+                assertEquals(AppIcon.DEFAULT, value.appIcon)
 
-            cancelAndConsumeRemainingEvents()
+                cancelAndConsumeRemainingEvents()
+            }
         }
-    }
 
     @Test
     fun whenThemeSettingsClickedThenPixelSent() {
@@ -111,41 +113,44 @@ internal class AppearanceViewModelTest {
     }
 
     @Test
-    fun whenThemeSettingsClickedThenCommandIsLaunchThemeSettingsIsSent() = runTest {
-        testee.commands().test {
-            testee.userRequestedToChangeTheme()
+    fun whenThemeSettingsClickedThenCommandIsLaunchThemeSettingsIsSent() =
+        runTest {
+            testee.commands().test {
+                testee.userRequestedToChangeTheme()
 
-            assertEquals(Command.LaunchThemeSettings(DuckDuckGoTheme.LIGHT), awaitItem())
+                assertEquals(Command.LaunchThemeSettings(DuckDuckGoTheme.LIGHT), awaitItem())
 
-            cancelAndIgnoreRemainingEvents()
+                cancelAndIgnoreRemainingEvents()
+            }
         }
-    }
 
     @Test
-    fun whenChangeIconRequestedThenCommandIsChangeIconAndPixelSent() = runTest {
-        testee.commands().test {
-            testee.userRequestedToChangeIcon()
+    fun whenChangeIconRequestedThenCommandIsChangeIconAndPixelSent() =
+        runTest {
+            testee.commands().test {
+                testee.userRequestedToChangeIcon()
 
-            assertEquals(Command.LaunchAppIcon, awaitItem())
-            verify(mockPixel).fire(AppPixelName.SETTINGS_APP_ICON_PRESSED)
+                assertEquals(Command.LaunchAppIcon, awaitItem())
+                verify(mockPixel).fire(AppPixelName.SETTINGS_APP_ICON_PRESSED)
 
-            cancelAndConsumeRemainingEvents()
+                cancelAndConsumeRemainingEvents()
+            }
         }
-    }
 
     @Test
-    fun whenThemeChangedThenDataStoreIsUpdatedAndUpdateThemeCommandIsSent() = runTest {
-        testee.commands().test {
-            givenThemeSelected(DuckDuckGoTheme.LIGHT)
-            testee.onThemeSelected(DuckDuckGoTheme.DARK)
+    fun whenThemeChangedThenDataStoreIsUpdatedAndUpdateThemeCommandIsSent() =
+        runTest {
+            testee.commands().test {
+                givenThemeSelected(DuckDuckGoTheme.LIGHT)
+                testee.onThemeSelected(DuckDuckGoTheme.DARK)
 
-            verify(mockThemeSettingsDataStore).theme = DuckDuckGoTheme.DARK
+                verify(mockThemeSettingsDataStore).theme = DuckDuckGoTheme.DARK
 
-            assertEquals(Command.UpdateTheme, awaitItem())
+                assertEquals(Command.UpdateTheme, awaitItem())
 
-            cancelAndConsumeRemainingEvents()
+                cancelAndConsumeRemainingEvents()
+            }
         }
-    }
 
     @Test
     fun whenThemeChangedToLightThenLightThemePixelIsSent() {
@@ -169,128 +174,139 @@ internal class AppearanceViewModelTest {
     }
 
     @Test
-    fun whenThemeChangedButThemeWasAlreadySetThenDoNothing() = runTest {
-        testee.commands().test {
-            givenThemeSelected(DuckDuckGoTheme.LIGHT)
-            testee.onThemeSelected(DuckDuckGoTheme.LIGHT)
+    fun whenThemeChangedButThemeWasAlreadySetThenDoNothing() =
+        runTest {
+            testee.commands().test {
+                givenThemeSelected(DuckDuckGoTheme.LIGHT)
+                testee.onThemeSelected(DuckDuckGoTheme.LIGHT)
 
-            verify(mockPixel, never()).fire(AppPixelName.SETTINGS_THEME_TOGGLED_LIGHT)
-            verify(mockThemeSettingsDataStore, never()).theme = DuckDuckGoTheme.LIGHT
+                verify(mockPixel, never()).fire(AppPixelName.SETTINGS_THEME_TOGGLED_LIGHT)
+                verify(mockThemeSettingsDataStore, never()).theme = DuckDuckGoTheme.LIGHT
 
-            expectNoEvents()
+                expectNoEvents()
 
-            cancelAndConsumeRemainingEvents()
+                cancelAndConsumeRemainingEvents()
+            }
         }
-    }
 
     @Test
-    fun whenForceDarkModeSettingEnabledChangeThenStoreUpdated() = runTest {
-        testee.onForceDarkModeSettingChanged(true)
-        verify(mockAppSettingsDataStore).experimentalWebsiteDarkMode = true
-        verify(mockPixel).fire(AppPixelName.FORCE_DARK_MODE_ENABLED)
-    }
-
-    @Test
-    fun whenForceDarkModeSettingDisabledChangeThenStoreUpdated() = runTest {
-        testee.onForceDarkModeSettingChanged(false)
-        verify(mockAppSettingsDataStore).experimentalWebsiteDarkMode = false
-        verify(mockPixel).fire(AppPixelName.FORCE_DARK_MODE_DISABLED)
-    }
-
-    @Test
-    fun whenOmnibarPositionSettingPressed() = runTest {
-        testee.commands().test {
-            testee.userRequestedToChangeAddressBarPosition()
-            assertEquals(Command.LaunchOmnibarPositionSettings(TOP), awaitItem())
-            verify(mockPixel).fire(AppPixelName.SETTINGS_ADDRESS_BAR_POSITION_PRESSED)
+    fun whenForceDarkModeSettingEnabledChangeThenStoreUpdated() =
+        runTest {
+            testee.onForceDarkModeSettingChanged(true)
+            verify(mockAppSettingsDataStore).experimentalWebsiteDarkMode = true
+            verify(mockPixel).fire(AppPixelName.FORCE_DARK_MODE_ENABLED)
         }
-    }
 
     @Test
-    fun whenOmnibarPositionUpdatedToBottom() = runTest {
-        testee.onOmnibarPositionUpdated(BOTTOM)
-        verify(mockAppSettingsDataStore).omnibarPosition = BOTTOM
-        verify(mockPixel).fire(AppPixelName.SETTINGS_ADDRESS_BAR_POSITION_SELECTED_BOTTOM)
-    }
-
-    @Test
-    fun whenOmnibarPositionUpdatedToTop() = runTest {
-        testee.onOmnibarPositionUpdated(TOP)
-        verify(mockAppSettingsDataStore).omnibarPosition = TOP
-        verify(mockPixel).fire(AppPixelName.SETTINGS_ADDRESS_BAR_POSITION_SELECTED_TOP)
-    }
-
-    @Test
-    fun whenFullSiteAddressEnabled() = runTest {
-        val enabled = true
-        testee.onFullUrlSettingChanged(enabled)
-        verify(mockAppSettingsDataStore).isFullUrlEnabled = enabled
-        val params = mapOf(Pixel.PixelParameter.IS_ENABLED to enabled.toString())
-        verify(mockPixel).fire(
-            AppPixelName.SETTINGS_APPEARANCE_IS_FULL_URL_OPTION_TOGGLED,
-            params,
-            emptyMap(),
-            Pixel.PixelType.Count,
-        )
-    }
-
-    @Test
-    fun whenFullSiteAddressDisabled() = runTest {
-        val enabled = false
-        testee.onFullUrlSettingChanged(enabled)
-        verify(mockAppSettingsDataStore).isFullUrlEnabled = enabled
-        val params = mapOf(Pixel.PixelParameter.IS_ENABLED to enabled.toString())
-        verify(mockPixel).fire(
-            AppPixelName.SETTINGS_APPEARANCE_IS_FULL_URL_OPTION_TOGGLED,
-            params,
-            emptyMap(),
-            Pixel.PixelType.Count,
-        )
-    }
-
-    @Test
-    fun `when tracker count in tab switcher is enabled then setting enabled`() = runTest {
-        val enabled = true
-        testee.onShowTrackersCountInTabSwitcherChanged(enabled)
-        verify(mockTabSwitcherDataStore).setTrackersAnimationInfoTileHidden(!enabled)
-        val params = mapOf(Pixel.PixelParameter.IS_ENABLED to enabled.toString())
-        verify(mockPixel).fire(
-            AppPixelName.SETTINGS_APPEARANCE_IS_TRACKER_COUNT_IN_TAB_SWITCHER_TOGGLED,
-            params,
-            emptyMap(),
-            Pixel.PixelType.Count,
-        )
-    }
-
-    @Test
-    fun `when tracker count in tab switcher is disabled then setting disabled`() = runTest {
-        val enabled = false
-        testee.onShowTrackersCountInTabSwitcherChanged(enabled)
-        verify(mockTabSwitcherDataStore).setTrackersAnimationInfoTileHidden(!enabled)
-        val params = mapOf(Pixel.PixelParameter.IS_ENABLED to enabled.toString())
-        verify(mockPixel).fire(
-            AppPixelName.SETTINGS_APPEARANCE_IS_TRACKER_COUNT_IN_TAB_SWITCHER_TOGGLED,
-            params,
-            emptyMap(),
-            Pixel.PixelType.Count,
-        )
-    }
-
-    @Test
-    fun whenInitialisedAndLightThemeThenViewStateEmittedWithProperValues() = runTest {
-        whenever(mockThemeSettingsDataStore.theme).thenReturn(DuckDuckGoTheme.LIGHT)
-        whenever(mockAppTheme.isLightModeEnabled()).thenReturn(true)
-
-        testee.viewState().test {
-            val value = expectMostRecentItem()
-
-            assertEquals(DuckDuckGoTheme.LIGHT, value.theme)
-            assertEquals(AppIcon.DEFAULT, value.appIcon)
-            assertEquals(false, value.forceDarkModeEnabled)
-
-            cancelAndConsumeRemainingEvents()
+    fun whenForceDarkModeSettingDisabledChangeThenStoreUpdated() =
+        runTest {
+            testee.onForceDarkModeSettingChanged(false)
+            verify(mockAppSettingsDataStore).experimentalWebsiteDarkMode = false
+            verify(mockPixel).fire(AppPixelName.FORCE_DARK_MODE_DISABLED)
         }
-    }
+
+    @Test
+    fun whenOmnibarPositionSettingPressed() =
+        runTest {
+            testee.commands().test {
+                testee.userRequestedToChangeAddressBarPosition()
+                assertEquals(Command.LaunchOmnibarPositionSettings(TOP), awaitItem())
+                verify(mockPixel).fire(AppPixelName.SETTINGS_ADDRESS_BAR_POSITION_PRESSED)
+            }
+        }
+
+    @Test
+    fun whenOmnibarPositionUpdatedToBottom() =
+        runTest {
+            testee.onOmnibarPositionUpdated(BOTTOM)
+            verify(mockAppSettingsDataStore).omnibarPosition = BOTTOM
+            verify(mockPixel).fire(AppPixelName.SETTINGS_ADDRESS_BAR_POSITION_SELECTED_BOTTOM)
+        }
+
+    @Test
+    fun whenOmnibarPositionUpdatedToTop() =
+        runTest {
+            testee.onOmnibarPositionUpdated(TOP)
+            verify(mockAppSettingsDataStore).omnibarPosition = TOP
+            verify(mockPixel).fire(AppPixelName.SETTINGS_ADDRESS_BAR_POSITION_SELECTED_TOP)
+        }
+
+    @Test
+    fun whenFullSiteAddressEnabled() =
+        runTest {
+            val enabled = true
+            testee.onFullUrlSettingChanged(enabled)
+            verify(mockAppSettingsDataStore).isFullUrlEnabled = enabled
+            val params = mapOf(Pixel.PixelParameter.IS_ENABLED to enabled.toString())
+            verify(mockPixel).fire(
+                AppPixelName.SETTINGS_APPEARANCE_IS_FULL_URL_OPTION_TOGGLED,
+                params,
+                emptyMap(),
+                Pixel.PixelType.Count,
+            )
+        }
+
+    @Test
+    fun whenFullSiteAddressDisabled() =
+        runTest {
+            val enabled = false
+            testee.onFullUrlSettingChanged(enabled)
+            verify(mockAppSettingsDataStore).isFullUrlEnabled = enabled
+            val params = mapOf(Pixel.PixelParameter.IS_ENABLED to enabled.toString())
+            verify(mockPixel).fire(
+                AppPixelName.SETTINGS_APPEARANCE_IS_FULL_URL_OPTION_TOGGLED,
+                params,
+                emptyMap(),
+                Pixel.PixelType.Count,
+            )
+        }
+
+    @Test
+    fun `when tracker count in tab switcher is enabled then setting enabled`() =
+        runTest {
+            val enabled = true
+            testee.onShowTrackersCountInTabSwitcherChanged(enabled)
+            verify(mockTabSwitcherDataStore).setTrackersAnimationInfoTileHidden(!enabled)
+            val params = mapOf(Pixel.PixelParameter.IS_ENABLED to enabled.toString())
+            verify(mockPixel).fire(
+                AppPixelName.SETTINGS_APPEARANCE_IS_TRACKER_COUNT_IN_TAB_SWITCHER_TOGGLED,
+                params,
+                emptyMap(),
+                Pixel.PixelType.Count,
+            )
+        }
+
+    @Test
+    fun `when tracker count in tab switcher is disabled then setting disabled`() =
+        runTest {
+            val enabled = false
+            testee.onShowTrackersCountInTabSwitcherChanged(enabled)
+            verify(mockTabSwitcherDataStore).setTrackersAnimationInfoTileHidden(!enabled)
+            val params = mapOf(Pixel.PixelParameter.IS_ENABLED to enabled.toString())
+            verify(mockPixel).fire(
+                AppPixelName.SETTINGS_APPEARANCE_IS_TRACKER_COUNT_IN_TAB_SWITCHER_TOGGLED,
+                params,
+                emptyMap(),
+                Pixel.PixelType.Count,
+            )
+        }
+
+    @Test
+    fun whenInitialisedAndLightThemeThenViewStateEmittedWithProperValues() =
+        runTest {
+            whenever(mockThemeSettingsDataStore.theme).thenReturn(DuckDuckGoTheme.LIGHT)
+            whenever(mockAppTheme.isLightModeEnabled()).thenReturn(true)
+
+            testee.viewState().test {
+                val value = expectMostRecentItem()
+
+                assertEquals(DuckDuckGoTheme.LIGHT, value.theme)
+                assertEquals(AppIcon.DEFAULT, value.appIcon)
+                assertEquals(false, value.forceDarkModeEnabled)
+
+                cancelAndConsumeRemainingEvents()
+            }
+        }
 
     private fun givenThemeSelected(theme: DuckDuckGoTheme) {
         whenever(mockThemeSettingsDataStore.theme).thenReturn(theme)

@@ -23,6 +23,9 @@ import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerManua
 import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerManualScanStarted
 import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerOptOutActionFailed
 import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerOptOutActionSucceeded
+import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerRecordEmailConfirmationCompleted
+import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerRecordEmailConfirmationNeeded
+import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerRecordEmailConfirmationStarted
 import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerRecordOptOutCompleted
 import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerRecordOptOutStarted
 import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerScanActionFailed
@@ -43,6 +46,7 @@ import com.duckduckgo.pir.impl.scripts.models.PirSuccessResponse.NavigateRespons
 import com.duckduckgo.pir.impl.scripts.models.PirSuccessResponse.SolveCaptchaResponse
 import com.duckduckgo.pir.impl.store.PirEventsRepository
 import com.duckduckgo.pir.impl.store.PirRepository
+import com.duckduckgo.pir.impl.store.PirSchedulingRepository
 import com.duckduckgo.pir.impl.store.db.BrokerScanEventType.BROKER_ERROR
 import com.duckduckgo.pir.impl.store.db.BrokerScanEventType.BROKER_STARTED
 import com.duckduckgo.pir.impl.store.db.BrokerScanEventType.BROKER_SUCCESS
@@ -51,13 +55,15 @@ import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.adapters.PolymorphicJsonAdapterFactory
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
-import javax.inject.Inject
 import kotlinx.coroutines.withContext
+import javax.inject.Inject
 
 interface PirRunStateHandler {
     suspend fun handleState(pirRunState: PirRunState)
 
-    sealed class PirRunState(open val brokerName: String) {
+    sealed class PirRunState(
+        open val brokerName: String,
+    ) {
         data class BrokerManualScanStarted(
             override val brokerName: String,
             val eventTimeInMillis: Long,
@@ -99,6 +105,27 @@ interface PirRunStateHandler {
             val message: String,
         ) : PirRunState(brokerName)
 
+        data class BrokerRecordEmailConfirmationNeeded(
+            override val brokerName: String,
+            val extractedProfile: ExtractedProfile,
+            val attemptId: String,
+            val lastActionId: String,
+        ) : PirRunState(brokerName)
+
+        data class BrokerRecordEmailConfirmationStarted(
+            override val brokerName: String,
+            val extractedProfileId: Long,
+            val firstActionId: String,
+        ) : PirRunState(brokerName)
+
+        data class BrokerRecordEmailConfirmationCompleted(
+            override val brokerName: String,
+            val extractedProfileId: Long,
+            val isSuccess: Boolean,
+            val lastActionId: String,
+            val totalTimeMillis: Long,
+        ) : PirRunState(brokerName)
+
         data class BrokerRecordOptOutStarted(
             override val brokerName: String,
             val extractedProfile: ExtractedProfile,
@@ -138,36 +165,124 @@ class RealPirRunStateHandler @Inject constructor(
     private val pixelSender: PirPixelSender,
     private val dispatcherProvider: DispatcherProvider,
     private val jobRecordUpdater: JobRecordUpdater,
+    private val pirSchedulingRepository: PirSchedulingRepository,
 ) : PirRunStateHandler {
     private val moshi: Moshi by lazy {
-        Moshi.Builder().add(
-            PolymorphicJsonAdapterFactory.of(PirSuccessResponse::class.java, "actionType")
-                .withSubtype(NavigateResponse::class.java, "navigate")
-                .withSubtype(ExtractedResponse::class.java, "extract")
-                .withSubtype(GetCaptchaInfoResponse::class.java, "getCaptchaInfo")
-                .withSubtype(SolveCaptchaResponse::class.java, "solveCaptcha")
-                .withSubtype(ClickResponse::class.java, "click")
-                .withSubtype(ExpectationResponse::class.java, "expectation")
-                .withSubtype(FillFormResponse::class.java, "fillForm"),
-        ).add(KotlinJsonAdapterFactory())
+        Moshi
+            .Builder()
+            .add(
+                PolymorphicJsonAdapterFactory
+                    .of(PirSuccessResponse::class.java, "actionType")
+                    .withSubtype(NavigateResponse::class.java, "navigate")
+                    .withSubtype(ExtractedResponse::class.java, "extract")
+                    .withSubtype(GetCaptchaInfoResponse::class.java, "getCaptchaInfo")
+                    .withSubtype(SolveCaptchaResponse::class.java, "solveCaptcha")
+                    .withSubtype(ClickResponse::class.java, "click")
+                    .withSubtype(ExpectationResponse::class.java, "expectation")
+                    .withSubtype(FillFormResponse::class.java, "fillForm"),
+            ).add(KotlinJsonAdapterFactory())
             .build()
     }
 
     private val pirSuccessAdapter by lazy { moshi.adapter(PirSuccessResponse::class.java) }
 
-    override suspend fun handleState(pirRunState: PirRunState) = withContext(dispatcherProvider.io()) {
-        when (pirRunState) {
-            is BrokerManualScanStarted -> handleBrokerManualScanStarted(pirRunState)
-            is BrokerManualScanCompleted -> handleBrokerManualScanCompleted(pirRunState)
-            is BrokerScheduledScanStarted -> handleBrokerScheduledScanStarted(pirRunState)
-            is BrokerScheduledScanCompleted -> handleBrokerScheduledScanCompleted(pirRunState)
-            is BrokerScanActionSucceeded -> handleBrokerScanActionSucceeded(pirRunState)
-            is BrokerScanActionFailed -> handleBrokerScanActionFailed(pirRunState)
-            is BrokerRecordOptOutStarted -> handleRecordOptOutStarted(pirRunState)
-            is BrokerRecordOptOutCompleted -> handleRecordOptOutCompleted(pirRunState)
-            is BrokerOptOutActionSucceeded -> handleBrokerOptOutActionSucceeded(pirRunState)
-            is BrokerOptOutActionFailed -> handleBrokerOptOutActionFailed(pirRunState)
-            else -> {}
+    override suspend fun handleState(pirRunState: PirRunState) =
+        withContext(dispatcherProvider.io()) {
+            when (pirRunState) {
+                is BrokerManualScanStarted -> handleBrokerManualScanStarted(pirRunState)
+                is BrokerManualScanCompleted -> handleBrokerManualScanCompleted(pirRunState)
+                is BrokerScheduledScanStarted -> handleBrokerScheduledScanStarted(pirRunState)
+                is BrokerScheduledScanCompleted -> handleBrokerScheduledScanCompleted(pirRunState)
+                is BrokerScanActionSucceeded -> handleBrokerScanActionSucceeded(pirRunState)
+                is BrokerScanActionFailed -> handleBrokerScanActionFailed(pirRunState)
+                is BrokerRecordOptOutStarted -> handleRecordOptOutStarted(pirRunState)
+                is BrokerRecordOptOutCompleted -> handleRecordOptOutCompleted(pirRunState)
+                is BrokerOptOutActionSucceeded -> handleBrokerOptOutActionSucceeded(pirRunState)
+                is BrokerOptOutActionFailed -> handleBrokerOptOutActionFailed(pirRunState)
+                is BrokerRecordEmailConfirmationNeeded -> handleBrokerRecordEmailConfirmationNeeded(pirRunState)
+                is BrokerRecordEmailConfirmationStarted -> handleBrokerRecordEmailConfirmationStarted(pirRunState)
+                is BrokerRecordEmailConfirmationCompleted -> handleBrokerRecordEmailConfirmationCompleted(pirRunState)
+                else -> {}
+            }
+        }
+
+    private suspend fun handleBrokerRecordEmailConfirmationStarted(pirRunState: BrokerRecordEmailConfirmationStarted) {
+        val updatedRecord = jobRecordUpdater.recordEmailConfirmationAttempt(pirRunState.extractedProfileId)
+        val broker = repository.getBrokerForName(pirRunState.brokerName)
+
+        if (broker != null && updatedRecord != null) {
+            pixelSender.reportEmailConfirmationAttemptStart(
+                brokerUrl = broker.url,
+                brokerVersion = broker.version,
+                attemptNumber = updatedRecord.jobAttemptData.jobAttemptCount,
+                attemptId = updatedRecord.emailData.attemptId,
+                actionId = pirRunState.firstActionId,
+            )
+        }
+    }
+
+    private suspend fun handleBrokerRecordEmailConfirmationCompleted(pirRunState: BrokerRecordEmailConfirmationCompleted) {
+        val broker = repository.getBrokerForName(pirRunState.brokerName)
+
+        if (pirRunState.isSuccess) {
+            // The job we pass to the engine could have outdated info so we just re-fetch it
+            val updatedRecord = pirSchedulingRepository.getEmailConfirmationJob(pirRunState.extractedProfileId)
+
+            if (broker != null && updatedRecord != null) {
+                pixelSender.reportEmailConfirmationAttemptSuccess(
+                    brokerUrl = broker.url,
+                    brokerVersion = broker.version,
+                    attemptNumber = updatedRecord.jobAttemptData.jobAttemptCount,
+                    actionId = pirRunState.lastActionId,
+                    attemptId = updatedRecord.emailData.attemptId,
+                    durationMs = pirRunState.totalTimeMillis,
+                )
+            }
+
+            jobRecordUpdater.recordEmailConfirmationCompleted(pirRunState.extractedProfileId)
+
+            broker?.let {
+                pixelSender.reportEmailConfirmationJobSuccess(
+                    brokerUrl = it.url,
+                    brokerVersion = it.version,
+                )
+            }
+        } else {
+            val updatedRecord = jobRecordUpdater.recordEmailConfirmationFailed(
+                pirRunState.extractedProfileId,
+                pirRunState.lastActionId,
+            )
+
+            if (broker != null && updatedRecord != null) {
+                pixelSender.reportEmailConfirmationAttemptFailed(
+                    brokerUrl = broker.url,
+                    brokerVersion = broker.version,
+                    attemptNumber = updatedRecord.jobAttemptData.jobAttemptCount,
+                    attemptId = updatedRecord.emailData.attemptId,
+                    actionId = updatedRecord.jobAttemptData.lastJobAttemptActionId,
+                    durationMs = pirRunState.totalTimeMillis,
+                )
+            }
+        }
+    }
+
+    private suspend fun handleBrokerRecordEmailConfirmationNeeded(pirRunState: BrokerRecordEmailConfirmationNeeded) {
+        jobRecordUpdater.markOptOutAsWaitingForEmailConfirmation(
+            profileQueryId = pirRunState.extractedProfile.profileQueryId,
+            extractedProfileId = pirRunState.extractedProfile.dbId,
+            brokerName = pirRunState.brokerName,
+            email = pirRunState.extractedProfile.email,
+            attemptId = pirRunState.attemptId,
+        )
+        repository.getBrokerForName(pirRunState.brokerName)?.let {
+            pixelSender.reportStagePendingEmailConfirmation(
+                brokerUrl = it.url,
+                brokerVersion = it.version,
+                attemptId = pirRunState.attemptId,
+                actionId = pirRunState.lastActionId,
+                durationMs = 0L, // TODO: Add proper action duration once we introduce stage pixels
+                tries = 0, // TODO: Add proper action tries once we introduce stage pixels
+            )
         }
     }
 
@@ -241,43 +356,46 @@ class RealPirRunStateHandler @Inject constructor(
 
     private suspend fun handleBrokerScanActionSucceeded(state: BrokerScanActionSucceeded) {
         when (state.pirSuccessResponse) {
-            is ExtractedResponse -> state.pirSuccessResponse.response.map {
-                ExtractedProfile(
-                    profileUrl = it.profileUrl.orEmpty(),
-                    profileQueryId = state.profileQueryId,
-                    brokerName = state.brokerName,
-                    name = it.name.orEmpty(),
-                    alternativeNames = it.alternativeNames,
-                    age = it.age.orEmpty(),
-                    addresses = it.addresses.map { item ->
-                        AddressCityState(
-                            city = item.city,
-                            state = item.state,
-                            fullAddress = item.fullAddress,
+            is ExtractedResponse ->
+                state.pirSuccessResponse.response
+                    .map {
+                        ExtractedProfile(
+                            profileUrl = it.profileUrl.orEmpty(),
+                            profileQueryId = state.profileQueryId,
+                            brokerName = state.brokerName,
+                            name = it.name.orEmpty(),
+                            alternativeNames = it.alternativeNames,
+                            age = it.age.orEmpty(),
+                            addresses =
+                            it.addresses.map { item ->
+                                AddressCityState(
+                                    city = item.city,
+                                    state = item.state,
+                                    fullAddress = item.fullAddress,
+                                )
+                            },
+                            phoneNumbers = it.phoneNumbers,
+                            relatives = it.relatives,
+                            identifier = it.identifier.orEmpty(),
+                            reportId = it.reportId.orEmpty(),
+                            email = it.email.orEmpty(),
+                            fullName = it.fullName.orEmpty(),
                         )
-                    },
-                    phoneNumbers = it.phoneNumbers,
-                    relatives = it.relatives,
-                    identifier = it.identifier.orEmpty(),
-                    reportId = it.reportId.orEmpty(),
-                    email = it.email.orEmpty(),
-                    fullName = it.fullName.orEmpty(),
-                )
-            }.also {
-                if (it.isNotEmpty()) {
-                    /**
-                     * For every locally stored extractedProfile for the broker x profile that is not part of the newly received extracted Profiles,
-                     * - We update the optOut status to REMOVED
-                     * - We store the new extracted profiles. We ignore the ones that already exist.
-                     * - Update the corresponding ScanJobRecord
-                     */
-                    jobRecordUpdater.markRemovedOptOutJobRecords(it, state.brokerName, state.profileQueryId)
-                    repository.saveNewExtractedProfiles(it)
-                    jobRecordUpdater.updateScanMatchesFound(state.brokerName, state.profileQueryId)
-                } else {
-                    jobRecordUpdater.updateScanNoMatchFound(state.brokerName, state.profileQueryId)
-                }
-            }
+                    }.also {
+                        if (it.isNotEmpty()) {
+                            /**
+                             * For every locally stored extractedProfile for the broker x profile that is not part of the newly received extracted Profiles,
+                             * - We update the optOut status to REMOVED
+                             * - We store the new extracted profiles. We ignore the ones that already exist.
+                             * - Update the corresponding ScanJobRecord
+                             */
+                            jobRecordUpdater.markRemovedOptOutJobRecords(it, state.brokerName, state.profileQueryId)
+                            repository.saveNewExtractedProfiles(it)
+                            jobRecordUpdater.updateScanMatchesFound(state.brokerName, state.profileQueryId)
+                        } else {
+                            jobRecordUpdater.updateScanNoMatchFound(state.brokerName, state.profileQueryId)
+                        }
+                    }
 
             else -> {}
         }

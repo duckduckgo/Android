@@ -30,9 +30,6 @@ import com.duckduckgo.feature.toggles.impl.FakePluginPoint
 import com.duckduckgo.feature.toggles.impl.FakeStore
 import com.duckduckgo.feature.toggles.impl.RealFeatureTogglesInventory
 import com.duckduckgo.feature.toggles.impl.RetentionMetric
-import java.time.ZoneId
-import java.time.ZonedDateTime
-import java.time.format.DateTimeFormatter
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -40,6 +37,9 @@ import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import java.time.ZoneId
+import java.time.ZonedDateTime
+import java.time.format.DateTimeFormatter
 
 class RetentionMetricsAtbLifecyclePluginTest {
     @get:Rule

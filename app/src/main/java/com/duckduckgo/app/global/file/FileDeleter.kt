@@ -17,11 +17,11 @@
 package com.duckduckgo.app.global.file
 
 import com.duckduckgo.common.utils.DispatcherProvider
-import java.io.File
 import kotlinx.coroutines.withContext
 import logcat.LogPriority.ERROR
 import logcat.LogPriority.INFO
 import logcat.logcat
+import java.io.File
 
 interface FileDeleter {
 

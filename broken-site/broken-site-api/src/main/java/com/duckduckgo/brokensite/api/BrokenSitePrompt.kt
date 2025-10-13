@@ -74,5 +74,4 @@ interface BrokenSitePrompt {
 enum class RefreshPattern {
     TWICE_IN_12_SECONDS,
     THRICE_IN_20_SECONDS,
-    ;
 }

@@ -68,12 +68,12 @@ import com.duckduckgo.common.utils.FragmentViewModelFactory
 import com.duckduckgo.common.utils.extensions.html
 import com.duckduckgo.common.utils.extensions.preventWidows
 import com.duckduckgo.di.scopes.FragmentScope
-import javax.inject.Inject
-import kotlin.time.Duration.Companion.milliseconds
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
+import javax.inject.Inject
+import kotlin.time.Duration.Companion.milliseconds
 
 @InjectWith(FragmentScope::class)
 class BbWelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome_page_bb) {
@@ -312,7 +312,7 @@ class BbWelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome
                     binding.daxDialogCta.secondaryCta.isVisible = false
                     binding.daxDialogCta.comparisonChart.root.isVisible = true
 
-                    val titleText = it.getString(R.string.highlightsPreOnboardingDaxDialog2Title)
+                    val titleText = it.getString(R.string.preOnboardingDaxDialog2Title)
                     binding.daxDialogCta.comparisonChart.titleInvisible.text = titleText.html(context = it)
 
                     val comparisonChartViews = with(binding.daxDialogCta.comparisonChart) {
@@ -347,8 +347,8 @@ class BbWelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome
                     )
                     binding.daxDialogCta.skipOnboarding.root.isVisible = true
 
-                    val titleText = it.getString(R.string.highlightsPreOnboardingDaxDialog3Title)
-                    val descriptionText = it.getString(R.string.highlightsPreOnboardingDaxDialog3Text)
+                    val titleText = it.getString(R.string.preOnboardingDaxDialog3Title)
+                    val descriptionText = it.getString(R.string.preOnboardingDaxDialog3Text)
 
                     binding.daxDialogCta.skipOnboarding.dialogTitleInvisible.text = titleText.html(context = it)
                     binding.daxDialogCta.skipOnboarding.descriptionInvisible.text = descriptionText.html(context = it)
@@ -398,12 +398,12 @@ class BbWelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome
                     )
                     binding.daxDialogCta.addressBarPosition.root.isVisible = true
 
-                    binding.daxDialogCta.primaryCta.text = it.getString(R.string.highlightsPreOnboardingAddressBarOkButton)
+                    binding.daxDialogCta.primaryCta.text = it.getString(R.string.preOnboardingAddressBarOkButton)
                     binding.daxDialogCta.primaryCta.alpha = MIN_ALPHA
 
                     val contentViews = with(binding.daxDialogCta.addressBarPosition) { listOf(option1, option2) }
                     contentViews.forEach { view -> view.alpha = MIN_ALPHA }
-                    val titleText = getString(R.string.highlightsPreOnboardingAddressBarTitle).preventWidows()
+                    val titleText = getString(R.string.preOnboardingAddressBarTitle).preventWidows()
 
                     val (topImage, bottomImage) = if (appTheme.isLightModeEnabled()) {
                         R.drawable.bb_address_bar_top_light to R.drawable.bb_address_bar_bottom_light
@@ -752,7 +752,6 @@ class BbWelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome
                 drawableLight = R.drawable.bb_onboarding_background_04_light,
                 drawableDark = R.drawable.bb_onboarding_background_04_dark,
             ),
-            ;
         }
 
         private companion object {

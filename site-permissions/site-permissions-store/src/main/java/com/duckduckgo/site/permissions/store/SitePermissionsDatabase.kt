@@ -33,7 +33,6 @@ import com.duckduckgo.site.permissions.store.sitepermissionsallowed.SitePermissi
         SitePermissionAllowedEntity::class,
     ],
 )
-
 abstract class SitePermissionsDatabase : RoomDatabase() {
     abstract fun sitePermissionsDao(): SitePermissionsDao
     abstract fun sitePermissionsAllowedDao(): SitePermissionsAllowedDao

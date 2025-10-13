@@ -24,12 +24,12 @@ import com.duckduckgo.user.agent.impl.store.ClientBrandHintDatabase
 import com.duckduckgo.user.agent.impl.store.ClientHintBrandDomainEntity
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
-import java.util.concurrent.CopyOnWriteArrayList
-import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import logcat.LogPriority.INFO
 import logcat.logcat
+import java.util.concurrent.CopyOnWriteArrayList
+import javax.inject.Inject
 
 interface ClientBrandHintFeatureSettingsRepository {
     fun updateAllSettings(settings: ClientBrandHintSettings)

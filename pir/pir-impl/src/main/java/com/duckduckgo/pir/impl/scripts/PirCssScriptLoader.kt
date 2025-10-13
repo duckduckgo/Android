@@ -20,10 +20,10 @@ import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
+import kotlinx.coroutines.withContext
 import java.io.BufferedReader
 import java.util.Locale
 import javax.inject.Inject
-import kotlinx.coroutines.withContext
 
 interface PirCssScriptLoader {
     /**

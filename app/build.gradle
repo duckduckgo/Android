@@ -184,6 +184,14 @@ android {
             jvmArgs '-XX:+TieredCompilation', '-XX:TieredStopAtLevel=1'
         }
     }
+
+    buildFeatures {
+        compose true
+    }
+
+    composeOptions {
+        kotlinCompilerExtensionVersion = "_"
+    }
 }
 
 static def isValidSigningConfig(signingConfig) {
@@ -258,6 +266,7 @@ dependencies {
 
     implementation project(':app-build-config-api')
     implementation project(':browser-api')
+    implementation project(':browser-ui')
     implementation project(":statistics-api")
     implementation project(':statistics-impl')
     implementation project(':experiments-api')
@@ -423,6 +432,7 @@ dependencies {
     }
 
     implementation AndroidX.appCompat
+    implementation AndroidX.activity.compose
     implementation Google.android.material
     implementation AndroidX.constraintLayout
     implementation AndroidX.recyclerView

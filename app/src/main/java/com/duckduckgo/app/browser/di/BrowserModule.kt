@@ -98,9 +98,9 @@ import dagger.Module
 import dagger.Provides
 import dagger.SingleInstanceIn
 import dagger.multibindings.IntoSet
+import kotlinx.coroutines.CoroutineScope
 import javax.inject.Named
 import javax.inject.Qualifier
-import kotlinx.coroutines.CoroutineScope
 
 @Module
 class BrowserModule {

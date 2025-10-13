@@ -26,10 +26,10 @@ import com.duckduckgo.customtabs.api.CustomTabDetector
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.SingleInstanceIn
+import logcat.logcat
 import java.util.concurrent.Executors
 import java.util.concurrent.atomic.AtomicBoolean
 import javax.inject.Inject
-import logcat.logcat
 
 @ContributesMultibinding(AppScope::class)
 @SingleInstanceIn(AppScope::class)

@@ -18,9 +18,9 @@ package com.duckduckgo.duckchat.impl.ui.filechooser
 
 import android.content.Intent
 import android.net.Uri
+import logcat.logcat
 import java.util.*
 import javax.inject.Inject
-import logcat.logcat
 
 class FileChooserIntentBuilder @Inject constructor() {
 

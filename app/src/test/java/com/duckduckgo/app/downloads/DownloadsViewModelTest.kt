@@ -30,14 +30,11 @@ import com.duckduckgo.app.downloads.DownloadsViewModel.Command.DisplayUndoMessag
 import com.duckduckgo.app.downloads.DownloadsViewModel.Command.OpenFile
 import com.duckduckgo.app.downloads.DownloadsViewModel.Command.ShareFile
 import com.duckduckgo.common.test.CoroutineTestRule
-import com.duckduckgo.common.utils.R as CommonR
 import com.duckduckgo.common.utils.formatters.time.RealTimeDiffFormatter
 import com.duckduckgo.common.utils.formatters.time.TimeDiffFormatter
 import com.duckduckgo.downloads.api.DownloadsRepository
 import com.duckduckgo.downloads.api.model.DownloadItem
 import com.duckduckgo.downloads.store.DownloadStatus.FINISHED
-import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -49,6 +46,9 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import org.robolectric.annotation.Config
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
+import com.duckduckgo.common.utils.R as CommonR
 
 @RunWith(AndroidJUnit4::class)
 @Config(manifest = Config.NONE)

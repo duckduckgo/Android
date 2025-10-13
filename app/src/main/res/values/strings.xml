@@ -166,6 +166,7 @@
     <string name="settingsAddressBarPosition">Set Your Address Bar Position</string>
     <string name="settingsEnableVoiceSearch">Enable Private Voice Search</string>
     <string name="settingsDDGOnOtherPlatforms">DuckDuckGo on Other Platforms</string>
+    <string name="settingsDuckAi">AI Features</string>
 
     <!-- Private Search -->
     <string name="privateSearchActivityTitle">Private Search</string>
@@ -245,7 +246,7 @@
     <string name="settingsAutomaticallyClearWhenAppExit30Minutes">App exit, inactive for 30 minutes</string>
     <string name="settingsAutomaticallyClearWhenAppExit60Minutes">App exit, inactive for 1 hour</string>
     <string name="settingsClearAiDataTitle">Clear Duck.ai Chats</string>
-    <string name="settingsClearAiDataMessage">Fire Button will also delete Duck.ai history</string>
+    <string name="settingsClearAiDataDeleteMessage">Fire Button will also delete Duck.ai history, including pinned chats.</string>
 
     <!-- About Activity -->
     <string name="aboutActivityTitle">About DuckDuckGo</string>
@@ -775,36 +776,44 @@
     <string name="sslErrorUntrustedMessage" instruction="Placeholder is domain with certificate issues">The security certificate for %1$s is not trusted by your device\'s operating system. It’s possible that the website is misconfigured or that an attacker has compromised your connection, or that your system clock is incorrect.</string>
 
     <!-- Extended Onboarding-->
-    <string name="preOnboardingDaxDialog1Title"><![CDATA[Hi there.<br/><br/>Ready for a better, more private internet?]]></string>
+    <string name="preOnboardingDaxDialog1Title"><![CDATA[Hi there.<br/><br/>Ready for a faster browser that keeps you protected?]]></string>
     <string name="preOnboardingDaxDialog1Button">Let\'s do it!</string>
-    <string name="preOnboardingDaxDialog2Title">Privacy protections activated!</string>
+    <string name="preOnboardingDaxDialog1SecondaryButton">I\'ve been here before</string>
+    <string name="preOnboardingDaxDialog2Title">Protections activated!</string>
     <string name="preOnboardingDaxDialog2Button">Choose Your Browser</string>
+    <string name="preOnboardingDaxDialog3Title"><![CDATA[Got it! I\'ll skip the other tips.]]></string>
+    <string name="preOnboardingDaxDialog3Text"><![CDATA[Remember: you can delete all your tabs, history, and browsing data in two taps with the <b>Fire Button</b> 🔥]]></string>
+    <string name="preOnboardingDaxDialog3SecondaryButton">Show Tutorial</string>
     <string name="preOnboardingComparisonChartItem1">Search privately by default</string>
     <string name="preOnboardingComparisonChartItem2">Block 3rd-party trackers</string>
     <string name="preOnboardingComparisonChartItem3">Block cookie pop-ups</string>
     <string name="preOnboardingComparisonChartItem4">Block targeted ads</string>
     <string name="preOnboardingComparisonChartItem5">Delete browsing data with one button</string>
-    <string name="preOnboardingDaxDialog3Title">Awesome! Welcome to the duck side.</string>
     <string name="preOnboardingDaxDialog3Button">Start Browsing</string>
+    <string name="preOnboardingAddressBarTitle">Where should I put your address bar?</string>
+    <string name="preOnboardingAddressBarOkButton">Next</string>
+    <string name="highlightsPreOnboardingAddressBarOption1Title">Top (default)</string>
+    <string name="highlightsPreOnboardingAddressBarOption1Description">Easy to see</string>
+    <string name="highlightsPreOnboardingAddressBarOption2Title">Bottom</string>
+    <string name="highlightsPreOnboardingAddressBarOption2Description">Easy to reach</string>
     <string name="onboardingSearchDaxDialogTitle">Try a search!</string>
-    <string name="onboardingSearchDaxDialogDescription">Your DuckDuckGo searches are always anonymous.</string>
-    <string name="onboardingSearchDaxDialogOption1" instruction="translate 'duck' too.">how to say “duck” in english</string>
-    <string name="onboardingSearchDaxDialogOption1English" instruction="translate 'duck' too. Don't add question mark">how to say “duck” in spanish</string>
+    <string name="onboardingSearchDaxDialogDescription">Your DuckDuckGo searches are always private.</string>
+    <string name="onboardingSearchDaxDialogOption1" instruction="translate 'duck' too.">how to say "duck" in english</string>
+    <string name="onboardingSearchDaxDialogOption1English" instruction="translate 'duck' too. Don't add question mark">how to say "duck" in spanish</string>
     <string name="onboardingSearchQueryOption1">how to say duck in english</string>
     <string name="onboardingSearchQueryOption1English">how to say duck in spanish</string>
     <string name="onboardingSearchDaxDialogOption2">cast of avatar</string>
     <string name="onboardingSearchDaxDialogOption2US">mighty ducks cast</string>
     <string name="onboardingSearchDaxDialogOption3">local weather</string>
     <string name="onboardingSearchDaxDialogOption4">Surprise me!</string>
-    <string name="onboardingSearchQueryOption4">dinner recipes</string>
-    <string name="onboardingSearchQueryOption4US">chocolate chip cookie recipes</string>
+    <string name="onboardingSearchQueryOption4">baby ducklings</string>
     <string name="onboardingSitesDaxDialogTitle">Try visiting a site!</string>
     <string name="onboardingSitesDaxDialogDescription">I\'ll block trackers so they can\'t spy on you.</string>
     <string name="onboardingSitesDaxDialogOption1">espn.com</string>
     <string name="onboardingSitesDaxDialogOption2">yahoo.com</string>
     <string name="onboardingSitesDaxDialogOption3">ebay.com</string>
     <string name="onboardingSitesDaxDialogOption4">Surprise me!</string>
-    <string name="onboardingSerpDaxDialogDescription">That’s DuckDuckGo Search. Private. Fast. Fewer ads.</string>
+    <string name="onboardingSerpDaxDialogDescription"><![CDATA[That\'s <b>DuckDuckGo Search</b>! Private. Fast. Fewer ads.]]></string>
     <string name="onboardingSerpDaxDialogButton">Got it!</string>
     <string name="onboardingSitesSuggestionsDaxDialogTitle">Next, try visiting a site!</string>
     <plurals name="onboardingTrackersBlockedDialogDescription">
@@ -817,42 +826,20 @@
     </plurals>
     <string name="onboardingTrackersBlockedDaxDialogButton">Got it!</string>
     <string name="onboardingFireButtonDaxDialogDescription"><![CDATA[Instantly clear your browsing activity with the <b>Fire Button</b>.<br/><br/>Give it a try!️ &#128293;]]></string>
+    <string name="onboardingFireButtonDaxDialogOkButton">Try It</string>
+    <string name="onboardingFireButtonDaxDialogCancelButton">Skip</string>
     <string name="onboardingEndDaxDialogTitle">You\'ve got this!"</string>
-    <string name="onboardingEndDaxDialogDescription">Remember: every time you browse with me a creepy ad loses its wings. 👌</string>
-    <string name="onboardingEndDaxDialogButton">All done!</string>
+    <string name="onboardingEndDaxDialogDescription">Remember: every time you browse with me a creepy ad loses its wings.</string>
+    <string name="onboardingInContextEndDaxDialogDescription">Remember: every time you browse with me a creepy ad loses its wings. 👌</string>
+    <string name="onboardingEndDaxDialogButton">High five!</string>
     <string name="onboardingPrivacyProDaxDialogTitle">Oh, before I forget…</string>
     <string name="onboardingPrivacyProDaxDialogDescription"><![CDATA[DuckDuckGo also has a secure <b>VPN + 2 more premium protections</b>, available with an <b>optional paid subscription</b>.]]></string>
     <string name="onboardingPrivacyProDaxDialogOkButton">Learn More</string>
     <string name="onboardingPrivacyProDaxDialogFreeTrialOkButton">Try for free!</string>
     <string name="onboardingPrivacyProDaxDialogCancelButton">Skip</string>
 
-    <!-- Highlight Onboarding Experiment-->
-    <string name="highlightsPreOnboardingDaxDialog1Title"><![CDATA[Hi there.<br/><br/>Ready for a faster browser that keeps you protected?]]></string>
-    <string name="highlightsPreOnboardingDaxDialog2Title">Protections activated!</string>
-    <string name="highlightsPreOnboardingComparisonChartItem2">Block 3rd party trackers</string>
-    <string name="highlightsPreOnboardingComparisonChartItem3">Block cookie requests &amp; pop-ups</string>
-    <string name="highlightsPreOnboardingComparisonChartItem4">Block targeted ads</string>
-    <string name="highlightsPreOnboardingComparisonChartItem5">Erase browsing data swiftly</string>
-    <string name="highlightsPreOnboardingSelectAppIconTitle">Which color looks best on me?</string>
-    <string name="highlightsPreOnboardingSelectAppIconDescription">Pick your app icon:</string>
-    <string name="highlightsPreOnboardingSelectAppIconOkButton">Next</string>
-    <string name="highlightsPreOnboardingAddressBarTitle">Where should I put your address bar?</string>
-    <string name="highlightsPreOnboardingAddressBarOption1Title">Top (default)</string>
-    <string name="highlightsPreOnboardingAddressBarOption1Description">Easy to see</string>
-    <string name="highlightsPreOnboardingAddressBarOkButton">Next</string>
-    <string name="highlightsPreOnboardingAddressBarOption2Title">Bottom</string>
-    <string name="highlightsPreOnboardingAddressBarOption2Description">Easy to reach</string>
-    <string name="highlightsOnboardingSearchQueryOption4">baby ducklings</string>
-    <string name="highlightsOnboardingSearchDaxDialogDescription">Your DuckDuckGo searches are always private.</string>
-    <string name="highlightsOnboardingSerpDaxDialogDescription"><![CDATA[That\'s <b>DuckDuckGo Search</b>! Private. Fast. Fewer ads.]]></string>
-    <string name="highlightsOnboardingEndDaxDialogDescription">Remember: every time you browse with me a creepy ad loses its wings.</string>
-    <string name="highlightsOnboardingEndDaxDialogButton">High five!</string>
-    <string name="onboardingFireButtonDaxDialogOkButton">Try It</string>
-    <string name="onboardingFireButtonDaxDialogCancelButton">Skip</string>
-    <string name="preOnboardingDaxDialog1SecondaryButton">I\'ve been here before</string>
-    <string name="highlightsPreOnboardingDaxDialog3Title"><![CDATA[Got it! I\'ll skip the other tips.]]></string>
-    <string name="highlightsPreOnboardingDaxDialog3Text"><![CDATA[Remember: you can delete all your tabs, history, and browsing data in two taps with the <b>Fire Button</b> 🔥]]></string>
-    <string name="preOnboardingDaxDialog3SecondaryButton">Show Tutorial</string>
+    <!-- Bubble BB & Buck experiment-->
+    <string name="onboardingBubbleExperimentSearchDaxDialogDescription">Your DuckDuckGo searches are always anonymous.</string>
 
     <!-- Appearance settings -->
     <string name="settingsAddressBarPositionTitle">Address Bar</string>
@@ -939,8 +926,6 @@
     <!-- Privacy Pro Rebranding-->
     <string name="aboutDescriptionBrandUpdate2025Rebranding">Welcome to the Duck Side!\n\nDuckDuckGo is the independent online protection company for anyone who wants to take back control of their personal information.\n\nWe believe the best way to protect your personal information from hackers, scammers, and privacy-invasive companies is to stop it from being collected at all. That\'s why millions of people <annotation type="chart_comparison">choose DuckDuckGo over Chrome and other browsers</annotation> to search and browse online. Our built-in search engine is like Google but never tracks your searches. And our browsing protections, such as ad tracker blocking and cookie blocking, help stop other companies from collecting your data. Oh, and our browser is free — we make money from <annotation type="privacy_respecting_ads">privacy-respecting search ads</annotation>, not by exploiting your data.\n\nIn addition, we also offer <annotation type="ppro_help_page">DuckDuckGo subscription</annotation> integrated into our browser. Subscribers get even more privacy protection with a fast and simple <annotation type="vpn_help_page">VPN</annotation> that helps secure your online activity, access to advanced AI models in our private AI chat service Duck.ai, a service that finds and removes your personal information from people-finder sites, and a service that restores your identity should it be stolen.\n\nTake back control of your personal information with the browser designed for data protection, not data collection.</string>
     <string name="onboardingPrivacyProDaxDialogDescriptionRebranding"><![CDATA[DuckDuckGo also has an <b>optional paid subscription</b>, with a secure <b>VPN</b> and <b>advanced, private AI</b>.]]></string>
-    <string name="settingsDuckAiRebranding">AI Features</string>
-    <string name="settingsDuckAi">Duck.ai</string>
 
     <!--TabSwitcher Trackers Animation-->
     <string name="showTrackerCountInTabSwitcher">Show Tracker Count in Tab Switcher</string>

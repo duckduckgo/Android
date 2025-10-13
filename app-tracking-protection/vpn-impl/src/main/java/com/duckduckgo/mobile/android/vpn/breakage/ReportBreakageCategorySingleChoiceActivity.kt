@@ -36,9 +36,9 @@ import com.duckduckgo.mobile.android.vpn.databinding.ActivityReportBreakageCateg
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
 import com.duckduckgo.mobile.android.vpn.ui.OpenVpnBreakageCategoryWithBrokenApp
 import com.duckduckgo.navigation.api.getActivityParams
-import javax.inject.Inject
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 @InjectWith(
     scope = ActivityScope::class,

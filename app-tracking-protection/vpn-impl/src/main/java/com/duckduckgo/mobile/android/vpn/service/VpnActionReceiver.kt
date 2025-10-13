@@ -30,11 +30,11 @@ import com.duckduckgo.mobile.android.vpn.Vpn
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
 import com.duckduckgo.networkprotection.api.NetworkProtectionState
 import dagger.android.AndroidInjection
-import java.util.concurrent.TimeUnit
-import javax.inject.Inject
 import kotlinx.coroutines.withContext
 import logcat.LogPriority.WARN
 import logcat.logcat
+import java.util.concurrent.TimeUnit
+import javax.inject.Inject
 
 @InjectWith(ReceiverScope::class)
 class VpnActionReceiver : BroadcastReceiver() {

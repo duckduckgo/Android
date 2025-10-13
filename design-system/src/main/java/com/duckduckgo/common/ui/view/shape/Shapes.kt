@@ -23,7 +23,6 @@ import com.google.android.material.shape.MaterialShapeDrawable
 import com.google.android.material.shape.ShapeAppearanceModel
 import com.google.android.material.shape.ShapePath
 
-class DaxBubbleEdgeTreatment
 /**
  * Instantiates a triangle treatment of the given size, which faces inward or outward relative to
  * the shape.
@@ -34,7 +33,8 @@ class DaxBubbleEdgeTreatment
  * if the triangle should extend out of the shape.
  * @param edgePosition TOP for positioning triangle on the top side of the dialog; LEFT for
  * positioning triangle on the left side of the dialog
- */(
+ */
+class DaxBubbleEdgeTreatment(
     private val size: Float,
     private val distanceFromEdge: Float,
     private val edgePosition: EdgePosition = EdgePosition.TOP,

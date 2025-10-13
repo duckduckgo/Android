@@ -33,5 +33,4 @@ enum class ScreenKind(val value: String) {
     NON_TRACKERS("nonTrackers"),
     CONSENT_MANAGED("consentManaged"),
     COOKIE_HIDDEN("cookieHidden"),
-    ;
 }

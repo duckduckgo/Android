@@ -38,9 +38,9 @@ import com.duckduckgo.networkprotection.impl.databinding.DialogGeoswitchingCityB
 import com.duckduckgo.networkprotection.store.NetPGeoswitchingRepository
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import dagger.android.support.AndroidSupportInjection
-import javax.inject.Inject
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import javax.inject.Inject
 
 @InjectWith(FragmentScope::class)
 class NetpGeoswitchingCityChoiceDialogFragment : BottomSheetDialogFragment() {

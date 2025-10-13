@@ -24,11 +24,11 @@ import com.duckduckgo.subscriptions.api.SubscriptionScreens.RestoreSubscriptionS
 import com.duckduckgo.subscriptions.api.SubscriptionScreens.SubscriptionPurchase
 import com.duckduckgo.subscriptions.api.SubscriptionScreens.SubscriptionsSettingsScreenWithEmptyParams
 import com.duckduckgo.subscriptions.api.SubscriptionsJSHelper
-import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.json.JSONObject
+import javax.inject.Inject
 
 class SubscriptionsHandler @Inject constructor(
     private val subscriptionsJSHelper: SubscriptionsJSHelper,

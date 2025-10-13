@@ -20,10 +20,10 @@ import com.duckduckgo.autofill.impl.time.TimeProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
-import java.util.concurrent.TimeUnit
-import javax.inject.Inject
 import logcat.LogPriority.VERBOSE
 import logcat.logcat
+import java.util.concurrent.TimeUnit
+import javax.inject.Inject
 
 interface AutofillFireproofDialogSuppressor {
     fun isAutofillPreventingFireproofPrompts(): Boolean
@@ -42,8 +42,8 @@ class RealAutofillFireproofDialogSuppressor @Inject constructor(private val time
         val suppressing = autofillDialogShowing || (timeSinceLastDismissed <= TIME_PERIOD_TO_SUPPRESS_FIREPROOF_PROMPT)
         logcat {
             """
-            isAutofillPreventingFireproofPrompts: $suppressing 
-            (autofillDialogShowing=$autofillDialogShowing, 
+            isAutofillPreventingFireproofPrompts: $suppressing
+            (autofillDialogShowing=$autofillDialogShowing,
             timeSinceLastDismissed=${timeSinceLastDismissed}ms)
             """.trimIndent()
         }

@@ -21,7 +21,6 @@ import com.duckduckgo.autofill.impl.email.service.DuckAddressStatusManagementSer
 import com.duckduckgo.autofill.impl.email.service.DuckAddressStatusManagementService.DuckAddressGetStatusResponse
 import com.duckduckgo.autofill.impl.ui.credential.repository.DuckAddressStatusRepository.ActivationStatusResult.*
 import com.duckduckgo.common.test.CoroutineTestRule
-import java.io.IOException
 import kotlinx.coroutines.test.runTest
 import okhttp3.ResponseBody.Companion.toResponseBody
 import org.junit.Assert.assertFalse
@@ -33,6 +32,7 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 import retrofit2.HttpException
 import retrofit2.Response
+import java.io.IOException
 
 class RemoteDuckAddressStatusRepositoryTest {
 

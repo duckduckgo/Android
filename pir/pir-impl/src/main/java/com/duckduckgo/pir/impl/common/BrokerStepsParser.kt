@@ -19,9 +19,11 @@ package com.duckduckgo.pir.impl.common
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.pir.impl.common.BrokerStepsParser.BrokerStep
+import com.duckduckgo.pir.impl.common.BrokerStepsParser.BrokerStep.EmailConfirmationStep
 import com.duckduckgo.pir.impl.common.BrokerStepsParser.BrokerStep.OptOutStep
 import com.duckduckgo.pir.impl.common.BrokerStepsParser.BrokerStep.ScanStep
 import com.duckduckgo.pir.impl.models.ExtractedProfile
+import com.duckduckgo.pir.impl.models.scheduling.JobRecord.EmailConfirmationJobRecord
 import com.duckduckgo.pir.impl.scripts.models.BrokerAction
 import com.duckduckgo.pir.impl.store.PirRepository
 import com.squareup.anvil.annotations.ContributesBinding
@@ -29,10 +31,10 @@ import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.adapters.PolymorphicJsonAdapterFactory
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
-import javax.inject.Inject
 import kotlinx.coroutines.withContext
 import logcat.LogPriority.ERROR
 import logcat.logcat
+import javax.inject.Inject
 
 interface BrokerStepsParser {
     /**
@@ -49,6 +51,17 @@ interface BrokerStepsParser {
         stepsJson: String,
         profileQueryId: Long? = null,
     ): List<BrokerStep>
+
+    /**
+     * This method parses the [optOutStepJson] and takes the subset starting from the emailConfirmation action.
+     *
+     * @param emailConfirmationJob associated email confirmation job record for this step
+     * @param optOutStepJson - string in JSONObject format obtained from the emailConfirmationJob's broker's json representing an opt-out step.
+     */
+    suspend fun parseEmailConfirmationStep(
+        optOutStepJson: String,
+        emailConfirmationJob: EmailConfirmationJobRecord,
+    ): BrokerStep?
 
     sealed class BrokerStep(
         open val brokerName: String = "", // this will be set later / not coming from json
@@ -68,6 +81,14 @@ interface BrokerStepsParser {
             override val actions: List<BrokerAction>,
             val optOutType: String,
             val profileToOptOut: ExtractedProfile = ExtractedProfile(-1, -1, ""), // this will be set later / not coming from json
+        ) : BrokerStep(brokerName, stepType, actions)
+
+        data class EmailConfirmationStep(
+            override val brokerName: String,
+            override val stepType: String,
+            override val actions: List<BrokerAction>, // Actions will be a subset already starting from emailConfirmationStep
+            val emailConfirmationJob: EmailConfirmationJobRecord,
+            val profileToOptOut: ExtractedProfile,
         ) : BrokerStep(brokerName, stepType, actions)
     }
 }
@@ -126,5 +147,29 @@ class RealBrokerStepsParser @Inject constructor(
         }.getOrElse {
             emptyList<BrokerStep>()
         }
+    }
+
+    override suspend fun parseEmailConfirmationStep(
+        optOutStepJson: String,
+        emailConfirmationJob: EmailConfirmationJobRecord,
+    ): BrokerStep? = withContext(dispatcherProvider.io()) {
+        return@withContext runCatching {
+            val profile = repository.getExtractedProfile(emailConfirmationJob.extractedProfileId)
+            if (profile != null) {
+                adapter.fromJson(optOutStepJson)?.run {
+                    EmailConfirmationStep(
+                        brokerName = emailConfirmationJob.brokerName,
+                        stepType = this.stepType,
+                        actions = actions.dropWhile { it !is BrokerAction.EmailConfirmation },
+                        emailConfirmationJob = emailConfirmationJob,
+                        profileToOptOut = profile,
+                    )
+                }
+            } else {
+                null
+            }
+        }.onFailure {
+            logcat(ERROR) { "PIR-SCAN: Parsing the steps failed due to: $it" }
+        }.getOrNull()
     }
 }

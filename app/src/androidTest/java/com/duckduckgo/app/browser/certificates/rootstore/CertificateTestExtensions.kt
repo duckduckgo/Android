@@ -18,10 +18,10 @@ package com.duckduckgo.app.browser.certificates.rootstore
 
 import android.net.http.SslCertificate
 import com.duckduckgo.app.browser.certificates.CertificateTypes.Companion.X509
-import java.security.cert.CertificateFactory
-import java.security.cert.X509Certificate
 import okio.ByteString
 import okio.ByteString.Companion.decodeBase64
+import java.security.cert.CertificateFactory
+import java.security.cert.X509Certificate
 
 fun String.parsePemCertificate(): ByteString? {
     return this

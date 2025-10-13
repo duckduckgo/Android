@@ -31,11 +31,11 @@ import com.squareup.anvil.annotations.ContributesTo
 import dagger.Lazy
 import dagger.Module
 import dagger.Provides
-import javax.inject.Inject
-import javax.inject.Qualifier
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import logcat.logcat
+import javax.inject.Inject
+import javax.inject.Qualifier
 
 interface SerpPromo {
     suspend fun injectCookie(cookieValue: String?)

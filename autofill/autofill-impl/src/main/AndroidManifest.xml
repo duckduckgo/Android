@@ -22,6 +22,10 @@
             android:configChanges="keyboardHidden|orientation|screenSize|smallestScreenSize|screenLayout|navigation|keyboard"
             android:exported="false" />
         <activity
+            android:name=".importing.takeout.webflow.ImportGoogleBookmarksWebFlowActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize|smallestScreenSize|screenLayout|navigation|keyboard"
+            android:exported="false" />
+        <activity
             android:name=".ui.credential.management.AutofillManagementActivity"
             android:configChanges="orientation|screenSize"
             android:exported="false"

@@ -50,9 +50,9 @@ import com.duckduckgo.sync.impl.ui.setup.SetupAccountViewModel.ViewMode.IntroCre
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountViewModel.ViewMode.IntroRecoveryCode
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountViewModel.ViewMode.SyncSetupCompleted
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountViewModel.ViewState
-import javax.inject.Inject
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import javax.inject.Inject
 
 @InjectWith(ActivityScope::class)
 class SetupAccountActivity : DuckDuckGoActivity(), SyncSetupNavigationFlowListener, SyncSetupFlowFinishedListener {

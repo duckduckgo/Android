@@ -16,11 +16,11 @@
 
 package com.duckduckgo.networkprotection.impl.config
 
+import logcat.logcat
 import java.net.InetAddress
 import java.net.UnknownHostException
 import kotlin.math.floor
 import kotlin.math.ln
-import logcat.logcat
 
 data class CIDR(
     val address: InetAddress,

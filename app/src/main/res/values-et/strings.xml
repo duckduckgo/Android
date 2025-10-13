@@ -167,6 +167,7 @@
     <string name="settingsAddressBarPosition">Määra aadressiriba asukoht</string>
     <string name="settingsEnableVoiceSearch">Luba privaatne häälotsing</string>
     <string name="settingsDDGOnOtherPlatforms">DuckDuckGo muudel platvormidel</string>
+    <string name="settingsDuckAi">AI funktsioonid</string>
 
     <!-- Private Search -->
     <string name="privateSearchActivityTitle">Privaatne otsing</string>
@@ -246,7 +247,7 @@
     <string name="settingsAutomaticallyClearWhenAppExit30Minutes">Rakendusest väljumisel, 30-minutilise passiivsuse järel</string>
     <string name="settingsAutomaticallyClearWhenAppExit60Minutes">Rakendusest väljumisel, 1-tunnise passiivsuse järel</string>
     <string name="settingsClearAiDataTitle">Tühjenda Duck.ai vestlused</string>
-    <string name="settingsClearAiDataMessage">Fire Button kustutab ka Duck.ai ajaloo</string>
+    <string name="settingsClearAiDataDeleteMessage">Fire Button kustutab ka Duck.ai ajaloo, sealhulgas kinnitatud vestlused.</string>
 
     <!-- About Activity -->
     <string name="aboutActivityTitle">DuckDuckGo\'st</string>
@@ -776,36 +777,44 @@
     <string name="sslErrorUntrustedMessage" instruction="Placeholder is domain with certificate issues">Sinu seadme operatsioonisüsteem ei usalda %1$s turvasertifikaati. Võimalik, et veebisait on valesti konfigureeritud, ründaja on sinu ühenduse ohtu seadnud või sinu süsteemi kell on vale.</string>
 
     <!-- Extended Onboarding-->
-    <string name="preOnboardingDaxDialog1Title"><![CDATA[Tere!<br/><br/>Kas oled valmis kasutama paremat ja privaatsemat internetti?]]></string>
+    <string name="preOnboardingDaxDialog1Title"><![CDATA[Tere!<br/><br/>Kas oled valmis kasutama kiiremat brauserit, mis hoiab sind kaitstud?]]></string>
     <string name="preOnboardingDaxDialog1Button">Teeme ära!</string>
-    <string name="preOnboardingDaxDialog2Title">Privaatsuskaitsed on aktiveeritud!</string>
+    <string name="preOnboardingDaxDialog1SecondaryButton">Olen siin varem olnud</string>
+    <string name="preOnboardingDaxDialog2Title">Kaitsed aktiveeritud!</string>
     <string name="preOnboardingDaxDialog2Button">Vali oma brauser</string>
+    <string name="preOnboardingDaxDialog3Title"><![CDATA[Sain aru! Jätan muud näpunäited vahele.]]></string>
+    <string name="preOnboardingDaxDialog3Text"><![CDATA[Tuletame meelde, et nupu <b>Fire Button</b> 🔥 abil saate kustutada kõik oma vahekaardid, ajaloo ja sirvimisandmed kahe puudutusega]]></string>
+    <string name="preOnboardingDaxDialog3SecondaryButton">Näita õpetust</string>
     <string name="preOnboardingComparisonChartItem1">Otsi vaikimisi privaatselt</string>
     <string name="preOnboardingComparisonChartItem2">Blokeeri kolmanda poole jälgurid</string>
     <string name="preOnboardingComparisonChartItem3">Blokeeri küpsiste hüpikaknad</string>
     <string name="preOnboardingComparisonChartItem4">Blokeeri suunatud reklaamid</string>
     <string name="preOnboardingComparisonChartItem5">Kustuta sirvimisandmed ühe nupuga</string>
-    <string name="preOnboardingDaxDialog3Title">Suurepärane! Tere tulemast pardi poolele.</string>
     <string name="preOnboardingDaxDialog3Button">Alusta sirvimist</string>
+    <string name="preOnboardingAddressBarTitle">Kuhu soovid oma aadressiriba paigutada?</string>
+    <string name="preOnboardingAddressBarOkButton">Järgmine</string>
+    <string name="highlightsPreOnboardingAddressBarOption1Title">Üles (vaikimisi)</string>
+    <string name="highlightsPreOnboardingAddressBarOption1Description">Kergesti märgatav</string>
+    <string name="highlightsPreOnboardingAddressBarOption2Title">All</string>
+    <string name="highlightsPreOnboardingAddressBarOption2Description">Kergesti ligipääsetav</string>
     <string name="onboardingSearchDaxDialogTitle">Proovige otsingut!</string>
-    <string name="onboardingSearchDaxDialogDescription">Sinu DuckDuckGo otsingud on alati anonüümsed.</string>
-    <string name="onboardingSearchDaxDialogOption1" instruction="translate &apos;duck&apos; too.">kuidas öelda „part“ inglise keeles</string>
-    <string name="onboardingSearchDaxDialogOption1English" instruction="translate &apos;duck&apos; too. Don&apos;t add question mark">kuidas öelda „part“ hispaania keeles</string>
+    <string name="onboardingSearchDaxDialogDescription">Sinu DuckDuckGo otsingud on alati privaatsed.</string>
+    <string name="onboardingSearchDaxDialogOption1" instruction="translate &apos;duck&apos; too.">"kuidas öelda part inglise keeles"</string>
+    <string name="onboardingSearchDaxDialogOption1English" instruction="translate &apos;duck&apos; too. Don&apos;t add question mark">"kuidas öelda part hispaania keeles"</string>
     <string name="onboardingSearchQueryOption1">kuidas öelda part inglise keeles</string>
     <string name="onboardingSearchQueryOption1English">kuidas öelda part hispaania keeles</string>
     <string name="onboardingSearchDaxDialogOption2">Avatari näitlejad</string>
     <string name="onboardingSearchDaxDialogOption2US">Mighty Ducks näitlejad</string>
     <string name="onboardingSearchDaxDialogOption3">kohalik ilm</string>
     <string name="onboardingSearchDaxDialogOption4">Üllata mind!</string>
-    <string name="onboardingSearchQueryOption4">õhtusöögi retseptid</string>
-    <string name="onboardingSearchQueryOption4US">šokolaadiküpsiste retseptid</string>
+    <string name="onboardingSearchQueryOption4">pardipojad</string>
     <string name="onboardingSitesDaxDialogTitle">Proovi külastada saiti!</string>
     <string name="onboardingSitesDaxDialogDescription">Ma blokeerin jälgijaid, et nad ei saaks sind luurata.</string>
     <string name="onboardingSitesDaxDialogOption1">espn.com</string>
     <string name="onboardingSitesDaxDialogOption2">yahoo.com</string>
     <string name="onboardingSitesDaxDialogOption3">ebay.com</string>
     <string name="onboardingSitesDaxDialogOption4">Üllata mind!</string>
-    <string name="onboardingSerpDaxDialogDescription">See on DuckDuckGo otsing. Privaatne. Kiire. Vähem reklaame.</string>
+    <string name="onboardingSerpDaxDialogDescription"><![CDATA[See on <b>DuckDuckGo Search</b>! Privaatne. Kiire. Vähem reklaame.]]></string>
     <string name="onboardingSerpDaxDialogButton">Sain aru!</string>
     <string name="onboardingSitesSuggestionsDaxDialogTitle">Järgmisena proovi mõnda saiti külastada!</string>
     <plurals name="onboardingTrackersBlockedDialogDescription">
@@ -818,42 +827,20 @@
     </plurals>
     <string name="onboardingTrackersBlockedDaxDialogButton">Sain aru!</string>
     <string name="onboardingFireButtonDaxDialogDescription"><![CDATA[Tühjendage oma sirvimistegevus hetkega <b>Fire Button</b> abil.<br/><br/>Proovige! 🔥]]></string>
+    <string name="onboardingFireButtonDaxDialogOkButton">Proovi seda</string>
+    <string name="onboardingFireButtonDaxDialogCancelButton">Jäta vahele</string>
     <string name="onboardingEndDaxDialogTitle">"Sa saad hakkama!"</string>
-    <string name="onboardingEndDaxDialogDescription">Pea meeles: iga kord kui minuga sirvid, kaotab jube reklaam oma tiivad. 👌</string>
-    <string name="onboardingEndDaxDialogButton">Kõik valmis!</string>
+    <string name="onboardingEndDaxDialogDescription">Pea meeles: iga kord kui minuga sirvid, kaotab jube reklaam oma tiivad.</string>
+    <string name="onboardingInContextEndDaxDialogDescription">Pea meeles: iga kord kui minuga sirvid, kaotab jube reklaam oma tiivad. 👌</string>
+    <string name="onboardingEndDaxDialogButton">Viska viis!</string>
     <string name="onboardingPrivacyProDaxDialogTitle">Ja enne kui ma unustan...</string>
     <string name="onboardingPrivacyProDaxDialogDescription"><![CDATA[DuckDuckGo-l on ka turvaline <b>VPN + veel kaks esmaklassilist kaitset</b>, mis on saadaval <b>valikulise tasulise tellimusega</b>.]]></string>
     <string name="onboardingPrivacyProDaxDialogOkButton">Loe edasi</string>
     <string name="onboardingPrivacyProDaxDialogFreeTrialOkButton">Proovi tasuta!</string>
     <string name="onboardingPrivacyProDaxDialogCancelButton">Jäta vahele</string>
 
-    <!-- Highlight Onboarding Experiment-->
-    <string name="highlightsPreOnboardingDaxDialog1Title"><![CDATA[Tere!<br/><br/>Kas oled valmis kasutama kiiremat brauserit, mis hoiab sind kaitstud?]]></string>
-    <string name="highlightsPreOnboardingDaxDialog2Title">Kaitsed aktiveeritud!</string>
-    <string name="highlightsPreOnboardingComparisonChartItem2">Blokeeri kolmanda poole jälgurid</string>
-    <string name="highlightsPreOnboardingComparisonChartItem3">Blokeerige küpsiste päringud ja hüpikaknad</string>
-    <string name="highlightsPreOnboardingComparisonChartItem4">Blokeeri suunatud reklaamid</string>
-    <string name="highlightsPreOnboardingComparisonChartItem5">Kustuta sirvimisandmed kiiresti</string>
-    <string name="highlightsPreOnboardingSelectAppIconTitle">Milline värv tundub kõige paremini sobivat?</string>
-    <string name="highlightsPreOnboardingSelectAppIconDescription">Vali oma rakenduse ikoon:</string>
-    <string name="highlightsPreOnboardingSelectAppIconOkButton">Järgmine</string>
-    <string name="highlightsPreOnboardingAddressBarTitle">Kuhu soovid oma aadressiriba paigutada?</string>
-    <string name="highlightsPreOnboardingAddressBarOption1Title">Üles (vaikimisi)</string>
-    <string name="highlightsPreOnboardingAddressBarOption1Description">Kergesti märgatav</string>
-    <string name="highlightsPreOnboardingAddressBarOkButton">Järgmine</string>
-    <string name="highlightsPreOnboardingAddressBarOption2Title">All</string>
-    <string name="highlightsPreOnboardingAddressBarOption2Description">Kergesti ligipääsetav</string>
-    <string name="highlightsOnboardingSearchQueryOption4">pardipojad</string>
-    <string name="highlightsOnboardingSearchDaxDialogDescription">Sinu DuckDuckGo otsingud on alati privaatsed.</string>
-    <string name="highlightsOnboardingSerpDaxDialogDescription"><![CDATA[See on <b>DuckDuckGo Search</b>! Privaatne. Kiire. Vähem reklaame.]]></string>
-    <string name="highlightsOnboardingEndDaxDialogDescription">Pea meeles: iga kord kui minuga sirvid, kaotab jube reklaam oma tiivad.</string>
-    <string name="highlightsOnboardingEndDaxDialogButton">Viska viis!</string>
-    <string name="onboardingFireButtonDaxDialogOkButton">Proovi seda</string>
-    <string name="onboardingFireButtonDaxDialogCancelButton">Jäta vahele</string>
-    <string name="preOnboardingDaxDialog1SecondaryButton">Olen siin varem olnud</string>
-    <string name="highlightsPreOnboardingDaxDialog3Title"><![CDATA[Sain aru! Jätan muud näpunäited vahele.]]></string>
-    <string name="highlightsPreOnboardingDaxDialog3Text"><![CDATA[Tuletame meelde, et nupu <b>Fire Button</b> 🔥 abil saate kustutada kõik oma vahekaardid, ajaloo ja sirvimisandmed kahe puudutusega]]></string>
-    <string name="preOnboardingDaxDialog3SecondaryButton">Näita õpetust</string>
+    <!-- Bubble BB & Buck experiment-->
+    <string name="onboardingBubbleExperimentSearchDaxDialogDescription">Sinu DuckDuckGo otsingud on alati anonüümsed.</string>
 
     <!-- Appearance settings -->
     <string name="settingsAddressBarPositionTitle">Aadressiriba</string>
@@ -940,8 +927,6 @@
     <!-- Privacy Pro Rebranding-->
     <string name="aboutDescriptionBrandUpdate2025Rebranding">Welcome to the Duck Side!\n\nDuckDuckGo on sõltumatu veebikaitseettevõte kõikidele, kes tahavad oma isikliku teabe üle kontrolli tagasi saada.\n\nUsume, et parim viis sinu isikuandmete kaitsmiseks häkkerite, petturite ja eraelu puutumatust rikkuvate ettevõtete eest on nende kogumise täielik vältimine. Seetõttu valivad miljonid inimesed <annotation type="chart_comparison">DuckDuckGo Chrome\'i ja teiste brauserite asemel</annotation>, et otsida ja sirvida internetis. Meie sisseehitatud otsingumootor on nagu Google, kuid ei jälgi kunagi teie otsinguid. Ja meie sirvimiskaitsed, nagu reklaamijälgijate ja küpsiste blokeerimine, aitavad takistada teistel ettevõtetel sinu andmeid kogumast. Ja muideks, meie brauser on tasuta — teenime raha <annotation type="privacy_respecting_ads">privaatsust austavate otsingureklaamidega</annotation>, mitte sinu andmeid ära kasutades.\n\nLisaks pakume ka <annotation type="ppro_help_page">DuckDuckGo tellimust</annotation>, mis on integreeritud meie brauserisse. Tellijad saavad veelgi tõhusama privaatsuse kaitse kiire ja lihtsa <annotation type="vpn_help_page">VPN-iga</annotation>, mis aitab kaitsta sinu veebitegevust, juurdepääsu täiustatud tehisintellekti mudelitele meie privaatses tehisintellekti vestlusteenuses Duck.ai, teenuse, mis otsib ja eemaldab sinu isikuandmeid inimesteotsingu saitidelt, ning teenuse, mis taastab sinu identiteedi, kui see varastatakse.\n\nVõta tagasi kontroll oma isikuandmete üle brauseriga, mis on loodud andmete kaitsmiseks ja mitte nende kogumiseks.</string>
     <string name="onboardingPrivacyProDaxDialogDescriptionRebranding"><![CDATA[DuckDuckGo-l on ka <b>valikuline tasuline tellimus</b>, mis sisaldab turvalist <b>VPN-i</b> ja <b>täiustatud privaatset tehisintellekti</b>.]]></string>
-    <string name="settingsDuckAiRebranding">AI funktsioonid</string>
-    <string name="settingsDuckAi">Duck.ai</string>
 
     <!--TabSwitcher Trackers Animation-->
     <string name="showTrackerCountInTabSwitcher">Kuva jälgurite arv vahekaardi vahetajas</string>

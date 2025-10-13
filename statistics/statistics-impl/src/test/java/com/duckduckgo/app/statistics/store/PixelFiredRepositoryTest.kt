@@ -20,10 +20,6 @@ import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.common.test.CoroutineTestRule
-import java.time.Instant
-import java.time.ZonedDateTime
-import kotlin.time.Duration.Companion.days
-import kotlin.time.toJavaDuration
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.junit.After
@@ -33,6 +29,10 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import java.time.Instant
+import java.time.ZonedDateTime
+import kotlin.time.Duration.Companion.days
+import kotlin.time.toJavaDuration
 
 @ExperimentalCoroutinesApi
 @RunWith(AndroidJUnit4::class)

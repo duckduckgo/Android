@@ -37,10 +37,10 @@ import com.duckduckgo.autofill.impl.service.AutofillProviderChooseActivity.Compa
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
-import javax.inject.Inject
-import kotlin.random.Random
 import logcat.LogPriority.INFO
 import logcat.logcat
+import javax.inject.Inject
+import kotlin.random.Random
 
 interface AutofillProviderSuggestions {
     suspend fun buildSuggestionsResponse(
@@ -72,9 +72,9 @@ class RealAutofillProviderSuggestions @Inject constructor(
         val fillableFields = nodeToAutofill.parsedAutofillFields.filter { it.type != UNKNOWN }
         logcat(INFO) {
             "DDGAutofillService Fillable Request for rootNode: ${nodeToAutofill.website} and ${nodeToAutofill.packageId} for fields:\n${
-            fillableFields.joinToString(
-                separator = "\n",
-            )
+                fillableFields.joinToString(
+                    separator = "\n",
+                )
             }"
         }
 
@@ -85,7 +85,7 @@ class RealAutofillProviderSuggestions @Inject constructor(
             val credentials = loginCredentials(nodeToAutofill)
             logcat(INFO) {
                 """
-                    DDGAutofillService suggesting credentials for ${fieldsToAutofill.autofillId}credentials: 
+                    DDGAutofillService suggesting credentials for ${fieldsToAutofill.autofillId}credentials:
                     ${credentials.joinToString(separator = "\n")}
                 """.trimIndent()
             }

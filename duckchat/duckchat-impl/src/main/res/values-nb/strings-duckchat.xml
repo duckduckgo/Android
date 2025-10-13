@@ -37,11 +37,13 @@
     <string name="audioCaptureSoundRecorderPermissionDeniedMessage">Nettsteder kan bare bruke lydopptakeren hvis du lar DuckDuckGo be om tilgang.</string>
 
     <!-- Settings -->
-    <string name="duck_chat_settings_activity_description">Duck.ai er en valgfri funksjon der du kan chatte anonymt med populære tredjeparts AI-chat-modeller. Chattene dine brukes ikke til å trene AI.\n<annotation type="learn_more_link">Les mer</annotation></string>
-    <string name="duck_chat_enable_duck_ai_setting">Aktiver Duck.ai</string>
+    <string name="duck_chat_ai_features_title">AI-funksjoner</string>
+    <string name="duck_chat_settings_activity_description">AI-funksjonene i DuckDuckGo er private og valgfrie.\nDataene dine brukes ikke til å trene AI.\n<annotation type="learn_more_link">Les mer</annotation></string>
+    <string name="duck_chat_enable_duck_ai_setting">Duck.ai</string>
+    <string name="duck_chat_enable_duck_ai_setting_description">Chat privat med populære tredjeparts AI-modeller</string>
     <string name="duck_chat_visibility_setting">Nettlesermeny</string>
     <string name="duck_chat_address_bar_visibility_setting">Adressefelt</string>
-    <string name="duck_chat_assist_settings_title">Assist-innstillinger</string>
+    <string name="duck_chat_assist_settings_title">Innstillinger for Search Assist</string>
     <string name="duck_chat_assist_settings_description">Velg hvor ofte du vil at AI-assisterte svar skal vises i søkene dine</string>
     <string name="duck_ai_shortcut_settings_title">Duck.ai-snarveier</string>
     <string name="duck_ai_shortcut_settings_description">Velg hvilke Duck.ai-snarveier du vil skal vises</string>
@@ -53,7 +55,7 @@
     <string name="input_screen_chat_hint">Spør privat</string>
     <string name="input_screen_user_pref_without_ai">Bare søk</string>
     <string name="input_screen_user_pref_with_ai">Søk og Duck.ai</string>
-    <string name="input_screen_user_pref_description">Prøv den nye valgmuligheten der du kan spørre Duck.ai direkte fra adressefeltet. <annotation type="share_feedback">Del tilbakemelding</annotation></string>
+    <string name="input_screen_user_pref_description">Prøv den nye valgmuligheten for å spørre Duck.ai direkte fra adressefeltet. <annotation type="share_feedback">Del tilbakemelding</annotation></string>
 
     <!-- Duck.ai Pro settings -->
     <string name="duck_ai_paid_settings_title">Duck.ai</string>
@@ -61,14 +63,6 @@
     <string name="duck_ai_paid_settings_page_description"><![CDATA[Chat privat med AI-modeller som bare er tilgjengelige for abonnenter.\n<a href=\"\">Finn ut mer</a>]]></string>
     <string name="duck_ai_paid_settings_open_duck_ai">Åpne Duck.ai</string>
     <string name="duck_ai_paid_settings_learn_more_title">Finn ut mer</string>
-
-    <!-- Rebranding-->
-    <string name="duck_chat_title_rebranding">AI-funksjoner</string>
-    <string name="duck_chat_settings_activity_description_rebranding">AI-funksjonene i DuckDuckGo er private og valgfrie.\nDataene dine brukes ikke til å trene AI.\n<annotation type="learn_more_link">Les mer</annotation></string>
-    <string name="duck_chat_enable_duck_ai_setting_rebranding">Duck.ai</string>
-    <string name="duck_chat_enable_duck_ai_setting_description_rebranding">Chat privat med populære tredjeparts AI-modeller</string>
-    <string name="duck_chat_assist_settings_title_rebranding">Innstillinger for Search Assist</string>
-    <string name="duck_chat_assist_settings_description_rebranding">Velg hvor ofte du vil at AI-assisterte svar skal vises i søkene dine</string>
 
     <!-- AutoComplete -->
     <string name="autocompleteDuckAiPrompt">Spør Duck.ai</string>

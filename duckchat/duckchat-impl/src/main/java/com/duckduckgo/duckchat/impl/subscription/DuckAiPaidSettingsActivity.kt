@@ -43,9 +43,9 @@ import com.duckduckgo.duckchat.impl.subscription.DuckAiPaidSettingsViewModel.Com
 import com.duckduckgo.duckchat.impl.subscription.DuckAiPaidSettingsViewModel.Command.OpenDuckAi
 import com.duckduckgo.mobile.android.R
 import com.duckduckgo.navigation.api.GlobalActivityStarter
-import javax.inject.Inject
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import javax.inject.Inject
 
 object DuckAiPaidSettingsNoParams : GlobalActivityStarter.ActivityParams
 

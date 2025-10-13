@@ -24,9 +24,9 @@ import com.duckduckgo.pir.impl.models.scheduling.JobRecord.OptOutJobRecord.OptOu
 import com.duckduckgo.pir.impl.store.PirRepository
 import com.duckduckgo.pir.impl.store.PirSchedulingRepository
 import com.squareup.anvil.annotations.ContributesBinding
+import kotlinx.coroutines.withContext
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
-import kotlinx.coroutines.withContext
 
 interface EligibleOptOutJobProvider {
     suspend fun getAllEligibleOptOutJobs(timeInMillis: Long): List<OptOutJobRecord>

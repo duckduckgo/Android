@@ -23,10 +23,10 @@ import com.duckduckgo.js.messaging.api.JsMessaging
 import com.duckduckgo.pir.impl.dashboard.messaging.PirDashboardWebMessages
 import com.duckduckgo.pir.impl.dashboard.messaging.model.PirWebMessageRequest
 import com.duckduckgo.pir.impl.dashboard.messaging.model.PirWebMessageResponse
-import com.duckduckgo.pir.impl.dashboard.state.PirWebOnboardingStateHolder
+import com.duckduckgo.pir.impl.dashboard.state.PirWebProfileStateHolder
 import com.squareup.anvil.annotations.ContributesMultibinding
-import javax.inject.Inject
 import logcat.logcat
+import javax.inject.Inject
 
 /**
  * Handles the message from Web to add an address the user inputted to the current user profile.
@@ -36,7 +36,7 @@ import logcat.logcat
     boundType = PirWebJsMessageHandler::class,
 )
 class PirWebAddAddressToCurrentUserProfileMessageHandler @Inject constructor(
-    private val pirWebOnboardingStateHolder: PirWebOnboardingStateHolder,
+    private val pirWebProfileStateHolder: PirWebProfileStateHolder,
 ) : PirWebJsMessageHandler() {
 
     override val message = PirDashboardWebMessages.ADD_ADDRESS_TO_CURRENT_USER_PROFILE
@@ -65,7 +65,7 @@ class PirWebAddAddressToCurrentUserProfileMessageHandler @Inject constructor(
         }
 
         // attempting to add a duplicate address should return success=false
-        if (!pirWebOnboardingStateHolder.addAddress(city, state)) {
+        if (!pirWebProfileStateHolder.addAddress(city, state)) {
             logcat { "PIR-WEB: PirWebAddAddressToCurrentUserProfileMessageHandler: address already exists" }
             jsMessaging.sendResponse(
                 jsMessage = jsMessage,

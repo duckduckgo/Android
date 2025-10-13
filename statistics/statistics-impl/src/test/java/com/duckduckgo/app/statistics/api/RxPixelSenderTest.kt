@@ -42,7 +42,6 @@ import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.test.InstantSchedulersRule
 import com.duckduckgo.common.utils.device.DeviceInfo
 import io.reactivex.Completable
-import java.util.concurrent.TimeoutException
 import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Assert.assertEquals
@@ -54,6 +53,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mock
 import org.mockito.kotlin.*
+import java.util.concurrent.TimeoutException
 
 @RunWith(AndroidJUnit4::class)
 class RxPixelSenderTest {

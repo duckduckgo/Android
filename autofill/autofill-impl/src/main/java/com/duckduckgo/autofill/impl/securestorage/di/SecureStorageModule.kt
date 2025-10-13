@@ -30,8 +30,8 @@ import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides
 import dagger.SingleInstanceIn
-import javax.inject.Named
 import kotlinx.coroutines.CoroutineScope
+import javax.inject.Named
 
 @Module
 @ContributesTo(AppScope::class)
