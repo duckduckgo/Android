@@ -300,9 +300,7 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
                 inputScreenButtons.setSendButtonVisible(it.submitButtonVisible)
                 inputScreenButtons.setNewLineButtonVisible(it.newLineButtonVisible)
                 inputModeWidget.setMainButtonsVisible(
-                    it.searchMode,
                     it.mainButtonsVisible,
-                    mainButtonsEnabled = it.mainButtonsEnabled,
                 )
             }.launchIn(lifecycleScope)
 
