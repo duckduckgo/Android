@@ -26,9 +26,13 @@ import com.duckduckgo.pir.impl.models.scheduling.JobRecord.EmailConfirmationJobR
 import com.duckduckgo.pir.impl.models.scheduling.JobRecord.EmailConfirmationJobRecord.EmailData
 import com.duckduckgo.pir.impl.pixels.PirPixelSender
 import com.duckduckgo.pir.impl.scheduling.JobRecordUpdater
+import com.duckduckgo.pir.impl.store.PirEventsRepository
 import com.duckduckgo.pir.impl.store.PirRepository
 import com.duckduckgo.pir.impl.store.PirRepository.EmailConfirmationLinkFetchStatus
 import com.duckduckgo.pir.impl.store.PirSchedulingRepository
+import com.duckduckgo.pir.impl.store.db.EventType.EMAIL_CONFIRMATION_COMPLETED
+import com.duckduckgo.pir.impl.store.db.EventType.EMAIL_CONFIRMATION_STARTED
+import com.duckduckgo.pir.impl.store.db.PirEventLog
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
 import kotlinx.coroutines.withContext
@@ -54,6 +58,7 @@ class RealPirEmailConfirmationJobsRunner @Inject constructor(
     private val emailConfirmation: PirEmailConfirmation,
     private val pirPixelSender: PirPixelSender,
     private val currentTimeProvider: CurrentTimeProvider,
+    private val pirEventsRepository: PirEventsRepository,
 ) : PirEmailConfirmationJobsRunner {
     private var startedTimeMs: Long = 0L
     private var totalFetchAttempts: Int = 0
@@ -62,6 +67,12 @@ class RealPirEmailConfirmationJobsRunner @Inject constructor(
     override suspend fun runEligibleJobs(context: Context): Result<Unit> {
         startedTimeMs = currentTimeProvider.currentTimeMillis()
         pirPixelSender.reportEmailConfirmationStarted()
+        pirEventsRepository.saveEventLog(
+            PirEventLog(
+                eventTimeInMillis = startedTimeMs,
+                eventType = EMAIL_CONFIRMATION_STARTED,
+            ),
+        )
 
         logcat { "PIR-EMAIL-CONFIRMATION: Starting run." }
         val activeBrokersMap = pirRepository.getAllActiveBrokerObjects().associateBy { it.name }
@@ -266,11 +277,17 @@ class RealPirEmailConfirmationJobsRunner @Inject constructor(
         }
     }
 
-    private fun handleJobCompleted() {
+    private suspend fun handleJobCompleted() {
         pirPixelSender.reportEmailConfirmationCompleted(
             totalTimeInMillis = currentTimeProvider.currentTimeMillis() - startedTimeMs,
             totalFetchAttempts = totalFetchAttempts,
             totalEmailConfirmationJobs = totalEmailConfirmationJobs,
+        )
+        pirEventsRepository.saveEventLog(
+            PirEventLog(
+                eventTimeInMillis = startedTimeMs,
+                eventType = EMAIL_CONFIRMATION_COMPLETED,
+            ),
         )
     }
 

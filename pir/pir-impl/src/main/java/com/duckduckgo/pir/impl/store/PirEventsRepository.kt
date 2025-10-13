@@ -40,7 +40,7 @@ import javax.inject.Inject
 interface PirEventsRepository {
     fun getAllEventLogsFlow(): Flow<List<PirEventLog>>
 
-    suspend fun saveScanLog(pirScanLog: PirEventLog)
+    suspend fun saveEventLog(pirEventLog: PirEventLog)
 
     suspend fun saveBrokerScanLog(pirBrokerScanLog: PirBrokerScanLog)
 
@@ -123,9 +123,9 @@ class RealPirEventsRepository @Inject constructor(
         return scanLogDao.getAllEventLogsFlow()
     }
 
-    override suspend fun saveScanLog(pirScanLog: PirEventLog) {
+    override suspend fun saveEventLog(pirEventLog: PirEventLog) {
         withContext(dispatcherProvider.io()) {
-            scanLogDao.insertEventLog(pirScanLog)
+            scanLogDao.insertEventLog(pirEventLog)
         }
     }
 

@@ -382,7 +382,7 @@ class RealPirOptOut @Inject constructor(
     }
 
     private suspend fun emitStartPixel() {
-        eventsRepository.saveScanLog(
+        eventsRepository.saveEventLog(
             PirEventLog(
                 eventTimeInMillis = currentTimeProvider.currentTimeMillis(),
                 eventType = EventType.MANUAL_OPTOUT_STARTED,
@@ -391,7 +391,7 @@ class RealPirOptOut @Inject constructor(
     }
 
     private suspend fun emitCompletedPixel() {
-        eventsRepository.saveScanLog(
+        eventsRepository.saveEventLog(
             PirEventLog(
                 eventTimeInMillis = currentTimeProvider.currentTimeMillis(),
                 eventType = EventType.MANUAL_OPTOUT_COMPLETED,
