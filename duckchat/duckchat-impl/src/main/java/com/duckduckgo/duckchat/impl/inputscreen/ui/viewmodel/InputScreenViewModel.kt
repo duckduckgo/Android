@@ -144,9 +144,7 @@ class InputScreenViewModel @AssistedInject constructor(
                 showChatLogo = true,
                 showSearchLogo = true,
                 newLineButtonVisible = false,
-                mainButtonsEnabled = inputScreenConfigResolver.mainButtonsEnabled(),
                 mainButtonsVisible = false,
-                searchMode = true,
             ),
         )
     val visibilityState: StateFlow<InputScreenVisibilityState> = _visibilityState.asStateFlow()
@@ -365,7 +363,7 @@ class InputScreenViewModel @AssistedInject constructor(
             it.copy(icon = if (isWebUrl(query)) SubmitButtonIcon.SEND else SubmitButtonIcon.SEARCH)
         }
         _visibilityState.update {
-            it.copy(searchMode = true, mainButtonsVisible = query.isEmpty())
+            it.copy(mainButtonsVisible = canShowMainButtons())
         }
     }
 
@@ -444,7 +442,7 @@ class InputScreenViewModel @AssistedInject constructor(
                 it.copy(icon = SubmitButtonIcon.SEND)
             }
             _visibilityState.update {
-                it.copy(newLineButtonVisible = true, searchMode = false, mainButtonsVisible = false)
+                it.copy(newLineButtonVisible = true, mainButtonsVisible = false)
             }
         }
         if (userSelectedMode == SEARCH) {
@@ -456,7 +454,7 @@ class InputScreenViewModel @AssistedInject constructor(
     fun onSearchSelected() {
         viewModelScope.launch {
             _visibilityState.update {
-                it.copy(newLineButtonVisible = false)
+                it.copy(newLineButtonVisible = false, mainButtonsVisible = canShowMainButtons())
             }
         }
         if (userSelectedMode == CHAT) {
@@ -628,13 +626,13 @@ class InputScreenViewModel @AssistedInject constructor(
     }
 
     fun onClearTextTapped() {
-        val params = inputScreenPixelsModeParam(isSearchMode = visibilityState.value.searchMode)
+        val params = inputScreenPixelsModeParam(isSearchMode = userSelectedMode == SEARCH)
         pixel.fire(DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_OMNIBAR_CLEAR_BUTTON_PRESSED, parameters = params)
-
-        _visibilityState.update {
-            it.copy(mainButtonsVisible = true)
-        }
     }
+
+    private fun canShowMainButtons() = searchInputTextState.value.isEmpty() &&
+        userSelectedMode == SEARCH &&
+        inputScreenConfigResolver.mainButtonsEnabled()
 
     class InputScreenViewModelProviderFactory(
         private val assistedFactory: InputScreenViewModelFactory,

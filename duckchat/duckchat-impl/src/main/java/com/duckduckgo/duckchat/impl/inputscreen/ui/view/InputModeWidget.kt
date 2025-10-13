@@ -449,38 +449,17 @@ class InputModeWidget @JvmOverloads constructor(
     }
 
     fun setMainButtonsVisible(
-        searchMode: Boolean,
         mainButtonsVisible: Boolean,
-        mainButtonsEnabled: Boolean,
     ) {
-        logcat { "inputScreen: setMainButtonsVisible searchMode $searchMode mainButtonsVisible $mainButtonsEnabled, mainButtonsEnabled" }
-        if (mainButtonsEnabled) {
-            if (searchMode) {
-                // buttons are shown in search mode if the input field is empty
-                fade(inputModeMainButtonsContainer, mainButtonsVisible)
+        fade(inputModeMainButtonsContainer, mainButtonsVisible)
 
-                inputModeWidgetLayout.updateLayoutParams<MarginLayoutParams> {
-                    marginEnd = if (mainButtonsVisible) {
-                        inputModeCardEndMargin
-                    } else {
-                        inputModeCardExtendedEndMargin
-                    }
-                    marginStart = inputModeCardExtendedEndMargin
-                }
+        inputModeWidgetLayout.updateLayoutParams<MarginLayoutParams> {
+            marginEnd = if (mainButtonsVisible) {
+                inputModeCardEndMargin
             } else {
-                // in duck.ai mode buttons are never visible but we need to adjust the layout margins
-                fade(inputModeMainButtonsContainer, false)
-                inputModeWidgetLayout.updateLayoutParams<MarginLayoutParams> {
-                    marginEnd = inputModeCardExtendedEndMargin
-                    marginStart = inputModeCardExtendedEndMargin
-                }
+                inputModeCardExtendedEndMargin
             }
-        } else {
-            fade(inputModeMainButtonsContainer, false)
-            inputModeWidgetLayout.updateLayoutParams<MarginLayoutParams> {
-                marginEnd = inputModeCardExtendedEndMargin
-                marginStart = inputModeCardExtendedEndMargin
-            }
+            marginStart = inputModeCardExtendedEndMargin
         }
     }
 

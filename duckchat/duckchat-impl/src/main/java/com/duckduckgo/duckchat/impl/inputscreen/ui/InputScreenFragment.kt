@@ -289,21 +289,18 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
 
         viewModel.visibilityState
             .onEach {
+                val isSearchMode = binding.viewPager.currentItem == 0
                 binding.ddgLogoContainer.isVisible =
-                    if (it.searchMode) {
+                    if (isSearchMode) {
                         it.showSearchLogo
                     } else {
                         it.showChatLogo
                     }
 
-                binding.ddgLogo.progress = if (it.searchMode) 0f else 1f
+                binding.ddgLogo.progress = if (isSearchMode) 0f else 1f
                 inputScreenButtons.setSendButtonVisible(it.submitButtonVisible)
                 inputScreenButtons.setNewLineButtonVisible(it.newLineButtonVisible)
-                inputModeWidget.setMainButtonsVisible(
-                    it.searchMode,
-                    it.mainButtonsVisible,
-                    mainButtonsEnabled = it.mainButtonsEnabled,
-                )
+                inputModeWidget.setMainButtonsVisible(it.mainButtonsVisible)
             }.launchIn(lifecycleScope)
 
         viewModel.visibilityState
