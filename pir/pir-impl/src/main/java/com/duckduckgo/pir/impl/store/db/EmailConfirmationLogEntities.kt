@@ -19,10 +19,29 @@ package com.duckduckgo.pir.impl.store.db
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 
+/**
+ * This table is used to log significant events in the email confirmation process.
+ * It helps in monitoring, debugging, and analyzing the email confirmation workflow.
+ * DO not use for any business logic
+ */
 @Entity(tableName = "pir_email_confirmation_log")
 data class PirEmailConfirmationLog(
     @PrimaryKey val eventTimeInMillis: Long,
     val eventType: EmailConfirmationEventType,
+    /**
+     * This can be used to store additional information about the event, such as:
+     * - [EmailConfirmationEventType.LINK_FETCH_ATTEMPT]Total of links attempted in the fetch event
+     * - [EmailConfirmationEventType.LINK_FETCH_READY]Total fetch links that resulted to ready
+     * - [EmailConfirmationEventType.LINK_FETCH_ERROR]Total fetch links that resulted to error
+     * - [EmailConfirmationEventType.EMAIL_CONFIRMATION_MAXED_OUT]
+     *      Total email confirmation jobs that were maxed out in the run
+     * - [EmailConfirmationEventType.EMAIL_CONFIRMATION_ATTEMPT]
+     *      Total number of email confirmation attempts in the run
+     * - [EmailConfirmationEventType.EMAIL_CONFIRMATION_SUCCESS]
+     *      Name of the broker for which the email confirmation was successfully completed.
+     * - [EmailConfirmationEventType.EMAIL_CONFIRMATION_FAILED]
+     *      Name of the broker for which the email confirmation was failed.
+     */
     val value: String,
 )
 
