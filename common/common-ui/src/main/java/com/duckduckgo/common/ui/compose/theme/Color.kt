@@ -40,7 +40,7 @@ data class DuckDuckGoColors(
     val accentYellow: Color,
     val ripple: Color,
     val text: DuckDuckGoTextColors,
-    val isDark: Boolean,
+    val isDark: Boolean, // TODO we'll need to do an exploration into using the app pref for Theme switching
 )
 
 @Immutable
