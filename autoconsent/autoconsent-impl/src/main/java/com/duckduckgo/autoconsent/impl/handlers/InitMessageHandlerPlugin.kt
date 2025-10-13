@@ -23,6 +23,7 @@ import com.duckduckgo.autoconsent.api.AutoconsentCallback
 import com.duckduckgo.autoconsent.impl.MessageHandlerPlugin
 import com.duckduckgo.autoconsent.impl.adapters.JSONObjectAdapter
 import com.duckduckgo.autoconsent.impl.cache.AutoconsentSettingsCache
+import com.duckduckgo.autoconsent.impl.remoteconfig.AutoconsentFeature
 import com.duckduckgo.autoconsent.impl.remoteconfig.AutoconsentFeatureModels.CompactRules
 import com.duckduckgo.autoconsent.impl.store.AutoconsentSettingsRepository
 import com.duckduckgo.common.utils.DispatcherProvider
@@ -47,6 +48,7 @@ class InitMessageHandlerPlugin @Inject constructor(
     private val dispatcherProvider: DispatcherProvider,
     private val settingsRepository: AutoconsentSettingsRepository,
     private val settingsCache: AutoconsentSettingsCache,
+    private val autoconsentFeature: AutoconsentFeature,
 ) : MessageHandlerPlugin {
 
     private val moshi = Moshi.Builder().add(JSONObjectAdapter()).build()
@@ -84,7 +86,11 @@ class InitMessageHandlerPlugin @Inject constructor(
                     val detectRetries = 20
                     val disabledCmps = settings.disabledCMPs
                     val config = Config(enabled = true, autoAction, disabledCmps, enablePreHide, detectRetries, enableCosmeticRules = true)
-                    val initResp = InitResp(config = config, rules = filterCompactRules(settings.compactRuleList, url))
+                    val initResp = if (autoconsentFeature.ruleFiltering().isEnabled()) {
+                        InitResp(config = config, rules = filterCompactRules(settings.compactRuleList, url))
+                    } else {
+                        InitResp(config = config, rules = AutoconsentRuleset(settings.compactRuleList))
+                    }
 
                     val response = ReplyHandler.constructReply(getMessage(initResp))
 
