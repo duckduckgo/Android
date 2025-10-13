@@ -184,7 +184,11 @@ class ContributesSubComponentCodeGenerator : CodeGenerator {
             .build()
     }
 
-    private fun generateSubcomponentFactoryBindingModule(vmClass: ClassReference.Psi, codeGenDir: File, module: ModuleDescriptor): GeneratedFileWithSources {
+    private fun generateSubcomponentFactoryBindingModule(
+        vmClass: ClassReference.Psi,
+        codeGenDir: File,
+        module: ModuleDescriptor,
+    ): GeneratedFileWithSources {
         val generatedPackage = vmClass.packageFqName.toString()
         val moduleClassName = "${vmClass.subComponentName()}_Module"
         val scope = vmClass.annotations.first { it.fqName == InjectWith::class.fqName }.scopeOrNull(0)!!
