@@ -29,7 +29,7 @@ import com.duckduckgo.navigation.api.GlobalActivityStarter
  */
 data class InputScreenActivityParams(
     val query: String,
-    val tabs: Int,
+    val tabs: Int = 0,
     val isTopOmnibar: Boolean = false,
 ) : GlobalActivityStarter.ActivityParams
 

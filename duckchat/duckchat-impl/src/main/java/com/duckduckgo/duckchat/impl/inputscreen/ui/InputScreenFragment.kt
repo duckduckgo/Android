@@ -214,9 +214,10 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
         }
 
         configureViewPager()
-        params?.tabs?.let { tabs ->
-            configureOmnibar(tabs)
-        }
+
+        val tabs = params?.tabs ?: 0
+        configureOmnibar(tabs)
+
         configureVoice(useTopBar)
         configureObservers()
         configureLogoAnimation()
