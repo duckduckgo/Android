@@ -602,6 +602,9 @@ class RealDuckChat @Inject constructor(
             showAIChatAddressBarChoiceScreen = duckChatFeature.showAIChatAddressBarChoiceScreen().isEnabled()
             inputScreenMainButtonsEnabled = duckChatFeature.showMainButtonsInInputScreen().isEnabled()
 
+            val showMainButtons = duckChatFeature.showMainButtonsInInputScreen().isEnabled()
+            _showMainButtonsInInputScreen.emit(showMainButtons)
+
             val settingsString = duckChatFeature.self().getSettings()
             val settingsJson =
                 settingsString?.let {
@@ -656,9 +659,6 @@ class RealDuckChat @Inject constructor(
 
             val showClearChatHistory = clearChatHistory
             _showClearDuckAIChatHistory.emit(showClearChatHistory)
-
-            val showMainButtons = duckChatFeature.showMainButtonsInInputScreen().isEnabled()
-            _showMainButtonsInInputScreen.emit(showMainButtons)
         }
 
     companion object {
