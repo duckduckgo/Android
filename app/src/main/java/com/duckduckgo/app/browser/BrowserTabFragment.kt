@@ -1109,9 +1109,19 @@ class BrowserTabFragment :
     }
 
     private fun configureInputScreenLauncher() {
-        omnibar.configureInputScreenLaunchListener { query ->
-            launchInputScreen(query)
-        }
+        omnibar.configureInputScreenLaunchListener(object : Omnibar.InputScreenLaunchListener {
+            override fun onLaunchInputScreen(query: String) {
+                launchInputScreen(query)
+            }
+
+            override fun onDuckAiToggleSelected() {
+                launchInputScreen("")
+            }
+
+            override fun onSearchToggleSelected() {
+                launchInputScreen("")
+            }
+        })
     }
 
     private fun launchInputScreen(query: String) {

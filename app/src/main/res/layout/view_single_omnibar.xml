@@ -43,7 +43,7 @@
                 style="@style/Widget.DuckChat.TabLayout.Rounded"
                 android:layout_width="wrap_content"
                 android:layout_height="@dimen/inputModeSwitchHeight"
-                android:layout_marginTop="@dimen/keyline_2"
+                android:layout_marginTop="@dimen/keyline_4"
                 android:layout_marginBottom="@dimen/keyline_1"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
