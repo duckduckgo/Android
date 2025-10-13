@@ -20,6 +20,7 @@
     <string name="cancel">Ακύρωση</string>
     <string name="ok">Εντάξει</string>
     <string name="privacyPro" translatable="false">Privacy Pro</string>
+    <string name="ddg_subscription">Συνδρομή DuckDuckGo</string>
     <string name="manageEmail">Διαχείριση Email</string>
 
     <!--Restore Subscriptions Activity-->
@@ -31,19 +32,19 @@
     <string name="subscriptionNotFound">Η συνδρομή δεν βρέθηκε</string>
     <string name="subscriptionNotFoundDescription">Η συνδρομή που συνδέεται με αυτόν τον λογαριασμό Google Play δεν είναι πλέον ενεργή.</string>
     <string name="purchaseRestored">Οι αγορές σας έχουν αποκατασταθεί.</string>
-    <string name="restoreSubscriptionTitle">Προσθέστε τη συνδρομή σας Privacy Pro σε αυτήν τη συσκευή</string>
+    <string name="restoreSubscriptionTitle">Προσθέστε τη συνδρομή σας σε αυτήν τη συσκευή</string>
     <string name="restoreSubscriptionGooglePlayTitle">Προσθήκη μέσω λογαριασμού Google Play</string>
     <string name="restoreSubscriptionGooglePlayDescription">Κάντε επαναφορά της συνδρομή σας σε συσκευές Android χρησιμοποιώντας τον λογαριασμό σας στο Google Play.</string>
     <string name="restoreSubscriptionGooglePlayGetStarted">Επαναφορά αγοράς</string>
     <string name="restoreSubscriptionEmailTitle">Προσθήκη μέσω email</string>
-    <string name="restoreSubscriptionEmailDescription">Συνδέστε μια διεύθυνση email με τη συνδρομή σας για να προσθέσετε το Privacy Pro σε αυτήν τη συσκευή.</string>
+    <string name="restoreSubscriptionEmailDescription">Συνδέστε μια διεύθυνση email με τη συνδρομή σας για να την προσθέσετε σε αυτήν τη συσκευή.</string>
     <string name="restoreSubscriptionEmailGetStarted">Ξεκινήστε</string>
 
     <!--Settings Subscriptions Activity-->
     <string name="removeSubscription">Αφαίρεση συνδρομής</string>
     <string name="subscriptionRemoved">Η συνδρομή σας έχει αφαιρεθεί από αυτήν τη συσκευή</string>
     <string name="removeFromDevice">Αφαίρεση από αυτήν τη συσκευή;</string>
-    <string name="removeFromDeviceDescription">Δεν θα μπορείτε πλέον να έχετε πρόσβαση στη συνδρομή Privacy Pro σε αυτήν τη συσκευή. Αυτό δεν θα ακυρώσει τη συνδρομή σας και θα παραμείνει ενεργή στις υπόλοιπες συσκευές σας.</string>
+    <string name="removeFromDeviceDescription">Δεν θα μπορείτε πλέον να έχετε πρόσβαση στη συνδρομή σας σε αυτήν τη συσκευή. Αυτό δεν θα ακυρώσει τη συνδρομή σας και θα παραμείνει ενεργή στις υπόλοιπες συσκευές σας.</string>
     <string name="subscriptionsDataMonthly" instruction="First placeholder is renews or expires, second is a date in format MMMM dd, yyyy">Η μηνιαία συνδρομή σας %1$s στις %2$s.</string>
     <string name="subscriptionsDataYearly" instruction="First placeholder is renews or expires, second is a date in format MMMM dd, yyyy">Η ετήσια συνδρομή σας %1$s στις %2$s.</string>
     <string name="subscriptionsExpiredData" instruction="The placeholder is a date in format MMMM dd, yyyy">Η συνδρομή σας έληξε %1$s.</string>
@@ -51,14 +52,14 @@
     <string name="yearlySubscription">Ετήσια συνδρομή</string>
     <string name="renews">ανανεώνεται</string>
     <string name="expires">λήγει</string>
-    <string name="activateOnOtherDevices">Προσθήκη Privacy Pro σε άλλες συσκευές</string>
+    <string name="activateOnOtherDevices">Προσθέστε τη συνδρομή σας σε άλλες συσκευές</string>
     <string name="addToDevicePrimaryText">Προσθήκη σε συσκευή</string>
-    <string name="addToDeviceSecondaryTextWithoutEmail">Προσθέστε το Privacy Pro στις άλλες συσκευές σας μέσω του Google Play ή συνδέοντας μια διεύθυνση email.</string>
-    <string name="addToDeviceSecondaryTextWithEmail">Χρησιμοποιήστε το παραπάνω email για να προσθέσετε τη συνδρομή σας στις άλλες συσκευές σας στην εφαρμογή DuckDuckGo. Μεταβείτε στις Ρυθμίσεις &gt; Privacy Pro &gt; Έχω συνδρομή.</string>
+    <string name="addToDeviceSecondaryTextWithoutEmail">Προσθέστε τη συνδρομή σας στις άλλες συσκευές σας μέσω Google Play ή συνδέοντας μια διεύθυνση email.</string>
+    <string name="addToDeviceSecondaryTextWithEmail">Χρησιμοποιήστε το παραπάνω email για να προσθέσετε τη συνδρομή σας στις άλλες συσκευές σας στην εφαρμογή DuckDuckGo. Μεταβείτε στις Ρυθμίσεις &gt; Ρυθμίσεις συνδρομής &gt; Έχω συνδρομή.</string>
     <string name="editEmailPrimaryText">Επεξεργασία email</string>
     <string name="learnMore">Μάθετε περισσότερα</string>
-    <string name="privacyProFaq">Χρειάζεστε βοήθεια με το Privacy Pro;</string>
-    <string name="privacyProFaqSecondary">Πάρτε απαντήσεις σε συχνές ερωτήσεις ή επικοινωνήστε με την υποστήριξη του Privacy Pro από τις σελίδες βοήθειας που διαθέτουμε. Η διαθεσιμότητα των λειτουργιών διαφέρει ανά χώρα.</string>
+    <string name="privacyProFaq">Χρειάζεστε βοήθεια με τη συνδρομή σας;</string>
+    <string name="privacyProFaqSecondary">Πάρτε απαντήσεις σε συχνές ερωτήσεις ή επικοινωνήστε με την υποστήριξη συνδρομών από τις σελίδες βοήθειας που διαθέτουμε. Η διαθεσιμότητα των λειτουργιών διαφέρει ανά χώρα.</string>
     <string name="subscriptionStatusSubscribed">Έχει γίνει εγγραφή</string>
     <string name="privacyPolicyAndTermsOfService">Πολιτική απορρήτου και Όροι χρήσης υπηρεσιών</string>
     <string name="subscriptionStatusFreeTrial">Η δωρεάν δοκιμή είναι ενεργή</string>
@@ -68,15 +69,15 @@
 
     <!--Settings Subscriptions-->
     <string name="subscriptionSetting">Ρυθμίσεις συνδρομής</string>
-    <string name="subscriptionSettingSubscribe">Προστατέψτε τη σύνδεση και την ταυτότητά σας με το Privacy Pro</string>
+    <string name="subscriptionSettingSubscribe">Προστατέψτε τη σύνδεσή σας και την ταυτότητά σας με μία συνδρομή.</string>
 
     <string name="subscriptionSettingSubscribeSubtitle">Οι συνδρομητές αποκτούν το VPN, το Personal Information Removal και το Identity Theft Restoration.</string>
     <string name="subscriptionSettingSubscribeSubtitleRow">Οι συνδρομητές λαμβάνουν το VPN μας και τo Identity Theft Restoration.</string>
 
-    <string name="subscriptionSettingGet">Απόκτησε το Privacy Pro</string>
-    <string name="subscriptionSettingTryFreeTrial">Δοκιμάστε το Privacy Pro δωρεάν</string>
+    <string name="subscriptionSettingGet">Εγγραφείτε στο DuckDuckGo</string>
+    <string name="subscriptionSettingTryFreeTrial">Δοκιμάστε το δωρεάν</string>
     <string name="subscriptionSettingRestore">Έχω συνδρομή</string>
-    <string name="subscriptionSettingExpired">Η συνδρομή σας στο Privacy Pro έληξε</string>
+    <string name="subscriptionSettingExpired">Η συνδρομή σας στο DuckDuckGo έληξε</string>
     <string name="subscriptionSettingExpiredViewPlans">Προβολή προγραμμάτων</string>
     <string name="subscriptionSettingSectionSubscription">Συνδρομή</string>
     <string name="subscriptionSettingRemoveFromDevice">Αφαίρεση από αυτήν τη συσκευή</string>
@@ -170,18 +171,7 @@
     <string name="activitySendFeedback">Αποστολή σχολίου</string>
 
     <!-- Privacy Pro Rebranding-->
-    <string name="privacyProRebranding">Συνδρομή DuckDuckGo</string>
-    <string name="subscriptionSettingExpiredRebranding">Η συνδρομή σας στο DuckDuckGo έληξε</string>
-    <string name="privacyProFaqRebranding">Χρειάζεστε βοήθεια με τη συνδρομή σας;</string>
-    <string name="privacyProFaqSecondaryRebranding">Πάρτε απαντήσεις σε συχνές ερωτήσεις ή επικοινωνήστε με την υποστήριξη συνδρομών από τις σελίδες βοήθειας που διαθέτουμε. Η διαθεσιμότητα των λειτουργιών διαφέρει ανά χώρα.</string>
-    <string name="restoreSubscriptionTitleRebranding">Προσθέστε τη συνδρομή σας σε αυτήν τη συσκευή</string>
-    <string name="restoreSubscriptionEmailDescriptionRebranding">Συνδέστε μια διεύθυνση email με τη συνδρομή σας για να την προσθέσετε σε αυτήν τη συσκευή.</string>
-    <string name="activateOnOtherDevicesRebranding">Προσθέστε τη συνδρομή σας σε άλλες συσκευές</string>
-    <string name="addToDeviceSecondaryTextWithoutEmailRebranding">Προσθέστε τη συνδρομή σας στις άλλες συσκευές σας μέσω Google Play ή συνδέοντας μια διεύθυνση email.</string>
-    <string name="addToDeviceSecondaryTextWithEmailRebranding">Χρησιμοποιήστε το παραπάνω email για να προσθέσετε τη συνδρομή σας στις άλλες συσκευές σας στην εφαρμογή DuckDuckGo. Μεταβείτε στις Ρυθμίσεις &gt; Ρυθμίσεις συνδρομής &gt; Έχω συνδρομή.</string>
     <string name="subscriptionSettingRebrandingMessage">Το Privacy Pro ονομάζεται πλέον απλά Συνδρομή DuckDuckGo</string>
-    <string name="subscriptionSettingSubscribeRebranding">Προστατέψτε τη σύνδεσή σας και την ταυτότητά σας με μία συνδρομή.</string>
-    <string name="removeFromDeviceDescriptionRebranding">Δεν θα μπορείτε πλέον να έχετε πρόσβαση στη συνδρομή σας σε αυτήν τη συσκευή. Αυτό δεν θα ακυρώσει τη συνδρομή σας και θα παραμείνει ενεργή στις υπόλοιπες συσκευές σας.</string>
 
     <string name="subscriptionSettingSubscribeWithDuckAiSubtitle">Οι συνδρομητές αποκτούν το VPN μας, προηγμένα μοντέλα τεχνητής νοημοσύνης στο Duck.ai, το Personal Information Removal και το Identity Theft Restoration.</string>
     <string name="subscriptionSettingSubscribeWithDuckAiSubtitleRow">Οι συνδρομητές αποκτούν το VPN μας, προηγμένα μοντέλα τεχνητής νοημοσύνης στο Duck.ai και το Identity Theft Restoration.</string>
@@ -194,8 +184,6 @@
     <string name="subscriptionSettingSectionTitle" translatable="false">DuckDuckGo Subscription</string>
     <string name="subscriptionSettingSubscribeSecure">Ασφαλίστε το Wi-Fi σας και συνομιλήστε ιδιωτικά με προηγμένα μοντέλα τεχνητής νοημοσύνης</string>
 
-    <string name="subscriptionSettingGetRebranding">Εγγραφείτε στο DuckDuckGo</string>
-    <string name="subscriptionSettingTryFreeTrialRebranding">Δοκιμάστε το δωρεάν</string>
     <string name="feedbackGeneralSubscription">Συνδρομή</string>
 
 </resources>
