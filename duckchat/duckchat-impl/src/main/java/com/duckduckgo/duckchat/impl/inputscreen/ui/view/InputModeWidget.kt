@@ -56,7 +56,6 @@ import com.duckduckgo.duckchat.impl.pixel.inputScreenPixelsModeParam
 import com.google.android.material.card.MaterialCardView
 import com.google.android.material.tabs.TabLayout
 import dagger.android.support.AndroidSupportInjection
-import logcat.logcat
 import javax.inject.Inject
 import kotlin.math.roundToInt
 
