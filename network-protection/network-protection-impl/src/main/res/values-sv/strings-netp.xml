@@ -192,7 +192,7 @@
     <string name="netpNotificationCTAReconnectNow">Återanslut nu</string>
     <string name="netpNotificationSnoozeTitle">VPN har pausats</string>
     <string name="netpNotificationSnoozeBody" instruction="Placeholder is time in hh:mm format">VPN kommer att återansluta kl. %1$s</string>
-    <string name="netpNotificationVpnAccessRevoked">VPN har kopplats från på grund av att abonnemanget har gått ut. Prenumerera på Privacy Pro för att återansluta DuckDuckGo VPN.</string>
+    <string name="netpNotificationVpnAccessRevoked">VPN har kopplats från på grund av att abonnemanget har gått ut. Abonnera på DuckDuckGo för att återansluta VPN-tjänsten.</string>
 
     <!-- Geoswitching -->
     <string name="netpGeoswitchingTitle">VPN-plats</string>
@@ -204,7 +204,7 @@
 
     <!-- Access revoked-->
     <string name="netpDialogVpnAccessRevokedTitle">VPN har kopplats från på grund av att abonnemanget har gått ut</string>
-    <string name="netpDialogVpnAccessRevokedBody">Prenumerera på Privacy Pro för att återansluta DuckDuckGo VPN.</string>
+    <string name="netpDialogVpnAccessRevokedBody">Abonnera på DuckDuckGo för att återansluta VPN-tjänsten.</string>
     <string name="netpDialogVpnAccessRevokedPositiveAction">Prenumerera</string>
     <string name="netpDialogVpnAccessRevokedNegativeAction">Avvisa</string>
 
@@ -258,7 +258,4 @@
     <string name="netpExclusionListLabelAutoExclude">Inkompatibel med VPN-tjänster</string>
     <string name="netpExclusionListAutoExcludeDescription">Vissa appar, som bank- eller streamingappar, fungerar inte så bra med VPN-tjänster. När den här inställningen är aktiverad kommer vi automatiskt att exkludera sådana appar.</string>
 
-    <!-- Privacy Pro Rebranding-->
-    <string name="netpNotificationVpnAccessRevokedRebranding">VPN har kopplats från på grund av att abonnemanget har gått ut. Prenumerera på DuckDuckGo för att återansluta VPN-tjänsten.</string>
-    <string name="netpDialogVpnAccessRevokedBodyRebranding">Abonnera på DuckDuckGo för att återansluta VPN-tjänsten.</string>
 </resources>
