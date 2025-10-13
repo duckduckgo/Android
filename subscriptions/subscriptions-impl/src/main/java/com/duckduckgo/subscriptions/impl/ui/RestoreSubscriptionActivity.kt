@@ -42,7 +42,6 @@ import com.duckduckgo.subscriptions.impl.ui.RestoreSubscriptionViewModel.Command
 import com.duckduckgo.subscriptions.impl.ui.RestoreSubscriptionViewModel.Command.RestoreFromEmail
 import com.duckduckgo.subscriptions.impl.ui.RestoreSubscriptionViewModel.Command.SubscriptionNotFound
 import com.duckduckgo.subscriptions.impl.ui.RestoreSubscriptionViewModel.Command.Success
-import com.duckduckgo.subscriptions.impl.ui.RestoreSubscriptionViewModel.ViewState
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import javax.inject.Inject

@@ -62,7 +62,6 @@ import com.duckduckgo.duckplayer.api.DuckPlayer.UserPreferences
 import com.duckduckgo.duckplayer.api.PrivatePlayerMode.AlwaysAsk
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle
-import com.duckduckgo.subscriptions.api.SubscriptionRebrandingFeatureToggle
 import com.duckduckgo.subscriptions.api.Subscriptions
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.drop
@@ -126,8 +125,6 @@ class CtaViewModelTest {
 
     private val mockOnboardingDesignExperimentManager: OnboardingDesignExperimentManager = mock()
 
-    private val mockRebrandingFeatureToggle: SubscriptionRebrandingFeatureToggle = mock()
-
     private val requiredDaxOnboardingCtas: List<CtaId> = listOf(
         CtaId.DAX_INTRO,
         CtaId.DAX_DIALOG_SERP,
@@ -186,7 +183,6 @@ class CtaViewModelTest {
             brokenSitePrompt = mockBrokenSitePrompt,
             onboardingHomeScreenWidgetToggles = fakeOnboardingHomeScreenWidgetToggles,
             onboardingDesignExperimentManager = mockOnboardingDesignExperimentManager,
-            rebrandingFeatureToggle = mockRebrandingFeatureToggle,
         )
     }
 

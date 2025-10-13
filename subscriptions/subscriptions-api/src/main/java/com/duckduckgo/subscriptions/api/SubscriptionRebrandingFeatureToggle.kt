@@ -22,7 +22,8 @@ interface SubscriptionRebrandingFeatureToggle {
      * @return true if the subscription rebranding feature is enabled, false otherwise
      */
     @Deprecated(
-        message = "This method is kept temporarily for legacy use in one location. It will be removed by November 2025 as the rebranding feature has been retired.",
+        message = "This method is kept temporarily for legacy use in one location. " +
+            "It will be removed by November 2025 as the rebranding feature has been retired.",
     )
     fun isSubscriptionRebrandingEnabled(): Boolean
 }
