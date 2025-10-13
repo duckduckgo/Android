@@ -25,8 +25,10 @@ import com.duckduckgo.autoconsent.impl.FakeSettingsRepository
 import com.duckduckgo.autoconsent.impl.adapters.JSONObjectAdapter
 import com.duckduckgo.autoconsent.impl.cache.RealAutoconsentSettingsCache
 import com.duckduckgo.autoconsent.impl.handlers.InitMessageHandlerPlugin.InitResp
+import com.duckduckgo.autoconsent.impl.remoteconfig.AutoconsentFeature
 import com.duckduckgo.autoconsent.impl.remoteconfig.AutoconsentFeatureModels.CompactRules
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import kotlinx.coroutines.test.TestScope
@@ -48,6 +50,7 @@ class InitMessageHandlerPluginTest {
     private val webView: WebView = WebView(InstrumentationRegistry.getInstrumentation().targetContext)
     private val settingsRepository = FakeSettingsRepository()
     private var settingsCache = RealAutoconsentSettingsCache()
+    private val feature = FakeFeatureToggleFactory.create(AutoconsentFeature::class.java)
 
     @Suppress("ktlint:standard:max-line-length")
     private val mockRulesetJson = "{\"disabledCMPs\":[],\"compactRuleList\":{\"v\":1,\"s\":[\".cc-type-categories[aria-describedby=\\\"cookieconsent:desc\\\"]\",\".cc-type-categories[aria-describedby=\\\"cookieconsent:desc\\\"] .cc-dismiss\",\".cc-dismiss\",\".cc-type-categories input[type=checkbox]:not([disabled]):checked\",\".cc-save\",\"#gdpr-cookie-consent-bar\",\"#gdpr-cookie-consent-bar #cookie_action_reject\",\"wpl_viewed_cookie=no\",\".cookie-alert-extended\",\".cookie-alert-extended-modal\",\"a[data-controller='cookie-alert/extended/detail-link']\",\".cookie-alert-configuration-input:checked\",\"button[data-controller='cookie-alert/extended/button/configuration']\",\"body > div#root > div#ccpa-iframe-theme-provider[data-testid=\\\"ccpa-iframe-theme-provider\\\"] > div#ccpa-iframe[data-testid=\\\"ccpa-iframe\\\"] > div#ccpa_consent_banner[data-testid=\\\"ccpa_consent_banner\\\"] > div:not([id]) > div:nth-child(3):not([id]) > span:not([id]) > span:not([id]) > div:nth-child(2):not([id]) > span:nth-child(1):not([id]) > button#decline_cookies_button[data-testid=\\\"decline_cookies_button\\\"]\",\"body:not([id]) > div#didomi-host > div:not([id]) > div#didomi-popup > div:nth-child(2):not([id]) > div:not([id]) > div:nth-child(2):not([id]) > span:nth-child(1):not([id])\"],\"r\":[[1,\"Complianz categories\",2,\"\",22,[0],[{\"e\":0}],[{\"v\":0}],[{\"if\":{\"e\":1},\"then\":[{\"k\":2}],\"else\":[{\"all\":true,\"optional\":true,\"k\":3},{\"k\":4}]}],[],{}],[1,\"WP Cookie Notice for GDPR\",2,\"\",22,[5],[{\"e\":5}],[{\"v\":5}],[{\"c\":6}],[{\"cc\":7}],{}],[1,\"cookiealert\",2,\"\",11,[],[{\"e\":8}],[{\"v\":9}],[{\"k\":10},{\"all\":true,\"optional\":true,\"k\":11},{\"k\":12},{\"eval\":\"EVAL_COOKIEALERT_0\"}],[{\"eval\":\"EVAL_COOKIEALERT_2\"}],{\"intermediate\":false}],[1,\"auto_AU_help.dropbox.com_4ad\",0,\"^https?://(www\\\\.)?dropbox\\\\.com/\",1,[],[{\"e\":13}],[{\"v\":13}],[{\"wait\":500},{\"c\":13}],[{\"timeout\":1000,\"check\":\"none\",\"wv\":13}],{}],[1,\"auto_AU_24h-lemans.com_2ab\",0,\"^https?://(www\\\\.)?24h-lemans\\\\.com/\",10,[],[{\"e\":14}],[{\"v\":14}],[{\"c\":14}],[],{}]],\"index\":{\"genericRuleRange\":[0,3],\"frameRuleRange\":[2,4],\"specificRuleRange\":[3,5],\"genericStringEnd\":13,\"frameStringEnd\":14}}}"
@@ -57,6 +60,7 @@ class InitMessageHandlerPluginTest {
         coroutineRule.testDispatcherProvider,
         settingsRepository,
         settingsCache,
+        feature,
     )
 
     @Test
