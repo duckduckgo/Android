@@ -833,7 +833,7 @@
     <string name="onboardingInContextEndDaxDialogDescription">Remember: every time you browse with me a creepy ad loses its wings. 👌</string>
     <string name="onboardingEndDaxDialogButton">High five!</string>
     <string name="onboardingPrivacyProDaxDialogTitle">Oh, before I forget…</string>
-    <string name="onboardingPrivacyProDaxDialogDescription"><![CDATA[DuckDuckGo also has a secure <b>VPN + 2 more premium protections</b>, available with an <b>optional paid subscription</b>.]]></string>
+    <string name="onboardingPrivacyProDaxDialogDescription"><![CDATA[DuckDuckGo also has an <b>optional paid subscription</b>, with a secure <b>VPN</b> and <b>advanced, private AI</b>.]]></string>
     <string name="onboardingPrivacyProDaxDialogOkButton">Learn More</string>
     <string name="onboardingPrivacyProDaxDialogFreeTrialOkButton">Try for free!</string>
     <string name="onboardingPrivacyProDaxDialogCancelButton">Skip</string>
@@ -922,9 +922,6 @@
     </plurals>
 
     <string name="bbOnboardingTrackersBlockedDialogDescription">☝️Tap the shield for more info.️</string>
-
-    <!-- Privacy Pro Rebranding-->
-    <string name="onboardingPrivacyProDaxDialogDescriptionRebranding"><![CDATA[DuckDuckGo also has an <b>optional paid subscription</b>, with a secure <b>VPN</b> and <b>advanced, private AI</b>.]]></string>
 
     <!--TabSwitcher Trackers Animation-->
     <string name="showTrackerCountInTabSwitcher">Show Tracker Count in Tab Switcher</string>
