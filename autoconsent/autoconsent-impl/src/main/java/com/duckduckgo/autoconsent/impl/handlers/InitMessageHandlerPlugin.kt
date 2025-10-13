@@ -39,9 +39,6 @@ import kotlinx.coroutines.withContext
 import logcat.logcat
 import javax.inject.Inject
 
-const val MAX_SUPPORTED_RULES_VERSION = 1
-const val MAX_SUPPORTED_STEP_VERSION = 1
-
 @ContributesMultibinding(AppScope::class)
 class InitMessageHandlerPlugin @Inject constructor(
     @AppCoroutineScope val appCoroutineScope: CoroutineScope,
@@ -221,4 +218,9 @@ class InitMessageHandlerPlugin @Inject constructor(
         val config: Config,
         val rules: AutoconsentRuleset,
     )
+
+    companion object {
+        const val MAX_SUPPORTED_RULES_VERSION = 1
+        const val MAX_SUPPORTED_STEP_VERSION = 1
+    }
 }

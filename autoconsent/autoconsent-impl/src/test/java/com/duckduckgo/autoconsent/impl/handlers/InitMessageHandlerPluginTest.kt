@@ -29,6 +29,7 @@ import com.duckduckgo.autoconsent.impl.remoteconfig.AutoconsentFeature
 import com.duckduckgo.autoconsent.impl.remoteconfig.AutoconsentFeatureModels.CompactRules
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
+import com.duckduckgo.feature.toggles.api.Toggle
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import kotlinx.coroutines.test.TestScope
@@ -303,6 +304,24 @@ class InitMessageHandlerPluginTest {
         assertEquals(1, compact.v)
         assertEquals(3, compact.r.size)
         assertEquals(13, compact.s.size)
+    }
+
+    @Test
+    fun whenRuleFilteringDisabledThenUseOriginalRuleset() {
+        settingsRepository.userSetting = true
+        settingsCache.updateSettings(mockRulesetJson)
+        feature.ruleFiltering().setRawStoredState(Toggle.State(enable = false))
+
+        initHandlerPlugin.process(initHandlerPlugin.supportedTypes.first(), message(), webView, mockCallback)
+
+        val shadow = shadowOf(webView)
+        val result = shadow.lastEvaluatedJavascript
+        val initResp = jsonToInitResp(result)
+
+        val compact = initResp!!.rules.compact as Map<*, *>
+        val rules = compact["r"] as List<*>
+
+        assertEquals(5, rules.size)
     }
 
     private fun invokeFilterCompactRules(
