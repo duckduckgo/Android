@@ -206,7 +206,6 @@ class RealPirRunStateHandler @Inject constructor(
                 is BrokerRecordEmailConfirmationNeeded -> handleBrokerRecordEmailConfirmationNeeded(pirRunState)
                 is BrokerRecordEmailConfirmationStarted -> handleBrokerRecordEmailConfirmationStarted(pirRunState)
                 is BrokerRecordEmailConfirmationCompleted -> handleBrokerRecordEmailConfirmationCompleted(pirRunState)
-                else -> {}
             }
         }
 
@@ -370,7 +369,7 @@ class RealPirRunStateHandler @Inject constructor(
 
     private suspend fun handleBrokerScanActionSucceeded(state: BrokerScanActionSucceeded) {
         when (state.pirSuccessResponse) {
-            is ExtractedResponse ->
+            is ExtractedResponse -> {
                 state.pirSuccessResponse.response
                     .map {
                         ExtractedProfile(
@@ -396,20 +395,23 @@ class RealPirRunStateHandler @Inject constructor(
                             fullName = it.fullName.orEmpty(),
                         )
                     }.also {
+                        /**
+                         * For every locally stored extractedProfile for the broker x profile that is not part of the newly received
+                         * extracted Profiles, or no extracted Profiles were found on the broker:
+                         * - We update the optOut status to REMOVED
+                         * - We store the new extracted profiles (if profile query is not deprecated). We ignore the ones that already exist.
+                         * - Update the corresponding ScanJobRecord
+                         */
+                        jobRecordUpdater.markRemovedOptOutJobRecords(it, state.brokerName, state.profileQueryId)
+
                         if (it.isNotEmpty()) {
-                            /**
-                             * For every locally stored extractedProfile for the broker x profile that is not part of the newly received extracted Profiles,
-                             * - We update the optOut status to REMOVED
-                             * - We store the new extracted profiles. We ignore the ones that already exist.
-                             * - Update the corresponding ScanJobRecord
-                             */
-                            jobRecordUpdater.markRemovedOptOutJobRecords(it, state.brokerName, state.profileQueryId)
                             repository.saveNewExtractedProfiles(it)
-                            jobRecordUpdater.updateScanMatchesFound(state.brokerName, state.profileQueryId)
+                            jobRecordUpdater.updateScanMatchesFound(it, state.brokerName, state.profileQueryId)
                         } else {
                             jobRecordUpdater.updateScanNoMatchFound(state.brokerName, state.profileQueryId)
                         }
                     }
+            }
 
             else -> {}
         }

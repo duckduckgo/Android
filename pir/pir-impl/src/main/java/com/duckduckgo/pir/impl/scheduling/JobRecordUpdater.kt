@@ -50,10 +50,12 @@ interface JobRecordUpdater {
      * broker and profile query combination. It updates the corresponding [ScanJobRecord]'s
      * status and also sets the latest scan time.
      *
+     * @param newExtractedProfiles Newly found [ExtractedProfile]s for the [brokerName] and [profileQueryId]
      * @param brokerName The name of the broker associated with the scan job.
      * @param profileQueryId The ID of the [ProfileQuery] related to the scan job.
      */
     suspend fun updateScanMatchesFound(
+        newExtractedProfiles: List<ExtractedProfile>,
         brokerName: String,
         profileQueryId: Long,
     )
@@ -91,7 +93,7 @@ interface JobRecordUpdater {
      * This method compares the [newExtractedProfiles] from the ones currently stored locally and
      * associated to [brokerName] and [profileQueryId]. For every stored [ExtractedProfile] that is
      * not part of the [newExtractedProfiles], we mark the status of the associated [OptOutJobRecord]
-     * to requested.
+     * to removed.
      *
      * This method should be called before we store [newExtractedProfiles] locally.
      *
@@ -214,6 +216,22 @@ interface JobRecordUpdater {
         extractedProfileId: Long,
         lastActionId: String,
     ): EmailConfirmationJobRecord?
+
+    /**
+     * Removes all [ScanJobRecord], [OptOutJobRecord] and [EmailConfirmationJobRecord] associated with the given [profileQueryId].
+     * Any job records that are associated with brokers in [brokersToExclude] will be retained.
+     *
+     * This method should be called when a [ProfileQuery] is deleted or set to deprecated, to ensure that
+     * no stale job records remain in the system or get picked up. However, we still want to retain job records
+     * for brokers that have associated [ExtractedProfile] instances, as those profiles still need to be managed.
+     *
+     * @param profileQueryId The ID of the [ProfileQuery] whose associated job records should be removed.
+     * @param brokersToExclude List of broker names for which records should not be deleted. Job records associated with these brokers will be retained.
+     */
+    suspend fun removeJobRecordsForProfile(
+        profileQueryId: Long,
+        brokersToExclude: List<String>,
+    )
 }
 
 @ContributesBinding(AppScope::class)
@@ -223,18 +241,62 @@ class RealJobRecordUpdater @Inject constructor(
     private val schedulingRepository: PirSchedulingRepository,
     private val repository: PirRepository,
 ) : JobRecordUpdater {
+
     override suspend fun updateScanNoMatchFound(
         brokerName: String,
         profileQueryId: Long,
     ) {
-        updateScanJobRecord(brokerName, profileQueryId, NO_MATCH_FOUND)
+        // if the profile query this scan belongs to is deprecated and no matches were found,
+        // also mark it as deprecated so it doesn't get picked up again
+        val shouldBeMarkedDeprecated = repository.getUserProfileQuery(profileQueryId)?.deprecated == true
+
+        updateScanJobRecord(
+            brokerName = brokerName,
+            profileQueryId = profileQueryId,
+            status = NO_MATCH_FOUND,
+            deprecated = shouldBeMarkedDeprecated,
+        )
     }
 
     override suspend fun updateScanMatchesFound(
+        newExtractedProfiles: List<ExtractedProfile>,
         brokerName: String,
         profileQueryId: Long,
     ) {
-        updateScanJobRecord(brokerName, profileQueryId, MATCHES_FOUND)
+        val profileQuery = repository.getUserProfileQuery(profileQueryId)
+        if (profileQuery?.deprecated != true) {
+            updateScanJobRecord(brokerName, profileQueryId, MATCHES_FOUND)
+            return
+        }
+
+        // special handling for deprecated profile queries as scans should only run to confirm that previously found profiles have been removed
+        // once that is confirmed, we can mark the scan job as deprecated so it doesn't get picked up again
+        val storedExtractedProfiles =
+            repository.getExtractedProfiles(brokerName, profileQueryId)
+
+        if (storedExtractedProfiles.isNotEmpty()) {
+            val newKeys =
+                newExtractedProfiles
+                    .asSequence()
+                    .map { it.toKey() }
+                    .toHashSet()
+
+            val removedExtractedProfiles =
+                storedExtractedProfiles
+                    .asSequence()
+                    .filter { it.toKey() !in newKeys }
+                    .toList()
+
+            // if all previously stored extracted profiles have been removed, we can mark the scan job record as deprecated
+            // since we do not store new extracted profiles for deprecated profile queries
+            val shouldBeMarkedAsDeprecated = removedExtractedProfiles.size == storedExtractedProfiles.size
+            updateScanJobRecord(
+                brokerName = brokerName,
+                profileQueryId = profileQueryId,
+                status = MATCHES_FOUND,
+                deprecated = shouldBeMarkedAsDeprecated,
+            )
+        }
     }
 
     override suspend fun updateScanError(
@@ -248,6 +310,7 @@ class RealJobRecordUpdater @Inject constructor(
         brokerName: String,
         profileQueryId: Long,
         status: ScanJobStatus,
+        deprecated: Boolean = false,
     ) {
         logcat { "PIR-JOB-RECORD: Updating ScanJobRecord for $brokerName and $profileQueryId to $status" }
         schedulingRepository.updateScanJobRecordStatus(
@@ -255,6 +318,7 @@ class RealJobRecordUpdater @Inject constructor(
             newLastScanDateMillis = currentTimeProvider.currentTimeMillis(),
             brokerName = brokerName,
             profileQueryId = profileQueryId,
+            deprecated = deprecated,
         )
     }
 
@@ -302,10 +366,12 @@ class RealJobRecordUpdater @Inject constructor(
 
                 logcat { "PIR-JOB-RECORD: Removed Profiles $removedExtractedProfiles" }
 
-                removedExtractedProfiles.forEach {
+                val profileQuery = repository.getUserProfileQuery(profileQueryId)
+                removedExtractedProfiles.forEach { extractedProfile ->
                     updateOptOutJobRecordAsRemoved(
-                        it.dbId,
-                        currentTimeMillis,
+                        profileQuery = profileQuery,
+                        extractedProfileId = extractedProfile.dbId,
+                        removedDateInMillis = currentTimeMillis,
                     )
                 }
             }
@@ -313,6 +379,7 @@ class RealJobRecordUpdater @Inject constructor(
     }
 
     private suspend fun updateOptOutJobRecordAsRemoved(
+        profileQuery: ProfileQuery?,
         extractedProfileId: Long,
         removedDateInMillis: Long,
     ) {
@@ -323,6 +390,9 @@ class RealJobRecordUpdater @Inject constructor(
                         .copy(
                             status = OptOutJobStatus.REMOVED,
                             optOutRemovedDateInMillis = removedDateInMillis,
+                            // we've confirmed that the extracted profile for a deprecated profile query has been removed
+                            // and need to mark the opt out job record as deprecated to not pick it up again for maintenance scans
+                            deprecated = profileQuery?.deprecated == true,
                         ).also {
                             logcat { "PIR-JOB-RECORD: Updating OptOutRecord for $extractedProfileId to $it" }
                         },
@@ -392,6 +462,15 @@ class RealJobRecordUpdater @Inject constructor(
             )
         }
         return@withContext newRecord
+    }
+
+    override suspend fun removeJobRecordsForProfile(
+        profileQueryId: Long,
+        brokersToExclude: List<String>,
+    ) {
+        withContext(dispatcherProvider.io()) {
+            schedulingRepository.deleteJobRecordsForProfile(profileQueryId, brokersToExclude)
+        }
     }
 
     private data class ExtractedProfileComparisonKey(

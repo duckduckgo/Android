@@ -42,6 +42,8 @@ sealed class JobRecord(
      * was successfully requested.
      * @property optOutRemovedDateInMillis Date (in milliseconds) when the record was confirmed
      * to be removed from the broker.
+     * @property deprecated Whether this job record is deprecated and should not be processed anymore.
+     * This can happen when it is linked to a deprecated [ProfileQuery]
      */
     data class OptOutJobRecord(
         override val brokerName: String,
@@ -52,6 +54,7 @@ sealed class JobRecord(
         val lastOptOutAttemptDateInMillis: Long = 0L,
         val optOutRequestedDateInMillis: Long = 0L,
         val optOutRemovedDateInMillis: Long = 0L,
+        val deprecated: Boolean = false,
     ) : JobRecord(brokerName, userProfileId) {
         enum class OptOutJobStatus {
             /** Opt-out has not been executed yet and should be executed when possible */
@@ -81,12 +84,15 @@ sealed class JobRecord(
      * @property status current status of the Job
      * @property lastScanDateInMillis Date (in milliseconds) of the last time the
      * scan job has been completed.
+     * @property deprecated Whether this job record is deprecated and should not be processed anymore.
+     * This can happen when it is linked to a deprecated [ProfileQuery]
      */
     data class ScanJobRecord(
         override val brokerName: String,
         override val userProfileId: Long,
         val status: ScanJobStatus = ScanJobStatus.NOT_EXECUTED,
         val lastScanDateInMillis: Long = 0L,
+        val deprecated: Boolean = false,
     ) : JobRecord(brokerName, userProfileId) {
         enum class ScanJobStatus {
             /** Scan has not been executed yet and should be executed when possible */

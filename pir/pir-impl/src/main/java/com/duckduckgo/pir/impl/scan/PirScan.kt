@@ -187,6 +187,7 @@ class RealPirScan @Inject constructor(
         }
 
         val relevantProfileIds = jobRecords.mapTo(mutableSetOf()) { it.userProfileId }
+        // Multiple profile support (includes deprecated profiles as we need to process opt-out for them if there are extracted profiles)
         val relevantProfiles = obtainProfiles()
             .filter {
                 it.id in relevantProfileIds
@@ -232,6 +233,7 @@ class RealPirScan @Inject constructor(
         emitScanStartPixel(runType)
         cleanPreviousRun()
 
+        // Multiple profile support (includes deprecated profiles as we need to process opt-out for them if there are extracted profiles)
         val profileQueries = obtainProfiles()
 
         logcat { "PIR-SCAN: Running scan on profiles: $profileQueries on ${Thread.currentThread().name}" }
@@ -291,7 +293,7 @@ class RealPirScan @Inject constructor(
     }
 
     private suspend fun obtainProfiles(): List<ProfileQuery> {
-        return repository.getUserProfileQueries().ifEmpty {
+        return repository.getAllUserProfileQueries().ifEmpty {
             DEFAULT_PROFILE_QUERIES
         }
     }

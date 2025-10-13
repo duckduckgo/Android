@@ -75,9 +75,20 @@ class RealPirJobsRunner @Inject constructor(
         val startTimeInMillis = currentTimeProvider.currentTimeMillis()
         emitStartPixel(executionType)
 
+        // Clean up any already running scan jobs before starting new ones as this function can be called
+        // while previous instance is still running in case of profile edits.
+        //
+        // The PirScan is a singleton and already stops any ongoing work if execute is called on it while a previous work is still ongoing.
+        //
+        // This handles case when user removes a profile while a scan or opt-out is ongoing for that profile.
+        // Without this, the scan would continue to run on the removed profile, potentially finding new extracted profiles
+        // and creating opt-out jobs for them, which we don't want.
+        // We only want to continue running opt-outs and confirmation scans for extracted profiles that were found up until the point of profile edit.
+        pirScan.stop()
+
         val activeBrokers = pirRepository.getAllActiveBrokers().toHashSet()
 
-        // Multiple profile support
+        // Multiple profile support (includes deprecated profiles as we need to process opt-out for them if there are extracted profiles)
         val profileQueries = obtainProfiles()
 
         if (profileQueries.isEmpty()) {
@@ -138,7 +149,7 @@ class RealPirJobsRunner @Inject constructor(
     }
 
     private suspend fun obtainProfiles(): List<ProfileQuery> {
-        return pirRepository.getUserProfileQueries().ifEmpty {
+        return pirRepository.getAllUserProfileQueries().ifEmpty {
             PirConstants.DEFAULT_PROFILE_QUERIES
         }
     }
@@ -152,6 +163,7 @@ class RealPirJobsRunner @Inject constructor(
         val toCreate = mutableListOf<ScanJobRecord>()
 
         profileQueries.filter {
+            // we should not create any new scan jobs for deprecated profile queries
             !it.deprecated
         }.forEach { profile ->
             activeBrokers.forEach { broker ->
@@ -203,8 +215,9 @@ class RealPirJobsRunner @Inject constructor(
         val extractedProfiles = pirRepository.getAllExtractedProfiles()
 
         extractedProfiles.forEach {
+            // we should create new opt-out jobs even for deprecated profile queries that have extracted profiles associated with them
             if (activeFormOptOutBrokers.contains(it.brokerName) &&
-                pirSchedulingRepository.getValidOptOutJobRecord(it.dbId) == null
+                pirSchedulingRepository.getValidOptOutJobRecord(it.dbId, includeDeprecated = true) == null
             ) {
                 toCreate.add(
                     OptOutJobRecord(

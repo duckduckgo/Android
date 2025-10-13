@@ -58,9 +58,7 @@ class PirWebGetCurrentUserProfileMessageHandler @Inject constructor(
         logcat { "PIR-WEB: PirWebGetCurrentUserProfileMessageHandler: process $jsMessage" }
 
         appCoroutineScope.launch(dispatcherProvider.io()) {
-            // TODO consider moving the deprecated filtering to the DB layer when updating job handling for new profiles
-            val profiles = repository.getUserProfileQueries()
-                .filter { !it.deprecated }
+            val profiles = repository.getValidUserProfileQueries()
                 .also { pirWebProfileStateHolder.setLoadedProfileQueries(it) }
 
             if (profiles.isEmpty()) {
