@@ -269,7 +269,7 @@ class InputModeWidget @JvmOverloads constructor(
                 }
 
                 val isNullOrEmpty = text.isNullOrEmpty()
-                fade(inputFieldClearText, !isNullOrEmpty)
+                inputFieldClearText.isVisible = !isNullOrEmpty
             }
 
             doAfterTextChanged { text ->
