@@ -392,7 +392,7 @@ class RealPirOptOutTest {
         verify(mockBrokerStepsParser).parseStep(testBrokerName, testStepsJson, deprecatedProfile.id)
         verify(mockPirActionsRunner).start(deprecatedProfile, listOf(testOptOutStep))
         verify(mockPirActionsRunner).stop()
-        verify(mockEventsRepository, times(2)).saveScanLog(any())
+        verify(mockEventsRepository, times(2)).saveEventLog(any())
     }
 
     @Test
@@ -454,7 +454,7 @@ class RealPirOptOutTest {
         verify(mockBrokerStepsParser).parseStep(testBrokerName, testStepsJson, nonDeprecatedProfile.id)
         verify(mockPirActionsRunner, times(2)).start(any(), any())
         verify(mockPirActionsRunner, times(2)).stop()
-        verify(mockEventsRepository, times(2)).saveScanLog(any())
+        verify(mockEventsRepository, times(2)).saveEventLog(any())
     }
 
     @Test
@@ -507,7 +507,7 @@ class RealPirOptOutTest {
         verify(mockBrokerStepsParser).parseStep(testBrokerName2, stepsJson2, testProfileQuery.id)
         verify(mockPirActionsRunner, times(2)).start(any(), any())
         verify(mockPirActionsRunner, times(2)).stop()
-        verify(mockEventsRepository, times(2)).saveScanLog(any())
+        verify(mockEventsRepository, times(2)).saveEventLog(any())
     }
 
     @Test
@@ -553,7 +553,7 @@ class RealPirOptOutTest {
         verify(mockBrokerStepsParser).parseStep(testBrokerName, testStepsJson, testProfileQuery2.id)
         verify(mockPirActionsRunner, times(2)).start(any(), any())
         verify(mockPirActionsRunner, times(2)).stop()
-        verify(mockEventsRepository, times(2)).saveScanLog(any())
+        verify(mockEventsRepository, times(2)).saveEventLog(any())
     }
 
     @Test
@@ -621,7 +621,7 @@ class RealPirOptOutTest {
         verify(mockBrokerStepsParser).parseStep(testBrokerName, testStepsJson, testProfileQuery2.id)
         verify(mockPirActionsRunner).start(any(), any())
         verify(mockPirActionsRunner).stop()
-        verify(mockEventsRepository, times(2)).saveScanLog(any())
+        verify(mockEventsRepository, times(2)).saveEventLog(any())
     }
 
     @Test
@@ -636,7 +636,7 @@ class RealPirOptOutTest {
 
         // Then
         verify(mockRepository).getAllUserProfileQueries()
-        verify(mockEventsRepository, times(2)).saveScanLog(any())
+        verify(mockEventsRepository, times(2)).saveEventLog(any())
         verify(mockPirCssScriptLoader).getScript()
         verifyNoInteractions(mockBrokerStepsParser)
         verifyNoInteractions(mockPirActionsRunnerFactory)
@@ -659,7 +659,7 @@ class RealPirOptOutTest {
         // Then
         verify(mockRepository).getBrokersForOptOut(formOptOutOnly = true)
         verify(mockRepository).getAllUserProfileQueries()
-        verify(mockEventsRepository, times(2)).saveScanLog(any())
+        verify(mockEventsRepository, times(2)).saveEventLog(any())
     }
 
     @Test
@@ -681,7 +681,7 @@ class RealPirOptOutTest {
         testee.executeOptOutForJobs(listOf(testOptOutJobRecord), mockContext)
 
         // Then
-        verify(mockEventsRepository, times(2)).saveScanLog(any())
+        verify(mockEventsRepository, times(2)).saveEventLog(any())
         verifyNoInteractions(mockPirCssScriptLoader)
         verifyNoInteractions(mockPirActionsRunnerFactory)
     }
@@ -739,6 +739,6 @@ class RealPirOptOutTest {
         verify(mockBrokerStepsParser).parseStep(testBrokerName, testStepsJson, deprecatedProfile2.id)
         verify(mockPirActionsRunner, times(2)).start(any(), any())
         verify(mockPirActionsRunner, times(2)).stop()
-        verify(mockEventsRepository, times(2)).saveScanLog(any())
+        verify(mockEventsRepository, times(2)).saveEventLog(any())
     }
 }
