@@ -140,7 +140,7 @@ fun DuckDuckGoTheme(
  * A Material3 [ColorScheme] implementation which sets all colors to [debugColor] to discourage usage of
  * [MaterialTheme.colorScheme] in preference to [DuckDuckGoTheme.colors].
  */
-fun debugColors(debugColor: Color = Color.Magenta) = ColorScheme(
+private fun debugColors(debugColor: Color = Color.Magenta) = ColorScheme(
     primary = debugColor,
     onPrimary = debugColor,
     primaryContainer = debugColor,
@@ -177,6 +177,18 @@ fun debugColors(debugColor: Color = Color.Magenta) = ColorScheme(
     surfaceContainerHighest = debugColor,
     surfaceContainerLow = debugColor,
     surfaceContainerLowest = debugColor,
+    primaryFixed = debugColor,
+    primaryFixedDim = debugColor,
+    onPrimaryFixed = debugColor,
+    onPrimaryFixedVariant = debugColor,
+    secondaryFixed = debugColor,
+    secondaryFixedDim = debugColor,
+    onSecondaryFixed = debugColor,
+    onSecondaryFixedVariant = debugColor,
+    tertiaryFixed = debugColor,
+    tertiaryFixedDim = debugColor,
+    onTertiaryFixed = debugColor,
+    onTertiaryFixedVariant = debugColor
 )
 
 /**
