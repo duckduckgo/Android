@@ -46,6 +46,7 @@ class RealDuckChatJSHelper @Inject constructor(
     private val duckChatPixels: DuckChatPixels,
     private val dataStore: DuckChatDataStore,
 ) : DuckChatJSHelper {
+    private val migrationItems = mutableListOf<String>()
     override suspend fun processJsCallbackMessage(
         featureName: String,
         method: String,
@@ -108,6 +109,38 @@ class RealDuckChatJSHelper @Inject constructor(
                     .fromValue(data?.optString("metricName"))
                     ?.let { reportMetric -> duckChatPixels.sendReportMetricPixel(reportMetric) }
                 null
+            }
+
+            METHOD_STORE_MIGRATION_DATA -> {
+                // Only handle if feature is supported
+                val item = data?.optString(SERIALIZED_MIGRATION_FILE)
+                if (item != null && item != JSONObject.NULL) {
+                    synchronized(migrationItems) { migrationItems.add(item) }
+                }
+                // Acknowledge with empty payload if id provided
+                id?.let { JsCallbackData(JSONObject(), featureName, method, it) }
+            }
+
+            METHOD_GET_MIGRATION_INFO -> id?.let {
+                val count = synchronized(migrationItems) { migrationItems.size }
+                val jsonPayload = JSONObject().apply { put(COUNT, count) }
+                JsCallbackData(jsonPayload, featureName, method, it)
+            }
+
+            METHOD_GET_MIGRATION_DATA_BY_INDEX -> id?.let {
+                val index = data?.optInt(INDEX, -1) ?: -1
+                val value = synchronized(migrationItems) {
+                    if (index in 0 until migrationItems.size) migrationItems[index] else null
+                }
+                val jsonPayload = JSONObject().apply {
+                    if (value != null) put(SERIALIZED_MIGRATION_FILE, value)
+                }
+                JsCallbackData(jsonPayload, featureName, method, it)
+            }
+
+            METHOD_CLEAR_MIGRATION_DATA -> {
+                synchronized(migrationItems) { migrationItems.clear() }
+                id?.let { JsCallbackData(JSONObject(), featureName, method, it) }
             }
 
             else -> null
@@ -210,5 +243,15 @@ class RealDuckChatJSHelper @Inject constructor(
         private const val DEFAULT_SELECTOR = "'user-prompt'"
         private const val SUCCESS = "success"
         private const val ERROR = "error"
+
+        // Migration messaging constants
+        private const val METHOD_STORE_MIGRATION_DATA = "storeMigrationData"
+        private const val METHOD_GET_MIGRATION_INFO = "getMigrationInfo"
+        private const val METHOD_GET_MIGRATION_DATA_BY_INDEX = "getMigrationDataByIndex"
+        private const val METHOD_CLEAR_MIGRATION_DATA = "clearMigrationData"
+
+        private const val SERIALIZED_MIGRATION_FILE = "serializedMigrationFile"
+        private const val COUNT = "count"
+        private const val INDEX = "index"
     }
 }

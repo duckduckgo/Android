@@ -57,6 +57,12 @@ class DuckChatContentScopeJsMessageHandler @Inject constructor() : ContentScopeJ
                     "showChatInput",
                     "reportMetric",
                     "openKeyboard",
+
+                    // migration handlers
+                    "storeMigrationData",
+                    "getMigrationInfo",
+                    "getMigrationDataByIndex",
+                    "clearMigrationData",
                 )
         }
 }
