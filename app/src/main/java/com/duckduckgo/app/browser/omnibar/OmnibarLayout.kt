@@ -1059,6 +1059,8 @@ open class OmnibarLayout @JvmOverloads constructor(
                     } else {
                         omnibarInputScreenLaunchListener?.onDuckAiToggleSelected()
                     }
+                    val reselectTab = duckAiToggle.getTabAt(0)
+                    duckAiToggle.selectTab(reselectTab, false)
                 }
 
                 override fun onTabUnselected(tab: TabLayout.Tab?) {}
