@@ -27,11 +27,13 @@ import java.io.Serializable
  * @param query The initial query text to pre-populate in the input field
  * @param isTopOmnibar whether the omnibar is positioned at the top of the screen
  * @param browserButtonsConfig configuration for displaying browser buttons (Fire Button, Tab Switcher, Menu)
+ * @param launchWithVoice whether to immediately launch voice input on activity start, if supported and enabled
  */
 data class InputScreenActivityParams(
     val query: String,
     val isTopOmnibar: Boolean,
     val browserButtonsConfig: InputScreenBrowserButtonsConfig,
+    val launchWithVoice: Boolean = false,
 ) : GlobalActivityStarter.ActivityParams
 
 /**

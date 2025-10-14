@@ -231,10 +231,29 @@ class InputScreenConfigResolverTest {
         assertFalse(inputScreenConfigResolver.mainButtonsEnabled())
     }
 
+    @Test
+    fun `when launchWithVoice is false then shouldLaunchVoiceSearch should return false`() {
+        val intent = createIntent(launchWithVoice = false)
+        whenever(mockAppCompatActivity.intent).thenReturn(intent)
+        inputScreenConfigResolver = InputScreenConfigResolverImpl(duckChatInternal, mockAppCompatActivity)
+
+        assertFalse(inputScreenConfigResolver.shouldLaunchVoiceSearch())
+    }
+
+    @Test
+    fun `when launchWithVoice is true then shouldLaunchVoiceSearch should return true`() {
+        val intent = createIntent(launchWithVoice = true)
+        whenever(mockAppCompatActivity.intent).thenReturn(intent)
+        inputScreenConfigResolver = InputScreenConfigResolverImpl(duckChatInternal, mockAppCompatActivity)
+
+        assertTrue(inputScreenConfigResolver.shouldLaunchVoiceSearch())
+    }
+
     private fun createIntent(
         query: String = "",
         isTopOmnibar: Boolean = true,
         browserButtonsConfig: InputScreenBrowserButtonsConfig = InputScreenBrowserButtonsConfig.Disabled(),
+        launchWithVoice: Boolean = false,
     ) = Intent().apply {
         putExtra(
             "ACTIVITY_SERIALIZABLE_PARAMETERS_ARG",
@@ -242,6 +261,7 @@ class InputScreenConfigResolverTest {
                 query = query,
                 isTopOmnibar = isTopOmnibar,
                 browserButtonsConfig = browserButtonsConfig,
+                launchWithVoice = launchWithVoice,
             ),
         )
     }
