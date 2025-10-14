@@ -140,6 +140,7 @@ class RealDuckChatJSHelper @Inject constructor(
                 put(SUPPORTS_OPENING_SETTINGS, true)
                 put(SUPPORTS_NATIVE_CHAT_INPUT, false)
                 put(SUPPORTS_IMAGE_UPLOAD, duckChat.isImageUploadEnabled())
+                put(SUPPORTS_STANDALONE_MIGRATION, duckChat.isStandaloneMigrationSupported())
             }
         return JsCallbackData(jsonPayload, featureName, method, id)
     }
@@ -201,6 +202,7 @@ class RealDuckChatJSHelper @Inject constructor(
         private const val SUPPORTS_OPENING_SETTINGS = "supportsOpeningSettings"
         private const val SUPPORTS_NATIVE_CHAT_INPUT = "supportsNativeChatInput"
         private const val SUPPORTS_IMAGE_UPLOAD = "supportsImageUpload"
+        private const val SUPPORTS_STANDALONE_MIGRATION = "supportsStandaloneMigration"
         private const val REPORT_METRIC = "reportMetric"
         private const val PLATFORM = "platform"
         private const val ANDROID = "android"
