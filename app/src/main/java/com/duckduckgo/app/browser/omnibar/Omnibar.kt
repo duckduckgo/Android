@@ -138,7 +138,7 @@ class Omnibar(
     }
 
     interface InputScreenLaunchListener {
-        fun onLaunchInputScreen(query: String, searchMode: Boolean)
+        fun onLaunchInputScreen(query: String, searchMode: Boolean, fromNTP: Boolean)
 
         fun onDuckAiToggleSelected()
 

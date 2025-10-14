@@ -68,8 +68,8 @@ class InputScreenActivity : DuckDuckGoActivity() {
     }
 
     private fun applyExitTransition() {
-        val enterTransition = browserAndInputScreenTransitionProvider.getBrowserEnterAnimation(inputScreenConfigResolver.isTopOmnibar)
-        val exitTransition = browserAndInputScreenTransitionProvider.getInputScreenExitAnimation(inputScreenConfigResolver.isTopOmnibar)
+        val enterTransition = browserAndInputScreenTransitionProvider.getBrowserEnterAnimation(inputScreenConfigResolver.isTopOmnibar, true)
+        val exitTransition = browserAndInputScreenTransitionProvider.getInputScreenExitAnimation(inputScreenConfigResolver.isTopOmnibar, true)
 
         if (VERSION.SDK_INT >= 34) {
             overrideActivityTransition(

@@ -1110,21 +1110,22 @@ class BrowserTabFragment :
 
     private fun configureInputScreenLauncher() {
         omnibar.configureInputScreenLaunchListener(object : Omnibar.InputScreenLaunchListener {
-            override fun onLaunchInputScreen(query: String, searchMode: Boolean) {
-                launchInputScreen(query, searchMode)
+            override fun onLaunchInputScreen(query: String, searchMode: Boolean, fromNTP: Boolean) {
+                launchInputScreen(query, searchMode = searchMode, fromNTP = fromNTP)
             }
 
             override fun onDuckAiToggleSelected() {
-                launchInputScreen("", false)
+                launchInputScreen("", searchMode = false, fromNTP = true)
             }
 
             override fun onSearchToggleSelected() {
-                launchInputScreen("", true)
+                launchInputScreen("", searchMode = true, fromNTP = true)
             }
         })
     }
 
-    private fun launchInputScreen(query: String, searchMode: Boolean) {
+    private fun launchInputScreen(query: String, searchMode: Boolean, fromNTP: Boolean) {
+        logcat { "inputScreen: Launching input screen for query: $query in searchMode $searchMode" }
         val intent =
             globalActivityStarter.startIntent(
                 requireContext(),
@@ -1135,8 +1136,9 @@ class BrowserTabFragment :
                     isSearchMode = searchMode,
                 ),
             )
-        val enterTransition = browserAndInputScreenTransitionProvider.getInputScreenEnterAnimation(omnibar.omnibarPosition == TOP)
-        val exitTransition = browserAndInputScreenTransitionProvider.getBrowserExitAnimation(omnibar.omnibarPosition == TOP)
+
+        val enterTransition = browserAndInputScreenTransitionProvider.getInputScreenEnterAnimation(omnibar.omnibarPosition == TOP, fromNTP)
+        val exitTransition = browserAndInputScreenTransitionProvider.getBrowserExitAnimation(omnibar.omnibarPosition == TOP, fromNTP)
         val options =
             ActivityOptionsCompat.makeCustomAnimation(
                 requireActivity(),
@@ -2306,7 +2308,7 @@ class BrowserTabFragment :
             is Command.LaunchInputScreen -> {
                 // if the fire button is used, prevent automatically launching the input screen until the process reloads
                 if ((requireActivity() as? BrowserActivity)?.isDataClearingInProgress == false) {
-                    launchInputScreen(query = "", true)
+                    launchInputScreen(query = "", true, false)
                 }
             }
 
