@@ -274,6 +274,26 @@ class RealPirSchedulingRepositoryTest {
         }
 
     @Test
+    fun whenDeleteScanJobRecordsWithoutMatchesForProfilesThenCallDaoWithCorrectProfiles() =
+        runTest {
+            val profileIds = listOf(123L, 456L, 789L)
+
+            testee.deleteScanJobRecordsWithoutMatchesForProfiles(profileIds)
+
+            verify(mockJobSchedulingDao).deleteScanJobRecordsWithoutMatchesForProfiles(profileIds)
+        }
+
+    @Test
+    fun whenDeleteScanJobRecordsWithoutMatchesForProfilesWithSingleProfileThenCallDao() =
+        runTest {
+            val profileIds = listOf(456L)
+
+            testee.deleteScanJobRecordsWithoutMatchesForProfiles(profileIds)
+
+            verify(mockJobSchedulingDao).deleteScanJobRecordsWithoutMatchesForProfiles(profileIds)
+        }
+
+    @Test
     fun whenGetValidScanJobRecordAndRecordExistsThenReturnRecord() =
         runTest {
             whenever(mockJobSchedulingDao.getScanJobRecord("test-broker", 123L)).thenReturn(validScanJobEntity)
@@ -454,6 +474,42 @@ class RealPirSchedulingRepositoryTest {
             val result = testee.getValidOptOutJobRecord(8888L)
 
             assertEquals(null, result)
+        }
+
+    @Test
+    fun whenGetValidOptOutJobRecordWithIncludeDeprecatedTrueThenReturnDeprecatedRecord() =
+        runTest {
+            whenever(mockJobSchedulingDao.getOptOutJobRecord(999L)).thenReturn(deprecatedOptOutJobEntity)
+
+            val result = testee.getValidOptOutJobRecord(999L, includeDeprecated = true)
+
+            assertEquals(999L, result?.extractedProfileId)
+            assertEquals("invalid-broker", result?.brokerName)
+            assertEquals(456L, result?.userProfileId)
+            assertEquals(OptOutJobStatus.REMOVED, result?.status)
+            assertEquals(true, result?.deprecated)
+        }
+
+    @Test
+    fun whenGetValidOptOutJobRecordWithIncludeDeprecatedFalseThenReturnNull() =
+        runTest {
+            whenever(mockJobSchedulingDao.getOptOutJobRecord(999L)).thenReturn(deprecatedOptOutJobEntity)
+
+            val result = testee.getValidOptOutJobRecord(999L, includeDeprecated = false)
+
+            assertEquals(null, result)
+        }
+
+    @Test
+    fun whenGetValidOptOutJobRecordWithIncludeDeprecatedTrueAndValidRecordThenReturnRecord() =
+        runTest {
+            whenever(mockJobSchedulingDao.getOptOutJobRecord(789L)).thenReturn(validOptOutJobEntity)
+
+            val result = testee.getValidOptOutJobRecord(789L, includeDeprecated = true)
+
+            assertEquals(789L, result?.extractedProfileId)
+            assertEquals("test-broker", result?.brokerName)
+            assertEquals(false, result?.deprecated)
         }
 
     @Test

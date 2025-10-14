@@ -834,6 +834,160 @@ class RealPirJobsRunnerTest {
     }
 
     @Test
+    fun whenRunEligibleJobsThenStopsPirScanFirst() = runTest {
+        // Given
+        whenever(mockPirRepository.getAllActiveBrokers()).thenReturn(emptyList())
+        whenever(mockPirRepository.getAllUserProfileQueries()).thenReturn(emptyList())
+
+        // When
+        testee.runEligibleJobs(mockContext, MANUAL)
+
+        // Then
+        verify(mockPirScan).stop()
+    }
+
+    @Test
+    fun whenDeprecatedProfileWithExtractedProfilesThenCreatesOptOutJob() = runTest {
+        // Given
+        val extractedProfileForDeprecatedProfile = testExtractedProfile.copy(
+            profileQueryId = testDeprecatedProfileQuery.id,
+        )
+        whenever(mockPirRepository.getBrokersForOptOut(true)).thenReturn(listOf(testBrokerName))
+        whenever(mockPirRepository.getAllActiveBrokers()).thenReturn(listOf(testBrokerName))
+        whenever(mockPirRepository.getAllUserProfileQueries()).thenReturn(
+            listOf(testDeprecatedProfileQuery),
+        )
+        whenever(mockEligibleScanJobProvider.getAllEligibleScanJobs(testCurrentTime)).thenReturn(
+            emptyList(),
+        )
+        whenever(mockPirRepository.getAllExtractedProfiles()).thenReturn(
+            listOf(extractedProfileForDeprecatedProfile),
+        )
+        whenever(mockPirSchedulingRepository.getValidOptOutJobRecord(extractedProfileForDeprecatedProfile.dbId, includeDeprecated = true)).thenReturn(
+            null,
+        )
+        whenever(mockEligibleOptOutJobProvider.getAllEligibleOptOutJobs(testCurrentTime)).thenReturn(
+            emptyList(),
+        )
+        whenever(mockCurrentTimeProvider.currentTimeMillis()).thenReturn(testCurrentTime)
+
+        // When
+        testee.runEligibleJobs(mockContext, MANUAL)
+
+        // Then
+        // Should create opt-out job even for deprecated profile if it has extracted profiles
+        verify(mockPirSchedulingRepository).saveOptOutJobRecords(
+            listOf(
+                OptOutJobRecord(
+                    extractedProfileId = extractedProfileForDeprecatedProfile.dbId,
+                    brokerName = extractedProfileForDeprecatedProfile.brokerName,
+                    userProfileId = extractedProfileForDeprecatedProfile.profileQueryId,
+                ),
+            ),
+        )
+    }
+
+    @Test
+    fun whenDeprecatedProfileWithExtractedProfilesAndExistingOptOutJobThenDoesNotCreateNew() = runTest {
+        // Given
+        val extractedProfileForDeprecatedProfile = testExtractedProfile.copy(
+            profileQueryId = testDeprecatedProfileQuery.id,
+        )
+        val existingOptOutJob = testOptOutJobRecord.copy(
+            extractedProfileId = extractedProfileForDeprecatedProfile.dbId,
+            userProfileId = testDeprecatedProfileQuery.id,
+        )
+        whenever(mockPirRepository.getBrokersForOptOut(true)).thenReturn(listOf(testBrokerName))
+        whenever(mockPirRepository.getAllActiveBrokers()).thenReturn(listOf(testBrokerName))
+        whenever(mockPirRepository.getAllUserProfileQueries()).thenReturn(
+            listOf(testDeprecatedProfileQuery),
+        )
+        whenever(mockEligibleScanJobProvider.getAllEligibleScanJobs(testCurrentTime)).thenReturn(
+            emptyList(),
+        )
+        whenever(mockPirRepository.getAllExtractedProfiles()).thenReturn(
+            listOf(extractedProfileForDeprecatedProfile),
+        )
+        whenever(mockPirSchedulingRepository.getValidOptOutJobRecord(extractedProfileForDeprecatedProfile.dbId, includeDeprecated = true)).thenReturn(
+            existingOptOutJob,
+        )
+        whenever(mockEligibleOptOutJobProvider.getAllEligibleOptOutJobs(testCurrentTime)).thenReturn(
+            emptyList(),
+        )
+        whenever(mockCurrentTimeProvider.currentTimeMillis()).thenReturn(testCurrentTime)
+
+        // When
+        testee.runEligibleJobs(mockContext, MANUAL)
+
+        // Then
+        // Should not create new opt-out job if one already exists
+        verify(mockPirSchedulingRepository, never()).saveOptOutJobRecords(any())
+    }
+
+    @Test
+    fun whenMixOfDeprecatedAndNonDeprecatedProfilesThenCreatesJobsCorrectly() = runTest {
+        // Given
+        val extractedProfileForNormal = testExtractedProfile.copy(
+            dbId = 100L,
+            profileQueryId = testProfileQuery.id,
+        )
+        val extractedProfileForDeprecated = testExtractedProfile.copy(
+            dbId = 200L,
+            profileQueryId = testDeprecatedProfileQuery.id,
+        )
+        whenever(mockPirRepository.getBrokersForOptOut(true)).thenReturn(listOf(testBrokerName))
+        whenever(mockPirRepository.getAllActiveBrokers()).thenReturn(listOf(testBrokerName))
+        whenever(mockPirRepository.getAllUserProfileQueries()).thenReturn(
+            listOf(testProfileQuery, testDeprecatedProfileQuery),
+        )
+        whenever(
+            mockPirSchedulingRepository.getValidScanJobRecord(
+                testBrokerName,
+                testProfileQuery.id,
+            ),
+        ).thenReturn(testScanJobRecord)
+        whenever(mockEligibleScanJobProvider.getAllEligibleScanJobs(testCurrentTime)).thenReturn(
+            emptyList(),
+        )
+        whenever(mockPirRepository.getAllExtractedProfiles()).thenReturn(
+            listOf(extractedProfileForNormal, extractedProfileForDeprecated),
+        )
+        whenever(mockPirSchedulingRepository.getValidOptOutJobRecord(extractedProfileForNormal.dbId, includeDeprecated = true)).thenReturn(
+            null,
+        )
+        whenever(mockPirSchedulingRepository.getValidOptOutJobRecord(extractedProfileForDeprecated.dbId, includeDeprecated = true)).thenReturn(
+            null,
+        )
+        whenever(mockEligibleOptOutJobProvider.getAllEligibleOptOutJobs(testCurrentTime)).thenReturn(
+            emptyList(),
+        )
+        whenever(mockCurrentTimeProvider.currentTimeMillis()).thenReturn(testCurrentTime)
+
+        // When
+        testee.runEligibleJobs(mockContext, MANUAL)
+
+        // Then
+        // Should create scan job only for non-deprecated profile
+        verify(mockPirSchedulingRepository, never()).saveScanJobRecords(any())
+
+        // Should create opt-out jobs for both profiles since both have extracted profiles
+        verify(mockPirSchedulingRepository).saveOptOutJobRecords(
+            listOf(
+                OptOutJobRecord(
+                    extractedProfileId = extractedProfileForNormal.dbId,
+                    brokerName = extractedProfileForNormal.brokerName,
+                    userProfileId = extractedProfileForNormal.profileQueryId,
+                ),
+                OptOutJobRecord(
+                    extractedProfileId = extractedProfileForDeprecated.dbId,
+                    brokerName = extractedProfileForDeprecated.brokerName,
+                    userProfileId = extractedProfileForDeprecated.profileQueryId,
+                ),
+            ),
+        )
+    }
+
+    @Test
     fun whenStopThenCallsStopOnPirScanAndPirOptOut() {
         // When
         testee.stop()
