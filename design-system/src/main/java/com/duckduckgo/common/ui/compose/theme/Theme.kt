@@ -188,7 +188,7 @@ private fun debugColors(debugColor: Color = Color.Magenta) = ColorScheme(
     tertiaryFixed = debugColor,
     tertiaryFixedDim = debugColor,
     onTertiaryFixed = debugColor,
-    onTertiaryFixedVariant = debugColor
+    onTertiaryFixedVariant = debugColor,
 )
 
 /**
@@ -196,9 +196,11 @@ private fun debugColors(debugColor: Color = Color.Magenta) = ColorScheme(
  * [MaterialTheme.shapes] in preference to [DuckDuckGoTheme.shapes].
  */
 private val debugShapes = Shapes(
+    extraSmall = CutCornerShape(50),
     small = CutCornerShape(50),
     medium = CutCornerShape(50),
     large = CutCornerShape(50),
+    extraLarge = CutCornerShape(50),
 )
 
 /**
