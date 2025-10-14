@@ -7080,6 +7080,28 @@ class BrowserTabViewModelTest {
         }
 
     @Test
+    fun whenPrivacyProtectionsUpdatedAndUpdateScriptOnProtectionsChangedEnabledAndStopLoadingBeforeUpdatingScriptEnabledThenStopLoading() =
+        runTest {
+            fakeAndroidConfigBrowserFeature.updateScriptOnProtectionsChanged().setRawStoredState(State(true))
+            fakeAndroidConfigBrowserFeature.stopLoadingBeforeUpdatingScript().setRawStoredState(State(true))
+
+            testee.privacyProtectionsUpdated(mockWebView)
+
+            verify(mockWebView).stopLoading()
+        }
+
+    @Test
+    fun whenPrivacyProtectionsUpdatedAndUpdateScriptOnProtectionsChangedEnabledAndStopLoadingBeforeUpdatingScriptDisabledThenDoNotStopLoading() =
+        runTest {
+            fakeAndroidConfigBrowserFeature.updateScriptOnProtectionsChanged().setRawStoredState(State(true))
+            fakeAndroidConfigBrowserFeature.stopLoadingBeforeUpdatingScript().setRawStoredState(State(false))
+
+            testee.privacyProtectionsUpdated(mockWebView)
+
+            verify(mockWebView, never()).stopLoading()
+        }
+
+    @Test
     fun whenPrivacyProtectionsUpdatedAndUpdateScriptOnPageFinishedTrueAndUpdateScriptOnProtectionsChangedFalseThenNotAddDocumentStartJavaScript() =
         runTest {
             fakeAndroidConfigBrowserFeature.updateScriptOnPageFinished().setRawStoredState(State(true))
