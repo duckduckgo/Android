@@ -623,6 +623,10 @@ class OmnibarLayoutViewModel @Inject constructor(
                     highlighted = decoration.fireButton,
                 ),
                 scrollingEnabled = !isScrollingDisabled,
+                showDuckAIToggle = shouldShowDuckAiToggle(
+                    viewMode = it.viewMode,
+                    it.hasFocus,
+                ),
             )
         }
     }
