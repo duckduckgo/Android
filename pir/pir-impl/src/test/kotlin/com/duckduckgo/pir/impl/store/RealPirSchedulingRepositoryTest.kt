@@ -67,11 +67,12 @@ class RealPirSchedulingRepositoryTest {
             lastScanDateInMillis = 1000L,
         )
 
-    private val invalidScanJobEntity =
+    private val deprecatedScanJobEntity =
         ScanJobRecordEntity(
             brokerName = "invalid-broker",
             userProfileId = 456L,
-            status = ScanJobStatus.INVALID.name,
+            status = ScanJobStatus.MATCHES_FOUND.name,
+            deprecated = true,
             lastScanDateInMillis = 2000L,
         )
 
@@ -87,12 +88,13 @@ class RealPirSchedulingRepositoryTest {
             optOutRemovedDate = 0L,
         )
 
-    private val invalidOptOutJobEntity =
+    private val deprecatedOptOutJobEntity =
         OptOutJobRecordEntity(
             extractedProfileId = 999L,
             brokerName = "invalid-broker",
             userProfileId = 456L,
-            status = OptOutJobStatus.INVALID.name,
+            deprecated = true,
+            status = OptOutJobStatus.REMOVED.name,
             attemptCount = 1,
             lastOptOutAttemptDate = 3000L,
             optOutRequestedDate = 4000L,
@@ -182,7 +184,7 @@ class RealPirSchedulingRepositoryTest {
     fun whenGetAllValidScanJobRecordsThenReturnOnlyValidRecords() =
         runTest {
             whenever(mockJobSchedulingDao.getAllScanJobRecords()).thenReturn(
-                listOf(validScanJobEntity, invalidScanJobEntity),
+                listOf(validScanJobEntity, deprecatedScanJobEntity),
             )
 
             val result = testee.getAllValidScanJobRecords()
@@ -198,7 +200,7 @@ class RealPirSchedulingRepositoryTest {
     fun whenGetAllValidScanJobRecordsAndAllAreInvalidThenReturnEmptyList() =
         runTest {
             whenever(mockJobSchedulingDao.getAllScanJobRecords()).thenReturn(
-                listOf(invalidScanJobEntity),
+                listOf(deprecatedScanJobEntity),
             )
 
             val result = testee.getAllValidScanJobRecords()
@@ -287,7 +289,7 @@ class RealPirSchedulingRepositoryTest {
     @Test
     fun whenGetValidScanJobRecordAndRecordIsInvalidThenReturnNull() =
         runTest {
-            whenever(mockJobSchedulingDao.getScanJobRecord("invalid-broker", 456L)).thenReturn(invalidScanJobEntity)
+            whenever(mockJobSchedulingDao.getScanJobRecord("invalid-broker", 456L)).thenReturn(deprecatedScanJobEntity)
 
             val result = testee.getValidScanJobRecord("invalid-broker", 456L)
 
@@ -308,7 +310,7 @@ class RealPirSchedulingRepositoryTest {
     fun whenGetAllValidOptOutJobRecordsThenReturnOnlyValidRecords() =
         runTest {
             whenever(mockJobSchedulingDao.getAllOptOutJobRecords()).thenReturn(
-                listOf(validOptOutJobEntity, invalidOptOutJobEntity),
+                listOf(validOptOutJobEntity, deprecatedOptOutJobEntity),
             )
 
             val result = testee.getAllValidOptOutJobRecords()
@@ -328,7 +330,7 @@ class RealPirSchedulingRepositoryTest {
     fun whenGetAllValidOptOutJobRecordsAndAllAreInvalidThenReturnEmptyList() =
         runTest {
             whenever(mockJobSchedulingDao.getAllOptOutJobRecords()).thenReturn(
-                listOf(invalidOptOutJobEntity),
+                listOf(deprecatedOptOutJobEntity),
             )
 
             val result = testee.getAllValidOptOutJobRecords()
@@ -437,7 +439,7 @@ class RealPirSchedulingRepositoryTest {
     @Test
     fun whenGetValidOptOutJobRecordAndRecordIsInvalidThenReturnNull() =
         runTest {
-            whenever(mockJobSchedulingDao.getOptOutJobRecord(999L)).thenReturn(invalidOptOutJobEntity)
+            whenever(mockJobSchedulingDao.getOptOutJobRecord(999L)).thenReturn(deprecatedOptOutJobEntity)
 
             val result = testee.getValidOptOutJobRecord(999L)
 
@@ -467,6 +469,7 @@ class RealPirSchedulingRepositoryTest {
                 newLastScanDateMillis = newLastScanDateMillis,
                 brokerName = brokerName,
                 profileQueryId = profileQueryId,
+                deprecated = false,
             )
 
             verify(mockJobSchedulingDao).updateScanJobRecordStatus(
@@ -474,6 +477,7 @@ class RealPirSchedulingRepositoryTest {
                 profileQueryId,
                 newStatus.name,
                 newLastScanDateMillis,
+                deprecated = false,
             )
         }
 
@@ -490,6 +494,7 @@ class RealPirSchedulingRepositoryTest {
                 newLastScanDateMillis = newLastScanDateMillis,
                 brokerName = brokerName,
                 profileQueryId = profileQueryId,
+                deprecated = false,
             )
 
             verify(mockJobSchedulingDao).updateScanJobRecordStatus(
@@ -497,6 +502,7 @@ class RealPirSchedulingRepositoryTest {
                 profileQueryId,
                 "ERROR",
                 newLastScanDateMillis,
+                false,
             )
         }
 
@@ -513,6 +519,7 @@ class RealPirSchedulingRepositoryTest {
                 newLastScanDateMillis = newLastScanDateMillis,
                 brokerName = brokerName,
                 profileQueryId = profileQueryId,
+                deprecated = false,
             )
 
             verify(mockJobSchedulingDao).updateScanJobRecordStatus(
@@ -520,6 +527,7 @@ class RealPirSchedulingRepositoryTest {
                 profileQueryId,
                 "NO_MATCH_FOUND",
                 newLastScanDateMillis,
+                false,
             )
         }
 
@@ -543,14 +551,14 @@ class RealPirSchedulingRepositoryTest {
                     validScanJobEntity.copy(status = ScanJobStatus.NO_MATCH_FOUND.name, brokerName = "broker2"),
                     validScanJobEntity.copy(status = ScanJobStatus.MATCHES_FOUND.name, brokerName = "broker3"),
                     validScanJobEntity.copy(status = ScanJobStatus.ERROR.name, brokerName = "broker4"),
-                    validScanJobEntity.copy(status = ScanJobStatus.INVALID.name, brokerName = "invalid-broker"),
+                    validScanJobEntity.copy(status = ScanJobStatus.MATCHES_FOUND.name, brokerName = "invalid-broker", deprecated = true),
                 )
             whenever(mockJobSchedulingDao.getAllScanJobRecords()).thenReturn(entities)
 
             val result = testee.getAllValidScanJobRecords()
 
             assertEquals(4, result.size)
-            assertTrue(result.none { it.status == ScanJobStatus.INVALID })
+            assertTrue(result.none { it.deprecated })
             assertTrue(result.any { it.status == ScanJobStatus.NOT_EXECUTED })
             assertTrue(result.any { it.status == ScanJobStatus.NO_MATCH_FOUND })
             assertTrue(result.any { it.status == ScanJobStatus.MATCHES_FOUND })
@@ -566,14 +574,14 @@ class RealPirSchedulingRepositoryTest {
                     validOptOutJobEntity.copy(status = OptOutJobStatus.REQUESTED.name, extractedProfileId = 800L),
                     validOptOutJobEntity.copy(status = OptOutJobStatus.REMOVED.name, extractedProfileId = 801L),
                     validOptOutJobEntity.copy(status = OptOutJobStatus.ERROR.name, extractedProfileId = 802L),
-                    validOptOutJobEntity.copy(status = OptOutJobStatus.INVALID.name, extractedProfileId = 999L),
+                    validOptOutJobEntity.copy(status = OptOutJobStatus.REMOVED.name, extractedProfileId = 999L, deprecated = true),
                 )
             whenever(mockJobSchedulingDao.getAllOptOutJobRecords()).thenReturn(entities)
 
             val result = testee.getAllValidOptOutJobRecords()
 
             assertEquals(4, result.size)
-            assertTrue(result.none { it.status == OptOutJobStatus.INVALID })
+            assertTrue(result.none { it.deprecated })
             assertTrue(result.any { it.status == OptOutJobStatus.NOT_EXECUTED })
             assertTrue(result.any { it.status == OptOutJobStatus.REQUESTED })
             assertTrue(result.any { it.status == OptOutJobStatus.REMOVED })

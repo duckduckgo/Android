@@ -304,9 +304,9 @@ class RealEligibleScanJobProviderTest {
     }
 
     @Test
-    fun whenGetAllEligibleScanJobsWithInvalidStatusThenReturnEmpty() = runTest {
+    fun whenGetAllEligibleScanJobsWithDeprecatedStatusThenReturnEmpty() = runTest {
         val invalidScanRecord = scanJobRecordNotExecuted.copy(
-            status = ScanJobStatus.INVALID,
+            deprecated = true,
             lastScanDateInMillis = 123L,
         )
         whenever(mockPirRepository.getAllBrokerSchedulingConfigs()).thenReturn(listOf(brokerSchedulingConfig))

@@ -128,7 +128,18 @@ interface PirRepository {
 
     suspend fun getAllExtractedProfiles(): List<ExtractedProfile>
 
-    suspend fun getUserProfileQueries(): List<ProfileQuery>
+    suspend fun getUserProfileQuery(id: Long): ProfileQuery?
+
+    /**
+     * Returns all user profile queries stored in the database, including deprecated ones.
+     * In some cases we still want to run jobs on them.
+     */
+    suspend fun getAllUserProfileQueries(): List<ProfileQuery>
+
+    /**
+     * Returns all user profile queries that are not marked as deprecated.
+     */
+    suspend fun getValidUserProfileQueries(): List<ProfileQuery>
 
     suspend fun getUserProfileQueriesWithIds(ids: List<Long>): List<ProfileQuery>
 
@@ -434,6 +445,18 @@ internal class RealPirRepository(
 
     override suspend fun saveNewExtractedProfiles(extractedProfiles: List<ExtractedProfile>) {
         withContext(dispatcherProvider.io()) {
+            if (extractedProfiles.isEmpty()) {
+                return@withContext
+            }
+
+            val profileQueryId = extractedProfiles.first().profileQueryId
+            val profileQuery = userProfileDao.getUserProfile(profileQueryId)
+            if (profileQuery?.deprecated == true) {
+                // we should not store any new extracted profiles for a deprecated user profile
+                // also don't mark them as deprecated as we still want to show them on the UI
+                return@withContext
+            }
+
             extractedProfiles
                 .map {
                     it.toStoredExtractedProfile()
@@ -478,9 +501,21 @@ internal class RealPirRepository(
             }
         }
 
-    override suspend fun getUserProfileQueries(): List<ProfileQuery> =
+    override suspend fun getUserProfileQuery(id: Long): ProfileQuery? =
         withContext(dispatcherProvider.io()) {
-            userProfileDao.getUserProfiles().map {
+            userProfileDao.getUserProfile(id)?.toProfileQuery()
+        }
+
+    override suspend fun getAllUserProfileQueries(): List<ProfileQuery> =
+        withContext(dispatcherProvider.io()) {
+            userProfileDao.getAllUserProfiles().map {
+                it.toProfileQuery()
+            }
+        }
+
+    override suspend fun getValidUserProfileQueries(): List<ProfileQuery> =
+        withContext(dispatcherProvider.io()) {
+            userProfileDao.getValidUserProfiles().map {
                 it.toProfileQuery()
             }
         }

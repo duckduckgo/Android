@@ -53,7 +53,7 @@ import com.squareup.moshi.Types
 
 @Database(
     exportSchema = true,
-    version = 13,
+    version = 14,
     entities = [
         BrokerJsonEtag::class,
         BrokerEntity::class,
