@@ -346,6 +346,20 @@ open class OmnibarLayout @JvmOverloads constructor(
 
     private val smoothProgressAnimator by lazy { SmoothProgressAnimator(pageLoadingIndicator) }
 
+    private val tabLayoutListener: TabLayout.OnTabSelectedListener = object : TabLayout.OnTabSelectedListener {
+        override fun onTabSelected(tab: TabLayout.Tab) {
+            val isSearchTab = tab.position == 0
+            if (isSearchTab) {
+                omnibarInputScreenLaunchListener?.onSearchToggleSelected()
+            } else {
+                omnibarInputScreenLaunchListener?.onDuckAiToggleSelected()
+            }
+            reselectPreviousTab()
+        }
+        override fun onTabUnselected(tab: TabLayout.Tab?) {}
+        override fun onTabReselected(tab: TabLayout.Tab?) {}
+    }
+
     protected val viewModel: OmnibarLayoutViewModel by lazy {
         ViewModelProvider(
             findViewTreeViewModelStoreOwner()!!,
@@ -1049,25 +1063,15 @@ open class OmnibarLayout @JvmOverloads constructor(
         omnibarTextInputClickCatcher.setOnClickListener {
             viewModel.onTextInputClickCatcherClicked()
         }
+        duckAiToggle.addOnTabSelectedListener(tabLayoutListener)
+    }
 
-        duckAiToggle.addOnTabSelectedListener(
-            object : TabLayout.OnTabSelectedListener {
-                override fun onTabSelected(tab: TabLayout.Tab) {
-                    val isSearchTab = tab.position == 0
-                    if (isSearchTab) {
-                        omnibarInputScreenLaunchListener?.onSearchToggleSelected()
-                    } else {
-                        omnibarInputScreenLaunchListener?.onDuckAiToggleSelected()
-                    }
-                    val reselectTab = duckAiToggle.getTabAt(0)
-                    duckAiToggle.selectTab(reselectTab, false)
-                }
-
-                override fun onTabUnselected(tab: TabLayout.Tab?) {}
-
-                override fun onTabReselected(tab: TabLayout.Tab?) {}
-            },
-        )
+    fun reselectPreviousTab() {
+        rootView.postDelayed({
+            duckAiToggle.removeOnTabSelectedListener(tabLayoutListener)
+            duckAiToggle.getTabAt(0)?.select()
+            duckAiToggle.addOnTabSelectedListener(tabLayoutListener)
+        }, 1000)
     }
 }
 
