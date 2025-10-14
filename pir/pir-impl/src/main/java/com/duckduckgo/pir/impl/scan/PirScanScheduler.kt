@@ -89,7 +89,7 @@ class RealPirScanScheduler @Inject constructor(
 
         pirPixelSender.reportScheduledScanScheduled()
         coroutineScope.launch {
-            eventsRepository.saveScanLog(
+            eventsRepository.saveEventLog(
                 PirEventLog(
                     eventTimeInMillis = currentTimeProvider.currentTimeMillis(),
                     eventType = EventType.SCHEDULED_SCAN_SCHEDULED,

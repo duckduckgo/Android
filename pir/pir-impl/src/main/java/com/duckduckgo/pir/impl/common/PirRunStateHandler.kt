@@ -16,6 +16,7 @@
 
 package com.duckduckgo.pir.impl.common
 
+import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState
@@ -50,6 +51,8 @@ import com.duckduckgo.pir.impl.store.PirSchedulingRepository
 import com.duckduckgo.pir.impl.store.db.BrokerScanEventType.BROKER_ERROR
 import com.duckduckgo.pir.impl.store.db.BrokerScanEventType.BROKER_STARTED
 import com.duckduckgo.pir.impl.store.db.BrokerScanEventType.BROKER_SUCCESS
+import com.duckduckgo.pir.impl.store.db.EmailConfirmationEventType.EMAIL_CONFIRMATION_FAILED
+import com.duckduckgo.pir.impl.store.db.EmailConfirmationEventType.EMAIL_CONFIRMATION_SUCCESS
 import com.duckduckgo.pir.impl.store.db.PirBrokerScanLog
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.moshi.Moshi
@@ -166,6 +169,7 @@ class RealPirRunStateHandler @Inject constructor(
     private val dispatcherProvider: DispatcherProvider,
     private val jobRecordUpdater: JobRecordUpdater,
     private val pirSchedulingRepository: PirSchedulingRepository,
+    private val currentTimeProvider: CurrentTimeProvider,
 ) : PirRunStateHandler {
     private val moshi: Moshi by lazy {
         Moshi
@@ -246,6 +250,11 @@ class RealPirRunStateHandler @Inject constructor(
                     brokerUrl = it.url,
                     brokerVersion = it.version,
                 )
+                eventsRepository.saveEmailConfirmationLog(
+                    eventTimeInMillis = currentTimeProvider.currentTimeMillis(),
+                    type = EMAIL_CONFIRMATION_SUCCESS,
+                    detail = it.name,
+                )
             }
         } else {
             val updatedRecord = jobRecordUpdater.recordEmailConfirmationFailed(
@@ -261,6 +270,11 @@ class RealPirRunStateHandler @Inject constructor(
                     attemptId = updatedRecord.emailData.attemptId,
                     actionId = updatedRecord.jobAttemptData.lastJobAttemptActionId,
                     durationMs = pirRunState.totalTimeMillis,
+                )
+                eventsRepository.saveEmailConfirmationLog(
+                    eventTimeInMillis = currentTimeProvider.currentTimeMillis(),
+                    type = EMAIL_CONFIRMATION_FAILED,
+                    detail = broker.name,
                 )
             }
         }

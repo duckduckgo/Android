@@ -315,14 +315,14 @@ class RealPirScan @Inject constructor(
 
     private suspend fun emitScanStartPixel(runType: RunType) {
         if (runType == RunType.MANUAL) {
-            eventsRepository.saveScanLog(
+            eventsRepository.saveEventLog(
                 PirEventLog(
                     eventTimeInMillis = currentTimeProvider.currentTimeMillis(),
                     eventType = EventType.MANUAL_SCAN_STARTED,
                 ),
             )
         } else {
-            eventsRepository.saveScanLog(
+            eventsRepository.saveEventLog(
                 PirEventLog(
                     eventTimeInMillis = currentTimeProvider.currentTimeMillis(),
                     eventType = EventType.SCHEDULED_SCAN_STARTED,
@@ -335,14 +335,14 @@ class RealPirScan @Inject constructor(
         runType: RunType,
     ) {
         if (runType == RunType.MANUAL) {
-            eventsRepository.saveScanLog(
+            eventsRepository.saveEventLog(
                 PirEventLog(
                     eventTimeInMillis = currentTimeProvider.currentTimeMillis(),
                     eventType = EventType.MANUAL_SCAN_COMPLETED,
                 ),
             )
         } else {
-            eventsRepository.saveScanLog(
+            eventsRepository.saveEventLog(
                 PirEventLog(
                     eventTimeInMillis = currentTimeProvider.currentTimeMillis(),
                     eventType = EventType.SCHEDULED_SCAN_COMPLETED,
