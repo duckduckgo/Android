@@ -559,7 +559,9 @@ class OmnibarLayoutViewModel @Inject constructor(
 
     private fun shouldShowDuckAiToggle(viewMode: ViewMode, hasFocus: Boolean): Boolean {
         // Duck.ai Toggle is shown if Duck.ai is enabled and we are in unfocused NTP
-        return duckAiFeatureState.showInputScreen.value && duckAiFeatureState.showToggleInNewTabPage.value && viewMode is NewTab
+        val shouldShowDuckAI = duckAiFeatureState.showInputScreen.value && duckAiFeatureState.showToggleInNewTabPage.value && viewMode is NewTab
+        logcat { "Omnibar: shouldShowDuckAiToggle $shouldShowDuckAI" }
+        return shouldShowDuckAI
     }
 
     fun onInputStateChanged(
