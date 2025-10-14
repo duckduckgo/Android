@@ -632,7 +632,7 @@ class InputScreenViewModel @AssistedInject constructor(
         pixel.fire(DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_OMNIBAR_CLEAR_BUTTON_PRESSED, parameters = params)
 
         _visibilityState.update {
-            it.copy(mainButtonsVisible = true)
+            it.copy(mainButtonsVisible = visibilityState.value.searchMode)
         }
     }
 

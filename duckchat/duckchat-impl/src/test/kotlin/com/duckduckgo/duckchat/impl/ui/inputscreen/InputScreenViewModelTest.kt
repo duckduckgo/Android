@@ -1714,7 +1714,7 @@ class InputScreenViewModelTest {
                 )
             verify(pixel).fire(DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_OMNIBAR_CLEAR_BUTTON_PRESSED, expectedParams)
 
-            assertTrue(viewModel.visibilityState.value.mainButtonsVisible)
+            assertFalse(viewModel.visibilityState.value.mainButtonsVisible)
         }
 
     @Test
