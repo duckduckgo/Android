@@ -58,7 +58,7 @@ object DuckDuckGoTheme {
 fun ProvideDuckDuckGoTheme(
     colors: DuckDuckGoColors,
     shapes: DuckDuckGoShapes,
-    typography: DuckDuckGoTypography = DuckDuckGoTypography,
+    typography: DuckDuckGoTypography,
     content: @Composable () -> Unit,
 ) {
     CompositionLocalProvider(
@@ -134,7 +134,9 @@ fun DuckDuckGoTheme(
 
     val colors = if (isDarkTheme) darkColorPalette else lightColorPalette
 
-    ProvideDuckDuckGoTheme(colors = colors, shapes = shapes) {
+    val typography = DuckDuckGoTypography()
+
+    ProvideDuckDuckGoTheme(colors = colors, shapes = shapes, typography = typography) {
         MaterialTheme(
             colorScheme = debugColors(),
             typography = debugTypography(),
