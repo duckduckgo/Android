@@ -25,6 +25,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
 import com.duckduckgo.mobile.android.R
 
+/**
+ * Default colors for DuckDuckGo theme, using colors from resources to match values used in View/XML layouts.
+ *
+ * Figma: https://www.figma.com/design/3W4vi0zX8hrpQc7zInQQB6/%F0%9F%8E%A8-Global-Colors---Styles?node-id=11-1
+ */
 @Immutable
 data class DuckDuckGoColors(
     val background: Color,

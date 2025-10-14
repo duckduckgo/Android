@@ -18,7 +18,6 @@ package com.duckduckgo.common.ui.compose.theme
 
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.shape.CutCornerShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Shapes
@@ -27,7 +26,6 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
-import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.text.font.FontFamily
 import com.duckduckgo.mobile.android.R
 
@@ -57,8 +55,8 @@ object DuckDuckGoTheme {
 @Composable
 fun ProvideDuckDuckGoTheme(
     colors: DuckDuckGoColors,
-    shapes: DuckDuckGoShapes,
-    typography: DuckDuckGoTypography,
+    shapes: DuckDuckGoShapes = Shapes,
+    typography: DuckDuckGoTypography = Typography,
     content: @Composable () -> Unit,
 ) {
     CompositionLocalProvider(
@@ -126,17 +124,9 @@ fun DuckDuckGoTheme(
         isDark = true,
     )
 
-    val shapes = DuckDuckGoShapes(
-        small = RoundedCornerShape(dimensionResource(R.dimen.smallShapeCornerRadius)),
-        medium = RoundedCornerShape(dimensionResource(R.dimen.mediumShapeCornerRadius)),
-        large = RoundedCornerShape(dimensionResource(R.dimen.largeShapeCornerRadius)),
-    )
-
     val colors = if (isDarkTheme) darkColorPalette else lightColorPalette
 
-    val typography = DuckDuckGoTypography()
-
-    ProvideDuckDuckGoTheme(colors = colors, shapes = shapes, typography = typography) {
+    ProvideDuckDuckGoTheme(colors = colors) {
         MaterialTheme(
             colorScheme = debugColors(),
             typography = debugTypography(),

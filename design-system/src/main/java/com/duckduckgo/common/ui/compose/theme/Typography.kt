@@ -23,15 +23,11 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 
-@Immutable
-data class DuckDuckGoTextStyle internal constructor(
-    internal val textStyle: TextStyle
-)
-
-// Internal extension to extract TextStyle - only accessible within the design system
-internal val DuckDuckGoTextStyle.asTextStyle: TextStyle
-    get() = textStyle
-
+/**
+ * Default typography for DuckDuckGo theme.
+ *
+ * Figma: https://www.figma.com/design/jHLwh4erLbNc2YeobQpGFt/Design-System-Guidelines?node-id=1313-19967
+ */
 @Immutable
 data class DuckDuckGoTypography(
 
@@ -119,7 +115,18 @@ data class DuckDuckGoTypography(
     ),
 )
 
+val Typography = DuckDuckGoTypography()
+
 @SuppressLint("ComposeCompositionLocalUsage")
 val LocalDuckDuckGoTypography = staticCompositionLocalOf<DuckDuckGoTypography> {
     error("No DuckDuckGoTypography provided")
 }
+
+@Immutable
+data class DuckDuckGoTextStyle internal constructor(
+    internal val textStyle: TextStyle,
+)
+
+// Internal extension to extract TextStyle - only accessible within the design system
+internal val DuckDuckGoTextStyle.asTextStyle: TextStyle
+    get() = textStyle

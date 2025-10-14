@@ -17,9 +17,28 @@
 package com.duckduckgo.common.ui.compose.theme
 
 import android.annotation.SuppressLint
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
+import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.res.dimensionResource
+import com.duckduckgo.mobile.android.R
+
+/**
+ * Default shapes for DuckDuckGo theme, using dimensions from resources to match values used in View/XML layouts.
+ *
+ * Figma: https://www.figma.com/design/jHLwh4erLbNc2YeobQpGFt/Design-System-Guidelines?node-id=8796-21531
+ */
+val Shapes
+    @Composable
+    @ReadOnlyComposable
+    get() = DuckDuckGoShapes(
+        small = RoundedCornerShape(dimensionResource(R.dimen.smallShapeCornerRadius)),
+        medium = RoundedCornerShape(dimensionResource(R.dimen.mediumShapeCornerRadius)),
+        large = RoundedCornerShape(dimensionResource(R.dimen.largeShapeCornerRadius)),
+    )
 
 @Immutable
 data class DuckDuckGoShapes(
