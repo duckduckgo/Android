@@ -44,7 +44,10 @@ import androidx.core.widget.doAfterTextChanged
 import androidx.core.widget.doOnTextChanged
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.browser.ui.tabs.TabSwitcherButton
 import com.duckduckgo.common.ui.view.addBottomShadow
+import com.duckduckgo.common.ui.view.gone
+import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.view.toPx
 import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.duckchat.impl.R
@@ -71,6 +74,20 @@ class InputModeWidget @JvmOverloads constructor(
     private val inputModeSwitch: TabLayout
     private val inputModeWidgetCard: MaterialCardView
     private val inputScreenButtonsContainer: FrameLayout
+    private val inputModeMainButtonsContainer: View
+    private val inputModeWidgetLayout: View
+    val tabSwitcherButton: TabSwitcherButton
+    private val menuButton: View
+    private val fireButton: View
+    private val voiceInputButton: View
+
+    private val inputModeCardExtendedEndMargin: Int by lazy {
+        resources.getDimensionPixelSize(R.dimen.inputScreenOmnibarCardExtendedMarginHorizontal)
+    }
+
+    private val inputModeCardEndMargin: Int by lazy {
+        resources.getDimensionPixelSize(R.dimen.inputScreenOmnibarCardMarginHorizontal)
+    }
 
     var onBack: (() -> Unit)? = null
     var onSearchSent: ((String) -> Unit)? = null
@@ -86,8 +103,13 @@ class InputModeWidget @JvmOverloads constructor(
     var onSearchTextChanged: ((String) -> Unit)? = null
     var onChatTextChanged: ((String) -> Unit)? = null
     var onInputFieldClicked: (() -> Unit)? = null
+    var onVoiceClick: (() -> Unit)? = null
 
     var onTabTapped: ((index: Int) -> Unit)? = null
+    var onFireButtonTapped: (() -> Unit)? = null
+    var onTabSwitcherTapped: (() -> Unit)? = null
+    var onMenuTapped: (() -> Unit)? = null
+    var onClearTextTapped: (() -> Unit)? = null
 
     var text: String
         get() = inputField.text.toString()
@@ -120,7 +142,13 @@ class InputModeWidget @JvmOverloads constructor(
         inputModeWidgetBack = findViewById(R.id.InputModeWidgetBack)
         inputModeSwitch = findViewById(R.id.inputModeSwitch)
         inputModeWidgetCard = findViewById(R.id.inputModeWidgetCard)
+        menuButton = findViewById(R.id.inputFieldBrowserMenu)
+        fireButton = findViewById(R.id.inputFieldFireButton)
+        tabSwitcherButton = findViewById(R.id.inputFieldTabsMenu)
+        voiceInputButton = findViewById(R.id.inputFieldVoiceInputButton)
         inputScreenButtonsContainer = findViewById(R.id.inputScreenButtonsContainer)
+        inputModeMainButtonsContainer = findViewById(R.id.inputModeMainButtonsContainer)
+        inputModeWidgetLayout = findViewById(R.id.inputModeWidgetLayout)
 
         configureClickListeners()
         configureInputBehavior()
@@ -134,13 +162,32 @@ class InputModeWidget @JvmOverloads constructor(
         super.onAttachedToWindow()
     }
 
-    fun provideInitialText(text: String) {
+    private fun provideInitialText(text: String) {
         originalText = text
         this.text = text
     }
 
+    fun provideInitialInputState(
+        text: String,
+        canShowMainButtons: Boolean,
+    ) {
+        if (text.isNotEmpty()) {
+            provideInitialText(text)
+        }
+
+        if (canShowMainButtons && text.isNotEmpty()) {
+            inputModeMainButtonsContainer.show()
+        } else {
+            inputModeMainButtonsContainer.gone()
+        }
+    }
+
     fun init() {
         onSearchSelected?.invoke()
+    }
+
+    fun clearInputFocus() {
+        inputField.clearFocus()
     }
 
     private fun configureClickListeners() {
@@ -148,9 +195,9 @@ class InputModeWidget @JvmOverloads constructor(
             inputField.text.clear()
             inputField.setSelection(0)
             inputField.scrollTo(0, 0)
+
             beginChangeBoundsTransition()
-            val params = inputScreenPixelsModeParam(isSearchMode = inputModeSwitch.selectedTabPosition == 0)
-            pixel.fire(DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_OMNIBAR_CLEAR_BUTTON_PRESSED, parameters = params)
+            onClearTextTapped?.invoke()
         }
         inputModeWidgetBack.setOnClickListener {
             onBack?.invoke()
@@ -160,6 +207,18 @@ class InputModeWidget @JvmOverloads constructor(
         }
         inputField.setOnClickListener {
             onInputFieldClicked?.invoke()
+        }
+        menuButton.setOnClickListener {
+            onMenuTapped?.invoke()
+        }
+        tabSwitcherButton.setOnClickListener {
+            onTabSwitcherTapped?.invoke()
+        }
+        fireButton.setOnClickListener {
+            onFireButtonTapped?.invoke()
+        }
+        voiceInputButton.setOnClickListener {
+            onVoiceClick?.invoke()
         }
         addTabClickListeners()
     }
@@ -210,7 +269,7 @@ class InputModeWidget @JvmOverloads constructor(
                 }
 
                 val isNullOrEmpty = text.isNullOrEmpty()
-                fade(inputFieldClearText, !isNullOrEmpty)
+                inputFieldClearText.isVisible = !isNullOrEmpty
             }
 
             doAfterTextChanged { text ->
@@ -358,7 +417,7 @@ class InputModeWidget @JvmOverloads constructor(
         inputField.selectAll()
     }
 
-    fun setInputScreenButtons(inputScreenButtons: InputScreenButtons) {
+    fun setInputScreenBottomButtons(inputScreenButtons: InputScreenButtons) {
         inputScreenButtonsContainer.addView(inputScreenButtons)
         inputFieldClearText.updateLayoutParams<MarginLayoutParams> {
             // align the clear text button with the center of the submit button
@@ -381,6 +440,25 @@ class InputModeWidget @JvmOverloads constructor(
     private fun configureShadow() {
         if (Build.VERSION.SDK_INT >= 28) {
             inputModeWidgetCard.addBottomShadow()
+        }
+    }
+
+    fun setVoiceButtonVisible(visible: Boolean) {
+        voiceInputButton.isVisible = visible
+    }
+
+    fun setMainButtonsVisible(
+        mainButtonsVisible: Boolean,
+    ) {
+        fade(inputModeMainButtonsContainer, mainButtonsVisible)
+
+        inputModeWidgetLayout.updateLayoutParams<MarginLayoutParams> {
+            marginEnd = if (mainButtonsVisible) {
+                inputModeCardEndMargin
+            } else {
+                inputModeCardExtendedEndMargin
+            }
+            marginStart = inputModeCardExtendedEndMargin
         }
     }
 
