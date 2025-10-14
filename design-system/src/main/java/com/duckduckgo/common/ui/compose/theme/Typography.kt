@@ -122,8 +122,9 @@ val LocalDuckDuckGoTypography = staticCompositionLocalOf<DuckDuckGoTypography> {
     error("No DuckDuckGoTypography provided")
 }
 
+@JvmInline
 @Immutable
-data class DuckDuckGoTextStyle internal constructor(
+value class DuckDuckGoTextStyle internal constructor(
     internal val textStyle: TextStyle,
 )
 
