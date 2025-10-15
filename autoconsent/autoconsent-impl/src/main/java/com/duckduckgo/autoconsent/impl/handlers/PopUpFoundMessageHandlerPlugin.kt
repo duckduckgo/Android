@@ -20,6 +20,8 @@ import android.webkit.WebView
 import com.duckduckgo.autoconsent.api.AutoconsentCallback
 import com.duckduckgo.autoconsent.impl.MessageHandlerPlugin
 import com.duckduckgo.autoconsent.impl.adapters.JSONObjectAdapter
+import com.duckduckgo.autoconsent.impl.pixels.AutoConsentPixel
+import com.duckduckgo.autoconsent.impl.pixels.AutoconsentPixelManager
 import com.duckduckgo.autoconsent.impl.store.AutoconsentSettingsRepository
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesMultibinding
@@ -29,7 +31,10 @@ import logcat.logcat
 import javax.inject.Inject
 
 @ContributesMultibinding(AppScope::class)
-class PopUpFoundMessageHandlerPlugin @Inject constructor(private val repository: AutoconsentSettingsRepository) : MessageHandlerPlugin {
+class PopUpFoundMessageHandlerPlugin @Inject constructor(
+    private val repository: AutoconsentSettingsRepository,
+    private val pixelManager: AutoconsentPixelManager,
+) : MessageHandlerPlugin {
 
     private val moshi = Moshi.Builder().add(JSONObjectAdapter()).build()
 
@@ -37,6 +42,9 @@ class PopUpFoundMessageHandlerPlugin @Inject constructor(private val repository:
         try {
             if (supportedTypes.contains(messageType)) {
                 val message: PopUpFoundMessage = parseMessage(jsonString) ?: return
+
+                pixelManager.fireDailyPixel(AutoConsentPixel.AUTOCONSENT_POPUP_FOUND_DAILY)
+
                 if (repository.userSetting) return
                 if (message.cmp.endsWith(IGNORE_CMP_SUFFIX, ignoreCase = true)) return
 
