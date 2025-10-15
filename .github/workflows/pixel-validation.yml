@@ -41,7 +41,7 @@ jobs:
               working-directory: PixelDefinitions
 
             - name: Lint
-              run: npm run lint || (npm run lint.fix; git diff; echo 'Pixel lint check failed, review diff above or run "npm run lint.fix"'; exit 1)
+              run: npm run lint || (npm run lint.fix; git --no-pager diff; echo 'Pixel lint check failed, review diff above or run "npm run lint.fix"'; exit 1)
               working-directory: PixelDefinitions
 
             - name: Run pixel validation
