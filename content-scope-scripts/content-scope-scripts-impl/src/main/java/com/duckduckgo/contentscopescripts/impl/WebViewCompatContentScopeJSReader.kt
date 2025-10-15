@@ -34,7 +34,6 @@ class RealWebViewCompatContentScopeJSReader @Inject constructor(
     private val dispatcherProvider: DispatcherProvider,
 ) : WebViewCompatContentScopeJSReader {
     private lateinit var contentScopeJS: String
-    private lateinit var noWebMessagingContentScopeJS: String
 
     override suspend fun getContentScopeJS(): String {
         if (!this@RealWebViewCompatContentScopeJSReader::contentScopeJS.isInitialized) {
