@@ -22,6 +22,7 @@ import com.duckduckgo.app.attributed.metrics.api.EventStats
 import com.duckduckgo.app.attributed.metrics.store.EventRepository
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Unique
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
@@ -71,10 +72,12 @@ class RealAttributedMetricClient @Inject constructor(
         appCoroutineScope.launch(dispatcherProvider.io()) {
             if (!metricsState.isActive()) return@launch
             val pixelName = metric.getPixelName()
+            val tag = metric.getTag()
             logcat(tag = "AttributedMetrics") {
                 "Firing pixel for $pixelName"
             }
-            pixel.fire(pixelName = pixelName, parameters = metric.getMetricParameters())
+            val pixelTag = "${pixelName}_$tag"
+            pixel.fire(pixelName = pixelName, parameters = metric.getMetricParameters(), type = Unique(pixelTag))
         }
     }
 }
