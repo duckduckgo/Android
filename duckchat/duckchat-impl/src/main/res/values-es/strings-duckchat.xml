@@ -66,6 +66,7 @@
 
     <!-- AutoComplete -->
     <string name="autocompleteDuckAiPrompt">Pregúntale a Duck.ai</string>
+    <string name="autocompleteDeviceAppNotFound">No se pudo encontrar la aplicación</string>
 
     <!-- New Address Bar Option Bottom Sheet Dialog -->
     <string name="newAddressBarOptionBottomSheetDialogSearchText">Buscar o introducir dirección</string>

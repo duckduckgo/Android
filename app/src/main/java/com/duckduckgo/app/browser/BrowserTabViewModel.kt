@@ -1006,6 +1006,9 @@ class BrowserTabViewModel @Inject constructor(
                     is AutoCompleteSwitchToTabSuggestion -> onUserSwitchedToTab(suggestion.tabId)
                     is AutoCompleteInAppMessageSuggestion -> return@withContext
                     is AutoCompleteSuggestion.AutoCompleteDuckAIPrompt -> onUserTappedDuckAiPromptAutocomplete(suggestion.phrase)
+                    is AutoCompleteSuggestion.AutoCompleteDeviceAppSuggestion -> {
+                        // no-op, installed apps search is disabled in tabs
+                    }
                 }
             }
             autoComplete.fireAutocompletePixel(autoCompleteViewState.searchResults.suggestions, suggestion)
