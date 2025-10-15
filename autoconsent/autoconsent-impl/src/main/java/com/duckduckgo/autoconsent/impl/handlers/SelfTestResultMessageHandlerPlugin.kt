@@ -20,6 +20,8 @@ import android.webkit.WebView
 import com.duckduckgo.autoconsent.api.AutoconsentCallback
 import com.duckduckgo.autoconsent.impl.MessageHandlerPlugin
 import com.duckduckgo.autoconsent.impl.adapters.JSONObjectAdapter
+import com.duckduckgo.autoconsent.impl.pixels.AutoConsentPixel
+import com.duckduckgo.autoconsent.impl.pixels.AutoconsentPixelManager
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesMultibinding
 import com.squareup.moshi.JsonAdapter
@@ -28,15 +30,28 @@ import logcat.logcat
 import javax.inject.Inject
 
 @ContributesMultibinding(AppScope::class)
-class SelfTestResultMessageHandlerPlugin @Inject constructor() : MessageHandlerPlugin {
+class SelfTestResultMessageHandlerPlugin @Inject constructor(
+    private val autoconsentPixelManager: AutoconsentPixelManager,
+) : MessageHandlerPlugin {
 
     private val moshi = Moshi.Builder().add(JSONObjectAdapter()).build()
 
     override fun process(messageType: String, jsonString: String, webView: WebView, autoconsentCallback: AutoconsentCallback) {
         if (supportedTypes.contains(messageType)) {
             try {
-                val message: SelfTestResultMessage = parseMessage(jsonString) ?: return
-                autoconsentCallback.onResultReceived(consentManaged = true, optOutFailed = false, selfTestFailed = message.result, isCosmetic = null)
+                parseMessage(jsonString)?.result?.let { messageResult ->
+                    if (messageResult) {
+                        autoconsentPixelManager.fireDailyPixel(AutoConsentPixel.AUTOCONSENT_SELF_TEST_OK_DAILY)
+                    } else {
+                        autoconsentPixelManager.fireDailyPixel(AutoConsentPixel.AUTOCONSENT_SELF_TEST_FAIL_DAILY)
+                    }
+                    autoconsentCallback.onResultReceived(
+                        consentManaged = true,
+                        optOutFailed = false,
+                        selfTestFailed = messageResult,
+                        isCosmetic = null,
+                    )
+                }
             } catch (e: Exception) {
                 logcat { e.localizedMessage }
             }
