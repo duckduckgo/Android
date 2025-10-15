@@ -77,4 +77,10 @@ interface AttributedMetric {
      * @return Parameters to be included with this metric
      */
     suspend fun getMetricParameters(): Map<String, String>
+
+    /**
+     * @return Identifier used to deduplicate metric emissions. The same combination of metric
+     *           and tag will only be emitted once.
+     */
+    suspend fun getTag(): String
 }
