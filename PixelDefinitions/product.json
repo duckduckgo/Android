@@ -1,0 +1,8 @@
+{
+    "agents": ["ddg_android"],
+    "target": {
+        "key": "appVersion",
+        "version": "5.250.0" // TODO update to 5.251.1
+    },
+    "forceLowerCase": false
+}
