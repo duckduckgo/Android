@@ -22,18 +22,7 @@
         <enum name="bottom" value="1" />
     </attr>
 
-    <!-- LegacyOmnibarView-->
-    <declare-styleable name="LegacyOmnibarView">
-        <attr name="omnibarPosition"/>
-    </declare-styleable>
-
-    <!-- NewOmnibarView-->
-    <declare-styleable name="NewOmnibarView">
-        <attr name="omnibarPosition"/>
-    </declare-styleable>
-
-    <!-- FadeOmnibarView-->
-    <declare-styleable name="FadeOmnibarLayout">
+    <declare-styleable name="OmnibarLayout">
         <attr name="omnibarPosition"/>
     </declare-styleable>
 
