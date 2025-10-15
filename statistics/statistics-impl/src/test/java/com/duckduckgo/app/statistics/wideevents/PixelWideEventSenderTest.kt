@@ -68,10 +68,12 @@ class PixelWideEventSenderTest {
     @Test
     fun `when sendWideEvent called with completed event then sends count and daily pixels`() =
         runTest {
+            val eventName = "subscription-purchase"
+
             val event =
                 createWideEvent(
                     id = 123L,
-                    name = "subscription.purchase",
+                    name = eventName,
                     status = WideEventRepository.WideEventStatus.SUCCESS,
                     flowEntryPoint = "app_settings",
                     metadata = mapOf("plan_type" to "premium"),
@@ -95,14 +97,14 @@ class PixelWideEventSenderTest {
             val expectedEncodedParameters = mapOf("plan_type" to "premium")
 
             verify(pixel).fire(
-                pixelName = eq("wide.subscription.purchase.c"),
+                pixelName = eq("wide_${eventName}_c"),
                 parameters = eq(expectedParameters),
                 encodedParameters = eq(expectedEncodedParameters),
                 type = eq(Pixel.PixelType.Count),
             )
 
             verify(pixel).fire(
-                pixelName = eq("wide.subscription.purchase.d"),
+                pixelName = eq("wide_${eventName}_d"),
                 parameters = eq(expectedParameters),
                 encodedParameters = eq(expectedEncodedParameters),
                 type = any<Pixel.PixelType.Daily>(),
