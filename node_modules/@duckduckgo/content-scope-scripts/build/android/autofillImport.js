@@ -1,4 +1,4 @@
-/*! © DuckDuckGo ContentScopeScripts protections https://github.com/duckduckgo/content-scope-scripts/ */
+/*! © DuckDuckGo ContentScopeScripts android-autofill-import https://github.com/duckduckgo/content-scope-scripts/ */
 "use strict";
 (() => {
   var __create = Object.create;
@@ -1564,6 +1564,10 @@
   var Map2 = globalThis.Map;
   var Error2 = globalThis.Error;
   var randomUUID = globalThis.crypto?.randomUUID?.bind(globalThis.crypto);
+  var console2 = globalThis.console;
+  var consoleLog = console2.log.bind(console2);
+  var consoleWarn = console2.warn.bind(console2);
+  var consoleError = console2.error.bind(console2);
 
   // src/utils.js
   var globalObj = typeof window === "undefined" ? globalThis : window;
@@ -5130,21 +5134,21 @@
             return () => {
             };
           }
-          return console.log.bind(console, prefix);
+          return consoleLog.bind(console, prefix);
         },
         get warn() {
           if (!shouldLog) {
             return () => {
             };
           }
-          return console.warn.bind(console, prefix);
+          return consoleWarn.bind(console, prefix);
         },
         get error() {
           if (!shouldLog) {
             return () => {
             };
           }
-          return console.error.bind(console, prefix);
+          return consoleError.bind(console, prefix);
         }
       };
     }
