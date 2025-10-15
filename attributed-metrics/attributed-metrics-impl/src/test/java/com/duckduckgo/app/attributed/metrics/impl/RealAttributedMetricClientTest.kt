@@ -21,6 +21,7 @@ import com.duckduckgo.app.attributed.metrics.api.AttributedMetric
 import com.duckduckgo.app.attributed.metrics.api.EventStats
 import com.duckduckgo.app.attributed.metrics.store.EventRepository
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Unique
 import com.duckduckgo.common.test.CoroutineTestRule
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -105,7 +106,7 @@ class RealAttributedMetricClientTest {
 
         testee.emitMetric(testMetric)
 
-        verify(mockPixel).fire(pixelName = "test_pixel", parameters = mapOf("param" to "value"))
+        verify(mockPixel).fire(pixelName = "test_pixel", parameters = mapOf("param" to "value"), type = Unique("test_pixel_test_tag"))
     }
 
     @Test
@@ -121,5 +122,6 @@ class RealAttributedMetricClientTest {
     private class TestAttributedMetric : AttributedMetric {
         override fun getPixelName(): String = "test_pixel"
         override suspend fun getMetricParameters(): Map<String, String> = mapOf("param" to "value")
+        override suspend fun getTag(): String = "test_tag"
     }
 }
