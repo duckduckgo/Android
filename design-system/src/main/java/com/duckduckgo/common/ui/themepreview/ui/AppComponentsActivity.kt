@@ -68,23 +68,3 @@ class AppComponentsActivity : AppCompatActivity() {
         }
     }
 }
-
-class AppComponentsSharedPreferences(private val context: Context) {
-    var selectedTheme: DuckDuckGoTheme
-        get() {
-            return if (preferences.getBoolean(KEY_SELECTED_DARK_THEME, false)) {
-                DuckDuckGoTheme.DARK
-            } else {
-                DuckDuckGoTheme.LIGHT
-            }
-        }
-        set(theme) =
-            preferences.edit { putBoolean(KEY_SELECTED_DARK_THEME, theme == DuckDuckGoTheme.DARK) }
-
-    private val preferences: SharedPreferences by lazy { context.getSharedPreferences(FILENAME, Context.MODE_PRIVATE) }
-
-    companion object {
-        const val FILENAME = "com.duckduckgo.app.dev_settings_activity.theme_settings"
-        const val KEY_SELECTED_DARK_THEME = "KEY_SELECTED_DARK_THEME"
-    }
-}
