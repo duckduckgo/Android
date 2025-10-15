@@ -22,7 +22,7 @@ import com.duckduckgo.common.ui.themepreview.ui.store.AppComponentsPrefsDataStor
 import kotlinx.coroutines.flow.Flow
 
 class AppComponentsViewModel(
-    private val appComponentsPrefsDataStore: AppComponentsPrefsDataStore
+    private val appComponentsPrefsDataStore: AppComponentsPrefsDataStore,
 ) : ViewModel() {
 
     val themeFlow: Flow<DuckDuckGoTheme> = appComponentsPrefsDataStore.themeFlow
