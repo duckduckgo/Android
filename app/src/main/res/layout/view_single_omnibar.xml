@@ -244,7 +244,7 @@
                                 android:layout_height="0dp"
                                 android:background="@null"
                                 android:fontFamily="sans-serif"
-                                android:hint="@string/omnibarInputHint"
+                                android:hint="@string/search"
                                 android:imeOptions="flagNoExtractUi|actionGo|flagNoPersonalizedLearning"
                                 android:inputType="textUri|textNoSuggestions"
                                 android:maxLines="1"
