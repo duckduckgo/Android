@@ -34,6 +34,7 @@ import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggesti
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion.AutoCompleteSearchSuggestion
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion.AutoCompleteUrlSuggestion.AutoCompleteBookmarkSuggestion
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion.AutoCompleteUrlSuggestion.AutoCompleteSwitchToTabSuggestion
+import com.duckduckgo.browser.api.autocomplete.AutoCompleteFactory
 import com.duckduckgo.browser.api.autocomplete.AutoCompleteSettings
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.SingleLiveEvent
@@ -113,7 +114,7 @@ enum class UserSelectedMode {
 
 class InputScreenViewModel @AssistedInject constructor(
     @Assisted currentOmnibarText: String,
-    private val autoComplete: AutoComplete,
+    autoCompleteFactory: AutoCompleteFactory,
     private val dispatchers: DispatcherProvider,
     private val history: NavigationHistory,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
@@ -126,6 +127,11 @@ class InputScreenViewModel @AssistedInject constructor(
     private val inputScreenSessionUsageMetric: InputScreenSessionUsageMetric,
     private val inputScreenConfigResolver: InputScreenConfigResolver,
 ) : ViewModel() {
+
+    private val autoComplete: AutoComplete = autoCompleteFactory.create(
+        AutoComplete.Config(showInstalledApps = inputScreenConfigResolver.shouldShowInstalledApps()),
+    )
+
     private var hasUserSeenHistoryIAM = false
     private var isTapTransition = false
 
@@ -294,9 +300,16 @@ class InputScreenViewModel @AssistedInject constructor(
                     is AutoCompleteSwitchToTabSuggestion -> onUserSwitchedToTab(suggestion.tabId)
                     is AutoCompleteInAppMessageSuggestion -> return@withContext
                     is AutoCompleteSuggestion.AutoCompleteDuckAIPrompt -> onUserTappedDuckAiPromptAutocomplete(suggestion.phrase)
+                    is AutoCompleteSuggestion.AutoCompleteDeviceAppSuggestion -> {
+                        command.value = Command.LaunchDeviceApplication(suggestion)
+                    }
                 }
             }
         }
+    }
+
+    fun appNotFound(suggestion: AutoCompleteSuggestion.AutoCompleteDeviceAppSuggestion) {
+        command.value = Command.ShowAppNotFoundMessage(suggestion.shortName)
     }
 
     private fun onUserSwitchedToTab(tabId: String) {

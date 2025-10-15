@@ -56,11 +56,13 @@ object SystemComponentsModule {
 
     @SingleInstanceIn(AppScope::class)
     @Provides
-    fun deviceAppsListProvider(packageManager: PackageManager): DeviceAppListProvider = InstalledDeviceAppListProvider(packageManager)
+    fun deviceAppsListProvider(packageManager: PackageManager, dispatcherProvider: DispatcherProvider): DeviceAppListProvider =
+        InstalledDeviceAppListProvider(packageManager, dispatcherProvider)
 
     @Provides
     @SingleInstanceIn(AppScope::class)
-    fun deviceAppLookup(deviceAppListProvider: DeviceAppListProvider): DeviceAppLookup = InstalledDeviceAppLookup(deviceAppListProvider)
+    fun deviceAppLookup(deviceAppListProvider: DeviceAppListProvider, dispatcherProvider: DispatcherProvider): DeviceAppLookup =
+        InstalledDeviceAppLookup(deviceAppListProvider, dispatcherProvider)
 
     @Provides
     fun appIconModifier(

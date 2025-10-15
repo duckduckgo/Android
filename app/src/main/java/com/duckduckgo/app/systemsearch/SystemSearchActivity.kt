@@ -160,25 +160,21 @@ class SystemSearchActivity : DuckDuckGoActivity() {
 
     private val inputScreenLauncher =
         registerForActivityResult(StartActivityForResult()) { result ->
-            val data = result.data ?: return@registerForActivityResult
-
             when (result.resultCode) {
                 InputScreenActivityResultCodes.NEW_SEARCH_REQUESTED -> {
-                    data.getStringExtra(InputScreenActivityResultParams.SEARCH_QUERY_PARAM)?.let { query ->
+                    result.data?.getStringExtra(InputScreenActivityResultParams.SEARCH_QUERY_PARAM)?.let { query ->
                         launchBrowser(query)
-                    }
+                    } ?: finish()
                 }
 
                 InputScreenActivityResultCodes.SWITCH_TO_TAB_REQUESTED -> {
-                    data.getStringExtra(InputScreenActivityResultParams.TAB_ID_PARAM)?.let { tabId ->
+                    result.data?.getStringExtra(InputScreenActivityResultParams.TAB_ID_PARAM)?.let { tabId ->
                         launchBrowser(query = "", openExistingTabId = tabId)
-                    }
+                    } ?: finish()
                 }
 
                 RESULT_CANCELED -> {
-                    data.getStringExtra(InputScreenActivityResultParams.CANCELED_DRAFT_PARAM)?.let { query ->
-                        finish()
-                    }
+                    finish()
                 }
             }
         }
@@ -274,6 +270,7 @@ class SystemSearchActivity : DuckDuckGoActivity() {
                 query = "",
                 isTopOmnibar = isTopOmnibar,
                 browserButtonsConfig = InputScreenBrowserButtonsConfig.Disabled(),
+                showInstalledApps = true,
             ),
         )?.let {
             inputScreenLauncher.launch(it)

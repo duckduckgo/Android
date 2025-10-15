@@ -231,10 +231,29 @@ class InputScreenConfigResolverTest {
         assertFalse(inputScreenConfigResolver.mainButtonsEnabled())
     }
 
+    @Test
+    fun `when shouldShowInstalledApps called with showInstalledApps true then returns true`() {
+        val intent = createIntent(showInstalledApps = true)
+        whenever(mockAppCompatActivity.intent).thenReturn(intent)
+        inputScreenConfigResolver = InputScreenConfigResolverImpl(duckChatInternal, mockAppCompatActivity)
+
+        assertTrue(inputScreenConfigResolver.shouldShowInstalledApps())
+    }
+
+    @Test
+    fun `when shouldShowInstalledApps called with showInstalledApps false then returns false`() {
+        val intent = createIntent(showInstalledApps = false)
+        whenever(mockAppCompatActivity.intent).thenReturn(intent)
+        inputScreenConfigResolver = InputScreenConfigResolverImpl(duckChatInternal, mockAppCompatActivity)
+
+        assertFalse(inputScreenConfigResolver.shouldShowInstalledApps())
+    }
+
     private fun createIntent(
         query: String = "",
         isTopOmnibar: Boolean = true,
         browserButtonsConfig: InputScreenBrowserButtonsConfig = InputScreenBrowserButtonsConfig.Disabled(),
+        showInstalledApps: Boolean = false,
     ) = Intent().apply {
         putExtra(
             "ACTIVITY_SERIALIZABLE_PARAMETERS_ARG",
@@ -242,6 +261,7 @@ class InputScreenConfigResolverTest {
                 query = query,
                 isTopOmnibar = isTopOmnibar,
                 browserButtonsConfig = browserButtonsConfig,
+                showInstalledApps = showInstalledApps,
             ),
         )
     }
