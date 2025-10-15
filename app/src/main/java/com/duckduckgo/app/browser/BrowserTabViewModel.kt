@@ -4259,11 +4259,27 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     suspend fun privacyProtectionsUpdated(webView: WebView) {
-        if (withContext(dispatchers.io()) { !androidBrowserConfig.updateScriptOnProtectionsChanged().isEnabled() }) {
+        val updateScriptOnProtectionsChanged: Boolean
+        val stopLoadingBeforeUpdatingScript: Boolean
+        val updateScriptOnPageFinished: Boolean
+
+        withContext(dispatchers.io()) {
+            updateScriptOnProtectionsChanged = androidBrowserConfig.updateScriptOnProtectionsChanged().isEnabled()
+            stopLoadingBeforeUpdatingScript = androidBrowserConfig.stopLoadingBeforeUpdatingScript().isEnabled()
+            updateScriptOnPageFinished = androidBrowserConfig.updateScriptOnPageFinished().isEnabled()
+        }
+
+        if (!updateScriptOnProtectionsChanged) {
             return
         }
 
-        if (withContext(dispatchers.io()) { !androidBrowserConfig.updateScriptOnPageFinished().isEnabled() }) {
+        if (stopLoadingBeforeUpdatingScript) {
+            withContext(dispatchers.main()) {
+                webView.stopLoading()
+            }
+        }
+
+        if (!updateScriptOnPageFinished) {
             addDocumentStartJavascriptPlugins
                 .getPlugins()
                 .filter { plugin ->
