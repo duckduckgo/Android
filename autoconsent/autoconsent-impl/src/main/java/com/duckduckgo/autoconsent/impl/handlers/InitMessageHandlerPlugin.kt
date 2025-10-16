@@ -23,6 +23,8 @@ import com.duckduckgo.autoconsent.api.AutoconsentCallback
 import com.duckduckgo.autoconsent.impl.MessageHandlerPlugin
 import com.duckduckgo.autoconsent.impl.adapters.JSONObjectAdapter
 import com.duckduckgo.autoconsent.impl.cache.AutoconsentSettingsCache
+import com.duckduckgo.autoconsent.impl.pixels.AutoConsentPixel
+import com.duckduckgo.autoconsent.impl.pixels.AutoconsentPixelManager
 import com.duckduckgo.autoconsent.impl.remoteconfig.AutoconsentFeature
 import com.duckduckgo.autoconsent.impl.remoteconfig.AutoconsentFeatureModels.CompactRules
 import com.duckduckgo.autoconsent.impl.store.AutoconsentSettingsRepository
@@ -46,6 +48,7 @@ class InitMessageHandlerPlugin @Inject constructor(
     private val settingsRepository: AutoconsentSettingsRepository,
     private val settingsCache: AutoconsentSettingsCache,
     private val autoconsentFeature: AutoconsentFeature,
+    private val pixelManager: AutoconsentPixelManager,
 ) : MessageHandlerPlugin {
 
     private val moshi = Moshi.Builder().add(JSONObjectAdapter()).build()
@@ -71,7 +74,18 @@ class InitMessageHandlerPlugin @Inject constructor(
                     val isAutoconsentDisabled = !settingsRepository.userSetting // && settingsRepository.firstPopupHandled
 
                     if (isAutoconsentDisabled) {
+                        withContext(dispatcherProvider.main()) {
+                            if (webView.url == url) {
+                                pixelManager.fireDailyPixel(AutoConsentPixel.AUTOCONSENT_DISABLED_FOR_SITE_DAILY)
+                            }
+                        }
                         return@launch
+                    }
+
+                    withContext(dispatcherProvider.main()) {
+                        if (webView.url == url) {
+                            pixelManager.fireDailyPixel(AutoConsentPixel.AUTOCONSENT_INIT_DAILY)
+                        }
                     }
 
                     // Reset site
