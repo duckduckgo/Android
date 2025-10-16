@@ -17,7 +17,6 @@
 package com.duckduckgo.autoconsent.impl.pixels
 
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
 import com.duckduckgo.di.scopes.AppScope
 import dagger.SingleInstanceIn
 import javax.inject.Inject
@@ -26,7 +25,36 @@ import javax.inject.Inject
 class AutoconsentPixelManager @Inject constructor(
     private val pixel: Pixel,
 ) {
+
+    private val detectedByPatternsCache = mutableSetOf<String>()
+    private val detectedByBothCache = mutableSetOf<String>()
+    private val detectedOnlyRulesCache = mutableSetOf<String>()
+
     fun fireDailyPixel(pixelName: AutoConsentPixel) {
-        pixel.fire(pixelName, type = Daily())
+        pixel.fire(pixelName, type = Pixel.PixelType.Daily())
+    }
+
+    fun isDetectedByPatternsProcessed(instanceId: String): Boolean {
+        return detectedByPatternsCache.contains(instanceId)
+    }
+
+    fun markDetectedByPatternsProcessed(instanceId: String) {
+        detectedByPatternsCache.add(instanceId)
+    }
+
+    fun isDetectedByBothProcessed(instanceId: String): Boolean {
+        return detectedByBothCache.contains(instanceId)
+    }
+
+    fun markDetectedByBothProcessed(instanceId: String) {
+        detectedByBothCache.add(instanceId)
+    }
+
+    fun isDetectedOnlyRulesProcessed(instanceId: String): Boolean {
+        return detectedOnlyRulesCache.contains(instanceId)
+    }
+
+    fun markDetectedOnlyRulesProcessed(instanceId: String) {
+        detectedOnlyRulesCache.add(instanceId)
     }
 }
