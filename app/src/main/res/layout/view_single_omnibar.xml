@@ -45,6 +45,7 @@
                 android:layout_height="@dimen/inputModeSwitchHeight"
                 android:layout_marginTop="@dimen/keyline_2"
                 android:layout_marginBottom="@dimen/keyline_1"
+                app:dummyMode="true"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
@@ -61,7 +62,7 @@
                     android:id="@+id/tabDuckAi"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout="@layout/view_chat_tab_indicator"/>
+                    android:layout="@layout/view_chat_tab_indicator_dummy"/>
 
             </com.duckduckgo.duckchat.impl.inputscreen.ui.view.InputModeTabLayout>
 
