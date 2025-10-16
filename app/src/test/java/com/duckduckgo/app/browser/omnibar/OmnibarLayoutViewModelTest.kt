@@ -1926,4 +1926,30 @@ class OmnibarLayoutViewModelTest {
         testee.onBackButtonPressed()
         verify(pixel).fire(DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_LEGACY_OMNIBAR_BACK_BUTTON_PRESSED)
     }
+
+    @Test
+    fun whenShowDuckAiInAllStatesAndNewTabAndNoInputScreenThenShowChatMenuTrue() = runTest {
+        duckAiShowOmnibarShortcutOnNtpAndOnFocusFlow.value = false
+        duckAiShowOmnibarShortcutInAllStatesFlow.value = true
+        duckAiShowInputScreenFlow.value = false
+        testee.onViewModeChanged(ViewMode.NewTab)
+
+        testee.viewState.test {
+            val viewState = awaitItem()
+            assertTrue(viewState.showChatMenu)
+        }
+    }
+
+    @Test
+    fun whenShowDuckAiInAllStatesAndNewTabAndInputScreenThenShowChatMenuTrue() = runTest {
+        duckAiShowOmnibarShortcutOnNtpAndOnFocusFlow.value = false
+        duckAiShowOmnibarShortcutInAllStatesFlow.value = true
+        duckAiShowInputScreenFlow.value = true
+        testee.onViewModeChanged(ViewMode.NewTab)
+
+        testee.viewState.test {
+            val viewState = awaitItem()
+            assertFalse(viewState.showChatMenu)
+        }
+    }
 }

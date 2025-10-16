@@ -126,9 +126,15 @@ class OmnibarLayoutViewModel @Inject constructor(
         _viewState,
         duckAiFeatureState.showOmnibarShortcutOnNtpAndOnFocus,
         duckAiFeatureState.showOmnibarShortcutInAllStates,
-    ) { viewState, showOnNtpAndOnFocus, showInAllStates ->
+        duckAiFeatureState.showInputScreen,
+    ) { viewState, showOnNtpAndOnFocus, showInAllStates, showInputScreen ->
+        logcat { "inputScreen: viewMode $showOnNtpAndOnFocus showInAllStates $showInAllStates showInputScreen $showInputScreen" }
         when {
             viewState.viewMode is CustomTab -> {
+                false
+            }
+
+            showInputScreen && viewState.viewMode is NewTab -> {
                 false
             }
 
