@@ -70,10 +70,11 @@
         app:constraint_referenced_ids="customDialogNegativeButton,customDialogPositiveButton"
         app:flow_wrapMode="chain"
         app:flow_horizontalStyle="packed"
+        app:flow_horizontalBias="1.0"
         app:flow_horizontalGap="@dimen/keyline_2"
         app:flow_verticalGap="@dimen/keyline_2"
-        app:flow_verticalAlign="top"
         app:layout_constraintTop_toBottomOf="@+id/customDialogContent"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toBottomOf="parent" />
 
