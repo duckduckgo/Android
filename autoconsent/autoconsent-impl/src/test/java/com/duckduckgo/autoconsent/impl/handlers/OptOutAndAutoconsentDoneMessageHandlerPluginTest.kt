@@ -110,6 +110,20 @@ class OptOutAndAutoconsentDoneMessageHandlerPluginTest {
         verify(mockPixelManager).fireDailyPixel(AutoConsentPixel.AUTOCONSENT_ERROR_OPTOUT_DAILY)
     }
 
+    @Test
+    fun whenProcessAutoconsentDoneAndIsCosmeticThenFireDoneCosmeticPixel() {
+        handler.process(getAutoconsentType(), autoconsentDoneMessage(cosmetic = true), webView, mockCallback)
+
+        verify(mockPixelManager).fireDailyPixel(AutoConsentPixel.AUTOCONSENT_DONE_COSMETIC_DAILY)
+    }
+
+    @Test
+    fun whenProcessAutoconsentDoneAndNotCosmeticThenFireDonePixel() {
+        handler.process(getAutoconsentType(), autoconsentDoneMessage(cosmetic = false), webView, mockCallback)
+
+        verify(mockPixelManager).fireDailyPixel(AutoConsentPixel.AUTOCONSENT_DONE_DAILY)
+    }
+
     private fun getOptOut(): String = handler.supportedTypes.first()
 
     private fun getAutoconsentType(): String = handler.supportedTypes.last()

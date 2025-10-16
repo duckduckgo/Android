@@ -74,6 +74,13 @@ class OptOutAndAutoconsentDoneMessageHandlerPlugin @Inject constructor(
     private fun processAutoconsentDone(jsonString: String, webView: WebView, autoconsentCallback: AutoconsentCallback) {
         try {
             val message: AutoconsentDoneMessage = parseAutoconsentDoneMessage(jsonString) ?: return
+
+            if (message.isCosmetic) {
+                pixelManager.fireDailyPixel(AutoConsentPixel.AUTOCONSENT_DONE_COSMETIC_DAILY)
+            } else {
+                pixelManager.fireDailyPixel(AutoConsentPixel.AUTOCONSENT_DONE_DAILY)
+            }
+
             message.url.toUri().host ?: return
 
             autoconsentCallback.onPopUpHandled(message.isCosmetic)
