@@ -63,6 +63,7 @@ class AppComponentsActivity : AppCompatActivity() {
     private lateinit var tabLayout: TabLayout
     private lateinit var darkThemeSwitch: OneLineListItem
 
+    @Suppress("DenyListedApi")
     override fun onCreate(savedInstanceState: Bundle?) {
         val selectedTheme = runBlocking {
             val selectedTheme = appComponentsViewModel.themeFlow.first()
