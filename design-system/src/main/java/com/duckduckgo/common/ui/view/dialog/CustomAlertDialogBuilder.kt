@@ -98,7 +98,6 @@ class CustomAlertDialogBuilder(val context: Context) : DaxAlertDialog {
         val dialogBuilder = MaterialAlertDialogBuilder(context)
             .setView(binding.root)
             .apply {
-                setCancelable(false)
                 setOnDismissListener { listener.onDialogDismissed() }
                 setOnCancelListener { listener.onDialogCancelled() }
             }
