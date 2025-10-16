@@ -94,9 +94,9 @@ class PixelWideEventSender @Inject constructor(
     }
 
     private companion object {
-        const val PIXEL_NAME_PREFIX = "wide."
-        const val COUNT_PIXEL_SUFFIX = ".c"
-        const val DAILY_PIXEL_SUFFIX = ".d"
+        const val PIXEL_NAME_PREFIX = "wide_"
+        const val COUNT_PIXEL_SUFFIX = "_c"
+        const val DAILY_PIXEL_SUFFIX = "_d"
 
         const val PARAM_PLATFORM = "global.platform"
         const val PARAM_TYPE = "global.type"
