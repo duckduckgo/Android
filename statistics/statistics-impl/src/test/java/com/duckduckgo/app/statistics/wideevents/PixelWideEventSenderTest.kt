@@ -77,6 +77,10 @@ class PixelWideEventSenderTest {
                     status = WideEventRepository.WideEventStatus.SUCCESS,
                     flowEntryPoint = "app_settings",
                     metadata = mapOf("plan_type" to "premium"),
+                    steps = listOf(
+                        WideEventRepository.WideEventStep(name = "init", success = true),
+                        WideEventRepository.WideEventStep(name = "refresh_data", success = false),
+                    ),
                 )
 
             pixelWideEventSender.sendWideEvent(event)
@@ -93,6 +97,8 @@ class PixelWideEventSenderTest {
                     "context.name" to "app_settings",
                     "feature.status" to "SUCCESS",
                     "app.dev_mode" to "false",
+                    "feature.data.ext.step.init" to "true",
+                    "feature.data.ext.step.refresh_data" to "false",
                 )
             val expectedEncodedParameters = mapOf("feature.data.ext.plan_type" to "premium")
 
