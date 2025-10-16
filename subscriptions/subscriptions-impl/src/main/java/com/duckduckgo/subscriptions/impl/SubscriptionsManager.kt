@@ -90,7 +90,6 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onSubscription
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -734,8 +733,14 @@ class RealSubscriptionsManager @Inject constructor(
                             throw e
                         }
 
-                        StoreLoginResult.Failure.Other -> {
-                            tokenRefreshWideEvent.onPlayLoginFailure(signedOut = false, refreshException = e, loginError = "Unknown error")
+                        StoreLoginResult.Failure.TokenValidationFailed,
+                        StoreLoginResult.Failure.UnknownError,
+                        -> {
+                            tokenRefreshWideEvent.onPlayLoginFailure(
+                                signedOut = false,
+                                refreshException = e,
+                                loginError = storeLoginResult.javaClass.simpleName,
+                            )
                             throw e
                         }
                     }
@@ -825,7 +830,11 @@ class RealSubscriptionsManager @Inject constructor(
             val sessionId = authClient.authorize(codeChallenge)
             val authorizationCode = authClient.storeLogin(sessionId, purchase.signature, purchase.originalJson)
             val tokens = authClient.getTokens(sessionId, authorizationCode, codeVerifier)
-            val validatedTokens = validateTokens(tokens, jwks)
+            val validatedTokens = try {
+                validateTokens(tokens, jwks)
+            } catch (_: Exception) {
+                return StoreLoginResult.Failure.TokenValidationFailed
+            }
 
             if (accountExternalId != null && accountExternalId != validatedTokens.accessTokenClaims.accountExternalId) {
                 return StoreLoginResult.Failure.AccountExternalIdMismatch
@@ -836,7 +845,7 @@ class RealSubscriptionsManager @Inject constructor(
             if (e is HttpException && e.code() == 400) {
                 StoreLoginResult.Failure.AuthenticationError
             } else {
-                StoreLoginResult.Failure.Other
+                StoreLoginResult.Failure.UnknownError
             }
         }
     }
@@ -1205,7 +1214,8 @@ class RealSubscriptionsManager @Inject constructor(
             data object PurchaseHistoryNotAvailable : Failure()
             data object AccountExternalIdMismatch : Failure()
             data object AuthenticationError : Failure()
-            data object Other : Failure()
+            data object TokenValidationFailed : Failure()
+            data object UnknownError : Failure()
         }
     }
 
