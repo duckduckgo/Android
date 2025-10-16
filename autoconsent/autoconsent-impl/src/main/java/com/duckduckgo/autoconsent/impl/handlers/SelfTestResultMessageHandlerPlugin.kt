@@ -39,19 +39,15 @@ class SelfTestResultMessageHandlerPlugin @Inject constructor(
     override fun process(messageType: String, jsonString: String, webView: WebView, autoconsentCallback: AutoconsentCallback) {
         if (supportedTypes.contains(messageType)) {
             try {
-                parseMessage(jsonString)?.result?.let { messageResult ->
-                    if (messageResult) {
-                        autoconsentPixelManager.fireDailyPixel(AutoConsentPixel.AUTOCONSENT_SELF_TEST_OK_DAILY)
-                    } else {
-                        autoconsentPixelManager.fireDailyPixel(AutoConsentPixel.AUTOCONSENT_SELF_TEST_FAIL_DAILY)
-                    }
-                    autoconsentCallback.onResultReceived(
-                        consentManaged = true,
-                        optOutFailed = false,
-                        selfTestFailed = messageResult,
-                        isCosmetic = null,
-                    )
+                val message: SelfTestResultMessage = parseMessage(jsonString) ?: return
+
+                if (message.result) {
+                    autoconsentPixelManager.fireDailyPixel(AutoConsentPixel.AUTOCONSENT_SELF_TEST_OK_DAILY)
+                } else {
+                    autoconsentPixelManager.fireDailyPixel(AutoConsentPixel.AUTOCONSENT_SELF_TEST_FAIL_DAILY)
                 }
+
+                autoconsentCallback.onResultReceived(consentManaged = true, optOutFailed = false, selfTestFailed = message.result, isCosmetic = null)
             } catch (e: Exception) {
                 logcat { e.localizedMessage }
             }
