@@ -32,6 +32,7 @@ import com.duckduckgo.navigation.api.getActivityParams
 import com.duckduckgo.pir.impl.store.PirEventsRepository
 import com.duckduckgo.pir.internal.R
 import com.duckduckgo.pir.internal.databinding.ActivityPirInternalResultsBinding
+import com.duckduckgo.pir.internal.settings.PirResultsScreenParams.PirEmailResultsScreen
 import com.duckduckgo.pir.internal.settings.PirResultsScreenParams.PirEventsResultsScreen
 import com.duckduckgo.pir.internal.settings.PirResultsScreenParams.PirOptOutResultsScreen
 import com.duckduckgo.pir.internal.settings.PirResultsScreenParams.PirScanResultsScreen
@@ -86,8 +87,29 @@ class PirResultsActivity : DuckDuckGoActivity() {
                 showOptOutResults()
             }
 
+            is PirEmailResultsScreen -> {
+                setTitle(R.string.pirDevViewEmailResults)
+                showEmailResults()
+            }
+
             null -> {}
         }
+    }
+
+    private fun showEmailResults() {
+        eventsRepository.getAllEmailConfirmationLogFlow().flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
+            .onEach { emailEvents ->
+                emailEvents.map { result ->
+                    val stringBuilder = StringBuilder()
+                    stringBuilder.append("Time: ${formatter.format(Date(result.eventTimeInMillis))}\n")
+                    stringBuilder.append("EVENT: ${result.eventType}\n")
+                    stringBuilder.append("RESULT: ${result.value}\n")
+                    stringBuilder.toString()
+                }.also {
+                    render(it)
+                }
+            }
+            .launchIn(lifecycleScope)
     }
 
     private fun showOptOutResults() {
@@ -151,4 +173,5 @@ sealed class PirResultsScreenParams : ActivityParams {
     data object PirEventsResultsScreen : PirResultsScreenParams()
     data object PirScanResultsScreen : PirResultsScreenParams()
     data object PirOptOutResultsScreen : PirResultsScreenParams()
+    data object PirEmailResultsScreen : PirResultsScreenParams()
 }

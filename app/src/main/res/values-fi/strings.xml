@@ -167,6 +167,7 @@
     <string name="settingsAddressBarPosition">Aseta osoitekentän sijainti</string>
     <string name="settingsEnableVoiceSearch">Ota yksityinen äänihaku käyttöön</string>
     <string name="settingsDDGOnOtherPlatforms">DuckDuckGo muilla alustoilla</string>
+    <string name="settingsDuckAi">Tekoälyominaisuudet</string>
 
     <!-- Private Search -->
     <string name="privateSearchActivityTitle">Yksityinen haku</string>
@@ -246,7 +247,7 @@
     <string name="settingsAutomaticallyClearWhenAppExit30Minutes">Sovelluksesta poistuttaessa, 30 minuutin toimettomuuden jälkeen</string>
     <string name="settingsAutomaticallyClearWhenAppExit60Minutes">Sovelluksesta poistuttaessa, 1 tunnin toimettomuuden jälkeen</string>
     <string name="settingsClearAiDataTitle">Tyhjennä Duck.ai-keskustelut</string>
-    <string name="settingsClearAiDataMessage">Fire Button poistaa myös Duck.ai-historian</string>
+    <string name="settingsClearAiDataDeleteMessage">Fire Button poistaa myös Duck.ai-historian, mukaan lukien kiinnitetyt keskustelut.</string>
 
     <!-- About Activity -->
     <string name="aboutActivityTitle">Tietoa DuckDuckGo:sta</string>
@@ -926,8 +927,6 @@
     <!-- Privacy Pro Rebranding-->
     <string name="aboutDescriptionBrandUpdate2025Rebranding">Welcome to the Duck Side!\n\nDuckDuckGo on riippumaton verkkosuojausta tarjoava yritys kaikille, jotka haluavat saada henkilökohtaiset tietonsa takaisin hallintaansa.\n\nUskomme, että paras tapa suojata henkilötietojasi hakkereilta, huijareilta ja tietosuojaa loukkaavilta yrityksiltä on estää niiden kerääminen kokonaan. Siksi miljoonat ihmiset <annotation type="chart_comparison">valitsevat DuckDuckGon hakeakseen ja selatakseen verkossa Chromen ja muiden selainten sijaan</annotation>. Selaimeemme sisältyvä hakukoneemme on kuin Google, mutta se ei koskaan seuraa hakujasi. Selaussuojauksemme, kuten mainosten seurannan esto ja evästeiden esto, auttavat estämään muita yrityksiä keräämästä tietojasi. Lisäksi selaimemme on ilmainen – ansaitsemme <annotation type="privacy_respecting_ads">tietosuojaa kunnioittavilla hakumainoksilla</annotation>, emme hyödyntämällä tietojasi.Lisäksi tarjoamme myös <annotation type="ppro_help_page">DuckDuckGo-tilauksen</annotation>, joka on integroitu selaimeemme. Tilaajat saavat entistä paremman tietosuojan nopealla ja yksinkertaisella <annotation type="vpn_help_page">VPN</annotation>:llä, joka auttaa suojaamaan verkkotoimintaasi, pääsyn edistyneisiin tekoälymalleihin yksityisessä Duck.ai-tekoälychat-palvelussamme, joka etsii ja poistaa henkilökohtaiset tietosi käyttäjiä etsiviltä sivustoilta sekä palauttaa henkilöllisyytesi, jos se varastetaan.\n\nOta henkilökohtaiset tietosi takaisin hallintaasi selaimella, joka on suunniteltu tietojen suojaamiseen, ei tietojen keräämiseen.</string>
     <string name="onboardingPrivacyProDaxDialogDescriptionRebranding"><![CDATA[DuckDuckGolla on myös <b>valinnainen maksullinen</b> tilaus, johon sisältyy turvallinen <b>VPN</b> ja <b>edistynyt, yksityinen tekoäly</b>.]]></string>
-    <string name="settingsDuckAiRebranding">Tekoälyominaisuudet</string>
-    <string name="settingsDuckAi">Duck.ai</string>
 
     <!--TabSwitcher Trackers Animation-->
     <string name="showTrackerCountInTabSwitcher">Näytä seurantaohjelmien määrä välilehtien vaihtotyökalussa</string>

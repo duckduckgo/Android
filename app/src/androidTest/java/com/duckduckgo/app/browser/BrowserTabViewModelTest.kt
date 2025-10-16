@@ -65,12 +65,14 @@ import com.duckduckgo.app.browser.WebViewErrorResponse.BAD_URL
 import com.duckduckgo.app.browser.WebViewErrorResponse.LOADING
 import com.duckduckgo.app.browser.WebViewErrorResponse.OMITTED
 import com.duckduckgo.app.browser.addtohome.AddToHomeCapabilityDetector
+import com.duckduckgo.app.browser.animations.AddressBarTrackersAnimationFeatureToggle
 import com.duckduckgo.app.browser.applinks.AppLinksHandler
 import com.duckduckgo.app.browser.camera.CameraHardwareChecker
 import com.duckduckgo.app.browser.certificates.BypassedSSLCertificatesRepository
 import com.duckduckgo.app.browser.certificates.remoteconfig.SSLCertificatesFeature
 import com.duckduckgo.app.browser.commands.Command
 import com.duckduckgo.app.browser.commands.Command.CloseCustomTab
+import com.duckduckgo.app.browser.commands.Command.EnqueueCookiesAnimation
 import com.duckduckgo.app.browser.commands.Command.EscapeMaliciousSite
 import com.duckduckgo.app.browser.commands.Command.HideBrokenSitePromptCta
 import com.duckduckgo.app.browser.commands.Command.HideOnboardingDaxBubbleCta
@@ -596,6 +598,7 @@ class BrowserTabViewModelTest {
 
     private val mockOnboardingDesignExperimentManager: OnboardingDesignExperimentManager = mock()
     private val mockSerpEasterEggLogoToggles: SerpEasterEggLogosToggles = mock()
+    private val mockAddressBarTrackersAnimationFeatureToggle: AddressBarTrackersAnimationFeatureToggle = mock()
 
     private val nonHttpAppLinkChecker: NonHttpAppLinkChecker = mock()
 
@@ -689,6 +692,7 @@ class BrowserTabViewModelTest {
             whenever(mockSerpEasterEggLogoToggles.feature()).thenReturn(mockDisabledToggle)
             whenever(nonHttpAppLinkChecker.isPermitted(anyOrNull())).thenReturn(true)
             remoteMessagingModel = givenRemoteMessagingModel(mockRemoteMessagingRepository, mockPixel, coroutineRule.testDispatcherProvider)
+            whenever(mockAddressBarTrackersAnimationFeatureToggle.feature()).thenReturn(mockDisabledToggle)
 
             ctaViewModel =
                 CtaViewModel(
@@ -842,6 +846,7 @@ class BrowserTabViewModelTest {
                     addDocumentStartJavascriptPlugins = fakeAddDocumentStartJavaScriptPlugins,
                     webMessagingPlugins = fakeMessagingPlugins,
                     postMessageWrapperPlugins = fakePostMessageWrapperPlugins,
+                    addressBarTrackersAnimationFeatureToggle = mockAddressBarTrackersAnimationFeatureToggle,
                 )
 
             testee.loadData("abc", null, false, false)
@@ -6436,6 +6441,64 @@ class BrowserTabViewModelTest {
     }
 
     @Test
+    fun whenAutoConsentPopupHandledWithFeatureToggleEnabledAndTrackersBlockedThenEnqueueCookiesAnimation() {
+        whenever(mockAddressBarTrackersAnimationFeatureToggle.feature()).thenReturn(mockEnabledToggle)
+
+        testee.browserViewState.value =
+            testee.browserViewState.value?.copy(
+                browserShowing = true,
+                maliciousSiteBlocked = false,
+                maliciousSiteStatus = null,
+            )
+
+        val site = givenCurrentSite("https://example.com")
+        whenever(site.trackerCount).thenReturn(5)
+        testee.siteLiveData.value = site
+
+        testee.onAutoConsentPopUpHandled(true)
+
+        assertCommandIssued<EnqueueCookiesAnimation> {
+            assertTrue(isCosmetic)
+        }
+    }
+
+    @Test
+    fun whenAutoConsentPopupHandledWithFeatureToggleDisabledThenShowAutoconsentAnimation() {
+        whenever(mockAddressBarTrackersAnimationFeatureToggle.feature()).thenReturn(mockDisabledToggle)
+
+        testee.browserViewState.value =
+            testee.browserViewState.value?.copy(
+                browserShowing = true,
+                maliciousSiteBlocked = false,
+                maliciousSiteStatus = null,
+            )
+
+        testee.onAutoConsentPopUpHandled(true)
+
+        assertCommandIssued<ShowAutoconsentAnimation>()
+    }
+
+    @Test
+    fun whenAutoConsentPopupHandledWithFeatureToggleEnabledButNoTrackersThenShowAutoconsentAnimation() {
+        whenever(mockAddressBarTrackersAnimationFeatureToggle.feature()).thenReturn(mockEnabledToggle)
+
+        testee.browserViewState.value =
+            testee.browserViewState.value?.copy(
+                browserShowing = true,
+                maliciousSiteBlocked = false,
+                maliciousSiteStatus = null,
+            )
+
+        val site = givenCurrentSite("https://example.com")
+        whenever(site.trackerCount).thenReturn(0)
+        testee.siteLiveData.value = site
+
+        testee.onAutoConsentPopUpHandled(true)
+
+        assertCommandIssued<ShowAutoconsentAnimation>()
+    }
+
+    @Test
     fun whenVisitSiteThenUpdateLoadingViewStateAndOmnibarViewState() {
         testee.browserViewState.value =
             browserViewState().copy(
@@ -7005,9 +7068,10 @@ class BrowserTabViewModelTest {
         }
 
     @Test
-    fun whenPrivacyProtectionsUpdatedAndAndUpdateScriptOnPageFinishedEnabledThenAddDocumentStartJavaScript() =
+    fun whenPrivacyProtectionsUpdatedAndUpdateScriptOnPageFinishedEnabledAndUpdateScriptOnProtectionsChangedEnabledThenAddDocumentStartJavaScript() =
         runTest {
             fakeAndroidConfigBrowserFeature.updateScriptOnPageFinished().setRawStoredState(State(true))
+            fakeAndroidConfigBrowserFeature.updateScriptOnProtectionsChanged().setRawStoredState(State(true))
 
             testee.privacyProtectionsUpdated(mockWebView)
 
@@ -7016,13 +7080,60 @@ class BrowserTabViewModelTest {
         }
 
     @Test
-    fun whenPrivacyProtectionsUpdatedAndAndUpdateScriptOnPageFinishedDisabledThenAddDocumentStartJavaScriptOnlyOnCSS() =
+    fun whenPrivacyProtectionsUpdatedAndUpdateScriptOnProtectionsChangedEnabledAndStopLoadingBeforeUpdatingScriptEnabledThenStopLoading() =
+        runTest {
+            fakeAndroidConfigBrowserFeature.updateScriptOnProtectionsChanged().setRawStoredState(State(true))
+            fakeAndroidConfigBrowserFeature.stopLoadingBeforeUpdatingScript().setRawStoredState(State(true))
+
+            testee.privacyProtectionsUpdated(mockWebView)
+
+            verify(mockWebView).stopLoading()
+        }
+
+    @Test
+    fun whenPrivacyProtectionsUpdatedAndUpdateScriptOnProtectionsChangedEnabledAndStopLoadingBeforeUpdatingScriptDisabledThenDoNotStopLoading() =
+        runTest {
+            fakeAndroidConfigBrowserFeature.updateScriptOnProtectionsChanged().setRawStoredState(State(true))
+            fakeAndroidConfigBrowserFeature.stopLoadingBeforeUpdatingScript().setRawStoredState(State(false))
+
+            testee.privacyProtectionsUpdated(mockWebView)
+
+            verify(mockWebView, never()).stopLoading()
+        }
+
+    @Test
+    fun whenPrivacyProtectionsUpdatedAndUpdateScriptOnPageFinishedTrueAndUpdateScriptOnProtectionsChangedFalseThenNotAddDocumentStartJavaScript() =
+        runTest {
+            fakeAndroidConfigBrowserFeature.updateScriptOnPageFinished().setRawStoredState(State(true))
+            fakeAndroidConfigBrowserFeature.updateScriptOnProtectionsChanged().setRawStoredState(State(false))
+
+            testee.privacyProtectionsUpdated(mockWebView)
+
+            assertEquals(0, fakeAddDocumentStartJavaScriptPlugins.cssPlugin.countInitted)
+            assertEquals(0, fakeAddDocumentStartJavaScriptPlugins.otherPlugin.countInitted)
+        }
+
+    @Test
+    fun whenPrivacyProtectionsUpdatedAndUpdateScriptOnPageFinishedDisabledThenAddDocumentStartJavaScriptOnlyOnCSS() =
         runTest {
             fakeAndroidConfigBrowserFeature.updateScriptOnPageFinished().setRawStoredState(State(false))
+            fakeAndroidConfigBrowserFeature.updateScriptOnProtectionsChanged().setRawStoredState(State(true))
 
             testee.privacyProtectionsUpdated(mockWebView)
 
             assertEquals(1, fakeAddDocumentStartJavaScriptPlugins.cssPlugin.countInitted)
+            assertEquals(0, fakeAddDocumentStartJavaScriptPlugins.otherPlugin.countInitted)
+        }
+
+    @Test
+    fun whenPrivacyProtectionsUpdatedAndUpdateScriptOnPageFinishedFalseAndUpdateScriptOnProtectionsChangedFalseThenNotAddDocumentStartJavaScript() =
+        runTest {
+            fakeAndroidConfigBrowserFeature.updateScriptOnPageFinished().setRawStoredState(State(false))
+            fakeAndroidConfigBrowserFeature.updateScriptOnProtectionsChanged().setRawStoredState(State(false))
+
+            testee.privacyProtectionsUpdated(mockWebView)
+
+            assertEquals(0, fakeAddDocumentStartJavaScriptPlugins.cssPlugin.countInitted)
             assertEquals(0, fakeAddDocumentStartJavaScriptPlugins.otherPlugin.countInitted)
         }
 
@@ -7901,5 +8012,47 @@ class BrowserTabViewModelTest {
         val plugin = FakePostMessageWrapperPlugin()
 
         override fun getPlugins(): Collection<PostMessageWrapperPlugin> = listOf(plugin)
+    }
+
+    @Test
+    fun whenVpnMenuClickedWithNotSubscribedStateThenPixelFiredWithPillStatus() {
+        testee.browserViewState.value = browserViewState().copy(
+            vpnMenuState = VpnMenuState.NotSubscribed,
+        )
+
+        testee.onVpnMenuClicked()
+
+        verify(mockPixel).fire(
+            AppPixelName.MENU_ACTION_VPN_PRESSED,
+            mapOf(PixelParameter.STATUS to "pill"),
+        )
+    }
+
+    @Test
+    fun whenVpnMenuClickedWithNotSubscribedNoPillStateThenPixelFiredWithNoPillStatus() {
+        testee.browserViewState.value = browserViewState().copy(
+            vpnMenuState = VpnMenuState.NotSubscribedNoPill,
+        )
+
+        testee.onVpnMenuClicked()
+
+        verify(mockPixel).fire(
+            AppPixelName.MENU_ACTION_VPN_PRESSED,
+            mapOf(PixelParameter.STATUS to "no_pill"),
+        )
+    }
+
+    @Test
+    fun whenVpnMenuClickedWithSubscribedStateThenPixelFiredWithSubscribedStatus() {
+        testee.browserViewState.value = browserViewState().copy(
+            vpnMenuState = VpnMenuState.Subscribed(isVpnEnabled = true),
+        )
+
+        testee.onVpnMenuClicked()
+
+        verify(mockPixel).fire(
+            AppPixelName.MENU_ACTION_VPN_PRESSED,
+            mapOf(PixelParameter.STATUS to "subscribed"),
+        )
     }
 }

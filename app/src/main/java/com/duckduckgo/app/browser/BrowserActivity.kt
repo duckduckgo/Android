@@ -767,7 +767,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
             val anchorView =
                 when (settingsDataStore.omnibarPosition) {
                     TOP -> null
-                    BOTTOM -> currentTab?.omnibar?.newOmnibar?.toolbar ?: binding.fragmentContainer
+                    BOTTOM -> currentTab?.getOmnibar()?.newOmnibar?.toolbar ?: binding.fragmentContainer
                 }
             DefaultSnackbar(
                 parentView = binding.fragmentContainer,
@@ -868,7 +868,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
             launchNewDuckChat(url, withTransition)
         }
 
-        currentTab?.omnibar?.newOmnibar?.omnibarTextInput?.let {
+        currentTab?.getOmnibar()?.newOmnibar?.omnibarTextInput?.let {
             hideKeyboard(it)
         }
     }

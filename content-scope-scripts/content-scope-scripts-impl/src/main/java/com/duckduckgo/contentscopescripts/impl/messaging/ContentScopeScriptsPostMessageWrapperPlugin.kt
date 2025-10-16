@@ -42,7 +42,7 @@ class ContentScopeScriptsPostMessageWrapperPlugin @Inject constructor(
         message: SubscriptionEventData,
         webView: WebView,
     ) {
-        if (webViewCompatContentScopeScripts.isEnabled()) {
+        if (webViewCompatContentScopeScripts.isWebMessagingEnabled()) {
             webMessagingPlugin.postMessage(webView, message)
         } else {
             jsMessageHelper.sendSubscriptionEvent(

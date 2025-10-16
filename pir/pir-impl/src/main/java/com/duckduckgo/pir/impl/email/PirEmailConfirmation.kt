@@ -134,6 +134,7 @@ class RealPirEmailConfirmation @Inject constructor(
         }
 
         val relevantProfileIds = jobRecords.mapTo(mutableSetOf()) { it.userProfileId }
+        // Multiple profile support (includes deprecated profiles as we need to process opt-out for them if there are extracted profiles)
         val relevantProfiles = obtainProfiles()
             .filter {
                 it.id in relevantProfileIds
@@ -163,7 +164,7 @@ class RealPirEmailConfirmation @Inject constructor(
     }
 
     private suspend fun obtainProfiles(): List<ProfileQuery> {
-        return repository.getUserProfileQueries().ifEmpty {
+        return repository.getAllUserProfileQueries().ifEmpty {
             DEFAULT_PROFILE_QUERIES
         }
     }

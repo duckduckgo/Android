@@ -14,17 +14,22 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.browser.omnibar.animations
+package com.duckduckgo.app.browser
 
-import com.airbnb.lottie.LottieAnimationView
-import com.duckduckgo.app.browser.omnibar.Omnibar
-import com.duckduckgo.app.global.model.PrivacyShield
+import android.content.Context
+import androidx.webkit.WebViewCompat
+import com.duckduckgo.di.scopes.AppScope
+import com.squareup.anvil.annotations.ContributesBinding
+import javax.inject.Inject
 
-/** Public interface for the Privacy Shield Animation Helper */
-interface PrivacyShieldAnimationHelper {
+interface WebViewPackageSource {
+    fun get(): String
+}
 
-    /**
-     * This method will setup into [holder] a LottieAnimation based on [PrivacyShield] state.
-     */
-    fun setAnimationView(holder: LottieAnimationView, privacyShield: PrivacyShield, viewMode: Omnibar.ViewMode)
+@ContributesBinding(AppScope::class)
+class WebViewCompatWebViewPackageSource @Inject constructor(
+    private val context: Context,
+) : WebViewPackageSource {
+    override fun get(): String =
+        WebViewCompat.getCurrentWebViewPackage(context)?.packageName ?: ""
 }

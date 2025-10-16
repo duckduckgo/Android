@@ -190,6 +190,11 @@ class RealPirDashboardMaintenanceScanDataProvider @Inject constructor(
         startDate: Long,
         endDate: Long,
     ): Long {
+        if (this.deprecated && this.status != ScanJobRecord.ScanJobStatus.MATCHES_FOUND) {
+            // Canceled and doesn't require a confirmation scan from opt-out, so no next run
+            return 0L
+        }
+
         return when (this.status) {
             ScanJobRecord.ScanJobStatus.NOT_EXECUTED -> {
                 // Should be executed immediately
@@ -219,15 +224,10 @@ class RealPirDashboardMaintenanceScanDataProvider @Inject constructor(
                 // Next run would be an error retry
                 lastScanDateInMillis + schedulingConfig.retryErrorInMillis
             }
-
-            ScanJobRecord.ScanJobStatus.INVALID -> {
-                // Canceled, so no next run
-                0L
-            }
         }
     }
 
-    suspend fun getBrokerMatches(
+    private suspend fun getBrokerMatches(
         scanFilter: (ScanJobRecord) -> Boolean,
         getDateMillis: (ScanJobRecord) -> Long,
     ): List<DashboardBrokerMatch> {

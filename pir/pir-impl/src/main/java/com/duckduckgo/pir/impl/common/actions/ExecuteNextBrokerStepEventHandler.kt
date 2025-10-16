@@ -123,7 +123,8 @@ class ExecuteNextBrokerStepEventHandler @Inject constructor(
                 pirRunStateHandler.handleState(
                     BrokerRecordEmailConfirmationStarted(
                         brokerName = currentBrokerStep.brokerName,
-                        emailConfirmationJobRecord = (currentBrokerStep as EmailConfirmationStep).emailConfirmationJob,
+                        extractedProfileId = (currentBrokerStep as EmailConfirmationStep).emailConfirmationJob.extractedProfileId,
+                        firstActionId = currentBrokerStep.actions[state.currentActionIndex].id,
                     ),
                 )
             }

@@ -31,6 +31,7 @@ import com.duckduckgo.pir.impl.dashboard.state.PirWebProfileStateHolder
 import com.duckduckgo.pir.impl.models.ProfileQuery
 import com.duckduckgo.pir.impl.scan.PirForegroundScanService
 import com.duckduckgo.pir.impl.scan.PirScanScheduler
+import com.duckduckgo.pir.impl.scheduling.JobRecordUpdater
 import com.duckduckgo.pir.impl.store.PirRepository
 import com.squareup.anvil.annotations.ContributesMultibinding
 import kotlinx.coroutines.CoroutineScope
@@ -53,6 +54,7 @@ class PirWebSaveProfileMessageHandler @Inject constructor(
     private val scanScheduler: PirScanScheduler,
     private val currentTimeProvider: CurrentTimeProvider,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
+    private val jobRecordUpdater: JobRecordUpdater,
 ) : PirWebJsMessageHandler() {
 
     override val message = PirDashboardWebMessages.SAVE_PROFILE
@@ -109,8 +111,7 @@ class PirWebSaveProfileMessageHandler @Inject constructor(
      */
     private suspend fun handleProfileQueryUpdates(): Boolean {
         // profiles queries that already exist in the database
-        // TODO consider moving the deprecated filtering to the DB layer when updating job handling for new profiles
-        val existingProfileQueries = repository.getUserProfileQueries().filterNot { it.deprecated }
+        val existingProfileQueries = repository.getValidUserProfileQueries()
 
         // new profile queries that are the result of user changes (editing names or addresses)
         val newProfileQueries = pirWebProfileStateHolder.toProfileQueries(currentTimeProvider.localDateTimeNow().year)
@@ -133,9 +134,13 @@ class PirWebSaveProfileMessageHandler @Inject constructor(
 
         // if profile query has extracted profiles associated to it, do not delete it but mark it as deprecated
         val profileQueriesToUpdate = mutableListOf<ProfileQuery>()
-        val extractedProfileQueryIds = repository.getAllExtractedProfiles().map { it.profileQueryId }.toSet()
+
+        val extractedProfilesMap = repository.getAllExtractedProfiles()
+            .groupBy { it.profileQueryId }
+
         profileQueriesToRemove.removeAll { profileQueryToRemove ->
-            if (profileQueryToRemove.id in extractedProfileQueryIds) {
+            if (!extractedProfilesMap[profileQueryToRemove.id].isNullOrEmpty()) {
+                // has extracted profiles, mark as deprecated instead of removing
                 profileQueriesToUpdate.add(profileQueryToRemove.copy(deprecated = true))
                 true
             } else {
@@ -148,12 +153,22 @@ class PirWebSaveProfileMessageHandler @Inject constructor(
             return true
         }
 
-        // store the changes in a single transaction to ensure data consistency
+        // store the profile changes in a single transaction to ensure data consistency
         return repository.updateProfileQueries(
             profileQueriesToAdd = profileQueriesToCreate,
             profileQueriesToUpdate = profileQueriesToUpdate,
             profileQueryIdsToDelete = profileQueriesToRemove.map { it.id },
-        )
+        ).also {
+            // remove all job records for the profile queries that have been removed as they are no longer needed
+            if (profileQueriesToRemove.isNotEmpty()) {
+                jobRecordUpdater.removeAllJobRecordsForProfiles(profileQueriesToRemove.map { it.id })
+            }
+
+            // keep only job records for brokers that have extracted profiles for the given profile query
+            if (profileQueriesToUpdate.isNotEmpty()) {
+                jobRecordUpdater.removeScanJobRecordsWithNoMatchesForProfiles(profileQueriesToUpdate.map { it.id })
+            }
+        }
     }
 
     private fun startAndScheduleInitialScan() {

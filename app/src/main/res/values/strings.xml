@@ -166,6 +166,7 @@
     <string name="settingsAddressBarPosition">Set Your Address Bar Position</string>
     <string name="settingsEnableVoiceSearch">Enable Private Voice Search</string>
     <string name="settingsDDGOnOtherPlatforms">DuckDuckGo on Other Platforms</string>
+    <string name="settingsDuckAi">AI Features</string>
 
     <!-- Private Search -->
     <string name="privateSearchActivityTitle">Private Search</string>
@@ -245,7 +246,7 @@
     <string name="settingsAutomaticallyClearWhenAppExit30Minutes">App exit, inactive for 30 minutes</string>
     <string name="settingsAutomaticallyClearWhenAppExit60Minutes">App exit, inactive for 1 hour</string>
     <string name="settingsClearAiDataTitle">Clear Duck.ai Chats</string>
-    <string name="settingsClearAiDataMessage">Fire Button will also delete Duck.ai history</string>
+    <string name="settingsClearAiDataDeleteMessage">Fire Button will also delete Duck.ai history, including pinned chats.</string>
 
     <!-- About Activity -->
     <string name="aboutActivityTitle">About DuckDuckGo</string>
@@ -925,8 +926,6 @@
     <!-- Privacy Pro Rebranding-->
     <string name="aboutDescriptionBrandUpdate2025Rebranding">Welcome to the Duck Side!\n\nDuckDuckGo is the independent online protection company for anyone who wants to take back control of their personal information.\n\nWe believe the best way to protect your personal information from hackers, scammers, and privacy-invasive companies is to stop it from being collected at all. That\'s why millions of people <annotation type="chart_comparison">choose DuckDuckGo over Chrome and other browsers</annotation> to search and browse online. Our built-in search engine is like Google but never tracks your searches. And our browsing protections, such as ad tracker blocking and cookie blocking, help stop other companies from collecting your data. Oh, and our browser is free — we make money from <annotation type="privacy_respecting_ads">privacy-respecting search ads</annotation>, not by exploiting your data.\n\nIn addition, we also offer <annotation type="ppro_help_page">DuckDuckGo subscription</annotation> integrated into our browser. Subscribers get even more privacy protection with a fast and simple <annotation type="vpn_help_page">VPN</annotation> that helps secure your online activity, access to advanced AI models in our private AI chat service Duck.ai, a service that finds and removes your personal information from people-finder sites, and a service that restores your identity should it be stolen.\n\nTake back control of your personal information with the browser designed for data protection, not data collection.</string>
     <string name="onboardingPrivacyProDaxDialogDescriptionRebranding"><![CDATA[DuckDuckGo also has an <b>optional paid subscription</b>, with a secure <b>VPN</b> and <b>advanced, private AI</b>.]]></string>
-    <string name="settingsDuckAiRebranding">AI Features</string>
-    <string name="settingsDuckAi">Duck.ai</string>
 
     <!--TabSwitcher Trackers Animation-->
     <string name="showTrackerCountInTabSwitcher">Show Tracker Count in Tab Switcher</string>

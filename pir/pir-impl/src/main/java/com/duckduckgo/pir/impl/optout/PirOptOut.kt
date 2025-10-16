@@ -178,6 +178,7 @@ class RealPirOptOut @Inject constructor(
     }
 
     private suspend fun processJobRecords(jobRecords: List<OptOutJobRecord>): List<Pair<ProfileQuery, BrokerStep>> {
+        // Multiple profile support (includes deprecated profiles as we need to process opt-out for them if there are extracted profiles)
         val allUserProfiles = obtainProfiles().associateBy { it.id }
         if (allUserProfiles.isEmpty()) {
             logcat { "PIR-OPT-OUT: No valid user profile available. Nothing to opt-out." }
@@ -259,6 +260,7 @@ class RealPirOptOut @Inject constructor(
         if (runners.isNotEmpty()) {
             cleanRunners()
         }
+        // Multiple profile support (includes deprecated profiles as we need to process opt-out for them if there are extracted profiles)
         val profileQueries = obtainProfiles()
 
         logcat { "PIR-OPT-OUT: Running debug opt-out for $brokers on profiles: $profileQueries on ${Thread.currentThread().name}" }
@@ -307,6 +309,7 @@ class RealPirOptOut @Inject constructor(
         if (runners.isNotEmpty()) {
             cleanRunners()
         }
+        // Multiple profile support (includes deprecated profiles as we need to process opt-out for them if there are extracted profiles)
         val profileQueries = obtainProfiles()
 
         logcat { "PIR-OPT-OUT: Running opt-out on profiles: $profileQueries on ${Thread.currentThread().name}" }
@@ -356,7 +359,7 @@ class RealPirOptOut @Inject constructor(
     }
 
     private suspend fun obtainProfiles(): List<ProfileQuery> {
-        return repository.getUserProfileQueries().ifEmpty {
+        return repository.getAllUserProfileQueries().ifEmpty {
             PirConstants.DEFAULT_PROFILE_QUERIES
         }
     }
@@ -382,7 +385,7 @@ class RealPirOptOut @Inject constructor(
     }
 
     private suspend fun emitStartPixel() {
-        eventsRepository.saveScanLog(
+        eventsRepository.saveEventLog(
             PirEventLog(
                 eventTimeInMillis = currentTimeProvider.currentTimeMillis(),
                 eventType = EventType.MANUAL_OPTOUT_STARTED,
@@ -391,7 +394,7 @@ class RealPirOptOut @Inject constructor(
     }
 
     private suspend fun emitCompletedPixel() {
-        eventsRepository.saveScanLog(
+        eventsRepository.saveEventLog(
             PirEventLog(
                 eventTimeInMillis = currentTimeProvider.currentTimeMillis(),
                 eventType = EventType.MANUAL_OPTOUT_COMPLETED,

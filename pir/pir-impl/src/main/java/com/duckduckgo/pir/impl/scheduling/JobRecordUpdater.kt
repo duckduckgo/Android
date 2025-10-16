@@ -25,7 +25,6 @@ import com.duckduckgo.pir.impl.models.ProfileQuery
 import com.duckduckgo.pir.impl.models.scheduling.JobRecord
 import com.duckduckgo.pir.impl.models.scheduling.JobRecord.EmailConfirmationJobRecord
 import com.duckduckgo.pir.impl.models.scheduling.JobRecord.EmailConfirmationJobRecord.EmailData
-import com.duckduckgo.pir.impl.models.scheduling.JobRecord.EmailConfirmationJobRecord.JobAttemptData
 import com.duckduckgo.pir.impl.models.scheduling.JobRecord.OptOutJobRecord
 import com.duckduckgo.pir.impl.models.scheduling.JobRecord.OptOutJobRecord.OptOutJobStatus
 import com.duckduckgo.pir.impl.models.scheduling.JobRecord.ScanJobRecord
@@ -51,10 +50,14 @@ interface JobRecordUpdater {
      * broker and profile query combination. It updates the corresponding [ScanJobRecord]'s
      * status and also sets the latest scan time.
      *
+     * This method should be called before we store [newExtractedProfiles] locally.
+     *
+     * @param newExtractedProfiles Newly found [ExtractedProfile]s for the [brokerName] and [profileQueryId]
      * @param brokerName The name of the broker associated with the scan job.
      * @param profileQueryId The ID of the [ProfileQuery] related to the scan job.
      */
     suspend fun updateScanMatchesFound(
+        newExtractedProfiles: List<ExtractedProfile>,
         brokerName: String,
         profileQueryId: Long,
     )
@@ -92,7 +95,7 @@ interface JobRecordUpdater {
      * This method compares the [newExtractedProfiles] from the ones currently stored locally and
      * associated to [brokerName] and [profileQueryId]. For every stored [ExtractedProfile] that is
      * not part of the [newExtractedProfiles], we mark the status of the associated [OptOutJobRecord]
-     * to requested.
+     * to removed.
      *
      * This method should be called before we store [newExtractedProfiles] locally.
      *
@@ -157,58 +160,80 @@ interface JobRecordUpdater {
         brokerName: String,
         email: String,
         attemptId: String,
-    )
+    ): EmailConfirmationJobRecord
 
     /**
      * Updates the [EmailConfirmationJobRecord] when the fetch of the email confirmation link has failed.
+     * We delete the corresponding [EmailConfirmationJobRecord] and mark the associated [OptOutJobRecord] as ERROR
      *
-     * @param emailConfirmationJobRecord Record to be updated
+     * @param extractedProfileId Id of the record to be updated
      */
-    suspend fun markEmailConfirmationLinkFetchFailed(emailConfirmationJobRecord: EmailConfirmationJobRecord)
+    suspend fun markEmailConfirmationLinkFetchFailed(extractedProfileId: Long)
 
     /**
      * Updates the [EmailConfirmationJobRecord] when the fetch of the email confirmation link has been attempted.
      * This should be called before the actual fetch is attempted.
      *
-     * @param emailConfirmationJobRecord Record to be updated
+     * @param extractedProfileId Id of the record to be updated
      */
-    suspend fun recordEmailConfirmationFetchAttempt(emailConfirmationJobRecord: EmailConfirmationJobRecord)
+    suspend fun recordEmailConfirmationFetchAttempt(extractedProfileId: Long): EmailConfirmationJobRecord?
 
     /**
      * Updates the [EmailConfirmationJobRecord] when the email confirmation link has been fetched successfully.
      *
-     * @param emailConfirmationJobRecord Record to be updated
+     * @param extractedProfileId Id of the record to be updated
      * @param link The fetched email confirmation link
      */
     suspend fun markEmailConfirmationWithLink(
-        emailConfirmationJobRecord: EmailConfirmationJobRecord,
+        extractedProfileId: Long,
         link: String,
-    )
+    ): EmailConfirmationJobRecord?
 
     /**
      * Updates the [EmailConfirmationJobRecord] when the succeeding email confirmation steps has been attempted.
      *
-     * @param emailConfirmationJobRecord Record to be updated
+     * @param extractedProfileId Id of the record to be updated
      */
-    suspend fun recordEmailConfirmationAttempt(emailConfirmationJobRecord: EmailConfirmationJobRecord)
+    suspend fun recordEmailConfirmationAttempt(extractedProfileId: Long): EmailConfirmationJobRecord?
 
     /**
      * Updates the [EmailConfirmationJobRecord] when email confirmation attempts have been maxed out.
      * This method deletes the corresponding [EmailConfirmationJobRecord] and marks the associated [OptOutJobRecord]
      * as [ERROR]
      *
-     * @param emailConfirmationJobRecord Record to be updated
+     * @param extractedProfileId Id of the record to be updated
      */
-    suspend fun recordEmailConfirmationAttemptMaxed(emailConfirmationJobRecord: EmailConfirmationJobRecord)
+    suspend fun recordEmailConfirmationAttemptMaxed(extractedProfileId: Long)
 
     /**
      * Updates the [EmailConfirmationJobRecord] when email confirmation attempt has been successfully completed.
      * This method deletes the corresponding [EmailConfirmationJobRecord] and marks the associated [OptOutJobRecord]
      * as [OptOutJobStatus.REQUESTED]
      *
-     * @param emailConfirmationJobRecord Record to be updated
+     * @param extractedProfileId Id of the record to be updated
      */
-    suspend fun recordEmailConfirmationCompleted(emailConfirmationJobRecord: EmailConfirmationJobRecord)
+    suspend fun recordEmailConfirmationCompleted(extractedProfileId: Long)
+
+    suspend fun recordEmailConfirmationFailed(
+        extractedProfileId: Long,
+        lastActionId: String,
+    ): EmailConfirmationJobRecord?
+
+    /**
+     * Removes all [ScanJobRecord], [OptOutJobRecord] and [EmailConfirmationJobRecord] associated with the given [profileQueryIds].
+     *
+     * This function should be called when a [ProfileQuery] is deleted or set to deprecated, to ensure that
+     * no stale job records remain in the system or get picked up.
+     */
+    suspend fun removeAllJobRecordsForProfiles(profileQueryIds: List<Long>)
+
+    /**
+     * Deletes all scan job records for the given [profileQueryIds] that are do not have status MATCHES_FOUND.
+     *
+     * This is used when a profile is deleted by the user, but we want to keep the scan job records for the brokers
+     * that have an extracted profile associated to it to continue running scan jobs on them.
+     */
+    suspend fun removeScanJobRecordsWithNoMatchesForProfiles(profileQueryIds: List<Long>)
 }
 
 @ContributesBinding(AppScope::class)
@@ -218,18 +243,62 @@ class RealJobRecordUpdater @Inject constructor(
     private val schedulingRepository: PirSchedulingRepository,
     private val repository: PirRepository,
 ) : JobRecordUpdater {
+
     override suspend fun updateScanNoMatchFound(
         brokerName: String,
         profileQueryId: Long,
     ) {
-        updateScanJobRecord(brokerName, profileQueryId, NO_MATCH_FOUND)
+        // if the profile query this scan belongs to is deprecated and no matches were found,
+        // also mark it as deprecated so it doesn't get picked up again
+        val shouldBeMarkedDeprecated = repository.getUserProfileQuery(profileQueryId)?.deprecated == true
+
+        updateScanJobRecord(
+            brokerName = brokerName,
+            profileQueryId = profileQueryId,
+            status = NO_MATCH_FOUND,
+            deprecated = shouldBeMarkedDeprecated,
+        )
     }
 
     override suspend fun updateScanMatchesFound(
+        newExtractedProfiles: List<ExtractedProfile>,
         brokerName: String,
         profileQueryId: Long,
     ) {
-        updateScanJobRecord(brokerName, profileQueryId, MATCHES_FOUND)
+        val profileQuery = repository.getUserProfileQuery(profileQueryId)
+        if (profileQuery?.deprecated != true) {
+            updateScanJobRecord(brokerName, profileQueryId, MATCHES_FOUND)
+            return
+        }
+
+        // special handling for deprecated profile queries as scans should only run to confirm that previously found profiles have been removed
+        // once that is confirmed, we can mark the scan job as deprecated so it doesn't get picked up again
+        val storedExtractedProfiles =
+            repository.getExtractedProfiles(brokerName, profileQueryId)
+
+        if (storedExtractedProfiles.isNotEmpty()) {
+            val newKeys =
+                newExtractedProfiles
+                    .asSequence()
+                    .map { it.toKey() }
+                    .toHashSet()
+
+            val removedExtractedProfiles =
+                storedExtractedProfiles
+                    .asSequence()
+                    .filter { it.toKey() !in newKeys }
+                    .toList()
+
+            // if all previously stored extracted profiles have been removed, we can mark the scan job record as deprecated
+            // since we do not store new extracted profiles for deprecated profile queries
+            val shouldBeMarkedAsDeprecated = removedExtractedProfiles.size == storedExtractedProfiles.size
+            updateScanJobRecord(
+                brokerName = brokerName,
+                profileQueryId = profileQueryId,
+                status = MATCHES_FOUND,
+                deprecated = shouldBeMarkedAsDeprecated,
+            )
+        }
     }
 
     override suspend fun updateScanError(
@@ -243,6 +312,7 @@ class RealJobRecordUpdater @Inject constructor(
         brokerName: String,
         profileQueryId: Long,
         status: ScanJobStatus,
+        deprecated: Boolean = false,
     ) {
         logcat { "PIR-JOB-RECORD: Updating ScanJobRecord for $brokerName and $profileQueryId to $status" }
         schedulingRepository.updateScanJobRecordStatus(
@@ -250,6 +320,7 @@ class RealJobRecordUpdater @Inject constructor(
             newLastScanDateMillis = currentTimeProvider.currentTimeMillis(),
             brokerName = brokerName,
             profileQueryId = profileQueryId,
+            deprecated = deprecated,
         )
     }
 
@@ -297,10 +368,12 @@ class RealJobRecordUpdater @Inject constructor(
 
                 logcat { "PIR-JOB-RECORD: Removed Profiles $removedExtractedProfiles" }
 
-                removedExtractedProfiles.forEach {
+                val profileQuery = repository.getUserProfileQuery(profileQueryId)
+                removedExtractedProfiles.forEach { extractedProfile ->
                     updateOptOutJobRecordAsRemoved(
-                        it.dbId,
-                        currentTimeMillis,
+                        profileQuery = profileQuery,
+                        extractedProfileId = extractedProfile.dbId,
+                        removedDateInMillis = currentTimeMillis,
                     )
                 }
             }
@@ -308,6 +381,7 @@ class RealJobRecordUpdater @Inject constructor(
     }
 
     private suspend fun updateOptOutJobRecordAsRemoved(
+        profileQuery: ProfileQuery?,
         extractedProfileId: Long,
         removedDateInMillis: Long,
     ) {
@@ -318,6 +392,9 @@ class RealJobRecordUpdater @Inject constructor(
                         .copy(
                             status = OptOutJobStatus.REMOVED,
                             optOutRemovedDateInMillis = removedDateInMillis,
+                            // we've confirmed that the extracted profile for a deprecated profile query has been removed
+                            // and need to mark the opt out job record as deprecated to not pick it up again for maintenance scans
+                            deprecated = profileQuery?.deprecated == true,
                         ).also {
                             logcat { "PIR-JOB-RECORD: Updating OptOutRecord for $extractedProfileId to $it" }
                         },
@@ -363,31 +440,41 @@ class RealJobRecordUpdater @Inject constructor(
         brokerName: String,
         email: String,
         attemptId: String,
-    ) {
-        withContext(dispatcherProvider.io()) {
-            schedulingRepository.saveEmailConfirmationJobRecord(
-                EmailConfirmationJobRecord(
-                    userProfileId = profileQueryId,
-                    extractedProfileId = extractedProfileId,
-                    brokerName = brokerName,
-                    emailData =
-                    EmailData(
-                        email = email,
-                        attemptId = attemptId,
-                    ),
-                ),
-            )
+    ): EmailConfirmationJobRecord = withContext(dispatcherProvider.io()) {
+        val newRecord = EmailConfirmationJobRecord(
+            userProfileId = profileQueryId,
+            extractedProfileId = extractedProfileId,
+            brokerName = brokerName,
+            emailData =
+            EmailData(
+                email = email,
+                attemptId = attemptId,
+            ),
+        )
+        schedulingRepository.saveEmailConfirmationJobRecord(newRecord)
 
-            schedulingRepository.getValidOptOutJobRecord(extractedProfileId)?.also {
-                schedulingRepository.saveOptOutJobRecord(
-                    it
-                        .copy(
-                            status = OptOutJobStatus.PENDING_EMAIL_CONFIRMATION,
-                        ).also {
-                            logcat { "PIR-JOB-RECORD: Updating OptOutRecord for $extractedProfileId to $it" }
-                        },
-                )
-            }
+        schedulingRepository.getValidOptOutJobRecord(extractedProfileId)?.also {
+            schedulingRepository.saveOptOutJobRecord(
+                it
+                    .copy(
+                        status = OptOutJobStatus.PENDING_EMAIL_CONFIRMATION,
+                    ).also {
+                        logcat { "PIR-JOB-RECORD: Updating OptOutRecord for $extractedProfileId to $it" }
+                    },
+            )
+        }
+        return@withContext newRecord
+    }
+
+    override suspend fun removeAllJobRecordsForProfiles(profileQueryIds: List<Long>) {
+        withContext(dispatcherProvider.io()) {
+            schedulingRepository.deleteJobRecordsForProfiles(profileQueryIds)
+        }
+    }
+
+    override suspend fun removeScanJobRecordsWithNoMatchesForProfiles(profileQueryIds: List<Long>) {
+        withContext(dispatcherProvider.io()) {
+            schedulingRepository.deleteScanJobRecordsWithoutMatchesForProfiles(profileQueryIds)
         }
     }
 
@@ -424,64 +511,78 @@ class RealJobRecordUpdater @Inject constructor(
             identifier = identifier,
         )
 
-    override suspend fun markEmailConfirmationLinkFetchFailed(emailConfirmationJobRecord: EmailConfirmationJobRecord) {
-        schedulingRepository.deleteEmailConfirmationJobRecord(emailConfirmationJobRecord.extractedProfileId)
-        updateOptOutError(emailConfirmationJobRecord.extractedProfileId)
+    override suspend fun markEmailConfirmationLinkFetchFailed(extractedProfileId: Long) {
+        schedulingRepository.deleteEmailConfirmationJobRecord(extractedProfileId)
+        updateOptOutError(extractedProfileId)
     }
 
-    override suspend fun recordEmailConfirmationFetchAttempt(emailConfirmationJobRecord: EmailConfirmationJobRecord) {
-        schedulingRepository.saveEmailConfirmationJobRecord(
-            emailConfirmationJobRecord
-                .copy(
-                    linkFetchData =
-                    emailConfirmationJobRecord.linkFetchData.copy(
-                        linkFetchAttemptCount = emailConfirmationJobRecord.linkFetchData.linkFetchAttemptCount + 1,
-                        lastLinkFetchDateInMillis = currentTimeProvider.currentTimeMillis(),
-                    ),
-                ).also {
-                    logcat { "PIR-JOB-RECORD: Updating EmailConfirmation for $emailConfirmationJobRecord to $it" }
-                },
+    override suspend fun recordEmailConfirmationFetchAttempt(extractedProfileId: Long): EmailConfirmationJobRecord? {
+        val currentRecord = schedulingRepository.getEmailConfirmationJob(extractedProfileId) ?: return null
+        val newRecord = currentRecord.copy(
+            linkFetchData =
+            currentRecord.linkFetchData.copy(
+                linkFetchAttemptCount = currentRecord.linkFetchData.linkFetchAttemptCount + 1,
+                lastLinkFetchDateInMillis = currentTimeProvider.currentTimeMillis(),
+            ),
         )
+
+        schedulingRepository.saveEmailConfirmationJobRecord(newRecord)
+        logcat { "PIR-JOB-RECORD: Updating EmailConfirmation for $currentRecord to $newRecord" }
+        return newRecord
     }
 
     override suspend fun markEmailConfirmationWithLink(
-        emailConfirmationJobRecord: EmailConfirmationJobRecord,
+        extractedProfileId: Long,
         link: String,
-    ) {
-        schedulingRepository.saveEmailConfirmationJobRecord(
-            emailConfirmationJobRecord
-                .copy(
-                    linkFetchData =
-                    emailConfirmationJobRecord.linkFetchData.copy(
-                        emailConfirmationLink = link,
-                    ),
-                ).also {
-                    logcat { "PIR-JOB-RECORD: Updating EmailConfirmation for $emailConfirmationJobRecord to $it" }
-                },
+    ): EmailConfirmationJobRecord? {
+        val currentRecord = schedulingRepository.getEmailConfirmationJob(extractedProfileId) ?: return null
+        val newRecord = currentRecord.copy(
+            linkFetchData =
+            currentRecord.linkFetchData.copy(
+                emailConfirmationLink = link,
+            ),
         )
+        schedulingRepository.saveEmailConfirmationJobRecord(newRecord)
+        logcat { "PIR-JOB-RECORD: Updating EmailConfirmation for $currentRecord to $newRecord" }
+        return newRecord
     }
 
-    override suspend fun recordEmailConfirmationAttempt(emailConfirmationJobRecord: EmailConfirmationJobRecord) {
-        schedulingRepository.saveEmailConfirmationJobRecord(
-            emailConfirmationJobRecord
-                .copy(
-                    jobAttemptData = JobAttemptData(
-                        jobAttemptCount = emailConfirmationJobRecord.jobAttemptData.jobAttemptCount + 1,
-                        lastJobAttemptDateInMillis = currentTimeProvider.currentTimeMillis(),
-                    ),
-                ).also {
-                    logcat { "PIR-JOB-RECORD: Updating EmailConfirmation for $emailConfirmationJobRecord to $it" }
-                },
+    override suspend fun recordEmailConfirmationAttempt(extractedProfileId: Long): EmailConfirmationJobRecord? {
+        val currentRecord = schedulingRepository.getEmailConfirmationJob(extractedProfileId) ?: return null
+
+        val newRecord = currentRecord.copy(
+            jobAttemptData = currentRecord.jobAttemptData.copy(
+                jobAttemptCount = currentRecord.jobAttemptData.jobAttemptCount + 1,
+                lastJobAttemptDateInMillis = currentTimeProvider.currentTimeMillis(),
+            ),
         )
+        schedulingRepository.saveEmailConfirmationJobRecord(newRecord)
+        logcat { "PIR-JOB-RECORD: Updating EmailConfirmation for $currentRecord to $newRecord" }
+        return newRecord
     }
 
-    override suspend fun recordEmailConfirmationAttemptMaxed(emailConfirmationJobRecord: EmailConfirmationJobRecord) {
-        schedulingRepository.deleteEmailConfirmationJobRecord(emailConfirmationJobRecord.extractedProfileId)
-        updateOptOutError(emailConfirmationJobRecord.extractedProfileId)
+    override suspend fun recordEmailConfirmationAttemptMaxed(extractedProfileId: Long) {
+        schedulingRepository.deleteEmailConfirmationJobRecord(extractedProfileId)
+        updateOptOutError(extractedProfileId)
     }
 
-    override suspend fun recordEmailConfirmationCompleted(emailConfirmationJobRecord: EmailConfirmationJobRecord) {
-        schedulingRepository.deleteEmailConfirmationJobRecord(emailConfirmationJobRecord.extractedProfileId)
-        updateOptOutRequested(emailConfirmationJobRecord.extractedProfileId)
+    override suspend fun recordEmailConfirmationCompleted(extractedProfileId: Long) {
+        schedulingRepository.deleteEmailConfirmationJobRecord(extractedProfileId)
+        updateOptOutRequested(extractedProfileId)
+    }
+
+    override suspend fun recordEmailConfirmationFailed(
+        extractedProfileId: Long,
+        lastActionId: String,
+    ): EmailConfirmationJobRecord? {
+        val currentRecord = schedulingRepository.getEmailConfirmationJob(extractedProfileId) ?: return null
+        val newRecord = currentRecord.copy(
+            jobAttemptData = currentRecord.jobAttemptData.copy(
+                lastJobAttemptActionId = lastActionId,
+            ),
+        )
+        schedulingRepository.saveEmailConfirmationJobRecord(newRecord)
+        logcat { "PIR-JOB-RECORD: Updating EmailConfirmation for $currentRecord to $newRecord" }
+        return newRecord
     }
 }

@@ -1,0 +1,16 @@
+// This file defines commonly used suffixes - this does NOT mean they are added by default
+// In your pixel definitions, you can reference these suffixes by their key
+// See TEMPLATE.json for an example
+{
+    "first_daily_count": {
+        "type": "string",
+        "description": "Pixel schedule type",
+        "enum": ["first", "daily", "count"]
+    },
+    "form_factor": {
+        "type": "string",
+        "description": "Platform and device form-factor",
+        "key": "android",
+        "enum": ["phone", "tablet"]
+    }
+}

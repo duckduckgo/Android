@@ -1,0 +1,5 @@
+{
+    // This file will define pixels sent by the native experiments framework
+    "defaultSuffixes": ["form_factor"],
+    "activeExperiments": {}
+}

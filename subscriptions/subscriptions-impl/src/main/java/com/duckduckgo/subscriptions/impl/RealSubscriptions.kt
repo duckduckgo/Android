@@ -250,9 +250,6 @@ interface PrivacyProFeature {
     @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun refreshSubscriptionPlanFeatures(): Toggle
 
-    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
-    fun subscriptionAIFeaturesRebranding(): Toggle
-
     @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun useClientWithCacheForFeatures(): Toggle
 
@@ -261,6 +258,9 @@ interface PrivacyProFeature {
 
     @Toggle.DefaultValue(defaultValue = DefaultFeatureValue.TRUE)
     fun sendSubscriptionPurchaseWideEvent(): Toggle
+
+    @Toggle.DefaultValue(defaultValue = DefaultFeatureValue.TRUE)
+    fun sendAuthTokenRefreshWideEvent(): Toggle
 }
 
 @ContributesBinding(AppScope::class)

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 DuckDuckGo
+ * Copyright (c) 2025 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,10 +14,11 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.browser.omnibar.animations
+package com.duckduckgo.app.browser.omnibar.animations.addressbar
 
 import com.airbnb.lottie.LottieAnimationView
 import com.duckduckgo.app.browser.R
+import com.duckduckgo.app.browser.animations.AddressBarTrackersAnimationFeatureToggle
 import com.duckduckgo.app.browser.omnibar.Omnibar
 import com.duckduckgo.app.global.model.PrivacyShield
 import com.duckduckgo.app.global.model.PrivacyShield.MALICIOUS
@@ -35,6 +36,7 @@ import javax.inject.Inject
 @SingleInstanceIn(AppScope::class)
 class LottiePrivacyShieldAnimationHelper @Inject constructor(
     private val appTheme: AppTheme,
+    private val addressBarTrackersAnimationFeatureToggle: AddressBarTrackersAnimationFeatureToggle,
 ) : PrivacyShieldAnimationHelper {
 
     override fun setAnimationView(
@@ -48,8 +50,13 @@ class LottiePrivacyShieldAnimationHelper @Inject constructor(
             protectedShield = R.raw.protected_shield_custom_tab
             protectedShieldDark = R.raw.dark_protected_shield_custom_tab
         } else {
-            protectedShield = R.raw.protected_shield
-            protectedShieldDark = R.raw.dark_protected_shield
+            if (addressBarTrackersAnimationFeatureToggle.feature().isEnabled()) {
+                protectedShield = R.raw.address_bar_trackers_animation_shield
+                protectedShieldDark = R.raw.address_bar_trackers_animation_shield
+            } else {
+                protectedShield = R.raw.protected_shield
+                protectedShieldDark = R.raw.dark_protected_shield
+            }
         }
         val unprotectedShield: Int = R.raw.unprotected_shield
         val unprotectedShieldDark: Int = R.raw.dark_unprotected_shield

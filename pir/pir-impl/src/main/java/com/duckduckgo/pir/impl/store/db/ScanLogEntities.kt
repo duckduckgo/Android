@@ -33,6 +33,8 @@ enum class EventType {
     SCHEDULED_SCAN_COMPLETED,
     MANUAL_OPTOUT_STARTED,
     MANUAL_OPTOUT_COMPLETED,
+    EMAIL_CONFIRMATION_STARTED,
+    EMAIL_CONFIRMATION_COMPLETED,
 }
 
 @Entity(tableName = "pir_broker_scan_log")

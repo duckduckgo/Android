@@ -30,8 +30,10 @@ import com.android.billingclient.api.Purchase.PurchaseState
 import com.android.billingclient.api.QueryProductDetailsParams
 import com.android.billingclient.api.QueryProductDetailsParams.Product
 import com.android.billingclient.api.QueryPurchaseHistoryParams
+import com.android.billingclient.api.QueryPurchasesParams
 import com.android.billingclient.api.queryProductDetails
 import com.android.billingclient.api.queryPurchaseHistory
+import com.android.billingclient.api.queryPurchasesAsync
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.subscriptions.impl.billing.BillingError.BILLING_CRASH_ERROR
@@ -130,6 +132,7 @@ class RealBillingClientAdapter @Inject constructor(
         }
     }
 
+    @Deprecated(message = "check interface")
     override suspend fun getSubscriptionsPurchaseHistory(): SubscriptionsPurchaseHistoryResult {
         val client = billingClient
         if (client == null || !client.isReady) return SubscriptionsPurchaseHistoryResult.Failure
@@ -143,6 +146,43 @@ class RealBillingClientAdapter @Inject constructor(
         return when (billingResult.responseCode) {
             BillingResponseCode.OK -> SubscriptionsPurchaseHistoryResult.Success(history = purchaseHistory.orEmpty())
             else -> SubscriptionsPurchaseHistoryResult.Failure
+        }
+    }
+
+    override suspend fun queryPurchases(): QueryPurchasesResult {
+        val client = billingClient
+        if (client == null || !client.isReady) {
+            return QueryPurchasesResult.Failure(
+                billingError = BillingError.SERVICE_DISCONNECTED,
+                debugMessage = "BillingClient is not ready",
+            )
+        }
+
+        return try {
+            val queryParams = QueryPurchasesParams.newBuilder()
+                .setProductType(ProductType.SUBS)
+                .build()
+
+            val (billingResult, purchases) = client.queryPurchasesAsync(queryParams)
+
+            when (billingResult.responseCode) {
+                BillingResponseCode.OK -> {
+                    QueryPurchasesResult.Success(purchases = purchases)
+                }
+                else -> {
+                    val billingError = billingResult.responseCode.toBillingError()
+                    QueryPurchasesResult.Failure(
+                        billingError = billingError,
+                        debugMessage = billingResult.debugMessage,
+                    )
+                }
+            }
+        } catch (e: Exception) {
+            logcat(WARN) { "Error querying purchases: ${e.asLog()}" }
+            QueryPurchasesResult.Failure(
+                billingError = BILLING_CRASH_ERROR,
+                debugMessage = e.message,
+            )
         }
     }
 

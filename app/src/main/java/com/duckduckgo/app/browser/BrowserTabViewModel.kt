@@ -60,6 +60,7 @@ import com.duckduckgo.app.browser.SpecialUrlDetector.UrlType.ShouldLaunchPrivacy
 import com.duckduckgo.app.browser.WebViewErrorResponse.LOADING
 import com.duckduckgo.app.browser.WebViewErrorResponse.OMITTED
 import com.duckduckgo.app.browser.addtohome.AddToHomeCapabilityDetector
+import com.duckduckgo.app.browser.animations.AddressBarTrackersAnimationFeatureToggle
 import com.duckduckgo.app.browser.applinks.AppLinksHandler
 import com.duckduckgo.app.browser.camera.CameraHardwareChecker
 import com.duckduckgo.app.browser.certificates.BypassedSSLCertificatesRepository
@@ -492,6 +493,7 @@ class BrowserTabViewModel @Inject constructor(
     private val addDocumentStartJavascriptPlugins: PluginPoint<AddDocumentStartJavaScriptPlugin>,
     private val webMessagingPlugins: PluginPoint<WebMessagingPlugin>,
     private val postMessageWrapperPlugins: PluginPoint<PostMessageWrapperPlugin>,
+    private val addressBarTrackersAnimationFeatureToggle: AddressBarTrackersAnimationFeatureToggle,
 ) : ViewModel(),
     WebViewClientListener,
     EditSavedSiteListener,
@@ -3868,6 +3870,24 @@ class BrowserTabViewModel @Inject constructor(
                 site?.debugFlags = (site?.debugFlags ?: listOf()).toMutableList().plus(featureName)?.toList()
             }
 
+            "initialPing" -> {
+                if (id != null) {
+                    command.value = SendResponseToJs(
+                        JsCallbackData(
+                            params = JSONObject(
+                                mapOf(
+                                    "desktopModeEnabled" to (getSite()?.isDesktopMode ?: false),
+                                    "forcedZoomEnabled" to (accessibilityViewState.value?.forceZoom ?: false),
+                                ),
+                            ),
+                            featureName = featureName,
+                            method = method,
+                            id = id,
+                        ),
+                    )
+                }
+            }
+
             else -> {
                 // NOOP
             }
@@ -4257,7 +4277,27 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     suspend fun privacyProtectionsUpdated(webView: WebView) {
-        if (withContext(dispatchers.io()) { !androidBrowserConfig.updateScriptOnPageFinished().isEnabled() }) {
+        val updateScriptOnProtectionsChanged: Boolean
+        val stopLoadingBeforeUpdatingScript: Boolean
+        val updateScriptOnPageFinished: Boolean
+
+        withContext(dispatchers.io()) {
+            updateScriptOnProtectionsChanged = androidBrowserConfig.updateScriptOnProtectionsChanged().isEnabled()
+            stopLoadingBeforeUpdatingScript = androidBrowserConfig.stopLoadingBeforeUpdatingScript().isEnabled()
+            updateScriptOnPageFinished = androidBrowserConfig.updateScriptOnPageFinished().isEnabled()
+        }
+
+        if (!updateScriptOnProtectionsChanged) {
+            return
+        }
+
+        if (stopLoadingBeforeUpdatingScript) {
+            withContext(dispatchers.main()) {
+                webView.stopLoading()
+            }
+        }
+
+        if (!updateScriptOnPageFinished) {
             addDocumentStartJavascriptPlugins
                 .getPlugins()
                 .filter { plugin ->
@@ -4465,23 +4505,31 @@ class BrowserTabViewModel @Inject constructor(
 
     fun onVpnMenuClicked() {
         val vpnMenuState = currentBrowserViewState().vpnMenuState
-        when (vpnMenuState) {
+        val statusParam = when (vpnMenuState) {
             VpnMenuState.NotSubscribed -> {
                 command.value = LaunchPrivacyPro("https://duckduckgo.com/pro?origin=funnel_appmenu_android".toUri())
+                "pill"
             }
             VpnMenuState.NotSubscribedNoPill -> {
                 command.value = LaunchPrivacyPro("https://duckduckgo.com/pro?origin=funnel_appmenu_android".toUri())
+                "no_pill"
             }
             is VpnMenuState.Subscribed -> {
                 command.value = LaunchVpnManagement
+                "subscribed"
             }
-            VpnMenuState.Hidden -> {} // Should not happen as menu item should not be visible
+            VpnMenuState.Hidden -> "" // Should not happen as menu item should not be visible
         }
+        pixel.fire(AppPixelName.MENU_ACTION_VPN_PRESSED, mapOf(PixelParameter.STATUS to statusParam))
     }
 
     fun onAutoConsentPopUpHandled(isCosmetic: Boolean) {
         if (!currentBrowserViewState().maliciousSiteBlocked) {
-            command.postValue(ShowAutoconsentAnimation(isCosmetic))
+            if (addressBarTrackersAnimationFeatureToggle.feature().isEnabled() && trackersCount().isNotEmpty()) {
+                command.postValue(Command.EnqueueCookiesAnimation(isCosmetic))
+            } else {
+                command.postValue(ShowAutoconsentAnimation(isCosmetic))
+            }
         }
     }
 
@@ -4501,8 +4549,6 @@ class BrowserTabViewModel @Inject constructor(
     private fun launchBookmarksActivity() {
         command.value = LaunchBookmarksActivity
     }
-
-    fun trackersCount(): String = site?.trackerCount?.takeIf { it > 0 }?.toString() ?: ""
 
     fun resetTrackersCount() {
         site?.resetTrackingEvents()
@@ -4539,6 +4585,9 @@ class BrowserTabViewModel @Inject constructor(
     fun onDynamicLogoClicked(url: String) {
         command.value = Command.ShowSerpEasterEggLogo(url)
     }
+
+    private fun trackersCount(): String =
+        siteLiveData.value?.trackerCount?.takeIf { it > 0 }?.toString() ?: ""
 
     companion object {
         private const val FIXED_PROGRESS = 50

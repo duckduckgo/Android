@@ -24,6 +24,7 @@ import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
 import com.duckduckgo.app.lifecycle.VpnProcessLifecycleObserver
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.appbuildconfig.api.isInternalBuild
+import com.duckduckgo.browser.api.WebViewVersionProvider
 import com.duckduckgo.common.utils.checkMainThread
 import com.duckduckgo.customtabs.api.CustomTabDetector
 import com.duckduckgo.di.scopes.AppScope
@@ -51,12 +52,24 @@ class NativeCrashInit @Inject constructor(
     private val customTabDetector: CustomTabDetector,
     private val appBuildConfig: AppBuildConfig,
     private val nativeCrashFeature: NativeCrashFeature,
+    private val webViewVersionProvider: WebViewVersionProvider,
 ) : MainProcessLifecycleObserver, VpnProcessLifecycleObserver, LibraryLoaderListener {
 
     private val isCustomTab: Boolean by lazy { customTabDetector.isCustomTab() }
     private val processName: String by lazy { if (isMainProcess) "main" else "vpn" }
 
-    private external fun jni_register_sighandler(logLevel: Int, appVersion: String, processName: String, isCustomTab: Boolean)
+    private val webViewVersion: String by lazy { webViewVersionProvider.getFullVersion() }
+
+    private val webViewPackage: String by lazy { webViewVersionProvider.getPackageName() }
+
+    private external fun jni_register_sighandler(
+        logLevel: Int,
+        appVersion: String,
+        processName: String,
+        isCustomTab: Boolean,
+        webViewPackage: String,
+        webViewVersion: String,
+    )
 
     override fun onCreate(owner: LifecycleOwner) {
         if (isMainProcess) {
@@ -89,7 +102,7 @@ class NativeCrashInit @Inject constructor(
             } else {
                 Log.ASSERT
             }
-            jni_register_sighandler(logLevel, appBuildConfig.versionName, processName, isCustomTab)
+            jni_register_sighandler(logLevel, appBuildConfig.versionName, processName, isCustomTab, webViewPackage, webViewVersion)
         }.onFailure {
             logcat(ERROR) { "ndk-crash: Error calling jni_register_sighandler: ${it.asLog()}" }
         }

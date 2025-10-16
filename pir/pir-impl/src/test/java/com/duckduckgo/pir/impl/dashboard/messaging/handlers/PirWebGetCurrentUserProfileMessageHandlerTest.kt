@@ -75,13 +75,13 @@ class PirWebGetCurrentUserProfileMessageHandlerTest {
     fun whenProcessWithNoProfilesThenSendsDefaultSuccessResponse() = runTest {
         // Given
         val jsMessage = createJsMessage("""""", PirDashboardWebMessages.GET_CURRENT_USER_PROFILE)
-        whenever(mockRepository.getUserProfileQueries()).thenReturn(emptyList())
+        whenever(mockRepository.getValidUserProfileQueries()).thenReturn(emptyList())
 
         // When
         testee.process(jsMessage, mockJsMessaging, mockJsMessageCallback)
 
         // Then
-        verify(mockRepository).getUserProfileQueries()
+        verify(mockRepository).getValidUserProfileQueries()
         verify(mockPirWebProfileStateHolder).setLoadedProfileQueries(emptyList())
         verifyResponse(jsMessage, true, mockJsMessaging)
     }
@@ -97,13 +97,13 @@ class PirWebGetCurrentUserProfileMessageHandlerTest {
             birthYear = 1990,
             addresses = listOf(Address("New York", "NY")),
         )
-        whenever(mockRepository.getUserProfileQueries()).thenReturn(listOf(profileQuery))
+        whenever(mockRepository.getValidUserProfileQueries()).thenReturn(listOf(profileQuery))
 
         // When
         testee.process(jsMessage, mockJsMessaging, mockJsMessageCallback)
 
         // Then
-        verify(mockRepository).getUserProfileQueries()
+        verify(mockRepository).getValidUserProfileQueries()
         verify(mockPirWebProfileStateHolder).setLoadedProfileQueries(listOf(profileQuery))
         verifyProfileResponse(
             jsMessage,
@@ -121,13 +121,13 @@ class PirWebGetCurrentUserProfileMessageHandlerTest {
         val address2 = Address("Los Angeles", "CA")
         val profile1 = createProfileQuery("John", "Michael", "Doe", 1990, listOf(address1))
         val profile2 = createProfileQuery("John", "Michael", "Doe", 1990, listOf(address2))
-        whenever(mockRepository.getUserProfileQueries()).thenReturn(listOf(profile1, profile2))
+        whenever(mockRepository.getValidUserProfileQueries()).thenReturn(listOf(profile1, profile2))
 
         // When
         testee.process(jsMessage, mockJsMessaging, mockJsMessageCallback)
 
         // Then
-        verify(mockRepository).getUserProfileQueries()
+        verify(mockRepository).getValidUserProfileQueries()
         verify(mockPirWebProfileStateHolder).setLoadedProfileQueries(listOf(profile1, profile2))
         verifyProfileResponse(
             jsMessage,
@@ -147,13 +147,13 @@ class PirWebGetCurrentUserProfileMessageHandlerTest {
         val address = Address("Chicago", "IL")
         val profile1 = createProfileQuery("John", "Michael", "Doe", 1990, listOf(address))
         val profile2 = createProfileQuery("Jane", null, "Smith", 1990, listOf(address))
-        whenever(mockRepository.getUserProfileQueries()).thenReturn(listOf(profile1, profile2))
+        whenever(mockRepository.getValidUserProfileQueries()).thenReturn(listOf(profile1, profile2))
 
         // When
         testee.process(jsMessage, mockJsMessaging, mockJsMessageCallback)
 
         // Then
-        verify(mockRepository).getUserProfileQueries()
+        verify(mockRepository).getValidUserProfileQueries()
         verify(mockPirWebProfileStateHolder).setLoadedProfileQueries(listOf(profile1, profile2))
         verifyProfileResponse(
             jsMessage,
@@ -177,13 +177,13 @@ class PirWebGetCurrentUserProfileMessageHandlerTest {
             birthYear = 1985,
             addresses = listOf(Address("Boston", "MA")),
         )
-        whenever(mockRepository.getUserProfileQueries()).thenReturn(listOf(profileQuery))
+        whenever(mockRepository.getValidUserProfileQueries()).thenReturn(listOf(profileQuery))
 
         // When
         testee.process(jsMessage, mockJsMessaging, mockJsMessageCallback)
 
         // Then
-        verify(mockRepository).getUserProfileQueries()
+        verify(mockRepository).getValidUserProfileQueries()
         verify(mockPirWebProfileStateHolder).setLoadedProfileQueries(listOf(profileQuery))
         verifyProfileResponse(
             jsMessage,
@@ -202,13 +202,13 @@ class PirWebGetCurrentUserProfileMessageHandlerTest {
         val address3 = Address("Portland", "OR")
         val profile =
             createProfileQuery("Bob", null, "Johnson", 1975, listOf(address1, address2, address3))
-        whenever(mockRepository.getUserProfileQueries()).thenReturn(listOf(profile))
+        whenever(mockRepository.getValidUserProfileQueries()).thenReturn(listOf(profile))
 
         // When
         testee.process(jsMessage, mockJsMessaging, mockJsMessageCallback)
 
         // Then
-        verify(mockRepository).getUserProfileQueries()
+        verify(mockRepository).getValidUserProfileQueries()
         verify(mockPirWebProfileStateHolder).setLoadedProfileQueries(listOf(profile))
         verifyProfileResponse(
             jsMessage,
@@ -227,13 +227,13 @@ class PirWebGetCurrentUserProfileMessageHandlerTest {
         val jsMessage = createJsMessage("""""", PirDashboardWebMessages.GET_CURRENT_USER_PROFILE)
         val profileQuery =
             createProfileQuery("Test", null, "User", 0, listOf(Address("City", "ST")))
-        whenever(mockRepository.getUserProfileQueries()).thenReturn(listOf(profileQuery))
+        whenever(mockRepository.getValidUserProfileQueries()).thenReturn(listOf(profileQuery))
 
         // When
         testee.process(jsMessage, mockJsMessaging, mockJsMessageCallback)
 
         // Then
-        verify(mockRepository).getUserProfileQueries()
+        verify(mockRepository).getValidUserProfileQueries()
         verify(mockPirWebProfileStateHolder).setLoadedProfileQueries(listOf(profileQuery))
         verifyProfileResponse(
             jsMessage,
@@ -244,44 +244,25 @@ class PirWebGetCurrentUserProfileMessageHandlerTest {
     }
 
     @Test
-    fun whenProcessWithDeprecatedProfilesThenFiltersThemOut() = runTest {
+    fun whenProcessWithProfilesThenFiltersThemOut() = runTest {
         // Given
         val jsMessage = createJsMessage("""""", PirDashboardWebMessages.GET_CURRENT_USER_PROFILE)
         val activeProfile = createProfileQuery("Active", null, "User", 1990, listOf(Address("Active City", "AC")))
-        val deprecatedProfile = createProfileQuery("Deprecated", null, "User", 1985, listOf(Address("Deprecated City", "DC")), deprecated = true)
 
-        whenever(mockRepository.getUserProfileQueries()).thenReturn(listOf(activeProfile, deprecatedProfile))
+        whenever(mockRepository.getValidUserProfileQueries()).thenReturn(listOf(activeProfile))
 
         // When
         testee.process(jsMessage, mockJsMessaging, mockJsMessageCallback)
 
         // Then
-        verify(mockRepository).getUserProfileQueries()
-        verify(mockPirWebProfileStateHolder).setLoadedProfileQueries(listOf(activeProfile)) // Only active profile
+        verify(mockRepository).getValidUserProfileQueries()
+        verify(mockPirWebProfileStateHolder).setLoadedProfileQueries(listOf(activeProfile))
         verifyProfileResponse(
             jsMessage,
             expectedNames = listOf(ExpectedName("Active", "", "User")),
             expectedAddresses = listOf(ExpectedAddress("Active City", "AC")),
             expectedBirthYear = 1990,
         )
-    }
-
-    @Test
-    fun whenProcessWithAllDeprecatedProfilesThenReturnsEmptySuccess() = runTest {
-        // Given
-        val jsMessage = createJsMessage("""""", PirDashboardWebMessages.GET_CURRENT_USER_PROFILE)
-        val deprecatedProfile1 = createProfileQuery("Deprecated1", null, "User", 1990, listOf(Address("City1", "C1")), deprecated = true)
-        val deprecatedProfile2 = createProfileQuery("Deprecated2", null, "User", 1985, listOf(Address("City2", "C2")), deprecated = true)
-
-        whenever(mockRepository.getUserProfileQueries()).thenReturn(listOf(deprecatedProfile1, deprecatedProfile2))
-
-        // When
-        testee.process(jsMessage, mockJsMessaging, mockJsMessageCallback)
-
-        // Then
-        verify(mockRepository).getUserProfileQueries()
-        verify(mockPirWebProfileStateHolder).setLoadedProfileQueries(emptyList()) // No active profiles
-        verifyResponse(jsMessage, true, mockJsMessaging)
     }
 
     private fun createProfileQuery(

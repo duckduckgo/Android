@@ -43,6 +43,7 @@ import com.duckduckgo.subscriptions.impl.billing.PurchaseState.Purchased
 import com.duckduckgo.subscriptions.impl.billing.SubscriptionReplacementMode
 import com.duckduckgo.subscriptions.impl.model.Entitlement
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
+import com.duckduckgo.subscriptions.impl.repository.Account
 import com.duckduckgo.subscriptions.impl.repository.AuthRepository
 import com.duckduckgo.subscriptions.impl.repository.FakeSubscriptionsDataStore
 import com.duckduckgo.subscriptions.impl.repository.RealAuthRepository
@@ -61,6 +62,7 @@ import com.duckduckgo.subscriptions.impl.services.SubscriptionResponse
 import com.duckduckgo.subscriptions.impl.services.SubscriptionsService
 import com.duckduckgo.subscriptions.impl.services.ValidateTokenResponse
 import com.duckduckgo.subscriptions.impl.store.SubscriptionsDataStore
+import com.duckduckgo.subscriptions.impl.wideevents.AuthTokenRefreshWideEvent
 import com.duckduckgo.subscriptions.impl.wideevents.SubscriptionPurchaseWideEvent
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.first
@@ -114,6 +116,7 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
     private val context: Context = mock()
     private val pixelSender: SubscriptionPixelSender = mock()
     private val subscriptionPurchaseWideEvent: SubscriptionPurchaseWideEvent = mock()
+    private val tokenRefreshWideEvent: AuthTokenRefreshWideEvent = mock()
 
     @SuppressLint("DenyListedApi")
     private val privacyProFeature: PrivacyProFeature = FakeFeatureToggleFactory.create(PrivacyProFeature::class.java)
@@ -146,6 +149,7 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
             timeProvider,
             backgroundTokenRefresh,
             subscriptionPurchaseWideEvent,
+            tokenRefreshWideEvent,
         )
     }
 
@@ -588,6 +592,7 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
             timeProvider,
             backgroundTokenRefresh,
             subscriptionPurchaseWideEvent,
+            tokenRefreshWideEvent,
         )
 
         manager.subscriptionStatus.test {
@@ -617,6 +622,7 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
             timeProvider,
             backgroundTokenRefresh,
             subscriptionPurchaseWideEvent,
+            tokenRefreshWideEvent,
         )
 
         manager.subscriptionStatus.test {
@@ -651,6 +657,7 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
             timeProvider,
             backgroundTokenRefresh,
             subscriptionPurchaseWideEvent,
+            tokenRefreshWideEvent,
         )
 
         manager.currentPurchaseState.test {
@@ -699,6 +706,7 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
             timeProvider,
             backgroundTokenRefresh,
             subscriptionPurchaseWideEvent,
+            tokenRefreshWideEvent,
         )
 
         manager.currentPurchaseState.test {
@@ -737,6 +745,7 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
             timeProvider,
             backgroundTokenRefresh,
             subscriptionPurchaseWideEvent,
+            tokenRefreshWideEvent,
         )
 
         manager.currentPurchaseState.test {
@@ -1087,6 +1096,7 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
             timeProvider,
             backgroundTokenRefresh,
             subscriptionPurchaseWideEvent,
+            tokenRefreshWideEvent,
         )
         manager.signOut()
         verify(mockRepo).setSubscription(null)
@@ -1133,6 +1143,7 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
             timeProvider,
             backgroundTokenRefresh,
             subscriptionPurchaseWideEvent,
+            tokenRefreshWideEvent,
         )
 
         manager.subscriptionStatus.test {
@@ -1315,6 +1326,7 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
             timeProvider,
             backgroundTokenRefresh,
             subscriptionPurchaseWideEvent,
+            tokenRefreshWideEvent,
         )
 
         assertFalse(subscriptionsManager.canSupportEncryption())
@@ -1747,62 +1759,136 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
     }
 
     @Test
-    fun whenSwitchSubscriptionPlanWithNoActiveSubscriptionThenReturnFalse() = runTest {
+    fun whenSwitchSubscriptionPlanWithNoActiveSubscriptionThenEmitFailure() = runTest {
         givenUserIsSignedIn()
         givenNoActiveSubscription()
 
-        val result = subscriptionsManager.switchSubscriptionPlan(
-            activity = mock(),
-            planId = YEARLY_PLAN_US,
-            offerId = null,
-            replacementMode = SubscriptionReplacementMode.DEFERRED,
-        )
+        subscriptionsManager.currentPurchaseState.test {
+            subscriptionsManager.switchSubscriptionPlan(
+                activity = mock(),
+                planId = YEARLY_PLAN_US,
+                offerId = null,
+                replacementMode = SubscriptionReplacementMode.DEFERRED,
+            )
 
-        assertFalse(result)
+            val item = awaitItem()
+            assertTrue(item is CurrentPurchase.Failure)
+            assertEquals("No active subscription found for switch", (item as CurrentPurchase.Failure).message)
+            cancelAndConsumeRemainingEvents()
+        }
     }
 
     @Test
-    fun whenSwitchSubscriptionPlanWithNoPurchaseTokenThenReturnFalse() = runTest {
+    fun whenSwitchSubscriptionPlanWithNoPurchaseTokenThenEmitFailure() = runTest {
         givenUserIsSignedIn()
         givenActiveSubscription()
         givenNoPurchaseHistory()
 
-        val result = subscriptionsManager.switchSubscriptionPlan(
-            activity = mock(),
-            planId = YEARLY_PLAN_US,
-            offerId = null,
-            replacementMode = SubscriptionReplacementMode.DEFERRED,
-        )
+        subscriptionsManager.currentPurchaseState.test {
+            subscriptionsManager.switchSubscriptionPlan(
+                activity = mock(),
+                planId = YEARLY_PLAN_US,
+                offerId = null,
+                replacementMode = SubscriptionReplacementMode.DEFERRED,
+            )
 
-        assertFalse(result)
+            val item = awaitItem()
+            assertTrue(item is CurrentPurchase.Failure)
+            assertEquals("No current purchase token found for switch", (item as CurrentPurchase.Failure).message)
+            cancelAndConsumeRemainingEvents()
+        }
     }
 
     @Test
-    fun whenSwitchSubscriptionPlanWithNoAccountThenReturnFalse() = runTest {
-        givenUserIsNotSignedIn()
+    fun whenSwitchSubscriptionPlanWithNoAccountThenEmitFailure() = runTest {
+        givenUserIsSignedIn()
         givenActiveSubscription()
         givenPurchaseStored()
+        whenever(playBillingManager.getLatestPurchaseToken()).thenReturn("validToken")
+        authRepository.setAccount(null) // No account despite being signed in
 
-        val result = subscriptionsManager.switchSubscriptionPlan(
-            activity = mock(),
-            planId = YEARLY_PLAN_US,
-            offerId = null,
-            replacementMode = SubscriptionReplacementMode.DEFERRED,
-        )
+        subscriptionsManager.currentPurchaseState.test {
+            subscriptionsManager.switchSubscriptionPlan(
+                activity = mock(),
+                planId = YEARLY_PLAN_US,
+                offerId = null,
+                replacementMode = SubscriptionReplacementMode.DEFERRED,
+            )
 
-        assertFalse(result)
+            val item = awaitItem()
+            assertTrue(item is CurrentPurchase.Failure)
+            assertEquals("No account found for switch", (item as CurrentPurchase.Failure).message)
+            cancelAndConsumeRemainingEvents()
+        }
     }
 
     @Test
-    fun whenSwitchSubscriptionPlanWithUserNotSignedInThenReturnFalse() = runTest {
-        val result = subscriptionsManager.switchSubscriptionPlan(
+    fun whenSwitchSubscriptionPlanWithUserNotSignedInThenEmitFailure() = runTest {
+        subscriptionsManager.currentPurchaseState.test {
+            subscriptionsManager.switchSubscriptionPlan(
+                activity = mock(),
+                planId = YEARLY_PLAN_US,
+                offerId = null,
+                replacementMode = SubscriptionReplacementMode.DEFERRED,
+            )
+
+            val item = awaitItem()
+            assertTrue(item is CurrentPurchase.Failure)
+            assertEquals("User not signed in for switch", (item as CurrentPurchase.Failure).message)
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenSwitchSubscriptionPlanWithInvalidPlanIdThenEmitFailure() = runTest {
+        givenUserIsSignedIn()
+        givenActiveSubscription()
+        givenPurchaseStored()
+        whenever(playBillingManager.getLatestPurchaseToken()).thenReturn("validToken")
+        authRepository.setAccount(Account("test@test.com", "1234"))
+        authRepository.setFeatures(MONTHLY_PLAN_US, setOf(NETP))
+        givenPlansAvailable(MONTHLY_PLAN_US)
+
+        subscriptionsManager.currentPurchaseState.test {
+            subscriptionsManager.switchSubscriptionPlan(
+                activity = mock(),
+                planId = "invalid_plan",
+                offerId = null,
+                replacementMode = SubscriptionReplacementMode.DEFERRED,
+            )
+
+            val item = awaitItem()
+            assertTrue(item is CurrentPurchase.Failure)
+            assertTrue((item as CurrentPurchase.Failure).message.contains("Target plan not found"))
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenSwitchSubscriptionPlanWithValidDataThenLaunchesSubscriptionUpdate() = runTest {
+        givenUserIsSignedIn()
+        givenActiveSubscription()
+        givenPurchaseStored()
+        whenever(playBillingManager.getLatestPurchaseToken()).thenReturn("validToken")
+        authRepository.setAccount(Account("test@test.com", "1234"))
+        authRepository.setFeatures(YEARLY_PLAN_US, setOf(NETP))
+        givenPlansAvailable(YEARLY_PLAN_US)
+
+        subscriptionsManager.switchSubscriptionPlan(
             activity = mock(),
             planId = YEARLY_PLAN_US,
             offerId = null,
             replacementMode = SubscriptionReplacementMode.DEFERRED,
         )
 
-        assertFalse(result)
+        verify(playBillingManager).launchSubscriptionUpdate(
+            activity = any(),
+            newPlanId = eq(YEARLY_PLAN_US),
+            externalId = eq("1234"),
+            newOfferId = isNull(),
+            oldPurchaseToken = eq("validToken"),
+            replacementMode = eq(SubscriptionReplacementMode.DEFERRED),
+        )
     }
 
     private suspend fun purchase(

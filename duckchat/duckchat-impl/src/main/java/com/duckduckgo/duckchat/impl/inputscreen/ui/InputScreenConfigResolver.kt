@@ -16,7 +16,10 @@
 
 package com.duckduckgo.duckchat.impl.inputscreen.ui
 
+import android.content.Context
 import android.content.Intent
+import android.content.res.Configuration
+import com.duckduckgo.app.di.ActivityContext
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.duckchat.api.inputscreen.InputScreenActivityParams
 import com.duckduckgo.duckchat.impl.DuckChatInternal
@@ -31,12 +34,15 @@ interface InputScreenConfigResolver {
     fun onInputScreenCreated(intent: Intent)
 
     fun useTopBar(): Boolean
+
+    fun mainButtonsEnabled(): Boolean
 }
 
 @ContributesBinding(scope = ActivityScope::class)
 @SingleInstanceIn(scope = ActivityScope::class)
 class InputScreenConfigResolverImpl @Inject constructor(
     private val duckChatInternal: DuckChatInternal,
+    @ActivityContext private val activityContext: Context,
 ) : InputScreenConfigResolver {
     companion object {
         fun useTopBar(
@@ -59,5 +65,9 @@ class InputScreenConfigResolverImpl @Inject constructor(
         useTopBar(
             isTopOmnibar = isTopOmnibar,
             duckChatInternal = duckChatInternal,
-        )
+        ) || activityContext.resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
+
+    override fun mainButtonsEnabled(): Boolean {
+        return duckChatInternal.showMainButtonsInInputScreen.value
+    }
 }

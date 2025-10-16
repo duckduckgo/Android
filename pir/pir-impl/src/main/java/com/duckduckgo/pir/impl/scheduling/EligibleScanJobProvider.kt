@@ -88,6 +88,8 @@ class RealEligibleScanJobProvider @Inject constructor(
         timeInMillis: Long,
     ): Boolean {
         return this.status == OptOutJobStatus.REMOVED &&
+            // do not pick-up deprecated opt-out jobs for maintenance scans as they belong to invalid/removed profiles
+            !this.deprecated &&
             (this.optOutRemovedDateInMillis + schedulingConfig.maintenanceScanInMillis) <= timeInMillis
     }
 
@@ -99,12 +101,14 @@ class RealEligibleScanJobProvider @Inject constructor(
             val schedulingConfig =
                 schedulingConfigs.find { config -> config.brokerName == record.brokerName }
 
-            schedulingConfig != null && (
-                record.isNotYetExecuted() ||
-                    record.isNoMatchAndShouldBeMaintained(schedulingConfig, timeInMillis) ||
-                    record.hasMatchAndShouldBeMaintained(schedulingConfig, timeInMillis) ||
-                    record.isErrorAndShouldBeRetried(schedulingConfig, timeInMillis)
-                )
+            schedulingConfig != null &&
+                // do not pick-up deprecated jobs as they belong to invalid/removed profiles
+                !record.deprecated && (
+                    record.isNotYetExecuted() ||
+                        record.isNoMatchAndShouldBeMaintained(schedulingConfig, timeInMillis) ||
+                        record.hasMatchAndShouldBeMaintained(schedulingConfig, timeInMillis) ||
+                        record.isErrorAndShouldBeRetried(schedulingConfig, timeInMillis)
+                    )
         }.sortedBy {
             it.lastScanDateInMillis
         }
