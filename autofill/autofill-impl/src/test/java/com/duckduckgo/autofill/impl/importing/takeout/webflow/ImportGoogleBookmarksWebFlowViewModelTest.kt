@@ -26,7 +26,7 @@ class ImportGoogleBookmarksWebFlowViewModelTest {
     val coroutineTestRule: CoroutineTestRule = CoroutineTestRule()
 
     private val mockBookmarkImportProcessor: BookmarkImportProcessor = mock()
-    private val mockWebFlowStepTracker: BookmarkImportWebFlowStepTracker = mock()
+    private val mockWebFlowStepObserver: BookmarkImportWebFlowStepObserver = mock()
 
     private val testee = ImportGoogleBookmarksWebFlowViewModel(
         dispatchers = coroutineTestRule.testDispatcherProvider,
@@ -35,7 +35,7 @@ class ImportGoogleBookmarksWebFlowViewModelTest {
         bookmarkImportProcessor = mockBookmarkImportProcessor,
         bookmarkImportConfigStore = mock(),
         takeoutWebMessageParser = mock(),
-        webFlowStepTracker = mockWebFlowStepTracker,
+        webFlowStepObserver = mockWebFlowStepObserver,
     )
 
     @Test

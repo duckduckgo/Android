@@ -4,22 +4,27 @@ import androidx.core.net.toUri
 import com.duckduckgo.autofill.impl.importing.takeout.processor.BookmarkImportProcessor.ImportResult
 import com.duckduckgo.autofill.impl.importing.takeout.processor.BookmarkImportProcessor.ImportResult.Error
 import com.duckduckgo.autofill.impl.importing.takeout.processor.BookmarkImportProcessor.ImportResult.Success
+import com.duckduckgo.autofill.impl.importing.takeout.webflow.BookmarkImportWebFlowStepObserver.Step
 import com.duckduckgo.di.scopes.FragmentScope
 import com.squareup.anvil.annotations.ContributesBinding
 import logcat.logcat
 import javax.inject.Inject
 
-interface BookmarkImportWebFlowStepTracker {
+interface BookmarkImportWebFlowStepObserver {
     fun getCurrentStep(): String
     fun startFlow()
-    fun updateStepFromUrl(url: String?)
-    fun updateLatestStepSpecificStage(step: String)
-    fun updateStepToDownloadDetected()
-    fun updateStepFromImportResult(importResult: ImportResult)
+    fun updateStep(step: Step)
+
+    sealed interface Step {
+        data class UrlVisited(val url: String?) : Step
+        data class JavascriptStep(val name: String) : Step
+        data object DownloadDetected : Step
+        data class ImportFinished(val result: ImportResult) : Step
+    }
 }
 
 @ContributesBinding(FragmentScope::class)
-class BookmarkImportWebFlowStepTrackerImpl @Inject constructor() : BookmarkImportWebFlowStepTracker {
+class BookmarkImportWebFlowStepObserverImpl @Inject constructor() : BookmarkImportWebFlowStepObserver {
 
     private var latestStepInWebFlow: String = STEP_UNINITIALIZED
     private var hasVisitedLogin: Boolean = false
@@ -34,12 +39,21 @@ class BookmarkImportWebFlowStepTrackerImpl @Inject constructor() : BookmarkImpor
         logcat { "Bookmark-import: flow started, flags reset" }
     }
 
-    override fun updateLatestStepSpecificStage(step: String) {
+    override fun updateStep(step: Step) {
+        when (step) {
+            is Step.DownloadDetected -> updateStepToDownloadDetected()
+            is Step.ImportFinished -> updateStepFromImportResult(step.result)
+            is Step.JavascriptStep -> updateLatestStepSpecificStage(step.name)
+            is Step.UrlVisited -> updateStepFromUrl(step.url)
+        }
+    }
+
+    private fun updateLatestStepSpecificStage(step: String) {
         latestStepInWebFlow = step
         logcat { "Bookmark-import: latest step is: $step" }
     }
 
-    override fun updateStepFromUrl(url: String?) {
+    private fun updateStepFromUrl(url: String?) {
         val host = url?.toUri()?.host ?: return
 
         when {
@@ -49,11 +63,11 @@ class BookmarkImportWebFlowStepTrackerImpl @Inject constructor() : BookmarkImpor
         }
     }
 
-    override fun updateStepToDownloadDetected() {
+    private fun updateStepToDownloadDetected() {
         updateLatestStepSpecificStage(STEP_DOWNLOAD_DETECTED)
     }
 
-    override fun updateStepFromImportResult(importResult: ImportResult) {
+    private fun updateStepFromImportResult(importResult: ImportResult) {
         val step = when (importResult) {
             is Success -> STEP_IMPORT_SUCCESS
             is Error.DownloadError -> STEP_IMPORT_ERROR_DOWNLOAD
