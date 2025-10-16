@@ -25,6 +25,8 @@ import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.autofill.api.domain.app.LoginTriggerType
 import com.duckduckgo.autofill.impl.importing.takeout.processor.BookmarkImportProcessor
 import com.duckduckgo.autofill.impl.importing.takeout.store.BookmarkImportConfigStore
+import com.duckduckgo.autofill.impl.importing.takeout.webflow.BookmarkImportWebFlowStepObserver.Step
+import com.duckduckgo.autofill.impl.importing.takeout.webflow.BookmarkImportWebFlowStepObserver.Step.JavascriptStep
 import com.duckduckgo.autofill.impl.importing.takeout.webflow.ImportGoogleBookmarksWebFlowViewModel.Command.ExitFlowAsFailure
 import com.duckduckgo.autofill.impl.importing.takeout.webflow.ImportGoogleBookmarksWebFlowViewModel.Command.PromptUserToConfirmFlowCancellation
 import com.duckduckgo.autofill.impl.importing.takeout.webflow.ImportGoogleBookmarksWebFlowViewModel.ViewState.HideWebPage
@@ -55,7 +57,7 @@ class ImportGoogleBookmarksWebFlowViewModel @Inject constructor(
     private val bookmarkImportProcessor: BookmarkImportProcessor,
     private val bookmarkImportConfigStore: BookmarkImportConfigStore,
     private val takeoutWebMessageParser: TakeoutWebMessageParser,
-    private val webFlowStepTracker: BookmarkImportWebFlowStepTracker,
+    private val webFlowStepObserver: BookmarkImportWebFlowStepObserver,
 ) : ViewModel() {
     private val _viewState = MutableStateFlow<ViewState>(ViewState.Initializing)
     val viewState: StateFlow<ViewState> = _viewState
@@ -64,6 +66,7 @@ class ImportGoogleBookmarksWebFlowViewModel @Inject constructor(
     val commands: SharedFlow<Command> = _commands
 
     suspend fun loadInitialWebpage() {
+        webFlowStepObserver.startFlow()
         withContext(dispatchers.io()) {
             val initialUrl = bookmarkImportConfigStore.getConfig().launchUrlGoogleTakeout
             _viewState.value = ViewState.LoadingWebPage(initialUrl)
@@ -79,7 +82,7 @@ class ImportGoogleBookmarksWebFlowViewModel @Inject constructor(
     ) {
         viewModelScope.launch(dispatchers.io()) {
             logcat { "Download detected: $url, mimeType: $mimeType, contentDisposition: $contentDisposition" }
-            webFlowStepTracker.updateStepToDownloadDetected()
+            webFlowStepObserver.updateStep(Step.DownloadDetected)
 
             // Check if this looks like a valid Google Takeout bookmark export
             val isValidImport = isTakeoutZipDownloadLink(mimeType, url, contentDisposition)
@@ -118,7 +121,7 @@ class ImportGoogleBookmarksWebFlowViewModel @Inject constructor(
         importResult: BookmarkImportProcessor.ImportResult,
         folderName: String,
     ) {
-        webFlowStepTracker.updateStepFromImportResult(importResult)
+        webFlowStepObserver.updateStep(Step.ImportFinished(importResult))
 
         when (importResult) {
             is BookmarkImportProcessor.ImportResult.Success -> {
@@ -141,7 +144,7 @@ class ImportGoogleBookmarksWebFlowViewModel @Inject constructor(
     }
 
     fun onCloseButtonPressed() {
-        terminateFlowAsCancellation(webFlowStepTracker.getCurrentStep())
+        terminateFlowAsCancellation(webFlowStepObserver.getCurrentStep())
     }
 
     fun onBackButtonPressed(canGoBack: Boolean = false) {
@@ -232,7 +235,7 @@ class ImportGoogleBookmarksWebFlowViewModel @Inject constructor(
     }
 
     fun onPageStarted(url: String?) {
-        webFlowStepTracker.updateStepFromUrl(url)
+        webFlowStepObserver.updateStep(Step.UrlVisited(url))
         val host = url?.toUri()?.host ?: return
         _viewState.value = if (host.contains(TAKEOUT_ADDRESS, ignoreCase = true)) {
             HideWebPage
@@ -246,10 +249,10 @@ class ImportGoogleBookmarksWebFlowViewModel @Inject constructor(
     fun onWebMessageReceived(data: String) {
         viewModelScope.launch {
             when (val result = takeoutWebMessageParser.parseMessage(data)) {
-                is TakeoutActionSuccess -> webFlowStepTracker.updateLatestStepSpecificStage(result.actionID)
+                is TakeoutActionSuccess -> webFlowStepObserver.updateStep(JavascriptStep(result.actionID))
                 is TakeoutActionError -> {
                     logcat(WARN) { "Bookmark-import: experienced an error in the step: $result, raw:$data" }
-                    val step = result.actionID ?: "last-success-${webFlowStepTracker.getCurrentStep()}"
+                    val step = result.actionID ?: "last-success-${webFlowStepObserver.getCurrentStep()}"
                     _commands.emit(ExitFlowAsFailure(WebAutomationError(step)))
                 }
                 is UnknownMessageFormat -> logcat(WARN) { "Bookmark-import: failed to parse message, unknown format: $data" }
