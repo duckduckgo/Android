@@ -637,7 +637,7 @@ class BrowserTabFragment :
 
     private val binding: FragmentBrowserTabBinding by viewBinding()
 
-    lateinit var omnibar: Omnibar
+    private lateinit var omnibar: Omnibar
 
     private lateinit var webViewContainer: FrameLayout
 
@@ -1936,6 +1936,14 @@ class BrowserTabFragment :
         webView?.reload()
         viewModel.onWebViewRefreshed()
         viewModel.resetErrors()
+    }
+
+    fun getOmnibar(): Omnibar? {
+        return if (this::omnibar.isInitialized) {
+            omnibar
+        } else {
+            null
+        }
     }
 
     private fun processCommand(it: Command?) {
