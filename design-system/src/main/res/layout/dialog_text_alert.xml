@@ -83,7 +83,7 @@
                 android:layout_weight="1"
                 android:layout_marginTop="@dimen/keyline_4"
                 app:flexDirection="row"
-                app:flexWrap="wrap"
+                app:flexWrap="wrap_reverse"
                 app:justifyContent="flex_end"
                 app:alignItems="center"
                 app:layout_constraintEnd_toEndOf="parent"
