@@ -69,7 +69,7 @@ class InputScreenConfigResolverTest {
     fun `when onInputScreenCreated called with isTopOmnibar true then isTopOmnibar should be true`() {
         val intent =
             Intent().apply {
-                putExtra("ACTIVITY_SERIALIZABLE_PARAMETERS_ARG", InputScreenActivityParams(query = "", isTopOmnibar = true))
+                putExtra("ACTIVITY_SERIALIZABLE_PARAMETERS_ARG", InputScreenActivityParams(query = "", isTopOmnibar = true, tabs = 1))
             }
 
         inputScreenConfigResolver.onInputScreenCreated(intent)
@@ -81,7 +81,7 @@ class InputScreenConfigResolverTest {
     fun `when onInputScreenCreated called with isTopOmnibar false then isTopOmnibar should be false`() {
         val intent =
             Intent().apply {
-                putExtra("ACTIVITY_SERIALIZABLE_PARAMETERS_ARG", InputScreenActivityParams(query = "", isTopOmnibar = false))
+                putExtra("ACTIVITY_SERIALIZABLE_PARAMETERS_ARG", InputScreenActivityParams(query = "", isTopOmnibar = false, tabs = 1))
             }
 
         inputScreenConfigResolver.onInputScreenCreated(intent)
@@ -93,7 +93,7 @@ class InputScreenConfigResolverTest {
     fun `when isTopOmnibar is true then useTopBar should return true regardless of bottom bar feature`() {
         val intent =
             Intent().apply {
-                putExtra("ACTIVITY_SERIALIZABLE_PARAMETERS_ARG", InputScreenActivityParams(query = "", isTopOmnibar = true))
+                putExtra("ACTIVITY_SERIALIZABLE_PARAMETERS_ARG", InputScreenActivityParams(query = "", isTopOmnibar = true, tabs = 1))
             }
         inputScreenConfigResolver.onInputScreenCreated(intent)
 
@@ -108,7 +108,7 @@ class InputScreenConfigResolverTest {
     fun `when isTopOmnibar is false and bottom bar feature disabled then useTopBar should return true`() {
         val intent =
             Intent().apply {
-                putExtra("ACTIVITY_SERIALIZABLE_PARAMETERS_ARG", InputScreenActivityParams(query = "", isTopOmnibar = false))
+                putExtra("ACTIVITY_SERIALIZABLE_PARAMETERS_ARG", InputScreenActivityParams(query = "", isTopOmnibar = false, tabs = 1))
             }
         inputScreenConfigResolver.onInputScreenCreated(intent)
         inputScreenBottomBarEnabled.value = false
@@ -120,7 +120,7 @@ class InputScreenConfigResolverTest {
     fun `when isTopOmnibar is false and bottom bar feature enabled then useTopBar should return false`() {
         val intent =
             Intent().apply {
-                putExtra("ACTIVITY_SERIALIZABLE_PARAMETERS_ARG", InputScreenActivityParams(query = "", isTopOmnibar = false))
+                putExtra("ACTIVITY_SERIALIZABLE_PARAMETERS_ARG", InputScreenActivityParams(query = "", isTopOmnibar = false, tabs = 1))
             }
         inputScreenConfigResolver.onInputScreenCreated(intent)
         inputScreenBottomBarEnabled.value = true
@@ -135,7 +135,7 @@ class InputScreenConfigResolverTest {
         val intent = Intent().apply {
             putExtra(
                 "ACTIVITY_SERIALIZABLE_PARAMETERS_ARG",
-                InputScreenActivityParams(query = "", isTopOmnibar = true),
+                InputScreenActivityParams(query = "", isTopOmnibar = true, tabs = 1),
             )
         }
         inputScreenConfigResolver.onInputScreenCreated(intent)
@@ -151,7 +151,7 @@ class InputScreenConfigResolverTest {
         val intent = Intent().apply {
             putExtra(
                 "ACTIVITY_SERIALIZABLE_PARAMETERS_ARG",
-                InputScreenActivityParams(query = "", isTopOmnibar = true),
+                InputScreenActivityParams(query = "", isTopOmnibar = true, tabs = 1),
             )
         }
         inputScreenConfigResolver.onInputScreenCreated(intent)
@@ -167,7 +167,7 @@ class InputScreenConfigResolverTest {
         val intent = Intent().apply {
             putExtra(
                 "ACTIVITY_SERIALIZABLE_PARAMETERS_ARG",
-                InputScreenActivityParams(query = "", isTopOmnibar = false),
+                InputScreenActivityParams(query = "", isTopOmnibar = false, tabs = 1),
             )
         }
         inputScreenConfigResolver.onInputScreenCreated(intent)
@@ -183,7 +183,7 @@ class InputScreenConfigResolverTest {
         val intent = Intent().apply {
             putExtra(
                 "ACTIVITY_SERIALIZABLE_PARAMETERS_ARG",
-                InputScreenActivityParams(query = "", isTopOmnibar = false),
+                InputScreenActivityParams(query = "", isTopOmnibar = false, tabs = 1),
             )
         }
         inputScreenConfigResolver.onInputScreenCreated(intent)

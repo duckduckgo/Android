@@ -1,0 +1,28 @@
+// See https://app.asana.com/0/72649045549333/1208001118995887/f.
+{
+    "pixel_name": {
+        "description": "Describe when the pixel fires and its purpose",
+        // Github usernames of the people responsible for the pixel (https://github.com/duckduckgo/internal-github-asana-utils/blob/main/user_map.yml)
+        "owners": ["nshuba"],
+        "triggers": ["other"],
+        "suffixes": [
+            // A suffix is a dynamic part of the pixel name, e.g. "some.pixel.[count|daily]"
+            "first_daily_count", // shortcut to a commonly used suffix, defined in common_suffixes.json.
+            {
+                // Custom suffix.
+                "description": "Describe the custom suffix and its purpose",
+                "enum": ["suffix1", "suffix2"]
+            }
+        ],
+        "parameters": [
+            // Commonly used param, defined in params_dictionary.json.
+            "appVersion",
+            {
+                "key": "paramKey",
+                "description": "Describe the parameter and its purpose"
+            }
+        ],
+        // If pixel is temporary, remove if pixel is permanent.
+        "expires": "2025-01-30"
+    }
+}

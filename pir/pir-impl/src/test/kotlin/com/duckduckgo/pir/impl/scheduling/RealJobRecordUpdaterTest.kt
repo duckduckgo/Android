@@ -145,21 +145,81 @@ class RealJobRecordUpdaterTest {
         )
 
     @Test
-    fun whenUpdateScanMatchesFoundThenUpdatesJobRecordWithCorrectStatus() =
+    fun whenUpdateScanMatchesFoundWithNonDeprecatedProfileThenUpdatesJobRecordWithCorrectStatus() =
         runTest {
-            toTest.updateScanMatchesFound(testBrokerName, testProfileQueryId)
+            whenever(mockRepository.getUserProfileQuery(testProfileQueryId)).thenReturn(mock())
+
+            toTest.updateScanMatchesFound(listOf(mock()), testBrokerName, testProfileQueryId)
 
             verify(mockSchedulingRepository).updateScanJobRecordStatus(
                 newStatus = ScanJobStatus.MATCHES_FOUND,
                 newLastScanDateMillis = TEST_CURRENT_TIME,
                 brokerName = testBrokerName,
                 profileQueryId = testProfileQueryId,
+                deprecated = false,
             )
         }
 
     @Test
-    fun whenUpdateScanNoMatchFoundThenUpdatesJobRecordWithCorrectStatus() =
+    fun whenUpdateScanMatchesFoundWithDeprecatedProfileAndAllProfilesRemovedThenMarksJobAsDeprecated() =
         runTest {
+            val deprecatedProfile = mock<com.duckduckgo.pir.impl.models.ProfileQuery>()
+            whenever(deprecatedProfile.deprecated).thenReturn(true)
+            whenever(mockRepository.getUserProfileQuery(testProfileQueryId)).thenReturn(deprecatedProfile)
+
+            val storedProfiles = listOf(testExtractedProfile1, testExtractedProfile2)
+            whenever(mockRepository.getExtractedProfiles(testBrokerName, testProfileQueryId))
+                .thenReturn(storedProfiles)
+
+            // New profiles are completely different - all old ones were removed
+            val newProfiles = listOf(
+                testExtractedProfile3.copy(dbId = 0L),
+            )
+
+            toTest.updateScanMatchesFound(newProfiles, testBrokerName, testProfileQueryId)
+
+            verify(mockSchedulingRepository).updateScanJobRecordStatus(
+                newStatus = ScanJobStatus.MATCHES_FOUND,
+                newLastScanDateMillis = TEST_CURRENT_TIME,
+                brokerName = testBrokerName,
+                profileQueryId = testProfileQueryId,
+                deprecated = true,
+            )
+        }
+
+    @Test
+    fun whenUpdateScanMatchesFoundWithDeprecatedProfileAndSomeProfilesRemainingThenDoesNotMarkAsDeprecated() =
+        runTest {
+            val deprecatedProfile = mock<com.duckduckgo.pir.impl.models.ProfileQuery>()
+            whenever(deprecatedProfile.deprecated).thenReturn(true)
+            whenever(mockRepository.getUserProfileQuery(testProfileQueryId)).thenReturn(deprecatedProfile)
+
+            val storedProfiles = listOf(testExtractedProfile1, testExtractedProfile2)
+            whenever(mockRepository.getExtractedProfiles(testBrokerName, testProfileQueryId))
+                .thenReturn(storedProfiles)
+
+            // New profiles still include one of the stored profiles
+            val newProfiles = listOf(
+                testExtractedProfile1.copy(dbId = 0L),
+                testExtractedProfile3.copy(dbId = 0L),
+            )
+
+            toTest.updateScanMatchesFound(newProfiles, testBrokerName, testProfileQueryId)
+
+            verify(mockSchedulingRepository).updateScanJobRecordStatus(
+                newStatus = ScanJobStatus.MATCHES_FOUND,
+                newLastScanDateMillis = TEST_CURRENT_TIME,
+                brokerName = testBrokerName,
+                profileQueryId = testProfileQueryId,
+                deprecated = false,
+            )
+        }
+
+    @Test
+    fun whenUpdateScanNoMatchFoundWithNonDeprecatedProfileThenUpdatesJobRecordWithCorrectStatus() =
+        runTest {
+            whenever(mockRepository.getUserProfileQuery(testProfileQueryId)).thenReturn(mock())
+
             toTest.updateScanNoMatchFound(testBrokerName, testProfileQueryId)
 
             verify(mockSchedulingRepository).updateScanJobRecordStatus(
@@ -167,6 +227,25 @@ class RealJobRecordUpdaterTest {
                 newLastScanDateMillis = TEST_CURRENT_TIME,
                 brokerName = testBrokerName,
                 profileQueryId = testProfileQueryId,
+                deprecated = false,
+            )
+        }
+
+    @Test
+    fun whenUpdateScanNoMatchFoundWithDeprecatedProfileThenMarksJobAsDeprecated() =
+        runTest {
+            val deprecatedProfile = mock<com.duckduckgo.pir.impl.models.ProfileQuery>()
+            whenever(deprecatedProfile.deprecated).thenReturn(true)
+            whenever(mockRepository.getUserProfileQuery(testProfileQueryId)).thenReturn(deprecatedProfile)
+
+            toTest.updateScanNoMatchFound(testBrokerName, testProfileQueryId)
+
+            verify(mockSchedulingRepository).updateScanJobRecordStatus(
+                newStatus = ScanJobStatus.NO_MATCH_FOUND,
+                newLastScanDateMillis = TEST_CURRENT_TIME,
+                brokerName = testBrokerName,
+                profileQueryId = testProfileQueryId,
+                deprecated = true,
             )
         }
 
@@ -180,6 +259,7 @@ class RealJobRecordUpdaterTest {
                 newLastScanDateMillis = TEST_CURRENT_TIME,
                 brokerName = testBrokerName,
                 profileQueryId = testProfileQueryId,
+                deprecated = false,
             )
         }
 
@@ -267,7 +347,7 @@ class RealJobRecordUpdaterTest {
         }
 
     @Test
-    fun whenMarkRemovedProfilesWithSomeRemovedProfilesThenMarksThemAsRemovedInCorrectOrder() =
+    fun whenMarkRemovedProfilesWithSomeRemovedProfilesAndNonDeprecatedProfileThenMarksThemAsRemovedInCorrectOrder() =
         runTest {
             // Setup: stored profiles [profile1, profile2, profile3] but new profiles only [profile1, profile3]
             // Result: profile2 should be marked as removed
@@ -282,6 +362,7 @@ class RealJobRecordUpdaterTest {
 
             val optOutJobRecord2 = testOptOutJobRecord.copy(extractedProfileId = 200L)
 
+            whenever(mockRepository.getUserProfileQuery(testProfileQueryId)).thenReturn(mock())
             whenever(mockRepository.getExtractedProfiles(testBrokerName, testProfileQueryId))
                 .thenReturn(storedProfiles)
             whenever(mockSchedulingRepository.getValidOptOutJobRecord(200L))
@@ -301,6 +382,33 @@ class RealJobRecordUpdaterTest {
                 optOutJobRecord2.copy(
                     status = OptOutJobStatus.REMOVED,
                     optOutRemovedDateInMillis = TEST_CURRENT_TIME,
+                    deprecated = false,
+                ),
+            )
+        }
+
+    @Test
+    fun whenMarkRemovedProfilesWithDeprecatedProfileThenMarksJobAsDeprecated() =
+        runTest {
+            val storedProfiles = listOf(testExtractedProfile1)
+            val newProfiles = emptyList<ExtractedProfile>()
+            val optOutJobRecord1 = testOptOutJobRecord.copy(extractedProfileId = 100L)
+
+            val deprecatedProfile = mock<com.duckduckgo.pir.impl.models.ProfileQuery>()
+            whenever(deprecatedProfile.deprecated).thenReturn(true)
+            whenever(mockRepository.getUserProfileQuery(testProfileQueryId)).thenReturn(deprecatedProfile)
+            whenever(mockRepository.getExtractedProfiles(testBrokerName, testProfileQueryId))
+                .thenReturn(storedProfiles)
+            whenever(mockSchedulingRepository.getValidOptOutJobRecord(100L))
+                .thenReturn(optOutJobRecord1)
+
+            toTest.markRemovedOptOutJobRecords(newProfiles, testBrokerName, testProfileQueryId)
+
+            verify(mockSchedulingRepository).saveOptOutJobRecord(
+                optOutJobRecord1.copy(
+                    status = OptOutJobStatus.REMOVED,
+                    optOutRemovedDateInMillis = TEST_CURRENT_TIME,
+                    deprecated = true,
                 ),
             )
         }
@@ -326,7 +434,7 @@ class RealJobRecordUpdaterTest {
 
             verify(mockRepository).getExtractedProfiles(testBrokerName, testProfileQueryId)
             // Should not call getValidOptOutJobRecord or saveOptOutJobRecord since no profiles were removed
-            verify(mockSchedulingRepository, never()).getValidOptOutJobRecord(any())
+            verify(mockSchedulingRepository, never()).getValidOptOutJobRecord(any(), any())
             verify(mockSchedulingRepository, never()).saveOptOutJobRecord(any())
         }
 
@@ -341,6 +449,7 @@ class RealJobRecordUpdaterTest {
             val optOutJobRecord1 = testOptOutJobRecord.copy(extractedProfileId = 100L)
             val optOutJobRecord2 = testOptOutJobRecord.copy(extractedProfileId = 200L)
 
+            whenever(mockRepository.getUserProfileQuery(testProfileQueryId)).thenReturn(mock())
             whenever(mockRepository.getExtractedProfiles(testBrokerName, testProfileQueryId))
                 .thenReturn(storedProfiles)
             whenever(mockSchedulingRepository.getValidOptOutJobRecord(100L))
@@ -354,12 +463,14 @@ class RealJobRecordUpdaterTest {
                 optOutJobRecord1.copy(
                     status = OptOutJobStatus.REMOVED,
                     optOutRemovedDateInMillis = TEST_CURRENT_TIME,
+                    deprecated = false,
                 ),
             )
             verify(mockSchedulingRepository).saveOptOutJobRecord(
                 optOutJobRecord2.copy(
                     status = OptOutJobStatus.REMOVED,
                     optOutRemovedDateInMillis = TEST_CURRENT_TIME,
+                    deprecated = false,
                 ),
             )
         }
@@ -671,6 +782,24 @@ class RealJobRecordUpdaterTest {
 
             verify(mockSchedulingRepository).saveEmailConfirmationJobRecord(expectedRecord)
             assertEquals(expectedRecord, result)
+        }
+
+    @Test
+    fun whenRemoveJobRecordsForProfileWithNoExclusionsThenDeletesAllJobRecords() =
+        runTest {
+            toTest.removeAllJobRecordsForProfiles(listOf(testProfileQueryId))
+
+            verify(mockSchedulingRepository).deleteJobRecordsForProfiles(listOf(testProfileQueryId))
+        }
+
+    @Test
+    fun whenRemoveJobRecordsForProfileWithExclusionsThenDeletesJobRecordsExceptExcluded() =
+        runTest {
+            val brokersToExclude = listOf("broker1", "broker2")
+
+            toTest.removeScanJobRecordsWithNoMatchesForProfiles(listOf(testProfileQueryId))
+
+            verify(mockSchedulingRepository).deleteScanJobRecordsWithoutMatchesForProfiles(listOf(testProfileQueryId))
         }
 
     companion object {

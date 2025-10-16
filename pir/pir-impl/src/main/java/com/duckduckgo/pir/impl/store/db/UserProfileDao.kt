@@ -25,7 +25,13 @@ import androidx.room.Transaction
 @Dao
 interface UserProfileDao {
     @Query("SELECT * FROM pir_user_profile")
-    fun getUserProfiles(): List<UserProfile>
+    fun getAllUserProfiles(): List<UserProfile>
+
+    @Query("SELECT * FROM pir_user_profile WHERE deprecated = 0")
+    fun getValidUserProfiles(): List<UserProfile>
+
+    @Query("SELECT * FROM pir_user_profile WHERE id = :id")
+    fun getUserProfile(id: Long): UserProfile?
 
     @Query("SELECT * FROM pir_user_profile WHERE id IN (:ids)")
     fun getUserProfilesWithIds(ids: List<Long>): List<UserProfile>

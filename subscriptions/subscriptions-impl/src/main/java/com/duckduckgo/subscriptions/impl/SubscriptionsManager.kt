@@ -74,6 +74,7 @@ import com.duckduckgo.subscriptions.impl.services.StoreLoginBody
 import com.duckduckgo.subscriptions.impl.services.SubscriptionsService
 import com.duckduckgo.subscriptions.impl.services.ValidateTokenResponse
 import com.duckduckgo.subscriptions.impl.services.toEntitlements
+import com.duckduckgo.subscriptions.impl.wideevents.AuthTokenRefreshWideEvent
 import com.duckduckgo.subscriptions.impl.wideevents.SubscriptionPurchaseWideEvent
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.moshi.JsonDataException
@@ -89,7 +90,6 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onSubscription
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -271,6 +271,7 @@ class RealSubscriptionsManager @Inject constructor(
     private val timeProvider: CurrentTimeProvider,
     private val backgroundTokenRefresh: BackgroundTokenRefresh,
     private val subscriptionPurchaseWideEvent: SubscriptionPurchaseWideEvent,
+    private val tokenRefreshWideEvent: AuthTokenRefreshWideEvent,
 ) : SubscriptionsManager {
     private val adapter = Moshi.Builder().build().adapter(ResponseError::class.java)
 
@@ -675,54 +676,85 @@ class RealSubscriptionsManager @Inject constructor(
     }
 
     override suspend fun refreshAccessToken() {
-        val refreshToken = checkNotNull(authRepository.getRefreshTokenV2())
+        try {
+            tokenRefreshWideEvent.onStart(subscriptionStatus())
+            val refreshToken = checkNotNull(authRepository.getRefreshTokenV2())
+            tokenRefreshWideEvent.onTokenRead()
 
-        /*
-            Get jwks before refreshing the token, just in case getting jwks fails. We don't want to end up in a situation where
-            a new token has been fetched (potentially invalidating the old one), but we can't validate and store it.
-         */
-        val jwks = authClient.getJwks()
+            /*
+                Get jwks before refreshing the token, just in case getting jwks fails. We don't want to end up in a situation where
+                a new token has been fetched (potentially invalidating the old one), but we can't validate and store it.
+             */
+            val jwks = authClient.getJwks()
+            tokenRefreshWideEvent.onJwksFetched()
 
-        val newTokens = try {
-            val tokens = authClient.getTokens(refreshToken.jwt)
-            validateTokens(tokens, jwks)
-        } catch (e: HttpException) {
-            if (e.code() == 400) {
-                if (parseError(e)?.error == "unknown_account") {
-                    /*
+            val newTokens = try {
+                val tokens = authClient.getTokens(refreshToken.jwt)
+                tokenRefreshWideEvent.onTokensFetched()
+                validateTokens(tokens, jwks)
+                    .also { tokenRefreshWideEvent.onTokensValidated() }
+            } catch (e: HttpException) {
+                val backendErrorResponse = parseError(e)?.error
+                    ?.also { tokenRefreshWideEvent.onBackendErrorResponse(backendErrorResponse = it) }
+
+                if (e.code() == 400) {
+                    if (backendErrorResponse == "unknown_account") {
+                        /*
                         Refresh token appears to be valid, but the related account doesn't exist in BE.
                         After the subscription expires, BE eventually deletes the account, so this is expected.
-                     */
-                    signOut()
-                    throw e
-                }
-
-                // refresh token is invalid / expired -> try to get a new pair of tokens using store login
-                pixelSender.reportAuthV2InvalidRefreshTokenDetected()
-                val account = checkNotNull(authRepository.getAccount()) { "Missing account info when refreshing access token" }
-
-                when (val storeLoginResult = storeLogin(account.externalId)) {
-                    is StoreLoginResult.Success -> {
-                        pixelSender.reportAuthV2InvalidRefreshTokenRecovered()
-                        storeLoginResult.tokens
-                    }
-                    StoreLoginResult.Failure.AccountExternalIdMismatch,
-                    StoreLoginResult.Failure.PurchaseHistoryNotAvailable,
-                    StoreLoginResult.Failure.AuthenticationError,
-                    -> {
-                        pixelSender.reportAuthV2InvalidRefreshTokenSignedOut()
+                         */
+                        tokenRefreshWideEvent.onUnknownAccountError()
                         signOut()
                         throw e
                     }
 
-                    StoreLoginResult.Failure.Other -> throw e
-                }
-            } else {
-                throw e
-            }
-        }
+                    // refresh token is invalid / expired -> try to get a new pair of tokens using store login
+                    pixelSender.reportAuthV2InvalidRefreshTokenDetected()
+                    val account = checkNotNull(authRepository.getAccount()) { "Missing account info when refreshing access token" }
 
-        saveTokens(newTokens)
+                    when (val storeLoginResult = storeLogin(account.externalId)) {
+                        is StoreLoginResult.Success -> {
+                            tokenRefreshWideEvent.onPlayLoginSuccess()
+                            pixelSender.reportAuthV2InvalidRefreshTokenRecovered()
+                            storeLoginResult.tokens
+                        }
+
+                        StoreLoginResult.Failure.AccountExternalIdMismatch,
+                        StoreLoginResult.Failure.PurchaseHistoryNotAvailable,
+                        StoreLoginResult.Failure.AuthenticationError,
+                        -> {
+                            tokenRefreshWideEvent.onPlayLoginFailure(
+                                signedOut = true,
+                                refreshException = e,
+                                loginError = storeLoginResult.javaClass.simpleName,
+                            )
+                            pixelSender.reportAuthV2InvalidRefreshTokenSignedOut()
+                            signOut()
+                            throw e
+                        }
+
+                        StoreLoginResult.Failure.TokenValidationFailed,
+                        StoreLoginResult.Failure.UnknownError,
+                        -> {
+                            tokenRefreshWideEvent.onPlayLoginFailure(
+                                signedOut = false,
+                                refreshException = e,
+                                loginError = storeLoginResult.javaClass.simpleName,
+                            )
+                            throw e
+                        }
+                    }
+                } else {
+                    throw e
+                }
+            }
+
+            saveTokens(newTokens)
+            tokenRefreshWideEvent.onSuccess()
+        } catch (e: Exception) {
+            tokenRefreshWideEvent.onFailure(e)
+            throw e
+        }
     }
 
     override suspend fun refreshSubscriptionData() {
@@ -798,7 +830,11 @@ class RealSubscriptionsManager @Inject constructor(
             val sessionId = authClient.authorize(codeChallenge)
             val authorizationCode = authClient.storeLogin(sessionId, purchase.signature, purchase.originalJson)
             val tokens = authClient.getTokens(sessionId, authorizationCode, codeVerifier)
-            val validatedTokens = validateTokens(tokens, jwks)
+            val validatedTokens = try {
+                validateTokens(tokens, jwks)
+            } catch (_: Exception) {
+                return StoreLoginResult.Failure.TokenValidationFailed
+            }
 
             if (accountExternalId != null && accountExternalId != validatedTokens.accessTokenClaims.accountExternalId) {
                 return StoreLoginResult.Failure.AccountExternalIdMismatch
@@ -809,7 +845,7 @@ class RealSubscriptionsManager @Inject constructor(
             if (e is HttpException && e.code() == 400) {
                 StoreLoginResult.Failure.AuthenticationError
             } else {
-                StoreLoginResult.Failure.Other
+                StoreLoginResult.Failure.UnknownError
             }
         }
     }
@@ -1178,7 +1214,8 @@ class RealSubscriptionsManager @Inject constructor(
             data object PurchaseHistoryNotAvailable : Failure()
             data object AccountExternalIdMismatch : Failure()
             data object AuthenticationError : Failure()
-            data object Other : Failure()
+            data object TokenValidationFailed : Failure()
+            data object UnknownError : Failure()
         }
     }
 

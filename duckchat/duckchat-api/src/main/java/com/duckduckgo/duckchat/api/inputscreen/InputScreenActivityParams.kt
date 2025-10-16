@@ -25,10 +25,12 @@ import com.duckduckgo.navigation.api.GlobalActivityStarter
  *
  * @param query The initial query text to pre-populate in the input field
  * @param isTopOmnibar whether the omnibar is positioned at the top of the screen
+ * @param tabs number of tabs to display
  */
 data class InputScreenActivityParams(
     val query: String,
-    val isTopOmnibar: Boolean,
+    val tabs: Int = 0,
+    val isTopOmnibar: Boolean = false,
 ) : GlobalActivityStarter.ActivityParams
 
 /**
@@ -40,6 +42,15 @@ data object InputScreenActivityResultCodes {
 
     /** User requested to switch to an existing tab */
     const val SWITCH_TO_TAB_REQUESTED = 2
+
+    /** User requested to launch the Fire Button */
+    const val FIRE_BUTTON_REQUESTED = 3
+
+    /** User requested to launch the Tab Switcher */
+    const val TAB_SWITCHER_REQUESTED = 4
+
+    /** User requested to launch the Browser Menu */
+    const val MENU_REQUESTED = 5
 }
 
 /**

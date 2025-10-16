@@ -148,7 +148,7 @@ class RealPirJobsRunnerTest {
     fun whenEmptyActiveBrokersAndEmptyProfileQueriesThenCompleteQuick() = runTest {
         // Given
         whenever(mockPirRepository.getAllActiveBrokers()).thenReturn(emptyList())
-        whenever(mockPirRepository.getUserProfileQueries()).thenReturn(emptyList())
+        whenever(mockPirRepository.getAllUserProfileQueries()).thenReturn(emptyList())
 
         // When
         testee.runEligibleJobs(mockContext, MANUAL)
@@ -158,10 +158,10 @@ class RealPirJobsRunnerTest {
         verify(mockPixelSender).reportScanStats(0)
         verify(mockPixelSender).reportOptOutStats(0)
         verify(mockPixelSender).reportManualScanCompleted(any())
+        verify(mockPirScan).stop()
         verifyNoInteractions(mockPirSchedulingRepository)
         verifyNoInteractions(mockEligibleScanJobProvider)
         verifyNoInteractions(mockEligibleOptOutJobProvider)
-        verifyNoInteractions(mockPirScan)
         verifyNoInteractions(mockPirOptOut)
     }
 
@@ -169,7 +169,7 @@ class RealPirJobsRunnerTest {
     fun whenEmptyProfileQueriesUsesDefaultProfileQueries() = runTest {
         // Given
         whenever(mockPirRepository.getAllActiveBrokers()).thenReturn(testActiveBrokers)
-        whenever(mockPirRepository.getUserProfileQueries()).thenReturn(emptyList())
+        whenever(mockPirRepository.getAllUserProfileQueries()).thenReturn(emptyList())
         whenever(mockPirRepository.getBrokersForOptOut(true)).thenReturn(emptyList())
         whenever(
             mockPirSchedulingRepository.getValidScanJobRecord(
@@ -256,7 +256,7 @@ class RealPirJobsRunnerTest {
     fun whenEmptyActiveBrokersThenCompletesQuick() = runTest {
         // Given
         whenever(mockPirRepository.getAllActiveBrokers()).thenReturn(emptyList())
-        whenever(mockPirRepository.getUserProfileQueries()).thenReturn(testUserProfileQueries)
+        whenever(mockPirRepository.getAllUserProfileQueries()).thenReturn(testUserProfileQueries)
 
         // When
         testee.runEligibleJobs(mockContext, MANUAL)
@@ -266,10 +266,10 @@ class RealPirJobsRunnerTest {
         verify(mockPixelSender).reportScanStats(0)
         verify(mockPixelSender).reportOptOutStats(0)
         verify(mockPixelSender).reportManualScanCompleted(any())
+        verify(mockPirScan).stop()
         verifyNoInteractions(mockPirSchedulingRepository)
         verifyNoInteractions(mockEligibleScanJobProvider)
         verifyNoInteractions(mockEligibleOptOutJobProvider)
-        verifyNoInteractions(mockPirScan)
         verifyNoInteractions(mockPirOptOut)
     }
 
@@ -278,7 +278,7 @@ class RealPirJobsRunnerTest {
         // Given
         val invalidBrokerJobRecord = testScanJobRecord.copy(brokerName = testBrokerName2)
         whenever(mockPirRepository.getAllActiveBrokers()).thenReturn(listOf(testBrokerName))
-        whenever(mockPirRepository.getUserProfileQueries()).thenReturn(testUserProfileQueries)
+        whenever(mockPirRepository.getAllUserProfileQueries()).thenReturn(testUserProfileQueries)
         whenever(mockPirRepository.getBrokersForOptOut(true)).thenReturn(emptyList())
         whenever(
             mockPirSchedulingRepository.getValidScanJobRecord(
@@ -327,7 +327,7 @@ class RealPirJobsRunnerTest {
     fun whenManualExecutionTypeThenExecutesScanJobsWithManualRunType() = runTest {
         // Given
         whenever(mockPirRepository.getAllActiveBrokers()).thenReturn(testActiveBrokers)
-        whenever(mockPirRepository.getUserProfileQueries()).thenReturn(testUserProfileQueries)
+        whenever(mockPirRepository.getAllUserProfileQueries()).thenReturn(testUserProfileQueries)
         whenever(mockPirRepository.getBrokersForOptOut(true)).thenReturn(emptyList())
         whenever(
             mockPirSchedulingRepository.getValidScanJobRecord(
@@ -376,7 +376,7 @@ class RealPirJobsRunnerTest {
     fun whenScheduledExecutionTypeThenExecutesScanJobsWithScheduledRunType() = runTest {
         // Given
         whenever(mockPirRepository.getAllActiveBrokers()).thenReturn(testActiveBrokers)
-        whenever(mockPirRepository.getUserProfileQueries()).thenReturn(testUserProfileQueries)
+        whenever(mockPirRepository.getAllUserProfileQueries()).thenReturn(testUserProfileQueries)
         whenever(mockPirRepository.getBrokersForOptOut(true)).thenReturn(emptyList())
         whenever(
             mockPirSchedulingRepository.getValidScanJobRecord(
@@ -425,7 +425,7 @@ class RealPirJobsRunnerTest {
     fun whenValidScanJobRecordExistsThenDoesNotCreateNewScanJob() = runTest {
         // Given
         whenever(mockPirRepository.getAllActiveBrokers()).thenReturn(listOf(testBrokerName))
-        whenever(mockPirRepository.getUserProfileQueries()).thenReturn(listOf(testProfileQuery))
+        whenever(mockPirRepository.getAllUserProfileQueries()).thenReturn(listOf(testProfileQuery))
         whenever(mockPirRepository.getBrokersForOptOut(true)).thenReturn(emptyList())
         whenever(
             mockPirSchedulingRepository.getValidScanJobRecord(
@@ -453,7 +453,7 @@ class RealPirJobsRunnerTest {
     fun whenNoValidScanJobRecordExistsThenCreatesNewScanJob() = runTest {
         // Given
         whenever(mockPirRepository.getAllActiveBrokers()).thenReturn(listOf(testBrokerName))
-        whenever(mockPirRepository.getUserProfileQueries()).thenReturn(listOf(testProfileQuery))
+        whenever(mockPirRepository.getAllUserProfileQueries()).thenReturn(listOf(testProfileQuery))
         whenever(mockPirRepository.getBrokersForOptOut(true)).thenReturn(emptyList())
         whenever(
             mockPirSchedulingRepository.getValidScanJobRecord(
@@ -484,7 +484,7 @@ class RealPirJobsRunnerTest {
         // Given
         whenever(mockPirRepository.getBrokersForOptOut(true)).thenReturn(emptyList())
         whenever(mockPirRepository.getAllActiveBrokers()).thenReturn(listOf(testBrokerName))
-        whenever(mockPirRepository.getUserProfileQueries()).thenReturn(
+        whenever(mockPirRepository.getAllUserProfileQueries()).thenReturn(
             listOf(
                 testDeprecatedProfileQuery,
             ),
@@ -509,7 +509,7 @@ class RealPirJobsRunnerTest {
     fun whenActiveBrokerIsNotFormOptOutThenDoNotCreateJob() = runTest {
         // Given
         whenever(mockPirRepository.getAllActiveBrokers()).thenReturn(listOf(testBrokerName))
-        whenever(mockPirRepository.getUserProfileQueries()).thenReturn(listOf(testProfileQuery))
+        whenever(mockPirRepository.getAllUserProfileQueries()).thenReturn(listOf(testProfileQuery))
         whenever(mockPirRepository.getBrokersForOptOut(true)).thenReturn(listOf("some-other-broker"))
         whenever(
             mockPirSchedulingRepository.getValidScanJobRecord(
@@ -521,7 +521,7 @@ class RealPirJobsRunnerTest {
             emptyList(),
         )
         whenever(mockPirRepository.getAllExtractedProfiles()).thenReturn(listOf(testExtractedProfile))
-        whenever(mockPirSchedulingRepository.getValidOptOutJobRecord(testExtractedProfile.dbId)).thenReturn(
+        whenever(mockPirSchedulingRepository.getValidOptOutJobRecord(testExtractedProfile.dbId, includeDeprecated = true)).thenReturn(
             null,
         )
         whenever(mockEligibleOptOutJobProvider.getAllEligibleOptOutJobs(testCurrentTime)).thenReturn(
@@ -533,6 +533,7 @@ class RealPirJobsRunnerTest {
         testee.runEligibleJobs(mockContext, MANUAL)
 
         // Then
+        verify(mockPirScan).stop()
         verify(mockPixelSender).reportManualScanStarted()
         verify(mockPixelSender).reportManualScanCompleted(any())
         verify(mockPixelSender).reportOptOutStats(0)
@@ -552,7 +553,7 @@ class RealPirJobsRunnerTest {
         // Given
         whenever(mockPirRepository.getBrokersForOptOut(true)).thenReturn(listOf(testBrokerName))
         whenever(mockPirRepository.getAllActiveBrokers()).thenReturn(listOf(testBrokerName))
-        whenever(mockPirRepository.getUserProfileQueries()).thenReturn(listOf(testProfileQuery))
+        whenever(mockPirRepository.getAllUserProfileQueries()).thenReturn(listOf(testProfileQuery))
         whenever(
             mockPirSchedulingRepository.getValidScanJobRecord(
                 testBrokerName,
@@ -563,7 +564,7 @@ class RealPirJobsRunnerTest {
             emptyList(),
         )
         whenever(mockPirRepository.getAllExtractedProfiles()).thenReturn(listOf(testExtractedProfile))
-        whenever(mockPirSchedulingRepository.getValidOptOutJobRecord(testExtractedProfile.dbId)).thenReturn(
+        whenever(mockPirSchedulingRepository.getValidOptOutJobRecord(testExtractedProfile.dbId, includeDeprecated = true)).thenReturn(
             null,
         )
         whenever(mockEligibleOptOutJobProvider.getAllEligibleOptOutJobs(testCurrentTime)).thenReturn(
@@ -591,7 +592,7 @@ class RealPirJobsRunnerTest {
         // Given
         whenever(mockPirRepository.getBrokersForOptOut(true)).thenReturn(listOf(testBrokerName))
         whenever(mockPirRepository.getAllActiveBrokers()).thenReturn(listOf(testBrokerName))
-        whenever(mockPirRepository.getUserProfileQueries()).thenReturn(listOf(testProfileQuery))
+        whenever(mockPirRepository.getAllUserProfileQueries()).thenReturn(listOf(testProfileQuery))
         whenever(
             mockPirSchedulingRepository.getValidScanJobRecord(
                 testBrokerName,
@@ -602,7 +603,7 @@ class RealPirJobsRunnerTest {
             emptyList(),
         )
         whenever(mockPirRepository.getAllExtractedProfiles()).thenReturn(listOf(testExtractedProfile))
-        whenever(mockPirSchedulingRepository.getValidOptOutJobRecord(testExtractedProfile.dbId)).thenReturn(
+        whenever(mockPirSchedulingRepository.getValidOptOutJobRecord(testExtractedProfile.dbId, includeDeprecated = true)).thenReturn(
             testOptOutJobRecord,
         )
         whenever(mockEligibleOptOutJobProvider.getAllEligibleOptOutJobs(testCurrentTime)).thenReturn(
@@ -624,7 +625,7 @@ class RealPirJobsRunnerTest {
             testExtractedProfile.copy(brokerName = "inactive-broker")
         whenever(mockPirRepository.getBrokersForOptOut(true)).thenReturn(emptyList())
         whenever(mockPirRepository.getAllActiveBrokers()).thenReturn(listOf(testBrokerName))
-        whenever(mockPirRepository.getUserProfileQueries()).thenReturn(listOf(testProfileQuery))
+        whenever(mockPirRepository.getAllUserProfileQueries()).thenReturn(listOf(testProfileQuery))
         whenever(
             mockPirSchedulingRepository.getValidScanJobRecord(
                 testBrokerName,
@@ -656,7 +657,7 @@ class RealPirJobsRunnerTest {
         // Given
         whenever(mockPirRepository.getBrokersForOptOut(true)).thenReturn(listOf("some-other-broker"))
         whenever(mockPirRepository.getAllActiveBrokers()).thenReturn(listOf(testBrokerName))
-        whenever(mockPirRepository.getUserProfileQueries()).thenReturn(listOf(testProfileQuery))
+        whenever(mockPirRepository.getAllUserProfileQueries()).thenReturn(listOf(testProfileQuery))
         whenever(
             mockPirSchedulingRepository.getValidScanJobRecord(
                 testBrokerName,
@@ -693,7 +694,7 @@ class RealPirJobsRunnerTest {
         // Given
         whenever(mockPirRepository.getBrokersForOptOut(true)).thenReturn(listOf(testBrokerName))
         whenever(mockPirRepository.getAllActiveBrokers()).thenReturn(listOf(testBrokerName))
-        whenever(mockPirRepository.getUserProfileQueries()).thenReturn(listOf(testProfileQuery))
+        whenever(mockPirRepository.getAllUserProfileQueries()).thenReturn(listOf(testProfileQuery))
         whenever(
             mockPirSchedulingRepository.getValidScanJobRecord(
                 testBrokerName,
@@ -728,7 +729,7 @@ class RealPirJobsRunnerTest {
         runTest {
             // Given
             whenever(mockPirRepository.getAllActiveBrokers()).thenReturn(listOf(testBrokerName))
-            whenever(mockPirRepository.getUserProfileQueries()).thenReturn(listOf(testProfileQuery))
+            whenever(mockPirRepository.getAllUserProfileQueries()).thenReturn(listOf(testProfileQuery))
             whenever(
                 mockPirSchedulingRepository.getValidScanJobRecord(
                     testBrokerName,
@@ -761,7 +762,7 @@ class RealPirJobsRunnerTest {
         // Given
         whenever(mockPirRepository.getBrokersForOptOut(true)).thenReturn(listOf(testBrokerName))
         whenever(mockPirRepository.getAllActiveBrokers()).thenReturn(listOf(testBrokerName))
-        whenever(mockPirRepository.getUserProfileQueries()).thenReturn(listOf(testProfileQuery))
+        whenever(mockPirRepository.getAllUserProfileQueries()).thenReturn(listOf(testProfileQuery))
         whenever(
             mockPirSchedulingRepository.getValidScanJobRecord(
                 testBrokerName,
@@ -772,7 +773,7 @@ class RealPirJobsRunnerTest {
             listOf(testScanJobRecord),
         )
         whenever(mockPirRepository.getAllExtractedProfiles()).thenReturn(listOf(testExtractedProfile))
-        whenever(mockPirSchedulingRepository.getValidOptOutJobRecord(testExtractedProfile.dbId)).thenReturn(
+        whenever(mockPirSchedulingRepository.getValidOptOutJobRecord(testExtractedProfile.dbId, includeDeprecated = true)).thenReturn(
             null,
         )
         whenever(mockEligibleOptOutJobProvider.getAllEligibleOptOutJobs(testCurrentTime)).thenReturn(
@@ -799,8 +800,9 @@ class RealPirJobsRunnerTest {
 
         // Then
         // Verify all major operations are called
+        verify(mockPirScan).stop()
         verify(mockPirRepository).getAllActiveBrokers()
-        verify(mockPirRepository).getUserProfileQueries()
+        verify(mockPirRepository).getAllUserProfileQueries()
         verify(mockPirSchedulingRepository).getValidScanJobRecord(
             testBrokerName,
             testProfileQuery.id,
@@ -815,7 +817,7 @@ class RealPirJobsRunnerTest {
             RunType.MANUAL,
         )
         verify(mockPirRepository).getAllExtractedProfiles()
-        verify(mockPirSchedulingRepository).getValidOptOutJobRecord(testExtractedProfile.dbId)
+        verify(mockPirSchedulingRepository).getValidOptOutJobRecord(testExtractedProfile.dbId, includeDeprecated = true)
         verify(mockPirSchedulingRepository).saveOptOutJobRecords(
             listOf(
                 OptOutJobRecord(
@@ -829,6 +831,160 @@ class RealPirJobsRunnerTest {
         verify(mockPirRepository).getBrokersForOptOut(true)
         verify(mockPixelSender).reportOptOutStats(1)
         verify(mockPirOptOut).executeOptOutForJobs(listOf(testOptOutJobRecord), mockContext)
+    }
+
+    @Test
+    fun whenRunEligibleJobsThenStopsPirScanFirst() = runTest {
+        // Given
+        whenever(mockPirRepository.getAllActiveBrokers()).thenReturn(emptyList())
+        whenever(mockPirRepository.getAllUserProfileQueries()).thenReturn(emptyList())
+
+        // When
+        testee.runEligibleJobs(mockContext, MANUAL)
+
+        // Then
+        verify(mockPirScan).stop()
+    }
+
+    @Test
+    fun whenDeprecatedProfileWithExtractedProfilesThenCreatesOptOutJob() = runTest {
+        // Given
+        val extractedProfileForDeprecatedProfile = testExtractedProfile.copy(
+            profileQueryId = testDeprecatedProfileQuery.id,
+        )
+        whenever(mockPirRepository.getBrokersForOptOut(true)).thenReturn(listOf(testBrokerName))
+        whenever(mockPirRepository.getAllActiveBrokers()).thenReturn(listOf(testBrokerName))
+        whenever(mockPirRepository.getAllUserProfileQueries()).thenReturn(
+            listOf(testDeprecatedProfileQuery),
+        )
+        whenever(mockEligibleScanJobProvider.getAllEligibleScanJobs(testCurrentTime)).thenReturn(
+            emptyList(),
+        )
+        whenever(mockPirRepository.getAllExtractedProfiles()).thenReturn(
+            listOf(extractedProfileForDeprecatedProfile),
+        )
+        whenever(mockPirSchedulingRepository.getValidOptOutJobRecord(extractedProfileForDeprecatedProfile.dbId, includeDeprecated = true)).thenReturn(
+            null,
+        )
+        whenever(mockEligibleOptOutJobProvider.getAllEligibleOptOutJobs(testCurrentTime)).thenReturn(
+            emptyList(),
+        )
+        whenever(mockCurrentTimeProvider.currentTimeMillis()).thenReturn(testCurrentTime)
+
+        // When
+        testee.runEligibleJobs(mockContext, MANUAL)
+
+        // Then
+        // Should create opt-out job even for deprecated profile if it has extracted profiles
+        verify(mockPirSchedulingRepository).saveOptOutJobRecords(
+            listOf(
+                OptOutJobRecord(
+                    extractedProfileId = extractedProfileForDeprecatedProfile.dbId,
+                    brokerName = extractedProfileForDeprecatedProfile.brokerName,
+                    userProfileId = extractedProfileForDeprecatedProfile.profileQueryId,
+                ),
+            ),
+        )
+    }
+
+    @Test
+    fun whenDeprecatedProfileWithExtractedProfilesAndExistingOptOutJobThenDoesNotCreateNew() = runTest {
+        // Given
+        val extractedProfileForDeprecatedProfile = testExtractedProfile.copy(
+            profileQueryId = testDeprecatedProfileQuery.id,
+        )
+        val existingOptOutJob = testOptOutJobRecord.copy(
+            extractedProfileId = extractedProfileForDeprecatedProfile.dbId,
+            userProfileId = testDeprecatedProfileQuery.id,
+        )
+        whenever(mockPirRepository.getBrokersForOptOut(true)).thenReturn(listOf(testBrokerName))
+        whenever(mockPirRepository.getAllActiveBrokers()).thenReturn(listOf(testBrokerName))
+        whenever(mockPirRepository.getAllUserProfileQueries()).thenReturn(
+            listOf(testDeprecatedProfileQuery),
+        )
+        whenever(mockEligibleScanJobProvider.getAllEligibleScanJobs(testCurrentTime)).thenReturn(
+            emptyList(),
+        )
+        whenever(mockPirRepository.getAllExtractedProfiles()).thenReturn(
+            listOf(extractedProfileForDeprecatedProfile),
+        )
+        whenever(mockPirSchedulingRepository.getValidOptOutJobRecord(extractedProfileForDeprecatedProfile.dbId, includeDeprecated = true)).thenReturn(
+            existingOptOutJob,
+        )
+        whenever(mockEligibleOptOutJobProvider.getAllEligibleOptOutJobs(testCurrentTime)).thenReturn(
+            emptyList(),
+        )
+        whenever(mockCurrentTimeProvider.currentTimeMillis()).thenReturn(testCurrentTime)
+
+        // When
+        testee.runEligibleJobs(mockContext, MANUAL)
+
+        // Then
+        // Should not create new opt-out job if one already exists
+        verify(mockPirSchedulingRepository, never()).saveOptOutJobRecords(any())
+    }
+
+    @Test
+    fun whenMixOfDeprecatedAndNonDeprecatedProfilesThenCreatesJobsCorrectly() = runTest {
+        // Given
+        val extractedProfileForNormal = testExtractedProfile.copy(
+            dbId = 100L,
+            profileQueryId = testProfileQuery.id,
+        )
+        val extractedProfileForDeprecated = testExtractedProfile.copy(
+            dbId = 200L,
+            profileQueryId = testDeprecatedProfileQuery.id,
+        )
+        whenever(mockPirRepository.getBrokersForOptOut(true)).thenReturn(listOf(testBrokerName))
+        whenever(mockPirRepository.getAllActiveBrokers()).thenReturn(listOf(testBrokerName))
+        whenever(mockPirRepository.getAllUserProfileQueries()).thenReturn(
+            listOf(testProfileQuery, testDeprecatedProfileQuery),
+        )
+        whenever(
+            mockPirSchedulingRepository.getValidScanJobRecord(
+                testBrokerName,
+                testProfileQuery.id,
+            ),
+        ).thenReturn(testScanJobRecord)
+        whenever(mockEligibleScanJobProvider.getAllEligibleScanJobs(testCurrentTime)).thenReturn(
+            emptyList(),
+        )
+        whenever(mockPirRepository.getAllExtractedProfiles()).thenReturn(
+            listOf(extractedProfileForNormal, extractedProfileForDeprecated),
+        )
+        whenever(mockPirSchedulingRepository.getValidOptOutJobRecord(extractedProfileForNormal.dbId, includeDeprecated = true)).thenReturn(
+            null,
+        )
+        whenever(mockPirSchedulingRepository.getValidOptOutJobRecord(extractedProfileForDeprecated.dbId, includeDeprecated = true)).thenReturn(
+            null,
+        )
+        whenever(mockEligibleOptOutJobProvider.getAllEligibleOptOutJobs(testCurrentTime)).thenReturn(
+            emptyList(),
+        )
+        whenever(mockCurrentTimeProvider.currentTimeMillis()).thenReturn(testCurrentTime)
+
+        // When
+        testee.runEligibleJobs(mockContext, MANUAL)
+
+        // Then
+        // Should create scan job only for non-deprecated profile
+        verify(mockPirSchedulingRepository, never()).saveScanJobRecords(any())
+
+        // Should create opt-out jobs for both profiles since both have extracted profiles
+        verify(mockPirSchedulingRepository).saveOptOutJobRecords(
+            listOf(
+                OptOutJobRecord(
+                    extractedProfileId = extractedProfileForNormal.dbId,
+                    brokerName = extractedProfileForNormal.brokerName,
+                    userProfileId = extractedProfileForNormal.profileQueryId,
+                ),
+                OptOutJobRecord(
+                    extractedProfileId = extractedProfileForDeprecated.dbId,
+                    brokerName = extractedProfileForDeprecated.brokerName,
+                    userProfileId = extractedProfileForDeprecated.profileQueryId,
+                ),
+            ),
+        )
     }
 
     @Test

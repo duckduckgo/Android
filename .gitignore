@@ -102,3 +102,7 @@ report
 !/node_modules/@duckduckgo/content-scope-scripts/build/android/pages/
 /node_modules/@duckduckgo/content-scope-scripts/build/android/pages/*
 !/node_modules/@duckduckgo/content-scope-scripts/build/android/pages/duckplayer/
+
+# Pixel processing results
+PixelDefinitions/pixel_processing_results/*
+PixelDefinitions/node_modules/
