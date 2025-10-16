@@ -30,6 +30,8 @@ import javax.inject.Inject
 interface InputScreenConfigResolver {
     val isTopOmnibar: Boolean
 
+    fun shouldLaunchVoiceSearch(): Boolean
+
     fun useTopBar(): Boolean
 
     fun mainButtonsEnabled(): Boolean
@@ -50,6 +52,11 @@ class InputScreenConfigResolverImpl @Inject constructor(
 
     override val isTopOmnibar: Boolean by lazy {
         appCompatActivity.intent.getActivityParams(InputScreenActivityParams::class.java)?.isTopOmnibar ?: true
+    }
+
+    override fun shouldLaunchVoiceSearch(): Boolean {
+        val params = appCompatActivity.intent.getActivityParams(InputScreenActivityParams::class.java)
+        return params?.launchWithVoice ?: false
     }
 
     override fun useTopBar(): Boolean =
