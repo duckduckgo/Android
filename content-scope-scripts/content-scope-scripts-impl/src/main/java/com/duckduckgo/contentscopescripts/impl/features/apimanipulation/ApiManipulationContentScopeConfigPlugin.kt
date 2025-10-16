@@ -19,7 +19,6 @@ package com.duckduckgo.contentscopescripts.impl.features.apimanipulation
 import com.duckduckgo.contentscopescripts.api.ContentScopeConfigPlugin
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesMultibinding
-import logcat.logcat
 import javax.inject.Inject
 
 const val API_MANIPULATION_FEATURE_NAME = "apiManipulation"
@@ -31,9 +30,7 @@ class ApiManipulationContentScopeConfigPlugin @Inject constructor(
 
     override fun config(): String {
         val config = apiManipulationRepository.getJsonData()
-        return "\"$API_MANIPULATION_FEATURE_NAME\":$config".also {
-            logcat("Cris") { "API manipulation $it" }
-        }
+        return "\"$API_MANIPULATION_FEATURE_NAME\":$config"
     }
 
     override fun preferences(): String? {
