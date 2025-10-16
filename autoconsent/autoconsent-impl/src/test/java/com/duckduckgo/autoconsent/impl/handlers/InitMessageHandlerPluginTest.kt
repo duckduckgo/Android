@@ -25,6 +25,8 @@ import com.duckduckgo.autoconsent.impl.FakeSettingsRepository
 import com.duckduckgo.autoconsent.impl.adapters.JSONObjectAdapter
 import com.duckduckgo.autoconsent.impl.cache.RealAutoconsentSettingsCache
 import com.duckduckgo.autoconsent.impl.handlers.InitMessageHandlerPlugin.InitResp
+import com.duckduckgo.autoconsent.impl.pixels.AutoConsentPixel
+import com.duckduckgo.autoconsent.impl.pixels.AutoconsentPixelManager
 import com.duckduckgo.autoconsent.impl.remoteconfig.AutoconsentFeature
 import com.duckduckgo.autoconsent.impl.remoteconfig.AutoconsentFeatureModels.CompactRules
 import com.duckduckgo.common.test.CoroutineTestRule
@@ -48,6 +50,7 @@ class InitMessageHandlerPluginTest {
     @get:Rule var coroutineRule = CoroutineTestRule()
 
     private val mockCallback: AutoconsentCallback = mock()
+    private val mockPixelManager: AutoconsentPixelManager = mock()
     private val webView: WebView = WebView(InstrumentationRegistry.getInstrumentation().targetContext)
     private val settingsRepository = FakeSettingsRepository()
     private var settingsCache = RealAutoconsentSettingsCache()
@@ -62,6 +65,7 @@ class InitMessageHandlerPluginTest {
         settingsRepository,
         settingsCache,
         feature,
+        mockPixelManager,
     )
 
     @Test
@@ -228,6 +232,26 @@ class InitMessageHandlerPluginTest {
         initHandlerPlugin.process(initHandlerPlugin.supportedTypes.first(), message(), webView, mockCallback)
 
         verify(mockCallback).onResultReceived(consentManaged = false, optOutFailed = false, selfTestFailed = false, isCosmetic = false)
+    }
+
+    @Test
+    fun whenProcessAndAutoconsentIsDisabledThenFireDisabledForSitePixel() {
+        settingsRepository.userSetting = false
+
+        webView.loadUrl("http://www.example.com")
+        initHandlerPlugin.process(initHandlerPlugin.supportedTypes.first(), message(), webView, mockCallback)
+
+        verify(mockPixelManager).fireDailyPixel(AutoConsentPixel.AUTOCONSENT_DISABLED_FOR_SITE_DAILY)
+    }
+
+    @Test
+    fun whenProcessAndAutoconsentIsEnabledThenFireInitPixel() {
+        settingsRepository.userSetting = true
+
+        webView.loadUrl("http://www.example.com")
+        initHandlerPlugin.process(initHandlerPlugin.supportedTypes.first(), message(), webView, mockCallback)
+
+        verify(mockPixelManager).fireDailyPixel(AutoConsentPixel.AUTOCONSENT_INIT_DAILY)
     }
 
     @Test
