@@ -92,7 +92,7 @@ class PixelWideEventSenderTest {
                     "feature.status" to "SUCCESS",
                     "dev_mode" to "false",
                 )
-            val expectedEncodedParameters = mapOf("plan_type" to "premium")
+            val expectedEncodedParameters = mapOf("feature.data.ext.plan_type" to "premium")
 
             verify(pixel).fire(
                 pixelName = eq("wide.subscription.purchase.c"),

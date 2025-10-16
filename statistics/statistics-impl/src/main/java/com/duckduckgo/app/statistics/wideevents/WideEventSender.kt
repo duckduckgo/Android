@@ -57,6 +57,7 @@ class PixelWideEventSender @Inject constructor(
             event.metadata
                 .filterValues { it != null }
                 .mapValues { it.value!! }
+                .mapKeys { PARAM_METADATA_PREFIX + it.key }
 
         val basePixelName = PIXEL_NAME_PREFIX + event.name
 
@@ -108,6 +109,8 @@ class PixelWideEventSender @Inject constructor(
         const val PARAM_FORM_FACTOR = "app.form_factor"
         const val PARAM_NA_EXPERIMENTS = "app.native_apps_experiments"
         const val PARAM_DEV_MODE = "dev_mode"
+
+        const val PARAM_METADATA_PREFIX = "feature.data.ext."
     }
 }
 
