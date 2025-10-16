@@ -51,6 +51,10 @@ class PixelWideEventSender @Inject constructor(
                 if (event.flowEntryPoint != null) {
                     put(PARAM_CONTEXT_NAME, event.flowEntryPoint)
                 }
+
+                event.steps.forEach { (name, success) ->
+                    put(PARAM_METADATA_STEP_PREFIX + name, success.toString())
+                }
             }
 
         val encodedParameters =
@@ -111,6 +115,7 @@ class PixelWideEventSender @Inject constructor(
         const val PARAM_DEV_MODE = "app.dev_mode"
 
         const val PARAM_METADATA_PREFIX = "feature.data.ext."
+        const val PARAM_METADATA_STEP_PREFIX = PARAM_METADATA_PREFIX + "step."
     }
 }
 
