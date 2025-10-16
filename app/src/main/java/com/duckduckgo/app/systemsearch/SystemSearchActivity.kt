@@ -91,6 +91,7 @@ import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.api.inputscreen.InputScreenActivityParams
 import com.duckduckgo.duckchat.api.inputscreen.InputScreenActivityResultCodes
 import com.duckduckgo.duckchat.api.inputscreen.InputScreenActivityResultParams
+import com.duckduckgo.duckchat.api.inputscreen.InputScreenBrowserButtonsConfig
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.savedsites.api.models.SavedSite
 import com.duckduckgo.savedsites.impl.dialogs.EditSavedSiteDialogFragment
@@ -269,7 +270,11 @@ class SystemSearchActivity : DuckDuckGoActivity() {
     private fun launchInputScreen(isTopOmnibar: Boolean) {
         globalActivityStarter.startIntent(
             this,
-            InputScreenActivityParams(query = "", isTopOmnibar = isTopOmnibar),
+            InputScreenActivityParams(
+                query = "",
+                isTopOmnibar = isTopOmnibar,
+                browserButtonsConfig = InputScreenBrowserButtonsConfig.Disabled(),
+            ),
         )?.let {
             inputScreenLauncher.launch(it)
         }
