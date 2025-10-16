@@ -20,14 +20,22 @@ import android.annotation.SuppressLint
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
+import com.duckduckgo.mobile.android.R
 
 /**
  * Default typography for DuckDuckGo theme.
  *
  * Figma: https://www.figma.com/design/jHLwh4erLbNc2YeobQpGFt/Design-System-Guidelines?node-id=1313-19967
  */
+
+private val RobotoMono = FontFamily(
+    Font(R.font.roboto_mono, FontWeight.Normal),
+)
+
 @Immutable
 data class DuckDuckGoTypography(
 
@@ -54,6 +62,7 @@ data class DuckDuckGoTypography(
             TextStyle(
                 fontSize = 20.sp,
                 lineHeight = 24.sp,
+                letterSpacing = 0.3.sp,
                 fontWeight = FontWeight.Medium,
             ),
         ),
@@ -72,6 +81,7 @@ data class DuckDuckGoTypography(
             TextStyle(
                 fontSize = 14.sp,
                 lineHeight = 20.sp,
+                letterSpacing = 0.3.sp,
                 fontWeight = FontWeight.Medium,
             ),
         ),
@@ -92,10 +102,30 @@ data class DuckDuckGoTypography(
         ),
     ),
 
+    val body1Bold: DuckDuckGoTextStyle = DuckDuckGoTextStyle(
+        body1.textStyle.copy(
+            fontWeight = FontWeight.Bold,
+        ),
+    ),
+
+    val body1Mono: DuckDuckGoTextStyle = DuckDuckGoTextStyle(
+        body1.textStyle.copy(
+            fontFamily = RobotoMono,
+        ),
+    ),
+
     val body2: DuckDuckGoTextStyle = DuckDuckGoTextStyle(
         TextStyle(
             fontSize = 14.sp,
             lineHeight = 18.sp,
+            letterSpacing = 0.2.sp,
+        ),
+    ),
+
+    val body2Bold: DuckDuckGoTextStyle = DuckDuckGoTextStyle(
+        body2.textStyle.copy(
+            fontWeight = FontWeight.Bold,
+            letterSpacing = 0.3.sp,
         ),
     ),
 
@@ -111,6 +141,7 @@ data class DuckDuckGoTypography(
         TextStyle(
             fontSize = 12.sp,
             lineHeight = 16.sp,
+            letterSpacing = 0.2.sp,
         ),
     ),
 )
@@ -122,8 +153,9 @@ val LocalDuckDuckGoTypography = staticCompositionLocalOf<DuckDuckGoTypography> {
     error("No DuckDuckGoTypography provided")
 }
 
+@JvmInline
 @Immutable
-data class DuckDuckGoTextStyle internal constructor(
+value class DuckDuckGoTextStyle internal constructor(
     internal val textStyle: TextStyle,
 )
 
