@@ -111,36 +111,20 @@ class RealDuckChatJSHelper @Inject constructor(
                 null
             }
 
-            METHOD_STORE_MIGRATION_DATA -> {
-                // Only handle if feature is supported
-                val item = data?.optString(SERIALIZED_MIGRATION_FILE)
-                if (item != null && item != JSONObject.NULL) {
-                    synchronized(migrationItems) { migrationItems.add(item) }
-                }
-                // Acknowledge with empty payload if id provided
-                id?.let { JsCallbackData(JSONObject(), featureName, method, it) }
+            METHOD_STORE_MIGRATION_DATA -> id?.let {
+                getStoreMigrationDataResponse(featureName, method, it, data)
             }
 
             METHOD_GET_MIGRATION_INFO -> id?.let {
-                val count = synchronized(migrationItems) { migrationItems.size }
-                val jsonPayload = JSONObject().apply { put(COUNT, count) }
-                JsCallbackData(jsonPayload, featureName, method, it)
+                getMigrationInfoResponse(featureName, method, it)
             }
 
             METHOD_GET_MIGRATION_DATA_BY_INDEX -> id?.let {
-                val index = data?.optInt(INDEX, -1) ?: -1
-                val value = synchronized(migrationItems) {
-                    if (index in 0 until migrationItems.size) migrationItems[index] else null
-                }
-                val jsonPayload = JSONObject().apply {
-                    if (value != null) put(SERIALIZED_MIGRATION_FILE, value)
-                }
-                JsCallbackData(jsonPayload, featureName, method, it)
+                getMigrationDataByIndexResponse(featureName, method, it, data)
             }
 
-            METHOD_CLEAR_MIGRATION_DATA -> {
-                synchronized(migrationItems) { migrationItems.clear() }
-                id?.let { JsCallbackData(JSONObject(), featureName, method, it) }
+            METHOD_CLEAR_MIGRATION_DATA -> id?.let {
+                getClearMigrationDataResponse(featureName, method, it)
             }
 
             else -> null
@@ -215,6 +199,56 @@ class RealDuckChatJSHelper @Inject constructor(
                 null
             }
         }
+    }
+
+    private fun getStoreMigrationDataResponse(
+        featureName: String,
+        method: String,
+        id: String,
+        data: JSONObject?,
+    ): JsCallbackData {
+        val item = data?.optString(SERIALIZED_MIGRATION_FILE)
+        if (item != null && item != JSONObject.NULL) {
+            synchronized(migrationItems) { migrationItems.add(item) }
+        }
+        val jsonPayload = JSONObject()
+        return JsCallbackData(jsonPayload, featureName, method, id)
+    }
+
+    private fun getMigrationInfoResponse(
+        featureName: String,
+        method: String,
+        id: String,
+    ): JsCallbackData {
+        val count = synchronized(migrationItems) { migrationItems.size }
+        val jsonPayload = JSONObject().apply { put(COUNT, count) }
+        return JsCallbackData(jsonPayload, featureName, method, id)
+    }
+
+    private fun getMigrationDataByIndexResponse(
+        featureName: String,
+        method: String,
+        id: String,
+        data: JSONObject?,
+    ): JsCallbackData {
+        val index = data?.optInt(INDEX, -1) ?: -1
+        val value = synchronized(migrationItems) {
+            if (index in 0 until migrationItems.size) migrationItems[index] else null
+        }
+        val jsonPayload = JSONObject().apply {
+            if (value != null) put(SERIALIZED_MIGRATION_FILE, value)
+        }
+        return JsCallbackData(jsonPayload, featureName, method, id)
+    }
+
+    private fun getClearMigrationDataResponse(
+        featureName: String,
+        method: String,
+        id: String,
+    ): JsCallbackData {
+        synchronized(migrationItems) { migrationItems.clear() }
+        val jsonPayload = JSONObject()
+        return JsCallbackData(jsonPayload, featureName, method, id)
     }
 
     companion object {
