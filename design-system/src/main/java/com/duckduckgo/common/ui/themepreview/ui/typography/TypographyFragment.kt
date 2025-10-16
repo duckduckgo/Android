@@ -51,6 +51,7 @@ class TypographyFragment : Fragment() {
         return inflater.inflate(R.layout.fragment_components_typography, container, false)
     }
 
+    @Suppress("DenyListedApi")
     override fun onViewCreated(
         view: View,
         savedInstanceBundle: Bundle?,
