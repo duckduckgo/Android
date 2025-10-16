@@ -90,7 +90,7 @@ class PixelWideEventSenderTest {
                     "app.native_apps_experiments" to "",
                     "context.name" to "app_settings",
                     "feature.status" to "SUCCESS",
-                    "dev_mode" to "false",
+                    "app.dev_mode" to "false",
                 )
             val expectedEncodedParameters = mapOf("feature.data.ext.plan_type" to "premium")
 

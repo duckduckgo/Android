@@ -108,7 +108,7 @@ class PixelWideEventSender @Inject constructor(
         const val PARAM_APP_VERSION = "app.version"
         const val PARAM_FORM_FACTOR = "app.form_factor"
         const val PARAM_NA_EXPERIMENTS = "app.native_apps_experiments"
-        const val PARAM_DEV_MODE = "dev_mode"
+        const val PARAM_DEV_MODE = "app.dev_mode"
 
         const val PARAM_METADATA_PREFIX = "feature.data.ext."
     }
