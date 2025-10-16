@@ -41,10 +41,9 @@ class PopUpFoundMessageHandlerPlugin @Inject constructor(
     override fun process(messageType: String, jsonString: String, webView: WebView, autoconsentCallback: AutoconsentCallback) {
         try {
             if (supportedTypes.contains(messageType)) {
-                val message: PopUpFoundMessage = parseMessage(jsonString) ?: return
-
                 pixelManager.fireDailyPixel(AutoConsentPixel.AUTOCONSENT_POPUP_FOUND_DAILY)
 
+                val message: PopUpFoundMessage = parseMessage(jsonString) ?: return
                 if (repository.userSetting) return
                 if (message.cmp.endsWith(IGNORE_CMP_SUFFIX, ignoreCase = true)) return
 
