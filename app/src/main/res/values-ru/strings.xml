@@ -862,7 +862,7 @@
 
     <!-- Appearance settings -->
     <string name="settingsAddressBarPositionTitle">Адресная строка</string>
-    <string name="settingsAddressBarPositionTop">Вверх</string>
+    <string name="settingsAddressBarPositionTop">Вверху</string>
     <string name="settingsAddressBarPositionBottom">Внизу</string>
 
     <!-- Show on App Launch Option -->
