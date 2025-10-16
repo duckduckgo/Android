@@ -57,7 +57,7 @@
     <dimen name="omnibarCardMarginHorizontal">16dp</dimen>
     <dimen name="omnibarCardMarginEnd">8dp</dimen>
     <dimen name="omnibarCardExtendedMarginEnd">4dp</dimen>
-    <dimen name="omnibarCardMarginTop">8dp</dimen>
+    <dimen name="omnibarCardMarginTop">4dp</dimen>
     <dimen name="omnibarCardMarginBottom">12dp</dimen>
     <dimen name="omnibarOutlineWidth">0dp</dimen>
     <dimen name="omnibarOutlineFocusedWidth">2dp</dimen>

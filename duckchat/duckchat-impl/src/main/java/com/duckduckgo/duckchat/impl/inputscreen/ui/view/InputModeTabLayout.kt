@@ -23,6 +23,7 @@ import android.util.AttributeSet
 import android.view.ViewOutlineProvider
 import android.widget.ImageView
 import androidx.core.content.ContextCompat
+import androidx.core.content.withStyledAttributes
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.common.ui.store.AppTheme
 import com.duckduckgo.di.scopes.ViewScope
@@ -45,7 +46,18 @@ class InputModeTabLayout @JvmOverloads constructor(
     @Inject
     lateinit var appTheme: AppTheme
 
+    private var dummyMode: Boolean = false
+
     init {
+        context.withStyledAttributes(
+            attrs,
+            R.styleable.InputModeTabLayout,
+            0,
+            0,
+        ) {
+            dummyMode = getBoolean(R.styleable.InputModeTabLayout_dummyMode, false)
+        }
+
         setSelectedTabIndicator(
             buildShadowedTabIndicator(
                 context = context,
@@ -67,9 +79,17 @@ class InputModeTabLayout @JvmOverloads constructor(
         // We're changing the selector to ensure that the right icon is used even if user manually changes the theme,
         // without relying on the system theme. For these cases, using "drawable-night" directory is not sufficient.
         if (appTheme.isLightModeEnabled()) {
-            searchTabIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_search_tab_selector))
+            if (dummyMode) {
+                searchTabIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_input_screen_search_find_color_16))
+            } else {
+                searchTabIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_search_tab_selector))
+            }
         } else {
-            searchTabIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_search_tab_selector_dark))
+            if (dummyMode) {
+                searchTabIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_input_screen_search_find_color_on_dark_16))
+            } else {
+                searchTabIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_search_tab_selector_dark))
+            }
         }
     }
 
