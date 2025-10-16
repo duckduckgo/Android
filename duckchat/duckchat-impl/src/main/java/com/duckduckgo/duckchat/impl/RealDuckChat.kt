@@ -260,6 +260,7 @@ class RealDuckChat @Inject constructor(
 
     private val _chatState = MutableStateFlow(ChatState.HIDE)
     private val keepSession = MutableStateFlow(false)
+    private val _showInputScreenOnSystemSearchLaunch = MutableStateFlow(false)
 
     private val jsonAdapter: JsonAdapter<DuckChatSettingJson> by lazy {
         moshi.adapter(DuckChatSettingJson::class.java)
@@ -279,6 +280,7 @@ class RealDuckChat @Inject constructor(
     private var keepSessionAliveInMinutes: Int = DEFAULT_SESSION_ALIVE
     private var clearChatHistory: Boolean = true
     private var inputScreenMainButtonsEnabled = false
+    private var showInputScreenOnSystemSearchLaunchEnabled: Boolean = true
 
     init {
         if (isMainProcess) {
@@ -388,6 +390,8 @@ class RealDuckChat @Inject constructor(
     override val showMainButtonsInInputScreen: StateFlow<Boolean> = _showMainButtonsInInputScreen.asStateFlow()
 
     override val showClearDuckAIChatHistory: StateFlow<Boolean> = _showClearDuckAIChatHistory.asStateFlow()
+
+    override val showInputScreenOnSystemSearchLaunch: StateFlow<Boolean> = _showInputScreenOnSystemSearchLaunch.asStateFlow()
 
     override val chatState: StateFlow<ChatState> = _chatState.asStateFlow()
 
@@ -600,6 +604,7 @@ class RealDuckChat @Inject constructor(
             duckAiInputScreenBottomBarEnabled = duckChatFeature.inputScreenBottomBarSupport().isEnabled()
             clearChatHistory = duckChatFeature.clearHistory().isEnabled()
             showAIChatAddressBarChoiceScreen = duckChatFeature.showAIChatAddressBarChoiceScreen().isEnabled()
+            showInputScreenOnSystemSearchLaunchEnabled = duckChatFeature.showInputScreenOnSystemSearchLaunch().isEnabled()
             inputScreenMainButtonsEnabled = duckChatFeature.showMainButtonsInInputScreen().isEnabled()
 
             val showMainButtons = duckChatFeature.showMainButtonsInInputScreen().isEnabled()
@@ -641,6 +646,8 @@ class RealDuckChat @Inject constructor(
             _showInputScreenAutomaticallyOnNewTab.value = showInputScreen && duckAiInputScreenOpenAutomaticallyEnabled
 
             _inputScreenBottomBarEnabled.value = showInputScreen && duckAiInputScreenBottomBarEnabled
+
+            _showInputScreenOnSystemSearchLaunch.value = showInputScreen && showInputScreenOnSystemSearchLaunchEnabled
 
             val showInBrowserMenu =
                 duckChatFeatureRepository.shouldShowInBrowserMenu() &&
