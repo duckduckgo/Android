@@ -22,6 +22,22 @@
     android:padding="16dp">
 
     <com.duckduckgo.common.ui.view.text.DaxTextInput
+        android:id="@+id/retentionAtb"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="16dp"
+        android:hint="App Retention Atb"
+        app:endIcon="@drawable/ic_copy_24" />
+
+    <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
+        android:id="@+id/retentionAtbSave"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="16dp"
+        android:layout_gravity="end"
+        android:text="Save" />
+
+    <com.duckduckgo.common.ui.view.text.DaxTextInput
         android:id="@+id/searchAtb"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

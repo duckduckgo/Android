@@ -32,6 +32,7 @@ dependencies {
     implementation project(path: ':di')
     implementation project(path: ':app-build-config-api')
     implementation project(path: ':statistics-api')
+    implementation project(path: ':browser-api')
 
     implementation KotlinX.coroutines.core
     implementation KotlinX.coroutines.android
