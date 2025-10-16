@@ -22,6 +22,8 @@ import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.autoconsent.api.AutoconsentCallback
 import com.duckduckgo.autoconsent.impl.MessageHandlerPlugin
 import com.duckduckgo.autoconsent.impl.adapters.JSONObjectAdapter
+import com.duckduckgo.autoconsent.impl.pixels.AutoConsentPixel
+import com.duckduckgo.autoconsent.impl.pixels.AutoconsentPixelManager
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesMultibinding
@@ -36,6 +38,7 @@ import javax.inject.Inject
 class OptOutAndAutoconsentDoneMessageHandlerPlugin @Inject constructor(
     @AppCoroutineScope val appCoroutineScope: CoroutineScope,
     private val dispatcherProvider: DispatcherProvider,
+    private val pixelManager: AutoconsentPixelManager,
 ) : MessageHandlerPlugin {
 
     private val moshi = Moshi.Builder().add(JSONObjectAdapter()).build()
@@ -58,6 +61,7 @@ class OptOutAndAutoconsentDoneMessageHandlerPlugin @Inject constructor(
             val message: OptOutResultMessage = parseOptOutMessage(jsonString) ?: return
 
             if (!message.result) {
+                pixelManager.fireDailyPixel(AutoConsentPixel.AUTOCONSENT_ERROR_OPTOUT_DAILY)
                 autoconsentCallback.onResultReceived(consentManaged = true, optOutFailed = true, selfTestFailed = false, isCosmetic = null)
             } else if (message.scheduleSelfTest) {
                 selfTest = true
