@@ -193,6 +193,7 @@ import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Unique
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelValues.DAX_INITIAL_CTA
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelValues.DAX_SERP_CTA
 import com.duckduckgo.app.surrogates.SurrogateResponse
+import com.duckduckgo.app.systemsearch.DeviceAppLookup
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.tabs.store.TabStatsBucketing
@@ -618,6 +619,8 @@ class BrowserTabViewModelTest {
     private val fakeMessagingPlugins = FakeWebMessagingPluginPoint()
     private val fakePostMessageWrapperPlugins = FakePostMessageWrapperPluginPoint()
 
+    private val mockDeviceAppLookup: DeviceAppLookup = mock()
+
     @Before
     fun before() =
         runTest {
@@ -648,6 +651,9 @@ class BrowserTabViewModelTest {
                     mockHistory,
                     DefaultDispatcherProvider(),
                     mockPixel,
+                    mockDeviceAppLookup,
+                    coroutineRule.testScope,
+                    AutoComplete.Config(),
                 )
             val fireproofWebsiteRepositoryImpl =
                 FireproofWebsiteRepositoryImpl(

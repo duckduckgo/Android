@@ -27,6 +27,8 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.ViewTreeObserver
 import android.widget.FrameLayout
+import android.widget.Toast
+import android.widget.Toast.LENGTH_SHORT
 import androidx.activity.OnBackPressedCallback
 import androidx.core.view.isVisible
 import androidx.lifecycle.ViewModelProvider
@@ -346,6 +348,22 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
             is Command.TabSwitcherRequested -> {
                 requireActivity().setResult(InputScreenActivityResultCodes.TAB_SWITCHER_REQUESTED)
                 exitInputScreen()
+            }
+
+            is Command.LaunchDeviceApplication -> {
+                try {
+                    startActivity(command.deviceAppSuggestion.launchIntent)
+                    // This command is only available when launched from widgets or system search,
+                    // and since we're moving to a new task (in another app),
+                    // ensure that our task is finished so that it gets removed from recents.
+                    requireActivity().finishAffinity()
+                } catch (e: Exception) {
+                    viewModel.appNotFound(command.deviceAppSuggestion)
+                }
+            }
+
+            is Command.ShowAppNotFoundMessage -> {
+                Toast.makeText(requireContext(), R.string.autocompleteDeviceAppNotFound, LENGTH_SHORT).show()
             }
         }
     }

@@ -16,6 +16,8 @@
 
 package com.duckduckgo.duckchat.impl.inputscreen.ui.command
 
+import com.duckduckgo.browser.api.autocomplete.AutoComplete
+
 sealed class Command {
     data class SwitchToTab(
         val tabId: String,
@@ -59,4 +61,8 @@ sealed class Command {
     data object TabSwitcherRequested : Command()
 
     data object MenuRequested : Command()
+
+    data class LaunchDeviceApplication(val deviceAppSuggestion: AutoComplete.AutoCompleteSuggestion.AutoCompleteDeviceAppSuggestion) : Command()
+
+    data class ShowAppNotFoundMessage(val shortName: String) : Command()
 }

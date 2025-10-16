@@ -1,5 +1,6 @@
 package com.duckduckgo.duckchat.impl.ui.inputscreen
 
+import android.content.Intent
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import app.cash.turbine.test
@@ -8,10 +9,12 @@ import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Count
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
 import com.duckduckgo.browser.api.autocomplete.AutoComplete
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteResult
+import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion.AutoCompleteDefaultSuggestion
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion.AutoCompleteHistoryRelatedSuggestion.AutoCompleteHistorySuggestion
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion.AutoCompleteHistoryRelatedSuggestion.AutoCompleteInAppMessageSuggestion
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion.AutoCompleteSearchSuggestion
+import com.duckduckgo.browser.api.autocomplete.AutoCompleteFactory
 import com.duckduckgo.browser.api.autocomplete.AutoCompleteSettings
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.extensions.toBinaryString
@@ -69,6 +72,7 @@ class InputScreenViewModelTest {
     var instantTaskExecutorRule = InstantTaskExecutorRule()
 
     private val autoComplete: AutoComplete = mock()
+    private val autoCompleteFactory: AutoCompleteFactory = mock()
     private val history: NavigationHistory = mock()
     private val voiceSearchAvailability: VoiceSearchAvailability = mock()
     private val autoCompleteSettings: AutoCompleteSettings = mock()
@@ -83,6 +87,7 @@ class InputScreenViewModelTest {
     fun setup() =
         runTest {
             whenever(autoCompleteSettings.autoCompleteSuggestionsEnabled).thenReturn(true)
+            whenever(autoCompleteFactory.create(any())).thenReturn(autoComplete)
             whenever(autoComplete.autoComplete(any())).thenReturn(
                 flowOf(AutoCompleteResult("", listOf(AutoCompleteDefaultSuggestion("suggestion")))),
             )
@@ -94,7 +99,7 @@ class InputScreenViewModelTest {
     private fun createViewModel(currentOmnibarText: String = ""): InputScreenViewModel =
         InputScreenViewModel(
             currentOmnibarText = currentOmnibarText,
-            autoComplete = autoComplete,
+            autoCompleteFactory = autoCompleteFactory,
             dispatchers = coroutineRule.testDispatcherProvider,
             history = history,
             appCoroutineScope = coroutineRule.testScope,
@@ -1881,5 +1886,88 @@ class InputScreenViewModelTest {
             // Clear text
             viewModel.onSearchInputTextChanged("")
             assertTrue(viewModel.visibilityState.value.mainButtonsVisible)
+        }
+
+    @Test
+    fun `when shouldShowInstalledApps is true then factory creates autoComplete with showInstalledApps config enabled`() =
+        runTest {
+            val expectedConfig = AutoComplete.Config(showInstalledApps = true)
+            whenever(inputScreenConfigResolver.shouldShowInstalledApps()).thenReturn(true)
+            val viewModel = createViewModel("test query")
+
+            verify(autoCompleteFactory).create(expectedConfig)
+
+            advanceTimeBy(301)
+            verify(autoComplete).autoComplete("test query")
+        }
+
+    @Test
+    fun `when shouldShowInstalledApps is false then factory creates autoComplete with showInstalledApps config disabled`() =
+        runTest {
+            val expectedConfig = AutoComplete.Config(showInstalledApps = false)
+            whenever(inputScreenConfigResolver.shouldShowInstalledApps()).thenReturn(false)
+            val viewModel = createViewModel("test query")
+
+            verify(autoCompleteFactory).create(expectedConfig)
+
+            advanceTimeBy(301)
+            verify(autoComplete).autoComplete("test query")
+        }
+
+    @Test
+    fun `when userSelectedAutocomplete with device app suggestion then LaunchDeviceApplication command is sent`() =
+        runTest {
+            val viewModel = createViewModel()
+            val deviceAppSuggestion = AutoCompleteSuggestion.AutoCompleteDeviceAppSuggestion(
+                phrase = "app",
+                shortName = "First App",
+                packageName = "com.example.first",
+                launchIntent = Intent(),
+            )
+
+            viewModel.userSelectedAutocomplete(deviceAppSuggestion)
+
+            advanceUntilIdle()
+
+            assertEquals(Command.LaunchDeviceApplication(deviceAppSuggestion), viewModel.command.value)
+        }
+
+    @Test
+    fun `when appNotFound is called then ShowAppNotFoundMessage command is sent and refreshAppList is called`() =
+        runTest {
+            val viewModel = createViewModel()
+            val deviceAppSuggestion = AutoCompleteSuggestion.AutoCompleteDeviceAppSuggestion(
+                phrase = "app",
+                shortName = "First App",
+                packageName = "com.example.first",
+                launchIntent = Intent(),
+            )
+
+            viewModel.appNotFound(deviceAppSuggestion)
+
+            assertEquals(Command.ShowAppNotFoundMessage("First App"), viewModel.command.value)
+        }
+
+    @Test
+    fun `when userSelectedAutocomplete with device app then fireAutocompletePixel is called with experimentalInputScreen true`() =
+        runTest {
+            val deviceAppSuggestion = AutoCompleteSuggestion.AutoCompleteDeviceAppSuggestion(
+                phrase = "app",
+                shortName = "First App",
+                packageName = "com.example.first",
+                launchIntent = Intent(),
+            )
+            val suggestions = listOf(AutoCompleteDefaultSuggestion("suggestion")) + deviceAppSuggestion
+            val expectedResult = AutoCompleteResult("test", suggestions)
+            whenever(autoComplete.autoComplete("test")).thenReturn(flowOf(expectedResult))
+            whenever(inputScreenConfigResolver.shouldShowInstalledApps()).thenReturn(true)
+
+            val viewModel = createViewModel("test")
+
+            viewModel.userSelectedAutocomplete(deviceAppSuggestion)
+
+            advanceUntilIdle()
+
+            verify(autoComplete).fireAutocompletePixel(suggestions, deviceAppSuggestion, experimentalInputScreen = true)
         }
 }

@@ -66,6 +66,7 @@
 
     <!-- AutoComplete -->
     <string name="autocompleteDuckAiPrompt">Küsi Duck.ai käest</string>
+    <string name="autocompleteDeviceAppNotFound">Rakendust ei leitud</string>
 
     <!-- New Address Bar Option Bottom Sheet Dialog -->
     <string name="newAddressBarOptionBottomSheetDialogSearchText">Otsi või sisesta aadress</string>

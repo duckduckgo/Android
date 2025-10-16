@@ -16,6 +16,7 @@
 
 package com.duckduckgo.browser.ui.autocomplete
 
+import android.content.pm.PackageManager.NameNotFoundException
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -31,6 +32,7 @@ import com.duckduckgo.browser.ui.R
 import com.duckduckgo.browser.ui.autocomplete.AutoCompleteViewHolder.InAppMessageViewHolder
 import com.duckduckgo.browser.ui.databinding.ItemAutocompleteBookmarkSuggestionBinding
 import com.duckduckgo.browser.ui.databinding.ItemAutocompleteDefaultBinding
+import com.duckduckgo.browser.ui.databinding.ItemAutocompleteDeviceAppSuggestionBinding
 import com.duckduckgo.browser.ui.databinding.ItemAutocompleteDividerBinding
 import com.duckduckgo.browser.ui.databinding.ItemAutocompleteDuckaiSuggestionBinding
 import com.duckduckgo.browser.ui.databinding.ItemAutocompleteHistorySearchSuggestionBinding
@@ -290,9 +292,33 @@ class DuckAIPromptSuggestionViewHolderFactory : SuggestionViewHolderFactory {
         openSettingsClickListener: () -> Unit,
         longPressClickListener: (AutoCompleteSuggestion) -> Unit,
     ) {
-        val bookmarkSuggestionViewHolder = holder as AutoCompleteViewHolder.DuckAIPromptViewHolder
-        bookmarkSuggestionViewHolder.bind(
+        val viewHolder = holder as AutoCompleteViewHolder.DuckAIPromptViewHolder
+        viewHolder.bind(
             suggestion as AutoCompleteSuggestion.AutoCompleteDuckAIPrompt,
+            immediateSearchClickListener,
+        )
+    }
+}
+
+class DeviceAppSuggestionViewHolderFactory : SuggestionViewHolderFactory {
+    override fun onCreateViewHolder(parent: ViewGroup): AutoCompleteViewHolder {
+        val inflater = LayoutInflater.from(parent.context)
+        val binding = ItemAutocompleteDeviceAppSuggestionBinding.inflate(inflater, parent, false)
+        return AutoCompleteViewHolder.DeviceAppViewHolder(binding)
+    }
+
+    override fun onBindViewHolder(
+        holder: AutoCompleteViewHolder,
+        suggestion: AutoCompleteSuggestion,
+        immediateSearchClickListener: (AutoCompleteSuggestion) -> Unit,
+        editableSearchClickListener: (AutoCompleteSuggestion) -> Unit,
+        deleteClickListener: (AutoCompleteSuggestion) -> Unit,
+        openSettingsClickListener: () -> Unit,
+        longPressClickListener: (AutoCompleteSuggestion) -> Unit,
+    ) {
+        val viewHolder = holder as AutoCompleteViewHolder.DeviceAppViewHolder
+        viewHolder.bind(
+            suggestion as AutoCompleteSuggestion.AutoCompleteDeviceAppSuggestion,
             immediateSearchClickListener,
         )
     }
@@ -445,6 +471,24 @@ sealed class AutoCompleteViewHolder(
         ) = with(binding) {
             title.text = item.phrase
 
+            root.setOnClickListener { itemClickListener(item) }
+        }
+    }
+
+    class DeviceAppViewHolder(
+        val binding: ItemAutocompleteDeviceAppSuggestionBinding,
+    ) : AutoCompleteViewHolder(binding.root) {
+        fun bind(
+            item: AutoCompleteSuggestion.AutoCompleteDeviceAppSuggestion,
+            itemClickListener: (AutoCompleteSuggestion) -> Unit,
+        ) = with(binding) {
+            binding.title.text = item.shortName
+            try {
+                val drawable = item.retrieveIcon(binding.icon.context.packageManager)
+                binding.icon.setImageDrawable(drawable)
+            } catch (e: NameNotFoundException) {
+                binding.icon.setImageDrawable(null)
+            }
             root.setOnClickListener { itemClickListener(item) }
         }
     }

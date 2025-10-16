@@ -66,6 +66,7 @@
 
     <!-- AutoComplete -->
     <string name="autocompleteDuckAiPrompt">Duck.ai kérdezése</string>
+    <string name="autocompleteDeviceAppNotFound">Az alkalmazás nem található</string>
 
     <!-- New Address Bar Option Bottom Sheet Dialog -->
     <string name="newAddressBarOptionBottomSheetDialogSearchText">Keresés vagy cím megadása</string>

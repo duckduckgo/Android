@@ -22,20 +22,26 @@ import com.duckduckgo.app.systemsearch.DeviceAppLookupTest.AppName.DDG_MOVIES
 import com.duckduckgo.app.systemsearch.DeviceAppLookupTest.AppName.DDG_MUSIC
 import com.duckduckgo.app.systemsearch.DeviceAppLookupTest.AppName.FILES
 import com.duckduckgo.app.systemsearch.DeviceAppLookupTest.AppName.LIVE_DDG
+import com.duckduckgo.common.test.CoroutineTestRule
+import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
+import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 
 class DeviceAppLookupTest {
 
+    @get:Rule
+    val coroutineTestRule: CoroutineTestRule = CoroutineTestRule()
+
     private val mockAppProvider: DeviceAppListProvider = mock()
 
-    private val testee = InstalledDeviceAppLookup(mockAppProvider)
+    private val testee = InstalledDeviceAppLookup(mockAppProvider, coroutineTestRule.testDispatcherProvider)
 
     @Test
-    fun whenQueryMatchesWordInShortNameThenMatchesAreReturned() {
+    fun whenQueryMatchesWordInShortNameThenMatchesAreReturned() = runTest {
         whenever(mockAppProvider.get()).thenReturn(apps)
         val result = testee.query("DDG")
         assertEquals(3, result.size)
@@ -45,7 +51,7 @@ class DeviceAppLookupTest {
     }
 
     @Test
-    fun whenQueryMatchesWordPrefixInShortNameThenMatchesAreReturned() {
+    fun whenQueryMatchesWordPrefixInShortNameThenMatchesAreReturned() = runTest {
         whenever(mockAppProvider.get()).thenReturn(apps)
         val result = testee.query("DDG")
         assertEquals(3, result.size)
@@ -55,7 +61,7 @@ class DeviceAppLookupTest {
     }
 
     @Test
-    fun whenQueryMatchesPastShortNameWordBoundaryToNextPrefixThenMatchesAreReturned() {
+    fun whenQueryMatchesPastShortNameWordBoundaryToNextPrefixThenMatchesAreReturned() = runTest {
         whenever(mockAppProvider.get()).thenReturn(apps)
         val result = testee.query("DDG M")
         assertEquals(2, result.size)
@@ -64,7 +70,7 @@ class DeviceAppLookupTest {
     }
 
     @Test
-    fun whenQueryMatchesWordPrefixInShortNameWithDifferentCaseThenMatchesAreReturned() {
+    fun whenQueryMatchesWordPrefixInShortNameWithDifferentCaseThenMatchesAreReturned() = runTest {
         whenever(mockAppProvider.get()).thenReturn(apps)
         val result = testee.query("ddg")
         assertEquals(3, result.size)
@@ -74,35 +80,35 @@ class DeviceAppLookupTest {
     }
 
     @Test
-    fun whenQueryMatchesMiddleOrSuffixOfAppNameWordThenNoAppsReturned() {
+    fun whenQueryMatchesMiddleOrSuffixOfAppNameWordThenNoAppsReturned() = runTest {
         whenever(mockAppProvider.get()).thenReturn(apps)
         val result = testee.query("DG")
         assertTrue(result.isEmpty())
     }
 
     @Test
-    fun whenQueryDoesNotMatchAnyPartOfAppNameThenNoAppsReturned() {
+    fun whenQueryDoesNotMatchAnyPartOfAppNameThenNoAppsReturned() = runTest {
         whenever(mockAppProvider.get()).thenReturn(apps)
         val result = testee.query("nonmatching")
         assertTrue(result.isEmpty())
     }
 
     @Test
-    fun whenQueryIsEmptyThenNoAppsReturned() {
+    fun whenQueryIsEmptyThenNoAppsReturned() = runTest {
         whenever(mockAppProvider.get()).thenReturn(apps)
         val result = testee.query("")
         assertTrue(result.isEmpty())
     }
 
     @Test
-    fun whenAppsListIsEmptyThenNoAppsReturned() {
+    fun whenAppsListIsEmptyThenNoAppsReturned() = runTest {
         whenever(mockAppProvider.get()).thenReturn(noApps)
         val result = testee.query("DDG")
         assertTrue(result.isEmpty())
     }
 
     @Test
-    fun whenQueryMatchesAppNameWithSpecialRegexCharactersThenAppReturnedWithoutCrashing() {
+    fun whenQueryMatchesAppNameWithSpecialRegexCharactersThenAppReturnedWithoutCrashing() = runTest {
         whenever(mockAppProvider.get()).thenReturn(apps)
         val result = testee.query(APP_WITH_RESERVED_CHARS)
         assertEquals(1, result.size)
