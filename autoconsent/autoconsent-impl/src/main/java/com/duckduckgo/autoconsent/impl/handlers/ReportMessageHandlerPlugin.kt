@@ -17,21 +17,30 @@
 package com.duckduckgo.autoconsent.impl.handlers
 
 import android.webkit.WebView
+import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.autoconsent.api.AutoconsentCallback
 import com.duckduckgo.autoconsent.impl.MessageHandlerPlugin
 import com.duckduckgo.autoconsent.impl.adapters.JSONObjectAdapter
 import com.duckduckgo.autoconsent.impl.pixels.AutoConsentPixel
 import com.duckduckgo.autoconsent.impl.pixels.AutoconsentPixelManager
+import com.duckduckgo.autoconsent.impl.remoteconfig.AutoconsentFeature
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesMultibinding
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import logcat.logcat
 import javax.inject.Inject
 
 @ContributesMultibinding(AppScope::class)
 class ReportMessageHandlerPlugin @Inject constructor(
     private val autoconsentPixelManager: AutoconsentPixelManager,
+    private val autoconsentFeature: AutoconsentFeature,
+    private val dispatcherProvider: DispatcherProvider,
+    @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
 ) : MessageHandlerPlugin {
 
     private val moshi = Moshi.Builder().add(JSONObjectAdapter()).build()
@@ -39,23 +48,30 @@ class ReportMessageHandlerPlugin @Inject constructor(
     override fun process(messageType: String, jsonString: String, webView: WebView, autoconsentCallback: AutoconsentCallback) {
         if (supportedTypes.contains(messageType)) {
             try {
-                val message: ReportMessage = parseMessage(jsonString) ?: return
+                appCoroutineScope.launch(dispatcherProvider.main()) {
+                    val message: ReportMessage = parseMessage(jsonString) ?: return@launch
 
-                val heuristicMatch = message.state.heuristicPatterns.isNotEmpty() || message.state.heuristicSnippets.isNotEmpty()
-                val hasDetectedPopups = message.state.detectedPopups.isNotEmpty()
+                    val isEnabled = withContext(dispatcherProvider.io()) {
+                        autoconsentFeature.cpmPixels().isEnabled()
+                    }
+                    if (!isEnabled) return@launch
 
-                if (heuristicMatch && !autoconsentPixelManager.isDetectedByPatternsProcessed(message.instanceId)) {
-                    autoconsentPixelManager.markDetectedByPatternsProcessed(message.instanceId)
-                    autoconsentPixelManager.fireDailyPixel(AutoConsentPixel.AUTOCONSENT_DETECTED_BY_PATTERNS_DAILY)
-                }
+                    val heuristicMatch = message.state.heuristicPatterns.isNotEmpty() || message.state.heuristicSnippets.isNotEmpty()
+                    val hasDetectedPopups = message.state.detectedPopups.isNotEmpty()
 
-                if (hasDetectedPopups) {
-                    if (heuristicMatch && !autoconsentPixelManager.isDetectedByBothProcessed(message.instanceId)) {
-                        autoconsentPixelManager.markDetectedByBothProcessed(message.instanceId)
-                        autoconsentPixelManager.fireDailyPixel(AutoConsentPixel.AUTOCONSENT_DETECTED_BY_BOTH_DAILY)
-                    } else if (!heuristicMatch && !autoconsentPixelManager.isDetectedOnlyRulesProcessed(message.instanceId)) {
-                        autoconsentPixelManager.markDetectedOnlyRulesProcessed(message.instanceId)
-                        autoconsentPixelManager.fireDailyPixel(AutoConsentPixel.AUTOCONSENT_DETECTED_ONLY_RULES_DAILY)
+                    if (heuristicMatch && !autoconsentPixelManager.isDetectedByPatternsProcessed(message.instanceId)) {
+                        autoconsentPixelManager.markDetectedByPatternsProcessed(message.instanceId)
+                        autoconsentPixelManager.fireDailyPixel(AutoConsentPixel.AUTOCONSENT_DETECTED_BY_PATTERNS_DAILY)
+                    }
+
+                    if (hasDetectedPopups) {
+                        if (heuristicMatch && !autoconsentPixelManager.isDetectedByBothProcessed(message.instanceId)) {
+                            autoconsentPixelManager.markDetectedByBothProcessed(message.instanceId)
+                            autoconsentPixelManager.fireDailyPixel(AutoConsentPixel.AUTOCONSENT_DETECTED_BY_BOTH_DAILY)
+                        } else if (!heuristicMatch && !autoconsentPixelManager.isDetectedOnlyRulesProcessed(message.instanceId)) {
+                            autoconsentPixelManager.markDetectedOnlyRulesProcessed(message.instanceId)
+                            autoconsentPixelManager.fireDailyPixel(AutoConsentPixel.AUTOCONSENT_DETECTED_ONLY_RULES_DAILY)
+                        }
                     }
                 }
             } catch (e: Exception) {
