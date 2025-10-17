@@ -1,0 +1,80 @@
+name: Design System Composable PR Tests
+
+on:
+  pull_request:
+    paths:
+      - 'design-system/src/main/java/com/duckduckgo/common/ui/compose/**/*.kt'
+    types: [opened, synchronize, reopened]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  maestro_test:
+    runs-on: ubuntu-latest
+    name: Run Design System Maestro Tests
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Set up JDK version
+        uses: actions/setup-java@v4
+        with:
+          java-version-file: .github/.java-version
+          distribution: 'adopt'
+
+      - name: Create folder
+        run: mkdir apk
+
+      - name: Decode keys
+        uses: davidSchuppa/base64Secret-toFile-action@v2
+        with:
+          secret: ${{ secrets.FAKE_RELEASE_PROPERTIES }}
+          fileName: ddg_android_build.properties
+          destination-path: $HOME/jenkins_static/com.duckduckgo.mobile.android/
+
+      - name: Decode key file
+        uses: davidSchuppa/base64Secret-toFile-action@v2
+        with:
+          secret: ${{ secrets.FAKE_RELEASE_KEY }}
+          fileName: android
+          destination-path: $HOME/jenkins_static/com.duckduckgo.mobile.android/
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v3
+
+      - name: Assemble internal release APK
+        run: ./gradlew assembleInternalRelease -Pforce-default-variant -Pskip-onboarding
+
+      - name: Move APK to new folder
+        if: always()
+        run: find . -name "*internal-release*.apk" -exec mv '{}' apk/internal.apk \;
+
+      - name: Run Design System Maestro Tests
+        uses: mobile-dev-inc/action-maestro-cloud@v1.9.8
+        timeout-minutes: 30
+        with:
+          api-key: ${{ secrets.ROBIN_API_KEY }}
+          project-id: ${{ vars.ROBIN_ANDROID_PROJECT_ID }}
+          name: design_system_pr_${{ github.event.pull_request.number }}_${{ github.sha }}
+          timeout: 15
+          app-file: apk/internal.apk
+          android-api-level: 30
+          workspace: .maestro
+          include-tags: androidDesignSystemTest
+
+      - name: Comment on PR
+        if: failure()
+        uses: actions/github-script@v8
+        with:
+          script: |
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: '❌ Design System Maestro tests failed. Please check the [workflow run](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}) for details.'
+            })
