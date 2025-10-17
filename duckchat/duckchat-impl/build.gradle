@@ -40,6 +40,7 @@ dependencies {
     implementation project(':browser-api')
     implementation project(':history-api')
     implementation project(':saved-sites-api')
+    implementation project(':remote-messaging-api')
 
     anvil project(path: ':anvil-compiler')
     implementation project(path: ':anvil-annotations')
