@@ -68,7 +68,7 @@ class RealAutoconsentPixelManager @Inject constructor(
                 summaryJob = appCoroutineScope.launch(dispatcherProvider.main()) {
                     delay(2.minutes)
                     val summaryData = pixelCounter.mapValues { it.value.toString() }
-                    pixel.fire(AutoConsentPixel.AUTOCONSENT_SUMMARY, parameters = summaryData)
+                    pixel.enqueueFire(AutoConsentPixel.AUTOCONSENT_SUMMARY, parameters = summaryData)
                     clearAllCaches()
                 }
             }

@@ -17,7 +17,6 @@
 package com.duckduckgo.autoconsent.impl.pixels
 
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Count
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
 import com.duckduckgo.autoconsent.impl.remoteconfig.AutoconsentFeature
 import com.duckduckgo.common.test.CoroutineTestRule
@@ -160,13 +159,12 @@ class AutoconsentPixelManagerTest {
         advanceTimeBy(120000L)
         advanceUntilIdle()
 
-        verify(mockPixel).fire(
+        verify(mockPixel).enqueueFire(
             eq(AutoConsentPixel.AUTOCONSENT_SUMMARY),
             argThat { parameters ->
                 parameters[pixel1.pixelName] == "2" && parameters[pixel2.pixelName] == "1"
             },
             eq(emptyMap()),
-            eq(Count),
         )
     }
 
@@ -183,17 +181,15 @@ class AutoconsentPixelManagerTest {
         advanceTimeBy(120000L)
         advanceUntilIdle()
 
-        verify(mockPixel).fire(
+        verify(mockPixel).enqueueFire(
             eq(AutoConsentPixel.AUTOCONSENT_SUMMARY),
             argThat { parameters -> parameters[pixel1.pixelName] == "1" },
             eq(emptyMap()),
-            eq(Count),
         )
-        verify(mockPixel).fire(
+        verify(mockPixel).enqueueFire(
             eq(AutoConsentPixel.AUTOCONSENT_SUMMARY),
             argThat { parameters -> parameters[pixel2.pixelName] == "1" },
             eq(emptyMap()),
-            eq(Count),
         )
     }
 }
