@@ -22,14 +22,10 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
-import android.widget.LinearLayout
 import androidx.recyclerview.widget.RecyclerView
 import com.duckduckgo.common.ui.view.MessageCta
 import com.duckduckgo.common.ui.view.MessageCta.Message
 import com.duckduckgo.common.ui.view.MessageCta.MessageType.REMOTE_PROMO_MESSAGE
-import com.duckduckgo.common.ui.view.button.DaxButtonSecondary
-import com.duckduckgo.common.ui.view.expand.DaxExpandableMenuItem
-import com.duckduckgo.common.ui.view.expand.daxExpandableMenuItem
 import com.duckduckgo.common.ui.view.listitem.OneLineListItem
 import com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
 import com.duckduckgo.common.ui.view.listitem.TwoLineListItem
@@ -351,44 +347,6 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
         }
     }
 
-    class ExpandableComponentViewHolder(parent: ViewGroup) : ComponentViewHolder(inflate(parent, R.layout.component_expandable_layout)) {
-        override fun bind(component: Component) {
-            view.findViewById<DaxExpandableMenuItem>(R.id.expandable1).apply {
-                setPrimaryButtonClickListener {
-                    Snackbar.make(this, component.name, Snackbar.LENGTH_SHORT).show()
-                }
-            }
-            view.findViewById<DaxExpandableMenuItem>(R.id.expandable3).customExpandedLayout?.apply {
-                findViewById<DaxButtonSecondary>(R.id.daxExpandableMenuItemSecondaryButton).apply {
-                    setOnClickListener {
-                        Snackbar.make(this, component.name, Snackbar.LENGTH_SHORT).show()
-                    }
-                }
-            }
-            view.findViewById<DaxExpandableMenuItem>(R.id.expandable4).apply {
-                LayoutInflater.from(context).inflate(R.layout.view_expandable_menu_item_expanded_layout_demo, this, false).apply {
-                    findViewById<DaxButtonSecondary>(R.id.daxExpandableMenuItemSecondaryButton).apply {
-                        setOnClickListener {
-                            Snackbar.make(this, component.name, Snackbar.LENGTH_SHORT).show()
-                        }
-                    }
-                    setExpandableMenuCustomLayout(this)
-                }
-            }
-
-            view.findViewById<LinearLayout>(R.id.expandableItemRootLayout).apply {
-                val expandableMenuItem = context.daxExpandableMenuItem {
-                    setPrimaryText("This is a Menu Item")
-                    setSecondaryText("Created using DSL")
-                    setPrimaryButtonClickListener {
-                        Snackbar.make(rootView, component.name, Snackbar.LENGTH_SHORT).show()
-                    }.build()
-                }
-                addView(expandableMenuItem)
-            }
-        }
-    }
-
     class SettingsListItemComponentViewHolder(parent: ViewGroup) :
         ComponentViewHolder(inflate(parent, R.layout.component_settings))
 
@@ -415,7 +373,6 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
                 Component.TWO_LINE_LIST_ITEM -> TwoLineItemComponentViewHolder(parent)
                 Component.SECTION_DIVIDER -> DividerComponentViewHolder(parent)
                 Component.CARD -> CardComponentViewHolder(parent)
-                Component.EXPANDABLE_LAYOUT -> ExpandableComponentViewHolder(parent)
                 Component.SETTINGS_LIST_ITEM -> SettingsListItemComponentViewHolder(parent)
                 else -> {
                     TODO()
