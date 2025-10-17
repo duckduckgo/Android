@@ -38,7 +38,7 @@ import javax.inject.Inject
 class OptOutAndAutoconsentDoneMessageHandlerPlugin @Inject constructor(
     @AppCoroutineScope val appCoroutineScope: CoroutineScope,
     private val dispatcherProvider: DispatcherProvider,
-    private val pixelManager: AutoconsentPixelManager,
+    private val autoconsentPixelManager: AutoconsentPixelManager,
 ) : MessageHandlerPlugin {
 
     private val moshi = Moshi.Builder().add(JSONObjectAdapter()).build()
@@ -61,7 +61,7 @@ class OptOutAndAutoconsentDoneMessageHandlerPlugin @Inject constructor(
             val message: OptOutResultMessage = parseOptOutMessage(jsonString) ?: return
 
             if (!message.result) {
-                pixelManager.fireDailyPixel(AutoConsentPixel.AUTOCONSENT_ERROR_OPTOUT_DAILY)
+                autoconsentPixelManager.fireDailyPixel(AutoConsentPixel.AUTOCONSENT_ERROR_OPTOUT_DAILY)
                 autoconsentCallback.onResultReceived(consentManaged = true, optOutFailed = true, selfTestFailed = false, isCosmetic = null)
             } else if (message.scheduleSelfTest) {
                 selfTest = true
@@ -76,9 +76,9 @@ class OptOutAndAutoconsentDoneMessageHandlerPlugin @Inject constructor(
             val message: AutoconsentDoneMessage = parseAutoconsentDoneMessage(jsonString) ?: return
 
             if (message.isCosmetic) {
-                pixelManager.fireDailyPixel(AutoConsentPixel.AUTOCONSENT_DONE_COSMETIC_DAILY)
+                autoconsentPixelManager.fireDailyPixel(AutoConsentPixel.AUTOCONSENT_DONE_COSMETIC_DAILY)
             } else {
-                pixelManager.fireDailyPixel(AutoConsentPixel.AUTOCONSENT_DONE_DAILY)
+                autoconsentPixelManager.fireDailyPixel(AutoConsentPixel.AUTOCONSENT_DONE_DAILY)
             }
 
             message.url.toUri().host ?: return
