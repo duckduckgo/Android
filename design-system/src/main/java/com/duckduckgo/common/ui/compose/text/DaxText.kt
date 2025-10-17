@@ -61,6 +61,14 @@ fun DaxText(
 
 @PreviewLightDark
 @Composable
+private fun DaxTextTitlePreviewTest() {
+    DaxTextPreviewBox {
+        DaxText(text = "Title Text", style = DuckDuckGoTheme.typography.title)
+    }
+}
+
+@PreviewLightDark
+@Composable
 private fun DaxTextTitlePreview() {
     DaxTextPreviewBox {
         DaxText(text = "Title Text", style = DuckDuckGoTheme.typography.title)
