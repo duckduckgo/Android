@@ -65,12 +65,14 @@
             app:layout_constraintTop_toBottomOf="@+id/radioListDialogMessage"/>
     </ScrollView>
 
-    <LinearLayout
+    <com.google.android.flexbox.FlexboxLayout
         android:id="@+id/radioListAlertDialogButtonContainer"
         android:layout_width="0dp"
-        android:gravity="end"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
+        app:flexDirection="row"
+        app:flexWrap="wrap_reverse"
+        app:justifyContent="flex_end"
+        app:alignItems="center"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"/>

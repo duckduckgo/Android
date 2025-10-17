@@ -191,6 +191,7 @@ class RadioListAlertDialogBuilder(val context: Context) : DaxAlertDialog {
         binding: DialogSingleChoiceAlertBinding,
         dialog: AlertDialog,
     ) {
+        val positiveButtonView = positiveButtonType.getView(context)
         val negativeButton = negativeButtonType
         if (negativeButton != null) {
             val negativeButtonView = negativeButton.getView(context)
@@ -199,15 +200,14 @@ class RadioListAlertDialogBuilder(val context: Context) : DaxAlertDialog {
             binding.radioListAlertDialogButtonContainer.addView(negativeButtonView)
             val layoutParams = negativeButtonView.layoutParams as ViewGroup.MarginLayoutParams
             layoutParams.setMargins(
-                layoutParams.leftMargin,
-                layoutParams.topMargin,
                 context.resources.getDimensionPixelSize(R.dimen.keyline_2),
+                layoutParams.topMargin,
+                layoutParams.rightMargin,
                 layoutParams.bottomMargin,
             )
-            negativeButtonView.layoutParams = layoutParams
+            positiveButtonView.layoutParams = layoutParams
         }
 
-        val positiveButtonView = positiveButtonType.getView(context)
         positiveButtonView.isEnabled = selectedOption != null
         binding.radioListAlertDialogButtonContainer.addView(positiveButtonView)
         setButtonListener(positiveButtonView, positiveButtonText, dialog) {

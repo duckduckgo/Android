@@ -55,20 +55,27 @@
     <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
         android:id="@+id/customDialogPositiveButton"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/keyline_4"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/customDialogContent" />
+        android:layout_height="wrap_content" />
 
     <com.duckduckgo.common.ui.view.button.DaxButtonGhost
         android:id="@+id/customDialogNegativeButton"
         android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+    <androidx.constraintlayout.helper.widget.Flow
+        android:id="@+id/dialogButtonFlow"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/keyline_4"
-        android:layout_marginEnd="@dimen/keyline_2"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/customDialogPositiveButton"
-        app:layout_constraintTop_toBottomOf="@+id/customDialogContent" />
+        app:constraint_referenced_ids="customDialogNegativeButton,customDialogPositiveButton"
+        app:flow_wrapMode="chain"
+        app:flow_horizontalStyle="packed"
+        app:flow_horizontalBias="1.0"
+        app:flow_horizontalGap="@dimen/keyline_2"
+        app:flow_verticalGap="@dimen/keyline_2"
+        app:layout_constraintTop_toBottomOf="@+id/customDialogContent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

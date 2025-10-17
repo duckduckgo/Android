@@ -243,6 +243,7 @@ class TextAlertDialogBuilder(val context: Context) : DaxAlertDialog {
         dialog: AlertDialog,
     ) {
         // add buttons
+        val positiveButtonView = positiveButtonType.getView(context)
         val negativeButton = negativeButtonType
         if (negativeButton != null) {
             val negativeButtonView = negativeButton.getView(context)
@@ -251,15 +252,14 @@ class TextAlertDialogBuilder(val context: Context) : DaxAlertDialog {
             binding.textAlertDialogButtonContainer.addView(negativeButtonView)
             val layoutParams = negativeButtonView.layoutParams as ViewGroup.MarginLayoutParams
             layoutParams.setMargins(
-                layoutParams.leftMargin,
-                layoutParams.topMargin,
                 context.resources.getDimensionPixelSize(R.dimen.keyline_2),
+                layoutParams.topMargin,
+                layoutParams.rightMargin,
                 layoutParams.bottomMargin,
             )
-            negativeButtonView.layoutParams = layoutParams
+            positiveButtonView.layoutParams = layoutParams
         }
 
-        val positiveButtonView = positiveButtonType.getView(context)
         setButtonListener(positiveButtonView, positiveButtonText, dialog) { listener.onPositiveButtonClicked() }
         binding.textAlertDialogButtonContainer.addView(positiveButtonView)
 
