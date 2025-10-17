@@ -374,6 +374,7 @@ dependencies {
     implementation project(':saved-sites-api')
     implementation project(':saved-sites-impl')
     implementation project(':saved-sites-store')
+    internalImplementation project(':saved-sites-internal')
 
     implementation project(':runtime-checks-impl')
     implementation project(':runtime-checks-store')

@@ -17,7 +17,6 @@
 package com.duckduckgo.autofill.impl.ui
 
 import androidx.fragment.app.DialogFragment
-import com.duckduckgo.autofill.api.AutofillImportBookmarksLaunchSource
 import com.duckduckgo.autofill.api.AutofillImportLaunchSource
 import com.duckduckgo.autofill.api.CredentialAutofillDialogFactory
 import com.duckduckgo.autofill.api.CredentialUpdateExistingCredentialsDialog.CredentialUpdateType
@@ -25,7 +24,6 @@ import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.autofill.api.domain.app.LoginTriggerType
 import com.duckduckgo.autofill.impl.email.EmailProtectionChooseEmailFragment
 import com.duckduckgo.autofill.impl.email.incontext.prompt.EmailProtectionInContextSignUpPromptFragment
-import com.duckduckgo.autofill.impl.ui.credential.management.importbookmark.google.preimport.ImportFromGoogleBookmarksPreImportDialog
 import com.duckduckgo.autofill.impl.ui.credential.management.importpassword.google.ImportFromGooglePasswordsDialog
 import com.duckduckgo.autofill.impl.ui.credential.passwordgeneration.AutofillUseGeneratedPasswordDialogFragment
 import com.duckduckgo.autofill.impl.ui.credential.saving.AutofillSavingCredentialsDialogFragment
@@ -108,9 +106,5 @@ class CredentialAutofillDialogAndroidFactory @Inject constructor() : CredentialA
 
     override fun autofillImportPasswordsPromoDialog(importSource: AutofillImportLaunchSource, tabId: String, url: String): DialogFragment {
         return ImportFromGooglePasswordsDialog.instance(importSource = importSource, tabId = tabId, originalUrl = url)
-    }
-
-    override fun autofillImportBookmarksPreImportDialog(importSource: AutofillImportBookmarksLaunchSource): DialogFragment {
-        return ImportFromGoogleBookmarksPreImportDialog.instance(importSource = importSource)
     }
 }

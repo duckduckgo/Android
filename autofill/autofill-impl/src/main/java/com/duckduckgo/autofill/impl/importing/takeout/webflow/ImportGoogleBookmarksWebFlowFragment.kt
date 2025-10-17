@@ -49,7 +49,6 @@ import com.duckduckgo.autofill.impl.importing.gpm.webflow.autofill.NoOpAutofillE
 import com.duckduckgo.autofill.impl.importing.gpm.webflow.autofill.NoOpEmailProtectionInContextSignupFlowListener
 import com.duckduckgo.autofill.impl.importing.gpm.webflow.autofill.NoOpEmailProtectionUserPromptListener
 import com.duckduckgo.autofill.impl.importing.takeout.store.BookmarkImportConfigStore
-import com.duckduckgo.autofill.impl.importing.takeout.webflow.ImportGoogleBookmarkResult.Success
 import com.duckduckgo.autofill.impl.importing.takeout.webflow.ImportGoogleBookmarksWebFlowViewModel.Command.ExitFlowAsFailure
 import com.duckduckgo.autofill.impl.importing.takeout.webflow.ImportGoogleBookmarksWebFlowViewModel.Command.ExitFlowWithSuccess
 import com.duckduckgo.autofill.impl.importing.takeout.webflow.ImportGoogleBookmarksWebFlowViewModel.Command.InjectCredentialsFromReauth
@@ -411,7 +410,7 @@ class ImportGoogleBookmarksWebFlowFragment :
             lifecycle.withStarted {
                 dismissCancellationDialog()
                 val result = Bundle().apply {
-                    putParcelable(ImportGoogleBookmarkResult.RESULT_KEY_DETAILS, Success(bookmarkCount))
+                    putParcelable(ImportGoogleBookmarkResult.RESULT_KEY_DETAILS, ImportGoogleBookmarkResult.Success(bookmarkCount))
                 }
                 setFragmentResult(ImportGoogleBookmarkResult.RESULT_KEY, result)
             }

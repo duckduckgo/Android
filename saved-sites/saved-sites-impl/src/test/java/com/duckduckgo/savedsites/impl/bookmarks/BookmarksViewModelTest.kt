@@ -17,15 +17,14 @@
 package com.duckduckgo.savedsites.impl.bookmarks
 
 import android.annotation.SuppressLint
+import android.content.Intent
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.Observer
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.autofill.api.AutofillFeature
+import com.duckduckgo.autofill.api.ImportFromGoogle
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.test.InstantSchedulersRule
-import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
-import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.savedsites.api.SavedSitesRepository
 import com.duckduckgo.savedsites.api.models.BookmarkFolder
 import com.duckduckgo.savedsites.api.models.BookmarkFolderItem
@@ -69,7 +68,7 @@ class BookmarksViewModelTest {
     @Suppress("unused")
     val coroutineRule = CoroutineTestRule()
 
-    private val autofillFeature = FakeFeatureToggleFactory.create(AutofillFeature::class.java)
+    private val importFromGoogle: ImportFromGoogle = mock()
 
     private val commandCaptor = argumentCaptor<BookmarksViewModel.Command>()
     private val viewStateCaptor = argumentCaptor<BookmarksViewModel.ViewState>()
@@ -116,7 +115,7 @@ class BookmarksViewModelTest {
             faviconsFetchingPrompt,
             bookmarksDataStore,
             coroutineRule.testDispatcherProvider,
-            autofillFeature,
+            importFromGoogle,
             coroutineRule.testScope,
         )
         model.viewState.observeForever(viewStateObserver)
@@ -132,8 +131,6 @@ class BookmarksViewModelTest {
 
         whenever(bookmarksDataStore.getSortingMode()).thenReturn(NAME)
         testee.fetchBookmarksAndFolders(SavedSitesNames.BOOKMARKS_ROOT)
-
-        autofillFeature.canImportBookmarksFromGoogleTakeout().setRawStoredState(State(true))
     }
 
     @After
@@ -608,8 +605,8 @@ class BookmarksViewModelTest {
     }
 
     @Test
-    fun whenImportBookmarksClickedAndFeatureEnabledThenShowDialog() {
-        autofillFeature.canImportBookmarksFromGoogleTakeout().setRawStoredState(State(true))
+    fun whenImportBookmarksClickedAndFeatureEnabledThenShowDialog() = runTest {
+        whenever(importFromGoogle.getBookmarksImportLaunchIntent()).thenReturn(Intent())
         testee.onImportBookmarksClicked()
 
         verify(commandObserver).onChanged(commandCaptor.capture())
@@ -617,8 +614,8 @@ class BookmarksViewModelTest {
     }
 
     @Test
-    fun whenImportBookmarksClickedAndFeatureDisabledThenLaunchFileImport() {
-        autofillFeature.canImportBookmarksFromGoogleTakeout().setRawStoredState(State(false))
+    fun whenImportBookmarksClickedAndFeatureDisabledThenLaunchFileImport() = runTest {
+        whenever(importFromGoogle.getBookmarksImportLaunchIntent()).thenReturn(null)
         testee.onImportBookmarksClicked()
 
         verify(commandObserver).onChanged(commandCaptor.capture())

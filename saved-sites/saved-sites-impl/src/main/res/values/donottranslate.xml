@@ -26,4 +26,11 @@
     <string name="favoriteDeleteConfirmationMessage">Favorite removed</string>
     <string name="fireproofWebsiteSnackbarAction">Undo</string>
     <string name="newTabPageShortcutBookmarks">Bookmarks</string>
+
+    <!-- Bookmark Import -->
+    <string name="importBookmarksFromGooglePreImportDialogTitle">Import Bookmarks From Google</string>
+    <string name="importBookmarksFromGooglePreImportDialogInstruction">Google may ask you to sign in or enter your password to confirm.</string>
+    <string name="importBookmarksFromGooglePreImportDialogImportButton">Import From Google</string>
+    <string name="importBookmarksFromGooglePreImportDialogSelectFileButton">Select Bookmarks File…</string>
+    <string name="bookmarksImportDialogClose">Close</string>
 </resources>

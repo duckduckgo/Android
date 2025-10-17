@@ -34,7 +34,7 @@
 
     <!-- Progress Fragment Strings -->
     <string name="importBookmarksProgressTitle">Importing from Google…</string>
-    <string name="importBookmarksProgressSubtitle">Hang tight — keep this screen open. It shouldn’t take more than a minute or two.</string>
+    <string name="importBookmarksProgressSubtitle">Keep this screen open and hang tight — it shouldn’t take more than a minute or two.</string>
     <string name="importBookmarksProgressInfoMessage1">Google may ask you to sign in or enter your password to confirm.</string>
     <string name="importBookmarksProgressInfoMessage2">Google may send you an email confirming your bookmarks are being exported.</string>
     <string name="importBookmarksProgressStatus">Importing bookmarks…</string>

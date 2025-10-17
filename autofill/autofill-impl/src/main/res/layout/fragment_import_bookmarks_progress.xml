@@ -30,17 +30,24 @@
 
         <androidx.constraintlayout.widget.Guideline
             android:id="@+id/guidelineStart"
-            style="@style/AutofillDialogContentGuidelineStart" />
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintGuide_begin="@dimen/keyline_5"
+            />
 
         <androidx.constraintlayout.widget.Guideline
             android:id="@+id/guidelineEnd"
-            style="@style/AutofillDialogContentGuidelineEnd" />
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintGuide_end="@dimen/keyline_5"/>
 
         <FrameLayout
             android:id="@+id/progressContainer"
             android:layout_width="168dp"
             android:layout_height="168dp"
-            android:layout_marginTop="@dimen/keyline_5"
+            android:layout_marginTop="40dp"
             app:layout_constraintEnd_toEndOf="@id/guidelineEnd"
             app:layout_constraintStart_toStartOf="@id/guidelineStart"
             app:layout_constraintTop_toTopOf="parent">
@@ -49,18 +56,20 @@
                 android:id="@+id/progressSpinner"
                 style="?android:attr/progressBarStyleLarge"
                 android:layout_width="match_parent"
+                android:indeterminateDrawable="@drawable/bookmark_import_progress_bar"
                 android:layout_height="match_parent"
                 android:layout_gravity="center"
-                android:indeterminate="true" />
+                android:indeterminate="true"
+                android:indeterminateDuration="800" />
 
             <androidx.appcompat.widget.AppCompatImageView
                 android:id="@+id/importIcon"
-                android:layout_width="96dp"
-                android:layout_height="96dp"
+                android:layout_width="64dp"
+                android:layout_height="64dp"
                 android:layout_gravity="center"
                 android:importantForAccessibility="no"
                 android:scaleType="fitCenter"
-                android:src="@drawable/bookmarks_import_128" />
+                android:src="@drawable/ic_bookmarks_import_96" />
 
         </FrameLayout>
 
@@ -68,7 +77,7 @@
             android:id="@+id/inProgressTitle"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/keyline_5"
+            android:layout_marginTop="@dimen/keyline_4"
             android:breakStrategy="balanced"
             android:gravity="center_horizontal"
             android:text="@string/importBookmarksProgressTitle"
@@ -114,7 +123,7 @@
             <com.duckduckgo.common.ui.view.listitem.OneLineListItem
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/keyline_2"
+                android:layout_marginTop="@dimen/keyline_1"
                 android:padding="@dimen/keyline_2"
                 android:background="@drawable/autofill_bookmark_import_info_listitem_background"
                 app:leadingIcon="@drawable/info_solid_24"

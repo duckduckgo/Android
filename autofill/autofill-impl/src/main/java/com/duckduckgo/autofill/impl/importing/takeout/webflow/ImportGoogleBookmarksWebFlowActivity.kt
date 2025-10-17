@@ -18,34 +18,31 @@ package com.duckduckgo.autofill.impl.importing.takeout.webflow
 
 import android.content.Intent
 import android.os.Bundle
-import android.os.Parcelable
 import androidx.core.os.BundleCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.commit
 import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
-import com.duckduckgo.autofill.api.AutofillImportBookmarksLaunchSource
-import com.duckduckgo.autofill.api.AutofillScreens
 import com.duckduckgo.autofill.impl.R
 import com.duckduckgo.autofill.impl.databinding.ActivityImportGoogleBookmarksWebflowBinding
-import com.duckduckgo.autofill.impl.importing.takeout.webflow.ImportGoogleBookmark.AutofillImportViaGoogleTakeoutScreenResultError
-import com.duckduckgo.autofill.impl.importing.takeout.webflow.ImportGoogleBookmark.AutofillImportViaGoogleTakeoutScreenResultSuccess
-import com.duckduckgo.autofill.impl.importing.takeout.webflow.ImportGoogleBookmark.ImportViaGoogleTakeoutScreen
 import com.duckduckgo.autofill.impl.importing.takeout.webflow.UserCannotImportReason.Unknown
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.di.scopes.ActivityScope
-import com.duckduckgo.navigation.api.GlobalActivityStarter.ActivityParams
-import com.duckduckgo.navigation.api.getActivityParams
-import kotlinx.parcelize.Parcelize
+import com.duckduckgo.navigation.api.GlobalActivityStarter
 import logcat.logcat
 import javax.inject.Inject
 
+/**
+ * Launch the Google Bookmarks import flow
+ */
+data object ImportBookmarksViaGoogleTakeoutScreen : GlobalActivityStarter.ActivityParams {
+    private fun readResolve(): Any = ImportBookmarksViaGoogleTakeoutScreen
+}
+
 @InjectWith(ActivityScope::class)
-@ContributeToActivityStarter(AutofillScreens.ImportBookmarksViaGoogleTakeoutScreen::class)
-@ContributeToActivityStarter(AutofillImportViaGoogleTakeoutScreenResultSuccess::class)
-@ContributeToActivityStarter(AutofillImportViaGoogleTakeoutScreenResultError::class)
+@ContributeToActivityStarter(ImportBookmarksViaGoogleTakeoutScreen::class)
 class ImportGoogleBookmarksWebFlowActivity :
     DuckDuckGoActivity(),
     ImportGoogleBookmarksWebFlowFragment.WebViewVisibilityListener {
@@ -57,31 +54,12 @@ class ImportGoogleBookmarksWebFlowActivity :
     private var isOverlayCurrentlyShown = false
     private var isOnResultScreen = false
 
-    private val launchSource: AutofillImportBookmarksLaunchSource by lazy {
-        intent.getActivityParams(ImportViaGoogleTakeoutScreen::class.java)?.launchSource ?: AutofillImportBookmarksLaunchSource.Unknown
-    }
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
         configureToolbar()
         configureResultListeners()
-
-        // Check if we should show the results screen immediately
-        val successResult = intent.getActivityParams(AutofillImportViaGoogleTakeoutScreenResultSuccess::class.java)
-        val errorResult = intent.getActivityParams(AutofillImportViaGoogleTakeoutScreenResultError::class.java)
-
-        when {
-            successResult != null -> {
-                isOnResultScreen = true
-                showSuccessFragment(successResult.bookmarkCount)
-            }
-            errorResult != null -> {
-                isOnResultScreen = true
-                showErrorFragment(errorResult.errorReason)
-            }
-            else -> launchWebFlow()
-        }
+        launchWebFlow()
     }
 
     private fun launchWebFlow() {
@@ -255,24 +233,4 @@ class ImportGoogleBookmarksWebFlowActivity :
     companion object {
         private const val PROGRESS_OVERLAY_TAG = "progress_overlay"
     }
-}
-
-object ImportGoogleBookmark {
-    @Parcelize
-    sealed class ImportViaGoogleTakeoutScreen(
-        val launchSource: AutofillImportBookmarksLaunchSource,
-    ) : ActivityParams,
-        Parcelable
-
-    @Parcelize
-    data class AutofillImportViaGoogleTakeoutScreenResultSuccess(
-        private val source: AutofillImportBookmarksLaunchSource,
-        val bookmarkCount: Int,
-    ) : ImportViaGoogleTakeoutScreen(source)
-
-    @Parcelize
-    data class AutofillImportViaGoogleTakeoutScreenResultError(
-        private val source: AutofillImportBookmarksLaunchSource,
-        val errorReason: UserCannotImportReason,
-    ) : ImportViaGoogleTakeoutScreen(source)
 }

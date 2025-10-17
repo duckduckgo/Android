@@ -18,6 +18,7 @@ plugins {
     id 'com.android.library'
     id 'kotlin-android'
     id 'com.squareup.anvil'
+    id 'kotlin-parcelize'
     id 'com.google.devtools.ksp'
 }
 
@@ -47,6 +48,7 @@ dependencies {
     implementation "io.reactivex.rxjava2:rxjava:_"
     implementation "io.reactivex.rxjava2:rxandroid:_"
     implementation AndroidX.appCompat
+    implementation AndroidX.fragment.ktx
     implementation Google.android.material
     implementation "com.squareup.logcat:logcat:_"
     implementation Google.dagger

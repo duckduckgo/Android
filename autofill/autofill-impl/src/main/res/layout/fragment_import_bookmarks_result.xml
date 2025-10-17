@@ -28,17 +28,24 @@
 
         <androidx.constraintlayout.widget.Guideline
             android:id="@+id/guidelineStart"
-            style="@style/AutofillDialogContentGuidelineStart" />
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintGuide_begin="@dimen/keyline_5"
+            />
 
         <androidx.constraintlayout.widget.Guideline
             android:id="@+id/guidelineEnd"
-            style="@style/AutofillDialogContentGuidelineEnd" />
-
-        <androidx.appcompat.widget.AppCompatImageView
-            android:id="@+id/successIcon"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
+            android:orientation="vertical"
+            app:layout_constraintGuide_end="@dimen/keyline_5"/>
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/bookmarkIcon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="62dp"
             android:importantForAccessibility="no"
             android:scaleType="fitCenter"
             android:src="@drawable/bookmarks_import_128"
@@ -50,21 +57,22 @@
             android:id="@+id/importResultTitle"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/keyline_5"
+            android:layout_marginTop="62dp"
             android:gravity="center_horizontal"
             android:text="@string/importBookmarksSuccessTitle"
             app:layout_constraintEnd_toEndOf="@id/guidelineEnd"
             app:layout_constraintStart_toStartOf="@id/guidelineStart"
-            app:layout_constraintTop_toBottomOf="@id/successIcon"
+            app:layout_constraintTop_toBottomOf="@id/bookmarkIcon"
             app:typography="h1" />
 
         <com.duckduckgo.common.ui.view.listitem.OneLineListItem
             android:id="@+id/bookmarksImportResult"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/keyline_5"
+            android:layout_marginTop="@dimen/keyline_4"
             android:layout_marginBottom="@dimen/keyline_2"
-            android:padding="@dimen/keyline_2"
+            android:paddingTop="@dimen/keyline_2"
+            android:paddingBottom="@dimen/keyline_2"
             android:background="@drawable/autofill_bookmark_import_info_listitem_background"
             app:layout_constraintEnd_toEndOf="@id/guidelineEnd"
             app:layout_constraintStart_toStartOf="@id/guidelineStart"
@@ -79,6 +87,8 @@
             android:layout_marginTop="@dimen/keyline_4"
             android:text="@string/importBookmarksErrorGenericMessageSecondary"
             android:visibility="gone"
+            android:layout_marginStart="@dimen/keyline_4"
+            android:layout_marginEnd="@dimen/keyline_4"
             app:layout_constraintEnd_toEndOf="@id/bookmarksImportResult"
             app:layout_constraintStart_toStartOf="@id/bookmarksImportResult"
             app:layout_constraintTop_toBottomOf="@id/bookmarksImportResult" />

@@ -23,7 +23,7 @@ import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
-import com.duckduckgo.autofill.api.AutofillFeature
+import com.duckduckgo.autofill.api.ImportFromGoogle
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.SingleLiveEvent
 import com.duckduckgo.di.scopes.ActivityScope
@@ -85,7 +85,7 @@ class BookmarksViewModel @Inject constructor(
     private val faviconsFetchingPrompt: FaviconsFetchingPrompt,
     private val bookmarksDataStore: BookmarksDataStore,
     private val dispatcherProvider: DispatcherProvider,
-    private val autofillFeature: AutofillFeature,
+    private val importFromGoogle: ImportFromGoogle,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
 ) : EditSavedSiteListener, AddBookmarkFolderListener, EditBookmarkFolderListener, DeleteBookmarkListener, ViewModel() {
 
@@ -521,11 +521,11 @@ class BookmarksViewModel @Inject constructor(
         pixel.fire(SavedSitesPixelName.BOOKMARK_MENU_IMPORT_CLICKED)
 
         viewModelScope.launch {
-            val googleImportEnabled = withContext(dispatcherProvider.io()) {
-                autofillFeature.canImportBookmarksFromGoogleTakeout().isEnabled()
+            val googleImportLaunchIntent = withContext(dispatcherProvider.io()) {
+                importFromGoogle.getBookmarksImportLaunchIntent()
             }
 
-            command.value = if (googleImportEnabled) {
+            command.value = if (googleImportLaunchIntent != null) {
                 Command.ShowBookmarkImportDialog
             } else {
                 LaunchBookmarkImportFile

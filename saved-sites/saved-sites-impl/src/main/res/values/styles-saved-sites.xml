@@ -16,6 +16,46 @@
 
 <resources>
 
+    <style name="BookmarksImportDialogRootViewStyle">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">match_parent</item>
+        <item name="android:background">@drawable/rounded_top_corners_bottom_sheet_background</item>
+        <item name="android:paddingBottom">30dp</item>
+    </style>
+
+    <style name="BookmarksImportDialogCloseButton">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginTop">11dp</item>
+        <item name="android:layout_marginEnd">11dp</item>
+        <item name="android:background">?attr/selectableItemBackground</item>
+        <item name="android:padding">8dp</item>
+        <item name="android:src">@drawable/ic_close_24</item>
+        <item name="android:contentDescription">@string/bookmarksImportDialogClose</item>
+    </style>
+
+    <style name="BookmarksImportDialogContentGuidelineStart">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:orientation">vertical</item>
+        <item name="layout_constraintGuide_percent">0.1</item>
+    </style>
+
+    <style name="BookmarksImportDialogContentGuidelineEnd">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:orientation">vertical</item>
+        <item name="layout_constraintGuide_percent">0.9</item>
+    </style>
+
+    <style name="BookmarksImportBottomSheetDialogTheme" parent="@style/ThemeOverlay.MaterialComponents.BottomSheetDialog">
+        <item name="bottomSheetStyle">@style/BookmarksImportBottomSheetStyle</item>
+    </style>
+
+    <style name="BookmarksImportBottomSheetStyle" parent="Widget.MaterialComponents.BottomSheet.Modal">
+        <item name="backgroundTint">@android:color/transparent</item>
+    </style>
+
     <style name="Widget.DuckDuckGo.FavouritesNewTabSection">
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">match_parent</item>
