@@ -16,21 +16,24 @@
 
 package com.duckduckgo.widget
 
-import android.annotation.SuppressLint
 import android.appwidget.AppWidgetManager
 import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
-import android.os.Build
+import android.net.Uri
 import android.os.Bundle
 import android.view.View
 import android.widget.RemoteViews
 import android.widget.RemoteViewsService
+import androidx.core.content.FileProvider
 import androidx.core.graphics.drawable.toBitmap
 import androidx.core.net.toUri
 import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.favicon.FaviconManager
+import com.duckduckgo.app.browser.favicon.FaviconPersister
+import com.duckduckgo.app.browser.favicon.FileBasedFaviconPersister.Companion.FAVICON_PERSISTED_DIR
+import com.duckduckgo.app.browser.favicon.FileBasedFaviconPersister.Companion.NO_SUBFOLDER
 import com.duckduckgo.app.global.DuckDuckGoApplication
 import com.duckduckgo.app.global.view.generateDefaultDrawable
 import com.duckduckgo.common.utils.DispatcherProvider
@@ -42,7 +45,6 @@ import logcat.logcat
 import javax.inject.Inject
 import com.duckduckgo.mobile.android.R as CommonR
 
-@SuppressLint("DenyListedApi")
 class FavoritesWidgetItemFactory(
     val context: Context,
     intent: Intent,
@@ -57,6 +59,9 @@ class FavoritesWidgetItemFactory(
     lateinit var faviconManager: FaviconManager
 
     @Inject
+    lateinit var faviconPersister: FaviconPersister
+
+    @Inject
     lateinit var widgetPrefs: WidgetPreferences
 
     @Inject
@@ -67,11 +72,7 @@ class FavoritesWidgetItemFactory(
         AppWidgetManager.INVALID_APPWIDGET_ID,
     )
 
-    private val faviconItemSize = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S_V2) {
-        context.resources.getDimension(CommonR.dimen.savedSiteGridItemFavicon).toInt()
-    } else {
-        context.resources.getDimension(R.dimen.oldOsVersionSavedSiteGridItemFavicon).toInt()
-    }
+    private val faviconItemSize = context.resources.getDimension(CommonR.dimen.savedSiteGridItemFavicon).toInt()
     private val faviconItemCornerRadius = CommonR.dimen.searchWidgetFavoritesCornerRadius
 
     private val maxItems: Int
@@ -79,15 +80,21 @@ class FavoritesWidgetItemFactory(
             return widgetPrefs.widgetSize(appWidgetId).let { it.first * it.second }
         }
 
-    data class WidgetFavorite(
+    // New data class returning a Uri reference instead of an in-memory Bitmap
+    /**
+     * Represents a widget favorite whose favicon is exposed as a Uri rather than an in-memory Bitmap.
+     * If the favicon file cannot be found locally, [bitmapUri] will be null and callers should
+     * fallback to a placeholder (as done for the Bitmap variant).
+     */
+    data class WidgetFavoriteUri(
         val title: String,
         val url: String,
-        val bitmap: Bitmap?,
+        val bitmapUri: Uri?,
     )
 
-    private val _widgetFavoritesFlow = MutableStateFlow<List<WidgetFavorite>>(emptyList())
+    private val _widgetFavoritesFlow = MutableStateFlow<List<WidgetFavoriteUri>>(emptyList())
 
-    private val currentFavorites: List<WidgetFavorite>
+    private val currentFavorites: List<WidgetFavoriteUri>
         get() = _widgetFavoritesFlow.value
 
     override fun onCreate() {
@@ -100,30 +107,41 @@ class FavoritesWidgetItemFactory(
 
     suspend fun updateWidgetFavoritesAsync() {
         runCatching {
-            val latestWidgetFavorites = fetchFavoritesWithBitmaps()
+            val latestWidgetFavorites = fetchFavoritesWithBitmapUris()
             _widgetFavoritesFlow.value = latestWidgetFavorites
         }.onFailure { error ->
             logcat { "Failed to update favorites in Search and Favorites widget: ${error.message}" }
         }
     }
 
-    private suspend fun fetchFavoritesWithBitmaps(): List<WidgetFavorite> {
+    // New function to fetch favorites with bitmap URIs
+    private suspend fun fetchFavoritesWithBitmapUris(): List<WidgetFavoriteUri> {
         return withContext(dispatchers.io()) {
-            val favorites = savedSitesRepository.getFavoritesSync().take(maxItems).map {
-                val bitmap = faviconManager.loadFromDiskWithParams(
-                    url = it.url,
-                    cornerRadius = context.resources.getDimension(faviconItemCornerRadius).toInt(),
-                    width = faviconItemSize,
-                    height = faviconItemSize,
-                ) ?: generateDefaultDrawable(
-                    context = context,
-                    domain = it.url.extractDomain().orEmpty(),
-                    cornerRadius = faviconItemCornerRadius,
-                ).toBitmap(faviconItemSize, faviconItemSize)
-
-                WidgetFavorite(it.title, it.url, bitmap)
+            savedSitesRepository.getFavoritesSync().take(maxItems).map { favorite ->
+                val file = runCatching { faviconManager.tryFetchFaviconForUrl(favorite.url) }.getOrNull()
+                val uri = if (file != null) {
+                    // Use existing favicon file
+                    runCatching {
+                        val contentUri = FileProvider.getUriForFile(context, "${context.packageName}.provider", file)
+                        // Grant permission for widget launchers to read the URI
+                        grantUriPermissionsForWidget(contentUri)
+                        contentUri
+                    }.getOrNull()
+                } else {
+                    // Generate and save placeholder if no favicon exists
+                    val placeholder = generateDefaultDrawable(
+                        context = context,
+                        domain = favorite.url.extractDomain().orEmpty(),
+                        cornerRadius = faviconItemCornerRadius,
+                    ).toBitmap(faviconItemSize, faviconItemSize)
+                    saveBitmapAndGetUri(placeholder, favorite.url.extractDomain().orEmpty())
+                }
+                WidgetFavoriteUri(
+                    title = favorite.title,
+                    url = favorite.url,
+                    bitmapUri = uri,
+                )
             }
-            favorites
         }
     }
 
@@ -145,12 +163,16 @@ class FavoritesWidgetItemFactory(
 
     override fun getViewAt(position: Int): RemoteViews {
         val item = if (position >= currentFavorites.size) null else currentFavorites[position]
+
         val remoteViews = RemoteViews(context.packageName, getItemLayout())
         if (item != null) {
             // This item has a favorite. Show the favorite view.
-            if (item.bitmap != null) {
+            if (item.bitmapUri != null) {
                 remoteViews.setViewVisibility(R.id.quickAccessFavicon, View.VISIBLE)
-                remoteViews.setImageViewBitmap(R.id.quickAccessFavicon, item.bitmap)
+                remoteViews.setImageViewUri(R.id.quickAccessFavicon, item.bitmapUri)
+            } else {
+                // If we don't have a URI (shouldn't happen), hide the favicon
+                remoteViews.setViewVisibility(R.id.quickAccessFavicon, View.GONE)
             }
             remoteViews.setViewVisibility(R.id.quickAccessFaviconContainer, View.VISIBLE)
             remoteViews.setTextViewText(R.id.quickAccessTitle, item.title)
@@ -158,16 +180,7 @@ class FavoritesWidgetItemFactory(
             remoteViews.setViewVisibility(R.id.placeholderFavicon, View.GONE)
             configureClickListener(remoteViews, item.url)
         } else {
-            if (currentFavorites.isEmpty()) {
-                // We don't have any favorites, show placeholder view.
-                remoteViews.setViewVisibility(R.id.quickAccessFaviconContainer, View.VISIBLE)
-                remoteViews.setViewVisibility(R.id.quickAccessFavicon, View.GONE)
-                remoteViews.setViewVisibility(R.id.placeholderFavicon, View.VISIBLE)
-            } else {
-                // We had at least one favorite, but not in this view. Don't show anything.
-                remoteViews.setViewVisibility(R.id.quickAccessFaviconContainer, View.INVISIBLE)
-            }
-            remoteViews.setViewVisibility(R.id.quickAccessTitle, View.GONE)
+            return RemoteViews(context.packageName, R.layout.empty_view)
         }
 
         return remoteViews
@@ -196,7 +209,7 @@ class FavoritesWidgetItemFactory(
     }
 
     override fun getLoadingView(): RemoteViews {
-        return RemoteViews(context.packageName, getItemLayout())
+        return RemoteViews(context.packageName, R.layout.empty_view)
     }
 
     override fun getViewTypeCount(): Int {
@@ -209,6 +222,72 @@ class FavoritesWidgetItemFactory(
 
     override fun hasStableIds(): Boolean {
         return true
+    }
+
+    /**
+     * Saves a bitmap to a file and returns a content URI for it.
+     * This prevents RemoteViews crashes from storing whole bitmaps directly.
+     * Uses FaviconPersister to save the bitmap in the same way as real favicons.
+     */
+    private suspend fun saveBitmapAndGetUri(bitmap: Bitmap, domain: String): Uri? {
+        return runCatching {
+            // Use FaviconPersister to store the placeholder bitmap in the same directory as real favicons
+            val file = faviconPersister.store(FAVICON_PERSISTED_DIR, NO_SUBFOLDER, bitmap, domain)
+
+            if (file != null) {
+                // Return a content URI for the file using the correct FileProvider authority
+                val uri = FileProvider.getUriForFile(context, "${context.packageName}.provider", file)
+
+                // Grant read permission to all packages that might host the widget
+                grantUriPermissionsForWidget(uri)
+
+                uri
+            } else {
+                null
+            }
+        }.getOrElse { error ->
+            logcat { "Failed to save placeholder bitmap: ${error.message}" }
+            null
+        }
+    }
+
+    /**
+     * Grants read URI permission to packages that host widgets (launchers).
+     * We grant to common launcher packages since we can't reliably detect which launcher is being used.
+     */
+    private fun grantUriPermissionsForWidget(uri: Uri) {
+        runCatching {
+            // Grant to system server which manages RemoteViews
+            context.grantUriPermission(
+                "android",
+                uri,
+                Intent.FLAG_GRANT_READ_URI_PERMISSION,
+            )
+
+            // Grant to common launcher packages
+            val commonLaunchers = listOf(
+                "com.android.launcher3", // AOSP/Pixel Launcher
+                "com.google.android.apps.nexuslauncher", // Pixel Launcher
+                "com.android.launcher",
+                "com.sec.android.app.launcher", // Samsung
+                "com.huawei.android.launcher", // Huawei
+                "com.mi.android.globallauncher", // Xiaomi
+                "com.miui.home", // MIUI
+                "com.oneplus.launcher", // OnePlus
+            )
+
+            commonLaunchers.forEach { packageName ->
+                runCatching {
+                    context.grantUriPermission(
+                        packageName,
+                        uri,
+                        Intent.FLAG_GRANT_READ_URI_PERMISSION,
+                    )
+                }
+            }
+        }.onFailure { error ->
+            logcat { "Failed to grant URI permissions: ${error.message}" }
+        }
     }
 
     private fun inject(context: Context) {
