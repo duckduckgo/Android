@@ -74,11 +74,7 @@ class InitMessageHandlerPlugin @Inject constructor(
                     val isAutoconsentDisabled = !settingsRepository.userSetting // && settingsRepository.firstPopupHandled
 
                     if (isAutoconsentDisabled) {
-                        withContext(dispatcherProvider.main()) {
-                            if (webView.url == url) {
-                                pixelManager.fireDailyPixel(AutoConsentPixel.AUTOCONSENT_DISABLED_FOR_SITE_DAILY)
-                            }
-                        }
+                        pixelManager.fireDailyPixel(AutoConsentPixel.AUTOCONSENT_DISABLED_FOR_SITE_DAILY)
                         return@launch
                     }
 
