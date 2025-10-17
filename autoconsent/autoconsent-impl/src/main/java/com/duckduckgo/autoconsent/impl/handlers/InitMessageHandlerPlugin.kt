@@ -48,7 +48,7 @@ class InitMessageHandlerPlugin @Inject constructor(
     private val settingsRepository: AutoconsentSettingsRepository,
     private val settingsCache: AutoconsentSettingsCache,
     private val autoconsentFeature: AutoconsentFeature,
-    private val pixelManager: AutoconsentPixelManager,
+    private val autoconsentPixelManager: AutoconsentPixelManager,
 ) : MessageHandlerPlugin {
 
     private val moshi = Moshi.Builder().add(JSONObjectAdapter()).build()
@@ -74,11 +74,11 @@ class InitMessageHandlerPlugin @Inject constructor(
                     val isAutoconsentDisabled = !settingsRepository.userSetting // && settingsRepository.firstPopupHandled
 
                     if (isAutoconsentDisabled) {
-                        pixelManager.fireDailyPixel(AutoConsentPixel.AUTOCONSENT_DISABLED_FOR_SITE_DAILY)
+                        autoconsentPixelManager.fireDailyPixel(AutoConsentPixel.AUTOCONSENT_DISABLED_FOR_SITE_DAILY)
                         return@launch
                     }
 
-                    pixelManager.fireDailyPixel(AutoConsentPixel.AUTOCONSENT_INIT_DAILY)
+                    autoconsentPixelManager.fireDailyPixel(AutoConsentPixel.AUTOCONSENT_INIT_DAILY)
 
                     // Reset site
                     autoconsentCallback.onResultReceived(consentManaged = false, optOutFailed = false, selfTestFailed = false, isCosmetic = false)

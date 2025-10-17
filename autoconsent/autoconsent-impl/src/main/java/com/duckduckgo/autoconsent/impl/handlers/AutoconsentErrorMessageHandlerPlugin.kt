@@ -28,13 +28,13 @@ import javax.inject.Inject
 
 @ContributesMultibinding(AppScope::class)
 class AutoconsentErrorMessageHandlerPlugin @Inject constructor(
-    private val pixelManager: AutoconsentPixelManager,
+    private val autoconsentPixelManager: AutoconsentPixelManager,
 ) : MessageHandlerPlugin {
 
     override fun process(messageType: String, jsonString: String, webView: WebView, autoconsentCallback: AutoconsentCallback) {
         try {
             if (supportedTypes.contains(messageType)) {
-                pixelManager.fireDailyPixel(AutoConsentPixel.AUTOCONSENT_ERROR_MULTIPLE_POPUPS_DAILY)
+                autoconsentPixelManager.fireDailyPixel(AutoConsentPixel.AUTOCONSENT_ERROR_MULTIPLE_POPUPS_DAILY)
             }
         } catch (e: Exception) {
             logcat { e.localizedMessage }

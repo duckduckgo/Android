@@ -33,7 +33,7 @@ import javax.inject.Inject
 @ContributesMultibinding(AppScope::class)
 class PopUpFoundMessageHandlerPlugin @Inject constructor(
     private val repository: AutoconsentSettingsRepository,
-    private val pixelManager: AutoconsentPixelManager,
+    private val autoconsentPixelManager: AutoconsentPixelManager,
 ) : MessageHandlerPlugin {
 
     private val moshi = Moshi.Builder().add(JSONObjectAdapter()).build()
@@ -41,7 +41,7 @@ class PopUpFoundMessageHandlerPlugin @Inject constructor(
     override fun process(messageType: String, jsonString: String, webView: WebView, autoconsentCallback: AutoconsentCallback) {
         try {
             if (supportedTypes.contains(messageType)) {
-                pixelManager.fireDailyPixel(AutoConsentPixel.AUTOCONSENT_POPUP_FOUND_DAILY)
+                autoconsentPixelManager.fireDailyPixel(AutoConsentPixel.AUTOCONSENT_POPUP_FOUND_DAILY)
 
                 val message: PopUpFoundMessage = parseMessage(jsonString) ?: return
                 if (repository.userSetting) return
