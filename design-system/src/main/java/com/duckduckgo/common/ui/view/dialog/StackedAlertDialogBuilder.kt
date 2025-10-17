@@ -98,7 +98,6 @@ class StackedAlertDialogBuilder(val context: Context) : DaxAlertDialog {
         val dialogBuilder = MaterialAlertDialogBuilder(context, com.duckduckgo.mobile.android.R.style.Widget_DuckDuckGo_Dialog)
             .setView(binding.root)
             .apply {
-                setCancelable(false)
                 setOnDismissListener { listener.onDialogDismissed() }
                 setOnCancelListener { listener.onDialogCancelled() }
             }
