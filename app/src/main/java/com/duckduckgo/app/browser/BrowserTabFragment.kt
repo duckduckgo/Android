@@ -1109,23 +1109,30 @@ class BrowserTabFragment :
     }
 
     private fun configureInputScreenLauncher() {
-        omnibar.configureInputScreenLaunchListener(object : Omnibar.InputScreenLaunchListener {
-            override fun onLaunchInputScreen(query: String, searchMode: Boolean, fromNTP: Boolean) {
-                launchInputScreen(query, searchMode = searchMode, fromNTP = fromNTP)
-            }
+        omnibar.configureInputScreenLaunchListener(
+            object : Omnibar.InputScreenLaunchListener {
+                override fun onLaunchInputScreen(
+                    query: String,
+                    searchMode: Boolean,
+                    fromNTP: Boolean,
+                ) {
+                    launchInputScreen(query, searchMode = searchMode, fromNTP = fromNTP)
+                }
 
-            override fun onDuckAiToggleSelected() {
-                launchInputScreen("", searchMode = false, fromNTP = true)
-            }
+                override fun onDuckAiToggleSelected() {
+                    launchInputScreen("", searchMode = false, fromNTP = true)
+                }
 
-            override fun onSearchToggleSelected() {
-                launchInputScreen("", searchMode = true, fromNTP = true)
-            }
-        })
+                override fun onSearchToggleSelected() {
+                    val isNtp = omnibar.viewMode == ViewMode.NewTab
+                    launchInputScreen("", searchMode = true, fromNTP = isNtp)
+                }
+            },
+        )
     }
 
     private fun launchInputScreen(query: String, searchMode: Boolean, fromNTP: Boolean) {
-        logcat { "inputScreen: Launching input screen for query: $query in searchMode $searchMode" }
+        logcat { "inputScreen: Launching input screen for query: $query in searchMode $searchMode fromNtp $fromNTP" }
         val intent =
             globalActivityStarter.startIntent(
                 requireContext(),
@@ -2308,7 +2315,8 @@ class BrowserTabFragment :
             is Command.LaunchInputScreen -> {
                 // if the fire button is used, prevent automatically launching the input screen until the process reloads
                 if ((requireActivity() as? BrowserActivity)?.isDataClearingInProgress == false) {
-                    launchInputScreen(query = "", true, false)
+                    val isNtp = omnibar.viewMode == ViewMode.NewTab
+                    launchInputScreen(query = "", true, isNtp)
                 }
             }
 
@@ -3035,8 +3043,7 @@ class BrowserTabFragment :
                         pixel.fire(DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_LEGACY_OMNIBAR_AICHAT_BUTTON_PRESSED_DAILY, type = Daily())
                     }
                     val hasFocus = omnibar.omnibarTextInput.hasFocus()
-                    val isNtp = omnibar.viewMode == ViewMode.NewTab
-                    onOmnibarDuckChatPressed(query = omnibar.getText(), hasFocus = hasFocus, isNtp = isNtp)
+                    onOmnibarDuckChatPressed(query = omnibar.getText(), hasFocus = hasFocus, isNtp = true)
                 }
             },
         )
