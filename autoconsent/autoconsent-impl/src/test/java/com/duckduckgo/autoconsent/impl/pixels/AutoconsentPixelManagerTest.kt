@@ -17,25 +17,36 @@
 package com.duckduckgo.autoconsent.impl.pixels
 
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Count
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
+import com.duckduckgo.common.test.CoroutineTestRule
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.advanceTimeBy
+import kotlinx.coroutines.test.advanceUntilIdle
+import kotlinx.coroutines.test.runTest
 import org.junit.Assert.*
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
-import org.junit.runner.RunWith
+import org.mockito.kotlin.argThat
+import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoMoreInteractions
-import org.robolectric.RobolectricTestRunner
 
-@RunWith(RobolectricTestRunner::class)
+@OptIn(ExperimentalCoroutinesApi::class)
 class AutoconsentPixelManagerTest {
+
+    @get:Rule
+    val coroutineTestRule: CoroutineTestRule = CoroutineTestRule()
 
     private val mockPixel: Pixel = mock()
     private lateinit var pixelManager: RealAutoconsentPixelManager
 
     @Before
     fun setup() {
-        pixelManager = RealAutoconsentPixelManager(mockPixel)
+        pixelManager = RealAutoconsentPixelManager(mockPixel, coroutineTestRule.testScope)
     }
 
     @Test
@@ -44,7 +55,7 @@ class AutoconsentPixelManagerTest {
 
         pixelManager.fireDailyPixel(pixelName)
 
-        verify(mockPixel).fire(pixelName, type = Daily())
+        verify(mockPixel).fire(eq(pixelName), eq(emptyMap()), eq(emptyMap()), eq(Daily()))
     }
 
     @Test
@@ -108,5 +119,57 @@ class AutoconsentPixelManagerTest {
 
         assertTrue(result)
         verifyNoMoreInteractions(mockPixel)
+    }
+
+    @Test
+    fun whenFireDailyPixelsThenSummaryPixelContainsAllCounts() = runTest {
+        val pixel1 = AutoConsentPixel.AUTOCONSENT_INIT_DAILY
+        val pixel2 = AutoConsentPixel.AUTOCONSENT_POPUP_FOUND_DAILY
+
+        pixelManager.fireDailyPixel(pixel1)
+        pixelManager.fireDailyPixel(pixel2)
+        pixelManager.fireDailyPixel(pixel1)
+
+        verify(mockPixel, times(2)).fire(eq(pixel1), eq(emptyMap()), eq(emptyMap()), eq(Daily()))
+        verify(mockPixel).fire(eq(pixel2), eq(emptyMap()), eq(emptyMap()), eq(Daily()))
+
+        advanceTimeBy(120000L)
+        advanceUntilIdle()
+
+        verify(mockPixel).fire(
+            eq(AutoConsentPixel.AUTOCONSENT_SUMMARY),
+            argThat { parameters ->
+                parameters[pixel1.pixelName] == "2" && parameters[pixel2.pixelName] == "1"
+            },
+            eq(emptyMap()),
+            eq(Count),
+        )
+    }
+
+    @Test
+    fun whenFireDailyPixelAfterSummaryThenScheduleNewSummary() = runTest {
+        val pixel1 = AutoConsentPixel.AUTOCONSENT_INIT_DAILY
+        val pixel2 = AutoConsentPixel.AUTOCONSENT_POPUP_FOUND_DAILY
+
+        pixelManager.fireDailyPixel(pixel1)
+        advanceTimeBy(120000L)
+        advanceUntilIdle()
+
+        pixelManager.fireDailyPixel(pixel2)
+        advanceTimeBy(120000L)
+        advanceUntilIdle()
+
+        verify(mockPixel).fire(
+            eq(AutoConsentPixel.AUTOCONSENT_SUMMARY),
+            argThat { parameters -> parameters[pixel1.pixelName] == "1" },
+            eq(emptyMap()),
+            eq(Count),
+        )
+        verify(mockPixel).fire(
+            eq(AutoConsentPixel.AUTOCONSENT_SUMMARY),
+            argThat { parameters -> parameters[pixel2.pixelName] == "1" },
+            eq(emptyMap()),
+            eq(Count),
+        )
     }
 }
