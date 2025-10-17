@@ -19,13 +19,15 @@ package com.duckduckgo.autoconsent.impl.pixels
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
+import com.duckduckgo.autoconsent.impl.remoteconfig.AutoconsentFeature
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import dagger.SingleInstanceIn
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 import kotlin.time.Duration.Companion.minutes
 
@@ -43,6 +45,8 @@ interface AutoconsentPixelManager {
 class RealAutoconsentPixelManager @Inject constructor(
     private val pixel: Pixel,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
+    private val autoconsentFeature: AutoconsentFeature,
+    private val dispatcherProvider: DispatcherProvider,
 ) : AutoconsentPixelManager {
 
     private val detectedByPatternsCache = mutableSetOf<String>()
@@ -52,18 +56,25 @@ class RealAutoconsentPixelManager @Inject constructor(
     private var summaryJob: Job? = null
 
     override fun fireDailyPixel(pixelName: AutoConsentPixel) {
-        pixelCounter[pixelName.pixelName] = (pixelCounter[pixelName.pixelName] ?: 0) + 1
-
-        if (pixelCounter.size == 1) {
-            summaryJob = appCoroutineScope.launch(Dispatchers.Main) {
-                delay(2.minutes)
-                val summaryData = pixelCounter.mapValues { it.value.toString() }
-                pixel.fire(AutoConsentPixel.AUTOCONSENT_SUMMARY, parameters = summaryData)
-                clearAllCaches()
+        appCoroutineScope.launch(dispatcherProvider.main()) {
+            val isEnabled = withContext(dispatcherProvider.io()) {
+                autoconsentFeature.cpmPixels().isEnabled()
             }
-        }
+            if (!isEnabled) return@launch
 
-        pixel.fire(pixelName, type = Daily())
+            pixelCounter[pixelName.pixelName] = (pixelCounter[pixelName.pixelName] ?: 0) + 1
+
+            if (pixelCounter.size == 1) {
+                summaryJob = appCoroutineScope.launch(dispatcherProvider.main()) {
+                    delay(2.minutes)
+                    val summaryData = pixelCounter.mapValues { it.value.toString() }
+                    pixel.fire(AutoConsentPixel.AUTOCONSENT_SUMMARY, parameters = summaryData)
+                    clearAllCaches()
+                }
+            }
+
+            pixel.fire(pixelName, type = Daily())
+        }
     }
 
     override fun isDetectedByPatternsProcessed(instanceId: String): Boolean {

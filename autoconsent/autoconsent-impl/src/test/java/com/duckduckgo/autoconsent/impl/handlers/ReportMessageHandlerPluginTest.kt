@@ -22,6 +22,14 @@ import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.autoconsent.api.AutoconsentCallback
 import com.duckduckgo.autoconsent.impl.pixels.AutoConsentPixel
 import com.duckduckgo.autoconsent.impl.pixels.AutoconsentPixelManager
+import com.duckduckgo.autoconsent.impl.remoteconfig.AutoconsentFeature
+import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.feature.toggles.api.Toggle
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.advanceUntilIdle
+import kotlinx.coroutines.test.runTest
+import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.mock
@@ -29,18 +37,37 @@ import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
+@OptIn(ExperimentalCoroutinesApi::class)
 @RunWith(AndroidJUnit4::class)
 class ReportMessageHandlerPluginTest {
 
+    @get:Rule
+    val coroutineTestRule: CoroutineTestRule = CoroutineTestRule()
+
     private val mockPixelManager: AutoconsentPixelManager = mock()
     private val mockCallback: AutoconsentCallback = mock()
+    private val mockAutoconsentFeature: AutoconsentFeature = mock()
+    private val mockToggle: Toggle = mock()
     private val webView: WebView = WebView(InstrumentationRegistry.getInstrumentation().targetContext)
 
-    private val reportMessageHandler = ReportMessageHandlerPlugin(mockPixelManager)
+    private lateinit var reportMessageHandler: ReportMessageHandlerPlugin
+
+    @Before
+    fun setup() {
+        whenever(mockAutoconsentFeature.cpmPixels()).thenReturn(mockToggle)
+        whenever(mockToggle.isEnabled()).thenReturn(true)
+        reportMessageHandler = ReportMessageHandlerPlugin(
+            mockPixelManager,
+            mockAutoconsentFeature,
+            coroutineTestRule.testDispatcherProvider,
+            coroutineTestRule.testScope,
+        )
+    }
 
     @Test
-    fun whenProcessAndUnsupportedMessageTypeThenDoNothing() {
+    fun whenProcessAndUnsupportedMessageTypeThenDoNothing() = runTest {
         reportMessageHandler.process("unsupported", "", webView, mockCallback)
+        advanceUntilIdle()
 
         verify(mockPixelManager, never()).fireDailyPixel(AutoConsentPixel.AUTOCONSENT_DETECTED_BY_PATTERNS_DAILY)
         verify(mockPixelManager, never()).fireDailyPixel(AutoConsentPixel.AUTOCONSENT_DETECTED_BY_BOTH_DAILY)
@@ -48,8 +75,9 @@ class ReportMessageHandlerPluginTest {
     }
 
     @Test
-    fun whenProcessAndInvalidJsonThenDoNothing() {
+    fun whenProcessAndInvalidJsonThenDoNothing() = runTest {
         reportMessageHandler.process("report", "invalid json", webView, mockCallback)
+        advanceUntilIdle()
 
         verify(mockPixelManager, never()).fireDailyPixel(AutoConsentPixel.AUTOCONSENT_DETECTED_BY_PATTERNS_DAILY)
         verify(mockPixelManager, never()).fireDailyPixel(AutoConsentPixel.AUTOCONSENT_DETECTED_BY_BOTH_DAILY)
@@ -57,7 +85,7 @@ class ReportMessageHandlerPluginTest {
     }
 
     @Test
-    fun whenProcessThrowsExceptionThenDoNothing() {
+    fun whenProcessThrowsExceptionThenDoNothing() = runTest {
         val message = createReportMessage(
             heuristicPatterns = listOf("pattern1"),
             heuristicSnippets = emptyList(),
@@ -67,6 +95,7 @@ class ReportMessageHandlerPluginTest {
         whenever(mockPixelManager.isDetectedByPatternsProcessed("id-123-abc")).thenThrow(RuntimeException("test"))
 
         reportMessageHandler.process("report", message, webView, mockCallback)
+        advanceUntilIdle()
 
         verify(mockPixelManager, never()).fireDailyPixel(AutoConsentPixel.AUTOCONSENT_DETECTED_BY_PATTERNS_DAILY)
         verify(mockPixelManager, never()).fireDailyPixel(AutoConsentPixel.AUTOCONSENT_DETECTED_BY_BOTH_DAILY)
@@ -74,7 +103,7 @@ class ReportMessageHandlerPluginTest {
     }
 
     @Test
-    fun whenProcessAndHeuristicPatternsOnlyThenFireDetectedByPatternsPixel() {
+    fun whenProcessAndHeuristicPatternsOnlyThenFireDetectedByPatternsPixel() = runTest {
         val message = createReportMessage(
             heuristicPatterns = listOf("pattern1", "pattern2"),
             heuristicSnippets = emptyList(),
@@ -84,6 +113,7 @@ class ReportMessageHandlerPluginTest {
         whenever(mockPixelManager.isDetectedByPatternsProcessed("id-123-abc")).thenReturn(false)
 
         reportMessageHandler.process("report", message, webView, mockCallback)
+        advanceUntilIdle()
 
         verify(mockPixelManager).isDetectedByPatternsProcessed("id-123-abc")
         verify(mockPixelManager).markDetectedByPatternsProcessed("id-123-abc")
@@ -93,7 +123,7 @@ class ReportMessageHandlerPluginTest {
     }
 
     @Test
-    fun whenProcessAndHeuristicSnippetsOnlyThenFireDetectedByPatternsPixel() {
+    fun whenProcessAndHeuristicSnippetsOnlyThenFireDetectedByPatternsPixel() = runTest {
         val message = createReportMessage(
             heuristicPatterns = emptyList(),
             heuristicSnippets = listOf("snippet1", "snippet2"),
@@ -103,6 +133,7 @@ class ReportMessageHandlerPluginTest {
         whenever(mockPixelManager.isDetectedByPatternsProcessed("id-123-abc")).thenReturn(false)
 
         reportMessageHandler.process("report", message, webView, mockCallback)
+        advanceUntilIdle()
 
         verify(mockPixelManager).isDetectedByPatternsProcessed("id-123-abc")
         verify(mockPixelManager).markDetectedByPatternsProcessed("id-123-abc")
@@ -112,7 +143,7 @@ class ReportMessageHandlerPluginTest {
     }
 
     @Test
-    fun whenProcessAndHeuristicPatternsAndSnippetsThenFireDetectedByPatternsPixel() {
+    fun whenProcessAndHeuristicPatternsAndSnippetsThenFireDetectedByPatternsPixel() = runTest {
         val message = createReportMessage(
             heuristicPatterns = listOf("pattern1"),
             heuristicSnippets = listOf("snippet1"),
@@ -122,6 +153,7 @@ class ReportMessageHandlerPluginTest {
         whenever(mockPixelManager.isDetectedByPatternsProcessed("id-123-abc")).thenReturn(false)
 
         reportMessageHandler.process("report", message, webView, mockCallback)
+        advanceUntilIdle()
 
         verify(mockPixelManager).isDetectedByPatternsProcessed("id-123-abc")
         verify(mockPixelManager).markDetectedByPatternsProcessed("id-123-abc")
@@ -131,7 +163,7 @@ class ReportMessageHandlerPluginTest {
     }
 
     @Test
-    fun whenProcessAndHeuristicMatchAndDetectedPopupsThenFireDetectedByBothPixel() {
+    fun whenProcessAndHeuristicMatchAndDetectedPopupsThenFireDetectedByBothPixel() = runTest {
         val message = createReportMessage(
             heuristicPatterns = listOf("pattern1"),
             heuristicSnippets = emptyList(),
@@ -142,6 +174,7 @@ class ReportMessageHandlerPluginTest {
         whenever(mockPixelManager.isDetectedByBothProcessed("id-123-abc")).thenReturn(false)
 
         reportMessageHandler.process("report", message, webView, mockCallback)
+        advanceUntilIdle()
 
         verify(mockPixelManager).isDetectedByPatternsProcessed("id-123-abc")
         verify(mockPixelManager).markDetectedByPatternsProcessed("id-123-abc")
@@ -153,7 +186,7 @@ class ReportMessageHandlerPluginTest {
     }
 
     @Test
-    fun whenProcessAndNoHeuristicMatchAndDetectedPopupsThenFireDetectedOnlyRulesPixel() {
+    fun whenProcessAndNoHeuristicMatchAndDetectedPopupsThenFireDetectedOnlyRulesPixel() = runTest {
         val message = createReportMessage(
             heuristicPatterns = emptyList(),
             heuristicSnippets = emptyList(),
@@ -173,7 +206,7 @@ class ReportMessageHandlerPluginTest {
     }
 
     @Test
-    fun whenProcessAndAlreadyProcessedDetectedByPatternsThenDoNotFireAgain() {
+    fun whenProcessAndAlreadyProcessedDetectedByPatternsThenDoNotFireAgain() = runTest {
         val message = createReportMessage(
             heuristicPatterns = listOf("pattern1"),
             heuristicSnippets = emptyList(),
@@ -183,6 +216,7 @@ class ReportMessageHandlerPluginTest {
         whenever(mockPixelManager.isDetectedByPatternsProcessed("id-123-abc")).thenReturn(true)
 
         reportMessageHandler.process("report", message, webView, mockCallback)
+        advanceUntilIdle()
 
         verify(mockPixelManager).isDetectedByPatternsProcessed("id-123-abc")
         verify(mockPixelManager, never()).markDetectedByPatternsProcessed("id-123-abc")
@@ -190,7 +224,7 @@ class ReportMessageHandlerPluginTest {
     }
 
     @Test
-    fun whenProcessAndAlreadyProcessedDetectedByBothThenDoNotFireAgain() {
+    fun whenProcessAndAlreadyProcessedDetectedByBothThenDoNotFireAgain() = runTest {
         val message = createReportMessage(
             heuristicPatterns = listOf("pattern1"),
             heuristicSnippets = emptyList(),
@@ -201,6 +235,7 @@ class ReportMessageHandlerPluginTest {
         whenever(mockPixelManager.isDetectedByBothProcessed("id-123-abc")).thenReturn(true)
 
         reportMessageHandler.process("report", message, webView, mockCallback)
+        advanceUntilIdle()
 
         verify(mockPixelManager).isDetectedByPatternsProcessed("id-123-abc")
         verify(mockPixelManager).markDetectedByPatternsProcessed("id-123-abc")
@@ -211,7 +246,7 @@ class ReportMessageHandlerPluginTest {
     }
 
     @Test
-    fun whenProcessAndAlreadyProcessedDetectedOnlyRulesThenDoNotFireAgain() {
+    fun whenProcessAndAlreadyProcessedDetectedOnlyRulesThenDoNotFireAgain() = runTest {
         val message = createReportMessage(
             heuristicPatterns = emptyList(),
             heuristicSnippets = emptyList(),
@@ -224,6 +259,23 @@ class ReportMessageHandlerPluginTest {
 
         verify(mockPixelManager).isDetectedOnlyRulesProcessed("id-123-abc")
         verify(mockPixelManager, never()).markDetectedOnlyRulesProcessed("id-123-abc")
+        verify(mockPixelManager, never()).fireDailyPixel(AutoConsentPixel.AUTOCONSENT_DETECTED_ONLY_RULES_DAILY)
+    }
+
+    @Test
+    fun whenCpmPixelsDisabledThenNoPixelsFired() = runTest {
+        whenever(mockToggle.isEnabled()).thenReturn(false)
+        val message = createReportMessage(
+            heuristicPatterns = listOf("pattern1"),
+            heuristicSnippets = emptyList(),
+            detectedPopups = listOf("popup1"),
+        )
+
+        reportMessageHandler.process("report", message, webView, mockCallback)
+        advanceUntilIdle()
+
+        verify(mockPixelManager, never()).fireDailyPixel(AutoConsentPixel.AUTOCONSENT_DETECTED_BY_PATTERNS_DAILY)
+        verify(mockPixelManager, never()).fireDailyPixel(AutoConsentPixel.AUTOCONSENT_DETECTED_BY_BOTH_DAILY)
         verify(mockPixelManager, never()).fireDailyPixel(AutoConsentPixel.AUTOCONSENT_DETECTED_ONLY_RULES_DAILY)
     }
 

@@ -19,7 +19,9 @@ package com.duckduckgo.autoconsent.impl.pixels
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Count
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
+import com.duckduckgo.autoconsent.impl.remoteconfig.AutoconsentFeature
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.feature.toggles.api.Toggle
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.advanceUntilIdle
@@ -34,6 +36,7 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoMoreInteractions
+import org.mockito.kotlin.whenever
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class AutoconsentPixelManagerTest {
@@ -42,20 +45,41 @@ class AutoconsentPixelManagerTest {
     val coroutineTestRule: CoroutineTestRule = CoroutineTestRule()
 
     private val mockPixel: Pixel = mock()
+    private val mockAutoconsentFeature: AutoconsentFeature = mock()
+    private val mockToggle: Toggle = mock()
     private lateinit var pixelManager: RealAutoconsentPixelManager
 
     @Before
     fun setup() {
-        pixelManager = RealAutoconsentPixelManager(mockPixel, coroutineTestRule.testScope)
+        whenever(mockAutoconsentFeature.cpmPixels()).thenReturn(mockToggle)
+        whenever(mockToggle.isEnabled()).thenReturn(true)
+        pixelManager = RealAutoconsentPixelManager(
+            mockPixel,
+            coroutineTestRule.testScope,
+            mockAutoconsentFeature,
+            coroutineTestRule.testDispatcherProvider,
+        )
     }
 
     @Test
-    fun whenFireDailyPixelThenFirePixelWithDailyType() {
+    fun whenFireDailyPixelThenFirePixelWithDailyType() = runTest {
         val pixelName = AutoConsentPixel.AUTOCONSENT_DETECTED_BY_PATTERNS_DAILY
 
         pixelManager.fireDailyPixel(pixelName)
+        advanceUntilIdle()
 
         verify(mockPixel).fire(eq(pixelName), eq(emptyMap()), eq(emptyMap()), eq(Daily()))
+    }
+
+    @Test
+    fun whenCpmPixelsDisabledThenNoPixelsFired() = runTest {
+        whenever(mockToggle.isEnabled()).thenReturn(false)
+        val pixelName = AutoConsentPixel.AUTOCONSENT_DETECTED_BY_PATTERNS_DAILY
+
+        pixelManager.fireDailyPixel(pixelName)
+        advanceUntilIdle()
+
+        verifyNoMoreInteractions(mockPixel)
     }
 
     @Test

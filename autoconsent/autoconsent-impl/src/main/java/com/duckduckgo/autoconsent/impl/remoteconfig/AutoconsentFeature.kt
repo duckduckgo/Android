@@ -47,4 +47,13 @@ interface AutoconsentFeature {
      */
     @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun ruleFiltering(): Toggle
+
+    /**
+     * Kill switch for autoconsent CPM pixels
+     * @return `true` when the remote config has the global "cpmPixels" autoconsent
+     * sub-feature flag enabled
+     * If the remote feature is not present defaults to `true`
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
+    fun cpmPixels(): Toggle
 }
