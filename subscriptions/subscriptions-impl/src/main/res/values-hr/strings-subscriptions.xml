@@ -20,6 +20,7 @@
     <string name="cancel">Odustani</string>
     <string name="ok">U redu</string>
     <string name="privacyPro" translatable="false">Privacy Pro</string>
+    <string name="ddg_subscription">DuckDuckGo pretplata</string>
     <string name="manageEmail">Upravljaj e-poštom</string>
 
     <!--Restore Subscriptions Activity-->
@@ -31,19 +32,19 @@
     <string name="subscriptionNotFound">Pretplata nije pronađena</string>
     <string name="subscriptionNotFoundDescription">Tvoja pretplata povezana s ovim Google Play računom više nije aktivna.</string>
     <string name="purchaseRestored">Tvoje kupnje su vraćene.</string>
-    <string name="restoreSubscriptionTitle">Dodaj svoju pretplatu na Privacy Pro na ovaj uređaj</string>
+    <string name="restoreSubscriptionTitle">Dodaj svoju pretplatu na ovaj uređaj</string>
     <string name="restoreSubscriptionGooglePlayTitle">Dodaj putem Google Play računa</string>
     <string name="restoreSubscriptionGooglePlayDescription">Obnovi svoju pretplatu na Android uređajima koristeći svoj Google Play račun.</string>
     <string name="restoreSubscriptionGooglePlayGetStarted">Vrati kupnju</string>
     <string name="restoreSubscriptionEmailTitle">Dodaj putem e-pošte</string>
-    <string name="restoreSubscriptionEmailDescription">Poveži adresu e-pošte s pretplatom kako bi dodao Privacy Pro na ovaj uređaj.</string>
+    <string name="restoreSubscriptionEmailDescription">Poveži adresu e-pošte sa svojom pretplatom kako bi je dodao na ovaj uređaj.</string>
     <string name="restoreSubscriptionEmailGetStarted">Započnite</string>
 
     <!--Settings Subscriptions Activity-->
     <string name="removeSubscription">Ukloni pretplatu</string>
     <string name="subscriptionRemoved">Tvoja pretplata je uklonjena s ovog uređaja</string>
     <string name="removeFromDevice">Ukloni s ovog uređaja?</string>
-    <string name="removeFromDeviceDescription">Više nećeš moći pristupiti svojoj pretplati na Privacy Pro na ovom uređaju. Ovo neće otkazati tvoju pretplatu i ostat će aktivna na tvojim drugim uređajima.</string>
+    <string name="removeFromDeviceDescription">Više nećeš moći pristupiti svojoj pretplati na ovom uređaju. Ovo neće otkazati tvoju pretplatu i ostat će aktivna na tvojim drugim uređajima.</string>
     <string name="subscriptionsDataMonthly" instruction="First placeholder is renews or expires, second is a date in format MMMM dd, yyyy">Tvoja mjesečna pretplata %1$s na %2$s.</string>
     <string name="subscriptionsDataYearly" instruction="First placeholder is renews or expires, second is a date in format MMMM dd, yyyy">Tvoja godišnja pretplata %1$s na %2$s.</string>
     <string name="subscriptionsExpiredData" instruction="The placeholder is a date in format MMMM dd, yyyy">Tvoja pretplata je istekla %1$s.</string>
@@ -51,14 +52,14 @@
     <string name="yearlySubscription">Godišnja pretplata</string>
     <string name="renews">obnavlja se</string>
     <string name="expires">istječe</string>
-    <string name="activateOnOtherDevices">Dodaj Privacy Pro na druge uređaje</string>
+    <string name="activateOnOtherDevices">Dodaj svoju pretplatu na druge uređaje</string>
     <string name="addToDevicePrimaryText">Dodaj na uređaj</string>
-    <string name="addToDeviceSecondaryTextWithoutEmail">Dodaj Privacy Pro na svoje druge uređaje putem Google Playa ili povezivanjem adrese e-pošte.</string>
-    <string name="addToDeviceSecondaryTextWithEmail">Koristi gore navedenu adresu e-pošte za dodavanje pretplate na svoje druge uređaje u aplikaciji DuckDuckGo. Idi na Postavke &gt; Privacy Pro &gt; Imam pretplatu.</string>
+    <string name="addToDeviceSecondaryTextWithoutEmail">Dodaj svoju pretplatu na svoje druge uređaje putem Google Playa ili povezivanjem adrese e-pošte.</string>
+    <string name="addToDeviceSecondaryTextWithEmail">Koristi gore navedenu adresu e-pošte za dodavanje pretplate na svoje druge uređaje u aplikaciji DuckDuckGo. Idi na Postavke &gt; Postavke pretplate &gt; Imam pretplatu.</string>
     <string name="editEmailPrimaryText">Uredi e-poštu</string>
     <string name="learnMore">Saznajte više</string>
-    <string name="privacyProFaq">Trebaš pomoć s Privacy Pro?</string>
-    <string name="privacyProFaqSecondary">Pronađi odgovore na često postavljana pitanja ili kontaktiraj podršku Privacy Pro putem naših stranica pomoći. Dostupnost značajki ovisi o zemlji.</string>
+    <string name="privacyProFaq">Trebaš pomoć s pretplatom?</string>
+    <string name="privacyProFaqSecondary">Pronađi odgovore na često postavljana pitanja ili kontaktiraj podršku za pretplatu putem naših stranica pomoći. Dostupnost značajki ovisi o zemlji.</string>
     <string name="subscriptionStatusSubscribed">Pretplaćen</string>
     <string name="privacyPolicyAndTermsOfService">Pravila privatnosti i Uvjeti pružanja usluge</string>
     <string name="subscriptionStatusFreeTrial">Besplatno probno razdoblje je aktivno</string>
@@ -68,15 +69,15 @@
 
     <!--Settings Subscriptions-->
     <string name="subscriptionSetting">Postavke pretplate</string>
-    <string name="subscriptionSettingSubscribe">Zaštiti svoju vezu i identitet uz Privacy Pro</string>
+    <string name="subscriptionSettingSubscribe">Zaštiti svoju vezu i identitet jednom pretplatom.</string>
 
     <string name="subscriptionSettingSubscribeSubtitle">Pretplatnici dobivaju naš VPN te usluge Personal Information Removal (uklanjanje osobnih podataka) i Identity Theft Restoration (oporavak od krađe identiteta).</string>
     <string name="subscriptionSettingSubscribeSubtitleRow">Pretplatnici dobivaju naš VPN i uslugu Identity Theft Restoration (oporavak od krađe identiteta).</string>
 
-    <string name="subscriptionSettingGet">Nabavi Privacy Pro</string>
-    <string name="subscriptionSettingTryFreeTrial">Besplatno isprobaj Privacy Pro</string>
+    <string name="subscriptionSettingGet">Pretplati se na DuckDuckGo</string>
+    <string name="subscriptionSettingTryFreeTrial">Isprobaj besplatno</string>
     <string name="subscriptionSettingRestore">Imam pretplatu</string>
-    <string name="subscriptionSettingExpired">Tvoja pretplata na Privacy Pro je istekla</string>
+    <string name="subscriptionSettingExpired">Tvoja pretplata na DuckDuckGo je istekla</string>
     <string name="subscriptionSettingExpiredViewPlans">Pregledaj planove</string>
     <string name="subscriptionSettingSectionSubscription">Pretplata</string>
     <string name="subscriptionSettingRemoveFromDevice">Ukloni s ovog uređaja</string>
@@ -170,18 +171,7 @@
     <string name="activitySendFeedback">Pošalji povratnu informaciju</string>
 
     <!-- Privacy Pro Rebranding-->
-    <string name="privacyProRebranding">DuckDuckGo pretplata</string>
-    <string name="subscriptionSettingExpiredRebranding">Tvoja pretplata na DuckDuckGo je istekla</string>
-    <string name="privacyProFaqRebranding">Trebaš pomoć s pretplatom?</string>
-    <string name="privacyProFaqSecondaryRebranding">Pronađi odgovore na često postavljana pitanja ili kontaktiraj podršku za pretplatu putem naših stranica pomoći. Dostupnost značajki ovisi o zemlji.</string>
-    <string name="restoreSubscriptionTitleRebranding">Dodaj svoju pretplatu na ovaj uređaj</string>
-    <string name="restoreSubscriptionEmailDescriptionRebranding">Poveži adresu e-pošte sa svojom pretplatom kako bi je dodao na ovaj uređaj.</string>
-    <string name="activateOnOtherDevicesRebranding">Dodaj svoju pretplatu na druge uređaje</string>
-    <string name="addToDeviceSecondaryTextWithoutEmailRebranding">Dodaj svoju pretplatu na svoje druge uređaje putem Google Playa ili povezivanjem adrese e-pošte.</string>
-    <string name="addToDeviceSecondaryTextWithEmailRebranding">Koristi gore navedenu adresu e-pošte za dodavanje pretplate na svoje druge uređaje u aplikaciji DuckDuckGo. Idi na Postavke &gt; Postavke pretplate &gt; Imam pretplatu.</string>
     <string name="subscriptionSettingRebrandingMessage">Privacy Pro sada se jednostavno zove DuckDuckGo pretplata</string>
-    <string name="subscriptionSettingSubscribeRebranding">Zaštiti svoju vezu i identitet jednom pretplatom.</string>
-    <string name="removeFromDeviceDescriptionRebranding">Više nećeš moći pristupiti svojoj pretplati na ovom uređaju. Ovo neće otkazati tvoju pretplatu i ostat će aktivna na tvojim drugim uređajima.</string>
 
     <string name="subscriptionSettingSubscribeWithDuckAiSubtitle">Pretplatnici dobivaju naš VPN, napredne AI modele u usluzi Duck.ai, uslugu Personal Information Removal (uklanjanje osobnih podataka) te uslugu Identity Theft Restoration (oporavak od krađe identiteta).</string>
     <string name="subscriptionSettingSubscribeWithDuckAiSubtitleRow">Pretplatnici dobivaju naš VPN, napredne AI modele u Duck.ai te usluge Personal Information Removal (uklanjanje osobnih podataka) i Identity Theft Restoration (oporavak od krađe identiteta).</string>
@@ -194,8 +184,6 @@
     <string name="subscriptionSettingSectionTitle" translatable="false">DuckDuckGo Subscription</string>
     <string name="subscriptionSettingSubscribeSecure">Osiguraj svoj Wi-Fi i privatno čavrljaj s naprednim AI modelima</string>
 
-    <string name="subscriptionSettingGetRebranding">Pretplati se na DuckDuckGo</string>
-    <string name="subscriptionSettingTryFreeTrialRebranding">Isprobaj besplatno</string>
     <string name="feedbackGeneralSubscription">Pretplata</string>
 
 </resources>

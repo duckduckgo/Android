@@ -20,6 +20,7 @@
     <string name="cancel">Atšaukti</string>
     <string name="ok">Gerai</string>
     <string name="privacyPro" translatable="false">Privacy Pro</string>
+    <string name="ddg_subscription">„DuckDuckGo“ prenumerata</string>
     <string name="manageEmail">Tvarkyti el. paštą</string>
 
     <!--Restore Subscriptions Activity-->
@@ -31,19 +32,19 @@
     <string name="subscriptionNotFound">Prenumeratos nerasta</string>
     <string name="subscriptionNotFoundDescription">Su šia „Google Play“ paskyra susijusi prenumerata nebėra aktyvi.</string>
     <string name="purchaseRestored">Jūsų pirkiniai atkurti.</string>
-    <string name="restoreSubscriptionTitle">Pridėkite savo „Privacy Pro“ prenumeratą prie šio įrenginio</string>
+    <string name="restoreSubscriptionTitle">Pridėkite savo prenumeratą prie šio įrenginio</string>
     <string name="restoreSubscriptionGooglePlayTitle">Pridėti per „Google Play“ paskyrą</string>
     <string name="restoreSubscriptionGooglePlayDescription">Atkurkite savo prenumeratą „Android“ įrenginiuose naudodami „Google Play“ paskyrą.</string>
     <string name="restoreSubscriptionGooglePlayGetStarted">Atkurti pirkimą</string>
     <string name="restoreSubscriptionEmailTitle">Pridėti per el. paštą</string>
-    <string name="restoreSubscriptionEmailDescription">Susiekite el. pašto adresą su prenumerata, kad prie šio įrenginio pridėtumėte \"Privacy Pro\".</string>
+    <string name="restoreSubscriptionEmailDescription">Susiekite el. pašto adresą su prenumerata, kad pridėtumėte jį prie šio įrenginio.</string>
     <string name="restoreSubscriptionEmailGetStarted">Pradėti</string>
 
     <!--Settings Subscriptions Activity-->
     <string name="removeSubscription">Pašalinti prenumeratą</string>
     <string name="subscriptionRemoved">Jūsų prenumerata buvo pašalinta iš šio įrenginio</string>
     <string name="removeFromDevice">Pašalinti iš šio įrenginio?</string>
-    <string name="removeFromDeviceDescription">Šiame prietaise nebegalėsite naudotis „Privacy Pro“ prenumerata. Tai neatšauks jūsų prenumeratos ir ji liks aktyvi kituose įrenginiuose.</string>
+    <string name="removeFromDeviceDescription">Šiame įrenginyje nebegalėsite pasiekti savo prenumeratos. Tai neatšauks jūsų prenumeratos ir ji liks aktyvi kituose įrenginiuose.</string>
     <string name="subscriptionsDataMonthly" instruction="First placeholder is renews or expires, second is a date in format MMMM dd, yyyy">Jūsų mėnesio prenumerata %1$s %2$s.</string>
     <string name="subscriptionsDataYearly" instruction="First placeholder is renews or expires, second is a date in format MMMM dd, yyyy">Jūsų metinė prenumerata %1$s %2$s.</string>
     <string name="subscriptionsExpiredData" instruction="The placeholder is a date in format MMMM dd, yyyy">Jūsų prenumerata baigėsi %1$s.</string>
@@ -51,14 +52,14 @@
     <string name="yearlySubscription">Metinė prenumerata</string>
     <string name="renews">atsinaujina</string>
     <string name="expires">baigiasi</string>
-    <string name="activateOnOtherDevices">Pridėti „Privacy Pro“ prie kitų įrenginių</string>
+    <string name="activateOnOtherDevices">Pridėkite savo prenumeratą prie kitų įrenginių</string>
     <string name="addToDevicePrimaryText">Pridėti prie įrenginio</string>
-    <string name="addToDeviceSecondaryTextWithoutEmail">Pridėkite „Privacy Pro“ į kitus įrenginius per „Google Play“ arba susiedami el. pašto adresą.</string>
-    <string name="addToDeviceSecondaryTextWithEmail">Naudokite pirmiau nurodytą el. paštą prenumeratą kituose savo įrenginiuose programėlėje „DuckDuckGo“ pridėti. Eikite į „Settings“ (Nustatymai) &gt; „Privacy Pro“ &gt; „I have a Subscription“ (Turiu prenumeratą).</string>
+    <string name="addToDeviceSecondaryTextWithoutEmail">Pridėkite prenumeratą į kitus įrenginius per „Google Play“ arba susiedami el. pašto adresą.</string>
+    <string name="addToDeviceSecondaryTextWithEmail">Naudokite pirmiau nurodytą el. paštą prenumeratą kituose savo įrenginiuose programėlėje „DuckDuckGo“ pridėti. Eikite į Nustatymai &gt; Prenumeratos nustatymai &gt; Turiu prenumeratą.</string>
     <string name="editEmailPrimaryText">Redaguoti el. pašto adresą</string>
     <string name="learnMore">Sužinoti daugiau</string>
-    <string name="privacyProFaq">Reikia pagalbos su „Privacy Pro“?</string>
-    <string name="privacyProFaqSecondary">Gaukite atsakymus į dažniausiai užduodamus klausimus arba susisiekite su „Privacy Pro“ palaikymo tarnyba mūsų pagalbos puslapiuose. Funkcijų prieinamumas skiriasi atsižvelgiant į šalį.</string>
+    <string name="privacyProFaq">Reikia pagalbos su prenumerata?</string>
+    <string name="privacyProFaqSecondary">Gauk atsakymus į dažniausiai užduodamus klausimus arba susisiek su prenumeratos palaikymo tarnyba mūsų pagalbos puslapiuose. Funkcijų prieinamumas skiriasi atsižvelgiant į šalį.</string>
     <string name="subscriptionStatusSubscribed">Prenumeruota</string>
     <string name="privacyPolicyAndTermsOfService">Privatumo politika ir paslaugų teikimo sąlygos</string>
     <string name="subscriptionStatusFreeTrial">Nemokama bandomoji versija aktyvi</string>
@@ -68,15 +69,15 @@
 
     <!--Settings Subscriptions-->
     <string name="subscriptionSetting">Prenumeratos nustatymai</string>
-    <string name="subscriptionSettingSubscribe">Apsaugokite savo ryšį ir tapatybę su „Privacy Pro“.</string>
+    <string name="subscriptionSettingSubscribe">Apsaugokite savo ryšį ir tapatybę naudodami vieną prenumeratą.</string>
 
     <string name="subscriptionSettingSubscribeSubtitle">Prenumeratoriai gauna mūsų VPN, asmeninės informacijos pašalinimo ir tapatybės vagystės atkūrimo paslaugas.</string>
     <string name="subscriptionSettingSubscribeSubtitleRow">Prenumeratoriai gauna mūsų VPN ir tapatybės vagystės atkūrimą.</string>
 
-    <string name="subscriptionSettingGet">Gaukite „Privacy Pro“</string>
-    <string name="subscriptionSettingTryFreeTrial">Išbandyk „Privacy Pro“ nemokamai</string>
+    <string name="subscriptionSettingGet">Prenumeruok „DuckDuckGo“</string>
+    <string name="subscriptionSettingTryFreeTrial">Išbandyk nemokamai</string>
     <string name="subscriptionSettingRestore">Turiu prenumeratą</string>
-    <string name="subscriptionSettingExpired">Jūsų „Privacy Pro“ prenumerata baigėsi</string>
+    <string name="subscriptionSettingExpired">Jūsų „DuckDuckGo“ prenumerata baigėsi</string>
     <string name="subscriptionSettingExpiredViewPlans">Peržiūrėti planus</string>
     <string name="subscriptionSettingSectionSubscription">Prenumerata</string>
     <string name="subscriptionSettingRemoveFromDevice">Pašalinti iš šio įrenginio</string>
@@ -170,18 +171,7 @@
     <string name="activitySendFeedback">Siųsti atsiliepimą</string>
 
     <!-- Privacy Pro Rebranding-->
-    <string name="privacyProRebranding">„DuckDuckGo“ prenumerata</string>
-    <string name="subscriptionSettingExpiredRebranding">Jūsų „DuckDuckGo“ prenumerata baigėsi</string>
-    <string name="privacyProFaqRebranding">Reikia pagalbos su prenumerata?</string>
-    <string name="privacyProFaqSecondaryRebranding">Gauk atsakymus į dažniausiai užduodamus klausimus arba susisiek su prenumeratos palaikymo tarnyba mūsų pagalbos puslapiuose. Funkcijų prieinamumas skiriasi atsižvelgiant į šalį.</string>
-    <string name="restoreSubscriptionTitleRebranding">Pridėkite savo prenumeratą prie šio įrenginio</string>
-    <string name="restoreSubscriptionEmailDescriptionRebranding">Susiekite el. pašto adresą su prenumerata, kad pridėtumėte jį prie šio įrenginio.</string>
-    <string name="activateOnOtherDevicesRebranding">Pridėkite savo prenumeratą prie kitų įrenginių</string>
-    <string name="addToDeviceSecondaryTextWithoutEmailRebranding">Pridėkite prenumeratą į kitus įrenginius per „Google Play“ arba susiedami el. pašto adresą.</string>
-    <string name="addToDeviceSecondaryTextWithEmailRebranding">Naudokite pirmiau nurodytą el. paštą prenumeratą kituose savo įrenginiuose programėlėje „DuckDuckGo“ pridėti. Eikite į Nustatymai &gt; Prenumeratos nustatymai &gt; Turiu prenumeratą.</string>
     <string name="subscriptionSettingRebrandingMessage">„Privacy Pro“ dabar tiesiog vadinama „DuckDuckGo“ prenumerata.</string>
-    <string name="subscriptionSettingSubscribeRebranding">Apsaugokite savo ryšį ir tapatybę naudodami vieną prenumeratą.</string>
-    <string name="removeFromDeviceDescriptionRebranding">Šiame įrenginyje nebegalėsite pasiekti savo prenumeratos. Tai neatšauks jūsų prenumeratos ir ji liks aktyvi kituose įrenginiuose.</string>
 
     <string name="subscriptionSettingSubscribeWithDuckAiSubtitle">Prenumeratoriai gauna mūsų VPN, pažangius dirbtinio intelekto modelius „Duck.ai“, asmens duomenų šalinimas ir tapatybės vagystės duomenų atkūrimas.</string>
     <string name="subscriptionSettingSubscribeWithDuckAiSubtitleRow">Prenumeratoriai gauna mūsų VPN, pažangius dirbtinio intelekto modelius „Duck.ai“ platformoje ir tapatybės vagystės atkūrimo paslaugą.</string>
@@ -194,8 +184,6 @@
     <string name="subscriptionSettingSectionTitle" translatable="false">DuckDuckGo Subscription</string>
     <string name="subscriptionSettingSubscribeSecure">Apsaugok savo Wi-Fi ir kalbėkis privačiai su pažangiais DI modeliais</string>
 
-    <string name="subscriptionSettingGetRebranding">Prenumeruok „DuckDuckGo“</string>
-    <string name="subscriptionSettingTryFreeTrialRebranding">Išbandyk nemokamai</string>
     <string name="feedbackGeneralSubscription">Prenumerata</string>
 
 </resources>

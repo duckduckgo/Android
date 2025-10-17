@@ -192,7 +192,7 @@
     <string name="netpNotificationCTAReconnectNow">Jetzt erneut verbinden</string>
     <string name="netpNotificationSnoozeTitle">VPN ist pausiert</string>
     <string name="netpNotificationSnoozeBody" instruction="Placeholder is time in hh:mm format">VPN-Verbindung wird um %1$s wiederhergestellt</string>
-    <string name="netpNotificationVpnAccessRevoked">VPN aufgrund abgelaufenen Abonnements getrennt. Abonniere Privacy Pro, um die Verbindung zum DuckDuckGo-VPN wiederherzustellen.</string>
+    <string name="netpNotificationVpnAccessRevoked">VPN aufgrund abgelaufenen Abonnements getrennt. Abonniere DuckDuckGo, um die Verbindung zum VPN wiederherzustellen.</string>
 
     <!-- Geoswitching -->
     <string name="netpGeoswitchingTitle">VPN-Standort</string>
@@ -204,7 +204,7 @@
 
     <!-- Access revoked-->
     <string name="netpDialogVpnAccessRevokedTitle">VPN aufgrund abgelaufenen Abonnements getrennt</string>
-    <string name="netpDialogVpnAccessRevokedBody">Abonniere Privacy Pro, um die Verbindung zum DuckDuckGo-VPN wiederherzustellen.</string>
+    <string name="netpDialogVpnAccessRevokedBody">Abonniere DuckDuckGo, um die Verbindung zum VPN wiederherzustellen.</string>
     <string name="netpDialogVpnAccessRevokedPositiveAction">Abonnieren</string>
     <string name="netpDialogVpnAccessRevokedNegativeAction">Verwerfen</string>
 
@@ -258,7 +258,4 @@
     <string name="netpExclusionListLabelAutoExclude">Inkompatibel mit VPNs</string>
     <string name="netpExclusionListAutoExcludeDescription">Einige Apps, wie Banking- oder Streaming-Apps, funktionieren nicht gut mit VPNs. Wenn diese Einstellung aktiviert ist, schließen wir diese Apps automatisch aus.</string>
 
-    <!-- Privacy Pro Rebranding-->
-    <string name="netpNotificationVpnAccessRevokedRebranding">VPN aufgrund abgelaufenen Abonnements getrennt. Abonniere DuckDuckGo, um die Verbindung zum VPN wiederherzustellen.</string>
-    <string name="netpDialogVpnAccessRevokedBodyRebranding">Abonniere DuckDuckGo, um die Verbindung zum VPN wiederherzustellen.</string>
 </resources>

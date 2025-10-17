@@ -192,7 +192,7 @@
     <string name="netpNotificationCTAReconnectNow">Свържи отново сега</string>
     <string name="netpNotificationSnoozeTitle">VPN е в режим на изчакване</string>
     <string name="netpNotificationSnoozeBody" instruction="Placeholder is time in hh:mm format">VPN ще се свърже отново в %1$s</string>
-    <string name="netpNotificationVpnAccessRevoked">VPN връзката е прекъсната поради изтекъл абонамент. Абонирайте се за Privacy Pro, за да свържете отново DuckDuckGo VPN.</string>
+    <string name="netpNotificationVpnAccessRevoked">VPN връзката е прекъсната поради изтекъл абонамент. Абонирайте се за DuckDuckGo, за да можете отново да ползвате VPN услугата.</string>
 
     <!-- Geoswitching -->
     <string name="netpGeoswitchingTitle">Местоположение на VPN</string>
@@ -204,7 +204,7 @@
 
     <!-- Access revoked-->
     <string name="netpDialogVpnAccessRevokedTitle">VPN връзката е прекъсната поради изтекъл абонамент</string>
-    <string name="netpDialogVpnAccessRevokedBody">Абонирайте се за Privacy Pro, за да свържете отново DuckDuckGo VPN.</string>
+    <string name="netpDialogVpnAccessRevokedBody">Абонирайте се за DuckDuckGo, за да можете отново да ползвате VPN услугата.</string>
     <string name="netpDialogVpnAccessRevokedPositiveAction">Абонамент</string>
     <string name="netpDialogVpnAccessRevokedNegativeAction">Отказване</string>
 
@@ -258,7 +258,4 @@
     <string name="netpExclusionListLabelAutoExclude">Несъвместими с VPN</string>
     <string name="netpExclusionListAutoExcludeDescription">Някои приложения, като банкови или стрийминг приложения, не работят добре с VPN. Когато тази настройка е активирана, ние автоматично ще изключим тези приложения.</string>
 
-    <!-- Privacy Pro Rebranding-->
-    <string name="netpNotificationVpnAccessRevokedRebranding">VPN връзката е прекъсната поради изтекъл абонамент. Абонирайте се за DuckDuckGo, за да можете отново ползвате VPN услугата.</string>
-    <string name="netpDialogVpnAccessRevokedBodyRebranding">Абонирайте се за DuckDuckGo, за да можете отново да ползвате VPN услугата.</string>
 </resources>

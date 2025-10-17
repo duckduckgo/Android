@@ -22,7 +22,6 @@ import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
-import com.duckduckgo.subscriptions.api.SubscriptionRebrandingFeatureToggle
 import com.duckduckgo.subscriptions.api.SubscriptionStatus
 import com.duckduckgo.subscriptions.impl.RealSubscriptionsManager.Companion.SUBSCRIPTION_NOT_FOUND_ERROR
 import com.duckduckgo.subscriptions.impl.RealSubscriptionsManager.RecoverSubscriptionResult
@@ -58,7 +57,6 @@ class RestoreSubscriptionViewModel @Inject constructor(
     private val pixelSender: SubscriptionPixelSender,
     private val authClient: AuthClient,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
-    private val subscriptionRebrandingFeatureToggle: SubscriptionRebrandingFeatureToggle,
 ) : ViewModel() {
 
     private val command = Channel<Command>(1, DROP_OLDEST)
@@ -69,7 +67,6 @@ class RestoreSubscriptionViewModel @Inject constructor(
 
     data class ViewState(
         val email: String? = null,
-        val rebrandingEnabled: Boolean = false,
     )
 
     private lateinit var subscriptionStatus: SubscriptionStatus
@@ -78,14 +75,6 @@ class RestoreSubscriptionViewModel @Inject constructor(
         subscriptionsManager.subscriptionStatus
             .onEach { subscriptionStatus = it }
             .launchIn(viewModelScope)
-
-        viewModelScope.launch {
-            _viewState.emit(
-                ViewState(
-                    rebrandingEnabled = subscriptionRebrandingFeatureToggle.isSubscriptionRebrandingEnabled(),
-                ),
-            )
-        }
     }
 
     fun restoreFromStore() {

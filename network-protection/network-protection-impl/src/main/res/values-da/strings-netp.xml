@@ -192,7 +192,7 @@
     <string name="netpNotificationCTAReconnectNow">Genopret forbindelsen nu</string>
     <string name="netpNotificationSnoozeTitle">VPN er sat på pause</string>
     <string name="netpNotificationSnoozeBody" instruction="Placeholder is time in hh:mm format">VPN vil oprette forbindelse igen kl %1$s</string>
-    <string name="netpNotificationVpnAccessRevoked">VPN er afbrudt på grund af et udløbet abonnement. Abonner på Privacy Pro for at genoprette forbindelsen til DuckDuckGo VPN.</string>
+    <string name="netpNotificationVpnAccessRevoked">VPN er afbrudt på grund af et udløbet abonnement. Abonner på DuckDuckGo for at genoprette forbindelsen til VPN.</string>
 
     <!-- Geoswitching -->
     <string name="netpGeoswitchingTitle">VPN-placering</string>
@@ -204,7 +204,7 @@
 
     <!-- Access revoked-->
     <string name="netpDialogVpnAccessRevokedTitle">VPN er afbrudt på grund af et udløbet abonnement</string>
-    <string name="netpDialogVpnAccessRevokedBody">Abonner på Privacy Pro for at genoprette forbindelsen til DuckDuckGo VPN.</string>
+    <string name="netpDialogVpnAccessRevokedBody">Abonner på DuckDuckGo for at genoprette forbindelsen til VPN.</string>
     <string name="netpDialogVpnAccessRevokedPositiveAction">Abonner</string>
     <string name="netpDialogVpnAccessRevokedNegativeAction">Afvis</string>
 
@@ -258,7 +258,4 @@
     <string name="netpExclusionListLabelAutoExclude">Inkompatible med VPN\'er</string>
     <string name="netpExclusionListAutoExcludeDescription">Nogle apps, såsom bank- eller streaming-apps, fungerer ikke godt med VPN\'er. Når denne indstilling er aktiveret, vil vi automatisk udelukke disse apps.</string>
 
-    <!-- Privacy Pro Rebranding-->
-    <string name="netpNotificationVpnAccessRevokedRebranding">VPN er afbrudt på grund af et udløbet abonnement. Abonner på DuckDuckGo for at genoprette forbindelsen til VPN.</string>
-    <string name="netpDialogVpnAccessRevokedBodyRebranding">Abonner på DuckDuckGo for at genoprette forbindelsen til VPN.</string>
 </resources>
