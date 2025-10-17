@@ -238,7 +238,6 @@ class InitMessageHandlerPluginTest {
     fun whenProcessAndAutoconsentIsDisabledThenFireDisabledForSitePixel() {
         settingsRepository.userSetting = false
 
-        webView.loadUrl("http://www.example.com")
         initHandlerPlugin.process(initHandlerPlugin.supportedTypes.first(), message(), webView, mockCallback)
 
         verify(mockPixelManager).fireDailyPixel(AutoConsentPixel.AUTOCONSENT_DISABLED_FOR_SITE_DAILY)
@@ -248,7 +247,6 @@ class InitMessageHandlerPluginTest {
     fun whenProcessAndAutoconsentIsEnabledThenFireInitPixel() {
         settingsRepository.userSetting = true
 
-        webView.loadUrl("http://www.example.com")
         initHandlerPlugin.process(initHandlerPlugin.supportedTypes.first(), message(), webView, mockCallback)
 
         verify(mockPixelManager).fireDailyPixel(AutoConsentPixel.AUTOCONSENT_INIT_DAILY)
