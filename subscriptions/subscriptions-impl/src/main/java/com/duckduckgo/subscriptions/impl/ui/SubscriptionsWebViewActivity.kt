@@ -452,6 +452,7 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationD
                 binding.includeToolbar.logoToolbar.show()
                 binding.includeToolbar.titleToolbar.show()
                 title = null
+                binding.includeToolbar.titleToolbar.text = getString(string.ddg_subscription)
                 toolbar.setNavigationOnClickListener { onBackPressed() }
             }
         }
