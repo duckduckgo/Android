@@ -61,6 +61,7 @@ import com.duckduckgo.autofill.impl.importing.takeout.webflow.ImportGoogleBookma
 import com.duckduckgo.autofill.impl.importing.takeout.webflow.UserCannotImportReason.DownloadError
 import com.duckduckgo.autofill.impl.importing.takeout.webflow.UserCannotImportReason.ErrorParsingBookmarks
 import com.duckduckgo.autofill.impl.importing.takeout.webflow.UserCannotImportReason.Unknown
+import com.duckduckgo.autofill.impl.importing.takeout.webflow.UserCannotImportReason.WebAutomationError
 import com.duckduckgo.autofill.impl.importing.takeout.webflow.UserCannotImportReason.WebViewError
 import com.duckduckgo.autofill.impl.importing.takeout.zip.TakeoutBookmarkExtractor
 import com.duckduckgo.autofill.impl.importing.takeout.zip.TakeoutBookmarkExtractor.ExtractionResult
@@ -290,6 +291,7 @@ class AutofillInternalSettingsActivity : DuckDuckGoActivity() {
                         ErrorParsingBookmarks -> "Failed to parse bookmark data"
                         Unknown -> "Failed to import bookmarks"
                         WebViewError -> "WebView error occurred"
+                        is WebAutomationError -> "Automation error ${(result.reason as WebAutomationError).step}"
                     }
                 errorMessage.showSnackbar()
                 hidePreImportDialog()

@@ -123,6 +123,12 @@ interface AutofillFeature {
     fun canImportBookmarksFromGoogleTakeout(): Toggle
 
     /**
+     * Remote Flag that enables the ability to use web message listener during bookmark import flow from Google Takeout
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
+    fun canUseWebMessageListenerDuringBookmarkImport(): Toggle
+
+    /**
      * Remote flag that enables the ability to support partial form saves. A partial form save is common with scenarios like:
      *  - a multi-step login form where username and password are entered on separate pages
      *  - password reset flow
