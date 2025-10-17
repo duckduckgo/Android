@@ -78,11 +78,7 @@ class InitMessageHandlerPlugin @Inject constructor(
                         return@launch
                     }
 
-                    withContext(dispatcherProvider.main()) {
-                        if (webView.url == url) {
-                            pixelManager.fireDailyPixel(AutoConsentPixel.AUTOCONSENT_INIT_DAILY)
-                        }
-                    }
+                    pixelManager.fireDailyPixel(AutoConsentPixel.AUTOCONSENT_INIT_DAILY)
 
                     // Reset site
                     autoconsentCallback.onResultReceived(consentManaged = false, optOutFailed = false, selfTestFailed = false, isCosmetic = false)
