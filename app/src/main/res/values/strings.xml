@@ -144,6 +144,7 @@
     <string name="settingsLightTheme">Light</string>
     <string name="settingsTheme">Theme</string>
     <string name="settingsDarkTheme">Dark</string>
+    <string name="settingsBlackTheme">Black</string>
     <string name="settingsSystemTheme">System default</string>
     <string name="settingsThemeDialogSave">Set Theme</string>
     <string name="settingsTitleAppLinks">Open Links in Apps</string>

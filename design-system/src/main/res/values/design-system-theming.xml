@@ -146,6 +146,15 @@
         <item name="actionBarSize">@dimen/toolbarSize</item>
     </style>
 
+    <style name="Theme.DuckDuckGo.Black" parent="Theme.DuckDuckGo.Dark">
+        <item name="preferredStatusBarColor">#000000</item>
+        <item name="preferredNavigationBarColor">#000000</item>
+        <item name="daxColorBackground">#000000</item>
+        <item name="daxColorSurface">#1A1A1A</item>
+        <item name="daxColorWindow">#292929</item>
+
+    </style>
+
     <!-- The app theme will mostly contain values for colour attributes -->
     <style name="Theme.DuckDuckGo.Dark" parent="Theme.DuckDuckGo">
         <item name="android:isLightTheme" tools:ignore="NewApi">false</item>

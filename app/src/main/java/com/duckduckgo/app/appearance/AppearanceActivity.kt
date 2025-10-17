@@ -149,6 +149,7 @@ class AppearanceActivity : DuckDuckGoActivity() {
                 when (selectedTheme) {
                     DARK -> R.string.settingsDarkTheme
                     LIGHT -> R.string.settingsLightTheme
+                    DuckDuckGoTheme.BLACK -> R.string.settingsBlackTheme
                     SYSTEM_DEFAULT -> R.string.settingsSystemTheme
                 },
             )
@@ -188,6 +189,7 @@ class AppearanceActivity : DuckDuckGoActivity() {
                     R.string.settingsSystemTheme,
                     R.string.settingsLightTheme,
                     R.string.settingsDarkTheme,
+                    R.string.settingsBlackTheme,
                 ),
                 currentTheme,
             ).setPositiveButton(R.string.settingsThemeDialogSave)
@@ -199,6 +201,7 @@ class AppearanceActivity : DuckDuckGoActivity() {
                             when (selectedItem) {
                                 2 -> DuckDuckGoTheme.LIGHT
                                 3 -> DuckDuckGoTheme.DARK
+                                4 -> DuckDuckGoTheme.BLACK
                                 else -> DuckDuckGoTheme.SYSTEM_DEFAULT
                             }
                         viewModel.onThemeSelected(selectedTheme)

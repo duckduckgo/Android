@@ -59,7 +59,8 @@ class TypographyFragment : Fragment() {
         val daxTextView = view.findViewById<DaxTextView>(R.id.typographyTitle)
         daxTextView.setTypography(Typography.Body1)
 
-        val isDarkTheme = runBlocking { appComponentsViewModel.themeFlow.first() } == AppTheme.DARK
+        val theme = runBlocking { appComponentsViewModel.themeFlow.first() }
+        val isDarkTheme = theme == AppTheme.DARK || theme == AppTheme.BLACK
 
         setupComposeViews(view, isDarkTheme)
     }

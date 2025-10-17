@@ -17,7 +17,9 @@
 package com.duckduckgo.duckchat.impl.inputscreen.ui
 
 import android.os.Build.VERSION
+import com.duckduckgo.common.ui.DuckDuckGoTheme
 import com.duckduckgo.common.ui.store.AppTheme
+import com.duckduckgo.common.ui.store.ThemingDataStore
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.api.R
 import com.duckduckgo.duckchat.api.inputscreen.BrowserAndInputScreenTransitionProvider
@@ -55,6 +57,7 @@ import javax.inject.Inject
 @ContributesBinding(scope = AppScope::class)
 class BrowserAndInputScreenTransitionProviderImpl @Inject constructor(
     private val appTheme: AppTheme,
+    private val themingDataStore: ThemingDataStore,
     private val duckChatInternal: DuckChatInternal,
 ) : BrowserAndInputScreenTransitionProvider {
     override fun getBrowserEnterAnimation(isTopOmnibar: Boolean): Int =
@@ -67,9 +70,17 @@ class BrowserAndInputScreenTransitionProviderImpl @Inject constructor(
                 }
             } else {
                 if (useTopBar(isTopOmnibar, duckChatInternal)) {
-                    R.anim.slide_in_from_bottom_fade_in_dark
+                    if (themingDataStore.theme == DuckDuckGoTheme.DARK) {
+                        R.anim.slide_in_from_bottom_fade_in_dark
+                    } else {
+                        R.anim.slide_in_from_bottom_fade_in_black
+                    }
                 } else {
-                    R.anim.fade_in_dark
+                    if (themingDataStore.theme == DuckDuckGoTheme.DARK) {
+                        R.anim.fade_in_dark
+                    } else {
+                        R.anim.fade_in_black
+                    }
                 }
             }
         } else {
@@ -86,9 +97,17 @@ class BrowserAndInputScreenTransitionProviderImpl @Inject constructor(
                 }
             } else {
                 if (useTopBar(isTopOmnibar, duckChatInternal)) {
-                    R.anim.slide_out_to_bottom_fade_out_dark
+                    if (themingDataStore.theme == DuckDuckGoTheme.DARK) {
+                        R.anim.slide_out_to_bottom_fade_out_dark
+                    } else {
+                        R.anim.slide_out_to_bottom_fade_out_black
+                    }
                 } else {
-                    R.anim.fade_out_dark
+                    if (themingDataStore.theme == DuckDuckGoTheme.DARK) {
+                        R.anim.fade_out_dark
+                    } else {
+                        R.anim.fade_out_black
+                    }
                 }
             }
         } else {

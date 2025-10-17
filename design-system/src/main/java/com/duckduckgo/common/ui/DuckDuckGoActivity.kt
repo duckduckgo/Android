@@ -99,7 +99,7 @@ abstract class DuckDuckGoActivity : DaggerActivity() {
                     else -> false
                 }
             }
-            DARK -> true
+            DARK, DuckDuckGoTheme.BLACK -> true
             else -> false
         }
     }

@@ -53,6 +53,7 @@ class ThemingSharedPreferences @Inject constructor(
         companion object {
             private const val THEME_LIGHT = "LIGHT"
             private const val THEME_DARK = "DARK"
+            private const val THEME_BLACK = "BLACK"
             private const val THEME_SYSTEM_DEFAULT = "SYSTEM_DEFAULT"
         }
 
@@ -60,6 +61,7 @@ class ThemingSharedPreferences @Inject constructor(
             when (theme) {
                 DuckDuckGoTheme.SYSTEM_DEFAULT -> THEME_SYSTEM_DEFAULT
                 DuckDuckGoTheme.LIGHT -> THEME_LIGHT
+                DuckDuckGoTheme.BLACK -> THEME_BLACK
                 else -> THEME_DARK
             }
 
@@ -72,6 +74,8 @@ class ThemingSharedPreferences @Inject constructor(
                 THEME_LIGHT -> DuckDuckGoTheme.LIGHT
 
                 THEME_DARK -> DuckDuckGoTheme.DARK
+
+                THEME_BLACK -> DuckDuckGoTheme.BLACK
 
                 else -> if (isInNightMode) {
                     DuckDuckGoTheme.DARK

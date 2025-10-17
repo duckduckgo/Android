@@ -141,6 +141,7 @@ class AppearanceViewModel @Inject constructor(
             when (selectedTheme) {
                 LIGHT -> SETTINGS_THEME_TOGGLED_LIGHT
                 DARK -> SETTINGS_THEME_TOGGLED_DARK
+                DuckDuckGoTheme.BLACK -> SETTINGS_THEME_TOGGLED_DARK // todo lp theme
                 SYSTEM_DEFAULT -> SETTINGS_THEME_TOGGLED_SYSTEM_DEFAULT
             }
         pixel.fire(pixelName)

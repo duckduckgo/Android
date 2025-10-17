@@ -33,6 +33,7 @@ enum class DuckDuckGoTheme {
     SYSTEM_DEFAULT,
     DARK,
     LIGHT,
+    BLACK,
     ;
 
     fun getOptionIndex(): Int {
@@ -40,6 +41,7 @@ enum class DuckDuckGoTheme {
             SYSTEM_DEFAULT -> 1
             LIGHT -> 2
             DARK -> 3
+            BLACK -> 4
         }
     }
 }
@@ -69,6 +71,7 @@ fun AppCompatActivity.getThemeId(theme: DuckDuckGoTheme): Int {
     return when (theme) {
         SYSTEM_DEFAULT -> getSystemDefaultTheme()
         DARK -> R.style.Theme_DuckDuckGo_Dark
+        DuckDuckGoTheme.BLACK -> R.style.Theme_DuckDuckGo_Black
         else -> R.style.Theme_DuckDuckGo_Light
     }
 }

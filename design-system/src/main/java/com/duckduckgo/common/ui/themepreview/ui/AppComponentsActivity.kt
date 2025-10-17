@@ -82,6 +82,7 @@ class AppComponentsActivity : AppCompatActivity() {
 
         darkThemeSwitch.quietlySetIsChecked(selectedTheme == DuckDuckGoTheme.DARK) { _, enabled ->
             // TODO if we add another theme (e.g. true black) we would change the toggle and move this logic to the VM
+            // todo lp theme ^^^
             val newTheme = if (enabled) {
                 DuckDuckGoTheme.DARK
             } else {
