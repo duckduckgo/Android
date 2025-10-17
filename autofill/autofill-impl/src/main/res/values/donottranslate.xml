@@ -24,6 +24,7 @@
     <string name="importBookmarksFromGooglePreImportDialogTitle">Import Bookmarks From Google</string>
     <string name="importBookmarksFromGooglePreImportDialogInstruction">Google may ask you to sign in or enter your password to confirm.</string>
     <string name="importBookmarksFromGooglePreImportDialogImportButton">Import From Google</string>
+    <string name="importBookmarksFromGooglePreImportDialogSelectFileButton">Select Bookmarks File…</string>
 
     <string name="importBookmarksFromGoogleImportInProgressDialogTitle">@string/importToDuckDuckGo</string>
     <string name="importBookmarksFromGoogleImportInProgressDialogInstruction">Your bookmarks are being imported. This may take a few moments.</string>

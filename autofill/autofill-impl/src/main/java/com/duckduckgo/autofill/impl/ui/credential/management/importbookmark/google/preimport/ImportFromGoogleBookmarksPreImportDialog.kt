@@ -23,13 +23,17 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.os.BundleCompat
+import androidx.fragment.app.setFragmentResult
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.autofill.api.AutofillImportBookmarksLaunchSource
 import com.duckduckgo.autofill.api.AutofillImportBookmarksLaunchSource.Unknown
+import com.duckduckgo.autofill.api.ImportBookmarksPreImportDialog
+import com.duckduckgo.autofill.api.ImportBookmarksPreImportDialog.Companion.BUNDLE_RESULT_KEY
+import com.duckduckgo.autofill.api.ImportBookmarksPreImportDialog.Companion.FRAGMENT_RESULT_KEY
+import com.duckduckgo.autofill.api.ImportBookmarksPreImportDialog.ImportBookmarksPreImportResult
 import com.duckduckgo.autofill.impl.R
 import com.duckduckgo.autofill.impl.databinding.ContentImportBookmarksFromGooglePreimportDialogBinding
 import com.duckduckgo.autofill.impl.ui.credential.dialog.animateClosed
-import com.duckduckgo.autofill.impl.ui.credential.management.importbookmark.google.preimport.ImportFromGoogleBookmarksPreImportDialog.ImportBookmarksDialog.Companion.KEY_TAB_ID
 import com.duckduckgo.common.utils.FragmentViewModelFactory
 import com.duckduckgo.di.scopes.FragmentScope
 import com.google.android.material.bottomsheet.BottomSheetBehavior
@@ -41,7 +45,7 @@ import logcat.logcat
 import javax.inject.Inject
 
 @InjectWith(FragmentScope::class)
-class ImportFromGoogleBookmarksPreImportDialog : BottomSheetDialogFragment() {
+class ImportFromGoogleBookmarksPreImportDialog : BottomSheetDialogFragment(), ImportBookmarksPreImportDialog {
     /**
      * To capture all the ways the BottomSheet can be dismissed, we might end up with onCancel being called when we don't want it
      * This flag is set to true when taking an action which dismisses the dialog, but should not be treated as a cancellation.
@@ -56,12 +60,6 @@ class ImportFromGoogleBookmarksPreImportDialog : BottomSheetDialogFragment() {
 
     @Inject
     lateinit var viewModelFactory: FragmentViewModelFactory
-
-    private var importClickedCallback: (() -> Unit)? = null
-
-    fun setImportClickedCallback(callback: () -> Unit) {
-        importClickedCallback = callback
-    }
 
     private fun getLaunchSource() =
         BundleCompat.getParcelable(arguments ?: Bundle(), KEY_LAUNCH_SOURCE, AutofillImportBookmarksLaunchSource::class.java) ?: Unknown
@@ -104,10 +102,31 @@ class ImportFromGoogleBookmarksPreImportDialog : BottomSheetDialogFragment() {
         with(binding.importButton) {
             setOnClickListener { onImportButtonClicked() }
         }
+
+        with(binding.selectFileButton) {
+            setOnClickListener { onSelectFileButtonClicked() }
+        }
     }
 
     private fun onImportButtonClicked() {
-        importClickedCallback?.invoke()
+        ignoreCancellationEvents = true
+
+        // Send fragment result
+        val result = Bundle().apply {
+            putParcelable(BUNDLE_RESULT_KEY, ImportBookmarksPreImportResult.ImportBookmarksFromGoogle)
+            putParcelable(KEY_IMPORT_SOURCE, getLaunchSource())
+        }
+        setFragmentResult(FRAGMENT_RESULT_KEY, result)
+    }
+
+    private fun onSelectFileButtonClicked() {
+        ignoreCancellationEvents = true
+
+        val result = Bundle().apply {
+            putParcelable(BUNDLE_RESULT_KEY, ImportBookmarksPreImportResult.SelectBookmarksFile)
+            putParcelable(KEY_IMPORT_SOURCE, getLaunchSource())
+        }
+        setFragmentResult(FRAGMENT_RESULT_KEY, result)
     }
 
     override fun onCancel(dialog: DialogInterface) {
@@ -115,32 +134,41 @@ class ImportFromGoogleBookmarksPreImportDialog : BottomSheetDialogFragment() {
             logcat(VERBOSE) { "onCancel: Ignoring cancellation event" }
             return
         }
+
+        val result = Bundle().apply {
+            putParcelable(BUNDLE_RESULT_KEY, ImportBookmarksPreImportResult.Cancel)
+            putParcelable(KEY_IMPORT_SOURCE, getLaunchSource())
+        }
+        setFragmentResult(FRAGMENT_RESULT_KEY, result)
     }
 
     private fun configureCloseButton(binding: ContentImportBookmarksFromGooglePreimportDialogBinding) {
-        binding.closeButton.setOnClickListener { (dialog as BottomSheetDialog).animateClosed() }
+        binding.closeButton.setOnClickListener {
+            ignoreCancellationEvents = true
+
+            val result = Bundle().apply {
+                putParcelable(BUNDLE_RESULT_KEY, ImportBookmarksPreImportResult.Cancel)
+                putParcelable(KEY_IMPORT_SOURCE, getLaunchSource())
+            }
+            setFragmentResult(FRAGMENT_RESULT_KEY, result)
+
+            (dialog as BottomSheetDialog).animateClosed()
+        }
     }
 
     companion object {
         private const val KEY_LAUNCH_SOURCE = "launchSource"
+        private const val KEY_IMPORT_SOURCE = "importSource"
 
         fun instance(
             importSource: AutofillImportBookmarksLaunchSource,
-            tabId: String? = null,
         ): ImportFromGoogleBookmarksPreImportDialog {
             val fragment = ImportFromGoogleBookmarksPreImportDialog()
             fragment.arguments =
                 Bundle().apply {
                     putParcelable(KEY_LAUNCH_SOURCE, importSource)
-                    putString(KEY_TAB_ID, tabId)
                 }
             return fragment
-        }
-    }
-
-    interface ImportBookmarksDialog {
-        companion object {
-            const val KEY_TAB_ID = "tabId"
         }
     }
 }

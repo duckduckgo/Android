@@ -26,9 +26,9 @@ import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.autofill.api.AutofillImportBookmarksLaunchSource
+import com.duckduckgo.autofill.api.AutofillScreens
 import com.duckduckgo.autofill.impl.R
 import com.duckduckgo.autofill.impl.databinding.ActivityImportGoogleBookmarksWebflowBinding
-import com.duckduckgo.autofill.impl.importing.takeout.webflow.ImportGoogleBookmark.AutofillImportViaGoogleTakeoutScreen
 import com.duckduckgo.autofill.impl.importing.takeout.webflow.ImportGoogleBookmark.AutofillImportViaGoogleTakeoutScreenResultError
 import com.duckduckgo.autofill.impl.importing.takeout.webflow.ImportGoogleBookmark.AutofillImportViaGoogleTakeoutScreenResultSuccess
 import com.duckduckgo.autofill.impl.importing.takeout.webflow.ImportGoogleBookmark.ImportViaGoogleTakeoutScreen
@@ -43,7 +43,7 @@ import logcat.logcat
 import javax.inject.Inject
 
 @InjectWith(ActivityScope::class)
-@ContributeToActivityStarter(AutofillImportViaGoogleTakeoutScreen::class)
+@ContributeToActivityStarter(AutofillScreens.ImportBookmarksViaGoogleTakeoutScreen::class)
 @ContributeToActivityStarter(AutofillImportViaGoogleTakeoutScreenResultSuccess::class)
 @ContributeToActivityStarter(AutofillImportViaGoogleTakeoutScreenResultError::class)
 class ImportGoogleBookmarksWebFlowActivity :
@@ -54,9 +54,11 @@ class ImportGoogleBookmarksWebFlowActivity :
 
     val binding: ActivityImportGoogleBookmarksWebflowBinding by viewBinding()
 
+    private var isOverlayCurrentlyShown = false
+    private var isOnResultScreen = false
+
     private val launchSource: AutofillImportBookmarksLaunchSource by lazy {
-        intent.getActivityParams(ImportViaGoogleTakeoutScreen::class.java)?.launchSource
-            ?: AutofillImportBookmarksLaunchSource.Unknown
+        intent.getActivityParams(ImportViaGoogleTakeoutScreen::class.java)?.launchSource ?: AutofillImportBookmarksLaunchSource.Unknown
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -70,15 +72,23 @@ class ImportGoogleBookmarksWebFlowActivity :
         val errorResult = intent.getActivityParams(AutofillImportViaGoogleTakeoutScreenResultError::class.java)
 
         when {
-            successResult != null -> showSuccessFragment(successResult.bookmarkCount)
-            errorResult != null -> showErrorFragment(errorResult.errorReason)
+            successResult != null -> {
+                isOnResultScreen = true
+                showSuccessFragment(successResult.bookmarkCount)
+            }
+            errorResult != null -> {
+                isOnResultScreen = true
+                showErrorFragment(errorResult.errorReason)
+            }
             else -> launchWebFlow()
         }
     }
 
     private fun launchWebFlow() {
         logcat { "Bookmark-import: Starting webflow" }
+        isOnResultScreen = false
         replaceFragment(ImportGoogleBookmarksWebFlowFragment())
+        updateToolbarTitle()
         invalidateOptionsMenu()
     }
 
@@ -91,6 +101,9 @@ class ImportGoogleBookmarksWebFlowActivity :
         }
 
         replaceFragment(successFragment)
+        isOverlayCurrentlyShown = false
+        isOnResultScreen = true
+        updateToolbarTitle()
         invalidateOptionsMenu()
     }
 
@@ -105,6 +118,9 @@ class ImportGoogleBookmarksWebFlowActivity :
         }
 
         replaceFragment(errorFragment)
+        isOverlayCurrentlyShown = false
+        isOnResultScreen = true
+        updateToolbarTitle()
         invalidateOptionsMenu()
     }
 
@@ -126,6 +142,9 @@ class ImportGoogleBookmarksWebFlowActivity :
     }
 
     private fun showProgressOverlay() {
+        isOverlayCurrentlyShown = true
+        updateToolbarTitle()
+
         val progressFragment = supportFragmentManager.findFragmentByTag(PROGRESS_OVERLAY_TAG)
         if (progressFragment == null) {
             supportFragmentManager
@@ -136,6 +155,9 @@ class ImportGoogleBookmarksWebFlowActivity :
     }
 
     private fun hideProgressOverlay() {
+        isOverlayCurrentlyShown = false
+        updateToolbarTitle()
+
         val progressFragment = supportFragmentManager.findFragmentByTag(PROGRESS_OVERLAY_TAG)
         if (progressFragment != null) {
             supportFragmentManager
@@ -210,7 +232,16 @@ class ImportGoogleBookmarksWebFlowActivity :
             setNavigationIcon(com.duckduckgo.mobile.android.R.drawable.ic_close_24)
         }
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
-        setTitle("")
+        updateToolbarTitle()
+    }
+
+    private fun updateToolbarTitle() {
+        val title = if (isOverlayCurrentlyShown || isOnResultScreen) {
+            ""
+        } else {
+            getString(R.string.importBookmarksFromGoogleWebFlowTitle)
+        }
+        setTitle(title)
     }
 
     override fun showLoadingState() {
@@ -232,11 +263,6 @@ object ImportGoogleBookmark {
         val launchSource: AutofillImportBookmarksLaunchSource,
     ) : ActivityParams,
         Parcelable
-
-    @Parcelize
-    data class AutofillImportViaGoogleTakeoutScreen(
-        private val source: AutofillImportBookmarksLaunchSource,
-    ) : ImportViaGoogleTakeoutScreen(source)
 
     @Parcelize
     data class AutofillImportViaGoogleTakeoutScreenResultSuccess(
