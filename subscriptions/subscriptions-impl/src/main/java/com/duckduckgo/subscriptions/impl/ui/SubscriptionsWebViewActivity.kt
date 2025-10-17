@@ -92,7 +92,6 @@ import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Command
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Command.SendResponseToJs
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Command.SubscriptionSelected
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.PurchaseStateView
-import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.ViewState
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionsWebViewActivityWithParams.ToolbarConfig
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionsWebViewActivityWithParams.ToolbarConfig.CustomTitle
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionsWebViewActivityWithParams.ToolbarConfig.DaxPrivacyPro
@@ -198,10 +197,7 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationD
         }
 
         setContentView(binding.root)
-
-        viewModel.viewState
-            .onEach { setupInternalToolbar(toolbar, it) }
-            .launchIn(lifecycleScope)
+        setupInternalToolbar(toolbar)
 
         binding.webview.let {
             subscriptionJsMessaging.register(
@@ -429,7 +425,7 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationD
         requestPermissions(arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE), PERMISSION_REQUEST_WRITE_EXTERNAL_STORAGE)
     }
 
-    private fun setupInternalToolbar(toolbar: Toolbar, viewState: ViewState) {
+    private fun setupInternalToolbar(toolbar: Toolbar) {
         setSupportActionBar(toolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
@@ -440,10 +436,10 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationD
             },
         )
 
-        updateToolbarTitle(params.toolbarConfig, viewState)
+        updateToolbarTitle(params.toolbarConfig)
     }
 
-    private fun updateToolbarTitle(config: ToolbarConfig, viewState: ViewState) {
+    private fun updateToolbarTitle(config: ToolbarConfig) {
         when (config) {
             is CustomTitle -> {
                 supportActionBar?.setDisplayShowTitleEnabled(true)
@@ -456,11 +452,6 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationD
                 binding.includeToolbar.logoToolbar.show()
                 binding.includeToolbar.titleToolbar.show()
                 title = null
-                binding.includeToolbar.titleToolbar.text = if (viewState.rebrandingEnabled) {
-                    getString(string.ddg_subscription)
-                } else {
-                    getString(string.privacyPro)
-                }
                 toolbar.setNavigationOnClickListener { onBackPressed() }
             }
         }
