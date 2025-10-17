@@ -220,4 +220,3 @@ class RMFDaysSinceDuckAiUsedMatchingAttributeTest {
         assertNull(result)
     }
 }
-

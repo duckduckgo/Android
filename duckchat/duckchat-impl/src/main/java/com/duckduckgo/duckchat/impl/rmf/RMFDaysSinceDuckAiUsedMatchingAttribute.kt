@@ -102,4 +102,3 @@ internal fun Any?.toIntOrDefault(default: Int): Int = when {
     this is Long -> this.toInt()
     else -> this as Int
 }
-
