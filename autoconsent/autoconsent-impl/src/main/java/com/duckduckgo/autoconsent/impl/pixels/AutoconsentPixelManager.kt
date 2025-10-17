@@ -17,44 +17,55 @@
 package com.duckduckgo.autoconsent.impl.pixels
 
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
 import com.duckduckgo.di.scopes.AppScope
 import dagger.SingleInstanceIn
 import javax.inject.Inject
 
+interface AutoconsentPixelManager {
+    fun fireDailyPixel(pixelName: AutoConsentPixel)
+    fun isDetectedByPatternsProcessed(instanceId: String): Boolean
+    fun markDetectedByPatternsProcessed(instanceId: String)
+    fun isDetectedByBothProcessed(instanceId: String): Boolean
+    fun markDetectedByBothProcessed(instanceId: String)
+    fun isDetectedOnlyRulesProcessed(instanceId: String): Boolean
+    fun markDetectedOnlyRulesProcessed(instanceId: String)
+}
+
 @SingleInstanceIn(AppScope::class)
-class AutoconsentPixelManager @Inject constructor(
+class RealAutoconsentPixelManager @Inject constructor(
     private val pixel: Pixel,
-) {
+) : AutoconsentPixelManager {
 
     private val detectedByPatternsCache = mutableSetOf<String>()
     private val detectedByBothCache = mutableSetOf<String>()
     private val detectedOnlyRulesCache = mutableSetOf<String>()
 
-    fun fireDailyPixel(pixelName: AutoConsentPixel) {
-        pixel.fire(pixelName, type = Pixel.PixelType.Daily())
+    override fun fireDailyPixel(pixelName: AutoConsentPixel) {
+        pixel.fire(pixelName, type = Daily())
     }
 
-    fun isDetectedByPatternsProcessed(instanceId: String): Boolean {
+    override fun isDetectedByPatternsProcessed(instanceId: String): Boolean {
         return detectedByPatternsCache.contains(instanceId)
     }
 
-    fun markDetectedByPatternsProcessed(instanceId: String) {
+    override fun markDetectedByPatternsProcessed(instanceId: String) {
         detectedByPatternsCache.add(instanceId)
     }
 
-    fun isDetectedByBothProcessed(instanceId: String): Boolean {
+    override fun isDetectedByBothProcessed(instanceId: String): Boolean {
         return detectedByBothCache.contains(instanceId)
     }
 
-    fun markDetectedByBothProcessed(instanceId: String) {
+    override fun markDetectedByBothProcessed(instanceId: String) {
         detectedByBothCache.add(instanceId)
     }
 
-    fun isDetectedOnlyRulesProcessed(instanceId: String): Boolean {
+    override fun isDetectedOnlyRulesProcessed(instanceId: String): Boolean {
         return detectedOnlyRulesCache.contains(instanceId)
     }
 
-    fun markDetectedOnlyRulesProcessed(instanceId: String) {
+    override fun markDetectedOnlyRulesProcessed(instanceId: String) {
         detectedOnlyRulesCache.add(instanceId)
     }
 }
