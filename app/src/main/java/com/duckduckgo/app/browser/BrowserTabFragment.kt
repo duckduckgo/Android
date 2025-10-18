@@ -1108,12 +1108,30 @@ class BrowserTabFragment :
     }
 
     private fun configureInputScreenLauncher() {
-        omnibar.configureInputScreenLaunchListener { query ->
-            launchInputScreen(query)
-        }
+        omnibar.configureInputScreenLaunchListener(
+            object : Omnibar.InputScreenLaunchListener {
+                override fun onLaunchInputScreen(
+                    query: String,
+                    searchMode: Boolean,
+                    fromNTP: Boolean,
+                ) {
+                    launchInputScreen(query, searchMode = searchMode, fromNTP = fromNTP)
+                }
+
+                override fun onDuckAiToggleSelected() {
+                    launchInputScreen("", searchMode = false, fromNTP = true)
+                }
+
+                override fun onSearchToggleSelected() {
+                    val isNtp = omnibar.viewMode == ViewMode.NewTab
+                    launchInputScreen("", searchMode = true, fromNTP = isNtp)
+                }
+            },
+        )
     }
 
-    private fun launchInputScreen(query: String) {
+    private fun launchInputScreen(query: String, searchMode: Boolean, fromNTP: Boolean) {
+        logcat { "inputScreen: Launching input screen for query: $query in searchMode $searchMode fromNtp $fromNTP" }
         val intent =
             globalActivityStarter.startIntent(
                 requireContext(),
@@ -1121,10 +1139,12 @@ class BrowserTabFragment :
                     query = query,
                     tabs = viewModel.tabs.value?.size ?: 0,
                     isTopOmnibar = omnibar.omnibarPosition == TOP,
+                    isSearchMode = searchMode,
                 ),
             )
-        val enterTransition = browserAndInputScreenTransitionProvider.getInputScreenEnterAnimation(omnibar.omnibarPosition == TOP)
-        val exitTransition = browserAndInputScreenTransitionProvider.getBrowserExitAnimation(omnibar.omnibarPosition == TOP)
+
+        val enterTransition = browserAndInputScreenTransitionProvider.getInputScreenEnterAnimation(omnibar.omnibarPosition == TOP, fromNTP)
+        val exitTransition = browserAndInputScreenTransitionProvider.getBrowserExitAnimation(omnibar.omnibarPosition == TOP, fromNTP)
         val options =
             ActivityOptionsCompat.makeCustomAnimation(
                 requireActivity(),
@@ -2294,7 +2314,8 @@ class BrowserTabFragment :
             is Command.LaunchInputScreen -> {
                 // if the fire button is used, prevent automatically launching the input screen until the process reloads
                 if ((requireActivity() as? BrowserActivity)?.isDataClearingInProgress == false) {
-                    launchInputScreen(query = "")
+                    val isNtp = omnibar.viewMode == ViewMode.NewTab
+                    launchInputScreen(query = "", true, isNtp)
                 }
             }
 
@@ -3021,8 +3042,7 @@ class BrowserTabFragment :
                         pixel.fire(DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_LEGACY_OMNIBAR_AICHAT_BUTTON_PRESSED_DAILY, type = Daily())
                     }
                     val hasFocus = omnibar.omnibarTextInput.hasFocus()
-                    val isNtp = omnibar.viewMode == ViewMode.NewTab
-                    onOmnibarDuckChatPressed(query = omnibar.getText(), hasFocus = hasFocus, isNtp = isNtp)
+                    onOmnibarDuckChatPressed(query = omnibar.getText(), hasFocus = hasFocus, isNtp = true)
                 }
             },
         )

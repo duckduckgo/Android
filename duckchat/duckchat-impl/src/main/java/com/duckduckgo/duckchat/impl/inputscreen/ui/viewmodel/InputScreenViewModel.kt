@@ -113,6 +113,7 @@ enum class UserSelectedMode {
 
 class InputScreenViewModel @AssistedInject constructor(
     @Assisted currentOmnibarText: String,
+    @Assisted searchMode: Boolean,
     private val autoComplete: AutoComplete,
     private val dispatchers: DispatcherProvider,
     private val history: NavigationHistory,
@@ -146,7 +147,7 @@ class InputScreenViewModel @AssistedInject constructor(
                 newLineButtonVisible = false,
                 mainButtonsEnabled = inputScreenConfigResolver.mainButtonsEnabled(),
                 mainButtonsVisible = false,
-                searchMode = true,
+                searchMode = searchMode,
             ),
         )
     val visibilityState: StateFlow<InputScreenVisibilityState> = _visibilityState.asStateFlow()
@@ -639,14 +640,15 @@ class InputScreenViewModel @AssistedInject constructor(
     class InputScreenViewModelProviderFactory(
         private val assistedFactory: InputScreenViewModelFactory,
         private val currentOmnibarText: String,
+        private val inSearchMode: Boolean,
     ) : ViewModelProvider.Factory {
         @Suppress("UNCHECKED_CAST")
-        override fun <T : ViewModel> create(modelClass: Class<T>): T = assistedFactory.create(currentOmnibarText) as T
+        override fun <T : ViewModel> create(modelClass: Class<T>): T = assistedFactory.create(currentOmnibarText, inSearchMode) as T
     }
 
     @AssistedFactory
     interface InputScreenViewModelFactory {
-        fun create(currentOmnibarText: String): InputScreenViewModel
+        fun create(currentOmnibarText: String, searchMode: Boolean): InputScreenViewModel
     }
 
     companion object {

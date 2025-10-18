@@ -31,6 +31,7 @@ data class InputScreenActivityParams(
     val query: String,
     val tabs: Int = 0,
     val isTopOmnibar: Boolean = false,
+    val isSearchMode: Boolean = true,
 ) : GlobalActivityStarter.ActivityParams
 
 /**

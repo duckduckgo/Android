@@ -137,8 +137,12 @@ class Omnibar(
         fun onTrackersCountFinished()
     }
 
-    fun interface InputScreenLaunchListener {
-        fun launchInputScreen(query: String)
+    interface InputScreenLaunchListener {
+        fun onLaunchInputScreen(query: String, searchMode: Boolean, fromNTP: Boolean)
+
+        fun onDuckAiToggleSelected()
+
+        fun onSearchToggleSelected()
     }
 
     interface LogoClickListener {

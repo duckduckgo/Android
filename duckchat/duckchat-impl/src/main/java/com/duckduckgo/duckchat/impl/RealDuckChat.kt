@@ -181,6 +181,11 @@ interface DuckChatInternal : DuckChat {
      * Indicates whether the three main button should be shown in the Input Screen
      */
     val showMainButtonsInInputScreen: StateFlow<Boolean>
+
+    /**
+     * Indicates whether the Duck.ai Toggle should be shown in New Tab Page
+     */
+    val showToggleInNewTabPage: StateFlow<Boolean>
 }
 
 enum class ChatState(
@@ -257,10 +262,11 @@ class RealDuckChat @Inject constructor(
     private val _showNewAddressBarOptionChoiceScreen = MutableStateFlow(false)
     private val _showClearDuckAIChatHistory = MutableStateFlow(true)
     private val _showMainButtonsInInputScreen = MutableStateFlow(false)
+    private val _showInputScreenOnSystemSearchLaunch = MutableStateFlow(false)
+    private val _showToggleInNewTabPage = MutableStateFlow(false)
 
     private val _chatState = MutableStateFlow(ChatState.HIDE)
     private val keepSession = MutableStateFlow(false)
-    private val _showInputScreenOnSystemSearchLaunch = MutableStateFlow(false)
 
     private val jsonAdapter: JsonAdapter<DuckChatSettingJson> by lazy {
         moshi.adapter(DuckChatSettingJson::class.java)
@@ -392,6 +398,8 @@ class RealDuckChat @Inject constructor(
     override val showClearDuckAIChatHistory: StateFlow<Boolean> = _showClearDuckAIChatHistory.asStateFlow()
 
     override val showInputScreenOnSystemSearchLaunch: StateFlow<Boolean> = _showInputScreenOnSystemSearchLaunch.asStateFlow()
+
+    override val showToggleInNewTabPage: StateFlow<Boolean> = _showToggleInNewTabPage.asStateFlow()
 
     override val chatState: StateFlow<ChatState> = _chatState.asStateFlow()
 
@@ -609,6 +617,9 @@ class RealDuckChat @Inject constructor(
 
             val showMainButtons = duckChatFeature.showMainButtonsInInputScreen().isEnabled()
             _showMainButtonsInInputScreen.emit(showMainButtons)
+
+            val showToggleInNewTabPage = duckChatFeature.showToggleInNewTabPage().isEnabled()
+            _showToggleInNewTabPage.emit(showToggleInNewTabPage)
 
             val settingsString = duckChatFeature.self().getSettings()
             val settingsJson =

@@ -126,9 +126,14 @@ class OmnibarLayoutViewModel @Inject constructor(
         _viewState,
         duckAiFeatureState.showOmnibarShortcutOnNtpAndOnFocus,
         duckAiFeatureState.showOmnibarShortcutInAllStates,
-    ) { viewState, showOnNtpAndOnFocus, showInAllStates ->
+        duckAiFeatureState.showInputScreen,
+    ) { viewState, showOnNtpAndOnFocus, showInAllStates, showInputScreen ->
         when {
             viewState.viewMode is CustomTab -> {
+                false
+            }
+
+            showInputScreen && viewState.viewMode is NewTab -> {
                 false
             }
 
@@ -175,6 +180,7 @@ class OmnibarLayoutViewModel @Inject constructor(
         val showShadows: Boolean = false,
         val showTextInputClickCatcher: Boolean = false,
         val showFindInPage: Boolean = false,
+        val showDuckAIToggle: Boolean = false,
     ) {
         fun shouldUpdateOmnibarText(isFullUrlEnabled: Boolean): Boolean {
             return this.viewMode is Browser || this.viewMode is MaliciousSiteWarning || (!isFullUrlEnabled && omnibarText.isNotEmpty())
@@ -186,7 +192,7 @@ class OmnibarLayoutViewModel @Inject constructor(
         data class StartTrackersAnimation(val entities: List<Entity>?) : Command()
         data class StartCookiesAnimation(val isCosmetic: Boolean) : Command()
         data object MoveCaretToFront : Command()
-        data class LaunchInputScreen(val query: String) : Command()
+        data class LaunchInputScreen(val query: String, val fromNTP: Boolean) : Command()
         data class EasterEggLogoClicked(val url: String) : Command()
     }
 
@@ -291,6 +297,10 @@ class OmnibarLayoutViewModel @Inject constructor(
                     ),
                     updateOmnibarText = shouldUpdateOmnibarText,
                     omnibarText = omnibarText,
+                    showDuckAIToggle = shouldShowDuckAiToggle(
+                        viewMode = it.viewMode,
+                        true,
+                    ),
                 )
             }
         } else {
@@ -337,6 +347,10 @@ class OmnibarLayoutViewModel @Inject constructor(
                     ),
                     updateOmnibarText = shouldUpdateOmnibarText,
                     omnibarText = omnibarText,
+                    showDuckAIToggle = shouldShowDuckAiToggle(
+                        viewMode = it.viewMode,
+                        false,
+                    ),
                 )
             }
 
@@ -429,6 +443,10 @@ class OmnibarLayoutViewModel @Inject constructor(
                             showTabsMenu = false,
                             showFireIcon = false,
                             showShadows = true,
+                            showDuckAIToggle = shouldShowDuckAiToggle(
+                                viewMode = it.viewMode,
+                                it.hasFocus,
+                            ),
                         )
                     }
                 }
@@ -458,6 +476,11 @@ class OmnibarLayoutViewModel @Inject constructor(
                                 urlLoaded = _viewState.value.url,
                             ),
                             showShadows = false,
+                            showDuckAIToggle = shouldShowDuckAiToggle(
+                                viewMode = it.viewMode,
+                                it.hasFocus,
+                            ),
+
                         )
                     }
                 }
@@ -539,6 +562,13 @@ class OmnibarLayoutViewModel @Inject constructor(
         }
     }
 
+    private fun shouldShowDuckAiToggle(viewMode: ViewMode, hasFocus: Boolean): Boolean {
+        // Duck.ai Toggle is shown if Duck.ai is enabled and we are in unfocused NTP
+        val shouldShowDuckAI = duckAiFeatureState.showInputScreen.value && duckAiFeatureState.showToggleInNewTabPage.value && viewMode is NewTab
+        logcat { "Omnibar: shouldShowDuckAiToggle $shouldShowDuckAI" }
+        return shouldShowDuckAI
+    }
+
     fun onInputStateChanged(
         query: String,
         hasFocus: Boolean,
@@ -600,6 +630,10 @@ class OmnibarLayoutViewModel @Inject constructor(
                     highlighted = decoration.fireButton,
                 ),
                 scrollingEnabled = !isScrollingDisabled,
+                showDuckAIToggle = shouldShowDuckAiToggle(
+                    viewMode = it.viewMode,
+                    it.hasFocus,
+                ),
             )
         }
     }
@@ -911,7 +945,7 @@ class OmnibarLayoutViewModel @Inject constructor(
             } else {
                 omnibarText
             }
-            command.send(Command.LaunchInputScreen(query = textToPreFill))
+            command.send(Command.LaunchInputScreen(query = textToPreFill, fromNTP = viewState.value.viewMode == ViewMode.NewTab))
         }
     }
 

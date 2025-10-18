@@ -63,4 +63,9 @@ interface DuckAiFeatureState {
      * Indicates whether the Input Screen should be shown when user open the app from system widgets
      */
     val showInputScreenOnSystemSearchLaunch: StateFlow<Boolean>
+
+    /**
+     * Indicates whether the Duck.ai Toggle should be shown in the New Tab Page (NTP)
+     */
+    val showToggleInNewTabPage: StateFlow<Boolean>
 }

@@ -56,6 +56,7 @@ import com.duckduckgo.duckchat.impl.pixel.inputScreenPixelsModeParam
 import com.google.android.material.card.MaterialCardView
 import com.google.android.material.tabs.TabLayout
 import dagger.android.support.AndroidSupportInjection
+import logcat.logcat
 import javax.inject.Inject
 import kotlin.math.roundToInt
 
@@ -133,8 +134,10 @@ class InputModeWidget @JvmOverloads constructor(
 
     private var originalText: String? = null
     private var hasTextChangedFromOriginal = false
+    private var initialSearchMode: Boolean = true
 
     init {
+        logcat { "inputScreen: InputModeWidget init" }
         LayoutInflater.from(context).inflate(R.layout.view_input_mode_switch_widget, this, true)
 
         inputField = findViewById(R.id.inputField)
@@ -153,13 +156,23 @@ class InputModeWidget @JvmOverloads constructor(
         configureClickListeners()
         configureInputBehavior()
         configureTabBehavior()
-        applyModeSpecificInputBehaviour(isSearchTab = true)
         configureShadow()
     }
 
     override fun onAttachedToWindow() {
         AndroidSupportInjection.inject(this)
         super.onAttachedToWindow()
+        applyInitialMode()
+    }
+
+    private fun applyInitialMode() {
+        if (initialSearchMode) {
+            onSearchSelected?.invoke()
+        } else {
+            onChatSelected?.invoke()
+        }
+
+        applyModeSpecificInputBehaviour(isSearchTab = initialSearchMode)
     }
 
     private fun provideInitialText(text: String) {
@@ -170,7 +183,9 @@ class InputModeWidget @JvmOverloads constructor(
     fun provideInitialInputState(
         text: String,
         canShowMainButtons: Boolean,
+        isSearchMode: Boolean,
     ) {
+        logcat { "inputScreen: provideInitialInputState text: $text in searchMode $isSearchMode" }
         if (text.isNotEmpty()) {
             provideInitialText(text)
         }
@@ -180,10 +195,8 @@ class InputModeWidget @JvmOverloads constructor(
         } else {
             inputModeMainButtonsContainer.gone()
         }
-    }
 
-    fun init() {
-        onSearchSelected?.invoke()
+        initialSearchMode = isSearchMode
     }
 
     fun clearInputFocus() {
@@ -301,6 +314,7 @@ class InputModeWidget @JvmOverloads constructor(
         inputModeSwitch.addOnTabSelectedListener(
             object : TabLayout.OnTabSelectedListener {
                 override fun onTabSelected(tab: TabLayout.Tab) {
+                    logcat { "inputScreen: onTabSelected tab position ${tab.position}" }
                     val isSearchTab = tab.position == 0
                     applyModeSpecificInputBehaviour(isSearchTab = isSearchTab)
                     when (tab.position) {

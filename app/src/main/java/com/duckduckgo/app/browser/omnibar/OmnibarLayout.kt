@@ -102,9 +102,11 @@ import com.duckduckgo.common.utils.text.TextChangedWatcher
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.api.DuckChat
+import com.duckduckgo.duckchat.impl.inputscreen.ui.view.InputModeTabLayout
 import com.duckduckgo.serp.logos.api.SerpEasterEggLogosToggles
 import com.duckduckgo.serp.logos.api.SerpLogos
 import com.google.android.material.appbar.AppBarLayout
+import com.google.android.material.tabs.TabLayout
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
@@ -295,6 +297,8 @@ open class OmnibarLayout @JvmOverloads constructor(
             )
         }
     }
+
+    private val duckAiToggle: InputModeTabLayout by lazy { findViewById(R.id.inputModeSwitch) }
     private val omnibarTextInputClickCatcher: View by lazy { findViewById(R.id.omnibarTextInputClickCatcher) }
 
     internal fun omnibarViews(): List<View> =
@@ -341,6 +345,20 @@ open class OmnibarLayout @JvmOverloads constructor(
     open var omnibarPosition: OmnibarPosition = OmnibarPosition.TOP
 
     private val smoothProgressAnimator by lazy { SmoothProgressAnimator(pageLoadingIndicator) }
+
+    private val tabLayoutListener: TabLayout.OnTabSelectedListener = object : TabLayout.OnTabSelectedListener {
+        override fun onTabSelected(tab: TabLayout.Tab) {
+            val isSearchTab = tab.position == 0
+            if (isSearchTab) {
+                omnibarInputScreenLaunchListener?.onSearchToggleSelected()
+            } else {
+                omnibarInputScreenLaunchListener?.onDuckAiToggleSelected()
+            }
+            reselectPreviousTab()
+        }
+        override fun onTabUnselected(tab: TabLayout.Tab?) {}
+        override fun onTabReselected(tab: TabLayout.Tab?) {}
+    }
 
     protected val viewModel: OmnibarLayoutViewModel by lazy {
         ViewModelProvider(
@@ -577,7 +595,11 @@ open class OmnibarLayout @JvmOverloads constructor(
             }
 
             is LaunchInputScreen -> {
-                omnibarInputScreenLaunchListener?.launchInputScreen(query = command.query)
+                omnibarInputScreenLaunchListener?.onLaunchInputScreen(
+                    query = command.query,
+                    searchMode = duckAiToggle.selectedTabPosition == 0,
+                    fromNTP = command.fromNTP,
+                )
             }
 
             is Command.EasterEggLogoClicked -> {
@@ -709,6 +731,7 @@ open class OmnibarLayout @JvmOverloads constructor(
         previousTransitionState = newTransitionState
 
         enableTextInputClickCatcher(viewState.showTextInputClickCatcher)
+        duckAiToggle.isVisible = viewState.showDuckAIToggle
     }
 
     private fun renderBrowserMode(viewState: ViewState) {
@@ -1040,6 +1063,15 @@ open class OmnibarLayout @JvmOverloads constructor(
         omnibarTextInputClickCatcher.setOnClickListener {
             viewModel.onTextInputClickCatcherClicked()
         }
+        duckAiToggle.addOnTabSelectedListener(tabLayoutListener)
+    }
+
+    fun reselectPreviousTab() {
+        rootView.postDelayed({
+            duckAiToggle.removeOnTabSelectedListener(tabLayoutListener)
+            duckAiToggle.getTabAt(0)?.select()
+            duckAiToggle.addOnTabSelectedListener(tabLayoutListener)
+        }, 1000)
     }
 }
 
