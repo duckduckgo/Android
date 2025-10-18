@@ -1018,7 +1018,15 @@ class BrowserWebViewClientTest {
     fun whenPageFinishesBeforeStartingThenPixelIsNotFired() {
         val mockWebView = getImmediatelyInvokedMockWebView()
         testee.onPageFinished(mockWebView, EXAMPLE_URL)
-        verify(pageLoadedHandler, never()).onPageLoaded(any(), any(), any(), any(), any())
+        verify(pageLoadedHandler, never()).onPageLoaded(
+            any(),
+            any(),
+            any(),
+            any(),
+            any(),
+            any(),
+            any(),
+        )
     }
 
     @Test
@@ -1032,7 +1040,15 @@ class BrowserWebViewClientTest {
         testee.onPageFinished(mockWebView, EXAMPLE_URL)
         val startArgumentCaptor = argumentCaptor<Long>()
         val endArgumentCaptor = argumentCaptor<Long>()
-        verify(pageLoadedHandler).onPageLoaded(any(), eq(null), startArgumentCaptor.capture(), endArgumentCaptor.capture(), any())
+        verify(pageLoadedHandler).onPageLoaded(
+            any(),
+            eq(null),
+            startArgumentCaptor.capture(),
+            endArgumentCaptor.capture(),
+            any(),
+            any(),
+            any(),
+        )
         assertEquals(0L, startArgumentCaptor.firstValue)
         assertEquals(10L, endArgumentCaptor.firstValue)
     }
@@ -1045,7 +1061,7 @@ class BrowserWebViewClientTest {
         whenever(mockWebView.settings).thenReturn(mock())
         testee.onPageStarted(mockWebView, "about:blank", null)
         testee.onPageFinished(mockWebView, "about:blank")
-        verify(pageLoadedHandler, never()).onPageLoaded(any(), any(), any(), any(), any())
+        verify(pageLoadedHandler, never()).onPageLoaded(any(), any(), any(), any(), any(), any(), any())
     }
 
     @Test
@@ -1054,7 +1070,7 @@ class BrowserWebViewClientTest {
         whenever(mockWebView.settings).thenReturn(mock())
         testee.onPageStarted(mockWebView, EXAMPLE_URL, null)
         testee.onPageFinished(mockWebView, EXAMPLE_URL)
-        verify(pageLoadedHandler, never()).onPageLoaded(any(), any(), any(), any(), any())
+        verify(pageLoadedHandler, never()).onPageLoaded(any(), any(), any(), any(), any(), any(), any())
     }
 
     @Test
@@ -1087,7 +1103,15 @@ class BrowserWebViewClientTest {
 
         val startArgumentCaptor = argumentCaptor<Long>()
         val endArgumentCaptor = argumentCaptor<Long>()
-        verify(pageLoadedHandler).onPageLoaded(any(), eq(null), startArgumentCaptor.capture(), endArgumentCaptor.capture(), any())
+        verify(pageLoadedHandler).onPageLoaded(
+            any(),
+            eq(null),
+            startArgumentCaptor.capture(),
+            endArgumentCaptor.capture(),
+            any(),
+            any(),
+            any(),
+        )
         assertEquals(0L, startArgumentCaptor.firstValue)
         assertEquals(10L, endArgumentCaptor.firstValue)
     }
@@ -1109,7 +1133,15 @@ class BrowserWebViewClientTest {
         testee.onPageFinished(mockWebView, EXAMPLE_URL)
         val startArgumentCaptor = argumentCaptor<Long>()
         val endArgumentCaptor = argumentCaptor<Long>()
-        verify(pageLoadedHandler).onPageLoaded(any(), eq(null), startArgumentCaptor.capture(), endArgumentCaptor.capture(), any())
+        verify(pageLoadedHandler).onPageLoaded(
+            any(),
+            eq(null),
+            startArgumentCaptor.capture(),
+            endArgumentCaptor.capture(),
+            any(),
+            any(),
+            any(),
+        )
         assertEquals(5L, startArgumentCaptor.firstValue)
         assertEquals(10L, endArgumentCaptor.firstValue)
     }

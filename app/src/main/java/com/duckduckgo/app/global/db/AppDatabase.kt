@@ -73,7 +73,7 @@ import com.duckduckgo.savedsites.store.SavedSitesRelationsDao
 
 @Database(
     exportSchema = true,
-    version = 59,
+    version = 60,
     entities = [
         TdsTracker::class,
         TdsEntity::class,
@@ -700,6 +700,14 @@ class MigrationsProvider(val context: Context, val settingsDataStore: SettingsDa
         }
     }
 
+    private val MIGRATION_59_TO_60: Migration = object : Migration(59, 60) {
+        override fun migrate(database: SupportSQLiteDatabase) {
+            database.execSQL("ALTER TABLE `page_loaded_pixel_entity` ADD COLUMN `isTabInForegroundOnFinish` INTEGER NOT NULL DEFAULT 0")
+            database.execSQL("ALTER TABLE `page_loaded_pixel_entity` ADD COLUMN `activeRequestsOnLoadStart` INTEGER NOT NULL DEFAULT 0")
+            database.execSQL("ALTER TABLE `page_loaded_pixel_entity` ADD COLUMN `concurrentRequestsOnFinish` INTEGER NOT NULL DEFAULT 0")
+        }
+    }
+
     /**
      * WARNING ⚠️
      * This needs to happen because Room doesn't support UNIQUE (...) ON CONFLICT REPLACE when creating the bookmarks table.
@@ -784,6 +792,7 @@ class MigrationsProvider(val context: Context, val settingsDataStore: SettingsDa
             MIGRATION_56_TO_57,
             MIGRATION_57_TO_58,
             MIGRATION_58_TO_59,
+            MIGRATION_59_TO_60,
         )
 
     @Deprecated(
