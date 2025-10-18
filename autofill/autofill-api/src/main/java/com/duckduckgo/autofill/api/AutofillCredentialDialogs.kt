@@ -68,8 +68,8 @@ interface CredentialSavePickerDialog {
 
     companion object {
         fun resultKeyUserChoseToSaveCredentials(tabId: String) = "${prefix(tabId, TAG)}/UserChoseToSave"
-        fun resultKeyShouldPromptToDisableAutofill(tabId: String) =
-            "${prefix(tabId, TAG)}/ShouldPromptToDisableAutofill"
+
+        fun resultKeyShouldPromptToDisableAutofill(tabId: String) = "${prefix(tabId, TAG)}/ShouldPromptToDisableAutofill"
 
         const val TAG = "CredentialSavePickerDialog"
         const val KEY_URL = "url"
@@ -253,15 +253,17 @@ interface CredentialAutofillDialogFactory {
     /**
      * Creates a dialog which prompts the user to import passwords from Google Passwords
      */
-    fun autofillImportPasswordsPromoDialog(importSource: AutofillImportLaunchSource, tabId: String, url: String): DialogFragment
+    fun autofillImportPasswordsPromoDialog(
+        importSource: AutofillImportLaunchSource,
+        tabId: String,
+        url: String,
+    ): DialogFragment
 }
 
 private fun prefix(
     tabId: String,
     tag: String,
-): String {
-    return "$tabId/$tag"
-}
+): String = "$tabId/$tag"
 
 @Parcelize
 enum class AutofillImportLaunchSource(val value: String) : Parcelable {
@@ -272,4 +274,10 @@ enum class AutofillImportLaunchSource(val value: String) : Parcelable {
     InBrowserPromo("in_browser_promo"),
     Unknown("unknown"),
     MainAppSettings("settings"),
+}
+
+@Parcelize
+enum class AutofillImportBookmarksLaunchSource(val value: String) : Parcelable {
+    Unknown("unknown"),
+    AutofillDevSettings("autofill_dev_settings"),
 }

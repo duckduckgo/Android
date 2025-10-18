@@ -17,17 +17,19 @@
 package com.duckduckgo.autofill.impl.importing.takeout.webflow
 
 import android.graphics.Bitmap
+import android.webkit.RenderProcessGoneDetail
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import javax.inject.Inject
 
 class ImportGoogleBookmarksWebFlowWebViewClient @Inject constructor(
-    private val callback: NewPageCallback,
+    private val callback: WebFlowCallback,
 ) : WebViewClient() {
-    interface NewPageCallback {
+    interface WebFlowCallback {
         fun onPageStarted(url: String?) {}
 
         fun onPageFinished(url: String?) {}
+        fun onFatalWebViewError()
     }
 
     override fun onPageStarted(
@@ -43,5 +45,13 @@ class ImportGoogleBookmarksWebFlowWebViewClient @Inject constructor(
         url: String?,
     ) {
         callback.onPageFinished(url)
+    }
+
+    override fun onRenderProcessGone(
+        view: WebView?,
+        detail: RenderProcessGoneDetail?,
+    ): Boolean {
+        callback.onFatalWebViewError()
+        return true
     }
 }

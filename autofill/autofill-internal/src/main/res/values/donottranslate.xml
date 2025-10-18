@@ -51,8 +51,11 @@
     <string name="autofillDevSettingsImportBookmarksTitle">Import Bookmarks</string>
     <string name="autofillDevSettingsImportBookmarksGoogleTakeoutOurAppTitle">Launch Google Takeout (normal tab)</string>
     <string name="autofillDevSettingsImportBookmarksGoogleTakeoutImportFlowTitle">Launch Bookmarks import flow</string>
+    <string name="autofillDevSettingsImportBookmarksGoogleTakeoutImportFlowWithDialogTitle">Launch Bookmarks import flow (with preimport dialog)</string>
     <string name="autofillDevSettingsImportBookmarksGoogleTakeoutImportZipDirectlyTitle">Choose zip file (downloaded from Takeout)</string>
     <string name="autofillDevSettingsImportBookmarksViewBookmarksTitle">View Bookmarks</string>
+    <string name="importBookmarksDevSettingLaunchErrorScreen">Show bookmark import failure screen (simulated data)</string>
+    <string name="importBookmarksDevSettingLaunchSuccessScreen">Show bookmark import success screen (simulated data)</string>
 
     <string name="autofillDevSettingsResetGooglePasswordsImportFlagTitle">Clear Previous Google Imports interactions</string>
     <string name="autofillDevSettingsResetGooglePasswordsImportFlagInstruction">Tap to forget whether we\'ve previously imported, what we chose when previously prompted etc…</string>

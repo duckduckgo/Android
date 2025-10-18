@@ -24,13 +24,13 @@ import android.view.ViewGroup
 import android.webkit.WebSettings
 import android.webkit.WebView
 import androidx.activity.OnBackPressedCallback
-import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.setFragmentResult
 import androidx.fragment.app.setFragmentResultListener
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.withStarted
 import androidx.webkit.WebViewCompat
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.autofill.api.AutofillFragmentResultsPlugin
@@ -48,11 +48,14 @@ import com.duckduckgo.autofill.impl.importing.gpm.webflow.autofill.NoOpAutofillE
 import com.duckduckgo.autofill.impl.importing.gpm.webflow.autofill.NoOpEmailProtectionInContextSignupFlowListener
 import com.duckduckgo.autofill.impl.importing.gpm.webflow.autofill.NoOpEmailProtectionUserPromptListener
 import com.duckduckgo.autofill.impl.importing.takeout.store.BookmarkImportConfigStore
+import com.duckduckgo.autofill.impl.importing.takeout.webflow.ImportGoogleBookmarkResult.Success
 import com.duckduckgo.autofill.impl.importing.takeout.webflow.ImportGoogleBookmarksWebFlowViewModel.Command.ExitFlowAsFailure
 import com.duckduckgo.autofill.impl.importing.takeout.webflow.ImportGoogleBookmarksWebFlowViewModel.Command.ExitFlowWithSuccess
 import com.duckduckgo.autofill.impl.importing.takeout.webflow.ImportGoogleBookmarksWebFlowViewModel.Command.InjectCredentialsFromReauth
 import com.duckduckgo.autofill.impl.importing.takeout.webflow.ImportGoogleBookmarksWebFlowViewModel.Command.NoCredentialsAvailable
+import com.duckduckgo.autofill.impl.importing.takeout.webflow.ImportGoogleBookmarksWebFlowViewModel.Command.PromptUserToConfirmFlowCancellation
 import com.duckduckgo.autofill.impl.importing.takeout.webflow.ImportGoogleBookmarksWebFlowViewModel.Command.PromptUserToSelectFromStoredCredentials
+import com.duckduckgo.autofill.impl.importing.takeout.webflow.ImportGoogleBookmarksWebFlowViewModel.ViewState.HideWebPage
 import com.duckduckgo.autofill.impl.importing.takeout.webflow.ImportGoogleBookmarksWebFlowViewModel.ViewState.Initializing
 import com.duckduckgo.autofill.impl.importing.takeout.webflow.ImportGoogleBookmarksWebFlowViewModel.ViewState.LoadingWebPage
 import com.duckduckgo.autofill.impl.importing.takeout.webflow.ImportGoogleBookmarksWebFlowViewModel.ViewState.NavigatingBack
@@ -60,10 +63,18 @@ import com.duckduckgo.autofill.impl.importing.takeout.webflow.ImportGoogleBookma
 import com.duckduckgo.autofill.impl.importing.takeout.webflow.ImportGoogleBookmarksWebFlowViewModel.ViewState.ShowWebPage
 import com.duckduckgo.autofill.impl.importing.takeout.webflow.ImportGoogleBookmarksWebFlowViewModel.ViewState.UserCancelledImportFlow
 import com.duckduckgo.autofill.impl.importing.takeout.webflow.ImportGoogleBookmarksWebFlowViewModel.ViewState.UserFinishedCannotImport
+import com.duckduckgo.autofill.impl.importing.takeout.webflow.UserCannotImportReason.DownloadError
+import com.duckduckgo.autofill.impl.importing.takeout.webflow.UserCannotImportReason.ErrorParsingBookmarks
+import com.duckduckgo.autofill.impl.importing.takeout.webflow.UserCannotImportReason.Unknown
+import com.duckduckgo.autofill.impl.importing.takeout.webflow.UserCannotImportReason.WebViewError
 import com.duckduckgo.autofill.impl.jsbridge.request.SupportedAutofillInputSubType
 import com.duckduckgo.autofill.impl.jsbridge.request.SupportedAutofillInputSubType.PASSWORD
 import com.duckduckgo.autofill.impl.store.ReAuthenticationDetails
 import com.duckduckgo.common.ui.DuckDuckGoFragment
+import com.duckduckgo.common.ui.view.button.ButtonType.DESTRUCTIVE
+import com.duckduckgo.common.ui.view.button.ButtonType.GHOST_ALT
+import com.duckduckgo.common.ui.view.dialog.DaxAlertDialog
+import com.duckduckgo.common.ui.view.dialog.TextAlertDialogBuilder
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.FragmentViewModelFactory
 import com.duckduckgo.common.utils.plugins.PluginPoint
@@ -84,7 +95,7 @@ class ImportGoogleBookmarksWebFlowFragment :
     NoOpEmailProtectionInContextSignupFlowListener,
     NoOpEmailProtectionUserPromptListener,
     NoOpAutofillEventListener,
-    ImportGoogleBookmarksWebFlowWebViewClient.NewPageCallback {
+    ImportGoogleBookmarksWebFlowWebViewClient.WebFlowCallback {
     @Inject
     lateinit var userAgentProvider: UserAgentProvider
 
@@ -113,15 +124,10 @@ class ImportGoogleBookmarksWebFlowFragment :
     lateinit var browserAutofillConfigurator: InternalBrowserAutofillConfigurator
 
     private var binding: FragmentImportGoogleBookmarksWebflowBinding? = null
+    private var cancellationDialog: DaxAlertDialog? = null
 
     private val viewModel by lazy {
         ViewModelProvider(requireActivity(), viewModelFactory)[ImportGoogleBookmarksWebFlowViewModel::class.java]
-    }
-
-    companion object {
-        private const val CUSTOM_FLOW_TAB_ID = "bookmark-import-webflow"
-
-        private const val SELECT_CREDENTIALS_FRAGMENT_TAG = "autofillSelectCredentialsDialog"
     }
 
     override fun onCreateView(
@@ -141,16 +147,13 @@ class ImportGoogleBookmarksWebFlowFragment :
         initialiseToolbar()
         configureWebView()
         configureBackButtonHandler()
+
         observeViewState()
         observeCommands()
+
         lifecycleScope.launch {
             viewModel.loadInitialWebpage()
         }
-    }
-
-    override fun onDestroyView() {
-        super.onDestroyView()
-        binding = null
     }
 
     private fun loadFirstWebpage(url: String) {
@@ -173,7 +176,8 @@ class ImportGoogleBookmarksWebFlowFragment :
                     is LoadingWebPage -> loadFirstWebpage(viewState.url)
                     is NavigatingBack -> binding?.webView?.goBack()
                     is Initializing -> {}
-                    is ShowWebPage -> {}
+                    is ShowWebPage -> hideImportProgressDialog()
+                    is HideWebPage -> showImportProgressDialog()
                 }
             }.launchIn(lifecycleScope)
     }
@@ -197,8 +201,12 @@ class ImportGoogleBookmarksWebFlowFragment :
                             command.credentials,
                             command.triggerType,
                         )
-                    is ExitFlowWithSuccess -> exitFlowAsSuccess(command.importedCount)
+                    is ExitFlowWithSuccess -> {
+                        logcat { "Bookmark-import: ExitFlowWithSuccess received with count: ${command.importedCount}" }
+                        exitFlowAsSuccess(command.importedCount)
+                    }
                     is ExitFlowAsFailure -> exitFlowAsError(command.reason)
+                    is PromptUserToConfirmFlowCancellation -> askUserToConfirmCancellation()
                 }
             }.launchIn(lifecycleScope)
     }
@@ -247,7 +255,6 @@ class ImportGoogleBookmarksWebFlowFragment :
             userAgentString = userAgentProvider.userAgent()
             javaScriptEnabled = true
             domStorageEnabled = true
-            databaseEnabled = true
             loadWithOverviewMode = true
             useWideViewPort = true
             builtInZoomControls = true
@@ -314,25 +321,52 @@ class ImportGoogleBookmarksWebFlowFragment :
 
     private fun initialiseToolbar() {
         with(getToolbar()) {
-            title = getString(R.string.autofillManagementImportBookmarks)
-            setNavigationIconAsCross()
-            setNavigationOnClickListener { viewModel.onCloseButtonPressed() }
+            setNavigationOnClickListener { askUserToConfirmCancellation() }
         }
     }
 
-    private fun Toolbar.setNavigationIconAsCross() {
-        setNavigationIcon(com.duckduckgo.mobile.android.R.drawable.ic_close_24)
+    private fun askUserToConfirmCancellation() {
+        context?.let {
+            // dismiss any existing dialog before creating a new one
+            dismissCancellationDialog()
+
+            cancellationDialog = TextAlertDialogBuilder(it)
+                .setTitle(R.string.importBookmarksFromGoogleCancelConfirmationDialogTitle)
+                .setMessage(R.string.importBookmarksFromGoogleCancelConfirmationDialogMessage)
+                .setPositiveButton(R.string.importBookmarksFromGoogleCancelConfirmationDialogCancelImport, DESTRUCTIVE)
+                .setNegativeButton(R.string.importBookmarksFromGoogleCancelConfirmationDialogContinue, GHOST_ALT)
+                .setCancellable(true)
+                .addEventListener(
+                    object : TextAlertDialogBuilder.EventListener() {
+                        override fun onPositiveButtonClicked() {
+                            cancellationDialog = null
+                            viewModel.onCloseButtonPressed()
+                        }
+                    },
+                ).build().also { dialog -> dialog.show() }
+        }
+    }
+
+    private fun dismissCancellationDialog() {
+        cancellationDialog?.dismiss()
+        cancellationDialog = null
     }
 
     private fun getToolbar() = (activity as ImportGoogleBookmarksWebFlowActivity).binding.includeToolbar.toolbar
 
     override fun onPageStarted(url: String?) {
+        viewModel.onPageStarted(url)
         lifecycleScope.launch(dispatchers.main()) {
             binding?.let {
                 val reauthDetails = url?.let { viewModel.getReauthData(url) } ?: ReAuthenticationDetails()
                 browserAutofillConfigurator.configureAutofillForCurrentPage(it.webView, url, reauthDetails)
             }
         }
+    }
+
+    override fun onFatalWebViewError() {
+        logcat(WARN) { "Bookmark-import: Fatal WebView error received" }
+        exitFlowAsError(WebViewError)
     }
 
     private fun configureBackButtonHandler() {
@@ -346,28 +380,48 @@ class ImportGoogleBookmarksWebFlowFragment :
         requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner, onBackPressedCallback)
     }
 
-    private fun exitFlowAsSuccess(importedCount: Int = 0) {
-        val result =
-            Bundle().apply {
-                putParcelable(ImportGoogleBookmarkResult.Companion.RESULT_KEY_DETAILS, ImportGoogleBookmarkResult.Success(importedCount))
+    private fun exitFlowAsSuccess(bookmarkCount: Int) {
+        logcat { "Bookmark-import: Reporting import success with bookmarkCount: $bookmarkCount" }
+        lifecycleScope.launch {
+            lifecycle.withStarted {
+                dismissCancellationDialog()
+                val result = Bundle().apply {
+                    putParcelable(ImportGoogleBookmarkResult.RESULT_KEY_DETAILS, Success(bookmarkCount))
+                }
+                setFragmentResult(ImportGoogleBookmarkResult.RESULT_KEY, result)
             }
-        setFragmentResult(ImportGoogleBookmarkResult.Companion.RESULT_KEY, result)
+        }
     }
 
     private fun exitFlowAsCancellation(stage: String) {
-        val result =
-            Bundle().apply {
-                putParcelable(ImportGoogleBookmarkResult.Companion.RESULT_KEY_DETAILS, ImportGoogleBookmarkResult.UserCancelled(stage))
+        logcat { "Bookmark-import: Flow cancelled at stage: $stage" }
+
+        lifecycleScope.launch {
+            lifecycle.withStarted {
+                dismissCancellationDialog()
+
+                val result =
+                    Bundle().apply {
+                        putParcelable(ImportGoogleBookmarkResult.Companion.RESULT_KEY_DETAILS, ImportGoogleBookmarkResult.UserCancelled(stage))
+                    }
+                setFragmentResult(ImportGoogleBookmarkResult.Companion.RESULT_KEY, result)
             }
-        setFragmentResult(ImportGoogleBookmarkResult.Companion.RESULT_KEY, result)
+        }
     }
 
     private fun exitFlowAsError(reason: UserCannotImportReason) {
-        val result =
-            Bundle().apply {
-                putParcelable(ImportGoogleBookmarkResult.Companion.RESULT_KEY_DETAILS, ImportGoogleBookmarkResult.Error(reason))
+        logcat { "Bookmark-import: Flow error at stage: ${reason.mapToStage()}" }
+
+        lifecycleScope.launch {
+            lifecycle.withStarted {
+                dismissCancellationDialog()
+
+                val result = Bundle().apply {
+                    putParcelable(ImportGoogleBookmarkResult.Companion.RESULT_KEY_DETAILS, ImportGoogleBookmarkResult.Error(reason))
+                }
+                setFragmentResult(ImportGoogleBookmarkResult.Companion.RESULT_KEY, result)
             }
-        setFragmentResult(ImportGoogleBookmarkResult.Companion.RESULT_KEY, result)
+        }
     }
 
     private suspend fun showCredentialChooserDialog(
@@ -459,4 +513,38 @@ class ImportGoogleBookmarksWebFlowFragment :
     override fun onCredentialsSaved(savedCredentials: LoginCredentials) {
         // no-op
     }
+
+    private fun showImportProgressDialog() {
+        logcat { "Bookmark-import: Notifying activity to show progress" }
+        (activity as? WebViewVisibilityListener)?.showLoadingState()
+    }
+
+    private fun hideImportProgressDialog() {
+        logcat { "Bookmark-import: Notifying activity to hide progress" }
+        (activity as? WebViewVisibilityListener)?.hideLoadingState()
+    }
+
+    override fun onDestroyView() {
+        dismissCancellationDialog()
+        binding = null
+        super.onDestroyView()
+    }
+
+    interface WebViewVisibilityListener {
+        fun showLoadingState()
+        fun hideLoadingState()
+    }
+
+    companion object {
+        private const val CUSTOM_FLOW_TAB_ID = "bookmark-import-webflow"
+        private const val SELECT_CREDENTIALS_FRAGMENT_TAG = "autofillSelectCredentialsDialog"
+    }
 }
+
+private fun UserCannotImportReason.mapToStage(): String =
+    when (this) {
+        DownloadError -> "zip-download-error"
+        ErrorParsingBookmarks -> "zip-parse-error"
+        Unknown -> "import-error-unknown"
+        WebViewError -> "webview-error"
+    }
