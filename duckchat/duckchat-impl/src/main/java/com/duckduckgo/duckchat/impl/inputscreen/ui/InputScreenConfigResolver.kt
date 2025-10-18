@@ -16,12 +16,11 @@
 
 package com.duckduckgo.duckchat.impl.inputscreen.ui
 
-import android.content.Context
-import android.content.Intent
 import android.content.res.Configuration
-import com.duckduckgo.app.di.ActivityContext
+import androidx.appcompat.app.AppCompatActivity
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.duckchat.api.inputscreen.InputScreenActivityParams
+import com.duckduckgo.duckchat.api.inputscreen.InputScreenBrowserButtonsConfig
 import com.duckduckgo.duckchat.impl.DuckChatInternal
 import com.duckduckgo.navigation.api.getActivityParams
 import com.squareup.anvil.annotations.ContributesBinding
@@ -30,8 +29,6 @@ import javax.inject.Inject
 
 interface InputScreenConfigResolver {
     val isTopOmnibar: Boolean
-
-    fun onInputScreenCreated(intent: Intent)
 
     fun useTopBar(): Boolean
 
@@ -42,7 +39,7 @@ interface InputScreenConfigResolver {
 @SingleInstanceIn(scope = ActivityScope::class)
 class InputScreenConfigResolverImpl @Inject constructor(
     private val duckChatInternal: DuckChatInternal,
-    @ActivityContext private val activityContext: Context,
+    private val appCompatActivity: AppCompatActivity,
 ) : InputScreenConfigResolver {
     companion object {
         fun useTopBar(
@@ -51,23 +48,18 @@ class InputScreenConfigResolverImpl @Inject constructor(
         ): Boolean = isTopOmnibar || !duckChatInternal.inputScreenBottomBarEnabled.value
     }
 
-    private var _isTopOmnibar = true
-
-    override val isTopOmnibar: Boolean
-        get() = _isTopOmnibar
-
-    override fun onInputScreenCreated(intent: Intent) {
-        val params = intent.getActivityParams(InputScreenActivityParams::class.java)
-        _isTopOmnibar = params?.isTopOmnibar ?: true
+    override val isTopOmnibar: Boolean by lazy {
+        appCompatActivity.intent.getActivityParams(InputScreenActivityParams::class.java)?.isTopOmnibar ?: true
     }
 
     override fun useTopBar(): Boolean =
         useTopBar(
             isTopOmnibar = isTopOmnibar,
             duckChatInternal = duckChatInternal,
-        ) || activityContext.resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
+        ) || appCompatActivity.resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
 
     override fun mainButtonsEnabled(): Boolean {
-        return duckChatInternal.showMainButtonsInInputScreen.value
+        val browserButtonsConfig = appCompatActivity.intent.getActivityParams(InputScreenActivityParams::class.java)?.browserButtonsConfig
+        return duckChatInternal.showMainButtonsInInputScreen.value && browserButtonsConfig is InputScreenBrowserButtonsConfig.Enabled
     }
 }

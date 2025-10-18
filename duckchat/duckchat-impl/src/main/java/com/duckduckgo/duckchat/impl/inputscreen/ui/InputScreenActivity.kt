@@ -48,7 +48,6 @@ class InputScreenActivity : DuckDuckGoActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        inputScreenConfigResolver.onInputScreenCreated(intent)
         setContentView(R.layout.activity_input_screen)
         inputScreenDiscoveryFunnel.onInputScreenOpened()
         val params =

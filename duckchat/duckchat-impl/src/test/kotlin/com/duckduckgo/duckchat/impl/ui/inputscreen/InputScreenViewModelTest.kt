@@ -1664,31 +1664,16 @@ class InputScreenViewModelTest {
         }
 
     @Test
-    fun `when initialized and main buttons flag disabled then view state has correct state`() =
-        runTest {
-            whenever(inputScreenConfigResolver.mainButtonsEnabled()).thenReturn(false)
-            val viewModel = createViewModel("")
-
-            assertFalse(viewModel.visibilityState.value.mainButtonsEnabled)
-        }
-
-    @Test
-    fun `when initialized and main buttons flag enabled then view state has correct state`() =
-        runTest {
-            whenever(inputScreenConfigResolver.mainButtonsEnabled()).thenReturn(true)
-            val viewModel = createViewModel()
-
-            assertTrue(viewModel.visibilityState.value.mainButtonsEnabled)
-        }
-
-    @Test
     fun `when onClearTextTapped and search mode enabled then pixel sent and state updated`() =
         runTest {
             whenever(inputScreenConfigResolver.mainButtonsEnabled()).thenReturn(true)
             val viewModel = createViewModel()
             viewModel.onSearchSelected()
+            viewModel.onSearchInputTextChanged("query")
 
             viewModel.onClearTextTapped()
+            // UI clears the text which triggers visibility update
+            viewModel.onSearchInputTextChanged("")
 
             val expectedParams =
                 mapOf(
@@ -1767,5 +1752,134 @@ class InputScreenViewModelTest {
 
             assertFalse(viewModel.visibilityState.value.mainButtonsVisible)
             assertFalse(viewModel.visibilityState.value.searchMode)
+        }
+
+    @Test
+    fun `when search mode selected with empty text and mainButtonsEnabled is true then mainButtonsVisible is true`() =
+        runTest {
+            whenever(inputScreenConfigResolver.mainButtonsEnabled()).thenReturn(true)
+            val viewModel = createViewModel("")
+
+            viewModel.onSearchSelected()
+
+            assertTrue(viewModel.visibilityState.value.mainButtonsVisible)
+        }
+
+    @Test
+    fun `when search mode selected with empty text and mainButtonsEnabled is false then mainButtonsVisible is false`() =
+        runTest {
+            whenever(inputScreenConfigResolver.mainButtonsEnabled()).thenReturn(false)
+            val viewModel = createViewModel("")
+
+            viewModel.onSearchSelected()
+
+            assertFalse(viewModel.visibilityState.value.mainButtonsVisible)
+        }
+
+    @Test
+    fun `when user types in search mode and mainButtonsEnabled is true then mainButtonsVisible becomes false`() =
+        runTest {
+            whenever(inputScreenConfigResolver.mainButtonsEnabled()).thenReturn(true)
+            val viewModel = createViewModel("")
+            viewModel.onSearchSelected()
+
+            assertTrue(viewModel.visibilityState.value.mainButtonsVisible)
+
+            viewModel.onSearchInputTextChanged("query")
+
+            assertFalse(viewModel.visibilityState.value.mainButtonsVisible)
+        }
+
+    @Test
+    fun `when user clears text in search mode and mainButtonsEnabled is true then mainButtonsVisible becomes true`() =
+        runTest {
+            whenever(inputScreenConfigResolver.mainButtonsEnabled()).thenReturn(true)
+            val viewModel = createViewModel("")
+            viewModel.onSearchSelected()
+            viewModel.onSearchInputTextChanged("query")
+
+            assertFalse(viewModel.visibilityState.value.mainButtonsVisible)
+
+            // Clear text
+            viewModel.onSearchInputTextChanged("")
+
+            assertTrue(viewModel.visibilityState.value.mainButtonsVisible)
+        }
+
+    @Test
+    fun `when user switches from search to chat mode with empty text then mainButtonsVisible becomes false`() =
+        runTest {
+            whenever(inputScreenConfigResolver.mainButtonsEnabled()).thenReturn(true)
+            val viewModel = createViewModel("")
+            viewModel.onSearchSelected()
+
+            assertTrue(viewModel.visibilityState.value.mainButtonsVisible)
+
+            viewModel.onChatSelected()
+
+            assertFalse(viewModel.visibilityState.value.mainButtonsVisible)
+        }
+
+    @Test
+    fun `when user switches from chat to search mode with empty text and mainButtonsEnabled is true then mainButtonsVisible becomes true`() =
+        runTest {
+            whenever(inputScreenConfigResolver.mainButtonsEnabled()).thenReturn(true)
+            val viewModel = createViewModel("")
+            viewModel.onChatSelected()
+
+            assertFalse(viewModel.visibilityState.value.mainButtonsVisible)
+
+            viewModel.onSearchSelected()
+            viewModel.onSearchInputTextChanged("")
+
+            assertTrue(viewModel.visibilityState.value.mainButtonsVisible)
+        }
+
+    @Test
+    fun `when user switches from chat to search mode with non-empty text then mainButtonsVisible is true because search text is empty`() =
+        runTest {
+            whenever(inputScreenConfigResolver.mainButtonsEnabled()).thenReturn(true)
+            val viewModel = createViewModel("")
+            viewModel.onChatSelected()
+            viewModel.onChatInputTextChanged("query")
+
+            assertFalse(viewModel.visibilityState.value.mainButtonsVisible)
+
+            viewModel.onSearchSelected()
+            viewModel.onSearchInputTextChanged("query")
+
+            assertFalse(viewModel.visibilityState.value.mainButtonsVisible)
+        }
+
+    @Test
+    fun `when initialized with non-empty text and user selects search mode then mainButtonsVisible is false`() =
+        runTest {
+            whenever(inputScreenConfigResolver.mainButtonsEnabled()).thenReturn(true)
+            val viewModel = createViewModel("initial query")
+
+            viewModel.onSearchSelected()
+
+            // mainButtonsVisible should be false because searchInputTextState is not empty
+            assertFalse(viewModel.visibilityState.value.mainButtonsVisible)
+        }
+
+    @Test
+    fun `when onSearchInputTextChanged called then mainButtonsVisible is updated based on canShowMainButtons`() =
+        runTest {
+            whenever(inputScreenConfigResolver.mainButtonsEnabled()).thenReturn(true)
+            val viewModel = createViewModel("")
+            viewModel.onSearchSelected()
+            viewModel.onSearchInputTextChanged("")
+
+            // Initially empty in search mode
+            assertTrue(viewModel.visibilityState.value.mainButtonsVisible)
+
+            // Type some text
+            viewModel.onSearchInputTextChanged("q")
+            assertFalse(viewModel.visibilityState.value.mainButtonsVisible)
+
+            // Clear text
+            viewModel.onSearchInputTextChanged("")
+            assertTrue(viewModel.visibilityState.value.mainButtonsVisible)
         }
 }

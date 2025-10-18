@@ -44,6 +44,7 @@ import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.duckchat.api.inputscreen.InputScreenActivityParams
 import com.duckduckgo.duckchat.api.inputscreen.InputScreenActivityResultCodes
 import com.duckduckgo.duckchat.api.inputscreen.InputScreenActivityResultParams
+import com.duckduckgo.duckchat.api.inputscreen.InputScreenBrowserButtonsConfig
 import com.duckduckgo.duckchat.impl.R
 import com.duckduckgo.duckchat.impl.databinding.FragmentInputScreenBinding
 import com.duckduckgo.duckchat.impl.inputscreen.ui.command.Command
@@ -215,7 +216,10 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
 
         configureViewPager()
 
-        val tabs = params?.tabs ?: 0
+        val tabs = when (val browserButtonsConfig = params?.browserButtonsConfig) {
+            is InputScreenBrowserButtonsConfig.Enabled -> browserButtonsConfig.tabs
+            else -> 0
+        }
         configureOmnibar(tabs)
 
         configureVoice(useTopBar)

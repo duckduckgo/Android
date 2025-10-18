@@ -19,18 +19,19 @@ package com.duckduckgo.duckchat.api.inputscreen
 import android.app.Activity
 import androidx.activity.result.ActivityResult
 import com.duckduckgo.navigation.api.GlobalActivityStarter
+import java.io.Serializable
 
 /**
  * Parameters for launching the Input Screen activity.
  *
  * @param query The initial query text to pre-populate in the input field
  * @param isTopOmnibar whether the omnibar is positioned at the top of the screen
- * @param tabs number of tabs to display
+ * @param browserButtonsConfig configuration for displaying browser buttons (Fire Button, Tab Switcher, Menu)
  */
 data class InputScreenActivityParams(
     val query: String,
-    val tabs: Int = 0,
-    val isTopOmnibar: Boolean = false,
+    val isTopOmnibar: Boolean,
+    val browserButtonsConfig: InputScreenBrowserButtonsConfig,
 ) : GlobalActivityStarter.ActivityParams
 
 /**
@@ -65,4 +66,21 @@ data object InputScreenActivityResultParams {
 
     /** Key for any canceled draft content when result is [Activity.RESULT_CANCELED] */
     const val CANCELED_DRAFT_PARAM = "draft"
+}
+
+/**
+ * Configuration for displaying browser buttons (Fire Button, Tab Switcher, Menu) on the Input Screen.
+ */
+sealed class InputScreenBrowserButtonsConfig : Serializable {
+    /**
+     * Don't show any browser buttons.
+     */
+    class Disabled : InputScreenBrowserButtonsConfig(), Serializable
+
+    /**
+     * Show buttons when context allows for it.
+     *
+     * @param tabs number of tabs to display in the tab switcher button
+     */
+    data class Enabled(val tabs: Int) : InputScreenBrowserButtonsConfig(), Serializable
 }
