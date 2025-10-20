@@ -1,0 +1,53 @@
+# Gradle Profiler Build Performance Scenarios
+# This file defines three benchmark scenarios to measure build performance
+
+# Scenario 1: Clean Build
+# Measures cold build performance with no incremental compilation
+clean-build {
+    title = "Clean Build"
+    versions = ["8.14"]
+    tasks = ["assembleInternalDebug"]
+    gradle-args = ["--no-build-cache", "--no-configuration-cache"]
+    cleanup-tasks = ["clean"]
+    warm-ups = 4
+    iterations = 7
+
+    # Use daemon for consistency
+    daemon = warm
+}
+
+# Scenario 2: ABI Change
+# Measures incremental build performance when public API changes
+# This triggers recompilation of all dependent modules
+abi-change {
+    title = "ABI Change (Incremental)"
+    versions = ["8.14"]
+    tasks = ["assembleInternalDebug"]
+    gradle-args = ["--no-build-cache", "--no-configuration-cache"]
+
+    # Apply ABI change to a core utility class
+    # Gradle profiler will modify a public method signature
+    apply-abi-change-to = "app/src/main/java/com/duckduckgo/app/global/DispatcherProvider.kt"
+
+    warm-ups = 4
+    iterations = 7
+    daemon = warm
+}
+
+# Scenario 3: Non-ABI Change
+# Measures incremental build performance when only implementation changes
+# Only the modified module needs recompilation
+non-abi-change {
+    title = "Non-ABI Change (Incremental)"
+    versions = ["8.14"]
+    tasks = ["assembleInternalDebug"]
+    gradle-args = ["--no-build-cache", "--no-configuration-cache"]
+
+    # Apply non-ABI change to the same file
+    # Gradle profiler will modify method implementation without changing signature
+    apply-non-abi-change-to = "app/src/main/java/com/duckduckgo/app/global/DispatcherProvider.kt"
+
+    warm-ups = 4
+    iterations = 7
+    daemon = warm
+}
