@@ -38,39 +38,22 @@ import com.duckduckgo.common.ui.compose.tools.PreviewBox
  */
 
 @Composable
-fun DaxButtonDestructiveGhostSecondary(
+fun DaxDestructiveGhostSecondaryButton(
     text: String,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
+    size: DaxButtonSize = DaxButtonSize.Small,
     enabled: Boolean = true,
 ) {
     DaxButton(
+        text = text,
         onClick = onClick,
+        size = size,
         colors = destructiveGhostSecondaryColors(),
         rippleConfiguration = destructiveGhostButtonRippleConfiguration(),
         modifier = modifier,
         enabled = enabled,
-    ) {
-        DaxButtonText(text)
-    }
-}
-
-@Composable
-fun DaxButtonDestructiveGhostSecondaryLarge(
-    text: String,
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier,
-    enabled: Boolean = true,
-) {
-    DaxButtonLarge(
-        onClick = onClick,
-        colors = destructiveGhostSecondaryColors(),
-        rippleConfiguration = destructiveGhostButtonRippleConfiguration(),
-        modifier = modifier,
-        enabled = enabled,
-    ) {
-        DaxButtonText(text)
-    }
+    )
 }
 
 @Composable
@@ -119,12 +102,12 @@ private fun destructiveGhostButtonRippleConfiguration() =
 
 @PreviewLightDark
 @Composable
-private fun DaxButtonDestructiveGhostSecondaryPreview(
+private fun DaxDestructiveGhostSecondaryButtonSmallPreview(
     @PreviewParameter(DaxButtonStateParameterProvider::class) enabled: Boolean,
 ) {
     PreviewBox {
-        DaxButtonDestructiveGhostSecondary(
-            text = "Destructive Ghost Secondary",
+        DaxDestructiveGhostSecondaryButton(
+            text = "Destructive Ghost Secondary Small",
             onClick = { },
             enabled = enabled,
         )
@@ -133,12 +116,13 @@ private fun DaxButtonDestructiveGhostSecondaryPreview(
 
 @PreviewLightDark
 @Composable
-private fun DaxButtonDestructiveGhostSecondaryLargePreview(
+private fun DaxDestructiveGhostSecondaryButtonLargePreview(
     @PreviewParameter(DaxButtonStateParameterProvider::class) enabled: Boolean,
 ) {
     PreviewBox {
-        DaxButtonDestructiveGhostSecondaryLarge(
+        DaxDestructiveGhostSecondaryButton(
             text = "Destructive Ghost Secondary Large",
+            size = DaxButtonSize.Large,
             onClick = { },
             enabled = enabled,
         )

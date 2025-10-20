@@ -37,35 +37,18 @@ fun DaxButtonGhost(
     text: String,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
+    size: DaxButtonSize = DaxButtonSize.Small,
     enabled: Boolean = true,
 ) {
     DaxButton(
+        text = text,
         onClick = onClick,
+        size = size,
         colors = ghostColors(),
         rippleConfiguration = ghostButtonRippleConfiguration(),
         modifier = modifier,
         enabled = enabled,
-    ) {
-        DaxButtonText(text)
-    }
-}
-
-@Composable
-fun DaxButtonGhostLarge(
-    text: String,
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier,
-    enabled: Boolean = true,
-) {
-    DaxButtonLarge(
-        onClick = onClick,
-        colors = ghostColors(),
-        rippleConfiguration = ghostButtonRippleConfiguration(),
-        modifier = modifier,
-        enabled = enabled,
-    ) {
-        DaxButtonText(text)
-    }
+    )
 }
 
 @Composable
@@ -114,7 +97,7 @@ private fun DaxButtonGhostPreview(
 ) {
     PreviewBox {
         DaxButtonGhost(
-            text = "Ghost",
+            text = "Ghost Small",
             onClick = { },
             enabled = enabled,
         )
@@ -127,8 +110,9 @@ private fun DaxButtonGhostLargePreview(
     @PreviewParameter(DaxButtonStateParameterProvider::class) enabled: Boolean,
 ) {
     PreviewBox {
-        DaxButtonGhostLarge(
+        DaxButtonGhost(
             text = "Ghost Large",
+            size = DaxButtonSize.Large,
             onClick = { },
             enabled = enabled,
         )

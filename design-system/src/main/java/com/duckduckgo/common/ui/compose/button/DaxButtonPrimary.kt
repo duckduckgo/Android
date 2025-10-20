@@ -18,7 +18,6 @@
 
 package com.duckduckgo.common.ui.compose.button
 
-import androidx.compose.material.ripple.RippleAlpha
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.RippleConfiguration
 import androidx.compose.runtime.Composable
@@ -36,40 +35,22 @@ import com.duckduckgo.common.ui.compose.theme.White6
 import com.duckduckgo.common.ui.compose.tools.PreviewBox
 
 @Composable
-fun DaxButtonPrimary(
+fun DaxPrimaryButton(
     text: String,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
+    size: DaxButtonSize = DaxButtonSize.Small,
     enabled: Boolean = true,
 ) {
     DaxButton(
+        text = text,
         onClick = onClick,
+        size = size,
         colors = primaryColors(),
         rippleConfiguration = primaryButtonRippleConfiguration(),
         modifier = modifier,
         enabled = enabled,
-    ) {
-        DaxButtonText(text)
-    }
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun DaxButtonPrimaryLarge(
-    text: String,
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier,
-    enabled: Boolean = true,
-) {
-    DaxButtonLarge(
-        onClick = onClick,
-        colors = primaryColors(),
-        rippleConfiguration = primaryButtonRippleConfiguration(),
-        modifier = modifier,
-        enabled = enabled,
-    ) {
-        DaxButtonText(text)
-    }
+    )
 }
 
 @Composable
@@ -112,24 +93,16 @@ private fun adsColorButtonPrimaryTextDisabled(): Color = DuckDuckGoTheme.textCol
 
 @Composable
 private fun primaryButtonRippleConfiguration() =
-    RippleConfiguration(
-        color = adsColorButtonPrimaryContainerPressed(),
-        rippleAlpha = RippleAlpha(
-            pressedAlpha = 1f,
-            focusedAlpha = 0.24f,
-            draggedAlpha = 0.16f,
-            hoveredAlpha = 0.08f,
-        ),
-    )
+    RippleConfiguration(color = adsColorButtonPrimaryContainerPressed())
 
 @PreviewLightDark
 @Composable
-private fun DaxButtonPrimaryPreview(
+private fun DaxPrimaryButtonPreview(
     @PreviewParameter(DaxButtonStateParameterProvider::class) enabled: Boolean,
 ) {
     PreviewBox {
-        DaxButtonPrimary(
-            text = "Primary",
+        DaxPrimaryButton(
+            text = "Primary Small",
             onClick = { },
             enabled = enabled,
         )
@@ -142,8 +115,9 @@ private fun DaxButtonPrimaryLargePreview(
     @PreviewParameter(DaxButtonStateParameterProvider::class) enabled: Boolean,
 ) {
     PreviewBox {
-        DaxButtonPrimaryLarge(
+        DaxPrimaryButton(
             text = "Primary Large",
+            size = DaxButtonSize.Large,
             onClick = { },
             enabled = enabled,
         )

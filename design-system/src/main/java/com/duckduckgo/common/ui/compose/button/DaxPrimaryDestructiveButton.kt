@@ -33,43 +33,26 @@ import com.duckduckgo.common.ui.compose.theme.White
 import com.duckduckgo.common.ui.compose.tools.PreviewBox
 
 @Composable
-fun DaxButtonDestructivePrimary(
+fun DaxPrimaryDestructiveButton(
     text: String,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
+    size: DaxButtonSize = DaxButtonSize.Small,
     enabled: Boolean = true,
 ) {
     DaxButton(
+        text = text,
         onClick = onClick,
-        colors = destructivePrimaryColors(),
-        rippleConfiguration = primaryButtonRippleConfiguration(),
+        size = size,
+        colors = primaryDestructiveButtonColors(),
+        rippleConfiguration = primaryDestructiveRippleConfiguration(),
         modifier = modifier,
         enabled = enabled,
-    ) {
-        DaxButtonText(text)
-    }
+    )
 }
 
 @Composable
-fun DaxButtonDestructivePrimaryLarge(
-    text: String,
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier,
-    enabled: Boolean = true,
-) {
-    DaxButtonLarge(
-        onClick = onClick,
-        colors = destructivePrimaryColors(),
-        rippleConfiguration = primaryButtonRippleConfiguration(),
-        modifier = modifier,
-        enabled = enabled,
-    ) {
-        DaxButtonText(text)
-    }
-}
-
-@Composable
-private fun destructivePrimaryColors(): DaxButtonColors = DaxButtonColors(
+private fun primaryDestructiveButtonColors(): DaxButtonColors = DaxButtonColors(
     containerColor = adsColorButtonDestructivePrimaryContainer(),
     contentColor = adsColorButtonDestructivePrimaryText(),
     disabledContainerColor = adsColorButtonDestructivePrimaryContainerDisabled(),
@@ -105,17 +88,17 @@ private fun adsColorButtonDestructivePrimaryContainerPressed(): Color =
     }
 
 @Composable
-private fun primaryButtonRippleConfiguration() =
+private fun primaryDestructiveRippleConfiguration() =
     RippleConfiguration(color = adsColorButtonDestructivePrimaryContainerPressed())
 
 @PreviewLightDark
 @Composable
-private fun DaxButtonDestructivePrimaryPreview(
+private fun DaxPrimaryDestructiveButtonSmallPreview(
     @PreviewParameter(DaxButtonStateParameterProvider::class) enabled: Boolean,
 ) {
     PreviewBox {
-        DaxButtonDestructivePrimary(
-            text = "Destructive Primary",
+        DaxPrimaryDestructiveButton(
+            text = "Primary Destructive Small",
             onClick = { },
             enabled = enabled,
         )
@@ -124,12 +107,12 @@ private fun DaxButtonDestructivePrimaryPreview(
 
 @PreviewLightDark
 @Composable
-private fun DaxButtonDestructivePrimaryLargePreview(
+private fun DaxPrimaryDestructiveLargeButtonPreview(
     @PreviewParameter(DaxButtonStateParameterProvider::class) enabled: Boolean,
 ) {
     PreviewBox {
-        DaxButtonDestructivePrimaryLarge(
-            text = "Destructive Primary Large",
+        DaxPrimaryDestructiveButton(
+            text = "Primary Destructive Large",
             onClick = { },
             enabled = enabled,
         )

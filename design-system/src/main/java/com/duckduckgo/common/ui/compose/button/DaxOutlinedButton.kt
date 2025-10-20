@@ -19,25 +19,15 @@
 package com.duckduckgo.common.ui.compose.button
 
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.RowScope
-import androidx.compose.foundation.layout.height
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.RippleConfiguration
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.dimensionResource
-import androidx.compose.ui.tooling.preview.PreviewLightDark
-import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.duckduckgo.common.ui.compose.theme.Black36
-import com.duckduckgo.common.ui.compose.theme.Black60
 import com.duckduckgo.common.ui.compose.theme.DuckDuckGoTheme
-import com.duckduckgo.common.ui.compose.theme.White36
-import com.duckduckgo.common.ui.compose.theme.White84
 import com.duckduckgo.common.ui.compose.tools.PreviewBox
-import com.duckduckgo.mobile.android.R
 
 /**
  * DuckDuckGo base version of an outlined button.
@@ -45,66 +35,37 @@ import com.duckduckgo.mobile.android.R
  * This is *not* part of the design system and should *only* be used when creating a
  * *new* design system compliant button.
  *
- * See [DaxButtonSecondary] and [DaxButtonGhost] for example usage.
+ * See [DaxSecondaryButton] and [DaxButtonGhost] for example usage.
  */
 @Composable
 internal fun DaxOutlinedButton(
+    text: String,
     onClick: () -> Unit,
     colors: DaxButtonColors,
+    border: BorderStroke,
     rippleConfiguration: RippleConfiguration,
     modifier: Modifier = Modifier,
-    border: BorderStroke? = null,
+    size: DaxButtonSize = DaxButtonSize.Small,
     enabled: Boolean = true,
-    height: Dp = dimensionResource(R.dimen.buttonSmallHeight),
-    contentPadding: PaddingValues = PaddingValues(
-        horizontal = dimensionResource(R.dimen.buttonSmallSidePadding),
-        vertical = dimensionResource(R.dimen.buttonSmallTopPadding),
-    ),
-    content: @Composable RowScope.() -> Unit,
 ) {
     DaxButton(
+        text = text,
         onClick = onClick,
-        modifier = modifier.height(height),
-        colors = DaxButtonColors(
-            containerColor = colors.containerColor,
-            contentColor = colors.contentColor,
-            disabledContainerColor = colors.disabledContainerColor,
-            disabledContentColor = colors.disabledContentColor,
-        ),
-        rippleConfiguration = rippleConfiguration,
-        border = border,
-        enabled = enabled,
-        contentPadding = contentPadding,
-        content = content,
-    )
-}
-
-@Composable
-internal fun DaxOutlinedButtonLarge(
-    onClick: () -> Unit,
-    colors: DaxButtonColors,
-    rippleConfiguration: RippleConfiguration,
-    modifier: Modifier = Modifier,
-    border: BorderStroke? = null,
-    enabled: Boolean = true,
-    content: @Composable RowScope.() -> Unit,
-) {
-    DaxButtonLarge(
-        onClick = onClick,
+        size = size,
         colors = colors,
+        modifier = modifier,
         rippleConfiguration = rippleConfiguration,
         border = border,
-        modifier = modifier,
         enabled = enabled,
-        content = content,
     )
 }
 
-@PreviewLightDark
+@Preview
 @Composable
-private fun DaxOutlinedButtonPreview() {
+private fun DaxOutlinedButtonSmallPreview() {
     PreviewBox {
         DaxOutlinedButton(
+            text = "DaxOutlinedButtonSmall",
             onClick = {},
             colors = previewButtonColors(),
             rippleConfiguration = RippleConfiguration(),
@@ -112,17 +73,17 @@ private fun DaxOutlinedButtonPreview() {
                 width = 1.dp,
                 color = DuckDuckGoTheme.colors.accentBlue,
             ),
-        ) {
-            DaxButtonText(text = "DaxOutlinedButton")
-        }
+        )
     }
 }
 
-@PreviewLightDark
+@Preview
 @Composable
 private fun DaxOutlinedButtonLargePreview() {
     PreviewBox {
-        DaxOutlinedButtonLarge(
+        DaxOutlinedButton(
+            text = "DaxOutlinedButtonLarge",
+            size = DaxButtonSize.Large,
             onClick = {},
             colors = previewButtonColors(),
             rippleConfiguration = RippleConfiguration(),
@@ -130,24 +91,14 @@ private fun DaxOutlinedButtonLargePreview() {
                 width = 1.dp,
                 color = DuckDuckGoTheme.colors.accentBlue,
             ),
-        ) {
-            DaxButtonText(text = "DaxOutlinedButtonLarge")
-        }
+        )
     }
 }
 
 @Composable
 private fun previewButtonColors(): DaxButtonColors = DaxButtonColors(
     containerColor = Color.Transparent,
-    contentColor = if (DuckDuckGoTheme.colors.isDark) {
-        White84
-    } else {
-        Black60
-    },
-    disabledContainerColor = Color.Transparent,
-    disabledContentColor = if (DuckDuckGoTheme.colors.isDark) {
-        White36
-    } else {
-        Black36
-    },
+    contentColor = Color.Black,
+    disabledContainerColor = Color.LightGray,
+    disabledContentColor = Color.DarkGray,
 )

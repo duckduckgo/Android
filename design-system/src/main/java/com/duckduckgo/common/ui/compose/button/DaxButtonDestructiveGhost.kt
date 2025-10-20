@@ -37,39 +37,22 @@ import com.duckduckgo.common.ui.compose.tools.PreviewBox
  * Figma reference: https://www.figma.com/design/BOHDESHODUXK7wSRNBOHdu/%F0%9F%A4%96-Android-Components?node-id=12110-29654&t=QDZRkhFFjlwerPPK-4
  */
 @Composable
-fun DaxButtonDestructiveGhost(
+fun DaxDestructiveGhostButton(
     text: String,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
+    size: DaxButtonSize = DaxButtonSize.Small,
     enabled: Boolean = true,
 ) {
     DaxButton(
+        text = text,
         onClick = onClick,
+        size = size,
         colors = destructiveGhostColors(),
         rippleConfiguration = destructiveGhostButtonRippleConfiguration(),
         modifier = modifier,
         enabled = enabled,
-    ) {
-        DaxButtonText(text)
-    }
-}
-
-@Composable
-fun DaxButtonDestructiveGhostLarge(
-    text: String,
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier,
-    enabled: Boolean = true,
-) {
-    DaxButtonLarge(
-        onClick = onClick,
-        colors = destructiveGhostColors(),
-        rippleConfiguration = destructiveGhostButtonRippleConfiguration(),
-        modifier = modifier,
-        enabled = enabled,
-    ) {
-        DaxButtonText(text)
-    }
+    )
 }
 
 @Composable
@@ -112,12 +95,12 @@ private fun destructiveGhostButtonRippleConfiguration() =
 
 @PreviewLightDark
 @Composable
-private fun DaxButtonDestructiveGhostPreview(
+private fun DaxDestructiveGhostButtonSmallPreview(
     @PreviewParameter(DaxButtonStateParameterProvider::class) enabled: Boolean,
 ) {
     PreviewBox {
-        DaxButtonDestructiveGhost(
-            text = "Destructive Ghost",
+        DaxDestructiveGhostButton(
+            text = "Destructive Ghost Small",
             onClick = { },
             enabled = enabled,
         )
@@ -126,12 +109,13 @@ private fun DaxButtonDestructiveGhostPreview(
 
 @PreviewLightDark
 @Composable
-private fun DaxButtonDestructiveGhostLargePreview(
+private fun DaxDestructiveGhostButtonLargePreview(
     @PreviewParameter(DaxButtonStateParameterProvider::class) enabled: Boolean,
 ) {
     PreviewBox {
-        DaxButtonDestructiveGhostLarge(
+        DaxDestructiveGhostButton(
             text = "Destructive Ghost Large",
+            size = DaxButtonSize.Large,
             onClick = { },
             enabled = enabled,
         )

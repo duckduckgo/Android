@@ -43,41 +43,23 @@ import com.duckduckgo.common.ui.compose.tools.PreviewBox
  * Figma reference: https://www.figma.com/design/BOHDESHODUXK7wSRNBOHdu/%F0%9F%A4%96-Android-Components?node-id=12110-29650
  */
 @Composable
-fun DaxButtonSecondary(
+fun DaxSecondaryButton(
     text: String,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
+    size: DaxButtonSize = DaxButtonSize.Small,
     enabled: Boolean = true,
 ) {
     DaxOutlinedButton(
+        text = text,
         onClick = onClick,
+        size = size,
         colors = secondaryColors(),
         rippleConfiguration = secondaryButtonRippleConfiguration(),
         border = border(enabled = enabled),
         modifier = modifier,
         enabled = enabled,
-    ) {
-        DaxButtonText(text)
-    }
-}
-
-@Composable
-fun DaxButtonSecondaryLarge(
-    text: String,
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier,
-    enabled: Boolean = true,
-) {
-    DaxOutlinedButtonLarge(
-        onClick = onClick,
-        colors = secondaryColors(),
-        rippleConfiguration = secondaryButtonRippleConfiguration(),
-        border = border(enabled = enabled),
-        modifier = modifier,
-        enabled = enabled,
-    ) {
-        DaxButtonText(text)
-    }
+    )
 }
 
 @Composable
@@ -148,12 +130,12 @@ private fun secondaryButtonRippleConfiguration() =
 
 @PreviewLightDark
 @Composable
-private fun DaxButtonSecondaryPreview(
+private fun DaxSecondaryButtonPreview(
     @PreviewParameter(DaxButtonStateParameterProvider::class) enabled: Boolean,
 ) {
     PreviewBox {
-        DaxButtonSecondary(
-            text = "Secondary",
+        DaxSecondaryButton(
+            text = "Secondary Small",
             onClick = { },
             enabled = enabled,
         )
@@ -166,8 +148,9 @@ private fun DaxButtonSecondaryLargePreview(
     @PreviewParameter(DaxButtonStateParameterProvider::class) enabled: Boolean,
 ) {
     PreviewBox {
-        DaxButtonSecondaryLarge(
+        DaxSecondaryButton(
             text = "Secondary Large",
+            size = DaxButtonSize.Large,
             onClick = { },
             enabled = enabled,
         )

@@ -23,17 +23,20 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import com.duckduckgo.common.ui.compose.theme.DuckDuckGoTheme
 
 @Composable
 internal fun PreviewBox(
-    backgroundColor: Color = Color.White,
+    backgroundColor: @Composable () -> Color = { DuckDuckGoTheme.colors.background },
     content: @Composable () -> Unit,
 ) {
-    Box(
-        modifier = Modifier
-            .background(backgroundColor)
-            .padding(16.dp),
-    ) {
-        content()
+    DuckDuckGoTheme {
+        Box(
+            modifier = Modifier
+                .background(backgroundColor())
+                .padding(16.dp),
+        ) {
+            content()
+        }
     }
 }
