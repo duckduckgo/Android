@@ -52,3 +52,25 @@ fun PreviewBox(
         )
     }
 }
+
+@Composable
+internal fun PreviewBox(
+    content: @Composable () -> Unit,
+) {
+    DuckDuckGoTheme {
+        PreviewBox(backgroundColor = DuckDuckGoTheme.colors.background) {
+            content()
+        }
+    }
+}
+
+@Composable
+internal fun InvertedPreviewBox(
+    content: @Composable () -> Unit,
+) {
+    DuckDuckGoTheme {
+        PreviewBox(backgroundColor = DuckDuckGoTheme.colors.backgroundInverted) {
+            content()
+        }
+    }
+}
