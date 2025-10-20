@@ -61,6 +61,7 @@ data class BrowserViewState(
     val showDuckChatOption: Boolean = false,
     val lastQueryOrigin: QueryOrigin = QueryOrigin.FromUser,
     val vpnMenuState: VpnMenuState = VpnMenuState.Hidden,
+    val isPdfDisplayed: Boolean = false,
 )
 
 sealed class VpnMenuState {

@@ -484,6 +484,8 @@ dependencies {
     testImplementation AndroidX.room.testing
     androidTestImplementation AndroidX.room.testing
 
+    implementation "io.github.afreakyelf:Pdf-Viewer:_"
+
     // WorkManager
     implementation AndroidX.work.runtimeKtx
     implementation "androidx.work:work-multiprocess:_"
@@ -606,6 +608,6 @@ tasks.register('assemblePlayReleaseDefaultVariant', Exec) {
     commandLine "$rootDir/gradlew", ':app:assemblePlayRelease', "-Pforce-default-variant"
 }
 
-task newModule(type: com.duckduckgo.gradle.ModuleCreator) {
+tasks.register('newModule', com.duckduckgo.gradle.ModuleCreator) {
     feature = project.hasProperty('feature') ? project.getProperty('feature') : null
 }

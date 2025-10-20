@@ -118,6 +118,7 @@ import com.duckduckgo.app.browser.commands.Command.OpenBrokenSiteLearnMore
 import com.duckduckgo.app.browser.commands.Command.OpenInNewBackgroundTab
 import com.duckduckgo.app.browser.commands.Command.OpenInNewTab
 import com.duckduckgo.app.browser.commands.Command.OpenMessageInNewTab
+import com.duckduckgo.app.browser.commands.Command.PopPdfViewer
 import com.duckduckgo.app.browser.commands.Command.PrintLink
 import com.duckduckgo.app.browser.commands.Command.RefreshAndShowPrivacyProtectionDisabledConfirmation
 import com.duckduckgo.app.browser.commands.Command.RefreshAndShowPrivacyProtectionEnabledConfirmation
@@ -194,6 +195,7 @@ import com.duckduckgo.app.browser.newtab.FavoritesQuickAccessAdapter
 import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
 import com.duckduckgo.app.browser.omnibar.QueryOrigin
 import com.duckduckgo.app.browser.omnibar.QueryOrigin.FromAutocomplete
+import com.duckduckgo.app.browser.pdf.PdfFragment
 import com.duckduckgo.app.browser.refreshpixels.RefreshPixelSender
 import com.duckduckgo.app.browser.santize.NonHttpAppLinkChecker
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
@@ -1090,7 +1092,7 @@ class BrowserTabViewModel @Inject constructor(
 
         when (cta) {
             is DaxBubbleCta.DaxIntroSearchOptionsCta,
-            -> {
+                -> {
                 if (!ctaViewModel.isSuggestedSearchOption(query)) {
                     pixel.fire(ONBOARDING_SEARCH_CUSTOM, type = Unique())
                     viewModelScope.launch {
@@ -1101,7 +1103,7 @@ class BrowserTabViewModel @Inject constructor(
 
             is DaxBubbleCta.DaxIntroVisitSiteOptionsCta,
             is OnboardingDaxDialogCta.DaxSiteSuggestionsCta,
-            -> {
+                -> {
                 if (!ctaViewModel.isSuggestedSiteOption(query)) {
                     pixel.fire(ONBOARDING_VISIT_SITE_CUSTOM, type = Unique())
                 }
@@ -1343,6 +1345,10 @@ class BrowserTabViewModel @Inject constructor(
         }
     }
 
+    fun onPdfCached(pdfFilePath: String) {
+        command.value = Command.GeneratePdfPreviewImage(pdfFilePath)
+    }
+
     private suspend fun removeAndSelectTabFromRepository() {
         removeCurrentTabFromRepository()
     }
@@ -1429,6 +1435,12 @@ class BrowserTabViewModel @Inject constructor(
 
         if (currentBrowserViewState().maliciousSiteBlocked) {
             command.postValue(HideWarningMaliciousSite(navigation.canGoBack))
+            return true
+        }
+
+        if (currentBrowserViewState().isPdfDisplayed) {
+            browserViewState.value = currentBrowserViewState().copy(isPdfDisplayed = false)
+            command.postValue(PopPdfViewer)
             return true
         }
 
@@ -2131,9 +2143,9 @@ class BrowserTabViewModel @Inject constructor(
                     currentLoadingViewState().copy(
                         isLoading = true,
                         trackersAnimationEnabled = true,
-                    /*We set the progress to 20 so the omnibar starts animating and the user knows we are loading the page.
-                     * We don't show the browser until the page actually starts loading, to prevent previous sites from briefly
-                     * showing in case the URL was blocked locally and therefore never started to show*/
+                        /*We set the progress to 20 so the omnibar starts animating and the user knows we are loading the page.
+                         * We don't show the browser until the page actually starts loading, to prevent previous sites from briefly
+                         * showing in case the URL was blocked locally and therefore never started to show*/
                         progress = 20,
                         url = documentUrlString,
                     )
@@ -3256,14 +3268,19 @@ class BrowserTabViewModel @Inject constructor(
         requestUserConfirmation: Boolean,
         isBlobDownloadWebViewFeatureEnabled: Boolean,
     ) {
-        if (url.startsWith("blob:")) {
-            if (isBlobDownloadWebViewFeatureEnabled) {
-                postMessageToConvertBlobToDataUri(webView, url)
-            } else {
-                command.value = ConvertBlobToDataUri(url, mimeType)
-            }
+        if (mimeType == PdfFragment.MIME_TYPE_PDF) {
+            command.value = Command.ShowPdfViewer(url)
+            browserViewState.value = browserViewState.value?.copy(isPdfDisplayed = true)
         } else {
-            sendRequestFileDownloadCommand(url, contentDisposition, mimeType, requestUserConfirmation)
+            if (url.startsWith("blob:")) {
+                if (isBlobDownloadWebViewFeatureEnabled) {
+                    postMessageToConvertBlobToDataUri(webView, url)
+                } else {
+                    command.value = ConvertBlobToDataUri(url, mimeType)
+                }
+            } else {
+                sendRequestFileDownloadCommand(url, contentDisposition, mimeType, requestUserConfirmation)
+            }
         }
     }
 
@@ -3277,7 +3294,10 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     @SuppressLint("RequiresFeature", "PostMessageUsage") // it's already checked in isBlobDownloadWebViewFeatureEnabled
-    private fun postMessageToConvertBlobToDataUri(webView: WebView, url: String) {
+    private fun postMessageToConvertBlobToDataUri(
+        webView: WebView,
+        url: String
+    ) {
         viewModelScope.launch(dispatchers.main()) {
             // main because postMessage is not always safe in another thread
             for ((key, proxies) in fixedReplyProxyMap) {
@@ -4154,7 +4174,7 @@ class BrowserTabViewModel @Inject constructor(
             is OnboardingDaxDialogCta.DaxTrackersBlockedCta,
             is OnboardingDaxDialogCta.DaxNoTrackersCta,
             is OnboardingDaxDialogCta.DaxMainNetworkCta,
-            -> {
+                -> {
                 viewModelScope.launch {
                     val cta =
                         withContext(dispatchers.io()) {

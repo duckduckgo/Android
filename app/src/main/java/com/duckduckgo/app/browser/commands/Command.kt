@@ -260,6 +260,10 @@ sealed class Command {
 
     data object GenerateWebViewPreviewImage : Command()
 
+    data class GeneratePdfPreviewImage(
+        val pdfFilePath: String,
+    ) : Command()
+
     data object LaunchTabSwitcher : Command()
 
     data object HideWebContent : Command()
@@ -299,6 +303,10 @@ sealed class Command {
     ) : Command()
 
     data object ChildTabClosed : Command()
+
+    class ShowPdfViewer(
+        val url: String,
+    ) : Command()
 
     class CopyAliasToClipboard(
         val alias: String,
@@ -419,7 +427,7 @@ sealed class Command {
     ) : Command()
 
     data object HideSSLError : Command()
-
+    data object PopPdfViewer : Command()
     class LaunchScreen(
         val screen: String,
         val payload: String,

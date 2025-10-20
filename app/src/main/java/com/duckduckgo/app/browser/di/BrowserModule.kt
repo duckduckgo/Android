@@ -48,8 +48,10 @@ import com.duckduckgo.app.browser.pageloadpixel.PageLoadedPixelDao
 import com.duckduckgo.app.browser.pageloadpixel.firstpaint.PagePaintedPixelDao
 import com.duckduckgo.app.browser.session.WebViewSessionInMemoryStorage
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
+import com.duckduckgo.app.browser.tabpreview.FileBasedPdfPreviewGenerator
 import com.duckduckgo.app.browser.tabpreview.FileBasedWebViewPreviewGenerator
 import com.duckduckgo.app.browser.tabpreview.FileBasedWebViewPreviewPersister
+import com.duckduckgo.app.browser.tabpreview.PdfPreviewGenerator
 import com.duckduckgo.app.browser.tabpreview.WebViewPreviewGenerator
 import com.duckduckgo.app.browser.tabpreview.WebViewPreviewPersister
 import com.duckduckgo.app.browser.urlextraction.DOMUrlExtractor
@@ -274,6 +276,14 @@ class BrowserModule {
     @Provides
     fun webViewPreviewGenerator(dispatchers: DispatcherProvider): WebViewPreviewGenerator {
         return FileBasedWebViewPreviewGenerator(dispatchers = dispatchers)
+    }
+
+    @Provides
+    fun pdfPreviewGenerator(
+        context: Context,
+        dispatchers: DispatcherProvider,
+    ): PdfPreviewGenerator {
+        return FileBasedPdfPreviewGenerator(context = context, dispatchers = dispatchers)
     }
 
     @Provides

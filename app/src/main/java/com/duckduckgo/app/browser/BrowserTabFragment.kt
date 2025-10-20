@@ -17,6 +17,7 @@
 package com.duckduckgo.app.browser
 
 import android.Manifest
+import android.R.attr.fragment
 import android.animation.LayoutTransition
 import android.annotation.SuppressLint
 import android.app.Activity.RESULT_CANCELED
@@ -83,6 +84,7 @@ import androidx.core.view.isVisible
 import androidx.core.view.postDelayed
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.commit
 import androidx.fragment.app.commitNow
 import androidx.fragment.app.setFragmentResultListener
 import androidx.fragment.app.transaction
@@ -147,11 +149,14 @@ import com.duckduckgo.app.browser.omnibar.Omnibar.OmnibarTextState
 import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode
 import com.duckduckgo.app.browser.omnibar.OmnibarItemPressedListener
 import com.duckduckgo.app.browser.omnibar.QueryOrigin
+import com.duckduckgo.app.browser.pdf.PdfFragment
+import com.duckduckgo.app.browser.pdf.PdfFragment.Companion.TAG_PDF_FRAGMENT
 import com.duckduckgo.app.browser.print.PrintDocumentAdapterFactory
 import com.duckduckgo.app.browser.print.PrintInjector
 import com.duckduckgo.app.browser.remotemessage.SharePromoLinkRMFBroadCastReceiver
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
 import com.duckduckgo.app.browser.shortcut.ShortcutBuilder
+import com.duckduckgo.app.browser.tabpreview.PdfPreviewGenerator
 import com.duckduckgo.app.browser.tabpreview.WebViewPreviewGenerator
 import com.duckduckgo.app.browser.tabpreview.WebViewPreviewPersister
 import com.duckduckgo.app.browser.ui.dialogs.AutomaticFireproofDialogOptions
@@ -416,6 +421,9 @@ class BrowserTabFragment :
 
     @Inject
     lateinit var previewGenerator: WebViewPreviewGenerator
+
+    @Inject
+    lateinit var pdfPreviewGenerator: PdfPreviewGenerator
 
     @Inject
     lateinit var previewPersister: WebViewPreviewPersister
@@ -1064,6 +1072,14 @@ class BrowserTabFragment :
     private fun updateOrDeleteWebViewPreview() {
         val url = viewModel.url
         logcat { "Updating or deleting WebView preview for $url" }
+
+        // Skip preview generation if PDF is currently showing (it already has its own preview)
+        val isPdfShowing = childFragmentManager.findFragmentByTag(TAG_PDF_FRAGMENT) != null
+        if (isPdfShowing) {
+            logcat { "Skipping WebView preview generation - PDF is showing" }
+            return
+        }
+
         if (url == null) {
             viewModel.deleteTabPreview(tabId)
         } else {
@@ -2151,6 +2167,7 @@ class BrowserTabFragment :
             is Command.RequiresAuthentication -> showAuthenticationDialog(it.request)
             is Command.SaveCredentials -> saveBasicAuthCredentials(it.request, it.credentials)
             is Command.GenerateWebViewPreviewImage -> generateWebViewPreviewImage()
+            is Command.GeneratePdfPreviewImage -> generatePdfPreviewImage(it.pdfFilePath)
             is Command.LaunchTabSwitcher -> launchTabSwitcher()
             is Command.ShowErrorWithAction -> showErrorSnackbar(it)
             is Command.HideWebContent -> webView?.hide()
@@ -2298,6 +2315,9 @@ class BrowserTabFragment :
 
             is Command.SubmitChat -> duckChat.openDuckChatWithAutoPrompt(it.query)
             is Command.EnqueueCookiesAnimation -> enqueueCookiesAnimation(it.isCosmetic)
+
+            is Command.ShowPdfViewer -> launchPdfFragment(it.url)
+            is Command.PopPdfViewer -> removePdfFragment()
         }
     }
 
@@ -2584,6 +2604,25 @@ class BrowserTabFragment :
                     }
                 }
         }
+    }
+
+    private fun generatePdfPreviewImage(pdfFilePath: String) {
+        // if there's an existing job for generating a preview, cancel that in favor of the new request
+        bitmapGeneratorJob?.cancel()
+
+        bitmapGeneratorJob =
+            launch {
+                logcat { "Generating PDF preview from: $pdfFilePath" }
+                try {
+                    val pdfFile = File(pdfFilePath)
+                    val preview = pdfPreviewGenerator.generatePreview(pdfFile)
+                    val fileName = previewPersister.save(preview, tabId)
+                    viewModel.updateTabPreview(tabId, fileName)
+                    logcat { "Saved and updated PDF tab preview" }
+                } catch (e: Exception) {
+                    logcat { "Failed to generate PDF preview: ${e.asLog()}" }
+                }
+            }
     }
 
     private fun openInNewBackgroundTab() {
@@ -4095,6 +4134,22 @@ class BrowserTabFragment :
 
         val downloadConfirmationFragment = downloadConfirmation.instance(pendingDownload)
         showDialogHidingPrevious(downloadConfirmationFragment, DOWNLOAD_CONFIRMATION_TAG)
+    }
+
+    private fun launchPdfFragment(pdfUrl: String) {
+        childFragmentManager.commit {
+            val fragment = PdfFragment.newInstance(pdfUrl)
+            fragment.onPdfLoadSuccess = { pdfFilePath ->
+                viewModel.onPdfCached(pdfFilePath)
+            }
+            add(R.id.browserLayout, fragment, TAG_PDF_FRAGMENT)
+        }
+    }
+
+    private fun removePdfFragment() {
+        childFragmentManager.findFragmentByTag(TAG_PDF_FRAGMENT)?.let { pdfFragment ->
+            childFragmentManager.commit { remove(pdfFragment) }
+        }
     }
 
     private fun launchFilePicker(
