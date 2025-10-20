@@ -50,7 +50,7 @@ class RMFDaysSinceDuckAiUsedMatchingAttribute @Inject constructor(
                     if (lastDuckAiSessionTimestamp == 0L) {
                         return false
                     }
-                    
+
                     val now = System.currentTimeMillis()
                     val daysSinceUsed = TimeUnit.MILLISECONDS.toDays(now - lastDuckAiSessionTimestamp).toInt()
                     if (!matchingAttribute.value.isDefaultValue()) {
