@@ -41,8 +41,9 @@ import com.duckduckgo.app.browser.omnibar.UnifiedOmnibarLayoutViewModel.LeadingI
 import com.duckduckgo.app.browser.omnibar.UnifiedOmnibarLayoutViewModel.LeadingIconState.DuckPlayer
 import com.duckduckgo.app.browser.omnibar.UnifiedOmnibarLayoutViewModel.LeadingIconState.EasterEggLogo
 import com.duckduckgo.app.browser.omnibar.UnifiedOmnibarLayoutViewModel.LeadingIconState.Globe
-import com.duckduckgo.app.browser.omnibar.UnifiedOmnibarLayoutViewModel.LeadingIconState.PrivacyShield
 import com.duckduckgo.app.browser.omnibar.UnifiedOmnibarLayoutViewModel.LeadingIconState.Search
+import com.duckduckgo.app.browser.omnibar.model.OmnibarType
+import com.duckduckgo.app.browser.omnibar.model.OmnibarTypeResolver
 import com.duckduckgo.app.browser.viewstate.HighlightableButton
 import com.duckduckgo.app.browser.viewstate.LoadingViewState
 import com.duckduckgo.app.browser.viewstate.OmnibarViewState
@@ -55,6 +56,7 @@ import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Unique
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.trackerdetection.model.Entity
 import com.duckduckgo.browser.api.UserBrowserProperties
+import com.duckduckgo.browser.ui.omnibar.OmnibarPosition
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
@@ -101,11 +103,14 @@ class UnifiedOmnibarLayoutViewModel @Inject constructor(
     private val addressDisplayFormatter: AddressDisplayFormatter,
     private val settingsDataStore: SettingsDataStore,
     private val serpEasterEggLogosToggles: SerpEasterEggLogosToggles,
+    private val omnibarTypeResolver: OmnibarTypeResolver,
 ) : ViewModel() {
 
     private val _viewState = MutableStateFlow(
         ViewState(
             showChatMenu = duckAiFeatureState.showOmnibarShortcutInAllStates.value,
+            showButtons = omnibarTypeResolver.getOmnibarType() == OmnibarType.SINGLE,
+            position = settingsDataStore.omnibarPosition,
         ),
     )
 
@@ -175,6 +180,8 @@ class UnifiedOmnibarLayoutViewModel @Inject constructor(
         val showShadows: Boolean = false,
         val showTextInputClickCatcher: Boolean = false,
         val showFindInPage: Boolean = false,
+        val showButtons: Boolean = true,
+        val position: OmnibarPosition = OmnibarPosition.TOP,
     ) {
         fun shouldUpdateOmnibarText(isFullUrlEnabled: Boolean): Boolean {
             return this.viewMode is Browser || this.viewMode is MaliciousSiteWarning || (!isFullUrlEnabled && omnibarText.isNotEmpty())
@@ -381,7 +388,7 @@ class UnifiedOmnibarLayoutViewModel @Inject constructor(
                     if (url.isEmpty()) {
                         Search
                     } else {
-                        PrivacyShield
+                        LeadingIconState.PrivacyShield
                     }
                 }
             }
@@ -794,7 +801,7 @@ class UnifiedOmnibarLayoutViewModel @Inject constructor(
                     if (!hasFocus) {
                         _viewState.update {
                             it.copy(
-                                leadingIconState = PrivacyShield,
+                                leadingIconState = LeadingIconState.PrivacyShield,
                             )
                         }
                         viewModelScope.launch {
