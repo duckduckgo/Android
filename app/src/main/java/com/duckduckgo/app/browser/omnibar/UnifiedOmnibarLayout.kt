@@ -20,7 +20,6 @@ import android.animation.ValueAnimator
 import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Color
-import android.graphics.drawable.ColorDrawable
 import android.os.Build
 import android.text.Editable
 import android.transition.ChangeBounds
@@ -40,6 +39,7 @@ import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.appcompat.widget.Toolbar
 import androidx.coordinatorlayout.widget.CoordinatorLayout
+import androidx.core.graphics.drawable.toDrawable
 import androidx.core.transition.doOnEnd
 import androidx.core.view.doOnLayout
 import androidx.core.view.isGone
@@ -157,7 +157,7 @@ open class UnifiedOmnibarLayout @JvmOverloads constructor(
         ) : Decoration()
 
         data class PrivacyShieldChanged(
-            val privacyShield: com.duckduckgo.app.global.model.PrivacyShield,
+            val privacyShield: PrivacyShieldState,
         ) : Decoration()
 
         data class HighlightOmnibarItem(
@@ -282,72 +282,12 @@ open class UnifiedOmnibarLayout @JvmOverloads constructor(
     private var focusAnimator: ValueAnimator? = null
 
     init {
-        val attr = context.theme.obtainStyledAttributes(attrs, R.styleable.OmnibarLayout, defStyle, 0)
-        val omnibarPosition = OmnibarPosition.entries[attr.getInt(R.styleable.OmnibarLayout_omnibarPosition, 0)]
-        attr.recycle()
-
         inflate(context, R.layout.view_single_omnibar, this)
 
         AndroidSupportInjection.inject(this)
 
         if (Build.VERSION.SDK_INT >= 28) {
             omnibarCardShadow.addBottomShadow()
-        }
-
-        when (omnibarPosition) {
-            OmnibarPosition.TOP -> {
-                if (Build.VERSION.SDK_INT < 28) {
-                    omnibarCardShadow.cardElevation = 2f.toPx(context)
-                }
-
-                shieldIconPulseAnimationContainer.updateLayoutParams {
-                    (this as MarginLayoutParams).apply {
-                        if (addressBarTrackersAnimationFeatureToggle.feature().isEnabled()) {
-                            // TODO when the animation is made permanent we should add this adjustment to the actual layout
-                            marginStart = 1.toPx()
-                        }
-                    }
-                }
-            }
-            OmnibarPosition.BOTTOM -> {
-                // When omnibar is at the bottom, we're adding an additional space at the top
-                omnibarCardShadow.updateLayoutParams {
-                    (this as MarginLayoutParams).apply {
-                        topMargin = experimentalOmnibarCardMarginBottom
-                        bottomMargin = experimentalOmnibarCardMarginTop
-                    }
-                }
-
-                iconsContainer.updateLayoutParams {
-                    (this as MarginLayoutParams).apply {
-                        topMargin = experimentalOmnibarCardMarginBottom
-                        bottomMargin = experimentalOmnibarCardMarginTop
-                    }
-                }
-
-                shieldIconPulseAnimationContainer.updateLayoutParams {
-                    (this as MarginLayoutParams).apply {
-                        topMargin = experimentalOmnibarCardMarginBottom
-                        bottomMargin = experimentalOmnibarCardMarginTop
-                        if (addressBarTrackersAnimationFeatureToggle.feature().isEnabled()) {
-                            // TODO when the animation is made permanent we should add this adjustment to the actual layout
-                            marginStart = 1.toPx()
-                        }
-                    }
-                }
-
-                shieldIconPulseAnimationContainer.setPadding(
-                    shieldIconPulseAnimationContainer.paddingLeft,
-                    shieldIconPulseAnimationContainer.paddingTop,
-                    shieldIconPulseAnimationContainer.paddingRight,
-                    6.toPx(),
-                )
-
-                // Try to reduce the bottom omnibar material shadow when not using the custom shadow
-                if (Build.VERSION.SDK_INT < 28) {
-                    omnibarCardShadow.cardElevation = 0.5f.toPx(context)
-                }
-            }
         }
     }
 
@@ -451,8 +391,6 @@ open class UnifiedOmnibarLayout @JvmOverloads constructor(
             isAttachedToWindow && it.hasFocus
         }
     }
-
-    open var omnibarPosition: OmnibarPosition = OmnibarPosition.TOP
 
     private val smoothProgressAnimator by lazy { SmoothProgressAnimator(pageLoadingIndicator) }
 
@@ -678,16 +616,76 @@ open class UnifiedOmnibarLayout @JvmOverloads constructor(
             animateOmnibarFocusedState(focused = false)
         }
 
-        omnibarCardShadow.isGone = viewState.viewMode is ViewMode.CustomTab && !isFindInPageVisible
+        omnibarCardShadow.isGone = viewState.viewMode is CustomTab && !isFindInPageVisible
 
         renderButtons(viewState)
 
         omniBarButtonTransitionSet.doOnEnd {
             omnibarTextInput.requestLayout()
         }
+
+        renderPosition(viewState.position)
     }
 
-    open fun processCommand(command: UnifiedOmnibarLayoutViewModel.Command) {
+    private fun renderPosition(position: OmnibarPosition) {
+        when (position) {
+            OmnibarPosition.TOP -> {
+                if (Build.VERSION.SDK_INT < 28) {
+                    omnibarCardShadow.cardElevation = 2f.toPx(context)
+                }
+
+                shieldIconPulseAnimationContainer.updateLayoutParams {
+                    (this as MarginLayoutParams).apply {
+                        if (addressBarTrackersAnimationFeatureToggle.feature().isEnabled()) {
+                            // TODO when the animation is made permanent we should add this adjustment to the actual layout
+                            marginStart = 1.toPx()
+                        }
+                    }
+                }
+            }
+            OmnibarPosition.BOTTOM -> {
+                // When omnibar is at the bottom, we're adding an additional space at the top
+                omnibarCardShadow.updateLayoutParams {
+                    (this as MarginLayoutParams).apply {
+                        topMargin = experimentalOmnibarCardMarginBottom
+                        bottomMargin = experimentalOmnibarCardMarginTop
+                    }
+                }
+
+                iconsContainer.updateLayoutParams {
+                    (this as MarginLayoutParams).apply {
+                        topMargin = experimentalOmnibarCardMarginBottom
+                        bottomMargin = experimentalOmnibarCardMarginTop
+                    }
+                }
+
+                shieldIconPulseAnimationContainer.updateLayoutParams {
+                    (this as MarginLayoutParams).apply {
+                        topMargin = experimentalOmnibarCardMarginBottom
+                        bottomMargin = experimentalOmnibarCardMarginTop
+                        if (addressBarTrackersAnimationFeatureToggle.feature().isEnabled()) {
+                            // TODO when the animation is made permanent we should add this adjustment to the actual layout
+                            marginStart = 1.toPx()
+                        }
+                    }
+                }
+
+                shieldIconPulseAnimationContainer.setPadding(
+                    shieldIconPulseAnimationContainer.paddingLeft,
+                    shieldIconPulseAnimationContainer.paddingTop,
+                    shieldIconPulseAnimationContainer.paddingRight,
+                    6.toPx(),
+                )
+
+                // Try to reduce the bottom omnibar material shadow when not using the custom shadow
+                if (Build.VERSION.SDK_INT < 28) {
+                    omnibarCardShadow.cardElevation = 0.5f.toPx(context)
+                }
+            }
+        }
+    }
+
+    fun processCommand(command: Command) {
         when (command) {
             Command.CancelAnimations -> {
                 cancelAddressBarAnimations()
@@ -802,7 +800,11 @@ open class UnifiedOmnibarLayout @JvmOverloads constructor(
         }
     }
 
-    open fun renderButtons(viewState: ViewState) {
+    fun renderButtons(viewState: ViewState) {
+        if (viewState.showButtons) {
+            TODO()
+        }
+
         val newTransitionState =
             TransitionState(
                 showClearButton = viewState.showClearButton,
@@ -1041,7 +1043,7 @@ open class UnifiedOmnibarLayout @JvmOverloads constructor(
         omniBarContainer.isPressed = enabled
     }
 
-    private fun configureCustomTabOmnibar(customTab: ViewMode.CustomTab) {
+    private fun configureCustomTabOmnibar(customTab: CustomTab) {
         if (!customTabToolbarContainer.customTabToolbar.isVisible) {
             customTabToolbarContainer.customTabCloseIcon.setOnClickListener {
                 omnibarItemPressedListener?.onCustomTabClosePressed()
@@ -1053,8 +1055,8 @@ open class UnifiedOmnibarLayout @JvmOverloads constructor(
 
             omniBarContainer.hide()
 
-            toolbar.background = ColorDrawable(customTab.toolbarColor)
-            toolbarContainer.background = ColorDrawable(customTab.toolbarColor)
+            toolbar.background = customTab.toolbarColor.toDrawable()
+            toolbarContainer.background = customTab.toolbarColor.toDrawable()
 
             customTabToolbarContainer.customTabToolbar.show()
 
@@ -1126,13 +1128,13 @@ open class UnifiedOmnibarLayout @JvmOverloads constructor(
     override fun isBottomNavEnabled(): Boolean = false
 
     override fun getBehavior(): CoordinatorLayout.Behavior<AppBarLayout> =
-        when (omnibarPosition) {
+        when (viewModel.viewState.value.position) {
             OmnibarPosition.TOP -> TopAppBarBehavior(context, this)
             OmnibarPosition.BOTTOM -> BottomAppBarBehavior(context, this)
         }
 
     override fun setExpanded(expanded: Boolean) {
-        when (omnibarPosition) {
+        when (viewModel.viewState.value.position) {
             OmnibarPosition.TOP -> super.setExpanded(expanded)
             OmnibarPosition.BOTTOM -> (behavior as BottomAppBarBehavior).setExpanded(expanded)
         }
@@ -1142,7 +1144,7 @@ open class UnifiedOmnibarLayout @JvmOverloads constructor(
         expanded: Boolean,
         animate: Boolean,
     ) {
-        when (omnibarPosition) {
+        when (viewModel.viewState.value.position) {
             OmnibarPosition.TOP -> super.setExpanded(expanded, animate)
             OmnibarPosition.BOTTOM -> (behavior as BottomAppBarBehavior).setExpanded(expanded)
         }
