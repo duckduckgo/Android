@@ -45,8 +45,14 @@ class RMFDaysSinceDuckAiUsedMatchingAttribute @Inject constructor(
                 return if (matchingAttribute == DaysSinceDuckAiUsedMatchingAttribute()) {
                     false
                 } else {
-                    val sessionDeltaMinutes = duckChatFeatureRepository.sessionDeltaInMinutes()
-                    val daysSinceUsed = TimeUnit.MINUTES.toDays(sessionDeltaMinutes).toInt()
+                    val lastDuckAiSessionTimestamp = duckChatFeatureRepository.lastSessionTimestamp()
+                    // If lastDuckAiSessionTimestamp is 0, Duck AI was never used, so no matching criteria should match
+                    if (lastDuckAiSessionTimestamp == 0L) {
+                        return false
+                    }
+                    
+                    val now = System.currentTimeMillis()
+                    val daysSinceUsed = TimeUnit.MILLISECONDS.toDays(now - lastDuckAiSessionTimestamp).toInt()
                     if (!matchingAttribute.value.isDefaultValue()) {
                         matchingAttribute.value == daysSinceUsed
                     } else {
