@@ -20,11 +20,10 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <com.duckduckgo.app.browser.omnibar.SingleOmnibarLayout
-        android:id="@+id/singleOmnibar"
+    <com.duckduckgo.app.browser.omnibar.OmnibarLayout
+        android:id="@+id/omnibarLayoutTop"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@android:color/transparent"
         android:elevation="1dp"
         android:outlineProvider="none"
         app:omnibarPosition="top" />
@@ -161,12 +160,12 @@
 
     </RelativeLayout>
 
-    <com.duckduckgo.app.browser.omnibar.SingleOmnibarLayout
-        android:id="@+id/singleOmnibarBottom"
+    <com.duckduckgo.app.browser.omnibar.OmnibarLayout
+        android:id="@+id/omnibarLayoutBottom"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:outlineProvider="none"
         android:layout_gravity="bottom"
-        app:omnibarPosition="bottom" />
+        android:outlineProvider="none"
+        app:omnibarPosition="bottom"  />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

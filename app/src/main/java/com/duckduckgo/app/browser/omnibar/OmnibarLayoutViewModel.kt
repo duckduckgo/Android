@@ -41,8 +41,10 @@ import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.LeadingIconStat
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.LeadingIconState.DuckPlayer
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.LeadingIconState.EasterEggLogo
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.LeadingIconState.Globe
-import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.LeadingIconState.PrivacyShield
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.LeadingIconState.Search
+import com.duckduckgo.app.browser.omnibar.datastore.OmnibarDataStore
+import com.duckduckgo.app.browser.omnibar.model.OmnibarType
+import com.duckduckgo.app.browser.omnibar.model.OmnibarTypeResolver
 import com.duckduckgo.app.browser.viewstate.HighlightableButton
 import com.duckduckgo.app.browser.viewstate.LoadingViewState
 import com.duckduckgo.app.browser.viewstate.OmnibarViewState
@@ -55,6 +57,7 @@ import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Unique
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.trackerdetection.model.Entity
 import com.duckduckgo.browser.api.UserBrowserProperties
+import com.duckduckgo.browser.ui.omnibar.OmnibarPosition
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
@@ -100,12 +103,15 @@ class OmnibarLayoutViewModel @Inject constructor(
     private val duckAiFeatureState: DuckAiFeatureState,
     private val addressDisplayFormatter: AddressDisplayFormatter,
     private val settingsDataStore: SettingsDataStore,
+    private val omnibarDataStore: OmnibarDataStore,
     private val serpEasterEggLogosToggles: SerpEasterEggLogosToggles,
+    private val omnibarTypeResolver: OmnibarTypeResolver,
 ) : ViewModel() {
 
     private val _viewState = MutableStateFlow(
         ViewState(
             showChatMenu = duckAiFeatureState.showOmnibarShortcutInAllStates.value,
+            showButtons = omnibarTypeResolver.getOmnibarType() == OmnibarType.SINGLE,
         ),
     )
 
@@ -113,12 +119,14 @@ class OmnibarLayoutViewModel @Inject constructor(
         _viewState,
         tabRepository.flowTabs,
         additionalDefaultBrowserPrompts.highlightPopupMenu,
-    ) { state, tabs, highlightOverflowMenu ->
+        omnibarDataStore.omnibarPositionFlow,
+    ) { state, tabs, highlightOverflowMenu, omnibarPosition ->
         state.copy(
             shouldUpdateTabsCount = tabs.size != state.tabCount && tabs.isNotEmpty(),
             tabCount = tabs.size,
             hasUnreadTabs = tabs.firstOrNull { !it.viewed } != null,
             showBrowserMenuHighlight = highlightOverflowMenu,
+            position = omnibarPosition,
         )
     }.flowOn(dispatcherProvider.io()).stateIn(viewModelScope, SharingStarted.Eagerly, _viewState.value)
 
@@ -175,6 +183,8 @@ class OmnibarLayoutViewModel @Inject constructor(
         val showShadows: Boolean = false,
         val showTextInputClickCatcher: Boolean = false,
         val showFindInPage: Boolean = false,
+        val showButtons: Boolean = true,
+        val position: OmnibarPosition = OmnibarPosition.TOP,
     ) {
         fun shouldUpdateOmnibarText(isFullUrlEnabled: Boolean): Boolean {
             return this.viewMode is Browser || this.viewMode is MaliciousSiteWarning || (!isFullUrlEnabled && omnibarText.isNotEmpty())
@@ -381,7 +391,7 @@ class OmnibarLayoutViewModel @Inject constructor(
                     if (url.isEmpty()) {
                         Search
                     } else {
-                        PrivacyShield
+                        LeadingIconState.PrivacyShield
                     }
                 }
             }
@@ -585,7 +595,7 @@ class OmnibarLayoutViewModel @Inject constructor(
         }
     }
 
-    fun onHighlightItem(decoration: OmnibarLayout.Decoration.HighlightOmnibarItem) {
+    fun onHighlightItem(decoration: Decoration.HighlightOmnibarItem) {
         // We only want to disable scrolling if one of the elements is highlighted
         logcat { "Omnibar: onHighlightItem" }
         val isScrollingDisabled = decoration.privacyShield || decoration.fireButton
@@ -794,7 +804,7 @@ class OmnibarLayoutViewModel @Inject constructor(
                     if (!hasFocus) {
                         _viewState.update {
                             it.copy(
-                                leadingIconState = PrivacyShield,
+                                leadingIconState = LeadingIconState.PrivacyShield,
                             )
                         }
                         viewModelScope.launch {

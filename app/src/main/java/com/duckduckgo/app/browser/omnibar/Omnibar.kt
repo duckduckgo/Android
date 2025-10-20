@@ -71,12 +71,12 @@ class Omnibar(
         when (omnibarPosition) {
             OmnibarPosition.TOP -> {
                 // remove bottom variant
-                binding.rootView.removeView(binding.singleOmnibarBottom)
+                binding.rootView.removeView(binding.omnibarLayoutBottom)
             }
 
             OmnibarPosition.BOTTOM -> {
                 // remove top variant
-                binding.rootView.removeView(binding.singleOmnibar)
+                binding.rootView.removeView(binding.omnibarLayoutTop)
 
                 adjustCoordinatorLayoutBehaviorForBottomOmnibar()
             }
@@ -176,11 +176,11 @@ class Omnibar(
     val omnibarLayout: OmnibarLayout by lazy {
         when (omnibarPosition) {
             OmnibarPosition.TOP -> {
-                binding.singleOmnibar
+                binding.omnibarLayoutTop
             }
 
             OmnibarPosition.BOTTOM -> {
-                binding.singleOmnibarBottom
+                binding.omnibarLayoutBottom
             }
         }
     }
@@ -285,13 +285,6 @@ class Omnibar(
 
     fun configureLogoClickListener(logoClickListener: LogoClickListener) {
         omnibarLayout.setLogoClickListener(logoClickListener)
-    }
-
-    fun configureOmnibarItemPressedListeners(listener: OmnibarItemPressedListener) {
-        val omnibar = omnibarLayout
-        if (omnibar is SingleOmnibarLayout) {
-            omnibar.setSingleOmnibarItemPressedListener(listener)
-        }
     }
 
     fun configureInputScreenLaunchListener(listener: InputScreenLaunchListener) {
