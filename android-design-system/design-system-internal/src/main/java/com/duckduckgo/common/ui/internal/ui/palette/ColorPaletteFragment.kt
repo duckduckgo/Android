@@ -22,11 +22,21 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import com.duckduckgo.common.ui.compose.theme.DuckDuckGoTheme
 import com.duckduckgo.common.ui.internal.R
+import com.duckduckgo.common.ui.internal.ui.appComponentsViewModel
+import com.duckduckgo.common.ui.internal.ui.setupThemedComposeView
+import com.duckduckgo.common.ui.internal.ui.widget.compose.DaxColorAttributeListItem
+import com.duckduckgo.common.ui.internal.ui.widget.compose.DaxColorDotColors
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.runBlocking
+import com.duckduckgo.common.ui.DuckDuckGoTheme as AppTheme
 
 /** Fragment to display a list of subsystems that show the values of this app's theme. */
 @SuppressLint("NoFragment") // we don't use DI here
 class ColorPaletteFragment : Fragment() {
+
+    private val appComponentsViewModel by appComponentsViewModel()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -34,5 +44,150 @@ class ColorPaletteFragment : Fragment() {
         savedInstanceState: Bundle?,
     ): View? {
         return inflater.inflate(R.layout.fragment_components_color_palette, container, false)
+    }
+
+    @Suppress("DenyListedApi")
+    override fun onViewCreated(
+        view: View,
+        savedInstanceBundle: Bundle?,
+    ) {
+        val isDarkTheme = runBlocking { appComponentsViewModel.themeFlow.first() } == AppTheme.DARK
+
+        setupComposeViews(view, isDarkTheme)
+    }
+
+    private fun setupComposeViews(
+        view: View,
+        isDarkTheme: Boolean,
+    ) {
+        view.setupThemedComposeView(id = R.id.compose_background, isDarkTheme = isDarkTheme) {
+            DaxColorAttributeListItem(
+                text = "Background",
+                dotColors = DaxColorDotColors(
+                    fillColor = DuckDuckGoTheme.colors.background,
+                    DuckDuckGoTheme.colors.backgroundInverted,
+                ),
+            )
+        }
+
+        view.setupThemedComposeView(id = R.id.compose_surface, isDarkTheme = isDarkTheme) {
+            DaxColorAttributeListItem(
+                text = "Surface",
+                dotColors = DaxColorDotColors(
+                    fillColor = DuckDuckGoTheme.colors.surface,
+                    strokeColor = DuckDuckGoTheme.colors.backgroundInverted,
+                ),
+            )
+        }
+
+        // Container
+        view.setupThemedComposeView(id = R.id.compose_container, isDarkTheme = isDarkTheme) {
+            DaxColorAttributeListItem(
+                text = "Container",
+                dotColors = DaxColorDotColors(
+                    fillColor = DuckDuckGoTheme.colors.container,
+                    strokeColor = DuckDuckGoTheme.colors.backgroundInverted,
+                ),
+            )
+        }
+
+        // Destructive
+        view.setupThemedComposeView(id = R.id.compose_destructive, isDarkTheme = isDarkTheme) {
+            DaxColorAttributeListItem(
+                text = "Destructive",
+                dotColors = DaxColorDotColors(
+                    fillColor = DuckDuckGoTheme.colors.destructive,
+                    strokeColor = DuckDuckGoTheme.colors.backgroundInverted,
+                ),
+            )
+        }
+
+        // Container Disabled
+        view.setupThemedComposeView(id = R.id.compose_container_disabled, isDarkTheme = isDarkTheme) {
+            DaxColorAttributeListItem(
+                text = "Container Disabled",
+                dotColors = DaxColorDotColors(
+                    fillColor = DuckDuckGoTheme.colors.containerDisabled,
+                    strokeColor = DuckDuckGoTheme.colors.backgroundInverted,
+                ),
+            )
+        }
+
+        // Lines
+        view.setupThemedComposeView(id = R.id.compose_lines, isDarkTheme = isDarkTheme) {
+            DaxColorAttributeListItem(
+                text = "Lines",
+                dotColors = DaxColorDotColors(
+                    fillColor = DuckDuckGoTheme.colors.lines,
+                    strokeColor = DuckDuckGoTheme.colors.backgroundInverted,
+                ),
+            )
+        }
+
+        // Accent Blue
+        view.setupThemedComposeView(id = R.id.compose_accent_blue, isDarkTheme = isDarkTheme) {
+            DaxColorAttributeListItem(
+                text = "Accent Blue",
+                dotColors = DaxColorDotColors(
+                    fillColor = DuckDuckGoTheme.colors.accentBlue,
+                    strokeColor = DuckDuckGoTheme.colors.backgroundInverted,
+                ),
+            )
+        }
+
+        // Accent Yellow
+        view.setupThemedComposeView(id = R.id.compose_accent_yellow, isDarkTheme = isDarkTheme) {
+            DaxColorAttributeListItem(
+                text = "Accent Yellow",
+                dotColors = DaxColorDotColors(
+                    fillColor = DuckDuckGoTheme.colors.accentYellow,
+                    strokeColor = DuckDuckGoTheme.colors.backgroundInverted,
+                ),
+            )
+        }
+
+        // Primary Text
+        view.setupThemedComposeView(id = R.id.compose_primary_text, isDarkTheme = isDarkTheme) {
+            DaxColorAttributeListItem(
+                text = "Primary Text",
+                dotColors = DaxColorDotColors(
+                    fillColor = DuckDuckGoTheme.textColors.primary,
+                    strokeColor = DuckDuckGoTheme.colors.backgroundInverted,
+                ),
+            )
+        }
+
+        // Secondary Text
+        view.setupThemedComposeView(id = R.id.compose_secondary_text, isDarkTheme = isDarkTheme) {
+            DaxColorAttributeListItem(
+                text = "Secondary Text",
+                dotColors = DaxColorDotColors(
+                    fillColor = DuckDuckGoTheme.textColors.secondary,
+                    strokeColor = DuckDuckGoTheme.colors.backgroundInverted,
+                ),
+            )
+        }
+
+        // Text Disabled
+        view.setupThemedComposeView(id = R.id.compose_text_disabled, isDarkTheme = isDarkTheme) {
+            DaxColorAttributeListItem(
+                text = "Text Disabled",
+                dotColors = DaxColorDotColors(
+                    fillColor = DuckDuckGoTheme.textColors.disabled,
+                    strokeColor = DuckDuckGoTheme.colors.backgroundInverted,
+                ),
+            )
+        }
+
+        // Primary Icon - Note: There's no direct primaryIcon in DuckDuckGoColors, using text.primary as fallback
+        view.setupThemedComposeView(id = R.id.compose_primary_icon, isDarkTheme = isDarkTheme) {
+            DaxColorAttributeListItem(
+                text = "Primary Icon",
+                dotColors = DaxColorDotColors(
+                    fillColor = DuckDuckGoTheme.textColors.primary,
+                    strokeColor = DuckDuckGoTheme.colors.backgroundInverted,
+                ),
+            )
+        }
     }
 }
