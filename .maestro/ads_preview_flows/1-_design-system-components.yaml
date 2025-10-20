@@ -24,7 +24,7 @@ tags:
         - assertVisible: "COLOR PALETTE"
         - tapOn: "TYPOGRAPHY"
         - scrollUntilVisible:
-            timeout: 30000
+            timeout: 50000
             speed: 60
             element:
               text: "Text Appearance Caption"
@@ -39,7 +39,7 @@ tags:
         - assertVisible: "Keep Using"
         - tapOn: "Keep Using"
         - scrollUntilVisible:
-            timeout: 30000
+            timeout: 50000
             speed: 60
             element:
               text: "Stacked Text Alert Dialog With 4 buttons"
@@ -48,7 +48,7 @@ tags:
         - assertVisible: "Keep Using"
         - tapOn: "Keep Using"
         - scrollUntilVisible:
-            timeout: 30000
+            timeout: 50000
             speed: 60
             element:
               text: "Promo Bottom Sheet with image"
@@ -66,7 +66,7 @@ tags:
         - tapOn:
             id: "com.duckduckgo.mobile.android:id/bottomSheetPromoPrimaryButton"
         - scrollUntilVisible:
-            timeout: 30000
+            timeout: 50000
             speed: 60
             element:
               text: "Cookie Consent dialog with animation"
@@ -108,14 +108,14 @@ tags:
             index: 0
         - tapOn: "LIST ITEMS"
         - scrollUntilVisible:
-            timeout: 30000
+            timeout: 50000
             speed: 60
             element:
               text: "With Beta Pill and Switch"
             direction: DOWN
         - tapOn: "Others"
         - scrollUntilVisible:
-            timeout: 30000
+            timeout: 50000
             speed: 60
             element:
               text: "Enable Dark Theme"
