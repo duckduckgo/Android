@@ -114,7 +114,7 @@ class RealAutoconsentPixelManager @Inject constructor(
         pixelCounter.forEach { (pixelName, count) ->
             val name = pixelName
                 .removePrefix("m_autoconsent_")
-                .removeSuffix("_android_daily")
+                .removeSuffix("_daily")
             summaryParams[name] = count.toString()
         }
         return summaryParams
