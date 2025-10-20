@@ -1,0 +1,199 @@
+name: Build Benchmark - Manual
+
+on:
+  workflow_dispatch:
+    inputs:
+      branch:
+        description: 'Branch to benchmark'
+        required: false
+        default: ''
+      base_branch:
+        description: 'Base branch for comparison'
+        required: false
+        default: 'develop'
+      warmups:
+        description: 'Number of warmup iterations'
+        required: false
+        default: '4'
+      iterations:
+        description: 'Number of measured iterations'
+        required: false
+        default: '7'
+
+jobs:
+  benchmark-head:
+    name: Benchmark Head Branch
+    runs-on: ubuntu-24.04
+    timeout-minutes: 120
+
+    steps:
+      - name: Determine branch to benchmark
+        id: determine-branch
+        run: |
+          BRANCH="${{ github.event.inputs.branch }}"
+          if [ -z "$BRANCH" ]; then
+            BRANCH="${{ github.ref_name }}"
+          fi
+          echo "branch=$BRANCH" >> $GITHUB_OUTPUT
+          echo "Benchmarking branch: $BRANCH"
+
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ steps.determine-branch.outputs.branch }}
+          submodules: recursive
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          cache-read-only: true
+
+      - name: Install SDKMAN
+        run: |
+          curl -s "https://get.sdkman.io" | bash
+          source "$HOME/.sdkman/bin/sdkman-init.sh"
+          sdk version
+
+      - name: Install Gradle Profiler
+        run: |
+          source "$HOME/.sdkman/bin/sdkman-init.sh"
+          sdk install gradleprofiler
+          gradle-profiler --version
+
+      - name: Warm up build cache
+        run: |
+          ./gradlew assembleInternalDebug --no-daemon
+
+      - name: Create dynamic scenarios file
+        if: github.event.inputs.warmups != '4' || github.event.inputs.iterations != '7'
+        run: |
+          WARMUPS="${{ github.event.inputs.warmups }}"
+          ITERATIONS="${{ github.event.inputs.iterations }}"
+
+          sed -i "s/warm-ups = 4/warm-ups = $WARMUPS/g" build_performance.scenarios
+          sed -i "s/iterations = 7/iterations = $ITERATIONS/g" build_performance.scenarios
+
+          echo "Updated scenarios file with warmups=$WARMUPS, iterations=$ITERATIONS"
+
+      - name: Run Build Benchmarks
+        run: |
+          source "$HOME/.sdkman/bin/sdkman-init.sh"
+          gradle-profiler --benchmark --scenario-file build_performance.scenarios --output-dir profile-out-head
+
+      - name: Upload Head Benchmark Results
+        uses: actions/upload-artifact@v4
+        with:
+          name: benchmark-results-head-${{ github.run_number }}
+          path: profile-out-head/**/*.csv
+          retention-days: 30
+
+  benchmark-base:
+    name: Benchmark Base Branch
+    runs-on: ubuntu-24.04
+    timeout-minutes: 120
+    needs: benchmark-head
+
+    steps:
+      - name: Determine base branch
+        id: determine-base
+        run: |
+          BASE="${{ github.event.inputs.base_branch }}"
+          echo "base=$BASE" >> $GITHUB_OUTPUT
+          echo "Benchmarking base branch: $BASE"
+
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ steps.determine-base.outputs.base }}
+          submodules: recursive
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          cache-read-only: true
+
+      - name: Install SDKMAN
+        run: |
+          curl -s "https://get.sdkman.io" | bash
+          source "$HOME/.sdkman/bin/sdkman-init.sh"
+          sdk version
+
+      - name: Install Gradle Profiler
+        run: |
+          source "$HOME/.sdkman/bin/sdkman-init.sh"
+          sdk install gradleprofiler
+          gradle-profiler --version
+
+      - name: Warm up build cache
+        run: |
+          ./gradlew assembleInternalDebug --no-daemon
+
+      - name: Create dynamic scenarios file
+        if: github.event.inputs.warmups != '4' || github.event.inputs.iterations != '7'
+        run: |
+          WARMUPS="${{ github.event.inputs.warmups }}"
+          ITERATIONS="${{ github.event.inputs.iterations }}"
+
+          sed -i "s/warm-ups = 4/warm-ups = $WARMUPS/g" build_performance.scenarios
+          sed -i "s/iterations = 7/iterations = $ITERATIONS/g" build_performance.scenarios
+
+          echo "Updated scenarios file with warmups=$WARMUPS, iterations=$ITERATIONS"
+
+      - name: Run Build Benchmarks
+        run: |
+          source "$HOME/.sdkman/bin/sdkman-init.sh"
+          gradle-profiler --benchmark --scenario-file build_performance.scenarios --output-dir profile-out-base
+
+      - name: Upload Base Benchmark Results
+        uses: actions/upload-artifact@v4
+        with:
+          name: benchmark-results-base-${{ github.run_number }}
+          path: profile-out-base/**/*.csv
+          retention-days: 30
+
+  compare-results:
+    name: Compare Results
+    runs-on: ubuntu-24.04
+    needs: [benchmark-head, benchmark-base]
+    if: always() && needs.benchmark-head.result == 'success' && needs.benchmark-base.result == 'success'
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Download Head Results
+        uses: actions/download-artifact@v4
+        with:
+          name: benchmark-results-head-${{ github.run_number }}
+          path: profile-out-head
+
+      - name: Download Base Results
+        uses: actions/download-artifact@v4
+        with:
+          name: benchmark-results-base-${{ github.run_number }}
+          path: profile-out-base
+
+      - name: Compare Results
+        run: |
+          python3 scripts/benchmark-comparison.py \
+            profile-out-head/benchmark.csv \
+            profile-out-base/benchmark.csv
+
+      - name: Upload Comparison Report
+        uses: actions/upload-artifact@v4
+        with:
+          name: benchmark-comparison-${{ github.run_number }}
+          path: benchmark-result.md
+          retention-days: 30

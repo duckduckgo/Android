@@ -1,0 +1,120 @@
+name: Build Benchmark - Nightly
+
+on:
+  schedule:
+    # Run nightly at 2 AM UTC (matching nightly.yml)
+    - cron: '0 2 * * *'
+  workflow_dispatch:
+    # Allow manual triggering
+
+jobs:
+  benchmark-develop:
+    name: Benchmark Develop Branch
+    runs-on: ubuntu-24.04
+    timeout-minutes: 120
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          ref: develop
+          submodules: recursive
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          cache-read-only: true
+
+      - name: Install SDKMAN
+        run: |
+          curl -s "https://get.sdkman.io" | bash
+          source "$HOME/.sdkman/bin/sdkman-init.sh"
+          sdk version
+
+      - name: Install Gradle Profiler
+        run: |
+          source "$HOME/.sdkman/bin/sdkman-init.sh"
+          sdk install gradleprofiler
+          gradle-profiler --version
+
+      - name: Run Gradle Build (warm cache)
+        run: |
+          ./gradlew assembleInternalDebug --no-daemon
+
+      - name: Run Build Benchmarks
+        run: |
+          source "$HOME/.sdkman/bin/sdkman-init.sh"
+          gradle-profiler --benchmark --scenario-file build_performance.scenarios --output-dir profile-out
+
+      - name: Upload Benchmark Results
+        uses: actions/upload-artifact@v4
+        with:
+          name: benchmark-results-develop-${{ github.run_number }}
+          path: profile-out/**/*.csv
+          retention-days: 30
+
+      - name: Generate Summary Report
+        run: |
+          python3 scripts/benchmark-comparison.py profile-out/benchmark.csv
+
+      - name: Upload Summary Report
+        uses: actions/upload-artifact@v4
+        with:
+          name: benchmark-summary-${{ github.run_number }}
+          path: benchmark-result.md
+          retention-days: 30
+
+  benchmark-comparison:
+    name: Compare with Previous Results
+    runs-on: ubuntu-24.04
+    needs: benchmark-develop
+    if: success()
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Download Current Results
+        uses: actions/download-artifact@v4
+        with:
+          name: benchmark-results-develop-${{ github.run_number }}
+          path: profile-out-current
+
+      - name: Compute Previous Run Number
+        id: prev-run
+        run: echo "previous=$(( ${{ github.run_number }} - 1 ))" >> $GITHUB_OUTPUT
+
+      - name: Download Previous Results
+        uses: actions/download-artifact@v4
+        continue-on-error: true
+        with:
+          name: benchmark-results-develop-${{ steps.prev-run.outputs.previous }}
+          path: profile-out-previous
+
+      - name: Compare Results
+        if: hashFiles('profile-out-previous/benchmark.csv') != ''
+        run: |
+          python3 scripts/benchmark-comparison.py \
+            profile-out-current/benchmark.csv \
+            profile-out-previous/benchmark.csv
+
+      - name: Generate Trend Summary
+        if: hashFiles('profile-out-previous/benchmark.csv') != ''
+        run: |
+          echo "## Nightly Build Performance Trend" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          cat benchmark-result.md >> $GITHUB_STEP_SUMMARY
+
+      - name: Upload Comparison Report
+        if: hashFiles('profile-out-previous/benchmark.csv') != ''
+        uses: actions/upload-artifact@v4
+        with:
+          name: benchmark-comparison-${{ github.run_number }}
+          path: benchmark-result.md
+          retention-days: 30
