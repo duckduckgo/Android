@@ -17,10 +17,19 @@ jobs:
     timeout-minutes: 120
 
     steps:
+      - name: Determine branch
+        id: determine-branch
+        run: |
+          if [ "${{ github.event_name }}" == "push" ]; then
+            echo "branch=${{ github.ref_name }}" >> $GITHUB_OUTPUT
+          else
+            echo "branch=develop" >> $GITHUB_OUTPUT
+          fi
+
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          ref: develop
+          ref: ${{ steps.determine-branch.outputs.branch }}
           submodules: recursive
 
       - name: Set up Java
