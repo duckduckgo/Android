@@ -113,7 +113,7 @@ class SearchOnlyWidget : AppWidgetProvider() {
     }
 
     private fun buildPendingIntent(context: Context): PendingIntent {
-        val intent = SystemSearchActivity.fromWidget(context)
+        val intent = SystemSearchActivity.fromSearchOnlyWidget(context)
         return PendingIntent.getActivity(
             context,
             SEARCH_ONLY_WIDGET_REQUEST_CODE,

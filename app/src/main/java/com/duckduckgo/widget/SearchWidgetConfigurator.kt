@@ -57,7 +57,7 @@ class SearchWidgetConfigurator @Inject constructor(
             remoteViews.setViewVisibility(R.id.search, if (!voiceSearchEnabled && !showDuckAi) View.VISIBLE else View.GONE)
 
             if (voiceSearchEnabled) {
-                val pendingIntent = buildVoiceSearchPendingIntent(context, fromFavWidget)
+                val pendingIntent = buildVoiceSearchPendingIntent(context, fromFavWidget, fromSearchOnlyWidget)
                 remoteViews.setOnClickPendingIntent(R.id.voiceSearch, pendingIntent)
             }
 
@@ -71,15 +71,34 @@ class SearchWidgetConfigurator @Inject constructor(
     private fun buildVoiceSearchPendingIntent(
         context: Context,
         fromFavWidget: Boolean,
+        fromSearchOnlyWidget: Boolean,
     ): PendingIntent {
-        val intent = if (fromFavWidget) SystemSearchActivity.fromFavWidget(context, true) else SystemSearchActivity.fromWidget(context, true)
-        return PendingIntent.getActivity(context, 1, intent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
+        val (intent, requestCode) = when {
+            fromFavWidget -> {
+                SystemSearchActivity.fromFavWidget(context, launchVoice = true) to REQUEST_CODE_SEARCH_WITH_FAV_WIDGET_VOICE_INTENT
+            }
+            fromSearchOnlyWidget -> {
+                SystemSearchActivity.fromSearchOnlyWidget(context, launchVoice = true) to REQUEST_CODE_SEARCH_ONLY_WIDGET_VOICE_INTENT
+            }
+            else -> {
+                SystemSearchActivity.fromWidget(context, launchVoice = true) to REQUEST_CODE_SEARCH_WIDGET_VOICE_INTENT
+            }
+        }
+        return PendingIntent.getActivity(context, requestCode, intent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
     }
 
     private fun buildDuckAiPendingIntent(
         context: Context,
     ): PendingIntent {
         val intent = BrowserActivity.intent(context, openDuckChat = true, duckChatSessionActive = true).also { it.action = Intent.ACTION_VIEW }
-        return PendingIntent.getActivity(context, 2, intent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
+        val requestCode = REQUEST_CODE_WIDGET_DUCK_AI_INTENT
+        return PendingIntent.getActivity(context, requestCode, intent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
+    }
+
+    private companion object {
+        private const val REQUEST_CODE_SEARCH_WIDGET_VOICE_INTENT = 1531
+        private const val REQUEST_CODE_SEARCH_WITH_FAV_WIDGET_VOICE_INTENT = 1541
+        private const val REQUEST_CODE_SEARCH_ONLY_WIDGET_VOICE_INTENT = 1551
+        private const val REQUEST_CODE_WIDGET_DUCK_AI_INTENT = 1561
     }
 }

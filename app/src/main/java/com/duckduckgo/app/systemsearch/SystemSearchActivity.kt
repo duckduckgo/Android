@@ -222,9 +222,8 @@ class SystemSearchActivity : DuckDuckGoActivity() {
         if (savedInstanceState == null) {
             intent?.let {
                 sendLaunchPixels(it)
-                if (duckAiFeatureState.showInputScreenOnSystemSearchLaunch.value) {
-                    launchInputScreen(isTopOmnibar = isOmnibarAtTop, intent = it)
-                } else {
+                val inputScreenLaunched = launchInputScreen(isTopOmnibar = isOmnibarAtTop, intent = it)
+                if (!inputScreenLaunched) {
                     handleVoiceSearchLaunch(it)
                 }
             }
@@ -255,33 +254,40 @@ class SystemSearchActivity : DuckDuckGoActivity() {
         dataClearerForegroundAppRestartPixel.registerIntent(intent)
         viewModel.resetViewState()
         sendLaunchPixels(intent)
-        if (duckAiFeatureState.showInputScreenOnSystemSearchLaunch.value) {
-            val isOmnibarAtTop = settingsDataStore.omnibarPosition == OmnibarPosition.TOP
-            launchInputScreen(isTopOmnibar = isOmnibarAtTop, intent = intent)
-        } else {
+        val isOmnibarAtTop = settingsDataStore.omnibarPosition == OmnibarPosition.TOP
+        val inputScreenLaunched = launchInputScreen(isTopOmnibar = isOmnibarAtTop, intent = intent)
+        if (!inputScreenLaunched) {
             handleVoiceSearchLaunch(intent)
         }
     }
 
-    private fun launchInputScreen(isTopOmnibar: Boolean, intent: Intent) {
-        globalActivityStarter.startIntent(
-            this,
-            InputScreenActivityParams(
-                query = "",
-                isTopOmnibar = isTopOmnibar,
-                browserButtonsConfig = InputScreenBrowserButtonsConfig.Disabled(),
-                showInstalledApps = true,
-                launchWithVoice = launchVoice(intent),
-            ),
-        )?.let {
-            inputScreenLauncher.launch(it)
+    /**
+     * @return `true` if the Input Screen was successfully launched, `false` otherwise.
+     */
+    private fun launchInputScreen(isTopOmnibar: Boolean, intent: Intent): Boolean {
+        return if (duckAiFeatureState.showInputScreenOnSystemSearchLaunch.value && !launchedFromSearchOnlyWidget(intent)) {
+            globalActivityStarter.startIntent(
+                this,
+                InputScreenActivityParams(
+                    query = "",
+                    isTopOmnibar = isTopOmnibar,
+                    browserButtonsConfig = InputScreenBrowserButtonsConfig.Disabled(),
+                    showInstalledApps = true,
+                    launchWithVoice = launchVoice(intent),
+                ),
+            )?.let {
+                inputScreenLauncher.launch(it)
+                true
+            } ?: false
+        } else {
+            false
         }
     }
 
     private fun sendLaunchPixels(intent: Intent) {
         when {
             launchedFromAssist(intent) -> pixel.fire(AppPixelName.APP_ASSIST_LAUNCH)
-            launchedFromWidget(intent) -> pixel.fire(AppPixelName.APP_WIDGET_LAUNCH)
+            launchedFromWidget(intent) || launchedFromSearchOnlyWidget(intent) -> pixel.fire(AppPixelName.APP_WIDGET_LAUNCH)
             launchedFromSearchWithFavsWidget(intent) -> pixel.fire(AppPixelName.APP_FAVORITES_SEARCHBAR_WIDGET_LAUNCH)
             launchedFromNotification(intent) -> pixel.fire(AppPixelName.APP_NOTIFICATION_LAUNCH)
             launchedFromSystemSearchBox(intent) -> pixel.fire(AppPixelName.APP_SYSTEM_SEARCH_BOX_LAUNCH)
@@ -699,6 +705,8 @@ class SystemSearchActivity : DuckDuckGoActivity() {
 
     private fun launchedFromWidget(intent: Intent): Boolean = intent.getBooleanExtra(WIDGET_SEARCH_EXTRA, false)
 
+    private fun launchedFromSearchOnlyWidget(intent: Intent): Boolean = intent.getBooleanExtra(WIDGET_SEARCH_ONLY_EXTRA, false)
+
     private fun launchedFromSearchWithFavsWidget(intent: Intent): Boolean = intent.getBooleanExtra(WIDGET_SEARCH_WITH_FAVS_EXTRA, false)
 
     private fun launchedFromNotification(intent: Intent): Boolean = intent.getBooleanExtra(NOTIFICATION_SEARCH_EXTRA, false)
@@ -708,6 +716,7 @@ class SystemSearchActivity : DuckDuckGoActivity() {
     companion object {
         const val NOTIFICATION_SEARCH_EXTRA = "NOTIFICATION_SEARCH_EXTRA"
         const val WIDGET_SEARCH_EXTRA = "WIDGET_SEARCH_EXTRA"
+        const val WIDGET_SEARCH_ONLY_EXTRA = "WIDGET_SEARCH_ONLY_EXTRA"
         const val WIDGET_SEARCH_WITH_FAVS_EXTRA = "WIDGET_SEARCH_WITH_FAVS_EXTRA"
         const val WIDGET_SEARCH_LAUNCH_VOICE = "WIDGET_SEARCH_LAUNCH_VOICE"
         const val NEW_SEARCH_ACTION = "com.duckduckgo.mobile.android.NEW_SEARCH"
@@ -720,6 +729,16 @@ class SystemSearchActivity : DuckDuckGoActivity() {
             val intent = Intent(context, SystemSearchActivity::class.java)
             intent.putExtra(WIDGET_SEARCH_EXTRA, true)
             intent.putExtra(NOTIFICATION_SEARCH_EXTRA, false)
+            intent.putExtra(WIDGET_SEARCH_LAUNCH_VOICE, launchVoice)
+            return intent
+        }
+
+        fun fromSearchOnlyWidget(
+            context: Context,
+            launchVoice: Boolean = false,
+        ): Intent {
+            val intent = Intent(context, SystemSearchActivity::class.java)
+            intent.putExtra(WIDGET_SEARCH_ONLY_EXTRA, true)
             intent.putExtra(WIDGET_SEARCH_LAUNCH_VOICE, launchVoice)
             return intent
         }
