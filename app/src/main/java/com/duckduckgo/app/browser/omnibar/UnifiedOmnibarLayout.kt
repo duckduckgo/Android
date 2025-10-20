@@ -281,8 +281,6 @@ open class UnifiedOmnibarLayout @JvmOverloads constructor(
 
     private var focusAnimator: ValueAnimator? = null
 
-    private var omnibarItemPressedListenerInternal: OmnibarItemPressedListener? = null
-
     init {
         val attr = context.theme.obtainStyledAttributes(attrs, R.styleable.OmnibarLayout, defStyle, 0)
         val omnibarPosition = OmnibarPosition.entries[attr.getInt(R.styleable.OmnibarLayout_omnibarPosition, 0)]
@@ -647,13 +645,17 @@ open class UnifiedOmnibarLayout @JvmOverloads constructor(
         voiceSearchButton.setOnClickListener {
             omnibarItemPressedListener?.onVoiceSearchPressed()
         }
+        backIcon.setOnClickListener {
+            viewModel.onBackButtonPressed()
+            omnibarItemPressedListener?.onBackButtonPressed()
+        }
     }
 
     fun setLogoClickListener(logoClickListener: Omnibar.LogoClickListener) {
         omnibarLogoClickedListener = logoClickListener
     }
 
-    open fun render(viewState: ViewState) {
+    fun render(viewState: ViewState) {
         when (viewState.viewMode) {
             is CustomTab -> {
                 renderCustomTabMode(viewState, viewState.viewMode)
@@ -1197,13 +1199,5 @@ open class UnifiedOmnibarLayout @JvmOverloads constructor(
             animateOmnibarFocusedState(focused = false)
         }
         viewModel.onFindInPageDismissed()
-    }
-
-    fun setOmnibarItemPressedListener(itemPressedListener: OmnibarItemPressedListener) {
-        omnibarItemPressedListenerInternal = itemPressedListener
-        backIcon.setOnClickListener {
-            viewModel.onBackButtonPressed()
-            omnibarItemPressedListenerInternal?.onBackButtonPressed()
-        }
     }
 }

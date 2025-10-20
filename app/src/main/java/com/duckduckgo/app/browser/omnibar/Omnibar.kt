@@ -101,6 +101,8 @@ class Omnibar(
         fun onVoiceSearchPressed()
 
         fun onDuckChatButtonPressed()
+
+        fun onBackButtonPressed()
     }
 
     interface FindInPageListener {

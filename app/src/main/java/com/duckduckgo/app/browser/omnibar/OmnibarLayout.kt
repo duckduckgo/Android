@@ -1042,7 +1042,3 @@ open class OmnibarLayout @JvmOverloads constructor(
         }
     }
 }
-
-interface OmnibarItemPressedListener {
-    fun onBackButtonPressed()
-}
