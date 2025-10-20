@@ -162,7 +162,7 @@ class AutoconsentPixelManagerTest {
         verify(mockPixel).enqueueFire(
             eq(AutoConsentPixel.AUTOCONSENT_SUMMARY),
             argThat { parameters ->
-                parameters[pixel1.pixelName] == "2" && parameters[pixel2.pixelName] == "1"
+                parameters["init"] == "2" && parameters["popup-found"] == "1"
             },
             eq(emptyMap()),
         )
@@ -183,12 +183,12 @@ class AutoconsentPixelManagerTest {
 
         verify(mockPixel).enqueueFire(
             eq(AutoConsentPixel.AUTOCONSENT_SUMMARY),
-            argThat { parameters -> parameters[pixel1.pixelName] == "1" },
+            argThat { parameters -> parameters["init"] == "1" },
             eq(emptyMap()),
         )
         verify(mockPixel).enqueueFire(
             eq(AutoConsentPixel.AUTOCONSENT_SUMMARY),
-            argThat { parameters -> parameters[pixel2.pixelName] == "1" },
+            argThat { parameters -> parameters["popup-found"] == "1" },
             eq(emptyMap()),
         )
     }

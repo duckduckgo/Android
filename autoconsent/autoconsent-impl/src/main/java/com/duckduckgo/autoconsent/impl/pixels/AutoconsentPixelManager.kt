@@ -64,11 +64,10 @@ class RealAutoconsentPixelManager @Inject constructor(
 
             pixelCounter[pixelName.pixelName] = (pixelCounter[pixelName.pixelName] ?: 0) + 1
 
-            if (pixelCounter.size == 1) {
+            if (summaryJob == null) {
                 summaryJob = appCoroutineScope.launch(dispatcherProvider.main()) {
                     delay(2.minutes)
-                    val summaryData = pixelCounter.mapValues { it.value.toString() }
-                    pixel.enqueueFire(AutoConsentPixel.AUTOCONSENT_SUMMARY, parameters = summaryData)
+                    pixel.enqueueFire(AutoConsentPixel.AUTOCONSENT_SUMMARY, parameters = buildSummaryParameters())
                     clearAllCaches()
                 }
             }
@@ -108,5 +107,16 @@ class RealAutoconsentPixelManager @Inject constructor(
         detectedByPatternsCache.clear()
         detectedByBothCache.clear()
         detectedOnlyRulesCache.clear()
+    }
+
+    private fun buildSummaryParameters(): Map<String, String> {
+        val summaryParams = mutableMapOf<String, String>()
+        pixelCounter.forEach { (pixelName, count) ->
+            val name = pixelName
+                .removePrefix("m_autoconsent_")
+                .removeSuffix("_android_daily")
+            summaryParams[name] = count.toString()
+        }
+        return summaryParams
     }
 }
