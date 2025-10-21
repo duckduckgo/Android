@@ -20,10 +20,10 @@ jobs:
       - name: Determine branch
         id: determine-branch
         run: |
-          if [ "${{ github.event_name }}" == "push" ]; then
-            echo "branch=${{ github.ref_name }}" >> $GITHUB_OUTPUT
+          if [ "${{ github.event_name }}" = "push" ]; then
+            echo "branch=${{ github.ref_name }}" >> "$GITHUB_OUTPUT"
           else
-            echo "branch=develop" >> $GITHUB_OUTPUT
+            echo "branch=develop" >> "$GITHUB_OUTPUT"
           fi
 
       - name: Checkout repository
@@ -35,8 +35,8 @@ jobs:
       - name: Set up Java
         uses: actions/setup-java@v4
         with:
-          distribution: 'temurin'
-          java-version: '17'
+          distribution: 'adopt'
+          java-version-file: .github/.java-version
 
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
@@ -100,7 +100,7 @@ jobs:
 
       - name: Compute Previous Run Number
         id: prev-run
-        run: echo "previous=$(( ${{ github.run_number }} - 1 ))" >> $GITHUB_OUTPUT
+        run: echo "previous=$(( ${{ github.run_number }} - 1 ))" >> "$GITHUB_OUTPUT"
 
       - name: Download Previous Results
         uses: actions/download-artifact@v4
@@ -119,9 +119,11 @@ jobs:
       - name: Generate Trend Summary
         if: hashFiles('profile-out-previous/benchmark.csv') != ''
         run: |
-          echo "## Nightly Build Performance Trend" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          cat benchmark-result.md >> $GITHUB_STEP_SUMMARY
+          {
+            echo "## Nightly Build Performance Trend"
+            echo ""
+            cat benchmark-result.md
+          } >> "$GITHUB_STEP_SUMMARY"
 
       - name: Upload Comparison Report
         if: hashFiles('profile-out-previous/benchmark.csv') != ''
