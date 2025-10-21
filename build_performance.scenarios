@@ -27,7 +27,7 @@ abi-change {
 
     # Apply ABI change to a core utility class
     # Gradle profiler will modify a public method signature
-    apply-abi-change-to = "app/src/main/java/com/duckduckgo/app/global/DispatcherProvider.kt"
+    apply-abi-change-to = "common/common-utils/src/main/java/com/duckduckgo/common/utils/DispatcherProvider.kt"
 
     warm-ups = 4
     iterations = 7
@@ -45,7 +45,7 @@ non-abi-change {
 
     # Apply non-ABI change to the same file
     # Gradle profiler will modify method implementation without changing signature
-    apply-non-abi-change-to = "app/src/main/java/com/duckduckgo/app/global/DispatcherProvider.kt"
+    apply-non-abi-change-to = "common/common-utils/src/main/java/com/duckduckgo/common/utils/DispatcherProvider.kt"
 
     warm-ups = 4
     iterations = 7
