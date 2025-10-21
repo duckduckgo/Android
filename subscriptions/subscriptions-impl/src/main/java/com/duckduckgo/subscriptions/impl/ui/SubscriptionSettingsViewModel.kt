@@ -106,7 +106,7 @@ class SubscriptionSettingsViewModel @Inject constructor(
                 showFeedback = privacyProUnifiedFeedback.shouldUseUnifiedFeedback(source = SUBSCRIPTION_SETTINGS),
                 activeOffers = subscription.activeOffers,
                 showRebrandingBanner = shouldShowRebrandingBanner(),
-                switchPlanAvailable = subscriptionsManager.isSwitchPlanAvailable()
+                switchPlanAvailable = subscriptionsManager.isSwitchPlanAvailable(),
             ),
         )
     }
