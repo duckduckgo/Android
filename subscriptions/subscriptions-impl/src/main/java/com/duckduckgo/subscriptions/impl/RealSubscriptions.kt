@@ -260,6 +260,9 @@ interface PrivacyProFeature {
 
     @Toggle.DefaultValue(defaultValue = DefaultFeatureValue.FALSE)
     fun useSubscriptionSupport(): Toggle
+
+    @Toggle.DefaultValue(defaultValue = DefaultFeatureValue.INTERNAL)
+    fun supportsSwitchSubscription(): Toggle
 }
 
 @ContributesBinding(AppScope::class)
