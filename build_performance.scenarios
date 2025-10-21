@@ -5,7 +5,7 @@
 # Measures cold build performance with no incremental compilation
 clean-build {
     title = "Clean Build"
-    versions = ["8.14"]
+    versions = ["default"]
     tasks = ["assembleInternalDebug"]
     gradle-args = ["--no-build-cache", "--no-configuration-cache"]
     cleanup-tasks = ["clean"]
@@ -21,7 +21,7 @@ clean-build {
 # This triggers recompilation of all dependent modules
 abi-change {
     title = "ABI Change (Incremental)"
-    versions = ["8.14"]
+    versions = ["default"]
     tasks = ["assembleInternalDebug"]
     gradle-args = ["--no-build-cache", "--no-configuration-cache"]
 
@@ -39,7 +39,7 @@ abi-change {
 # Only the modified module needs recompilation
 non-abi-change {
     title = "Non-ABI Change (Incremental)"
-    versions = ["8.14"]
+    versions = ["default"]
     tasks = ["assembleInternalDebug"]
     gradle-args = ["--no-build-cache", "--no-configuration-cache"]
 
