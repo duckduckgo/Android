@@ -34,8 +34,8 @@ jobs:
           if [ -z "$BRANCH" ]; then
             BRANCH="${{ github.ref_name }}"
           fi
-          echo "branch=$BRANCH" >> $GITHUB_OUTPUT
-          echo "Benchmarking branch: $BRANCH"
+          echo "branch=${BRANCH}" >> "$GITHUB_OUTPUT"
+          echo "Benchmarking branch: ${BRANCH}"
 
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -46,8 +46,8 @@ jobs:
       - name: Set up Java
         uses: actions/setup-java@v4
         with:
-          distribution: 'temurin'
-          java-version: '17'
+          distribution: 'adopt'
+          java-version-file: .github/.java-version
 
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
@@ -76,10 +76,10 @@ jobs:
           WARMUPS="${{ github.event.inputs.warmups }}"
           ITERATIONS="${{ github.event.inputs.iterations }}"
 
-          sed -i "s/warm-ups = 4/warm-ups = $WARMUPS/g" build_performance.scenarios
-          sed -i "s/iterations = 7/iterations = $ITERATIONS/g" build_performance.scenarios
+          sed -i "s/warm-ups = 4/warm-ups = ${WARMUPS}/g" build_performance.scenarios
+          sed -i "s/iterations = 7/iterations = ${ITERATIONS}/g" build_performance.scenarios
 
-          echo "Updated scenarios file with warmups=$WARMUPS, iterations=$ITERATIONS"
+          echo "Updated scenarios file with warmups=${WARMUPS}, iterations=${ITERATIONS}"
 
       - name: Run Build Benchmarks
         run: |
@@ -104,8 +104,8 @@ jobs:
         id: determine-base
         run: |
           BASE="${{ github.event.inputs.base_branch }}"
-          echo "base=$BASE" >> $GITHUB_OUTPUT
-          echo "Benchmarking base branch: $BASE"
+          echo "base=${BASE}" >> "$GITHUB_OUTPUT"
+          echo "Benchmarking base branch: ${BASE}"
 
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -116,8 +116,8 @@ jobs:
       - name: Set up Java
         uses: actions/setup-java@v4
         with:
-          distribution: 'temurin'
-          java-version: '17'
+          distribution: 'adopt'
+          java-version-file: .github/.java-version
 
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
@@ -146,10 +146,10 @@ jobs:
           WARMUPS="${{ github.event.inputs.warmups }}"
           ITERATIONS="${{ github.event.inputs.iterations }}"
 
-          sed -i "s/warm-ups = 4/warm-ups = $WARMUPS/g" build_performance.scenarios
-          sed -i "s/iterations = 7/iterations = $ITERATIONS/g" build_performance.scenarios
+          sed -i "s/warm-ups = 4/warm-ups = ${WARMUPS}/g" build_performance.scenarios
+          sed -i "s/iterations = 7/iterations = ${ITERATIONS}/g" build_performance.scenarios
 
-          echo "Updated scenarios file with warmups=$WARMUPS, iterations=$ITERATIONS"
+          echo "Updated scenarios file with warmups=${WARMUPS}, iterations=${ITERATIONS}"
 
       - name: Run Build Benchmarks
         run: |
