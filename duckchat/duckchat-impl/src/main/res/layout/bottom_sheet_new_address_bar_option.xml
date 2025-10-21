@@ -95,15 +95,6 @@
                             app:textType="primary"
                             app:typography="title" />
 
-                        <com.duckduckgo.common.ui.view.text.DaxTextView
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_marginHorizontal="40dp"
-                            android:layout_marginTop="16dp"
-                            android:gravity="center"
-                            android:text="@string/newAddressBarOptionBottomSheetDialogSubTitle"
-                            app:textType="secondary"
-                            app:typography="body2" />
                     </LinearLayout>
 
                     <FrameLayout

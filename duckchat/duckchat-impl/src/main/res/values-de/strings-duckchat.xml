@@ -71,7 +71,6 @@
     <!-- New Address Bar Option Bottom Sheet Dialog -->
     <string name="newAddressBarOptionBottomSheetDialogSearchText">Adresse suchen oder eingeben</string>
     <string name="newAddressBarOptionBottomSheetDialogTitle">Wechseln zwischen Suche und KI-Chat</string>
-    <string name="newAddressBarOptionBottomSheetDialogSubTitle">KI-Funktionen sind immer optional.</string>
     <string name="newAddressBarOptionBottomSheetDialogPrimaryButton">Bestätigen</string>
     <string name="newAddressBarOptionBottomSheetDialogGhostButton">Jetzt nicht</string>
     <string name="newAddressBarOptionBottomSheetDialogFooter">Anpassen unter Einstellungen &gt; KI-Funktionen.</string>

@@ -71,7 +71,6 @@
     <!-- New Address Bar Option Bottom Sheet Dialog -->
     <string name="newAddressBarOptionBottomSheetDialogSearchText">Rechercher ou saisir une adresse</string>
     <string name="newAddressBarOptionBottomSheetDialogTitle">Basculer entre la recherche et le chat IA</string>
-    <string name="newAddressBarOptionBottomSheetDialogSubTitle">Les fonctionnalités d\'IA sont toujours facultatives.</string>
     <string name="newAddressBarOptionBottomSheetDialogPrimaryButton">Confirmer</string>
     <string name="newAddressBarOptionBottomSheetDialogGhostButton">Pas maintenant</string>
     <string name="newAddressBarOptionBottomSheetDialogFooter">Effectuez les réglages dans Paramètres &gt; Fonctionnalités d\'IA.</string>

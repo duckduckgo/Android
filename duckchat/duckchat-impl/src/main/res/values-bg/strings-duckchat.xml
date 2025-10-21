@@ -71,7 +71,6 @@
     <!-- New Address Bar Option Bottom Sheet Dialog -->
     <string name="newAddressBarOptionBottomSheetDialogSearchText">Търсене или въвеждане на адрес</string>
     <string name="newAddressBarOptionBottomSheetDialogTitle">Превключвайте между търсене и AI чат</string>
-    <string name="newAddressBarOptionBottomSheetDialogSubTitle">AI функциите винаги са незадължителни.</string>
     <string name="newAddressBarOptionBottomSheetDialogPrimaryButton">Потвърдете</string>
     <string name="newAddressBarOptionBottomSheetDialogGhostButton">Не сега</string>
     <string name="newAddressBarOptionBottomSheetDialogFooter">Промени в Настройки &gt; функции на ИИ.</string>

@@ -71,7 +71,6 @@
     <!-- New Address Bar Option Bottom Sheet Dialog -->
     <string name="newAddressBarOptionBottomSheetDialogSearchText">Hae tai anna osoite</string>
     <string name="newAddressBarOptionBottomSheetDialogTitle">Vaihda haun ja tekoälykeskustelun välillä</string>
-    <string name="newAddressBarOptionBottomSheetDialogSubTitle">Tekoälyominaisuudet ovat aina valinnaisia.</string>
     <string name="newAddressBarOptionBottomSheetDialogPrimaryButton">Vahvista</string>
     <string name="newAddressBarOptionBottomSheetDialogGhostButton">Ei nyt</string>
     <string name="newAddressBarOptionBottomSheetDialogFooter">Säädä kohdassa Asetukset &gt; Tekoälyominaisuudet.</string>

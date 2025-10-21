@@ -71,7 +71,6 @@
     <!-- New Address Bar Option Bottom Sheet Dialog -->
     <string name="newAddressBarOptionBottomSheetDialogSearchText">Otsi või sisesta aadress</string>
     <string name="newAddressBarOptionBottomSheetDialogTitle">Vaheta otsingu ja tehisintellekti vestluse vahel</string>
-    <string name="newAddressBarOptionBottomSheetDialogSubTitle">Tehisintellekti funktsioonid on alati valikulised.</string>
     <string name="newAddressBarOptionBottomSheetDialogPrimaryButton">Kinnita</string>
     <string name="newAddressBarOptionBottomSheetDialogGhostButton">Mitte praegu</string>
     <string name="newAddressBarOptionBottomSheetDialogFooter">Kohanda menüüs Seaded &gt; Tehisintellekti funktsioonid.</string>

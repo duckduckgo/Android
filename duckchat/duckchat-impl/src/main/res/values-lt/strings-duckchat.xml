@@ -71,7 +71,6 @@
     <!-- New Address Bar Option Bottom Sheet Dialog -->
     <string name="newAddressBarOptionBottomSheetDialogSearchText">Ieškoti arba įvesti adresą</string>
     <string name="newAddressBarOptionBottomSheetDialogTitle">Perjunkite paiešką ir DI pokalbius</string>
-    <string name="newAddressBarOptionBottomSheetDialogSubTitle">DI funkcijos visada yra pasirenkamos.</string>
     <string name="newAddressBarOptionBottomSheetDialogPrimaryButton">Patvirtinti</string>
     <string name="newAddressBarOptionBottomSheetDialogGhostButton">Ne dabar</string>
     <string name="newAddressBarOptionBottomSheetDialogFooter">Koreguokite skiltyje „Nustatymai“ &gt; „DI funkcijos“.</string>
