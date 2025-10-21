@@ -106,6 +106,7 @@ class SubscriptionSettingsViewModel @Inject constructor(
                 showFeedback = privacyProUnifiedFeedback.shouldUseUnifiedFeedback(source = SUBSCRIPTION_SETTINGS),
                 activeOffers = subscription.activeOffers,
                 showRebrandingBanner = shouldShowRebrandingBanner(),
+                switchPlanAvailable = subscriptionsManager.isSwitchPlanAvailable()
             ),
         )
     }
@@ -173,6 +174,7 @@ class SubscriptionSettingsViewModel @Inject constructor(
             val showFeedback: Boolean = false,
             val activeOffers: List<ActiveOfferType>,
             val showRebrandingBanner: Boolean = false,
+            val switchPlanAvailable: Boolean,
         ) : ViewState()
     }
 }

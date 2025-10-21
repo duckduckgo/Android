@@ -174,6 +174,10 @@ class SubscriptionSettingsActivity : DuckDuckGoActivity() {
             binding.subscriptionActiveStatusContainer.isVisible = true
             binding.subscriptionExpiredStatusContainer.isVisible = false
 
+            if (viewState.switchPlanAvailable) {
+                // TODO Add/edit views for switching plan
+            }
+
             // Free Trial active
             if (viewState.activeOffers.contains(ActiveOfferType.TRIAL)) {
                 binding.subscriptionActiveStatusTextView.text = getString(string.subscriptionStatusFreeTrial)
