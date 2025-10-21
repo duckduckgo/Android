@@ -75,4 +75,6 @@
     <string name="newAddressBarOptionBottomSheetDialogSearchOnly">Search Only</string>
     <string name="newAddressBarOptionBottomSheetDialogSearchAndDuckAi">Search &amp; Duck.ai</string>
     <string name="newAddressBarOptionBottomSheetDialogHeader">Address bar option</string>
+    <string name="newAddressBarOptionBottomSheetDialogTitle">Want Easier Access\nto AI Chat?</string>
+
 </resources>
