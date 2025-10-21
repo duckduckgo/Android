@@ -99,14 +99,23 @@ class SubscriptionFeedbackSubmitFragment : SubscriptionFeedbackFragment(R.layout
             }
             binding.feedbackSubmitDescription.hint = getString(R.string.feedbackSubmitVpnDescriptionHint)
 
-            if (privacyProFeature.allowEmailFeedback().isEnabled()) {
-                binding.showEmail()
-            } else {
+            if (privacyProFeature.useSubscriptionSupport().isEnabled()) {
                 binding.hideEmail()
+                binding.feedbackSubmitContactSupportByLine.show()
+                binding.feedbackSubmitContactSupportByLine.setClickableLink(
+                    "support_link",
+                    SpannableString(getText(R.string.feedbackSubmitContactSupport)),
+                ) {
+                    listener.onContactSupportOpened()
+                }
+            } else {
+                binding.showEmail()
+                binding.feedbackSubmitContactSupportByLine.gone()
             }
         } else {
             binding.feedbackSubmitHeader.gone()
             binding.feedbackSubmitByLine.gone()
+            binding.feedbackSubmitContactSupportByLine.gone()
             binding.hideEmail()
             if (reportType == GENERAL_FEEDBACK) {
                 binding.feedbackSubmitDescription.hint = getString(R.string.feedbackSubmitGeneralDescriptionHint)
@@ -181,6 +190,7 @@ class SubscriptionFeedbackSubmitFragment : SubscriptionFeedbackFragment(R.layout
         )
 
         fun onFaqsOpened()
+        fun onContactSupportOpened()
     }
 
     companion object {

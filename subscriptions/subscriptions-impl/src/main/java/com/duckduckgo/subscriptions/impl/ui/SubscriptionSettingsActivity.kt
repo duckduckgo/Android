@@ -148,21 +148,10 @@ class SubscriptionSettingsActivity : DuckDuckGoActivity() {
     }
 
     private fun renderView(viewState: ViewState.Ready) {
-        // Privacy Pro Rebranding active
-        val removeFromDeviceMessage: Int
-        if (viewState.rebrandingEnabled) {
-            removeFromDeviceMessage = string.removeFromDeviceDescriptionRebranding
-            binding.subscriptionSettingsProductName.setText(string.privacyProRebranding)
-            binding.activateOnOtherDevices.setText(string.activateOnOtherDevicesRebranding)
-            binding.faq.setPrimaryText(getString(string.privacyProFaqRebranding))
-            binding.faq.setSecondaryText(getString(string.privacyProFaqSecondaryRebranding))
-        } else {
-            removeFromDeviceMessage = string.removeFromDeviceDescription
-            binding.subscriptionSettingsProductName.setText(string.privacyPro)
-            binding.activateOnOtherDevices.setText(string.activateOnOtherDevices)
-            binding.faq.setPrimaryText(getString(string.privacyProFaq))
-            binding.faq.setSecondaryText(getString(string.privacyProFaqSecondary))
-        }
+        binding.subscriptionSettingsProductName.setText(string.ddg_subscription)
+        binding.activateOnOtherDevices.setText(string.activateOnOtherDevices)
+        binding.faq.setPrimaryText(getString(string.privacyProFaq))
+        binding.faq.setSecondaryText(getString(string.privacyProFaqSecondary))
 
         if (viewState.showRebrandingBanner) {
             binding.includePrivacyProRebrandingBanner.root.show()
@@ -243,21 +232,11 @@ class SubscriptionSettingsActivity : DuckDuckGoActivity() {
 
         if (viewState.email == null) {
             binding.manageEmail.gone()
-            val secondaryTextRes = if (viewState.rebrandingEnabled) {
-                string.addToDeviceSecondaryTextWithoutEmailRebranding
-            } else {
-                string.addToDeviceSecondaryTextWithoutEmail
-            }
-            binding.addToDevice.setSecondaryText(resources.getString(secondaryTextRes))
+            binding.addToDevice.setSecondaryText(resources.getString(string.addToDeviceSecondaryTextWithoutEmail))
         } else {
             binding.manageEmail.show()
             binding.manageEmail.setSecondaryText(viewState.email)
-            val secondaryTextRes = if (viewState.rebrandingEnabled) {
-                string.addToDeviceSecondaryTextWithEmailRebranding
-            } else {
-                string.addToDeviceSecondaryTextWithEmail
-            }
-            binding.addToDevice.setSecondaryText(resources.getString(secondaryTextRes))
+            binding.addToDevice.setSecondaryText(resources.getString(string.addToDeviceSecondaryTextWithEmail))
         }
 
         if (viewState.showFeedback) {
@@ -269,7 +248,7 @@ class SubscriptionSettingsActivity : DuckDuckGoActivity() {
         binding.removeDevice.setClickListener {
             TextAlertDialogBuilder(this)
                 .setTitle(string.removeFromDevice)
-                .setMessage(removeFromDeviceMessage)
+                .setMessage(string.removeFromDeviceDescription)
                 .setPositiveButton(string.removeSubscription, DESTRUCTIVE)
                 .setNegativeButton(string.cancel, GHOST_ALT)
                 .addEventListener(

@@ -167,6 +167,7 @@
     <string name="settingsAddressBarPosition">Imposta la posizione della barra degli indirizzi</string>
     <string name="settingsEnableVoiceSearch">Attiva la ricerca vocale privata</string>
     <string name="settingsDDGOnOtherPlatforms">DuckDuckGo su altre piattaforme</string>
+    <string name="settingsDuckAi">Funzionalità IA</string>
 
     <!-- Private Search -->
     <string name="privateSearchActivityTitle">Ricerca privata</string>
@@ -246,13 +247,13 @@
     <string name="settingsAutomaticallyClearWhenAppExit30Minutes">Uscita dall\'app, inattività di 30 minuti</string>
     <string name="settingsAutomaticallyClearWhenAppExit60Minutes">Uscita dall\'app, inattività di 1 ora</string>
     <string name="settingsClearAiDataTitle">Cancella le chat di Duck.ai</string>
-    <string name="settingsClearAiDataMessage">Fire Button eliminerà anche la cronologia di Duck.ai</string>
+    <string name="settingsClearAiDataDeleteMessage">Fire Button eliminerà anche la cronologia di Duck.ai, incluse le chat fissate.</string>
 
     <!-- About Activity -->
     <string name="aboutActivityTitle">Info su DuckDuckGo</string>
     <string name="aboutActivityTitleNew">Informazioni</string>
     <string name="aboutHeaderNewTagLine">Protezione. Privacy.  Serenità.</string>
-    <string name="aboutDescriptionBrandUpdate2025">Welcome to the Duck Side!\n\nDuckDuckGo è la società indipendente di protezione online per chiunque voglia riprendere il controllo dei propri dati personali.\n\nDuckDuckGo ritiene che il modo migliore per proteggere le informazioni personali da hacker, truffatori e aziende che violano la privacy sia impedire del tutto che vengano raccolte. Ecco perché milioni di persone <annotation type="chart_comparison">scelgono DuckDuckGo invece di Chrome e altri browser</annotation> per cercare e navigare online. Il nostro motore di ricerca integrato è come Google, ma non tiene mai traccia delle ricerche. E le nostre misure di protezione per la navigazione, come il blocco dei sistemi di tracciamento degli annunci e dei cookie, aiutano a impedire ad altre aziende di raccogliere i dati. Inoltre, il nostro browser è gratuito: guadagniamo con gli <annotation type="privacy_respecting_ads">annunci di ricerca che rispettano la privacy</annotation>, non sfruttando i dati.\n\nInoltre, offriamo anche <annotation type="ppro_help_page">Privacy Pro</annotation>, un servizio di abbonamento tre in uno, integrato nel nostro browser. Gli abbonati a Privacy Pro ottengono una protezione della privacy maggiore con una <annotation type="vpn_help_page">VPN</annotation> veloce e semplice che aiuta a proteggere l\'attività online, un servizio che trova e rimuove le informazioni personali dai siti di ricerca persone e un servizio che ripristina l\'identità in caso di furto.\n\nRiprendi il controllo delle informazioni personali con il browser progettato per la protezione dei dati, non per la loro raccolta.</string>
+    <string name="aboutDescriptionBrandUpdate2025">Welcome to the Duck Side!\n\nDuckDuckGo è la società indipendente di protezione online per chiunque voglia riprendere il controllo dei propri dati personali.\n\nDuckDuckGo ritiene che il modo migliore per proteggere le informazioni personali da hacker, truffatori e aziende che violano la privacy sia impedire del tutto che vengano raccolte. Ecco perché milioni di persone <annotation type="chart_comparison">scelgono DuckDuckGo invece di Chrome e altri browser</annotation> per cercare e navigare online. Il nostro motore di ricerca integrato è come Google, ma non tiene mai traccia delle ricerche. E le nostre misure di protezione per la navigazione, come il blocco dei sistemi di tracciamento degli annunci e dei cookie, aiutano a impedire ad altre aziende di raccogliere i dati. Inoltre, il nostro browser è gratuito: guadagniamo con gli <annotation type="privacy_respecting_ads">annunci di ricerca che rispettano la privacy</annotation>, non sfruttando i dati.\n\nInoltre, offriamo anche <annotation type="ppro_help_page">l\'abbonamento DuckDuckGo</annotation> integrato nel nostro browser. Gli abbonati ottengono una protezione della privacy ancora maggiore grazie a una <annotation type="vpn_help_page">VPN</annotation> veloce e semplice che aiuta a proteggere la tua attività online, l\'accesso a modelli di intelligenza artificiale avanzati nel nostro servizio di chat AI privata Duck.ai, un servizio che individua e rimuove le tue informazioni personali dai siti di ricerca persone e un servizio che ripristina la tua identità in caso di furto.\n\nRiprendi il controllo delle informazioni personali con il browser progettato per la protezione dei dati, non per la loro raccolta.</string>
     <string name="no_suggestions">Nessun suggerimento</string>
 
     <!-- Broken Site Activity -->
@@ -833,7 +834,7 @@
     <string name="onboardingInContextEndDaxDialogDescription">Ricorda: quando navighi con me gli annunci inquietanti non possono seguirti. 👌</string>
     <string name="onboardingEndDaxDialogButton">Batti cinque!</string>
     <string name="onboardingPrivacyProDaxDialogTitle">Oh, prima che me ne dimentichi...</string>
-    <string name="onboardingPrivacyProDaxDialogDescription"><![CDATA[DuckDuckGo offre anche una <b>VPN sicura + altre 2 protezioni premium</b>, disponibili con un <b>abbonamento opzionale a pagamento</b>.]]></string>
+    <string name="onboardingPrivacyProDaxDialogDescription"><![CDATA[DuckDuckGo offre anche un <b>abbonamento a pagamento</b> facoltativo, con una <b>VPN sicura</b> e <b>un\'IA avanzata e</b> privata.]]></string>
     <string name="onboardingPrivacyProDaxDialogOkButton">Ulteriori informazioni</string>
     <string name="onboardingPrivacyProDaxDialogFreeTrialOkButton">Prova gratuitamente!</string>
     <string name="onboardingPrivacyProDaxDialogCancelButton">Salta</string>
@@ -922,12 +923,6 @@
     </plurals>
 
     <string name="bbOnboardingTrackersBlockedDialogDescription">☝️Tocca lo scudo per maggiori informazioni.️</string>
-
-    <!-- Privacy Pro Rebranding-->
-    <string name="aboutDescriptionBrandUpdate2025Rebranding">Welcome to the Duck Side!\n\nDuckDuckGo è la società indipendente di protezione online per chiunque voglia riprendere il controllo dei propri dati personali.\n\nDuckDuckGo ritiene che il modo migliore per proteggere le informazioni personali da hacker, truffatori e aziende che violano la privacy sia impedire del tutto che vengano raccolte. Ecco perché milioni di persone <annotation type="chart_comparison">scelgono DuckDuckGo invece di Chrome e altri browser</annotation> per cercare e navigare online. Il nostro motore di ricerca integrato è come Google, ma non tiene mai traccia delle ricerche. E le nostre protezioni di navigazione, come il blocco dei sistemi di tracciamento degli annunci e dei cookie, aiutano a impedire ad altre aziende di raccogliere i dati. Inoltre, il nostro browser è gratuito: guadagniamo con gli <annotation type="privacy_respecting_ads">annunci di ricerca che rispettano la privacy</annotation>, non sfruttando i tuoi dati.\n\nInoltre, offriamo anche <annotation type="ppro_help_page">l\'abbonamento DuckDuckGo</annotation> integrato nel nostro browser. Gli abbonati ottengono una protezione della privacy ancora maggiore grazie a una <annotation type="vpn_help_page">VPN</annotation> veloce e semplice che aiuta a proteggere la tua attività online, l\'accesso a modelli di intelligenza artificiale avanzati nel nostro servizio di chat AI privata Duck.ai, un servizio che individua e rimuove le tue informazioni personali dai siti di ricerca persone e un servizio che ripristina la tua identità in caso di furto.\n\nRiprendi il controllo delle tue informazioni personali con il browser progettato per la protezione dei dati, non per la loro raccolta.</string>
-    <string name="onboardingPrivacyProDaxDialogDescriptionRebranding"><![CDATA[DuckDuckGo offre anche un <b>abbonamento a pagamento</b> facoltativo, con una <b>VPN sicura</b> e <b>un\'IA avanzata e</b> privata.]]></string>
-    <string name="settingsDuckAiRebranding">Funzionalità IA</string>
-    <string name="settingsDuckAi">Duck.ai</string>
 
     <!--TabSwitcher Trackers Animation-->
     <string name="showTrackerCountInTabSwitcher">Mostra il numero dei sistemi di tracciamento nel Selettore schede</string>

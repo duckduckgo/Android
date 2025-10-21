@@ -1,6 +1,13 @@
-
     #!/bin/bash
     echo "Running spotless check"
     ./gradlew spotlessApply
+
+    echo "Running PixelDefinitions lint fix (npm run lint.fix)"
+    pushd PixelDefinitions >/dev/null
+    npm install
+    # Auto fix pixel-schema lint issues
+    npm run lint.fix
+    popd >/dev/null
+
     git add `git diff --name-only --cached`
     exit 0

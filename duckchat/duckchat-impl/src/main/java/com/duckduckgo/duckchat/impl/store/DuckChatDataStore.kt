@@ -50,26 +50,39 @@ import javax.inject.Inject
 
 interface DuckChatDataStore {
     suspend fun setDuckChatUserEnabled(enabled: Boolean)
+
     suspend fun setInputScreenUserSetting(enabled: Boolean)
+
     suspend fun setShowInBrowserMenu(showDuckChat: Boolean)
+
     suspend fun setShowInAddressBar(showDuckChat: Boolean)
 
     fun observeDuckChatUserEnabled(): Flow<Boolean>
+
     fun observeInputScreenUserSettingEnabled(): Flow<Boolean>
+
     fun observeShowInBrowserMenu(): Flow<Boolean>
+
     fun observeShowInAddressBar(): Flow<Boolean>
 
     suspend fun isDuckChatUserEnabled(): Boolean
+
     suspend fun isInputScreenUserSettingEnabled(): Boolean
+
     suspend fun getShowInBrowserMenu(): Boolean
+
     suspend fun getShowInAddressBar(): Boolean
 
     suspend fun fetchAndClearUserPreferences(): String?
+
     suspend fun updateUserPreferences(userPreferences: String?)
 
     suspend fun registerOpened()
+
     suspend fun wasOpenedBefore(): Boolean
+
     suspend fun lastSessionTimestamp(): Long
+
     suspend fun sessionDeltaTimestamp(): Long
 }
 
@@ -81,7 +94,6 @@ class SharedPreferencesDuckChatDataStore @Inject constructor(
     @IsMainProcess private val isMainProcess: Boolean,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
 ) : DuckChatDataStore {
-
     private object Keys {
         val DUCK_CHAT_USER_ENABLED = booleanPreferencesKey(name = "DUCK_CHAT_USER_ENABLED")
         val DUCK_AI_INPUT_SCREEN_USER_SETTING = booleanPreferencesKey(name = "DUCK_AI_INPUT_SCREEN_USER_SETTING")
@@ -93,11 +105,10 @@ class SharedPreferencesDuckChatDataStore @Inject constructor(
         val DUCK_CHAT_SESSION_DELTA_TIMESTAMP = longPreferencesKey(name = "DUCK_CHAT_SESSION_DELTA_TIMESTAMP")
     }
 
-    private fun Preferences.defaultShowInAddressBar(): Boolean {
-        return this[DUCK_CHAT_SHOW_IN_ADDRESS_BAR]
+    private fun Preferences.defaultShowInAddressBar(): Boolean =
+        this[DUCK_CHAT_SHOW_IN_ADDRESS_BAR]
             ?: this[DUCK_CHAT_SHOW_IN_MENU]
             ?: true
-    }
 
     init {
         if (isMainProcess) {
@@ -105,34 +116,39 @@ class SharedPreferencesDuckChatDataStore @Inject constructor(
         }
     }
 
-    private fun storeDerivedValues() = appCoroutineScope.launch(dispatchers.io()) {
-        store.data.firstOrNull()?.let { prefs ->
-            if (prefs[DUCK_CHAT_SHOW_IN_ADDRESS_BAR] == null) {
-                val default = prefs[DUCK_CHAT_SHOW_IN_MENU] ?: true
-                store.edit { it[DUCK_CHAT_SHOW_IN_ADDRESS_BAR] = default }
+    private fun storeDerivedValues() =
+        appCoroutineScope.launch(dispatchers.io()) {
+            store.data.firstOrNull()?.let { prefs ->
+                if (prefs[DUCK_CHAT_SHOW_IN_ADDRESS_BAR] == null) {
+                    val default = prefs[DUCK_CHAT_SHOW_IN_MENU] ?: true
+                    store.edit { it[DUCK_CHAT_SHOW_IN_ADDRESS_BAR] = default }
+                }
             }
         }
-    }
 
-    private val duckChatUserEnabled: StateFlow<Boolean> = store.data
-        .map { prefs -> prefs[DUCK_CHAT_USER_ENABLED] ?: true }
-        .distinctUntilChanged()
-        .stateIn(appCoroutineScope, SharingStarted.Eagerly, true)
+    private val duckChatUserEnabled: StateFlow<Boolean> =
+        store.data
+            .map { prefs -> prefs[DUCK_CHAT_USER_ENABLED] ?: true }
+            .distinctUntilChanged()
+            .stateIn(appCoroutineScope, SharingStarted.Eagerly, true)
 
-    private val inputScreenUserSettingEnabled: StateFlow<Boolean> = store.data
-        .map { prefs -> prefs[DUCK_AI_INPUT_SCREEN_USER_SETTING] ?: false }
-        .distinctUntilChanged()
-        .stateIn(appCoroutineScope, SharingStarted.Eagerly, false)
+    private val inputScreenUserSettingEnabled: StateFlow<Boolean> =
+        store.data
+            .map { prefs -> prefs[DUCK_AI_INPUT_SCREEN_USER_SETTING] ?: false }
+            .distinctUntilChanged()
+            .stateIn(appCoroutineScope, SharingStarted.Eagerly, false)
 
-    private val duckChatShowInBrowserMenu: StateFlow<Boolean> = store.data
-        .map { prefs -> prefs[DUCK_CHAT_SHOW_IN_MENU] ?: true }
-        .distinctUntilChanged()
-        .stateIn(appCoroutineScope, SharingStarted.Eagerly, true)
+    private val duckChatShowInBrowserMenu: StateFlow<Boolean> =
+        store.data
+            .map { prefs -> prefs[DUCK_CHAT_SHOW_IN_MENU] ?: true }
+            .distinctUntilChanged()
+            .stateIn(appCoroutineScope, SharingStarted.Eagerly, true)
 
-    private val duckChatShowInAddressBar: StateFlow<Boolean> = store.data
-        .map { prefs -> prefs.defaultShowInAddressBar() }
-        .distinctUntilChanged()
-        .stateIn(appCoroutineScope, SharingStarted.Eagerly, true)
+    private val duckChatShowInAddressBar: StateFlow<Boolean> =
+        store.data
+            .map { prefs -> prefs.defaultShowInAddressBar() }
+            .distinctUntilChanged()
+            .stateIn(appCoroutineScope, SharingStarted.Eagerly, true)
 
     override suspend fun setDuckChatUserEnabled(enabled: Boolean) {
         store.edit { prefs -> prefs[DUCK_CHAT_USER_ENABLED] = enabled }
@@ -158,21 +174,13 @@ class SharedPreferencesDuckChatDataStore @Inject constructor(
 
     override fun observeShowInAddressBar(): Flow<Boolean> = duckChatShowInAddressBar
 
-    override suspend fun isDuckChatUserEnabled(): Boolean {
-        return store.data.firstOrNull()?.let { it[DUCK_CHAT_USER_ENABLED] } ?: true
-    }
+    override suspend fun isDuckChatUserEnabled(): Boolean = store.data.firstOrNull()?.let { it[DUCK_CHAT_USER_ENABLED] } ?: true
 
-    override suspend fun isInputScreenUserSettingEnabled(): Boolean {
-        return store.data.firstOrNull()?.let { it[DUCK_AI_INPUT_SCREEN_USER_SETTING] } ?: false
-    }
+    override suspend fun isInputScreenUserSettingEnabled(): Boolean = store.data.firstOrNull()?.let { it[DUCK_AI_INPUT_SCREEN_USER_SETTING] } ?: false
 
-    override suspend fun getShowInBrowserMenu(): Boolean {
-        return store.data.firstOrNull()?.let { it[DUCK_CHAT_SHOW_IN_MENU] } ?: true
-    }
+    override suspend fun getShowInBrowserMenu(): Boolean = store.data.firstOrNull()?.let { it[DUCK_CHAT_SHOW_IN_MENU] } ?: true
 
-    override suspend fun getShowInAddressBar(): Boolean {
-        return store.data.firstOrNull()?.defaultShowInAddressBar() ?: true
-    }
+    override suspend fun getShowInAddressBar(): Boolean = store.data.firstOrNull()?.defaultShowInAddressBar() ?: true
 
     override suspend fun fetchAndClearUserPreferences(): String? {
         val userPreferences = store.data.map { it[DUCK_CHAT_USER_PREFERENCES] }.firstOrNull()
@@ -200,15 +208,9 @@ class SharedPreferencesDuckChatDataStore @Inject constructor(
         store.edit { it[DUCK_CHAT_SESSION_DELTA_TIMESTAMP] = delta }
     }
 
-    override suspend fun wasOpenedBefore(): Boolean {
-        return store.data.map { it[DUCK_CHAT_OPENED] }.firstOrNull() ?: false
-    }
+    override suspend fun wasOpenedBefore(): Boolean = store.data.map { it[DUCK_CHAT_OPENED] }.firstOrNull() ?: false
 
-    override suspend fun lastSessionTimestamp(): Long {
-        return store.data.firstOrNull()?.let { it[DUCK_CHAT_LAST_SESSION_TIMESTAMP] } ?: 0L
-    }
+    override suspend fun lastSessionTimestamp(): Long = store.data.firstOrNull()?.let { it[DUCK_CHAT_LAST_SESSION_TIMESTAMP] } ?: 0L
 
-    override suspend fun sessionDeltaTimestamp(): Long {
-        return store.data.firstOrNull()?.let { it[DUCK_CHAT_SESSION_DELTA_TIMESTAMP] } ?: 0L
-    }
+    override suspend fun sessionDeltaTimestamp(): Long = store.data.firstOrNull()?.let { it[DUCK_CHAT_SESSION_DELTA_TIMESTAMP] } ?: 0L
 }

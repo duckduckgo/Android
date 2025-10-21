@@ -20,6 +20,7 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import androidx.room.Transaction
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -48,7 +49,7 @@ interface JobSchedulingDao {
     @Query(
         """
         UPDATE pir_scan_job_record
-        SET status = :newStatus, lastScanDateInMillis = :newLastScanDateMillis
+        SET status = :newStatus, lastScanDateInMillis = :newLastScanDateMillis, deprecated = :deprecated
         WHERE brokerName = :brokerName AND userProfileId = :profileQueryId
     """,
     )
@@ -57,6 +58,7 @@ interface JobSchedulingDao {
         profileQueryId: Long,
         newStatus: String,
         newLastScanDateMillis: Long,
+        deprecated: Boolean,
     )
 
     @Query("SELECT * FROM pir_email_confirmation_job_record WHERE emailConfirmationLink = '' AND deprecated == 0 ORDER BY linkFetchAttemptCount")
@@ -89,9 +91,28 @@ interface JobSchedulingDao {
     @Query("DELETE from pir_scan_job_record")
     fun deleteAllScanJobRecords()
 
+    @Query("DELETE from pir_scan_job_record WHERE userProfileId IN (:profileQueryIds)")
+    fun deleteScanJobRecordsForProfiles(profileQueryIds: List<Long>)
+
+    @Query("DELETE from pir_scan_job_record WHERE userProfileId IN (:profileQueryIds) AND status != 'MATCHES_FOUND'")
+    fun deleteScanJobRecordsWithoutMatchesForProfiles(profileQueryIds: List<Long>)
+
     @Query("DELETE from pir_optout_job_record")
     fun deleteAllOptOutJobRecords()
 
+    @Query("DELETE from pir_optout_job_record WHERE userProfileId IN (:profileQueryIds)")
+    fun deleteOptOutJobRecordsForProfiles(profileQueryIds: List<Long>)
+
     @Query("DELETE from pir_email_confirmation_job_record")
     fun deleteAllEmailConfirmationJobRecords()
+
+    @Query("DELETE from pir_email_confirmation_job_record WHERE userProfileId IN (:profileQueryIds)")
+    fun deleteEmailConfirmationJobRecordsForProfiles(profileQueryIds: List<Long>)
+
+    @Transaction
+    fun deleteJobRecordsForProfiles(profileQueryIds: List<Long>) {
+        deleteScanJobRecordsForProfiles(profileQueryIds)
+        deleteOptOutJobRecordsForProfiles(profileQueryIds)
+        deleteEmailConfirmationJobRecordsForProfiles(profileQueryIds)
+    }
 }

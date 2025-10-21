@@ -23,6 +23,8 @@
 
     <ImageView
         android:id="@+id/actionVoice"
+        android:layout_marginTop="6dp"
+        android:layout_marginBottom="8dp"
         android:layout_width="36dp"
         android:layout_height="36dp"
         android:background="@drawable/selectable_item_experimental_background"
@@ -33,6 +35,8 @@
 
     <ImageView
         android:id="@+id/actionNewLine"
+        android:layout_marginTop="6dp"
+        android:layout_marginBottom="8dp"
         android:layout_width="36dp"
         android:layout_height="36dp"
         android:layout_marginStart="8dp"
@@ -44,6 +48,8 @@
 
     <ImageView
         android:id="@+id/actionSend"
+        android:layout_marginTop="6dp"
+        android:layout_marginBottom="8dp"
         android:layout_width="36dp"
         android:layout_height="36dp"
         android:layout_marginStart="8dp"

@@ -16,10 +16,14 @@
 
 package com.duckduckgo.contentscopescripts.impl.features.apimanipulation
 
+import com.duckduckgo.app.di.AppCoroutineScope
+import com.duckduckgo.app.di.IsMainProcess
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.contentscopescripts.impl.features.apimanipulation.store.ApiManipulationStore
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
@@ -41,20 +45,40 @@ import javax.inject.Inject
 
 interface ApiManipulationRepository {
     suspend fun insertJsonData(jsonData: String): Boolean
-    suspend fun getJsonData(): String?
+    fun getJsonData(): String
 }
 
 @ContributesBinding(AppScope::class)
 class RealApiManipulationRepository @Inject constructor(
     private val apiManipulationStore: ApiManipulationStore,
     private val dispatcherProvider: DispatcherProvider,
+    @AppCoroutineScope private val coroutineScope: CoroutineScope,
+    @IsMainProcess private val isMainProcess: Boolean,
 ) : ApiManipulationRepository {
+
+    private var jsonData: String = EMPTY_JSON
+
+    init {
+        coroutineScope.launch(dispatcherProvider.io()) {
+            if (isMainProcess) {
+                loadToMemory()
+            }
+        }
+    }
 
     override suspend fun insertJsonData(jsonData: String): Boolean {
         return withContext(dispatcherProvider.io()) { apiManipulationStore.insertJsonData(jsonData) }
     }
 
-    override suspend fun getJsonData(): String? {
-        return withContext(dispatcherProvider.io()) { apiManipulationStore.getJsonData() }
+    override fun getJsonData(): String {
+        return jsonData
+    }
+
+    private suspend fun loadToMemory() {
+        jsonData = apiManipulationStore.getJsonData() ?: EMPTY_JSON
+    }
+
+    companion object {
+        const val EMPTY_JSON = "{}"
     }
 }

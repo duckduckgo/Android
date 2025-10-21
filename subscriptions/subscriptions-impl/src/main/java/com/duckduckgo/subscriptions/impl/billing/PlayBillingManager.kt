@@ -20,6 +20,7 @@ import android.app.Activity
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import com.android.billingclient.api.ProductDetails
+import com.android.billingclient.api.Purchase
 import com.android.billingclient.api.PurchaseHistoryRecord
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
@@ -65,6 +66,7 @@ interface PlayBillingManager {
     val products: List<ProductDetails>
     val productsFlow: Flow<List<ProductDetails>>
     val purchaseHistory: List<PurchaseHistoryRecord>
+    val purchases: List<Purchase>
     val purchaseState: Flow<PurchaseState>
 
     /**
@@ -92,6 +94,12 @@ interface PlayBillingManager {
         oldPurchaseToken: String,
         replacementMode: SubscriptionReplacementMode,
     )
+
+    /**
+     * Gets the current purchase token from active purchases (queryPurchasesAsync)
+     * This is the preferred method over purchase history for getting current tokens
+     */
+    fun getLatestPurchaseToken(): String?
 }
 
 @SingleInstanceIn(AppScope::class)
@@ -123,7 +131,14 @@ class RealPlayBillingManager @Inject constructor(
         get() = _products.asStateFlow()
 
     // Purchase History
+    @Deprecated(
+        message = "purchaseHistory is deprecated",
+        replaceWith = ReplaceWith("purchases"),
+    )
     override var purchaseHistory = emptyList<PurchaseHistoryRecord>()
+
+    // Active Purchases
+    override var purchases = emptyList<Purchase>()
 
     override fun onCreate(owner: LifecycleOwner) {
         connectAsyncWithRetry()
@@ -136,6 +151,7 @@ class RealPlayBillingManager @Inject constructor(
                 owner.lifecycleScope.launch(dispatcherProvider.io()) {
                     loadProducts()
                     loadPurchaseHistory()
+                    loadPurchases()
                 }
             }
         }
@@ -169,6 +185,7 @@ class RealPlayBillingManager @Inject constructor(
                 Success -> {
                     loadProducts()
                     loadPurchaseHistory()
+                    loadPurchases()
                     true // success, don't retry
                 }
 
@@ -346,6 +363,36 @@ class RealPlayBillingManager @Inject constructor(
             }
             SubscriptionsPurchaseHistoryResult.Failure -> {
             }
+        }
+    }
+
+    private suspend fun loadPurchases() {
+        when (val result = billingClient.queryPurchases()) {
+            is QueryPurchasesResult.Success -> {
+                purchases = result.purchases
+                logcat { "Billing: Loaded ${result.purchases.size} active purchases" }
+            }
+            is QueryPurchasesResult.Failure -> {
+                logcat { "Billing: Failed to load purchases: ${result.billingError} - ${result.debugMessage}" }
+            }
+        }
+    }
+
+    override fun getLatestPurchaseToken(): String? {
+        val activePurchases = purchases.filter { purchase: Purchase ->
+            purchase.products.contains(BASIC_SUBSCRIPTION) &&
+                purchase.purchaseState == Purchase.PurchaseState.PURCHASED
+        }
+
+        val latestPurchase = activePurchases.maxByOrNull { it.purchaseTime }
+
+        return if (latestPurchase != null) {
+            val tokenPreview = latestPurchase.purchaseToken.take(10) + "..."
+            logcat { "Billing: Latest active purchase token preview: $tokenPreview" }
+            latestPurchase.purchaseToken
+        } else {
+            logcat { "Billing: No active purchase token found" }
+            null
         }
     }
 }

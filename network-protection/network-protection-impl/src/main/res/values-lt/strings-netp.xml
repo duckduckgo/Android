@@ -194,7 +194,7 @@
     <string name="netpNotificationCTAReconnectNow">Prisijunk iš naujo dabar</string>
     <string name="netpNotificationSnoozeTitle">VPN pristabdytas</string>
     <string name="netpNotificationSnoozeBody" instruction="Placeholder is time in hh:mm format">VPN vėl prisijungs %1$s</string>
-    <string name="netpNotificationVpnAccessRevoked">VPN atjungtas dėl pasibaigusios prenumeratos. Prenumeruok „Privacy Pro“, kad iš naujo prisijungtum prie „DuckDuckGo“ VPN.</string>
+    <string name="netpNotificationVpnAccessRevoked">VPN atjungtas dėl pasibaigusios prenumeratos. Prenumeruokite „DuckDuckGo“, kad iš naujo prisijungtumėte prie VPN.</string>
 
     <!-- Geoswitching -->
     <string name="netpGeoswitchingTitle">VPN vieta</string>
@@ -206,7 +206,7 @@
 
     <!-- Access revoked-->
     <string name="netpDialogVpnAccessRevokedTitle">VPN atjungtas dėl pasibaigusios prenumeratos.</string>
-    <string name="netpDialogVpnAccessRevokedBody">„DuckDuckGo“ VPN galima naudoti nemokamai, kol veikia beta versija.</string>
+    <string name="netpDialogVpnAccessRevokedBody">Prenumeruokite „DuckDuckGo“, kad iš naujo prisijungtumėte prie VPN.</string>
     <string name="netpDialogVpnAccessRevokedPositiveAction">Prenumeruoti</string>
     <string name="netpDialogVpnAccessRevokedNegativeAction">Atmesti</string>
 
@@ -264,7 +264,4 @@
     <string name="netpExclusionListLabelAutoExclude">Nesuderinama su VPN</string>
     <string name="netpExclusionListAutoExcludeDescription">Kai kurios programėlės, pavyzdžiui, bankininkystės ar transliacijos programėlės, neveikia gerai su VPN. Įjungus šį nustatymą, mes automatiškai pašalinsime tas programas.</string>
 
-    <!-- Privacy Pro Rebranding-->
-    <string name="netpNotificationVpnAccessRevokedRebranding">VPN atjungtas dėl pasibaigusios prenumeratos. Prenumeruokite „DuckDuckGo“, kad iš naujo prisijungtumėte prie VPN.</string>
-    <string name="netpDialogVpnAccessRevokedBodyRebranding">Prenumeruokite „DuckDuckGo“, kad iš naujo prisijungtumėte prie VPN.</string>
 </resources>

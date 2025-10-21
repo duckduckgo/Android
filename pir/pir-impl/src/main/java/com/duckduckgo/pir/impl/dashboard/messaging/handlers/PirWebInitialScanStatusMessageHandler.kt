@@ -84,7 +84,7 @@ class PirWebInitialScanStatusMessageHandler @Inject constructor(
     }
 
     private suspend fun canRunScan(): Boolean {
-        return pirRepository.getUserProfileQueries().isNotEmpty()
+        return pirRepository.getValidUserProfileQueries().isNotEmpty()
     }
 
     private suspend fun getResultsFound(): List<ScanResult> {

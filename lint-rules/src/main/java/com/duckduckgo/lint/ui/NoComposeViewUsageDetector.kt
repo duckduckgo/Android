@@ -37,6 +37,7 @@ class NoComposeViewUsageDetector : LayoutDetector(), SourceCodeScanner {
     override fun getApplicableElements() = listOf("androidx.compose.ui.platform.ComposeView")
 
     override fun visitElement(context: XmlContext, element: Element) {
+        if (isInDesignSystemModule(context.project.name)) return
         reportComposeViewUsageInXml(context, element)
     }
 
@@ -48,6 +49,7 @@ class NoComposeViewUsageDetector : LayoutDetector(), SourceCodeScanner {
         node: UCallExpression,
         constructor: PsiMethod
     ) {
+        if (isInDesignSystemModule(context.project.name)) return
         reportComposeViewUsageInCode(context, node)
     }
 
@@ -65,6 +67,10 @@ class NoComposeViewUsageDetector : LayoutDetector(), SourceCodeScanner {
             location = context.getLocation(node),
             message = NO_COMPOSE_VIEW_USAGE.getExplanation(TextFormat.RAW)
         )
+    }
+
+    private fun isInDesignSystemModule(projectName: String): Boolean {
+        return projectName.contains("design-system")
     }
 
     companion object {

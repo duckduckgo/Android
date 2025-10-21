@@ -51,12 +51,17 @@ class PixelWideEventSender @Inject constructor(
                 if (event.flowEntryPoint != null) {
                     put(PARAM_CONTEXT_NAME, event.flowEntryPoint)
                 }
+
+                event.steps.forEach { (name, success) ->
+                    put(PARAM_METADATA_STEP_PREFIX + name, success.toString())
+                }
             }
 
         val encodedParameters =
             event.metadata
                 .filterValues { it != null }
                 .mapValues { it.value!! }
+                .mapKeys { PARAM_METADATA_PREFIX + it.key }
 
         val basePixelName = PIXEL_NAME_PREFIX + event.name
 
@@ -94,9 +99,9 @@ class PixelWideEventSender @Inject constructor(
     }
 
     private companion object {
-        const val PIXEL_NAME_PREFIX = "wide."
-        const val COUNT_PIXEL_SUFFIX = ".c"
-        const val DAILY_PIXEL_SUFFIX = ".d"
+        const val PIXEL_NAME_PREFIX = "wide_"
+        const val COUNT_PIXEL_SUFFIX = "_c"
+        const val DAILY_PIXEL_SUFFIX = "_d"
 
         const val PARAM_PLATFORM = "global.platform"
         const val PARAM_TYPE = "global.type"
@@ -107,7 +112,10 @@ class PixelWideEventSender @Inject constructor(
         const val PARAM_APP_VERSION = "app.version"
         const val PARAM_FORM_FACTOR = "app.form_factor"
         const val PARAM_NA_EXPERIMENTS = "app.native_apps_experiments"
-        const val PARAM_DEV_MODE = "dev_mode"
+        const val PARAM_DEV_MODE = "app.dev_mode"
+
+        const val PARAM_METADATA_PREFIX = "feature.data.ext."
+        const val PARAM_METADATA_STEP_PREFIX = PARAM_METADATA_PREFIX + "step."
     }
 }
 

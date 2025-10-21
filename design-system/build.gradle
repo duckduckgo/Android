@@ -58,6 +58,7 @@ dependencies {
     implementation Google.android.material
     implementation AndroidX.constraintLayout
     implementation AndroidX.core.splashscreen
+    implementation AndroidX.fragment.ktx
     implementation AndroidX.recyclerView
     implementation AndroidX.lifecycle.viewModelKtx
     // just to get the dagger annotations

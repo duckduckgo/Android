@@ -824,6 +824,24 @@ class RealDuckChatTest {
     }
 
     @Test
+    fun `when showMainButtonsInInputScreen enabled then showMainButtonsInInputScreen emits true`() = runTest {
+        duckChatFeature.showMainButtonsInInputScreen().setRawStoredState(State(enable = true))
+
+        testee.onPrivacyConfigDownloaded()
+
+        assertTrue(testee.showMainButtonsInInputScreen.value)
+    }
+
+    @Test
+    fun `when showMainButtonsInInputScreen disabled then showMainButtonsInInputScreen emits false`() = runTest {
+        duckChatFeature.showMainButtonsInInputScreen().setRawStoredState(State(enable = false))
+
+        testee.onPrivacyConfigDownloaded()
+
+        assertFalse(testee.showMainButtonsInInputScreen.value)
+    }
+
+    @Test
     fun `when showNewAddressBarOptionChoiceScreen called with dark theme then show dialog with dark theme`() = runTest {
         val mockContext = mock<Context>()
         testee.showNewAddressBarOptionChoiceScreen(mockContext, true)
@@ -994,6 +1012,39 @@ class RealDuckChatTest {
 
         verify(mockDuckChatFeatureRepository, times(0)).setInputScreenUserSetting(any())
         verify(mockPixel).fire(DUCK_CHAT_NEW_ADDRESS_BAR_PICKER_CANCELLED)
+    }
+
+    @Test
+    fun `when input screen disabled then don't show input screen when launched from system search`() = runTest {
+        duckChatFeature.duckAiInputScreen().setRawStoredState(State(false))
+        whenever(mockDuckChatFeatureRepository.observeInputScreenUserSettingEnabled()).thenReturn(flowOf(true))
+        duckChatFeature.showInputScreenOnSystemSearchLaunch().setRawStoredState(State(true))
+
+        testee.onPrivacyConfigDownloaded()
+
+        assertFalse(testee.showInputScreenOnSystemSearchLaunch.value)
+    }
+
+    @Test
+    fun `when input screen enabled but feature disabled then don't show input screen when launched from system search`() = runTest {
+        duckChatFeature.duckAiInputScreen().setRawStoredState(State(true))
+        whenever(mockDuckChatFeatureRepository.observeInputScreenUserSettingEnabled()).thenReturn(flowOf(true))
+        duckChatFeature.showInputScreenOnSystemSearchLaunch().setRawStoredState(State(false))
+
+        testee.onPrivacyConfigDownloaded()
+
+        assertFalse(testee.showInputScreenOnSystemSearchLaunch.value)
+    }
+
+    @Test
+    fun `when input screen enabled and feature flag enabled then show input screen when launched from system search`() = runTest {
+        duckChatFeature.duckAiInputScreen().setRawStoredState(State(true))
+        whenever(mockDuckChatFeatureRepository.observeInputScreenUserSettingEnabled()).thenReturn(flowOf(true))
+        duckChatFeature.showInputScreenOnSystemSearchLaunch().setRawStoredState(State(true))
+
+        testee.onPrivacyConfigDownloaded()
+
+        assertTrue(testee.showInputScreenOnSystemSearchLaunch.value)
     }
 
     companion object {

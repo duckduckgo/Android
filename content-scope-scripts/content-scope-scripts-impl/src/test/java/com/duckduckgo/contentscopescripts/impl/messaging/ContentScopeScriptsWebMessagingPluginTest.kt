@@ -88,7 +88,7 @@ class ContentScopeScriptsWebMessagingPluginTest {
     @Before
     fun setUp() =
         runTest {
-            whenever(webViewCompatContentScopeScripts.isEnabled()).thenReturn(true)
+            whenever(webViewCompatContentScopeScripts.isWebMessagingEnabled()).thenReturn(true)
             testee =
                 ContentScopeScriptsWebMessagingPlugin(
                     handlers = handlers,
@@ -169,9 +169,9 @@ class ContentScopeScriptsWebMessagingPluginTest {
         }
 
     @Test
-    fun `when registering and adsjs is disabled then do not register`() =
+    fun `when registering and webmessaging is disabled then do not register`() =
         runTest {
-            whenever(webViewCompatContentScopeScripts.isEnabled()).thenReturn(false)
+            whenever(webViewCompatContentScopeScripts.isWebMessagingEnabled()).thenReturn(false)
 
             testee.register(callback, mockWebView)
 
@@ -180,9 +180,9 @@ class ContentScopeScriptsWebMessagingPluginTest {
         }
 
     @Test
-    fun `when registering and adsjs is enabled then register`() =
+    fun `when registering and webmessaging is enabled then register`() =
         runTest {
-            whenever(webViewCompatContentScopeScripts.isEnabled()).thenReturn(true)
+            whenever(webViewCompatContentScopeScripts.isWebMessagingEnabled()).thenReturn(true)
 
             testee.register(callback, mockWebView)
 
@@ -195,9 +195,9 @@ class ContentScopeScriptsWebMessagingPluginTest {
         }
 
     @Test
-    fun `when unregistering and adsjs is disabled then do not unregister`() =
+    fun `when unregistering and webmessaging is disabled then do not unregister`() =
         runTest {
-            whenever(webViewCompatContentScopeScripts.isEnabled()).thenReturn(false)
+            whenever(webViewCompatContentScopeScripts.isWebMessagingEnabled()).thenReturn(false)
 
             testee.unregister(mockWebView)
 
@@ -206,9 +206,9 @@ class ContentScopeScriptsWebMessagingPluginTest {
         }
 
     @Test
-    fun `when unregistering and adsjs is enabled then unregister`() =
+    fun `when unregistering and webmessaging is enabled then unregister`() =
         runTest {
-            whenever(webViewCompatContentScopeScripts.isEnabled()).thenReturn(true)
+            whenever(webViewCompatContentScopeScripts.isWebMessagingEnabled()).thenReturn(true)
 
             testee.unregister(mockWebView)
 
@@ -216,9 +216,9 @@ class ContentScopeScriptsWebMessagingPluginTest {
         }
 
     @Test
-    fun `when posting message and adsjs is disabled then do not post message`() =
+    fun `when posting message and webmessaging is disabled then do not post message`() =
         runTest {
-            whenever(webViewCompatContentScopeScripts.isEnabled()).thenReturn(false)
+            whenever(webViewCompatContentScopeScripts.isWebMessagingEnabled()).thenReturn(false)
             val eventData = SubscriptionEventData("feature", "subscription", JSONObject())
             givenInterfaceIsRegistered()
 
@@ -228,9 +228,9 @@ class ContentScopeScriptsWebMessagingPluginTest {
         }
 
     @Test
-    fun `when posting message and adsjs is enabled but webView not registered then do not post message`() =
+    fun `when posting message and webmessaging is enabled but webView not registered then do not post message`() =
         runTest {
-            whenever(webViewCompatContentScopeScripts.isEnabled()).thenReturn(true)
+            whenever(webViewCompatContentScopeScripts.isWebMessagingEnabled()).thenReturn(true)
             val eventData = SubscriptionEventData("feature", "subscription", JSONObject())
 
             testee.postMessage(mockWebView, eventData)
@@ -239,9 +239,9 @@ class ContentScopeScriptsWebMessagingPluginTest {
         }
 
     @Test
-    fun `when posting message and adsjs is enabled but initialPing not processes then do not post message`() =
+    fun `when posting message and webmessaging is enabled but initialPing not processes then do not post message`() =
         runTest {
-            whenever(webViewCompatContentScopeScripts.isEnabled()).thenReturn(true)
+            whenever(webViewCompatContentScopeScripts.isWebMessagingEnabled()).thenReturn(true)
             val eventData = SubscriptionEventData("feature", "subscription", JSONObject())
 
             testee.postMessage(mockWebView, eventData)
@@ -250,9 +250,9 @@ class ContentScopeScriptsWebMessagingPluginTest {
         }
 
     @Test
-    fun `when posting message after getting initialPing and adsjs is enabled then post message`() =
+    fun `when posting message after getting initialPing and webmessaging is enabled then post message`() =
         runTest {
-            whenever(webViewCompatContentScopeScripts.isEnabled()).thenReturn(true)
+            whenever(webViewCompatContentScopeScripts.isWebMessagingEnabled()).thenReturn(true)
             val eventData = SubscriptionEventData("feature", "subscription", JSONObject())
             givenInterfaceIsRegistered()
             val expectedMessage =

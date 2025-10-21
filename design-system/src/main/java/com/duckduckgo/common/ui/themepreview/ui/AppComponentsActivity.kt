@@ -18,28 +18,58 @@ package com.duckduckgo.common.ui.themepreview.ui
 
 import android.content.Context
 import android.content.Intent
-import android.content.SharedPreferences
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.content.edit
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import androidx.viewpager.widget.ViewPager
 import com.duckduckgo.common.ui.DuckDuckGoTheme
 import com.duckduckgo.common.ui.applyTheme
+import com.duckduckgo.common.ui.store.ThemingSharedPreferences
+import com.duckduckgo.common.ui.themepreview.ui.store.AppComponentsPrefsDataStore
+import com.duckduckgo.common.ui.themepreview.ui.store.appComponentsDataStore
 import com.duckduckgo.common.ui.view.listitem.OneLineListItem
+import com.duckduckgo.common.utils.DefaultDispatcherProvider
 import com.duckduckgo.mobile.android.R
 import com.google.android.material.tabs.TabLayout
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 
 class AppComponentsActivity : AppCompatActivity() {
+
+    // TODO when ADS is all compose we should start using DI for AppComponentsActivity and AppComponentsViewModel
+    private val appComponentsViewModel: AppComponentsViewModel by lazy {
+        ViewModelProvider(
+            this,
+            object : ViewModelProvider.Factory {
+                override fun <T : ViewModel> create(modelClass: Class<T>): T {
+                    @Suppress("UNCHECKED_CAST")
+                    return AppComponentsViewModel(
+                        AppComponentsPrefsDataStore(
+                            dispatcherProvider = DefaultDispatcherProvider(),
+                            context = this@AppComponentsActivity,
+                            store = appComponentsDataStore,
+                            themePrefMapper = ThemingSharedPreferences.ThemePrefsMapper(),
+                        ),
+                    ) as T
+                }
+            },
+        )[AppComponentsViewModel::class.java]
+    }
 
     private lateinit var viewPager: ViewPager
     private lateinit var tabLayout: TabLayout
     private lateinit var darkThemeSwitch: OneLineListItem
 
+    @Suppress("DenyListedApi")
     override fun onCreate(savedInstanceState: Bundle?) {
-        val themePreferences = AppComponentsSharedPreferences(this)
-        val selectedTheme = themePreferences.selectedTheme
-        applyTheme(selectedTheme)
-
+        val selectedTheme = runBlocking {
+            val selectedTheme = appComponentsViewModel.themeFlow.first()
+            applyTheme(selectedTheme)
+            selectedTheme
+        }
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_app_components)
         viewPager = findViewById(R.id.view_pager)
@@ -51,14 +81,17 @@ class AppComponentsActivity : AppCompatActivity() {
         viewPager.adapter = adapter
 
         darkThemeSwitch.quietlySetIsChecked(selectedTheme == DuckDuckGoTheme.DARK) { _, enabled ->
-            themePreferences.selectedTheme =
-                if (enabled) {
-                    DuckDuckGoTheme.DARK
-                } else {
-                    DuckDuckGoTheme.LIGHT
-                }
-            startActivity(intent(this))
-            finish()
+            // TODO if we add another theme (e.g. true black) we would change the toggle and move this logic to the VM
+            val newTheme = if (enabled) {
+                DuckDuckGoTheme.DARK
+            } else {
+                DuckDuckGoTheme.LIGHT
+            }
+            lifecycleScope.launch {
+                appComponentsViewModel.setTheme(newTheme)
+                startActivity(intent(this@AppComponentsActivity))
+                finish()
+            }
         }
     }
 
@@ -66,25 +99,5 @@ class AppComponentsActivity : AppCompatActivity() {
         fun intent(context: Context): Intent {
             return Intent(context, AppComponentsActivity::class.java)
         }
-    }
-}
-
-class AppComponentsSharedPreferences(private val context: Context) {
-    var selectedTheme: DuckDuckGoTheme
-        get() {
-            return if (preferences.getBoolean(KEY_SELECTED_DARK_THEME, false)) {
-                DuckDuckGoTheme.DARK
-            } else {
-                DuckDuckGoTheme.LIGHT
-            }
-        }
-        set(theme) =
-            preferences.edit { putBoolean(KEY_SELECTED_DARK_THEME, theme == DuckDuckGoTheme.DARK) }
-
-    private val preferences: SharedPreferences by lazy { context.getSharedPreferences(FILENAME, Context.MODE_PRIVATE) }
-
-    companion object {
-        const val FILENAME = "com.duckduckgo.app.dev_settings_activity.theme_settings"
-        const val KEY_SELECTED_DARK_THEME = "KEY_SELECTED_DARK_THEME"
     }
 }

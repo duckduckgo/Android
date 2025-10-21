@@ -74,6 +74,7 @@ import com.duckduckgo.subscriptions.impl.services.StoreLoginBody
 import com.duckduckgo.subscriptions.impl.services.SubscriptionsService
 import com.duckduckgo.subscriptions.impl.services.ValidateTokenResponse
 import com.duckduckgo.subscriptions.impl.services.toEntitlements
+import com.duckduckgo.subscriptions.impl.wideevents.AuthTokenRefreshWideEvent
 import com.duckduckgo.subscriptions.impl.wideevents.SubscriptionPurchaseWideEvent
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.moshi.JsonDataException
@@ -89,14 +90,9 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.filterNot
-import kotlinx.coroutines.flow.firstOrNull
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.onSubscription
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import kotlinx.coroutines.withTimeoutOrNull
 import logcat.LogPriority.ERROR
 import logcat.asLog
 import logcat.logcat
@@ -108,7 +104,6 @@ import java.time.Period
 import java.time.format.DateTimeParseException
 import javax.inject.Inject
 import kotlin.time.Duration.Companion.milliseconds
-import kotlin.time.Duration.Companion.seconds
 
 interface SubscriptionsManager {
     /**
@@ -247,14 +242,14 @@ interface SubscriptionsManager {
      * @param planId The new plan ID to switch to
      * @param offerId The offer ID for the new plan (optional)
      * @param replacementMode The replacement mode for the subscription switch
-     * @return `true` if the switch was successful, `false` otherwise
+     *
      */
     suspend fun switchSubscriptionPlan(
         activity: Activity,
         planId: String,
         offerId: String? = null,
         replacementMode: SubscriptionReplacementMode,
-    ): Boolean
+    )
 }
 
 @SingleInstanceIn(AppScope::class)
@@ -276,6 +271,7 @@ class RealSubscriptionsManager @Inject constructor(
     private val timeProvider: CurrentTimeProvider,
     private val backgroundTokenRefresh: BackgroundTokenRefresh,
     private val subscriptionPurchaseWideEvent: SubscriptionPurchaseWideEvent,
+    private val tokenRefreshWideEvent: AuthTokenRefreshWideEvent,
 ) : SubscriptionsManager {
     private val adapter = Moshi.Builder().build().adapter(ResponseError::class.java)
 
@@ -391,133 +387,65 @@ class RealSubscriptionsManager @Inject constructor(
         planId: String,
         offerId: String?,
         replacementMode: SubscriptionReplacementMode,
-    ): Boolean =
-        withContext(dispatcherProvider.io()) {
-            return@withContext try {
-                if (!isSignedIn()) {
-                    logcat { "Subs: Cannot switch plan - user not signed in" }
-                    return@withContext false
-                }
-
-                val currentSubscription = authRepository.getSubscription()
-                if (currentSubscription == null || !currentSubscription.isActive()) {
-                    logcat { "Subs: Cannot switch plan - no active subscription found" }
-                    return@withContext false
-                }
-
-                // fixme: Replace purchaseHistory with queryPurchasesAsync() to fetch the current purchase token.
-                // This aligns with Billing v8 and avoids using the deprecated Purchase History API.
-                val currentPurchaseToken =
-                    playBillingManager.purchaseHistory
-                        .filter { it.products.contains(BASIC_SUBSCRIPTION) }
-                        .maxByOrNull { it.purchaseTime }
-                        ?.purchaseToken
-
-                if (currentPurchaseToken == null) {
-                    logcat { "Subs: Cannot switch plan - no current purchase token found" }
-                    return@withContext false
-                }
-
-                // Get account details for external ID
-                val account = authRepository.getAccount()
-                if (account == null) {
-                    logcat { "Subs: Cannot switch plan - no account found" }
-                    return@withContext false
-                }
-
-                // Validate the new plan exists
-                val availableOffers = getSubscriptionOffer()
-                val targetOffer = availableOffers.find { it.planId == planId && it.offerId == offerId }
-                if (targetOffer == null) {
-                    logcat { "Subs: Cannot switch plan - target plan not found: $planId with offer $offerId" }
-                    return@withContext false
-                }
-
-                // Launch Google Play billing flow for subscription update
-                logcat { "Subs: Launching subscription update flow for plan: $planId" }
-
-                // Launch the subscription update flow using PlayBillingManager
-                withContext(dispatcherProvider.main()) {
-                    playBillingManager.launchSubscriptionUpdate(
-                        activity = activity,
-                        newPlanId = planId,
-                        externalId = account.externalId,
-                        newOfferId = offerId,
-                        oldPurchaseToken = currentPurchaseToken,
-                        replacementMode = replacementMode,
-                    )
-                }
-
-                // Wait for the purchase to complete by observing the purchase state
-                val newPurchaseToken = withTimeoutOrNull(timeout = 60.seconds) {
-                    playBillingManager.purchaseState
-                        .onEach { state ->
-                            when (state) {
-                                is PurchaseState.Purchased -> logcat { "Subs: Purchase completed successfully" }
-                                is PurchaseState.Canceled -> logcat { "Subs: Purchase was canceled" }
-                                is PurchaseState.InProgress -> logcat { "Subs: Purchase in progress..." }
-                            }
-                        }
-                        .filterNot { it is PurchaseState.InProgress }
-                        .map { (it as? PurchaseState.Purchased)?.purchaseToken }
-                        .firstOrNull()
-                }
-                if (newPurchaseToken == null) {
-                    logcat { "Subs: Plan switch failed - no new purchase token received" }
-                    return@withContext false
-                }
-
-                // Confirm the plan switch with backend using the new purchase token
-                val packageName = context.packageName
-                val experimentName: String? = experimentAssigned?.name
-                val cohort: String? = experimentAssigned?.cohort
-
-                val confirmationResponse =
-                    subscriptionsService.confirm(
-                        ConfirmationBody(
-                            packageName = packageName,
-                            purchaseToken = newPurchaseToken,
-                            experimentName = experimentName,
-                            experimentCohort = cohort,
-                            oldPurchaseToken = currentPurchaseToken,
-                            replacementMode = replacementMode.name,
-                        ),
-                    )
-
-                // Update subscription data
-                val subscription =
-                    Subscription(
-                        productId = confirmationResponse.subscription.productId,
-                        billingPeriod = confirmationResponse.subscription.billingPeriod,
-                        startedAt = confirmationResponse.subscription.startedAt,
-                        expiresOrRenewsAt = confirmationResponse.subscription.expiresOrRenewsAt,
-                        status = confirmationResponse.subscription.status.toStatus(),
-                        platform = confirmationResponse.subscription.platform,
-                        activeOffers = confirmationResponse.subscription.activeOffers.map { it.type.toActiveOfferType() },
-                    )
-
-                authRepository.setSubscription(subscription)
-
-                if (shouldUseAuthV2()) {
-                    // Invalidate access token and refresh
-                    authRepository.setAccessTokenV2(null)
-                    refreshAccessToken()
-                } else {
-                    authRepository
-                        .getAccount()
-                        ?.copy(email = confirmationResponse.email)
-                        ?.let { authRepository.setAccount(it) }
-
-                    authRepository.setEntitlements(confirmationResponse.entitlements.toEntitlements())
-                }
-
-                logcat { "Subs: Successfully switched subscription plan to $planId" }
-                true
-            } catch (e: Exception) {
-                logcat(ERROR) { "Subs: Failed to switch subscription plan: ${e.asLog()}" }
-                false
+    ) = withContext(dispatcherProvider.io()) {
+        try {
+            if (!isSignedIn()) {
+                logcat { "Subs: Cannot switch plan - user not signed in" }
+                _currentPurchaseState.emit(CurrentPurchase.Failure("User not signed in for switch"))
+                return@withContext
             }
+
+            val currentSubscription = authRepository.getSubscription()
+            if (currentSubscription == null || !currentSubscription.isActive()) {
+                logcat { "Subs: Cannot switch plan - no active subscription found" }
+                _currentPurchaseState.emit(CurrentPurchase.Failure("No active subscription found for switch"))
+                return@withContext
+            }
+
+            val currentPurchaseToken = playBillingManager.getLatestPurchaseToken()
+
+            if (currentPurchaseToken == null) {
+                logcat { "Subs: Cannot switch plan - no current purchase token found" }
+                _currentPurchaseState.emit(CurrentPurchase.Failure("No current purchase token found for switch"))
+                return@withContext
+            }
+
+            // Get account details for external ID
+            val account = authRepository.getAccount()
+            if (account == null) {
+                logcat { "Subs: Cannot switch plan - no account found" }
+                _currentPurchaseState.emit(CurrentPurchase.Failure("No account found for switch"))
+                return@withContext
+            }
+
+            // Validate the new plan exists
+            val availableOffers = getSubscriptionOffer()
+            val targetOffer = availableOffers.find { it.planId == planId && it.offerId == offerId }
+            if (targetOffer == null) {
+                logcat { "Subs: Cannot switch plan - target plan not found: $planId" }
+                _currentPurchaseState.emit(CurrentPurchase.Failure("Target plan not found: $planId for switch"))
+                return@withContext
+            }
+
+            // Launch Google Play billing flow for subscription update
+            logcat { "Subs: Launching subscription update flow for plan: $planId" }
+
+            // Launch the subscription update flow using PlayBillingManager
+            withContext(dispatcherProvider.main()) {
+                playBillingManager.launchSubscriptionUpdate(
+                    activity = activity,
+                    newPlanId = planId,
+                    externalId = account.externalId,
+                    newOfferId = offerId,
+                    oldPurchaseToken = currentPurchaseToken,
+                    replacementMode = replacementMode,
+                )
+            }
+        } catch (e: Exception) {
+            logcat(ERROR) { "Subs: Failed to switch subscription plan: ${e.asLog()}" }
+            _currentPurchaseState.emit(CurrentPurchase.Failure("Failed to switch subscription plan: ${e.message}"))
         }
+    }
 
     override suspend fun getAccount(): Account? = authRepository.getAccount()
 
@@ -748,54 +676,85 @@ class RealSubscriptionsManager @Inject constructor(
     }
 
     override suspend fun refreshAccessToken() {
-        val refreshToken = checkNotNull(authRepository.getRefreshTokenV2())
+        try {
+            tokenRefreshWideEvent.onStart(subscriptionStatus())
+            val refreshToken = checkNotNull(authRepository.getRefreshTokenV2())
+            tokenRefreshWideEvent.onTokenRead()
 
-        /*
-            Get jwks before refreshing the token, just in case getting jwks fails. We don't want to end up in a situation where
-            a new token has been fetched (potentially invalidating the old one), but we can't validate and store it.
-         */
-        val jwks = authClient.getJwks()
+            /*
+                Get jwks before refreshing the token, just in case getting jwks fails. We don't want to end up in a situation where
+                a new token has been fetched (potentially invalidating the old one), but we can't validate and store it.
+             */
+            val jwks = authClient.getJwks()
+            tokenRefreshWideEvent.onJwksFetched()
 
-        val newTokens = try {
-            val tokens = authClient.getTokens(refreshToken.jwt)
-            validateTokens(tokens, jwks)
-        } catch (e: HttpException) {
-            if (e.code() == 400) {
-                if (parseError(e)?.error == "unknown_account") {
-                    /*
+            val newTokens = try {
+                val tokens = authClient.getTokens(refreshToken.jwt)
+                tokenRefreshWideEvent.onTokensFetched()
+                validateTokens(tokens, jwks)
+                    .also { tokenRefreshWideEvent.onTokensValidated() }
+            } catch (e: HttpException) {
+                val backendErrorResponse = parseError(e)?.error
+                    ?.also { tokenRefreshWideEvent.onBackendErrorResponse(backendErrorResponse = it) }
+
+                if (e.code() == 400) {
+                    if (backendErrorResponse == "unknown_account") {
+                        /*
                         Refresh token appears to be valid, but the related account doesn't exist in BE.
                         After the subscription expires, BE eventually deletes the account, so this is expected.
-                     */
-                    signOut()
-                    throw e
-                }
-
-                // refresh token is invalid / expired -> try to get a new pair of tokens using store login
-                pixelSender.reportAuthV2InvalidRefreshTokenDetected()
-                val account = checkNotNull(authRepository.getAccount()) { "Missing account info when refreshing access token" }
-
-                when (val storeLoginResult = storeLogin(account.externalId)) {
-                    is StoreLoginResult.Success -> {
-                        pixelSender.reportAuthV2InvalidRefreshTokenRecovered()
-                        storeLoginResult.tokens
-                    }
-                    StoreLoginResult.Failure.AccountExternalIdMismatch,
-                    StoreLoginResult.Failure.PurchaseHistoryNotAvailable,
-                    StoreLoginResult.Failure.AuthenticationError,
-                    -> {
-                        pixelSender.reportAuthV2InvalidRefreshTokenSignedOut()
+                         */
+                        tokenRefreshWideEvent.onUnknownAccountError()
                         signOut()
                         throw e
                     }
 
-                    StoreLoginResult.Failure.Other -> throw e
-                }
-            } else {
-                throw e
-            }
-        }
+                    // refresh token is invalid / expired -> try to get a new pair of tokens using store login
+                    pixelSender.reportAuthV2InvalidRefreshTokenDetected()
+                    val account = checkNotNull(authRepository.getAccount()) { "Missing account info when refreshing access token" }
 
-        saveTokens(newTokens)
+                    when (val storeLoginResult = storeLogin(account.externalId)) {
+                        is StoreLoginResult.Success -> {
+                            tokenRefreshWideEvent.onPlayLoginSuccess()
+                            pixelSender.reportAuthV2InvalidRefreshTokenRecovered()
+                            storeLoginResult.tokens
+                        }
+
+                        StoreLoginResult.Failure.AccountExternalIdMismatch,
+                        StoreLoginResult.Failure.PurchaseHistoryNotAvailable,
+                        StoreLoginResult.Failure.AuthenticationError,
+                        -> {
+                            tokenRefreshWideEvent.onPlayLoginFailure(
+                                signedOut = true,
+                                refreshException = e,
+                                loginError = storeLoginResult.javaClass.simpleName,
+                            )
+                            pixelSender.reportAuthV2InvalidRefreshTokenSignedOut()
+                            signOut()
+                            throw e
+                        }
+
+                        StoreLoginResult.Failure.TokenValidationFailed,
+                        StoreLoginResult.Failure.UnknownError,
+                        -> {
+                            tokenRefreshWideEvent.onPlayLoginFailure(
+                                signedOut = false,
+                                refreshException = e,
+                                loginError = storeLoginResult.javaClass.simpleName,
+                            )
+                            throw e
+                        }
+                    }
+                } else {
+                    throw e
+                }
+            }
+
+            saveTokens(newTokens)
+            tokenRefreshWideEvent.onSuccess()
+        } catch (e: Exception) {
+            tokenRefreshWideEvent.onFailure(e)
+            throw e
+        }
     }
 
     override suspend fun refreshSubscriptionData() {
@@ -871,7 +830,11 @@ class RealSubscriptionsManager @Inject constructor(
             val sessionId = authClient.authorize(codeChallenge)
             val authorizationCode = authClient.storeLogin(sessionId, purchase.signature, purchase.originalJson)
             val tokens = authClient.getTokens(sessionId, authorizationCode, codeVerifier)
-            val validatedTokens = validateTokens(tokens, jwks)
+            val validatedTokens = try {
+                validateTokens(tokens, jwks)
+            } catch (_: Exception) {
+                return StoreLoginResult.Failure.TokenValidationFailed
+            }
 
             if (accountExternalId != null && accountExternalId != validatedTokens.accessTokenClaims.accountExternalId) {
                 return StoreLoginResult.Failure.AccountExternalIdMismatch
@@ -882,7 +845,7 @@ class RealSubscriptionsManager @Inject constructor(
             if (e is HttpException && e.code() == 400) {
                 StoreLoginResult.Failure.AuthenticationError
             } else {
-                StoreLoginResult.Failure.Other
+                StoreLoginResult.Failure.UnknownError
             }
         }
     }
@@ -1251,7 +1214,8 @@ class RealSubscriptionsManager @Inject constructor(
             data object PurchaseHistoryNotAvailable : Failure()
             data object AccountExternalIdMismatch : Failure()
             data object AuthenticationError : Failure()
-            data object Other : Failure()
+            data object TokenValidationFailed : Failure()
+            data object UnknownError : Failure()
         }
     }
 

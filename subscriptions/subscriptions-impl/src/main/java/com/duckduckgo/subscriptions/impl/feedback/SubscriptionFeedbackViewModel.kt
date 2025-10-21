@@ -41,6 +41,7 @@ import com.duckduckgo.subscriptions.impl.feedback.SubscriptionFeedbackViewModel.
 import com.duckduckgo.subscriptions.impl.feedback.SubscriptionFeedbackViewModel.Command.FeedbackCompleted
 import com.duckduckgo.subscriptions.impl.feedback.SubscriptionFeedbackViewModel.Command.FeedbackFailed
 import com.duckduckgo.subscriptions.impl.feedback.SubscriptionFeedbackViewModel.Command.ShowHelpPages
+import com.duckduckgo.subscriptions.impl.feedback.SubscriptionFeedbackViewModel.Command.ShowSupportPage
 import com.duckduckgo.subscriptions.impl.feedback.SubscriptionFeedbackViewModel.FeedbackFragmentState.FeedbackAction
 import com.duckduckgo.subscriptions.impl.feedback.SubscriptionFeedbackViewModel.FeedbackFragmentState.FeedbackCategory
 import com.duckduckgo.subscriptions.impl.feedback.SubscriptionFeedbackViewModel.FeedbackFragmentState.FeedbackGeneral
@@ -288,6 +289,12 @@ class SubscriptionFeedbackViewModel @Inject constructor(
         }
     }
 
+    fun onContactSupportFromSubmit() {
+        viewModelScope.launch {
+            command.send(ShowSupportPage(SUBSCRIPTION_SUPPORT))
+        }
+    }
+
     fun allowUserToChooseFeedbackType() {
         viewModelScope.launch {
             val newFragmentState = FeedbackGeneral
@@ -529,6 +536,7 @@ class SubscriptionFeedbackViewModel @Inject constructor(
         data object FeedbackCompleted : Command()
         data object FeedbackCancelled : Command()
         data class ShowHelpPages(val url: String) : Command()
+        data class ShowSupportPage(val url: String) : Command()
     }
 
     internal data class ViewState(
@@ -569,5 +577,6 @@ class SubscriptionFeedbackViewModel @Inject constructor(
         private const val PARAMS_KEY_CUSTOM_METADATA = "customMetadata"
         private const val PARAMS_KEY_APP_NAME = "appName"
         private const val PARAMS_KEY_APP_PACKAGE = "appPackage"
+        private const val SUBSCRIPTION_SUPPORT = "https://duckduckgo.com/subscription-support"
     }
 }

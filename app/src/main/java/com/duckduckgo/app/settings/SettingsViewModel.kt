@@ -81,7 +81,6 @@ import com.duckduckgo.mobile.android.app.tracking.AppTrackingProtection
 import com.duckduckgo.settings.api.SettingsPageFeature
 import com.duckduckgo.subscriptions.api.PrivacyProUnifiedFeedback
 import com.duckduckgo.subscriptions.api.PrivacyProUnifiedFeedback.PrivacyProFeedbackSource.DDG_SETTINGS
-import com.duckduckgo.subscriptions.api.SubscriptionRebrandingFeatureToggle
 import com.duckduckgo.subscriptions.api.Subscriptions
 import com.duckduckgo.sync.api.DeviceSyncState
 import com.duckduckgo.voice.api.VoiceSearchAvailability
@@ -124,7 +123,6 @@ class SettingsViewModel @Inject constructor(
     private val settingsPageFeature: SettingsPageFeature,
     private val widgetCapabilities: WidgetCapabilities,
     private val postCtaExperienceToggles: PostCtaExperienceToggles,
-    private val rebrandingFeatureToggle: SubscriptionRebrandingFeatureToggle,
 ) : ViewModel(), DefaultLifecycleObserver {
 
     data class ViewState(
@@ -142,7 +140,6 @@ class SettingsViewModel @Inject constructor(
         val isVoiceSearchVisible: Boolean = false,
         val isAddWidgetInProtectionsVisible: Boolean = false,
         val widgetsInstalled: Boolean = false,
-        val isAiFeaturesRebrandingEnabled: Boolean = false,
     )
 
     sealed class Command {
@@ -220,7 +217,6 @@ class SettingsViewModel @Inject constructor(
                     widgetsInstalled = withContext(dispatcherProvider.io()) {
                         widgetCapabilities.hasInstalledWidgets
                     },
-                    isAiFeaturesRebrandingEnabled = rebrandingFeatureToggle.isAIFeaturesRebrandingEnabled(),
                 ),
             )
         }

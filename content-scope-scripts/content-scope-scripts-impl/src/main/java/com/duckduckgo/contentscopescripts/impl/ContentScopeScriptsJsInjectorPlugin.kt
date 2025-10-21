@@ -39,7 +39,11 @@ class ContentScopeScriptsJsInjectorPlugin @Inject constructor(
         }
     }
 
-    override fun onPageFinished(webView: WebView, url: String?, site: Site?) {
+    override fun onPageFinished(
+        webView: WebView,
+        url: String?,
+        site: Site?,
+    ) {
         // NOOP
     }
 }

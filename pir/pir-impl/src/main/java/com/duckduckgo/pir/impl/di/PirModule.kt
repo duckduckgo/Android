@@ -40,6 +40,7 @@ import com.duckduckgo.pir.impl.store.RealPirDataStore
 import com.duckduckgo.pir.impl.store.RealPirRepository
 import com.duckduckgo.pir.impl.store.db.BrokerDao
 import com.duckduckgo.pir.impl.store.db.BrokerJsonDao
+import com.duckduckgo.pir.impl.store.db.EmailConfirmationLogDao
 import com.duckduckgo.pir.impl.store.db.ExtractedProfileDao
 import com.duckduckgo.pir.impl.store.db.JobSchedulingDao
 import com.duckduckgo.pir.impl.store.db.OptOutResultsDao
@@ -111,6 +112,12 @@ class PirModule {
     @Provides
     fun provideExtractedProfileDao(database: PirDatabase): ExtractedProfileDao {
         return database.extractedProfileDao()
+    }
+
+    @SingleInstanceIn(AppScope::class)
+    @Provides
+    fun provideEmailConfirmationLogDao(database: PirDatabase): EmailConfirmationLogDao {
+        return database.emailConfirmationLogDao()
     }
 
     @Provides

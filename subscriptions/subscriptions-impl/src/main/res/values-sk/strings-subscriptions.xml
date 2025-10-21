@@ -20,6 +20,7 @@
     <string name="cancel">Zrušiť</string>
     <string name="ok">OK</string>
     <string name="privacyPro" translatable="false">Privacy Pro</string>
+    <string name="ddg_subscription">Predplatné DuckDuckGo</string>
     <string name="manageEmail">Spravovať e-mail</string>
 
     <!--Restore Subscriptions Activity-->
@@ -31,19 +32,19 @@
     <string name="subscriptionNotFound">Predplatné nebolo nájdené</string>
     <string name="subscriptionNotFoundDescription">Predplatné spojené s týmto účtom Google Play už nie je aktívne.</string>
     <string name="purchaseRestored">Tvoje nákupy boli obnovené.</string>
-    <string name="restoreSubscriptionTitle">Pridaj si do tohto zariadenia predplatné Privacy Pro</string>
+    <string name="restoreSubscriptionTitle">Pridaj svoje predplatné do tohto zariadenia</string>
     <string name="restoreSubscriptionGooglePlayTitle">Pridať prostredníctvom účtu Google Play</string>
     <string name="restoreSubscriptionGooglePlayDescription">Obnov svoje predplatné na zariadeniach so systémom Android pomocou svojho účtu Google Play.</string>
     <string name="restoreSubscriptionGooglePlayGetStarted">Obnoviť nákup</string>
     <string name="restoreSubscriptionEmailTitle">Pridať cez e-mail</string>
-    <string name="restoreSubscriptionEmailDescription">Ak chceš pridať Privacy Pro do tohto zariadenia, prepoj e-mailovú adresu so svojím predplatným.</string>
+    <string name="restoreSubscriptionEmailDescription">Prepoj e-mailovú adresu so svojím predplatným, aby si ho mohol/mohla pridať do tohto zariadenia.</string>
     <string name="restoreSubscriptionEmailGetStarted">Začnite</string>
 
     <!--Settings Subscriptions Activity-->
     <string name="removeSubscription">Zrušiť predplatné</string>
     <string name="subscriptionRemoved">Tvoje predplatné bolo z tohto zariadenia odstránené</string>
     <string name="removeFromDevice">Odstrániť z tohto zariadenia?</string>
-    <string name="removeFromDeviceDescription">Na tomto zariadení už nebudeš mať prístup k predplatnému služby Privacy Pro. Tým sa tvoje predplatné nezruší a zostane aktívne na tvojich ostatných zariadeniach.</string>
+    <string name="removeFromDeviceDescription">Na tomto zariadení už nebudeš mať prístup k svojmu predplatnému. Tým sa tvoje predplatné nezruší a zostane aktívne na tvojich ostatných zariadeniach.</string>
     <string name="subscriptionsDataMonthly" instruction="First placeholder is renews or expires, second is a date in format MMMM dd, yyyy">Tvoje mesačné predplatné %1$s dňa %2$s.</string>
     <string name="subscriptionsDataYearly" instruction="First placeholder is renews or expires, second is a date in format MMMM dd, yyyy">Tvoje ročné predplatné %1$s na %2$s.</string>
     <string name="subscriptionsExpiredData" instruction="The placeholder is a date in format MMMM dd, yyyy">Platnosť tvojho predplatného vypršala dňa %1$s.</string>
@@ -51,14 +52,14 @@
     <string name="yearlySubscription">Ročné predplatné</string>
     <string name="renews">obnovuje</string>
     <string name="expires">platnosť sa končí</string>
-    <string name="activateOnOtherDevices">Pridaj Privacy Pro do iných zariadení</string>
+    <string name="activateOnOtherDevices">Pridaj svoje predplatné do ďalších zariadení</string>
     <string name="addToDevicePrimaryText">Pridať do zariadenia</string>
-    <string name="addToDeviceSecondaryTextWithoutEmail">Pridaj Privacy Pro do svojich ďalších zariadení cez Google Play alebo prepojením e-mailovej adresy.</string>
-    <string name="addToDeviceSecondaryTextWithEmail">Použi vyššie uvedený e-mail na pridanie predplatného v iných zariadeniach v aplikácii DuckDuckGo. Prejdi do ponuky Nastavenia &gt; Privacy Pro &gt; Mám predplatné.</string>
+    <string name="addToDeviceSecondaryTextWithoutEmail">Pridaj si predplatné do svojich ďalších zariadení cez Google Play alebo prepojením e-mailovej adresy.</string>
+    <string name="addToDeviceSecondaryTextWithEmail">Použi vyššie uvedený e-mail na pridanie predplatného v iných zariadeniach v aplikácii DuckDuckGo. Prejdi do Nastavenia &gt; Nastavenia predplatného &gt; Mám predplatné.</string>
     <string name="editEmailPrimaryText">Upraviť e-mail</string>
     <string name="learnMore">Zistite viac</string>
-    <string name="privacyProFaq">Potrebuješ pomoc s aplikáciou Privacy Pro?</string>
-    <string name="privacyProFaqSecondary">Získaj odpovede na často kladené otázky alebo kontaktuj podporu programu Privacy Pro na našich stránkach pomoci. Dostupnosť funkcií sa líši podľa krajiny.</string>
+    <string name="privacyProFaq">Potrebuješ pomoc s tvojím predplatným?</string>
+    <string name="privacyProFaqSecondary">Získaj odpovede na často kladené otázky alebo kontaktuj podporu predplatného na našich stránkach pomoci. Dostupnosť funkcií sa líši podľa krajiny.</string>
     <string name="subscriptionStatusSubscribed">Prihlásený/-á</string>
     <string name="privacyPolicyAndTermsOfService">Zásady ochrany osobných údajov a podmienky služby</string>
     <string name="subscriptionStatusFreeTrial">Bezplatná skúšobná verzia je aktívna</string>
@@ -68,15 +69,15 @@
 
     <!--Settings Subscriptions-->
     <string name="subscriptionSetting">Nastavenia predplatného</string>
-    <string name="subscriptionSettingSubscribe">Chráň si pripojenie a totožnosť pomocou Privacy Pro</string>
+    <string name="subscriptionSettingSubscribe">Chráň si pripojenie a identitu s jedným predplatným.</string>
 
     <string name="subscriptionSettingSubscribeSubtitle">Predplatitelia získajú našu sieť VPN, Personal Information Removal a Identity Theft Restoration.</string>
     <string name="subscriptionSettingSubscribeSubtitleRow">Predplatitelia získajú našu VPN a Identity Theft Restoration.</string>
 
-    <string name="subscriptionSettingGet">Získaj Privacy Pro</string>
-    <string name="subscriptionSettingTryFreeTrial">Vyskúšaj Privacy Pro zadarmo</string>
+    <string name="subscriptionSettingGet">Predplatné DuckDuckGo</string>
+    <string name="subscriptionSettingTryFreeTrial">Vyskúšať zadarmo</string>
     <string name="subscriptionSettingRestore">Mám predplatné</string>
-    <string name="subscriptionSettingExpired">Vaše predplatné Privacy Pro vypršalo</string>
+    <string name="subscriptionSettingExpired">Platnosť tvojho predplatného DuckDuckGo vypršala</string>
     <string name="subscriptionSettingExpiredViewPlans">Zobraziť plány</string>
     <string name="subscriptionSettingSectionSubscription">Predplatné</string>
     <string name="subscriptionSettingRemoveFromDevice">Odstrániť z tohto zariadenia</string>
@@ -170,18 +171,7 @@
     <string name="activitySendFeedback">Odoslať spätnú väzbu</string>
 
     <!-- Privacy Pro Rebranding-->
-    <string name="privacyProRebranding">Predplatné DuckDuckGo</string>
-    <string name="subscriptionSettingExpiredRebranding">Platnosť tvojho predplatného DuckDuckGo vypršala</string>
-    <string name="privacyProFaqRebranding">Potrebuješ pomoc s tvojím predplatným?</string>
-    <string name="privacyProFaqSecondaryRebranding">Získaj odpovede na často kladené otázky alebo kontaktuj podporu predplatného na našich stránkach pomoci. Dostupnosť funkcií sa líši podľa krajiny.</string>
-    <string name="restoreSubscriptionTitleRebranding">Pridaj svoje predplatné do tohto zariadenia</string>
-    <string name="restoreSubscriptionEmailDescriptionRebranding">Prepoj e-mailovú adresu so svojím predplatným, aby si ho mohol/mohla pridať do tohto zariadenia.</string>
-    <string name="activateOnOtherDevicesRebranding">Pridaj svoje predplatné do ďalších zariadení</string>
-    <string name="addToDeviceSecondaryTextWithoutEmailRebranding">Pridaj si predplatné do svojich ďalších zariadení cez Google Play alebo prepojením e-mailovej adresy.</string>
-    <string name="addToDeviceSecondaryTextWithEmailRebranding">Použi vyššie uvedený e-mail na pridanie predplatného v&amp;nbsp;iných zariadeniach v&amp;nbsp;aplikácii DuckDuckGo. Prejdi do Nastavenia &gt; Nastavenia predplatného &gt; Mám predplatné.</string>
     <string name="subscriptionSettingRebrandingMessage">Privacy Pro sa teraz nazýva predplatné DuckDuckGo.</string>
-    <string name="subscriptionSettingSubscribeRebranding">Chráň si pripojenie a identitu s jedným predplatným.</string>
-    <string name="removeFromDeviceDescriptionRebranding">Na tomto zariadení už nebudeš mať prístup k svojmu predplatnému. Tým sa tvoje predplatné nezruší a zostane aktívne na tvojich ostatných zariadeniach.</string>
 
     <string name="subscriptionSettingSubscribeWithDuckAiSubtitle">Predplatitelia získajú našu VPN, pokročilé modely umelej inteligencie v Duck.ai, Personal Information Removal a Identity Theft Restoration.</string>
     <string name="subscriptionSettingSubscribeWithDuckAiSubtitleRow">Predplatitelia získajú našu VPN, pokročilé modely umelej inteligencie v Duck.ai a službu Identity Theft Restoration.</string>
@@ -194,8 +184,6 @@
     <string name="subscriptionSettingSectionTitle" translatable="false">DuckDuckGo Subscription</string>
     <string name="subscriptionSettingSubscribeSecure">Zabezpeč si Wi-Fi a chatuj súkromne s pokročilými modelmi umelej inteligencie</string>
 
-    <string name="subscriptionSettingGetRebranding">Predplatné DuckDuckGo</string>
-    <string name="subscriptionSettingTryFreeTrialRebranding">Vyskúšať zadarmo</string>
     <string name="feedbackGeneralSubscription">Predplatné</string>
 
 </resources>

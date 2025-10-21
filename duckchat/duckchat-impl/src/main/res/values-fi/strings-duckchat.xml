@@ -37,11 +37,13 @@
     <string name="audioCaptureSoundRecorderPermissionDeniedMessage">Sivustot voivat käyttää äänitallenninta vain, jos sallit DuckDuckGon pyytää sen käyttöoikeutta.</string>
 
     <!-- Settings -->
-    <string name="duck_chat_settings_activity_description">Duck.ai on valinnainen ominaisuus, jonka avulla voit keskustella anonyymisti suosittujen kolmannen osapuolen tekoälykeskustelumallien kanssa. Keskustelujasi ei käytetä tekoälyn kouluttamiseen.\n<annotation type="learn_more_link">Lue lisää</annotation></string>
-    <string name="duck_chat_enable_duck_ai_setting">Ota Duck.ai käyttöön</string>
+    <string name="duck_chat_ai_features_title">Tekoälyominaisuudet</string>
+    <string name="duck_chat_settings_activity_description">DuckDuckGon tekoälyominaisuudet ovat yksityisiä ja valinnaisia.\nTietojasi ei käytetä tekoälyn kouluttamiseen.\n<annotation type="learn_more_link">Lue lisää</annotation></string>
+    <string name="duck_chat_enable_duck_ai_setting">Duck.ai</string>
+    <string name="duck_chat_enable_duck_ai_setting_description">Keskustele yksityisesti suosittujen kolmannen osapuolen tekoälymallien kanssa</string>
     <string name="duck_chat_visibility_setting">Selainvalikko</string>
     <string name="duck_chat_address_bar_visibility_setting">Osoitekenttä</string>
-    <string name="duck_chat_assist_settings_title">Assist-asetukset</string>
+    <string name="duck_chat_assist_settings_title">Search Assist -asetukset</string>
     <string name="duck_chat_assist_settings_description">Valitse, kuinka usein haluat tekoälyavusteisten vastausten näkyvän hauissasi</string>
     <string name="duck_ai_shortcut_settings_title">Duck.ai-pikakuvakkeet</string>
     <string name="duck_ai_shortcut_settings_description">Valitse, mitkä Duck.ai-pikakuvakkeet näytetään</string>
@@ -61,14 +63,6 @@
     <string name="duck_ai_paid_settings_page_description"><![CDATA[Keskustele yksityisesti tilaajien käytettävissä olevien tekoälymallien kanssa.\n<a href=\"\">Lue lisää</a>]]></string>
     <string name="duck_ai_paid_settings_open_duck_ai">Avaa Duck.ai</string>
     <string name="duck_ai_paid_settings_learn_more_title">Lue lisää</string>
-
-    <!-- Rebranding-->
-    <string name="duck_chat_title_rebranding">Tekoälyominaisuudet</string>
-    <string name="duck_chat_settings_activity_description_rebranding">DuckDuckGon tekoälyominaisuudet ovat yksityisiä ja valinnaisia.\nTietojasi ei käytetä tekoälyn kouluttamiseen.\n<annotation type="learn_more_link">Lue lisää</annotation></string>
-    <string name="duck_chat_enable_duck_ai_setting_rebranding">Duck.ai</string>
-    <string name="duck_chat_enable_duck_ai_setting_description_rebranding">Keskustele yksityisesti suosittujen kolmannen osapuolen tekoälymallien kanssa</string>
-    <string name="duck_chat_assist_settings_title_rebranding">Search Assist -asetukset</string>
-    <string name="duck_chat_assist_settings_description_rebranding">Valitse, kuinka usein haluat tekoälyavusteisten vastausten näkyvän hauissasi</string>
 
     <!-- AutoComplete -->
     <string name="autocompleteDuckAiPrompt">Kysy Duck.ai:lta</string>

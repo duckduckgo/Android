@@ -20,6 +20,7 @@
     <string name="cancel">Peruuta</string>
     <string name="ok">OK</string>
     <string name="privacyPro" translatable="false">Privacy Pro</string>
+    <string name="ddg_subscription">DuckDuckGo-tilaus</string>
     <string name="manageEmail">Hallinnoi sähköpostia</string>
 
     <!--Restore Subscriptions Activity-->
@@ -31,19 +32,19 @@
     <string name="subscriptionNotFound">Tilausta ei löytynyt</string>
     <string name="subscriptionNotFoundDescription">Tähän Google Play -tiliin liitetty tilaus ei ole enää voimassa.</string>
     <string name="purchaseRestored">Ostosi on palautettu.</string>
-    <string name="restoreSubscriptionTitle">Lisää Privacy Pro -tilauksesi tähän laitteeseen</string>
+    <string name="restoreSubscriptionTitle">Lisää tilauksesi tähän laitteeseen</string>
     <string name="restoreSubscriptionGooglePlayTitle">Lisää Google Play -tilin kautta</string>
     <string name="restoreSubscriptionGooglePlayDescription">Palauta tilauksesi Android-laitteissa käyttämällä Google Play -tiliäsi.</string>
     <string name="restoreSubscriptionGooglePlayGetStarted">Palauta osto</string>
     <string name="restoreSubscriptionEmailTitle">Lisää sähköpostin kautta</string>
-    <string name="restoreSubscriptionEmailDescription">Lisää Privacy Pro tähän laitteeseen linkittämällä sähköpostiosoite tilaukseesi.</string>
+    <string name="restoreSubscriptionEmailDescription">Liitä sähköpostiosoite tilaukseesi lisätäksesi sen tähän laitteeseen.</string>
     <string name="restoreSubscriptionEmailGetStarted">Aloita</string>
 
     <!--Settings Subscriptions Activity-->
     <string name="removeSubscription">Poista tilaus</string>
     <string name="subscriptionRemoved">Tilauksesi on poistettu tältä laitteelta</string>
     <string name="removeFromDevice">Poistetaanko tältä laitteelta?</string>
-    <string name="removeFromDeviceDescription">Et voi enää käyttää Privacy Pro -tilaustasi tällä laitteella. Tämä ei peruuta tilaustasi, vaan se pysyy aktiivisena muilla laitteillasi.</string>
+    <string name="removeFromDeviceDescription">Et voi enää käyttää tilaustasi tällä laitteella. Tämä ei peruuta tilaustasi, vaan se pysyy aktiivisena muilla laitteillasi.</string>
     <string name="subscriptionsDataMonthly" instruction="First placeholder is renews or expires, second is a date in format MMMM dd, yyyy">Kuukausitilauksesi %1$s %2$s.</string>
     <string name="subscriptionsDataYearly" instruction="First placeholder is renews or expires, second is a date in format MMMM dd, yyyy">Vuositilauksesi %1$s %2$s.</string>
     <string name="subscriptionsExpiredData" instruction="The placeholder is a date in format MMMM dd, yyyy">Tilauksesi päättyi %1$s.</string>
@@ -51,14 +52,14 @@
     <string name="yearlySubscription">Vuositilaus</string>
     <string name="renews">uusiutuu</string>
     <string name="expires">päättyy</string>
-    <string name="activateOnOtherDevices">Lisää Privacy Pro muihin laitteisiin</string>
+    <string name="activateOnOtherDevices">Lisää tilauksesi muihin laitteisiin</string>
     <string name="addToDevicePrimaryText">Lisää laitteeseen</string>
-    <string name="addToDeviceSecondaryTextWithoutEmail">Lisää Privacy Pro muihin laitteisiisi Google Playn kautta tai linkittämällä sähköpostiosoite.</string>
-    <string name="addToDeviceSecondaryTextWithEmail">Lisää tilauksesi muihin laitteisiisi DuckDuckGo-sovelluksessa käyttämällä yllä olevaa sähköpostiosoitetta. Siirry kohtaan Asetukset &gt; Privacy Pro &gt; Minulla on tilaus.</string>
+    <string name="addToDeviceSecondaryTextWithoutEmail">Lisää tilauksesi muihin laitteisiisi Google Playn kautta tai liittämällä sähköpostiosoite.</string>
+    <string name="addToDeviceSecondaryTextWithEmail">Lisää tilauksesi muihin laitteisiisi DuckDuckGo-sovelluksessa käyttämällä yllä olevaa sähköpostiosoitetta. Siirry kohtaan Asetukset &gt; Tilausasetukset &gt; Minulla on tilaus.</string>
     <string name="editEmailPrimaryText">Muokkaa sähköpostiosoitetta</string>
     <string name="learnMore">Lue lisää</string>
-    <string name="privacyProFaq">Tarvitsetko apua Privacy Pron kanssa?</string>
-    <string name="privacyProFaqSecondary">Katso vastaukset usein kysyttyihin kysymyksiin tai ota yhteyttä Privacy Pron tukeen ohjesivuiltamme. Ominaisuuden saatavuus vaihtelee maittain.</string>
+    <string name="privacyProFaq">Tarvitsetko apua tilauksesi kanssa?</string>
+    <string name="privacyProFaqSecondary">Katso vastaukset usein kysyttyihin kysymyksiin tai ota yhteyttä tilaustukeen ohjesivujemme kautta. Ominaisuuden saatavuus vaihtelee maittain.</string>
     <string name="subscriptionStatusSubscribed">Tilattu</string>
     <string name="privacyPolicyAndTermsOfService">Tietosuojakäytäntö ja palveluehdot</string>
     <string name="subscriptionStatusFreeTrial">Ilmainen kokeilujakso on aktiivinen</string>
@@ -68,15 +69,15 @@
 
     <!--Settings Subscriptions-->
     <string name="subscriptionSetting">Tilauksen asetukset</string>
-    <string name="subscriptionSettingSubscribe">Suojaa yhteytesi ja identiteettisi Privacy Prolla</string>
+    <string name="subscriptionSettingSubscribe">Suojaa yhteytesi ja henkilöllisyytesi yhdellä tilauksella.</string>
 
     <string name="subscriptionSettingSubscribeSubtitle">Tilaajat saavat VPN:n, Personal Information Removalin ja Identity Theft Restorationin.</string>
     <string name="subscriptionSettingSubscribeSubtitleRow">Tilaajat saavat VPN:n ja Identity Theft Restorationin.</string>
 
-    <string name="subscriptionSettingGet">Hanki Privacy Pro</string>
-    <string name="subscriptionSettingTryFreeTrial">Kokeile Privacy Pro -tilausta ilmaiseksi</string>
+    <string name="subscriptionSettingGet">Tilaa DuckDuckGo</string>
+    <string name="subscriptionSettingTryFreeTrial">Kokeile maksutta</string>
     <string name="subscriptionSettingRestore">Minulla on tilaus</string>
-    <string name="subscriptionSettingExpired">Privacy Pro -tilauksesi on päättynyt</string>
+    <string name="subscriptionSettingExpired">DuckDuckGo-tilauksesi on päättynyt</string>
     <string name="subscriptionSettingExpiredViewPlans">Näytä tilaukset</string>
     <string name="subscriptionSettingSectionSubscription">Tilaus</string>
     <string name="subscriptionSettingRemoveFromDevice">Poista tältä laitteelta</string>
@@ -170,18 +171,7 @@
     <string name="activitySendFeedback">Lähetä palautetta</string>
 
     <!-- Privacy Pro Rebranding-->
-    <string name="privacyProRebranding">DuckDuckGo-tilaus</string>
-    <string name="subscriptionSettingExpiredRebranding">DuckDuckGo-tilauksesi on päättynyt</string>
-    <string name="privacyProFaqRebranding">Tarvitsetko apua tilauksesi kanssa?</string>
-    <string name="privacyProFaqSecondaryRebranding">Katso vastaukset usein kysyttyihin kysymyksiin tai ota yhteyttä tilaustukeen ohjesivujemme kautta. Ominaisuuden saatavuus vaihtelee maittain.</string>
-    <string name="restoreSubscriptionTitleRebranding">Lisää tilauksesi tähän laitteeseen</string>
-    <string name="restoreSubscriptionEmailDescriptionRebranding">Liitä sähköpostiosoite tilaukseesi lisätäksesi sen tähän laitteeseen.</string>
-    <string name="activateOnOtherDevicesRebranding">Lisää tilauksesi muihin laitteisiin</string>
-    <string name="addToDeviceSecondaryTextWithoutEmailRebranding">Lisää tilauksesi muihin laitteisiisi Google Playn kautta tai liittämällä sähköpostiosoite.</string>
-    <string name="addToDeviceSecondaryTextWithEmailRebranding">Lisää tilauksesi muihin laitteisiisi DuckDuckGo-sovelluksessa käyttämällä yllä olevaa sähköpostiosoitetta. Siirry kohtaan Asetukset &gt; Tilausasetukset &gt; Minulla on tilaus.</string>
     <string name="subscriptionSettingRebrandingMessage">Privacy Pro on nyt nimeltään DuckDuckGo-tilaus</string>
-    <string name="subscriptionSettingSubscribeRebranding">Suojaa yhteytesi ja henkilöllisyytesi yhdellä tilauksella.</string>
-    <string name="removeFromDeviceDescriptionRebranding">Et voi enää käyttää tilaustasi tällä laitteella. Tämä ei peruuta tilaustasi, vaan se pysyy aktiivisena muissa laitteissasi.</string>
 
     <string name="subscriptionSettingSubscribeWithDuckAiSubtitle">Tilaajat saavat VPN:n ja edistyneet tekoälymallit Duck.ai:ssa, Personal Information Removalin ja Identity Theft Restorationin.</string>
     <string name="subscriptionSettingSubscribeWithDuckAiSubtitleRow">Tilaajat saavat VPN:n, edistyneet tekoälymallit Duck.ai:ssa ja Identity Theft Restorationin.</string>
@@ -194,8 +184,6 @@
     <string name="subscriptionSettingSectionTitle" translatable="false">DuckDuckGo Subscription</string>
     <string name="subscriptionSettingSubscribeSecure">Suojaa WiFi-yhteytesi ja keskustele yksityisesti edistyneiden tekoälymallien kanssa</string>
 
-    <string name="subscriptionSettingGetRebranding">Tilaa DuckDuckGo</string>
-    <string name="subscriptionSettingTryFreeTrialRebranding">Kokeile maksutta</string>
     <string name="feedbackGeneralSubscription">Tilaus</string>
 
 </resources>

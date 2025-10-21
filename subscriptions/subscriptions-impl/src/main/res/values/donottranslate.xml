@@ -15,4 +15,5 @@
   -->
 
 <resources>
+    <string name="feedbackSubmitContactSupport">Need help? <annotation type="support_link">Contact support</annotation>.</string>
 </resources>
