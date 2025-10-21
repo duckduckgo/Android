@@ -76,4 +76,6 @@
     <string name="newAddressBarOptionBottomSheetDialogSearchOnly">Vain haku</string>
     <string name="newAddressBarOptionBottomSheetDialogSearchAndDuckAi">Haku ja Duck.ai</string>
     <string name="newAddressBarOptionBottomSheetDialogHeader">Osoiterivi-vaihtoehto</string>
+    <string name="newAddressBarOptionBottomSheetDialogTitle">Haluatko helpomman pääsyn tekoäly-chatiin?</string>
+
 </resources>

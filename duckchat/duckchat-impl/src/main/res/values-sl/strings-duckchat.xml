@@ -76,4 +76,6 @@
     <string name="newAddressBarOptionBottomSheetDialogSearchOnly">Samo iskanje</string>
     <string name="newAddressBarOptionBottomSheetDialogSearchAndDuckAi">Iskanje in Duck.ai</string>
     <string name="newAddressBarOptionBottomSheetDialogHeader">Možnost naslovne vrstice</string>
+    <string name="newAddressBarOptionBottomSheetDialogTitle">Želite lažji dostop do klepeta z umetno inteligenco?</string>
+
 </resources>

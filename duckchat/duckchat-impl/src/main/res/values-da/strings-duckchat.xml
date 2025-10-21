@@ -76,4 +76,6 @@
     <string name="newAddressBarOptionBottomSheetDialogSearchOnly">Kun søgning</string>
     <string name="newAddressBarOptionBottomSheetDialogSearchAndDuckAi">Søg &amp; Duck.ai</string>
     <string name="newAddressBarOptionBottomSheetDialogHeader">Indstilling af adresselinje</string>
+    <string name="newAddressBarOptionBottomSheetDialogTitle">Vil du have nemmere adgang til AI-chat?</string>
+
 </resources>

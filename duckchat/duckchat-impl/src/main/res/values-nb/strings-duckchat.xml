@@ -76,4 +76,6 @@
     <string name="newAddressBarOptionBottomSheetDialogSearchOnly">Bare søk</string>
     <string name="newAddressBarOptionBottomSheetDialogSearchAndDuckAi">Søk og Duck.ai</string>
     <string name="newAddressBarOptionBottomSheetDialogHeader">Alternativ for adressefelt</string>
+    <string name="newAddressBarOptionBottomSheetDialogTitle">Vil du ha enklere tilgang til AI-chat?</string>
+
 </resources>

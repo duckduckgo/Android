@@ -76,4 +76,6 @@
     <string name="newAddressBarOptionBottomSheetDialogSearchOnly">Doar căutare</string>
     <string name="newAddressBarOptionBottomSheetDialogSearchAndDuckAi">Caută pe Duck.ai</string>
     <string name="newAddressBarOptionBottomSheetDialogHeader">Opțiunea bară de adrese</string>
+    <string name="newAddressBarOptionBottomSheetDialogTitle">Vrei un acces mai ușor la chatul cu IA?</string>
+
 </resources>

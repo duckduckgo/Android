@@ -76,4 +76,6 @@
     <string name="newAddressBarOptionBottomSheetDialogSearchOnly">Ainult otsi</string>
     <string name="newAddressBarOptionBottomSheetDialogSearchAndDuckAi">Otsi ja Duck.ai</string>
     <string name="newAddressBarOptionBottomSheetDialogHeader">Aadressiriba valik</string>
+    <string name="newAddressBarOptionBottomSheetDialogTitle">Kas soovid AI-chatile lihtsamat juurdepääsu?</string>
+
 </resources>

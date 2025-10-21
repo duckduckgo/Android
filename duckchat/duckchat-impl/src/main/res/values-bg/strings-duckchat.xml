@@ -76,4 +76,6 @@
     <string name="newAddressBarOptionBottomSheetDialogSearchOnly">Само търсене</string>
     <string name="newAddressBarOptionBottomSheetDialogSearchAndDuckAi">Търсене и Duck.ai</string>
     <string name="newAddressBarOptionBottomSheetDialogHeader">Опция за адресната лента</string>
+    <string name="newAddressBarOptionBottomSheetDialogTitle">Искаш ли по-лесен достъп до AI чат?</string>
+
 </resources>
