@@ -70,7 +70,6 @@
 
     <!-- New Address Bar Option Bottom Sheet Dialog -->
     <string name="newAddressBarOptionBottomSheetDialogSearchText">Αναζήτηση ή εισαγωγή διεύθυνσης</string>
-    <string name="newAddressBarOptionBottomSheetDialogTitle">Εναλλαγή μεταξύ αναζήτησης και συνομιλίας τεχνητής νοημοσύνης</string>
     <string name="newAddressBarOptionBottomSheetDialogPrimaryButton">Επιβεβαίωση</string>
     <string name="newAddressBarOptionBottomSheetDialogGhostButton">Όχι τώρα</string>
     <string name="newAddressBarOptionBottomSheetDialogFooter">Προσαρμόστε στις Ρυθμίσεις &gt; Λειτουργίες τεχνητής νοημοσύνης.</string>

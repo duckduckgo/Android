@@ -70,7 +70,6 @@
 
     <!-- New Address Bar Option Bottom Sheet Dialog -->
     <string name="newAddressBarOptionBottomSheetDialogSearchText">Caută sau introdu adresa</string>
-    <string name="newAddressBarOptionBottomSheetDialogTitle">Comută între căutare și chat IA</string>
     <string name="newAddressBarOptionBottomSheetDialogPrimaryButton">Confirmare</string>
     <string name="newAddressBarOptionBottomSheetDialogGhostButton">Nu acum</string>
     <string name="newAddressBarOptionBottomSheetDialogFooter">Ajustează din Setări &gt; Funcții IA.</string>

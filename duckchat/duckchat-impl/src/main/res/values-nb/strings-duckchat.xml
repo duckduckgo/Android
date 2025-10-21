@@ -70,7 +70,6 @@
 
     <!-- New Address Bar Option Bottom Sheet Dialog -->
     <string name="newAddressBarOptionBottomSheetDialogSearchText">Søk eller skriv inn adresse</string>
-    <string name="newAddressBarOptionBottomSheetDialogTitle">Veksle mellom søk og AI-chat</string>
     <string name="newAddressBarOptionBottomSheetDialogPrimaryButton">Bekreft</string>
     <string name="newAddressBarOptionBottomSheetDialogGhostButton">Ikke nå</string>
     <string name="newAddressBarOptionBottomSheetDialogFooter">Juster i Innstillinger &gt; AI-funksjoner.</string>

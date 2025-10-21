@@ -70,7 +70,6 @@
 
     <!-- New Address Bar Option Bottom Sheet Dialog -->
     <string name="newAddressBarOptionBottomSheetDialogSearchText">Adres ara veya gir</string>
-    <string name="newAddressBarOptionBottomSheetDialogTitle">Arama ve AI sohbeti arasında geçiş yapın</string>
     <string name="newAddressBarOptionBottomSheetDialogPrimaryButton">Onayla</string>
     <string name="newAddressBarOptionBottomSheetDialogGhostButton">Şimdi Değil</string>
     <string name="newAddressBarOptionBottomSheetDialogFooter">Ayarlar &gt; AI Özellikleri bölümünden ayarlarınızı değiştirebilirsiniz.</string>

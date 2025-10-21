@@ -70,7 +70,6 @@
 
     <!-- New Address Bar Option Bottom Sheet Dialog -->
     <string name="newAddressBarOptionBottomSheetDialogSearchText">Meklē vai ievadi adresi</string>
-    <string name="newAddressBarOptionBottomSheetDialogTitle">Pārslēgties starp meklēšanu un MI tērzēšanu</string>
     <string name="newAddressBarOptionBottomSheetDialogPrimaryButton">Apstiprināt</string>
     <string name="newAddressBarOptionBottomSheetDialogGhostButton">Ne tagad</string>
     <string name="newAddressBarOptionBottomSheetDialogFooter">Pielāgo iestatījumos &gt; MI funkcijas.</string>

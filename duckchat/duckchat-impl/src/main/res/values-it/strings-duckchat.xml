@@ -70,7 +70,6 @@
 
     <!-- New Address Bar Option Bottom Sheet Dialog -->
     <string name="newAddressBarOptionBottomSheetDialogSearchText">Cerca o digita l\'indirizzo</string>
-    <string name="newAddressBarOptionBottomSheetDialogTitle">Passa dalla ricerca alla chat AI e viceversa</string>
     <string name="newAddressBarOptionBottomSheetDialogPrimaryButton">Conferma</string>
     <string name="newAddressBarOptionBottomSheetDialogGhostButton">Non adesso</string>
     <string name="newAddressBarOptionBottomSheetDialogFooter">Regola in Impostazioni &gt; Funzionalità AI.</string>

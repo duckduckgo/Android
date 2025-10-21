@@ -70,7 +70,6 @@
 
     <!-- New Address Bar Option Bottom Sheet Dialog -->
     <string name="newAddressBarOptionBottomSheetDialogSearchText">Введите поисковый запрос или адрес сайта</string>
-    <string name="newAddressBarOptionBottomSheetDialogTitle">Переключатель между поиском и чатом с ИИ</string>
     <string name="newAddressBarOptionBottomSheetDialogPrimaryButton">Подтвердить</string>
     <string name="newAddressBarOptionBottomSheetDialogGhostButton">Не сейчас</string>
     <string name="newAddressBarOptionBottomSheetDialogFooter">Посетите раздел «Настройки &gt; Функции ИИ».</string>

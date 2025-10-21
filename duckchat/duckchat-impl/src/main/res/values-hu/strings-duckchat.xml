@@ -70,7 +70,6 @@
 
     <!-- New Address Bar Option Bottom Sheet Dialog -->
     <string name="newAddressBarOptionBottomSheetDialogSearchText">Keresés vagy cím megadása</string>
-    <string name="newAddressBarOptionBottomSheetDialogTitle">Váltogatás a keresés és az AI-csevegés között</string>
     <string name="newAddressBarOptionBottomSheetDialogPrimaryButton">Megerősítés</string>
     <string name="newAddressBarOptionBottomSheetDialogGhostButton">Most nem</string>
     <string name="newAddressBarOptionBottomSheetDialogFooter">Állítsd be a Beállítások &gt; AI-funkciók menüpontban.</string>

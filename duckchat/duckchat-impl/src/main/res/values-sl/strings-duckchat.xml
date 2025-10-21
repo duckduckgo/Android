@@ -70,7 +70,6 @@
 
     <!-- New Address Bar Option Bottom Sheet Dialog -->
     <string name="newAddressBarOptionBottomSheetDialogSearchText">Poišči ali vnesi naslov</string>
-    <string name="newAddressBarOptionBottomSheetDialogTitle">Preklapljanje med iskanjem in klepetom UI</string>
     <string name="newAddressBarOptionBottomSheetDialogPrimaryButton">Potrdi</string>
     <string name="newAddressBarOptionBottomSheetDialogGhostButton">Ne zdaj</string>
     <string name="newAddressBarOptionBottomSheetDialogFooter">Prilagodite v Nastavitve &gt; Funkcije UI.</string>
