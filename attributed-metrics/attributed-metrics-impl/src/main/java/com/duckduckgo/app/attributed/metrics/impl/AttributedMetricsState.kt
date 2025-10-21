@@ -26,7 +26,6 @@ import com.duckduckgo.app.statistics.api.AtbLifecyclePlugin
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.privacy.config.api.PrivacyConfigCallbackPlugin
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.SingleInstanceIn
@@ -44,6 +43,7 @@ import javax.inject.Inject
  */
 interface AttributedMetricsState {
     suspend fun isActive(): Boolean
+    suspend fun canEmitMetrics(): Boolean
 }
 
 @ContributesBinding(
@@ -58,10 +58,6 @@ interface AttributedMetricsState {
     scope = AppScope::class,
     boundType = AtbLifecyclePlugin::class,
 )
-@ContributesMultibinding(
-    scope = AppScope::class,
-    boundType = PrivacyConfigCallbackPlugin::class,
-)
 @SingleInstanceIn(AppScope::class)
 class RealAttributedMetricsState @Inject constructor(
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
@@ -70,7 +66,7 @@ class RealAttributedMetricsState @Inject constructor(
     private val attributedMetricsConfigFeature: AttributedMetricsConfigFeature,
     private val appBuildConfig: AppBuildConfig,
     private val attributedMetricsDateUtils: AttributedMetricsDateUtils,
-) : AttributedMetricsState, MainProcessLifecycleObserver, AtbLifecyclePlugin, PrivacyConfigCallbackPlugin {
+) : AttributedMetricsState, MainProcessLifecycleObserver, AtbLifecyclePlugin {
 
     override fun onCreate(owner: LifecycleOwner) {
         appCoroutineScope.launch(dispatcherProvider.io()) {
@@ -84,7 +80,7 @@ class RealAttributedMetricsState @Inject constructor(
             logcat(tag = "AttributedMetrics") {
                 "Detected New Install, try to initialize Attributed Metrics"
             }
-            if (attributedMetricsConfigFeature.self().isEnabled().not()) {
+            if (!isEnabled()) {
                 logcat(tag = "AttributedMetrics") {
                     "Client disabled from remote config, skipping initialization"
                 }
@@ -115,18 +111,9 @@ class RealAttributedMetricsState @Inject constructor(
         }
     }
 
-    override fun onPrivacyConfigDownloaded() {
-        appCoroutineScope.launch(dispatcherProvider.io()) {
-            val toggleEnabledState = attributedMetricsConfigFeature.self().isEnabled()
-            logcat(tag = "AttributedMetrics") {
-                "Privacy config downloaded, update client toggle state: $toggleEnabledState"
-            }
-            dataStore.setEnabled(toggleEnabledState)
-            logClientStatus()
-        }
-    }
+    override suspend fun isActive(): Boolean = isEnabled() && dataStore.isActive() && dataStore.getInitializationDate() != null
 
-    override suspend fun isActive(): Boolean = dataStore.isActive() && dataStore.isEnabled() && dataStore.getInitializationDate() != null
+    override suspend fun canEmitMetrics(): Boolean = isActive() && emitMetricsEnabled()
 
     private suspend fun checkCollectionPeriodAndUpdateState() {
         val initDate = dataStore.getInitializationDate()
@@ -150,9 +137,13 @@ class RealAttributedMetricsState @Inject constructor(
     }
 
     private suspend fun logClientStatus() = logcat(tag = "AttributedMetrics") {
-        "Client status running: ${isActive()} -> isActive: ${dataStore.isActive()}, isEnabled: ${dataStore.isEnabled()}," +
+        "Client status running: ${isActive()} -> isActive: ${dataStore.isActive()}, isEnabled: ${isEnabled()}," +
             " initializationDate: ${dataStore.getInitializationDate()}"
     }
+
+    private fun isEnabled(): Boolean = attributedMetricsConfigFeature.self().isEnabled()
+
+    private fun emitMetricsEnabled(): Boolean = attributedMetricsConfigFeature.emitAllMetrics().isEnabled()
 
     companion object {
         private const val COLLECTION_PERIOD_DAYS = 168 // 24 weeks * 7 days (6 months in weeks)

@@ -103,10 +103,22 @@ class RealAttributedMetricClientTest {
     fun whenEmitMetricAndClientActiveMetricIsEmitted() = runTest {
         val testMetric = TestAttributedMetric()
         whenever(mockMetricsState.isActive()).thenReturn(true)
+        whenever(mockMetricsState.canEmitMetrics()).thenReturn(true)
 
         testee.emitMetric(testMetric)
 
         verify(mockPixel).fire(pixelName = "test_pixel", parameters = mapOf("param" to "value"), type = Unique("test_pixel_test_tag"))
+    }
+
+    @Test
+    fun whenEmitMetricClientActiveButCanEmitMetricsFalseThenMetricIsNotEmitted() = runTest {
+        val testMetric = TestAttributedMetric()
+        whenever(mockMetricsState.isActive()).thenReturn(true)
+        whenever(mockMetricsState.canEmitMetrics()).thenReturn(false)
+
+        testee.emitMetric(testMetric)
+
+        verify(mockPixel, never()).fire(pixelName = "test_pixel", parameters = mapOf("param" to "value"), type = Unique("test_pixel_test_tag"))
     }
 
     @Test

@@ -14,13 +14,19 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.attributed.metrics
+package com.duckduckgo.app.attributed.metrics.retention
 
+import android.annotation.SuppressLint
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.duckduckgo.app.attributed.metrics.AttributedMetricsConfigFeature
 import com.duckduckgo.app.attributed.metrics.api.AttributedMetricClient
+import com.duckduckgo.app.attributed.metrics.api.AttributedMetricConfig
+import com.duckduckgo.app.attributed.metrics.api.MetricBucket
 import com.duckduckgo.app.attributed.metrics.store.AttributedMetricsDateUtils
 import com.duckduckgo.browser.api.install.AppInstall
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
+import com.duckduckgo.feature.toggles.api.Toggle.State
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Before
@@ -32,6 +38,7 @@ import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
+@SuppressLint("DenyListedApi")
 @RunWith(AndroidJUnit4::class)
 class RetentionMonthAttributedMetricTest {
 
@@ -39,19 +46,27 @@ class RetentionMonthAttributedMetricTest {
     val coroutineRule = CoroutineTestRule()
 
     private val attributedMetricClient: AttributedMetricClient = mock()
+    private val attributedMetricConfig: AttributedMetricConfig = mock()
     private val appInstall: AppInstall = mock()
     private val dateUtils: AttributedMetricsDateUtils = mock()
+    private val retentionToggle = FakeFeatureToggleFactory.create(AttributedMetricsConfigFeature::class.java)
 
     private lateinit var testee: RetentionMonthAttributedMetric
 
     @Before
-    fun setup() {
+    fun setup() = runTest {
+        retentionToggle.retention().setRawStoredState(State(true))
+        retentionToggle.canEmitRetention().setRawStoredState(State(true))
+        whenever(attributedMetricConfig.metricsToggles()).thenReturn(
+            listOf(retentionToggle.retention(), retentionToggle.canEmitRetention()),
+        )
         testee = RetentionMonthAttributedMetric(
             appCoroutineScope = coroutineRule.testScope,
             dispatcherProvider = coroutineRule.testDispatcherProvider,
             appInstall = appInstall,
             attributedMetricClient = attributedMetricClient,
             dateUtils = dateUtils,
+            attributedMetricConfig = attributedMetricConfig,
         )
     }
 
@@ -86,6 +101,33 @@ class RetentionMonthAttributedMetricTest {
     }
 
     @Test
+    fun whenAppOpensAndDaysIs29ButFFDisabledThenDoNotEmitMetric() = runTest {
+        retentionToggle.retention().setRawStoredState(State(false))
+        whenever(attributedMetricConfig.metricsToggles()).thenReturn(
+            listOf(retentionToggle.retention(), retentionToggle.canEmitRetention()),
+        )
+        givenDaysSinceInstalled(29)
+
+        testee.onAppRetentionAtbRefreshed("old", "new")
+
+        verify(attributedMetricClient, never()).emitMetric(testee)
+    }
+
+    @Test
+    fun whenAppOpensAndDaysIs29AndEmitDisabledThenDoNotEmitMetric() = runTest {
+        retentionToggle.retention().setRawStoredState(State(true))
+        retentionToggle.canEmitRetention().setRawStoredState(State(false))
+        whenever(attributedMetricConfig.metricsToggles()).thenReturn(
+            listOf(retentionToggle.retention(), retentionToggle.canEmitRetention()),
+        )
+        givenDaysSinceInstalled(29)
+
+        testee.onAppRetentionAtbRefreshed("old", "new")
+
+        verify(attributedMetricClient, never()).emitMetric(testee)
+    }
+
+    @Test
     fun whenDaysLessThan29ThenReturnEmptyParameters() = runTest {
         givenDaysSinceInstalled(28)
 
@@ -96,17 +138,27 @@ class RetentionMonthAttributedMetricTest {
 
     @Test
     fun whenDaysInstalledThenReturnCorrectPeriod() = runTest {
+        whenever(attributedMetricConfig.getBucketConfiguration()).thenReturn(
+            mapOf(
+                "user_retention_month" to MetricBucket(
+                    buckets = listOf(2, 3, 4, 5),
+                    version = 0,
+                ),
+            ),
+        )
         // Map of days installed to expected period number
         val periodRanges = mapOf(
-            28 to 0, // Day 28 -> No period (empty map)
-            29 to 1, // Day 29 -> Period 1 (first month)
-            45 to 1, // Day 45 -> Period 1 (still first month)
-            57 to 2, // Day 57 -> Period 2 (second month)
-            85 to 3, // Day 85 -> Period 3 (third month)
-            113 to 4, // Day 113 -> Period 4 (fourth month)
-            141 to 5, // Day 141 -> Period 5 (fifth month)
-            169 to 6, // Day 169 -> Period 6 (sixth month)
-            197 to 7, // Day 197 -> Period 7 (seventh month)
+            10 to -1, // Day 10 -> month 1, not captured by this metric
+            28 to -1, // Day 28 -> month 1, not captured by this metric
+            29 to 0, // Day 29 -> month 2, Bucket 0
+            45 to 0, // Day 45 -> month 2, Bucket 0
+            56 to 0, // Day 57 -> month 2, Bucket 0
+            57 to 1, // Day 57 -> month 3, Bucket 1
+            85 to 2, // Day 85 -> month 4, Bucket 2
+            113 to 3, // Day 113 -> month 5, Bucket 3
+            141 to 4, // Day 141 -> month 6, Bucket 4
+            169 to 4, // Day 169 -> month 7, Bucket 4
+            197 to 4, // Day 197 -> month 8, Bucket 4
         )
 
         periodRanges.forEach { (days, expectedPeriod) ->
@@ -114,7 +166,7 @@ class RetentionMonthAttributedMetricTest {
 
             val params = testee.getMetricParameters()
 
-            val expectedParams = if (expectedPeriod > 0) {
+            val expectedParams = if (expectedPeriod > -1) {
                 mapOf("count" to expectedPeriod.toString())
             } else {
                 emptyMap()
@@ -130,14 +182,28 @@ class RetentionMonthAttributedMetricTest {
 
     @Test
     fun whenDaysInstalledThenReturnCorrectTag() = runTest {
+        whenever(attributedMetricConfig.getBucketConfiguration()).thenReturn(
+            mapOf(
+                "user_retention_month" to MetricBucket(
+                    buckets = listOf(2, 3, 4, 5),
+                    version = 0,
+                ),
+            ),
+        )
+
         // Test different days and expected period numbers
         val testCases = mapOf(
-            28 to "0", // Day 28 -> No period
-            29 to "1", // Day 29 -> Period 1
-            57 to "2", // Day 57 -> Period 2
-            85 to "3", // Day 85 -> Period 3
-            113 to "4", // Day 113 -> Period 4
-            141 to "5", // Day 141 -> Period 5
+            10 to "-1", // Day 10 -> month 1, not captured by this metric
+            28 to "-1", // Day 28 -> month 1, not captured by this metric
+            29 to "0", // Day 29 -> month 2, Bucket 0
+            45 to "0", // Day 45 -> month 2, Bucket 0
+            56 to "0", // Day 57 -> month 2, Bucket 0
+            57 to "1", // Day 57 -> month 3, Bucket 1
+            85 to "2", // Day 85 -> month 4, Bucket 2
+            113 to "3", // Day 113 -> month 5, Bucket 3
+            141 to "4", // Day 141 -> month 6, Bucket 4
+            169 to "4", // Day 169 -> month 7, Bucket 4
+            197 to "4", // Day 197 -> month 8, Bucket 4
         )
 
         testCases.forEach { (days, expectedTag) ->

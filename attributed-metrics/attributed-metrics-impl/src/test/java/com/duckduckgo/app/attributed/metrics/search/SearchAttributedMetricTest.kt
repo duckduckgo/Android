@@ -14,15 +14,21 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.attributed.metrics
+package com.duckduckgo.app.attributed.metrics.search
 
+import android.annotation.SuppressLint
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.duckduckgo.app.attributed.metrics.AttributedMetricsConfigFeature
 import com.duckduckgo.app.attributed.metrics.api.AttributedMetricClient
+import com.duckduckgo.app.attributed.metrics.api.AttributedMetricConfig
 import com.duckduckgo.app.attributed.metrics.api.EventStats
+import com.duckduckgo.app.attributed.metrics.api.MetricBucket
 import com.duckduckgo.app.attributed.metrics.store.AttributedMetricsDateUtils
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.duckduckgo.browser.api.install.AppInstall
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
+import com.duckduckgo.feature.toggles.api.Toggle.State
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
@@ -37,8 +43,9 @@ import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
+@SuppressLint("DenyListedApi")
 @RunWith(AndroidJUnit4::class)
-class RealSearchAttributedMetricTest {
+class SearchAttributedMetricTest {
 
     @get:Rule
     val coroutineRule = CoroutineTestRule()
@@ -47,18 +54,38 @@ class RealSearchAttributedMetricTest {
     private val appInstall: AppInstall = mock()
     private val statisticsDataStore: StatisticsDataStore = mock()
     private val dateUtils: AttributedMetricsDateUtils = mock()
+    private val attributedMetricConfig: AttributedMetricConfig = mock()
+    private val searchToggle = FakeFeatureToggleFactory.create(AttributedMetricsConfigFeature::class.java)
 
-    private lateinit var testee: RealSearchAttributedMetric
+    private lateinit var testee: SearchAttributedMetric
 
     @Before
-    fun setup() {
-        testee = RealSearchAttributedMetric(
+    fun setup() = runTest {
+        searchToggle.searchCountAvg().setRawStoredState(State(true))
+        searchToggle.canEmitSearchCountAvg().setRawStoredState(State(true))
+        whenever(attributedMetricConfig.metricsToggles()).thenReturn(
+            listOf(searchToggle.searchCountAvg(), searchToggle.canEmitSearchCountAvg()),
+        )
+        whenever(attributedMetricConfig.getBucketConfiguration()).thenReturn(
+            mapOf(
+                "user_average_searches_past_week_first_month" to MetricBucket(
+                    buckets = listOf(5, 9),
+                    version = 0,
+                ),
+                "user_average_searches_past_week" to MetricBucket(
+                    buckets = listOf(5, 9),
+                    version = 0,
+                ),
+            ),
+        )
+        testee = SearchAttributedMetric(
             appCoroutineScope = coroutineRule.testScope,
             dispatcherProvider = coroutineRule.testDispatcherProvider,
             attributedMetricClient = attributedMetricClient,
             appInstall = appInstall,
             statisticsDataStore = statisticsDataStore,
             dateUtils = dateUtils,
+            attributedMetricConfig = attributedMetricConfig,
         )
     }
 
@@ -73,6 +100,7 @@ class RealSearchAttributedMetricTest {
     fun whenOnSearchAndAtbNotChangedThenDoNotEmitMetric() = runTest {
         testee.onSearchRetentionAtbRefreshed("same", "same")
 
+        verify(attributedMetricClient).collectEvent("ddg_search")
         verify(attributedMetricClient, never()).emitMetric(testee)
     }
 
@@ -146,17 +174,76 @@ class RealSearchAttributedMetricTest {
     }
 
     @Test
+    fun whenSearchedButFFDisabledThenDoNotCollectAndDoNotEmitMetric() = runTest {
+        searchToggle.searchCountAvg().setRawStoredState(State(false))
+        whenever(attributedMetricConfig.metricsToggles()).thenReturn(
+            listOf(searchToggle.searchCountAvg(), searchToggle.canEmitSearchCountAvg()),
+        )
+        givenDaysSinceInstalled(7)
+        whenever(attributedMetricClient.getEventStats(any(), any())).thenReturn(
+            EventStats(
+                totalEvents = 16,
+                daysWithEvents = 3,
+                rollingAverage = 5.3,
+            ),
+        )
+
+        testee.onSearchRetentionAtbRefreshed("old", "new")
+
+        verify(attributedMetricClient, never()).collectEvent("ddg_search")
+        verify(attributedMetricClient, never()).emitMetric(testee)
+    }
+
+    @Test
+    fun whenSearchedButEmitDisabledThenCollectButDoNotEmitMetric() = runTest {
+        searchToggle.searchCountAvg().setRawStoredState(State(true))
+        searchToggle.canEmitSearchCountAvg().setRawStoredState(State(false))
+        whenever(attributedMetricConfig.metricsToggles()).thenReturn(
+            listOf(searchToggle.searchCountAvg(), searchToggle.canEmitSearchCountAvg()),
+        )
+        givenDaysSinceInstalled(7)
+        whenever(attributedMetricClient.getEventStats(any(), any())).thenReturn(
+            EventStats(
+                totalEvents = 16,
+                daysWithEvents = 3,
+                rollingAverage = 5.3,
+            ),
+        )
+
+        testee.onSearchRetentionAtbRefreshed("old", "new")
+
+        verify(attributedMetricClient).collectEvent("ddg_search")
+        verify(attributedMetricClient, never()).emitMetric(testee)
+    }
+
+    @Test
     fun given7dAverageThenReturnCorrectAverageBucketInParams() = runTest {
+        whenever(attributedMetricConfig.getBucketConfiguration()).thenReturn(
+            mapOf(
+                "user_average_searches_past_week_first_month" to MetricBucket(
+                    buckets = listOf(5, 9),
+                    version = 0,
+                ),
+                "user_average_searches_past_week" to MetricBucket(
+                    buckets = listOf(5, 9),
+                    version = 0,
+                ),
+            ),
+        )
         givenDaysSinceInstalled(7)
 
         // Map of 7d average to expected bucket
         val searches7dAvgExpectedBuckets = mapOf(
-            2.2 to 0,
-            4.4 to 0,
-            6.6 to 1,
-            9.9 to 1,
-            10.0 to 2,
-            14.1 to 2,
+            2.2 to 0, // ≤5 -> bucket 0
+            4.4 to 0, // ≤5 -> bucket 0
+            5.0 to 0, // ≤5 -> bucket 0
+            5.1 to 0, // rounds to 5, ≤5 -> bucket 0
+            5.8 to 1, // rounds to 6, >5 and ≤9 -> bucket 1
+            6.6 to 1, // >5 and ≤9 -> bucket 1
+            9.0 to 1, // >5 and ≤9 -> bucket 1
+            9.3 to 1, // rounds to 9, >5 and ≤9 -> bucket 1
+            10.0 to 2, // >9 -> bucket 2
+            14.1 to 2, // >9 -> bucket 2
         )
 
         searches7dAvgExpectedBuckets.forEach { (avg, bucket) ->
@@ -171,6 +258,7 @@ class RealSearchAttributedMetricTest {
             val params = testee.getMetricParameters()
 
             assertEquals(
+                "For $avg searches, should return bucket $bucket",
                 mapOf("count" to bucket.toString()),
                 params,
             )
@@ -190,7 +278,6 @@ class RealSearchAttributedMetricTest {
 
         val params = testee.getMetricParameters()
 
-        assertEquals("0", params["count"])
         assertEquals("5", params["dayAverage"])
     }
 
@@ -208,7 +295,6 @@ class RealSearchAttributedMetricTest {
 
             val params = testee.getMetricParameters()
 
-            assertEquals("0", params["count"])
             assertNull(params["dayAverage"])
         }
 

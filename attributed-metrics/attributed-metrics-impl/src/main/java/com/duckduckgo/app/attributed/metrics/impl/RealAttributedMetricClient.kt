@@ -80,12 +80,13 @@ class RealAttributedMetricClient @Inject constructor(
     // TODO: Pending adding default attributed metrics and removing default prefix from pixel names
     override fun emitMetric(metric: AttributedMetric) {
         appCoroutineScope.launch(dispatcherProvider.io()) {
-            if (!metricsState.isActive()) {
+            if (!metricsState.isActive() || !metricsState.canEmitMetrics()) {
                 logcat(tag = "AttributedMetrics") {
                     "Discard pixel, client not active"
                 }
                 return@launch
             }
+
             val pixelName = metric.getPixelName()
             val params = metric.getMetricParameters()
             val tag = metric.getTag()

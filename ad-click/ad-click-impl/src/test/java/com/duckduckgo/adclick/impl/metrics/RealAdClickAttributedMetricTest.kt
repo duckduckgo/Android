@@ -16,11 +16,18 @@
 
 package com.duckduckgo.adclick.impl.metrics
 
+import android.annotation.SuppressLint
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.app.attributed.metrics.api.AttributedMetricClient
+import com.duckduckgo.app.attributed.metrics.api.AttributedMetricConfig
 import com.duckduckgo.app.attributed.metrics.api.EventStats
+import com.duckduckgo.app.attributed.metrics.api.MetricBucket
 import com.duckduckgo.browser.api.install.AppInstall
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
+import com.duckduckgo.feature.toggles.api.Toggle
+import com.duckduckgo.feature.toggles.api.Toggle.DefaultFeatureValue
+import com.duckduckgo.feature.toggles.api.Toggle.State
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
@@ -35,6 +42,7 @@ import org.mockito.kotlin.whenever
 import java.time.Instant
 import java.time.ZoneId
 
+@SuppressLint("DenyListedApi")
 @RunWith(AndroidJUnit4::class)
 class RealAdClickAttributedMetricTest {
 
@@ -42,15 +50,31 @@ class RealAdClickAttributedMetricTest {
 
     private val attributedMetricClient: AttributedMetricClient = mock()
     private val appInstall: AppInstall = mock()
+    private val attributedMetricConfig: AttributedMetricConfig = mock()
+    private val adClickToggle = FakeFeatureToggleFactory.create(FakeAttributedMetricsConfigFeature::class.java)
 
     private lateinit var testee: RealAdClickAttributedMetric
 
-    @Before fun setup() {
+    @Before fun setup() = runTest {
+        adClickToggle.adClickCountAvg().setRawStoredState(State(true))
+        adClickToggle.canEmitAdClickCountAvg().setRawStoredState(State(true))
+        whenever(attributedMetricConfig.metricsToggles()).thenReturn(
+            listOf(adClickToggle.adClickCountAvg(), adClickToggle.canEmitAdClickCountAvg()),
+        )
+        whenever(attributedMetricConfig.getBucketConfiguration()).thenReturn(
+            mapOf(
+                "user_average_ad_clicks_past_week" to MetricBucket(
+                    buckets = listOf(2, 5),
+                    version = 0,
+                ),
+            ),
+        )
         testee = RealAdClickAttributedMetric(
             appCoroutineScope = coroutineRule.testScope,
             dispatcherProvider = coroutineRule.testDispatcherProvider,
             attributedMetricClient = attributedMetricClient,
             appInstall = appInstall,
+            attributedMetricConfig = attributedMetricConfig,
         )
     }
 
@@ -99,6 +123,48 @@ class RealAdClickAttributedMetricTest {
         verify(attributedMetricClient).emitMetric(testee)
     }
 
+    @Test
+    fun whenAdClickedButFFDisabledThenDoNotCollectAndDoNotEmitMetric() = runTest {
+        adClickToggle.adClickCountAvg().setRawStoredState(State(false))
+        whenever(attributedMetricConfig.metricsToggles()).thenReturn(
+            listOf(adClickToggle.adClickCountAvg(), adClickToggle.canEmitAdClickCountAvg()),
+        )
+        givenDaysSinceInstalled(7)
+        whenever(attributedMetricClient.getEventStats("ad_click", 7)).thenReturn(
+            EventStats(
+                daysWithEvents = 1,
+                rollingAverage = 1.0,
+                totalEvents = 1,
+            ),
+        )
+
+        testee.onAdClick()
+
+        verify(attributedMetricClient, never()).collectEvent("ad_click")
+        verify(attributedMetricClient, never()).emitMetric(testee)
+    }
+
+    @Test fun whenAdClickedButEmitDisabledThenCollectButDoNotEmitMetric() = runTest {
+        adClickToggle.adClickCountAvg().setRawStoredState(State(true))
+        adClickToggle.canEmitAdClickCountAvg().setRawStoredState(State(false))
+        whenever(attributedMetricConfig.metricsToggles()).thenReturn(
+            listOf(adClickToggle.adClickCountAvg(), adClickToggle.canEmitAdClickCountAvg()),
+        )
+        givenDaysSinceInstalled(7)
+        whenever(attributedMetricClient.getEventStats("ad_click", 7)).thenReturn(
+            EventStats(
+                daysWithEvents = 1,
+                rollingAverage = 1.0,
+                totalEvents = 1,
+            ),
+        )
+
+        testee.onAdClick()
+
+        verify(attributedMetricClient).collectEvent("ad_click")
+        verify(attributedMetricClient, never()).emitMetric(testee)
+    }
+
     @Test fun whenDaysInstalledLessThanWindowThenIncludeDayAverageParameter() = runTest {
         givenDaysSinceInstalled(5)
         whenever(attributedMetricClient.getEventStats("ad_click", 5)).thenReturn(
@@ -133,14 +199,17 @@ class RealAdClickAttributedMetricTest {
         // Map of average clicks to expected bucket value
         // clicks avg -> bucket
         val bucketRanges = mapOf(
-            0.0 to 0,
-            1.0 to 0,
-            2.2 to 0,
-            2.6 to 1,
-            3.0 to 1,
-            5.4 to 1,
-            6.0 to 2,
-            10.0 to 2,
+            0.0 to 0, // 0 clicks -> bucket 0 (≤2)
+            1.0 to 0, // 1 click -> bucket 0 (≤2)
+            2.0 to 0, // 2 clicks -> bucket 0 (≤2)
+            2.1 to 0, // 2.1 clicks rounds to 2 -> bucket 0 (≤2)
+            2.5 to 1, // 2.5 clicks rounds to 3 -> bucket 1 (≤5)
+            2.7 to 1, // 2.7 clicks rounds to 3 -> bucket 1 (≤5)
+            3.0 to 1, // 3 clicks -> bucket 1 (≤5)
+            5.0 to 1, // 5 clicks -> bucket 1 (≤5)
+            5.1 to 1, // 5.1 clicks rounds to 5 -> bucket 1 (≤5)
+            6.0 to 2, // 6 clicks -> bucket 2 (>5)
+            10.0 to 2, // 10 clicks -> bucket 2 (>5)
         )
 
         bucketRanges.forEach { (clicksAvg, expectedBucket) ->
@@ -193,4 +262,15 @@ class RealAdClickAttributedMetricTest {
         val installInEt = nowInEt.minusDays(days.toLong())
         whenever(appInstall.getInstallationTimestamp()).thenReturn(installInEt.toInstant().toEpochMilli())
     }
+}
+
+interface FakeAttributedMetricsConfigFeature {
+    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    fun self(): Toggle
+
+    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    fun adClickCountAvg(): Toggle
+
+    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    fun canEmitAdClickCountAvg(): Toggle
 }

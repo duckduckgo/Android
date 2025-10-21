@@ -18,7 +18,9 @@ package com.duckduckgo.adclick.impl.metrics
 
 import com.duckduckgo.app.attributed.metrics.api.AttributedMetric
 import com.duckduckgo.app.attributed.metrics.api.AttributedMetricClient
+import com.duckduckgo.app.attributed.metrics.api.AttributedMetricConfig
 import com.duckduckgo.app.attributed.metrics.api.EventStats
+import com.duckduckgo.app.attributed.metrics.api.MetricBucket
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.browser.api.install.AppInstall
 import com.duckduckgo.common.utils.DispatcherProvider
@@ -27,6 +29,9 @@ import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.SingleInstanceIn
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.CoroutineStart.LAZY
+import kotlinx.coroutines.Deferred
+import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import logcat.logcat
 import java.time.Instant
@@ -54,26 +59,46 @@ class RealAdClickAttributedMetric @Inject constructor(
     private val dispatcherProvider: DispatcherProvider,
     private val attributedMetricClient: AttributedMetricClient,
     private val appInstall: AppInstall,
+    private val attributedMetricConfig: AttributedMetricConfig,
 ) : AttributedMetric, AdClickCollector {
 
     companion object {
         private const val EVENT_NAME = "ad_click"
         private const val PIXEL_NAME = "user_average_ad_clicks_past_week"
+        private const val FEATURE_TOGGLE_NAME = "adClickCountAvg"
+        private const val FEATURE_EMIT_TOGGLE_NAME = "canEmitAdClickCountAvg"
         private const val DAYS_WINDOW = 7
-        private val AD_CLICK_BUCKETS = arrayOf(2, 5)
+    }
+
+    private val isEnabled: Deferred<Boolean> = appCoroutineScope.async(start = LAZY) {
+        getToggle(FEATURE_TOGGLE_NAME)?.isEnabled() ?: false
+    }
+
+    private val canEmit: Deferred<Boolean> = appCoroutineScope.async(start = LAZY) {
+        getToggle(FEATURE_EMIT_TOGGLE_NAME)?.isEnabled() ?: false
+    }
+
+    private val bucketConfig: Deferred<MetricBucket> = appCoroutineScope.async(start = LAZY) {
+        attributedMetricConfig.getBucketConfiguration()[PIXEL_NAME] ?: MetricBucket(
+            buckets = listOf(2, 5),
+            version = 0,
+        )
     }
 
     override fun onAdClick() {
-        attributedMetricClient.collectEvent(EVENT_NAME)
-
         appCoroutineScope.launch(dispatcherProvider.io()) {
+            if (!isEnabled.await()) return@launch
+            attributedMetricClient.collectEvent(EVENT_NAME)
             if (shouldSendPixel().not()) {
                 logcat(tag = "AttributedMetrics") {
                     "AdClickCount7d: Skip emitting, not enough data or no events"
                 }
                 return@launch
             }
-            attributedMetricClient.emitMetric(this@RealAdClickAttributedMetric)
+
+            if (canEmit.await()) {
+                attributedMetricClient.emitMetric(this@RealAdClickAttributedMetric)
+            }
         }
     }
 
@@ -94,9 +119,10 @@ class RealAdClickAttributedMetric @Inject constructor(
         return daysSinceInstalled().toString()
     }
 
-    private fun getBucketValue(avg: Int): Int {
-        return AD_CLICK_BUCKETS.indexOfFirst { bucket -> avg <= bucket }.let { index ->
-            if (index == -1) AD_CLICK_BUCKETS.size else index
+    private suspend fun getBucketValue(avg: Int): Int {
+        val buckets = bucketConfig.await().buckets
+        return buckets.indexOfFirst { bucket -> avg <= bucket }.let { index ->
+            if (index == -1) buckets.size else index
         }
     }
 
@@ -141,4 +167,9 @@ class RealAdClickAttributedMetric @Inject constructor(
 
         return ChronoUnit.DAYS.between(installInEt.toLocalDate(), nowInEt.toLocalDate()).toInt()
     }
+
+    private suspend fun getToggle(toggleName: String) =
+        attributedMetricConfig.metricsToggles().firstOrNull { toggle ->
+            toggle.featureName().name == toggleName
+        }
 }

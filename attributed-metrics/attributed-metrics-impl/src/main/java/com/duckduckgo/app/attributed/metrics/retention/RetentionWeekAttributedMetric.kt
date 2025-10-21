@@ -14,10 +14,12 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.attributed.metrics
+package com.duckduckgo.app.attributed.metrics.retention
 
 import com.duckduckgo.app.attributed.metrics.api.AttributedMetric
 import com.duckduckgo.app.attributed.metrics.api.AttributedMetricClient
+import com.duckduckgo.app.attributed.metrics.api.AttributedMetricConfig
+import com.duckduckgo.app.attributed.metrics.api.MetricBucket
 import com.duckduckgo.app.attributed.metrics.store.AttributedMetricsDateUtils
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.statistics.api.AtbLifecyclePlugin
@@ -27,6 +29,9 @@ import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.SingleInstanceIn
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.CoroutineStart.LAZY
+import kotlinx.coroutines.Deferred
+import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import logcat.logcat
 import javax.inject.Inject
@@ -40,10 +45,28 @@ class RetentionWeekAttributedMetric @Inject constructor(
     private val appInstall: AppInstall,
     private val attributedMetricClient: AttributedMetricClient,
     private val dateUtils: AttributedMetricsDateUtils,
+    private val attributedMetricConfig: AttributedMetricConfig,
 ) : AttributedMetric, AtbLifecyclePlugin {
 
     companion object {
-        private const val PIXEL_NAME_FIRST_MONTH = "user_retention_week"
+        private const val PIXEL_NAME_FIRST_WEEK = "user_retention_week"
+        private const val FEATURE_TOGGLE_NAME = "retention"
+        private const val FEATURE_EMIT_TOGGLE_NAME = "canEmitRetention"
+    }
+
+    private val isEnabled: Deferred<Boolean> = appCoroutineScope.async(start = LAZY) {
+        getToggle(FEATURE_TOGGLE_NAME)?.isEnabled() ?: false
+    }
+
+    private val canEmit: Deferred<Boolean> = appCoroutineScope.async(start = LAZY) {
+        getToggle(FEATURE_EMIT_TOGGLE_NAME)?.isEnabled() ?: false
+    }
+
+    private val bucketConfig: Deferred<MetricBucket> = appCoroutineScope.async(start = LAZY) {
+        attributedMetricConfig.getBucketConfiguration()[PIXEL_NAME_FIRST_WEEK] ?: MetricBucket(
+            buckets = listOf(1, 2, 3),
+            version = 0,
+        )
     }
 
     override fun onAppRetentionAtbRefreshed(
@@ -51,6 +74,7 @@ class RetentionWeekAttributedMetric @Inject constructor(
         newAtb: String,
     ) {
         appCoroutineScope.launch(dispatcherProvider.io()) {
+            if (!isEnabled.await()) return@launch
             if (oldAtb == newAtb) {
                 logcat(tag = "AttributedMetrics") {
                     "RetentionFirstMonth: Skip emitting atb not changed"
@@ -63,47 +87,56 @@ class RetentionWeekAttributedMetric @Inject constructor(
                 }
                 return@launch
             }
-            attributedMetricClient.emitMetric(this@RetentionWeekAttributedMetric)
+            if (canEmit.await()) {
+                attributedMetricClient.emitMetric(this@RetentionWeekAttributedMetric)
+            }
         }
     }
 
-    override fun getPixelName(): String = PIXEL_NAME_FIRST_MONTH
+    override fun getPixelName(): String = PIXEL_NAME_FIRST_WEEK
 
     override suspend fun getMetricParameters(): Map<String, String> {
-        val days = daysSinceInstalled()
-        if (days <= 0 || days >= 29) return emptyMap()
-
-        val week = getWeekFromDays(days)
-        return if (week > 0) {
-            mutableMapOf("count" to week.toString())
-        } else {
-            emptyMap()
-        }
+        val week = getWeekSinceInstall()
+        if (week == -1) return emptyMap()
+        return mutableMapOf("count" to bucketValue(getWeekSinceInstall()).toString())
     }
 
     override suspend fun getTag(): String {
-        val days = daysSinceInstalled()
-        return getWeekFromDays(days).toString()
+        return bucketValue(getWeekSinceInstall()).toString()
     }
 
     private fun shouldSendPixel(): Boolean {
-        val days = daysSinceInstalled()
-        if (days <= 0 || days >= 29) return false
+        val week = getWeekSinceInstall()
+        if (week == -1) return false
 
         return true
     }
 
-    private fun getWeekFromDays(days: Int): Int {
-        return when (days) {
+    private fun getWeekSinceInstall(): Int {
+        val installationDay = daysSinceInstalled()
+        return when (installationDay) {
             in 1..7 -> 1
             in 8..14 -> 2
             in 15..21 -> 3
             in 22..28 -> 4
-            else -> -1
+            else -> -1 // outside of first month
+        }
+    }
+
+    private suspend fun bucketValue(value: Int): Int {
+        if (value < 0) return -1
+        val buckets = bucketConfig.await().buckets
+        return buckets.indexOfFirst { bucket -> value <= bucket }.let { index ->
+            if (index == -1) buckets.size else index
         }
     }
 
     private fun daysSinceInstalled(): Int {
         return dateUtils.daysSince(appInstall.getInstallationTimestamp())
     }
+
+    private suspend fun getToggle(toggleName: String) =
+        attributedMetricConfig.metricsToggles().firstOrNull { toggle ->
+            toggle.featureName().name == toggleName
+        }
 }

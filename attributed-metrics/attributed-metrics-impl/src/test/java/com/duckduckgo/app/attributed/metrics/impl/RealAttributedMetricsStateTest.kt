@@ -108,25 +108,17 @@ class RealAttributedMetricsStateTest {
         verify(mockDataStore, never()).setActive(any())
     }
 
-    @Test fun whenOnPrivacyConfigDownloadedThenUpdateEnabledState() = runTest {
-        givenAttributedClientFeatureEnabled(true)
-
-        testee.onPrivacyConfigDownloaded()
-
-        verify(mockDataStore).setEnabled(true)
-    }
-
     @Test fun whenIsActiveAndAllConditionsMetThenReturnTrue() = runTest {
         whenever(mockDataStore.isActive()).thenReturn(true)
-        whenever(mockDataStore.isEnabled()).thenReturn(true)
         whenever(mockDataStore.getInitializationDate()).thenReturn("2025-10-03")
+        mockConfigFeature.self().setRawStoredState(State(true))
 
         assertTrue(testee.isActive())
     }
 
     @Test fun whenIsActiveAndClientNotActiveThenReturnFalse() = runTest {
         whenever(mockDataStore.isActive()).thenReturn(false)
-        whenever(mockDataStore.isEnabled()).thenReturn(true)
+        mockConfigFeature.self().setRawStoredState(State(true))
         whenever(mockDataStore.getInitializationDate()).thenReturn("2025-10-03")
 
         assertFalse(testee.isActive())
@@ -134,7 +126,7 @@ class RealAttributedMetricsStateTest {
 
     @Test fun whenIsActiveAndNotEnabledThenReturnFalse() = runTest {
         whenever(mockDataStore.isActive()).thenReturn(true)
-        whenever(mockDataStore.isEnabled()).thenReturn(false)
+        mockConfigFeature.self().setRawStoredState(State(false))
         whenever(mockDataStore.getInitializationDate()).thenReturn("2025-10-03")
 
         assertFalse(testee.isActive())
@@ -142,7 +134,7 @@ class RealAttributedMetricsStateTest {
 
     @Test fun whenIsActiveAndNoInitDateThenReturnFalse() = runTest {
         whenever(mockDataStore.isActive()).thenReturn(true)
-        whenever(mockDataStore.isEnabled()).thenReturn(true)
+        mockConfigFeature.self().setRawStoredState(State(true))
         whenever(mockDataStore.getInitializationDate()).thenReturn(null)
 
         assertFalse(testee.isActive())
