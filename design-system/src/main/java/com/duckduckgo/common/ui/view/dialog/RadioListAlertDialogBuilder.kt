@@ -55,6 +55,7 @@ class RadioListAlertDialogBuilder(val context: Context) : DaxAlertDialog {
     private var negativeButtonType: ButtonType? = null
     private var optionList: MutableList<CharSequence> = mutableListOf()
     private var selectedOption: Int? = null
+    private var isCancelable: Boolean = false
 
     fun setTitle(@StringRes textId: Int): RadioListAlertDialogBuilder {
         titleText = context.getText(textId)
@@ -130,7 +131,7 @@ class RadioListAlertDialogBuilder(val context: Context) : DaxAlertDialog {
         val dialogBuilder = MaterialAlertDialogBuilder(context, com.duckduckgo.mobile.android.R.style.Widget_DuckDuckGo_Dialog)
             .setView(binding.root)
             .apply {
-                setCancelable(false)
+                setCancelable(isCancelable)
                 setOnDismissListener { listener.onDialogDismissed() }
                 setOnCancelListener { listener.onDialogCancelled() }
             }
@@ -151,6 +152,11 @@ class RadioListAlertDialogBuilder(val context: Context) : DaxAlertDialog {
 
     override fun dismiss() {
         dialog?.dismiss()
+    }
+
+    fun setCancelable(cancelable: Boolean): RadioListAlertDialogBuilder {
+        isCancelable = cancelable
+        return this
     }
 
     override fun isShowing(): Boolean = dialog?.isShowing == true
