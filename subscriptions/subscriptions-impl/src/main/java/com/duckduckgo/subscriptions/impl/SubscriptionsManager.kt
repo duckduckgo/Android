@@ -388,9 +388,9 @@ class RealSubscriptionsManager @Inject constructor(
         return !userHadFreeTrial && privacyProFeature.get().privacyProFreeTrial().isEnabled() && freeTrialProductsAvailableInGooglePlay
     }
 
-    override suspend fun isSwitchPlanAvailable(): Boolean {
+    override suspend fun isSwitchPlanAvailable(): Boolean = withContext(dispatcherProvider.io()) {
         val hasActiveSubscription = authRepository.getSubscription()?.isActive() ?: false
-        return hasActiveSubscription && privacyProFeature.get().supportsSwitchSubscription().isEnabled()
+        return@withContext hasActiveSubscription && privacyProFeature.get().supportsSwitchSubscription().isEnabled()
     }
 
     override suspend fun switchSubscriptionPlan(
