@@ -24,11 +24,11 @@ import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.browser.AddressDisplayFormatter
 import com.duckduckgo.app.browser.DuckDuckGoUrlDetector
 import com.duckduckgo.app.browser.defaultbrowsing.prompts.AdditionalDefaultBrowserPrompts
-import com.duckduckgo.app.browser.omnibar.UnifiedLayoutViewModel.LeadingIconState.Dax
-import com.duckduckgo.app.browser.omnibar.UnifiedLayoutViewModel.LeadingIconState.DuckPlayer
-import com.duckduckgo.app.browser.omnibar.UnifiedLayoutViewModel.LeadingIconState.EasterEggLogo
-import com.duckduckgo.app.browser.omnibar.UnifiedLayoutViewModel.LeadingIconState.Globe
-import com.duckduckgo.app.browser.omnibar.UnifiedLayoutViewModel.LeadingIconState.Search
+import com.duckduckgo.app.browser.omnibar.UnifiedOmnibarViewModel.LeadingIconState.Dax
+import com.duckduckgo.app.browser.omnibar.UnifiedOmnibarViewModel.LeadingIconState.DuckPlayer
+import com.duckduckgo.app.browser.omnibar.UnifiedOmnibarViewModel.LeadingIconState.EasterEggLogo
+import com.duckduckgo.app.browser.omnibar.UnifiedOmnibarViewModel.LeadingIconState.Globe
+import com.duckduckgo.app.browser.omnibar.UnifiedOmnibarViewModel.LeadingIconState.Search
 import com.duckduckgo.app.browser.omnibar.model.Decoration
 import com.duckduckgo.app.browser.omnibar.model.Decoration.ChangeCustomTabTitle
 import com.duckduckgo.app.browser.omnibar.model.Decoration.LaunchCookiesAnimation
@@ -85,7 +85,7 @@ import javax.inject.Inject
 import com.duckduckgo.app.global.model.PrivacyShield as PrivacyShieldState
 
 @ContributesViewModel(FragmentScope::class)
-class UnifiedLayoutViewModel @Inject constructor(
+class UnifiedOmnibarViewModel @Inject constructor(
     private val tabRepository: TabRepository,
     private val voiceSearchAvailability: VoiceSearchAvailability,
     private val voiceSearchPixelLogger: VoiceSearchAvailabilityPixelLogger,

@@ -62,14 +62,14 @@ import com.duckduckgo.app.browser.SmoothProgressAnimator
 import com.duckduckgo.app.browser.animations.AddressBarTrackersAnimationFeatureToggle
 import com.duckduckgo.app.browser.databinding.IncludeCustomTabToolbarBinding
 import com.duckduckgo.app.browser.databinding.IncludeFindInPageBinding
-import com.duckduckgo.app.browser.omnibar.UnifiedLayoutViewModel.Command
-import com.duckduckgo.app.browser.omnibar.UnifiedLayoutViewModel.Command.LaunchInputScreen
-import com.duckduckgo.app.browser.omnibar.UnifiedLayoutViewModel.Command.MoveCaretToFront
-import com.duckduckgo.app.browser.omnibar.UnifiedLayoutViewModel.Command.StartCookiesAnimation
-import com.duckduckgo.app.browser.omnibar.UnifiedLayoutViewModel.Command.StartTrackersAnimation
-import com.duckduckgo.app.browser.omnibar.UnifiedLayoutViewModel.LeadingIconState.EasterEggLogo
-import com.duckduckgo.app.browser.omnibar.UnifiedLayoutViewModel.LeadingIconState.PrivacyShield
-import com.duckduckgo.app.browser.omnibar.UnifiedLayoutViewModel.ViewState
+import com.duckduckgo.app.browser.omnibar.UnifiedOmnibarViewModel.Command
+import com.duckduckgo.app.browser.omnibar.UnifiedOmnibarViewModel.Command.LaunchInputScreen
+import com.duckduckgo.app.browser.omnibar.UnifiedOmnibarViewModel.Command.MoveCaretToFront
+import com.duckduckgo.app.browser.omnibar.UnifiedOmnibarViewModel.Command.StartCookiesAnimation
+import com.duckduckgo.app.browser.omnibar.UnifiedOmnibarViewModel.Command.StartTrackersAnimation
+import com.duckduckgo.app.browser.omnibar.UnifiedOmnibarViewModel.LeadingIconState.EasterEggLogo
+import com.duckduckgo.app.browser.omnibar.UnifiedOmnibarViewModel.LeadingIconState.PrivacyShield
+import com.duckduckgo.app.browser.omnibar.UnifiedOmnibarViewModel.ViewState
 import com.duckduckgo.app.browser.omnibar.animations.addressbar.BrowserTrackersAnimatorHelper
 import com.duckduckgo.app.browser.omnibar.animations.addressbar.PrivacyShieldAnimationHelper
 import com.duckduckgo.app.browser.omnibar.animations.addressbar.TrackersAnimatorListener
@@ -357,11 +357,11 @@ class UnifiedOmnibarLayout @JvmOverloads constructor(
 
     private val smoothProgressAnimator by lazy { SmoothProgressAnimator(pageLoadingIndicator) }
 
-    protected val viewModel: UnifiedLayoutViewModel by lazy {
+    protected val viewModel: UnifiedOmnibarViewModel by lazy {
         ViewModelProvider(
             findViewTreeViewModelStoreOwner()!!,
             viewModelFactory,
-        )[UnifiedLayoutViewModel::class.java]
+        )[UnifiedOmnibarViewModel::class.java]
     }
 
     private val conflatedStateJob = ConflatedJob()
@@ -690,7 +690,7 @@ class UnifiedOmnibarLayout @JvmOverloads constructor(
 
     private fun renderLeadingIconState(viewState: ViewState) {
         when (val leadingIconState = viewState.leadingIconState) {
-            UnifiedLayoutViewModel.LeadingIconState.Search -> {
+            UnifiedOmnibarViewModel.LeadingIconState.Search -> {
                 searchIcon.show()
                 shieldIcon.gone()
                 daxIcon.gone()
@@ -706,7 +706,7 @@ class UnifiedOmnibarLayout @JvmOverloads constructor(
                 duckPlayerIcon.gone()
             }
 
-            UnifiedLayoutViewModel.LeadingIconState.Dax -> {
+            UnifiedOmnibarViewModel.LeadingIconState.Dax -> {
                 if (serpEasterEggLogosToggles.feature().isEnabled()) {
                     with(daxIcon) {
                         setOnClickListener(null)
@@ -727,7 +727,7 @@ class UnifiedOmnibarLayout @JvmOverloads constructor(
                 duckPlayerIcon.gone()
             }
 
-            UnifiedLayoutViewModel.LeadingIconState.Globe -> {
+            UnifiedOmnibarViewModel.LeadingIconState.Globe -> {
                 globeIcon.show()
                 daxIcon.gone()
                 shieldIcon.gone()
@@ -735,7 +735,7 @@ class UnifiedOmnibarLayout @JvmOverloads constructor(
                 duckPlayerIcon.gone()
             }
 
-            UnifiedLayoutViewModel.LeadingIconState.DuckPlayer -> {
+            UnifiedOmnibarViewModel.LeadingIconState.DuckPlayer -> {
                 globeIcon.gone()
                 daxIcon.gone()
                 shieldIcon.gone()

@@ -7,10 +7,10 @@ import app.cash.turbine.test
 import com.duckduckgo.app.browser.AddressDisplayFormatter
 import com.duckduckgo.app.browser.DuckDuckGoUrlDetectorImpl
 import com.duckduckgo.app.browser.defaultbrowsing.prompts.AdditionalDefaultBrowserPrompts
-import com.duckduckgo.app.browser.omnibar.UnifiedLayoutViewModel.Command
-import com.duckduckgo.app.browser.omnibar.UnifiedLayoutViewModel.Command.LaunchInputScreen
-import com.duckduckgo.app.browser.omnibar.UnifiedLayoutViewModel.LeadingIconState
-import com.duckduckgo.app.browser.omnibar.UnifiedLayoutViewModel.LeadingIconState.Search
+import com.duckduckgo.app.browser.omnibar.UnifiedOmnibarViewModel.Command
+import com.duckduckgo.app.browser.omnibar.UnifiedOmnibarViewModel.Command.LaunchInputScreen
+import com.duckduckgo.app.browser.omnibar.UnifiedOmnibarViewModel.LeadingIconState
+import com.duckduckgo.app.browser.omnibar.UnifiedOmnibarViewModel.LeadingIconState.Search
 import com.duckduckgo.app.browser.omnibar.model.Decoration
 import com.duckduckgo.app.browser.omnibar.model.Decoration.ChangeCustomTabTitle
 import com.duckduckgo.app.browser.omnibar.model.StateChange
@@ -95,7 +95,7 @@ class UnifiedLayoutViewModelTest {
     }
     private val serpEasterEggLogosToggles: SerpEasterEggLogosToggles = mock()
 
-    private lateinit var testee: UnifiedLayoutViewModel
+    private lateinit var testee: UnifiedOmnibarViewModel
 
     private val EMPTY_URL = ""
     private val SERP_URL = "https://duckduckgo.com/?q=test&atb=v395-1-wb&ia=web"
@@ -141,7 +141,7 @@ class UnifiedLayoutViewModelTest {
     }
 
     private fun initializeViewModel() {
-        testee = UnifiedLayoutViewModel(
+        testee = UnifiedOmnibarViewModel(
             tabRepository = tabRepository,
             voiceSearchAvailability = voiceSearchAvailability,
             voiceSearchPixelLogger = voiceSearchPixelLogger,
