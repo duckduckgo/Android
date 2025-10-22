@@ -69,6 +69,7 @@
     <string name="autocompleteDeviceAppNotFound">Sovellusta ei löytynyt</string>
 
     <!-- New Address Bar Option Bottom Sheet Dialog -->
+    <string name="newAddressBarOptionBottomSheetDialogTitle">Haluatko helpomman pääsyn\nyksityiseen tekoäly-chatiin?</string>
     <string name="newAddressBarOptionBottomSheetDialogSearchText">Hae tai anna osoite</string>
     <string name="newAddressBarOptionBottomSheetDialogPrimaryButton">Vahvista</string>
     <string name="newAddressBarOptionBottomSheetDialogGhostButton">Ei nyt</string>
