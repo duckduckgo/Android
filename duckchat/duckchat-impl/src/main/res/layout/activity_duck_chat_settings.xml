@@ -217,6 +217,21 @@
                 app:leadingIconBackground="circular"
                 app:showSwitch="false"/>
 
+            <Space
+                android:layout_width="wrap_content"
+                android:layout_height="@dimen/keyline_2"/>
+
+            <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
+                android:id="@+id/duckAiHideAiGeneratedImagesLink"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="gone"
+                app:leadingIcon="@drawable/ic_image_ai"
+                app:leadingIconBackground="circular"
+                app:primaryText="@string/duckAiHideAiGeneratedImagesTitle"
+                app:secondaryText="@string/duckAiHideAiGeneratedImagesDescription"
+                app:showSwitch="false" />
+
         </LinearLayout>
     </ScrollView>
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

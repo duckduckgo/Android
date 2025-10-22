@@ -23,6 +23,7 @@ import android.os.Bundle
 import android.view.View
 import android.widget.CompoundButton
 import androidx.core.content.ContextCompat
+import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.core.view.updatePadding
 import androidx.lifecycle.Lifecycle
@@ -169,6 +170,18 @@ class DuckChatSettingsActivity : DuckDuckGoActivity() {
         binding.showDuckChatSearchSettingsLink.setOnClickListener {
             viewModel.duckChatSearchAISettingsClicked()
         }
+
+        if (settingsPageFeature.hideAiGeneratedImagesOption().isEnabled()) {
+            binding.duckAiHideAiGeneratedImagesLink.apply {
+                isVisible = true
+                setOnClickListener {
+                    viewModel.onDuckAiHideAiGeneratedImagesClicked()
+                }
+            }
+        } else {
+            binding.duckAiHideAiGeneratedImagesLink.isGone = true
+        }
+
         binding.duckAiInputScreenWithoutAiContainer.setOnClickListener {
             viewModel.onDuckAiInputScreenWithoutAiSelected()
         }
