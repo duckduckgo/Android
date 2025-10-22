@@ -19,6 +19,7 @@ package com.duckduckgo.app.onboarding.ui.page
 import android.content.Context
 import android.content.Intent
 import app.cash.turbine.test
+import com.duckduckgo.app.browser.omnibar.datastore.OmnibarDataStore
 import com.duckduckgo.app.global.DefaultRoleBrowserDialog
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.notificationpromptexperiment.NotificationPromptExperimentManager
@@ -42,12 +43,11 @@ import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_INTRO_SHOWN_UNIQUE
 import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_RESUME_ONBOARDING_PRESSED
 import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_SKIP_ONBOARDING_PRESSED
 import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_SKIP_ONBOARDING_SHOWN_UNIQUE
-import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Unique
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
-import com.duckduckgo.browser.ui.omnibar.OmnibarPosition
+import com.duckduckgo.browser.ui.omnibar.OmnibarType
 import com.duckduckgo.common.test.CoroutineTestRule
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert
@@ -66,7 +66,7 @@ class WelcomePageViewModelTest {
     private val mockContext: Context = mock()
     private val mockPixel: Pixel = mock()
     private val mockAppInstallStore: AppInstallStore = mock()
-    private val mockSettingsDataStore: SettingsDataStore = mock()
+    private val mockOmnibarDataStore: OmnibarDataStore = mock()
     private val mockAppBuildConfig: AppBuildConfig = mock()
     private val mockOnboardingDesignExperimentManager: OnboardingDesignExperimentManager = mock()
     private val mockNotificationPromptExperimentManager: NotificationPromptExperimentManager = mock()
@@ -77,7 +77,7 @@ class WelcomePageViewModelTest {
             mockContext,
             mockPixel,
             mockAppInstallStore,
-            mockSettingsDataStore,
+            mockOmnibarDataStore,
             coroutineRule.testDispatcherProvider,
             mockAppBuildConfig,
             mockOnboardingDesignExperimentManager,
@@ -309,7 +309,7 @@ class WelcomePageViewModelTest {
             testee.onAddressBarPositionOptionSelected(false)
             testee.onPrimaryCtaClicked(PreOnboardingDialogType.ADDRESS_BAR_POSITION)
 
-            verify(mockSettingsDataStore).omnibarPosition = OmnibarPosition.BOTTOM
+            verify(mockOmnibarDataStore).setOmnibarType(OmnibarType.SINGLE_BOTTOM)
         }
 
     @Test

@@ -75,7 +75,7 @@ class WelcomePageViewModel @Inject constructor(
     private val context: Context,
     private val pixel: Pixel,
     private val appInstallStore: AppInstallStore,
-    private val omnibaDataStore: OmnibarDataStore,
+    private val omnibarDataStore: OmnibarDataStore,
     private val dispatchers: DispatcherProvider,
     private val appBuildConfig: AppBuildConfig,
     private val onboardingDesignExperimentManager: OnboardingDesignExperimentManager,
@@ -158,7 +158,7 @@ class WelcomePageViewModel @Inject constructor(
             ADDRESS_BAR_POSITION -> {
                 viewModelScope.launch {
                     if (!defaultAddressBarPosition) {
-                        omnibaDataStore.setOmnibarType(OmnibarType.SINGLE_BOTTOM)
+                        omnibarDataStore.setOmnibarType(OmnibarType.SINGLE_BOTTOM)
                         pixel.fire(PREONBOARDING_BOTTOM_ADDRESS_BAR_SELECTED_UNIQUE)
 
                         onboardingDesignExperimentManager.fireAddressBarSetBottomPixel()
