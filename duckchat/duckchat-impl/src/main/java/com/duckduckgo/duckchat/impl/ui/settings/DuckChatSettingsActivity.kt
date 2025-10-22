@@ -172,6 +172,7 @@ class DuckChatSettingsActivity : DuckDuckGoActivity() {
         }
 
         if (settingsPageFeature.hideAiGeneratedImagesOption().isEnabled()) {
+            binding.searchSettingsSectionHeader.isVisible = true
             binding.duckAiHideAiGeneratedImagesLink.apply {
                 isVisible = true
                 setOnClickListener {
@@ -179,6 +180,7 @@ class DuckChatSettingsActivity : DuckDuckGoActivity() {
                 }
             }
         } else {
+            binding.searchSettingsSectionHeader.isGone = true
             binding.duckAiHideAiGeneratedImagesLink.isGone = true
         }
 

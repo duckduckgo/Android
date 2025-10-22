@@ -207,6 +207,13 @@
                 android:layout_height="wrap_content"
                 android:id="@+id/divider2"/>
 
+            <com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
+                android:id="@+id/searchSettingsSectionHeader"
+                android:visibility="gone"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:primaryText="@string/duckAiSearchSettingsSectionHeader" />
+
             <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
                 android:id="@+id/showDuckChatSearchSettingsLink"
                 android:layout_width="match_parent"
