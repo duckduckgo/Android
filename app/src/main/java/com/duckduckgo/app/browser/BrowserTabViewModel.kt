@@ -4229,6 +4229,13 @@ class BrowserTabViewModel @Inject constructor(
             onUserDismissedCta(cta)
             command.value = HideOnboardingDaxDialog(cta as OnboardingDaxDialogCta)
         }
+
+        if (currentBrowserViewState().fireButton.isHighlighted()) {
+            browserViewState.value = currentBrowserViewState().copy(fireButton = HighlightableButton.Visible(highlighted = false))
+            viewModelScope.launch {
+                ctaViewModel.dismissPulseAnimation()
+            }
+        }
     }
 
     fun onOnboardingDaxTypingAnimationFinished() {

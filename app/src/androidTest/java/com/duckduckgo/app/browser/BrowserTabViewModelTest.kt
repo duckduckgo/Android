@@ -7163,6 +7163,28 @@ class BrowserTabViewModelTest {
         }
 
     @Test
+    fun whenFireMenuSelectedAndFireButtonHighlightedThenHighlightIsCleared() = runTest {
+        testee.browserViewState.value = browserViewState().copy(fireButton = HighlightableButton.Visible(highlighted = true))
+
+        testee.onFireMenuSelected()
+
+        val viewState = testee.browserViewState.value
+        assertNotNull(viewState)
+        assertFalse((viewState.fireButton as HighlightableButton.Visible).highlighted)
+    }
+
+    @Test
+    fun whenFireMenuSelectedAndFireButtonNotHighlightedThenStateUnchanged() = runTest {
+        testee.browserViewState.value = browserViewState().copy(fireButton = HighlightableButton.Visible(highlighted = false))
+
+        testee.onFireMenuSelected()
+
+        val viewState = testee.browserViewState.value
+        assertNotNull(viewState)
+        assertFalse((viewState.fireButton as HighlightableButton.Visible).highlighted)
+    }
+
+    @Test
     fun whenInputScreenEnabledAndSwitchToNewTabThenLaunchInputScreenCommandTriggered() =
         runTest {
             val initialTabId = "initial-tab"
