@@ -22,6 +22,7 @@ import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.launch.LaunchViewModel.Command.DaxPromptBrowserComparison
 import com.duckduckgo.app.launch.LaunchViewModel.Command.Home
 import com.duckduckgo.app.launch.LaunchViewModel.Command.Onboarding
+import com.duckduckgo.app.notificationpromptexperiment.NotificationPromptExperimentManager
 import com.duckduckgo.app.onboarding.store.AppStage
 import com.duckduckgo.app.onboarding.store.UserStageStore
 import com.duckduckgo.app.onboardingdesignexperiment.OnboardingDesignExperimentManager
@@ -55,12 +56,14 @@ class LaunchViewModelTest {
     private val mockDaxPrompts: DaxPrompts = mock()
     private val mockAppInstallStore: AppInstallStore = mock()
     private val mockOnboardingExperiment: OnboardingDesignExperimentManager = mock()
+    private val mockNotificationPromptExperiment: NotificationPromptExperimentManager = mock()
 
     private lateinit var testee: LaunchViewModel
 
     @Before
     fun before() = runTest {
         whenever(mockOnboardingExperiment.isWaitForLocalPrivacyConfigEnabled()).thenReturn(false)
+        whenever(mockNotificationPromptExperiment.isWaitForLocalPrivacyConfigEnabled()).thenReturn(false)
     }
 
     @After
@@ -76,6 +79,7 @@ class LaunchViewModelTest {
             mockDaxPrompts,
             mockAppInstallStore,
             mockOnboardingExperiment,
+            mockNotificationPromptExperiment,
         )
         whenever(mockDaxPrompts.evaluate()).thenReturn(ActionType.NONE)
         whenever(userStageStore.getUserAppStage()).thenReturn(AppStage.NEW)
@@ -94,6 +98,7 @@ class LaunchViewModelTest {
             mockDaxPrompts,
             mockAppInstallStore,
             mockOnboardingExperiment,
+            mockNotificationPromptExperiment,
         )
         whenever(mockDaxPrompts.evaluate()).thenReturn(ActionType.NONE)
         whenever(userStageStore.getUserAppStage()).thenReturn(AppStage.NEW)
@@ -112,6 +117,7 @@ class LaunchViewModelTest {
             mockDaxPrompts,
             mockAppInstallStore,
             mockOnboardingExperiment,
+            mockNotificationPromptExperiment,
         )
         whenever(mockDaxPrompts.evaluate()).thenReturn(ActionType.NONE)
         whenever(userStageStore.getUserAppStage()).thenReturn(AppStage.NEW)
@@ -130,6 +136,7 @@ class LaunchViewModelTest {
             mockDaxPrompts,
             mockAppInstallStore,
             mockOnboardingExperiment,
+            mockNotificationPromptExperiment,
         )
         whenever(mockDaxPrompts.evaluate()).thenReturn(ActionType.NONE)
         whenever(userStageStore.getUserAppStage()).thenReturn(AppStage.DAX_ONBOARDING)
@@ -146,6 +153,7 @@ class LaunchViewModelTest {
             mockDaxPrompts,
             mockAppInstallStore,
             mockOnboardingExperiment,
+            mockNotificationPromptExperiment,
         )
         whenever(mockDaxPrompts.evaluate()).thenReturn(ActionType.NONE)
         whenever(userStageStore.getUserAppStage()).thenReturn(AppStage.DAX_ONBOARDING)
@@ -162,6 +170,7 @@ class LaunchViewModelTest {
             mockDaxPrompts,
             mockAppInstallStore,
             mockOnboardingExperiment,
+            mockNotificationPromptExperiment,
         )
         whenever(mockDaxPrompts.evaluate()).thenReturn(ActionType.NONE)
         whenever(userStageStore.getUserAppStage()).thenReturn(AppStage.DAX_ONBOARDING)
@@ -178,6 +187,7 @@ class LaunchViewModelTest {
             mockDaxPrompts,
             mockAppInstallStore,
             mockOnboardingExperiment,
+            mockNotificationPromptExperiment,
         )
         whenever(mockDaxPrompts.evaluate()).thenReturn(ActionType.SHOW_BROWSER_COMPARISON_PROMPT)
         whenever(userStageStore.getUserAppStage()).thenReturn(AppStage.DAX_ONBOARDING)
@@ -195,6 +205,7 @@ class LaunchViewModelTest {
             mockDaxPrompts,
             mockAppInstallStore,
             mockOnboardingExperiment,
+            mockNotificationPromptExperiment,
         )
         whenever(mockDaxPrompts.evaluate()).thenReturn(ActionType.NONE)
         whenever(userStageStore.getUserAppStage()).thenReturn(AppStage.NEW)
@@ -215,6 +226,7 @@ class LaunchViewModelTest {
             mockDaxPrompts,
             mockAppInstallStore,
             mockOnboardingExperiment,
+            mockNotificationPromptExperiment,
         )
         whenever(mockDaxPrompts.evaluate()).thenReturn(ActionType.NONE)
         whenever(userStageStore.getUserAppStage()).thenReturn(AppStage.DAX_ONBOARDING)
@@ -236,6 +248,7 @@ class LaunchViewModelTest {
             mockDaxPrompts,
             mockAppInstallStore,
             mockOnboardingExperiment,
+            mockNotificationPromptExperiment,
         )
         whenever(mockDaxPrompts.evaluate()).thenReturn(ActionType.NONE)
         whenever(userStageStore.getUserAppStage()).thenReturn(AppStage.NEW)
@@ -260,6 +273,7 @@ class LaunchViewModelTest {
             mockDaxPrompts,
             mockAppInstallStore,
             mockOnboardingExperiment,
+            mockNotificationPromptExperiment,
         )
         whenever(mockDaxPrompts.evaluate()).thenReturn(ActionType.NONE)
         whenever(userStageStore.getUserAppStage()).thenReturn(AppStage.NEW)

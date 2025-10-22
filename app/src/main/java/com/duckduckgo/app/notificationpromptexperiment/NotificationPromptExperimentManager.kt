@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.notificationpromptexperiment
 
+import android.annotation.SuppressLint
 import android.os.Build
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.notificationpromptexperiment.NotificationPromptExperimentToggles.Cohorts.CONTROL
@@ -70,6 +71,7 @@ class NotificationPromptExperimentManagerImpl @Inject constructor(
 
     private var privacyPersisted: Boolean = false
 
+    @SuppressLint("DenyListedApi")
     override suspend fun enroll() {
         if (appBuildConfig.sdkInt >= Build.VERSION_CODES.TIRAMISU && !appBuildConfig.isAppReinstall()) {
             notificationPromptExperimentToggles.notificationPromptExperimentOct25().enroll()
