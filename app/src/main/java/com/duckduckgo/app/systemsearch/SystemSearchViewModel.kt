@@ -98,6 +98,7 @@ class SystemSearchViewModel @Inject constructor(
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
 ) : ViewModel(),
     EditSavedSiteDialogFragment.EditSavedSiteListener {
+
     data class OnboardingViewState(
         val visible: Boolean,
         val expanded: Boolean = false,
@@ -176,6 +177,8 @@ class SystemSearchViewModel @Inject constructor(
         data object ExitSearch : Command()
     }
 
+    private val isSearchOnly = MutableStateFlow(false)
+
     val onboardingViewState: MutableLiveData<OnboardingViewState> = MutableLiveData()
     val command: SingleLiveEvent<Command> = SingleLiveEvent()
 
@@ -221,10 +224,11 @@ class SystemSearchViewModel @Inject constructor(
             flow = voiceSearchState.map { voiceSearchAvailability.isVoiceSearchAvailable },
             flow2 = queryFlow,
             flow3 = duckAiFeatureState.showOmnibarShortcutOnNtpAndOnFocus,
-        ) { isVoiceSearchEnabled, query, isDuckAiEnabled ->
+            flow4 = isSearchOnly,
+        ) { isVoiceSearchEnabled, query, isDuckAiEnabled, isSearchOnly ->
             OmnibarViewState(
                 isVoiceSearchButtonVisible = isVoiceSearchEnabled,
-                isDuckAiButtonVisible = isDuckAiEnabled,
+                isDuckAiButtonVisible = !isSearchOnly && isDuckAiEnabled,
                 isClearButtonVisible = query.isNotEmpty(),
             )
         }.stateIn(viewModelScope, SharingStarted.Lazily, OmnibarViewState())
@@ -232,6 +236,10 @@ class SystemSearchViewModel @Inject constructor(
     init {
         resetViewState()
         refreshAppList()
+    }
+
+    fun setLaunchedFromSearchOnlyWidget(launchedFromSearchOnlyWidget: Boolean) {
+        isSearchOnly.value = launchedFromSearchOnlyWidget
     }
 
     private fun currentOnboardingState(): OnboardingViewState = onboardingViewState.value!!

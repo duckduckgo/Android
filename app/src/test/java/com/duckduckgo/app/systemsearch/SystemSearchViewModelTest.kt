@@ -695,6 +695,95 @@ class SystemSearchViewModelTest {
         }
     }
 
+    @Test
+    fun `when launched from search only widget and duck ai enabled then duck ai button not visible`() = runTest {
+        whenever(mockVoiceSearchAvailability.isVoiceSearchAvailable).thenReturn(true)
+        (mockDuckAiFeatureState.showOmnibarShortcutOnNtpAndOnFocus as MutableStateFlow).value = true
+        testee.queryFlow.value = "query"
+
+        testee.setLaunchedFromSearchOnlyWidget(true)
+
+        testee.omnibarViewState.test {
+            val viewState = awaitItem()
+            assertTrue(viewState.isVoiceSearchButtonVisible)
+            assertFalse(viewState.isDuckAiButtonVisible)
+            assertTrue(viewState.isClearButtonVisible)
+            assertFalse(viewState.isButtonDividerVisible)
+        }
+    }
+
+    @Test
+    fun `when not launched from search only widget and duck ai enabled then duck ai button visible`() = runTest {
+        whenever(mockVoiceSearchAvailability.isVoiceSearchAvailable).thenReturn(true)
+        (mockDuckAiFeatureState.showOmnibarShortcutOnNtpAndOnFocus as MutableStateFlow).value = true
+        testee.queryFlow.value = "query"
+
+        testee.setLaunchedFromSearchOnlyWidget(false)
+
+        testee.omnibarViewState.test {
+            val viewState = awaitItem()
+            assertTrue(viewState.isVoiceSearchButtonVisible)
+            assertTrue(viewState.isDuckAiButtonVisible)
+            assertTrue(viewState.isClearButtonVisible)
+            assertTrue(viewState.isButtonDividerVisible)
+        }
+    }
+
+    @Test
+    fun `when launched from search only widget and duck ai disabled then duck ai button not visible`() = runTest {
+        whenever(mockVoiceSearchAvailability.isVoiceSearchAvailable).thenReturn(true)
+        (mockDuckAiFeatureState.showOmnibarShortcutOnNtpAndOnFocus as MutableStateFlow).value = false
+        testee.queryFlow.value = "query"
+
+        testee.setLaunchedFromSearchOnlyWidget(true)
+
+        testee.omnibarViewState.test {
+            val viewState = awaitItem()
+            assertTrue(viewState.isVoiceSearchButtonVisible)
+            assertFalse(viewState.isDuckAiButtonVisible)
+            assertTrue(viewState.isClearButtonVisible)
+            assertFalse(viewState.isButtonDividerVisible)
+        }
+    }
+
+    @Test
+    fun `when launched from search only widget and query empty then duck ai button not visible`() = runTest {
+        whenever(mockVoiceSearchAvailability.isVoiceSearchAvailable).thenReturn(true)
+        (mockDuckAiFeatureState.showOmnibarShortcutOnNtpAndOnFocus as MutableStateFlow).value = true
+        testee.queryFlow.value = ""
+
+        testee.setLaunchedFromSearchOnlyWidget(true)
+
+        testee.omnibarViewState.test {
+            val viewState = awaitItem()
+            assertTrue(viewState.isVoiceSearchButtonVisible)
+            assertFalse(viewState.isDuckAiButtonVisible)
+            assertFalse(viewState.isClearButtonVisible)
+            assertFalse(viewState.isButtonDividerVisible)
+        }
+    }
+
+    @Test
+    fun `when reset view state then search only widget state preserved`() = runTest {
+        whenever(mockVoiceSearchAvailability.isVoiceSearchAvailable).thenReturn(true)
+        (mockDuckAiFeatureState.showOmnibarShortcutOnNtpAndOnFocus as MutableStateFlow).value = true
+
+        // Set search-only widget state
+        testee.setLaunchedFromSearchOnlyWidget(true)
+        testee.queryFlow.value = "query"
+
+        // Reset view state
+        testee.resetViewState()
+
+        testee.omnibarViewState.test {
+            val viewState = awaitItem()
+            assertTrue(viewState.isVoiceSearchButtonVisible)
+            assertFalse(viewState.isDuckAiButtonVisible) // Should still be false due to search-only widget
+            assertFalse(viewState.isClearButtonVisible) // Should be false due to reset
+            assertFalse(viewState.isButtonDividerVisible)
+        }
+    }
+
     private suspend fun whenOnboardingShowing() {
         whenever(mockUserStageStore.getUserAppStage()).thenReturn(AppStage.NEW)
         testee.resetViewState()

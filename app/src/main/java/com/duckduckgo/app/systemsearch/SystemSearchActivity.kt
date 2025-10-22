@@ -74,7 +74,6 @@ import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggesti
 import com.duckduckgo.browser.api.ui.BrowserScreens.PrivateSearchScreenNoParams
 import com.duckduckgo.browser.ui.autocomplete.BrowserAutoCompleteSuggestionsAdapter
 import com.duckduckgo.browser.ui.omnibar.OmnibarPosition
-import com.duckduckgo.browser.ui.omnibar.OmnibarPosition.TOP
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.view.KeyboardAwareEditText
 import com.duckduckgo.common.ui.view.addBottomShadow
@@ -238,6 +237,8 @@ class SystemSearchActivity : DuckDuckGoActivity() {
             )
         }
 
+        viewModel.setLaunchedFromSearchOnlyWidget(launchedFromSearchOnlyWidget(intent))
+
         showKeyboard(omnibarTextInput)
     }
 
@@ -253,6 +254,7 @@ class SystemSearchActivity : DuckDuckGoActivity() {
         super.onNewIntent(intent)
         dataClearerForegroundAppRestartPixel.registerIntent(intent)
         viewModel.resetViewState()
+        viewModel.setLaunchedFromSearchOnlyWidget(launchedFromSearchOnlyWidget(intent))
         sendLaunchPixels(intent)
         val isOmnibarAtTop = settingsDataStore.omnibarPosition == OmnibarPosition.TOP
         val inputScreenLaunched = launchInputScreen(isTopOmnibar = isOmnibarAtTop, intent = intent)
