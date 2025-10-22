@@ -70,6 +70,11 @@ import com.duckduckgo.app.browser.omnibar.UnifiedLayoutViewModel.Command.StartTr
 import com.duckduckgo.app.browser.omnibar.UnifiedLayoutViewModel.LeadingIconState.EasterEggLogo
 import com.duckduckgo.app.browser.omnibar.UnifiedLayoutViewModel.LeadingIconState.PrivacyShield
 import com.duckduckgo.app.browser.omnibar.UnifiedLayoutViewModel.ViewState
+import com.duckduckgo.app.browser.omnibar.animations.addressbar.BrowserTrackersAnimatorHelper
+import com.duckduckgo.app.browser.omnibar.animations.addressbar.PrivacyShieldAnimationHelper
+import com.duckduckgo.app.browser.omnibar.animations.addressbar.TrackersAnimatorListener
+import com.duckduckgo.app.browser.omnibar.animations.omnibaranimation.OmnibarAnimationManager
+import com.duckduckgo.app.browser.omnibar.model.Decoration
 import com.duckduckgo.app.browser.omnibar.model.Decoration.ChangeCustomTabTitle
 import com.duckduckgo.app.browser.omnibar.model.Decoration.DisableVoiceSearch
 import com.duckduckgo.app.browser.omnibar.model.Decoration.HighlightOmnibarItem
@@ -78,11 +83,6 @@ import com.duckduckgo.app.browser.omnibar.model.Decoration.LaunchTrackersAnimati
 import com.duckduckgo.app.browser.omnibar.model.Decoration.Mode
 import com.duckduckgo.app.browser.omnibar.model.Decoration.PrivacyShieldChanged
 import com.duckduckgo.app.browser.omnibar.model.Decoration.QueueCookiesAnimation
-import com.duckduckgo.app.browser.omnibar.animations.addressbar.BrowserTrackersAnimatorHelper
-import com.duckduckgo.app.browser.omnibar.animations.addressbar.PrivacyShieldAnimationHelper
-import com.duckduckgo.app.browser.omnibar.animations.addressbar.TrackersAnimatorListener
-import com.duckduckgo.app.browser.omnibar.animations.omnibaranimation.OmnibarAnimationManager
-import com.duckduckgo.app.browser.omnibar.model.Decoration
 import com.duckduckgo.app.browser.omnibar.model.InputScreenLaunchListener
 import com.duckduckgo.app.browser.omnibar.model.ItemPressedListener
 import com.duckduckgo.app.browser.omnibar.model.LogoClickListener
