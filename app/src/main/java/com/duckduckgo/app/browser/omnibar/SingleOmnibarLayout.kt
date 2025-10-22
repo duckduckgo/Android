@@ -179,6 +179,28 @@ class SingleOmnibarLayout @JvmOverloads constructor(
         }
 
         omnibarCardShadow.isGone = viewState.viewMode is ViewMode.CustomTab && !isFindInPageVisible
+
+        // fix margins when Duck.ai toggle is visible
+        maybeFixMarginsForBottomDuckAiToggle(viewState)
+    }
+
+    private fun maybeFixMarginsForBottomDuckAiToggle(viewState: ViewState) {
+        // When omnibar is at the bottom, we're removing the additional space at the top
+        if (viewState.showDuckAIToggle && omnibarPosition == OmnibarPosition.BOTTOM) {
+            omnibarCardShadow.updateLayoutParams {
+                (this as MarginLayoutParams).apply {
+                    topMargin = experimentalOmnibarCardMarginTop
+                    bottomMargin = experimentalOmnibarCardMarginBottom
+                }
+            }
+
+            iconsContainer.updateLayoutParams {
+                (this as MarginLayoutParams).apply {
+                    topMargin = experimentalOmnibarCardMarginTop
+                    bottomMargin = experimentalOmnibarCardMarginBottom
+                }
+            }
+        }
     }
 
     override fun renderButtons(viewState: ViewState) {
