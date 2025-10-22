@@ -18,6 +18,7 @@ package com.duckduckgo.app.browser.omnibar
 
 import android.annotation.SuppressLint
 import android.text.Editable
+import android.view.MotionEvent
 import android.view.View
 import android.widget.ImageView
 import androidx.appcompat.widget.Toolbar
@@ -33,18 +34,7 @@ import com.duckduckgo.app.browser.omnibar.model.Decoration
 import com.duckduckgo.app.browser.omnibar.model.Decoration.DisableVoiceSearch
 import com.duckduckgo.app.browser.omnibar.model.Decoration.HighlightOmnibarItem
 import com.duckduckgo.app.browser.omnibar.model.Decoration.Mode
-import com.duckduckgo.app.browser.omnibar.model.FindInPageListener
-import com.duckduckgo.app.browser.omnibar.model.InputScreenLaunchListener
-import com.duckduckgo.app.browser.omnibar.model.ItemPressedListener
-import com.duckduckgo.app.browser.omnibar.model.LogoClickListener
 import com.duckduckgo.app.browser.omnibar.model.StateChange
-import com.duckduckgo.app.browser.omnibar.model.TextListener
-import com.duckduckgo.app.browser.omnibar.model.ViewMode
-import com.duckduckgo.app.browser.omnibar.model.ViewMode.CustomTab
-import com.duckduckgo.app.browser.omnibar.model.ViewMode.Error
-import com.duckduckgo.app.browser.omnibar.model.ViewMode.MaliciousSiteWarning
-import com.duckduckgo.app.browser.omnibar.model.ViewMode.NewTab
-import com.duckduckgo.app.browser.omnibar.model.ViewMode.SSLWarning
 import com.duckduckgo.app.browser.viewstate.BrowserViewState
 import com.duckduckgo.app.browser.viewstate.FindInPageViewState
 import com.duckduckgo.app.browser.viewstate.LoadingViewState
@@ -73,6 +63,94 @@ class Omnibar(
     private val binding: FragmentBrowserTabBinding,
     isUnifiedOmnibarEnabled: Boolean,
 ) {
+    interface ItemPressedListener {
+        fun onTabsButtonPressed()
+
+        fun onTabsButtonLongPressed()
+
+        fun onFireButtonPressed()
+
+        fun onBrowserMenuPressed()
+
+        fun onPrivacyShieldPressed()
+
+        fun onCustomTabClosePressed()
+
+        fun onCustomTabPrivacyDashboardPressed()
+
+        fun onVoiceSearchPressed()
+
+        fun onDuckChatButtonPressed()
+
+        fun onBackButtonPressed()
+    }
+
+    interface FindInPageListener {
+        fun onFocusChanged(
+            hasFocus: Boolean,
+            query: String,
+        )
+
+        fun onPreviousSearchItemPressed()
+
+        fun onNextSearchItemPressed()
+
+        fun onClosePressed()
+
+        fun onFindInPageTextChanged(query: String)
+    }
+
+    interface TextListener {
+        fun onFocusChanged(
+            hasFocus: Boolean,
+            query: String,
+        )
+
+        fun onBackKeyPressed()
+
+        fun onEnterPressed()
+
+        fun onTouchEvent(event: MotionEvent)
+
+        fun onOmnibarTextChanged(state: OmnibarTextState)
+
+        fun onShowSuggestions(state: OmnibarTextState)
+
+        fun onTrackersCountFinished()
+    }
+
+    fun interface InputScreenLaunchListener {
+        fun launchInputScreen(query: String)
+    }
+
+    interface LogoClickListener {
+        fun onClick(url: String)
+    }
+
+    data class OmnibarTextState(
+        val text: String,
+        val hasFocus: Boolean,
+    )
+    sealed class ViewMode {
+        data object Error : ViewMode()
+
+        data object SSLWarning : ViewMode()
+
+        data object MaliciousSiteWarning : ViewMode()
+
+        data object NewTab : ViewMode()
+
+        data class Browser(
+            val url: String?,
+        ) : ViewMode()
+
+        data class CustomTab(
+            val toolbarColor: Int,
+            val title: String?,
+            val domain: String?,
+            val showDuckPlayerIcon: Boolean = false,
+        ) : ViewMode()
+    }
 
     val omnibarView: OmnibarView by lazy {
         if (isUnifiedOmnibarEnabled) {
@@ -186,19 +264,19 @@ class Omnibar(
         logcat { "Omnibar: setViewMode $newViewMode" }
         viewMode = newViewMode
         when (newViewMode) {
-            Error -> {
+            ViewMode.Error -> {
                 omnibarView.decorate(Mode(newViewMode))
             }
 
-            NewTab -> {
+            ViewMode.NewTab -> {
                 omnibarView.decorate(Mode(newViewMode))
             }
 
-            SSLWarning -> {
+            ViewMode.SSLWarning -> {
                 omnibarView.decorate(Mode(newViewMode))
             }
 
-            MaliciousSiteWarning -> {
+            ViewMode.MaliciousSiteWarning -> {
                 omnibarView.decorate(Mode(newViewMode))
             }
 
@@ -344,7 +422,7 @@ class Omnibar(
         customTabToolbarColor: Int,
         customTabDomainText: String?,
     ) {
-        omnibarView.decorate(Mode(CustomTab(toolbarColor = customTabToolbarColor, title = null, domain = customTabDomainText)))
+        omnibarView.decorate(Mode(ViewMode.CustomTab(toolbarColor = customTabToolbarColor, title = null, domain = customTabDomainText)))
     }
 
     fun showWebPageTitleInCustomTab(

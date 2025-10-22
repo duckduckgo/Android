@@ -19,7 +19,7 @@ package com.duckduckgo.app.browser.omnibar.animations.addressbar
 import com.airbnb.lottie.LottieAnimationView
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.animations.AddressBarTrackersAnimationFeatureToggle
-import com.duckduckgo.app.browser.omnibar.model.ViewMode
+import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode
 import com.duckduckgo.app.global.model.PrivacyShield
 import com.duckduckgo.app.global.model.PrivacyShield.MALICIOUS
 import com.duckduckgo.app.global.model.PrivacyShield.PROTECTED

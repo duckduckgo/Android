@@ -16,12 +16,13 @@
 
 package com.duckduckgo.app.browser.omnibar.model
 
+import com.duckduckgo.app.browser.omnibar.Omnibar
 import com.duckduckgo.app.global.model.PrivacyShield
 import com.duckduckgo.app.trackerdetection.model.Entity
 
 sealed class Decoration {
     data class Mode(
-        val viewMode: ViewMode,
+        val viewMode: Omnibar.ViewMode,
     ) : Decoration()
 
     data class LaunchTrackersAnimation(

@@ -30,7 +30,7 @@ import androidx.core.view.updateLayoutParams
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.ViewState
-import com.duckduckgo.app.browser.omnibar.model.ViewMode
+import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode
 import com.duckduckgo.browser.ui.omnibar.OmnibarPosition
 import com.duckduckgo.common.ui.view.addBottomShadow
 import com.duckduckgo.common.ui.view.gone
@@ -92,8 +92,8 @@ class SingleOmnibarLayout @JvmOverloads constructor(
     override val omnibarPosition: OmnibarPosition
 
     init {
-        val attr = context.theme.obtainStyledAttributes(attrs, R.styleable.SingleOmnibarLayout, defStyle, 0)
-        omnibarPosition = OmnibarPosition.entries[attr.getInt(R.styleable.SingleOmnibarLayout_omnibarPosition, 0)]
+        val attr = context.theme.obtainStyledAttributes(attrs, R.styleable.OmnibarLayout, defStyle, 0)
+        omnibarPosition = OmnibarPosition.entries[attr.getInt(R.styleable.OmnibarLayout_omnibarPosition, 0)]
 
         inflate(context, R.layout.view_single_omnibar, this)
 

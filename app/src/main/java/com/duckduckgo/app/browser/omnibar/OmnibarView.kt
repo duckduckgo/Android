@@ -22,11 +22,11 @@ import androidx.appcompat.widget.Toolbar
 import com.airbnb.lottie.LottieAnimationView
 import com.duckduckgo.app.browser.databinding.IncludeFindInPageBinding
 import com.duckduckgo.app.browser.omnibar.model.Decoration
-import com.duckduckgo.app.browser.omnibar.model.InputScreenLaunchListener
-import com.duckduckgo.app.browser.omnibar.model.ItemPressedListener
-import com.duckduckgo.app.browser.omnibar.model.LogoClickListener
+import com.duckduckgo.app.browser.omnibar.Omnibar.InputScreenLaunchListener
+import com.duckduckgo.app.browser.omnibar.Omnibar.ItemPressedListener
+import com.duckduckgo.app.browser.omnibar.Omnibar.LogoClickListener
 import com.duckduckgo.app.browser.omnibar.model.StateChange
-import com.duckduckgo.app.browser.omnibar.model.TextListener
+import com.duckduckgo.app.browser.omnibar.Omnibar.TextListener
 import com.duckduckgo.browser.ui.omnibar.OmnibarPosition
 import com.duckduckgo.common.ui.view.KeyboardAwareEditText
 import kotlinx.coroutines.flow.Flow

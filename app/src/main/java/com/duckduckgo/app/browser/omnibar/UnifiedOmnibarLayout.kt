@@ -83,13 +83,13 @@ import com.duckduckgo.app.browser.omnibar.model.Decoration.LaunchTrackersAnimati
 import com.duckduckgo.app.browser.omnibar.model.Decoration.Mode
 import com.duckduckgo.app.browser.omnibar.model.Decoration.PrivacyShieldChanged
 import com.duckduckgo.app.browser.omnibar.model.Decoration.QueueCookiesAnimation
-import com.duckduckgo.app.browser.omnibar.model.InputScreenLaunchListener
-import com.duckduckgo.app.browser.omnibar.model.ItemPressedListener
-import com.duckduckgo.app.browser.omnibar.model.LogoClickListener
-import com.duckduckgo.app.browser.omnibar.model.OmnibarTextState
+import com.duckduckgo.app.browser.omnibar.Omnibar.InputScreenLaunchListener
+import com.duckduckgo.app.browser.omnibar.Omnibar.ItemPressedListener
+import com.duckduckgo.app.browser.omnibar.Omnibar.LogoClickListener
+import com.duckduckgo.app.browser.omnibar.Omnibar.OmnibarTextState
 import com.duckduckgo.app.browser.omnibar.model.StateChange
-import com.duckduckgo.app.browser.omnibar.model.TextListener
-import com.duckduckgo.app.browser.omnibar.model.ViewMode
+import com.duckduckgo.app.browser.omnibar.Omnibar.TextListener
+import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode
 import com.duckduckgo.app.global.view.renderIfChanged
 import com.duckduckgo.app.onboardingdesignexperiment.OnboardingDesignExperimentManager
 import com.duckduckgo.app.statistics.pixels.Pixel
@@ -123,6 +123,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import logcat.logcat
 import javax.inject.Inject
+import kotlin.collections.isNotEmpty
 import kotlin.jvm.java
 import com.duckduckgo.app.global.model.PrivacyShield as PrivacyShieldState
 import com.duckduckgo.mobile.android.R as CommonR
@@ -424,7 +425,7 @@ class UnifiedOmnibarLayout @JvmOverloads constructor(
         omnibarTextListener = textListener
 
         omnibarTextInput.onFocusChangeListener =
-            View.OnFocusChangeListener { _, hasFocus: Boolean ->
+            OnFocusChangeListener { _, hasFocus: Boolean ->
                 if (isAttachedToWindow) {
                     viewModel.onOmnibarFocusChanged(hasFocus, omnibarTextInput.text.toString())
                     omnibarTextListener?.onFocusChanged(hasFocus, omnibarTextInput.text.toString())
