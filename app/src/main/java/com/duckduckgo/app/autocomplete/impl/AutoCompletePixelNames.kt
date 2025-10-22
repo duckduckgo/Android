@@ -33,3 +33,11 @@ enum class AutoCompletePixelNames(override val pixelName: String) : Pixel.PixelN
     AUTOCOMPLETE_DUCKAI_PROMPT_EXPERIMENTAL_SELECTION("m_autocomplete_click_duckai_experimental"),
     AUTOCOMPLETE_DUCKAI_PROMPT_LEGACY_SELECTION("m_autocomplete_click_duckai_legacy"),
 }
+
+object AutocompletePixelParams {
+    /**
+     * Parameter to capture the index of the selected suggestion within the list of search suggestions
+     * (either [AutoCompletePixelNames.AUTOCOMPLETE_SEARCH_PHRASE_SELECTION] or [AutoCompletePixelNames.AUTOCOMPLETE_SEARCH_WEBSITE_SELECTION]).
+     */
+    const val PARAM_SEARCH_SUGGESTION_INDEX = "search_suggestion_index"
+}
