@@ -19,7 +19,6 @@ package com.duckduckgo.app.settings.db
 import android.content.Context
 import android.content.SharedPreferences
 import androidx.core.content.edit
-import com.duckduckgo.app.browser.omnibar.datastore.OmnibarDataStore
 import com.duckduckgo.app.fire.fireproofwebsite.ui.AutomaticFireproofSetting
 import com.duckduckgo.app.fire.fireproofwebsite.ui.AutomaticFireproofSetting.ASK_EVERY_TIME
 import com.duckduckgo.app.fire.fireproofwebsite.ui.AutomaticFireproofSetting.NEVER
@@ -33,7 +32,6 @@ import com.duckduckgo.browser.ui.omnibar.OmnibarPosition
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
-import kotlinx.coroutines.runBlocking
 import javax.inject.Inject
 
 interface SettingsDataStore {
@@ -110,7 +108,6 @@ interface SettingsDataStore {
 class SettingsSharedPreferences @Inject constructor(
     private val context: Context,
     private val appBuildConfig: AppBuildConfig,
-    private val omnibarDataStore: OmnibarDataStore,
 ) : SettingsDataStore,
     AutoCompleteSettings {
     private val fireAnimationMapper = FireAnimationPrefsMapper()
@@ -217,10 +214,8 @@ class SettingsSharedPreferences @Inject constructor(
         set(enabled) = preferences.edit { putBoolean(SHOW_AUTOMATIC_FIREPROOF_DIALOG, enabled) }
 
     override var omnibarPosition: OmnibarPosition
-        get() = omnibarDataStore.omnibarPosition
-        set(value) = runBlocking {
-            omnibarDataStore.setOmnibarPosition(value)
-        }
+        get() = OmnibarPosition.valueOf(preferences.getString(KEY_OMNIBAR_POSITION, OmnibarPosition.TOP.name) ?: OmnibarPosition.TOP.name)
+        set(value) = preferences.edit { putString(KEY_OMNIBAR_POSITION, value.name) }
 
     override var isFullUrlEnabled: Boolean
         get() = preferences.getBoolean(KEY_IS_FULL_URL_ENABLED, true)
