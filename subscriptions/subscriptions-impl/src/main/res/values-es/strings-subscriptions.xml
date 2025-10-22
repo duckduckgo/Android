@@ -162,6 +162,7 @@
 
     <string name="feedbackSubmitGeneralDescriptionHint">Danos tu opinión…</string>
     <string name="feedbackSubmitFeatureRequestDescriptionHint">¿Qué función te gustaría ver?</string>
+    <string name="feedbackSubmitContactSupport">¿Necesitas ayuda? <annotation type="support_link">Ponte en contacto con el servicio de asistencia</annotation>.</string>
 
     <!-- Activity titles -->
     <string name="activitySubscriptions">Suscripciones</string>
