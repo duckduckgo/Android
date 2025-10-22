@@ -162,6 +162,7 @@
 
     <string name="feedbackSubmitGeneralDescriptionHint">Моля, споделете своето мнение…</string>
     <string name="feedbackSubmitFeatureRequestDescriptionHint">Каква функция бихте искали да въведем?</string>
+    <string name="feedbackSubmitContactSupport">Имаш нужда от помощ? <annotation type="support_link">Свържи се с поддръжката</annotation>.</string>
 
     <!-- Activity titles -->
     <string name="activitySubscriptions">Абонаменти</string>
