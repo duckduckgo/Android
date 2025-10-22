@@ -66,6 +66,14 @@ interface SettingsDataStore {
     var appLinksEnabled: Boolean
     var showAppLinksPrompt: Boolean
     var showAutomaticFireproofDialog: Boolean
+
+    @Deprecated(
+        message = "Omnibar position is now stored in OmnibarDataStore as OmnibarType. DO NOT use this to set a new value.",
+        replaceWith = ReplaceWith(
+            expression = "OmnibarDataStore.omnibarTypeFlow",
+            imports = ["com.duckduckgo.app.browser.omnibar.datastore.OmnibarDataStore"]
+        ),
+    )
     var omnibarPosition: OmnibarPosition
 
     /**

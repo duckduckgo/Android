@@ -14,9 +14,10 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.browser.omnibar.model
+package com.duckduckgo.browser.ui.omnibar
 
-enum class OmnibarType {
-    SINGLE,
-    SPLIT,
+enum class OmnibarType(val typeName: String) {
+    SINGLE_TOP("top"),
+    SINGLE_BOTTOM("bottom"),
+    SPLIT("split_top"),
 }
