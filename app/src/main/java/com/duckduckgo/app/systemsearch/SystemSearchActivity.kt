@@ -223,7 +223,7 @@ class SystemSearchActivity : DuckDuckGoActivity() {
             intent?.let {
                 sendLaunchPixels(it)
                 if (duckAiFeatureState.showInputScreenOnSystemSearchLaunch.value) {
-                    launchInputScreen(isTopOmnibar = isOmnibarAtTop)
+                    launchInputScreen(isTopOmnibar = isOmnibarAtTop, intent = it)
                 } else {
                     handleVoiceSearchLaunch(it)
                 }
@@ -257,13 +257,13 @@ class SystemSearchActivity : DuckDuckGoActivity() {
         sendLaunchPixels(intent)
         if (duckAiFeatureState.showInputScreenOnSystemSearchLaunch.value) {
             val isOmnibarAtTop = settingsDataStore.omnibarPosition == OmnibarPosition.TOP
-            launchInputScreen(isTopOmnibar = isOmnibarAtTop)
+            launchInputScreen(isTopOmnibar = isOmnibarAtTop, intent = intent)
         } else {
             handleVoiceSearchLaunch(intent)
         }
     }
 
-    private fun launchInputScreen(isTopOmnibar: Boolean) {
+    private fun launchInputScreen(isTopOmnibar: Boolean, intent: Intent) {
         globalActivityStarter.startIntent(
             this,
             InputScreenActivityParams(
@@ -271,6 +271,7 @@ class SystemSearchActivity : DuckDuckGoActivity() {
                 isTopOmnibar = isTopOmnibar,
                 browserButtonsConfig = InputScreenBrowserButtonsConfig.Disabled(),
                 showInstalledApps = true,
+                launchWithVoice = launchVoice(intent),
             ),
         )?.let {
             inputScreenLauncher.launch(it)
@@ -425,7 +426,7 @@ class SystemSearchActivity : DuckDuckGoActivity() {
     private fun configureVoiceSearch() {
         voiceSearchLauncher.registerResultsCallback(this, this, WIDGET) {
             if (it is VoiceSearchLauncher.Event.VoiceRecognitionSuccess) {
-                viewModel.onUserSelectedToEditQuery(it.result)
+                viewModel.onVoiceSearchResult(it.result)
             } else if (it is VoiceSearchLauncher.Event.VoiceSearchDisabled) {
                 viewModel.onVoiceSearchStateChanged()
             }

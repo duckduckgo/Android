@@ -350,6 +350,14 @@ class SystemSearchViewModelTest {
     }
 
     @Test
+    fun `when voice search result then launch browser`() {
+        val query = "test"
+        testee.onVoiceSearchResult(capturedText = query)
+        verify(commandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
+        assertEquals(Command.LaunchBrowser(query), commandCaptor.lastValue)
+    }
+
+    @Test
     fun whenQuickAccessItemClickedThenLaunchBrowser() {
         val quickAccessItem = QuickAccessFavorite(Favorite("favorite1", "title", "http://example.com", "timestamp", 0))
 

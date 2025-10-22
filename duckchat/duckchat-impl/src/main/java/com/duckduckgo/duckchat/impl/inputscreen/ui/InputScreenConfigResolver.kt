@@ -32,6 +32,8 @@ interface InputScreenConfigResolver {
 
     fun shouldShowInstalledApps(): Boolean
 
+    fun shouldLaunchVoiceSearch(): Boolean
+
     fun useTopBar(): Boolean
 
     fun mainButtonsEnabled(): Boolean
@@ -57,6 +59,11 @@ class InputScreenConfigResolverImpl @Inject constructor(
     override fun shouldShowInstalledApps(): Boolean {
         val params = appCompatActivity.intent?.getActivityParams(InputScreenActivityParams::class.java)
         return params?.showInstalledApps ?: false
+    }
+
+    override fun shouldLaunchVoiceSearch(): Boolean {
+        val params = appCompatActivity.intent.getActivityParams(InputScreenActivityParams::class.java)
+        return params?.launchWithVoice ?: false
     }
 
     override fun useTopBar(): Boolean =
