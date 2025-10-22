@@ -82,7 +82,7 @@ class AutoconsentPixelManagerTest {
     }
 
     @Test
-    fun whenIsDetectedByPatternsProcessedWithNewInstanceIdThenReturnFalse() {
+    fun whenIsDetectedByPatternsProcessedWithNewInstanceIdThenReturnFalse() = runTest {
         val instanceId = "id-123-abc"
 
         val result = pixelManager.isDetectedByPatternsProcessed(instanceId)
@@ -92,7 +92,7 @@ class AutoconsentPixelManagerTest {
     }
 
     @Test
-    fun whenIsDetectedByPatternsProcessedWithProcessedInstanceIdThenReturnTrue() {
+    fun whenIsDetectedByPatternsProcessedWithProcessedInstanceIdThenReturnTrue() = runTest {
         val instanceId = "id-123-abc"
         pixelManager.markDetectedByPatternsProcessed(instanceId)
 
@@ -103,7 +103,7 @@ class AutoconsentPixelManagerTest {
     }
 
     @Test
-    fun whenIsDetectedByBothProcessedWithNewInstanceIdThenReturnFalse() {
+    fun whenIsDetectedByBothProcessedWithNewInstanceIdThenReturnFalse() = runTest {
         val instanceId = "id-123-abc"
 
         val result = pixelManager.isDetectedByBothProcessed(instanceId)
@@ -113,7 +113,7 @@ class AutoconsentPixelManagerTest {
     }
 
     @Test
-    fun whenIsDetectedByBothProcessedWithProcessedInstanceIdThenReturnTrue() {
+    fun whenIsDetectedByBothProcessedWithProcessedInstanceIdThenReturnTrue() = runTest {
         val instanceId = "id-123-abc"
         pixelManager.markDetectedByBothProcessed(instanceId)
 
@@ -124,7 +124,7 @@ class AutoconsentPixelManagerTest {
     }
 
     @Test
-    fun whenIsDetectedOnlyRulesProcessedWithNewInstanceIdThenReturnFalse() {
+    fun whenIsDetectedOnlyRulesProcessedWithNewInstanceIdThenReturnFalse() = runTest {
         val instanceId = "id-123-abc"
 
         val result = pixelManager.isDetectedOnlyRulesProcessed(instanceId)
@@ -134,7 +134,7 @@ class AutoconsentPixelManagerTest {
     }
 
     @Test
-    fun whenIsDetectedOnlyRulesProcessedWithProcessedInstanceIdThenReturnTrue() {
+    fun whenIsDetectedOnlyRulesProcessedWithProcessedInstanceIdThenReturnTrue() = runTest {
         val instanceId = "id-123-abc"
         pixelManager.markDetectedOnlyRulesProcessed(instanceId)
 

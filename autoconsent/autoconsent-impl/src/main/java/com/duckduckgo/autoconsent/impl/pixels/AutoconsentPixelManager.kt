@@ -27,18 +27,20 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 import kotlin.time.Duration.Companion.minutes
 
 interface AutoconsentPixelManager {
     fun fireDailyPixel(pixelName: AutoConsentPixel)
-    fun isDetectedByPatternsProcessed(instanceId: String): Boolean
-    fun markDetectedByPatternsProcessed(instanceId: String)
-    fun isDetectedByBothProcessed(instanceId: String): Boolean
-    fun markDetectedByBothProcessed(instanceId: String)
-    fun isDetectedOnlyRulesProcessed(instanceId: String): Boolean
-    fun markDetectedOnlyRulesProcessed(instanceId: String)
+    suspend fun isDetectedByPatternsProcessed(instanceId: String): Boolean
+    suspend fun markDetectedByPatternsProcessed(instanceId: String)
+    suspend fun isDetectedByBothProcessed(instanceId: String): Boolean
+    suspend fun markDetectedByBothProcessed(instanceId: String)
+    suspend fun isDetectedOnlyRulesProcessed(instanceId: String): Boolean
+    suspend fun markDetectedOnlyRulesProcessed(instanceId: String)
 }
 
 @SingleInstanceIn(AppScope::class)
@@ -54,21 +56,26 @@ class RealAutoconsentPixelManager @Inject constructor(
     private val detectedOnlyRulesCache = mutableSetOf<String>()
     private val pixelCounter = mutableMapOf<String, Int>()
     private var summaryJob: Job? = null
+    private val mutex = Mutex()
 
     override fun fireDailyPixel(pixelName: AutoConsentPixel) {
-        appCoroutineScope.launch(dispatcherProvider.main()) {
+        appCoroutineScope.launch {
             val isEnabled = withContext(dispatcherProvider.io()) {
                 autoconsentFeature.cpmPixels().isEnabled()
             }
             if (!isEnabled) return@launch
 
-            pixelCounter[pixelName.pixelName] = (pixelCounter[pixelName.pixelName] ?: 0) + 1
+            mutex.withLock {
+                pixelCounter[pixelName.pixelName] = (pixelCounter[pixelName.pixelName] ?: 0) + 1
 
-            if (summaryJob == null) {
-                summaryJob = appCoroutineScope.launch(dispatcherProvider.main()) {
-                    delay(2.minutes)
-                    pixel.enqueueFire(AutoConsentPixel.AUTOCONSENT_SUMMARY, parameters = buildSummaryParameters())
-                    clearAllCaches()
+                if (summaryJob == null) {
+                    summaryJob = appCoroutineScope.launch {
+                        delay(2.minutes)
+                        mutex.withLock {
+                            pixel.enqueueFire(AutoConsentPixel.AUTOCONSENT_SUMMARY, parameters = buildSummaryParameters())
+                            clearAllCaches()
+                        }
+                    }
                 }
             }
 
@@ -76,28 +83,40 @@ class RealAutoconsentPixelManager @Inject constructor(
         }
     }
 
-    override fun isDetectedByPatternsProcessed(instanceId: String): Boolean {
-        return detectedByPatternsCache.contains(instanceId)
+    override suspend fun isDetectedByPatternsProcessed(instanceId: String): Boolean {
+        return mutex.withLock {
+            detectedByPatternsCache.contains(instanceId)
+        }
     }
 
-    override fun markDetectedByPatternsProcessed(instanceId: String) {
-        detectedByPatternsCache.add(instanceId)
+    override suspend fun markDetectedByPatternsProcessed(instanceId: String) {
+        mutex.withLock {
+            detectedByPatternsCache.add(instanceId)
+        }
     }
 
-    override fun isDetectedByBothProcessed(instanceId: String): Boolean {
-        return detectedByBothCache.contains(instanceId)
+    override suspend fun isDetectedByBothProcessed(instanceId: String): Boolean {
+        return mutex.withLock {
+            detectedByBothCache.contains(instanceId)
+        }
     }
 
-    override fun markDetectedByBothProcessed(instanceId: String) {
-        detectedByBothCache.add(instanceId)
+    override suspend fun markDetectedByBothProcessed(instanceId: String) {
+        mutex.withLock {
+            detectedByBothCache.add(instanceId)
+        }
     }
 
-    override fun isDetectedOnlyRulesProcessed(instanceId: String): Boolean {
-        return detectedOnlyRulesCache.contains(instanceId)
+    override suspend fun isDetectedOnlyRulesProcessed(instanceId: String): Boolean {
+        return mutex.withLock {
+            detectedOnlyRulesCache.contains(instanceId)
+        }
     }
 
-    override fun markDetectedOnlyRulesProcessed(instanceId: String) {
-        detectedOnlyRulesCache.add(instanceId)
+    override suspend fun markDetectedOnlyRulesProcessed(instanceId: String) {
+        mutex.withLock {
+            detectedOnlyRulesCache.add(instanceId)
+        }
     }
 
     private fun clearAllCaches() {
