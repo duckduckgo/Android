@@ -71,7 +71,7 @@ interface SettingsDataStore {
         message = "Omnibar position is now stored in OmnibarDataStore as OmnibarType. DO NOT use this to set a new value.",
         replaceWith = ReplaceWith(
             expression = "OmnibarDataStore.omnibarTypeFlow",
-            imports = ["com.duckduckgo.app.browser.omnibar.datastore.OmnibarDataStore"]
+            imports = ["com.duckduckgo.app.browser.omnibar.datastore.OmnibarDataStore"],
         ),
     )
     var omnibarPosition: OmnibarPosition

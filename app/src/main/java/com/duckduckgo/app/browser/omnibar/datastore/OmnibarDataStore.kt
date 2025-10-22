@@ -16,7 +16,6 @@
 
 package com.duckduckgo.app.browser.omnibar.datastore
 
-import android.annotation.SuppressLint
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
