@@ -46,9 +46,9 @@ class ReportMessageHandlerPlugin @Inject constructor(
     private val moshi by lazy { Moshi.Builder().add(JSONObjectAdapter()).build() }
 
     override fun process(messageType: String, jsonString: String, webView: WebView, autoconsentCallback: AutoconsentCallback) {
-        try {
-            if (supportedTypes.contains(messageType)) {
-                appCoroutineScope.launch(dispatcherProvider.main()) {
+        if (supportedTypes.contains(messageType)) {
+            appCoroutineScope.launch(dispatcherProvider.main()) {
+                try {
                     val message: ReportMessage = parseMessage(jsonString) ?: return@launch
 
                     val isEnabled = withContext(dispatcherProvider.io()) {
@@ -73,10 +73,10 @@ class ReportMessageHandlerPlugin @Inject constructor(
                             autoconsentPixelManager.fireDailyPixel(AutoConsentPixel.AUTOCONSENT_DETECTED_ONLY_RULES_DAILY)
                         }
                     }
+                } catch (e: Exception) {
+                    logcat { e.localizedMessage }
                 }
             }
-        } catch (e: Exception) {
-            logcat { e.localizedMessage }
         }
     }
 
