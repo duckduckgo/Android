@@ -49,6 +49,9 @@ sealed interface UserCannotImportReason : Parcelable {
     data object DownloadError : UserCannotImportReason
 
     @Parcelize
+    data class WebAutomationError(val step: String) : UserCannotImportReason
+
+    @Parcelize
     data object Unknown : UserCannotImportReason
 
     @Parcelize
