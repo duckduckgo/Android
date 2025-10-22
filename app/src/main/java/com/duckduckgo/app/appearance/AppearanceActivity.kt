@@ -30,13 +30,13 @@ import com.duckduckgo.app.appearance.AppearanceScreen.Default
 import com.duckduckgo.app.appearance.AppearanceScreen.HighlightedItem
 import com.duckduckgo.app.appearance.AppearanceViewModel.Command
 import com.duckduckgo.app.appearance.AppearanceViewModel.Command.LaunchAppIcon
-import com.duckduckgo.app.appearance.AppearanceViewModel.Command.LaunchOmnibarPositionSettings
+import com.duckduckgo.app.appearance.AppearanceViewModel.Command.LaunchOmnibarTypeSettings
 import com.duckduckgo.app.appearance.AppearanceViewModel.Command.LaunchThemeSettings
 import com.duckduckgo.app.appearance.AppearanceViewModel.Command.UpdateTheme
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ActivityAppearanceBinding
 import com.duckduckgo.app.fire.FireActivity
-import com.duckduckgo.browser.ui.omnibar.OmnibarPosition
+import com.duckduckgo.browser.ui.omnibar.OmnibarType
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.DuckDuckGoTheme
 import com.duckduckgo.common.ui.DuckDuckGoTheme.DARK
@@ -127,7 +127,7 @@ class AppearanceActivity : DuckDuckGoActivity() {
                     binding.experimentalNightMode.quietlySetIsChecked(viewState.forceDarkModeEnabled, forceDarkModeToggleListener)
                     binding.experimentalNightMode.isEnabled = viewState.canForceDarkMode
                     binding.experimentalNightMode.isVisible = viewState.supportsForceDarkMode
-                    updateSelectedOmnibarPosition(it.omnibarPosition)
+                    updateSelectedOmnibarPosition(it.omnibarType)
                     binding.showFullUrlSetting.quietlySetIsChecked(viewState.isFullUrlEnabled, showFullUrlToggleListener)
                     binding.showTrackersCountInTabSwitcher.quietlySetIsChecked(
                         viewState.isTrackersCountInTabSwitcherEnabled,
@@ -155,12 +155,13 @@ class AppearanceActivity : DuckDuckGoActivity() {
         binding.selectedThemeSetting.setSecondaryText(subtitle)
     }
 
-    private fun updateSelectedOmnibarPosition(position: OmnibarPosition) {
+    private fun updateSelectedOmnibarPosition(omnibarType: OmnibarType) {
         val subtitle =
             getString(
-                when (position) {
-                    OmnibarPosition.TOP -> R.string.settingsAddressBarPositionTop
-                    OmnibarPosition.BOTTOM -> R.string.settingsAddressBarPositionBottom
+                when (omnibarType) {
+                    OmnibarType.SINGLE_TOP -> R.string.settingsAddressBarPositionTop
+                    else -> R.string.settingsAddressBarPositionBottom
+                    // TODO: The split option will be added later
                 },
             )
         binding.addressBarPositionSetting.setSecondaryText(subtitle)
@@ -171,7 +172,7 @@ class AppearanceActivity : DuckDuckGoActivity() {
             is LaunchAppIcon -> launchAppIconChange()
             is UpdateTheme -> sendThemeChangedBroadcast()
             is LaunchThemeSettings -> launchThemeSelector(it.theme)
-            is LaunchOmnibarPositionSettings -> launchOmnibarPositionSelector(it.position)
+            is LaunchOmnibarTypeSettings -> launchOmnibarPositionSelector(it.omnibarType)
         }
     }
 
@@ -207,7 +208,7 @@ class AppearanceActivity : DuckDuckGoActivity() {
             ).show()
     }
 
-    private fun launchOmnibarPositionSelector(position: OmnibarPosition) {
+    private fun launchOmnibarPositionSelector(type: OmnibarType) {
         RadioListAlertDialogBuilder(this)
             .setTitle(R.string.settingsAddressBarPositionTitle)
             .setOptions(
@@ -215,15 +216,15 @@ class AppearanceActivity : DuckDuckGoActivity() {
                     R.string.settingsAddressBarPositionTop,
                     R.string.settingsAddressBarPositionBottom,
                 ),
-                OmnibarPosition.entries.indexOf(position) + 1,
+                OmnibarType.entries.indexOf(type) + 1,
             ).setPositiveButton(com.duckduckgo.mobile.android.R.string.dialogSave)
             .setNegativeButton(R.string.cancel)
             .setCancelable(true)
             .addEventListener(
                 object : RadioListAlertDialogBuilder.EventListener() {
                     override fun onPositiveButtonClicked(selectedItem: Int) {
-                        val newPosition = OmnibarPosition.entries[selectedItem - 1]
-                        viewModel.onOmnibarPositionUpdated(newPosition)
+                        val newType = OmnibarType.entries[selectedItem - 1]
+                        viewModel.setOmnibarType(newType)
                     }
                 },
             ).show()

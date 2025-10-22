@@ -16,6 +16,7 @@
 
 package com.duckduckgo.browser.ui.omnibar
 
+@Deprecated("Use OmnibarType instead", ReplaceWith("OmnibarType", "com.duckduckgo.browser.ui.omnibar.OmnibarType"))
 enum class OmnibarPosition {
     TOP,
     BOTTOM,

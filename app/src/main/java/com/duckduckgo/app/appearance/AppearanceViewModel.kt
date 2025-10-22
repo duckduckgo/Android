@@ -20,6 +20,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.webkit.WebViewFeature
 import com.duckduckgo.anvil.annotations.ContributesViewModel
+import com.duckduckgo.app.browser.omnibar.datastore.OmnibarDataStore
 import com.duckduckgo.app.icon.api.AppIcon
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_THEME_TOGGLED_DARK
@@ -28,7 +29,7 @@ import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_THEME_TOGGLED_SYSTEM_DEFA
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.tabs.store.TabSwitcherDataStore
-import com.duckduckgo.browser.ui.omnibar.OmnibarPosition
+import com.duckduckgo.browser.ui.omnibar.OmnibarType
 import com.duckduckgo.common.ui.DuckDuckGoTheme
 import com.duckduckgo.common.ui.DuckDuckGoTheme.DARK
 import com.duckduckgo.common.ui.DuckDuckGoTheme.LIGHT
@@ -40,8 +41,7 @@ import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.firstOrNull
-import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -54,6 +54,7 @@ import kotlin.to
 class AppearanceViewModel @Inject constructor(
     private val themingDataStore: ThemingDataStore,
     private val settingsDataStore: SettingsDataStore,
+    private val omnibarDataStore: OmnibarDataStore,
     private val pixel: Pixel,
     private val dispatcherProvider: DispatcherProvider,
     private val tabSwitcherDataStore: TabSwitcherDataStore,
@@ -64,7 +65,7 @@ class AppearanceViewModel @Inject constructor(
         val forceDarkModeEnabled: Boolean = false,
         val canForceDarkMode: Boolean = false,
         val supportsForceDarkMode: Boolean = true,
-        val omnibarPosition: OmnibarPosition = OmnibarPosition.TOP,
+        val omnibarType: OmnibarType = OmnibarType.SINGLE_TOP,
         val isFullUrlEnabled: Boolean = true,
         val isTrackersCountInTabSwitcherEnabled: Boolean = true,
     )
@@ -78,32 +79,33 @@ class AppearanceViewModel @Inject constructor(
 
         data object UpdateTheme : Command()
 
-        data class LaunchOmnibarPositionSettings(
-            val position: OmnibarPosition,
+        data class LaunchOmnibarTypeSettings(
+            val omnibarType: OmnibarType,
         ) : Command()
     }
 
-    private val viewState = MutableStateFlow(ViewState())
+    private val viewState = MutableStateFlow(
+        ViewState(
+            theme = themingDataStore.theme,
+            appIcon = settingsDataStore.appIcon,
+            forceDarkModeEnabled = settingsDataStore.experimentalWebsiteDarkMode,
+            canForceDarkMode = canForceDarkMode(),
+            supportsForceDarkMode = WebViewFeature.isFeatureSupported(WebViewFeature.ALGORITHMIC_DARKENING),
+            isFullUrlEnabled = settingsDataStore.isFullUrlEnabled,
+            omnibarType = omnibarDataStore.omnibarType,
+        ),
+    )
+
+    fun viewState() = combine(
+        viewState,
+        tabSwitcherDataStore.isTrackersAnimationInfoTileHidden(),
+    ) { currentViewState, isTrackersAnimationTileHidden ->
+        currentViewState.copy(
+            isTrackersCountInTabSwitcherEnabled = !isTrackersAnimationTileHidden,
+        )
+    }
+
     private val command = Channel<Command>(1, BufferOverflow.DROP_OLDEST)
-
-    fun viewState(): Flow<ViewState> =
-        viewState.onStart {
-            viewModelScope.launch {
-                viewState.update {
-                    currentViewState().copy(
-                        theme = themingDataStore.theme,
-                        appIcon = settingsDataStore.appIcon,
-                        forceDarkModeEnabled = settingsDataStore.experimentalWebsiteDarkMode,
-                        canForceDarkMode = canForceDarkMode(),
-                        supportsForceDarkMode = WebViewFeature.isFeatureSupported(WebViewFeature.ALGORITHMIC_DARKENING),
-                        omnibarPosition = settingsDataStore.omnibarPosition,
-                        isFullUrlEnabled = settingsDataStore.isFullUrlEnabled,
-                        isTrackersCountInTabSwitcherEnabled = tabSwitcherDataStore.isTrackersAnimationInfoTileHidden().firstOrNull() != true,
-                    )
-                }
-            }
-        }
-
     fun commands(): Flow<Command> = command.receiveAsFlow()
 
     private fun canForceDarkMode(): Boolean = themingDataStore.theme != DuckDuckGoTheme.LIGHT
@@ -119,7 +121,7 @@ class AppearanceViewModel @Inject constructor(
     }
 
     fun userRequestedToChangeAddressBarPosition() {
-        viewModelScope.launch { command.send(Command.LaunchOmnibarPositionSettings(viewState.value.omnibarPosition)) }
+        viewModelScope.launch { command.send(Command.LaunchOmnibarTypeSettings(viewState.value.omnibarType)) }
         pixel.fire(AppPixelName.SETTINGS_ADDRESS_BAR_POSITION_PRESSED)
     }
 
@@ -132,7 +134,7 @@ class AppearanceViewModel @Inject constructor(
         viewModelScope.launch(dispatcherProvider.io()) {
             themingDataStore.theme = selectedTheme
             withContext(dispatcherProvider.main()) {
-                viewState.update { currentViewState().copy(theme = selectedTheme, forceDarkModeEnabled = canForceDarkMode()) }
+                viewState.update { it.copy(theme = selectedTheme, forceDarkModeEnabled = canForceDarkMode()) }
                 command.send(Command.UpdateTheme)
             }
         }
@@ -146,19 +148,18 @@ class AppearanceViewModel @Inject constructor(
         pixel.fire(pixelName)
     }
 
-    fun onOmnibarPositionUpdated(position: OmnibarPosition) {
+    fun setOmnibarType(type: OmnibarType) {
         viewModelScope.launch(dispatcherProvider.io()) {
-            settingsDataStore.omnibarPosition = position
-            viewState.update { currentViewState().copy(omnibarPosition = position) }
+            omnibarDataStore.setOmnibarType(type)
+            viewState.update { it.copy(omnibarType = type) }
 
-            when (position) {
-                OmnibarPosition.TOP -> pixel.fire(AppPixelName.SETTINGS_ADDRESS_BAR_POSITION_SELECTED_TOP)
-                OmnibarPosition.BOTTOM -> pixel.fire(AppPixelName.SETTINGS_ADDRESS_BAR_POSITION_SELECTED_BOTTOM)
+            when (type) {
+                OmnibarType.SINGLE_TOP -> pixel.fire(AppPixelName.SETTINGS_ADDRESS_BAR_POSITION_SELECTED_TOP)
+                OmnibarType.SINGLE_BOTTOM -> pixel.fire(AppPixelName.SETTINGS_ADDRESS_BAR_POSITION_SELECTED_BOTTOM)
+                OmnibarType.SPLIT -> pixel.fire(AppPixelName.SETTINGS_ADDRESS_BAR_POSITION_SELECTED_SPLIT_TOP)
             }
         }
     }
-
-    private fun currentViewState(): ViewState = viewState.value
 
     fun onForceDarkModeSettingChanged(checked: Boolean) {
         viewModelScope.launch(dispatcherProvider.io()) {
