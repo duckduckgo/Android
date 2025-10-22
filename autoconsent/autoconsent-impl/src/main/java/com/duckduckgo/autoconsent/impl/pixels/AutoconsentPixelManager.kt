@@ -101,12 +101,12 @@ class RealAutoconsentPixelManager @Inject constructor(
     }
 
     private fun clearAllCaches() {
-        summaryJob?.cancel()
-        summaryJob = null
         pixelCounter.clear()
         detectedByPatternsCache.clear()
         detectedByBothCache.clear()
         detectedOnlyRulesCache.clear()
+        summaryJob?.cancel()
+        summaryJob = null
     }
 
     private fun buildSummaryParameters(): Map<String, String> {
