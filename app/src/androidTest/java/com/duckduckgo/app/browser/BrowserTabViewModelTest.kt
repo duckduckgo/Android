@@ -6549,26 +6549,6 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenAutoConsentPopupHandledAndAddressBarTrackersAnimationEnabledThenNoPixelFired() {
-        whenever(mockAddressBarTrackersAnimationFeatureToggle.feature()).thenReturn(mockEnabledToggle)
-
-        testee.browserViewState.value =
-            testee.browserViewState.value?.copy(
-                browserShowing = true,
-                maliciousSiteBlocked = false,
-                maliciousSiteStatus = null,
-            )
-
-        val site = givenCurrentSite("https://example.com")
-        whenever(site.trackerCount).thenReturn(5)
-        testee.siteLiveData.value = site
-
-        testee.onAutoConsentPopUpHandled(true)
-
-        verify(mockAutoconsentPixelManager, never()).fireDailyPixel(any())
-    }
-
-    @Test
     fun whenVisitSiteThenUpdateLoadingViewStateAndOmnibarViewState() {
         testee.browserViewState.value =
             browserViewState().copy(

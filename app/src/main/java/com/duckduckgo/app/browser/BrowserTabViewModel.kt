@@ -4531,14 +4531,14 @@ class BrowserTabViewModel @Inject constructor(
 
     fun onAutoConsentPopUpHandled(isCosmetic: Boolean) {
         if (!currentBrowserViewState().maliciousSiteBlocked) {
+            if (isCosmetic) {
+                autoconsentPixelManager.fireDailyPixel(AutoConsentPixel.AUTOCONSENT_ANIMATION_SHOWN_COSMETIC_DAILY)
+            } else {
+                autoconsentPixelManager.fireDailyPixel(AutoConsentPixel.AUTOCONSENT_ANIMATION_SHOWN_DAILY)
+            }
             if (addressBarTrackersAnimationFeatureToggle.feature().isEnabled() && trackersCount().isNotEmpty()) {
                 command.postValue(Command.EnqueueCookiesAnimation(isCosmetic))
             } else {
-                if (isCosmetic) {
-                    autoconsentPixelManager.fireDailyPixel(AutoConsentPixel.AUTOCONSENT_ANIMATION_SHOWN_COSMETIC_DAILY)
-                } else {
-                    autoconsentPixelManager.fireDailyPixel(AutoConsentPixel.AUTOCONSENT_ANIMATION_SHOWN_DAILY)
-                }
                 command.postValue(ShowAutoconsentAnimation(isCosmetic))
             }
         }
