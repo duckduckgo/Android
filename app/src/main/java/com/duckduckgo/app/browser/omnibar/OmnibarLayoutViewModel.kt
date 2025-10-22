@@ -24,12 +24,12 @@ import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.browser.AddressDisplayFormatter
 import com.duckduckgo.app.browser.DuckDuckGoUrlDetector
 import com.duckduckgo.app.browser.defaultbrowsing.prompts.AdditionalDefaultBrowserPrompts
-import com.duckduckgo.app.browser.omnibar.OmnibarLayout.Decoration
-import com.duckduckgo.app.browser.omnibar.OmnibarLayout.Decoration.ChangeCustomTabTitle
-import com.duckduckgo.app.browser.omnibar.OmnibarLayout.Decoration.LaunchCookiesAnimation
-import com.duckduckgo.app.browser.omnibar.OmnibarLayout.Decoration.LaunchTrackersAnimation
-import com.duckduckgo.app.browser.omnibar.OmnibarLayout.StateChange
-import com.duckduckgo.app.browser.omnibar.OmnibarLayout.StateChange.OmnibarStateChange
+import com.duckduckgo.app.browser.omnibar.model.Decoration
+import com.duckduckgo.app.browser.omnibar.model.Decoration.ChangeCustomTabTitle
+import com.duckduckgo.app.browser.omnibar.model.Decoration.LaunchCookiesAnimation
+import com.duckduckgo.app.browser.omnibar.model.Decoration.LaunchTrackersAnimation
+import com.duckduckgo.app.browser.omnibar.model.StateChange
+import com.duckduckgo.app.browser.omnibar.model.StateChange.OmnibarStateChange
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.LeadingIconState.Dax
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.LeadingIconState.DuckPlayer
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.LeadingIconState.EasterEggLogo
@@ -585,7 +585,7 @@ class OmnibarLayoutViewModel @Inject constructor(
         }
     }
 
-    fun onHighlightItem(decoration: OmnibarLayout.Decoration.HighlightOmnibarItem) {
+    fun onHighlightItem(decoration: Decoration.HighlightOmnibarItem) {
         // We only want to disable scrolling if one of the elements is highlighted
         logcat { "Omnibar: onHighlightItem" }
         val isScrollingDisabled = decoration.privacyShield || decoration.fireButton
