@@ -46,8 +46,8 @@ class ReportMessageHandlerPlugin @Inject constructor(
     private val moshi = Moshi.Builder().add(JSONObjectAdapter()).build()
 
     override fun process(messageType: String, jsonString: String, webView: WebView, autoconsentCallback: AutoconsentCallback) {
-        if (supportedTypes.contains(messageType)) {
-            try {
+        try {
+            if (supportedTypes.contains(messageType)) {
                 appCoroutineScope.launch(dispatcherProvider.main()) {
                     val message: ReportMessage = parseMessage(jsonString) ?: return@launch
 
@@ -74,9 +74,9 @@ class ReportMessageHandlerPlugin @Inject constructor(
                         }
                     }
                 }
-            } catch (e: Exception) {
-                logcat { e.localizedMessage }
             }
+        } catch (e: Exception) {
+            logcat { e.localizedMessage }
         }
     }
 
