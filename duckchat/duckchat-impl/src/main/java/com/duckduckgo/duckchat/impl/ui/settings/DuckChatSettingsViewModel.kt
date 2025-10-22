@@ -128,14 +128,30 @@ class DuckChatSettingsViewModel @Inject constructor(
             if (settingsPageFeature.embeddedSettingsWebView().isEnabled()) {
                 commandChannel.send(
                     OpenLink(
-                        DUCK_CHAT_SEARCH_AI_SETTINGS_LINK_EMBEDDED,
-                        R.string.duck_chat_assist_settings_title,
+                        link = DUCK_CHAT_SEARCH_AI_SETTINGS_LINK_EMBEDDED,
+                        titleRes = if (settingsPageFeature.hideAiGeneratedImagesOption().isEnabled()) {
+                            R.string.duckAiSerpSettingsTitle
+                        } else {
+                            R.string.duck_chat_assist_settings_title
+                        },
                     ),
                 )
             } else {
                 commandChannel.send(OpenLinkInNewTab(DUCK_CHAT_SEARCH_AI_SETTINGS_LINK))
             }
             pixel.fire(DuckChatPixelName.DUCK_CHAT_SEARCH_ASSIST_SETTINGS_BUTTON_CLICKED)
+        }
+    }
+
+    fun onDuckAiHideAiGeneratedImagesClicked() {
+        viewModelScope.launch {
+            commandChannel.send(
+                OpenLink(
+                    link = DUCK_CHAT_HIDE_GENERATED_IMAGES_LINK_EMBEDDED,
+                    titleRes = R.string.duckAiSerpSettingsTitle,
+                ),
+            )
+            pixel.fire(DuckChatPixelName.DUCK_CHAT_HIDE_AI_GENERATED_IMAGES_BUTTON_CLICKED)
         }
     }
 
@@ -171,5 +187,6 @@ class DuckChatSettingsViewModel @Inject constructor(
         const val DUCK_CHAT_LEARN_MORE_LINK = "https://duckduckgo.com/duckduckgo-help-pages/aichat/"
         const val DUCK_CHAT_SEARCH_AI_SETTINGS_LINK = "https://duckduckgo.com/settings?ko=-1#aifeatures"
         const val DUCK_CHAT_SEARCH_AI_SETTINGS_LINK_EMBEDDED = "https://duckduckgo.com/settings?ko=-1&embedded=1&highlight=kbe#aifeatures"
+        const val DUCK_CHAT_HIDE_GENERATED_IMAGES_LINK_EMBEDDED = "https://duckduckgo.com/settings?ko=-1&embedded=1&highlight=kbj#aifeatures"
     }
 }
