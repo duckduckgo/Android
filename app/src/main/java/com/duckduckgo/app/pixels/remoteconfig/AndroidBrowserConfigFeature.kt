@@ -189,4 +189,7 @@ interface AndroidBrowserConfigFeature {
 
     @Toggle.DefaultValue(FALSE)
     fun stopLoadingBeforeUpdatingScript(): Toggle
+
+    @Toggle.DefaultValue(TRUE)
+    fun useUnifiedOmnibarLayout(): Toggle
 }
