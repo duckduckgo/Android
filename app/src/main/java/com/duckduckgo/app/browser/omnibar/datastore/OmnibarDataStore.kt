@@ -55,13 +55,13 @@ class SharedPreferencesOmnibarDataStore @Inject constructor(
     }
 
     override suspend fun setOmnibarType(omnibarType: OmnibarType) {
-        store.edit { it[KEY_OMNIBAR_TYPE] = omnibarType.typeName.lowercase() }
+        store.edit { it[KEY_OMNIBAR_TYPE] = omnibarType.typeName }
     }
 
     @Suppress("Deprecation")
     override val omnibarTypeFlow: Flow<OmnibarType> = store.data.map { preferences ->
         val positionName = preferences[KEY_OMNIBAR_TYPE] ?: settingsDataStore.omnibarPosition.name
-        when (positionName.lowercase()) {
+        when (positionName) {
             OmnibarType.SINGLE_TOP.typeName -> OmnibarType.SINGLE_TOP
             OmnibarType.SINGLE_BOTTOM.typeName -> OmnibarType.SINGLE_BOTTOM
             OmnibarType.SPLIT.typeName -> OmnibarType.SPLIT
