@@ -237,7 +237,7 @@ class UnifiedOmnibarLayout @JvmOverloads constructor(
 
     private var focusAnimator: ValueAnimator? = null
 
-    val omnibarPosition: OmnibarPosition
+    override val omnibarPosition: OmnibarPosition
 
     init {
         inflate(context, R.layout.view_omnibar, this)

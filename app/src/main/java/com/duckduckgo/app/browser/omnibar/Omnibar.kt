@@ -71,8 +71,20 @@ import logcat.logcat
 class Omnibar(
     val omnibarPosition: OmnibarPosition,
     private val binding: FragmentBrowserTabBinding,
+    isUnifiedOmnibarEnabled: Boolean,
 ) {
     init {
+        if (isUnifiedOmnibarEnabled) {
+            setupUnifiedOmnibar()
+        } else {
+            setupSingleOmnibar()
+        }
+    }
+
+    private fun setupSingleOmnibar() {
+        binding.rootView.removeView(binding.unifiedOmnibarLayoutTop)
+        binding.rootView.removeView(binding.unifiedOmnibarLayoutBottom)
+
         when (omnibarPosition) {
             OmnibarPosition.TOP -> {
                 // remove bottom variant
@@ -86,8 +98,25 @@ class Omnibar(
                 adjustCoordinatorLayoutBehaviorForBottomOmnibar()
             }
         }
-        binding.rootView.removeView(binding.unifiedOmnibarLayoutTop)
-        binding.rootView.removeView(binding.unifiedOmnibarLayoutBottom)
+    }
+
+    private fun setupUnifiedOmnibar() {
+        binding.rootView.removeView(binding.singleOmnibarLayoutTop)
+        binding.rootView.removeView(binding.singleOmnibarLayoutBottom)
+
+        when (omnibarPosition) {
+            OmnibarPosition.TOP -> {
+                // remove bottom variant
+                binding.rootView.removeView(binding.unifiedOmnibarLayoutBottom)
+            }
+
+            OmnibarPosition.BOTTOM -> {
+                // remove top variant
+                binding.rootView.removeView(binding.unifiedOmnibarLayoutTop)
+
+                adjustCoordinatorLayoutBehaviorForBottomOmnibar()
+            }
+        }
     }
 
     val omnibarView: OmnibarView by lazy {

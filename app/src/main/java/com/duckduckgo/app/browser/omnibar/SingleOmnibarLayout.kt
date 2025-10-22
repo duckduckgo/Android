@@ -89,6 +89,8 @@ class SingleOmnibarLayout @JvmOverloads constructor(
 
     private var singleOmnibarItemPressedListener: OmnibarItemPressedListener? = null
 
+    override val omnibarPosition: OmnibarPosition
+
     init {
         val attr = context.theme.obtainStyledAttributes(attrs, R.styleable.SingleOmnibarLayout, defStyle, 0)
         omnibarPosition = OmnibarPosition.entries[attr.getInt(R.styleable.SingleOmnibarLayout_omnibarPosition, 0)]

@@ -293,7 +293,7 @@ open class OmnibarLayout @JvmOverloads constructor(
         }
     }
 
-    open var omnibarPosition: OmnibarPosition = OmnibarPosition.TOP
+    override val omnibarPosition: OmnibarPosition = OmnibarPosition.TOP
 
     private val smoothProgressAnimator by lazy { SmoothProgressAnimator(pageLoadingIndicator) }
 
