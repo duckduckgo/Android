@@ -69,6 +69,7 @@
     <string name="autocompleteDeviceAppNotFound">Aplikaciju nije bilo moguće pronaći</string>
 
     <!-- New Address Bar Option Bottom Sheet Dialog -->
+    <string name="newAddressBarOptionBottomSheetDialogTitle">Želiš lakši pristup privatnom AI čavrljanju?</string>
     <string name="newAddressBarOptionBottomSheetDialogSearchText">Pretraži ili unesi adresu</string>
     <string name="newAddressBarOptionBottomSheetDialogPrimaryButton">Potvrdi</string>
     <string name="newAddressBarOptionBottomSheetDialogGhostButton">Ne sad</string>
