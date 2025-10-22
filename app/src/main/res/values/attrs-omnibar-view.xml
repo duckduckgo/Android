@@ -26,6 +26,11 @@
         <attr name="omnibarPosition"/>
     </declare-styleable>
 
+    <!-- SingleOmnibarView-->
+    <declare-styleable name="SingleOmnibarLayout">
+        <attr name="omnibarPosition"/>
+    </declare-styleable>
+
     <declare-styleable name="BrowserNavigationBarView">
         <attr name="showShadows" format="boolean"/>
     </declare-styleable>
