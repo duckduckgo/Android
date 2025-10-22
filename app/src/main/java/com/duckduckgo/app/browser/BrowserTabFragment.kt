@@ -143,9 +143,14 @@ import com.duckduckgo.app.browser.model.LongPressTarget
 import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarObserver
 import com.duckduckgo.app.browser.newtab.NewTabPageProvider
 import com.duckduckgo.app.browser.omnibar.Omnibar
-import com.duckduckgo.app.browser.omnibar.Omnibar.OmnibarTextState
-import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode
+import com.duckduckgo.app.browser.omnibar.OmnibarItemPressedListener
 import com.duckduckgo.app.browser.omnibar.QueryOrigin
+import com.duckduckgo.app.browser.omnibar.model.FindInPageListener
+import com.duckduckgo.app.browser.omnibar.model.ItemPressedListener
+import com.duckduckgo.app.browser.omnibar.model.LogoClickListener
+import com.duckduckgo.app.browser.omnibar.model.OmnibarTextState
+import com.duckduckgo.app.browser.omnibar.model.TextListener
+import com.duckduckgo.app.browser.omnibar.model.ViewMode
 import com.duckduckgo.app.browser.print.PrintDocumentAdapterFactory
 import com.duckduckgo.app.browser.print.PrintInjector
 import com.duckduckgo.app.browser.remotemessage.SharePromoLinkRMFBroadCastReceiver
@@ -637,6 +642,7 @@ class BrowserTabFragment :
 
     private val binding: FragmentBrowserTabBinding by viewBinding()
 
+    private lateinit var unifiedOmnibar: Omnibar
     private lateinit var omnibar: Omnibar
 
     private lateinit var webViewContainer: FrameLayout
@@ -1099,7 +1105,7 @@ class BrowserTabFragment :
 
     private fun configureLogoClickListener() {
         omnibar.configureLogoClickListener(
-            object : Omnibar.LogoClickListener {
+            object : LogoClickListener {
                 override fun onClick(url: String) {
                     viewModel.onDynamicLogoClicked(url)
                 }
@@ -2951,7 +2957,7 @@ class BrowserTabFragment :
 
     private fun configureFindInPage() {
         omnibar.configureFindInPage(
-            object : Omnibar.FindInPageListener {
+            object : FindInPageListener {
                 override fun onFocusChanged(
                     hasFocus: Boolean,
                     query: String,
@@ -2982,7 +2988,7 @@ class BrowserTabFragment :
 
     private fun configureItemPressedListener() {
         omnibar.configureItemPressedListeners(
-            object : Omnibar.ItemPressedListener {
+            object : ItemPressedListener {
                 override fun onTabsButtonPressed() {
                     this@BrowserTabFragment.onTabsButtonPressed()
                 }
@@ -3030,11 +3036,18 @@ class BrowserTabFragment :
                 }
             },
         )
+        omnibar.configureOmnibarItemPressedListeners(
+            object : OmnibarItemPressedListener {
+                override fun onBackButtonPressed() {
+                    hideKeyboard()
+                }
+            },
+        )
     }
 
     private fun configureOmnibarTextInput() {
         omnibar.addTextListener(
-            object : Omnibar.TextListener {
+            object : TextListener {
                 override fun onFocusChanged(
                     hasFocus: Boolean,
                     query: String,

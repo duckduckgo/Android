@@ -18,7 +18,6 @@ package com.duckduckgo.app.browser.omnibar
 
 import android.annotation.SuppressLint
 import android.text.Editable
-import android.view.MotionEvent
 import android.view.View
 import android.widget.ImageView
 import androidx.appcompat.widget.Toolbar
@@ -30,16 +29,22 @@ import com.duckduckgo.app.browser.BrowserTabFragment.Companion.KEYBOARD_DELAY
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.FragmentBrowserTabBinding
 import com.duckduckgo.app.browser.databinding.IncludeFindInPageBinding
-import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode.CustomTab
-import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode.Error
-import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode.MaliciousSiteWarning
-import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode.NewTab
-import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode.SSLWarning
 import com.duckduckgo.app.browser.omnibar.OmnibarLayout.Decoration
 import com.duckduckgo.app.browser.omnibar.OmnibarLayout.Decoration.DisableVoiceSearch
 import com.duckduckgo.app.browser.omnibar.OmnibarLayout.Decoration.HighlightOmnibarItem
 import com.duckduckgo.app.browser.omnibar.OmnibarLayout.Decoration.Mode
 import com.duckduckgo.app.browser.omnibar.OmnibarLayout.StateChange
+import com.duckduckgo.app.browser.omnibar.model.FindInPageListener
+import com.duckduckgo.app.browser.omnibar.model.InputScreenLaunchListener
+import com.duckduckgo.app.browser.omnibar.model.ItemPressedListener
+import com.duckduckgo.app.browser.omnibar.model.LogoClickListener
+import com.duckduckgo.app.browser.omnibar.model.TextListener
+import com.duckduckgo.app.browser.omnibar.model.ViewMode
+import com.duckduckgo.app.browser.omnibar.model.ViewMode.CustomTab
+import com.duckduckgo.app.browser.omnibar.model.ViewMode.Error
+import com.duckduckgo.app.browser.omnibar.model.ViewMode.MaliciousSiteWarning
+import com.duckduckgo.app.browser.omnibar.model.ViewMode.NewTab
+import com.duckduckgo.app.browser.omnibar.model.ViewMode.SSLWarning
 import com.duckduckgo.app.browser.viewstate.BrowserViewState
 import com.duckduckgo.app.browser.viewstate.FindInPageViewState
 import com.duckduckgo.app.browser.viewstate.LoadingViewState
@@ -71,116 +76,28 @@ class Omnibar(
         when (omnibarPosition) {
             OmnibarPosition.TOP -> {
                 // remove bottom variant
-                binding.rootView.removeView(binding.omnibarLayoutBottom)
+                binding.rootView.removeView(binding.singleOmnibarLayoutBottom)
             }
 
             OmnibarPosition.BOTTOM -> {
                 // remove top variant
-                binding.rootView.removeView(binding.omnibarLayoutTop)
+                binding.rootView.removeView(binding.singleOmnibarLayoutTop)
 
                 adjustCoordinatorLayoutBehaviorForBottomOmnibar()
             }
         }
+        binding.rootView.removeView(binding.unifiedOmnibarLayoutTop)
+        binding.rootView.removeView(binding.unifiedOmnibarLayoutBottom)
     }
 
-    interface ItemPressedListener {
-        fun onTabsButtonPressed()
-
-        fun onTabsButtonLongPressed()
-
-        fun onFireButtonPressed()
-
-        fun onBrowserMenuPressed()
-
-        fun onPrivacyShieldPressed()
-
-        fun onCustomTabClosePressed()
-
-        fun onCustomTabPrivacyDashboardPressed()
-
-        fun onVoiceSearchPressed()
-
-        fun onDuckChatButtonPressed()
-
-        fun onBackButtonPressed()
-    }
-
-    interface FindInPageListener {
-        fun onFocusChanged(
-            hasFocus: Boolean,
-            query: String,
-        )
-
-        fun onPreviousSearchItemPressed()
-
-        fun onNextSearchItemPressed()
-
-        fun onClosePressed()
-
-        fun onFindInPageTextChanged(query: String)
-    }
-
-    interface TextListener {
-        fun onFocusChanged(
-            hasFocus: Boolean,
-            query: String,
-        )
-
-        fun onBackKeyPressed()
-
-        fun onEnterPressed()
-
-        fun onTouchEvent(event: MotionEvent)
-
-        fun onOmnibarTextChanged(state: OmnibarTextState)
-
-        fun onShowSuggestions(state: OmnibarTextState)
-
-        fun onTrackersCountFinished()
-    }
-
-    fun interface InputScreenLaunchListener {
-        fun launchInputScreen(query: String)
-    }
-
-    interface LogoClickListener {
-        fun onClick(url: String)
-    }
-
-    data class OmnibarTextState(
-        val text: String,
-        val hasFocus: Boolean,
-    )
-
-    sealed class ViewMode {
-        data object Error : ViewMode()
-
-        data object SSLWarning : ViewMode()
-
-        data object MaliciousSiteWarning : ViewMode()
-
-        data object NewTab : ViewMode()
-
-        data class Browser(
-            val url: String?,
-        ) : ViewMode()
-
-        data class CustomTab(
-            val toolbarColor: Int,
-            val title: String?,
-            val domain: String?,
-            val showDuckPlayerIcon: Boolean = false,
-        ) : ViewMode()
-    }
-
-    val omnibarLayout: OmnibarLayout by lazy {
+    val newOmnibar: OmnibarLayout by lazy {
         when (omnibarPosition) {
             OmnibarPosition.TOP -> {
-                binding.omnibarLayoutTop
+                binding.singleOmnibarLayoutTop
             }
 
             OmnibarPosition.BOTTOM -> {
-                binding.omnibarLayoutBottom
+                binding.singleOmnibarLayoutBottom
             }
         }
     }
@@ -210,40 +127,40 @@ class Omnibar(
     }
 
     private val findInPage: IncludeFindInPageBinding by lazy {
-        omnibarLayout.findInPage
+        newOmnibar.findInPage
     }
 
     val omnibarTextInput: KeyboardAwareEditText by lazy {
-        omnibarLayout.omnibarTextInput
+        newOmnibar.omnibarTextInput
     }
 
     val omniBarContainer: View by lazy {
-        omnibarLayout.omniBarContainer
+        newOmnibar.omniBarContainer
     }
 
     val toolbar: Toolbar by lazy {
-        omnibarLayout.toolbar
+        newOmnibar.toolbar
     }
 
     val shieldIcon: LottieAnimationView by lazy {
-        omnibarLayout.shieldIcon
+        newOmnibar.shieldIcon
     }
 
     val daxIcon: ImageView by lazy {
-        omnibarLayout.daxIcon
+        newOmnibar.daxIcon
     }
 
     val textInputRootView: View by lazy {
-        omnibarLayout.omnibarTextInput.rootView
+        newOmnibar.omnibarTextInput.rootView
     }
 
-    val isInEditMode = omnibarLayout.isEditingFlow.distinctUntilChanged()
+    val isInEditMode = newOmnibar.isEditingFlow.distinctUntilChanged()
 
     var isScrollingEnabled: Boolean
         get() =
-            omnibarLayout.isScrollingEnabled
+            newOmnibar.isScrollingEnabled
         set(value) {
-            omnibarLayout.isScrollingEnabled = value
+            newOmnibar.isScrollingEnabled = value
         }
 
     var viewMode: ViewMode = ViewMode.Browser(null)
@@ -254,45 +171,52 @@ class Omnibar(
         viewMode = newViewMode
         when (newViewMode) {
             Error -> {
-                omnibarLayout.decorate(Mode(newViewMode))
+                newOmnibar.decorate(Mode(newViewMode))
             }
 
             NewTab -> {
-                omnibarLayout.decorate(Mode(newViewMode))
+                newOmnibar.decorate(Mode(newViewMode))
             }
 
             SSLWarning -> {
-                omnibarLayout.decorate(Mode(newViewMode))
+                newOmnibar.decorate(Mode(newViewMode))
             }
 
             MaliciousSiteWarning -> {
-                omnibarLayout.decorate(Mode(newViewMode))
+                newOmnibar.decorate(Mode(newViewMode))
             }
 
             else -> {
-                omnibarLayout.decorate(Mode(newViewMode))
+                newOmnibar.decorate(Mode(newViewMode))
             }
         }
     }
 
     fun setExpanded(expanded: Boolean) {
-        omnibarLayout.setExpanded(expanded)
+        newOmnibar.setExpanded(expanded)
     }
 
     fun configureItemPressedListeners(listener: ItemPressedListener) {
-        omnibarLayout.setOmnibarItemPressedListener(listener)
+        newOmnibar.setOmnibarItemPressedListener(listener)
     }
 
     fun configureLogoClickListener(logoClickListener: LogoClickListener) {
-        omnibarLayout.setLogoClickListener(logoClickListener)
+        newOmnibar.setLogoClickListener(logoClickListener)
+    }
+
+    fun configureOmnibarItemPressedListeners(listener: OmnibarItemPressedListener) {
+        val omnibar = newOmnibar
+        if (omnibar is SingleOmnibarLayout) {
+            omnibar.setSingleOmnibarItemPressedListener(listener)
+        }
     }
 
     fun configureInputScreenLaunchListener(listener: InputScreenLaunchListener) {
-        omnibarLayout.setInputScreenLaunchListener(listener)
+        newOmnibar.setInputScreenLaunchListener(listener)
     }
 
     fun addTextListener(listener: TextListener) {
-        omnibarLayout.setOmnibarTextListener(listener)
+        newOmnibar.setOmnibarTextListener(listener)
     }
 
     fun configureFindInPage(listener: FindInPageListener) {
@@ -314,7 +238,7 @@ class Omnibar(
     }
 
     fun renderLoadingViewState(viewState: LoadingViewState) {
-        omnibarLayout.reduce(StateChange.LoadingStateChange(viewState))
+        newOmnibar.reduce(StateChange.LoadingStateChange(viewState))
     }
 
     fun renderOmnibarViewState(
@@ -322,14 +246,14 @@ class Omnibar(
         forceRender: Boolean = false,
     ) {
         logcat { "Omnibar: renderOmnibarViewState $viewState" }
-        omnibarLayout.reduce(StateChange.OmnibarStateChange(viewState, forceRender))
+        newOmnibar.reduce(StateChange.OmnibarStateChange(viewState, forceRender))
     }
 
     fun setPrivacyShield(privacyShield: PrivacyShield) {
-        omnibarLayout.decorate(Decoration.PrivacyShieldChanged(privacyShield))
+        newOmnibar.decorate(Decoration.PrivacyShieldChanged(privacyShield))
     }
 
-    fun isPulseAnimationPlaying(): Boolean = omnibarLayout.isPulseAnimationPlaying()
+    fun isPulseAnimationPlaying(): Boolean = newOmnibar.isPulseAnimationPlaying()
 
     fun hideFindInPage() {
         if (findInPage.findInPageContainer.visibility != GONE) {
@@ -371,10 +295,12 @@ class Omnibar(
         omniBarContainer.isPressed = pressed
     }
 
-    fun isEditing(): Boolean = omnibarLayout.isEditing
+    fun isOutlineShown(): Boolean = omniBarContainer.isPressed
+
+    fun isEditing(): Boolean = newOmnibar.isEditing
 
     fun renderBrowserViewState(viewState: BrowserViewState) {
-        omnibarLayout.decorate(
+        newOmnibar.decorate(
             HighlightOmnibarItem(
                 fireButton = viewState.fireButton.isHighlighted(),
                 privacyShield = viewState.showPrivacyShield.isHighlighted(),
@@ -383,26 +309,26 @@ class Omnibar(
     }
 
     fun createCookiesAnimation(isCosmetic: Boolean) {
-        omnibarLayout.decorate(Decoration.LaunchCookiesAnimation(isCosmetic))
+        newOmnibar.decorate(Decoration.LaunchCookiesAnimation(isCosmetic))
     }
 
     fun enqueueCookiesAnimation(isCosmetic: Boolean) {
-        omnibarLayout.decorate(Decoration.QueueCookiesAnimation(isCosmetic))
+        newOmnibar.decorate(Decoration.QueueCookiesAnimation(isCosmetic))
     }
 
     fun cancelTrackersAnimation() {
-        omnibarLayout.decorate(Decoration.CancelAnimations)
+        newOmnibar.decorate(Decoration.CancelAnimations)
     }
 
     fun startTrackersAnimation(events: List<Entity>?) {
-        omnibarLayout.decorate(Decoration.LaunchTrackersAnimation(events))
+        newOmnibar.decorate(Decoration.LaunchTrackersAnimation(events))
     }
 
     fun configureCustomTab(
         customTabToolbarColor: Int,
         customTabDomainText: String?,
     ) {
-        omnibarLayout.decorate(Mode(CustomTab(toolbarColor = customTabToolbarColor, title = null, domain = customTabDomainText)))
+        newOmnibar.decorate(Mode(CustomTab(toolbarColor = customTabToolbarColor, title = null, domain = customTabDomainText)))
     }
 
     fun showWebPageTitleInCustomTab(
@@ -412,22 +338,22 @@ class Omnibar(
     ) {
         val redirectedDomain = url?.extractDomain()
 
-        omnibarLayout.decorate(Decoration.ChangeCustomTabTitle(title, redirectedDomain, showDuckPlayerIcon))
+        newOmnibar.decorate(Decoration.ChangeCustomTabTitle(title, redirectedDomain, showDuckPlayerIcon))
     }
 
     fun show() {
-        omnibarLayout.show()
+        newOmnibar.show()
     }
 
     fun hide() {
-        omnibarLayout.gone()
+        newOmnibar.gone()
     }
 
     fun voiceSearchDisabled(url: String?) {
-        omnibarLayout.decorate(DisableVoiceSearch(url ?: ""))
+        newOmnibar.decorate(DisableVoiceSearch(url ?: ""))
     }
 
     fun setDraftTextIfNtpOrSerp(query: String) {
-        omnibarLayout.setDraftTextIfNtpOrSerp(query)
+        newOmnibar.setDraftTextIfNtpOrSerp(query)
     }
 }

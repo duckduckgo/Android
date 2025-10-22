@@ -17,7 +17,7 @@
 package com.duckduckgo.app.browser.omnibar.animations.addressbar
 
 import com.airbnb.lottie.LottieAnimationView
-import com.duckduckgo.app.browser.omnibar.Omnibar
+import com.duckduckgo.app.browser.omnibar.model.ViewMode
 import com.duckduckgo.app.global.model.PrivacyShield
 
 /** Public interface for the Privacy Shield Animation Helper */
@@ -26,5 +26,5 @@ interface PrivacyShieldAnimationHelper {
     /**
      * This method will setup into [holder] a LottieAnimation based on [PrivacyShield] state.
      */
-    fun setAnimationView(holder: LottieAnimationView, privacyShield: PrivacyShield, viewMode: Omnibar.ViewMode)
+    fun setAnimationView(holder: LottieAnimationView, privacyShield: PrivacyShield, viewMode: ViewMode)
 }
