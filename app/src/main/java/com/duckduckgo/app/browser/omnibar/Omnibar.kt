@@ -73,7 +73,8 @@ class Omnibar(
     private val binding: FragmentBrowserTabBinding,
     isUnifiedOmnibarEnabled: Boolean,
 ) {
-    init {
+
+    val omnibarView: OmnibarView by lazy {
         if (isUnifiedOmnibarEnabled) {
             setupUnifiedOmnibar()
         } else {
@@ -81,52 +82,38 @@ class Omnibar(
         }
     }
 
-    private fun setupSingleOmnibar() {
+    private fun setupSingleOmnibar(): OmnibarView {
         binding.rootView.removeView(binding.unifiedOmnibarLayoutTop)
         binding.rootView.removeView(binding.unifiedOmnibarLayoutBottom)
 
-        when (omnibarPosition) {
+        return when (omnibarPosition) {
             OmnibarPosition.TOP -> {
-                // remove bottom variant
                 binding.rootView.removeView(binding.singleOmnibarLayoutBottom)
-            }
-
-            OmnibarPosition.BOTTOM -> {
-                // remove top variant
-                binding.rootView.removeView(binding.singleOmnibarLayoutTop)
-
-                adjustCoordinatorLayoutBehaviorForBottomOmnibar()
-            }
-        }
-    }
-
-    private fun setupUnifiedOmnibar() {
-        binding.rootView.removeView(binding.singleOmnibarLayoutTop)
-        binding.rootView.removeView(binding.singleOmnibarLayoutBottom)
-
-        when (omnibarPosition) {
-            OmnibarPosition.TOP -> {
-                // remove bottom variant
-                binding.rootView.removeView(binding.unifiedOmnibarLayoutBottom)
-            }
-
-            OmnibarPosition.BOTTOM -> {
-                // remove top variant
-                binding.rootView.removeView(binding.unifiedOmnibarLayoutTop)
-
-                adjustCoordinatorLayoutBehaviorForBottomOmnibar()
-            }
-        }
-    }
-
-    val omnibarView: OmnibarView by lazy {
-        when (omnibarPosition) {
-            OmnibarPosition.TOP -> {
                 binding.singleOmnibarLayoutTop
             }
 
             OmnibarPosition.BOTTOM -> {
+                binding.rootView.removeView(binding.singleOmnibarLayoutTop)
+                adjustCoordinatorLayoutBehaviorForBottomOmnibar()
                 binding.singleOmnibarLayoutBottom
+            }
+        }
+    }
+
+    private fun setupUnifiedOmnibar(): OmnibarView {
+        binding.rootView.removeView(binding.singleOmnibarLayoutTop)
+        binding.rootView.removeView(binding.singleOmnibarLayoutBottom)
+
+        return when (omnibarPosition) {
+            OmnibarPosition.TOP -> {
+                binding.rootView.removeView(binding.unifiedOmnibarLayoutBottom)
+                binding.unifiedOmnibarLayoutTop
+            }
+
+            OmnibarPosition.BOTTOM -> {
+                binding.rootView.removeView(binding.unifiedOmnibarLayoutTop)
+                adjustCoordinatorLayoutBehaviorForBottomOmnibar()
+                binding.unifiedOmnibarLayoutBottom
             }
         }
     }
