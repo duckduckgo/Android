@@ -47,4 +47,10 @@ sealed interface UserCannotImportReason : Parcelable {
 
     @Parcelize
     data object DownloadError : UserCannotImportReason
+
+    @Parcelize
+    data object Unknown : UserCannotImportReason
+
+    @Parcelize
+    data object WebViewError : UserCannotImportReason
 }
