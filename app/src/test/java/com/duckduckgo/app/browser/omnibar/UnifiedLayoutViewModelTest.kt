@@ -7,10 +7,10 @@ import app.cash.turbine.test
 import com.duckduckgo.app.browser.AddressDisplayFormatter
 import com.duckduckgo.app.browser.DuckDuckGoUrlDetectorImpl
 import com.duckduckgo.app.browser.defaultbrowsing.prompts.AdditionalDefaultBrowserPrompts
-import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.Command
-import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.Command.LaunchInputScreen
-import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.LeadingIconState
-import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.LeadingIconState.Search
+import com.duckduckgo.app.browser.omnibar.UnifiedLayoutViewModel.Command
+import com.duckduckgo.app.browser.omnibar.UnifiedLayoutViewModel.Command.LaunchInputScreen
+import com.duckduckgo.app.browser.omnibar.UnifiedLayoutViewModel.LeadingIconState
+import com.duckduckgo.app.browser.omnibar.UnifiedLayoutViewModel.LeadingIconState.Search
 import com.duckduckgo.app.browser.omnibar.model.Decoration
 import com.duckduckgo.app.browser.omnibar.model.Decoration.ChangeCustomTabTitle
 import com.duckduckgo.app.browser.omnibar.model.StateChange
@@ -63,7 +63,7 @@ import org.mockito.kotlin.whenever
 import kotlin.reflect.KClass
 
 @RunWith(AndroidJUnit4::class)
-class OmnibarLayoutViewModelTest {
+class UnifiedLayoutViewModelTest {
 
     @get:Rule
     val coroutineTestRule: CoroutineTestRule = CoroutineTestRule()
@@ -95,7 +95,7 @@ class OmnibarLayoutViewModelTest {
     }
     private val serpEasterEggLogosToggles: SerpEasterEggLogosToggles = mock()
 
-    private lateinit var testee: OmnibarLayoutViewModel
+    private lateinit var testee: UnifiedLayoutViewModel
 
     private val EMPTY_URL = ""
     private val SERP_URL = "https://duckduckgo.com/?q=test&atb=v395-1-wb&ia=web"
@@ -141,7 +141,7 @@ class OmnibarLayoutViewModelTest {
     }
 
     private fun initializeViewModel() {
-        testee = OmnibarLayoutViewModel(
+        testee = UnifiedLayoutViewModel(
             tabRepository = tabRepository,
             voiceSearchAvailability = voiceSearchAvailability,
             voiceSearchPixelLogger = voiceSearchPixelLogger,
@@ -193,7 +193,7 @@ class OmnibarLayoutViewModelTest {
             val viewState = awaitItem()
             assertTrue(viewState.hasFocus)
             assertTrue(viewState.expanded)
-            assertTrue(viewState.leadingIconState == LeadingIconState.Search)
+            assertTrue(viewState.leadingIconState == Search)
             assertTrue(viewState.showClearButton)
             assertFalse(viewState.showTabsMenu)
             assertFalse(viewState.showFireIcon)
@@ -211,7 +211,7 @@ class OmnibarLayoutViewModelTest {
             val viewState = awaitItem()
             assertTrue(viewState.hasFocus)
             assertTrue(viewState.expanded)
-            assertTrue(viewState.leadingIconState == LeadingIconState.Search)
+            assertTrue(viewState.leadingIconState == Search)
             assertFalse(viewState.showClearButton)
             assertTrue(viewState.showTabsMenu)
             assertTrue(viewState.showFireIcon)
@@ -280,7 +280,7 @@ class OmnibarLayoutViewModelTest {
             val viewState = expectMostRecentItem()
             assertFalse(viewState.hasFocus)
             assertFalse(viewState.expanded)
-            assertTrue(viewState.leadingIconState == LeadingIconState.Search)
+            assertTrue(viewState.leadingIconState == Search)
             assertFalse(viewState.showClearButton)
             assertTrue(viewState.showTabsMenu)
             assertTrue(viewState.showFireIcon)
@@ -427,7 +427,7 @@ class OmnibarLayoutViewModelTest {
 
         testee.viewState.test {
             val viewState = awaitItem()
-            assertTrue(viewState.leadingIconState == LeadingIconState.Search)
+            assertTrue(viewState.leadingIconState == Search)
             assertFalse(viewState.scrollingEnabled)
             assertTrue(viewState.viewMode is ViewMode.NewTab)
         }
@@ -439,7 +439,7 @@ class OmnibarLayoutViewModelTest {
 
         testee.viewState.test {
             val viewState = awaitItem()
-            assertTrue(viewState.leadingIconState == LeadingIconState.Search)
+            assertTrue(viewState.leadingIconState == Search)
             assertTrue(viewState.scrollingEnabled)
             assertTrue(viewState.viewMode is ViewMode.Browser)
         }
@@ -452,7 +452,7 @@ class OmnibarLayoutViewModelTest {
 
         testee.viewState.test {
             val viewState = expectMostRecentItem()
-            assertTrue(viewState.leadingIconState == LeadingIconState.Search)
+            assertTrue(viewState.leadingIconState == Search)
             assertTrue(viewState.viewMode is ViewMode.Error)
         }
     }
@@ -464,7 +464,7 @@ class OmnibarLayoutViewModelTest {
 
         testee.viewState.test {
             val viewState = expectMostRecentItem()
-            assertTrue(viewState.leadingIconState == LeadingIconState.Search)
+            assertTrue(viewState.leadingIconState == Search)
             assertTrue(viewState.viewMode is ViewMode.SSLWarning)
         }
     }
@@ -476,7 +476,7 @@ class OmnibarLayoutViewModelTest {
 
         testee.viewState.test {
             val viewState = expectMostRecentItem()
-            assertTrue(viewState.leadingIconState == LeadingIconState.Search)
+            assertTrue(viewState.leadingIconState == Search)
             assertTrue(viewState.viewMode is ViewMode.MaliciousSiteWarning)
         }
     }
@@ -488,7 +488,7 @@ class OmnibarLayoutViewModelTest {
 
         testee.viewState.test {
             val viewState = expectMostRecentItem()
-            assertTrue(viewState.leadingIconState == LeadingIconState.Search)
+            assertTrue(viewState.leadingIconState == Search)
             assertTrue(viewState.viewMode is ViewMode.NewTab)
         }
     }
@@ -500,7 +500,7 @@ class OmnibarLayoutViewModelTest {
 
         testee.viewState.test {
             val viewState = awaitItem()
-            assertTrue(viewState.leadingIconState == LeadingIconState.Search)
+            assertTrue(viewState.leadingIconState == Search)
             assertTrue(viewState.viewMode is ViewMode.Browser)
         }
     }
@@ -820,7 +820,7 @@ class OmnibarLayoutViewModelTest {
         testee.viewState.test {
             val viewState = awaitItem()
             assertTrue(viewState.url == EMPTY_URL)
-            assertTrue(viewState.leadingIconState == LeadingIconState.Search)
+            assertTrue(viewState.leadingIconState == Search)
         }
     }
 
@@ -962,7 +962,7 @@ class OmnibarLayoutViewModelTest {
 
         testee.viewState.test {
             val viewState = awaitItem()
-            assertTrue(viewState.leadingIconState == LeadingIconState.Search)
+            assertTrue(viewState.leadingIconState == Search)
         }
     }
 
