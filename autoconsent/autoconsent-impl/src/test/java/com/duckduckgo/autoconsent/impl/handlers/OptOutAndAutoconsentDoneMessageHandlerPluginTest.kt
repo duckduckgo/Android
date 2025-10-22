@@ -20,6 +20,8 @@ import android.webkit.WebView
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.autoconsent.api.AutoconsentCallback
+import com.duckduckgo.autoconsent.impl.pixels.AutoConsentPixel
+import com.duckduckgo.autoconsent.impl.pixels.AutoconsentPixelManager
 import com.duckduckgo.common.test.CoroutineTestRule
 import kotlinx.coroutines.test.TestScope
 import org.junit.Assert.*
@@ -37,9 +39,10 @@ class OptOutAndAutoconsentDoneMessageHandlerPluginTest {
     @get:Rule var coroutineRule = CoroutineTestRule()
 
     private val mockCallback: AutoconsentCallback = mock()
+    private val mockPixelManager: AutoconsentPixelManager = mock()
     private val webView: WebView = WebView(InstrumentationRegistry.getInstrumentation().targetContext)
 
-    private val handler = OptOutAndAutoconsentDoneMessageHandlerPlugin(TestScope(), coroutineRule.testDispatcherProvider)
+    private val handler = OptOutAndAutoconsentDoneMessageHandlerPlugin(TestScope(), coroutineRule.testDispatcherProvider, mockPixelManager)
 
     @Test
     fun whenProcessIfMessageTypeIsNotIncludedInListThenDoNothing() {
@@ -98,6 +101,27 @@ class OptOutAndAutoconsentDoneMessageHandlerPluginTest {
         handler.process(getAutoconsentType(), autoconsentDoneMessage(), webView, mockCallback)
 
         assertEquals(expected, Shadows.shadowOf(webView).lastEvaluatedJavascript)
+    }
+
+    @Test
+    fun whenProcessOptOutAndResultIsFalseThenFireErrorOptOutPixel() {
+        handler.process(getOptOut(), optOutMessage(result = false, selfTest = false), webView, mockCallback)
+
+        verify(mockPixelManager).fireDailyPixel(AutoConsentPixel.AUTOCONSENT_ERROR_OPTOUT_DAILY)
+    }
+
+    @Test
+    fun whenProcessAutoconsentDoneAndIsCosmeticThenFireDoneCosmeticPixel() {
+        handler.process(getAutoconsentType(), autoconsentDoneMessage(cosmetic = true), webView, mockCallback)
+
+        verify(mockPixelManager).fireDailyPixel(AutoConsentPixel.AUTOCONSENT_DONE_COSMETIC_DAILY)
+    }
+
+    @Test
+    fun whenProcessAutoconsentDoneAndNotCosmeticThenFireDonePixel() {
+        handler.process(getAutoconsentType(), autoconsentDoneMessage(cosmetic = false), webView, mockCallback)
+
+        verify(mockPixelManager).fireDailyPixel(AutoConsentPixel.AUTOCONSENT_DONE_DAILY)
     }
 
     private fun getOptOut(): String = handler.supportedTypes.first()

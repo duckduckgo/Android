@@ -268,6 +268,8 @@ import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.tabs.store.TabStatsBucketing
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 import com.duckduckgo.app.usage.search.SearchCountDao
+import com.duckduckgo.autoconsent.impl.pixels.AutoConsentPixel
+import com.duckduckgo.autoconsent.impl.pixels.AutoconsentPixelManager
 import com.duckduckgo.autofill.api.AutofillCapabilityChecker
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.autofill.api.email.EmailManager
@@ -494,6 +496,7 @@ class BrowserTabViewModel @Inject constructor(
     private val webMessagingPlugins: PluginPoint<WebMessagingPlugin>,
     private val postMessageWrapperPlugins: PluginPoint<PostMessageWrapperPlugin>,
     private val addressBarTrackersAnimationFeatureToggle: AddressBarTrackersAnimationFeatureToggle,
+    private val autoconsentPixelManager: AutoconsentPixelManager,
 ) : ViewModel(),
     WebViewClientListener,
     EditSavedSiteListener,
@@ -4535,6 +4538,11 @@ class BrowserTabViewModel @Inject constructor(
 
     fun onAutoConsentPopUpHandled(isCosmetic: Boolean) {
         if (!currentBrowserViewState().maliciousSiteBlocked) {
+            if (isCosmetic) {
+                autoconsentPixelManager.fireDailyPixel(AutoConsentPixel.AUTOCONSENT_ANIMATION_SHOWN_COSMETIC_DAILY)
+            } else {
+                autoconsentPixelManager.fireDailyPixel(AutoConsentPixel.AUTOCONSENT_ANIMATION_SHOWN_DAILY)
+            }
             if (addressBarTrackersAnimationFeatureToggle.feature().isEnabled() && trackersCount().isNotEmpty()) {
                 command.postValue(Command.EnqueueCookiesAnimation(isCosmetic))
             } else {

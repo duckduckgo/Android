@@ -204,6 +204,8 @@ import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 import com.duckduckgo.app.usage.search.SearchCountDao
 import com.duckduckgo.app.widget.ui.WidgetCapabilities
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.autoconsent.impl.pixels.AutoConsentPixel
+import com.duckduckgo.autoconsent.impl.pixels.AutoconsentPixelManager
 import com.duckduckgo.autofill.api.AutofillCapabilityChecker
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.autofill.api.email.EmailManager
@@ -399,6 +401,8 @@ class BrowserTabViewModelTest {
     private val mockNewTabPixels: NewTabPixels = mock()
 
     private val mockHttpErrorPixels: HttpErrorPixels = mock()
+
+    private val mockAutoconsentPixelManager: AutoconsentPixelManager = mock()
 
     private val mockOnboardingStore: OnboardingStore = mock()
 
@@ -850,6 +854,7 @@ class BrowserTabViewModelTest {
                     webMessagingPlugins = fakeMessagingPlugins,
                     postMessageWrapperPlugins = fakePostMessageWrapperPlugins,
                     addressBarTrackersAnimationFeatureToggle = mockAddressBarTrackersAnimationFeatureToggle,
+                    autoconsentPixelManager = mockAutoconsentPixelManager,
                 )
 
             testee.loadData("abc", null, false, false)
@@ -6499,6 +6504,48 @@ class BrowserTabViewModelTest {
         testee.onAutoConsentPopUpHandled(true)
 
         assertCommandIssued<ShowAutoconsentAnimation>()
+    }
+
+    @Test
+    fun whenAutoConsentPopupHandledAndCosmeticTrueThenFireAnimationShownCosmeticPixel() {
+        testee.browserViewState.value =
+            testee.browserViewState.value?.copy(
+                browserShowing = true,
+                maliciousSiteBlocked = false,
+                maliciousSiteStatus = null,
+            )
+
+        testee.onAutoConsentPopUpHandled(true)
+
+        verify(mockAutoconsentPixelManager).fireDailyPixel(AutoConsentPixel.AUTOCONSENT_ANIMATION_SHOWN_COSMETIC_DAILY)
+    }
+
+    @Test
+    fun whenAutoConsentPopupHandledAndCosmeticFalseThenFireAnimationShownPixel() {
+        testee.browserViewState.value =
+            testee.browserViewState.value?.copy(
+                browserShowing = true,
+                maliciousSiteBlocked = false,
+                maliciousSiteStatus = null,
+            )
+
+        testee.onAutoConsentPopUpHandled(false)
+
+        verify(mockAutoconsentPixelManager).fireDailyPixel(AutoConsentPixel.AUTOCONSENT_ANIMATION_SHOWN_DAILY)
+    }
+
+    @Test
+    fun whenAutoConsentPopupHandledAndMaliciousSiteBlockedThenNoPixelFired() {
+        testee.browserViewState.value =
+            testee.browserViewState.value?.copy(
+                browserShowing = true,
+                maliciousSiteBlocked = true,
+                maliciousSiteStatus = PHISHING,
+            )
+
+        testee.onAutoConsentPopUpHandled(true)
+
+        verify(mockAutoconsentPixelManager, never()).fireDailyPixel(any())
     }
 
     @Test
