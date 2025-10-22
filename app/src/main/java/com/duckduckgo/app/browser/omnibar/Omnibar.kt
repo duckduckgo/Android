@@ -42,7 +42,7 @@ import com.duckduckgo.app.browser.viewstate.OmnibarViewState
 import com.duckduckgo.app.browser.webview.BottomOmnibarBrowserContainerLayoutBehavior
 import com.duckduckgo.app.global.model.PrivacyShield
 import com.duckduckgo.app.trackerdetection.model.Entity
-import com.duckduckgo.browser.ui.omnibar.OmnibarPosition
+import com.duckduckgo.browser.ui.omnibar.OmnibarType
 import com.duckduckgo.common.ui.view.KeyboardAwareEditText
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.hide
@@ -59,7 +59,7 @@ import logcat.logcat
 
 @SuppressLint("ClickableViewAccessibility")
 class Omnibar(
-    val omnibarPosition: OmnibarPosition,
+    val omnibarType: OmnibarType,
     private val binding: FragmentBrowserTabBinding,
     isUnifiedOmnibarEnabled: Boolean,
 ) {
@@ -164,13 +164,13 @@ class Omnibar(
         binding.rootView.removeView(binding.omnibarLayoutTop)
         binding.rootView.removeView(binding.omnibarLayoutBottom)
 
-        return when (omnibarPosition) {
-            OmnibarPosition.TOP -> {
+        return when (omnibarType) {
+            OmnibarType.SINGLE_TOP, OmnibarType.SPLIT -> {
                 binding.rootView.removeView(binding.singleOmnibarLayoutBottom)
                 binding.singleOmnibarLayoutTop
             }
 
-            OmnibarPosition.BOTTOM -> {
+            OmnibarType.SINGLE_BOTTOM -> {
                 binding.rootView.removeView(binding.singleOmnibarLayoutTop)
                 adjustCoordinatorLayoutBehaviorForBottomOmnibar()
                 binding.singleOmnibarLayoutBottom
@@ -182,13 +182,13 @@ class Omnibar(
         binding.rootView.removeView(binding.singleOmnibarLayoutTop)
         binding.rootView.removeView(binding.singleOmnibarLayoutBottom)
 
-        return when (omnibarPosition) {
-            OmnibarPosition.TOP -> {
+        return when (omnibarType) {
+            OmnibarType.SINGLE_TOP, OmnibarType.SPLIT -> {
                 binding.rootView.removeView(binding.omnibarLayoutBottom)
                 binding.omnibarLayoutTop
             }
 
-            OmnibarPosition.BOTTOM -> {
+            OmnibarType.SINGLE_BOTTOM -> {
                 binding.rootView.removeView(binding.omnibarLayoutTop)
                 adjustCoordinatorLayoutBehaviorForBottomOmnibar()
                 binding.omnibarLayoutBottom
