@@ -162,6 +162,7 @@
 
     <string name="feedbackSubmitGeneralDescriptionHint">Оставьте комментарий здесь...</string>
     <string name="feedbackSubmitFeatureRequestDescriptionHint">Какую функцию вы хотели бы увидеть?</string>
+    <string name="feedbackSubmitContactSupport">Нужна помощь? <annotation type="support_link">Обращайтесь в службу поддержки</annotation>.</string>
 
     <!-- Activity titles -->
     <string name="activitySubscriptions">Подписки</string>
