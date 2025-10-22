@@ -58,6 +58,7 @@ import com.duckduckgo.app.browser.defaultbrowsing.prompts.ui.DefaultBrowserBotto
 import com.duckduckgo.app.browser.defaultbrowsing.prompts.ui.DefaultBrowserBottomSheetDialog.EventListener
 import com.duckduckgo.app.browser.newaddressbaroption.NewAddressBarOptionManager
 import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
+import com.duckduckgo.app.browser.omnibar.datastore.OmnibarDataStore
 import com.duckduckgo.app.browser.shortcut.ShortcutBuilder
 import com.duckduckgo.app.browser.tabs.TabManager
 import com.duckduckgo.app.browser.tabs.TabManager.TabModel
@@ -94,8 +95,7 @@ import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.autofill.api.emailprotection.EmailProtectionLinkVerifier
 import com.duckduckgo.browser.api.ui.BrowserScreens.BookmarksScreenNoParams
 import com.duckduckgo.browser.api.ui.BrowserScreens.SettingsScreenNoParams
-import com.duckduckgo.browser.ui.omnibar.OmnibarPosition.BOTTOM
-import com.duckduckgo.browser.ui.omnibar.OmnibarPosition.TOP
+import com.duckduckgo.browser.ui.omnibar.OmnibarType
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.tabs.SwipingTabsFeatureProvider
 import com.duckduckgo.common.ui.view.addBottomShadow
@@ -137,6 +137,9 @@ import javax.inject.Inject
 open class BrowserActivity : DuckDuckGoActivity() {
     @Inject
     lateinit var settingsDataStore: SettingsDataStore
+
+    @Inject
+    lateinit var omnibarDataStore: OmnibarDataStore
 
     @Inject
     lateinit var clearPersonalDataAction: ClearDataAction
@@ -765,9 +768,9 @@ open class BrowserActivity : DuckDuckGoActivity() {
             delay(500)
 
             val anchorView =
-                when (settingsDataStore.omnibarPosition) {
-                    TOP -> null
-                    BOTTOM -> currentTab?.getOmnibar()?.omnibarView?.toolbar ?: binding.fragmentContainer
+                when (omnibarDataStore.omnibarType) {
+                    OmnibarType.SINGLE_TOP, OmnibarType.SPLIT -> null
+                    OmnibarType.SINGLE_BOTTOM -> currentTab?.getOmnibar()?.omnibarView?.toolbar ?: binding.fragmentContainer
                 }
             DefaultSnackbar(
                 parentView = binding.fragmentContainer,
@@ -1397,8 +1400,8 @@ open class BrowserActivity : DuckDuckGoActivity() {
     }
 
     private fun bindMockupToolbars() {
-        when (settingsDataStore.omnibarPosition) {
-            TOP -> {
+        when (omnibarDataStore.omnibarType) {
+            OmnibarType.SINGLE_TOP, OmnibarType.SPLIT -> {
                 if (Build.VERSION.SDK_INT < 28) {
                     binding.topMockupSingleToolbar.mockOmniBarContainerShadow.cardElevation = 2f.toPx(this)
                 }
@@ -1415,7 +1418,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
                 }
             }
 
-            BOTTOM -> {
+            OmnibarType.SINGLE_BOTTOM -> {
                 if (Build.VERSION.SDK_INT < 28) {
                     binding.bottomMockupSingleToolbar.mockOmniBarContainerShadow.cardElevation = 0.5f.toPx(this)
                 }
