@@ -20,22 +20,22 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <androidx.constraintlayout.widget.ConstraintLayout style="@style/AutofillDialogRootViewStyle">
+    <androidx.constraintlayout.widget.ConstraintLayout style="@style/BookmarksImportDialogRootViewStyle">
 
         <ImageView
             android:id="@+id/closeButton"
-            style="@style/AutofillDialogCloseButton"
+            style="@style/BookmarksImportDialogCloseButton"
             android:importantForAccessibility="no"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
         <androidx.constraintlayout.widget.Guideline
             android:id="@+id/guidelineStart"
-            style="@style/AutofillDialogContentGuidelineStart" />
+            style="@style/BookmarksImportDialogContentGuidelineStart" />
 
         <androidx.constraintlayout.widget.Guideline
             android:id="@+id/guidelineEnd"
-            style="@style/AutofillDialogContentGuidelineEnd" />
+            style="@style/BookmarksImportDialogContentGuidelineEnd" />
 
         <androidx.appcompat.widget.AppCompatImageView
             android:id="@+id/appIcon"
@@ -68,7 +68,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/keyline_5"
             android:gravity="center"
-            android:textColor="?autofillDialogOnboardingExplanationColor"
+            android:textColor="?attr/daxColorSecondaryText"
             app:textType="secondary"
             android:text="@string/importBookmarksFromGooglePreImportDialogInstruction"
             app:typography="body2"
@@ -79,14 +79,25 @@
         <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
             android:id="@+id/importButton"
             android:layout_width="0dp"
-            android:layout_marginTop="@dimen/keyline_5"
-            app:layout_constraintTop_toBottomOf="@id/onboardingSubtitle"
             android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="@dimen/keyline_5"
+            android:text="@string/importBookmarksFromGooglePreImportDialogImportButton"
+            app:daxButtonSize="large"
             app:layout_constraintEnd_toEndOf="@id/guidelineEnd"
             app:layout_constraintStart_toStartOf="@id/guidelineStart"
+            app:layout_constraintTop_toBottomOf="@id/onboardingSubtitle" />
+
+        <com.duckduckgo.common.ui.view.button.DaxButtonGhost
+            android:id="@+id/selectFileButton"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:text="@string/importBookmarksFromGooglePreImportDialogImportButton"
-            app:daxButtonSize="large" />
+            android:text="@string/importBookmarksFromGooglePreImportDialogSelectFileButton"
+            app:daxButtonSize="large"
+            app:layout_constraintEnd_toEndOf="@id/guidelineEnd"
+            app:layout_constraintStart_toStartOf="@id/guidelineStart"
+            app:layout_constraintTop_toBottomOf="@id/importButton" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
