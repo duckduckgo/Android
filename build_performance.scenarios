@@ -1,5 +1,5 @@
 # Gradle Profiler Build Performance Scenarios
-# TEMPORARY: Reduced scenarios for workflow testing
+# TEMPORARY: Reduced scenarios for workflow testing test 2
 # This file defines three benchmark scenarios to measure build performance
 
 # Scenario 1: Clean Build
