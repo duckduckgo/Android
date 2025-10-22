@@ -66,6 +66,7 @@
 
     <!-- AutoComplete -->
     <string name="autocompleteDuckAiPrompt">Ρωτήστε το Duck.ai</string>
+    <string name="autocompleteDeviceAppNotFound">Η εφαρμογή δεν βρέθηκε</string>
 
     <!-- New Address Bar Option Bottom Sheet Dialog -->
     <string name="newAddressBarOptionBottomSheetDialogSearchText">Αναζήτηση ή εισαγωγή διεύθυνσης</string>

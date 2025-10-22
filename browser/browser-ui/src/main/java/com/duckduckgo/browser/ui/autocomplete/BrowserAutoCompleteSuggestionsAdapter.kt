@@ -102,6 +102,7 @@ class BrowserAutoCompleteSuggestionsAdapter(
             Type.SWITCH_TO_TAB_TYPE to SwitchToTabSuggestionViewHolderFactory(),
             Type.DIVIDER_TYPE to DividerViewHolderFactory(),
             Type.DUCK_AI_PROMPT_TYPE to DuckAIPromptSuggestionViewHolderFactory(),
+            Type.DEVICE_APP to DeviceAppSuggestionViewHolderFactory(),
         )
 
     private var phrase = ""
@@ -129,6 +130,7 @@ class BrowserAutoCompleteSuggestionsAdapter(
                     is AutoCompleteSwitchToTabSuggestion -> Type.SWITCH_TO_TAB_TYPE
                     is AutoCompleteUrlSuggestion -> Type.SWITCH_TO_TAB_TYPE
                     is AutoCompleteSuggestion.AutoCompleteDuckAIPrompt -> Type.DUCK_AI_PROMPT_TYPE
+                    is AutoCompleteSuggestion.AutoCompleteDeviceAppSuggestion -> Type.DEVICE_APP
                     else -> Type.SUGGESTION_TYPE
                 }
         }
@@ -193,7 +195,8 @@ class BrowserAutoCompleteSuggestionsAdapter(
     private fun needsDivider(
         current: AutoCompleteSuggestion,
         next: AutoCompleteSuggestion,
-    ): Boolean = current.isSearchItem != next.isSearchItem
+    ): Boolean = (current.isSearchItem != next.isSearchItem) ||
+        (current is AutoCompleteSuggestion.AutoCompleteDeviceAppSuggestion) != (next is AutoCompleteSuggestion.AutoCompleteDeviceAppSuggestion)
 
     object Type {
         const val EMPTY_TYPE = 1
@@ -206,5 +209,6 @@ class BrowserAutoCompleteSuggestionsAdapter(
         const val SWITCH_TO_TAB_TYPE = 8
         const val DIVIDER_TYPE = 9
         const val DUCK_AI_PROMPT_TYPE = 10
+        const val DEVICE_APP = 11
     }
 }

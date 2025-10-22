@@ -66,6 +66,7 @@
 
     <!-- AutoComplete -->
     <string name="autocompleteDuckAiPrompt">Duck.ai\'a sor</string>
+    <string name="autocompleteDeviceAppNotFound">Uygulama bulunamadı</string>
 
     <!-- New Address Bar Option Bottom Sheet Dialog -->
     <string name="newAddressBarOptionBottomSheetDialogSearchText">Adres ara veya gir</string>

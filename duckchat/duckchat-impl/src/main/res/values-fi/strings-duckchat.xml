@@ -66,6 +66,7 @@
 
     <!-- AutoComplete -->
     <string name="autocompleteDuckAiPrompt">Kysy Duck.ai:lta</string>
+    <string name="autocompleteDeviceAppNotFound">Sovellusta ei löytynyt</string>
 
     <!-- New Address Bar Option Bottom Sheet Dialog -->
     <string name="newAddressBarOptionBottomSheetDialogSearchText">Hae tai anna osoite</string>
