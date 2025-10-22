@@ -295,6 +295,7 @@ import com.duckduckgo.duckchat.api.inputscreen.BrowserAndInputScreenTransitionPr
 import com.duckduckgo.duckchat.api.inputscreen.InputScreenActivityParams
 import com.duckduckgo.duckchat.api.inputscreen.InputScreenActivityResultCodes
 import com.duckduckgo.duckchat.api.inputscreen.InputScreenActivityResultParams
+import com.duckduckgo.duckchat.api.inputscreen.InputScreenBrowserButtonsConfig
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
 import com.duckduckgo.duckplayer.api.DuckPlayer
 import com.duckduckgo.duckplayer.api.DuckPlayerSettingsNoParams
@@ -1119,8 +1120,8 @@ class BrowserTabFragment :
                 requireContext(),
                 InputScreenActivityParams(
                     query = query,
-                    tabs = viewModel.tabs.value?.size ?: 0,
                     isTopOmnibar = omnibar.omnibarPosition == TOP,
+                    browserButtonsConfig = InputScreenBrowserButtonsConfig.Enabled(tabs = viewModel.tabs.value?.size ?: 0),
                 ),
             )
         val enterTransition = browserAndInputScreenTransitionProvider.getInputScreenEnterAnimation(omnibar.omnibarPosition == TOP)
