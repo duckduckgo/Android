@@ -52,6 +52,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.*
+import kotlinx.coroutines.test.runTest
 import org.junit.*
 import org.junit.Assert.*
 import org.mockito.Mockito.verify
@@ -87,7 +88,7 @@ class SystemSearchViewModelTest {
     private lateinit var testee: SystemSearchViewModel
 
     @Before
-    fun setup() {
+    fun setup() = runTest {
         whenever(mockAutoComplete.autoComplete(QUERY)).thenReturn(flowOf(autocompleteQueryResult))
         whenever(mockAutoComplete.autoComplete(BLANK_QUERY)).thenReturn(flowOf(autocompleteBlankResult))
         whenever(mockDeviceAppLookup.query(QUERY)).thenReturn(appQueryResult)
@@ -346,6 +347,14 @@ class SystemSearchViewModelTest {
         testee.onUserSelectedToEditQuery(query)
         verify(commandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
         assertEquals(Command.EditQuery(query), commandCaptor.lastValue)
+    }
+
+    @Test
+    fun `when voice search result then launch browser`() {
+        val query = "test"
+        testee.onVoiceSearchResult(capturedText = query)
+        verify(commandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
+        assertEquals(Command.LaunchBrowser(query), commandCaptor.lastValue)
     }
 
     @Test

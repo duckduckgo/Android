@@ -185,14 +185,10 @@ interface PrivacyProFeature {
     @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
     fun useUnifiedFeedback(): Toggle
 
-    // Kill switch
-    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
-    fun allowEmailFeedback(): Toggle
-
     @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
     fun serpPromoCookie(): Toggle
 
-    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
+    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun authApiV2(): Toggle
 
     @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
@@ -227,7 +223,7 @@ interface PrivacyProFeature {
      * This flag will be used to select FE subscription messaging mode.
      * The value is added into GetFeatureConfig to allow FE to select the mode.
      */
-    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun enableSubscriptionFlowsV2(): Toggle
 
     /**
@@ -250,9 +246,6 @@ interface PrivacyProFeature {
     @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun refreshSubscriptionPlanFeatures(): Toggle
 
-    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
-    fun subscriptionAIFeaturesRebranding(): Toggle
-
     @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun useClientWithCacheForFeatures(): Toggle
 
@@ -261,6 +254,15 @@ interface PrivacyProFeature {
 
     @Toggle.DefaultValue(defaultValue = DefaultFeatureValue.TRUE)
     fun sendSubscriptionPurchaseWideEvent(): Toggle
+
+    @Toggle.DefaultValue(defaultValue = DefaultFeatureValue.TRUE)
+    fun sendAuthTokenRefreshWideEvent(): Toggle
+
+    @Toggle.DefaultValue(defaultValue = DefaultFeatureValue.FALSE)
+    fun useSubscriptionSupport(): Toggle
+
+    @Toggle.DefaultValue(defaultValue = DefaultFeatureValue.INTERNAL)
+    fun supportsSwitchSubscription(): Toggle
 }
 
 @ContributesBinding(AppScope::class)

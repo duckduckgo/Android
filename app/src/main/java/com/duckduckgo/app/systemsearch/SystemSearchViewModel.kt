@@ -296,6 +296,10 @@ class SystemSearchViewModel @Inject constructor(
         command.value = Command.EditQuery(query)
     }
 
+    fun onVoiceSearchResult(capturedText: String) {
+        command.value = Command.LaunchBrowser(query = capturedText)
+    }
+
     fun onVoiceSearchStateChanged() {
         voiceSearchState.tryEmit(Unit)
     }

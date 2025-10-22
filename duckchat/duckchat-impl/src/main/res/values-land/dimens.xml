@@ -16,5 +16,6 @@
 
 <resources>
     <dimen name="inputScreenOmnibarCardMarginHorizontal">170dp</dimen>
+    <dimen name="inputScreenOmnibarCardExtendedMarginHorizontal">170dp</dimen>
     <dimen name="inputScreenMarginHorizontal">154dp</dimen>
 </resources>

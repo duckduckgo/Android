@@ -20,11 +20,18 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import androidx.room.Transaction
 
 @Dao
 interface UserProfileDao {
     @Query("SELECT * FROM pir_user_profile")
-    fun getUserProfiles(): List<UserProfile>
+    fun getAllUserProfiles(): List<UserProfile>
+
+    @Query("SELECT * FROM pir_user_profile WHERE deprecated = 0")
+    fun getValidUserProfiles(): List<UserProfile>
+
+    @Query("SELECT * FROM pir_user_profile WHERE id = :id")
+    fun getUserProfile(id: Long): UserProfile?
 
     @Query("SELECT * FROM pir_user_profile WHERE id IN (:ids)")
     fun getUserProfilesWithIds(ids: List<Long>): List<UserProfile>
@@ -35,6 +42,24 @@ interface UserProfileDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertUserProfiles(userProfiles: List<UserProfile>): List<Long>
 
+    @Query("DELETE from pir_user_profile WHERE id IN (:ids)")
+    fun deleteUserProfiles(ids: List<Long>)
+
     @Query("DELETE from pir_user_profile")
     fun deleteAllProfiles()
+
+    @Transaction
+    fun updateUserProfiles(
+        profilesToAdd: List<UserProfile>,
+        profilesToUpdate: List<UserProfile>,
+        profileIdsToDelete: List<Long>,
+    ) {
+        if (profileIdsToDelete.isNotEmpty()) {
+            deleteUserProfiles(profileIdsToDelete)
+        }
+
+        if (profilesToAdd.isNotEmpty() || profilesToUpdate.isNotEmpty()) {
+            insertUserProfiles(profilesToAdd + profilesToUpdate)
+        }
+    }
 }

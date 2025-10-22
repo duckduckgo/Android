@@ -25,6 +25,7 @@ import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_ENGAGEMENT
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_ENGAGEMENT_ONBOARDED_USER
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_ENGAGEMENT_STACKED_LOGINS
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_IMPORT_GOOGLE_PASSWORDS_MAIN_APP_SETTINGS_HIDDEN
+import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_IMPORT_GOOGLE_PASSWORDS_RESULT_FAILURE_WEBVIEW_CRASH
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_IMPORT_PASSWORDS_COPIED_DESKTOP_LINK
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_IMPORT_PASSWORDS_GET_DESKTOP_BROWSER
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_IMPORT_PASSWORDS_SHARED_DESKTOP_LINK
@@ -171,6 +172,7 @@ enum class AutofillPixelNames(override val pixelName: String) : Pixel.PixelName 
     AUTOFILL_IMPORT_GOOGLE_PASSWORDS_PREIMPORT_PROMPT_DISPLAYED("autofill_import_google_passwords_preimport_prompt_displayed"),
     AUTOFILL_IMPORT_GOOGLE_PASSWORDS_PREIMPORT_PROMPT_CONFIRMED("autofill_import_google_passwords_preimport_prompt_confirmed"),
     AUTOFILL_IMPORT_GOOGLE_PASSWORDS_RESULT_FAILURE_ERROR_PARSING("autofill_import_google_passwords_result_parsing"),
+    AUTOFILL_IMPORT_GOOGLE_PASSWORDS_RESULT_FAILURE_WEBVIEW_CRASH("autofill_import_google_passwords_webview_crash"),
     AUTOFILL_IMPORT_GOOGLE_PASSWORDS_RESULT_FAILURE_USER_CANCELLED("autofill_import_google_passwords_result_user_cancelled"),
     AUTOFILL_IMPORT_GOOGLE_PASSWORDS_RESULT_SUCCESS("autofill_import_google_passwords_result_success"),
 
@@ -285,6 +287,8 @@ object AutofillPixelsRequiringDataCleaning : PixelParamRemovalPlugin {
 
             AUTOFILL_IMPORT_GOOGLE_PASSWORDS_MAIN_APP_SETTINGS_HIDDEN.pixelName to PixelParameter.removeAtb(),
             AUTOFILL_SYSTEM_AUTOFILL_USED.pixelName to PixelParameter.removeAtb(),
+
+            AUTOFILL_IMPORT_GOOGLE_PASSWORDS_RESULT_FAILURE_WEBVIEW_CRASH.pixelName to PixelParameter.removeAtb(),
         )
     }
 }

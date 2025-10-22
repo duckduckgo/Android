@@ -100,6 +100,7 @@ class PirDevOptOutActivity : DuckDuckGoActivity() {
             stopService(Intent(this, PirForegroundOptOutService::class.java))
             lifecycleScope.launch {
                 eventsRepository.deleteAllOptOutData()
+                eventsRepository.deleteAllEmailConfirmationsLogs()
             }
             pirNotificationManager.cancelNotifications()
         }

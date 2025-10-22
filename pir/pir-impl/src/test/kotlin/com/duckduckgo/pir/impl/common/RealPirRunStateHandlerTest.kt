@@ -17,16 +17,22 @@
 package com.duckduckgo.pir.impl.common
 
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerManualScanCompleted
+import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerRecordEmailConfirmationCompleted
 import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerRecordEmailConfirmationNeeded
+import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerRecordEmailConfirmationStarted
 import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerRecordOptOutCompleted
 import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerRecordOptOutStarted
 import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerScanActionSucceeded
 import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerScheduledScanCompleted
 import com.duckduckgo.pir.impl.models.AddressCityState
+import com.duckduckgo.pir.impl.models.Broker
 import com.duckduckgo.pir.impl.models.ExtractedProfile
 import com.duckduckgo.pir.impl.models.scheduling.JobRecord.EmailConfirmationJobRecord
 import com.duckduckgo.pir.impl.models.scheduling.JobRecord.EmailConfirmationJobRecord.EmailData
+import com.duckduckgo.pir.impl.models.scheduling.JobRecord.EmailConfirmationJobRecord.JobAttemptData
+import com.duckduckgo.pir.impl.models.scheduling.JobRecord.EmailConfirmationJobRecord.LinkFetchData
 import com.duckduckgo.pir.impl.pixels.PirPixelSender
 import com.duckduckgo.pir.impl.scheduling.JobRecordUpdater
 import com.duckduckgo.pir.impl.scripts.models.PirSuccessResponse.ExtractedResponse
@@ -38,15 +44,20 @@ import com.duckduckgo.pir.impl.store.PirRepository
 import com.duckduckgo.pir.impl.store.PirSchedulingRepository
 import com.duckduckgo.pir.impl.store.db.BrokerScanEventType.BROKER_ERROR
 import com.duckduckgo.pir.impl.store.db.BrokerScanEventType.BROKER_SUCCESS
+import com.duckduckgo.pir.impl.store.db.EmailConfirmationEventType.EMAIL_CONFIRMATION_FAILED
+import com.duckduckgo.pir.impl.store.db.EmailConfirmationEventType.EMAIL_CONFIRMATION_SUCCESS
 import com.duckduckgo.pir.impl.store.db.PirBrokerScanLog
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import org.mockito.kotlin.any
 import org.mockito.kotlin.inOrder
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
+import org.mockito.kotlin.verifyNoMoreInteractions
+import org.mockito.kotlin.whenever
 
 class RealPirRunStateHandlerTest {
     @get:Rule
@@ -59,6 +70,7 @@ class RealPirRunStateHandlerTest {
     private val mockPixelSender: PirPixelSender = mock()
     private val mockJobRecordUpdater: JobRecordUpdater = mock()
     private val mockSchedulingRepository: PirSchedulingRepository = mock()
+    private val mockCurrentTimeProvider: CurrentTimeProvider = mock()
 
     @Before
     fun setUp() {
@@ -69,8 +81,11 @@ class RealPirRunStateHandlerTest {
                 pixelSender = mockPixelSender,
                 dispatcherProvider = coroutineRule.testDispatcherProvider,
                 jobRecordUpdater = mockJobRecordUpdater,
-                schedulingRepository = mockSchedulingRepository,
+                pirSchedulingRepository = mockSchedulingRepository,
+                currentTimeProvider = mockCurrentTimeProvider,
             )
+
+        whenever(mockCurrentTimeProvider.currentTimeMillis()).thenReturn(testEventTimeInMillis)
     }
 
     // Test data
@@ -126,6 +141,38 @@ class RealPirRunStateHandlerTest {
             reportId = "report123",
             email = "john@example.com",
             fullName = "John Michael Doe",
+        )
+
+    private val testEmailConfirmationJob =
+        EmailConfirmationJobRecord(
+            brokerName = testBrokerName,
+            userProfileId = testProfileQueryId,
+            extractedProfileId = testExtractedProfileId,
+            emailData = EmailData(
+                email = "john@example.com",
+                attemptId = "c9982ded-021a-4251-9e03-2c58b130410f",
+            ),
+            linkFetchData = LinkFetchData(
+                emailConfirmationLink = "https://example.com/confirm",
+                linkFetchAttemptCount = 5,
+                lastLinkFetchDateInMillis = testEventTimeInMillis,
+            ),
+            jobAttemptData = JobAttemptData(
+                jobAttemptCount = 1,
+                lastJobAttemptDateInMillis = testEventTimeInMillis,
+                lastJobAttemptActionId = "last82ded-021a-4251-9e03-2c58b130410f",
+            ),
+            dateCreatedInMillis = 10000000L,
+        )
+    private val testBroker =
+        Broker(
+            name = testBrokerName,
+            fileName = "test.json",
+            url = "testbroker.com",
+            version = "1.1.1",
+            addedDatetime = 10000000L,
+            parent = null,
+            removedAt = 0L,
         )
 
     @Test
@@ -328,8 +375,12 @@ class RealPirRunStateHandlerTest {
                 brokerName = testBrokerName,
                 profileQueryId = testProfileQueryId,
             )
+            inOrder.verify(mockJobRecordUpdater).updateScanMatchesFound(
+                listOf(expectedExtractedProfile),
+                testBrokerName,
+                testProfileQueryId,
+            )
             inOrder.verify(mockRepository).saveNewExtractedProfiles(listOf(expectedExtractedProfile))
-            inOrder.verify(mockJobRecordUpdater).updateScanMatchesFound(testBrokerName, testProfileQueryId)
         }
 
     @Test
@@ -457,22 +508,133 @@ class RealPirRunStateHandlerTest {
                     brokerName = testBrokerName,
                     extractedProfile = testExtractedProfile,
                     attemptId = "c9982ded-021a-4251-9e03-2c58b130410f",
+                    lastActionId = "hello82ded-021a-4251-9e03-2c58b130410f",
                 )
-            val expectedEmailConfirmationJobRecord =
-                EmailConfirmationJobRecord(
-                    userProfileId = testProfileQueryId,
-                    extractedProfileId = testExtractedProfileId,
-                    brokerName = testBrokerName,
-                    emailData =
-                    EmailData(
-                        email = "john@example.com",
-                        attemptId = "c9982ded-021a-4251-9e03-2c58b130410f",
-                    ),
-                )
+            whenever(mockRepository.getBrokerForName(testBrokerName)).thenReturn(testBroker)
 
             testee.handleState(state)
 
-            verify(mockSchedulingRepository).saveEmailConfirmationJobRecord(expectedEmailConfirmationJobRecord)
-            verify(mockJobRecordUpdater).markOptOutAsWaitingForEmailConfirmation(testExtractedProfileId)
+            verify(mockJobRecordUpdater).markOptOutAsWaitingForEmailConfirmation(
+                profileQueryId = testProfileQueryId,
+                extractedProfileId = testExtractedProfileId,
+                brokerName = testBrokerName,
+                email = "john@example.com",
+                attemptId = "c9982ded-021a-4251-9e03-2c58b130410f",
+            )
+            verify(mockPixelSender).reportStagePendingEmailConfirmation(
+                brokerUrl = testBroker.url,
+                brokerVersion = testBroker.version,
+                attemptId = "c9982ded-021a-4251-9e03-2c58b130410f",
+                actionId = "hello82ded-021a-4251-9e03-2c58b130410f",
+                durationMs = 0L,
+                tries = 0,
+            )
+        }
+
+    @Test
+    fun whenHandleBrokerRecordEmailConfirmationStartedThenUpdateEmailJobRecordAndEmitPixel() =
+        runTest {
+            val state =
+                BrokerRecordEmailConfirmationStarted(
+                    brokerName = testBrokerName,
+                    extractedProfileId = testExtractedProfileId,
+                    firstActionId = "first82ded-021a-4251-9e03-2c58b130410f",
+                )
+            whenever(mockRepository.getBrokerForName(testBrokerName)).thenReturn(testBroker)
+            whenever(mockJobRecordUpdater.recordEmailConfirmationAttempt(any())).thenReturn(testEmailConfirmationJob)
+
+            testee.handleState(state)
+
+            verify(mockJobRecordUpdater).recordEmailConfirmationAttempt(
+                extractedProfileId = testExtractedProfileId,
+            )
+
+            verify(mockPixelSender).reportEmailConfirmationAttemptStart(
+                brokerUrl = testBroker.url,
+                brokerVersion = testBroker.version,
+                attemptId = testEmailConfirmationJob.emailData.attemptId,
+                actionId = state.firstActionId,
+                attemptNumber = testEmailConfirmationJob.jobAttemptData.jobAttemptCount,
+            )
+            verifyNoMoreInteractions(mockPixelSender)
+            verifyNoMoreInteractions(mockJobRecordUpdater)
+        }
+
+    @Test
+    fun whenHandleBrokerRecordEmailConfirmationCompletedSuccessThenUpdateEmailJobRecordAndEmitPixel() =
+        runTest {
+            val state =
+                BrokerRecordEmailConfirmationCompleted(
+                    brokerName = testBrokerName,
+                    extractedProfileId = testExtractedProfileId,
+                    isSuccess = true,
+                    lastActionId = "last82ded-021a-4251-9e03-2c58b130410f",
+                    totalTimeMillis = 1000L,
+                )
+            whenever(mockRepository.getBrokerForName(testBrokerName)).thenReturn(testBroker)
+            whenever(mockSchedulingRepository.getEmailConfirmationJob(testExtractedProfileId)).thenReturn(testEmailConfirmationJob)
+
+            testee.handleState(state)
+
+            verify(mockPixelSender).reportEmailConfirmationAttemptSuccess(
+                brokerUrl = testBroker.url,
+                brokerVersion = testBroker.version,
+                attemptId = testEmailConfirmationJob.emailData.attemptId,
+                actionId = state.lastActionId,
+                attemptNumber = testEmailConfirmationJob.jobAttemptData.jobAttemptCount,
+                durationMs = state.totalTimeMillis,
+            )
+            verify(mockJobRecordUpdater).recordEmailConfirmationCompleted(
+                extractedProfileId = testExtractedProfileId,
+            )
+            verify(mockPixelSender).reportEmailConfirmationJobSuccess(
+                brokerUrl = testBroker.url,
+                brokerVersion = testBroker.version,
+            )
+            verify(mockEventsRepository).saveEmailConfirmationLog(
+                testEventTimeInMillis,
+                EMAIL_CONFIRMATION_SUCCESS,
+                testBrokerName,
+            )
+            verifyNoMoreInteractions(mockPixelSender)
+            verifyNoMoreInteractions(mockJobRecordUpdater)
+        }
+
+    @Test
+    fun whenHandleBrokerRecordEmailConfirmationCompletedFailedThenUpdateEmailJobRecordAndEmitPixel() =
+        runTest {
+            val state =
+                BrokerRecordEmailConfirmationCompleted(
+                    brokerName = testBrokerName,
+                    extractedProfileId = testExtractedProfileId,
+                    isSuccess = false,
+                    lastActionId = "last82ded-021a-4251-9e03-2c58b130410f",
+                    totalTimeMillis = 1000L,
+                )
+            whenever(mockRepository.getBrokerForName(testBrokerName)).thenReturn(testBroker)
+            whenever(mockJobRecordUpdater.recordEmailConfirmationFailed(any(), any())).thenReturn(testEmailConfirmationJob)
+
+            testee.handleState(state)
+
+            verify(mockJobRecordUpdater).recordEmailConfirmationFailed(
+                extractedProfileId = testExtractedProfileId,
+                lastActionId = state.lastActionId,
+            )
+
+            verify(mockPixelSender).reportEmailConfirmationAttemptFailed(
+                brokerUrl = testBroker.url,
+                brokerVersion = testBroker.version,
+                attemptId = testEmailConfirmationJob.emailData.attemptId,
+                actionId = state.lastActionId,
+                attemptNumber = testEmailConfirmationJob.jobAttemptData.jobAttemptCount,
+                durationMs = state.totalTimeMillis,
+            )
+            verify(mockEventsRepository).saveEmailConfirmationLog(
+                testEventTimeInMillis,
+                EMAIL_CONFIRMATION_FAILED,
+                testBrokerName,
+            )
+            verifyNoMoreInteractions(mockPixelSender)
+            verifyNoMoreInteractions(mockJobRecordUpdater)
         }
 }

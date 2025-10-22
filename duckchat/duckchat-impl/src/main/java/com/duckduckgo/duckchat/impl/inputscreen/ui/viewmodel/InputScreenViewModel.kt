@@ -34,6 +34,7 @@ import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggesti
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion.AutoCompleteSearchSuggestion
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion.AutoCompleteUrlSuggestion.AutoCompleteBookmarkSuggestion
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion.AutoCompleteUrlSuggestion.AutoCompleteSwitchToTabSuggestion
+import com.duckduckgo.browser.api.autocomplete.AutoCompleteFactory
 import com.duckduckgo.browser.api.autocomplete.AutoCompleteSettings
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.SingleLiveEvent
@@ -113,7 +114,7 @@ enum class UserSelectedMode {
 
 class InputScreenViewModel @AssistedInject constructor(
     @Assisted currentOmnibarText: String,
-    private val autoComplete: AutoComplete,
+    autoCompleteFactory: AutoCompleteFactory,
     private val dispatchers: DispatcherProvider,
     private val history: NavigationHistory,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
@@ -126,6 +127,11 @@ class InputScreenViewModel @AssistedInject constructor(
     private val inputScreenSessionUsageMetric: InputScreenSessionUsageMetric,
     private val inputScreenConfigResolver: InputScreenConfigResolver,
 ) : ViewModel() {
+
+    private val autoComplete: AutoComplete = autoCompleteFactory.create(
+        AutoComplete.Config(showInstalledApps = inputScreenConfigResolver.shouldShowInstalledApps()),
+    )
+
     private var hasUserSeenHistoryIAM = false
     private var isTapTransition = false
 
@@ -144,6 +150,8 @@ class InputScreenViewModel @AssistedInject constructor(
                 showChatLogo = true,
                 showSearchLogo = true,
                 newLineButtonVisible = false,
+                mainButtonsVisible = false,
+                searchMode = true,
             ),
         )
     val visibilityState: StateFlow<InputScreenVisibilityState> = _visibilityState.asStateFlow()
@@ -292,9 +300,16 @@ class InputScreenViewModel @AssistedInject constructor(
                     is AutoCompleteSwitchToTabSuggestion -> onUserSwitchedToTab(suggestion.tabId)
                     is AutoCompleteInAppMessageSuggestion -> return@withContext
                     is AutoCompleteSuggestion.AutoCompleteDuckAIPrompt -> onUserTappedDuckAiPromptAutocomplete(suggestion.phrase)
+                    is AutoCompleteSuggestion.AutoCompleteDeviceAppSuggestion -> {
+                        command.value = Command.LaunchDeviceApplication(suggestion)
+                    }
                 }
             }
         }
+    }
+
+    fun appNotFound(suggestion: AutoCompleteSuggestion.AutoCompleteDeviceAppSuggestion) {
+        command.value = Command.ShowAppNotFoundMessage(suggestion.shortName)
     }
 
     private fun onUserSwitchedToTab(tabId: String) {
@@ -360,6 +375,9 @@ class InputScreenViewModel @AssistedInject constructor(
         searchInputTextState.value = query.trim()
         _submitButtonIconState.update {
             it.copy(icon = if (isWebUrl(query)) SubmitButtonIcon.SEND else SubmitButtonIcon.SEARCH)
+        }
+        _visibilityState.update {
+            it.copy(searchMode = true, mainButtonsVisible = canShowMainButtons())
         }
     }
 
@@ -438,7 +456,7 @@ class InputScreenViewModel @AssistedInject constructor(
                 it.copy(icon = SubmitButtonIcon.SEND)
             }
             _visibilityState.update {
-                it.copy(newLineButtonVisible = true)
+                it.copy(newLineButtonVisible = true, searchMode = false, mainButtonsVisible = false)
             }
         }
         if (userSelectedMode == SEARCH) {
@@ -448,15 +466,15 @@ class InputScreenViewModel @AssistedInject constructor(
     }
 
     fun onSearchSelected() {
-        viewModelScope.launch {
-            _visibilityState.update {
-                it.copy(newLineButtonVisible = false)
-            }
-        }
         if (userSelectedMode == CHAT) {
             fireModeSwitchedPixel(directionToSearch = true)
         }
         userSelectedMode = SEARCH
+        viewModelScope.launch {
+            _visibilityState.update {
+                it.copy(newLineButtonVisible = false, mainButtonsVisible = canShowMainButtons())
+            }
+        }
     }
 
     fun onPageScrolled(
@@ -608,6 +626,27 @@ class InputScreenViewModel @AssistedInject constructor(
             this <= 100 -> "long"
             else -> "very_long"
         }
+
+    fun onTabSwitcherTapped() {
+        command.value = Command.TabSwitcherRequested
+    }
+
+    fun onFireButtonTapped() {
+        command.value = Command.FireButtonRequested
+    }
+
+    fun onBrowserMenuTapped() {
+        command.value = Command.MenuRequested
+    }
+
+    fun onClearTextTapped() {
+        val params = inputScreenPixelsModeParam(isSearchMode = visibilityState.value.searchMode)
+        pixel.fire(DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_OMNIBAR_CLEAR_BUTTON_PRESSED, parameters = params)
+    }
+
+    private fun canShowMainButtons() = searchInputTextState.value.isEmpty() &&
+        userSelectedMode == SEARCH &&
+        inputScreenConfigResolver.mainButtonsEnabled()
 
     class InputScreenViewModelProviderFactory(
         private val assistedFactory: InputScreenViewModelFactory,

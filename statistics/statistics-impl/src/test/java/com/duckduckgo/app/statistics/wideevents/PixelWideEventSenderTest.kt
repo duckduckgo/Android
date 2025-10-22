@@ -68,13 +68,19 @@ class PixelWideEventSenderTest {
     @Test
     fun `when sendWideEvent called with completed event then sends count and daily pixels`() =
         runTest {
+            val eventName = "subscription-purchase"
+
             val event =
                 createWideEvent(
                     id = 123L,
-                    name = "subscription.purchase",
+                    name = eventName,
                     status = WideEventRepository.WideEventStatus.SUCCESS,
                     flowEntryPoint = "app_settings",
                     metadata = mapOf("plan_type" to "premium"),
+                    steps = listOf(
+                        WideEventRepository.WideEventStep(name = "init", success = true),
+                        WideEventRepository.WideEventStep(name = "refresh_data", success = false),
+                    ),
                 )
 
             pixelWideEventSender.sendWideEvent(event)
@@ -90,19 +96,21 @@ class PixelWideEventSenderTest {
                     "app.native_apps_experiments" to "",
                     "context.name" to "app_settings",
                     "feature.status" to "SUCCESS",
-                    "dev_mode" to "false",
+                    "app.dev_mode" to "false",
+                    "feature.data.ext.step.init" to "true",
+                    "feature.data.ext.step.refresh_data" to "false",
                 )
-            val expectedEncodedParameters = mapOf("plan_type" to "premium")
+            val expectedEncodedParameters = mapOf("feature.data.ext.plan_type" to "premium")
 
             verify(pixel).fire(
-                pixelName = eq("wide.subscription.purchase.c"),
+                pixelName = eq("wide_${eventName}_c"),
                 parameters = eq(expectedParameters),
                 encodedParameters = eq(expectedEncodedParameters),
                 type = eq(Pixel.PixelType.Count),
             )
 
             verify(pixel).fire(
-                pixelName = eq("wide.subscription.purchase.d"),
+                pixelName = eq("wide_${eventName}_d"),
                 parameters = eq(expectedParameters),
                 encodedParameters = eq(expectedEncodedParameters),
                 type = any<Pixel.PixelType.Daily>(),

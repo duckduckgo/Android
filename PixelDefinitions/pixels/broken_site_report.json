@@ -1,0 +1,368 @@
+{
+    "epbf": {
+        "description": "User sent broken site report",
+        "owners": ["laghee"],
+        "triggers": ["user_submitted"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "atb",
+            "appVersion",
+            "remoteConfigEtag",
+            {
+                "key": "blockedTrackers",
+                "description": "Tracker domains blocked on the page. Comma separated list.",
+                "type": "string"
+            },
+            {
+                "key": "category",
+                "description": "User chosen breakage category",
+                "enum": ["", "comments", "blocked", "dislike", "empty-spaces", "layout", "login", "other", "paywall", "shopping", "videos"]
+            },
+            {
+                "key": "consentManaged",
+                "description": "1 if the Cookie Prompt Management (CPM) feature ran on the page.",
+                "enum": ["", "0", "1"]
+            },
+            {
+                "key": "consentOptoutFailed",
+                "description": "1 if the Cookie Prompt Management (CPM) feature failed to run on the page.",
+                "enum": ["", "0", "1"]
+            },
+            {
+                "key": "consentSelftestFailed",
+                "description": "1 if the Cookie Prompt Management (CPM) feature's self-test of the page's consent settings detected an issue.",
+                "enum": ["", "0", "1"]
+            },
+            {
+                "key": "description",
+                "description": "User-provided description of the breakage.",
+                "type": "string"
+            },
+            {
+                "key": "errorDescriptions",
+                "description": "List of main frame status error on page. URL encoded JSON array.",
+                "type": "string"
+            },
+            {
+                "key": "httpErrorCodes",
+                "description": "List of HTTP error codes encountered.",
+                "type": "string"
+            },
+            {
+                "key": "jsPerformance",
+                "description": "Metrics gathered via the Performance web API.",
+                "type": "string"
+            },
+            {
+                "key": "lastSentDay",
+                "description": "If a report for the same site was previously sent by this user, this indicates the day of that report.",
+                "anyOf": [
+                    {
+                        "type": "string",
+                        "format": "date"
+                    },
+                    {
+                        "type": "string",
+                        "maxLength": 0
+                    }
+                ]
+            },
+            {
+                "key": "locale",
+                "description": "User's browser locale",
+                "pattern": "[a-z][a-z](-[A-Z][A-Z])?"
+            },
+            {
+                "key": "openerContext",
+                "description": "Reported page's opener context",
+                "enum": ["external", "navigation", "serp", ""]
+            },
+            {
+                "key": "os",
+                "description": "User's operating system version",
+                "type": "string"
+            },
+            {
+                "key": "manufacturer",
+                "description": "Device manufacturer.",
+                "type": "string"
+            },
+            {
+                "key": "model",
+                "description": "Device model.",
+                "type": "string"
+            },
+            {
+                "key": "siteType",
+                "description": "Type of site version loaded.",
+                "enum": ["desktop", "mobile"]
+            },
+            {
+                "key": "loginSite",
+                "description": "Login site/domain if supplied.",
+                "type": "string",
+                "enum": [""]
+            },
+            {
+                "key": "remoteConfigVersion",
+                "description": "",
+                "type": "number"
+            },
+            {
+                "key": "reportFlow",
+                "description": "The UI flow that the user used to trigger this breakage report.",
+                "enum": [
+                    "dashboard",
+                    "menu",
+                    "on_protections_off_dashboard_main",
+                    "on_protections_off_menu",
+                    "reload-three-times-within-20-seconds",
+                    "prompt"
+                ]
+            },
+            {
+                "key": "siteUrl",
+                "description": "URL of reported site (query string removed)",
+                "type": "string"
+            },
+            {
+                "key": "surrogates",
+                "description": "Surrogate scripts injected on the page",
+                "type": "string"
+            },
+            {
+                "key": "tds",
+                "description": "eTag of active blocklist",
+                "type": "string"
+            },
+            {
+                "key": "upgradedHttps",
+                "description": "",
+                "enum": ["false", "true"]
+            },
+            {
+                "key": "userRefreshCount",
+                "description": "Number of times the user refreshed this page.",
+                "type": "number"
+            },
+            {
+                "key": "wvVersion",
+                "description": "User's runtime WebView version",
+                "type": "string"
+            },
+            {
+                "key": "protectionsState",
+                "description": "If the protections toggle is on or not for the site.",
+                "enum": ["false", "true"]
+            },
+            {
+                "key": "vpnOn",
+                "description": "True if the user has the DuckDuckGo VPN enabled.",
+                "enum": ["false", "true"]
+            },
+            {
+                "key": "blockListExperiment",
+                "description": "Block list experiment cohort identifier.",
+                "type": "string",
+                "pattern": "^tdsNextExperiment.*_(control|treatment)$",
+                "examples": [
+                    "tdsNextExperiment003_control",
+                    "tdsNextExperiment003_treatment",
+                    "tdsNextExperimentBaseline_control",
+                    "tdsNextExperiment002_control"
+                ]
+            },
+            {
+                "key": "debugFlags",
+                "description": "Enabled debug flags, comma-separated (may be URL-encoded).",
+                "type": "string"
+            },
+            {
+                "key": "gpc",
+                "description": "Global Privacy Control value reported.",
+                "enum": ["false", "true"]
+            },
+            {
+                "key": "urlParametersRemoved",
+                "description": "Whether URL parameters were removed.",
+                "enum": ["0", "1"]
+            }
+        ]
+    },
+    "protection-toggled-off-breakage-report": {
+        "description": "User agreed to send broken site report after disabling protections",
+        "owners": ["laghee"],
+        "triggers": ["user_submitted"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "atb",
+            "appVersion",
+            "remoteConfigEtag",
+            {
+                "key": "blockedTrackers",
+                "description": "Tracker domains blocked on the page. Comma separated list.",
+                "type": "string"
+            },
+            {
+                "key": "consentManaged",
+                "description": "1 if the Cookie Prompt Management (CPM) feature ran on the page.",
+                "enum": ["", "0", "1"]
+            },
+            {
+                "key": "consentOptoutFailed",
+                "description": "1 if the Cookie Prompt Management (CPM) feature failed to run on the page.",
+                "enum": ["", "0", "1"]
+            },
+            {
+                "key": "consentSelftestFailed",
+                "description": "1 if the Cookie Prompt Management (CPM) feature's self-test of the page's consent settings detected an issue.",
+                "enum": ["", "0", "1"]
+            },
+            {
+                "key": "errorDescriptions",
+                "description": "List of main frame status error on page. URL encoded JSON array.",
+                "type": "string"
+            },
+            {
+                "key": "httpErrorCodes",
+                "description": "List of HTTP error codes encountered.",
+                "type": "string"
+            },
+            {
+                "key": "jsPerformance",
+                "description": "Metrics gathered via the Performance web API.",
+                "type": "string"
+            },
+            {
+                "key": "lastSentDay",
+                "description": "If a report for the same site was previously sent by this user, this indicates the day of that report.",
+                "anyOf": [
+                    {
+                        "type": "string",
+                        "format": "date"
+                    },
+                    {
+                        "type": "string",
+                        "maxLength": 0
+                    }
+                ]
+            },
+            {
+                "key": "locale",
+                "description": "User's browser locale",
+                "pattern": "[a-z][a-z](-[A-Z][A-Z])?"
+            },
+            {
+                "key": "openerContext",
+                "description": "Reported page's opener context",
+                "enum": ["external", "navigation", "serp", ""]
+            },
+            {
+                "key": "os",
+                "description": "User's operating system version",
+                "type": "string"
+            },
+            {
+                "key": "referrerHeaderTrimmed",
+                "description": "True if the 'Referer' request header was trimmed for this page.",
+                "enum": ["true", "false"]
+            },
+            {
+                "key": "remoteConfigVersion",
+                "description": "",
+                "type": "number"
+            },
+            {
+                "key": "reportFlow",
+                "description": "The UI flow that the user used to trigger this breakage report.",
+                "enum": ["on_protections_off_menu", "on_protections_off_dashboard_main"]
+            },
+            {
+                "key": "siteUrl",
+                "description": "URL of reported site (query string removed)",
+                "type": "string"
+            },
+            {
+                "key": "surrogates",
+                "description": "Surrogate scripts injected on the page",
+                "type": "string"
+            },
+            {
+                "key": "tds",
+                "description": "eTag of active blocklist",
+                "type": "string"
+            },
+            {
+                "key": "upgradedHttps",
+                "description": "",
+                "enum": ["false", "true"]
+            },
+            {
+                "key": "userRefreshCount",
+                "type": "number",
+                "description": "Number of times the user refreshed this page."
+            },
+            {
+                "key": "vpnOn",
+                "description": "True if the user has the DuckDuckGo VPN enabled.",
+                "enum": ["false", "true"]
+            },
+            {
+                "key": "wvVersion",
+                "description": "User's runtime WebView version",
+                "type": "string"
+            }
+        ]
+    },
+    "m_report-broken-site_shown": {
+        "description": "User opened the broken site report UI.",
+        "owners": ["laghee"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            "atb",
+            {
+                "key": "opener",
+                "description": "Where the report UI was opened from.",
+                "enum": ["dashboard", "menu", "reload-three-times-within-20-seconds", "prompt", ""]
+            }
+        ]
+    },
+    "m_report-broken-site_sent": {
+        "description": "User sent a broken site report.",
+        "owners": ["laghee"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            "atb",
+            {
+                "key": "opener",
+                "description": "Where the report UI was opened from.",
+                "enum": ["dashboard", "menu", "reload-three-times-within-20-seconds", "prompt", ""]
+            }
+        ]
+    },
+    "m_reload-three-times-within-20-seconds": {
+        "description": "User reloaded a tab three times in a 20 second window (indicating the site could be broken).",
+        "owners": ["laghee"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion", "atb"]
+    },
+    "m_site-not-working_shown": {
+        "description": "User was shown the prompt to send a broken site report after reloading a website three times in 20 seconds.",
+        "owners": ["laghee"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion", "atb"]
+    },
+    "m_site-not-working_website-is-broken": {
+        "description": "User agreed to send a broken site report when prompted, after they reloaded a website three times in 20 seconds.",
+        "owners": ["laghee"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion", "atb"]
+    }
+}

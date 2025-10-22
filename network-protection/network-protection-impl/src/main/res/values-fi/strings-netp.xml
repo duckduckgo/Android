@@ -192,7 +192,7 @@
     <string name="netpNotificationCTAReconnectNow">Yhdistä nyt uudelleen</string>
     <string name="netpNotificationSnoozeTitle">VPN on lepotilassa</string>
     <string name="netpNotificationSnoozeBody" instruction="Placeholder is time in hh:mm format">VPN yhdistää uudelleen klo %1$s</string>
-    <string name="netpNotificationVpnAccessRevoked">VPN katkaistu vanhentuneen tilauksen takia. Tilaa Privacy Pro, jotta voit yhdistää DuckDuckGo VPN:n uudelleen.</string>
+    <string name="netpNotificationVpnAccessRevoked">VPN katkaistu vanhentuneen tilauksen takia. Tilaa DuckDuckGo, jotta voit yhdistää VPN:n uudelleen.</string>
 
     <!-- Geoswitching -->
     <string name="netpGeoswitchingTitle">VPN-sijainti</string>
@@ -204,7 +204,7 @@
 
     <!-- Access revoked-->
     <string name="netpDialogVpnAccessRevokedTitle">VPN-yhteys katkaistu vanhentuneen tilauksen takia.</string>
-    <string name="netpDialogVpnAccessRevokedBody">Tilaa Privacy Pro, jotta voit yhdistää DuckDuckGo VPN:n uudelleen.</string>
+    <string name="netpDialogVpnAccessRevokedBody">Tilaa DuckDuckGo, jotta voit yhdistää VPN:n uudelleen.</string>
     <string name="netpDialogVpnAccessRevokedPositiveAction">Tilaa</string>
     <string name="netpDialogVpnAccessRevokedNegativeAction">Hylkää</string>
 
@@ -258,7 +258,4 @@
     <string name="netpExclusionListLabelAutoExclude">Ei yhteensopiva VPN-verkkojen kanssa</string>
     <string name="netpExclusionListAutoExcludeDescription">Jotkin sovellukset, kuten pankki- tai suoratoistosovellukset, eivät toimi hyvin VPN-verkkojen kanssa. Kun tämä asetus on käytössä, suljemme kyseiset sovellukset automaattisesti pois.</string>
 
-    <!-- Privacy Pro Rebranding-->
-    <string name="netpNotificationVpnAccessRevokedRebranding">VPN katkaistu vanhentuneen tilauksen takia. Tilaa DuckDuckGo, jotta voit yhdistää VPN:n uudelleen.</string>
-    <string name="netpDialogVpnAccessRevokedBodyRebranding">Tilaa DuckDuckGo, jotta voit yhdistää VPN:n uudelleen.</string>
 </resources>

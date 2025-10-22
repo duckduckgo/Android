@@ -175,6 +175,7 @@ class PirDevScanActivity : DuckDuckGoActivity() {
                 eventsRepository.deleteEventLogs()
                 eventsRepository.deleteAllOptOutData()
                 pirSchedulingRepository.deleteAllJobRecords()
+                eventsRepository.deleteAllEmailConfirmationsLogs()
             }
         }
 
@@ -182,6 +183,8 @@ class PirDevScanActivity : DuckDuckGoActivity() {
             killRunningWork()
             lifecycleScope.launch(dispatcherProvider.io()) {
                 pirSchedulingRepository.deleteAllOptOutJobRecords()
+                eventsRepository.deleteAllOptOutData()
+                eventsRepository.deleteAllEmailConfirmationsLogs()
             }
         }
 
@@ -190,6 +193,7 @@ class PirDevScanActivity : DuckDuckGoActivity() {
         }
 
         binding.scheduleScan.setOnClickListener {
+            pirScanScheduler.cancelScheduledScans(this)
             pirScanScheduler.scheduleScans()
             Toast.makeText(this, getString(R.string.pirMessageSchedule), Toast.LENGTH_SHORT).show()
         }

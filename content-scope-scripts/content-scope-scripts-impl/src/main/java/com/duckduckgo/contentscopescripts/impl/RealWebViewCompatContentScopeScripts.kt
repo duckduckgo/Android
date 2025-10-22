@@ -45,6 +45,8 @@ interface WebViewCompatContentScopeScripts {
 
     suspend fun isEnabled(): Boolean
 
+    suspend fun isWebMessagingEnabled(): Boolean
+
     val secret: String
     val javascriptInterface: String
     val callbackName: String
@@ -119,6 +121,12 @@ class RealWebViewCompatContentScopeScripts @Inject constructor(
     override suspend fun isEnabled(): Boolean {
         return withContext(dispatcherProvider.io()) {
             contentScopeScriptsFeature.self().isEnabled() && contentScopeScriptsFeature.useNewWebCompatApis().isEnabled()
+        }
+    }
+
+    override suspend fun isWebMessagingEnabled(): Boolean {
+        return withContext(dispatcherProvider.io()) {
+            isEnabled() && contentScopeScriptsFeature.useWebMessageListener().isEnabled()
         }
     }
 

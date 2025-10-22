@@ -16,6 +16,9 @@
 
 package com.duckduckgo.browser.api.autocomplete
 
+import android.content.Intent
+import android.content.pm.PackageManager
+import android.graphics.drawable.Drawable
 import kotlinx.coroutines.flow.Flow
 
 interface AutoComplete {
@@ -26,6 +29,10 @@ interface AutoComplete {
         suggestions: List<AutoCompleteSuggestion>,
         suggestion: AutoCompleteSuggestion,
         experimentalInputScreen: Boolean = false,
+    )
+
+    data class Config(
+        val showInstalledApps: Boolean = false,
     )
 
     data class AutoCompleteResult(
@@ -84,5 +91,19 @@ interface AutoComplete {
         data class AutoCompleteDuckAIPrompt(
             override val phrase: String,
         ) : AutoCompleteSuggestion(phrase)
+
+        data class AutoCompleteDeviceAppSuggestion(
+            override val phrase: String,
+            val shortName: String,
+            val packageName: String,
+            val launchIntent: Intent,
+            private var icon: Drawable? = null,
+        ) : AutoCompleteSuggestion(phrase) {
+            fun retrieveIcon(packageManager: PackageManager): Drawable {
+                return icon ?: packageManager.getApplicationIcon(packageName).also {
+                    icon = it
+                }
+            }
+        }
     }
 }

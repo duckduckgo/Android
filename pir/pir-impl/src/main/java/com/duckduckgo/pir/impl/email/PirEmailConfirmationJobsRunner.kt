@@ -17,15 +17,23 @@
 package com.duckduckgo.pir.impl.email
 
 import android.content.Context
+import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.pir.impl.common.PirJob.RunType.EMAIL_CONFIRMATION
+import com.duckduckgo.pir.impl.models.Broker
 import com.duckduckgo.pir.impl.models.scheduling.JobRecord.EmailConfirmationJobRecord
 import com.duckduckgo.pir.impl.models.scheduling.JobRecord.EmailConfirmationJobRecord.EmailData
+import com.duckduckgo.pir.impl.pixels.PirPixelSender
 import com.duckduckgo.pir.impl.scheduling.JobRecordUpdater
+import com.duckduckgo.pir.impl.store.PirEventsRepository
 import com.duckduckgo.pir.impl.store.PirRepository
 import com.duckduckgo.pir.impl.store.PirRepository.EmailConfirmationLinkFetchStatus
 import com.duckduckgo.pir.impl.store.PirSchedulingRepository
+import com.duckduckgo.pir.impl.store.db.EmailConfirmationEventType
+import com.duckduckgo.pir.impl.store.db.EventType.EMAIL_CONFIRMATION_COMPLETED
+import com.duckduckgo.pir.impl.store.db.EventType.EMAIL_CONFIRMATION_STARTED
+import com.duckduckgo.pir.impl.store.db.PirEventLog
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
 import kotlinx.coroutines.withContext
@@ -49,12 +57,41 @@ class RealPirEmailConfirmationJobsRunner @Inject constructor(
     private val pirRepository: PirRepository,
     private val jobRecordUpdater: JobRecordUpdater,
     private val emailConfirmation: PirEmailConfirmation,
+    private val pirPixelSender: PirPixelSender,
+    private val currentTimeProvider: CurrentTimeProvider,
+    private val pirEventsRepository: PirEventsRepository,
 ) : PirEmailConfirmationJobsRunner {
+    private var startedTimeMs: Long = 0L
+    private var totalFetchAttempts: Int = 0
+    private var totalEmailConfirmationJobs: Int = 0
+
     override suspend fun runEligibleJobs(context: Context): Result<Unit> {
-        val activeBrokers = pirRepository.getAllActiveBrokers()
-        runEmailConfirmationFetch(activeBrokers)
-        runEmailConfirmationJobs(context, activeBrokers)
+        totalFetchAttempts = 0
+        totalEmailConfirmationJobs = 0
+
+        startedTimeMs = currentTimeProvider.currentTimeMillis()
+        pirPixelSender.reportEmailConfirmationStarted()
+        pirEventsRepository.saveEventLog(
+            PirEventLog(
+                eventTimeInMillis = startedTimeMs,
+                eventType = EMAIL_CONFIRMATION_STARTED,
+            ),
+        )
+
+        logcat { "PIR-EMAIL-CONFIRMATION: Starting run." }
+        val activeBrokersMap = pirRepository.getAllActiveBrokerObjects().associateBy { it.name }
+
+        if (activeBrokersMap.isEmpty()) {
+            logcat { "PIR-EMAIL-CONFIRMATION: NO active brokers." }
+            handleJobCompleted()
+            return Result.success(Unit)
+        }
+
+        runEmailConfirmationFetch(activeBrokersMap)
+        runEmailConfirmationJobs(context, activeBrokersMap)
         logcat { "PIR-EMAIL-CONFIRMATION: Completed run." }
+
+        handleJobCompleted()
         return Result.success(Unit)
     }
 
@@ -63,17 +100,18 @@ class RealPirEmailConfirmationJobsRunner @Inject constructor(
         emailConfirmation.stop()
     }
 
-    private suspend fun runEmailConfirmationFetch(activeBrokers: List<String>) =
+    private suspend fun runEmailConfirmationFetch(activeBrokersMap: Map<String, Broker>) =
         withContext(dispatcherProvider.io()) {
             logcat { "PIR-EMAIL-CONFIRMATION: Attempting to run email confirmation link fetch" }
             val eligibleJobRecordsMap =
                 pirSchedulingRepository
                     .getEmailConfirmationJobsWithNoLink()
                     .filter {
-                        it.brokerName in activeBrokers
+                        it.brokerName in activeBrokersMap.keys
                     }.associateBy { it.emailData.email }
             if (eligibleJobRecordsMap.isEmpty()) {
                 logcat { "PIR-EMAIL-CONFIRMATION: No fetch to run" }
+                handleJobCompleted()
                 return@withContext
             }
 
@@ -83,6 +121,16 @@ class RealPirEmailConfirmationJobsRunner @Inject constructor(
             eligibleJobRecordsMap.forEach {
                 jobRecordUpdater.recordEmailConfirmationFetchAttempt(it.value.extractedProfileId)
             }
+
+            totalFetchAttempts = eligibleJobRecordsMap.size
+            pirEventsRepository.saveEmailConfirmationLog(
+                eventTimeInMillis = currentTimeProvider.currentTimeMillis(),
+                type = EmailConfirmationEventType.LINK_FETCH_ATTEMPT,
+                detail = totalFetchAttempts.toString(),
+            )
+
+            var ready = 0
+            var error = 0
 
             pirRepository.getEmailConfirmationLinkStatus(eligibleJobRecordsMap.values.map { it.emailData }).forEach {
                 val record = eligibleJobRecordsMap[it.key.email]
@@ -95,20 +143,21 @@ class RealPirEmailConfirmationJobsRunner @Inject constructor(
                 when (val status = it.value) {
                     is EmailConfirmationLinkFetchStatus.Ready -> {
                         status.data[KEY_LINK]?.let { link ->
-                            jobRecordUpdater.markEmailConfirmationWithLink(record.extractedProfileId, link)
+                            handleLinkReady(record.extractedProfileId, status.emailReceivedAtMs, link, activeBrokersMap[record.brokerName]!!)
                             emailDataForDeletion.add(it.key)
+                            ready++
                         }
                     }
 
                     is EmailConfirmationLinkFetchStatus.Error -> {
-                        pirSchedulingRepository.deleteEmailConfirmationJobRecord(record.extractedProfileId)
-                        jobRecordUpdater.updateOptOutError(record.extractedProfileId)
+                        handleLinkFetchFailed(record.extractedProfileId, status, activeBrokersMap[record.brokerName]!!)
                         emailDataForDeletion.add(it.key)
+                        error++
                     }
 
                     is EmailConfirmationLinkFetchStatus.Unknown -> {
-                        pirSchedulingRepository.deleteEmailConfirmationJobRecord(record.extractedProfileId)
-                        jobRecordUpdater.updateOptOutError(record.extractedProfileId)
+                        handleLinkFetchFailed(record.extractedProfileId, status, activeBrokersMap[record.brokerName]!!)
+                        error++
                     }
 
                     is EmailConfirmationLinkFetchStatus.Pending -> {
@@ -116,8 +165,64 @@ class RealPirEmailConfirmationJobsRunner @Inject constructor(
                     }
                 }
             }
+            pirEventsRepository.saveEmailConfirmationLog(
+                eventTimeInMillis = currentTimeProvider.currentTimeMillis(),
+                type = EmailConfirmationEventType.LINK_FETCH_READY,
+                detail = ready.toString(),
+            )
+            pirEventsRepository.saveEmailConfirmationLog(
+                eventTimeInMillis = currentTimeProvider.currentTimeMillis(),
+                type = EmailConfirmationEventType.LINK_FETCH_ERROR,
+                detail = error.toString(),
+            )
             attemptDeleteEmailData(emailDataForDeletion)
         }
+
+    private suspend fun handleLinkReady(
+        extractedProfileId: Long,
+        emailReceivedAtMs: Long,
+        link: String,
+        broker: Broker,
+    ) {
+        jobRecordUpdater.markEmailConfirmationWithLink(extractedProfileId, link)
+        pirPixelSender.reportEmailConfirmationLinkFetched(
+            brokerUrl = broker.url,
+            brokerVersion = broker.version,
+            linkAgeMs = currentTimeProvider.currentTimeMillis() - emailReceivedAtMs,
+        )
+    }
+
+    private suspend fun handleLinkFetchFailed(
+        extractedProfileId: Long,
+        status: EmailConfirmationLinkFetchStatus,
+        broker: Broker,
+    ) {
+        jobRecordUpdater.markEmailConfirmationLinkFetchFailed(extractedProfileId)
+
+        when (status) {
+            is EmailConfirmationLinkFetchStatus.Error -> {
+                pirPixelSender.reportEmailConfirmationLinkFetchBEError(
+                    brokerUrl = broker.url,
+                    brokerVersion = broker.version,
+                    status = status.statusString,
+                    errorCode = status.errorCode,
+                )
+            }
+
+            is EmailConfirmationLinkFetchStatus.Unknown -> {
+                pirPixelSender.reportEmailConfirmationLinkFetchBEError(
+                    brokerUrl = broker.url,
+                    brokerVersion = broker.version,
+                    status = status.statusString,
+                    errorCode = status.errorCode,
+                )
+            }
+
+            else -> {
+                // no-op
+            }
+        }
+    }
 
     private suspend fun attemptDeleteEmailData(emailData: List<EmailData>) {
         logcat { "PIR-EMAIL-CONFIRMATION: Attempting to delete ${emailData.size} email data" }
@@ -129,23 +234,26 @@ class RealPirEmailConfirmationJobsRunner @Inject constructor(
 
     private suspend fun runEmailConfirmationJobs(
         context: Context,
-        activeBrokers: List<String>,
+        activeBrokersMap: Map<String, Broker>,
     ) {
         logcat { "PIR-EMAIL-CONFIRMATION: Attempting to run email confirmation jobs" }
         val jobsWithLink =
             pirSchedulingRepository.getEmailConfirmationJobsWithLink().filter {
-                it.brokerName in activeBrokers
+                it.brokerName in activeBrokersMap.keys
             }
 
         if (jobsWithLink.isNotEmpty()) {
-            handleRecordsWithMaxAttempt(jobsWithLink)
+            handleRecordsWithMaxAttempt(activeBrokersMap, jobsWithLink)
             handleEligibleJobRecords(context, jobsWithLink)
         } else {
             logcat { "PIR-EMAIL-CONFIRMATION: No jobs to run." }
         }
     }
 
-    private suspend fun handleRecordsWithMaxAttempt(jobsWithLink: List<EmailConfirmationJobRecord>) {
+    private suspend fun handleRecordsWithMaxAttempt(
+        activeBrokersMap: Map<String, Broker>,
+        jobsWithLink: List<EmailConfirmationJobRecord>,
+    ) {
         logcat { "PIR-EMAIL-CONFIRMATION: Attempting to cleanup records that maxed attempts" }
         val toDelete =
             jobsWithLink.filter {
@@ -155,9 +263,21 @@ class RealPirEmailConfirmationJobsRunner @Inject constructor(
         if (toDelete.isNotEmpty()) {
             logcat { "PIR-EMAIL-CONFIRMATION: Cleaning up ${toDelete.size} records that maxed attempts" }
             toDelete.forEach {
-                pirSchedulingRepository.deleteEmailConfirmationJobRecord(it.extractedProfileId)
-                jobRecordUpdater.updateOptOutError(it.extractedProfileId)
+                val broker = activeBrokersMap[it.brokerName]!!
+                pirPixelSender.reportEmailConfirmationAttemptRetriesExceeded(
+                    brokerUrl = broker.url,
+                    brokerVersion = broker.version,
+                    actionId = it.jobAttemptData.lastJobAttemptActionId,
+                    attemptId = it.emailData.attemptId,
+                )
+
+                jobRecordUpdater.recordEmailConfirmationAttemptMaxed(it.extractedProfileId)
             }
+            pirEventsRepository.saveEmailConfirmationLog(
+                eventTimeInMillis = currentTimeProvider.currentTimeMillis(),
+                type = EmailConfirmationEventType.EMAIL_CONFIRMATION_MAXED_OUT,
+                detail = toDelete.size.toString(),
+            )
         } else {
             logcat { "PIR-EMAIL-CONFIRMATION: Nothing to clean" }
         }
@@ -173,8 +293,16 @@ class RealPirEmailConfirmationJobsRunner @Inject constructor(
                 it.jobAttemptData.jobAttemptCount < EMAIL_CONFIRMATION_JOB_MAX_ATTEMPTS
             }
 
+        totalEmailConfirmationJobs = eligibleJobs.size
+
         if (eligibleJobs.isNotEmpty()) {
             logcat { "PIR-EMAIL-CONFIRMATION: Running ${eligibleJobs.size} email confirmation jobs" }
+            pirEventsRepository.saveEmailConfirmationLog(
+                eventTimeInMillis = currentTimeProvider.currentTimeMillis(),
+                type = EmailConfirmationEventType.EMAIL_CONFIRMATION_ATTEMPT,
+                detail = eligibleJobs.size.toString(),
+            )
+
             emailConfirmation.executeForEmailConfirmationJobs(
                 eligibleJobs,
                 context,
@@ -183,6 +311,20 @@ class RealPirEmailConfirmationJobsRunner @Inject constructor(
         } else {
             logcat { "PIR-EMAIL-CONFIRMATION: No email confirmation jobs to run." }
         }
+    }
+
+    private suspend fun handleJobCompleted() {
+        pirPixelSender.reportEmailConfirmationCompleted(
+            totalTimeInMillis = currentTimeProvider.currentTimeMillis() - startedTimeMs,
+            totalFetchAttempts = totalFetchAttempts,
+            totalEmailConfirmationJobs = totalEmailConfirmationJobs,
+        )
+        pirEventsRepository.saveEventLog(
+            PirEventLog(
+                eventTimeInMillis = currentTimeProvider.currentTimeMillis(),
+                eventType = EMAIL_CONFIRMATION_COMPLETED,
+            ),
+        )
     }
 
     companion object {

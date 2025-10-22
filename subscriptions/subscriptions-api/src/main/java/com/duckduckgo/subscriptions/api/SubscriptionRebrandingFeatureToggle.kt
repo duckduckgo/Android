@@ -21,11 +21,9 @@ interface SubscriptionRebrandingFeatureToggle {
      * This method is safe to call from the main thread.
      * @return true if the subscription rebranding feature is enabled, false otherwise
      */
+    @Deprecated(
+        message = "This method is kept temporarily for legacy use in one location. " +
+            "It will be removed by November 2025 as the rebranding feature has been retired.",
+    )
     fun isSubscriptionRebrandingEnabled(): Boolean
-
-    /**
-     * This method is safe to call from the main thread.
-     * @return true if the AI Features rebranding feature is enabled, false otherwise
-     */
-    fun isAIFeaturesRebrandingEnabled(): Boolean
 }

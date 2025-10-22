@@ -18,10 +18,13 @@ package com.duckduckgo.pir.impl.common.actions
 
 import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.pir.impl.common.BrokerStepsParser.BrokerStep.EmailConfirmationStep
 import com.duckduckgo.pir.impl.common.BrokerStepsParser.BrokerStep.OptOutStep
 import com.duckduckgo.pir.impl.common.PirJob.RunType
+import com.duckduckgo.pir.impl.common.PirJob.RunType.EMAIL_CONFIRMATION
 import com.duckduckgo.pir.impl.common.PirRunStateHandler
 import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerManualScanCompleted
+import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerRecordEmailConfirmationCompleted
 import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerRecordOptOutCompleted
 import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerScheduledScanCompleted
 import com.duckduckgo.pir.impl.common.actions.EventHandler.Next
@@ -56,6 +59,7 @@ class BrokerStepCompletedEventHandler @Inject constructor(
                     brokerName = currentBrokerStep.brokerName,
                     extractedProfile = (currentBrokerStep as OptOutStep).profileToOptOut,
                     attemptId = state.attemptId ?: "no-attempt-id",
+                    lastActionId = currentBrokerStep.actions[state.currentBrokerStepIndex].id,
                 ),
             )
         } else {
@@ -121,6 +125,25 @@ class BrokerStepCompletedEventHandler @Inject constructor(
                     ),
                 )
             }
+
+            EMAIL_CONFIRMATION -> {
+                val currentOptOutStep = currentBrokerStep as EmailConfirmationStep
+                pirRunStateHandler.handleState(
+                    BrokerRecordEmailConfirmationCompleted(
+                        brokerName = currentOptOutStep.brokerName,
+                        isSuccess = isSuccess,
+                        // Success means we finished all steps and reaching here means that index has been incremented. If error, we don't increment.
+                        lastActionId = if (isSuccess) {
+                            currentOptOutStep.actions[state.currentActionIndex - 1]
+                        } else {
+                            currentOptOutStep.actions[state.currentActionIndex]
+                        }.id,
+                        totalTimeMillis = totalTimeMillis,
+                        extractedProfileId = currentBrokerStep.emailConfirmationJob.extractedProfileId,
+                    ),
+                )
+            }
+
             else -> {
                 // No op
             }

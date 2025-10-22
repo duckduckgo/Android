@@ -31,10 +31,6 @@ import com.duckduckgo.pir.impl.service.DbpService.PirEmailConfirmationDataReques
 import com.duckduckgo.pir.impl.service.DbpService.PirJsonBroker
 import com.duckduckgo.pir.impl.store.PirRepository.BrokerJson
 import com.duckduckgo.pir.impl.store.PirRepository.EmailConfirmationLinkFetchStatus
-import com.duckduckgo.pir.impl.store.PirRepository.EmailConfirmationLinkFetchStatus.Error
-import com.duckduckgo.pir.impl.store.PirRepository.EmailConfirmationLinkFetchStatus.Pending
-import com.duckduckgo.pir.impl.store.PirRepository.EmailConfirmationLinkFetchStatus.Ready
-import com.duckduckgo.pir.impl.store.PirRepository.EmailConfirmationLinkFetchStatus.Unknown
 import com.duckduckgo.pir.impl.store.db.BrokerDao
 import com.duckduckgo.pir.impl.store.db.BrokerEntity
 import com.duckduckgo.pir.impl.store.db.BrokerJsonDao
@@ -71,6 +67,8 @@ interface PirRepository {
     suspend fun getAllActiveBrokers(): List<String>
 
     suspend fun getAllActiveBrokerObjects(): List<Broker>
+
+    suspend fun getBrokerForName(name: String): Broker?
 
     suspend fun getAllMirrorSitesForBroker(brokerName: String): List<MirrorSite>
 
@@ -122,11 +120,26 @@ interface PirRepository {
         profileQueryId: Long,
     ): List<ExtractedProfile>
 
+    suspend fun getExtractedProfile(
+        extractedProfileId: Long,
+    ): ExtractedProfile?
+
     fun getAllExtractedProfilesFlow(): Flow<List<ExtractedProfile>>
 
     suspend fun getAllExtractedProfiles(): List<ExtractedProfile>
 
-    suspend fun getUserProfileQueries(): List<ProfileQuery>
+    suspend fun getUserProfileQuery(id: Long): ProfileQuery?
+
+    /**
+     * Returns all user profile queries stored in the database, including deprecated ones.
+     * In some cases we still want to run jobs on them.
+     */
+    suspend fun getAllUserProfileQueries(): List<ProfileQuery>
+
+    /**
+     * Returns all user profile queries that are not marked as deprecated.
+     */
+    suspend fun getValidUserProfileQueries(): List<ProfileQuery>
 
     suspend fun getUserProfileQueriesWithIds(ids: List<Long>): List<ProfileQuery>
 
@@ -134,7 +147,11 @@ interface PirRepository {
 
     suspend fun replaceUserProfile(profileQuery: ProfileQuery)
 
-    suspend fun saveProfileQueries(profileQueries: List<ProfileQuery>): Boolean
+    suspend fun updateProfileQueries(
+        profileQueriesToAdd: List<ProfileQuery>,
+        profileQueriesToUpdate: List<ProfileQuery>,
+        profileQueryIdsToDelete: List<Long>,
+    ): Boolean
 
     suspend fun getEmailForBroker(dataBroker: String): String
 
@@ -147,23 +164,52 @@ interface PirRepository {
         val etag: String,
     )
 
-    sealed class EmailConfirmationLinkFetchStatus {
+    sealed class EmailConfirmationLinkFetchStatus(val statusString: String) {
+
         data class Ready(
             /**
              * This represents the data we receive from the backend where the key could be "link" or "verification_code"
              * And the value is the actual link or code.
              */
             val data: Map<String, String>,
-        ) : EmailConfirmationLinkFetchStatus()
+            val emailReceivedAtMs: Long,
+        ) : EmailConfirmationLinkFetchStatus(STATUS_READY)
 
-        data object Pending : EmailConfirmationLinkFetchStatus()
+        data object Pending : EmailConfirmationLinkFetchStatus(STATUS_PENDING)
 
-        data object Unknown : EmailConfirmationLinkFetchStatus()
+        data class Unknown(
+            val errorCode: String = "unknown_error",
+        ) : EmailConfirmationLinkFetchStatus(STATUS_UNKNOWN)
 
         data class Error(
             val errorCode: String,
             val error: String,
-        ) : EmailConfirmationLinkFetchStatus()
+        ) : EmailConfirmationLinkFetchStatus(STATUS_ERROR)
+
+        companion object {
+            const val STATUS_READY = "ready"
+            const val STATUS_PENDING = "pending"
+            const val STATUS_UNKNOWN = "unknown"
+            const val STATUS_ERROR = "error"
+
+            fun fromString(
+                status: String,
+                emailReceivedAtMs: Long = 0L,
+                data: Map<String, String>? = null,
+                errorCode: String? = null,
+                error: String? = null,
+            ): EmailConfirmationLinkFetchStatus = when (status.lowercase()) {
+                STATUS_READY -> Ready(
+                    data = data ?: emptyMap(),
+                    emailReceivedAtMs = emailReceivedAtMs,
+                )
+
+                STATUS_PENDING -> Pending
+                STATUS_UNKNOWN -> if (errorCode != null) Unknown(errorCode) else Unknown()
+                STATUS_ERROR -> Error(errorCode ?: "unknown_error", error ?: "Unknown error")
+                else -> Unknown()
+            }
+        }
     }
 }
 
@@ -224,6 +270,21 @@ internal class RealPirRepository(
     override suspend fun getAllActiveBrokerObjects(): List<Broker> =
         withContext(dispatcherProvider.io()) {
             return@withContext brokerDao.getAllActiveBrokers().map {
+                Broker(
+                    name = it.name,
+                    fileName = it.fileName,
+                    url = it.url,
+                    version = it.version,
+                    parent = it.parent,
+                    addedDatetime = it.addedDatetime,
+                    removedAt = it.removedAt,
+                )
+            }
+        }
+
+    override suspend fun getBrokerForName(name: String): Broker? =
+        withContext(dispatcherProvider.io()) {
+            return@withContext brokerDao.getBrokerDetails(name)?.let {
                 Broker(
                     name = it.name,
                     fileName = it.fileName,
@@ -384,6 +445,18 @@ internal class RealPirRepository(
 
     override suspend fun saveNewExtractedProfiles(extractedProfiles: List<ExtractedProfile>) {
         withContext(dispatcherProvider.io()) {
+            if (extractedProfiles.isEmpty()) {
+                return@withContext
+            }
+
+            val profileQueryId = extractedProfiles.first().profileQueryId
+            val profileQuery = userProfileDao.getUserProfile(profileQueryId)
+            if (profileQuery?.deprecated == true) {
+                // we should not store any new extracted profiles for a deprecated user profile
+                // also don't mark them as deprecated as we still want to show them on the UI
+                return@withContext
+            }
+
             extractedProfiles
                 .map {
                     it.toStoredExtractedProfile()
@@ -407,6 +480,13 @@ internal class RealPirRepository(
                 }
         }
 
+    override suspend fun getExtractedProfile(
+        extractedProfileId: Long,
+    ): ExtractedProfile? =
+        withContext(dispatcherProvider.io()) {
+            return@withContext extractedProfileDao.getExtractedProfile(extractedProfileId)?.toExtractedProfile()
+        }
+
     override fun getAllExtractedProfilesFlow(): Flow<List<ExtractedProfile>> =
         extractedProfileDao.getAllExtractedProfileFlow().map { list ->
             list.map {
@@ -421,9 +501,21 @@ internal class RealPirRepository(
             }
         }
 
-    override suspend fun getUserProfileQueries(): List<ProfileQuery> =
+    override suspend fun getUserProfileQuery(id: Long): ProfileQuery? =
         withContext(dispatcherProvider.io()) {
-            userProfileDao.getUserProfiles().map {
+            userProfileDao.getUserProfile(id)?.toProfileQuery()
+        }
+
+    override suspend fun getAllUserProfileQueries(): List<ProfileQuery> =
+        withContext(dispatcherProvider.io()) {
+            userProfileDao.getAllUserProfiles().map {
+                it.toProfileQuery()
+            }
+        }
+
+    override suspend fun getValidUserProfileQueries(): List<ProfileQuery> =
+        withContext(dispatcherProvider.io()) {
+            userProfileDao.getValidUserProfiles().map {
                 it.toProfileQuery()
             }
         }
@@ -462,7 +554,7 @@ internal class RealPirRepository(
                 "${this.userName.firstName} $middleName ${this.userName.lastName}"
             } ?: "${this.userName.firstName} ${this.userName.lastName}",
             age = currentTimeProvider.localDateTimeNow().year - this.birthYear,
-            deprecated = false,
+            deprecated = this.deprecated,
         )
 
     override suspend fun replaceUserProfile(profileQuery: ProfileQuery) {
@@ -472,15 +564,22 @@ internal class RealPirRepository(
         }
     }
 
-    override suspend fun saveProfileQueries(profileQueries: List<ProfileQuery>): Boolean =
-        withContext(dispatcherProvider.io()) {
-            val userProfiles =
-                profileQueries.map { query ->
-                    query.toUserProfile()
-                }
-            val insertResult = userProfileDao.insertUserProfiles(userProfiles)
-            insertResult.size == userProfiles.size
+    override suspend fun updateProfileQueries(
+        profileQueriesToAdd: List<ProfileQuery>,
+        profileQueriesToUpdate: List<ProfileQuery>,
+        profileQueryIdsToDelete: List<Long>,
+    ): Boolean = withContext(dispatcherProvider.io()) {
+        try {
+            userProfileDao.updateUserProfiles(
+                profilesToAdd = profileQueriesToAdd.map { query -> query.toUserProfile() },
+                profilesToUpdate = profileQueriesToUpdate.map { query -> query.toUserProfile() },
+                profileIdsToDelete = profileQueryIdsToDelete,
+            )
+            true
+        } catch (_: Exception) {
+            false
         }
+    }
 
     override suspend fun getEmailForBroker(dataBroker: String): String =
         withContext(dispatcherProvider.io()) {
@@ -501,25 +600,15 @@ internal class RealPirRepository(
                                 email = response.email,
                                 attemptId = response.attemptId,
                             )
-                        val value =
-                            when (response.status) {
-                                "ready" ->
-                                    Ready(
-                                        data =
-                                        response.data.associate {
-                                            it.name to it.value
-                                        },
-                                    )
-
-                                "error" ->
-                                    Error(
-                                        errorCode = response.errorCode.orEmpty(),
-                                        error = response.error.orEmpty(),
-                                    )
-
-                                "pending" -> Pending
-                                else -> Unknown
-                            }
+                        val value = EmailConfirmationLinkFetchStatus.fromString(
+                            status = response.status,
+                            emailReceivedAtMs = TimeUnit.SECONDS.toMillis(response.emailReceivedAt),
+                            data = response.data.associate {
+                                it.name to it.value
+                            },
+                            errorCode = response.errorCode,
+                            error = response.error,
+                        )
                         key to value
                     }
                 }
@@ -602,6 +691,7 @@ internal class RealPirRepository(
 
     private fun ProfileQuery.toUserProfile(): UserProfile =
         UserProfile(
+            id = this.id,
             userName =
             UserName(
                 firstName = this.firstName,
@@ -614,6 +704,7 @@ internal class RealPirRepository(
                 state = this.state,
             ),
             birthYear = this.birthYear,
+            deprecated = this.deprecated,
         )
 
     companion object {

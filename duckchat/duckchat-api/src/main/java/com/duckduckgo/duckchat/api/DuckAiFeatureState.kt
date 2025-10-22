@@ -19,7 +19,6 @@ package com.duckduckgo.duckchat.api
 import kotlinx.coroutines.flow.StateFlow
 
 interface DuckAiFeatureState {
-
     /**
      * Indicates whether the Duck AI settings should be available from the main settings screen.
      */
@@ -59,4 +58,9 @@ interface DuckAiFeatureState {
      * Indicates whether the Setting for allowing Duck.ai chats to be deleted with the Fire Button is enabled
      */
     val showClearDuckAIChatHistory: StateFlow<Boolean>
+
+    /**
+     * Indicates whether the Input Screen should be shown when user open the app from system widgets
+     */
+    val showInputScreenOnSystemSearchLaunch: StateFlow<Boolean>
 }

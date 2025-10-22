@@ -193,7 +193,7 @@
     <string name="netpNotificationCTAReconnectNow">Atkārtoti izveidot savienojumu tūlīt</string>
     <string name="netpNotificationSnoozeTitle">VPN ir atslēgts</string>
     <string name="netpNotificationSnoozeBody" instruction="Placeholder is time in hh:mm format">VPN atkārtoti pieslēgsies plkst. %1$s</string>
-    <string name="netpNotificationVpnAccessRevoked">VPN atvienots, jo ir beidzies abonements. Abonē Privacy Pro, lai atkārtoti izveidotu savienojumu ar DuckDuckGo VPN.</string>
+    <string name="netpNotificationVpnAccessRevoked">VPN atvienots, jo ir beidzies abonements. Abonē DuckDuckGo, lai atkārtoti izveidotu savienojumu ar VPN.</string>
 
     <!-- Geoswitching -->
     <string name="netpGeoswitchingTitle">VPN atrašanās vieta</string>
@@ -205,7 +205,7 @@
 
     <!-- Access revoked-->
     <string name="netpDialogVpnAccessRevokedTitle">VPN atvienots, jo ir beidzies abonements</string>
-    <string name="netpDialogVpnAccessRevokedBody">Abonē Privacy Pro, lai atkārtoti izveidotu savienojumu ar DuckDuckGo VPN.</string>
+    <string name="netpDialogVpnAccessRevokedBody">Abonē DuckDuckGo, lai atkārtoti izveidotu savienojumu ar VPN.</string>
     <string name="netpDialogVpnAccessRevokedPositiveAction">Abonēt</string>
     <string name="netpDialogVpnAccessRevokedNegativeAction">Nerādīt</string>
 
@@ -261,7 +261,4 @@
     <string name="netpExclusionListLabelAutoExclude">Nesaderīgs ar VPN</string>
     <string name="netpExclusionListAutoExcludeDescription">Dažas lietotnes, piemēram, banku vai straumēšanas lietotnes, nedarbojas labi ar VPN. Kad šis iestatījums ir ieslēgts, mēs automātiski izslēgsim šādas lietotnes.</string>
 
-    <!-- Privacy Pro Rebranding-->
-    <string name="netpNotificationVpnAccessRevokedRebranding">VPN atvienots, jo ir beidzies abonements. Abonē DuckDuckGo, lai atkārtoti izveidotu savienojumu ar VPN.</string>
-    <string name="netpDialogVpnAccessRevokedBodyRebranding">Abonē DuckDuckGo, lai atkārtoti izveidotu savienojumu ar VPN.</string>
 </resources>

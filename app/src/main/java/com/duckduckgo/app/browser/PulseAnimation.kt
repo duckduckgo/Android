@@ -88,16 +88,6 @@ class PulseAnimation(
             pulse.repeatCount = ObjectAnimator.INFINITE
             pulse.duration = 1100L
 
-            // TODO renable when sense of protection animated shield is implemented
-/*            if (false) {
-                pulse.startDelay = 1000L
-                view.alpha = 0.0f
-                conflatedJob += CoroutineScope(Dispatchers.Main).launch {
-                    delay(1000L)
-                    view.alpha = 1.0f
-                }
-            }*/
-
             pulseAnimation = AnimatorSet().apply {
                 play(pulse)
                 start()

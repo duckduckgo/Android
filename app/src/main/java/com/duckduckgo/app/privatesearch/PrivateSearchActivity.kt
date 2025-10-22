@@ -33,6 +33,8 @@ import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter
+import com.duckduckgo.settings.api.SettingsPageFeature
+import com.duckduckgo.settings.api.SettingsWebViewScreenWithParams
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import javax.inject.Inject
@@ -40,20 +42,24 @@ import javax.inject.Inject
 @InjectWith(ActivityScope::class)
 @ContributeToActivityStarter(PrivateSearchScreenNoParams::class)
 class PrivateSearchActivity : DuckDuckGoActivity() {
-
     @Inject
     lateinit var globalActivityStarter: GlobalActivityStarter
+
+    @Inject
+    lateinit var settingsPageFeature: SettingsPageFeature
 
     private val viewModel: PrivateSearchViewModel by bindViewModel()
     private val binding: ActivityPrivateSearchBinding by viewBinding()
 
-    private val autocompleteToggleListener = CompoundButton.OnCheckedChangeListener { _, isChecked ->
-        viewModel.onAutocompleteSettingChanged(isChecked)
-    }
+    private val autocompleteToggleListener =
+        CompoundButton.OnCheckedChangeListener { _, isChecked ->
+            viewModel.onAutocompleteSettingChanged(isChecked)
+        }
 
-    private val autocompleteRecentlyVisitedSitesToggleListener = CompoundButton.OnCheckedChangeListener { _, isChecked ->
-        viewModel.onAutocompleteRecentlyVisitedSitesSettingChanged(isChecked)
-    }
+    private val autocompleteRecentlyVisitedSitesToggleListener =
+        CompoundButton.OnCheckedChangeListener { _, isChecked ->
+            viewModel.onAutocompleteRecentlyVisitedSitesSettingChanged(isChecked)
+        }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -93,7 +99,8 @@ class PrivateSearchActivity : DuckDuckGoActivity() {
                 }
             }.launchIn(lifecycleScope)
 
-        viewModel.commands()
+        viewModel
+            .commands()
             .flowWithLifecycle(lifecycle, Lifecycle.State.CREATED)
             .onEach { processCommand(it) }
             .launchIn(lifecycleScope)
@@ -106,16 +113,27 @@ class PrivateSearchActivity : DuckDuckGoActivity() {
     }
 
     private fun launchCustomizeSearchWebPage() {
-        globalActivityStarter.start(
-            this,
-            WebViewActivityWithParams(
-                url = DUCKDUCKGO_SETTINGS_WEB_LINK,
-                getString(R.string.privateSearchMoreSearchSettingsTitle),
-            ),
-        )
+        if (settingsPageFeature.embeddedSettingsWebView().isEnabled()) {
+            globalActivityStarter.start(
+                this,
+                SettingsWebViewScreenWithParams(
+                    url = DUCKDUCKGO_SETTINGS_WEB_LINK_EMBEDDED,
+                    getString(R.string.privateSearchMoreSearchSettingsTitle),
+                ),
+            )
+        } else {
+            globalActivityStarter.start(
+                this,
+                WebViewActivityWithParams(
+                    url = DUCKDUCKGO_SETTINGS_WEB_LINK,
+                    getString(R.string.privateSearchMoreSearchSettingsTitle),
+                ),
+            )
+        }
     }
 
     companion object {
         private const val DUCKDUCKGO_SETTINGS_WEB_LINK = "https://duckduckgo.com/settings"
+        private const val DUCKDUCKGO_SETTINGS_WEB_LINK_EMBEDDED = "https://duckduckgo.com/settings?ko=-1&embedded=1#general"
     }
 }

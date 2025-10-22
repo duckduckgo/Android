@@ -20,6 +20,7 @@
     <string name="cancel">Отмени</string>
     <string name="ok">ОК</string>
     <string name="privacyPro" translatable="false">Privacy Pro</string>
+    <string name="ddg_subscription">Абонамент за DuckDuckGo</string>
     <string name="manageEmail">Управление на имейл</string>
 
     <!--Restore Subscriptions Activity-->
@@ -31,19 +32,19 @@
     <string name="subscriptionNotFound">Не е намерен абонамент</string>
     <string name="subscriptionNotFoundDescription">Абонаментът, свързан с този акаунт в Google Play, вече не е активен.</string>
     <string name="purchaseRestored">Вашите покупки са възстановени.</string>
-    <string name="restoreSubscriptionTitle">Добавяне на абонамент за Privacy Pro към това устройство</string>
+    <string name="restoreSubscriptionTitle">Добавете абонамента си към това устройство</string>
     <string name="restoreSubscriptionGooglePlayTitle">Добавяне чрез акаунт в Google Play</string>
     <string name="restoreSubscriptionGooglePlayDescription">Възстановете абонамента си за устройства с Android, като използвате профила си в Google Play.</string>
     <string name="restoreSubscriptionGooglePlayGetStarted">Възстановяване на покупката</string>
     <string name="restoreSubscriptionEmailTitle">Добавяне чрез имейл</string>
-    <string name="restoreSubscriptionEmailDescription">Свържете имейл адрес с абонамента си, за да добавите Privacy Pro към това устройство.</string>
+    <string name="restoreSubscriptionEmailDescription">Свържете имейл адрес с абонамента си, за да го добавите към това устройство.</string>
     <string name="restoreSubscriptionEmailGetStarted">Първи стъпки</string>
 
     <!--Settings Subscriptions Activity-->
     <string name="removeSubscription">Премахване на абонамент</string>
     <string name="subscriptionRemoved">Абонаментът е премахнат от това устройство</string>
     <string name="removeFromDevice">Премахване от това устройство?</string>
-    <string name="removeFromDeviceDescription">Вече няма да имате достъп до абонамента си за Privacy Pro на това устройство. Това няма да отмени абонамента и той ще остане активен на останалите устройства.</string>
+    <string name="removeFromDeviceDescription">Вече няма да имате достъп до абонамента си на това устройство. Това няма да отмени абонамента и той ще остане активен на останалите устройства.</string>
     <string name="subscriptionsDataMonthly" instruction="First placeholder is renews or expires, second is a date in format MMMM dd, yyyy">Месечният абонамент %1$s на %2$s.</string>
     <string name="subscriptionsDataYearly" instruction="First placeholder is renews or expires, second is a date in format MMMM dd, yyyy">Годишният абонамент %1$s на %2$s.</string>
     <string name="subscriptionsExpiredData" instruction="The placeholder is a date in format MMMM dd, yyyy">Абонаментът е изтекъл на %1$s.</string>
@@ -51,14 +52,14 @@
     <string name="yearlySubscription">Годишен абонамент</string>
     <string name="renews">се подновява</string>
     <string name="expires">изтича</string>
-    <string name="activateOnOtherDevices">Добавяне на Privacy Pro към други устройства</string>
+    <string name="activateOnOtherDevices">Добавяне на абонамента Ви към други устройства</string>
     <string name="addToDevicePrimaryText">Добавяне към устройството</string>
-    <string name="addToDeviceSecondaryTextWithoutEmail">Добавете Privacy Pro към други устройства чрез Google Play или чрез свързване с имейл адрес.</string>
-    <string name="addToDeviceSecondaryTextWithEmail">Използвайте имейла по-горе, за да добавите абонамента си на други устройства в приложението DuckDuckGo. Отидете в Настройки &gt; Privacy Pro &gt; Имам абонамент.</string>
+    <string name="addToDeviceSecondaryTextWithoutEmail">Добавете абонамента си към други устройства чрез Google Play или чрез свързване с имейл адрес.</string>
+    <string name="addToDeviceSecondaryTextWithEmail">Използвайте имейла по-горе, за да добавите абонамента си на други устройства в приложението DuckDuckGo. Отидете в Настройки &gt; Настройки на абонамента &gt; Имам абонамент.</string>
     <string name="editEmailPrimaryText">Редактиране на имейл</string>
     <string name="learnMore">Научете повече</string>
-    <string name="privacyProFaq">Имате нужда от помощ с Privacy Pro?</string>
-    <string name="privacyProFaqSecondary">Вижте отговори на често задавани въпроси или се свържете с поддръжката на Privacy Pro от нашите страници за помощ. Предлаганите функции се различават в различните държави.</string>
+    <string name="privacyProFaq">Имате нужда от помощ за абонамента?</string>
+    <string name="privacyProFaqSecondary">Вижте отговори на често задавани въпроси или се свържете с поддръжката за абонаменти от нашите страници за помощ. Предлаганите функции се различават в различните държави.</string>
     <string name="subscriptionStatusSubscribed">Активен абонамент</string>
     <string name="privacyPolicyAndTermsOfService">Политика за поверителност и Условия на услугата</string>
     <string name="subscriptionStatusFreeTrial">Безплатна пробна версия е активна</string>
@@ -68,15 +69,15 @@
 
     <!--Settings Subscriptions-->
     <string name="subscriptionSetting">Настройки на абонамент</string>
-    <string name="subscriptionSettingSubscribe">Защитете връзката и самоличността си с Privacy Pro</string>
+    <string name="subscriptionSettingSubscribe">Защитете връзката и самоличността си с един абонамент.</string>
 
     <string name="subscriptionSettingSubscribeSubtitle">Абонатите получават нашите услуги за VPN, Personal Information Removal и Identity Theft Restoration.</string>
     <string name="subscriptionSettingSubscribeSubtitleRow">Абонатите получават нашите услуги за VPN и Identity Theft Restoration.</string>
 
-    <string name="subscriptionSettingGet">Вземете Privacy Pro</string>
-    <string name="subscriptionSettingTryFreeTrial">Изпробвайте Privacy Pro безплатно</string>
+    <string name="subscriptionSettingGet">Абонирайте се за DuckDuckGo</string>
+    <string name="subscriptionSettingTryFreeTrial">Пробвайте безплатно</string>
     <string name="subscriptionSettingRestore">Имам абонамент</string>
-    <string name="subscriptionSettingExpired">Абонамент ви за Privacy Pro е изтекъл</string>
+    <string name="subscriptionSettingExpired">Вашият абонамент за DuckDuckGo е изтекъл</string>
     <string name="subscriptionSettingExpiredViewPlans">Преглед на плановете</string>
     <string name="subscriptionSettingSectionSubscription">Абонамент</string>
     <string name="subscriptionSettingRemoveFromDevice">Премахване от това устройство</string>
@@ -170,18 +171,7 @@
     <string name="activitySendFeedback">Изпратете отзив</string>
 
     <!-- Privacy Pro Rebranding-->
-    <string name="privacyProRebranding">Абонамент за DuckDuckGo</string>
-    <string name="subscriptionSettingExpiredRebranding">Вашият абонамент за DuckDuckGo е изтекъл</string>
-    <string name="privacyProFaqRebranding">Имате нужда от помощ за абонамента?</string>
-    <string name="privacyProFaqSecondaryRebranding">Вижте отговори на често задавани въпроси или се свържете с поддръжката за абонаменти от нашите страници за помощ. Предлаганите функции се различават в различните държави.</string>
-    <string name="restoreSubscriptionTitleRebranding">Добавете абонамента си към това устройство</string>
-    <string name="restoreSubscriptionEmailDescriptionRebranding">Свържете имейл адрес с абонамента си, за да го добавите към това устройство.</string>
-    <string name="activateOnOtherDevicesRebranding">Добавяне на абонамента Ви към други устройства</string>
-    <string name="addToDeviceSecondaryTextWithoutEmailRebranding">Добавете абонамента си към други устройства чрез Google Play или чрез свързване с имейл адрес.</string>
-    <string name="addToDeviceSecondaryTextWithEmailRebranding">Използвайте имейла по-горе, за да добавите абонамента си на други устройства в приложението DuckDuckGo. Отидете в Настройки &gt; Настройки на абонамента &gt; Имам абонамент.</string>
     <string name="subscriptionSettingRebrandingMessage">Privacy Pro вече се нарича просто абонамент за DuckDuckGo</string>
-    <string name="subscriptionSettingSubscribeRebranding">Защитете връзката и самоличността си с един абонамент.</string>
-    <string name="removeFromDeviceDescriptionRebranding">Вече няма да имате достъп до абонамента си на това устройство. Това няма да отмени абонамента и той ще остане активен на останалите устройства.</string>
 
     <string name="subscriptionSettingSubscribeWithDuckAiSubtitle">Абонатите получават VPN и усъвършенствани AI модели в Duck.ai. Personal Information Removal и Identity Theft Restoration.</string>
     <string name="subscriptionSettingSubscribeWithDuckAiSubtitleRow">Абонатите получават VPN, усъвършенствани AI модели в Duck.ai и Identity Theft Restoration.</string>
@@ -194,8 +184,6 @@
     <string name="subscriptionSettingSectionTitle" translatable="false">DuckDuckGo Subscription</string>
     <string name="subscriptionSettingSubscribeSecure">Сигурна Wi-Fi мрежа и поверителен чат с усъвършенствани AI модели</string>
 
-    <string name="subscriptionSettingGetRebranding">Абонирайте се за DuckDuckGo</string>
-    <string name="subscriptionSettingTryFreeTrialRebranding">Пробвайте безплатно</string>
     <string name="feedbackGeneralSubscription">Абонамент</string>
 
 </resources>

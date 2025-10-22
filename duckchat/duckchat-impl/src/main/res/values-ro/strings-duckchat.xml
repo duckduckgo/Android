@@ -37,11 +37,13 @@
     <string name="audioCaptureSoundRecorderPermissionDeniedMessage">Site-urile pot utiliza înregistratorul de sunet numai dacă permiți ca DuckDuckGo să solicite accesul.</string>
 
     <!-- Settings -->
-    <string name="duck_chat_settings_activity_description">Duck.ai este o caracteristică opțională care îți permite să discuți anonim cu modele populare de chat AI de la terțe părți. Chaturile tale nu sunt folosite pentru a antrena AI.\n<annotation type="learn_more_link">Află mai multe</annotation></string>
-    <string name="duck_chat_enable_duck_ai_setting">Activează Duck.ai</string>
+    <string name="duck_chat_ai_features_title">Caracteristici AI</string>
+    <string name="duck_chat_settings_activity_description">Funcțiile IA ale DuckDuckGo sunt private și opționale.Datele tale nu sunt folosite pentru a antrena IA.\n<annotation type="learn_more_link">Află mai multe</annotation></string>
+    <string name="duck_chat_enable_duck_ai_setting">Duck.ai</string>
+    <string name="duck_chat_enable_duck_ai_setting_description">Discută în privat cu modele AI populare de la entități externe</string>
     <string name="duck_chat_visibility_setting">Meniu browser</string>
     <string name="duck_chat_address_bar_visibility_setting">Bara de adrese</string>
-    <string name="duck_chat_assist_settings_title">Setări Assist</string>
+    <string name="duck_chat_assist_settings_title">Setări Search Assist</string>
     <string name="duck_chat_assist_settings_description">Alege cât de des vrei să apară răspunsurile asistate de IA în căutările tale</string>
     <string name="duck_ai_shortcut_settings_title">Comenzi rapide Duck.ai</string>
     <string name="duck_ai_shortcut_settings_description">Alege ce comenzi rapide Duck.ai dorești să afișezi</string>
@@ -53,7 +55,7 @@
     <string name="input_screen_chat_hint">Întreabă în mod privat</string>
     <string name="input_screen_user_pref_without_ai">Doar căutare</string>
     <string name="input_screen_user_pref_with_ai">Caută pe Duck.ai</string>
-    <string name="input_screen_user_pref_description">Încearcă noua noastră opțiune de a adresa o întrebare către Duck.ai direct din bara de adrese. <annotation type="share_feedback">Trimite feedback</annotation></string>
+    <string name="input_screen_user_pref_description">Încearcă noua opțiune de a adresa o întrebare către Duck.ai direct din bara de adrese. <annotation type="share_feedback">Trimite feedback</annotation></string>
 
     <!-- Duck.ai Pro settings -->
     <string name="duck_ai_paid_settings_title">Duck.ai</string>
@@ -62,16 +64,9 @@
     <string name="duck_ai_paid_settings_open_duck_ai">Deschide Duck.ai</string>
     <string name="duck_ai_paid_settings_learn_more_title">Află mai multe</string>
 
-    <!-- Rebranding-->
-    <string name="duck_chat_title_rebranding">Caracteristici AI</string>
-    <string name="duck_chat_settings_activity_description_rebranding">Funcțiile IA ale DuckDuckGo sunt private și opționale.Datele tale nu sunt folosite pentru a antrena IA.\n<annotation type="learn_more_link">Află mai multe</annotation></string>
-    <string name="duck_chat_enable_duck_ai_setting_rebranding">Duck.ai</string>
-    <string name="duck_chat_enable_duck_ai_setting_description_rebranding">Discută în privat cu modele AI populare de la entități externe</string>
-    <string name="duck_chat_assist_settings_title_rebranding">Setări Search Assist</string>
-    <string name="duck_chat_assist_settings_description_rebranding">Alege cât de des vrei să apară răspunsurile asistate de IA în căutările tale</string>
-
     <!-- AutoComplete -->
     <string name="autocompleteDuckAiPrompt">Întreabă Duck.ai</string>
+    <string name="autocompleteDeviceAppNotFound">Aplicația nu a fost găsită</string>
 
     <!-- New Address Bar Option Bottom Sheet Dialog -->
     <string name="newAddressBarOptionBottomSheetDialogSearchText">Caută sau introdu adresa</string>

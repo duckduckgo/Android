@@ -37,11 +37,13 @@
     <string name="audioCaptureSoundRecorderPermissionDeniedMessage">Witryny mogą korzystać z rejestratora dźwięku tylko po zezwoleniu DuckDuckGo na żądanie dostępu.</string>
 
     <!-- Settings -->
-    <string name="duck_chat_settings_activity_description">Duck.ai to opcjonalna funkcja, która umożliwia prowadzenie anonimowych rozmów z popularnymi modelami czatu AI innych firm. Twoje czaty nie są używane do trenowania AI.\n<annotation type="learn_more_link">Dowiedz się więcej</annotation></string>
-    <string name="duck_chat_enable_duck_ai_setting">Włącz Duck.ai</string>
+    <string name="duck_chat_ai_features_title">Funkcje AI</string>
+    <string name="duck_chat_settings_activity_description">Funkcje sztucznej inteligencji DuckDuckGo są prywatne i opcjonalne.Twoje dane nie są używane do trenowania AI.\n<annotation type="learn_more_link">Dowiedz się więcej</annotation></string>
+    <string name="duck_chat_enable_duck_ai_setting">Duck.ai</string>
+    <string name="duck_chat_enable_duck_ai_setting_description">Czatuj prywatnie z popularnymi modelami AI innych firm</string>
     <string name="duck_chat_visibility_setting">Menu przeglądarki</string>
     <string name="duck_chat_address_bar_visibility_setting">Pasek adresu</string>
-    <string name="duck_chat_assist_settings_title">Ustawienia Assist</string>
+    <string name="duck_chat_assist_settings_title">Ustawienia wyszukiwania Assist</string>
     <string name="duck_chat_assist_settings_description">Wybierz, jak często w wyszukiwaniach mają pojawiać się odpowiedzi wspomagane przez sztuczną inteligencję</string>
     <string name="duck_ai_shortcut_settings_title">Skróty Duck.ai</string>
     <string name="duck_ai_shortcut_settings_description">Wybierz, które skróty Duck.ai chcesz wyświetlić</string>
@@ -53,7 +55,7 @@
     <string name="input_screen_chat_hint">Zapytaj prywatnie</string>
     <string name="input_screen_user_pref_without_ai">Tylko wyszukiwanie</string>
     <string name="input_screen_user_pref_with_ai">Wyszukiwanie i Duck.ai</string>
-    <string name="input_screen_user_pref_description">Wypróbuj naszą nową opcję, aby zapytać Duck.ai bezpośrednio z paska adresu. <annotation type="share_feedback">Podziel się opinią</annotation></string>
+    <string name="input_screen_user_pref_description">Wypróbuj nową opcję umożliwiającą zapytanie Duck.ai bezpośrednio z paska adresu. <annotation type="share_feedback">Podziel się opinią</annotation></string>
 
     <!-- Duck.ai Pro settings -->
     <string name="duck_ai_paid_settings_title">Duck.ai</string>
@@ -62,16 +64,9 @@
     <string name="duck_ai_paid_settings_open_duck_ai">Otwórz Duck.ai</string>
     <string name="duck_ai_paid_settings_learn_more_title">Dowiedz się więcej</string>
 
-    <!-- Rebranding-->
-    <string name="duck_chat_title_rebranding">Funkcje AI</string>
-    <string name="duck_chat_settings_activity_description_rebranding">Funkcje sztucznej inteligencji DuckDuckGo są prywatne i opcjonalne.Twoje dane nie są używane do trenowania AI.\n<annotation type="learn_more_link">Dowiedz się więcej</annotation></string>
-    <string name="duck_chat_enable_duck_ai_setting_rebranding">Duck.ai</string>
-    <string name="duck_chat_enable_duck_ai_setting_description_rebranding">Czatuj prywatnie z popularnymi modelami AI innych firm</string>
-    <string name="duck_chat_assist_settings_title_rebranding">Ustawienia wyszukiwania Assist</string>
-    <string name="duck_chat_assist_settings_description_rebranding">Wybierz, jak często w wyszukiwaniach mają pojawiać się odpowiedzi wspomagane przez sztuczną inteligencję</string>
-
     <!-- AutoComplete -->
     <string name="autocompleteDuckAiPrompt">Zapytaj Duck.ai</string>
+    <string name="autocompleteDeviceAppNotFound">Nie można znaleźć aplikacji</string>
 
     <!-- New Address Bar Option Bottom Sheet Dialog -->
     <string name="newAddressBarOptionBottomSheetDialogSearchText">Wyszukaj lub wprowadź adres</string>

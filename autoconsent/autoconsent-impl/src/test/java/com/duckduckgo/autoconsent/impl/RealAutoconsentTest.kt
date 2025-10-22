@@ -19,12 +19,16 @@ package com.duckduckgo.autoconsent.impl
 import android.webkit.WebView
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
+import com.duckduckgo.autoconsent.impl.cache.RealAutoconsentSettingsCache
 import com.duckduckgo.autoconsent.impl.remoteconfig.AutoconsentExceptionsRepository
 import com.duckduckgo.autoconsent.impl.remoteconfig.AutoconsentFeature
+import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.feature.toggles.api.FeatureException
 import com.duckduckgo.feature.toggles.api.Toggle
+import kotlinx.coroutines.test.TestScope
 import org.junit.Assert.*
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.mock
@@ -35,8 +39,12 @@ import java.util.concurrent.CopyOnWriteArrayList
 @RunWith(AndroidJUnit4::class)
 class RealAutoconsentTest {
 
+    @get:Rule
+    val coroutineRule = CoroutineTestRule()
+
     private val pluginPoint = FakePluginPoint()
     private val settingsRepository = FakeSettingsRepository()
+    private val settingsCache = RealAutoconsentSettingsCache()
     private val unprotected = FakeUnprotected(listOf("unprotected.com"))
     private val userAllowlist = FakeUserAllowlist(listOf("userallowed.com"))
     private val mockAutoconsentExceptionsRepository: AutoconsentExceptionsRepository = mock()
@@ -59,6 +67,10 @@ class RealAutoconsentTest {
             mockAutoconsentFeature,
             userAllowlist,
             unprotected,
+            settingsCache,
+            TestScope(),
+            coroutineRule.testDispatcherProvider,
+            isMainProcess = true,
         )
     }
 

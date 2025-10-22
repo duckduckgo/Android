@@ -48,7 +48,7 @@ class ThemingSharedPreferences @Inject constructor(
 
     private val preferences: SharedPreferences by lazy { context.getSharedPreferences(FILENAME, Context.MODE_PRIVATE) }
 
-    private class ThemePrefsMapper {
+    class ThemePrefsMapper {
 
         companion object {
             private const val THEME_LIGHT = "LIGHT"

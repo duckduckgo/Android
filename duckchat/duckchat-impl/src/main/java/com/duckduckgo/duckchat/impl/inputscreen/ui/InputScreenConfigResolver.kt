@@ -16,9 +16,11 @@
 
 package com.duckduckgo.duckchat.impl.inputscreen.ui
 
-import android.content.Intent
+import android.content.res.Configuration
+import androidx.appcompat.app.AppCompatActivity
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.duckchat.api.inputscreen.InputScreenActivityParams
+import com.duckduckgo.duckchat.api.inputscreen.InputScreenBrowserButtonsConfig
 import com.duckduckgo.duckchat.impl.DuckChatInternal
 import com.duckduckgo.navigation.api.getActivityParams
 import com.squareup.anvil.annotations.ContributesBinding
@@ -28,15 +30,20 @@ import javax.inject.Inject
 interface InputScreenConfigResolver {
     val isTopOmnibar: Boolean
 
-    fun onInputScreenCreated(intent: Intent)
+    fun shouldShowInstalledApps(): Boolean
+
+    fun shouldLaunchVoiceSearch(): Boolean
 
     fun useTopBar(): Boolean
+
+    fun mainButtonsEnabled(): Boolean
 }
 
 @ContributesBinding(scope = ActivityScope::class)
 @SingleInstanceIn(scope = ActivityScope::class)
 class InputScreenConfigResolverImpl @Inject constructor(
     private val duckChatInternal: DuckChatInternal,
+    private val appCompatActivity: AppCompatActivity,
 ) : InputScreenConfigResolver {
     companion object {
         fun useTopBar(
@@ -45,19 +52,28 @@ class InputScreenConfigResolverImpl @Inject constructor(
         ): Boolean = isTopOmnibar || !duckChatInternal.inputScreenBottomBarEnabled.value
     }
 
-    private var _isTopOmnibar = true
+    override val isTopOmnibar: Boolean by lazy {
+        appCompatActivity.intent.getActivityParams(InputScreenActivityParams::class.java)?.isTopOmnibar ?: true
+    }
 
-    override val isTopOmnibar: Boolean
-        get() = _isTopOmnibar
+    override fun shouldShowInstalledApps(): Boolean {
+        val params = appCompatActivity.intent?.getActivityParams(InputScreenActivityParams::class.java)
+        return params?.showInstalledApps ?: false
+    }
 
-    override fun onInputScreenCreated(intent: Intent) {
-        val params = intent.getActivityParams(InputScreenActivityParams::class.java)
-        _isTopOmnibar = params?.isTopOmnibar ?: true
+    override fun shouldLaunchVoiceSearch(): Boolean {
+        val params = appCompatActivity.intent.getActivityParams(InputScreenActivityParams::class.java)
+        return params?.launchWithVoice ?: false
     }
 
     override fun useTopBar(): Boolean =
         useTopBar(
             isTopOmnibar = isTopOmnibar,
             duckChatInternal = duckChatInternal,
-        )
+        ) || appCompatActivity.resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
+
+    override fun mainButtonsEnabled(): Boolean {
+        val browserButtonsConfig = appCompatActivity.intent.getActivityParams(InputScreenActivityParams::class.java)?.browserButtonsConfig
+        return duckChatInternal.showMainButtonsInInputScreen.value && browserButtonsConfig is InputScreenBrowserButtonsConfig.Enabled
+    }
 }

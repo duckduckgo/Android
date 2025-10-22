@@ -24,6 +24,8 @@ tags:
         - assertVisible: "COLOR PALETTE"
         - tapOn: "TYPOGRAPHY"
         - scrollUntilVisible:
+            timeout: 50000
+            speed: 60
             element:
               text: "Text Appearance Caption"
             direction: DOWN
@@ -37,6 +39,8 @@ tags:
         - assertVisible: "Keep Using"
         - tapOn: "Keep Using"
         - scrollUntilVisible:
+            timeout: 50000
+            speed: 60
             element:
               text: "Stacked Text Alert Dialog With 4 buttons"
             direction: DOWN
@@ -44,6 +48,8 @@ tags:
         - assertVisible: "Keep Using"
         - tapOn: "Keep Using"
         - scrollUntilVisible:
+            timeout: 50000
+            speed: 60
             element:
               text: "Promo Bottom Sheet with image"
             direction: DOWN
@@ -60,6 +66,8 @@ tags:
         - tapOn:
             id: "com.duckduckgo.mobile.android:id/bottomSheetPromoPrimaryButton"
         - scrollUntilVisible:
+            timeout: 50000
+            speed: 60
             element:
               text: "Cookie Consent dialog with animation"
             direction: DOWN
@@ -72,7 +80,7 @@ tags:
         - tapOn:
             id: "com.duckduckgo.mobile.android:id/primaryCta"
         - tapOn: "LAYOUTS"
-        - assertVisible: "Expandable Layout"
+        - assertVisible: "Dax Dialog Card"
         - tapOn: "INTERACTIVE"
         - tapOn:
             id: "com.duckduckgo.mobile.android:id/dax_switch_one"
@@ -100,11 +108,15 @@ tags:
             index: 0
         - tapOn: "LIST ITEMS"
         - scrollUntilVisible:
+            timeout: 50000
+            speed: 60
             element:
               text: "With Beta Pill and Switch"
             direction: DOWN
         - tapOn: "Others"
         - scrollUntilVisible:
+            timeout: 50000
+            speed: 60
             element:
               text: "Enable Dark Theme"
             direction: UP

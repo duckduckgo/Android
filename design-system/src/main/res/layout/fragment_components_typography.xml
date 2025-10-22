@@ -35,6 +35,13 @@
             android:layout_width="match_parent"
             app:primaryText="Typography"/>
 
+        <com.duckduckgo.common.ui.themepreview.ui.PlatformLabelView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/keyline_1"
+            android:layout_marginBottom="@dimen/keyline_1"
+            app:platformType="view"/>
+
         <com.duckduckgo.common.ui.view.text.DaxTextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -44,6 +51,32 @@
             app:typography="title"
             android:text="Text Appearance Title"
             tools:ignore="HardcodedText"/>
+
+        <com.duckduckgo.common.ui.themepreview.ui.PlatformLabelView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/keyline_1"
+            android:layout_marginBottom="@dimen/keyline_1"
+            app:platformType="compose"/>
+
+        <androidx.compose.ui.platform.ComposeView
+            android:id="@+id/compose_title_label"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/keyline_1"
+            android:layout_marginBottom="@dimen/keyline_2"
+            android:paddingStart="@dimen/keyline_3"/>
+
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="32dp"/>
+
+        <com.duckduckgo.common.ui.themepreview.ui.PlatformLabelView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/keyline_1"
+            android:layout_marginBottom="@dimen/keyline_1"
+            app:platformType="view"/>
 
         <com.duckduckgo.common.ui.view.text.DaxTextView
             android:layout_width="match_parent"
@@ -55,6 +88,32 @@
             android:text="Lorem ipsum dolor sit amet, consectetur adipiscing elit."
             tools:ignore="HardcodedText"/>
 
+        <com.duckduckgo.common.ui.themepreview.ui.PlatformLabelView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/keyline_1"
+            android:layout_marginBottom="@dimen/keyline_1"
+            app:platformType="compose"/>
+
+        <androidx.compose.ui.platform.ComposeView
+            android:id="@+id/compose_title_lorem"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/keyline_1"
+            android:layout_marginBottom="@dimen/keyline_2"
+            android:paddingStart="@dimen/keyline_3"/>
+
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="32dp"/>
+
+        <com.duckduckgo.common.ui.themepreview.ui.PlatformLabelView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/keyline_1"
+            android:layout_marginBottom="@dimen/keyline_1"
+            app:platformType="view"/>
+
         <com.duckduckgo.common.ui.view.text.DaxTextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -65,6 +124,32 @@
             android:text="Text Appearance H1"
             tools:ignore="HardcodedText"/>
 
+        <com.duckduckgo.common.ui.themepreview.ui.PlatformLabelView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/keyline_1"
+            android:layout_marginBottom="@dimen/keyline_1"
+            app:platformType="compose"/>
+
+        <androidx.compose.ui.platform.ComposeView
+            android:id="@+id/compose_h1_label"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/keyline_1"
+            android:layout_marginBottom="@dimen/keyline_2"
+            android:paddingStart="@dimen/keyline_3"/>
+
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="32dp"/>
+
+        <com.duckduckgo.common.ui.themepreview.ui.PlatformLabelView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/keyline_1"
+            android:layout_marginBottom="@dimen/keyline_1"
+            app:platformType="view"/>
+
         <com.duckduckgo.common.ui.view.text.DaxTextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -74,6 +159,32 @@
             app:typography="h1"
             android:text="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
             tools:ignore="HardcodedText"/>
+
+        <com.duckduckgo.common.ui.themepreview.ui.PlatformLabelView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/keyline_1"
+            android:layout_marginBottom="@dimen/keyline_1"
+            app:platformType="compose"/>
+
+        <androidx.compose.ui.platform.ComposeView
+            android:id="@+id/compose_h1_lorem"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/keyline_1"
+            android:layout_marginBottom="@dimen/keyline_2"
+            android:paddingStart="@dimen/keyline_3"/>
+
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="32dp"/>
+
+        <com.duckduckgo.common.ui.themepreview.ui.PlatformLabelView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/keyline_1"
+            android:layout_marginBottom="@dimen/keyline_1"
+            app:platformType="view"/>
 
         <com.duckduckgo.common.ui.view.text.DaxTextView
             android:layout_width="match_parent"
@@ -85,6 +196,32 @@
             android:text="Text Appearance H2"
             tools:ignore="HardcodedText"/>
 
+        <com.duckduckgo.common.ui.themepreview.ui.PlatformLabelView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/keyline_1"
+            android:layout_marginBottom="@dimen/keyline_1"
+            app:platformType="compose"/>
+
+        <androidx.compose.ui.platform.ComposeView
+            android:id="@+id/compose_h2_label"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/keyline_1"
+            android:layout_marginBottom="@dimen/keyline_2"
+            android:paddingStart="@dimen/keyline_3"/>
+
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="32dp"/>
+
+        <com.duckduckgo.common.ui.themepreview.ui.PlatformLabelView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/keyline_1"
+            android:layout_marginBottom="@dimen/keyline_1"
+            app:platformType="view"/>
+
         <com.duckduckgo.common.ui.view.text.DaxTextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -94,6 +231,32 @@
             app:typography="h2"
             android:text="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
             tools:ignore="HardcodedText"/>
+
+        <com.duckduckgo.common.ui.themepreview.ui.PlatformLabelView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/keyline_1"
+            android:layout_marginBottom="@dimen/keyline_1"
+            app:platformType="compose"/>
+
+        <androidx.compose.ui.platform.ComposeView
+            android:id="@+id/compose_h2_lorem"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/keyline_1"
+            android:layout_marginBottom="@dimen/keyline_2"
+            android:paddingStart="@dimen/keyline_3"/>
+
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="32dp"/>
+
+        <com.duckduckgo.common.ui.themepreview.ui.PlatformLabelView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/keyline_1"
+            android:layout_marginBottom="@dimen/keyline_1"
+            app:platformType="view"/>
 
         <com.duckduckgo.common.ui.view.text.DaxTextView
             android:layout_width="match_parent"
@@ -105,6 +268,32 @@
             android:text="Text Appearance H3"
             tools:ignore="HardcodedText"/>
 
+        <com.duckduckgo.common.ui.themepreview.ui.PlatformLabelView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/keyline_1"
+            android:layout_marginBottom="@dimen/keyline_1"
+            app:platformType="compose"/>
+
+        <androidx.compose.ui.platform.ComposeView
+            android:id="@+id/compose_h3_label"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/keyline_1"
+            android:layout_marginBottom="@dimen/keyline_2"
+            android:paddingStart="@dimen/keyline_3"/>
+
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="32dp"/>
+
+        <com.duckduckgo.common.ui.themepreview.ui.PlatformLabelView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/keyline_1"
+            android:layout_marginBottom="@dimen/keyline_1"
+            app:platformType="view"/>
+
         <com.duckduckgo.common.ui.view.text.DaxTextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -114,6 +303,32 @@
             app:typography="h3"
             android:text="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
             tools:ignore="HardcodedText"/>
+
+        <com.duckduckgo.common.ui.themepreview.ui.PlatformLabelView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/keyline_1"
+            android:layout_marginBottom="@dimen/keyline_1"
+            app:platformType="compose"/>
+
+        <androidx.compose.ui.platform.ComposeView
+            android:id="@+id/compose_h3_lorem"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/keyline_1"
+            android:layout_marginBottom="@dimen/keyline_2"
+            android:paddingStart="@dimen/keyline_3"/>
+
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="32dp"/>
+
+        <com.duckduckgo.common.ui.themepreview.ui.PlatformLabelView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/keyline_1"
+            android:layout_marginBottom="@dimen/keyline_1"
+            app:platformType="view"/>
 
         <com.duckduckgo.common.ui.view.text.DaxTextView
             android:layout_width="match_parent"
@@ -125,6 +340,32 @@
             android:text="Text Appearance H4"
             tools:ignore="HardcodedText"/>
 
+        <com.duckduckgo.common.ui.themepreview.ui.PlatformLabelView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/keyline_1"
+            android:layout_marginBottom="@dimen/keyline_1"
+            app:platformType="compose"/>
+
+        <androidx.compose.ui.platform.ComposeView
+            android:id="@+id/compose_h4_label"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/keyline_1"
+            android:layout_marginBottom="@dimen/keyline_2"
+            android:paddingStart="@dimen/keyline_3"/>
+
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="32dp"/>
+
+        <com.duckduckgo.common.ui.themepreview.ui.PlatformLabelView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/keyline_1"
+            android:layout_marginBottom="@dimen/keyline_1"
+            app:platformType="view"/>
+
         <com.duckduckgo.common.ui.view.text.DaxTextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -134,6 +375,32 @@
             app:typography="h4"
             android:text="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
             tools:ignore="HardcodedText"/>
+
+        <com.duckduckgo.common.ui.themepreview.ui.PlatformLabelView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/keyline_1"
+            android:layout_marginBottom="@dimen/keyline_1"
+            app:platformType="compose"/>
+
+        <androidx.compose.ui.platform.ComposeView
+            android:id="@+id/compose_h4_lorem"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/keyline_1"
+            android:layout_marginBottom="@dimen/keyline_2"
+            android:paddingStart="@dimen/keyline_3"/>
+
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="32dp"/>
+
+        <com.duckduckgo.common.ui.themepreview.ui.PlatformLabelView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/keyline_1"
+            android:layout_marginBottom="@dimen/keyline_1"
+            app:platformType="view"/>
 
         <com.duckduckgo.common.ui.view.text.DaxTextView
             android:layout_width="match_parent"
@@ -145,6 +412,32 @@
             android:text="Text Appearance H5"
             tools:ignore="HardcodedText"/>
 
+        <com.duckduckgo.common.ui.themepreview.ui.PlatformLabelView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/keyline_1"
+            android:layout_marginBottom="@dimen/keyline_1"
+            app:platformType="compose"/>
+
+        <androidx.compose.ui.platform.ComposeView
+            android:id="@+id/compose_h5_label"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/keyline_1"
+            android:layout_marginBottom="@dimen/keyline_2"
+            android:paddingStart="@dimen/keyline_3"/>
+
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="32dp"/>
+
+        <com.duckduckgo.common.ui.themepreview.ui.PlatformLabelView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/keyline_1"
+            android:layout_marginBottom="@dimen/keyline_1"
+            app:platformType="view"/>
+
         <com.duckduckgo.common.ui.view.text.DaxTextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -154,6 +447,32 @@
             app:typography="h5"
             android:text="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
             tools:ignore="HardcodedText"/>
+
+        <com.duckduckgo.common.ui.themepreview.ui.PlatformLabelView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/keyline_1"
+            android:layout_marginBottom="@dimen/keyline_1"
+            app:platformType="compose"/>
+
+        <androidx.compose.ui.platform.ComposeView
+            android:id="@+id/compose_h5_lorem"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/keyline_1"
+            android:layout_marginBottom="@dimen/keyline_2"
+            android:paddingStart="@dimen/keyline_3"/>
+
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="32dp"/>
+
+        <com.duckduckgo.common.ui.themepreview.ui.PlatformLabelView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/keyline_1"
+            android:layout_marginBottom="@dimen/keyline_1"
+            app:platformType="view"/>
 
         <com.duckduckgo.common.ui.view.text.DaxTextView
             android:layout_width="match_parent"
@@ -165,6 +484,32 @@
             android:text="Text Appearance Body1"
             tools:ignore="HardcodedText"/>
 
+        <com.duckduckgo.common.ui.themepreview.ui.PlatformLabelView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/keyline_1"
+            android:layout_marginBottom="@dimen/keyline_1"
+            app:platformType="compose"/>
+
+        <androidx.compose.ui.platform.ComposeView
+            android:id="@+id/compose_body1_label"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/keyline_1"
+            android:layout_marginBottom="@dimen/keyline_2"
+            android:paddingStart="@dimen/keyline_3"/>
+
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="32dp"/>
+
+        <com.duckduckgo.common.ui.themepreview.ui.PlatformLabelView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/keyline_1"
+            android:layout_marginBottom="@dimen/keyline_1"
+            app:platformType="view"/>
+
         <com.duckduckgo.common.ui.view.text.DaxTextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -174,6 +519,32 @@
             app:typography="body1"
             android:text="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
             tools:ignore="HardcodedText"/>
+
+        <com.duckduckgo.common.ui.themepreview.ui.PlatformLabelView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/keyline_1"
+            android:layout_marginBottom="@dimen/keyline_1"
+            app:platformType="compose"/>
+
+        <androidx.compose.ui.platform.ComposeView
+            android:id="@+id/compose_body1_lorem"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/keyline_1"
+            android:layout_marginBottom="@dimen/keyline_2"
+            android:paddingStart="@dimen/keyline_3"/>
+
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="32dp"/>
+
+        <com.duckduckgo.common.ui.themepreview.ui.PlatformLabelView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/keyline_1"
+            android:layout_marginBottom="@dimen/keyline_1"
+            app:platformType="view"/>
 
         <com.duckduckgo.common.ui.view.text.DaxTextView
             android:layout_width="match_parent"
@@ -185,6 +556,32 @@
             android:text="Text Appearance Body1 Bold"
             tools:ignore="HardcodedText"/>
 
+        <com.duckduckgo.common.ui.themepreview.ui.PlatformLabelView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/keyline_1"
+            android:layout_marginBottom="@dimen/keyline_1"
+            app:platformType="compose"/>
+
+        <androidx.compose.ui.platform.ComposeView
+            android:id="@+id/compose_body1_bold_label"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/keyline_1"
+            android:layout_marginBottom="@dimen/keyline_2"
+            android:paddingStart="@dimen/keyline_3"/>
+
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="32dp"/>
+
+        <com.duckduckgo.common.ui.themepreview.ui.PlatformLabelView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/keyline_1"
+            android:layout_marginBottom="@dimen/keyline_1"
+            app:platformType="view"/>
+
         <com.duckduckgo.common.ui.view.text.DaxTextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -194,6 +591,32 @@
             app:typography="body1_bold"
             android:text="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
             tools:ignore="HardcodedText"/>
+
+        <com.duckduckgo.common.ui.themepreview.ui.PlatformLabelView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/keyline_1"
+            android:layout_marginBottom="@dimen/keyline_1"
+            app:platformType="compose"/>
+
+        <androidx.compose.ui.platform.ComposeView
+            android:id="@+id/compose_body1_bold_lorem"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/keyline_1"
+            android:layout_marginBottom="@dimen/keyline_2"
+            android:paddingStart="@dimen/keyline_3"/>
+
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="32dp"/>
+
+        <com.duckduckgo.common.ui.themepreview.ui.PlatformLabelView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/keyline_1"
+            android:layout_marginBottom="@dimen/keyline_1"
+            app:platformType="view"/>
 
         <com.duckduckgo.common.ui.view.text.DaxTextView
             android:layout_width="match_parent"
@@ -205,6 +628,32 @@
             android:text="Text Appearance Body1 Mono"
             tools:ignore="HardcodedText"/>
 
+        <com.duckduckgo.common.ui.themepreview.ui.PlatformLabelView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/keyline_1"
+            android:layout_marginBottom="@dimen/keyline_1"
+            app:platformType="compose"/>
+
+        <androidx.compose.ui.platform.ComposeView
+            android:id="@+id/compose_body1_mono_label"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/keyline_1"
+            android:layout_marginBottom="@dimen/keyline_2"
+            android:paddingStart="@dimen/keyline_3"/>
+
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="32dp"/>
+
+        <com.duckduckgo.common.ui.themepreview.ui.PlatformLabelView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/keyline_1"
+            android:layout_marginBottom="@dimen/keyline_1"
+            app:platformType="view"/>
+
         <com.duckduckgo.common.ui.view.text.DaxTextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -214,6 +663,32 @@
             app:typography="body1_mono"
             android:text="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
             tools:ignore="HardcodedText"/>
+
+        <com.duckduckgo.common.ui.themepreview.ui.PlatformLabelView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/keyline_1"
+            android:layout_marginBottom="@dimen/keyline_1"
+            app:platformType="compose"/>
+
+        <androidx.compose.ui.platform.ComposeView
+            android:id="@+id/compose_body1_mono_lorem"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/keyline_1"
+            android:layout_marginBottom="@dimen/keyline_2"
+            android:paddingStart="@dimen/keyline_3"/>
+
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="32dp"/>
+
+        <com.duckduckgo.common.ui.themepreview.ui.PlatformLabelView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/keyline_1"
+            android:layout_marginBottom="@dimen/keyline_1"
+            app:platformType="view"/>
 
         <com.duckduckgo.common.ui.view.text.DaxTextView
             android:layout_width="match_parent"
@@ -225,6 +700,32 @@
             android:text="Text Appearance Body2"
             tools:ignore="HardcodedText"/>
 
+        <com.duckduckgo.common.ui.themepreview.ui.PlatformLabelView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/keyline_1"
+            android:layout_marginBottom="@dimen/keyline_1"
+            app:platformType="compose"/>
+
+        <androidx.compose.ui.platform.ComposeView
+            android:id="@+id/compose_body2_label"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/keyline_1"
+            android:layout_marginBottom="@dimen/keyline_2"
+            android:paddingStart="@dimen/keyline_3"/>
+
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="32dp"/>
+
+        <com.duckduckgo.common.ui.themepreview.ui.PlatformLabelView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/keyline_1"
+            android:layout_marginBottom="@dimen/keyline_1"
+            app:platformType="view"/>
+
         <com.duckduckgo.common.ui.view.text.DaxTextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -234,6 +735,32 @@
             app:typography="body2"
             android:text="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
             tools:ignore="HardcodedText"/>
+
+        <com.duckduckgo.common.ui.themepreview.ui.PlatformLabelView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/keyline_1"
+            android:layout_marginBottom="@dimen/keyline_1"
+            app:platformType="compose"/>
+
+        <androidx.compose.ui.platform.ComposeView
+            android:id="@+id/compose_body2_lorem"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/keyline_1"
+            android:layout_marginBottom="@dimen/keyline_2"
+            android:paddingStart="@dimen/keyline_3"/>
+
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="32dp"/>
+
+        <com.duckduckgo.common.ui.themepreview.ui.PlatformLabelView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/keyline_1"
+            android:layout_marginBottom="@dimen/keyline_1"
+            app:platformType="view"/>
 
         <com.duckduckgo.common.ui.view.text.DaxTextView
             android:layout_width="match_parent"
@@ -245,6 +772,32 @@
             android:text="Text Appearance Body2 Bold"
             tools:ignore="HardcodedText"/>
 
+        <com.duckduckgo.common.ui.themepreview.ui.PlatformLabelView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/keyline_1"
+            android:layout_marginBottom="@dimen/keyline_1"
+            app:platformType="compose"/>
+
+        <androidx.compose.ui.platform.ComposeView
+            android:id="@+id/compose_body2_bold_label"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/keyline_1"
+            android:layout_marginBottom="@dimen/keyline_2"
+            android:paddingStart="@dimen/keyline_3"/>
+
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="32dp"/>
+
+        <com.duckduckgo.common.ui.themepreview.ui.PlatformLabelView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/keyline_1"
+            android:layout_marginBottom="@dimen/keyline_1"
+            app:platformType="view"/>
+
         <com.duckduckgo.common.ui.view.text.DaxTextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -254,6 +807,32 @@
             app:typography="body2_bold"
             android:text="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
             tools:ignore="HardcodedText"/>
+
+        <com.duckduckgo.common.ui.themepreview.ui.PlatformLabelView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/keyline_1"
+            android:layout_marginBottom="@dimen/keyline_1"
+            app:platformType="compose"/>
+
+        <androidx.compose.ui.platform.ComposeView
+            android:id="@+id/compose_body2_bold_lorem"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/keyline_1"
+            android:layout_marginBottom="@dimen/keyline_2"
+            android:paddingStart="@dimen/keyline_3"/>
+
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="32dp"/>
+
+        <com.duckduckgo.common.ui.themepreview.ui.PlatformLabelView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/keyline_1"
+            android:layout_marginBottom="@dimen/keyline_1"
+            app:platformType="view"/>
 
         <com.duckduckgo.common.ui.view.text.DaxTextView
             android:layout_width="match_parent"
@@ -265,6 +844,32 @@
             android:text="Text Appearance Button"
             tools:ignore="HardcodedText"/>
 
+        <com.duckduckgo.common.ui.themepreview.ui.PlatformLabelView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/keyline_1"
+            android:layout_marginBottom="@dimen/keyline_1"
+            app:platformType="compose"/>
+
+        <androidx.compose.ui.platform.ComposeView
+            android:id="@+id/compose_button_label"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/keyline_1"
+            android:layout_marginBottom="@dimen/keyline_2"
+            android:paddingStart="@dimen/keyline_3"/>
+
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="32dp"/>
+
+        <com.duckduckgo.common.ui.themepreview.ui.PlatformLabelView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/keyline_1"
+            android:layout_marginBottom="@dimen/keyline_1"
+            app:platformType="view"/>
+
         <com.duckduckgo.common.ui.view.text.DaxTextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -274,6 +879,32 @@
             app:typography="button"
             android:text="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
             tools:ignore="HardcodedText"/>
+
+        <com.duckduckgo.common.ui.themepreview.ui.PlatformLabelView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/keyline_1"
+            android:layout_marginBottom="@dimen/keyline_1"
+            app:platformType="compose"/>
+
+        <androidx.compose.ui.platform.ComposeView
+            android:id="@+id/compose_button_lorem"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/keyline_1"
+            android:layout_marginBottom="@dimen/keyline_2"
+            android:paddingStart="@dimen/keyline_3"/>
+
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="32dp"/>
+
+        <com.duckduckgo.common.ui.themepreview.ui.PlatformLabelView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/keyline_1"
+            android:layout_marginBottom="@dimen/keyline_1"
+            app:platformType="view"/>
 
         <com.duckduckgo.common.ui.view.text.DaxTextView
             android:layout_width="match_parent"
@@ -285,6 +916,32 @@
             android:text="Text Appearance Caption"
             tools:ignore="HardcodedText"/>
 
+        <com.duckduckgo.common.ui.themepreview.ui.PlatformLabelView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/keyline_1"
+            android:layout_marginBottom="@dimen/keyline_1"
+            app:platformType="compose"/>
+
+        <androidx.compose.ui.platform.ComposeView
+            android:id="@+id/compose_caption_label"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/keyline_1"
+            android:layout_marginBottom="@dimen/keyline_2"
+            android:paddingStart="@dimen/keyline_3"/>
+
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="32dp"/>
+
+        <com.duckduckgo.common.ui.themepreview.ui.PlatformLabelView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/keyline_1"
+            android:layout_marginBottom="@dimen/keyline_1"
+            app:platformType="view"/>
+
         <com.duckduckgo.common.ui.view.text.DaxTextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -294,6 +951,32 @@
             app:typography="caption"
             android:text="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
             tools:ignore="HardcodedText"/>
+
+        <com.duckduckgo.common.ui.themepreview.ui.PlatformLabelView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/keyline_1"
+            android:layout_marginBottom="@dimen/keyline_1"
+            app:platformType="compose"/>
+
+        <androidx.compose.ui.platform.ComposeView
+            android:id="@+id/compose_caption_lorem"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/keyline_1"
+            android:layout_marginBottom="@dimen/keyline_2"
+            android:paddingStart="@dimen/keyline_3"/>
+
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="32dp"/>
+
+        <com.duckduckgo.common.ui.themepreview.ui.PlatformLabelView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/keyline_1"
+            android:layout_marginBottom="@dimen/keyline_1"
+            app:platformType="view"/>
 
         <com.duckduckgo.common.ui.view.text.DaxTextView
             android:layout_width="match_parent"
@@ -305,6 +988,32 @@
             android:text="Text Appearance Caption All Caps"
             tools:ignore="HardcodedText"/>
 
+        <com.duckduckgo.common.ui.themepreview.ui.PlatformLabelView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/keyline_1"
+            android:layout_marginBottom="@dimen/keyline_1"
+            app:platformType="compose"/>
+
+        <androidx.compose.ui.platform.ComposeView
+            android:id="@+id/compose_caption_allcaps_label"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/keyline_1"
+            android:layout_marginBottom="@dimen/keyline_2"
+            android:paddingStart="@dimen/keyline_3"/>
+
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="32dp"/>
+
+        <com.duckduckgo.common.ui.themepreview.ui.PlatformLabelView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/keyline_1"
+            android:layout_marginBottom="@dimen/keyline_1"
+            app:platformType="view"/>
+
         <com.duckduckgo.common.ui.view.text.DaxTextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -315,10 +1024,32 @@
             android:text="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
             tools:ignore="HardcodedText"/>
 
+        <com.duckduckgo.common.ui.themepreview.ui.PlatformLabelView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/keyline_1"
+            android:layout_marginBottom="@dimen/keyline_1"
+            app:platformType="compose"/>
+
+        <androidx.compose.ui.platform.ComposeView
+            android:id="@+id/compose_caption_allcaps_lorem"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/keyline_1"
+            android:layout_marginBottom="@dimen/keyline_2"
+            android:paddingStart="@dimen/keyline_3"/>
+
         <com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
             android:layout_height="wrap_content"
             android:layout_width="match_parent"
             app:primaryText="Typography Set Manually"/>
+
+        <com.duckduckgo.common.ui.themepreview.ui.PlatformLabelView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/keyline_1"
+            android:layout_marginBottom="@dimen/keyline_1"
+            app:platformType="view"/>
 
         <com.duckduckgo.common.ui.view.text.DaxTextView
             android:id="@+id/typographyTitle"
@@ -330,6 +1061,21 @@
             android:text="Text Appearance Body 1 set manually"
             android:textColor="@color/destructive_text_color_selector"
             tools:ignore="HardcodedText"/>
+
+        <com.duckduckgo.common.ui.themepreview.ui.PlatformLabelView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/keyline_1"
+            android:layout_marginBottom="@dimen/keyline_1"
+            app:platformType="compose"/>
+
+        <androidx.compose.ui.platform.ComposeView
+            android:id="@+id/compose_manual_typography"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/keyline_1"
+            android:layout_marginBottom="@dimen/keyline_2"
+            android:paddingStart="@dimen/keyline_3"/>
 
     </LinearLayout>
 

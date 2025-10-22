@@ -273,6 +273,7 @@ dependencies {
     implementation project(':experiments-impl')
     implementation project(':common-utils')
     implementation project(':app-store')
+    internalImplementation project(':design-system-internal')
     implementation project(':design-system')
     implementation project(':di')
     implementation project(':app-tracking-api')

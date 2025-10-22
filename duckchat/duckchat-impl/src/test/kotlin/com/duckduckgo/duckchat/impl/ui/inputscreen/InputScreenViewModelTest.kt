@@ -1,5 +1,6 @@
 package com.duckduckgo.duckchat.impl.ui.inputscreen
 
+import android.content.Intent
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import app.cash.turbine.test
@@ -8,10 +9,12 @@ import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Count
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
 import com.duckduckgo.browser.api.autocomplete.AutoComplete
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteResult
+import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion.AutoCompleteDefaultSuggestion
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion.AutoCompleteHistoryRelatedSuggestion.AutoCompleteHistorySuggestion
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion.AutoCompleteHistoryRelatedSuggestion.AutoCompleteInAppMessageSuggestion
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion.AutoCompleteSearchSuggestion
+import com.duckduckgo.browser.api.autocomplete.AutoCompleteFactory
 import com.duckduckgo.browser.api.autocomplete.AutoCompleteSettings
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.extensions.toBinaryString
@@ -69,6 +72,7 @@ class InputScreenViewModelTest {
     var instantTaskExecutorRule = InstantTaskExecutorRule()
 
     private val autoComplete: AutoComplete = mock()
+    private val autoCompleteFactory: AutoCompleteFactory = mock()
     private val history: NavigationHistory = mock()
     private val voiceSearchAvailability: VoiceSearchAvailability = mock()
     private val autoCompleteSettings: AutoCompleteSettings = mock()
@@ -83,6 +87,7 @@ class InputScreenViewModelTest {
     fun setup() =
         runTest {
             whenever(autoCompleteSettings.autoCompleteSuggestionsEnabled).thenReturn(true)
+            whenever(autoCompleteFactory.create(any())).thenReturn(autoComplete)
             whenever(autoComplete.autoComplete(any())).thenReturn(
                 flowOf(AutoCompleteResult("", listOf(AutoCompleteDefaultSuggestion("suggestion")))),
             )
@@ -94,7 +99,7 @@ class InputScreenViewModelTest {
     private fun createViewModel(currentOmnibarText: String = ""): InputScreenViewModel =
         InputScreenViewModel(
             currentOmnibarText = currentOmnibarText,
-            autoComplete = autoComplete,
+            autoCompleteFactory = autoCompleteFactory,
             dispatchers = coroutineRule.testDispatcherProvider,
             history = history,
             appCoroutineScope = coroutineRule.testScope,
@@ -1584,6 +1589,36 @@ class InputScreenViewModelTest {
         }
 
     @Test
+    fun `when onTabSwitcherTapped then emit TabSwitcherRequested Command`() =
+        runTest {
+            val viewModel = createViewModel()
+
+            viewModel.onTabSwitcherTapped()
+
+            assertEquals(Command.TabSwitcherRequested, viewModel.command.value)
+        }
+
+    @Test
+    fun `when onFireButtonTapped then emit FireButtonRequested Command`() =
+        runTest {
+            val viewModel = createViewModel()
+
+            viewModel.onFireButtonTapped()
+
+            assertEquals(Command.FireButtonRequested, viewModel.command.value)
+        }
+
+    @Test
+    fun `when onBrowserMenuTapped then emit MenuRequested Command`() =
+        runTest {
+            val viewModel = createViewModel()
+
+            viewModel.onBrowserMenuTapped()
+
+            assertEquals(Command.MenuRequested, viewModel.command.value)
+        }
+
+    @Test
     fun `when any button is visible then actionButtonsContainerVisible should be true`() =
         runTest {
             data class TestCase(
@@ -1631,5 +1666,308 @@ class InputScreenViewModelTest {
                     viewModel.visibilityState.value.actionButtonsContainerVisible,
                 )
             }
+        }
+
+    @Test
+    fun `when onClearTextTapped and search mode enabled then pixel sent and state updated`() =
+        runTest {
+            whenever(inputScreenConfigResolver.mainButtonsEnabled()).thenReturn(true)
+            val viewModel = createViewModel()
+            viewModel.onSearchSelected()
+            viewModel.onSearchInputTextChanged("query")
+
+            viewModel.onClearTextTapped()
+            // UI clears the text which triggers visibility update
+            viewModel.onSearchInputTextChanged("")
+
+            val expectedParams =
+                mapOf(
+                    "mode" to "search",
+                )
+            verify(pixel).fire(DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_OMNIBAR_CLEAR_BUTTON_PRESSED, expectedParams)
+
+            assertTrue(viewModel.visibilityState.value.mainButtonsVisible)
+        }
+
+    @Test
+    fun `when onClearTextTapped and chat mode enabled then pixel sent and state updated`() =
+        runTest {
+            whenever(inputScreenConfigResolver.mainButtonsEnabled()).thenReturn(true)
+            val viewModel = createViewModel()
+            viewModel.onChatSelected()
+
+            viewModel.onClearTextTapped()
+
+            val expectedParams =
+                mapOf(
+                    "mode" to "aiChat",
+                )
+            verify(pixel).fire(DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_OMNIBAR_CLEAR_BUTTON_PRESSED, expectedParams)
+
+            assertFalse(viewModel.visibilityState.value.mainButtonsVisible)
+        }
+
+    @Test
+    fun `when user types some text in search mode then buttons are not visible`() =
+        runTest {
+            whenever(inputScreenConfigResolver.mainButtonsEnabled()).thenReturn(true)
+            val viewModel = createViewModel()
+            viewModel.onSearchSelected()
+
+            viewModel.onSearchInputTextChanged("query")
+
+            assertFalse(viewModel.visibilityState.value.mainButtonsVisible)
+            assertTrue(viewModel.visibilityState.value.searchMode)
+        }
+
+    @Test
+    fun `when user types some text in duck ai mode then buttons are not visible`() =
+        runTest {
+            whenever(inputScreenConfigResolver.mainButtonsEnabled()).thenReturn(true)
+            val viewModel = createViewModel()
+            viewModel.onChatSelected()
+
+            viewModel.onChatInputTextChanged("query")
+
+            assertFalse(viewModel.visibilityState.value.mainButtonsVisible)
+            assertFalse(viewModel.visibilityState.value.searchMode)
+        }
+
+    @Test
+    fun `when user deletes all text in search mode then buttons are visible`() =
+        runTest {
+            whenever(inputScreenConfigResolver.mainButtonsEnabled()).thenReturn(true)
+            val viewModel = createViewModel()
+            viewModel.onSearchSelected()
+
+            viewModel.onSearchInputTextChanged("")
+
+            assertTrue(viewModel.visibilityState.value.mainButtonsVisible)
+            assertTrue(viewModel.visibilityState.value.searchMode)
+        }
+
+    @Test
+    fun `when user deletes all text in chat mode then buttons are not visible`() =
+        runTest {
+            whenever(inputScreenConfigResolver.mainButtonsEnabled()).thenReturn(true)
+            val viewModel = createViewModel()
+            viewModel.onChatSelected()
+
+            viewModel.onChatInputTextChanged("")
+
+            assertFalse(viewModel.visibilityState.value.mainButtonsVisible)
+            assertFalse(viewModel.visibilityState.value.searchMode)
+        }
+
+    @Test
+    fun `when search mode selected with empty text and mainButtonsEnabled is true then mainButtonsVisible is true`() =
+        runTest {
+            whenever(inputScreenConfigResolver.mainButtonsEnabled()).thenReturn(true)
+            val viewModel = createViewModel("")
+
+            viewModel.onSearchSelected()
+
+            assertTrue(viewModel.visibilityState.value.mainButtonsVisible)
+        }
+
+    @Test
+    fun `when search mode selected with empty text and mainButtonsEnabled is false then mainButtonsVisible is false`() =
+        runTest {
+            whenever(inputScreenConfigResolver.mainButtonsEnabled()).thenReturn(false)
+            val viewModel = createViewModel("")
+
+            viewModel.onSearchSelected()
+
+            assertFalse(viewModel.visibilityState.value.mainButtonsVisible)
+        }
+
+    @Test
+    fun `when user types in search mode and mainButtonsEnabled is true then mainButtonsVisible becomes false`() =
+        runTest {
+            whenever(inputScreenConfigResolver.mainButtonsEnabled()).thenReturn(true)
+            val viewModel = createViewModel("")
+            viewModel.onSearchSelected()
+
+            assertTrue(viewModel.visibilityState.value.mainButtonsVisible)
+
+            viewModel.onSearchInputTextChanged("query")
+
+            assertFalse(viewModel.visibilityState.value.mainButtonsVisible)
+        }
+
+    @Test
+    fun `when user clears text in search mode and mainButtonsEnabled is true then mainButtonsVisible becomes true`() =
+        runTest {
+            whenever(inputScreenConfigResolver.mainButtonsEnabled()).thenReturn(true)
+            val viewModel = createViewModel("")
+            viewModel.onSearchSelected()
+            viewModel.onSearchInputTextChanged("query")
+
+            assertFalse(viewModel.visibilityState.value.mainButtonsVisible)
+
+            // Clear text
+            viewModel.onSearchInputTextChanged("")
+
+            assertTrue(viewModel.visibilityState.value.mainButtonsVisible)
+        }
+
+    @Test
+    fun `when user switches from search to chat mode with empty text then mainButtonsVisible becomes false`() =
+        runTest {
+            whenever(inputScreenConfigResolver.mainButtonsEnabled()).thenReturn(true)
+            val viewModel = createViewModel("")
+            viewModel.onSearchSelected()
+
+            assertTrue(viewModel.visibilityState.value.mainButtonsVisible)
+
+            viewModel.onChatSelected()
+
+            assertFalse(viewModel.visibilityState.value.mainButtonsVisible)
+        }
+
+    @Test
+    fun `when user switches from chat to search mode with empty text and mainButtonsEnabled is true then mainButtonsVisible becomes true`() =
+        runTest {
+            whenever(inputScreenConfigResolver.mainButtonsEnabled()).thenReturn(true)
+            val viewModel = createViewModel("")
+            viewModel.onChatSelected()
+
+            assertFalse(viewModel.visibilityState.value.mainButtonsVisible)
+
+            viewModel.onSearchSelected()
+            viewModel.onSearchInputTextChanged("")
+
+            assertTrue(viewModel.visibilityState.value.mainButtonsVisible)
+        }
+
+    @Test
+    fun `when user switches from chat to search mode with non-empty text then mainButtonsVisible is true because search text is empty`() =
+        runTest {
+            whenever(inputScreenConfigResolver.mainButtonsEnabled()).thenReturn(true)
+            val viewModel = createViewModel("")
+            viewModel.onChatSelected()
+            viewModel.onChatInputTextChanged("query")
+
+            assertFalse(viewModel.visibilityState.value.mainButtonsVisible)
+
+            viewModel.onSearchSelected()
+            viewModel.onSearchInputTextChanged("query")
+
+            assertFalse(viewModel.visibilityState.value.mainButtonsVisible)
+        }
+
+    @Test
+    fun `when initialized with non-empty text and user selects search mode then mainButtonsVisible is false`() =
+        runTest {
+            whenever(inputScreenConfigResolver.mainButtonsEnabled()).thenReturn(true)
+            val viewModel = createViewModel("initial query")
+
+            viewModel.onSearchSelected()
+
+            // mainButtonsVisible should be false because searchInputTextState is not empty
+            assertFalse(viewModel.visibilityState.value.mainButtonsVisible)
+        }
+
+    @Test
+    fun `when onSearchInputTextChanged called then mainButtonsVisible is updated based on canShowMainButtons`() =
+        runTest {
+            whenever(inputScreenConfigResolver.mainButtonsEnabled()).thenReturn(true)
+            val viewModel = createViewModel("")
+            viewModel.onSearchSelected()
+            viewModel.onSearchInputTextChanged("")
+
+            // Initially empty in search mode
+            assertTrue(viewModel.visibilityState.value.mainButtonsVisible)
+
+            // Type some text
+            viewModel.onSearchInputTextChanged("q")
+            assertFalse(viewModel.visibilityState.value.mainButtonsVisible)
+
+            // Clear text
+            viewModel.onSearchInputTextChanged("")
+            assertTrue(viewModel.visibilityState.value.mainButtonsVisible)
+        }
+
+    @Test
+    fun `when shouldShowInstalledApps is true then factory creates autoComplete with showInstalledApps config enabled`() =
+        runTest {
+            val expectedConfig = AutoComplete.Config(showInstalledApps = true)
+            whenever(inputScreenConfigResolver.shouldShowInstalledApps()).thenReturn(true)
+            val viewModel = createViewModel("test query")
+
+            verify(autoCompleteFactory).create(expectedConfig)
+
+            advanceTimeBy(301)
+            verify(autoComplete).autoComplete("test query")
+        }
+
+    @Test
+    fun `when shouldShowInstalledApps is false then factory creates autoComplete with showInstalledApps config disabled`() =
+        runTest {
+            val expectedConfig = AutoComplete.Config(showInstalledApps = false)
+            whenever(inputScreenConfigResolver.shouldShowInstalledApps()).thenReturn(false)
+            val viewModel = createViewModel("test query")
+
+            verify(autoCompleteFactory).create(expectedConfig)
+
+            advanceTimeBy(301)
+            verify(autoComplete).autoComplete("test query")
+        }
+
+    @Test
+    fun `when userSelectedAutocomplete with device app suggestion then LaunchDeviceApplication command is sent`() =
+        runTest {
+            val viewModel = createViewModel()
+            val deviceAppSuggestion = AutoCompleteSuggestion.AutoCompleteDeviceAppSuggestion(
+                phrase = "app",
+                shortName = "First App",
+                packageName = "com.example.first",
+                launchIntent = Intent(),
+            )
+
+            viewModel.userSelectedAutocomplete(deviceAppSuggestion)
+
+            advanceUntilIdle()
+
+            assertEquals(Command.LaunchDeviceApplication(deviceAppSuggestion), viewModel.command.value)
+        }
+
+    @Test
+    fun `when appNotFound is called then ShowAppNotFoundMessage command is sent and refreshAppList is called`() =
+        runTest {
+            val viewModel = createViewModel()
+            val deviceAppSuggestion = AutoCompleteSuggestion.AutoCompleteDeviceAppSuggestion(
+                phrase = "app",
+                shortName = "First App",
+                packageName = "com.example.first",
+                launchIntent = Intent(),
+            )
+
+            viewModel.appNotFound(deviceAppSuggestion)
+
+            assertEquals(Command.ShowAppNotFoundMessage("First App"), viewModel.command.value)
+        }
+
+    @Test
+    fun `when userSelectedAutocomplete with device app then fireAutocompletePixel is called with experimentalInputScreen true`() =
+        runTest {
+            val deviceAppSuggestion = AutoCompleteSuggestion.AutoCompleteDeviceAppSuggestion(
+                phrase = "app",
+                shortName = "First App",
+                packageName = "com.example.first",
+                launchIntent = Intent(),
+            )
+            val suggestions = listOf(AutoCompleteDefaultSuggestion("suggestion")) + deviceAppSuggestion
+            val expectedResult = AutoCompleteResult("test", suggestions)
+            whenever(autoComplete.autoComplete("test")).thenReturn(flowOf(expectedResult))
+            whenever(inputScreenConfigResolver.shouldShowInstalledApps()).thenReturn(true)
+
+            val viewModel = createViewModel("test")
+
+            viewModel.userSelectedAutocomplete(deviceAppSuggestion)
+
+            advanceUntilIdle()
+
+            verify(autoComplete).fireAutocompletePixel(suggestions, deviceAppSuggestion, experimentalInputScreen = true)
         }
 }

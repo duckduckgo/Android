@@ -69,6 +69,13 @@ interface DuckChatFeature {
     fun showInputScreenAutomaticallyOnNewTab(): Toggle
 
     /**
+     * @return `true` when the Input Screen should be shown when user open the app from system widgets
+     * If the remote feature is not present defaults to `disabled`
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
+    fun showInputScreenOnSystemSearchLaunch(): Toggle
+
+    /**
      * @return `true` when the Input Screen can present a bottom input box, if user has the omnibar also set to the bottom position.
      * If disabled, the Input Screen should always show the input box at the top of the screen.
      * If the remote feature is not present defaults to `enabled`
@@ -89,4 +96,10 @@ interface DuckChatFeature {
      */
     @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun clearHistory(): Toggle
+
+    /**
+     * @return `true` when the new input screen should show the three main buttons (fire, tabs, menu)
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    fun showMainButtonsInInputScreen(): Toggle
 }

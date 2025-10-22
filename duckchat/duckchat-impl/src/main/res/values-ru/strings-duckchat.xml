@@ -37,11 +37,13 @@
     <string name="audioCaptureSoundRecorderPermissionDeniedMessage">Сайты получат возможность пользоваться диктофоном, только если вы разрешите DuckDuckGo запрашивать доступ.</string>
 
     <!-- Settings -->
-    <string name="duck_chat_settings_activity_description">Duck.ai — дополнительная функция, позволяющая анонимно беседовать с популярными сторонними чат-моделями на базе искусственного интеллекта. Содержимое чатов не применяется для обучения ИИ.\n<annotation type="learn_more_link">Подробнее...</annotation></string>
-    <string name="duck_chat_enable_duck_ai_setting">Включить Duck.ai</string>
+    <string name="duck_chat_ai_features_title">Функции ИИ</string>
+    <string name="duck_chat_settings_activity_description">DuckDuckGo AI — дополнительный конфиденциальный сервис.\nВаши данные не применяются для обучения ИИ.\n<annotation type="learn_more_link">Подробнее...</annotation></string>
+    <string name="duck_chat_enable_duck_ai_setting">Duck.ai</string>
+    <string name="duck_chat_enable_duck_ai_setting_description">Общайтесь в приватном чате с популярными сторонними моделями искусственного интеллекта</string>
     <string name="duck_chat_visibility_setting">Меню браузера</string>
     <string name="duck_chat_address_bar_visibility_setting">Адресная строка</string>
-    <string name="duck_chat_assist_settings_title">Настройки Assist</string>
+    <string name="duck_chat_assist_settings_title">Настройки Search Assist</string>
     <string name="duck_chat_assist_settings_description">Выберите, как часто вы хотите видеть ответы от ИИ в результатах поиска.</string>
     <string name="duck_ai_shortcut_settings_title">Ярлыки Duck.ai</string>
     <string name="duck_ai_shortcut_settings_description">Выберите, какие ярлыки Duck.ai нужно показывать в интерфейсе</string>
@@ -62,16 +64,9 @@
     <string name="duck_ai_paid_settings_open_duck_ai">Открыть Duck.ai</string>
     <string name="duck_ai_paid_settings_learn_more_title">Подробнее</string>
 
-    <!-- Rebranding-->
-    <string name="duck_chat_title_rebranding">Функции ИИ</string>
-    <string name="duck_chat_settings_activity_description_rebranding">DuckDuckGo AI — дополнительный конфиденциальный сервис.\nВаши данные не применяются для обучения ИИ.\n<annotation type="learn_more_link">Подробнее...</annotation></string>
-    <string name="duck_chat_enable_duck_ai_setting_rebranding">Duck.ai</string>
-    <string name="duck_chat_enable_duck_ai_setting_description_rebranding">Общайтесь в приватном чате с популярными сторонними моделями искусственного интеллекта</string>
-    <string name="duck_chat_assist_settings_title_rebranding">Настройки Search Assist</string>
-    <string name="duck_chat_assist_settings_description_rebranding">Выберите, как часто вы хотите видеть ответы от ИИ в результатах поиска.</string>
-
     <!-- AutoComplete -->
     <string name="autocompleteDuckAiPrompt">Спросить у Duck.ai</string>
+    <string name="autocompleteDeviceAppNotFound">Приложение не найдено</string>
 
     <!-- New Address Bar Option Bottom Sheet Dialog -->
     <string name="newAddressBarOptionBottomSheetDialogSearchText">Введите поисковый запрос или адрес сайта</string>

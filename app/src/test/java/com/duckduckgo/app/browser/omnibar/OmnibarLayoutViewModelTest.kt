@@ -176,7 +176,7 @@ class OmnibarLayoutViewModelTest {
     }
 
     @Test
-    fun whenOmnibarFocusedThenCancelTrackersAnimationCommandSent() = runTest {
+    fun whenOmnibarFocusedThenCancelAddressBarAnimationsCommandSent() = runTest {
         testee.onOmnibarFocusChanged(true, "query")
 
         testee.commands().test {

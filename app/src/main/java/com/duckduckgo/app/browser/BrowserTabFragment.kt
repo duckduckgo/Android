@@ -295,6 +295,7 @@ import com.duckduckgo.duckchat.api.inputscreen.BrowserAndInputScreenTransitionPr
 import com.duckduckgo.duckchat.api.inputscreen.InputScreenActivityParams
 import com.duckduckgo.duckchat.api.inputscreen.InputScreenActivityResultCodes
 import com.duckduckgo.duckchat.api.inputscreen.InputScreenActivityResultParams
+import com.duckduckgo.duckchat.api.inputscreen.InputScreenBrowserButtonsConfig
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
 import com.duckduckgo.duckplayer.api.DuckPlayer
 import com.duckduckgo.duckplayer.api.DuckPlayerSettingsNoParams
@@ -637,7 +638,7 @@ class BrowserTabFragment :
 
     private val binding: FragmentBrowserTabBinding by viewBinding()
 
-    lateinit var omnibar: Omnibar
+    private lateinit var omnibar: Omnibar
 
     private lateinit var webViewContainer: FrameLayout
 
@@ -742,21 +743,7 @@ class BrowserTabFragment :
             override fun onFirstPopUpHandled() {}
 
             override fun onPopUpHandled(isCosmetic: Boolean) {
-                launch {
-                    context?.let {
-                    /* TODO uncomment when sense of protection experiment shield is enabled
-                     if (senseOfProtectionExperiment.isUserEnrolledInAVariantAndExperimentEnabled() &&
-                        viewModel.trackersCount().isNotEmpty()
-                    ) {
-                        if (isCosmetic) {
-                            delay(COOKIES_ANIMATION_DELAY)
-                        }
-                        omnibar.enqueueCookiesAnimation(isCosmetic)
-                    } else {*/
-                        viewModel.onAutoConsentPopUpHandled(isCosmetic)
-                        // }
-                    }
-                }
+                viewModel.onAutoConsentPopUpHandled(isCosmetic)
             }
 
             override fun onResultReceived(
@@ -916,23 +903,34 @@ class BrowserTabFragment :
 
     private val inputScreenLauncher =
         registerForActivityResult(StartActivityForResult()) { result ->
-            val data = result.data ?: return@registerForActivityResult
-
+            val data = result.data
             when (result.resultCode) {
                 InputScreenActivityResultCodes.NEW_SEARCH_REQUESTED -> {
-                    data.getStringExtra(InputScreenActivityResultParams.SEARCH_QUERY_PARAM)?.let { query ->
+                    data?.getStringExtra(InputScreenActivityResultParams.SEARCH_QUERY_PARAM)?.let { query ->
                         submitQuery(query)
                     }
                 }
 
                 InputScreenActivityResultCodes.SWITCH_TO_TAB_REQUESTED -> {
-                    data.getStringExtra(InputScreenActivityResultParams.TAB_ID_PARAM)?.let { tabId ->
+                    data?.getStringExtra(InputScreenActivityResultParams.TAB_ID_PARAM)?.let { tabId ->
                         browserActivity?.openExistingTab(tabId)
                     }
                 }
 
+                InputScreenActivityResultCodes.MENU_REQUESTED -> {
+                    launchPopupMenu()
+                }
+
+                InputScreenActivityResultCodes.TAB_SWITCHER_REQUESTED -> {
+                    launchTabSwitcher()
+                }
+
+                InputScreenActivityResultCodes.FIRE_BUTTON_REQUESTED -> {
+                    onFireButtonPressed()
+                }
+
                 RESULT_CANCELED -> {
-                    data.getStringExtra(InputScreenActivityResultParams.CANCELED_DRAFT_PARAM)?.let { query ->
+                    data?.getStringExtra(InputScreenActivityResultParams.CANCELED_DRAFT_PARAM)?.let { query ->
                         omnibar.setDraftTextIfNtpOrSerp(query)
                     }
                 }
@@ -1120,7 +1118,11 @@ class BrowserTabFragment :
         val intent =
             globalActivityStarter.startIntent(
                 requireContext(),
-                InputScreenActivityParams(query = query, isTopOmnibar = omnibar.omnibarPosition == TOP),
+                InputScreenActivityParams(
+                    query = query,
+                    isTopOmnibar = omnibar.omnibarPosition == TOP,
+                    browserButtonsConfig = InputScreenBrowserButtonsConfig.Enabled(tabs = viewModel.tabs.value?.size ?: 0),
+                ),
             )
         val enterTransition = browserAndInputScreenTransitionProvider.getInputScreenEnterAnimation(omnibar.omnibarPosition == TOP)
         val exitTransition = browserAndInputScreenTransitionProvider.getBrowserExitAnimation(omnibar.omnibarPosition == TOP)
@@ -1937,6 +1939,14 @@ class BrowserTabFragment :
         viewModel.resetErrors()
     }
 
+    fun getOmnibar(): Omnibar? {
+        return if (this::omnibar.isInitialized) {
+            omnibar
+        } else {
+            null
+        }
+    }
+
     private fun processCommand(it: Command?) {
         if (it is NavigationCommand) {
             omnibar.cancelTrackersAnimation()
@@ -2296,6 +2306,7 @@ class BrowserTabFragment :
             }
 
             is Command.SubmitChat -> duckChat.openDuckChatWithAutoPrompt(it.query)
+            is Command.EnqueueCookiesAnimation -> enqueueCookiesAnimation(it.isCosmetic)
         }
     }
 
@@ -2319,6 +2330,17 @@ class BrowserTabFragment :
             }
             context?.let {
                 omnibar.createCookiesAnimation(isCosmetic)
+            }
+        }
+    }
+
+    private fun enqueueCookiesAnimation(isCosmetic: Boolean) {
+        launch {
+            if (isCosmetic) {
+                delay(COOKIES_ANIMATION_DELAY)
+            }
+            context?.let {
+                omnibar.enqueueCookiesAnimation(isCosmetic)
             }
         }
     }

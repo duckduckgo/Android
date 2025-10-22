@@ -21,7 +21,7 @@ import com.duckduckgo.js.messaging.api.JsMessageCallback
 import com.duckduckgo.js.messaging.api.JsMessaging
 import com.duckduckgo.pir.impl.dashboard.messaging.PirDashboardWebMessages
 import com.duckduckgo.pir.impl.dashboard.messaging.handlers.PirMessageHandlerUtils.createJsMessage
-import com.duckduckgo.pir.impl.dashboard.state.PirWebOnboardingStateHolder
+import com.duckduckgo.pir.impl.dashboard.state.PirWebProfileStateHolder
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
@@ -36,14 +36,14 @@ class PirWebAddNameToCurrentUserProfileMessageHandlerTest {
 
     private lateinit var testee: PirWebAddNameToCurrentUserProfileMessageHandler
 
-    private val mockPirWebOnboardingStateHolder: PirWebOnboardingStateHolder = mock()
+    private val mockPirWebProfileStateHolder: PirWebProfileStateHolder = mock()
     private val mockJsMessaging: JsMessaging = mock()
     private val mockJsMessageCallback: JsMessageCallback = mock()
 
     @Before
     fun setUp() {
         testee = PirWebAddNameToCurrentUserProfileMessageHandler(
-            pirWebOnboardingStateHolder = mockPirWebOnboardingStateHolder,
+            pirWebProfileStateHolder = mockPirWebProfileStateHolder,
         )
     }
 
@@ -59,13 +59,13 @@ class PirWebAddNameToCurrentUserProfileMessageHandlerTest {
             paramsJson = """{"first": "John", "middle": "Michael", "last": "Doe"}""",
             method = PirDashboardWebMessages.ADD_NAME_TO_CURRENT_USER_PROFILE,
         )
-        whenever(mockPirWebOnboardingStateHolder.addName("John", "Michael", "Doe")).thenReturn(true)
+        whenever(mockPirWebProfileStateHolder.addName("John", "Michael", "Doe")).thenReturn(true)
 
         // When
         testee.process(jsMessage, mockJsMessaging, mockJsMessageCallback)
 
         // Then
-        verify(mockPirWebOnboardingStateHolder).addName("John", "Michael", "Doe")
+        verify(mockPirWebProfileStateHolder).addName("John", "Michael", "Doe")
         PirMessageHandlerUtils.verifyResponse(jsMessage, true, mockJsMessaging)
     }
 
@@ -76,13 +76,13 @@ class PirWebAddNameToCurrentUserProfileMessageHandlerTest {
             paramsJson = """{"first": "Jane", "last": "Smith"}""",
             method = PirDashboardWebMessages.ADD_NAME_TO_CURRENT_USER_PROFILE,
         )
-        whenever(mockPirWebOnboardingStateHolder.addName("Jane", "", "Smith")).thenReturn(true)
+        whenever(mockPirWebProfileStateHolder.addName("Jane", "", "Smith")).thenReturn(true)
 
         // When
         testee.process(jsMessage, mockJsMessaging, mockJsMessageCallback)
 
         // Then
-        verify(mockPirWebOnboardingStateHolder).addName("Jane", "", "Smith")
+        verify(mockPirWebProfileStateHolder).addName("Jane", "", "Smith")
         PirMessageHandlerUtils.verifyResponse(jsMessage, true, mockJsMessaging)
     }
 
@@ -93,13 +93,13 @@ class PirWebAddNameToCurrentUserProfileMessageHandlerTest {
             paramsJson = """{"first": "Bob", "middle": "", "last": "Johnson"}""",
             method = PirDashboardWebMessages.ADD_NAME_TO_CURRENT_USER_PROFILE,
         )
-        whenever(mockPirWebOnboardingStateHolder.addName("Bob", "", "Johnson")).thenReturn(true)
+        whenever(mockPirWebProfileStateHolder.addName("Bob", "", "Johnson")).thenReturn(true)
 
         // When
         testee.process(jsMessage, mockJsMessaging, mockJsMessageCallback)
 
         // Then
-        verify(mockPirWebOnboardingStateHolder).addName("Bob", "", "Johnson")
+        verify(mockPirWebProfileStateHolder).addName("Bob", "", "Johnson")
         PirMessageHandlerUtils.verifyResponse(jsMessage, true, mockJsMessaging)
     }
 
@@ -112,7 +112,7 @@ class PirWebAddNameToCurrentUserProfileMessageHandlerTest {
                 method = PirDashboardWebMessages.ADD_NAME_TO_CURRENT_USER_PROFILE,
             )
         whenever(
-            mockPirWebOnboardingStateHolder.addName(
+            mockPirWebProfileStateHolder.addName(
                 "Alice",
                 "Marie",
                 "Brown",
@@ -123,7 +123,7 @@ class PirWebAddNameToCurrentUserProfileMessageHandlerTest {
         testee.process(jsMessage, mockJsMessaging, mockJsMessageCallback)
 
         // Then
-        verify(mockPirWebOnboardingStateHolder).addName("Alice", "Marie", "Brown")
+        verify(mockPirWebProfileStateHolder).addName("Alice", "Marie", "Brown")
         PirMessageHandlerUtils.verifyResponse(jsMessage, true, mockJsMessaging)
     }
 
@@ -139,7 +139,7 @@ class PirWebAddNameToCurrentUserProfileMessageHandlerTest {
         testee.process(jsMessage, mockJsMessaging, mockJsMessageCallback)
 
         // Then
-        verify(mockPirWebOnboardingStateHolder, org.mockito.kotlin.never()).addName(
+        verify(mockPirWebProfileStateHolder, org.mockito.kotlin.never()).addName(
             any(),
             any(),
             any(),
@@ -159,7 +159,7 @@ class PirWebAddNameToCurrentUserProfileMessageHandlerTest {
         testee.process(jsMessage, mockJsMessaging, mockJsMessageCallback)
 
         // Then
-        verify(mockPirWebOnboardingStateHolder, org.mockito.kotlin.never()).addName(
+        verify(mockPirWebProfileStateHolder, org.mockito.kotlin.never()).addName(
             any(),
             any(),
             any(),
@@ -179,7 +179,7 @@ class PirWebAddNameToCurrentUserProfileMessageHandlerTest {
         testee.process(jsMessage, mockJsMessaging, mockJsMessageCallback)
 
         // Then
-        verify(mockPirWebOnboardingStateHolder, org.mockito.kotlin.never()).addName(
+        verify(mockPirWebProfileStateHolder, org.mockito.kotlin.never()).addName(
             any(),
             any(),
             any(),
@@ -199,7 +199,7 @@ class PirWebAddNameToCurrentUserProfileMessageHandlerTest {
         testee.process(jsMessage, mockJsMessaging, mockJsMessageCallback)
 
         // Then
-        verify(mockPirWebOnboardingStateHolder, org.mockito.kotlin.never()).addName(
+        verify(mockPirWebProfileStateHolder, org.mockito.kotlin.never()).addName(
             any(),
             any(),
             any(),
@@ -219,7 +219,7 @@ class PirWebAddNameToCurrentUserProfileMessageHandlerTest {
         testee.process(jsMessage, mockJsMessaging, mockJsMessageCallback)
 
         // Then
-        verify(mockPirWebOnboardingStateHolder, org.mockito.kotlin.never()).addName(
+        verify(mockPirWebProfileStateHolder, org.mockito.kotlin.never()).addName(
             any(),
             any(),
             any(),
@@ -239,7 +239,7 @@ class PirWebAddNameToCurrentUserProfileMessageHandlerTest {
         testee.process(jsMessage, mockJsMessaging, mockJsMessageCallback)
 
         // Then
-        verify(mockPirWebOnboardingStateHolder, org.mockito.kotlin.never()).addName(
+        verify(mockPirWebProfileStateHolder, org.mockito.kotlin.never()).addName(
             any(),
             any(),
             any(),
@@ -259,7 +259,7 @@ class PirWebAddNameToCurrentUserProfileMessageHandlerTest {
         testee.process(jsMessage, mockJsMessaging, mockJsMessageCallback)
 
         // Then
-        verify(mockPirWebOnboardingStateHolder, org.mockito.kotlin.never()).addName(
+        verify(mockPirWebProfileStateHolder, org.mockito.kotlin.never()).addName(
             any(),
             any(),
             any(),
@@ -275,7 +275,7 @@ class PirWebAddNameToCurrentUserProfileMessageHandlerTest {
             method = PirDashboardWebMessages.ADD_NAME_TO_CURRENT_USER_PROFILE,
         )
         whenever(
-            mockPirWebOnboardingStateHolder.addName(
+            mockPirWebProfileStateHolder.addName(
                 "John",
                 "Michael",
                 "Doe",
@@ -286,7 +286,7 @@ class PirWebAddNameToCurrentUserProfileMessageHandlerTest {
         testee.process(jsMessage, mockJsMessaging, mockJsMessageCallback)
 
         // Then
-        verify(mockPirWebOnboardingStateHolder).addName("John", "Michael", "Doe")
+        verify(mockPirWebProfileStateHolder).addName("John", "Michael", "Doe")
         PirMessageHandlerUtils.verifyResponse(jsMessage, false, mockJsMessaging)
     }
 
@@ -302,7 +302,7 @@ class PirWebAddNameToCurrentUserProfileMessageHandlerTest {
         testee.process(jsMessage, mockJsMessaging, mockJsMessageCallback)
 
         // Then
-        verify(mockPirWebOnboardingStateHolder, org.mockito.kotlin.never()).addName(
+        verify(mockPirWebProfileStateHolder, org.mockito.kotlin.never()).addName(
             any(),
             any(),
             any(),
@@ -322,7 +322,7 @@ class PirWebAddNameToCurrentUserProfileMessageHandlerTest {
         testee.process(jsMessage, mockJsMessaging, mockJsMessageCallback)
 
         // Then
-        verify(mockPirWebOnboardingStateHolder, org.mockito.kotlin.never()).addName(
+        verify(mockPirWebProfileStateHolder, org.mockito.kotlin.never()).addName(
             any(),
             any(),
             any(),
@@ -342,7 +342,7 @@ class PirWebAddNameToCurrentUserProfileMessageHandlerTest {
         testee.process(jsMessage, mockJsMessaging, mockJsMessageCallback)
 
         // Then
-        verify(mockPirWebOnboardingStateHolder, org.mockito.kotlin.never()).addName(
+        verify(mockPirWebProfileStateHolder, org.mockito.kotlin.never()).addName(
             any(),
             any(),
             any(),

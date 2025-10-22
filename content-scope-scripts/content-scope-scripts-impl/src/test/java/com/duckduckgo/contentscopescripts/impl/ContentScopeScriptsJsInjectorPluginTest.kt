@@ -1,7 +1,6 @@
 package com.duckduckgo.contentscopescripts.impl
 
 import android.webkit.WebView
-import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.any
@@ -10,10 +9,8 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
-import java.util.*
 
 class ContentScopeScriptsJsInjectorPluginTest {
-
     private val mockCoreContentScopeScripts: CoreContentScopeScripts = mock()
     private val mockWebView: WebView = mock()
 

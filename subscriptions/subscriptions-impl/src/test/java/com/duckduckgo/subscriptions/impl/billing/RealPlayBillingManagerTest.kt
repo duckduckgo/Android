@@ -7,6 +7,7 @@ import androidx.lifecycle.Lifecycle.State.RESUMED
 import androidx.lifecycle.testing.TestLifecycleOwner
 import app.cash.turbine.test
 import com.android.billingclient.api.ProductDetails
+import com.android.billingclient.api.Purchase
 import com.android.billingclient.api.PurchaseHistoryRecord
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.BASIC_SUBSCRIPTION
@@ -21,6 +22,7 @@ import com.duckduckgo.subscriptions.impl.billing.FakeBillingClientAdapter.FakeMe
 import com.duckduckgo.subscriptions.impl.billing.FakeBillingClientAdapter.FakeMethodInvocation.GetSubscriptionsPurchaseHistory
 import com.duckduckgo.subscriptions.impl.billing.FakeBillingClientAdapter.FakeMethodInvocation.LaunchBillingFlow
 import com.duckduckgo.subscriptions.impl.billing.FakeBillingClientAdapter.FakeMethodInvocation.LaunchSubscriptionUpdate
+import com.duckduckgo.subscriptions.impl.billing.FakeBillingClientAdapter.FakeMethodInvocation.QueryPurchases
 import com.duckduckgo.subscriptions.impl.billing.PurchaseState.Canceled
 import com.duckduckgo.subscriptions.impl.billing.PurchaseState.InProgress
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -235,6 +237,7 @@ class RealPlayBillingManagerTest {
                 newPlanId = MONTHLY_PLAN_US,
                 externalId = externalId,
                 newOfferId = null,
+                oldPurchaseToken = oldPurchaseToken,
                 replacementMode = replacementMode,
             )
 
@@ -264,6 +267,7 @@ class RealPlayBillingManagerTest {
         runCurrent() // Ensure purchase history is loaded
 
         val externalId = "test_external_id"
+        val oldPurchaseToken = "old_purchase_token"
 
         subject.purchaseState.test {
             expectNoEvents()
@@ -273,6 +277,8 @@ class RealPlayBillingManagerTest {
                 newPlanId = "invalid_plan_id",
                 externalId = externalId,
                 newOfferId = null,
+                oldPurchaseToken = oldPurchaseToken,
+                replacementMode = SubscriptionReplacementMode.DEFERRED,
             )
 
             assertEquals(Canceled, awaitItem())
@@ -300,6 +306,7 @@ class RealPlayBillingManagerTest {
         val offerDetails = productDetails.subscriptionOfferDetails!!.first()
         val externalId = "test_external_id"
         val oldPurchaseToken = "old_purchase_token" // This is what getCurrentPurchaseToken() will return
+        val replacementMode = SubscriptionReplacementMode.DEFERRED
 
         subject.purchaseState.test {
             expectNoEvents()
@@ -309,6 +316,8 @@ class RealPlayBillingManagerTest {
                 newPlanId = MONTHLY_PLAN_US,
                 externalId = externalId,
                 newOfferId = null,
+                oldPurchaseToken = oldPurchaseToken,
+                replacementMode = replacementMode,
             )
 
             assertEquals(Canceled, awaitItem())
@@ -324,14 +333,15 @@ class RealPlayBillingManagerTest {
     }
 
     @Test
-    fun `when launchSubscriptionUpdate called with no purchase history then emits canceled state`() = runTest {
-        // No purchase history set up, so getCurrentPurchaseToken() will return null
+    fun `when launchSubscriptionUpdate called with empty purchase token then emits canceled state`() = runTest {
+        // Test with empty purchase token to simulate no valid token scenario
         billingClientAdapter.subscriptionsPurchaseHistory = emptyList()
 
         processLifecycleOwner.currentState = RESUMED
         runCurrent() // Ensure purchase history is loaded
 
         val externalId = "test_external_id"
+        val oldPurchaseToken = "" // Empty token to simulate no valid purchase token
 
         subject.purchaseState.test {
             expectNoEvents()
@@ -341,6 +351,8 @@ class RealPlayBillingManagerTest {
                 newPlanId = MONTHLY_PLAN_US,
                 externalId = externalId,
                 newOfferId = null,
+                oldPurchaseToken = oldPurchaseToken,
+                replacementMode = SubscriptionReplacementMode.DEFERRED,
             )
 
             assertEquals(Canceled, awaitItem())
@@ -374,6 +386,7 @@ class FakeBillingClientAdapter : BillingClientAdapter {
     )
 
     var subscriptionsPurchaseHistory: List<PurchaseHistoryRecord> = emptyList()
+    var activePurchases: List<Purchase> = emptyList()
     var launchBillingFlowResult: LaunchBillingFlowResult = LaunchBillingFlowResult.Failure(error = SERVICE_UNAVAILABLE)
     var billingInitResult: BillingInitResult = BillingInitResult.Success
 
@@ -420,6 +433,15 @@ class FakeBillingClientAdapter : BillingClientAdapter {
             SubscriptionsPurchaseHistoryResult.Success(subscriptionsPurchaseHistory)
         } else {
             SubscriptionsPurchaseHistoryResult.Failure
+        }
+    }
+
+    override suspend fun queryPurchases(): QueryPurchasesResult {
+        methodInvocations.add(QueryPurchases)
+        return if (ready) {
+            QueryPurchasesResult.Success(activePurchases)
+        } else {
+            QueryPurchasesResult.Failure(BillingError.SERVICE_DISCONNECTED, "Service not connected")
         }
     }
 
@@ -510,6 +532,7 @@ class FakeBillingClientAdapter : BillingClientAdapter {
         data object Connect : FakeMethodInvocation()
         data class GetSubscriptions(val productIds: List<String>) : FakeMethodInvocation()
         data object GetSubscriptionsPurchaseHistory : FakeMethodInvocation()
+        data object QueryPurchases : FakeMethodInvocation()
 
         data class LaunchBillingFlow(
             val productDetails: ProductDetails,

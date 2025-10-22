@@ -20,28 +20,6 @@
                 }
             }
         },
-        "onboardingDesignExperiment": {
-            "state": "enabled",
-            "features": {
-                "onboardingDesignExperimentOct25": {
-                    "state": "enabled",
-                    "cohorts": [
-                        {
-                            "name": "modifiedControl",
-                            "weight": 1
-                        },
-                        {
-                            "name": "bb",
-                            "weight": 1
-                        },
-                        {
-                            "name": "buck",
-                            "weight": 1
-                        }
-                    ]
-                }
-            }
-        },
         "ampLinks": {
             "exceptions": [
                 {

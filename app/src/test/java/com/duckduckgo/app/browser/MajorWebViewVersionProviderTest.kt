@@ -26,8 +26,10 @@ import org.mockito.kotlin.whenever
 @RunWith(AndroidJUnit4::class)
 class MajorWebViewVersionProviderTest {
     private val webViewVersionSource: WebViewVersionSource = mock()
+    private val webViewPackageSource: WebViewPackageSource = mock()
     private val testee = DefaultWebViewVersionProvider(
         webViewVersionSource,
+        webViewPackageSource,
     )
 
     @Test
@@ -38,6 +40,13 @@ class MajorWebViewVersionProviderTest {
     }
 
     @Test
+    fun whenWebViewPackageIsEmptyThenReturnUnknown() {
+        whenever(webViewPackageSource.get()).thenReturn("")
+
+        assertEquals("unknown", testee.getPackageName())
+    }
+
+    @Test
     fun whenWebViewVersionIsAvailableThenReturnFullVersion() {
         whenever(webViewVersionSource.get()).thenReturn("91.1.12.1234.423")
 
@@ -45,10 +54,24 @@ class MajorWebViewVersionProviderTest {
     }
 
     @Test
+    fun whenWebViewVPackageIsAvailableThenReturnPackage() {
+        whenever(webViewPackageSource.get()).thenReturn("com.test.webview")
+
+        assertEquals("com.test.webview", testee.getPackageName())
+    }
+
+    @Test
     fun whenWebViewVersionIsBlankThenReturnFullVersion() {
         whenever(webViewVersionSource.get()).thenReturn("    ")
 
         assertEquals("unknown", testee.getFullVersion())
+    }
+
+    @Test
+    fun whenWebViewPackageIsBlankThenReturnUnknown() {
+        whenever(webViewPackageSource.get()).thenReturn("    ")
+
+        assertEquals("unknown", testee.getPackageName())
     }
 
     @Test

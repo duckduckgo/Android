@@ -19,6 +19,7 @@ import com.duckduckgo.subscriptions.impl.feedback.SubscriptionFeedbackViewModel.
 import com.duckduckgo.subscriptions.impl.feedback.SubscriptionFeedbackViewModel.Command.FeedbackCompleted
 import com.duckduckgo.subscriptions.impl.feedback.SubscriptionFeedbackViewModel.Command.FeedbackFailed
 import com.duckduckgo.subscriptions.impl.feedback.SubscriptionFeedbackViewModel.Command.ShowHelpPages
+import com.duckduckgo.subscriptions.impl.feedback.SubscriptionFeedbackViewModel.Command.ShowSupportPage
 import com.duckduckgo.subscriptions.impl.feedback.SubscriptionFeedbackViewModel.FeedbackFragmentState.FeedbackAction
 import com.duckduckgo.subscriptions.impl.feedback.SubscriptionFeedbackViewModel.FeedbackFragmentState.FeedbackCategory
 import com.duckduckgo.subscriptions.impl.feedback.SubscriptionFeedbackViewModel.FeedbackFragmentState.FeedbackGeneral
@@ -613,6 +614,15 @@ class SubscriptionFeedbackViewModelTest {
 
         viewModel.commands().test {
             assertEquals(ShowHelpPages("test.com"), expectMostRecentItem())
+        }
+    }
+
+    @Test
+    fun whenContactSupportOpenedReportIssueThenShowPage() = runTest {
+        viewModel.onContactSupportFromSubmit()
+
+        viewModel.commands().test {
+            assertEquals(ShowSupportPage("https://duckduckgo.com/subscription-support"), expectMostRecentItem())
         }
     }
 

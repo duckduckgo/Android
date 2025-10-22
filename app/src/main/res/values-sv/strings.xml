@@ -167,6 +167,7 @@
     <string name="settingsAddressBarPosition">Ange din adressfältsposition</string>
     <string name="settingsEnableVoiceSearch">Aktivera privat röstsökning</string>
     <string name="settingsDDGOnOtherPlatforms">DuckDuckGo på andra plattformar</string>
+    <string name="settingsDuckAi">AI-funktioner</string>
 
     <!-- Private Search -->
     <string name="privateSearchActivityTitle">Privatsökning</string>
@@ -246,13 +247,13 @@
     <string name="settingsAutomaticallyClearWhenAppExit30Minutes">Avsluta app, inaktiv i 30 minuter</string>
     <string name="settingsAutomaticallyClearWhenAppExit60Minutes">Avsluta app, inaktiv i 1 timme</string>
     <string name="settingsClearAiDataTitle">Rensa Duck.ai-chattar</string>
-    <string name="settingsClearAiDataMessage">Fire Button raderar också Duck.ai-historik</string>
+    <string name="settingsClearAiDataDeleteMessage">Fire Button raderar också Duck.ai-historik, inklusive fästa chattar.</string>
 
     <!-- About Activity -->
     <string name="aboutActivityTitle">Om DuckDuckGo</string>
     <string name="aboutActivityTitleNew">Om</string>
     <string name="aboutHeaderNewTagLine">Skydd. Integritet. Sinnesro.</string>
-    <string name="aboutDescriptionBrandUpdate2025">Welcome to the Duck Side!\n\nDuckDuckGo är ett oberoende företag för onlineskydd för alla som vill återta kontrollen över sin personliga information.\n\nVi vill skydda din personliga information från hackare, bedragare och integritetskränkande företag – och den bästa metoden är att förhindra att den samlas in överhuvudtaget. Det är därför som miljontals människor <annotation type="chart_comparison">väljer DuckDuckGo framför Chrome och andra webbläsare</annotation> för att söka och surfa online. Vår inbyggda sökmotor är som Google men spårar aldrig dina sökningar. Och våra surfskydd, som spårningsblockering och blockering av cookies, hjälper till att stoppa andra företag från att samla in dina data. Vår webbläsare är dessutom gratis – vi tjänar pengar på <annotation type="privacy_respecting_ads">sökannonser som respekterar din integritet</annotation>, inte genom att utnyttja dina data.Vi erbjuder också <annotation type="ppro_help_page">Privacy Pro</annotation>, en tre-i-ett-prenumerationstjänst som är integrerad i vår webbläsare. Privacy Pro-prenumeranter får ännu mer integritetsskydd med en snabb och enkel <annotation type="vpn_help_page">VPN</annotation> som hjälper till att skydda din onlineaktivitet, en tjänst som hittar och tar bort din personliga information från webbplatser som är till för att hitta människor, samt en tjänst som återställer din identitet om den skulle bli stulen.\n\nTa tillbaka kontrollen över din personliga information med webbläsaren som är utformad för dataskydd, inte datainsamling.</string>
+    <string name="aboutDescriptionBrandUpdate2025">Welcome to the Duck Side!\n\nDuckDuckGo är ett oberoende företag för onlineskydd för alla som vill återta kontrollen över sin personliga information.\n\nVi vill skydda din personliga information från hackare, bedragare och integritetskränkande företag – och den bästa metoden är att förhindra att den samlas in överhuvudtaget. Det är därför som miljontals människor <annotation type="chart_comparison">väljer DuckDuckGo framför Chrome och andra webbläsare</annotation> för att söka och surfa online. Vår inbyggda sökmotor är som Google men spårar aldrig dina sökningar. Och våra surfskydd, som spårningsblockering och blockering av cookies, hjälper till att stoppa andra företag från att samla in dina data. Vår webbläsare är dessutom gratis – vi tjänar pengar på <annotation type="privacy_respecting_ads">sökannonser som respekterar din integritet</annotation>, inte genom att utnyttja dina data.Vi erbjuder också en <annotation type="ppro_help_page">DuckDuckGo-prenumeration</annotation> som är integrerad i vår webbläsare. Prenumeranter får ännu mer integritetsskydd med ett snabbt och enkelt <annotation type="vpn_help_page">VPN</annotation> som hjälper till att skydda din onlineaktivitet, tillgång till avancerade AI-modeller i den privata AI-chattjänsten Duck.ai, en tjänst som hittar och tar bort din personliga information från webbplatser som är till för att hitta människor, samt en tjänst som återställer din identitet om den skulle bli stulen\n\nTa tillbaka kontrollen över din personliga information med webbläsaren som är utformad för dataskydd, inte datainsamling.</string>
     <string name="no_suggestions">Inga förslag</string>
 
     <!-- Broken Site Activity -->
@@ -833,7 +834,7 @@
     <string name="onboardingInContextEndDaxDialogDescription">Kom ihåg: varje gång du surfar med mig förlorar en läskig annons sina vingar. 👌</string>
     <string name="onboardingEndDaxDialogButton">High Five!</string>
     <string name="onboardingPrivacyProDaxDialogTitle">Innan jag glömmer det ...</string>
-    <string name="onboardingPrivacyProDaxDialogDescription"><![CDATA[DuckDuckGo har också ett säkert <b>VPN + 2 premiumskydd till</b> som är tillgängliga med <b>valfritt betalt abonnemang</b>.]]></string>
+    <string name="onboardingPrivacyProDaxDialogDescription"><![CDATA[DuckDuckGo har också en <b>valfri betald prenumeration</b> med ett säkert <b>VPN</b> och <b>avancerad, privat AI</b>.]]></string>
     <string name="onboardingPrivacyProDaxDialogOkButton">Läs mer</string>
     <string name="onboardingPrivacyProDaxDialogFreeTrialOkButton">Prova gratis!</string>
     <string name="onboardingPrivacyProDaxDialogCancelButton">Hoppa över</string>
@@ -922,12 +923,6 @@
     </plurals>
 
     <string name="bbOnboardingTrackersBlockedDialogDescription">☝️Tryck på skölden för mer info.️</string>
-
-    <!-- Privacy Pro Rebranding-->
-    <string name="aboutDescriptionBrandUpdate2025Rebranding">Welcome to the Duck Side!\n\nDuckDuckGo är ett oberoende företag för onlineskydd för alla som vill återta kontrollen över sin personliga information.\n\nVi vill skydda din personliga information från hackare, bedragare och integritetskränkande företag – och den bästa metoden är att förhindra att den samlas in överhuvudtaget. Det är därför som miljontals människor <annotation type="chart_comparison">väljer DuckDuckGo framför Chrome och andra webbläsare</annotation> för att söka och surfa online. Vår inbyggda sökmotor är som Google men spårar aldrig dina sökningar. Och våra surfskydd, som spårningsblockering och blockering av cookies, hjälper till att stoppa andra företag från att samla in dina data. Vår webbläsare är dessutom gratis – vi tjänar pengar på <annotation type="privacy_respecting_ads">sökannonser som respekterar din integritet</annotation>, inte genom att utnyttja dina data.Vi erbjuder också en <annotation type="ppro_help_page">DuckDuckGo-prenumeration</annotation> som är integrerad i vår webbläsare. Prenumeranter får ännu mer integritetsskydd med ett snabbt och enkelt <annotation type="vpn_help_page">VPN</annotation> som hjälper till att skydda din onlineaktivitet, tillgång till avancerade AI-modeller i den privata AI-chattjänsten Duck.ai, en tjänst som hittar och tar bort din personliga information från webbplatser som är till för att hitta människor, samt en tjänst som återställer din identitet om den skulle bli stulen\n\nTa tillbaka kontrollen över din personliga information med webbläsaren som är utformad för dataskydd, inte datainsamling.</string>
-    <string name="onboardingPrivacyProDaxDialogDescriptionRebranding"><![CDATA[DuckDuckGo har också en <b>valfri betald prenumeration</b> med ett säkert <b>VPN</b> och <b>avancerad, privat AI</b>.]]></string>
-    <string name="settingsDuckAiRebranding">AI-funktioner</string>
-    <string name="settingsDuckAi">Duck.ai</string>
 
     <!--TabSwitcher Trackers Animation-->
     <string name="showTrackerCountInTabSwitcher">Visa spårarräknare i flikfäxlare</string>

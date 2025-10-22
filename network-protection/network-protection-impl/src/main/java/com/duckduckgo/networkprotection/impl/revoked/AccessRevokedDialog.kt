@@ -28,7 +28,6 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.networkprotection.impl.R
 import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixels
-import com.duckduckgo.subscriptions.api.SubscriptionRebrandingFeatureToggle
 import com.duckduckgo.subscriptions.api.SubscriptionScreens.SubscriptionPurchase
 import com.squareup.anvil.annotations.ContributesBinding
 import kotlinx.coroutines.CoroutineScope
@@ -61,7 +60,6 @@ class RealAccessRevokedDialog @Inject constructor(
     private val globalActivityStarter: GlobalActivityStarter,
     private val networkProtectionPixels: NetworkProtectionPixels,
     private val sharedPreferencesProvider: SharedPreferencesProvider,
-    private val subscriptionRebrandingFeatureToggle: SubscriptionRebrandingFeatureToggle,
 ) : AccessRevokedDialog {
 
     private val preferences: SharedPreferences by lazy {
@@ -92,15 +90,10 @@ class RealAccessRevokedDialog @Inject constructor(
         if (boundActivity == activity) return
 
         boundActivity = activity
-        val messageRes = if (subscriptionRebrandingFeatureToggle.isSubscriptionRebrandingEnabled()) {
-            R.string.netpDialogVpnAccessRevokedBodyRebranding
-        } else {
-            R.string.netpDialogVpnAccessRevokedBody
-        }
 
         TextAlertDialogBuilder(activity)
             .setTitle(R.string.netpDialogVpnAccessRevokedTitle)
-            .setMessage(messageRes)
+            .setMessage(R.string.netpDialogVpnAccessRevokedBody)
             .setPositiveButton(R.string.netpDialogVpnAccessRevokedPositiveAction)
             .setNegativeButton(R.string.netpDialogVpnAccessRevokedNegativeAction)
             .addEventListener(

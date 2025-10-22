@@ -54,9 +54,9 @@ class ContentScopeScriptsPostMessageWrapperPluginTest {
     }
 
     @Test
-    fun whenWebViewCompatContentScopeScriptsIsEnabledThenPostMessageToWebMessagingPlugin() =
+    fun whenWebMessagingIsEnabledThenPostMessageToWebMessagingPlugin() =
         runTest {
-            whenever(mockWebViewCompatContentScopeScripts.isEnabled()).thenReturn(true)
+            whenever(mockWebViewCompatContentScopeScripts.isWebMessagingEnabled()).thenReturn(true)
 
             testee.postMessage(subscriptionEventData, mockWebView)
 
@@ -64,9 +64,9 @@ class ContentScopeScriptsPostMessageWrapperPluginTest {
         }
 
     @Test
-    fun whenWebViewCompatContentScopeScriptsIsNotEnabledThenPostMessageToContentScopeScriptsJsMessaging() =
+    fun whenWebMessagingIsNotEnabledThenPostMessageToContentScopeScriptsJsMessaging() =
         runTest {
-            whenever(mockWebViewCompatContentScopeScripts.isEnabled()).thenReturn(false)
+            whenever(mockWebViewCompatContentScopeScripts.isWebMessagingEnabled()).thenReturn(false)
 
             testee.postMessage(subscriptionEventData, mockWebView)
 

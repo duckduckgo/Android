@@ -250,6 +250,15 @@
         app:layout_constraintTop_toBottomOf="@id/oneLineListItemWithLongText"
         app:primaryTextTruncated="true"/>
 
-
+    <com.duckduckgo.common.ui.view.listitem.OneLineListItem
+        android:id="@+id/oneLineListItemWithNewPill"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/keyline_2"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/oneLineListItemWithLongTextTruncated"
+        app:primaryText="Item with New Pill"
+        app:showNewPill="true" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
