@@ -80,7 +80,7 @@ tags:
         - tapOn:
             id: "com.duckduckgo.mobile.android:id/primaryCta"
         - tapOn: "LAYOUTS"
-        - assertVisible: "Expandable Layout"
+        - assertVisible: "Dax Dialog Card"
         - tapOn: "INTERACTIVE"
         - tapOn:
             id: "com.duckduckgo.mobile.android:id/dax_switch_one"
