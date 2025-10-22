@@ -29,7 +29,6 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
-import kotlinx.coroutines.withContext
 import javax.inject.Inject
 import kotlin.time.Duration.Companion.minutes
 
@@ -59,11 +58,8 @@ class RealAutoconsentPixelManager @Inject constructor(
     private val mutex = Mutex()
 
     override fun fireDailyPixel(pixelName: AutoConsentPixel) {
-        appCoroutineScope.launch {
-            val isEnabled = withContext(dispatcherProvider.io()) {
-                autoconsentFeature.cpmPixels().isEnabled()
-            }
-            if (!isEnabled) return@launch
+        appCoroutineScope.launch(dispatcherProvider.io()) {
+            if (!autoconsentFeature.cpmPixels().isEnabled()) return@launch
 
             mutex.withLock {
                 pixelCounter[pixelName.pixelName] = (pixelCounter[pixelName.pixelName] ?: 0) + 1
