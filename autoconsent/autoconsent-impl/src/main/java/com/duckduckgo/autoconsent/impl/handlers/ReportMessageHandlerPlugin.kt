@@ -43,7 +43,7 @@ class ReportMessageHandlerPlugin @Inject constructor(
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
 ) : MessageHandlerPlugin {
 
-    private val moshi = Moshi.Builder().add(JSONObjectAdapter()).build()
+    private val moshi by lazy { Moshi.Builder().add(JSONObjectAdapter()).build() }
 
     override fun process(messageType: String, jsonString: String, webView: WebView, autoconsentCallback: AutoconsentCallback) {
         try {
