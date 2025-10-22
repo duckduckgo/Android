@@ -76,6 +76,4 @@
     <string name="newAddressBarOptionBottomSheetDialogSearchOnly">Yalnızca Arama</string>
     <string name="newAddressBarOptionBottomSheetDialogSearchAndDuckAi">Arama ve Duck.ai</string>
     <string name="newAddressBarOptionBottomSheetDialogHeader">Adres çubuğu seçeneği</string>
-    <string name="newAddressBarOptionBottomSheetDialogTitle">AI Sohbetine Daha Kolay Erişmek İster misiniz?</string>
-
 </resources>

@@ -76,6 +76,4 @@
     <string name="newAddressBarOptionBottomSheetDialogSearchOnly">Αναζήτηση μόνο</string>
     <string name="newAddressBarOptionBottomSheetDialogSearchAndDuckAi">Αναζήτηση και Duck.ai</string>
     <string name="newAddressBarOptionBottomSheetDialogHeader">Επιλογή γραμμής διευθύνσεων</string>
-    <string name="newAddressBarOptionBottomSheetDialogTitle">Θέλετε πιο εύκολη πρόσβαση στο AI Chat;</string>
-
 </resources>

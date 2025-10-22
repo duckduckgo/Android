@@ -76,6 +76,4 @@
     <string name="newAddressBarOptionBottomSheetDialogSearchOnly">Csak keresés</string>
     <string name="newAddressBarOptionBottomSheetDialogSearchAndDuckAi">Keresés és Duck.ai</string>
     <string name="newAddressBarOptionBottomSheetDialogHeader">Címsorbeállítás</string>
-    <string name="newAddressBarOptionBottomSheetDialogTitle">Szeretnél könnyebben hozzáférni az AI-csevegőhöz?</string>
-
 </resources>

@@ -76,6 +76,4 @@
     <string name="newAddressBarOptionBottomSheetDialogSearchOnly">Samo pretraživanje</string>
     <string name="newAddressBarOptionBottomSheetDialogSearchAndDuckAi">Pretraživanje i Duck.ai</string>
     <string name="newAddressBarOptionBottomSheetDialogHeader">Opcija adresne trake</string>
-    <string name="newAddressBarOptionBottomSheetDialogTitle">Želiš lakši pristup AI čavrljanju?</string>
-
 </resources>

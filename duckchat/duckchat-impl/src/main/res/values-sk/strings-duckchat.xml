@@ -76,6 +76,4 @@
     <string name="newAddressBarOptionBottomSheetDialogSearchOnly">Len vyhľadávanie</string>
     <string name="newAddressBarOptionBottomSheetDialogSearchAndDuckAi">Vyhľadávanie &amp; Duck.ai</string>
     <string name="newAddressBarOptionBottomSheetDialogHeader">Možnosť panela s adresou</string>
-    <string name="newAddressBarOptionBottomSheetDialogTitle">Chceš jednoduchší prístup k AI chatu?</string>
-
 </resources>

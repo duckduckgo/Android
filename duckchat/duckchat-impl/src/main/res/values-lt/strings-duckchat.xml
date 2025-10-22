@@ -76,6 +76,4 @@
     <string name="newAddressBarOptionBottomSheetDialogSearchOnly">Tik paieška</string>
     <string name="newAddressBarOptionBottomSheetDialogSearchAndDuckAi">Paieška ir „Duck.ai“</string>
     <string name="newAddressBarOptionBottomSheetDialogHeader">Adreso juostos parinktis</string>
-    <string name="newAddressBarOptionBottomSheetDialogTitle">Norite lengviau pasiekti DI pokalbius?</string>
-
 </resources>

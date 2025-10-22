@@ -76,6 +76,4 @@
     <string name="newAddressBarOptionBottomSheetDialogSearchOnly">Meklēt tikai</string>
     <string name="newAddressBarOptionBottomSheetDialogSearchAndDuckAi">Meklēšana &amp; Duck.ai</string>
     <string name="newAddressBarOptionBottomSheetDialogHeader">Adreses joslas opcija</string>
-    <string name="newAddressBarOptionBottomSheetDialogTitle">Vēlies vieglāk piekļūt MI tērzēšanai?</string>
-
 </resources>
