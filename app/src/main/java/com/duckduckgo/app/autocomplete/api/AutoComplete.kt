@@ -326,7 +326,7 @@ class AutoCompleteApi constructor(
                 AutoCompletePixelNames.AUTOCOMPLETE_DUCKAI_PROMPT_LEGACY_SELECTION
             }
             is AutoCompleteDeviceAppSuggestion -> {
-                // todo add pixel for device app selection
+                pixel.fire(AutoCompletePixelNames.AUTOCOMPLETE_INSTALLED_APP_SELECTION)
                 return
             }
 
