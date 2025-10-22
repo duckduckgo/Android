@@ -72,7 +72,7 @@ interface DuckChatFeature {
      * @return `true` when the Input Screen should be shown when user open the app from system widgets
      * If the remote feature is not present defaults to `disabled`
      */
-    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
+    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun showInputScreenOnSystemSearchLaunch(): Toggle
 
     /**
