@@ -162,7 +162,7 @@ def generate_markdown_summary(results: List[BenchmarkResult]) -> str:
     return md
 
 
-def send_results_to_api(results: List[BenchmarkResult], github_action_run_id: Optional[str] = None, github_action_job_id: Optional[str] = None, git_commit_sha: Optional[str] = None) -> None:
+def send_results_to_api(results: List[BenchmarkResult], github_action_run_id: Optional[str] = None, git_commit_sha: Optional[str] = None) -> None:
     """Send benchmark results to the API endpoint."""
     base_url = "https://improving.duckduckgo.com/t/m_build_time_android"
     
@@ -183,9 +183,6 @@ def send_results_to_api(results: List[BenchmarkResult], github_action_run_id: Op
 
         if github_action_run_id:
             params['github_action_run_id'] = github_action_run_id
-
-        if github_action_job_id:
-            params['github_action_job_id'] = github_action_job_id
 
         if git_commit_sha:
             params['git_commit_sha'] = git_commit_sha
@@ -219,11 +216,6 @@ def main():
         help="GitHub Action run ID for linking results"
     )
     parser.add_argument(
-        "--github-action-job-id",
-        type=str,
-        help="GitHub Action job ID for linking results"
-    )
-    parser.add_argument(
         "--git-commit-sha",
         type=str,
         help="Git commit SHA for linking results to specific code version"
@@ -241,13 +233,13 @@ def main():
     print(generate_terminal_summary(results))
     
     # Send results to API only if both conditions are met
-    if results and args.report_pixel and args.github_action_run_id and args.github_action_job_id and args.git_commit_sha:
+    if results and args.report_pixel and args.github_action_run_id and args.git_commit_sha:
         print("\n" + "=" * 80)
         print("SENDING RESULTS TO API")
         print("=" * 80)
-        send_results_to_api(results, args.github_action_run_id, args.github_action_job_id, args.git_commit_sha)
-    elif results and args.report_pixel and (not args.github_action_run_id or not args.github_action_job_id or not args.git_commit_sha):
-        print("\n⚠️  --report-pixel flag set but no --github-action-run-id, --github-action-job-id and --git-commit-sha provided. Skipping API requests.")
+        send_results_to_api(results, args.github_action_run_id, args.git_commit_sha)
+    elif results and args.report_pixel and (not args.github_action_run_id or not args.git_commit_sha):
+        print("\n⚠️  --report-pixel flag set but no --github-action-run-id and --git-commit-sha provided. Skipping API requests.")
 
 
 if __name__ == '__main__':

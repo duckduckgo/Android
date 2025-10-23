@@ -5,7 +5,7 @@
 # Scenario 1: Build
 # Measures repeatable build performance with warm cache and no changes
 build-repeatable {
-    title = "Build (warm cache and no changes)"
+    title = "build-warm"
     tasks = ["app:buildInternalDebug"]
     warm-ups = 2
     iterations = 4
@@ -14,7 +14,7 @@ build-repeatable {
 # Scenario 2: Clean Build
 # Measures cold build performance with no incremental compilation
 build-clean {
-    title = "Build (clean and cold cache)"
+    title = "build-cold"
     tasks = ["app:buildInternalDebug"]
     gradle-args = ["--no-build-cache", "--no-configuration-cache"]
     cleanup-tasks = ["clean"]
@@ -26,7 +26,7 @@ build-clean {
 # Measures incremental build performance when public API changes
 # This triggers recompilation of all dependent modules
 abi-change {
-    title = "ABI Change (Incremental)"
+    title = "build-abi-change-incremental"
     tasks = ["app:buildInternalDebug"]
 
     # Apply ABI change to a core utility class
@@ -40,7 +40,7 @@ abi-change {
 # Measures incremental build performance when only implementation changes
 # Only the modified module needs recompilation
 non-abi-change {
-    title = "Non-ABI Change (Incremental)"
+    title = "build-non-abi-change-incremental"
     tasks = ["app:buildInternalDebug"]
 
     # Apply non-ABI change to the same file

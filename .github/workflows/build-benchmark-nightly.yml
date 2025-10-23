@@ -17,11 +17,6 @@ jobs:
     timeout-minutes: 120
 
     steps:
-      - name: Build job URL
-        run: |
-          echo "JOB_URL=https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}/job/${GITHUB_JOB_ID}" >> $GITHUB_ENV
-          echo "$JOB_URL"
-
       - name: Determine branch
         id: determine-branch
         run: |
@@ -71,3 +66,18 @@ jobs:
           name: benchmark-results-develop-${{ github.run_number }}
           path: profile-out/**/*.csv
           retention-days: 30
+
+      - name: Run Benchmark Comparison
+        run: |
+          # Find the CSV file in the profile-out directory
+          CSV_FILE=$(find profile-out -name "*.csv" | head -1)
+          if [ -z "$CSV_FILE" ]; then
+            echo "No CSV file found in profile-out directory"
+            exit 1
+          fi
+          
+          echo "Running benchmark comparison on: $CSV_FILE"
+          python3 scripts/benchmark-comparison.py "$CSV_FILE" \
+            --github-action-run-id "${{ github.run_id }}" \
+            --git-commit-sha "${{ github.sha }}" \
+            --report-pixel
