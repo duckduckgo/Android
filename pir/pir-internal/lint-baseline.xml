@@ -1,48 +1,70 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<issues format="6" by="lint 8.7.3" type="baseline" client="gradle" dependencies="false"
-    name="AGP (8.7.3)" variant="all" version="8.7.3">
+<issues format="6" by="lint 8.8.2" type="baseline" client="gradle" dependencies="false" name="AGP (8.7.3)" variant="all" version="8.8.2">
 
-    <issue id="HardcodedText"
+    <issue
+        id="HardcodedText"
         message="Hardcoded string &quot;First name&quot;, should use `@string` resource"
         errorLine1="                android:hint=&quot;First name&quot;"
         errorLine2="                ~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location file="src/main/res/layout/activity_pir_internal_scan.xml" line="63" column="17" />
+        <location
+            file="src/main/res/layout/activity_pir_internal_scan.xml"
+            line="63"
+            column="17"/>
     </issue>
 
-    <issue id="HardcodedText"
+    <issue
+        id="HardcodedText"
         message="Hardcoded string &quot;Middle name&quot;, should use `@string` resource"
         errorLine1="                android:hint=&quot;Middle name&quot;"
         errorLine2="                ~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location file="src/main/res/layout/activity_pir_internal_scan.xml" line="72" column="17" />
+        <location
+            file="src/main/res/layout/activity_pir_internal_scan.xml"
+            line="72"
+            column="17"/>
     </issue>
 
-    <issue id="HardcodedText"
+    <issue
+        id="HardcodedText"
         message="Hardcoded string &quot;Last name&quot;, should use `@string` resource"
         errorLine1="                android:hint=&quot;Last name&quot;"
         errorLine2="                ~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location file="src/main/res/layout/activity_pir_internal_scan.xml" line="81" column="17" />
+        <location
+            file="src/main/res/layout/activity_pir_internal_scan.xml"
+            line="81"
+            column="17"/>
     </issue>
 
-    <issue id="HardcodedText"
+    <issue
+        id="HardcodedText"
         message="Hardcoded string &quot;City&quot;, should use `@string` resource"
         errorLine1="                android:hint=&quot;City&quot;"
         errorLine2="                ~~~~~~~~~~~~~~~~~~~">
-        <location file="src/main/res/layout/activity_pir_internal_scan.xml" line="90" column="17" />
+        <location
+            file="src/main/res/layout/activity_pir_internal_scan.xml"
+            line="90"
+            column="17"/>
     </issue>
 
-    <issue id="HardcodedText"
+    <issue
+        id="HardcodedText"
         message="Hardcoded string &quot;State (two characters format)&quot;, should use `@string` resource"
         errorLine1="                android:hint=&quot;State (two characters format)&quot;"
         errorLine2="                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location file="src/main/res/layout/activity_pir_internal_scan.xml" line="99" column="17" />
+        <location
+            file="src/main/res/layout/activity_pir_internal_scan.xml"
+            line="99"
+            column="17"/>
     </issue>
 
-    <issue id="HardcodedText"
+    <issue
+        id="HardcodedText"
         message="Hardcoded string &quot;Birth Year&quot;, should use `@string` resource"
         errorLine1="                android:hint=&quot;Birth Year&quot;"
         errorLine2="                ~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location file="src/main/res/layout/activity_pir_internal_scan.xml" line="109"
-            column="17" />
+        <location
+            file="src/main/res/layout/activity_pir_internal_scan.xml"
+            line="109"
+            column="17"/>
     </issue>
 
 </issues>

@@ -1,5 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<issues format="6" by="lint 8.7.3" type="baseline" client="gradle" dependencies="false" name="AGP (8.7.3)" variant="all" version="8.7.3">
+<issues format="6" by="lint 8.8.2" type="baseline" client="gradle" dependencies="false" name="AGP (8.7.3)" variant="all" version="8.8.2">
+
+    <issue
+        id="ScrollViewSize"
+        message="This LinearLayout should use `android:layout_height=&quot;wrap_content&quot;`"
+        errorLine1="        android:layout_height=&quot;match_parent&quot;"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/view_autofill_settings.xml"
+            line="27"
+            column="9"/>
+    </issue>
 
     <issue
         id="DefaultLocale"
@@ -8,7 +19,7 @@
         errorLine2="                               ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/java/com/duckduckgo/autofill/impl/deviceauth/AuthLauncher.kt"
-            line="103"
+            line="108"
             column="32"/>
     </issue>
 
@@ -78,7 +89,7 @@
             message="Duplicate id @+id/dialogTitle, defined or included multiple times in layout/content_import_from_google_password_dialog.xml: [layout/content_import_from_google_password_dialog.xml => layout/content_import_google_password_pre_flow.xml defines @+id/dialogTitle, layout/content_import_from_google_password_dialog.xml => layout/content_import_google_password_post_flow.xml defines @+id/dialogTitle]"/>
         <location
             file="src/main/res/layout/content_import_google_password_pre_flow.xml"
-            line="45"
+            line="59"
             column="9"
             message="Defined here, included via layout/content_import_from_google_password_dialog.xml => layout/content_import_google_password_pre_flow.xml defines @+id/dialogTitle"/>
         <location
@@ -1377,7 +1388,7 @@
         errorLine2="                                            ~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/java/com/duckduckgo/autofill/impl/deviceauth/AuthLauncher.kt"
-            line="126"
+            line="147"
             column="45"/>
     </issue>
 
@@ -1388,7 +1399,7 @@
         errorLine2="                                                                                              ~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/java/com/duckduckgo/autofill/impl/deviceauth/AuthLauncher.kt"
-            line="126"
+            line="147"
             column="95"/>
     </issue>
 
@@ -1454,7 +1465,7 @@
         errorLine2="                                     ~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/java/com/duckduckgo/autofill/impl/ui/credential/management/viewing/AutofillManagementDisabledMode.kt"
-            line="74"
+            line="80"
             column="38"/>
     </issue>
 
@@ -1465,7 +1476,7 @@
         errorLine2="                                     ~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/java/com/duckduckgo/autofill/impl/ui/credential/management/viewing/AutofillManagementDisabledMode.kt"
-            line="78"
+            line="89"
             column="38"/>
     </issue>
 
@@ -1476,7 +1487,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/java/com/duckduckgo/autofill/impl/newtab/AutofillNewTabShortcut.kt"
-            line="62"
+            line="63"
             column="13"/>
     </issue>
 
@@ -1487,7 +1498,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/java/com/duckduckgo/autofill/impl/newtab/AutofillNewTabShortcut.kt"
-            line="64"
+            line="65"
             column="13"/>
     </issue>
 
@@ -1498,19 +1509,8 @@
         errorLine2="                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/java/com/duckduckgo/autofill/impl/pixel/AutofillPixelSender.kt"
-            line="58"
+            line="59"
             column="17"/>
-    </issue>
-
-    <issue
-        id="DenyListedApi"
-        message="first() will throw if flow is empty, firstOrNull() it&apos;s a safer option."
-        errorLine1="        if (autofillStore.getCredentialCount().first() == 0) {"
-        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/java/com/duckduckgo/autofill/impl/ui/credential/management/AutofillSettingsViewModel.kt"
-            line="332"
-            column="13"/>
     </issue>
 
     <issue
@@ -1542,7 +1542,7 @@
         errorLine2="                                                                                  ~~~~~~~~~~~~~~~">
         <location
             file="src/main/java/com/duckduckgo/autofill/impl/ui/credential/passwordgeneration/AutofillUseGeneratedPasswordDialogFragment.kt"
-            line="141"
+            line="142"
             column="83"/>
     </issue>
 
@@ -1553,7 +1553,7 @@
         errorLine2="                                                                                                                              ~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/java/com/duckduckgo/autofill/impl/ui/credential/passwordgeneration/AutofillUseGeneratedPasswordDialogFragment.kt"
-            line="141"
+            line="142"
             column="127"/>
     </issue>
 
@@ -1564,7 +1564,7 @@
         errorLine2="                                        ~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/java/com/duckduckgo/autofill/impl/ui/credential/passwordgeneration/AutofillUseGeneratedPasswordDialogFragment.kt"
-            line="146"
+            line="147"
             column="41"/>
     </issue>
 
@@ -1955,17 +1955,6 @@
 
     <issue
         id="DenyListedApi"
-        message="If you find yourself using this API in production, you&apos;re doing something wrong!!"
-        errorLine1="        autofillFeature.canCategorizeUnknownUsername().setRawStoredState(State(enable = true))"
-        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/test/java/com/duckduckgo/autofill/impl/configuration/RealAutofillRuntimeConfigProviderTest.kt"
-            line="77"
-            column="9"/>
-    </issue>
-
-    <issue
-        id="DenyListedApi"
         message="Use com.duckduckgo.data.store.api.SharedPreferencesProvider instead"
         errorLine1="        whenever(this.getSharedPreferences(ArgumentMatchers.anyString(), ArgumentMatchers.anyInt())).thenReturn(preferences)"
         errorLine2="                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
@@ -2004,7 +1993,7 @@
         errorLine2="                     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/test/java/com/duckduckgo/autofill/impl/securestorage/RealSecureStorageTest.kt"
-            line="139"
+            line="137"
             column="22"/>
     </issue>
 
@@ -2015,7 +2004,7 @@
         errorLine2="                     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/test/java/com/duckduckgo/autofill/impl/securestorage/RealSecureStorageTest.kt"
-            line="150"
+            line="148"
             column="22"/>
     </issue>
 
@@ -2026,7 +2015,7 @@
         errorLine2="                     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/test/java/com/duckduckgo/autofill/impl/securestorage/RealSecureStorageTest.kt"
-            line="161"
+            line="159"
             column="22"/>
     </issue>
 
@@ -2037,7 +2026,7 @@
         errorLine2="                     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/test/java/com/duckduckgo/autofill/impl/securestorage/RealSecureStorageTest.kt"
-            line="172"
+            line="170"
             column="22"/>
     </issue>
 
@@ -2050,6 +2039,17 @@
             file="src/main/res/drawable/ic_autofill_keychain.xml"
             line="2"
             column="20"/>
+    </issue>
+
+    <issue
+        id="ExtraText"
+        message="Unexpected text found in layout file: &quot;/>&quot;"
+        errorLine1="        />"
+        errorLine2="        ~~">
+        <location
+            file="src/main/res/layout/popup_window_import_passwords_menu.xml"
+            line="31"
+            column="9"/>
     </issue>
 
     <issue
@@ -3390,7 +3390,7 @@
         errorLine2="                                                                     ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-bg/strings-autofill-impl.xml"
-            line="216"
+            line="218"
             column="70"/>
     </issue>
 
@@ -3401,7 +3401,7 @@
         errorLine2="                                                                     ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-da/strings-autofill-impl.xml"
-            line="216"
+            line="218"
             column="70"/>
     </issue>
 
@@ -3412,7 +3412,7 @@
         errorLine2="                                                                     ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-de/strings-autofill-impl.xml"
-            line="216"
+            line="218"
             column="70"/>
     </issue>
 
@@ -3423,7 +3423,7 @@
         errorLine2="                                                                     ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-el/strings-autofill-impl.xml"
-            line="216"
+            line="218"
             column="70"/>
     </issue>
 
@@ -3434,7 +3434,7 @@
         errorLine2="                                                                     ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-es/strings-autofill-impl.xml"
-            line="216"
+            line="218"
             column="70"/>
     </issue>
 
@@ -3445,7 +3445,7 @@
         errorLine2="                                                                     ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-et/strings-autofill-impl.xml"
-            line="216"
+            line="218"
             column="70"/>
     </issue>
 
@@ -3456,7 +3456,7 @@
         errorLine2="                                                                     ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-fi/strings-autofill-impl.xml"
-            line="216"
+            line="218"
             column="70"/>
     </issue>
 
@@ -3467,7 +3467,7 @@
         errorLine2="                                                                     ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-fr/strings-autofill-impl.xml"
-            line="216"
+            line="218"
             column="70"/>
     </issue>
 
@@ -3478,7 +3478,7 @@
         errorLine2="                                                                     ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-hu/strings-autofill-impl.xml"
-            line="216"
+            line="218"
             column="70"/>
     </issue>
 
@@ -3489,7 +3489,7 @@
         errorLine2="                                                                     ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-it/strings-autofill-impl.xml"
-            line="216"
+            line="218"
             column="70"/>
     </issue>
 
@@ -3500,7 +3500,7 @@
         errorLine2="                                                                     ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-nb/strings-autofill-impl.xml"
-            line="216"
+            line="218"
             column="70"/>
     </issue>
 
@@ -3511,7 +3511,7 @@
         errorLine2="                                                                     ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-nl/strings-autofill-impl.xml"
-            line="216"
+            line="218"
             column="70"/>
     </issue>
 
@@ -3522,7 +3522,7 @@
         errorLine2="                                                                     ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-pt/strings-autofill-impl.xml"
-            line="216"
+            line="218"
             column="70"/>
     </issue>
 
@@ -3533,7 +3533,7 @@
         errorLine2="                                                                     ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-sv/strings-autofill-impl.xml"
-            line="216"
+            line="218"
             column="70"/>
     </issue>
 
@@ -3544,7 +3544,7 @@
         errorLine2="                                                                     ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-tr/strings-autofill-impl.xml"
-            line="216"
+            line="218"
             column="70"/>
     </issue>
 
@@ -3555,7 +3555,7 @@
         errorLine2="                                                                     ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-lv/strings-autofill-impl.xml"
-            line="222"
+            line="224"
             column="70"/>
     </issue>
 
@@ -3566,7 +3566,7 @@
         errorLine2="                                                                     ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-ro/strings-autofill-impl.xml"
-            line="222"
+            line="224"
             column="70"/>
     </issue>
 
@@ -3577,7 +3577,7 @@
         errorLine2="                                                                     ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-cs/strings-autofill-impl.xml"
-            line="228"
+            line="230"
             column="70"/>
     </issue>
 
@@ -3588,7 +3588,7 @@
         errorLine2="                                                                     ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-hr/strings-autofill-impl.xml"
-            line="228"
+            line="230"
             column="70"/>
     </issue>
 
@@ -3599,7 +3599,7 @@
         errorLine2="                                                                     ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-lt/strings-autofill-impl.xml"
-            line="228"
+            line="230"
             column="70"/>
     </issue>
 
@@ -3610,7 +3610,7 @@
         errorLine2="                                                                     ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-pl/strings-autofill-impl.xml"
-            line="228"
+            line="230"
             column="70"/>
     </issue>
 
@@ -3621,7 +3621,7 @@
         errorLine2="                                                                     ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-ru/strings-autofill-impl.xml"
-            line="228"
+            line="230"
             column="70"/>
     </issue>
 
@@ -3632,7 +3632,7 @@
         errorLine2="                                                                     ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-sk/strings-autofill-impl.xml"
-            line="228"
+            line="230"
             column="70"/>
     </issue>
 
@@ -3643,8 +3643,272 @@
         errorLine2="                                                                     ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-sl/strings-autofill-impl.xml"
-            line="228"
+            line="230"
             column="70"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;serviceName&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;bg&quot; (Bulgarian) here"
+        errorLine1="    &lt;string name=&quot;serviceName&quot; translatable=&quot;false&quot;>DuckDuckGo&lt;/string>"
+        errorLine2="                               ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-bg/strings-autofill-impl.xml"
+            line="266"
+            column="32"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;serviceName&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;da&quot; (Danish) here"
+        errorLine1="    &lt;string name=&quot;serviceName&quot; translatable=&quot;false&quot;>DuckDuckGo&lt;/string>"
+        errorLine2="                               ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-da/strings-autofill-impl.xml"
+            line="266"
+            column="32"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;serviceName&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;de&quot; (German) here"
+        errorLine1="    &lt;string name=&quot;serviceName&quot; translatable=&quot;false&quot;>DuckDuckGo&lt;/string>"
+        errorLine2="                               ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-de/strings-autofill-impl.xml"
+            line="266"
+            column="32"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;serviceName&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;el&quot; (Greek) here"
+        errorLine1="    &lt;string name=&quot;serviceName&quot; translatable=&quot;false&quot;>DuckDuckGo&lt;/string>"
+        errorLine2="                               ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-el/strings-autofill-impl.xml"
+            line="266"
+            column="32"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;serviceName&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;es&quot; (Spanish) here"
+        errorLine1="    &lt;string name=&quot;serviceName&quot; translatable=&quot;false&quot;>DuckDuckGo&lt;/string>"
+        errorLine2="                               ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-es/strings-autofill-impl.xml"
+            line="266"
+            column="32"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;serviceName&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;et&quot; (Estonian) here"
+        errorLine1="    &lt;string name=&quot;serviceName&quot; translatable=&quot;false&quot;>DuckDuckGo&lt;/string>"
+        errorLine2="                               ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-et/strings-autofill-impl.xml"
+            line="266"
+            column="32"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;serviceName&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;fi&quot; (Finnish) here"
+        errorLine1="    &lt;string name=&quot;serviceName&quot; translatable=&quot;false&quot;>DuckDuckGo&lt;/string>"
+        errorLine2="                               ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-fi/strings-autofill-impl.xml"
+            line="266"
+            column="32"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;serviceName&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;fr&quot; (French) here"
+        errorLine1="    &lt;string name=&quot;serviceName&quot; translatable=&quot;false&quot;>DuckDuckGo&lt;/string>"
+        errorLine2="                               ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-fr/strings-autofill-impl.xml"
+            line="266"
+            column="32"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;serviceName&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;hu&quot; (Hungarian) here"
+        errorLine1="    &lt;string name=&quot;serviceName&quot; translatable=&quot;false&quot;>DuckDuckGo&lt;/string>"
+        errorLine2="                               ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-hu/strings-autofill-impl.xml"
+            line="266"
+            column="32"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;serviceName&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;it&quot; (Italian) here"
+        errorLine1="    &lt;string name=&quot;serviceName&quot; translatable=&quot;false&quot;>DuckDuckGo&lt;/string>"
+        errorLine2="                               ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-it/strings-autofill-impl.xml"
+            line="266"
+            column="32"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;serviceName&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;nb&quot; (Norwegian Bokmål) here"
+        errorLine1="    &lt;string name=&quot;serviceName&quot; translatable=&quot;false&quot;>DuckDuckGo&lt;/string>"
+        errorLine2="                               ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-nb/strings-autofill-impl.xml"
+            line="266"
+            column="32"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;serviceName&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;nl&quot; (Dutch) here"
+        errorLine1="    &lt;string name=&quot;serviceName&quot; translatable=&quot;false&quot;>DuckDuckGo&lt;/string>"
+        errorLine2="                               ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-nl/strings-autofill-impl.xml"
+            line="266"
+            column="32"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;serviceName&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;pt&quot; (Portuguese) here"
+        errorLine1="    &lt;string name=&quot;serviceName&quot; translatable=&quot;false&quot;>DuckDuckGo&lt;/string>"
+        errorLine2="                               ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-pt/strings-autofill-impl.xml"
+            line="266"
+            column="32"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;serviceName&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;sv&quot; (Swedish) here"
+        errorLine1="    &lt;string name=&quot;serviceName&quot; translatable=&quot;false&quot;>DuckDuckGo&lt;/string>"
+        errorLine2="                               ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-sv/strings-autofill-impl.xml"
+            line="266"
+            column="32"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;serviceName&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;tr&quot; (Turkish) here"
+        errorLine1="    &lt;string name=&quot;serviceName&quot; translatable=&quot;false&quot;>DuckDuckGo&lt;/string>"
+        errorLine2="                               ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-tr/strings-autofill-impl.xml"
+            line="266"
+            column="32"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;serviceName&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;lv&quot; (Latvian) here"
+        errorLine1="    &lt;string name=&quot;serviceName&quot; translatable=&quot;false&quot;>DuckDuckGo&lt;/string>"
+        errorLine2="                               ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-lv/strings-autofill-impl.xml"
+            line="272"
+            column="32"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;serviceName&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;ro&quot; (Romanian) here"
+        errorLine1="    &lt;string name=&quot;serviceName&quot; translatable=&quot;false&quot;>DuckDuckGo&lt;/string>"
+        errorLine2="                               ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-ro/strings-autofill-impl.xml"
+            line="272"
+            column="32"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;serviceName&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;cs&quot; (Czech) here"
+        errorLine1="    &lt;string name=&quot;serviceName&quot; translatable=&quot;false&quot;>DuckDuckGo&lt;/string>"
+        errorLine2="                               ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-cs/strings-autofill-impl.xml"
+            line="278"
+            column="32"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;serviceName&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;hr&quot; (Croatian) here"
+        errorLine1="    &lt;string name=&quot;serviceName&quot; translatable=&quot;false&quot;>DuckDuckGo&lt;/string>"
+        errorLine2="                               ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-hr/strings-autofill-impl.xml"
+            line="278"
+            column="32"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;serviceName&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;lt&quot; (Lithuanian) here"
+        errorLine1="    &lt;string name=&quot;serviceName&quot; translatable=&quot;false&quot;>DuckDuckGo&lt;/string>"
+        errorLine2="                               ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-lt/strings-autofill-impl.xml"
+            line="278"
+            column="32"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;serviceName&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;pl&quot; (Polish) here"
+        errorLine1="    &lt;string name=&quot;serviceName&quot; translatable=&quot;false&quot;>DuckDuckGo&lt;/string>"
+        errorLine2="                               ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-pl/strings-autofill-impl.xml"
+            line="278"
+            column="32"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;serviceName&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;ru&quot; (Russian) here"
+        errorLine1="    &lt;string name=&quot;serviceName&quot; translatable=&quot;false&quot;>DuckDuckGo&lt;/string>"
+        errorLine2="                               ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-ru/strings-autofill-impl.xml"
+            line="278"
+            column="32"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;serviceName&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;sk&quot; (Slovak) here"
+        errorLine1="    &lt;string name=&quot;serviceName&quot; translatable=&quot;false&quot;>DuckDuckGo&lt;/string>"
+        errorLine2="                               ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-sk/strings-autofill-impl.xml"
+            line="278"
+            column="32"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;serviceName&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;sl&quot; (Slovenian) here"
+        errorLine1="    &lt;string name=&quot;serviceName&quot; translatable=&quot;false&quot;>DuckDuckGo&lt;/string>"
+        errorLine2="                               ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-sl/strings-autofill-impl.xml"
+            line="278"
+            column="32"/>
     </issue>
 
     <issue
@@ -3654,7 +3918,7 @@
         errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings-autofill-impl.xml"
-            line="238"
+            line="240"
             column="5"/>
     </issue>
 
@@ -3665,7 +3929,7 @@
         errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings-autofill-impl.xml"
-            line="239"
+            line="241"
             column="5"/>
     </issue>
 
@@ -3814,6 +4078,17 @@
 
     <issue
         id="VectorPath"
+        message="Very long vector path (1444 characters), which is bad for performance. Considering reducing precision, removing minor details or rasterizing vector."
+        errorLine1="      android:pathData=&quot;M15.091,2.001C18.915,2.05 22,5.164 22,9L21.999,9.091C21.984,10.264 21.68,11.367 21.155,12.333C20.841,12.053 20.498,11.804 20.132,11.592C20.526,10.813 20.75,9.933 20.75,9C20.75,5.849 18.216,3.291 15.074,3.251L15,3.25C11.824,3.25 9.25,5.824 9.25,9L9.251,9.094C9.258,9.529 9.313,9.951 9.411,10.356L9.433,10.443L9.445,10.495C9.564,11.019 9.458,11.615 9.054,12.052L9.012,12.095L3.937,17.193C3.497,17.635 3.25,18.233 3.25,18.855V19.388C3.25,20.14 3.86,20.75 4.612,20.75H5.635C6.113,20.75 6.5,20.362 6.5,19.885V19.12C6.5,18.364 7.113,17.75 7.87,17.75H8.856L8.887,17.749C9.03,17.742 9.167,17.685 9.272,17.588L9.295,17.566L10.828,16.014C10.777,16.335 10.75,16.664 10.75,17C10.75,17.277 10.77,17.549 10.805,17.816L10.185,18.445C9.845,18.789 9.384,18.987 8.902,18.999L8.856,19H7.87C7.804,19 7.75,19.054 7.75,19.12V19.885C7.75,21.053 6.803,22 5.635,22H4.612C3.17,22 2,20.83 2,19.388V18.855C2,17.902 2.378,16.987 3.051,16.312L8.126,11.213L8.144,11.194C8.226,11.098 8.27,10.939 8.223,10.756L8.195,10.649C8.076,10.155 8.009,9.641 8.001,9.113L8,9C8,5.134 11.134,2 15,2L15.091,2.001ZM15.5,6.042C16.858,6.042 17.958,7.142 17.958,8.5C17.958,9.53 17.324,10.412 16.425,10.777C16.078,10.809 15.74,10.867 15.412,10.953C14.095,10.907 13.042,9.828 13.042,8.5C13.042,7.142 14.142,6.042 15.5,6.042ZM15.5,7.292C14.833,7.292 14.292,7.833 14.292,8.5C14.292,9.167 14.833,9.708 15.5,9.708C16.167,9.708 16.708,9.167 16.708,8.5L16.707,8.438C16.674,7.799 16.146,7.292 15.5,7.292Z&quot;>"
+        errorLine2="                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/drawable/key_color_import_24.xml"
+            line="11"
+            column="25"/>
+    </issue>
+
+    <issue
+        id="VectorPath"
         message="Very long vector path (949 characters), which is bad for performance. Considering reducing precision, removing minor details or rasterizing vector."
         errorLine1="      android:pathData=&quot;M89.49,65.46C86.64,63.99 83.15,65.06 81.52,67.97L81.51,67.98C80.97,68.94 80.71,69.98 80.68,71.02C80.66,71.57 80.33,72.05 79.82,72.19L77.79,72.74C77.43,72.84 77.08,72.58 77.05,72.19C76.86,70.12 77.26,67.97 78.35,66.03C81.01,61.27 86.77,59.59 91.38,62.16C91.59,62.27 91.84,62.2 91.96,61.99L92.75,60.57C92.95,60.23 93.44,60.3 93.54,60.69L94.92,66.21C94.98,66.45 94.84,66.7 94.61,66.76L89.34,68.2C88.97,68.3 88.66,67.88 88.86,67.54L89.67,66.09C89.79,65.87 89.72,65.58 89.49,65.46ZM84.02,76.62C86.99,78.09 90.62,77.02 92.31,74.11L92.32,74.1C92.88,73.14 93.15,72.1 93.18,71.06C93.2,70.51 93.55,70.03 94.07,69.89L96.18,69.34C96.55,69.24 96.91,69.5 96.95,69.89C97.15,71.96 96.73,74.11 95.6,76.05C92.83,80.81 86.85,82.49 82.07,79.92C81.85,79.81 81.59,79.88 81.46,80.09L80.64,81.51C80.44,81.85 79.92,81.78 79.82,81.39L78.39,75.87C78.33,75.63 78.47,75.38 78.71,75.32L84.18,73.88C84.57,73.78 84.89,74.2 84.69,74.54L83.85,75.98C83.72,76.21 83.8,76.5 84.02,76.62Z&quot;"
         errorLine2="                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
@@ -3858,9 +4133,9 @@
 
     <issue
         id="Overdraw"
-        message="Possible overdraw: Root element paints background `?attr/colorPrimaryDark` with a theme that also paints a background (inferred theme is `@android:style/Theme.Holo`)"
-        errorLine1="    android:background=&quot;?attr/colorPrimaryDark&quot;>"
-        errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        message="Possible overdraw: Root element paints background `?attr/daxColorBackground` with a theme that also paints a background (inferred theme is `@android:style/Theme.Holo`)"
+        errorLine1="    android:background=&quot;?attr/daxColorBackground&quot;>"
+        errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/layout/fragment_autofill_management_edit_mode.xml"
             line="22"
@@ -3880,11 +4155,33 @@
 
     <issue
         id="Overdraw"
+        message="Possible overdraw: Root element paints background `?android:attr/colorBackground` with a theme that also paints a background (inferred theme is `@android:style/Theme.Holo`)"
+        errorLine1="    android:background=&quot;?android:attr/colorBackground&quot;>"
+        errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/fragment_import_bookmarks_progress.xml"
+            line="24"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="Overdraw"
         message="Possible overdraw: Root element paints background `?attr/selectableItemBackground` with a theme that also paints a background (inferred theme is `@android:style/Theme.Holo`)"
         errorLine1="    android:background=&quot;?attr/selectableItemBackground&quot;"
         errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/layout/item_row_autofill_credentials_management_screen.xml"
+            line="23"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="Overdraw"
+        message="Possible overdraw: Root element paints background `@drawable/popup_menu_bg` with a theme that also paints a background (inferred theme is `@android:style/Theme.Holo`)"
+        errorLine1="    android:background=&quot;@drawable/popup_menu_bg&quot;>"
+        errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/popup_window_import_passwords_menu.xml"
             line="23"
             column="5"/>
     </issue>

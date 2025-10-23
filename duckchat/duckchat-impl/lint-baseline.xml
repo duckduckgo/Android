@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<issues format="6" by="lint 8.7.3" type="baseline" client="gradle" dependencies="false" name="AGP (8.7.3)" variant="all" version="8.7.3">
+<issues format="6" by="lint 8.8.2" type="baseline" client="gradle" dependencies="false" name="AGP (8.7.3)" variant="all" version="8.8.2">
 
     <issue
         id="DenyListedApi"
@@ -8,7 +8,7 @@
         errorLine2="                    ~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/test/kotlin/com/duckduckgo/duckchat/impl/store/SharedPreferencesDuckChatDataStoreTest.kt"
-            line="70"
+            line="76"
             column="21"/>
     </issue>
 
@@ -19,7 +19,7 @@
         errorLine2="                                     ~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/test/kotlin/com/duckduckgo/duckchat/impl/store/SharedPreferencesDuckChatDataStoreTest.kt"
-            line="87"
+            line="93"
             column="38"/>
     </issue>
 
@@ -30,8 +30,41 @@
         errorLine2="                    ~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/test/kotlin/com/duckduckgo/duckchat/impl/store/SharedPreferencesDuckChatDataStoreTest.kt"
-            line="94"
+            line="100"
             column="21"/>
+    </issue>
+
+    <issue
+        id="QueryPermissionsNeeded"
+        message="Consider adding a `&lt;queries>` declaration to your manifest when calling this method; see https://g.co/dev/packagevisibility for details"
+        errorLine1="        if (Intent(inputAction).resolveActivity(packageManager) == null) {"
+        errorLine2="                                ~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/duckduckgo/duckchat/impl/ui/DuckChatWebViewActivity.kt"
+            line="365"
+            column="33"/>
+    </issue>
+
+    <issue
+        id="QueryPermissionsNeeded"
+        message="Consider adding a `&lt;queries>` declaration to your manifest when calling this method; see https://g.co/dev/packagevisibility for details"
+        errorLine1="        if (Intent(inputAction).resolveActivity(requireActivity().packageManager) == null) {"
+        errorLine2="                                ~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/duckduckgo/duckchat/impl/ui/DuckChatWebViewFragment.kt"
+            line="391"
+            column="33"/>
+    </issue>
+
+    <issue
+        id="VectorRaster"
+        message="Limit vector icons sizes to 200×200 to keep icon drawing fast; see https://developer.android.com/studio/write/vector-asset-studio#when for more"
+        errorLine1="    android:width=&quot;207dp&quot;"
+        errorLine2="                   ~~~~~">
+        <location
+            file="src/main/res/drawable/logo_full_ai.xml"
+            line="2"
+            column="20"/>
     </issue>
 
     <issue
@@ -43,6 +76,200 @@
             file="src/main/res/drawable/chat_private_128.xml"
             line="8"
             column="25"/>
+    </issue>
+
+    <issue
+        id="VectorPath"
+        message="Very long vector path (1021 characters), which is bad for performance. Considering reducing precision, removing minor details or rasterizing vector."
+        errorLine1="        android:pathData=&quot;M72.5,30a8,8 0,1 1,0 16h-10a8,8 0,1 1,0 -16h10ZM66.75,32a5.25,5.25 0,1 0,3.34 9.3l2.56,2.55 0.08,0.06a0.5,0.5 0,0 0,0.69 -0.69l-0.06,-0.08 -2.55,-2.56A5.25,5.25 0,0 0,66.75 32ZM93.5,32c3.31,0 6,2.39 6,5.34 0,2.24 -1.55,4.16 -3.74,4.95 -1.42,0.65 -4.91,1.31 -6.9,1.65a0.53,0.53 0,0 1,-0.49 -0.88l0.97,-1.12c0.21,-0.24 0.17,-0.61 -0.07,-0.82 -1.09,-0.97 -1.77,-2.31 -1.77,-3.79 0,-2.95 2.69,-5.34 6,-5.34ZM93.5,33c-2.87,0 -5,2.05 -5,4.34 0,1.16 0.53,2.24 1.43,3.04 0.6,0.53 0.78,1.52 0.17,2.22l-0.11,0.12a68.24,68.24 0,0 0,2.32 -0.47c1.3,-0.29 2.43,-0.6 3.04,-0.88l0.04,-0.02 0.04,-0.01c1.87,-0.68 3.08,-2.26 3.08,-4.01 0,-2.29 -2.13,-4.34 -5,-4.34ZM66.75,33a4.25,4.25 0,1 1,0 8.5,4.25 4.25,0 0,1 0,-8.5ZM93.21,34.45c0.07,-0.3 0.5,-0.3 0.57,0l0.16,0.66c0.22,0.88 0.91,1.56 1.78,1.78l0.66,0.16c0.3,0.07 0.3,0.5 0,0.57l-0.66,0.17a2.45,2.45 0,0 0,-1.78 1.78l-0.16,0.66c-0.07,0.3 -0.5,0.3 -0.57,0l-0.17,-0.66a2.45,2.45 0,0 0,-1.78 -1.78l-0.66,-0.17c-0.3,-0.07 -0.3,-0.5 0,-0.57l0.66,-0.16a2.45,2.45 0,0 0,1.78 -1.78l0.17,-0.66Z&quot;"
+        errorLine2="                          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/drawable/searchbox_withai_active.xml"
+            line="22"
+            column="27"/>
+    </issue>
+
+    <issue
+        id="VectorPath"
+        message="Very long vector path (1021 characters), which is bad for performance. Considering reducing precision, removing minor details or rasterizing vector."
+        errorLine1="        android:pathData=&quot;M72.5,30a8,8 0,1 1,0 16h-10a8,8 0,1 1,0 -16h10ZM66.75,32a5.25,5.25 0,1 0,3.34 9.3l2.56,2.55 0.08,0.06a0.5,0.5 0,0 0,0.69 -0.69l-0.06,-0.08 -2.55,-2.56A5.25,5.25 0,0 0,66.75 32ZM93.5,32c3.31,0 6,2.39 6,5.34 0,2.24 -1.55,4.16 -3.74,4.95 -1.42,0.65 -4.91,1.31 -6.9,1.65a0.53,0.53 0,0 1,-0.49 -0.88l0.97,-1.12c0.21,-0.24 0.17,-0.61 -0.07,-0.82 -1.09,-0.97 -1.77,-2.31 -1.77,-3.79 0,-2.95 2.69,-5.34 6,-5.34ZM93.5,33c-2.87,0 -5,2.05 -5,4.34 0,1.16 0.53,2.24 1.43,3.04 0.6,0.53 0.78,1.52 0.17,2.22l-0.11,0.12a68.24,68.24 0,0 0,2.32 -0.47c1.3,-0.29 2.43,-0.6 3.04,-0.88l0.04,-0.02 0.04,-0.01c1.87,-0.68 3.08,-2.26 3.08,-4.01 0,-2.29 -2.13,-4.34 -5,-4.34ZM66.75,33a4.25,4.25 0,1 1,0 8.5,4.25 4.25,0 0,1 0,-8.5ZM93.21,34.45c0.07,-0.3 0.5,-0.3 0.57,0l0.16,0.66c0.22,0.88 0.91,1.56 1.78,1.78l0.66,0.16c0.3,0.07 0.3,0.5 0,0.57l-0.66,0.17a2.45,2.45 0,0 0,-1.78 1.78l-0.16,0.66c-0.07,0.3 -0.5,0.3 -0.57,0l-0.17,-0.66a2.45,2.45 0,0 0,-1.78 -1.78l-0.66,-0.17c-0.3,-0.07 -0.3,-0.5 0,-0.57l0.66,-0.16a2.45,2.45 0,0 0,1.78 -1.78l0.17,-0.66Z&quot;"
+        errorLine2="                          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/drawable/searchbox_withai_active_dark.xml"
+            line="25"
+            column="27"/>
+    </issue>
+
+    <issue
+        id="VectorPath"
+        message="Very long vector path (1021 characters), which is bad for performance. Considering reducing precision, removing minor details or rasterizing vector."
+        errorLine1="        android:pathData=&quot;M72.5,30a8,8 0,1 1,0 16h-10a8,8 0,1 1,0 -16h10ZM66.75,32a5.25,5.25 0,1 0,3.34 9.3l2.56,2.55 0.08,0.06a0.5,0.5 0,0 0,0.69 -0.69l-0.06,-0.08 -2.55,-2.56A5.25,5.25 0,0 0,66.75 32ZM93.5,32c3.31,0 6,2.39 6,5.34 0,2.24 -1.55,4.16 -3.74,4.95 -1.42,0.65 -4.91,1.31 -6.9,1.65a0.53,0.53 0,0 1,-0.49 -0.88l0.97,-1.12c0.21,-0.24 0.17,-0.61 -0.07,-0.82 -1.09,-0.97 -1.77,-2.31 -1.77,-3.79 0,-2.95 2.69,-5.34 6,-5.34ZM93.5,33c-2.87,0 -5,2.05 -5,4.34 0,1.16 0.53,2.24 1.43,3.04 0.6,0.53 0.78,1.52 0.17,2.22l-0.11,0.12a68.24,68.24 0,0 0,2.32 -0.47c1.3,-0.29 2.43,-0.6 3.04,-0.88l0.04,-0.02 0.04,-0.01c1.87,-0.68 3.08,-2.26 3.08,-4.01 0,-2.29 -2.13,-4.34 -5,-4.34ZM66.75,33a4.25,4.25 0,1 1,0 8.5,4.25 4.25,0 0,1 0,-8.5ZM93.21,34.45c0.07,-0.3 0.5,-0.3 0.57,0l0.16,0.66c0.22,0.88 0.91,1.56 1.78,1.78l0.66,0.16c0.3,0.07 0.3,0.5 0,0.57l-0.66,0.17a2.45,2.45 0,0 0,-1.78 1.78l-0.16,0.66c-0.07,0.3 -0.5,0.3 -0.57,0l-0.17,-0.66a2.45,2.45 0,0 0,-1.78 -1.78l-0.66,-0.17c-0.3,-0.07 -0.3,-0.5 0,-0.57l0.66,-0.16a2.45,2.45 0,0 0,1.78 -1.78l0.17,-0.66Z&quot;"
+        errorLine2="                          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/drawable/searchbox_withai_inactive.xml"
+            line="22"
+            column="27"/>
+    </issue>
+
+    <issue
+        id="VectorPath"
+        message="Very long vector path (1021 characters), which is bad for performance. Considering reducing precision, removing minor details or rasterizing vector."
+        errorLine1="        android:pathData=&quot;M72.5,30a8,8 0,1 1,0 16h-10a8,8 0,1 1,0 -16h10ZM66.75,32a5.25,5.25 0,1 0,3.34 9.3l2.56,2.55 0.08,0.06a0.5,0.5 0,0 0,0.69 -0.69l-0.06,-0.08 -2.55,-2.56A5.25,5.25 0,0 0,66.75 32ZM93.5,32c3.31,0 6,2.39 6,5.34 0,2.24 -1.55,4.16 -3.74,4.95 -1.42,0.65 -4.91,1.31 -6.9,1.65a0.53,0.53 0,0 1,-0.49 -0.88l0.97,-1.12c0.21,-0.24 0.17,-0.61 -0.07,-0.82 -1.09,-0.97 -1.77,-2.31 -1.77,-3.79 0,-2.95 2.69,-5.34 6,-5.34ZM93.5,33c-2.87,0 -5,2.05 -5,4.34 0,1.16 0.53,2.24 1.43,3.04 0.6,0.53 0.78,1.52 0.17,2.22l-0.11,0.12a68.24,68.24 0,0 0,2.32 -0.47c1.3,-0.29 2.43,-0.6 3.04,-0.88l0.04,-0.02 0.04,-0.01c1.87,-0.68 3.08,-2.26 3.08,-4.01 0,-2.29 -2.13,-4.34 -5,-4.34ZM66.75,33a4.25,4.25 0,1 1,0 8.5,4.25 4.25,0 0,1 0,-8.5ZM93.21,34.45c0.07,-0.3 0.5,-0.3 0.57,0l0.16,0.66c0.22,0.88 0.91,1.56 1.78,1.78l0.66,0.16c0.3,0.07 0.3,0.5 0,0.57l-0.66,0.17a2.45,2.45 0,0 0,-1.78 1.78l-0.16,0.66c-0.07,0.3 -0.5,0.3 -0.57,0l-0.17,-0.66a2.45,2.45 0,0 0,-1.78 -1.78l-0.66,-0.17c-0.3,-0.07 -0.3,-0.5 0,-0.57l0.66,-0.16a2.45,2.45 0,0 0,1.78 -1.78l0.17,-0.66Z&quot;"
+        errorLine2="                          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/drawable/searchbox_withai_inactive_dark.xml"
+            line="22"
+            column="27"/>
+    </issue>
+
+    <issue
+        id="UselessParent"
+        message="This `LinearLayout` layout or its `LinearLayout` parent is unnecessary; transfer the `background` attribute to the other view"
+        errorLine1="    &lt;LinearLayout"
+        errorLine2="     ~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/bottom_sheet_new_address_bar_option.xml"
+            line="24"
+            column="6"/>
+    </issue>
+
+    <issue
+        id="TextFields"
+        message="This text field does not specify an `inputType`"
+        errorLine1="                    &lt;EditText"
+        errorLine2="                     ~~~~~~~~">
+        <location
+            file="src/main/res/layout/view_input_mode_switch_widget.xml"
+            line="100"
+            column="22"/>
+    </issue>
+
+    <issue
+        id="Autofill"
+        message="Missing `autofillHints` attribute"
+        errorLine1="                    &lt;EditText"
+        errorLine2="                     ~~~~~~~~">
+        <location
+            file="src/main/res/layout/view_input_mode_switch_widget.xml"
+            line="100"
+            column="22"/>
+    </issue>
+
+    <issue
+        id="ContentDescription"
+        message="Missing `contentDescription` attribute on image"
+        errorLine1="                    &lt;ImageView"
+        errorLine2="                     ~~~~~~~~~">
+        <location
+            file="src/main/res/layout/activity_duck_chat_settings.xml"
+            line="106"
+            column="22"/>
+    </issue>
+
+    <issue
+        id="ContentDescription"
+        message="Missing `contentDescription` attribute on image"
+        errorLine1="                    &lt;ImageView"
+        errorLine2="                     ~~~~~~~~~">
+        <location
+            file="src/main/res/layout/activity_duck_chat_settings.xml"
+            line="122"
+            column="22"/>
+    </issue>
+
+    <issue
+        id="ContentDescription"
+        message="Missing `contentDescription` attribute on image"
+        errorLine1="                    &lt;ImageView"
+        errorLine2="                     ~~~~~~~~~">
+        <location
+            file="src/main/res/layout/activity_duck_chat_settings.xml"
+            line="145"
+            column="22"/>
+    </issue>
+
+    <issue
+        id="ContentDescription"
+        message="Missing `contentDescription` attribute on image"
+        errorLine1="                        &lt;ImageView"
+        errorLine2="                         ~~~~~~~~~">
+        <location
+            file="src/main/res/layout/activity_duck_chat_settings.xml"
+            line="167"
+            column="26"/>
+    </issue>
+
+    <issue
+        id="ContentDescription"
+        message="Missing `contentDescription` attribute on image"
+        errorLine1="                    &lt;ImageView"
+        errorLine2="                     ~~~~~~~~~">
+        <location
+            file="src/main/res/layout/activity_duck_chat_settings.xml"
+            line="175"
+            column="22"/>
+    </issue>
+
+    <issue
+        id="ContentDescription"
+        message="Missing `contentDescription` attribute on image"
+        errorLine1="                            &lt;ImageView"
+        errorLine2="                             ~~~~~~~~~">
+        <location
+            file="src/main/res/layout/bottom_sheet_new_address_bar_option.xml"
+            line="71"
+            column="30"/>
+    </issue>
+
+    <issue
+        id="ContentDescription"
+        message="Missing `contentDescription` attribute on image"
+        errorLine1="    &lt;ImageView"
+        errorLine2="     ~~~~~~~~~">
+        <location
+            file="src/main/res/layout/view_chat_tab_indicator.xml"
+            line="23"
+            column="6"/>
+    </issue>
+
+    <issue
+        id="ContentDescription"
+        message="Missing `contentDescription` attribute on image"
+        errorLine1="                &lt;ImageView"
+        errorLine2="                 ~~~~~~~~~">
+        <location
+            file="src/main/res/layout/view_input_mode_switch_widget.xml"
+            line="181"
+            column="18"/>
+    </issue>
+
+    <issue
+        id="ContentDescription"
+        message="Missing `contentDescription` attribute on image"
+        errorLine1="                &lt;ImageView"
+        errorLine2="                 ~~~~~~~~~">
+        <location
+            file="src/main/res/layout/view_input_mode_switch_widget.xml"
+            line="209"
+            column="18"/>
+    </issue>
+
+    <issue
+        id="ContentDescription"
+        message="Missing `contentDescription` attribute on image"
+        errorLine1="    &lt;ImageView"
+        errorLine2="     ~~~~~~~~~">
+        <location
+            file="src/main/res/layout/view_search_tab_indicator.xml"
+            line="24"
+            column="6"/>
+    </issue>
+
+    <issue
+        id="RtlEnabled"
+        message="The project references RTL attributes, but does not explicitly enable or disable RTL support with `android:supportsRtl` in the manifest">
+        <location
+            file="src/main/AndroidManifest.xml"/>
     </issue>
 
 </issues>
