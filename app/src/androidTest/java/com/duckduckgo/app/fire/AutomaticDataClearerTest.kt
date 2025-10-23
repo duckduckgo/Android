@@ -54,7 +54,12 @@ class AutomaticDataClearerTest {
     private val mockWorkManager: WorkManager = mock()
     private val pixel: Pixel = mock()
     private val dataClearerForegroundAppRestartPixel =
-        DataClearerForegroundAppRestartPixel(InstrumentationRegistry.getInstrumentation().targetContext, pixel)
+        DataClearerForegroundAppRestartPixel(
+            InstrumentationRegistry.getInstrumentation().targetContext,
+            pixel,
+            coroutineTestRule.testScope,
+            coroutineTestRule.testDispatcherProvider,
+        )
 
     @UiThreadTest
     @Before
