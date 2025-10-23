@@ -20,7 +20,6 @@ import org.mockito.kotlin.whenever
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 import java.io.File
-import java.io.InputStream
 import java.util.zip.ZipEntry
 import java.util.zip.ZipOutputStream
 
@@ -170,6 +169,84 @@ class TakeoutZipBookmarkExtractorTest {
             assertEquals(content, actualContent)
         }
 
+    @Test
+    fun whenZipContainsSingleLocalizedBookmarkFileThenExtractionSucceeds() =
+        runTest {
+            val bookmarkContent = loadHtmlFile("valid_chrome_bookmarks_netscape")
+            val zipData = createZipWithEntry("Takeout/Chrome/Marcadores.html", bookmarkContent) // Spanish
+            mockFileUri(mockUri, zipData)
+
+            val result = testee.extractBookmarksFromFile(mockUri)
+
+            assertTrue(result is Success)
+            val tempFileUri = (result as Success).tempFileUri
+            val actualContent = File(tempFileUri.path!!).readText()
+            assertEquals(bookmarkContent, actualContent)
+        }
+
+    @Test
+    fun whenZipContainsMultipleBookmarkFilesWithBookmarksHtmlThenBookmarksHtmlIsPreferred() =
+        runTest {
+            val englishContent = loadHtmlFile("valid_chrome_bookmarks_netscape")
+            val spanishContent = loadHtmlFile("valid_chrome_bookmarks_title_only")
+            val frenchContent = loadHtmlFile("mixed_valid_invalid_bookmarks")
+            val zipData = createZipWithMultipleEntries(
+                mapOf(
+                    "Takeout/Chrome/Marcadores.html" to spanishContent, // Spanish
+                    "Takeout/Chrome/Bookmarks.html" to englishContent, // English - should be preferred
+                    "Takeout/Chrome/Favoris.html" to frenchContent, // French
+                ),
+            )
+            mockFileUri(mockUri, zipData)
+
+            val result = testee.extractBookmarksFromFile(mockUri)
+
+            assertTrue(result is Success)
+            val tempFileUri = (result as Success).tempFileUri
+            val actualContent = File(tempFileUri.path!!).readText()
+            assertEquals(englishContent, actualContent)
+        }
+
+    @Test
+    fun whenZipContainsMultipleLocalizedBookmarkFilesWithoutBookmarksHtmlThenExtractionFails() =
+        runTest {
+            val spanishContent = loadHtmlFile("valid_chrome_bookmarks_netscape")
+            val frenchContent = loadHtmlFile("valid_chrome_bookmarks_title_only")
+            val zipData = createZipWithMultipleEntries(
+                mapOf(
+                    "Takeout/Chrome/Marcadores.html" to spanishContent,
+                    "Takeout/Chrome/Favoris.html" to frenchContent,
+                ),
+            )
+            mockFileUri(mockUri, zipData)
+
+            val result = testee.extractBookmarksFromFile(mockUri)
+
+            assertTrue(result is TakeoutBookmarkExtractor.ExtractionResult.Error)
+        }
+
+    @Test
+    fun whenZipContainsNonBookmarkFilesInChromeFolderThenTheyAreIgnored() =
+        runTest {
+            val bookmarkContent = loadHtmlFile("valid_chrome_bookmarks_netscape")
+            val zipData = createZipWithMultipleEntries(
+                mapOf(
+                    "Takeout/Chrome/History" to "history data", // Not bookmarks
+                    "Takeout/Chrome/Preferences" to "preferences data", // Not bookmarks
+                    "Takeout/Chrome/Bookmarks.html" to bookmarkContent, // bookmarks - should be used
+                    "Takeout/Chrome/cookies.txt" to "cookie data", // Not bookmarks
+                ),
+            )
+            mockFileUri(mockUri, zipData)
+
+            val result = testee.extractBookmarksFromFile(mockUri)
+
+            assertTrue(result is Success)
+            val tempFileUri = (result as Success).tempFileUri
+            val actualContent = File(tempFileUri.path!!).readText()
+            assertEquals(bookmarkContent, actualContent)
+        }
+
     private fun loadHtmlFile(filename: String): String =
         FileUtilities.loadText(
             TakeoutZipBookmarkExtractorTest::class.java.classLoader!!,
@@ -204,7 +281,8 @@ class TakeoutZipBookmarkExtractorTest {
         uri: Uri,
         zipData: ByteArray,
     ) {
-        val inputStream: InputStream = ByteArrayInputStream(zipData)
-        whenever(mockContext.contentResolver.openInputStream(uri)).thenReturn(inputStream)
+        whenever(mockContext.contentResolver.openInputStream(uri)).thenAnswer {
+            ByteArrayInputStream(zipData)
+        }
     }
 }

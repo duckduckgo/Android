@@ -43,6 +43,7 @@ import com.duckduckgo.subscriptions.impl.feedback.SubscriptionFeedbackViewModel.
 import com.duckduckgo.subscriptions.impl.feedback.SubscriptionFeedbackViewModel.Command.FeedbackCompleted
 import com.duckduckgo.subscriptions.impl.feedback.SubscriptionFeedbackViewModel.Command.FeedbackFailed
 import com.duckduckgo.subscriptions.impl.feedback.SubscriptionFeedbackViewModel.Command.ShowHelpPages
+import com.duckduckgo.subscriptions.impl.feedback.SubscriptionFeedbackViewModel.Command.ShowSupportPage
 import com.duckduckgo.subscriptions.impl.feedback.SubscriptionFeedbackViewModel.FeedbackFragmentState
 import com.duckduckgo.subscriptions.impl.feedback.SubscriptionFeedbackViewModel.FeedbackMetadata
 import com.duckduckgo.subscriptions.impl.feedback.SubscriptionFeedbackViewModel.ViewState
@@ -140,6 +141,10 @@ class SubscriptionFeedbackActivity :
         viewModel.onFaqOpenedFromSubmit()
     }
 
+    override fun onContactSupportOpened() {
+        viewModel.onContactSupportFromSubmit()
+    }
+
     private fun observeViewModel() {
         viewModel.viewState()
             .flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
@@ -165,6 +170,15 @@ class SubscriptionFeedbackActivity :
             }
 
             is ShowHelpPages -> {
+                globalActivityStarter.start(
+                    this,
+                    SubscriptionsWebViewActivityWithParams(
+                        url = command.url,
+                        toolbarConfig = CustomTitle(""), // empty toolbar
+                    ),
+                )
+            }
+            is ShowSupportPage -> {
                 globalActivityStarter.start(
                     this,
                     SubscriptionsWebViewActivityWithParams(

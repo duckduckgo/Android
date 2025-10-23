@@ -192,7 +192,7 @@
     <string name="netpNotificationCTAReconnectNow">Voltar a ligar-se agora</string>
     <string name="netpNotificationSnoozeTitle">A VPN está suspensa</string>
     <string name="netpNotificationSnoozeBody" instruction="Placeholder is time in hh:mm format">A VPN vai voltar a ligar-se à(s) %1$s</string>
-    <string name="netpNotificationVpnAccessRevoked">VPN desativada devido a subscrição expirada. Subscreve o Privacy Pro para voltar a ligar a DuckDuckGo VPN.</string>
+    <string name="netpNotificationVpnAccessRevoked">VPN desativada devido a subscrição expirada. Subscreve a DuckDuckGo para voltares a ativar a VPN.</string>
 
     <!-- Geoswitching -->
     <string name="netpGeoswitchingTitle">Localização da VPN</string>
@@ -204,7 +204,7 @@
 
     <!-- Access revoked-->
     <string name="netpDialogVpnAccessRevokedTitle">VPN desativada devido a subscrição expirada</string>
-    <string name="netpDialogVpnAccessRevokedBody">Subscreve o Privacy Pro para ativar a VPN DuckDuckGo.</string>
+    <string name="netpDialogVpnAccessRevokedBody">Subscreve a DuckDuckGo para voltares a ativar a VPN.</string>
     <string name="netpDialogVpnAccessRevokedPositiveAction">Subscrever</string>
     <string name="netpDialogVpnAccessRevokedNegativeAction">Ignorar</string>
 
@@ -258,7 +258,4 @@
     <string name="netpExclusionListLabelAutoExclude">Incompatível com VPNs</string>
     <string name="netpExclusionListAutoExcludeDescription">Algumas aplicações, como aplicações bancárias ou de streaming, não funcionam bem com VPNs. Quando esta definição estiver ativada, vamos excluir automaticamente essas aplicações.</string>
 
-    <!-- Privacy Pro Rebranding-->
-    <string name="netpNotificationVpnAccessRevokedRebranding">VPN desativada devido a subscrição expirada. Subscreve a DuckDuckGo para voltares a ativar a VPN.</string>
-    <string name="netpDialogVpnAccessRevokedBodyRebranding">Subscreve a DuckDuckGo para voltares a ativar a VPN.</string>
 </resources>

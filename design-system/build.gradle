@@ -58,6 +58,7 @@ dependencies {
     implementation Google.android.material
     implementation AndroidX.constraintLayout
     implementation AndroidX.core.splashscreen
+    implementation AndroidX.fragment.ktx
     implementation AndroidX.recyclerView
     implementation AndroidX.lifecycle.viewModelKtx
     // just to get the dagger annotations
@@ -65,6 +66,8 @@ dependencies {
 
     implementation "androidx.core:core-ktx:_"
     implementation "androidx.localbroadcastmanager:localbroadcastmanager:_"
+
+    implementation "com.google.android.flexbox:flexbox:_"
 
     api(platform("io.coil-kt.coil3:coil-bom:_"))
     api("io.coil-kt.coil3:coil-compose")

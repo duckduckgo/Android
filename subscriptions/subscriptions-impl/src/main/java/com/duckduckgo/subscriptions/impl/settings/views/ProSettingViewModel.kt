@@ -25,7 +25,6 @@ import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.subscriptions.api.Product.DuckAiPlus
-import com.duckduckgo.subscriptions.api.SubscriptionRebrandingFeatureToggle
 import com.duckduckgo.subscriptions.api.SubscriptionStatus
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.UNKNOWN
 import com.duckduckgo.subscriptions.impl.PrivacyProFeature
@@ -55,7 +54,6 @@ import javax.inject.Inject
 @SuppressLint("NoLifecycleObserver") // we don't observe app lifecycle
 @ContributesViewModel(ViewScope::class)
 class ProSettingViewModel @Inject constructor(
-    private val subscriptionRebrandingFeatureToggle: SubscriptionRebrandingFeatureToggle,
     private val subscriptionsManager: SubscriptionsManager,
     private val pixelSender: SubscriptionPixelSender,
     private val privacyProFeature: PrivacyProFeature,
@@ -73,7 +71,6 @@ class ProSettingViewModel @Inject constructor(
     data class ViewState(
         val status: SubscriptionStatus = UNKNOWN,
         val region: SubscriptionRegion? = null,
-        val rebrandingEnabled: Boolean = false,
         val duckAiPlusAvailable: Boolean = false,
         val freeTrialEligible: Boolean = false,
     ) {
@@ -114,13 +111,11 @@ class ProSettingViewModel @Inject constructor(
                     val duckAiAvailable = duckAiEnabled && offer?.features?.any { feature ->
                         feature == DuckAiPlus.value
                     } ?: false
-                    val rebrandingEnabled = subscriptionRebrandingFeatureToggle.isSubscriptionRebrandingEnabled()
 
                     _viewState.emit(
                         viewState.value.copy(
                             status = subscriptionStatus,
                             region = region,
-                            rebrandingEnabled = rebrandingEnabled,
                             duckAiPlusAvailable = duckAiAvailable,
                             freeTrialEligible = subscriptionsManager.isFreeTrialEligible(),
                         ),

@@ -22,6 +22,8 @@ import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.autoconsent.api.AutoconsentCallback
 import com.duckduckgo.autoconsent.impl.MessageHandlerPlugin
 import com.duckduckgo.autoconsent.impl.adapters.JSONObjectAdapter
+import com.duckduckgo.autoconsent.impl.pixels.AutoConsentPixel
+import com.duckduckgo.autoconsent.impl.pixels.AutoconsentPixelManager
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesMultibinding
@@ -36,6 +38,7 @@ import javax.inject.Inject
 class OptOutAndAutoconsentDoneMessageHandlerPlugin @Inject constructor(
     @AppCoroutineScope val appCoroutineScope: CoroutineScope,
     private val dispatcherProvider: DispatcherProvider,
+    private val autoconsentPixelManager: AutoconsentPixelManager,
 ) : MessageHandlerPlugin {
 
     private val moshi = Moshi.Builder().add(JSONObjectAdapter()).build()
@@ -58,6 +61,7 @@ class OptOutAndAutoconsentDoneMessageHandlerPlugin @Inject constructor(
             val message: OptOutResultMessage = parseOptOutMessage(jsonString) ?: return
 
             if (!message.result) {
+                autoconsentPixelManager.fireDailyPixel(AutoConsentPixel.AUTOCONSENT_ERROR_OPTOUT_DAILY)
                 autoconsentCallback.onResultReceived(consentManaged = true, optOutFailed = true, selfTestFailed = false, isCosmetic = null)
             } else if (message.scheduleSelfTest) {
                 selfTest = true
@@ -70,6 +74,13 @@ class OptOutAndAutoconsentDoneMessageHandlerPlugin @Inject constructor(
     private fun processAutoconsentDone(jsonString: String, webView: WebView, autoconsentCallback: AutoconsentCallback) {
         try {
             val message: AutoconsentDoneMessage = parseAutoconsentDoneMessage(jsonString) ?: return
+
+            if (message.isCosmetic) {
+                autoconsentPixelManager.fireDailyPixel(AutoConsentPixel.AUTOCONSENT_DONE_COSMETIC_DAILY)
+            } else {
+                autoconsentPixelManager.fireDailyPixel(AutoConsentPixel.AUTOCONSENT_DONE_DAILY)
+            }
+
             message.url.toUri().host ?: return
 
             autoconsentCallback.onPopUpHandled(message.isCosmetic)

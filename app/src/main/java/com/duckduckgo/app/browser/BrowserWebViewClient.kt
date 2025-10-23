@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.browser
 
+import android.annotation.SuppressLint
 import android.graphics.Bitmap
 import android.net.Uri
 import android.net.http.SslError
@@ -89,6 +90,9 @@ import logcat.LogPriority.VERBOSE
 import logcat.LogPriority.WARN
 import logcat.logcat
 import java.net.URI
+import java.util.UUID
+import java.util.concurrent.ConcurrentHashMap
+import java.util.concurrent.atomic.AtomicInteger
 import javax.inject.Inject
 
 private const val ABOUT_BLANK = "about:blank"
@@ -134,12 +138,46 @@ class BrowserWebViewClient @Inject constructor(
 
     private var shouldOpenDuckPlayerInNewTab: Boolean = true
 
+    private var currentLoadOperationId: String? = null
+    private var parallelRequestsOnStart = 0
+
     init {
         appCoroutineScope.launch {
             duckPlayer.observeShouldOpenInNewTab().collect {
                 shouldOpenDuckPlayerInNewTab = it is On
             }
         }
+    }
+
+    private fun incrementAndTrackLoad() {
+        // a new load operation is starting for this WebView instance.
+        val loadId = UUID.randomUUID().toString()
+        this.currentLoadOperationId = loadId
+
+        parallelRequestsOnStart = parallelRequestCounter.incrementAndGet() - 1
+
+        val job = timeoutScope.launch {
+            delay(REQUEST_TIMEOUT_MS)
+            // attempt to remove the job - if successful, it means it hasn't been finished/errored/cancelled yet
+            if (activeRequestTimeoutJobs.remove(loadId) != null) {
+                parallelRequestCounter.decrementAndGet()
+            }
+        }
+        activeRequestTimeoutJobs[loadId] = job
+    }
+
+    private fun decrementLoadCountAndGet(): Int {
+        this.currentLoadOperationId?.let { loadId ->
+            val job = activeRequestTimeoutJobs.remove(loadId)
+
+            // if we successfully removed the job (it means it hadn't timed out yet)
+            if (job != null) {
+                job.cancel()
+                parallelRequestCounter.decrementAndGet()
+            }
+        }
+        this.currentLoadOperationId = null
+        return parallelRequestCounter.get()
     }
 
     /**
@@ -436,6 +474,7 @@ class BrowserWebViewClient @Inject constructor(
             // See https://app.asana.com/0/0/1206159443951489/f (WebView limitations)
             if (it != ABOUT_BLANK && start == null) {
                 start = currentTimeProvider.elapsedRealtime()
+                incrementAndTrackLoad() // increment the request counter
                 requestInterceptor.onPageStarted(url)
             }
             handleMediaPlayback(webView, it)
@@ -509,7 +548,9 @@ class BrowserWebViewClient @Inject constructor(
                             title = navigationList.currentItem?.title,
                             start = safeStart,
                             end = currentTimeProvider.elapsedRealtime(),
-                            isTabInForeground = webViewClientListener?.isTabInForeground() ?: true,
+                            isTabInForegroundOnFinish = webViewClientListener?.isTabInForeground() ?: true,
+                            activeRequestsOnLoadStart = parallelRequestsOnStart,
+                            concurrentRequestsOnFinish = decrementLoadCountAndGet(),
                         )
                         shouldSendPagePaintedPixel(webView = webView, url = it)
                         appCoroutineScope.launch(dispatcherProvider.io()) {
@@ -528,6 +569,7 @@ class BrowserWebViewClient @Inject constructor(
                             }
                         }
                         uriLoadedManager.sendUriLoadedPixel()
+
                         start = null
                     }
                 }
@@ -570,6 +612,12 @@ class BrowserWebViewClient @Inject constructor(
         } else {
             pixel.fire(WEB_RENDERER_GONE_KILLED)
         }
+
+        if (this.start != null) {
+            decrementLoadCountAndGet()
+            this.start = null
+        }
+
         webViewClientListener?.recoverFromRenderProcessGone()
         return true
     }
@@ -668,16 +716,19 @@ class BrowserWebViewClient @Inject constructor(
         request: WebResourceRequest?,
         error: WebResourceError?,
     ) {
-        error?.let {
-            val parsedError = parseErrorResponse(it)
-            if (parsedError != OMITTED && request?.isForMainFrame == true) {
-                start = null
-                webViewClientListener?.onReceivedError(parsedError, request.url.toString())
-            }
+        error?.let { webResourceError ->
+            val parsedError = parseErrorResponse(webResourceError)
             if (request?.isForMainFrame == true) {
+                if (parsedError != OMITTED) {
+                    if (this.start != null) {
+                        decrementLoadCountAndGet()
+                        this.start = null
+                    }
+                    webViewClientListener?.onReceivedError(parsedError, request.url.toString())
+                }
                 logcat { "recordErrorCode for ${request.url}" }
                 webViewClientListener?.recordErrorCode(
-                    "${it.errorCode.asStringErrorCode()} - ${it.description}",
+                    "${webResourceError.errorCode.asStringErrorCode()} - ${webResourceError.description}",
                     request.url.toString(),
                 )
             }
@@ -748,11 +799,19 @@ class BrowserWebViewClient @Inject constructor(
     ) {
         requestInterceptor.addExemptedMaliciousSite(url, feed)
     }
+
+    companion object {
+        val parallelRequestCounter = AtomicInteger(0)
+        private val activeRequestTimeoutJobs = ConcurrentHashMap<String, Job>()
+        private const val REQUEST_TIMEOUT_MS = 30000L // 30 seconds
+
+        // dedicated scope for request count timeout jobs (static, to be shared across all instances)
+        @SuppressLint("NoHardcodedCoroutineDispatcher")
+        private val timeoutScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
+    }
 }
 
-enum class WebViewPixelName(
-    override val pixelName: String,
-) : Pixel.PixelName {
+enum class WebViewPixelName(override val pixelName: String) : Pixel.PixelName {
     WEB_RENDERER_GONE_CRASH("m_web_view_renderer_gone_crash"),
     WEB_RENDERER_GONE_KILLED("m_web_view_renderer_gone_killed"),
     WEB_PAGE_LOADED("m_web_view_page_loaded"),

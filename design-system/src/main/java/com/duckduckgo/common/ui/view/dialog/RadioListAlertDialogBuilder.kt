@@ -55,6 +55,7 @@ class RadioListAlertDialogBuilder(val context: Context) : DaxAlertDialog {
     private var negativeButtonType: ButtonType? = null
     private var optionList: MutableList<CharSequence> = mutableListOf()
     private var selectedOption: Int? = null
+    private var isCancelable: Boolean = false
 
     fun setTitle(@StringRes textId: Int): RadioListAlertDialogBuilder {
         titleText = context.getText(textId)
@@ -130,7 +131,7 @@ class RadioListAlertDialogBuilder(val context: Context) : DaxAlertDialog {
         val dialogBuilder = MaterialAlertDialogBuilder(context, com.duckduckgo.mobile.android.R.style.Widget_DuckDuckGo_Dialog)
             .setView(binding.root)
             .apply {
-                setCancelable(false)
+                setCancelable(isCancelable)
                 setOnDismissListener { listener.onDialogDismissed() }
                 setOnCancelListener { listener.onDialogCancelled() }
             }
@@ -151,6 +152,11 @@ class RadioListAlertDialogBuilder(val context: Context) : DaxAlertDialog {
 
     override fun dismiss() {
         dialog?.dismiss()
+    }
+
+    fun setCancelable(cancelable: Boolean): RadioListAlertDialogBuilder {
+        isCancelable = cancelable
+        return this
     }
 
     override fun isShowing(): Boolean = dialog?.isShowing == true
@@ -191,6 +197,7 @@ class RadioListAlertDialogBuilder(val context: Context) : DaxAlertDialog {
         binding: DialogSingleChoiceAlertBinding,
         dialog: AlertDialog,
     ) {
+        val positiveButtonView = positiveButtonType.getView(context)
         val negativeButton = negativeButtonType
         if (negativeButton != null) {
             val negativeButtonView = negativeButton.getView(context)
@@ -199,15 +206,14 @@ class RadioListAlertDialogBuilder(val context: Context) : DaxAlertDialog {
             binding.radioListAlertDialogButtonContainer.addView(negativeButtonView)
             val layoutParams = negativeButtonView.layoutParams as ViewGroup.MarginLayoutParams
             layoutParams.setMargins(
-                layoutParams.leftMargin,
-                layoutParams.topMargin,
                 context.resources.getDimensionPixelSize(R.dimen.keyline_2),
+                layoutParams.topMargin,
+                layoutParams.rightMargin,
                 layoutParams.bottomMargin,
             )
-            negativeButtonView.layoutParams = layoutParams
+            positiveButtonView.layoutParams = layoutParams
         }
 
-        val positiveButtonView = positiveButtonType.getView(context)
         positiveButtonView.isEnabled = selectedOption != null
         binding.radioListAlertDialogButtonContainer.addView(positiveButtonView)
         setButtonListener(positiveButtonView, positiveButtonText, dialog) {

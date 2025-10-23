@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright (c) 2025 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fillViewport="true"
+    android:background="?android:attr/colorBackground">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/autofillDialogContentContainer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guidelineStart"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintGuide_begin="@dimen/keyline_5"
+            />
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guidelineEnd"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintGuide_end="@dimen/keyline_5"/>
+
+        <FrameLayout
+            android:id="@+id/progressContainer"
+            android:layout_width="168dp"
+            android:layout_height="168dp"
+            android:layout_marginTop="40dp"
+            app:layout_constraintEnd_toEndOf="@id/guidelineEnd"
+            app:layout_constraintStart_toStartOf="@id/guidelineStart"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <ProgressBar
+                android:id="@+id/progressSpinner"
+                style="?android:attr/progressBarStyleLarge"
+                android:layout_width="match_parent"
+                android:indeterminateDrawable="@drawable/bookmark_import_progress_bar"
+                android:layout_height="match_parent"
+                android:layout_gravity="center"
+                android:indeterminate="true"
+                android:indeterminateDuration="800" />
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/importIcon"
+                android:layout_width="64dp"
+                android:layout_height="64dp"
+                android:layout_gravity="center"
+                android:importantForAccessibility="no"
+                android:scaleType="fitCenter"
+                android:src="@drawable/ic_bookmarks_import_96" />
+
+        </FrameLayout>
+
+        <com.duckduckgo.common.ui.view.text.DaxTextView
+            android:id="@+id/inProgressTitle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/keyline_4"
+            android:breakStrategy="balanced"
+            android:gravity="center_horizontal"
+            android:text="@string/importBookmarksProgressTitle"
+            app:layout_constraintEnd_toEndOf="@id/guidelineEnd"
+            app:layout_constraintStart_toStartOf="@id/guidelineStart"
+            app:layout_constraintTop_toBottomOf="@id/progressContainer"
+            app:typography="h1" />
+
+        <com.duckduckgo.common.ui.view.text.DaxTextView
+            android:id="@+id/inProgressSubtitle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/keyline_4"
+            android:breakStrategy="balanced"
+            android:gravity="center_horizontal"
+            android:text="@string/importBookmarksProgressSubtitle"
+            app:layout_constraintEnd_toEndOf="@id/guidelineEnd"
+            app:layout_constraintStart_toStartOf="@id/guidelineStart"
+            app:layout_constraintTop_toBottomOf="@id/inProgressTitle"
+            app:typography="body1" />
+
+        <LinearLayout
+            android:id="@+id/infoMessagesContainer"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/keyline_7"
+            android:orientation="vertical"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintVertical_bias="1"
+            android:layout_marginBottom="@dimen/keyline_5"
+            app:layout_constraintEnd_toEndOf="@id/guidelineEnd"
+            app:layout_constraintStart_toStartOf="@id/guidelineStart"
+            app:layout_constraintTop_toBottomOf="@id/inProgressSubtitle">
+
+            <com.duckduckgo.common.ui.view.listitem.OneLineListItem
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:leadingIcon="@drawable/info_solid_24"
+                android:padding="@dimen/keyline_2"
+                android:background="@drawable/autofill_bookmark_import_info_listitem_background"
+                app:primaryText="@string/importBookmarksProgressInfoMessage1" />
+
+            <com.duckduckgo.common.ui.view.listitem.OneLineListItem
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/keyline_1"
+                android:padding="@dimen/keyline_2"
+                android:background="@drawable/autofill_bookmark_import_info_listitem_background"
+                app:leadingIcon="@drawable/info_solid_24"
+                app:primaryText="@string/importBookmarksProgressInfoMessage2" />
+
+        </LinearLayout>
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</androidx.core.widget.NestedScrollView>

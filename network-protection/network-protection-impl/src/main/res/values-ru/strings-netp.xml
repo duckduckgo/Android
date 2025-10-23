@@ -194,7 +194,7 @@
     <string name="netpNotificationCTAReconnectNow">Подключитесь заново</string>
     <string name="netpNotificationSnoozeTitle">Работа VPN приостановлена</string>
     <string name="netpNotificationSnoozeBody" instruction="Placeholder is time in hh:mm format">Подключение к VPN будет восстановлено в %1$s.</string>
-    <string name="netpNotificationVpnAccessRevoked">VPN отключен ввиду окончания подписки. Чтобы вновь подключиться к DuckDuckGo VPN, оформите подписку Privacy Pro.</string>
+    <string name="netpNotificationVpnAccessRevoked">VPN отключен ввиду окончания подписки. Оформите подписку, чтобы подключиться снова.</string>
 
     <!-- Geoswitching -->
     <string name="netpGeoswitchingTitle">Местоположение VPN</string>
@@ -206,7 +206,7 @@
 
     <!-- Access revoked-->
     <string name="netpDialogVpnAccessRevokedTitle">VPN отключен ввиду окончания подписки</string>
-    <string name="netpDialogVpnAccessRevokedBody">Чтобы вновь подключиться к DuckDuckGo VPN, оформите подписку Privacy Pro.</string>
+    <string name="netpDialogVpnAccessRevokedBody">Оформите подписку, чтобы подключиться снова.</string>
     <string name="netpDialogVpnAccessRevokedPositiveAction">Подписаться</string>
     <string name="netpDialogVpnAccessRevokedNegativeAction">Отклонить</string>
 
@@ -264,7 +264,4 @@
     <string name="netpExclusionListLabelAutoExclude">Несовместимые с VPN</string>
     <string name="netpExclusionListAutoExcludeDescription">Банковские, стриминговые и некоторые другие приложения плохо работают с VPN. При активации этой настройки такие приложения будут исключаться автоматически.</string>
 
-    <!-- Privacy Pro Rebranding-->
-    <string name="netpNotificationVpnAccessRevokedRebranding">VPN отключен ввиду окончания подписки. Оформите подписку, чтобы подключиться снова.</string>
-    <string name="netpDialogVpnAccessRevokedBodyRebranding">Оформите подписку, чтобы подключиться снова.</string>
 </resources>

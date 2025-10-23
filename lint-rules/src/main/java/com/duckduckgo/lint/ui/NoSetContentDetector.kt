@@ -39,6 +39,7 @@ class NoSetContentDetector : Detector(), SourceCodeScanner {
 
     internal class SetContentCallHandler(private val context: JavaContext) : UElementHandler() {
         override fun visitCallExpression(node: UCallExpression) {
+            if (isInDesignSystemModule(context.project.name)) return
             if (node.methodName == "setContent") {
                 val containingClass = node.getContainingUClass()
                 if (containingClass != null && isActivityClass(containingClass)) {
@@ -57,6 +58,10 @@ class NoSetContentDetector : Detector(), SourceCodeScanner {
                 location = context.getLocation(node),
                 message = NO_SET_CONTENT_USAGE.getExplanation(TextFormat.RAW)
             )
+        }
+
+        private fun isInDesignSystemModule(projectName: String): Boolean {
+            return projectName.contains("design-system")
         }
     }
 

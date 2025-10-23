@@ -20,7 +20,10 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.content.pm.PackageManager.GET_META_DATA
 import android.graphics.drawable.Drawable
-import androidx.annotation.WorkerThread
+import com.duckduckgo.common.utils.DispatcherProvider
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
+import kotlinx.coroutines.withContext
 import kotlin.text.RegexOption.IGNORE_CASE
 
 data class DeviceApp(
@@ -37,28 +40,33 @@ data class DeviceApp(
 }
 
 interface DeviceAppLookup {
-    @WorkerThread
-    fun query(query: String): List<DeviceApp>
-
-    @WorkerThread
-    fun refreshAppList()
+    suspend fun query(query: String): List<DeviceApp>
+    suspend fun refreshAppList(): List<DeviceApp>
 }
 
-class InstalledDeviceAppLookup(private val appListProvider: DeviceAppListProvider) : DeviceAppLookup {
+class InstalledDeviceAppLookup(
+    private val appListProvider: DeviceAppListProvider,
+    private val dispatcherProvider: DispatcherProvider,
+) : DeviceAppLookup {
 
-    private var apps: List<DeviceApp>? = null
+    private var cachedApps: List<DeviceApp>? = null
 
-    @WorkerThread
-    override fun query(query: String): List<DeviceApp> {
-        if (query.isBlank()) return emptyList()
+    private val refreshMutex = Mutex()
 
-        if (apps == null) {
-            refreshAppList()
+    override suspend fun query(query: String): List<DeviceApp> = withContext(dispatcherProvider.io()) {
+        if (query.isBlank()) return@withContext emptyList()
+
+        val apps = refreshMutex.withLock {
+            cachedApps ?: run {
+                val freshApps = appListProvider.get()
+                cachedApps = freshApps
+                freshApps
+            }
         }
 
         val escapedQuery = Regex.escape(query)
         val wordPrefixMatchingRegex = ".*\\b$escapedQuery.*".toRegex(IGNORE_CASE)
-        return apps!!.filter {
+        apps.filter {
             it.shortName.matches(wordPrefixMatchingRegex)
         }.sortedWith(comparator(query))
     }
@@ -71,28 +79,32 @@ class InstalledDeviceAppLookup(private val appListProvider: DeviceAppListProvide
         }
     }
 
-    @WorkerThread
-    override fun refreshAppList() {
-        apps = appListProvider.get()
+    override suspend fun refreshAppList(): List<DeviceApp> = withContext(dispatcherProvider.io()) {
+        refreshMutex.withLock {
+            appListProvider.get().also {
+                cachedApps = it
+            }
+        }
     }
 }
 
 interface DeviceAppListProvider {
-    @WorkerThread
-    fun get(): List<DeviceApp>
+    suspend fun get(): List<DeviceApp>
 }
 
-class InstalledDeviceAppListProvider(private val packageManager: PackageManager) : DeviceAppListProvider {
+class InstalledDeviceAppListProvider(
+    private val packageManager: PackageManager,
+    private val dispatcherProvider: DispatcherProvider,
+) : DeviceAppListProvider {
 
-    @WorkerThread
-    override fun get(): List<DeviceApp> {
+    override suspend fun get(): List<DeviceApp> = withContext(dispatcherProvider.io()) {
         val appsInfo = packageManager.getInstalledApplications(GET_META_DATA)
 
-        return appsInfo.map {
+        appsInfo.map {
             val packageName = it.packageName
             val launchIntent = packageManager.getLaunchIntentForPackage(packageName) ?: return@map null
             val shortName = it.loadLabel(packageManager).toString()
-            return@map DeviceApp(shortName, packageName, launchIntent)
+            DeviceApp(shortName, packageName, launchIntent)
         }.filterNotNull()
     }
 }

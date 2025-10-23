@@ -61,35 +61,84 @@ class TakeoutZipBookmarkExtractor @Inject constructor(
             runCatching {
                 context.contentResolver.openInputStream(takeoutZipUri)?.use { inputStream ->
                     ZipInputStream(inputStream).use { zipInputStream ->
-                        extractFromZipStreamToTempFile(zipInputStream)
+                        extractFromZipStreamToTempFile(zipInputStream, takeoutZipUri)
                     }
                 } ?: ExtractionResult.Error(Exception("Unable to open file: $takeoutZipUri"))
             }.getOrElse { ExtractionResult.Error(Exception(it)) }
         }
 
-    private fun extractFromZipStreamToTempFile(zipInputStream: ZipInputStream): ExtractionResult {
+    private fun extractFromZipStreamToTempFile(zipInputStream: ZipInputStream, takeoutZipUri: Uri): ExtractionResult {
         var entry = zipInputStream.nextEntry
 
         if (entry == null) {
-            logcat(WARN) { "No entries found in ZIP stream" }
+            logcat(WARN) { "Bookmark-import: No entries found in ZIP stream" }
             return ExtractionResult.Error(Exception("Invalid or empty ZIP file"))
         }
 
+        val chromeHtmlFiles = mutableListOf<String>()
+
+        // First pass: collect Chrome HTML files and look for Bookmarks.html
         while (entry != null) {
             val entryName = entry.name
-            logcat { "Processing zip entry '$entryName'" }
+            logcat { "Bookmark-import: Processing zip entry '$entryName'" }
 
-            if (isBookmarkEntry(entry)) {
-                return streamEntryToTempFile(zipInputStream, entryName)
+            if (isChromeHtmlEntry(entry)) {
+                if (entryName == "Takeout/Chrome/Bookmarks.html") {
+                    // If we find Bookmarks.html, extract it immediately
+                    logcat { "Bookmark-import: Found Bookmarks.html, extracting immediately" }
+                    return streamEntryToTempFile(zipInputStream, entryName)
+                }
+
+                chromeHtmlFiles.add(entryName)
             }
 
             entry = zipInputStream.nextEntry
         }
 
-        return ExtractionResult.Error(Exception("Chrome/Bookmarks.html not found in file"))
+        // If we get here, we didn't find Bookmarks.html but there might still be the right file with a localized name
+        return handleNonBookmarksHtmlFiles(chromeHtmlFiles, takeoutZipUri)
     }
 
-    private fun isBookmarkEntry(entry: ZipEntry): Boolean = !entry.isDirectory && entry.name.endsWith(EXPECTED_BOOKMARKS_FILENAME, ignoreCase = true)
+    private fun handleNonBookmarksHtmlFiles(chromeHtmlFiles: List<String>, takeoutZipUri: Uri): ExtractionResult {
+        logcat { "Bookmark-import: Found ${chromeHtmlFiles.size} HTML files in Chrome folder: $chromeHtmlFiles" }
+
+        return when (chromeHtmlFiles.size) {
+            0 -> {
+                logcat(WARN) { "Bookmark-import: No HTML files found in Chrome folder" }
+                ExtractionResult.Error(Exception("No HTML files found in Chrome folder"))
+            }
+            1 -> {
+                val singleFile = chromeHtmlFiles.first()
+                logcat { "Bookmark-import: Single HTML file found, extracting: $singleFile" }
+                extractSpecificFile(singleFile, takeoutZipUri)
+            }
+            else -> {
+                logcat(WARN) { "Bookmark-import: Multiple HTML files found but no Bookmarks.html: $chromeHtmlFiles" }
+                ExtractionResult.Error(Exception("Multiple HTML files found but no Bookmarks.html available"))
+            }
+        }
+    }
+
+    private fun isChromeHtmlEntry(entry: ZipEntry): Boolean =
+        !entry.isDirectory &&
+            entry.name.startsWith(EXPECTED_ZIP_ENTRY_PREFIX, ignoreCase = true) &&
+            entry.name.endsWith(".html", ignoreCase = true) &&
+            entry.name.count { it == '/' } == 2
+
+    private fun extractSpecificFile(fileName: String, takeoutZipUri: Uri): ExtractionResult {
+        return context.contentResolver.openInputStream(takeoutZipUri)?.use { inputStream ->
+            ZipInputStream(inputStream).use { zipInputStream ->
+                var entry = zipInputStream.nextEntry
+                while (entry != null) {
+                    if (entry.name == fileName) {
+                        return streamEntryToTempFile(zipInputStream, fileName)
+                    }
+                    entry = zipInputStream.nextEntry
+                }
+                ExtractionResult.Error(Exception("Selected bookmark file not found: $fileName"))
+            }
+        } ?: ExtractionResult.Error(Exception("Unable to reopen ZIP file"))
+    }
 
     private fun streamEntryToTempFile(
         zipInputStream: ZipInputStream,
@@ -100,11 +149,11 @@ class TakeoutZipBookmarkExtractor @Inject constructor(
 
         return try {
             val totalBytesRead = streamAndValidateContent(zipInputStream, tempFile)
-            logcat { "Successfully streamed '$entryName' to temp file: ${tempFile.absolutePath}, size: $totalBytesRead bytes" }
+            logcat { "Bookmark-import: Successfully streamed '$entryName' to temp file: ${tempFile.absolutePath}, size: $totalBytesRead bytes" }
             ExtractionResult.Success(Uri.fromFile(tempFile))
         } catch (e: Exception) {
             runCatching { tempFile.takeIf { it.exists() }?.delete() }
-            logcat(WARN) { "Error streaming ZIP entry to temp file: ${e.message}" }
+            logcat(WARN) { "Bookmark-import: Error streaming ZIP entry to temp file: ${e.message}" }
             ExtractionResult.Error(e)
         }
     }
@@ -169,8 +218,6 @@ class TakeoutZipBookmarkExtractor @Inject constructor(
         val hasNetscapeHeader = content.contains(NETSCAPE_HEADER, ignoreCase = true)
         val hasBookmarkTitle = content.contains(BOOKMARK_TITLE, ignoreCase = true)
 
-        logcat { "Content validation: hasNetscapeHeader=$hasNetscapeHeader, hasBookmarkTitle=$hasBookmarkTitle" }
-
         return hasNetscapeHeader || hasBookmarkTitle
     }
 
@@ -181,16 +228,16 @@ class TakeoutZipBookmarkExtractor @Inject constructor(
                     file.name.startsWith(TEMP_FILE_PREFIX) && file.name.endsWith(TEMP_FILE_SUFFIX)
                 }?.forEach { file ->
                     if (file.delete()) {
-                        logcat { "Cleaned up old temp file: ${file.name}" }
+                        logcat { "Bookmark-import: Cleaned up old temp file: ${file.name}" }
                     }
                 }
         } catch (e: Exception) {
-            logcat(WARN) { "Error cleaning up old temp files: ${e.message}" }
+            logcat(WARN) { "Bookmark-import: Error cleaning up old temp files: ${e.message}" }
         }
     }
 
     companion object {
-        private const val EXPECTED_BOOKMARKS_FILENAME = "Chrome/Bookmarks.html"
+        private const val EXPECTED_ZIP_ENTRY_PREFIX = "Takeout/Chrome/"
         private const val BUFFER_SIZE = 8192
         private const val NETSCAPE_HEADER = "<!DOCTYPE NETSCAPE-Bookmark-file"
         private const val BOOKMARK_TITLE = "<title>Bookmarks</title>"

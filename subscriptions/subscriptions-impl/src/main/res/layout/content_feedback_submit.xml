@@ -56,6 +56,13 @@
             app:type="single_line" />
 
         <com.duckduckgo.common.ui.view.text.DaxTextView
+            android:id="@+id/feedbackSubmitContactSupportByLine"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/keyline_4"
+            android:text="@string/feedbackSubmitContactSupport" />
+
+        <com.duckduckgo.common.ui.view.text.DaxTextView
             android:id="@+id/feedbackSubmitByLine"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

@@ -1891,6 +1891,56 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
         )
     }
 
+    @Test
+    fun whenIsSwitchPlanAvailableWithActiveSubscriptionAndFeatureFlagEnabledThenReturnTrue() = runTest {
+        givenSwitchPlanFeatureFlagEnabled(true)
+        givenActiveSubscription()
+
+        val result = subscriptionsManager.isSwitchPlanAvailable()
+
+        assertTrue(result)
+    }
+
+    @Test
+    fun whenIsSwitchPlanAvailableWithActiveSubscriptionAndFeatureFlagDisabledThenReturnFalse() = runTest {
+        givenSwitchPlanFeatureFlagEnabled(false)
+        givenActiveSubscription()
+
+        val result = subscriptionsManager.isSwitchPlanAvailable()
+
+        assertFalse(result)
+    }
+
+    @Test
+    fun whenIsSwitchPlanAvailableWithNoActiveSubscriptionAndFeatureFlagEnabledThenReturnFalse() = runTest {
+        givenSwitchPlanFeatureFlagEnabled(true)
+        givenUserIsNotSignedIn()
+
+        val result = subscriptionsManager.isSwitchPlanAvailable()
+
+        assertFalse(result)
+    }
+
+    @Test
+    fun whenIsSwitchPlanAvailableWithExpiredSubscriptionAndFeatureFlagEnabledThenReturnFalse() = runTest {
+        givenSwitchPlanFeatureFlagEnabled(true)
+        authRepository.setSubscription(
+            Subscription(
+                productId = "ddg_privacy_pro",
+                billingPeriod = "P1M",
+                startedAt = 1234L,
+                expiresOrRenewsAt = 1234L,
+                status = EXPIRED,
+                platform = "android",
+                activeOffers = emptyList(),
+            ),
+        )
+
+        val result = subscriptionsManager.isSwitchPlanAvailable()
+
+        assertFalse(result)
+    }
+
     private suspend fun purchase(
         planId: String = "",
         offerId: String? = null,
@@ -1910,6 +1960,11 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
     @SuppressLint("DenyListedApi")
     private fun givenIsLaunchedRow(value: Boolean) {
         privacyProFeature.isLaunchedROW().setRawStoredState(State(remoteEnableState = value))
+    }
+
+    @SuppressLint("DenyListedApi")
+    private fun givenSwitchPlanFeatureFlagEnabled(value: Boolean) {
+        privacyProFeature.supportsSwitchSubscription().setRawStoredState(State(remoteEnableState = value))
     }
 
     private suspend fun givenActiveSubscription() {

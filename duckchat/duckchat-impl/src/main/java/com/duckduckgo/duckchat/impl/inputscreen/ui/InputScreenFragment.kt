@@ -27,6 +27,8 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.ViewTreeObserver
 import android.widget.FrameLayout
+import android.widget.Toast
+import android.widget.Toast.LENGTH_SHORT
 import androidx.activity.OnBackPressedCallback
 import androidx.core.view.isVisible
 import androidx.lifecycle.ViewModelProvider
@@ -44,6 +46,7 @@ import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.duckchat.api.inputscreen.InputScreenActivityParams
 import com.duckduckgo.duckchat.api.inputscreen.InputScreenActivityResultCodes
 import com.duckduckgo.duckchat.api.inputscreen.InputScreenActivityResultParams
+import com.duckduckgo.duckchat.api.inputscreen.InputScreenBrowserButtonsConfig
 import com.duckduckgo.duckchat.impl.R
 import com.duckduckgo.duckchat.impl.databinding.FragmentInputScreenBinding
 import com.duckduckgo.duckchat.impl.inputscreen.ui.command.Command
@@ -215,7 +218,10 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
 
         configureViewPager()
 
-        val tabs = params?.tabs ?: 0
+        val tabs = when (val browserButtonsConfig = params?.browserButtonsConfig) {
+            is InputScreenBrowserButtonsConfig.Enabled -> browserButtonsConfig.tabs
+            else -> 0
+        }
         configureOmnibar(tabs)
 
         configureVoice(useTopBar)
@@ -343,6 +349,22 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
                 requireActivity().setResult(InputScreenActivityResultCodes.TAB_SWITCHER_REQUESTED)
                 exitInputScreen()
             }
+
+            is Command.LaunchDeviceApplication -> {
+                try {
+                    startActivity(command.deviceAppSuggestion.launchIntent)
+                    // This command is only available when launched from widgets or system search,
+                    // and since we're moving to a new task (in another app),
+                    // ensure that our task is finished so that it gets removed from recents.
+                    requireActivity().finishAffinity()
+                } catch (e: Exception) {
+                    viewModel.appNotFound(command.deviceAppSuggestion)
+                }
+            }
+
+            is Command.ShowAppNotFoundMessage -> {
+                Toast.makeText(requireContext(), R.string.autocompleteDeviceAppNotFound, LENGTH_SHORT).show()
+            }
         }
     }
 
@@ -459,6 +481,9 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
                     }
                 }
             }.launchIn(lifecycleScope)
+        if (inputScreenConfigResolver.shouldLaunchVoiceSearch()) {
+            voiceSearchLauncher.launch(requireActivity())
+        }
     }
 
     private fun configureInputScreenButtons() {

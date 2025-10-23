@@ -20,6 +20,7 @@
     <string name="cancel">Preklic</string>
     <string name="ok">V redu</string>
     <string name="privacyPro" translatable="false">Privacy Pro</string>
+    <string name="ddg_subscription">Naročnina DuckDuckGo</string>
     <string name="manageEmail">Upravljajte e-naslov</string>
 
     <!--Restore Subscriptions Activity-->
@@ -31,19 +32,19 @@
     <string name="subscriptionNotFound">Naročnina ni najdena</string>
     <string name="subscriptionNotFoundDescription">Naročnina, povezana s tem računom Google Play, ni več aktivna.</string>
     <string name="purchaseRestored">Vaši nakupi so bili obnovljeni.</string>
-    <string name="restoreSubscriptionTitle">V to napravo dodajte svojo naročnino na Privacy Pro</string>
+    <string name="restoreSubscriptionTitle">Dodajte svojo naročnino v to napravo</string>
     <string name="restoreSubscriptionGooglePlayTitle">Dodajte prek računa Google Play</string>
     <string name="restoreSubscriptionGooglePlayDescription">Obnovite naročnino v napravah Android z računom Google Play.</string>
     <string name="restoreSubscriptionGooglePlayGetStarted">Obnovitev nakupa</string>
     <string name="restoreSubscriptionEmailTitle">Dodajte prek e-pošte</string>
-    <string name="restoreSubscriptionEmailDescription">Povežite e-poštni naslov z naročnino, da v to napravo dodate Privacy Pro.</string>
+    <string name="restoreSubscriptionEmailDescription">Povežite e-poštni naslov z naročnino, da jo dodate v to napravo.</string>
     <string name="restoreSubscriptionEmailGetStarted">Začni</string>
 
     <!--Settings Subscriptions Activity-->
     <string name="removeSubscription">Odstranitev naročnine</string>
     <string name="subscriptionRemoved">Vaša naročnina je bila odstranjena iz te naprave</string>
     <string name="removeFromDevice">Želite odstraniti iz te naprave?</string>
-    <string name="removeFromDeviceDescription">V tej napravi ne boste mogli več dostopati do naročnine Privacy Pro. S tem ne boste preklicali naročnine, ki bo ostala aktivna v drugih napravah.</string>
+    <string name="removeFromDeviceDescription">V tej napravi ne boste mogli več dostopati do naročnine. S tem ne boste preklicali naročnine, ki bo ostala aktivna v drugih napravah.</string>
     <string name="subscriptionsDataMonthly" instruction="First placeholder is renews or expires, second is a date in format MMMM dd, yyyy">Vaša mesečna naročnina %1$s dne %2$s.</string>
     <string name="subscriptionsDataYearly" instruction="First placeholder is renews or expires, second is a date in format MMMM dd, yyyy">Vaša letna naročnina %1$s dne %2$s.</string>
     <string name="subscriptionsExpiredData" instruction="The placeholder is a date in format MMMM dd, yyyy">Vaša naročnina je potekla dne %1$s.</string>
@@ -51,14 +52,14 @@
     <string name="yearlySubscription">Letna naročnina</string>
     <string name="renews">se bo podaljšala</string>
     <string name="expires">bo potekla</string>
-    <string name="activateOnOtherDevices">Dodajte Privacy Pro v druge naprave</string>
+    <string name="activateOnOtherDevices">Dodajte svojo naročnino v druge naprave</string>
     <string name="addToDevicePrimaryText">Dodajte v napravo</string>
-    <string name="addToDeviceSecondaryTextWithoutEmail">Dodajte Privacy Pro v svoje druge naprave prek Googla Play ali z uporabo e-poštnega naslova.</string>
-    <string name="addToDeviceSecondaryTextWithEmail">Uporabite zgornji e-naslov za dodajanje naročnine v drugih napravah v aplikaciji DuckDuckGo. Pojdite v Nastavitve &gt; Privacy Pro &gt; Imam naročnino.</string>
+    <string name="addToDeviceSecondaryTextWithoutEmail">Dodajte naročnino v svoje druge naprave prek Googla Play ali z uporabo e-poštnega naslova.</string>
+    <string name="addToDeviceSecondaryTextWithEmail">Uporabite zgornji e-naslov za dodajanje naročnine v drugih napravah v aplikaciji DuckDuckGo. Pojdi v Nastavitve &gt; Nastavitve naročnine &gt; Imam naročnino.</string>
     <string name="editEmailPrimaryText">Urejanje e-naslova</string>
     <string name="learnMore">Več</string>
-    <string name="privacyProFaq">Potrebujete pomoč za naročnino Privacy Pro?</string>
-    <string name="privacyProFaqSecondary">Poiščite odgovore na pogosta vprašanja ali stopite v stik s podporo za naročnino Privacy Pro na naših straneh za pomoč. Razpoložljivost funkcij se razlikuje po državah.</string>
+    <string name="privacyProFaq">Potrebujete pomoč pri sklenitvi naročnine?</string>
+    <string name="privacyProFaqSecondary">Poiščite odgovore na pogosta vprašanja ali se obrnite na podporo pri naročnini na naših straneh za pomoč. Razpoložljivost funkcij se razlikuje po državah.</string>
     <string name="subscriptionStatusSubscribed">Naročeni</string>
     <string name="privacyPolicyAndTermsOfService">Pravilnik o zasebnosti in pogoji storitve</string>
     <string name="subscriptionStatusFreeTrial">Brezplačni preizkus je aktiven</string>
@@ -68,15 +69,15 @@
 
     <!--Settings Subscriptions-->
     <string name="subscriptionSetting">Nastavitve naročnine</string>
-    <string name="subscriptionSettingSubscribe">Zaščite svojo povezavo in identiteto s Privacy Pro</string>
+    <string name="subscriptionSettingSubscribe">Zaščitite svojo povezavo in identiteto z eno naročnino.</string>
 
     <string name="subscriptionSettingSubscribeSubtitle">Naročnikom so na voljo naš VPN ter zaščiti Personal Information Removal in Identity Theft Restoration.</string>
     <string name="subscriptionSettingSubscribeSubtitleRow">Naročnikom je sta voljo naš VPN in zaščita Identity Theft Restoration.</string>
 
-    <string name="subscriptionSettingGet">Pridobite Privacy Pro</string>
-    <string name="subscriptionSettingTryFreeTrial">Preizkusite Privacy Pro brezplačno</string>
+    <string name="subscriptionSettingGet">Naročite se na DuckDuckGo</string>
+    <string name="subscriptionSettingTryFreeTrial">Poskusite brezplačno</string>
     <string name="subscriptionSettingRestore">Imam naročnino</string>
-    <string name="subscriptionSettingExpired">Vaša naročnina na Privacy Pro je potekla</string>
+    <string name="subscriptionSettingExpired">Vaša naročnina na DuckDuckGo je potekla</string>
     <string name="subscriptionSettingExpiredViewPlans">Oglejte si načrte</string>
     <string name="subscriptionSettingSectionSubscription">Naročnina</string>
     <string name="subscriptionSettingRemoveFromDevice">Odstrani iz te naprave</string>
@@ -170,18 +171,7 @@
     <string name="activitySendFeedback">Pošljite povratne informacije</string>
 
     <!-- Privacy Pro Rebranding-->
-    <string name="privacyProRebranding">Naročnina DuckDuckGo</string>
-    <string name="subscriptionSettingExpiredRebranding">Vaša naročnina na DuckDuckGo je potekla</string>
-    <string name="privacyProFaqRebranding">Potrebujete pomoč pri sklenitvi naročnine?</string>
-    <string name="privacyProFaqSecondaryRebranding">Poiščite odgovore na pogosta vprašanja ali se obrnite na podporo pri naročnini na naših straneh za pomoč. Razpoložljivost funkcij se razlikuje po državah.</string>
-    <string name="restoreSubscriptionTitleRebranding">Dodajte svojo naročnino v to napravo</string>
-    <string name="restoreSubscriptionEmailDescriptionRebranding">Povežite e-poštni naslov z naročnino, da jo dodate v to napravo.</string>
-    <string name="activateOnOtherDevicesRebranding">Dodajte svojo naročnino v druge naprave</string>
-    <string name="addToDeviceSecondaryTextWithoutEmailRebranding">Dodajte naročnino v svoje druge naprave prek Googla Play ali z uporabo e-poštnega naslova.</string>
-    <string name="addToDeviceSecondaryTextWithEmailRebranding">Uporabite zgornji e-naslov za dodajanje naročnine v drugih napravah v aplikaciji DuckDuckGo. Pojdi v Nastavitve &gt; Nastavitve naročnine &gt; Imam naročnino.</string>
     <string name="subscriptionSettingRebrandingMessage">Privacy Pro se zdaj imenuje le naročnina DuckDuckGo</string>
-    <string name="subscriptionSettingSubscribeRebranding">Zaščitite svojo povezavo in identiteto z eno naročnino.</string>
-    <string name="removeFromDeviceDescriptionRebranding">V tej napravi ne boste mogli več dostopati do naročnine. S tem ne boste preklicali naročnine, ta bo ostala aktivna v drugih napravah.</string>
 
     <string name="subscriptionSettingSubscribeWithDuckAiSubtitle">Naročnikom so na voljo naš VPN, napredni modeli umetne inteligence v Duck.ai ter zaščiti Personal Information Removal in Identity Theft Restoration.</string>
     <string name="subscriptionSettingSubscribeWithDuckAiSubtitleRow">Naročnikom so na voljo naš VPN, napredni modeli umetne inteligence v Duck.ai in zaščita Identity Theft Restoration.</string>
@@ -194,8 +184,6 @@
     <string name="subscriptionSettingSectionTitle" translatable="false">DuckDuckGo Subscription</string>
     <string name="subscriptionSettingSubscribeSecure">Zagotovite varnost omrežja Wi-Fi in se zasebno pogovarjajte z naprednimi modeli umetne inteligence</string>
 
-    <string name="subscriptionSettingGetRebranding">Naročite se na DuckDuckGo</string>
-    <string name="subscriptionSettingTryFreeTrialRebranding">Poskusite brezplačno</string>
     <string name="feedbackGeneralSubscription">Naročnina</string>
 
 </resources>

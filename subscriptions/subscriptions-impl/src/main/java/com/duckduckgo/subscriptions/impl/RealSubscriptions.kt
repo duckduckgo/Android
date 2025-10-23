@@ -185,10 +185,6 @@ interface PrivacyProFeature {
     @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
     fun useUnifiedFeedback(): Toggle
 
-    // Kill switch
-    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
-    fun allowEmailFeedback(): Toggle
-
     @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
     fun serpPromoCookie(): Toggle
 
@@ -261,6 +257,12 @@ interface PrivacyProFeature {
 
     @Toggle.DefaultValue(defaultValue = DefaultFeatureValue.TRUE)
     fun sendAuthTokenRefreshWideEvent(): Toggle
+
+    @Toggle.DefaultValue(defaultValue = DefaultFeatureValue.FALSE)
+    fun useSubscriptionSupport(): Toggle
+
+    @Toggle.DefaultValue(defaultValue = DefaultFeatureValue.INTERNAL)
+    fun supportsSwitchSubscription(): Toggle
 }
 
 @ContributesBinding(AppScope::class)

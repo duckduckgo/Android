@@ -20,6 +20,7 @@
     <string name="cancel">Avbryt</string>
     <string name="ok">OK</string>
     <string name="privacyPro" translatable="false">Privacy Pro</string>
+    <string name="ddg_subscription">DuckDuckGo-abonnement</string>
     <string name="manageEmail">Administrer e-postadresse</string>
 
     <!--Restore Subscriptions Activity-->
@@ -31,19 +32,19 @@
     <string name="subscriptionNotFound">Abonnementet ble ikke funnet</string>
     <string name="subscriptionNotFoundDescription">Abonnementet tilknyttet denne Google Play-kontoen er ikke lenger aktiv.</string>
     <string name="purchaseRestored">Kjøpene dine er gjenopprettet.</string>
-    <string name="restoreSubscriptionTitle">Legg til Privacy Pro-abonnementet ditt på denne enheten</string>
+    <string name="restoreSubscriptionTitle">Legg til abonnementet på denne enheten</string>
     <string name="restoreSubscriptionGooglePlayTitle">Legg til via Google Play-konto</string>
     <string name="restoreSubscriptionGooglePlayDescription">Gjenopprett abonnementet ditt på Android-enheter ved å bruke Google Play-kontoen din.</string>
     <string name="restoreSubscriptionGooglePlayGetStarted">Gjenopprett kjøp</string>
     <string name="restoreSubscriptionEmailTitle">Legg til via e-postadresse</string>
-    <string name="restoreSubscriptionEmailDescription">Koble en e-postadresse til abonnementet ditt for å legge til Privacy Pro på denne enheten.</string>
+    <string name="restoreSubscriptionEmailDescription">Koble en e-postadresse til abonnementet ditt for å legge det til på denne enheten.</string>
     <string name="restoreSubscriptionEmailGetStarted">Kom i gang</string>
 
     <!--Settings Subscriptions Activity-->
     <string name="removeSubscription">Fjern abonnement</string>
     <string name="subscriptionRemoved">Abonnementet ditt er fjernet fra denne enheten</string>
     <string name="removeFromDevice">Vil du fjerne det fra denne enheten?</string>
-    <string name="removeFromDeviceDescription">Du får ikke lenger tilgang til Privacy Pro-abonnementet ditt på denne enheten. Dette avslutter ikke abonnementet, det er fortsatt aktivt på de andre enhetene.</string>
+    <string name="removeFromDeviceDescription">Du får ikke lenger tilgang til abonnementet ditt på denne enheten. Dette avslutter ikke abonnementet, det er fortsatt aktivt på de andre enhetene.</string>
     <string name="subscriptionsDataMonthly" instruction="First placeholder is renews or expires, second is a date in format MMMM dd, yyyy">Månedsabonnementet ditt %1$s %2$s.</string>
     <string name="subscriptionsDataYearly" instruction="First placeholder is renews or expires, second is a date in format MMMM dd, yyyy">Årsabonnementet ditt %1$s %2$s.</string>
     <string name="subscriptionsExpiredData" instruction="The placeholder is a date in format MMMM dd, yyyy">Abonnementet ditt utløp %1$s.</string>
@@ -51,14 +52,14 @@
     <string name="yearlySubscription">Årsabonnement</string>
     <string name="renews">fornyes</string>
     <string name="expires">utløper</string>
-    <string name="activateOnOtherDevices">Legg til Privacy Pro på andre enheter</string>
+    <string name="activateOnOtherDevices">Legg til abonnementet ditt på andre enheter</string>
     <string name="addToDevicePrimaryText">Legg til på enheten</string>
-    <string name="addToDeviceSecondaryTextWithoutEmail">Legg til Privacy Pro på dine andre enheter via Google Play eller ved å koble til en e-postadresse.</string>
-    <string name="addToDeviceSecondaryTextWithEmail">Bruk e-postadressen ovenfor til å legge til abonnementet ditt på andre enheter i DuckDuckGo-appen. Gå til Innstillinger &gt; Privacy Pro &gt; Jeg har et abonnement.</string>
+    <string name="addToDeviceSecondaryTextWithoutEmail">Legg til abonnementet på de andre enhetene dine via Google Play eller ved å koble til en e-postadresse.</string>
+    <string name="addToDeviceSecondaryTextWithEmail">Bruk e-postadressen ovenfor til å legge til abonnementet ditt på andre enheter i DuckDuckGo-appen. Gå til Innstillinger &gt; Abonnementsinnstillinger &gt; Jeg har et abonnement.</string>
     <string name="editEmailPrimaryText">Rediger e-postadresse</string>
     <string name="learnMore">Finn ut mer</string>
-    <string name="privacyProFaq">Trenger du hjelp med Privacy Pro?</string>
-    <string name="privacyProFaqSecondary">Få svar på ofte stilte spørsmål eller kontakt Privacy Pro-støtte fra hjelpesidene våre. Tilgjengelige funksjoner varierer fra land til land.</string>
+    <string name="privacyProFaq">Trenger du hjelp med abonnementet ditt?</string>
+    <string name="privacyProFaqSecondary">Få svar på ofte stilte spørsmål eller kontakt abonnementsstøtte via hjelpesidene våre. Tilgjengelige funksjoner varierer fra land til land.</string>
     <string name="subscriptionStatusSubscribed">Abonnerer</string>
     <string name="privacyPolicyAndTermsOfService">Personvernerklæring og vilkår for bruk</string>
     <string name="subscriptionStatusFreeTrial">Gratis prøveperiode er aktiv</string>
@@ -68,15 +69,15 @@
 
     <!--Settings Subscriptions-->
     <string name="subscriptionSetting">Abonnementsinnstillinger</string>
-    <string name="subscriptionSettingSubscribe">Beskytt tilkoblingen og identiteten din med Privacy Pro</string>
+    <string name="subscriptionSettingSubscribe">Beskytt tilkoblingen og identiteten din med ett abonnement.</string>
 
     <string name="subscriptionSettingSubscribeSubtitle">Abonnenter får vår VPN, Personal Information Removal og Identity Theft Restoration.</string>
     <string name="subscriptionSettingSubscribeSubtitleRow">Abonnenter får vår VPN og Identity Theft Restoration.</string>
 
-    <string name="subscriptionSettingGet">Skaff deg Privacy Pro</string>
-    <string name="subscriptionSettingTryFreeTrial">Prøv Privacy Pro gratis</string>
+    <string name="subscriptionSettingGet">Abonner på DuckDuckGo</string>
+    <string name="subscriptionSettingTryFreeTrial">Prøv gratis</string>
     <string name="subscriptionSettingRestore">Jeg har et abonnement</string>
-    <string name="subscriptionSettingExpired">Abonnementet ditt på Privacy Pro har utløpt</string>
+    <string name="subscriptionSettingExpired">DuckDuckGo-abonnementet er utløpt</string>
     <string name="subscriptionSettingExpiredViewPlans">Se abonnementer</string>
     <string name="subscriptionSettingSectionSubscription">Abonnement</string>
     <string name="subscriptionSettingRemoveFromDevice">Fjern fra denne enheten</string>
@@ -170,18 +171,7 @@
     <string name="activitySendFeedback">Send tilbakemelding</string>
 
     <!-- Privacy Pro Rebranding-->
-    <string name="privacyProRebranding">DuckDuckGo-abonnement</string>
-    <string name="subscriptionSettingExpiredRebranding">DuckDuckGo-abonnementet er utløpt</string>
-    <string name="privacyProFaqRebranding">Trenger du hjelp med abonnementet ditt?</string>
-    <string name="privacyProFaqSecondaryRebranding">Få svar på ofte stilte spørsmål eller kontakt abonnementsstøtte via hjelpesidene våre. Tilgjengelige funksjoner varierer fra land til land.</string>
-    <string name="restoreSubscriptionTitleRebranding">Legg til abonnementet på denne enheten</string>
-    <string name="restoreSubscriptionEmailDescriptionRebranding">Koble en e-postadresse til abonnementet ditt for å legge det til på denne enheten.</string>
-    <string name="activateOnOtherDevicesRebranding">Legg til abonnementet ditt på andre enheter</string>
-    <string name="addToDeviceSecondaryTextWithoutEmailRebranding">Legg til abonnementet på de andre enhetene dine via Google Play eller ved å koble til en e-postadresse.</string>
-    <string name="addToDeviceSecondaryTextWithEmailRebranding">Bruk e-postadressen ovenfor til å legge til abonnementet ditt på andre enheter i DuckDuckGo-appen. Gå til Innstillinger &gt; Abonnementsinnstillinger &gt; Jeg har et abonnement.</string>
     <string name="subscriptionSettingRebrandingMessage">Privacy Pro kalles nå bare DuckDuckGo-abonnementet</string>
-    <string name="subscriptionSettingSubscribeRebranding">Beskytt tilkoblingen og identiteten din med ett abonnement.</string>
-    <string name="removeFromDeviceDescriptionRebranding">Du får ikke lenger tilgang til abonnementet ditt på denne enheten. Dette avslutter ikke abonnementet; det er fortsatt aktivt på de andre enhetene.</string>
 
     <string name="subscriptionSettingSubscribeWithDuckAiSubtitle">Abonnenter får vår VPN, avanserte AI-modeller i Duck.ai, Personal Information Removal og Identity Theft Restoration.</string>
     <string name="subscriptionSettingSubscribeWithDuckAiSubtitleRow">Abonnenter får vår VPN, avanserte AI-modeller i Duck.ai og Identity Theft Restoration.</string>
@@ -194,8 +184,6 @@
     <string name="subscriptionSettingSectionTitle" translatable="false">DuckDuckGo Subscription</string>
     <string name="subscriptionSettingSubscribeSecure">Sikre wifien din og chat privat med avanserte AI-modeller</string>
 
-    <string name="subscriptionSettingGetRebranding">Abonner på DuckDuckGo</string>
-    <string name="subscriptionSettingTryFreeTrialRebranding">Prøv gratis</string>
     <string name="feedbackGeneralSubscription">Abonnement</string>
 
 </resources>

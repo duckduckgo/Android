@@ -236,6 +236,12 @@ interface SubscriptionsManager {
     suspend fun isFreeTrialEligible(): Boolean
 
     /**
+     * Returns `true` if the user has an active subscription and the switch plan feature is enabled,
+     * `false` otherwise.
+     */
+    suspend fun isSwitchPlanAvailable(): Boolean
+
+    /**
      * Switches the current subscription plan to a new one
      *
      * @param activity The activity context required for launching Google Play billing flow
@@ -380,6 +386,11 @@ class RealSubscriptionsManager @Inject constructor(
             it.offerId in SubscriptionsConstants.LIST_OF_FREE_TRIAL_OFFERS
         }
         return !userHadFreeTrial && privacyProFeature.get().privacyProFreeTrial().isEnabled() && freeTrialProductsAvailableInGooglePlay
+    }
+
+    override suspend fun isSwitchPlanAvailable(): Boolean = withContext(dispatcherProvider.io()) {
+        val hasActiveSubscription = authRepository.getSubscription()?.isActive() ?: false
+        return@withContext hasActiveSubscription && privacyProFeature.get().supportsSwitchSubscription().isEnabled()
     }
 
     override suspend fun switchSubscriptionPlan(

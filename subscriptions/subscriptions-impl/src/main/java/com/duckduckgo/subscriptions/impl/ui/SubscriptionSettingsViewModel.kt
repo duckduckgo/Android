@@ -105,8 +105,8 @@ class SubscriptionSettingsViewModel @Inject constructor(
                 email = account.email?.takeUnless { it.isBlank() },
                 showFeedback = privacyProUnifiedFeedback.shouldUseUnifiedFeedback(source = SUBSCRIPTION_SETTINGS),
                 activeOffers = subscription.activeOffers,
-                rebrandingEnabled = subscriptionRebrandingFeatureToggle.isSubscriptionRebrandingEnabled(),
                 showRebrandingBanner = shouldShowRebrandingBanner(),
+                switchPlanAvailable = subscriptionsManager.isSwitchPlanAvailable(),
             ),
         )
     }
@@ -173,8 +173,8 @@ class SubscriptionSettingsViewModel @Inject constructor(
             val email: String?,
             val showFeedback: Boolean = false,
             val activeOffers: List<ActiveOfferType>,
-            val rebrandingEnabled: Boolean = false,
             val showRebrandingBanner: Boolean = false,
+            val switchPlanAvailable: Boolean,
         ) : ViewState()
     }
 }

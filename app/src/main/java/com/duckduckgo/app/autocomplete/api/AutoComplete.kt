@@ -22,17 +22,22 @@ import androidx.core.net.toUri
 import com.duckduckgo.app.autocomplete.AutocompleteTabsFeature
 import com.duckduckgo.app.autocomplete.impl.AutoCompletePixelNames
 import com.duckduckgo.app.autocomplete.impl.AutoCompleteRepository
+import com.duckduckgo.app.autocomplete.impl.AutocompletePixelParams
 import com.duckduckgo.app.browser.UriString
+import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.onboarding.store.AppStage
 import com.duckduckgo.app.onboarding.store.UserStageStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter
+import com.duckduckgo.app.systemsearch.DeviceApp
+import com.duckduckgo.app.systemsearch.DeviceAppLookup
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.browser.api.autocomplete.AutoComplete
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteResult
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion.AutoCompleteDefaultSuggestion
+import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion.AutoCompleteDeviceAppSuggestion
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion.AutoCompleteHistoryRelatedSuggestion
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion.AutoCompleteHistoryRelatedSuggestion.AutoCompleteHistorySearchSuggestion
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion.AutoCompleteHistoryRelatedSuggestion.AutoCompleteHistorySuggestion
@@ -41,11 +46,13 @@ import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggesti
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion.AutoCompleteUrlSuggestion
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion.AutoCompleteUrlSuggestion.AutoCompleteBookmarkSuggestion
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion.AutoCompleteUrlSuggestion.AutoCompleteSwitchToTabSuggestion
+import com.duckduckgo.browser.api.autocomplete.AutoCompleteFactory
 import com.duckduckgo.common.utils.AppUrl
 import com.duckduckgo.common.utils.AppUrl.Url
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.UrlScheme
 import com.duckduckgo.common.utils.baseHost
+import com.duckduckgo.common.utils.extensions.combine
 import com.duckduckgo.common.utils.toStringDropScheme
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.api.DuckChat
@@ -58,12 +65,14 @@ import com.duckduckgo.savedsites.api.models.SavedSite
 import com.duckduckgo.savedsites.api.models.SavedSite.Bookmark
 import com.duckduckgo.savedsites.api.models.SavedSite.Favorite
 import com.squareup.anvil.annotations.ContributesBinding
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 import kotlin.math.max
@@ -72,8 +81,16 @@ const val maximumNumberOfSuggestions = 12
 const val maximumNumberOfTopHits = 2
 const val minimumNumberInSuggestionGroup = 5
 
+/**
+ * Provides a default [AutoComplete] instance with default configuration.
+ * For dynamic configs, use [AutoCompleteFactory] instead.
+ */
 @ContributesBinding(AppScope::class)
-class AutoCompleteApi @Inject constructor(
+class DefaultAutoComplete @Inject constructor(
+    private val factory: AutoCompleteFactory,
+) : AutoComplete by factory.create(AutoComplete.Config())
+
+class AutoCompleteApi constructor(
     private val autoCompleteService: AutoCompleteService,
     private val savedSitesRepository: SavedSitesRepository,
     private val navigationHistory: NavigationHistory,
@@ -86,9 +103,20 @@ class AutoCompleteApi @Inject constructor(
     private val history: NavigationHistory,
     private val dispatchers: DispatcherProvider,
     private val pixel: Pixel,
+    private val deviceAppLookup: DeviceAppLookup,
+    @AppCoroutineScope private val coroutineScope: CoroutineScope,
+    private val config: AutoComplete.Config,
 ) : AutoComplete {
 
     private var isAutocompleteTabsFeatureEnabled: Boolean? = null
+
+    init {
+        if (config.showInstalledApps) {
+            coroutineScope.launch {
+                deviceAppLookup.refreshAppList()
+            }
+        }
+    }
 
     override fun autoComplete(query: String): Flow<AutoCompleteResult> {
         if (query.isBlank()) {
@@ -101,15 +129,21 @@ class AutoCompleteApi @Inject constructor(
             getAutocompleteSwitchToTabResults(query),
             getAutoCompleteHistoryResults(query),
             getAutoCompleteSearchResults(query),
-        ) { bookmarks, favorites, tabs, historyResults, searchResults ->
+            getDeviceAppResults(query),
+        ) { bookmarks, favorites, tabs, historyResults, searchResults, deviceAppResults ->
             val bookmarksFavoritesTabsAndHistory = combineBookmarksFavoritesTabsAndHistory(bookmarks, favorites, tabs, historyResults)
             val topHits = getTopHits(bookmarksFavoritesTabsAndHistory, searchResults)
             val filteredBookmarksFavoritesTabsAndHistory = filterBookmarksAndTabsAndHistory(bookmarksFavoritesTabsAndHistory, topHits)
             val middleSectionSearchResults = makeSearchResultsNotAllowedInTopHits(searchResults)
             val distinctSearchResults = getDistinctSearchResults(middleSectionSearchResults, topHits, filteredBookmarksFavoritesTabsAndHistory)
 
-            (topHits + distinctSearchResults + filteredBookmarksFavoritesTabsAndHistory).distinctBy {
+            val searchSuggestions = (topHits + distinctSearchResults + filteredBookmarksFavoritesTabsAndHistory).distinctBy {
                 Pair(it.phrase, it::class.java)
+            }
+            if (searchSuggestions.isNotEmpty() && deviceAppResults.isNotEmpty()) {
+                searchSuggestions.take(MAX_RESULTS_PER_GROUP_WITH_INSTALLED_APPS) + deviceAppResults.take(MAX_RESULTS_PER_GROUP_WITH_INSTALLED_APPS)
+            } else {
+                searchSuggestions + deviceAppResults
             }
         }.map { suggestions ->
             val inAppMessage = mutableListOf<AutoCompleteSuggestion>()
@@ -259,7 +293,7 @@ class AutoCompleteApi @Inject constructor(
         val hasFavoriteResults = suggestions.any { it is AutoCompleteBookmarkSuggestion && it.isFavorite }
         val hasHistoryResults = suggestions.any { it is AutoCompleteHistorySuggestion || it is AutoCompleteHistorySearchSuggestion }
         val hasSwitchToTabResults = suggestions.any { it is AutoCompleteSwitchToTabSuggestion }
-        val params = mapOf(
+        val params = mutableMapOf(
             PixelParameter.SHOWED_BOOKMARKS to hasBookmarkResults.toString(),
             PixelParameter.SHOWED_FAVORITES to hasFavoriteResults.toString(),
             PixelParameter.BOOKMARK_CAPABLE to hasBookmarks.toString(),
@@ -292,8 +326,17 @@ class AutoCompleteApi @Inject constructor(
             } else {
                 AutoCompletePixelNames.AUTOCOMPLETE_DUCKAI_PROMPT_LEGACY_SELECTION
             }
+            is AutoCompleteDeviceAppSuggestion -> {
+                pixel.fire(AutoCompletePixelNames.AUTOCOMPLETE_INSTALLED_APP_SELECTION)
+                return
+            }
 
             else -> return
+        }
+
+        if (suggestion is AutoCompleteSearchSuggestion) {
+            val clickedSearchSuggestionIndex = suggestions.filter { it is AutoCompleteSearchSuggestion }.indexOf(suggestion)
+            params[AutocompletePixelParams.PARAM_SEARCH_SUGGESTION_INDEX] = clickedSearchSuggestionIndex.toString()
         }
 
         pixel.fire(pixelName, params)
@@ -361,6 +404,25 @@ class AutoCompleteApi @Inject constructor(
                 .map { rankHistory(query, it) }
                 .distinctUntilChanged()
         }.getOrElse { flowOf(emptyList()) }
+
+    private fun getDeviceAppResults(query: String): Flow<List<AutoCompleteDeviceAppSuggestion>> =
+        if (!config.showInstalledApps || query.isBlank()) {
+            flowOf(emptyList())
+        } else {
+            flow {
+                val apps = deviceAppLookup.query(query).toAutoCompleteSuggestion(query)
+                emit(apps)
+            }
+        }
+
+    private fun List<DeviceApp>.toAutoCompleteSuggestion(phrase: String) = map {
+        AutoCompleteDeviceAppSuggestion(
+            phrase = phrase,
+            shortName = it.shortName,
+            packageName = it.packageName,
+            launchIntent = it.launchIntent,
+        )
+    }
 
     private fun rankTabs(
         query: String,
@@ -523,6 +585,10 @@ class AutoCompleteApi @Inject constructor(
         val suggestion: T,
         val score: Int = DEFAULT_SCORE,
     )
+
+    private companion object {
+        private const val MAX_RESULTS_PER_GROUP_WITH_INSTALLED_APPS = 4
+    }
 }
 
 @VisibleForTesting

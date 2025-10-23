@@ -193,6 +193,7 @@ import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Unique
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelValues.DAX_INITIAL_CTA
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelValues.DAX_SERP_CTA
 import com.duckduckgo.app.surrogates.SurrogateResponse
+import com.duckduckgo.app.systemsearch.DeviceAppLookup
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.tabs.store.TabStatsBucketing
@@ -203,6 +204,8 @@ import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 import com.duckduckgo.app.usage.search.SearchCountDao
 import com.duckduckgo.app.widget.ui.WidgetCapabilities
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.autoconsent.impl.pixels.AutoConsentPixel
+import com.duckduckgo.autoconsent.impl.pixels.AutoconsentPixelManager
 import com.duckduckgo.autofill.api.AutofillCapabilityChecker
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.autofill.api.email.EmailManager
@@ -293,7 +296,6 @@ import com.duckduckgo.site.permissions.api.SitePermissionsManager.LocationPermis
 import com.duckduckgo.site.permissions.api.SitePermissionsManager.SitePermissionQueryResponse
 import com.duckduckgo.site.permissions.api.SitePermissionsManager.SitePermissions
 import com.duckduckgo.subscriptions.api.SUBSCRIPTIONS_FEATURE_NAME
-import com.duckduckgo.subscriptions.api.SubscriptionRebrandingFeatureToggle
 import com.duckduckgo.subscriptions.api.Subscriptions
 import com.duckduckgo.subscriptions.api.SubscriptionsJSHelper
 import com.duckduckgo.sync.api.favicons.FaviconsFetchingPrompt
@@ -399,6 +401,8 @@ class BrowserTabViewModelTest {
     private val mockNewTabPixels: NewTabPixels = mock()
 
     private val mockHttpErrorPixels: HttpErrorPixels = mock()
+
+    private val mockAutoconsentPixelManager: AutoconsentPixelManager = mock()
 
     private val mockOnboardingStore: OnboardingStore = mock()
 
@@ -580,7 +584,6 @@ class BrowserTabViewModelTest {
     private val mockSiteHttpErrorHandler: HttpCodeSiteErrorHandler = mock()
     private val mockSubscriptionsJSHelper: SubscriptionsJSHelper = mock()
     private val mockOnboardingHomeScreenWidgetToggles: OnboardingHomeScreenWidgetToggles = mock()
-    private val mockRebrandingFeatureToggle: SubscriptionRebrandingFeatureToggle = mock()
     private val tabManager: TabManager = mock()
 
     private val mockAddressDisplayFormatter: AddressDisplayFormatter by lazy {
@@ -618,6 +621,8 @@ class BrowserTabViewModelTest {
     private val fakeMessagingPlugins = FakeWebMessagingPluginPoint()
     private val fakePostMessageWrapperPlugins = FakePostMessageWrapperPluginPoint()
 
+    private val mockDeviceAppLookup: DeviceAppLookup = mock()
+
     @Before
     fun before() =
         runTest {
@@ -648,6 +653,9 @@ class BrowserTabViewModelTest {
                     mockHistory,
                     DefaultDispatcherProvider(),
                     mockPixel,
+                    mockDeviceAppLookup,
+                    coroutineRule.testScope,
+                    AutoComplete.Config(),
                 )
             val fireproofWebsiteRepositoryImpl =
                 FireproofWebsiteRepositoryImpl(
@@ -713,7 +721,6 @@ class BrowserTabViewModelTest {
                     brokenSitePrompt = mockBrokenSitePrompt,
                     onboardingHomeScreenWidgetToggles = mockOnboardingHomeScreenWidgetToggles,
                     onboardingDesignExperimentManager = mockOnboardingDesignExperimentManager,
-                    rebrandingFeatureToggle = mockRebrandingFeatureToggle,
                 )
 
             val siteFactory =
@@ -847,6 +854,7 @@ class BrowserTabViewModelTest {
                     webMessagingPlugins = fakeMessagingPlugins,
                     postMessageWrapperPlugins = fakePostMessageWrapperPlugins,
                     addressBarTrackersAnimationFeatureToggle = mockAddressBarTrackersAnimationFeatureToggle,
+                    autoconsentPixelManager = mockAutoconsentPixelManager,
                 )
 
             testee.loadData("abc", null, false, false)
@@ -6499,6 +6507,48 @@ class BrowserTabViewModelTest {
     }
 
     @Test
+    fun whenAutoConsentPopupHandledAndCosmeticTrueThenFireAnimationShownCosmeticPixel() {
+        testee.browserViewState.value =
+            testee.browserViewState.value?.copy(
+                browserShowing = true,
+                maliciousSiteBlocked = false,
+                maliciousSiteStatus = null,
+            )
+
+        testee.onAutoConsentPopUpHandled(true)
+
+        verify(mockAutoconsentPixelManager).fireDailyPixel(AutoConsentPixel.AUTOCONSENT_ANIMATION_SHOWN_COSMETIC_DAILY)
+    }
+
+    @Test
+    fun whenAutoConsentPopupHandledAndCosmeticFalseThenFireAnimationShownPixel() {
+        testee.browserViewState.value =
+            testee.browserViewState.value?.copy(
+                browserShowing = true,
+                maliciousSiteBlocked = false,
+                maliciousSiteStatus = null,
+            )
+
+        testee.onAutoConsentPopUpHandled(false)
+
+        verify(mockAutoconsentPixelManager).fireDailyPixel(AutoConsentPixel.AUTOCONSENT_ANIMATION_SHOWN_DAILY)
+    }
+
+    @Test
+    fun whenAutoConsentPopupHandledAndMaliciousSiteBlockedThenNoPixelFired() {
+        testee.browserViewState.value =
+            testee.browserViewState.value?.copy(
+                browserShowing = true,
+                maliciousSiteBlocked = true,
+                maliciousSiteStatus = PHISHING,
+            )
+
+        testee.onAutoConsentPopUpHandled(true)
+
+        verify(mockAutoconsentPixelManager, never()).fireDailyPixel(any())
+    }
+
+    @Test
     fun whenVisitSiteThenUpdateLoadingViewStateAndOmnibarViewState() {
         testee.browserViewState.value =
             browserViewState().copy(
@@ -7158,6 +7208,28 @@ class BrowserTabViewModelTest {
 
             verify(mockOnboardingDesignExperimentManager).fireFireButtonClickedFromOnboardingPixel()
         }
+
+    @Test
+    fun whenFireMenuSelectedAndFireButtonHighlightedThenHighlightIsCleared() = runTest {
+        testee.browserViewState.value = browserViewState().copy(fireButton = HighlightableButton.Visible(highlighted = true))
+
+        testee.onFireMenuSelected()
+
+        val viewState = testee.browserViewState.value
+        assertNotNull(viewState)
+        assertFalse((viewState.fireButton as HighlightableButton.Visible).highlighted)
+    }
+
+    @Test
+    fun whenFireMenuSelectedAndFireButtonNotHighlightedThenStateUnchanged() = runTest {
+        testee.browserViewState.value = browserViewState().copy(fireButton = HighlightableButton.Visible(highlighted = false))
+
+        testee.onFireMenuSelected()
+
+        val viewState = testee.browserViewState.value
+        assertNotNull(viewState)
+        assertFalse((viewState.fireButton as HighlightableButton.Visible).highlighted)
+    }
 
     @Test
     fun whenInputScreenEnabledAndSwitchToNewTabThenLaunchInputScreenCommandTriggered() =

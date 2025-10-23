@@ -23,6 +23,7 @@ import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
+import com.duckduckgo.autofill.api.ImportFromGoogle
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.SingleLiveEvent
 import com.duckduckgo.di.scopes.ActivityScope
@@ -47,7 +48,7 @@ import com.duckduckgo.savedsites.impl.bookmarks.BookmarksViewModel.Command.Expor
 import com.duckduckgo.savedsites.impl.bookmarks.BookmarksViewModel.Command.ImportedSavedSites
 import com.duckduckgo.savedsites.impl.bookmarks.BookmarksViewModel.Command.LaunchAddFolder
 import com.duckduckgo.savedsites.impl.bookmarks.BookmarksViewModel.Command.LaunchBookmarkExport
-import com.duckduckgo.savedsites.impl.bookmarks.BookmarksViewModel.Command.LaunchBookmarkImport
+import com.duckduckgo.savedsites.impl.bookmarks.BookmarksViewModel.Command.LaunchBookmarkImportFile
 import com.duckduckgo.savedsites.impl.bookmarks.BookmarksViewModel.Command.OpenBookmarkFolder
 import com.duckduckgo.savedsites.impl.bookmarks.BookmarksViewModel.Command.OpenSavedSite
 import com.duckduckgo.savedsites.impl.bookmarks.BookmarksViewModel.Command.ShowBrowserMenu
@@ -84,6 +85,7 @@ class BookmarksViewModel @Inject constructor(
     private val faviconsFetchingPrompt: FaviconsFetchingPrompt,
     private val bookmarksDataStore: BookmarksDataStore,
     private val dispatcherProvider: DispatcherProvider,
+    private val importFromGoogle: ImportFromGoogle,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
 ) : EditSavedSiteListener, AddBookmarkFolderListener, EditBookmarkFolderListener, DeleteBookmarkListener, ViewModel() {
 
@@ -106,7 +108,8 @@ class BookmarksViewModel @Inject constructor(
         class ConfirmDeleteBookmarkFolder(val bookmarkFolder: BookmarkFolder) : Command()
         data class ImportedSavedSites(val importSavedSitesResult: ImportSavedSitesResult) : Command()
         data class ExportedSavedSites(val exportSavedSitesResult: ExportSavedSitesResult) : Command()
-        data object LaunchBookmarkImport : Command()
+        data object ShowBookmarkImportDialog : Command()
+        data object LaunchBookmarkImportFile : Command()
         data object LaunchBookmarkExport : Command()
         data object LaunchAddFolder : Command()
         data object ShowFaviconsPrompt : Command()
@@ -516,7 +519,18 @@ class BookmarksViewModel @Inject constructor(
 
     fun onImportBookmarksClicked() {
         pixel.fire(SavedSitesPixelName.BOOKMARK_MENU_IMPORT_CLICKED)
-        command.value = LaunchBookmarkImport
+
+        viewModelScope.launch {
+            val googleImportLaunchIntent = withContext(dispatcherProvider.io()) {
+                importFromGoogle.getBookmarksImportLaunchIntent()
+            }
+
+            command.value = if (googleImportLaunchIntent != null) {
+                Command.ShowBookmarkImportDialog
+            } else {
+                LaunchBookmarkImportFile
+            }
+        }
     }
 
     fun onExportBookmarksClicked() {
