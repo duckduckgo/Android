@@ -167,14 +167,16 @@ def generate_markdown_summary(results: Dict[str, BenchmarkResult]) -> str:
 
 def main():
     if len(sys.argv) < 2:
-        print("Usage: benchmark-comparison.py <benchmark_results_csv>")
+        print("Usage: benchmark-comparison.py <benchmark_results_csv> [github_action_run_url]")
         sys.exit(1)
 
     results_csv = Path(sys.argv[1])
+    github_action_run_url = Path(sys.argv[2])
 
     print(f"Parsing results from: {results_csv}")
     results = parse_csv(results_csv)
     print(generate_terminal_summary(results))
+
 
 if __name__ == '__main__':
     main()
