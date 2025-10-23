@@ -24,6 +24,7 @@ import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.global.DefaultRoleBrowserDialog
 import com.duckduckgo.app.global.install.AppInstallStore
+import com.duckduckgo.app.notificationpromptexperiment.NotificationPromptExperimentManager
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.ADDRESS_BAR_POSITION
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.COMPARISON_CHART
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.INITIAL
@@ -78,6 +79,7 @@ class WelcomePageViewModel @Inject constructor(
     private val dispatchers: DispatcherProvider,
     private val appBuildConfig: AppBuildConfig,
     private val onboardingDesignExperimentManager: OnboardingDesignExperimentManager,
+    private val notificationPromptExperimentManager: NotificationPromptExperimentManager,
 ) : ViewModel() {
     private val _commands = Channel<Command>(1, DROP_OLDEST)
     val commands: Flow<Command> = _commands.receiveAsFlow()
@@ -206,6 +208,7 @@ class WelcomePageViewModel @Inject constructor(
         pixel.fire(AppPixelName.DEFAULT_BROWSER_SET, mapOf(PixelParameter.DEFAULT_BROWSER_SET_FROM_ONBOARDING to true.toString()))
 
         viewModelScope.launch {
+            notificationPromptExperimentManager.fireDdgSetAsDefault()
             onboardingDesignExperimentManager.fireSetDefaultRatePixel()
             _commands.send(ShowAddressBarPositionDialog)
         }
