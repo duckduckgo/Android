@@ -8,8 +8,11 @@ Compares build performance metrics from gradle-profiler CSV outputs.
 import csv
 import sys
 import statistics
+import requests
+import argparse
 from pathlib import Path
 from typing import Dict, List, Optional
+from urllib.parse import urlencode
 
 
 class BenchmarkResult:
@@ -42,16 +45,18 @@ def parse_csv(csv_path: Path) -> Dict[str, BenchmarkResult]:
             phase = row.get('Phase')
             sample = row.get('Sample')
             duration = row.get('Duration')
-            # Process only 'total execution time' and 'task start' samples
-            if sample not in ['total execution time', 'task start'] or not duration:
+            # Process only 'total execution time' and 'task start' samples from MEASURE phase
+            if (sample not in ['total execution time', 'task start'] or 
+                not duration or 
+                phase != 'MEASURE'):
                 continue
 
             try:
                 # Convert time to seconds (gradle-profiler outputs in ms)
                 time_seconds = float(duration) / 1000.0
 
-                # Group builds by phase, scenario, and sample type
-                group_scenario = f'{scenario} - {sample} ({phase})'
+                # Group builds by scenario and sample type (no phase needed since we only process MEASURE)
+                group_scenario = f'{scenario} - {sample}'
 
                 if group_scenario not in scenario_data:
                     scenario_data[group_scenario] = []
@@ -114,18 +119,15 @@ def generate_terminal_summary(results: Dict[str, BenchmarkResult]) -> str:
         task_start_results = []
         
         for result in scenario_results:
-            # Extract the metric type and phase from the scenario name
+            # Extract the metric type from the scenario name
             parts = result.scenario.split(' - ')
             if len(parts) >= 2:
-                metric_type = parts[1].split(' (')[0]  # Remove phase info
-                phase = parts[1].split(' (')[1].rstrip(')') if '(' in parts[1] else 'Unknown'
+                metric_type = parts[1]
                 
-                # Only include MEASURE phase results (skip WARM_UP)
-                if phase == "MEASURE":
-                    if metric_type == "total execution time":
-                        total_exec_results.append(result)
-                    elif metric_type == "task start":
-                        task_start_results.append(result)
+                if metric_type == "total execution time":
+                    total_exec_results.append(result)
+                elif metric_type == "task start":
+                    task_start_results.append(result)
         
         # Display total execution time results
         for result in total_exec_results:
@@ -165,17 +167,79 @@ def generate_markdown_summary(results: Dict[str, BenchmarkResult]) -> str:
     return md
 
 
+def send_results_to_api(results: Dict[str, BenchmarkResult], github_action_run_url: Optional[str] = None) -> None:
+    """Send benchmark results to the API endpoint."""
+    base_url = "https://improving.duckduckgo.com/t/m_build_time_android"
+    
+    for result in results.values():
+        # Extract scenario and task from the result name
+        # Format: "scenario - metric_type"
+        parts = result.scenario.split(' - ')
+        if len(parts) >= 2:
+            scenario = parts[0]
+            task = parts[1]  # No need to clean up phase info anymore
+            
+            # Prepare query parameters
+            params = {
+                'scenario': scenario,
+                'task': task,
+                'mean': f"{result.mean:.3f}",
+                'median': f"{result.median:.3f}",
+                'std_dev': f"{result.std_dev:.3f}"
+            }
+            
+            # Add github_action_run_url if provided
+            if github_action_run_url:
+                params['github_action_run_url'] = github_action_run_url
+            
+            # Construct URL with query parameters
+            url = f"{base_url}?{urlencode(params)}"
+            
+            try:
+                print(f"Sending results for {scenario} - {task}...")
+                response = requests.get(url, timeout=10)
+                response.raise_for_status()
+                print(f"✅ Successfully sent results for {scenario} - {task}")
+            except requests.exceptions.RequestException as e:
+                print(f"❌ Failed to send results for {scenario} - {task}: {e}")
+            except Exception as e:
+                print(f"❌ Unexpected error sending results for {scenario} - {task}: {e}")
+
+
 def main():
-    if len(sys.argv) < 2:
-        print("Usage: benchmark-comparison.py <benchmark_results_csv> [github_action_run_url]")
-        sys.exit(1)
-
-    results_csv = Path(sys.argv[1])
-    github_action_run_url = Path(sys.argv[2])
-
-    print(f"Parsing results from: {results_csv}")
-    results = parse_csv(results_csv)
+    parser = argparse.ArgumentParser(
+        description="Compare build performance metrics from gradle-profiler CSV outputs"
+    )
+    parser.add_argument(
+        "csv_file",
+        type=Path,
+        help="Path to the benchmark results CSV file"
+    )
+    parser.add_argument(
+        "--github-action-url",
+        type=str,
+        help="GitHub Action run URL to include in the pixel report"
+    )
+    parser.add_argument(
+        "--report-pixel",
+        action="store_true",
+        help="Send results to the reporting API (requires --github-action-url)"
+    )
+    
+    args = parser.parse_args()
+    
+    print(f"Parsing results from: {args.csv_file}")
+    results = parse_csv(args.csv_file)
     print(generate_terminal_summary(results))
+    
+    # Send results to API only if both conditions are met
+    if results and args.report_pixel and args.github_action_url:
+        print("\n" + "=" * 80)
+        print("SENDING RESULTS TO API")
+        print("=" * 80)
+        send_results_to_api(results, args.github_action_url)
+    elif results and args.report_pixel and not args.github_action_url:
+        print("\n⚠️  --report-pixel flag set but no --github-action-url provided. Skipping API requests.")
 
 
 if __name__ == '__main__':
