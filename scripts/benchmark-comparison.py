@@ -85,6 +85,54 @@ def format_time(seconds: float) -> str:
         return f"{seconds:.1f}s"
 
 
+def generate_terminal_summary(results: Dict[str, BenchmarkResult]) -> str:
+    """Generate terminal-friendly summary with better formatting."""
+    
+    if not results:
+        return "No benchmark results found."
+    
+    output = []
+    output.append("=" * 80)
+    output.append("BUILD PERFORMANCE BENCHMARK RESULTS")
+    output.append("=" * 80)
+    output.append("")
+    
+    # Group results by scenario (without phase/sample details for cleaner grouping)
+    scenario_groups = {}
+    for result in results.values():
+        # Extract base scenario name (before the first ' - ')
+        base_scenario = result.scenario.split(' - ')[0]
+        if base_scenario not in scenario_groups:
+            scenario_groups[base_scenario] = []
+        scenario_groups[base_scenario].append(result)
+    
+    for base_scenario, scenario_results in scenario_groups.items():
+        output.append(f"📊 {base_scenario}")
+        output.append("-" * (len(base_scenario) + 4))
+        
+        for result in scenario_results:
+            # Extract the metric type and phase from the scenario name
+            parts = result.scenario.split(' - ')
+            if len(parts) >= 2:
+                metric_type = parts[1].split(' (')[0]  # Remove phase info
+                phase = parts[1].split(' (')[1].rstrip(')') if '(' in parts[1] else 'Unknown'
+                phase_icon = "🔥 (WARM_UP)" if phase == "WARM_UP" else "📈 (MEASURE)"
+            else:
+                metric_type = "Unknown"
+                phase_icon = "❓"
+            
+            output.append(f"  {phase_icon} {metric_type}:")
+            output.append(f"    Mean:   {format_time(result.mean):>8}")
+            output.append(f"    Median: {format_time(result.median):>8}")
+            output.append(f"    StdDev: ±{format_time(result.std_dev):>7}")
+            output.append(f"    Range:  {format_time(result.min):>8} - {format_time(result.max)}")
+            output.append("")
+        
+        output.append("")
+    
+    return "\n".join(output)
+
+
 def generate_markdown_summary(results: Dict[str, BenchmarkResult]) -> str:
     """Generate markdown comparison table."""
 
@@ -110,7 +158,7 @@ def main():
 
     print(f"Parsing results from: {results_csv}")
     results = parse_csv(results_csv)
-    print(generate_markdown_summary(results))
+    print(generate_terminal_summary(results))
 
 if __name__ == '__main__':
     main()
