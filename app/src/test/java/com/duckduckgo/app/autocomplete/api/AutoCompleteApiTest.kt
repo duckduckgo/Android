@@ -23,6 +23,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.app.autocomplete.AutocompleteTabsFeature
 import com.duckduckgo.app.autocomplete.impl.AutoCompletePixelNames
 import com.duckduckgo.app.autocomplete.impl.AutoCompleteRepository
+import com.duckduckgo.app.autocomplete.impl.AutocompletePixelParams
 import com.duckduckgo.app.onboarding.store.AppStage
 import com.duckduckgo.app.onboarding.store.AppStage.NEW
 import com.duckduckgo.app.onboarding.store.UserStageStore
@@ -1879,6 +1880,120 @@ class AutoCompleteApiTest {
 
         assertEquals("false", argumentCaptor.firstValue[PixelParameter.SHOWED_SWITCH_TO_TAB])
         assertEquals("false", argumentCaptor.firstValue[PixelParameter.SWITCH_TO_TAB_CAPABLE])
+    }
+
+    @Test
+    fun `when search suggestion clicked then search suggestion index parameter is added`() = runTest {
+        whenever(mockSavedSitesRepository.hasBookmarks()).thenReturn(false)
+        whenever(mockNavigationHistory.hasHistory()).thenReturn(false)
+        whenever(mockHistory.hasHistory()).thenReturn(false)
+        tabsLiveData.value = listOf(TabEntity("1", "https://example.com", position = 0))
+
+        val suggestions = listOf(
+            AutoCompleteSearchSuggestion("first", isUrl = false, isAllowedInTopHits = false),
+            AutoCompleteSearchSuggestion("second", isUrl = false, isAllowedInTopHits = false),
+            AutoCompleteSearchSuggestion("third", isUrl = false, isAllowedInTopHits = false),
+        )
+        val clickedSuggestion = suggestions[1] // second suggestion (index 1)
+
+        testee.fireAutocompletePixel(suggestions, clickedSuggestion)
+
+        val argumentCaptor = argumentCaptor<Map<String, String>>()
+        Mockito.verify(mockPixel).fire(eq(AutoCompletePixelNames.AUTOCOMPLETE_SEARCH_PHRASE_SELECTION), argumentCaptor.capture(), any(), any())
+
+        assertEquals("1", argumentCaptor.firstValue[AutocompletePixelParams.PARAM_SEARCH_SUGGESTION_INDEX])
+    }
+
+    @Test
+    fun `when search website suggestion clicked then search suggestion index parameter is added`() = runTest {
+        whenever(mockSavedSitesRepository.hasBookmarks()).thenReturn(false)
+        whenever(mockNavigationHistory.hasHistory()).thenReturn(false)
+        whenever(mockHistory.hasHistory()).thenReturn(false)
+        tabsLiveData.value = listOf(TabEntity("1", "https://example.com", position = 0))
+
+        val suggestions = listOf(
+            AutoCompleteSearchSuggestion("first", isUrl = false, isAllowedInTopHits = false),
+            AutoCompleteSearchSuggestion("second", isUrl = false, isAllowedInTopHits = false),
+            AutoCompleteSearchSuggestion("third", isUrl = true, isAllowedInTopHits = false), // isUrl = true for website suggestion
+        )
+        val clickedSuggestion = suggestions[2] // third suggestion (index 2)
+
+        testee.fireAutocompletePixel(suggestions, clickedSuggestion)
+
+        val argumentCaptor = argumentCaptor<Map<String, String>>()
+        Mockito.verify(mockPixel).fire(eq(AutoCompletePixelNames.AUTOCOMPLETE_SEARCH_WEBSITE_SELECTION), argumentCaptor.capture(), any(), any())
+
+        assertEquals("2", argumentCaptor.firstValue[AutocompletePixelParams.PARAM_SEARCH_SUGGESTION_INDEX])
+    }
+
+    @Test
+    fun `when non search suggestion clicked then search suggestion index parameter is not added`() = runTest {
+        whenever(mockSavedSitesRepository.hasBookmarks()).thenReturn(true)
+        whenever(mockNavigationHistory.hasHistory()).thenReturn(false)
+        whenever(mockHistory.hasHistory()).thenReturn(false)
+        tabsLiveData.value = listOf(TabEntity("1", "https://example.com", position = 0))
+
+        val suggestions = listOf(
+            AutoCompleteSearchSuggestion("first", isUrl = false, isAllowedInTopHits = false),
+            AutoCompleteBookmarkSuggestion("bookmark", "title", "url"),
+            AutoCompleteSearchSuggestion("second", isUrl = false, isAllowedInTopHits = false),
+        )
+        val clickedSuggestion = AutoCompleteBookmarkSuggestion("bookmark", "title", "url")
+
+        testee.fireAutocompletePixel(suggestions, clickedSuggestion)
+
+        val argumentCaptor = argumentCaptor<Map<String, String>>()
+        Mockito.verify(mockPixel).fire(eq(AutoCompletePixelNames.AUTOCOMPLETE_BOOKMARK_SELECTION), argumentCaptor.capture(), any(), any())
+
+        assertFalse(argumentCaptor.firstValue.containsKey(AutocompletePixelParams.PARAM_SEARCH_SUGGESTION_INDEX))
+    }
+
+    @Test
+    fun `when search suggestion clicked with mixed suggestions then correct index is calculated`() = runTest {
+        whenever(mockSavedSitesRepository.hasBookmarks()).thenReturn(true)
+        whenever(mockNavigationHistory.hasHistory()).thenReturn(false)
+        whenever(mockHistory.hasHistory()).thenReturn(false)
+        tabsLiveData.value = listOf(TabEntity("1", "https://example.com", position = 0))
+
+        val suggestions = listOf(
+            AutoCompleteBookmarkSuggestion("bookmark1", "title1", "url1"),
+            AutoCompleteSearchSuggestion("first", isUrl = false, isAllowedInTopHits = false),
+            AutoCompleteBookmarkSuggestion("bookmark2", "title2", "url2"),
+            AutoCompleteSearchSuggestion("second", isUrl = false, isAllowedInTopHits = false),
+            AutoCompleteSearchSuggestion("third", isUrl = false, isAllowedInTopHits = false),
+        )
+        val clickedSuggestion = suggestions[4] // third search suggestion (index 2 among search suggestions)
+
+        testee.fireAutocompletePixel(suggestions, clickedSuggestion)
+
+        val argumentCaptor = argumentCaptor<Map<String, String>>()
+        Mockito.verify(mockPixel).fire(eq(AutoCompletePixelNames.AUTOCOMPLETE_SEARCH_PHRASE_SELECTION), argumentCaptor.capture(), any(), any())
+
+        assertEquals("2", argumentCaptor.firstValue[AutocompletePixelParams.PARAM_SEARCH_SUGGESTION_INDEX])
+    }
+
+    @Test
+    fun `when search website suggestion clicked with mixed suggestions then correct index is calculated`() = runTest {
+        whenever(mockSavedSitesRepository.hasBookmarks()).thenReturn(true)
+        whenever(mockNavigationHistory.hasHistory()).thenReturn(false)
+        whenever(mockHistory.hasHistory()).thenReturn(false)
+        tabsLiveData.value = listOf(TabEntity("1", "https://example.com", position = 0))
+
+        val suggestions = listOf(
+            AutoCompleteBookmarkSuggestion("bookmark1", "title1", "url1"),
+            AutoCompleteSearchSuggestion("first", isUrl = true, isAllowedInTopHits = true), // isUrl = true for website suggestion
+            AutoCompleteBookmarkSuggestion("bookmark2", "title2", "url2"),
+            AutoCompleteSearchSuggestion("second", isUrl = true, isAllowedInTopHits = false), // isUrl = true for website suggestion
+            AutoCompleteSearchSuggestion("third", isUrl = false, isAllowedInTopHits = true),
+        )
+        val clickedSuggestion = suggestions[3] // second search suggestion (index 1 among search suggestions)
+
+        testee.fireAutocompletePixel(suggestions, clickedSuggestion)
+
+        val argumentCaptor = argumentCaptor<Map<String, String>>()
+        Mockito.verify(mockPixel).fire(eq(AutoCompletePixelNames.AUTOCOMPLETE_SEARCH_WEBSITE_SELECTION), argumentCaptor.capture(), any(), any())
+
+        assertEquals("1", argumentCaptor.firstValue[AutocompletePixelParams.PARAM_SEARCH_SUGGESTION_INDEX])
     }
 
     @Test

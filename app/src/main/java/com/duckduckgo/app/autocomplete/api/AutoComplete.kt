@@ -22,6 +22,7 @@ import androidx.core.net.toUri
 import com.duckduckgo.app.autocomplete.AutocompleteTabsFeature
 import com.duckduckgo.app.autocomplete.impl.AutoCompletePixelNames
 import com.duckduckgo.app.autocomplete.impl.AutoCompleteRepository
+import com.duckduckgo.app.autocomplete.impl.AutocompletePixelParams
 import com.duckduckgo.app.browser.UriString
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.onboarding.store.AppStage
@@ -292,7 +293,7 @@ class AutoCompleteApi constructor(
         val hasFavoriteResults = suggestions.any { it is AutoCompleteBookmarkSuggestion && it.isFavorite }
         val hasHistoryResults = suggestions.any { it is AutoCompleteHistorySuggestion || it is AutoCompleteHistorySearchSuggestion }
         val hasSwitchToTabResults = suggestions.any { it is AutoCompleteSwitchToTabSuggestion }
-        val params = mapOf(
+        val params = mutableMapOf(
             PixelParameter.SHOWED_BOOKMARKS to hasBookmarkResults.toString(),
             PixelParameter.SHOWED_FAVORITES to hasFavoriteResults.toString(),
             PixelParameter.BOOKMARK_CAPABLE to hasBookmarks.toString(),
@@ -331,6 +332,11 @@ class AutoCompleteApi constructor(
             }
 
             else -> return
+        }
+
+        if (suggestion is AutoCompleteSearchSuggestion) {
+            val clickedSearchSuggestionIndex = suggestions.filter { it is AutoCompleteSearchSuggestion }.indexOf(suggestion)
+            params[AutocompletePixelParams.PARAM_SEARCH_SUGGESTION_INDEX] = clickedSearchSuggestionIndex.toString()
         }
 
         pixel.fire(pixelName, params)

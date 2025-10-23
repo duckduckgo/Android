@@ -48,3 +48,11 @@ class AutocompleteParamRemovalPlugin @Inject constructor() : PixelParamRemovalPl
         )
     }
 }
+
+object AutocompletePixelParams {
+    /**
+     * Parameter to capture the index of the selected suggestion within the list of search suggestions
+     * (either [AutoCompletePixelNames.AUTOCOMPLETE_SEARCH_PHRASE_SELECTION] or [AutoCompletePixelNames.AUTOCOMPLETE_SEARCH_WEBSITE_SELECTION]).
+     */
+    const val PARAM_SEARCH_SUGGESTION_INDEX = "search_suggestion_index"
+}
