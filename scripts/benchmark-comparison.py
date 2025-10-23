@@ -3,7 +3,6 @@
 Build Benchmark Comparison Script
 
 Compares build performance metrics from gradle-profiler CSV outputs.
-Analyzes clean build, ABI change, and non-ABI change scenarios.
 """
 
 import csv
@@ -43,7 +42,7 @@ def parse_csv(csv_path: Path) -> Dict[str, BenchmarkResult]:
             phase = row.get('Phase')
             sample = row.get('Sample')
             duration = row.get('Duration')
-            # Process both 'total execution time' and 'task start' samples
+            # Process only 'total execution time' and 'task start' samples
             if sample not in ['total execution time', 'task start'] or not duration:
                 continue
 
@@ -152,7 +151,7 @@ def generate_terminal_summary(results: Dict[str, BenchmarkResult]) -> str:
 
 
 def generate_markdown_summary(results: Dict[str, BenchmarkResult]) -> str:
-    """Generate markdown comparison table."""
+    """Generate markdown results table."""
 
     md = "# Build Performance Benchmark Results\n\n"
     md += "## Results\n\n"
@@ -167,7 +166,6 @@ def generate_markdown_summary(results: Dict[str, BenchmarkResult]) -> str:
 
 
 def main():
-    """Main entry point."""
     if len(sys.argv) < 2:
         print("Usage: benchmark-comparison.py <benchmark_results_csv>")
         sys.exit(1)
