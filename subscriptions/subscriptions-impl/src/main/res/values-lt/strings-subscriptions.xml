@@ -84,6 +84,16 @@
     <string name="subscriptionSettingSectionHelpAndSupport">Pagalba ir palaikymas</string>
     <string name="subscriptionSettingSendFeedback">Siųsti atsiliepimą</string>
     <string name="subscriptionSettingActivating">Aktyvavimas</string>
+    <string name="subscriptionSettingManageSubscription">Tvarkyti prenumeratą</string>
+    <string name="subscriptionSettingSwitchUpgrade">Pereikite prie metinio abonemento ir sutaupykite 16 %</string>
+    <!-- smartling.character_limit = 10 -->
+    <string name="subscriptionSettingSwitchUpgradePill">Geriausia vertė</string>
+    <string name="subscriptionSettingSwitchDowngrade">Pakeisti planą</string>
+    <string name="subscriptionSettingManagePlan">Tvarkyti planą ir mokėjimo parinktis</string>
+    <!-- Change Plan -->
+    <string name="changePlanTitle">Atnaujinkite planą arba atšaukite</string>
+    <string name="changePlanDescription">Jūsų prenumerata buvo įsigyta per „Apple App Store“. Norėdami pakeisti savo plano ar atsiskaitymo nustatymus, eikite į Nustatymai &gt; „Apple“ paskyra &gt; Prenumeratos įrenginyje, prijungtame prie tos pačios „Apple“ paskyros, naudotos prenumeratai įsigyti.</string>
+
 
     <!--Purchase Subscriptions-->
     <string name="purchaseCompletedTitle">Viskas paruošta.</string>
@@ -97,10 +107,6 @@
 
     <!-- ITR Settings-->
     <string name="itrSettingTitle" translatable="false">Identity Theft Restoration</string>
-
-    <!-- Change Plan -->
-    <string name="changePlanTitle">Atnaujinkite planą arba atšaukite</string>
-    <string name="changePlanDescription">Jūsų prenumerata buvo įsigyta per „Apple App Store“. Norėdami pakeisti savo plano ar atsiskaitymo nustatymus, eikite į Nustatymai &gt; „Apple“ paskyra &gt; Prenumeratos įrenginyje, prijungtame prie tos pačios „Apple“ paskyros, naudotos prenumeratai įsigyti.</string>
 
     <!-- PIR Activity-->
     <string name="pirTitle">Aktyvuokite „Privacy Pro“ darbalaukyje, kad nustatytumėte Asmeninės informacijos pašalinimą.</string>
@@ -185,5 +191,15 @@
     <string name="subscriptionSettingSubscribeSecure">Apsaugok savo Wi-Fi ir kalbėkis privačiai su pažangiais DI modeliais</string>
 
     <string name="feedbackGeneralSubscription">Prenumerata</string>
+    
+    <!-- Switch plan-->
+    <string name="switchBottomSheetTitleUpgrade">Sutaupykite 16 % su\n metiniu planu!</string>
+    <string name="switchBottomSheetDescriptionUpgrade">Metinis planas kainuoja tik 8,33 USD/mėn., palyginti su dabartiniu 9,99 USD mėnesiniu planu.</string>
+    <string name="switchBottomSheetPrimaryButtonUpgrade">Pereiti prie metinio (99,99 USD/metus)</string>
+    <string name="switchBottomSheetSecondaryButtonUpgrade">Išsaugoti mėnesio planą</string>
+    <string name="switchBottomSheetTitleDowngrade">Sutaupote 16 % su\n metiniu planu!</string>
+    <string name="switchBottomSheetDescriptionDowngrade">Perėjimas padidins jūsų mėnesinę kainą nuo 8,33 USD/mėn. iki 9,99 USD/mėn.</string>
+    <string name="switchBottomSheetPrimaryButtonDowngrade">Išsaugoti metinį planą</string>
+    <string name="switchBottomSheetSecondaryButtonDowngrade">Pereiti prie mėnesinio plano (9,99 USD/mėn.)</string>
 
 </resources>
