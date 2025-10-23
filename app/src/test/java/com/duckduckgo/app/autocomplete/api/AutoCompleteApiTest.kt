@@ -2012,6 +2012,26 @@ class AutoCompleteApiTest {
         assertEquals(0, deviceAppSuggestions.size)
     }
 
+    @Test
+    fun whenDeviceAppSuggestionSubmittedThenAutoCompleteInstalledAppSelectionPixelSent() = runTest {
+        whenever(mockSavedSitesRepository.hasBookmarks()).thenReturn(false)
+        whenever(mockSavedSitesRepository.hasFavorites()).thenReturn(false)
+        whenever(mockHistory.hasHistory()).thenReturn(false)
+        tabsLiveData.value = listOf(TabEntity("1", "https://example.com", position = 0))
+
+        val suggestion = AutoCompleteDeviceAppSuggestion(
+            phrase = "test",
+            shortName = "Test App",
+            packageName = "com.test.app",
+            launchIntent = Intent(),
+        )
+        val suggestions = listOf(suggestion)
+
+        testee.fireAutocompletePixel(suggestions, suggestion)
+
+        verify(mockPixel).fire(AutoCompletePixelNames.AUTOCOMPLETE_INSTALLED_APP_SELECTION)
+    }
+
     private fun favorite(
         id: String = UUID.randomUUID().toString(),
         title: String = "title",
