@@ -26,6 +26,9 @@ android {
     anvil {
         generateDaggerFactories = true // default is false
     }
+    lint {
+        baseline = file("lint-baseline.xml")
+    }
     namespace 'com.duckduckgo.common.ui.internal'
 }
 
