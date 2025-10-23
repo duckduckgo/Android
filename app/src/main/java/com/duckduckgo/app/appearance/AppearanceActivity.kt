@@ -160,8 +160,8 @@ class AppearanceActivity : DuckDuckGoActivity() {
             getString(
                 when (omnibarType) {
                     OmnibarType.SINGLE_TOP -> R.string.settingsAddressBarPositionTop
-                    else -> R.string.settingsAddressBarPositionBottom
-                    // TODO: The split option will be added later
+                    OmnibarType.SINGLE_BOTTOM -> R.string.settingsAddressBarPositionBottom
+                    OmnibarType.SPLIT -> TODO()
                 },
             )
         binding.addressBarPositionSetting.setSecondaryText(subtitle)
