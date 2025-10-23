@@ -152,7 +152,7 @@ class RealDuckChatJSHelper @Inject constructor(
     ): JsCallbackData {
         val jsonPayload =
             JSONObject().apply {
-                val jsCall = "document.getElementsByName($selector)[0]?.focus();"
+                val jsCall = "document.getElementsByName('$selector')[0]?.focus();"
                 put(SELECTOR, jsCall)
                 put(SUCCESS, true)
                 put(ERROR, "")
