@@ -65,6 +65,7 @@ import logcat.logcat
 @SuppressLint("ClickableViewAccessibility")
 class Omnibar(
     val omnibarPosition: OmnibarPosition,
+    val inputScreenEnabled: Boolean,
     private val binding: FragmentBrowserTabBinding,
 ) {
     init {

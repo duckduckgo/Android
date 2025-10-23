@@ -2137,9 +2137,9 @@ class BrowserTabViewModel @Inject constructor(
                     currentLoadingViewState().copy(
                         isLoading = true,
                         trackersAnimationEnabled = true,
-                    /*We set the progress to 20 so the omnibar starts animating and the user knows we are loading the page.
-                     * We don't show the browser until the page actually starts loading, to prevent previous sites from briefly
-                     * showing in case the URL was blocked locally and therefore never started to show*/
+                        /*We set the progress to 20 so the omnibar starts animating and the user knows we are loading the page.
+                         * We don't show the browser until the page actually starts loading, to prevent previous sites from briefly
+                         * showing in case the URL was blocked locally and therefore never started to show*/
                         progress = 20,
                         url = documentUrlString,
                     )
@@ -2990,6 +2990,7 @@ class BrowserTabViewModel @Inject constructor(
                 is HomePanelCta.AddWidgetAuto, is HomePanelCta.AddWidgetAutoOnboardingExperiment, is HomePanelCta.AddWidgetInstructions -> {
                     LaunchAddWidget
                 }
+
                 is OnboardingDaxDialogCta -> onOnboardingCtaOkButtonClicked(cta)
                 is DaxBubbleCta -> onDaxBubbleCtaOkButtonClicked(cta)
                 is BrokenSitePromptDialogCta -> onBrokenSiteCtaOkButtonClicked(cta)
@@ -3283,7 +3284,10 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     @SuppressLint("RequiresFeature", "PostMessageUsage") // it's already checked in isBlobDownloadWebViewFeatureEnabled
-    private fun postMessageToConvertBlobToDataUri(webView: WebView, url: String) {
+    private fun postMessageToConvertBlobToDataUri(
+        webView: WebView,
+        url: String,
+    ) {
         viewModelScope.launch(dispatchers.main()) {
             // main because postMessage is not always safe in another thread
             for ((key, proxies) in fixedReplyProxyMap) {
@@ -3799,6 +3803,7 @@ class BrowserTabViewModel @Inject constructor(
                         if (id != null && data != null) {
                             webViewCompatWebShare(featureName, method, id, data, onResponse)
                         }
+
                     "permissionsQuery" ->
                         if (id != null && data != null) {
                             webViewCompatPermissionsQuery(featureName, method, id, data, onResponse)
@@ -3812,6 +3817,7 @@ class BrowserTabViewModel @Inject constructor(
                     "screenUnlock" -> screenUnlock()
                 }
             }
+
             "breakageReporting" ->
                 if (data != null) {
                     when (method) {
@@ -3820,6 +3826,7 @@ class BrowserTabViewModel @Inject constructor(
                         }
                     }
                 }
+
             "messaging" ->
                 when (method) {
                     "initialPing" -> {
@@ -4389,7 +4396,14 @@ class BrowserTabViewModel @Inject constructor(
 
     fun isPrinting(): Boolean = currentBrowserViewState().isPrinting
 
-    fun hasOmnibarPositionChanged(currentPosition: OmnibarPosition): Boolean = settingsDataStore.omnibarPosition != currentPosition
+    fun hasOmnibarChanged(currentPosition: OmnibarPosition, inputScreenEnabled: Boolean): Boolean =
+        if (settingsDataStore.omnibarPosition != currentPosition) {
+            true
+        } else if (duckAiFeatureState.showInputScreen.value != inputScreenEnabled) {
+            true
+        } else {
+            false
+        }
 
     private fun firePixelBasedOnCurrentUrl(
         emptyUrlPixel: AppPixelName,
@@ -4434,10 +4448,12 @@ class BrowserTabViewModel @Inject constructor(
             onboardingDesignExperimentManager.isBuckEnrolledAndEnabled() -> {
                 command.value = SetBrowserBackgroundColor(getBuckOnboardingExperimentBackgroundColor(lightModeEnabled))
             }
+
             onboardingDesignExperimentManager.isBbEnrolledAndEnabled() -> {
                 // TODO if BB wins the we should rename the function to SetBubbleDialogBackground
                 command.value = Command.SetBubbleDialogBackground(getBBBackgroundResource(lightModeEnabled))
             }
+
             else -> {
                 command.value = SetBrowserBackground(getBackgroundResource(lightModeEnabled))
             }
@@ -4456,9 +4472,11 @@ class BrowserTabViewModel @Inject constructor(
             onboardingDesignExperimentManager.isBuckEnrolledAndEnabled() -> {
                 command.value = SetOnboardingDialogBackgroundColor(getBuckOnboardingExperimentBackgroundColor(lightModeEnabled))
             }
+
             onboardingDesignExperimentManager.isBbEnrolledAndEnabled() -> {
                 command.value = SetOnboardingDialogBackground(getBBBackgroundResource(lightModeEnabled))
             }
+
             else -> {
                 command.value = SetOnboardingDialogBackground(getBackgroundResource(lightModeEnabled))
             }
@@ -4523,14 +4541,17 @@ class BrowserTabViewModel @Inject constructor(
                 command.value = LaunchPrivacyPro("https://duckduckgo.com/pro?origin=funnel_appmenu_android".toUri())
                 "pill"
             }
+
             VpnMenuState.NotSubscribedNoPill -> {
                 command.value = LaunchPrivacyPro("https://duckduckgo.com/pro?origin=funnel_appmenu_android".toUri())
                 "no_pill"
             }
+
             is VpnMenuState.Subscribed -> {
                 command.value = LaunchVpnManagement
                 "subscribed"
             }
+
             VpnMenuState.Hidden -> "" // Should not happen as menu item should not be visible
         }
         pixel.fire(AppPixelName.MENU_ACTION_VPN_PRESSED, mapOf(PixelParameter.STATUS to statusParam))

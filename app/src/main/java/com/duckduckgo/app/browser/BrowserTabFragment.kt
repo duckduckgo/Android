@@ -1012,7 +1012,11 @@ class BrowserTabFragment :
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
 
-        omnibar = Omnibar(settingsDataStore.omnibarPosition, binding)
+        omnibar = Omnibar(
+            omnibarPosition = settingsDataStore.omnibarPosition,
+            inputScreenEnabled = duckAiFeatureState.showInputScreen.value,
+            binding = binding,
+        )
 
         webViewContainer = binding.webViewContainer
         configureObservers()
@@ -1495,8 +1499,7 @@ class BrowserTabFragment :
             return
         }
 
-        val hasOmnibarPositionChanged = viewModel.hasOmnibarPositionChanged(omnibar.omnibarPosition)
-        if (hasOmnibarPositionChanged) {
+        if (viewModel.hasOmnibarChanged(omnibar.omnibarPosition, omnibar.inputScreenEnabled)) {
             viewModel.resetTrackersCount()
             if (swipingTabsFeature.isEnabled && requireActivity() is BrowserActivity) {
                 (requireActivity() as BrowserActivity).clearTabsAndRecreate()
