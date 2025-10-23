@@ -3,8 +3,8 @@
 # This file defines three benchmark scenarios to measure build performance
 
 assemble {
-    title = "Clean Build"
-    tasks = ["assembleInternalDebug"]
+    title = "Build (warm cache, no changes)"
+    tasks = ["app:buildInternalDebug"]
     warm-ups = 3
     iterations = 5
 

@@ -17,6 +17,12 @@ jobs:
     timeout-minutes: 120
 
     steps:
+      - name: Build job URL
+        run: |
+          echo "JOB_URL=https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}/job/${GITHUB_JOB_ID}" >> $GITHUB_ENV
+      - name: Echo job URL
+        run: echo "$JOB_URL"
+
       - name: Determine branch
         id: determine-branch
         run: |
