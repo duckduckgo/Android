@@ -20,6 +20,6 @@ jobs:
       - name: Trigger review task
         uses: ./native-github-asana-sync/.github/actions/privacy-review/
         with:
-          team_name: 'Extension'
+          team_name: 'Android'
           asana_pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
           github_pat: ${{ secrets.DAXMOBILE_ANDROID_AUTOMATION }}
