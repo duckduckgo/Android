@@ -165,8 +165,8 @@ class AppShortcutCreator @Inject constructor(
             .addNextIntent(adsActivity)
 
         return ShortcutInfoCompat.Builder(context, SHORTCUT_ID_DESIGN_SYSTEM_DEMO)
-            .setShortLabel(context.getString(com.duckduckgo.mobile.android.R.string.ads_demo_activity_title))
-            .setIcon(IconCompat.createWithResource(context, com.duckduckgo.mobile.android.R.drawable.ic_dax_icon))
+            .setShortLabel(context.getString(R.string.ads_demo_activity_title))
+            .setIcon(IconCompat.createWithResource(context, R.drawable.ic_dax_icon))
             .setIntents(stackBuilder.intents)
             .build().toShortcutInfo()
     }
