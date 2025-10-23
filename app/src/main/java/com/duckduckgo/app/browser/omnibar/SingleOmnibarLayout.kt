@@ -42,6 +42,7 @@ import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.google.android.material.card.MaterialCardView
 import dagger.android.support.AndroidSupportInjection
 import javax.inject.Inject
+import com.duckduckgo.duckchat.impl.R as DuckChatR
 import com.duckduckgo.mobile.android.R as CommonR
 
 @InjectWith(FragmentScope::class)
@@ -180,11 +181,10 @@ class SingleOmnibarLayout @JvmOverloads constructor(
 
         omnibarCardShadow.isGone = viewState.viewMode is ViewMode.CustomTab && !isFindInPageVisible
 
-        // fix margins when Duck.ai toggle is visible
-        maybeFixMarginsForBottomDuckAiToggle(viewState)
+        renderDuckAiToggle(viewState)
     }
 
-    private fun maybeFixMarginsForBottomDuckAiToggle(viewState: ViewState) {
+    private fun renderDuckAiToggle(viewState: ViewState) {
         // When omnibar is at the bottom, we're removing the additional space at the top
         if (viewState.showDuckAIToggle && omnibarPosition == OmnibarPosition.BOTTOM) {
             omnibarCardShadow.updateLayoutParams {
@@ -200,6 +200,12 @@ class SingleOmnibarLayout @JvmOverloads constructor(
                     bottomMargin = experimentalOmnibarCardMarginBottom
                 }
             }
+        }
+
+        if (viewState.showDuckAIToggle && viewState.viewMode == ViewMode.NewTab) {
+            omnibarTextInput.hint = context.getString(DuckChatR.string.input_screen_search_hint)
+        } else {
+            omnibarTextInput.hint = context.getString(R.string.search)
         }
     }
 
