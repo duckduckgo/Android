@@ -110,23 +110,41 @@ def generate_terminal_summary(results: Dict[str, BenchmarkResult]) -> str:
         output.append(f"📊 {base_scenario}")
         output.append("-" * (len(base_scenario) + 4))
         
+        # Separate total execution time and task start results
+        total_exec_results = []
+        task_start_results = []
+        
         for result in scenario_results:
             # Extract the metric type and phase from the scenario name
             parts = result.scenario.split(' - ')
             if len(parts) >= 2:
                 metric_type = parts[1].split(' (')[0]  # Remove phase info
                 phase = parts[1].split(' (')[1].rstrip(')') if '(' in parts[1] else 'Unknown'
-                phase_icon = "🔥 (WARM_UP)" if phase == "WARM_UP" else "📈 (MEASURE)"
-            else:
-                metric_type = "Unknown"
-                phase_icon = "❓"
-            
-            output.append(f"  {phase_icon} {metric_type}:")
+                
+                # Only include MEASURE phase results (skip WARM_UP)
+                if phase == "MEASURE":
+                    if metric_type == "total execution time":
+                        total_exec_results.append(result)
+                    elif metric_type == "task start":
+                        task_start_results.append(result)
+        
+        # Display total execution time results
+        for result in total_exec_results:
+            output.append(f"  📈 Total Execution Time:")
             output.append(f"    Mean:   {format_time(result.mean):>8}")
             output.append(f"    Median: {format_time(result.median):>8}")
             output.append(f"    StdDev: ±{format_time(result.std_dev):>7}")
             output.append(f"    Range:  {format_time(result.min):>8} - {format_time(result.max)}")
             output.append("")
+            
+            # Display task start as sub-metric
+            for task_result in task_start_results:
+                output.append(f"    └─ Gradle Configuration Time:")
+                output.append(f"      Mean:   {format_time(task_result.mean):>8}")
+                output.append(f"      Median: {format_time(task_result.median):>8}")
+                output.append(f"      StdDev: ±{format_time(task_result.std_dev):>7}")
+                output.append(f"      Range:  {format_time(task_result.min):>8} - {format_time(task_result.max)}")
+                output.append("")
         
         output.append("")
     
