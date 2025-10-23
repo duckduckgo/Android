@@ -2,60 +2,50 @@
 # TEMPORARY: Reduced scenarios for workflow testing test 2
 # This file defines three benchmark scenarios to measure build performance
 
-assemble {
-    title = "Build (warm cache, no changes)"
+# Scenario 1: Build
+# Measures repeatable build performance with warm cache and no changes
+build-repeatable {
+    title = "Build (warm cache and no changes)"
     tasks = ["app:buildInternalDebug"]
-    warm-ups = 3
-    iterations = 5
-
-    # Use daemon for consistency
-    daemon = warm
+    warm-ups = 2
+    iterations = 4
 }
 
-# Scenario 1: Clean Build
+# Scenario 2: Clean Build
 # Measures cold build performance with no incremental compilation
-#clean-build {
-#    title = "Clean Build"
-#    tasks = ["assembleInternalDebug"]
-#    gradle-args = ["--no-build-cache", "--no-configuration-cache"]
-#    cleanup-tasks = ["clean"]
-#    warm-ups = 2
-#    iterations = 3
-#
-#    # Use daemon for consistency
-#    daemon = warm
-#}
+build-clean {
+    title = "Build (clean and cold cache)"
+    tasks = ["app:buildInternalDebug"]
+    gradle-args = ["--no-build-cache", "--no-configuration-cache"]
+    cleanup-tasks = ["clean"]
+    warm-ups = 1
+    iterations = 2
+}
 
-# Scenario 2: ABI Change - DISABLED FOR TESTING
+# Scenario 3: ABI Change
 # Measures incremental build performance when public API changes
 # This triggers recompilation of all dependent modules
-#abi-change {
-#    title = "ABI Change (Incremental)"
-#    tasks = ["assembleInternalDebug"]
-#    gradle-args = ["--no-build-cache", "--no-configuration-cache"]
-#
-#    # Apply ABI change to a core utility class
-#    # Gradle profiler will modify a public method signature
-#    apply-abi-change-to = "common/common-utils/src/main/java/com/duckduckgo/common/utils/DispatcherProvider.kt"
-#
-#    warm-ups = 4
-#    iterations = 7
-#    daemon = warm
-#}
+abi-change {
+    title = "ABI Change (Incremental)"
+    tasks = ["app:buildInternalDebug"]
 
-# Scenario 3: Non-ABI Change - DISABLED FOR TESTING
+    # Apply ABI change to a core utility class
+    apply-abi-change-to = "common/common-utils/src/main/java/com/duckduckgo/common/utils/DispatcherProvider.kt"
+
+    warm-ups = 2
+    iterations = 4
+}
+
+# Scenario 4: Non-ABI Change
 # Measures incremental build performance when only implementation changes
 # Only the modified module needs recompilation
-#non-abi-change {
-#    title = "Non-ABI Change (Incremental)"
-#    tasks = ["assembleInternalDebug"]
-#    gradle-args = ["--no-build-cache", "--no-configuration-cache"]
-#
-#    # Apply non-ABI change to the same file
-#    # Gradle profiler will modify method implementation without changing signature
-#    apply-non-abi-change-to = "common/common-utils/src/main/java/com/duckduckgo/common/utils/DispatcherProvider.kt"
-#
-#    warm-ups = 4
-#    iterations = 7
-#    daemon = warm
-#}
+non-abi-change {
+    title = "Non-ABI Change (Incremental)"
+    tasks = ["app:buildInternalDebug"]
+
+    # Apply non-ABI change to the same file
+    apply-non-abi-change-to = "common/common-utils/src/main/java/com/duckduckgo/common/utils/DispatcherProvider.kt"
+
+    warm-ups = 2
+    iterations = 4
+}
