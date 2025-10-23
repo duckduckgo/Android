@@ -162,6 +162,7 @@
 
     <string name="feedbackSubmitGeneralDescriptionHint">Giv os feedback...</string>
     <string name="feedbackSubmitFeatureRequestDescriptionHint">Hvilken funktion kunne du tænke dig at se?</string>
+    <string name="feedbackSubmitContactSupport">Har du brug for hjælp? <annotation type="support_link">Kontakt support</annotation>.</string>
 
     <!-- Activity titles -->
     <string name="activitySubscriptions">Abonnementer</string>
