@@ -18,8 +18,9 @@ from urllib.parse import urlencode
 class BenchmarkResult:
     """Represents benchmark results for a single scenario."""
 
-    def __init__(self, scenario: str, mean: float, median: float, std_dev: float, data: List[float]):
+    def __init__(self, scenario: str, task: str, mean: float, median: float, std_dev: float, data: List[float]):
         self.scenario = scenario
+        self.task = task
         self.mean = mean
         self.median = median
         self.std_dev = std_dev
@@ -28,9 +29,9 @@ class BenchmarkResult:
         self.max = max(data) if data else 0
 
 
-def parse_csv(csv_path: Path) -> Dict[str, BenchmarkResult]:
+def parse_csv(csv_path: Path) -> List[BenchmarkResult]:
     """Parse gradle-profiler CSV output and extract metrics per scenario."""
-    results = {}
+    results = []
 
     if not csv_path.exists():
         print(f"Warning: CSV file not found: {csv_path}")
@@ -38,7 +39,8 @@ def parse_csv(csv_path: Path) -> Dict[str, BenchmarkResult]:
 
     with open(csv_path, 'r') as f:
         reader = csv.DictReader(f)
-        scenario_data = {}
+        # Group measurements by (scenario, task) tuple
+        measurements = {}
 
         for row in reader:
             scenario = row.get('Scenario')
@@ -55,26 +57,26 @@ def parse_csv(csv_path: Path) -> Dict[str, BenchmarkResult]:
                 # Convert time to seconds (gradle-profiler outputs in ms)
                 time_seconds = float(duration) / 1000.0
 
-                # Group builds by scenario and sample type (no phase needed since we only process MEASURE)
-                group_scenario = f'{scenario} - {sample}'
-
-                if group_scenario not in scenario_data:
-                    scenario_data[group_scenario] = []
-                scenario_data[group_scenario].append(time_seconds)
+                # Group by (scenario, task) tuple
+                key = (scenario, sample)
+                if key not in measurements:
+                    measurements[key] = []
+                measurements[key].append(time_seconds)
             except (ValueError, TypeError) as e:
                 print(f"Warning: Could not parse duration '{duration}' for scenario '{scenario}': {e}")
                 continue
 
-    # Calculate statistics for each scenario
-    for scenario, data in scenario_data.items():
+    # Create BenchmarkResult for each group of measurements
+    for (scenario, task), data in measurements.items():
         if data:
-            results[scenario] = BenchmarkResult(
+            results.append(BenchmarkResult(
                 scenario=scenario,
+                task=task,
                 mean=statistics.mean(data),
                 median=statistics.median(data),
                 std_dev=statistics.stdev(data) if len(data) > 1 else 0,
                 data=data
-            )
+            ))
 
     return results
 
@@ -89,7 +91,7 @@ def format_time(seconds: float) -> str:
         return f"{seconds:.1f}s"
 
 
-def generate_terminal_summary(results: Dict[str, BenchmarkResult]) -> str:
+def generate_terminal_summary(results: List[BenchmarkResult]) -> str:
     """Generate terminal-friendly summary with better formatting."""
     
     if not results:
@@ -101,11 +103,10 @@ def generate_terminal_summary(results: Dict[str, BenchmarkResult]) -> str:
     output.append("=" * 80)
     output.append("")
     
-    # Group results by scenario (without phase/sample details for cleaner grouping)
+    # Group results by scenario
     scenario_groups = {}
-    for result in results.values():
-        # Extract base scenario name (before the first ' - ')
-        base_scenario = result.scenario.split(' - ')[0]
+    for result in results:
+        base_scenario = result.scenario
         if base_scenario not in scenario_groups:
             scenario_groups[base_scenario] = []
         scenario_groups[base_scenario].append(result)
@@ -119,15 +120,11 @@ def generate_terminal_summary(results: Dict[str, BenchmarkResult]) -> str:
         task_start_results = []
         
         for result in scenario_results:
-            # Extract the metric type from the scenario name
-            parts = result.scenario.split(' - ')
-            if len(parts) >= 2:
-                metric_type = parts[1]
-                
-                if metric_type == "total execution time":
-                    total_exec_results.append(result)
-                elif metric_type == "task start":
-                    task_start_results.append(result)
+            # Use the task field directly
+            if result.task == "total execution time":
+                total_exec_results.append(result)
+            elif result.task == "task start":
+                task_start_results.append(result)
         
         # Display total execution time results
         for result in total_exec_results:
@@ -152,7 +149,7 @@ def generate_terminal_summary(results: Dict[str, BenchmarkResult]) -> str:
     return "\n".join(output)
 
 
-def generate_markdown_summary(results: Dict[str, BenchmarkResult]) -> str:
+def generate_markdown_summary(results: List[BenchmarkResult]) -> str:
     """Generate markdown results table."""
 
     md = "# Build Performance Benchmark Results\n\n"
@@ -160,50 +157,47 @@ def generate_markdown_summary(results: Dict[str, BenchmarkResult]) -> str:
     md += "| Scenario | Mean | Median | Std Dev | Min | Max |\n"
     md += "|----------|------|--------|---------|-----|-----|\n"
 
-    for result in results.values():
+    for result in results:
         md += f"| {result.scenario} | {format_time(result.mean)} | {format_time(result.median)} | "
         md += f"±{format_time(result.std_dev)} | {format_time(result.min)} | {format_time(result.max)} |\n"
 
     return md
 
 
-def send_results_to_api(results: Dict[str, BenchmarkResult], github_action_run_url: Optional[str] = None) -> None:
+def send_results_to_api(results: List[BenchmarkResult], github_action_run_url: Optional[str] = None) -> None:
     """Send benchmark results to the API endpoint."""
     base_url = "https://improving.duckduckgo.com/t/m_build_time_android"
     
-    for result in results.values():
-        # Extract scenario and task from the result name
-        # Format: "scenario - metric_type"
-        parts = result.scenario.split(' - ')
-        if len(parts) >= 2:
-            scenario = parts[0]
-            task = parts[1]  # No need to clean up phase info anymore
-            
-            # Prepare query parameters
-            params = {
-                'scenario': scenario,
-                'task': task,
-                'mean': f"{result.mean:.3f}",
-                'median': f"{result.median:.3f}",
-                'std_dev': f"{result.std_dev:.3f}"
-            }
-            
-            # Add github_action_run_url if provided
-            if github_action_run_url:
-                params['github_action_run_url'] = github_action_run_url
-            
-            # Construct URL with query parameters
-            url = f"{base_url}?{urlencode(params)}"
-            
-            try:
-                print(f"Sending results for {scenario} - {task}...")
-                response = requests.get(url, timeout=10)
-                response.raise_for_status()
-                print(f"✅ Successfully sent results for {scenario} - {task}")
-            except requests.exceptions.RequestException as e:
-                print(f"❌ Failed to send results for {scenario} - {task}: {e}")
-            except Exception as e:
-                print(f"❌ Unexpected error sending results for {scenario} - {task}: {e}")
+    for result in results:
+        # Use the stored scenario and task fields directly
+        scenario = result.scenario
+        task = result.task
+        
+        # Prepare query parameters
+        params = {
+            'scenario': scenario,
+            'task': task,
+            'mean': f"{result.mean:.3f}",
+            'median': f"{result.median:.3f}",
+            'std_dev': f"{result.std_dev:.3f}"
+        }
+        
+        # Add github_action_run_url if provided
+        if github_action_run_url:
+            params['github_action_run_url'] = github_action_run_url
+        
+        # Construct URL with query parameters
+        url = f"{base_url}?{urlencode(params)}"
+        
+        try:
+            print(f"Sending results for {scenario} - {task}...")
+            response = requests.get(url, timeout=10)
+            response.raise_for_status()
+            print(f"✅ Successfully sent results for {scenario} - {task}")
+        except requests.exceptions.RequestException as e:
+            print(f"❌ Failed to send results for {scenario} - {task}: {e}")
+        except Exception as e:
+            print(f"❌ Unexpected error sending results for {scenario} - {task}: {e}")
 
 
 def main():
