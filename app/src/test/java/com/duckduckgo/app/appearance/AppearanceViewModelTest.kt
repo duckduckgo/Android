@@ -82,6 +82,10 @@ internal class AppearanceViewModelTest {
         whenever(mockAppSettingsDataStore.omnibarType).thenReturn(OmnibarType.SINGLE_TOP)
         whenever(mockTabSwitcherDataStore.isTrackersAnimationInfoTileHidden()).thenReturn(flowOf(false))
 
+        initializeViewModel()
+    }
+
+    private fun initializeViewModel() {
         testee =
             AppearanceViewModel(
                 mockThemeSettingsDataStore,
@@ -117,7 +121,7 @@ internal class AppearanceViewModelTest {
             testee.commands().test {
                 testee.userRequestedToChangeTheme()
 
-                assertEquals(Command.LaunchThemeSettings(DuckDuckGoTheme.LIGHT), awaitItem())
+                assertEquals(Command.LaunchThemeSettings(DuckDuckGoTheme.SYSTEM_DEFAULT), awaitItem())
 
                 cancelAndIgnoreRemainingEvents()
             }
@@ -139,8 +143,8 @@ internal class AppearanceViewModelTest {
     @Test
     fun whenThemeChangedThenDataStoreIsUpdatedAndUpdateThemeCommandIsSent() =
         runTest {
+            givenThemeSelected(DuckDuckGoTheme.LIGHT)
             testee.commands().test {
-                givenThemeSelected(DuckDuckGoTheme.LIGHT)
                 testee.onThemeSelected(DuckDuckGoTheme.DARK)
 
                 verify(mockThemeSettingsDataStore).theme = DuckDuckGoTheme.DARK
@@ -296,6 +300,8 @@ internal class AppearanceViewModelTest {
             whenever(mockThemeSettingsDataStore.theme).thenReturn(DuckDuckGoTheme.LIGHT)
             whenever(mockAppTheme.isLightModeEnabled()).thenReturn(true)
 
+            initializeViewModel()
+
             testee.viewState().test {
                 val value = expectMostRecentItem()
 
@@ -310,5 +316,6 @@ internal class AppearanceViewModelTest {
     private fun givenThemeSelected(theme: DuckDuckGoTheme) {
         whenever(mockThemeSettingsDataStore.theme).thenReturn(theme)
         whenever(mockThemeSettingsDataStore.isCurrentlySelected(theme)).thenReturn(true)
+        initializeViewModel()
     }
 }

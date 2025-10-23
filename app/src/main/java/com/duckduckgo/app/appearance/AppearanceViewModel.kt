@@ -30,9 +30,6 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.tabs.store.TabSwitcherDataStore
 import com.duckduckgo.browser.ui.omnibar.OmnibarType
 import com.duckduckgo.common.ui.DuckDuckGoTheme
-import com.duckduckgo.common.ui.DuckDuckGoTheme.DARK
-import com.duckduckgo.common.ui.DuckDuckGoTheme.LIGHT
-import com.duckduckgo.common.ui.DuckDuckGoTheme.SYSTEM_DEFAULT
 import com.duckduckgo.common.ui.store.ThemingDataStore
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
@@ -40,8 +37,10 @@ import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -101,7 +100,7 @@ class AppearanceViewModel @Inject constructor(
         currentViewState.copy(
             isTrackersCountInTabSwitcherEnabled = !isTrackersAnimationTileHidden,
         )
-    }
+    }.stateIn(viewModelScope, SharingStarted.Lazily, viewState.value)
 
     private val command = Channel<Command>(1, BufferOverflow.DROP_OLDEST)
     fun commands(): Flow<Command> = command.receiveAsFlow()
@@ -139,9 +138,9 @@ class AppearanceViewModel @Inject constructor(
 
         val pixelName =
             when (selectedTheme) {
-                LIGHT -> SETTINGS_THEME_TOGGLED_LIGHT
-                DARK -> SETTINGS_THEME_TOGGLED_DARK
-                SYSTEM_DEFAULT -> SETTINGS_THEME_TOGGLED_SYSTEM_DEFAULT
+                DuckDuckGoTheme.LIGHT -> SETTINGS_THEME_TOGGLED_LIGHT
+                DuckDuckGoTheme.DARK -> SETTINGS_THEME_TOGGLED_DARK
+                DuckDuckGoTheme.SYSTEM_DEFAULT -> SETTINGS_THEME_TOGGLED_SYSTEM_DEFAULT
             }
         pixel.fire(pixelName)
     }
