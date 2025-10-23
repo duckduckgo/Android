@@ -84,6 +84,16 @@
     <string name="subscriptionSettingSectionHelpAndSupport">Abi ja tugi</string>
     <string name="subscriptionSettingSendFeedback">Saada tagasisidet</string>
     <string name="subscriptionSettingActivating">Aktiveerimine</string>
+    <string name="subscriptionSettingManageSubscription">Tellimuse haldamine</string>
+    <string name="subscriptionSettingSwitchUpgrade">Mine üle aastasele plaanile ja säästa 16%</string>
+    <!-- smartling.character_limit = 10 -->
+    <string name="subscriptionSettingSwitchUpgradePill">Parim hind</string>
+    <string name="subscriptionSettingSwitchDowngrade">Vaheta plaani</string>
+    <string name="subscriptionSettingManagePlan">Halda plaani ja makseviise</string>
+    <!-- Change Plan -->
+    <string name="changePlanTitle">Uuenda plaani või loobu</string>
+    <string name="changePlanDescription">Teie tellimus osteti Apple\'i App Store\'i kaudu. Paketi või arvelduse seadistuste muutmiseks avage jaotis Seaded &gt; Apple\'i konto &gt; Tellimused seadmel, mis on sisse logitud sama Apple\'i kontoga, millelt ostsite oma tellimuse.</string>
+
 
     <!--Purchase Subscriptions-->
     <string name="purchaseCompletedTitle">Kõik on valmis.</string>
@@ -97,10 +107,6 @@
 
     <!-- ITR Settings-->
     <string name="itrSettingTitle" translatable="false">Identity Theft Restoration</string>
-
-    <!-- Change Plan -->
-    <string name="changePlanTitle">Uuenda plaani või loobu</string>
-    <string name="changePlanDescription">Teie tellimus osteti Apple\'i App Store\'i kaudu. Paketi või arvelduse seadistuste muutmiseks avage jaotis Seaded &gt; Apple\'i konto &gt; Tellimused seadmel, mis on sisse logitud sama Apple\'i kontoga, millelt ostsite oma tellimuse.</string>
 
     <!-- PIR Activity-->
     <string name="pirTitle">Personal Information Removal\'i seadistamiseks aktiveerige töölaual Privacy Pro</string>
@@ -185,5 +191,15 @@
     <string name="subscriptionSettingSubscribeSecure">Muuda oma Wi-Fi turvaliseks ja vestle privaatselt täiustatud tehisintellekti mudelitega</string>
 
     <string name="feedbackGeneralSubscription">Püsitellimus</string>
+    
+    <!-- Switch plan-->
+    <string name="switchBottomSheetTitleUpgrade">Säästa 16% aastase plaaniga!</string>
+    <string name="switchBottomSheetDescriptionUpgrade">Aastaplaan maksab vaid $8,33/kuus, võrreldes sinu praeguse igakuise $9,99 plaaniga.</string>
+    <string name="switchBottomSheetPrimaryButtonUpgrade">Mine üle aastasele plaanile ($99,99/aasta)</string>
+    <string name="switchBottomSheetSecondaryButtonUpgrade">Jätka igakuise plaaniga</string>
+    <string name="switchBottomSheetTitleDowngrade">Sa säästad aastase plaaniga 16%!</string>
+    <string name="switchBottomSheetDescriptionDowngrade">Üleminek suurendab teie igakuist hinda hinnalt $8,33/kuus hinnale $9,99/kuus.</string>
+    <string name="switchBottomSheetPrimaryButtonDowngrade">Jätka aastaplaaniga</string>
+    <string name="switchBottomSheetSecondaryButtonDowngrade">Mine üle igakuisele plaanile ($9,99/kuu)</string>
 
 </resources>
