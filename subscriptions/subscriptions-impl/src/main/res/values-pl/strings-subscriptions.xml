@@ -84,6 +84,16 @@
     <string name="subscriptionSettingSectionHelpAndSupport">Pomoc i wsparcie</string>
     <string name="subscriptionSettingSendFeedback">Wyślij opinię</string>
     <string name="subscriptionSettingActivating">Aktywacja</string>
+    <string name="subscriptionSettingManageSubscription">Zarządzaj subskrypcją</string>
+    <string name="subscriptionSettingSwitchUpgrade">Przejdź na plan roczny i zaoszczędź 16%</string>
+    <!-- smartling.character_limit = 10 -->
+    <string name="subscriptionSettingSwitchUpgradePill">Najlepsza oferta</string>
+    <string name="subscriptionSettingSwitchDowngrade">Zmień plan</string>
+    <string name="subscriptionSettingManagePlan">Zarządzaj planem i opcjami płatności</string>
+    <!-- Change Plan -->
+    <string name="changePlanTitle">Aktualizuj lub anuluj plan</string>
+    <string name="changePlanDescription">Twoja subskrypcja została zakupiona za pośrednictwem sklepu Apple App Store. Aby zmienić plan lub ustawienia rozliczeń, wybierz kolejno Ustawienia &gt; Konto Apple &gt; Subskrypcje na urządzeniu zalogowanym na konto Apple wykorzystane do zakupu subskrypcji.</string>
+
 
     <!--Purchase Subscriptions-->
     <string name="purchaseCompletedTitle">Wszystko gotowe.</string>
@@ -97,10 +107,6 @@
 
     <!-- ITR Settings-->
     <string name="itrSettingTitle" translatable="false">Identity Theft Restoration</string>
-
-    <!-- Change Plan -->
-    <string name="changePlanTitle">Aktualizuj lub anuluj plan</string>
-    <string name="changePlanDescription">Twoja subskrypcja została zakupiona za pośrednictwem sklepu Apple App Store. Aby zmienić plan lub ustawienia rozliczeń, wybierz kolejno Ustawienia &gt; Konto Apple &gt; Subskrypcje na urządzeniu zalogowanym na konto Apple wykorzystane do zakupu subskrypcji.</string>
 
     <!-- PIR Activity-->
     <string name="pirTitle">Aktywuj Privacy Pro na komputerze, aby skonfigurować usługę Personal Information Removal</string>
@@ -185,5 +191,15 @@
     <string name="subscriptionSettingSubscribeSecure">Zabezpiecz Wi-Fi i czatuj prywatnie z zaawansowanymi modelami AI</string>
 
     <string name="feedbackGeneralSubscription">Subskrypcja</string>
+    
+    <!-- Switch plan-->
+    <string name="switchBottomSheetTitleUpgrade">Zaoszczędź 16% \nz planem rocznym!</string>
+    <string name="switchBottomSheetDescriptionUpgrade">Plan roczny kosztuje tylko 8,33 USD/mies., w porównaniu do Twojego obecnego planu miesięcznego za 9,99 USD.</string>
+    <string name="switchBottomSheetPrimaryButtonUpgrade">Przełącz na roczny (99,99 USD/rok)</string>
+    <string name="switchBottomSheetSecondaryButtonUpgrade">Zachowaj miesięczny plan</string>
+    <string name="switchBottomSheetTitleDowngrade">Oszczędzasz 16% \nz planem rocznym!</string>
+    <string name="switchBottomSheetDescriptionDowngrade">Zmiana zwiększy Twoją miesięczną opłatę z 8,33 USD/mies. do 9,99 USD/mies.</string>
+    <string name="switchBottomSheetPrimaryButtonDowngrade">Zachowaj plan roczny</string>
+    <string name="switchBottomSheetSecondaryButtonDowngrade">Przejdź na plan miesięczny (9,99 USD/miesiąc)</string>
 
 </resources>
