@@ -2,19 +2,29 @@
 # TEMPORARY: Reduced scenarios for workflow testing test 2
 # This file defines three benchmark scenarios to measure build performance
 
-# Scenario 1: Clean Build
-# Measures cold build performance with no incremental compilation
-clean-build {
+assemble {
     title = "Clean Build"
     tasks = ["assembleInternalDebug"]
-    gradle-args = ["--no-build-cache", "--no-configuration-cache"]
-    cleanup-tasks = ["clean"]
-    warm-ups = 2
-    iterations = 3
+    warm-ups = 3
+    iterations = 5
 
     # Use daemon for consistency
     daemon = warm
 }
+
+# Scenario 1: Clean Build
+# Measures cold build performance with no incremental compilation
+#clean-build {
+#    title = "Clean Build"
+#    tasks = ["assembleInternalDebug"]
+#    gradle-args = ["--no-build-cache", "--no-configuration-cache"]
+#    cleanup-tasks = ["clean"]
+#    warm-ups = 2
+#    iterations = 3
+#
+#    # Use daemon for consistency
+#    daemon = warm
+#}
 
 # Scenario 2: ABI Change - DISABLED FOR TESTING
 # Measures incremental build performance when public API changes

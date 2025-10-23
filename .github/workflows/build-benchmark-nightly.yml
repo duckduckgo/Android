@@ -3,7 +3,7 @@ name: Build Benchmark - Nightly
 on:
   push:
     branches:
-      - feature/mike/ci-build-times
+      - feature/lukasz-p/ci-build-times
   schedule:
     # Run nightly at 2 AM UTC (matching nightly.yml)
     - cron: '0 2 * * *'
@@ -55,80 +55,14 @@ jobs:
           sdk install gradleprofiler
           gradle-profiler --version
 
-      - name: Run Gradle Build (warm cache)
-        run: |
-          ./gradlew assembleInternalDebug --no-daemon
-
       - name: Run Build Benchmarks
         run: |
           source "$HOME/.sdkman/bin/sdkman-init.sh"
-          gradle-profiler --benchmark --scenario-file build_performance.scenarios --output-dir profile-out
+          gradle-profiler --benchmark --scenario-file build_performance.scenarios --output-dir profile-out --gradle-user-home "$HOME/.gradle"
 
       - name: Upload Benchmark Results
         uses: actions/upload-artifact@v4
         with:
           name: benchmark-results-develop-${{ github.run_number }}
           path: profile-out/**/*.csv
-          retention-days: 30
-
-      - name: Generate Summary Report
-        run: |
-          python3 scripts/benchmark-comparison.py profile-out/benchmark.csv
-
-      - name: Upload Summary Report
-        uses: actions/upload-artifact@v4
-        with:
-          name: benchmark-summary-${{ github.run_number }}
-          path: benchmark-result.md
-          retention-days: 30
-
-  benchmark-comparison:
-    name: Compare with Previous Results
-    runs-on: ubuntu-24.04
-    needs: benchmark-develop
-    if: success()
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Download Current Results
-        uses: actions/download-artifact@v4
-        with:
-          name: benchmark-results-develop-${{ github.run_number }}
-          path: profile-out-current
-
-      - name: Compute Previous Run Number
-        id: prev-run
-        run: echo "previous=$(( ${{ github.run_number }} - 1 ))" >> "$GITHUB_OUTPUT"
-
-      - name: Download Previous Results
-        uses: actions/download-artifact@v4
-        continue-on-error: true
-        with:
-          name: benchmark-results-develop-${{ steps.prev-run.outputs.previous }}
-          path: profile-out-previous
-
-      - name: Compare Results
-        if: hashFiles('profile-out-previous/benchmark.csv') != ''
-        run: |
-          python3 scripts/benchmark-comparison.py \
-            profile-out-current/benchmark.csv \
-            profile-out-previous/benchmark.csv
-
-      - name: Generate Trend Summary
-        if: hashFiles('profile-out-previous/benchmark.csv') != ''
-        run: |
-          {
-            echo "## Nightly Build Performance Trend"
-            echo ""
-            cat benchmark-result.md
-          } >> "$GITHUB_STEP_SUMMARY"
-
-      - name: Upload Comparison Report
-        if: hashFiles('profile-out-previous/benchmark.csv') != ''
-        uses: actions/upload-artifact@v4
-        with:
-          name: benchmark-comparison-${{ github.run_number }}
-          path: benchmark-result.md
           retention-days: 30
