@@ -109,7 +109,8 @@ class RealBrokerStepsParser @Inject constructor(
                     .withSubtype(BrokerAction.Navigate::class.java, "navigate")
                     .withSubtype(BrokerAction.GetCaptchaInfo::class.java, "getCaptchaInfo")
                     .withSubtype(BrokerAction.SolveCaptcha::class.java, "solveCaptcha")
-                    .withSubtype(BrokerAction.EmailConfirmation::class.java, "emailConfirmation"),
+                    .withSubtype(BrokerAction.EmailConfirmation::class.java, "emailConfirmation")
+                    .withSubtype(BrokerAction.Condition::class.java, "condition"),
             )
             .add(
                 PolymorphicJsonAdapterFactory.of(BrokerStep::class.java, "stepType")
