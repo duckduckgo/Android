@@ -83,6 +83,16 @@
     <string name="subscriptionSettingSectionHelpAndSupport">Help and Support</string>
     <string name="subscriptionSettingSendFeedback">Send Feedback</string>
     <string name="subscriptionSettingActivating">Activating</string>
+    <string name="subscriptionSettingManageSubscription">Manage Subscription</string>
+    <string name="subscriptionSettingSwitchUpgrade">Switch to Yearly and Save 16%</string>
+    <!-- smartling.character_limit = 10 -->
+    <string name="subscriptionSettingSwitchUpgradePill">Best offer</string>
+    <string name="subscriptionSettingSwitchDowngrade">Switch Plan</string>
+    <string name="subscriptionSettingManagePlan">Manage Plan and Payment Options</string>
+    <!-- Change Plan -->
+    <string name="changePlanTitle">Update Plan or Cancel</string>
+    <string name="changePlanDescription">Your subscription was purchased through the Apple App Store. To change your plan or billing settings, please go to Settings > Apple Account > Subscriptions on a device signed in to the same Apple Account used to purchase your subscription.</string>
+
 
     <!--Purchase Subscriptions-->
     <string name="purchaseCompletedTitle">You\'re all set.</string>
@@ -96,10 +106,6 @@
 
     <!-- ITR Settings-->
     <string name="itrSettingTitle" translatable="false">Identity Theft Restoration</string>
-
-    <!-- Change Plan -->
-    <string name="changePlanTitle">Update Plan or Cancel</string>
-    <string name="changePlanDescription">Your subscription was purchased through the Apple App Store. To change your plan or billing settings, please go to Settings > Apple Account > Subscriptions on a device signed in to the same Apple Account used to purchase your subscription.</string>
 
     <!-- PIR Activity-->
     <string name="pirTitle">Activate Privacy Pro on desktop to set up Personal Information Removal</string>
@@ -184,5 +190,15 @@
     <string name="subscriptionSettingSubscribeSecure">Secure your Wi-Fi, and chat privately with advanced AI models</string>
 
     <string name="feedbackGeneralSubscription">Subscription</string>
+    
+    <!-- Switch plan-->
+    <string name="switchBottomSheetTitleUpgrade">Save 16% with\na yearly plan!</string>
+    <string name="switchBottomSheetDescriptionUpgrade">A yearly plan is just $8.33/mo, compared to your current $9.99 monthly plan.</string>
+    <string name="switchBottomSheetPrimaryButtonUpgrade">Switch to Yearly ($99.99/year)</string>
+    <string name="switchBottomSheetSecondaryButtonUpgrade">Keep Monthly Plan</string>
+    <string name="switchBottomSheetTitleDowngrade">You’re saving 16% with\na yearly plan!</string>
+    <string name="switchBottomSheetDescriptionDowngrade">Switching will increase your monthly price from $8.33/mo to $9.99/mo.</string>
+    <string name="switchBottomSheetPrimaryButtonDowngrade">Keep Yearly Plan</string>
+    <string name="switchBottomSheetSecondaryButtonDowngrade">Switch to Monthly ($9.99/month)</string>
 
 </resources>
