@@ -23,7 +23,6 @@ import com.duckduckgo.app.fire.fireproofwebsite.ui.AutomaticFireproofSetting
 import com.duckduckgo.app.fire.fireproofwebsite.ui.AutomaticFireproofSetting.ASK_EVERY_TIME
 import com.duckduckgo.app.fire.fireproofwebsite.ui.AutomaticFireproofSetting.NEVER
 import com.duckduckgo.app.icon.api.AppIcon
-import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.app.settings.clear.ClearWhatOption
 import com.duckduckgo.app.settings.clear.ClearWhenOption
 import com.duckduckgo.app.settings.clear.FireAnimation
@@ -216,7 +215,7 @@ class SettingsSharedPreferences @Inject constructor(
 
     override var omnibarType: OmnibarType
         get() = OmnibarType.fromString(
-                preferences.getString(KEY_OMNIBAR_TYPE, OmnibarType.SINGLE_TOP.typeName) ?: OmnibarType.SINGLE_TOP.typeName,
+            preferences.getString(KEY_OMNIBAR_TYPE, OmnibarType.SINGLE_TOP.typeName) ?: OmnibarType.SINGLE_TOP.typeName,
         )
         set(value) = preferences.edit { putString(KEY_OMNIBAR_TYPE, value.typeName) }
 

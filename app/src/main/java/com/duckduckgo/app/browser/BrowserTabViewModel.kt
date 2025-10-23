@@ -1380,7 +1380,7 @@ class BrowserTabViewModel @Inject constructor(
                 brokenSitePrompt.pageRefreshed(it)
             }
             privacyProtectionsPopupManager.onPageRefreshTriggeredByUser(
-                isOmnibarAtTheTop = settingsDataStore.omnibarType != OmnibarType.SINGLE_BOTTOM
+                isOmnibarAtTheTop = settingsDataStore.omnibarType != OmnibarType.SINGLE_BOTTOM,
             )
         }
     }
