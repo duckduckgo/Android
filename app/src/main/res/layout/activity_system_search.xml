@@ -251,30 +251,6 @@
                     tools:itemCount="4"
                     tools:listitem="@layout/item_autocomplete_search_suggestion" />
 
-                <View
-                    android:id="@+id/listDivider"
-                    android:layout_width="match_parent"
-                    android:layout_height="0.5dp"
-                    android:background="?attr/daxColorShade"
-                    android:layout_marginVertical="@dimen/keyline_2"
-                    android:visibility="gone"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/autocompleteSuggestions"
-                    app:layout_constraintBottom_toTopOf="@id/deviceAppSuggestions"/>
-
-                <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/deviceAppSuggestions"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/keyline_2"
-                    android:overScrollMode="never"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/listDivider"
-                    tools:itemCount="4"
-                    tools:listitem="@layout/item_device_app_suggestion" />
-
                 <include
                     android:id="@+id/includeSystemSearchOnboarding"
                     layout="@layout/include_system_search_onboarding" />

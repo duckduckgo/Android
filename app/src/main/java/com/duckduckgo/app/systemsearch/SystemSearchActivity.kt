@@ -136,7 +136,6 @@ class SystemSearchActivity : DuckDuckGoActivity() {
     private val viewModel: SystemSearchViewModel by bindViewModel()
     private val binding: ActivitySystemSearchBinding by viewBinding()
     private lateinit var autocompleteSuggestionsAdapter: BrowserAutoCompleteSuggestionsAdapter
-    private lateinit var deviceAppSuggestionsAdapter: DeviceAppSuggestionsAdapter
     private lateinit var quickAccessAdapter: FavoritesQuickAccessAdapter
     private lateinit var itemTouchHelper: ItemTouchHelper
 
@@ -211,7 +210,6 @@ class SystemSearchActivity : DuckDuckGoActivity() {
         configureFlowCollectors()
         configureOnboarding()
         configureAutoComplete()
-        configureDeviceAppSuggestions()
         configureDaxButton()
         configureTextInput()
         configureQuickAccessGrid()
@@ -376,15 +374,6 @@ class SystemSearchActivity : DuckDuckGoActivity() {
         )
     }
 
-    private fun configureDeviceAppSuggestions() {
-        binding.deviceAppSuggestions.layoutManager = LinearLayoutManager(this)
-        deviceAppSuggestionsAdapter =
-            DeviceAppSuggestionsAdapter {
-                viewModel.userSelectedApp(it)
-            }
-        binding.deviceAppSuggestions.adapter = deviceAppSuggestionsAdapter
-    }
-
     private fun configureQuickAccessGrid() {
         val quickAccessRecyclerView = binding.quickAccessRecyclerView
         val numOfColumns = gridViewColumnCalculator.calculateNumberOfColumns(QUICK_ACCESS_ITEM_MAX_SIZE_DP, QUICK_ACCESS_GRID_MAX_COLUMNS)
@@ -495,11 +484,8 @@ class SystemSearchActivity : DuckDuckGoActivity() {
         if (viewState.autocompleteResults.suggestions.isEmpty()) {
             viewModel.autoCompleteSuggestionsGone()
         }
-        deviceAppSuggestionsAdapter.updateData(viewState.appResults)
 
         binding.autocompleteSuggestions.isVisible = !viewState.autocompleteResults.suggestions.isEmpty()
-        binding.listDivider.isVisible = viewState.appResults.isNotEmpty()
-        binding.deviceAppSuggestions.isVisible = !viewState.appResults.isEmpty()
     }
 
     private fun renderOmnibarState(viewState: SystemSearchViewModel.OmnibarViewState) {
@@ -694,10 +680,10 @@ class SystemSearchActivity : DuckDuckGoActivity() {
 
     private fun launchDeviceApp(command: LaunchDeviceApplication) {
         try {
-            startActivity(command.deviceApp.launchIntent)
+            startActivity(command.deviceAppSuggestion.launchIntent)
             finish()
         } catch (error: ActivityNotFoundException) {
-            viewModel.appNotFound(command.deviceApp)
+            viewModel.appNotFound(command.deviceAppSuggestion)
         }
     }
 
