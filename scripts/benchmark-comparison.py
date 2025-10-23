@@ -162,7 +162,7 @@ def generate_markdown_summary(results: List[BenchmarkResult]) -> str:
     return md
 
 
-def send_results_to_api(results: List[BenchmarkResult], github_action_run_url: Optional[str] = None) -> None:
+def send_results_to_api(results: List[BenchmarkResult], github_action_run_id: Optional[str] = None, github_action_job_id: Optional[str] = None) -> None:
     """Send benchmark results to the API endpoint."""
     base_url = "https://improving.duckduckgo.com/t/m_build_time_android"
     
@@ -180,10 +180,12 @@ def send_results_to_api(results: List[BenchmarkResult], github_action_run_url: O
             'min': f"{result.min:.3f}",
             'max': f"{result.max:.3f}"
         }
-        
-        # Add github_action_run_url if provided
-        if github_action_run_url:
-            params['github_action_run_url'] = github_action_run_url
+
+        if github_action_run_id:
+            params['github_action_run_id'] = github_action_run_id
+
+        if github_action_job_id:
+            params['github_action_job_id'] = github_action_job_id
         
         # Construct URL with query parameters
         url = f"{base_url}?{urlencode(params)}"
@@ -209,14 +211,19 @@ def main():
         help="Path to the benchmark results CSV file"
     )
     parser.add_argument(
-        "--github-action-url",
+        "--github-action-run-id",
         type=str,
-        help="GitHub Action run URL to include in the pixel report"
+        help="GitHub Action run ID for linking results"
+    )
+    parser.add_argument(
+        "--github-action-job-id",
+        type=str,
+        help="GitHub Action job ID for linking results"
     )
     parser.add_argument(
         "--report-pixel",
         action="store_true",
-        help="Send results to the reporting API (requires --github-action-url)"
+        help="Send results to the reporting API (requires --github-action-run-id and --github-action-job-id)"
     )
     
     args = parser.parse_args()
@@ -226,13 +233,13 @@ def main():
     print(generate_terminal_summary(results))
     
     # Send results to API only if both conditions are met
-    if results and args.report_pixel and args.github_action_url:
+    if results and args.report_pixel and args.github_action_run_id and args.github_action_job_id:
         print("\n" + "=" * 80)
         print("SENDING RESULTS TO API")
         print("=" * 80)
-        send_results_to_api(results, args.github_action_url)
-    elif results and args.report_pixel and not args.github_action_url:
-        print("\n⚠️  --report-pixel flag set but no --github-action-url provided. Skipping API requests.")
+        send_results_to_api(results, args.github_action_run_id, args.github_action_job_id)
+    elif results and args.report_pixel and (not args.github_action_run_id or not args.github_action_job_id):
+        print("\n⚠️  --report-pixel flag set but no --github-action-run-id and --github-action-job-id provided. Skipping API requests.")
 
 
 if __name__ == '__main__':
