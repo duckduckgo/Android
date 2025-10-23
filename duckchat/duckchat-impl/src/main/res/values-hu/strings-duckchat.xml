@@ -69,6 +69,7 @@
     <string name="autocompleteDeviceAppNotFound">Az alkalmazás nem található</string>
 
     <!-- New Address Bar Option Bottom Sheet Dialog -->
+    <string name="newAddressBarOptionBottomSheetDialogTitle">Szeretnél könnyebben hozzáférni a privát AI-csevegéshez?</string>
     <string name="newAddressBarOptionBottomSheetDialogSearchText">Keresés vagy cím megadása</string>
     <string name="newAddressBarOptionBottomSheetDialogPrimaryButton">Megerősítés</string>
     <string name="newAddressBarOptionBottomSheetDialogGhostButton">Most nem</string>
