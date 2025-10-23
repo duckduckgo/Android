@@ -187,13 +187,13 @@ jobs:
 
       - name: Compare Results
         run: |
-          python3 scripts/benchmark-comparison.py \
+          python3 scripts/process-build-benchmark.py \
             profile-out-head/benchmark.csv \
             profile-out-base/benchmark.csv
 
       - name: Upload Comparison Report
         uses: actions/upload-artifact@v4
         with:
-          name: benchmark-comparison-${{ github.run_number }}
+          name: process-build-benchmark-${{ github.run_number }}
           path: benchmark-result.md
           retention-days: 30

@@ -63,21 +63,13 @@ jobs:
       - name: Upload Benchmark Results
         uses: actions/upload-artifact@v4
         with:
-          name: benchmark-results-develop-${{ github.run_number }}
+          name: benchmark-results-${{ github.run_number }}
           path: profile-out/**/*.csv
           retention-days: 30
 
-      - name: Run Benchmark Comparison
+      - name: Run Benchmark Processing
         run: |
-          # Find the CSV file in the profile-out directory
-          CSV_FILE=$(find profile-out -name "*.csv" | head -1)
-          if [ -z "$CSV_FILE" ]; then
-            echo "No CSV file found in profile-out directory"
-            exit 1
-          fi
-          
-          echo "Running benchmark comparison on: $CSV_FILE"
-          python3 scripts/benchmark-comparison.py "$CSV_FILE" \
+          python3 scripts/process-build-benchmark.py profile-out/benchmark.csv \
             --github-action-run-id "${{ github.run_id }}" \
             --git-commit-sha "${{ github.sha }}" \
             --report-pixel
