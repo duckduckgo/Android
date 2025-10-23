@@ -65,10 +65,11 @@
     <string name="duck_ai_paid_settings_learn_more_title">Sužinoti daugiau</string>
 
     <!-- AutoComplete -->
-    <string name="autocompleteDuckAiPrompt">Paklausk „Duck.ai"</string>
+    <string name="autocompleteDuckAiPrompt">Paklausk „Duck.ai“</string>
     <string name="autocompleteDeviceAppNotFound">Nepavyko rasti programos</string>
 
     <!-- New Address Bar Option Bottom Sheet Dialog -->
+    <string name="newAddressBarOptionBottomSheetDialogTitle">Norite lengviau pasiekti privačius DI pokalbius?</string>
     <string name="newAddressBarOptionBottomSheetDialogSearchText">Ieškoti arba įvesti adresą</string>
     <string name="newAddressBarOptionBottomSheetDialogPrimaryButton">Patvirtinti</string>
     <string name="newAddressBarOptionBottomSheetDialogGhostButton">Ne dabar</string>
