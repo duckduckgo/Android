@@ -1,0 +1,25 @@
+name: Create Asana task for Privacy Review
+
+on:
+  pull_request:
+    types: [ labeled ]
+
+jobs:
+  call-privacy-review:
+    if: contains(github.event.label.name, 'privacy review')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout native actions repo
+        uses: actions/checkout@v4
+        with:
+            ref: v2.1
+            # Do not change the below path (downstream actions expect it)
+            path: native-github-asana-sync
+            repository: duckduckgo/native-github-asana-sync
+
+      - name: Trigger review task
+        uses: ./native-github-asana-sync/.github/actions/privacy-review/
+        with:
+          team_name: 'Android'
+          asana_pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
+          github_pat: ${{ secrets.DAXMOBILE_ANDROID_AUTOMATION }}
