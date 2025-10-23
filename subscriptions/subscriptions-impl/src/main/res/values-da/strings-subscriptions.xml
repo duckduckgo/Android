@@ -84,6 +84,16 @@
     <string name="subscriptionSettingSectionHelpAndSupport">Hjælp og support</string>
     <string name="subscriptionSettingSendFeedback">Send tilbagemelding</string>
     <string name="subscriptionSettingActivating">Aktiverer</string>
+    <string name="subscriptionSettingManageSubscription">Administrer abonnement</string>
+    <string name="subscriptionSettingSwitchUpgrade">Skift til årligt og spar 16%</string>
+    <!-- smartling.character_limit = 10 -->
+    <string name="subscriptionSettingSwitchUpgradePill">Anbefales</string>
+    <string name="subscriptionSettingSwitchDowngrade">Skift abonnement</string>
+    <string name="subscriptionSettingManagePlan">Administrer abonnements- og betalingsmuligheder</string>
+    <!-- Change Plan -->
+    <string name="changePlanTitle">Opdater abonnement eller annuller</string>
+    <string name="changePlanDescription">Dit abonnement blev købt gennem Apple App Store. Hvis du vil ændre dit abonnement eller dine faktureringsindstillinger, skal du gå til Indstillinger &gt; Apple-konto &gt; Abonnementer på en enhed, der er logget ind med den samme Apple-konto, som blev brugt til at købe dit abonnement.</string>
+
 
     <!--Purchase Subscriptions-->
     <string name="purchaseCompletedTitle">Du er klar.</string>
@@ -97,10 +107,6 @@
 
     <!-- ITR Settings-->
     <string name="itrSettingTitle" translatable="false">Identity Theft Restoration</string>
-
-    <!-- Change Plan -->
-    <string name="changePlanTitle">Opdater abonnement eller annuller</string>
-    <string name="changePlanDescription">Dit abonnement blev købt gennem Apple App Store. Hvis du vil ændre dit abonnement eller dine faktureringsindstillinger, skal du gå til Indstillinger &gt; Apple-konto &gt; Abonnementer på en enhed, der er logget ind med den samme Apple-konto, som blev brugt til at købe dit abonnement.</string>
 
     <!-- PIR Activity-->
     <string name="pirTitle">Aktivér Privacy Pro på en computer for at opsætte Personal Information Removal</string>
@@ -185,5 +191,15 @@
     <string name="subscriptionSettingSubscribeSecure">Beskyt dit Wi-Fi, og chat privat med avancerede AI-modeller</string>
 
     <string name="feedbackGeneralSubscription">Abonnement</string>
+    
+    <!-- Switch plan-->
+    <string name="switchBottomSheetTitleUpgrade">Spar 16 % med\net årligt abonnement!</string>
+    <string name="switchBottomSheetDescriptionUpgrade">En årligt abonnement koster kun 8,33 USD/måned sammenlignet med dit nuværende abonnement til 9,99 USD/måned.</string>
+    <string name="switchBottomSheetPrimaryButtonUpgrade">Skift til årligt (99,99 USD/år)</string>
+    <string name="switchBottomSheetSecondaryButtonUpgrade">Behold månedligt abonnement</string>
+    <string name="switchBottomSheetTitleDowngrade">Du sparer 16 % med\net årligt abonnement!</string>
+    <string name="switchBottomSheetDescriptionDowngrade">Hvis du skifter, vil din månedlige pris øges fra 8,33 USD/måned til 9,99 USD/måned.</string>
+    <string name="switchBottomSheetPrimaryButtonDowngrade">Behold årligt abonnement</string>
+    <string name="switchBottomSheetSecondaryButtonDowngrade">Skift til månedligt (9,99 USD/måned)</string>
 
 </resources>

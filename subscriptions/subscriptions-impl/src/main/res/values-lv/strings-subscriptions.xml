@@ -84,6 +84,16 @@
     <string name="subscriptionSettingSectionHelpAndSupport">Palīdzība un atbalsts</string>
     <string name="subscriptionSettingSendFeedback">Sūtīt atsauksmi</string>
     <string name="subscriptionSettingActivating">Notiek aktivizēšana</string>
+    <string name="subscriptionSettingManageSubscription">Pārvaldīt abonementu</string>
+    <string name="subscriptionSettingSwitchUpgrade">Maini plānu uz ikgadējo un ietaupi 16 %!</string>
+    <!-- smartling.character_limit = 10 -->
+    <string name="subscriptionSettingSwitchUpgradePill">Labākais piedāvājums</string>
+    <string name="subscriptionSettingSwitchDowngrade">Mainīt plānu</string>
+    <string name="subscriptionSettingManagePlan">Plāna un maksājumu iespēju pārvaldība</string>
+    <!-- Change Plan -->
+    <string name="changePlanTitle">Atjaunināt plānu vai atcelt</string>
+    <string name="changePlanDescription">Tavs abonements tika iegādāts Apple App Store veikalā. Lai mainītu plāna vai norēķinu iestatījumus, atver sadaļu Iestatījumi &gt; Apple konts &gt; Abonementi ierīcē, kas pierakstīta tajā pašā Apple kontā, kas izmantots abonementa iegādei.</string>
+
 
     <!--Purchase Subscriptions-->
     <string name="purchaseCompletedTitle">Viss ir gatavs.</string>
@@ -97,10 +107,6 @@
 
     <!-- ITR Settings-->
     <string name="itrSettingTitle" translatable="false">Identity Theft Restoration</string>
-
-    <!-- Change Plan -->
-    <string name="changePlanTitle">Atjaunināt plānu vai atcelt</string>
-    <string name="changePlanDescription">Tavs abonements tika iegādāts Apple App Store veikalā. Lai mainītu plāna vai norēķinu iestatījumus, atver sadaļu Iestatījumi &gt; Apple konts &gt; Abonementi ierīcē, kas pierakstīta tajā pašā Apple kontā, kas izmantots abonementa iegādei.</string>
 
     <!-- PIR Activity-->
     <string name="pirTitle">Aktivizē Privacy Pro datorā, lai iestatītu Personal Information Removal</string>
@@ -185,5 +191,15 @@
     <string name="subscriptionSettingSubscribeSecure">Nodrošini sava Wi-Fi drošību un privāti tērzē ar uzlabotiem mākslīgā intelekta modeļiem</string>
 
     <string name="feedbackGeneralSubscription">Abonements</string>
+    
+    <!-- Switch plan-->
+    <string name="switchBottomSheetTitleUpgrade">Ietaupi 16 % ar\nikgadējo plānu!</string>
+    <string name="switchBottomSheetDescriptionUpgrade">Ikgadējais plāns maksā tikai 8,33 USD mēnesī, salīdzinot ar tavu pašreizējo ikmēneša plānu, kas maksā 9,99 USD.</string>
+    <string name="switchBottomSheetPrimaryButtonUpgrade">Maini plānu uz ikgadējo (99,99 USD gadā)</string>
+    <string name="switchBottomSheetSecondaryButtonUpgrade">Atstāt ikmēneša plānu</string>
+    <string name="switchBottomSheetTitleDowngrade">Tu ietaupi 16 % ar\nikgadējo plānu!</string>
+    <string name="switchBottomSheetDescriptionDowngrade">Plāna maiņa palielinās tavu ikmēneša cenu no 8,33 USD mēnesī līdz 9,99 USD mēnesī.</string>
+    <string name="switchBottomSheetPrimaryButtonDowngrade">Atstāt ikgadējo plānu</string>
+    <string name="switchBottomSheetSecondaryButtonDowngrade">Maini plānu uz ikmēneša (9,99 USD mēnesī)</string>
 
 </resources>
