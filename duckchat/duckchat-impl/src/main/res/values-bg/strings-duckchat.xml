@@ -69,6 +69,7 @@
     <string name="autocompleteDeviceAppNotFound">Приложението не може да бъде намерено</string>
 
     <!-- New Address Bar Option Bottom Sheet Dialog -->
+    <string name="newAddressBarOptionBottomSheetDialogTitle">Искаш ли по-лесен достъп до поверителен AI чат?</string>
     <string name="newAddressBarOptionBottomSheetDialogSearchText">Търсене или въвеждане на адрес</string>
     <string name="newAddressBarOptionBottomSheetDialogPrimaryButton">Потвърдете</string>
     <string name="newAddressBarOptionBottomSheetDialogGhostButton">Не сега</string>
