@@ -18,9 +18,9 @@ from urllib.parse import urlencode
 class BenchmarkResult:
     """Represents benchmark results for a single scenario."""
 
-    def __init__(self, scenario: str, task: str, mean: float, median: float, std_dev: float, data: List[float]):
+    def __init__(self, scenario: str, sample: str, mean: float, median: float, std_dev: float, data: List[float]):
         self.scenario = scenario
-        self.task = task
+        self.sample = sample
         self.mean = mean
         self.median = median
         self.std_dev = std_dev
@@ -39,7 +39,6 @@ def parse_csv(csv_path: Path) -> List[BenchmarkResult]:
 
     with open(csv_path, 'r') as f:
         reader = csv.DictReader(f)
-        # Group measurements by (scenario, task) tuple
         measurements = {}
 
         for row in reader:
@@ -57,7 +56,6 @@ def parse_csv(csv_path: Path) -> List[BenchmarkResult]:
                 # Convert time to seconds (gradle-profiler outputs in ms)
                 time_seconds = float(duration) / 1000.0
 
-                # Group by (scenario, task) tuple
                 key = (scenario, sample)
                 if key not in measurements:
                     measurements[key] = []
@@ -67,11 +65,11 @@ def parse_csv(csv_path: Path) -> List[BenchmarkResult]:
                 continue
 
     # Create BenchmarkResult for each group of measurements
-    for (scenario, task), data in measurements.items():
+    for (scenario, sample), data in measurements.items():
         if data:
             results.append(BenchmarkResult(
                 scenario=scenario,
-                task=task,
+                sample=sample,
                 mean=statistics.mean(data),
                 median=statistics.median(data),
                 std_dev=statistics.stdev(data) if len(data) > 1 else 0,
@@ -121,27 +119,27 @@ def generate_terminal_summary(results: List[BenchmarkResult]) -> str:
         
         for result in scenario_results:
             # Use the task field directly
-            if result.task == "total execution time":
+            if result.sample == "total execution time":
                 total_exec_results.append(result)
-            elif result.task == "task start":
+            elif result.sample == "task start":
                 task_start_results.append(result)
         
         # Display total execution time results
-        for result in total_exec_results:
+        for total_exec_result in total_exec_results:
             output.append(f"  📈 Total Execution Time:")
-            output.append(f"    Mean:   {format_time(result.mean):>8}")
-            output.append(f"    Median: {format_time(result.median):>8}")
-            output.append(f"    StdDev: ±{format_time(result.std_dev):>7}")
-            output.append(f"    Range:  {format_time(result.min):>8} - {format_time(result.max)}")
+            output.append(f"    Mean:   {format_time(total_exec_result.mean):>8}")
+            output.append(f"    Median: {format_time(total_exec_result.median):>8}")
+            output.append(f"    StdDev: ±{format_time(total_exec_result.std_dev):>7}")
+            output.append(f"    Range:  {format_time(total_exec_result.min):>8} - {format_time(total_exec_result.max)}")
             output.append("")
             
             # Display task start as sub-metric
-            for task_result in task_start_results:
+            for task_start_result in task_start_results:
                 output.append(f"    └─ Gradle Configuration Time:")
-                output.append(f"      Mean:   {format_time(task_result.mean):>8}")
-                output.append(f"      Median: {format_time(task_result.median):>8}")
-                output.append(f"      StdDev: ±{format_time(task_result.std_dev):>7}")
-                output.append(f"      Range:  {format_time(task_result.min):>8} - {format_time(task_result.max)}")
+                output.append(f"      Mean:   {format_time(task_start_result.mean):>8}")
+                output.append(f"      Median: {format_time(task_start_result.median):>8}")
+                output.append(f"      StdDev: ±{format_time(task_start_result.std_dev):>7}")
+                output.append(f"      Range:  {format_time(task_start_result.min):>8} - {format_time(task_start_result.max)}")
                 output.append("")
         
         output.append("")
@@ -169,17 +167,18 @@ def send_results_to_api(results: List[BenchmarkResult], github_action_run_url: O
     base_url = "https://improving.duckduckgo.com/t/m_build_time_android"
     
     for result in results:
-        # Use the stored scenario and task fields directly
         scenario = result.scenario
-        task = result.task
+        sample = result.sample
         
         # Prepare query parameters
         params = {
             'scenario': scenario,
-            'task': task,
+            'sample': sample,
             'mean': f"{result.mean:.3f}",
             'median': f"{result.median:.3f}",
-            'std_dev': f"{result.std_dev:.3f}"
+            'std_dev': f"{result.std_dev:.3f}",
+            'min': f"{result.min:.3f}",
+            'max': f"{result.max:.3f}"
         }
         
         # Add github_action_run_url if provided
@@ -190,14 +189,14 @@ def send_results_to_api(results: List[BenchmarkResult], github_action_run_url: O
         url = f"{base_url}?{urlencode(params)}"
         
         try:
-            print(f"Sending results for {scenario} - {task}...")
+            print(f"Sending results for {scenario} - {sample}...")
             response = requests.get(url, timeout=10)
             response.raise_for_status()
-            print(f"✅ Successfully sent results for {scenario} - {task}")
+            print(f"✅ Successfully sent results for {scenario} - {sample}")
         except requests.exceptions.RequestException as e:
-            print(f"❌ Failed to send results for {scenario} - {task}: {e}")
+            print(f"❌ Failed to send results for {scenario} - {sample}: {e}")
         except Exception as e:
-            print(f"❌ Unexpected error sending results for {scenario} - {task}: {e}")
+            print(f"❌ Unexpected error sending results for {scenario} - {sample}: {e}")
 
 
 def main():
