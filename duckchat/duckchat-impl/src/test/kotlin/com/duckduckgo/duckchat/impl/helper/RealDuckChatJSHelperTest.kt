@@ -465,7 +465,7 @@ class RealDuckChatJSHelperTest {
         val result = testee.processJsCallbackMessage(featureName, method, id, data)
 
         val expectedPayload = JSONObject().apply {
-            put("selector", "document.getElementsByName('user-prompt')[0]?.focus();")
+            put("selector", "document.getElementsByName(''user-prompt'')[0]?.focus();")
             put("success", true)
             put("error", "")
         }
