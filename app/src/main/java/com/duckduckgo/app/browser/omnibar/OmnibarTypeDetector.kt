@@ -16,7 +16,7 @@
 
 package com.duckduckgo.app.browser.omnibar
 
-import com.duckduckgo.app.browser.omnibar.datastore.OmnibarDataStore
+import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.api.BrowserFeatureStateReporterPlugin
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter
 import com.duckduckgo.di.scopes.AppScope
@@ -31,9 +31,9 @@ interface OmnibarTypeReporterPlugin
 @ContributesBinding(scope = AppScope::class, boundType = OmnibarTypeReporterPlugin::class)
 @SingleInstanceIn(AppScope::class)
 class OmnibarTypeDetector @Inject constructor(
-    private val omnibarDataStore: OmnibarDataStore,
+    private val settingsDataStore: SettingsDataStore,
 ) : OmnibarTypeReporterPlugin, BrowserFeatureStateReporterPlugin {
     override fun featureStateParams(): Map<String, String> {
-        return mapOf(PixelParameter.ADDRESS_BAR to omnibarDataStore.omnibarType.typeName)
+        return mapOf(PixelParameter.ADDRESS_BAR to settingsDataStore.omnibarType.typeName)
     }
 }

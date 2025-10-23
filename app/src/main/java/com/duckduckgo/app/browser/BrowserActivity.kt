@@ -58,7 +58,6 @@ import com.duckduckgo.app.browser.defaultbrowsing.prompts.ui.DefaultBrowserBotto
 import com.duckduckgo.app.browser.defaultbrowsing.prompts.ui.DefaultBrowserBottomSheetDialog.EventListener
 import com.duckduckgo.app.browser.newaddressbaroption.NewAddressBarOptionManager
 import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
-import com.duckduckgo.app.browser.omnibar.datastore.OmnibarDataStore
 import com.duckduckgo.app.browser.shortcut.ShortcutBuilder
 import com.duckduckgo.app.browser.tabs.TabManager
 import com.duckduckgo.app.browser.tabs.TabManager.TabModel
@@ -137,9 +136,6 @@ import javax.inject.Inject
 open class BrowserActivity : DuckDuckGoActivity() {
     @Inject
     lateinit var settingsDataStore: SettingsDataStore
-
-    @Inject
-    lateinit var omnibarDataStore: OmnibarDataStore
 
     @Inject
     lateinit var clearPersonalDataAction: ClearDataAction
@@ -768,7 +764,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
             delay(500)
 
             val anchorView =
-                when (omnibarDataStore.omnibarType) {
+                when (settingsDataStore.omnibarType) {
                     OmnibarType.SINGLE_TOP, OmnibarType.SPLIT -> null
                     OmnibarType.SINGLE_BOTTOM -> currentTab?.getOmnibar()?.omnibarView?.toolbar ?: binding.fragmentContainer
                 }
@@ -1400,7 +1396,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
     }
 
     private fun bindMockupToolbars() {
-        when (omnibarDataStore.omnibarType) {
+        when (settingsDataStore.omnibarType) {
             OmnibarType.SINGLE_TOP, OmnibarType.SPLIT -> {
                 if (Build.VERSION.SDK_INT < 28) {
                     binding.topMockupSingleToolbar.mockOmniBarContainerShadow.cardElevation = 2f.toPx(this)

@@ -31,7 +31,7 @@ import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.ViewState
-import com.duckduckgo.browser.ui.omnibar.OmnibarPosition
+import com.duckduckgo.browser.ui.omnibar.OmnibarType
 import com.duckduckgo.common.ui.view.addBottomShadow
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.hide
@@ -89,11 +89,11 @@ class SingleOmnibarLayout @JvmOverloads constructor(
 
     private var singleOmnibarItemPressedListener: OmnibarItemPressedListener? = null
 
-    override val omnibarPosition: OmnibarPosition
+    override val omnibarType: OmnibarType
 
     init {
         val attr = context.theme.obtainStyledAttributes(attrs, R.styleable.OmnibarLayout, defStyle, 0)
-        omnibarPosition = OmnibarPosition.entries[attr.getInt(R.styleable.OmnibarLayout_omnibarPosition, 0)]
+        omnibarType = OmnibarType.entries[attr.getInt(R.styleable.OmnibarLayout_omnibarPosition, 0)]
 
         inflate(context, R.layout.view_single_omnibar, this)
 
@@ -103,8 +103,8 @@ class SingleOmnibarLayout @JvmOverloads constructor(
             omnibarCardShadow.addBottomShadow()
         }
 
-        when (omnibarPosition) {
-            OmnibarPosition.TOP -> {
+        when (omnibarType) {
+            OmnibarType.SINGLE_TOP -> {
                 if (Build.VERSION.SDK_INT < 28) {
                     omnibarCardShadow.cardElevation = 2f.toPx(context)
                 }
@@ -118,7 +118,7 @@ class SingleOmnibarLayout @JvmOverloads constructor(
                     }
                 }
             }
-            OmnibarPosition.BOTTOM -> {
+            OmnibarType.SINGLE_BOTTOM -> {
                 // When omnibar is at the bottom, we're adding an additional space at the top
                 omnibarCardShadow.updateLayoutParams {
                     (this as MarginLayoutParams).apply {
@@ -157,6 +157,7 @@ class SingleOmnibarLayout @JvmOverloads constructor(
                     omnibarCardShadow.cardElevation = 0.5f.toPx(context)
                 }
             }
+            else -> throw IllegalStateException("OmnibarType $omnibarType not supported in SingleOmnibarLayout")
         }
     }
 

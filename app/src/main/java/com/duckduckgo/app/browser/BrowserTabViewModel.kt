@@ -293,8 +293,7 @@ import com.duckduckgo.browser.api.brokensite.BrokenSiteData
 import com.duckduckgo.browser.api.brokensite.BrokenSiteData.ReportFlow.MENU
 import com.duckduckgo.browser.api.brokensite.BrokenSiteData.ReportFlow.RELOAD_THREE_TIMES_WITHIN_20_SECONDS
 import com.duckduckgo.browser.api.webviewcompat.WebViewCompatWrapper
-import com.duckduckgo.browser.ui.omnibar.OmnibarPosition
-import com.duckduckgo.browser.ui.omnibar.OmnibarPosition.TOP
+import com.duckduckgo.browser.ui.omnibar.OmnibarType
 import com.duckduckgo.common.ui.tabs.SwipingTabsFeatureProvider
 import com.duckduckgo.common.utils.AppUrl
 import com.duckduckgo.common.utils.AppUrl.ParamKey.QUERY
@@ -1380,7 +1379,9 @@ class BrowserTabViewModel @Inject constructor(
             site?.uri?.let {
                 brokenSitePrompt.pageRefreshed(it)
             }
-            privacyProtectionsPopupManager.onPageRefreshTriggeredByUser(isOmnibarAtTheTop = settingsDataStore.omnibarPosition == TOP)
+            privacyProtectionsPopupManager.onPageRefreshTriggeredByUser(
+                isOmnibarAtTheTop = settingsDataStore.omnibarType != OmnibarType.SINGLE_BOTTOM
+            )
         }
     }
 
@@ -4389,7 +4390,7 @@ class BrowserTabViewModel @Inject constructor(
 
     fun isPrinting(): Boolean = currentBrowserViewState().isPrinting
 
-    fun hasOmnibarPositionChanged(currentPosition: OmnibarPosition): Boolean = settingsDataStore.omnibarPosition != currentPosition
+    fun hasOmnibarTypeChanged(omnibarType: OmnibarType): Boolean = settingsDataStore.omnibarType != omnibarType
 
     private fun firePixelBasedOnCurrentUrl(
         emptyUrlPixel: AppPixelName,

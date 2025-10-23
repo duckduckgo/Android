@@ -19,5 +19,16 @@ package com.duckduckgo.browser.ui.omnibar
 enum class OmnibarType(val typeName: String) {
     SINGLE_TOP("TOP"),
     SINGLE_BOTTOM("BOTTOM"),
-    SPLIT("SPLIT_TOP"),
+    SPLIT("SPLIT_TOP");
+
+    companion object {
+        fun fromString(name: String): OmnibarType {
+            return when (name) {
+                "TOP" -> SINGLE_TOP
+                "BOTTOM" -> SINGLE_BOTTOM
+                "SPLIT_TOP" -> SPLIT
+                else -> throw IllegalStateException("Unknown OmnibarType: $name")
+            }
+        }
+    }
 }

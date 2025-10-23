@@ -32,8 +32,7 @@ import com.duckduckgo.app.trackerdetection.model.Entity
 import com.duckduckgo.app.trackerdetection.model.TrackerStatus
 import com.duckduckgo.app.trackerdetection.model.TrackerType
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
-import com.duckduckgo.browser.ui.omnibar.OmnibarPosition.BOTTOM
-import com.duckduckgo.browser.ui.omnibar.OmnibarPosition.TOP
+import com.duckduckgo.browser.ui.omnibar.OmnibarType
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
@@ -74,7 +73,7 @@ class CtaTest {
         whenever(mockActivity.resources).thenReturn(mockResources)
         whenever(mockResources.getQuantityString(any(), any())).thenReturn("withZero")
         whenever(mockResources.getQuantityString(any(), any(), any())).thenReturn("withMultiple")
-        whenever(mockSettingsDataStore.omnibarPosition).thenReturn(TOP)
+        whenever(mockSettingsDataStore.omnibarType).thenReturn(OmnibarType.SINGLE_TOP)
     }
 
     @Test
@@ -212,14 +211,14 @@ class CtaTest {
     @Test
     fun whenOmnibarPositionIsTopKeepTopPointingEmoji() {
         val inputString = "<![CDATA[&#160;were trying to track you here. I blocked them!<br/><br/>☝️ Tap the shield for more info.️]]"
-        assertEquals(inputString.getStringForOmnibarPosition(TOP), inputString)
+        assertEquals(inputString.getStringForOmnibarPosition(OmnibarType.SINGLE_TOP), inputString)
     }
 
     @Test
     fun whenOmnibarPositionIsBottomUpdateHandEmojiToPointDown() {
         val inputString = "<![CDATA[&#160;were trying to track you here. I blocked them!<br/><br/>☝️ Tap the shield for more info.️]]"
         val expectedString = "<![CDATA[&#160;were trying to track you here. I blocked them!<br/><br/>\uD83D\uDC47️ Tap the shield for more info.️]]"
-        assertEquals(inputString.getStringForOmnibarPosition(BOTTOM), expectedString)
+        assertEquals(inputString.getStringForOmnibarPosition(OmnibarType.SINGLE_BOTTOM), expectedString)
     }
 
     @Test

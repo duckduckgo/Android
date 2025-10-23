@@ -22,7 +22,6 @@ import android.content.Intent
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
-import com.duckduckgo.app.browser.omnibar.datastore.OmnibarDataStore
 import com.duckduckgo.app.global.DefaultRoleBrowserDialog
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.notificationpromptexperiment.NotificationPromptExperimentManager
@@ -53,6 +52,7 @@ import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_INTRO_SHOWN_UNIQUE
 import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_RESUME_ONBOARDING_PRESSED
 import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_SKIP_ONBOARDING_PRESSED
 import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_SKIP_ONBOARDING_SHOWN_UNIQUE
+import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Unique
@@ -75,7 +75,7 @@ class WelcomePageViewModel @Inject constructor(
     private val context: Context,
     private val pixel: Pixel,
     private val appInstallStore: AppInstallStore,
-    private val omnibarDataStore: OmnibarDataStore,
+    private val settingsDataStore: SettingsDataStore,
     private val dispatchers: DispatcherProvider,
     private val appBuildConfig: AppBuildConfig,
     private val onboardingDesignExperimentManager: OnboardingDesignExperimentManager,
@@ -158,7 +158,7 @@ class WelcomePageViewModel @Inject constructor(
             ADDRESS_BAR_POSITION -> {
                 viewModelScope.launch {
                     if (!defaultAddressBarPosition) {
-                        omnibarDataStore.setOmnibarType(OmnibarType.SINGLE_BOTTOM)
+                        settingsDataStore.omnibarType = OmnibarType.SINGLE_BOTTOM
                         pixel.fire(PREONBOARDING_BOTTOM_ADDRESS_BAR_SELECTED_UNIQUE)
 
                         onboardingDesignExperimentManager.fireAddressBarSetBottomPixel()

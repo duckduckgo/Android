@@ -73,7 +73,7 @@ import com.duckduckgo.app.tabs.ui.GridViewColumnCalculator
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion
 import com.duckduckgo.browser.api.ui.BrowserScreens.PrivateSearchScreenNoParams
 import com.duckduckgo.browser.ui.autocomplete.BrowserAutoCompleteSuggestionsAdapter
-import com.duckduckgo.browser.ui.omnibar.OmnibarPosition
+import com.duckduckgo.browser.ui.omnibar.OmnibarType
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.view.KeyboardAwareEditText
 import com.duckduckgo.common.ui.view.addBottomShadow
@@ -202,10 +202,8 @@ class SystemSearchActivity : DuckDuckGoActivity() {
         dataClearerForegroundAppRestartPixel.registerIntent(intent)
         setContentView(binding.root)
 
-        val isOmnibarAtTop = settingsDataStore.omnibarPosition == OmnibarPosition.TOP
-
-        configureViewReferences(isOmnibarAtTop)
-        configureOmnibar(isOmnibarAtTop)
+        configureViewReferences(viewModel.isOmnibarAtTop)
+        configureOmnibar(viewModel.isOmnibarAtTop)
         configureObservers()
         configureFlowCollectors()
         configureOnboarding()
@@ -219,7 +217,7 @@ class SystemSearchActivity : DuckDuckGoActivity() {
         if (savedInstanceState == null) {
             intent?.let {
                 sendLaunchPixels(it)
-                val inputScreenLaunched = launchInputScreen(isTopOmnibar = isOmnibarAtTop, intent = it)
+                val inputScreenLaunched = launchInputScreen(isTopOmnibar = viewModel.isOmnibarAtTop, intent = it)
                 if (!inputScreenLaunched) {
                     handleVoiceSearchLaunch(it)
                 }
@@ -243,7 +241,7 @@ class SystemSearchActivity : DuckDuckGoActivity() {
     override fun onResume() {
         super.onResume()
 
-        if (viewModel.hasOmnibarPositionChanged) {
+        if (viewModel.hasOmnibarTypeChanged) {
             recreate()
         }
     }
@@ -254,8 +252,7 @@ class SystemSearchActivity : DuckDuckGoActivity() {
         viewModel.resetViewState()
         viewModel.setLaunchedFromSearchOnlyWidget(launchedFromSearchOnlyWidget(intent))
         sendLaunchPixels(intent)
-        val isOmnibarAtTop = settingsDataStore.omnibarPosition == OmnibarPosition.TOP
-        val inputScreenLaunched = launchInputScreen(isTopOmnibar = isOmnibarAtTop, intent = intent)
+        val inputScreenLaunched = launchInputScreen(isTopOmnibar = viewModel.isOmnibarAtTop, intent = intent)
         if (!inputScreenLaunched) {
             handleVoiceSearchLaunch(intent)
         }
@@ -363,7 +360,7 @@ class SystemSearchActivity : DuckDuckGoActivity() {
                 autoCompleteLongPressClickListener = {
                     viewModel.userLongPressedAutocomplete(it)
                 },
-                omnibarPosition = settingsDataStore.omnibarPosition,
+                omnibarType = settingsDataStore.omnibarType,
             )
         binding.autocompleteSuggestions.adapter = autocompleteSuggestionsAdapter
 
@@ -417,7 +414,7 @@ class SystemSearchActivity : DuckDuckGoActivity() {
         } else {
             binding.rootView.removeView(binding.appBarLayout)
         }
-        viewModel.onOmnibarConfigured(settingsDataStore.omnibarPosition)
+        viewModel.onOmnibarConfigured(settingsDataStore.omnibarType)
     }
 
     private fun configureVoiceSearch() {

@@ -222,8 +222,7 @@ import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggesti
 import com.duckduckgo.browser.api.autocomplete.AutoCompleteSettings
 import com.duckduckgo.browser.api.brokensite.BrokenSiteContext
 import com.duckduckgo.browser.api.webviewcompat.WebViewCompatWrapper
-import com.duckduckgo.browser.ui.omnibar.OmnibarPosition.BOTTOM
-import com.duckduckgo.browser.ui.omnibar.OmnibarPosition.TOP
+import com.duckduckgo.browser.ui.omnibar.OmnibarType
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.test.InstantSchedulersRule
 import com.duckduckgo.common.ui.tabs.SwipingTabsFeature
@@ -675,7 +674,7 @@ class BrowserTabViewModelTest {
             whenever(mockSavedSitesRepository.getBookmarks()).thenReturn(bookmarksListFlow.consumeAsFlow())
             whenever(mockRemoteMessagingRepository.messageFlow()).thenReturn(remoteMessageFlow.consumeAsFlow())
             whenever(mockSettingsDataStore.automaticFireproofSetting).thenReturn(AutomaticFireproofSetting.ASK_EVERY_TIME)
-            whenever(mockSettingsDataStore.omnibarPosition).thenReturn(TOP)
+            whenever(mockSettingsDataStore.omnibarType).thenReturn(OmnibarType.SINGLE_TOP)
             whenever(mockSettingsDataStore.isFullUrlEnabled).then { isFullSiteAddressEnabled }
             whenever(mockSSLCertificatesFeature.allowBypass()).thenReturn(mockEnabledToggle)
             whenever(subscriptions.shouldLaunchPrivacyProForUrl(any())).thenReturn(false)
@@ -5337,7 +5336,7 @@ class BrowserTabViewModelTest {
     @Test
     fun whenRefreshIsTriggeredByUserThenPrivacyProtectionsPopupManagerIsNotifiedWithBottomPosition() =
         runTest {
-            whenever(mockSettingsDataStore.omnibarPosition).thenReturn(BOTTOM)
+            whenever(mockSettingsDataStore.omnibarType).thenReturn(OmnibarType.SINGLE_BOTTOM)
             testee.onRefreshRequested(triggeredByUser = false)
             verify(mockPrivacyProtectionsPopupManager, never()).onPageRefreshTriggeredByUser(isOmnibarAtTheTop = false)
             testee.onRefreshRequested(triggeredByUser = true)

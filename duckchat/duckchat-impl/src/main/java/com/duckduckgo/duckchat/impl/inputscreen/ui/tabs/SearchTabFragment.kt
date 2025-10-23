@@ -30,7 +30,7 @@ import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion
 import com.duckduckgo.browser.api.ui.BrowserScreens.PrivateSearchScreenNoParams
 import com.duckduckgo.browser.ui.autocomplete.BrowserAutoCompleteSuggestionsAdapter
-import com.duckduckgo.browser.ui.omnibar.OmnibarPosition
+import com.duckduckgo.browser.ui.omnibar.OmnibarType
 import com.duckduckgo.common.ui.DuckDuckGoFragment
 import com.duckduckgo.common.ui.view.dialog.TextAlertDialogBuilder
 import com.duckduckgo.common.ui.view.toPx
@@ -147,11 +147,11 @@ class SearchTabFragment : DuckDuckGoFragment(R.layout.fragment_search_tab) {
                 autoCompleteLongPressClickListener = {
                     viewModel.userLongPressedAutocomplete(it)
                 },
-                omnibarPosition =
+                omnibarType =
                 if (inputScreenConfigResolver.useTopBar()) {
-                    OmnibarPosition.TOP
+                    OmnibarType.SINGLE_TOP
                 } else {
-                    OmnibarPosition.BOTTOM
+                    OmnibarType.SINGLE_BOTTOM
                 },
             )
         binding.autoCompleteSuggestionsList.adapter = autoCompleteSuggestionsAdapter

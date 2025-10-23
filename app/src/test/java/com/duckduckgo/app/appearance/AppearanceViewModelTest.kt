@@ -21,14 +21,12 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import app.cash.turbine.test
 import com.duckduckgo.app.appearance.AppearanceViewModel.Command
-import com.duckduckgo.app.browser.omnibar.datastore.OmnibarDataStore
 import com.duckduckgo.app.icon.api.AppIcon
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.settings.clear.FireAnimation
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.tabs.store.TabSwitcherDataStore
-import com.duckduckgo.browser.ui.omnibar.OmnibarPosition.TOP
 import com.duckduckgo.browser.ui.omnibar.OmnibarType
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.ui.DuckDuckGoTheme
@@ -65,9 +63,6 @@ internal class AppearanceViewModelTest {
     private lateinit var mockAppSettingsDataStore: SettingsDataStore
 
     @Mock
-    private lateinit var mockOmnibarDataStore: OmnibarDataStore
-
-    @Mock
     private lateinit var mockPixel: Pixel
 
     @Mock
@@ -84,14 +79,13 @@ internal class AppearanceViewModelTest {
         whenever(mockAppSettingsDataStore.appIcon).thenReturn(AppIcon.DEFAULT)
         whenever(mockThemeSettingsDataStore.theme).thenReturn(DuckDuckGoTheme.SYSTEM_DEFAULT)
         whenever(mockAppSettingsDataStore.selectedFireAnimation).thenReturn(FireAnimation.HeroFire)
-        whenever(mockAppSettingsDataStore.omnibarPosition).thenReturn(TOP)
+        whenever(mockAppSettingsDataStore.omnibarType).thenReturn(OmnibarType.SINGLE_TOP)
         whenever(mockTabSwitcherDataStore.isTrackersAnimationInfoTileHidden()).thenReturn(flowOf(false))
 
         testee =
             AppearanceViewModel(
                 mockThemeSettingsDataStore,
                 mockAppSettingsDataStore,
-                mockOmnibarDataStore,
                 mockPixel,
                 coroutineTestRule.testDispatcherProvider,
                 mockTabSwitcherDataStore,
@@ -224,7 +218,7 @@ internal class AppearanceViewModelTest {
     fun whenOmnibarPositionUpdatedToBottom() =
         runTest {
             testee.setOmnibarType(OmnibarType.SINGLE_BOTTOM)
-            verify(mockOmnibarDataStore).setOmnibarType(OmnibarType.SINGLE_BOTTOM)
+            verify(mockAppSettingsDataStore).omnibarType = OmnibarType.SINGLE_BOTTOM
             verify(mockPixel).fire(AppPixelName.SETTINGS_ADDRESS_BAR_POSITION_SELECTED_BOTTOM)
         }
 
@@ -232,7 +226,7 @@ internal class AppearanceViewModelTest {
     fun whenOmnibarPositionUpdatedToTop() =
         runTest {
             testee.setOmnibarType(OmnibarType.SINGLE_TOP)
-            verify(mockOmnibarDataStore).setOmnibarType(OmnibarType.SINGLE_TOP)
+            verify(mockAppSettingsDataStore).omnibarType = OmnibarType.SINGLE_TOP
             verify(mockPixel).fire(AppPixelName.SETTINGS_ADDRESS_BAR_POSITION_SELECTED_TOP)
         }
 

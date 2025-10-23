@@ -20,7 +20,7 @@ import android.app.Activity
 import com.duckduckgo.app.onboarding.store.AppStage
 import com.duckduckgo.app.onboarding.store.UserStageStore
 import com.duckduckgo.app.settings.db.SettingsDataStore
-import com.duckduckgo.browser.ui.omnibar.OmnibarPosition
+import com.duckduckgo.browser.ui.omnibar.OmnibarType
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.utils.DefaultDispatcherProvider
 import com.duckduckgo.common.utils.DispatcherProvider
@@ -131,7 +131,7 @@ class RealNewAddressBarOptionManager @Inject constructor(
         }
 
     private fun isBottomAddressBarDisabled(): Boolean =
-        (settingsDataStore.omnibarPosition != OmnibarPosition.BOTTOM).also {
+        (settingsDataStore.omnibarType != OmnibarType.SINGLE_BOTTOM).also {
             logcat(DEBUG) { "NewAddressBarOptionManager: $it isBottomAddressBarDisabled" }
         }
 

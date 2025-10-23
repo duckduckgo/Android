@@ -40,7 +40,7 @@ import com.duckduckgo.browser.ui.databinding.ItemAutocompleteHistorySuggestionBi
 import com.duckduckgo.browser.ui.databinding.ItemAutocompleteInAppMessageBinding
 import com.duckduckgo.browser.ui.databinding.ItemAutocompleteSearchSuggestionBinding
 import com.duckduckgo.browser.ui.databinding.ItemAutocompleteSwitchToTabSuggestionBinding
-import com.duckduckgo.browser.ui.omnibar.OmnibarPosition
+import com.duckduckgo.browser.ui.omnibar.OmnibarType
 import com.duckduckgo.common.ui.view.MessageCta.Message
 import com.duckduckgo.mobile.android.R as CommonR
 
@@ -59,7 +59,7 @@ interface SuggestionViewHolderFactory {
 }
 
 class SearchSuggestionViewHolderFactory(
-    private val omnibarPosition: OmnibarPosition,
+    private val omnibarType: OmnibarType,
 ) : SuggestionViewHolderFactory {
     override fun onCreateViewHolder(parent: ViewGroup): AutoCompleteViewHolder {
         val inflater = LayoutInflater.from(parent.context)
@@ -81,7 +81,7 @@ class SearchSuggestionViewHolderFactory(
             suggestion as AutoCompleteSearchSuggestion,
             immediateSearchClickListener,
             editableSearchClickListener,
-            omnibarPosition,
+            omnibarType,
         )
     }
 }
@@ -209,7 +209,7 @@ class EmptySuggestionViewHolderFactory : SuggestionViewHolderFactory {
 }
 
 class DefaultSuggestionViewHolderFactory(
-    private val omnibarPosition: OmnibarPosition,
+    private val omnibarType: OmnibarType,
 ) : SuggestionViewHolderFactory {
     override fun onCreateViewHolder(parent: ViewGroup): AutoCompleteViewHolder {
         val inflater = LayoutInflater.from(parent.context)
@@ -232,7 +232,7 @@ class DefaultSuggestionViewHolderFactory(
         longPressClickListener: (AutoCompleteSuggestion) -> Unit,
     ) {
         val viewholder = holder as AutoCompleteViewHolder.DefaultSuggestionViewHolder
-        viewholder.bind(suggestion as AutoCompleteDefaultSuggestion, immediateSearchClickListener, omnibarPosition)
+        viewholder.bind(suggestion as AutoCompleteDefaultSuggestion, immediateSearchClickListener, omnibarType)
     }
 }
 
@@ -334,7 +334,7 @@ sealed class AutoCompleteViewHolder(
             item: AutoCompleteSearchSuggestion,
             immediateSearchListener: (AutoCompleteSuggestion) -> Unit,
             editableSearchClickListener: (AutoCompleteSuggestion) -> Unit,
-            omnibarPosition: OmnibarPosition,
+            omnibarType: OmnibarType,
         ) = with(binding) {
             phrase.text = item.phrase
 
@@ -345,7 +345,7 @@ sealed class AutoCompleteViewHolder(
             editQueryImage.setOnClickListener { editableSearchClickListener(item) }
             root.setOnClickListener { immediateSearchListener(item) }
 
-            if (omnibarPosition == OmnibarPosition.BOTTOM) {
+            if (omnibarType == OmnibarType.SINGLE_BOTTOM) {
                 editQueryImage.setImageResource(R.drawable.ic_arrow_circle_down_left_16)
             }
         }
@@ -431,12 +431,12 @@ sealed class AutoCompleteViewHolder(
         fun bind(
             item: AutoCompleteDefaultSuggestion,
             immediateSearchListener: (AutoCompleteSuggestion) -> Unit,
-            omnibarPosition: OmnibarPosition,
+            omnibarType: OmnibarType,
         ) {
             binding.phrase.text = item.phrase
             binding.root.setOnClickListener { immediateSearchListener(item) }
 
-            if (omnibarPosition == OmnibarPosition.BOTTOM) {
+            if (omnibarType == OmnibarType.SINGLE_BOTTOM) {
                 binding.editQueryImage.setImageResource(R.drawable.ic_arrow_circle_down_left_16)
             }
         }

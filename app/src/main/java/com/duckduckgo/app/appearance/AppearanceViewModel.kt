@@ -20,7 +20,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.webkit.WebViewFeature
 import com.duckduckgo.anvil.annotations.ContributesViewModel
-import com.duckduckgo.app.browser.omnibar.datastore.OmnibarDataStore
 import com.duckduckgo.app.icon.api.AppIcon
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_THEME_TOGGLED_DARK
@@ -54,7 +53,6 @@ import kotlin.to
 class AppearanceViewModel @Inject constructor(
     private val themingDataStore: ThemingDataStore,
     private val settingsDataStore: SettingsDataStore,
-    private val omnibarDataStore: OmnibarDataStore,
     private val pixel: Pixel,
     private val dispatcherProvider: DispatcherProvider,
     private val tabSwitcherDataStore: TabSwitcherDataStore,
@@ -92,7 +90,7 @@ class AppearanceViewModel @Inject constructor(
             canForceDarkMode = canForceDarkMode(),
             supportsForceDarkMode = WebViewFeature.isFeatureSupported(WebViewFeature.ALGORITHMIC_DARKENING),
             isFullUrlEnabled = settingsDataStore.isFullUrlEnabled,
-            omnibarType = omnibarDataStore.omnibarType,
+            omnibarType = settingsDataStore.omnibarType,
         ),
     )
 
@@ -150,7 +148,7 @@ class AppearanceViewModel @Inject constructor(
 
     fun setOmnibarType(type: OmnibarType) {
         viewModelScope.launch(dispatcherProvider.io()) {
-            omnibarDataStore.setOmnibarType(type)
+            settingsDataStore.omnibarType = type
             viewState.update { it.copy(omnibarType = type) }
 
             when (type) {

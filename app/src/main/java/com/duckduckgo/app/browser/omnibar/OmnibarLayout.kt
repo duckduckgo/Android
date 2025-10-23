@@ -92,9 +92,10 @@ import com.duckduckgo.app.browser.omnibar.model.Decoration.QueueCookiesAnimation
 import com.duckduckgo.app.browser.omnibar.model.StateChange
 import com.duckduckgo.app.global.view.renderIfChanged
 import com.duckduckgo.app.onboardingdesignexperiment.OnboardingDesignExperimentManager
+import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.trackerdetection.model.Entity
-import com.duckduckgo.browser.ui.omnibar.OmnibarPosition
+import com.duckduckgo.browser.ui.omnibar.OmnibarType
 import com.duckduckgo.browser.ui.tabs.TabSwitcherButton
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.view.KeyboardAwareEditText
@@ -188,6 +189,9 @@ class OmnibarLayout @JvmOverloads constructor(
     @Inject
     lateinit var addressBarTrackersAnimationFeatureToggle: AddressBarTrackersAnimationFeatureToggle
 
+    @Inject
+    lateinit var settingsDataStore: SettingsDataStore
+
     private var previousTransitionState: TransitionState? = null
 
     private val lifecycleOwner: LifecycleOwner by lazy {
@@ -238,17 +242,19 @@ class OmnibarLayout @JvmOverloads constructor(
 
     private var focusAnimator: ValueAnimator? = null
 
-    override val omnibarPosition: OmnibarPosition
+    override val omnibarType: OmnibarType
 
     init {
         inflate(context, R.layout.view_omnibar, this)
 
-        val attr = context.theme.obtainStyledAttributes(attrs, R.styleable.OmnibarLayout, defStyle, 0)
-        omnibarPosition = OmnibarPosition.entries[attr.getInt(R.styleable.OmnibarLayout_omnibarPosition, 0)]
-
         AndroidSupportInjection.inject(this)
 
-        renderPosition()
+        omnibarType = settingsDataStore.omnibarType
+
+        val attr = context.theme.obtainStyledAttributes(attrs, R.styleable.OmnibarLayout, defStyle, 0)
+        val isTopPosition = attr.getInt(R.styleable.OmnibarLayout_omnibarPosition, 0) == TOP_POSITION_INDEX
+
+        renderPosition(isTopPosition)
 
         if (Build.VERSION.SDK_INT >= 28) {
             omnibarCardShadow.addBottomShadow()
@@ -589,61 +595,57 @@ class OmnibarLayout @JvmOverloads constructor(
         }
     }
 
-    private fun renderPosition() {
-        when (omnibarPosition) {
-            OmnibarPosition.TOP -> {
-                if (Build.VERSION.SDK_INT < 28) {
-                    omnibarCardShadow.cardElevation = 2f.toPx(context)
-                }
+    private fun renderPosition(isTopPosition: Boolean) {
+        if (isTopPosition) {
+            if (Build.VERSION.SDK_INT < 28) {
+                omnibarCardShadow.cardElevation = 2f.toPx(context)
+            }
 
-                shieldIconPulseAnimationContainer.updateLayoutParams {
-                    (this as MarginLayoutParams).apply {
-                        if (addressBarTrackersAnimationFeatureToggle.feature().isEnabled()) {
-                            // TODO when the animation is made permanent we should add this adjustment to the actual layout
-                            marginStart = 1.toPx()
-                        }
+            shieldIconPulseAnimationContainer.updateLayoutParams {
+                (this as MarginLayoutParams).apply {
+                    if (addressBarTrackersAnimationFeatureToggle.feature().isEnabled()) {
+                        // TODO when the animation is made permanent we should add this adjustment to the actual layout
+                        marginStart = 1.toPx()
+                    }
+                }
+            }
+        } else {
+            // When omnibar is at the bottom, we're adding an additional space at the top
+            omnibarCardShadow.updateLayoutParams {
+                (this as MarginLayoutParams).apply {
+                    topMargin = experimentalOmnibarCardMarginBottom
+                    bottomMargin = experimentalOmnibarCardMarginTop
+                }
+            }
+
+            iconsContainer.updateLayoutParams {
+                (this as MarginLayoutParams).apply {
+                    topMargin = experimentalOmnibarCardMarginBottom
+                    bottomMargin = experimentalOmnibarCardMarginTop
+                }
+            }
+
+            shieldIconPulseAnimationContainer.updateLayoutParams {
+                (this as MarginLayoutParams).apply {
+                    topMargin = experimentalOmnibarCardMarginBottom
+                    bottomMargin = experimentalOmnibarCardMarginTop
+                    if (addressBarTrackersAnimationFeatureToggle.feature().isEnabled()) {
+                        // TODO when the animation is made permanent we should add this adjustment to the actual layout
+                        marginStart = 1.toPx()
                     }
                 }
             }
 
-            OmnibarPosition.BOTTOM -> {
-                // When omnibar is at the bottom, we're adding an additional space at the top
-                omnibarCardShadow.updateLayoutParams {
-                    (this as MarginLayoutParams).apply {
-                        topMargin = experimentalOmnibarCardMarginBottom
-                        bottomMargin = experimentalOmnibarCardMarginTop
-                    }
-                }
+            shieldIconPulseAnimationContainer.setPadding(
+                shieldIconPulseAnimationContainer.paddingLeft,
+                shieldIconPulseAnimationContainer.paddingTop,
+                shieldIconPulseAnimationContainer.paddingRight,
+                6.toPx(),
+            )
 
-                iconsContainer.updateLayoutParams {
-                    (this as MarginLayoutParams).apply {
-                        topMargin = experimentalOmnibarCardMarginBottom
-                        bottomMargin = experimentalOmnibarCardMarginTop
-                    }
-                }
-
-                shieldIconPulseAnimationContainer.updateLayoutParams {
-                    (this as MarginLayoutParams).apply {
-                        topMargin = experimentalOmnibarCardMarginBottom
-                        bottomMargin = experimentalOmnibarCardMarginTop
-                        if (addressBarTrackersAnimationFeatureToggle.feature().isEnabled()) {
-                            // TODO when the animation is made permanent we should add this adjustment to the actual layout
-                            marginStart = 1.toPx()
-                        }
-                    }
-                }
-
-                shieldIconPulseAnimationContainer.setPadding(
-                    shieldIconPulseAnimationContainer.paddingLeft,
-                    shieldIconPulseAnimationContainer.paddingTop,
-                    shieldIconPulseAnimationContainer.paddingRight,
-                    6.toPx(),
-                )
-
-                // Try to reduce the bottom omnibar material shadow when not using the custom shadow
-                if (Build.VERSION.SDK_INT < 28) {
-                    omnibarCardShadow.cardElevation = 0.5f.toPx(context)
-                }
+            // Try to reduce the bottom omnibar material shadow when not using the custom shadow
+            if (Build.VERSION.SDK_INT < 28) {
+                omnibarCardShadow.cardElevation = 0.5f.toPx(context)
             }
         }
     }
@@ -1099,15 +1101,15 @@ class OmnibarLayout @JvmOverloads constructor(
     override fun isBottomNavEnabled(): Boolean = false
 
     override fun getBehavior(): CoordinatorLayout.Behavior<AppBarLayout> =
-        when (omnibarPosition) {
-            OmnibarPosition.TOP -> TopAppBarBehavior(context, this)
-            OmnibarPosition.BOTTOM -> BottomAppBarBehavior(context, this)
+        when (omnibarType) {
+            OmnibarType.SINGLE_TOP, OmnibarType.SPLIT -> TopAppBarBehavior(context, this)
+            OmnibarType.SINGLE_BOTTOM -> BottomAppBarBehavior(context, this)
         }
 
     override fun setExpanded(expanded: Boolean) {
-        when (omnibarPosition) {
-            OmnibarPosition.TOP -> super.setExpanded(expanded)
-            OmnibarPosition.BOTTOM -> (behavior as BottomAppBarBehavior).setExpanded(expanded)
+        when (omnibarType) {
+            OmnibarType.SINGLE_TOP, OmnibarType.SPLIT -> super.setExpanded(expanded)
+            OmnibarType.SINGLE_BOTTOM -> (behavior as BottomAppBarBehavior).setExpanded(expanded)
         }
     }
 
@@ -1115,9 +1117,9 @@ class OmnibarLayout @JvmOverloads constructor(
         expanded: Boolean,
         animate: Boolean,
     ) {
-        when (omnibarPosition) {
-            OmnibarPosition.TOP -> super.setExpanded(expanded, animate)
-            OmnibarPosition.BOTTOM -> (behavior as BottomAppBarBehavior).setExpanded(expanded)
+        when (omnibarType) {
+            OmnibarType.SINGLE_TOP, OmnibarType.SPLIT -> super.setExpanded(expanded, animate)
+            OmnibarType.SINGLE_BOTTOM -> (behavior as BottomAppBarBehavior).setExpanded(expanded)
         }
     }
 
@@ -1180,5 +1182,9 @@ class OmnibarLayout @JvmOverloads constructor(
 
     override fun gone() {
         visibility = View.GONE
+    }
+
+    companion object {
+        private const val TOP_POSITION_INDEX = 0
     }
 }
