@@ -84,6 +84,16 @@
     <string name="subscriptionSettingSectionHelpAndSupport">Pomoc a podpora</string>
     <string name="subscriptionSettingSendFeedback">Odoslať spätnú väzbu</string>
     <string name="subscriptionSettingActivating">Aktivácia</string>
+    <string name="subscriptionSettingManageSubscription">Spravovať predplatné</string>
+    <string name="subscriptionSettingSwitchUpgrade">Prejdi na ročný plán ušetri 16 %</string>
+    <!-- smartling.character_limit = 10 -->
+    <string name="subscriptionSettingSwitchUpgradePill">Zľava!</string>
+    <string name="subscriptionSettingSwitchDowngrade">Zmeniť plán</string>
+    <string name="subscriptionSettingManagePlan">Spravovať plán a možnosti platby</string>
+    <!-- Change Plan -->
+    <string name="changePlanTitle">Aktualizovať plán alebo zrušiť</string>
+    <string name="changePlanDescription">Tvoje predplatné bolo zakúpené prostredníctvom obchodu Apple App Store. Ak chceš zmeniť svoje nastavenia plánu alebo fakturácie, prejdi do časti Nastavenia &gt; Apple účet &gt; Predplatné na zariadení prihlásenom do rovnakého Apple účtu, ktorý bol použitý na zakúpenie predplatného.</string>
+
 
     <!--Purchase Subscriptions-->
     <string name="purchaseCompletedTitle">Máš všetko pripravené.</string>
@@ -97,10 +107,6 @@
 
     <!-- ITR Settings-->
     <string name="itrSettingTitle" translatable="false">Identity Theft Restoration</string>
-
-    <!-- Change Plan -->
-    <string name="changePlanTitle">Aktualizovať plán alebo zrušiť</string>
-    <string name="changePlanDescription">Tvoje predplatné bolo zakúpené prostredníctvom obchodu Apple App Store. Ak chceš zmeniť svoje nastavenia plánu alebo fakturácie, prejdi do časti Nastavenia &gt; Apple účet &gt; Predplatné na zariadení prihlásenom do rovnakého Apple účtu, ktorý bol použitý na zakúpenie predplatného.</string>
 
     <!-- PIR Activity-->
     <string name="pirTitle">Aktivuj si Privacy Pro na pracovnej ploche a nastav si Personal Information Removal</string>
@@ -185,5 +191,15 @@
     <string name="subscriptionSettingSubscribeSecure">Zabezpeč si Wi-Fi a chatuj súkromne s pokročilými modelmi umelej inteligencie</string>
 
     <string name="feedbackGeneralSubscription">Predplatné</string>
+    
+    <!-- Switch plan-->
+    <string name="switchBottomSheetTitleUpgrade">Ušetri 16 % s\nročným plánom!</string>
+    <string name="switchBottomSheetDescriptionUpgrade">Ročný plán stojí len 8,33 EUR/mesiac v porovnaní s tvojím súčasným mesačným plánom za 9,99 EUR.</string>
+    <string name="switchBottomSheetPrimaryButtonUpgrade">Prejdi na ročné predplatné (99,99 EUR/rok)</string>
+    <string name="switchBottomSheetSecondaryButtonUpgrade">Zachovať mesačný plán</string>
+    <string name="switchBottomSheetTitleDowngrade">S\nročným plánom ušetríš 16 %!</string>
+    <string name="switchBottomSheetDescriptionDowngrade">Prechod zvýši tvoju mesačnú cenu z 8,33 EUR/mesiac na 9,99 EUR/mesiac.</string>
+    <string name="switchBottomSheetPrimaryButtonDowngrade">Ponechať ročný plán</string>
+    <string name="switchBottomSheetSecondaryButtonDowngrade">Prejdi na mesačný plán (9,99 EUR/mesiac)</string>
 
 </resources>
