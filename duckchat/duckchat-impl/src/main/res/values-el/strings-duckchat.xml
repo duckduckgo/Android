@@ -69,6 +69,7 @@
     <string name="autocompleteDeviceAppNotFound">Η εφαρμογή δεν βρέθηκε</string>
 
     <!-- New Address Bar Option Bottom Sheet Dialog -->
+    <string name="newAddressBarOptionBottomSheetDialogTitle">Θέλετε πιο εύκολη πρόσβαση στο ιδιωτικό AI chat;</string>
     <string name="newAddressBarOptionBottomSheetDialogSearchText">Αναζήτηση ή εισαγωγή διεύθυνσης</string>
     <string name="newAddressBarOptionBottomSheetDialogPrimaryButton">Επιβεβαίωση</string>
     <string name="newAddressBarOptionBottomSheetDialogGhostButton">Όχι τώρα</string>
