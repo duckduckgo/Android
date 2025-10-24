@@ -16,7 +16,8 @@ ext {
 
 android {
     defaultConfig {
-        applicationId "com.duckduckgo.mobile.android"
+//        applicationId "com.duckduckgo.mobile.android"
+        applicationId "com.duckduckgo.mobile.android.ntp_toggle_2310"
 
         minSdk min_sdk
         targetSdk target_sdk
@@ -138,8 +139,8 @@ android {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             manifestPlaceholders = [
-                    appIcon     : "@mipmap/ic_launcher_red",
-                    appIconRound: "@mipmap/ic_launcher_red_round"
+                    appIcon     : "@mipmap/ic_launcher_purple",
+                    appIconRound: "@mipmap/ic_launcher_purple_round"
             ]
 
             if (project.hasProperty('useUploadSigning')) {

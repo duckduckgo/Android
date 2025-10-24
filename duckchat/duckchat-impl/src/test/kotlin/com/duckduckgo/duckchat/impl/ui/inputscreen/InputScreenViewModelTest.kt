@@ -96,9 +96,10 @@ class InputScreenViewModelTest {
             whenever(voiceSearchAvailability.isVoiceSearchAvailable).thenReturn(true)
         }
 
-    private fun createViewModel(currentOmnibarText: String = ""): InputScreenViewModel =
+    private fun createViewModel(currentOmnibarText: String = "", searchMode: Boolean = true): InputScreenViewModel =
         InputScreenViewModel(
             currentOmnibarText = currentOmnibarText,
+            searchMode = searchMode,
             autoCompleteFactory = autoCompleteFactory,
             dispatchers = coroutineRule.testDispatcherProvider,
             history = history,
