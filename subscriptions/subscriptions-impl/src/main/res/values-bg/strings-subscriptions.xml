@@ -84,6 +84,16 @@
     <string name="subscriptionSettingSectionHelpAndSupport">Помощ и поддръжка</string>
     <string name="subscriptionSettingSendFeedback">Изпратете отзив</string>
     <string name="subscriptionSettingActivating">Активиране</string>
+    <string name="subscriptionSettingManageSubscription">Управление на абонамент</string>
+    <string name="subscriptionSettingSwitchUpgrade">Превключи на годишен план и спести 16%</string>
+    <!-- smartling.character_limit = 10 -->
+    <string name="subscriptionSettingSwitchUpgradePill">Най-изгодно</string>
+    <string name="subscriptionSettingSwitchDowngrade">Смяна на плана</string>
+    <string name="subscriptionSettingManagePlan">Управлявай плана и опциите за плащане</string>
+    <!-- Change Plan -->
+    <string name="changePlanTitle">Актуализиране или отмяна на плана</string>
+    <string name="changePlanDescription">Вашият абонамент е закупен през Apple App Store. За да промените плана или настройките за фактуриране, отидете на Настройки &gt; Apple Account &gt; Абонаменти на устройство, вписано със същия Apple Account, използван за закупуване на абонамента ви.</string>
+
 
     <!--Purchase Subscriptions-->
     <string name="purchaseCompletedTitle">Всичко е готово.</string>
@@ -97,10 +107,6 @@
 
     <!-- ITR Settings-->
     <string name="itrSettingTitle" translatable="false">Identity Theft Restoration</string>
-
-    <!-- Change Plan -->
-    <string name="changePlanTitle">Актуализиране или отмяна на плана</string>
-    <string name="changePlanDescription">Вашият абонамент е закупен през Apple App Store. За да промените плана или настройките за фактуриране, отидете на Настройки &gt; Apple Account &gt; Абонаменти на устройство, вписано със същия Apple Account, използван за закупуване на абонамента ви.</string>
 
     <!-- PIR Activity-->
     <string name="pirTitle">Активирайте Privacy Pro на настолен компютър, за да настроите Personal Information Removal</string>
@@ -185,5 +191,15 @@
     <string name="subscriptionSettingSubscribeSecure">Сигурна Wi-Fi мрежа и поверителен чат с усъвършенствани AI модели</string>
 
     <string name="feedbackGeneralSubscription">Абонамент</string>
+    
+    <!-- Switch plan-->
+    <string name="switchBottomSheetTitleUpgrade">Спести 16% с\nгодишен план!</string>
+    <string name="switchBottomSheetDescriptionUpgrade">Годишният план е само $8.33/месец, в сравнение с текущия ти месечен план от $9.99.</string>
+    <string name="switchBottomSheetPrimaryButtonUpgrade">Превключи на годишен план ($99,99/година)</string>
+    <string name="switchBottomSheetSecondaryButtonUpgrade">Запази месечен план</string>
+    <string name="switchBottomSheetTitleDowngrade">Спестяваш 16% с\nгодишен план!</string>
+    <string name="switchBottomSheetDescriptionDowngrade">Превключването ще увеличи месечната ти цена от $8.33/месец до $9.99/месец.</string>
+    <string name="switchBottomSheetPrimaryButtonDowngrade">Запази годишния план</string>
+    <string name="switchBottomSheetSecondaryButtonDowngrade">Превключи на месечен план ($9,99/месец)</string>
 
 </resources>

@@ -84,6 +84,16 @@
     <string name="subscriptionSettingSectionHelpAndSupport">Apu ja tuki</string>
     <string name="subscriptionSettingSendFeedback">Lähetä palautetta</string>
     <string name="subscriptionSettingActivating">Aktivoidaan</string>
+    <string name="subscriptionSettingManageSubscription">Hallitse tilausta</string>
+    <string name="subscriptionSettingSwitchUpgrade">Vaihda vuosisopimukseen ja säästä 16 %</string>
+    <!-- smartling.character_limit = 10 -->
+    <string name="subscriptionSettingSwitchUpgradePill">Paras ale</string>
+    <string name="subscriptionSettingSwitchDowngrade">Vaihda sopimusta</string>
+    <string name="subscriptionSettingManagePlan">Hallitse sopimusta ja maksuvaihtoehtoja</string>
+    <!-- Change Plan -->
+    <string name="changePlanTitle">Päivitä tilaus tai peruuta</string>
+    <string name="changePlanDescription">Tilauksesi on ostettu Applen App Storesta. Jos haluat muuttaa tilaustasi tai laskutusasetuksiasi, siirry kohtaan Asetukset &gt; Apple-tili &gt; Tilaukset sillä laitteella, jolla on kirjauduttu samalle Apple-tilille, jota käytit tilauksesi ostamiseen.</string>
+
 
     <!--Purchase Subscriptions-->
     <string name="purchaseCompletedTitle">Kaikki on valmista.</string>
@@ -97,10 +107,6 @@
 
     <!-- ITR Settings-->
     <string name="itrSettingTitle" translatable="false">Identity Theft Restoration</string>
-
-    <!-- Change Plan -->
-    <string name="changePlanTitle">Päivitä tilaus tai peruuta</string>
-    <string name="changePlanDescription">Tilauksesi on ostettu Applen App Storesta. Jos haluat muuttaa tilaustasi tai laskutusasetuksiasi, siirry kohtaan Asetukset &gt; Apple-tili &gt; Tilaukset sillä laitteella, jolla on kirjauduttu samalle Apple-tilille, jota käytit tilauksesi ostamiseen.</string>
 
     <!-- PIR Activity-->
     <string name="pirTitle">Aktivoi Privacy Pro tietokoneella Personal Information Removalin asentamiseksi</string>
@@ -185,5 +191,15 @@
     <string name="subscriptionSettingSubscribeSecure">Suojaa WiFi-yhteytesi ja keskustele yksityisesti edistyneiden tekoälymallien kanssa</string>
 
     <string name="feedbackGeneralSubscription">Tilaus</string>
+    
+    <!-- Switch plan-->
+    <string name="switchBottomSheetTitleUpgrade">Säästä 16 %\nvuosittaisella sopimuksella!</string>
+    <string name="switchBottomSheetDescriptionUpgrade">Vuosittainen sopimus maksaa vain 8,33 $/kk, verrattuna nykyiseen 9,99 $ kuukausisuunnitelmaan.</string>
+    <string name="switchBottomSheetPrimaryButtonUpgrade">Vaihda vuositilaukseen (99,99 $ / vuosi)</string>
+    <string name="switchBottomSheetSecondaryButtonUpgrade">Pidä kuukausisopimus</string>
+    <string name="switchBottomSheetTitleDowngrade">Säästät 16 %\nvuosisopimuksella!</string>
+    <string name="switchBottomSheetDescriptionDowngrade">Vaihtaminen nostaa kuukausihinnan 8,33 dollarista 9,99 dollariin.</string>
+    <string name="switchBottomSheetPrimaryButtonDowngrade">Säilytä vuosisuunnitelma</string>
+    <string name="switchBottomSheetSecondaryButtonDowngrade">Vaihda kuukausitilaukseen (9,99 $/kk)</string>
 
 </resources>
