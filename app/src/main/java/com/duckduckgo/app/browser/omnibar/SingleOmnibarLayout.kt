@@ -186,18 +186,34 @@ class SingleOmnibarLayout @JvmOverloads constructor(
 
     private fun renderDuckAiToggle(viewState: ViewState) {
         // When omnibar is at the bottom, we're removing the additional space at the top
-        if (viewState.showDuckAIToggle && omnibarPosition == OmnibarPosition.BOTTOM) {
-            omnibarCardShadow.updateLayoutParams {
-                (this as MarginLayoutParams).apply {
-                    topMargin = experimentalOmnibarCardMarginTop
-                    bottomMargin = experimentalOmnibarCardMarginBottom
+        if (omnibarPosition == OmnibarPosition.BOTTOM) {
+            if (viewState.showDuckAIToggle) {
+                omnibarCardShadow.updateLayoutParams {
+                    (this as MarginLayoutParams).apply {
+                        topMargin = experimentalOmnibarCardMarginTop
+                        bottomMargin = experimentalOmnibarCardMarginBottom
+                    }
                 }
-            }
 
-            iconsContainer.updateLayoutParams {
-                (this as MarginLayoutParams).apply {
-                    topMargin = experimentalOmnibarCardMarginTop
-                    bottomMargin = experimentalOmnibarCardMarginBottom
+                iconsContainer.updateLayoutParams {
+                    (this as MarginLayoutParams).apply {
+                        topMargin = experimentalOmnibarCardMarginTop
+                        bottomMargin = experimentalOmnibarCardMarginBottom
+                    }
+                }
+            } else {
+                omnibarCardShadow.updateLayoutParams {
+                    (this as MarginLayoutParams).apply {
+                        topMargin = experimentalOmnibarCardMarginBottom
+                        bottomMargin = experimentalOmnibarCardMarginBottom
+                    }
+                }
+
+                iconsContainer.updateLayoutParams {
+                    (this as MarginLayoutParams).apply {
+                        topMargin = experimentalOmnibarCardMarginBottom
+                        bottomMargin = experimentalOmnibarCardMarginBottom
+                    }
                 }
             }
         }
