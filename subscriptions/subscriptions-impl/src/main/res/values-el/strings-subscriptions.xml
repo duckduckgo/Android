@@ -162,6 +162,7 @@
 
     <string name="feedbackSubmitGeneralDescriptionHint">Στείλτε μας τα σχόλιά σας...</string>
     <string name="feedbackSubmitFeatureRequestDescriptionHint">Ποιες λειτουργίες θα θέλατε να δείτε;</string>
+    <string name="feedbackSubmitContactSupport">Χρειάζεστε βοήθεια; <annotation type="support_link">Επικοινωνήστε με την υποστήριξη</annotation>.</string>
 
     <!-- Activity titles -->
     <string name="activitySubscriptions">Συνδρομές</string>
