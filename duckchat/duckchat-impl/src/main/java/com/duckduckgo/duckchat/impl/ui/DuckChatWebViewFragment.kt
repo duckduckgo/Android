@@ -163,6 +163,7 @@ open class DuckChatWebViewFragment : DuckDuckGoFragment(R.layout.activity_duck_c
 
     // private val toolbar: Toolbar? by lazy { binding.includeToolbar.toolbar }
     internal val simpleWebview: WebView by lazy { binding.simpleWebview }
+    internal val tabSwitcher by lazy { binding.inputFieldTabsMenu }
 
     @SuppressLint("SetJavaScriptEnabled")
     override fun onViewCreated(
@@ -180,6 +181,7 @@ open class DuckChatWebViewFragment : DuckDuckGoFragment(R.layout.activity_duck_c
         // }
 
         val url = arguments?.getString(KEY_DUCK_AI_URL) ?: "https://duckduckgo.com/?q=DuckDuckGo+AI+Chat&ia=chat&duckai=5"
+        val tabs = arguments?.getInt(KEY_DUCK_AI_TABS) ?: 0
 
         simpleWebview.let {
             it.webViewClient = webViewClient
@@ -304,6 +306,8 @@ open class DuckChatWebViewFragment : DuckDuckGoFragment(R.layout.activity_duck_c
             }
             pendingUploadTask = null
         }
+
+        tabSwitcher.count = tabs
 
         // Observe ViewModel commands
         viewModel.commands
@@ -604,6 +608,6 @@ open class DuckChatWebViewFragment : DuckDuckGoFragment(R.layout.activity_duck_c
             "Mozilla/5.0 (Linux; Android 16) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/124.0.0.0 Mobile DuckDuckGo/5 Safari/537.36"
         private const val REQUEST_CODE_CHOOSE_FILE = 100
         const val KEY_DUCK_AI_URL: String = "KEY_DUCK_AI_URL"
-        const val KEY_DUCK_AI_URL: String = "KEY_TABS_URL"
+        const val KEY_DUCK_AI_TABS: String = "KEY_DUCK_AI_TABS"
     }
 }

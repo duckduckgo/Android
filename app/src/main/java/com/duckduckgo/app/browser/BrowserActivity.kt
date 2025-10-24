@@ -111,6 +111,7 @@ import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.impl.ui.DuckChatWebViewFragment
+import com.duckduckgo.duckchat.impl.ui.DuckChatWebViewFragment.Companion.KEY_DUCK_AI_TABS
 import com.duckduckgo.duckchat.impl.ui.DuckChatWebViewFragment.Companion.KEY_DUCK_AI_URL
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.savedsites.impl.bookmarks.BookmarksActivity.Companion.SAVED_SITE_URL_EXTRA
@@ -753,7 +754,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
             is Command.ShowSystemDefaultAppsActivity -> showSystemDefaultAppsActivity(command.intent)
             is Command.ShowSystemDefaultBrowserDialog -> showSystemDefaultBrowserDialog(command.intent)
             is Command.ShowUndoDeleteTabsMessage -> showTabsDeletedSnackbar(command.tabIds)
-            is Command.OpenDuckChat -> openDuckChat(command.duckChatUrl, command.duckChatSessionActive, command.withTransition)
+            is Command.OpenDuckChat -> openDuckChat(command.duckChatUrl, command.duckChatSessionActive, command.withTransition, command.tabs)
             Command.LaunchTabSwitcher -> currentTab?.launchTabSwitcherAfterTabsUndeleted()
         }
     }
@@ -856,15 +857,16 @@ open class BrowserActivity : DuckDuckGoActivity() {
         url: String?,
         duckChatSessionActive: Boolean,
         withTransition: Boolean,
+        tabs: Int,
     ) {
         duckAiFragment?.let { fragment ->
             if (duckChatSessionActive) {
                 restoreDuckChat(fragment, withTransition)
             } else {
-                launchNewDuckChat(url, withTransition)
+                launchNewDuckChat(url, withTransition, tabs)
             }
         } ?: run {
-            launchNewDuckChat(url, withTransition)
+            launchNewDuckChat(url, withTransition, tabs)
         }
 
         currentTab?.getOmnibar()?.omnibarView?.omnibarTextInput?.let {
@@ -875,6 +877,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
     private fun launchNewDuckChat(
         duckChatUrl: String?,
         withTransition: Boolean,
+        tabs: Int,
     ) {
         val wasFragmentVisible = duckAiFragment?.isVisible ?: false
         val fragment =
@@ -883,6 +886,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
                     arguments =
                         Bundle().apply {
                             putString(KEY_DUCK_AI_URL, duckChatUrl)
+                            putInt(KEY_DUCK_AI_TABS, tabs)
                         }
                 }
             }
