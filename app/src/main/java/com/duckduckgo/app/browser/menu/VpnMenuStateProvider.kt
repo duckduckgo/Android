@@ -18,6 +18,7 @@ package com.duckduckgo.app.browser.menu
 
 import com.duckduckgo.app.browser.viewstate.VpnMenuState
 import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.networkprotection.api.NetworkProtectionState
 import com.duckduckgo.subscriptions.api.Product.NetP
@@ -26,6 +27,7 @@ import com.duckduckgo.subscriptions.api.Subscriptions
 import com.squareup.anvil.annotations.ContributesBinding
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.flowOn
 import javax.inject.Inject
 
 interface VpnMenuStateProvider {
@@ -38,6 +40,7 @@ class VpnMenuStateProviderImpl @Inject constructor(
     private val networkProtectionState: NetworkProtectionState,
     private val androidBrowserConfigFeature: AndroidBrowserConfigFeature,
     private val vpnMenuStore: VpnMenuStore,
+    private val dispatcherProvider: DispatcherProvider,
 ) : VpnMenuStateProvider {
     override fun getVpnMenuState(): Flow<VpnMenuState> {
         return combine(
@@ -63,7 +66,7 @@ class VpnMenuStateProviderImpl @Inject constructor(
                     }
                 }
             }
-        }
+        }.flowOn(dispatcherProvider.io())
     }
 }
 
@@ -73,5 +76,6 @@ private fun SubscriptionStatus.isActive(): Boolean =
         SubscriptionStatus.NOT_AUTO_RENEWABLE,
         SubscriptionStatus.GRACE_PERIOD,
         -> true
+
         else -> false
     }
