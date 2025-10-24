@@ -84,6 +84,16 @@
     <string name="subscriptionSettingSectionHelpAndSupport">Pomoć i podrška</string>
     <string name="subscriptionSettingSendFeedback">Pošalji povratnu informaciju</string>
     <string name="subscriptionSettingActivating">Aktiviranje u tijeku...</string>
+    <string name="subscriptionSettingManageSubscription">Upravljaj pretplatom</string>
+    <string name="subscriptionSettingSwitchUpgrade">Prebaci se na godišnju pretplatu i uštedi 16 %</string>
+    <!-- smartling.character_limit = 10 -->
+    <string name="subscriptionSettingSwitchUpgradePill">Najbolja ponuda</string>
+    <string name="subscriptionSettingSwitchDowngrade">Promijeni plan</string>
+    <string name="subscriptionSettingManagePlan">Upravljaj planom i opcijama plaćanja</string>
+    <!-- Change Plan -->
+    <string name="changePlanTitle">Ažuriraj plan ili odustani</string>
+    <string name="changePlanDescription">Tvoja pretplata kupljena je putem Apple App Storea. Za promjenu postavki plana ili naplate, idi na Postavke &gt; Apple račun &gt; Pretplate na uređaju prijavljenom na isti Apple račun koji je korišten za kupnju pretplate.</string>
+
 
     <!--Purchase Subscriptions-->
     <string name="purchaseCompletedTitle">Sve je spremno.</string>
@@ -97,10 +107,6 @@
 
     <!-- ITR Settings-->
     <string name="itrSettingTitle" translatable="false">Identity Theft Restoration</string>
-
-    <!-- Change Plan -->
-    <string name="changePlanTitle">Ažuriraj plan ili odustani</string>
-    <string name="changePlanDescription">Tvoja pretplata kupljena je putem Apple App Storea. Za promjenu postavki plana ili naplate, idi na Postavke &gt; Apple račun &gt; Pretplate na uređaju prijavljenom na isti Apple račun koji je korišten za kupnju pretplate.</string>
 
     <!-- PIR Activity-->
     <string name="pirTitle">Aktiviraj Privacy Pro na radnoj površini kako bi postavio Personal Information Removal</string>
@@ -185,5 +191,15 @@
     <string name="subscriptionSettingSubscribeSecure">Osiguraj svoj Wi-Fi i privatno čavrljaj s naprednim AI modelima</string>
 
     <string name="feedbackGeneralSubscription">Pretplata</string>
+    
+    <!-- Switch plan-->
+    <string name="switchBottomSheetTitleUpgrade">Uštedi 16 % s\ngodišnjim planom!</string>
+    <string name="switchBottomSheetDescriptionUpgrade">Godišnji plan iznosi samo 8,33 USD/mjesečno, u usporedbi s tvojim sadašnjim mjesečnim planom od 9,99 USD.</string>
+    <string name="switchBottomSheetPrimaryButtonUpgrade">Prebaci se na godišnju pretplatu (99,99 USD/godišnje)</string>
+    <string name="switchBottomSheetSecondaryButtonUpgrade">Zadrži mjesečni plan</string>
+    <string name="switchBottomSheetTitleDowngrade">S godišnjim planom\nštediš 16 %!</string>
+    <string name="switchBottomSheetDescriptionDowngrade">Prebacivanje će povećati tvoju mjesečnu cijenu s 8,33 USD/mjesečno na 9,99 USD/mjesečno.</string>
+    <string name="switchBottomSheetPrimaryButtonDowngrade">Zadrži godišnji plan</string>
+    <string name="switchBottomSheetSecondaryButtonDowngrade">Prebaci se na mjesečnu pretplatu (9,99 USD/mjesečno)</string>
 
 </resources>
