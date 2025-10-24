@@ -297,10 +297,7 @@ class OmnibarLayoutViewModel @Inject constructor(
                     ),
                     updateOmnibarText = shouldUpdateOmnibarText,
                     omnibarText = omnibarText,
-                    showDuckAIToggle = shouldShowDuckAiToggle(
-                        viewMode = it.viewMode,
-                        true,
-                    ),
+                    showDuckAIToggle = shouldShowDuckAiToggle(viewMode = it.viewMode),
                 )
             }
         } else {
@@ -347,10 +344,7 @@ class OmnibarLayoutViewModel @Inject constructor(
                     ),
                     updateOmnibarText = shouldUpdateOmnibarText,
                     omnibarText = omnibarText,
-                    showDuckAIToggle = shouldShowDuckAiToggle(
-                        viewMode = it.viewMode,
-                        false,
-                    ),
+                    showDuckAIToggle = shouldShowDuckAiToggle(viewMode = it.viewMode),
                 )
             }
 
@@ -443,10 +437,7 @@ class OmnibarLayoutViewModel @Inject constructor(
                             showTabsMenu = false,
                             showFireIcon = false,
                             showShadows = true,
-                            showDuckAIToggle = shouldShowDuckAiToggle(
-                                viewMode = it.viewMode,
-                                it.hasFocus,
-                            ),
+                            showDuckAIToggle = shouldShowDuckAiToggle(viewMode = it.viewMode),
                         )
                     }
                 }
@@ -476,10 +467,7 @@ class OmnibarLayoutViewModel @Inject constructor(
                                 urlLoaded = _viewState.value.url,
                             ),
                             showShadows = false,
-                            showDuckAIToggle = shouldShowDuckAiToggle(
-                                viewMode = it.viewMode,
-                                it.hasFocus,
-                            ),
+                            showDuckAIToggle = shouldShowDuckAiToggle(viewMode = it.viewMode),
 
                         )
                     }
@@ -562,7 +550,7 @@ class OmnibarLayoutViewModel @Inject constructor(
         }
     }
 
-    private fun shouldShowDuckAiToggle(viewMode: ViewMode, hasFocus: Boolean): Boolean {
+    private fun shouldShowDuckAiToggle(viewMode: ViewMode): Boolean {
         // Duck.ai Toggle is shown if Duck.ai is enabled and we are in unfocused NTP
         val shouldShowDuckAI = duckAiFeatureState.showInputScreen.value && duckAiFeatureState.showToggleInNewTabPage.value && viewMode is NewTab
         logcat { "Omnibar: shouldShowDuckAiToggle $shouldShowDuckAI" }
@@ -630,10 +618,7 @@ class OmnibarLayoutViewModel @Inject constructor(
                     highlighted = decoration.fireButton,
                 ),
                 scrollingEnabled = !isScrollingDisabled,
-                showDuckAIToggle = shouldShowDuckAiToggle(
-                    viewMode = it.viewMode,
-                    it.hasFocus,
-                ),
+                showDuckAIToggle = shouldShowDuckAiToggle(viewMode = it.viewMode),
             )
         }
     }

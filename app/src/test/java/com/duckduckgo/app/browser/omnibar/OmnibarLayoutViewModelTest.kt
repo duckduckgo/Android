@@ -83,6 +83,7 @@ class OmnibarLayoutViewModelTest {
     private val duckAiFeatureState: DuckAiFeatureState = mock()
     private val duckAiShowOmnibarShortcutOnNtpAndOnFocusFlow = MutableStateFlow(true)
     private val duckAiShowOmnibarShortcutInAllStatesFlow = MutableStateFlow(true)
+    private val duckAiToggleInNewTabPageFlow = MutableStateFlow(true)
     private val duckAiShowInputScreenFlow = MutableStateFlow(false)
     private val settingsDataStore: SettingsDataStore = mock()
     private val mockAddressDisplayFormatter: AddressDisplayFormatter by lazy {
@@ -111,6 +112,7 @@ class OmnibarLayoutViewModelTest {
         whenever(duckPlayer.isDuckPlayerUri(DUCK_PLAYER_URL)).thenReturn(true)
         whenever(duckAiFeatureState.showOmnibarShortcutOnNtpAndOnFocus).thenReturn(duckAiShowOmnibarShortcutOnNtpAndOnFocusFlow)
         whenever(duckAiFeatureState.showOmnibarShortcutInAllStates).thenReturn(duckAiShowOmnibarShortcutInAllStatesFlow)
+        whenever(duckAiFeatureState.showToggleInNewTabPage).thenReturn(duckAiToggleInNewTabPageFlow)
         whenever(settingsDataStore.isFullUrlEnabled).thenReturn(true)
         whenever(duckAiFeatureState.showInputScreen).thenReturn(duckAiShowInputScreenFlow)
         whenever(serpEasterEggLogosToggles.feature()).thenReturn(mock())
@@ -1945,11 +1947,224 @@ class OmnibarLayoutViewModelTest {
         duckAiShowOmnibarShortcutOnNtpAndOnFocusFlow.value = false
         duckAiShowOmnibarShortcutInAllStatesFlow.value = true
         duckAiShowInputScreenFlow.value = true
+        duckAiToggleInNewTabPageFlow.value = true
         testee.onViewModeChanged(ViewMode.NewTab)
 
         testee.viewState.test {
             val viewState = awaitItem()
             assertFalse(viewState.showChatMenu)
+        }
+    }
+
+    @Test
+    fun whenShowToggleInNTPEnabledAndFocusGainedInNTPThenShowToggle() = runTest {
+        duckAiShowInputScreenFlow.value = true
+        duckAiToggleInNewTabPageFlow.value = true
+        testee.onViewModeChanged(ViewMode.NewTab)
+
+        testee.onOmnibarFocusChanged(true, QUERY)
+
+        testee.viewState.test {
+            val viewState = awaitItem()
+            assertTrue(viewState.showDuckAIToggle)
+        }
+    }
+
+    @Test
+    fun whenShowToggleInNTPEnabledAndFocusLostInNTPThenShowToggle() = runTest {
+        duckAiShowInputScreenFlow.value = true
+        duckAiToggleInNewTabPageFlow.value = true
+        testee.onViewModeChanged(ViewMode.NewTab)
+
+        testee.onOmnibarFocusChanged(false, QUERY)
+
+        testee.viewState.test {
+            val viewState = awaitItem()
+            assertTrue(viewState.showDuckAIToggle)
+        }
+    }
+
+    @Test
+    fun whenShowToggleInNTPEnabledAndInBrowserModeThenHideToggle() = runTest {
+        duckAiShowInputScreenFlow.value = true
+        duckAiToggleInNewTabPageFlow.value = true
+        testee.onViewModeChanged(ViewMode.Browser(QUERY))
+
+        testee.viewState.test {
+            val viewState = awaitItem()
+            assertFalse(viewState.showDuckAIToggle)
+        }
+    }
+
+    @Test
+    fun whenShowToggleInNTPEnabledAndInCustomTabModeThenHideToggle() = runTest {
+        duckAiShowInputScreenFlow.value = true
+        duckAiToggleInNewTabPageFlow.value = true
+
+        val expectedToolbarColor = 100
+        val expectedTitle = "example"
+        val expectedDomain = "example.com"
+        val expectedShowDuckPlayerIcon = false
+        testee.onViewModeChanged(
+            ViewMode.CustomTab(
+                toolbarColor = expectedToolbarColor,
+                title = expectedTitle,
+                domain = expectedDomain,
+                showDuckPlayerIcon = expectedShowDuckPlayerIcon,
+            ),
+        )
+
+        testee.viewState.test {
+            val viewState = awaitItem()
+            assertFalse(viewState.showDuckAIToggle)
+        }
+    }
+
+    @Test
+    fun whenShowToggleInNTPEnabledAndInErrorModeThenHideToggle() = runTest {
+        duckAiShowInputScreenFlow.value = true
+        duckAiToggleInNewTabPageFlow.value = true
+        testee.onViewModeChanged(ViewMode.Error)
+
+        testee.viewState.test {
+            val viewState = awaitItem()
+            assertFalse(viewState.showDuckAIToggle)
+        }
+    }
+
+    @Test
+    fun whenShowToggleInNTPEnabledAndInSSLWarningModeThenHideToggle() = runTest {
+        duckAiShowInputScreenFlow.value = true
+        duckAiToggleInNewTabPageFlow.value = true
+        testee.onViewModeChanged(ViewMode.SSLWarning)
+
+        testee.viewState.test {
+            val viewState = awaitItem()
+            assertFalse(viewState.showDuckAIToggle)
+        }
+    }
+
+    @Test
+    fun whenShowToggleInNTPEnabledAndInMaliciousSiteWarningModeThenHideToggle() = runTest {
+        duckAiShowInputScreenFlow.value = true
+        duckAiToggleInNewTabPageFlow.value = true
+        testee.onViewModeChanged(ViewMode.MaliciousSiteWarning)
+
+        testee.viewState.test {
+            val viewState = awaitItem()
+            assertFalse(viewState.showDuckAIToggle)
+        }
+    }
+
+    @Test
+    fun whenShowToggleInNTPEnabledAndInMErrorModeThenHideToggle() = runTest {
+        duckAiShowInputScreenFlow.value = true
+        duckAiToggleInNewTabPageFlow.value = true
+        testee.onViewModeChanged(ViewMode.Error)
+
+        testee.viewState.test {
+            val viewState = awaitItem()
+            assertFalse(viewState.showDuckAIToggle)
+        }
+    }
+
+    @Test
+    fun whenShowToggleInNTPEnabledAndItemHighlightedInNTPThenShowToggle() = runTest {
+        duckAiShowInputScreenFlow.value = true
+        duckAiToggleInNewTabPageFlow.value = true
+        testee.onViewModeChanged(ViewMode.NewTab)
+
+        testee.onHighlightItem(Decoration.HighlightOmnibarItem(true, true))
+
+        testee.viewState.test {
+            val viewState = awaitItem()
+            assertTrue(viewState.showDuckAIToggle)
+        }
+    }
+
+    @Test
+    fun whenShowToggleInNTPEnabledAndItemHighlightedInBrowserThenShowToggle() = runTest {
+        duckAiShowInputScreenFlow.value = true
+        duckAiToggleInNewTabPageFlow.value = true
+        testee.onViewModeChanged(ViewMode.Browser(QUERY))
+
+        testee.onHighlightItem(Decoration.HighlightOmnibarItem(true, true))
+
+        testee.viewState.test {
+            val viewState = awaitItem()
+            assertFalse(viewState.showDuckAIToggle)
+        }
+    }
+
+    @Test
+    fun whenShowToggleInNTPDisabledAndNTPModeThenHideToggle() = runTest {
+        duckAiShowInputScreenFlow.value = true
+        duckAiToggleInNewTabPageFlow.value = false
+        testee.onViewModeChanged(ViewMode.NewTab)
+
+        testee.viewState.test {
+            val viewState = awaitItem()
+            assertFalse(viewState.showDuckAIToggle)
+        }
+    }
+
+    @Test
+    fun whenShowToggleInDisabledAndBrowserThenHideToggle() = runTest {
+        duckAiShowInputScreenFlow.value = true
+        duckAiToggleInNewTabPageFlow.value = false
+        testee.onViewModeChanged(ViewMode.Browser(QUERY))
+
+        testee.viewState.test {
+            val viewState = awaitItem()
+            assertFalse(viewState.showDuckAIToggle)
+        }
+    }
+
+    @Test
+    fun whenShowToggleInNTPEnabledAndInputScreenDisabledAndNTPModeThenHideToggle() = runTest {
+        duckAiShowInputScreenFlow.value = false
+        duckAiToggleInNewTabPageFlow.value = true
+        testee.onViewModeChanged(ViewMode.NewTab)
+
+        testee.viewState.test {
+            val viewState = awaitItem()
+            assertFalse(viewState.showDuckAIToggle)
+        }
+    }
+
+    @Test
+    fun whenShowToggleInNTPEnabledAndInputScreenDisabledAndBrowserModeThenHideToggle() = runTest {
+        duckAiShowInputScreenFlow.value = false
+        duckAiToggleInNewTabPageFlow.value = true
+        testee.onViewModeChanged(ViewMode.Browser(QUERY))
+
+        testee.viewState.test {
+            val viewState = awaitItem()
+            assertFalse(viewState.showDuckAIToggle)
+        }
+    }
+
+    @Test
+    fun whenShowToggleInNTPDisabledAndInputScreenDisabledAndBrowserModeThenHideToggle() = runTest {
+        duckAiShowInputScreenFlow.value = false
+        duckAiToggleInNewTabPageFlow.value = false
+        testee.onViewModeChanged(ViewMode.Browser(QUERY))
+
+        testee.viewState.test {
+            val viewState = awaitItem()
+            assertFalse(viewState.showDuckAIToggle)
+        }
+    }
+
+    @Test
+    fun whenShowToggleInNTPDisabledAndInputScreenDisabledAndNTPModeThenHideToggle() = runTest {
+        duckAiShowInputScreenFlow.value = false
+        duckAiToggleInNewTabPageFlow.value = false
+        testee.onViewModeChanged(ViewMode.Browser(QUERY))
+
+        testee.viewState.test {
+            val viewState = awaitItem()
+            assertFalse(viewState.showDuckAIToggle)
         }
     }
 }
