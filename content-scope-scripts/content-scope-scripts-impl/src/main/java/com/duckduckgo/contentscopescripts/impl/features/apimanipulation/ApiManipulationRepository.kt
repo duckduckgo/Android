@@ -22,6 +22,7 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.contentscopescripts.impl.features.apimanipulation.store.ApiManipulationStore
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
+import dagger.SingleInstanceIn
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -48,6 +49,7 @@ interface ApiManipulationRepository {
     fun getJsonData(): String
 }
 
+@SingleInstanceIn(AppScope::class)
 @ContributesBinding(AppScope::class)
 class RealApiManipulationRepository @Inject constructor(
     private val apiManipulationStore: ApiManipulationStore,
@@ -67,7 +69,11 @@ class RealApiManipulationRepository @Inject constructor(
     }
 
     override suspend fun insertJsonData(jsonData: String): Boolean {
-        return withContext(dispatcherProvider.io()) { apiManipulationStore.insertJsonData(jsonData) }
+        val success = withContext(dispatcherProvider.io()) { apiManipulationStore.insertJsonData(jsonData) }
+        if (success) {
+            this.jsonData = jsonData
+        }
+        return success
     }
 
     override fun getJsonData(): String {
