@@ -192,7 +192,7 @@ class OmnibarLayoutViewModel @Inject constructor(
         data class StartTrackersAnimation(val entities: List<Entity>?) : Command()
         data class StartCookiesAnimation(val isCosmetic: Boolean) : Command()
         data object MoveCaretToFront : Command()
-        data class LaunchInputScreen(val query: String, val fromNTP: Boolean) : Command()
+        data class LaunchInputScreen(val query: String, val duckAiToggleVisible: Boolean) : Command()
         data class EasterEggLogoClicked(val url: String) : Command()
     }
 
@@ -930,7 +930,8 @@ class OmnibarLayoutViewModel @Inject constructor(
             } else {
                 omnibarText
             }
-            command.send(Command.LaunchInputScreen(query = textToPreFill, fromNTP = viewState.value.viewMode == ViewMode.NewTab))
+            val duckAiToggleVisible = viewState.value.viewMode == ViewMode.NewTab
+            command.send(Command.LaunchInputScreen(query = textToPreFill, duckAiToggleVisible = duckAiToggleVisible))
         }
     }
 

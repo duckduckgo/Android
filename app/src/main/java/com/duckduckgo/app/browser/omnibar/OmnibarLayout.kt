@@ -598,7 +598,7 @@ open class OmnibarLayout @JvmOverloads constructor(
                 omnibarInputScreenLaunchListener?.onLaunchInputScreen(
                     query = command.query,
                     searchMode = duckAiToggle.selectedTabPosition == 0,
-                    fromNTP = command.fromNTP,
+                    duckAiToggleVisible = command.duckAiToggleVisible,
                 )
             }
 

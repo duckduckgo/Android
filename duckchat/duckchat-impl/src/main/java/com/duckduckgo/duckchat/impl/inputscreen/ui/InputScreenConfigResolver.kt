@@ -29,6 +29,7 @@ import javax.inject.Inject
 
 interface InputScreenConfigResolver {
     val isTopOmnibar: Boolean
+    val duckAiToggleVisible: Boolean
 
     fun shouldShowInstalledApps(): Boolean
 
@@ -54,6 +55,10 @@ class InputScreenConfigResolverImpl @Inject constructor(
 
     override val isTopOmnibar: Boolean by lazy {
         appCompatActivity.intent.getActivityParams(InputScreenActivityParams::class.java)?.isTopOmnibar ?: true
+    }
+
+    override val duckAiToggleVisible: Boolean by lazy {
+        appCompatActivity.intent.getActivityParams(InputScreenActivityParams::class.java)?.fromNTP ?: true
     }
 
     override fun shouldShowInstalledApps(): Boolean {

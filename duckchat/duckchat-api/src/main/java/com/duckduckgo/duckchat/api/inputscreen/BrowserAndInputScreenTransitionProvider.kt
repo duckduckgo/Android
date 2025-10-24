@@ -20,11 +20,11 @@ package com.duckduckgo.duckchat.api.inputscreen
  * Provides animation resources for activity transitions between browser and input screen.
  */
 interface BrowserAndInputScreenTransitionProvider {
-    fun getBrowserEnterAnimation(isTopOmnibar: Boolean, fromNTP: Boolean): Int
+    fun getBrowserEnterAnimation(isTopOmnibar: Boolean, duckAiToggleVisible: Boolean): Int
 
-    fun getBrowserExitAnimation(isTopOmnibar: Boolean, fromNTP: Boolean): Int
+    fun getBrowserExitAnimation(isTopOmnibar: Boolean, duckAiToggleVisible: Boolean): Int
 
-    fun getInputScreenEnterAnimation(isTopOmnibar: Boolean, fromNTP: Boolean): Int
+    fun getInputScreenEnterAnimation(isTopOmnibar: Boolean, duckAiToggleVisible: Boolean): Int
 
-    fun getInputScreenExitAnimation(isTopOmnibar: Boolean, fromNTP: Boolean): Int
+    fun getInputScreenExitAnimation(isTopOmnibar: Boolean, duckAiToggleVisible: Boolean): Int
 }

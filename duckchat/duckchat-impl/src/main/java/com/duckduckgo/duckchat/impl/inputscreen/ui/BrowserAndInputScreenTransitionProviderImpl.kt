@@ -57,8 +57,8 @@ class BrowserAndInputScreenTransitionProviderImpl @Inject constructor(
     private val appTheme: AppTheme,
     private val duckChatInternal: DuckChatInternal,
 ) : BrowserAndInputScreenTransitionProvider {
-    override fun getBrowserEnterAnimation(isTopOmnibar: Boolean, fromNTP: Boolean): Int =
-        if (fromNTP) {
+    override fun getBrowserEnterAnimation(isTopOmnibar: Boolean, duckAiToggleVisible: Boolean): Int =
+        if (duckAiToggleVisible && duckChatInternal.showToggleInNewTabPage.value) {
             NO_ANIMATION
         } else if (VERSION.SDK_INT >= 33) {
             if (appTheme.isLightModeEnabled()) {
@@ -78,8 +78,8 @@ class BrowserAndInputScreenTransitionProviderImpl @Inject constructor(
             R.anim.fade_in
         }
 
-    override fun getBrowserExitAnimation(isTopOmnibar: Boolean, fromNTP: Boolean): Int =
-        if (fromNTP) {
+    override fun getBrowserExitAnimation(isTopOmnibar: Boolean, duckAiToggleVisible: Boolean): Int =
+        if (duckAiToggleVisible && duckChatInternal.showToggleInNewTabPage.value) {
             NO_ANIMATION
         } else if (VERSION.SDK_INT >= 33) {
             if (appTheme.isLightModeEnabled()) {
@@ -99,8 +99,8 @@ class BrowserAndInputScreenTransitionProviderImpl @Inject constructor(
             R.anim.fade_out
         }
 
-    override fun getInputScreenEnterAnimation(isTopOmnibar: Boolean, fromNTP: Boolean): Int =
-        if (fromNTP) {
+    override fun getInputScreenEnterAnimation(isTopOmnibar: Boolean, duckAiToggleVisible: Boolean): Int =
+        if (duckAiToggleVisible && duckChatInternal.showToggleInNewTabPage.value) {
             NO_ANIMATION
         } else if (VERSION.SDK_INT >= 33 && useTopBar(isTopOmnibar, duckChatInternal)) {
             R.anim.slide_in_from_top_fade_in
@@ -108,8 +108,8 @@ class BrowserAndInputScreenTransitionProviderImpl @Inject constructor(
             R.anim.fade_in
         }
 
-    override fun getInputScreenExitAnimation(isTopOmnibar: Boolean, fromNTP: Boolean): Int =
-        if (fromNTP) {
+    override fun getInputScreenExitAnimation(isTopOmnibar: Boolean, duckAiToggleVisible: Boolean): Int =
+        if (duckAiToggleVisible && duckChatInternal.showToggleInNewTabPage.value) {
             NO_ANIMATION
         } else if (VERSION.SDK_INT >= 33 && useTopBar(isTopOmnibar, duckChatInternal)) {
             R.anim.slide_out_to_top_fade_out

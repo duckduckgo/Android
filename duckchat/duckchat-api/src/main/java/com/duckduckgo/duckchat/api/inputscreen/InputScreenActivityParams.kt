@@ -38,6 +38,8 @@ data class InputScreenActivityParams(
     val showInstalledApps: Boolean = false,
     val launchWithVoice: Boolean = false,
     val isSearchMode: Boolean = true,
+    val fromNTP: Boolean = false,
+
 ) : GlobalActivityStarter.ActivityParams
 
 /**
