@@ -84,6 +84,16 @@
     <string name="subscriptionSettingSectionHelpAndSupport">Ajutor și suport</string>
     <string name="subscriptionSettingSendFeedback">Trimite feedback</string>
     <string name="subscriptionSettingActivating">Se activează</string>
+    <string name="subscriptionSettingManageSubscription">Gestionează abonamentul</string>
+    <string name="subscriptionSettingSwitchUpgrade">Treci la abonamentul anual și economisește 16%</string>
+    <!-- smartling.character_limit = 10 -->
+    <string name="subscriptionSettingSwitchUpgradePill">Cea mai bună ofertă</string>
+    <string name="subscriptionSettingSwitchDowngrade">Schimbă planul</string>
+    <string name="subscriptionSettingManagePlan">Gestionează planul și opțiunile de plată</string>
+    <!-- Change Plan -->
+    <string name="changePlanTitle">Actualizează planul sau anulează</string>
+    <string name="changePlanDescription">Abonamentul tău a fost achiziționat prin Apple App Store. Pentru a-ți modifica planul sau setările de facturare, accesează Setări &gt; Cont Apple &gt; Abonamente pe un dispozitiv conectat la același cont Apple folosit pentru achiziționarea abonamentului.</string>
+
 
     <!--Purchase Subscriptions-->
     <string name="purchaseCompletedTitle">Ești gata.</string>
@@ -97,10 +107,6 @@
 
     <!-- ITR Settings-->
     <string name="itrSettingTitle" translatable="false">Identity Theft Restoration</string>
-
-    <!-- Change Plan -->
-    <string name="changePlanTitle">Actualizează planul sau anulează</string>
-    <string name="changePlanDescription">Abonamentul tău a fost achiziționat prin Apple App Store. Pentru a-ți modifica planul sau setările de facturare, accesează Setări &gt; Cont Apple &gt; Abonamente pe un dispozitiv conectat la același cont Apple folosit pentru achiziționarea abonamentului.</string>
 
     <!-- PIR Activity-->
     <string name="pirTitle">Activează Privacy Pro pe desktop pentru a configura Personal Information Removal</string>
@@ -185,5 +191,15 @@
     <string name="subscriptionSettingSubscribeSecure">Asigură-ți rețeaua Wi-Fi și discută în privat cu modele avansate de IA</string>
 
     <string name="feedbackGeneralSubscription">Abonament</string>
+    
+    <!-- Switch plan-->
+    <string name="switchBottomSheetTitleUpgrade">Economisește 16% cu\n un plan anual!</string>
+    <string name="switchBottomSheetDescriptionUpgrade">Un plan anual costă doar 8,33 USD/lună, comparativ cu planul tău lunar actual de 9,99 USD.</string>
+    <string name="switchBottomSheetPrimaryButtonUpgrade">Treci la planul anual (99,99 USD/an)</string>
+    <string name="switchBottomSheetSecondaryButtonUpgrade">Păstrează planul lunar</string>
+    <string name="switchBottomSheetTitleDowngrade">Economisești 16% \ncu un plan anual!</string>
+    <string name="switchBottomSheetDescriptionDowngrade">Această schimbare va majora prețul lunar de la 8,33 USD/lună la 9,99 USD/lună.</string>
+    <string name="switchBottomSheetPrimaryButtonDowngrade">Păstrează planul anual</string>
+    <string name="switchBottomSheetSecondaryButtonDowngrade">Treci la planul lunar (9,99 USD/lună)</string>
 
 </resources>
