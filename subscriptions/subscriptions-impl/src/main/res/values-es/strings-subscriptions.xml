@@ -84,6 +84,16 @@
     <string name="subscriptionSettingSectionHelpAndSupport">Ayuda y asistencia</string>
     <string name="subscriptionSettingSendFeedback">Enviar comentarios</string>
     <string name="subscriptionSettingActivating">Activando</string>
+    <string name="subscriptionSettingManageSubscription">Gestionar suscripción</string>
+    <string name="subscriptionSettingSwitchUpgrade">Cambia a un plan anual y ahorra un 16 %</string>
+    <!-- smartling.character_limit = 10 -->
+    <string name="subscriptionSettingSwitchUpgradePill">Mejor oferta</string>
+    <string name="subscriptionSettingSwitchDowngrade">Cambiar de plan</string>
+    <string name="subscriptionSettingManagePlan">Gestionar plan y opciones de pago</string>
+    <!-- Change Plan -->
+    <string name="changePlanTitle">Actualizar el plan o cancelar</string>
+    <string name="changePlanDescription">Has adquirido tu suscripción a través de la App Store de Apple. Para cambiar tu plan o la configuración de facturación, ve a Ajustes &gt; Cuenta de Apple &gt; Suscripciones en un dispositivo con la misma Cuenta de Apple que usaste para comprar tu suscripción.</string>
+
 
     <!--Purchase Subscriptions-->
     <string name="purchaseCompletedTitle">¡Todo listo!</string>
@@ -97,10 +107,6 @@
 
     <!-- ITR Settings-->
     <string name="itrSettingTitle" translatable="false">Identity Theft Restoration</string>
-
-    <!-- Change Plan -->
-    <string name="changePlanTitle">Actualizar el plan o cancelar</string>
-    <string name="changePlanDescription">Has adquirido tu suscripción a través de la App Store de Apple. Para cambiar tu plan o la configuración de facturación, ve a Ajustes &gt; Cuenta de Apple &gt; Suscripciones en un dispositivo con la misma Cuenta de Apple que usaste para comprar tu suscripción.</string>
 
     <!-- PIR Activity-->
     <string name="pirTitle">Activa Privacy Pro en el escritorio para configurar Personal Information Removal</string>
@@ -185,5 +191,15 @@
     <string name="subscriptionSettingSubscribeSecure">Protege tu Wi-Fi y chatea de forma privada con modelos avanzados de IA</string>
 
     <string name="feedbackGeneralSubscription">Suscripción</string>
+    
+    <!-- Switch plan-->
+    <string name="switchBottomSheetTitleUpgrade">Ahorra un 16 % con\nun plan anual.</string>
+    <string name="switchBottomSheetDescriptionUpgrade">El plan anual solo cuesta 8,33 $/mes, en comparación con tu plan actual de 9,99 $/mes</string>
+    <string name="switchBottomSheetPrimaryButtonUpgrade">Cambiar a un plan anual (99,99 $/año)</string>
+    <string name="switchBottomSheetSecondaryButtonUpgrade">Mantener el plan mensual</string>
+    <string name="switchBottomSheetTitleDowngrade">¡Te ahorras un 16 %\ncon un plan anual!</string>
+    <string name="switchBottomSheetDescriptionDowngrade">Si te cambias, el precio al mes pasará de ser de 8,33 $/mes a 9,99 $/mes.</string>
+    <string name="switchBottomSheetPrimaryButtonDowngrade">Mantener el plan anual</string>
+    <string name="switchBottomSheetSecondaryButtonDowngrade">Cambiar a plan mensual (9,99 $/mes)</string>
 
 </resources>
