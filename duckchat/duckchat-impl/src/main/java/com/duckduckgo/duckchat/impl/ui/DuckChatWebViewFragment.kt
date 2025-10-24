@@ -37,7 +37,6 @@ import android.webkit.WebChromeClient.FileChooserParams
 import android.webkit.WebSettings
 import android.webkit.WebView
 import androidx.annotation.AnyThread
-import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
@@ -161,7 +160,8 @@ open class DuckChatWebViewFragment : DuckDuckGoFragment(R.layout.activity_duck_c
     private var pendingUploadTask: ValueCallback<Array<Uri>>? = null
 
     private val root: ViewGroup by lazy { binding.root }
-    private val toolbar: Toolbar? by lazy { binding.includeToolbar.toolbar }
+
+    // private val toolbar: Toolbar? by lazy { binding.includeToolbar.toolbar }
     internal val simpleWebview: WebView by lazy { binding.simpleWebview }
 
     @SuppressLint("SetJavaScriptEnabled")
@@ -171,13 +171,13 @@ open class DuckChatWebViewFragment : DuckDuckGoFragment(R.layout.activity_duck_c
     ) {
         super.onViewCreated(view, savedInstanceState)
 
-        toolbar?.let {
-            it.setNavigationIcon(com.duckduckgo.mobile.android.R.drawable.ic_arrow_left_24)
-            it.setNavigationOnClickListener {
-                requireActivity().onBackPressed()
-            }
-            it.setTitle(R.string.duck_chat_title)
-        }
+        // toolbar?.let {
+        //     it.setNavigationIcon(com.duckduckgo.mobile.android.R.drawable.ic_arrow_left_24)
+        //     it.setNavigationOnClickListener {
+        //         requireActivity().onBackPressed()
+        //     }
+        //     it.setTitle(R.string.duck_chat_title)
+        // }
 
         val url = arguments?.getString(KEY_DUCK_AI_URL) ?: "https://duckduckgo.com/?q=DuckDuckGo+AI+Chat&ia=chat&duckai=5"
 
@@ -604,5 +604,6 @@ open class DuckChatWebViewFragment : DuckDuckGoFragment(R.layout.activity_duck_c
             "Mozilla/5.0 (Linux; Android 16) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/124.0.0.0 Mobile DuckDuckGo/5 Safari/537.36"
         private const val REQUEST_CODE_CHOOSE_FILE = 100
         const val KEY_DUCK_AI_URL: String = "KEY_DUCK_AI_URL"
+        const val KEY_DUCK_AI_URL: String = "KEY_TABS_URL"
     }
 }
