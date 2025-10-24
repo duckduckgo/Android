@@ -84,6 +84,16 @@
     <string name="subscriptionSettingSectionHelpAndSupport">Segítség és támogatás</string>
     <string name="subscriptionSettingSendFeedback">Visszajelzés küldése</string>
     <string name="subscriptionSettingActivating">Aktiválás</string>
+    <string name="subscriptionSettingManageSubscription">Előfizetés kezelése</string>
+    <string name="subscriptionSettingSwitchUpgrade">Válts éves előfizetésre, és takaríts meg 16%-ot</string>
+    <!-- smartling.character_limit = 10 -->
+    <string name="subscriptionSettingSwitchUpgradePill">Legjobb ajánlat</string>
+    <string name="subscriptionSettingSwitchDowngrade">Csomagváltás</string>
+    <string name="subscriptionSettingManagePlan">Csomag és fizetési lehetőségek kezelése</string>
+    <!-- Change Plan -->
+    <string name="changePlanTitle">Csomag frissítése vagy lemondása</string>
+    <string name="changePlanDescription">Előfizetésed az Apple App Store áruházban lett megvásárolva. A csomag vagy a számlázási beállítások módosításához lépj a Beállítások &gt; Apple-fiók &gt; Előfizetések menüpontra egy olyan eszközön, amely ugyanabba az Apple-fiókba van bejelentkezve, mint amellyel az előfizetés meg lett vásárolva.</string>
+
 
     <!--Purchase Subscriptions-->
     <string name="purchaseCompletedTitle">Minden készen áll.</string>
@@ -97,10 +107,6 @@
 
     <!-- ITR Settings-->
     <string name="itrSettingTitle" translatable="false">Identity Theft Restoration</string>
-
-    <!-- Change Plan -->
-    <string name="changePlanTitle">Csomag frissítése vagy lemondása</string>
-    <string name="changePlanDescription">Előfizetésed az Apple App Store áruházban lett megvásárolva. A csomag vagy a számlázási beállítások módosításához lépj a Beállítások &gt; Apple-fiók &gt; Előfizetések menüpontra egy olyan eszközön, amely ugyanabba az Apple-fiókba van bejelentkezve, mint amellyel az előfizetés meg lett vásárolva.</string>
 
     <!-- PIR Activity-->
     <string name="pirTitle">Privacy Pro aktiválása asztali számítógépen a Personal Information Removal beállításához</string>
@@ -185,5 +191,15 @@
     <string name="subscriptionSettingSubscribeSecure">A Wi-Fi biztonságossá tétele, és privát csevegés a fejlett AI-modellekkel</string>
 
     <string name="feedbackGeneralSubscription">Előfizetés</string>
+    
+    <!-- Switch plan-->
+    <string name="switchBottomSheetTitleUpgrade">Takaríts meg 16%-ot\naz éves csomaggal!</string>
+    <string name="switchBottomSheetDescriptionUpgrade">Az éves csomag díja mindössze 8,33 USD/hó, szemben a jelenlegi havi csomagod 9,99 USD/hó díjával.</string>
+    <string name="switchBottomSheetPrimaryButtonUpgrade">Váltás éves előfizetésre (99,99 USD/év)</string>
+    <string name="switchBottomSheetSecondaryButtonUpgrade">Havi csomag megtartása</string>
+    <string name="switchBottomSheetTitleDowngrade">16%-ot takarítasz meg\naz éves csomaggal!</string>
+    <string name="switchBottomSheetDescriptionDowngrade">A váltással 8,33 USD/hó összegről 9,99 USD/hó összegre nő a havi díjad.</string>
+    <string name="switchBottomSheetPrimaryButtonDowngrade">Éves csomag megtartása</string>
+    <string name="switchBottomSheetSecondaryButtonDowngrade">Váltás havi előfizetésre (9,99 USD/hó)</string>
 
 </resources>
