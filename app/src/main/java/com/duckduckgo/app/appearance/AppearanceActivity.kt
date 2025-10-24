@@ -43,20 +43,28 @@ import com.duckduckgo.common.ui.DuckDuckGoTheme.DARK
 import com.duckduckgo.common.ui.DuckDuckGoTheme.LIGHT
 import com.duckduckgo.common.ui.DuckDuckGoTheme.SYSTEM_DEFAULT
 import com.duckduckgo.common.ui.sendThemeChangedBroadcast
+import com.duckduckgo.common.ui.store.AppTheme
 import com.duckduckgo.common.ui.view.dialog.RadioListAlertDialogBuilder
 import com.duckduckgo.common.ui.view.dialog.TextAlertDialogBuilder
 import com.duckduckgo.common.ui.view.getColorFromAttr
+import com.duckduckgo.common.ui.view.gone
+import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.navigation.api.getActivityParams
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import logcat.logcat
+import javax.inject.Inject
+import com.duckduckgo.mobile.android.R as CommonR
 
 @InjectWith(ActivityScope::class)
 @ContributeToActivityStarter(Default::class, screenName = "appearance")
 @ContributeToActivityStarter(HighlightedItem::class, screenName = "appearance")
 class AppearanceActivity : DuckDuckGoActivity() {
+    @Inject
+    lateinit var appTheme: AppTheme
+
     private val viewModel: AppearanceViewModel by bindViewModel()
     private val binding: ActivityAppearanceBinding by viewBinding()
 
@@ -110,10 +118,43 @@ class AppearanceActivity : DuckDuckGoActivity() {
         scrollToHighlightedItem()
     }
 
+    private fun configureOmnibarSettings(viewState: AppearanceViewModel.ViewState) {
+        if (viewState.shouldShowSplitOmnibarSettings) {
+            configureOmnibarTypeToggle(
+                top = InputScreenToggleButton.Top(
+                    isActive = viewState.omnibarType == OmnibarType.SINGLE_TOP,
+                    isLightMode = appTheme.isLightModeEnabled(),
+                ),
+                bottom = InputScreenToggleButton.Bottom(
+                    isActive = viewState.omnibarType == OmnibarType.SINGLE_BOTTOM,
+                    isLightMode = appTheme.isLightModeEnabled(),
+                ),
+                split = InputScreenToggleButton.Split(
+                    isActive = viewState.omnibarType == OmnibarType.SPLIT,
+                    isLightMode = appTheme.isLightModeEnabled(),
+                ),
+            )
+
+            binding.omnibarTypeSettingsTitle.show()
+            binding.omnibarTypeToggleContainer.show()
+            binding.showFullUrlSettingDivider.show()
+            binding.addressBarPositionSetting.gone()
+        } else {
+            updateSelectedOmnibarPosition(viewState.omnibarType)
+            binding.omnibarTypeSettingsTitle.gone()
+            binding.omnibarTypeToggleContainer.gone()
+            binding.showFullUrlSettingDivider.gone()
+            binding.addressBarPositionSetting.show()
+        }
+    }
+
     private fun configureUiEventHandlers() {
         binding.selectedThemeSetting.setClickListener { viewModel.userRequestedToChangeTheme() }
         binding.changeAppIconSetting.setOnClickListener { viewModel.userRequestedToChangeIcon() }
         binding.addressBarPositionSetting.setOnClickListener { viewModel.userRequestedToChangeAddressBarPosition() }
+        binding.topOmnibarContainer.setOnClickListener { viewModel.onOmnibarTypeSelected(OmnibarType.SINGLE_TOP) }
+        binding.bottomOmnibarContainer.setOnClickListener { viewModel.onOmnibarTypeSelected(OmnibarType.SINGLE_BOTTOM) }
+        binding.splitOmnibarContainer.setOnClickListener { viewModel.onOmnibarTypeSelected(OmnibarType.SPLIT) }
     }
 
     private fun observeViewModel() {
@@ -127,12 +168,12 @@ class AppearanceActivity : DuckDuckGoActivity() {
                     binding.experimentalNightMode.quietlySetIsChecked(viewState.forceDarkModeEnabled, forceDarkModeToggleListener)
                     binding.experimentalNightMode.isEnabled = viewState.canForceDarkMode
                     binding.experimentalNightMode.isVisible = viewState.supportsForceDarkMode
-                    updateSelectedOmnibarPosition(it.omnibarType)
                     binding.showFullUrlSetting.quietlySetIsChecked(viewState.isFullUrlEnabled, showFullUrlToggleListener)
                     binding.showTrackersCountInTabSwitcher.quietlySetIsChecked(
                         viewState.isTrackersCountInTabSwitcherEnabled,
                         showTrackersCountInTabSwitcher,
                     )
+                    configureOmnibarSettings(it)
                 }
             }.launchIn(lifecycleScope)
 
@@ -159,9 +200,8 @@ class AppearanceActivity : DuckDuckGoActivity() {
         val subtitle =
             getString(
                 when (omnibarType) {
-                    OmnibarType.SINGLE_TOP -> R.string.settingsAddressBarPositionTop
+                    OmnibarType.SINGLE_TOP, OmnibarType.SPLIT -> R.string.settingsAddressBarPositionTop
                     OmnibarType.SINGLE_BOTTOM -> R.string.settingsAddressBarPositionBottom
-                    OmnibarType.SPLIT -> TODO()
                 },
             )
         binding.addressBarPositionSetting.setSecondaryText(subtitle)
@@ -224,7 +264,7 @@ class AppearanceActivity : DuckDuckGoActivity() {
                 object : RadioListAlertDialogBuilder.EventListener() {
                     override fun onPositiveButtonClicked(selectedItem: Int) {
                         val newType = OmnibarType.entries[selectedItem - 1]
-                        viewModel.setOmnibarType(newType)
+                        viewModel.onOmnibarTypeSelected(newType)
                     }
                 },
             ).show()
@@ -258,6 +298,74 @@ class AppearanceActivity : DuckDuckGoActivity() {
             binding.addressBarPositionSetting.setBackgroundColor(animator.animatedValue as Int)
         }
         colorAnimator.start()
+    }
+
+    private fun configureOmnibarTypeToggle(
+        top: InputScreenToggleButton,
+        bottom: InputScreenToggleButton,
+        split: InputScreenToggleButton,
+    ) = with(binding) {
+        val context = this@AppearanceActivity
+        topOmnibarToggleImage.setImageDrawable(ContextCompat.getDrawable(context, top.imageRes))
+        topOmnibarToggleCheck.setImageDrawable(ContextCompat.getDrawable(context, top.checkRes))
+
+        bottomOmnibarToggleImage.setImageDrawable(ContextCompat.getDrawable(context, bottom.imageRes))
+        bottomOmnibarToggleCheck.setImageDrawable(ContextCompat.getDrawable(context, bottom.checkRes))
+
+        splitOmnibarToggleImage.setImageDrawable(ContextCompat.getDrawable(context, split.imageRes))
+        splitOmnibarToggleCheck.setImageDrawable(ContextCompat.getDrawable(context, split.checkRes))
+    }
+
+    private sealed class InputScreenToggleButton(
+        isActive: Boolean,
+    ) {
+        abstract val imageRes: Int
+
+        val checkRes: Int =
+            if (isActive) {
+                CommonR.drawable.ic_check_accent_24
+            } else {
+                CommonR.drawable.ic_shape_circle_disabled_24
+            }
+
+        class Top(
+            isActive: Boolean,
+            isLightMode: Boolean,
+        ) : InputScreenToggleButton(isActive) {
+            override val imageRes: Int =
+                when {
+                    isActive && isLightMode -> R.drawable.mobile_toolbar_top_selected_light
+                    isActive && !isLightMode -> R.drawable.mobile_toolbar_top_selected_dark
+                    !isActive && isLightMode -> R.drawable.mobile_toolbar_top_unselected_light
+                    else -> R.drawable.mobile_toolbar_top_unselected_dark
+                }
+        }
+
+        class Bottom(
+            isActive: Boolean,
+            isLightMode: Boolean,
+        ) : InputScreenToggleButton(isActive) {
+            override val imageRes: Int =
+                when {
+                    isActive && isLightMode -> R.drawable.mobile_toolbar_bottom_selected_light
+                    isActive && !isLightMode -> R.drawable.mobile_toolbar_bottom_selected_dark
+                    !isActive && isLightMode -> R.drawable.mobile_toolbar_bottom_unselected_light
+                    else -> R.drawable.mobile_toolbar_bottom_unselected_dark
+                }
+        }
+
+        class Split(
+            isActive: Boolean,
+            isLightMode: Boolean,
+        ) : InputScreenToggleButton(isActive) {
+            override val imageRes: Int =
+                when {
+                    isActive && isLightMode -> R.drawable.mobile_toolbar_split_selected_light
+                    isActive && !isLightMode -> R.drawable.mobile_toolbar_split_selected_dark
+                    !isActive && isLightMode -> R.drawable.mobile_toolbar_split_unselected_light
+                    else -> R.drawable.mobile_toolbar_split_unselected_dark
+                }
+        }
     }
 
     companion object {

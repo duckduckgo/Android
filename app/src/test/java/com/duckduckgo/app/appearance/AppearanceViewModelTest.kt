@@ -23,6 +23,7 @@ import app.cash.turbine.test
 import com.duckduckgo.app.appearance.AppearanceViewModel.Command
 import com.duckduckgo.app.icon.api.AppIcon
 import com.duckduckgo.app.pixels.AppPixelName
+import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.app.settings.clear.FireAnimation
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
@@ -32,6 +33,8 @@ import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.ui.DuckDuckGoTheme
 import com.duckduckgo.common.ui.store.AppTheme
 import com.duckduckgo.common.ui.store.ThemingDataStore
+import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
+import com.duckduckgo.feature.toggles.api.Toggle.State
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -71,6 +74,8 @@ internal class AppearanceViewModelTest {
     @Mock
     private lateinit var mockTabSwitcherDataStore: TabSwitcherDataStore
 
+    private val androidBrowserConfigFeature = FakeFeatureToggleFactory.create(AndroidBrowserConfigFeature::class.java)
+
     @SuppressLint("DenyListedApi")
     @Before
     fun before() {
@@ -81,6 +86,9 @@ internal class AppearanceViewModelTest {
         whenever(mockAppSettingsDataStore.selectedFireAnimation).thenReturn(FireAnimation.HeroFire)
         whenever(mockAppSettingsDataStore.omnibarType).thenReturn(OmnibarType.SINGLE_TOP)
         whenever(mockTabSwitcherDataStore.isTrackersAnimationInfoTileHidden()).thenReturn(flowOf(false))
+
+        androidBrowserConfigFeature.useUnifiedOmnibarLayout().setRawStoredState(State(enable = false))
+        androidBrowserConfigFeature.splitOmnibar().setRawStoredState(State(enable = false))
 
         initializeViewModel()
     }
@@ -93,6 +101,7 @@ internal class AppearanceViewModelTest {
                 mockPixel,
                 coroutineTestRule.testDispatcherProvider,
                 mockTabSwitcherDataStore,
+                androidBrowserConfigFeature,
             )
     }
 
@@ -221,7 +230,7 @@ internal class AppearanceViewModelTest {
     @Test
     fun whenOmnibarPositionUpdatedToBottom() =
         runTest {
-            testee.setOmnibarType(OmnibarType.SINGLE_BOTTOM)
+            testee.onOmnibarTypeSelected(OmnibarType.SINGLE_BOTTOM)
             verify(mockAppSettingsDataStore).omnibarType = OmnibarType.SINGLE_BOTTOM
             verify(mockPixel).fire(AppPixelName.SETTINGS_ADDRESS_BAR_POSITION_SELECTED_BOTTOM)
         }
@@ -229,7 +238,7 @@ internal class AppearanceViewModelTest {
     @Test
     fun whenOmnibarPositionUpdatedToTop() =
         runTest {
-            testee.setOmnibarType(OmnibarType.SINGLE_TOP)
+            testee.onOmnibarTypeSelected(OmnibarType.SINGLE_TOP)
             verify(mockAppSettingsDataStore).omnibarType = OmnibarType.SINGLE_TOP
             verify(mockPixel).fire(AppPixelName.SETTINGS_ADDRESS_BAR_POSITION_SELECTED_TOP)
         }
