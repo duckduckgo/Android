@@ -17,19 +17,175 @@
   -->
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    tools:context="com.duckduckgo.app.about.AboutDuckDuckGoActivity">
+    android:orientation="vertical">
 
-    <include
-        android:id="@+id/includeToolbar"
-        layout="@layout/include_default_toolbar" />
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/inputModeWidgetLayout"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:layout_marginStart="@dimen/omnibarCardMarginHorizontal"
+        android:layout_marginTop="@dimen/omnibarCardMarginBottom"
+        android:orientation="horizontal"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/spacer">
+
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/inputModeWidgetCard"
+            style="@style/Widget.DuckDuckGo.OmnibarCardView"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            app:cardElevation="0dp"
+            app:layout_constraintEnd_toStartOf="@id/inputModeMainButtonsContainer"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:strokeColor="?attr/daxColorAccentBlue"
+            app:strokeWidth="@dimen/omnibarOutlineWidth">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <LinearLayout
+                    android:id="@+id/inputModeWidgetCardContent"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:padding="@dimen/keyline_0">
+
+                    <ImageView
+                        android:id="@+id/daxIcon"
+                        android:layout_width="@dimen/toolbarIcon"
+                        android:layout_height="@dimen/toolbarIcon"
+                        android:layout_gravity="center"
+                        android:importantForAccessibility="no"
+                        android:scaleType="fitCenter"
+                        app:srcCompat="@drawable/ic_duckai"
+                        tools:visibility="visible" />
+
+                    <com.duckduckgo.common.ui.view.text.DaxTextView
+                        android:id="@+id/inputField"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_gravity="center_vertical"
+                        android:layout_marginStart="10dp"
+                        app:typography="body1"
+                        app:textType="primary"
+                        android:text="Duck.ai" />
+
+                    <ImageView
+                        android:id="@+id/inputFieldVoiceInputButton"
+                        android:layout_width="@dimen/toolbarIcon"
+                        android:layout_height="@dimen/toolbarIcon"
+                        android:layout_gravity="top"
+                        android:background="@drawable/selectable_item_experimental_background"
+                        android:gravity="center"
+                        android:importantForAccessibility="no"
+                        android:scaleType="center"
+                        android:visibility="gone"
+                        app:srcCompat="@drawable/ic_microphone_24"
+                        tools:visibility="visible" />
+
+                    <ImageView
+                        android:id="@+id/inputFieldClearText"
+                        android:layout_width="@dimen/toolbarIcon"
+                        android:layout_height="@dimen/toolbarIcon"
+                        android:layout_gravity="top"
+                        android:background="@drawable/selectable_item_experimental_background"
+                        android:gravity="center"
+                        android:importantForAccessibility="no"
+                        android:scaleType="centerInside"
+                        android:visibility="gone"
+                        app:srcCompat="@drawable/ic_close_circle_small_secondary_24" />
+
+                </LinearLayout>
+
+                <FrameLayout
+                    android:id="@+id/inputScreenButtonsContainer"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="end"
+                    android:layout_marginEnd="8dp"
+                    android:visibility="gone" />
+
+            </LinearLayout>
+
+        </com.google.android.material.card.MaterialCardView>
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/inputModeMainButtonsContainer"
+            android:layout_width="wrap_content"
+            android:layout_height="@dimen/toolbarIcon"
+            android:layout_marginStart="@dimen/keyline_2"
+            app:layout_constraintBottom_toBottomOf="@id/inputModeWidgetCard"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/inputModeWidgetCard"
+            app:layout_constraintTop_toTopOf="@id/inputModeWidgetCard">
+
+            <FrameLayout
+                android:id="@+id/inputFieldFireButton"
+                android:layout_width="@dimen/toolbarIcon"
+                android:layout_height="@dimen/toolbarIcon"
+                android:background="@drawable/selectable_item_experimental_background"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@id/inputFieldTabsMenu"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
+
+                <ImageView
+                    android:id="@+id/fireIconImageView"
+                    android:layout_width="@dimen/bottomNavIcon"
+                    android:layout_height="@dimen/bottomNavIcon"
+                    android:layout_gravity="center"
+                    android:scaleType="center"
+                    android:src="@drawable/ic_fire_24" />
+            </FrameLayout>
+
+            <com.duckduckgo.browser.ui.tabs.NewTabSwitcherButton
+                android:id="@+id/inputFieldTabsMenu"
+                android:layout_width="@dimen/toolbarIcon"
+                android:layout_height="@dimen/toolbarIcon"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@id/inputFieldBrowserMenu"
+                app:layout_constraintStart_toEndOf="@id/inputFieldFireButton"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <FrameLayout
+                android:id="@+id/inputFieldBrowserMenu"
+                android:layout_width="@dimen/toolbarIcon"
+                android:layout_height="@dimen/toolbarIcon"
+                android:background="@drawable/selectable_item_experimental_background"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@id/inputFieldTabsMenu"
+                app:layout_constraintTop_toTopOf="parent">
+
+                <ImageView
+                    android:id="@+id/browserMenuImageView"
+                    android:layout_width="@dimen/bottomNavIcon"
+                    android:layout_height="@dimen/bottomNavIcon"
+                    android:layout_gravity="center"
+                    android:scaleType="center"
+                    android:src="@drawable/ic_menu_vertical_24" />
+
+            </FrameLayout>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
     <WebView
         android:id="@+id/simpleWebview"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent"
+        app:layout_constraintBottom_toBottomOf="@id/inputModeWidgetCard"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
 
 </LinearLayout>
