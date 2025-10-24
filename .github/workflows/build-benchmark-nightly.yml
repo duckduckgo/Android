@@ -3,7 +3,7 @@ name: Build Benchmark - Nightly
 on:
   push:
     branches:
-      - feature/lukasz-p/ci-build-times
+      - feature/mike/ci-build-times-lukasz
   schedule:
     # Run nightly at 2 AM UTC (matching nightly.yml)
     - cron: '0 2 * * *'

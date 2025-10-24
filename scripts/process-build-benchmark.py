@@ -233,13 +233,13 @@ def main():
     print(generate_terminal_summary(results))
     
     # Send results to API only if both conditions are met
-    if results and args.report_pixel and args.github_action_run_id and args.git_commit_sha:
-        print("\n" + "=" * 80)
-        print("SENDING RESULTS TO API")
-        print("=" * 80)
-        send_results_to_api(results, args.github_action_run_id, args.git_commit_sha)
-    elif results and args.report_pixel and (not args.github_action_run_id or not args.git_commit_sha):
-        print("\n⚠️  --report-pixel flag set but no --github-action-run-id and --git-commit-sha provided. Skipping API requests.")
+    # if results and args.report_pixel and args.github_action_run_id and args.git_commit_sha:
+    #     print("\n" + "=" * 80)
+    #     print("SENDING RESULTS TO API")
+    #     print("=" * 80)
+    #     send_results_to_api(results, args.github_action_run_id, args.git_commit_sha)
+    # elif results and args.report_pixel and (not args.github_action_run_id or not args.git_commit_sha):
+    #     print("\n⚠️  --report-pixel flag set but no --github-action-run-id and --git-commit-sha provided. Skipping API requests.")
 
 
 if __name__ == '__main__':
