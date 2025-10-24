@@ -84,6 +84,16 @@
     <string name="subscriptionSettingSectionHelpAndSupport">Hulp en ondersteuning</string>
     <string name="subscriptionSettingSendFeedback">Verstuur feedback</string>
     <string name="subscriptionSettingActivating">Bezig met activeren</string>
+    <string name="subscriptionSettingManageSubscription">Abonnement beheren</string>
+    <string name="subscriptionSettingSwitchUpgrade">Schakel over naar een jaarabonnement en bespaar 16%</string>
+    <!-- smartling.character_limit = 10 -->
+    <string name="subscriptionSettingSwitchUpgradePill">Topdeal</string>
+    <string name="subscriptionSettingSwitchDowngrade">Abonnement wijzigen</string>
+    <string name="subscriptionSettingManagePlan">Abonnement en betalingsopties beheren</string>
+    <!-- Change Plan -->
+    <string name="changePlanTitle">Plan bijwerken of annuleren</string>
+    <string name="changePlanDescription">Je abonnement is aangeschaft via de Apple App Store. Om je abonnement of factureringsinstellingen te wijzigen, ga je naar \'Instellingen\' &gt; \'Apple-account\' &gt; \'Abonnementen\' op een apparaat dat is aangemeld bij hetzelfde Apple-account waarmee je het abonnement hebt gekocht.</string>
+
 
     <!--Purchase Subscriptions-->
     <string name="purchaseCompletedTitle">Je bent klaar.</string>
@@ -97,10 +107,6 @@
 
     <!-- ITR Settings-->
     <string name="itrSettingTitle" translatable="false">Identity Theft Restoration</string>
-
-    <!-- Change Plan -->
-    <string name="changePlanTitle">Plan bijwerken of annuleren</string>
-    <string name="changePlanDescription">Je abonnement is aangeschaft via de Apple App Store. Om je abonnement of factureringsinstellingen te wijzigen, ga je naar \'Instellingen\' &gt; \'Apple-account\' &gt; \'Abonnementen\' op een apparaat dat is aangemeld bij hetzelfde Apple-account waarmee je het abonnement hebt gekocht.</string>
 
     <!-- PIR Activity-->
     <string name="pirTitle">Activeer Privacy Pro op je desktop om Personal Information Removal in te stellen.</string>
@@ -185,5 +191,15 @@
     <string name="subscriptionSettingSubscribeSecure">Beveilig je wifi en chat privé met geavanceerde AI-modellen</string>
 
     <string name="feedbackGeneralSubscription">Abonnement</string>
+    
+    <!-- Switch plan-->
+    <string name="switchBottomSheetTitleUpgrade">Bespaar 16% met een jaarlijks abonnement!</string>
+    <string name="switchBottomSheetDescriptionUpgrade">Een jaarlijks abonnement kost slechts $8,33/maand, vergeleken met je huidige maandabonnement van $9,99.</string>
+    <string name="switchBottomSheetPrimaryButtonUpgrade">Overschakelen naar een jaarlijks abonnement ($ 99,99/jaar)</string>
+    <string name="switchBottomSheetSecondaryButtonUpgrade">Maandabonnement behouden</string>
+    <string name="switchBottomSheetTitleDowngrade">Je bespaart 16% met een jaarabonnement!</string>
+    <string name="switchBottomSheetDescriptionDowngrade">Als je overstapt, stijgt je maandprijs van $ 8,33/maand naar $ 9,99/maand.</string>
+    <string name="switchBottomSheetPrimaryButtonDowngrade">Behoud je jaarabonnement</string>
+    <string name="switchBottomSheetSecondaryButtonDowngrade">Overschakelen naar een maandelijks abonnement ($ 9,99/maand)</string>
 
 </resources>
