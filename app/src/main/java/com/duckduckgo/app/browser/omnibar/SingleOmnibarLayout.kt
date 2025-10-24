@@ -206,6 +206,15 @@ class SingleOmnibarLayout @JvmOverloads constructor(
         } else {
             omnibarTextInput.hint = context.getString(R.string.search)
         }
+
+        if (duckAiToggle.isVisible && omnibarPosition == OmnibarPosition.BOTTOM) {
+            iconsContainer.updateLayoutParams {
+                (this as MarginLayoutParams).apply {
+                    topMargin = experimentalOmnibarCardMarginTop
+                    bottomMargin = experimentalOmnibarCardMarginTop
+                }
+            }
+        }
     }
 
     override fun renderButtons(viewState: ViewState) {
