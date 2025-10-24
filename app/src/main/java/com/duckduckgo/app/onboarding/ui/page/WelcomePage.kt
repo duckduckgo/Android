@@ -188,7 +188,7 @@ class WelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome_p
     @SuppressLint("InlinedApi")
     private fun requestNotificationsPermissions() {
         if (appBuildConfig.sdkInt >= android.os.Build.VERSION_CODES.TIRAMISU) {
-            if (notificationPromptExperimentManager.isControl()) {
+            if (!notificationPromptExperimentManager.isExperimentalNoNotificationPrompt()) {
                 viewModel.notificationRuntimePermissionRequested()
                 requestPermission.launch(Manifest.permission.POST_NOTIFICATIONS)
             } else {
