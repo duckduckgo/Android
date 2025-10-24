@@ -84,6 +84,16 @@
     <string name="subscriptionSettingSectionHelpAndSupport">Справка и поддержка</string>
     <string name="subscriptionSettingSendFeedback">Отправить отзыв</string>
     <string name="subscriptionSettingActivating">Выполняется активация</string>
+    <string name="subscriptionSettingManageSubscription">Управление подпиской</string>
+    <string name="subscriptionSettingSwitchUpgrade">Переход на годовую подписку сэкономит вам 16%</string>
+    <!-- smartling.character_limit = 10 -->
+    <string name="subscriptionSettingSwitchUpgradePill">Оптимально</string>
+    <string name="subscriptionSettingSwitchDowngrade">Смените тариф</string>
+    <string name="subscriptionSettingManagePlan">Управление тарифом и оплатой</string>
+    <!-- Change Plan -->
+    <string name="changePlanTitle">Изменить или отменить подписку</string>
+    <string name="changePlanDescription">Подписка приобретена в магазине приложений Apple App Store. Чтобы изменить тарифный план или платежные параметры, откройте раздел «Настройки &gt; Аккаунт Apple &gt; Подписки» на устройстве, где выполнен вход в ту же учетную запись Apple, через которую была оформлена подписка.</string>
+
 
     <!--Purchase Subscriptions-->
     <string name="purchaseCompletedTitle">Все готово!</string>
@@ -97,10 +107,6 @@
 
     <!-- ITR Settings-->
     <string name="itrSettingTitle" translatable="false">Identity Theft Restoration</string>
-
-    <!-- Change Plan -->
-    <string name="changePlanTitle">Изменить или отменить подписку</string>
-    <string name="changePlanDescription">Подписка приобретена в магазине приложений Apple App Store. Чтобы изменить тарифный план или платежные параметры, откройте раздел «Настройки &gt; Аккаунт Apple &gt; Подписки» на устройстве, где выполнен вход в ту же учетную запись Apple, через которую была оформлена подписка.</string>
 
     <!-- PIR Activity-->
     <string name="pirTitle">Чтобы включить функцию Personal Information Removal, активируйте подписку Privacy Pro на настольном компьютере</string>
@@ -185,5 +191,15 @@
     <string name="subscriptionSettingSubscribeSecure">Безопасный Wi-Fi и приватные чаты с продвинутыми моделями ИИ</string>
 
     <string name="feedbackGeneralSubscription">По подписке</string>
+    
+    <!-- Switch plan-->
+    <string name="switchBottomSheetTitleUpgrade">Экономьте 16%\nна годовой подписке!</string>
+    <string name="switchBottomSheetDescriptionUpgrade">В отличие от текущего ежемесячного тарифа 9,99 $, годовой тариф — всего 8,33 $ в месяц.</string>
+    <string name="switchBottomSheetPrimaryButtonUpgrade">Перейти на годовой план (99,99 $/год)</string>
+    <string name="switchBottomSheetSecondaryButtonUpgrade">Оставить месячный план</string>
+    <string name="switchBottomSheetTitleDowngrade">Годовая подписка экономит 16%!</string>
+    <string name="switchBottomSheetDescriptionDowngrade">Со сменой тарифа ваша ежемесячная плата увеличится с 8,33 до 9,99 $.</string>
+    <string name="switchBottomSheetPrimaryButtonDowngrade">Перейти на годовой тариф</string>
+    <string name="switchBottomSheetSecondaryButtonDowngrade">Перейти на месячный план (9,99 $/мес.)</string>
 
 </resources>
