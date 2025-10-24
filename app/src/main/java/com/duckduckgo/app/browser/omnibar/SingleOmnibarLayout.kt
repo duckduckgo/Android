@@ -83,6 +83,14 @@ class SingleOmnibarLayout @JvmOverloads constructor(
         resources.getDimensionPixelSize(CommonR.dimen.omnibarCardMarginBottom)
     }
 
+    private val duckAIToggleBottomMarginTop by lazy {
+        resources.getDimensionPixelSize(CommonR.dimen.keyline_2)
+    }
+
+    private val duckAIToggleBottomMarginBottom by lazy {
+        resources.getDimensionPixelSize(CommonR.dimen.keyline__1)
+    }
+
     private val omnibarOutlineWidth by lazy { resources.getDimensionPixelSize(CommonR.dimen.omnibarOutlineWidth) }
     private val omnibarOutlineFocusedWidth by lazy { resources.getDimensionPixelSize(CommonR.dimen.omnibarOutlineFocusedWidth) }
 
@@ -144,6 +152,13 @@ class SingleOmnibarLayout @JvmOverloads constructor(
                     }
                 }
 
+                duckAiToggle.updateLayoutParams {
+                    (this as MarginLayoutParams).apply {
+                        topMargin = duckAIToggleBottomMarginTop
+                        bottomMargin = duckAIToggleBottomMarginBottom
+                    }
+                }
+
                 shieldIconPulseAnimationContainer.setPadding(
                     shieldIconPulseAnimationContainer.paddingLeft,
                     shieldIconPulseAnimationContainer.paddingTop,
@@ -185,39 +200,7 @@ class SingleOmnibarLayout @JvmOverloads constructor(
     }
 
     private fun renderDuckAiToggle(viewState: ViewState) {
-        // When omnibar is at the bottom, we're removing the additional space at the top
-        if (omnibarPosition == OmnibarPosition.BOTTOM) {
-            if (viewState.showDuckAIToggle) {
-                omnibarCardShadow.updateLayoutParams {
-                    (this as MarginLayoutParams).apply {
-                        topMargin = experimentalOmnibarCardMarginTop
-                        bottomMargin = experimentalOmnibarCardMarginBottom
-                    }
-                }
-
-                iconsContainer.updateLayoutParams {
-                    (this as MarginLayoutParams).apply {
-                        topMargin = experimentalOmnibarCardMarginTop
-                        bottomMargin = experimentalOmnibarCardMarginBottom
-                    }
-                }
-            } else {
-                omnibarCardShadow.updateLayoutParams {
-                    (this as MarginLayoutParams).apply {
-                        topMargin = experimentalOmnibarCardMarginBottom
-                        bottomMargin = experimentalOmnibarCardMarginBottom
-                    }
-                }
-
-                iconsContainer.updateLayoutParams {
-                    (this as MarginLayoutParams).apply {
-                        topMargin = experimentalOmnibarCardMarginBottom
-                        bottomMargin = experimentalOmnibarCardMarginBottom
-                    }
-                }
-            }
-        }
-
+        duckAiToggle.isVisible = viewState.showDuckAIToggle
         if (viewState.showDuckAIToggle && viewState.viewMode == ViewMode.NewTab) {
             omnibarTextInput.hint = context.getString(DuckChatR.string.input_screen_search_hint)
         } else {

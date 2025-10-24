@@ -77,6 +77,8 @@ class InputModeWidget @JvmOverloads constructor(
     private val inputScreenButtonsContainer: FrameLayout
     private val inputModeMainButtonsContainer: View
     private val inputModeWidgetLayout: View
+    private val inputModeContentSpacer: View
+    private val inputModeBottomSpacer: View
     val tabSwitcherButton: TabSwitcherButton
     private val menuButton: View
     private val fireButton: View
@@ -152,6 +154,8 @@ class InputModeWidget @JvmOverloads constructor(
         inputScreenButtonsContainer = findViewById(R.id.inputScreenButtonsContainer)
         inputModeMainButtonsContainer = findViewById(R.id.inputModeMainButtonsContainer)
         inputModeWidgetLayout = findViewById(R.id.inputModeWidgetLayout)
+        inputModeContentSpacer = findViewById(R.id.inputModeContentSpacer)
+        inputModeBottomSpacer = findViewById(R.id.inputModeBottomSpacer)
 
         configureClickListeners()
         configureInputBehavior()
@@ -437,6 +441,8 @@ class InputModeWidget @JvmOverloads constructor(
             // align the clear text button with the center of the submit button
             marginEnd = 4f.toPx(context).roundToInt()
         }
+        inputModeContentSpacer.gone()
+        inputModeBottomSpacer.show()
     }
 
     fun setInputScreenButtonsVisible(buttonsVisible: Boolean) {

@@ -220,11 +220,20 @@
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <Space
-        android:id="@+id/bottomSpacer"
+        android:id="@+id/inputModeContentSpacer"
         android:layout_width="0dp"
         android:layout_height="@dimen/omnibarCardMarginBottom"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/inputModeWidgetLayout" />
+
+    <Space
+        android:id="@+id/inputModeBottomSpacer"
+        android:layout_width="0dp"
+        android:layout_height="@dimen/omnibarCardMarginTop"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        android:visibility="gone"
         app:layout_constraintTop_toBottomOf="@id/inputModeWidgetLayout" />
 
 </merge>
