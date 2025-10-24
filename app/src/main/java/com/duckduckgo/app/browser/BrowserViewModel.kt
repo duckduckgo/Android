@@ -131,7 +131,7 @@ class BrowserViewModel @Inject constructor(
         data class ShowSystemDefaultBrowserDialog(val intent: Intent) : Command()
         data class ShowSystemDefaultAppsActivity(val intent: Intent) : Command()
         data class ShowUndoDeleteTabsMessage(val tabIds: List<String>) : Command()
-        data class OpenDuckChat(val duckChatUrl: String?, val duckChatSessionActive: Boolean, val withTransition: Boolean) : Command()
+        data class OpenDuckChat(val duckChatUrl: String?, val duckChatSessionActive: Boolean, val withTransition: Boolean, val tabs: Int) : Command()
     }
 
     var viewState: MutableLiveData<ViewState> = MutableLiveData<ViewState>().also {
@@ -462,7 +462,7 @@ class BrowserViewModel @Inject constructor(
 
     fun openDuckChat(duckChatUrl: String?, duckChatSessionActive: Boolean, withTransition: Boolean) {
         logcat(INFO) { "Duck.ai openDuckChat duckChatSessionActive $duckChatSessionActive" }
-        command.value = OpenDuckChat(duckChatUrl, duckChatSessionActive, withTransition)
+        command.value = OpenDuckChat(duckChatUrl, duckChatSessionActive, withTransition, tabs.value.size)
     }
 }
 
