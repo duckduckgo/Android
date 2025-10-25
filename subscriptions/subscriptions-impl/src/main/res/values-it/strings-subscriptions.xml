@@ -84,6 +84,16 @@
     <string name="subscriptionSettingSectionHelpAndSupport">Aiuto e assistenza</string>
     <string name="subscriptionSettingSendFeedback">Invia feedback</string>
     <string name="subscriptionSettingActivating">Attivazione in corso…</string>
+    <string name="subscriptionSettingManageSubscription">Gestisci l\'abbonamento</string>
+    <string name="subscriptionSettingSwitchUpgrade">Passa a un abbonamento annuale e risparmia il 16%</string>
+    <!-- smartling.character_limit = 10 -->
+    <string name="subscriptionSettingSwitchUpgradePill">Migliore offerta</string>
+    <string name="subscriptionSettingSwitchDowngrade">Cambia piano</string>
+    <string name="subscriptionSettingManagePlan">Gestisci il piano e le opzioni di pagamento</string>
+    <!-- Change Plan -->
+    <string name="changePlanTitle">Aggiorna o o annulla il piano</string>
+    <string name="changePlanDescription">L\'abbonamento è stato acquistato tramite l\'App Store di Apple. Per modificare il tuo piano o le impostazioni di fatturazione, vai su Impostazioni &gt; Account Apple &gt; Abbonamenti su un dispositivo che ha effettuato l\'accesso con lo stesso account Apple utilizzato per acquistare l\'abbonamento.</string>
+
 
     <!--Purchase Subscriptions-->
     <string name="purchaseCompletedTitle">È tutto pronto.</string>
@@ -97,10 +107,6 @@
 
     <!-- ITR Settings-->
     <string name="itrSettingTitle" translatable="false">Identity Theft Restoration</string>
-
-    <!-- Change Plan -->
-    <string name="changePlanTitle">Aggiorna o o annulla il piano</string>
-    <string name="changePlanDescription">L\'abbonamento è stato acquistato tramite l\'App Store di Apple. Per modificare il tuo piano o le impostazioni di fatturazione, vai su Impostazioni &gt; Account Apple &gt; Abbonamenti su un dispositivo che ha effettuato l\'accesso con lo stesso account Apple utilizzato per acquistare l\'abbonamento.</string>
 
     <!-- PIR Activity-->
     <string name="pirTitle">Attiva Privacy Pro sul desktop per impostare Personal Information Removal</string>
@@ -185,5 +191,15 @@
     <string name="subscriptionSettingSubscribeSecure">Proteggi la rete Wi-Fi e chatta privatamente con modelli AI avanzati</string>
 
     <string name="feedbackGeneralSubscription">Abbonamento</string>
+    
+    <!-- Switch plan-->
+    <string name="switchBottomSheetTitleUpgrade">Risparmia il 16% con un piano annuale!</string>
+    <string name="switchBottomSheetDescriptionUpgrade">Un piano annuale costa solo 8,33 $ al mese, rispetto al tuo attuale piano mensile di 9,99 $.</string>
+    <string name="switchBottomSheetPrimaryButtonUpgrade">Passa al piano annuale (99,99 $ all\'anno)</string>
+    <string name="switchBottomSheetSecondaryButtonUpgrade">Mantieni il piano mensile</string>
+    <string name="switchBottomSheetTitleDowngrade">Risparmi il 16% con un piano annuale!</string>
+    <string name="switchBottomSheetDescriptionDowngrade">Il passaggio comporterà un aumento del prezzo mensile da 8,33 $ al mese a 9,99 $ al mese.</string>
+    <string name="switchBottomSheetPrimaryButtonDowngrade">Mantieni il piano annuale</string>
+    <string name="switchBottomSheetSecondaryButtonDowngrade">Passa al piano mensile (9,99 $ al mese)</string>
 
 </resources>
