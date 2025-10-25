@@ -84,6 +84,16 @@
     <string name="subscriptionSettingSectionHelpAndSupport">Aide et assistance</string>
     <string name="subscriptionSettingSendFeedback">Envoyer vos remarques</string>
     <string name="subscriptionSettingActivating">Activation en cours</string>
+    <string name="subscriptionSettingManageSubscription">Gérer l\'abonnement</string>
+    <string name="subscriptionSettingSwitchUpgrade">Passez au forfait annuel et économisez 16 %</string>
+    <!-- smartling.character_limit = 10 -->
+    <string name="subscriptionSettingSwitchUpgradePill">Meilleure offre</string>
+    <string name="subscriptionSettingSwitchDowngrade">Changer de forfait</string>
+    <string name="subscriptionSettingManagePlan">Gérer le forfait et les options de paiement</string>
+    <!-- Change Plan -->
+    <string name="changePlanTitle">Modifier le forfait ou le résilier</string>
+    <string name="changePlanDescription">Votre abonnement a été souscrit via l\'App Store d\'Apple. Pour modifier votre forfait ou vos paramètres de facturation, allez dans Réglages &gt; Compte Apple &gt; Abonnements sur un appareil connecté au même compte Apple que celui utilisé pour souscrire votre abonnement.</string>
+
 
     <!--Purchase Subscriptions-->
     <string name="purchaseCompletedTitle">Tout est prêt !</string>
@@ -97,10 +107,6 @@
 
     <!-- ITR Settings-->
     <string name="itrSettingTitle" translatable="false">Identity Theft Restoration</string>
-
-    <!-- Change Plan -->
-    <string name="changePlanTitle">Modifier le forfait ou le résilier</string>
-    <string name="changePlanDescription">Votre abonnement a été souscrit via l\'App Store d\'Apple. Pour modifier votre forfait ou vos paramètres de facturation, allez dans Réglages &gt; Compte Apple &gt; Abonnements sur un appareil connecté au même compte Apple que celui utilisé pour souscrire votre abonnement.</string>
 
     <!-- PIR Activity-->
     <string name="pirTitle">Activez Privacy Pro sur ordinateur pour configurer Personal Information Removal</string>
@@ -185,5 +191,15 @@
     <string name="subscriptionSettingSubscribeSecure">Sécurisez votre Wi-Fi et discutez en toute confidentialité grâce à des modèles d\'IA avancés</string>
 
     <string name="feedbackGeneralSubscription">Abonnement</string>
+    
+    <!-- Switch plan-->
+    <string name="switchBottomSheetTitleUpgrade">Économisez 16 % avec\nun forfait annuel !</string>
+    <string name="switchBottomSheetDescriptionUpgrade">Un forfait annuel coûte seulement 8,33 $/mois, contre 9,99 $/mois pour votre forfait mensuel actuel.</string>
+    <string name="switchBottomSheetPrimaryButtonUpgrade">Passer à un forfait annuel (99,99 $/an)</string>
+    <string name="switchBottomSheetSecondaryButtonUpgrade">Conserver le forfait mensuel</string>
+    <string name="switchBottomSheetTitleDowngrade">Vous économisez 16 % avec\nun forfait annuel !</string>
+    <string name="switchBottomSheetDescriptionDowngrade">Ce changement augmentera vos mensualités, qui passeront de 8,33 $/mois à 9,99 $/mois.</string>
+    <string name="switchBottomSheetPrimaryButtonDowngrade">Conserver le forfait annuel</string>
+    <string name="switchBottomSheetSecondaryButtonDowngrade">Passer à un forfait mensuel (9,99 $/mois)</string>
 
 </resources>
