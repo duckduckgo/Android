@@ -70,7 +70,4 @@ interface AttributedMetricsConfigFeature {
 
     @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
     fun syncDevices(): Toggle
-
-    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
-    fun canEmitSyncDevices(): Toggle
 }
