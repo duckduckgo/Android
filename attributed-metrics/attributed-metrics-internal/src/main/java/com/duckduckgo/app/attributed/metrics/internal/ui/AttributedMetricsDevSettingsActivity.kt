@@ -79,6 +79,9 @@ class AttributedMetricsDevSettingsActivity : DuckDuckGoActivity() {
         binding.addAdClickTestEventsButton.setOnClickListener {
             addAdClickTestEvents()
         }
+        binding.addAiPromptsTestEventsButton.setOnClickListener {
+            addAiUsageTestEvents()
+        }
         lifecycleScope.launch {
             binding.clientActive.setSecondaryText(if (attributedMetricsState.isActive()) "Yes" else "No")
             binding.returningUser.setSecondaryText(if (appBuildConfig.isAppReinstall()) "Yes" else "No")
@@ -101,6 +104,16 @@ class AttributedMetricsDevSettingsActivity : DuckDuckGoActivity() {
             repeat(10) { daysAgo ->
                 val date = dateUtils.getDateMinusDays(daysAgo)
                 eventDao.insertEvent(EventEntity(eventName = "ad_click", count = 1, day = date))
+            }
+            Toast.makeText(this@AttributedMetricsDevSettingsActivity, "Test events added", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    private fun addAiUsageTestEvents() {
+        lifecycleScope.launch {
+            repeat(10) { daysAgo ->
+                val date = dateUtils.getDateMinusDays(daysAgo)
+                eventDao.insertEvent(EventEntity(eventName = "submit_prompt", count = 1, day = date))
             }
             Toast.makeText(this@AttributedMetricsDevSettingsActivity, "Test events added", Toast.LENGTH_SHORT).show()
         }
