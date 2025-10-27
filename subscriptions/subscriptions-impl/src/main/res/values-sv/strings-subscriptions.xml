@@ -84,6 +84,16 @@
     <string name="subscriptionSettingSectionHelpAndSupport">Hjälp och support</string>
     <string name="subscriptionSettingSendFeedback">Skicka återkoppling</string>
     <string name="subscriptionSettingActivating">Aktiverar</string>
+    <string name="subscriptionSettingManageSubscription">Hantera abonnemang</string>
+    <string name="subscriptionSettingSwitchUpgrade">Byt till årligt och spara 16 %</string>
+    <!-- smartling.character_limit = 10 -->
+    <string name="subscriptionSettingSwitchUpgradePill">Bäst deal</string>
+    <string name="subscriptionSettingSwitchDowngrade">Byt abonnemang</string>
+    <string name="subscriptionSettingManagePlan">Hantera abonnemang och betalningsalternativ</string>
+    <!-- Change Plan -->
+    <string name="changePlanTitle">Uppdatera abonnemang eller avbryt</string>
+    <string name="changePlanDescription">Ditt abonnemang köptes genom Apple App Store. För att ändra ditt abonnemang eller faktureringsinställningar går du till Inställningar &gt; Apple-konto &gt; Abonnemang på en enhet som är inloggad på det Apple-konto som användes för att köpa ditt abonnemang.</string>
+
 
     <!--Purchase Subscriptions-->
     <string name="purchaseCompletedTitle">Du är klar.</string>
@@ -97,10 +107,6 @@
 
     <!-- ITR Settings-->
     <string name="itrSettingTitle" translatable="false">Identity Theft Restoration</string>
-
-    <!-- Change Plan -->
-    <string name="changePlanTitle">Uppdatera abonnemang eller avbryt</string>
-    <string name="changePlanDescription">Ditt abonnemang köptes genom Apple App Store. För att ändra ditt abonnemang eller faktureringsinställningar går du till Inställningar &gt; Apple-konto &gt; Abonnemang på en enhet som är inloggad på det Apple-konto som användes för att köpa ditt abonnemang.</string>
 
     <!-- PIR Activity-->
     <string name="pirTitle">Aktivera Privacy Pro på en dator för att konfigurera Personal Information Removal</string>
@@ -185,5 +191,15 @@
     <string name="subscriptionSettingSubscribeSecure">Säkra ditt Wi-Fi och chatta privat med avancerade AI-modeller</string>
 
     <string name="feedbackGeneralSubscription">Abonnemang</string>
+    
+    <!-- Switch plan-->
+    <string name="switchBottomSheetTitleUpgrade">Spara 16 % med\nett årsabonnemang!</string>
+    <string name="switchBottomSheetDescriptionUpgrade">Ett årsabonnemang kostar bara 8,33 USD per månad, jämfört med ditt nuvarande månadsabonnemang för 9,99 USD.</string>
+    <string name="switchBottomSheetPrimaryButtonUpgrade">Byt till årlig ($99,99/år)</string>
+    <string name="switchBottomSheetSecondaryButtonUpgrade">Behåll månadsabonnemang</string>
+    <string name="switchBottomSheetTitleDowngrade">Du sparar 16 % med\nett årsabonnemang!</string>
+    <string name="switchBottomSheetDescriptionDowngrade">Ett byte kommer att öka ditt månadspris från $8,33/månad till $9,99/månad.</string>
+    <string name="switchBottomSheetPrimaryButtonDowngrade">Behåll årsabonnemang</string>
+    <string name="switchBottomSheetSecondaryButtonDowngrade">Byt till månadsvis (9,99 USD/månad)</string>
 
 </resources>
