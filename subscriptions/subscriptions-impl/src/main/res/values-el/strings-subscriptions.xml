@@ -84,6 +84,16 @@
     <string name="subscriptionSettingSectionHelpAndSupport">Βοήθεια και υποστήριξη</string>
     <string name="subscriptionSettingSendFeedback">Αποστολή σχολίου</string>
     <string name="subscriptionSettingActivating">Ενεργοποίηση</string>
+    <string name="subscriptionSettingManageSubscription">Διαχείριση συνδρομής</string>
+    <string name="subscriptionSettingSwitchUpgrade">Αλλάξτε σε ετήσιο και εξοικονόμησε 16%</string>
+    <!-- smartling.character_limit = 10 -->
+    <string name="subscriptionSettingSwitchUpgradePill">Καλύτερη προσφορά</string>
+    <string name="subscriptionSettingSwitchDowngrade">Αλλαγή προγράμματος</string>
+    <string name="subscriptionSettingManagePlan">Διαχείριση προγράμματος και επιλογών πληρωμής</string>
+    <!-- Change Plan -->
+    <string name="changePlanTitle">Ενημέρωση προγράμματος ή ακύρωση</string>
+    <string name="changePlanDescription">Η συνδρομή σας αγοράστηκε μέσω του Apple Play Store. Για να αλλάξετε το πρόγραμμα ή τις ρυθμίσεις χρέωσης, μεταβείτε στις επιλογές Ρυθμίσεις &gt; Λογαριασμός Apple &gt; Συνδρομές, σε μια συσκευή που έχει συνδεθεί με τον ίδιο Λογαριασμό Apple που χρησιμοποιήθηκε για την αγορά της συνδρομής σας.</string>
+
 
     <!--Purchase Subscriptions-->
     <string name="purchaseCompletedTitle">Είστε πανέτοιμοι.</string>
@@ -97,10 +107,6 @@
 
     <!-- ITR Settings-->
     <string name="itrSettingTitle" translatable="false">Identity Theft Restoration</string>
-
-    <!-- Change Plan -->
-    <string name="changePlanTitle">Ενημέρωση προγράμματος ή ακύρωση</string>
-    <string name="changePlanDescription">Η συνδρομή σας αγοράστηκε μέσω του Apple Play Store. Για να αλλάξετε το πρόγραμμα ή τις ρυθμίσεις χρέωσης, μεταβείτε στις επιλογές Ρυθμίσεις &gt; Λογαριασμός Apple &gt; Συνδρομές, σε μια συσκευή που έχει συνδεθεί με τον ίδιο Λογαριασμό Apple που χρησιμοποιήθηκε για την αγορά της συνδρομής σας.</string>
 
     <!-- PIR Activity-->
     <string name="pirTitle">Ενεργοποιήστε το Privacy Pro στην επιφάνεια εργασίας για να ρυθμίσετε το Personal Information Removal</string>
@@ -185,5 +191,15 @@
     <string name="subscriptionSettingSubscribeSecure">Ασφαλίστε το Wi-Fi σας και συνομιλήστε ιδιωτικά με προηγμένα μοντέλα τεχνητής νοημοσύνης</string>
 
     <string name="feedbackGeneralSubscription">Συνδρομή</string>
+    
+    <!-- Switch plan-->
+    <string name="switchBottomSheetTitleUpgrade">Εξοικονομήστε 16% με\nένα ετήσιο πρόγραμμα!</string>
+    <string name="switchBottomSheetDescriptionUpgrade">Ένα ετήσιο πρόγραμμα κοστίζει μόλις 8,33 $/μήνα, σε σύγκριση με το τρέχον μηνιαίο πρόγραμμά σου των 9,99 $.</string>
+    <string name="switchBottomSheetPrimaryButtonUpgrade">Μετάβαση σε ετήσια συνδρομή (99,99 $/έτος)</string>
+    <string name="switchBottomSheetSecondaryButtonUpgrade">Διατήρηση μηνιαίου προγράμματος</string>
+    <string name="switchBottomSheetTitleDowngrade">Εξοικονομείτε 16% με\nένα ετήσιο πρόγραμμα!</string>
+    <string name="switchBottomSheetDescriptionDowngrade">Η αλλαγή θα αυξήσει τη μηνιαία τιμή σας από 8,33 $/μήνα σε 9,99 $/μήνα.</string>
+    <string name="switchBottomSheetPrimaryButtonDowngrade">Διατήρηση ετήσιου προγράμματος</string>
+    <string name="switchBottomSheetSecondaryButtonDowngrade">Αλλαγή σε μηνιαίο (9.99 $/μήνα)</string>
 
 </resources>
