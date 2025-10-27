@@ -45,11 +45,9 @@
     <dimen name="toolbarSize">60dp</dimen>
 
     <!-- Navigation Bar -->
-    <dimen name="experimentalNavigationBarPaddingTopWhenStandalone">12dp</dimen>
-    <dimen name="experimentalNavigationBarPaddingBottom">8dp</dimen>
-    <dimen name="bottomNavIconContainer">44dp</dimen>
-    <dimen name="bottomNavFireIconContainerHeight">44dp</dimen>
-    <dimen name="bottomNavFireIconContainerWidth">80dp</dimen>
+    <dimen name="navigationBarPaddingTopWhenStandalone">12dp</dimen>
+    <dimen name="navigationBarPaddingBottom">8dp</dimen>
+    <dimen name="navigationBarPaddingHorizontal">18dp</dimen>
     <dimen name="bottomNavIcon">24dp</dimen>
 
     <!-- Omnibar -->
