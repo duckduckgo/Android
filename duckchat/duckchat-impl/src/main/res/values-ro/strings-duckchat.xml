@@ -69,9 +69,8 @@
     <string name="autocompleteDeviceAppNotFound">Aplicația nu a fost găsită</string>
 
     <!-- New Address Bar Option Bottom Sheet Dialog -->
+    <string name="newAddressBarOptionBottomSheetDialogTitle">Dorești un acces mai ușor\nla chatul privat cu IA?</string>
     <string name="newAddressBarOptionBottomSheetDialogSearchText">Caută sau introdu adresa</string>
-    <string name="newAddressBarOptionBottomSheetDialogTitle">Comută între căutare și chat IA</string>
-    <string name="newAddressBarOptionBottomSheetDialogSubTitle">Funcțiile IA sunt întotdeauna opționale.</string>
     <string name="newAddressBarOptionBottomSheetDialogPrimaryButton">Confirmare</string>
     <string name="newAddressBarOptionBottomSheetDialogGhostButton">Nu acum</string>
     <string name="newAddressBarOptionBottomSheetDialogFooter">Ajustează din Setări &gt; Funcții IA.</string>

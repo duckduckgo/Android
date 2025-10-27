@@ -69,9 +69,8 @@
     <string name="autocompleteDeviceAppNotFound">Rakendust ei leitud</string>
 
     <!-- New Address Bar Option Bottom Sheet Dialog -->
+    <string name="newAddressBarOptionBottomSheetDialogTitle">Kas soovid lihtsamat juurdepääsu privaatsele AI-vestlusele?</string>
     <string name="newAddressBarOptionBottomSheetDialogSearchText">Otsi või sisesta aadress</string>
-    <string name="newAddressBarOptionBottomSheetDialogTitle">Vaheta otsingu ja tehisintellekti vestluse vahel</string>
-    <string name="newAddressBarOptionBottomSheetDialogSubTitle">Tehisintellekti funktsioonid on alati valikulised.</string>
     <string name="newAddressBarOptionBottomSheetDialogPrimaryButton">Kinnita</string>
     <string name="newAddressBarOptionBottomSheetDialogGhostButton">Mitte praegu</string>
     <string name="newAddressBarOptionBottomSheetDialogFooter">Kohanda menüüs Seaded &gt; Tehisintellekti funktsioonid.</string>

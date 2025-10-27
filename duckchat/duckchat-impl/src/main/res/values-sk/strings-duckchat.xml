@@ -69,9 +69,8 @@
     <string name="autocompleteDeviceAppNotFound">Aplikáciu sa nepodarilo nájsť</string>
 
     <!-- New Address Bar Option Bottom Sheet Dialog -->
+    <string name="newAddressBarOptionBottomSheetDialogTitle">Chceš jednoduchší prístup k súkromnému AI chatu?</string>
     <string name="newAddressBarOptionBottomSheetDialogSearchText">Vyhľadajte alebo zadajte adresu</string>
-    <string name="newAddressBarOptionBottomSheetDialogTitle">Prepnúť medzi vyhľadávaním a AI chatom</string>
-    <string name="newAddressBarOptionBottomSheetDialogSubTitle">Funkcie AI sú vždy voliteľné.</string>
     <string name="newAddressBarOptionBottomSheetDialogPrimaryButton">Potvrdiť</string>
     <string name="newAddressBarOptionBottomSheetDialogGhostButton">Teraz nie</string>
     <string name="newAddressBarOptionBottomSheetDialogFooter">Uprav v Nastaveniach &gt; Funkcie AI.</string>
