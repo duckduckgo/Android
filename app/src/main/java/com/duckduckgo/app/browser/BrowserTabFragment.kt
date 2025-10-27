@@ -642,7 +642,6 @@ class BrowserTabFragment :
 
     private val binding: FragmentBrowserTabBinding by viewBinding()
 
-    private lateinit var unifiedOmnibar: Omnibar
     private lateinit var omnibar: Omnibar
 
     private lateinit var webViewContainer: FrameLayout
