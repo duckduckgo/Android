@@ -84,6 +84,16 @@
     <string name="subscriptionSettingSectionHelpAndSupport">Hilfe und Support</string>
     <string name="subscriptionSettingSendFeedback">Rückmeldung senden</string>
     <string name="subscriptionSettingActivating">Wird aktiviert</string>
+    <string name="subscriptionSettingManageSubscription">Abonnement verwalten</string>
+    <string name="subscriptionSettingSwitchUpgrade">Wechsle zum Jahresabo und spare 16 %</string>
+    <!-- smartling.character_limit = 10 -->
+    <string name="subscriptionSettingSwitchUpgradePill">Top-Angebot</string>
+    <string name="subscriptionSettingSwitchDowngrade">Tarif wechseln</string>
+    <string name="subscriptionSettingManagePlan">Tarif und Zahlungsoptionen verwalten</string>
+    <!-- Change Plan -->
+    <string name="changePlanTitle">Tarif aktualisieren oder kündigen</string>
+    <string name="changePlanDescription">Dein Abonnement wurde über den Apple App Store erworben. Um deinen Tarif oder deine Rechnungseinstellungen zu ändern, gehe auf einem Gerät, auf dem du mit derselben Apple-Konto angemeldet bist, die du für den Kauf deines Abonnements verwendet hast, zu Einstellungen &gt; Apple-Konto &gt; Abonnements.</string>
+
 
     <!--Purchase Subscriptions-->
     <string name="purchaseCompletedTitle">Du bist startklar.</string>
@@ -97,10 +107,6 @@
 
     <!-- ITR Settings-->
     <string name="itrSettingTitle" translatable="false">Identity Theft Restoration</string>
-
-    <!-- Change Plan -->
-    <string name="changePlanTitle">Tarif aktualisieren oder kündigen</string>
-    <string name="changePlanDescription">Dein Abonnement wurde über den Apple App Store erworben. Um deinen Tarif oder deine Rechnungseinstellungen zu ändern, gehe auf einem Gerät, auf dem du mit derselben Apple-Konto angemeldet bist, die du für den Kauf deines Abonnements verwendet hast, zu Einstellungen &gt; Apple-Konto &gt; Abonnements.</string>
 
     <!-- PIR Activity-->
     <string name="pirTitle">Aktiviere Privacy Pro auf dem Desktop, um Personal Information Removal einzurichten</string>
@@ -185,5 +191,15 @@
     <string name="subscriptionSettingSubscribeSecure">Sichere dein WLAN, und chatte privat mit fortschrittlichen KI-Modellen</string>
 
     <string name="feedbackGeneralSubscription">Abonnement</string>
+    
+    <!-- Switch plan-->
+    <string name="switchBottomSheetTitleUpgrade">Mit einem Jahresabo\nsparst du 16 %!</string>
+    <string name="switchBottomSheetDescriptionUpgrade">Ein Jahrestarif kostet nur 8,33 USD/Monat, verglichen mit deinem derzeitigen Monatstarif von 9,99 USD.</string>
+    <string name="switchBottomSheetPrimaryButtonUpgrade">Zum Jahresabonnement (99,99 USD/Jahr) wechseln</string>
+    <string name="switchBottomSheetSecondaryButtonUpgrade">Monatlichen Tarif beibehalten</string>
+    <string name="switchBottomSheetTitleDowngrade">Du sparst 16 % mit einem Jahrestarif!</string>
+    <string name="switchBottomSheetDescriptionDowngrade">Durch den Wechsel erhöht sich dein monatlicher Preis von 8,33 $/Monat auf 9,99 $/Monat.</string>
+    <string name="switchBottomSheetPrimaryButtonDowngrade">Jahrestarif behalten</string>
+    <string name="switchBottomSheetSecondaryButtonDowngrade">Zum Monatstarif wechseln (9,99 USD/Monat)</string>
 
 </resources>
