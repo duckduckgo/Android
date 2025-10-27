@@ -127,4 +127,9 @@ sealed class PirSuccessResponse(
     data class AdditionalData(
         val additionalData: String,
     )
+    data class ConditionResponse(
+        override val actionID: String,
+        override val actionType: String,
+        val actions: List<BrokerAction> = emptyList(),
+    ) : PirSuccessResponse(actionID, actionType)
 }
