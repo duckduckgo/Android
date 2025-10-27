@@ -162,6 +162,7 @@
 
     <string name="feedbackSubmitGeneralDescriptionHint">Pateikite mums savo atsiliepimą...</string>
     <string name="feedbackSubmitFeatureRequestDescriptionHint">Kokią funkciją norėtumėte pamatyti?</string>
+    <string name="feedbackSubmitContactSupport">Reikia pagalbos? <annotation type="support_link">Kreipkitės į palaikymo tarnybą</annotation>.</string>
 
     <!-- Activity titles -->
     <string name="activitySubscriptions">Prenumeratos</string>

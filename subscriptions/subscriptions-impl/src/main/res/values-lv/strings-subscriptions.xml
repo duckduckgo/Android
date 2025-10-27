@@ -162,6 +162,7 @@
 
     <string name="feedbackSubmitGeneralDescriptionHint">Lūdzu, sniedz atsauksmes…</string>
     <string name="feedbackSubmitFeatureRequestDescriptionHint">Kādu funkciju tu vēlētos redzēt?</string>
+    <string name="feedbackSubmitContactSupport">Vai tev vajadzīga palīdzība? <annotation type="support_link">Sazinies ar atbalsta dienestu</annotation>.</string>
 
     <!-- Activity titles -->
     <string name="activitySubscriptions">Abonementi</string>

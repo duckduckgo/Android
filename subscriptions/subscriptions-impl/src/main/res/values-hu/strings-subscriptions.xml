@@ -162,6 +162,7 @@
 
     <string name="feedbackSubmitGeneralDescriptionHint">Küldj nekünk visszajelzést…</string>
     <string name="feedbackSubmitFeatureRequestDescriptionHint">Milyen funkciót szeretnél látni?</string>
+    <string name="feedbackSubmitContactSupport">Segítségre van szükséged? <annotation type="support_link">Vedd fel a kapcsolatot az ügyfélszolgálattal</annotation>.</string>
 
     <!-- Activity titles -->
     <string name="activitySubscriptions">Előfizetések</string>

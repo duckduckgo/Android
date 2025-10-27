@@ -162,6 +162,7 @@
 
     <string name="feedbackSubmitGeneralDescriptionHint">Pruži nam svoje povratne informacije…</string>
     <string name="feedbackSubmitFeatureRequestDescriptionHint">Koju bi značajku želio vidjeti?</string>
+    <string name="feedbackSubmitContactSupport">Trebaš pomoć? <annotation type="support_link">Kontaktiraj podršku</annotation>.</string>
 
     <!-- Activity titles -->
     <string name="activitySubscriptions">Pretplate</string>

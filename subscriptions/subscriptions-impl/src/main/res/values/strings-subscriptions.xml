@@ -161,6 +161,7 @@
 
     <string name="feedbackSubmitGeneralDescriptionHint">Please give us your feedback…</string>
     <string name="feedbackSubmitFeatureRequestDescriptionHint">What feature would you like to see?</string>
+    <string name="feedbackSubmitContactSupport">Need help? <annotation type="support_link">Contact support</annotation>.</string>
 
     <!-- Activity titles -->
     <string name="activitySubscriptions">Subscriptions</string>

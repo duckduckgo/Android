@@ -162,6 +162,7 @@
 
     <string name="feedbackSubmitGeneralDescriptionHint">Lütfen bize geri bildirimlerinizi iletin…</string>
     <string name="feedbackSubmitFeatureRequestDescriptionHint">Hangi özelliği görmek istersiniz?</string>
+    <string name="feedbackSubmitContactSupport">Yardıma mı ihtiyacınız var? <annotation type="support_link">Destek ekibiyle iletişime geçin</annotation>.</string>
 
     <!-- Activity titles -->
     <string name="activitySubscriptions">Abonelikler</string>

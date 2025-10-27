@@ -162,6 +162,7 @@
 
     <string name="feedbackSubmitGeneralDescriptionHint">Anna meille palautetta...</string>
     <string name="feedbackSubmitFeatureRequestDescriptionHint">Minkä ominaisuuden haluaisit nähdä?</string>
+    <string name="feedbackSubmitContactSupport">Tarvitsetko apua? <annotation type="support_link">Ota yhteyttä tukeen</annotation>.</string>
 
     <!-- Activity titles -->
     <string name="activitySubscriptions">Tilaukset</string>
