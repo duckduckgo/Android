@@ -57,20 +57,20 @@ import com.duckduckgo.app.browser.SmoothProgressAnimator
 import com.duckduckgo.app.browser.animations.AddressBarTrackersAnimationFeatureToggle
 import com.duckduckgo.app.browser.databinding.IncludeCustomTabToolbarBinding
 import com.duckduckgo.app.browser.databinding.IncludeFindInPageBinding
-import com.duckduckgo.app.browser.omnibar.LegacyOmnibarLayoutViewModel.Command
-import com.duckduckgo.app.browser.omnibar.LegacyOmnibarLayoutViewModel.Command.LaunchInputScreen
-import com.duckduckgo.app.browser.omnibar.LegacyOmnibarLayoutViewModel.Command.MoveCaretToFront
-import com.duckduckgo.app.browser.omnibar.LegacyOmnibarLayoutViewModel.Command.StartCookiesAnimation
-import com.duckduckgo.app.browser.omnibar.LegacyOmnibarLayoutViewModel.Command.StartTrackersAnimation
-import com.duckduckgo.app.browser.omnibar.LegacyOmnibarLayoutViewModel.LeadingIconState.EasterEggLogo
-import com.duckduckgo.app.browser.omnibar.LegacyOmnibarLayoutViewModel.LeadingIconState.PrivacyShield
-import com.duckduckgo.app.browser.omnibar.LegacyOmnibarLayoutViewModel.ViewState
 import com.duckduckgo.app.browser.omnibar.Omnibar.InputScreenLaunchListener
 import com.duckduckgo.app.browser.omnibar.Omnibar.ItemPressedListener
 import com.duckduckgo.app.browser.omnibar.Omnibar.LogoClickListener
 import com.duckduckgo.app.browser.omnibar.Omnibar.OmnibarTextState
 import com.duckduckgo.app.browser.omnibar.Omnibar.TextListener
 import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode
+import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.Command
+import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.Command.LaunchInputScreen
+import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.Command.MoveCaretToFront
+import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.Command.StartCookiesAnimation
+import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.Command.StartTrackersAnimation
+import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.LeadingIconState.EasterEggLogo
+import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.LeadingIconState.PrivacyShield
+import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.ViewState
 import com.duckduckgo.app.browser.omnibar.animations.addressbar.BrowserTrackersAnimatorHelper
 import com.duckduckgo.app.browser.omnibar.animations.addressbar.PrivacyShieldAnimationHelper
 import com.duckduckgo.app.browser.omnibar.animations.addressbar.TrackersAnimatorListener
@@ -114,6 +114,7 @@ import kotlinx.coroutines.launch
 import logcat.logcat
 import javax.inject.Inject
 import kotlin.collections.isNotEmpty
+import kotlin.jvm.java
 import com.duckduckgo.app.global.model.PrivacyShield as PrivacyShieldState
 import com.duckduckgo.mobile.android.R as CommonR
 
@@ -297,11 +298,11 @@ open class LegacyOmnibarLayout @JvmOverloads constructor(
 
     private val smoothProgressAnimator by lazy { SmoothProgressAnimator(pageLoadingIndicator) }
 
-    protected val viewModel: LegacyOmnibarLayoutViewModel by lazy {
+    protected val viewModel: OmnibarLayoutViewModel by lazy {
         ViewModelProvider(
             findViewTreeViewModelStoreOwner()!!,
             viewModelFactory,
-        )[LegacyOmnibarLayoutViewModel::class.java]
+        )[OmnibarLayoutViewModel::class.java]
     }
 
     private val conflatedStateJob = ConflatedJob()
@@ -556,7 +557,7 @@ open class LegacyOmnibarLayout @JvmOverloads constructor(
 
     private fun renderLeadingIconState(viewState: ViewState) {
         when (val leadingIconState = viewState.leadingIconState) {
-            LegacyOmnibarLayoutViewModel.LeadingIconState.Search -> {
+            OmnibarLayoutViewModel.LeadingIconState.Search -> {
                 searchIcon.show()
                 shieldIcon.gone()
                 daxIcon.gone()
@@ -572,7 +573,7 @@ open class LegacyOmnibarLayout @JvmOverloads constructor(
                 duckPlayerIcon.gone()
             }
 
-            LegacyOmnibarLayoutViewModel.LeadingIconState.Dax -> {
+            OmnibarLayoutViewModel.LeadingIconState.Dax -> {
                 if (serpEasterEggLogosToggles.feature().isEnabled()) {
                     with(daxIcon) {
                         setOnClickListener(null)
@@ -593,7 +594,7 @@ open class LegacyOmnibarLayout @JvmOverloads constructor(
                 duckPlayerIcon.gone()
             }
 
-            LegacyOmnibarLayoutViewModel.LeadingIconState.Globe -> {
+            OmnibarLayoutViewModel.LeadingIconState.Globe -> {
                 globeIcon.show()
                 daxIcon.gone()
                 shieldIcon.gone()
@@ -601,7 +602,7 @@ open class LegacyOmnibarLayout @JvmOverloads constructor(
                 duckPlayerIcon.gone()
             }
 
-            LegacyOmnibarLayoutViewModel.LeadingIconState.DuckPlayer -> {
+            OmnibarLayoutViewModel.LeadingIconState.DuckPlayer -> {
                 globeIcon.gone()
                 daxIcon.gone()
                 shieldIcon.gone()
