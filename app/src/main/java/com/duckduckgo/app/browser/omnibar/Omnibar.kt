@@ -161,8 +161,8 @@ class Omnibar(
     }
 
     private fun setupSingleOmnibar(): OmnibarView {
-        binding.rootView.removeView(binding.unifiedOmnibarLayoutTop)
-        binding.rootView.removeView(binding.unifiedOmnibarLayoutBottom)
+        binding.rootView.removeView(binding.omnibarLayoutTop)
+        binding.rootView.removeView(binding.omnibarLayoutBottom)
 
         return when (omnibarPosition) {
             OmnibarPosition.TOP -> {
@@ -184,14 +184,14 @@ class Omnibar(
 
         return when (omnibarPosition) {
             OmnibarPosition.TOP -> {
-                binding.rootView.removeView(binding.unifiedOmnibarLayoutBottom)
-                binding.unifiedOmnibarLayoutTop
+                binding.rootView.removeView(binding.omnibarLayoutBottom)
+                binding.omnibarLayoutTop
             }
 
             OmnibarPosition.BOTTOM -> {
-                binding.rootView.removeView(binding.unifiedOmnibarLayoutTop)
+                binding.rootView.removeView(binding.omnibarLayoutTop)
                 adjustCoordinatorLayoutBehaviorForBottomOmnibar()
-                binding.unifiedOmnibarLayoutBottom
+                binding.omnibarLayoutBottom
             }
         }
     }

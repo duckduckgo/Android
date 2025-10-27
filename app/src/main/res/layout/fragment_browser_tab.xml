@@ -20,8 +20,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <com.duckduckgo.app.browser.omnibar.UnifiedOmnibarLayout
-        android:id="@+id/unifiedOmnibarLayoutTop"
+    <com.duckduckgo.app.browser.omnibar.OmnibarLayout
+        android:id="@+id/omnibarLayoutTop"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:elevation="1dp"
@@ -168,8 +168,8 @@
 
     </RelativeLayout>
 
-    <com.duckduckgo.app.browser.omnibar.UnifiedOmnibarLayout
-        android:id="@+id/unifiedOmnibarLayoutBottom"
+    <com.duckduckgo.app.browser.omnibar.OmnibarLayout
+        android:id="@+id/omnibarLayoutBottom"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom"
