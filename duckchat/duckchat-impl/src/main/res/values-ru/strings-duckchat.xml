@@ -69,6 +69,7 @@
     <string name="autocompleteDeviceAppNotFound">Приложение не найдено</string>
 
     <!-- New Address Bar Option Bottom Sheet Dialog -->
+    <string name="newAddressBarOptionBottomSheetDialogTitle">Нужен удобный доступ \nк приватному чату с ИИ?</string>
     <string name="newAddressBarOptionBottomSheetDialogSearchText">Введите поисковый запрос или адрес сайта</string>
     <string name="newAddressBarOptionBottomSheetDialogPrimaryButton">Подтвердить</string>
     <string name="newAddressBarOptionBottomSheetDialogGhostButton">Не сейчас</string>

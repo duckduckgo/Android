@@ -69,6 +69,7 @@
     <string name="autocompleteDeviceAppNotFound">Rakendust ei leitud</string>
 
     <!-- New Address Bar Option Bottom Sheet Dialog -->
+    <string name="newAddressBarOptionBottomSheetDialogTitle">Kas soovid lihtsamat juurdepääsu privaatsele AI-vestlusele?</string>
     <string name="newAddressBarOptionBottomSheetDialogSearchText">Otsi või sisesta aadress</string>
     <string name="newAddressBarOptionBottomSheetDialogPrimaryButton">Kinnita</string>
     <string name="newAddressBarOptionBottomSheetDialogGhostButton">Mitte praegu</string>

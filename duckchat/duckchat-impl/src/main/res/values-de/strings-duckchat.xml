@@ -69,6 +69,7 @@
     <string name="autocompleteDeviceAppNotFound">Die Anwendung konnte nicht gefunden werden.</string>
 
     <!-- New Address Bar Option Bottom Sheet Dialog -->
+    <string name="newAddressBarOptionBottomSheetDialogTitle">Möchtest du einfacheren Zugriff auf den privaten KI-Chat?</string>
     <string name="newAddressBarOptionBottomSheetDialogSearchText">Adresse suchen oder eingeben</string>
     <string name="newAddressBarOptionBottomSheetDialogPrimaryButton">Bestätigen</string>
     <string name="newAddressBarOptionBottomSheetDialogGhostButton">Jetzt nicht</string>

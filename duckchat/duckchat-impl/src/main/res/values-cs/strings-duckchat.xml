@@ -69,6 +69,7 @@
     <string name="autocompleteDeviceAppNotFound">Aplikace nebyla nalezena</string>
 
     <!-- New Address Bar Option Bottom Sheet Dialog -->
+    <string name="newAddressBarOptionBottomSheetDialogTitle">Chceš mít soukromý AI chat hned po ruce?</string>
     <string name="newAddressBarOptionBottomSheetDialogSearchText">Vyhledejte nebo zadejte adresu</string>
     <string name="newAddressBarOptionBottomSheetDialogPrimaryButton">Potvrdit</string>
     <string name="newAddressBarOptionBottomSheetDialogGhostButton">Teď ne</string>

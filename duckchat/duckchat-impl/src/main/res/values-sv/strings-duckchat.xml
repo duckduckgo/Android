@@ -69,6 +69,7 @@
     <string name="autocompleteDeviceAppNotFound">Appen kunde inte hittas</string>
 
     <!-- New Address Bar Option Bottom Sheet Dialog -->
+    <string name="newAddressBarOptionBottomSheetDialogTitle">Vill du ha enklare åtkomst\ntill privat AI-chatt?</string>
     <string name="newAddressBarOptionBottomSheetDialogSearchText">Sök eller ange adress</string>
     <string name="newAddressBarOptionBottomSheetDialogPrimaryButton">Bekräfta</string>
     <string name="newAddressBarOptionBottomSheetDialogGhostButton">Inte nu</string>

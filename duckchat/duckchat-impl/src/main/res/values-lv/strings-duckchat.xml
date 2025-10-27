@@ -69,6 +69,7 @@
     <string name="autocompleteDeviceAppNotFound">Lietojumprogrammu nevarēja atrast</string>
 
     <!-- New Address Bar Option Bottom Sheet Dialog -->
+    <string name="newAddressBarOptionBottomSheetDialogTitle">Vēlies vieglāk piekļūt privātai MI tērzēšanai?</string>
     <string name="newAddressBarOptionBottomSheetDialogSearchText">Meklē vai ievadi adresi</string>
     <string name="newAddressBarOptionBottomSheetDialogPrimaryButton">Apstiprināt</string>
     <string name="newAddressBarOptionBottomSheetDialogGhostButton">Ne tagad</string>

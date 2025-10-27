@@ -68,6 +68,7 @@
     <string name="autocompleteDeviceAppNotFound">Application could not be found</string>
 
     <!-- New Address Bar Option Bottom Sheet Dialog -->
+    <string name="newAddressBarOptionBottomSheetDialogTitle">Want easier access\nto private AI chat?</string>
     <string name="newAddressBarOptionBottomSheetDialogSearchText">Search or enter address</string>
     <string name="newAddressBarOptionBottomSheetDialogPrimaryButton">Confirm</string>
     <string name="newAddressBarOptionBottomSheetDialogGhostButton">Not Now</string>

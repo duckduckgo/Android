@@ -69,6 +69,7 @@
     <string name="autocompleteDeviceAppNotFound">Prošnje ni bilo mogoče najti</string>
 
     <!-- New Address Bar Option Bottom Sheet Dialog -->
+    <string name="newAddressBarOptionBottomSheetDialogTitle">Želite lažji dostop do zasebnega klepeta z umetno inteligenco?</string>
     <string name="newAddressBarOptionBottomSheetDialogSearchText">Poišči ali vnesi naslov</string>
     <string name="newAddressBarOptionBottomSheetDialogPrimaryButton">Potrdi</string>
     <string name="newAddressBarOptionBottomSheetDialogGhostButton">Ne zdaj</string>
