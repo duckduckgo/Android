@@ -346,6 +346,11 @@ open class BrowserActivity : DuckDuckGoActivity() {
 
         super.onCreate(savedInstanceState = newInstanceState, daggerInject = false)
 
+        // safety check: if the omnibar type is SPLIT but the feature is disabled, reset to SINGLE_TOP
+        if (settingsDataStore.omnibarType == OmnibarType.SPLIT && (!browserFeatures.useUnifiedOmnibarLayout().isEnabled() || !browserFeatures.splitOmnibar().isEnabled())) {
+            settingsDataStore.omnibarType = OmnibarType.SINGLE_TOP
+        }
+
         bindMockupToolbars()
 
         setContentView(binding.root)
