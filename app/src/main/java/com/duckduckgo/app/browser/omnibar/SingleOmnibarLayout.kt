@@ -29,8 +29,8 @@ import androidx.core.view.isVisible
 import androidx.core.view.updateLayoutParams
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.R
+import com.duckduckgo.app.browser.omnibar.LegacyOmnibarLayoutViewModel.ViewState
 import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode
-import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.ViewState
 import com.duckduckgo.browser.ui.omnibar.OmnibarPosition
 import com.duckduckgo.common.ui.view.addBottomShadow
 import com.duckduckgo.common.ui.view.gone
@@ -49,7 +49,7 @@ class SingleOmnibarLayout @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyle: Int = 0,
-) : OmnibarLayout(context, attrs, defStyle) {
+) : LegacyOmnibarLayout(context, attrs, defStyle) {
     @Inject
     lateinit var globalActivityStarter: GlobalActivityStarter
 
