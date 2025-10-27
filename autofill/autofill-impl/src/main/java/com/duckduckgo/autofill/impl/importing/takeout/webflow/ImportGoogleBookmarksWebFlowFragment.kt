@@ -63,11 +63,6 @@ import com.duckduckgo.autofill.impl.importing.takeout.webflow.ImportGoogleBookma
 import com.duckduckgo.autofill.impl.importing.takeout.webflow.ImportGoogleBookmarksWebFlowViewModel.ViewState.ShowWebPage
 import com.duckduckgo.autofill.impl.importing.takeout.webflow.ImportGoogleBookmarksWebFlowViewModel.ViewState.UserCancelledImportFlow
 import com.duckduckgo.autofill.impl.importing.takeout.webflow.ImportGoogleBookmarksWebFlowViewModel.ViewState.UserFinishedCannotImport
-import com.duckduckgo.autofill.impl.importing.takeout.webflow.UserCannotImportReason.DownloadError
-import com.duckduckgo.autofill.impl.importing.takeout.webflow.UserCannotImportReason.ErrorParsingBookmarks
-import com.duckduckgo.autofill.impl.importing.takeout.webflow.UserCannotImportReason.Unknown
-import com.duckduckgo.autofill.impl.importing.takeout.webflow.UserCannotImportReason.WebAutomationError
-import com.duckduckgo.autofill.impl.importing.takeout.webflow.UserCannotImportReason.WebViewError
 import com.duckduckgo.autofill.impl.jsbridge.request.SupportedAutofillInputSubType
 import com.duckduckgo.autofill.impl.jsbridge.request.SupportedAutofillInputSubType.PASSWORD
 import com.duckduckgo.autofill.impl.store.ReAuthenticationDetails
@@ -388,7 +383,7 @@ class ImportGoogleBookmarksWebFlowFragment :
 
     override fun onFatalWebViewError() {
         logcat(WARN) { "Bookmark-import: Fatal WebView error received" }
-        exitFlowAsError(WebViewError)
+        viewModel.onFatalWebViewError()
     }
 
     private fun configureBackButtonHandler() {
@@ -435,7 +430,7 @@ class ImportGoogleBookmarksWebFlowFragment :
     }
 
     private fun exitFlowAsError(reason: UserCannotImportReason) {
-        logcat { "Bookmark-import: Flow error at stage: ${reason.mapToStage()}" }
+        logcat { "Bookmark-import: Flow error at stage: $reason" }
         onWebFlowEnding()
 
         lifecycleScope.launch {
@@ -576,12 +571,3 @@ class ImportGoogleBookmarksWebFlowFragment :
         private const val SELECT_CREDENTIALS_FRAGMENT_TAG = "autofillSelectCredentialsDialog"
     }
 }
-
-private fun UserCannotImportReason.mapToStage(): String =
-    when (this) {
-        is DownloadError -> "zip-download-error"
-        is ErrorParsingBookmarks -> "zip-parse-error"
-        is Unknown -> "import-error-unknown"
-        is WebViewError -> "webview-error"
-        is WebAutomationError -> "web-automation-step-failure-${this.step}"
-    }

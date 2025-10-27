@@ -18,7 +18,9 @@ package com.duckduckgo.autofill.impl.importing.takeout.zip
 
 import android.content.Context
 import android.net.Uri
+import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.autofill.impl.importing.takeout.zip.TakeoutBookmarkExtractor.ExtractionResult
+import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.BOOKMARK_IMPORT_FROM_GOOGLE_FLOW_EXTRA_CHROME_EXPORT
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
@@ -55,6 +57,7 @@ interface TakeoutBookmarkExtractor {
 class TakeoutZipBookmarkExtractor @Inject constructor(
     private val context: Context,
     private val dispatchers: DispatcherProvider,
+    private val pixel: Pixel,
 ) : TakeoutBookmarkExtractor {
     override suspend fun extractBookmarksFromFile(takeoutZipUri: Uri): ExtractionResult =
         withContext(dispatchers.io()) {
@@ -77,46 +80,58 @@ class TakeoutZipBookmarkExtractor @Inject constructor(
 
         val chromeHtmlFiles = mutableListOf<String>()
 
-        // First pass: collect Chrome HTML files and look for Bookmarks.html
+        // First pass: collect all Chrome HTML files
         while (entry != null) {
             val entryName = entry.name
             logcat { "Bookmark-import: Processing zip entry '$entryName'" }
 
             if (isChromeHtmlEntry(entry)) {
-                if (entryName == "Takeout/Chrome/Bookmarks.html") {
-                    // If we find Bookmarks.html, extract it immediately
-                    logcat { "Bookmark-import: Found Bookmarks.html, extracting immediately" }
-                    return streamEntryToTempFile(zipInputStream, entryName)
-                }
-
                 chromeHtmlFiles.add(entryName)
             }
 
             entry = zipInputStream.nextEntry
         }
 
-        // If we get here, we didn't find Bookmarks.html but there might still be the right file with a localized name
-        return handleNonBookmarksHtmlFiles(chromeHtmlFiles, takeoutZipUri)
-    }
+        // Fire pixel if multiple Chrome files were found
+        if (chromeHtmlFiles.size > 1) {
+            logcat { "Bookmark-import: Multiple Chrome files detected (${chromeHtmlFiles.size})" }
+            pixel.fire(BOOKMARK_IMPORT_FROM_GOOGLE_FLOW_EXTRA_CHROME_EXPORT)
+        }
 
-    private fun handleNonBookmarksHtmlFiles(chromeHtmlFiles: List<String>, takeoutZipUri: Uri): ExtractionResult {
-        logcat { "Bookmark-import: Found ${chromeHtmlFiles.size} HTML files in Chrome folder: $chromeHtmlFiles" }
-
-        return when (chromeHtmlFiles.size) {
-            0 -> {
+        // Determine which file to extract
+        val fileToExtract = when {
+            chromeHtmlFiles.isEmpty() -> {
                 logcat(WARN) { "Bookmark-import: No HTML files found in Chrome folder" }
-                ExtractionResult.Error(Exception("No HTML files found in Chrome folder"))
+                return ExtractionResult.Error(Exception("No HTML files found in Chrome folder"))
             }
-            1 -> {
+            chromeHtmlFiles.contains(BOOKMARKS_HTML_FILENAME) -> {
+                logcat { "Bookmark-import: Found Bookmarks.html, extracting" }
+                BOOKMARKS_HTML_FILENAME
+            }
+            chromeHtmlFiles.size == 1 -> {
                 val singleFile = chromeHtmlFiles.first()
                 logcat { "Bookmark-import: Single HTML file found, extracting: $singleFile" }
-                extractSpecificFile(singleFile, takeoutZipUri)
+                singleFile
             }
             else -> {
                 logcat(WARN) { "Bookmark-import: Multiple HTML files found but no Bookmarks.html: $chromeHtmlFiles" }
-                ExtractionResult.Error(Exception("Multiple HTML files found but no Bookmarks.html available"))
+                return ExtractionResult.Error(Exception("Multiple HTML files found but no Bookmarks.html available"))
             }
         }
+
+        // Extract the selected file
+        return context.contentResolver.openInputStream(takeoutZipUri)?.use { inputStream ->
+            ZipInputStream(inputStream).use { zipInputStream ->
+                var entry = zipInputStream.nextEntry
+                while (entry != null) {
+                    if (entry.name == fileToExtract) {
+                        return streamEntryToTempFile(zipInputStream, fileToExtract)
+                    }
+                    entry = zipInputStream.nextEntry
+                }
+                ExtractionResult.Error(Exception("Selected bookmark file not found: $fileToExtract"))
+            }
+        } ?: ExtractionResult.Error(Exception("Unable to reopen ZIP file"))
     }
 
     private fun isChromeHtmlEntry(entry: ZipEntry): Boolean =
@@ -124,21 +139,6 @@ class TakeoutZipBookmarkExtractor @Inject constructor(
             entry.name.startsWith(EXPECTED_ZIP_ENTRY_PREFIX, ignoreCase = true) &&
             entry.name.endsWith(".html", ignoreCase = true) &&
             entry.name.count { it == '/' } == 2
-
-    private fun extractSpecificFile(fileName: String, takeoutZipUri: Uri): ExtractionResult {
-        return context.contentResolver.openInputStream(takeoutZipUri)?.use { inputStream ->
-            ZipInputStream(inputStream).use { zipInputStream ->
-                var entry = zipInputStream.nextEntry
-                while (entry != null) {
-                    if (entry.name == fileName) {
-                        return streamEntryToTempFile(zipInputStream, fileName)
-                    }
-                    entry = zipInputStream.nextEntry
-                }
-                ExtractionResult.Error(Exception("Selected bookmark file not found: $fileName"))
-            }
-        } ?: ExtractionResult.Error(Exception("Unable to reopen ZIP file"))
-    }
 
     private fun streamEntryToTempFile(
         zipInputStream: ZipInputStream,
@@ -238,6 +238,7 @@ class TakeoutZipBookmarkExtractor @Inject constructor(
 
     companion object {
         private const val EXPECTED_ZIP_ENTRY_PREFIX = "Takeout/Chrome/"
+        private const val BOOKMARKS_HTML_FILENAME = "${EXPECTED_ZIP_ENTRY_PREFIX}Bookmarks.html"
         private const val BUFFER_SIZE = 8192
         private const val NETSCAPE_HEADER = "<!DOCTYPE NETSCAPE-Bookmark-file"
         private const val BOOKMARK_TITLE = "<title>Bookmarks</title>"

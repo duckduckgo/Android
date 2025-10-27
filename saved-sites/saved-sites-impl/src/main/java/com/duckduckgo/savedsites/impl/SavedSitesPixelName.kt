@@ -17,6 +17,11 @@
 package com.duckduckgo.savedsites.impl
 
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.common.utils.plugins.pixel.PixelParamRemovalPlugin
+import com.duckduckgo.common.utils.plugins.pixel.PixelParamRemovalPlugin.PixelParameter
+import com.duckduckgo.di.scopes.AppScope
+import com.squareup.anvil.annotations.ContributesMultibinding
+
 enum class SavedSitesPixelName(override val pixelName: String) : Pixel.PixelName {
     /** Bookmarks Screen **/
     MENU_ACTION_BOOKMARKS_PRESSED_DAILY("m_navigation_menu_bookmarks_daily"),
@@ -60,8 +65,29 @@ enum class SavedSitesPixelName(override val pixelName: String) : Pixel.PixelName
     MENU_ACTION_ADD_FAVORITE_PRESSED_DAILY("m_nav_af_p_daily"),
     FAVOURITE_REMOVED("m_favorite_removed"),
     FAVOURITE_DELETED("m_favorite_deleted"),
+
+    /** Bookmark import from Google **/
+    BOOKMARK_IMPORT_FROM_GOOGLE_PREIMPORT_DIALOG_SHOWN("bookmark_import_from_google_dialog_shown"),
+    BOOKMARK_IMPORT_FROM_GOOGLE_PREIMPORT_DIALOG_DISMISSED("bookmark_import_from_google_dialog_dismissed"),
+    BOOKMARK_IMPORT_FROM_GOOGLE_PREIMPORT_DIALOG_START_FLOW("bookmark_import_from_google_dialog_startflow"),
+    BOOKMARK_IMPORT_FROM_GOOGLE_PREIMPORT_DIALOG_FROM_FILE("bookmark_import_from_google_dialog_fromfile"),
 }
 
 object SavedSitesPixelParameters {
     const val SORT_MODE = "sort_mode"
+}
+
+@ContributesMultibinding(
+    scope = AppScope::class,
+    boundType = PixelParamRemovalPlugin::class,
+)
+object SavedSitePixelsRequiringDataCleaning : PixelParamRemovalPlugin {
+    override fun names(): List<Pair<String, Set<PixelParameter>>> {
+        return listOf(
+            SavedSitesPixelName.BOOKMARK_IMPORT_FROM_GOOGLE_PREIMPORT_DIALOG_SHOWN.pixelName to PixelParameter.removeAtb(),
+            SavedSitesPixelName.BOOKMARK_IMPORT_FROM_GOOGLE_PREIMPORT_DIALOG_DISMISSED.pixelName to PixelParameter.removeAtb(),
+            SavedSitesPixelName.BOOKMARK_IMPORT_FROM_GOOGLE_PREIMPORT_DIALOG_START_FLOW.pixelName to PixelParameter.removeAtb(),
+            SavedSitesPixelName.BOOKMARK_IMPORT_FROM_GOOGLE_PREIMPORT_DIALOG_FROM_FILE.pixelName to PixelParameter.removeAtb(),
+        )
+    }
 }

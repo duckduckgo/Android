@@ -260,6 +260,13 @@ class ImportGoogleBookmarksWebFlowViewModel @Inject constructor(
         }
     }
 
+    fun onFatalWebViewError() {
+        viewModelScope.launch {
+            val stage = webFlowStepObserver.getCurrentStep()
+            _commands.emit(ExitFlowAsFailure(UserCannotImportReason.WebViewError(stage)))
+        }
+    }
+
     companion object {
         private const val TAKEOUT_ADDRESS = "takeout.google.com"
         private const val ACCOUNTS_ADDRESS = "accounts.google.com"

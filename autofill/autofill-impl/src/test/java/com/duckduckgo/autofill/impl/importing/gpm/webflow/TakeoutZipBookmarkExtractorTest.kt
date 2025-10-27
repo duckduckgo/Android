@@ -3,9 +3,11 @@ package com.duckduckgo.autofill.impl.importing.gpm.webflow
 import android.content.Context
 import android.net.Uri
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.autofill.impl.importing.takeout.zip.TakeoutBookmarkExtractor
 import com.duckduckgo.autofill.impl.importing.takeout.zip.TakeoutBookmarkExtractor.ExtractionResult.Success
 import com.duckduckgo.autofill.impl.importing.takeout.zip.TakeoutZipBookmarkExtractor
+import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.test.FileUtilities
 import kotlinx.coroutines.test.runTest
@@ -16,6 +18,8 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
+import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
@@ -30,10 +34,12 @@ class TakeoutZipBookmarkExtractorTest {
 
     private val mockContext = mock<Context>()
     private val mockUri = mock<Uri>()
+    private val mockPixel = mock<Pixel>()
     private val testee =
         TakeoutZipBookmarkExtractor(
             context = mockContext,
             dispatchers = coroutineTestRule.testDispatcherProvider,
+            pixel = mockPixel,
         )
 
     @Before
@@ -185,7 +191,7 @@ class TakeoutZipBookmarkExtractorTest {
         }
 
     @Test
-    fun whenZipContainsMultipleBookmarkFilesWithBookmarksHtmlThenBookmarksHtmlIsPreferred() =
+    fun whenZipContainsMultipleBookmarkFilesWithBookmarksHtmlThenBookmarksHtmlIsPreferredAndPixelFired() =
         runTest {
             val englishContent = loadHtmlFile("valid_chrome_bookmarks_netscape")
             val spanishContent = loadHtmlFile("valid_chrome_bookmarks_title_only")
@@ -205,10 +211,13 @@ class TakeoutZipBookmarkExtractorTest {
             val tempFileUri = (result as Success).tempFileUri
             val actualContent = File(tempFileUri.path!!).readText()
             assertEquals(englishContent, actualContent)
+
+            // Pixel should be fired because multiple Chrome HTML files were found
+            verify(mockPixel).fire(AutofillPixelNames.BOOKMARK_IMPORT_FROM_GOOGLE_FLOW_EXTRA_CHROME_EXPORT)
         }
 
     @Test
-    fun whenZipContainsMultipleLocalizedBookmarkFilesWithoutBookmarksHtmlThenExtractionFails() =
+    fun whenZipContainsMultipleLocalizedBookmarkFilesWithoutBookmarksHtmlThenExtractionFailsButPixelFired() =
         runTest {
             val spanishContent = loadHtmlFile("valid_chrome_bookmarks_netscape")
             val frenchContent = loadHtmlFile("valid_chrome_bookmarks_title_only")
@@ -223,6 +232,9 @@ class TakeoutZipBookmarkExtractorTest {
             val result = testee.extractBookmarksFromFile(mockUri)
 
             assertTrue(result is TakeoutBookmarkExtractor.ExtractionResult.Error)
+
+            // Pixel should be fired because multiple Chrome HTML files were found
+            verify(mockPixel).fire(AutofillPixelNames.BOOKMARK_IMPORT_FROM_GOOGLE_FLOW_EXTRA_CHROME_EXPORT)
         }
 
     @Test
@@ -284,5 +296,33 @@ class TakeoutZipBookmarkExtractorTest {
         whenever(mockContext.contentResolver.openInputStream(uri)).thenAnswer {
             ByteArrayInputStream(zipData)
         }
+    }
+
+    @Test
+    fun whenValidZipWithBookmarksHtmlOnlyThenPixelNotFired() = runTest {
+        val bookmarkContent = loadHtmlFile("valid_chrome_bookmarks_netscape")
+        val zipData = createZipWithEntry("Takeout/Chrome/Bookmarks.html", bookmarkContent)
+        mockFileUri(mockUri, zipData)
+
+        val result = testee.extractBookmarksFromFile(mockUri)
+
+        assertTrue(result is Success)
+
+        // Pixel should NOT be fired because only one Chrome HTML file was found
+        verify(mockPixel, never()).fire(AutofillPixelNames.BOOKMARK_IMPORT_FROM_GOOGLE_FLOW_EXTRA_CHROME_EXPORT)
+    }
+
+    @Test
+    fun whenZipContainsSingleLocalizedBookmarkFileThenPixelNotFired() = runTest {
+        val bookmarkContent = loadHtmlFile("valid_chrome_bookmarks_netscape")
+        val zipData = createZipWithEntry("Takeout/Chrome/Marcadores.html", bookmarkContent) // Spanish
+        mockFileUri(mockUri, zipData)
+
+        val result = testee.extractBookmarksFromFile(mockUri)
+
+        assertTrue(result is Success)
+
+        // Pixel should NOT be fired because only one Chrome HTML file was found
+        verify(mockPixel, never()).fire(AutofillPixelNames.BOOKMARK_IMPORT_FROM_GOOGLE_FLOW_EXTRA_CHROME_EXPORT)
     }
 }

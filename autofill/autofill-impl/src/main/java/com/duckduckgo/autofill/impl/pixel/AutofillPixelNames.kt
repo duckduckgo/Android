@@ -64,6 +64,11 @@ import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_SITE_BREAK
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_SYNC_DESKTOP_PASSWORDS_CTA_BUTTON
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_SYNC_DESKTOP_PASSWORDS_OVERFLOW_MENU
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_SYSTEM_AUTOFILL_USED
+import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.BOOKMARK_IMPORT_FROM_GOOGLE_FLOW_CANCELLED
+import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.BOOKMARK_IMPORT_FROM_GOOGLE_FLOW_ERROR
+import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.BOOKMARK_IMPORT_FROM_GOOGLE_FLOW_EXTRA_CHROME_EXPORT
+import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.BOOKMARK_IMPORT_FROM_GOOGLE_FLOW_STARTED
+import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.BOOKMARK_IMPORT_FROM_GOOGLE_FLOW_SUCCESS
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.EMAIL_TOOLTIP_DISMISSED
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.EMAIL_USE_ADDRESS
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.EMAIL_USE_ALIAS
@@ -211,6 +216,12 @@ enum class AutofillPixelNames(override val pixelName: String) : Pixel.PixelName 
     AUTOFILL_NEVER_SAVE_FOR_THIS_SITE_OVERFLOW_MENU("autofill_reset_excluded_overflow_menu_tapped"),
 
     AUTOFILL_SYSTEM_AUTOFILL_USED("autofill_systemautofill_used"),
+
+    BOOKMARK_IMPORT_FROM_GOOGLE_FLOW_STARTED("bookmark_import_from_google_flow_started"),
+    BOOKMARK_IMPORT_FROM_GOOGLE_FLOW_SUCCESS("bookmark_import_from_google_flow_success"),
+    BOOKMARK_IMPORT_FROM_GOOGLE_FLOW_ERROR("bookmark_import_from_google_flow_error"),
+    BOOKMARK_IMPORT_FROM_GOOGLE_FLOW_CANCELLED("bookmark_import_from_google_flow_cancelled"),
+    BOOKMARK_IMPORT_FROM_GOOGLE_FLOW_EXTRA_CHROME_EXPORT("bookmark_import_from_google_flow_extra_chrome_export"),
 }
 
 object AutofillPixelParameters {
@@ -289,6 +300,12 @@ object AutofillPixelsRequiringDataCleaning : PixelParamRemovalPlugin {
             AUTOFILL_SYSTEM_AUTOFILL_USED.pixelName to PixelParameter.removeAtb(),
 
             AUTOFILL_IMPORT_GOOGLE_PASSWORDS_RESULT_FAILURE_WEBVIEW_CRASH.pixelName to PixelParameter.removeAtb(),
+
+            BOOKMARK_IMPORT_FROM_GOOGLE_FLOW_STARTED.pixelName to PixelParameter.removeAtb(),
+            BOOKMARK_IMPORT_FROM_GOOGLE_FLOW_SUCCESS.pixelName to PixelParameter.removeAtb(),
+            BOOKMARK_IMPORT_FROM_GOOGLE_FLOW_ERROR.pixelName to PixelParameter.removeAtb(),
+            BOOKMARK_IMPORT_FROM_GOOGLE_FLOW_CANCELLED.pixelName to PixelParameter.removeAtb(),
+            BOOKMARK_IMPORT_FROM_GOOGLE_FLOW_EXTRA_CHROME_EXPORT.pixelName to PixelParameter.removeAtb(),
         )
     }
 }

@@ -42,7 +42,8 @@ class ImportFromGoogleImpl @Inject constructor(
     override suspend fun getBookmarksImportLaunchIntent(): Intent? {
         return withContext(dispatchers.io()) {
             if (autofillFeature.canImportBookmarksFromGoogleTakeout().isEnabled()) {
-                globalActivityStarter.startIntent(context, ImportBookmarksViaGoogleTakeoutScreen)
+                val launchSource = getLaunchSource()
+                globalActivityStarter.startIntent(context, ImportBookmarksViaGoogleTakeoutScreen(launchSource))
             } else {
                 null
             }
@@ -68,5 +69,10 @@ class ImportFromGoogleImpl @Inject constructor(
                 is ImportGoogleBookmarkResult.Error -> PublicResult.Error
             }
         }
+    }
+
+    private fun getLaunchSource(): String {
+        // launchSource can only be bookmarks screen or dev settings currently, so hardcoding to bookmarks screen for now
+        return "bookmarks_screen"
     }
 }

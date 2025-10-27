@@ -27,27 +27,31 @@ import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.autofill.impl.R
 import com.duckduckgo.autofill.impl.databinding.ActivityImportGoogleBookmarksWebflowBinding
 import com.duckduckgo.autofill.impl.importing.takeout.webflow.UserCannotImportReason.Unknown
+import com.duckduckgo.autofill.impl.importing.takeout.webflow.journey.ImportGoogleBookmarksJourney
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter
+import com.duckduckgo.navigation.api.getActivityParams
 import logcat.logcat
 import javax.inject.Inject
 
 /**
  * Launch the Google Bookmarks import flow
  */
-data object ImportBookmarksViaGoogleTakeoutScreen : GlobalActivityStarter.ActivityParams {
-    private fun readResolve(): Any = ImportBookmarksViaGoogleTakeoutScreen
-}
+data class ImportBookmarksViaGoogleTakeoutScreen(val launchSource: String) : GlobalActivityStarter.ActivityParams
 
 @InjectWith(ActivityScope::class)
 @ContributeToActivityStarter(ImportBookmarksViaGoogleTakeoutScreen::class)
 class ImportGoogleBookmarksWebFlowActivity :
     DuckDuckGoActivity(),
     ImportGoogleBookmarksWebFlowFragment.WebViewVisibilityListener {
+
     @Inject
     lateinit var appBuildConfig: AppBuildConfig
+
+    @Inject
+    lateinit var importJourney: ImportGoogleBookmarksJourney
 
     val binding: ActivityImportGoogleBookmarksWebflowBinding by viewBinding()
 
@@ -60,6 +64,9 @@ class ImportGoogleBookmarksWebFlowActivity :
         configureToolbar()
         configureResultListeners()
         launchWebFlow()
+        if (savedInstanceState == null) {
+            importJourney.started(getLaunchSource())
+        }
     }
 
     private fun launchWebFlow() {
@@ -67,7 +74,6 @@ class ImportGoogleBookmarksWebFlowActivity :
         isOnResultScreen = false
         replaceFragment(ImportGoogleBookmarksWebFlowFragment())
         updateToolbarTitle()
-        invalidateOptionsMenu()
     }
 
     private fun showSuccessFragment(bookmarkCount: Int) {
@@ -82,7 +88,6 @@ class ImportGoogleBookmarksWebFlowActivity :
         isOverlayCurrentlyShown = false
         isOnResultScreen = true
         updateToolbarTitle()
-        invalidateOptionsMenu()
     }
 
     private fun showErrorFragment(errorReason: UserCannotImportReason) {
@@ -99,7 +104,6 @@ class ImportGoogleBookmarksWebFlowActivity :
         isOverlayCurrentlyShown = false
         isOnResultScreen = true
         updateToolbarTitle()
-        invalidateOptionsMenu()
     }
 
     private fun replaceFragment(fragment: Fragment) {
@@ -149,16 +153,19 @@ class ImportGoogleBookmarksWebFlowActivity :
         when (result) {
             is ImportGoogleBookmarkResult.Success -> {
                 logcat { "Bookmark-import: ${javaClass.simpleName}, WebFlow succeeded with ${result.importedCount} bookmarks" }
+                importJourney.finishedWithSuccess()
                 showSuccessFragment(result.importedCount)
             }
 
             is ImportGoogleBookmarkResult.UserCancelled -> {
                 logcat { "Bookmark-import: ${javaClass.simpleName}, User cancelled at ${result.stage}" }
+                importJourney.cancelled(result.stage)
                 exitUserCancelled(result.stage)
             }
 
             is ImportGoogleBookmarkResult.Error -> {
                 logcat { "Bookmark-import: ${javaClass.simpleName}, Import failed with reason: ${result.reason}" }
+                importJourney.finishedWithError(error = result.reason)
                 showErrorFragment(result.reason)
             }
 
@@ -223,14 +230,21 @@ class ImportGoogleBookmarksWebFlowActivity :
     }
 
     override fun showLoadingState() {
+        importJourney.startedWaitingForExport()
         showProgressOverlay()
     }
 
     override fun hideLoadingState() {
+        importJourney.stoppedWaitingForExport()
         hideProgressOverlay()
+    }
+
+    private fun getLaunchSource(): String {
+        return intent.getActivityParams(ImportBookmarksViaGoogleTakeoutScreen::class.java)?.launchSource ?: UNKNOWN_LAUNCH_SOURCE
     }
 
     companion object {
         private const val PROGRESS_OVERLAY_TAG = "progress_overlay"
+        private const val UNKNOWN_LAUNCH_SOURCE = "unknown"
     }
 }

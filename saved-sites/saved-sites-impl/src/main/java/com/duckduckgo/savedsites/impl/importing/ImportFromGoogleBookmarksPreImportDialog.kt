@@ -25,10 +25,12 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.setFragmentResult
 import com.duckduckgo.anvil.annotations.InjectWith
+import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.utils.FragmentViewModelFactory
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.saved.sites.impl.R
 import com.duckduckgo.saved.sites.impl.databinding.ContentImportBookmarksFromGooglePreimportDialogBinding
+import com.duckduckgo.savedsites.impl.SavedSitesPixelName
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
@@ -55,19 +57,12 @@ class ImportFromGoogleBookmarksPreImportDialog : BottomSheetDialogFragment() {
     @Inject
     lateinit var viewModelFactory: FragmentViewModelFactory
 
+    @Inject
+    lateinit var pixel: Pixel
+
     override fun onAttach(context: Context) {
         AndroidSupportInjection.inject(this)
         super.onAttach(context)
-    }
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
-        if (savedInstanceState != null) {
-            // If being created after a configuration change, dismiss the dialog as the WebView will be re-created too
-            dismiss()
-            return
-        }
     }
 
     override fun onCreateView(
@@ -77,6 +72,9 @@ class ImportFromGoogleBookmarksPreImportDialog : BottomSheetDialogFragment() {
     ): View {
         _binding = ContentImportBookmarksFromGooglePreimportDialogBinding.inflate(inflater, container, false)
         configureViews(binding)
+        if (savedInstanceState == null) {
+            pixel.fire(SavedSitesPixelName.BOOKMARK_IMPORT_FROM_GOOGLE_PREIMPORT_DIALOG_SHOWN)
+        }
         return binding.root
     }
 
@@ -101,6 +99,8 @@ class ImportFromGoogleBookmarksPreImportDialog : BottomSheetDialogFragment() {
     private fun onImportButtonClicked() {
         ignoreCancellationEvents = true
 
+        pixel.fire(SavedSitesPixelName.BOOKMARK_IMPORT_FROM_GOOGLE_PREIMPORT_DIALOG_START_FLOW)
+
         // Send fragment result
         val result = Bundle().apply {
             putParcelable(BUNDLE_RESULT_KEY, ImportBookmarksPreImportResult.ImportBookmarksFromGoogle)
@@ -110,6 +110,8 @@ class ImportFromGoogleBookmarksPreImportDialog : BottomSheetDialogFragment() {
 
     private fun onSelectFileButtonClicked() {
         ignoreCancellationEvents = true
+
+        pixel.fire(SavedSitesPixelName.BOOKMARK_IMPORT_FROM_GOOGLE_PREIMPORT_DIALOG_FROM_FILE)
 
         val result = Bundle().apply {
             putParcelable(BUNDLE_RESULT_KEY, ImportBookmarksPreImportResult.SelectBookmarksFile)
@@ -123,6 +125,8 @@ class ImportFromGoogleBookmarksPreImportDialog : BottomSheetDialogFragment() {
             return
         }
 
+        pixel.fire(SavedSitesPixelName.BOOKMARK_IMPORT_FROM_GOOGLE_PREIMPORT_DIALOG_DISMISSED)
+
         val result = Bundle().apply {
             putParcelable(BUNDLE_RESULT_KEY, ImportBookmarksPreImportResult.Cancel)
         }
@@ -131,13 +135,6 @@ class ImportFromGoogleBookmarksPreImportDialog : BottomSheetDialogFragment() {
 
     private fun configureCloseButton(binding: ContentImportBookmarksFromGooglePreimportDialogBinding) {
         binding.closeButton.setOnClickListener {
-            ignoreCancellationEvents = true
-
-            val result = Bundle().apply {
-                putParcelable(BUNDLE_RESULT_KEY, ImportBookmarksPreImportResult.Cancel)
-            }
-            setFragmentResult(FRAGMENT_RESULT_KEY, result)
-
             (dialog as BottomSheetDialog).behavior.state = BottomSheetBehavior.STATE_HIDDEN
         }
     }
