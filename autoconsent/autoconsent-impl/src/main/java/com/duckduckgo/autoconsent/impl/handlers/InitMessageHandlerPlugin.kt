@@ -88,7 +88,16 @@ class InitMessageHandlerPlugin @Inject constructor(
                     val enablePreHide = settingsRepository.userSetting
                     val detectRetries = 20
                     val disabledCmps = settings.disabledCMPs
-                    val config = Config(enabled = true, autoAction, disabledCmps, enablePreHide, detectRetries, enableCosmeticRules = true)
+                    val config =
+                        Config(
+                            enabled = true,
+                            autoAction,
+                            disabledCmps,
+                            enablePreHide,
+                            detectRetries,
+                            enableCosmeticRules = true,
+                            enableHeuristicDetection = true,
+                        )
                     val initResp = if (autoconsentFeature.ruleFiltering().isEnabled()) {
                         InitResp(config = config, rules = filterCompactRules(settings.compactRuleList, url))
                     } else {
@@ -215,6 +224,7 @@ class InitMessageHandlerPlugin @Inject constructor(
         val enablePrehide: Boolean,
         val detectRetries: Int,
         val enableCosmeticRules: Boolean,
+        val enableHeuristicDetection: Boolean,
     )
 
     data class AutoconsentRuleset(val compact: Any?)
