@@ -1,3 +1,5 @@
+import com.duckduckgo.gradle.ModuleCreator
+
 plugins {
     id 'com.android.application'
 
@@ -608,6 +610,8 @@ tasks.register('assemblePlayReleaseDefaultVariant', Exec) {
     commandLine "$rootDir/gradlew", ':app:assemblePlayRelease', "-Pforce-default-variant"
 }
 
-task newModule(type: com.duckduckgo.gradle.ModuleCreator) {
-    feature = project.hasProperty('feature') ? project.getProperty('feature') : null
+tasks.register('newModule', ModuleCreator) {
+    feature.set(providers.gradleProperty('feature'))
+    repoRootDirectory.set(rootProject.layout.projectDirectory)
+    appBuildGradleFile.set(layout.projectDirectory.file('build.gradle'))
 }

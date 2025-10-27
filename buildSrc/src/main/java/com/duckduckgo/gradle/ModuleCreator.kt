@@ -19,15 +19,19 @@ package com.duckduckgo.gradle
 import com.duckduckgo.gradle.ModuleType.ApiPureKotlin
 import com.duckduckgo.gradle.ModuleType.Companion.INPUT_API_ANDROID
 import com.duckduckgo.gradle.ModuleType.Companion.INPUT_API_IMPL
-import com.duckduckgo.gradle.ModuleType.Companion.INPUT_API_KOTLIN
 import com.duckduckgo.gradle.ModuleType.Companion.INPUT_API_INTERNAL
+import com.duckduckgo.gradle.ModuleType.Companion.INPUT_API_KOTLIN
 import com.duckduckgo.gradle.ModuleType.Companion.destinationDirectorySuffix
 import com.duckduckgo.gradle.ModuleType.Companion.exampleSubdirectorySuffix
 import com.duckduckgo.gradle.ModuleType.Companion.namespaceSuffix
 import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
+import org.gradle.api.file.DirectoryProperty
+import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Input
+import org.gradle.api.tasks.InputDirectory
+import org.gradle.api.tasks.InputFile
 import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.TaskAction
 import java.io.File
@@ -38,6 +42,12 @@ abstract class ModuleCreator : DefaultTask() {
     @get:Input
     abstract val feature: Property<String>
 
+    @get:InputDirectory
+    abstract val repoRootDirectory: DirectoryProperty
+
+    @get:InputFile
+    abstract val appBuildGradleFile: RegularFileProperty
+
     @TaskAction
     fun performAction() {
         val featureName = feature.orNull?.trim() ?: throw GradleException(ERROR_MESSAGE_MISSING_FEATURE.trim())
@@ -45,7 +55,8 @@ abstract class ModuleCreator : DefaultTask() {
 
         val (feature, moduleType) = extractFeatureAndModuleType(featureName)
 
-        val newFeatureDestination = File(project.rootDir, feature)
+        val rootDirFile = repoRootDirectory.asFile.get()
+        val newFeatureDestination = File(rootDirFile, feature)
         val newModuleDestination = File(newFeatureDestination, "${feature}-${moduleType.destinationDirectorySuffix()}")
 
         newModuleDestination.ensureModuleDoesNotExist()
@@ -57,7 +68,7 @@ abstract class ModuleCreator : DefaultTask() {
 
         with(IntermoduleDependencyManager()) {
             wireUpIntermoduleDependencies(newFeatureDestination)
-            wireUpAppModule(feature, moduleType, File(project.projectDir, ModuleCreator.BUILD_GRADLE))
+            wireUpAppModule(feature, moduleType, appBuildGradleFile.asFile.get())
         }
     }
 
@@ -79,7 +90,8 @@ abstract class ModuleCreator : DefaultTask() {
     }
 
     private fun File.ensureModuleDoesNotExist() {
-        if (exists()) throw GradleException("Feature [${relativeTo(project.rootDir)}] already exists")
+        val root = repoRootDirectory.asFile.get()
+        if (exists()) throw GradleException("Feature [${relativeTo(root)}] already exists")
     }
 
     private fun File.createDirectory() {
@@ -98,7 +110,7 @@ abstract class ModuleCreator : DefaultTask() {
             }
     }
 
-    private fun getExampleDir(): File = File(project.rootDir, EXAMPLE_FEATURE_NAME)
+    private fun getExampleDir(): File = File(repoRootDirectory.asFile.get(), EXAMPLE_FEATURE_NAME)
 
     private fun getExampleSubDirectory(type: ModuleType): File {
         val exampleDir = getExampleDir()
