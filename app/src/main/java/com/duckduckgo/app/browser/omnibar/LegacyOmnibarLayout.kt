@@ -654,7 +654,7 @@ open class LegacyOmnibarLayout @JvmOverloads constructor(
         tabsMenu.isVisible = newTransitionState.showTabsMenu
         fireIconMenu.isVisible = newTransitionState.showFireIcon
         browserMenu.isVisible = newTransitionState.showBrowserMenu
-        browserMenuHighlight.isVisible = viewState.showBrowserMenuHighlight
+        browserMenuHighlight.isVisible = newTransitionState.showBrowserMenuHighlight
         aiChatMenu?.isVisible = newTransitionState.showChatMenu
         aiChatDivider.isVisible = (viewState.showVoiceSearch || viewState.showClearButton) && viewState.showChatMenu
 
