@@ -36,6 +36,7 @@
         android:layout_height="?attr/actionBarSize"
         android:background="?attr/daxColorToolbar"
         android:theme="@style/TabSwitcher.Widget.Toolbar"
+        app:buttonGravity="center_vertical"
         app:popupTheme="@style/Widget.DuckDuckGo.PopUpOverflowMenu" />
 
 </com.google.android.material.appbar.AppBarLayout>
