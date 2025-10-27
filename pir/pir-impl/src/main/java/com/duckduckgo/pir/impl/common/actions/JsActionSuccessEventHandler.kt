@@ -25,6 +25,7 @@ import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerOptOu
 import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerScanActionSucceeded
 import com.duckduckgo.pir.impl.common.actions.EventHandler.Next
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.Event
+import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.Event.ConditionExpectationSucceeded
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.Event.ExecuteBrokerStepAction
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.Event.JsActionSuccess
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.SideEffect.EvaluateJs
@@ -33,6 +34,7 @@ import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.SideEf
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.State
 import com.duckduckgo.pir.impl.scripts.models.PirScriptRequestData.UserProfile
 import com.duckduckgo.pir.impl.scripts.models.PirSuccessResponse.ClickResponse
+import com.duckduckgo.pir.impl.scripts.models.PirSuccessResponse.ConditionResponse
 import com.duckduckgo.pir.impl.scripts.models.PirSuccessResponse.ExpectationResponse
 import com.duckduckgo.pir.impl.scripts.models.PirSuccessResponse.ExtractedResponse
 import com.duckduckgo.pir.impl.scripts.models.PirSuccessResponse.FillFormResponse
@@ -150,6 +152,28 @@ class JsActionSuccessEventHandler @Inject constructor(
                         ),
                     ),
                 )
+            }
+
+            is ConditionResponse -> {
+                if (pirSuccessResponse.actions.isNotEmpty()) {
+                    Next(
+                        nextState = baseSuccessState,
+                        nextEvent = ConditionExpectationSucceeded(
+                            pirSuccessResponse.actions,
+                        ),
+                    )
+                } else {
+                    Next(
+                        nextState = baseSuccessState.copy(
+                            currentActionIndex = baseSuccessState.currentActionIndex + 1,
+                        ),
+                        nextEvent = ExecuteBrokerStepAction(
+                            UserProfile(
+                                userProfile = baseSuccessState.profileQuery,
+                            ),
+                        ),
+                    )
+                }
             }
         }
     }
