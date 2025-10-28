@@ -39,6 +39,7 @@ import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Comman
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.GoToActivationScreen
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.GoToEditEmailScreen
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.GoToPortal
+import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.ShowSwitchPlanDialog
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.SubscriptionDuration.Monthly
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.SubscriptionDuration.Yearly
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.ViewState.Ready
@@ -149,6 +150,17 @@ class SubscriptionSettingsViewModel @Inject constructor(
         }
     }
 
+    fun onSwitchPlanClicked() {
+        viewModelScope.launch {
+            val currentState = _viewState.value as? Ready ?: return@launch
+            val switchType = when (currentState.duration) {
+                Monthly -> SwitchPlanType.UPGRADE_TO_YEARLY
+                Yearly -> SwitchPlanType.DOWNGRADE_TO_MONTHLY
+            }
+            command.send(Command.ShowSwitchPlanDialog(switchType))
+        }
+    }
+
     sealed class SubscriptionDuration {
         data object Monthly : SubscriptionDuration()
         data object Yearly : SubscriptionDuration()
@@ -160,6 +172,12 @@ class SubscriptionSettingsViewModel @Inject constructor(
         data object GoToActivationScreen : Command()
         data class GoToPortal(val url: String) : Command()
         data object DismissRebrandingBanner : Command()
+        data class ShowSwitchPlanDialog(val switchType: SwitchPlanType) : Command()
+    }
+
+    enum class SwitchPlanType {
+        UPGRADE_TO_YEARLY,
+        DOWNGRADE_TO_MONTHLY,
     }
 
     sealed class ViewState {

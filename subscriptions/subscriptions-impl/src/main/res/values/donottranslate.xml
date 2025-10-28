@@ -31,5 +31,7 @@
     <string name="subscriptionSettingSwitchUpgradePill">Best offer</string>
     <string name="subscriptionSettingSwitchDowngrade">Switch Plan</string>
     <string name="subscriptionSettingManagePlan">Manage Plan and Payment Options</string>
+    <string name="switchPlanSuccessMessage">Successfully switched plans</string>
+    <string name="switchPlanErrorMessage">Failed to switch plans. Please try again.</string>
 
 </resources>

@@ -160,6 +160,14 @@
                 tools:visibility="visible" />
 
             <com.duckduckgo.common.ui.view.listitem.OneLineListItem
+                android:id="@+id/switchPlan"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="gone"
+                tools:primaryText="Switch to Yearly Plan"
+                tools:visibility="visible" />
+
+            <com.duckduckgo.common.ui.view.listitem.OneLineListItem
                 android:id="@+id/viewPlans"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
