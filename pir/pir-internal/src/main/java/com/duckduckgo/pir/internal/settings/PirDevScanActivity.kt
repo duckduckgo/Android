@@ -44,6 +44,7 @@ import com.duckduckgo.pir.impl.store.PirRepository
 import com.duckduckgo.pir.impl.store.PirSchedulingRepository
 import com.duckduckgo.pir.internal.R
 import com.duckduckgo.pir.internal.databinding.ActivityPirInternalScanBinding
+import com.duckduckgo.pir.internal.settings.store.secure.PirDatabaseExporter
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
@@ -76,6 +77,9 @@ class PirDevScanActivity : DuckDuckGoActivity() {
 
     @Inject
     lateinit var currentTimeProvider: CurrentTimeProvider
+
+    @Inject
+    lateinit var pirDatabaseExporter: PirDatabaseExporter
 
     private val binding: ActivityPirInternalScanBinding by viewBinding()
     private val recordStringBuilder = StringBuilder()
@@ -196,6 +200,12 @@ class PirDevScanActivity : DuckDuckGoActivity() {
             pirScanScheduler.cancelScheduledScans(this)
             pirScanScheduler.scheduleScans()
             Toast.makeText(this, getString(R.string.pirMessageSchedule), Toast.LENGTH_SHORT).show()
+        }
+
+        binding.debugExportDb.setOnClickListener {
+            lifecycleScope.launch(dispatcherProvider.io()) {
+                pirDatabaseExporter.exportToPlaintext()
+            }
         }
     }
 
