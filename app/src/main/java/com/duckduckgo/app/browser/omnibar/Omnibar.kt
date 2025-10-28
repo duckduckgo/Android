@@ -165,7 +165,7 @@ class Omnibar(
         binding.rootView.removeView(binding.omnibarLayoutBottom)
 
         return when (omnibarType) {
-            OmnibarType.SINGLE_TOP, OmnibarType.SPLIT -> {
+            OmnibarType.SINGLE_TOP -> {
                 binding.rootView.removeView(binding.singleOmnibarLayoutBottom)
                 binding.singleOmnibarLayoutTop
             }
@@ -175,6 +175,7 @@ class Omnibar(
                 adjustCoordinatorLayoutBehaviorForBottomOmnibar()
                 binding.singleOmnibarLayoutBottom
             }
+            else -> throw IllegalStateException("Invalid omnibar type for single omnibar setup: $omnibarType")
         }
     }
 
