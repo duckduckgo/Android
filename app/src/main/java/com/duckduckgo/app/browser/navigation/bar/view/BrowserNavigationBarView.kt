@@ -248,7 +248,7 @@ class BrowserNavigationBarView @JvmOverloads constructor(
             child: View,
             dependency: View,
         ): Boolean {
-            return dependency is OmnibarView && dependency.omnibarType != OmnibarType.SINGLE_BOTTOM
+            return dependency is OmnibarView && dependency.omnibarType == OmnibarType.SPLIT
         }
 
         override fun onDependentViewChanged(
@@ -256,7 +256,7 @@ class BrowserNavigationBarView @JvmOverloads constructor(
             child: View,
             dependency: View,
         ): Boolean {
-            if (dependency is OmnibarView && dependency.omnibarType != OmnibarType.SINGLE_BOTTOM) {
+            if (dependency is OmnibarView && dependency.omnibarType == OmnibarType.SPLIT) {
                 val dependencyOffset = abs(dependency.top)
                 val offsetPercentage = dependencyOffset.toFloat() / dependency.measuredHeight.toFloat()
                 val childHeight = child.measuredHeight
