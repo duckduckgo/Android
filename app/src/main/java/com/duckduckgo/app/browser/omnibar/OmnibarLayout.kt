@@ -251,6 +251,7 @@ class OmnibarLayout @JvmOverloads constructor(
 
         omnibarType = settingsDataStore.omnibarType
 
+        val attr = context.theme.obtainStyledAttributes(attrs, R.styleable.OmnibarLayout, defStyle, 0)
         val omnibarType = OmnibarType.entries[attr.getInt(R.styleable.OmnibarLayout_omnibarPosition, 0)]
         val isTopPosition = omnibarType == OmnibarType.SINGLE_TOP || omnibarType == OmnibarType.SPLIT
 
@@ -1182,9 +1183,5 @@ class OmnibarLayout @JvmOverloads constructor(
 
     override fun gone() {
         visibility = View.GONE
-    }
-
-    companion object {
-        private const val TOP_POSITION_INDEX = 0
     }
 }
