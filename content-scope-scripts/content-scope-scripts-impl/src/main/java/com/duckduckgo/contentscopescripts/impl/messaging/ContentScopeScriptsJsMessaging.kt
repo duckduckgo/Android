@@ -20,6 +20,7 @@ import android.webkit.JavascriptInterface
 import android.webkit.WebView
 import androidx.core.net.toUri
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.common.utils.extensions.toTldPlusOne
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.contentscopescripts.api.ContentScopeJsMessageHandlersPlugin
 import com.duckduckgo.contentscopescripts.impl.CoreContentScopeScripts
@@ -72,7 +73,7 @@ class ContentScopeScriptsJsMessaging @Inject constructor(
                     webView.url?.toUri()?.host
                 }
             jsMessage?.let {
-                if (this.secret == secret && context == jsMessage.context && (allowedDomains.isEmpty() || allowedDomains.contains(domain))) {
+                if (this.secret == secret && context == jsMessage.context && isUrlAllowed(allowedDomains, domain)) {
                     if (jsMessage.method == "addDebugFlag") {
                         // If method is addDebugFlag, we want to handle it for all features
                         jsMessageCallback.process(
@@ -87,7 +88,7 @@ class ContentScopeScriptsJsMessaging @Inject constructor(
                         .map { it.getJsMessageHandler() }
                         .firstOrNull {
                             it.methods.contains(jsMessage.method) && it.featureName == jsMessage.featureName &&
-                                (it.allowedDomains.isEmpty() || it.allowedDomains.contains(domain))
+                                isUrlAllowed(it.allowedDomains, domain)
                         }?.process(jsMessage, this, jsMessageCallback)
                 }
             }
@@ -129,5 +130,14 @@ class ContentScopeScriptsJsMessaging @Inject constructor(
                 result = response.params,
             )
         jsMessageHelper.sendJsResponse(jsResponse, callbackName, secret, webView)
+    }
+
+    private fun isUrlAllowed(
+        allowedDomains: List<String>,
+        url: String?,
+    ): Boolean {
+        if (allowedDomains.isEmpty()) return true
+        val eTld = url?.toTldPlusOne() ?: return false
+        return (allowedDomains.contains(eTld))
     }
 }

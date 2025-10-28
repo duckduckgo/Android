@@ -223,6 +223,38 @@ class ContentScopeScriptsJsMessagingTest {
             assertEquals(0, callback.counter)
         }
 
+    @Test
+    fun `when processing message with subdomain of allowed domain then process message`() =
+        runTest {
+            contentScopeScriptsJsMessaging.register(mockWebView, callback)
+            whenever(mockWebView.url).thenReturn("https://subdomain.example.com")
+
+            val message =
+                """
+                {"context":"contentScopeScripts","featureName":"webCompat","id":"myId","method":"webShare","params":{}}
+                """.trimIndent()
+
+            contentScopeScriptsJsMessaging.process(message, contentScopeScriptsJsMessaging.secret)
+
+            assertEquals(1, callback.counter)
+        }
+
+    @Test
+    fun `when processing message with null url and handler has allowed domains then do nothing`() =
+        runTest {
+            contentScopeScriptsJsMessaging.register(mockWebView, callback)
+            whenever(mockWebView.url).thenReturn(null)
+
+            val message =
+                """
+                {"context":"contentScopeScripts","featureName":"webCompat","id":"myId","method":"webShare","params":{}}
+                """.trimIndent()
+
+            contentScopeScriptsJsMessaging.process(message, contentScopeScriptsJsMessaging.secret)
+
+            assertEquals(0, callback.counter)
+        }
+
     private val callback =
         object : JsMessageCallback() {
             var counter = 0
