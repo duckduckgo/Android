@@ -66,7 +66,7 @@ sealed class Command {
         val query: String,
     ) : Command()
 
-    data object LaunchNewTab : Command()
+    data class LaunchNewTab(val fireTab: Boolean = false) : Command()
 
     data object ResetHistory : Command()
 

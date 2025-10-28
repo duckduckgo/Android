@@ -18,6 +18,7 @@ package com.duckduckgo.app.tabs.model
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.webkit.Profile
 import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.tabs.model.TabSwitcherData.LayoutType
 import kotlinx.coroutines.flow.Flow
@@ -51,6 +52,7 @@ interface TabRepository {
     suspend fun add(
         url: String? = null,
         skipHome: Boolean = false,
+        isFireTab: Boolean = false,
     ): String
 
     suspend fun addDefaultTab(): String
@@ -59,11 +61,13 @@ interface TabRepository {
         url: String? = null,
         skipHome: Boolean = false,
         sourceTabId: String,
+        isFireTab: Boolean = false,
     ): String
 
     suspend fun addNewTabAfterExistingTab(
         url: String? = null,
         tabId: String,
+        isFireTab: Boolean = false,
     )
 
     suspend fun update(
@@ -139,4 +143,6 @@ interface TabRepository {
      * @return the number of tabs that are inactive
      */
     fun countTabsAccessedWithinRange(accessOlderThan: Long, accessNotMoreThan: Long? = null): Int
+
+    fun getTabProfile(tabId: String): Profile?
 }

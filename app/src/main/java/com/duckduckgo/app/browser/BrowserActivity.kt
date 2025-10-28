@@ -1296,10 +1296,11 @@ open class BrowserActivity : DuckDuckGoActivity() {
         query: String? = null,
         sourceTabId: String? = null,
         skipHome: Boolean = false,
+        fireTab: Boolean = false,
     ) {
         lifecycleScope.launch {
             if (swipingTabsFeature.isEnabled) {
-                tabManager.openNewTab(query, sourceTabId, skipHome)
+                tabManager.openNewTab(query, sourceTabId, skipHome, fireTab)
             } else {
                 viewModel.onNewTabRequested()
             }

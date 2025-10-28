@@ -21,6 +21,8 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.asFlow
 import androidx.lifecycle.distinctUntilChanged
+import androidx.webkit.Profile
+import androidx.webkit.ProfileStore
 import com.duckduckgo.adclick.api.AdClickManager
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
@@ -70,6 +72,8 @@ class TabDataRepository @Inject constructor(
     private val tabManagerFeatureFlags: TabManagerFeatureFlags,
 ) : TabRepository {
 
+    private val profileStore: ProfileStore = ProfileStore.getInstance()
+
     override val liveTabs: LiveData<List<TabEntity>> = tabsDao.liveTabs().distinctUntilChanged()
 
     override val flowTabs: Flow<List<TabEntity>> = liveTabs.asFlow()
@@ -99,8 +103,12 @@ class TabDataRepository @Inject constructor(
     override suspend fun add(
         url: String?,
         skipHome: Boolean,
+        isFireTab: Boolean,
     ): String = withContext(dispatchers.io()) {
         val tabId = generateTabId()
+        if (isFireTab) {
+            profileStore.getOrCreateProfile(tabId)
+        }
         val flag = getAndCacheTabInsertionFixesFlag()
         val siteData = if (flag) {
             buildSiteData(url, tabId)
@@ -116,8 +124,12 @@ class TabDataRepository @Inject constructor(
         url: String?,
         skipHome: Boolean,
         sourceTabId: String,
+        isFireTab: Boolean,
     ): String = withContext(dispatchers.io()) {
         val tabId = generateTabId()
+        if (isFireTab) {
+            profileStore.getOrCreateProfile(tabId)
+        }
         val flag = getAndCacheTabInsertionFixesFlag()
         val siteData = if (flag) {
             buildSiteData(url, tabId)
@@ -264,13 +276,18 @@ class TabDataRepository @Inject constructor(
     override suspend fun addNewTabAfterExistingTab(
         url: String?,
         tabId: String,
+        isFireTab: Boolean,
     ) {
+        val newTabId = generateTabId()
+        if (isFireTab) {
+            profileStore.getOrCreateProfile(newTabId)
+        }
         databaseExecutor().scheduleDirect {
             val position = tabsDao.tab(tabId)?.position ?: -1
             val uri = Uri.parse(url)
             val title = uri.host?.removePrefix("www.") ?: url
             val tab = TabEntity(
-                tabId = generateTabId(),
+                tabId = newTabId,
                 url = url,
                 title = title,
                 skipHome = false,
@@ -337,6 +354,24 @@ class TabDataRepository @Inject constructor(
             deleteOldPreviewImages(tabId)
             deleteOldFavicon(tabId)
             siteData.remove(tabId)
+            appCoroutineScope.launch(dispatchers.main()) {
+                val profile = profileStore.getProfile(tabId)
+                val profileName = try {
+                    profile?.name
+                } catch (ex: Exception) {
+                    logcat { "lp_test; tab data repo; getName ${ex}" }
+                    null
+                }
+                if (profileName != null) {
+                    if (profileStore.deleteProfile(profileName)) {
+                        logcat { "lp_test; Deleted profile for tabId: $tabId" }
+                    } else {
+                        logcat { "lp_test; Failed to delete profile for tabId: $tabId" }
+                    }
+                } else {
+                    logcat { "lp_test; No profile found for tabId: $tabId" }
+                }
+            }
         }
     }
 
@@ -478,5 +513,9 @@ class TabDataRepository @Inject constructor(
      */
     private fun databaseExecutor(): Scheduler {
         return Schedulers.single()
+    }
+
+    override fun getTabProfile(tabId: String): Profile? {
+        return profileStore.getProfile(tabId)
     }
 }

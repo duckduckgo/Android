@@ -1318,7 +1318,7 @@ class BrowserTabViewModel @Inject constructor(
         }
     }
 
-    private fun openNewTab() {
+    private fun openNewTab(longPress: Boolean = false) {
         command.value = GenerateWebViewPreviewImage
 
         if (swipingTabsFeature.isEnabled) {
@@ -1327,11 +1327,11 @@ class BrowserTabViewModel @Inject constructor(
                 if (emptyTab != null) {
                     tabRepository.select(tabId = emptyTab)
                 } else {
-                    command.value = LaunchNewTab
+                    command.value = LaunchNewTab(fireTab = longPress)
                 }
             }
         } else {
-            command.value = LaunchNewTab
+            command.value = LaunchNewTab(fireTab = longPress)
         }
 
         onUserDismissedCta(ctaViewState.value?.cta)
@@ -2911,7 +2911,7 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     fun onNewTabMenuItemClicked(longPress: Boolean = false) {
-        openNewTab()
+        openNewTab(longPress)
 
         if (longPress) {
             pixel.fire(AppPixelName.TAB_MANAGER_NEW_TAB_LONG_PRESSED)

@@ -96,6 +96,8 @@ import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.webkit.JavaScriptReplyProxy
+import androidx.webkit.Profile
+import androidx.webkit.ProfileStore
 import androidx.webkit.WebMessageCompat
 import androidx.webkit.WebSettingsCompat
 import androidx.webkit.WebViewCompat
@@ -205,6 +207,7 @@ import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
+import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.tabs.ui.GridViewColumnCalculator
 import com.duckduckgo.app.tabs.ui.TabSwitcherActivity
 import com.duckduckgo.app.widget.AddWidgetLauncher
@@ -595,6 +598,9 @@ class BrowserTabFragment :
 
     @Inject
     lateinit var webViewCompatWrapper: WebViewCompatWrapper
+
+    @Inject
+    lateinit var tabRepository: TabRepository
 
     /**
      * We use this to monitor whether the user was seeing the in-context Email Protection signup prompt
@@ -1988,7 +1994,7 @@ class BrowserTabFragment :
             }
 
             is Command.LaunchNewTab -> {
-                browserActivity?.launchNewTab()
+                browserActivity?.launchNewTab(fireTab = it.fireTab)
             }
 
             is Command.ShowSavedSiteAddedConfirmation -> savedSiteAdded(it.savedSiteChangedViewState)
@@ -3153,6 +3159,18 @@ class BrowserTabFragment :
                 ).findViewById<DuckDuckGoWebView>(R.id.browserWebView)
 
         webView?.let {
+            logcat { "lp_test; tabId: $tabId" }
+            val profile = tabRepository.getTabProfile(tabId)
+            val profileName = try {
+                profile?.name
+            } catch (ex: Exception) {
+                logcat { "lp_test; browser tab fragment; getName ${ex}" }
+                null
+            }
+            logcat { "lp_test; profile: ${profileName}" }
+            if (profileName != null) {
+                WebViewCompat.setProfile(it, profileName)
+            }
             it.isSafeWebViewEnabled = safeWebViewFeature.self().isEnabled()
             it.webViewClient = webViewClient
             it.webChromeClient = webChromeClient
@@ -3871,18 +3889,29 @@ class BrowserTabFragment :
         url: String,
         title: String,
     ) {
-        val intent =
-            Intent(Intent.ACTION_SEND).also {
-                it.type = "text/plain"
-                it.putExtra(Intent.EXTRA_TEXT, url)
-                it.putExtra(Intent.EXTRA_SUBJECT, title)
-                it.putExtra(Intent.EXTRA_TITLE, title)
-            }
-        try {
-            startActivity(Intent.createChooser(intent, null))
-        } catch (e: ActivityNotFoundException) {
-            logcat(WARN) { "Activity not found: ${e.asLog()}" }
+        val profiles = ProfileStore.getInstance().allProfileNames
+        logcat {
+            "lp_test; profiles: $profiles"
         }
+        val profile = WebViewCompat.getProfile(webView!!)
+
+        val cookieManager = profile.cookieManager
+
+        logcat {
+            "lp_test; cookies ${cookieManager.getCookie("https://privacy-test-pages.site")}"
+        }
+        // val intent =
+        //     Intent(Intent.ACTION_SEND).also {
+        //         it.type = "text/plain"
+        //         it.putExtra(Intent.EXTRA_TEXT, url)
+        //         it.putExtra(Intent.EXTRA_SUBJECT, title)
+        //         it.putExtra(Intent.EXTRA_TITLE, title)
+        //     }
+        // try {
+        //     startActivity(Intent.createChooser(intent, null))
+        // } catch (e: ActivityNotFoundException) {
+        //     logcat(WARN) { "Activity not found: ${e.asLog()}" }
+        // }
     }
 
     private fun launchSharePromoRMFPageChooser(
