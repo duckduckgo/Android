@@ -251,8 +251,8 @@ class OmnibarLayout @JvmOverloads constructor(
 
         omnibarType = settingsDataStore.omnibarType
 
-        val attr = context.theme.obtainStyledAttributes(attrs, R.styleable.OmnibarLayout, defStyle, 0)
-        val isTopPosition = attr.getInt(R.styleable.OmnibarLayout_omnibarPosition, 0) == TOP_POSITION_INDEX
+        val omnibarType = OmnibarType.entries[attr.getInt(R.styleable.OmnibarLayout_omnibarPosition, 0)]
+        val isTopPosition = omnibarType == OmnibarType.SINGLE_TOP || omnibarType == OmnibarType.SPLIT
 
         renderPosition(isTopPosition)
 
