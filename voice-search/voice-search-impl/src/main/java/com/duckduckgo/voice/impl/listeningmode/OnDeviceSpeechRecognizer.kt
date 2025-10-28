@@ -56,6 +56,8 @@ class DefaultOnDeviceSpeechRecognizer @Inject constructor(
 ) : OnDeviceSpeechRecognizer {
 
     private var speechRecognizer: SpeechRecognizer? = null
+    private var isListening = false
+    private var hasSpeechBegun = false
 
     private val speechRecognizerIntent: Intent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH).run {
         putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM)
@@ -68,7 +70,7 @@ class DefaultOnDeviceSpeechRecognizer @Inject constructor(
         }
 
         override fun onBeginningOfSpeech() {
-            // Do nothing. User has started speaking
+            hasSpeechBegun = true
         }
 
         override fun onRmsChanged(rmsdB: Float) {
@@ -85,7 +87,13 @@ class DefaultOnDeviceSpeechRecognizer @Inject constructor(
 
         override fun onError(error: Int) {
             when (error) {
-                SpeechRecognizer.ERROR_NO_MATCH -> _eventHandler(Event.RecognitionTimedOut(error))
+                SpeechRecognizer.ERROR_NO_MATCH -> {
+                    if (isListening && !hasSpeechBegun) {
+                        speechRecognizer?.startListening(speechRecognizerIntent)
+                    } else {
+                        _eventHandler(Event.RecognitionTimedOut(error))
+                    }
+                }
                 else -> {
                     logcat(ERROR) { "SpeechRecognizer error: $error" }
                     _eventHandler(Event.RecognitionFailed(error))
@@ -121,6 +129,8 @@ class DefaultOnDeviceSpeechRecognizer @Inject constructor(
     @RequiresApi(VERSION_CODES.S)
     override fun start(eventHandler: (Event) -> Unit) {
         _eventHandler = eventHandler
+        isListening = true
+        hasSpeechBegun = false
         runCatching {
             speechRecognizer = SpeechRecognizer.createOnDeviceSpeechRecognizer(context)
         }.onFailure {
@@ -133,6 +143,8 @@ class DefaultOnDeviceSpeechRecognizer @Inject constructor(
     }
 
     override fun stop() {
+        isListening = false
+        hasSpeechBegun = false
         speechRecognizer?.destroy()
     }
 
