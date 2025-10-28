@@ -110,4 +110,11 @@
     <string name="deleteBookmarkFolderConfirmationDialogDescription" instruction="Placeholder is the name of the favorite site">Bu işlem &lt;b&gt;%1$s&lt;/b&gt; yer işareti klasörünüzü silecektir.</string>
     <string name="deleteSavedSiteConfirmationDialogCancel">Vazgeç</string>
     <string name="deleteSavedSiteConfirmationDialogDelete">Sil</string>
+
+    <!-- Bookmark Import -->
+    <string name="importBookmarksFromGooglePreImportDialogTitle">Google\'dan Yer İşaretlerini İçe Aktar</string>
+    <string name="importBookmarksFromGooglePreImportDialogInstruction">Google, onaylamak için oturum açmanızı veya şifre girmenizi isteyebilir.</string>
+    <string name="importBookmarksFromGooglePreImportDialogImportButton">Google\'dan İçe Aktar</string>
+    <string name="importBookmarksFromGooglePreImportDialogSelectFileButton">Yer İşaretleri Dosyasını Seç…</string>
+    <string name="bookmarksImportDialogClose">Kapat</string>
 </resources>
