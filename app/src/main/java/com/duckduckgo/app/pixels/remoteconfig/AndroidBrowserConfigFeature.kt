@@ -182,14 +182,5 @@ interface AndroidBrowserConfigFeature {
     fun vpnMenuItem(): Toggle
 
     @Toggle.DefaultValue(TRUE)
-    fun updateScriptOnPageFinished(): Toggle
-
-    @Toggle.DefaultValue(TRUE)
-    fun updateScriptOnProtectionsChanged(): Toggle
-
-    @Toggle.DefaultValue(FALSE)
-    fun stopLoadingBeforeUpdatingScript(): Toggle
-
-    @Toggle.DefaultValue(TRUE)
     fun useUnifiedOmnibarLayout(): Toggle
 }
