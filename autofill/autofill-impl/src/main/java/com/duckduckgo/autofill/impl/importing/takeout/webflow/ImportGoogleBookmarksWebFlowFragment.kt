@@ -269,7 +269,7 @@ class ImportGoogleBookmarksWebFlowFragment :
         webView.setDownloadListener { url, userAgent, contentDisposition, mimeType, _ ->
             logcat { "Download intercepted: $url, mimeType: $mimeType, contentDisposition: $contentDisposition" }
 
-            val folderName = context?.getString(R.string.autofillImportBookmarksChromeFolderName) ?: return@setDownloadListener
+            val folderName = context?.getString(R.string.importBookmarksFromGoogleChromeFolderName) ?: return@setDownloadListener
             viewModel.onDownloadDetected(
                 url = url,
                 userAgent = userAgent,

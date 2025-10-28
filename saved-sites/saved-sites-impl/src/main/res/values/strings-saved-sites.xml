@@ -110,4 +110,11 @@
     <string name="deleteBookmarkFolderConfirmationDialogDescription" instruction="Placeholder is the name of the favorite site">This will delete your &lt;b>%1$s&lt;/b> bookmark folder.</string>
     <string name="deleteSavedSiteConfirmationDialogCancel">Cancel</string>
     <string name="deleteSavedSiteConfirmationDialogDelete">Delete</string>
+
+    <!-- Bookmark Import -->
+    <string name="importBookmarksFromGooglePreImportDialogTitle">Import Bookmarks From Google</string>
+    <string name="importBookmarksFromGooglePreImportDialogInstruction">Google may ask you to sign in or enter your password to confirm.</string>
+    <string name="importBookmarksFromGooglePreImportDialogImportButton">Import From Google</string>
+    <string name="importBookmarksFromGooglePreImportDialogSelectFileButton">Select Bookmarks File…</string>
+    <string name="bookmarksImportDialogClose">Close</string>
 </resources>
