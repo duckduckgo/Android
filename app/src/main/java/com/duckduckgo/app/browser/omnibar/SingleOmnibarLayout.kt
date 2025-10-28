@@ -49,7 +49,7 @@ class SingleOmnibarLayout @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyle: Int = 0,
-) : OmnibarLayout(context, attrs, defStyle) {
+) : LegacyOmnibarLayout(context, attrs, defStyle) {
     @Inject
     lateinit var globalActivityStarter: GlobalActivityStarter
 
@@ -89,9 +89,11 @@ class SingleOmnibarLayout @JvmOverloads constructor(
 
     private var singleOmnibarItemPressedListener: OmnibarItemPressedListener? = null
 
+    override val omnibarPosition: OmnibarPosition
+
     init {
-        val attr = context.theme.obtainStyledAttributes(attrs, R.styleable.SingleOmnibarLayout, defStyle, 0)
-        omnibarPosition = OmnibarPosition.entries[attr.getInt(R.styleable.SingleOmnibarLayout_omnibarPosition, 0)]
+        val attr = context.theme.obtainStyledAttributes(attrs, R.styleable.OmnibarLayout, defStyle, 0)
+        omnibarPosition = OmnibarPosition.entries[attr.getInt(R.styleable.OmnibarLayout_omnibarPosition, 0)]
 
         inflate(context, R.layout.view_single_omnibar, this)
 

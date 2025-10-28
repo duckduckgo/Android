@@ -24,6 +24,7 @@ import androidx.coordinatorlayout.widget.CoordinatorLayout.Behavior
 import androidx.core.view.isGone
 import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarView
 import com.duckduckgo.app.browser.omnibar.OmnibarLayout
+import com.duckduckgo.app.browser.omnibar.OmnibarView
 import com.duckduckgo.browser.ui.omnibar.OmnibarPosition
 import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.appbar.AppBarLayout.ScrollingViewBehavior
@@ -118,4 +119,4 @@ private fun offsetByBottomElementVisibleHeight(
 
 private fun View.isBrowserNavigationBar(): Boolean = this is BrowserNavigationBarView
 
-private fun View.isBottomOmnibar(): Boolean = this is OmnibarLayout && this.omnibarPosition == OmnibarPosition.BOTTOM
+private fun View.isBottomOmnibar(): Boolean = this is OmnibarView && this.omnibarPosition == OmnibarPosition.BOTTOM

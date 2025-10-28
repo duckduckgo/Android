@@ -16,11 +16,10 @@
 
 package com.duckduckgo.app.browser.omnibar
 
-import android.animation.ValueAnimator
 import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Color
-import android.os.Build
+import android.graphics.drawable.ColorDrawable
 import android.text.Editable
 import android.transition.ChangeBounds
 import android.transition.Fade
@@ -30,7 +29,6 @@ import android.util.AttributeSet
 import android.view.KeyEvent
 import android.view.View
 import android.view.ViewGroup
-import android.view.ViewTreeObserver.OnGlobalLayoutListener
 import android.view.animation.OvershootInterpolator
 import android.view.inputmethod.EditorInfo
 import android.widget.FrameLayout
@@ -39,13 +37,10 @@ import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.appcompat.widget.Toolbar
 import androidx.coordinatorlayout.widget.CoordinatorLayout
-import androidx.core.graphics.drawable.toDrawable
 import androidx.core.transition.doOnEnd
 import androidx.core.view.doOnLayout
-import androidx.core.view.isGone
 import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
-import androidx.core.view.updateLayoutParams
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.findViewTreeLifecycleOwner
@@ -99,11 +94,9 @@ import com.duckduckgo.browser.ui.tabs.TabSwitcherButton
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.view.KeyboardAwareEditText
 import com.duckduckgo.common.ui.view.KeyboardAwareEditText.ShowSuggestionsListener
-import com.duckduckgo.common.ui.view.addBottomShadow
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.hide
 import com.duckduckgo.common.ui.view.show
-import com.duckduckgo.common.ui.view.toPx
 import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.FragmentViewModelFactory
@@ -112,12 +105,9 @@ import com.duckduckgo.common.utils.text.TextChangedWatcher
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.api.DuckChat
-import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.serp.logos.api.SerpEasterEggLogosToggles
 import com.duckduckgo.serp.logos.api.SerpLogos
 import com.google.android.material.appbar.AppBarLayout
-import com.google.android.material.card.MaterialCardView
-import dagger.android.support.AndroidSupportInjection
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
@@ -129,7 +119,7 @@ import com.duckduckgo.app.global.model.PrivacyShield as PrivacyShieldState
 import com.duckduckgo.mobile.android.R as CommonR
 
 @InjectWith(FragmentScope::class)
-class OmnibarLayout @JvmOverloads constructor(
+open class LegacyOmnibarLayout @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyle: Int = 0,
@@ -137,7 +127,6 @@ class OmnibarLayout @JvmOverloads constructor(
     OmnibarView,
     OmnibarBehaviour,
     TrackersAnimatorListener {
-
     data class TransitionState(
         val showClearButton: Boolean,
         val showVoiceSearch: Boolean,
@@ -183,9 +172,6 @@ class OmnibarLayout @JvmOverloads constructor(
     lateinit var serpEasterEggLogosToggles: SerpEasterEggLogosToggles
 
     @Inject
-    lateinit var globalActivityStarter: GlobalActivityStarter
-
-    @Inject
     lateinit var addressBarTrackersAnimationFeatureToggle: AddressBarTrackersAnimationFeatureToggle
 
     private var previousTransitionState: TransitionState? = null
@@ -206,54 +192,6 @@ class OmnibarLayout @JvmOverloads constructor(
     private var decoration: Decoration? = null
     private var lastViewMode: Mode? = null
     private var stateBuffer: MutableList<StateChange> = mutableListOf()
-
-    private val omnibarCardShadow: MaterialCardView by lazy { findViewById(R.id.omniBarContainerShadow) }
-    private val iconsContainer: View by lazy { findViewById(R.id.iconsContainer) }
-    private val shieldIconPulseAnimationContainer: View by lazy { findViewById(R.id.shieldIconPulseAnimationContainer) }
-    private val omniBarContentContainer: View by lazy { findViewById(R.id.omniBarContentContainer) }
-    private val backIcon: ImageView by lazy { findViewById(R.id.backIcon) }
-    private val customTabToolbarContainerWrapper: ViewGroup by lazy { findViewById(R.id.customTabToolbarContainerWrapper) }
-
-    private var isFindInPageVisible = false
-    private val findInPageLayoutVisibilityChangeListener =
-        OnGlobalLayoutListener {
-            val isVisible = findInPage.findInPageContainer.isVisible
-            if (isFindInPageVisible != isVisible) {
-                isFindInPageVisible = isVisible
-                if (isVisible) {
-                    onFindInPageShown()
-                } else {
-                    onFindInPageHidden()
-                }
-            }
-        }
-
-    private val experimentalOmnibarCardMarginTop by lazy {
-        resources.getDimensionPixelSize(CommonR.dimen.omnibarCardMarginTop)
-    }
-
-    private val experimentalOmnibarCardMarginBottom by lazy {
-        resources.getDimensionPixelSize(CommonR.dimen.omnibarCardMarginBottom)
-    }
-
-    private var focusAnimator: ValueAnimator? = null
-
-    override val omnibarPosition: OmnibarPosition
-
-    init {
-        inflate(context, R.layout.view_omnibar, this)
-
-        val attr = context.theme.obtainStyledAttributes(attrs, R.styleable.OmnibarLayout, defStyle, 0)
-        omnibarPosition = OmnibarPosition.entries[attr.getInt(R.styleable.OmnibarLayout_omnibarPosition, 0)]
-
-        AndroidSupportInjection.inject(this)
-
-        renderPosition()
-
-        if (Build.VERSION.SDK_INT >= 28) {
-            omnibarCardShadow.addBottomShadow()
-        }
-    }
 
     override val findInPage: IncludeFindInPageBinding by lazy {
         IncludeFindInPageBinding.bind(findViewById(R.id.findInPage))
@@ -356,6 +294,8 @@ class OmnibarLayout @JvmOverloads constructor(
         }
     }
 
+    override val omnibarPosition: OmnibarPosition = OmnibarPosition.TOP
+
     private val smoothProgressAnimator by lazy { SmoothProgressAnimator(pageLoadingIndicator) }
 
     protected val viewModel: OmnibarLayoutViewModel by lazy {
@@ -409,14 +349,11 @@ class OmnibarLayout @JvmOverloads constructor(
         }
 
         animatorHelper.setListener(this)
-        findInPage.findInPageContainer.viewTreeObserver.addOnGlobalLayoutListener(findInPageLayoutVisibilityChangeListener)
     }
 
     override fun onDetachedFromWindow() {
         conflatedStateJob.cancel()
         conflatedCommandJob.cancel()
-        focusAnimator?.cancel()
-        findInPage.findInPageContainer.viewTreeObserver.removeOnGlobalLayoutListener(findInPageLayoutVisibilityChangeListener)
         super.onDetachedFromWindow()
     }
 
@@ -547,17 +484,13 @@ class OmnibarLayout @JvmOverloads constructor(
         voiceSearchButton.setOnClickListener {
             omnibarItemPressedListener?.onVoiceSearchPressed()
         }
-        backIcon.setOnClickListener {
-            viewModel.onBackButtonPressed()
-            omnibarItemPressedListener?.onBackButtonPressed()
-        }
     }
 
     override fun setLogoClickListener(logoClickListener: LogoClickListener) {
         omnibarLogoClickedListener = logoClickListener
     }
 
-    fun render(viewState: ViewState) {
+    open fun render(viewState: ViewState) {
         when (viewState.viewMode) {
             is ViewMode.CustomTab -> {
                 renderCustomTabMode(viewState, viewState.viewMode)
@@ -574,14 +507,6 @@ class OmnibarLayout @JvmOverloads constructor(
             lastSeenPrivacyShield = null
         }
 
-        if (viewState.hasFocus || isFindInPageVisible) {
-            animateOmnibarFocusedState(focused = true)
-        } else {
-            animateOmnibarFocusedState(focused = false)
-        }
-
-        omnibarCardShadow.isGone = viewState.viewMode is ViewMode.CustomTab && !isFindInPageVisible
-
         renderButtons(viewState)
 
         omniBarButtonTransitionSet.doOnEnd {
@@ -589,66 +514,7 @@ class OmnibarLayout @JvmOverloads constructor(
         }
     }
 
-    private fun renderPosition() {
-        when (omnibarPosition) {
-            OmnibarPosition.TOP -> {
-                if (Build.VERSION.SDK_INT < 28) {
-                    omnibarCardShadow.cardElevation = 2f.toPx(context)
-                }
-
-                shieldIconPulseAnimationContainer.updateLayoutParams {
-                    (this as MarginLayoutParams).apply {
-                        if (addressBarTrackersAnimationFeatureToggle.feature().isEnabled()) {
-                            // TODO when the animation is made permanent we should add this adjustment to the actual layout
-                            marginStart = 1.toPx()
-                        }
-                    }
-                }
-            }
-
-            OmnibarPosition.BOTTOM -> {
-                // When omnibar is at the bottom, we're adding an additional space at the top
-                omnibarCardShadow.updateLayoutParams {
-                    (this as MarginLayoutParams).apply {
-                        topMargin = experimentalOmnibarCardMarginBottom
-                        bottomMargin = experimentalOmnibarCardMarginTop
-                    }
-                }
-
-                iconsContainer.updateLayoutParams {
-                    (this as MarginLayoutParams).apply {
-                        topMargin = experimentalOmnibarCardMarginBottom
-                        bottomMargin = experimentalOmnibarCardMarginTop
-                    }
-                }
-
-                shieldIconPulseAnimationContainer.updateLayoutParams {
-                    (this as MarginLayoutParams).apply {
-                        topMargin = experimentalOmnibarCardMarginBottom
-                        bottomMargin = experimentalOmnibarCardMarginTop
-                        if (addressBarTrackersAnimationFeatureToggle.feature().isEnabled()) {
-                            // TODO when the animation is made permanent we should add this adjustment to the actual layout
-                            marginStart = 1.toPx()
-                        }
-                    }
-                }
-
-                shieldIconPulseAnimationContainer.setPadding(
-                    shieldIconPulseAnimationContainer.paddingLeft,
-                    shieldIconPulseAnimationContainer.paddingTop,
-                    shieldIconPulseAnimationContainer.paddingRight,
-                    6.toPx(),
-                )
-
-                // Try to reduce the bottom omnibar material shadow when not using the custom shadow
-                if (Build.VERSION.SDK_INT < 28) {
-                    omnibarCardShadow.cardElevation = 0.5f.toPx(context)
-                }
-            }
-        }
-    }
-
-    fun processCommand(command: Command) {
+    open fun processCommand(command: Command) {
         when (command) {
             Command.CancelAnimations -> {
                 cancelAddressBarAnimations()
@@ -763,7 +629,7 @@ class OmnibarLayout @JvmOverloads constructor(
         }
     }
 
-    fun renderButtons(viewState: ViewState) {
+    open fun renderButtons(viewState: ViewState) {
         val newTransitionState =
             TransitionState(
                 showClearButton = viewState.showClearButton,
@@ -799,18 +665,6 @@ class OmnibarLayout @JvmOverloads constructor(
         previousTransitionState = newTransitionState
 
         enableTextInputClickCatcher(viewState.showTextInputClickCatcher)
-
-        val showBackArrow = viewState.hasFocus
-        if (showBackArrow) {
-            backIcon.show()
-            searchIcon.gone()
-            shieldIcon.gone()
-            daxIcon.gone()
-            globeIcon.gone()
-            duckPlayerIcon.gone()
-        } else {
-            backIcon.hide()
-        }
     }
 
     private fun renderBrowserMode(viewState: ViewState) {
@@ -837,8 +691,6 @@ class OmnibarLayout @JvmOverloads constructor(
         renderPulseAnimation(viewState)
 
         renderLeadingIconState(viewState)
-
-        omnibarTextInput.hint = context.getString(R.string.search)
     }
 
     private fun renderCustomTabMode(
@@ -1026,8 +878,8 @@ class OmnibarLayout @JvmOverloads constructor(
 
             omniBarContainer.hide()
 
-            toolbar.background = customTab.toolbarColor.toDrawable()
-            toolbarContainer.background = customTab.toolbarColor.toDrawable()
+            toolbar.background = ColorDrawable(customTab.toolbarColor)
+            toolbarContainer.background = ColorDrawable(customTab.toolbarColor)
 
             customTabToolbarContainer.customTabToolbar.show()
 
@@ -1146,34 +998,6 @@ class OmnibarLayout @JvmOverloads constructor(
         }
     }
 
-    private fun animateOmnibarFocusedState(focused: Boolean) {
-        // temporarily disable focus animation
-    }
-
-    private fun onFindInPageShown() {
-        omniBarContentContainer.hide()
-        customTabToolbarContainerWrapper.hide()
-        if (viewModel.viewState.value.viewMode is ViewMode.CustomTab) {
-            omniBarContainer.show()
-            browserMenu.gone()
-        }
-        animateOmnibarFocusedState(focused = true)
-        viewModel.onFindInPageRequested()
-    }
-
-    private fun onFindInPageHidden() {
-        omniBarContentContainer.show()
-        customTabToolbarContainerWrapper.show()
-        if (viewModel.viewState.value.viewMode is ViewMode.CustomTab) {
-            omniBarContainer.hide()
-            browserMenu.isVisible = viewModel.viewState.value.showBrowserMenu
-        }
-        if (!viewModel.viewState.value.hasFocus) {
-            animateOmnibarFocusedState(focused = false)
-        }
-        viewModel.onFindInPageDismissed()
-    }
-
     override fun show() {
         show()
     }
@@ -1181,4 +1005,8 @@ class OmnibarLayout @JvmOverloads constructor(
     override fun gone() {
         gone()
     }
+}
+
+interface OmnibarItemPressedListener {
+    fun onBackButtonPressed()
 }
