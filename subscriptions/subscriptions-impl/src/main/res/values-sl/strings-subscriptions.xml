@@ -193,7 +193,7 @@
     <string name="feedbackGeneralSubscription">Naročnina</string>
 
     <!-- Switch plan-->
-    <string name="switchBottomSheetTitleUpgrade">Prihranite 16 %\nz letno naročnino!</string>
+    <string name="switchBottomSheetTitleUpgrade">Prihranite 16 %%\nz letno naročnino!</string>
     <string name="switchBottomSheetDescriptionUpgrade">Letna naročnina znaša samo 8,33 USD/mesec v primerjavi z vašo trenutno mesečno naročnino po 9,99 USD.</string>
     <string name="switchBottomSheetPrimaryButtonUpgrade">Preklopi na letno naročnino (99,99 USD/leto)</string>
     <string name="switchBottomSheetSecondaryButtonUpgrade">Obdrži mesečno naročnino</string>
