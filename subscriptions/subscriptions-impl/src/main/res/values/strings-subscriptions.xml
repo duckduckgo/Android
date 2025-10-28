@@ -192,7 +192,7 @@
     <string name="feedbackGeneralSubscription">Subscription</string>
 
     <!-- Switch plan-->
-    <string name="switchBottomSheetTitleUpgrade">Save 16% with\na yearly plan!</string>
+    <string name="switchBottomSheetTitleUpgrade">Save 16%% with\na yearly plan!</string>
     <string name="switchBottomSheetDescriptionUpgrade">A yearly plan is just $8.33/mo, compared to your current $9.99 monthly plan.</string>
     <string name="switchBottomSheetPrimaryButtonUpgrade">Switch to Yearly ($99.99/year)</string>
     <string name="switchBottomSheetSecondaryButtonUpgrade">Keep Monthly Plan</string>
