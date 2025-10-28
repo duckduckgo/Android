@@ -876,8 +876,10 @@
 
     <!-- Appearance settings -->
     <string name="settingsAddressBarPositionTitle">Riadok adresy</string>
+    <string name="settingsAddressBarPositionHeaderTitle">Poloha panela s adresou a panela s nástrojmi</string>
     <string name="settingsAddressBarPositionTop">Hore</string>
     <string name="settingsAddressBarPositionBottom">Spodná časť</string>
+    <string name="settingsAddressBarPositionSplit">Rozdelenie</string>
 
     <!-- Show on App Launch Option -->
     <string name="showOnAppLaunchOptionTitle">Zobraziť pri spustení aplikácie</string>
