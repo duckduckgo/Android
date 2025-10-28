@@ -191,7 +191,7 @@
     <string name="subscriptionSettingSubscribeSecure">Suojaa WiFi-yhteytesi ja keskustele yksityisesti edistyneiden tekoälymallien kanssa</string>
 
     <string name="feedbackGeneralSubscription">Tilaus</string>
-    
+
     <!-- Switch plan-->
     <string name="switchBottomSheetTitleUpgrade">Säästä 16 %\nvuosittaisella sopimuksella!</string>
     <string name="switchBottomSheetDescriptionUpgrade">Vuosittainen sopimus maksaa vain 8,33 $/kk, verrattuna nykyiseen 9,99 $ kuukausisuunnitelmaan.</string>

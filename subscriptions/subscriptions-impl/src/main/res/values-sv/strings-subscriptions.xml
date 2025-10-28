@@ -191,7 +191,7 @@
     <string name="subscriptionSettingSubscribeSecure">Säkra ditt Wi-Fi och chatta privat med avancerade AI-modeller</string>
 
     <string name="feedbackGeneralSubscription">Abonnemang</string>
-    
+
     <!-- Switch plan-->
     <string name="switchBottomSheetTitleUpgrade">Spara 16 % med\nett årsabonnemang!</string>
     <string name="switchBottomSheetDescriptionUpgrade">Ett årsabonnemang kostar bara 8,33 USD per månad, jämfört med ditt nuvarande månadsabonnemang för 9,99 USD.</string>

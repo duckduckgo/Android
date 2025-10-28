@@ -191,7 +191,7 @@
     <string name="subscriptionSettingSubscribeSecure">Sécurisez votre Wi-Fi et discutez en toute confidentialité grâce à des modèles d\'IA avancés</string>
 
     <string name="feedbackGeneralSubscription">Abonnement</string>
-    
+
     <!-- Switch plan-->
     <string name="switchBottomSheetTitleUpgrade">Économisez 16 % avec\nun forfait annuel !</string>
     <string name="switchBottomSheetDescriptionUpgrade">Un forfait annuel coûte seulement 8,33 $/mois, contre 9,99 $/mois pour votre forfait mensuel actuel.</string>

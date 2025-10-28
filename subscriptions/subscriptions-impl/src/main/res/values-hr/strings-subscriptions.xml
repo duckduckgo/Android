@@ -191,7 +191,7 @@
     <string name="subscriptionSettingSubscribeSecure">Osiguraj svoj Wi-Fi i privatno čavrljaj s naprednim AI modelima</string>
 
     <string name="feedbackGeneralSubscription">Pretplata</string>
-    
+
     <!-- Switch plan-->
     <string name="switchBottomSheetTitleUpgrade">Uštedi 16 % s\ngodišnjim planom!</string>
     <string name="switchBottomSheetDescriptionUpgrade">Godišnji plan iznosi samo 8,33 USD/mjesečno, u usporedbi s tvojim sadašnjim mjesečnim planom od 9,99 USD.</string>

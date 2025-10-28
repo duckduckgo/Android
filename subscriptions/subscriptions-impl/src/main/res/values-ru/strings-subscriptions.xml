@@ -191,7 +191,7 @@
     <string name="subscriptionSettingSubscribeSecure">Безопасный Wi-Fi и приватные чаты с продвинутыми моделями ИИ</string>
 
     <string name="feedbackGeneralSubscription">По подписке</string>
-    
+
     <!-- Switch plan-->
     <string name="switchBottomSheetTitleUpgrade">Экономьте 16%\nна годовой подписке!</string>
     <string name="switchBottomSheetDescriptionUpgrade">В отличие от текущего ежемесячного тарифа 9,99 $, годовой тариф — всего 8,33 $ в месяц.</string>

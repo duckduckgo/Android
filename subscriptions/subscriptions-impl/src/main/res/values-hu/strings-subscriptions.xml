@@ -191,7 +191,7 @@
     <string name="subscriptionSettingSubscribeSecure">A Wi-Fi biztonságossá tétele, és privát csevegés a fejlett AI-modellekkel</string>
 
     <string name="feedbackGeneralSubscription">Előfizetés</string>
-    
+
     <!-- Switch plan-->
     <string name="switchBottomSheetTitleUpgrade">Takaríts meg 16%-ot\naz éves csomaggal!</string>
     <string name="switchBottomSheetDescriptionUpgrade">Az éves csomag díja mindössze 8,33 USD/hó, szemben a jelenlegi havi csomagod 9,99 USD/hó díjával.</string>

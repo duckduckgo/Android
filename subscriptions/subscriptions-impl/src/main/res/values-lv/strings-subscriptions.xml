@@ -191,7 +191,7 @@
     <string name="subscriptionSettingSubscribeSecure">Nodrošini sava Wi-Fi drošību un privāti tērzē ar uzlabotiem mākslīgā intelekta modeļiem</string>
 
     <string name="feedbackGeneralSubscription">Abonements</string>
-    
+
     <!-- Switch plan-->
     <string name="switchBottomSheetTitleUpgrade">Ietaupi 16 % ar\nikgadējo plānu!</string>
     <string name="switchBottomSheetDescriptionUpgrade">Ikgadējais plāns maksā tikai 8,33 USD mēnesī, salīdzinot ar tavu pašreizējo ikmēneša plānu, kas maksā 9,99 USD.</string>

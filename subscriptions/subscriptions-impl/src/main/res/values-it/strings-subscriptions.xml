@@ -191,7 +191,7 @@
     <string name="subscriptionSettingSubscribeSecure">Proteggi la rete Wi-Fi e chatta privatamente con modelli AI avanzati</string>
 
     <string name="feedbackGeneralSubscription">Abbonamento</string>
-    
+
     <!-- Switch plan-->
     <string name="switchBottomSheetTitleUpgrade">Risparmia il 16% con un piano annuale!</string>
     <string name="switchBottomSheetDescriptionUpgrade">Un piano annuale costa solo 8,33 $ al mese, rispetto al tuo attuale piano mensile di 9,99 $.</string>

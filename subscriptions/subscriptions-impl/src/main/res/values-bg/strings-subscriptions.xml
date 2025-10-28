@@ -191,7 +191,7 @@
     <string name="subscriptionSettingSubscribeSecure">Сигурна Wi-Fi мрежа и поверителен чат с усъвършенствани AI модели</string>
 
     <string name="feedbackGeneralSubscription">Абонамент</string>
-    
+
     <!-- Switch plan-->
     <string name="switchBottomSheetTitleUpgrade">Спести 16% с\nгодишен план!</string>
     <string name="switchBottomSheetDescriptionUpgrade">Годишният план е само $8.33/месец, в сравнение с текущия ти месечен план от $9.99.</string>

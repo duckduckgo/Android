@@ -191,7 +191,7 @@
     <string name="subscriptionSettingSubscribeSecure">Sikre wifien din og chat privat med avanserte AI-modeller</string>
 
     <string name="feedbackGeneralSubscription">Abonnement</string>
-    
+
     <!-- Switch plan-->
     <string name="switchBottomSheetTitleUpgrade">Spar 16 % med\net årsabonnement!</string>
     <string name="switchBottomSheetDescriptionUpgrade">Et årsabonnement koster bare 8,33 USD per måned, sammenlignet med det nåværende månedsabonnementet ditt til 9,99 USD per måned.</string>

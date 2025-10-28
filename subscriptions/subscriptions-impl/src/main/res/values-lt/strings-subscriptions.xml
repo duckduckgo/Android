@@ -191,7 +191,7 @@
     <string name="subscriptionSettingSubscribeSecure">Apsaugok savo Wi-Fi ir kalbėkis privačiai su pažangiais DI modeliais</string>
 
     <string name="feedbackGeneralSubscription">Prenumerata</string>
-    
+
     <!-- Switch plan-->
     <string name="switchBottomSheetTitleUpgrade">Sutaupykite 16 % su\n metiniu planu!</string>
     <string name="switchBottomSheetDescriptionUpgrade">Metinis planas kainuoja tik 8,33 USD/mėn., palyginti su dabartiniu 9,99 USD mėnesiniu planu.</string>

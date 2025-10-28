@@ -191,7 +191,7 @@
     <string name="subscriptionSettingSubscribeSecure">Wi-Fi bağlantınızı güvence altına alın ve gelişmiş yapay zeka modelleriyle gizlice sohbet edin</string>
 
     <string name="feedbackGeneralSubscription">Abonelik</string>
-    
+
     <!-- Switch plan-->
     <string name="switchBottomSheetTitleUpgrade">Yıllık planla %16 tasarruf edin!</string>
     <string name="switchBottomSheetDescriptionUpgrade">Yıllık bir plan, mevcut 9,99 ABD dolarlık aylık planınıza kıyasla ayda sadece 8,33 ABD dolarıdır.</string>

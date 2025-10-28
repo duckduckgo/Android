@@ -191,7 +191,7 @@
     <string name="subscriptionSettingSubscribeSecure">Zagotovite varnost omrežja Wi-Fi in se zasebno pogovarjajte z naprednimi modeli umetne inteligence</string>
 
     <string name="feedbackGeneralSubscription">Naročnina</string>
-    
+
     <!-- Switch plan-->
     <string name="switchBottomSheetTitleUpgrade">Prihranite 16 %\nz letno naročnino!</string>
     <string name="switchBottomSheetDescriptionUpgrade">Letna naročnina znaša samo 8,33 USD/mesec v primerjavi z vašo trenutno mesečno naročnino po 9,99 USD.</string>

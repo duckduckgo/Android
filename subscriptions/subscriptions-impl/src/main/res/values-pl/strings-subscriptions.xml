@@ -191,7 +191,7 @@
     <string name="subscriptionSettingSubscribeSecure">Zabezpiecz Wi-Fi i czatuj prywatnie z zaawansowanymi modelami AI</string>
 
     <string name="feedbackGeneralSubscription">Subskrypcja</string>
-    
+
     <!-- Switch plan-->
     <string name="switchBottomSheetTitleUpgrade">Zaoszczędź 16% \nz planem rocznym!</string>
     <string name="switchBottomSheetDescriptionUpgrade">Plan roczny kosztuje tylko 8,33 USD/mies., w porównaniu do Twojego obecnego planu miesięcznego za 9,99 USD.</string>

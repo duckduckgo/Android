@@ -191,7 +191,7 @@
     <string name="subscriptionSettingSubscribeSecure">Zabezpeč si Wi-Fi a chatuj súkromne s pokročilými modelmi umelej inteligencie</string>
 
     <string name="feedbackGeneralSubscription">Predplatné</string>
-    
+
     <!-- Switch plan-->
     <string name="switchBottomSheetTitleUpgrade">Ušetri 16 % s\nročným plánom!</string>
     <string name="switchBottomSheetDescriptionUpgrade">Ročný plán stojí len 8,33 EUR/mesiac v porovnaní s tvojím súčasným mesačným plánom za 9,99 EUR.</string>

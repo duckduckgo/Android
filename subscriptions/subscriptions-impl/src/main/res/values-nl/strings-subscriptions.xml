@@ -191,7 +191,7 @@
     <string name="subscriptionSettingSubscribeSecure">Beveilig je wifi en chat privé met geavanceerde AI-modellen</string>
 
     <string name="feedbackGeneralSubscription">Abonnement</string>
-    
+
     <!-- Switch plan-->
     <string name="switchBottomSheetTitleUpgrade">Bespaar 16% met een jaarlijks abonnement!</string>
     <string name="switchBottomSheetDescriptionUpgrade">Een jaarlijks abonnement kost slechts $8,33/maand, vergeleken met je huidige maandabonnement van $9,99.</string>

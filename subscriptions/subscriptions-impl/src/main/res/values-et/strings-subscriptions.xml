@@ -191,7 +191,7 @@
     <string name="subscriptionSettingSubscribeSecure">Muuda oma Wi-Fi turvaliseks ja vestle privaatselt täiustatud tehisintellekti mudelitega</string>
 
     <string name="feedbackGeneralSubscription">Püsitellimus</string>
-    
+
     <!-- Switch plan-->
     <string name="switchBottomSheetTitleUpgrade">Säästa 16% aastase plaaniga!</string>
     <string name="switchBottomSheetDescriptionUpgrade">Aastaplaan maksab vaid $8,33/kuus, võrreldes sinu praeguse igakuise $9,99 plaaniga.</string>

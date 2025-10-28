@@ -191,7 +191,7 @@
     <string name="subscriptionSettingSubscribeSecure">Asigură-ți rețeaua Wi-Fi și discută în privat cu modele avansate de IA</string>
 
     <string name="feedbackGeneralSubscription">Abonament</string>
-    
+
     <!-- Switch plan-->
     <string name="switchBottomSheetTitleUpgrade">Economisește 16% cu\n un plan anual!</string>
     <string name="switchBottomSheetDescriptionUpgrade">Un plan anual costă doar 8,33 USD/lună, comparativ cu planul tău lunar actual de 9,99 USD.</string>
