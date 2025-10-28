@@ -58,6 +58,11 @@ dependencies {
     implementation AndroidX.work.runtimeKtx
     implementation "androidx.work:work-multiprocess:_"
 
+    // Encryption
+    implementation "net.zetetic:sqlcipher-android:_"
+    implementation project(':library-loader-api')
+    implementation AndroidX.security.crypto
+
     testImplementation Testing.junit4
     testImplementation "org.mockito.kotlin:mockito-kotlin:_"
     testImplementation project(path: ':common-test')
