@@ -193,7 +193,7 @@
     <string name="feedbackGeneralSubscription">Abonelik</string>
 
     <!-- Switch plan-->
-    <string name="switchBottomSheetTitleUpgrade">Yıllık planla %16 tasarruf edin!</string>
+    <string name="switchBottomSheetTitleUpgrade">Yıllık planla %%16 tasarruf edin!</string>
     <string name="switchBottomSheetDescriptionUpgrade">Yıllık bir plan, mevcut 9,99 ABD dolarlık aylık planınıza kıyasla ayda sadece 8,33 ABD dolarıdır.</string>
     <string name="switchBottomSheetPrimaryButtonUpgrade">Yıllık Üyeliğe Geç ($99,99/yıl)</string>
     <string name="switchBottomSheetSecondaryButtonUpgrade">Aylık Planı Sürdür</string>
