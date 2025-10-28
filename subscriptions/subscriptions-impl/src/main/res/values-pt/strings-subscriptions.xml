@@ -193,7 +193,7 @@
     <string name="feedbackGeneralSubscription">Subscrição</string>
 
     <!-- Switch plan-->
-    <string name="switchBottomSheetTitleUpgrade">Poupa 16% com um plano anual!</string>
+    <string name="switchBottomSheetTitleUpgrade">Poupa 16%% com\num plano anual!</string>
     <string name="switchBottomSheetDescriptionUpgrade">Um plano anual custa apenas 8,33 $/mês, em comparação com o teu plano mensal atual de 9,99 $.</string>
     <string name="switchBottomSheetPrimaryButtonUpgrade">Mudar para anual (99,99 $/ano)</string>
     <string name="switchBottomSheetSecondaryButtonUpgrade">Manter plano mensal</string>
