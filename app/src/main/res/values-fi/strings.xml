@@ -844,8 +844,10 @@
 
     <!-- Appearance settings -->
     <string name="settingsAddressBarPositionTitle">Osoitekenttä</string>
+    <string name="settingsAddressBarPositionHeaderTitle">Osoiterivin ja työkalupalkin sijainti</string>
     <string name="settingsAddressBarPositionTop">Ylös</string>
     <string name="settingsAddressBarPositionBottom">Alareuna</string>
+    <string name="settingsAddressBarPositionSplit">Jaa</string>
 
     <!-- Show on App Launch Option -->
     <string name="showOnAppLaunchOptionTitle">Näytä sovelluksen käynnistyksen yhteydessä</string>
