@@ -844,8 +844,10 @@
 
     <!-- Appearance settings -->
     <string name="settingsAddressBarPositionTitle">Adressefelt</string>
+    <string name="settingsAddressBarPositionHeaderTitle">Plassering av adresselinjen og verktøylinjen</string>
     <string name="settingsAddressBarPositionTop">Topp</string>
     <string name="settingsAddressBarPositionBottom">Nederst</string>
+    <string name="settingsAddressBarPositionSplit">Del</string>
 
     <!-- Show on App Launch Option -->
     <string name="showOnAppLaunchOptionTitle">Vis ved lansering av appen</string>
