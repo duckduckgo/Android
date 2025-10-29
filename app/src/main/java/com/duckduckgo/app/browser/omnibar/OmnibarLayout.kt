@@ -255,6 +255,15 @@ class OmnibarLayout @JvmOverloads constructor(
         }
     }
 
+    override fun setFireTab(isFireTab: Boolean) {
+        val fireResource = if (isFireTab) {
+            com.duckduckgo.mobile.android.R.drawable.ic_fire_color_24
+        } else {
+            com.duckduckgo.mobile.android.R.drawable.ic_fire_24
+        }
+        fireIconImageView.setImageResource(fireResource)
+    }
+
     override val findInPage: IncludeFindInPageBinding by lazy {
         IncludeFindInPageBinding.bind(findViewById(R.id.findInPage))
     }

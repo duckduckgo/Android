@@ -144,5 +144,7 @@ interface TabRepository {
      */
     fun countTabsAccessedWithinRange(accessOlderThan: Long, accessNotMoreThan: Long? = null): Int
 
-    fun getTabProfile(tabId: String): Profile?
+    fun getTabProfileName(tabId: String): String?
+
+    fun isFireTab(tabId: String): Boolean
 }

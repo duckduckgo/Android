@@ -107,7 +107,9 @@ class TabDataRepository @Inject constructor(
     ): String = withContext(dispatchers.io()) {
         val tabId = generateTabId()
         if (isFireTab) {
-            profileStore.getOrCreateProfile(tabId)
+            withContext(dispatchers.main()) {
+                profileStore.getOrCreateProfile(tabId)
+            }
         }
         val flag = getAndCacheTabInsertionFixesFlag()
         val siteData = if (flag) {
@@ -355,13 +357,7 @@ class TabDataRepository @Inject constructor(
             deleteOldFavicon(tabId)
             siteData.remove(tabId)
             appCoroutineScope.launch(dispatchers.main()) {
-                val profile = profileStore.getProfile(tabId)
-                val profileName = try {
-                    profile?.name
-                } catch (ex: Exception) {
-                    logcat { "lp_test; tab data repo; getName ${ex}" }
-                    null
-                }
+                val profileName = getTabProfileName(tabId)
                 if (profileName != null) {
                     if (profileStore.deleteProfile(profileName)) {
                         logcat { "lp_test; Deleted profile for tabId: $tabId" }
@@ -515,7 +511,16 @@ class TabDataRepository @Inject constructor(
         return Schedulers.single()
     }
 
-    override fun getTabProfile(tabId: String): Profile? {
-        return profileStore.getProfile(tabId)
+    override fun getTabProfileName(tabId: String): String? {
+        return try {
+            profileStore.getProfile(tabId)?.name
+        } catch (ex: Exception) {
+            logcat { "lp_test; getTabProfileName $ex" }
+            null
+        }
+    }
+
+    override fun isFireTab(tabId: String): Boolean {
+        return getTabProfileName(tabId) != null
     }
 }

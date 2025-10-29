@@ -450,4 +450,8 @@ class Omnibar(
     fun setDraftTextIfNtpOrSerp(query: String) {
         omnibarView.setDraftTextIfNtpOrSerp(query)
     }
+
+    fun setFireTab(isFireTab: Boolean) {
+        omnibarView.setFireTab(isFireTab)
+    }
 }

@@ -1005,6 +1005,15 @@ open class LegacyOmnibarLayout @JvmOverloads constructor(
     override fun gone() {
         gone()
     }
+
+    override fun setFireTab(isFireTab: Boolean) {
+        val fireResource = if (isFireTab) {
+            com.duckduckgo.mobile.android.R.drawable.ic_fire_color_24
+        } else {
+            com.duckduckgo.mobile.android.R.drawable.ic_fire_24
+        }
+        fireIconImageView.setImageResource(fireResource)
+    }
 }
 
 interface OmnibarItemPressedListener {

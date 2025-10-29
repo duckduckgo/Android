@@ -1027,6 +1027,7 @@ class BrowserTabFragment :
             binding = binding,
             isUnifiedOmnibarEnabled = androidBrowserConfigFeature.useUnifiedOmnibarLayout().isEnabled(),
         )
+        omnibar.setFireTab(tabRepository.isFireTab(tabId))
 
         webViewContainer = binding.webViewContainer
         configureObservers()
@@ -3160,14 +3161,8 @@ class BrowserTabFragment :
 
         webView?.let {
             logcat { "lp_test; tabId: $tabId" }
-            val profile = tabRepository.getTabProfile(tabId)
-            val profileName = try {
-                profile?.name
-            } catch (ex: Exception) {
-                logcat { "lp_test; browser tab fragment; getName ${ex}" }
-                null
-            }
-            logcat { "lp_test; profile: ${profileName}" }
+            val profileName = tabRepository.getTabProfileName(tabId)
+            logcat { "lp_test; profileName: ${profileName}" }
             if (profileName != null) {
                 WebViewCompat.setProfile(it, profileName)
             }

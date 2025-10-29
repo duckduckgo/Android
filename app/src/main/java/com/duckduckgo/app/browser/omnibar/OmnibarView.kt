@@ -57,4 +57,6 @@ interface OmnibarView {
     )
     fun show()
     fun gone()
+
+    fun setFireTab(isFireTab: Boolean)
 }
