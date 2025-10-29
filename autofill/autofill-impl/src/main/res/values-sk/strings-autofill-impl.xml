@@ -301,4 +301,27 @@
     <string name="passwords_import_promo_in_settings_title">Importujte heslá z Google</string>
     <string name="passwords_import_promo_in_settings_dismiss_text">Skryť</string>
 
+    <!-- Import Bookmarks Strings -->
+    <string name="importToDuckDuckGo">Importovať do DuckDuckGo</string>
+    <string name="importBookmarksFromGoogleChromeFolderName">Importované z prehliadača Chrome</string>
+    <string name="importBookmarksFromGooglePreImportDialogTitle">Importovať záložky z Google</string>
+    <string name="importBookmarksFromGooglePreImportDialogInstruction">Google vás môže požiadať, aby ste sa prihlásili alebo zadali svoje heslo na potvrdenie.</string>
+    <string name="importBookmarksFromGooglePreImportDialogImportButton">Importovať z Google</string>
+    <string name="importBookmarksFromGooglePreImportDialogSelectFileButton">Vyber súbor záložiek…</string>
+    <string name="importBookmarksFromGoogleWebFlowTitle">Importovať záložky</string>
+    <string name="importBookmarksProgressTitle">Importovanie z Google…</string>
+    <string name="importBookmarksProgressSubtitle">Nechaj túto obrazovku otvorenú a počkaj – nemalo by to trvať viac ako minútu alebo dve.</string>
+    <string name="importBookmarksProgressInfoMessage1">Google vás môže požiadať, aby ste sa prihlásili alebo zadali svoje heslo na potvrdenie.</string>
+    <string name="importBookmarksProgressInfoMessage2">Google ti môže poslať e-mail s potvrdením, že tvoje záložky sa exportujú.</string>
+    <string name="importBookmarksFromGoogleCancelConfirmationDialogTitle">Zrušiť import?</string>
+    <string name="importBookmarksFromGoogleCancelConfirmationDialogMessage">Ak teraz zrušíš, tvoje záložky nebudú importované.</string>
+    <string name="importBookmarksFromGoogleCancelConfirmationDialogCancelImport">Zrušiť import</string>
+    <string name="importBookmarksFromGoogleCancelConfirmationDialogContinue">Pokračovať</string>
+    <string name="importBookmarksFromGoogleSuccessBookmarksCount" instruction="Placeholder is the number of bookmarks that were imported">Záložky: %1$d</string>
+    <string name="importBookmarksSuccessTitle">@string/importToDuckDuckGo</string>
+    <string name="importBookmarksFinalDoneButton">Zatvoriť</string>
+    <string name="importBookmarksErrorTitle">@string/importToDuckDuckGo</string>
+    <string name="importBookmarksErrorGenericMessage">Vyskytla sa chyba</string>
+    <string name="importBookmarksErrorGenericMessageSecondary">Uisti sa, že si pripojený na internet a skús to znova.</string>
+
 </resources>
