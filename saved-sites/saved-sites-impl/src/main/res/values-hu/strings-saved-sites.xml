@@ -110,4 +110,11 @@
     <string name="deleteBookmarkFolderConfirmationDialogDescription" instruction="Placeholder is the name of the favorite site">Ez törli a(z) &lt;b&gt;%1$s&lt;/b&gt; könyvjelzőmappát.</string>
     <string name="deleteSavedSiteConfirmationDialogCancel">Mégsem</string>
     <string name="deleteSavedSiteConfirmationDialogDelete">Törlés</string>
+
+    <!-- Bookmark Import -->
+    <string name="importBookmarksFromGooglePreImportDialogTitle">Könyvjelzők importálása a Google-ből</string>
+    <string name="importBookmarksFromGooglePreImportDialogInstruction">A Google megkérhet, hogy jelentkezz be, vagy a megerősítéshez add meg a jelszavad.</string>
+    <string name="importBookmarksFromGooglePreImportDialogImportButton">Importálás a Google-ból</string>
+    <string name="importBookmarksFromGooglePreImportDialogSelectFileButton">Válaszd ki a könyvjelzőfájlt…</string>
+    <string name="bookmarksImportDialogClose">Bezárás</string>
 </resources>
