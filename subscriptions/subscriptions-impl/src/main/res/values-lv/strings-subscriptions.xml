@@ -193,7 +193,7 @@
     <string name="feedbackGeneralSubscription">Abonements</string>
 
     <!-- Switch plan-->
-    <string name="switchBottomSheetTitleUpgrade">Ietaupi 16 % ar\nikgadējo plānu!</string>
+    <string name="switchBottomSheetTitleUpgrade">Ietaupiet 16%% ar\nikgadējo plānu!</string>
     <string name="switchBottomSheetDescriptionUpgrade">Ikgadējais plāns maksā tikai 8,33 USD mēnesī, salīdzinot ar tavu pašreizējo ikmēneša plānu, kas maksā 9,99 USD.</string>
     <string name="switchBottomSheetPrimaryButtonUpgrade">Maini plānu uz ikgadējo (99,99 USD gadā)</string>
     <string name="switchBottomSheetSecondaryButtonUpgrade">Atstāt ikmēneša plānu</string>
