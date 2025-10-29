@@ -999,11 +999,11 @@ open class LegacyOmnibarLayout @JvmOverloads constructor(
     }
 
     override fun show() {
-        show()
+        visibility = View.VISIBLE
     }
 
     override fun gone() {
-        gone()
+        visibility = View.GONE
     }
 }
 
