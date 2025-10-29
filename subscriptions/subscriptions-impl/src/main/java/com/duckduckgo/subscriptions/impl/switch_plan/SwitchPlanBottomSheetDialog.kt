@@ -45,6 +45,7 @@ import com.google.android.material.shape.MaterialShapeDrawable
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.launch
+import logcat.logcat
 
 @SuppressLint("NoBottomSheetDialog")
 class SwitchPlanBottomSheetDialog @AssistedInject constructor(
@@ -109,6 +110,7 @@ class SwitchPlanBottomSheetDialog @AssistedInject constructor(
 
                 binding.switchBottomSheetDialogPrimaryButton.setOnClickListener {
                     triggerSwitch(isUpgrade = true)
+                    dismiss()
                 }
                 binding.switchBottomSheetDialogSecondaryButton.setOnClickListener {
                     dismiss()
@@ -127,6 +129,7 @@ class SwitchPlanBottomSheetDialog @AssistedInject constructor(
                 }
                 binding.switchBottomSheetDialogSecondaryButton.setOnClickListener {
                     triggerSwitch(isUpgrade = false)
+                    dismiss()
                 }
             }
         }
@@ -137,21 +140,19 @@ class SwitchPlanBottomSheetDialog @AssistedInject constructor(
             subscriptionsManager.currentPurchaseState.collect {
                 when (it) {
                     is CurrentPurchase.Success -> {
-                        launch(dispatcherProvider.main()) {
-                            Toast.makeText(context, context.getString(R.string.switchPlanSuccessMessage), Toast.LENGTH_LONG).show()
-                            dismiss()
-                        }
+                        logcat { "Switch flow: Successfully switched plans" }
+                        //TODO NOELIA update subscription view
                     }
 
                     is CurrentPurchase.Failure -> {
                         launch(dispatcherProvider.main()) {
-                            Toast.makeText(context, context.getString(R.string.switchPlanErrorMessage), Toast.LENGTH_LONG).show()
+                            logcat { "Switch flow: Failed to switch plans. Error: ${it.message}" }
                         }
                     }
 
                     is CurrentPurchase.Canceled -> {
                         launch(dispatcherProvider.main()) {
-                            dismiss()
+                            logcat { "Switch flow: Canceled switch plans" }
                         }
                     }
 
@@ -167,7 +168,7 @@ class SwitchPlanBottomSheetDialog @AssistedInject constructor(
                 val subscription = subscriptionsManager.getSubscription()
                 if (subscription == null) {
                     launch(dispatcherProvider.main()) {
-                        Toast.makeText(context, "No active subscription found", Toast.LENGTH_SHORT).show()
+                        logcat { "Switch flow: Failed to switch plans. No active subscription found" }
                         dismiss()
                     }
                     return@launch
@@ -181,24 +182,17 @@ class SwitchPlanBottomSheetDialog @AssistedInject constructor(
                     if (isUS) MONTHLY_PLAN_US else MONTHLY_PLAN_ROW
                 }
 
-                // Use appropriate replacement mode
-                val replacementMode = if (isUpgrade) {
-                    SubscriptionReplacementMode.CHARGE_PRORATED_PRICE
-                } else {
-                    SubscriptionReplacementMode.DEFERRED
-                }
-
                 launch(dispatcherProvider.main()) {
                     subscriptionsManager.switchSubscriptionPlan(
                         activity = context as Activity,
                         planId = targetPlanId,
                         offerId = null,
-                        replacementMode = replacementMode,
+                        replacementMode = SubscriptionReplacementMode.WITHOUT_PRORATION,
                     )
                 }
             } catch (e: Exception) {
                 launch(dispatcherProvider.main()) {
-                    Toast.makeText(context, "Error: ${e.message}", Toast.LENGTH_SHORT).show()
+                    logcat { "Switch flow: Failed to switch plans. Exception: ${e.message}" }
                 }
             }
         }

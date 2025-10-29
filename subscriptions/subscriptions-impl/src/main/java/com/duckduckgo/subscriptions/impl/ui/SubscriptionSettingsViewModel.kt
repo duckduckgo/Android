@@ -150,14 +150,13 @@ class SubscriptionSettingsViewModel @Inject constructor(
         }
     }
 
-    fun onSwitchPlanClicked() {
+    fun onSwitchPlanClicked(currentDuration: SubscriptionDuration) {
         viewModelScope.launch {
-            val currentState = _viewState.value as? Ready ?: return@launch
-            val switchType = when (currentState.duration) {
+            val switchType = when (currentDuration) {
                 Monthly -> SwitchPlanType.UPGRADE_TO_YEARLY
                 Yearly -> SwitchPlanType.DOWNGRADE_TO_MONTHLY
             }
-            command.send(Command.ShowSwitchPlanDialog(switchType))
+            command.send(ShowSwitchPlanDialog(switchType))
         }
     }
 

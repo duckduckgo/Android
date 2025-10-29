@@ -192,7 +192,7 @@ class SubscriptionSettingsActivity : DuckDuckGoActivity() {
                 }
                 binding.switchPlan.setPrimaryText(switchText)
                 binding.switchPlan.setClickListener {
-                    viewModel.onSwitchPlanClicked()
+                    viewModel.onSwitchPlanClicked(viewState.duration)
                 }
             } else {
                 binding.switchPlan.gone()

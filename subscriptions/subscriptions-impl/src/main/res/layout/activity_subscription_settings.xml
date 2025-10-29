@@ -150,21 +150,21 @@
                 android:layout_height="wrap_content"
                 app:primaryText="@string/subscriptionSettingSectionSubscription" />
 
-            <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
-                android:id="@+id/changePlan"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:visibility="gone"
-                app:primaryText="@string/changePlanTitle"
-                tools:secondaryText="Your monthly subscription renews on April 20, 2027."
-                tools:visibility="visible" />
-
             <com.duckduckgo.common.ui.view.listitem.OneLineListItem
                 android:id="@+id/switchPlan"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:visibility="gone"
                 tools:primaryText="Switch to Yearly Plan"
+                tools:visibility="visible" />
+
+            <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
+                android:id="@+id/changePlan"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="gone"
+                app:primaryText="@string/subscriptionSettingManagePlan"
+                tools:secondaryText="Your monthly subscription renews on April 20, 2027."
                 tools:visibility="visible" />
 
             <com.duckduckgo.common.ui.view.listitem.OneLineListItem
