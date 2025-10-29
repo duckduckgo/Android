@@ -48,6 +48,7 @@ dependencies {
     implementation project(':js-messaging-api')
     implementation project(':statistics-api')
     implementation project(':content-scope-scripts-api')
+    implementation project(':duckchat-api')
 
     implementation "com.squareup.logcat:logcat:_"
 
