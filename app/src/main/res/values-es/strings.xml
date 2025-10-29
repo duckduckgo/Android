@@ -844,8 +844,10 @@
 
     <!-- Appearance settings -->
     <string name="settingsAddressBarPositionTitle">Barra de direcciones</string>
+    <string name="settingsAddressBarPositionHeaderTitle">Posición de la barra de direcciones y de la barra de herramientas</string>
     <string name="settingsAddressBarPositionTop">Arriba</string>
     <string name="settingsAddressBarPositionBottom">Inferior</string>
+    <string name="settingsAddressBarPositionSplit">Dividir</string>
 
     <!-- Show on App Launch Option -->
     <string name="showOnAppLaunchOptionTitle">Mostrar al abrir la aplicación</string>
