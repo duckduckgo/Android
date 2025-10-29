@@ -193,7 +193,7 @@
     <string name="feedbackGeneralSubscription">Püsitellimus</string>
 
     <!-- Switch plan-->
-    <string name="switchBottomSheetTitleUpgrade">Säästa 16% aastase plaaniga!</string>
+    <string name="switchBottomSheetTitleUpgrade">Säästa 16%\naastase plaaniga!</string>
     <string name="switchBottomSheetDescriptionUpgrade">Aastaplaan maksab vaid $8,33/kuus, võrreldes sinu praeguse igakuise $9,99 plaaniga.</string>
     <string name="switchBottomSheetPrimaryButtonUpgrade">Mine üle aastasele plaanile ($99,99/aasta)</string>
     <string name="switchBottomSheetSecondaryButtonUpgrade">Jätka igakuise plaaniga</string>
