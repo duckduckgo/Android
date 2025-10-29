@@ -193,7 +193,7 @@
     <string name="feedbackGeneralSubscription">Předplatné</string>
 
     <!-- Switch plan-->
-    <string name="switchBottomSheetTitleUpgrade">Ušetři 16 %\ns ročním tarifem!</string>
+    <string name="switchBottomSheetTitleUpgrade">Ušetři 16 %%\ns ročním tarifem!</string>
     <string name="switchBottomSheetDescriptionUpgrade">Roční tarif stojí jen 8,33 $ za měsíc oproti tvému současnému měsíčnímu tarifu za 9,99 $.</string>
     <string name="switchBottomSheetPrimaryButtonUpgrade">Přejít na roční tarif (99,99 $/rok)</string>
     <string name="switchBottomSheetSecondaryButtonUpgrade">Nechat měsíční tarif</string>
