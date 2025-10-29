@@ -155,7 +155,7 @@ class JsActionSuccessEventHandler @Inject constructor(
             }
 
             is ConditionResponse -> {
-                if (pirSuccessResponse.response != null && pirSuccessResponse.response.actions.isNotEmpty()) {
+                if (pirSuccessResponse.response.actions.isNotEmpty()) {
                     Next(
                         nextState = baseSuccessState,
                         nextEvent = ConditionExpectationSucceeded(
