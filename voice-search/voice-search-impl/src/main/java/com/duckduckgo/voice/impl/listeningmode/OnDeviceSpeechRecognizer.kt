@@ -23,10 +23,16 @@ import android.speech.RecognitionListener
 import android.speech.RecognizerIntent
 import android.speech.SpeechRecognizer
 import androidx.annotation.RequiresApi
+import com.duckduckgo.app.di.AppCoroutineScope
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.voice.impl.listeningmode.OnDeviceSpeechRecognizer.Companion
 import com.duckduckgo.voice.impl.listeningmode.OnDeviceSpeechRecognizer.Event
+import com.duckduckgo.voice.impl.remoteconfig.VoiceSearchFeature
 import com.squareup.anvil.annotations.ContributesBinding
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import logcat.LogPriority.ERROR
 import logcat.asLog
 import logcat.logcat
@@ -53,10 +59,12 @@ interface OnDeviceSpeechRecognizer {
 @ContributesBinding(ActivityScope::class)
 class DefaultOnDeviceSpeechRecognizer @Inject constructor(
     private val context: Context,
+    private val voiceSearchFeature: VoiceSearchFeature,
+    private val dispatcherProvider: DispatcherProvider,
+    @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
 ) : OnDeviceSpeechRecognizer {
 
     private var speechRecognizer: SpeechRecognizer? = null
-    private var isListening = false
     private var hasSpeechBegun = false
 
     private val speechRecognizerIntent: Intent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH).run {
@@ -88,10 +96,15 @@ class DefaultOnDeviceSpeechRecognizer @Inject constructor(
         override fun onError(error: Int) {
             when (error) {
                 SpeechRecognizer.ERROR_NO_MATCH -> {
-                    if (isListening && !hasSpeechBegun) {
-                        speechRecognizer?.startListening(speechRecognizerIntent)
-                    } else {
-                        _eventHandler(Event.RecognitionTimedOut(error))
+                    appCoroutineScope.launch(dispatcherProvider.io()) {
+                        val isEnabled = voiceSearchFeature.restartAfterTimeout().isEnabled()
+                        withContext(dispatcherProvider.main()) {
+                            if (isEnabled && !hasSpeechBegun) {
+                                speechRecognizer?.startListening(speechRecognizerIntent)
+                            } else {
+                                _eventHandler(Event.RecognitionTimedOut(error))
+                            }
+                        }
                     }
                 }
                 else -> {
@@ -129,7 +142,6 @@ class DefaultOnDeviceSpeechRecognizer @Inject constructor(
     @RequiresApi(VERSION_CODES.S)
     override fun start(eventHandler: (Event) -> Unit) {
         _eventHandler = eventHandler
-        isListening = true
         hasSpeechBegun = false
         runCatching {
             speechRecognizer = SpeechRecognizer.createOnDeviceSpeechRecognizer(context)
@@ -143,7 +155,6 @@ class DefaultOnDeviceSpeechRecognizer @Inject constructor(
     }
 
     override fun stop() {
-        isListening = false
         hasSpeechBegun = false
         speechRecognizer?.destroy()
     }
