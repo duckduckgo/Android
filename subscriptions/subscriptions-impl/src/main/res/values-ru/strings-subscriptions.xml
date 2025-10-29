@@ -193,7 +193,7 @@
     <string name="feedbackGeneralSubscription">По подписке</string>
 
     <!-- Switch plan-->
-    <string name="switchBottomSheetTitleUpgrade">Экономьте 16%\nна годовой подписке!</string>
+    <string name="switchBottomSheetTitleUpgrade">Годовая подписка\nсэкономит вам 16%%</string>
     <string name="switchBottomSheetDescriptionUpgrade">В отличие от текущего ежемесячного тарифа 9,99 $, годовой тариф — всего 8,33 $ в месяц.</string>
     <string name="switchBottomSheetPrimaryButtonUpgrade">Перейти на годовой план (99,99 $/год)</string>
     <string name="switchBottomSheetSecondaryButtonUpgrade">Оставить месячный план</string>

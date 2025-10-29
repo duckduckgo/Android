@@ -193,7 +193,7 @@
     <string name="feedbackGeneralSubscription">Előfizetés</string>
 
     <!-- Switch plan-->
-    <string name="switchBottomSheetTitleUpgrade">Takaríts meg 16%-ot\naz éves csomaggal!</string>
+    <string name="switchBottomSheetTitleUpgrade">Spórolj 16%-ot\naz éves csomaggal!</string>
     <string name="switchBottomSheetDescriptionUpgrade">Az éves csomag díja mindössze 8,33 USD/hó, szemben a jelenlegi havi csomagod 9,99 USD/hó díjával.</string>
     <string name="switchBottomSheetPrimaryButtonUpgrade">Váltás éves előfizetésre (99,99 USD/év)</string>
     <string name="switchBottomSheetSecondaryButtonUpgrade">Havi csomag megtartása</string>

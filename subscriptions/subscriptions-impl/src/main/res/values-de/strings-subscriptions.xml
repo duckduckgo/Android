@@ -193,7 +193,7 @@
     <string name="feedbackGeneralSubscription">Abonnement</string>
 
     <!-- Switch plan-->
-    <string name="switchBottomSheetTitleUpgrade">Mit einem Jahresabo\nsparst du 16 %!</string>
+    <string name="switchBottomSheetTitleUpgrade">Mit einem Jahresabo\nsparst du 16 %%!</string>
     <string name="switchBottomSheetDescriptionUpgrade">Ein Jahrestarif kostet nur 8,33 USD/Monat, verglichen mit deinem derzeitigen Monatstarif von 9,99 USD.</string>
     <string name="switchBottomSheetPrimaryButtonUpgrade">Zum Jahresabonnement (99,99 USD/Jahr) wechseln</string>
     <string name="switchBottomSheetSecondaryButtonUpgrade">Monatlichen Tarif beibehalten</string>
