@@ -51,7 +51,7 @@ import com.duckduckgo.subscriptions.impl.SubscriptionsManager
 import com.duckduckgo.subscriptions.impl.databinding.ActivitySubscriptionSettingsBinding
 import com.duckduckgo.subscriptions.impl.internal.SubscriptionsUrlProvider
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
-import com.duckduckgo.subscriptions.impl.switch_plan.SwitchPlanBottomSheetDialog
+import com.duckduckgo.subscriptions.impl.switch_plan.SwitchPlanBottomSheetDialogFactory
 import com.duckduckgo.subscriptions.impl.ui.ChangePlanActivity.Companion.ChangePlanScreenWithEmptyParams
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.DismissRebrandingBanner
@@ -84,10 +84,7 @@ class SubscriptionSettingsActivity : DuckDuckGoActivity() {
     lateinit var subscriptionsUrlProvider: SubscriptionsUrlProvider
 
     @Inject
-    lateinit var subscriptionsManager: SubscriptionsManager
-
-    @Inject
-    lateinit var dispatcherProvider: DispatcherProvider
+    lateinit var switchPlanDialogFactory: SwitchPlanBottomSheetDialogFactory
 
     private val viewModel: SubscriptionSettingsViewModel by bindViewModel()
     private val binding: ActivitySubscriptionSettingsBinding by viewBinding()
@@ -320,11 +317,9 @@ class SubscriptionSettingsActivity : DuckDuckGoActivity() {
     }
 
     private fun showSwitchPlanDialog(switchType: SwitchPlanType) {
-        val dialog = SwitchPlanBottomSheetDialog(
+        val dialog = switchPlanDialogFactory.create(
             context = this,
             lifecycleOwner = this,
-            subscriptionsManager = subscriptionsManager,
-            dispatcherProvider = dispatcherProvider,
             switchType = switchType,
         )
         dialog.show()

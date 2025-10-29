@@ -19,11 +19,14 @@ package com.duckduckgo.subscriptions.impl.switch_plan
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
+import android.content.DialogInterface
 import android.view.LayoutInflater
+import android.widget.FrameLayout
 import android.widget.Toast
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.mobile.android.R as CommonR
 import com.duckduckgo.subscriptions.impl.CurrentPurchase
 import com.duckduckgo.subscriptions.impl.R
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.MONTHLY_PLAN_ROW
@@ -34,30 +37,102 @@ import com.duckduckgo.subscriptions.impl.SubscriptionsManager
 import com.duckduckgo.subscriptions.impl.billing.SubscriptionReplacementMode
 import com.duckduckgo.subscriptions.impl.databinding.BottomSheetSwitchPlanBinding
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.SwitchPlanType
+import com.google.android.material.R as MaterialR
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
+import com.google.android.material.shape.CornerFamily
+import com.google.android.material.shape.MaterialShapeDrawable
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedInject
 import kotlinx.coroutines.launch
 
 @SuppressLint("NoBottomSheetDialog")
-class SwitchPlanBottomSheetDialog(
-    private val context: Context,
-    private val lifecycleOwner: LifecycleOwner,
+class SwitchPlanBottomSheetDialog @AssistedInject constructor(
+    @Assisted private val context: Context,
+    @Assisted private val lifecycleOwner: LifecycleOwner,
+    @Assisted private val switchType: SwitchPlanType,
     private val subscriptionsManager: SubscriptionsManager,
     private val dispatcherProvider: DispatcherProvider,
-    private val switchType: SwitchPlanType,
 ) : BottomSheetDialog(context) {
 
     private val binding: BottomSheetSwitchPlanBinding = BottomSheetSwitchPlanBinding.inflate(LayoutInflater.from(context))
 
     init {
         setContentView(binding.root)
+        // We need the dialog to always be expanded and not draggable because the content takes up a lot of vertical space and requires a scroll view,
+        // especially in landscape aspect-ratios. If the dialog started as collapsed, the drag would interfere with internal scroll.
         this.behavior.state = BottomSheetBehavior.STATE_EXPANDED
         this.behavior.isDraggable = false
+        
+        setOnShowListener { dialogInterface ->
+            setRoundCorners(dialogInterface)
+        }
+    }
+    
+    /**
+     * By default, when bottom sheet dialog is expanded, the corners become squared.
+     * This function ensures that the bottom sheet dialog will have rounded corners even when in an expanded state.
+     */
+    private fun setRoundCorners(dialogInterface: DialogInterface) {
+        val bottomSheetDialog = dialogInterface as BottomSheetDialog
+        val bottomSheet = bottomSheetDialog.findViewById<FrameLayout>(MaterialR.id.design_bottom_sheet)
+
+        val shapeDrawable = MaterialShapeDrawable.createWithElevationOverlay(context)
+        shapeDrawable.shapeAppearanceModel = shapeDrawable.shapeAppearanceModel
+            .toBuilder()
+            .setTopLeftCorner(CornerFamily.ROUNDED, context.resources.getDimension(CommonR.dimen.dialogBorderRadius))
+            .setTopRightCorner(CornerFamily.ROUNDED, context.resources.getDimension(CommonR.dimen.dialogBorderRadius))
+            .build()
+        bottomSheet?.background = shapeDrawable
     }
 
     override fun onAttachedToWindow() {
         super.onAttachedToWindow()
+
         configureViews()
+        observePurchaseState()
+    }
+
+    private fun configureViews() {
+        // Set up close button
+        binding.switchBottomSheetDialogCloseButton.setOnClickListener {
+            dismiss()
+        }
+
+        when (switchType) {
+            SwitchPlanType.UPGRADE_TO_YEARLY -> {
+                // Configure for upgrade (Monthly → Yearly)
+                binding.switchBottomSheetDialogTitle.text = context.getString(R.string.switchBottomSheetTitleUpgrade)
+                binding.switchBottomSheetDialogSubTitle.text = context.getString(R.string.switchBottomSheetDescriptionUpgrade)
+                binding.switchBottomSheetDialogPrimaryButton.text = context.getString(R.string.switchBottomSheetPrimaryButtonUpgrade)
+                binding.switchBottomSheetDialogSecondaryButton.text = context.getString(R.string.switchBottomSheetSecondaryButtonUpgrade)
+
+                binding.switchBottomSheetDialogPrimaryButton.setOnClickListener {
+                    triggerSwitch(isUpgrade = true)
+                }
+                binding.switchBottomSheetDialogSecondaryButton.setOnClickListener {
+                    dismiss()
+                }
+            }
+
+            SwitchPlanType.DOWNGRADE_TO_MONTHLY -> {
+                // Configure for downgrade (Yearly → Monthly)
+                binding.switchBottomSheetDialogTitle.text = context.getString(R.string.switchBottomSheetTitleDowngrade)
+                binding.switchBottomSheetDialogSubTitle.text = context.getString(R.string.switchBottomSheetDescriptionDowngrade)
+                binding.switchBottomSheetDialogPrimaryButton.text = context.getString(R.string.switchBottomSheetPrimaryButtonDowngrade)
+                binding.switchBottomSheetDialogSecondaryButton.text = context.getString(R.string.switchBottomSheetSecondaryButtonDowngrade)
+
+                binding.switchBottomSheetDialogPrimaryButton.setOnClickListener {
+                    dismiss()
+                }
+                binding.switchBottomSheetDialogSecondaryButton.setOnClickListener {
+                    triggerSwitch(isUpgrade = false)
+                }
+            }
+        }
+    }
+
+    private fun observePurchaseState() {
         lifecycleOwner.lifecycleScope.launch(dispatcherProvider.io()) {
             subscriptionsManager.currentPurchaseState.collect {
                 when (it) {
@@ -67,49 +142,20 @@ class SwitchPlanBottomSheetDialog(
                             dismiss()
                         }
                     }
+
                     is CurrentPurchase.Failure -> {
                         launch(dispatcherProvider.main()) {
                             Toast.makeText(context, context.getString(R.string.switchPlanErrorMessage), Toast.LENGTH_LONG).show()
                         }
                     }
+
                     is CurrentPurchase.Canceled -> {
                         launch(dispatcherProvider.main()) {
                             dismiss()
                         }
                     }
-                    else -> {}
-                }
-            }
-        }
-    }
 
-    private fun configureViews() {
-        binding.switchBottomSheetDialogCloseButton.setOnClickListener {
-            dismiss()
-        }
-        when (switchType) {
-            SwitchPlanType.UPGRADE_TO_YEARLY -> {
-                binding.switchBottomSheetDialogTitle.text = context.getString(R.string.switchBottomSheetTitleUpgrade)
-                binding.switchBottomSheetDialogSubTitle.text = context.getString(R.string.switchBottomSheetDescriptionUpgrade)
-                binding.switchBottomSheetDialogPrimaryButton.text = context.getString(R.string.switchBottomSheetPrimaryButtonUpgrade)
-                binding.switchBottomSheetDialogSecondaryButton.text = context.getString(R.string.switchBottomSheetSecondaryButtonUpgrade)
-                binding.switchBottomSheetDialogPrimaryButton.setOnClickListener {
-                    triggerSwitch(isUpgrade = true)
-                }
-                binding.switchBottomSheetDialogSecondaryButton.setOnClickListener {
-                    dismiss()
-                }
-            }
-            SwitchPlanType.DOWNGRADE_TO_MONTHLY -> {
-                binding.switchBottomSheetDialogTitle.text = context.getString(R.string.switchBottomSheetTitleDowngrade)
-                binding.switchBottomSheetDialogSubTitle.text = context.getString(R.string.switchBottomSheetDescriptionDowngrade)
-                binding.switchBottomSheetDialogPrimaryButton.text = context.getString(R.string.switchBottomSheetPrimaryButtonDowngrade)
-                binding.switchBottomSheetDialogSecondaryButton.text = context.getString(R.string.switchBottomSheetSecondaryButtonDowngrade)
-                binding.switchBottomSheetDialogPrimaryButton.setOnClickListener {
-                    dismiss()
-                }
-                binding.switchBottomSheetDialogSecondaryButton.setOnClickListener {
-                    triggerSwitch(isUpgrade = false)
+                    else -> {}
                 }
             }
         }
@@ -126,17 +172,22 @@ class SwitchPlanBottomSheetDialog(
                     }
                     return@launch
                 }
+
+                // Determine target plan based on current subscription
                 val isUS = subscription.productId in listOf(MONTHLY_PLAN_US, YEARLY_PLAN_US)
                 val targetPlanId = if (isUpgrade) {
                     if (isUS) YEARLY_PLAN_US else YEARLY_PLAN_ROW
                 } else {
                     if (isUS) MONTHLY_PLAN_US else MONTHLY_PLAN_ROW
                 }
+
+                // Use appropriate replacement mode
                 val replacementMode = if (isUpgrade) {
                     SubscriptionReplacementMode.CHARGE_PRORATED_PRICE
                 } else {
                     SubscriptionReplacementMode.DEFERRED
                 }
+
                 launch(dispatcherProvider.main()) {
                     subscriptionsManager.switchSubscriptionPlan(
                         activity = context as Activity,
