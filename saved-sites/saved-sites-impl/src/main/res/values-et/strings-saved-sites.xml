@@ -110,4 +110,11 @@
     <string name="deleteBookmarkFolderConfirmationDialogDescription" instruction="Placeholder is the name of the favorite site">See kustutab sinu järjehoidjate kausta &lt;b&gt;%1$s&lt;/b&gt;.</string>
     <string name="deleteSavedSiteConfirmationDialogCancel">Loobu</string>
     <string name="deleteSavedSiteConfirmationDialogDelete">Kustuta</string>
+
+    <!-- Bookmark Import -->
+    <string name="importBookmarksFromGooglePreImportDialogTitle">Impordi järjehoidjad Google\'ist</string>
+    <string name="importBookmarksFromGooglePreImportDialogInstruction">Google võib paluda sul sisse logida või sisestada kinnitamiseks parooli.</string>
+    <string name="importBookmarksFromGooglePreImportDialogImportButton">Impordi Google\'ist</string>
+    <string name="importBookmarksFromGooglePreImportDialogSelectFileButton">Vali järjehoidjate fail...</string>
+    <string name="bookmarksImportDialogClose">Sulge</string>
 </resources>
