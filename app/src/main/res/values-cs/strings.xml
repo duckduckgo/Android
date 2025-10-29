@@ -876,8 +876,10 @@
 
     <!-- Appearance settings -->
     <string name="settingsAddressBarPositionTitle">Adresní řádek</string>
+    <string name="settingsAddressBarPositionHeaderTitle">Pozice adresního řádku a nástrojové lišty</string>
     <string name="settingsAddressBarPositionTop">Nahoru</string>
     <string name="settingsAddressBarPositionBottom">Dole</string>
+    <string name="settingsAddressBarPositionSplit">Rozdělení</string>
 
     <!-- Show on App Launch Option -->
     <string name="showOnAppLaunchOptionTitle">Zobrazit při spuštění aplikace</string>
