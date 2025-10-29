@@ -1297,8 +1297,8 @@ class BrowserTabFragment :
     private fun createPopupMenu() {
         val popupMenuResourceType =
             when (omnibar.omnibarType) {
-                OmnibarType.SINGLE_TOP, OmnibarType.SPLIT -> BrowserPopupMenu.ResourceType.TOP
-                OmnibarType.SINGLE_BOTTOM -> BrowserPopupMenu.ResourceType.BOTTOM
+                OmnibarType.SINGLE_TOP -> BrowserPopupMenu.ResourceType.TOP
+                OmnibarType.SINGLE_BOTTOM, OmnibarType.SPLIT -> BrowserPopupMenu.ResourceType.BOTTOM
             }
 
         popupMenu =
