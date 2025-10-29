@@ -96,7 +96,6 @@ import com.duckduckgo.app.browser.omnibar.model.Decoration.PrivacyShieldChanged
 import com.duckduckgo.app.browser.omnibar.model.Decoration.QueueCookiesAnimation
 import com.duckduckgo.app.browser.omnibar.model.StateChange
 import com.duckduckgo.app.global.view.renderIfChanged
-import com.duckduckgo.app.onboardingdesignexperiment.OnboardingDesignExperimentManager
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType
@@ -179,9 +178,6 @@ class OmnibarLayout @JvmOverloads constructor(
     lateinit var omnibarAnimationManager: OmnibarAnimationManager
 
     @Inject
-    lateinit var onboardingDesignExperimentManager: OnboardingDesignExperimentManager
-
-    @Inject
     lateinit var serpLogos: SerpLogos
 
     @Inject
@@ -206,7 +202,7 @@ class OmnibarLayout @JvmOverloads constructor(
     }
 
     private val pulseAnimation: PulseAnimation by lazy {
-        PulseAnimation(lifecycleOwner, onboardingDesignExperimentManager)
+        PulseAnimation(lifecycleOwner)
     }
 
     private var omnibarTextListener: TextListener? = null
