@@ -193,7 +193,7 @@
     <string name="feedbackGeneralSubscription">Pretplata</string>
 
     <!-- Switch plan-->
-    <string name="switchBottomSheetTitleUpgrade">Uštedi 16 % s\ngodišnjim planom!</string>
+    <string name="switchBottomSheetTitleUpgrade">S godišnjim planom\nuštedi 16 %!</string>
     <string name="switchBottomSheetDescriptionUpgrade">Godišnji plan iznosi samo 8,33 USD/mjesečno, u usporedbi s tvojim sadašnjim mjesečnim planom od 9,99 USD.</string>
     <string name="switchBottomSheetPrimaryButtonUpgrade">Prebaci se na godišnju pretplatu (99,99 USD/godišnje)</string>
     <string name="switchBottomSheetSecondaryButtonUpgrade">Zadrži mjesečni plan</string>
