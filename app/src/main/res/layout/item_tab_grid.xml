@@ -107,6 +107,17 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/close" />
 
+        <ImageView
+            android:id="@+id/fireTabIcon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginBottom="8dp"
+            android:src="@drawable/ic_fire_color_24"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="@id/tabPreview"
+            app:layout_constraintStart_toStartOf="@id/tabPreview" />
+
     </androidx.constraintlayout.widget.ConstraintLayout>
 
 </com.google.android.material.card.MaterialCardView>

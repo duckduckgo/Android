@@ -28,6 +28,7 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.annotation.VisibleForTesting
+import androidx.cardview.widget.CardView
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.DiffUtil
@@ -70,6 +71,7 @@ import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.view.toPx
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.swap
+import com.google.android.material.card.MaterialCardView
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import logcat.LogPriority.ERROR
@@ -209,6 +211,11 @@ class TabSwitcherAdapter(
             bindingAdapterPosition = { holder.bindingAdapterPosition },
             tabId = tab.id,
         )
+        if (tab.isFireTab) {
+            holder.fireTabIcon.show()
+        } else {
+            holder.fireTabIcon.hide()
+        }
     }
 
     private fun attachTabClickListeners(tabViewHolder: TabViewHolder, bindingAdapterPosition: () -> Int, tabId: String) {
@@ -490,6 +497,7 @@ class TabSwitcherAdapter(
             override val tabUnread: ImageView,
             override val selectionIndicator: ImageView,
             val tabPreview: ImageView,
+            val fireTabIcon: ImageView,
         ) : TabSwitcherViewHolder(rootView), TabViewHolder {
 
             constructor(binding: ItemTabGridBinding) : this(
@@ -500,6 +508,7 @@ class TabSwitcherAdapter(
                 tabUnread = binding.tabUnread,
                 selectionIndicator = binding.selectionIndicator,
                 tabPreview = binding.tabPreview,
+                fireTabIcon = binding.fireTabIcon,
             )
         }
 

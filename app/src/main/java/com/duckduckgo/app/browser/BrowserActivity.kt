@@ -1302,7 +1302,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
             if (swipingTabsFeature.isEnabled) {
                 tabManager.openNewTab(query, sourceTabId, skipHome, fireTab)
             } else {
-                viewModel.onNewTabRequested()
+                viewModel.onNewTabRequested(fireTab = fireTab)
             }
         }
     }

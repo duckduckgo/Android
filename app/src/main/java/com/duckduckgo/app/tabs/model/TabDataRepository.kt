@@ -23,6 +23,7 @@ import androidx.lifecycle.asFlow
 import androidx.lifecycle.distinctUntilChanged
 import androidx.webkit.Profile
 import androidx.webkit.ProfileStore
+import androidx.webkit.WebStorageCompat
 import com.duckduckgo.adclick.api.AdClickManager
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
@@ -43,6 +44,7 @@ import dagger.SingleInstanceIn
 import io.reactivex.Scheduler
 import io.reactivex.schedulers.Schedulers
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
@@ -357,16 +359,47 @@ class TabDataRepository @Inject constructor(
             deleteOldFavicon(tabId)
             siteData.remove(tabId)
             appCoroutineScope.launch(dispatchers.main()) {
-                val profileName = getTabProfileName(tabId)
-                if (profileName != null) {
-                    if (profileStore.deleteProfile(profileName)) {
-                        logcat { "lp_test; Deleted profile for tabId: $tabId" }
-                    } else {
-                        logcat { "lp_test; Failed to delete profile for tabId: $tabId" }
+                val profile = profileStore.getProfile(tabId)
+                if (profile != null) {
+                    WebStorageCompat.deleteBrowsingData(profile.webStorage) {
+                        logcat { "lp_test; All web storage data removed for tabId: $tabId" }
                     }
-                } else {
-                    logcat { "lp_test; No profile found for tabId: $tabId" }
                 }
+                // profile.webStorage.deleteAllData()
+                // profile.cookieManager.flush()
+                // profile.cookieManager.removeAllCookies { removed ->
+                //     logcat { "lp_test; All cookies removed for tabId: $tabId : $removed" }
+                // }
+                //
+                //
+                //
+                //
+                //
+                //
+                //
+                //
+                // var success = false
+                // while (!success) {
+                //     try {
+                //         logcat { "lp_test; Trying to delete profile for tabId: $tabId" }
+                //
+                //         val profileName = getTabProfileName(tabId)
+                //         if (profileName != null) {
+                //             if (profileStore.deleteProfile(profileName)) {
+                //                 logcat { "lp_test; Deleted profile for tabId: $tabId" }
+                //             } else {
+                //                 logcat { "lp_test; Failed to delete profile for tabId: $tabId" }
+                //             }
+                //         } else {
+                //             logcat { "lp_test; No profile found for tabId: $tabId" }
+                //         }
+                //         success = true
+                //     } catch (ex: Exception) {
+                //         logcat(WARN) { "lp_test; Exception deleting profile for tabId: $tabId : $ex" }
+                //         delay(1000)
+                //         continue
+                //     }
+                // }
             }
         }
     }
@@ -522,5 +555,25 @@ class TabDataRepository @Inject constructor(
 
     override fun isFireTab(tabId: String): Boolean {
         return getTabProfileName(tabId) != null
+    }
+
+    override fun clearStaleProfiles() {
+        appCoroutineScope.launch(dispatchers.main()) {
+            logcat { "lp_test; clearStaleProfiles" }
+            val tabIds = withContext(dispatchers.io()) {
+                tabsDao.tabs().map { it.tabId }
+            }
+            logcat { "lp_test; tabIds: $tabIds" }
+            val profileNames = profileStore.allProfileNames
+            logcat { "lp_test; profileNames: $profileNames" }
+            profileNames.forEach { profileName ->
+                if (profileName != "Default") {
+                    if (!tabIds.contains(profileName)) {
+                        logcat { "lp_test; deleting: $profileName" }
+                        profileStore.deleteProfile(profileName)
+                    }
+                }
+            }
+        }
     }
 }

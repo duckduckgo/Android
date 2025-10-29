@@ -147,4 +147,6 @@ interface TabRepository {
     fun getTabProfileName(tabId: String): String?
 
     fun isFireTab(tabId: String): Boolean
+
+    fun clearStaleProfiles()
 }

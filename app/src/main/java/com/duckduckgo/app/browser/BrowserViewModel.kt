@@ -215,11 +215,11 @@ class BrowserViewModel @Inject constructor(
         }
     }
 
-    suspend fun onNewTabRequested(sourceTabId: String? = null): String {
+    suspend fun onNewTabRequested(sourceTabId: String? = null, fireTab: Boolean = false): String {
         return if (sourceTabId != null) {
-            tabRepository.addFromSourceTab(sourceTabId = sourceTabId)
+            tabRepository.addFromSourceTab(sourceTabId = sourceTabId, isFireTab = fireTab)
         } else {
-            tabRepository.add()
+            tabRepository.add(isFireTab = fireTab)
         }
     }
 

@@ -4059,6 +4059,7 @@ class BrowserTabFragment :
     }
 
     override fun onDestroy() {
+        logcat { "lp_test; fragment onDestroy: $tabId" }
         dismissAppLinkSnackBar()
         supervisorJob.cancel()
         if (::popupMenu.isInitialized) popupMenu.dismiss()
@@ -4070,10 +4071,16 @@ class BrowserTabFragment :
     }
 
     private fun destroyWebView() {
+        logcat { "lp_test; destroyWebView: $tabId" }
         if (::webViewContainer.isInitialized) webViewContainer.removeAllViews()
         webView?.let {
             it.removeSystemAutofillCallback()
             it.destroy()
+
+            // tabRepository.getTabProfileName(tabId)?.let {
+            //     logcat { "lp_test; deleteProfile: $tabId" }
+            //     ProfileStore.getInstance().deleteProfile(it)
+            // }
         }
         webView = null
     }

@@ -594,7 +594,7 @@ class TabSwitcherViewModel @Inject constructor(
         mode: Mode,
     ): List<TabSwitcherItem> {
         val normalTabs = tabEntities.map {
-            NormalTab(it, isActive = it.tabId == activeTab?.tabId)
+            NormalTab(it, isActive = it.tabId == activeTab?.tabId, isFireTab = tabRepository.isFireTab(it.tabId))
         }
 
         suspend fun getNormalTabItemsWithOptionalAnimationTile(): List<TabSwitcherItem> {
@@ -609,7 +609,7 @@ class TabSwitcherViewModel @Inject constructor(
 
         return if (mode is Selection) {
             tabEntities.map {
-                SelectableTab(it, isSelected = it.tabId in mode.selectedTabs)
+                SelectableTab(it, isSelected = it.tabId in mode.selectedTabs, isFireTab = tabRepository.isFireTab(it.tabId))
             }
         } else {
             getNormalTabItemsWithOptionalAnimationTile()
