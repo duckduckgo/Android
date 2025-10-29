@@ -289,4 +289,27 @@
     <string name="passwords_import_promo_in_settings_title">Importa le password da Google</string>
     <string name="passwords_import_promo_in_settings_dismiss_text">Nascondi</string>
 
+    <!-- Import Bookmarks Strings -->
+    <string name="importToDuckDuckGo">Importa in DuckDuckGo</string>
+    <string name="importBookmarksFromGoogleChromeFolderName">Importato da Chrome</string>
+    <string name="importBookmarksFromGooglePreImportDialogTitle">Importa segnalibri da Google</string>
+    <string name="importBookmarksFromGooglePreImportDialogInstruction">Google potrebbe chiederti di effettuare l\'accesso o di inserire la tua password per confermare.</string>
+    <string name="importBookmarksFromGooglePreImportDialogImportButton">Importa da Google</string>
+    <string name="importBookmarksFromGooglePreImportDialogSelectFileButton">Seleziona il file dei segnalibri...</string>
+    <string name="importBookmarksFromGoogleWebFlowTitle">Importa segnalibri</string>
+    <string name="importBookmarksProgressTitle">Importazione da Google...</string>
+    <string name="importBookmarksProgressSubtitle">Tieni aperta questa schermata e attendi, ci vorrà solo qualche minuto.</string>
+    <string name="importBookmarksProgressInfoMessage1">Google potrebbe chiederti di effettuare l\'accesso o di inserire la tua password per confermare.</string>
+    <string name="importBookmarksProgressInfoMessage2">Google potrebbe inviarti un\'email per confermare che i tuoi segnalibri sono in fase di esportazione.</string>
+    <string name="importBookmarksFromGoogleCancelConfirmationDialogTitle">Annullare l\'importazione?</string>
+    <string name="importBookmarksFromGoogleCancelConfirmationDialogMessage">I tuoi segnalibri non verranno importati se annulli ora.</string>
+    <string name="importBookmarksFromGoogleCancelConfirmationDialogCancelImport">Annulla importazione</string>
+    <string name="importBookmarksFromGoogleCancelConfirmationDialogContinue">Continua</string>
+    <string name="importBookmarksFromGoogleSuccessBookmarksCount" instruction="Placeholder is the number of bookmarks that were imported">Segnalibri: %1$d</string>
+    <string name="importBookmarksSuccessTitle">@string/importToDuckDuckGo</string>
+    <string name="importBookmarksFinalDoneButton">Chiudi</string>
+    <string name="importBookmarksErrorTitle">@string/importToDuckDuckGo</string>
+    <string name="importBookmarksErrorGenericMessage">Si è verificato un errore</string>
+    <string name="importBookmarksErrorGenericMessageSecondary">Verifica se la connessione a Internet è attiva e riprova.</string>
+
 </resources>
