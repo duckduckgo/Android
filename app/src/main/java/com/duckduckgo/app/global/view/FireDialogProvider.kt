@@ -20,8 +20,6 @@ import android.content.Context
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.firebutton.FireButtonStore
 import com.duckduckgo.app.global.events.db.UserEventsStore
-import com.duckduckgo.app.onboardingdesignexperiment.OnboardingDesignExperimentManager
-import com.duckduckgo.app.settings.clear.OnboardingExperimentFireAnimationHelper
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
@@ -65,12 +63,6 @@ class FireDialogLauncherImpl @Inject constructor() : FireDialogProvider {
     @Inject
     lateinit var appBuildConfig: AppBuildConfig
 
-    @Inject
-    lateinit var onboardingDesignExperimentManager: OnboardingDesignExperimentManager
-
-    @Inject
-    lateinit var onboardingExperimentFireAnimationHelper: OnboardingExperimentFireAnimationHelper
-
     override fun createFireDialog(context: Context): FireDialog = FireDialog(
         context = context,
         clearPersonalDataAction = clearPersonalDataAction,
@@ -81,7 +73,5 @@ class FireDialogLauncherImpl @Inject constructor() : FireDialogProvider {
         dispatcherProvider = dispatcherProvider,
         fireButtonStore = fireButtonStore,
         appBuildConfig = appBuildConfig,
-        onboardingDesignExperimentManager = onboardingDesignExperimentManager,
-        onboardingExperimentFireAnimationHelper = onboardingExperimentFireAnimationHelper,
     )
 }

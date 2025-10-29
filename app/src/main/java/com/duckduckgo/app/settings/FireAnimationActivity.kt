@@ -27,9 +27,7 @@ import com.airbnb.lottie.RenderMode
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ActivityFireAnimationBinding
-import com.duckduckgo.app.onboardingdesignexperiment.OnboardingDesignExperimentManager
 import com.duckduckgo.app.settings.clear.FireAnimation
-import com.duckduckgo.app.settings.clear.OnboardingExperimentFireAnimationHelper
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.view.setAndPropagateUpFitsSystemWindows
 import com.duckduckgo.common.ui.view.show
@@ -39,12 +37,6 @@ import javax.inject.Inject
 
 @InjectWith(ActivityScope::class)
 class FireAnimationActivity : DuckDuckGoActivity() {
-
-    @Inject
-    lateinit var onboardingDesignExperimentManager: OnboardingDesignExperimentManager
-
-    @Inject
-    lateinit var onboardingExperimentFireAnimationHelper: OnboardingExperimentFireAnimationHelper
 
     private val binding: ActivityFireAnimationBinding by viewBinding()
 
@@ -66,12 +58,7 @@ class FireAnimationActivity : DuckDuckGoActivity() {
         fireAnimation: FireAnimation,
         fireAnimationView: LottieAnimationView,
     ) {
-        if (onboardingDesignExperimentManager.isAnyExperimentEnrolledAndEnabled()) {
-            val resId = onboardingExperimentFireAnimationHelper.getSelectedFireAnimationResId(fireAnimation)
-            fireAnimationView.setAnimation(resId)
-        } else {
-            fireAnimationView.setAnimation(fireAnimation.resId)
-        }
+        fireAnimationView.setAnimation(fireAnimation.resId)
         fireAnimationView.setRenderMode(RenderMode.SOFTWARE)
         fireAnimationView.enableMergePathsForKitKatAndAbove(true)
         fireAnimationView.setAndPropagateUpFitsSystemWindows(false)
