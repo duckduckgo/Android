@@ -21,6 +21,7 @@ import android.content.pm.ApplicationInfo
 import android.content.pm.PackageManager
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.extensions.isDdgApp
+import com.duckduckgo.common.utils.extensions.safeGetInstalledApplications
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.mobile.android.vpn.apps.TrackingProtectionAppsRepository.ProtectionState
 import com.duckduckgo.mobile.android.vpn.apps.TrackingProtectionAppsRepository.ProtectionState.PROTECTED
@@ -113,7 +114,7 @@ class RealTrackingProtectionAppsRepository @Inject constructor(
 
     private fun refreshInstalledApps() {
         logcat { "Excluded Apps: refreshInstalledApps" }
-        installedApps = packageManager.getInstalledApplications(PackageManager.GET_META_DATA)
+        installedApps = packageManager.safeGetInstalledApplications(context)
             .asSequence()
             .filterNot { shouldNotBeShown(it) }
     }
@@ -121,7 +122,7 @@ class RealTrackingProtectionAppsRepository @Inject constructor(
     override suspend fun getExclusionAppsList(): List<String> = withContext(dispatcherProvider.io()) {
         val exclusionList = appTrackerRepository.getAppExclusionList()
         val manualExclusionList = appTrackerRepository.getManualAppExclusionList()
-        return@withContext packageManager.getInstalledApplications(PackageManager.GET_META_DATA)
+        return@withContext packageManager.safeGetInstalledApplications(context)
             .asSequence()
             .filter { isExcludedFromAppTP(it, exclusionList, manualExclusionList) }
             .sortedBy { it.name }

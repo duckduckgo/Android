@@ -41,6 +41,11 @@ import java.util.EnumSet
 internal class DenyListedApiDetector : Detector(), SourceCodeScanner, XmlScanner {
     private val config = DenyListConfig(
         DenyListedEntry(
+            className = "android.content.pm.PackageManager",
+            functionName = "getInstalledApplications",
+            errorMessage = "Use PackageManager.safeGetInstalledApplications() instead"
+        ),
+        DenyListedEntry(
             className = "kotlinx.coroutines.flow.FlowKt__ReduceKt",
             functionName = "first",
             errorMessage = "first() will throw if flow is empty, firstOrNull() it's a safer option."
