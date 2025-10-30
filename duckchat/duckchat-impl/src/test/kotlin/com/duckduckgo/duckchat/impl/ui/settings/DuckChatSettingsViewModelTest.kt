@@ -374,4 +374,43 @@ class DuckChatSettingsViewModelTest {
                 cancelAndIgnoreRemainingEvents()
             }
         }
+
+    @Test
+    fun `when hideAiGeneratedImagesOption is enabled then viewState shows option visible`() =
+        runTest {
+            @Suppress("DenyListedApi")
+            settingsPageFeature.hideAiGeneratedImagesOption().setRawStoredState(State(enable = true))
+            testee = DuckChatSettingsViewModel(
+                duckChat = duckChat,
+                pixel = mockPixel,
+                inputScreenDiscoveryFunnel = mockInputScreenDiscoveryFunnel,
+                settingsPageFeature = settingsPageFeature,
+                dispatcherProvider = coroutineRule.testDispatcherProvider
+            )
+
+            testee.viewState.test {
+                val state = awaitItem()
+                assertTrue(state.isHideGeneratedImagesOptionVisible)
+            }
+        }
+
+    @Test
+    fun `when hideAiGeneratedImagesOption is disabled then viewState shows option not visible`() =
+        runTest {
+            @Suppress("DenyListedApi")
+            settingsPageFeature.hideAiGeneratedImagesOption().setRawStoredState(State(enable = false))
+            testee = DuckChatSettingsViewModel(
+                duckChat = duckChat,
+                pixel = mockPixel,
+                inputScreenDiscoveryFunnel = mockInputScreenDiscoveryFunnel,
+                settingsPageFeature = settingsPageFeature,
+                dispatcherProvider = coroutineRule.testDispatcherProvider
+            )
+
+            testee.viewState.test {
+                val state = awaitItem()
+                assertFalse(state.isHideGeneratedImagesOptionVisible)
+            }
+        }
+
 }
