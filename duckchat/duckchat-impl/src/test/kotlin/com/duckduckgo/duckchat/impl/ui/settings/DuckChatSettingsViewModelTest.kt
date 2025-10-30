@@ -68,7 +68,7 @@ class DuckChatSettingsViewModelTest {
                 pixel = mockPixel,
                 inputScreenDiscoveryFunnel = mockInputScreenDiscoveryFunnel,
                 settingsPageFeature = settingsPageFeature,
-                dispatcherProvider = coroutineRule.testDispatcherProvider
+                dispatcherProvider = coroutineRule.testDispatcherProvider,
             )
         }
 
@@ -151,7 +151,7 @@ class DuckChatSettingsViewModelTest {
                 pixel = mockPixel,
                 inputScreenDiscoveryFunnel = mockInputScreenDiscoveryFunnel,
                 settingsPageFeature = settingsPageFeature,
-                dispatcherProvider = coroutineRule.testDispatcherProvider
+                dispatcherProvider = coroutineRule.testDispatcherProvider,
             )
 
             testee.viewState.test {
@@ -168,7 +168,7 @@ class DuckChatSettingsViewModelTest {
                 pixel = mockPixel,
                 inputScreenDiscoveryFunnel = mockInputScreenDiscoveryFunnel,
                 settingsPageFeature = settingsPageFeature,
-                dispatcherProvider = coroutineRule.testDispatcherProvider
+                dispatcherProvider = coroutineRule.testDispatcherProvider,
             )
 
             testee.viewState.test {
@@ -186,7 +186,7 @@ class DuckChatSettingsViewModelTest {
                 pixel = mockPixel,
                 inputScreenDiscoveryFunnel = mockInputScreenDiscoveryFunnel,
                 settingsPageFeature = settingsPageFeature,
-                dispatcherProvider = coroutineRule.testDispatcherProvider
+                dispatcherProvider = coroutineRule.testDispatcherProvider,
             )
 
             testee.viewState.test {
@@ -205,7 +205,7 @@ class DuckChatSettingsViewModelTest {
                 pixel = mockPixel,
                 inputScreenDiscoveryFunnel = mockInputScreenDiscoveryFunnel,
                 settingsPageFeature = settingsPageFeature,
-                dispatcherProvider = coroutineRule.testDispatcherProvider
+                dispatcherProvider = coroutineRule.testDispatcherProvider,
             )
 
             testee.viewState.test {
@@ -224,7 +224,7 @@ class DuckChatSettingsViewModelTest {
                 pixel = mockPixel,
                 inputScreenDiscoveryFunnel = mockInputScreenDiscoveryFunnel,
                 settingsPageFeature = settingsPageFeature,
-                dispatcherProvider = coroutineRule.testDispatcherProvider
+                dispatcherProvider = coroutineRule.testDispatcherProvider,
             )
 
             testee.viewState.test {
@@ -385,7 +385,7 @@ class DuckChatSettingsViewModelTest {
                 pixel = mockPixel,
                 inputScreenDiscoveryFunnel = mockInputScreenDiscoveryFunnel,
                 settingsPageFeature = settingsPageFeature,
-                dispatcherProvider = coroutineRule.testDispatcherProvider
+                dispatcherProvider = coroutineRule.testDispatcherProvider,
             )
 
             testee.viewState.test {
@@ -404,7 +404,7 @@ class DuckChatSettingsViewModelTest {
                 pixel = mockPixel,
                 inputScreenDiscoveryFunnel = mockInputScreenDiscoveryFunnel,
                 settingsPageFeature = settingsPageFeature,
-                dispatcherProvider = coroutineRule.testDispatcherProvider
+                dispatcherProvider = coroutineRule.testDispatcherProvider,
             )
 
             testee.viewState.test {
@@ -412,5 +412,4 @@ class DuckChatSettingsViewModelTest {
                 assertFalse(state.isHideGeneratedImagesOptionVisible)
             }
         }
-
 }
