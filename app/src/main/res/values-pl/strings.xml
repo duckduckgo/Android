@@ -876,8 +876,10 @@
 
     <!-- Appearance settings -->
     <string name="settingsAddressBarPositionTitle">Pasek adresu</string>
+    <string name="settingsAddressBarPositionHeaderTitle">Pozycja paska adresu i paska narzędzi</string>
     <string name="settingsAddressBarPositionTop">Do góry</string>
     <string name="settingsAddressBarPositionBottom">Dół</string>
+    <string name="settingsAddressBarPositionSplit">Podziel</string>
 
     <!-- Show on App Launch Option -->
     <string name="showOnAppLaunchOptionTitle">Pokaż przy uruchomieniu aplikacji</string>
