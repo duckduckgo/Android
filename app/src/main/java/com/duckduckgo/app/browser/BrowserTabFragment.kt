@@ -100,6 +100,7 @@ import androidx.webkit.Profile
 import androidx.webkit.ProfileStore
 import androidx.webkit.WebMessageCompat
 import androidx.webkit.WebSettingsCompat
+import androidx.webkit.WebStorageCompat
 import androidx.webkit.WebViewCompat
 import androidx.webkit.WebViewFeature
 import com.duckduckgo.anvil.annotations.InjectWith
@@ -1246,6 +1247,14 @@ class BrowserTabFragment :
     }
 
     private fun onFireButtonPressed() {
+        // tabRepository.deleteBrowsingDataForTab(tabId, setOf("reddit.com"))
+        // Toast.makeText(requireContext(), "Browsing data for reddit.com (profile: ${tabRepository.getTabProfileName(tabId)})", Toast.LENGTH_LONG).show()
+        // return
+
+        // Toast.makeText(requireContext(), "Navigation history (back/forward) for this tab cleared", Toast.LENGTH_LONG).show()
+        // webView?.clearHistory()
+        // return
+        
         val isFocusedNtp = omnibar.viewMode == ViewMode.NewTab && omnibar.getText().isEmpty() && omnibar.omnibarTextInput.hasFocus()
         browserActivity?.launchFire(launchedFromFocusedNtp = isFocusedNtp)
         viewModel.onFireMenuSelected()

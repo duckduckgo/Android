@@ -149,4 +149,9 @@ interface TabRepository {
     fun isFireTab(tabId: String): Boolean
 
     fun clearStaleProfiles()
+
+    fun deleteBrowsingDataForTab(
+        tabId: String,
+        sites: Set<String>,
+    )
 }

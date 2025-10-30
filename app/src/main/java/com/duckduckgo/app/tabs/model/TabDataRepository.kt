@@ -24,6 +24,7 @@ import androidx.lifecycle.distinctUntilChanged
 import androidx.webkit.Profile
 import androidx.webkit.ProfileStore
 import androidx.webkit.WebStorageCompat
+import androidx.webkit.WebViewFeature
 import com.duckduckgo.adclick.api.AdClickManager
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
@@ -74,7 +75,14 @@ class TabDataRepository @Inject constructor(
     private val tabManagerFeatureFlags: TabManagerFeatureFlags,
 ) : TabRepository {
 
-    private val profileStore: ProfileStore = ProfileStore.getInstance()
+    private fun webViewMultiProfileSupported() = WebViewFeature.isFeatureSupported(WebViewFeature.MULTI_PROFILE)
+    private fun webViewDeleteBrowsingDataSupported() = WebViewFeature.isFeatureSupported(WebViewFeature.DELETE_BROWSING_DATA)
+
+    private val profileStore: ProfileStore? = if (webViewMultiProfileSupported()) {
+        ProfileStore.getInstance()
+    } else {
+        null
+    }
 
     override val liveTabs: LiveData<List<TabEntity>> = tabsDao.liveTabs().distinctUntilChanged()
 
@@ -110,7 +118,7 @@ class TabDataRepository @Inject constructor(
         val tabId = generateTabId()
         if (isFireTab) {
             withContext(dispatchers.main()) {
-                profileStore.getOrCreateProfile(tabId)
+                profileStore?.getOrCreateProfile(tabId)
             }
         }
         val flag = getAndCacheTabInsertionFixesFlag()
@@ -132,7 +140,7 @@ class TabDataRepository @Inject constructor(
     ): String = withContext(dispatchers.io()) {
         val tabId = generateTabId()
         if (isFireTab) {
-            profileStore.getOrCreateProfile(tabId)
+            profileStore?.getOrCreateProfile(tabId)
         }
         val flag = getAndCacheTabInsertionFixesFlag()
         val siteData = if (flag) {
@@ -284,7 +292,7 @@ class TabDataRepository @Inject constructor(
     ) {
         val newTabId = generateTabId()
         if (isFireTab) {
-            profileStore.getOrCreateProfile(newTabId)
+            profileStore?.getOrCreateProfile(newTabId)
         }
         databaseExecutor().scheduleDirect {
             val position = tabsDao.tab(tabId)?.position ?: -1
@@ -359,39 +367,38 @@ class TabDataRepository @Inject constructor(
             deleteOldFavicon(tabId)
             siteData.remove(tabId)
             appCoroutineScope.launch(dispatchers.main()) {
-                val profile = profileStore.getProfile(tabId)
-                if (profile != null) {
-                    WebStorageCompat.deleteBrowsingData(profile.webStorage) {
-                        logcat { "lp_test; All web storage data removed for tabId: $tabId" }
+                if (webViewDeleteBrowsingDataSupported()) {
+                    val profile = profileStore?.getProfile(tabId)
+                    if (profile != null) {
+                        WebStorageCompat.deleteBrowsingData(profile.webStorage) {
+                            logcat { "lp_test; All web storage data removed for tabId: $tabId" }
+                        }
                     }
+                } else {
+                    logcat { "lp_test; DELETE_BROWSING_DATA not supported" }
                 }
                 // profile.webStorage.deleteAllData()
                 // profile.cookieManager.flush()
                 // profile.cookieManager.removeAllCookies { removed ->
                 //     logcat { "lp_test; All cookies removed for tabId: $tabId : $removed" }
                 // }
-                //
-                //
-                //
-                //
-                //
-                //
-                //
-                //
+
+
+
+
+
+
+
+
                 // var success = false
                 // while (!success) {
                 //     try {
                 //         logcat { "lp_test; Trying to delete profile for tabId: $tabId" }
                 //
-                //         val profileName = getTabProfileName(tabId)
-                //         if (profileName != null) {
-                //             if (profileStore.deleteProfile(profileName)) {
-                //                 logcat { "lp_test; Deleted profile for tabId: $tabId" }
-                //             } else {
-                //                 logcat { "lp_test; Failed to delete profile for tabId: $tabId" }
-                //             }
+                //         if (profileStore.deleteProfile(tabId)) {
+                //             logcat { "lp_test; Deleted profile for tabId: $tabId" }
                 //         } else {
-                //             logcat { "lp_test; No profile found for tabId: $tabId" }
+                //             logcat { "lp_test; Failed to delete profile for tabId: $tabId" }
                 //         }
                 //         success = true
                 //     } catch (ex: Exception) {
@@ -546,7 +553,12 @@ class TabDataRepository @Inject constructor(
 
     override fun getTabProfileName(tabId: String): String? {
         return try {
-            profileStore.getProfile(tabId)?.name
+            // profileStore.getProfile(tabId)?.name
+            if (profileStore?.allProfileNames?.contains(tabId) == true) {
+                tabId
+            } else {
+                null
+            }
         } catch (ex: Exception) {
             logcat { "lp_test; getTabProfileName $ex" }
             null
@@ -564,15 +576,37 @@ class TabDataRepository @Inject constructor(
                 tabsDao.tabs().map { it.tabId }
             }
             logcat { "lp_test; tabIds: $tabIds" }
-            val profileNames = profileStore.allProfileNames
+            val profileNames = profileStore?.allProfileNames
             logcat { "lp_test; profileNames: $profileNames" }
-            profileNames.forEach { profileName ->
-                if (profileName != "Default") {
-                    if (!tabIds.contains(profileName)) {
-                        logcat { "lp_test; deleting: $profileName" }
-                        profileStore.deleteProfile(profileName)
+            profileNames?.filterNot { it == Profile.DEFAULT_PROFILE_NAME }?.forEach { profileName ->
+                if (!tabIds.contains(profileName)) {
+                    logcat { "lp_test; deleting: $profileName" }
+                    profileStore?.deleteProfile(profileName)
+                }
+            }
+        }
+    }
+
+    override fun deleteBrowsingDataForTab(
+        tabId: String,
+        sites: Set<String>,
+    ) {
+        appCoroutineScope.launch(dispatchers.main()) {
+            if (webViewDeleteBrowsingDataSupported()) {
+                val profileName = getTabProfileName(tabId) ?: Profile.DEFAULT_PROFILE_NAME
+                val profile = profileStore?.getProfile(profileName)
+                if (profile != null) {
+                    sites.forEach { site ->
+                        WebStorageCompat.deleteBrowsingDataForSite(
+                            profile.webStorage,
+                            site,
+                        ) {
+                            logcat { "lp_test; Data removed for profile: $profileName; site: $site" }
+                        }
                     }
                 }
+            } else {
+                logcat { "lp_test; deleteBrowsingDataForTab; DELETE_BROWSING_DATA not supported" }
             }
         }
     }
