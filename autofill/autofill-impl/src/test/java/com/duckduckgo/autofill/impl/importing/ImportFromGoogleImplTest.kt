@@ -54,6 +54,8 @@ class ImportFromGoogleImplTest {
 
     private val globalActivityStarter: GlobalActivityStarter = mock()
 
+    private val webViewCapabilityChecker: ImportGoogleBookmarksWebViewCapabilityChecker = mock()
+
     private val context: Context = mock()
 
     private lateinit var testee: ImportFromGoogleImpl
@@ -65,6 +67,7 @@ class ImportFromGoogleImplTest {
             dispatchers = coroutinesTestRule.testDispatcherProvider,
             globalActivityStarter = globalActivityStarter,
             context = context,
+            webViewCapabilityChecker = webViewCapabilityChecker,
         )
 
         whenever(
@@ -82,9 +85,17 @@ class ImportFromGoogleImplTest {
     }
 
     @Test
-    fun `Launch intent is not null when feature is enabled`() = runTest {
+    fun `Launch intent is not null when feature is enabled and WebView is capable`() = runTest {
         configureFeatureState(isEnabled = true)
+        whenever(webViewCapabilityChecker.webViewCapableOfImporting()).thenReturn(true)
         assertNotNull(testee.getBookmarksImportLaunchIntent())
+    }
+
+    @Test
+    fun `Launch intent is null when feature is enabled but WebView is not capable`() = runTest {
+        configureFeatureState(isEnabled = true)
+        whenever(webViewCapabilityChecker.webViewCapableOfImporting()).thenReturn(false)
+        assertNull(testee.getBookmarksImportLaunchIntent())
     }
 
     @Test
