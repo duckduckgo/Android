@@ -68,6 +68,9 @@ interface SettingsDataStore {
     var showAutomaticFireproofDialog: Boolean
     var omnibarType: OmnibarType
 
+    // Temporary cache value for split omnibar feature, in case the flag is temporarily disabled
+    var isSplitOmnibarSelected: Boolean
+
     /**
      * This will be checked upon app startup and used to decide whether it should perform a clear or not.
      * If the app is cleared and the process restarted as a result, then we don't want to clear and restart again when the app launches.
@@ -219,6 +222,10 @@ class SettingsSharedPreferences @Inject constructor(
         )
         set(value) = preferences.edit { putString(KEY_OMNIBAR_TYPE, value.typeName) }
 
+    override var isSplitOmnibarSelected: Boolean
+        get() = preferences.getBoolean(KEY_SPLIT_OMNIBAR, false)
+        set(value) = preferences.edit { putBoolean(KEY_SPLIT_OMNIBAR, value) }
+
     override var isFullUrlEnabled: Boolean
         get() = preferences.getBoolean(KEY_IS_FULL_URL_ENABLED, true)
         set(enabled) = preferences.edit { putBoolean(KEY_IS_FULL_URL_ENABLED, enabled) }
@@ -300,6 +307,7 @@ class SettingsSharedPreferences @Inject constructor(
         const val KEY_NOTIFY_ME_IN_DOWNLOADS_DISMISSED = "KEY_NOTIFY_ME_IN_DOWNLOADS_DISMISSED"
         const val KEY_EXPERIMENTAL_SITE_DARK_MODE = "KEY_EXPERIMENTAL_SITE_DARK_MODE"
         const val KEY_OMNIBAR_TYPE = "KEY_OMNIBAR_POSITION"
+        const val KEY_SPLIT_OMNIBAR = "KEY_SPLIT_OMNIBAR"
         const val KEY_IS_FULL_URL_ENABLED = "KEY_IS_FULL_URL_ENABLED"
         const val KEY_CLEAR_DUCK_AI_DATA = "KEY_CLEAR_DUCK_AI_DATA"
     }
