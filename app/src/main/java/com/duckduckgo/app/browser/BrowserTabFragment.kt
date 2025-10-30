@@ -1260,6 +1260,10 @@ class BrowserTabFragment :
     private fun onBrowserMenuButtonPressed() {
         contentScopeScripts.sendSubscriptionEvent(createBreakageReportingEventData())
         viewModel.onBrowserMenuClicked(isCustomTab = isActiveCustomTab())
+
+        lifecycleScope.launch {
+            webViewCompatTestHelper.onBrowserMenuButtonPressed(webView)
+        }
     }
 
     private fun onOmnibarPrivacyShieldButtonPressed() {
@@ -3254,7 +3258,10 @@ class BrowserTabFragment :
             )
             configureWebViewForBlobDownload(it)
             lifecycleScope.launch {
-                webViewCompatTestHelper.configureWebViewForWebViewCompatTest(it)
+                webViewCompatTestHelper.configureWebViewForWebViewCompatTest(
+                    it,
+                    isBlobDownloadWebViewFeatureEnabled(it),
+                )
             }
             configureWebViewForAutofill(it)
             printInjector.addJsInterface(it) { viewModel.printFromWebView() }
@@ -3382,7 +3389,13 @@ class BrowserTabFragment :
     private fun configureWebViewForBlobDownload(webView: DuckDuckGoWebView) {
         lifecycleScope.launch(dispatchers.main()) {
             if (isBlobDownloadWebViewFeatureEnabled(webView)) {
-                val script = blobDownloadScript()
+                val useDedicatedWebViewCompatMessageListener = webViewCompatTestHelper.useDedicatedWebMessageListener()
+
+                val script = if (useDedicatedWebViewCompatMessageListener) {
+                    blobDownloadScript()
+                } else {
+                    blobDownloadScriptForWebViewCompatTest()
+                }
                 WebViewCompat.addDocumentStartJavaScript(webView, script, setOf("*"))
 
                 webViewCompatWrapper.addWebMessageListener(
@@ -3407,6 +3420,13 @@ class BrowserTabFragment :
                                         .md5()
                                         .toString()
                                 viewModel.saveReplyProxyForBlobDownload(sourceOrigin.toString(), replyProxy, locationRef)
+                            } else if (!useDedicatedWebViewCompatMessageListener && message.data?.startsWith("webViewCompat") == true) {
+                                lifecycleScope.launch {
+                                    webViewCompatTestHelper.handleWebViewCompatMessage(
+                                        message = message,
+                                        replyProxy = replyProxy,
+                                    )
+                                }
                             }
                         }
                     },
@@ -3424,6 +3444,61 @@ class BrowserTabFragment :
                 }
             }
         }
+    }
+
+    private fun blobDownloadScriptForWebViewCompatTest(): String {
+        val script =
+            """
+            (function() {
+
+                const urlToBlobCollection = {};
+
+                const original_createObjectURL = URL.createObjectURL;
+
+                URL.createObjectURL = function () {
+                    const blob = arguments[0];
+                    const url = original_createObjectURL.call(this, ...arguments);
+                    if (blob instanceof Blob) {
+                        urlToBlobCollection[url] = blob;
+                    }
+                    return url;
+                }
+
+                function blobToBase64DataUrl(blob) {
+                    return new Promise((resolve, reject) => {
+                        const reader = new FileReader();
+                        reader.onloadend = function() {
+                            resolve(reader.result);
+                        }
+                        reader.onerror = function() {
+                            reject(new Error('Failed to read Blob object'));
+                        }
+                        reader.readAsDataURL(blob);
+                    });
+                }
+
+                const pingMessage = 'Ping:' + window.location.href;
+                window.ddgBlobDownloadObj.postMessage(pingMessage);
+                console.log('Sent ping message for blob downloads: ' + pingMessage);
+
+                window.ddgBlobDownloadObj.addEventListener('message', function(event) {
+                    if (event.data.startsWith('blob:')) {
+                        console.log(event.data);
+                        const blob = urlToBlobCollection[event.data];
+                        if (blob) {
+                            blobToBase64DataUrl(blob).then((dataUrl) => {
+                                console.log('Sending data URL back to native ' + dataUrl);
+                                window.ddgBlobDownloadObj.postMessage(dataUrl);
+                            });
+                        } else {
+                            console.log('No Blob found for URL: ' + event.data);
+                        }
+                    }
+                });
+            })();
+            """.trimIndent()
+
+        return script
     }
 
     private fun blobDownloadScript(): String {

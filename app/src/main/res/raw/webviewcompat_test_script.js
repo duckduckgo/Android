@@ -1,33 +1,39 @@
-const supportedMessages = ["ContextMenuOpened", "PageStarted"];
+(function() {
+    // Capture the injected object immediately
+    const ddgObj = window.$OBJECT_NAME$;
 
-const delay = $DELAY$;
-const postInitialPing = $POST_INITIAL_PING$;
-const replyToNativeMessages = $REPLY_TO_NATIVE_MESSAGES$;
+    const supportedMessages = ["ContextMenuOpened", "PageStarted"];
 
-const webViewCompatPingMessage = 'Ping:' + window.location.href + ' ' + delay + 'ms'
+    const delay = $DELAY$;
+    const postInitialPing = $POST_INITIAL_PING$;
+    const replyToNativeMessages = $REPLY_TO_NATIVE_MESSAGES$;
+    const messagePrefix = 'webViewCompat '
+
+    const webViewCompatPingMessage = messagePrefix + 'Ping:' + window.location.href + ' ' + delay + 'ms'
 
 
-if (postInitialPing) {
-    if (delay > 0) {
-        setTimeout(() => {
-            webViewCompatTestObj.postMessage(webViewCompatPingMessage)
-        }, delay)
-    } else {
-        webViewCompatTestObj.postMessage(webViewCompatPingMessage)
+    if (postInitialPing) {
+     if (delay > 0) {
+            setTimeout(() => {
+                ddgObj.postMessage(webViewCompatPingMessage)
+            }, delay)
+        } else {
+            ddgObj.postMessage(webViewCompatPingMessage)
+        }
     }
-}
 
 
-webViewCompatTestObj.onmessage = function(event) {
-    console.log("webViewCompatTestObj received", event.data)
-    if (replyToNativeMessages && supportedMessages.includes(event.data)) {
-        webViewCompatTestObj.postMessage(event.data + " from webViewCompatTestObj")
-    }
-}
+    ddgObj.addEventListener('message', function(event) {
+        console.log("$OBJECT_NAME$ received", event.data)
+        if (replyToNativeMessages && supportedMessages.includes(event.data)) {
+            ddgObj.postMessage(messagePrefix + event.data + " from $OBJECT_NAME$")
+        }
+    });
 
-window.onmessage = function(event) {
-    console.log("window received", event.data)
-    if (replyToNativeMessages && supportedMessages.includes(event.data)) {
-        webViewCompatTestObj.postMessage(event.data + " from window")
-    }
-}
+    window.addEventListener('message', function(event) {
+        console.log("window received", event.data)
+        if (replyToNativeMessages && supportedMessages.includes(event.data)) {
+            ddgObj.postMessage(messagePrefix + event.data + " from window")
+        }
+    });
+})();

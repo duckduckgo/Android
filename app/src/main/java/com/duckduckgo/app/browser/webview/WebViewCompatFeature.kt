@@ -35,8 +35,24 @@ interface WebViewCompatFeature {
 
     @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
     fun jsRepliesToNativeMessages(): Toggle
+
+    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
+    fun replyToInitialPing(): Toggle
+
+    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
+    fun dedicatedMessageListener(): Toggle
+
+    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
+    fun sendMessageOnContextMenuOpen(): Toggle
+
+    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
+    fun sendMessageOnPageStarted(): Toggle
+
+    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
+    fun sendMessagesUsingReplyProxy(): Toggle
 }
 
 data class WebViewCompatFeatureSettings(
     val jsInitialPingDelay: Long = 0,
+    val initialPingDelay: Long = 0,
 )
