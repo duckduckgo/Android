@@ -27,6 +27,7 @@ interface SwitchPlanBottomSheetDialogFactory {
         context: Context,
         lifecycleOwner: LifecycleOwner,
         switchType: SwitchPlanType,
+        onSwitchSuccess: () -> Unit,
     ): SwitchPlanBottomSheetDialog
 }
 

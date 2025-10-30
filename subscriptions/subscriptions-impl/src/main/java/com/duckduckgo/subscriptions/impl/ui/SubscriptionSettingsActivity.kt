@@ -321,6 +321,9 @@ class SubscriptionSettingsActivity : DuckDuckGoActivity() {
             context = this,
             lifecycleOwner = this,
             switchType = switchType,
+            onSwitchSuccess = {
+                viewModel.onSwitchPlanSuccess()
+            }
         )
         dialog.show()
     }

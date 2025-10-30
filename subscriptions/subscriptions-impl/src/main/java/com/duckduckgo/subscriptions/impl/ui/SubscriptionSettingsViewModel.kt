@@ -160,6 +160,12 @@ class SubscriptionSettingsViewModel @Inject constructor(
         }
     }
 
+    fun onSwitchPlanSuccess() {
+        viewModelScope.launch {
+            emitChanges()
+        }
+    }
+
     sealed class SubscriptionDuration {
         data object Monthly : SubscriptionDuration()
         data object Yearly : SubscriptionDuration()

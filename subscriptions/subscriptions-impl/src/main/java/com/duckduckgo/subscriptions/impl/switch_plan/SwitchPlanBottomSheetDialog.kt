@@ -52,6 +52,7 @@ class SwitchPlanBottomSheetDialog @AssistedInject constructor(
     @Assisted private val context: Context,
     @Assisted private val lifecycleOwner: LifecycleOwner,
     @Assisted private val switchType: SwitchPlanType,
+    @Assisted private val onSwitchSuccess: () -> Unit,
     private val subscriptionsManager: SubscriptionsManager,
     private val dispatcherProvider: DispatcherProvider,
 ) : BottomSheetDialog(context) {
@@ -141,7 +142,7 @@ class SwitchPlanBottomSheetDialog @AssistedInject constructor(
                 when (it) {
                     is CurrentPurchase.Success -> {
                         logcat { "Switch flow: Successfully switched plans" }
-                        //TODO NOELIA update subscription view
+                        onSwitchSuccess.invoke()
                     }
 
                     is CurrentPurchase.Failure -> {
