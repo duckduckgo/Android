@@ -197,7 +197,7 @@
     <string name="switchBottomSheetDescriptionUpgrade">В отличие от текущего ежемесячного тарифа 9,99 $, годовой тариф — всего 8,33 $ в месяц.</string>
     <string name="switchBottomSheetPrimaryButtonUpgrade">Перейти на годовой план (99,99 $/год)</string>
     <string name="switchBottomSheetSecondaryButtonUpgrade">Оставить месячный план</string>
-    <string name="switchBottomSheetTitleDowngrade">You’re saving 16%% with\na yearly plan!</string>
+    <string name="switchBottomSheetTitleDowngrade">Годовая подписка \nэкономит 16%%!</string>
     <string name="switchBottomSheetDescriptionDowngrade">Со сменой тарифа ваша ежемесячная плата увеличится с 8,33 до 9,99 $.</string>
     <string name="switchBottomSheetPrimaryButtonDowngrade">Перейти на годовой тариф</string>
     <string name="switchBottomSheetSecondaryButtonDowngrade">Перейти на месячный план (9,99 $/мес.)</string>
