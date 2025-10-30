@@ -193,7 +193,7 @@
     <string name="feedbackGeneralSubscription">Prenumerata</string>
 
     <!-- Switch plan-->
-    <string name="switchBottomSheetTitleUpgrade">Sutaupykite 16 % su \n metiniu planu!</string>
+    <string name="switchBottomSheetTitleUpgrade">Sutaupykite 16 %% su \n metiniu planu!</string>
     <string name="switchBottomSheetDescriptionUpgrade">Metinis planas kainuoja tik 8,33 USD/mėn., palyginti su dabartiniu 9,99 USD mėnesiniu planu.</string>
     <string name="switchBottomSheetPrimaryButtonUpgrade">Pereiti prie metinio (99,99 USD/metus)</string>
     <string name="switchBottomSheetSecondaryButtonUpgrade">Išsaugoti mėnesio planą</string>

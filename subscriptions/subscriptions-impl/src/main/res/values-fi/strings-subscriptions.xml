@@ -193,7 +193,7 @@
     <string name="feedbackGeneralSubscription">Tilaus</string>
 
     <!-- Switch plan-->
-    <string name="switchBottomSheetTitleUpgrade">Säästä 16 %\nvuositilauksella!</string>
+    <string name="switchBottomSheetTitleUpgrade">Säästä 16 %%\nvuositilauksella!</string>
     <string name="switchBottomSheetDescriptionUpgrade">Vuosittainen sopimus maksaa vain 8,33 $/kk, verrattuna nykyiseen 9,99 $ kuukausisuunnitelmaan.</string>
     <string name="switchBottomSheetPrimaryButtonUpgrade">Vaihda vuositilaukseen (99,99 $ / vuosi)</string>
     <string name="switchBottomSheetSecondaryButtonUpgrade">Pidä kuukausisopimus</string>

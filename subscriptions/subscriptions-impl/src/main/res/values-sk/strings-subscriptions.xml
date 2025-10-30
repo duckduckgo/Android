@@ -193,7 +193,7 @@
     <string name="feedbackGeneralSubscription">Predplatné</string>
 
     <!-- Switch plan-->
-    <string name="switchBottomSheetTitleUpgrade">Ušetri 16 % \ns ročným plánom!</string>
+    <string name="switchBottomSheetTitleUpgrade">Ušetri 16 %% \ns ročným plánom!</string>
     <string name="switchBottomSheetDescriptionUpgrade">Ročný plán stojí len 8,33 EUR/mesiac v porovnaní s tvojím súčasným mesačným plánom za 9,99 EUR.</string>
     <string name="switchBottomSheetPrimaryButtonUpgrade">Prejdi na ročné predplatné (99,99 EUR/rok)</string>
     <string name="switchBottomSheetSecondaryButtonUpgrade">Zachovať mesačný plán</string>

@@ -193,7 +193,7 @@
     <string name="feedbackGeneralSubscription">Abbonamento</string>
 
     <!-- Switch plan-->
-    <string name="switchBottomSheetTitleUpgrade">Risparmia il 16% con\n un piano annuale!</string>
+    <string name="switchBottomSheetTitleUpgrade">Risparmia il 16%% con\n un piano annuale!</string>
     <string name="switchBottomSheetDescriptionUpgrade">Un piano annuale costa solo 8,33 $ al mese, rispetto al tuo attuale piano mensile di 9,99 $.</string>
     <string name="switchBottomSheetPrimaryButtonUpgrade">Passa al piano annuale (99,99 $ all\'anno)</string>
     <string name="switchBottomSheetSecondaryButtonUpgrade">Mantieni il piano mensile</string>

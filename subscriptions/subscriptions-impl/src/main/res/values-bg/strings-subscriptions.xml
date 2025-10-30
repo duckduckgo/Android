@@ -193,7 +193,7 @@
     <string name="feedbackGeneralSubscription">Абонамент</string>
 
     <!-- Switch plan-->
-    <string name="switchBottomSheetTitleUpgrade">Спести 16% с\nгодишен план!</string>
+    <string name="switchBottomSheetTitleUpgrade">Спести 16%% с\nгодишен план!</string>
     <string name="switchBottomSheetDescriptionUpgrade">Годишният план е само $8.33/месец, в сравнение с текущия ти месечен план от $9.99.</string>
     <string name="switchBottomSheetPrimaryButtonUpgrade">Превключи на годишен план ($99,99/година)</string>
     <string name="switchBottomSheetSecondaryButtonUpgrade">Запази месечен план</string>
