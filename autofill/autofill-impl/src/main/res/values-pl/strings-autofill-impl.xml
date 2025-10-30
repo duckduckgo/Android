@@ -301,4 +301,27 @@
     <string name="passwords_import_promo_in_settings_title">Importuj hasła z Google</string>
     <string name="passwords_import_promo_in_settings_dismiss_text">Ukryj</string>
 
+    <!-- Import Bookmarks Strings -->
+    <string name="importToDuckDuckGo">Importuj do DuckDuckGo</string>
+    <string name="importBookmarksFromGoogleChromeFolderName">Importowane z Chrome</string>
+    <string name="importBookmarksFromGooglePreImportDialogTitle">Importuj zakładki z Google</string>
+    <string name="importBookmarksFromGooglePreImportDialogInstruction">Google może poprosić o zalogowanie lub podanie hasła, aby potwierdzić.</string>
+    <string name="importBookmarksFromGooglePreImportDialogImportButton">Importuj z Google</string>
+    <string name="importBookmarksFromGooglePreImportDialogSelectFileButton">Wybierz plik zakładek…</string>
+    <string name="importBookmarksFromGoogleWebFlowTitle">Importuj zakładki</string>
+    <string name="importBookmarksProgressTitle">Importowanie z Google…</string>
+    <string name="importBookmarksProgressSubtitle">Zostaw ten ekran otwarty i nie martw się — powinno to zająć tylko chwilę.</string>
+    <string name="importBookmarksProgressInfoMessage1">Google może poprosić o zalogowanie lub podanie hasła, aby potwierdzić.</string>
+    <string name="importBookmarksProgressInfoMessage2">Google może wysłać Ci e-mail z potwierdzeniem, że Twoje zakładki są eksportowane.</string>
+    <string name="importBookmarksFromGoogleCancelConfirmationDialogTitle">Anulować import?</string>
+    <string name="importBookmarksFromGoogleCancelConfirmationDialogMessage">Twoje zakładki nie zostaną zaimportowane, jeśli teraz anulujesz.</string>
+    <string name="importBookmarksFromGoogleCancelConfirmationDialogCancelImport">Anuluj import</string>
+    <string name="importBookmarksFromGoogleCancelConfirmationDialogContinue">Kontynuuj</string>
+    <string name="importBookmarksFromGoogleSuccessBookmarksCount" instruction="Placeholder is the number of bookmarks that were imported">Zakładki: %1$d</string>
+    <string name="importBookmarksSuccessTitle">@string/importToDuckDuckGo</string>
+    <string name="importBookmarksFinalDoneButton">Zamknij</string>
+    <string name="importBookmarksErrorTitle">@string/importToDuckDuckGo</string>
+    <string name="importBookmarksErrorGenericMessage">Wystąpił błąd</string>
+    <string name="importBookmarksErrorGenericMessageSecondary">Upewnij się, że masz połączenie z internetem, i spróbuj ponownie.</string>
+
 </resources>
