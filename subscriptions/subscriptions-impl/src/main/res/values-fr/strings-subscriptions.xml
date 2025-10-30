@@ -197,7 +197,7 @@
     <string name="switchBottomSheetDescriptionUpgrade">Un forfait annuel coûte seulement 8,33 $/mois, contre 9,99 $/mois pour votre forfait mensuel actuel.</string>
     <string name="switchBottomSheetPrimaryButtonUpgrade">Passer à un forfait annuel (99,99 $/an)</string>
     <string name="switchBottomSheetSecondaryButtonUpgrade">Conserver le forfait mensuel</string>
-    <string name="switchBottomSheetTitleDowngrade">You’re saving 16%% with\na yearly plan!</string>
+    <string name="switchBottomSheetTitleDowngrade">Vous économisez 16 %% avec\nun forfait annuel !</string>
     <string name="switchBottomSheetDescriptionDowngrade">Ce changement augmentera vos mensualités, qui passeront de 8,33 $/mois à 9,99 $/mois.</string>
     <string name="switchBottomSheetPrimaryButtonDowngrade">Conserver le forfait annuel</string>
     <string name="switchBottomSheetSecondaryButtonDowngrade">Passer à un forfait mensuel (9,99 $/mois)</string>
