@@ -56,6 +56,7 @@ dependencies {
     implementation AndroidX.core.ktx
     implementation AndroidX.webkit
     implementation KotlinX.coroutines.android
+    implementation AndroidX.dataStore.preferences
 
     // Dagger
     implementation Google.dagger
