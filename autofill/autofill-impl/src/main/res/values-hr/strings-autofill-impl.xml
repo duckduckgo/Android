@@ -301,4 +301,27 @@
     <string name="passwords_import_promo_in_settings_title">Uvezi lozinke s Googlea</string>
     <string name="passwords_import_promo_in_settings_dismiss_text">Sakrij</string>
 
+    <!-- Import Bookmarks Strings -->
+    <string name="importToDuckDuckGo">Uvezi u DuckDuckGo</string>
+    <string name="importBookmarksFromGoogleChromeFolderName">Uvezeno iz Chromea</string>
+    <string name="importBookmarksFromGooglePreImportDialogTitle">Uvezi knjižne oznake iz Googlea</string>
+    <string name="importBookmarksFromGooglePreImportDialogInstruction">Google te može tražiti da se prijaviš ili uneseš svoju lozinku za potvrdu.</string>
+    <string name="importBookmarksFromGooglePreImportDialogImportButton">Uvezi s Googlea</string>
+    <string name="importBookmarksFromGooglePreImportDialogSelectFileButton">Odaberi datoteku knjižnih oznaka…</string>
+    <string name="importBookmarksFromGoogleWebFlowTitle">Uvoz knjižnih oznaka</string>
+    <string name="importBookmarksProgressTitle">Uvozi se iz Googlea…</string>
+    <string name="importBookmarksProgressSubtitle">Drži ovaj zaslon otvorenim i pričekaj — ne bi trebalo potrajati više od minute ili dvije.</string>
+    <string name="importBookmarksProgressInfoMessage1">Google te može tražiti da se prijaviš ili uneseš svoju lozinku za potvrdu.</string>
+    <string name="importBookmarksProgressInfoMessage2">Google ti može poslati e-poruku kojom potvrđuje da se tvoje oznake izvoze.</string>
+    <string name="importBookmarksFromGoogleCancelConfirmationDialogTitle">Odustani od uvoza?</string>
+    <string name="importBookmarksFromGoogleCancelConfirmationDialogMessage">Ako sada otkažeš uvoz, tvoji favoriti neće biti uvezeni.</string>
+    <string name="importBookmarksFromGoogleCancelConfirmationDialogCancelImport">Odustani od uvoza</string>
+    <string name="importBookmarksFromGoogleCancelConfirmationDialogContinue">Nastavi</string>
+    <string name="importBookmarksFromGoogleSuccessBookmarksCount" instruction="Placeholder is the number of bookmarks that were imported">Knjižne oznake: %1$d</string>
+    <string name="importBookmarksSuccessTitle">@string/importToDuckDuckGo</string>
+    <string name="importBookmarksFinalDoneButton">Zatvori</string>
+    <string name="importBookmarksErrorTitle">@string/importToDuckDuckGo</string>
+    <string name="importBookmarksErrorGenericMessage">Nešto nije bilo kako treba</string>
+    <string name="importBookmarksErrorGenericMessageSecondary">Provjeri jesi li povezan s internetom i pokušaj ponovno.</string>
+
 </resources>
