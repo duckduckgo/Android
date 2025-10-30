@@ -197,7 +197,7 @@
     <string name="switchBottomSheetDescriptionUpgrade">Yıllık bir plan, mevcut 9,99 ABD dolarlık aylık planınıza kıyasla ayda sadece 8,33 ABD dolarıdır.</string>
     <string name="switchBottomSheetPrimaryButtonUpgrade">Yıllık Üyeliğe Geç ($99,99/yıl)</string>
     <string name="switchBottomSheetSecondaryButtonUpgrade">Aylık Planı Sürdür</string>
-    <string name="switchBottomSheetTitleDowngrade">Yıllık plan ile 16% tasarruf ediyorsunuz!</string>
+    <string name="switchBottomSheetTitleDowngrade">Yıllık plan ile 16%% tasarruf ediyorsunuz!</string>
     <string name="switchBottomSheetDescriptionDowngrade">Geçiş, aylık fiyatını 8,33 $/ay\'dan 9,99 $/ay\'a çıkaracaktır.</string>
     <string name="switchBottomSheetPrimaryButtonDowngrade">Yıllık Planı Sürdür</string>
     <string name="switchBottomSheetSecondaryButtonDowngrade">Aylık Üyeliğe Geç (9,99 $/ay)</string>

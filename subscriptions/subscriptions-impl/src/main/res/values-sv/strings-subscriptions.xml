@@ -197,7 +197,7 @@
     <string name="switchBottomSheetDescriptionUpgrade">Ett årsabonnemang kostar bara 8,33 USD per månad, jämfört med ditt nuvarande månadsabonnemang för 9,99 USD.</string>
     <string name="switchBottomSheetPrimaryButtonUpgrade">Byt till årlig ($99,99/år)</string>
     <string name="switchBottomSheetSecondaryButtonUpgrade">Behåll månadsabonnemang</string>
-    <string name="switchBottomSheetTitleDowngrade">Du sparar 16 % med\nett årsabonnemang!</string>
+    <string name="switchBottomSheetTitleDowngrade">Du sparar 16 %% med\nett årsabonnemang!</string>
     <string name="switchBottomSheetDescriptionDowngrade">Ett byte kommer att öka ditt månadspris från $8,33/månad till $9,99/månad.</string>
     <string name="switchBottomSheetPrimaryButtonDowngrade">Behåll årsabonnemang</string>
     <string name="switchBottomSheetSecondaryButtonDowngrade">Byt till månadsvis (9,99 USD/månad)</string>

@@ -197,7 +197,7 @@
     <string name="switchBottomSheetDescriptionUpgrade">Ikgadējais plāns maksā tikai 8,33 USD mēnesī, salīdzinot ar tavu pašreizējo ikmēneša plānu, kas maksā 9,99 USD.</string>
     <string name="switchBottomSheetPrimaryButtonUpgrade">Maini plānu uz ikgadējo (99,99 USD gadā)</string>
     <string name="switchBottomSheetSecondaryButtonUpgrade">Atstāt ikmēneša plānu</string>
-    <string name="switchBottomSheetTitleDowngrade">Tu ietaupi 16 % ar\nikgadējo plānu!</string>
+    <string name="switchBottomSheetTitleDowngrade">Tu ietaupi 16 %% ar\nikgadējo plānu!</string>
     <string name="switchBottomSheetDescriptionDowngrade">Plāna maiņa palielinās tavu ikmēneša cenu no 8,33 USD mēnesī līdz 9,99 USD mēnesī.</string>
     <string name="switchBottomSheetPrimaryButtonDowngrade">Atstāt ikgadējo plānu</string>
     <string name="switchBottomSheetSecondaryButtonDowngrade">Maini plānu uz ikmēneša (9,99 USD mēnesī)</string>

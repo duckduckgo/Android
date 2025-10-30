@@ -197,7 +197,7 @@
     <string name="switchBottomSheetDescriptionUpgrade">Un piano annuale costa solo 8,33 $ al mese, rispetto al tuo attuale piano mensile di 9,99 $.</string>
     <string name="switchBottomSheetPrimaryButtonUpgrade">Passa al piano annuale (99,99 $ all\'anno)</string>
     <string name="switchBottomSheetSecondaryButtonUpgrade">Mantieni il piano mensile</string>
-    <string name="switchBottomSheetTitleDowngrade">Risparmi il 16% con un piano annuale!</string>
+    <string name="switchBottomSheetTitleDowngrade">Risparmi il 16%% con un piano annuale!</string>
     <string name="switchBottomSheetDescriptionDowngrade">Il passaggio comporterà un aumento del prezzo mensile da 8,33 $ al mese a 9,99 $ al mese.</string>
     <string name="switchBottomSheetPrimaryButtonDowngrade">Mantieni il piano annuale</string>
     <string name="switchBottomSheetSecondaryButtonDowngrade">Passa al piano mensile (9,99 $ al mese)</string>

@@ -197,7 +197,7 @@
     <string name="switchBottomSheetDescriptionUpgrade">Aastaplaan maksab vaid $8,33/kuus, võrreldes sinu praeguse igakuise $9,99 plaaniga.</string>
     <string name="switchBottomSheetPrimaryButtonUpgrade">Mine üle aastasele plaanile ($99,99/aasta)</string>
     <string name="switchBottomSheetSecondaryButtonUpgrade">Jätka igakuise plaaniga</string>
-    <string name="switchBottomSheetTitleDowngrade">Sa säästad aastase plaaniga 16%!</string>
+    <string name="switchBottomSheetTitleDowngrade">Sa säästad aastase plaaniga 16%%!</string>
     <string name="switchBottomSheetDescriptionDowngrade">Üleminek suurendab teie igakuist hinda hinnalt $8,33/kuus hinnale $9,99/kuus.</string>
     <string name="switchBottomSheetPrimaryButtonDowngrade">Jätka aastaplaaniga</string>
     <string name="switchBottomSheetSecondaryButtonDowngrade">Mine üle igakuisele plaanile ($9,99/kuu)</string>

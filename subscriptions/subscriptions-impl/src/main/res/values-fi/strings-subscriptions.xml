@@ -197,7 +197,7 @@
     <string name="switchBottomSheetDescriptionUpgrade">Vuosittainen sopimus maksaa vain 8,33 $/kk, verrattuna nykyiseen 9,99 $ kuukausisuunnitelmaan.</string>
     <string name="switchBottomSheetPrimaryButtonUpgrade">Vaihda vuositilaukseen (99,99 $ / vuosi)</string>
     <string name="switchBottomSheetSecondaryButtonUpgrade">Pidä kuukausisopimus</string>
-    <string name="switchBottomSheetTitleDowngrade">Säästät 16 %\nvuosisopimuksella!</string>
+    <string name="switchBottomSheetTitleDowngrade">Säästät 16 %%\nvuosisopimuksella!</string>
     <string name="switchBottomSheetDescriptionDowngrade">Vaihtaminen nostaa kuukausihinnan 8,33 dollarista 9,99 dollariin.</string>
     <string name="switchBottomSheetPrimaryButtonDowngrade">Säilytä vuosisuunnitelma</string>
     <string name="switchBottomSheetSecondaryButtonDowngrade">Vaihda kuukausitilaukseen (9,99 $/kk)</string>
