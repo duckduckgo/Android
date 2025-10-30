@@ -168,6 +168,12 @@ class FakeSettingsDataStore :
             store["omnibarPosition"] = value.name
         }
 
+    override var isSplitOmnibarSelected: Boolean
+        get() = store["isSplitOmnibarSelected"] as Boolean? ?: false
+        set(value) {
+            store["isSplitOmnibarSelected"] = value
+        }
+
     override var notifyMeInDownloadsDismissed: Boolean
         get() = store["notifyMeInDownloadsDismissed"] as Boolean? ?: false
         set(value) {
