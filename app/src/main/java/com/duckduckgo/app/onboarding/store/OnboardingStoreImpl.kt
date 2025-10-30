@@ -85,7 +85,7 @@ class OnboardingStoreImpl @Inject constructor(
 
             "GB" -> {
                 site1 = "skysports.com "
-                site2 = "uk.yahho.com"
+                site2 = "uk.yahoo.com"
                 site3 = "ebay.com"
                 site4Query = "britannica.com/animal/duck"
             }
@@ -127,7 +127,7 @@ class OnboardingStoreImpl @Inject constructor(
 
             "IE" -> {
                 site1 = "skysports.com"
-                site2 = "uk.yahho.com"
+                site2 = "uk.yahoo.com"
                 site3 = "ebay.com"
                 site4Query = "britannica.com/animal/duck"
             }
