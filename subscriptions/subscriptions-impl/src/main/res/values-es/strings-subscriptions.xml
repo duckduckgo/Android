@@ -193,11 +193,11 @@
     <string name="feedbackGeneralSubscription">Suscripción</string>
 
     <!-- Switch plan-->
-    <string name="switchBottomSheetTitleUpgrade">Ahorra un 16 % con\nun plan anual.</string>
+    <string name="switchBottomSheetTitleUpgrade">¡Ahorra un 16 %% con\nun plan anual!</string>
     <string name="switchBottomSheetDescriptionUpgrade">El plan anual solo cuesta 8,33 $/mes, en comparación con tu plan actual de 9,99 $/mes</string>
     <string name="switchBottomSheetPrimaryButtonUpgrade">Cambiar a un plan anual (99,99 $/año)</string>
     <string name="switchBottomSheetSecondaryButtonUpgrade">Mantener el plan mensual</string>
-    <string name="switchBottomSheetTitleDowngrade">¡Te ahorras un 16 %%\ncon un plan anual!</string>
+    <string name="switchBottomSheetTitleDowngrade">You’re saving 16%% with\na yearly plan!</string>
     <string name="switchBottomSheetDescriptionDowngrade">Si te cambias, el precio al mes pasará de ser de 8,33 $/mes a 9,99 $/mes.</string>
     <string name="switchBottomSheetPrimaryButtonDowngrade">Mantener el plan anual</string>
     <string name="switchBottomSheetSecondaryButtonDowngrade">Cambiar a plan mensual (9,99 $/mes)</string>

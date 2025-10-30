@@ -193,11 +193,11 @@
     <string name="feedbackGeneralSubscription">Subskrypcja</string>
 
     <!-- Switch plan-->
-    <string name="switchBottomSheetTitleUpgrade">Zaoszczędź 16% \nz planem rocznym!</string>
+    <string name="switchBottomSheetTitleUpgrade">Zaoszczędź 16%%\nz planem rocznym!</string>
     <string name="switchBottomSheetDescriptionUpgrade">Plan roczny kosztuje tylko 8,33 USD/mies., w porównaniu do Twojego obecnego planu miesięcznego za 9,99 USD.</string>
     <string name="switchBottomSheetPrimaryButtonUpgrade">Przełącz na roczny (99,99 USD/rok)</string>
     <string name="switchBottomSheetSecondaryButtonUpgrade">Zachowaj miesięczny plan</string>
-    <string name="switchBottomSheetTitleDowngrade">Oszczędzasz 16%% \nz planem rocznym!</string>
+    <string name="switchBottomSheetTitleDowngrade">You’re saving 16%% with\na yearly plan!</string>
     <string name="switchBottomSheetDescriptionDowngrade">Zmiana zwiększy Twoją miesięczną opłatę z 8,33 USD/mies. do 9,99 USD/mies.</string>
     <string name="switchBottomSheetPrimaryButtonDowngrade">Zachowaj plan roczny</string>
     <string name="switchBottomSheetSecondaryButtonDowngrade">Przejdź na plan miesięczny (9,99 USD/miesiąc)</string>

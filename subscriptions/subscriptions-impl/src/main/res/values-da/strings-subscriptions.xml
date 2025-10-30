@@ -193,11 +193,11 @@
     <string name="feedbackGeneralSubscription">Abonnement</string>
 
     <!-- Switch plan-->
-    <string name="switchBottomSheetTitleUpgrade">Spar 16 % med\net årligt abonnement!</string>
+    <string name="switchBottomSheetTitleUpgrade">Spar 16 %% med\net årligt abonnement!</string>
     <string name="switchBottomSheetDescriptionUpgrade">En årligt abonnement koster kun 8,33 USD/måned sammenlignet med dit nuværende abonnement til 9,99 USD/måned.</string>
     <string name="switchBottomSheetPrimaryButtonUpgrade">Skift til årligt (99,99 USD/år)</string>
     <string name="switchBottomSheetSecondaryButtonUpgrade">Behold månedligt abonnement</string>
-    <string name="switchBottomSheetTitleDowngrade">Du sparer 16 %% med\net årligt abonnement!</string>
+    <string name="switchBottomSheetTitleDowngrade">You’re saving 16%% with\na yearly plan!</string>
     <string name="switchBottomSheetDescriptionDowngrade">Hvis du skifter, vil din månedlige pris øges fra 8,33 USD/måned til 9,99 USD/måned.</string>
     <string name="switchBottomSheetPrimaryButtonDowngrade">Behold årligt abonnement</string>
     <string name="switchBottomSheetSecondaryButtonDowngrade">Skift til månedligt (9,99 USD/måned)</string>

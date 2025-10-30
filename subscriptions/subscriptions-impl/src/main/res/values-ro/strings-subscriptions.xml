@@ -193,11 +193,11 @@
     <string name="feedbackGeneralSubscription">Abonament</string>
 
     <!-- Switch plan-->
-    <string name="switchBottomSheetTitleUpgrade">Economisește 16% cu\n un plan anual!</string>
+    <string name="switchBottomSheetTitleUpgrade">Economisește 16%% \ncu un plan anual!</string>
     <string name="switchBottomSheetDescriptionUpgrade">Un plan anual costă doar 8,33 USD/lună, comparativ cu planul tău lunar actual de 9,99 USD.</string>
     <string name="switchBottomSheetPrimaryButtonUpgrade">Treci la planul anual (99,99 USD/an)</string>
     <string name="switchBottomSheetSecondaryButtonUpgrade">Păstrează planul lunar</string>
-    <string name="switchBottomSheetTitleDowngrade">Economisești 16%% \ncu un plan anual!</string>
+    <string name="switchBottomSheetTitleDowngrade">You’re saving 16%% with\na yearly plan!</string>
     <string name="switchBottomSheetDescriptionDowngrade">Această schimbare va majora prețul lunar de la 8,33 USD/lună la 9,99 USD/lună.</string>
     <string name="switchBottomSheetPrimaryButtonDowngrade">Păstrează planul anual</string>
     <string name="switchBottomSheetSecondaryButtonDowngrade">Treci la planul lunar (9,99 USD/lună)</string>
