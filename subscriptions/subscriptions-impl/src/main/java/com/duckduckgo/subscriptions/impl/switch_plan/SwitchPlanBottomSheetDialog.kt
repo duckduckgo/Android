@@ -65,12 +65,12 @@ class SwitchPlanBottomSheetDialog @AssistedInject constructor(
         // especially in landscape aspect-ratios. If the dialog started as collapsed, the drag would interfere with internal scroll.
         this.behavior.state = BottomSheetBehavior.STATE_EXPANDED
         this.behavior.isDraggable = false
-        
+
         setOnShowListener { dialogInterface ->
             setRoundCorners(dialogInterface)
         }
     }
-    
+
     /**
      * By default, when bottom sheet dialog is expanded, the corners become squared.
      * This function ensures that the bottom sheet dialog will have rounded corners even when in an expanded state.
@@ -101,36 +101,58 @@ class SwitchPlanBottomSheetDialog @AssistedInject constructor(
             dismiss()
         }
 
-        when (switchType) {
-            SwitchPlanType.UPGRADE_TO_YEARLY -> {
-                // Configure for upgrade (Monthly → Yearly)
-                binding.switchBottomSheetDialogTitle.text = context.getString(R.string.switchBottomSheetTitleUpgrade)
-                binding.switchBottomSheetDialogSubTitle.text = context.getString(R.string.switchBottomSheetDescriptionUpgrade)
-                binding.switchBottomSheetDialogPrimaryButton.text = context.getString(R.string.switchBottomSheetPrimaryButtonUpgrade)
-                binding.switchBottomSheetDialogSecondaryButton.text = context.getString(R.string.switchBottomSheetSecondaryButtonUpgrade)
+        // Load pricing information and configure views
+        lifecycleOwner.lifecycleScope.launch(dispatcherProvider.io()) {
+            val isUpgrade = switchType == SwitchPlanType.UPGRADE_TO_YEARLY
+            val pricingInfo = subscriptionsManager.getSwitchPlanPricing(isUpgrade)
 
-                binding.switchBottomSheetDialogPrimaryButton.setOnClickListener {
-                    triggerSwitch(isUpgrade = true)
-                    dismiss()
-                }
-                binding.switchBottomSheetDialogSecondaryButton.setOnClickListener {
-                    dismiss()
-                }
-            }
+            launch(dispatcherProvider.main()) {
+                when (switchType) {
+                    SwitchPlanType.UPGRADE_TO_YEARLY -> {
+                        // Configure for upgrade (Monthly → Yearly)
+                        binding.switchBottomSheetDialogTitle.text = context.getString(R.string.switchBottomSheetTitleUpgrade)
+                        binding.switchBottomSheetDialogSubTitle.text = context.getString(
+                            R.string.switchBottomSheetDescriptionUpgrade,
+                            pricingInfo?.yearlyMonthlyEquivalent ?: "",
+                            pricingInfo?.currentPrice ?: ""
+                        )
+                        binding.switchBottomSheetDialogPrimaryButton.text = context.getString(
+                            R.string.switchBottomSheetPrimaryButtonUpgrade,
+                            pricingInfo?.targetPrice ?: ""
+                        )
+                        binding.switchBottomSheetDialogSecondaryButton.text = context.getString(R.string.switchBottomSheetSecondaryButtonUpgrade)
 
-            SwitchPlanType.DOWNGRADE_TO_MONTHLY -> {
-                // Configure for downgrade (Yearly → Monthly)
-                binding.switchBottomSheetDialogTitle.text = context.getString(R.string.switchBottomSheetTitleDowngrade)
-                binding.switchBottomSheetDialogSubTitle.text = context.getString(R.string.switchBottomSheetDescriptionDowngrade)
-                binding.switchBottomSheetDialogPrimaryButton.text = context.getString(R.string.switchBottomSheetPrimaryButtonDowngrade)
-                binding.switchBottomSheetDialogSecondaryButton.text = context.getString(R.string.switchBottomSheetSecondaryButtonDowngrade)
+                        binding.switchBottomSheetDialogPrimaryButton.setOnClickListener {
+                            triggerSwitch(isUpgrade = true)
+                            dismiss()
+                        }
+                        binding.switchBottomSheetDialogSecondaryButton.setOnClickListener {
+                            dismiss()
+                        }
+                    }
 
-                binding.switchBottomSheetDialogPrimaryButton.setOnClickListener {
-                    dismiss()
-                }
-                binding.switchBottomSheetDialogSecondaryButton.setOnClickListener {
-                    triggerSwitch(isUpgrade = false)
-                    dismiss()
+                    SwitchPlanType.DOWNGRADE_TO_MONTHLY -> {
+                        // Configure for downgrade (Yearly → Monthly)
+                        binding.switchBottomSheetDialogTitle.text = context.getString(R.string.switchBottomSheetTitleDowngrade)
+                        binding.switchBottomSheetDialogSubTitle.text = context.getString(
+                            R.string.switchBottomSheetDescriptionDowngrade,
+                            pricingInfo?.yearlyMonthlyEquivalent ?: "",
+                            pricingInfo?.targetPrice ?: ""
+                        )
+                        binding.switchBottomSheetDialogPrimaryButton.text = context.getString(R.string.switchBottomSheetPrimaryButtonDowngrade)
+                        binding.switchBottomSheetDialogSecondaryButton.text = context.getString(
+                            R.string.switchBottomSheetSecondaryButtonDowngrade,
+                            pricingInfo?.targetPrice ?: ""
+                        )
+
+                        binding.switchBottomSheetDialogPrimaryButton.setOnClickListener {
+                            dismiss()
+                        }
+                        binding.switchBottomSheetDialogSecondaryButton.setOnClickListener {
+                            triggerSwitch(isUpgrade = false)
+                            dismiss()
+                        }
+                    }
                 }
             }
         }

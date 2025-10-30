@@ -256,6 +256,14 @@ interface SubscriptionsManager {
         offerId: String? = null,
         replacementMode: SubscriptionReplacementMode,
     )
+
+    /**
+     * Gets pricing information for switching between plans
+     *
+     * @param isUpgrade `true` if upgrading from monthly to yearly, `false` if downgrading from yearly to monthly
+     * @return [SwitchPlanPricingInfo] containing current price, target price, and yearly monthly equivalent, or null if unavailable
+     */
+    suspend fun getSwitchPlanPricing(isUpgrade: Boolean): SwitchPlanPricingInfo?
 }
 
 @SingleInstanceIn(AppScope::class)
@@ -391,6 +399,78 @@ class RealSubscriptionsManager @Inject constructor(
     override suspend fun isSwitchPlanAvailable(): Boolean = withContext(dispatcherProvider.io()) {
         val hasActiveSubscription = authRepository.getSubscription()?.isActive() ?: false
         return@withContext hasActiveSubscription && privacyProFeature.get().supportsSwitchSubscription().isEnabled()
+    }
+
+    override suspend fun getSwitchPlanPricing(isUpgrade: Boolean): SwitchPlanPricingInfo? = withContext(dispatcherProvider.io()) {
+        return@withContext try {
+            val currentSubscription = getSubscription() ?: return@withContext null
+            val offers = getSubscriptionOffer()
+            
+            // Determine current and target plan IDs based on region
+            val isUS = currentSubscription.productId in listOf(MONTHLY_PLAN_US, YEARLY_PLAN_US)
+            val (currentPlanId, targetPlanId) = if (isUpgrade) {
+                val monthly = if (isUS) MONTHLY_PLAN_US else MONTHLY_PLAN_ROW
+                val yearly = if (isUS) YEARLY_PLAN_US else YEARLY_PLAN_ROW
+                monthly to yearly
+            } else {
+                val yearly = if (isUS) YEARLY_PLAN_US else YEARLY_PLAN_ROW
+                val monthly = if (isUS) MONTHLY_PLAN_US else MONTHLY_PLAN_ROW
+                yearly to monthly
+            }
+            
+            // Get prices from offers
+            val currentPrice = offers.find { it.planId == currentPlanId }
+                ?.pricingPhases
+                ?.firstOrNull()
+                ?.formattedPrice ?: return@withContext null
+                
+            val targetPrice = offers.find { it.planId == targetPlanId }
+                ?.pricingPhases
+                ?.firstOrNull()
+                ?.formattedPrice ?: return@withContext null
+            
+            // Calculate monthly equivalent for yearly plan
+            val yearlyPrice = offers.find { it.planId in listOf(YEARLY_PLAN_US, YEARLY_PLAN_ROW) }
+                ?.pricingPhases
+                ?.firstOrNull()
+                ?.formattedPrice ?: return@withContext null
+            
+            val yearlyMonthlyEquivalent = calculateMonthlyEquivalent(yearlyPrice)
+            
+            SwitchPlanPricingInfo(
+                currentPrice = currentPrice,
+                targetPrice = targetPrice,
+                yearlyMonthlyEquivalent = yearlyMonthlyEquivalent
+            )
+        } catch (e: Exception) {
+            logcat { "Subs: Failed to get switch plan pricing: ${e.message}" }
+            null
+        }
+    }
+
+    private fun calculateMonthlyEquivalent(yearlyPrice: String): String {
+        return try {
+            // Extract currency symbol and numeric value
+            val numericValue = yearlyPrice.replace(Regex("[^0-9.,]"), "").replace(",", ".")
+            val currencySymbol = yearlyPrice.replace(Regex("[0-9.,\\s]"), "")
+            
+            // Parse and divide by 12
+            val yearly = numericValue.toDoubleOrNull() ?: return yearlyPrice
+            val monthly = yearly / 12.0
+            
+            // Format with 2 decimal places
+            val formattedMonthly = String.format("%.2f", monthly)
+            
+            // Reconstruct with currency symbol (handle symbol position)
+            if (yearlyPrice.startsWith(currencySymbol)) {
+                "$currencySymbol$formattedMonthly"
+            } else {
+                "$formattedMonthly$currencySymbol"
+            }
+        } catch (e: Exception) {
+            logcat { "Subs: Failed to calculate monthly equivalent: ${e.message}" }
+            yearlyPrice
+        }
     }
 
     override suspend fun switchSubscriptionPlan(
@@ -1300,6 +1380,12 @@ data class PricingPhase(
         }
     }
 }
+
+data class SwitchPlanPricingInfo(
+    val currentPrice: String,
+    val targetPrice: String,
+    val yearlyMonthlyEquivalent: String,
+)
 
 data class ValidatedTokenPair(
     val accessToken: String,

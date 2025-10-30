@@ -17,14 +17,14 @@
 <resources>
 
     <!-- Switch plan-->
-    <string name="switchBottomSheetTitleUpgrade">Save 16% with\na yearly plan!</string>
-    <string name="switchBottomSheetDescriptionUpgrade">A yearly plan is just $8.33/mo, compared to your current $9.99 monthly plan.</string>
-    <string name="switchBottomSheetPrimaryButtonUpgrade">Switch to Yearly ($99.99/year)</string>
+    <string name="switchBottomSheetTitleUpgrade">Save 16%% with\na yearly plan!</string>
+    <string name="switchBottomSheetDescriptionUpgrade">A yearly plan is just %1$s/mo, compared to your current %2$s monthly plan.</string>
+    <string name="switchBottomSheetPrimaryButtonUpgrade">Switch to Yearly (%1$s/year)</string>
     <string name="switchBottomSheetSecondaryButtonUpgrade">Keep Monthly Plan</string>
-    <string name="switchBottomSheetTitleDowngrade">You’re saving 16% with\na yearly plan!</string>
-    <string name="switchBottomSheetDescriptionDowngrade">Switching will increase your monthly price from $8.33/mo to $9.99/mo.</string>
+    <string name="switchBottomSheetTitleDowngrade">You\'re saving 16%% with\na yearly plan!</string>
+    <string name="switchBottomSheetDescriptionDowngrade">Switching will increase your monthly price from %1$s/mo to %2$s/mo.</string>
     <string name="switchBottomSheetPrimaryButtonDowngrade">Keep Yearly Plan</string>
-    <string name="switchBottomSheetSecondaryButtonDowngrade">Switch to Monthly ($9.99/month)</string>
+    <string name="switchBottomSheetSecondaryButtonDowngrade">Switch to Monthly (%1$s/month)</string>
     <string name="subscriptionSettingManageSubscription">Manage Subscription</string>
     <string name="subscriptionSettingSwitchUpgrade">Switch to Yearly and Save 16%</string>
     <!-- smartling.character_limit = 10 -->
