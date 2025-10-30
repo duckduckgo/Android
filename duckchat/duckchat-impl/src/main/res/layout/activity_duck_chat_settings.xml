@@ -233,7 +233,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:visibility="gone"
-                app:leadingIcon="@drawable/ic_image_ai"
+                app:leadingIcon="@drawable/ic_image_ai_hide_24"
                 app:leadingIconBackground="circular"
                 app:primaryText="@string/duckAiHideAiGeneratedImagesTitle"
                 app:secondaryText="@string/duckAiHideAiGeneratedImagesDescription"

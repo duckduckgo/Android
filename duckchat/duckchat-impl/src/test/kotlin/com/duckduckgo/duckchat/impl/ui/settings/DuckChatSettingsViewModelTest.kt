@@ -63,7 +63,13 @@ class DuckChatSettingsViewModelTest {
             whenever(duckChat.observeShowInBrowserMenuUserSetting()).thenReturn(flowOf(false))
             whenever(duckChat.observeShowInAddressBarUserSetting()).thenReturn(flowOf(false))
             whenever(duckChat.observeInputScreenUserSettingEnabled()).thenReturn(flowOf(false))
-            testee = DuckChatSettingsViewModel(duckChat, mockPixel, mockInputScreenDiscoveryFunnel, settingsPageFeature)
+            testee = DuckChatSettingsViewModel(
+                duckChat = duckChat,
+                pixel = mockPixel,
+                inputScreenDiscoveryFunnel = mockInputScreenDiscoveryFunnel,
+                settingsPageFeature = settingsPageFeature,
+                dispatcherProvider = coroutineRule.testDispatcherProvider,
+            )
         }
 
     @Test
@@ -140,7 +146,13 @@ class DuckChatSettingsViewModelTest {
     fun `input screen - user preference enabled then set correct state`() =
         runTest {
             whenever(duckChat.observeInputScreenUserSettingEnabled()).thenReturn(flowOf(true))
-            testee = DuckChatSettingsViewModel(duckChat, mockPixel, mockInputScreenDiscoveryFunnel, settingsPageFeature)
+            testee = DuckChatSettingsViewModel(
+                duckChat = duckChat,
+                pixel = mockPixel,
+                inputScreenDiscoveryFunnel = mockInputScreenDiscoveryFunnel,
+                settingsPageFeature = settingsPageFeature,
+                dispatcherProvider = coroutineRule.testDispatcherProvider,
+            )
 
             testee.viewState.test {
                 assertTrue(awaitItem().isInputScreenEnabled)
@@ -151,7 +163,13 @@ class DuckChatSettingsViewModelTest {
     fun `input screen - user preference disabled then set correct state`() =
         runTest {
             whenever(duckChat.observeInputScreenUserSettingEnabled()).thenReturn(flowOf(false))
-            testee = DuckChatSettingsViewModel(duckChat, mockPixel, mockInputScreenDiscoveryFunnel, settingsPageFeature)
+            testee = DuckChatSettingsViewModel(
+                duckChat = duckChat,
+                pixel = mockPixel,
+                inputScreenDiscoveryFunnel = mockInputScreenDiscoveryFunnel,
+                settingsPageFeature = settingsPageFeature,
+                dispatcherProvider = coroutineRule.testDispatcherProvider,
+            )
 
             testee.viewState.test {
                 assertFalse(awaitItem().isInputScreenEnabled)
@@ -163,7 +181,13 @@ class DuckChatSettingsViewModelTest {
         runTest {
             whenever(duckChat.observeEnableDuckChatUserSetting()).thenReturn(flowOf(true))
             whenever(duckChat.isInputScreenFeatureAvailable()).thenReturn(true)
-            testee = DuckChatSettingsViewModel(duckChat, mockPixel, mockInputScreenDiscoveryFunnel, settingsPageFeature)
+            testee = DuckChatSettingsViewModel(
+                duckChat = duckChat,
+                pixel = mockPixel,
+                inputScreenDiscoveryFunnel = mockInputScreenDiscoveryFunnel,
+                settingsPageFeature = settingsPageFeature,
+                dispatcherProvider = coroutineRule.testDispatcherProvider,
+            )
 
             testee.viewState.test {
                 val state = awaitItem()
@@ -176,7 +200,13 @@ class DuckChatSettingsViewModelTest {
         runTest {
             whenever(duckChat.observeEnableDuckChatUserSetting()).thenReturn(flowOf(true))
             whenever(duckChat.isInputScreenFeatureAvailable()).thenReturn(false)
-            testee = DuckChatSettingsViewModel(duckChat, mockPixel, mockInputScreenDiscoveryFunnel, settingsPageFeature)
+            testee = DuckChatSettingsViewModel(
+                duckChat = duckChat,
+                pixel = mockPixel,
+                inputScreenDiscoveryFunnel = mockInputScreenDiscoveryFunnel,
+                settingsPageFeature = settingsPageFeature,
+                dispatcherProvider = coroutineRule.testDispatcherProvider,
+            )
 
             testee.viewState.test {
                 val state = awaitItem()
@@ -189,7 +219,13 @@ class DuckChatSettingsViewModelTest {
         runTest {
             whenever(duckChat.observeEnableDuckChatUserSetting()).thenReturn(flowOf(false))
             whenever(duckChat.observeInputScreenUserSettingEnabled()).thenReturn(flowOf(true))
-            testee = DuckChatSettingsViewModel(duckChat, mockPixel, mockInputScreenDiscoveryFunnel, settingsPageFeature)
+            testee = DuckChatSettingsViewModel(
+                duckChat = duckChat,
+                pixel = mockPixel,
+                inputScreenDiscoveryFunnel = mockInputScreenDiscoveryFunnel,
+                settingsPageFeature = settingsPageFeature,
+                dispatcherProvider = coroutineRule.testDispatcherProvider,
+            )
 
             testee.viewState.test {
                 val state = awaitItem()
@@ -336,6 +372,44 @@ class DuckChatSettingsViewModelTest {
                 val command = awaitItem()
                 assertTrue(command is LaunchFeedback)
                 cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `when hideAiGeneratedImagesOption is enabled then viewState shows option visible`() =
+        runTest {
+            @Suppress("DenyListedApi")
+            settingsPageFeature.hideAiGeneratedImagesOption().setRawStoredState(State(enable = true))
+            testee = DuckChatSettingsViewModel(
+                duckChat = duckChat,
+                pixel = mockPixel,
+                inputScreenDiscoveryFunnel = mockInputScreenDiscoveryFunnel,
+                settingsPageFeature = settingsPageFeature,
+                dispatcherProvider = coroutineRule.testDispatcherProvider,
+            )
+
+            testee.viewState.test {
+                val state = awaitItem()
+                assertTrue(state.isHideGeneratedImagesOptionVisible)
+            }
+        }
+
+    @Test
+    fun `when hideAiGeneratedImagesOption is disabled then viewState shows option not visible`() =
+        runTest {
+            @Suppress("DenyListedApi")
+            settingsPageFeature.hideAiGeneratedImagesOption().setRawStoredState(State(enable = false))
+            testee = DuckChatSettingsViewModel(
+                duckChat = duckChat,
+                pixel = mockPixel,
+                inputScreenDiscoveryFunnel = mockInputScreenDiscoveryFunnel,
+                settingsPageFeature = settingsPageFeature,
+                dispatcherProvider = coroutineRule.testDispatcherProvider,
+            )
+
+            testee.viewState.test {
+                val state = awaitItem()
+                assertFalse(state.isHideGeneratedImagesOptionVisible)
             }
         }
 }
