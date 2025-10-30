@@ -197,7 +197,7 @@
     <string name="switchBottomSheetDescriptionUpgrade">Letna naročnina znaša samo 8,33 USD/mesec v primerjavi z vašo trenutno mesečno naročnino po 9,99 USD.</string>
     <string name="switchBottomSheetPrimaryButtonUpgrade">Preklopi na letno naročnino (99,99 USD/leto)</string>
     <string name="switchBottomSheetSecondaryButtonUpgrade">Obdrži mesečno naročnino</string>
-    <string name="switchBottomSheetTitleDowngrade">Z letno naročnino\ntrenutno prihranite 16 %%!</string>
+    <string name="switchBottomSheetTitleDowngrade">You’re saving 16%% with\na yearly plan!</string>
     <string name="switchBottomSheetDescriptionDowngrade">Ob preklopu se bo mesečna cena povišala z 8,33 USD/mesec na 9,99 USD/mesec.</string>
     <string name="switchBottomSheetPrimaryButtonDowngrade">Obdrži letno naročnino</string>
     <string name="switchBottomSheetSecondaryButtonDowngrade">Preklopi na mesečno naročnino (9,99 USD/mesec)</string>

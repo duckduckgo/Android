@@ -197,7 +197,7 @@
     <string name="switchBottomSheetDescriptionUpgrade">Een jaarlijks abonnement kost slechts $8,33/maand, vergeleken met je huidige maandabonnement van $9,99.</string>
     <string name="switchBottomSheetPrimaryButtonUpgrade">Overschakelen naar een jaarlijks abonnement ($ 99,99/jaar)</string>
     <string name="switchBottomSheetSecondaryButtonUpgrade">Maandabonnement behouden</string>
-    <string name="switchBottomSheetTitleDowngrade">Je bespaart 16%% met een jaarabonnement!</string>
+    <string name="switchBottomSheetTitleDowngrade">You’re saving 16%% with\na yearly plan!</string>
     <string name="switchBottomSheetDescriptionDowngrade">Als je overstapt, stijgt je maandprijs van $ 8,33/maand naar $ 9,99/maand.</string>
     <string name="switchBottomSheetPrimaryButtonDowngrade">Behoud je jaarabonnement</string>
     <string name="switchBottomSheetSecondaryButtonDowngrade">Overschakelen naar een maandelijks abonnement ($ 9,99/maand)</string>

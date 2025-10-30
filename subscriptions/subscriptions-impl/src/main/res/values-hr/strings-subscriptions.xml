@@ -197,7 +197,7 @@
     <string name="switchBottomSheetDescriptionUpgrade">Godišnji plan iznosi samo 8,33 USD/mjesečno, u usporedbi s tvojim sadašnjim mjesečnim planom od 9,99 USD.</string>
     <string name="switchBottomSheetPrimaryButtonUpgrade">Prebaci se na godišnju pretplatu (99,99 USD/godišnje)</string>
     <string name="switchBottomSheetSecondaryButtonUpgrade">Zadrži mjesečni plan</string>
-    <string name="switchBottomSheetTitleDowngrade">S godišnjim planom\nštediš 16 %%!</string>
+    <string name="switchBottomSheetTitleDowngrade">You’re saving 16%% with\na yearly plan!</string>
     <string name="switchBottomSheetDescriptionDowngrade">Prebacivanje će povećati tvoju mjesečnu cijenu s 8,33 USD/mjesečno na 9,99 USD/mjesečno.</string>
     <string name="switchBottomSheetPrimaryButtonDowngrade">Zadrži godišnji plan</string>
     <string name="switchBottomSheetSecondaryButtonDowngrade">Prebaci se na mjesečnu pretplatu (9,99 USD/mjesečno)</string>

@@ -197,7 +197,7 @@
     <string name="switchBottomSheetDescriptionUpgrade">Az éves csomag díja mindössze 8,33 USD/hó, szemben a jelenlegi havi csomagod 9,99 USD/hó díjával.</string>
     <string name="switchBottomSheetPrimaryButtonUpgrade">Váltás éves előfizetésre (99,99 USD/év)</string>
     <string name="switchBottomSheetSecondaryButtonUpgrade">Havi csomag megtartása</string>
-    <string name="switchBottomSheetTitleDowngrade">16%%-ot takarítasz meg\naz éves csomaggal!</string>
+    <string name="switchBottomSheetTitleDowngrade">You’re saving 16%% with\na yearly plan!</string>
     <string name="switchBottomSheetDescriptionDowngrade">A váltással 8,33 USD/hó összegről 9,99 USD/hó összegre nő a havi díjad.</string>
     <string name="switchBottomSheetPrimaryButtonDowngrade">Éves csomag megtartása</string>
     <string name="switchBottomSheetSecondaryButtonDowngrade">Váltás havi előfizetésre (9,99 USD/hó)</string>

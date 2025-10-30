@@ -197,7 +197,7 @@
     <string name="switchBottomSheetDescriptionUpgrade">Et årsabonnement koster bare 8,33 USD per måned, sammenlignet med det nåværende månedsabonnementet ditt til 9,99 USD per måned.</string>
     <string name="switchBottomSheetPrimaryButtonUpgrade">Bytt til årlig (99,99 USD per år)</string>
     <string name="switchBottomSheetSecondaryButtonUpgrade">Behold månedsabonnementet</string>
-    <string name="switchBottomSheetTitleDowngrade">Du sparer 16 %% med\net årsabonnement!</string>
+    <string name="switchBottomSheetTitleDowngrade">You’re saving 16%% with\na yearly plan!</string>
     <string name="switchBottomSheetDescriptionDowngrade">Hvis du bytter, øker månedsprisen din fra 8,33 USD per måned til 9,99 USD per måned.</string>
     <string name="switchBottomSheetPrimaryButtonDowngrade">Behold årsabonnementet</string>
     <string name="switchBottomSheetSecondaryButtonDowngrade">Bytt til månedlig (9,99 USD per måned)</string>
