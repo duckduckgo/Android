@@ -17,39 +17,57 @@
 package com.duckduckgo.app.browser.omnibar
 
 import androidx.lifecycle.LifecycleOwner
+import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
 import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.browser.ui.omnibar.OmnibarType
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesMultibinding
+import dagger.SingleInstanceIn
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-/**
- * Observes app lifecycle to ensure that if the Split Omnibar feature is disabled via remote config,
- * and the user had selected the Split Omnibar, we revert to Single Top Omnibar.
- * If the feature is re-enabled, we restore the user's choice.
- */
 @ContributesMultibinding(
     scope = AppScope::class,
     boundType = MainProcessLifecycleObserver::class,
 )
-class SplitOmnibarFallbackObserver @Inject constructor(
+@SingleInstanceIn(AppScope::class)
+class OmnibarFeatureRepository @Inject constructor(
     private val settingsDataStore: SettingsDataStore,
     private val browserFeatures: AndroidBrowserConfigFeature,
+    private val dispatcherProvider: DispatcherProvider,
+    @AppCoroutineScope private val coroutineScope: CoroutineScope,
 ) : MainProcessLifecycleObserver {
-    override fun onStart(owner: LifecycleOwner) {
-        super.onStart(owner)
+    var isUnifiedOmnibarEnabled: Boolean = false
+        private set
 
-        if (settingsDataStore.omnibarType == OmnibarType.SPLIT &&
-            (!browserFeatures.useUnifiedOmnibarLayout().isEnabled() || !browserFeatures.splitOmnibar().isEnabled())
-        ) {
+    var isSplitOmnibarEnabled: Boolean = false
+        private set
+
+    val isSplitOmnibarAvailable: Boolean
+        get() = isUnifiedOmnibarEnabled && isSplitOmnibarEnabled
+
+    override fun onStart(owner: LifecycleOwner) {
+        updateFeatureFlags()
+    }
+
+    fun updateFeatureFlags() {
+        coroutineScope.launch(dispatcherProvider.io()) {
+            isUnifiedOmnibarEnabled = browserFeatures.useUnifiedOmnibarLayout().isEnabled()
+            isSplitOmnibarEnabled = browserFeatures.splitOmnibar().isEnabled()
+
+            resetOmnibarTypeIfNecessary()
+        }
+    }
+
+    private fun resetOmnibarTypeIfNecessary() {
+        if (settingsDataStore.omnibarType == OmnibarType.SPLIT && !isSplitOmnibarAvailable) {
             settingsDataStore.isSplitOmnibarSelected = true
             settingsDataStore.omnibarType = OmnibarType.SINGLE_TOP
-        } else if (settingsDataStore.isSplitOmnibarSelected &&
-            browserFeatures.useUnifiedOmnibarLayout().isEnabled() &&
-            browserFeatures.splitOmnibar().isEnabled()
-        ) {
+        } else if (settingsDataStore.isSplitOmnibarSelected && isSplitOmnibarAvailable) {
             // Restore user's choice if the feature is re-enabled
             settingsDataStore.omnibarType = OmnibarType.SPLIT
             settingsDataStore.isSplitOmnibarSelected = false
