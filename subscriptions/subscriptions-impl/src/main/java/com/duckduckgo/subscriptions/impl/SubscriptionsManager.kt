@@ -397,14 +397,18 @@ class RealSubscriptionsManager @Inject constructor(
     }
 
     override suspend fun isSwitchPlanAvailable(): Boolean = withContext(dispatcherProvider.io()) {
-        val hasActiveSubscription = authRepository.getSubscription()?.isActive() ?: false
-        return@withContext hasActiveSubscription && privacyProFeature.get().supportsSwitchSubscription().isEnabled()
+        val subscription = authRepository.getSubscription()
+        val hasActiveSubscription = subscription?.isActive() ?: false
+        val isOnFreeTrial = subscription?.activeOffers?.any { it == ActiveOfferType.TRIAL } ?: false
+        val isSwitchFeatureEnabled = privacyProFeature.get().supportsSwitchSubscription().isEnabled()
+        
+        return@withContext hasActiveSubscription && !isOnFreeTrial && isSwitchFeatureEnabled
     }
 
     override suspend fun getSwitchPlanPricing(isUpgrade: Boolean): SwitchPlanPricingInfo? = withContext(dispatcherProvider.io()) {
         return@withContext try {
             val currentSubscription = getSubscription() ?: return@withContext null
-            val offers = getSubscriptionOffer()
+            val basePlans = getSubscriptionOffer().filter { it.offerId == null }
             
             // Determine current and target plan IDs based on region
             val isUS = currentSubscription.productId in listOf(MONTHLY_PLAN_US, YEARLY_PLAN_US)
@@ -419,18 +423,18 @@ class RealSubscriptionsManager @Inject constructor(
             }
             
             // Get prices from offers
-            val currentPrice = offers.find { it.planId == currentPlanId }
+            val currentPrice = basePlans.find { it.planId == currentPlanId }
                 ?.pricingPhases
                 ?.firstOrNull()
                 ?.formattedPrice ?: return@withContext null
                 
-            val targetPrice = offers.find { it.planId == targetPlanId }
+            val targetPrice = basePlans.find { it.planId == targetPlanId }
                 ?.pricingPhases
                 ?.firstOrNull()
                 ?.formattedPrice ?: return@withContext null
             
             // Calculate monthly equivalent for yearly plan
-            val yearlyPrice = offers.find { it.planId in listOf(YEARLY_PLAN_US, YEARLY_PLAN_ROW) }
+            val yearlyPrice = basePlans.find { it.planId in listOf(YEARLY_PLAN_US, YEARLY_PLAN_ROW) }
                 ?.pricingPhases
                 ?.firstOrNull()
                 ?.formattedPrice ?: return@withContext null
@@ -454,14 +458,12 @@ class RealSubscriptionsManager @Inject constructor(
             val numericValue = yearlyPrice.replace(Regex("[^0-9.,]"), "").replace(",", ".")
             val currencySymbol = yearlyPrice.replace(Regex("[0-9.,\\s]"), "")
             
-            // Parse and divide by 12
+            // Calculate monthly equivalent for yearly plan
             val yearly = numericValue.toDoubleOrNull() ?: return yearlyPrice
             val monthly = yearly / 12.0
-            
-            // Format with 2 decimal places
             val formattedMonthly = String.format("%.2f", monthly)
             
-            // Reconstruct with currency symbol (handle symbol position)
+            // Reconstruct with currency symbol
             if (yearlyPrice.startsWith(currencySymbol)) {
                 "$currencySymbol$formattedMonthly"
             } else {

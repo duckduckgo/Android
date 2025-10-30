@@ -114,11 +114,11 @@ class SwitchPlanBottomSheetDialog @AssistedInject constructor(
                         binding.switchBottomSheetDialogSubTitle.text = context.getString(
                             R.string.switchBottomSheetDescriptionUpgrade,
                             pricingInfo?.yearlyMonthlyEquivalent ?: "",
-                            pricingInfo?.currentPrice ?: ""
+                            pricingInfo?.currentPrice ?: "",
                         )
                         binding.switchBottomSheetDialogPrimaryButton.text = context.getString(
                             R.string.switchBottomSheetPrimaryButtonUpgrade,
-                            pricingInfo?.targetPrice ?: ""
+                            pricingInfo?.targetPrice ?: "",
                         )
                         binding.switchBottomSheetDialogSecondaryButton.text = context.getString(R.string.switchBottomSheetSecondaryButtonUpgrade)
 
@@ -137,12 +137,12 @@ class SwitchPlanBottomSheetDialog @AssistedInject constructor(
                         binding.switchBottomSheetDialogSubTitle.text = context.getString(
                             R.string.switchBottomSheetDescriptionDowngrade,
                             pricingInfo?.yearlyMonthlyEquivalent ?: "",
-                            pricingInfo?.targetPrice ?: ""
+                            pricingInfo?.targetPrice ?: "",
                         )
                         binding.switchBottomSheetDialogPrimaryButton.text = context.getString(R.string.switchBottomSheetPrimaryButtonDowngrade)
                         binding.switchBottomSheetDialogSecondaryButton.text = context.getString(
                             R.string.switchBottomSheetSecondaryButtonDowngrade,
-                            pricingInfo?.targetPrice ?: ""
+                            pricingInfo?.targetPrice ?: "",
                         )
 
                         binding.switchBottomSheetDialogPrimaryButton.setOnClickListener {
@@ -168,15 +168,11 @@ class SwitchPlanBottomSheetDialog @AssistedInject constructor(
                     }
 
                     is CurrentPurchase.Failure -> {
-                        launch(dispatcherProvider.main()) {
-                            logcat { "Switch flow: Failed to switch plans. Error: ${it.message}" }
-                        }
+                        logcat { "Switch flow: Failed to switch plans. Error: ${it.message}" }
                     }
 
                     is CurrentPurchase.Canceled -> {
-                        launch(dispatcherProvider.main()) {
-                            logcat { "Switch flow: Canceled switch plans" }
-                        }
+                        logcat { "Switch flow: Canceled switch plans" }
                     }
 
                     else -> {}
@@ -214,9 +210,7 @@ class SwitchPlanBottomSheetDialog @AssistedInject constructor(
                     )
                 }
             } catch (e: Exception) {
-                launch(dispatcherProvider.main()) {
-                    logcat { "Switch flow: Failed to switch plans. Exception: ${e.message}" }
-                }
+                logcat { "Switch flow: Failed to switch plans. Exception: ${e.message}" }
             }
         }
     }
