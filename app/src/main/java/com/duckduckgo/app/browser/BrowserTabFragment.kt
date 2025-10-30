@@ -667,20 +667,8 @@ class BrowserTabFragment :
     private val daxDialogIntroBubble
         get() = binding.includeNewBrowserTab.includeOnboardingDaxDialogBubble
 
-    private val buckDialogIntroBubble
-        get() = binding.includeNewBrowserTab.includeOnboardingBuckDialogBubble
-
-    private val bbDialogIntroBubble
-        get() = binding.includeNewBrowserTab.includeOnboardingBBDialogBubble
-
     private val daxDialogInContext
         get() = binding.includeOnboardingInContextDaxDialog
-
-    private val buckDialogInContext
-        get() = binding.includeOnboardingInContextBuckDialog
-
-    private val bbDialogInContext
-        get() = binding.includeOnboardingInContextBBDialog
 
     // Optimization to prevent against excessive work generating WebView previews; an existing job will be cancelled if a new one is launched
     private var bitmapGeneratorJob: Job? = null
@@ -1668,13 +1656,6 @@ class BrowserTabFragment :
         )
 
         viewModel.ctaViewState.observe(viewLifecycleOwner, ctaViewStateObserver)
-
-        viewModel.buckTryASearchAnimationEnabled
-            .onEach {
-                if (it) {
-                    renderer.renderBuckOnboardingTryASearchAnimation()
-                }
-            }.launchIn(lifecycleScope)
 
         viewModel.command.observe(
             viewLifecycleOwner,
@@ -3407,8 +3388,6 @@ class BrowserTabFragment :
 
     private fun hideDaxBubbleCta() {
         newBrowserTab.browserBackground.setImageResource(0)
-        buckDialogIntroBubble.root.gone()
-        bbDialogIntroBubble.root.gone()
         daxDialogIntroBubble.root.gone()
     }
 
@@ -4899,20 +4878,6 @@ class BrowserTabFragment :
             binding.focusDummy.requestFocus()
         }
 
-        fun renderBuckOnboardingTryASearchAnimation() {
-            newBrowserTab.buckMagnifyingGlassAnimation.isVisible = true
-            newBrowserTab.buckMagnifyingGlassAnimation.playAnimation()
-        }
-    }
-
-    private fun hideBuckMagnifyingGlassAnimation() {
-        newBrowserTab.buckMagnifyingGlassAnimation.isGone = true
-    }
-
-    private fun hideBuckEndAnimation() {
-        newBrowserTab.buckEndAnimation.isGone = true
-        val backgroundColor = requireActivity().getColorFromAttr(attrColor = CommonR.attr.daxColorBackground)
-        newBrowserTab.newTabLayout.setBackgroundColor(backgroundColor)
     }
 
     private fun launchPrint(
