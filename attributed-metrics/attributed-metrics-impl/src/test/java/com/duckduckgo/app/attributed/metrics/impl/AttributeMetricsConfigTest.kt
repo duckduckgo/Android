@@ -90,11 +90,11 @@ class AttributeMetricsConfigTest {
     fun whenFeatureDisabledThenReturnEmptyBucketConfig() = runTest {
         val settings = """
             {
-                "user_active_past_week": {
+                "attributed_metric_active_past_week": {
                     "buckets": [2, 4],
                     "version": 0
                 },
-                "user_average_searches_past_week": {
+                "attributed_metric_average_searches_past_week": {
                     "buckets": [5, 9],
                     "version": 1
                 }
@@ -129,11 +129,11 @@ class AttributeMetricsConfigTest {
     fun whenFeatureEnabledAndValidSettingsThenReturnBucketConfig() = runTest {
         val settings = """
             {
-                "user_active_past_week": {
+                "attributed_metric_active_past_week": {
                     "buckets": [2, 4],
                     "version": 0
                 },
-                "user_average_searches_past_week": {
+                "attributed_metric_average_searches_past_week": {
                     "buckets": [5, 9],
                     "version": 1
                 }
@@ -150,11 +150,11 @@ class AttributeMetricsConfigTest {
 
         assertEquals(
             mapOf(
-                "user_active_past_week" to MetricBucket(
+                "attributed_metric_active_past_week" to MetricBucket(
                     buckets = listOf(2, 4),
                     version = 0,
                 ),
-                "user_average_searches_past_week" to MetricBucket(
+                "attributed_metric_average_searches_past_week" to MetricBucket(
                     buckets = listOf(5, 9),
                     version = 1,
                 ),

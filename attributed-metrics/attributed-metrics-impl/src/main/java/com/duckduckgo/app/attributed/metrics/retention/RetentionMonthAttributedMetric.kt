@@ -49,7 +49,7 @@ class RetentionMonthAttributedMetric @Inject constructor(
 ) : AttributedMetric, AtbLifecyclePlugin {
 
     companion object {
-        private const val PIXEL_NAME_FIRST_MONTH = "user_retention_month"
+        private const val PIXEL_NAME_FIRST_MONTH = "attributed_metric_retention_month"
         private const val DAYS_IN_4_WEEKS = 28 // we consider 1 month after 4 weeks
         private const val MONTH_DAY_THRESHOLD = DAYS_IN_4_WEEKS + 1
         private const val START_MONTH_THRESHOLD = 2
@@ -103,7 +103,11 @@ class RetentionMonthAttributedMetric @Inject constructor(
         val month = getMonthSinceInstall()
         if (month < START_MONTH_THRESHOLD) return emptyMap()
 
-        return mutableMapOf("count" to bucketMonth(month).toString())
+        val params = mutableMapOf(
+            "count" to bucketMonth(month).toString(),
+            "version" to bucketConfig.await().version.toString(),
+        )
+        return params
     }
 
     override suspend fun getTag(): String {

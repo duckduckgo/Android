@@ -61,7 +61,7 @@ class SyncDevicesAttributeMetricTest {
         whenever(attributedMetricConfig.metricsToggles()).thenReturn(listOf(syncToggle.syncDevices()))
         whenever(attributedMetricConfig.getBucketConfiguration()).thenReturn(
             mapOf(
-                "syncDevices" to MetricBucket(
+                "attributed_metric_synced_device" to MetricBucket(
                     buckets = listOf(1),
                     version = 0,
                 ),
@@ -80,7 +80,7 @@ class SyncDevicesAttributeMetricTest {
 
     @Test
     fun whenPixelNameRequestedThenReturnCorrectName() {
-        assertEquals("user_synced_device", testee.getPixelName())
+        assertEquals("attributed_metric_synced_device", testee.getPixelName())
     }
 
     @Test
@@ -125,12 +125,12 @@ class SyncDevicesAttributeMetricTest {
         deviceCountExpectedBuckets.forEach { (devices, bucket) ->
             connectedDevicesFlow.emit(devices)
 
-            val params = testee.getMetricParameters()
+            val realbucket = testee.getMetricParameters()["device_count"]
 
             assertEquals(
                 "For $devices devices, should return bucket $bucket",
-                mapOf("device_count" to bucket.toString()),
-                params,
+                bucket.toString(),
+                realbucket,
             )
         }
     }
@@ -156,6 +156,15 @@ class SyncDevicesAttributeMetricTest {
                 tag,
             )
         }
+    }
+
+    @Test
+    fun whenGetMetricParametersThenReturnVersion() = runTest {
+        connectedDevicesFlow.emit(1)
+
+        val version = testee.getMetricParameters()["version"]
+
+        assertEquals("0", version)
     }
 }
 

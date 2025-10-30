@@ -55,7 +55,7 @@ class SubscriptionStatusAttributedMetric @Inject constructor(
 ) : AttributedMetric, MainProcessLifecycleObserver {
 
     companion object {
-        private const val PIXEL_NAME = "user_subscribed"
+        private const val PIXEL_NAME = "attributed_metric_subscribed"
         private const val FEATURE_TOGGLE_NAME = "subscriptionRetention"
         private const val FEATURE_EMIT_TOGGLE_NAME = "canEmitSubscriptionRetention"
     }
@@ -109,6 +109,7 @@ class SubscriptionStatusAttributedMetric @Inject constructor(
         val isOnTrial = authRepository.isFreeTrialActive()
         val params = mutableMapOf(
             "month" to getBucketValue(daysSinceSubscribed, isOnTrial).toString(),
+            "version" to bucketConfig.await().version.toString(),
         )
         return params
     }
