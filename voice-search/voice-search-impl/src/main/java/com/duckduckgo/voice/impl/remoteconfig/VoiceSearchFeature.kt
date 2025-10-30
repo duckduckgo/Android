@@ -39,8 +39,8 @@ interface VoiceSearchFeature {
 
     /**
      * Kill switch to restart listening when ERROR_NO_MATCH occurs before speech begins
-     * @return `true` when retry is allowed, defaults to `true`
+     * If the remote feature is not present defaults to `internal`
      */
-    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
+    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
     fun restartAfterTimeout(): Toggle
 }
