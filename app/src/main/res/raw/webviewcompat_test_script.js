@@ -1,15 +1,15 @@
-let supportedMessages = ["ContextMenuOpened", "PageStarted"];
+const supportedMessages = ["ContextMenuOpened", "PageStarted"];
 
 const delay = $DELAY$;
 const postInitialPing = $POST_INITIAL_PING$;
 const replyToNativeMessages = $REPLY_TO_NATIVE_MESSAGES$;
 
-  const pingMessage = 'Ping:' + window.location.href + ' ' + delay + 'ms'
+const webViewCompatPingMessage = 'Ping:' + window.location.href + ' ' + delay + 'ms'
 
 
 if (postInitialPing) {
     setTimeout(() => {
-        webViewCompatTestObj.postMessage(pingMessage)
+        webViewCompatTestObj.postMessage(webViewCompatPingMessage)
     }, delay)
 }
 
