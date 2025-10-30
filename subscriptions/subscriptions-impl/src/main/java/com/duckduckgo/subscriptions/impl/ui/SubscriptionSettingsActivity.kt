@@ -34,7 +34,6 @@ import com.duckduckgo.common.ui.view.dialog.TextAlertDialogBuilder
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.viewbinding.viewBinding
-import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.subscriptions.api.ActiveOfferType
@@ -47,7 +46,6 @@ import com.duckduckgo.subscriptions.api.SubscriptionStatus.INACTIVE
 import com.duckduckgo.subscriptions.impl.R.*
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.BASIC_SUBSCRIPTION
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.FAQS_URL
-import com.duckduckgo.subscriptions.impl.SubscriptionsManager
 import com.duckduckgo.subscriptions.impl.databinding.ActivitySubscriptionSettingsBinding
 import com.duckduckgo.subscriptions.impl.internal.SubscriptionsUrlProvider
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
@@ -311,7 +309,7 @@ class SubscriptionSettingsActivity : DuckDuckGoActivity() {
             }
 
             is DismissRebrandingBanner -> dismissRebrandingBanner()
-            
+
             is ShowSwitchPlanDialog -> showSwitchPlanDialog(command.switchType)
         }
     }
@@ -323,7 +321,7 @@ class SubscriptionSettingsActivity : DuckDuckGoActivity() {
             switchType = switchType,
             onSwitchSuccess = {
                 viewModel.onSwitchPlanSuccess()
-            }
+            },
         )
         dialog.show()
     }

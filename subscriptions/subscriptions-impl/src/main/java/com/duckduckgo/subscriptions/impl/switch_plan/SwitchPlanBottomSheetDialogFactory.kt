@@ -30,4 +30,3 @@ interface SwitchPlanBottomSheetDialogFactory {
         onSwitchSuccess: () -> Unit,
     ): SwitchPlanBottomSheetDialog
 }
-

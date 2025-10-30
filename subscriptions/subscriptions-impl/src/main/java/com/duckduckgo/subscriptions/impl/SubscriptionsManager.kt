@@ -401,7 +401,7 @@ class RealSubscriptionsManager @Inject constructor(
         val hasActiveSubscription = subscription?.isActive() ?: false
         val isOnFreeTrial = subscription?.activeOffers?.any { it == ActiveOfferType.TRIAL } ?: false
         val isSwitchFeatureEnabled = privacyProFeature.get().supportsSwitchSubscription().isEnabled()
-        
+
         return@withContext hasActiveSubscription && !isOnFreeTrial && isSwitchFeatureEnabled
     }
 
@@ -409,7 +409,7 @@ class RealSubscriptionsManager @Inject constructor(
         return@withContext try {
             val currentSubscription = getSubscription() ?: return@withContext null
             val basePlans = getSubscriptionOffer().filter { it.offerId == null }
-            
+
             // Determine current and target plan IDs based on region
             val isUS = currentSubscription.productId in listOf(MONTHLY_PLAN_US, YEARLY_PLAN_US)
             val (currentPlanId, targetPlanId) = if (isUpgrade) {
@@ -421,30 +421,30 @@ class RealSubscriptionsManager @Inject constructor(
                 val monthly = if (isUS) MONTHLY_PLAN_US else MONTHLY_PLAN_ROW
                 yearly to monthly
             }
-            
+
             // Get prices from offers
             val currentPrice = basePlans.find { it.planId == currentPlanId }
                 ?.pricingPhases
                 ?.firstOrNull()
                 ?.formattedPrice ?: return@withContext null
-                
+
             val targetPrice = basePlans.find { it.planId == targetPlanId }
                 ?.pricingPhases
                 ?.firstOrNull()
                 ?.formattedPrice ?: return@withContext null
-            
+
             // Calculate monthly equivalent for yearly plan
             val yearlyPrice = basePlans.find { it.planId in listOf(YEARLY_PLAN_US, YEARLY_PLAN_ROW) }
                 ?.pricingPhases
                 ?.firstOrNull()
                 ?.formattedPrice ?: return@withContext null
-            
+
             val yearlyMonthlyEquivalent = calculateMonthlyEquivalent(yearlyPrice)
-            
+
             SwitchPlanPricingInfo(
                 currentPrice = currentPrice,
                 targetPrice = targetPrice,
-                yearlyMonthlyEquivalent = yearlyMonthlyEquivalent
+                yearlyMonthlyEquivalent = yearlyMonthlyEquivalent,
             )
         } catch (e: Exception) {
             logcat { "Subs: Failed to get switch plan pricing: ${e.message}" }
@@ -457,12 +457,12 @@ class RealSubscriptionsManager @Inject constructor(
             // Extract currency symbol and numeric value
             val numericValue = yearlyPrice.replace(Regex("[^0-9.,]"), "").replace(",", ".")
             val currencySymbol = yearlyPrice.replace(Regex("[0-9.,\\s]"), "")
-            
+
             // Calculate monthly equivalent for yearly plan
             val yearly = numericValue.toDoubleOrNull() ?: return yearlyPrice
             val monthly = yearly / 12.0
             val formattedMonthly = String.format("%.2f", monthly)
-            
+
             // Reconstruct with currency symbol
             if (yearlyPrice.startsWith(currencySymbol)) {
                 "$currencySymbol$formattedMonthly"
