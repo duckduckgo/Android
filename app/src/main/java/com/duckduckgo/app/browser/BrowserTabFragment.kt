@@ -196,7 +196,6 @@ import com.duckduckgo.app.global.model.orderedTrackerBlockedEntities
 import com.duckduckgo.app.global.view.NonDismissibleBehavior
 import com.duckduckgo.app.global.view.launchDefaultAppActivity
 import com.duckduckgo.app.global.view.renderIfChanged
-import com.duckduckgo.app.onboardingdesignexperiment.OnboardingDesignExperimentManager
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.app.settings.db.SettingsDataStore
@@ -575,9 +574,6 @@ class BrowserTabFragment :
 
     @Inject
     lateinit var swipingTabsFeature: SwipingTabsFeatureProvider
-
-    @Inject
-    lateinit var onboardingDesignExperimentManager: OnboardingDesignExperimentManager
 
     @Inject
     lateinit var browserAndInputScreenTransitionProvider: BrowserAndInputScreenTransitionProvider
@@ -2376,7 +2372,6 @@ class BrowserTabFragment :
 
             is Command.SetBrowserBackground -> setBrowserBackgroundRes(it.backgroundRes)
             is Command.SetBrowserBackgroundColor -> setNewTabBackgroundColor(it.colorRes)
-            is Command.SetBubbleDialogBackground -> setBubbleDialogBackground(it.backgroundRes)
             is Command.SetOnboardingDialogBackground -> setOnboardingDialogBackgroundRes(it.backgroundRes)
             is Command.SetOnboardingDialogBackgroundColor -> setOnboardingDialogBackgroundColor(it.colorRes)
             is Command.LaunchFireDialogFromOnboardingDialog -> {
@@ -2470,10 +2465,6 @@ class BrowserTabFragment :
         @ColorRes colorRes: Int,
     ) {
         newBrowserTab.newTabLayout.setBackgroundColor(getColor(requireContext(), colorRes))
-    }
-
-    private fun setBubbleDialogBackground(backgroundRes: Int) {
-        newBrowserTab.includeOnboardingBBDialogBubble.root.setBackgroundResource(backgroundRes)
     }
 
     private fun setOnboardingDialogBackgroundRes(backgroundRes: Int) {
