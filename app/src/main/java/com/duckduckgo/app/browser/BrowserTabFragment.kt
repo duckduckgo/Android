@@ -2468,21 +2468,13 @@ class BrowserTabFragment :
     }
 
     private fun setOnboardingDialogBackgroundRes(backgroundRes: Int) {
-        if (onboardingDesignExperimentManager.isBbEnrolledAndEnabled()) {
-            bbDialogInContext.onboardingDaxDialogBackground.setImageResource(backgroundRes)
-        } else {
-            daxDialogInContext.onboardingDaxDialogBackground.setImageResource(backgroundRes)
-        }
+        daxDialogInContext.onboardingDaxDialogBackground.setImageResource(backgroundRes)
     }
 
     private fun setOnboardingDialogBackgroundColor(
         @ColorRes colorRes: Int,
     ) {
-        if (onboardingDesignExperimentManager.isBuckEnrolledAndEnabled()) {
-            buckDialogInContext.root.setBackgroundColor(getColor(requireContext(), colorRes))
-        } else {
-            daxDialogInContext.onboardingDaxDialogContainer.setBackgroundColor(getColor(requireContext(), colorRes))
-        }
+        daxDialogInContext.onboardingDaxDialogContainer.setBackgroundColor(getColor(requireContext(), colorRes))
     }
 
     private fun showRemoveSearchSuggestionDialog(suggestion: AutoCompleteSuggestion) {
@@ -3230,13 +3222,11 @@ class BrowserTabFragment :
 
     @SuppressLint("SetJavaScriptEnabled")
     private fun configureWebView() {
-        if (!onboardingDesignExperimentManager.isBuckEnrolledAndEnabled()) {
-            binding.daxDialogOnboardingCtaContent.layoutTransition = LayoutTransition()
-            binding.daxDialogOnboardingCtaContent.layoutTransition.enableTransitionType(LayoutTransition.CHANGING)
+        binding.daxDialogOnboardingCtaContent.layoutTransition = LayoutTransition()
+        binding.daxDialogOnboardingCtaContent.layoutTransition.enableTransitionType(LayoutTransition.CHANGING)
 
-            if (swipingTabsFeature.isEnabled) {
-                binding.daxDialogOnboardingCtaContent.layoutTransition.setAnimateParentHierarchy(false)
-            }
+        if (swipingTabsFeature.isEnabled) {
+            binding.daxDialogOnboardingCtaContent.layoutTransition.setAnimateParentHierarchy(false)
         }
 
         val webViewLayout = R.layout.include_duckduckgo_browser_webview
@@ -3401,19 +3391,7 @@ class BrowserTabFragment :
     }
 
     private fun hideOnboardingDaxDialog(onboardingCta: OnboardingDaxDialogCta) {
-        when {
-            onboardingDesignExperimentManager.isBuckEnrolledAndEnabled() -> {
-                onboardingCta.hideBuckOnboardingCta(binding)
-            }
-
-            onboardingDesignExperimentManager.isBbEnrolledAndEnabled() -> {
-                onboardingCta.hideBBOnboardingCta(binding)
-            }
-
-            else -> {
-                onboardingCta.hideOnboardingCta(binding)
-            }
-        }
+        onboardingCta.hideOnboardingCta(binding)
     }
 
     private fun hideBrokenSitePromptCta(brokenSitePromptDialogCta: BrokenSitePromptDialogCta) {
@@ -3423,25 +3401,12 @@ class BrowserTabFragment :
     private fun hideOnboardingDaxBubbleCta(daxBubbleCta: DaxBubbleCta) {
         daxBubbleCta.hideDaxBubbleCta(binding)
         hideDaxBubbleCta()
-        if (onboardingDesignExperimentManager.isBuckEnrolledAndEnabled()) {
-            when (daxBubbleCta) {
-                is DaxBubbleCta.DaxIntroSearchOptionsCta -> hideBuckMagnifyingGlassAnimation()
-                is DaxBubbleCta.DaxEndCta -> hideBuckEndAnimation()
-                else -> Unit
-            }
-        }
         renderer.showNewTab()
         showKeyboard()
     }
 
     private fun hideDaxBubbleCta() {
-        if (onboardingDesignExperimentManager.isBuckEnrolledAndEnabled()) {
-            newBrowserTab.newTabLayout.setBackgroundColor(
-                requireContext().getColorFromAttr(CommonR.attr.daxColorSurface),
-            )
-        } else {
-            newBrowserTab.browserBackground.setImageResource(0)
-        }
+        newBrowserTab.browserBackground.setImageResource(0)
         buckDialogIntroBubble.root.gone()
         bbDialogIntroBubble.root.gone()
         daxDialogIntroBubble.root.gone()
@@ -4703,9 +4668,6 @@ class BrowserTabFragment :
 
                     viewState.isOnboardingCompleteInNewTabPage && !viewState.isErrorShowing -> {
                         hideDaxBubbleCta()
-                        if (onboardingDesignExperimentManager.isBuckEnrolledAndEnabled()) {
-                            hideBuckEndAnimation()
-                        }
                         showNewTab()
                     }
                 }
@@ -4724,57 +4686,18 @@ class BrowserTabFragment :
         private fun showDaxOnboardingBubbleCta(configuration: DaxBubbleCta) {
             hideNewTab()
             configuration.apply {
-                when {
-                    onboardingDesignExperimentManager.isBuckEnrolledAndEnabled() -> {
-                        showBuckCta(binding = buckDialogIntroBubble, configuration = configuration) {
-                            setOnOptionClicked(
-                                onboardingExperimentEnabled = true,
-                                configuration = configuration,
-                            ) { option, index ->
-                                userEnteredQuery(option.link)
-                                viewModel.onUserSelectedOnboardingDialogOption(configuration, index)
-                            }
-                        }
-                    }
-
-                    onboardingDesignExperimentManager.isBbEnrolledAndEnabled() -> {
-                        showBBCta(binding = bbDialogIntroBubble, configuration = configuration) {
-                            setOnOptionClicked(
-                                onboardingExperimentEnabled = true,
-                                configuration = configuration,
-                            ) { option, index ->
-                                userEnteredQuery(option.link)
-                                viewModel.onUserSelectedOnboardingDialogOption(configuration, index)
-                            }
-                        }
-                    }
-
-                    else -> {
-                        showCta(daxDialogIntroBubble.daxCtaContainer) {
-                            setOnOptionClicked(
-                                onboardingExperimentEnabled = onboardingDesignExperimentManager.isModifiedControlEnrolledAndEnabled(),
-                                configuration = configuration,
-                            ) { option, index ->
-                                userEnteredQuery(option.link)
-                                viewModel.onUserSelectedOnboardingDialogOption(configuration, index)
-                            }
-                        }
+                showCta(daxDialogIntroBubble.daxCtaContainer) {
+                    setOnOptionClicked(
+                        onboardingExperimentEnabled = false,
+                        configuration = configuration,
+                    ) { option, index ->
+                        userEnteredQuery(option.link)
+                        viewModel.onUserSelectedOnboardingDialogOption(configuration, index)
                     }
                 }
 
                 setOnPrimaryCtaClicked {
-                    if (onboardingDesignExperimentManager.isBuckEnrolledAndEnabled() && configuration is DaxBubbleCta.DaxEndCta) {
-                        newBrowserTab.buckEndAnimation.isGone = true
-                        viewModel.onUserClickCtaOkButton(configuration)
-                    } else if (onboardingDesignExperimentManager.isBbEnrolledAndEnabled() && configuration is DaxBubbleCta.DaxEndCta) {
-                        configuration.hideBBEndCta(
-                            onAnimationEnd = {
-                                viewModel.onUserClickCtaOkButton(configuration)
-                            },
-                        )
-                    } else {
-                        viewModel.onUserClickCtaOkButton(configuration)
-                    }
+                    viewModel.onUserClickCtaOkButton(configuration)
                 }
                 setOnSecondaryCtaClicked {
                     viewModel.onUserClickCtaSecondaryButton(configuration)
@@ -4782,31 +4705,6 @@ class BrowserTabFragment :
 
                 setOnDismissCtaClicked {
                     viewModel.onUserClickCtaDismissButton(configuration)
-                }
-            }
-
-            if (onboardingDesignExperimentManager.isBuckEnrolledAndEnabled()) {
-                if (configuration is DaxIntroVisitSiteOptionsCta) {
-                    hideBuckMagnifyingGlassAnimation()
-                    if (context?.resources?.getBoolean(R.bool.show_wing_animation) == true) {
-                        lifecycleScope.launch {
-                            with(newBrowserTab.wingAnimation) {
-                                delay(2.5.seconds)
-                                show()
-                                playAnimation()
-                            }
-                        }
-                    }
-                }
-
-                if (configuration is DaxBubbleCta.DaxEndCta) {
-                    lifecycleScope.launch {
-                        with(newBrowserTab.buckEndAnimation) {
-                            delay(500)
-                            isVisible = true
-                            playAnimation()
-                        }
-                    }
                 }
             }
 
@@ -4969,12 +4867,8 @@ class BrowserTabFragment :
         }
 
         private fun hideDaxCta() {
-            if (onboardingDesignExperimentManager.isBuckEnrolledAndEnabled()) {
-                buckDialogInContext.root.gone()
-            } else {
-                daxDialogInContext.dialogTextCta.cancelAnimation()
-                daxDialogInContext.daxCtaContainer.gone()
-            }
+            daxDialogInContext.dialogTextCta.cancelAnimation()
+            daxDialogInContext.daxCtaContainer.gone()
         }
 
         fun renderHomeCta() {
