@@ -37,11 +37,12 @@ class ImportFromGoogleImpl @Inject constructor(
     private val dispatchers: DispatcherProvider,
     private val globalActivityStarter: GlobalActivityStarter,
     private val context: Context,
+    private val webViewCapabilityChecker: ImportGoogleBookmarksWebViewCapabilityChecker,
 ) : ImportFromGoogle {
 
     override suspend fun getBookmarksImportLaunchIntent(): Intent? {
         return withContext(dispatchers.io()) {
-            if (autofillFeature.canImportBookmarksFromGoogleTakeout().isEnabled()) {
+            if (autofillFeature.canImportBookmarksFromGoogleTakeout().isEnabled() && webViewCapabilityChecker.webViewCapableOfImporting()) {
                 val launchSource = getLaunchSource()
                 globalActivityStarter.startIntent(context, ImportBookmarksViaGoogleTakeoutScreen(launchSource))
             } else {
