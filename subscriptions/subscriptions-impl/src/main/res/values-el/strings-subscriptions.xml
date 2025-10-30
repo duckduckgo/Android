@@ -193,7 +193,7 @@
     <string name="feedbackGeneralSubscription">Συνδρομή</string>
 
     <!-- Switch plan-->
-    <string name="switchBottomSheetTitleUpgrade">Εξοικονομήστε 16% με\nένα ετήσιο πρόγραμμα!</string>
+    <string name="switchBottomSheetTitleUpgrade">Εξοικονομήστε 16%% με\nένα ετήσιο πρόγραμμα!</string>
     <string name="switchBottomSheetDescriptionUpgrade">Ένα ετήσιο πρόγραμμα κοστίζει μόλις 8,33 $/μήνα, σε σύγκριση με το τρέχον μηνιαίο πρόγραμμά σου των 9,99 $.</string>
     <string name="switchBottomSheetPrimaryButtonUpgrade">Μετάβαση σε ετήσια συνδρομή (99,99 $/έτος)</string>
     <string name="switchBottomSheetSecondaryButtonUpgrade">Διατήρηση μηνιαίου προγράμματος</string>
