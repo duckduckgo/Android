@@ -110,4 +110,11 @@
     <string name="deleteBookmarkFolderConfirmationDialogDescription" instruction="Placeholder is the name of the favorite site">Dadurch wird dein Lesezeichen-Ordner &lt;b&gt;%1$s&lt;/b&gt; gelöscht.</string>
     <string name="deleteSavedSiteConfirmationDialogCancel">Abbrechen</string>
     <string name="deleteSavedSiteConfirmationDialogDelete">Löschen</string>
+
+    <!-- Bookmark Import -->
+    <string name="importBookmarksFromGooglePreImportDialogTitle">Lesezeichen von Google importieren</string>
+    <string name="importBookmarksFromGooglePreImportDialogInstruction">Google fordert dich eventuell auf, dich anzumelden oder dein Passwort zur Bestätigung einzugeben.</string>
+    <string name="importBookmarksFromGooglePreImportDialogImportButton">Von Google importieren</string>
+    <string name="importBookmarksFromGooglePreImportDialogSelectFileButton">Lesezeichendatei auswählen …</string>
+    <string name="bookmarksImportDialogClose">Schließen</string>
 </resources>
