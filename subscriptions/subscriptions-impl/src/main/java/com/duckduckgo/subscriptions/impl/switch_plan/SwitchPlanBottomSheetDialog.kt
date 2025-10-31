@@ -95,12 +95,10 @@ class SwitchPlanBottomSheetDialog @AssistedInject constructor(
     }
 
     private fun configureViews() {
-        // Set up close button
         binding.switchBottomSheetDialogCloseButton.setOnClickListener {
             dismiss()
         }
 
-        // Load pricing information and configure views
         lifecycleOwner.lifecycleScope.launch(dispatcherProvider.io()) {
             val isUpgrade = switchType == SwitchPlanType.UPGRADE_TO_YEARLY
             val pricingInfo = subscriptionsManager.getSwitchPlanPricing(isUpgrade)

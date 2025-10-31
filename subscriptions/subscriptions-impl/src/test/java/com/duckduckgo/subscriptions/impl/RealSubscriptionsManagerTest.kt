@@ -1997,6 +1997,121 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
         override fun localDateTimeNow(): LocalDateTime = throw UnsupportedOperationException()
     }
 
+    @Test
+    fun whenGetSwitchPlanPricingForUpgradeThenReturnCorrectPricing() = runTest {
+        givenSwitchPlanSubscriptionExists(productId = MONTHLY_PLAN_US)
+        authRepository.setFeatures(MONTHLY_PLAN_US, setOf(NETP))
+        authRepository.setFeatures(YEARLY_PLAN_US, setOf(NETP))
+        givenPlanOffersExist(monthlyPrice = "$9.99", yearlyPrice = "$99.99")
+
+        val result = subscriptionsManager.getSwitchPlanPricing(isUpgrade = true)
+
+        assertNotNull(result)
+        assertEquals("$9.99", result!!.currentPrice)
+        assertEquals("$99.99", result.targetPrice)
+        assertEquals("$8.33", result.yearlyMonthlyEquivalent)
+    }
+
+    @Test
+    fun whenGetSwitchPlanPricingForDowngradeThenReturnCorrectPricing() = runTest {
+        givenSwitchPlanSubscriptionExists(productId = YEARLY_PLAN_US)
+        authRepository.setFeatures(MONTHLY_PLAN_US, setOf(NETP))
+        authRepository.setFeatures(YEARLY_PLAN_US, setOf(NETP))
+        givenPlanOffersExist(monthlyPrice = "$9.99", yearlyPrice = "$99.99")
+
+        val result = subscriptionsManager.getSwitchPlanPricing(isUpgrade = false)
+
+        assertNotNull(result)
+        assertEquals("$99.99", result!!.currentPrice)
+        assertEquals("$9.99", result.targetPrice)
+        assertEquals("$8.33", result.yearlyMonthlyEquivalent)
+    }
+
+    @Test
+    fun whenGetSwitchPlanPricingWithNoSubscriptionThenReturnNull() = runTest {
+        authRepository.setSubscription(null)
+
+        val result = subscriptionsManager.getSwitchPlanPricing(isUpgrade = true)
+
+        assertNull(result)
+    }
+
+    @Test
+    fun whenGetSwitchPlanPricingWithDifferentCurrenciesThenCalculateCorrectly() = runTest {
+        givenSwitchPlanSubscriptionExists(productId = MONTHLY_PLAN_ROW)
+        authRepository.setFeatures(MONTHLY_PLAN_ROW, setOf(NETP))
+        authRepository.setFeatures(YEARLY_PLAN_ROW, setOf(NETP))
+        givenIsLaunchedRow(true)
+        givenPlanOffersExist(
+            monthlyPlanId = MONTHLY_PLAN_ROW,
+            yearlyPlanId = YEARLY_PLAN_ROW,
+            monthlyPrice = "€8.99",
+            yearlyPrice = "€89.99",
+        )
+
+        val result = subscriptionsManager.getSwitchPlanPricing(isUpgrade = true)
+
+        assertNotNull(result)
+        assertEquals("€7.50", result!!.yearlyMonthlyEquivalent)
+    }
+
+    private suspend fun givenSwitchPlanSubscriptionExists(
+        productId: String = MONTHLY_PLAN_US,
+        status: SubscriptionStatus = AUTO_RENEWABLE,
+    ) {
+        authRepository.setSubscription(
+            Subscription(
+                productId = productId,
+                billingPeriod = "Monthly",
+                startedAt = 1234,
+                expiresOrRenewsAt = 1701694623000,
+                status = status,
+                platform = "google",
+                activeOffers = listOf(),
+            ),
+        )
+    }
+
+    private fun givenPlanOffersExist(
+        monthlyPlanId: String = MONTHLY_PLAN_US,
+        yearlyPlanId: String = YEARLY_PLAN_US,
+        monthlyPrice: String = "$9.99",
+        yearlyPrice: String = "$99.99",
+    ) {
+        val monthlyPhase: PricingPhase = mock {
+            on { formattedPrice } doReturn monthlyPrice
+            on { billingPeriod } doReturn "P1M"
+        }
+        val monthlyPricingPhases: PricingPhases = mock {
+            on { pricingPhaseList } doReturn listOf(monthlyPhase)
+        }
+        val monthlyOffer: SubscriptionOfferDetails = mock {
+            on { basePlanId } doReturn monthlyPlanId
+            on { offerId } doReturn null
+            on { pricingPhases } doReturn monthlyPricingPhases
+        }
+
+        val yearlyPhase: PricingPhase = mock {
+            on { formattedPrice } doReturn yearlyPrice
+            on { billingPeriod } doReturn "P1Y"
+        }
+        val yearlyPricingPhases: PricingPhases = mock {
+            on { pricingPhaseList } doReturn listOf(yearlyPhase)
+        }
+        val yearlyOffer: SubscriptionOfferDetails = mock {
+            on { basePlanId } doReturn yearlyPlanId
+            on { offerId } doReturn null
+            on { pricingPhases } doReturn yearlyPricingPhases
+        }
+
+        val productDetails: ProductDetails = mock {
+            on { productId } doReturn SubscriptionsConstants.BASIC_SUBSCRIPTION
+            on { subscriptionOfferDetails } doReturn listOf(monthlyOffer, yearlyOffer)
+        }
+
+        whenever(playBillingManager.products).thenReturn(listOf(productDetails))
+    }
+
     private companion object {
         @JvmStatic
         @Parameterized.Parameters(name = "authApiV2Enabled={0}")
