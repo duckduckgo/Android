@@ -19,7 +19,7 @@ package com.duckduckgo.app.browser.newaddressbaroption
 import com.duckduckgo.app.onboarding.store.AppStage
 import com.duckduckgo.app.onboarding.store.UserStageStore
 import com.duckduckgo.app.settings.db.SettingsDataStore
-import com.duckduckgo.browser.ui.omnibar.OmnibarPosition
+import com.duckduckgo.browser.ui.omnibar.OmnibarType
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
@@ -190,7 +190,7 @@ class NewAddressBarOptionManagerTest {
     fun `when bottom address bar is enabled then showChoiceScreen does not show dialog`() =
         runTest {
             setupAllConditionsMet()
-            whenever(settingsDataStoreMock.omnibarPosition).thenReturn(OmnibarPosition.BOTTOM)
+            whenever(settingsDataStoreMock.omnibarType).thenReturn(OmnibarType.SINGLE_BOTTOM)
 
             testee.showChoiceScreen(mock(), isLaunchedFromExternal = false)
 
@@ -302,7 +302,7 @@ class NewAddressBarOptionManagerTest {
         showInputScreenFlow.value = false
         whenever(newAddressBarOptionDataStoreMock.wasShown()).thenReturn(false)
         whenever(remoteMessagingRepositoryMock.dismissedMessages()).thenReturn(emptyList())
-        whenever(settingsDataStoreMock.omnibarPosition).thenReturn(OmnibarPosition.TOP)
+        whenever(settingsDataStoreMock.omnibarType).thenReturn(OmnibarType.SINGLE_TOP)
         whenever(newAddressBarOptionDataStoreMock.wasValidated()).thenReturn(true)
     }
 }

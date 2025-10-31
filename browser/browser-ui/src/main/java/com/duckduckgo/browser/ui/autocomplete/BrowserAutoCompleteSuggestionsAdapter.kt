@@ -32,7 +32,7 @@ import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggesti
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion.AutoCompleteUrlSuggestion.AutoCompleteBookmarkSuggestion
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion.AutoCompleteUrlSuggestion.AutoCompleteSwitchToTabSuggestion
 import com.duckduckgo.browser.ui.autocomplete.AutoCompleteViewHolder.EmptySuggestionViewHolder
-import com.duckduckgo.browser.ui.omnibar.OmnibarPosition
+import com.duckduckgo.browser.ui.omnibar.OmnibarType
 
 private sealed interface AutoCompleteItem {
     data class Suggestion(
@@ -51,7 +51,7 @@ class BrowserAutoCompleteSuggestionsAdapter(
     private val autoCompleteInAppMessageDismissedListener: () -> Unit,
     private val autoCompleteOpenSettingsClickListener: () -> Unit,
     private val autoCompleteLongPressClickListener: (AutoCompleteSuggestion) -> Unit,
-    omnibarPosition: OmnibarPosition,
+    omnibarType: OmnibarType,
 ) : RecyclerView.Adapter<AutoCompleteViewHolder>() {
     private val deleteClickListener: (AutoCompleteSuggestion) -> Unit = {
         val suggestions = getSuggestions().filter { suggestion -> suggestion != it }
@@ -93,12 +93,12 @@ class BrowserAutoCompleteSuggestionsAdapter(
     private val viewHolderFactoryMap: Map<Int, SuggestionViewHolderFactory> =
         mapOf(
             Type.EMPTY_TYPE to EmptySuggestionViewHolderFactory(),
-            Type.SUGGESTION_TYPE to SearchSuggestionViewHolderFactory(omnibarPosition),
+            Type.SUGGESTION_TYPE to SearchSuggestionViewHolderFactory(omnibarType),
             Type.BOOKMARK_TYPE to BookmarkSuggestionViewHolderFactory(),
             Type.HISTORY_TYPE to HistorySuggestionViewHolderFactory(),
             Type.HISTORY_SEARCH_TYPE to HistorySearchSuggestionViewHolderFactory(),
             Type.IN_APP_MESSAGE_TYPE to InAppMessageViewHolderFactory(),
-            Type.DEFAULT_TYPE to DefaultSuggestionViewHolderFactory(omnibarPosition),
+            Type.DEFAULT_TYPE to DefaultSuggestionViewHolderFactory(omnibarType),
             Type.SWITCH_TO_TAB_TYPE to SwitchToTabSuggestionViewHolderFactory(),
             Type.DIVIDER_TYPE to DividerViewHolderFactory(),
             Type.DUCK_AI_PROMPT_TYPE to DuckAIPromptSuggestionViewHolderFactory(),

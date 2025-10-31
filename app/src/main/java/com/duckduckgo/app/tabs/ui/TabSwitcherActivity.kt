@@ -77,7 +77,7 @@ import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command.ShowUndoDeleteTab
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.SelectionViewState.Mode
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.SelectionViewState.Mode.Selection
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
-import com.duckduckgo.browser.ui.omnibar.OmnibarPosition
+import com.duckduckgo.browser.ui.omnibar.OmnibarType
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.menu.PopupMenu
 import com.duckduckgo.common.ui.view.button.ButtonType
@@ -211,7 +211,7 @@ class TabSwitcherActivity :
 
     private val binding: ActivityTabSwitcherBinding by viewBinding()
     private val popupMenu by lazy {
-        if (settingsDataStore.omnibarPosition == OmnibarPosition.BOTTOM && viewModel.isNewToolbarEnabled) {
+        if (settingsDataStore.omnibarType == OmnibarType.SINGLE_BOTTOM && viewModel.isNewToolbarEnabled) {
             PopupMenu(layoutInflater, R.layout.popup_tabs_menu_bottom)
         } else {
             PopupMenu(layoutInflater, R.layout.popup_tabs_menu)
@@ -219,7 +219,7 @@ class TabSwitcherActivity :
     }
 
     private val snackbarAnchorView by lazy {
-        if (settingsDataStore.omnibarPosition == OmnibarPosition.BOTTOM) {
+        if (settingsDataStore.omnibarType == OmnibarType.SINGLE_BOTTOM) {
             toolbar
         } else {
             null
@@ -277,10 +277,13 @@ class TabSwitcherActivity :
         tabsRecycler = findViewById(R.id.tabsRecycler)
 
         if (viewModel.isNewToolbarEnabled) {
-            if (settingsDataStore.omnibarPosition == OmnibarPosition.BOTTOM) {
-                binding.root.removeView(binding.tabSwitcherExperimentToolbarTop.root)
-            } else {
-                binding.root.removeView(binding.tabSwitcherToolbarBottom.root)
+            when (settingsDataStore.omnibarType) {
+                OmnibarType.SINGLE_TOP, OmnibarType.SPLIT -> {
+                    binding.root.removeView(binding.tabSwitcherToolbarBottom.root)
+                }
+                OmnibarType.SINGLE_BOTTOM -> {
+                    binding.root.removeView(binding.tabSwitcherExperimentToolbarTop.root)
+                }
             }
             binding.root.removeView(binding.tabSwitcherToolbarTop.root)
         } else {
@@ -328,10 +331,13 @@ class TabSwitcherActivity :
             tabsContainer.updateLayoutParams {
                 this as CoordinatorLayout.LayoutParams
                 this.behavior = null
-                if (settingsDataStore.omnibarPosition == OmnibarPosition.TOP) {
-                    this.topMargin = TABS_CONTENT_PADDING_DP.toPx()
-                } else {
-                    this.bottomMargin = TABS_CONTENT_PADDING_DP.toPx()
+                when (settingsDataStore.omnibarType) {
+                    OmnibarType.SINGLE_TOP, OmnibarType.SPLIT -> {
+                        this.topMargin = TABS_CONTENT_PADDING_DP.toPx()
+                    }
+                    OmnibarType.SINGLE_BOTTOM -> {
+                        this.bottomMargin = TABS_CONTENT_PADDING_DP.toPx()
+                    }
                 }
             }
         }

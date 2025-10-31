@@ -89,7 +89,7 @@ import com.duckduckgo.app.global.view.renderIfChanged
 import com.duckduckgo.app.onboardingdesignexperiment.OnboardingDesignExperimentManager
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.trackerdetection.model.Entity
-import com.duckduckgo.browser.ui.omnibar.OmnibarPosition
+import com.duckduckgo.browser.ui.omnibar.OmnibarType
 import com.duckduckgo.browser.ui.tabs.TabSwitcherButton
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.view.KeyboardAwareEditText
@@ -114,7 +114,6 @@ import kotlinx.coroutines.launch
 import logcat.logcat
 import javax.inject.Inject
 import kotlin.collections.isNotEmpty
-import kotlin.jvm.java
 import com.duckduckgo.app.global.model.PrivacyShield as PrivacyShieldState
 import com.duckduckgo.mobile.android.R as CommonR
 
@@ -294,7 +293,7 @@ open class LegacyOmnibarLayout @JvmOverloads constructor(
         }
     }
 
-    override val omnibarPosition: OmnibarPosition = OmnibarPosition.TOP
+    override val omnibarType: OmnibarType = OmnibarType.SINGLE_TOP
 
     private val smoothProgressAnimator by lazy { SmoothProgressAnimator(pageLoadingIndicator) }
 
@@ -951,15 +950,17 @@ open class LegacyOmnibarLayout @JvmOverloads constructor(
     override fun isBottomNavEnabled(): Boolean = false
 
     override fun getBehavior(): CoordinatorLayout.Behavior<AppBarLayout> =
-        when (omnibarPosition) {
-            OmnibarPosition.TOP -> TopAppBarBehavior(context, this)
-            OmnibarPosition.BOTTOM -> BottomAppBarBehavior(context, this)
+        when (omnibarType) {
+            OmnibarType.SINGLE_TOP -> TopAppBarBehavior(context, this)
+            OmnibarType.SINGLE_BOTTOM -> BottomAppBarBehavior(context, this)
+            else -> throw IllegalStateException("OmnibarType $omnibarType not supported in OmnibarLayout")
         }
 
     override fun setExpanded(expanded: Boolean) {
-        when (omnibarPosition) {
-            OmnibarPosition.TOP -> super.setExpanded(expanded)
-            OmnibarPosition.BOTTOM -> (behavior as BottomAppBarBehavior).setExpanded(expanded)
+        when (omnibarType) {
+            OmnibarType.SINGLE_TOP -> super.setExpanded(expanded)
+            OmnibarType.SINGLE_BOTTOM -> (behavior as BottomAppBarBehavior).setExpanded(expanded)
+            else -> throw IllegalStateException("OmnibarType $omnibarType not supported in OmnibarLayout")
         }
     }
 
@@ -967,9 +968,10 @@ open class LegacyOmnibarLayout @JvmOverloads constructor(
         expanded: Boolean,
         animate: Boolean,
     ) {
-        when (omnibarPosition) {
-            OmnibarPosition.TOP -> super.setExpanded(expanded, animate)
-            OmnibarPosition.BOTTOM -> (behavior as BottomAppBarBehavior).setExpanded(expanded)
+        when (omnibarType) {
+            OmnibarType.SINGLE_TOP -> super.setExpanded(expanded, animate)
+            OmnibarType.SINGLE_BOTTOM -> (behavior as BottomAppBarBehavior).setExpanded(expanded)
+            else -> throw IllegalStateException("OmnibarType $omnibarType not supported in OmnibarLayout")
         }
     }
 

@@ -28,7 +28,7 @@ import com.duckduckgo.app.settings.clear.ClearWhenOption
 import com.duckduckgo.app.settings.clear.FireAnimation
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.browser.api.autocomplete.AutoCompleteSettings
-import com.duckduckgo.browser.ui.omnibar.OmnibarPosition
+import com.duckduckgo.browser.ui.omnibar.OmnibarType
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
@@ -66,7 +66,10 @@ interface SettingsDataStore {
     var appLinksEnabled: Boolean
     var showAppLinksPrompt: Boolean
     var showAutomaticFireproofDialog: Boolean
-    var omnibarPosition: OmnibarPosition
+    var omnibarType: OmnibarType
+
+    // Temporary cache value for split omnibar feature, in case the flag is temporarily disabled
+    var isSplitOmnibarSelected: Boolean
 
     /**
      * This will be checked upon app startup and used to decide whether it should perform a clear or not.
@@ -213,9 +216,15 @@ class SettingsSharedPreferences @Inject constructor(
         get() = preferences.getBoolean(SHOW_AUTOMATIC_FIREPROOF_DIALOG, true)
         set(enabled) = preferences.edit { putBoolean(SHOW_AUTOMATIC_FIREPROOF_DIALOG, enabled) }
 
-    override var omnibarPosition: OmnibarPosition
-        get() = OmnibarPosition.valueOf(preferences.getString(KEY_OMNIBAR_POSITION, OmnibarPosition.TOP.name) ?: OmnibarPosition.TOP.name)
-        set(value) = preferences.edit { putString(KEY_OMNIBAR_POSITION, value.name) }
+    override var omnibarType: OmnibarType
+        get() = OmnibarType.fromString(
+            preferences.getString(KEY_OMNIBAR_TYPE, OmnibarType.SINGLE_TOP.typeName) ?: OmnibarType.SINGLE_TOP.typeName,
+        )
+        set(value) = preferences.edit { putString(KEY_OMNIBAR_TYPE, value.typeName) }
+
+    override var isSplitOmnibarSelected: Boolean
+        get() = preferences.getBoolean(KEY_SPLIT_OMNIBAR, false)
+        set(value) = preferences.edit { putBoolean(KEY_SPLIT_OMNIBAR, value) }
 
     override var isFullUrlEnabled: Boolean
         get() = preferences.getBoolean(KEY_IS_FULL_URL_ENABLED, true)
@@ -297,7 +306,8 @@ class SettingsSharedPreferences @Inject constructor(
         const val SHOW_AUTOMATIC_FIREPROOF_DIALOG = "SHOW_AUTOMATIC_FIREPROOF_DIALOG"
         const val KEY_NOTIFY_ME_IN_DOWNLOADS_DISMISSED = "KEY_NOTIFY_ME_IN_DOWNLOADS_DISMISSED"
         const val KEY_EXPERIMENTAL_SITE_DARK_MODE = "KEY_EXPERIMENTAL_SITE_DARK_MODE"
-        const val KEY_OMNIBAR_POSITION = "KEY_OMNIBAR_POSITION"
+        const val KEY_OMNIBAR_TYPE = "KEY_OMNIBAR_POSITION"
+        const val KEY_SPLIT_OMNIBAR = "KEY_SPLIT_OMNIBAR"
         const val KEY_IS_FULL_URL_ENABLED = "KEY_IS_FULL_URL_ENABLED"
         const val KEY_CLEAR_DUCK_AI_DATA = "KEY_CLEAR_DUCK_AI_DATA"
     }

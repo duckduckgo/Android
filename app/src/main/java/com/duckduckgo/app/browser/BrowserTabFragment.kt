@@ -149,6 +149,7 @@ import com.duckduckgo.app.browser.omnibar.Omnibar.LogoClickListener
 import com.duckduckgo.app.browser.omnibar.Omnibar.OmnibarTextState
 import com.duckduckgo.app.browser.omnibar.Omnibar.TextListener
 import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode
+import com.duckduckgo.app.browser.omnibar.OmnibarFeatureRepository
 import com.duckduckgo.app.browser.omnibar.OmnibarItemPressedListener
 import com.duckduckgo.app.browser.omnibar.QueryOrigin
 import com.duckduckgo.app.browser.print.PrintDocumentAdapterFactory
@@ -250,8 +251,7 @@ import com.duckduckgo.browser.api.ui.BrowserScreens.PrivateSearchScreenNoParams
 import com.duckduckgo.browser.api.ui.BrowserScreens.WebViewActivityWithParams
 import com.duckduckgo.browser.api.webviewcompat.WebViewCompatWrapper
 import com.duckduckgo.browser.ui.autocomplete.BrowserAutoCompleteSuggestionsAdapter
-import com.duckduckgo.browser.ui.omnibar.OmnibarPosition.BOTTOM
-import com.duckduckgo.browser.ui.omnibar.OmnibarPosition.TOP
+import com.duckduckgo.browser.ui.omnibar.OmnibarType
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.DuckDuckGoFragment
 import com.duckduckgo.common.ui.store.BrowserAppTheme
@@ -594,6 +594,9 @@ class BrowserTabFragment :
 
     @Inject
     lateinit var webViewCompatWrapper: WebViewCompatWrapper
+
+    @Inject
+    lateinit var omnibarFeatureRepository: OmnibarFeatureRepository
 
     /**
      * We use this to monitor whether the user was seeing the in-context Email Protection signup prompt
@@ -1016,9 +1019,9 @@ class BrowserTabFragment :
         super.onActivityCreated(savedInstanceState)
 
         omnibar = Omnibar(
-            omnibarPosition = settingsDataStore.omnibarPosition,
+            omnibarType = settingsDataStore.omnibarType,
             binding = binding,
-            isUnifiedOmnibarEnabled = androidBrowserConfigFeature.useUnifiedOmnibarLayout().isEnabled(),
+            isUnifiedOmnibarEnabled = omnibarFeatureRepository.isUnifiedOmnibarEnabled,
         )
 
         webViewContainer = binding.webViewContainer
@@ -1122,17 +1125,18 @@ class BrowserTabFragment :
     }
 
     private fun launchInputScreen(query: String) {
+        val isTopOmnibar = omnibar.omnibarType != OmnibarType.SINGLE_BOTTOM
         val intent =
             globalActivityStarter.startIntent(
                 requireContext(),
                 InputScreenActivityParams(
                     query = query,
-                    isTopOmnibar = omnibar.omnibarPosition == TOP,
+                    isTopOmnibar = isTopOmnibar,
                     browserButtonsConfig = InputScreenBrowserButtonsConfig.Enabled(tabs = viewModel.tabs.value?.size ?: 0),
                 ),
             )
-        val enterTransition = browserAndInputScreenTransitionProvider.getInputScreenEnterAnimation(omnibar.omnibarPosition == TOP)
-        val exitTransition = browserAndInputScreenTransitionProvider.getBrowserExitAnimation(omnibar.omnibarPosition == TOP)
+        val enterTransition = browserAndInputScreenTransitionProvider.getInputScreenEnterAnimation(isTopOmnibar)
+        val exitTransition = browserAndInputScreenTransitionProvider.getBrowserExitAnimation(isTopOmnibar)
         val options =
             ActivityOptionsCompat.makeCustomAnimation(
                 requireActivity(),
@@ -1278,9 +1282,9 @@ class BrowserTabFragment :
 
     private fun createPopupMenu() {
         val popupMenuResourceType =
-            when (settingsDataStore.omnibarPosition) {
-                TOP -> BrowserPopupMenu.ResourceType.TOP
-                BOTTOM -> BrowserPopupMenu.ResourceType.BOTTOM
+            when (omnibar.omnibarType) {
+                OmnibarType.SINGLE_TOP, OmnibarType.SPLIT -> BrowserPopupMenu.ResourceType.TOP
+                OmnibarType.SINGLE_BOTTOM -> BrowserPopupMenu.ResourceType.BOTTOM
             }
 
         popupMenu =
@@ -1475,8 +1479,7 @@ class BrowserTabFragment :
             return
         }
 
-        val hasOmnibarPositionChanged = viewModel.hasOmnibarPositionChanged(omnibar.omnibarPosition)
-        if (hasOmnibarPositionChanged) {
+        if (viewModel.hasOmnibarTypeChanged(omnibar.omnibarType)) {
             viewModel.resetTrackersCount()
             if (swipingTabsFeature.isEnabled && requireActivity() is BrowserActivity) {
                 (requireActivity() as BrowserActivity).clearTabsAndRecreate()
@@ -2935,7 +2938,7 @@ class BrowserTabFragment :
                 autoCompleteLongPressClickListener = {
                     viewModel.userLongPressedAutocomplete(it)
                 },
-                omnibarPosition = settingsDataStore.omnibarPosition,
+                omnibarType = settingsDataStore.omnibarType,
             )
         binding.autoCompleteSuggestionsList.adapter = autoCompleteSuggestionsAdapter
     }

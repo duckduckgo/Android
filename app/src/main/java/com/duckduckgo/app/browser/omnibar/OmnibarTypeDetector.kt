@@ -25,15 +25,15 @@ import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.SingleInstanceIn
 import javax.inject.Inject
 
-interface OmnibarPositionReporterPlugin
+interface OmnibarTypeReporterPlugin
 
 @ContributesMultibinding(scope = AppScope::class, boundType = BrowserFeatureStateReporterPlugin::class)
-@ContributesBinding(scope = AppScope::class, boundType = OmnibarPositionReporterPlugin::class)
+@ContributesBinding(scope = AppScope::class, boundType = OmnibarTypeReporterPlugin::class)
 @SingleInstanceIn(AppScope::class)
-class OmnibarPositionDetector @Inject constructor(
+class OmnibarTypeDetector @Inject constructor(
     private val settingsDataStore: SettingsDataStore,
-) : OmnibarPositionReporterPlugin, BrowserFeatureStateReporterPlugin {
+) : OmnibarTypeReporterPlugin, BrowserFeatureStateReporterPlugin {
     override fun featureStateParams(): Map<String, String> {
-        return mapOf(PixelParameter.ADDRESS_BAR to settingsDataStore.omnibarPosition.name)
+        return mapOf(PixelParameter.ADDRESS_BAR to settingsDataStore.omnibarType.typeName)
     }
 }
