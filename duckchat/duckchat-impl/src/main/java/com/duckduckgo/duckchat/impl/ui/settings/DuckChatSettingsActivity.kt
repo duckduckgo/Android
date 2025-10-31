@@ -27,6 +27,8 @@ import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.core.view.updatePadding
 import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
@@ -41,13 +43,16 @@ import com.duckduckgo.common.ui.store.AppTheme
 import com.duckduckgo.common.ui.view.addClickableSpan
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.duckchat.api.DuckChatNativeSettingsNoParams
 import com.duckduckgo.duckchat.api.DuckChatSettingsNoParams
 import com.duckduckgo.duckchat.impl.R
 import com.duckduckgo.duckchat.impl.databinding.ActivityDuckChatSettingsBinding
 import com.duckduckgo.duckchat.impl.inputscreen.ui.metrics.discovery.InputScreenDiscoveryFunnel
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_SETTINGS_DISPLAYED
+import com.duckduckgo.duckchat.impl.ui.settings.DuckChatSettingsViewModel.DuckChatSettingsViewModelFactory
 import com.duckduckgo.duckchat.impl.ui.settings.DuckChatSettingsViewModel.ViewState
 import com.duckduckgo.navigation.api.GlobalActivityStarter
+import com.duckduckgo.navigation.api.getActivityParams
 import com.duckduckgo.settings.api.SettingsPageFeature
 import com.duckduckgo.settings.api.SettingsWebViewScreenWithParams
 import kotlinx.coroutines.flow.launchIn
@@ -57,9 +62,18 @@ import com.duckduckgo.mobile.android.R as CommonR
 
 @InjectWith(ActivityScope::class)
 @ContributeToActivityStarter(DuckChatSettingsNoParams::class, screenName = "duckai.settings")
+@ContributeToActivityStarter(DuckChatNativeSettingsNoParams::class, screenName = "duckai.settings")
 class DuckChatSettingsActivity : DuckDuckGoActivity() {
-    private val viewModel: DuckChatSettingsViewModel by bindViewModel()
+
+    @Inject
+    lateinit var duckChatSettingsViewModelFactory: DuckChatSettingsViewModelFactory
+
     private val binding: ActivityDuckChatSettingsBinding by viewBinding()
+
+    private val viewModel by lazy {
+        val activityParams = intent.getActivityParams(GlobalActivityStarter.ActivityParams::class.java)!!
+        duckChatSettingsViewModel(activityParams)
+    }
 
     private val userEnabledDuckChatToggleListener =
         CompoundButton.OnCheckedChangeListener { _, isChecked ->
@@ -283,4 +297,13 @@ class DuckChatSettingsActivity : DuckDuckGoActivity() {
         val intent = Intent(AppWidgetManager.ACTION_APPWIDGET_UPDATE)
         sendBroadcast(intent)
     }
+
+    private fun duckChatSettingsViewModel(activityParams: GlobalActivityStarter.ActivityParams): DuckChatSettingsViewModel = ViewModelProvider.create(
+        store = viewModelStore,
+        factory = object : ViewModelProvider.Factory {
+            @Suppress("UNCHECKED_CAST")
+            override fun <T : ViewModel> create(modelClass: Class<T>) = duckChatSettingsViewModelFactory.create(activityParams) as T
+        },
+        extras = this.defaultViewModelCreationExtras,
+    )[DuckChatSettingsViewModel::class.java]
 }
