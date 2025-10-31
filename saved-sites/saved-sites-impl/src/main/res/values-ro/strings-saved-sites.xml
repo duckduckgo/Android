@@ -114,4 +114,11 @@
     <string name="deleteBookmarkFolderConfirmationDialogDescription" instruction="Placeholder is the name of the favorite site">Aceasta va șterge folderul tău de marcaje &lt;b&gt;%1$s&lt;/b&gt;.</string>
     <string name="deleteSavedSiteConfirmationDialogCancel">Anulare</string>
     <string name="deleteSavedSiteConfirmationDialogDelete">Ștergere</string>
+
+    <!-- Bookmark Import -->
+    <string name="importBookmarksFromGooglePreImportDialogTitle">Importă marcajele din Google</string>
+    <string name="importBookmarksFromGooglePreImportDialogInstruction">Google îți poate solicita să te conectezi sau să completezi parola pentru a confirma.</string>
+    <string name="importBookmarksFromGooglePreImportDialogImportButton">Importă din Google</string>
+    <string name="importBookmarksFromGooglePreImportDialogSelectFileButton">Selectează fișierul cu marcaje...</string>
+    <string name="bookmarksImportDialogClose">Închidere</string>
 </resources>

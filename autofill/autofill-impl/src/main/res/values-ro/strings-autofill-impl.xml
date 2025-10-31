@@ -295,4 +295,27 @@
     <string name="passwords_import_promo_in_settings_title">Importă parole de la Google</string>
     <string name="passwords_import_promo_in_settings_dismiss_text">Ascunde</string>
 
+    <!-- Import Bookmarks Strings -->
+    <string name="importToDuckDuckGo">Importă în DuckDuckGo</string>
+    <string name="importBookmarksFromGoogleChromeFolderName">Importat din Chrome</string>
+    <string name="importBookmarksFromGooglePreImportDialogTitle">Importă marcajele din Google</string>
+    <string name="importBookmarksFromGooglePreImportDialogInstruction">Google îți poate solicita să te conectezi sau să completezi parola pentru a confirma.</string>
+    <string name="importBookmarksFromGooglePreImportDialogImportButton">Importă din Google</string>
+    <string name="importBookmarksFromGooglePreImportDialogSelectFileButton">Selectează fișierul cu marcaje...</string>
+    <string name="importBookmarksFromGoogleWebFlowTitle">Importă marcaje</string>
+    <string name="importBookmarksProgressTitle">Se importă din Google…</string>
+    <string name="importBookmarksProgressSubtitle">Ține acest ecran deschis și așteaptă – nu ar trebui să dureze mai mult de un minut sau două.</string>
+    <string name="importBookmarksProgressInfoMessage1">Google îți poate solicita să te conectezi sau să completezi parola pentru a confirma.</string>
+    <string name="importBookmarksProgressInfoMessage2">Google îți poate trimite un e-mail confirmând că marcajele tale sunt exportate.</string>
+    <string name="importBookmarksFromGoogleCancelConfirmationDialogTitle">Dorești să anulezi importul?</string>
+    <string name="importBookmarksFromGoogleCancelConfirmationDialogMessage">Marcajele tale nu vor fi importate dacă anulezi acum.</string>
+    <string name="importBookmarksFromGoogleCancelConfirmationDialogCancelImport">Anulează importul</string>
+    <string name="importBookmarksFromGoogleCancelConfirmationDialogContinue">Continuă</string>
+    <string name="importBookmarksFromGoogleSuccessBookmarksCount" instruction="Placeholder is the number of bookmarks that were imported">Marcaje: %1$d</string>
+    <string name="importBookmarksSuccessTitle">@string/importToDuckDuckGo</string>
+    <string name="importBookmarksFinalDoneButton">Închidere</string>
+    <string name="importBookmarksErrorTitle">@string/importToDuckDuckGo</string>
+    <string name="importBookmarksErrorGenericMessage">Ceva nu a funcționat corect</string>
+    <string name="importBookmarksErrorGenericMessageSecondary">Asigură-te că ești conectat la internet și încearcă din nou.</string>
+
 </resources>

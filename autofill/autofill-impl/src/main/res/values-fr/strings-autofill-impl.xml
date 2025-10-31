@@ -289,4 +289,27 @@
     <string name="passwords_import_promo_in_settings_title">Importer des mots de passe depuis Google</string>
     <string name="passwords_import_promo_in_settings_dismiss_text">Masquer</string>
 
+    <!-- Import Bookmarks Strings -->
+    <string name="importToDuckDuckGo">Importer dans DuckDuckGo</string>
+    <string name="importBookmarksFromGoogleChromeFolderName">Importé depuis Chrome</string>
+    <string name="importBookmarksFromGooglePreImportDialogTitle">Importer des signets depuis Google</string>
+    <string name="importBookmarksFromGooglePreImportDialogInstruction">Google peut vous demander de vous connecter ou de saisir votre mot de passe pour confirmer.</string>
+    <string name="importBookmarksFromGooglePreImportDialogImportButton">Importer depuis Google</string>
+    <string name="importBookmarksFromGooglePreImportDialogSelectFileButton">Sélectionner le fichier de signets…</string>
+    <string name="importBookmarksFromGoogleWebFlowTitle">Importer des favoris</string>
+    <string name="importBookmarksProgressTitle">Importation depuis Google…</string>
+    <string name="importBookmarksProgressSubtitle">Restez sur cet écran et patientez ; cela ne devrait pas prendre plus d\'une minute ou deux.</string>
+    <string name="importBookmarksProgressInfoMessage1">Google peut vous demander de vous connecter ou de saisir votre mot de passe pour confirmer.</string>
+    <string name="importBookmarksProgressInfoMessage2">Il se peut que Google vous envoie un e-mail confirmant que vos signets sont en cours d\'exportation.</string>
+    <string name="importBookmarksFromGoogleCancelConfirmationDialogTitle">Annuler l\'importation ?</string>
+    <string name="importBookmarksFromGoogleCancelConfirmationDialogMessage">Vos signets ne seront pas importés si vous annulez maintenant.</string>
+    <string name="importBookmarksFromGoogleCancelConfirmationDialogCancelImport">Annuler l\'importation</string>
+    <string name="importBookmarksFromGoogleCancelConfirmationDialogContinue">Continuer</string>
+    <string name="importBookmarksFromGoogleSuccessBookmarksCount" instruction="Placeholder is the number of bookmarks that were imported">Signets : %1$d</string>
+    <string name="importBookmarksSuccessTitle">@string/importToDuckDuckGo</string>
+    <string name="importBookmarksFinalDoneButton">Fermer</string>
+    <string name="importBookmarksErrorTitle">@string/importToDuckDuckGo</string>
+    <string name="importBookmarksErrorGenericMessage">Une erreur s\'est produite</string>
+    <string name="importBookmarksErrorGenericMessageSecondary">Veuillez vérifier votre connexion à Internet puis réessayer.</string>
+
 </resources>

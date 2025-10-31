@@ -301,4 +301,27 @@
     <string name="passwords_import_promo_in_settings_title">Importuok slaptažodžius iš „Google“</string>
     <string name="passwords_import_promo_in_settings_dismiss_text">Slėpti</string>
 
+    <!-- Import Bookmarks Strings -->
+    <string name="importToDuckDuckGo">Importuoti į „DuckDuckGo“</string>
+    <string name="importBookmarksFromGoogleChromeFolderName">Importuota iš „Chrome“</string>
+    <string name="importBookmarksFromGooglePreImportDialogTitle">Importuoti žymes iš „Google“</string>
+    <string name="importBookmarksFromGooglePreImportDialogInstruction">„Google“ gali paprašyti tavęs prisijungti arba įvesti slaptažodį patvirtinimui.</string>
+    <string name="importBookmarksFromGooglePreImportDialogImportButton">Importuok iš „Google“</string>
+    <string name="importBookmarksFromGooglePreImportDialogSelectFileButton">Pasirinkite žymių failą…</string>
+    <string name="importBookmarksFromGoogleWebFlowTitle">Importuoti žymes</string>
+    <string name="importBookmarksProgressTitle">Importuojama iš „Google“…</string>
+    <string name="importBookmarksProgressSubtitle">Palikite šį ekraną atidarytą ir luktelėkite – tai neturėtų užtrukti ilgiau nei porą minučių.</string>
+    <string name="importBookmarksProgressInfoMessage1">„Google“ gali paprašyti tavęs prisijungti arba įvesti slaptažodį patvirtinimui.</string>
+    <string name="importBookmarksProgressInfoMessage2">„Google“ gali atsiųsti jums el. laišką, patvirtinantį, kad jūsų žymės eksportuojamos.</string>
+    <string name="importBookmarksFromGoogleCancelConfirmationDialogTitle">Atšaukti importavimą?</string>
+    <string name="importBookmarksFromGoogleCancelConfirmationDialogMessage">Jūsų žymės nebus importuotos, jei atšauksite dabar.</string>
+    <string name="importBookmarksFromGoogleCancelConfirmationDialogCancelImport">Atšaukti importavimą</string>
+    <string name="importBookmarksFromGoogleCancelConfirmationDialogContinue">Tęsti</string>
+    <string name="importBookmarksFromGoogleSuccessBookmarksCount" instruction="Placeholder is the number of bookmarks that were imported">Žymės: %1$d</string>
+    <string name="importBookmarksSuccessTitle">@string/importToDuckDuckGo</string>
+    <string name="importBookmarksFinalDoneButton">Uždaryti</string>
+    <string name="importBookmarksErrorTitle">@string/importToDuckDuckGo</string>
+    <string name="importBookmarksErrorGenericMessage">Įvyko klaida</string>
+    <string name="importBookmarksErrorGenericMessageSecondary">Įsitikinkite, kad esate prisijungę prie interneto, ir bandykite dar kartą.</string>
+
 </resources>

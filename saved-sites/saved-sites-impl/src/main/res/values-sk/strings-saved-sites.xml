@@ -118,4 +118,11 @@
     <string name="deleteBookmarkFolderConfirmationDialogDescription" instruction="Placeholder is the name of the favorite site">Týmto sa zmaže priečinok so záložkami &lt;b&gt;%1$s&lt;/b&gt; .</string>
     <string name="deleteSavedSiteConfirmationDialogCancel">Zrušiť</string>
     <string name="deleteSavedSiteConfirmationDialogDelete">Odstrániť</string>
+
+    <!-- Bookmark Import -->
+    <string name="importBookmarksFromGooglePreImportDialogTitle">Importovať záložky z Google</string>
+    <string name="importBookmarksFromGooglePreImportDialogInstruction">Google vás môže požiadať, aby ste sa prihlásili alebo zadali svoje heslo na potvrdenie.</string>
+    <string name="importBookmarksFromGooglePreImportDialogImportButton">Importovať z Google</string>
+    <string name="importBookmarksFromGooglePreImportDialogSelectFileButton">Vyber súbor záložiek…</string>
+    <string name="bookmarksImportDialogClose">Zatvoriť</string>
 </resources>

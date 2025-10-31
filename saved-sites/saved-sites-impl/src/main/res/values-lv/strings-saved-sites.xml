@@ -114,4 +114,11 @@
     <string name="deleteBookmarkFolderConfirmationDialogDescription" instruction="Placeholder is the name of the favorite site">Tādējādi tiks dzēsta tava &lt;b&gt;%1$s&lt;/b&gt; grāmatzīmju mape.</string>
     <string name="deleteSavedSiteConfirmationDialogCancel">Atcelt</string>
     <string name="deleteSavedSiteConfirmationDialogDelete">Dzēst</string>
+
+    <!-- Bookmark Import -->
+    <string name="importBookmarksFromGooglePreImportDialogTitle">Importēt Google grāmatzīmes</string>
+    <string name="importBookmarksFromGooglePreImportDialogInstruction">Google var lūgt tevi pierakstīties vai ievadīt paroli, lai apstiprinātu.</string>
+    <string name="importBookmarksFromGooglePreImportDialogImportButton">Importēt no Google</string>
+    <string name="importBookmarksFromGooglePreImportDialogSelectFileButton">Izvēlies grāmatzīmju failu…</string>
+    <string name="bookmarksImportDialogClose">Aizvērt</string>
 </resources>

@@ -110,4 +110,11 @@
     <string name="deleteBookmarkFolderConfirmationDialogDescription" instruction="Placeholder is the name of the favorite site">Esto eliminará la carpeta de marcadores &lt;b&gt;%1$s&lt;/b&gt;.</string>
     <string name="deleteSavedSiteConfirmationDialogCancel">Cancelar</string>
     <string name="deleteSavedSiteConfirmationDialogDelete">Eliminar</string>
+
+    <!-- Bookmark Import -->
+    <string name="importBookmarksFromGooglePreImportDialogTitle">Importa marcadores desde Google</string>
+    <string name="importBookmarksFromGooglePreImportDialogInstruction">Google puede pedirte que inicies sesión o introduzcas tu contraseña para confirmar.</string>
+    <string name="importBookmarksFromGooglePreImportDialogImportButton">Importar desde Google</string>
+    <string name="importBookmarksFromGooglePreImportDialogSelectFileButton">Seleccionar Archivo de marcadores…</string>
+    <string name="bookmarksImportDialogClose">Cerrar</string>
 </resources>

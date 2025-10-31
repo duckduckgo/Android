@@ -118,4 +118,11 @@
     <string name="deleteBookmarkFolderConfirmationDialogDescription" instruction="Placeholder is the name of the favorite site">Ovo će izbrisati tvoju mapu knjižnih oznaka: &lt;b&gt;%1$s&lt;/b&gt;.</string>
     <string name="deleteSavedSiteConfirmationDialogCancel">Odustani</string>
     <string name="deleteSavedSiteConfirmationDialogDelete">Izbriši</string>
+
+    <!-- Bookmark Import -->
+    <string name="importBookmarksFromGooglePreImportDialogTitle">Uvezi knjižne oznake iz Googlea</string>
+    <string name="importBookmarksFromGooglePreImportDialogInstruction">Google te može tražiti da se prijaviš ili uneseš svoju lozinku za potvrdu.</string>
+    <string name="importBookmarksFromGooglePreImportDialogImportButton">Uvezi s Googlea</string>
+    <string name="importBookmarksFromGooglePreImportDialogSelectFileButton">Odaberi datoteku knjižnih oznaka…</string>
+    <string name="bookmarksImportDialogClose">Zatvori</string>
 </resources>

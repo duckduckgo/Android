@@ -118,4 +118,11 @@
     <string name="deleteBookmarkFolderConfirmationDialogDescription" instruction="Placeholder is the name of the favorite site">Папка &lt;b&gt;«%1$s»&lt;/b&gt; будет удалена.</string>
     <string name="deleteSavedSiteConfirmationDialogCancel">Отменить</string>
     <string name="deleteSavedSiteConfirmationDialogDelete">Удалить</string>
+
+    <!-- Bookmark Import -->
+    <string name="importBookmarksFromGooglePreImportDialogTitle">Импортировать закладки из Google</string>
+    <string name="importBookmarksFromGooglePreImportDialogInstruction">Google может попросить вас войти в систему или ввести пароль для подтверждения.</string>
+    <string name="importBookmarksFromGooglePreImportDialogImportButton">Импортировать из Google</string>
+    <string name="importBookmarksFromGooglePreImportDialogSelectFileButton">Выберите файл закладок…</string>
+    <string name="bookmarksImportDialogClose">Закрыть</string>
 </resources>

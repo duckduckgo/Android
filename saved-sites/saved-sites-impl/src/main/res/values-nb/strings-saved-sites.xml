@@ -110,4 +110,11 @@
     <string name="deleteBookmarkFolderConfirmationDialogDescription" instruction="Placeholder is the name of the favorite site">Dette sletter bokmerkemappen for &lt;b&gt;%1$s&lt;/b&gt; .</string>
     <string name="deleteSavedSiteConfirmationDialogCancel">Avbryt</string>
     <string name="deleteSavedSiteConfirmationDialogDelete">Slett</string>
+
+    <!-- Bookmark Import -->
+    <string name="importBookmarksFromGooglePreImportDialogTitle">Importer bokmerker fra Google</string>
+    <string name="importBookmarksFromGooglePreImportDialogInstruction">Google kan be deg om å logge inn eller skrive inn passordet ditt for å bekrefte.</string>
+    <string name="importBookmarksFromGooglePreImportDialogImportButton">Importer fra Google</string>
+    <string name="importBookmarksFromGooglePreImportDialogSelectFileButton">Velg bokmerkefil…</string>
+    <string name="bookmarksImportDialogClose">Lukk</string>
 </resources>
