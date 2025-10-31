@@ -144,6 +144,7 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     SETTINGS_ADDRESS_BAR_POSITION_PRESSED("ms_address_bar_position_setting_pressed"),
     SETTINGS_ADDRESS_BAR_POSITION_SELECTED_TOP("ms_address_bar_position_setting_selected_top"),
     SETTINGS_ADDRESS_BAR_POSITION_SELECTED_BOTTOM("ms_address_bar_position_setting_selected_bottom"),
+    SETTINGS_ADDRESS_BAR_POSITION_SELECTED_SPLIT_TOP("ms_address_bar_position_setting_selected_split_top"),
     SETTINGS_NEXT_STEPS_ADDRESS_BAR("m_settings_next_steps_set_address_bar"),
     SETTINGS_NEXT_STEPS_VOICE_SEARCH("m_settings_next_steps_enable_voice_search"),
     SETTINGS_MAC_APP_PRESSED("ms_mac_app_setting_pressed"),

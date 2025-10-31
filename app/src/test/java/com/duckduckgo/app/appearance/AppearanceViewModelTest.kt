@@ -27,8 +27,7 @@ import com.duckduckgo.app.settings.clear.FireAnimation
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.tabs.store.TabSwitcherDataStore
-import com.duckduckgo.browser.ui.omnibar.OmnibarPosition.BOTTOM
-import com.duckduckgo.browser.ui.omnibar.OmnibarPosition.TOP
+import com.duckduckgo.browser.ui.omnibar.OmnibarType
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.ui.DuckDuckGoTheme
 import com.duckduckgo.common.ui.store.AppTheme
@@ -80,9 +79,13 @@ internal class AppearanceViewModelTest {
         whenever(mockAppSettingsDataStore.appIcon).thenReturn(AppIcon.DEFAULT)
         whenever(mockThemeSettingsDataStore.theme).thenReturn(DuckDuckGoTheme.SYSTEM_DEFAULT)
         whenever(mockAppSettingsDataStore.selectedFireAnimation).thenReturn(FireAnimation.HeroFire)
-        whenever(mockAppSettingsDataStore.omnibarPosition).thenReturn(TOP)
+        whenever(mockAppSettingsDataStore.omnibarType).thenReturn(OmnibarType.SINGLE_TOP)
         whenever(mockTabSwitcherDataStore.isTrackersAnimationInfoTileHidden()).thenReturn(flowOf(false))
 
+        initializeViewModel()
+    }
+
+    private fun initializeViewModel() {
         testee =
             AppearanceViewModel(
                 mockThemeSettingsDataStore,
@@ -118,7 +121,7 @@ internal class AppearanceViewModelTest {
             testee.commands().test {
                 testee.userRequestedToChangeTheme()
 
-                assertEquals(Command.LaunchThemeSettings(DuckDuckGoTheme.LIGHT), awaitItem())
+                assertEquals(Command.LaunchThemeSettings(DuckDuckGoTheme.SYSTEM_DEFAULT), awaitItem())
 
                 cancelAndIgnoreRemainingEvents()
             }
@@ -140,8 +143,8 @@ internal class AppearanceViewModelTest {
     @Test
     fun whenThemeChangedThenDataStoreIsUpdatedAndUpdateThemeCommandIsSent() =
         runTest {
+            givenThemeSelected(DuckDuckGoTheme.LIGHT)
             testee.commands().test {
-                givenThemeSelected(DuckDuckGoTheme.LIGHT)
                 testee.onThemeSelected(DuckDuckGoTheme.DARK)
 
                 verify(mockThemeSettingsDataStore).theme = DuckDuckGoTheme.DARK
@@ -210,7 +213,7 @@ internal class AppearanceViewModelTest {
         runTest {
             testee.commands().test {
                 testee.userRequestedToChangeAddressBarPosition()
-                assertEquals(Command.LaunchOmnibarPositionSettings(TOP), awaitItem())
+                assertEquals(Command.LaunchOmnibarTypeSettings(OmnibarType.SINGLE_TOP), awaitItem())
                 verify(mockPixel).fire(AppPixelName.SETTINGS_ADDRESS_BAR_POSITION_PRESSED)
             }
         }
@@ -218,16 +221,16 @@ internal class AppearanceViewModelTest {
     @Test
     fun whenOmnibarPositionUpdatedToBottom() =
         runTest {
-            testee.onOmnibarPositionUpdated(BOTTOM)
-            verify(mockAppSettingsDataStore).omnibarPosition = BOTTOM
+            testee.setOmnibarType(OmnibarType.SINGLE_BOTTOM)
+            verify(mockAppSettingsDataStore).omnibarType = OmnibarType.SINGLE_BOTTOM
             verify(mockPixel).fire(AppPixelName.SETTINGS_ADDRESS_BAR_POSITION_SELECTED_BOTTOM)
         }
 
     @Test
     fun whenOmnibarPositionUpdatedToTop() =
         runTest {
-            testee.onOmnibarPositionUpdated(TOP)
-            verify(mockAppSettingsDataStore).omnibarPosition = TOP
+            testee.setOmnibarType(OmnibarType.SINGLE_TOP)
+            verify(mockAppSettingsDataStore).omnibarType = OmnibarType.SINGLE_TOP
             verify(mockPixel).fire(AppPixelName.SETTINGS_ADDRESS_BAR_POSITION_SELECTED_TOP)
         }
 
@@ -297,6 +300,8 @@ internal class AppearanceViewModelTest {
             whenever(mockThemeSettingsDataStore.theme).thenReturn(DuckDuckGoTheme.LIGHT)
             whenever(mockAppTheme.isLightModeEnabled()).thenReturn(true)
 
+            initializeViewModel()
+
             testee.viewState().test {
                 val value = expectMostRecentItem()
 
@@ -311,5 +316,6 @@ internal class AppearanceViewModelTest {
     private fun givenThemeSelected(theme: DuckDuckGoTheme) {
         whenever(mockThemeSettingsDataStore.theme).thenReturn(theme)
         whenever(mockThemeSettingsDataStore.isCurrentlySelected(theme)).thenReturn(true)
+        initializeViewModel()
     }
 }

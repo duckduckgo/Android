@@ -162,6 +162,7 @@
 
     <string name="feedbackSubmitGeneralDescriptionHint">Palun anna meile tagasisidet...</string>
     <string name="feedbackSubmitFeatureRequestDescriptionHint">Millist funktsiooni soovid näha?</string>
+    <string name="feedbackSubmitContactSupport">Kas vajad abi? <annotation type="support_link">Võta ühendust tugiteenusega</annotation>.</string>
 
     <!-- Activity titles -->
     <string name="activitySubscriptions">Tellimused</string>

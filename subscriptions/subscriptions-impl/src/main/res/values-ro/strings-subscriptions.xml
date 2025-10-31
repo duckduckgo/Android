@@ -162,6 +162,7 @@
 
     <string name="feedbackSubmitGeneralDescriptionHint">Te rugăm să ne comunici feedbackul tău...</string>
     <string name="feedbackSubmitFeatureRequestDescriptionHint">Ce caracteristică ai dori să vezi?</string>
+    <string name="feedbackSubmitContactSupport">Ai nevoie de ajutor? <annotation type="support_link">Contactează Serviciul de asistență</annotation>.</string>
 
     <!-- Activity titles -->
     <string name="activitySubscriptions">Abonamente</string>

@@ -182,11 +182,9 @@ interface AndroidBrowserConfigFeature {
     fun vpnMenuItem(): Toggle
 
     @Toggle.DefaultValue(TRUE)
-    fun updateScriptOnPageFinished(): Toggle
-
-    @Toggle.DefaultValue(TRUE)
-    fun updateScriptOnProtectionsChanged(): Toggle
+    fun useUnifiedOmnibarLayout(): Toggle
 
     @Toggle.DefaultValue(FALSE)
-    fun stopLoadingBeforeUpdatingScript(): Toggle
+    @Toggle.InternalAlwaysEnabled
+    fun splitOmnibar(): Toggle
 }

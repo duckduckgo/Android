@@ -110,4 +110,11 @@
     <string name="deleteBookmarkFolderConfirmationDialogDescription" instruction="Placeholder is the name of the favorite site">Тази операция ще изтрие папката с отметки &lt;b&gt;%1$s&lt;/b&gt;.</string>
     <string name="deleteSavedSiteConfirmationDialogCancel">Отмени</string>
     <string name="deleteSavedSiteConfirmationDialogDelete">Изтрий</string>
+
+    <!-- Bookmark Import -->
+    <string name="importBookmarksFromGooglePreImportDialogTitle">Импортирай отметки от Google</string>
+    <string name="importBookmarksFromGooglePreImportDialogInstruction">Google може да ви помоли да влезете или да въведете паролата си, за да потвърдите.</string>
+    <string name="importBookmarksFromGooglePreImportDialogImportButton">Импортиране от Google</string>
+    <string name="importBookmarksFromGooglePreImportDialogSelectFileButton">Избери файл с отметки...</string>
+    <string name="bookmarksImportDialogClose">Затваряне</string>
 </resources>

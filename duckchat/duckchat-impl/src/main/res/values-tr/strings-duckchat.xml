@@ -69,9 +69,8 @@
     <string name="autocompleteDeviceAppNotFound">Uygulama bulunamadı</string>
 
     <!-- New Address Bar Option Bottom Sheet Dialog -->
+    <string name="newAddressBarOptionBottomSheetDialogTitle">Gizli AI sohbetine daha kolay erişmek ister misiniz?</string>
     <string name="newAddressBarOptionBottomSheetDialogSearchText">Adres ara veya gir</string>
-    <string name="newAddressBarOptionBottomSheetDialogTitle">Arama ve AI sohbeti arasında geçiş yapın</string>
-    <string name="newAddressBarOptionBottomSheetDialogSubTitle">Yapay zeka özellikleri her zaman isteğe bağlıdır.</string>
     <string name="newAddressBarOptionBottomSheetDialogPrimaryButton">Onayla</string>
     <string name="newAddressBarOptionBottomSheetDialogGhostButton">Şimdi Değil</string>
     <string name="newAddressBarOptionBottomSheetDialogFooter">Ayarlar &gt; AI Özellikleri bölümünden ayarlarınızı değiştirebilirsiniz.</string>

@@ -29,6 +29,7 @@ import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.common.utils.extensions.safeGetInstalledApplications
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository
 import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
@@ -113,7 +114,7 @@ class ExceptionRulesDebugActivity : DuckDuckGoActivity(), RuleTrackerView.RuleTr
     }
 
     private fun getAppTrackers(): List<InstalledAppTrackers> {
-        return packageManager.getInstalledApplications(PackageManager.GET_META_DATA)
+        return packageManager.safeGetInstalledApplications(this.applicationContext)
             .asSequence()
             .map { InstalledApp(it.packageName, packageManager.getApplicationLabel(it).toString()) }
             .map {

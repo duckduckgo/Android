@@ -69,9 +69,8 @@
     <string name="autocompleteDeviceAppNotFound">Toepassing kon niet worden gevonden</string>
 
     <!-- New Address Bar Option Bottom Sheet Dialog -->
+    <string name="newAddressBarOptionBottomSheetDialogTitle">Wil je eenvoudiger toegang\ntot privé AI-chat?</string>
     <string name="newAddressBarOptionBottomSheetDialogSearchText">Zoek of voer een adres in</string>
-    <string name="newAddressBarOptionBottomSheetDialogTitle">Schakelen tussen zoeken en AI-chat</string>
-    <string name="newAddressBarOptionBottomSheetDialogSubTitle">AI-functies zijn altijd optioneel.</string>
     <string name="newAddressBarOptionBottomSheetDialogPrimaryButton">Bevestigen</string>
     <string name="newAddressBarOptionBottomSheetDialogGhostButton">Niet nu</string>
     <string name="newAddressBarOptionBottomSheetDialogFooter">Aanpassen in Instellingen &gt; AI-functies</string>

@@ -30,6 +30,7 @@ import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.experiments.api.VariantManager
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle.State
+import com.duckduckgo.settings.api.SettingsPageFeature
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
@@ -46,6 +47,7 @@ class DuckDuckGoRequestRewriterTest {
     private val mockVariantManager: VariantManager = mock()
     private val mockAppReferrerDataStore: AppReferrerDataStore = mock()
     private val duckChat: DuckChat = mock()
+    private val settingsPageFeature: SettingsPageFeature = FakeFeatureToggleFactory.create(SettingsPageFeature::class.java)
     private val androidBrowserConfigFeature: AndroidBrowserConfigFeature = FakeFeatureToggleFactory.create(AndroidBrowserConfigFeature::class.java)
     private lateinit var builder: Uri.Builder
 
@@ -64,6 +66,7 @@ class DuckDuckGoRequestRewriterTest {
             mockAppReferrerDataStore,
             duckChat,
             androidBrowserConfigFeature,
+            settingsPageFeature,
         )
         builder = Uri.Builder()
     }
@@ -146,6 +149,18 @@ class DuckDuckGoRequestRewriterTest {
     fun whenDuckAiIsEnabledAndKillSwitchedThenDoNotHideSerpDuckChat() {
         whenever(duckChat.isEnabled()).thenReturn(true)
         androidBrowserConfigFeature.hideDuckAiInSerpKillSwitch().setRawStoredState(State(false))
+        testee.addCustomQueryParams(builder)
+
+        val uri = builder.build()
+        assertFalse(uri.queryParameterNames.contains(ParamKey.HIDE_DUCK_AI))
+    }
+
+    @Test
+    fun whenSerpSettingsSyncIsEnabledThenDoNotHideDuckAi() {
+        settingsPageFeature.serpSettingsSync().setRawStoredState(State(true))
+        whenever(duckChat.isEnabled()).thenReturn(false)
+        androidBrowserConfigFeature.hideDuckAiInSerpKillSwitch().setRawStoredState(State(true))
+
         testee.addCustomQueryParams(builder)
 
         val uri = builder.build()

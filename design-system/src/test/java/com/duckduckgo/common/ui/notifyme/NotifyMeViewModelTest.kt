@@ -47,10 +47,11 @@ class NotifyMeViewModelTest {
 
     private val mockAppBuildConfig = mock<AppBuildConfig>()
     private val mockNotifyMeDataStore = mock<NotifyMeDataStore>()
+    private val mockNotifyMeListener = mock<NotifyMeListener>()
     private val mockLifecycleOwner = mock<LifecycleOwner>()
 
     private val testee: NotifyMeViewModel by lazy {
-        NotifyMeViewModel(mockAppBuildConfig, mockNotifyMeDataStore)
+        NotifyMeViewModel(mockAppBuildConfig, mockNotifyMeDataStore, mockNotifyMeListener)
     }
 
     @Before
@@ -193,6 +194,7 @@ class NotifyMeViewModelTest {
                 awaitItem(),
             )
         }
+        verify(mockNotifyMeListener).onNotifyMeButtonClicked()
     }
 
     @Test

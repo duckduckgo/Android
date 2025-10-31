@@ -25,16 +25,21 @@ import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.systemsearch.SystemSearchActivity
+import com.duckduckgo.common.test.CoroutineTestRule
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 
 class DataClearerForegroundAppRestartPixelTest {
 
+    @get:Rule
+    val coroutineTestRule: CoroutineTestRule = CoroutineTestRule()
+
     private val context = InstrumentationRegistry.getInstrumentation().targetContext
     private val pixel = mock<Pixel>()
-    private val testee = DataClearerForegroundAppRestartPixel(context, pixel)
+    private val testee = DataClearerForegroundAppRestartPixel(context, pixel, coroutineTestRule.testScope, coroutineTestRule.testDispatcherProvider)
 
     @Before
     fun setUp() {

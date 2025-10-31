@@ -162,6 +162,7 @@
 
     <string name="feedbackSubmitGeneralDescriptionHint">Prosím, daj nám svoju spätnú väzbu...</string>
     <string name="feedbackSubmitFeatureRequestDescriptionHint">Akú funkciu by si chcel/-a?</string>
+    <string name="feedbackSubmitContactSupport">Potrebuješ pomoc? <annotation type="support_link">Kontaktuj podporu</annotation>.</string>
 
     <!-- Activity titles -->
     <string name="activitySubscriptions">Predplatné</string>

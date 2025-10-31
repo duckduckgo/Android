@@ -14,9 +14,15 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.browser.ui.omnibar
+package com.duckduckgo.app.notificationpromptexperiment
 
-enum class OmnibarPosition {
-    TOP,
-    BOTTOM,
+import com.duckduckgo.common.ui.notifyme.NotifyMeListener
+
+class NotifyMeListenerImpl(
+    private val notificationPromptExperimentManager: NotificationPromptExperimentManager,
+) : NotifyMeListener {
+
+    override suspend fun onNotifyMeButtonClicked() {
+        notificationPromptExperimentManager.fireNotifyMeClickedLater()
+    }
 }

@@ -32,6 +32,7 @@ import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.js.messaging.api.JsMessaging
 import com.duckduckgo.navigation.api.getActivityParams
+import com.duckduckgo.settings.api.SettingsPageFeature
 import com.duckduckgo.settings.api.SettingsWebViewScreenWithParams
 import com.duckduckgo.settings.impl.databinding.ActivitySettingsWebviewBinding
 import kotlinx.coroutines.flow.launchIn
@@ -51,6 +52,12 @@ class SettingsWebViewActivity : DuckDuckGoActivity() {
     @Inject
     @Named("ContentScopeScripts")
     lateinit var contentScopeScripts: JsMessaging
+
+    @Inject
+    lateinit var settingsWebViewClient: SettingsWebViewClient
+
+    @Inject
+    lateinit var settingsPageFeature: SettingsPageFeature
 
     private val binding: ActivitySettingsWebviewBinding by viewBinding()
 
@@ -116,8 +123,8 @@ class SettingsWebViewActivity : DuckDuckGoActivity() {
 
     @SuppressLint("SetJavaScriptEnabled")
     private fun setupWebView() {
-        binding.settingsWebView.let {
-            it.settings.apply {
+        binding.settingsWebView.let { webView ->
+            webView.settings.apply {
                 userAgentString = CUSTOM_USER_AGENT
                 javaScriptEnabled = true
                 domStorageEnabled = true
@@ -128,6 +135,10 @@ class SettingsWebViewActivity : DuckDuckGoActivity() {
                 mixedContentMode = WebSettings.MIXED_CONTENT_COMPATIBILITY_MODE
                 databaseEnabled = false
                 setSupportZoom(true)
+            }
+
+            if (settingsPageFeature.serpSettingsSync().isEnabled()) {
+                webView.webViewClient = settingsWebViewClient
             }
         }
     }

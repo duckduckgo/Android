@@ -37,6 +37,7 @@ import androidx.transition.TransitionManager
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ContentOnboardingWelcomePageBinding
+import com.duckduckgo.app.notificationpromptexperiment.NotificationPromptExperimentManager
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.ADDRESS_BAR_POSITION
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.COMPARISON_CHART
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.INITIAL
@@ -79,6 +80,9 @@ class WelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome_p
 
     @Inject
     lateinit var onboardingDesignExperimentManager: OnboardingDesignExperimentManager
+
+    @Inject
+    lateinit var notificationPromptExperimentManager: NotificationPromptExperimentManager
 
     private val binding: ContentOnboardingWelcomePageBinding by viewBinding()
     private val viewModel by lazy {
@@ -184,8 +188,12 @@ class WelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome_p
     @SuppressLint("InlinedApi")
     private fun requestNotificationsPermissions() {
         if (appBuildConfig.sdkInt >= android.os.Build.VERSION_CODES.TIRAMISU) {
-            viewModel.notificationRuntimePermissionRequested()
-            requestPermission.launch(Manifest.permission.POST_NOTIFICATIONS)
+            if (!notificationPromptExperimentManager.isExperimentalNoNotificationPrompt()) {
+                viewModel.notificationRuntimePermissionRequested()
+                requestPermission.launch(Manifest.permission.POST_NOTIFICATIONS)
+            } else {
+                scheduleWelcomeAnimation()
+            }
         } else {
             scheduleWelcomeAnimation()
         }

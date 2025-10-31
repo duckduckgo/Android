@@ -110,4 +110,11 @@
     <string name="deleteBookmarkFolderConfirmationDialogDescription" instruction="Placeholder is the name of the favorite site">Cela supprimera votre dossier de signets &lt;b&gt;%1$s&lt;/b&gt;.</string>
     <string name="deleteSavedSiteConfirmationDialogCancel">Annuler</string>
     <string name="deleteSavedSiteConfirmationDialogDelete">Supprimer</string>
+
+    <!-- Bookmark Import -->
+    <string name="importBookmarksFromGooglePreImportDialogTitle">Importer des signets depuis Google</string>
+    <string name="importBookmarksFromGooglePreImportDialogInstruction">Google peut vous demander de vous connecter ou de saisir votre mot de passe pour confirmer.</string>
+    <string name="importBookmarksFromGooglePreImportDialogImportButton">Importer depuis Google</string>
+    <string name="importBookmarksFromGooglePreImportDialogSelectFileButton">Sélectionner le fichier de signets…</string>
+    <string name="bookmarksImportDialogClose">Fermer</string>
 </resources>

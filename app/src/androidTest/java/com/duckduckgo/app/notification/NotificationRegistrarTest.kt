@@ -20,6 +20,7 @@ import androidx.core.app.NotificationManagerCompat
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.notification.model.NotificationPlugin
 import com.duckduckgo.app.notification.model.SchedulableNotificationPlugin
+import com.duckduckgo.app.notificationpromptexperiment.NotificationPromptExperimentManager
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
@@ -28,7 +29,10 @@ import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.experiments.api.VariantManager
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.TestScope
+import kotlinx.coroutines.test.advanceUntilIdle
+import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -39,6 +43,7 @@ import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
+@ExperimentalCoroutinesApi
 class NotificationRegistrarTest {
     @get:Rule
     val coroutineRule = CoroutineTestRule()
@@ -52,6 +57,7 @@ class NotificationRegistrarTest {
     private val mockSchedulableNotificationPluginPoint: PluginPoint<SchedulableNotificationPlugin> = mock()
     private val mockNotificationPluginPoint: PluginPoint<NotificationPlugin> = mock()
     private val appBuildConfig: AppBuildConfig = mock()
+    private val mockNotificationPromptExperimentManager: NotificationPromptExperimentManager = mock()
 
     private lateinit var testee: NotificationRegistrar
 
@@ -69,38 +75,47 @@ class NotificationRegistrarTest {
             mockNotificationPluginPoint,
             appBuildConfig,
             coroutineRule.testDispatcherProvider,
+            mockNotificationPromptExperimentManager,
         )
     }
 
     @Test
-    fun whenNotificationsPreviouslyOffAndNowOnThenPixelIsFiredAndSettingsUpdated() {
+    fun whenNotificationsPreviouslyOffAndNowOnThenPixelIsFiredAndSettingsUpdated() = runTest {
         whenever(mockSettingsDataStore.appNotificationsEnabled).thenReturn(false)
         testee.updateStatus(true)
+        advanceUntilIdle()
         verify(mockPixel).fire(eq(AppPixelName.NOTIFICATIONS_ENABLED), any(), any(), eq(Count))
         verify(mockSettingsDataStore).appNotificationsEnabled = true
+        verify(mockNotificationPromptExperimentManager).fireNotificationsEnabledLater()
     }
 
     @Test
-    fun whenNotificationsPreviouslyOffAndStillOffThenNoPixelIsFiredAndSettingsUnchanged() {
+    fun whenNotificationsPreviouslyOffAndStillOffThenNoPixelIsFiredAndSettingsUnchanged() = runTest {
         whenever(mockSettingsDataStore.appNotificationsEnabled).thenReturn(false)
         testee.updateStatus(false)
+        advanceUntilIdle()
         verify(mockPixel, never()).fire(any<Pixel.PixelName>(), any(), any(), eq(Count))
         verify(mockSettingsDataStore, never()).appNotificationsEnabled = true
+        verify(mockNotificationPromptExperimentManager, never()).fireNotificationsEnabledLater()
     }
 
     @Test
-    fun whenNotificationsPreviouslyOnAndStillOnThenNoPixelIsFiredAndSettingsUnchanged() {
+    fun whenNotificationsPreviouslyOnAndStillOnThenNoPixelIsFiredAndSettingsUnchanged() = runTest {
         whenever(mockSettingsDataStore.appNotificationsEnabled).thenReturn(true)
         testee.updateStatus(true)
+        advanceUntilIdle()
         verify(mockPixel, never()).fire(any<Pixel.PixelName>(), any(), any(), eq(Count))
         verify(mockSettingsDataStore, never()).appNotificationsEnabled = false
+        verify(mockNotificationPromptExperimentManager, never()).fireNotificationsEnabledLater()
     }
 
     @Test
-    fun whenNotificationsPreviouslyOnAndNowOffPixelIsFiredAndSettingsUpdated() {
+    fun whenNotificationsPreviouslyOnAndNowOffPixelIsFiredAndSettingsUpdated() = runTest {
         whenever(mockSettingsDataStore.appNotificationsEnabled).thenReturn(true)
         testee.updateStatus(false)
+        advanceUntilIdle()
         verify(mockPixel).fire(eq(AppPixelName.NOTIFICATIONS_DISABLED), any(), any(), eq(Count))
         verify(mockSettingsDataStore).appNotificationsEnabled = false
+        verify(mockNotificationPromptExperimentManager, never()).fireNotificationsEnabledLater()
     }
 }

@@ -65,7 +65,13 @@ class VpnMenuStateProviderTest {
         whenever(androidBrowserConfigFeature.vpnMenuItem()).thenReturn(featureToggle)
         whenever(featureToggle.isEnabled()).thenReturn(true)
         whenever(vpnMenuStore.canShowVpnMenuForNotSubscribed()).thenReturn(true)
-        testee = VpnMenuStateProviderImpl(subscriptions, networkProtectionState, androidBrowserConfigFeature, vpnMenuStore)
+        testee = VpnMenuStateProviderImpl(
+            subscriptions,
+            networkProtectionState,
+            androidBrowserConfigFeature,
+            vpnMenuStore,
+            coroutineTestRule.testDispatcherProvider,
+        )
     }
 
     @Test

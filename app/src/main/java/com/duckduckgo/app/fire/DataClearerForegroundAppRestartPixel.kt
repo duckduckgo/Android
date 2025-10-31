@@ -23,13 +23,17 @@ import androidx.annotation.UiThread
 import androidx.annotation.VisibleForTesting
 import androidx.core.content.edit
 import androidx.lifecycle.LifecycleOwner
+import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.global.intentText
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.systemsearch.SystemSearchActivity
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import dagger.SingleInstanceIn
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 import logcat.LogPriority.INFO
 import logcat.logcat
 import javax.inject.Inject
@@ -44,6 +48,8 @@ import javax.inject.Inject
 class DataClearerForegroundAppRestartPixel @Inject constructor(
     private val context: Context,
     private val pixel: Pixel,
+    @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
+    private val dispatchers: DispatcherProvider,
 ) : MainProcessLifecycleObserver {
     private var detectedUserIntent: Boolean = false
 
@@ -56,7 +62,9 @@ class DataClearerForegroundAppRestartPixel @Inject constructor(
     @UiThread
     override fun onCreate(owner: LifecycleOwner) {
         logcat(INFO) { "onAppCreated firePendingPixels" }
-        firePendingPixels()
+        appCoroutineScope.launch(dispatchers.io()) {
+            firePendingPixels()
+        }
     }
 
     @UiThread

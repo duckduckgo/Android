@@ -24,7 +24,8 @@ import androidx.coordinatorlayout.widget.CoordinatorLayout.Behavior
 import androidx.core.view.isGone
 import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarView
 import com.duckduckgo.app.browser.omnibar.OmnibarLayout
-import com.duckduckgo.browser.ui.omnibar.OmnibarPosition
+import com.duckduckgo.app.browser.omnibar.OmnibarView
+import com.duckduckgo.browser.ui.omnibar.OmnibarType
 import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.appbar.AppBarLayout.ScrollingViewBehavior
 
@@ -37,7 +38,7 @@ import com.google.android.material.appbar.AppBarLayout.ScrollingViewBehavior
  *
  * This prevents the omnibar and the navigation bar from overlapping with, for example, content found in the web view.
  *
- * Note: If bottom [OmnibarLayout] is used ([OmnibarPosition.BOTTOM]), [BottomOmnibarBrowserContainerLayoutBehavior] should be set to the target child.
+ * Note: If bottom [OmnibarLayout] is used ([OmnibarType.SINGLE_BOTTOM]), [BottomOmnibarBrowserContainerLayoutBehavior] should be set to the target child.
  */
 class TopOmnibarBrowserContainerLayoutBehavior(
     context: Context,
@@ -62,7 +63,7 @@ class TopOmnibarBrowserContainerLayoutBehavior(
 }
 
 /**
- * A behavior that observes the position of the bottom [OmnibarLayout] ([OmnibarPosition.BOTTOM]), if present,
+ * A behavior that observes the position of the bottom [OmnibarLayout] ([OmnibarType.SINGLE_BOTTOM]), if present,
  * and applies bottom padding to the target view equal to the visible height of the omnibar.
  *
  * This prevents the omnibar from overlapping with, for example, content found in the web view.
@@ -72,7 +73,7 @@ class TopOmnibarBrowserContainerLayoutBehavior(
  *
  * We don't need to additionally observe the position of the [BrowserNavigationBarView] when bottom [OmnibarLayout] is used because it comes pre-embedded with the navigation bar.
  *
- * Note: If top [OmnibarLayout] is used ([OmnibarPosition.TOP]), [TopOmnibarBrowserContainerLayoutBehavior] should be set to the target child.
+ * Note: If top [OmnibarLayout] is used ([OmnibarType.SINGLE_TOP] or [OmnibarType.SPLIT]), [TopOmnibarBrowserContainerLayoutBehavior] should be set to the target child.
  */
 class BottomOmnibarBrowserContainerLayoutBehavior : Behavior<View>() {
     override fun layoutDependsOn(
@@ -118,4 +119,4 @@ private fun offsetByBottomElementVisibleHeight(
 
 private fun View.isBrowserNavigationBar(): Boolean = this is BrowserNavigationBarView
 
-private fun View.isBottomOmnibar(): Boolean = this is OmnibarLayout && this.omnibarPosition == OmnibarPosition.BOTTOM
+private fun View.isBottomOmnibar(): Boolean = this is OmnibarView && this.omnibarType == OmnibarType.SINGLE_BOTTOM

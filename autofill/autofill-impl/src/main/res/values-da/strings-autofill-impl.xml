@@ -289,4 +289,27 @@
     <string name="passwords_import_promo_in_settings_title">Importer adgangskoder fra Google</string>
     <string name="passwords_import_promo_in_settings_dismiss_text">Skjul</string>
 
+    <!-- Import Bookmarks Strings -->
+    <string name="importToDuckDuckGo">Importer til DuckDuckGo</string>
+    <string name="importBookmarksFromGoogleChromeFolderName">Importeret fra Chrome</string>
+    <string name="importBookmarksFromGooglePreImportDialogTitle">Importer bogmærker fra Google</string>
+    <string name="importBookmarksFromGooglePreImportDialogInstruction">Google kan bede dig om at logge ind eller indtaste din adgangskode for at bekræfte.</string>
+    <string name="importBookmarksFromGooglePreImportDialogImportButton">Importer fra Google</string>
+    <string name="importBookmarksFromGooglePreImportDialogSelectFileButton">Vælg bogmærkefil…</string>
+    <string name="importBookmarksFromGoogleWebFlowTitle">Importer bogmærker</string>
+    <string name="importBookmarksProgressTitle">Importerer fra Google…</string>
+    <string name="importBookmarksProgressSubtitle">Hold denne skærm åben og vent – det burde ikke tage mere end et minut eller to.</string>
+    <string name="importBookmarksProgressInfoMessage1">Google kan bede dig om at logge ind eller indtaste din adgangskode for at bekræfte.</string>
+    <string name="importBookmarksProgressInfoMessage2">Google sender dig muligvis en e-mail, der bekræfter, at dine bogmærker eksporteres.</string>
+    <string name="importBookmarksFromGoogleCancelConfirmationDialogTitle">Annuller import?</string>
+    <string name="importBookmarksFromGoogleCancelConfirmationDialogMessage">Dine bogmærker bliver ikke importeret, hvis du annullerer nu.</string>
+    <string name="importBookmarksFromGoogleCancelConfirmationDialogCancelImport">Annuller import</string>
+    <string name="importBookmarksFromGoogleCancelConfirmationDialogContinue">Forsæt</string>
+    <string name="importBookmarksFromGoogleSuccessBookmarksCount" instruction="Placeholder is the number of bookmarks that were imported">Bogmærker: %1$d</string>
+    <string name="importBookmarksSuccessTitle">@string/importToDuckDuckGo</string>
+    <string name="importBookmarksFinalDoneButton">Luk</string>
+    <string name="importBookmarksErrorTitle">@string/importToDuckDuckGo</string>
+    <string name="importBookmarksErrorGenericMessage">Noget gik galt</string>
+    <string name="importBookmarksErrorGenericMessageSecondary">Sørg for, at du er forbundet til internettet, og prøv igen.</string>
+
 </resources>

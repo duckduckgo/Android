@@ -21,6 +21,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.duckchat.impl.DuckChatInternal
 import com.duckduckgo.duckchat.impl.R
@@ -34,6 +35,8 @@ import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -45,6 +48,7 @@ class DuckChatSettingsViewModel @Inject constructor(
     private val pixel: Pixel,
     private val inputScreenDiscoveryFunnel: InputScreenDiscoveryFunnel,
     private val settingsPageFeature: SettingsPageFeature,
+    dispatcherProvider: DispatcherProvider,
 ) : ViewModel() {
     private val commandChannel = Channel<Command>(capacity = 1, onBufferOverflow = DROP_OLDEST)
     val commands = commandChannel.receiveAsFlow()
@@ -54,18 +58,21 @@ class DuckChatSettingsViewModel @Inject constructor(
         val isInputScreenEnabled: Boolean = false,
         val shouldShowShortcuts: Boolean = false,
         val shouldShowInputScreenToggle: Boolean = false,
+        val isHideGeneratedImagesOptionVisible: Boolean = false,
     )
 
     val viewState =
         combine(
             duckChat.observeEnableDuckChatUserSetting(),
             duckChat.observeInputScreenUserSettingEnabled(),
-        ) { isDuckChatUserEnabled, isInputScreenEnabled ->
+            flowOf(settingsPageFeature.hideAiGeneratedImagesOption().isEnabled()).flowOn(dispatcherProvider.io()),
+        ) { isDuckChatUserEnabled, isInputScreenEnabled, isHideAiGeneratedImagesOptionVisible ->
             ViewState(
                 isDuckChatUserEnabled = isDuckChatUserEnabled,
                 isInputScreenEnabled = isInputScreenEnabled,
                 shouldShowShortcuts = isDuckChatUserEnabled,
                 shouldShowInputScreenToggle = isDuckChatUserEnabled && duckChat.isInputScreenFeatureAvailable(),
+                isHideGeneratedImagesOptionVisible = isHideAiGeneratedImagesOptionVisible,
             )
         }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), ViewState())
 
@@ -128,14 +135,30 @@ class DuckChatSettingsViewModel @Inject constructor(
             if (settingsPageFeature.embeddedSettingsWebView().isEnabled()) {
                 commandChannel.send(
                     OpenLink(
-                        DUCK_CHAT_SEARCH_AI_SETTINGS_LINK_EMBEDDED,
-                        R.string.duck_chat_assist_settings_title,
+                        link = DUCK_CHAT_SEARCH_AI_SETTINGS_LINK_EMBEDDED,
+                        titleRes = if (settingsPageFeature.hideAiGeneratedImagesOption().isEnabled()) {
+                            R.string.duckAiSerpSettingsTitle
+                        } else {
+                            R.string.duck_chat_assist_settings_title
+                        },
                     ),
                 )
             } else {
                 commandChannel.send(OpenLinkInNewTab(DUCK_CHAT_SEARCH_AI_SETTINGS_LINK))
             }
             pixel.fire(DuckChatPixelName.DUCK_CHAT_SEARCH_ASSIST_SETTINGS_BUTTON_CLICKED)
+        }
+    }
+
+    fun onDuckAiHideAiGeneratedImagesClicked() {
+        viewModelScope.launch {
+            commandChannel.send(
+                OpenLink(
+                    link = DUCK_CHAT_HIDE_GENERATED_IMAGES_LINK_EMBEDDED,
+                    titleRes = R.string.duckAiSerpSettingsTitle,
+                ),
+            )
+            pixel.fire(DuckChatPixelName.DUCK_CHAT_HIDE_AI_GENERATED_IMAGES_BUTTON_CLICKED)
         }
     }
 
@@ -171,5 +194,6 @@ class DuckChatSettingsViewModel @Inject constructor(
         const val DUCK_CHAT_LEARN_MORE_LINK = "https://duckduckgo.com/duckduckgo-help-pages/aichat/"
         const val DUCK_CHAT_SEARCH_AI_SETTINGS_LINK = "https://duckduckgo.com/settings?ko=-1#aifeatures"
         const val DUCK_CHAT_SEARCH_AI_SETTINGS_LINK_EMBEDDED = "https://duckduckgo.com/settings?ko=-1&embedded=1&highlight=kbe#aifeatures"
+        const val DUCK_CHAT_HIDE_GENERATED_IMAGES_LINK_EMBEDDED = "https://duckduckgo.com/settings?ko=-1&embedded=1&highlight=kbj#aifeatures"
     }
 }

@@ -289,4 +289,27 @@
     <string name="passwords_import_promo_in_settings_title">Importar palavras-passe do Google</string>
     <string name="passwords_import_promo_in_settings_dismiss_text">Ocultar</string>
 
+    <!-- Import Bookmarks Strings -->
+    <string name="importToDuckDuckGo">Importar para o DuckDuckGo</string>
+    <string name="importBookmarksFromGoogleChromeFolderName">Importado do Chrome</string>
+    <string name="importBookmarksFromGooglePreImportDialogTitle">Importar marcadores do Google</string>
+    <string name="importBookmarksFromGooglePreImportDialogInstruction">O Google pode pedir-te para iniciares sessão ou introduzires a tua palavra-passe para confirmação.</string>
+    <string name="importBookmarksFromGooglePreImportDialogImportButton">Importar do Google</string>
+    <string name="importBookmarksFromGooglePreImportDialogSelectFileButton">Selecionar ficheiro de marcadores…</string>
+    <string name="importBookmarksFromGoogleWebFlowTitle">Importar marcadores</string>
+    <string name="importBookmarksProgressTitle">A importar do Google…</string>
+    <string name="importBookmarksProgressSubtitle">Mantém este ecrã aberto e aguarda — não deve demorar mais do que um ou dois minutos.</string>
+    <string name="importBookmarksProgressInfoMessage1">O Google pode pedir-te para iniciares sessão ou introduzires a tua palavra-passe para confirmação.</string>
+    <string name="importBookmarksProgressInfoMessage2">A Google poderá enviar-te um e-mail a confirmar que os teus marcadores estão a ser exportados.</string>
+    <string name="importBookmarksFromGoogleCancelConfirmationDialogTitle">Cancelar importação?</string>
+    <string name="importBookmarksFromGoogleCancelConfirmationDialogMessage">Os teus favoritos não serão importados se cancelares agora.</string>
+    <string name="importBookmarksFromGoogleCancelConfirmationDialogCancelImport">Cancelar importação</string>
+    <string name="importBookmarksFromGoogleCancelConfirmationDialogContinue">Continuar</string>
+    <string name="importBookmarksFromGoogleSuccessBookmarksCount" instruction="Placeholder is the number of bookmarks that were imported">Marcadores: %1$d</string>
+    <string name="importBookmarksSuccessTitle">@string/importToDuckDuckGo</string>
+    <string name="importBookmarksFinalDoneButton">Fechar</string>
+    <string name="importBookmarksErrorTitle">@string/importToDuckDuckGo</string>
+    <string name="importBookmarksErrorGenericMessage">Ocorreu um erro</string>
+    <string name="importBookmarksErrorGenericMessageSecondary">Certifica-te de que tens ligação à Internet e tente novamente.</string>
+
 </resources>

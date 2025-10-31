@@ -110,4 +110,11 @@
     <string name="deleteBookmarkFolderConfirmationDialogDescription" instruction="Placeholder is the name of the favorite site">Αυτό θα διαγράψει τον φάκελο σελιδοδεικτών του ιστότοπου &lt;b&gt;%1$s&lt;/b&gt;.</string>
     <string name="deleteSavedSiteConfirmationDialogCancel">Ακύρωση</string>
     <string name="deleteSavedSiteConfirmationDialogDelete">Διαγραφή</string>
+
+    <!-- Bookmark Import -->
+    <string name="importBookmarksFromGooglePreImportDialogTitle">Εισαγωγή σελιδοδεικτών από το Google</string>
+    <string name="importBookmarksFromGooglePreImportDialogInstruction">Η Google μπορεί να σας ζητήσει να συνδεθείτε ή να εισαγάγετε τον κωδικό πρόσβασής σας για επιβεβαίωση.</string>
+    <string name="importBookmarksFromGooglePreImportDialogImportButton">Εισαγωγή από το Google</string>
+    <string name="importBookmarksFromGooglePreImportDialogSelectFileButton">Επιλογή αρχείου σελιδοδεικτών...</string>
+    <string name="bookmarksImportDialogClose">Κλείσιμο</string>
 </resources>

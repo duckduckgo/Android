@@ -21,6 +21,7 @@ import android.content.Intent
 import app.cash.turbine.test
 import com.duckduckgo.app.global.DefaultRoleBrowserDialog
 import com.duckduckgo.app.global.install.AppInstallStore
+import com.duckduckgo.app.notificationpromptexperiment.NotificationPromptExperimentManager
 import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.Finish
 import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.OnboardingSkipped
 import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.ShowAddressBarPositionDialog
@@ -46,7 +47,7 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Unique
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
-import com.duckduckgo.browser.ui.omnibar.OmnibarPosition
+import com.duckduckgo.browser.ui.omnibar.OmnibarType
 import com.duckduckgo.common.test.CoroutineTestRule
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert
@@ -68,6 +69,7 @@ class WelcomePageViewModelTest {
     private val mockSettingsDataStore: SettingsDataStore = mock()
     private val mockAppBuildConfig: AppBuildConfig = mock()
     private val mockOnboardingDesignExperimentManager: OnboardingDesignExperimentManager = mock()
+    private val mockNotificationPromptExperimentManager: NotificationPromptExperimentManager = mock()
 
     private val testee: WelcomePageViewModel by lazy {
         WelcomePageViewModel(
@@ -79,6 +81,7 @@ class WelcomePageViewModelTest {
             coroutineRule.testDispatcherProvider,
             mockAppBuildConfig,
             mockOnboardingDesignExperimentManager,
+            mockNotificationPromptExperimentManager,
         )
     }
 
@@ -172,6 +175,14 @@ class WelcomePageViewModelTest {
             testee.onDefaultBrowserSet()
 
             verify(mockOnboardingDesignExperimentManager).fireSetDefaultRatePixel()
+        }
+
+    @Test
+    fun whenDefaultBrowserIsSetThenFireDdgSetAsDefaultPixel() =
+        runTest {
+            testee.onDefaultBrowserSet()
+
+            verify(mockNotificationPromptExperimentManager).fireDdgSetAsDefault()
         }
 
     @Test
@@ -298,7 +309,7 @@ class WelcomePageViewModelTest {
             testee.onAddressBarPositionOptionSelected(false)
             testee.onPrimaryCtaClicked(PreOnboardingDialogType.ADDRESS_BAR_POSITION)
 
-            verify(mockSettingsDataStore).omnibarPosition = OmnibarPosition.BOTTOM
+            verify(mockSettingsDataStore).omnibarType = OmnibarType.SINGLE_BOTTOM
         }
 
     @Test

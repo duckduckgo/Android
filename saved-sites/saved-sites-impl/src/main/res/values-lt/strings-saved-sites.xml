@@ -118,4 +118,11 @@
     <string name="deleteBookmarkFolderConfirmationDialogDescription" instruction="Placeholder is the name of the favorite site">Tai ištrins jūsų &lt;b&gt;%1$s&lt;/b&gt; žymių aplanką.</string>
     <string name="deleteSavedSiteConfirmationDialogCancel">Atšaukti</string>
     <string name="deleteSavedSiteConfirmationDialogDelete">Trinti</string>
+
+    <!-- Bookmark Import -->
+    <string name="importBookmarksFromGooglePreImportDialogTitle">Importuoti žymes iš „Google“</string>
+    <string name="importBookmarksFromGooglePreImportDialogInstruction">„Google“ gali paprašyti tavęs prisijungti arba įvesti slaptažodį patvirtinimui.</string>
+    <string name="importBookmarksFromGooglePreImportDialogImportButton">Importuok iš „Google“</string>
+    <string name="importBookmarksFromGooglePreImportDialogSelectFileButton">Pasirinkite žymių failą…</string>
+    <string name="bookmarksImportDialogClose">Uždaryti</string>
 </resources>

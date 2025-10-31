@@ -110,4 +110,11 @@
     <string name="deleteBookmarkFolderConfirmationDialogDescription" instruction="Placeholder is the name of the favorite site">Hiermee verwijder je de bladwijzermap voor &lt;b&gt;%1$s&lt;/b&gt;.</string>
     <string name="deleteSavedSiteConfirmationDialogCancel">Annuleren</string>
     <string name="deleteSavedSiteConfirmationDialogDelete">Verwijderen</string>
+
+    <!-- Bookmark Import -->
+    <string name="importBookmarksFromGooglePreImportDialogTitle">Bladwijzers importeren uit Google</string>
+    <string name="importBookmarksFromGooglePreImportDialogInstruction">Google kan je vragen om in te loggen of je wachtwoord in te voeren ter bevestiging.</string>
+    <string name="importBookmarksFromGooglePreImportDialogImportButton">Importeren van Google</string>
+    <string name="importBookmarksFromGooglePreImportDialogSelectFileButton">Bladwijzerbestand selecteren...</string>
+    <string name="bookmarksImportDialogClose">Sluiten</string>
 </resources>
