@@ -181,28 +181,45 @@ class DuckChatSettingsActivity : DuckDuckGoActivity() {
             viewModel.onDuckAiShortcutsClicked()
         }
 
-        binding.showDuckChatSearchSettingsLink.setOnClickListener {
-            viewModel.duckChatSearchAISettingsClicked()
-        }
-
-        if (viewState.isHideGeneratedImagesOptionVisible) {
-            binding.searchSettingsSectionHeader.isVisible = true
-            binding.duckAiHideAiGeneratedImagesLink.apply {
-                isVisible = true
-                setOnClickListener {
-                    viewModel.onDuckAiHideAiGeneratedImagesClicked()
-                }
-            }
-        } else {
-            binding.searchSettingsSectionHeader.isGone = true
-            binding.duckAiHideAiGeneratedImagesLink.isGone = true
-        }
+        renderSearchSettingsSection(viewState)
 
         binding.duckAiInputScreenWithoutAiContainer.setOnClickListener {
             viewModel.onDuckAiInputScreenWithoutAiSelected()
         }
         binding.duckAiInputScreenWithAiContainer.setOnClickListener {
             viewModel.onDuckAiInputScreenWithAiSelected()
+        }
+    }
+
+    private fun renderSearchSettingsSection(viewState: ViewState) {
+        with(binding) {
+            if (viewState.isSearchSectionVisible) {
+                with(showDuckChatSearchSettingsLink) {
+                    isVisible = true
+                    setOnClickListener {
+                        viewModel.duckChatSearchAISettingsClicked()
+                    }
+                }
+
+                if (viewState.isHideGeneratedImagesOptionVisible) {
+                    searchSettingsSectionHeader.isVisible = true
+
+                    with(duckAiHideAiGeneratedImagesLink) {
+                        isVisible = true
+                        setOnClickListener {
+                            viewModel.onDuckAiHideAiGeneratedImagesClicked()
+                        }
+                    }
+                } else {
+                    searchSettingsSectionHeader.isGone = true
+                    duckAiHideAiGeneratedImagesLink.isGone = true
+                }
+            } else {
+                divider2.isGone = true
+                searchSettingsSectionHeader.isGone = true
+                showDuckChatSearchSettingsLink.isGone = true
+                duckAiHideAiGeneratedImagesLink.isGone = true
+            }
         }
     }
 
