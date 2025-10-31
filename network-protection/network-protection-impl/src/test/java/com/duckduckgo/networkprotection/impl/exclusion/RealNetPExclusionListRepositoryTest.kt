@@ -1,9 +1,9 @@
 package com.duckduckgo.networkprotection.impl.exclusion
 
 import android.annotation.SuppressLint
+import android.content.Context
 import android.content.pm.ApplicationInfo
 import android.content.pm.PackageManager
-import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.networkprotection.impl.autoexclude.FakeAutoExcludeAppsRepository
@@ -31,6 +31,9 @@ class RealNetPExclusionListRepositoryTest {
     @Mock
     private lateinit var packageManager: PackageManager
 
+    @Mock
+    private lateinit var context: Context
+
     private lateinit var repository: RealNetPExclusionListRepository
     private val autoExcludeAppsRepository = FakeAutoExcludeAppsRepository()
     private val localConfig = FakeNetPSettingsLocalConfigFactory.create()
@@ -45,7 +48,7 @@ class RealNetPExclusionListRepositoryTest {
             localConfig,
             coroutineTestRule.testDispatcherProvider,
             packageManager,
-            InstrumentationRegistry.getInstrumentation().targetContext.applicationContext,
+            context,
         )
         whenever(packageManager.getInstalledApplications(PackageManager.GET_META_DATA)).thenReturn(
             listOf(
