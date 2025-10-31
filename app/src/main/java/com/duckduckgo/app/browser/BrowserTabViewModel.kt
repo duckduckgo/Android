@@ -192,6 +192,7 @@ import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
 import com.duckduckgo.app.browser.model.LongPressTarget
 import com.duckduckgo.app.browser.newtab.FavoritesQuickAccessAdapter
 import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
+import com.duckduckgo.app.browser.omnibar.OmnibarFeatureRepository
 import com.duckduckgo.app.browser.omnibar.QueryOrigin
 import com.duckduckgo.app.browser.omnibar.QueryOrigin.FromAutocomplete
 import com.duckduckgo.app.browser.refreshpixels.RefreshPixelSender
@@ -488,6 +489,7 @@ class BrowserTabViewModel @Inject constructor(
     private val webViewCompatWrapper: WebViewCompatWrapper,
     private val addressBarTrackersAnimationFeatureToggle: AddressBarTrackersAnimationFeatureToggle,
     private val autoconsentPixelManager: AutoconsentPixelManager,
+    private val omnibarFeatureRepository: OmnibarFeatureRepository,
 ) : ViewModel(),
     WebViewClientListener,
     EditSavedSiteListener,
@@ -556,9 +558,7 @@ class BrowserTabViewModel @Inject constructor(
         get() = site?.title
 
     val isSplitOmnibarEnabled: Boolean by lazy {
-        androidBrowserConfig.useUnifiedOmnibarLayout().isEnabled() &&
-            androidBrowserConfig.splitOmnibar().isEnabled() &&
-            settingsDataStore.omnibarType == OmnibarType.SPLIT
+        omnibarFeatureRepository.isSplitOmnibarAvailable && settingsDataStore.omnibarType == OmnibarType.SPLIT
     }
 
     private var locationPermissionRequest: LocationPermissionRequest? = null
