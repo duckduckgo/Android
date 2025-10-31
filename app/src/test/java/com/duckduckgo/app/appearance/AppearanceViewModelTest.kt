@@ -21,9 +21,9 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import app.cash.turbine.test
 import com.duckduckgo.app.appearance.AppearanceViewModel.Command
+import com.duckduckgo.app.browser.omnibar.OmnibarFeatureRepository
 import com.duckduckgo.app.icon.api.AppIcon
 import com.duckduckgo.app.pixels.AppPixelName
-import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.app.settings.clear.FireAnimation
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
@@ -33,8 +33,6 @@ import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.ui.DuckDuckGoTheme
 import com.duckduckgo.common.ui.store.AppTheme
 import com.duckduckgo.common.ui.store.ThemingDataStore
-import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
-import com.duckduckgo.feature.toggles.api.Toggle.State
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -74,7 +72,8 @@ internal class AppearanceViewModelTest {
     @Mock
     private lateinit var mockTabSwitcherDataStore: TabSwitcherDataStore
 
-    private val androidBrowserConfigFeature = FakeFeatureToggleFactory.create(AndroidBrowserConfigFeature::class.java)
+    @Mock
+    private lateinit var mockOmnibarFeatureRepository: OmnibarFeatureRepository
 
     @SuppressLint("DenyListedApi")
     @Before
@@ -86,9 +85,7 @@ internal class AppearanceViewModelTest {
         whenever(mockAppSettingsDataStore.selectedFireAnimation).thenReturn(FireAnimation.HeroFire)
         whenever(mockAppSettingsDataStore.omnibarType).thenReturn(OmnibarType.SINGLE_TOP)
         whenever(mockTabSwitcherDataStore.isTrackersAnimationInfoTileHidden()).thenReturn(flowOf(false))
-
-        androidBrowserConfigFeature.useUnifiedOmnibarLayout().setRawStoredState(State(enable = false))
-        androidBrowserConfigFeature.splitOmnibar().setRawStoredState(State(enable = false))
+        whenever(mockOmnibarFeatureRepository.isSplitOmnibarEnabled).thenReturn(false)
 
         initializeViewModel()
     }
@@ -101,7 +98,7 @@ internal class AppearanceViewModelTest {
                 mockPixel,
                 coroutineTestRule.testDispatcherProvider,
                 mockTabSwitcherDataStore,
-                androidBrowserConfigFeature,
+                mockOmnibarFeatureRepository,
             )
     }
 
@@ -241,6 +238,14 @@ internal class AppearanceViewModelTest {
             testee.onOmnibarTypeSelected(OmnibarType.SINGLE_TOP)
             verify(mockAppSettingsDataStore).omnibarType = OmnibarType.SINGLE_TOP
             verify(mockPixel).fire(AppPixelName.SETTINGS_ADDRESS_BAR_POSITION_SELECTED_TOP)
+        }
+
+    @Test
+    fun whenOmnibarPositionUpdatedToSplit() =
+        runTest {
+            testee.onOmnibarTypeSelected(OmnibarType.SPLIT)
+            verify(mockAppSettingsDataStore).omnibarType = OmnibarType.SPLIT
+            verify(mockPixel).fire(AppPixelName.SETTINGS_ADDRESS_BAR_POSITION_SELECTED_SPLIT_TOP)
         }
 
     @Test
