@@ -197,7 +197,7 @@
     <string name="switchBottomSheetDescriptionUpgrade">Ein Jahrestarif kostet nur 8,33 USD/Monat, verglichen mit deinem derzeitigen Monatstarif von 9,99 USD.</string>
     <string name="switchBottomSheetPrimaryButtonUpgrade">Zum Jahresabonnement (99,99 USD/Jahr) wechseln</string>
     <string name="switchBottomSheetSecondaryButtonUpgrade">Monatlichen Tarif beibehalten</string>
-    <string name="switchBottomSheetTitleDowngrade">You’re saving 16%% with\na yearly plan!</string>
+    <string name="switchBottomSheetTitleDowngrade">Du sparst 16 %% mit\n einem Jahresabo!</string>
     <string name="switchBottomSheetDescriptionDowngrade">Durch den Wechsel erhöht sich dein monatlicher Preis von 8,33 $/Monat auf 9,99 $/Monat.</string>
     <string name="switchBottomSheetPrimaryButtonDowngrade">Jahrestarif behalten</string>
     <string name="switchBottomSheetSecondaryButtonDowngrade">Zum Monatstarif wechseln (9,99 USD/Monat)</string>
