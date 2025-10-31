@@ -197,7 +197,7 @@
     <string name="switchBottomSheetDescriptionUpgrade">Roční tarif stojí jen 8,33 $ za měsíc oproti tvému současnému měsíčnímu tarifu za 9,99 $.</string>
     <string name="switchBottomSheetPrimaryButtonUpgrade">Přejít na roční tarif (99,99 $/rok)</string>
     <string name="switchBottomSheetSecondaryButtonUpgrade">Nechat měsíční tarif</string>
-    <string name="switchBottomSheetTitleDowngrade">You’re saving 16%% with\na yearly plan!</string>
+    <string name="switchBottomSheetTitleDowngrade">S ročním tarifem\nušetříš 16 %%!</string>
     <string name="switchBottomSheetDescriptionDowngrade">Když tarif změníš, cena tvého předplatného se zvýší z 8,33 $/měsíc na 9,99 $/měsíc.</string>
     <string name="switchBottomSheetPrimaryButtonDowngrade">Nechat roční tarif</string>
     <string name="switchBottomSheetSecondaryButtonDowngrade">Přejít na měsíční tarif (9,99 $/měsíc)</string>
