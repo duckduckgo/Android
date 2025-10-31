@@ -322,12 +322,7 @@ import com.duckduckgo.duckplayer.api.DuckPlayer
 import com.duckduckgo.duckplayer.api.DuckPlayer.DuckPlayerState.ENABLED
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.history.api.NavigationHistory
-import com.duckduckgo.js.messaging.api.AddDocumentStartJavaScriptPlugin
 import com.duckduckgo.js.messaging.api.JsCallbackData
-import com.duckduckgo.js.messaging.api.PostMessageWrapperPlugin
-import com.duckduckgo.js.messaging.api.SubscriptionEventData
-import com.duckduckgo.js.messaging.api.WebMessagingPlugin
-import com.duckduckgo.js.messaging.api.WebViewCompatMessageCallback
 import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.Feed
 import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.Feed.MALWARE
 import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.Feed.PHISHING
@@ -492,9 +487,6 @@ class BrowserTabViewModel @Inject constructor(
     private val externalIntentProcessingState: ExternalIntentProcessingState,
     private val vpnMenuStateProvider: VpnMenuStateProvider,
     private val webViewCompatWrapper: WebViewCompatWrapper,
-    private val addDocumentStartJavascriptPlugins: PluginPoint<AddDocumentStartJavaScriptPlugin>,
-    private val webMessagingPlugins: PluginPoint<WebMessagingPlugin>,
-    private val postMessageWrapperPlugins: PluginPoint<PostMessageWrapperPlugin>,
     private val addressBarTrackersAnimationFeatureToggle: AddressBarTrackersAnimationFeatureToggle,
     private val autoconsentPixelManager: AutoconsentPixelManager,
 ) : ViewModel(),
@@ -1940,11 +1932,6 @@ class BrowserTabViewModel @Inject constructor(
             }
 
             evaluateSerpLogoState(url)
-        }
-        viewModelScope.launch(dispatchers.io()) {
-            if (androidBrowserConfig.updateScriptOnPageFinished().isEnabled()) {
-                addDocumentStartJavaScript(webView)
-            }
         }
     }
 
@@ -4251,75 +4238,6 @@ class BrowserTabViewModel @Inject constructor(
         val cta = currentCtaViewState().cta
         if (cta is OnboardingDaxDialogCta) {
             onDismissOnboardingDaxDialog(cta)
-        }
-    }
-
-    fun configureWebView(
-        webView: DuckDuckGoWebView,
-        callback: WebViewCompatMessageCallback?,
-    ) {
-        viewModelScope.launch {
-            addDocumentStartJavaScript(webView)
-
-            callback?.let {
-                webMessagingPlugins.getPlugins().forEach { plugin ->
-                    plugin.register(callback, webView)
-                }
-            }
-        }
-    }
-
-    fun postContentScopeMessage(
-        eventData: SubscriptionEventData,
-        webView: WebView,
-    ) {
-        viewModelScope.launch {
-            postMessageWrapperPlugins
-                .getPlugins()
-                .firstOrNull { it.context == "contentScopeScripts" }
-                ?.postMessage(eventData, webView)
-        }
-    }
-
-    private suspend fun addDocumentStartJavaScript(webView: WebView) {
-        addDocumentStartJavascriptPlugins.getPlugins().forEach {
-            it.addDocumentStartJavaScript(
-                webView,
-            )
-        }
-    }
-
-    suspend fun privacyProtectionsUpdated(webView: WebView) {
-        val updateScriptOnProtectionsChanged: Boolean
-        val stopLoadingBeforeUpdatingScript: Boolean
-        val updateScriptOnPageFinished: Boolean
-
-        withContext(dispatchers.io()) {
-            updateScriptOnProtectionsChanged = androidBrowserConfig.updateScriptOnProtectionsChanged().isEnabled()
-            stopLoadingBeforeUpdatingScript = androidBrowserConfig.stopLoadingBeforeUpdatingScript().isEnabled()
-            updateScriptOnPageFinished = androidBrowserConfig.updateScriptOnPageFinished().isEnabled()
-        }
-
-        if (!updateScriptOnProtectionsChanged) {
-            return
-        }
-
-        if (stopLoadingBeforeUpdatingScript) {
-            withContext(dispatchers.main()) {
-                webView.stopLoading()
-            }
-        }
-
-        if (!updateScriptOnPageFinished) {
-            addDocumentStartJavascriptPlugins
-                .getPlugins()
-                .filter { plugin ->
-                    (plugin.context == "contentScopeScripts")
-                }.forEach {
-                    it.addDocumentStartJavaScript(webView)
-                }
-        } else {
-            addDocumentStartJavaScript(webView)
         }
     }
 

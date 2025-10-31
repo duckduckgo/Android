@@ -307,7 +307,6 @@ import com.duckduckgo.js.messaging.api.JsCallbackData
 import com.duckduckgo.js.messaging.api.JsMessageCallback
 import com.duckduckgo.js.messaging.api.JsMessaging
 import com.duckduckgo.js.messaging.api.SubscriptionEventData
-import com.duckduckgo.js.messaging.api.WebViewCompatMessageCallback
 import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.Feed
 import com.duckduckgo.mobile.android.app.tracking.ui.AppTrackingProtectionScreens.AppTrackerOnboardingActivityWithEmptyParamsParams
 import com.duckduckgo.navigation.api.GlobalActivityStarter
@@ -1226,16 +1225,9 @@ class BrowserTabFragment :
     private fun onOmnibarCustomTabPrivacyDashboardPressed() {
         val params = PrivacyDashboardPrimaryScreen(tabId)
         val intent = globalActivityStarter.startIntent(requireContext(), params)
-        postBreakageReportingEvent()
+        contentScopeScripts.sendSubscriptionEvent(createBreakageReportingEventData())
         intent?.let { activityResultPrivacyDashboard.launch(intent) }
         pixel.fire(CustomTabPixelNames.CUSTOM_TABS_PRIVACY_DASHBOARD_OPENED)
-    }
-
-    private fun postBreakageReportingEvent() {
-        val eventData = createBreakageReportingEventData()
-        webView?.let {
-            viewModel.postContentScopeMessage(eventData, it)
-        }
     }
 
     private fun onFireButtonPressed() {
@@ -1245,12 +1237,12 @@ class BrowserTabFragment :
     }
 
     private fun onBrowserMenuButtonPressed() {
-        postBreakageReportingEvent()
+        contentScopeScripts.sendSubscriptionEvent(createBreakageReportingEventData())
         viewModel.onBrowserMenuClicked(isCustomTab = isActiveCustomTab())
     }
 
     private fun onOmnibarPrivacyShieldButtonPressed() {
-        postBreakageReportingEvent()
+        contentScopeScripts.sendSubscriptionEvent(createBreakageReportingEventData())
         launchPrivacyDashboard(toggle = false)
     }
 
@@ -2014,7 +2006,6 @@ class BrowserTabFragment :
             is Command.RefreshAndShowPrivacyProtectionEnabledConfirmation -> {
                 webView?.let { safeWebView ->
                     lifecycleScope.launch {
-                        viewModel.privacyProtectionsUpdated(safeWebView)
                         refresh()
                         privacyProtectionEnabledConfirmation(it.domain)
                     }
@@ -2024,7 +2015,6 @@ class BrowserTabFragment :
             is Command.RefreshAndShowPrivacyProtectionDisabledConfirmation -> {
                 webView?.let { safeWebView ->
                     lifecycleScope.launch {
-                        viewModel.privacyProtectionsUpdated(safeWebView)
                         refresh()
                         privacyProtectionDisabledConfirmation(it.domain)
                     }
@@ -3242,29 +3232,6 @@ class BrowserTabFragment :
                     }
                 },
             )
-            viewModel.configureWebView(
-                it,
-                object : WebViewCompatMessageCallback {
-                    override fun process(
-                        context: String,
-                        featureName: String,
-                        method: String,
-                        id: String?,
-                        data: JSONObject?,
-                        onResponse: suspend (JSONObject) -> Unit,
-                    ) {
-                        viewModel.webViewCompatProcessJsCallbackMessage(
-                            context = context,
-                            featureName = featureName,
-                            method = method,
-                            id = id,
-                            data = data,
-                            onResponse = onResponse,
-                        )
-                    }
-                },
-            )
-
             duckPlayerScripts.register(
                 it,
                 object : JsMessageCallback() {
