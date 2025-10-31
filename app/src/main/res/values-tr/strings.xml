@@ -601,7 +601,7 @@
     <string name="waitlistNotificationDialogNotifyMe">BANA BİLDİR</string>
 
     <!-- Email Protection -->
-    <string name="emailProtectionActivityTitle">E-posta Koruması (Beta)</string>
+    <string name="emailProtectionActivityTitle">E-posta Koruması</string>
     <string name="emailNotSupported">Cihaz desteklenmiyor</string>
     <string name="emailNotSupportedExplanation">E-posta Koruması, e-posta izleyicilerini devre dışı bırakan özel e-posta adresleri oluşturmanıza olanak tanır. Oluşturduğunuz bu adresleri cihazınızda yerel olarak şifrelememiz ve depolamamız gerekir. Cihazınız şifreli depolama alanını desteklemediğinden E-posta Koruması kullanılamıyor.</string>
 
