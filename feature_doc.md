@@ -42,3 +42,11 @@ if (profile != null) {
 
 To use `WebStorageCompat` APIs, the WebView version on the device must support the [WebViewFeature#DELETE_BROWSING_DATA](https://developer.android.com/reference/androidx/webkit/WebViewFeature#DELETE_BROWSING_DATA()).
 - Anecdotally, this is supported on WebView version `141.0.7390.97` (running on a Pixel 9 Pro) and isn't on `124.0.6367.219` (running on an emulator).
+
+# Use-case analysis
+## Can we create Fire Tabs (Containerised tabs that burn after use)?
+A single tab can branch into multiple tabs when pages open links in new tabs, so a concept of a "Fire Tab" would require either blocking opening new tabs from links or open new tabs from links as independent Fire Tabs without a reference to their parent, where either would break all sorts of navigation patterns, login sessions or cookie sharing.
+
+That's why, I think we should reconsider this use-case as a "Fire Session" instead of "Fire Tabs".
+
+A Fire Session won't have any navigation history or visited links references to any other browsing session.
