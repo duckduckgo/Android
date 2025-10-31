@@ -19,7 +19,6 @@ package com.duckduckgo.networkprotection.internal.feature.system_apps
 import android.content.Context
 import android.content.Intent
 import android.content.pm.ApplicationInfo
-import android.content.pm.PackageManager
 import android.os.Bundle
 import android.view.View
 import androidx.core.view.isVisible

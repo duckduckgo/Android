@@ -18,7 +18,6 @@ package com.duckduckgo.vpn.internal.feature
 
 import android.content.Intent
 import android.content.pm.ApplicationInfo
-import android.content.pm.PackageManager
 import android.os.Bundle
 import android.widget.CompoundButton
 import androidx.core.view.isVisible
