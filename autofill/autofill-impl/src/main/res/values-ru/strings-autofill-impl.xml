@@ -301,4 +301,27 @@
     <string name="passwords_import_promo_in_settings_title">Импортировать пароли из Google</string>
     <string name="passwords_import_promo_in_settings_dismiss_text">Скрыть</string>
 
+    <!-- Import Bookmarks Strings -->
+    <string name="importToDuckDuckGo">Импорт в DuckDuckGo</string>
+    <string name="importBookmarksFromGoogleChromeFolderName">Импортировано из Chrome</string>
+    <string name="importBookmarksFromGooglePreImportDialogTitle">Импортировать закладки из Google</string>
+    <string name="importBookmarksFromGooglePreImportDialogInstruction">Google может попросить вас войти в систему или ввести пароль для подтверждения.</string>
+    <string name="importBookmarksFromGooglePreImportDialogImportButton">Импортировать из Google</string>
+    <string name="importBookmarksFromGooglePreImportDialogSelectFileButton">Выберите файл закладок…</string>
+    <string name="importBookmarksFromGoogleWebFlowTitle">Импортировать закладки</string>
+    <string name="importBookmarksProgressTitle">Импорт из Google…</string>
+    <string name="importBookmarksProgressSubtitle">Не закрывайте этот экран и подождите одну-две минуты.</string>
+    <string name="importBookmarksProgressInfoMessage1">Google может попросить вас войти в систему или ввести пароль для подтверждения.</string>
+    <string name="importBookmarksProgressInfoMessage2">Google также, возможно, отправит вам письмо с подтверждением экспорта закладок.</string>
+    <string name="importBookmarksFromGoogleCancelConfirmationDialogTitle">Отменить импорт?</string>
+    <string name="importBookmarksFromGoogleCancelConfirmationDialogMessage">При отмене операции закладки не импортируются.</string>
+    <string name="importBookmarksFromGoogleCancelConfirmationDialogCancelImport">Отменить импорт</string>
+    <string name="importBookmarksFromGoogleCancelConfirmationDialogContinue">Продолжить</string>
+    <string name="importBookmarksFromGoogleSuccessBookmarksCount" instruction="Placeholder is the number of bookmarks that were imported">Закладок: %1$d</string>
+    <string name="importBookmarksSuccessTitle">@string/importToDuckDuckGo</string>
+    <string name="importBookmarksFinalDoneButton">Закрыть</string>
+    <string name="importBookmarksErrorTitle">@string/importToDuckDuckGo</string>
+    <string name="importBookmarksErrorGenericMessage">Что-то пошло не так</string>
+    <string name="importBookmarksErrorGenericMessageSecondary">Проверьте подключение к интернету и повторите попытку.</string>
+
 </resources>
