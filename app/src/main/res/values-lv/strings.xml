@@ -602,6 +602,7 @@
     <string name="waitlistNotificationDialogNotifyMe">INFORMĒT MANI</string>
 
     <!-- Email Protection -->
+    <string name="emailProtectionActivityTitle">E-pasta aizsardzība</string>
     <string name="emailNotSupported">Ierīce netiek atbalstīta</string>
     <string name="emailNotSupportedExplanation">E-pasta aizsardzība ļauj izveidot privātas e-pasta adreses, kas noņem e-pasta izsekotājus. Mums ir jāšifrē un jāsaglabā šīs tavā ierīcē vietēji izveidotās adreses. Tā kā tava ierīce neatbalsta šifrētu krātuvi, e-pasta aizsardzība nav pieejama.</string>
 

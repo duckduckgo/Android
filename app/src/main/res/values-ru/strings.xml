@@ -603,6 +603,7 @@
     <string name="waitlistNotificationDialogNotifyMe">ОПОВЕСТИТЬ</string>
 
     <!-- Email Protection -->
+    <string name="emailProtectionActivityTitle">Защита электронной почты</string>
     <string name="emailNotSupported">Устройство не поддерживается</string>
     <string name="emailNotSupportedExplanation">Функция защиты почты позволяет создавать закрытые адреса электронной почты, где удаляются трекеры в письмах. Нам необходимо шифровать такие адреса и хранить их локально на вашем устройстве. Поскольку данное устройство не поддерживает хранение зашифрованной информации, вы не сможете воспользоваться защитой почты.</string>
 

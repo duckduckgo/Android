@@ -601,6 +601,7 @@
     <string name="waitlistNotificationDialogNotifyMe">MEDDELA MIG</string>
 
     <!-- Email Protection -->
+    <string name="emailProtectionActivityTitle">E-postskydd</string>
     <string name="emailNotSupported">Enheten stöds inte</string>
     <string name="emailNotSupportedExplanation">Med e-postskydd kan du skapa privata e-postadresser som tar bort e-postspårare. Vi måste kryptera och lagra de adresser du skapar lokalt på din enhet. Eftersom din enhet inte stöder krypterad lagring är e-postskydd inte tillgängligt.</string>
 

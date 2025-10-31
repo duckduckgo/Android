@@ -603,6 +603,7 @@
     <string name="waitlistNotificationDialogNotifyMe">UPOZORNĚTE MĚ</string>
 
     <!-- Email Protection -->
+    <string name="emailProtectionActivityTitle">Ochrana e-mailu</string>
     <string name="emailNotSupported">Zařízení není podporované</string>
     <string name="emailNotSupportedExplanation">Ochrana e-mailu umožňuje vytvářet soukromé e-mailové adresy, pomocí kterých obejdeš trackery e-mailů. Tyhle adresy potřebujeme zašifrovat a uložit přímo v tvém zařízení. Ochrana e-mailů není k dispozici, protože tvoje zařízení nepodporuje šifrování úložiště.</string>
 

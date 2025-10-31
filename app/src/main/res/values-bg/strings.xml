@@ -601,6 +601,7 @@
     <string name="waitlistNotificationDialogNotifyMe">УВЕДОМЕТЕ МЕ</string>
 
     <!-- Email Protection -->
+    <string name="emailProtectionActivityTitle">Защита на имейл</string>
     <string name="emailNotSupported">Устройството не се поддържа</string>
     <string name="emailNotSupportedExplanation">Защитата на имейла ви позволява да създавате поверителни имейл адреси, които премахват имейл тракерите. Необходимо е да криптираме и съхраняваме създадените от вас адреси локално на вашето устройство. Тъй като вашето устройство не поддържа криптирано съхранение, защитата на имейл не е достъпна.</string>
 

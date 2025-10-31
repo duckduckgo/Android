@@ -601,6 +601,7 @@
     <string name="waitlistNotificationDialogNotifyMe">INVIAMI UNA NOTIFICA</string>
 
     <!-- Email Protection -->
+    <string name="emailProtectionActivityTitle">Protezione email</string>
     <string name="emailNotSupported">Dispositivo non supportato</string>
     <string name="emailNotSupportedExplanation">Protezione email consente di creare indirizzi e-mail privati che rimuovono i sistemi di tracciamento delle e-mail. Dobbiamo crittografare e archiviare questi indirizzi che crei localmente sul tuo dispositivo. Poiché il tuo dispositivo non supporta l\'archiviazione crittografata, Protezione email non è disponibile.</string>
 
