@@ -990,6 +990,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
                 if (this::omnibarToolbarMockupBottomBinding.isInitialized) {
                     omnibarToolbarMockupBottomBinding.appBarLayoutMockup.visibility = View.GONE
                 }
+                binding.navigationBarMockup.root.gone()
             },
             300,
         )
@@ -1411,6 +1412,11 @@ open class BrowserActivity : DuckDuckGoActivity() {
 
                 if (Build.VERSION.SDK_INT >= 28) {
                     omnibarToolbarMockupBinding.mockOmniBarContainerShadow.addBottomShadow()
+                }
+
+                if (settingsDataStore.omnibarType == OmnibarType.SPLIT) {
+                    binding.topMockupSingleToolbar.iconsContainer.gone()
+                    binding.navigationBarMockup.root.show()
                 }
             }
 

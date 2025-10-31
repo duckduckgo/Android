@@ -588,6 +588,7 @@ class OmnibarLayout @JvmOverloads constructor(
         }
 
         omnibarCardShadow.isGone = viewState.viewMode is ViewMode.CustomTab && !isFindInPageVisible
+        iconsContainer.isVisible = viewState.showFireIcon || viewState.showTabsMenu || viewState.showBrowserMenu
 
         renderButtons(viewState)
 
@@ -779,9 +780,12 @@ class OmnibarLayout @JvmOverloads constructor(
                 showSpacer = viewState.showClearButton || viewState.showVoiceSearch,
             )
 
-        if (omnibarAnimationManager.isFeatureEnabled() &&
-            previousTransitionState != null &&
-            newTransitionState != previousTransitionState
+        if (omnibarAnimationManager.isFeatureEnabled() && previousTransitionState != null &&
+            (
+                newTransitionState.showFireIcon != previousTransitionState?.showFireIcon ||
+                    newTransitionState.showTabsMenu != previousTransitionState?.showTabsMenu ||
+                    newTransitionState.showBrowserMenu != previousTransitionState?.showBrowserMenu
+                )
         ) {
             TransitionManager.beginDelayedTransition(toolbarContainer, omniBarButtonTransitionSet)
         }

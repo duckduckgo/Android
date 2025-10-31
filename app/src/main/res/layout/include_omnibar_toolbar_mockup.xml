@@ -23,6 +23,7 @@
     android:layout_width="match_parent"
     android:layout_height="?attr/actionBarSize"
     android:background="?daxColorToolbar"
+    android:paddingEnd="@dimen/keyline_1"
     android:clipChildren="false">
 
     <com.google.android.material.card.MaterialCardView
@@ -95,7 +96,6 @@
         android:layout_height="@dimen/toolbarIcon"
         android:layout_marginTop="@dimen/omnibarCardMarginTop"
         android:layout_marginBottom="@dimen/omnibarCardMarginBottom"
-        android:layout_marginEnd="@dimen/keyline_1"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@id/mockOmniBarContainerShadow"

@@ -36,6 +36,7 @@
             android:id="@+id/toolbarContainer"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginEnd="@dimen/keyline_1"
             android:background="?attr/daxColorToolbar">
 
             <androidx.appcompat.widget.Toolbar
@@ -404,7 +405,6 @@
                 android:layout_width="wrap_content"
                 android:layout_height="@dimen/toolbarIcon"
                 android:layout_marginTop="@dimen/omnibarCardMarginTop"
-                android:layout_marginEnd="@dimen/keyline_1"
                 android:layout_marginBottom="@dimen/omnibarCardMarginBottom"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"

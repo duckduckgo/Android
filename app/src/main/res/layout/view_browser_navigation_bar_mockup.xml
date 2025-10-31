@@ -27,63 +27,27 @@
         android:background="?attr/preferredNavigationBarColor"
         android:gravity="center"
         android:orientation="horizontal"
+        android:paddingHorizontal="@dimen/navigationBarPaddingHorizontal"
         android:paddingTop="@dimen/navigationBarPaddingTop"
         android:paddingBottom="@dimen/navigationBarPaddingBottom"
         app:layout_constraintTop_toTopOf="parent"
         tools:parentTag="androidx.coordinatorlayout.widget.CoordinatorLayout">
 
-        <Space
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1" />
-
-
-        <Space
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1" />
-
-
         <FrameLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content">
+            android:id="@+id/newTabButton"
+            android:layout_width="@dimen/toolbarIcon"
+            android:layout_height="@dimen/toolbarIcon"
+            android:background="@drawable/selectable_item_experimental_background"
+            tools:visibility="visible">
 
-            <FrameLayout
-                android:id="@+id/newTabButton"
-                android:layout_width="@dimen/toolbarIcon"
-                android:layout_height="@dimen/toolbarIcon"
-                android:background="@drawable/selectable_item_experimental_background"
-                android:visibility="gone"
-                tools:visibility="visible">
-
-                <ImageView
-                    android:id="@+id/newTabButtonImageView"
-                    android:layout_width="@dimen/toolbarIcon"
-                    android:layout_height="@dimen/toolbarIcon"
-                    android:layout_gravity="center"
-                    android:contentDescription="@string/newTabMenuItem"
-                    android:scaleType="center"
-                    android:src="@drawable/ic_add_24" />
-            </FrameLayout>
-
-            <FrameLayout
-                android:id="@+id/autofillButton"
-                android:layout_width="@dimen/toolbarIcon"
-                android:layout_height="@dimen/toolbarIcon"
-                android:background="@drawable/selectable_item_experimental_background"
-                android:visibility="gone"
-                tools:visibility="visible">
-
-                <ImageView
-                    android:id="@+id/autofillButtonImageView"
-                    android:layout_width="@dimen/toolbarIcon"
-                    android:layout_height="@dimen/toolbarIcon"
-                    android:layout_gravity="center"
-                    android:contentDescription="@string/autofillManagementScreenTitle"
-                    android:scaleType="center"
-                    android:src="@drawable/ic_key_24" />
-            </FrameLayout>
-
+            <ImageView
+                android:id="@+id/newTabButtonImageView"
+                android:layout_width="@dimen/bottomNavIcon"
+                android:layout_height="@dimen/bottomNavIcon"
+                android:layout_gravity="center"
+                android:contentDescription="@string/newTabMenuItem"
+                android:scaleType="center"
+                android:src="@drawable/ic_add_24" />
         </FrameLayout>
 
         <Space
@@ -99,8 +63,8 @@
 
             <ImageView
                 android:id="@+id/bookmarksImageView"
-                android:layout_width="@dimen/toolbarIcon"
-                android:layout_height="@dimen/toolbarIcon"
+                android:layout_width="@dimen/bottomNavIcon"
+                android:layout_height="@dimen/bottomNavIcon"
                 android:layout_gravity="center"
                 android:contentDescription="@string/bookmarksMenuTitle"
                 android:scaleType="center"
@@ -120,8 +84,8 @@
 
             <ImageView
                 android:id="@+id/fireIconImageView"
-                android:layout_width="@dimen/toolbarIcon"
-                android:layout_height="@dimen/toolbarIcon"
+                android:layout_width="@dimen/bottomNavIcon"
+                android:layout_height="@dimen/bottomNavIcon"
                 android:layout_gravity="center"
                 android:contentDescription="@string/fireMenu"
                 android:scaleType="center"
@@ -150,25 +114,14 @@
             android:background="@drawable/selectable_item_experimental_background">
 
             <ImageView
-                android:id="@+id/menuIconImageView"
-                android:layout_width="@dimen/toolbarIcon"
-                android:layout_height="@dimen/toolbarIcon"
+                android:id="@+id/browserMenuImageView"
+                android:layout_width="@dimen/bottomNavIcon"
+                android:layout_height="@dimen/bottomNavIcon"
                 android:layout_gravity="center"
                 android:contentDescription="@string/browserPopupMenu"
                 android:scaleType="center"
                 android:src="@drawable/ic_menu_vertical_24" />
         </FrameLayout>
-
-        <Space
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1" />
-
-        <Space
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1" />
-
 
     </LinearLayout>
 

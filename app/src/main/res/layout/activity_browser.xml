@@ -60,4 +60,11 @@
         android:layout_alignParentBottom="true"
         layout="@layout/include_omnibar_toolbar_mockup_bottom" />
 
+    <include
+        android:id="@+id/navigationBarMockup"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        android:layout_alignParentBottom="true"
+        layout="@layout/view_browser_navigation_bar_mockup" />
 </RelativeLayout>
