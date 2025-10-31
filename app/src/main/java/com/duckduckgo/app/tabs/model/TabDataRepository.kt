@@ -610,4 +610,19 @@ class TabDataRepository @Inject constructor(
             }
         }
     }
+
+    override fun deleteBrowsingData() {
+        appCoroutineScope.launch(dispatchers.main()) {
+            profileStore?.allProfileNames?.forEach { profileName ->
+                val storage = profileStore.getProfile(profileName)?.webStorage
+                if (storage != null) {
+                    WebStorageCompat.deleteBrowsingData(storage) {
+                        logcat {
+                            "lp_test; All web storage data removed for profile: $profileName"
+                        }
+                    }
+                }
+            }
+        }
+    }
 }

@@ -154,4 +154,6 @@ interface TabRepository {
         tabId: String,
         sites: Set<String>,
     )
+
+    fun deleteBrowsingData()
 }

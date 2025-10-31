@@ -1254,6 +1254,10 @@ class BrowserTabFragment :
         // Toast.makeText(requireContext(), "Navigation history (back/forward) for this tab cleared", Toast.LENGTH_LONG).show()
         // webView?.clearHistory()
         // return
+
+        // tabRepository.deleteBrowsingData()
+        // Toast.makeText(requireContext(), "Browsing data deleted.", Toast.LENGTH_LONG).show()
+        // return
         
         val isFocusedNtp = omnibar.viewMode == ViewMode.NewTab && omnibar.getText().isEmpty() && omnibar.omnibarTextInput.hasFocus()
         browserActivity?.launchFire(launchedFromFocusedNtp = isFocusedNtp)
