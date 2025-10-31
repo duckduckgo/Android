@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.systemsearch
 
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.content.pm.PackageManager.GET_META_DATA
@@ -92,6 +93,7 @@ interface DeviceAppListProvider {
     suspend fun get(): List<DeviceApp>
 }
 
+@SuppressLint("DenyListedApi")
 class InstalledDeviceAppListProvider(
     private val packageManager: PackageManager,
     private val dispatcherProvider: DispatcherProvider,

@@ -19,7 +19,6 @@ package com.duckduckgo.networkprotection.internal.feature.system_apps
 import android.content.Context
 import android.content.Intent
 import android.content.pm.ApplicationInfo
-import android.content.pm.PackageManager
 import android.os.Bundle
 import android.view.View
 import androidx.core.view.isVisible
@@ -28,6 +27,7 @@ import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.common.utils.extensions.safeGetInstalledApplications
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.networkprotection.api.NetworkProtectionState
 import com.duckduckgo.networkprotection.internal.databinding.ActivityNetpInternalSystemAppsExclusionBinding
@@ -58,7 +58,7 @@ class NetPSystemAppsExclusionListActivity : DuckDuckGoActivity(), SystemAppView.
 
         binding.progress.isVisible = true
 
-        packageManager.getInstalledApplications(PackageManager.GET_META_DATA)
+        packageManager.safeGetInstalledApplications(this.applicationContext)
             .asSequence()
             .filter { (it.flags and ApplicationInfo.FLAG_SYSTEM) != 0 }
             .sortedBy { it.packageName }
