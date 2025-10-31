@@ -4425,13 +4425,6 @@ class BrowserTabViewModel @Inject constructor(
         command.value = SetBrowserBackground(getBackgroundResource(lightModeEnabled))
     }
 
-    private fun getBuckOnboardingExperimentBackgroundColor(lightModeEnabled: Boolean): Int =
-        if (lightModeEnabled) {
-            CommonR.color.buckYellow
-        } else {
-            CommonR.color.buckLightBlue
-        }
-
     fun setOnboardingDialogBackground(lightModeEnabled: Boolean) {
         command.value = SetOnboardingDialogBackground(getBackgroundResource(lightModeEnabled))
     }
