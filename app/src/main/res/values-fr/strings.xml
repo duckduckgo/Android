@@ -601,7 +601,6 @@
     <string name="waitlistNotificationDialogNotifyMe">ME PRÉVENIR</string>
 
     <!-- Email Protection -->
-    <string name="emailProtectionActivityTitle">Protection des e-mails (bêta)</string>
     <string name="emailNotSupported">Appareil non pris en charge</string>
     <string name="emailNotSupportedExplanation">La protection des e-mails vous permet de créer des adresses e-mail privées qui suppriment les traqueurs d\'e-mails. Nous devons chiffrer et stocker ces adresses que vous créez localement sur votre appareil. Ce dernier ne prenant pas en charge le stockage chiffré, la protection des e-mails n\'est pas disponible.</string>
 

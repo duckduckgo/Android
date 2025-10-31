@@ -601,7 +601,6 @@
     <string name="waitlistNotificationDialogNotifyMe">ÉRTESÍTSETEK</string>
 
     <!-- Email Protection -->
-    <string name="emailProtectionActivityTitle">E-mail védelem (béta)</string>
     <string name="emailNotSupported">Az eszköz nem támogatott</string>
     <string name="emailNotSupportedExplanation">Az e-mail-védelem lehetővé teszi olyan privát e-mail-címek létrehozását, amelyek eltávolítják az e-mail nyomkövetőket. Ezeket a címeket helyileg az eszközödön kell titkosítanunk és tárolnunk. Mivel az eszközöd nem támogatja a titkosított tárhelyet, az e-mail-védelem nem érhető el.</string>
 

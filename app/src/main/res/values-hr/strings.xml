@@ -603,7 +603,6 @@
     <string name="waitlistNotificationDialogNotifyMe">OBAVIJESTI ME</string>
 
     <!-- Email Protection -->
-    <string name="emailProtectionActivityTitle">Zaštita e-pošte (Beta)</string>
     <string name="emailNotSupported">Uređaj nije podržan</string>
     <string name="emailNotSupportedExplanation">Zaštita e-pošte omogućuje ti stvaranje privatnih adresa e-pošte koje uklanjaju praćenje e-pošte. Adrese koje kreiraš moramo šifrirati i pohraniti lokalno na tvom uređaju. Budući da tvoj uređaj ne podržava šifriranu pohranu, zaštita e-pošte nije dostupna.</string>
 

@@ -601,7 +601,6 @@
     <string name="waitlistNotificationDialogNotifyMe">NOTIFICARME</string>
 
     <!-- Email Protection -->
-    <string name="emailProtectionActivityTitle">Protección de correo electrónico (beta)</string>
     <string name="emailNotSupported">Dispositivo no compatible</string>
     <string name="emailNotSupportedExplanation">Email Protection te permite crear direcciones de correo electrónico privadas que eliminan los rastreadores de correo electrónico. Necesitamos encriptar y almacenar las direcciones que creas localmente en tu dispositivo. Debido a que tu dispositivo no admite el almacenamiento cifrado, Email Protection no está disponible.</string>
 

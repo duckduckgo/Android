@@ -601,7 +601,6 @@
     <string name="waitlistNotificationDialogNotifyMe">UNDERRET MIG</string>
 
     <!-- Email Protection -->
-    <string name="emailProtectionActivityTitle">E-mailbeskyttelse (Beta)</string>
     <string name="emailNotSupported">Enheden understøttes ikke</string>
     <string name="emailNotSupportedExplanation">E-mailbeskyttelse giver dig mulighed for at oprette private e-mailadresser, der fjerner e-mailtrackere. Vi skal kryptere og gemme disse adresser, som du opretter lokalt på din enhed. Fordi din enhed ikke understøtter krypteret lagring, er e-mailbeskyttelse ikke tilgængelig.</string>
 

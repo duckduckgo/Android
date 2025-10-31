@@ -603,7 +603,6 @@
     <string name="waitlistNotificationDialogNotifyMe">POWIADOM MNIE</string>
 
     <!-- Email Protection -->
-    <string name="emailProtectionActivityTitle">Ochrona poczty e-mail (wersja beta)</string>
     <string name="emailNotSupported">Urządzenie nie jest obsługiwane</string>
     <string name="emailNotSupportedExplanation">Ochrona poczty e-mail umożliwia tworzenie prywatnych adresów e-mail, które usuwają skrypty śledzące wiadomości e-mail. Musimy szyfrować i przechowywać tworzone adresy lokalnie na Twoim urządzeniu. Ponieważ Twoje urządzenie nie obsługuje szyfrowanego przechowywania, ochrona poczty e-mail jest niedostępna.</string>
 
