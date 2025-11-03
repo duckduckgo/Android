@@ -109,7 +109,7 @@ class GetNativeSettingsHandlerTest {
         val response = fakeJsMessaging.getLastResponse()!!
         assertEquals(jsMessage.featureName, response.featureName)
         assertEquals(jsMessage.method, response.method)
-        assertEquals(jsMessage.id ?: "", response.id)
+        assertEquals(jsMessage.id, response.id)
         assertEquals(0, response.params.length())
     }
 
@@ -129,7 +129,7 @@ class GetNativeSettingsHandlerTest {
         val response = fakeJsMessaging.getLastResponse()!!
         assertEquals(jsMessage.featureName, response.featureName)
         assertEquals(jsMessage.method, response.method)
-        assertEquals(jsMessage.id ?: "", response.id)
+        assertEquals(jsMessage.id, response.id)
         assertEquals(0, response.params.length())
     }
 
@@ -146,11 +146,51 @@ class GetNativeSettingsHandlerTest {
         val response = fakeJsMessaging.getLastResponse()!!
         assertEquals(jsMessage.featureName, response.featureName)
         assertEquals(jsMessage.method, response.method)
-        assertEquals(jsMessage.id ?: "", response.id)
+        assertEquals(jsMessage.id, response.id)
 
         assertEquals(2, response.params.length())
         assertEquals(true, response.params.getBoolean("isDuckAiEnabled"))
         assertEquals("Duck.AI", response.params.getString("duckAiTitle"))
+    }
+
+    @Test
+    fun `when id is null then no response is sent`() = runTest {
+        fakeSettingsPageFeature.serpSettingsSync().setRawStoredState(Toggle.State(enable = true))
+        fakeDataStore.setSerpSettings("""{"isDuckAiEnabled":"true"}""")
+
+        val jsMessage = JsMessage(
+            context = "test",
+            featureName = "serpSettings",
+            method = "getNativeSettings",
+            id = null,
+            params = JSONObject(),
+        )
+
+        handler.getJsMessageHandler().process(jsMessage, fakeJsMessaging, null)
+        coroutineTestRule.testScope.testScheduler.advanceUntilIdle()
+
+        assertEquals(0, fakeJsMessaging.getResponseCount())
+    }
+
+    @Test
+    fun `when id is not null then response is sent`() = runTest {
+        fakeSettingsPageFeature.serpSettingsSync().setRawStoredState(Toggle.State(enable = true))
+        fakeDataStore.setSerpSettings("""{"isDuckAiEnabled":"true"}""")
+
+        val jsMessage = JsMessage(
+            context = "test",
+            featureName = "serpSettings",
+            method = "getNativeSettings",
+            id = "test-id",
+            params = JSONObject(),
+        )
+
+        handler.getJsMessageHandler().process(jsMessage, fakeJsMessaging, null)
+        coroutineTestRule.testScope.testScheduler.advanceUntilIdle()
+
+        assertEquals(1, fakeJsMessaging.getResponseCount())
+        val response = fakeJsMessaging.getLastResponse()!!
+        assertEquals("test-id", response.id)
     }
 
     private fun createJsMessage(): JsMessage {
