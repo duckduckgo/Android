@@ -42,6 +42,7 @@ import com.duckduckgo.pir.impl.scripts.models.PirScriptRequestData.SolveCaptcha
 import com.duckduckgo.pir.impl.scripts.models.PirScriptRequestData.UserProfile
 import com.duckduckgo.pir.impl.scripts.models.PirSuccessResponse
 import com.duckduckgo.pir.impl.scripts.models.PirSuccessResponse.ClickResponse
+import com.duckduckgo.pir.impl.scripts.models.PirSuccessResponse.ConditionResponse
 import com.duckduckgo.pir.impl.scripts.models.PirSuccessResponse.ExpectationResponse
 import com.duckduckgo.pir.impl.scripts.models.PirSuccessResponse.ExtractedResponse
 import com.duckduckgo.pir.impl.scripts.models.PirSuccessResponse.FillFormResponse
@@ -217,8 +218,7 @@ class PirModule {
                     .withSubtype(BrokerAction.SolveCaptcha::class.java, "solveCaptcha")
                     .withSubtype(BrokerAction.EmailConfirmation::class.java, "emailConfirmation")
                     .withSubtype(BrokerAction.Condition::class.java, "condition"),
-            )
-            .add(
+            ).add(
                 PolymorphicJsonAdapterFactory.of(BrokerStep::class.java, "stepType")
                     .withSubtype(ScanStep::class.java, "scan")
                     .withSubtype(OptOutStep::class.java, "optOut"),
@@ -230,7 +230,8 @@ class PirModule {
                     .withSubtype(SolveCaptchaResponse::class.java, "solveCaptcha")
                     .withSubtype(ClickResponse::class.java, "click")
                     .withSubtype(ExpectationResponse::class.java, "expectation")
-                    .withSubtype(FillFormResponse::class.java, "fillForm"),
+                    .withSubtype(FillFormResponse::class.java, "fillForm")
+                    .withSubtype(ConditionResponse::class.java, "condition"),
             )
             .add(KotlinJsonAdapterFactory())
             .build()

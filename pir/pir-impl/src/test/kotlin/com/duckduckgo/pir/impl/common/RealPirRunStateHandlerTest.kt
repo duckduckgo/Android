@@ -47,6 +47,7 @@ import com.duckduckgo.pir.impl.store.db.BrokerScanEventType.BROKER_SUCCESS
 import com.duckduckgo.pir.impl.store.db.EmailConfirmationEventType.EMAIL_CONFIRMATION_FAILED
 import com.duckduckgo.pir.impl.store.db.EmailConfirmationEventType.EMAIL_CONFIRMATION_SUCCESS
 import com.duckduckgo.pir.impl.store.db.PirBrokerScanLog
+import com.squareup.moshi.Moshi
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule
@@ -71,6 +72,7 @@ class RealPirRunStateHandlerTest {
     private val mockJobRecordUpdater: JobRecordUpdater = mock()
     private val mockSchedulingRepository: PirSchedulingRepository = mock()
     private val mockCurrentTimeProvider: CurrentTimeProvider = mock()
+    private val moshi: Moshi = Moshi.Builder().build()
 
     @Before
     fun setUp() {
@@ -83,6 +85,7 @@ class RealPirRunStateHandlerTest {
                 jobRecordUpdater = mockJobRecordUpdater,
                 pirSchedulingRepository = mockSchedulingRepository,
                 currentTimeProvider = mockCurrentTimeProvider,
+                moshi = moshi,
             )
 
         whenever(mockCurrentTimeProvider.currentTimeMillis()).thenReturn(testEventTimeInMillis)
