@@ -489,9 +489,9 @@ class RealDuckChatJSHelperTest {
 
         // get count
         val info = testee.processJsCallbackMessage(featureName, "getMigrationInfo", id, null)
-        val expected = JSONObject().apply { 
+        val expected = JSONObject().apply {
             put("ok", true)
-            put("count", 2) 
+            put("count", 2)
         }
         assertEquals(expected.toString(), info!!.params.toString())
     }
@@ -506,9 +506,9 @@ class RealDuckChatJSHelperTest {
         testee.processJsCallbackMessage(featureName, "storeMigrationData", id, JSONObject(mapOf("serializedMigrationFile" to "file-2")))
 
         val result = testee.processJsCallbackMessage(featureName, "getMigrationDataByIndex", id, JSONObject(mapOf("index" to 1)))
-        val expected = JSONObject().apply { 
+        val expected = JSONObject().apply {
             put("ok", true)
-            put("serializedMigrationFile", "file-2") 
+            put("serializedMigrationFile", "file-2")
         }
         assertEquals(expected.toString(), result!!.params.toString())
     }
@@ -555,9 +555,9 @@ class RealDuckChatJSHelperTest {
 
         // count is zero
         val info = testee.processJsCallbackMessage(featureName, "getMigrationInfo", id, null)
-        val expected = JSONObject().apply { 
+        val expected = JSONObject().apply {
             put("ok", true)
-            put("count", 0) 
+            put("count", 0)
         }
         assertEquals(expected.toString(), info!!.params.toString())
     }
