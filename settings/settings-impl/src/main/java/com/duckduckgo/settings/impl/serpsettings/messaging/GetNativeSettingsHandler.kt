@@ -21,28 +21,31 @@ import com.duckduckgo.common.utils.AppUrl
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.contentscopescripts.api.ContentScopeJsMessageHandlersPlugin
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.js.messaging.api.JsCallbackData
 import com.duckduckgo.js.messaging.api.JsMessage
 import com.duckduckgo.js.messaging.api.JsMessageCallback
 import com.duckduckgo.js.messaging.api.JsMessageHandler
 import com.duckduckgo.js.messaging.api.JsMessaging
 import com.duckduckgo.settings.api.SettingsPageFeature
+import com.duckduckgo.settings.impl.serpsettings.store.SerpSettingsDataStore
 import com.squareup.anvil.annotations.ContributesMultibinding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import logcat.logcat
+import org.json.JSONObject
 import javax.inject.Inject
 
 /**
  * Handles the getNativeSettings message from SERP to retrieve stored settings.
  *
- * If there are no stored settings, it returns an empty JSON object.
+ * If there are no stored settings, it returns an empty JSON object according to the expected format.
  */
 @ContributesMultibinding(AppScope::class)
 class GetNativeSettingsHandler @Inject constructor(
     private val dispatcherProvider: DispatcherProvider,
     @AppCoroutineScope private val appScope: CoroutineScope,
     private val settingsPageFeature: SettingsPageFeature,
-    // TODO: Inject data store when implemented
+    private val serpSettingsDataStore: SerpSettingsDataStore,
 ) : ContentScopeJsMessageHandlersPlugin {
 
     override fun getJsMessageHandler(): JsMessageHandler =
@@ -56,7 +59,26 @@ class GetNativeSettingsHandler @Inject constructor(
                     if (settingsPageFeature.serpSettingsSync().isEnabled()) {
                         logcat { "SERP-SETTINGS: GetNativeSettingsHandler processing message" }
 
-                        // TODO return settings from datastore or empty object
+                        val settingsString = serpSettingsDataStore.getSerpSettings()
+
+                        val settingsJsonObject = if (settingsString.isNullOrEmpty()) {
+                            // Return an empty JSON object if no settings are stored
+                            JSONObject()
+                        } else {
+                            JSONObject(settingsString)
+                        }
+
+                        logcat { "SERP-SETTINGS: GetNativeSettingsHandler sending: $settingsJsonObject" }
+                        jsMessage.id?.let { id ->
+                            jsMessaging.onResponse(
+                                JsCallbackData(
+                                    params = settingsJsonObject,
+                                    featureName = jsMessage.featureName,
+                                    method = jsMessage.method,
+                                    id = id,
+                                ),
+                            )
+                        }
                     }
                 }
             }

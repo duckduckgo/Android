@@ -26,6 +26,7 @@ import com.duckduckgo.js.messaging.api.JsMessageCallback
 import com.duckduckgo.js.messaging.api.JsMessageHandler
 import com.duckduckgo.js.messaging.api.JsMessaging
 import com.duckduckgo.settings.api.SettingsPageFeature
+import com.duckduckgo.settings.impl.serpsettings.store.SerpSettingsDataStore
 import com.squareup.anvil.annotations.ContributesMultibinding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -40,7 +41,7 @@ class UpdateNativeSettingsHandler @Inject constructor(
     private val dispatcherProvider: DispatcherProvider,
     @AppCoroutineScope private val appScope: CoroutineScope,
     private val settingsPageFeature: SettingsPageFeature,
-    // TODO: Inject data store when implemented
+    private val serpSettingsDataStore: SerpSettingsDataStore,
 ) : ContentScopeJsMessageHandlersPlugin {
 
     override fun getJsMessageHandler(): JsMessageHandler =
@@ -53,7 +54,10 @@ class UpdateNativeSettingsHandler @Inject constructor(
                 appScope.launch(dispatcherProvider.io()) {
                     if (settingsPageFeature.serpSettingsSync().isEnabled()) {
                         logcat { "SERP-SETTINGS: UpdateNativeSettingsHandler processing message" }
-                        // TODO Use a data store to store the settings from SERP
+
+                        val params = jsMessage.params
+                        logcat { "SERP-SETTINGS: UpdateNativeSettingsHandler storing: $params" }
+                        serpSettingsDataStore.setSerpSettings(params.toString())
                     }
                 }
             }

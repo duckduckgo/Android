@@ -63,14 +63,16 @@ class IsNativeDuckAiEnabledHandler @Inject constructor(
                             put("enabled", duckChat.isEnabled())
                         }
 
-                        jsMessaging.onResponse(
-                            JsCallbackData(
-                                params = response,
-                                featureName = jsMessage.featureName,
-                                method = jsMessage.method,
-                                id = jsMessage.id ?: "",
-                            ),
-                        )
+                        jsMessage.id?.let { id ->
+                            jsMessaging.onResponse(
+                                JsCallbackData(
+                                    params = response,
+                                    featureName = jsMessage.featureName,
+                                    method = jsMessage.method,
+                                    id = id,
+                                ),
+                            )
+                        }
                     }
                 }
             }
