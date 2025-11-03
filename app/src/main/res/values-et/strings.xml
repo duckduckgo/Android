@@ -844,7 +844,7 @@
 
     <!-- Appearance settings -->
     <string name="settingsAddressBarPositionTitle">Aadressiriba</string>
-    <string name="settingsAddressBarPositionHeaderTitle">Aadressi asukoht</string>
+    <string name="settingsAddressBarPositionHeaderTitle">Aadressiriba asukoht</string>
     <string name="settingsAddressBarPositionTop">Tipp</string>
     <string name="settingsAddressBarPositionBottom">All</string>
     <string name="settingsAddressBarPositionSplit">Jagatud</string>

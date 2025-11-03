@@ -876,7 +876,7 @@
 
     <!-- Appearance settings -->
     <string name="settingsAddressBarPositionTitle">Riadok adresy</string>
-    <string name="settingsAddressBarPositionHeaderTitle">Poloha panela s adresou</string>
+    <string name="settingsAddressBarPositionHeaderTitle">Poloha riadku s adresou</string>
     <string name="settingsAddressBarPositionTop">Hore</string>
     <string name="settingsAddressBarPositionBottom">Spodná časť</string>
     <string name="settingsAddressBarPositionSplit">Rozdelenie</string>

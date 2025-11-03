@@ -844,7 +844,7 @@
 
     <!-- Appearance settings -->
     <string name="settingsAddressBarPositionTitle">Adressfält</string>
-    <string name="settingsAddressBarPositionHeaderTitle">Adressfältets position</string>
+    <string name="settingsAddressBarPositionHeaderTitle">Adressfältsläge</string>
     <string name="settingsAddressBarPositionTop">Topp</string>
     <string name="settingsAddressBarPositionBottom">Botten</string>
     <string name="settingsAddressBarPositionSplit">Dela</string>

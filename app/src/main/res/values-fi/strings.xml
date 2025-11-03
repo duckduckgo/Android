@@ -844,7 +844,7 @@
 
     <!-- Appearance settings -->
     <string name="settingsAddressBarPositionTitle">Osoitekenttä</string>
-    <string name="settingsAddressBarPositionHeaderTitle">Osoiterivin sijainti</string>
+    <string name="settingsAddressBarPositionHeaderTitle">Osoitepalkin sijainti</string>
     <string name="settingsAddressBarPositionTop">Ylös</string>
     <string name="settingsAddressBarPositionBottom">Alareuna</string>
     <string name="settingsAddressBarPositionSplit">Jaa</string>

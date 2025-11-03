@@ -844,7 +844,7 @@
 
     <!-- Appearance settings -->
     <string name="settingsAddressBarPositionTitle">Adressefelt</string>
-    <string name="settingsAddressBarPositionHeaderTitle">Plassering av adresselinjen</string>
+    <string name="settingsAddressBarPositionHeaderTitle">Plassering av adressefelt</string>
     <string name="settingsAddressBarPositionTop">Topp</string>
     <string name="settingsAddressBarPositionBottom">Nederst</string>
     <string name="settingsAddressBarPositionSplit">Del</string>
