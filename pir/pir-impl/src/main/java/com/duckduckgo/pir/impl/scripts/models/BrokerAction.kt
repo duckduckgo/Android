@@ -63,11 +63,13 @@ sealed class BrokerAction(
     data class GetCaptchaInfo(
         override val id: String,
         val selector: String,
+        val captchaType: String? = null,
     ) : BrokerAction(id)
 
     data class SolveCaptcha(
         override val id: String,
         val selector: String,
+        val captchaType: String? = null,
     ) : BrokerAction(id)
 
     data class Click(
