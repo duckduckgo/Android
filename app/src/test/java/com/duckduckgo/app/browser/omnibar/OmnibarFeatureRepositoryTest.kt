@@ -65,7 +65,7 @@ class OmnibarFeatureRepositoryTest {
     }
 
     @Test
-    fun givenSplitOmnibarEnabledWhenSplitOmnibarIsDisabledThenOmnibarTypeIsReset() = runTest {
+    fun `given split omnibar enabled when split omnibar is disabled then omnibar type is reset`() = runTest {
         fakeSettingsDataStore.omnibarType = OmnibarType.SPLIT
         browserFeatures.useUnifiedOmnibarLayout().setRawStoredState(Toggle.State(enable = true))
         browserFeatures.splitOmnibar().setRawStoredState(Toggle.State(enable = false))
@@ -78,7 +78,7 @@ class OmnibarFeatureRepositoryTest {
     }
 
     @Test
-    fun givenSplitOmnibarWasPreviouslySelectedWhenSplitOmnibarIsEnabledThenOmnibarTypeIsRestored() = runTest {
+    fun `given split omnibar was previously selected when split omnibar is enabled then omnibar type is restored`() = runTest {
         fakeSettingsDataStore.omnibarType = OmnibarType.SINGLE_TOP
         fakeSettingsDataStore.isSplitOmnibarSelected = true
         browserFeatures.useUnifiedOmnibarLayout().setRawStoredState(Toggle.State(enable = true))
@@ -92,7 +92,7 @@ class OmnibarFeatureRepositoryTest {
     }
 
     @Test
-    fun whenIsSplitOmnibarAvailableAndOmnibarTypeIsSplitThenIsSplitOmnibarEnabledIsTrue() = runTest {
+    fun `when split omnibar available and omnibar type is split then split omnibar enabled is true`() = runTest {
         browserFeatures.useUnifiedOmnibarLayout().setRawStoredState(Toggle.State(enable = true))
         browserFeatures.splitOmnibar().setRawStoredState(Toggle.State(enable = true))
         fakeSettingsDataStore.omnibarType = OmnibarType.SPLIT
@@ -103,7 +103,7 @@ class OmnibarFeatureRepositoryTest {
     }
 
     @Test
-    fun whenIsSplitOmnibarNotAvailableThenIsSplitOmnibarEnabledIsFalse() = runTest {
+    fun `when split omnibar not available then split omnibar enabled is false`() = runTest {
         browserFeatures.useUnifiedOmnibarLayout().setRawStoredState(Toggle.State(enable = false))
         browserFeatures.splitOmnibar().setRawStoredState(Toggle.State(enable = true))
         fakeSettingsDataStore.omnibarType = OmnibarType.SPLIT
@@ -114,7 +114,7 @@ class OmnibarFeatureRepositoryTest {
     }
 
     @Test
-    fun whenOmnibarTypeIsNotSplitThenIsSplitOmnibarEnabledIsFalse() = runTest {
+    fun `when omnibar type is not split then split omnibar enabled is false`() = runTest {
         browserFeatures.useUnifiedOmnibarLayout().setRawStoredState(Toggle.State(enable = true))
         browserFeatures.splitOmnibar().setRawStoredState(Toggle.State(enable = true))
         fakeSettingsDataStore.omnibarType = OmnibarType.SINGLE_TOP
