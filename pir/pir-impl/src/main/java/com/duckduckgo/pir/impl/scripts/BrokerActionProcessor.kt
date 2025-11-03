@@ -28,20 +28,9 @@ import com.duckduckgo.pir.impl.scripts.models.PirError
 import com.duckduckgo.pir.impl.scripts.models.PirResult
 import com.duckduckgo.pir.impl.scripts.models.PirScriptError
 import com.duckduckgo.pir.impl.scripts.models.PirScriptRequestData
-import com.duckduckgo.pir.impl.scripts.models.PirScriptRequestData.SolveCaptcha
-import com.duckduckgo.pir.impl.scripts.models.PirScriptRequestData.UserProfile
 import com.duckduckgo.pir.impl.scripts.models.PirScriptRequestParams
 import com.duckduckgo.pir.impl.scripts.models.PirSuccessResponse
-import com.duckduckgo.pir.impl.scripts.models.PirSuccessResponse.ClickResponse
-import com.duckduckgo.pir.impl.scripts.models.PirSuccessResponse.ExpectationResponse
-import com.duckduckgo.pir.impl.scripts.models.PirSuccessResponse.ExtractedResponse
-import com.duckduckgo.pir.impl.scripts.models.PirSuccessResponse.FillFormResponse
-import com.duckduckgo.pir.impl.scripts.models.PirSuccessResponse.GetCaptchaInfoResponse
-import com.duckduckgo.pir.impl.scripts.models.PirSuccessResponse.NavigateResponse
-import com.duckduckgo.pir.impl.scripts.models.PirSuccessResponse.SolveCaptchaResponse
 import com.squareup.moshi.Moshi
-import com.squareup.moshi.adapters.PolymorphicJsonAdapterFactory
-import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import logcat.LogPriority.ERROR
 import logcat.logcat
 import org.json.JSONObject
@@ -74,43 +63,17 @@ interface BrokerActionProcessor {
 
 class RealBrokerActionProcessor(
     private val pirMessagingInterface: JsMessaging,
+    private val moshi: Moshi,
 ) : BrokerActionProcessor {
     private val requestAdapter by lazy {
-        Moshi.Builder()
-            .add(
-                PolymorphicJsonAdapterFactory.of(PirScriptRequestData::class.java, "data")
-                    .withSubtype(SolveCaptcha::class.java, "solveCaptcha")
-                    .withSubtype(UserProfile::class.java, "userProfile"),
-            ).add(
-                PolymorphicJsonAdapterFactory.of(BrokerAction::class.java, "actionType")
-                    .withSubtype(BrokerAction.Extract::class.java, "extract")
-                    .withSubtype(BrokerAction.Expectation::class.java, "expectation")
-                    .withSubtype(BrokerAction.Click::class.java, "click")
-                    .withSubtype(BrokerAction.FillForm::class.java, "fillForm")
-                    .withSubtype(BrokerAction.Navigate::class.java, "navigate")
-                    .withSubtype(BrokerAction.GetCaptchaInfo::class.java, "getCaptchaInfo")
-                    .withSubtype(BrokerAction.SolveCaptcha::class.java, "solveCaptcha")
-                    .withSubtype(BrokerAction.EmailConfirmation::class.java, "emailConfirmation"),
-            ).add(KotlinJsonAdapterFactory())
-            .build()
-            .adapter(PirScriptRequestParams::class.java)
+        moshi.adapter(PirScriptRequestParams::class.java)
     }
     private val responseAdapter by lazy {
-        Moshi.Builder().add(
-            PolymorphicJsonAdapterFactory.of(PirSuccessResponse::class.java, "actionType")
-                .withSubtype(NavigateResponse::class.java, "navigate")
-                .withSubtype(ExtractedResponse::class.java, "extract")
-                .withSubtype(GetCaptchaInfoResponse::class.java, "getCaptchaInfo")
-                .withSubtype(SolveCaptchaResponse::class.java, "solveCaptcha")
-                .withSubtype(ClickResponse::class.java, "click")
-                .withSubtype(ExpectationResponse::class.java, "expectation")
-                .withSubtype(FillFormResponse::class.java, "fillForm"),
-        ).add(KotlinJsonAdapterFactory())
-            .build().adapter(PirResult::class.java)
+        moshi.adapter(PirResult::class.java)
     }
 
     private val errorAdapter by lazy {
-        Moshi.Builder().build().adapter(PirScriptError::class.java)
+        moshi.adapter(PirScriptError::class.java)
     }
 
     private var registeredActionResultListener: ActionResultListener? = null
