@@ -66,10 +66,10 @@ class OmnibarFeatureRepository @Inject constructor(
     }
 
     private fun resetOmnibarTypeIfNecessary() {
-        if (settingsDataStore.omnibarType == OmnibarType.SPLIT && !isSplitOmnibarFlagEnabled) {
+        if (settingsDataStore.omnibarType == OmnibarType.SPLIT && !isSplitOmnibarAvailable) {
             settingsDataStore.isSplitOmnibarSelected = true
             settingsDataStore.omnibarType = OmnibarType.SINGLE_TOP
-        } else if (settingsDataStore.isSplitOmnibarSelected && isSplitOmnibarFlagEnabled) {
+        } else if (settingsDataStore.isSplitOmnibarSelected && isSplitOmnibarAvailable) {
             // Restore user's choice if the feature is re-enabled
             settingsDataStore.omnibarType = OmnibarType.SPLIT
             settingsDataStore.isSplitOmnibarSelected = false
