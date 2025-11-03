@@ -24,6 +24,7 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import com.duckduckgo.common.ui.internal.R
 import com.duckduckgo.common.ui.view.LottieDaxDialog
 import com.duckduckgo.common.ui.view.TypewriterDaxDialog
 import com.duckduckgo.common.ui.view.button.ButtonType.DESTRUCTIVE
@@ -34,8 +35,8 @@ import com.duckduckgo.common.ui.view.dialog.PromoBottomSheetDialog
 import com.duckduckgo.common.ui.view.dialog.RadioListAlertDialogBuilder
 import com.duckduckgo.common.ui.view.dialog.StackedAlertDialogBuilder
 import com.duckduckgo.common.ui.view.dialog.TextAlertDialogBuilder
-import com.duckduckgo.mobile.android.R
 import com.google.android.material.snackbar.Snackbar
+import com.duckduckgo.mobile.android.R as CommonR
 
 /** Fragment to display a list of dialogs. */
 @SuppressLint("NoFragment") // we don't use DI here
@@ -58,11 +59,11 @@ class DialogsFragment : Fragment() {
         view.findViewById<Button>(R.id.textAlertDialogWithImageButton)?.let {
             it.setOnClickListener {
                 TextAlertDialogBuilder(requireContext())
-                    .setHeaderImageResource(R.drawable.ic_dax_icon)
-                    .setTitle(R.string.text_dialog_title)
-                    .setMessage(R.string.text_dialog_message)
-                    .setPositiveButton(R.string.text_dialog_positive)
-                    .setNegativeButton(R.string.text_dialog_negative)
+                    .setHeaderImageResource(CommonR.drawable.ic_dax_icon)
+                    .setTitle(CommonR.string.text_dialog_title)
+                    .setMessage(CommonR.string.text_dialog_message)
+                    .setPositiveButton(CommonR.string.text_dialog_positive)
+                    .setNegativeButton(CommonR.string.text_dialog_negative)
                     .addEventListener(
                         object : TextAlertDialogBuilder.EventListener() {
                             override fun onPositiveButtonClicked() {
@@ -81,11 +82,17 @@ class DialogsFragment : Fragment() {
         view.findViewById<Button>(R.id.radioButtonAlertDialog)?.let {
             it.setOnClickListener {
                 RadioListAlertDialogBuilder(requireContext())
-                    .setTitle(R.string.text_dialog_title)
-                    .setMessage(R.string.text_dialog_message)
-                    .setPositiveButton(R.string.text_dialog_positive)
-                    .setNegativeButton(R.string.text_dialog_negative)
-                    .setOptions(listOf(R.string.text_dialog_option, R.string.text_dialog_option, R.string.text_dialog_option))
+                    .setTitle(CommonR.string.text_dialog_title)
+                    .setMessage(CommonR.string.text_dialog_message)
+                    .setPositiveButton(CommonR.string.text_dialog_positive)
+                    .setNegativeButton(CommonR.string.text_dialog_negative)
+                    .setOptions(
+                        listOf(
+                            CommonR.string.text_dialog_option,
+                            CommonR.string.text_dialog_option,
+                            CommonR.string.text_dialog_option,
+                        ),
+                    )
                     .addEventListener(
                         object : RadioListAlertDialogBuilder.EventListener() {
                             override fun onRadioItemSelected(selectedItem: Int) {
@@ -100,11 +107,11 @@ class DialogsFragment : Fragment() {
         view.findViewById<Button>(R.id.radioButtonDestructiveAlertDialog)?.let {
             it.setOnClickListener {
                 RadioListAlertDialogBuilder(requireContext())
-                    .setTitle(R.string.text_dialog_title)
-                    .setMessage(R.string.text_dialog_message)
-                    .setPositiveButton(R.string.text_dialog_positive, DESTRUCTIVE)
-                    .setNegativeButton(R.string.text_dialog_negative, GHOST_ALT)
-                    .setOptions(listOf(R.string.text_dialog_option, R.string.text_dialog_option, R.string.text_dialog_option))
+                    .setTitle(CommonR.string.text_dialog_title)
+                    .setMessage(CommonR.string.text_dialog_message)
+                    .setPositiveButton(CommonR.string.text_dialog_positive, DESTRUCTIVE)
+                    .setNegativeButton(CommonR.string.text_dialog_negative, GHOST_ALT)
+                    .setOptions(listOf(CommonR.string.text_dialog_option, CommonR.string.text_dialog_option, CommonR.string.text_dialog_option))
                     .addEventListener(
                         object : RadioListAlertDialogBuilder.EventListener() {
                             override fun onRadioItemSelected(selectedItem: Int) {
@@ -119,10 +126,10 @@ class DialogsFragment : Fragment() {
         view.findViewById<Button>(R.id.textAlertDialogButton)?.let {
             it.setOnClickListener {
                 TextAlertDialogBuilder(requireContext())
-                    .setTitle(R.string.text_dialog_title)
-                    .setMessage(R.string.text_dialog_message)
-                    .setPositiveButton(R.string.text_dialog_positive)
-                    .setNegativeButton(R.string.text_dialog_negative)
+                    .setTitle(CommonR.string.text_dialog_title)
+                    .setMessage(CommonR.string.text_dialog_message)
+                    .setPositiveButton(CommonR.string.text_dialog_positive)
+                    .setNegativeButton(CommonR.string.text_dialog_negative)
                     .addEventListener(
                         object : TextAlertDialogBuilder.EventListener() {
                             override fun onPositiveButtonClicked() {
@@ -141,10 +148,10 @@ class DialogsFragment : Fragment() {
         view.findViewById<Button>(R.id.textAlertDestructiveDialogButton)?.let {
             it.setOnClickListener {
                 TextAlertDialogBuilder(requireContext())
-                    .setTitle(R.string.text_dialog_title)
-                    .setMessage(R.string.text_dialog_message)
-                    .setPositiveButton(R.string.text_dialog_positive, DESTRUCTIVE)
-                    .setNegativeButton(R.string.text_dialog_negative, GHOST_ALT)
+                    .setTitle(CommonR.string.text_dialog_title)
+                    .setMessage(CommonR.string.text_dialog_message)
+                    .setPositiveButton(CommonR.string.text_dialog_positive, DESTRUCTIVE)
+                    .setNegativeButton(CommonR.string.text_dialog_negative, GHOST_ALT)
                     .addEventListener(
                         object : TextAlertDialogBuilder.EventListener() {
                             override fun onPositiveButtonClicked() {
@@ -163,9 +170,9 @@ class DialogsFragment : Fragment() {
         view.findViewById<Button>(R.id.textAlertSingleDialogButton)?.let {
             it.setOnClickListener {
                 TextAlertDialogBuilder(requireContext())
-                    .setTitle(R.string.text_dialog_title)
-                    .setMessage(R.string.text_dialog_message)
-                    .setPositiveButton(R.string.text_dialog_positive, GHOST)
+                    .setTitle(CommonR.string.text_dialog_title)
+                    .setMessage(CommonR.string.text_dialog_message)
+                    .setPositiveButton(CommonR.string.text_dialog_positive, GHOST)
                     .addEventListener(
                         object : TextAlertDialogBuilder.EventListener() {
                             override fun onPositiveButtonClicked() {
@@ -184,11 +191,11 @@ class DialogsFragment : Fragment() {
         view.findViewById<Button>(R.id.textAlertDialogCancellable)?.let {
             it.setOnClickListener {
                 TextAlertDialogBuilder(requireContext())
-                    .setTitle(R.string.text_dialog_title)
-                    .setMessage(R.string.text_dialog_message)
+                    .setTitle(CommonR.string.text_dialog_title)
+                    .setMessage(CommonR.string.text_dialog_message)
                     .setCancellable(true)
-                    .setPositiveButton(R.string.text_dialog_positive)
-                    .setNegativeButton(R.string.text_dialog_negative)
+                    .setPositiveButton(CommonR.string.text_dialog_positive)
+                    .setNegativeButton(CommonR.string.text_dialog_negative)
                     .addEventListener(
                         object : TextAlertDialogBuilder.EventListener() {
                             override fun onPositiveButtonClicked() {
@@ -211,10 +218,10 @@ class DialogsFragment : Fragment() {
         view.findViewById<Button>(R.id.textAlertDialogOneButton)?.let {
             it.setOnClickListener {
                 TextAlertDialogBuilder(requireContext())
-                    .setTitle(R.string.text_dialog_title)
-                    .setMessage(R.string.text_dialog_message)
+                    .setTitle(CommonR.string.text_dialog_title)
+                    .setMessage(CommonR.string.text_dialog_message)
                     .setCancellable(true)
-                    .setPositiveButton(R.string.text_dialog_positive)
+                    .setPositiveButton(CommonR.string.text_dialog_positive)
                     .addEventListener(
                         object : TextAlertDialogBuilder.EventListener() {
                             override fun onPositiveButtonClicked() {
@@ -229,11 +236,11 @@ class DialogsFragment : Fragment() {
         view.findViewById<Button>(R.id.textAlertDialogCheckbox)?.let {
             it.setOnClickListener {
                 TextAlertDialogBuilder(requireContext())
-                    .setTitle(R.string.text_dialog_title)
-                    .setMessage(R.string.text_dialog_message)
-                    .setPositiveButton(R.string.text_dialog_positive)
-                    .setNegativeButton(R.string.text_dialog_negative)
-                    .setCheckBoxText(R.string.text_dialog_checkbox)
+                    .setTitle(CommonR.string.text_dialog_title)
+                    .setMessage(CommonR.string.text_dialog_message)
+                    .setPositiveButton(CommonR.string.text_dialog_positive)
+                    .setNegativeButton(CommonR.string.text_dialog_negative)
+                    .setCheckBoxText(CommonR.string.text_dialog_checkbox)
                     .addEventListener(
                         object : TextAlertDialogBuilder.EventListener() {
                             var isChecked: Boolean = false
@@ -257,14 +264,14 @@ class DialogsFragment : Fragment() {
         view.findViewById<Button>(R.id.stackedAlertDialogWithImageButton)?.let {
             it.setOnClickListener {
                 StackedAlertDialogBuilder(requireContext())
-                    .setHeaderImageResource(R.drawable.ic_dax_icon)
-                    .setTitle(R.string.text_dialog_title)
-                    .setMessage(R.string.text_dialog_message)
+                    .setHeaderImageResource(CommonR.drawable.ic_dax_icon)
+                    .setTitle(CommonR.string.text_dialog_title)
+                    .setMessage(CommonR.string.text_dialog_message)
                     .setStackedButtons(
                         listOf(
-                            R.string.text_dialog_positive,
-                            R.string.text_dialog_positive,
-                            R.string.text_dialog_positive,
+                            CommonR.string.text_dialog_positive,
+                            CommonR.string.text_dialog_positive,
+                            CommonR.string.text_dialog_positive,
                         ),
                     )
                     .addEventListener(
@@ -280,14 +287,14 @@ class DialogsFragment : Fragment() {
             view.findViewById<Button>(R.id.stackedAlertDialogWithButtons)?.let {
                 it.setOnClickListener {
                     StackedAlertDialogBuilder(requireContext())
-                        .setTitle(R.string.text_dialog_title)
-                        .setMessage(R.string.text_dialog_message)
+                        .setTitle(CommonR.string.text_dialog_title)
+                        .setMessage(CommonR.string.text_dialog_message)
                         .setStackedButtons(
                             listOf(
-                                R.string.text_dialog_positive,
-                                R.string.text_dialog_positive,
-                                R.string.text_dialog_positive,
-                                R.string.text_dialog_positive,
+                                CommonR.string.text_dialog_positive,
+                                CommonR.string.text_dialog_positive,
+                                CommonR.string.text_dialog_positive,
+                                CommonR.string.text_dialog_positive,
                             ),
                         )
                         .addEventListener(
@@ -303,14 +310,14 @@ class DialogsFragment : Fragment() {
                 view.findViewById<Button>(R.id.stackedAlertDestructiveDialogWithButtons)?.let {
                     it.setOnClickListener {
                         StackedAlertDialogBuilder(requireContext())
-                            .setTitle(R.string.text_dialog_title)
-                            .setMessage(R.string.text_dialog_message)
+                            .setTitle(CommonR.string.text_dialog_title)
+                            .setMessage(CommonR.string.text_dialog_message)
                             .setStackedButtons(
                                 listOf(
-                                    R.string.text_dialog_positive,
-                                    R.string.text_dialog_positive,
-                                    R.string.text_dialog_positive,
-                                    R.string.text_dialog_positive,
+                                    CommonR.string.text_dialog_positive,
+                                    CommonR.string.text_dialog_positive,
+                                    CommonR.string.text_dialog_positive,
+                                    CommonR.string.text_dialog_positive,
                                 ),
                             )
                             .setDestructiveButtons(true)
@@ -348,8 +355,8 @@ class DialogsFragment : Fragment() {
                         button.setOnClickListener {
                             ActionBottomSheetDialog.Builder(requireContext())
                                 .setTitle("Title")
-                                .setPrimaryItem("Primary Item", R.drawable.ic_add_16)
-                                .setSecondaryItem("Secondary Item", R.drawable.ic_add_16)
+                                .setPrimaryItem("Primary Item", CommonR.drawable.ic_add_16)
+                                .setSecondaryItem("Secondary Item", CommonR.drawable.ic_add_16)
                                 .addEventListener(
                                     object : ActionBottomSheetDialog.EventListener() {
                                         override fun onPrimaryItemClicked() {
@@ -415,7 +422,7 @@ class DialogsFragment : Fragment() {
                     view.findViewById<Button>(R.id.promoBottomSheetButtonWithImage)?.let { button ->
                         button.setOnClickListener {
                             PromoBottomSheetDialog.Builder(requireContext())
-                                .setIcon(R.drawable.ic_bottom_sheet_promo_icon)
+                                .setIcon(CommonR.drawable.ic_bottom_sheet_promo_icon)
                                 .setTitle("Title")
                                 .setContent("Add our search widget to your home screen for quick, easy access.")
                                 .setPrimaryButton("Button")
@@ -516,7 +523,7 @@ class DialogsFragment : Fragment() {
                                 LottieDaxDialog.newInstance(
                                     titleText = "Cookie Prompt",
                                     descriptionText = "This is an example of a Dax dialog with a custom animation",
-                                    lottieRes = R.raw.cookie_banner_dark,
+                                    lottieRes = CommonR.raw.cookie_banner_dark,
                                     primaryButtonText = "Primary CTA",
                                     secondaryButtonText = "Secondary CTA",
                                     hideButtonText = "Hide",

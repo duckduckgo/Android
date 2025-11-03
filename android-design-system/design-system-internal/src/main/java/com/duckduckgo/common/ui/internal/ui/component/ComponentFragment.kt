@@ -24,7 +24,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.duckduckgo.mobile.android.R
+import com.duckduckgo.common.ui.internal.R
 
 @SuppressLint("NoFragment") // we don't use DI here
 abstract class ComponentFragment : Fragment() {

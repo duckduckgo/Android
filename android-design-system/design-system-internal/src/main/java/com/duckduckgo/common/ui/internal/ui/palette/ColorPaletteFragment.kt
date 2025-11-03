@@ -22,7 +22,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import com.duckduckgo.mobile.android.R
+import com.duckduckgo.common.ui.internal.R
 
 /** Fragment to display a list of subsystems that show the values of this app's theme. */
 @SuppressLint("NoFragment") // we don't use DI here

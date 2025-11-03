@@ -24,11 +24,11 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import com.duckduckgo.common.ui.compose.text.DaxText
 import com.duckduckgo.common.ui.compose.theme.DuckDuckGoTheme
+import com.duckduckgo.common.ui.internal.R
 import com.duckduckgo.common.ui.internal.ui.appComponentsViewModel
 import com.duckduckgo.common.ui.internal.ui.setupThemedComposeView
 import com.duckduckgo.common.ui.view.text.DaxTextView
 import com.duckduckgo.common.ui.view.text.DaxTextView.Typography
-import com.duckduckgo.mobile.android.R
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import com.duckduckgo.common.ui.DuckDuckGoTheme as AppTheme
