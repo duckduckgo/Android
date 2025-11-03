@@ -479,7 +479,7 @@ sealed class Command {
 
     data object CloseCustomTab : Command()
 
-    data object LaunchPopupMenu : Command()
+    data class LaunchPopupMenu(val anchorToNavigationBar: Boolean) : Command()
 
     data class ShowAutoconsentAnimation(
         val isCosmetic: Boolean,

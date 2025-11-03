@@ -601,7 +601,7 @@
     <string name="waitlistNotificationDialogNotifyMe">HALUAN ILMOITUKSEN</string>
 
     <!-- Email Protection -->
-    <string name="emailProtectionActivityTitle">Sähköpostisuojaus (beta)</string>
+    <string name="emailProtectionActivityTitle">Sähköpostisuojaus</string>
     <string name="emailNotSupported">Laitetta ei tueta</string>
     <string name="emailNotSupportedExplanation">Sähköpostisuojauksen avulla voit luoda yksityisiä sähköpostiosoitteita, jotka poistavat sähköpostiseuraajat. Meidän on salattava ja tallennettava nämä luomasi osoitteet paikallisesti laitteellesi. Koska laitteesi ei tue salattua tallennusta, sähköpostisuojaus ei ole käytettävissä.</string>
 

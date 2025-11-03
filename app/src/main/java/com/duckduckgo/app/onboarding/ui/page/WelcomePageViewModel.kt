@@ -57,7 +57,7 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Unique
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
-import com.duckduckgo.browser.ui.omnibar.OmnibarPosition
+import com.duckduckgo.browser.ui.omnibar.OmnibarType
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.FragmentScope
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
@@ -156,12 +156,11 @@ class WelcomePageViewModel @Inject constructor(
             }
 
             ADDRESS_BAR_POSITION -> {
-                if (!defaultAddressBarPosition) {
-                    settingsDataStore.omnibarPosition = OmnibarPosition.BOTTOM
-                    pixel.fire(PREONBOARDING_BOTTOM_ADDRESS_BAR_SELECTED_UNIQUE)
-                }
                 viewModelScope.launch {
                     if (!defaultAddressBarPosition) {
+                        settingsDataStore.omnibarType = OmnibarType.SINGLE_BOTTOM
+                        pixel.fire(PREONBOARDING_BOTTOM_ADDRESS_BAR_SELECTED_UNIQUE)
+
                         onboardingDesignExperimentManager.fireAddressBarSetBottomPixel()
                     } else {
                         onboardingDesignExperimentManager.fireAddressBarSetTopPixel()

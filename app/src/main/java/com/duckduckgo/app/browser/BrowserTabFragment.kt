@@ -140,6 +140,7 @@ import com.duckduckgo.app.browser.menu.VpnMenuStore
 import com.duckduckgo.app.browser.model.BasicAuthenticationCredentials
 import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
 import com.duckduckgo.app.browser.model.LongPressTarget
+import com.duckduckgo.app.browser.navigation.bar.BrowserNavigationBarViewIntegration
 import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarObserver
 import com.duckduckgo.app.browser.newtab.NewTabPageProvider
 import com.duckduckgo.app.browser.omnibar.Omnibar
@@ -149,6 +150,7 @@ import com.duckduckgo.app.browser.omnibar.Omnibar.LogoClickListener
 import com.duckduckgo.app.browser.omnibar.Omnibar.OmnibarTextState
 import com.duckduckgo.app.browser.omnibar.Omnibar.TextListener
 import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode
+import com.duckduckgo.app.browser.omnibar.OmnibarFeatureRepository
 import com.duckduckgo.app.browser.omnibar.OmnibarItemPressedListener
 import com.duckduckgo.app.browser.omnibar.QueryOrigin
 import com.duckduckgo.app.browser.print.PrintDocumentAdapterFactory
@@ -250,8 +252,7 @@ import com.duckduckgo.browser.api.ui.BrowserScreens.PrivateSearchScreenNoParams
 import com.duckduckgo.browser.api.ui.BrowserScreens.WebViewActivityWithParams
 import com.duckduckgo.browser.api.webviewcompat.WebViewCompatWrapper
 import com.duckduckgo.browser.ui.autocomplete.BrowserAutoCompleteSuggestionsAdapter
-import com.duckduckgo.browser.ui.omnibar.OmnibarPosition.BOTTOM
-import com.duckduckgo.browser.ui.omnibar.OmnibarPosition.TOP
+import com.duckduckgo.browser.ui.omnibar.OmnibarType
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.DuckDuckGoFragment
 import com.duckduckgo.common.ui.store.BrowserAppTheme
@@ -307,7 +308,6 @@ import com.duckduckgo.js.messaging.api.JsCallbackData
 import com.duckduckgo.js.messaging.api.JsMessageCallback
 import com.duckduckgo.js.messaging.api.JsMessaging
 import com.duckduckgo.js.messaging.api.SubscriptionEventData
-import com.duckduckgo.js.messaging.api.WebViewCompatMessageCallback
 import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.Feed
 import com.duckduckgo.mobile.android.app.tracking.ui.AppTrackingProtectionScreens.AppTrackerOnboardingActivityWithEmptyParamsParams
 import com.duckduckgo.navigation.api.GlobalActivityStarter
@@ -596,6 +596,9 @@ class BrowserTabFragment :
     @Inject
     lateinit var webViewCompatWrapper: WebViewCompatWrapper
 
+    @Inject
+    lateinit var omnibarFeatureRepository: OmnibarFeatureRepository
+
     /**
      * We use this to monitor whether the user was seeing the in-context Email Protection signup prompt
      * This is needed because the activity stack will be cleared if an external link is opened in our browser
@@ -641,6 +644,8 @@ class BrowserTabFragment :
     }
 
     private val binding: FragmentBrowserTabBinding by viewBinding()
+
+    private lateinit var browserNavigationBarIntegration: BrowserNavigationBarViewIntegration
 
     private lateinit var omnibar: Omnibar
 
@@ -922,7 +927,7 @@ class BrowserTabFragment :
                 }
 
                 InputScreenActivityResultCodes.MENU_REQUESTED -> {
-                    launchPopupMenu()
+                    launchPopupMenu(omnibarFeatureRepository.isSplitOmnibarEnabled)
                 }
 
                 InputScreenActivityResultCodes.TAB_SWITCHER_REQUESTED -> {
@@ -1017,9 +1022,9 @@ class BrowserTabFragment :
         super.onActivityCreated(savedInstanceState)
 
         omnibar = Omnibar(
-            omnibarPosition = settingsDataStore.omnibarPosition,
+            omnibarType = settingsDataStore.omnibarType,
             binding = binding,
-            isUnifiedOmnibarEnabled = androidBrowserConfigFeature.useUnifiedOmnibarLayout().isEnabled(),
+            isUnifiedOmnibarEnabled = omnibarFeatureRepository.isUnifiedOmnibarFlagEnabled,
         )
 
         webViewContainer = binding.webViewContainer
@@ -1123,17 +1128,18 @@ class BrowserTabFragment :
     }
 
     private fun launchInputScreen(query: String) {
+        val isTopOmnibar = omnibar.omnibarType != OmnibarType.SINGLE_BOTTOM
         val intent =
             globalActivityStarter.startIntent(
                 requireContext(),
                 InputScreenActivityParams(
                     query = query,
-                    isTopOmnibar = omnibar.omnibarPosition == TOP,
+                    isTopOmnibar = isTopOmnibar,
                     browserButtonsConfig = InputScreenBrowserButtonsConfig.Enabled(tabs = viewModel.tabs.value?.size ?: 0),
                 ),
             )
-        val enterTransition = browserAndInputScreenTransitionProvider.getInputScreenEnterAnimation(omnibar.omnibarPosition == TOP)
-        val exitTransition = browserAndInputScreenTransitionProvider.getBrowserExitAnimation(omnibar.omnibarPosition == TOP)
+        val enterTransition = browserAndInputScreenTransitionProvider.getInputScreenEnterAnimation(isTopOmnibar)
+        val exitTransition = browserAndInputScreenTransitionProvider.getBrowserExitAnimation(isTopOmnibar)
         val options =
             ActivityOptionsCompat.makeCustomAnimation(
                 requireActivity(),
@@ -1186,6 +1192,14 @@ class BrowserTabFragment :
                     viewModel.onNavigationBarBookmarksButtonClicked()
                 }
             }
+
+        browserNavigationBarIntegration = BrowserNavigationBarViewIntegration(
+            lifecycleScope = lifecycleScope,
+            browserTabFragmentBinding = binding,
+            isEnabled = omnibarFeatureRepository.isSplitOmnibarEnabled,
+            omnibar = omnibar,
+            browserNavigationBarObserver = observer,
+        )
     }
 
     private fun configureEditModeChangeDetection() {
@@ -1226,16 +1240,9 @@ class BrowserTabFragment :
     private fun onOmnibarCustomTabPrivacyDashboardPressed() {
         val params = PrivacyDashboardPrimaryScreen(tabId)
         val intent = globalActivityStarter.startIntent(requireContext(), params)
-        postBreakageReportingEvent()
+        contentScopeScripts.sendSubscriptionEvent(createBreakageReportingEventData())
         intent?.let { activityResultPrivacyDashboard.launch(intent) }
         pixel.fire(CustomTabPixelNames.CUSTOM_TABS_PRIVACY_DASHBOARD_OPENED)
-    }
-
-    private fun postBreakageReportingEvent() {
-        val eventData = createBreakageReportingEventData()
-        webView?.let {
-            viewModel.postContentScopeMessage(eventData, it)
-        }
     }
 
     private fun onFireButtonPressed() {
@@ -1245,12 +1252,12 @@ class BrowserTabFragment :
     }
 
     private fun onBrowserMenuButtonPressed() {
-        postBreakageReportingEvent()
+        contentScopeScripts.sendSubscriptionEvent(createBreakageReportingEventData())
         viewModel.onBrowserMenuClicked(isCustomTab = isActiveCustomTab())
     }
 
     private fun onOmnibarPrivacyShieldButtonPressed() {
-        postBreakageReportingEvent()
+        contentScopeScripts.sendSubscriptionEvent(createBreakageReportingEventData())
         launchPrivacyDashboard(toggle = false)
     }
 
@@ -1276,6 +1283,8 @@ class BrowserTabFragment :
             )
             requireActivity().window.navigationBarColor = customTabToolbarColor
             requireActivity().window.statusBarColor = customTabToolbarColor
+
+            browserNavigationBarIntegration.configureCustomTab()
         }
     }
 
@@ -1286,9 +1295,9 @@ class BrowserTabFragment :
 
     private fun createPopupMenu() {
         val popupMenuResourceType =
-            when (settingsDataStore.omnibarPosition) {
-                TOP -> BrowserPopupMenu.ResourceType.TOP
-                BOTTOM -> BrowserPopupMenu.ResourceType.BOTTOM
+            when (omnibar.omnibarType) {
+                OmnibarType.SINGLE_TOP -> BrowserPopupMenu.ResourceType.TOP
+                OmnibarType.SINGLE_BOTTOM, OmnibarType.SPLIT -> BrowserPopupMenu.ResourceType.BOTTOM
             }
 
         popupMenu =
@@ -1413,7 +1422,7 @@ class BrowserTabFragment :
         startActivity(intent)
     }
 
-    private fun launchPopupMenu() {
+    private fun launchPopupMenu(anchorToNavigationBar: Boolean) {
         val isFocusedNtp = omnibar.viewMode == ViewMode.NewTab && omnibar.getText().isEmpty() && omnibar.omnibarTextInput.hasFocus()
 
         // small delay added to let keyboard disappear and avoid jarring transition
@@ -1428,7 +1437,12 @@ class BrowserTabFragment :
                     }
                 }
 
-                popupMenu.show(binding.rootView, omnibar.toolbar)
+                if (anchorToNavigationBar) {
+                    val anchorView = browserNavigationBarIntegration.navigationBarView.popupMenuAnchor
+                    popupMenu.showAnchoredView(requireActivity(), binding.rootView, anchorView)
+                } else {
+                    popupMenu.show(binding.rootView, omnibar.toolbar)
+                }
                 viewModel.onPopupMenuLaunched()
                 if (isActiveCustomTab()) {
                     pixel.fire(CustomTabPixelNames.CUSTOM_TABS_MENU_OPENED)
@@ -1483,8 +1497,7 @@ class BrowserTabFragment :
             return
         }
 
-        val hasOmnibarPositionChanged = viewModel.hasOmnibarPositionChanged(omnibar.omnibarPosition)
-        if (hasOmnibarPositionChanged) {
+        if (viewModel.hasOmnibarTypeChanged(omnibar.omnibarType)) {
             viewModel.resetTrackersCount()
             if (swipingTabsFeature.isEnabled && requireActivity() is BrowserActivity) {
                 (requireActivity() as BrowserActivity).clearTabsAndRecreate()
@@ -1521,6 +1534,7 @@ class BrowserTabFragment :
         webView?.removeEnableSwipeRefreshCallback()
         webView?.stopNestedScroll()
         webView?.stopLoading()
+        browserNavigationBarIntegration.onDestroyView()
         super.onDestroyView()
     }
 
@@ -1702,6 +1716,8 @@ class BrowserTabFragment :
         errorView.errorLayout.gone()
         sslErrorView.gone()
         maliciousWarningView.gone()
+
+        browserNavigationBarIntegration.configureNewTabViewMode()
     }
 
     private fun showBrowser() {
@@ -1715,6 +1731,8 @@ class BrowserTabFragment :
         sslErrorView.gone()
         maliciousWarningView.gone()
         omnibar.setViewMode(ViewMode.Browser(viewModel.url))
+
+        browserNavigationBarIntegration.configureBrowserViewMode()
     }
 
     private fun showError(
@@ -1736,6 +1754,8 @@ class BrowserTabFragment :
             errorView.yetiIcon.setImageResource(com.duckduckgo.mobile.android.R.drawable.ic_yeti_dark)
         }
         errorView.errorLayout.show()
+
+        browserNavigationBarIntegration.configureBrowserViewMode()
     }
 
     private fun showMaliciousWarning(
@@ -1774,6 +1794,8 @@ class BrowserTabFragment :
                 isMainframe = isMainframe,
             ),
         )
+
+        browserNavigationBarIntegration.configureBrowserViewMode()
     }
 
     private fun hideMaliciousWarning(canGoBack: Boolean) {
@@ -1848,6 +1870,8 @@ class BrowserTabFragment :
             viewModel.onSSLCertificateWarningAction(action, errorResponse.url)
         }
         sslErrorView.show()
+
+        browserNavigationBarIntegration.configureBrowserViewMode()
     }
 
     private fun hideSSLWarning() {
@@ -2014,7 +2038,6 @@ class BrowserTabFragment :
             is Command.RefreshAndShowPrivacyProtectionEnabledConfirmation -> {
                 webView?.let { safeWebView ->
                     lifecycleScope.launch {
-                        viewModel.privacyProtectionsUpdated(safeWebView)
                         refresh()
                         privacyProtectionEnabledConfirmation(it.domain)
                     }
@@ -2024,7 +2047,6 @@ class BrowserTabFragment :
             is Command.RefreshAndShowPrivacyProtectionDisabledConfirmation -> {
                 webView?.let { safeWebView ->
                     lifecycleScope.launch {
-                        viewModel.privacyProtectionsUpdated(safeWebView)
                         refresh()
                         privacyProtectionDisabledConfirmation(it.domain)
                     }
@@ -2291,7 +2313,7 @@ class BrowserTabFragment :
             is Command.ShowAutoconsentAnimation -> showAutoconsentAnimation(it.isCosmetic)
 
             is Command.LaunchPopupMenu -> {
-                launchPopupMenu()
+                launchPopupMenu(it.anchorToNavigationBar)
                 hideKeyboard()
             }
 
@@ -2945,7 +2967,7 @@ class BrowserTabFragment :
                 autoCompleteLongPressClickListener = {
                     viewModel.userLongPressedAutocomplete(it)
                 },
-                omnibarPosition = settingsDataStore.omnibarPosition,
+                omnibarType = settingsDataStore.omnibarType,
             )
         binding.autoCompleteSuggestionsList.adapter = autoCompleteSuggestionsAdapter
     }
@@ -3242,29 +3264,6 @@ class BrowserTabFragment :
                     }
                 },
             )
-            viewModel.configureWebView(
-                it,
-                object : WebViewCompatMessageCallback {
-                    override fun process(
-                        context: String,
-                        featureName: String,
-                        method: String,
-                        id: String?,
-                        data: JSONObject?,
-                        onResponse: suspend (JSONObject) -> Unit,
-                    ) {
-                        viewModel.webViewCompatProcessJsCallbackMessage(
-                            context = context,
-                            featureName = featureName,
-                            method = method,
-                            id = id,
-                            data = data,
-                            onResponse = onResponse,
-                        )
-                    }
-                },
-            )
-
             duckPlayerScripts.register(
                 it,
                 object : JsMessageCallback() {
@@ -3924,7 +3923,6 @@ class BrowserTabFragment :
             logcat(VERBOSE) { "Keyboard now hiding" }
             hideKeyboard(omnibar.omnibarTextInput)
             binding.focusDummy.requestFocus()
-            omnibar.showOutline(false)
         }
     }
 
@@ -3949,7 +3947,6 @@ class BrowserTabFragment :
         if (!isHidden) {
             logcat(VERBOSE) { "Keyboard now showing" }
             showKeyboard(omnibar.omnibarTextInput)
-            omnibar.showOutline(true)
         }
     }
 
@@ -4568,6 +4565,8 @@ class BrowserTabFragment :
                     webView?.setBottomMatchingBehaviourEnabled(true) // only execute if animation is playing
                 }
 
+                browserNavigationBarIntegration.configureFireButtonHighlight(highlighted = viewState.fireButton.isHighlighted())
+
                 popupMenu.renderState(browserShowing, viewState, tabDisplayedInCustomTabScreen)
 
                 renderFullscreenMode(viewState)
@@ -4897,6 +4896,8 @@ class BrowserTabFragment :
 
             omnibar.setViewMode(ViewMode.NewTab)
             omnibar.isScrollingEnabled = false
+
+            browserNavigationBarIntegration.configureNewTabViewMode()
 
             viewModel.onNewTabShown()
         }

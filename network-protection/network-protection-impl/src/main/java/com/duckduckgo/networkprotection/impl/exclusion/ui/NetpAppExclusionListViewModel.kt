@@ -17,6 +17,7 @@
 package com.duckduckgo.networkprotection.impl.exclusion.ui
 
 import android.annotation.SuppressLint
+import android.content.Context
 import android.content.pm.ApplicationInfo
 import android.content.pm.PackageManager
 import androidx.lifecycle.DefaultLifecycleObserver
@@ -25,6 +26,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.common.utils.extensions.safeGetInstalledApplications
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.mobile.android.vpn.exclusion.SystemAppOverridesProvider
@@ -87,6 +89,7 @@ class NetpAppExclusionListViewModel @Inject constructor(
     private val localConfig: NetPSettingsLocalConfig,
     private val autoExcludeAppsRepository: AutoExcludeAppsRepository,
     private val autoExcludePrompt: AutoExcludePrompt,
+    private val context: Context,
 ) : ViewModel(), DefaultLifecycleObserver {
     private val command = Channel<Command>(1, DROP_OLDEST)
     private val filterState = MutableStateFlow(ALL)
@@ -216,7 +219,7 @@ class NetpAppExclusionListViewModel @Inject constructor(
     }
 
     private fun refreshInstalledApps() {
-        installedApps = packageManager.getInstalledApplications(PackageManager.GET_META_DATA)
+        installedApps = packageManager.safeGetInstalledApplications(context)
             .asSequence()
             .filterNot { !systemAppOverridesProvider.getSystemAppOverridesList().contains(it.packageName) && it.isSystemApp() }
     }

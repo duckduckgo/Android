@@ -47,7 +47,7 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Unique
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
-import com.duckduckgo.browser.ui.omnibar.OmnibarPosition
+import com.duckduckgo.browser.ui.omnibar.OmnibarType
 import com.duckduckgo.common.test.CoroutineTestRule
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert
@@ -309,7 +309,7 @@ class WelcomePageViewModelTest {
             testee.onAddressBarPositionOptionSelected(false)
             testee.onPrimaryCtaClicked(PreOnboardingDialogType.ADDRESS_BAR_POSITION)
 
-            verify(mockSettingsDataStore).omnibarPosition = OmnibarPosition.BOTTOM
+            verify(mockSettingsDataStore).omnibarType = OmnibarType.SINGLE_BOTTOM
         }
 
     @Test

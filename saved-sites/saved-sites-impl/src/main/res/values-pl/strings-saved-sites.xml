@@ -118,4 +118,11 @@
     <string name="deleteBookmarkFolderConfirmationDialogDescription" instruction="Placeholder is the name of the favorite site">Spowoduje to usunięcie folderu zakładek &lt;b&gt;%1$s&lt;/b&gt;.</string>
     <string name="deleteSavedSiteConfirmationDialogCancel">Anuluj</string>
     <string name="deleteSavedSiteConfirmationDialogDelete">Usuń</string>
+
+    <!-- Bookmark Import -->
+    <string name="importBookmarksFromGooglePreImportDialogTitle">Importuj zakładki z Google</string>
+    <string name="importBookmarksFromGooglePreImportDialogInstruction">Google może poprosić o zalogowanie lub podanie hasła, aby potwierdzić.</string>
+    <string name="importBookmarksFromGooglePreImportDialogImportButton">Importuj z Google</string>
+    <string name="importBookmarksFromGooglePreImportDialogSelectFileButton">Wybierz plik zakładek…</string>
+    <string name="bookmarksImportDialogClose">Zamknij</string>
 </resources>

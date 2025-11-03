@@ -110,4 +110,11 @@
     <string name="deleteBookmarkFolderConfirmationDialogDescription" instruction="Placeholder is the name of the favorite site">Din bokmärkesmapp för &lt;b&gt;%1$s&lt;/b&gt; kommer att raderas.</string>
     <string name="deleteSavedSiteConfirmationDialogCancel">Avbryt</string>
     <string name="deleteSavedSiteConfirmationDialogDelete">Ta bort</string>
+
+    <!-- Bookmark Import -->
+    <string name="importBookmarksFromGooglePreImportDialogTitle">Importera bokmärken från Google</string>
+    <string name="importBookmarksFromGooglePreImportDialogInstruction">Google kan be dig att logga in eller ange ditt lösenord för att bekräfta åtgärden.</string>
+    <string name="importBookmarksFromGooglePreImportDialogImportButton">Importera från Google</string>
+    <string name="importBookmarksFromGooglePreImportDialogSelectFileButton">Välj bokmärkesfil …</string>
+    <string name="bookmarksImportDialogClose">Stäng</string>
 </resources>

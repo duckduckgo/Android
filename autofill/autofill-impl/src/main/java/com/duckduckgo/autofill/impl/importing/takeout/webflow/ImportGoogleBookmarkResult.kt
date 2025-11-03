@@ -49,5 +49,5 @@ sealed interface UserCannotImportReason : Parcelable {
     data object Unknown : UserCannotImportReason
 
     @Parcelize
-    data object WebViewError : UserCannotImportReason
+    data class WebViewError(val step: String) : UserCannotImportReason
 }

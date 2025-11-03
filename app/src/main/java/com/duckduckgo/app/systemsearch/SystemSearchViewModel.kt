@@ -39,7 +39,7 @@ import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggesti
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion.AutoCompleteUrlSuggestion.AutoCompleteSwitchToTabSuggestion
 import com.duckduckgo.browser.api.autocomplete.AutoCompleteFactory
 import com.duckduckgo.browser.api.autocomplete.AutoCompleteSettings
-import com.duckduckgo.browser.ui.omnibar.OmnibarPosition
+import com.duckduckgo.browser.ui.omnibar.OmnibarType
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.SingleLiveEvent
 import com.duckduckgo.di.scopes.ActivityScope
@@ -183,7 +183,10 @@ class SystemSearchViewModel @Inject constructor(
     private val hiddenIds = MutableStateFlow(HiddenBookmarksIds())
 
     private var hasUserSeenHistory = false
-    private var omnibarPosition: OmnibarPosition = appSettingsPreferencesStore.omnibarPosition
+    private var omnibarType: OmnibarType = appSettingsPreferencesStore.omnibarType
+
+    val isOmnibarAtTop: Boolean
+        get() = omnibarType == OmnibarType.SINGLE_TOP || omnibarType == OmnibarType.SPLIT
 
     private val autoComplete: AutoComplete = autoCompleteFactory.create(
         AutoComplete.Config(showInstalledApps = true),
@@ -273,12 +276,12 @@ class SystemSearchViewModel @Inject constructor(
         }
     }
 
-    fun onOmnibarConfigured(position: OmnibarPosition) {
-        omnibarPosition = position
+    fun onOmnibarConfigured(type: OmnibarType) {
+        omnibarType = type
     }
 
-    val hasOmnibarPositionChanged: Boolean
-        get() = omnibarPosition != appSettingsPreferencesStore.omnibarPosition
+    val hasOmnibarTypeChanged: Boolean
+        get() = omnibarType != appSettingsPreferencesStore.omnibarType
 
     fun userTappedOnboardingToggle() {
         onboardingViewState.value = currentOnboardingState().copy(expanded = !currentOnboardingState().expanded)

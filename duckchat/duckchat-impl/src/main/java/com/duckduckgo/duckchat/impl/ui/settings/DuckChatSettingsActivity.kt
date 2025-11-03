@@ -171,7 +171,7 @@ class DuckChatSettingsActivity : DuckDuckGoActivity() {
             viewModel.duckChatSearchAISettingsClicked()
         }
 
-        if (settingsPageFeature.hideAiGeneratedImagesOption().isEnabled()) {
+        if (viewState.isHideGeneratedImagesOptionVisible) {
             binding.searchSettingsSectionHeader.isVisible = true
             binding.duckAiHideAiGeneratedImagesLink.apply {
                 isVisible = true

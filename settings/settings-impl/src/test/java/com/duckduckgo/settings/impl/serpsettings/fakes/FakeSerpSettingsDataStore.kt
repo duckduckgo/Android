@@ -14,9 +14,21 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.browser.ui.omnibar
+package com.duckduckgo.settings.impl.serpsettings.fakes
 
-enum class OmnibarPosition {
-    TOP,
-    BOTTOM,
+import com.duckduckgo.settings.impl.serpsettings.store.SerpSettingsDataStore
+
+class FakeSerpSettingsDataStore : SerpSettingsDataStore {
+
+    private var settings: String? = null
+
+    override suspend fun setSerpSettings(value: String) {
+        settings = value
+    }
+
+    override suspend fun getSerpSettings(): String? = settings
+
+    fun reset() {
+        settings = null
+    }
 }

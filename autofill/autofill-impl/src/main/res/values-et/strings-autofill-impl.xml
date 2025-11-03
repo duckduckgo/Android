@@ -289,4 +289,27 @@
     <string name="passwords_import_promo_in_settings_title">Impordi paroolid Google\'ist</string>
     <string name="passwords_import_promo_in_settings_dismiss_text">Peida</string>
 
+    <!-- Import Bookmarks Strings -->
+    <string name="importToDuckDuckGo">Impordi DuckDuckGo-sse</string>
+    <string name="importBookmarksFromGoogleChromeFolderName">Imporditud Chrome\'ist</string>
+    <string name="importBookmarksFromGooglePreImportDialogTitle">Impordi järjehoidjad Google\'ist</string>
+    <string name="importBookmarksFromGooglePreImportDialogInstruction">Google võib paluda sul sisse logida või sisestada kinnitamiseks parooli.</string>
+    <string name="importBookmarksFromGooglePreImportDialogImportButton">Impordi Google\'ist</string>
+    <string name="importBookmarksFromGooglePreImportDialogSelectFileButton">Vali järjehoidjate fail...</string>
+    <string name="importBookmarksFromGoogleWebFlowTitle">Impordi järjehoidjaid</string>
+    <string name="importBookmarksProgressTitle">Importimine Google\'ist…</string>
+    <string name="importBookmarksProgressSubtitle">Hoia see ekraan avatuna ja ole kannatlik — see ei tohiks võtta rohkem kui minut või kaks.</string>
+    <string name="importBookmarksProgressInfoMessage1">Google võib paluda sul sisse logida või sisestada kinnitamiseks parooli.</string>
+    <string name="importBookmarksProgressInfoMessage2">Google võib saata sulle kinnitava e-kirja, et su järjehoidjaid eksporditakse.</string>
+    <string name="importBookmarksFromGoogleCancelConfirmationDialogTitle">Kas loobuda importimisest?</string>
+    <string name="importBookmarksFromGoogleCancelConfirmationDialogMessage">Sinu järjehoidjaid ei impordita, kui sa kohe tühistad.</string>
+    <string name="importBookmarksFromGoogleCancelConfirmationDialogCancelImport">Tühista importimine</string>
+    <string name="importBookmarksFromGoogleCancelConfirmationDialogContinue">Jätka</string>
+    <string name="importBookmarksFromGoogleSuccessBookmarksCount" instruction="Placeholder is the number of bookmarks that were imported">Järjehoidjad: %1$d</string>
+    <string name="importBookmarksSuccessTitle">@string/importToDuckDuckGo</string>
+    <string name="importBookmarksFinalDoneButton">Sulge</string>
+    <string name="importBookmarksErrorTitle">@string/importToDuckDuckGo</string>
+    <string name="importBookmarksErrorGenericMessage">Midagi läks valesti</string>
+    <string name="importBookmarksErrorGenericMessageSecondary">Veenduge, et olete internetiga ühendatud ja proovige uuesti.</string>
+
 </resources>

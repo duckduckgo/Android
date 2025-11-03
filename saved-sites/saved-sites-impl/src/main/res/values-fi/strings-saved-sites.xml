@@ -110,4 +110,11 @@
     <string name="deleteBookmarkFolderConfirmationDialogDescription" instruction="Placeholder is the name of the favorite site">Tämä poistaa sivuston &lt;b&gt;%1$s&lt;/b&gt; kirjanmerkkikansion.</string>
     <string name="deleteSavedSiteConfirmationDialogCancel">Peruuta</string>
     <string name="deleteSavedSiteConfirmationDialogDelete">Poista</string>
+
+    <!-- Bookmark Import -->
+    <string name="importBookmarksFromGooglePreImportDialogTitle">Tuo kirjanmerkit Googlesta</string>
+    <string name="importBookmarksFromGooglePreImportDialogInstruction">Google saattaa pyytää sinua kirjautumaan sisään tai antamaan salasanasi vahvistusta varten.</string>
+    <string name="importBookmarksFromGooglePreImportDialogImportButton">Tuo Googlesta</string>
+    <string name="importBookmarksFromGooglePreImportDialogSelectFileButton">Valitse kirjanmerkkitiedosto…</string>
+    <string name="bookmarksImportDialogClose">Sulje</string>
 </resources>

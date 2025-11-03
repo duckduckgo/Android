@@ -21,6 +21,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.duckchat.impl.DuckChatInternal
 import com.duckduckgo.duckchat.impl.R
@@ -34,6 +35,8 @@ import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -45,6 +48,7 @@ class DuckChatSettingsViewModel @Inject constructor(
     private val pixel: Pixel,
     private val inputScreenDiscoveryFunnel: InputScreenDiscoveryFunnel,
     private val settingsPageFeature: SettingsPageFeature,
+    dispatcherProvider: DispatcherProvider,
 ) : ViewModel() {
     private val commandChannel = Channel<Command>(capacity = 1, onBufferOverflow = DROP_OLDEST)
     val commands = commandChannel.receiveAsFlow()
@@ -54,18 +58,21 @@ class DuckChatSettingsViewModel @Inject constructor(
         val isInputScreenEnabled: Boolean = false,
         val shouldShowShortcuts: Boolean = false,
         val shouldShowInputScreenToggle: Boolean = false,
+        val isHideGeneratedImagesOptionVisible: Boolean = false,
     )
 
     val viewState =
         combine(
             duckChat.observeEnableDuckChatUserSetting(),
             duckChat.observeInputScreenUserSettingEnabled(),
-        ) { isDuckChatUserEnabled, isInputScreenEnabled ->
+            flowOf(settingsPageFeature.hideAiGeneratedImagesOption().isEnabled()).flowOn(dispatcherProvider.io()),
+        ) { isDuckChatUserEnabled, isInputScreenEnabled, isHideAiGeneratedImagesOptionVisible ->
             ViewState(
                 isDuckChatUserEnabled = isDuckChatUserEnabled,
                 isInputScreenEnabled = isInputScreenEnabled,
                 shouldShowShortcuts = isDuckChatUserEnabled,
                 shouldShowInputScreenToggle = isDuckChatUserEnabled && duckChat.isInputScreenFeatureAvailable(),
+                isHideGeneratedImagesOptionVisible = isHideAiGeneratedImagesOptionVisible,
             )
         }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), ViewState())
 

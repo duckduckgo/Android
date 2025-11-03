@@ -13,152 +13,134 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
-
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/rootView"
+    android:id="@+id/barView"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    android:background="?attr/preferredNavigationBarColor"
+    android:gravity="center"
+    android:orientation="horizontal"
+    android:paddingHorizontal="@dimen/navigationBarPaddingHorizontal"
+    android:paddingTop="@dimen/navigationBarPaddingTop"
+    android:paddingBottom="@dimen/navigationBarPaddingBottom"
+    app:layout_constraintTop_toTopOf="parent"
+    tools:parentTag="androidx.coordinatorlayout.widget.CoordinatorLayout">
 
-    <LinearLayout
-        android:id="@+id/barView"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="?attr/preferredNavigationBarColor"
-        android:gravity="center"
-        android:orientation="horizontal"
-        android:paddingHorizontal="@dimen/keyline_4"
-        android:paddingTop="@dimen/experimentalNavigationBarPaddingTopWhenStandalone"
-        android:paddingBottom="@dimen/experimentalNavigationBarPaddingBottom"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:parentTag="androidx.coordinatorlayout.widget.CoordinatorLayout">
-
-        <FrameLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content">
-
-            <FrameLayout
-                android:id="@+id/newTabButton"
-                android:layout_width="@dimen/bottomNavIconContainer"
-                android:layout_height="@dimen/bottomNavIconContainer"
-                android:background="@drawable/selectable_item_experimental_background"
-                android:visibility="gone"
-                tools:visibility="visible">
-
-                <ImageView
-                    android:id="@+id/newTabButtonImageView"
-                    android:layout_width="@dimen/bottomNavIcon"
-                    android:layout_height="@dimen/bottomNavIcon"
-                    android:layout_gravity="center"
-                    android:contentDescription="@string/newTabMenuItem"
-                    android:scaleType="center"
-                    android:src="@drawable/ic_add_24" />
-            </FrameLayout>
-
-            <FrameLayout
-                android:id="@+id/autofillButton"
-                android:layout_width="@dimen/bottomNavIconContainer"
-                android:layout_height="@dimen/bottomNavIconContainer"
-                android:background="@drawable/selectable_item_experimental_background"
-                android:visibility="gone"
-                tools:visibility="visible">
-
-                <ImageView
-                    android:id="@+id/autofillButtonImageView"
-                    android:layout_width="@dimen/bottomNavIcon"
-                    android:layout_height="@dimen/bottomNavIcon"
-                    android:layout_gravity="center"
-                    android:contentDescription="@string/autofillManagementScreenTitle"
-                    android:scaleType="center"
-                    android:src="@drawable/ic_key_24" />
-            </FrameLayout>
-
-        </FrameLayout>
-
-        <Space
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1" />
+    <FrameLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
 
         <FrameLayout
-            android:id="@+id/bookmarksButton"
-            android:layout_width="@dimen/bottomNavIconContainer"
-            android:layout_height="@dimen/bottomNavIconContainer"
-            android:background="@drawable/selectable_item_experimental_background">
+            android:id="@+id/newTabButton"
+            android:layout_width="@dimen/toolbarIcon"
+            android:layout_height="@dimen/toolbarIcon"
+            android:background="@drawable/selectable_item_experimental_background"
+            android:visibility="gone"
+            tools:visibility="visible">
 
             <ImageView
-                android:id="@+id/bookmarksImageView"
+                android:id="@+id/newTabButtonImageView"
                 android:layout_width="@dimen/bottomNavIcon"
                 android:layout_height="@dimen/bottomNavIcon"
                 android:layout_gravity="center"
-                android:contentDescription="@string/bookmarksMenuTitle"
+                android:contentDescription="@string/newTabMenuItem"
                 android:scaleType="center"
-                android:src="@drawable/ic_bookmarks_24" />
+                android:src="@drawable/ic_add_24" />
         </FrameLayout>
 
-        <Space
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1" />
-
         <FrameLayout
-            android:id="@+id/fireButton"
-            android:layout_width="@dimen/bottomNavIconContainer"
-            android:layout_height="@dimen/bottomNavIconContainer"
-            android:background="@drawable/selectable_item_experimental_background">
+            android:id="@+id/autofillButton"
+            android:layout_width="@dimen/toolbarIcon"
+            android:layout_height="@dimen/toolbarIcon"
+            android:background="@drawable/selectable_item_experimental_background"
+            android:visibility="gone"
+            tools:visibility="visible">
 
             <ImageView
-                android:id="@+id/fireIconImageView"
+                android:id="@+id/autofillButtonImageView"
                 android:layout_width="@dimen/bottomNavIcon"
                 android:layout_height="@dimen/bottomNavIcon"
                 android:layout_gravity="center"
-                android:contentDescription="@string/fireMenu"
+                android:contentDescription="@string/autofillManagementScreenTitle"
                 android:scaleType="center"
-                android:src="@drawable/ic_fire_24" />
+                android:src="@drawable/ic_key_24" />
         </FrameLayout>
 
-        <Space
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1" />
+    </FrameLayout>
 
-        <com.duckduckgo.browser.ui.tabs.TabSwitcherButton
-            android:id="@+id/tabsButton"
-            android:layout_width="@dimen/bottomNavIconContainer"
-            android:layout_height="@dimen/bottomNavIconContainer" />
+    <Space
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1" />
 
-        <Space
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1" />
+    <FrameLayout
+        android:id="@+id/bookmarksButton"
+        android:layout_width="@dimen/toolbarIcon"
+        android:layout_height="@dimen/toolbarIcon"
+        android:background="@drawable/selectable_item_experimental_background">
 
-        <FrameLayout
-            android:id="@+id/menuButton"
-            android:layout_width="@dimen/bottomNavIconContainer"
-            android:layout_height="@dimen/bottomNavIconContainer"
-            android:background="@drawable/selectable_item_experimental_background">
+        <ImageView
+            android:id="@+id/bookmarksImageView"
+            android:layout_width="@dimen/bottomNavIcon"
+            android:layout_height="@dimen/bottomNavIcon"
+            android:layout_gravity="center"
+            android:contentDescription="@string/bookmarksMenuTitle"
+            android:scaleType="center"
+            android:src="@drawable/ic_bookmarks_24" />
+    </FrameLayout>
 
-            <ImageView
-                android:id="@+id/browserMenuImageView"
-                android:layout_width="@dimen/bottomNavIcon"
-                android:layout_height="@dimen/bottomNavIcon"
-                android:layout_gravity="center"
-                android:contentDescription="@string/browserPopupMenu"
-                android:scaleType="center"
-                android:src="@drawable/ic_menu_vertical_24" />
-        </FrameLayout>
+    <Space
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1" />
 
-    </LinearLayout>
+    <FrameLayout
+        android:id="@+id/fireButton"
+        android:layout_width="@dimen/toolbarIcon"
+        android:layout_height="@dimen/toolbarIcon"
+        android:background="@drawable/selectable_item_experimental_background">
 
-    <View
-        android:id="@+id/shadowView"
-        android:layout_width="match_parent"
-        android:layout_height="2dp"
-        android:background="@drawable/background_navigation_bar_shadow"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        <ImageView
+            android:id="@+id/fireIconImageView"
+            android:layout_width="@dimen/bottomNavIcon"
+            android:layout_height="@dimen/bottomNavIcon"
+            android:layout_gravity="center"
+            android:contentDescription="@string/fireMenu"
+            android:scaleType="center"
+            android:src="@drawable/ic_fire_24" />
+    </FrameLayout>
 
+    <Space
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1" />
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+    <com.duckduckgo.browser.ui.tabs.NewTabSwitcherButton
+        android:id="@+id/tabsButton"
+        android:layout_width="@dimen/toolbarIcon"
+        android:layout_height="@dimen/toolbarIcon" />
+
+    <Space
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1" />
+
+    <FrameLayout
+        android:id="@+id/menuButton"
+        android:layout_width="@dimen/toolbarIcon"
+        android:layout_height="@dimen/toolbarIcon"
+        android:background="@drawable/selectable_item_experimental_background">
+
+        <ImageView
+            android:id="@+id/browserMenuImageView"
+            android:layout_width="@dimen/bottomNavIcon"
+            android:layout_height="@dimen/bottomNavIcon"
+            android:layout_gravity="center"
+            android:contentDescription="@string/browserPopupMenu"
+            android:scaleType="center"
+            android:src="@drawable/ic_menu_vertical_24" />
+    </FrameLayout>
+
+</LinearLayout>

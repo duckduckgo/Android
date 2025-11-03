@@ -601,7 +601,7 @@
     <string name="waitlistNotificationDialogNotifyMe">VARSLE MEG</string>
 
     <!-- Email Protection -->
-    <string name="emailProtectionActivityTitle">E-postbeskyttelse (Beta)</string>
+    <string name="emailProtectionActivityTitle">E-postbeskyttelse</string>
     <string name="emailNotSupported">Enheten støttes ikke</string>
     <string name="emailNotSupportedExplanation">Med e-postbeskyttelse kan du opprette private e-postadresser som fjerner e-postsporere. Vi må kryptere og lagre disse adressene du oppretter, lokalt på enheten din. Fordi enheten din ikke støtter kryptert lagring, er e-postbeskyttelse utilgjengelig.</string>
 

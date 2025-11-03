@@ -289,4 +289,27 @@
     <string name="passwords_import_promo_in_settings_title">Εισαγωγή κωδικών πρόσβασης από το Google</string>
     <string name="passwords_import_promo_in_settings_dismiss_text">Αποκρυψη</string>
 
+    <!-- Import Bookmarks Strings -->
+    <string name="importToDuckDuckGo">Εισαγωγή στο DuckDuckGo</string>
+    <string name="importBookmarksFromGoogleChromeFolderName">Εισαγωγή από το Chrome</string>
+    <string name="importBookmarksFromGooglePreImportDialogTitle">Εισαγωγή σελιδοδεικτών από το Google</string>
+    <string name="importBookmarksFromGooglePreImportDialogInstruction">Η Google μπορεί να σας ζητήσει να συνδεθείτε ή να εισαγάγετε τον κωδικό πρόσβασής σας για επιβεβαίωση.</string>
+    <string name="importBookmarksFromGooglePreImportDialogImportButton">Εισαγωγή από το Google</string>
+    <string name="importBookmarksFromGooglePreImportDialogSelectFileButton">Επιλογή αρχείου σελιδοδεικτών...</string>
+    <string name="importBookmarksFromGoogleWebFlowTitle">Εισαγωγή σελιδοδεικτών</string>
+    <string name="importBookmarksProgressTitle">Εισαγωγή από το Google…</string>
+    <string name="importBookmarksProgressSubtitle">Κρατήστε αυτήν την οθόνη ανοιχτή και περιμένετε. Δεν θα χρειαστούν περισσότερο από ένα ή δύο λεπτά.</string>
+    <string name="importBookmarksProgressInfoMessage1">Η Google μπορεί να σας ζητήσει να συνδεθείτε ή να εισαγάγετε τον κωδικό πρόσβασής σας για επιβεβαίωση.</string>
+    <string name="importBookmarksProgressInfoMessage2">Η Google ενδέχεται να σας στείλει email που να επιβεβαιώνει την εξαγωγή των σελιδοδεικτών σας.</string>
+    <string name="importBookmarksFromGoogleCancelConfirmationDialogTitle">Ακύρωση εισαγωγής;</string>
+    <string name="importBookmarksFromGoogleCancelConfirmationDialogMessage">Οι σελιδοδείκτες σας δεν θα εισαχθούν εάν ακυρώσετε τώρα.</string>
+    <string name="importBookmarksFromGoogleCancelConfirmationDialogCancelImport">Ακύρωση εισαγωγής</string>
+    <string name="importBookmarksFromGoogleCancelConfirmationDialogContinue">Συνέχεια</string>
+    <string name="importBookmarksFromGoogleSuccessBookmarksCount" instruction="Placeholder is the number of bookmarks that were imported">Σελιδοδείκτες: %1$d</string>
+    <string name="importBookmarksSuccessTitle">@string/importToDuckDuckGo</string>
+    <string name="importBookmarksFinalDoneButton">Κλείσιμο</string>
+    <string name="importBookmarksErrorTitle">@string/importToDuckDuckGo</string>
+    <string name="importBookmarksErrorGenericMessage">Κάτι πήγε λάθος</string>
+    <string name="importBookmarksErrorGenericMessageSecondary">Βεβαιωθείτε ότι είστε συνδεδεμένοι στο διαδίκτυο και προσπαθήστε ξανά.</string>
+
 </resources>

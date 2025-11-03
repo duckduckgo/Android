@@ -41,7 +41,6 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import androidx.room.Room
-import androidx.test.annotation.UiThreadTest
 import androidx.test.filters.SdkSuppress
 import androidx.test.platform.app.InstrumentationRegistry.getInstrumentation
 import com.duckduckgo.adclick.api.AdClickManager
@@ -115,6 +114,7 @@ import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
 import com.duckduckgo.app.browser.model.LongPressTarget
 import com.duckduckgo.app.browser.newtab.FavoritesQuickAccessAdapter.QuickAccessFavorite
 import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
+import com.duckduckgo.app.browser.omnibar.OmnibarFeatureRepository
 import com.duckduckgo.app.browser.omnibar.QueryOrigin.*
 import com.duckduckgo.app.browser.refreshpixels.RefreshPixelSender
 import com.duckduckgo.app.browser.remotemessage.RemoteMessagingModel
@@ -222,8 +222,7 @@ import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggesti
 import com.duckduckgo.browser.api.autocomplete.AutoCompleteSettings
 import com.duckduckgo.browser.api.brokensite.BrokenSiteContext
 import com.duckduckgo.browser.api.webviewcompat.WebViewCompatWrapper
-import com.duckduckgo.browser.ui.omnibar.OmnibarPosition.BOTTOM
-import com.duckduckgo.browser.ui.omnibar.OmnibarPosition.TOP
+import com.duckduckgo.browser.ui.omnibar.OmnibarType
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.test.InstantSchedulersRule
 import com.duckduckgo.common.ui.tabs.SwipingTabsFeature
@@ -585,6 +584,7 @@ class BrowserTabViewModelTest {
     private val mockSubscriptionsJSHelper: SubscriptionsJSHelper = mock()
     private val mockOnboardingHomeScreenWidgetToggles: OnboardingHomeScreenWidgetToggles = mock()
     private val tabManager: TabManager = mock()
+    private val mockOmnibarFeatureRepository: OmnibarFeatureRepository = mock()
 
     private val mockAddressDisplayFormatter: AddressDisplayFormatter by lazy {
         mock {
@@ -616,10 +616,6 @@ class BrowserTabViewModelTest {
     private val mockWebViewCompatWrapper: WebViewCompatWrapper = mock()
 
     private val mockWebView: WebView = mock()
-
-    private val fakeAddDocumentStartJavaScriptPlugins = FakeAddDocumentStartJavaScriptPluginPoint()
-    private val fakeMessagingPlugins = FakeWebMessagingPluginPoint()
-    private val fakePostMessageWrapperPlugins = FakePostMessageWrapperPluginPoint()
 
     private val mockDeviceAppLookup: DeviceAppLookup = mock()
 
@@ -675,7 +671,7 @@ class BrowserTabViewModelTest {
             whenever(mockSavedSitesRepository.getBookmarks()).thenReturn(bookmarksListFlow.consumeAsFlow())
             whenever(mockRemoteMessagingRepository.messageFlow()).thenReturn(remoteMessageFlow.consumeAsFlow())
             whenever(mockSettingsDataStore.automaticFireproofSetting).thenReturn(AutomaticFireproofSetting.ASK_EVERY_TIME)
-            whenever(mockSettingsDataStore.omnibarPosition).thenReturn(TOP)
+            whenever(mockSettingsDataStore.omnibarType).thenReturn(OmnibarType.SINGLE_TOP)
             whenever(mockSettingsDataStore.isFullUrlEnabled).then { isFullSiteAddressEnabled }
             whenever(mockSSLCertificatesFeature.allowBypass()).thenReturn(mockEnabledToggle)
             whenever(subscriptions.shouldLaunchPrivacyProForUrl(any())).thenReturn(false)
@@ -850,11 +846,9 @@ class BrowserTabViewModelTest {
                     externalIntentProcessingState = mockExternalIntentProcessingState,
                     vpnMenuStateProvider = mockVpnMenuStateProvider,
                     webViewCompatWrapper = mockWebViewCompatWrapper,
-                    addDocumentStartJavascriptPlugins = fakeAddDocumentStartJavaScriptPlugins,
-                    webMessagingPlugins = fakeMessagingPlugins,
-                    postMessageWrapperPlugins = fakePostMessageWrapperPlugins,
                     addressBarTrackersAnimationFeatureToggle = mockAddressBarTrackersAnimationFeatureToggle,
                     autoconsentPixelManager = mockAutoconsentPixelManager,
+                    omnibarFeatureRepository = mockOmnibarFeatureRepository,
                 )
 
             testee.loadData("abc", null, false, false)
@@ -5337,7 +5331,7 @@ class BrowserTabViewModelTest {
     @Test
     fun whenRefreshIsTriggeredByUserThenPrivacyProtectionsPopupManagerIsNotifiedWithBottomPosition() =
         runTest {
-            whenever(mockSettingsDataStore.omnibarPosition).thenReturn(BOTTOM)
+            whenever(mockSettingsDataStore.omnibarType).thenReturn(OmnibarType.SINGLE_BOTTOM)
             testee.onRefreshRequested(triggeredByUser = false)
             verify(mockPrivacyProtectionsPopupManager, never()).onPageRefreshTriggeredByUser(isOmnibarAtTheTop = false)
             testee.onRefreshRequested(triggeredByUser = true)
@@ -7092,102 +7086,6 @@ class BrowserTabViewModelTest {
         }
 
     @Test
-    fun whenPageFinishedAndUpdateScriptOnPageFinishedEnabledThenAddDocumentStartJavaScript() =
-        runTest {
-            val url = "https://example.com"
-            val webViewNavState = WebViewNavigationState(mockStack, 100)
-            fakeAndroidConfigBrowserFeature.updateScriptOnPageFinished().setRawStoredState(State(true))
-
-            testee.pageFinished(mockWebView, webViewNavState, url)
-
-            assertEquals(1, fakeAddDocumentStartJavaScriptPlugins.cssPlugin.countInitted)
-            assertEquals(1, fakeAddDocumentStartJavaScriptPlugins.otherPlugin.countInitted)
-        }
-
-    @Test
-    fun whenPageFinishedAndUpdateScriptOnPageFinishedDisabledThenDoNotCallAddDocumentStartJavaScript() =
-        runTest {
-            val url = "https://example.com"
-            val webViewNavState = WebViewNavigationState(mockStack, 100)
-            fakeAndroidConfigBrowserFeature.updateScriptOnPageFinished().setRawStoredState(State(false))
-
-            testee.pageFinished(mockWebView, webViewNavState, url)
-
-            assertEquals(0, fakeAddDocumentStartJavaScriptPlugins.cssPlugin.countInitted)
-            assertEquals(0, fakeAddDocumentStartJavaScriptPlugins.otherPlugin.countInitted)
-        }
-
-    @Test
-    fun whenPrivacyProtectionsUpdatedAndUpdateScriptOnPageFinishedEnabledAndUpdateScriptOnProtectionsChangedEnabledThenAddDocumentStartJavaScript() =
-        runTest {
-            fakeAndroidConfigBrowserFeature.updateScriptOnPageFinished().setRawStoredState(State(true))
-            fakeAndroidConfigBrowserFeature.updateScriptOnProtectionsChanged().setRawStoredState(State(true))
-
-            testee.privacyProtectionsUpdated(mockWebView)
-
-            assertEquals(1, fakeAddDocumentStartJavaScriptPlugins.cssPlugin.countInitted)
-            assertEquals(1, fakeAddDocumentStartJavaScriptPlugins.otherPlugin.countInitted)
-        }
-
-    @Test
-    fun whenPrivacyProtectionsUpdatedAndUpdateScriptOnProtectionsChangedEnabledAndStopLoadingBeforeUpdatingScriptEnabledThenStopLoading() =
-        runTest {
-            fakeAndroidConfigBrowserFeature.updateScriptOnProtectionsChanged().setRawStoredState(State(true))
-            fakeAndroidConfigBrowserFeature.stopLoadingBeforeUpdatingScript().setRawStoredState(State(true))
-
-            testee.privacyProtectionsUpdated(mockWebView)
-
-            verify(mockWebView).stopLoading()
-        }
-
-    @Test
-    fun whenPrivacyProtectionsUpdatedAndUpdateScriptOnProtectionsChangedEnabledAndStopLoadingBeforeUpdatingScriptDisabledThenDoNotStopLoading() =
-        runTest {
-            fakeAndroidConfigBrowserFeature.updateScriptOnProtectionsChanged().setRawStoredState(State(true))
-            fakeAndroidConfigBrowserFeature.stopLoadingBeforeUpdatingScript().setRawStoredState(State(false))
-
-            testee.privacyProtectionsUpdated(mockWebView)
-
-            verify(mockWebView, never()).stopLoading()
-        }
-
-    @Test
-    fun whenPrivacyProtectionsUpdatedAndUpdateScriptOnPageFinishedTrueAndUpdateScriptOnProtectionsChangedFalseThenNotAddDocumentStartJavaScript() =
-        runTest {
-            fakeAndroidConfigBrowserFeature.updateScriptOnPageFinished().setRawStoredState(State(true))
-            fakeAndroidConfigBrowserFeature.updateScriptOnProtectionsChanged().setRawStoredState(State(false))
-
-            testee.privacyProtectionsUpdated(mockWebView)
-
-            assertEquals(0, fakeAddDocumentStartJavaScriptPlugins.cssPlugin.countInitted)
-            assertEquals(0, fakeAddDocumentStartJavaScriptPlugins.otherPlugin.countInitted)
-        }
-
-    @Test
-    fun whenPrivacyProtectionsUpdatedAndUpdateScriptOnPageFinishedDisabledThenAddDocumentStartJavaScriptOnlyOnCSS() =
-        runTest {
-            fakeAndroidConfigBrowserFeature.updateScriptOnPageFinished().setRawStoredState(State(false))
-            fakeAndroidConfigBrowserFeature.updateScriptOnProtectionsChanged().setRawStoredState(State(true))
-
-            testee.privacyProtectionsUpdated(mockWebView)
-
-            assertEquals(1, fakeAddDocumentStartJavaScriptPlugins.cssPlugin.countInitted)
-            assertEquals(0, fakeAddDocumentStartJavaScriptPlugins.otherPlugin.countInitted)
-        }
-
-    @Test
-    fun whenPrivacyProtectionsUpdatedAndUpdateScriptOnPageFinishedFalseAndUpdateScriptOnProtectionsChangedFalseThenNotAddDocumentStartJavaScript() =
-        runTest {
-            fakeAndroidConfigBrowserFeature.updateScriptOnPageFinished().setRawStoredState(State(false))
-            fakeAndroidConfigBrowserFeature.updateScriptOnProtectionsChanged().setRawStoredState(State(false))
-
-            testee.privacyProtectionsUpdated(mockWebView)
-
-            assertEquals(0, fakeAddDocumentStartJavaScriptPlugins.cssPlugin.countInitted)
-            assertEquals(0, fakeAddDocumentStartJavaScriptPlugins.otherPlugin.countInitted)
-        }
-
-    @Test
     fun whenCtaShownThenFireInContextDialogShownPixel() =
         runTest {
             val cta = DaxSerpCta(mockOnboardingStore, mockAppInstallStore, mockOnboardingDesignExperimentManager)
@@ -7688,46 +7586,6 @@ class BrowserTabViewModelTest {
 
         assertNull("SERP logo should be cleared when navigating to non-DuckDuckGo URL", omnibarViewState().serpLogo)
     }
-
-    @UiThreadTest
-    @Test
-    fun whenConfigureWebViewThenCallAddDocumentStartJavaScript() =
-        runTest {
-            val mockCallback = mock<WebViewCompatMessageCallback>()
-            val webView = DuckDuckGoWebView(context)
-            assertEquals(0, fakeAddDocumentStartJavaScriptPlugins.cssPlugin.countInitted)
-
-            testee.configureWebView(webView, mockCallback)
-
-            assertEquals(1, fakeAddDocumentStartJavaScriptPlugins.cssPlugin.countInitted)
-        }
-
-    @UiThreadTest
-    @Test
-    fun whenConfigureWebViewThenCallAddMessageListener() =
-        runTest {
-            val mockCallback = mock<WebViewCompatMessageCallback>()
-            val webView = DuckDuckGoWebView(context)
-            assertFalse(fakeMessagingPlugins.plugin.registered)
-
-            testee.configureWebView(webView, mockCallback)
-
-            assertTrue(fakeMessagingPlugins.plugin.registered)
-        }
-
-    @UiThreadTest
-    @Test
-    fun whenPostMessageThenCallPostContentScopeMessage() =
-        runTest {
-            val data = SubscriptionEventData("feature", "method", JSONObject())
-            val webView = DuckDuckGoWebView(context)
-
-            assertFalse(fakePostMessageWrapperPlugins.plugin.postMessageCalled)
-
-            testee.postContentScopeMessage(data, webView)
-
-            assertTrue(fakePostMessageWrapperPlugins.plugin.postMessageCalled)
-        }
 
     private fun aCredential(): LoginCredentials = LoginCredentials(domain = null, username = null, password = null)
 

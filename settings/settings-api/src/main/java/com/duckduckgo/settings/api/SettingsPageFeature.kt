@@ -36,6 +36,5 @@ interface SettingsPageFeature {
     fun hideAiGeneratedImagesOption(): Toggle
 
     @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
-    @Toggle.InternalAlwaysEnabled
     fun serpSettingsSync(): Toggle
 }

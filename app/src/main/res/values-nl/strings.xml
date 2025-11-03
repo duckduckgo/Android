@@ -601,7 +601,7 @@
     <string name="waitlistNotificationDialogNotifyMe">MELDING STUREN</string>
 
     <!-- Email Protection -->
-    <string name="emailProtectionActivityTitle">E-mailbescherming (bèta)</string>
+    <string name="emailProtectionActivityTitle">E-mailbescherming</string>
     <string name="emailNotSupported">Apparaat wordt niet ondersteund</string>
     <string name="emailNotSupportedExplanation">Met E-mailbescherming maak je privémailadressen die e-mailtrackers verwijderen. De adressen die je lokaal op je apparaat maakt, dienen we te versleutelen en opslaan. E-mailbescherming is niet beschikbaar omdat je apparaat geen versleutelde opslag ondersteunt.</string>
 

@@ -192,6 +192,7 @@ import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
 import com.duckduckgo.app.browser.model.LongPressTarget
 import com.duckduckgo.app.browser.newtab.FavoritesQuickAccessAdapter
 import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
+import com.duckduckgo.app.browser.omnibar.OmnibarFeatureRepository
 import com.duckduckgo.app.browser.omnibar.QueryOrigin
 import com.duckduckgo.app.browser.omnibar.QueryOrigin.FromAutocomplete
 import com.duckduckgo.app.browser.refreshpixels.RefreshPixelSender
@@ -293,8 +294,7 @@ import com.duckduckgo.browser.api.brokensite.BrokenSiteData
 import com.duckduckgo.browser.api.brokensite.BrokenSiteData.ReportFlow.MENU
 import com.duckduckgo.browser.api.brokensite.BrokenSiteData.ReportFlow.RELOAD_THREE_TIMES_WITHIN_20_SECONDS
 import com.duckduckgo.browser.api.webviewcompat.WebViewCompatWrapper
-import com.duckduckgo.browser.ui.omnibar.OmnibarPosition
-import com.duckduckgo.browser.ui.omnibar.OmnibarPosition.TOP
+import com.duckduckgo.browser.ui.omnibar.OmnibarType
 import com.duckduckgo.common.ui.tabs.SwipingTabsFeatureProvider
 import com.duckduckgo.common.utils.AppUrl
 import com.duckduckgo.common.utils.AppUrl.ParamKey.QUERY
@@ -322,12 +322,7 @@ import com.duckduckgo.duckplayer.api.DuckPlayer
 import com.duckduckgo.duckplayer.api.DuckPlayer.DuckPlayerState.ENABLED
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.history.api.NavigationHistory
-import com.duckduckgo.js.messaging.api.AddDocumentStartJavaScriptPlugin
 import com.duckduckgo.js.messaging.api.JsCallbackData
-import com.duckduckgo.js.messaging.api.PostMessageWrapperPlugin
-import com.duckduckgo.js.messaging.api.SubscriptionEventData
-import com.duckduckgo.js.messaging.api.WebMessagingPlugin
-import com.duckduckgo.js.messaging.api.WebViewCompatMessageCallback
 import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.Feed
 import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.Feed.MALWARE
 import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.Feed.PHISHING
@@ -492,11 +487,9 @@ class BrowserTabViewModel @Inject constructor(
     private val externalIntentProcessingState: ExternalIntentProcessingState,
     private val vpnMenuStateProvider: VpnMenuStateProvider,
     private val webViewCompatWrapper: WebViewCompatWrapper,
-    private val addDocumentStartJavascriptPlugins: PluginPoint<AddDocumentStartJavaScriptPlugin>,
-    private val webMessagingPlugins: PluginPoint<WebMessagingPlugin>,
-    private val postMessageWrapperPlugins: PluginPoint<PostMessageWrapperPlugin>,
     private val addressBarTrackersAnimationFeatureToggle: AddressBarTrackersAnimationFeatureToggle,
     private val autoconsentPixelManager: AutoconsentPixelManager,
+    private val omnibarFeatureRepository: OmnibarFeatureRepository,
 ) : ViewModel(),
     WebViewClientListener,
     EditSavedSiteListener,
@@ -1380,7 +1373,9 @@ class BrowserTabViewModel @Inject constructor(
             site?.uri?.let {
                 brokenSitePrompt.pageRefreshed(it)
             }
-            privacyProtectionsPopupManager.onPageRefreshTriggeredByUser(isOmnibarAtTheTop = settingsDataStore.omnibarPosition == TOP)
+            privacyProtectionsPopupManager.onPageRefreshTriggeredByUser(
+                isOmnibarAtTheTop = settingsDataStore.omnibarType != OmnibarType.SINGLE_BOTTOM,
+            )
         }
     }
 
@@ -1940,11 +1935,6 @@ class BrowserTabViewModel @Inject constructor(
             }
 
             evaluateSerpLogoState(url)
-        }
-        viewModelScope.launch(dispatchers.io()) {
-            if (androidBrowserConfig.updateScriptOnPageFinished().isEnabled()) {
-                addDocumentStartJavaScript(webView)
-            }
         }
     }
 
@@ -2903,7 +2893,7 @@ class BrowserTabViewModel @Inject constructor(
                     showMenuButton = HighlightableButton.Visible(highlighted = false),
                 )
         }
-        command.value = LaunchPopupMenu
+        command.value = LaunchPopupMenu(anchorToNavigationBar = !isCustomTab && omnibarFeatureRepository.isSplitOmnibarEnabled)
     }
 
     fun onPopupMenuLaunched() {
@@ -4254,75 +4244,6 @@ class BrowserTabViewModel @Inject constructor(
         }
     }
 
-    fun configureWebView(
-        webView: DuckDuckGoWebView,
-        callback: WebViewCompatMessageCallback?,
-    ) {
-        viewModelScope.launch {
-            addDocumentStartJavaScript(webView)
-
-            callback?.let {
-                webMessagingPlugins.getPlugins().forEach { plugin ->
-                    plugin.register(callback, webView)
-                }
-            }
-        }
-    }
-
-    fun postContentScopeMessage(
-        eventData: SubscriptionEventData,
-        webView: WebView,
-    ) {
-        viewModelScope.launch {
-            postMessageWrapperPlugins
-                .getPlugins()
-                .firstOrNull { it.context == "contentScopeScripts" }
-                ?.postMessage(eventData, webView)
-        }
-    }
-
-    private suspend fun addDocumentStartJavaScript(webView: WebView) {
-        addDocumentStartJavascriptPlugins.getPlugins().forEach {
-            it.addDocumentStartJavaScript(
-                webView,
-            )
-        }
-    }
-
-    suspend fun privacyProtectionsUpdated(webView: WebView) {
-        val updateScriptOnProtectionsChanged: Boolean
-        val stopLoadingBeforeUpdatingScript: Boolean
-        val updateScriptOnPageFinished: Boolean
-
-        withContext(dispatchers.io()) {
-            updateScriptOnProtectionsChanged = androidBrowserConfig.updateScriptOnProtectionsChanged().isEnabled()
-            stopLoadingBeforeUpdatingScript = androidBrowserConfig.stopLoadingBeforeUpdatingScript().isEnabled()
-            updateScriptOnPageFinished = androidBrowserConfig.updateScriptOnPageFinished().isEnabled()
-        }
-
-        if (!updateScriptOnProtectionsChanged) {
-            return
-        }
-
-        if (stopLoadingBeforeUpdatingScript) {
-            withContext(dispatchers.main()) {
-                webView.stopLoading()
-            }
-        }
-
-        if (!updateScriptOnPageFinished) {
-            addDocumentStartJavascriptPlugins
-                .getPlugins()
-                .filter { plugin ->
-                    (plugin.context == "contentScopeScripts")
-                }.forEach {
-                    it.addDocumentStartJavaScript(webView)
-                }
-        } else {
-            addDocumentStartJavaScript(webView)
-        }
-    }
-
     fun onUserDismissedAutoCompleteInAppMessage() {
         viewModelScope.launch(dispatchers.io()) {
             autoComplete.userDismissedHistoryInAutoCompleteIAM()
@@ -4389,7 +4310,7 @@ class BrowserTabViewModel @Inject constructor(
 
     fun isPrinting(): Boolean = currentBrowserViewState().isPrinting
 
-    fun hasOmnibarPositionChanged(currentPosition: OmnibarPosition): Boolean = settingsDataStore.omnibarPosition != currentPosition
+    fun hasOmnibarTypeChanged(omnibarType: OmnibarType): Boolean = settingsDataStore.omnibarType != omnibarType
 
     private fun firePixelBasedOnCurrentUrl(
         emptyUrlPixel: AppPixelName,

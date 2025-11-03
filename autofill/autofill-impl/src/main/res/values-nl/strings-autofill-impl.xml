@@ -289,4 +289,27 @@
     <string name="passwords_import_promo_in_settings_title">Wachtwoorden importeren van Google</string>
     <string name="passwords_import_promo_in_settings_dismiss_text">Verbergen</string>
 
+    <!-- Import Bookmarks Strings -->
+    <string name="importToDuckDuckGo">Importeren naar DuckDuckGo</string>
+    <string name="importBookmarksFromGoogleChromeFolderName">Geïmporteerd vanuit Chrome</string>
+    <string name="importBookmarksFromGooglePreImportDialogTitle">Bladwijzers importeren uit Google</string>
+    <string name="importBookmarksFromGooglePreImportDialogInstruction">Google kan je vragen om in te loggen of je wachtwoord in te voeren ter bevestiging.</string>
+    <string name="importBookmarksFromGooglePreImportDialogImportButton">Importeren van Google</string>
+    <string name="importBookmarksFromGooglePreImportDialogSelectFileButton">Bladwijzerbestand selecteren...</string>
+    <string name="importBookmarksFromGoogleWebFlowTitle">Bladwijzers importeren</string>
+    <string name="importBookmarksProgressTitle">Importeren van Google…</string>
+    <string name="importBookmarksProgressSubtitle">Houd dit scherm open en wacht even — het zou niet langer dan een minuut of twee moeten duren.</string>
+    <string name="importBookmarksProgressInfoMessage1">Google kan je vragen om in te loggen of je wachtwoord in te voeren ter bevestiging.</string>
+    <string name="importBookmarksProgressInfoMessage2">Google stuurt je mogelijk een e-mail ter bevestiging dat je bladwijzers worden geëxporteerd.</string>
+    <string name="importBookmarksFromGoogleCancelConfirmationDialogTitle">Import annuleren?</string>
+    <string name="importBookmarksFromGoogleCancelConfirmationDialogMessage">Je bladwijzers worden niet geïmporteerd als je nu annuleert.</string>
+    <string name="importBookmarksFromGoogleCancelConfirmationDialogCancelImport">Importeren annuleren</string>
+    <string name="importBookmarksFromGoogleCancelConfirmationDialogContinue">Doorgaan</string>
+    <string name="importBookmarksFromGoogleSuccessBookmarksCount" instruction="Placeholder is the number of bookmarks that were imported">Bladwijzers: %1$d</string>
+    <string name="importBookmarksSuccessTitle">@string/importToDuckDuckGo</string>
+    <string name="importBookmarksFinalDoneButton">Sluiten</string>
+    <string name="importBookmarksErrorTitle">@string/importToDuckDuckGo</string>
+    <string name="importBookmarksErrorGenericMessage">Er is iets misgegaan</string>
+    <string name="importBookmarksErrorGenericMessageSecondary">Controleer of je verbinding hebt met internet en probeer het opnieuw.</string>
+
 </resources>

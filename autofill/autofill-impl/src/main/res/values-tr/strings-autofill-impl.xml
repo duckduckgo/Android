@@ -289,4 +289,27 @@
     <string name="passwords_import_promo_in_settings_title">Google\'dan Şifreleri İçe Aktar</string>
     <string name="passwords_import_promo_in_settings_dismiss_text">Gizle</string>
 
+    <!-- Import Bookmarks Strings -->
+    <string name="importToDuckDuckGo">DuckDuckGo\'ya Aktar</string>
+    <string name="importBookmarksFromGoogleChromeFolderName">Chrome\'dan İçe Aktarıldı</string>
+    <string name="importBookmarksFromGooglePreImportDialogTitle">Google\'dan Yer İşaretlerini İçe Aktar</string>
+    <string name="importBookmarksFromGooglePreImportDialogInstruction">Google, onaylamak için oturum açmanızı veya şifre girmenizi isteyebilir.</string>
+    <string name="importBookmarksFromGooglePreImportDialogImportButton">Google\'dan İçe Aktar</string>
+    <string name="importBookmarksFromGooglePreImportDialogSelectFileButton">Yer İşaretleri Dosyasını Seç…</string>
+    <string name="importBookmarksFromGoogleWebFlowTitle">Yer İmlerini İçe Aktar</string>
+    <string name="importBookmarksProgressTitle">Google\'dan İçe Aktarılıyor…</string>
+    <string name="importBookmarksProgressSubtitle">Bu ekranı açık tutun ve bekleyin. İşlem en fazla bir veya iki dakika sürecektir.</string>
+    <string name="importBookmarksProgressInfoMessage1">Google, onaylamak için oturum açmanızı veya şifre girmenizi isteyebilir.</string>
+    <string name="importBookmarksProgressInfoMessage2">Google, yer işaretlerinizin dışa aktarıldığını onaylayan bir e-posta gönderebilir.</string>
+    <string name="importBookmarksFromGoogleCancelConfirmationDialogTitle">İçe aktarma iptal edilsin mi?</string>
+    <string name="importBookmarksFromGoogleCancelConfirmationDialogMessage">Şimdi iptal ederseniz yer işaretleriniz içe aktarılmayacaktır.</string>
+    <string name="importBookmarksFromGoogleCancelConfirmationDialogCancelImport">İçe Aktarmayı İptal Et</string>
+    <string name="importBookmarksFromGoogleCancelConfirmationDialogContinue">Devam et</string>
+    <string name="importBookmarksFromGoogleSuccessBookmarksCount" instruction="Placeholder is the number of bookmarks that were imported">Yer işaretleri: %1$d</string>
+    <string name="importBookmarksSuccessTitle">@string/importToDuckDuckGo</string>
+    <string name="importBookmarksFinalDoneButton">Kapat</string>
+    <string name="importBookmarksErrorTitle">@string/importToDuckDuckGo</string>
+    <string name="importBookmarksErrorGenericMessage">Bir hata oluştu</string>
+    <string name="importBookmarksErrorGenericMessageSecondary">Lütfen internete bağlı olduğunuzdan emin olun ve tekrar deneyin.</string>
+
 </resources>

@@ -48,6 +48,7 @@ dependencies {
     implementation project(':js-messaging-api')
     implementation project(':statistics-api')
     implementation project(':content-scope-scripts-api')
+    implementation project(':duckchat-api')
 
     implementation "com.squareup.logcat:logcat:_"
 
@@ -55,10 +56,12 @@ dependencies {
     implementation AndroidX.core.ktx
     implementation AndroidX.webkit
     implementation KotlinX.coroutines.android
+    implementation AndroidX.dataStore.preferences
 
     // Dagger
     implementation Google.dagger
 
+    testImplementation project(':feature-toggles-test')
     testImplementation Testing.junit4
     testImplementation "org.mockito.kotlin:mockito-kotlin:_"
     testImplementation project(path: ':common-test')

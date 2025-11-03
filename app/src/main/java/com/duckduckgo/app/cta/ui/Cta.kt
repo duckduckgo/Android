@@ -53,7 +53,7 @@ import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelValues.DAX_FIRE_DIALOG_CTA
 import com.duckduckgo.app.trackerdetection.model.Entity
-import com.duckduckgo.browser.ui.omnibar.OmnibarPosition
+import com.duckduckgo.browser.ui.omnibar.OmnibarType
 import com.duckduckgo.common.ui.view.TypeAnimationTextView
 import com.duckduckgo.common.ui.view.button.DaxButton
 import com.duckduckgo.common.ui.view.gone
@@ -498,7 +498,7 @@ sealed class OnboardingDaxDialogCta(
                         title = getTrackersDescription(context, trackers),
                         description = context
                             .getString(R.string.bbOnboardingTrackersBlockedDialogDescription)
-                            .getStringForOmnibarPosition(settingsDataStore.omnibarPosition),
+                            .getStringForOmnibarPosition(settingsDataStore.omnibarType),
                         primaryCtaText = buttonText?.let { context.getString(it) },
                         binding = binding,
                         onTypingAnimationFinished = onTypingAnimationFinished,
@@ -538,21 +538,21 @@ sealed class OnboardingDaxDialogCta(
                     if (onboardingDesignExperimentManager.isBbEnrolledAndEnabled()) {
                         context.resources
                             .getQuantityString(R.plurals.bbOnboardingTrackersBlockedZeroDialogTitle, trackersFiltered.size)
-                            .getStringForOmnibarPosition(settingsDataStore.omnibarPosition)
+                            .getStringForOmnibarPosition(settingsDataStore.omnibarType)
                     } else {
                         context.resources
                             .getQuantityString(R.plurals.onboardingTrackersBlockedZeroDialogDescription, trackersFiltered.size)
-                            .getStringForOmnibarPosition(settingsDataStore.omnibarPosition)
+                            .getStringForOmnibarPosition(settingsDataStore.omnibarType)
                     }
                 } else {
                     if (onboardingDesignExperimentManager.isBbEnrolledAndEnabled()) {
                         context.resources
                             .getQuantityString(R.plurals.bbOnboardingTrackersBlockedDialogTitle, size, size)
-                            .getStringForOmnibarPosition(settingsDataStore.omnibarPosition)
+                            .getStringForOmnibarPosition(settingsDataStore.omnibarType)
                     } else {
                         context.resources
                             .getQuantityString(R.plurals.onboardingTrackersBlockedDialogDescription, size, size)
-                            .getStringForOmnibarPosition(settingsDataStore.omnibarPosition)
+                            .getStringForOmnibarPosition(settingsDataStore.omnibarType)
                     }
                 }
             return if (onboardingDesignExperimentManager.isBbEnrolledAndEnabled()) {
@@ -1865,10 +1865,10 @@ fun DaxCta.canSendShownPixel(): Boolean {
     return !(param.isNotEmpty() && param.any { it.split(":").firstOrNull().orEmpty() == ctaPixelParam })
 }
 
-fun String.getStringForOmnibarPosition(position: OmnibarPosition): String =
+fun String.getStringForOmnibarPosition(position: OmnibarType): String =
     when (position) {
-        OmnibarPosition.TOP -> this
-        OmnibarPosition.BOTTOM -> replace("☝", "\uD83D\uDC47")
+        OmnibarType.SINGLE_TOP, OmnibarType.SPLIT -> this
+        OmnibarType.SINGLE_BOTTOM -> replace("☝", "\uD83D\uDC47")
     }
 
 private fun View.fadeIn(duration: Duration = 500.milliseconds): ViewPropertyAnimator = animate().alpha(1f).setDuration(duration.inWholeMilliseconds)

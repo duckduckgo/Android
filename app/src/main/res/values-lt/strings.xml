@@ -603,7 +603,7 @@
     <string name="waitlistNotificationDialogNotifyMe">INFORMUOTI</string>
 
     <!-- Email Protection -->
-    <string name="emailProtectionActivityTitle">El. pašto apsauga (beta)</string>
+    <string name="emailProtectionActivityTitle">El. pašto apsauga</string>
     <string name="emailNotSupported">Nepalaikomas įrenginys</string>
     <string name="emailNotSupportedExplanation">El. pašto apsauga leidžia jums sukurti privačius el. pašto adresus, kurie pašalina el. laiškų sekimo priemones. Mums reikia užšifruoti ir saugoti šiuos adresus, kuriuos lokaliai sukuriate įrenginyje. Kadangi jūsų įrenginys nepalaiko užšifruotos talpyklos funkcijos, El. pašto apsaugos funkcija neprieinama.</string>
 

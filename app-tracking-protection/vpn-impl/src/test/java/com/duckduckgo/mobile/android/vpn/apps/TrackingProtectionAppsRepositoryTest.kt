@@ -16,6 +16,7 @@
 
 package com.duckduckgo.mobile.android.vpn.apps
 
+import android.annotation.SuppressLint
 import android.content.pm.ApplicationInfo
 import android.content.pm.PackageManager
 import android.content.pm.PackageManager.NameNotFoundException
@@ -49,6 +50,7 @@ class TrackingProtectionAppsRepositoryTest {
     private lateinit var trackingProtectionAppsRepository: TrackingProtectionAppsRepository
 
     @Before
+    @SuppressLint("DenyListedApi")
     fun setup() {
         whenever(packageManager.getInstalledApplications(PackageManager.GET_META_DATA)).thenReturn(INSTALLED_APPS.asApplicationInfo())
         whenever(packageManager.getApplicationLabel(any())).thenReturn("App Name")

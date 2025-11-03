@@ -24,7 +24,7 @@ import com.duckduckgo.app.settings.clear.ClearWhenOption
 import com.duckduckgo.app.settings.clear.FireAnimation
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.browser.api.autocomplete.AutoCompleteSettings
-import com.duckduckgo.browser.ui.omnibar.OmnibarPosition
+import com.duckduckgo.browser.ui.omnibar.OmnibarType
 
 class FakeSettingsDataStore :
     SettingsDataStore,
@@ -162,10 +162,16 @@ class FakeSettingsDataStore :
             store["showAutomaticFireproofDialog"] = value
         }
 
-    override var omnibarPosition: OmnibarPosition
-        get() = OmnibarPosition.valueOf(store["omnibarPosition"] as String)
+    override var omnibarType: OmnibarType
+        get() = OmnibarType.fromString(store["omnibarPosition"] as String)
         set(value) {
-            store["omnibarPosition"] = value.name
+            store["omnibarPosition"] = value.typeName
+        }
+
+    override var isSplitOmnibarSelected: Boolean
+        get() = store["isSplitOmnibarSelected"] as Boolean? ?: false
+        set(value) {
+            store["isSplitOmnibarSelected"] = value
         }
 
     override var notifyMeInDownloadsDismissed: Boolean

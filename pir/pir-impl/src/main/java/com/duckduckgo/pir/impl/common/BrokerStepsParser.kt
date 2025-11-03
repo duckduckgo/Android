@@ -29,12 +29,11 @@ import com.duckduckgo.pir.impl.store.PirRepository
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
-import com.squareup.moshi.adapters.PolymorphicJsonAdapterFactory
-import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import kotlinx.coroutines.withContext
 import logcat.LogPriority.ERROR
 import logcat.logcat
 import javax.inject.Inject
+import javax.inject.Named
 
 interface BrokerStepsParser {
     /**
@@ -97,28 +96,10 @@ interface BrokerStepsParser {
 class RealBrokerStepsParser @Inject constructor(
     private val dispatcherProvider: DispatcherProvider,
     private val repository: PirRepository,
+    @Named("pir") private val moshi: Moshi,
 ) : BrokerStepsParser {
     val adapter: JsonAdapter<BrokerStep> by lazy {
-        Moshi.Builder()
-            .add(
-                PolymorphicJsonAdapterFactory.of(BrokerAction::class.java, "actionType")
-                    .withSubtype(BrokerAction.Extract::class.java, "extract")
-                    .withSubtype(BrokerAction.Expectation::class.java, "expectation")
-                    .withSubtype(BrokerAction.Click::class.java, "click")
-                    .withSubtype(BrokerAction.FillForm::class.java, "fillForm")
-                    .withSubtype(BrokerAction.Navigate::class.java, "navigate")
-                    .withSubtype(BrokerAction.GetCaptchaInfo::class.java, "getCaptchaInfo")
-                    .withSubtype(BrokerAction.SolveCaptcha::class.java, "solveCaptcha")
-                    .withSubtype(BrokerAction.EmailConfirmation::class.java, "emailConfirmation"),
-            )
-            .add(
-                PolymorphicJsonAdapterFactory.of(BrokerStep::class.java, "stepType")
-                    .withSubtype(ScanStep::class.java, "scan")
-                    .withSubtype(OptOutStep::class.java, "optOut"),
-            )
-            .add(KotlinJsonAdapterFactory())
-            .build()
-            .adapter(BrokerStep::class.java)
+        moshi.adapter(BrokerStep::class.java)
     }
 
     override suspend fun parseStep(
