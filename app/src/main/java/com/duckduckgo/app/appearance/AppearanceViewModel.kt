@@ -67,7 +67,7 @@ class AppearanceViewModel @Inject constructor(
         val omnibarType: OmnibarType = OmnibarType.SINGLE_TOP,
         val isFullUrlEnabled: Boolean = true,
         val isTrackersCountInTabSwitcherEnabled: Boolean = true,
-        val shouldShowSplitOmnibarSettings: Boolean = true,
+        val shouldShowSplitOmnibarSettings: Boolean = false,
     )
 
     sealed class Command {
