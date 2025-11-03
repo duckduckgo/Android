@@ -69,14 +69,16 @@ class GetNativeSettingsHandler @Inject constructor(
                         }
 
                         logcat { "SERP-SETTINGS: GetNativeSettingsHandler sending: $settingsJsonObject" }
-                        jsMessaging.onResponse(
-                            JsCallbackData(
-                                params = settingsJsonObject,
-                                featureName = jsMessage.featureName,
-                                method = jsMessage.method,
-                                id = jsMessage.id ?: "",
-                            ),
-                        )
+                        jsMessage.id?.let { id ->
+                            jsMessaging.onResponse(
+                                JsCallbackData(
+                                    params = settingsJsonObject,
+                                    featureName = jsMessage.featureName,
+                                    method = jsMessage.method,
+                                    id = id,
+                                ),
+                            )
+                        }
                     }
                 }
             }
