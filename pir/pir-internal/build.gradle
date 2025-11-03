@@ -41,4 +41,5 @@ dependencies {
     implementation AndroidX.webkit
     implementation Google.android.material
     implementation Google.dagger
+    implementation AndroidX.room.runtime
 }
