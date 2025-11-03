@@ -22,12 +22,6 @@
     android:background="@drawable/popup_menu_bg">
 
     <com.duckduckgo.common.ui.view.PopupMenuItemView
-        android:id="@+id/newTabMenuItem"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:primaryText="@string/newTabMenuItem" />
-
-    <com.duckduckgo.common.ui.view.PopupMenuItemView
         android:id="@+id/gridLayoutMenuItem"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
