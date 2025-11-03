@@ -45,6 +45,7 @@
         <meta-data
             android:name="android.webkit.WebView.MetricsOptOut"
             android:value="true" />
+        <meta-data android:name="asset_statements" android:resource="@string/asset_statements" />
 
         <!-- Disable WorkManager's default initialization so we can use Dagger with it -->
         <provider
