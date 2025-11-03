@@ -557,10 +557,6 @@ class BrowserTabViewModel @Inject constructor(
     val title: String?
         get() = site?.title
 
-    val isSplitOmnibarEnabled: Boolean by lazy {
-        omnibarFeatureRepository.isSplitOmnibarAvailable && settingsDataStore.omnibarType == OmnibarType.SPLIT
-    }
-
     private var locationPermissionRequest: LocationPermissionRequest? = null
     private val locationPermissionMessages: MutableMap<String, Boolean> = mutableMapOf()
     private val locationPermissionSession: MutableMap<String, LocationPermissionType> = mutableMapOf()
@@ -2897,7 +2893,7 @@ class BrowserTabViewModel @Inject constructor(
                     showMenuButton = HighlightableButton.Visible(highlighted = false),
                 )
         }
-        command.value = LaunchPopupMenu(anchorToNavigationBar = !isCustomTab && isSplitOmnibarEnabled)
+        command.value = LaunchPopupMenu(anchorToNavigationBar = !isCustomTab && omnibarFeatureRepository.isSplitOmnibarEnabled)
     }
 
     fun onPopupMenuLaunched() {

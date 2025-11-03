@@ -362,7 +362,6 @@ import logcat.logcat
 import okio.ByteString.Companion.encode
 import org.json.JSONObject
 import java.io.File
-import java.lang.Compiler.command
 import javax.inject.Inject
 import javax.inject.Named
 import javax.inject.Provider
@@ -1025,7 +1024,7 @@ class BrowserTabFragment :
         omnibar = Omnibar(
             omnibarType = settingsDataStore.omnibarType,
             binding = binding,
-            isUnifiedOmnibarEnabled = omnibarFeatureRepository.isUnifiedOmnibarEnabled,
+            isUnifiedOmnibarEnabled = omnibarFeatureRepository.isUnifiedOmnibarFlagEnabled,
         )
 
         webViewContainer = binding.webViewContainer
@@ -1197,7 +1196,7 @@ class BrowserTabFragment :
         browserNavigationBarIntegration = BrowserNavigationBarViewIntegration(
             lifecycleScope = lifecycleScope,
             browserTabFragmentBinding = binding,
-            isEnabled = viewModel.isSplitOmnibarEnabled,
+            isEnabled = omnibarFeatureRepository.isSplitOmnibarEnabled,
             omnibar = omnibar,
             browserNavigationBarObserver = observer,
         )
