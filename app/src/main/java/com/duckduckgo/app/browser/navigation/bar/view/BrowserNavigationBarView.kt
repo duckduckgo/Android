@@ -236,8 +236,6 @@ class BrowserNavigationBarView @JvmOverloads constructor(
 
     /**
      * Behavior that offsets the navigation bar proportionally to the offset of the top omnibar.
-     *
-     * This practically applies only when paired with the top omnibar because if the bottom omnibar is used, it comes with the navigation bar embedded.
      */
     private class BottomViewBehavior(
         context: Context,
