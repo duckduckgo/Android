@@ -20,6 +20,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.webkit.WebViewFeature
 import com.duckduckgo.anvil.annotations.ContributesViewModel
+import com.duckduckgo.app.browser.omnibar.OmnibarFeatureRepository
 import com.duckduckgo.app.icon.api.AppIcon
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_THEME_TOGGLED_DARK
@@ -55,6 +56,7 @@ class AppearanceViewModel @Inject constructor(
     private val pixel: Pixel,
     private val dispatcherProvider: DispatcherProvider,
     private val tabSwitcherDataStore: TabSwitcherDataStore,
+    omnibarFeatureRepository: OmnibarFeatureRepository,
 ) : ViewModel() {
     data class ViewState(
         val theme: DuckDuckGoTheme = DuckDuckGoTheme.LIGHT,
@@ -65,6 +67,7 @@ class AppearanceViewModel @Inject constructor(
         val omnibarType: OmnibarType = OmnibarType.SINGLE_TOP,
         val isFullUrlEnabled: Boolean = true,
         val isTrackersCountInTabSwitcherEnabled: Boolean = true,
+        val shouldShowSplitOmnibarSettings: Boolean = false,
     )
 
     sealed class Command {
@@ -90,6 +93,7 @@ class AppearanceViewModel @Inject constructor(
             supportsForceDarkMode = WebViewFeature.isFeatureSupported(WebViewFeature.ALGORITHMIC_DARKENING),
             isFullUrlEnabled = settingsDataStore.isFullUrlEnabled,
             omnibarType = settingsDataStore.omnibarType,
+            shouldShowSplitOmnibarSettings = omnibarFeatureRepository.isSplitOmnibarAvailable,
         ),
     )
 
@@ -145,7 +149,7 @@ class AppearanceViewModel @Inject constructor(
         pixel.fire(pixelName)
     }
 
-    fun setOmnibarType(type: OmnibarType) {
+    fun onOmnibarTypeSelected(type: OmnibarType) {
         viewModelScope.launch(dispatcherProvider.io()) {
             settingsDataStore.omnibarType = type
             viewState.update { it.copy(omnibarType = type) }

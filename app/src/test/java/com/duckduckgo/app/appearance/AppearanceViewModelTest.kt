@@ -21,6 +21,7 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import app.cash.turbine.test
 import com.duckduckgo.app.appearance.AppearanceViewModel.Command
+import com.duckduckgo.app.browser.omnibar.OmnibarFeatureRepository
 import com.duckduckgo.app.icon.api.AppIcon
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.settings.clear.FireAnimation
@@ -71,6 +72,9 @@ internal class AppearanceViewModelTest {
     @Mock
     private lateinit var mockTabSwitcherDataStore: TabSwitcherDataStore
 
+    @Mock
+    private lateinit var mockOmnibarFeatureRepository: OmnibarFeatureRepository
+
     @SuppressLint("DenyListedApi")
     @Before
     fun before() {
@@ -81,6 +85,7 @@ internal class AppearanceViewModelTest {
         whenever(mockAppSettingsDataStore.selectedFireAnimation).thenReturn(FireAnimation.HeroFire)
         whenever(mockAppSettingsDataStore.omnibarType).thenReturn(OmnibarType.SINGLE_TOP)
         whenever(mockTabSwitcherDataStore.isTrackersAnimationInfoTileHidden()).thenReturn(flowOf(false))
+        whenever(mockOmnibarFeatureRepository.isSplitOmnibarEnabled).thenReturn(false)
 
         initializeViewModel()
     }
@@ -93,6 +98,7 @@ internal class AppearanceViewModelTest {
                 mockPixel,
                 coroutineTestRule.testDispatcherProvider,
                 mockTabSwitcherDataStore,
+                mockOmnibarFeatureRepository,
             )
     }
 
@@ -221,7 +227,7 @@ internal class AppearanceViewModelTest {
     @Test
     fun whenOmnibarPositionUpdatedToBottom() =
         runTest {
-            testee.setOmnibarType(OmnibarType.SINGLE_BOTTOM)
+            testee.onOmnibarTypeSelected(OmnibarType.SINGLE_BOTTOM)
             verify(mockAppSettingsDataStore).omnibarType = OmnibarType.SINGLE_BOTTOM
             verify(mockPixel).fire(AppPixelName.SETTINGS_ADDRESS_BAR_POSITION_SELECTED_BOTTOM)
         }
@@ -229,9 +235,17 @@ internal class AppearanceViewModelTest {
     @Test
     fun whenOmnibarPositionUpdatedToTop() =
         runTest {
-            testee.setOmnibarType(OmnibarType.SINGLE_TOP)
+            testee.onOmnibarTypeSelected(OmnibarType.SINGLE_TOP)
             verify(mockAppSettingsDataStore).omnibarType = OmnibarType.SINGLE_TOP
             verify(mockPixel).fire(AppPixelName.SETTINGS_ADDRESS_BAR_POSITION_SELECTED_TOP)
+        }
+
+    @Test
+    fun whenOmnibarPositionUpdatedToSplit() =
+        runTest {
+            testee.onOmnibarTypeSelected(OmnibarType.SPLIT)
+            verify(mockAppSettingsDataStore).omnibarType = OmnibarType.SPLIT
+            verify(mockPixel).fire(AppPixelName.SETTINGS_ADDRESS_BAR_POSITION_SELECTED_SPLIT_TOP)
         }
 
     @Test
