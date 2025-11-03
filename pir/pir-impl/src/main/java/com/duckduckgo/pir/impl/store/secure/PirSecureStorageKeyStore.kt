@@ -16,13 +16,11 @@
 
 package com.duckduckgo.pir.impl.store.secure
 
-import android.content.Context
 import android.content.SharedPreferences
 import androidx.core.content.edit
-import androidx.security.crypto.EncryptedSharedPreferences
-import androidx.security.crypto.MasterKey
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.data.store.api.SharedPreferencesProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
@@ -62,9 +60,9 @@ interface PirSecureStorageKeyStore {
     boundType = PirSecureStorageKeyStore::class,
 )
 class RealPirSecureStorageKeyStore @Inject constructor(
-    private val context: Context,
     @AppCoroutineScope private val coroutineScope: CoroutineScope,
     private val dispatcherProvider: DispatcherProvider,
+    private val sharedPreferencesProvider: SharedPreferencesProvider,
 ) : PirSecureStorageKeyStore {
 
     private val mutex: Mutex = Mutex()
@@ -108,14 +106,9 @@ class RealPirSecureStorageKeyStore @Inject constructor(
     private suspend fun createEncryptedPreferences(): SharedPreferences? {
         return try {
             mutex.withLock {
-                EncryptedSharedPreferences.create(
-                    context,
-                    FILENAME,
-                    MasterKey.Builder(context)
-                        .setKeyScheme(MasterKey.KeyScheme.AES256_GCM)
-                        .build(),
-                    EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
-                    EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM,
+                sharedPreferencesProvider.getEncryptedSharedPreferences(
+                    name = FILENAME,
+                    multiprocess = true,
                 )
             }
         } catch (_: Exception) {
