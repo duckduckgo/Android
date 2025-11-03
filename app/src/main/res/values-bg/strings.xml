@@ -844,7 +844,7 @@
 
     <!-- Appearance settings -->
     <string name="settingsAddressBarPositionTitle">Адресна лента</string>
-    <string name="settingsAddressBarPositionHeaderTitle">Позиция на адресната лента и лентата с инструменти</string>
+    <string name="settingsAddressBarPositionHeaderTitle">Позиция на адресната лента</string>
     <string name="settingsAddressBarPositionTop">Най-горе</string>
     <string name="settingsAddressBarPositionBottom">Отдолу</string>
     <string name="settingsAddressBarPositionSplit">Раздели</string>
