@@ -927,7 +927,7 @@ class BrowserTabFragment :
                 }
 
                 InputScreenActivityResultCodes.MENU_REQUESTED -> {
-                    launchPopupMenu(false)
+                    launchPopupMenu(omnibarFeatureRepository.isSplitOmnibarEnabled)
                 }
 
                 InputScreenActivityResultCodes.TAB_SWITCHER_REQUESTED -> {
