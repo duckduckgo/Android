@@ -22,7 +22,7 @@
     android:background="?attr/preferredNavigationBarColor"
     android:gravity="center"
     android:orientation="horizontal"
-    android:paddingTop="@dimen/navigationBarPaddingTopWhenStandalone"
+    android:paddingTop="@dimen/navigationBarPaddingTop"
     android:paddingBottom="@dimen/navigationBarPaddingBottom"
     app:layout_constraintTop_toTopOf="parent"
     tools:parentTag="androidx.coordinatorlayout.widget.CoordinatorLayout">
