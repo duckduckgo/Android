@@ -200,8 +200,9 @@ class AppearanceActivity : DuckDuckGoActivity() {
         val subtitle =
             getString(
                 when (omnibarType) {
-                    OmnibarType.SINGLE_TOP, OmnibarType.SPLIT -> R.string.settingsAddressBarPositionTop
+                    OmnibarType.SINGLE_TOP -> R.string.settingsAddressBarPositionTop
                     OmnibarType.SINGLE_BOTTOM -> R.string.settingsAddressBarPositionBottom
+                    OmnibarType.SPLIT -> throw IllegalStateException("Split omnibar not supported in the position selection settings")
                 },
             )
         binding.addressBarPositionSetting.setSecondaryText(subtitle)

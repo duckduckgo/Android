@@ -142,6 +142,7 @@ import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
 import com.duckduckgo.app.browser.model.LongPressTarget
 import com.duckduckgo.app.browser.navigation.bar.BrowserNavigationBarViewIntegration
 import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarObserver
+import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarView
 import com.duckduckgo.app.browser.newtab.NewTabPageProvider
 import com.duckduckgo.app.browser.omnibar.Omnibar
 import com.duckduckgo.app.browser.omnibar.Omnibar.FindInPageListener
@@ -1190,18 +1191,6 @@ class BrowserTabFragment :
                     onBrowserMenuButtonPressed()
                 }
 
-                override fun onBackButtonClicked() {
-                    onBackArrowClicked()
-                }
-
-                override fun onBackButtonLongClicked() {
-                    onBackArrowLongClicked()
-                }
-
-                override fun onForwardButtonClicked() {
-                    onForwardArrowClicked()
-                }
-
                 override fun onNewTabButtonClicked() {
                     viewModel.onNavigationBarNewTabButtonClicked()
                 }
@@ -2010,6 +1999,10 @@ class BrowserTabFragment :
         } else {
             null
         }
+    }
+
+    fun getBottomNavigationBar(): BrowserNavigationBarView {
+        return binding.navigationBar
     }
 
     private fun processCommand(it: Command?) {

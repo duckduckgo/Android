@@ -122,8 +122,6 @@ class BrowserNavigationBarViewModel @Inject constructor(
                     it.copy(
                         newTabButtonVisible = false,
                         autofillButtonVisible = true,
-                        fireButtonVisible = true,
-                        tabsButtonVisible = true,
                     )
                 }
             }
@@ -133,8 +131,17 @@ class BrowserNavigationBarViewModel @Inject constructor(
                     it.copy(
                         newTabButtonVisible = true,
                         autofillButtonVisible = false,
-                        fireButtonVisible = true,
-                        tabsButtonVisible = true,
+                    )
+                }
+            }
+
+            ViewMode.TabManager -> {
+                _viewState.update {
+                    it.copy(
+                        newTabButtonVisible = true,
+                        autofillButtonVisible = false,
+                        tabsButtonVisible = false,
+                        bookmarksButtonVisible = false,
                     )
                 }
             }
@@ -154,9 +161,6 @@ class BrowserNavigationBarViewModel @Inject constructor(
         data object NotifyTabsButtonClicked : Command()
         data object NotifyTabsButtonLongClicked : Command()
         data object NotifyMenuButtonClicked : Command()
-        data object NotifyBackButtonClicked : Command()
-        data object NotifyBackButtonLongClicked : Command()
-        data object NotifyForwardButtonClicked : Command()
         data object NotifyNewTabButtonClicked : Command()
         data object NotifyAutofillButtonClicked : Command()
         data object NotifyBookmarksButtonClicked : Command()
