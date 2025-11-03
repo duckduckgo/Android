@@ -386,12 +386,6 @@ class Omnibar(
         omnibarTextInput.setSelection(index)
     }
 
-    fun showOutline(pressed: Boolean) {
-        omniBarContainer.isPressed = pressed
-    }
-
-    fun isOutlineShown(): Boolean = omniBarContainer.isPressed
-
     fun isEditing(): Boolean = omnibarView.isEditing
 
     fun renderBrowserViewState(viewState: BrowserViewState) {

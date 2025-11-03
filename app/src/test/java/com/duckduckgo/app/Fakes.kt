@@ -165,7 +165,7 @@ class FakeSettingsDataStore :
     override var omnibarType: OmnibarType
         get() = OmnibarType.fromString(store["omnibarPosition"] as String)
         set(value) {
-            store["omnibarPosition"] = value.name
+            store["omnibarPosition"] = value.typeName
         }
 
     override var isSplitOmnibarSelected: Boolean

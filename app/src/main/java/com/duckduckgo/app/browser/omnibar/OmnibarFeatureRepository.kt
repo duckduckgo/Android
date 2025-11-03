@@ -35,20 +35,22 @@ import javax.inject.Inject
     boundType = MainProcessLifecycleObserver::class,
 )
 @SingleInstanceIn(AppScope::class)
-class OmnibarFeatureRepository @Inject constructor(
+open class OmnibarFeatureRepository @Inject constructor(
     private val settingsDataStore: SettingsDataStore,
     private val browserFeatures: AndroidBrowserConfigFeature,
     private val dispatcherProvider: DispatcherProvider,
     @AppCoroutineScope private val coroutineScope: CoroutineScope,
 ) : MainProcessLifecycleObserver {
-    var isUnifiedOmnibarEnabled: Boolean = false
+    private var isSplitOmnibarFlagEnabled: Boolean = false
+
+    var isUnifiedOmnibarFlagEnabled: Boolean = false
         private set
 
-    var isSplitOmnibarEnabled: Boolean = false
-        private set
+    val isSplitOmnibarEnabled: Boolean
+        get() = isSplitOmnibarAvailable && settingsDataStore.omnibarType == OmnibarType.SPLIT
 
     val isSplitOmnibarAvailable: Boolean
-        get() = isUnifiedOmnibarEnabled && isSplitOmnibarEnabled
+        get() = isSplitOmnibarFlagEnabled && isUnifiedOmnibarFlagEnabled
 
     override fun onStart(owner: LifecycleOwner) {
         updateFeatureFlags()
@@ -56,8 +58,8 @@ class OmnibarFeatureRepository @Inject constructor(
 
     fun updateFeatureFlags() {
         coroutineScope.launch(dispatcherProvider.io()) {
-            isUnifiedOmnibarEnabled = browserFeatures.useUnifiedOmnibarLayout().isEnabled()
-            isSplitOmnibarEnabled = browserFeatures.splitOmnibar().isEnabled()
+            isUnifiedOmnibarFlagEnabled = browserFeatures.useUnifiedOmnibarLayout().isEnabled()
+            isSplitOmnibarFlagEnabled = browserFeatures.splitOmnibar().isEnabled()
 
             resetOmnibarTypeIfNecessary()
         }

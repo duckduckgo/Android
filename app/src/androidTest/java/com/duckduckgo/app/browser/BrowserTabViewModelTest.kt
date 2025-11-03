@@ -114,6 +114,7 @@ import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
 import com.duckduckgo.app.browser.model.LongPressTarget
 import com.duckduckgo.app.browser.newtab.FavoritesQuickAccessAdapter.QuickAccessFavorite
 import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
+import com.duckduckgo.app.browser.omnibar.OmnibarFeatureRepository
 import com.duckduckgo.app.browser.omnibar.QueryOrigin.*
 import com.duckduckgo.app.browser.refreshpixels.RefreshPixelSender
 import com.duckduckgo.app.browser.remotemessage.RemoteMessagingModel
@@ -583,6 +584,7 @@ class BrowserTabViewModelTest {
     private val mockSubscriptionsJSHelper: SubscriptionsJSHelper = mock()
     private val mockOnboardingHomeScreenWidgetToggles: OnboardingHomeScreenWidgetToggles = mock()
     private val tabManager: TabManager = mock()
+    private val mockOmnibarFeatureRepository: OmnibarFeatureRepository = mock()
 
     private val mockAddressDisplayFormatter: AddressDisplayFormatter by lazy {
         mock {
@@ -846,6 +848,7 @@ class BrowserTabViewModelTest {
                     webViewCompatWrapper = mockWebViewCompatWrapper,
                     addressBarTrackersAnimationFeatureToggle = mockAddressBarTrackersAnimationFeatureToggle,
                     autoconsentPixelManager = mockAutoconsentPixelManager,
+                    omnibarFeatureRepository = mockOmnibarFeatureRepository,
                 )
 
             testee.loadData("abc", null, false, false)
