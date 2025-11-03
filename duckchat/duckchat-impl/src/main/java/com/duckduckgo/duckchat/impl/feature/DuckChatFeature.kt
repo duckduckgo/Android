@@ -102,4 +102,11 @@ interface DuckChatFeature {
      */
     @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
     fun showMainButtonsInInputScreen(): Toggle
+
+    /**
+     * @return `true` when standalone migration is supported
+     * If the remote feature is not present defaults to `internal`
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
+    fun standaloneMigration(): Toggle
 }

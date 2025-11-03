@@ -46,6 +46,7 @@ class RealDuckChatJSHelper @Inject constructor(
     private val duckChatPixels: DuckChatPixels,
     private val dataStore: DuckChatDataStore,
 ) : DuckChatJSHelper {
+    private val migrationItems = mutableListOf<String>()
     override suspend fun processJsCallbackMessage(
         featureName: String,
         method: String,
@@ -110,6 +111,22 @@ class RealDuckChatJSHelper @Inject constructor(
                 null
             }
 
+            METHOD_STORE_MIGRATION_DATA -> id?.let {
+                getStoreMigrationDataResponse(featureName, method, it, data)
+            }
+
+            METHOD_GET_MIGRATION_INFO -> id?.let {
+                getMigrationInfoResponse(featureName, method, it)
+            }
+
+            METHOD_GET_MIGRATION_DATA_BY_INDEX -> id?.let {
+                getMigrationDataByIndexResponse(featureName, method, it, data)
+            }
+
+            METHOD_CLEAR_MIGRATION_DATA -> id?.let {
+                getClearMigrationDataResponse(featureName, method, it)
+            }
+
             else -> null
         }
 
@@ -140,6 +157,7 @@ class RealDuckChatJSHelper @Inject constructor(
                 put(SUPPORTS_OPENING_SETTINGS, true)
                 put(SUPPORTS_NATIVE_CHAT_INPUT, false)
                 put(SUPPORTS_IMAGE_UPLOAD, duckChat.isImageUploadEnabled())
+                put(SUPPORTS_STANDALONE_MIGRATION, duckChat.isStandaloneMigrationEnabled())
             }
         return JsCallbackData(jsonPayload, featureName, method, id)
     }
@@ -183,6 +201,66 @@ class RealDuckChatJSHelper @Inject constructor(
         }
     }
 
+    private fun getStoreMigrationDataResponse(
+        featureName: String,
+        method: String,
+        id: String,
+        data: JSONObject?,
+    ): JsCallbackData {
+        val item = data?.optString(SERIALIZED_MIGRATION_FILE)
+        val jsonPayload = JSONObject()
+        if (item != null && item != JSONObject.NULL) {
+            synchronized(migrationItems) { migrationItems.add(item) }
+            jsonPayload.put(OK, true)
+        } else {
+            jsonPayload.put(OK, false)
+            jsonPayload.put(REASON, "Missing or invalid serializedMigrationFile")
+        }
+        return JsCallbackData(jsonPayload, featureName, method, id)
+    }
+
+    private fun getMigrationInfoResponse(
+        featureName: String,
+        method: String,
+        id: String,
+    ): JsCallbackData {
+        val count = synchronized(migrationItems) { migrationItems.size }
+        val jsonPayload = JSONObject().apply {
+            put(OK, true)
+            put(COUNT, count)
+        }
+        return JsCallbackData(jsonPayload, featureName, method, id)
+    }
+
+    private fun getMigrationDataByIndexResponse(
+        featureName: String,
+        method: String,
+        id: String,
+        data: JSONObject?,
+    ): JsCallbackData {
+        val index = data?.optInt(INDEX, -1) ?: -1
+        val value = synchronized(migrationItems) { migrationItems.getOrNull(index) }
+        val jsonPayload = JSONObject()
+        if (value == null) {
+            jsonPayload.put(OK, false)
+            jsonPayload.put(REASON, "nothing at index: $index")
+        } else {
+            jsonPayload.put(OK, true)
+            jsonPayload.put(SERIALIZED_MIGRATION_FILE, value)
+        }
+        return JsCallbackData(jsonPayload, featureName, method, id)
+    }
+
+    private fun getClearMigrationDataResponse(
+        featureName: String,
+        method: String,
+        id: String,
+    ): JsCallbackData {
+        synchronized(migrationItems) { migrationItems.clear() }
+        val jsonPayload = JSONObject().apply { put(OK, true) }
+        return JsCallbackData(jsonPayload, featureName, method, id)
+    }
+
     companion object {
         const val DUCK_CHAT_FEATURE_NAME = "aiChat"
         private const val METHOD_GET_AI_CHAT_NATIVE_HANDOFF_DATA = "getAIChatNativeHandoffData"
@@ -201,6 +279,7 @@ class RealDuckChatJSHelper @Inject constructor(
         private const val SUPPORTS_OPENING_SETTINGS = "supportsOpeningSettings"
         private const val SUPPORTS_NATIVE_CHAT_INPUT = "supportsNativeChatInput"
         private const val SUPPORTS_IMAGE_UPLOAD = "supportsImageUpload"
+        private const val SUPPORTS_STANDALONE_MIGRATION = "supportsStandaloneMigration"
         private const val REPORT_METRIC = "reportMetric"
         private const val PLATFORM = "platform"
         private const val ANDROID = "android"
@@ -208,5 +287,17 @@ class RealDuckChatJSHelper @Inject constructor(
         private const val DEFAULT_SELECTOR = "'user-prompt'"
         private const val SUCCESS = "success"
         private const val ERROR = "error"
+        private const val OK = "ok"
+        private const val REASON = "reason"
+
+        // Migration messaging constants
+        private const val METHOD_STORE_MIGRATION_DATA = "storeMigrationData"
+        private const val METHOD_GET_MIGRATION_INFO = "getMigrationInfo"
+        private const val METHOD_GET_MIGRATION_DATA_BY_INDEX = "getMigrationDataByIndex"
+        private const val METHOD_CLEAR_MIGRATION_DATA = "clearMigrationData"
+
+        private const val SERIALIZED_MIGRATION_FILE = "serializedMigrationFile"
+        private const val COUNT = "count"
+        private const val INDEX = "index"
     }
 }

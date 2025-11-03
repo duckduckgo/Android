@@ -193,8 +193,14 @@ open class DuckChatWebViewFragment : DuckDuckGoFragment(R.layout.activity_duck_c
                     view?.requestFocusNodeHref(resultMsg)
                     val newWindowUrl = resultMsg?.data?.getString("url")
                     if (newWindowUrl != null) {
-                        startActivity(browserNav.openInNewTab(requireContext(), newWindowUrl))
-                        return true
+                        return if (isDuckAiUrl(newWindowUrl)) {
+                            // Allow-list: open duck.ai links inside the current sheet WebView
+                            this@DuckChatWebViewFragment.simpleWebview.loadUrl(newWindowUrl)
+                            true
+                        } else {
+                            startActivity(browserNav.openInNewTab(requireContext(), newWindowUrl))
+                            true
+                        }
                     }
                     return false
                 }
@@ -596,6 +602,15 @@ open class DuckChatWebViewFragment : DuckDuckGoFragment(R.layout.activity_duck_c
         downloadMessagesJob.cancel()
         simpleWebview.onPause()
         super.onPause()
+    }
+
+    private fun isDuckAiUrl(url: String): Boolean {
+        return try {
+            val host = Uri.parse(url).host
+            host != null && (host == "duck.ai" || host.endsWith(".duck.ai"))
+        } catch (t: Throwable) {
+            false
+        }
     }
 
     companion object {
