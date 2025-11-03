@@ -860,7 +860,7 @@
 
     <!-- Appearance settings -->
     <string name="settingsAddressBarPositionTitle">Bara de adrese</string>
-    <string name="settingsAddressBarPositionHeaderTitle">Poziția barei de adrese și a barei de unelte</string>
+    <string name="settingsAddressBarPositionHeaderTitle">Poziția barei de adrese</string>
     <string name="settingsAddressBarPositionTop">Sus</string>
     <string name="settingsAddressBarPositionBottom">Partea de jos</string>
     <string name="settingsAddressBarPositionSplit">Împarte</string>

@@ -876,7 +876,7 @@
 
     <!-- Appearance settings -->
     <string name="settingsAddressBarPositionTitle">Adresna traka</string>
-    <string name="settingsAddressBarPositionHeaderTitle">Položaj adresne trake i alatne trake</string>
+    <string name="settingsAddressBarPositionHeaderTitle">Položaj adresne trake</string>
     <string name="settingsAddressBarPositionTop">Vrh</string>
     <string name="settingsAddressBarPositionBottom">Dno</string>
     <string name="settingsAddressBarPositionSplit">Podijeli</string>

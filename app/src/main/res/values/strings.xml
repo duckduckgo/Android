@@ -843,7 +843,7 @@
 
     <!-- Appearance settings -->
     <string name="settingsAddressBarPositionTitle">Address Bar</string>
-    <string name="settingsAddressBarPositionHeaderTitle">Address Bar and Toolbar Position</string>
+    <string name="settingsAddressBarPositionHeaderTitle">Address Bar Position</string>
     <string name="settingsAddressBarPositionTop">Top</string>
     <string name="settingsAddressBarPositionBottom">Bottom</string>
     <string name="settingsAddressBarPositionSplit">Split</string>

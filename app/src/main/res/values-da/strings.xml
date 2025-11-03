@@ -844,7 +844,7 @@
 
     <!-- Appearance settings -->
     <string name="settingsAddressBarPositionTitle">Adresselinje</string>
-    <string name="settingsAddressBarPositionHeaderTitle">Placering af adresselinje og værktøjslinje</string>
+    <string name="settingsAddressBarPositionHeaderTitle">Placering af adresselinje</string>
     <string name="settingsAddressBarPositionTop">Top</string>
     <string name="settingsAddressBarPositionBottom">Nederst</string>
     <string name="settingsAddressBarPositionSplit">Opdel</string>

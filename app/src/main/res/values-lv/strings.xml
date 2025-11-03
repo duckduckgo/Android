@@ -860,7 +860,7 @@
 
     <!-- Appearance settings -->
     <string name="settingsAddressBarPositionTitle">Adreses josla</string>
-    <string name="settingsAddressBarPositionHeaderTitle">Adreses joslas un rīkjoslas pozīcija</string>
+    <string name="settingsAddressBarPositionHeaderTitle">Adreses joslas pozīcija</string>
     <string name="settingsAddressBarPositionTop">Populārākie</string>
     <string name="settingsAddressBarPositionBottom">Apakšā</string>
     <string name="settingsAddressBarPositionSplit">Sadalīt</string>

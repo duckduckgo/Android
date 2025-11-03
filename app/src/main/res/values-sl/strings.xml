@@ -876,7 +876,7 @@
 
     <!-- Appearance settings -->
     <string name="settingsAddressBarPositionTitle">Naslovna vrstica</string>
-    <string name="settingsAddressBarPositionHeaderTitle">Položaj naslovne vrstice in orodne vrstice</string>
+    <string name="settingsAddressBarPositionHeaderTitle">Položaj naslovne vrstice</string>
     <string name="settingsAddressBarPositionTop">Vrh</string>
     <string name="settingsAddressBarPositionBottom">Spodaj</string>
     <string name="settingsAddressBarPositionSplit">Razdeli</string>

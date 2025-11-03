@@ -844,7 +844,7 @@
 
     <!-- Appearance settings -->
     <string name="settingsAddressBarPositionTitle">Adresbalk</string>
-    <string name="settingsAddressBarPositionHeaderTitle">Positie van de adresbalk en werkbalk</string>
+    <string name="settingsAddressBarPositionHeaderTitle">Positie van de adresbalk</string>
     <string name="settingsAddressBarPositionTop">Boven</string>
     <string name="settingsAddressBarPositionBottom">Onderkant</string>
     <string name="settingsAddressBarPositionSplit">Splitsen</string>

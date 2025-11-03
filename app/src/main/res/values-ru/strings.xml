@@ -876,7 +876,7 @@
 
     <!-- Appearance settings -->
     <string name="settingsAddressBarPositionTitle">Адресная строка</string>
-    <string name="settingsAddressBarPositionHeaderTitle">Положение адресной строки и панели инструментов</string>
+    <string name="settingsAddressBarPositionHeaderTitle">Положение адресной строки</string>
     <string name="settingsAddressBarPositionTop">Вверху</string>
     <string name="settingsAddressBarPositionBottom">Внизу</string>
     <string name="settingsAddressBarPositionSplit">Разделить</string>

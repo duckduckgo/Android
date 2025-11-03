@@ -844,7 +844,7 @@
 
     <!-- Appearance settings -->
     <string name="settingsAddressBarPositionTitle">Barra degli indirizzi</string>
-    <string name="settingsAddressBarPositionHeaderTitle">Posizione della Barra degli indirizzi e della Barra degli strumenti</string>
+    <string name="settingsAddressBarPositionHeaderTitle">Posizione della Barra degli indirizzi</string>
     <string name="settingsAddressBarPositionTop">Inizio</string>
     <string name="settingsAddressBarPositionBottom">Parte inferiore</string>
     <string name="settingsAddressBarPositionSplit">Dividi</string>

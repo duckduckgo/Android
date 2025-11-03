@@ -876,7 +876,7 @@
 
     <!-- Appearance settings -->
     <string name="settingsAddressBarPositionTitle">Adresní řádek</string>
-    <string name="settingsAddressBarPositionHeaderTitle">Pozice adresního řádku a nástrojové lišty</string>
+    <string name="settingsAddressBarPositionHeaderTitle">Pozice adresního řádku</string>
     <string name="settingsAddressBarPositionTop">Nahoru</string>
     <string name="settingsAddressBarPositionBottom">Dole</string>
     <string name="settingsAddressBarPositionSplit">Rozdělení</string>

@@ -876,7 +876,7 @@
 
     <!-- Appearance settings -->
     <string name="settingsAddressBarPositionTitle">Adreso juosta</string>
-    <string name="settingsAddressBarPositionHeaderTitle">Adreso juostos ir įrankių juostos padėtis</string>
+    <string name="settingsAddressBarPositionHeaderTitle">Adreso juostos padėtis</string>
     <string name="settingsAddressBarPositionTop">Viršus</string>
     <string name="settingsAddressBarPositionBottom">Apačia</string>
     <string name="settingsAddressBarPositionSplit">Padalintas</string>

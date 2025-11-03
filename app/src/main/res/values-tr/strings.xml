@@ -844,7 +844,7 @@
 
     <!-- Appearance settings -->
     <string name="settingsAddressBarPositionTitle">Adres Çubuğu</string>
-    <string name="settingsAddressBarPositionHeaderTitle">Adres Çubuğu ve Araç Çubuğu Konumu</string>
+    <string name="settingsAddressBarPositionHeaderTitle">Adres Çubuğu Konumu</string>
     <string name="settingsAddressBarPositionTop">Başa dön</string>
     <string name="settingsAddressBarPositionBottom">Alt</string>
     <string name="settingsAddressBarPositionSplit">Böl</string>

@@ -844,7 +844,7 @@
 
     <!-- Appearance settings -->
     <string name="settingsAddressBarPositionTitle">Γραμμή διευθύνσεων</string>
-    <string name="settingsAddressBarPositionHeaderTitle">Θέση γραμμής διευθύνσεων και γραμμής εργαλείων</string>
+    <string name="settingsAddressBarPositionHeaderTitle">Θέση γραμμής διευθύνσεων</string>
     <string name="settingsAddressBarPositionTop">Κορυφή</string>
     <string name="settingsAddressBarPositionBottom">Κάτω μέρος</string>
     <string name="settingsAddressBarPositionSplit">Διαχωρισμός</string>
