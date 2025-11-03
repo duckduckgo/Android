@@ -53,7 +53,7 @@ class OmnibarFeatureRepositoryTest {
     }
 
     @Test
-    fun whenOnStartThenFeatureFlagsAreUpdated() = runTest {
+    fun `when onStart called, then feature flags are updated`() = runTest {
         browserFeatures.useUnifiedOmnibarLayout().setRawStoredState(Toggle.State(enable = true))
         browserFeatures.splitOmnibar().setRawStoredState(Toggle.State(enable = true))
         createTestee()
