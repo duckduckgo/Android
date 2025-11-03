@@ -16,8 +16,6 @@
 
 package com.duckduckgo.pir.impl.di
 
-import android.content.Context
-import androidx.room.Room
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.common.utils.DispatcherProvider
@@ -63,6 +61,7 @@ import com.duckduckgo.pir.impl.store.db.OptOutResultsDao
 import com.duckduckgo.pir.impl.store.db.ScanLogDao
 import com.duckduckgo.pir.impl.store.db.ScanResultsDao
 import com.duckduckgo.pir.impl.store.db.UserProfileDao
+import com.duckduckgo.pir.impl.store.secure.PirSecureStorageDatabaseFactory
 import com.squareup.anvil.annotations.ContributesTo
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.adapters.PolymorphicJsonAdapterFactory
@@ -71,6 +70,7 @@ import dagger.Module
 import dagger.Provides
 import dagger.SingleInstanceIn
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.runBlocking
 import javax.inject.Named
 
 @Module
@@ -79,11 +79,12 @@ class PirModule {
 
     @SingleInstanceIn(AppScope::class)
     @Provides
-    fun bindPirDatabase(context: Context): PirDatabase {
-        return Room.databaseBuilder(context, PirDatabase::class.java, "pir.db")
-            .enableMultiInstanceInvalidation()
-            .fallbackToDestructiveMigration()
-            .build()
+    fun bindPirDatabase(
+        databaseFactory: PirSecureStorageDatabaseFactory,
+    ): PirDatabase {
+        return runBlocking {
+            databaseFactory.getDatabase()
+        } ?: throw IllegalStateException("Failed to create PIR encrypted database")
     }
 
     @SingleInstanceIn(AppScope::class)
