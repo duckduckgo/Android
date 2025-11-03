@@ -35,7 +35,7 @@ import javax.inject.Inject
     boundType = MainProcessLifecycleObserver::class,
 )
 @SingleInstanceIn(AppScope::class)
-class OmnibarFeatureRepository @Inject constructor(
+open class OmnibarFeatureRepository @Inject constructor(
     private val settingsDataStore: SettingsDataStore,
     private val browserFeatures: AndroidBrowserConfigFeature,
     private val dispatcherProvider: DispatcherProvider,
