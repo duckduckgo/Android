@@ -8,9 +8,13 @@ const webViewCompatPingMessage = 'Ping:' + window.location.href + ' ' + delay + 
 
 
 if (postInitialPing) {
-    setTimeout(() => {
+    if (delay > 0) {
+        setTimeout(() => {
+            webViewCompatTestObj.postMessage(webViewCompatPingMessage)
+        }, delay)
+    } else {
         webViewCompatTestObj.postMessage(webViewCompatPingMessage)
-    }, delay)
+    }
 }
 
 
