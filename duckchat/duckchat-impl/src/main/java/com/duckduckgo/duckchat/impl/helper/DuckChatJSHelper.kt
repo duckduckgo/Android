@@ -201,6 +201,10 @@ class RealDuckChatJSHelper @Inject constructor(
         }
     }
 
+    /**
+     * Accept incoming JSON payload { "serializedMigrationFile": "..." }
+     * Store the string value in an ordered list for later retrieval
+     */
     private fun getStoreMigrationDataResponse(
         featureName: String,
         method: String,
@@ -219,6 +223,10 @@ class RealDuckChatJSHelper @Inject constructor(
         return JsCallbackData(jsonPayload, featureName, method, id)
     }
 
+    /**
+     * Return the count of strings previously stored.
+     * It's ok to return 0 if no items have been stored
+     */
     private fun getMigrationInfoResponse(
         featureName: String,
         method: String,
@@ -232,6 +240,11 @@ class RealDuckChatJSHelper @Inject constructor(
         return JsCallbackData(jsonPayload, featureName, method, id)
     }
 
+    /**
+     * Try to lookup a string by index
+     *  - when found, return { ok: true, serializedMigrationFile: '...' }
+     *  - when missing, return { ok: false, reason: '...' }
+     */
     private fun getMigrationDataByIndexResponse(
         featureName: String,
         method: String,
@@ -251,6 +264,9 @@ class RealDuckChatJSHelper @Inject constructor(
         return JsCallbackData(jsonPayload, featureName, method, id)
     }
 
+    /**
+     * Clear migration data, returning { ok: true } when complete
+     */
     private fun getClearMigrationDataResponse(
         featureName: String,
         method: String,
