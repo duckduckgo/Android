@@ -124,6 +124,7 @@ class ClearPersonalDataAction(
         withContext(dispatchers.io()) {
             logcat(INFO) { "Clearing tabs" }
             dataManager.clearWebViewSessions()
+            // tabRepository.deleteAll()
             tabRepository.deleteAll()
             adClickManager.clearAll()
             setAppUsedSinceLastClearFlag(appInForeground)
