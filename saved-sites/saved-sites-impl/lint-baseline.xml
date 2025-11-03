@@ -409,6 +409,72 @@
     </issue>
 
     <issue
+        id="TypographyEllipsis"
+        message="Replace &quot;...&quot; with ellipsis character (…, &amp;#8230;) ?"
+        errorLine1="    &lt;string name=&quot;importBookmarksFromGooglePreImportDialogSelectFileButton&quot;>Избери файл с отметки...&lt;/string>"
+        errorLine2="                                                                            ~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-bg/strings-saved-sites.xml"
+            line="118"
+            column="77"/>
+    </issue>
+
+    <issue
+        id="TypographyEllipsis"
+        message="Replace &quot;...&quot; with ellipsis character (…, &amp;#8230;) ?"
+        errorLine1="    &lt;string name=&quot;importBookmarksFromGooglePreImportDialogSelectFileButton&quot;>Επιλογή αρχείου σελιδοδεικτών...&lt;/string>"
+        errorLine2="                                                                            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-el/strings-saved-sites.xml"
+            line="118"
+            column="77"/>
+    </issue>
+
+    <issue
+        id="TypographyEllipsis"
+        message="Replace &quot;...&quot; with ellipsis character (…, &amp;#8230;) ?"
+        errorLine1="    &lt;string name=&quot;importBookmarksFromGooglePreImportDialogSelectFileButton&quot;>Vali järjehoidjate fail...&lt;/string>"
+        errorLine2="                                                                            ~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-et/strings-saved-sites.xml"
+            line="118"
+            column="77"/>
+    </issue>
+
+    <issue
+        id="TypographyEllipsis"
+        message="Replace &quot;...&quot; with ellipsis character (…, &amp;#8230;) ?"
+        errorLine1="    &lt;string name=&quot;importBookmarksFromGooglePreImportDialogSelectFileButton&quot;>Seleziona il file dei segnalibri...&lt;/string>"
+        errorLine2="                                                                            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-it/strings-saved-sites.xml"
+            line="118"
+            column="77"/>
+    </issue>
+
+    <issue
+        id="TypographyEllipsis"
+        message="Replace &quot;...&quot; with ellipsis character (…, &amp;#8230;) ?"
+        errorLine1="    &lt;string name=&quot;importBookmarksFromGooglePreImportDialogSelectFileButton&quot;>Bladwijzerbestand selecteren...&lt;/string>"
+        errorLine2="                                                                            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-nl/strings-saved-sites.xml"
+            line="118"
+            column="77"/>
+    </issue>
+
+    <issue
+        id="TypographyEllipsis"
+        message="Replace &quot;...&quot; with ellipsis character (…, &amp;#8230;) ?"
+        errorLine1="    &lt;string name=&quot;importBookmarksFromGooglePreImportDialogSelectFileButton&quot;>Selectează fișierul cu marcaje...&lt;/string>"
+        errorLine2="                                                                            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-ro/strings-saved-sites.xml"
+            line="122"
+            column="77"/>
+    </issue>
+
+    <issue
         id="AlwaysShowAction"
         message="Prefer &quot;`ifRoom`&quot; instead of &quot;`always`&quot;"
         errorLine1="        app:showAsAction=&quot;always|collapseActionView&quot; />"

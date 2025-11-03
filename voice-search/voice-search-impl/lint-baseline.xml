@@ -41,7 +41,7 @@
         errorLine2="                 ~~~~~~~~~~~~~~~">
         <location
             file="src/main/java/com/duckduckgo/voice/impl/listeningmode/OnDeviceSpeechRecognizer.kt"
-            line="121"
+            line="142"
             column="18"/>
     </issue>
 

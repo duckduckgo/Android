@@ -51,6 +51,7 @@ import kotlinx.coroutines.launch
 import logcat.LogPriority.INFO
 import logcat.logcat
 import javax.inject.Inject
+import com.duckduckgo.mobile.android.R as CommonR
 
 @Module
 @ContributesTo(AppScope::class)
@@ -165,8 +166,8 @@ class AppShortcutCreator @Inject constructor(
             .addNextIntent(adsActivity)
 
         return ShortcutInfoCompat.Builder(context, SHORTCUT_ID_DESIGN_SYSTEM_DEMO)
-            .setShortLabel(context.getString(R.string.ads_demo_activity_title))
-            .setIcon(IconCompat.createWithResource(context, R.drawable.ic_dax_icon))
+            .setShortLabel(context.getString(CommonR.string.ads_demo_activity_title))
+            .setIcon(IconCompat.createWithResource(context, CommonR.drawable.ic_dax_icon))
             .setIntents(stackBuilder.intents)
             .build().toShortcutInfo()
     }

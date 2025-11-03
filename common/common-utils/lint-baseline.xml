@@ -58,6 +58,17 @@
 
     <issue
         id="QueryPermissionsNeeded"
+        message="As of Android 11, this method no longer returns information about all apps; see https://g.co/dev/packagevisibility for details"
+        errorLine1="        this.getInstalledApplications(PackageManager.GET_META_DATA)"
+        errorLine2="             ~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/duckduckgo/common/utils/extensions/PackageManagerExtension.kt"
+            line="34"
+            column="14"/>
+    </issue>
+
+    <issue
+        id="QueryPermissionsNeeded"
         message="Consider adding a `&lt;queries>` declaration to your manifest when calling this method; see https://g.co/dev/packagevisibility for details"
         errorLine1="        return playStoreIntent().resolveActivity(context.packageManager) != null"
         errorLine2="                                 ~~~~~~~~~~~~~~~">

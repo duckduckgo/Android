@@ -360,7 +360,7 @@
         errorLine2="            ^">
         <location
             file="src/main/res/layout/fragment_browser_tab.xml"
-            line="101"
+            line="108"
             column="13"
             message="Duplicate id @+id/cardContainer, defined or included multiple times in layout/fragment_browser_tab.xml: [layout/fragment_browser_tab.xml => layout/include_onboarding_in_context_bb_dialog.xml defines @+id/cardContainer, layout/fragment_browser_tab.xml => layout/include_onboarding_in_context_dax_dialog.xml defines @+id/cardContainer, layout/fragment_browser_tab.xml => layout/include_onboarding_in_context_buck_dialog.xml defines @+id/cardContainer, layout/fragment_browser_tab.xml => layout/include_new_browser_tab.xml => layout/include_onboarding_bubble_bb_dialog.xml defines @+id/cardContainer, layout/fragment_browser_tab.xml => layout/include_new_browser_tab.xml => layout/include_onboarding_bubble_dax_dialog.xml defines @+id/cardContainer, layout/fragment_browser_tab.xml => layout/include_new_browser_tab.xml => layout/include_onboarding_bubble_buck_dialog.xml defines @+id/cardContainer]"/>
         <location
@@ -402,7 +402,7 @@
         errorLine2="            ^">
         <location
             file="src/main/res/layout/fragment_browser_tab.xml"
-            line="101"
+            line="108"
             column="13"
             message="Duplicate id @+id/cardView, defined or included multiple times in layout/fragment_browser_tab.xml: [layout/fragment_browser_tab.xml => layout/include_onboarding_in_context_bb_dialog.xml defines @+id/cardView, layout/fragment_browser_tab.xml => layout/include_onboarding_in_context_dax_dialog.xml defines @+id/cardView, layout/fragment_browser_tab.xml => layout/include_new_browser_tab.xml => layout/include_onboarding_bubble_bb_dialog.xml defines @+id/cardView, layout/fragment_browser_tab.xml => layout/include_new_browser_tab.xml => layout/include_onboarding_bubble_dax_dialog.xml defines @+id/cardView]"/>
         <location
@@ -434,7 +434,7 @@
         errorLine2="            ^">
         <location
             file="src/main/res/layout/fragment_browser_tab.xml"
-            line="101"
+            line="108"
             column="13"
             message="Duplicate id @+id/daxBubbleDialogTitle, defined or included multiple times in layout/fragment_browser_tab.xml: [layout/fragment_browser_tab.xml => layout/include_onboarding_in_context_dax_dialog.xml defines @+id/daxBubbleDialogTitle, layout/fragment_browser_tab.xml => layout/include_onboarding_in_context_buck_dialog.xml defines @+id/daxBubbleDialogTitle, layout/fragment_browser_tab.xml => layout/include_new_browser_tab.xml => layout/include_onboarding_bubble_bb_dialog.xml defines @+id/daxBubbleDialogTitle, layout/fragment_browser_tab.xml => layout/include_new_browser_tab.xml => layout/include_onboarding_bubble_dax_dialog.xml defines @+id/daxBubbleDialogTitle, layout/fragment_browser_tab.xml => layout/include_new_browser_tab.xml => layout/include_onboarding_bubble_buck_dialog.xml defines @+id/daxBubbleDialogTitle]"/>
         <location
@@ -471,7 +471,7 @@
         errorLine2="            ^">
         <location
             file="src/main/res/layout/fragment_browser_tab.xml"
-            line="101"
+            line="108"
             column="13"
             message="Duplicate id @+id/daxCtaContainer, defined or included multiple times in layout/fragment_browser_tab.xml: [layout/fragment_browser_tab.xml => layout/include_onboarding_in_context_bb_dialog.xml defines @+id/daxCtaContainer, layout/fragment_browser_tab.xml => layout/include_onboarding_in_context_dax_dialog.xml defines @+id/daxCtaContainer, layout/fragment_browser_tab.xml => layout/include_new_browser_tab.xml => layout/include_onboarding_bubble_bb_dialog.xml defines @+id/daxCtaContainer, layout/fragment_browser_tab.xml => layout/include_new_browser_tab.xml => layout/include_onboarding_bubble_dax_dialog.xml defines @+id/daxCtaContainer, layout/fragment_browser_tab.xml => layout/include_new_browser_tab.xml => layout/include_onboarding_bubble_buck_dialog.xml defines @+id/daxCtaContainer]"/>
         <location
@@ -508,7 +508,7 @@
         errorLine2="            ^">
         <location
             file="src/main/res/layout/fragment_browser_tab.xml"
-            line="101"
+            line="108"
             column="13"
             message="Duplicate id @+id/daxDialogDismissButton, defined or included multiple times in layout/fragment_browser_tab.xml: [layout/fragment_browser_tab.xml => layout/include_onboarding_in_context_bb_dialog.xml defines @+id/daxDialogDismissButton, layout/fragment_browser_tab.xml => layout/include_onboarding_in_context_dax_dialog.xml defines @+id/daxDialogDismissButton, layout/fragment_browser_tab.xml => layout/include_onboarding_in_context_buck_dialog.xml defines @+id/daxDialogDismissButton, layout/fragment_browser_tab.xml => layout/include_new_browser_tab.xml => layout/include_onboarding_bubble_bb_dialog.xml defines @+id/daxDialogDismissButton, layout/fragment_browser_tab.xml => layout/include_new_browser_tab.xml => layout/include_onboarding_bubble_dax_dialog.xml defines @+id/daxDialogDismissButton, layout/fragment_browser_tab.xml => layout/include_new_browser_tab.xml => layout/include_onboarding_bubble_buck_dialog.xml defines @+id/daxDialogDismissButton]"/>
         <location
@@ -550,7 +550,7 @@
         errorLine2="            ^">
         <location
             file="src/main/res/layout/fragment_browser_tab.xml"
-            line="101"
+            line="108"
             column="13"
             message="Duplicate id @+id/daxDialogOption1, defined or included multiple times in layout/fragment_browser_tab.xml: [layout/fragment_browser_tab.xml => layout/include_onboarding_in_context_bb_dialog.xml defines @+id/daxDialogOption1, layout/fragment_browser_tab.xml => layout/include_onboarding_in_context_dax_dialog.xml defines @+id/daxDialogOption1, layout/fragment_browser_tab.xml => layout/include_onboarding_in_context_buck_dialog.xml defines @+id/daxDialogOption1, layout/fragment_browser_tab.xml => layout/include_new_browser_tab.xml => layout/include_onboarding_bubble_bb_dialog.xml defines @+id/daxDialogOption1, layout/fragment_browser_tab.xml => layout/include_new_browser_tab.xml => layout/include_onboarding_bubble_dax_dialog.xml defines @+id/daxDialogOption1, layout/fragment_browser_tab.xml => layout/include_new_browser_tab.xml => layout/include_onboarding_bubble_buck_dialog.xml defines @+id/daxDialogOption1]"/>
         <location
@@ -592,7 +592,7 @@
         errorLine2="            ^">
         <location
             file="src/main/res/layout/fragment_browser_tab.xml"
-            line="101"
+            line="108"
             column="13"
             message="Duplicate id @+id/daxDialogOption2, defined or included multiple times in layout/fragment_browser_tab.xml: [layout/fragment_browser_tab.xml => layout/include_onboarding_in_context_bb_dialog.xml defines @+id/daxDialogOption2, layout/fragment_browser_tab.xml => layout/include_onboarding_in_context_dax_dialog.xml defines @+id/daxDialogOption2, layout/fragment_browser_tab.xml => layout/include_onboarding_in_context_buck_dialog.xml defines @+id/daxDialogOption2, layout/fragment_browser_tab.xml => layout/include_new_browser_tab.xml => layout/include_onboarding_bubble_bb_dialog.xml defines @+id/daxDialogOption2, layout/fragment_browser_tab.xml => layout/include_new_browser_tab.xml => layout/include_onboarding_bubble_dax_dialog.xml defines @+id/daxDialogOption2, layout/fragment_browser_tab.xml => layout/include_new_browser_tab.xml => layout/include_onboarding_bubble_buck_dialog.xml defines @+id/daxDialogOption2]"/>
         <location
@@ -634,7 +634,7 @@
         errorLine2="            ^">
         <location
             file="src/main/res/layout/fragment_browser_tab.xml"
-            line="101"
+            line="108"
             column="13"
             message="Duplicate id @+id/daxDialogOption3, defined or included multiple times in layout/fragment_browser_tab.xml: [layout/fragment_browser_tab.xml => layout/include_onboarding_in_context_bb_dialog.xml defines @+id/daxDialogOption3, layout/fragment_browser_tab.xml => layout/include_onboarding_in_context_dax_dialog.xml defines @+id/daxDialogOption3, layout/fragment_browser_tab.xml => layout/include_onboarding_in_context_buck_dialog.xml defines @+id/daxDialogOption3, layout/fragment_browser_tab.xml => layout/include_new_browser_tab.xml => layout/include_onboarding_bubble_bb_dialog.xml defines @+id/daxDialogOption3, layout/fragment_browser_tab.xml => layout/include_new_browser_tab.xml => layout/include_onboarding_bubble_dax_dialog.xml defines @+id/daxDialogOption3, layout/fragment_browser_tab.xml => layout/include_new_browser_tab.xml => layout/include_onboarding_bubble_buck_dialog.xml defines @+id/daxDialogOption3]"/>
         <location
@@ -676,7 +676,7 @@
         errorLine2="            ^">
         <location
             file="src/main/res/layout/fragment_browser_tab.xml"
-            line="101"
+            line="108"
             column="13"
             message="Duplicate id @+id/daxDialogOption4, defined or included multiple times in layout/fragment_browser_tab.xml: [layout/fragment_browser_tab.xml => layout/include_onboarding_in_context_dax_dialog.xml defines @+id/daxDialogOption4, layout/fragment_browser_tab.xml => layout/include_new_browser_tab.xml => layout/include_onboarding_bubble_dax_dialog.xml defines @+id/daxDialogOption4]"/>
         <location
@@ -698,7 +698,7 @@
         errorLine2="            ^">
         <location
             file="src/main/res/layout/fragment_browser_tab.xml"
-            line="101"
+            line="108"
             column="13"
             message="Duplicate id @+id/dialogTextCta, defined or included multiple times in layout/fragment_browser_tab.xml: [layout/fragment_browser_tab.xml => layout/include_onboarding_in_context_bb_dialog.xml defines @+id/dialogTextCta, layout/fragment_browser_tab.xml => layout/include_onboarding_in_context_dax_dialog.xml defines @+id/dialogTextCta, layout/fragment_browser_tab.xml => layout/include_onboarding_in_context_buck_dialog.xml defines @+id/dialogTextCta, layout/fragment_browser_tab.xml => layout/include_new_browser_tab.xml => layout/include_onboarding_bubble_bb_dialog.xml defines @+id/dialogTextCta, layout/fragment_browser_tab.xml => layout/include_new_browser_tab.xml => layout/include_onboarding_bubble_dax_dialog.xml defines @+id/dialogTextCta, layout/fragment_browser_tab.xml => layout/include_new_browser_tab.xml => layout/include_onboarding_bubble_buck_dialog.xml defines @+id/dialogTextCta]"/>
         <location
@@ -740,7 +740,7 @@
         errorLine2="            ^">
         <location
             file="src/main/res/layout/fragment_browser_tab.xml"
-            line="101"
+            line="108"
             column="13"
             message="Duplicate id @+id/hiddenTextCta, defined or included multiple times in layout/fragment_browser_tab.xml: [layout/fragment_browser_tab.xml => layout/include_onboarding_in_context_bb_dialog.xml defines @+id/hiddenTextCta, layout/fragment_browser_tab.xml => layout/include_onboarding_in_context_dax_dialog.xml defines @+id/hiddenTextCta, layout/fragment_browser_tab.xml => layout/include_onboarding_in_context_buck_dialog.xml defines @+id/hiddenTextCta, layout/fragment_browser_tab.xml => layout/include_new_browser_tab.xml => layout/include_onboarding_bubble_bb_dialog.xml defines @+id/hiddenTextCta, layout/fragment_browser_tab.xml => layout/include_new_browser_tab.xml => layout/include_onboarding_bubble_dax_dialog.xml defines @+id/hiddenTextCta, layout/fragment_browser_tab.xml => layout/include_new_browser_tab.xml => layout/include_onboarding_bubble_buck_dialog.xml defines @+id/hiddenTextCta]"/>
         <location
@@ -782,7 +782,7 @@
         errorLine2="            ^">
         <location
             file="src/main/res/layout/fragment_browser_tab.xml"
-            line="101"
+            line="108"
             column="13"
             message="Duplicate id @+id/logo, defined or included multiple times in layout/fragment_browser_tab.xml: [layout/fragment_browser_tab.xml => layout/include_onboarding_in_context_bb_dialog.xml defines @+id/logo, layout/fragment_browser_tab.xml => layout/include_onboarding_in_context_dax_dialog.xml defines @+id/logo, layout/fragment_browser_tab.xml => layout/include_new_browser_tab.xml => layout/include_onboarding_bubble_bb_dialog.xml defines @+id/logo, layout/fragment_browser_tab.xml => layout/include_new_browser_tab.xml => layout/include_onboarding_bubble_dax_dialog.xml defines @+id/logo]"/>
         <location
@@ -814,7 +814,7 @@
         errorLine2="            ^">
         <location
             file="src/main/res/layout/fragment_browser_tab.xml"
-            line="101"
+            line="108"
             column="13"
             message="Duplicate id @+id/primaryCta, defined or included multiple times in layout/fragment_browser_tab.xml: [layout/fragment_browser_tab.xml => layout/include_onboarding_in_context_bb_dialog.xml defines @+id/primaryCta, layout/fragment_browser_tab.xml => layout/include_onboarding_in_context_dax_dialog.xml defines @+id/primaryCta, layout/fragment_browser_tab.xml => layout/include_onboarding_in_context_buck_dialog.xml defines @+id/primaryCta, layout/fragment_browser_tab.xml => layout/include_new_browser_tab.xml => layout/include_onboarding_bubble_bb_dialog.xml defines @+id/primaryCta, layout/fragment_browser_tab.xml => layout/include_new_browser_tab.xml => layout/include_onboarding_bubble_dax_dialog.xml defines @+id/primaryCta, layout/fragment_browser_tab.xml => layout/include_new_browser_tab.xml => layout/include_onboarding_bubble_buck_dialog.xml defines @+id/primaryCta]"/>
         <location
@@ -856,7 +856,7 @@
         errorLine2="            ^">
         <location
             file="src/main/res/layout/fragment_browser_tab.xml"
-            line="101"
+            line="108"
             column="13"
             message="Duplicate id @+id/secondaryCta, defined or included multiple times in layout/fragment_browser_tab.xml: [layout/fragment_browser_tab.xml => layout/include_onboarding_in_context_dax_dialog.xml defines @+id/secondaryCta, layout/fragment_browser_tab.xml => layout/include_new_browser_tab.xml => layout/include_onboarding_bubble_bb_dialog.xml defines @+id/secondaryCta, layout/fragment_browser_tab.xml => layout/include_new_browser_tab.xml => layout/include_onboarding_bubble_dax_dialog.xml defines @+id/secondaryCta, layout/fragment_browser_tab.xml => layout/include_new_browser_tab.xml => layout/include_onboarding_bubble_buck_dialog.xml defines @+id/secondaryCta]"/>
         <location
@@ -888,7 +888,7 @@
         errorLine2="            ^">
         <location
             file="src/main/res/layout/fragment_browser_tab.xml"
-            line="106"
+            line="113"
             column="13"
             message="Duplicate id @+id/buckOnboardingDialogView, defined or included multiple times in layout/fragment_browser_tab.xml: [layout/fragment_browser_tab.xml => layout/include_onboarding_in_context_buck_dialog.xml defines @+id/buckOnboardingDialogView, layout/fragment_browser_tab.xml => layout/include_new_browser_tab.xml => layout/include_onboarding_bubble_buck_dialog.xml defines @+id/buckOnboardingDialogView]"/>
         <location
@@ -910,7 +910,7 @@
         errorLine2="            ^">
         <location
             file="src/main/res/layout/fragment_browser_tab.xml"
-            line="106"
+            line="113"
             column="13"
             message="Duplicate id @+id/cardContainer, defined or included multiple times in layout/fragment_browser_tab.xml: [layout/fragment_browser_tab.xml => layout/include_onboarding_in_context_bb_dialog.xml defines @+id/cardContainer, layout/fragment_browser_tab.xml => layout/include_onboarding_in_context_dax_dialog.xml defines @+id/cardContainer, layout/fragment_browser_tab.xml => layout/include_onboarding_in_context_buck_dialog.xml defines @+id/cardContainer, layout/fragment_browser_tab.xml => layout/include_new_browser_tab.xml => layout/include_onboarding_bubble_bb_dialog.xml defines @+id/cardContainer, layout/fragment_browser_tab.xml => layout/include_new_browser_tab.xml => layout/include_onboarding_bubble_dax_dialog.xml defines @+id/cardContainer, layout/fragment_browser_tab.xml => layout/include_new_browser_tab.xml => layout/include_onboarding_bubble_buck_dialog.xml defines @+id/cardContainer]"/>
         <location
@@ -952,7 +952,7 @@
         errorLine2="            ^">
         <location
             file="src/main/res/layout/fragment_browser_tab.xml"
-            line="106"
+            line="113"
             column="13"
             message="Duplicate id @+id/daxBubbleDialogTitle, defined or included multiple times in layout/fragment_browser_tab.xml: [layout/fragment_browser_tab.xml => layout/include_onboarding_in_context_dax_dialog.xml defines @+id/daxBubbleDialogTitle, layout/fragment_browser_tab.xml => layout/include_onboarding_in_context_buck_dialog.xml defines @+id/daxBubbleDialogTitle, layout/fragment_browser_tab.xml => layout/include_new_browser_tab.xml => layout/include_onboarding_bubble_bb_dialog.xml defines @+id/daxBubbleDialogTitle, layout/fragment_browser_tab.xml => layout/include_new_browser_tab.xml => layout/include_onboarding_bubble_dax_dialog.xml defines @+id/daxBubbleDialogTitle, layout/fragment_browser_tab.xml => layout/include_new_browser_tab.xml => layout/include_onboarding_bubble_buck_dialog.xml defines @+id/daxBubbleDialogTitle]"/>
         <location
@@ -989,7 +989,7 @@
         errorLine2="            ^">
         <location
             file="src/main/res/layout/fragment_browser_tab.xml"
-            line="106"
+            line="113"
             column="13"
             message="Duplicate id @+id/daxDialogDismissButton, defined or included multiple times in layout/fragment_browser_tab.xml: [layout/fragment_browser_tab.xml => layout/include_onboarding_in_context_bb_dialog.xml defines @+id/daxDialogDismissButton, layout/fragment_browser_tab.xml => layout/include_onboarding_in_context_dax_dialog.xml defines @+id/daxDialogDismissButton, layout/fragment_browser_tab.xml => layout/include_onboarding_in_context_buck_dialog.xml defines @+id/daxDialogDismissButton, layout/fragment_browser_tab.xml => layout/include_new_browser_tab.xml => layout/include_onboarding_bubble_bb_dialog.xml defines @+id/daxDialogDismissButton, layout/fragment_browser_tab.xml => layout/include_new_browser_tab.xml => layout/include_onboarding_bubble_dax_dialog.xml defines @+id/daxDialogDismissButton, layout/fragment_browser_tab.xml => layout/include_new_browser_tab.xml => layout/include_onboarding_bubble_buck_dialog.xml defines @+id/daxDialogDismissButton]"/>
         <location
@@ -1031,7 +1031,7 @@
         errorLine2="            ^">
         <location
             file="src/main/res/layout/fragment_browser_tab.xml"
-            line="106"
+            line="113"
             column="13"
             message="Duplicate id @+id/daxDialogOption1, defined or included multiple times in layout/fragment_browser_tab.xml: [layout/fragment_browser_tab.xml => layout/include_onboarding_in_context_bb_dialog.xml defines @+id/daxDialogOption1, layout/fragment_browser_tab.xml => layout/include_onboarding_in_context_dax_dialog.xml defines @+id/daxDialogOption1, layout/fragment_browser_tab.xml => layout/include_onboarding_in_context_buck_dialog.xml defines @+id/daxDialogOption1, layout/fragment_browser_tab.xml => layout/include_new_browser_tab.xml => layout/include_onboarding_bubble_bb_dialog.xml defines @+id/daxDialogOption1, layout/fragment_browser_tab.xml => layout/include_new_browser_tab.xml => layout/include_onboarding_bubble_dax_dialog.xml defines @+id/daxDialogOption1, layout/fragment_browser_tab.xml => layout/include_new_browser_tab.xml => layout/include_onboarding_bubble_buck_dialog.xml defines @+id/daxDialogOption1]"/>
         <location
@@ -1073,7 +1073,7 @@
         errorLine2="            ^">
         <location
             file="src/main/res/layout/fragment_browser_tab.xml"
-            line="106"
+            line="113"
             column="13"
             message="Duplicate id @+id/daxDialogOption2, defined or included multiple times in layout/fragment_browser_tab.xml: [layout/fragment_browser_tab.xml => layout/include_onboarding_in_context_bb_dialog.xml defines @+id/daxDialogOption2, layout/fragment_browser_tab.xml => layout/include_onboarding_in_context_dax_dialog.xml defines @+id/daxDialogOption2, layout/fragment_browser_tab.xml => layout/include_onboarding_in_context_buck_dialog.xml defines @+id/daxDialogOption2, layout/fragment_browser_tab.xml => layout/include_new_browser_tab.xml => layout/include_onboarding_bubble_bb_dialog.xml defines @+id/daxDialogOption2, layout/fragment_browser_tab.xml => layout/include_new_browser_tab.xml => layout/include_onboarding_bubble_dax_dialog.xml defines @+id/daxDialogOption2, layout/fragment_browser_tab.xml => layout/include_new_browser_tab.xml => layout/include_onboarding_bubble_buck_dialog.xml defines @+id/daxDialogOption2]"/>
         <location
@@ -1115,7 +1115,7 @@
         errorLine2="            ^">
         <location
             file="src/main/res/layout/fragment_browser_tab.xml"
-            line="106"
+            line="113"
             column="13"
             message="Duplicate id @+id/daxDialogOption3, defined or included multiple times in layout/fragment_browser_tab.xml: [layout/fragment_browser_tab.xml => layout/include_onboarding_in_context_bb_dialog.xml defines @+id/daxDialogOption3, layout/fragment_browser_tab.xml => layout/include_onboarding_in_context_dax_dialog.xml defines @+id/daxDialogOption3, layout/fragment_browser_tab.xml => layout/include_onboarding_in_context_buck_dialog.xml defines @+id/daxDialogOption3, layout/fragment_browser_tab.xml => layout/include_new_browser_tab.xml => layout/include_onboarding_bubble_bb_dialog.xml defines @+id/daxDialogOption3, layout/fragment_browser_tab.xml => layout/include_new_browser_tab.xml => layout/include_onboarding_bubble_dax_dialog.xml defines @+id/daxDialogOption3, layout/fragment_browser_tab.xml => layout/include_new_browser_tab.xml => layout/include_onboarding_bubble_buck_dialog.xml defines @+id/daxDialogOption3]"/>
         <location
@@ -1157,7 +1157,7 @@
         errorLine2="            ^">
         <location
             file="src/main/res/layout/fragment_browser_tab.xml"
-            line="106"
+            line="113"
             column="13"
             message="Duplicate id @+id/dialogTextCta, defined or included multiple times in layout/fragment_browser_tab.xml: [layout/fragment_browser_tab.xml => layout/include_onboarding_in_context_bb_dialog.xml defines @+id/dialogTextCta, layout/fragment_browser_tab.xml => layout/include_onboarding_in_context_dax_dialog.xml defines @+id/dialogTextCta, layout/fragment_browser_tab.xml => layout/include_onboarding_in_context_buck_dialog.xml defines @+id/dialogTextCta, layout/fragment_browser_tab.xml => layout/include_new_browser_tab.xml => layout/include_onboarding_bubble_bb_dialog.xml defines @+id/dialogTextCta, layout/fragment_browser_tab.xml => layout/include_new_browser_tab.xml => layout/include_onboarding_bubble_dax_dialog.xml defines @+id/dialogTextCta, layout/fragment_browser_tab.xml => layout/include_new_browser_tab.xml => layout/include_onboarding_bubble_buck_dialog.xml defines @+id/dialogTextCta]"/>
         <location
@@ -1199,7 +1199,7 @@
         errorLine2="            ^">
         <location
             file="src/main/res/layout/fragment_browser_tab.xml"
-            line="106"
+            line="113"
             column="13"
             message="Duplicate id @+id/hiddenTextCta, defined or included multiple times in layout/fragment_browser_tab.xml: [layout/fragment_browser_tab.xml => layout/include_onboarding_in_context_bb_dialog.xml defines @+id/hiddenTextCta, layout/fragment_browser_tab.xml => layout/include_onboarding_in_context_dax_dialog.xml defines @+id/hiddenTextCta, layout/fragment_browser_tab.xml => layout/include_onboarding_in_context_buck_dialog.xml defines @+id/hiddenTextCta, layout/fragment_browser_tab.xml => layout/include_new_browser_tab.xml => layout/include_onboarding_bubble_bb_dialog.xml defines @+id/hiddenTextCta, layout/fragment_browser_tab.xml => layout/include_new_browser_tab.xml => layout/include_onboarding_bubble_dax_dialog.xml defines @+id/hiddenTextCta, layout/fragment_browser_tab.xml => layout/include_new_browser_tab.xml => layout/include_onboarding_bubble_buck_dialog.xml defines @+id/hiddenTextCta]"/>
         <location
@@ -1241,7 +1241,7 @@
         errorLine2="            ^">
         <location
             file="src/main/res/layout/fragment_browser_tab.xml"
-            line="106"
+            line="113"
             column="13"
             message="Duplicate id @+id/onboardingDaxDialogContainer, defined or included multiple times in layout/fragment_browser_tab.xml: [layout/fragment_browser_tab.xml => layout/include_onboarding_in_context_bb_dialog.xml defines @+id/onboardingDaxDialogContainer, layout/fragment_browser_tab.xml => layout/include_onboarding_in_context_dax_dialog.xml defines @+id/onboardingDaxDialogContainer, layout/fragment_browser_tab.xml => layout/include_onboarding_in_context_buck_dialog.xml defines @+id/onboardingDaxDialogContainer]"/>
         <location
@@ -1268,7 +1268,7 @@
         errorLine2="            ^">
         <location
             file="src/main/res/layout/fragment_browser_tab.xml"
-            line="106"
+            line="113"
             column="13"
             message="Duplicate id @+id/onboardingDialogContent, defined or included multiple times in layout/fragment_browser_tab.xml: [layout/fragment_browser_tab.xml => layout/include_onboarding_in_context_bb_dialog.xml defines @+id/onboardingDialogContent, layout/fragment_browser_tab.xml => layout/include_onboarding_in_context_dax_dialog.xml defines @+id/onboardingDialogContent, layout/fragment_browser_tab.xml => layout/include_onboarding_in_context_buck_dialog.xml defines @+id/onboardingDialogContent]"/>
         <location
@@ -1295,7 +1295,7 @@
         errorLine2="            ^">
         <location
             file="src/main/res/layout/fragment_browser_tab.xml"
-            line="106"
+            line="113"
             column="13"
             message="Duplicate id @+id/onboardingDialogSuggestionsContent, defined or included multiple times in layout/fragment_browser_tab.xml: [layout/fragment_browser_tab.xml => layout/include_onboarding_in_context_bb_dialog.xml defines @+id/onboardingDialogSuggestionsContent, layout/fragment_browser_tab.xml => layout/include_onboarding_in_context_dax_dialog.xml defines @+id/onboardingDialogSuggestionsContent, layout/fragment_browser_tab.xml => layout/include_onboarding_in_context_buck_dialog.xml defines @+id/onboardingDialogSuggestionsContent]"/>
         <location
@@ -1322,7 +1322,7 @@
         errorLine2="            ^">
         <location
             file="src/main/res/layout/fragment_browser_tab.xml"
-            line="106"
+            line="113"
             column="13"
             message="Duplicate id @+id/onboardingDialogTitle, defined or included multiple times in layout/fragment_browser_tab.xml: [layout/fragment_browser_tab.xml => layout/include_onboarding_in_context_bb_dialog.xml defines @+id/onboardingDialogTitle, layout/fragment_browser_tab.xml => layout/include_onboarding_in_context_dax_dialog.xml defines @+id/onboardingDialogTitle, layout/fragment_browser_tab.xml => layout/include_onboarding_in_context_buck_dialog.xml defines @+id/onboardingDialogTitle]"/>
         <location
@@ -1349,7 +1349,7 @@
         errorLine2="            ^">
         <location
             file="src/main/res/layout/fragment_browser_tab.xml"
-            line="106"
+            line="113"
             column="13"
             message="Duplicate id @+id/primaryCta, defined or included multiple times in layout/fragment_browser_tab.xml: [layout/fragment_browser_tab.xml => layout/include_onboarding_in_context_bb_dialog.xml defines @+id/primaryCta, layout/fragment_browser_tab.xml => layout/include_onboarding_in_context_dax_dialog.xml defines @+id/primaryCta, layout/fragment_browser_tab.xml => layout/include_onboarding_in_context_buck_dialog.xml defines @+id/primaryCta, layout/fragment_browser_tab.xml => layout/include_new_browser_tab.xml => layout/include_onboarding_bubble_bb_dialog.xml defines @+id/primaryCta, layout/fragment_browser_tab.xml => layout/include_new_browser_tab.xml => layout/include_onboarding_bubble_dax_dialog.xml defines @+id/primaryCta, layout/fragment_browser_tab.xml => layout/include_new_browser_tab.xml => layout/include_onboarding_bubble_buck_dialog.xml defines @+id/primaryCta]"/>
         <location
@@ -1391,7 +1391,7 @@
         errorLine2="            ^">
         <location
             file="src/main/res/layout/fragment_browser_tab.xml"
-            line="106"
+            line="113"
             column="13"
             message="Duplicate id @+id/suggestionsDialogTextCta, defined or included multiple times in layout/fragment_browser_tab.xml: [layout/fragment_browser_tab.xml => layout/include_onboarding_in_context_bb_dialog.xml defines @+id/suggestionsDialogTextCta, layout/fragment_browser_tab.xml => layout/include_onboarding_in_context_dax_dialog.xml defines @+id/suggestionsDialogTextCta, layout/fragment_browser_tab.xml => layout/include_onboarding_in_context_buck_dialog.xml defines @+id/suggestionsDialogTextCta]"/>
         <location
@@ -1418,7 +1418,7 @@
         errorLine2="            ^">
         <location
             file="src/main/res/layout/fragment_browser_tab.xml"
-            line="106"
+            line="113"
             column="13"
             message="Duplicate id @+id/suggestionsHiddenTextCta, defined or included multiple times in layout/fragment_browser_tab.xml: [layout/fragment_browser_tab.xml => layout/include_onboarding_in_context_bb_dialog.xml defines @+id/suggestionsHiddenTextCta, layout/fragment_browser_tab.xml => layout/include_onboarding_in_context_dax_dialog.xml defines @+id/suggestionsHiddenTextCta, layout/fragment_browser_tab.xml => layout/include_onboarding_in_context_buck_dialog.xml defines @+id/suggestionsHiddenTextCta]"/>
         <location
@@ -1445,7 +1445,7 @@
         errorLine2="            ^">
         <location
             file="src/main/res/layout/fragment_browser_tab.xml"
-            line="106"
+            line="113"
             column="13"
             message="Duplicate id @+id/wingAnimation, defined or included multiple times in layout/fragment_browser_tab.xml: [layout/fragment_browser_tab.xml => layout/include_new_browser_tab.xml defines @+id/wingAnimation, layout/fragment_browser_tab.xml => layout/include_onboarding_in_context_buck_dialog.xml defines @+id/wingAnimation]"/>
         <location
@@ -1467,7 +1467,7 @@
         errorLine2="            ^">
         <location
             file="src/main/res/layout/fragment_browser_tab.xml"
-            line="111"
+            line="118"
             column="13"
             message="Duplicate id @+id/cardContainer, defined or included multiple times in layout/fragment_browser_tab.xml: [layout/fragment_browser_tab.xml => layout/include_onboarding_in_context_bb_dialog.xml defines @+id/cardContainer, layout/fragment_browser_tab.xml => layout/include_onboarding_in_context_dax_dialog.xml defines @+id/cardContainer, layout/fragment_browser_tab.xml => layout/include_onboarding_in_context_buck_dialog.xml defines @+id/cardContainer, layout/fragment_browser_tab.xml => layout/include_new_browser_tab.xml => layout/include_onboarding_bubble_bb_dialog.xml defines @+id/cardContainer, layout/fragment_browser_tab.xml => layout/include_new_browser_tab.xml => layout/include_onboarding_bubble_dax_dialog.xml defines @+id/cardContainer, layout/fragment_browser_tab.xml => layout/include_new_browser_tab.xml => layout/include_onboarding_bubble_buck_dialog.xml defines @+id/cardContainer]"/>
         <location
@@ -1509,7 +1509,7 @@
         errorLine2="            ^">
         <location
             file="src/main/res/layout/fragment_browser_tab.xml"
-            line="111"
+            line="118"
             column="13"
             message="Duplicate id @+id/cardView, defined or included multiple times in layout/fragment_browser_tab.xml: [layout/fragment_browser_tab.xml => layout/include_onboarding_in_context_bb_dialog.xml defines @+id/cardView, layout/fragment_browser_tab.xml => layout/include_onboarding_in_context_dax_dialog.xml defines @+id/cardView, layout/fragment_browser_tab.xml => layout/include_new_browser_tab.xml => layout/include_onboarding_bubble_bb_dialog.xml defines @+id/cardView, layout/fragment_browser_tab.xml => layout/include_new_browser_tab.xml => layout/include_onboarding_bubble_dax_dialog.xml defines @+id/cardView]"/>
         <location
@@ -1541,7 +1541,7 @@
         errorLine2="            ^">
         <location
             file="src/main/res/layout/fragment_browser_tab.xml"
-            line="111"
+            line="118"
             column="13"
             message="Duplicate id @+id/daxCtaContainer, defined or included multiple times in layout/fragment_browser_tab.xml: [layout/fragment_browser_tab.xml => layout/include_onboarding_in_context_bb_dialog.xml defines @+id/daxCtaContainer, layout/fragment_browser_tab.xml => layout/include_onboarding_in_context_dax_dialog.xml defines @+id/daxCtaContainer, layout/fragment_browser_tab.xml => layout/include_new_browser_tab.xml => layout/include_onboarding_bubble_bb_dialog.xml defines @+id/daxCtaContainer, layout/fragment_browser_tab.xml => layout/include_new_browser_tab.xml => layout/include_onboarding_bubble_dax_dialog.xml defines @+id/daxCtaContainer, layout/fragment_browser_tab.xml => layout/include_new_browser_tab.xml => layout/include_onboarding_bubble_buck_dialog.xml defines @+id/daxCtaContainer]"/>
         <location
@@ -1578,7 +1578,7 @@
         errorLine2="            ^">
         <location
             file="src/main/res/layout/fragment_browser_tab.xml"
-            line="111"
+            line="118"
             column="13"
             message="Duplicate id @+id/daxDialogDismissButton, defined or included multiple times in layout/fragment_browser_tab.xml: [layout/fragment_browser_tab.xml => layout/include_onboarding_in_context_bb_dialog.xml defines @+id/daxDialogDismissButton, layout/fragment_browser_tab.xml => layout/include_onboarding_in_context_dax_dialog.xml defines @+id/daxDialogDismissButton, layout/fragment_browser_tab.xml => layout/include_onboarding_in_context_buck_dialog.xml defines @+id/daxDialogDismissButton, layout/fragment_browser_tab.xml => layout/include_new_browser_tab.xml => layout/include_onboarding_bubble_bb_dialog.xml defines @+id/daxDialogDismissButton, layout/fragment_browser_tab.xml => layout/include_new_browser_tab.xml => layout/include_onboarding_bubble_dax_dialog.xml defines @+id/daxDialogDismissButton, layout/fragment_browser_tab.xml => layout/include_new_browser_tab.xml => layout/include_onboarding_bubble_buck_dialog.xml defines @+id/daxDialogDismissButton]"/>
         <location
@@ -1620,7 +1620,7 @@
         errorLine2="            ^">
         <location
             file="src/main/res/layout/fragment_browser_tab.xml"
-            line="111"
+            line="118"
             column="13"
             message="Duplicate id @+id/daxDialogOption1, defined or included multiple times in layout/fragment_browser_tab.xml: [layout/fragment_browser_tab.xml => layout/include_onboarding_in_context_bb_dialog.xml defines @+id/daxDialogOption1, layout/fragment_browser_tab.xml => layout/include_onboarding_in_context_dax_dialog.xml defines @+id/daxDialogOption1, layout/fragment_browser_tab.xml => layout/include_onboarding_in_context_buck_dialog.xml defines @+id/daxDialogOption1, layout/fragment_browser_tab.xml => layout/include_new_browser_tab.xml => layout/include_onboarding_bubble_bb_dialog.xml defines @+id/daxDialogOption1, layout/fragment_browser_tab.xml => layout/include_new_browser_tab.xml => layout/include_onboarding_bubble_dax_dialog.xml defines @+id/daxDialogOption1, layout/fragment_browser_tab.xml => layout/include_new_browser_tab.xml => layout/include_onboarding_bubble_buck_dialog.xml defines @+id/daxDialogOption1]"/>
         <location
@@ -1662,7 +1662,7 @@
         errorLine2="            ^">
         <location
             file="src/main/res/layout/fragment_browser_tab.xml"
-            line="111"
+            line="118"
             column="13"
             message="Duplicate id @+id/daxDialogOption2, defined or included multiple times in layout/fragment_browser_tab.xml: [layout/fragment_browser_tab.xml => layout/include_onboarding_in_context_bb_dialog.xml defines @+id/daxDialogOption2, layout/fragment_browser_tab.xml => layout/include_onboarding_in_context_dax_dialog.xml defines @+id/daxDialogOption2, layout/fragment_browser_tab.xml => layout/include_onboarding_in_context_buck_dialog.xml defines @+id/daxDialogOption2, layout/fragment_browser_tab.xml => layout/include_new_browser_tab.xml => layout/include_onboarding_bubble_bb_dialog.xml defines @+id/daxDialogOption2, layout/fragment_browser_tab.xml => layout/include_new_browser_tab.xml => layout/include_onboarding_bubble_dax_dialog.xml defines @+id/daxDialogOption2, layout/fragment_browser_tab.xml => layout/include_new_browser_tab.xml => layout/include_onboarding_bubble_buck_dialog.xml defines @+id/daxDialogOption2]"/>
         <location
@@ -1704,7 +1704,7 @@
         errorLine2="            ^">
         <location
             file="src/main/res/layout/fragment_browser_tab.xml"
-            line="111"
+            line="118"
             column="13"
             message="Duplicate id @+id/daxDialogOption3, defined or included multiple times in layout/fragment_browser_tab.xml: [layout/fragment_browser_tab.xml => layout/include_onboarding_in_context_bb_dialog.xml defines @+id/daxDialogOption3, layout/fragment_browser_tab.xml => layout/include_onboarding_in_context_dax_dialog.xml defines @+id/daxDialogOption3, layout/fragment_browser_tab.xml => layout/include_onboarding_in_context_buck_dialog.xml defines @+id/daxDialogOption3, layout/fragment_browser_tab.xml => layout/include_new_browser_tab.xml => layout/include_onboarding_bubble_bb_dialog.xml defines @+id/daxDialogOption3, layout/fragment_browser_tab.xml => layout/include_new_browser_tab.xml => layout/include_onboarding_bubble_dax_dialog.xml defines @+id/daxDialogOption3, layout/fragment_browser_tab.xml => layout/include_new_browser_tab.xml => layout/include_onboarding_bubble_buck_dialog.xml defines @+id/daxDialogOption3]"/>
         <location
@@ -1746,7 +1746,7 @@
         errorLine2="            ^">
         <location
             file="src/main/res/layout/fragment_browser_tab.xml"
-            line="111"
+            line="118"
             column="13"
             message="Duplicate id @+id/dialogTextCta, defined or included multiple times in layout/fragment_browser_tab.xml: [layout/fragment_browser_tab.xml => layout/include_onboarding_in_context_bb_dialog.xml defines @+id/dialogTextCta, layout/fragment_browser_tab.xml => layout/include_onboarding_in_context_dax_dialog.xml defines @+id/dialogTextCta, layout/fragment_browser_tab.xml => layout/include_onboarding_in_context_buck_dialog.xml defines @+id/dialogTextCta, layout/fragment_browser_tab.xml => layout/include_new_browser_tab.xml => layout/include_onboarding_bubble_bb_dialog.xml defines @+id/dialogTextCta, layout/fragment_browser_tab.xml => layout/include_new_browser_tab.xml => layout/include_onboarding_bubble_dax_dialog.xml defines @+id/dialogTextCta, layout/fragment_browser_tab.xml => layout/include_new_browser_tab.xml => layout/include_onboarding_bubble_buck_dialog.xml defines @+id/dialogTextCta]"/>
         <location
@@ -1788,7 +1788,7 @@
         errorLine2="            ^">
         <location
             file="src/main/res/layout/fragment_browser_tab.xml"
-            line="111"
+            line="118"
             column="13"
             message="Duplicate id @+id/hiddenTextCta, defined or included multiple times in layout/fragment_browser_tab.xml: [layout/fragment_browser_tab.xml => layout/include_onboarding_in_context_bb_dialog.xml defines @+id/hiddenTextCta, layout/fragment_browser_tab.xml => layout/include_onboarding_in_context_dax_dialog.xml defines @+id/hiddenTextCta, layout/fragment_browser_tab.xml => layout/include_onboarding_in_context_buck_dialog.xml defines @+id/hiddenTextCta, layout/fragment_browser_tab.xml => layout/include_new_browser_tab.xml => layout/include_onboarding_bubble_bb_dialog.xml defines @+id/hiddenTextCta, layout/fragment_browser_tab.xml => layout/include_new_browser_tab.xml => layout/include_onboarding_bubble_dax_dialog.xml defines @+id/hiddenTextCta, layout/fragment_browser_tab.xml => layout/include_new_browser_tab.xml => layout/include_onboarding_bubble_buck_dialog.xml defines @+id/hiddenTextCta]"/>
         <location
@@ -1830,7 +1830,7 @@
         errorLine2="            ^">
         <location
             file="src/main/res/layout/fragment_browser_tab.xml"
-            line="111"
+            line="118"
             column="13"
             message="Duplicate id @+id/logo, defined or included multiple times in layout/fragment_browser_tab.xml: [layout/fragment_browser_tab.xml => layout/include_onboarding_in_context_bb_dialog.xml defines @+id/logo, layout/fragment_browser_tab.xml => layout/include_onboarding_in_context_dax_dialog.xml defines @+id/logo, layout/fragment_browser_tab.xml => layout/include_new_browser_tab.xml => layout/include_onboarding_bubble_bb_dialog.xml defines @+id/logo, layout/fragment_browser_tab.xml => layout/include_new_browser_tab.xml => layout/include_onboarding_bubble_dax_dialog.xml defines @+id/logo]"/>
         <location
@@ -1862,7 +1862,7 @@
         errorLine2="            ^">
         <location
             file="src/main/res/layout/fragment_browser_tab.xml"
-            line="111"
+            line="118"
             column="13"
             message="Duplicate id @+id/onboardingDaxDialogBackground, defined or included multiple times in layout/fragment_browser_tab.xml: [layout/fragment_browser_tab.xml => layout/include_onboarding_in_context_bb_dialog.xml defines @+id/onboardingDaxDialogBackground, layout/fragment_browser_tab.xml => layout/include_onboarding_in_context_dax_dialog.xml defines @+id/onboardingDaxDialogBackground]"/>
         <location
@@ -1884,7 +1884,7 @@
         errorLine2="            ^">
         <location
             file="src/main/res/layout/fragment_browser_tab.xml"
-            line="111"
+            line="118"
             column="13"
             message="Duplicate id @+id/onboardingDaxDialogContainer, defined or included multiple times in layout/fragment_browser_tab.xml: [layout/fragment_browser_tab.xml => layout/include_onboarding_in_context_bb_dialog.xml defines @+id/onboardingDaxDialogContainer, layout/fragment_browser_tab.xml => layout/include_onboarding_in_context_dax_dialog.xml defines @+id/onboardingDaxDialogContainer, layout/fragment_browser_tab.xml => layout/include_onboarding_in_context_buck_dialog.xml defines @+id/onboardingDaxDialogContainer]"/>
         <location
@@ -1911,7 +1911,7 @@
         errorLine2="            ^">
         <location
             file="src/main/res/layout/fragment_browser_tab.xml"
-            line="111"
+            line="118"
             column="13"
             message="Duplicate id @+id/onboardingDialogContent, defined or included multiple times in layout/fragment_browser_tab.xml: [layout/fragment_browser_tab.xml => layout/include_onboarding_in_context_bb_dialog.xml defines @+id/onboardingDialogContent, layout/fragment_browser_tab.xml => layout/include_onboarding_in_context_dax_dialog.xml defines @+id/onboardingDialogContent, layout/fragment_browser_tab.xml => layout/include_onboarding_in_context_buck_dialog.xml defines @+id/onboardingDialogContent]"/>
         <location
@@ -1938,7 +1938,7 @@
         errorLine2="            ^">
         <location
             file="src/main/res/layout/fragment_browser_tab.xml"
-            line="111"
+            line="118"
             column="13"
             message="Duplicate id @+id/onboardingDialogSuggestionsContent, defined or included multiple times in layout/fragment_browser_tab.xml: [layout/fragment_browser_tab.xml => layout/include_onboarding_in_context_bb_dialog.xml defines @+id/onboardingDialogSuggestionsContent, layout/fragment_browser_tab.xml => layout/include_onboarding_in_context_dax_dialog.xml defines @+id/onboardingDialogSuggestionsContent, layout/fragment_browser_tab.xml => layout/include_onboarding_in_context_buck_dialog.xml defines @+id/onboardingDialogSuggestionsContent]"/>
         <location
@@ -1965,7 +1965,7 @@
         errorLine2="            ^">
         <location
             file="src/main/res/layout/fragment_browser_tab.xml"
-            line="111"
+            line="118"
             column="13"
             message="Duplicate id @+id/onboardingDialogTitle, defined or included multiple times in layout/fragment_browser_tab.xml: [layout/fragment_browser_tab.xml => layout/include_onboarding_in_context_bb_dialog.xml defines @+id/onboardingDialogTitle, layout/fragment_browser_tab.xml => layout/include_onboarding_in_context_dax_dialog.xml defines @+id/onboardingDialogTitle, layout/fragment_browser_tab.xml => layout/include_onboarding_in_context_buck_dialog.xml defines @+id/onboardingDialogTitle]"/>
         <location
@@ -1992,7 +1992,7 @@
         errorLine2="            ^">
         <location
             file="src/main/res/layout/fragment_browser_tab.xml"
-            line="111"
+            line="118"
             column="13"
             message="Duplicate id @+id/primaryCta, defined or included multiple times in layout/fragment_browser_tab.xml: [layout/fragment_browser_tab.xml => layout/include_onboarding_in_context_bb_dialog.xml defines @+id/primaryCta, layout/fragment_browser_tab.xml => layout/include_onboarding_in_context_dax_dialog.xml defines @+id/primaryCta, layout/fragment_browser_tab.xml => layout/include_onboarding_in_context_buck_dialog.xml defines @+id/primaryCta, layout/fragment_browser_tab.xml => layout/include_new_browser_tab.xml => layout/include_onboarding_bubble_bb_dialog.xml defines @+id/primaryCta, layout/fragment_browser_tab.xml => layout/include_new_browser_tab.xml => layout/include_onboarding_bubble_dax_dialog.xml defines @+id/primaryCta, layout/fragment_browser_tab.xml => layout/include_new_browser_tab.xml => layout/include_onboarding_bubble_buck_dialog.xml defines @+id/primaryCta]"/>
         <location
@@ -2034,7 +2034,7 @@
         errorLine2="            ^">
         <location
             file="src/main/res/layout/fragment_browser_tab.xml"
-            line="111"
+            line="118"
             column="13"
             message="Duplicate id @+id/suggestionsDialogTextCta, defined or included multiple times in layout/fragment_browser_tab.xml: [layout/fragment_browser_tab.xml => layout/include_onboarding_in_context_bb_dialog.xml defines @+id/suggestionsDialogTextCta, layout/fragment_browser_tab.xml => layout/include_onboarding_in_context_dax_dialog.xml defines @+id/suggestionsDialogTextCta, layout/fragment_browser_tab.xml => layout/include_onboarding_in_context_buck_dialog.xml defines @+id/suggestionsDialogTextCta]"/>
         <location
@@ -2061,7 +2061,7 @@
         errorLine2="            ^">
         <location
             file="src/main/res/layout/fragment_browser_tab.xml"
-            line="111"
+            line="118"
             column="13"
             message="Duplicate id @+id/suggestionsHiddenTextCta, defined or included multiple times in layout/fragment_browser_tab.xml: [layout/fragment_browser_tab.xml => layout/include_onboarding_in_context_bb_dialog.xml defines @+id/suggestionsHiddenTextCta, layout/fragment_browser_tab.xml => layout/include_onboarding_in_context_dax_dialog.xml defines @+id/suggestionsHiddenTextCta, layout/fragment_browser_tab.xml => layout/include_onboarding_in_context_buck_dialog.xml defines @+id/suggestionsHiddenTextCta]"/>
         <location
@@ -3114,12 +3114,12 @@
     <issue
         id="InconsistentLayout"
         message="The id &quot;browserMenuImageView&quot; in layout &quot;view_browser_navigation_bar&quot; is missing from the following layout configurations: layout-w600dp (present in layout)"
-        errorLine1="                android:id=&quot;@+id/browserMenuImageView&quot;"
-        errorLine2="                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        errorLine1="            android:id=&quot;@+id/browserMenuImageView&quot;"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/layout/view_browser_navigation_bar.xml"
-            line="143"
-            column="17"
+            line="137"
+            column="13"
             message="Occurrence in layout"/>
     </issue>
 
@@ -3130,7 +3130,7 @@
         errorLine2="                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/java/com/duckduckgo/app/browser/BrowserTabFragment.kt"
-            line="3365"
+            line="3376"
             column="17"/>
     </issue>
 
@@ -3262,7 +3262,7 @@
         errorLine2="                                                               ~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/java/com/duckduckgo/app/browser/BrowserTabFragment.kt"
-            line="4169"
+            line="4178"
             column="64"/>
     </issue>
 
@@ -3350,7 +3350,7 @@
         errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/java/com/duckduckgo/app/fire/DataClearerForegroundAppRestartPixel.kt"
-            line="122"
+            line="130"
             column="9"/>
     </issue>
 
@@ -3361,7 +3361,7 @@
         errorLine2="                          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/androidTest/java/com/duckduckgo/app/fire/DataClearerForegroundAppRestartPixelTest.kt"
-            line="41"
+            line="46"
             column="27"/>
     </issue>
 
@@ -3746,7 +3746,7 @@
         errorLine2="                                                         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/java/com/duckduckgo/app/settings/db/SettingsDataStore.kt"
-            line="263"
+            line="272"
             column="58"/>
     </issue>
 
@@ -4142,7 +4142,7 @@
         errorLine2="                                     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/java/com/duckduckgo/app/onboarding/ui/page/WelcomePage.kt"
-            line="186"
+            line="190"
             column="38"/>
     </issue>
 
@@ -7196,17 +7196,6 @@
     <issue
         id="NotifyDataSetChanged"
         message="It will always be more efficient to use more specific change events if you can. Rely on `notifyDataSetChanged` as a last resort."
-        errorLine1="        notifyDataSetChanged()"
-        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/java/com/duckduckgo/app/systemsearch/DeviceAppSuggestionsAdapter.kt"
-            line="68"
-            column="9"/>
-    </issue>
-
-    <issue
-        id="NotifyDataSetChanged"
-        message="It will always be more efficient to use more specific change events if you can. Rely on `notifyDataSetChanged` as a last resort."
         errorLine1="                notifyDataSetChanged()"
         errorLine2="                ~~~~~~~~~~~~~~~~~~~~~~">
         <location
@@ -8559,17 +8548,6 @@
 
     <issue
         id="Overdraw"
-        message="Possible overdraw: Root element paints background `?attr/selectableItemBackground` with a theme that also paints a background (inferred theme is `@style/Theme.DuckDuckGo.Light`)"
-        errorLine1="    android:background=&quot;?attr/selectableItemBackground&quot;"
-        errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/layout/item_device_app_suggestion.xml"
-            line="22"
-            column="5"/>
-    </issue>
-
-    <issue
-        id="Overdraw"
         message="Possible overdraw: Root element paints background `@drawable/popup_menu_bg` with a theme that also paints a background (inferred theme is `@style/Theme.DuckDuckGo.Light`)"
         errorLine1="    android:background=&quot;@drawable/popup_menu_bg&quot;>"
         errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
@@ -8680,6 +8658,28 @@
 
     <issue
         id="Overdraw"
+        message="Possible overdraw: Root element paints background `?attr/preferredNavigationBarColor` with a theme that also paints a background (inferred theme is `@style/Theme.DuckDuckGo.Light`)"
+        errorLine1="    android:background=&quot;?attr/preferredNavigationBarColor&quot;"
+        errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout-w600dp/view_browser_navigation_bar.xml"
+            line="22"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="Overdraw"
+        message="Possible overdraw: Root element paints background `?attr/preferredNavigationBarColor` with a theme that also paints a background (inferred theme is `@style/Theme.DuckDuckGo.Light`)"
+        errorLine1="    android:background=&quot;?attr/preferredNavigationBarColor&quot;"
+        errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/view_browser_navigation_bar.xml"
+            line="22"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="Overdraw"
         message="Possible overdraw: Root element paints background `?attr/daxColorBrowserOverlay` with a theme that also paints a background (inferred theme is `@style/Theme.DuckDuckGo.Light`)"
         errorLine1="    android:background=&quot;?attr/daxColorBrowserOverlay&quot; />"
         errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
@@ -8741,6 +8741,17 @@
         <location
             file="src/main/res/menu/allowlist_individual_overflow_menu.xml"
             line="19"
+            column="1"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.drawable.background_navigation_bar_shadow` appears to be unused"
+        errorLine1="&lt;shape xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
+        errorLine2="^">
+        <location
+            file="src/main/res/drawable/background_navigation_bar_shadow.xml"
+            line="16"
             column="1"/>
     </issue>
 
@@ -10405,6 +10416,17 @@
 
     <issue
         id="TooDeepLayout"
+        message="`view_omnibar.xml` has more than 10 levels, bad for performance"
+        errorLine1="                                    &lt;include layout=&quot;@layout/cookie_scene_1&quot; />"
+        errorLine2="                                    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/view_omnibar.xml"
+            line="197"
+            column="37"/>
+    </issue>
+
+    <issue
+        id="TooDeepLayout"
         message="`view_single_omnibar.xml` has more than 10 levels, bad for performance"
         errorLine1="                                    &lt;include layout=&quot;@layout/cookie_scene_1&quot; />"
         errorLine2="                                    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
@@ -11003,7 +11025,7 @@
         errorLine2="            ^">
         <location
             file="src/main/java/com/duckduckgo/app/browser/BrowserTabFragment.kt"
-            line="3175"
+            line="3209"
             column="13"/>
     </issue>
 
@@ -11014,7 +11036,7 @@
         errorLine2="                                  ^">
         <location
             file="src/main/java/com/duckduckgo/app/browser/BrowserTabFragment.kt"
-            line="3175"
+            line="3209"
             column="35"/>
     </issue>
 
@@ -12069,6 +12091,17 @@
         errorLine1="                                android:paddingStart=&quot;@dimen/keyline_4&quot;"
         errorLine2="                                ~~~~~~~~~~~~~~~~~~~~">
         <location
+            file="src/main/res/layout/view_omnibar.xml"
+            line="100"
+            column="33"/>
+    </issue>
+
+    <issue
+        id="RtlSymmetry"
+        message="When you define `paddingStart` you should probably also define `paddingEnd` for right-to-left symmetry"
+        errorLine1="                                android:paddingStart=&quot;@dimen/keyline_4&quot;"
+        errorLine2="                                ~~~~~~~~~~~~~~~~~~~~">
+        <location
             file="src/main/res/layout/view_single_omnibar.xml"
             line="100"
             column="33"/>
@@ -12154,7 +12187,7 @@
         errorLine2="                    ~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/layout/fragment_browser_tab.xml"
-            line="138"
+            line="145"
             column="21"/>
     </issue>
 

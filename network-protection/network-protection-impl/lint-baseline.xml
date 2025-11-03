@@ -96,7 +96,7 @@
         errorLine2="        ^">
         <location
             file="src/main/java/com/duckduckgo/networkprotection/impl/exclusion/systemapps/SystemAppsExclusionRepository.kt"
-            line="81"
+            line="84"
             column="9"/>
     </issue>
 
@@ -107,7 +107,7 @@
         errorLine2="        ^">
         <location
             file="src/main/java/com/duckduckgo/networkprotection/impl/exclusion/systemapps/SystemAppsExclusionRepository.kt"
-            line="90"
+            line="93"
             column="9"/>
     </issue>
 
@@ -153,50 +153,6 @@
             file="src/test/java/com/duckduckgo/networkprotection/impl/WgVpnNetworkStackTest.kt"
             line="140"
             column="9"/>
-    </issue>
-
-    <issue
-        id="QueryPermissionsNeeded"
-        message="As of Android 11, this method no longer returns information about all apps; see https://g.co/dev/packagevisibility for details"
-        errorLine1="            val installedApps = packageManager.getInstalledApplications(PackageManager.GET_META_DATA).map { it.packageName }"
-        errorLine2="                                               ~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/java/com/duckduckgo/networkprotection/impl/autoexclude/AutoExcludeAppsRepository.kt"
-            line="136"
-            column="48"/>
-    </issue>
-
-    <issue
-        id="QueryPermissionsNeeded"
-        message="As of Android 11, this method no longer returns information about all apps; see https://g.co/dev/packagevisibility for details"
-        errorLine1="        installedApps = packageManager.getInstalledApplications(PackageManager.GET_META_DATA)"
-        errorLine2="                                       ~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/java/com/duckduckgo/networkprotection/impl/exclusion/ui/NetpAppExclusionListViewModel.kt"
-            line="219"
-            column="40"/>
-    </issue>
-
-    <issue
-        id="QueryPermissionsNeeded"
-        message="As of Android 11, this method no longer returns information about all apps; see https://g.co/dev/packagevisibility for details"
-        errorLine1="            packageManager.getInstalledApplications(PackageManager.GET_META_DATA).asSequence()"
-        errorLine2="                           ~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/java/com/duckduckgo/networkprotection/impl/exclusion/NetpExclusionListRepository.kt"
-            line="55"
-            column="28"/>
-    </issue>
-
-    <issue
-        id="QueryPermissionsNeeded"
-        message="As of Android 11, this method no longer returns information about all apps; see https://g.co/dev/packagevisibility for details"
-        errorLine1="        return packageManager.getInstalledApplications(PackageManager.GET_META_DATA)"
-        errorLine2="                              ~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/java/com/duckduckgo/networkprotection/impl/exclusion/systemapps/SystemAppsExclusionRepository.kt"
-            line="203"
-            column="31"/>
     </issue>
 
     <issue
@@ -1978,6 +1934,17 @@
         <location
             file="src/main/res/values-hr/strings-netp.xml"
             line="254"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="StaticFieldLeak"
+        message="This field leaks a context object"
+        errorLine1="    private val context: Context,"
+        errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/duckduckgo/networkprotection/impl/exclusion/ui/NetpAppExclusionListViewModel.kt"
+            line="92"
             column="5"/>
     </issue>
 

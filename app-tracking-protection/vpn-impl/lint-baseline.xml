@@ -27,7 +27,7 @@
         id="BadPeriodicWorkRequestEnqueue"
         message="Use `enqueueUniquePeriodicWork()` instead of `enqueue()`">
         <location
-            file="$GRADLE_USER_HOME/caches/8.10.2/transforms/c4bcc726a76f1dad06c79219aea4c14c/transformed/work-runtime-2.9.1/jars/classes.jar!/androidx/work/WorkManager.class"/>
+            file="$GRADLE_USER_HOME/caches/8.10.2/transforms/2a4e339704b1b0d41939a899d56b03a7/transformed/work-runtime-2.9.1/jars/classes.jar!/androidx/work/WorkManager.class"/>
     </issue>
 
     <issue
@@ -160,28 +160,6 @@
             file="src/main/java/com/duckduckgo/mobile/android/vpn/service/VpnReminderReceiverManager.kt"
             line="49"
             column="58"/>
-    </issue>
-
-    <issue
-        id="QueryPermissionsNeeded"
-        message="As of Android 11, this method no longer returns information about all apps; see https://g.co/dev/packagevisibility for details"
-        errorLine1="        installedApps = packageManager.getInstalledApplications(PackageManager.GET_META_DATA)"
-        errorLine2="                                       ~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/java/com/duckduckgo/mobile/android/vpn/apps/TrackingProtectionAppsRepository.kt"
-            line="116"
-            column="40"/>
-    </issue>
-
-    <issue
-        id="QueryPermissionsNeeded"
-        message="As of Android 11, this method no longer returns information about all apps; see https://g.co/dev/packagevisibility for details"
-        errorLine1="        return@withContext packageManager.getInstalledApplications(PackageManager.GET_META_DATA)"
-        errorLine2="                                          ~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/java/com/duckduckgo/mobile/android/vpn/apps/TrackingProtectionAppsRepository.kt"
-            line="124"
-            column="43"/>
     </issue>
 
     <issue

@@ -2328,6 +2328,17 @@
     </issue>
 
     <issue
+        id="Typos"
+        message="&quot;internett&quot; is usually capitalized as &quot;Internett&quot;"
+        errorLine1="    &lt;string name=&quot;importBookmarksErrorGenericMessageSecondary&quot;>Sørg for at du er koblet til internett og prøv igjen.&lt;/string>"
+        errorLine2="                                                                                            ^">
+        <location
+            file="src/main/res/values-nb/strings-autofill-impl.xml"
+            line="313"
+            column="93"/>
+    </issue>
+
+    <issue
         id="Untranslatable"
         message="The resource string &quot;autofillManagementSurveyPromptTitle&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;bg&quot; (Bulgarian) here"
         errorLine1="    &lt;string name=&quot;autofillManagementSurveyPromptTitle&quot; translatable=&quot;false&quot;>Help us improve!&lt;/string>"
@@ -4448,6 +4459,83 @@
             file="src/main/res/values-tr/strings-autofill-impl.xml"
             line="98"
             column="204"/>
+    </issue>
+
+    <issue
+        id="TypographyEllipsis"
+        message="Replace &quot;...&quot; with ellipsis character (…, &amp;#8230;) ?"
+        errorLine1="    &lt;string name=&quot;importBookmarksFromGooglePreImportDialogSelectFileButton&quot;>Избери файл с отметки...&lt;/string>"
+        errorLine2="                                                                            ~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-bg/strings-autofill-impl.xml"
+            line="298"
+            column="77"/>
+    </issue>
+
+    <issue
+        id="TypographyEllipsis"
+        message="Replace &quot;...&quot; with ellipsis character (…, &amp;#8230;) ?"
+        errorLine1="    &lt;string name=&quot;importBookmarksFromGooglePreImportDialogSelectFileButton&quot;>Επιλογή αρχείου σελιδοδεικτών...&lt;/string>"
+        errorLine2="                                                                            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-el/strings-autofill-impl.xml"
+            line="298"
+            column="77"/>
+    </issue>
+
+    <issue
+        id="TypographyEllipsis"
+        message="Replace &quot;...&quot; with ellipsis character (…, &amp;#8230;) ?"
+        errorLine1="    &lt;string name=&quot;importBookmarksFromGooglePreImportDialogSelectFileButton&quot;>Vali järjehoidjate fail...&lt;/string>"
+        errorLine2="                                                                            ~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-et/strings-autofill-impl.xml"
+            line="298"
+            column="77"/>
+    </issue>
+
+    <issue
+        id="TypographyEllipsis"
+        message="Replace &quot;...&quot; with ellipsis character (…, &amp;#8230;) ?"
+        errorLine1="    &lt;string name=&quot;importBookmarksFromGooglePreImportDialogSelectFileButton&quot;>Seleziona il file dei segnalibri...&lt;/string>"
+        errorLine2="                                                                            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-it/strings-autofill-impl.xml"
+            line="298"
+            column="77"/>
+    </issue>
+
+    <issue
+        id="TypographyEllipsis"
+        message="Replace &quot;...&quot; with ellipsis character (…, &amp;#8230;) ?"
+        errorLine1="    &lt;string name=&quot;importBookmarksFromGooglePreImportDialogSelectFileButton&quot;>Bladwijzerbestand selecteren...&lt;/string>"
+        errorLine2="                                                                            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-nl/strings-autofill-impl.xml"
+            line="298"
+            column="77"/>
+    </issue>
+
+    <issue
+        id="TypographyEllipsis"
+        message="Replace &quot;...&quot; with ellipsis character (…, &amp;#8230;) ?"
+        errorLine1="    &lt;string name=&quot;importBookmarksProgressTitle&quot;>Importazione da Google...&lt;/string>"
+        errorLine2="                                                ~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-it/strings-autofill-impl.xml"
+            line="300"
+            column="49"/>
+    </issue>
+
+    <issue
+        id="TypographyEllipsis"
+        message="Replace &quot;...&quot; with ellipsis character (…, &amp;#8230;) ?"
+        errorLine1="    &lt;string name=&quot;importBookmarksFromGooglePreImportDialogSelectFileButton&quot;>Selectează fișierul cu marcaje...&lt;/string>"
+        errorLine2="                                                                            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-ro/strings-autofill-impl.xml"
+            line="304"
+            column="77"/>
     </issue>
 
     <issue
