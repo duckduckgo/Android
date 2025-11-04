@@ -588,7 +588,6 @@ class OmnibarLayout @JvmOverloads constructor(
         }
 
         omnibarCardShadow.isGone = viewState.viewMode is ViewMode.CustomTab && !isFindInPageVisible
-        iconsContainer.isVisible = viewState.showFireIcon || viewState.showTabsMenu || viewState.showBrowserMenu
 
         renderButtons(viewState)
 
