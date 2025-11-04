@@ -30,6 +30,14 @@ android {
         baseline = file("lint-baseline.xml")
     }
     namespace 'com.duckduckgo.common.ui.internal'
+
+    buildFeatures {
+        compose true
+    }
+
+    composeOptions {
+        kotlinCompilerExtensionVersion = "_"
+    }
 }
 
 dependencies {
