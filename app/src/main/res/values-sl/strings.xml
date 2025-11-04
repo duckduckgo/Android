@@ -876,8 +876,10 @@
 
     <!-- Appearance settings -->
     <string name="settingsAddressBarPositionTitle">Naslovna vrstica</string>
+    <string name="settingsAddressBarPositionHeaderTitle">Položaj naslovne vrstice</string>
     <string name="settingsAddressBarPositionTop">Vrh</string>
     <string name="settingsAddressBarPositionBottom">Spodaj</string>
+    <string name="settingsAddressBarPositionSplit">Razdeli</string>
 
     <!-- Show on App Launch Option -->
     <string name="showOnAppLaunchOptionTitle">Pokaži ob zagonu aplikacije</string>

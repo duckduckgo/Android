@@ -876,8 +876,10 @@
 
     <!-- Appearance settings -->
     <string name="settingsAddressBarPositionTitle">Адресная строка</string>
+    <string name="settingsAddressBarPositionHeaderTitle">Положение адресной строки</string>
     <string name="settingsAddressBarPositionTop">Вверху</string>
     <string name="settingsAddressBarPositionBottom">Внизу</string>
+    <string name="settingsAddressBarPositionSplit">Разделить</string>
 
     <!-- Show on App Launch Option -->
     <string name="showOnAppLaunchOptionTitle">Показывать при запуске приложения</string>

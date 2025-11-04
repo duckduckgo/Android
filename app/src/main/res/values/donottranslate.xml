@@ -62,8 +62,4 @@
 
     <!-- DuckChat -->
     <string name="duckChatMenuItem">@string/duck_chat_title</string>
-
-    <!-- Settings -->
-    <string name="settingsAddressBarPositionHeaderTitle">Address Bar and Toolbar Position</string>
-    <string name="settingsAddressBarPositionSplit">Split</string>
 </resources>

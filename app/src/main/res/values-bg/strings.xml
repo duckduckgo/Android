@@ -844,8 +844,10 @@
 
     <!-- Appearance settings -->
     <string name="settingsAddressBarPositionTitle">Адресна лента</string>
+    <string name="settingsAddressBarPositionHeaderTitle">Позиция на адресната лента</string>
     <string name="settingsAddressBarPositionTop">Най-горе</string>
     <string name="settingsAddressBarPositionBottom">Отдолу</string>
+    <string name="settingsAddressBarPositionSplit">Раздели</string>
 
     <!-- Show on App Launch Option -->
     <string name="showOnAppLaunchOptionTitle">Показване при стартиране на приложението</string>

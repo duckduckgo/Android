@@ -844,8 +844,10 @@
 
     <!-- Appearance settings -->
     <string name="settingsAddressBarPositionTitle">Adresszeile</string>
+    <string name="settingsAddressBarPositionHeaderTitle">Position der Adressleiste</string>
     <string name="settingsAddressBarPositionTop">Nach oben</string>
     <string name="settingsAddressBarPositionBottom">Unten</string>
+    <string name="settingsAddressBarPositionSplit">Teilen</string>
 
     <!-- Show on App Launch Option -->
     <string name="showOnAppLaunchOptionTitle">Beim App-Start anzeigen</string>

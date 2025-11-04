@@ -844,8 +844,10 @@
 
     <!-- Appearance settings -->
     <string name="settingsAddressBarPositionTitle">Címsor</string>
+    <string name="settingsAddressBarPositionHeaderTitle">Címsor elhelyezkedése</string>
     <string name="settingsAddressBarPositionTop">Fent</string>
     <string name="settingsAddressBarPositionBottom">Lent</string>
+    <string name="settingsAddressBarPositionSplit">Felosztás</string>
 
     <!-- Show on App Launch Option -->
     <string name="showOnAppLaunchOptionTitle">Megjelenítés az alkalmazás indításakor</string>
