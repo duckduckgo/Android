@@ -28,30 +28,30 @@ import retrofit2.http.Path
 @ContributesNonCachingServiceApi(AppScope::class)
 interface SubscriptionsService {
     @AuthRequired
-    @GET("https://subscriptions.duckduckgo.com/api/subscription")
+    @GET("https://subscriptions-dev.duckduckgo.com/api/subscription")
     suspend fun subscription(): SubscriptionResponse
 
     @AuthRequired
-    @GET("https://subscriptions.duckduckgo.com/api/checkout/portal")
+    @GET("https://subscriptions-dev.duckduckgo.com/api/checkout/portal")
     suspend fun portal(): PortalResponse
 
     @AuthRequired
-    @GET("https://subscriptions.duckduckgo.com/api/v1/offer-status")
+    @GET("https://subscriptions-dev.duckduckgo.com/api/v1/offer-status")
     suspend fun offerStatus(): OfferStatusResponse
 
     @AuthRequired
-    @POST("https://subscriptions.duckduckgo.com/api/purchase/confirm/google")
+    @POST("https://subscriptions-dev.duckduckgo.com/api/purchase/confirm/google")
     suspend fun confirm(
         @Body confirmationBody: ConfirmationBody,
     ): ConfirmationResponse
 
     @AuthRequired
-    @POST("https://subscriptions.duckduckgo.com/api/feedback")
+    @POST("https://subscriptions-dev.duckduckgo.com/api/feedback")
     suspend fun feedback(
         @Body feedbackBody: FeedbackBody,
     ): FeedbackResponse
 
-    @GET("https://subscriptions.duckduckgo.com/api/products/{sku}/features")
+    @GET("https://subscriptions-dev.duckduckgo.com/api/products/{sku}/features")
     suspend fun features(@Path("sku") sku: String): FeaturesResponse
 }
 

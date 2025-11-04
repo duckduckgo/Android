@@ -31,11 +31,11 @@ interface SubscriptionsUrlProvider {
 class RealSubscriptionsUrlProvider @Inject constructor(
     subscriptionsBaseUrl: SubscriptionsBaseUrl,
 ) : SubscriptionsUrlProvider {
-    override val buyUrl: String = subscriptionsBaseUrl.subscriptionsBaseUrl
+    override val buyUrl: String = "${subscriptionsBaseUrl.subscriptionsBaseUrl}?environment=staging"
 
-    override val welcomeUrl: String = "${subscriptionsBaseUrl.subscriptionsBaseUrl}/welcome"
+    override val welcomeUrl: String = "${subscriptionsBaseUrl.subscriptionsBaseUrl}/welcome?environment=staging"
 
-    override val activateUrl: String = "${subscriptionsBaseUrl.subscriptionsBaseUrl}/activation-flow"
+    override val activateUrl: String = "${subscriptionsBaseUrl.subscriptionsBaseUrl}/activation-flow?environment=staging"
 
-    override val manageUrl: String = "${subscriptionsBaseUrl.subscriptionsBaseUrl}/manage"
+    override val manageUrl: String = "${subscriptionsBaseUrl.subscriptionsBaseUrl}/manage?environment=staging"
 }

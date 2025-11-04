@@ -90,7 +90,7 @@ interface WgVpnControllerService {
     suspend fun getEligibleLocations(): List<EligibleLocation>
 }
 
-const val NETP_ENVIRONMENT_URL = "https://controller.netp.duckduckgo.com"
+const val NETP_ENVIRONMENT_URL = "https://staging.netp.duckduckgo.com"
 
 data class ServerStatus(
     val shouldMigrate: Boolean,

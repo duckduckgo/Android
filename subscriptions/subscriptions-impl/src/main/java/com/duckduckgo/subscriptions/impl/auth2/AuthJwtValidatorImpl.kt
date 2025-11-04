@@ -90,7 +90,7 @@ class AuthJwtValidatorImpl @Inject constructor(
                 jwks.first { it.id == keyId }.toKey()
             }
             .clock { Date(timeProvider.currentTimeMillis()) }
-            .requireIssuer("https://quack.duckduckgo.com")
+            .requireIssuer("https://quackdev.duckduckgo.com")
             .requireAudience(requiredAudience)
             .require("scope", requiredScope)
             .build()

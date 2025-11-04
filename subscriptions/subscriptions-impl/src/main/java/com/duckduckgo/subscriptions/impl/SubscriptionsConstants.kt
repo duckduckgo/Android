@@ -23,16 +23,16 @@ object SubscriptionsConstants {
     val LIST_OF_PRODUCTS = listOf(BASIC_SUBSCRIPTION)
 
     // List of plans
-    const val YEARLY_PLAN_US = "ddg-privacy-pro-yearly-renews-us"
-    const val MONTHLY_PLAN_US = "ddg-privacy-pro-monthly-renews-us"
-    const val YEARLY_PLAN_ROW = "ddg-privacy-pro-yearly-renews-row"
-    const val MONTHLY_PLAN_ROW = "ddg-privacy-pro-monthly-renews-row"
+    const val YEARLY_PLAN_US = "ddg-privacy-pro-sandbox-yearly-renews-us"
+    const val MONTHLY_PLAN_US = "ddg-privacy-pro-sandbox-monthly-renews-us"
+    const val YEARLY_PLAN_ROW = "ddg-privacy-pro-sandbox-yearly-renews-row"
+    const val MONTHLY_PLAN_ROW = "ddg-privacy-pro-sandbox-monthly-renews-row"
 
     // List of offers
-    const val MONTHLY_FREE_TRIAL_OFFER_US = "ddg-privacy-pro-freetrial-monthly-renews-us"
-    const val YEARLY_FREE_TRIAL_OFFER_US = "ddg-privacy-pro-freetrial-yearly-renews-us"
-    const val MONTHLY_FREE_TRIAL_OFFER_ROW = "ddg-privacy-pro-freetrial-monthly-renews-row"
-    const val YEARLY_FREE_TRIAL_OFFER_ROW = "ddg-privacy-pro-freetrial-yearly-renews-row"
+    const val MONTHLY_FREE_TRIAL_OFFER_US = "ddg-privacy-pro-sandbox-freetrial-monthly-renews-us"
+    const val YEARLY_FREE_TRIAL_OFFER_US = "ddg-privacy-pro-sandbox-freetrial-yearly-renews-us"
+    const val MONTHLY_FREE_TRIAL_OFFER_ROW = "ddg-privacy-pro-sandbox-freetrial-monthly-renews-row"
+    const val YEARLY_FREE_TRIAL_OFFER_ROW = "ddg-privacy-pro-sandbox-freetrial-yearly-renews-row"
     val LIST_OF_FREE_TRIAL_OFFERS =
         listOf(MONTHLY_FREE_TRIAL_OFFER_US, YEARLY_FREE_TRIAL_OFFER_US, MONTHLY_FREE_TRIAL_OFFER_ROW, YEARLY_FREE_TRIAL_OFFER_ROW)
 

@@ -20,6 +20,6 @@ import retrofit2.http.GET
 import retrofit2.http.Path
 
 interface SubscriptionsCachedService {
-    @GET("https://subscriptions.duckduckgo.com/api/products/{sku}/features")
+    @GET("https://subscriptions-dev.duckduckgo.com/api/products/{sku}/features")
     suspend fun features(@Path("sku") sku: String): FeaturesResponse
 }

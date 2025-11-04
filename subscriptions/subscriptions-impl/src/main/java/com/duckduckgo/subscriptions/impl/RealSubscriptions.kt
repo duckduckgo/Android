@@ -163,7 +163,7 @@ class RealSubscriptions @Inject constructor(
     private fun buildSubscriptionUrl(uri: Uri?): String {
         val queryParams = uri?.query
         return if (!queryParams.isNullOrBlank()) {
-            "${subscriptionsUrlProvider.buyUrl}?$queryParams"
+            "${subscriptionsUrlProvider.buyUrl}&$queryParams"
         } else {
             subscriptionsUrlProvider.buyUrl
         }
