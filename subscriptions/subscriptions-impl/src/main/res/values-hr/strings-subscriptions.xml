@@ -84,6 +84,11 @@
     <string name="subscriptionSettingSectionHelpAndSupport">Pomoć i podrška</string>
     <string name="subscriptionSettingSendFeedback">Pošalji povratnu informaciju</string>
     <string name="subscriptionSettingActivating">Aktiviranje u tijeku...</string>
+    <string name="subscriptionSettingSwitchUpgrade">Prebaci se na godišnju pretplatu i uštedi 16 %</string>
+    <!-- smartling.character_limit = 10 -->
+    <string name="subscriptionSettingSwitchUpgradePill">Najbolja ponuda</string>
+    <string name="subscriptionSettingSwitchDowngrade">Promijeni plan</string>
+    <string name="subscriptionSettingManagePlan">Upravljaj plaćanjem</string>
 
     <!--Purchase Subscriptions-->
     <string name="purchaseCompletedTitle">Sve je spremno.</string>
@@ -191,5 +196,15 @@
     <string name="subscriptionSettingSubscribeSecure">Osiguraj svoj Wi-Fi i privatno čavrljaj s naprednim AI modelima</string>
 
     <string name="feedbackGeneralSubscription">Pretplata</string>
+
+    <!-- Switch plan-->
+    <string name="switchBottomSheetTitleUpgrade">Uštedi 16 % s\ngodišnjim planom!</string>
+    <string name="switchBottomSheetDescriptionUpgrade" instruction="%1$s is the yearly plan monthly equivalent price (e.g. $8.33), %2$s is the current monthly plan price (e.g. $9.99)">Godišnji plan košta samo %1$s/mjesečno, u usporedbi s tvojim sadašnjim mjesečnim planom od %2$s.</string>
+    <string name="switchBottomSheetPrimaryButtonUpgrade" instruction="%1$s is the yearly plan price (e.g. $99.99)">Prebaci se na godišnju pretplatu (%1$s/godišnje)</string>
+    <string name="switchBottomSheetSecondaryButtonUpgrade">Zadrži mjesečni plan</string>
+    <string name="switchBottomSheetTitleDowngrade">S godišnjim planom\nštediš 16 %!</string>
+    <string name="switchBottomSheetDescriptionDowngrade" instruction="%1$s is the yearly plan monthly equivalent price (e.g. $8.33), %2$s is the monthly plan price (e.g. $9.99)">Prebacivanje će povećati tvoju mjesečnu cijenu s %1$s/mjesečno na %2$s/mjesečno.</string>
+    <string name="switchBottomSheetPrimaryButtonDowngrade">Zadrži godišnji plan</string>
+    <string name="switchBottomSheetSecondaryButtonDowngrade" instruction="%1$s is the monthly plan price (e.g. $9.99)">Prebaci se na mjesečnu pretplatu (%1$s/mjesečno)</string>
 
 </resources>
