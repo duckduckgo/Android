@@ -16,24 +16,9 @@
 
 <resources>
 
-    <!-- Switch plan-->
-    <string name="switchBottomSheetTitleUpgrade">Save 16% with\na yearly plan!</string>
-    <string name="switchBottomSheetDescriptionUpgrade" instruction="%1$s is the yearly plan monthly equivalent price (e.g. $8.33), %2$s is the current monthly plan price (e.g. $9.99)">A yearly plan is just %1$s/mo, compared to your current %2$s monthly plan.</string>
-    <string name="switchBottomSheetPrimaryButtonUpgrade" instruction="%1$s is the yearly plan price (e.g. $99.99)">Switch to Yearly (%1$s/year)</string>
-    <string name="switchBottomSheetSecondaryButtonUpgrade">Keep Monthly Plan</string>
-    <string name="switchBottomSheetTitleDowngrade">You\'re saving 16% with\na yearly plan!</string>
-    <string name="switchBottomSheetDescriptionDowngrade" instruction="%1$s is the yearly plan monthly equivalent price (e.g. $8.33), %2$s is the monthly plan price (e.g. $9.99)">Switching will increase your monthly price from %1$s/mo to %2$s/mo.</string>
-    <string name="switchBottomSheetPrimaryButtonDowngrade">Keep Yearly Plan</string>
-    <string name="switchBottomSheetSecondaryButtonDowngrade" instruction="%1$s is the monthly plan price (e.g. $9.99)">Switch to Monthly (%1$s/month)</string>
-    <string name="subscriptionSettingManageSubscription">Manage Subscription</string>
-    <string name="subscriptionSettingSwitchUpgrade">Switch to Yearly and Save 16%</string>
-    <!-- smartling.character_limit = 10 -->
-    <string name="subscriptionSettingSwitchUpgradePill">Best offer</string>
-    <string name="subscriptionSettingSwitchDowngrade">Switch Plan</string>
-    <string name="subscriptionSettingManagePlan">Manage Plan and Payment Options</string>
-
     <!-- Personal Information Removal -->
     <string name="pirStorageUnavailableDialogTitle">Something went wrong</string>
     <string name="pirStorageUnavailableDialogMessage">Personal Information Removal is not available at this moment. Please restart the app and try again.</string>
     <string name="pirStorageUnavailableDialogButton">OK</string>
+
 </resources>
