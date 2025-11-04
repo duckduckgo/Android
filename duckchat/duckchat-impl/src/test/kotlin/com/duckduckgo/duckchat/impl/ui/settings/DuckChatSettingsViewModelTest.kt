@@ -459,4 +459,18 @@ class DuckChatSettingsViewModelTest {
                 assertFalse(state.isSearchSectionVisible)
             }
         }
+
+    @Test
+    fun `when Duck Chat fullscreen mode enabled then user setting is set`() =
+        runTest {
+            testee.onDuckChatFullscreenModeToggled(true)
+            verify(duckChat).setFullScreenModeUserSetting(true)
+        }
+
+    @Test
+    fun `when Duck Chat fullscreen mode disabled then user setting is set`() =
+        runTest {
+            testee.onDuckChatUserEnabledToggled(false)
+            verify(duckChat).setEnableDuckChatUserSetting(false)
+        }
 }
