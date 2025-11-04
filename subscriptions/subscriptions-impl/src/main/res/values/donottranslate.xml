@@ -32,4 +32,8 @@
     <string name="subscriptionSettingSwitchDowngrade">Switch Plan</string>
     <string name="subscriptionSettingManagePlan">Manage Plan and Payment Options</string>
 
+    <!-- Personal Information Removal -->
+    <string name="pirStorageUnavailableDialogTitle">Something went wrong</string>
+    <string name="pirStorageUnavailableDialogMessage">Personal Information Removal is not available at this moment. Please restart the app and try again.</string>
+    <string name="pirStorageUnavailableDialogButton">OK</string>
 </resources>

@@ -23,6 +23,7 @@ import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.feature.toggles.api.Toggle.DefaultFeatureValue
 import com.duckduckgo.feature.toggles.api.Toggle.DefaultValue
 import com.duckduckgo.pir.api.PirFeature
+import com.duckduckgo.pir.impl.store.PirRepository
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
 import kotlinx.coroutines.withContext
@@ -48,9 +49,14 @@ interface PirRemoteFeatures {
 class PirRemoteFeatureImpl @Inject constructor(
     private val pirRemoteFeatures: PirRemoteFeatures,
     private val dispatcherProvider: DispatcherProvider,
+    private val pirRepository: PirRepository,
 ) : PirFeature {
 
     override suspend fun isPirBetaEnabled(): Boolean = withContext(dispatcherProvider.io()) {
         pirRemoteFeatures.pirBeta().isEnabled()
+    }
+
+    override suspend fun isPirStorageAvailable(): Boolean = withContext(dispatcherProvider.io()) {
+        pirRepository.isRepositoryAvailable()
     }
 }

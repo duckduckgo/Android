@@ -26,6 +26,8 @@ import androidx.lifecycle.findViewTreeLifecycleOwner
 import androidx.lifecycle.findViewTreeViewModelStoreOwner
 import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.InjectWith
+import com.duckduckgo.common.ui.view.button.ButtonType.GHOST
+import com.duckduckgo.common.ui.view.dialog.TextAlertDialogBuilder
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.DispatcherProvider
@@ -127,6 +129,14 @@ class PirSettingView @JvmOverloads constructor(
 
             OpenPirDashboard -> {
                 globalActivityStarter.start(context, PirDashboardWebViewScreen)
+            }
+
+            Command.ShowPirStorageUnavailableDialog -> {
+                TextAlertDialogBuilder(context)
+                    .setTitle(R.string.pirStorageUnavailableDialogTitle)
+                    .setMessage(R.string.pirStorageUnavailableDialogMessage)
+                    .setPositiveButton(R.string.pirStorageUnavailableDialogButton, GHOST)
+                    .show()
             }
         }
     }

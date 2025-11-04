@@ -133,18 +133,19 @@ class PirDevOptOutActivity : DuckDuckGoActivity() {
                 dropDownAdapter.clear()
                 dropDownAdapter.addAll(brokerOptions)
             }
+
+            eventsRepository.getAllSuccessfullySubmittedOptOutFlow()
+                .flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
+                .onEach { optOuts ->
+                    optOutAdapter.clear()
+                    optOutAdapter.addAll(
+                        optOuts.map {
+                            "${it.value} - ${it.key}"
+                        },
+                    )
+                }
+                .launchIn(lifecycleScope)
         }
-        eventsRepository.getAllSuccessfullySubmittedOptOutFlow()
-            .flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
-            .onEach { optOuts ->
-                optOutAdapter.clear()
-                optOutAdapter.addAll(
-                    optOuts.map {
-                        "${it.value} - ${it.key}"
-                    },
-                )
-            }
-            .launchIn(lifecycleScope)
     }
 }
 

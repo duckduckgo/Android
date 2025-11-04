@@ -57,6 +57,7 @@ class PirSettingViewModel @Inject constructor(
     sealed class Command {
         data object OpenPirDesktop : Command()
         data object OpenPirDashboard : Command()
+        data object ShowPirStorageUnavailableDialog : Command()
     }
 
     private val command = Channel<Command>(1, BufferOverflow.DROP_OLDEST)
@@ -83,11 +84,19 @@ class PirSettingViewModel @Inject constructor(
     fun onPir(type: Type) {
         pixelSender.reportAppSettingsPirClick()
 
-        val command = when (type) {
-            DESKTOP -> OpenPirDesktop
-            DASHBOARD -> Command.OpenPirDashboard
+        viewModelScope.launch {
+            val command = when (type) {
+                DESKTOP -> OpenPirDesktop
+                DASHBOARD -> {
+                    if (pirFeature.isPirStorageAvailable()) {
+                        Command.OpenPirDashboard
+                    } else {
+                        Command.ShowPirStorageUnavailableDialog
+                    }
+                }
+            }
+            sendCommand(command)
         }
-        sendCommand(command)
     }
 
     override fun onCreate(owner: LifecycleOwner) {

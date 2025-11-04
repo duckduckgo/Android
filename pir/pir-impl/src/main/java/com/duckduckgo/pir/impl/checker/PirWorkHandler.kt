@@ -24,6 +24,7 @@ import com.duckduckgo.pir.impl.PirRemoteFeatures
 import com.duckduckgo.pir.impl.optout.PirForegroundOptOutService
 import com.duckduckgo.pir.impl.scan.PirForegroundScanService
 import com.duckduckgo.pir.impl.scan.PirScanScheduler
+import com.duckduckgo.pir.impl.store.PirRepository
 import com.duckduckgo.subscriptions.api.Product.PIR
 import com.duckduckgo.subscriptions.api.SubscriptionStatus
 import com.duckduckgo.subscriptions.api.Subscriptions
@@ -65,6 +66,7 @@ class RealPirWorkHandler @Inject constructor(
     private val subscriptions: Subscriptions,
     private val context: Context,
     private val pirScanScheduler: PirScanScheduler,
+    private val pirRepository: PirRepository,
 ) : PirWorkHandler {
 
     override suspend fun canRunPir(): Flow<Boolean> {
@@ -81,7 +83,7 @@ class RealPirWorkHandler @Inject constructor(
                         }
                         .distinctUntilChanged(),
                 ) { subscriptionStatus, hasValidEntitlement ->
-                    isPirEnabled(hasValidEntitlement, subscriptionStatus)
+                    isPirEnabled(hasValidEntitlement, subscriptionStatus) && pirRepository.isRepositoryAvailable()
                 }
             } else {
                 flowOf(false)

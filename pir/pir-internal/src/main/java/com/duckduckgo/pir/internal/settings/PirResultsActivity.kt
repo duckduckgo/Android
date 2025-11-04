@@ -38,6 +38,7 @@ import com.duckduckgo.pir.internal.settings.PirResultsScreenParams.PirOptOutResu
 import com.duckduckgo.pir.internal.settings.PirResultsScreenParams.PirScanResultsScreen
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -97,70 +98,78 @@ class PirResultsActivity : DuckDuckGoActivity() {
     }
 
     private fun showEmailResults() {
-        eventsRepository.getAllEmailConfirmationLogFlow().flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
-            .onEach { emailEvents ->
-                emailEvents.map { result ->
-                    val stringBuilder = StringBuilder()
-                    stringBuilder.append("Time: ${formatter.format(Date(result.eventTimeInMillis))}\n")
-                    stringBuilder.append("EVENT: ${result.eventType}\n")
-                    stringBuilder.append("RESULT: ${result.value}\n")
-                    stringBuilder.toString()
-                }.also {
-                    render(it)
+        lifecycleScope.launch {
+            eventsRepository.getAllEmailConfirmationLogFlow().flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
+                .onEach { emailEvents ->
+                    emailEvents.map { result ->
+                        val stringBuilder = StringBuilder()
+                        stringBuilder.append("Time: ${formatter.format(Date(result.eventTimeInMillis))}\n")
+                        stringBuilder.append("EVENT: ${result.eventType}\n")
+                        stringBuilder.append("RESULT: ${result.value}\n")
+                        stringBuilder.toString()
+                    }.also {
+                        render(it)
+                    }
                 }
-            }
-            .launchIn(lifecycleScope)
+                .launchIn(lifecycleScope)
+        }
     }
 
     private fun showOptOutResults() {
-        eventsRepository.getAllOptOutActionLogFlow()
-            .flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
-            .onEach { optOutEvents ->
-                optOutEvents.map { result ->
-                    val stringBuilder = StringBuilder()
-                    stringBuilder.append("Time: ${formatter.format(Date(result.completionTimeInMillis))}\n")
-                    stringBuilder.append("BROKER NAME: ${result.brokerName}\n")
-                    stringBuilder.append("EXTRACTED PROFILE: ${result.extractedProfile}\n")
-                    stringBuilder.append("ACTION EXECUTED: ${result.actionType}\n")
-                    stringBuilder.append("IS ERROR: ${result.isError}\n")
-                    stringBuilder.append("RAW RESULT: ${result.result}\n")
-                    stringBuilder.toString()
-                }.also {
-                    render(it)
+        lifecycleScope.launch {
+            eventsRepository.getAllOptOutActionLogFlow()
+                .flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
+                .onEach { optOutEvents ->
+                    optOutEvents.map { result ->
+                        val stringBuilder = StringBuilder()
+                        stringBuilder.append("Time: ${formatter.format(Date(result.completionTimeInMillis))}\n")
+                        stringBuilder.append("BROKER NAME: ${result.brokerName}\n")
+                        stringBuilder.append("EXTRACTED PROFILE: ${result.extractedProfile}\n")
+                        stringBuilder.append("ACTION EXECUTED: ${result.actionType}\n")
+                        stringBuilder.append("IS ERROR: ${result.isError}\n")
+                        stringBuilder.append("RAW RESULT: ${result.result}\n")
+                        stringBuilder.toString()
+                    }.also {
+                        render(it)
+                    }
                 }
-            }
-            .launchIn(lifecycleScope)
+                .launchIn(lifecycleScope)
+        }
     }
 
     private fun showScanResults() {
-        eventsRepository.getScannedBrokersFlow()
-            .flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
-            .onEach { scanResults ->
-                scanResults.map {
-                    val stringBuilder = StringBuilder()
-                    stringBuilder.append("BROKER NAME: ${it.brokerName}\n")
-                    stringBuilder.append("PROFILE ID: ${it.profileQueryId}\n")
-                    stringBuilder.append("COMPLETED WITH NO ERROR: ${it.isSuccess}\n")
-                    stringBuilder.append("DURATION: ${it.endTimeInMillis - it.startTimeInMillis}\n")
-                    stringBuilder.toString()
-                }.also {
-                    render(it)
+        lifecycleScope.launch {
+            eventsRepository.getScannedBrokersFlow()
+                .flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
+                .onEach { scanResults ->
+                    scanResults.map {
+                        val stringBuilder = StringBuilder()
+                        stringBuilder.append("BROKER NAME: ${it.brokerName}\n")
+                        stringBuilder.append("PROFILE ID: ${it.profileQueryId}\n")
+                        stringBuilder.append("COMPLETED WITH NO ERROR: ${it.isSuccess}\n")
+                        stringBuilder.append("DURATION: ${it.endTimeInMillis - it.startTimeInMillis}\n")
+                        stringBuilder.toString()
+                    }.also {
+                        render(it)
+                    }
                 }
-            }
-            .launchIn(lifecycleScope)
+                .launchIn(lifecycleScope)
+        }
     }
 
     private fun showAllEvents() {
-        eventsRepository.getAllEventLogsFlow()
-            .flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
-            .onEach { scanEvents ->
-                scanEvents.map { result ->
-                    "Time: ${formatter.format(Date(result.eventTimeInMillis))}\nEVENT: ${result.eventType}\n"
-                }.also {
-                    render(it)
+        lifecycleScope.launch {
+            eventsRepository.getAllEventLogsFlow()
+                .flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
+                .onEach { scanEvents ->
+                    scanEvents.map { result ->
+                        "Time: ${formatter.format(Date(result.eventTimeInMillis))}\nEVENT: ${result.eventType}\n"
+                    }.also {
+                        render(it)
+                    }
                 }
-            }
-            .launchIn(lifecycleScope)
+                .launchIn(lifecycleScope)
+        }
     }
 
     private fun render(results: List<String>) {

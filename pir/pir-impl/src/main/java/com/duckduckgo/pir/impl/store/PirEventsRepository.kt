@@ -16,6 +16,7 @@
 
 package com.duckduckgo.pir.impl.store
 
+import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.pir.impl.models.ExtractedProfile
@@ -32,16 +33,25 @@ import com.duckduckgo.pir.impl.store.db.PirEventLog
 import com.duckduckgo.pir.impl.store.db.ScanCompletedBroker
 import com.duckduckgo.pir.impl.store.db.ScanLogDao
 import com.duckduckgo.pir.impl.store.db.ScanResultsDao
+import com.duckduckgo.pir.impl.store.secure.PirSecureStorageDatabaseFactory
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.moshi.Moshi
 import dagger.SingleInstanceIn
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.CoroutineStart
+import kotlinx.coroutines.Deferred
+import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.emptyFlow
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
+import logcat.LogPriority.ERROR
+import logcat.logcat
 import javax.inject.Inject
 
 interface PirEventsRepository {
-    fun getAllEventLogsFlow(): Flow<List<PirEventLog>>
+    suspend fun getAllEventLogsFlow(): Flow<List<PirEventLog>>
 
     suspend fun saveEventLog(pirEventLog: PirEventLog)
 
@@ -49,7 +59,7 @@ interface PirEventsRepository {
 
     suspend fun deleteEventLogs()
 
-    fun getScannedBrokersFlow(): Flow<List<ScanCompletedBroker>>
+    suspend fun getScannedBrokersFlow(): Flow<List<ScanCompletedBroker>>
 
     suspend fun getScanErrorResultsCount(): Int
 
@@ -57,13 +67,13 @@ interface PirEventsRepository {
 
     suspend fun deleteAllScanResults()
 
-    fun getTotalScannedBrokersFlow(): Flow<Int>
+    suspend fun getTotalScannedBrokersFlow(): Flow<Int>
 
-    fun getTotalOptOutCompletedFlow(): Flow<Int>
+    suspend fun getTotalOptOutCompletedFlow(): Flow<Int>
 
-    fun getAllOptOutActionLogFlow(): Flow<List<OptOutActionLog>>
+    suspend fun getAllOptOutActionLogFlow(): Flow<List<OptOutActionLog>>
 
-    fun getAllSuccessfullySubmittedOptOutFlow(): Flow<Map<String, String>>
+    suspend fun getAllSuccessfullySubmittedOptOutFlow(): Flow<Map<String, String>>
 
     suspend fun saveScanCompletedBroker(
         brokerName: String,
@@ -98,7 +108,7 @@ interface PirEventsRepository {
         detail: String,
     )
 
-    fun getAllEmailConfirmationLogFlow(): Flow<List<PirEmailConfirmationLog>>
+    suspend fun getAllEmailConfirmationLogFlow(): Flow<List<PirEmailConfirmationLog>>
 
     suspend fun deleteAllEmailConfirmationsLogs()
 }
@@ -111,64 +121,66 @@ interface PirEventsRepository {
 class RealPirEventsRepository @Inject constructor(
     val moshi: Moshi,
     private val dispatcherProvider: DispatcherProvider,
-    private val scanResultsDao: ScanResultsDao,
-    private val scanLogDao: ScanLogDao,
-    private val optOutResultsDao: OptOutResultsDao,
-    private val emailConfirmationLogDao: EmailConfirmationLogDao,
+    private val databaseFactory: PirSecureStorageDatabaseFactory,
+    @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
 ) : PirEventsRepository {
     private val extractedProfileAdapter by lazy { moshi.adapter(ExtractedProfile::class.java) }
 
+    private val database: Deferred<PirDatabase?> = appCoroutineScope.async(start = CoroutineStart.LAZY) {
+        prepareDatabase()
+    }
+
     override suspend fun deleteAllScanResults() {
         withContext(dispatcherProvider.io()) {
-            scanResultsDao.deleteAllScanCompletedBroker()
-            scanLogDao.deleteAllBrokerScanEvents()
+            scanResultsDao()?.deleteAllScanCompletedBroker()
+            scanLogDao()?.deleteAllBrokerScanEvents()
         }
     }
 
     override suspend fun getScanErrorResultsCount(): Int = withContext(dispatcherProvider.io()) {
-        scanLogDao.getAllBrokerScanEvents().filter { it.eventType == BROKER_ERROR }.size
+        scanLogDao()?.getAllBrokerScanEvents()?.filter { it.eventType == BROKER_ERROR }?.size ?: 0
     }
 
     override suspend fun getScanSuccessResultsCount(): Int = withContext(dispatcherProvider.io()) {
-        scanLogDao.getAllBrokerScanEvents().filter { it.eventType == BROKER_SUCCESS }.size
+        scanLogDao()?.getAllBrokerScanEvents()?.filter { it.eventType == BROKER_SUCCESS }?.size ?: 0
     }
 
-    override fun getAllEventLogsFlow(): Flow<List<PirEventLog>> {
-        return scanLogDao.getAllEventLogsFlow()
+    override suspend fun getAllEventLogsFlow(): Flow<List<PirEventLog>> {
+        return scanLogDao()?.getAllEventLogsFlow() ?: emptyFlow()
     }
 
     override suspend fun saveEventLog(pirEventLog: PirEventLog) {
         withContext(dispatcherProvider.io()) {
-            scanLogDao.insertEventLog(pirEventLog)
+            scanLogDao()?.insertEventLog(pirEventLog)
         }
     }
 
     override suspend fun saveBrokerScanLog(pirBrokerScanLog: PirBrokerScanLog) {
         withContext(dispatcherProvider.io()) {
-            scanLogDao.insertBrokerScanEvent(pirBrokerScanLog)
+            scanLogDao()?.insertBrokerScanEvent(pirBrokerScanLog)
         }
     }
 
     override suspend fun deleteEventLogs() {
         withContext(dispatcherProvider.io()) {
-            scanLogDao.deleteAllEventLogs()
+            scanLogDao()?.deleteAllEventLogs()
         }
     }
 
-    override fun getScannedBrokersFlow(): Flow<List<ScanCompletedBroker>> {
-        return scanResultsDao.getScanCompletedBrokerFlow()
+    override suspend fun getScannedBrokersFlow(): Flow<List<ScanCompletedBroker>> {
+        return scanResultsDao()?.getScanCompletedBrokerFlow() ?: flowOf(emptyList())
     }
 
-    override fun getTotalScannedBrokersFlow(): Flow<Int> {
-        return scanResultsDao.getScanCompletedBrokerFlow().map { it.size }
+    override suspend fun getTotalScannedBrokersFlow(): Flow<Int> {
+        return scanResultsDao()?.getScanCompletedBrokerFlow()?.map { it.size } ?: flowOf(0)
     }
 
-    override fun getTotalOptOutCompletedFlow(): Flow<Int> {
-        return optOutResultsDao.getOptOutCompletedBrokerFlow().map { it.size }
+    override suspend fun getTotalOptOutCompletedFlow(): Flow<Int> {
+        return optOutResultsDao()?.getOptOutCompletedBrokerFlow()?.map { it.size } ?: flowOf(0)
     }
 
-    override fun getAllSuccessfullySubmittedOptOutFlow(): Flow<Map<String, String>> {
-        return optOutResultsDao.getOptOutCompletedBrokerFlow().map {
+    override suspend fun getAllSuccessfullySubmittedOptOutFlow(): Flow<Map<String, String>> {
+        return optOutResultsDao()?.getOptOutCompletedBrokerFlow()?.map {
             it.filter {
                 it.isSubmitSuccess
             }.map {
@@ -177,11 +189,11 @@ class RealPirEventsRepository @Inject constructor(
                         ?: "Unknown"
                     ) to it.brokerName
             }.distinct().toMap()
-        }
+        } ?: flowOf(emptyMap())
     }
 
-    override fun getAllOptOutActionLogFlow(): Flow<List<OptOutActionLog>> {
-        return optOutResultsDao.getOptOutActionLogFlow()
+    override suspend fun getAllOptOutActionLogFlow(): Flow<List<OptOutActionLog>> {
+        return optOutResultsDao()?.getOptOutActionLogFlow() ?: flowOf(emptyList())
     }
 
     override suspend fun saveScanCompletedBroker(
@@ -190,8 +202,8 @@ class RealPirEventsRepository @Inject constructor(
         startTimeInMillis: Long,
         endTimeInMillis: Long,
         isSuccess: Boolean,
-    ) = withContext(dispatcherProvider.io()) {
-        scanResultsDao.insertScanCompletedBroker(
+    ): Unit = withContext(dispatcherProvider.io()) {
+        scanResultsDao()?.insertScanCompletedBroker(
             ScanCompletedBroker(
                 brokerName = brokerName,
                 profileQueryId = profileQueryId,
@@ -208,8 +220,8 @@ class RealPirEventsRepository @Inject constructor(
         startTimeInMillis: Long,
         endTimeInMillis: Long,
         isSubmitSuccess: Boolean,
-    ) = withContext(dispatcherProvider.io()) {
-        optOutResultsDao.insertOptOutCompletedBroker(
+    ): Unit = withContext(dispatcherProvider.io()) {
+        optOutResultsDao()?.insertOptOutCompletedBroker(
             OptOutCompletedBroker(
                 brokerName = brokerName,
                 extractedProfile = extractedProfileAdapter.toJson(extractedProfile),
@@ -227,8 +239,8 @@ class RealPirEventsRepository @Inject constructor(
         actionType: String,
         isError: Boolean,
         result: String,
-    ) = withContext(dispatcherProvider.io()) {
-        optOutResultsDao.insertOptOutActionLog(
+    ): Unit = withContext(dispatcherProvider.io()) {
+        optOutResultsDao()?.insertOptOutActionLog(
             OptOutActionLog(
                 brokerName = brokerName,
                 extractedProfile = extractedProfileAdapter.toJson(extractedProfile),
@@ -240,17 +252,17 @@ class RealPirEventsRepository @Inject constructor(
         )
     }
 
-    override suspend fun deleteAllOptOutData() = withContext(dispatcherProvider.io()) {
-        optOutResultsDao.deleteAllOptOutActionLog()
-        optOutResultsDao.deleteAllOptOutCompletedBroker()
+    override suspend fun deleteAllOptOutData(): Unit = withContext(dispatcherProvider.io()) {
+        optOutResultsDao()?.deleteAllOptOutActionLog()
+        optOutResultsDao()?.deleteAllOptOutCompletedBroker()
     }
 
     override suspend fun saveEmailConfirmationLog(
         eventTimeInMillis: Long,
         type: EmailConfirmationEventType,
         detail: String,
-    ) = withContext(dispatcherProvider.io()) {
-        emailConfirmationLogDao.insertEmailConfirmationLog(
+    ): Unit = withContext(dispatcherProvider.io()) {
+        emailConfirmationLogDao()?.insertEmailConfirmationLog(
             PirEmailConfirmationLog(
                 eventTimeInMillis = eventTimeInMillis,
                 eventType = type,
@@ -259,11 +271,40 @@ class RealPirEventsRepository @Inject constructor(
         )
     }
 
-    override fun getAllEmailConfirmationLogFlow(): Flow<List<PirEmailConfirmationLog>> {
-        return emailConfirmationLogDao.getAllEmailConfirmationLogsFlow()
+    override suspend fun getAllEmailConfirmationLogFlow(): Flow<List<PirEmailConfirmationLog>> {
+        return emailConfirmationLogDao()?.getAllEmailConfirmationLogsFlow() ?: flowOf(emptyList())
     }
 
-    override suspend fun deleteAllEmailConfirmationsLogs() = withContext(dispatcherProvider.io()) {
-        emailConfirmationLogDao.deleteAllEmailConfirmationLogs()
+    override suspend fun deleteAllEmailConfirmationsLogs(): Unit = withContext(dispatcherProvider.io()) {
+        emailConfirmationLogDao()?.deleteAllEmailConfirmationLogs()
     }
+
+    private suspend fun prepareDatabase(): PirDatabase? {
+        val database = databaseFactory.getDatabase()
+        return if (database != null && database.databaseContentsAreReadable()) {
+            database
+        } else {
+            logcat(ERROR) { "PIR-DB: PIR events repository is not readable" }
+            null
+        }
+    }
+
+    private fun PirDatabase.databaseContentsAreReadable(): Boolean {
+        return kotlin.runCatching {
+            // Try to read from the database to verify it's accessible
+            brokerJsonDao().getAllBrokersCount()
+            true
+        }.getOrElse {
+            logcat(ERROR) { "PIR-DB: Error reading from PIR events repository: ${it.message}" }
+            false
+        }
+    }
+
+    private suspend fun scanResultsDao(): ScanResultsDao? = database.await()?.scanResultsDao()
+
+    private suspend fun scanLogDao(): ScanLogDao? = database.await()?.scanLogDao()
+
+    private suspend fun optOutResultsDao(): OptOutResultsDao? = database.await()?.optOutResultsDao()
+
+    private suspend fun emailConfirmationLogDao(): EmailConfirmationLogDao? = database.await()?.emailConfirmationLogDao()
 }

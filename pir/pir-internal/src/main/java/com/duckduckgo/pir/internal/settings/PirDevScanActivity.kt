@@ -93,19 +93,21 @@ class PirDevScanActivity : DuckDuckGoActivity() {
     }
 
     private fun bindViews() {
-        repository.getAllExtractedProfilesFlow()
-            .flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
-            .onEach {
-                render(it)
-            }
-            .launchIn(lifecycleScope)
+        lifecycleScope.launch {
+            repository.getAllExtractedProfilesFlow()
+                .flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
+                .onEach {
+                    render(it)
+                }
+                .launchIn(lifecycleScope)
 
-        eventsRepository.getTotalScannedBrokersFlow()
-            .flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
-            .onEach {
-                binding.statusSitesScanned.text = getString(R.string.pirStatsStatusScanned, it)
-            }
-            .launchIn(lifecycleScope)
+            eventsRepository.getTotalScannedBrokersFlow()
+                .flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
+                .onEach {
+                    binding.statusSitesScanned.text = getString(R.string.pirStatsStatusScanned, it)
+                }
+                .launchIn(lifecycleScope)
+        }
     }
 
     private fun render(extractedProfiles: List<ExtractedProfile>) {

@@ -24,4 +24,11 @@ interface PirFeature {
      * @return true if the PIR beta is enabled, false otherwise
      */
     suspend fun isPirBetaEnabled(): Boolean
+
+    /**
+     * Runs on the IO thread by default.
+     *
+     * @return true if PIR storage is available, false otherwise
+     */
+    suspend fun isPirStorageAvailable(): Boolean
 }
