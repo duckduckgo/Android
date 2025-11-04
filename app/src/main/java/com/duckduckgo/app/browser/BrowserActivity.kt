@@ -824,11 +824,8 @@ open class BrowserActivity : DuckDuckGoActivity() {
             removeObservers()
         }
         dialog.clearFinished = {
-            lifecycleScope.launch {
-                tabRepository.createNewDefaultProfile()
-                dialog.dismiss()
-                recreate()
-            }
+            dialog.dismiss()
+            recreate()
         }
         dialog.show()
     }

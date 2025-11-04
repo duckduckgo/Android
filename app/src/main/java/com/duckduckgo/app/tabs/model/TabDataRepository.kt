@@ -16,6 +16,11 @@
 
 package com.duckduckgo.app.tabs.model
 
+import android.content.ContentValues
+import android.content.Context
+import android.database.DatabaseErrorHandler
+import android.database.DefaultDatabaseErrorHandler
+import android.database.sqlite.SQLiteDatabase
 import android.net.Uri
 import androidx.annotation.MainThread
 import androidx.lifecycle.LiveData
@@ -59,6 +64,7 @@ import kotlinx.coroutines.withContext
 import logcat.LogPriority.INFO
 import logcat.LogPriority.WARN
 import logcat.logcat
+import java.io.File
 import java.util.UUID
 import javax.inject.Inject
 
@@ -76,6 +82,7 @@ class TabDataRepository @Inject constructor(
     private val webViewSessionStorage: WebViewSessionStorage,
     private val tabManagerFeatureFlags: TabManagerFeatureFlags,
     private val fireproofRepository: FireproofRepository,
+    private val context: Context,
 ) : TabRepository {
 
     private fun webViewMultiProfileSupported() = WebViewFeature.isFeatureSupported(WebViewFeature.MULTI_PROFILE)
@@ -635,13 +642,23 @@ class TabDataRepository @Inject constructor(
         return defaultProfileName
     }
 
+
     override suspend fun createNewDefaultProfile() = withContext(dispatchers.main()) {
         val oldProfile = profileStore?.getProfile(defaultProfileName)
         defaultProfileName = "ddg_default"
         val newProfile = profileStore?.getOrCreateProfile(defaultProfileName)
-        val websites = withContext(dispatchers.io()) { fireproofRepository.fireproofWebsites() }
+        val websites = withContext(dispatchers.io()) { fireproofRepository.fireproofWebsites() }.flatMap {
+            listOf(it, "https://$it")
+        }
+        logcat {
+            "lp_test; createNewDefaultProfile; migrating cookies from '${oldProfile?.name}' to '${newProfile?.name}' for websites: $websites"
+        }
         websites.forEach { website ->
-            oldProfile?.cookieManager?.getCookie(website)?.split("; ")?.forEach { cookie ->
+            val cookies = oldProfile?.cookieManager?.getCookie(website)?.split("; ")
+            logcat {
+                "lp_test; Retrieved cookies from '${oldProfile?.name}' for $website: $cookies"
+            }
+            cookies?.forEach { cookie ->
                 logcat { "lp_test; Setting cookie from '${oldProfile?.name}' to '${newProfile?.name}' for $website: $cookie" }
                 newProfile?.cookieManager?.setCookie(website, cookie) {
                     logcat { "lp_test; Cookie set result: $it" }

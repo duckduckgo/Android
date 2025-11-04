@@ -182,7 +182,6 @@ class FireDialog(
             clearPersonalDataAction.clearTabsAndAllDataAsync(appInForeground = true, shouldFireDataClearPixel = true)
             clearPersonalDataAction.setAppUsedSinceLastClearFlag(false)
             onFireDialogClearAllEvent(ClearAllDataFinished)
-            clearFinished()
         }
     }
 
@@ -234,6 +233,7 @@ class FireDialog(
                 binding.fireAnimationView.addAnimatorUpdateListener(accelerateAnimatorUpdateListener)
             }
         } else {
+            clearFinished()
             // clearPersonalDataAction.killAndRestartProcess(notifyDataCleared = false, enableTransitionAnimation = false)
         }
     }

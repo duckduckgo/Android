@@ -115,6 +115,7 @@ class ClearPersonalDataAction(
         withContext(dispatchers.main()) {
             clearDataAsync(shouldFireDataClearPixel)
         }
+        tabRepository.createNewDefaultProfile()
 
         logcat(INFO) { "Finished clearing everything" }
     }
