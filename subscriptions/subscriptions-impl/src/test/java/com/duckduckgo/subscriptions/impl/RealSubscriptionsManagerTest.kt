@@ -96,9 +96,11 @@ import org.mockito.kotlin.verifyNoMoreInteractions
 import org.mockito.kotlin.whenever
 import retrofit2.HttpException
 import retrofit2.Response
+import java.text.NumberFormat
 import java.time.Duration
 import java.time.Instant
 import java.time.LocalDateTime
+import java.util.Currency
 
 @RunWith(Parameterized::class)
 class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
@@ -1735,6 +1737,8 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
             whenever(productDetails.productId).thenReturn(SubscriptionsConstants.BASIC_SUBSCRIPTION)
 
             val mockPricingPhase: PricingPhase = mock {
+                on { priceAmountMicros } doReturn 1000000
+                on { priceCurrencyCode } doReturn "USD"
                 on { formattedPrice } doReturn "1$"
                 on { billingPeriod } doReturn "P1M"
             }
@@ -2002,7 +2006,11 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
         givenSwitchPlanSubscriptionExists(productId = MONTHLY_PLAN_US)
         authRepository.setFeatures(MONTHLY_PLAN_US, setOf(NETP))
         authRepository.setFeatures(YEARLY_PLAN_US, setOf(NETP))
-        givenPlanOffersExist(monthlyPrice = "$9.99", yearlyPrice = "$99.99")
+        givenPlanOffersExist(
+            monthlyAmount = "9.99".toBigDecimal(),
+            yearlyAmount = "99.99".toBigDecimal(),
+            currency = Currency.getInstance("USD"),
+        )
 
         val result = subscriptionsManager.getSwitchPlanPricing(isUpgrade = true)
 
@@ -2017,7 +2025,11 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
         givenSwitchPlanSubscriptionExists(productId = YEARLY_PLAN_US)
         authRepository.setFeatures(MONTHLY_PLAN_US, setOf(NETP))
         authRepository.setFeatures(YEARLY_PLAN_US, setOf(NETP))
-        givenPlanOffersExist(monthlyPrice = "$9.99", yearlyPrice = "$99.99")
+        givenPlanOffersExist(
+            monthlyAmount = "9.99".toBigDecimal(),
+            yearlyAmount = "99.99".toBigDecimal(),
+            currency = Currency.getInstance("USD"),
+        )
 
         val result = subscriptionsManager.getSwitchPlanPricing(isUpgrade = false)
 
@@ -2045,8 +2057,9 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
         givenPlanOffersExist(
             monthlyPlanId = MONTHLY_PLAN_ROW,
             yearlyPlanId = YEARLY_PLAN_ROW,
-            monthlyPrice = "€8.99",
-            yearlyPrice = "€89.99",
+            monthlyAmount = "8.99".toBigDecimal(),
+            yearlyAmount = "89.99".toBigDecimal(),
+            currency = Currency.getInstance("EUR"),
         )
 
         val result = subscriptionsManager.getSwitchPlanPricing(isUpgrade = true)
@@ -2075,10 +2088,19 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
     private fun givenPlanOffersExist(
         monthlyPlanId: String = MONTHLY_PLAN_US,
         yearlyPlanId: String = YEARLY_PLAN_US,
-        monthlyPrice: String = "$9.99",
-        yearlyPrice: String = "$99.99",
+        monthlyAmount: java.math.BigDecimal = 9.99.toBigDecimal(),
+        yearlyAmount: java.math.BigDecimal = 99.99.toBigDecimal(),
+        currency: Currency = Currency.getInstance("USD"),
     ) {
+        val currencyFormatter = NumberFormat.getCurrencyInstance()
+            .apply { this.currency = currency }
+
+        val monthlyPrice = currencyFormatter.format(monthlyAmount)
+        val yearlyPrice = currencyFormatter.format(yearlyAmount)
+
         val monthlyPhase: PricingPhase = mock {
+            on { priceAmountMicros } doReturn monthlyAmount.scaleByPowerOfTen(6).toLong()
+            on { priceCurrencyCode } doReturn currency.currencyCode
             on { formattedPrice } doReturn monthlyPrice
             on { billingPeriod } doReturn "P1M"
         }
@@ -2092,6 +2114,8 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
         }
 
         val yearlyPhase: PricingPhase = mock {
+            on { priceAmountMicros } doReturn yearlyAmount.scaleByPowerOfTen(6).toLong()
+            on { priceCurrencyCode } doReturn currency.currencyCode
             on { formattedPrice } doReturn yearlyPrice
             on { billingPeriod } doReturn "P1Y"
         }

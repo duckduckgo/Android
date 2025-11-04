@@ -52,6 +52,8 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
+import java.math.BigDecimal
+import java.util.Currency
 
 @SuppressLint("DenyListedApi")
 @RunWith(AndroidJUnit4::class)
@@ -211,13 +213,27 @@ class SubscriptionWebViewViewModelTest {
             SubscriptionOffer(
                 planId = MONTHLY_PLAN_US,
                 offerId = null,
-                pricingPhases = listOf(PricingPhase(formattedPrice = "$1", billingPeriod = "P1M")),
+                pricingPhases = listOf(
+                    PricingPhase(
+                        priceAmount = 1.toBigDecimal(),
+                        priceCurrency = Currency.getInstance("USD"),
+                        formattedPrice = "$1",
+                        billingPeriod = "P1M",
+                    ),
+                ),
                 features = setOf(SubscriptionsConstants.NETP),
             ),
             SubscriptionOffer(
                 planId = YEARLY_PLAN_US,
                 offerId = null,
-                pricingPhases = listOf(PricingPhase(formattedPrice = "$10", billingPeriod = "P1Y")),
+                pricingPhases = listOf(
+                    PricingPhase(
+                        priceAmount = 10.toBigDecimal(),
+                        priceCurrency = Currency.getInstance("USD"),
+                        formattedPrice = "$10",
+                        billingPeriod = "P1Y",
+                    ),
+                ),
                 features = setOf(SubscriptionsConstants.NETP),
             ),
         )
@@ -267,13 +283,27 @@ class SubscriptionWebViewViewModelTest {
             SubscriptionOffer(
                 planId = MONTHLY_PLAN_US,
                 offerId = null,
-                pricingPhases = listOf(PricingPhase(formattedPrice = "$1", billingPeriod = "P1M")),
+                pricingPhases = listOf(
+                    PricingPhase(
+                        priceAmount = 1.toBigDecimal(),
+                        priceCurrency = Currency.getInstance("USD"),
+                        formattedPrice = "$1",
+                        billingPeriod = "P1M",
+                    ),
+                ),
                 features = setOf(SubscriptionsConstants.NETP),
             ),
             SubscriptionOffer(
                 planId = YEARLY_PLAN_US,
                 offerId = null,
-                pricingPhases = listOf(PricingPhase(formattedPrice = "$10", billingPeriod = "P1Y")),
+                pricingPhases = listOf(
+                    PricingPhase(
+                        priceAmount = 10.toBigDecimal(),
+                        priceCurrency = Currency.getInstance("USD"),
+                        formattedPrice = "$10",
+                        billingPeriod = "P1Y",
+                    ),
+                ),
                 features = setOf(SubscriptionsConstants.NETP),
             ),
         )
@@ -303,21 +333,45 @@ class SubscriptionWebViewViewModelTest {
             SubscriptionOffer(
                 planId = MONTHLY_PLAN_US,
                 offerId = null,
-                pricingPhases = listOf(PricingPhase(formattedPrice = "$1", billingPeriod = "P1M")),
+                pricingPhases = listOf(
+                    PricingPhase(
+                        priceAmount = 1.toBigDecimal(),
+                        priceCurrency = Currency.getInstance("USD"),
+                        formattedPrice = "$1",
+                        billingPeriod = "P1M",
+                    ),
+                ),
                 features = setOf(SubscriptionsConstants.NETP),
             ),
             SubscriptionOffer(
                 planId = YEARLY_PLAN_US,
                 offerId = null,
-                pricingPhases = listOf(PricingPhase(formattedPrice = "$10", billingPeriod = "P1Y")),
+                pricingPhases = listOf(
+                    PricingPhase(
+                        priceAmount = 1.toBigDecimal(),
+                        priceCurrency = Currency.getInstance("USD"),
+                        formattedPrice = "$10",
+                        billingPeriod = "P1Y",
+                    ),
+                ),
                 features = setOf(SubscriptionsConstants.NETP),
             ),
             SubscriptionOffer(
                 planId = MONTHLY_PLAN_US,
                 offerId = MONTHLY_FREE_TRIAL_OFFER_US,
                 pricingPhases = listOf(
-                    PricingPhase(formattedPrice = "$1", billingPeriod = "P1M"),
-                    PricingPhase(formattedPrice = "Free", billingPeriod = "P1W"),
+                    PricingPhase(
+                        priceAmount = 1.toBigDecimal(),
+                        priceCurrency = Currency.getInstance("USD"),
+                        formattedPrice = "$1",
+                        billingPeriod = "P1M",
+                    ),
+                    PricingPhase(
+                        priceAmount = BigDecimal.ZERO,
+                        priceCurrency = Currency.getInstance("USD"),
+                        formattedPrice = "Free",
+                        billingPeriod = "P1W",
+                    ),
                 ),
                 features = setOf(SubscriptionsConstants.NETP),
             ),
@@ -325,8 +379,18 @@ class SubscriptionWebViewViewModelTest {
                 planId = YEARLY_PLAN_US,
                 offerId = YEARLY_FREE_TRIAL_OFFER_US,
                 pricingPhases = listOf(
-                    PricingPhase(formattedPrice = "$10", billingPeriod = "P1Y"),
-                    PricingPhase(formattedPrice = "Free", billingPeriod = "P1W"),
+                    PricingPhase(
+                        priceAmount = 1.toBigDecimal(),
+                        priceCurrency = Currency.getInstance("USD"),
+                        formattedPrice = "$10",
+                        billingPeriod = "P1Y",
+                    ),
+                    PricingPhase(
+                        priceAmount = BigDecimal.ZERO,
+                        priceCurrency = Currency.getInstance("USD"),
+                        formattedPrice = "Free",
+                        billingPeriod = "P1W",
+                    ),
                 ),
                 features = setOf(SubscriptionsConstants.NETP),
             ),
@@ -356,21 +420,45 @@ class SubscriptionWebViewViewModelTest {
             SubscriptionOffer(
                 planId = MONTHLY_PLAN_US,
                 offerId = null,
-                pricingPhases = listOf(PricingPhase(formattedPrice = "$1", billingPeriod = "P1M")),
+                pricingPhases = listOf(
+                    PricingPhase(
+                        priceAmount = 1.toBigDecimal(),
+                        priceCurrency = Currency.getInstance("USD"),
+                        formattedPrice = "$1",
+                        billingPeriod = "P1M",
+                    ),
+                ),
                 features = setOf(SubscriptionsConstants.NETP),
             ),
             SubscriptionOffer(
                 planId = YEARLY_PLAN_US,
                 offerId = null,
-                pricingPhases = listOf(PricingPhase(formattedPrice = "$10", billingPeriod = "P1Y")),
+                pricingPhases = listOf(
+                    PricingPhase(
+                        priceAmount = 10.toBigDecimal(),
+                        priceCurrency = Currency.getInstance("USD"),
+                        formattedPrice = "$10",
+                        billingPeriod = "P1Y",
+                    ),
+                ),
                 features = setOf(SubscriptionsConstants.NETP),
             ),
             SubscriptionOffer(
                 planId = MONTHLY_PLAN_US,
                 offerId = MONTHLY_FREE_TRIAL_OFFER_US,
                 pricingPhases = listOf(
-                    PricingPhase(formattedPrice = "$1", billingPeriod = "P1M"),
-                    PricingPhase(formattedPrice = "Free", billingPeriod = "P1W"),
+                    PricingPhase(
+                        priceAmount = 1.toBigDecimal(),
+                        priceCurrency = Currency.getInstance("USD"),
+                        formattedPrice = "$1",
+                        billingPeriod = "P1M",
+                    ),
+                    PricingPhase(
+                        priceAmount = BigDecimal.ZERO,
+                        priceCurrency = Currency.getInstance("USD"),
+                        formattedPrice = "Free",
+                        billingPeriod = "P1W",
+                    ),
                 ),
                 features = setOf(SubscriptionsConstants.NETP),
             ),
@@ -378,8 +466,18 @@ class SubscriptionWebViewViewModelTest {
                 planId = YEARLY_PLAN_US,
                 offerId = YEARLY_FREE_TRIAL_OFFER_US,
                 pricingPhases = listOf(
-                    PricingPhase(formattedPrice = "$10", billingPeriod = "P1Y"),
-                    PricingPhase(formattedPrice = "Free", billingPeriod = "P1W"),
+                    PricingPhase(
+                        priceAmount = 10.toBigDecimal(),
+                        priceCurrency = Currency.getInstance("USD"),
+                        formattedPrice = "$10",
+                        billingPeriod = "P1Y",
+                    ),
+                    PricingPhase(
+                        priceAmount = BigDecimal.ZERO,
+                        priceCurrency = Currency.getInstance("USD"),
+                        formattedPrice = "Free",
+                        billingPeriod = "P1W",
+                    ),
                 ),
                 features = setOf(SubscriptionsConstants.NETP),
             ),
