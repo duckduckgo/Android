@@ -1631,7 +1631,7 @@ class BrowserTabFragment :
                 .flowWithLifecycle(lifecycle, Lifecycle.State.RESUMED)
                 .collectLatest { hasFavorites ->
                     binding.includeNewBrowserTab.topNtpOutlineStroke.isVisible = hasFavorites
-                    binding.includeNewBrowserTab.bottomNtpOutlineStroke.isVisible = hasFavorites
+                    binding.includeNewBrowserTab.bottomNtpOutlineStroke.isVisible = hasFavorites && !omnibarFeatureRepository.isSplitOmnibarEnabled
                 }
         }
 
