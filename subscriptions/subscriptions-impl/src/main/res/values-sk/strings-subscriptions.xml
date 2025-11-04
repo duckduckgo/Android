@@ -84,6 +84,11 @@
     <string name="subscriptionSettingSectionHelpAndSupport">Pomoc a podpora</string>
     <string name="subscriptionSettingSendFeedback">Odoslať spätnú väzbu</string>
     <string name="subscriptionSettingActivating">Aktivácia</string>
+    <string name="subscriptionSettingSwitchUpgrade">Prejdi na ročný plán ušetri 16 %</string>
+    <!-- smartling.character_limit = 10 -->
+    <string name="subscriptionSettingSwitchUpgradePill">Zľava!</string>
+    <string name="subscriptionSettingSwitchDowngrade">Zmeniť plán</string>
+    <string name="subscriptionSettingManagePlan">Spravovať platby</string>
 
     <!--Purchase Subscriptions-->
     <string name="purchaseCompletedTitle">Máš všetko pripravené.</string>
@@ -191,5 +196,15 @@
     <string name="subscriptionSettingSubscribeSecure">Zabezpeč si Wi-Fi a chatuj súkromne s pokročilými modelmi umelej inteligencie</string>
 
     <string name="feedbackGeneralSubscription">Predplatné</string>
+
+    <!-- Switch plan-->
+    <string name="switchBottomSheetTitleUpgrade">Ušetri 16 % s\nročným plánom!</string>
+    <string name="switchBottomSheetDescriptionUpgrade" instruction="%1$s is the yearly plan monthly equivalent price (e.g. $8.33), %2$s is the current monthly plan price (e.g. $9.99)">Ročný plán stojí iba %1$s/mesiac v porovnaní s tvojím súčasným mesačným plánom za %2$s.</string>
+    <string name="switchBottomSheetPrimaryButtonUpgrade" instruction="%1$s is the yearly plan price (e.g. $99.99)">Prejdi na ročné predplatné (%1$s/rok)</string>
+    <string name="switchBottomSheetSecondaryButtonUpgrade">Zachovať mesačný plán</string>
+    <string name="switchBottomSheetTitleDowngrade">S ročným plánom ušetríš 16 %!</string>
+    <string name="switchBottomSheetDescriptionDowngrade" instruction="%1$s is the yearly plan monthly equivalent price (e.g. $8.33), %2$s is the monthly plan price (e.g. $9.99)">Zmena zvýši tvoju mesačnú cenu z %1$s/mesiac na %2$s/mesiac.</string>
+    <string name="switchBottomSheetPrimaryButtonDowngrade">Ponechať ročný plán</string>
+    <string name="switchBottomSheetSecondaryButtonDowngrade" instruction="%1$s is the monthly plan price (e.g. $9.99)">Prejsť na mesačný plán (%1$s/mesiac)</string>
 
 </resources>
