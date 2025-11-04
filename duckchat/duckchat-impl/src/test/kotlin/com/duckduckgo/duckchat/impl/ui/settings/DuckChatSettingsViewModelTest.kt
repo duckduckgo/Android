@@ -65,6 +65,7 @@ class DuckChatSettingsViewModelTest {
             whenever(duckChat.observeShowInBrowserMenuUserSetting()).thenReturn(flowOf(false))
             whenever(duckChat.observeShowInAddressBarUserSetting()).thenReturn(flowOf(false))
             whenever(duckChat.observeInputScreenUserSettingEnabled()).thenReturn(flowOf(false))
+            whenever(duckChat.observeFullscreenModeUserSetting()).thenReturn(flowOf(false))
             testee = DuckChatSettingsViewModel(
                 duckChatActivityParams = DuckChatSettingsNoParams,
                 duckChat = duckChat,
