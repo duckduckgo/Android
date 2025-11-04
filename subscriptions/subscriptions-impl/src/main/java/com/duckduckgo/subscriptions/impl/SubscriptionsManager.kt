@@ -18,6 +18,9 @@ package com.duckduckgo.subscriptions.impl
 
 import android.app.Activity
 import android.content.Context
+import android.icu.text.NumberFormat
+import android.icu.util.Currency
+import android.icu.util.CurrencyAmount
 import androidx.annotation.VisibleForTesting
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.autofill.api.email.EmailManager
@@ -98,6 +101,7 @@ import logcat.asLog
 import logcat.logcat
 import retrofit2.HttpException
 import java.io.IOException
+import java.math.BigDecimal
 import java.time.Duration
 import java.time.Instant
 import java.time.Period
@@ -434,12 +438,15 @@ class RealSubscriptionsManager @Inject constructor(
                 ?.formattedPrice ?: return@withContext null
 
             // Calculate monthly equivalent for yearly plan
-            val yearlyPrice = basePlans.find { it.planId in listOf(YEARLY_PLAN_US, YEARLY_PLAN_ROW) }
+            val (yearlyPriceAmount, yearlyPriceCurrency) = basePlans
+                .find { it.planId in listOf(YEARLY_PLAN_US, YEARLY_PLAN_ROW) }
                 ?.pricingPhases
                 ?.firstOrNull()
-                ?.formattedPrice ?: return@withContext null
+                ?.let { it.priceAmount to it.priceCurrency } ?: return@withContext null
 
-            val yearlyMonthlyEquivalent = calculateMonthlyEquivalent(yearlyPrice)
+            val yearlyMonthlyEquivalent = NumberFormat.getCurrencyInstance().format(
+                CurrencyAmount(yearlyPriceAmount / 12.toBigDecimal(), yearlyPriceCurrency),
+            )
 
             SwitchPlanPricingInfo(
                 currentPrice = currentPrice,
@@ -449,29 +456,6 @@ class RealSubscriptionsManager @Inject constructor(
         } catch (e: Exception) {
             logcat { "Subs: Failed to get switch plan pricing: ${e.message}" }
             null
-        }
-    }
-
-    private fun calculateMonthlyEquivalent(yearlyPrice: String): String {
-        return try {
-            // Extract currency symbol and numeric value
-            val numericValue = yearlyPrice.replace(Regex("[^0-9.,]"), "").replace(",", ".")
-            val currencySymbol = yearlyPrice.replace(Regex("[0-9.,\\s]"), "")
-
-            // Calculate monthly equivalent for yearly plan
-            val yearly = numericValue.toDoubleOrNull() ?: return yearlyPrice
-            val monthly = yearly / 12.0
-            val formattedMonthly = String.format("%.2f", monthly)
-
-            // Reconstruct with currency symbol
-            if (yearlyPrice.startsWith(currencySymbol)) {
-                "$currencySymbol$formattedMonthly"
-            } else {
-                "$formattedMonthly$currencySymbol"
-            }
-        } catch (e: Exception) {
-            logcat { "Subs: Failed to calculate monthly equivalent: ${e.message}" }
-            yearlyPrice
         }
     }
 
@@ -1017,9 +1001,10 @@ class RealSubscriptionsManager @Inject constructor(
                 availablePlans.map { offer ->
                     val pricingPhases = offer.pricingPhases.pricingPhaseList.map { phase ->
                         PricingPhase(
+                            priceAmount = BigDecimal.valueOf(phase.priceAmountMicros, 6),
+                            priceCurrency = Currency.getInstance(phase.priceCurrencyCode),
                             formattedPrice = phase.formattedPrice,
                             billingPeriod = phase.billingPeriod,
-
                         )
                     }
 
@@ -1368,6 +1353,8 @@ data class SubscriptionOffer(
 )
 
 data class PricingPhase(
+    val priceAmount: BigDecimal,
+    val priceCurrency: Currency,
     val formattedPrice: String,
     val billingPeriod: String,
 
