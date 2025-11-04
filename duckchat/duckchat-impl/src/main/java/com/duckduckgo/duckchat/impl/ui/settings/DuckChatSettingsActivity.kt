@@ -81,6 +81,11 @@ class DuckChatSettingsActivity : DuckDuckGoActivity() {
             updateWidgets()
         }
 
+    private val userEnabledDuckChatFullScreenModeListener =
+        CompoundButton.OnCheckedChangeListener { _, isChecked ->
+            viewModel.onDuckChatFullscreenModeToggled(isChecked)
+        }
+
     @Inject
     lateinit var globalActivityStarter: GlobalActivityStarter
 
@@ -189,6 +194,10 @@ class DuckChatSettingsActivity : DuckDuckGoActivity() {
         binding.duckAiInputScreenWithAiContainer.setOnClickListener {
             viewModel.onDuckAiInputScreenWithAiSelected()
         }
+
+        binding.duckAiFullScreenMode.isVisible = viewState.shouldShowFullScreenModeToggle
+        binding.duckAiFullScreenMode.updatePadding(left = offset)
+        binding.duckAiFullScreenMode.quietlySetIsChecked(viewState.isFullScreenModeEnabled, userEnabledDuckChatFullScreenModeListener)
     }
 
     private fun renderSearchSettingsSection(viewState: ViewState) {

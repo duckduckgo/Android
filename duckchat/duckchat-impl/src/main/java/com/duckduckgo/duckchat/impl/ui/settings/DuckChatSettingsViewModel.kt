@@ -63,14 +63,17 @@ class DuckChatSettingsViewModel @AssistedInject constructor(
         val shouldShowInputScreenToggle: Boolean = false,
         val isSearchSectionVisible: Boolean = true,
         val isHideGeneratedImagesOptionVisible: Boolean = false,
+        val shouldShowFullScreenModeToggle: Boolean = false,
+        val isFullScreenModeEnabled: Boolean = false,
     )
 
     val viewState =
         combine(
             duckChat.observeEnableDuckChatUserSetting(),
             duckChat.observeInputScreenUserSettingEnabled(),
+            duckChat.observeFullscreenModeUserSetting(),
             flowOf(settingsPageFeature.hideAiGeneratedImagesOption().isEnabled()).flowOn(dispatcherProvider.io()),
-        ) { isDuckChatUserEnabled, isInputScreenEnabled, isHideAiGeneratedImagesOptionVisible ->
+        ) { isDuckChatUserEnabled, isInputScreenEnabled, isFullScreenModeEnabled, isHideAiGeneratedImagesOptionVisible ->
             ViewState(
                 isDuckChatUserEnabled = isDuckChatUserEnabled,
                 isInputScreenEnabled = isInputScreenEnabled,
@@ -78,6 +81,8 @@ class DuckChatSettingsViewModel @AssistedInject constructor(
                 shouldShowInputScreenToggle = isDuckChatUserEnabled && duckChat.isInputScreenFeatureAvailable(),
                 isSearchSectionVisible = isSearchSectionVisible(duckChatActivityParams),
                 isHideGeneratedImagesOptionVisible = isHideAiGeneratedImagesOptionVisible,
+                shouldShowFullScreenModeToggle = duckChat.isDuckChatFeatureEnabled(),
+                isFullScreenModeEnabled = isFullScreenModeEnabled,
             )
         }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), ViewState())
 
@@ -192,6 +197,12 @@ class DuckChatSettingsViewModel @AssistedInject constructor(
     fun duckAiInputScreenShareFeedbackClicked() {
         viewModelScope.launch {
             commandChannel.send(Command.LaunchFeedback)
+        }
+    }
+
+    fun onDuckChatFullscreenModeToggled(checked: Boolean) {
+        viewModelScope.launch {
+            duckChat.setFullScreenModeUserSetting(checked)
         }
     }
 

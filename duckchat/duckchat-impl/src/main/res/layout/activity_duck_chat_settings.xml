@@ -195,6 +195,15 @@
                 app:typography="body2" />
 
             <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
+                android:id="@+id/duckAiFullScreenMode"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="gone"
+                app:showSwitch="true"
+                app:primaryText="@string/duckAiFullScreenModeTitle"
+                app:secondaryText="@string/duckAiFullScreenModeDescription" />
+
+            <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
                 android:id="@+id/duckAiShortcuts"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
