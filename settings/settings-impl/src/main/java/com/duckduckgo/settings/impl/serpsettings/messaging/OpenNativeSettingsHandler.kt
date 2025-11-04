@@ -23,7 +23,7 @@ import com.duckduckgo.common.utils.AppUrl
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.contentscopescripts.api.ContentScopeJsMessageHandlersPlugin
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.duckchat.api.DuckChatSettingsNoParams
+import com.duckduckgo.duckchat.api.DuckChatNativeSettingsNoParams
 import com.duckduckgo.js.messaging.api.JsMessage
 import com.duckduckgo.js.messaging.api.JsMessageCallback
 import com.duckduckgo.js.messaging.api.JsMessageHandler
@@ -63,7 +63,7 @@ class OpenNativeSettingsHandler @Inject constructor(
 
                         when (val screenParam = params.optString("screen", "")) {
                             AI_FEATURES_SCREEN_NAME -> {
-                                val intent = globalActivityStarter.startIntent(context, DuckChatSettingsNoParams)
+                                val intent = globalActivityStarter.startIntent(context, DuckChatNativeSettingsNoParams)
                                 intent?.flags = Intent.FLAG_ACTIVITY_NEW_TASK
                                 context.startActivity(intent)
                             }

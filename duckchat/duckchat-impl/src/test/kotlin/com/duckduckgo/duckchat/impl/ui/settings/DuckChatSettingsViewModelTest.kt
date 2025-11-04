@@ -19,6 +19,8 @@ package com.duckduckgo.duckchat.impl.ui.settings
 import app.cash.turbine.test
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.duckchat.api.DuckChatNativeSettingsNoParams
+import com.duckduckgo.duckchat.api.DuckChatSettingsNoParams
 import com.duckduckgo.duckchat.impl.DuckChatInternal
 import com.duckduckgo.duckchat.impl.R
 import com.duckduckgo.duckchat.impl.inputscreen.ui.metrics.discovery.InputScreenDiscoveryFunnel
@@ -64,6 +66,7 @@ class DuckChatSettingsViewModelTest {
             whenever(duckChat.observeShowInAddressBarUserSetting()).thenReturn(flowOf(false))
             whenever(duckChat.observeInputScreenUserSettingEnabled()).thenReturn(flowOf(false))
             testee = DuckChatSettingsViewModel(
+                duckChatActivityParams = DuckChatSettingsNoParams,
                 duckChat = duckChat,
                 pixel = mockPixel,
                 inputScreenDiscoveryFunnel = mockInputScreenDiscoveryFunnel,
@@ -147,6 +150,7 @@ class DuckChatSettingsViewModelTest {
         runTest {
             whenever(duckChat.observeInputScreenUserSettingEnabled()).thenReturn(flowOf(true))
             testee = DuckChatSettingsViewModel(
+                duckChatActivityParams = DuckChatSettingsNoParams,
                 duckChat = duckChat,
                 pixel = mockPixel,
                 inputScreenDiscoveryFunnel = mockInputScreenDiscoveryFunnel,
@@ -164,6 +168,7 @@ class DuckChatSettingsViewModelTest {
         runTest {
             whenever(duckChat.observeInputScreenUserSettingEnabled()).thenReturn(flowOf(false))
             testee = DuckChatSettingsViewModel(
+                duckChatActivityParams = DuckChatSettingsNoParams,
                 duckChat = duckChat,
                 pixel = mockPixel,
                 inputScreenDiscoveryFunnel = mockInputScreenDiscoveryFunnel,
@@ -182,6 +187,7 @@ class DuckChatSettingsViewModelTest {
             whenever(duckChat.observeEnableDuckChatUserSetting()).thenReturn(flowOf(true))
             whenever(duckChat.isInputScreenFeatureAvailable()).thenReturn(true)
             testee = DuckChatSettingsViewModel(
+                duckChatActivityParams = DuckChatSettingsNoParams,
                 duckChat = duckChat,
                 pixel = mockPixel,
                 inputScreenDiscoveryFunnel = mockInputScreenDiscoveryFunnel,
@@ -201,6 +207,7 @@ class DuckChatSettingsViewModelTest {
             whenever(duckChat.observeEnableDuckChatUserSetting()).thenReturn(flowOf(true))
             whenever(duckChat.isInputScreenFeatureAvailable()).thenReturn(false)
             testee = DuckChatSettingsViewModel(
+                duckChatActivityParams = DuckChatSettingsNoParams,
                 duckChat = duckChat,
                 pixel = mockPixel,
                 inputScreenDiscoveryFunnel = mockInputScreenDiscoveryFunnel,
@@ -220,6 +227,7 @@ class DuckChatSettingsViewModelTest {
             whenever(duckChat.observeEnableDuckChatUserSetting()).thenReturn(flowOf(false))
             whenever(duckChat.observeInputScreenUserSettingEnabled()).thenReturn(flowOf(true))
             testee = DuckChatSettingsViewModel(
+                duckChatActivityParams = DuckChatSettingsNoParams,
                 duckChat = duckChat,
                 pixel = mockPixel,
                 inputScreenDiscoveryFunnel = mockInputScreenDiscoveryFunnel,
@@ -381,6 +389,7 @@ class DuckChatSettingsViewModelTest {
             @Suppress("DenyListedApi")
             settingsPageFeature.hideAiGeneratedImagesOption().setRawStoredState(State(enable = true))
             testee = DuckChatSettingsViewModel(
+                duckChatActivityParams = DuckChatSettingsNoParams,
                 duckChat = duckChat,
                 pixel = mockPixel,
                 inputScreenDiscoveryFunnel = mockInputScreenDiscoveryFunnel,
@@ -400,6 +409,7 @@ class DuckChatSettingsViewModelTest {
             @Suppress("DenyListedApi")
             settingsPageFeature.hideAiGeneratedImagesOption().setRawStoredState(State(enable = false))
             testee = DuckChatSettingsViewModel(
+                duckChatActivityParams = DuckChatSettingsNoParams,
                 duckChat = duckChat,
                 pixel = mockPixel,
                 inputScreenDiscoveryFunnel = mockInputScreenDiscoveryFunnel,
@@ -410,6 +420,42 @@ class DuckChatSettingsViewModelTest {
             testee.viewState.test {
                 val state = awaitItem()
                 assertFalse(state.isHideGeneratedImagesOptionVisible)
+            }
+        }
+
+    @Test
+    fun `when DuckChatSettingsNoParams passed then viewState shows search section visible`() =
+        runTest {
+            testee = DuckChatSettingsViewModel(
+                duckChatActivityParams = DuckChatSettingsNoParams,
+                duckChat = duckChat,
+                pixel = mockPixel,
+                inputScreenDiscoveryFunnel = mockInputScreenDiscoveryFunnel,
+                settingsPageFeature = settingsPageFeature,
+                dispatcherProvider = coroutineRule.testDispatcherProvider,
+            )
+
+            testee.viewState.test {
+                val state = awaitItem()
+                assertTrue(state.isSearchSectionVisible)
+            }
+        }
+
+    @Test
+    fun `when DuckChatNativeSettingsNoParams passed then viewState shows search section hidden`() =
+        runTest {
+            testee = DuckChatSettingsViewModel(
+                duckChatActivityParams = DuckChatNativeSettingsNoParams,
+                duckChat = duckChat,
+                pixel = mockPixel,
+                inputScreenDiscoveryFunnel = mockInputScreenDiscoveryFunnel,
+                settingsPageFeature = settingsPageFeature,
+                dispatcherProvider = coroutineRule.testDispatcherProvider,
+            )
+
+            testee.viewState.test {
+                val state = awaitItem()
+                assertFalse(state.isSearchSectionVisible)
             }
         }
 }
