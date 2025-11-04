@@ -930,7 +930,10 @@ class BrowserTabFragment :
                 }
 
                 InputScreenActivityResultCodes.MENU_REQUESTED -> {
-                    launchPopupMenu(omnibarFeatureRepository.isSplitOmnibarEnabled)
+                    launchPopupMenu(
+                        anchorToNavigationBar = omnibarFeatureRepository.isSplitOmnibarEnabled,
+                        addExtraDelay = omnibarFeatureRepository.isSplitOmnibarEnabled,
+                    )
                 }
 
                 InputScreenActivityResultCodes.TAB_SWITCHER_REQUESTED -> {
@@ -1425,11 +1428,12 @@ class BrowserTabFragment :
         startActivity(intent)
     }
 
-    private fun launchPopupMenu(anchorToNavigationBar: Boolean) {
+    private fun launchPopupMenu(anchorToNavigationBar: Boolean, addExtraDelay: Boolean = false) {
         val isFocusedNtp = omnibar.viewMode == ViewMode.NewTab && omnibar.getText().isEmpty() && omnibar.omnibarTextInput.hasFocus()
 
+        val delay = if (addExtraDelay) POPUP_MENU_DELAY * 2 else POPUP_MENU_DELAY
         // small delay added to let keyboard disappear and avoid jarring transition
-        binding.rootView.postDelayed(POPUP_MENU_DELAY) {
+        binding.rootView.postDelayed(delay) {
             if (isAdded) {
                 // Check if VPN menu item will be shown to non-subscribed user and increment count
                 val currentViewState = viewModel.browserViewState.value
