@@ -46,7 +46,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
                 android:layout_marginTop="@dimen/keyline_4"
-                android:src="@drawable/ic_privacy_pro_settings_hero" />
+                android:src="@drawable/ic_subscription_128" />
 
             <com.duckduckgo.common.ui.view.text.DaxTextView
                 android:id="@+id/subscriptionSettingsProductName"
