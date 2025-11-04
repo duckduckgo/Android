@@ -73,6 +73,9 @@ class RealWebViewCompatTestHelper @Inject constructor(
         val replyToInitialPing: Boolean,
         val jsSendsInitialPing: Boolean,
         val jsRepliesToNativeMessages: Boolean,
+        val sendMessageOnPageStarted: Boolean,
+        val sendMessageOnContextMenuOpen: Boolean,
+        val sendMessagesUsingReplyProxy: Boolean,
     )
 
     private var cachedConfig: WebViewCompatConfig? = null
@@ -89,6 +92,9 @@ class RealWebViewCompatTestHelper @Inject constructor(
                 replyToInitialPing = webViewCompatFeature.replyToInitialPing().isEnabled(),
                 jsSendsInitialPing = webViewCompatFeature.jsSendsInitialPing().isEnabled(),
                 jsRepliesToNativeMessages = webViewCompatFeature.jsRepliesToNativeMessages().isEnabled(),
+                sendMessageOnPageStarted = webViewCompatFeature.sendMessageOnPageStarted().isEnabled(),
+                sendMessageOnContextMenuOpen = webViewCompatFeature.sendMessageOnContextMenuOpen().isEnabled(),
+                sendMessagesUsingReplyProxy = webViewCompatFeature.sendMessagesUsingReplyProxy().isEnabled(),
             ).also {
                 cachedConfig = it
             }
@@ -161,16 +167,11 @@ class RealWebViewCompatTestHelper @Inject constructor(
     @SuppressLint("PostMessageUsage", "RequiresFeature")
     override suspend fun onPageStarted(webView: DuckDuckGoWebView?) {
         withContext(dispatchers.main()) {
-            val flags = withContext(dispatchers.io()) {
-                object {
-                    val sendMessageOnPageStarted = webViewCompatFeature.sendMessageOnPageStarted().isEnabled()
-                    val sendMessagesUsingReplyProxy = webViewCompatFeature.sendMessagesUsingReplyProxy().isEnabled()
-                }
-            }
+            val config = getWebViewCompatConfig()
 
-            if (!flags.sendMessageOnPageStarted) return@withContext
+            if (!config.sendMessageOnPageStarted) return@withContext
 
-            if (flags.sendMessagesUsingReplyProxy) {
+            if (config.sendMessagesUsingReplyProxy) {
                 postMessage("PageStarted")
             } else {
                 webView?.url?.let {
@@ -187,16 +188,11 @@ class RealWebViewCompatTestHelper @Inject constructor(
     @SuppressLint("RequiresFeature")
     override suspend fun onBrowserMenuButtonPressed(webView: DuckDuckGoWebView?) {
         withContext(dispatchers.main()) {
-            val flags = withContext(dispatchers.io()) {
-                object {
-                    val sendMessageOnContextMenuOpen = webViewCompatFeature.sendMessageOnContextMenuOpen().isEnabled()
-                    val sendMessagesUsingReplyProxy = webViewCompatFeature.sendMessagesUsingReplyProxy().isEnabled()
-                }
-            }
+            val config = getWebViewCompatConfig()
 
-            if (!flags.sendMessageOnContextMenuOpen) return@withContext
+            if (!config.sendMessageOnContextMenuOpen) return@withContext
 
-            if (flags.sendMessagesUsingReplyProxy) {
+            if (config.sendMessagesUsingReplyProxy) {
                 postMessage("ContextMenuOpened")
             } else {
                 webView?.url?.let {
