@@ -171,13 +171,15 @@ class RealWebViewCompatTestHelper @Inject constructor(
 
             if (!config.sendMessageOnPageStarted) return@withContext
 
+            val messageData = "PageStarted"
+
             if (config.sendMessagesUsingReplyProxy) {
-                postMessage("PageStarted")
+                postMessage(messageData)
             } else {
                 webView?.url?.let {
                     WebViewCompat.postWebMessage(
                         webView,
-                        WebMessageCompat("PageStarted"),
+                        WebMessageCompat(messageData),
                         it.toUri(),
                     )
                 }
@@ -192,13 +194,15 @@ class RealWebViewCompatTestHelper @Inject constructor(
 
             if (!config.sendMessageOnContextMenuOpen) return@withContext
 
+            val messageData = "ContextMenuOpened"
+
             if (config.sendMessagesUsingReplyProxy) {
-                postMessage("ContextMenuOpened")
+                postMessage(messageData)
             } else {
                 webView?.url?.let {
                     WebViewCompat.postWebMessage(
                         webView,
-                        WebMessageCompat("ContextMenuOpened"),
+                        WebMessageCompat(messageData),
                         it.toUri(),
                     )
                 }

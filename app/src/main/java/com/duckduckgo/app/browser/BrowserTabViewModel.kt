@@ -1972,6 +1972,8 @@ class BrowserTabViewModel @Inject constructor(
                 maliciousSiteBlocked = false,
             )
         navigationStateChanged(webViewNavigationState)
+
+        command.postValue(Command.PageStarted)
     }
 
     override fun onSitePermissionRequested(

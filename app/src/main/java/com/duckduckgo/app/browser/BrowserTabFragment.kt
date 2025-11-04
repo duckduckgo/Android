@@ -1266,6 +1266,12 @@ class BrowserTabFragment :
         }
     }
 
+    private fun onPageStarted() {
+        lifecycleScope.launch(dispatchers.main()) {
+            webViewCompatTestHelper.onPageStarted(webView)
+        }
+    }
+
     private fun onOmnibarPrivacyShieldButtonPressed() {
         contentScopeScripts.sendSubscriptionEvent(createBreakageReportingEventData())
         launchPrivacyDashboard(toggle = false)
@@ -2348,6 +2354,7 @@ class BrowserTabFragment :
 
             is Command.SubmitChat -> duckChat.openDuckChatWithAutoPrompt(it.query)
             is Command.EnqueueCookiesAnimation -> enqueueCookiesAnimation(it.isCosmetic)
+            is Command.PageStarted -> onPageStarted()
         }
     }
 
