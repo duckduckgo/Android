@@ -329,7 +329,7 @@ import com.duckduckgo.savedsites.api.models.SavedSitesNames
 import com.duckduckgo.savedsites.impl.bookmarks.BookmarksBottomSheetDialog
 import com.duckduckgo.savedsites.impl.bookmarks.FaviconPromptSheet
 import com.duckduckgo.savedsites.impl.dialogs.EditSavedSiteDialogFragment
-import com.duckduckgo.serp.logos.api.SerpLogoScreens.*
+import com.duckduckgo.serp.logos.api.SerpLogoScreens.EasterEggLogoScreen
 import com.duckduckgo.serp.logos.api.SerpLogos
 import com.duckduckgo.site.permissions.api.SitePermissionsDialogLauncher
 import com.duckduckgo.site.permissions.api.SitePermissionsGrantedListener
@@ -598,6 +598,9 @@ class BrowserTabFragment :
 
     @Inject
     lateinit var omnibarFeatureRepository: OmnibarFeatureRepository
+
+    @Inject
+    lateinit var webViewCompatTestHelper: WebViewCompatTestHelper
 
     /**
      * We use this to monitor whether the user was seeing the in-context Email Protection signup prompt
@@ -3246,6 +3249,9 @@ class BrowserTabFragment :
                 onInContextEmailProtectionSignupPromptShown = { showNativeInContextEmailProtectionSignupPrompt() },
             )
             configureWebViewForBlobDownload(it)
+            lifecycleScope.launch {
+                webViewCompatTestHelper.configureWebViewForWebViewCompatTest(it)
+            }
             configureWebViewForAutofill(it)
             printInjector.addJsInterface(it) { viewModel.printFromWebView() }
             autoconsent.addJsInterface(it, autoconsentCallback)
