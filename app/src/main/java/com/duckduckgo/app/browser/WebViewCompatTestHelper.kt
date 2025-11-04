@@ -47,19 +47,19 @@ class RealWebViewCompatTestHelper @Inject constructor(
     private val adapter = moshi.adapter(WebViewCompatFeatureSettings::class.java)
 
     override suspend fun configureWebViewForWebViewCompatTest(webView: DuckDuckGoWebView) {
+        val script = withContext(dispatchers.io()) {
+            if (!webViewCompatFeature.self().isEnabled()) return@withContext null
+
+            val webViewCompatSettings = webViewCompatFeature.self().getSettings()?.let {
+                adapter.fromJson(it)
+            }
+            webView.resources?.openRawResource(R.raw.webviewcompat_test_script)?.bufferedReader().use { it?.readText() }.orEmpty()
+                .replace(delay, webViewCompatSettings?.jsInitialPingDelay?.toString() ?: "0")
+                .replace(postInitialPing, webViewCompatFeature.jsSendsInitialPing().isEnabled().toString())
+                .replace(replyToNativeMessages, webViewCompatFeature.jsRepliesToNativeMessages().isEnabled().toString())
+        } ?: return
+
         withContext(dispatchers.main()) {
-            val script = withContext(dispatchers.io()) {
-                if (!webViewCompatFeature.self().isEnabled()) return@withContext null
-
-                val webViewCompatSettings = webViewCompatFeature.self().getSettings()?.let {
-                    adapter.fromJson(it)
-                }
-                webView.resources?.openRawResource(R.raw.webviewcompat_test_script)?.bufferedReader().use { it?.readText() }.orEmpty()
-                    .replace(delay, webViewCompatSettings?.jsInitialPingDelay?.toString() ?: "0")
-                    .replace(postInitialPing, webViewCompatFeature.jsSendsInitialPing().isEnabled().toString())
-                    .replace(replyToNativeMessages, webViewCompatFeature.jsRepliesToNativeMessages().isEnabled().toString())
-            } ?: return@withContext
-
             webViewCompatWrapper.addDocumentStartJavaScript(webView, script, setOf("*"))
         }
     }
