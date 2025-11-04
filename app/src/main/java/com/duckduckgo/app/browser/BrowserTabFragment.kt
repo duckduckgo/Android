@@ -3389,9 +3389,9 @@ class BrowserTabFragment :
     private fun configureWebViewForBlobDownload(webView: DuckDuckGoWebView) {
         lifecycleScope.launch(dispatchers.main()) {
             if (isBlobDownloadWebViewFeatureEnabled(webView)) {
-                val useDedicatedWebViewCompatMessageListener = webViewCompatTestHelper.useDedicatedWebMessageListener()
+                val webViewCompatUsesBlobDownloadsMessageListener = webViewCompatTestHelper.useBlobDownloadsMessageListener()
 
-                val script = if (useDedicatedWebViewCompatMessageListener) {
+                val script = if (!webViewCompatUsesBlobDownloadsMessageListener) {
                     blobDownloadScript()
                 } else {
                     blobDownloadScriptForWebViewCompatTest()
@@ -3420,7 +3420,7 @@ class BrowserTabFragment :
                                         .md5()
                                         .toString()
                                 viewModel.saveReplyProxyForBlobDownload(sourceOrigin.toString(), replyProxy, locationRef)
-                            } else if (!useDedicatedWebViewCompatMessageListener && message.data?.startsWith("webViewCompat") == true) {
+                            } else if (webViewCompatUsesBlobDownloadsMessageListener && message.data?.startsWith("webViewCompat") == true) {
                                 lifecycleScope.launch {
                                     webViewCompatTestHelper.handleWebViewCompatMessage(
                                         message = message,

@@ -48,7 +48,7 @@ interface WebViewCompatTestHelper {
         replyProxy: JavaScriptReplyProxy,
     )
 
-    suspend fun useDedicatedWebMessageListener(): Boolean
+    suspend fun useBlobDownloadsMessageListener(): Boolean
 
     suspend fun onPageStarted(webView: DuckDuckGoWebView?)
     suspend fun onBrowserMenuButtonPressed(webView: DuckDuckGoWebView?)
@@ -69,7 +69,7 @@ class RealWebViewCompatTestHelper @Inject constructor(
 
     data class WebViewCompatConfig(
         val settings: WebViewCompatFeatureSettings?,
-        val dedicatedMessageListener: Boolean,
+        val useBlobDownloadsMessageListener: Boolean,
         val replyToInitialPing: Boolean,
         val jsSendsInitialPing: Boolean,
         val jsRepliesToNativeMessages: Boolean,
@@ -77,17 +77,15 @@ class RealWebViewCompatTestHelper @Inject constructor(
 
     private var cachedConfig: WebViewCompatConfig? = null
 
-    private suspend fun getWebViewCompatConfig(): WebViewCompatConfig? {
+    private suspend fun getWebViewCompatConfig(): WebViewCompatConfig {
         cachedConfig?.let { return it }
 
         return withContext(dispatchers.io()) {
-            if (!webViewCompatFeature.self().isEnabled()) return@withContext null
-
             WebViewCompatConfig(
                 settings = webViewCompatFeature.self().getSettings()?.let {
                     adapter.fromJson(it)
                 },
-                dedicatedMessageListener = webViewCompatFeature.dedicatedMessageListener().isEnabled(),
+                useBlobDownloadsMessageListener = webViewCompatFeature.useBlobDownloadsMessageListener().isEnabled(),
                 replyToInitialPing = webViewCompatFeature.replyToInitialPing().isEnabled(),
                 jsSendsInitialPing = webViewCompatFeature.jsSendsInitialPing().isEnabled(),
                 jsRepliesToNativeMessages = webViewCompatFeature.jsRepliesToNativeMessages().isEnabled(),
@@ -98,11 +96,12 @@ class RealWebViewCompatTestHelper @Inject constructor(
     }
 
     override suspend fun configureWebViewForWebViewCompatTest(webView: DuckDuckGoWebView, isBlobDownloadWebViewFeatureEnabled: Boolean) {
-        val config = getWebViewCompatConfig() ?: return
+        val config = getWebViewCompatConfig()
 
-        val useDedicatedListener = config.dedicatedMessageListener || !isBlobDownloadWebViewFeatureEnabled
+        val useDedicatedListener = !config.useBlobDownloadsMessageListener || !isBlobDownloadWebViewFeatureEnabled
 
         val script = withContext(dispatchers.io()) {
+            if (!webViewCompatFeature.self().isEnabled()) return@withContext null
             webView.context.resources?.openRawResource(R.raw.webviewcompat_test_script)
                 ?.bufferedReader().use { it?.readText() }
                 ?.replace(delay, config.settings?.jsInitialPingDelay?.toString() ?: "0")
@@ -131,7 +130,7 @@ class RealWebViewCompatTestHelper @Inject constructor(
     @SuppressLint("PostMessageUsage", "RequiresFeature")
     private suspend fun postMessage(string: String) {
         withContext(dispatchers.main()) {
-            proxy?.postMessage("PageStarted")
+            proxy?.postMessage(string)
         }
     }
 
@@ -142,22 +141,21 @@ class RealWebViewCompatTestHelper @Inject constructor(
     ) {
         withContext(dispatchers.io()) {
             if (message.data?.startsWith("webViewCompat Ping:") != true) return@withContext
-            getWebViewCompatConfig()?.let { cfg ->
-                proxy = replyProxy
-                if (cfg.replyToInitialPing) {
-                    cfg.settings?.initialPingDelay?.takeIf { it > 0 }?.let {
-                        delay(it)
-                    }
-                    withContext(dispatchers.main()) {
-                        replyProxy.postMessage("Pong from Native")
-                    }
+            val cfg = getWebViewCompatConfig()
+            proxy = replyProxy
+            if (cfg.replyToInitialPing) {
+                cfg.settings?.initialPingDelay?.takeIf { it > 0 }?.let {
+                    delay(it)
+                }
+                withContext(dispatchers.main()) {
+                    replyProxy.postMessage("Pong from Native")
                 }
             }
         }
     }
 
-    override suspend fun useDedicatedWebMessageListener(): Boolean {
-        return withContext(dispatchers.io()) { getWebViewCompatConfig()?.dedicatedMessageListener ?: true }
+    override suspend fun useBlobDownloadsMessageListener(): Boolean {
+        return withContext(dispatchers.io()) { getWebViewCompatConfig().useBlobDownloadsMessageListener }
     }
 
     @SuppressLint("PostMessageUsage", "RequiresFeature")

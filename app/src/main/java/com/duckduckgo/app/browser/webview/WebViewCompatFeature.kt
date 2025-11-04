@@ -40,7 +40,7 @@ interface WebViewCompatFeature {
     fun replyToInitialPing(): Toggle
 
     @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
-    fun dedicatedMessageListener(): Toggle
+    fun useBlobDownloadsMessageListener(): Toggle
 
     @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
     fun sendMessageOnContextMenuOpen(): Toggle
