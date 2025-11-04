@@ -1,5 +1,4 @@
 (function() {
-    // Capture the injected object immediately
     const ddgObj = window.$OBJECT_NAME$;
 
     const supportedMessages = ["ContextMenuOpened", "PageStarted"];
@@ -13,7 +12,7 @@
 
 
     if (postInitialPing) {
-     if (delay > 0) {
+        if (delay > 0) {
             setTimeout(() => {
                 ddgObj.postMessage(webViewCompatPingMessage)
             }, delay)
