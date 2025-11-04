@@ -80,6 +80,7 @@ class FireDialog(
     private lateinit var binding: SheetFireClearDataBinding
 
     var clearStarted: (() -> Unit) = {}
+    var clearFinished: (() -> Unit) = {}
 
     private val accelerateAnimatorUpdateListener = object : ValueAnimator.AnimatorUpdateListener {
         override fun onAnimationUpdate(animation: ValueAnimator) {
@@ -181,6 +182,7 @@ class FireDialog(
             clearPersonalDataAction.clearTabsAndAllDataAsync(appInForeground = true, shouldFireDataClearPixel = true)
             clearPersonalDataAction.setAppUsedSinceLastClearFlag(false)
             onFireDialogClearAllEvent(ClearAllDataFinished)
+            clearFinished()
         }
     }
 
@@ -232,7 +234,7 @@ class FireDialog(
                 binding.fireAnimationView.addAnimatorUpdateListener(accelerateAnimatorUpdateListener)
             }
         } else {
-            clearPersonalDataAction.killAndRestartProcess(notifyDataCleared = false, enableTransitionAnimation = false)
+            // clearPersonalDataAction.killAndRestartProcess(notifyDataCleared = false, enableTransitionAnimation = false)
         }
     }
 

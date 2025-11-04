@@ -1257,6 +1257,8 @@ class BrowserTabFragment :
 
         // tabRepository.deleteBrowsingData()
         // Toast.makeText(requireContext(), "Browsing data deleted.", Toast.LENGTH_LONG).show()
+        // test++
+        // requireActivity().recreate()
         // return
         
         val isFocusedNtp = omnibar.viewMode == ViewMode.NewTab && omnibar.getText().isEmpty() && omnibar.omnibarTextInput.hasFocus()
@@ -3174,11 +3176,9 @@ class BrowserTabFragment :
 
         webView?.let {
             logcat { "lp_test; tabId: $tabId" }
-            val profileName = tabRepository.getTabProfileName(tabId)
-            logcat { "lp_test; profileName: ${profileName}" }
-            if (profileName != null) {
-                WebViewCompat.setProfile(it, profileName)
-            }
+            val profileName = tabRepository.getTabProfileName(tabId) ?: tabRepository.getDefaultProfileName()
+            logcat { "lp_test; profileName: $profileName" }
+            WebViewCompat.setProfile(it, profileName)
             it.isSafeWebViewEnabled = safeWebViewFeature.self().isEnabled()
             it.webViewClient = webViewClient
             it.webChromeClient = webChromeClient
@@ -5155,3 +5155,5 @@ private class JsOrientationHandler {
         const val NO_ACTIVITY_ERROR = """{"failure":{"name":"InvalidStateError","message":"The page is not tied to an activity"}}"""
     }
 }
+
+var test = 0

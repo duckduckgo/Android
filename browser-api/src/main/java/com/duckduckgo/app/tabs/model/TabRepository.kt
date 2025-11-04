@@ -156,4 +156,8 @@ interface TabRepository {
     )
 
     fun deleteBrowsingData()
+
+    fun getDefaultProfileName(): String
+
+    suspend fun createNewDefaultProfile()
 }

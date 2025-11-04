@@ -89,6 +89,7 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter
 import com.duckduckgo.app.tabs.TabManagerFeatureFlags
 import com.duckduckgo.app.tabs.model.TabEntity
+import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.tabs.ui.DefaultSnackbar
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.autofill.api.emailprotection.EmailProtectionLinkVerifier
@@ -135,6 +136,9 @@ import javax.inject.Inject
 // open class so that we can test BrowserApplicationStateInfo
 @InjectWith(ActivityScope::class)
 open class BrowserActivity : DuckDuckGoActivity() {
+    @Inject
+    lateinit var tabRepository: TabRepository
+
     @Inject
     lateinit var settingsDataStore: SettingsDataStore
 
@@ -818,6 +822,13 @@ open class BrowserActivity : DuckDuckGoActivity() {
         dialog.clearStarted = {
             isDataClearingInProgress = true
             removeObservers()
+        }
+        dialog.clearFinished = {
+            lifecycleScope.launch {
+                tabRepository.createNewDefaultProfile()
+                dialog.dismiss()
+                recreate()
+            }
         }
         dialog.show()
     }

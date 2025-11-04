@@ -17,6 +17,7 @@
 package com.duckduckgo.app.tabs.model
 
 import android.net.Uri
+import androidx.annotation.MainThread
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.asFlow
@@ -30,6 +31,7 @@ import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
 import com.duckduckgo.app.browser.tabpreview.WebViewPreviewPersister
 import com.duckduckgo.app.di.AppCoroutineScope
+import com.duckduckgo.app.fire.FireproofRepository
 import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.global.model.SiteFactory
 import com.duckduckgo.app.tabs.TabManagerFeatureFlags
@@ -73,6 +75,7 @@ class TabDataRepository @Inject constructor(
     private val adClickManager: AdClickManager,
     private val webViewSessionStorage: WebViewSessionStorage,
     private val tabManagerFeatureFlags: TabManagerFeatureFlags,
+    private val fireproofRepository: FireproofRepository,
 ) : TabRepository {
 
     private fun webViewMultiProfileSupported() = WebViewFeature.isFeatureSupported(WebViewFeature.MULTI_PROFILE)
@@ -621,6 +624,27 @@ class TabDataRepository @Inject constructor(
                             "lp_test; All web storage data removed for profile: $profileName"
                         }
                     }
+                }
+            }
+        }
+    }
+
+    private var defaultProfileName = "Default"
+
+    override fun getDefaultProfileName(): String {
+        return defaultProfileName
+    }
+
+    override suspend fun createNewDefaultProfile() = withContext(dispatchers.main()) {
+        val oldProfile = profileStore?.getProfile(defaultProfileName)
+        defaultProfileName = "ddg_default"
+        val newProfile = profileStore?.getOrCreateProfile(defaultProfileName)
+        val websites = withContext(dispatchers.io()) { fireproofRepository.fireproofWebsites() }
+        websites.forEach { website ->
+            oldProfile?.cookieManager?.getCookie(website)?.split("; ")?.forEach { cookie ->
+                logcat { "lp_test; Setting cookie from '${oldProfile?.name}' to '${newProfile?.name}' for $website: $cookie" }
+                newProfile?.cookieManager?.setCookie(website, cookie) {
+                    logcat { "lp_test; Cookie set result: $it" }
                 }
             }
         }
