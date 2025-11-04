@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Copyright (c) 2025 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingTop="12dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/rounded_top_corners_bottom_sheet_drawable"
+        android:orientation="vertical"
+        android:paddingBottom="16dp">
+
+        <ImageView
+            android:id="@+id/switchBottomSheetDialogCloseButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end"
+            android:layout_marginHorizontal="2dp"
+            android:background="?selectableItemBackground"
+            android:padding="10dp"
+            android:visibility="visible"
+            app:srcCompat="@drawable/ic_close_24"
+            tools:ignore="ContentDescription" />
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="20dp"
+            app:srcCompat="@drawable/ic_discount_128"
+            tools:ignore="ContentDescription" />
+
+        <com.duckduckgo.common.ui.view.text.DaxTextView
+            android:id="@+id/switchBottomSheetDialogTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/keyline_5"
+            android:gravity="center"
+            android:paddingHorizontal="@dimen/keyline_5"
+            app:textType="primary"
+            app:typography="h1"
+            tools:text="@string/switchBottomSheetTitleUpgrade" />
+
+        <com.duckduckgo.common.ui.view.text.DaxTextView
+            android:id="@+id/switchBottomSheetDialogSubTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/keyline_5"
+            android:gravity="center"
+            android:paddingHorizontal="@dimen/keyline_5"
+            app:textType="primary"
+            app:typography="body1"
+            tools:text="@string/switchBottomSheetDescriptionUpgrade" />
+
+        <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
+            android:id="@+id/switchBottomSheetDialogPrimaryButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="@dimen/keyline_5"
+            android:layout_marginTop="36dp"
+            app:daxButtonSize="large"
+            tools:text="@string/switchBottomSheetPrimaryButtonUpgrade" />
+
+        <com.duckduckgo.common.ui.view.button.DaxButtonSecondary
+            android:id="@+id/switchBottomSheetDialogSecondaryButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="@dimen/keyline_5"
+            android:layout_marginTop="@dimen/keyline_2"
+            android:text="@string/switchBottomSheetSecondaryButtonUpgrade"
+            app:daxButtonSize="large" />
+
+    </LinearLayout>
+</ScrollView>
