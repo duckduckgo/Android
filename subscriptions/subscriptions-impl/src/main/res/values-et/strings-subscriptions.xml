@@ -84,6 +84,11 @@
     <string name="subscriptionSettingSectionHelpAndSupport">Abi ja tugi</string>
     <string name="subscriptionSettingSendFeedback">Saada tagasisidet</string>
     <string name="subscriptionSettingActivating">Aktiveerimine</string>
+    <string name="subscriptionSettingSwitchUpgrade">Mine üle aastasele plaanile ja säästa 16%</string>
+    <!-- smartling.character_limit = 10 -->
+    <string name="subscriptionSettingSwitchUpgradePill">Parim hind</string>
+    <string name="subscriptionSettingSwitchDowngrade">Vaheta plaani</string>
+    <string name="subscriptionSettingManagePlan">Makse haldamine</string>
 
     <!--Purchase Subscriptions-->
     <string name="purchaseCompletedTitle">Kõik on valmis.</string>
@@ -191,5 +196,15 @@
     <string name="subscriptionSettingSubscribeSecure">Muuda oma Wi-Fi turvaliseks ja vestle privaatselt täiustatud tehisintellekti mudelitega</string>
 
     <string name="feedbackGeneralSubscription">Püsitellimus</string>
+
+    <!-- Switch plan-->
+    <string name="switchBottomSheetTitleUpgrade">Säästa 16% aastase plaaniga!</string>
+    <string name="switchBottomSheetDescriptionUpgrade" instruction="%1$s is the yearly plan monthly equivalent price (e.g. $8.33), %2$s is the current monthly plan price (e.g. $9.99)">Aastaplaan on vaid %1$s/kuu, võrreldes sinu praeguse %2$s kuuplaaniga.</string>
+    <string name="switchBottomSheetPrimaryButtonUpgrade" instruction="%1$s is the yearly plan price (e.g. $99.99)">Mine üle aastasele plaanile (%1$s/aasta)</string>
+    <string name="switchBottomSheetSecondaryButtonUpgrade">Jätka igakuise plaaniga</string>
+    <string name="switchBottomSheetTitleDowngrade">Sa säästad\naastase plaaniga 16%!</string>
+    <string name="switchBottomSheetDescriptionDowngrade" instruction="%1$s is the yearly plan monthly equivalent price (e.g. $8.33), %2$s is the monthly plan price (e.g. $9.99)">Üleminek suurendab sinu igakuist hinda hinnalt %1$s/kuus hinnale %2$s/kuus.</string>
+    <string name="switchBottomSheetPrimaryButtonDowngrade">Jätka aastaplaaniga</string>
+    <string name="switchBottomSheetSecondaryButtonDowngrade" instruction="%1$s is the monthly plan price (e.g. $9.99)">Mine üle igakuisele plaanile (%1$s/kuu)</string>
 
 </resources>
