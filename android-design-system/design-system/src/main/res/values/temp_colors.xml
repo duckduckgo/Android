@@ -105,7 +105,7 @@
     <color name="bbColorPreonboardingOptionIconSelected">#2373D5</color>
     <color name="bbColorPreonboardingOptionIcon">#27251F</color>
 
-    <!-- Input Screen -->
+    <!-- Input Mode Tab Layout -->
     <color name="daxColorBackdropDark">#080808</color>
     <color name="daxColorBackdropLight">#E0E0E0</color>
 

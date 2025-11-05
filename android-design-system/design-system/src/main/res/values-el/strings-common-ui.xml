@@ -38,7 +38,7 @@
     <string name="on">Ενεργό</string>
     <string name="off">Κλειστό</string>
 
-    <!-- Input Screen -->
-    <string name="input_screen_search_tab">Αναζήτηση</string>
-    <string name="input_screen_chat_tab">Duck.ai</string>
+    <!-- Input Mode Tab Layout -->
+    <string name="input_mode_search_tab">Αναζήτηση</string>
+    <string name="input_mode_chat_tab">Duck.ai</string>
 </resources>
