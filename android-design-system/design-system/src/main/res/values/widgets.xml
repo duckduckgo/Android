@@ -779,7 +779,7 @@
         <item name="rippleColor">@color/bbColorButtonOptionPressed</item>
     </style>
 
-    <style name="Widget.DuckChat.TabLayout.Rounded" parent="Widget.MaterialComponents.TabLayout">
+    <style name="Widget.DuckDuckGo.TabLayout.Rounded" parent="Widget.MaterialComponents.TabLayout">
         <item name="android:background">@drawable/tab_layout_background</item>
         <item name="tabIndicatorGravity">center</item>
         <item name="tabIndicatorColor">?attr/daxColorInputModeIndicator</item>

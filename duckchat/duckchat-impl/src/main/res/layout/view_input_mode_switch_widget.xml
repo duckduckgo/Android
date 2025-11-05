@@ -15,7 +15,7 @@
 
     <com.duckduckgo.common.ui.view.tablayout.InputModeTabLayout
         android:id="@+id/inputModeSwitch"
-        style="@style/Widget.DuckChat.TabLayout.Rounded"
+        style="@style/Widget.DuckDuckGo.TabLayout.Rounded"
         android:layout_width="wrap_content"
         android:layout_height="@dimen/inputModeSwitchHeight"
         android:layout_marginTop="@dimen/keyline_2"
