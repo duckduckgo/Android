@@ -156,7 +156,13 @@ class DefaultOnDeviceSpeechRecognizer @Inject constructor(
 
     override fun stop() {
         hasSpeechBegun = false
-        speechRecognizer?.destroy()
+        runCatching {
+            speechRecognizer?.cancel()
+            speechRecognizer?.destroy()
+        }.onFailure {
+            logcat(ERROR) { "Error cleaning up SpeechRecognizer: ${it.asLog()}" }
+        }
+        speechRecognizer = null
     }
 
     private fun Bundle.extractResult(): String {
