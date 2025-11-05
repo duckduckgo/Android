@@ -107,10 +107,13 @@ class SearchAndFavoritesWidget : AppWidgetProvider() {
         // and without it onUpdate could be called multiple times at same time
         val pendingResult = goAsync()
         appCoroutineScope.launch {
-            appWidgetIds.forEach { id ->
-                updateWidget(context, appWidgetManager, id, null)
+            try {
+                appWidgetIds.forEach { id ->
+                    updateWidget(context, appWidgetManager, id, null)
+                }
+            } finally {
+                pendingResult.finish()
             }
-            pendingResult.finish()
         }
         super.onUpdate(context, appWidgetManager, appWidgetIds)
     }
@@ -122,8 +125,15 @@ class SearchAndFavoritesWidget : AppWidgetProvider() {
         newOptions: Bundle,
     ) {
         logcat(INFO) { "SearchAndFavoritesWidget - onAppWidgetOptionsChanged" }
+        // need to use goAsync since updating the widget may take some time
+        // and without it onUpdate could be called multiple times at same time
+        val pendingResult = goAsync()
         appCoroutineScope.launch {
-            updateWidget(context, appWidgetManager, appWidgetId, newOptions)
+            try {
+                updateWidget(context, appWidgetManager, appWidgetId, newOptions)
+            } finally {
+                pendingResult.finish()
+            }
         }
         super.onAppWidgetOptionsChanged(context, appWidgetManager, appWidgetId, newOptions)
     }
