@@ -84,6 +84,11 @@
     <string name="subscriptionSettingSectionHelpAndSupport">Ajutor și suport</string>
     <string name="subscriptionSettingSendFeedback">Trimite feedback</string>
     <string name="subscriptionSettingActivating">Se activează</string>
+    <string name="subscriptionSettingSwitchUpgrade">Treci la abonamentul anual și economisește 16%</string>
+    <!-- smartling.character_limit = 10 -->
+    <string name="subscriptionSettingSwitchUpgradePill">Cea mai bună ofertă</string>
+    <string name="subscriptionSettingSwitchDowngrade">Schimbă planul</string>
+    <string name="subscriptionSettingManagePlan">Gestionează plata</string>
 
     <!--Purchase Subscriptions-->
     <string name="purchaseCompletedTitle">Ești gata.</string>
@@ -191,5 +196,15 @@
     <string name="subscriptionSettingSubscribeSecure">Asigură-ți rețeaua Wi-Fi și discută în privat cu modele avansate de IA</string>
 
     <string name="feedbackGeneralSubscription">Abonament</string>
+
+    <!-- Switch plan-->
+    <string name="switchBottomSheetTitleUpgrade">Economisește 16% cu\n un plan anual!</string>
+    <string name="switchBottomSheetDescriptionUpgrade" instruction="%1$s is the yearly plan monthly equivalent price (e.g. $8.33), %2$s is the current monthly plan price (e.g. $9.99)">Un plan anual costă doar %1$s/lună, comparativ cu planul tău lunar actual de %2$s.</string>
+    <string name="switchBottomSheetPrimaryButtonUpgrade" instruction="%1$s is the yearly plan price (e.g. $99.99)">Treci la planul anual (%1$s/an)</string>
+    <string name="switchBottomSheetSecondaryButtonUpgrade">Păstrează planul lunar</string>
+    <string name="switchBottomSheetTitleDowngrade">Economisești 16% cu un plan anual!</string>
+    <string name="switchBottomSheetDescriptionDowngrade" instruction="%1$s is the yearly plan monthly equivalent price (e.g. $8.33), %2$s is the monthly plan price (e.g. $9.99)">Trecerea va crește prețul lunar de la %1$s/lună la %2$s/lună.</string>
+    <string name="switchBottomSheetPrimaryButtonDowngrade">Păstrează planul anual</string>
+    <string name="switchBottomSheetSecondaryButtonDowngrade" instruction="%1$s is the monthly plan price (e.g. $9.99)">Treci la planul lunar (%1$s/lună)</string>
 
 </resources>
