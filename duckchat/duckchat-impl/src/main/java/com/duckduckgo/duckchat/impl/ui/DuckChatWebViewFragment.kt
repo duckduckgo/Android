@@ -37,6 +37,7 @@ import android.webkit.WebChromeClient.FileChooserParams
 import android.webkit.WebSettings
 import android.webkit.WebView
 import androidx.annotation.AnyThread
+import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
@@ -160,10 +161,10 @@ open class DuckChatWebViewFragment : DuckDuckGoFragment(R.layout.activity_duck_c
     private var pendingUploadTask: ValueCallback<Array<Uri>>? = null
 
     private val root: ViewGroup by lazy { binding.root }
+    private val toolbar: Toolbar? by lazy { binding.includeToolbar.toolbar }
+    private val duckChatOmnibar: DuckChatOmnibarLayout? by lazy { binding.omnibarLayoutTop }
 
-    // private val toolbar: Toolbar? by lazy { binding.includeToolbar.toolbar }
     internal val simpleWebview: WebView by lazy { binding.simpleWebview }
-    internal val tabSwitcher by lazy { binding.inputFieldTabsMenu }
 
     @SuppressLint("SetJavaScriptEnabled")
     override fun onViewCreated(
@@ -172,16 +173,10 @@ open class DuckChatWebViewFragment : DuckDuckGoFragment(R.layout.activity_duck_c
     ) {
         super.onViewCreated(view, savedInstanceState)
 
-        // toolbar?.let {
-        //     it.setNavigationIcon(com.duckduckgo.mobile.android.R.drawable.ic_arrow_left_24)
-        //     it.setNavigationOnClickListener {
-        //         requireActivity().onBackPressed()
-        //     }
-        //     it.setTitle(R.string.duck_chat_title)
-        // }
-
         val url = arguments?.getString(KEY_DUCK_AI_URL) ?: "https://duckduckgo.com/?q=DuckDuckGo+AI+Chat&ia=chat&duckai=5"
         val tabs = arguments?.getInt(KEY_DUCK_AI_TABS) ?: 0
+
+        configureOmnibar(tabs)
 
         simpleWebview.let {
             it.webViewClient = webViewClient
@@ -307,8 +302,6 @@ open class DuckChatWebViewFragment : DuckDuckGoFragment(R.layout.activity_duck_c
             pendingUploadTask = null
         }
 
-        tabSwitcher.count = tabs
-
         // Observe ViewModel commands
         viewModel.commands
             .onEach { command ->
@@ -323,6 +316,35 @@ open class DuckChatWebViewFragment : DuckDuckGoFragment(R.layout.activity_duck_c
                     }
                 }
             }.launchIn(lifecycleScope)
+    }
+
+    private fun configureOmnibar(tabs: Int) {
+        if (false) {
+            toolbar?.let {
+                it.setNavigationIcon(com.duckduckgo.mobile.android.R.drawable.ic_arrow_left_24)
+                it.setNavigationOnClickListener {
+                    requireActivity().onBackPressed()
+                }
+                it.setTitle(R.string.duck_chat_title)
+            }
+        } else {
+            duckChatOmnibar?.setOmnibarItemPressedListener(
+                object : DuckChatOmnibarLayout.ItemPressedListener {
+                    override fun onTabsButtonPressed() {
+                        TODO("Not yet implemented")
+                    }
+
+                    override fun onFireButtonPressed() {
+                        TODO("Not yet implemented")
+                    }
+
+                    override fun onBrowserMenuPressed() {
+                        TODO("Not yet implemented")
+                    }
+                },
+            )
+            duckChatOmnibar?.setTabsCount(tabs)
+        }
     }
 
     data class FileChooserRequestedParams(
