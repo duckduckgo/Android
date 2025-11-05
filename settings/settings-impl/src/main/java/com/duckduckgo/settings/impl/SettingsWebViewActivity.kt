@@ -39,6 +39,7 @@ import com.duckduckgo.settings.impl.databinding.ActivitySettingsWebviewBinding
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
+import logcat.logcat
 import org.json.JSONObject
 import javax.inject.Inject
 import javax.inject.Named
@@ -84,6 +85,13 @@ class SettingsWebViewActivity : DuckDuckGoActivity() {
 
             viewModel.onStart(url)
         }
+
+        observeSubscriptionEventDataChannel()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        viewModel.onResume()
     }
 
     private fun setupBackPressedDispatcher() {
@@ -113,6 +121,13 @@ class SettingsWebViewActivity : DuckDuckGoActivity() {
             is SettingsWebViewViewModel.Command.LoadUrl -> binding.settingsWebView.loadUrl(command.url)
             SettingsWebViewViewModel.Command.Exit -> exit()
         }
+    }
+
+    private fun observeSubscriptionEventDataChannel() {
+        viewModel.subscriptionEventDataFlow.onEach { subscriptionEventData ->
+            logcat { "SERP-Settings: Sending subscription event data to content scope scripts: $subscriptionEventData" }
+            contentScopeScripts.sendSubscriptionEvent(subscriptionEventData)
+        }.launchIn(lifecycleScope)
     }
 
     private fun exit() {
