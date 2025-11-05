@@ -129,7 +129,7 @@ enum class PirPixel(
 
     PIR_INTERNAL_SECURE_STORAGE_UNAVAILABLE(
         baseName = "pir_internal_secure-storage_unavailable",
-        type = Count,
+        types = setOf(Count, Daily()),
     ), ;
 
     constructor(
