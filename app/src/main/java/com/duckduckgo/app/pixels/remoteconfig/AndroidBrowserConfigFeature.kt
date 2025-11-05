@@ -198,8 +198,8 @@ interface AndroidBrowserConfigFeature {
     /**
      * @return `true` when the remote config has the global "repotWebViewCapabilities" androidBrowserConfig
      * sub-feature flag enabled
-     * If the remote feature is not present defaults to `true`
+     * If the remote feature is not present defaults to `false`
      */
-    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
-    fun repotWebViewCapabilities(): Toggle
+    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
+    fun reportWebViewCapabilities(): Toggle
 }

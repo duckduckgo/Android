@@ -62,7 +62,7 @@ class RealWebViewCapabilityChecker @Inject constructor(
 
     private fun reportWebViewCapabilities() {
         coroutineScope.launch(dispatchers.io()) {
-            if (androidBrowserConfigFeature.repotWebViewCapabilities().isEnabled()) {
+            if (androidBrowserConfigFeature.reportWebViewCapabilities().isEnabled()) {
                 val params = mapOf(
                     "version" to webViewVersionProvider.getFullVersion(),
                     "multi_profile" to isMultiProfileSupported().toString(),
