@@ -37,4 +37,8 @@
     <string name="alwaysOn">Alati sisse lülitatud</string>
     <string name="on">Sees</string>
     <string name="off">Väljas</string>
+
+    <!-- Input Screen -->
+    <string name="input_screen_search_tab">Otsing</string>
+    <string name="input_screen_chat_tab">Duck.ai</string>
 </resources>

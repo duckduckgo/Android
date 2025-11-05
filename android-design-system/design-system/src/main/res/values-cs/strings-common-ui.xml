@@ -37,4 +37,8 @@
     <string name="alwaysOn">Vždycky zapnuté</string>
     <string name="on">Aktivní</string>
     <string name="off">Vypnout</string>
+
+    <!-- Input Screen -->
+    <string name="input_screen_search_tab">Vyhledávání</string>
+    <string name="input_screen_chat_tab">Duck.ai</string>
 </resources>

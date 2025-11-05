@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.duckchat.impl.inputscreen.ui.view
+package com.duckduckgo.common.ui.view.tablayout
 
 import android.content.Context
 import android.graphics.Color
@@ -26,7 +26,7 @@ import androidx.core.content.ContextCompat
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.common.ui.store.AppTheme
 import com.duckduckgo.di.scopes.ViewScope
-import com.duckduckgo.duckchat.impl.R
+import com.duckduckgo.mobile.android.R
 import com.google.android.material.color.MaterialColors
 import com.google.android.material.shape.CornerFamily
 import com.google.android.material.shape.MaterialShapeDrawable
@@ -107,7 +107,7 @@ class InputModeTabLayout @JvmOverloads constructor(
             initializeElevationOverlay(context)
             val shadowColor = MaterialColors.getColor(
                 context,
-                com.duckduckgo.mobile.android.R.attr.daxColorInputModeIndicatorShadow,
+                R.attr.daxColorInputModeIndicatorShadow,
                 Color.BLACK,
             )
             setShadowColor(shadowColor)

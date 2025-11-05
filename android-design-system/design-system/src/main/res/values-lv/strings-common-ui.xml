@@ -37,4 +37,8 @@
     <string name="alwaysOn">Vienmēr ieslēgts</string>
     <string name="on">Ieslēgts</string>
     <string name="off">Izslēgts</string>
+
+    <!-- Input Screen -->
+    <string name="input_screen_search_tab">Meklēt</string>
+    <string name="input_screen_chat_tab">Duck.ai</string>
 </resources>

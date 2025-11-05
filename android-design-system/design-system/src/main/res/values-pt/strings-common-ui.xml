@@ -37,4 +37,8 @@
     <string name="alwaysOn">Sempre ligada</string>
     <string name="on">Ligado</string>
     <string name="off">Desligado</string>
+
+    <!-- Input Screen -->
+    <string name="input_screen_search_tab">Pesquisar</string>
+    <string name="input_screen_chat_tab">Duck.ai</string>
 </resources>

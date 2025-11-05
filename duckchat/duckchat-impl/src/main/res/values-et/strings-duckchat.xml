@@ -49,9 +49,7 @@
     <string name="duck_ai_shortcut_settings_description">Vali, milliseid Duck.ai otseteid kuvada</string>
 
     <!-- Input Screen  -->
-    <string name="input_screen_search_tab">Otsing</string>
     <string name="input_screen_search_hint">Otsi või sisesta aadress</string>
-    <string name="input_screen_chat_tab">Duck.ai</string>
     <string name="input_screen_chat_hint">Küsi privaatselt</string>
     <string name="input_screen_user_pref_without_ai">Ainult otsi</string>
     <string name="input_screen_user_pref_with_ai">Otsi ja Duck.ai</string>

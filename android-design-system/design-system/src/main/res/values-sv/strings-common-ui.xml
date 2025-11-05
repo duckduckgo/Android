@@ -37,4 +37,8 @@
     <string name="alwaysOn">Alltid på</string>
     <string name="on">På</string>
     <string name="off">Av</string>
+
+    <!-- Input Screen -->
+    <string name="input_screen_search_tab">Sökning</string>
+    <string name="input_screen_chat_tab">Duck.ai</string>
 </resources>

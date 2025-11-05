@@ -37,4 +37,8 @@
     <string name="alwaysOn">Uvijek uključeno</string>
     <string name="on">Uključeno</string>
     <string name="off">Isključeno</string>
+
+    <!-- Input Screen -->
+    <string name="input_screen_search_tab">Pretraga</string>
+    <string name="input_screen_chat_tab">Duck.ai</string>
 </resources>
