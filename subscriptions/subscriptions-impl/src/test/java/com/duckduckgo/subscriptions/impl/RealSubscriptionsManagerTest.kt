@@ -10,6 +10,7 @@ import com.android.billingclient.api.ProductDetails.SubscriptionOfferDetails
 import com.android.billingclient.api.PurchaseHistoryRecord
 import com.duckduckgo.autofill.api.email.EmailManager
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.common.test.FixedLocaleRule
 import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle.State
@@ -107,6 +108,9 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
 
     @get:Rule
     val coroutineRule = CoroutineTestRule()
+
+    @get:Rule
+    val fixedLocalRule = FixedLocaleRule()
 
     private val authService: AuthService = mock()
     private val subscriptionsService: SubscriptionsService = mock()
