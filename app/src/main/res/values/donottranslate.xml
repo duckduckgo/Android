@@ -62,4 +62,7 @@
 
     <!-- DuckChat -->
     <string name="duckChatMenuItem">@string/duck_chat_title</string>
+
+    <!-- ADS -->
+    <string name="ads_demo_activity_title" translatable="false">Android Design System Demo</string>
 </resources>

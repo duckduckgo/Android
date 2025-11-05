@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<issues format="6" by="lint 8.7.3" type="baseline" client="gradle" dependencies="false" name="AGP (8.7.3)" variant="all" version="8.7.3">
+<issues format="6" by="lint 8.8.2" type="baseline" client="gradle" dependencies="false" name="AGP (8.7.3)" variant="all" version="8.8.2">
 
     <issue
         id="DenyListedApi"
@@ -32,28 +32,6 @@
             file="src/main/java/com/duckduckgo/vpn/internal/flipper/PreferencesFlipperPlugin.kt"
             line="167"
             column="17"/>
-    </issue>
-
-    <issue
-        id="QueryPermissionsNeeded"
-        message="As of Android 11, this method no longer returns information about all apps; see https://g.co/dev/packagevisibility for details"
-        errorLine1="        return packageManager.getInstalledApplications(PackageManager.GET_META_DATA)"
-        errorLine2="                              ~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/java/com/duckduckgo/vpn/internal/feature/rules/ExceptionRulesDebugActivity.kt"
-            line="116"
-            column="31"/>
-    </issue>
-
-    <issue
-        id="QueryPermissionsNeeded"
-        message="As of Android 11, this method no longer returns information about all apps; see https://g.co/dev/packagevisibility for details"
-        errorLine1="        installedApps = packageManager.getInstalledApplications(PackageManager.GET_META_DATA)"
-        errorLine2="                                       ~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/java/com/duckduckgo/vpn/internal/feature/VpnInternalSettingsActivity.kt"
-            line="167"
-            column="40"/>
     </issue>
 
 </issues>
