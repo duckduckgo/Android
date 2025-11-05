@@ -131,7 +131,7 @@ class PirSettingView @JvmOverloads constructor(
                 globalActivityStarter.start(context, PirDashboardWebViewScreen)
             }
 
-            Command.ShowPirStorageUnavailableDialog -> {
+            Command.ShowPirUnavailableDialog -> {
                 TextAlertDialogBuilder(context)
                     .setTitle(R.string.pirStorageUnavailableDialogTitle)
                     .setMessage(R.string.pirStorageUnavailableDialogMessage)
