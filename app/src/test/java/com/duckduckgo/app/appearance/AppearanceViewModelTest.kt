@@ -85,7 +85,7 @@ internal class AppearanceViewModelTest {
         whenever(mockAppSettingsDataStore.selectedFireAnimation).thenReturn(FireAnimation.HeroFire)
         whenever(mockAppSettingsDataStore.omnibarType).thenReturn(OmnibarType.SINGLE_TOP)
         whenever(mockTabSwitcherDataStore.isTrackersAnimationInfoTileHidden()).thenReturn(flowOf(false))
-        whenever(mockOmnibarFeatureRepository.omnibarType).thenReturn(mockAppSettingsDataStore.omnibarType)
+        whenever(mockOmnibarFeatureRepository.isSplitOmnibarAvailable).thenReturn(false)
 
         initializeViewModel()
     }
@@ -322,6 +322,36 @@ internal class AppearanceViewModelTest {
                 assertEquals(DuckDuckGoTheme.LIGHT, value.theme)
                 assertEquals(AppIcon.DEFAULT, value.appIcon)
                 assertEquals(false, value.forceDarkModeEnabled)
+
+                cancelAndConsumeRemainingEvents()
+            }
+        }
+
+    @Test
+    fun whenSplitOmnibarAvailableThenViewStateShowsSetting() =
+        runTest {
+            whenever(mockOmnibarFeatureRepository.isSplitOmnibarAvailable).thenReturn(true)
+            initializeViewModel()
+
+            testee.viewState().test {
+                val value = expectMostRecentItem()
+
+                assertEquals(true, value.shouldShowSplitOmnibarSettings)
+
+                cancelAndConsumeRemainingEvents()
+            }
+        }
+
+    @Test
+    fun whenSplitOmnibarNotAvailableThenViewStateHidesSetting() =
+        runTest {
+            whenever(mockOmnibarFeatureRepository.isSplitOmnibarAvailable).thenReturn(false)
+            initializeViewModel()
+
+            testee.viewState().test {
+                val value = expectMostRecentItem()
+
+                assertEquals(false, value.shouldShowSplitOmnibarSettings)
 
                 cancelAndConsumeRemainingEvents()
             }
