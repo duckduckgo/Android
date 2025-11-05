@@ -46,6 +46,7 @@ interface WebViewCompatTestHelper {
     suspend fun handleWebViewCompatMessage(
         message: WebMessageCompat,
         replyProxy: JavaScriptReplyProxy,
+        isMainFrame: Boolean,
     )
 
     suspend fun useBlobDownloadsMessageListener(): Boolean
@@ -126,7 +127,7 @@ class RealWebViewCompatTestHelper @Inject constructor(
                     setOf("*"),
                 ) { view, message, sourceOrigin, isMainFrame, replyProxy ->
                     webView.findViewTreeLifecycleOwner()?.lifecycleScope?.launch {
-                        handleWebViewCompatMessage(message, replyProxy)
+                        handleWebViewCompatMessage(message, replyProxy, isMainFrame)
                     }
                 }
             }
@@ -144,11 +145,14 @@ class RealWebViewCompatTestHelper @Inject constructor(
     override suspend fun handleWebViewCompatMessage(
         message: WebMessageCompat,
         replyProxy: JavaScriptReplyProxy,
+        isMainFrame: Boolean,
     ) {
         withContext(dispatchers.io()) {
             if (message.data?.startsWith("webViewCompat Ping:") != true) return@withContext
             val cfg = getWebViewCompatConfig()
-            proxy = replyProxy
+            if (isMainFrame) {
+                proxy = replyProxy
+            }
             if (cfg.replyToInitialPing) {
                 cfg.settings?.initialPingDelay?.takeIf { it > 0 }?.let {
                     delay(it)

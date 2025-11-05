@@ -3432,6 +3432,7 @@ class BrowserTabFragment :
                                     webViewCompatTestHelper.handleWebViewCompatMessage(
                                         message = message,
                                         replyProxy = replyProxy,
+                                        isMainFrame = isMainFrame,
                                     )
                                 }
                             }
