@@ -38,12 +38,6 @@
         app:showAsAction="always" />
 
     <item
-        android:id="@+id/layoutTypeToolbarButton"
-        android:icon="@drawable/ic_view_list_24"
-        android:title="@string/tabSwitcherListViewMenu"
-        app:showAsAction="always" />
-
-    <item
         android:id="@+id/popupMenuToolbarButton"
         android:icon="@drawable/ic_menu_vertical_24"
         android:title="@string/browserPopupMenu"
