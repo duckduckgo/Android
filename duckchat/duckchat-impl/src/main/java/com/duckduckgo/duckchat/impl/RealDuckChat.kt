@@ -157,6 +157,11 @@ interface DuckChatInternal : DuckChat {
     fun isImageUploadEnabled(): Boolean
 
     /**
+     * Returns whether standalone migration is supported.
+     */
+    fun isStandaloneMigrationEnabled(): Boolean
+
+    /**
      * Returns the time a Duck Chat session should be kept alive
      */
     fun keepSessionIntervalInMinutes(): Int
@@ -277,6 +282,7 @@ class RealDuckChat @Inject constructor(
     private var bangRegex: Regex? = null
     private var isAddressBarEntryPointEnabled: Boolean = false
     private var isImageUploadEnabled: Boolean = false
+    private var isStandaloneMigrationEnabled: Boolean = false
     private var keepSessionAliveInMinutes: Int = DEFAULT_SESSION_ALIVE
     private var clearChatHistory: Boolean = true
     private var inputScreenMainButtonsEnabled = false
@@ -396,6 +402,8 @@ class RealDuckChat @Inject constructor(
     override val chatState: StateFlow<ChatState> = _chatState.asStateFlow()
 
     override fun isImageUploadEnabled(): Boolean = isImageUploadEnabled
+
+    override fun isStandaloneMigrationEnabled(): Boolean = isStandaloneMigrationEnabled
 
     override fun keepSessionIntervalInMinutes() = keepSessionAliveInMinutes
 
@@ -626,6 +634,7 @@ class RealDuckChat @Inject constructor(
                 }
             isAddressBarEntryPointEnabled = settingsJson?.addressBarEntryPoint ?: false
             isImageUploadEnabled = imageUploadFeature.self().isEnabled()
+            isStandaloneMigrationEnabled = duckChatFeature.standaloneMigration().isEnabled()
 
             keepSession.value = duckChatFeature.keepSession().isEnabled()
             keepSessionAliveInMinutes = settingsJson?.sessionTimeoutMinutes ?: DEFAULT_SESSION_ALIVE
