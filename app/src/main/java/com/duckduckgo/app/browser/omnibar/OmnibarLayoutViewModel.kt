@@ -55,6 +55,7 @@ import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Unique
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.trackerdetection.model.Entity
 import com.duckduckgo.browser.api.UserBrowserProperties
+import com.duckduckgo.browser.ui.omnibar.OmnibarType
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
@@ -103,9 +104,14 @@ class OmnibarLayoutViewModel @Inject constructor(
     private val serpEasterEggLogosToggles: SerpEasterEggLogosToggles,
 ) : ViewModel() {
 
+    private val isSplitOmnibarEnabled = settingsDataStore.omnibarType == OmnibarType.SPLIT
+
     private val _viewState = MutableStateFlow(
         ViewState(
             showChatMenu = duckAiFeatureState.showOmnibarShortcutInAllStates.value,
+            showFireIcon = !isSplitOmnibarEnabled,
+            showTabsMenu = !isSplitOmnibarEnabled,
+            showBrowserMenu = !isSplitOmnibarEnabled,
         ),
     )
 
@@ -256,7 +262,7 @@ class OmnibarLayoutViewModel @Inject constructor(
     ) {
         logcat { "Omnibar: onOmnibarFocusChanged" }
         val showClearButton = hasFocus && inputFieldText.isNotBlank()
-        val showControls = inputFieldText.isBlank()
+        val showControls = inputFieldText.isBlank() && !isSplitOmnibarEnabled
 
         if (hasFocus) {
             viewModelScope.launch {
@@ -326,9 +332,9 @@ class OmnibarLayoutViewModel @Inject constructor(
                     previousLeadingIconState = null,
                     highlightFireButton = HighlightableButton.Visible(highlighted = false),
                     showClearButton = false,
-                    showTabsMenu = true,
-                    showFireIcon = true,
-                    showBrowserMenu = true,
+                    showTabsMenu = !isSplitOmnibarEnabled,
+                    showFireIcon = !isSplitOmnibarEnabled,
+                    showBrowserMenu = !isSplitOmnibarEnabled,
                     showVoiceSearch = shouldShowVoiceSearch(
                         hasFocus = false,
                         query = _viewState.value.omnibarText,
@@ -481,7 +487,6 @@ class OmnibarLayoutViewModel @Inject constructor(
             AppPixelName.ADDRESS_BAR_SERP_ENTRY_CLEARED,
             AppPixelName.ADDRESS_BAR_WEBSITE_ENTRY_CLEARED,
         )
-        val showControls = true
 
         _viewState.update {
             it.copy(
@@ -489,9 +494,9 @@ class OmnibarLayoutViewModel @Inject constructor(
                 updateOmnibarText = true,
                 expanded = true,
                 showClearButton = false,
-                showBrowserMenu = showControls,
-                showTabsMenu = showControls,
-                showFireIcon = showControls,
+                showBrowserMenu = !isSplitOmnibarEnabled,
+                showTabsMenu = !isSplitOmnibarEnabled,
+                showFireIcon = !isSplitOmnibarEnabled,
             )
         }
     }
@@ -546,7 +551,7 @@ class OmnibarLayoutViewModel @Inject constructor(
         deleteLastCharacter: Boolean,
     ) {
         val showClearButton = hasFocus && query.isNotBlank()
-        val showControls = !hasFocus || query.isBlank()
+        val showControls = (!hasFocus || query.isBlank()) && !isSplitOmnibarEnabled
 
         logcat { "Omnibar: onInputStateChanged query $query hasFocus $hasFocus clearQuery $clearQuery deleteLastCharacter $deleteLastCharacter" }
 

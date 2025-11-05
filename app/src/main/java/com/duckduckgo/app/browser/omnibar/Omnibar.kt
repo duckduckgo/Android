@@ -184,11 +184,16 @@ class Omnibar(
         binding.rootView.removeView(binding.singleOmnibarLayoutBottom)
 
         return when (omnibarType) {
-            OmnibarType.SINGLE_TOP, OmnibarType.SPLIT -> {
+            OmnibarType.SINGLE_TOP -> {
                 binding.rootView.removeView(binding.omnibarLayoutBottom)
                 binding.omnibarLayoutTop
             }
-
+            OmnibarType.SPLIT -> {
+                binding.rootView.removeView(binding.omnibarLayoutBottom)
+                binding.bottomBrowserOutlineStroke.gone()
+                binding.includeNewBrowserTab.bottomNtpOutlineStroke.gone()
+                binding.omnibarLayoutTop
+            }
             OmnibarType.SINGLE_BOTTOM -> {
                 binding.rootView.removeView(binding.omnibarLayoutTop)
                 adjustCoordinatorLayoutBehaviorForBottomOmnibar()

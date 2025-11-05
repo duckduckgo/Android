@@ -23,7 +23,7 @@
     tools:context="com.duckduckgo.app.browser.BrowserActivity">
 
     <include
-        android:id="@+id/topMockupSingleToolbar"
+        android:id="@+id/topMockupToolbar"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
         android:layout_alignParentTop="true"
@@ -54,10 +54,17 @@
         android:visibility="gone" />
 
     <include
-        android:id="@+id/bottomMockupSingleToolbar"
+        android:id="@+id/bottomMockupToolbar"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
         android:layout_alignParentBottom="true"
         layout="@layout/include_omnibar_toolbar_mockup_bottom" />
 
+    <include
+        android:id="@+id/navigationBarMockup"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        android:layout_alignParentBottom="true"
+        layout="@layout/view_browser_navigation_bar_mockup" />
 </RelativeLayout>
