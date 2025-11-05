@@ -84,6 +84,11 @@
     <string name="subscriptionSettingSectionHelpAndSupport">Hjelp og kundestøtte</string>
     <string name="subscriptionSettingSendFeedback">Send tilbakemelding</string>
     <string name="subscriptionSettingActivating">Aktiverer</string>
+    <string name="subscriptionSettingSwitchUpgrade">Bytt til årsabonnement og spar 16 %</string>
+    <!-- smartling.character_limit = 10 -->
+    <string name="subscriptionSettingSwitchUpgradePill">Tilbud</string>
+    <string name="subscriptionSettingSwitchDowngrade">Bytt abonnement</string>
+    <string name="subscriptionSettingManagePlan">Administrer betaling</string>
 
     <!--Purchase Subscriptions-->
     <string name="purchaseCompletedTitle">Alt klart.</string>
@@ -191,5 +196,15 @@
     <string name="subscriptionSettingSubscribeSecure">Sikre wifien din og chat privat med avanserte AI-modeller</string>
 
     <string name="feedbackGeneralSubscription">Abonnement</string>
+
+    <!-- Switch plan-->
+    <string name="switchBottomSheetTitleUpgrade">Spar 16 % med\net årsabonnement!</string>
+    <string name="switchBottomSheetDescriptionUpgrade" instruction="%1$s is the yearly plan monthly equivalent price (e.g. $8.33), %2$s is the current monthly plan price (e.g. $9.99)">Et årsabonnement koster bare %1$s per måned, sammenlignet med det nåværende månedsabonnementet ditt til %2$s per måned.</string>
+    <string name="switchBottomSheetPrimaryButtonUpgrade" instruction="%1$s is the yearly plan price (e.g. $99.99)">Bytt til årlig (%1$s per år)</string>
+    <string name="switchBottomSheetSecondaryButtonUpgrade">Behold månedsabonnementet</string>
+    <string name="switchBottomSheetTitleDowngrade">Du sparer 16 % med\net årsabonnement!</string>
+    <string name="switchBottomSheetDescriptionDowngrade" instruction="%1$s is the yearly plan monthly equivalent price (e.g. $8.33), %2$s is the monthly plan price (e.g. $9.99)">Hvis du bytter, øker månedsprisen fra %1$s per måned til %2$s per måned.</string>
+    <string name="switchBottomSheetPrimaryButtonDowngrade">Behold årsabonnementet</string>
+    <string name="switchBottomSheetSecondaryButtonDowngrade" instruction="%1$s is the monthly plan price (e.g. $9.99)">Bytt til månedlig (%1$s per måned)</string>
 
 </resources>
