@@ -103,10 +103,14 @@ class SearchAndFavoritesWidget : AppWidgetProvider() {
         appWidgetManager: AppWidgetManager,
         appWidgetIds: IntArray,
     ) {
+        // need to use goAsync since updating the widget may take some time
+        // and without it onUpdate could be called multiple times at same time
+        val pendingResult = goAsync()
         appCoroutineScope.launch {
             appWidgetIds.forEach { id ->
                 updateWidget(context, appWidgetManager, id, null)
             }
+            pendingResult.finish()
         }
         super.onUpdate(context, appWidgetManager, appWidgetIds)
     }
