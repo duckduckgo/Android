@@ -171,6 +171,11 @@
     <string name="activityPir" translatable="false">Privacy Pro</string>
     <string name="activitySendFeedback">Odeslat zpětnou vazbu</string>
 
+    <!-- Dynamic Switch % -->
+    <string name="switchBottomSheetDynamicTitleUpgrade" instruction="%1$s is the savings percentage when switching from monthly to yearly (e.g. 16)">Ušetři %1$s %%\ns ročním tarifem!</string>
+    <string name="switchBottomSheetDynamicTitleDowngrade" instruction="%1$s is the savings percentage when using a yearly plan instead of monthly (e.g. 16)">S ročním tarifem\nušetříš %1$s %%</string>
+    <string name="subscriptionSettingSwitchUpgradeDynamic" instruction="%1$s is the savings percentage when switching from monthly to yearly (e.g. 16)">Přejdi na roční tarif a ušetři %1$s %%</string>
+
     <!-- Privacy Pro Rebranding-->
     <string name="subscriptionSettingRebrandingMessage">Privacy Pro mění název na „předplatné DuckDuckGo“</string>
 
