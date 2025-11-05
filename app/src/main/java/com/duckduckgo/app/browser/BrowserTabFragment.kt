@@ -1260,6 +1260,16 @@ class BrowserTabFragment :
     private fun onBrowserMenuButtonPressed() {
         contentScopeScripts.sendSubscriptionEvent(createBreakageReportingEventData())
         viewModel.onBrowserMenuClicked(isCustomTab = isActiveCustomTab())
+
+        lifecycleScope.launch {
+            webViewCompatTestHelper.onBrowserMenuButtonPressed(webView)
+        }
+    }
+
+    private fun onPageStarted() {
+        lifecycleScope.launch {
+            webViewCompatTestHelper.onPageStarted(webView)
+        }
     }
 
     private fun onOmnibarPrivacyShieldButtonPressed() {
@@ -2344,6 +2354,7 @@ class BrowserTabFragment :
 
             is Command.SubmitChat -> duckChat.openDuckChatWithAutoPrompt(it.query)
             is Command.EnqueueCookiesAnimation -> enqueueCookiesAnimation(it.isCosmetic)
+            is Command.PageStarted -> onPageStarted()
         }
     }
 
@@ -3254,7 +3265,10 @@ class BrowserTabFragment :
             )
             configureWebViewForBlobDownload(it)
             lifecycleScope.launch {
-                webViewCompatTestHelper.configureWebViewForWebViewCompatTest(it)
+                webViewCompatTestHelper.configureWebViewForWebViewCompatTest(
+                    it,
+                    isBlobDownloadWebViewFeatureEnabled(it),
+                )
             }
             configureWebViewForAutofill(it)
             printInjector.addJsInterface(it) { viewModel.printFromWebView() }
@@ -3382,7 +3396,13 @@ class BrowserTabFragment :
     private fun configureWebViewForBlobDownload(webView: DuckDuckGoWebView) {
         lifecycleScope.launch(dispatchers.main()) {
             if (isBlobDownloadWebViewFeatureEnabled(webView)) {
-                val script = blobDownloadScript()
+                val webViewCompatUsesBlobDownloadsMessageListener = webViewCompatTestHelper.useBlobDownloadsMessageListener()
+
+                val script = if (!webViewCompatUsesBlobDownloadsMessageListener) {
+                    blobDownloadScript()
+                } else {
+                    webViewCompatTestHelper.blobDownloadScriptForWebViewCompatTest()
+                }
                 WebViewCompat.addDocumentStartJavaScript(webView, script, setOf("*"))
 
                 webViewCompatWrapper.addWebMessageListener(
@@ -3407,6 +3427,14 @@ class BrowserTabFragment :
                                         .md5()
                                         .toString()
                                 viewModel.saveReplyProxyForBlobDownload(sourceOrigin.toString(), replyProxy, locationRef)
+                            } else if (webViewCompatUsesBlobDownloadsMessageListener && message.data?.startsWith("webViewCompat") == true) {
+                                lifecycleScope.launch {
+                                    webViewCompatTestHelper.handleWebViewCompatMessage(
+                                        message = message,
+                                        replyProxy = replyProxy,
+                                        isMainFrame = isMainFrame,
+                                    )
+                                }
                             }
                         }
                     },
