@@ -157,6 +157,11 @@ interface DuckChatInternal : DuckChat {
     fun isAddressBarEntryPointEnabled(): Boolean
 
     /**
+     * Returns whether voice search entry point is enabled or not.
+     */
+    fun isVoiceSearchEntryPointEnabled(): Boolean
+
+    /**
      * Returns whether DuckChat is user enabled or not.
      */
     fun isDuckChatUserEnabled(): Boolean
@@ -303,6 +308,7 @@ class RealDuckChat @Inject constructor(
     private var duckChatLink = DUCK_CHAT_WEB_LINK
     private var bangRegex: Regex? = null
     private var isAddressBarEntryPointEnabled: Boolean = false
+    private var isVoiceSearchEntryPointEnabled: Boolean = false
     private var isImageUploadEnabled: Boolean = false
     private var keepSessionAliveInMinutes: Int = DEFAULT_SESSION_ALIVE
     private var clearChatHistory: Boolean = true
@@ -411,6 +417,7 @@ class RealDuckChat @Inject constructor(
     }
 
     override fun isAddressBarEntryPointEnabled(): Boolean = isAddressBarEntryPointEnabled
+    override fun isVoiceSearchEntryPointEnabled(): Boolean = isVoiceSearchEntryPointEnabled
 
     override fun isDuckChatUserEnabled(): Boolean = isDuckChatUserEnabled
 
@@ -676,6 +683,7 @@ class RealDuckChat @Inject constructor(
                     bangRegex = settingsJson.aiChatBangRegex?.replace("{bangs}", bangAlternation)?.toRegex()
                 }
             isAddressBarEntryPointEnabled = settingsJson?.addressBarEntryPoint ?: false
+            isVoiceSearchEntryPointEnabled = duckChatFeature.duckAiVoiceSearch().isEnabled()
             isImageUploadEnabled = imageUploadFeature.self().isEnabled()
 
             keepSession.value = duckChatFeature.keepSession().isEnabled()
@@ -723,7 +731,7 @@ class RealDuckChat @Inject constructor(
 
             val showVoiceSearchToggle =
                 duckChatFeatureRepository.shouldShowInVoiceSearch() &&
-                    isDuckChatFeatureEnabled && isDuckChatUserEnabled
+                    isDuckChatFeatureEnabled && isDuckChatUserEnabled && isVoiceSearchEntryPointEnabled
             _showVoiceSearchToggle.emit(showVoiceSearchToggle)
         }
 

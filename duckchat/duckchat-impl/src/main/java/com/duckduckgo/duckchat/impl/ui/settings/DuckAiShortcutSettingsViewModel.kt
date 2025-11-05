@@ -53,7 +53,7 @@ class DuckAiShortcutSettingsViewModel @Inject constructor(
             showInAddressBar = showInAddressBar,
             showInVoiceSearch = showInVoiceSearch,
             shouldShowAddressBarToggle = duckChat.isAddressBarEntryPointEnabled(),
-            shouldShowVoiceSearchToggle = showVoiceSearchToggle,
+            shouldShowVoiceSearchToggle = duckChat.isVoiceSearchEntryPointEnabled(),
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), ViewState())
 
