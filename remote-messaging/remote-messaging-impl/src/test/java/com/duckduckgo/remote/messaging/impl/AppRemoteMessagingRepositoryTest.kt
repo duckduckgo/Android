@@ -86,6 +86,7 @@ class AppRemoteMessagingRepositoryTest {
                 ),
                 matchingRules = emptyList(),
                 exclusionRules = emptyList(),
+                surfaces = emptyList(),
             ),
         )
 
@@ -102,6 +103,7 @@ class AppRemoteMessagingRepositoryTest {
                     ),
                     matchingRules = emptyList(),
                     exclusionRules = emptyList(),
+                    surfaces = emptyList(),
                 ),
                 message,
             )
@@ -120,6 +122,7 @@ class AppRemoteMessagingRepositoryTest {
                 ),
                 matchingRules = emptyList(),
                 exclusionRules = emptyList(),
+                surfaces = emptyList(),
             ),
         )
 
@@ -135,6 +138,7 @@ class AppRemoteMessagingRepositoryTest {
                     ),
                     matchingRules = emptyList(),
                     exclusionRules = emptyList(),
+                    surfaces = emptyList(),
                 ),
                 message,
             )
@@ -156,6 +160,7 @@ class AppRemoteMessagingRepositoryTest {
                 ),
                 matchingRules = emptyList(),
                 exclusionRules = emptyList(),
+                surfaces = emptyList(),
             ),
         )
 
@@ -174,6 +179,7 @@ class AppRemoteMessagingRepositoryTest {
                     ),
                     matchingRules = emptyList(),
                     exclusionRules = emptyList(),
+                    surfaces = emptyList(),
                 ),
                 message,
             )
@@ -197,6 +203,7 @@ class AppRemoteMessagingRepositoryTest {
                 ),
                 matchingRules = emptyList(),
                 exclusionRules = emptyList(),
+                surfaces = emptyList(),
             ),
         )
 
@@ -217,6 +224,7 @@ class AppRemoteMessagingRepositoryTest {
                     ),
                     matchingRules = emptyList(),
                     exclusionRules = emptyList(),
+                    surfaces = emptyList(),
                 ),
                 message,
             )
@@ -238,6 +246,7 @@ class AppRemoteMessagingRepositoryTest {
                 ),
                 matchingRules = emptyList(),
                 exclusionRules = emptyList(),
+                surfaces = emptyList(),
             ),
         )
 
@@ -256,6 +265,7 @@ class AppRemoteMessagingRepositoryTest {
                     ),
                     matchingRules = emptyList(),
                     exclusionRules = emptyList(),
+                    surfaces = emptyList(),
                 ),
                 message,
             )
@@ -426,6 +436,7 @@ class AppRemoteMessagingRepositoryTest {
             ),
             matchingRules = emptyList(),
             exclusionRules = emptyList(),
+            surfaces = emptyList(),
         )
     }
 }

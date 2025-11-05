@@ -27,6 +27,7 @@ import com.duckduckgo.remote.messaging.api.Content.Small
 import com.duckduckgo.remote.messaging.api.JsonMessageAction
 import com.duckduckgo.remote.messaging.api.MessageActionMapperPlugin
 import com.duckduckgo.remote.messaging.api.RemoteMessage
+import com.duckduckgo.remote.messaging.api.Surface
 import com.duckduckgo.remote.messaging.impl.models.*
 import com.duckduckgo.remote.messaging.impl.models.JsonMessageType.BIG_SINGLE_ACTION
 import com.duckduckgo.remote.messaging.impl.models.JsonMessageType.BIG_TWO_ACTION
@@ -109,6 +110,7 @@ private fun JsonRemoteMessage.map(
             content = this.content!!.mapToContent(this.content.messageType, actionMappers),
             matchingRules = this.matchingRules.orEmpty(),
             exclusionRules = this.exclusionRules.orEmpty(),
+            surfaces = Surface.fromList(this.surfaces),
         )
         remoteMessage.localizeMessage(this.translations, locale)
     }.onFailure {
