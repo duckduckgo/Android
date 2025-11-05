@@ -53,6 +53,8 @@ import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.emitAll
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
@@ -136,7 +138,7 @@ interface PirRepository {
         extractedProfileId: Long,
     ): ExtractedProfile?
 
-    suspend fun getAllExtractedProfilesFlow(): Flow<List<ExtractedProfile>>
+    fun getAllExtractedProfilesFlow(): Flow<List<ExtractedProfile>>
 
     suspend fun getAllExtractedProfiles(): List<ExtractedProfile>
 
@@ -505,12 +507,17 @@ class RealPirRepository(
             return@withContext extractedProfileDao()?.getExtractedProfile(extractedProfileId)?.toExtractedProfile()
         }
 
-    override suspend fun getAllExtractedProfilesFlow(): Flow<List<ExtractedProfile>> =
-        extractedProfileDao()?.getAllExtractedProfileFlow()?.map { list ->
-            list.map {
-                it.toExtractedProfile()
-            }
-        } ?: flowOf(emptyList())
+    override fun getAllExtractedProfilesFlow(): Flow<List<ExtractedProfile>> {
+        return flow {
+            emitAll(
+                extractedProfileDao()?.getAllExtractedProfileFlow()?.map { list ->
+                    list.map {
+                        it.toExtractedProfile()
+                    }
+                } ?: flowOf(emptyList()),
+            )
+        }
+    }
 
     override suspend fun getAllExtractedProfiles(): List<ExtractedProfile> =
         withContext(dispatcherProvider.io()) {
