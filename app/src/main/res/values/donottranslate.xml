@@ -62,4 +62,14 @@
 
     <!-- DuckChat -->
     <string name="duckChatMenuItem">@string/duck_chat_title</string>
+
+    <string name="asset_statements">
+  [{
+    \"relation\": [\"delegate_permission/common.handle_all_urls\"],
+    \"target\": {
+      \"namespace\": \"web\",
+      \"site\": \"https://duckduckgo.com\"
+    }
+  }]
+</string>
 </resources>
