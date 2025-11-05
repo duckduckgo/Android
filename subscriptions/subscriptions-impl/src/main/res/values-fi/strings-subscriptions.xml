@@ -84,6 +84,11 @@
     <string name="subscriptionSettingSectionHelpAndSupport">Apu ja tuki</string>
     <string name="subscriptionSettingSendFeedback">Lähetä palautetta</string>
     <string name="subscriptionSettingActivating">Aktivoidaan</string>
+    <string name="subscriptionSettingSwitchUpgrade">Vaihda vuosisopimukseen ja säästä 16 %</string>
+    <!-- smartling.character_limit = 10 -->
+    <string name="subscriptionSettingSwitchUpgradePill">Paras ale</string>
+    <string name="subscriptionSettingSwitchDowngrade">Vaihda sopimusta</string>
+    <string name="subscriptionSettingManagePlan">Hallinnoi maksua</string>
 
     <!--Purchase Subscriptions-->
     <string name="purchaseCompletedTitle">Kaikki on valmista.</string>
@@ -191,5 +196,15 @@
     <string name="subscriptionSettingSubscribeSecure">Suojaa WiFi-yhteytesi ja keskustele yksityisesti edistyneiden tekoälymallien kanssa</string>
 
     <string name="feedbackGeneralSubscription">Tilaus</string>
+
+    <!-- Switch plan-->
+    <string name="switchBottomSheetTitleUpgrade">Säästä 16 %\nvuosittaisella sopimuksella!</string>
+    <string name="switchBottomSheetDescriptionUpgrade" instruction="%1$s is the yearly plan monthly equivalent price (e.g. $8.33), %2$s is the current monthly plan price (e.g. $9.99)">Vuositilaus maksaa vain %1$s/kk verrattuna nykyiseen %2$s kuukausitilaukseesi.</string>
+    <string name="switchBottomSheetPrimaryButtonUpgrade" instruction="%1$s is the yearly plan price (e.g. $99.99)">Vaihda vuositilaukseen (%1$s/ vuosi)</string>
+    <string name="switchBottomSheetSecondaryButtonUpgrade">Pidä kuukausisopimus</string>
+    <string name="switchBottomSheetTitleDowngrade">Säästät 16 %\nvuosisopimuksella!</string>
+    <string name="switchBottomSheetDescriptionDowngrade" instruction="%1$s is the yearly plan monthly equivalent price (e.g. $8.33), %2$s is the monthly plan price (e.g. $9.99)">Vaihtaminen nostaa kuukausihintasi %1$s/kk:sta %2$s/kk:een.</string>
+    <string name="switchBottomSheetPrimaryButtonDowngrade">Säilytä vuosisuunnitelma</string>
+    <string name="switchBottomSheetSecondaryButtonDowngrade" instruction="%1$s is the monthly plan price (e.g. $9.99)">Vaihda kuukausitilaukseen (%1$s/kk)</string>
 
 </resources>
