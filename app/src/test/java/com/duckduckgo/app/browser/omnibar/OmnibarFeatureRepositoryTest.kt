@@ -20,7 +20,6 @@ import androidx.lifecycle.LifecycleOwner
 import com.duckduckgo.app.FakeSettingsDataStore
 import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.app.settings.db.SettingsDataStore
-import com.duckduckgo.browser.ui.omnibar.OmnibarType
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle
@@ -60,7 +59,7 @@ class OmnibarFeatureRepositoryTest {
 
         testee.onStart(mockLifecycleOwner)
 
-        assertTrue(testee.isUnifiedOmnibarFlagEnabled)
+        assertTrue(testee.isUnifiedOmnibarLayoutEnabled)
         assertTrue(testee.isSplitOmnibarAvailable)
     }
 
@@ -71,7 +70,7 @@ class OmnibarFeatureRepositoryTest {
         browserFeatures.splitOmnibar().setRawStoredState(Toggle.State(enable = false))
         createTestee()
 
-        testee.updateFeatureFlags()
+        testee.onStart(mockLifecycleOwner)
 
         assertFalse(testee.isSplitOmnibarAvailable)
         assertEquals(OmnibarType.SINGLE_TOP, fakeSettingsDataStore.omnibarType)
@@ -85,7 +84,7 @@ class OmnibarFeatureRepositoryTest {
         browserFeatures.splitOmnibar().setRawStoredState(Toggle.State(enable = true))
         createTestee()
 
-        testee.updateFeatureFlags()
+        testee.onStart(mockLifecycleOwner)
 
         assertTrue(testee.isSplitOmnibarAvailable)
         assertEquals(OmnibarType.SPLIT, fakeSettingsDataStore.omnibarType)
@@ -97,9 +96,9 @@ class OmnibarFeatureRepositoryTest {
         browserFeatures.splitOmnibar().setRawStoredState(Toggle.State(enable = true))
         fakeSettingsDataStore.omnibarType = OmnibarType.SPLIT
         createTestee()
-        testee.updateFeatureFlags()
+        testee.onStart(mockLifecycleOwner)
 
-        assertTrue(testee.isSplitOmnibarEnabled)
+        assertTrue(testee.omnibarType == OmnibarType.SPLIT)
     }
 
     @Test
@@ -108,9 +107,9 @@ class OmnibarFeatureRepositoryTest {
         browserFeatures.splitOmnibar().setRawStoredState(Toggle.State(enable = true))
         fakeSettingsDataStore.omnibarType = OmnibarType.SPLIT
         createTestee()
-        testee.updateFeatureFlags()
+        testee.onStart(mockLifecycleOwner)
 
-        assertFalse(testee.isSplitOmnibarEnabled)
+        assertFalse(testee.omnibarType == OmnibarType.SPLIT)
     }
 
     @Test
@@ -119,8 +118,8 @@ class OmnibarFeatureRepositoryTest {
         browserFeatures.splitOmnibar().setRawStoredState(Toggle.State(enable = true))
         fakeSettingsDataStore.omnibarType = OmnibarType.SINGLE_TOP
         createTestee()
-        testee.updateFeatureFlags()
+        testee.onStart(mockLifecycleOwner)
 
-        assertFalse(testee.isSplitOmnibarEnabled)
+        assertFalse(testee.omnibarType == OmnibarType.SPLIT)
     }
 }

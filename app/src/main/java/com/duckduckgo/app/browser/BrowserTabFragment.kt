@@ -107,6 +107,7 @@ import com.duckduckgo.app.browser.R.string
 import com.duckduckgo.app.browser.SSLErrorType.NONE
 import com.duckduckgo.app.browser.WebViewErrorResponse.LOADING
 import com.duckduckgo.app.browser.WebViewErrorResponse.OMITTED
+import com.duckduckgo.app.browser.api.OmnibarRepository
 import com.duckduckgo.app.browser.api.WebViewCapabilityChecker
 import com.duckduckgo.app.browser.api.WebViewCapabilityChecker.WebViewCapability
 import com.duckduckgo.app.browser.applinks.AppLinksLauncher
@@ -151,8 +152,8 @@ import com.duckduckgo.app.browser.omnibar.Omnibar.LogoClickListener
 import com.duckduckgo.app.browser.omnibar.Omnibar.OmnibarTextState
 import com.duckduckgo.app.browser.omnibar.Omnibar.TextListener
 import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode
-import com.duckduckgo.app.browser.omnibar.OmnibarFeatureRepository
 import com.duckduckgo.app.browser.omnibar.OmnibarItemPressedListener
+import com.duckduckgo.app.browser.omnibar.OmnibarType
 import com.duckduckgo.app.browser.omnibar.QueryOrigin
 import com.duckduckgo.app.browser.print.PrintDocumentAdapterFactory
 import com.duckduckgo.app.browser.print.PrintInjector
@@ -252,7 +253,6 @@ import com.duckduckgo.browser.api.ui.BrowserScreens.PrivateSearchScreenNoParams
 import com.duckduckgo.browser.api.ui.BrowserScreens.WebViewActivityWithParams
 import com.duckduckgo.browser.api.webviewcompat.WebViewCompatWrapper
 import com.duckduckgo.browser.ui.autocomplete.BrowserAutoCompleteSuggestionsAdapter
-import com.duckduckgo.browser.ui.omnibar.OmnibarType
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.DuckDuckGoFragment
 import com.duckduckgo.common.ui.store.BrowserAppTheme
@@ -594,7 +594,7 @@ class BrowserTabFragment :
     lateinit var webViewCompatWrapper: WebViewCompatWrapper
 
     @Inject
-    lateinit var omnibarFeatureRepository: OmnibarFeatureRepository
+    lateinit var omnibarRepository: OmnibarRepository
 
     @Inject
     lateinit var webViewCompatTestHelper: WebViewCompatTestHelper
@@ -927,9 +927,10 @@ class BrowserTabFragment :
                 }
 
                 InputScreenActivityResultCodes.MENU_REQUESTED -> {
+                    val isSplitOmnibarEnabled = omnibarRepository.omnibarType == OmnibarType.SPLIT
                     launchPopupMenu(
-                        anchorToNavigationBar = omnibarFeatureRepository.isSplitOmnibarEnabled,
-                        addExtraDelay = omnibarFeatureRepository.isSplitOmnibarEnabled,
+                        anchorToNavigationBar = isSplitOmnibarEnabled,
+                        addExtraDelay = isSplitOmnibarEnabled,
                     )
                 }
 
@@ -1043,7 +1044,7 @@ class BrowserTabFragment :
         omnibar = Omnibar(
             omnibarType = settingsDataStore.omnibarType,
             binding = binding,
-            isUnifiedOmnibarEnabled = omnibarFeatureRepository.isUnifiedOmnibarFlagEnabled,
+            isUnifiedOmnibarEnabled = omnibarRepository.isUnifiedOmnibarLayoutEnabled,
         )
 
         webViewContainer = binding.webViewContainer
@@ -1204,7 +1205,7 @@ class BrowserTabFragment :
         browserNavigationBarIntegration = BrowserNavigationBarViewIntegration(
             lifecycleScope = lifecycleScope,
             browserTabFragmentBinding = binding,
-            isEnabled = omnibarFeatureRepository.isSplitOmnibarEnabled,
+            isEnabled = omnibarRepository.omnibarType == OmnibarType.SPLIT,
             omnibar = omnibar,
             browserNavigationBarObserver = observer,
         )
@@ -1647,7 +1648,7 @@ class BrowserTabFragment :
                 .flowWithLifecycle(lifecycle, Lifecycle.State.RESUMED)
                 .collectLatest { hasFavorites ->
                     binding.includeNewBrowserTab.topNtpOutlineStroke.isVisible = hasFavorites
-                    binding.includeNewBrowserTab.bottomNtpOutlineStroke.isVisible = hasFavorites && !omnibarFeatureRepository.isSplitOmnibarEnabled
+                    binding.includeNewBrowserTab.bottomNtpOutlineStroke.isVisible = hasFavorites && omnibarRepository.omnibarType != OmnibarType.SPLIT
                 }
         }
 
