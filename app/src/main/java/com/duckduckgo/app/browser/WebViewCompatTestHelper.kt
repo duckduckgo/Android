@@ -53,6 +53,8 @@ interface WebViewCompatTestHelper {
 
     suspend fun onPageStarted(webView: DuckDuckGoWebView?)
     suspend fun onBrowserMenuButtonPressed(webView: DuckDuckGoWebView?)
+
+    fun blobDownloadScriptForWebViewCompatTest(): String
 }
 
 @ContributesBinding(FragmentScope::class)
@@ -135,13 +137,6 @@ class RealWebViewCompatTestHelper @Inject constructor(
     }
 
     @SuppressLint("PostMessageUsage", "RequiresFeature")
-    private suspend fun postMessage(string: String) {
-        withContext(dispatchers.main()) {
-            proxy?.postMessage(string)
-        }
-    }
-
-    @SuppressLint("PostMessageUsage", "RequiresFeature")
     override suspend fun handleWebViewCompatMessage(
         message: WebMessageCompat,
         replyProxy: JavaScriptReplyProxy,
@@ -178,7 +173,7 @@ class RealWebViewCompatTestHelper @Inject constructor(
             val messageData = "PageStarted"
 
             if (config.sendMessagesUsingReplyProxy) {
-                postMessage(messageData)
+                proxy?.postMessage(messageData)
             } else {
                 webView?.url?.let {
                     WebViewCompat.postWebMessage(
@@ -191,7 +186,7 @@ class RealWebViewCompatTestHelper @Inject constructor(
         }
     }
 
-    @SuppressLint("RequiresFeature")
+    @SuppressLint("RequiresFeature", "PostMessageUsage")
     override suspend fun onBrowserMenuButtonPressed(webView: DuckDuckGoWebView?) {
         withContext(dispatchers.main()) {
             val config = getWebViewCompatConfig()
@@ -201,7 +196,7 @@ class RealWebViewCompatTestHelper @Inject constructor(
             val messageData = "ContextMenuOpened"
 
             if (config.sendMessagesUsingReplyProxy) {
-                postMessage(messageData)
+                proxy?.postMessage(messageData)
             } else {
                 webView?.url?.let {
                     WebViewCompat.postWebMessage(
@@ -212,5 +207,60 @@ class RealWebViewCompatTestHelper @Inject constructor(
                 }
             }
         }
+    }
+
+    override fun blobDownloadScriptForWebViewCompatTest(): String {
+        val script =
+            """
+            (function() {
+
+                const urlToBlobCollection = {};
+
+                const original_createObjectURL = URL.createObjectURL;
+
+                URL.createObjectURL = function () {
+                    const blob = arguments[0];
+                    const url = original_createObjectURL.call(this, ...arguments);
+                    if (blob instanceof Blob) {
+                        urlToBlobCollection[url] = blob;
+                    }
+                    return url;
+                }
+
+                function blobToBase64DataUrl(blob) {
+                    return new Promise((resolve, reject) => {
+                        const reader = new FileReader();
+                        reader.onloadend = function() {
+                            resolve(reader.result);
+                        }
+                        reader.onerror = function() {
+                            reject(new Error('Failed to read Blob object'));
+                        }
+                        reader.readAsDataURL(blob);
+                    });
+                }
+
+                const pingMessage = 'Ping:' + window.location.href;
+                window.ddgBlobDownloadObj.postMessage(pingMessage);
+                console.log('Sent ping message for blob downloads: ' + pingMessage);
+
+                window.ddgBlobDownloadObj.addEventListener('message', function(event) {
+                    if (event.data.startsWith('blob:')) {
+                        console.log(event.data);
+                        const blob = urlToBlobCollection[event.data];
+                        if (blob) {
+                            blobToBase64DataUrl(blob).then((dataUrl) => {
+                                console.log('Sending data URL back to native ' + dataUrl);
+                                window.ddgBlobDownloadObj.postMessage(dataUrl);
+                            });
+                        } else {
+                            console.log('No Blob found for URL: ' + event.data);
+                        }
+                    }
+                });
+            })();
+            """.trimIndent()
+
+        return script
     }
 }
