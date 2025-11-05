@@ -385,7 +385,7 @@ class RealDuckChat @Inject constructor(
 
     override val showOmnibarShortcutInAllStates: StateFlow<Boolean> = _showOmnibarShortcutInAllStates.asStateFlow()
 
-    override val showNewAddressBarOptionChoiceScreen: StateFlow<Boolean> = _showNewAddressBarOptionChoiceScreen.asStateFlow()
+    override val showNewAddressBarOptionChoiceScreen: StateFlow<Boolean> = MutableStateFlow(false)//_showNewAddressBarOptionChoiceScreen.asStateFlow()
 
     override val showMainButtonsInInputScreen: StateFlow<Boolean> = _showMainButtonsInInputScreen.asStateFlow()
 

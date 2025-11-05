@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.tabs.model
 
+import android.annotation.SuppressLint
 import android.content.ContentValues
 import android.content.Context
 import android.database.DatabaseErrorHandler
@@ -586,13 +587,19 @@ class TabDataRepository @Inject constructor(
                 tabsDao.tabs().map { it.tabId }
             }
             logcat { "lp_test; tabIds: $tabIds" }
-            val profileNames = profileStore?.allProfileNames
+            val profileNames = profileStore!!.allProfileNames
             logcat { "lp_test; profileNames: $profileNames" }
-            profileNames?.filterNot { it == Profile.DEFAULT_PROFILE_NAME }?.forEach { profileName ->
+            profileNames.filterNot { it == Profile.DEFAULT_PROFILE_NAME || it.startsWith(DDG_DEFAULT_PROFILE_PREFIX) }?.forEach { profileName ->
                 if (!tabIds.contains(profileName)) {
                     logcat { "lp_test; deleting: $profileName" }
                     profileStore?.deleteProfile(profileName)
                 }
+            }
+            profileNames.filter { it.startsWith(DDG_DEFAULT_PROFILE_PREFIX) }.sortedBy {
+                it.split("_").last().toLong()
+            }.dropLast(1).forEach { profileName ->
+                logcat { "lp_test; deleting: $profileName" }
+                profileStore.deleteProfile(profileName)
             }
         }
     }
@@ -636,34 +643,47 @@ class TabDataRepository @Inject constructor(
         }
     }
 
-    private var defaultProfileName = "Default"
+    private val DDG_DEFAULT_PROFILE_PREFIX = "ddg_default_"
+    @SuppressLint("RequiresFeature")
+    private var defaultProfileName =
+        profileStore?.allProfileNames
+            ?.filter {
+                it.startsWith(DDG_DEFAULT_PROFILE_PREFIX)
+            }?.maxByOrNull {
+                it.split("_").last().toLong()
+            } ?: "${DDG_DEFAULT_PROFILE_PREFIX}0"
 
     override fun getDefaultProfileName(): String {
         return defaultProfileName
     }
 
-
     override suspend fun createNewDefaultProfile() = withContext(dispatchers.main()) {
-        val oldProfile = profileStore?.getProfile(defaultProfileName)
-        defaultProfileName = "ddg_default"
-        val newProfile = profileStore?.getOrCreateProfile(defaultProfileName)
+        val currentDefaultProfileName = defaultProfileName
+        val currentProfile = profileStore?.getProfile(currentDefaultProfileName)
+
+        // generate new profile
+        val currentProfileId = defaultProfileName.split("_").last().toLong()
+        val newDefaultProfileName = "$DDG_DEFAULT_PROFILE_PREFIX${currentProfileId + 1}"
+        val newProfile = profileStore?.getOrCreateProfile(newDefaultProfileName)
+
+        // grab fireproof websites domains
         val websites = withContext(dispatchers.io()) { fireproofRepository.fireproofWebsites() }.flatMap {
+            // I found out that `cookieManager.getCookie` needs the protocol to correctly grab cookies,
+            // otherwise, cookies for sites like `.reddit.com` are not returned
             listOf(it, "https://$it")
         }
-        logcat {
-            "lp_test; createNewDefaultProfile; migrating cookies from '${oldProfile?.name}' to '${newProfile?.name}' for websites: $websites"
-        }
+
+        // for each wesbite, copy cookies from old profile to new profile
         websites.forEach { website ->
-            val cookies = oldProfile?.cookieManager?.getCookie(website)?.split("; ")
-            logcat {
-                "lp_test; Retrieved cookies from '${oldProfile?.name}' for $website: $cookies"
-            }
+            // all cookies are returned as a single string but need to be set one by one
+            val cookies = currentProfile?.webStorage?.getCookie(website)?.split("; ")
             cookies?.forEach { cookie ->
-                logcat { "lp_test; Setting cookie from '${oldProfile?.name}' to '${newProfile?.name}' for $website: $cookie" }
-                newProfile?.cookieManager?.setCookie(website, cookie) {
-                    logcat { "lp_test; Cookie set result: $it" }
-                }
+                logcat { "lp_test; Setting cookie from '${currentProfile?.name}' to '${newProfile?.name}' for $website: $cookie" }
+                newProfile?.cookieManager?.setCookie(website, cookie)
             }
         }
+
+        // persist the new profile names that all the tabs can be used when they are recreated
+        defaultProfileName = newDefaultProfileName
     }
 }

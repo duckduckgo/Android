@@ -4089,11 +4089,6 @@ class BrowserTabFragment :
         webView?.let {
             it.removeSystemAutofillCallback()
             it.destroy()
-
-            // tabRepository.getTabProfileName(tabId)?.let {
-            //     logcat { "lp_test; deleteProfile: $tabId" }
-            //     ProfileStore.getInstance().deleteProfile(it)
-            // }
         }
         webView = null
     }
