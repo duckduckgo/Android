@@ -20,6 +20,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.voice.api.VoiceSearchLauncher.VoiceSearchMode
 import com.duckduckgo.voice.impl.listeningmode.OnDeviceSpeechRecognizer.Event.PartialResultReceived
 import com.duckduckgo.voice.impl.listeningmode.OnDeviceSpeechRecognizer.Event.RecognitionFailed
@@ -42,6 +43,7 @@ import javax.inject.Inject
 class VoiceSearchViewModel @Inject constructor(
     private val speechRecognizer: OnDeviceSpeechRecognizer,
     private val voiceSearchRepository: VoiceSearchRepository,
+    private val duckAiFeatureState: DuckAiFeatureState,
 ) : ViewModel() {
     data class ViewState(
         val result: String = "",
@@ -157,8 +159,13 @@ class VoiceSearchViewModel @Inject constructor(
         )
     }
 
-    fun updateSelectedMode(mode: VoiceSearchMode) {
+    fun updateSelectedMode(selectedMode: VoiceSearchMode) {
         viewModelScope.launch {
+            val mode = if (!duckAiFeatureState.showVoiceSearchToggle.value) {
+                VoiceSearchMode.SEARCH
+            } else {
+                selectedMode
+            }
             viewState.emit(viewState.value.copy(selectedMode = mode))
             voiceSearchRepository.setLastSelectedMode(mode)
         }

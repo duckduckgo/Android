@@ -46,7 +46,7 @@ interface VoiceSearchActivityLauncher {
         onEvent: (Event) -> Unit,
     )
 
-    fun launch(activity: Activity, initialMode: VoiceSearchMode = VoiceSearchMode.SEARCH)
+    fun launch(activity: Activity, initialMode: VoiceSearchMode?)
 }
 
 @ContributesBinding(ActivityScope::class)
@@ -128,11 +128,12 @@ class RealVoiceSearchActivityLauncher @Inject constructor(
         )
     }
 
-    override fun launch(activity: Activity, initialMode: VoiceSearchMode) {
-        launchVoiceSearch(activity, initialMode)
+    override fun launch(activity: Activity, initialMode: VoiceSearchMode?) {
+        val mode = initialMode ?: voiceSearchRepository.getLastSelectedMode()
+        launchVoiceSearch(activity, mode)
     }
 
-    private fun launchVoiceSearch(activity: Activity, initialMode: VoiceSearchMode = VoiceSearchMode.SEARCH) {
+    private fun launchVoiceSearch(activity: Activity, initialMode: VoiceSearchMode) {
         activity.window?.decorView?.rootView?.let {
             blurRenderer.addBlur(it)
         }

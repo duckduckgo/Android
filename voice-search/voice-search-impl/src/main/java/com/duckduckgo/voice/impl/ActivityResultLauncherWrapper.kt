@@ -50,7 +50,7 @@ interface ActivityResultLauncherWrapper {
 
     sealed class Action {
         data object LaunchPermissionRequest : Action()
-        data class LaunchVoiceSearch(val initialMode: VoiceSearchMode = VoiceSearchMode.SEARCH) : Action()
+        data class LaunchVoiceSearch(val initialMode: VoiceSearchMode) : Action()
     }
 }
 

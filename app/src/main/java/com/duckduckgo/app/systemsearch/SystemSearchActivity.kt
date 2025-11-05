@@ -96,7 +96,6 @@ import com.duckduckgo.savedsites.impl.dialogs.EditSavedSiteDialogFragment
 import com.duckduckgo.voice.api.VoiceSearchAvailability
 import com.duckduckgo.voice.api.VoiceSearchLauncher
 import com.duckduckgo.voice.api.VoiceSearchLauncher.Source.WIDGET
-import com.duckduckgo.voice.store.VoiceSearchRepository
 import com.google.android.material.card.MaterialCardView
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.Snackbar
@@ -123,9 +122,6 @@ class SystemSearchActivity : DuckDuckGoActivity() {
 
     @Inject
     lateinit var voiceSearchLauncher: VoiceSearchLauncher
-
-    @Inject
-    lateinit var voiceSearchRepository: VoiceSearchRepository
 
     @Inject
     lateinit var voiceSearchAvailability: VoiceSearchAvailability
@@ -437,7 +433,7 @@ class SystemSearchActivity : DuckDuckGoActivity() {
         }
         voiceSearch.setOnClickListener {
             omnibarTextInput.hideKeyboard()
-            voiceSearchLauncher.launch(this, voiceSearchRepository.getLastSelectedMode())
+            voiceSearchLauncher.launch(this)
         }
     }
 

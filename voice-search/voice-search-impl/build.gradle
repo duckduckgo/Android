@@ -34,6 +34,7 @@ dependencies {
     implementation project(path: ':common-utils')
     implementation project(path: ':design-system')
     implementation project(path: ':di')
+    implementation project(path: ':duckchat-api')
     implementation project(path: ':feature-toggles-api')
     implementation project(path: ':privacy-config-api')
     implementation project(path: ':statistics-api')

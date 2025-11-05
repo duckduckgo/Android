@@ -23,6 +23,7 @@ import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Build
 import android.os.Bundle
+import androidx.core.view.isVisible
 import androidx.core.view.postDelayed
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
@@ -33,6 +34,7 @@ import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.extensions.capitalizeFirstLetter
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.voice.api.VoiceSearchLauncher.VoiceSearchMode
 import com.duckduckgo.voice.impl.R
 import com.duckduckgo.voice.impl.databinding.ActivityVoiceSearchBinding
@@ -55,6 +57,8 @@ class VoiceSearchActivity : DuckDuckGoActivity() {
     }
 
     @Inject lateinit var appBuildConfig: AppBuildConfig
+
+    @Inject lateinit var duckAiFeatureState: DuckAiFeatureState
 
     private val viewModel: VoiceSearchViewModel by bindViewModel()
     private val binding: ActivityVoiceSearchBinding by viewBinding()
@@ -101,8 +105,7 @@ class VoiceSearchActivity : DuckDuckGoActivity() {
             object : TabLayout.OnTabSelectedListener {
                 override fun onTabSelected(tab: TabLayout.Tab?) {
                     tab?.let {
-                        val mode = VoiceSearchMode.fromValue(it.position)
-                        viewModel.updateSelectedMode(mode)
+                        viewModel.updateSelectedMode(VoiceSearchMode.fromValue(it.position))
                     }
                 }
                 override fun onTabUnselected(tab: TabLayout.Tab?) {}
@@ -169,6 +172,13 @@ class VoiceSearchActivity : DuckDuckGoActivity() {
                     is Command.HandleSpeechRecognitionSuccess -> handleSuccess(it.result)
                     is Command.TerminateVoiceSearch -> handleError(it.error)
                 }
+            }
+            .launchIn(lifecycleScope)
+
+        duckAiFeatureState.showVoiceSearchToggle
+            .flowWithLifecycle(lifecycle, Lifecycle.State.RESUMED)
+            .onEach { showToggle ->
+                binding.inputModeTabLayout.isVisible = showToggle
             }
             .launchIn(lifecycleScope)
     }

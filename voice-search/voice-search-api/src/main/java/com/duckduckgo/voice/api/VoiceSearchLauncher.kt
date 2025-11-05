@@ -27,7 +27,7 @@ interface VoiceSearchLauncher {
         onEvent: (Event) -> Unit,
     )
 
-    fun launch(activity: Activity, mode: VoiceSearchMode = VoiceSearchMode.SEARCH)
+    fun launch(activity: Activity, mode: VoiceSearchMode? = null)
 
     enum class VoiceSearchMode(val value: Int) {
         SEARCH(0),

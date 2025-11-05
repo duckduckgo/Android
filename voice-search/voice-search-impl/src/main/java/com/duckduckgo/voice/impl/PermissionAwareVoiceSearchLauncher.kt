@@ -36,7 +36,7 @@ class PermissionAwareVoiceSearchLauncher @Inject constructor(
     private val voiceSearchAvailability: VoiceSearchAvailability,
 ) : VoiceSearchLauncher {
 
-    private var pendingInitialMode: VoiceSearchMode = VoiceSearchMode.SEARCH
+    private var pendingInitialMode: VoiceSearchMode? = null
 
     override fun registerResultsCallback(
         caller: ActivityResultCaller,
@@ -55,7 +55,7 @@ class PermissionAwareVoiceSearchLauncher @Inject constructor(
         )
     }
 
-    override fun launch(activity: Activity, mode: VoiceSearchMode) {
+    override fun launch(activity: Activity, mode: VoiceSearchMode?) {
         if (!voiceSearchAvailability.isVoiceSearchAvailable) return
 
         pendingInitialMode = mode
