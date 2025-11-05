@@ -84,6 +84,11 @@
     <string name="subscriptionSettingSectionHelpAndSupport">Yardım ve Destek</string>
     <string name="subscriptionSettingSendFeedback">Geri Bildirim gönder</string>
     <string name="subscriptionSettingActivating">Etkinleştiriliyor</string>
+    <string name="subscriptionSettingSwitchUpgrade">Yıllık plana geç ve %16 tasarruf et</string>
+    <!-- smartling.character_limit = 10 -->
+    <string name="subscriptionSettingSwitchUpgradePill">En iyi</string>
+    <string name="subscriptionSettingSwitchDowngrade">Planı Değiştir</string>
+    <string name="subscriptionSettingManagePlan">Ödemeyi Yönet</string>
 
     <!--Purchase Subscriptions-->
     <string name="purchaseCompletedTitle">Her şey hazır.</string>
@@ -191,5 +196,15 @@
     <string name="subscriptionSettingSubscribeSecure">Wi-Fi bağlantınızı güvence altına alın ve gelişmiş yapay zeka modelleriyle gizlice sohbet edin</string>
 
     <string name="feedbackGeneralSubscription">Abonelik</string>
+
+    <!-- Switch plan-->
+    <string name="switchBottomSheetTitleUpgrade">Yıllık planla %16 tasarruf edin!</string>
+    <string name="switchBottomSheetDescriptionUpgrade" instruction="%1$s is the yearly plan monthly equivalent price (e.g. $8.33), %2$s is the current monthly plan price (e.g. $9.99)">Yıllık bir plan, mevcut %2$s aylık planınıza kıyasla ayda sadece %1$s tutarındadır.</string>
+    <string name="switchBottomSheetPrimaryButtonUpgrade" instruction="%1$s is the yearly plan price (e.g. $99.99)">Yıllık Plana Geç (%1$s/yıl)</string>
+    <string name="switchBottomSheetSecondaryButtonUpgrade">Aylık Planı Sürdür</string>
+    <string name="switchBottomSheetTitleDowngrade">Yıllık planla %16 tasarruf ediyorsunuz!</string>
+    <string name="switchBottomSheetDescriptionDowngrade" instruction="%1$s is the yearly plan monthly equivalent price (e.g. $8.33), %2$s is the monthly plan price (e.g. $9.99)">Geçiş yapmak, aylık fiyatı %1$s/ay\'dan %2$s/ay\'a çıkaracaktır.</string>
+    <string name="switchBottomSheetPrimaryButtonDowngrade">Yıllık Planı Sürdür</string>
+    <string name="switchBottomSheetSecondaryButtonDowngrade" instruction="%1$s is the monthly plan price (e.g. $9.99)">Aylık Plana Geç (%1$s/ay)</string>
 
 </resources>
