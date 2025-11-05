@@ -92,6 +92,13 @@ class SubscriptionSettingsViewModel @Inject constructor(
             else -> Yearly
         }
 
+        val switchPlanAvailable = subscriptionsManager.isSwitchPlanAvailable()
+        val savingsPercentage = if (switchPlanAvailable && type == Monthly) {
+            subscriptionsManager.getSwitchPlanPricing(isUpgrade = true)?.savingsPercentage
+        } else {
+            null
+        }
+
         _viewState.emit(
             Ready(
                 date = date,
@@ -101,7 +108,8 @@ class SubscriptionSettingsViewModel @Inject constructor(
                 email = account.email?.takeUnless { it.isBlank() },
                 showFeedback = privacyProUnifiedFeedback.shouldUseUnifiedFeedback(source = SUBSCRIPTION_SETTINGS),
                 activeOffers = subscription.activeOffers,
-                switchPlanAvailable = subscriptionsManager.isSwitchPlanAvailable(),
+                switchPlanAvailable = switchPlanAvailable,
+                savingsPercentage = savingsPercentage,
             ),
         )
     }
@@ -180,6 +188,7 @@ class SubscriptionSettingsViewModel @Inject constructor(
             val showFeedback: Boolean = false,
             val activeOffers: List<ActiveOfferType>,
             val switchPlanAvailable: Boolean,
+            val savingsPercentage: Int?,
         ) : ViewState()
     }
 }

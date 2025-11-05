@@ -2019,9 +2019,10 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
         val result = subscriptionsManager.getSwitchPlanPricing(isUpgrade = true)
 
         assertNotNull(result)
-        assertEquals("$9.99", result!!.currentPrice)
-        assertEquals("$99.99", result.targetPrice)
-        assertEquals("$8.33", result.yearlyMonthlyEquivalent)
+        assertEquals("US$9.99", result!!.currentPrice)
+        assertEquals("US$99.99", result.targetPrice)
+        assertEquals("US$8.33", result.yearlyMonthlyEquivalent)
+        assertEquals(17, result.savingsPercentage)
     }
 
     @Test
@@ -2038,9 +2039,10 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
         val result = subscriptionsManager.getSwitchPlanPricing(isUpgrade = false)
 
         assertNotNull(result)
-        assertEquals("$99.99", result!!.currentPrice)
-        assertEquals("$9.99", result.targetPrice)
-        assertEquals("$8.33", result.yearlyMonthlyEquivalent)
+        assertEquals("US$99.99", result!!.currentPrice)
+        assertEquals("US$9.99", result.targetPrice)
+        assertEquals("US$8.33", result.yearlyMonthlyEquivalent)
+        assertEquals(17, result.savingsPercentage)
     }
 
     @Test
@@ -2070,6 +2072,45 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
 
         assertNotNull(result)
         assertEquals("€7.50", result!!.yearlyMonthlyEquivalent)
+        // Savings: (8.99 * 12 - 89.99) / (8.99 * 12) * 100 = 16.58% ≈ 17%
+        assertEquals(17, result.savingsPercentage)
+    }
+
+    @Test
+    fun whenGetSwitchPlanPricingThenSavingsPercentageIsRoundedCorrectly() = runTest {
+        givenSwitchPlanSubscriptionExists(productId = MONTHLY_PLAN_US)
+        authRepository.setFeatures(MONTHLY_PLAN_US, setOf(NETP))
+        authRepository.setFeatures(YEARLY_PLAN_US, setOf(NETP))
+        // Monthly: $10, Yearly: $100 (exact 16.666...% savings)
+        givenPlanOffersExist(
+            monthlyAmount = "10.00".toBigDecimal(),
+            yearlyAmount = "100.00".toBigDecimal(),
+            currency = Currency.getInstance("USD"),
+        )
+
+        val result = subscriptionsManager.getSwitchPlanPricing(isUpgrade = true)
+
+        assertNotNull(result)
+        // Savings: (10 * 12 - 100) / (10 * 12) * 100 = 16.666...% rounds to 17%
+        assertEquals(17, result!!.savingsPercentage)
+    }
+
+    @Test
+    fun whenGetSwitchPlanPricingWith20PercentSavingsThenCalculateCorrectly() = runTest {
+        givenSwitchPlanSubscriptionExists(productId = MONTHLY_PLAN_US)
+        authRepository.setFeatures(MONTHLY_PLAN_US, setOf(NETP))
+        authRepository.setFeatures(YEARLY_PLAN_US, setOf(NETP))
+        // Monthly: $10, Yearly: $96 (20% savings: 12*10 - 96 = 24, 24/120 = 20%)
+        givenPlanOffersExist(
+            monthlyAmount = "10.00".toBigDecimal(),
+            yearlyAmount = "96.00".toBigDecimal(),
+            currency = Currency.getInstance("USD"),
+        )
+
+        val result = subscriptionsManager.getSwitchPlanPricing(isUpgrade = true)
+
+        assertNotNull(result)
+        assertEquals(20, result!!.savingsPercentage)
     }
 
     private suspend fun givenSwitchPlanSubscriptionExists(
