@@ -18,9 +18,11 @@ package com.duckduckgo.voice.impl.listeningmode
 
 import app.cash.turbine.test
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.voice.impl.listeningmode.OnDeviceSpeechRecognizer.Event
 import com.duckduckgo.voice.impl.listeningmode.VoiceSearchViewModel.Command
 import com.duckduckgo.voice.impl.listeningmode.VoiceSearchViewModel.ViewState
+import com.duckduckgo.voice.store.VoiceSearchRepository
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.*
 import org.junit.Before
@@ -41,10 +43,16 @@ class VoiceSearchViewModelTest {
     @Mock
     private lateinit var speechRecognizer: OnDeviceSpeechRecognizer
 
+    @Mock
+    private lateinit var voiceSearchRepository: VoiceSearchRepository
+
+    @Mock
+    private lateinit var duckAiFeatureState: DuckAiFeatureState
+
     @Before
     fun setUp() {
         MockitoAnnotations.openMocks(this)
-        testee = VoiceSearchViewModel(speechRecognizer)
+        testee = VoiceSearchViewModel(speechRecognizer, voiceSearchRepository, duckAiFeatureState)
     }
 
     @Test

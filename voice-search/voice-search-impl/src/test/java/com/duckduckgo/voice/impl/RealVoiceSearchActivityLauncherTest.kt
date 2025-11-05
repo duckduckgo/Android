@@ -190,21 +190,23 @@ class RealVoiceSearchActivityLauncherTest {
 
     @Test
     fun whenBrowserVoiceSearchLaunchedThenEmitStartedPixelAndCallLaunchVoiceSearch() {
+        whenever(voiceSearchRepository.getLastSelectedMode()).thenReturn(VoiceSearchMode.SEARCH)
         testee.registerResultsCallback(mock(), mock(), BROWSER) { }
 
-        testee.launch(mock())
+        testee.launch(mock(), null)
 
         verify(pixel).fire(VoiceSearchPixelNames.VOICE_SEARCH_STARTED, mapOf("source" to "browser"))
-        assertEquals(Action.LaunchVoiceSearch(), activityResultLauncherWrapper.lastKnownAction)
+        assertEquals(Action.LaunchVoiceSearch(VoiceSearchMode.SEARCH), activityResultLauncherWrapper.lastKnownAction)
     }
 
     @Test
     fun whenWidgetVoiceSearchLaunchedThenEmitStartedPixelAndCallLaunchVoiceSearch() {
+        whenever(voiceSearchRepository.getLastSelectedMode()).thenReturn(VoiceSearchMode.SEARCH)
         testee.registerResultsCallback(mock(), mock(), WIDGET) { }
 
-        testee.launch(mock())
+        testee.launch(mock(), null)
 
         verify(pixel).fire(VoiceSearchPixelNames.VOICE_SEARCH_STARTED, mapOf("source" to "widget"))
-        assertEquals(Action.LaunchVoiceSearch(), activityResultLauncherWrapper.lastKnownAction)
+        assertEquals(Action.LaunchVoiceSearch(VoiceSearchMode.SEARCH), activityResultLauncherWrapper.lastKnownAction)
     }
 }

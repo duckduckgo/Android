@@ -22,6 +22,7 @@ import org.junit.Test
 import org.mockito.Mock
 import org.mockito.MockitoAnnotations
 import org.mockito.kotlin.any
+import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
@@ -57,7 +58,7 @@ class PermissionAwareVoiceSearchLauncherTest {
         testee.launch(mock())
 
         verify(permissionRequest).launch(any())
-        verify(voiceSearchActivityLauncher, never()).launch(any())
+        verify(voiceSearchActivityLauncher, never()).launch(any(), anyOrNull())
     }
 
     @Test
@@ -68,7 +69,7 @@ class PermissionAwareVoiceSearchLauncherTest {
         testee.launch(mock())
 
         verify(permissionRequest, never()).launch(any())
-        verify(voiceSearchActivityLauncher, never()).launch(any())
+        verify(voiceSearchActivityLauncher, never()).launch(any(), anyOrNull())
     }
 
     @Test
@@ -78,7 +79,7 @@ class PermissionAwareVoiceSearchLauncherTest {
 
         testee.launch(mock())
 
-        verify(voiceSearchActivityLauncher).launch(any())
+        verify(voiceSearchActivityLauncher).launch(any(), anyOrNull())
         verify(permissionRequest, never()).launch(any())
     }
 
@@ -89,7 +90,7 @@ class PermissionAwareVoiceSearchLauncherTest {
 
         testee.launch(mock())
 
-        verify(voiceSearchActivityLauncher, never()).launch(any())
+        verify(voiceSearchActivityLauncher, never()).launch(any(), anyOrNull())
         verify(permissionRequest, never()).launch(any())
     }
 }
