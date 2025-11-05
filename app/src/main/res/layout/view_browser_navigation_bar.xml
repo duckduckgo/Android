@@ -146,6 +146,16 @@
                 android:contentDescription="@string/browserPopupMenu"
                 android:scaleType="center"
                 android:src="@drawable/ic_menu_vertical_24" />
+
+            <View
+                android:id="@+id/browserMenuHighlight"
+                android:layout_width="7dp"
+                android:layout_height="7dp"
+                android:layout_gravity="end"
+                android:layout_margin="@dimen/keyline_2"
+                android:background="@drawable/ic_circle_7_accent_blue"
+                android:visibility="gone" />
+
         </FrameLayout>
 
     </LinearLayout>
