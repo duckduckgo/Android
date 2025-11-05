@@ -31,6 +31,7 @@ import com.duckduckgo.pir.impl.common.RealNativeBrokerActionHandler
 import com.duckduckgo.pir.impl.common.actions.EventHandler
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngineFactory
 import com.duckduckgo.pir.impl.common.actions.RealPirActionsRunnerStateEngineFactory
+import com.duckduckgo.pir.impl.pixels.PirPixelSender
 import com.duckduckgo.pir.impl.scripts.BrokerActionProcessor
 import com.duckduckgo.pir.impl.scripts.PirMessagingInterface
 import com.duckduckgo.pir.impl.scripts.RealBrokerActionProcessor
@@ -48,19 +49,9 @@ import com.duckduckgo.pir.impl.scripts.models.PirSuccessResponse.GetCaptchaInfoR
 import com.duckduckgo.pir.impl.scripts.models.PirSuccessResponse.NavigateResponse
 import com.duckduckgo.pir.impl.scripts.models.PirSuccessResponse.SolveCaptchaResponse
 import com.duckduckgo.pir.impl.service.DbpService
-import com.duckduckgo.pir.impl.store.PirDatabase
 import com.duckduckgo.pir.impl.store.PirRepository
 import com.duckduckgo.pir.impl.store.RealPirDataStore
 import com.duckduckgo.pir.impl.store.RealPirRepository
-import com.duckduckgo.pir.impl.store.db.BrokerDao
-import com.duckduckgo.pir.impl.store.db.BrokerJsonDao
-import com.duckduckgo.pir.impl.store.db.EmailConfirmationLogDao
-import com.duckduckgo.pir.impl.store.db.ExtractedProfileDao
-import com.duckduckgo.pir.impl.store.db.JobSchedulingDao
-import com.duckduckgo.pir.impl.store.db.OptOutResultsDao
-import com.duckduckgo.pir.impl.store.db.ScanLogDao
-import com.duckduckgo.pir.impl.store.db.ScanResultsDao
-import com.duckduckgo.pir.impl.store.db.UserProfileDao
 import com.duckduckgo.pir.impl.store.secure.PirSecureStorageDatabaseFactory
 import com.squareup.anvil.annotations.ContributesTo
 import com.squareup.moshi.Moshi
@@ -70,97 +61,30 @@ import dagger.Module
 import dagger.Provides
 import dagger.SingleInstanceIn
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.runBlocking
 import javax.inject.Named
 
 @Module
 @ContributesTo(AppScope::class)
 class PirModule {
 
-    @SingleInstanceIn(AppScope::class)
-    @Provides
-    fun bindPirDatabase(
-        databaseFactory: PirSecureStorageDatabaseFactory,
-    ): PirDatabase {
-        return runBlocking {
-            databaseFactory.getDatabase()
-        } ?: throw IllegalStateException("Failed to create PIR encrypted database")
-    }
-
-    @SingleInstanceIn(AppScope::class)
-    @Provides
-    fun provideBrokerJsonDao(database: PirDatabase): BrokerJsonDao {
-        return database.brokerJsonDao()
-    }
-
-    @SingleInstanceIn(AppScope::class)
-    @Provides
-    fun provideBrokerDao(database: PirDatabase): BrokerDao {
-        return database.brokerDao()
-    }
-
-    @SingleInstanceIn(AppScope::class)
-    @Provides
-    fun provideScanResultsDao(database: PirDatabase): ScanResultsDao {
-        return database.scanResultsDao()
-    }
-
-    @SingleInstanceIn(AppScope::class)
-    @Provides
-    fun provideUserProfileDao(database: PirDatabase): UserProfileDao {
-        return database.userProfileDao()
-    }
-
-    @SingleInstanceIn(AppScope::class)
-    @Provides
-    fun provideScanLogDao(database: PirDatabase): ScanLogDao {
-        return database.scanLogDao()
-    }
-
-    @SingleInstanceIn(AppScope::class)
-    @Provides
-    fun provideOptOutResultsDao(database: PirDatabase): OptOutResultsDao {
-        return database.optOutResultsDao()
-    }
-
-    @SingleInstanceIn(AppScope::class)
-    @Provides
-    fun provideJobSchedulingDao(database: PirDatabase): JobSchedulingDao {
-        return database.jobSchedulingDao()
-    }
-
-    @SingleInstanceIn(AppScope::class)
-    @Provides
-    fun provideExtractedProfileDao(database: PirDatabase): ExtractedProfileDao {
-        return database.extractedProfileDao()
-    }
-
-    @SingleInstanceIn(AppScope::class)
-    @Provides
-    fun provideEmailConfirmationLogDao(database: PirDatabase): EmailConfirmationLogDao {
-        return database.emailConfirmationLogDao()
-    }
-
     @Provides
     @SingleInstanceIn(AppScope::class)
     fun providePirRepository(
         sharedPreferencesProvider: SharedPreferencesProvider,
         dispatcherProvider: DispatcherProvider,
-        brokerJsonDao: BrokerJsonDao,
-        brokerDao: BrokerDao,
         currentTimeProvider: CurrentTimeProvider,
-        userProfileDao: UserProfileDao,
         dbpService: DbpService,
-        extractedProfileDao: ExtractedProfileDao,
+        @AppCoroutineScope appCoroutineScope: CoroutineScope,
+        databaseFactory: PirSecureStorageDatabaseFactory,
+        pixelSender: PirPixelSender,
     ): PirRepository = RealPirRepository(
         dispatcherProvider,
         RealPirDataStore(sharedPreferencesProvider),
         currentTimeProvider,
-        brokerJsonDao,
-        brokerDao,
-        userProfileDao,
+        databaseFactory,
         dbpService,
-        extractedProfileDao,
+        pixelSender,
+        appCoroutineScope,
     )
 
     @Provides

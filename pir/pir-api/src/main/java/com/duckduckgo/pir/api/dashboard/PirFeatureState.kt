@@ -14,16 +14,24 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.pir.api
+package com.duckduckgo.pir.api.dashboard
 
-import com.duckduckgo.pir.api.dashboard.PirFeatureState
-
-interface PirFeature {
+/**
+ * Represents the state of the PIR (Private Information Retrieval) feature.
+ */
+enum class PirFeatureState {
+    /**
+     * The PIR feature is enabled and available for use.
+     */
+    ENABLED,
 
     /**
-     * Runs on the IO thread by default.
-     *
-     * @return [PirFeatureState] that represents the current state of the feature
+     * The PIR feature is disabled and cannot be used.
      */
-    suspend fun getPirFeatureState(): PirFeatureState
+    DISABLED,
+
+    /**
+     * The PIR feature is enabled but not available.
+     */
+    NOT_AVAILABLE,
 }

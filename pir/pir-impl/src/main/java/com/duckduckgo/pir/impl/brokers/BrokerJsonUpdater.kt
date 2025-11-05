@@ -56,6 +56,10 @@ class RealBrokerJsonUpdater @Inject constructor(
      */
     override suspend fun update(): Boolean = withContext(dispatcherProvider.io()) {
         return@withContext kotlin.runCatching {
+            if (!pirRepository.isRepositoryAvailable()) {
+                return@withContext false
+            }
+
             confirmEtagIntegrity()
             dbpService.getMainConfig(pirRepository.getCurrentMainEtag()).also {
                 logcat { "PIR-update: Main config result $it." }

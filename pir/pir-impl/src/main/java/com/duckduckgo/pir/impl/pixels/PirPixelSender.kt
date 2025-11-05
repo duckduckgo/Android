@@ -39,6 +39,7 @@ import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_INTERNAL_SCAN_STATS
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_INTERNAL_SCHEDULED_SCAN_COMPLETED
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_INTERNAL_SCHEDULED_SCAN_SCHEDULED
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_INTERNAL_SCHEDULED_SCAN_STARTED
+import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_INTERNAL_SECURE_STORAGE_UNAVAILABLE
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_OPTOUT_STAGE_PENDING_EMAIL_CONFIRMATION
 import com.squareup.anvil.annotations.ContributesBinding
 import logcat.logcat
@@ -282,6 +283,11 @@ interface PirPixelSender {
         totalFetchAttempts: Int,
         totalEmailConfirmationJobs: Int,
     )
+
+    /**
+     * Emits a pixel to signal that PIR encrypted database is unavailable.
+     */
+    fun reportSecureStorageUnavailable()
 }
 
 @ContributesBinding(AppScope::class)
@@ -524,6 +530,10 @@ class RealPirPixelSender @Inject constructor(
             PARAM_TOTAL_EMAIL_CONFIRMATION to totalEmailConfirmationJobs.toString(),
         )
         fire(PIR_EMAIL_CONFIRMATION_RUN_COMPLETED, params)
+    }
+
+    override fun reportSecureStorageUnavailable() {
+        fire(PIR_INTERNAL_SECURE_STORAGE_UNAVAILABLE)
     }
 
     private fun fire(

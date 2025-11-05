@@ -23,6 +23,7 @@ import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.pir.impl.PirRemoteFeatures
 import com.duckduckgo.pir.impl.scan.PirScanScheduler
+import com.duckduckgo.pir.impl.store.PirRepository
 import com.duckduckgo.subscriptions.api.Product
 import com.duckduckgo.subscriptions.api.SubscriptionStatus
 import com.duckduckgo.subscriptions.api.Subscriptions
@@ -50,12 +51,14 @@ class RealPirWorkHandlerTest {
     private val pirScanScheduler: PirScanScheduler = mock()
     private val context: Context = mock()
     private val pirBetaToggle: Toggle = mock()
+    private val pirRepository: PirRepository = mock()
 
     private lateinit var pirWorkHandler: RealPirWorkHandler
 
     @Before
-    fun setUp() {
+    fun setUp() = runTest {
         whenever(pirRemoteFeatures.pirBeta()).thenReturn(pirBetaToggle)
+        whenever(pirRepository.isRepositoryAvailable()).thenReturn(true)
 
         pirWorkHandler = RealPirWorkHandler(
             pirRemoteFeatures = pirRemoteFeatures,
@@ -63,6 +66,7 @@ class RealPirWorkHandlerTest {
             subscriptions = subscriptions,
             context = context,
             pirScanScheduler = pirScanScheduler,
+            pirRepository = pirRepository,
         )
     }
 
@@ -250,6 +254,19 @@ class RealPirWorkHandlerTest {
             // No new emissions should occur since value hasn't changed
             expectNoEvents()
 
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenRepositoryNotAvailableThenCanRunPirReturnsFalse() = runTest {
+        whenever(pirBetaToggle.isEnabled()).thenReturn(true)
+        whenever(subscriptions.getEntitlementStatus()).thenReturn(flowOf(listOf(Product.PIR)))
+        whenever(subscriptions.getSubscriptionStatusFlow()).thenReturn(flowOf(SubscriptionStatus.AUTO_RENEWABLE))
+        whenever(pirRepository.isRepositoryAvailable()).thenReturn(false)
+
+        pirWorkHandler.canRunPir().test {
+            assertFalse(awaitItem())
             cancelAndIgnoreRemainingEvents()
         }
     }

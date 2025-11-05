@@ -19,7 +19,7 @@ package com.duckduckgo.pir.internal.settings.store.secure
 import android.content.Context
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.pir.impl.store.PirDatabase
+import com.duckduckgo.pir.impl.store.secure.PirSecureStorageDatabaseFactory
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
 import kotlinx.coroutines.withContext
@@ -50,7 +50,7 @@ interface PirDatabaseExporter {
     boundType = PirDatabaseExporter::class,
 )
 class PirRealDatabaseExporter @Inject constructor(
-    private val pirDatabase: PirDatabase,
+    private val pirDatabaseFactory: PirSecureStorageDatabaseFactory,
     private val dispatcherProvider: DispatcherProvider,
     private val context: Context,
 ) : PirDatabaseExporter {
@@ -59,10 +59,10 @@ class PirRealDatabaseExporter @Inject constructor(
         exportDecryptedDatabase()
     }
 
-    private fun exportDecryptedDatabase() {
+    private suspend fun exportDecryptedDatabase() {
         try {
             // Get the writable database instance
-            val db = pirDatabase.openHelper.writableDatabase
+            val db = pirDatabaseFactory.getDatabase()?.openHelper?.writableDatabase ?: return
 
             // Define output path - using external files directory for accessibility
             val outputFile = File(context.getExternalFilesDir(null), "pir_decrypted.db")
