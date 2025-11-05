@@ -84,6 +84,11 @@
     <string name="subscriptionSettingSectionHelpAndSupport">Palīdzība un atbalsts</string>
     <string name="subscriptionSettingSendFeedback">Sūtīt atsauksmi</string>
     <string name="subscriptionSettingActivating">Notiek aktivizēšana</string>
+    <string name="subscriptionSettingSwitchUpgrade">Maini plānu uz ikgadējo un ietaupi 16 %!</string>
+    <!-- smartling.character_limit = 10 -->
+    <string name="subscriptionSettingSwitchUpgradePill">Labākais piedāvājums</string>
+    <string name="subscriptionSettingSwitchDowngrade">Mainīt plānu</string>
+    <string name="subscriptionSettingManagePlan">Pārvaldīt maksājumu</string>
 
     <!--Purchase Subscriptions-->
     <string name="purchaseCompletedTitle">Viss ir gatavs.</string>
@@ -191,5 +196,15 @@
     <string name="subscriptionSettingSubscribeSecure">Nodrošini sava Wi-Fi drošību un privāti tērzē ar uzlabotiem mākslīgā intelekta modeļiem</string>
 
     <string name="feedbackGeneralSubscription">Abonements</string>
+
+    <!-- Switch plan-->
+    <string name="switchBottomSheetTitleUpgrade">Ietaupi 16 % ar\nikgadējo plānu!</string>
+    <string name="switchBottomSheetDescriptionUpgrade" instruction="%1$s is the yearly plan monthly equivalent price (e.g. $8.33), %2$s is the current monthly plan price (e.g. $9.99)">Gada plāns ir tikai %1$s/mēnesī, salīdzinot ar tavu pašreizējo %2$s mēneša plānu.</string>
+    <string name="switchBottomSheetPrimaryButtonUpgrade" instruction="%1$s is the yearly plan price (e.g. $99.99)">Maini plānu uz ikgadējo (%1$s/gadā)</string>
+    <string name="switchBottomSheetSecondaryButtonUpgrade">Atstāt ikmēneša plānu</string>
+    <string name="switchBottomSheetTitleDowngrade">Tu ietaupi 16 % ar\nikgadējo plānu!</string>
+    <string name="switchBottomSheetDescriptionDowngrade" instruction="%1$s is the yearly plan monthly equivalent price (e.g. $8.33), %2$s is the monthly plan price (e.g. $9.99)">Pārejot tava mēneša maksa palielināsies no %1$s/mēn. līdz %2$s/mēn.</string>
+    <string name="switchBottomSheetPrimaryButtonDowngrade">Atstāt ikgadējo plānu</string>
+    <string name="switchBottomSheetSecondaryButtonDowngrade" instruction="%1$s is the monthly plan price (e.g. $9.99)">Maini plānu uz ikmēneša (%1$smēnesī)</string>
 
 </resources>
