@@ -434,7 +434,7 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
                 viewModel.onBrowserMenuTapped()
             }
             onVoiceClick = {
-                voiceSearchLauncher.launch(requireActivity())
+                voiceSearchLauncher.launch(requireActivity(), inputModeWidget.getSelectedTabPosition())
             }
             onClearTextTapped = {
                 viewModel.onClearTextTapped()
@@ -457,7 +457,14 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
         voiceSearchLauncher.registerResultsCallback(this, requireActivity(), BROWSER) {
             when (it) {
                 is VoiceRecognitionSuccess -> {
-                    inputModeWidget.submitMessage(it.result)
+                    when (val result = it.result) {
+                        is VoiceSearchLauncher.VoiceRecognitionResult.SearchResult -> {
+                            viewModel.onSearchSubmitted(result.query)
+                        }
+                        is VoiceSearchLauncher.VoiceRecognitionResult.DuckAiResult -> {
+                            viewModel.onChatSubmitted(result.query)
+                        }
+                    }
                 }
 
                 is SearchCancelled -> {}
@@ -482,7 +489,7 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
                 }
             }.launchIn(lifecycleScope)
         if (inputScreenConfigResolver.shouldLaunchVoiceSearch()) {
-            voiceSearchLauncher.launch(requireActivity())
+            voiceSearchLauncher.launch(requireActivity(), inputModeWidget.getSelectedTabPosition())
         }
     }
 
@@ -497,7 +504,7 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
             pixel.fire(DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_OMNIBAR_FLOATING_RETURN_PRESSED)
         }
         inputScreenButtons.onVoiceClick = {
-            voiceSearchLauncher.launch(requireActivity())
+            voiceSearchLauncher.launch(requireActivity(), inputModeWidget.getSelectedTabPosition())
         }
     }
 

@@ -26,10 +26,12 @@ import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.voice.api.VoiceSearchLauncher.Event
 import com.duckduckgo.voice.api.VoiceSearchLauncher.Event.VoiceSearchDisabled
 import com.duckduckgo.voice.api.VoiceSearchLauncher.Source
-import com.duckduckgo.voice.impl.ActivityResultLauncherWrapper.Action.LaunchVoiceSearch
+import com.duckduckgo.voice.api.VoiceSearchLauncher.VoiceRecognitionResult
+import com.duckduckgo.voice.impl.ActivityResultLauncherWrapper.Action
 import com.duckduckgo.voice.impl.ActivityResultLauncherWrapper.Request
 import com.duckduckgo.voice.impl.R.string
 import com.duckduckgo.voice.impl.listeningmode.VoiceSearchActivity.Companion.VOICE_SEARCH_ERROR
+import com.duckduckgo.voice.impl.listeningmode.VoiceSearchMode
 import com.duckduckgo.voice.impl.listeningmode.ui.VoiceSearchBackgroundBlurRenderer
 import com.duckduckgo.voice.store.VoiceSearchRepository
 import com.google.android.material.snackbar.Snackbar
@@ -44,7 +46,7 @@ interface VoiceSearchActivityLauncher {
         onEvent: (Event) -> Unit,
     )
 
-    fun launch(activity: Activity)
+    fun launch(activity: Activity, initialMode: Int = 0)
 }
 
 @ContributesBinding(ActivityScope::class)
@@ -73,7 +75,7 @@ class RealVoiceSearchActivityLauncher @Inject constructor(
         _source = source
         activityResultLauncherWrapper.register(
             caller,
-            Request.ResultFromVoiceSearch { code, data ->
+            Request.ResultFromVoiceSearch { code, data, mode ->
                 if (code == Activity.RESULT_OK) {
                     if (data.isNotEmpty()) {
                         pixel.fire(
@@ -81,7 +83,12 @@ class RealVoiceSearchActivityLauncher @Inject constructor(
                             parameters = mapOf(KEY_PARAM_SOURCE to _source?.paramValueName.orEmpty()),
                         )
                         voiceSearchRepository.resetVoiceSearchDismissed()
-                        onEvent(Event.VoiceRecognitionSuccess(data))
+                        val modeEnum = VoiceSearchMode.fromValue(mode)
+                        val recognitionResult = when (modeEnum) {
+                            VoiceSearchMode.DUCK_AI -> VoiceRecognitionResult.DuckAiResult(data)
+                            VoiceSearchMode.SEARCH -> VoiceRecognitionResult.SearchResult(data)
+                        }
+                        onEvent(Event.VoiceRecognitionSuccess(recognitionResult))
                     } else {
                         onEvent(Event.SearchCancelled)
                     }
@@ -122,11 +129,11 @@ class RealVoiceSearchActivityLauncher @Inject constructor(
         )
     }
 
-    override fun launch(activity: Activity) {
-        launchVoiceSearch(activity)
+    override fun launch(activity: Activity, initialMode: Int) {
+        launchVoiceSearch(activity, initialMode)
     }
 
-    private fun launchVoiceSearch(activity: Activity) {
+    private fun launchVoiceSearch(activity: Activity, initialMode: Int = 0) {
         activity.window?.decorView?.rootView?.let {
             blurRenderer.addBlur(it)
         }
@@ -134,6 +141,6 @@ class RealVoiceSearchActivityLauncher @Inject constructor(
             pixel = VoiceSearchPixelNames.VOICE_SEARCH_STARTED,
             parameters = mapOf(KEY_PARAM_SOURCE to _source?.paramValueName.orEmpty()),
         )
-        activityResultLauncherWrapper.launch(LaunchVoiceSearch)
+        activityResultLauncherWrapper.launch(Action.LaunchVoiceSearch(initialMode = initialMode))
     }
 }

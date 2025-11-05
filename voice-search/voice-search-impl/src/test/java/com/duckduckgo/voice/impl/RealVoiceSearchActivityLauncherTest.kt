@@ -21,7 +21,8 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.voice.api.VoiceSearchLauncher.Event
 import com.duckduckgo.voice.api.VoiceSearchLauncher.Source.BROWSER
 import com.duckduckgo.voice.api.VoiceSearchLauncher.Source.WIDGET
-import com.duckduckgo.voice.impl.ActivityResultLauncherWrapper.Action.LaunchVoiceSearch
+import com.duckduckgo.voice.api.VoiceSearchLauncher.VoiceRecognitionResult
+import com.duckduckgo.voice.impl.ActivityResultLauncherWrapper.Action
 import com.duckduckgo.voice.impl.fakes.FakeActivityResultLauncherWrapper
 import com.duckduckgo.voice.impl.listeningmode.VoiceSearchActivity
 import com.duckduckgo.voice.impl.listeningmode.ui.VoiceSearchBackgroundBlurRenderer
@@ -76,10 +77,10 @@ class RealVoiceSearchActivityLauncherTest {
         }
 
         val lastKnownRequest = activityResultLauncherWrapper.lastKnownRequest as ActivityResultLauncherWrapper.Request.ResultFromVoiceSearch
-        lastKnownRequest.onResult(Activity.RESULT_OK, "Result")
+        lastKnownRequest.onResult(Activity.RESULT_OK, "Result", 0)
 
         verify(pixel).fire(VoiceSearchPixelNames.VOICE_SEARCH_DONE, mapOf("source" to "browser"))
-        assertEquals(Event.VoiceRecognitionSuccess("Result"), lastKnownEvent)
+        assertEquals(Event.VoiceRecognitionSuccess(VoiceRecognitionResult.SearchResult("Result")), lastKnownEvent)
     }
 
     @Test
@@ -90,7 +91,7 @@ class RealVoiceSearchActivityLauncherTest {
         }
 
         val lastKnownRequest = activityResultLauncherWrapper.lastKnownRequest as ActivityResultLauncherWrapper.Request.ResultFromVoiceSearch
-        lastKnownRequest.onResult(VoiceSearchActivity.VOICE_SEARCH_ERROR, "1")
+        lastKnownRequest.onResult(VoiceSearchActivity.VOICE_SEARCH_ERROR, "1", 0)
         verify(pixel).fire(VoiceSearchPixelNames.VOICE_SEARCH_ERROR, mapOf("error" to "1"))
 
         assertNull(lastKnownEvent)
@@ -104,10 +105,10 @@ class RealVoiceSearchActivityLauncherTest {
         }
 
         val lastKnownRequest = activityResultLauncherWrapper.lastKnownRequest as ActivityResultLauncherWrapper.Request.ResultFromVoiceSearch
-        lastKnownRequest.onResult(Activity.RESULT_OK, "Result")
+        lastKnownRequest.onResult(Activity.RESULT_OK, "Result", 0)
 
         verify(pixel).fire(VoiceSearchPixelNames.VOICE_SEARCH_DONE, mapOf("source" to "widget"))
-        assertEquals(Event.VoiceRecognitionSuccess("Result"), lastKnownEvent)
+        assertEquals(Event.VoiceRecognitionSuccess(VoiceRecognitionResult.SearchResult("Result")), lastKnownEvent)
     }
 
     @Test
@@ -118,7 +119,7 @@ class RealVoiceSearchActivityLauncherTest {
         }
 
         val lastKnownRequest = activityResultLauncherWrapper.lastKnownRequest as ActivityResultLauncherWrapper.Request.ResultFromVoiceSearch
-        lastKnownRequest.onResult(Activity.RESULT_OK, "")
+        lastKnownRequest.onResult(Activity.RESULT_OK, "", 0)
 
         verify(pixel, never()).fire(VoiceSearchPixelNames.VOICE_SEARCH_DONE, mapOf("source" to "browser"))
         assertEquals(Event.SearchCancelled, lastKnownEvent)
@@ -132,7 +133,7 @@ class RealVoiceSearchActivityLauncherTest {
         }
 
         val lastKnownRequest = activityResultLauncherWrapper.lastKnownRequest as ActivityResultLauncherWrapper.Request.ResultFromVoiceSearch
-        lastKnownRequest.onResult(Activity.RESULT_CANCELED, "Result")
+        lastKnownRequest.onResult(Activity.RESULT_CANCELED, "Result", 0)
 
         verify(pixel, never()).fire(VoiceSearchPixelNames.VOICE_SEARCH_DONE, mapOf("source" to "browser"))
         verify(voiceSearchRepository).dismissVoiceSearch()
@@ -148,7 +149,7 @@ class RealVoiceSearchActivityLauncherTest {
         whenever(voiceSearchRepository.countVoiceSearchDismissed()).thenReturn(3)
 
         val lastKnownRequest = activityResultLauncherWrapper.lastKnownRequest as ActivityResultLauncherWrapper.Request.ResultFromVoiceSearch
-        lastKnownRequest.onResult(Activity.RESULT_CANCELED, "Result")
+        lastKnownRequest.onResult(Activity.RESULT_CANCELED, "Result", 0)
 
         verify(pixel, never()).fire(VoiceSearchPixelNames.VOICE_SEARCH_DONE, mapOf("source" to "browser"))
         verify(dialogLauncher).showRemoveVoiceSearchDialog(any(), any(), any())
@@ -164,7 +165,7 @@ class RealVoiceSearchActivityLauncherTest {
         whenever(voiceSearchRepository.countVoiceSearchDismissed()).thenReturn(1)
 
         val lastKnownRequest = activityResultLauncherWrapper.lastKnownRequest as ActivityResultLauncherWrapper.Request.ResultFromVoiceSearch
-        lastKnownRequest.onResult(Activity.RESULT_CANCELED, "Result")
+        lastKnownRequest.onResult(Activity.RESULT_CANCELED, "Result", 0)
 
         verify(pixel, never()).fire(VoiceSearchPixelNames.VOICE_SEARCH_DONE, mapOf("source" to "browser"))
         verify(dialogLauncher, never()).showRemoveVoiceSearchDialog(any(), any(), any())
@@ -180,7 +181,7 @@ class RealVoiceSearchActivityLauncherTest {
         whenever(voiceSearchRepository.countVoiceSearchDismissed()).thenReturn(1)
 
         val lastKnownRequest = activityResultLauncherWrapper.lastKnownRequest as ActivityResultLauncherWrapper.Request.ResultFromVoiceSearch
-        lastKnownRequest.onResult(Activity.RESULT_OK, "Result")
+        lastKnownRequest.onResult(Activity.RESULT_OK, "Result", 0)
 
         verify(voiceSearchRepository).resetVoiceSearchDismissed()
         verify(voiceSearchRepository, never()).dismissVoiceSearch()
@@ -193,7 +194,7 @@ class RealVoiceSearchActivityLauncherTest {
         testee.launch(mock())
 
         verify(pixel).fire(VoiceSearchPixelNames.VOICE_SEARCH_STARTED, mapOf("source" to "browser"))
-        assertEquals(LaunchVoiceSearch, activityResultLauncherWrapper.lastKnownAction)
+        assertEquals(Action.LaunchVoiceSearch(), activityResultLauncherWrapper.lastKnownAction)
     }
 
     @Test
@@ -203,6 +204,6 @@ class RealVoiceSearchActivityLauncherTest {
         testee.launch(mock())
 
         verify(pixel).fire(VoiceSearchPixelNames.VOICE_SEARCH_STARTED, mapOf("source" to "widget"))
-        assertEquals(LaunchVoiceSearch, activityResultLauncherWrapper.lastKnownAction)
+        assertEquals(Action.LaunchVoiceSearch(), activityResultLauncherWrapper.lastKnownAction)
     }
 }

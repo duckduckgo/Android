@@ -36,6 +36,18 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+enum class VoiceSearchMode(val value: Int) {
+    SEARCH(0),
+    DUCK_AI(1),
+    ;
+
+    companion object {
+        fun fromValue(value: Int): VoiceSearchMode {
+            return VoiceSearchMode.entries.find { it.value == value } ?: SEARCH
+        }
+    }
+}
+
 @ContributesViewModel(ActivityScope::class)
 class VoiceSearchViewModel @Inject constructor(
     private val speechRecognizer: OnDeviceSpeechRecognizer,
@@ -43,6 +55,7 @@ class VoiceSearchViewModel @Inject constructor(
     data class ViewState(
         val result: String = "",
         val unsentResult: String = "",
+        val selectedMode: VoiceSearchMode = VoiceSearchMode.SEARCH,
     )
 
     sealed class Command {
@@ -151,5 +164,11 @@ class VoiceSearchViewModel @Inject constructor(
                 ),
             ),
         )
+    }
+
+    fun updateSelectedMode(mode: VoiceSearchMode) {
+        viewModelScope.launch {
+            viewState.emit(viewState.value.copy(selectedMode = mode))
+        }
     }
 }

@@ -52,10 +52,34 @@
         android:layout_height="0dp"
         android:layout_margin="@dimen/keyline_2"
         android:layout_marginTop="60dp"
-        app:layout_constraintBottom_toTopOf="@+id/footer"
+        app:layout_constraintBottom_toTopOf="@+id/inputModeTabLayout"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/speechResults" />
+
+    <com.duckduckgo.common.ui.view.tablayout.InputModeTabLayout
+        android:id="@+id/inputModeTabLayout"
+        style="@style/Widget.DuckDuckGo.TabLayout.Rounded"
+        android:layout_width="wrap_content"
+        android:layout_height="@dimen/inputModeSwitchHeight"
+        android:layout_marginBottom="@dimen/keyline_4"
+        app:layout_constrainedWidth="true"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/indicator"
+        app:layout_constraintBottom_toTopOf="@+id/footer">
+
+        <com.google.android.material.tabs.TabItem
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout="@layout/view_search_tab_indicator" />
+
+        <com.google.android.material.tabs.TabItem
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout="@layout/view_chat_tab_indicator" />
+
+    </com.duckduckgo.common.ui.view.tablayout.InputModeTabLayout>
 
     <com.duckduckgo.common.ui.view.text.DaxTextView
         android:id="@+id/footer"
@@ -69,6 +93,7 @@
         android:text="@string/voiceSearchListeningFooter"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/inputModeTabLayout" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
