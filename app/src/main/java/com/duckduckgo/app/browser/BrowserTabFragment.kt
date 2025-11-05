@@ -339,6 +339,7 @@ import com.duckduckgo.user.agent.api.ClientBrandHintProvider
 import com.duckduckgo.user.agent.api.UserAgentProvider
 import com.duckduckgo.voice.api.VoiceSearchLauncher
 import com.duckduckgo.voice.api.VoiceSearchLauncher.Source.BROWSER
+import com.duckduckgo.voice.store.VoiceSearchRepository
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.snackbar.BaseTransientBottomBar
@@ -494,6 +495,9 @@ class BrowserTabFragment :
 
     @Inject
     lateinit var voiceSearchLauncher: VoiceSearchLauncher
+
+    @Inject
+    lateinit var voiceSearchRepository: VoiceSearchRepository
 
     @Inject
     lateinit var printInjector: PrintInjector
@@ -1296,7 +1300,7 @@ class BrowserTabFragment :
     private fun onOmnibarVoiceSearchPressed() {
         webView?.onPause()
         hideKeyboard()
-        voiceSearchLauncher.launch(requireActivity())
+        voiceSearchLauncher.launch(requireActivity(), voiceSearchRepository.getLastSelectedMode())
     }
 
     private fun onOmnibarDuckChatPressed(

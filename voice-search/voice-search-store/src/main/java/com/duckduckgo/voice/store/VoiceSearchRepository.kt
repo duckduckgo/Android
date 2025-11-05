@@ -16,6 +16,7 @@
 
 package com.duckduckgo.voice.store
 
+import com.duckduckgo.voice.api.VoiceSearchLauncher.VoiceSearchMode
 import com.duckduckgo.voice.api.VoiceSearchStatusListener
 
 interface VoiceSearchRepository {
@@ -30,6 +31,8 @@ interface VoiceSearchRepository {
     fun countVoiceSearchDismissed(): Int
     fun dismissVoiceSearch()
     fun resetVoiceSearchDismissed()
+    fun getLastSelectedMode(): VoiceSearchMode
+    fun setLastSelectedMode(mode: VoiceSearchMode)
 }
 
 class RealVoiceSearchRepository constructor(
@@ -71,5 +74,13 @@ class RealVoiceSearchRepository constructor(
 
     override fun resetVoiceSearchDismissed() {
         dataStore.countVoiceSearchDismissed = 0
+    }
+
+    override fun getLastSelectedMode(): VoiceSearchMode {
+        return dataStore.lastSelectedMode
+    }
+
+    override fun setLastSelectedMode(mode: VoiceSearchMode) {
+        dataStore.lastSelectedMode = mode
     }
 }

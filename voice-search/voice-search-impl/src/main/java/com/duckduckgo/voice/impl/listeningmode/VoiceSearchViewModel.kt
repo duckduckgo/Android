@@ -28,6 +28,7 @@ import com.duckduckgo.voice.impl.listeningmode.OnDeviceSpeechRecognizer.Event.Re
 import com.duckduckgo.voice.impl.listeningmode.OnDeviceSpeechRecognizer.Event.VolumeUpdateReceived
 import com.duckduckgo.voice.impl.listeningmode.VoiceSearchViewModel.Command.HandleSpeechRecognitionSuccess
 import com.duckduckgo.voice.impl.listeningmode.VoiceSearchViewModel.Command.UpdateVoiceIndicator
+import com.duckduckgo.voice.store.VoiceSearchRepository
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
@@ -40,6 +41,7 @@ import javax.inject.Inject
 @ContributesViewModel(ActivityScope::class)
 class VoiceSearchViewModel @Inject constructor(
     private val speechRecognizer: OnDeviceSpeechRecognizer,
+    private val voiceSearchRepository: VoiceSearchRepository,
 ) : ViewModel() {
     data class ViewState(
         val result: String = "",
@@ -158,6 +160,7 @@ class VoiceSearchViewModel @Inject constructor(
     fun updateSelectedMode(mode: VoiceSearchMode) {
         viewModelScope.launch {
             viewState.emit(viewState.value.copy(selectedMode = mode))
+            voiceSearchRepository.setLastSelectedMode(mode)
         }
     }
 }
