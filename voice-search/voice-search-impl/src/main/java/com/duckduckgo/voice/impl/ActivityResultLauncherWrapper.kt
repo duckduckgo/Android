@@ -24,6 +24,7 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts.RequestPermission
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.voice.api.VoiceSearchLauncher.VoiceSearchMode
 import com.duckduckgo.voice.impl.ActivityResultLauncherWrapper.Action
 import com.duckduckgo.voice.impl.ActivityResultLauncherWrapper.Request
 import com.duckduckgo.voice.impl.ActivityResultLauncherWrapper.Request.Permission
@@ -43,13 +44,13 @@ interface ActivityResultLauncherWrapper {
     sealed class Request {
         data class Permission(val onResult: (Boolean) -> Unit) : Request()
         data class ResultFromVoiceSearch(
-            val onResult: (Int, String, Int) -> Unit,
+            val onResult: (Int, String, VoiceSearchMode) -> Unit,
         ) : Request()
     }
 
     sealed class Action {
         data object LaunchPermissionRequest : Action()
-        data class LaunchVoiceSearch(val initialMode: Int = 0) : Action()
+        data class LaunchVoiceSearch(val initialMode: VoiceSearchMode = VoiceSearchMode.SEARCH) : Action()
     }
 }
 
@@ -73,13 +74,13 @@ class RealActivityResultLauncherWrapper @Inject constructor(
 
     private fun registerResultFromVoiceSearch(
         caller: ActivityResultCaller,
-        onResult: (Int, String, Int) -> Unit,
+        onResult: (Int, String, VoiceSearchMode) -> Unit,
     ) {
         voiceSearchActivityLaucher = caller.registerForActivityResult(StartActivityForResult()) {
             val resultCode = it.resultCode
             val result = it.data?.getStringExtra(VoiceSearchActivity.EXTRA_VOICE_RESULT) ?: ""
             val mode = it.data?.getIntExtra(VoiceSearchActivity.EXTRA_SELECTED_MODE, 0) ?: 0
-            onResult(resultCode, result, mode)
+            onResult(resultCode, result, VoiceSearchMode.fromValue(mode))
         }
     }
 
@@ -95,13 +96,15 @@ class RealActivityResultLauncherWrapper @Inject constructor(
     override fun launch(action: Action) {
         when (action) {
             is Action.LaunchPermissionRequest -> launchPermissionRequest()
-            is Action.LaunchVoiceSearch -> {
-                Intent(context, VoiceSearchActivity::class.java).apply {
-                    putExtra(VoiceSearchActivity.EXTRA_INITIAL_MODE, action.initialMode)
-                }.let {
-                    voiceSearchActivityLaucher?.launch(it)
-                }
-            }
+            is Action.LaunchVoiceSearch -> launchVoiceSearch(action.initialMode)
+        }
+    }
+
+    private fun launchVoiceSearch(initialMode: VoiceSearchMode) {
+        Intent(context, VoiceSearchActivity::class.java).apply {
+            putExtra(VoiceSearchActivity.EXTRA_INITIAL_MODE, initialMode.value)
+        }.let {
+            voiceSearchActivityLaucher?.launch(it)
         }
     }
 

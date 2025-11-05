@@ -77,6 +77,7 @@ import com.duckduckgo.voice.api.VoiceSearchLauncher.Event.SearchCancelled
 import com.duckduckgo.voice.api.VoiceSearchLauncher.Event.VoiceRecognitionSuccess
 import com.duckduckgo.voice.api.VoiceSearchLauncher.Event.VoiceSearchDisabled
 import com.duckduckgo.voice.api.VoiceSearchLauncher.Source.BROWSER
+import com.duckduckgo.voice.api.VoiceSearchLauncher.VoiceSearchMode
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
@@ -434,7 +435,7 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
                 viewModel.onBrowserMenuTapped()
             }
             onVoiceClick = {
-                voiceSearchLauncher.launch(requireActivity(), inputModeWidget.getSelectedTabPosition())
+                voiceSearchLauncher.launch(requireActivity(), VoiceSearchMode.fromValue(inputModeWidget.getSelectedTabPosition()))
             }
             onClearTextTapped = {
                 viewModel.onClearTextTapped()
@@ -489,7 +490,7 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
                 }
             }.launchIn(lifecycleScope)
         if (inputScreenConfigResolver.shouldLaunchVoiceSearch()) {
-            voiceSearchLauncher.launch(requireActivity(), inputModeWidget.getSelectedTabPosition())
+            voiceSearchLauncher.launch(requireActivity(), VoiceSearchMode.fromValue(inputModeWidget.getSelectedTabPosition()))
         }
     }
 
@@ -504,7 +505,7 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
             pixel.fire(DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_OMNIBAR_FLOATING_RETURN_PRESSED)
         }
         inputScreenButtons.onVoiceClick = {
-            voiceSearchLauncher.launch(requireActivity(), inputModeWidget.getSelectedTabPosition())
+            voiceSearchLauncher.launch(requireActivity(), VoiceSearchMode.fromValue(inputModeWidget.getSelectedTabPosition()))
         }
     }
 

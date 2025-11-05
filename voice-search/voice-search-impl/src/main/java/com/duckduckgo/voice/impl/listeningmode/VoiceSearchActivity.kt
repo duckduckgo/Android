@@ -33,6 +33,7 @@ import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.extensions.capitalizeFirstLetter
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.voice.api.VoiceSearchLauncher.VoiceSearchMode
 import com.duckduckgo.voice.impl.R
 import com.duckduckgo.voice.impl.databinding.ActivityVoiceSearchBinding
 import com.duckduckgo.voice.impl.listeningmode.VoiceSearchViewModel.Command
@@ -64,15 +65,14 @@ class VoiceSearchActivity : DuckDuckGoActivity() {
         makeBackgroundTransparent()
         setContentView(binding.root)
         configureToolbar()
-        val initialModeValue = intent.getIntExtra(EXTRA_INITIAL_MODE, VoiceSearchMode.SEARCH.value)
-        val initialMode = VoiceSearchMode.fromValue(initialModeValue)
-        viewModel.updateSelectedMode(initialMode)
         configureViews()
         observeViewModel()
     }
 
     @SuppressLint("NewApi")
     private fun configureViews() {
+        setInitialMode()
+
         if (appBuildConfig.sdkInt >= Build.VERSION_CODES.R) {
             window.setDecorFitsSystemWindows(false)
             window.statusBarColor = Color.TRANSPARENT
@@ -89,6 +89,11 @@ class VoiceSearchActivity : DuckDuckGoActivity() {
             }
         }
         configureInputModeTabLayout()
+    }
+
+    private fun setInitialMode() {
+        val initialMode = intent.getIntExtra(EXTRA_INITIAL_MODE, VoiceSearchMode.SEARCH.value)
+        viewModel.updateSelectedMode(VoiceSearchMode.fromValue(initialMode))
     }
 
     private fun configureInputModeTabLayout() {

@@ -20,6 +20,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.voice.api.VoiceSearchLauncher.VoiceSearchMode
 import com.duckduckgo.voice.impl.listeningmode.OnDeviceSpeechRecognizer.Event.PartialResultReceived
 import com.duckduckgo.voice.impl.listeningmode.OnDeviceSpeechRecognizer.Event.RecognitionFailed
 import com.duckduckgo.voice.impl.listeningmode.OnDeviceSpeechRecognizer.Event.RecognitionSuccess
@@ -35,18 +36,6 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
-
-enum class VoiceSearchMode(val value: Int) {
-    SEARCH(0),
-    DUCK_AI(1),
-    ;
-
-    companion object {
-        fun fromValue(value: Int): VoiceSearchMode {
-            return VoiceSearchMode.entries.find { it.value == value } ?: SEARCH
-        }
-    }
-}
 
 @ContributesViewModel(ActivityScope::class)
 class VoiceSearchViewModel @Inject constructor(

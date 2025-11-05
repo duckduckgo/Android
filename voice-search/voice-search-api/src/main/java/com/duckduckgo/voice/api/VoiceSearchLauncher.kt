@@ -27,7 +27,19 @@ interface VoiceSearchLauncher {
         onEvent: (Event) -> Unit,
     )
 
-    fun launch(activity: Activity, mode: Int = 0)
+    fun launch(activity: Activity, mode: VoiceSearchMode = VoiceSearchMode.SEARCH)
+
+    enum class VoiceSearchMode(val value: Int) {
+        SEARCH(0),
+        DUCK_AI(1),
+        ;
+
+        companion object {
+            fun fromValue(value: Int): VoiceSearchMode {
+                return entries.find { it.value == value } ?: SEARCH
+            }
+        }
+    }
 
     enum class Source(val paramValueName: String) {
         BROWSER("browser"),

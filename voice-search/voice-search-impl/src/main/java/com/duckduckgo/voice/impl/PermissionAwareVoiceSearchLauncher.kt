@@ -24,6 +24,7 @@ import com.duckduckgo.voice.api.VoiceSearchLauncher
 import com.duckduckgo.voice.api.VoiceSearchLauncher.Event
 import com.duckduckgo.voice.api.VoiceSearchLauncher.Event.VoiceSearchDisabled
 import com.duckduckgo.voice.api.VoiceSearchLauncher.Source
+import com.duckduckgo.voice.api.VoiceSearchLauncher.VoiceSearchMode
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
 
@@ -35,7 +36,7 @@ class PermissionAwareVoiceSearchLauncher @Inject constructor(
     private val voiceSearchAvailability: VoiceSearchAvailability,
 ) : VoiceSearchLauncher {
 
-    private var pendingInitialMode: Int = 0
+    private var pendingInitialMode: VoiceSearchMode = VoiceSearchMode.SEARCH
 
     override fun registerResultsCallback(
         caller: ActivityResultCaller,
@@ -54,12 +55,12 @@ class PermissionAwareVoiceSearchLauncher @Inject constructor(
         )
     }
 
-    override fun launch(activity: Activity, initialMode: Int) {
+    override fun launch(activity: Activity, mode: VoiceSearchMode) {
         if (!voiceSearchAvailability.isVoiceSearchAvailable) return
 
-        pendingInitialMode = initialMode
+        pendingInitialMode = mode
         if (voiceSearchPermissionCheck.hasRequiredPermissionsGranted()) {
-            voiceSearchActivityLauncher.launch(activity, initialMode)
+            voiceSearchActivityLauncher.launch(activity, mode)
         } else {
             permissionRequest.launch(activity)
         }
