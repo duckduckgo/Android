@@ -490,7 +490,7 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
                 }
             }.launchIn(lifecycleScope)
         if (inputScreenConfigResolver.shouldLaunchVoiceSearch()) {
-            voiceSearchLauncher.launch(requireActivity(), VoiceSearchMode.fromValue(inputModeWidget.getSelectedTabPosition()))
+            voiceSearchLauncher.launch(requireActivity())
         }
     }
 
