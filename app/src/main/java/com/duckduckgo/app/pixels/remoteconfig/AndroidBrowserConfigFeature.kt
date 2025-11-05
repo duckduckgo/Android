@@ -194,4 +194,12 @@ interface AndroidBrowserConfigFeature {
      */
     @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
     fun splitOmnibar(): Toggle
+
+    /**
+     * @return `true` when the remote config has the global "repotWebViewCapabilities" androidBrowserConfig
+     * sub-feature flag enabled
+     * If the remote feature is not present defaults to `true`
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
+    fun repotWebViewCapabilities(): Toggle
 }
