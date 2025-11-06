@@ -14,17 +14,24 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.attributed.metrics
+package com.duckduckgo.app.attributed.metrics.search
 
+import android.annotation.SuppressLint
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.duckduckgo.app.attributed.metrics.AttributedMetricsConfigFeature
 import com.duckduckgo.app.attributed.metrics.api.AttributedMetricClient
+import com.duckduckgo.app.attributed.metrics.api.AttributedMetricConfig
 import com.duckduckgo.app.attributed.metrics.api.EventStats
+import com.duckduckgo.app.attributed.metrics.api.MetricBucket
 import com.duckduckgo.app.attributed.metrics.store.AttributedMetricsDateUtils
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.duckduckgo.browser.api.install.AppInstall
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
+import com.duckduckgo.feature.toggles.api.Toggle.State
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNull
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -35,8 +42,9 @@ import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
+@SuppressLint("DenyListedApi")
 @RunWith(AndroidJUnit4::class)
-class RealSearchDaysAttributedMetricTest {
+class SearchDaysAttributedMetricTest {
 
     @get:Rule
     val coroutineRule = CoroutineTestRule()
@@ -45,41 +53,78 @@ class RealSearchDaysAttributedMetricTest {
     private val appInstall: AppInstall = mock()
     private val statisticsDataStore: StatisticsDataStore = mock()
     private val dateUtils: AttributedMetricsDateUtils = mock()
-    private lateinit var testee: RealSearchDaysAttributedMetric
+    private val attributedMetricConfig: AttributedMetricConfig = mock()
+    private val searchDaysToggle = FakeFeatureToggleFactory.create(AttributedMetricsConfigFeature::class.java)
+
+    private lateinit var testee: SearchDaysAttributedMetric
 
     @Before
-    fun setup() {
-        testee = RealSearchDaysAttributedMetric(
+    fun setup() = runTest {
+        searchDaysToggle.searchDaysAvg().setRawStoredState(State(true))
+        searchDaysToggle.canEmitSearchDaysAvg().setRawStoredState(State(true))
+        whenever(attributedMetricConfig.metricsToggles()).thenReturn(
+            listOf(searchDaysToggle.searchDaysAvg(), searchDaysToggle.canEmitSearchDaysAvg()),
+        )
+        whenever(attributedMetricConfig.getBucketConfiguration()).thenReturn(
+            mapOf(
+                "attributed_metric_active_past_week" to MetricBucket(
+                    buckets = listOf(2, 4),
+                    version = 0,
+                ),
+            ),
+        )
+        testee = SearchDaysAttributedMetric(
             appCoroutineScope = coroutineRule.testScope,
             dispatcherProvider = coroutineRule.testDispatcherProvider,
             attributedMetricClient = attributedMetricClient,
             appInstall = appInstall,
             statisticsDataStore = statisticsDataStore,
             dateUtils = dateUtils,
+            attributedMetricConfig = attributedMetricConfig,
         )
     }
 
     @Test
-    fun whenOnFirstSearchThenCollectEventCalled() {
+    fun whenOnFirstSearchThenCollectEventCalled() = runTest {
         testee.onSearchRetentionAtbRefreshed("old", "new")
 
         verify(attributedMetricClient).collectEvent("ddg_search_days")
     }
 
     @Test
-    fun whenOnEachSearchThenCollectEventCalled() {
+    fun whenOnEachSearchThenCollectEventCalled() = runTest {
         testee.onSearchRetentionAtbRefreshed("same", "same")
 
         verify(attributedMetricClient).collectEvent("ddg_search_days")
     }
 
     @Test
-    fun whenPixelNameRequestedThenReturnCorrectName() {
-        assertEquals("user_active_past_week", testee.getPixelName())
+    fun whenSearchedButFFDisabledThenDoNotCollectMetric() = runTest {
+        searchDaysToggle.searchDaysAvg().setRawStoredState(State(false))
+        whenever(attributedMetricConfig.metricsToggles()).thenReturn(
+            listOf(searchDaysToggle.searchDaysAvg(), searchDaysToggle.canEmitSearchDaysAvg()),
+        )
+        givenDaysSinceInstalled(7)
+        whenever(attributedMetricClient.getEventStats(any(), any())).thenReturn(
+            EventStats(
+                totalEvents = 16,
+                daysWithEvents = 3,
+                rollingAverage = 5.3,
+            ),
+        )
+
+        testee.onSearchRetentionAtbRefreshed("old", "new")
+
+        verify(attributedMetricClient, never()).collectEvent("ddg_search_days")
     }
 
     @Test
-    fun whenFirstSearchOfDayIfInstallationDayThenDoNotEmitMetric() = runTest {
+    fun whenPixelNameRequestedThenReturnCorrectName() {
+        assertEquals("attributed_metric_active_past_week", testee.getPixelName())
+    }
+
+    @Test
+    fun whenAtbRefreshedIfInstallationDayThenDoNotEmitMetric() = runTest {
         givenDaysSinceInstalled(0)
 
         testee.onAppRetentionAtbRefreshed("old", "new")
@@ -88,7 +133,7 @@ class RealSearchDaysAttributedMetricTest {
     }
 
     @Test
-    fun whenFirstSearchOfDayIfNoDaysWithEventsThenDoNotEmitMetric() = runTest {
+    fun whenAtbRefreshedIfNoDaysWithEventsThenDoNotEmitMetric() = runTest {
         givenDaysSinceInstalled(3)
         whenever(attributedMetricClient.getEventStats(any(), any())).thenReturn(
             EventStats(
@@ -104,7 +149,7 @@ class RealSearchDaysAttributedMetricTest {
     }
 
     @Test
-    fun whenFirstSearchOfDayIfHasDaysWithEventsThenEmitMetric() = runTest {
+    fun whenAtbRefreshedIfHasDaysWithEventsThenEmitMetric() = runTest {
         givenDaysSinceInstalled(3)
         whenever(attributedMetricClient.getEventStats(any(), any())).thenReturn(
             EventStats(
@@ -136,6 +181,27 @@ class RealSearchDaysAttributedMetricTest {
     }
 
     @Test
+    fun whenAtbRefreshedButEmitDisabledThenDoNotEmitMetric() = runTest {
+        searchDaysToggle.searchDaysAvg().setRawStoredState(State(true))
+        searchDaysToggle.canEmitSearchDaysAvg().setRawStoredState(State(false))
+        whenever(attributedMetricConfig.metricsToggles()).thenReturn(
+            listOf(searchDaysToggle.searchDaysAvg(), searchDaysToggle.canEmitSearchDaysAvg()),
+        )
+        givenDaysSinceInstalled(7)
+        whenever(attributedMetricClient.getEventStats(any(), any())).thenReturn(
+            EventStats(
+                totalEvents = 16,
+                daysWithEvents = 3,
+                rollingAverage = 5.3,
+            ),
+        )
+
+        testee.onAppRetentionAtbRefreshed("old", "new")
+
+        verify(attributedMetricClient, never()).emitMetric(testee)
+    }
+
+    @Test
     fun whenGetTagThenReturnAppRetentionAtb() = runTest {
         whenever(statisticsDataStore.appRetentionAtb).thenReturn("v123-1")
 
@@ -148,14 +214,14 @@ class RealSearchDaysAttributedMetricTest {
 
         // Map of days with events to expected bucket
         val daysWithEventsExpectedBuckets = mapOf(
-            0 to 0,
-            1 to 0,
-            2 to 0,
-            3 to 1,
-            4 to 1,
-            5 to 2,
-            6 to 2,
-            7 to 2,
+            0 to 0, // 0 days ≤2 -> bucket 0
+            1 to 0, // 1 day ≤2 -> bucket 0
+            2 to 0, // 2 days ≤2 -> bucket 0
+            3 to 1, // 3 days >2 and ≤4 -> bucket 1
+            4 to 1, // 4 days >2 and ≤4 -> bucket 1
+            5 to 2, // 5 days >4 -> bucket 2
+            6 to 2, // 6 days >4 -> bucket 2
+            7 to 2, // 7 days >4 -> bucket 2
         )
 
         daysWithEventsExpectedBuckets.forEach { (days, bucket) ->
@@ -167,11 +233,12 @@ class RealSearchDaysAttributedMetricTest {
                 ),
             )
 
-            val params = testee.getMetricParameters()
+            val realBucket = testee.getMetricParameters()["days"]
 
             assertEquals(
-                mapOf("days" to bucket.toString()),
-                params,
+                "For $days days with events, should return bucket $bucket",
+                bucket.toString(),
+                realBucket,
             )
         }
     }
@@ -187,19 +254,13 @@ class RealSearchDaysAttributedMetricTest {
             ),
         )
 
-        val params = testee.getMetricParameters()
+        val daysWindow = testee.getMetricParameters()["daysSinceInstalled"]
 
-        assertEquals(
-            mapOf(
-                "days" to "2",
-                "daysSinceInstalled" to "5",
-            ),
-            params,
-        )
+        assertEquals("5", daysWindow)
     }
 
     @Test
-    fun whenDaysSinceInstalledIs8ThenDoNotIncludeDaysSinceInstalled() = runTest {
+    fun whenDaysSinceInstalledIs7ThenDoNotIncludeDaysSinceInstalled() = runTest {
         givenDaysSinceInstalled(7)
         whenever(attributedMetricClient.getEventStats(any(), any())).thenReturn(
             EventStats(
@@ -209,12 +270,25 @@ class RealSearchDaysAttributedMetricTest {
             ),
         )
 
-        val params = testee.getMetricParameters()
+        val daysSince = testee.getMetricParameters()["daysSinceInstalled"]
 
-        assertEquals(
-            mapOf("days" to "2"),
-            params,
+        assertNull(daysSince)
+    }
+
+    @Test
+    fun whenGetMetricParametersThenReturnVersion() = runTest {
+        givenDaysSinceInstalled(7)
+        whenever(attributedMetricClient.getEventStats(any(), any())).thenReturn(
+            EventStats(
+                totalEvents = 25,
+                daysWithEvents = 5,
+                rollingAverage = 5.0,
+            ),
         )
+
+        val version = testee.getMetricParameters()["version"]
+
+        assertEquals("0", version)
     }
 
     private fun givenDaysSinceInstalled(days: Int) {

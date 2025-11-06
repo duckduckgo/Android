@@ -33,4 +33,6 @@ kotlin {
 dependencies {
     implementation Kotlin.stdlib.jdk7
     implementation KotlinX.coroutines.core
+
+    implementation project(path: ':feature-toggles-api')
 }
