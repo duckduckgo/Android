@@ -76,6 +76,16 @@ class RealVoiceSearchActivityLauncher @Inject constructor(
             Request.ResultFromVoiceSearch { code, data ->
                 if (code == Activity.RESULT_OK) {
                     if (data.isNotEmpty()) {
+                        if (duckAiFeatureState.showVoiceSearchToggle.value) {
+                            val pixelName = when (mode) {
+                                VoiceSearchMode.SEARCH -> VoiceSearchPixelNames.VOICE_SEARCH_SERP_DONE
+                                VoiceSearchMode.DUCK_AI -> VoiceSearchPixelNames.VOICE_SEARCH_AICHAT_DONE
+                            }
+                            pixel.fire(
+                                pixel = pixelName,
+                                parameters = mapOf(KEY_PARAM_SOURCE to _source?.paramValueName.orEmpty()),
+                            )
+                        }
                         pixel.fire(
                             pixel = VoiceSearchPixelNames.VOICE_SEARCH_DONE,
                             parameters = mapOf(KEY_PARAM_SOURCE to _source?.paramValueName.orEmpty()),
@@ -83,6 +93,10 @@ class RealVoiceSearchActivityLauncher @Inject constructor(
                         voiceSearchRepository.resetVoiceSearchDismissed()
                         onEvent(Event.VoiceRecognitionSuccess(data))
                     } else {
+                        pixel.fire(
+                            pixel = VoiceSearchPixelNames.VOICE_SEARCH_CANCELLED,
+                            parameters = mapOf(KEY_PARAM_SOURCE to _source?.paramValueName.orEmpty()),
+                        )
                         onEvent(Event.SearchCancelled)
                     }
                 } else {
@@ -102,6 +116,10 @@ class RealVoiceSearchActivityLauncher @Inject constructor(
                             snackbar.show()
                         }
                     } else {
+                        pixel.fire(
+                            pixel = VoiceSearchPixelNames.VOICE_SEARCH_CANCELLED,
+                            parameters = mapOf(KEY_PARAM_SOURCE to _source?.paramValueName.orEmpty()),
+                        )
                         onEvent(Event.SearchCancelled)
                     }
                     voiceSearchRepository.dismissVoiceSearch()
