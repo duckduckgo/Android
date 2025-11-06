@@ -27,15 +27,35 @@
     app:layout_constraintStart_toStartOf="parent"
     app:layout_constraintTop_toBottomOf="@id/spacer">
 
+    <FrameLayout
+        android:id="@+id/duckAiHistoryButton"
+        android:layout_width="@dimen/toolbarIcon"
+        android:layout_height="@dimen/toolbarIcon"
+        android:background="@drawable/selectable_item_experimental_background"
+        app:layout_constraintBottom_toBottomOf="@id/inputModeWidgetCard"
+        app:layout_constraintEnd_toStartOf="@id/inputModeWidgetCard"
+        app:layout_constraintTop_toTopOf="@id/inputModeWidgetCard"
+        app:layout_constraintStart_toStartOf="parent">
+
+        <ImageView
+            android:id="@+id/duckAiHistoryImageView"
+            android:layout_width="@dimen/bottomNavIcon"
+            android:layout_height="@dimen/bottomNavIcon"
+            android:layout_gravity="center"
+            android:scaleType="center"
+            android:src="@drawable/ic_chat_list_24" />
+    </FrameLayout>
+
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/inputModeWidgetCard"
         style="@style/Widget.DuckDuckGo.OmnibarCardView"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="2dp"
+        android:layout_marginStart="@dimen/keyline_4"
         app:cardElevation="0dp"
         app:layout_constraintEnd_toStartOf="@id/inputModeMainButtonsContainer"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/duckAiHistoryButton"
         app:layout_constraintTop_toTopOf="parent">
 
         <LinearLayout
@@ -43,26 +63,50 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
+            android:layout_marginTop="@dimen/keyline_2"
+            android:layout_marginBottom="@dimen/keyline_2"
+            android:gravity="center"
             android:padding="@dimen/keyline_0">
 
             <ImageView
                 android:id="@+id/daxIcon"
-                android:layout_width="@dimen/toolbarIcon"
-                android:layout_height="@dimen/toolbarIcon"
+                android:layout_width="@dimen/toolbarIconSize"
+                android:layout_height="@dimen/toolbarIconSize"
                 android:layout_gravity="center"
                 android:importantForAccessibility="no"
                 android:scaleType="fitCenter"
-                app:srcCompat="@drawable/ic_duckai"
+                app:srcCompat="@drawable/ic_dax_icon"
+                tools:visibility="visible" />
+
+            <ImageView
+                android:id="@+id/caretIcon"
+                android:layout_width="@dimen/toolbarIconSize"
+                android:layout_height="@dimen/toolbarIconSize"
+                android:layout_gravity="center"
+                android:importantForAccessibility="no"
+                android:scaleType="fitCenter"
+                android:layout_marginStart="@dimen/keyline_1"
+                app:srcCompat="@drawable/ic_chevron_right_24"
+                tools:visibility="visible" />
+
+            <ImageView
+                android:id="@+id/aiIcon"
+                android:layout_width="@dimen/toolbarIconSize"
+                android:layout_height="@dimen/toolbarIconSize"
+                android:layout_gravity="center"
+                android:importantForAccessibility="no"
+                android:scaleType="fitCenter"
+                android:layout_marginStart="@dimen/keyline_1"
+                app:srcCompat="@drawable/ic_ai_chat_omnibar_24"
                 tools:visibility="visible" />
 
             <com.duckduckgo.common.ui.view.text.DaxTextView
                 android:id="@+id/inputField"
-                android:layout_width="0dp"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
-                android:layout_marginStart="10dp"
-                android:layout_weight="1"
-                android:text="Duck.ai"
+                android:layout_marginStart="@dimen/keyline_1"
+                android:text="@string/duckAiFullScreenModeOmnibarHint"
                 app:textType="primary"
                 app:typography="body1" />
 

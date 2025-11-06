@@ -28,6 +28,7 @@
     <!-- Duck AI Fullscreen Mode -->
     <string name="duckAiFullScreenModeTitle">Full Screen Mode</string>
     <string name="duckAiFullScreenModeDescription">Internal setting for O-J work</string>
+    <string name="duckAiFullScreenModeOmnibarHint">Duck.ai</string>
 
     <!-- Duck AI Voice Search Shortcut Setting -->
     <string name="duckAiVoiceSearchVisibilitySetting">Voice Search</string>
