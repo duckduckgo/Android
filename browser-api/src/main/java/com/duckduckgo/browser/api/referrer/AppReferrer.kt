@@ -23,4 +23,9 @@ interface AppReferrer {
      * Sets the attribute campaign origin.
      */
     fun setOriginAttributeCampaign(origin: String?)
+
+    /**
+     * Returns campaign origin if it exists.
+     */
+    fun getOriginAttributeCampaign(): String?
 }

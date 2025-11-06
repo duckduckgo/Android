@@ -179,4 +179,40 @@ class RealAuthRepositoryTest {
 
         assertEquals(emptySet<String>(), result)
     }
+
+    @Test
+    fun whenRegisterLocalPurchasedAtThenStoreTimestamp() = runTest {
+        authRepository.registerLocalPurchasedAt()
+
+        assertNotNull(authStore.localPurchasedAt)
+        assertTrue(authStore.localPurchasedAt!! > 0)
+    }
+
+    @Test
+    fun whenGetLocalPurchasedAtThenReturnStoredValue() = runTest {
+        val expectedTimestamp = 1699000000000L
+        authStore.localPurchasedAt = expectedTimestamp
+
+        val result = authRepository.getLocalPurchasedAt()
+
+        assertEquals(expectedTimestamp, result)
+    }
+
+    @Test
+    fun whenGetLocalPurchasedAtAndNotSetThenReturnNull() = runTest {
+        authStore.localPurchasedAt = null
+
+        val result = authRepository.getLocalPurchasedAt()
+
+        assertNull(result)
+    }
+
+    @Test
+    fun whenRemoveLocalPurchasedAtThenClearValue() = runTest {
+        authStore.localPurchasedAt = 1699000000000L
+
+        authRepository.removeLocalPurchasedAt()
+
+        assertNull(authStore.localPurchasedAt)
+    }
 }

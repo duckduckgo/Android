@@ -45,6 +45,7 @@ class FakeSubscriptionsDataStore(
     override var platform: String? = null
     override var billingPeriod: String? = null
     override var startedAt: Long? = 0L
+    override var localPurchasedAt: Long? = 0L
     override var status: String? = null
     override var entitlements: String? = null
     override var productId: String? = null

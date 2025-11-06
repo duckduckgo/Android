@@ -17,7 +17,9 @@
 package com.duckduckgo.app.attributed.metrics
 
 import com.duckduckgo.app.attributed.metrics.store.AttributedMetricsDateUtils
+import java.time.Instant
 import java.time.LocalDate
+import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
 
@@ -30,11 +32,23 @@ class FakeAttributedMetricsDateUtils(var testDate: LocalDate) : AttributedMetric
         return ChronoUnit.DAYS.between(initDate, getCurrentLocalDate()).toInt()
     }
 
+    override fun daysSince(timestamp: Long): Int {
+        val installDate = Instant.ofEpochMilli(timestamp)
+        return ChronoUnit.DAYS.between(installDate, getCurrentLocalDate()).toInt()
+    }
+
     override fun getDateMinusDays(days: Int): String = getCurrentLocalDate().minusDays(days.toLong()).format(DATE_FORMATTER)
+
+    override fun getDateFromTimestamp(timestamp: Long): String {
+        val instant = Instant.ofEpochMilli(timestamp)
+        val zonedDateTime = instant.atZone(ET_ZONE)
+        return zonedDateTime.format(DATE_FORMATTER)
+    }
 
     private fun getCurrentLocalDate(): LocalDate = testDate
 
     companion object {
         private val DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd")
+        private val ET_ZONE = ZoneId.of("America/New_York")
     }
 }

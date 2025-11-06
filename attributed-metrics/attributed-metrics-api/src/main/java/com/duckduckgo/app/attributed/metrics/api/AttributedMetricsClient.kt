@@ -16,6 +16,8 @@
 
 package com.duckduckgo.app.attributed.metrics.api
 
+import com.duckduckgo.feature.toggles.api.Toggle
+
 /**
  * Client for collecting and emitting attributed metrics.
  */
@@ -84,3 +86,22 @@ interface AttributedMetric {
      */
     suspend fun getTag(): String
 }
+
+interface AttributedMetricConfig {
+    /**
+     * Provides attributed Metrics subfeature Toggles. Each metric to find their toggle and react to enabled state.
+     * @return List of Toggles that belong to Attributed Metrics feature
+     */
+    suspend fun metricsToggles(): List<Toggle>
+
+    /**
+     * Provides metrics bucket configuration, on a key-value. Each metric to consume map, and obtain the bucket config from he metric they own.
+     * @return Map of metric keys to their bucket configurations
+     */
+    suspend fun getBucketConfiguration(): Map<String, MetricBucket>
+}
+
+data class MetricBucket(
+    val buckets: List<Int>,
+    val version: Int,
+)

@@ -18,6 +18,7 @@ package com.duckduckgo.app.attributed.metrics.store
 
 import com.duckduckgo.app.attributed.metrics.api.EventStats
 import com.duckduckgo.app.di.AppCoroutineScope
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import kotlinx.coroutines.CoroutineScope
@@ -32,14 +33,15 @@ interface EventRepository {
         days: Int,
     ): EventStats
 
-    suspend fun deleteOldEvents(olderThanDays: Int)
+    suspend fun deleteAllEvents()
 }
 
 @ContributesBinding(AppScope::class)
 class RealEventRepository @Inject constructor(
     private val eventDao: EventDao,
     private val attributedMetricsDateUtils: AttributedMetricsDateUtils,
-    @AppCoroutineScope private val coroutineScope: CoroutineScope,
+    @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
+    private val dispatcherProvider: DispatcherProvider,
 ) : EventRepository {
     override suspend fun collectEvent(eventName: String) {
         val today = attributedMetricsDateUtils.getCurrentDate()
@@ -57,9 +59,10 @@ class RealEventRepository @Inject constructor(
         days: Int,
     ): EventStats {
         val startDay = attributedMetricsDateUtils.getDateMinusDays(days)
+        val yesterday = attributedMetricsDateUtils.getDateMinusDays(1)
 
-        val daysWithEvents = eventDao.getDaysWithEvents(eventName, startDay)
-        val totalEvents = eventDao.getTotalEvents(eventName, startDay) ?: 0
+        val daysWithEvents = eventDao.getDaysWithEvents(eventName, startDay, yesterday)
+        val totalEvents = eventDao.getTotalEvents(eventName, startDay, yesterday) ?: 0
         val rollingAverage = if (days > 0) totalEvents.toDouble() / days else 0.0
 
         return EventStats(
@@ -69,10 +72,9 @@ class RealEventRepository @Inject constructor(
         )
     }
 
-    override suspend fun deleteOldEvents(olderThanDays: Int) {
-        coroutineScope.launch {
-            val cutoffDay = attributedMetricsDateUtils.getDateMinusDays(olderThanDays)
-            eventDao.deleteEventsOlderThan(cutoffDay)
+    override suspend fun deleteAllEvents() {
+        appCoroutineScope.launch(dispatcherProvider.io()) {
+            eventDao.deleteAllEvents()
         }
     }
 }
