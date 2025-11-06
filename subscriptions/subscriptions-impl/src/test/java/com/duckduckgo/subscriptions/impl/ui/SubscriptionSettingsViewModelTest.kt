@@ -4,16 +4,13 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import app.cash.turbine.test
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.subscriptions.api.PrivacyProUnifiedFeedback
-import com.duckduckgo.subscriptions.api.SubscriptionRebrandingFeatureToggle
 import com.duckduckgo.subscriptions.api.SubscriptionStatus
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.AUTO_RENEWABLE
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants
 import com.duckduckgo.subscriptions.impl.SubscriptionsManager
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
 import com.duckduckgo.subscriptions.impl.repository.Account
-import com.duckduckgo.subscriptions.impl.repository.RebrandingRepository
 import com.duckduckgo.subscriptions.impl.repository.Subscription
-import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.DismissRebrandingBanner
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.FinishSignOut
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.GoToActivationScreen
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.GoToEditEmailScreen
@@ -46,8 +43,6 @@ class SubscriptionSettingsViewModelTest {
     private val subscriptionsManager: SubscriptionsManager = mock()
     private val pixelSender: SubscriptionPixelSender = mock()
     private val privacyProUnifiedFeedback: PrivacyProUnifiedFeedback = mock()
-    private val mockSubscriptionRebrandingFeatureToggle: SubscriptionRebrandingFeatureToggle = mock()
-    private val mockRebrandingRepository: RebrandingRepository = mock()
 
     private lateinit var viewModel: SubscriptionSettingsViewModel
 
@@ -57,8 +52,6 @@ class SubscriptionSettingsViewModelTest {
             subscriptionsManager,
             pixelSender,
             privacyProUnifiedFeedback,
-            mockSubscriptionRebrandingFeatureToggle,
-            mockRebrandingRepository,
         )
     }
 
@@ -235,16 +228,6 @@ class SubscriptionSettingsViewModelTest {
     fun whenRemoveFromDeviceThenPixelIsSent() = runTest {
         viewModel.removeFromDevice()
         verify(pixelSender).reportSubscriptionSettingsRemoveFromDeviceClick()
-    }
-
-    @Test
-    fun whenDismissRebrandingBannerThenSetRebrandingAsViewedAndDismissBannerCommandIsSent() = runTest {
-        viewModel.commands().test {
-            viewModel.rebrandingBannerDismissed()
-            verify(mockRebrandingRepository).setRebrandingBannerAsViewed()
-            assertEquals(DismissRebrandingBanner, awaitItem())
-            cancelAndIgnoreRemainingEvents()
-        }
     }
 
     @Test
