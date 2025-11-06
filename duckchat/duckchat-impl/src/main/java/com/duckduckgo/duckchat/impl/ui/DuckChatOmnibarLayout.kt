@@ -50,6 +50,8 @@ class DuckChatOmnibarLayout @JvmOverloads constructor(
         fun onBrowserMenuPressed()
 
         fun onHistoryMenuPressed()
+
+        fun onInputFieldPressed()
     }
 
     init {
@@ -76,6 +78,7 @@ class DuckChatOmnibarLayout @JvmOverloads constructor(
         }
 
         inputCard.setOnClickListener {
+            omnibarItemPressedListener?.onInputFieldPressed()
         }
     }
 

@@ -1012,6 +1012,14 @@ open class BrowserActivity : DuckDuckGoActivity() {
                             val intent = TabSwitcherActivity.intent(this@BrowserActivity)
                             tabSwitcherActivityResult.launch(intent)
                         }
+                        is DuckChatSharedViewModel.Command.SearchRequested -> {
+                            currentTab?.submitQuery(command.query)
+                            closeDuckChat()
+                        }
+
+                        is DuckChatSharedViewModel.Command.OpenTab -> {
+                            openExistingTab(command.tabId)
+                        }
                     }
                 }
             }

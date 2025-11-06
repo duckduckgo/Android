@@ -39,8 +39,22 @@ class DuckChatSharedViewModel() : ViewModel() {
         }
     }
 
+    fun onSearchRequested(query: String) {
+        viewModelScope.launch {
+            _command.send(Command.SearchRequested(query))
+        }
+    }
+
+    fun openExistingTab(tabId: String) {
+        viewModelScope.launch {
+            _command.send(Command.OpenTab(tabId))
+        }
+    }
+
     sealed class Command {
         object LaunchFire : Command()
         object LaunchTabSwitcher : Command()
+        data class SearchRequested(val query: String) : Command()
+        data class OpenTab(val tabId: String) : Command()
     }
 }
