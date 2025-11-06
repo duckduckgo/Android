@@ -16,11 +16,13 @@
 
 package com.duckduckgo.subscriptions.impl.wideevents
 
+import com.duckduckgo.app.di.ProcessName
 import com.duckduckgo.app.statistics.wideevents.CleanupPolicy.OnProcessStart
 import com.duckduckgo.app.statistics.wideevents.FlowStatus
 import com.duckduckgo.app.statistics.wideevents.WideEventClient
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.networkprotection.api.NetworkProtectionState
 import com.duckduckgo.subscriptions.api.SubscriptionStatus
 import com.duckduckgo.subscriptions.impl.PrivacyProFeature
 import com.squareup.anvil.annotations.ContributesBinding
@@ -49,6 +51,8 @@ class AuthTokenRefreshWideEventImpl @Inject constructor(
     private val wideEventClient: WideEventClient,
     private val privacyProFeature: Lazy<PrivacyProFeature>,
     private val dispatchers: DispatcherProvider,
+    private val networkProtectionState: Lazy<NetworkProtectionState>,
+    @ProcessName val processName: String,
 ) : AuthTokenRefreshWideEvent {
 
     private var ongoingTokenRefreshWideEventId: Long? = null
@@ -67,6 +71,9 @@ class AuthTokenRefreshWideEventImpl @Inject constructor(
                 cleanupPolicy = OnProcessStart(ignoreIfIntervalTimeoutPresent = false),
                 metadata = mapOf(
                     KEY_SUBSCRIPTION_STATUS to subscriptionStatus.statusName,
+                    KEY_NETP_IS_ENABLED to runCatching { networkProtectionState.get().isEnabled().toString() }.getOrDefault(""),
+                    KEY_NETP_IS_RUNNING to runCatching { networkProtectionState.get().isRunning().toString() }.getOrDefault(""),
+                    KEY_PROCESS_NAME to processName,
                 ),
             )
             .getOrNull()
@@ -188,6 +195,9 @@ class AuthTokenRefreshWideEventImpl @Inject constructor(
         const val KEY_SUBSCRIPTION_STATUS = "subscription_status"
         const val KEY_BACKEND_ERROR_RESPONSE = "backend_error_response"
         const val KEY_PLAY_LOGIN_ERROR = "play_login_error"
+        const val KEY_NETP_IS_ENABLED = "netp_is_enabled"
+        const val KEY_NETP_IS_RUNNING = "netp_is_running"
+        const val KEY_PROCESS_NAME = "process_name"
     }
 }
 

@@ -23,8 +23,10 @@ import com.duckduckgo.app.statistics.wideevents.WideEventClient
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle
+import com.duckduckgo.networkprotection.api.NetworkProtectionState
 import com.duckduckgo.subscriptions.api.SubscriptionStatus
 import com.duckduckgo.subscriptions.impl.PrivacyProFeature
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule
@@ -36,6 +38,7 @@ class AuthTokenRefreshWideEventTest {
     val coroutineRule = CoroutineTestRule()
 
     private val wideEventClient: WideEventClient = mock()
+    private val networkProtectionState: NetworkProtectionState = mock()
 
     @SuppressLint("DenyListedApi")
     private val privacyProFeature: PrivacyProFeature =
@@ -46,11 +49,16 @@ class AuthTokenRefreshWideEventTest {
     private lateinit var authWideEvent: AuthTokenRefreshWideEventImpl
 
     @Before
-    fun setup() {
+    fun setup() = runBlocking {
+        whenever(networkProtectionState.isEnabled()).thenReturn(false)
+        whenever(networkProtectionState.isRunning()).thenReturn(false)
+
         authWideEvent = AuthTokenRefreshWideEventImpl(
             wideEventClient = wideEventClient,
             privacyProFeature = { privacyProFeature },
             dispatchers = coroutineRule.testDispatcherProvider,
+            networkProtectionState = { networkProtectionState },
+            processName = "main",
         )
     }
 
@@ -66,6 +74,9 @@ class AuthTokenRefreshWideEventTest {
             flowEntryPoint = null,
             metadata = mapOf(
                 "subscription_status" to SubscriptionStatus.UNKNOWN.statusName,
+                "netp_is_enabled" to "false",
+                "netp_is_running" to "false",
+                "process_name" to "main",
             ),
             cleanupPolicy = CleanupPolicy.OnProcessStart(ignoreIfIntervalTimeoutPresent = false),
         )
