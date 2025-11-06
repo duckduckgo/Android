@@ -65,6 +65,6 @@ interface EventDao {
         day: String,
     ): Int?
 
-    @Query("DELETE FROM event_metrics WHERE day < :day")
-    suspend fun deleteEventsOlderThan(day: String)
+    @Query("delete from event_metrics")
+    suspend fun deleteAllEvents()
 }

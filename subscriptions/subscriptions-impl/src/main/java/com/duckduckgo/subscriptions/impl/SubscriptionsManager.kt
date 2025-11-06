@@ -577,6 +577,7 @@ class RealSubscriptionsManager @Inject constructor(
         authRepository.setAccount(null)
         authRepository.setSubscription(null)
         authRepository.setEntitlements(emptyList())
+        authRepository.removeLocalPurchasedAt()
         _isSignedIn.emit(false)
         _subscriptionStatus.emit(UNKNOWN)
         _entitlements.emit(emptyList())
@@ -659,6 +660,7 @@ class RealSubscriptionsManager @Inject constructor(
                 pixelSender.reportSubscriptionActivated()
                 emitEntitlementsValues()
                 _currentPurchaseState.emit(CurrentPurchase.Success)
+                authRepository.registerLocalPurchasedAt()
                 subscriptionPurchaseWideEvent.onPurchaseConfirmationSuccess()
             } else {
                 handlePurchaseFailed()
