@@ -156,4 +156,69 @@ class BrowserNavigationBarViewModelTest {
             cancelAndIgnoreRemainingEvents()
         }
     }
+
+    @Test
+    fun `when setViewMode NewTab then viewState reflects NewTab configuration`() = runTest {
+        testee.viewState.test {
+            val initial = awaitItem()
+            // sanity check defaults
+            Assert.assertTrue(initial.newTabButtonVisible)
+            Assert.assertFalse(initial.autofillButtonVisible)
+
+            testee.setViewMode(BrowserNavigationBarView.ViewMode.NewTab)
+
+            val updated = awaitItem()
+            Assert.assertFalse(updated.newTabButtonVisible)
+            Assert.assertTrue(updated.autofillButtonVisible)
+            // unchanged flags
+            Assert.assertTrue(updated.tabsButtonVisible)
+            Assert.assertTrue(updated.bookmarksButtonVisible)
+            Assert.assertTrue(updated.showShadow)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `when setViewMode TabManager then viewState reflects TabManager configuration`() = runTest {
+        testee.viewState.test {
+            awaitItem() // initial
+            testee.setViewMode(BrowserNavigationBarView.ViewMode.TabManager)
+            val updated = awaitItem()
+            Assert.assertTrue(updated.newTabButtonVisible)
+            Assert.assertFalse(updated.autofillButtonVisible)
+            Assert.assertFalse(updated.tabsButtonVisible)
+            Assert.assertFalse(updated.bookmarksButtonVisible)
+            Assert.assertFalse(updated.showShadow)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `when switching NewTab then Browser then viewState reflects Browser configuration`() = runTest {
+        testee.viewState.test {
+            awaitItem() // initial
+            testee.setViewMode(BrowserNavigationBarView.ViewMode.NewTab)
+            awaitItem() // NewTab state
+            testee.setViewMode(BrowserNavigationBarView.ViewMode.Browser)
+            val browserState = awaitItem()
+            Assert.assertTrue(browserState.newTabButtonVisible)
+            Assert.assertFalse(browserState.autofillButtonVisible)
+            Assert.assertTrue(browserState.tabsButtonVisible)
+            Assert.assertTrue(browserState.bookmarksButtonVisible)
+            Assert.assertTrue(browserState.showShadow)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `when setViewMode CustomTab then navigation bar becomes hidden`() = runTest {
+        testee.viewState.test {
+            val initial = awaitItem()
+            Assert.assertTrue(initial.isVisible)
+
+            testee.setViewMode(BrowserNavigationBarView.ViewMode.CustomTab)
+            val hidden = awaitItem()
+            Assert.assertFalse(hidden.isVisible)
+        }
+    }
 }

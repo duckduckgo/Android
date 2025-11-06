@@ -24,7 +24,9 @@ import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.browser.defaultbrowsing.prompts.AdditionalDefaultBrowserPrompts
 import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarView.ViewMode
 import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarView.ViewMode.Browser
+import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarView.ViewMode.CustomTab
 import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarView.ViewMode.NewTab
+import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarView.ViewMode.TabManager
 import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarViewModel.Command.NotifyAutofillButtonClicked
 import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarViewModel.Command.NotifyBookmarksButtonClicked
 import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarViewModel.Command.NotifyFireButtonClicked
@@ -61,16 +63,13 @@ class BrowserNavigationBarViewModel @Inject constructor(
     private val _commands = Channel<Command>(capacity = Channel.CONFLATED)
     val commands: Flow<Command> = _commands.receiveAsFlow()
 
-    private val isCustomTab = MutableStateFlow(false)
     private val _viewState = MutableStateFlow(ViewState())
     val viewState = combine(
         _viewState.asStateFlow(),
-        isCustomTab,
         tabRepository.flowTabs,
         additionalDefaultBrowserPrompts.highlightPopupMenu,
-    ) { state, isCustomTab, tabs, highlightOverflowMenu ->
+    ) { state, tabs, highlightOverflowMenu ->
         state.copy(
-            isVisible = !isCustomTab,
             tabsCount = tabs.size,
             hasUnreadTabs = tabs.firstOrNull { !it.viewed } != null,
             showBrowserMenuHighlight = highlightOverflowMenu,
@@ -115,10 +114,6 @@ class BrowserNavigationBarViewModel @Inject constructor(
         _commands.trySend(NotifyBookmarksButtonClicked)
     }
 
-    fun setCustomTab(customTab: Boolean) {
-        isCustomTab.update { customTab }
-    }
-
     fun setViewMode(viewMode: ViewMode) {
         when (viewMode) {
             NewTab -> {
@@ -139,13 +134,21 @@ class BrowserNavigationBarViewModel @Inject constructor(
                 }
             }
 
-            ViewMode.TabManager -> {
+            TabManager -> {
                 _viewState.update {
                     it.copy(
                         newTabButtonVisible = true,
                         autofillButtonVisible = false,
                         tabsButtonVisible = false,
                         bookmarksButtonVisible = false,
+                        showShadow = false,
+                    )
+                }
+            }
+            CustomTab -> {
+                _viewState.update {
+                    it.copy(
+                        isVisible = false,
                     )
                 }
             }
@@ -181,5 +184,6 @@ class BrowserNavigationBarViewModel @Inject constructor(
         val tabsCount: Int = 0,
         val hasUnreadTabs: Boolean = false,
         val showBrowserMenuHighlight: Boolean = false,
+        val showShadow: Boolean = true,
     )
 }
