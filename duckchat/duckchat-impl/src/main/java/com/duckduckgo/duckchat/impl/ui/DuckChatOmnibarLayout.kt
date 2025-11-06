@@ -36,6 +36,7 @@ class DuckChatOmnibarLayout @JvmOverloads constructor(
     internal val tabsMenu: NewTabSwitcherButton by lazy { findViewById(R.id.inputFieldTabsMenu) }
     internal val fireIconMenu: FrameLayout by lazy { findViewById(R.id.inputFieldFireButton) }
     internal val browserMenu: FrameLayout by lazy { findViewById(R.id.inputFieldBrowserMenu) }
+    internal val historyMenu: FrameLayout by lazy { findViewById(R.id.duckAiHistoryButton) }
 
     private var omnibarItemPressedListener: ItemPressedListener? = null
 
@@ -67,6 +68,10 @@ class DuckChatOmnibarLayout @JvmOverloads constructor(
 
         browserMenu.setOnClickListener {
             omnibarItemPressedListener?.onBrowserMenuPressed()
+        }
+
+        historyMenu.setOnClickListener {
+            omnibarItemPressedListener?.onHistoryMenuPressed()
         }
     }
 
