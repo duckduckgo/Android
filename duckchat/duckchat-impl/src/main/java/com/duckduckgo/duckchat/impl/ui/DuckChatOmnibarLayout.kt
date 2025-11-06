@@ -45,6 +45,8 @@ class DuckChatOmnibarLayout @JvmOverloads constructor(
         fun onFireButtonPressed()
 
         fun onBrowserMenuPressed()
+
+        fun onHistoryMenuPressed()
     }
 
     init {

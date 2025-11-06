@@ -377,6 +377,10 @@ open class DuckChatWebViewFragment : DuckDuckGoFragment(R.layout.activity_duck_c
                 override fun onBrowserMenuPressed() {
                     Snackbar.make(root, "Menu", Snackbar.LENGTH_SHORT).show()
                 }
+
+                override fun onHistoryMenuPressed() {
+                    Snackbar.make(root, "History", Snackbar.LENGTH_SHORT).show()
+                }
             },
         )
     }
