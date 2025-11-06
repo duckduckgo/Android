@@ -350,6 +350,7 @@ open class DuckChatWebViewFragment : DuckDuckGoFragment(R.layout.activity_duck_c
     }
 
     private fun configureLegacyOmnibar() {
+        root.findViewById<View>(R.id.includeToolbar).show()
         toolbar?.let {
             it.setNavigationIcon(com.duckduckgo.mobile.android.R.drawable.ic_arrow_left_24)
             it.setNavigationOnClickListener {
