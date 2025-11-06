@@ -2019,9 +2019,9 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
         val result = subscriptionsManager.getSwitchPlanPricing(isUpgrade = true)
 
         assertNotNull(result)
-        assertEquals("US$9.99", result!!.currentPrice)
-        assertEquals("US$99.99", result.targetPrice)
-        assertEquals("US$8.33", result.yearlyMonthlyEquivalent)
+        assertEquals("$9.99", result!!.currentPrice)
+        assertEquals("$99.99", result.targetPrice)
+        assertEquals("$8.33", result.yearlyMonthlyEquivalent)
         assertEquals(17, result.savingsPercentage)
     }
 
@@ -2039,9 +2039,9 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
         val result = subscriptionsManager.getSwitchPlanPricing(isUpgrade = false)
 
         assertNotNull(result)
-        assertEquals("US$99.99", result!!.currentPrice)
-        assertEquals("US$9.99", result.targetPrice)
-        assertEquals("US$8.33", result.yearlyMonthlyEquivalent)
+        assertEquals("$99.99", result!!.currentPrice)
+        assertEquals("$9.99", result.targetPrice)
+        assertEquals("$8.33", result.yearlyMonthlyEquivalent)
         assertEquals(17, result.savingsPercentage)
     }
 
