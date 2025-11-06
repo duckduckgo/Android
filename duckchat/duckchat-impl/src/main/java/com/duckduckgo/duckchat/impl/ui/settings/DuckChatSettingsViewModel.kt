@@ -168,7 +168,7 @@ class DuckChatSettingsViewModel @AssistedInject constructor(
                     titleRes = R.string.duckAiSerpSettingsTitle,
                 ),
             )
-            pixel.fire(DuckChatPixelName.DUCK_CHAT_HIDE_AI_GENERATED_IMAGES_BUTTON_CLICKED)
+            pixel.fire(DuckChatPixelName.SERP_SETTINGS_OPEN_HIDE_AI_GENERATED_IMAGES)
         }
     }
 
