@@ -21,9 +21,11 @@ import com.duckduckgo.remote.messaging.impl.mappers.DismissActionMapper
 import com.duckduckgo.remote.messaging.impl.mappers.PlayStoreActionMapper
 import com.duckduckgo.remote.messaging.impl.mappers.ShareActionMapper
 import com.duckduckgo.remote.messaging.impl.mappers.UrlActionMapper
+import com.duckduckgo.remote.messaging.impl.mappers.UrlInContextActionMapper
 
 val messageActionPlugins = listOf(
     UrlActionMapper(),
+    UrlInContextActionMapper(),
     DismissActionMapper(),
     PlayStoreActionMapper(),
     DefaultBrowserActionMapper(),

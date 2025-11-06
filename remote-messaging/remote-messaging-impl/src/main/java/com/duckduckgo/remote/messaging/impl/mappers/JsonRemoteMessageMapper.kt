@@ -17,19 +17,24 @@
 package com.duckduckgo.remote.messaging.impl.mappers
 
 import com.duckduckgo.remote.messaging.api.Action
+import com.duckduckgo.remote.messaging.api.CardItem
+import com.duckduckgo.remote.messaging.api.CardItemType
 import com.duckduckgo.remote.messaging.api.Content
 import com.duckduckgo.remote.messaging.api.Content.BigSingleAction
 import com.duckduckgo.remote.messaging.api.Content.BigTwoActions
+import com.duckduckgo.remote.messaging.api.Content.CardsList
 import com.duckduckgo.remote.messaging.api.Content.Medium
 import com.duckduckgo.remote.messaging.api.Content.Placeholder
 import com.duckduckgo.remote.messaging.api.Content.PromoSingleAction
 import com.duckduckgo.remote.messaging.api.Content.Small
+import com.duckduckgo.remote.messaging.api.JsonListItem
 import com.duckduckgo.remote.messaging.api.JsonMessageAction
 import com.duckduckgo.remote.messaging.api.MessageActionMapperPlugin
 import com.duckduckgo.remote.messaging.api.RemoteMessage
 import com.duckduckgo.remote.messaging.impl.models.*
 import com.duckduckgo.remote.messaging.impl.models.JsonMessageType.BIG_SINGLE_ACTION
 import com.duckduckgo.remote.messaging.impl.models.JsonMessageType.BIG_TWO_ACTION
+import com.duckduckgo.remote.messaging.impl.models.JsonMessageType.CARDS_LIST
 import com.duckduckgo.remote.messaging.impl.models.JsonMessageType.MEDIUM
 import com.duckduckgo.remote.messaging.impl.models.JsonMessageType.PROMO_SINGLE_ACTION
 import com.duckduckgo.remote.messaging.impl.models.JsonMessageType.SMALL
@@ -85,6 +90,17 @@ private val promoSingleActionMapper: (JsonContent, Set<MessageActionMapperPlugin
     )
 }
 
+private val cardsListMapper: (JsonContent, Set<MessageActionMapperPlugin>) -> Content = { jsonContent, actionMappers ->
+    CardsList(
+        titleText = jsonContent.titleText.failIfEmpty(),
+        descriptionText = jsonContent.descriptionText.failIfEmpty(),
+        placeholder = jsonContent.placeholder.asPlaceholder(),
+        primaryActionText = jsonContent.primaryActionText.failIfEmpty(),
+        primaryAction = jsonContent.primaryAction!!.toAction(actionMappers),
+        listItems = jsonContent.listItems.toListItems(actionMappers),
+    )
+}
+
 // plugin point?
 private val messageMappers = mapOf(
     Pair(SMALL.jsonValue, smallMapper),
@@ -92,6 +108,7 @@ private val messageMappers = mapOf(
     Pair(BIG_SINGLE_ACTION.jsonValue, bigMessageSingleActionMapper),
     Pair(BIG_TWO_ACTION.jsonValue, bigMessageTwoActionMapper),
     Pair(PROMO_SINGLE_ACTION.jsonValue, promoSingleActionMapper),
+    Pair(CARDS_LIST.jsonValue, cardsListMapper),
 )
 
 fun List<JsonRemoteMessage>.mapToRemoteMessage(
@@ -112,7 +129,7 @@ private fun JsonRemoteMessage.map(
         )
         remoteMessage.localizeMessage(this.translations, locale)
     }.onFailure {
-        logcat(ERROR) { "RMF: error $it" }
+        logcat(ERROR) { "RMF: error parsing message id=${this.id}: ${it.message}\n${it.stackTraceToString()}" }
     }.getOrNull()
 }
 
@@ -140,13 +157,27 @@ private fun JsonMessageAction.toAction(actionMappers: Set<MessageActionMapperPlu
         val result = it.evaluate(this)
         if (result != null) return result
     }
-
-    throw IllegalArgumentException("Unknown Action Type")
+    logcat(ERROR) { "Unknown Action Type: $this. Available mappers: ${actionMappers.map { it::class.simpleName }}" }
+    throw IllegalArgumentException("Unknown Action Type: $this")
 }
 
 private fun String.failIfEmpty() = this.ifEmpty { throw IllegalStateException("Empty argument") }
 
 private fun String.asPlaceholder(): Placeholder = Placeholder.from(this)
+
+private fun List<JsonListItem>?.toListItems(actionMappers: Set<MessageActionMapperPlugin>): List<CardItem> {
+    return this?.map { jsonItem ->
+        CardItem(
+            id = jsonItem.id.failIfEmpty(),
+            type = CardItemType.from(jsonItem.type),
+            titleText = jsonItem.titleText.failIfEmpty(),
+            descriptionText = jsonItem.descriptionText.failIfEmpty(),
+            placeholder = jsonItem.placeholder.asPlaceholder(),
+            primaryAction = jsonItem.primaryAction?.toAction(actionMappers)
+                ?: throw IllegalStateException("CardItem primaryAction cannot be null"),
+        )
+    } ?: emptyList()
+}
 
 private fun Content.localize(translations: JsonContentTranslations): Content {
     return when (this) {
@@ -173,6 +204,11 @@ private fun Content.localize(translations: JsonContentTranslations): Content {
             titleText = translations.titleText.takeUnless { it.isEmpty() } ?: this.titleText,
             descriptionText = translations.descriptionText.takeUnless { it.isEmpty() } ?: this.descriptionText,
             actionText = translations.actionText.takeUnless { it.isEmpty() } ?: this.actionText,
+        )
+        is CardsList -> this.copy(
+            titleText = translations.titleText.takeUnless { it.isEmpty() } ?: this.titleText,
+            descriptionText = translations.descriptionText.takeUnless { it.isEmpty() } ?: this.descriptionText,
+            primaryActionText = translations.primaryActionText.takeUnless { it.isEmpty() } ?: this.primaryActionText,
         )
     }
 }
