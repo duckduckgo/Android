@@ -20,22 +20,44 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.di.scopes.FragmentScope
+import com.duckduckgo.duckchat.impl.DuckChatInternal
+import com.duckduckgo.duckchat.impl.ui.settings.DuckChatSettingsViewModel.ViewState
 import com.duckduckgo.subscriptions.api.Subscriptions
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.flow.stateIn
 import javax.inject.Inject
 
 @ContributesViewModel(FragmentScope::class)
 class DuckChatWebViewViewModel @Inject constructor(
     private val subscriptions: Subscriptions,
+    private val duckChat: DuckChatInternal,
 ) : ViewModel() {
 
     private val commandChannel = Channel<Command>(capacity = 1, onBufferOverflow = DROP_OLDEST)
     val commands = commandChannel.receiveAsFlow()
+
+    data class ViewState(
+        val isDuckChatUserEnabled: Boolean = false,
+        val isFullScreenModeEnabled: Boolean = false,
+    )
+
+    val viewState =
+        combine(
+            duckChat.observeEnableDuckChatUserSetting(),
+            duckChat.observeFullscreenModeUserSetting(),
+        ) { isDuckChatUserEnabled, isFullScreenModeEnabled ->
+            ViewState(
+                isDuckChatUserEnabled = isDuckChatUserEnabled,
+                isFullScreenModeEnabled = isFullScreenModeEnabled,
+            )
+        }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), ViewState())
 
     sealed class Command {
         data object SendSubscriptionAuthUpdateEvent : Command()

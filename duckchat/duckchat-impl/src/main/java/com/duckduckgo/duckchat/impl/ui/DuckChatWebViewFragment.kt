@@ -39,7 +39,9 @@ import android.webkit.WebView
 import androidx.annotation.AnyThread
 import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.di.AppCoroutineScope
@@ -47,7 +49,9 @@ import com.duckduckgo.app.tabs.BrowserNav
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.ui.DuckDuckGoFragment
 import com.duckduckgo.common.ui.view.dialog.ActionBottomSheetDialog
+import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.makeSnackbarWithNoBottomInset
+import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.DispatcherProvider
@@ -174,9 +178,6 @@ open class DuckChatWebViewFragment : DuckDuckGoFragment(R.layout.activity_duck_c
         super.onViewCreated(view, savedInstanceState)
 
         val url = arguments?.getString(KEY_DUCK_AI_URL) ?: "https://duckduckgo.com/?q=DuckDuckGo+AI+Chat&ia=chat&duckai=5"
-        val tabs = arguments?.getInt(KEY_DUCK_AI_TABS) ?: 0
-
-        configureOmnibar(tabs)
 
         simpleWebview.let {
             it.webViewClient = webViewClient
@@ -302,7 +303,15 @@ open class DuckChatWebViewFragment : DuckDuckGoFragment(R.layout.activity_duck_c
             pendingUploadTask = null
         }
 
-        // Observe ViewModel commands
+        observeViewModel()
+    }
+
+    private fun observeViewModel() {
+        viewModel.viewState
+            .flowWithLifecycle(lifecycle, Lifecycle.State.RESUMED)
+            .onEach { renderViewState(it) }
+            .launchIn(lifecycleScope)
+
         viewModel.commands
             .onEach { command ->
                 when (command) {
@@ -318,33 +327,58 @@ open class DuckChatWebViewFragment : DuckDuckGoFragment(R.layout.activity_duck_c
             }.launchIn(lifecycleScope)
     }
 
-    private fun configureOmnibar(tabs: Int) {
-        if (false) {
-            toolbar?.let {
-                it.setNavigationIcon(com.duckduckgo.mobile.android.R.drawable.ic_arrow_left_24)
-                it.setNavigationOnClickListener {
-                    requireActivity().onBackPressed()
-                }
-                it.setTitle(R.string.duck_chat_title)
-            }
+    private fun renderViewState(viewState: DuckChatWebViewViewModel.ViewState) {
+        if (viewState.isFullScreenModeEnabled) {
+            configureFullscreenMode()
         } else {
-            duckChatOmnibar?.setOmnibarItemPressedListener(
-                object : DuckChatOmnibarLayout.ItemPressedListener {
-                    override fun onTabsButtonPressed() {
-                        TODO("Not yet implemented")
-                    }
-
-                    override fun onFireButtonPressed() {
-                        TODO("Not yet implemented")
-                    }
-
-                    override fun onBrowserMenuPressed() {
-                        TODO("Not yet implemented")
-                    }
-                },
-            )
-            duckChatOmnibar?.setTabsCount(tabs)
+            configureLegacyMode()
         }
+    }
+
+    private fun configureLegacyMode() {
+        configureLegacyOmnibar()
+    }
+
+    private fun configureFullscreenMode() {
+        configureTabs()
+        configureFullscreenOmnibar()
+    }
+
+    private fun configureTabs() {
+        val tabs = arguments?.getInt(KEY_DUCK_AI_TABS) ?: 0
+        duckChatOmnibar?.setTabsCount(tabs)
+    }
+
+    private fun configureLegacyOmnibar() {
+        toolbar?.let {
+            it.setNavigationIcon(com.duckduckgo.mobile.android.R.drawable.ic_arrow_left_24)
+            it.setNavigationOnClickListener {
+                requireActivity().onBackPressed()
+            }
+            it.setTitle(R.string.duck_chat_title)
+        }
+        duckChatOmnibar?.gone()
+    }
+
+    private fun configureFullscreenOmnibar() {
+        root.findViewById<View>(R.id.includeToolbar).gone()
+        duckChatOmnibar?.show()
+
+        duckChatOmnibar?.setOmnibarItemPressedListener(
+            object : DuckChatOmnibarLayout.ItemPressedListener {
+                override fun onTabsButtonPressed() {
+                    Snackbar.make(root, "Tabs", Snackbar.LENGTH_SHORT).show()
+                }
+
+                override fun onFireButtonPressed() {
+                    Snackbar.make(root, "Fire", Snackbar.LENGTH_SHORT).show()
+                }
+
+                override fun onBrowserMenuPressed() {
+                    Snackbar.make(root, "Menu", Snackbar.LENGTH_SHORT).show()
+                }
+            },
+        )
     }
 
     data class FileChooserRequestedParams(

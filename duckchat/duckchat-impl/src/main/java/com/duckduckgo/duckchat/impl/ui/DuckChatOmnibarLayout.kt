@@ -20,7 +20,6 @@ import android.content.Context
 import android.util.AttributeSet
 import android.widget.FrameLayout
 import com.duckduckgo.anvil.annotations.InjectWith
-import com.duckduckgo.browser.ui.omnibar.OmnibarType
 import com.duckduckgo.browser.ui.tabs.NewTabSwitcherButton
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.duckchat.impl.R
@@ -52,10 +51,6 @@ class DuckChatOmnibarLayout @JvmOverloads constructor(
         inflate(context, R.layout.view_duck_chat_omnibar, this)
 
         AndroidSupportInjection.inject(this)
-
-        val attr = context.theme.obtainStyledAttributes(attrs, R.styleable.DuckChatOmnibarLayout, defStyle, 0)
-        val omnibarType = OmnibarType.entries[attr.getInt(R.styleable.DuckChatOmnibarLayout_duckOmnibarPosition, 0)]
-        val isTopPosition = omnibarType == OmnibarType.SINGLE_TOP || omnibarType == OmnibarType.SPLIT
     }
 
     fun setOmnibarItemPressedListener(itemPressedListener: ItemPressedListener) {
