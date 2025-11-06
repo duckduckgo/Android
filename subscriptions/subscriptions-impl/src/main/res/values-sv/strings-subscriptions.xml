@@ -84,6 +84,11 @@
     <string name="subscriptionSettingSectionHelpAndSupport">Hjälp och support</string>
     <string name="subscriptionSettingSendFeedback">Skicka återkoppling</string>
     <string name="subscriptionSettingActivating">Aktiverar</string>
+    <string name="subscriptionSettingSwitchUpgrade">Byt till årligt och spara 16 %</string>
+    <!-- smartling.character_limit = 10 -->
+    <string name="subscriptionSettingSwitchUpgradePill">Bäst deal</string>
+    <string name="subscriptionSettingSwitchDowngrade">Byt abonnemang</string>
+    <string name="subscriptionSettingManagePlan">Hantera betalning</string>
 
     <!--Purchase Subscriptions-->
     <string name="purchaseCompletedTitle">Du är klar.</string>
@@ -191,5 +196,15 @@
     <string name="subscriptionSettingSubscribeSecure">Säkra ditt Wi-Fi och chatta privat med avancerade AI-modeller</string>
 
     <string name="feedbackGeneralSubscription">Abonnemang</string>
+
+    <!-- Switch plan-->
+    <string name="switchBottomSheetTitleUpgrade">Spara 16 % med\nett årsabonnemang!</string>
+    <string name="switchBottomSheetDescriptionUpgrade" instruction="%1$s is the yearly plan monthly equivalent price (e.g. $8.33), %2$s is the current monthly plan price (e.g. $9.99)">Ett årsabonnemang kostar bara %1$s per månad, jämfört med ditt nuvarande månadsabonnemang för %2$s.</string>
+    <string name="switchBottomSheetPrimaryButtonUpgrade" instruction="%1$s is the yearly plan price (e.g. $99.99)">Byt till årlig (%1$s/år)</string>
+    <string name="switchBottomSheetSecondaryButtonUpgrade">Behåll månadsabonnemang</string>
+    <string name="switchBottomSheetTitleDowngrade">Du sparar 16 % med\nett årsabonnemang!</string>
+    <string name="switchBottomSheetDescriptionDowngrade" instruction="%1$s is the yearly plan monthly equivalent price (e.g. $8.33), %2$s is the monthly plan price (e.g. $9.99)">Ett byte kommer att höja ditt månadspris från %1$s/månad till %2$s/månad.</string>
+    <string name="switchBottomSheetPrimaryButtonDowngrade">Behåll årsabonnemang</string>
+    <string name="switchBottomSheetSecondaryButtonDowngrade" instruction="%1$s is the monthly plan price (e.g. $9.99)">Byt till månadsvis (%1$s/månad)</string>
 
 </resources>
