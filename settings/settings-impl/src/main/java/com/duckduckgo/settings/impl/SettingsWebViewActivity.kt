@@ -30,6 +30,7 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.js.messaging.api.JsMessageCallback
 import com.duckduckgo.js.messaging.api.JsMessaging
 import com.duckduckgo.navigation.api.getActivityParams
 import com.duckduckgo.settings.api.SettingsPageFeature
@@ -38,6 +39,8 @@ import com.duckduckgo.settings.impl.databinding.ActivitySettingsWebviewBinding
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
+import logcat.logcat
+import org.json.JSONObject
 import javax.inject.Inject
 import javax.inject.Named
 
@@ -82,6 +85,13 @@ class SettingsWebViewActivity : DuckDuckGoActivity() {
 
             viewModel.onStart(url)
         }
+
+        observeSubscriptionEventDataChannel()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        viewModel.onResume()
     }
 
     private fun setupBackPressedDispatcher() {
@@ -113,6 +123,13 @@ class SettingsWebViewActivity : DuckDuckGoActivity() {
         }
     }
 
+    private fun observeSubscriptionEventDataChannel() {
+        viewModel.subscriptionEventDataFlow.onEach { subscriptionEventData ->
+            logcat { "SERP-Settings: Sending subscription event data to content scope scripts: $subscriptionEventData" }
+            contentScopeScripts.sendSubscriptionEvent(subscriptionEventData)
+        }.launchIn(lifecycleScope)
+    }
+
     private fun exit() {
         binding.settingsWebView.stopLoading()
         binding.root.removeView(binding.settingsWebView)
@@ -139,6 +156,20 @@ class SettingsWebViewActivity : DuckDuckGoActivity() {
 
             if (settingsPageFeature.serpSettingsSync().isEnabled()) {
                 webView.webViewClient = settingsWebViewClient
+
+                contentScopeScripts.register(
+                    webView,
+                    object : JsMessageCallback() {
+                        override fun process(
+                            featureName: String,
+                            method: String,
+                            id: String?,
+                            data: JSONObject?,
+                        ) {
+                            // No-op
+                        }
+                    },
+                )
             }
         }
     }
