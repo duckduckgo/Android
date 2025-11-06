@@ -31,10 +31,6 @@ import kotlinx.coroutines.flow.*
 import javax.inject.Inject
 
 interface AttributedMetricsDataStore {
-    suspend fun isEnabled(): Boolean
-
-    suspend fun setEnabled(enabled: Boolean)
-
     suspend fun isActive(): Boolean
 
     suspend fun setActive(active: Boolean)
@@ -42,8 +38,6 @@ interface AttributedMetricsDataStore {
     suspend fun getInitializationDate(): String?
 
     suspend fun setInitializationDate(date: String?)
-
-    fun observeEnabled(): Flow<Boolean>
 }
 
 @ContributesBinding(AppScope::class)
@@ -53,23 +47,8 @@ class RealAttributedMetricsDataStore @Inject constructor(
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
 ) : AttributedMetricsDataStore {
     private object Keys {
-        val IS_ENABLED = booleanPreferencesKey("is_enabled")
         val IS_ACTIVE = booleanPreferencesKey("is_active")
         val INIT_DATE = stringPreferencesKey("client_init_date")
-    }
-
-    private val enabledState: StateFlow<Boolean> =
-        store.data
-            .map { prefs -> prefs[Keys.IS_ENABLED] ?: false }
-            .distinctUntilChanged()
-            .stateIn(appCoroutineScope, SharingStarted.Eagerly, false)
-
-    override suspend fun isEnabled(): Boolean = store.data.firstOrNull()?.get(Keys.IS_ENABLED) ?: false
-
-    override suspend fun setEnabled(enabled: Boolean) {
-        store.edit { preferences ->
-            preferences[Keys.IS_ENABLED] = enabled
-        }
     }
 
     override suspend fun getInitializationDate(): String? = store.data.firstOrNull()?.get(Keys.INIT_DATE)
@@ -91,6 +70,4 @@ class RealAttributedMetricsDataStore @Inject constructor(
             preferences[Keys.IS_ACTIVE] = active
         }
     }
-
-    override fun observeEnabled(): Flow<Boolean> = enabledState
 }

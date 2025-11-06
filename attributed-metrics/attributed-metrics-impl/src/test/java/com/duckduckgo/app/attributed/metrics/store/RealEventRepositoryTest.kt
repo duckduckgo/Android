@@ -70,7 +70,7 @@ class RealEventRepositoryTest {
 
             repository.collectEvent("test_event")
 
-            val events = eventDao.getEventsByNameAndTimeframe("test_event", "2025-10-03")
+            val events = eventDao.getEventsByNameAndTimeframe("test_event", "2025-10-03", "2025-10-03")
             assert(events.size == 1)
             assert(events[0].count == 1)
             assert(events[0].eventName == "test_event")
@@ -86,7 +86,7 @@ class RealEventRepositoryTest {
             repository.collectEvent("test_event")
             repository.collectEvent("test_event")
 
-            val events = eventDao.getEventsByNameAndTimeframe("test_event", "2025-10-03")
+            val events = eventDao.getEventsByNameAndTimeframe("test_event", "2025-10-03", "2025-10-03")
             assert(events.size == 1)
             assert(events[0].count == 3)
         }
@@ -104,34 +104,56 @@ class RealEventRepositoryTest {
         }
 
     @Test
-    fun whenGetEventStatsThenCalculateCorrectly() =
+    fun whenGetEventStatsWithDataOnEveryDayThenCalculateCorrectlyUsingPreviousDaysWindow() =
         runTest {
             // Setup data for 3 days
-            testDateProvider.testDate = LocalDate.of(2025, 10, 3)
+            testDateProvider.testDate = LocalDate.of(2025, 10, 8)
+            eventDao.insertEvent(EventEntity("test_event", count = 3, day = "2025-10-08"))
+            eventDao.insertEvent(EventEntity("test_event", count = 1, day = "2025-10-07"))
+            eventDao.insertEvent(EventEntity("test_event", count = 2, day = "2025-10-06"))
+            eventDao.insertEvent(EventEntity("test_event", count = 3, day = "2025-10-05"))
+            eventDao.insertEvent(EventEntity("test_event", count = 1, day = "2025-10-04"))
             eventDao.insertEvent(EventEntity("test_event", count = 2, day = "2025-10-03"))
             eventDao.insertEvent(EventEntity("test_event", count = 3, day = "2025-10-02"))
             eventDao.insertEvent(EventEntity("test_event", count = 1, day = "2025-10-01"))
 
             val stats = repository.getEventStats("test_event", days = 7)
 
-            assert(stats.daysWithEvents == 3)
-            assert(stats.totalEvents == 6)
-            assert(stats.rollingAverage == 6.0 / 7.0)
+            assert(stats.daysWithEvents == 7)
+            assert(stats.totalEvents == 13)
+            assert(stats.rollingAverage == 13.0 / 7.0)
         }
 
     @Test
-    fun whenDeleteOldEventsThenRemoveOnlyOlderThanSpecified() =
+    fun whenGetEventStatsWithMissingDaysDataThenCalculateCorrectlyUsingPreviousDaysWindow() =
+        runTest {
+            // Setup data for 3 days
+            testDateProvider.testDate = LocalDate.of(2025, 10, 8)
+            eventDao.insertEvent(EventEntity("test_event", count = 3, day = "2025-10-08"))
+            eventDao.insertEvent(EventEntity("test_event", count = 1, day = "2025-10-07"))
+            eventDao.insertEvent(EventEntity("test_event", count = 2, day = "2025-10-06"))
+            eventDao.insertEvent(EventEntity("test_event", count = 1, day = "2025-10-04"))
+            eventDao.insertEvent(EventEntity("test_event", count = 2, day = "2025-10-03"))
+            eventDao.insertEvent(EventEntity("test_event", count = 1, day = "2025-10-01"))
+
+            val stats = repository.getEventStats("test_event", days = 7)
+
+            assert(stats.daysWithEvents == 5)
+            assert(stats.totalEvents == 7)
+            assert(stats.rollingAverage == 7.0 / 7.0)
+        }
+
+    @Test
+    fun whenDeleteAllEventsThenRemoveAllEvents() =
         runTest {
             // Setup data
             eventDao.insertEvent(EventEntity("test_event", count = 1, day = "2025-10-03"))
             eventDao.insertEvent(EventEntity("test_event", count = 1, day = "2025-10-02"))
             eventDao.insertEvent(EventEntity("test_event", count = 1, day = "2025-09-03"))
 
-            testDateProvider.testDate = LocalDate.of(2025, 10, 3)
-            repository.deleteOldEvents(olderThanDays = 5)
+            repository.deleteAllEvents()
 
-            val remainingEvents = eventDao.getEventsByNameAndTimeframe("test_event", "2025-09-03")
-            assert(remainingEvents.size == 2)
-            assert(remainingEvents.none { it.day == "2025-09-03" })
+            val remainingEvents = eventDao.getEventsByNameAndTimeframe("test_event", "2025-09-03", "2025-10-03")
+            assert(remainingEvents.isEmpty())
         }
 }

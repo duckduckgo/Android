@@ -54,14 +54,21 @@ class StatisticsInternalInfoView @JvmOverloads constructor(
         AndroidSupportInjection.inject(this)
         super.onAttachedToWindow()
 
+        binding.retentionAtb.apply {
+            text = store.appRetentionAtb ?: "unknown"
+        }
+
+        binding.retentionAtbSave.setOnClickListener {
+            store.appRetentionAtb = binding.retentionAtb.text
+            Toast.makeText(this.context, "App Retention Atb updated", Toast.LENGTH_SHORT).show()
+        }
+
         binding.searchAtb.apply {
             text = store.searchRetentionAtb ?: "unknown"
         }
 
         binding.searchAtbSave.setOnClickListener {
-            store.searchRetentionAtb?.let {
-                store.searchRetentionAtb = binding.searchAtb.text
-            }
+            store.searchRetentionAtb = binding.searchAtb.text
             Toast.makeText(this.context, "Search Atb updated", Toast.LENGTH_SHORT).show()
         }
 

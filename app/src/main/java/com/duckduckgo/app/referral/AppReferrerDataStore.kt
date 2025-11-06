@@ -57,6 +57,8 @@ class AppReferenceSharePreferences @Inject constructor(
         }
     }
 
+    override fun getOriginAttributeCampaign(): String? = utmOriginAttributeCampaign
+
     override var campaignSuffix: String?
         get() = preferences.getString(KEY_CAMPAIGN_SUFFIX, null)
         set(value) = preferences.edit(true) { putString(KEY_CAMPAIGN_SUFFIX, value) }

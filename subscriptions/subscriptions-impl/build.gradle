@@ -62,6 +62,7 @@ dependencies {
     implementation project(':content-scope-scripts-api')
     implementation project(':duckchat-api')
     implementation project(':pir-api')
+    implementation project(':attributed-metrics-api')
 
     implementation AndroidX.appCompat
     implementation KotlinX.coroutines.core
