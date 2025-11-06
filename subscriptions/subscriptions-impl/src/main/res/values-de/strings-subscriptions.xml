@@ -84,6 +84,11 @@
     <string name="subscriptionSettingSectionHelpAndSupport">Hilfe und Support</string>
     <string name="subscriptionSettingSendFeedback">Rückmeldung senden</string>
     <string name="subscriptionSettingActivating">Wird aktiviert</string>
+    <string name="subscriptionSettingSwitchUpgrade">Wechsle zum Jahresabo und spare 16 %</string>
+    <!-- smartling.character_limit = 10 -->
+    <string name="subscriptionSettingSwitchUpgradePill">Top-Angebot</string>
+    <string name="subscriptionSettingSwitchDowngrade">Tarif wechseln</string>
+    <string name="subscriptionSettingManagePlan">Zahlung verwalten</string>
 
     <!--Purchase Subscriptions-->
     <string name="purchaseCompletedTitle">Du bist startklar.</string>
@@ -191,5 +196,15 @@
     <string name="subscriptionSettingSubscribeSecure">Sichere dein WLAN, und chatte privat mit fortschrittlichen KI-Modellen</string>
 
     <string name="feedbackGeneralSubscription">Abonnement</string>
+
+    <!-- Switch plan-->
+    <string name="switchBottomSheetTitleUpgrade">Mit einem Jahresabo\nsparst du 16 %!</string>
+    <string name="switchBottomSheetDescriptionUpgrade" instruction="%1$s is the yearly plan monthly equivalent price (e.g. $8.33), %2$s is the current monthly plan price (e.g. $9.99)">Ein Jahresabo kostet nur %1$s/Monat, verglichen mit deinem derzeitigen Monatstarif von %2$s.</string>
+    <string name="switchBottomSheetPrimaryButtonUpgrade" instruction="%1$s is the yearly plan price (e.g. $99.99)">Zum Jahresabo (%1$s/Jahr) wechseln</string>
+    <string name="switchBottomSheetSecondaryButtonUpgrade">Monatlichen Tarif beibehalten</string>
+    <string name="switchBottomSheetTitleDowngrade">Du sparst 16 % mit\neinem Jahresabo!</string>
+    <string name="switchBottomSheetDescriptionDowngrade" instruction="%1$s is the yearly plan monthly equivalent price (e.g. $8.33), %2$s is the monthly plan price (e.g. $9.99)">Durch den Wechsel erhöht sich dein monatlicher Preis von %1$s/Monat auf %2$s/Monat.</string>
+    <string name="switchBottomSheetPrimaryButtonDowngrade">Jahrestarif behalten</string>
+    <string name="switchBottomSheetSecondaryButtonDowngrade" instruction="%1$s is the monthly plan price (e.g. $9.99)">Zum Monatsabo wechseln (%1$s/Monat)</string>
 
 </resources>
