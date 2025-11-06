@@ -84,6 +84,11 @@
     <string name="subscriptionSettingSectionHelpAndSupport">Pomoc i wsparcie</string>
     <string name="subscriptionSettingSendFeedback">Wyślij opinię</string>
     <string name="subscriptionSettingActivating">Aktywacja</string>
+    <string name="subscriptionSettingSwitchUpgrade">Przejdź na plan roczny i zaoszczędź 16%</string>
+    <!-- smartling.character_limit = 10 -->
+    <string name="subscriptionSettingSwitchUpgradePill">Najlepsza oferta</string>
+    <string name="subscriptionSettingSwitchDowngrade">Zmień plan</string>
+    <string name="subscriptionSettingManagePlan">Zarządzaj płatnością</string>
 
     <!--Purchase Subscriptions-->
     <string name="purchaseCompletedTitle">Wszystko gotowe.</string>
@@ -191,5 +196,15 @@
     <string name="subscriptionSettingSubscribeSecure">Zabezpiecz Wi-Fi i czatuj prywatnie z zaawansowanymi modelami AI</string>
 
     <string name="feedbackGeneralSubscription">Subskrypcja</string>
+
+    <!-- Switch plan-->
+    <string name="switchBottomSheetTitleUpgrade">Zaoszczędź 16% \nz planem rocznym!</string>
+    <string name="switchBottomSheetDescriptionUpgrade" instruction="%1$s is the yearly plan monthly equivalent price (e.g. $8.33), %2$s is the current monthly plan price (e.g. $9.99)">Plan roczny kosztuje tylko %1$s/mies., w porównaniu do Twojego obecnego planu miesięcznego za %2$s.</string>
+    <string name="switchBottomSheetPrimaryButtonUpgrade" instruction="%1$s is the yearly plan price (e.g. $99.99)">Przełącz na plan roczny (%1$s/rok)</string>
+    <string name="switchBottomSheetSecondaryButtonUpgrade">Zachowaj miesięczny plan</string>
+    <string name="switchBottomSheetTitleDowngrade">Oszczędzasz 16% \nz planem rocznym!</string>
+    <string name="switchBottomSheetDescriptionDowngrade" instruction="%1$s is the yearly plan monthly equivalent price (e.g. $8.33), %2$s is the monthly plan price (e.g. $9.99)">Zmiana zwiększy Twoją miesięczną opłatę z %1$s/mies. do %2$s/mies.</string>
+    <string name="switchBottomSheetPrimaryButtonDowngrade">Zachowaj plan roczny</string>
+    <string name="switchBottomSheetSecondaryButtonDowngrade" instruction="%1$s is the monthly plan price (e.g. $9.99)">Przejdź na plan miesięczny (%1$s/miesiąc)</string>
 
 </resources>
