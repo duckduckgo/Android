@@ -84,6 +84,11 @@
     <string name="subscriptionSettingSectionHelpAndSupport">Aiuto e assistenza</string>
     <string name="subscriptionSettingSendFeedback">Invia feedback</string>
     <string name="subscriptionSettingActivating">Attivazione in corso…</string>
+    <string name="subscriptionSettingSwitchUpgrade">Passa a un abbonamento annuale e risparmia il 16%</string>
+    <!-- smartling.character_limit = 10 -->
+    <string name="subscriptionSettingSwitchUpgradePill">Migliore offerta</string>
+    <string name="subscriptionSettingSwitchDowngrade">Cambia piano</string>
+    <string name="subscriptionSettingManagePlan">Gestisci il pagamento</string>
 
     <!--Purchase Subscriptions-->
     <string name="purchaseCompletedTitle">È tutto pronto.</string>
@@ -191,5 +196,15 @@
     <string name="subscriptionSettingSubscribeSecure">Proteggi la rete Wi-Fi e chatta privatamente con modelli AI avanzati</string>
 
     <string name="feedbackGeneralSubscription">Abbonamento</string>
+
+    <!-- Switch plan-->
+    <string name="switchBottomSheetTitleUpgrade">Risparmia il 16% con un piano annuale!</string>
+    <string name="switchBottomSheetDescriptionUpgrade" instruction="%1$s is the yearly plan monthly equivalent price (e.g. $8.33), %2$s is the current monthly plan price (e.g. $9.99)">Un piano annuale costa solo %1$sal mese, rispetto al tuo attuale piano mensile di %2$s.</string>
+    <string name="switchBottomSheetPrimaryButtonUpgrade" instruction="%1$s is the yearly plan price (e.g. $99.99)">Passa al piano annuale (%1$sall\'anno)</string>
+    <string name="switchBottomSheetSecondaryButtonUpgrade">Mantieni il piano mensile</string>
+    <string name="switchBottomSheetTitleDowngrade">Risparmi il 16% con un piano annuale!</string>
+    <string name="switchBottomSheetDescriptionDowngrade" instruction="%1$s is the yearly plan monthly equivalent price (e.g. $8.33), %2$s is the monthly plan price (e.g. $9.99)">Il passaggio comporterà un aumento del prezzo mensile da %1$s/mese a %2$s/mese.</string>
+    <string name="switchBottomSheetPrimaryButtonDowngrade">Mantieni il piano annuale</string>
+    <string name="switchBottomSheetSecondaryButtonDowngrade" instruction="%1$s is the monthly plan price (e.g. $9.99)">Passa al piano mensile (%1$s/mese)</string>
 
 </resources>
