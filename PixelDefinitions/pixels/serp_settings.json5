@@ -1,0 +1,19 @@
+// See https://app.asana.com/1/137249556945/project/1207908166761516/task/1211846254913290
+{
+    "serp_settings_open_hide-ai-generated-images": {
+        // See DuckChatSettingsViewModel.kt for usage.
+        "description": "When the `Hide Ai Generated` option is opened and highlighted in SERP settings.",
+        "owners": ["mikescamell"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "serp_settings_open_duck-ai": {
+        // See OpenNativeSettingsHandler.kt for usage.
+        "description": "When a user clicks the 'Open Duck.AI button' in the SERP settings menu which takes them to AI Features settings page.",
+        "owners": ["mikescamell"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    }
+}
