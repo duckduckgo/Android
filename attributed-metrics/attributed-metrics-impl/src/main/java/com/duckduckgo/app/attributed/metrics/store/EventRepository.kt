@@ -32,7 +32,7 @@ interface EventRepository {
         days: Int,
     ): EventStats
 
-    suspend fun deleteOldEvents(olderThanDays: Int)
+    suspend fun deleteAllEvents()
 }
 
 @ContributesBinding(AppScope::class)
@@ -70,10 +70,9 @@ class RealEventRepository @Inject constructor(
         )
     }
 
-    override suspend fun deleteOldEvents(olderThanDays: Int) {
+    override suspend fun deleteAllEvents() {
         coroutineScope.launch {
-            val cutoffDay = attributedMetricsDateUtils.getDateMinusDays(olderThanDays)
-            eventDao.deleteEventsOlderThan(cutoffDay)
+            eventDao.deleteAllEvents()
         }
     }
 }

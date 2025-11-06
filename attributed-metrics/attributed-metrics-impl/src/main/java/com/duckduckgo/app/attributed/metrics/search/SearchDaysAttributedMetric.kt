@@ -59,7 +59,7 @@ class SearchDaysAttributedMetric @Inject constructor(
 
     companion object {
         private const val EVENT_NAME = "ddg_search_days"
-        private const val PIXEL_NAME = "user_active_past_week"
+        private const val PIXEL_NAME = "attributed_metric_active_past_week"
         private const val DAYS_WINDOW = 7
         private const val FEATURE_TOGGLE_NAME = "searchDaysAvg"
         private const val FEATURE_EMIT_TOGGLE_NAME = "canEmitSearchDaysAvg"
@@ -124,6 +124,7 @@ class SearchDaysAttributedMetric @Inject constructor(
         val stats = attributedMetricClient.getEventStats(EVENT_NAME, DAYS_WINDOW)
         val params = mutableMapOf(
             "days" to getBucketValue(stats.daysWithEvents).toString(),
+            "version" to bucketConfiguration.await().version.toString(),
         )
         if (!hasCompleteDataWindow) {
             params["daysSinceInstalled"] = daysSinceInstalled.toString()

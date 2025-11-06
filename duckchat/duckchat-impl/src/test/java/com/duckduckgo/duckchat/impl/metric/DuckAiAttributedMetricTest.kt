@@ -30,6 +30,7 @@ import com.duckduckgo.feature.toggles.api.Toggle.DefaultFeatureValue
 import com.duckduckgo.feature.toggles.api.Toggle.State
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNull
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -65,7 +66,7 @@ class DuckAiAttributedMetricTest {
         )
         whenever(attributedMetricConfig.getBucketConfiguration()).thenReturn(
             mapOf(
-                "aiUsageAvg" to MetricBucket(
+                "attributed_metric_average_duck_ai_usage_past_week" to MetricBucket(
                     buckets = listOf(5, 9),
                     version = 0,
                 ),
@@ -83,7 +84,7 @@ class DuckAiAttributedMetricTest {
 
     @Test
     fun whenPixelNameRequestedThenReturnCorrectName() {
-        assertEquals("user_average_duck_ai_usage_past_week", testee.getPixelName())
+        assertEquals("attributed_metric_average_duck_ai_usage_past_week", testee.getPixelName())
     }
 
     @Test
@@ -201,12 +202,12 @@ class DuckAiAttributedMetricTest {
                 ),
             )
 
-            val params = testee.getMetricParameters()
+            val realBucket = testee.getMetricParameters()["count"]
 
             assertEquals(
                 "For $avg average usage, should return bucket $bucket",
-                mapOf("count" to bucket.toString()),
-                params,
+                bucket.toString(),
+                realBucket,
             )
         }
     }
@@ -222,15 +223,9 @@ class DuckAiAttributedMetricTest {
             ),
         )
 
-        val params = testee.getMetricParameters()
+        val dayAverage = testee.getMetricParameters()["dayAverage"]
 
-        assertEquals(
-            mapOf(
-                "count" to "0", // 5.3 rounds to 5, ≤5 -> bucket 0
-                "dayAverage" to "5",
-            ),
-            params,
-        )
+        assertEquals("5", dayAverage)
     }
 
     @Test
@@ -244,12 +239,9 @@ class DuckAiAttributedMetricTest {
             ),
         )
 
-        val params = testee.getMetricParameters()
+        val dayAverage = testee.getMetricParameters()["dayAverage"]
 
-        assertEquals(
-            mapOf("count" to "0"), // 5.3 rounds to 5, ≤5 -> bucket 0
-            params,
-        )
+        assertNull(dayAverage)
     }
 
     @Test
@@ -259,6 +251,22 @@ class DuckAiAttributedMetricTest {
         val tag = testee.getTag()
 
         assertEquals("7", tag)
+    }
+
+    @Test
+    fun whenGetMetricParametersThenReturnVersion() = runTest {
+        givenDaysSinceInstalled(7)
+        whenever(attributedMetricClient.getEventStats(any(), any())).thenReturn(
+            EventStats(
+                totalEvents = 16,
+                daysWithEvents = 3,
+                rollingAverage = 5.3,
+            ),
+        )
+
+        val version = testee.getMetricParameters()["version"]
+
+        assertEquals("0", version)
     }
 
     private fun givenDaysSinceInstalled(days: Int) {

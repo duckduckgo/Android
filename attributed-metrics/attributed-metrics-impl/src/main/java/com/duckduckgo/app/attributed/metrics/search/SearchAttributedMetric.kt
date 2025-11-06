@@ -61,8 +61,8 @@ class SearchAttributedMetric @Inject constructor(
 
     companion object {
         private const val EVENT_NAME = "ddg_search"
-        private const val FIRST_MONTH_PIXEL = "user_average_searches_past_week_first_month"
-        private const val PAST_WEEK_PIXEL_NAME = "user_average_searches_past_week"
+        private const val FIRST_MONTH_PIXEL = "attributed_metric_average_searches_past_week_first_month"
+        private const val PAST_WEEK_PIXEL_NAME = "attributed_metric_average_searches_past_week"
         private const val DAYS_WINDOW = 7
         private const val FIRST_MONTH_DAY_THRESHOLD = 28 // we consider 1 month after 4 weeks
         private const val FEATURE_TOGGLE_NAME = "searchCountAvg"
@@ -126,6 +126,7 @@ class SearchAttributedMetric @Inject constructor(
         val stats = getEventStats()
         val params = mutableMapOf(
             "count" to getBucketValue(stats.rollingAverage.roundToInt()).toString(),
+            "version" to getBucketConfig().version.toString(),
         )
         if (!hasCompleteDataWindow()) {
             params["dayAverage"] = daysSinceInstalled().toString()
@@ -141,10 +142,7 @@ class SearchAttributedMetric @Inject constructor(
     }
 
     private suspend fun getBucketValue(searches: Int): Int {
-        val buckets = when (daysSinceInstalled()) {
-            in 0..FIRST_MONTH_DAY_THRESHOLD -> bucketConfigFirstMonth.await().buckets
-            else -> bucketConfigPastWeek.await().buckets
-        }
+        val buckets = getBucketConfig().buckets
         return buckets.indexOfFirst { bucket -> searches <= bucket }.let { index ->
             if (index == -1) buckets.size else index
         }
@@ -175,6 +173,11 @@ class SearchAttributedMetric @Inject constructor(
             )
         }
         return stats
+    }
+
+    private suspend fun getBucketConfig() = when (daysSinceInstalled()) {
+        in 0..FIRST_MONTH_DAY_THRESHOLD -> bucketConfigFirstMonth.await()
+        else -> bucketConfigPastWeek.await()
     }
 
     private fun hasCompleteDataWindow(): Boolean {
