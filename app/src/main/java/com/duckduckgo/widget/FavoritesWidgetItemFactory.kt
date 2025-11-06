@@ -40,8 +40,6 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.domain
 import com.duckduckgo.savedsites.api.SavedSitesRepository
 import com.duckduckgo.savedsites.api.models.SavedSite
-import kotlinx.coroutines.async
-import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.withContext
 import logcat.logcat
@@ -119,11 +117,9 @@ class FavoritesWidgetItemFactory(
                 .getFavoritesSync()
                 .take(maxItems)
                 .map { favorite ->
-                    async {
-                        favorite.toWidgetFavorite()
-                    }
+                    favorite.toWidgetFavorite()
                 }
-            deferredFavorites.awaitAll()
+            deferredFavorites
         }
     }
 
@@ -139,14 +135,12 @@ class FavoritesWidgetItemFactory(
             subFolder = NO_SUBFOLDER,
             domain = domain,
         )
-
         var uri: Uri? = null
 
         if (existingFile != null) {
             // found existing file on disk (favicon or placeholder) - use it without network call
             uri = existingFile.getContentUri()
         }
-
         if (uri != null) {
             return WidgetFavorite(
                 title = title,
@@ -155,23 +149,7 @@ class FavoritesWidgetItemFactory(
             )
         }
 
-        // step 2: No cached file or failed, try fetching real favicon from network
-        val fetchedFile = runCatching { faviconManager.tryFetchFaviconForUrl(url) }.getOrNull()
-
-        if (fetchedFile != null) {
-            // successfully fetched real favicon from network
-            uri = fetchedFile.getContentUri()
-        }
-
-        if (uri != null) {
-            return WidgetFavorite(
-                title = title,
-                url = url,
-                bitmapUri = uri,
-            )
-        }
-
-        // step 3: Network fetch failed, generate and save placeholder
+        // step 2: generate and save placeholder
         val placeholderBitmap = generateDefaultDrawable(
             context = context,
             domain = domain,
