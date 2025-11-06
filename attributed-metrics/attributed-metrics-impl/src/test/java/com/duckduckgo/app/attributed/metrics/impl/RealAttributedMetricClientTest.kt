@@ -19,9 +19,12 @@ package com.duckduckgo.app.attributed.metrics.impl
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.app.attributed.metrics.api.AttributedMetric
 import com.duckduckgo.app.attributed.metrics.api.EventStats
+import com.duckduckgo.app.attributed.metrics.store.AttributedMetricsDateUtils
 import com.duckduckgo.app.attributed.metrics.store.EventRepository
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Unique
+import com.duckduckgo.browser.api.install.AppInstall
+import com.duckduckgo.browser.api.referrer.AppReferrer
 import com.duckduckgo.common.test.CoroutineTestRule
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -45,6 +48,9 @@ class RealAttributedMetricClientTest {
     private val mockEventRepository: EventRepository = mock()
     private val mockPixel: Pixel = mock()
     private val mockMetricsState: AttributedMetricsState = mock()
+    private val appReferrer: AppReferrer = mock()
+    private val appInstall: AppInstall = mock()
+    private val dateUtils: AttributedMetricsDateUtils = mock()
 
     private lateinit var testee: RealAttributedMetricClient
 
@@ -56,6 +62,9 @@ class RealAttributedMetricClientTest {
             eventRepository = mockEventRepository,
             pixel = mockPixel,
             metricsState = mockMetricsState,
+            appReferrer = appReferrer,
+            dateUtils = dateUtils,
+            appInstall = appInstall,
         )
     }
 
@@ -100,13 +109,51 @@ class RealAttributedMetricClientTest {
     }
 
     @Test
-    fun whenEmitMetricAndClientActiveMetricIsEmitted() = runTest {
+    fun whenEmitMetricAndClientActiveWithOriginThenMetricIsEmittedWithOrigin() = runTest {
         val testMetric = TestAttributedMetric()
         whenever(mockMetricsState.isActive()).thenReturn(true)
+        whenever(mockMetricsState.canEmitMetrics()).thenReturn(true)
+        whenever(appReferrer.getOriginAttributeCampaign()).thenReturn("campaign_origin")
 
         testee.emitMetric(testMetric)
 
-        verify(mockPixel).fire(pixelName = "test_pixel", parameters = mapOf("param" to "value"), type = Unique("test_pixel_test_tag"))
+        verify(mockPixel).fire(
+            pixelName = "test_pixel",
+            parameters = mapOf("param" to "value", "origin" to "campaign_origin"),
+            type = Unique("test_pixel_test_tag"),
+        )
+    }
+
+    @Test
+    fun whenEmitMetricAndClientActiveWithoutOriginThenMetricIsEmittedWithInstallDate() = runTest {
+        val testMetric = TestAttributedMetric()
+        whenever(mockMetricsState.isActive()).thenReturn(true)
+        whenever(mockMetricsState.canEmitMetrics()).thenReturn(true)
+        whenever(appReferrer.getOriginAttributeCampaign()).thenReturn(null)
+        whenever(dateUtils.getDateFromTimestamp(any())).thenReturn("2025-01-01")
+
+        testee.emitMetric(testMetric)
+
+        verify(mockPixel).fire(
+            pixelName = "test_pixel",
+            parameters = mapOf("param" to "value", "install_date" to "2025-01-01"),
+            type = Unique("test_pixel_test_tag"),
+        )
+    }
+
+    @Test
+    fun whenEmitMetricClientActiveButCanEmitMetricsFalseThenMetricIsNotEmitted() = runTest {
+        val testMetric = TestAttributedMetric()
+        whenever(mockMetricsState.isActive()).thenReturn(true)
+        whenever(mockMetricsState.canEmitMetrics()).thenReturn(false)
+
+        testee.emitMetric(testMetric)
+
+        verify(mockPixel, never()).fire(
+            pixelName = "test_pixel",
+            parameters = mapOf("param" to "value"),
+            type = Unique("test_pixel_test_tag"),
+        )
     }
 
     @Test

@@ -14,10 +14,12 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.attributed.metrics
+package com.duckduckgo.app.attributed.metrics.search
 
 import com.duckduckgo.app.attributed.metrics.api.AttributedMetric
 import com.duckduckgo.app.attributed.metrics.api.AttributedMetricClient
+import com.duckduckgo.app.attributed.metrics.api.AttributedMetricConfig
+import com.duckduckgo.app.attributed.metrics.api.MetricBucket
 import com.duckduckgo.app.attributed.metrics.store.AttributedMetricsDateUtils
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.statistics.api.AtbLifecyclePlugin
@@ -28,6 +30,9 @@ import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.SingleInstanceIn
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.CoroutineStart.LAZY
+import kotlinx.coroutines.Deferred
+import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import logcat.logcat
 import javax.inject.Inject
@@ -42,23 +47,37 @@ import javax.inject.Inject
 @ContributesMultibinding(AppScope::class, AtbLifecyclePlugin::class)
 @ContributesMultibinding(AppScope::class, AttributedMetric::class)
 @SingleInstanceIn(AppScope::class)
-class RealSearchDaysAttributedMetric @Inject constructor(
+class SearchDaysAttributedMetric @Inject constructor(
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val dispatcherProvider: DispatcherProvider,
     private val attributedMetricClient: AttributedMetricClient,
     private val appInstall: AppInstall,
     private val statisticsDataStore: StatisticsDataStore,
     private val dateUtils: AttributedMetricsDateUtils,
+    private val attributedMetricConfig: AttributedMetricConfig,
 ) : AttributedMetric, AtbLifecyclePlugin {
 
     companion object {
         private const val EVENT_NAME = "ddg_search_days"
-        private const val PIXEL_NAME = "user_active_past_week"
+        private const val PIXEL_NAME = "attributed_metric_active_past_week"
         private const val DAYS_WINDOW = 7
-        private val DAYS_BUCKETS = arrayOf(
-            2,
-            4,
-        ) // TODO: default bucket, remote bucket implementation will happen in future PRs
+        private const val FEATURE_TOGGLE_NAME = "searchDaysAvg"
+        private const val FEATURE_EMIT_TOGGLE_NAME = "canEmitSearchDaysAvg"
+    }
+
+    private val isEnabled: Deferred<Boolean> = appCoroutineScope.async(start = LAZY) {
+        getToggle(FEATURE_TOGGLE_NAME)?.isEnabled() ?: false
+    }
+
+    private val canEmit: Deferred<Boolean> = appCoroutineScope.async(start = LAZY) {
+        getToggle(FEATURE_EMIT_TOGGLE_NAME)?.isEnabled() ?: false
+    }
+
+    private val bucketConfiguration: Deferred<MetricBucket> = appCoroutineScope.async(start = LAZY) {
+        attributedMetricConfig.getBucketConfiguration()[PIXEL_NAME] ?: MetricBucket(
+            buckets = listOf(2, 4),
+            version = 0,
+        )
     }
 
     override fun onAppRetentionAtbRefreshed(
@@ -66,6 +85,8 @@ class RealSearchDaysAttributedMetric @Inject constructor(
         newAtb: String,
     ) {
         appCoroutineScope.launch(dispatcherProvider.io()) {
+            if (!isEnabled.await()) return@launch
+
             if (oldAtb == newAtb) {
                 logcat(tag = "AttributedMetrics") {
                     "SearchDays: Skip emitting atb not changed"
@@ -78,7 +99,10 @@ class RealSearchDaysAttributedMetric @Inject constructor(
                 }
                 return@launch
             }
-            attributedMetricClient.emitMetric(this@RealSearchDaysAttributedMetric)
+
+            if (canEmit.await()) {
+                attributedMetricClient.emitMetric(this@SearchDaysAttributedMetric)
+            }
         }
     }
 
@@ -87,6 +111,7 @@ class RealSearchDaysAttributedMetric @Inject constructor(
         newAtb: String,
     ) {
         appCoroutineScope.launch(dispatcherProvider.io()) {
+            if (!isEnabled.await()) return@launch
             attributedMetricClient.collectEvent(EVENT_NAME)
         }
     }
@@ -99,6 +124,7 @@ class RealSearchDaysAttributedMetric @Inject constructor(
         val stats = attributedMetricClient.getEventStats(EVENT_NAME, DAYS_WINDOW)
         val params = mutableMapOf(
             "days" to getBucketValue(stats.daysWithEvents).toString(),
+            "version" to bucketConfiguration.await().version.toString(),
         )
         if (!hasCompleteDataWindow) {
             params["daysSinceInstalled"] = daysSinceInstalled.toString()
@@ -112,9 +138,10 @@ class RealSearchDaysAttributedMetric @Inject constructor(
         return statisticsDataStore.appRetentionAtb ?: "no-atb" // should not happen, but just in case
     }
 
-    private fun getBucketValue(days: Int): Int {
-        return DAYS_BUCKETS.indexOfFirst { bucket -> days <= bucket }.let { index ->
-            if (index == -1) DAYS_BUCKETS.size else index
+    private suspend fun getBucketValue(days: Int): Int {
+        val buckets = bucketConfiguration.await().buckets
+        return buckets.indexOfFirst { bucket -> days <= bucket }.let { index ->
+            if (index == -1) buckets.size else index
         }
     }
 
@@ -136,4 +163,9 @@ class RealSearchDaysAttributedMetric @Inject constructor(
     private fun daysSinceInstalled(): Int {
         return dateUtils.daysSince(appInstall.getInstallationTimestamp())
     }
+
+    private suspend fun getToggle(toggleName: String) =
+        attributedMetricConfig.metricsToggles().firstOrNull { toggle ->
+            toggle.featureName().name == toggleName
+        }
 }

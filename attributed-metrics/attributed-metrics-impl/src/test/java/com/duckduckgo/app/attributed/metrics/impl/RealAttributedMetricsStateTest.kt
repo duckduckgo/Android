@@ -23,6 +23,7 @@ import com.duckduckgo.app.attributed.metrics.AttributedMetricsConfigFeature
 import com.duckduckgo.app.attributed.metrics.FakeAttributedMetricsDateUtils
 import com.duckduckgo.app.attributed.metrics.store.AttributedMetricsDataStore
 import com.duckduckgo.app.attributed.metrics.store.AttributedMetricsDateUtils
+import com.duckduckgo.app.attributed.metrics.store.EventRepository
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
@@ -51,6 +52,7 @@ class RealAttributedMetricsStateTest {
     private val mockConfigFeature: AttributedMetricsConfigFeature = FakeFeatureToggleFactory.create(AttributedMetricsConfigFeature::class.java)
     private val mockAppBuildConfig: AppBuildConfig = mock()
     private val mockLifecycleOwner: LifecycleOwner = mock()
+    private val mockEventRepository: EventRepository = mock()
     private lateinit var testDateUtils: AttributedMetricsDateUtils
 
     private lateinit var testee: RealAttributedMetricsState
@@ -64,6 +66,7 @@ class RealAttributedMetricsStateTest {
             attributedMetricsConfigFeature = mockConfigFeature,
             appBuildConfig = mockAppBuildConfig,
             attributedMetricsDateUtils = testDateUtils,
+            eventRepository = mockEventRepository,
         )
     }
 
@@ -108,25 +111,17 @@ class RealAttributedMetricsStateTest {
         verify(mockDataStore, never()).setActive(any())
     }
 
-    @Test fun whenOnPrivacyConfigDownloadedThenUpdateEnabledState() = runTest {
-        givenAttributedClientFeatureEnabled(true)
-
-        testee.onPrivacyConfigDownloaded()
-
-        verify(mockDataStore).setEnabled(true)
-    }
-
     @Test fun whenIsActiveAndAllConditionsMetThenReturnTrue() = runTest {
         whenever(mockDataStore.isActive()).thenReturn(true)
-        whenever(mockDataStore.isEnabled()).thenReturn(true)
         whenever(mockDataStore.getInitializationDate()).thenReturn("2025-10-03")
+        mockConfigFeature.self().setRawStoredState(State(true))
 
         assertTrue(testee.isActive())
     }
 
     @Test fun whenIsActiveAndClientNotActiveThenReturnFalse() = runTest {
         whenever(mockDataStore.isActive()).thenReturn(false)
-        whenever(mockDataStore.isEnabled()).thenReturn(true)
+        mockConfigFeature.self().setRawStoredState(State(true))
         whenever(mockDataStore.getInitializationDate()).thenReturn("2025-10-03")
 
         assertFalse(testee.isActive())
@@ -134,7 +129,7 @@ class RealAttributedMetricsStateTest {
 
     @Test fun whenIsActiveAndNotEnabledThenReturnFalse() = runTest {
         whenever(mockDataStore.isActive()).thenReturn(true)
-        whenever(mockDataStore.isEnabled()).thenReturn(false)
+        mockConfigFeature.self().setRawStoredState(State(false))
         whenever(mockDataStore.getInitializationDate()).thenReturn("2025-10-03")
 
         assertFalse(testee.isActive())
@@ -142,7 +137,7 @@ class RealAttributedMetricsStateTest {
 
     @Test fun whenIsActiveAndNoInitDateThenReturnFalse() = runTest {
         whenever(mockDataStore.isActive()).thenReturn(true)
-        whenever(mockDataStore.isEnabled()).thenReturn(true)
+        mockConfigFeature.self().setRawStoredState(State(true))
         whenever(mockDataStore.getInitializationDate()).thenReturn(null)
 
         assertFalse(testee.isActive())
@@ -154,6 +149,7 @@ class RealAttributedMetricsStateTest {
         testee.onCreate(mockLifecycleOwner)
 
         verify(mockDataStore, never()).setActive(any())
+        verify(mockEventRepository, never()).deleteAllEvents()
     }
 
     @Test fun whenCheckCollectionPeriodAndWithinPeriodAndActiveThenKeepActive() = runTest {
@@ -163,6 +159,7 @@ class RealAttributedMetricsStateTest {
         testee.onCreate(mockLifecycleOwner)
 
         verify(mockDataStore).setActive(true)
+        verify(mockEventRepository, never()).deleteAllEvents()
     }
 
     @Test fun whenCheckCollectionPeriodAndWithinPeriodAndNotActiveThenKeepInactive() = runTest {
@@ -171,16 +168,18 @@ class RealAttributedMetricsStateTest {
 
         testee.onCreate(mockLifecycleOwner)
 
-        verify(mockDataStore).setActive(false)
+        verify(mockDataStore, never()).setActive(any())
+        verify(mockEventRepository, never()).deleteAllEvents()
     }
 
-    @Test fun whenCheckCollectionPeriodAndOutsidePeriodThenSetInactive() = runTest {
+    @Test fun whenCheckCollectionPeriodAndOutsidePeriodThenSetInactiveAndDeleteAllData() = runTest {
         whenever(mockDataStore.getInitializationDate()).thenReturn(testDateUtils.getDateMinusDays(169)) // 6months + 1
         whenever(mockDataStore.isActive()).thenReturn(true)
 
         testee.onCreate(mockLifecycleOwner)
 
         verify(mockDataStore).setActive(false)
+        verify(mockEventRepository).deleteAllEvents()
     }
 
     private fun givenAttributedClientFeatureEnabled(isEnabled: Boolean) {
