@@ -20,6 +20,7 @@ import androidx.lifecycle.LifecycleOwner
 import com.duckduckgo.app.attributed.metrics.AttributedMetricsConfigFeature
 import com.duckduckgo.app.attributed.metrics.store.AttributedMetricsDataStore
 import com.duckduckgo.app.attributed.metrics.store.AttributedMetricsDateUtils
+import com.duckduckgo.app.attributed.metrics.store.EventRepository
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
 import com.duckduckgo.app.statistics.api.AtbLifecyclePlugin
@@ -66,6 +67,7 @@ class RealAttributedMetricsState @Inject constructor(
     private val attributedMetricsConfigFeature: AttributedMetricsConfigFeature,
     private val appBuildConfig: AppBuildConfig,
     private val attributedMetricsDateUtils: AttributedMetricsDateUtils,
+    private val eventRepository: EventRepository,
 ) : AttributedMetricsState, MainProcessLifecycleObserver, AtbLifecyclePlugin {
 
     override fun onCreate(owner: LifecycleOwner) {
@@ -125,6 +127,8 @@ class RealAttributedMetricsState @Inject constructor(
             return
         }
 
+        if (dataStore.isActive().not()) return // if already inactive, no need to check further
+
         val daysSinceInit = attributedMetricsDateUtils.daysSince(initDate)
         val isWithinPeriod = daysSinceInit <= COLLECTION_PERIOD_DAYS
         val newClientActiveState = isWithinPeriod && dataStore.isActive()
@@ -133,6 +137,10 @@ class RealAttributedMetricsState @Inject constructor(
             "Updating client state to $newClientActiveState result of -> within period? $isWithinPeriod, client active? ${dataStore.isActive()}"
         }
         dataStore.setActive(newClientActiveState)
+        if (!isWithinPeriod) {
+            eventRepository.deleteAllEvents()
+        }
+
         logClientStatus()
     }
 

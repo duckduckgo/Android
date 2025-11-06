@@ -60,6 +60,14 @@ class RetentionWeekAttributedMetricTest {
         whenever(attributedMetricConfig.metricsToggles()).thenReturn(
             listOf(retentionToggle.retention(), retentionToggle.canEmitRetention()),
         )
+        whenever(attributedMetricConfig.getBucketConfiguration()).thenReturn(
+            mapOf(
+                "attributed_metric_retention_week" to MetricBucket(
+                    buckets = listOf(1, 2, 3, 4),
+                    version = 0,
+                ),
+            ),
+        )
         testee = RetentionWeekAttributedMetric(
             appCoroutineScope = coroutineRule.testScope,
             dispatcherProvider = coroutineRule.testDispatcherProvider,
@@ -72,7 +80,7 @@ class RetentionWeekAttributedMetricTest {
 
     @Test
     fun whenPixelNameRequestedThenReturnCorrectName() {
-        assertEquals("user_retention_week", testee.getPixelName())
+        assertEquals("attributed_metric_retention_week", testee.getPixelName())
     }
 
     @Test
@@ -138,14 +146,6 @@ class RetentionWeekAttributedMetricTest {
 
     @Test
     fun whenDaysInstalledThenReturnCorrectPeriod() = runTest {
-        whenever(attributedMetricConfig.getBucketConfiguration()).thenReturn(
-            mapOf(
-                "user_retention_week" to MetricBucket(
-                    buckets = listOf(1, 2, 3, 4),
-                    version = 0,
-                ),
-            ),
-        )
         // Map of days installed to expected period number
         val periodRanges = mapOf(
             0 to -1, // Day 0 -> not captured
@@ -168,17 +168,17 @@ class RetentionWeekAttributedMetricTest {
         periodRanges.forEach { (days, expectedPeriod) ->
             givenDaysSinceInstalled(days)
 
-            val params = testee.getMetricParameters()
+            val params = testee.getMetricParameters()["count"]
 
-            val expectedParams = if (expectedPeriod > -1) {
-                mapOf("count" to expectedPeriod.toString())
+            val expectedCount = if (expectedPeriod > -1) {
+                expectedPeriod.toString()
             } else {
-                emptyMap()
+                null
             }
 
             assertEquals(
                 "For $days days installed, should return period $expectedPeriod",
-                expectedParams,
+                expectedCount,
                 params,
             )
         }
@@ -186,15 +186,6 @@ class RetentionWeekAttributedMetricTest {
 
     @Test
     fun whenDaysInstalledThenReturnCorrectTag() = runTest {
-        whenever(attributedMetricConfig.getBucketConfiguration()).thenReturn(
-            mapOf(
-                "user_retention_week" to MetricBucket(
-                    buckets = listOf(1, 2, 3, 4),
-                    version = 0,
-                ),
-            ),
-        )
-
         // Test different days and expected period numbers
         val testCases = mapOf(
             0 to "-1", // Day 0 -> not captured
@@ -225,6 +216,15 @@ class RetentionWeekAttributedMetricTest {
                 tag,
             )
         }
+    }
+
+    @Test
+    fun whenGetMetricParametersThenReturnVersion() = runTest {
+        givenDaysSinceInstalled(7)
+
+        val version = testee.getMetricParameters()["version"]
+
+        assertEquals("0", version)
     }
 
     private fun givenDaysSinceInstalled(days: Int) {

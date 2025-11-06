@@ -68,7 +68,7 @@ class SubscriptionStatusAttributedMetricTest {
         givenFFStatus(metricEnabled = true, canEmitMetric = true)
         whenever(attributedMetricConfig.getBucketConfiguration()).thenReturn(
             mapOf(
-                "subscriptionRetention" to MetricBucket(
+                "attributed_metric_subscribed" to MetricBucket(
                     buckets = listOf(0, 1),
                     version = 0,
                 ),
@@ -88,7 +88,7 @@ class SubscriptionStatusAttributedMetricTest {
 
     @Test
     fun whenPixelNameRequestedThenReturnCorrectName() {
-        assertEquals("user_subscribed", testee.getPixelName())
+        assertEquals("attributed_metric_subscribed", testee.getPixelName())
     }
 
     @Test
@@ -161,9 +161,19 @@ class SubscriptionStatusAttributedMetricTest {
         givenDaysSinceSubscribed(7)
         whenever(authRepository.isFreeTrialActive()).thenReturn(true)
 
-        val params = testee.getMetricParameters()
+        val monthBucket = testee.getMetricParameters()["month"]
 
-        assertEquals(mapOf("month" to "0"), params)
+        assertEquals("0", monthBucket)
+    }
+
+    @Test
+    fun whenGetMetricParametersThenReturnVersion() = runTest {
+        givenDaysSinceSubscribed(7)
+        whenever(authRepository.isFreeTrialActive()).thenReturn(false)
+
+        val version = testee.getMetricParameters()["version"]
+
+        assertEquals("0", version)
     }
 
     @Test
@@ -186,15 +196,15 @@ class SubscriptionStatusAttributedMetricTest {
             111 to "2", // end of month 4 -> bucket 2
         )
 
-        daysSubscribedExpectedBuckets.forEach { (days, bucket) ->
+        daysSubscribedExpectedBuckets.forEach { (days, expectedBucket) ->
             givenDaysSinceSubscribed(days)
 
-            val params = testee.getMetricParameters()
+            val realMonthBucket = testee.getMetricParameters()["month"]
 
             assertEquals(
-                "For $days days subscribed, should return bucket $bucket",
-                mapOf("month" to bucket.toString()),
-                params,
+                "For $days days subscribed, should return bucket $expectedBucket",
+                expectedBucket,
+                realMonthBucket,
             )
         }
     }

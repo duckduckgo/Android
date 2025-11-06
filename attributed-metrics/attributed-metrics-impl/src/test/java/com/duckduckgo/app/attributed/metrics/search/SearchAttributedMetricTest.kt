@@ -68,11 +68,11 @@ class SearchAttributedMetricTest {
         )
         whenever(attributedMetricConfig.getBucketConfiguration()).thenReturn(
             mapOf(
-                "user_average_searches_past_week_first_month" to MetricBucket(
+                "attributed_metric_average_searches_past_week_first_month" to MetricBucket(
                     buckets = listOf(5, 9),
                     version = 0,
                 ),
-                "user_average_searches_past_week" to MetricBucket(
+                "attributed_metric_average_searches_past_week" to MetricBucket(
                     buckets = listOf(5, 9),
                     version = 0,
                 ),
@@ -115,21 +115,21 @@ class SearchAttributedMetricTest {
     fun whenDaysSinceInstalledLessThan4WThenReturnFirstMonthPixelName() {
         givenDaysSinceInstalled(15)
 
-        assertEquals("user_average_searches_past_week_first_month", testee.getPixelName())
+        assertEquals("attributed_metric_average_searches_past_week_first_month", testee.getPixelName())
     }
 
     @Test
     fun whenDaysSinceInstalledMoreThan4WThenReturnRegularPixelName() {
         givenDaysSinceInstalled(45)
 
-        assertEquals("user_average_searches_past_week", testee.getPixelName())
+        assertEquals("attributed_metric_average_searches_past_week", testee.getPixelName())
     }
 
     @Test
     fun whenDaysSinceInstalledIsEndOf4WThenReturnFirstMonthPixelName() {
         givenDaysSinceInstalled(28)
 
-        assertEquals("user_average_searches_past_week_first_month", testee.getPixelName())
+        assertEquals("attributed_metric_average_searches_past_week_first_month", testee.getPixelName())
     }
 
     @Test
@@ -220,11 +220,11 @@ class SearchAttributedMetricTest {
     fun given7dAverageThenReturnCorrectAverageBucketInParams() = runTest {
         whenever(attributedMetricConfig.getBucketConfiguration()).thenReturn(
             mapOf(
-                "user_average_searches_past_week_first_month" to MetricBucket(
+                "attributed_metric_average_searches_past_week_first_month" to MetricBucket(
                     buckets = listOf(5, 9),
                     version = 0,
                 ),
-                "user_average_searches_past_week" to MetricBucket(
+                "attributed_metric_average_searches_past_week" to MetricBucket(
                     buckets = listOf(5, 9),
                     version = 0,
                 ),
@@ -255,12 +255,12 @@ class SearchAttributedMetricTest {
                 ),
             )
 
-            val params = testee.getMetricParameters()
+            val realBucket = testee.getMetricParameters()["count"]
 
             assertEquals(
                 "For $avg searches, should return bucket $bucket",
-                mapOf("count" to bucket.toString()),
-                params,
+                bucket.toString(),
+                realBucket,
             )
         }
     }
@@ -331,6 +331,22 @@ class SearchAttributedMetricTest {
 
             verify(attributedMetricClient).getEventStats(eq("ddg_search"), eq(7))
         }
+
+    @Test
+    fun whenGetMetricParametersThenReturnVersion() = runTest {
+        givenDaysSinceInstalled(7)
+        whenever(attributedMetricClient.getEventStats(any(), any())).thenReturn(
+            EventStats(
+                totalEvents = 16,
+                daysWithEvents = 3,
+                rollingAverage = 5.3,
+            ),
+        )
+
+        val version = testee.getMetricParameters()["version"]
+
+        assertEquals("0", version)
+    }
 
     private fun givenDaysSinceInstalled(days: Int) {
         whenever(appInstall.getInstallationTimestamp()).thenReturn(123L)

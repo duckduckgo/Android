@@ -46,7 +46,7 @@ class SyncDevicesAttributeMetric @Inject constructor(
 ) : AttributedMetric, MainProcessLifecycleObserver {
 
     companion object {
-        private const val PIXEL_NAME = "user_synced_device"
+        private const val PIXEL_NAME = "attributed_metric_synced_device"
         private const val FEATURE_TOGGLE_NAME = "syncDevices"
     }
 
@@ -77,7 +77,11 @@ class SyncDevicesAttributeMetric @Inject constructor(
 
     override suspend fun getMetricParameters(): Map<String, String> {
         val connectedDevices = connectedDevicesObserver.observeConnectedDevicesCount().value
-        return mapOf("device_count" to getBucketValue(connectedDevices).toString())
+        val params = mutableMapOf(
+            "device_count" to getBucketValue(connectedDevices).toString(),
+            "version" to bucketConfig.await().version.toString(),
+        )
+        return params
     }
 
     override suspend fun getTag(): String {

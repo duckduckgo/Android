@@ -63,7 +63,7 @@ class RealAdClickAttributedMetricTest {
         )
         whenever(attributedMetricConfig.getBucketConfiguration()).thenReturn(
             mapOf(
-                "user_average_ad_clicks_past_week" to MetricBucket(
+                "attributed_metric_average_ad_clicks_past_week" to MetricBucket(
                     buckets = listOf(2, 5),
                     version = 0,
                 ),
@@ -79,7 +79,7 @@ class RealAdClickAttributedMetricTest {
     }
 
     @Test fun whenPixelNameRequestedThenReturnCorrectName() {
-        assertEquals("user_average_ad_clicks_past_week", testee.getPixelName())
+        assertEquals("attributed_metric_average_ad_clicks_past_week", testee.getPixelName())
     }
 
     @Test fun whenAdClickAndDaysInstalledIsZeroThenDoNotEmitMetric() = runTest {
@@ -222,12 +222,12 @@ class RealAdClickAttributedMetricTest {
                 ),
             )
 
-            val params = testee.getMetricParameters()
+            val count = testee.getMetricParameters()["count"]
 
             assertEquals(
                 "For $clicksAvg clicks, should return bucket $expectedBucket",
-                mapOf("count" to expectedBucket.toString()),
-                params,
+                expectedBucket.toString(),
+                count,
             )
         }
     }
@@ -253,6 +253,21 @@ class RealAdClickAttributedMetricTest {
                 tag,
             )
         }
+    }
+
+    @Test fun whenGetMetricParametersThenReturnVersion() = runTest {
+        givenDaysSinceInstalled(7)
+        whenever(attributedMetricClient.getEventStats("ad_click", 7)).thenReturn(
+            EventStats(
+                daysWithEvents = 1,
+                rollingAverage = 1.0,
+                totalEvents = 1,
+            ),
+        )
+
+        val version = testee.getMetricParameters()["version"]
+
+        assertEquals("0", version)
     }
 
     private fun givenDaysSinceInstalled(days: Int) {
