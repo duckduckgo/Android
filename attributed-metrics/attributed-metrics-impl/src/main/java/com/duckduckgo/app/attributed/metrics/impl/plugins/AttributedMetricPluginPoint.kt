@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 DuckDuckGo
+ * Copyright (c) 2025 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,25 +14,15 @@
  * limitations under the License.
  */
 
-plugins {
-    id 'java-library'
-    id 'kotlin'
-}
+package com.duckduckgo.app.attributed.metrics.impl.plugins
 
-apply from: "$rootProject.projectDir/code-formatting.gradle"
+import com.duckduckgo.anvil.annotations.ContributesPluginPoint
+import com.duckduckgo.app.attributed.metrics.api.AttributedMetric
+import com.duckduckgo.di.scopes.AppScope
 
-java {
-    sourceCompatibility = JavaVersion.VERSION_17
-    targetCompatibility = JavaVersion.VERSION_17
-}
-
-kotlin {
-    jvmToolchain(17)
-}
-
-dependencies {
-    implementation Kotlin.stdlib.jdk7
-    implementation KotlinX.coroutines.core
-
-    implementation project(path: ':feature-toggles-api')
-}
+@ContributesPluginPoint(
+    scope = AppScope::class,
+    boundType = AttributedMetric::class,
+)
+@Suppress("unused")
+interface AttributedMetricPluginPoint

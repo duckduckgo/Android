@@ -19,10 +19,13 @@ package com.duckduckgo.app.attributed.metrics.impl
 import com.duckduckgo.app.attributed.metrics.api.AttributedMetric
 import com.duckduckgo.app.attributed.metrics.api.AttributedMetricClient
 import com.duckduckgo.app.attributed.metrics.api.EventStats
+import com.duckduckgo.app.attributed.metrics.store.AttributedMetricsDateUtils
 import com.duckduckgo.app.attributed.metrics.store.EventRepository
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Unique
+import com.duckduckgo.browser.api.install.AppInstall
+import com.duckduckgo.browser.api.referrer.AppReferrer
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
@@ -41,6 +44,9 @@ class RealAttributedMetricClient @Inject constructor(
     private val eventRepository: EventRepository,
     private val pixel: Pixel,
     private val metricsState: AttributedMetricsState,
+    private val appReferrer: AppReferrer,
+    private val dateUtils: AttributedMetricsDateUtils,
+    private val appInstall: AppInstall,
 ) : AttributedMetricClient {
 
     override fun collectEvent(eventName: String) {
@@ -77,24 +83,36 @@ class RealAttributedMetricClient @Inject constructor(
             }
         }
 
-    // TODO: Pending adding default attributed metrics and removing default prefix from pixel names
     override fun emitMetric(metric: AttributedMetric) {
         appCoroutineScope.launch(dispatcherProvider.io()) {
-            if (!metricsState.isActive()) {
+            if (!metricsState.isActive() || !metricsState.canEmitMetrics()) {
                 logcat(tag = "AttributedMetrics") {
                     "Discard pixel, client not active"
                 }
                 return@launch
             }
+
             val pixelName = metric.getPixelName()
             val params = metric.getMetricParameters()
             val tag = metric.getTag()
             val pixelTag = "${pixelName}_$tag"
-            pixel.fire(pixelName = pixelName, parameters = params, type = Unique(pixelTag)).also {
+
+            val origin = appReferrer.getOriginAttributeCampaign()
+            val paramsMutableMap = params.toMutableMap()
+            if (!origin.isNullOrBlank()) {
+                paramsMutableMap["origin"] = origin
+            } else {
+                paramsMutableMap["install_date"] = getInstallDate()
+            }
+            pixel.fire(pixelName = pixelName, parameters = paramsMutableMap, type = Unique(pixelTag)).also {
                 logcat(tag = "AttributedMetrics") {
-                    "Fired pixel $pixelName with params $params"
+                    "Fired pixel $pixelName with params $paramsMutableMap"
                 }
             }
         }
+    }
+
+    private fun getInstallDate(): String {
+        return dateUtils.getDateFromTimestamp(appInstall.getInstallationTimestamp())
     }
 }

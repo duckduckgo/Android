@@ -97,6 +97,14 @@ interface AttributedMetricsDateUtils {
      * @return The calculated date as a string in "yyyy-MM-dd" format (in ET)
      */
     fun getDateMinusDays(days: Int): String
+
+    /**
+     * Converts a timestamp to a formatted date string in Eastern Time.
+     *
+     * @param timestamp The timestamp in milliseconds since epoch (Unix timestamp)
+     * @return The date as a string in "yyyy-MM-dd" format (in ET)
+     */
+    fun getDateFromTimestamp(timestamp: Long): String
 }
 
 @ContributesBinding(AppScope::class)
@@ -125,6 +133,12 @@ class RealAttributedMetricsDateUtils @Inject constructor() : AttributedMetricsDa
     }
 
     override fun getDateMinusDays(days: Int): String = getCurrentZonedDateTime().minusDays(days.toLong()).format(DATE_FORMATTER)
+
+    override fun getDateFromTimestamp(timestamp: Long): String {
+        val instant = Instant.ofEpochMilli(timestamp)
+        val zonedDateTime = instant.atZone(ET_ZONE)
+        return zonedDateTime.format(DATE_FORMATTER)
+    }
 
     private fun getCurrentZonedDateTime(): ZonedDateTime = ZonedDateTime.now(ET_ZONE)
 

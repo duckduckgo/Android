@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.adclick.impl.metrics
+package com.duckduckgo.duckchat.impl.metric
 
 import com.duckduckgo.app.attributed.metrics.api.AttributedMetric
 import com.duckduckgo.app.attributed.metrics.api.AttributedMetricClient
@@ -40,33 +40,26 @@ import java.time.temporal.ChronoUnit
 import javax.inject.Inject
 import kotlin.math.roundToInt
 
-interface AdClickCollector {
-    fun onAdClick()
+interface DuckAiMetricCollector {
+    fun onMessageSent()
 }
 
-/**
- * Ad clicks 7d avg Attributed Metric
- * Trigger: on first Ad click of day
- * Type: Daily pixel
- * Report: 7d rolling average of ad clicks (bucketed value). Not sent if count is 0.
- * Specs: https://app.asana.com/1/137249556945/project/1206716555947156/task/1211301604929610?focus=true
- */
 @ContributesMultibinding(AppScope::class, AttributedMetric::class)
-@ContributesBinding(AppScope::class, AdClickCollector::class)
+@ContributesBinding(AppScope::class, DuckAiMetricCollector::class)
 @SingleInstanceIn(AppScope::class)
-class RealAdClickAttributedMetric @Inject constructor(
+class DuckAiAttributedMetric @Inject constructor(
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val dispatcherProvider: DispatcherProvider,
     private val attributedMetricClient: AttributedMetricClient,
     private val appInstall: AppInstall,
     private val attributedMetricConfig: AttributedMetricConfig,
-) : AttributedMetric, AdClickCollector {
+) : AttributedMetric, DuckAiMetricCollector {
 
     companion object {
-        private const val EVENT_NAME = "ad_click"
-        private const val PIXEL_NAME = "attributed_metric_average_ad_clicks_past_week"
-        private const val FEATURE_TOGGLE_NAME = "adClickCountAvg"
-        private const val FEATURE_EMIT_TOGGLE_NAME = "canEmitAdClickCountAvg"
+        private const val EVENT_NAME = "submit_prompt"
+        private const val PIXEL_NAME = "attributed_metric_average_duck_ai_usage_past_week"
+        private const val FEATURE_TOGGLE_NAME = "aiUsageAvg"
+        private const val FEATURE_EMIT_TOGGLE_NAME = "canEmitAIUsageAvg"
         private const val DAYS_WINDOW = 7
     }
 
@@ -80,26 +73,9 @@ class RealAdClickAttributedMetric @Inject constructor(
 
     private val bucketConfig: Deferred<MetricBucket> = appCoroutineScope.async(start = LAZY) {
         attributedMetricConfig.getBucketConfiguration()[PIXEL_NAME] ?: MetricBucket(
-            buckets = listOf(2, 5),
+            buckets = listOf(5, 9),
             version = 0,
         )
-    }
-
-    override fun onAdClick() {
-        appCoroutineScope.launch(dispatcherProvider.io()) {
-            if (!isEnabled.await()) return@launch
-            attributedMetricClient.collectEvent(EVENT_NAME)
-            if (shouldSendPixel().not()) {
-                logcat(tag = "AttributedMetrics") {
-                    "AdClickCount7d: Skip emitting, not enough data or no events"
-                }
-                return@launch
-            }
-
-            if (canEmit.await()) {
-                attributedMetricClient.emitMetric(this@RealAdClickAttributedMetric)
-            }
-        }
     }
 
     override fun getPixelName(): String = PIXEL_NAME
@@ -118,6 +94,23 @@ class RealAdClickAttributedMetric @Inject constructor(
 
     override suspend fun getTag(): String {
         return daysSinceInstalled().toString()
+    }
+
+    override fun onMessageSent() {
+        appCoroutineScope.launch(dispatcherProvider.io()) {
+            if (!isEnabled.await()) return@launch
+            attributedMetricClient.collectEvent(EVENT_NAME)
+            if (shouldSendPixel().not()) {
+                logcat(tag = "AttributedMetrics") {
+                    "DuckAiUsage: Skip emitting, not enough data or no events"
+                }
+                return@launch
+            }
+
+            if (canEmit.await()) {
+                attributedMetricClient.emitMetric(this@DuckAiAttributedMetric)
+            }
+        }
     }
 
     private suspend fun getBucketValue(avg: Int): Int {

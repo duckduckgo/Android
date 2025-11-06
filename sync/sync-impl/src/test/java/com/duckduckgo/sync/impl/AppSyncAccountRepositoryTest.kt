@@ -74,6 +74,7 @@ import com.duckduckgo.sync.impl.AccountErrorCodes.LOGIN_FAILED
 import com.duckduckgo.sync.impl.Result.Error
 import com.duckduckgo.sync.impl.Result.Success
 import com.duckduckgo.sync.impl.SyncAccountRepository.AuthCode
+import com.duckduckgo.sync.impl.metrics.ConnectedDevicesObserver
 import com.duckduckgo.sync.impl.pixels.SyncPixels
 import com.duckduckgo.sync.impl.ui.qrcode.SyncBarcodeUrl
 import com.duckduckgo.sync.impl.ui.qrcode.SyncBarcodeUrlWrapper
@@ -108,6 +109,7 @@ class AppSyncAccountRepositoryTest {
     private var syncEngine: SyncEngine = mock()
     private var syncPixels: SyncPixels = mock()
     private val deviceKeyGenerator: DeviceKeyGenerator = mock()
+    private val connectedDevicesObserver: ConnectedDevicesObserver = mock()
     private val moshi = Moshi.Builder().build()
     private val invitationCodeWrapperAdapter = moshi.adapter(InvitationCodeWrapper::class.java)
     private val invitedDeviceDetailsAdapter = moshi.adapter(InvitedDeviceDetails::class.java)
@@ -123,6 +125,7 @@ class AppSyncAccountRepositoryTest {
     @Before
     fun before() {
         syncRepo = AppSyncAccountRepository(
+            connectedDevicesObserver,
             syncDeviceIds,
             nativeLib,
             syncApi,
@@ -585,6 +588,19 @@ class AppSyncAccountRepositoryTest {
         val result = syncRepo.getConnectedDevices() as Success
 
         assertEquals(listOfConnectedDevices, result.data)
+    }
+
+    @Test
+    fun getConnectedDevicesSucceedsThenNotifyDevicesObserver() {
+        whenever(syncStore.token).thenReturn(token)
+        whenever(syncStore.primaryKey).thenReturn(primaryKey)
+        whenever(syncStore.deviceId).thenReturn(deviceId)
+        prepareForEncryption()
+        whenever(syncApi.getDevices(anyString())).thenReturn(getDevicesSuccess)
+
+        val result = syncRepo.getConnectedDevices() as Success
+
+        verify(connectedDevicesObserver).onDevicesUpdated(any())
     }
 
     @Test
