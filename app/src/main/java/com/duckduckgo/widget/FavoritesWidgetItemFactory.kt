@@ -113,13 +113,12 @@ class FavoritesWidgetItemFactory(
 
     private suspend fun fetchFavoritesWithBitmapUris(): List<WidgetFavorite> {
         return withContext(dispatchers.io()) {
-            val deferredFavorites = savedSitesRepository
+            savedSitesRepository
                 .getFavoritesSync()
                 .take(maxItems)
                 .map { favorite ->
                     favorite.toWidgetFavorite()
                 }
-            deferredFavorites
         }
     }
 
