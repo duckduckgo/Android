@@ -19,10 +19,12 @@ package com.duckduckgo.voice.impl.listeningmode
 import app.cash.turbine.test
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
+import com.duckduckgo.voice.api.VoiceSearchLauncher.VoiceSearchMode
 import com.duckduckgo.voice.impl.listeningmode.OnDeviceSpeechRecognizer.Event
 import com.duckduckgo.voice.impl.listeningmode.VoiceSearchViewModel.Command
 import com.duckduckgo.voice.impl.listeningmode.VoiceSearchViewModel.ViewState
 import com.duckduckgo.voice.store.VoiceSearchRepository
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.*
 import org.junit.Before
@@ -33,6 +35,7 @@ import org.mockito.MockitoAnnotations
 import org.mockito.kotlin.any
 import org.mockito.kotlin.argumentCaptor
 import org.mockito.kotlin.verify
+import org.mockito.kotlin.whenever
 
 class VoiceSearchViewModelTest {
     private lateinit var testee: VoiceSearchViewModel
@@ -49,9 +52,12 @@ class VoiceSearchViewModelTest {
     @Mock
     private lateinit var duckAiFeatureState: DuckAiFeatureState
 
+    private val showVoiceSearchToggleFlow = MutableStateFlow(false)
+
     @Before
     fun setUp() {
         MockitoAnnotations.openMocks(this)
+        whenever(duckAiFeatureState.showVoiceSearchToggle).thenReturn(showVoiceSearchToggleFlow)
         testee = VoiceSearchViewModel(speechRecognizer, voiceSearchRepository, duckAiFeatureState)
     }
 
@@ -247,5 +253,47 @@ class VoiceSearchViewModelTest {
             assertEquals(Command.HandleSpeechRecognitionSuccess("Test"), expectMostRecentItem())
             cancelAndConsumeRemainingEvents()
         }
+    }
+
+    @Test
+    fun whenUpdateSelectedModeAndShowVoiceSearchToggleIsFalseThenUseSearchMode() = runTest {
+        showVoiceSearchToggleFlow.value = false
+
+        testee.updateSelectedMode(VoiceSearchMode.DUCK_AI)
+
+        testee.viewState().test {
+            val state = expectMostRecentItem()
+            assertEquals(VoiceSearchMode.SEARCH, state.selectedMode)
+            cancelAndConsumeRemainingEvents()
+        }
+        verify(voiceSearchRepository).setLastSelectedMode(VoiceSearchMode.SEARCH)
+    }
+
+    @Test
+    fun whenUpdateSelectedModeWithDuckAiAndShowVoiceSearchToggleIsTrueThenUseDuckAiMode() = runTest {
+        showVoiceSearchToggleFlow.value = true
+
+        testee.updateSelectedMode(VoiceSearchMode.DUCK_AI)
+
+        testee.viewState().test {
+            val state = expectMostRecentItem()
+            assertEquals(VoiceSearchMode.DUCK_AI, state.selectedMode)
+            cancelAndConsumeRemainingEvents()
+        }
+        verify(voiceSearchRepository).setLastSelectedMode(VoiceSearchMode.DUCK_AI)
+    }
+
+    @Test
+    fun whenUpdateSelectedModeWithSearchAndShowVoiceSearchToggleIsTrueThenUseSearchMode() = runTest {
+        showVoiceSearchToggleFlow.value = true
+
+        testee.updateSelectedMode(VoiceSearchMode.SEARCH)
+
+        testee.viewState().test {
+            val state = expectMostRecentItem()
+            assertEquals(VoiceSearchMode.SEARCH, state.selectedMode)
+            cancelAndConsumeRemainingEvents()
+        }
+        verify(voiceSearchRepository).setLastSelectedMode(VoiceSearchMode.SEARCH)
     }
 }
