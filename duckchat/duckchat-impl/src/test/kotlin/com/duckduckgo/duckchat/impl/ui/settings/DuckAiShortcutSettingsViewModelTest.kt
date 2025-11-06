@@ -29,6 +29,7 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
 class DuckAiShortcutSettingsViewModelTest {
@@ -92,6 +93,25 @@ class DuckAiShortcutSettingsViewModelTest {
     }
 
     @Test
+    fun whenViewModelIsCreatedAndShowInVoiceSearchIsEnabledThenEmitEnabled() = runTest {
+        whenever(duckChat.observeShowInVoiceSearchUserSetting()).thenReturn(flowOf(true))
+        testee = DuckAiShortcutSettingsViewModel(duckChat, duckAiFeatureState)
+
+        testee.viewState.test {
+            assertTrue(awaitItem().showInVoiceSearch)
+        }
+    }
+
+    @Test
+    fun whenViewModelIsCreatedAndShowInVoiceSearchIsDisabledThenEmitDisabled() = runTest {
+        testee = DuckAiShortcutSettingsViewModel(duckChat, duckAiFeatureState)
+
+        testee.viewState.test {
+            assertFalse(awaitItem().showInVoiceSearch)
+        }
+    }
+
+    @Test
     fun whenAddressBarEntryPointEnabledTogglesShown() = runTest {
         whenever(duckChat.isAddressBarEntryPointEnabled()).thenReturn(true)
         testee = DuckAiShortcutSettingsViewModel(duckChat, duckAiFeatureState)
@@ -112,5 +132,35 @@ class DuckAiShortcutSettingsViewModelTest {
             val state = awaitItem()
             assertFalse(state.shouldShowAddressBarToggle)
         }
+    }
+
+    @Test
+    fun whenVoiceSearchEntryPointEnabledThenToggleShown() = runTest {
+        whenever(duckChat.isVoiceSearchEntryPointEnabled()).thenReturn(true)
+        testee = DuckAiShortcutSettingsViewModel(duckChat, duckAiFeatureState)
+
+        testee.viewState.test {
+            val state = awaitItem()
+            assertTrue(state.shouldShowVoiceSearchToggle)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenVoiceSearchEntryPointDisabledThenToggleHidden() = runTest {
+        whenever(duckChat.isVoiceSearchEntryPointEnabled()).thenReturn(false)
+        testee = DuckAiShortcutSettingsViewModel(duckChat, duckAiFeatureState)
+
+        testee.viewState.test {
+            val state = awaitItem()
+            assertFalse(state.shouldShowVoiceSearchToggle)
+        }
+    }
+
+    @Test
+    fun whenOnShowDuckChatInVoiceSearchToggledThenCallSetShowInVoiceSearchUserSetting() = runTest {
+        testee.onShowDuckChatInVoiceSearchToggled(true)
+
+        verify(duckChat).setShowInVoiceSearchUserSetting(true)
     }
 }
