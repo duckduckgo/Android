@@ -72,7 +72,6 @@
                 android:id="@+id/daxIcon"
                 android:layout_width="@dimen/toolbarIconSize"
                 android:layout_height="@dimen/toolbarIconSize"
-                android:layout_gravity="center"
                 android:importantForAccessibility="no"
                 android:scaleType="fitCenter"
                 app:srcCompat="@drawable/ic_dax_icon"
@@ -86,7 +85,7 @@
                 android:importantForAccessibility="no"
                 android:scaleType="fitCenter"
                 android:layout_marginStart="@dimen/keyline_1"
-                app:srcCompat="@drawable/ic_chevron_right_24"
+                app:srcCompat="@drawable/ic_chevron_small_right_24"
                 tools:visibility="visible" />
 
             <ImageView
