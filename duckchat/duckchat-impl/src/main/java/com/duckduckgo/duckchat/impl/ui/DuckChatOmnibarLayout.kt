@@ -18,6 +18,7 @@ package com.duckduckgo.duckchat.impl.ui
 
 import android.content.Context
 import android.util.AttributeSet
+import android.view.View
 import android.widget.FrameLayout
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.browser.ui.tabs.NewTabSwitcherButton
@@ -37,6 +38,7 @@ class DuckChatOmnibarLayout @JvmOverloads constructor(
     internal val fireIconMenu: FrameLayout by lazy { findViewById(R.id.inputFieldFireButton) }
     internal val browserMenu: FrameLayout by lazy { findViewById(R.id.inputFieldBrowserMenu) }
     internal val historyMenu: FrameLayout by lazy { findViewById(R.id.duckAiHistoryButton) }
+    internal val inputCard: View by lazy { findViewById(R.id.inputModeWidgetCard) }
 
     private var omnibarItemPressedListener: ItemPressedListener? = null
 
@@ -52,7 +54,6 @@ class DuckChatOmnibarLayout @JvmOverloads constructor(
 
     init {
         inflate(context, R.layout.view_duck_chat_omnibar, this)
-
         AndroidSupportInjection.inject(this)
     }
 
@@ -72,6 +73,9 @@ class DuckChatOmnibarLayout @JvmOverloads constructor(
 
         historyMenu.setOnClickListener {
             omnibarItemPressedListener?.onHistoryMenuPressed()
+        }
+
+        inputCard.setOnClickListener {
         }
     }
 

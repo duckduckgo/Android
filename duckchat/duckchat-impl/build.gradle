@@ -53,6 +53,7 @@ dependencies {
 
     implementation KotlinX.coroutines.android
     implementation AndroidX.core.ktx
+    implementation AndroidX.fragment.ktx
     implementation Google.android.material
     implementation Google.dagger
     implementation AndroidX.work.runtimeKtx

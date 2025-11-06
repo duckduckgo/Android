@@ -39,6 +39,7 @@ import android.webkit.WebView
 import androidx.annotation.AnyThread
 import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.flowWithLifecycle
@@ -65,6 +66,7 @@ import com.duckduckgo.downloads.api.DownloadStateListener
 import com.duckduckgo.downloads.api.DownloadsFileActions
 import com.duckduckgo.downloads.api.FileDownloader
 import com.duckduckgo.downloads.api.FileDownloader.PendingFileDownload
+import com.duckduckgo.duckchat.api.viewmodel.DuckChatSharedViewModel
 import com.duckduckgo.duckchat.impl.DuckChatInternal
 import com.duckduckgo.duckchat.impl.R
 import com.duckduckgo.duckchat.impl.databinding.ActivityDuckChatWebviewBinding
@@ -107,6 +109,8 @@ open class DuckChatWebViewFragment : DuckDuckGoFragment(R.layout.activity_duck_c
     private val viewModel: DuckChatWebViewViewModel by lazy {
         ViewModelProvider(this, viewModelFactory)[DuckChatWebViewViewModel::class.java]
     }
+
+    private val sharedViewModel: DuckChatSharedViewModel by activityViewModels()
 
     @Inject
     lateinit var webViewClient: DuckChatWebViewClient
@@ -368,11 +372,11 @@ open class DuckChatWebViewFragment : DuckDuckGoFragment(R.layout.activity_duck_c
         duckChatOmnibar?.setOmnibarItemPressedListener(
             object : DuckChatOmnibarLayout.ItemPressedListener {
                 override fun onTabsButtonPressed() {
-                    Snackbar.make(root, "Tabs", Snackbar.LENGTH_SHORT).show()
+                    sharedViewModel.onTabSwitcherCLicked()
                 }
 
                 override fun onFireButtonPressed() {
-                    Snackbar.make(root, "Fire", Snackbar.LENGTH_SHORT).show()
+                    sharedViewModel.onFireButtonClicked()
                 }
 
                 override fun onBrowserMenuPressed() {

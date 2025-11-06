@@ -30,6 +30,7 @@ android {
 
 dependencies {
     implementation project(':navigation-api')
+    implementation project(':common-utils')
 
     implementation KotlinX.coroutines.core
     implementation AndroidX.appCompat
