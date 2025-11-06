@@ -65,4 +65,8 @@
         <item name="cornerFamily">rounded</item>
         <item name="cornerSize">@dimen/smallShapeCornerRadius</item>
     </style>
+    <style name="Widget.DuckDuckGo.OmnibarTypePictogram">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">@dimen/smallShapeCornerRadius</item>
+    </style>
 </resources>
