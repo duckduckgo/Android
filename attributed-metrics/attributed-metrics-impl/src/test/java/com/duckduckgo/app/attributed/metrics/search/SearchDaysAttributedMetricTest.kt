@@ -31,6 +31,7 @@ import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle.State
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNull
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -66,7 +67,7 @@ class SearchDaysAttributedMetricTest {
         )
         whenever(attributedMetricConfig.getBucketConfiguration()).thenReturn(
             mapOf(
-                "user_active_past_week" to MetricBucket(
+                "attributed_metric_active_past_week" to MetricBucket(
                     buckets = listOf(2, 4),
                     version = 0,
                 ),
@@ -119,7 +120,7 @@ class SearchDaysAttributedMetricTest {
 
     @Test
     fun whenPixelNameRequestedThenReturnCorrectName() {
-        assertEquals("user_active_past_week", testee.getPixelName())
+        assertEquals("attributed_metric_active_past_week", testee.getPixelName())
     }
 
     @Test
@@ -232,12 +233,12 @@ class SearchDaysAttributedMetricTest {
                 ),
             )
 
-            val params = testee.getMetricParameters()
+            val realBucket = testee.getMetricParameters()["days"]
 
             assertEquals(
                 "For $days days with events, should return bucket $bucket",
-                mapOf("days" to bucket.toString()),
-                params,
+                bucket.toString(),
+                realBucket,
             )
         }
     }
@@ -253,15 +254,9 @@ class SearchDaysAttributedMetricTest {
             ),
         )
 
-        val params = testee.getMetricParameters()
+        val daysWindow = testee.getMetricParameters()["daysSinceInstalled"]
 
-        assertEquals(
-            mapOf(
-                "days" to "2", // 5 days >4 -> bucket 2
-                "daysSinceInstalled" to "5",
-            ),
-            params,
-        )
+        assertEquals("5", daysWindow)
     }
 
     @Test
@@ -275,12 +270,25 @@ class SearchDaysAttributedMetricTest {
             ),
         )
 
-        val params = testee.getMetricParameters()
+        val daysSince = testee.getMetricParameters()["daysSinceInstalled"]
 
-        assertEquals(
-            mapOf("days" to "2"), // 5 days >4 -> bucket 2
-            params,
+        assertNull(daysSince)
+    }
+
+    @Test
+    fun whenGetMetricParametersThenReturnVersion() = runTest {
+        givenDaysSinceInstalled(7)
+        whenever(attributedMetricClient.getEventStats(any(), any())).thenReturn(
+            EventStats(
+                totalEvents = 25,
+                daysWithEvents = 5,
+                rollingAverage = 5.0,
+            ),
         )
+
+        val version = testee.getMetricParameters()["version"]
+
+        assertEquals("0", version)
     }
 
     private fun givenDaysSinceInstalled(days: Int) {

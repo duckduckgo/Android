@@ -64,7 +64,7 @@ class RealAdClickAttributedMetric @Inject constructor(
 
     companion object {
         private const val EVENT_NAME = "ad_click"
-        private const val PIXEL_NAME = "user_average_ad_clicks_past_week"
+        private const val PIXEL_NAME = "attributed_metric_average_ad_clicks_past_week"
         private const val FEATURE_TOGGLE_NAME = "adClickCountAvg"
         private const val FEATURE_EMIT_TOGGLE_NAME = "canEmitAdClickCountAvg"
         private const val DAYS_WINDOW = 7
@@ -108,6 +108,7 @@ class RealAdClickAttributedMetric @Inject constructor(
         val stats = getEventStats()
         val params = mutableMapOf(
             "count" to getBucketValue(stats.rollingAverage.roundToInt()).toString(),
+            "version" to bucketConfig.await().version.toString(),
         )
         if (!hasCompleteDataWindow()) {
             params["dayAverage"] = daysSinceInstalled().toString()

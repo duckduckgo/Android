@@ -144,18 +144,16 @@ class RealEventRepositoryTest {
         }
 
     @Test
-    fun whenDeleteOldEventsThenRemoveOnlyOlderThanSpecified() =
+    fun whenDeleteAllEventsThenRemoveAllEvents() =
         runTest {
             // Setup data
             eventDao.insertEvent(EventEntity("test_event", count = 1, day = "2025-10-03"))
             eventDao.insertEvent(EventEntity("test_event", count = 1, day = "2025-10-02"))
             eventDao.insertEvent(EventEntity("test_event", count = 1, day = "2025-09-03"))
 
-            testDateProvider.testDate = LocalDate.of(2025, 10, 3)
-            repository.deleteOldEvents(olderThanDays = 5)
+            repository.deleteAllEvents()
 
             val remainingEvents = eventDao.getEventsByNameAndTimeframe("test_event", "2025-09-03", "2025-10-03")
-            assert(remainingEvents.size == 2)
-            assert(remainingEvents.none { it.day == "2025-09-03" })
+            assert(remainingEvents.isEmpty())
         }
 }

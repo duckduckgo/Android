@@ -49,7 +49,7 @@ class RetentionWeekAttributedMetric @Inject constructor(
 ) : AttributedMetric, AtbLifecyclePlugin {
 
     companion object {
-        private const val PIXEL_NAME_FIRST_WEEK = "user_retention_week"
+        private const val PIXEL_NAME_FIRST_WEEK = "attributed_metric_retention_week"
         private const val FEATURE_TOGGLE_NAME = "retention"
         private const val FEATURE_EMIT_TOGGLE_NAME = "canEmitRetention"
     }
@@ -98,7 +98,12 @@ class RetentionWeekAttributedMetric @Inject constructor(
     override suspend fun getMetricParameters(): Map<String, String> {
         val week = getWeekSinceInstall()
         if (week == -1) return emptyMap()
-        return mutableMapOf("count" to bucketValue(getWeekSinceInstall()).toString())
+
+        val params = mutableMapOf(
+            "count" to bucketValue(getWeekSinceInstall()).toString(),
+            "version" to bucketConfig.await().version.toString(),
+        )
+        return params
     }
 
     override suspend fun getTag(): String {

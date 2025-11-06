@@ -57,7 +57,7 @@ class DuckAiAttributedMetric @Inject constructor(
 
     companion object {
         private const val EVENT_NAME = "submit_prompt"
-        private const val PIXEL_NAME = "user_average_duck_ai_usage_past_week"
+        private const val PIXEL_NAME = "attributed_metric_average_duck_ai_usage_past_week"
         private const val FEATURE_TOGGLE_NAME = "aiUsageAvg"
         private const val FEATURE_EMIT_TOGGLE_NAME = "canEmitAIUsageAvg"
         private const val DAYS_WINDOW = 7
@@ -84,6 +84,7 @@ class DuckAiAttributedMetric @Inject constructor(
         val stats = getEventStats()
         val params = mutableMapOf(
             "count" to getBucketValue(stats.rollingAverage.roundToInt()).toString(),
+            "version" to bucketConfig.await().version.toString(),
         )
         if (!hasCompleteDataWindow()) {
             params["dayAverage"] = daysSinceInstalled().toString()
