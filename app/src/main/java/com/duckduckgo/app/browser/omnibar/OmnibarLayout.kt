@@ -779,9 +779,12 @@ class OmnibarLayout @JvmOverloads constructor(
                 showSpacer = viewState.showClearButton || viewState.showVoiceSearch,
             )
 
-        if (omnibarAnimationManager.isFeatureEnabled() &&
-            previousTransitionState != null &&
-            newTransitionState != previousTransitionState
+        if (omnibarAnimationManager.isFeatureEnabled() && previousTransitionState != null &&
+            (
+                newTransitionState.showFireIcon != previousTransitionState?.showFireIcon ||
+                    newTransitionState.showTabsMenu != previousTransitionState?.showTabsMenu ||
+                    newTransitionState.showBrowserMenu != previousTransitionState?.showBrowserMenu
+                )
         ) {
             TransitionManager.beginDelayedTransition(toolbarContainer, omniBarButtonTransitionSet)
         }

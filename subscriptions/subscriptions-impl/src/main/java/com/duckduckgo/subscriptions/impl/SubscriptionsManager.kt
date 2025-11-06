@@ -98,10 +98,13 @@ import logcat.asLog
 import logcat.logcat
 import retrofit2.HttpException
 import java.io.IOException
+import java.math.BigDecimal
+import java.text.NumberFormat
 import java.time.Duration
 import java.time.Instant
 import java.time.Period
 import java.time.format.DateTimeParseException
+import java.util.Currency
 import javax.inject.Inject
 import kotlin.time.Duration.Companion.milliseconds
 
@@ -256,6 +259,14 @@ interface SubscriptionsManager {
         offerId: String? = null,
         replacementMode: SubscriptionReplacementMode,
     )
+
+    /**
+     * Gets pricing information for switching between plans
+     *
+     * @param isUpgrade `true` if upgrading from monthly to yearly, `false` if downgrading from yearly to monthly
+     * @return [SwitchPlanPricingInfo] containing current price, target price, and yearly monthly equivalent, or null if unavailable
+     */
+    suspend fun getSwitchPlanPricing(isUpgrade: Boolean): SwitchPlanPricingInfo?
 }
 
 @SingleInstanceIn(AppScope::class)
@@ -389,8 +400,62 @@ class RealSubscriptionsManager @Inject constructor(
     }
 
     override suspend fun isSwitchPlanAvailable(): Boolean = withContext(dispatcherProvider.io()) {
-        val hasActiveSubscription = authRepository.getSubscription()?.isActive() ?: false
-        return@withContext hasActiveSubscription && privacyProFeature.get().supportsSwitchSubscription().isEnabled()
+        val subscription = authRepository.getSubscription()
+        val hasActiveSubscription = subscription?.isActive() ?: false
+        val isOnFreeTrial = subscription?.activeOffers?.any { it == ActiveOfferType.TRIAL } ?: false
+        val isSwitchFeatureEnabled = privacyProFeature.get().supportsSwitchSubscription().isEnabled()
+
+        return@withContext hasActiveSubscription && !isOnFreeTrial && isSwitchFeatureEnabled
+    }
+
+    override suspend fun getSwitchPlanPricing(isUpgrade: Boolean): SwitchPlanPricingInfo? = withContext(dispatcherProvider.io()) {
+        return@withContext try {
+            val currentSubscription = getSubscription() ?: return@withContext null
+            val basePlans = getSubscriptionOffer().filter { it.offerId == null }
+
+            // Determine current and target plan IDs based on region
+            val isUS = currentSubscription.productId in listOf(MONTHLY_PLAN_US, YEARLY_PLAN_US)
+            val (currentPlanId, targetPlanId) = if (isUpgrade) {
+                val monthly = if (isUS) MONTHLY_PLAN_US else MONTHLY_PLAN_ROW
+                val yearly = if (isUS) YEARLY_PLAN_US else YEARLY_PLAN_ROW
+                monthly to yearly
+            } else {
+                val yearly = if (isUS) YEARLY_PLAN_US else YEARLY_PLAN_ROW
+                val monthly = if (isUS) MONTHLY_PLAN_US else MONTHLY_PLAN_ROW
+                yearly to monthly
+            }
+
+            // Get prices from offers
+            val currentPrice = basePlans.find { it.planId == currentPlanId }
+                ?.pricingPhases
+                ?.firstOrNull()
+                ?.formattedPrice ?: return@withContext null
+
+            val targetPrice = basePlans.find { it.planId == targetPlanId }
+                ?.pricingPhases
+                ?.firstOrNull()
+                ?.formattedPrice ?: return@withContext null
+
+            // Calculate monthly equivalent for yearly plan
+            val (yearlyPriceAmount, yearlyPriceCurrency) = basePlans
+                .find { it.planId in listOf(YEARLY_PLAN_US, YEARLY_PLAN_ROW) }
+                ?.pricingPhases
+                ?.firstOrNull()
+                ?.let { it.priceAmount to it.priceCurrency } ?: return@withContext null
+
+            val yearlyMonthlyEquivalent = NumberFormat.getCurrencyInstance()
+                .apply { currency = yearlyPriceCurrency }
+                .format(yearlyPriceAmount / 12.toBigDecimal())
+
+            SwitchPlanPricingInfo(
+                currentPrice = currentPrice,
+                targetPrice = targetPrice,
+                yearlyMonthlyEquivalent = yearlyMonthlyEquivalent,
+            )
+        } catch (e: Exception) {
+            logcat { "Subs: Failed to get switch plan pricing: ${e.message}" }
+            null
+        }
     }
 
     override suspend fun switchSubscriptionPlan(
@@ -935,9 +1000,10 @@ class RealSubscriptionsManager @Inject constructor(
                 availablePlans.map { offer ->
                     val pricingPhases = offer.pricingPhases.pricingPhaseList.map { phase ->
                         PricingPhase(
+                            priceAmount = BigDecimal.valueOf(phase.priceAmountMicros, 6),
+                            priceCurrency = Currency.getInstance(phase.priceCurrencyCode),
                             formattedPrice = phase.formattedPrice,
                             billingPeriod = phase.billingPeriod,
-
                         )
                     }
 
@@ -1286,6 +1352,8 @@ data class SubscriptionOffer(
 )
 
 data class PricingPhase(
+    val priceAmount: BigDecimal,
+    val priceCurrency: Currency,
     val formattedPrice: String,
     val billingPeriod: String,
 
@@ -1300,6 +1368,12 @@ data class PricingPhase(
         }
     }
 }
+
+data class SwitchPlanPricingInfo(
+    val currentPrice: String,
+    val targetPrice: String,
+    val yearlyMonthlyEquivalent: String,
+)
 
 data class ValidatedTokenPair(
     val accessToken: String,

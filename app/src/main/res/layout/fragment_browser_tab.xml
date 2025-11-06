@@ -184,4 +184,10 @@
         android:outlineProvider="none"
         app:omnibarPosition="bottom"  />
 
+    <com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarView
+        android:id="@+id/navigationBar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom" />
+
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

@@ -990,6 +990,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
                 if (this::omnibarToolbarMockupBottomBinding.isInitialized) {
                     omnibarToolbarMockupBottomBinding.appBarLayoutMockup.visibility = View.GONE
                 }
+                binding.navigationBarMockup.root.gone()
             },
             300,
         )
@@ -1399,11 +1400,11 @@ open class BrowserActivity : DuckDuckGoActivity() {
         when (settingsDataStore.omnibarType) {
             OmnibarType.SINGLE_TOP, OmnibarType.SPLIT -> {
                 if (Build.VERSION.SDK_INT < 28) {
-                    binding.topMockupSingleToolbar.mockOmniBarContainerShadow.cardElevation = 2f.toPx(this)
+                    binding.topMockupToolbar.mockOmniBarContainerShadow.cardElevation = 2f.toPx(this)
                 }
 
-                binding.bottomMockupSingleToolbar.appBarLayoutMockup.gone()
-                omnibarToolbarMockupBinding = binding.topMockupSingleToolbar
+                binding.bottomMockupToolbar.appBarLayoutMockup.gone()
+                omnibarToolbarMockupBinding = binding.topMockupToolbar
 
                 if (!duckAiFeatureState.showOmnibarShortcutOnNtpAndOnFocus.value) {
                     omnibarToolbarMockupBinding.aiChatIconMockup.isVisible = false
@@ -1412,15 +1413,22 @@ open class BrowserActivity : DuckDuckGoActivity() {
                 if (Build.VERSION.SDK_INT >= 28) {
                     omnibarToolbarMockupBinding.mockOmniBarContainerShadow.addBottomShadow()
                 }
+
+                if (settingsDataStore.omnibarType == OmnibarType.SPLIT) {
+                    binding.topMockupToolbar.tabsMenu.gone()
+                    binding.topMockupToolbar.browserMenu.gone()
+                    binding.topMockupToolbar.fireIconMenu.gone()
+                    binding.navigationBarMockup.root.show()
+                }
             }
 
             OmnibarType.SINGLE_BOTTOM -> {
                 if (Build.VERSION.SDK_INT < 28) {
-                    binding.bottomMockupSingleToolbar.mockOmniBarContainerShadow.cardElevation = 0.5f.toPx(this)
+                    binding.bottomMockupToolbar.mockOmniBarContainerShadow.cardElevation = 0.5f.toPx(this)
                 }
 
-                binding.topMockupSingleToolbar.appBarLayoutMockup.gone()
-                omnibarToolbarMockupBottomBinding = binding.bottomMockupSingleToolbar
+                binding.topMockupToolbar.appBarLayoutMockup.gone()
+                omnibarToolbarMockupBottomBinding = binding.bottomMockupToolbar
 
                 if (!duckAiFeatureState.showOmnibarShortcutOnNtpAndOnFocus.value) {
                     omnibarToolbarMockupBottomBinding.aiChatIconMockup.isVisible = false

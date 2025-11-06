@@ -19,9 +19,14 @@ package com.duckduckgo.settings.impl
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
+import com.duckduckgo.common.utils.plugins.PluginPoint
+import com.duckduckgo.contentscopescripts.api.ContentScopeScriptsSubscriptionEventPlugin
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.js.messaging.api.SubscriptionEventData
+import com.duckduckgo.settings.api.SettingsPageFeature
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import logcat.LogPriority
@@ -29,9 +34,16 @@ import logcat.logcat
 import javax.inject.Inject
 
 @ContributesViewModel(ActivityScope::class)
-class SettingsWebViewViewModel @Inject constructor() : ViewModel() {
+class SettingsWebViewViewModel @Inject constructor(
+    private val contentScopeScriptsSubscriptionEventPluginPoint: PluginPoint<ContentScopeScriptsSubscriptionEventPlugin>,
+    private val settingsPageFeature: SettingsPageFeature,
+) : ViewModel() {
+
     private val commandChannel = Channel<Command>(capacity = 1, onBufferOverflow = DROP_OLDEST)
     val commands = commandChannel.receiveAsFlow()
+
+    private val _subscriptionEventDataChannel = Channel<SubscriptionEventData>(capacity = Channel.BUFFERED)
+    val subscriptionEventDataFlow: Flow<SubscriptionEventData> = _subscriptionEventDataChannel.receiveAsFlow()
 
     sealed class Command {
         data class LoadUrl(
@@ -47,6 +59,20 @@ class SettingsWebViewViewModel @Inject constructor() : ViewModel() {
         } else {
             logcat(LogPriority.ERROR) { "No URL provided to WebViewActivity" }
             sendCommand(Command.Exit)
+        }
+    }
+
+    fun onResume() {
+        processContentScopeScriptsSubscriptionEventPlugin()
+    }
+
+    private fun processContentScopeScriptsSubscriptionEventPlugin() {
+        if (settingsPageFeature.serpSettingsSync().isEnabled()) {
+            viewModelScope.launch {
+                contentScopeScriptsSubscriptionEventPluginPoint.getPlugins().forEach { plugin ->
+                    _subscriptionEventDataChannel.send(plugin.getSubscriptionEventData())
+                }
+            }
         }
     }
 

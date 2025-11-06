@@ -601,7 +601,7 @@
     <string name="waitlistNotificationDialogNotifyMe">NOTIFICARME</string>
 
     <!-- Email Protection -->
-    <string name="emailProtectionActivityTitle">Protección de correo electrónico (beta)</string>
+    <string name="emailProtectionActivityTitle">Protección del correo electrónico</string>
     <string name="emailNotSupported">Dispositivo no compatible</string>
     <string name="emailNotSupportedExplanation">Email Protection te permite crear direcciones de correo electrónico privadas que eliminan los rastreadores de correo electrónico. Necesitamos encriptar y almacenar las direcciones que creas localmente en tu dispositivo. Debido a que tu dispositivo no admite el almacenamiento cifrado, Email Protection no está disponible.</string>
 
@@ -844,8 +844,10 @@
 
     <!-- Appearance settings -->
     <string name="settingsAddressBarPositionTitle">Barra de direcciones</string>
+    <string name="settingsAddressBarPositionHeaderTitle">Posición de la barra de direcciones</string>
     <string name="settingsAddressBarPositionTop">Arriba</string>
     <string name="settingsAddressBarPositionBottom">Inferior</string>
+    <string name="settingsAddressBarPositionSplit">Dividir</string>
 
     <!-- Show on App Launch Option -->
     <string name="showOnAppLaunchOptionTitle">Mostrar al abrir la aplicación</string>

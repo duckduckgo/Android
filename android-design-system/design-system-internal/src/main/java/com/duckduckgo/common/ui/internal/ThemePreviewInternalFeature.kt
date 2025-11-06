@@ -18,7 +18,7 @@ package com.duckduckgo.common.ui.internal
 
 import android.content.Context
 import com.duckduckgo.anvil.annotations.PriorityKey
-import com.duckduckgo.common.ui.themepreview.ui.AppComponentsActivity
+import com.duckduckgo.common.ui.internal.ui.AppComponentsActivity
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.internal.features.api.InternalFeaturePlugin
 import com.squareup.anvil.annotations.ContributesMultibinding

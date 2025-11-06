@@ -38,13 +38,7 @@ import com.duckduckgo.pir.impl.models.ExtractedProfile
 import com.duckduckgo.pir.impl.pixels.PirPixelSender
 import com.duckduckgo.pir.impl.scheduling.JobRecordUpdater
 import com.duckduckgo.pir.impl.scripts.models.PirSuccessResponse
-import com.duckduckgo.pir.impl.scripts.models.PirSuccessResponse.ClickResponse
-import com.duckduckgo.pir.impl.scripts.models.PirSuccessResponse.ExpectationResponse
 import com.duckduckgo.pir.impl.scripts.models.PirSuccessResponse.ExtractedResponse
-import com.duckduckgo.pir.impl.scripts.models.PirSuccessResponse.FillFormResponse
-import com.duckduckgo.pir.impl.scripts.models.PirSuccessResponse.GetCaptchaInfoResponse
-import com.duckduckgo.pir.impl.scripts.models.PirSuccessResponse.NavigateResponse
-import com.duckduckgo.pir.impl.scripts.models.PirSuccessResponse.SolveCaptchaResponse
 import com.duckduckgo.pir.impl.store.PirEventsRepository
 import com.duckduckgo.pir.impl.store.PirRepository
 import com.duckduckgo.pir.impl.store.PirSchedulingRepository
@@ -56,10 +50,9 @@ import com.duckduckgo.pir.impl.store.db.EmailConfirmationEventType.EMAIL_CONFIRM
 import com.duckduckgo.pir.impl.store.db.PirBrokerScanLog
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.moshi.Moshi
-import com.squareup.moshi.adapters.PolymorphicJsonAdapterFactory
-import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
+import javax.inject.Named
 
 interface PirRunStateHandler {
     suspend fun handleState(pirRunState: PirRunState)
@@ -170,24 +163,8 @@ class RealPirRunStateHandler @Inject constructor(
     private val jobRecordUpdater: JobRecordUpdater,
     private val pirSchedulingRepository: PirSchedulingRepository,
     private val currentTimeProvider: CurrentTimeProvider,
+    @Named("pir") private val moshi: Moshi,
 ) : PirRunStateHandler {
-    private val moshi: Moshi by lazy {
-        Moshi
-            .Builder()
-            .add(
-                PolymorphicJsonAdapterFactory
-                    .of(PirSuccessResponse::class.java, "actionType")
-                    .withSubtype(NavigateResponse::class.java, "navigate")
-                    .withSubtype(ExtractedResponse::class.java, "extract")
-                    .withSubtype(GetCaptchaInfoResponse::class.java, "getCaptchaInfo")
-                    .withSubtype(SolveCaptchaResponse::class.java, "solveCaptcha")
-                    .withSubtype(ClickResponse::class.java, "click")
-                    .withSubtype(ExpectationResponse::class.java, "expectation")
-                    .withSubtype(FillFormResponse::class.java, "fillForm"),
-            ).add(KotlinJsonAdapterFactory())
-            .build()
-    }
-
     private val pirSuccessAdapter by lazy { moshi.adapter(PirSuccessResponse::class.java) }
 
     override suspend fun handleState(pirRunState: PirRunState) =

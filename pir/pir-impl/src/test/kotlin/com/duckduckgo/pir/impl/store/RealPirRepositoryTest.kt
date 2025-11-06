@@ -22,6 +22,7 @@ import com.duckduckgo.pir.impl.models.Address
 import com.duckduckgo.pir.impl.models.AddressCityState
 import com.duckduckgo.pir.impl.models.ExtractedProfile
 import com.duckduckgo.pir.impl.models.scheduling.JobRecord.EmailConfirmationJobRecord.EmailData
+import com.duckduckgo.pir.impl.pixels.PirPixelSender
 import com.duckduckgo.pir.impl.service.DbpService
 import com.duckduckgo.pir.impl.service.DbpService.PirEmailConfirmationDataRequest
 import com.duckduckgo.pir.impl.service.DbpService.PirGetEmailConfirmationLinkResponse
@@ -32,6 +33,8 @@ import com.duckduckgo.pir.impl.store.db.ExtractedProfileDao
 import com.duckduckgo.pir.impl.store.db.UserName
 import com.duckduckgo.pir.impl.store.db.UserProfile
 import com.duckduckgo.pir.impl.store.db.UserProfileDao
+import com.duckduckgo.pir.impl.store.secure.PirSecureStorageDatabaseFactory
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
@@ -60,18 +63,29 @@ class RealPirRepositoryTest {
     private val mockUserProfileDao: UserProfileDao = mock()
     private val mockDbpService: DbpService = mock()
     private val mockExtractedProfileDao: ExtractedProfileDao = mock()
+    private val mockDatabaseFactory: PirSecureStorageDatabaseFactory = mock()
+    private val mockDatabase: PirDatabase = mock()
+    private val mockPixelSender: PirPixelSender = mock()
 
     @Before
     fun setUp() {
+        runBlocking {
+            whenever(mockDatabaseFactory.getDatabase()).thenReturn(mockDatabase)
+        }
+        whenever(mockDatabase.brokerJsonDao()).thenReturn(mockBrokerJsonDao)
+        whenever(mockDatabase.brokerDao()).thenReturn(mockBrokerDao)
+        whenever(mockDatabase.userProfileDao()).thenReturn(mockUserProfileDao)
+        whenever(mockDatabase.extractedProfileDao()).thenReturn(mockExtractedProfileDao)
+        whenever(mockBrokerJsonDao.getAllBrokersCount()).thenReturn(0)
+
         testee = RealPirRepository(
             dispatcherProvider = coroutineRule.testDispatcherProvider,
             pirDataStore = mockPirDataStore,
             currentTimeProvider = mockCurrentTimeProvider,
-            brokerJsonDao = mockBrokerJsonDao,
-            brokerDao = mockBrokerDao,
-            userProfileDao = mockUserProfileDao,
+            databaseFactory = mockDatabaseFactory,
             dbpService = mockDbpService,
-            extractedProfileDao = mockExtractedProfileDao,
+            pixelSender = mockPixelSender,
+            appCoroutineScope = coroutineRule.testScope,
         )
     }
 
@@ -79,6 +93,33 @@ class RealPirRepositoryTest {
     private val testEmailData1 = EmailData(email = "test1@example.com", attemptId = "attempt-123")
     private val testEmailData2 = EmailData(email = "test2@example.com", attemptId = "attempt-456")
     private val testEmailData3 = EmailData(email = "test3@example.com", attemptId = "attempt-789")
+
+    @Test
+    fun whenIsRepositoryAvailableAndDatabaseReadableThenReturnTrue() = runTest {
+        // Given - Database is readable (set up in setUp method)
+
+        // When
+        val result = testee.isRepositoryAvailable()
+
+        // Then
+        assertTrue(result)
+        verify(mockDatabaseFactory).getDatabase()
+        verify(mockBrokerJsonDao).getAllBrokersCount()
+    }
+
+    @Test
+    fun whenIsRepositoryAvailableAndDatabaseNotReadableThenReturnFalse() = runTest {
+        // Given - Set up the database to throw an exception when accessed
+        whenever(mockBrokerJsonDao.getAllBrokersCount()).thenThrow(RuntimeException("Database not readable"))
+
+        // When
+        val result = testee.isRepositoryAvailable()
+
+        // Then
+        assertEquals(false, result)
+        verify(mockDatabaseFactory).getDatabase()
+        verify(mockBrokerJsonDao).getAllBrokersCount()
+    }
 
     @Test
     fun whenGetEmailConfirmationLinkStatusWithReadyStatusThenReturnReadyWithData() = runTest {

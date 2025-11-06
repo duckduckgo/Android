@@ -601,7 +601,7 @@
     <string name="waitlistNotificationDialogNotifyMe">VARSLE MEG</string>
 
     <!-- Email Protection -->
-    <string name="emailProtectionActivityTitle">E-postbeskyttelse (Beta)</string>
+    <string name="emailProtectionActivityTitle">E-postbeskyttelse</string>
     <string name="emailNotSupported">Enheten støttes ikke</string>
     <string name="emailNotSupportedExplanation">Med e-postbeskyttelse kan du opprette private e-postadresser som fjerner e-postsporere. Vi må kryptere og lagre disse adressene du oppretter, lokalt på enheten din. Fordi enheten din ikke støtter kryptert lagring, er e-postbeskyttelse utilgjengelig.</string>
 
@@ -844,8 +844,10 @@
 
     <!-- Appearance settings -->
     <string name="settingsAddressBarPositionTitle">Adressefelt</string>
+    <string name="settingsAddressBarPositionHeaderTitle">Plassering av adressefelt</string>
     <string name="settingsAddressBarPositionTop">Topp</string>
     <string name="settingsAddressBarPositionBottom">Nederst</string>
+    <string name="settingsAddressBarPositionSplit">Del</string>
 
     <!-- Show on App Launch Option -->
     <string name="showOnAppLaunchOptionTitle">Vis ved lansering av appen</string>

@@ -122,6 +122,10 @@ interface PirActionsRunnerStateEngine {
             val actionId: String,
             val responseData: ResponseData?,
         ) : Event()
+
+        data class ConditionExpectationSucceeded(
+            val conditionActions: List<BrokerAction>,
+        ) : Event()
     }
 
     /**

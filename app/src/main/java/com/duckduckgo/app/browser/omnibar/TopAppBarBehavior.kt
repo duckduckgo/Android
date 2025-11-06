@@ -40,6 +40,7 @@ class TopAppBarBehavior(
         private val viewsExemptedFromOffset = setOf(
             R.id.browserLayout,
             R.id.webViewFullScreenContainer,
+            R.id.navigationBar,
         )
     }
 

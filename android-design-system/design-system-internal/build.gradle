@@ -26,7 +26,18 @@ android {
     anvil {
         generateDaggerFactories = true // default is false
     }
+    lint {
+        baseline = file("lint-baseline.xml")
+    }
     namespace 'com.duckduckgo.common.ui.internal'
+
+    buildFeatures {
+        compose true
+    }
+
+    composeOptions {
+        kotlinCompilerExtensionVersion = "_"
+    }
 }
 
 dependencies {
@@ -42,11 +53,13 @@ dependencies {
     implementation project(path: ':app-build-config-api')
     implementation project(':internal-features-api')
     implementation project(path: ':navigation-api')
+    implementation "androidx.datastore:datastore-preferences:_"
 
     implementation AndroidX.appCompat
     implementation Google.android.material
     implementation AndroidX.constraintLayout
     implementation AndroidX.core.splashscreen
+    implementation AndroidX.fragment.ktx
     implementation AndroidX.recyclerView
     implementation AndroidX.lifecycle.viewModelKtx
     // just to get the dagger annotations

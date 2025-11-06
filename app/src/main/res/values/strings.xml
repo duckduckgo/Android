@@ -600,7 +600,7 @@
     <string name="waitlistNotificationDialogNotifyMe">Notify Me</string>
 
     <!-- Email Protection -->
-    <string name="emailProtectionActivityTitle">Email Protection (Beta)</string>
+    <string name="emailProtectionActivityTitle">Email Protection</string>
     <string name="emailNotSupported">Device not supported</string>
     <string name="emailNotSupportedExplanation">Email Protection allows you to create private email addresses that remove email trackers. We need to encrypt and store these addresses you create locally on your device. Because your device does not support encrypted storage, Email Protection is unavailable.</string>
 
@@ -843,8 +843,10 @@
 
     <!-- Appearance settings -->
     <string name="settingsAddressBarPositionTitle">Address Bar</string>
+    <string name="settingsAddressBarPositionHeaderTitle">Address Bar Position</string>
     <string name="settingsAddressBarPositionTop">Top</string>
     <string name="settingsAddressBarPositionBottom">Bottom</string>
+    <string name="settingsAddressBarPositionSplit">Split</string>
 
     <!-- Show on App Launch Option -->
     <string name="showOnAppLaunchOptionTitle">Show on App Launch</string>

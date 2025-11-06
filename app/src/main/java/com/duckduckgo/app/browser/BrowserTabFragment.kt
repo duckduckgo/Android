@@ -140,6 +140,7 @@ import com.duckduckgo.app.browser.menu.VpnMenuStore
 import com.duckduckgo.app.browser.model.BasicAuthenticationCredentials
 import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
 import com.duckduckgo.app.browser.model.LongPressTarget
+import com.duckduckgo.app.browser.navigation.bar.BrowserNavigationBarViewIntegration
 import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarObserver
 import com.duckduckgo.app.browser.newtab.NewTabPageProvider
 import com.duckduckgo.app.browser.omnibar.Omnibar
@@ -328,7 +329,7 @@ import com.duckduckgo.savedsites.api.models.SavedSitesNames
 import com.duckduckgo.savedsites.impl.bookmarks.BookmarksBottomSheetDialog
 import com.duckduckgo.savedsites.impl.bookmarks.FaviconPromptSheet
 import com.duckduckgo.savedsites.impl.dialogs.EditSavedSiteDialogFragment
-import com.duckduckgo.serp.logos.api.SerpLogoScreens.*
+import com.duckduckgo.serp.logos.api.SerpLogoScreens.EasterEggLogoScreen
 import com.duckduckgo.serp.logos.api.SerpLogos
 import com.duckduckgo.site.permissions.api.SitePermissionsDialogLauncher
 import com.duckduckgo.site.permissions.api.SitePermissionsGrantedListener
@@ -598,6 +599,9 @@ class BrowserTabFragment :
     @Inject
     lateinit var omnibarFeatureRepository: OmnibarFeatureRepository
 
+    @Inject
+    lateinit var webViewCompatTestHelper: WebViewCompatTestHelper
+
     /**
      * We use this to monitor whether the user was seeing the in-context Email Protection signup prompt
      * This is needed because the activity stack will be cleared if an external link is opened in our browser
@@ -643,6 +647,8 @@ class BrowserTabFragment :
     }
 
     private val binding: FragmentBrowserTabBinding by viewBinding()
+
+    private lateinit var browserNavigationBarIntegration: BrowserNavigationBarViewIntegration
 
     private lateinit var omnibar: Omnibar
 
@@ -924,7 +930,10 @@ class BrowserTabFragment :
                 }
 
                 InputScreenActivityResultCodes.MENU_REQUESTED -> {
-                    launchPopupMenu()
+                    launchPopupMenu(
+                        anchorToNavigationBar = omnibarFeatureRepository.isSplitOmnibarEnabled,
+                        addExtraDelay = omnibarFeatureRepository.isSplitOmnibarEnabled,
+                    )
                 }
 
                 InputScreenActivityResultCodes.TAB_SWITCHER_REQUESTED -> {
@@ -983,6 +992,15 @@ class BrowserTabFragment :
             pendingUploadTask = null
         }
         viewModel.handleExternalLaunch(isLaunchedFromExternalApp)
+
+        observeSubscriptionEventDataChannel()
+    }
+
+    private fun observeSubscriptionEventDataChannel() {
+        viewModel.subscriptionEventDataFlow.onEach { subscriptionEventData ->
+            logcat { "SERP-Settings: Sending subscription event data to content scope scripts: $subscriptionEventData" }
+            contentScopeScripts.sendSubscriptionEvent(subscriptionEventData)
+        }.launchIn(lifecycleScope)
     }
 
     private fun resumeWebView() {
@@ -1021,7 +1039,7 @@ class BrowserTabFragment :
         omnibar = Omnibar(
             omnibarType = settingsDataStore.omnibarType,
             binding = binding,
-            isUnifiedOmnibarEnabled = omnibarFeatureRepository.isUnifiedOmnibarEnabled,
+            isUnifiedOmnibarEnabled = omnibarFeatureRepository.isUnifiedOmnibarFlagEnabled,
         )
 
         webViewContainer = binding.webViewContainer
@@ -1189,6 +1207,14 @@ class BrowserTabFragment :
                     viewModel.onNavigationBarBookmarksButtonClicked()
                 }
             }
+
+        browserNavigationBarIntegration = BrowserNavigationBarViewIntegration(
+            lifecycleScope = lifecycleScope,
+            browserTabFragmentBinding = binding,
+            isEnabled = omnibarFeatureRepository.isSplitOmnibarEnabled,
+            omnibar = omnibar,
+            browserNavigationBarObserver = observer,
+        )
     }
 
     private fun configureEditModeChangeDetection() {
@@ -1243,6 +1269,16 @@ class BrowserTabFragment :
     private fun onBrowserMenuButtonPressed() {
         contentScopeScripts.sendSubscriptionEvent(createBreakageReportingEventData())
         viewModel.onBrowserMenuClicked(isCustomTab = isActiveCustomTab())
+
+        lifecycleScope.launch {
+            webViewCompatTestHelper.onBrowserMenuButtonPressed(webView)
+        }
+    }
+
+    private fun onPageStarted() {
+        lifecycleScope.launch {
+            webViewCompatTestHelper.onPageStarted(webView)
+        }
     }
 
     private fun onOmnibarPrivacyShieldButtonPressed() {
@@ -1272,6 +1308,8 @@ class BrowserTabFragment :
             )
             requireActivity().window.navigationBarColor = customTabToolbarColor
             requireActivity().window.statusBarColor = customTabToolbarColor
+
+            browserNavigationBarIntegration.configureCustomTab()
         }
     }
 
@@ -1283,8 +1321,8 @@ class BrowserTabFragment :
     private fun createPopupMenu() {
         val popupMenuResourceType =
             when (omnibar.omnibarType) {
-                OmnibarType.SINGLE_TOP, OmnibarType.SPLIT -> BrowserPopupMenu.ResourceType.TOP
-                OmnibarType.SINGLE_BOTTOM -> BrowserPopupMenu.ResourceType.BOTTOM
+                OmnibarType.SINGLE_TOP -> BrowserPopupMenu.ResourceType.TOP
+                OmnibarType.SINGLE_BOTTOM, OmnibarType.SPLIT -> BrowserPopupMenu.ResourceType.BOTTOM
             }
 
         popupMenu =
@@ -1409,11 +1447,12 @@ class BrowserTabFragment :
         startActivity(intent)
     }
 
-    private fun launchPopupMenu() {
+    private fun launchPopupMenu(anchorToNavigationBar: Boolean, addExtraDelay: Boolean = false) {
         val isFocusedNtp = omnibar.viewMode == ViewMode.NewTab && omnibar.getText().isEmpty() && omnibar.omnibarTextInput.hasFocus()
 
+        val delay = if (addExtraDelay) POPUP_MENU_DELAY * 2 else POPUP_MENU_DELAY
         // small delay added to let keyboard disappear and avoid jarring transition
-        binding.rootView.postDelayed(POPUP_MENU_DELAY) {
+        binding.rootView.postDelayed(delay) {
             if (isAdded) {
                 // Check if VPN menu item will be shown to non-subscribed user and increment count
                 val currentViewState = viewModel.browserViewState.value
@@ -1424,7 +1463,12 @@ class BrowserTabFragment :
                     }
                 }
 
-                popupMenu.show(binding.rootView, omnibar.toolbar)
+                if (anchorToNavigationBar) {
+                    val anchorView = browserNavigationBarIntegration.navigationBarView.popupMenuAnchor
+                    popupMenu.showAnchoredView(requireActivity(), binding.rootView, anchorView)
+                } else {
+                    popupMenu.show(binding.rootView, omnibar.toolbar)
+                }
                 viewModel.onPopupMenuLaunched()
                 if (isActiveCustomTab()) {
                     pixel.fire(CustomTabPixelNames.CUSTOM_TABS_MENU_OPENED)
@@ -1516,6 +1560,7 @@ class BrowserTabFragment :
         webView?.removeEnableSwipeRefreshCallback()
         webView?.stopNestedScroll()
         webView?.stopLoading()
+        browserNavigationBarIntegration.onDestroyView()
         super.onDestroyView()
     }
 
@@ -1609,7 +1654,7 @@ class BrowserTabFragment :
                 .flowWithLifecycle(lifecycle, Lifecycle.State.RESUMED)
                 .collectLatest { hasFavorites ->
                     binding.includeNewBrowserTab.topNtpOutlineStroke.isVisible = hasFavorites
-                    binding.includeNewBrowserTab.bottomNtpOutlineStroke.isVisible = hasFavorites
+                    binding.includeNewBrowserTab.bottomNtpOutlineStroke.isVisible = hasFavorites && !omnibarFeatureRepository.isSplitOmnibarEnabled
                 }
         }
 
@@ -1697,6 +1742,8 @@ class BrowserTabFragment :
         errorView.errorLayout.gone()
         sslErrorView.gone()
         maliciousWarningView.gone()
+
+        browserNavigationBarIntegration.configureNewTabViewMode()
     }
 
     private fun showBrowser() {
@@ -1710,6 +1757,8 @@ class BrowserTabFragment :
         sslErrorView.gone()
         maliciousWarningView.gone()
         omnibar.setViewMode(ViewMode.Browser(viewModel.url))
+
+        browserNavigationBarIntegration.configureBrowserViewMode()
     }
 
     private fun showError(
@@ -1731,6 +1780,8 @@ class BrowserTabFragment :
             errorView.yetiIcon.setImageResource(com.duckduckgo.mobile.android.R.drawable.ic_yeti_dark)
         }
         errorView.errorLayout.show()
+
+        browserNavigationBarIntegration.configureBrowserViewMode()
     }
 
     private fun showMaliciousWarning(
@@ -1769,6 +1820,8 @@ class BrowserTabFragment :
                 isMainframe = isMainframe,
             ),
         )
+
+        browserNavigationBarIntegration.configureBrowserViewMode()
     }
 
     private fun hideMaliciousWarning(canGoBack: Boolean) {
@@ -1843,6 +1896,8 @@ class BrowserTabFragment :
             viewModel.onSSLCertificateWarningAction(action, errorResponse.url)
         }
         sslErrorView.show()
+
+        browserNavigationBarIntegration.configureBrowserViewMode()
     }
 
     private fun hideSSLWarning() {
@@ -2284,7 +2339,7 @@ class BrowserTabFragment :
             is Command.ShowAutoconsentAnimation -> showAutoconsentAnimation(it.isCosmetic)
 
             is Command.LaunchPopupMenu -> {
-                launchPopupMenu()
+                launchPopupMenu(it.anchorToNavigationBar)
                 hideKeyboard()
             }
 
@@ -2308,6 +2363,7 @@ class BrowserTabFragment :
 
             is Command.SubmitChat -> duckChat.openDuckChatWithAutoPrompt(it.query)
             is Command.EnqueueCookiesAnimation -> enqueueCookiesAnimation(it.isCosmetic)
+            is Command.PageStarted -> onPageStarted()
         }
     }
 
@@ -3217,6 +3273,12 @@ class BrowserTabFragment :
                 onInContextEmailProtectionSignupPromptShown = { showNativeInContextEmailProtectionSignupPrompt() },
             )
             configureWebViewForBlobDownload(it)
+            lifecycleScope.launch {
+                webViewCompatTestHelper.configureWebViewForWebViewCompatTest(
+                    it,
+                    isBlobDownloadWebViewFeatureEnabled(it),
+                )
+            }
             configureWebViewForAutofill(it)
             printInjector.addJsInterface(it) { viewModel.printFromWebView() }
             autoconsent.addJsInterface(it, autoconsentCallback)
@@ -3343,7 +3405,13 @@ class BrowserTabFragment :
     private fun configureWebViewForBlobDownload(webView: DuckDuckGoWebView) {
         lifecycleScope.launch(dispatchers.main()) {
             if (isBlobDownloadWebViewFeatureEnabled(webView)) {
-                val script = blobDownloadScript()
+                val webViewCompatUsesBlobDownloadsMessageListener = webViewCompatTestHelper.useBlobDownloadsMessageListener()
+
+                val script = if (!webViewCompatUsesBlobDownloadsMessageListener) {
+                    blobDownloadScript()
+                } else {
+                    webViewCompatTestHelper.blobDownloadScriptForWebViewCompatTest()
+                }
                 WebViewCompat.addDocumentStartJavaScript(webView, script, setOf("*"))
 
                 webViewCompatWrapper.addWebMessageListener(
@@ -3368,6 +3436,14 @@ class BrowserTabFragment :
                                         .md5()
                                         .toString()
                                 viewModel.saveReplyProxyForBlobDownload(sourceOrigin.toString(), replyProxy, locationRef)
+                            } else if (webViewCompatUsesBlobDownloadsMessageListener && message.data?.startsWith("webViewCompat") == true) {
+                                lifecycleScope.launch {
+                                    webViewCompatTestHelper.handleWebViewCompatMessage(
+                                        message = message,
+                                        replyProxy = replyProxy,
+                                        isMainFrame = isMainFrame,
+                                    )
+                                }
                             }
                         }
                     },
@@ -3894,7 +3970,6 @@ class BrowserTabFragment :
             logcat(VERBOSE) { "Keyboard now hiding" }
             hideKeyboard(omnibar.omnibarTextInput)
             binding.focusDummy.requestFocus()
-            omnibar.showOutline(false)
         }
     }
 
@@ -3919,7 +3994,6 @@ class BrowserTabFragment :
         if (!isHidden) {
             logcat(VERBOSE) { "Keyboard now showing" }
             showKeyboard(omnibar.omnibarTextInput)
-            omnibar.showOutline(true)
         }
     }
 
@@ -4538,6 +4612,8 @@ class BrowserTabFragment :
                     webView?.setBottomMatchingBehaviourEnabled(true) // only execute if animation is playing
                 }
 
+                browserNavigationBarIntegration.configureFireButtonHighlight(highlighted = viewState.fireButton.isHighlighted())
+
                 popupMenu.renderState(browserShowing, viewState, tabDisplayedInCustomTabScreen)
 
                 renderFullscreenMode(viewState)
@@ -4867,6 +4943,8 @@ class BrowserTabFragment :
 
             omnibar.setViewMode(ViewMode.NewTab)
             omnibar.isScrollingEnabled = false
+
+            browserNavigationBarIntegration.configureNewTabViewMode()
 
             viewModel.onNewTabShown()
         }

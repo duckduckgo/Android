@@ -601,7 +601,7 @@
     <string name="waitlistNotificationDialogNotifyMe">TEAVITAGE MIND</string>
 
     <!-- Email Protection -->
-    <string name="emailProtectionActivityTitle">E-posti kaitse (beeta)</string>
+    <string name="emailProtectionActivityTitle">E-posti kaitse</string>
     <string name="emailNotSupported">Seadet ei toetata</string>
     <string name="emailNotSupportedExplanation">Meilikaitse võimaldab luua privaatseid ja jälguritest vabasid meiliaadresse. Me peame need aadressid krüptima ja sinu seadmesse salvestama. Meilikaitset ei saa kasutada, sest sinu seade ei toeta krüptitud salvestamist.</string>
 
@@ -844,8 +844,10 @@
 
     <!-- Appearance settings -->
     <string name="settingsAddressBarPositionTitle">Aadressiriba</string>
+    <string name="settingsAddressBarPositionHeaderTitle">Aadressiriba asukoht</string>
     <string name="settingsAddressBarPositionTop">Tipp</string>
     <string name="settingsAddressBarPositionBottom">All</string>
+    <string name="settingsAddressBarPositionSplit">Jagatud</string>
 
     <!-- Show on App Launch Option -->
     <string name="showOnAppLaunchOptionTitle">Kuva rakenduse käivitamisel</string>

@@ -13,7 +13,6 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
-
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
@@ -28,9 +27,9 @@
         android:background="?attr/preferredNavigationBarColor"
         android:gravity="center"
         android:orientation="horizontal"
-        android:paddingHorizontal="@dimen/keyline_4"
-        android:paddingTop="@dimen/experimentalNavigationBarPaddingTopWhenStandalone"
-        android:paddingBottom="@dimen/experimentalNavigationBarPaddingBottom"
+        android:paddingHorizontal="@dimen/navigationBarPaddingHorizontal"
+        android:paddingTop="@dimen/navigationBarPaddingTop"
+        android:paddingBottom="@dimen/navigationBarPaddingBottom"
         app:layout_constraintTop_toTopOf="parent"
         tools:parentTag="androidx.coordinatorlayout.widget.CoordinatorLayout">
 
@@ -40,8 +39,8 @@
 
             <FrameLayout
                 android:id="@+id/newTabButton"
-                android:layout_width="@dimen/bottomNavIconContainer"
-                android:layout_height="@dimen/bottomNavIconContainer"
+                android:layout_width="@dimen/toolbarIcon"
+                android:layout_height="@dimen/toolbarIcon"
                 android:background="@drawable/selectable_item_experimental_background"
                 android:visibility="gone"
                 tools:visibility="visible">
@@ -58,8 +57,8 @@
 
             <FrameLayout
                 android:id="@+id/autofillButton"
-                android:layout_width="@dimen/bottomNavIconContainer"
-                android:layout_height="@dimen/bottomNavIconContainer"
+                android:layout_width="@dimen/toolbarIcon"
+                android:layout_height="@dimen/toolbarIcon"
                 android:background="@drawable/selectable_item_experimental_background"
                 android:visibility="gone"
                 tools:visibility="visible">
@@ -83,8 +82,8 @@
 
         <FrameLayout
             android:id="@+id/bookmarksButton"
-            android:layout_width="@dimen/bottomNavIconContainer"
-            android:layout_height="@dimen/bottomNavIconContainer"
+            android:layout_width="@dimen/toolbarIcon"
+            android:layout_height="@dimen/toolbarIcon"
             android:background="@drawable/selectable_item_experimental_background">
 
             <ImageView
@@ -104,8 +103,8 @@
 
         <FrameLayout
             android:id="@+id/fireButton"
-            android:layout_width="@dimen/bottomNavIconContainer"
-            android:layout_height="@dimen/bottomNavIconContainer"
+            android:layout_width="@dimen/toolbarIcon"
+            android:layout_height="@dimen/toolbarIcon"
             android:background="@drawable/selectable_item_experimental_background">
 
             <ImageView
@@ -123,10 +122,10 @@
             android:layout_height="match_parent"
             android:layout_weight="1" />
 
-        <com.duckduckgo.browser.ui.tabs.TabSwitcherButton
+        <com.duckduckgo.browser.ui.tabs.NewTabSwitcherButton
             android:id="@+id/tabsButton"
-            android:layout_width="@dimen/bottomNavIconContainer"
-            android:layout_height="@dimen/bottomNavIconContainer" />
+            android:layout_width="@dimen/toolbarIcon"
+            android:layout_height="@dimen/toolbarIcon" />
 
         <Space
             android:layout_width="0dp"
@@ -135,8 +134,8 @@
 
         <FrameLayout
             android:id="@+id/menuButton"
-            android:layout_width="@dimen/bottomNavIconContainer"
-            android:layout_height="@dimen/bottomNavIconContainer"
+            android:layout_width="@dimen/toolbarIcon"
+            android:layout_height="@dimen/toolbarIcon"
             android:background="@drawable/selectable_item_experimental_background">
 
             <ImageView
@@ -154,11 +153,10 @@
     <View
         android:id="@+id/shadowView"
         android:layout_width="match_parent"
-        android:layout_height="2dp"
-        android:background="@drawable/background_navigation_bar_shadow"
+        android:layout_height="0.5dp"
+        android:background="?attr/daxColorShadeSolid"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
-
 
 </androidx.constraintlayout.widget.ConstraintLayout>

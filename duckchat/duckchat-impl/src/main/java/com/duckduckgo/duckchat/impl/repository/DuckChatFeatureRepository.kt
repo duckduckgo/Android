@@ -35,6 +35,8 @@ interface DuckChatFeatureRepository {
 
     suspend fun setShowInAddressBar(showDuckChat: Boolean)
 
+    suspend fun setFullScreenModeUserSetting(enabled: Boolean)
+
     fun observeDuckChatUserEnabled(): Flow<Boolean>
 
     fun observeInputScreenUserSettingEnabled(): Flow<Boolean>
@@ -43,6 +45,8 @@ interface DuckChatFeatureRepository {
 
     fun observeShowInAddressBar(): Flow<Boolean>
 
+    fun observeFullscreenModeEnabled(): Flow<Boolean>
+
     suspend fun isDuckChatUserEnabled(): Boolean
 
     suspend fun isInputScreenUserSettingEnabled(): Boolean
@@ -50,6 +54,8 @@ interface DuckChatFeatureRepository {
     suspend fun shouldShowInBrowserMenu(): Boolean
 
     suspend fun shouldShowInAddressBar(): Boolean
+
+    suspend fun isFullScreenModeUserSettingEnabled(): Boolean
 
     suspend fun registerOpened()
 
@@ -82,6 +88,10 @@ class RealDuckChatFeatureRepository @Inject constructor(
         duckChatDataStore.setShowInAddressBar(showDuckChat)
     }
 
+    override suspend fun setFullScreenModeUserSetting(enabled: Boolean) {
+        duckChatDataStore.setFullScreenModeUserSetting(enabled)
+    }
+
     override fun observeDuckChatUserEnabled(): Flow<Boolean> = duckChatDataStore.observeDuckChatUserEnabled()
 
     override fun observeInputScreenUserSettingEnabled(): Flow<Boolean> = duckChatDataStore.observeInputScreenUserSettingEnabled()
@@ -90,6 +100,8 @@ class RealDuckChatFeatureRepository @Inject constructor(
 
     override fun observeShowInAddressBar(): Flow<Boolean> = duckChatDataStore.observeShowInAddressBar()
 
+    override fun observeFullscreenModeEnabled(): Flow<Boolean> = duckChatDataStore.observeFullscreenMode()
+
     override suspend fun isDuckChatUserEnabled(): Boolean = duckChatDataStore.isDuckChatUserEnabled()
 
     override suspend fun isInputScreenUserSettingEnabled(): Boolean = duckChatDataStore.isInputScreenUserSettingEnabled()
@@ -97,6 +109,8 @@ class RealDuckChatFeatureRepository @Inject constructor(
     override suspend fun shouldShowInBrowserMenu(): Boolean = duckChatDataStore.getShowInBrowserMenu()
 
     override suspend fun shouldShowInAddressBar(): Boolean = duckChatDataStore.getShowInAddressBar()
+
+    override suspend fun isFullScreenModeUserSettingEnabled(): Boolean = duckChatDataStore.isFullScreenUserSettingEnabled()
 
     override suspend fun registerOpened() {
         if (!duckChatDataStore.wasOpenedBefore()) {

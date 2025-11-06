@@ -602,7 +602,7 @@
     <string name="waitlistNotificationDialogNotifyMe">Doresc să primesc notificări</string>
 
     <!-- Email Protection -->
-    <string name="emailProtectionActivityTitle">Protecția comunicațiilor prin e-mail (beta)</string>
+    <string name="emailProtectionActivityTitle">Protecția comunicațiilor prin e-mail</string>
     <string name="emailNotSupported">Dispozitivul nu este acceptat</string>
     <string name="emailNotSupportedExplanation">Protecția pentru e-mail îți permite să creezi adrese de e-mail private care elimină tehnologiile de urmărire prin e-mail. Trebuie să criptăm și să stocăm aceste adrese pe care le-ai creat local, pe dispozitivul tău. Din cauza faptului că dispozitivul tău nu acceptă stocarea criptată, protecția pentru e-mail este indisponibilă.</string>
 
@@ -860,8 +860,10 @@
 
     <!-- Appearance settings -->
     <string name="settingsAddressBarPositionTitle">Bara de adrese</string>
+    <string name="settingsAddressBarPositionHeaderTitle">Poziția barei de adrese</string>
     <string name="settingsAddressBarPositionTop">Sus</string>
     <string name="settingsAddressBarPositionBottom">Partea de jos</string>
+    <string name="settingsAddressBarPositionSplit">Împarte</string>
 
     <!-- Show on App Launch Option -->
     <string name="showOnAppLaunchOptionTitle">Afișează la lansarea aplicației</string>

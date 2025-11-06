@@ -30,6 +30,7 @@
     <string name="pirDevViewOptOutResults">View All OptOut Results</string>
     <string name="pirDevViewEmailResults">View Email Confirmation Results</string>
     <string name="pirDevViewRunEvents">View PIR Run events</string>
+    <string name="pirDevExportDb">Export database</string>
     <string name="pirDevViewEmailEvents">PIR Email</string>
     <string name="pirDevSchedule">Schedule Scan</string>
     <string name="pirDevSimpleScanHeader">Simple Scan Results</string>
@@ -46,4 +47,5 @@
     <string name="pirDevDebugOptOut">Debug opt out</string>
     <string name="pirDevOptOut">Run opt out</string>
     <string name="pirDevOptOutDisclaimer">Note: Only brokers with formOptOut are supported and will appear as an option for optout.</string>
+    <string name="pirDevSettingNotAvailableMessage">PIR database is not available. This may be due to keystore access issues.</string>
 </resources>

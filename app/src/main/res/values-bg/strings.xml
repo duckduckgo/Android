@@ -601,7 +601,7 @@
     <string name="waitlistNotificationDialogNotifyMe">УВЕДОМЕТЕ МЕ</string>
 
     <!-- Email Protection -->
-    <string name="emailProtectionActivityTitle">Защита на имейл (Бета версия)</string>
+    <string name="emailProtectionActivityTitle">Защита на имейл</string>
     <string name="emailNotSupported">Устройството не се поддържа</string>
     <string name="emailNotSupportedExplanation">Защитата на имейла ви позволява да създавате поверителни имейл адреси, които премахват имейл тракерите. Необходимо е да криптираме и съхраняваме създадените от вас адреси локално на вашето устройство. Тъй като вашето устройство не поддържа криптирано съхранение, защитата на имейл не е достъпна.</string>
 
@@ -844,8 +844,10 @@
 
     <!-- Appearance settings -->
     <string name="settingsAddressBarPositionTitle">Адресна лента</string>
+    <string name="settingsAddressBarPositionHeaderTitle">Позиция на адресната лента</string>
     <string name="settingsAddressBarPositionTop">Най-горе</string>
     <string name="settingsAddressBarPositionBottom">Отдолу</string>
+    <string name="settingsAddressBarPositionSplit">Раздели</string>
 
     <!-- Show on App Launch Option -->
     <string name="showOnAppLaunchOptionTitle">Показване при стартиране на приложението</string>

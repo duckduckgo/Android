@@ -479,7 +479,7 @@ sealed class Command {
 
     data object CloseCustomTab : Command()
 
-    data object LaunchPopupMenu : Command()
+    data class LaunchPopupMenu(val anchorToNavigationBar: Boolean) : Command()
 
     data class ShowAutoconsentAnimation(
         val isCosmetic: Boolean,
@@ -502,4 +502,5 @@ sealed class Command {
     data class EnqueueCookiesAnimation(
         val isCosmetic: Boolean,
     ) : Command()
+    data object PageStarted : Command()
 }

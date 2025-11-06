@@ -603,7 +603,7 @@
     <string name="waitlistNotificationDialogNotifyMe">POWIADOM MNIE</string>
 
     <!-- Email Protection -->
-    <string name="emailProtectionActivityTitle">Ochrona poczty e-mail (wersja beta)</string>
+    <string name="emailProtectionActivityTitle">Ochrona poczty e-mail</string>
     <string name="emailNotSupported">Urządzenie nie jest obsługiwane</string>
     <string name="emailNotSupportedExplanation">Ochrona poczty e-mail umożliwia tworzenie prywatnych adresów e-mail, które usuwają skrypty śledzące wiadomości e-mail. Musimy szyfrować i przechowywać tworzone adresy lokalnie na Twoim urządzeniu. Ponieważ Twoje urządzenie nie obsługuje szyfrowanego przechowywania, ochrona poczty e-mail jest niedostępna.</string>
 
@@ -876,8 +876,10 @@
 
     <!-- Appearance settings -->
     <string name="settingsAddressBarPositionTitle">Pasek adresu</string>
+    <string name="settingsAddressBarPositionHeaderTitle">Pozycja paska adresu</string>
     <string name="settingsAddressBarPositionTop">Do góry</string>
     <string name="settingsAddressBarPositionBottom">Dół</string>
+    <string name="settingsAddressBarPositionSplit">Podziel</string>
 
     <!-- Show on App Launch Option -->
     <string name="showOnAppLaunchOptionTitle">Pokaż przy uruchomieniu aplikacji</string>

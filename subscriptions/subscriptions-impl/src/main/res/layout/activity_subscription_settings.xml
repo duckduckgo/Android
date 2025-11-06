@@ -46,7 +46,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
                 android:layout_marginTop="@dimen/keyline_4"
-                android:src="@drawable/ic_privacy_pro_settings_hero" />
+                android:src="@drawable/ic_subscription_128" />
 
             <com.duckduckgo.common.ui.view.text.DaxTextView
                 android:id="@+id/subscriptionSettingsProductName"
@@ -150,12 +150,20 @@
                 android:layout_height="wrap_content"
                 app:primaryText="@string/subscriptionSettingSectionSubscription" />
 
+            <com.duckduckgo.common.ui.view.listitem.OneLineListItem
+                android:id="@+id/switchPlan"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="gone"
+                tools:primaryText="Switch to Yearly Plan"
+                tools:visibility="visible" />
+
             <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
                 android:id="@+id/changePlan"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:visibility="gone"
-                app:primaryText="@string/changePlanTitle"
+                app:primaryText="@string/subscriptionSettingManagePlan"
                 tools:secondaryText="Your monthly subscription renews on April 20, 2027."
                 tools:visibility="visible" />
 

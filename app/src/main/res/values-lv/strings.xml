@@ -602,7 +602,7 @@
     <string name="waitlistNotificationDialogNotifyMe">INFORMĒT MANI</string>
 
     <!-- Email Protection -->
-    <string name="emailProtectionActivityTitle">E-pasta aizsardzība (Beta)</string>
+    <string name="emailProtectionActivityTitle">E-pasta aizsardzība</string>
     <string name="emailNotSupported">Ierīce netiek atbalstīta</string>
     <string name="emailNotSupportedExplanation">E-pasta aizsardzība ļauj izveidot privātas e-pasta adreses, kas noņem e-pasta izsekotājus. Mums ir jāšifrē un jāsaglabā šīs tavā ierīcē vietēji izveidotās adreses. Tā kā tava ierīce neatbalsta šifrētu krātuvi, e-pasta aizsardzība nav pieejama.</string>
 
@@ -860,8 +860,10 @@
 
     <!-- Appearance settings -->
     <string name="settingsAddressBarPositionTitle">Adreses josla</string>
+    <string name="settingsAddressBarPositionHeaderTitle">Adreses joslas pozīcija</string>
     <string name="settingsAddressBarPositionTop">Populārākie</string>
     <string name="settingsAddressBarPositionBottom">Apakšā</string>
+    <string name="settingsAddressBarPositionSplit">Sadalīt</string>
 
     <!-- Show on App Launch Option -->
     <string name="showOnAppLaunchOptionTitle">Rādīt lietotnes palaišanas laikā</string>

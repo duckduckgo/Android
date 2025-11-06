@@ -192,6 +192,7 @@ import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
 import com.duckduckgo.app.browser.model.LongPressTarget
 import com.duckduckgo.app.browser.newtab.FavoritesQuickAccessAdapter
 import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
+import com.duckduckgo.app.browser.omnibar.OmnibarFeatureRepository
 import com.duckduckgo.app.browser.omnibar.QueryOrigin
 import com.duckduckgo.app.browser.omnibar.QueryOrigin.FromAutocomplete
 import com.duckduckgo.app.browser.refreshpixels.RefreshPixelSender
@@ -307,6 +308,7 @@ import com.duckduckgo.common.utils.isMobileSite
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.common.utils.plugins.headers.CustomHeadersProvider
 import com.duckduckgo.common.utils.toDesktopUri
+import com.duckduckgo.contentscopescripts.api.ContentScopeScriptsSubscriptionEventPlugin
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.downloads.api.DownloadCommand
 import com.duckduckgo.downloads.api.DownloadStateListener
@@ -322,6 +324,7 @@ import com.duckduckgo.duckplayer.api.DuckPlayer.DuckPlayerState.ENABLED
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.history.api.NavigationHistory
 import com.duckduckgo.js.messaging.api.JsCallbackData
+import com.duckduckgo.js.messaging.api.SubscriptionEventData
 import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.Feed
 import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.Feed.MALWARE
 import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.Feed.PHISHING
@@ -349,6 +352,7 @@ import com.duckduckgo.savedsites.impl.dialogs.EditSavedSiteDialogFragment.Delete
 import com.duckduckgo.savedsites.impl.dialogs.EditSavedSiteDialogFragment.EditSavedSiteListener
 import com.duckduckgo.serp.logos.api.SerpEasterEggLogosToggles
 import com.duckduckgo.serp.logos.api.SerpLogo
+import com.duckduckgo.settings.api.SettingsPageFeature
 import com.duckduckgo.site.permissions.api.SitePermissionsManager
 import com.duckduckgo.site.permissions.api.SitePermissionsManager.LocationPermissionRequest
 import com.duckduckgo.site.permissions.api.SitePermissionsManager.SitePermissionQueryResponse
@@ -364,6 +368,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -382,6 +387,7 @@ import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -488,6 +494,9 @@ class BrowserTabViewModel @Inject constructor(
     private val webViewCompatWrapper: WebViewCompatWrapper,
     private val addressBarTrackersAnimationFeatureToggle: AddressBarTrackersAnimationFeatureToggle,
     private val autoconsentPixelManager: AutoconsentPixelManager,
+    private val omnibarFeatureRepository: OmnibarFeatureRepository,
+    private val contentScopeScriptsSubscriptionEventPluginPoint: PluginPoint<ContentScopeScriptsSubscriptionEventPlugin>,
+    private val settingsPageFeature: SettingsPageFeature,
 ) : ViewModel(),
     WebViewClientListener,
     EditSavedSiteListener,
@@ -536,6 +545,9 @@ class BrowserTabViewModel @Inject constructor(
     val hiddenIds = MutableStateFlow(HiddenBookmarksIds())
 
     private var activeExperiments: List<Toggle>? = null
+
+    private val _subscriptionEventDataChannel = Channel<SubscriptionEventData>(capacity = Channel.BUFFERED)
+    val subscriptionEventDataFlow: Flow<SubscriptionEventData> = _subscriptionEventDataChannel.receiveAsFlow()
 
     data class HiddenBookmarksIds(
         val favorites: List<String> = emptyList(),
@@ -938,6 +950,14 @@ class BrowserTabViewModel @Inject constructor(
         if (lastFullSiteUrlEnabled != settingsDataStore.isFullUrlEnabled) {
             lastFullSiteUrlEnabled = settingsDataStore.isFullUrlEnabled
             command.value = Command.RefreshOmnibar
+        }
+
+        if (settingsPageFeature.serpSettingsSync().isEnabled()) {
+            viewModelScope.launch {
+                contentScopeScriptsSubscriptionEventPluginPoint.getPlugins().forEach { plugin ->
+                    _subscriptionEventDataChannel.send(plugin.getSubscriptionEventData())
+                }
+            }
         }
     }
 
@@ -1970,6 +1990,8 @@ class BrowserTabViewModel @Inject constructor(
                 maliciousSiteBlocked = false,
             )
         navigationStateChanged(webViewNavigationState)
+
+        command.postValue(Command.PageStarted)
     }
 
     override fun onSitePermissionRequested(
@@ -2891,7 +2913,7 @@ class BrowserTabViewModel @Inject constructor(
                     showMenuButton = HighlightableButton.Visible(highlighted = false),
                 )
         }
-        command.value = LaunchPopupMenu
+        command.value = LaunchPopupMenu(anchorToNavigationBar = !isCustomTab && omnibarFeatureRepository.isSplitOmnibarEnabled)
     }
 
     fun onPopupMenuLaunched() {

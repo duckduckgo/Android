@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Copyright (c) 2025 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/rootView"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <LinearLayout
+        android:id="@+id/barView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="?attr/preferredNavigationBarColor"
+        android:gravity="center"
+        android:orientation="horizontal"
+        android:paddingTop="@dimen/navigationBarPaddingTop"
+        android:paddingBottom="@dimen/navigationBarPaddingBottom"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:parentTag="androidx.coordinatorlayout.widget.CoordinatorLayout">
+
+        <Space
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1" />
+
+
+        <Space
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1" />
+
+        <FrameLayout
+            android:id="@+id/newTabButton"
+            android:layout_width="@dimen/toolbarIcon"
+            android:layout_height="@dimen/toolbarIcon"
+            android:background="@drawable/selectable_item_experimental_background"
+            android:visibility="gone"
+            tools:visibility="visible">
+
+            <ImageView
+                android:id="@+id/newTabButtonImageView"
+                android:layout_width="@dimen/toolbarIcon"
+                android:layout_height="@dimen/toolbarIcon"
+                android:layout_gravity="center"
+                android:contentDescription="@string/newTabMenuItem"
+                android:scaleType="center"
+                android:src="@drawable/ic_add_24" />
+        </FrameLayout>
+
+        <Space
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1" />
+
+        <FrameLayout
+            android:id="@+id/bookmarksButton"
+            android:layout_width="@dimen/toolbarIcon"
+            android:layout_height="@dimen/toolbarIcon"
+            android:background="@drawable/selectable_item_experimental_background">
+
+            <ImageView
+                android:id="@+id/bookmarksImageView"
+                android:layout_width="@dimen/toolbarIcon"
+                android:layout_height="@dimen/toolbarIcon"
+                android:layout_gravity="center"
+                android:contentDescription="@string/bookmarksMenuTitle"
+                android:scaleType="center"
+                android:src="@drawable/ic_bookmarks_24" />
+        </FrameLayout>
+
+        <Space
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1" />
+
+        <FrameLayout
+            android:id="@+id/fireButton"
+            android:layout_width="@dimen/toolbarIcon"
+            android:layout_height="@dimen/toolbarIcon"
+            android:background="@drawable/selectable_item_experimental_background">
+
+            <ImageView
+                android:id="@+id/fireIconImageView"
+                android:layout_width="@dimen/toolbarIcon"
+                android:layout_height="@dimen/toolbarIcon"
+                android:layout_gravity="center"
+                android:contentDescription="@string/fireMenu"
+                android:scaleType="center"
+                android:src="@drawable/ic_fire_24" />
+        </FrameLayout>
+
+        <Space
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1" />
+
+        <com.duckduckgo.browser.ui.tabs.NewTabSwitcherButton
+            android:id="@+id/tabsButton"
+            android:layout_width="@dimen/toolbarIcon"
+            android:layout_height="@dimen/toolbarIcon" />
+
+        <Space
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1" />
+
+        <FrameLayout
+            android:id="@+id/menuButton"
+            android:layout_width="@dimen/toolbarIcon"
+            android:layout_height="@dimen/toolbarIcon"
+            android:background="@drawable/selectable_item_experimental_background">
+
+            <ImageView
+                android:id="@+id/menuIconImageView"
+                android:layout_width="@dimen/toolbarIcon"
+                android:layout_height="@dimen/toolbarIcon"
+                android:layout_gravity="center"
+                android:contentDescription="@string/browserPopupMenu"
+                android:scaleType="center"
+                android:src="@drawable/ic_menu_vertical_24" />
+        </FrameLayout>
+
+        <Space
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1" />
+
+        <Space
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1" />
+
+    </LinearLayout>
+
+    <View
+        android:id="@+id/shadowView"
+        android:layout_width="match_parent"
+        android:layout_height="0.5dp"
+        android:background="?attr/daxColorShadeSolid"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

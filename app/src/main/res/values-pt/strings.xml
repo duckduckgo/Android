@@ -601,7 +601,7 @@
     <string name="waitlistNotificationDialogNotifyMe">NOTIFICAR-ME</string>
 
     <!-- Email Protection -->
-    <string name="emailProtectionActivityTitle">Proteção de E-mail (Beta)</string>
+    <string name="emailProtectionActivityTitle">Proteção de e-mail</string>
     <string name="emailNotSupported">Dispositivo não suportado</string>
     <string name="emailNotSupportedExplanation">A Proteção do Correio Eletrónico permite-lhe criar endereços de correio eletrónico privados que removem os rastreadores de correio eletrónico. Precisamos de encriptar e armazenar estes endereços que cria localmente no seu dispositivo. Uma vez que o dispositivo não suporta armazenamento encriptado, a Proteção do Correio Eletrónico não está disponível.</string>
 
@@ -844,8 +844,10 @@
 
     <!-- Appearance settings -->
     <string name="settingsAddressBarPositionTitle">Barra de endereço</string>
+    <string name="settingsAddressBarPositionHeaderTitle">Posição da barra de endereços</string>
     <string name="settingsAddressBarPositionTop">Topo</string>
     <string name="settingsAddressBarPositionBottom">Parte inferior</string>
+    <string name="settingsAddressBarPositionSplit">Dividir</string>
 
     <!-- Show on App Launch Option -->
     <string name="showOnAppLaunchOptionTitle">Mostrar ao abrir a aplicação</string>

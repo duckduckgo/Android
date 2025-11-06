@@ -29,10 +29,7 @@ import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
-import com.duckduckgo.app.settings.SettingsActivity
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
-import com.duckduckgo.appbuildconfig.api.isInternalBuild
-import com.duckduckgo.common.ui.themepreview.ui.AppComponentsActivity
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
@@ -101,8 +98,6 @@ class AppShortcutCreator @Inject constructor(
 
             if (duckAiFeatureState.showPopupMenuShortcut.value) {
                 shortcutList.add(buildDuckChatShortcut(context))
-            } else if (appBuildConfig.isInternalBuild()) {
-                shortcutList.add(buildAndroidDesignSystemShortcut(context))
             }
 
             val shortcutManager = context.getSystemService(ShortcutManager::class.java)
@@ -150,23 +145,6 @@ class AppShortcutCreator @Inject constructor(
         return ShortcutInfoCompat.Builder(context, SHORTCUT_ID_SHOW_BOOKMARKS)
             .setShortLabel(context.getString(com.duckduckgo.saved.sites.impl.R.string.bookmarksActivityTitle))
             .setIcon(IconCompat.createWithResource(context, R.drawable.ic_app_shortcut_bookmarks))
-            .setIntents(stackBuilder.intents)
-            .build().toShortcutInfo()
-    }
-
-    private fun buildAndroidDesignSystemShortcut(context: Context): ShortcutInfo {
-        val browserActivity = BrowserActivity.intent(context).also { it.action = Intent.ACTION_VIEW }
-        val settingsActivity = SettingsActivity.intent(context).also { it.action = Intent.ACTION_VIEW }
-        val adsActivity = AppComponentsActivity.intent(context).also { it.action = Intent.ACTION_VIEW }
-
-        val stackBuilder = TaskStackBuilder.create(context)
-            .addNextIntent(browserActivity)
-            .addNextIntent(settingsActivity)
-            .addNextIntent(adsActivity)
-
-        return ShortcutInfoCompat.Builder(context, SHORTCUT_ID_DESIGN_SYSTEM_DEMO)
-            .setShortLabel(context.getString(com.duckduckgo.mobile.android.R.string.ads_demo_activity_title))
-            .setIcon(IconCompat.createWithResource(context, com.duckduckgo.mobile.android.R.drawable.ic_dax_icon))
             .setIntents(stackBuilder.intents)
             .build().toShortcutInfo()
     }

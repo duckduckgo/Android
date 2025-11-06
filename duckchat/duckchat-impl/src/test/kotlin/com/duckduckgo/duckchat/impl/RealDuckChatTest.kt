@@ -421,6 +421,16 @@ class RealDuckChatTest {
     }
 
     @Test
+    fun whenUriHostIsDuckAiThenIsDuckChatUrlReturnsTrue() {
+        assertTrue(testee.isDuckChatUrl("https://duck.ai".toUri()))
+    }
+
+    @Test
+    fun whenUriStringIsDuckAiThenIsDuckChatUrlReturnsTrue() {
+        assertTrue(testee.isDuckChatUrl("duck.ai".toUri()))
+    }
+
+    @Test
     fun whenWasOpenedBeforeQueriedThenRepoStateIsReturned() = runTest {
         whenever(mockDuckChatFeatureRepository.wasOpenedBefore()).thenReturn(true)
 

@@ -601,7 +601,7 @@
     <string name="waitlistNotificationDialogNotifyMe">ÉRTESÍTSETEK</string>
 
     <!-- Email Protection -->
-    <string name="emailProtectionActivityTitle">E-mail védelem (béta)</string>
+    <string name="emailProtectionActivityTitle">E-mail védelem</string>
     <string name="emailNotSupported">Az eszköz nem támogatott</string>
     <string name="emailNotSupportedExplanation">Az e-mail-védelem lehetővé teszi olyan privát e-mail-címek létrehozását, amelyek eltávolítják az e-mail nyomkövetőket. Ezeket a címeket helyileg az eszközödön kell titkosítanunk és tárolnunk. Mivel az eszközöd nem támogatja a titkosított tárhelyet, az e-mail-védelem nem érhető el.</string>
 
@@ -844,8 +844,10 @@
 
     <!-- Appearance settings -->
     <string name="settingsAddressBarPositionTitle">Címsor</string>
+    <string name="settingsAddressBarPositionHeaderTitle">Címsor elhelyezkedése</string>
     <string name="settingsAddressBarPositionTop">Fent</string>
     <string name="settingsAddressBarPositionBottom">Lent</string>
+    <string name="settingsAddressBarPositionSplit">Felosztás</string>
 
     <!-- Show on App Launch Option -->
     <string name="showOnAppLaunchOptionTitle">Megjelenítés az alkalmazás indításakor</string>
