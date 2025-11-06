@@ -89,6 +89,11 @@ interface DuckChatInternal : DuckChat {
     suspend fun setShowInAddressBarUserSetting(showDuckChat: Boolean)
 
     /**
+     * Set user setting to determine whether DuckChat should be shown in fullscreen mode.
+     */
+    suspend fun setFullScreenModeUserSetting(enabled: Boolean)
+
+    /**
      * Observes whether DuckChat is user enabled or disabled.
      */
     fun observeEnableDuckChatUserSetting(): Flow<Boolean>
@@ -107,6 +112,11 @@ interface DuckChatInternal : DuckChat {
      * Observes whether DuckChat should be shown in address bar based on user settings only.
      */
     fun observeShowInAddressBarUserSetting(): Flow<Boolean>
+
+    /**
+     * Observes whether Duck.ai full screen mode is enabled or disabled.
+     */
+    fun observeFullscreenModeUserSetting(): Flow<Boolean>
 
     /**
      * Opens DuckChat settings.
@@ -165,6 +175,11 @@ interface DuckChatInternal : DuckChat {
      * Returns whether dedicated Duck.ai input screen feature is available (its feature flag is enabled).
      */
     fun isInputScreenFeatureAvailable(): Boolean
+
+    /**
+     * Returns whether dedicated Duck.ai full screen mode feature is available (its feature flag is enabled).
+     */
+    fun isDuckChatFullScreenModeFeatureAvailable(): Boolean
 
     /**
      * Checks whether DuckChat is enabled based on remote config flag.
@@ -257,6 +272,7 @@ class RealDuckChat @Inject constructor(
     private val _showNewAddressBarOptionChoiceScreen = MutableStateFlow(false)
     private val _showClearDuckAIChatHistory = MutableStateFlow(true)
     private val _showMainButtonsInInputScreen = MutableStateFlow(false)
+    private val _fullscreenModeEnabled = MutableStateFlow(false)
 
     private val _chatState = MutableStateFlow(ChatState.HIDE)
     private val keepSession = MutableStateFlow(false)
@@ -281,6 +297,7 @@ class RealDuckChat @Inject constructor(
     private var clearChatHistory: Boolean = true
     private var inputScreenMainButtonsEnabled = false
     private var showInputScreenOnSystemSearchLaunchEnabled: Boolean = true
+    private var isFullscreenModeEnabled: Boolean = false
 
     init {
         if (isMainProcess) {
@@ -314,11 +331,20 @@ class RealDuckChat @Inject constructor(
             cacheUserSettings()
         }
 
+    override suspend fun setFullScreenModeUserSetting(enabled: Boolean) {
+        withContext(dispatchers.io()) {
+            duckChatFeatureRepository.setFullScreenModeUserSetting(enabled)
+            cacheUserSettings()
+        }
+    }
+
     override fun isEnabled(): Boolean = isDuckChatFeatureEnabled && isDuckChatUserEnabled
 
     override fun isInputScreenFeatureAvailable(): Boolean = duckAiInputScreen
 
     override fun isDuckChatFeatureEnabled(): Boolean = isDuckChatFeatureEnabled
+
+    override fun isDuckChatFullScreenModeFeatureAvailable(): Boolean = duckChatFeature.fullscreenMode().isEnabled()
 
     override fun observeEnableDuckChatUserSetting(): Flow<Boolean> = duckChatFeatureRepository.observeDuckChatUserEnabled()
 
@@ -327,6 +353,8 @@ class RealDuckChat @Inject constructor(
     override fun observeShowInBrowserMenuUserSetting(): Flow<Boolean> = duckChatFeatureRepository.observeShowInBrowserMenu()
 
     override fun observeShowInAddressBarUserSetting(): Flow<Boolean> = duckChatFeatureRepository.observeShowInAddressBar()
+
+    override fun observeFullscreenModeUserSetting(): Flow<Boolean> = duckChatFeatureRepository.observeFullscreenModeEnabled()
 
     override fun openDuckChatSettings() {
         val intent = globalActivityStarter.startIntent(context, DuckChatSettingsNoParams)
@@ -607,6 +635,8 @@ class RealDuckChat @Inject constructor(
             showInputScreenOnSystemSearchLaunchEnabled = duckChatFeature.showInputScreenOnSystemSearchLaunch().isEnabled()
             inputScreenMainButtonsEnabled = duckChatFeature.showMainButtonsInInputScreen().isEnabled()
 
+            isFullscreenModeEnabled = duckChatFeature.fullscreenMode().isEnabled()
+
             val showMainButtons = duckChatFeature.showMainButtonsInInputScreen().isEnabled()
             _showMainButtonsInInputScreen.emit(showMainButtons)
 
@@ -666,6 +696,9 @@ class RealDuckChat @Inject constructor(
 
             val showClearChatHistory = clearChatHistory
             _showClearDuckAIChatHistory.emit(showClearChatHistory)
+
+            val fullscreenModeEnabled = isFullscreenModeEnabled
+            _fullscreenModeEnabled.emit(fullscreenModeEnabled)
         }
 
     companion object {

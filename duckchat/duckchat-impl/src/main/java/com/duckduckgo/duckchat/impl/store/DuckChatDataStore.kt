@@ -28,6 +28,7 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.impl.di.DuckChat
 import com.duckduckgo.duckchat.impl.store.SharedPreferencesDuckChatDataStore.Keys.DUCK_AI_INPUT_SCREEN_USER_SETTING
+import com.duckduckgo.duckchat.impl.store.SharedPreferencesDuckChatDataStore.Keys.DUCK_CHAT_FULLSCREEN_MODE_SETTING
 import com.duckduckgo.duckchat.impl.store.SharedPreferencesDuckChatDataStore.Keys.DUCK_CHAT_LAST_SESSION_TIMESTAMP
 import com.duckduckgo.duckchat.impl.store.SharedPreferencesDuckChatDataStore.Keys.DUCK_CHAT_OPENED
 import com.duckduckgo.duckchat.impl.store.SharedPreferencesDuckChatDataStore.Keys.DUCK_CHAT_SESSION_DELTA_TIMESTAMP
@@ -57,6 +58,8 @@ interface DuckChatDataStore {
 
     suspend fun setShowInAddressBar(showDuckChat: Boolean)
 
+    suspend fun setFullScreenModeUserSetting(enabled: Boolean)
+
     fun observeDuckChatUserEnabled(): Flow<Boolean>
 
     fun observeInputScreenUserSettingEnabled(): Flow<Boolean>
@@ -65,6 +68,8 @@ interface DuckChatDataStore {
 
     fun observeShowInAddressBar(): Flow<Boolean>
 
+    fun observeFullscreenMode(): Flow<Boolean>
+
     suspend fun isDuckChatUserEnabled(): Boolean
 
     suspend fun isInputScreenUserSettingEnabled(): Boolean
@@ -72,6 +77,8 @@ interface DuckChatDataStore {
     suspend fun getShowInBrowserMenu(): Boolean
 
     suspend fun getShowInAddressBar(): Boolean
+
+    suspend fun isFullScreenUserSettingEnabled(): Boolean
 
     suspend fun fetchAndClearUserPreferences(): String?
 
@@ -103,6 +110,7 @@ class SharedPreferencesDuckChatDataStore @Inject constructor(
         val DUCK_CHAT_USER_PREFERENCES = stringPreferencesKey("DUCK_CHAT_USER_PREFERENCES")
         val DUCK_CHAT_LAST_SESSION_TIMESTAMP = longPreferencesKey(name = "DUCK_CHAT_LAST_SESSION_TIMESTAMP")
         val DUCK_CHAT_SESSION_DELTA_TIMESTAMP = longPreferencesKey(name = "DUCK_CHAT_SESSION_DELTA_TIMESTAMP")
+        val DUCK_CHAT_FULLSCREEN_MODE_SETTING = booleanPreferencesKey(name = "DUCK_CHAT_FULLSCREEN_MODE_SETTING")
     }
 
     private fun Preferences.defaultShowInAddressBar(): Boolean =
@@ -158,6 +166,10 @@ class SharedPreferencesDuckChatDataStore @Inject constructor(
         store.edit { prefs -> prefs[DUCK_AI_INPUT_SCREEN_USER_SETTING] = enabled }
     }
 
+    override suspend fun setFullScreenModeUserSetting(enabled: Boolean) {
+        store.edit { prefs -> prefs[DUCK_CHAT_FULLSCREEN_MODE_SETTING] = enabled }
+    }
+
     override suspend fun setShowInBrowserMenu(showDuckChat: Boolean) {
         store.edit { prefs -> prefs[DUCK_CHAT_SHOW_IN_MENU] = showDuckChat }
     }
@@ -174,6 +186,8 @@ class SharedPreferencesDuckChatDataStore @Inject constructor(
 
     override fun observeShowInAddressBar(): Flow<Boolean> = duckChatShowInAddressBar
 
+    override fun observeFullscreenMode(): Flow<Boolean> = store.data.map { it[DUCK_CHAT_FULLSCREEN_MODE_SETTING] ?: false }
+
     override suspend fun isDuckChatUserEnabled(): Boolean = store.data.firstOrNull()?.let { it[DUCK_CHAT_USER_ENABLED] } ?: true
 
     override suspend fun isInputScreenUserSettingEnabled(): Boolean = store.data.firstOrNull()?.let { it[DUCK_AI_INPUT_SCREEN_USER_SETTING] } ?: false
@@ -181,6 +195,8 @@ class SharedPreferencesDuckChatDataStore @Inject constructor(
     override suspend fun getShowInBrowserMenu(): Boolean = store.data.firstOrNull()?.let { it[DUCK_CHAT_SHOW_IN_MENU] } ?: true
 
     override suspend fun getShowInAddressBar(): Boolean = store.data.firstOrNull()?.defaultShowInAddressBar() ?: true
+
+    override suspend fun isFullScreenUserSettingEnabled(): Boolean = store.data.firstOrNull()?.let { it[DUCK_CHAT_FULLSCREEN_MODE_SETTING] } ?: false
 
     override suspend fun fetchAndClearUserPreferences(): String? {
         val userPreferences = store.data.map { it[DUCK_CHAT_USER_PREFERENCES] }.firstOrNull()

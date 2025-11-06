@@ -102,4 +102,10 @@ interface DuckChatFeature {
      */
     @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
     fun showMainButtonsInInputScreen(): Toggle
+
+    /**
+     * @return `true` when the new fullscreen mode is enabled
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    fun fullscreenMode(): Toggle
 }
