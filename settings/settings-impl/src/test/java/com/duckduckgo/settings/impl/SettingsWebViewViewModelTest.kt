@@ -169,7 +169,7 @@ class FakeContentScopeScriptsSubscriptionEventPlugin(
     override fun getSubscriptionEventData(): SubscriptionEventData = eventData
 }
 
-class FakeContentScopeScriptsSubscriptionEventPluginPoint() : PluginPoint<ContentScopeScriptsSubscriptionEventPlugin> {
+class FakeContentScopeScriptsSubscriptionEventPluginPoint : PluginPoint<ContentScopeScriptsSubscriptionEventPlugin> {
 
     private val plugins: MutableList<ContentScopeScriptsSubscriptionEventPlugin> = mutableListOf()
 

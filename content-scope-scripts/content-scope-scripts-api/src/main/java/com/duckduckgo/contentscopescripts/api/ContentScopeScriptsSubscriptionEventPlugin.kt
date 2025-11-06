@@ -19,8 +19,7 @@ package com.duckduckgo.contentscopescripts.api
 import com.duckduckgo.js.messaging.api.SubscriptionEventData
 
 /**
- * Use this interface to create a new plugin that will provide a ContentScopeScriptsSubscriptionEventPlugin and provide
- * [SubscriptionEventData] that can be sent to C-S-S
+ * Use this interface to create a new plugin that will provide [SubscriptionEventData] that can be sent to C-S-S
  */
 interface ContentScopeScriptsSubscriptionEventPlugin {
 
