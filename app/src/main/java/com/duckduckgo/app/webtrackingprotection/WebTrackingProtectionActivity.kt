@@ -24,7 +24,6 @@ import android.text.method.LinkMovementMethod
 import android.text.style.ClickableSpan
 import android.text.style.URLSpan
 import android.view.View
-import androidx.annotation.StringRes
 import androidx.core.view.isVisible
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
@@ -57,9 +56,6 @@ class WebTrackingProtectionActivity : DuckDuckGoActivity() {
 
     @Inject
     lateinit var globalActivityStarter: GlobalActivityStarter
-
-    @Inject
-    lateinit var webTrackingProtectionsGridFeature: WebTrackingProtectionsGridFeature
 
     private val viewModel: WebTrackingProtectionViewModel by bindViewModel()
     private val binding: ActivityWebTrackingProtectionBinding by viewBinding()
@@ -96,13 +92,7 @@ class WebTrackingProtectionActivity : DuckDuckGoActivity() {
     }
 
     private fun configureClickableLink() {
-        @StringRes val descriptionStringRes = if (webTrackingProtectionsGridFeature.self().isEnabled()) {
-            R.string.webTrackingProtectionExplanationDescription
-        } else {
-            R.string.webTrackingProtectionDescriptionNew
-        }
-
-        val htmlGPCText = getString(descriptionStringRes).html(this)
+        val htmlGPCText = getString(R.string.webTrackingProtectionExplanationDescription).html(this)
         val gpcSpannableString = SpannableStringBuilder(htmlGPCText)
         val urlSpans = htmlGPCText.getSpans(0, htmlGPCText.length, URLSpan::class.java)
         urlSpans?.forEach {
@@ -125,10 +115,6 @@ class WebTrackingProtectionActivity : DuckDuckGoActivity() {
     }
 
     private fun configureGridList() {
-        if (!webTrackingProtectionsGridFeature.self().isEnabled()) {
-            return
-        }
-
         binding.protectionsListDivider.isVisible = true
         binding.protectionsTitle.isVisible = true
         binding.protectionsList.isVisible = true
@@ -192,10 +178,6 @@ class WebTrackingProtectionActivity : DuckDuckGoActivity() {
     }
 
     private fun updateProtectionsGridList(protectionItems: List<FeatureGridItem>) {
-        if (!webTrackingProtectionsGridFeature.self().isEnabled()) {
-            return
-        }
-
         gridAdapter.submitList(protectionItems)
     }
 }
