@@ -130,15 +130,14 @@
                     app:layout_constraintTop_toTopOf="parent"
                     app:layout_constraintWidth_max="160dp">
 
-                    <com.google.android.material.imageview.ShapeableImageView
+                    <ImageView
                         android:id="@+id/topOmnibarToggleImage"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:contentDescription="@string/settingsAddressBarPositionTop"
-                        android:foreground="@drawable/selectable_rounded_ripple"
                         android:scaleType="fitCenter"
-                        android:src="@drawable/mobile_toolbar_top_selected_light"
-                        app:shapeAppearanceOverlay="@style/Widget.DuckDuckGo.OmnibarTypePictogram" />
+                        android:foreground="@drawable/selectable_rounded_ripple"
+                        android:contentDescription="@string/settingsAddressBarPositionTop"
+                        android:src="@drawable/mobile_toolbar_top_selected_light" />
 
                     <com.duckduckgo.common.ui.view.text.DaxTextView
                         android:layout_width="wrap_content"
@@ -173,15 +172,14 @@
                     app:layout_constraintStart_toEndOf="@+id/topOmnibarContainer"
                     app:layout_constraintTop_toTopOf="parent">
 
-                    <com.google.android.material.imageview.ShapeableImageView
+                    <ImageView
                         android:id="@+id/bottomOmnibarToggleImage"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:contentDescription="@string/settingsAddressBarPositionBottom"
-                        android:foreground="@drawable/selectable_rounded_ripple"
                         android:scaleType="fitCenter"
-                        android:src="@drawable/mobile_toolbar_bottom_unselected_light"
-                        app:shapeAppearanceOverlay="@style/Widget.DuckDuckGo.OmnibarTypePictogram" />
+                        android:foreground="@drawable/selectable_rounded_ripple"
+                        android:contentDescription="@string/settingsAddressBarPositionBottom"
+                        android:src="@drawable/mobile_toolbar_bottom_unselected_light" />
 
                     <LinearLayout
                         android:layout_width="wrap_content"
@@ -224,15 +222,14 @@
                     app:layout_constraintStart_toEndOf="@+id/bottomOmnibarContainer"
                     app:layout_constraintTop_toTopOf="parent">
 
-                    <com.google.android.material.imageview.ShapeableImageView
+                    <ImageView
                         android:id="@+id/splitOmnibarToggleImage"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:contentDescription="@string/settingsAddressBarPositionSplit"
-                        android:foreground="@drawable/selectable_rounded_ripple"
                         android:scaleType="fitCenter"
-                        android:src="@drawable/mobile_toolbar_split_unselected_light"
-                        app:shapeAppearanceOverlay="@style/Widget.DuckDuckGo.OmnibarTypePictogram" />
+                        android:foreground="@drawable/selectable_rounded_ripple"
+                        android:contentDescription="@string/settingsAddressBarPositionSplit"
+                        android:src="@drawable/mobile_toolbar_split_unselected_light" />
 
                     <LinearLayout
                         android:layout_width="wrap_content"
