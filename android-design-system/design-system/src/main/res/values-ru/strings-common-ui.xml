@@ -37,8 +37,4 @@
     <string name="alwaysOn">Всегда включено</string>
     <string name="on">вкл.</string>
     <string name="off">Выкл</string>
-
-    <!-- Input Mode Tab Layout -->
-    <string name="input_mode_search_tab">Поиск</string>
-    <string name="input_mode_chat_tab">Duck.ai</string>
 </resources>

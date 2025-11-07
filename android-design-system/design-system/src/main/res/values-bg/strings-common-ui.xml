@@ -37,8 +37,4 @@
     <string name="alwaysOn">Винаги включено</string>
     <string name="on">Включен</string>
     <string name="off">Изключено</string>
-
-    <!-- Input Mode Tab Layout -->
-    <string name="input_mode_search_tab">Търсене</string>
-    <string name="input_mode_chat_tab">Duck.ai</string>
 </resources>

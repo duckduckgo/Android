@@ -37,8 +37,4 @@
     <string name="alwaysOn">Alltid på</string>
     <string name="on">På</string>
     <string name="off">Av</string>
-
-    <!-- Input Mode Tab Layout -->
-    <string name="input_mode_search_tab">Søk</string>
-    <string name="input_mode_chat_tab">Duck.ai</string>
 </resources>

@@ -37,8 +37,4 @@
     <string name="alwaysOn">Πάντα σε λειτουργία</string>
     <string name="on">Ενεργό</string>
     <string name="off">Κλειστό</string>
-
-    <!-- Input Mode Tab Layout -->
-    <string name="input_mode_search_tab">Αναζήτηση</string>
-    <string name="input_mode_chat_tab">Duck.ai</string>
 </resources>

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.common.ui.view.tablayout
+package com.duckduckgo.browser.ui.inputmode
 
 import android.content.Context
 import android.graphics.Color
@@ -24,9 +24,9 @@ import android.view.ViewOutlineProvider
 import android.widget.ImageView
 import androidx.core.content.ContextCompat
 import com.duckduckgo.anvil.annotations.InjectWith
+import com.duckduckgo.browser.ui.R
 import com.duckduckgo.common.ui.store.AppTheme
 import com.duckduckgo.di.scopes.ViewScope
-import com.duckduckgo.mobile.android.R
 import com.google.android.material.color.MaterialColors
 import com.google.android.material.shape.CornerFamily
 import com.google.android.material.shape.MaterialShapeDrawable
@@ -59,7 +59,7 @@ class InputModeTabLayout @JvmOverloads constructor(
         clipToOutline = true
     }
     override fun onAttachedToWindow() {
-        AndroidSupportInjection.inject(this)
+        AndroidSupportInjection.Companion.inject(this)
         super.onAttachedToWindow()
 
         val searchTabView = getTabAt(0)!!.view
@@ -107,7 +107,7 @@ class InputModeTabLayout @JvmOverloads constructor(
             initializeElevationOverlay(context)
             val shadowColor = MaterialColors.getColor(
                 context,
-                R.attr.daxColorInputModeIndicatorShadow,
+                com.duckduckgo.mobile.android.R.attr.daxColorInputModeIndicatorShadow,
                 Color.BLACK,
             )
             setShadowColor(shadowColor)

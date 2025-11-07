@@ -37,8 +37,4 @@
     <string name="alwaysOn">Altid aktiv</string>
     <string name="on">Til</string>
     <string name="off">Fra</string>
-
-    <!-- Input Mode Tab Layout -->
-    <string name="input_mode_search_tab">Søg</string>
-    <string name="input_mode_chat_tab">Duck.ai</string>
 </resources>

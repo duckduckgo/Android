@@ -37,8 +37,4 @@
     <string name="alwaysOn">Aina käytössä</string>
     <string name="on">Päällä</string>
     <string name="off">Pois</string>
-
-    <!-- Input Mode Tab Layout -->
-    <string name="input_mode_search_tab">Hae</string>
-    <string name="input_mode_chat_tab">Duck.ai</string>
 </resources>

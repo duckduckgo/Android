@@ -37,8 +37,4 @@
     <string name="alwaysOn">Altijd aan</string>
     <string name="on">Aan</string>
     <string name="off">Uit</string>
-
-    <!-- Input Mode Tab Layout -->
-    <string name="input_mode_search_tab">Zoeken</string>
-    <string name="input_mode_chat_tab">Duck.ai</string>
 </resources>

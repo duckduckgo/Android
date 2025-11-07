@@ -37,8 +37,4 @@
     <string name="alwaysOn">Alati sisse lülitatud</string>
     <string name="on">Sees</string>
     <string name="off">Väljas</string>
-
-    <!-- Input Mode Tab Layout -->
-    <string name="input_mode_search_tab">Otsing</string>
-    <string name="input_mode_chat_tab">Duck.ai</string>
 </resources>

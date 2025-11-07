@@ -37,8 +37,4 @@
     <string name="alwaysOn">Întotdeauna activat</string>
     <string name="on">Activat</string>
     <string name="off">Dezactivat</string>
-
-    <!-- Input Mode Tab Layout -->
-    <string name="input_mode_search_tab">Căutare</string>
-    <string name="input_mode_chat_tab">Duck.ai</string>
 </resources>

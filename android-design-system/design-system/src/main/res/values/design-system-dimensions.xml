@@ -166,10 +166,4 @@
     <dimen name="searchWidgetFavoritesHorizontalSpacing">4dp</dimen>
     <dimen name="searchWidgetFavoritesCornerRadius">12dp</dimen>
 
-    <!-- Input Mode Tab Layout -->
-    <dimen name="inputModeSwitchHeight">38dp</dimen>
-    <dimen name="inputModeTabIndicatorHeight">34dp</dimen>
-    <dimen name="inputModeTabIndicatorHorizontalInset">2dp</dimen>
-    <dimen name="inputModeTabIndicatorElevation">5dp</dimen>
-
 </resources>

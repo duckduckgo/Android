@@ -37,8 +37,4 @@
     <string name="alwaysOn">Toujours activé</string>
     <string name="on">Activé</string>
     <string name="off">Off</string>
-
-    <!-- Input Mode Tab Layout -->
-    <string name="input_mode_search_tab">Rechercher</string>
-    <string name="input_mode_chat_tab">Duck.ai</string>
 </resources>

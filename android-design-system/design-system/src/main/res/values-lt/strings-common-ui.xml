@@ -37,8 +37,4 @@
     <string name="alwaysOn">Visada įjungta</string>
     <string name="on">Įjungti</string>
     <string name="off">Išjungti</string>
-
-    <!-- Input Mode Tab Layout -->
-    <string name="input_mode_search_tab">Paieška</string>
-    <string name="input_mode_chat_tab">Duck.ai</string>
 </resources>

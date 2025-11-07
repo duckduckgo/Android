@@ -37,8 +37,4 @@
     <string name="alwaysOn">Immer aktiviert</string>
     <string name="on">Ein</string>
     <string name="off">Aus</string>
-
-    <!-- Input Mode Tab Layout -->
-    <string name="input_mode_search_tab">Suche</string>
-    <string name="input_mode_chat_tab">Duck.ai</string>
 </resources>

@@ -37,8 +37,4 @@
     <string name="alwaysOn">Mindig be van kapcsolva</string>
     <string name="on">Be</string>
     <string name="off">Ki</string>
-
-    <!-- Input Mode Tab Layout -->
-    <string name="input_mode_search_tab">Keresés</string>
-    <string name="input_mode_chat_tab">Duck.ai</string>
 </resources>

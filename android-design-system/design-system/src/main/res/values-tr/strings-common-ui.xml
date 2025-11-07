@@ -37,8 +37,4 @@
     <string name="alwaysOn">Her Zaman Açık</string>
     <string name="on">Açık</string>
     <string name="off">Kapalı</string>
-
-    <!-- Input Mode Tab Layout -->
-    <string name="input_mode_search_tab">Arama yap</string>
-    <string name="input_mode_chat_tab">Duck.ai</string>
 </resources>
