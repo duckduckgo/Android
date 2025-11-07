@@ -175,7 +175,7 @@ class SubscriptionSettingsActivity : DuckDuckGoActivity() {
             if (viewState.switchPlanAvailable && viewState.platform.lowercase() == "google") {
                 binding.switchPlan.show()
                 val switchText = when (viewState.duration) {
-                    Monthly -> getString(string.subscriptionSettingSwitchUpgrade)
+                    Monthly -> getString(string.subscriptionSettingSwitchUpgradeDynamic, viewState.savingsPercentage.toString())
                     Yearly -> getString(string.subscriptionSettingSwitchDowngrade)
                 }
                 binding.switchPlan.setPrimaryText(switchText)
