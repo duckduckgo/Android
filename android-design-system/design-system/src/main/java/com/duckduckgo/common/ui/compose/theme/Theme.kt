@@ -73,9 +73,9 @@ fun DuckDuckGoTheme(
     content: @Composable () -> Unit,
 ) {
     val lightColorPalette = DuckDuckGoColors(
-        background = colorResource(R.color.gray0),
+        background = colorResource(R.color.background_background_light),
         backgroundInverted = colorResource(R.color.gray100),
-        surface = colorResource(R.color.white),
+        surface = colorResource(R.color.background_surface_light),
         container = colorResource(R.color.black6),
         containerDisabled = colorResource(R.color.black6),
         window = colorResource(R.color.white),
@@ -99,9 +99,9 @@ fun DuckDuckGoTheme(
     )
 
     val darkColorPalette = DuckDuckGoColors(
-        background = colorResource(R.color.gray100),
+        background = colorResource(R.color.background_background_dark),
         backgroundInverted = colorResource(R.color.gray0),
-        surface = colorResource(R.color.gray90),
+        surface = colorResource(R.color.background_surface_dark),
         container = colorResource(R.color.white12),
         containerDisabled = colorResource(R.color.white18),
         window = colorResource(R.color.gray85),
