@@ -65,7 +65,7 @@ class OnboardingActivity : DuckDuckGoActivity() {
         if (!::viewPageAdapter.isInitialized) {
             return
         }
-        
+
         val next = viewPager.currentItem + 1
         if (next < viewPageAdapter.count) {
             viewPager.setCurrentItem(next, true)
