@@ -154,30 +154,6 @@ class ProSettingViewModelTest {
         }
     }
 
-    @Test
-    fun whenRebrandingEnabledThenRebrandingEnabledViewStateTrue() = runTest {
-        whenever(subscriptionsManager.subscriptionStatus).thenReturn(flowOf(SubscriptionStatus.AUTO_RENEWABLE))
-        whenever(subscriptionsManager.getSubscriptionOffer()).thenReturn(emptyList())
-        whenever(subscriptionsManager.isFreeTrialEligible()).thenReturn(true)
-
-        viewModel.onCreate(mock())
-        viewModel.viewState.test {
-            cancelAndConsumeRemainingEvents()
-        }
-    }
-
-    @Test
-    fun whenRebrandingDisabledThenRebrandingEnabledViewStateFalse() = runTest {
-        whenever(subscriptionsManager.subscriptionStatus).thenReturn(flowOf(SubscriptionStatus.AUTO_RENEWABLE))
-        whenever(subscriptionsManager.getSubscriptionOffer()).thenReturn(emptyList())
-        whenever(subscriptionsManager.isFreeTrialEligible()).thenReturn(true)
-
-        viewModel.onCreate(mock())
-        viewModel.viewState.test {
-            cancelAndConsumeRemainingEvents()
-        }
-    }
-
     private val subscriptionOffer = SubscriptionOffer(
         planId = "test",
         offerId = null,

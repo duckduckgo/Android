@@ -47,6 +47,11 @@ class DuckAiShortcutSettingsActivity : DuckDuckGoActivity() {
             viewModel.onShowDuckChatInAddressBarToggled(isChecked)
         }
 
+    private val voiceSearchToggleListener =
+        CompoundButton.OnCheckedChangeListener { _, isChecked ->
+            viewModel.onShowDuckChatInVoiceSearchToggled(isChecked)
+        }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -71,6 +76,10 @@ class DuckAiShortcutSettingsActivity : DuckDuckGoActivity() {
         binding.showDuckAiInAddressBarToggle.apply {
             isVisible = viewState.shouldShowAddressBarToggle
             quietlySetIsChecked(viewState.showInAddressBar, addressBarToggleListener)
+        }
+        binding.showDuckAiInVoiceSearchToggle.apply {
+            isVisible = viewState.shouldShowVoiceSearchToggle
+            quietlySetIsChecked(viewState.showInVoiceSearch, voiceSearchToggleListener)
         }
     }
 }

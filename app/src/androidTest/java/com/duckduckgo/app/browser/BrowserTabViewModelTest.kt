@@ -75,6 +75,7 @@ import com.duckduckgo.app.browser.commands.Command.CloseCustomTab
 import com.duckduckgo.app.browser.commands.Command.EnqueueCookiesAnimation
 import com.duckduckgo.app.browser.commands.Command.EscapeMaliciousSite
 import com.duckduckgo.app.browser.commands.Command.HideBrokenSitePromptCta
+import com.duckduckgo.app.browser.commands.Command.HideKeyboard
 import com.duckduckgo.app.browser.commands.Command.HideOnboardingDaxBubbleCta
 import com.duckduckgo.app.browser.commands.Command.HideOnboardingDaxDialog
 import com.duckduckgo.app.browser.commands.Command.HideWarningMaliciousSite
@@ -935,6 +936,40 @@ class BrowserTabViewModelTest {
             testee.onViewVisible()
 
             assertCommandNotIssued<ShowKeyboard>()
+        }
+
+    @Test
+    fun whenOmnibarTypeSplitThenThenKeyboardShownOnlyTheFirstTimeNtpIsVisible() =
+        runTest {
+            whenever(mockExtendedOnboardingFeatureToggles.noBrowserCtas()).thenReturn(mockDisabledToggle)
+            whenever(mockWidgetCapabilities.hasInstalledWidgets).thenReturn(true)
+            testee.browserViewState.value = browserViewState().copy(browserShowing = false)
+            whenever(mockSettingsDataStore.omnibarType).thenReturn(OmnibarType.SPLIT)
+
+            testee.onViewVisible()
+
+            assertCommandIssued<ShowKeyboard>()
+
+            testee.onViewVisible()
+
+            assertCommandIssued<HideKeyboard>()
+        }
+
+    @Test
+    fun whenOmnibarTypeNotSplitThenThenKeyboardNotHiddenWhenOpenedMultipleTimes() =
+        runTest {
+            whenever(mockExtendedOnboardingFeatureToggles.noBrowserCtas()).thenReturn(mockDisabledToggle)
+            whenever(mockWidgetCapabilities.hasInstalledWidgets).thenReturn(true)
+            testee.browserViewState.value = browserViewState().copy(browserShowing = false)
+            whenever(mockSettingsDataStore.omnibarType).thenReturn(OmnibarType.SINGLE_TOP)
+
+            testee.onViewVisible()
+
+            assertCommandIssued<ShowKeyboard>()
+
+            testee.onViewVisible()
+
+            assertCommandNotIssued<HideKeyboard>()
         }
 
     @Test

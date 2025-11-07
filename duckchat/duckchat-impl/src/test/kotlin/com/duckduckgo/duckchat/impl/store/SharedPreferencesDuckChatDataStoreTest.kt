@@ -117,6 +117,11 @@ class SharedPreferencesDuckChatDataStoreTest {
     }
 
     @Test
+    fun whenGetShowInVoiceSearchDefaultThenReturnTrue() = runTest {
+        assertTrue(testee.getShowInVoiceSearch())
+    }
+
+    @Test
     fun `when isInputScreenUserSettingEnabled then return default value`() = runTest {
         assertFalse(testee.isInputScreenUserSettingEnabled())
     }
@@ -148,6 +153,12 @@ class SharedPreferencesDuckChatDataStoreTest {
     fun whenSetShowInAddressBarThenGetShowInAddressBarThenReturnValue() = runTest {
         testee.setShowInAddressBar(false)
         assertFalse(testee.getShowInAddressBar())
+    }
+
+    @Test
+    fun whenSetShowInVoiceSearchThenGetShowInVoiceSearchThenReturnValue() = runTest {
+        testee.setShowInVoiceSearch(false)
+        assertFalse(testee.getShowInVoiceSearch())
     }
 
     @Test
@@ -210,6 +221,20 @@ class SharedPreferencesDuckChatDataStoreTest {
         job.join()
 
         assertEquals(listOf(false, true), results)
+    }
+
+    @Test
+    fun whenObserveShowInVoiceSearchThenReceiveUpdates() = runTest {
+        val results = mutableListOf<Boolean>()
+        val job = launch {
+            testee.observeShowInVoiceSearch()
+                .take(2)
+                .toList(results)
+        }
+        testee.setShowInVoiceSearch(false)
+        job.join()
+
+        assertEquals(listOf(true, false), results)
     }
 
     @Test

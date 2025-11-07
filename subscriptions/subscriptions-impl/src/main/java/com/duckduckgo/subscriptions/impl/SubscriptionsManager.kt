@@ -99,6 +99,7 @@ import logcat.logcat
 import retrofit2.HttpException
 import java.io.IOException
 import java.math.BigDecimal
+import java.math.RoundingMode
 import java.text.NumberFormat
 import java.time.Duration
 import java.time.Instant
@@ -436,21 +437,43 @@ class RealSubscriptionsManager @Inject constructor(
                 ?.firstOrNull()
                 ?.formattedPrice ?: return@withContext null
 
-            // Calculate monthly equivalent for yearly plan
-            val (yearlyPriceAmount, yearlyPriceCurrency) = basePlans
+            // Get monthly and yearly price amounts for savings calculation
+            val monthlyPriceAmount = basePlans
+                .find { it.planId in listOf(MONTHLY_PLAN_US, MONTHLY_PLAN_ROW) }
+                ?.pricingPhases
+                ?.firstOrNull()
+                ?.priceAmount ?: return@withContext null
+
+            val yearlyPriceAmount = basePlans
                 .find { it.planId in listOf(YEARLY_PLAN_US, YEARLY_PLAN_ROW) }
                 ?.pricingPhases
                 ?.firstOrNull()
-                ?.let { it.priceAmount to it.priceCurrency } ?: return@withContext null
+                ?.priceAmount ?: return@withContext null
 
+            val yearlyPriceCurrency = basePlans
+                .find { it.planId in listOf(YEARLY_PLAN_US, YEARLY_PLAN_ROW) }
+                ?.pricingPhases
+                ?.firstOrNull()
+                ?.priceCurrency ?: return@withContext null
+
+            // Calculate monthly equivalent for yearly plan
             val yearlyMonthlyEquivalent = NumberFormat.getCurrencyInstance()
                 .apply { currency = yearlyPriceCurrency }
                 .format(yearlyPriceAmount / 12.toBigDecimal())
+
+            // Calculate savings percentage: ((monthly * 12 - yearly) / (monthly * 12)) * 100
+            // This represents the percentage saved by choosing yearly over 12 monthly payments
+            val totalMonthlyAnnual = monthlyPriceAmount * 12.toBigDecimal()
+            val savingsAmount = totalMonthlyAnnual - yearlyPriceAmount
+            val savingsPercentage = ((savingsAmount / totalMonthlyAnnual) * 100.toBigDecimal())
+                .setScale(0, RoundingMode.HALF_UP)
+                .toInt()
 
             SwitchPlanPricingInfo(
                 currentPrice = currentPrice,
                 targetPrice = targetPrice,
                 yearlyMonthlyEquivalent = yearlyMonthlyEquivalent,
+                savingsPercentage = savingsPercentage,
             )
         } catch (e: Exception) {
             logcat { "Subs: Failed to get switch plan pricing: ${e.message}" }
@@ -577,6 +600,7 @@ class RealSubscriptionsManager @Inject constructor(
         authRepository.setAccount(null)
         authRepository.setSubscription(null)
         authRepository.setEntitlements(emptyList())
+        authRepository.removeLocalPurchasedAt()
         _isSignedIn.emit(false)
         _subscriptionStatus.emit(UNKNOWN)
         _entitlements.emit(emptyList())
@@ -659,6 +683,7 @@ class RealSubscriptionsManager @Inject constructor(
                 pixelSender.reportSubscriptionActivated()
                 emitEntitlementsValues()
                 _currentPurchaseState.emit(CurrentPurchase.Success)
+                authRepository.registerLocalPurchasedAt()
                 subscriptionPurchaseWideEvent.onPurchaseConfirmationSuccess()
             } else {
                 handlePurchaseFailed()
@@ -1373,6 +1398,7 @@ data class SwitchPlanPricingInfo(
     val currentPrice: String,
     val targetPrice: String,
     val yearlyMonthlyEquivalent: String,
+    val savingsPercentage: Int,
 )
 
 data class ValidatedTokenPair(

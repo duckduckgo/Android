@@ -64,6 +64,10 @@ interface AuthRepository {
     suspend fun canSupportEncryption(): Boolean
     suspend fun setFeatures(basePlanId: String, features: Set<String>)
     suspend fun getFeatures(basePlanId: String): Set<String>
+    suspend fun isFreeTrialActive(): Boolean
+    suspend fun registerLocalPurchasedAt()
+    suspend fun getLocalPurchasedAt(): Long?
+    suspend fun removeLocalPurchasedAt()
 }
 
 @Module
@@ -232,6 +236,22 @@ internal class RealAuthRepository constructor(
     private suspend fun updateSerpPromoCookie() = withContext(dispatcherProvider.io()) {
         val accessToken = subscriptionsDataStore.run { accessTokenV2 ?: accessToken }
         serpPromo.injectCookie(accessToken)
+    }
+
+    override suspend fun isFreeTrialActive(): Boolean {
+        return subscriptionsDataStore.freeTrialActive
+    }
+
+    override suspend fun registerLocalPurchasedAt() {
+        subscriptionsDataStore.localPurchasedAt = System.currentTimeMillis()
+    }
+
+    override suspend fun getLocalPurchasedAt(): Long? {
+        return subscriptionsDataStore.localPurchasedAt
+    }
+
+    override suspend fun removeLocalPurchasedAt() {
+        subscriptionsDataStore.localPurchasedAt = null
     }
 }
 

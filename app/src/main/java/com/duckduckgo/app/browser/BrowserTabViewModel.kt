@@ -574,6 +574,7 @@ class BrowserTabViewModel @Inject constructor(
     @VisibleForTesting
     internal val autoCompleteStateFlow = MutableStateFlow("")
     private val fireproofWebsiteState: LiveData<List<FireproofWebsiteEntity>> = fireproofWebsiteRepository.getFireproofWebsites()
+    private var alreadyShownKeyboard = false
 
     @ExperimentalCoroutinesApi
     @FlowPreview
@@ -2988,7 +2989,12 @@ class BrowserTabViewModel @Inject constructor(
         val shouldHideKeyboard =
             cta is HomePanelCta || cta is DaxBubbleCta.DaxPrivacyProCta ||
                 duckAiFeatureState.showInputScreen.value || currentBrowserViewState().lastQueryOrigin == QueryOrigin.FromBookmark
-        command.value = if (shouldHideKeyboard) HideKeyboard else ShowKeyboard
+        command.value = if (shouldHideKeyboard || (settingsDataStore.omnibarType == OmnibarType.SPLIT && alreadyShownKeyboard)) {
+            HideKeyboard
+        } else {
+            alreadyShownKeyboard = true
+            ShowKeyboard
+        }
     }
 
     fun onUserClickCtaOkButton(cta: Cta) {

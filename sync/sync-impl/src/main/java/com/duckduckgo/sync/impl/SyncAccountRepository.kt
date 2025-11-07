@@ -41,6 +41,7 @@ import com.duckduckgo.sync.impl.SyncAuthCode.Connect
 import com.duckduckgo.sync.impl.SyncAuthCode.Exchange
 import com.duckduckgo.sync.impl.SyncAuthCode.Recovery
 import com.duckduckgo.sync.impl.SyncAuthCode.Unknown
+import com.duckduckgo.sync.impl.metrics.ConnectedDevicesObserver
 import com.duckduckgo.sync.impl.pixels.*
 import com.duckduckgo.sync.impl.ui.qrcode.SyncBarcodeUrl
 import com.duckduckgo.sync.impl.ui.qrcode.SyncBarcodeUrlWrapper
@@ -98,6 +99,7 @@ interface SyncAccountRepository {
 @SingleInstanceIn(AppScope::class)
 @WorkerThread
 class AppSyncAccountRepository @Inject constructor(
+    private val connectedDevicesObserver: ConnectedDevicesObserver,
     private val syncDeviceIds: SyncDeviceIds,
     private val nativeLib: SyncLib,
     private val syncApi: SyncApi,
@@ -632,11 +634,12 @@ class AppSyncAccountRepository @Inject constructor(
                         }
                     }.sortedWith { a, b ->
                         if (a.thisDevice) -1 else 1
-                    }.also {
+                    }.also { devices ->
                         connectedDevicesCached.apply {
                             clear()
-                            addAll(it)
+                            addAll(devices)
                         }
+                        connectedDevicesObserver.onDevicesUpdated(devices)
                     },
                 )
             }

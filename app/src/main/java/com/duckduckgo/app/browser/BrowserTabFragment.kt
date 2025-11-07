@@ -961,8 +961,15 @@ class BrowserTabFragment :
         voiceSearchLauncher.registerResultsCallback(this, requireActivity(), BROWSER) {
             when (it) {
                 is VoiceSearchLauncher.Event.VoiceRecognitionSuccess -> {
-                    omnibar.setText(it.result)
-                    userEnteredQuery(it.result)
+                    when (val result = it.result) {
+                        is VoiceSearchLauncher.VoiceRecognitionResult.SearchResult -> {
+                            omnibar.setText(result.query)
+                            userEnteredQuery(result.query)
+                        }
+                        is VoiceSearchLauncher.VoiceRecognitionResult.DuckAiResult -> {
+                            duckChat.openDuckChatWithAutoPrompt(result.query)
+                        }
+                    }
                     resumeWebView()
                 }
 
