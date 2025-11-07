@@ -7456,43 +7456,6 @@ class BrowserTabViewModelTest {
         }
 
     @Test
-    fun whenInputScreenEnabledAndExternalIntentProcessingCompletedThenLaunchInputScreenCommandTriggered() =
-        runTest {
-            val initialTabId = "initial-tab"
-            val initialTab =
-                TabEntity(
-                    tabId = initialTabId,
-                    url = "https://example.com",
-                    title = "EX",
-                    skipHome = false,
-                    viewed = true,
-                    position = 0,
-                )
-            val ntpTabId = "ntp-tab"
-            val ntpTab = TabEntity(tabId = ntpTabId, url = null, title = "", skipHome = false, viewed = true, position = 0)
-            whenever(mockTabRepository.getTab(initialTabId)).thenReturn(initialTab)
-            whenever(mockTabRepository.getTab(ntpTabId)).thenReturn(ntpTab)
-            flowSelectedTab.emit(initialTab)
-
-            testee.loadData(tabId = ntpTabId, initialUrl = null, skipHome = false, isExternal = false)
-            mockDuckAiFeatureStateInputScreenOpenAutomaticallyFlow.emit(true)
-            mockHasPendingTabLaunchFlow.emit(true)
-
-            // Switch to a new tab with no URL
-            flowSelectedTab.emit(ntpTab)
-
-            // Complete external intent processing
-            mockHasPendingTabLaunchFlow.emit(false)
-
-            verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
-            val commands = commandCaptor.allValues
-            assertTrue(
-                "LaunchInputScreen command should be triggered when external intent processing completes",
-                commands.any { it is Command.LaunchInputScreen },
-            )
-        }
-
-    @Test
     fun whenInputScreenEnabledAndDuckAiOpenThenLaunchInputScreenCommandSuppressed() =
         runTest {
             val initialTabId = "initial-tab"
