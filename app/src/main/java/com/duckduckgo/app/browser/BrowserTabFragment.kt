@@ -3149,7 +3149,7 @@ class BrowserTabFragment :
         } else {
             omnibar.omnibarTextInput.hideKeyboard()
 
-            // prevent a crash when the view is not initiliazed yet
+            // prevent a crash when the view is not initialized yet
             if (view != null) {
                 binding.focusDummy.requestFocus()
             }
