@@ -234,7 +234,7 @@ private fun DaxTextPreviewBox(
     content: @Composable () -> Unit,
 ) {
     DuckDuckGoTheme {
-        PreviewBox(backgroundColor = DuckDuckGoTheme.colors.background) {
+        PreviewBox(backgroundColor = { DuckDuckGoTheme.colors.background }) {
             content()
         }
     }
@@ -245,7 +245,7 @@ private fun DaxTextInvertedPreviewBox(
     content: @Composable () -> Unit,
 ) {
     DuckDuckGoTheme {
-        PreviewBox(backgroundColor = DuckDuckGoTheme.colors.backgroundInverted) {
+        PreviewBox(backgroundColor = { DuckDuckGoTheme.colors.backgroundInverted }) {
             content()
         }
     }
