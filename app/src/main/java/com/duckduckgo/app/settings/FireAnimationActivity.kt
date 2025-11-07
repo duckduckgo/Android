@@ -33,7 +33,6 @@ import com.duckduckgo.common.ui.view.setAndPropagateUpFitsSystemWindows
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.di.scopes.ActivityScope
-import javax.inject.Inject
 
 @InjectWith(ActivityScope::class)
 class FireAnimationActivity : DuckDuckGoActivity() {

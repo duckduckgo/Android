@@ -7122,7 +7122,6 @@ class BrowserTabViewModelTest {
             assertCommandIssued<Command.RefreshOmnibar>()
         }
 
-
     @Test
     fun whenSetBrowserBackgroundWithBuckOnboardingDisabledAndLightModeEnabledThenSetBrowserBackgroundCommandIssuedWithCorrectColor() {
         testee.setBrowserBackground(lightModeEnabled = true)

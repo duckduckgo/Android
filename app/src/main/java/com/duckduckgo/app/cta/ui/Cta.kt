@@ -18,20 +18,13 @@ package com.duckduckgo.app.cta.ui
 
 import android.content.Context
 import android.net.Uri
-import android.view.Gravity
 import android.view.View
-import android.view.ViewGroup
 import android.view.ViewPropertyAnimator
 import android.widget.ImageView
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.annotation.VisibleForTesting
 import androidx.core.content.ContextCompat
-import androidx.core.view.isInvisible
-import androidx.core.view.isVisible
-import androidx.core.view.updateLayoutParams
-import androidx.core.view.updatePadding
-import androidx.interpolator.view.animation.FastOutSlowInInterpolator
 import androidx.transition.AutoTransition
 import androidx.transition.TransitionManager
 import com.duckduckgo.app.browser.R
@@ -55,7 +48,6 @@ import com.duckduckgo.common.ui.view.button.DaxButton
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.view.text.DaxTextView
-import com.duckduckgo.common.ui.view.toPx
 import com.duckduckgo.common.utils.baseHost
 import com.duckduckgo.common.utils.extensions.html
 import com.google.android.material.button.MaterialButton
@@ -63,7 +55,6 @@ import kotlin.collections.forEachIndexed
 import kotlin.collections.toMutableList
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
-import com.duckduckgo.mobile.android.R as CommonR
 
 interface ViewCta {
     fun showCta(
