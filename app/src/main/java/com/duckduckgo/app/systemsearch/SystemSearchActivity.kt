@@ -419,7 +419,14 @@ class SystemSearchActivity : DuckDuckGoActivity() {
     private fun configureVoiceSearch() {
         voiceSearchLauncher.registerResultsCallback(this, this, WIDGET) {
             if (it is VoiceSearchLauncher.Event.VoiceRecognitionSuccess) {
-                viewModel.onVoiceSearchResult(it.result)
+                when (val result = it.result) {
+                    is VoiceSearchLauncher.VoiceRecognitionResult.SearchResult -> {
+                        viewModel.onVoiceSearchResult(result.query)
+                    }
+                    is VoiceSearchLauncher.VoiceRecognitionResult.DuckAiResult -> {
+                        viewModel.onDuckAiRequested(result.query)
+                    }
+                }
             } else if (it is VoiceSearchLauncher.Event.VoiceSearchDisabled) {
                 viewModel.onVoiceSearchStateChanged()
             }

@@ -27,15 +27,33 @@ interface VoiceSearchLauncher {
         onEvent: (Event) -> Unit,
     )
 
-    fun launch(activity: Activity)
+    fun launch(activity: Activity, mode: VoiceSearchMode? = null)
+
+    enum class VoiceSearchMode(val value: Int) {
+        SEARCH(0),
+        DUCK_AI(1),
+        ;
+
+        companion object {
+            fun fromValue(value: Int): VoiceSearchMode {
+                return entries.find { it.value == value } ?: SEARCH
+            }
+        }
+    }
 
     enum class Source(val paramValueName: String) {
         BROWSER("browser"),
         WIDGET("widget"),
     }
 
+    sealed class VoiceRecognitionResult {
+        abstract val query: String
+        data class SearchResult(override val query: String) : VoiceRecognitionResult()
+        data class DuckAiResult(override val query: String) : VoiceRecognitionResult()
+    }
+
     sealed class Event {
-        data class VoiceRecognitionSuccess(val result: String) : Event()
+        data class VoiceRecognitionSuccess(val result: VoiceRecognitionResult) : Event()
         data object SearchCancelled : Event()
         data object VoiceSearchDisabled : Event()
     }

@@ -23,6 +23,7 @@ import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Build
 import android.os.Bundle
+import androidx.core.view.isVisible
 import androidx.core.view.postDelayed
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
@@ -33,11 +34,14 @@ import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.extensions.capitalizeFirstLetter
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.duckchat.api.DuckAiFeatureState
+import com.duckduckgo.voice.api.VoiceSearchLauncher.VoiceSearchMode
 import com.duckduckgo.voice.impl.R
 import com.duckduckgo.voice.impl.databinding.ActivityVoiceSearchBinding
 import com.duckduckgo.voice.impl.listeningmode.VoiceSearchViewModel.Command
 import com.duckduckgo.voice.impl.listeningmode.ui.VoiceRecognizingIndicator.Action.INDICATOR_CLICKED
 import com.duckduckgo.voice.impl.listeningmode.ui.VoiceRecognizingIndicator.Model
+import com.google.android.material.tabs.TabLayout
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import javax.inject.Inject
@@ -46,11 +50,15 @@ import javax.inject.Inject
 class VoiceSearchActivity : DuckDuckGoActivity() {
     companion object {
         const val EXTRA_VOICE_RESULT = "extra.voice.result"
+        const val EXTRA_SELECTED_MODE = "extra.selected.mode"
+        const val EXTRA_INITIAL_MODE = "extra.initial.mode"
         const val DELAY_SPEAKNOW_REMINDER_MILLIS = 2000L
         const val VOICE_SEARCH_ERROR = 1
     }
 
     @Inject lateinit var appBuildConfig: AppBuildConfig
+
+    @Inject lateinit var duckAiFeatureState: DuckAiFeatureState
 
     private val viewModel: VoiceSearchViewModel by bindViewModel()
     private val binding: ActivityVoiceSearchBinding by viewBinding()
@@ -67,6 +75,8 @@ class VoiceSearchActivity : DuckDuckGoActivity() {
 
     @SuppressLint("NewApi")
     private fun configureViews() {
+        setInitialMode()
+
         if (appBuildConfig.sdkInt >= Build.VERSION_CODES.R) {
             window.setDecorFitsSystemWindows(false)
             window.statusBarColor = Color.TRANSPARENT
@@ -82,6 +92,28 @@ class VoiceSearchActivity : DuckDuckGoActivity() {
                 if (it.text.isEmpty()) it.text = getString(R.string.voiceSearchListening)
             }
         }
+        configureInputModeTabLayout()
+    }
+
+    private fun setInitialMode() {
+        val initialMode = intent.getIntExtra(EXTRA_INITIAL_MODE, VoiceSearchMode.SEARCH.value)
+        viewModel.updateSelectedMode(VoiceSearchMode.fromValue(initialMode))
+    }
+
+    private fun configureInputModeTabLayout() {
+        binding.inputModeTabLayout.addOnTabSelectedListener(
+            object : TabLayout.OnTabSelectedListener {
+                override fun onTabSelected(tab: TabLayout.Tab?) {
+                    tab?.let {
+                        viewModel.updateSelectedMode(VoiceSearchMode.fromValue(it.position))
+                    }
+                }
+                override fun onTabUnselected(tab: TabLayout.Tab?) {}
+                override fun onTabReselected(tab: TabLayout.Tab?) {}
+            },
+        )
+        val mode = viewModel.viewState().value.selectedMode
+        binding.inputModeTabLayout.getTabAt(mode.value)?.select()
     }
 
     private fun configureToolbar() {
@@ -127,6 +159,9 @@ class VoiceSearchActivity : DuckDuckGoActivity() {
             .flowWithLifecycle(lifecycle, Lifecycle.State.RESUMED)
             .onEach {
                 if (it.result.isNotEmpty()) updateText(it.result)
+                if (binding.inputModeTabLayout.selectedTabPosition != it.selectedMode.value) {
+                    binding.inputModeTabLayout.getTabAt(it.selectedMode.value)?.select()
+                }
             }.launchIn(lifecycleScope)
 
         viewModel.commands()
@@ -137,6 +172,13 @@ class VoiceSearchActivity : DuckDuckGoActivity() {
                     is Command.HandleSpeechRecognitionSuccess -> handleSuccess(it.result)
                     is Command.TerminateVoiceSearch -> handleError(it.error)
                 }
+            }
+            .launchIn(lifecycleScope)
+
+        duckAiFeatureState.showVoiceSearchToggle
+            .flowWithLifecycle(lifecycle, Lifecycle.State.RESUMED)
+            .onEach { showToggle ->
+                binding.inputModeTabLayout.isVisible = showToggle
             }
             .launchIn(lifecycleScope)
     }
@@ -150,6 +192,7 @@ class VoiceSearchActivity : DuckDuckGoActivity() {
             updateText(result)
             Intent().apply {
                 putExtra(EXTRA_VOICE_RESULT, result.capitalizeFirstLetter())
+                putExtra(EXTRA_SELECTED_MODE, viewModel.viewState().value.selectedMode.value)
                 setResult(Activity.RESULT_OK, this)
             }
         }

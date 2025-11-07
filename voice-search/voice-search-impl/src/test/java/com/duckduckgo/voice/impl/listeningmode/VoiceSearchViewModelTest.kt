@@ -18,9 +18,11 @@ package com.duckduckgo.voice.impl.listeningmode
 
 import app.cash.turbine.test
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.voice.api.VoiceSearchLauncher.VoiceSearchMode
 import com.duckduckgo.voice.impl.listeningmode.OnDeviceSpeechRecognizer.Event
 import com.duckduckgo.voice.impl.listeningmode.VoiceSearchViewModel.Command
 import com.duckduckgo.voice.impl.listeningmode.VoiceSearchViewModel.ViewState
+import com.duckduckgo.voice.store.VoiceSearchRepository
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.*
 import org.junit.Before
@@ -41,10 +43,13 @@ class VoiceSearchViewModelTest {
     @Mock
     private lateinit var speechRecognizer: OnDeviceSpeechRecognizer
 
+    @Mock
+    private lateinit var voiceSearchRepository: VoiceSearchRepository
+
     @Before
     fun setUp() {
         MockitoAnnotations.openMocks(this)
-        testee = VoiceSearchViewModel(speechRecognizer)
+        testee = VoiceSearchViewModel(speechRecognizer, voiceSearchRepository)
     }
 
     @Test
@@ -239,5 +244,29 @@ class VoiceSearchViewModelTest {
             assertEquals(Command.HandleSpeechRecognitionSuccess("Test"), expectMostRecentItem())
             cancelAndConsumeRemainingEvents()
         }
+    }
+
+    @Test
+    fun whenUpdateSelectedModeWithDuckAiThenUseDuckAiMode() = runTest {
+        testee.updateSelectedMode(VoiceSearchMode.DUCK_AI)
+
+        testee.viewState().test {
+            val state = expectMostRecentItem()
+            assertEquals(VoiceSearchMode.DUCK_AI, state.selectedMode)
+            cancelAndConsumeRemainingEvents()
+        }
+        verify(voiceSearchRepository).setLastSelectedMode(VoiceSearchMode.DUCK_AI)
+    }
+
+    @Test
+    fun whenUpdateSelectedModeWithSearchThenUseSearchMode() = runTest {
+        testee.updateSelectedMode(VoiceSearchMode.SEARCH)
+
+        testee.viewState().test {
+            val state = expectMostRecentItem()
+            assertEquals(VoiceSearchMode.SEARCH, state.selectedMode)
+            cancelAndConsumeRemainingEvents()
+        }
+        verify(voiceSearchRepository).setLastSelectedMode(VoiceSearchMode.SEARCH)
     }
 }

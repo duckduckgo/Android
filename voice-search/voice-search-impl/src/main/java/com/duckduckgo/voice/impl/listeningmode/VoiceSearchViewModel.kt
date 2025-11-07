@@ -20,6 +20,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.voice.api.VoiceSearchLauncher.VoiceSearchMode
 import com.duckduckgo.voice.impl.listeningmode.OnDeviceSpeechRecognizer.Event.PartialResultReceived
 import com.duckduckgo.voice.impl.listeningmode.OnDeviceSpeechRecognizer.Event.RecognitionFailed
 import com.duckduckgo.voice.impl.listeningmode.OnDeviceSpeechRecognizer.Event.RecognitionSuccess
@@ -27,6 +28,7 @@ import com.duckduckgo.voice.impl.listeningmode.OnDeviceSpeechRecognizer.Event.Re
 import com.duckduckgo.voice.impl.listeningmode.OnDeviceSpeechRecognizer.Event.VolumeUpdateReceived
 import com.duckduckgo.voice.impl.listeningmode.VoiceSearchViewModel.Command.HandleSpeechRecognitionSuccess
 import com.duckduckgo.voice.impl.listeningmode.VoiceSearchViewModel.Command.UpdateVoiceIndicator
+import com.duckduckgo.voice.store.VoiceSearchRepository
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
@@ -39,10 +41,12 @@ import javax.inject.Inject
 @ContributesViewModel(ActivityScope::class)
 class VoiceSearchViewModel @Inject constructor(
     private val speechRecognizer: OnDeviceSpeechRecognizer,
+    private val voiceSearchRepository: VoiceSearchRepository,
 ) : ViewModel() {
     data class ViewState(
         val result: String = "",
         val unsentResult: String = "",
+        val selectedMode: VoiceSearchMode = VoiceSearchMode.SEARCH,
     )
 
     sealed class Command {
@@ -151,5 +155,12 @@ class VoiceSearchViewModel @Inject constructor(
                 ),
             ),
         )
+    }
+
+    fun updateSelectedMode(selectedMode: VoiceSearchMode) {
+        viewModelScope.launch {
+            viewState.emit(viewState.value.copy(selectedMode = selectedMode))
+            voiceSearchRepository.setLastSelectedMode(selectedMode)
+        }
     }
 }
