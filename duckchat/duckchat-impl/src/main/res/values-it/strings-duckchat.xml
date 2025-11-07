@@ -49,9 +49,7 @@
     <string name="duck_ai_shortcut_settings_description">Scegli quali scorciatoie di Duck.ai visualizzare</string>
 
     <!-- Input Screen  -->
-    <string name="input_screen_search_tab">Ricerca</string>
     <string name="input_screen_search_hint">Cerca o digita l\'indirizzo</string>
-    <string name="input_screen_chat_tab">Duck.ai</string>
     <string name="input_screen_chat_hint">Chiedi in privato</string>
     <string name="input_screen_user_pref_without_ai">Solo ricerca</string>
     <string name="input_screen_user_pref_with_ai">Ricerca e Duck.ai</string>

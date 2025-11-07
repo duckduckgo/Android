@@ -49,9 +49,7 @@
     <string name="duck_ai_shortcut_settings_description">Hangi Duck.ai kısayollarının gösterileceğini seçin</string>
 
     <!-- Input Screen  -->
-    <string name="input_screen_search_tab">Arama yap</string>
     <string name="input_screen_search_hint">Adres ara veya gir</string>
-    <string name="input_screen_chat_tab">Duck.ai</string>
     <string name="input_screen_chat_hint">Özel olarak sor</string>
     <string name="input_screen_user_pref_without_ai">Yalnızca Arama</string>
     <string name="input_screen_user_pref_with_ai">Arama ve Duck.ai</string>

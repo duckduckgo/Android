@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.duckchat.impl.inputscreen.ui.view
+package com.duckduckgo.browser.ui.inputmode
 
 import android.content.Context
 import android.graphics.Color
@@ -24,9 +24,9 @@ import android.view.ViewOutlineProvider
 import android.widget.ImageView
 import androidx.core.content.ContextCompat
 import com.duckduckgo.anvil.annotations.InjectWith
+import com.duckduckgo.browser.ui.R
 import com.duckduckgo.common.ui.store.AppTheme
 import com.duckduckgo.di.scopes.ViewScope
-import com.duckduckgo.duckchat.impl.R
 import com.google.android.material.color.MaterialColors
 import com.google.android.material.shape.CornerFamily
 import com.google.android.material.shape.MaterialShapeDrawable

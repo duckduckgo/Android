@@ -13,12 +13,10 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
-
+<!-- smartling.entity_escaping = false -->
+<!-- smartling.instruction_attributes = instruction -->
 <resources>
-    <dimen name="inputScreenUserPrefToggleSpacing">16dp</dimen>
-    <dimen name="inputScreenOmnibarCardExtendedMarginHorizontal">@dimen/omnibarCardMarginHorizontal</dimen>
-    <dimen name="inputScreenOmnibarCardMarginHorizontal">4dp</dimen>
-    <dimen name="inputScreenMarginHorizontal">0dp</dimen>
-    <dimen name="inputScreenAutocompleteListBottomSpace">64dp</dimen>
-    <dimen name="inputScreenContentSeparatorHeight">0.5dp</dimen>
+    <!-- Input Mode Tab Layout -->
+    <string name="input_mode_search_tab">Søg</string>
+    <string name="input_mode_chat_tab">Duck.ai</string>
 </resources>
