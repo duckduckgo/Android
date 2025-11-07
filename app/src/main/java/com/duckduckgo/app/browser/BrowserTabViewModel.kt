@@ -602,6 +602,7 @@ class BrowserTabViewModel @Inject constructor(
     private var isLinkOpenedInNewTab = false
     private var allowlistRefreshTriggerJob: Job? = null
     private var isCustomTabScreen: Boolean = false
+    private var alreadyShownKeyboard: Boolean = false
 
     private val fireproofWebsitesObserver =
         Observer<List<FireproofWebsiteEntity>> {
