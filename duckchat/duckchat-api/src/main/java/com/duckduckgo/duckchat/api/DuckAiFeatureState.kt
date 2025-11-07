@@ -68,4 +68,9 @@ interface DuckAiFeatureState {
      * Indicates whether the Input Mode toggle should be shown in the voice search screen.
      */
     val showVoiceSearchToggle: StateFlow<Boolean>
+
+    /**
+     * Indicates whether Duck.ai fullscreen is enabled but the feature flag and the user selection
+     */
+    val isFullScreenModeEnabled: StateFlow<Boolean>
 }

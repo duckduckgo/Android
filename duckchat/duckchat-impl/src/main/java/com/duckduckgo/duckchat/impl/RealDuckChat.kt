@@ -449,6 +449,8 @@ class RealDuckChat @Inject constructor(
 
     override val showVoiceSearchToggle: StateFlow<Boolean> = _showVoiceSearchToggle.asStateFlow()
 
+    override val isFullScreenModeEnabled: StateFlow<Boolean> = _fullscreenModeEnabled
+
     override val chatState: StateFlow<ChatState> = _chatState.asStateFlow()
 
     override fun isImageUploadEnabled(): Boolean = isImageUploadEnabled
@@ -726,7 +728,7 @@ class RealDuckChat @Inject constructor(
             val showClearChatHistory = clearChatHistory
             _showClearDuckAIChatHistory.emit(showClearChatHistory)
 
-            val fullscreenModeEnabled = isFullscreenModeEnabled
+            val fullscreenModeEnabled = isDuckChatFullScreenModeFeatureAvailable() && duckChatFeatureRepository.isFullScreenModeUserSettingEnabled()
             _fullscreenModeEnabled.emit(fullscreenModeEnabled)
 
             val showVoiceSearchToggle =
