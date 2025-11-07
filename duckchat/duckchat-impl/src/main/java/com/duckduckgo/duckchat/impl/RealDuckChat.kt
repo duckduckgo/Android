@@ -287,7 +287,6 @@ class RealDuckChat @Inject constructor(
     private val _showNewAddressBarOptionChoiceScreen = MutableStateFlow(false)
     private val _showClearDuckAIChatHistory = MutableStateFlow(true)
     private val _showMainButtonsInInputScreen = MutableStateFlow(false)
-    private val _fullscreenModeEnabled = MutableStateFlow(false)
 
     private val _chatState = MutableStateFlow(ChatState.HIDE)
     private val keepSession = MutableStateFlow(false)
@@ -725,9 +724,6 @@ class RealDuckChat @Inject constructor(
 
             val showClearChatHistory = clearChatHistory
             _showClearDuckAIChatHistory.emit(showClearChatHistory)
-
-            val fullscreenModeEnabled = isFullscreenModeEnabled
-            _fullscreenModeEnabled.emit(fullscreenModeEnabled)
 
             val showVoiceSearchToggle =
                 duckChatFeatureRepository.shouldShowInVoiceSearch() &&

@@ -1150,6 +1150,7 @@ class BrowserTabFragment :
     }
 
     private fun launchInputScreen(query: String) {
+        logcat { "Duck.ai: launchInputScreen" }
         val isTopOmnibar = omnibar.omnibarType != OmnibarType.SINGLE_BOTTOM
         val intent =
             globalActivityStarter.startIntent(

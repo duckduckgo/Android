@@ -26,9 +26,9 @@ import com.duckduckgo.subscriptions.api.Subscriptions
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
@@ -47,15 +47,15 @@ class DuckChatWebViewViewModel @Inject constructor(
         val isFullScreenModeEnabled: Boolean = false,
     )
 
-    val viewState = duckChat.observeFullscreenModeUserSetting()
-        .map { isFullScreenModeEnabled ->
-            ViewState(isFullScreenModeEnabled = isFullScreenModeEnabled)
-        }
-        .stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(), // Using a 5-second timeout is best practice
-            initialValue = ViewState(),
-        )
+    val viewState =
+        combine(
+            duckChat.observeInputScreenUserSettingEnabled(),
+            duckChat.observeFullscreenModeUserSetting(),
+        ) { isInputScreenEnabled, isFullScreenModeEnabled ->
+            ViewState(
+                isFullScreenModeEnabled = isFullScreenModeEnabled && isInputScreenEnabled,
+            )
+        }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), ViewState())
 
     sealed class Command {
         data object SendSubscriptionAuthUpdateEvent : Command()

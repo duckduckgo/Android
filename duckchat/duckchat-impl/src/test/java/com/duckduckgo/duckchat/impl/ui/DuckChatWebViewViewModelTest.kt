@@ -144,6 +144,7 @@ class DuckChatWebViewViewModelTest {
     @Test
     fun `fullscreen mode - when flags enabled, then viewstate enabled`() =
         runTest {
+            whenever(duckChat.observeInputScreenUserSettingEnabled()).thenReturn(flowOf(true))
             whenever(duckChat.observeFullscreenModeUserSetting()).thenReturn(flowOf(true))
             viewModel = DuckChatWebViewViewModel(
                 subscriptions,
@@ -159,7 +160,24 @@ class DuckChatWebViewViewModelTest {
     @Test
     fun `fullscreen mode - when flags disabled, then viewstate disabled`() =
         runTest {
+            whenever(duckChat.observeInputScreenUserSettingEnabled()).thenReturn(flowOf(true))
             whenever(duckChat.observeFullscreenModeUserSetting()).thenReturn(flowOf(false))
+            viewModel = DuckChatWebViewViewModel(
+                subscriptions,
+                duckChat = duckChat,
+            )
+
+            viewModel.viewState.test {
+                val state = awaitItem()
+                assertFalse(state.isFullScreenModeEnabled)
+            }
+        }
+
+    @Test
+    fun `fullscreen mode - when input scree disabled, then viewstate disabled`() =
+        runTest {
+            whenever(duckChat.observeInputScreenUserSettingEnabled()).thenReturn(flowOf(false))
+            whenever(duckChat.observeFullscreenModeUserSetting()).thenReturn(flowOf(true))
             viewModel = DuckChatWebViewViewModel(
                 subscriptions,
                 duckChat = duckChat,
