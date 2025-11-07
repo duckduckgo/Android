@@ -1013,8 +1013,8 @@ open class BrowserActivity : DuckDuckGoActivity() {
                             tabSwitcherActivityResult.launch(intent)
                         }
                         is DuckChatSharedViewModel.Command.SearchRequested -> {
-                            currentTab?.submitQuery(command.query)
                             closeDuckChat()
+                            currentTab?.submitQuery(command.query)
                         }
 
                         is DuckChatSharedViewModel.Command.OpenTab -> {

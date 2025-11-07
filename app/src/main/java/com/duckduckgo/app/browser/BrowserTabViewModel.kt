@@ -380,7 +380,6 @@ import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.distinctUntilChangedBy
 import kotlinx.coroutines.flow.drop
-import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOn
@@ -677,6 +676,7 @@ class BrowserTabViewModel @Inject constructor(
         }
 
     init {
+        logcat { "Duck.ai: init" }
         initializeViewStates()
 
         fireproofWebsiteState.observeForever(fireproofWebsitesObserver)
@@ -775,33 +775,24 @@ class BrowserTabViewModel @Inject constructor(
             }.launchIn(viewModelScope)
 
         // auto-launch input screen for new, empty tabs (New Tab Page)
-        combine(
-            externalIntentProcessingState.hasPendingTabLaunch,
-            externalIntentProcessingState.hasPendingDuckAiOpen,
-        ) { hasPendingTabLaunch, hasPendingDuckAiOpen ->
-            hasPendingTabLaunch || hasPendingDuckAiOpen
-        }.flatMapLatest {
-            if (it) {
-                // suppress auto-launch while processing external intents (for example, opening links from other apps)
-                // this prevents the New Tab Page from incorrectly triggering the input screen when the app
-                // is started via external intent while previously left on NTP
-                emptyFlow()
-            } else {
-                tabRepository.flowSelectedTab
-                    .distinctUntilChangedBy { selectedTab -> selectedTab?.tabId } // only observe when the tab changes and ignore further updates
-                    .filter { selectedTab ->
-                        // fire event when activating a new, empty tab
-                        // (has no URL and wasn't opened from another tab)
-                        val showInputScreenAutomatically = duckAiFeatureState.showInputScreenAutomaticallyOnNewTab.value
-                        val isActiveTab = ::tabId.isInitialized && selectedTab?.tabId == tabId
-                        val isOpenedFromAnotherTab = selectedTab?.sourceTabId != null
-                        showInputScreenAutomatically && isActiveTab && selectedTab?.url.isNullOrBlank() && !isOpenedFromAnotherTab
-                    }.flowOn(dispatchers.main()) // don't use the immediate dispatcher so that the tabId field has a chance to initialize
-            }
-        }.onEach {
-            // whenever an event fires, so the user switched to a new tab page, launch the input screen
-            command.value = LaunchInputScreen
-        }.launchIn(viewModelScope)
+        tabRepository.flowSelectedTab
+            .distinctUntilChangedBy { selectedTab -> selectedTab?.tabId } // only observe when the tab changes and ignore further updates
+            .filter { selectedTab ->
+                // fire event when activating a new, empty tab
+                // (has no URL and wasn't opened from another tab)
+                val showInputScreenAutomatically = duckAiFeatureState.showInputScreenAutomaticallyOnNewTab.value
+                val isActiveTab = ::tabId.isInitialized && selectedTab?.tabId == tabId
+                val isOpenedFromAnotherTab = selectedTab?.sourceTabId != null
+                showInputScreenAutomatically && isActiveTab && selectedTab?.url.isNullOrBlank() && !isOpenedFromAnotherTab
+            }.flowOn(dispatchers.main()) // don't use the immediate dispatcher so that the tabId field has a chance to initialize
+            .onEach {
+                val hasPendingTabLaunch = externalIntentProcessingState.hasPendingTabLaunch.value
+                val hasPendingDuckAiOpen = externalIntentProcessingState.hasPendingDuckAiOpen.value
+                if (!hasPendingTabLaunch && !hasPendingDuckAiOpen) {
+                    // whenever an event fires, so the user switched to a new tab page, launch the input screen
+                    command.value = LaunchInputScreen
+                }
+            }.launchIn(viewModelScope)
     }
 
     fun loadData(
@@ -2989,8 +2980,10 @@ class BrowserTabViewModel @Inject constructor(
         val shouldHideKeyboard =
             cta is HomePanelCta || cta is DaxBubbleCta.DaxPrivacyProCta ||
                 duckAiFeatureState.showInputScreen.value || currentBrowserViewState().lastQueryOrigin == QueryOrigin.FromBookmark ||
-                (settingsDataStore.omnibarType == OmnibarType.SPLIT && alreadyShownKeyboard) ||
-                duckAiFeatureState.isFullScreenModeEnabled.value
+                (settingsDataStore.omnibarType == OmnibarType.SPLIT && alreadyShownKeyboard)
+
+        logcat { "Duck.ai: fullscreenEnabled: ${duckAiFeatureState.isFullScreenModeEnabled.value}" }
+        logcat { "Duck.ai: shouldHideKeyboard: $shouldHideKeyboard" }
 
         command.value = if (shouldHideKeyboard) {
             HideKeyboard
