@@ -184,10 +184,7 @@ class RealVoiceSearchActivityLauncherTest {
 
     @Test
     fun whenResultFromVoiceSearchIsOkThenResetDismissedCounter() {
-        var lastKnownEvent: Event? = null
-        testee.registerResultsCallback(mock(), mock(), BROWSER) {
-            lastKnownEvent = it
-        }
+        testee.registerResultsCallback(mock(), mock(), BROWSER) { }
         whenever(voiceSearchRepository.countVoiceSearchDismissed()).thenReturn(1)
 
         val lastKnownRequest = activityResultLauncherWrapper.lastKnownRequest as ActivityResultLauncherWrapper.Request.ResultFromVoiceSearch
@@ -195,6 +192,50 @@ class RealVoiceSearchActivityLauncherTest {
 
         verify(voiceSearchRepository).resetVoiceSearchDismissed()
         verify(voiceSearchRepository, never()).dismissVoiceSearch()
+    }
+
+    @Test
+    fun whenResultFromVoiceSearchWithSearchModeAndToggleEnabledThenFireSerpDonePixel() {
+        showVoiceSearchToggleFlow.value = true
+        testee.registerResultsCallback(mock(), mock(), BROWSER) { }
+
+        val lastKnownRequest = activityResultLauncherWrapper.lastKnownRequest as ActivityResultLauncherWrapper.Request.ResultFromVoiceSearch
+        lastKnownRequest.onResult(Activity.RESULT_OK, "Result", VoiceSearchMode.SEARCH)
+
+        verify(pixel).fire(VoiceSearchPixelNames.VOICE_SEARCH_SERP_DONE, mapOf("source" to "browser"))
+    }
+
+    @Test
+    fun whenResultFromVoiceSearchWithSearchModeAndToggleDisabledThenDoNotFireSerpDonePixel() {
+        showVoiceSearchToggleFlow.value = false
+        testee.registerResultsCallback(mock(), mock(), BROWSER) { }
+
+        val lastKnownRequest = activityResultLauncherWrapper.lastKnownRequest as ActivityResultLauncherWrapper.Request.ResultFromVoiceSearch
+        lastKnownRequest.onResult(Activity.RESULT_OK, "Result", VoiceSearchMode.SEARCH)
+
+        verify(pixel, never()).fire(VoiceSearchPixelNames.VOICE_SEARCH_SERP_DONE, mapOf("source" to "browser"))
+    }
+
+    @Test
+    fun whenResultFromVoiceSearchWithDuckAiModeAndToggleEnabledThenFireAiChatDonePixel() {
+        showVoiceSearchToggleFlow.value = true
+        testee.registerResultsCallback(mock(), mock(), BROWSER) { }
+
+        val lastKnownRequest = activityResultLauncherWrapper.lastKnownRequest as ActivityResultLauncherWrapper.Request.ResultFromVoiceSearch
+        lastKnownRequest.onResult(Activity.RESULT_OK, "Result", VoiceSearchMode.DUCK_AI)
+
+        verify(pixel).fire(VoiceSearchPixelNames.VOICE_SEARCH_AICHAT_DONE, mapOf("source" to "browser"))
+    }
+
+    @Test
+    fun whenResultFromVoiceSearchWithDuckAiModeAndToggleDisabledThenDoNotFireAiChatDonePixel() {
+        showVoiceSearchToggleFlow.value = false
+        testee.registerResultsCallback(mock(), mock(), BROWSER) { }
+
+        val lastKnownRequest = activityResultLauncherWrapper.lastKnownRequest as ActivityResultLauncherWrapper.Request.ResultFromVoiceSearch
+        lastKnownRequest.onResult(Activity.RESULT_OK, "Result", VoiceSearchMode.DUCK_AI)
+
+        verify(pixel, never()).fire(VoiceSearchPixelNames.VOICE_SEARCH_AICHAT_DONE, mapOf("source" to "browser"))
     }
 
     @Test
