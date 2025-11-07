@@ -62,7 +62,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/speechResults" />
 
-    <com.duckduckgo.common.ui.view.tablayout.InputModeTabLayout
+    <com.duckduckgo.browser.ui.inputmode.InputModeTabLayout
         android:id="@+id/inputModeTabLayout"
         style="@style/Widget.DuckDuckGo.TabLayout.Rounded"
         android:layout_width="wrap_content"
@@ -84,7 +84,7 @@
             android:layout_height="wrap_content"
             android:layout="@layout/view_chat_tab_indicator" />
 
-    </com.duckduckgo.common.ui.view.tablayout.InputModeTabLayout>
+    </com.duckduckgo.browser.ui.inputmode.InputModeTabLayout>
 
     <com.duckduckgo.common.ui.view.text.DaxTextView
         android:id="@+id/footer"
