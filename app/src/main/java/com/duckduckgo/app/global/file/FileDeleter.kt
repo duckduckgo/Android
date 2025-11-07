@@ -60,7 +60,18 @@ class AndroidFileDeleter(private val dispatchers: DispatcherProvider) : FileDele
             runCatching {
                 val files = parentDirectory.listFiles() ?: return@withContext
                 val filesToDelete = files.filterNot { excludedFiles.contains(it.name) }
-                filesToDelete.forEach { it.deleteRecursively() }
+                filesToDelete.forEach { file ->
+                    try {
+                        val success = file.deleteRecursively()
+                        if (success) {
+                            logcat(INFO) { "Deleted file: ${file.name}" }
+                        } else {
+                            logcat(ERROR) { "Failed to delete file: ${file.name}" }
+                        }
+                    } catch (e: Exception) {
+                        logcat(ERROR) { "Error deleting file ${file.name}: ${e.message}" }
+                    }
+                }
             }.onFailure {
                 logcat(ERROR) { "Failed to delete contents of directory: $parentDirectory" }
             }
@@ -70,7 +81,16 @@ class AndroidFileDeleter(private val dispatchers: DispatcherProvider) : FileDele
     override suspend fun deleteDirectory(directoryToDelete: File) {
         logcat(INFO) { "Deleting directory: $directoryToDelete" }
         withContext(dispatchers.io()) {
-            directoryToDelete.deleteRecursively()
+            runCatching {
+                val success = directoryToDelete.deleteRecursively()
+                if (success) {
+                    logcat(INFO) { "Successfully deleted directory: $directoryToDelete" }
+                } else {
+                    logcat(ERROR) { "Failed to delete directory: $directoryToDelete" }
+                }
+            }.onFailure {
+                logcat(ERROR) { "Error while deleting directory: ${it.message}" }
+            }
         }
     }
 
@@ -80,9 +100,27 @@ class AndroidFileDeleter(private val dispatchers: DispatcherProvider) : FileDele
     ) {
         logcat(INFO) { "Deleting files from directory: $parentDirectory" }
         withContext(dispatchers.io()) {
-            val allFiles = parentDirectory.listFiles() ?: return@withContext
-            val filesToDelete = allFiles.filter { files.contains(it.name) }
-            filesToDelete.forEach { it.deleteRecursively() }
+            runCatching {
+                val allFiles = parentDirectory.listFiles() ?: return@withContext
+                val filesToDelete = allFiles.filter { files.contains(it.name) }
+                val results = filesToDelete.map { file ->
+                    try {
+                        val success = file.deleteRecursively()
+                        if (!success) {
+                            logcat(ERROR) { "Failed to delete file: ${file.name}" }
+                        }
+                        success
+                    } catch (e: Exception) {
+                        logcat(ERROR) { "Error deleting file ${file.name}: ${e.message}" }
+                        false
+                    }
+                }
+
+                val deletedCount = results.count { it }
+                logcat(INFO) { "Successfully deleted $deletedCount/${filesToDelete.size} files" }
+            }.onFailure {
+                logcat(ERROR) { "Failed to process file deletion: ${it.message}" }
+            }
         }
     }
 }
