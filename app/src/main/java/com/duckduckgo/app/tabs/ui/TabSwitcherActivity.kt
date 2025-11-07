@@ -39,6 +39,7 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.OnScrollListener
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.R
+import com.duckduckgo.app.browser.api.OmnibarRepository
 import com.duckduckgo.app.browser.databinding.ActivityTabSwitcherBinding
 import com.duckduckgo.app.browser.databinding.PopupTabsMenuBinding
 import com.duckduckgo.app.browser.favicon.FaviconManager
@@ -165,6 +166,9 @@ class TabSwitcherActivity :
     @Inject
     lateinit var onboardingExperimentFireAnimationHelper: OnboardingExperimentFireAnimationHelper
 
+    @Inject
+    lateinit var omnibarRepository: OmnibarRepository
+
     private val viewModel: TabSwitcherViewModel by bindViewModel()
 
     private val tabsAdapter: TabSwitcherAdapter by lazy {
@@ -253,21 +257,26 @@ class TabSwitcherActivity :
     }
 
     private fun configureNavigationBar() {
-        binding.navigationBar.browserNavigationBarObserver =
-            object : BrowserNavigationBarObserver {
-                override fun onMenuButtonClicked() {
-                    showPopupMenu(binding.navigationBar.popupMenuAnchor.id)
-                }
+        if (omnibarRepository.omnibarType == OmnibarType.SPLIT) {
+            binding.navigationBar.browserNavigationBarObserver =
+                object : BrowserNavigationBarObserver {
+                    override fun onMenuButtonClicked() {
+                        showPopupMenu(binding.navigationBar.popupMenuAnchor.id)
+                    }
 
-                override fun onNewTabButtonClicked() {
-                    viewModel.onNewTabRequested()
-                }
+                    override fun onNewTabButtonClicked() {
+                        viewModel.onNewTabRequested()
+                    }
 
-                override fun onFireButtonClicked() {
-                    viewModel.onFireButtonTapped()
+                    override fun onFireButtonClicked() {
+                        viewModel.onFireButtonTapped()
+                    }
                 }
-            }
-        binding.navigationBar.setViewMode(BrowserNavigationBarView.ViewMode.TabManager)
+            binding.navigationBar.setViewMode(BrowserNavigationBarView.ViewMode.TabManager)
+            binding.navigationBar.show()
+        } else {
+            binding.navigationBar.gone()
+        }
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
