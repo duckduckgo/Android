@@ -171,6 +171,11 @@
     <string name="activityPir" translatable="false">Privacy Pro</string>
     <string name="activitySendFeedback">Envoyer vos remarques</string>
 
+    <!-- Dynamic Switch % -->
+    <string name="switchBottomSheetDynamicTitleUpgrade" instruction="%1$s is the savings percentage when switching from monthly to yearly (e.g. 16)">Économisez %1$s %% avec\nun forfait annuel !</string>
+    <string name="switchBottomSheetDynamicTitleDowngrade" instruction="%1$s is the savings percentage when using a yearly plan instead of monthly (e.g. 16)">Vous économisez %1$s %% avec\nun forfait annuel !</string>
+    <string name="subscriptionSettingSwitchUpgradeDynamic" instruction="%1$s is the savings percentage when switching from monthly to yearly (e.g. 16)">Passez au forfait annuel et économisez %1$s %%</string>
+
     <!-- Privacy Pro Rebranding-->
     <string name="subscriptionSettingRebrandingMessage">Privacy Pro s\'appelle désormais simplement l\'abonnement DuckDuckGo</string>
 

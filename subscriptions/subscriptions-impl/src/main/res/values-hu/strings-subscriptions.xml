@@ -171,6 +171,11 @@
     <string name="activityPir" translatable="false">Privacy Pro</string>
     <string name="activitySendFeedback">Visszajelzés küldése</string>
 
+    <!-- Dynamic Switch % -->
+    <string name="switchBottomSheetDynamicTitleUpgrade" instruction="%1$s is the savings percentage when switching from monthly to yearly (e.g. 16)">Spórolj %1$s%%-ot\naz éves csomaggal!</string>
+    <string name="switchBottomSheetDynamicTitleDowngrade" instruction="%1$s is the savings percentage when using a yearly plan instead of monthly (e.g. 16)">%1$s%%-ot takarítasz meg\naz éves előfizetéssel!</string>
+    <string name="subscriptionSettingSwitchUpgradeDynamic" instruction="%1$s is the savings percentage when switching from monthly to yearly (e.g. 16)">Válts éves előfizetésre, és takaríts meg %1$s%%-ot</string>
+
     <!-- Privacy Pro Rebranding-->
     <string name="subscriptionSettingRebrandingMessage">A Privacy Pro mostantól egyszerűen DuckDuckGo-előfizetés néven fut</string>
 
