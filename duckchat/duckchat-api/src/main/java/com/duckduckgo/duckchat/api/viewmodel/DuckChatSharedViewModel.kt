@@ -33,7 +33,7 @@ class DuckChatSharedViewModel() : ViewModel() {
         }
     }
 
-    fun onTabSwitcherCLicked() {
+    fun onTabSwitcherClicked() {
         viewModelScope.launch {
             _command.send(Command.LaunchTabSwitcher)
         }

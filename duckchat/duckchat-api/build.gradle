@@ -36,6 +36,21 @@ dependencies {
     implementation AndroidX.appCompat
 
     coreLibraryDesugaring Android.tools.desugarJdkLibs
+
+    testImplementation Testing.junit4
+    testImplementation "org.mockito.kotlin:mockito-kotlin:_"
+    testImplementation project(path: ':common-test')
+    testImplementation "androidx.test.ext:junit-ktx:_"
+    testImplementation project(':feature-toggles-test')
+    testImplementation CashApp.turbine
+    testImplementation Testing.robolectric
+    testImplementation(KotlinX.coroutines.test) {
+        // https://github.com/Kotlin/kotlinx.coroutines/issues/2023
+        // conflicts with mockito due to direct inclusion of byte buddy
+        exclude group: "org.jetbrains.kotlinx", module: "kotlinx-coroutines-debug"
+    }
+    testImplementation AndroidX.lifecycle.runtime.testing
+    testImplementation AndroidX.archCore.testing
 }
 
 

@@ -118,7 +118,7 @@ open class DuckChatWebViewFragment : DuckDuckGoFragment(R.layout.activity_duck_c
         ViewModelProvider(this, viewModelFactory)[DuckChatWebViewViewModel::class.java]
     }
 
-    private val sharedViewModel: DuckChatSharedViewModel by activityViewModels()
+    private val browseSharedViewModel: DuckChatSharedViewModel by activityViewModels()
 
     @Inject
     lateinit var webViewClient: DuckChatWebViewClient
@@ -386,11 +386,11 @@ open class DuckChatWebViewFragment : DuckDuckGoFragment(R.layout.activity_duck_c
         duckChatOmnibar?.setOmnibarItemPressedListener(
             object : DuckChatOmnibarLayout.ItemPressedListener {
                 override fun onTabsButtonPressed() {
-                    sharedViewModel.onTabSwitcherCLicked()
+                    browseSharedViewModel.onTabSwitcherClicked()
                 }
 
                 override fun onFireButtonPressed() {
-                    sharedViewModel.onFireButtonClicked()
+                    browseSharedViewModel.onFireButtonClicked()
                 }
 
                 override fun onBrowserMenuPressed() {
@@ -439,13 +439,13 @@ open class DuckChatWebViewFragment : DuckDuckGoFragment(R.layout.activity_duck_c
             when (result.resultCode) {
                 InputScreenActivityResultCodes.NEW_SEARCH_REQUESTED -> {
                     data?.getStringExtra(InputScreenActivityResultParams.SEARCH_QUERY_PARAM)?.let { query ->
-                        sharedViewModel.onSearchRequested(query)
+                        browseSharedViewModel.onSearchRequested(query)
                     }
                 }
 
                 InputScreenActivityResultCodes.SWITCH_TO_TAB_REQUESTED -> {
                     data?.getStringExtra(InputScreenActivityResultParams.TAB_ID_PARAM)?.let { tabId ->
-                        sharedViewModel.openExistingTab(tabId)
+                        browseSharedViewModel.openExistingTab(tabId)
                     }
                 }
 
@@ -453,11 +453,11 @@ open class DuckChatWebViewFragment : DuckDuckGoFragment(R.layout.activity_duck_c
                 }
 
                 InputScreenActivityResultCodes.TAB_SWITCHER_REQUESTED -> {
-                    sharedViewModel.onTabSwitcherCLicked()
+                    browseSharedViewModel.onTabSwitcherClicked()
                 }
 
                 InputScreenActivityResultCodes.FIRE_BUTTON_REQUESTED -> {
-                    sharedViewModel.onFireButtonClicked()
+                    browseSharedViewModel.onFireButtonClicked()
                 }
             }
         }
