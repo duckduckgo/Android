@@ -30,4 +30,9 @@
         <item name="tabGravity">center</item>
         <item name="tabInlineLabel">true</item>
     </style>
+
+    <style name="Widget.DuckDuckGo.SettingsPictogram">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">@dimen/extraLargeShapeCornerRadius</item>
+    </style>
 </resources>

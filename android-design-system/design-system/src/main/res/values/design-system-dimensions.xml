@@ -32,6 +32,7 @@
     <dimen name="smallShapeCornerRadius">8dp</dimen>
     <dimen name="mediumShapeCornerRadius">12dp</dimen>
     <dimen name="largeShapeCornerRadius">16dp</dimen>
+    <dimen name="extraLargeShapeCornerRadius">24dp</dimen>
 
     <!-- App Components -->
     <dimen name="changeAppIconSize">75dp</dimen>
