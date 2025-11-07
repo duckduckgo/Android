@@ -26,7 +26,6 @@ import com.duckduckgo.js.messaging.api.JsCallbackData
 import com.duckduckgo.js.messaging.api.SubscriptionEventData
 import com.duckduckgo.navigation.api.GlobalActivityStarter.ActivityParams
 import com.duckduckgo.networkprotection.api.NetworkProtectionAccessState
-import com.duckduckgo.subscriptions.api.SubscriptionRebrandingFeatureToggle
 import com.duckduckgo.subscriptions.api.SubscriptionStatus
 import com.duckduckgo.subscriptions.impl.CurrentPurchase
 import com.duckduckgo.subscriptions.impl.JSONObjectAdapter
@@ -58,7 +57,6 @@ import com.duckduckgo.subscriptions.impl.pixels.SubscriptionFailureErrorType
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
 import com.duckduckgo.subscriptions.impl.repository.isActive
 import com.duckduckgo.subscriptions.impl.repository.isExpired
-import com.duckduckgo.subscriptions.impl.settings.views.ProSettingViewModel.ViewState
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Command.*
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.PurchaseStateView.Failure
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.PurchaseStateView.InProgress
@@ -89,7 +87,6 @@ class SubscriptionWebViewViewModel @Inject constructor(
     private val networkProtectionAccessState: NetworkProtectionAccessState,
     private val pixelSender: SubscriptionPixelSender,
     private val privacyProFeature: PrivacyProFeature,
-    private val subscriptionRebrandingFeatureToggle: SubscriptionRebrandingFeatureToggle,
 ) : ViewModel() {
 
     private val moshi = Moshi.Builder().add(JSONObjectAdapter()).build()
@@ -102,11 +99,6 @@ class SubscriptionWebViewViewModel @Inject constructor(
 
     private val _currentPurchaseViewState = MutableStateFlow(CurrentPurchaseViewState())
     val currentPurchaseViewState = _currentPurchaseViewState.asStateFlow()
-
-    data class ViewState(val rebrandingEnabled: Boolean = false)
-
-    private val _viewState = MutableStateFlow(ViewState())
-    val viewState = _viewState.asStateFlow()
 
     private lateinit var subscriptionStatus: SubscriptionStatus
 
@@ -146,14 +138,6 @@ class SubscriptionWebViewViewModel @Inject constructor(
         subscriptionsManager.subscriptionStatus
             .onEach { subscriptionStatus = it }
             .launchIn(viewModelScope)
-
-        viewModelScope.launch {
-            _viewState.emit(
-                ViewState(
-                    rebrandingEnabled = subscriptionRebrandingFeatureToggle.isSubscriptionRebrandingEnabled(),
-                ),
-            )
-        }
     }
 
     fun processJsCallbackMessage(featureName: String, method: String, id: String?, data: JSONObject?) {
