@@ -65,7 +65,7 @@ dependencies {
     testImplementation Testing.robolectric
     testImplementation CashApp.turbine
     testImplementation AndroidX.work.testing
-
+    testImplementation "androidx.lifecycle:lifecycle-runtime-testing:_"
     testImplementation project(path: ':common-test')
 
     coreLibraryDesugaring Android.tools.desugarJdkLibs
