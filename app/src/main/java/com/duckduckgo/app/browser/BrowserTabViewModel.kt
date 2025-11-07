@@ -2989,7 +2989,7 @@ class BrowserTabViewModel @Inject constructor(
         val shouldHideKeyboard =
             cta is HomePanelCta || cta is DaxBubbleCta.DaxPrivacyProCta ||
                 duckAiFeatureState.showInputScreen.value || currentBrowserViewState().lastQueryOrigin == QueryOrigin.FromBookmark
-        command.value = if (shouldHideKeyboard || alreadyShownKeyboard) {
+        command.value = if (shouldHideKeyboard || (settingsDataStore.omnibarType == OmnibarType.SPLIT && alreadyShownKeyboard)) {
             HideKeyboard
         } else {
             alreadyShownKeyboard = true
