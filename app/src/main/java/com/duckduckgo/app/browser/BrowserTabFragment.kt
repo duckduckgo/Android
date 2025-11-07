@@ -920,7 +920,6 @@ class BrowserTabFragment :
                 InputScreenActivityResultCodes.NEW_SEARCH_REQUESTED -> {
                     data?.getStringExtra(InputScreenActivityResultParams.SEARCH_QUERY_PARAM)?.let { query ->
                         submitQuery(query)
-                        browserActivity?.closeDuckChat()
                     }
                 }
 
