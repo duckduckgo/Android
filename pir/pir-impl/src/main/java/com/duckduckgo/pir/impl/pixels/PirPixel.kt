@@ -76,11 +76,6 @@ enum class PirPixel(
         type = Count,
     ),
 
-    PIR_INTERNAL_BROKER_OPT_OUT_COMPLETED(
-        baseName = "pir_internal_opt-out_completed",
-        type = Count,
-    ),
-
     PIR_INTERNAL_CPU_USAGE(
         baseName = "pir_internal_cpu_usage",
         type = Count,
@@ -130,6 +125,16 @@ enum class PirPixel(
     PIR_INTERNAL_SECURE_STORAGE_UNAVAILABLE(
         baseName = "pir_internal_secure-storage_unavailable",
         types = setOf(Count, Daily()),
+    ),
+
+    PIR_OPTOUT_SUBMIT_SUCCESS(
+        baseName = "pir_optout_process_submit-success",
+        types = setOf(Count),
+    ),
+
+    PIR_OPTOUT_SUBMIT_FAILURE(
+        baseName = "pir_optout_process_failure",
+        types = setOf(Count),
     ), ;
 
     constructor(
