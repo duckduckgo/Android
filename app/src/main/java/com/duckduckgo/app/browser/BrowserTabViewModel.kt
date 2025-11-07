@@ -573,7 +573,6 @@ class BrowserTabViewModel @Inject constructor(
     @VisibleForTesting
     internal val autoCompleteStateFlow = MutableStateFlow("")
     private val fireproofWebsiteState: LiveData<List<FireproofWebsiteEntity>> = fireproofWebsiteRepository.getFireproofWebsites()
-    private var alreadyShownKeyboard = false
 
     @ExperimentalCoroutinesApi
     @FlowPreview
