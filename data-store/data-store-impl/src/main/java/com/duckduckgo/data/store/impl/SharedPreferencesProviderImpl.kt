@@ -23,11 +23,13 @@ import androidx.core.content.edit
 import androidx.security.crypto.EncryptedSharedPreferences
 import androidx.security.crypto.MasterKey
 import androidx.security.crypto.MasterKeys
+import com.duckduckgo.anrs.api.CrashLogger
 import com.duckduckgo.data.store.api.SharedPreferencesProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.frybits.harmony.getHarmonySharedPreferences
 import com.frybits.harmony.secure.getEncryptedHarmonySharedPreferences
 import com.squareup.anvil.annotations.ContributesBinding
+import dagger.Lazy
 import logcat.LogPriority.WARN
 import logcat.logcat
 import javax.inject.Inject
@@ -37,6 +39,7 @@ private const val MIGRATED_TO_HARMONY = "migrated_to_harmony"
 @ContributesBinding(AppScope::class)
 class SharedPreferencesProviderImpl @Inject constructor(
     private val context: Context,
+    private val crashLogger: Lazy<CrashLogger>,
 ) : SharedPreferencesProvider {
     override fun getSharedPreferences(name: String, multiprocess: Boolean, migrate: Boolean): SharedPreferences {
         return if (multiprocess) {
@@ -80,7 +83,7 @@ class SharedPreferencesProviderImpl @Inject constructor(
             )
         }
 
-        return SafeSharedPreferences(prefs)
+        return SafeSharedPreferences(prefs, crashLogger.get())
     }
 
     private fun migrateToHarmonyIfNecessary(name: String): SharedPreferences {
