@@ -18,9 +18,11 @@ package com.duckduckgo.app.global.install
 
 import com.duckduckgo.browser.api.install.AppInstall
 import com.duckduckgo.di.scopes.AppScope
+import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
 import javax.inject.Inject
 
+@ContributesBinding(AppScope::class)
 @SingleInstanceIn(AppScope::class)
 class AppInstallRepository @Inject constructor(
     private val appInstallStore: AppInstallStore,
