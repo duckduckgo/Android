@@ -350,8 +350,8 @@ open class DuckChatWebViewFragment : DuckDuckGoFragment(R.layout.activity_duck_c
     }
 
     private fun configureLegacyOmnibar() {
-        root.findViewById<View>(R.id.includeToolbar).show()
         toolbar?.let {
+            it.show()
             it.setNavigationIcon(com.duckduckgo.mobile.android.R.drawable.ic_arrow_left_24)
             it.setNavigationOnClickListener {
                 requireActivity().onBackPressed()
@@ -362,7 +362,7 @@ open class DuckChatWebViewFragment : DuckDuckGoFragment(R.layout.activity_duck_c
     }
 
     private fun configureFullscreenOmnibar() {
-        root.findViewById<View>(R.id.includeToolbar).gone()
+        toolbar?.gone()
         duckChatOmnibar?.show()
 
         duckChatOmnibar?.setOmnibarItemPressedListener(
