@@ -59,7 +59,7 @@ class InputModeTabLayout @JvmOverloads constructor(
         clipToOutline = true
     }
     override fun onAttachedToWindow() {
-        AndroidSupportInjection.Companion.inject(this)
+        AndroidSupportInjection.inject(this)
         super.onAttachedToWindow()
 
         val searchTabView = getTabAt(0)!!.view
