@@ -2982,7 +2982,6 @@ class BrowserTabViewModel @Inject constructor(
                 duckAiFeatureState.showInputScreen.value || currentBrowserViewState().lastQueryOrigin == QueryOrigin.FromBookmark ||
                 (settingsDataStore.omnibarType == OmnibarType.SPLIT && alreadyShownKeyboard)
 
-        logcat { "Duck.ai: fullscreenEnabled: ${duckAiFeatureState.isFullScreenModeEnabled.value}" }
         logcat { "Duck.ai: shouldHideKeyboard: $shouldHideKeyboard" }
 
         command.value = if (shouldHideKeyboard) {
