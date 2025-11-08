@@ -124,7 +124,9 @@ class RealOnboardingDesignExperimentManager @Inject constructor(
         return true
     }
 
-    override suspend fun isWaitForLocalPrivacyConfigEnabled(): Boolean = onboardingDesignExperimentToggles.waitForLocalPrivacyConfig().isEnabled()
+    override suspend fun isWaitForLocalPrivacyConfigEnabled(): Boolean = withContext(dispatcherProvider.io()) {
+        onboardingDesignExperimentToggles.waitForLocalPrivacyConfig().isEnabled()
+    }
 
     override fun onPrivacyConfigPersisted() {
         privacyPersisted = true
