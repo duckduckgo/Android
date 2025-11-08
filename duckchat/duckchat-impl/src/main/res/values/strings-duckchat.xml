@@ -47,6 +47,9 @@
     <string name="duck_ai_shortcut_settings_title">Duck.ai Shortcuts</string>
     <string name="duck_ai_shortcut_settings_description">Choose which Duck.ai shortcuts to display</string>
 
+    <!-- Duck AI Voice Search Shortcut Setting -->
+    <string name="duckAiVoiceSearchVisibilitySetting">Voice Search</string>
+
     <!-- Input Screen  -->
     <string name="input_screen_search_hint">Search or enter address</string>
     <string name="input_screen_chat_hint">Ask privately</string>
