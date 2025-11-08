@@ -48,6 +48,9 @@
     <string name="duck_ai_shortcut_settings_title">Duck.ai prečaci</string>
     <string name="duck_ai_shortcut_settings_description">Odaberi koje Duck.ai prečace želiš prikazati</string>
 
+    <!-- Duck AI Voice Search Shortcut Setting -->
+    <string name="duckAiVoiceSearchVisibilitySetting">Glasovno pretraživanje</string>
+
     <!-- Input Screen  -->
     <string name="input_screen_search_hint">Pretraži ili unesi adresu</string>
     <string name="input_screen_chat_hint">Pitaj privatno</string>

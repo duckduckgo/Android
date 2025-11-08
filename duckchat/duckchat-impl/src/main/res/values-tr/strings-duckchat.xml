@@ -48,6 +48,9 @@
     <string name="duck_ai_shortcut_settings_title">Duck.ai Kısayolları</string>
     <string name="duck_ai_shortcut_settings_description">Hangi Duck.ai kısayollarının gösterileceğini seçin</string>
 
+    <!-- Duck AI Voice Search Shortcut Setting -->
+    <string name="duckAiVoiceSearchVisibilitySetting">Sesli Arama</string>
+
     <!-- Input Screen  -->
     <string name="input_screen_search_hint">Adres ara veya gir</string>
     <string name="input_screen_chat_hint">Özel olarak sor</string>

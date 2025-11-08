@@ -48,6 +48,9 @@
     <string name="duck_ai_shortcut_settings_title">Duck.ai-snarveier</string>
     <string name="duck_ai_shortcut_settings_description">Velg hvilke Duck.ai-snarveier du vil skal vises</string>
 
+    <!-- Duck AI Voice Search Shortcut Setting -->
+    <string name="duckAiVoiceSearchVisibilitySetting">Talesøk</string>
+
     <!-- Input Screen  -->
     <string name="input_screen_search_hint">Søk eller skriv inn adresse</string>
     <string name="input_screen_chat_hint">Spør privat</string>

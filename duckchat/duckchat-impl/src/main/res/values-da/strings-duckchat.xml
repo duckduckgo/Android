@@ -48,6 +48,9 @@
     <string name="duck_ai_shortcut_settings_title">Duck.ai-genveje</string>
     <string name="duck_ai_shortcut_settings_description">Vælg hvilke Duck.ai-genveje der skal vises</string>
 
+    <!-- Duck AI Voice Search Shortcut Setting -->
+    <string name="duckAiVoiceSearchVisibilitySetting">Stemmesøgning</string>
+
     <!-- Input Screen  -->
     <string name="input_screen_search_hint">Søg eller indtast adresse</string>
     <string name="input_screen_chat_hint">Spørg privat</string>

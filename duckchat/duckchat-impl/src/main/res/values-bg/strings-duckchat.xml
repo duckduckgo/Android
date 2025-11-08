@@ -48,6 +48,9 @@
     <string name="duck_ai_shortcut_settings_title">Преки пътища за Duck.ai</string>
     <string name="duck_ai_shortcut_settings_description">Изберете кои преки пътища на Duck.ai да се показват</string>
 
+    <!-- Duck AI Voice Search Shortcut Setting -->
+    <string name="duckAiVoiceSearchVisibilitySetting">Гласово търсене</string>
+
     <!-- Input Screen  -->
     <string name="input_screen_search_hint">Търсене или въвеждане на адрес</string>
     <string name="input_screen_chat_hint">Задавайте въпроси поверително</string>

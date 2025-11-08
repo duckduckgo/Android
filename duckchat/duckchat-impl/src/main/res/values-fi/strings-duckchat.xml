@@ -48,6 +48,9 @@
     <string name="duck_ai_shortcut_settings_title">Duck.ai-pikakuvakkeet</string>
     <string name="duck_ai_shortcut_settings_description">Valitse, mitkä Duck.ai-pikakuvakkeet näytetään</string>
 
+    <!-- Duck AI Voice Search Shortcut Setting -->
+    <string name="duckAiVoiceSearchVisibilitySetting">Äänihaku</string>
+
     <!-- Input Screen  -->
     <string name="input_screen_search_hint">Hae tai anna osoite</string>
     <string name="input_screen_chat_hint">Kysy yksityisesti</string>
