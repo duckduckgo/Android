@@ -48,6 +48,9 @@
     <string name="duck_ai_shortcut_settings_title">Duck.ai otseteed</string>
     <string name="duck_ai_shortcut_settings_description">Vali, milliseid Duck.ai otseteid kuvada</string>
 
+    <!-- Duck AI Voice Search Shortcut Setting -->
+    <string name="duckAiVoiceSearchVisibilitySetting">Häälotsing</string>
+
     <!-- Input Screen  -->
     <string name="input_screen_search_hint">Otsi või sisesta aadress</string>
     <string name="input_screen_chat_hint">Küsi privaatselt</string>
