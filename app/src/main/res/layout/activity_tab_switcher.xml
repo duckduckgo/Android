@@ -14,30 +14,26 @@
   ~ limitations under the License.
   -->
 
-<androidx.coordinatorlayout.widget.CoordinatorLayout
+<LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
     <include
-        android:id="@+id/tabSwitcherExperimentToolbarTop"
-        layout="@layout/include_tab_switcher_toolbar_top"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
-
-    <include
         android:id="@+id/tabSwitcherToolbarTop"
-        layout="@layout/include_default_toolbar"
+        layout="@layout/include_tab_switcher_toolbar_top"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
 
     <FrameLayout
         android:id="@+id/tabsContainer"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:fillViewport="true">
 
         <View
             android:layout_width="match_parent"
@@ -66,36 +62,6 @@
 
     </FrameLayout>
 
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/aiChatFab"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_margin="@dimen/keyline_3"
-        android:contentDescription="@string/newTabMenuItem"
-        app:layout_anchor="@id/spacer"
-        android:layout_gravity="top|end"
-        android:visibility="gone"
-        android:src="@drawable/ic_ai_chat_24_solid_color" />
-
-    <View
-        android:id="@+id/spacer"
-        android:layout_width="@dimen/keyline_4"
-        android:layout_height="@dimen/keyline_3"
-        android:layout_gravity="top|end"
-        app:layout_anchorGravity="end"
-        app:layout_anchor="@id/mainFab"
-        />
-
-    <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
-        android:id="@+id/mainFab"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom|end"
-        android:layout_margin="@dimen/keyline_4"
-        tools:text="Test"
-        android:visibility="gone"
-        app:icon="@drawable/ic_add_24_solid_color" />
-
     <include
         android:id="@+id/tabSwitcherToolbarBottom"
         layout="@layout/include_tab_switcher_toolbar_bottom"
@@ -103,4 +69,4 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
 
-</androidx.coordinatorlayout.widget.CoordinatorLayout>
+</LinearLayout>

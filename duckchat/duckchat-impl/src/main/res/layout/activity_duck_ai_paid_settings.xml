@@ -87,9 +87,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/keyline_2"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/oneLineListItemWithTrailingIcon"
                 app:primaryText="@string/duck_ai_paid_settings_open_duck_ai"
                 app:trailingIconTint="?attr/daxColorSecondaryIcon"
                 app:trailingIcon="@drawable/ic_open_in_16" />

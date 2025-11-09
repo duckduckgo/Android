@@ -63,4 +63,9 @@ interface DuckAiFeatureState {
      * Indicates whether the Input Screen should be shown when user open the app from system widgets
      */
     val showInputScreenOnSystemSearchLaunch: StateFlow<Boolean>
+
+    /**
+     * Indicates whether the Input Mode toggle should be shown in the voice search screen.
+     */
+    val showVoiceSearchToggle: StateFlow<Boolean>
 }

@@ -31,6 +31,7 @@ import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.trackerdetection.model.Entity
 import com.duckduckgo.browser.api.UserBrowserProperties
+import com.duckduckgo.browser.ui.omnibar.OmnibarType
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.baseHost
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
@@ -1583,6 +1584,45 @@ class OmnibarLayoutViewModelTest {
             val viewState = awaitItem()
             assertEquals(expected, viewState.omnibarText)
             assertTrue(viewState.updateOmnibarText)
+        }
+    }
+
+    @Test
+    fun `when omnibar type is SPLIT then show buttons is false`() = runTest {
+        whenever(settingsDataStore.omnibarType).thenReturn(OmnibarType.SPLIT)
+        initializeViewModel()
+
+        testee.viewState.test {
+            val viewState = awaitItem()
+            assertFalse(viewState.showTabsMenu)
+            assertFalse(viewState.showFireIcon)
+            assertFalse(viewState.showBrowserMenu)
+        }
+    }
+
+    @Test
+    fun `when omnibar type is SINGLE_TOP then show buttons is true`() = runTest {
+        whenever(settingsDataStore.omnibarType).thenReturn(OmnibarType.SINGLE_TOP)
+        initializeViewModel()
+
+        testee.viewState.test {
+            val viewState = awaitItem()
+            assertTrue(viewState.showTabsMenu)
+            assertTrue(viewState.showFireIcon)
+            assertTrue(viewState.showBrowserMenu)
+        }
+    }
+
+    @Test
+    fun `when omnibar type is SINGLE_BOTTOM then show buttons is true`() = runTest {
+        whenever(settingsDataStore.omnibarType).thenReturn(OmnibarType.SINGLE_BOTTOM)
+        initializeViewModel()
+
+        testee.viewState.test {
+            val viewState = awaitItem()
+            assertTrue(viewState.showTabsMenu)
+            assertTrue(viewState.showFireIcon)
+            assertTrue(viewState.showBrowserMenu)
         }
     }
 

@@ -105,9 +105,10 @@
 
                     <ImageView
                         android:id="@+id/duckAiInputScreenToggleWithoutAiImage"
-                        android:layout_width="match_parent"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:scaleType="fitCenter"
+                        android:scaleType="fitXY"
+                        android:foreground="@drawable/selectable_large_rounded_ripple"
                         android:src="@drawable/searchbox_withoutai_active" />
 
                     <com.duckduckgo.common.ui.view.text.DaxTextView
@@ -144,9 +145,10 @@
 
                     <ImageView
                         android:id="@+id/duckAiInputScreenToggleWithAiImage"
-                        android:layout_width="match_parent"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:scaleType="fitCenter"
+                        android:scaleType="fitXY"
+                        android:foreground="@drawable/selectable_large_rounded_ripple"
                         android:src="@drawable/searchbox_withai_inactive" />
 
                     <LinearLayout
@@ -193,6 +195,15 @@
                 android:text="@string/input_screen_user_pref_description"
                 app:textType="secondary"
                 app:typography="body2" />
+
+            <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
+                android:id="@+id/duckAiFullScreenMode"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="gone"
+                app:showSwitch="true"
+                app:primaryText="@string/duckAiFullScreenModeTitle"
+                app:secondaryText="@string/duckAiFullScreenModeDescription" />
 
             <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
                 android:id="@+id/duckAiShortcuts"

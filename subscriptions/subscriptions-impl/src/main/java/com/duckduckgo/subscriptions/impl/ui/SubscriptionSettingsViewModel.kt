@@ -27,18 +27,16 @@ import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.subscriptions.api.ActiveOfferType
 import com.duckduckgo.subscriptions.api.PrivacyProUnifiedFeedback
 import com.duckduckgo.subscriptions.api.PrivacyProUnifiedFeedback.PrivacyProFeedbackSource.SUBSCRIPTION_SETTINGS
-import com.duckduckgo.subscriptions.api.SubscriptionRebrandingFeatureToggle
 import com.duckduckgo.subscriptions.api.SubscriptionStatus
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.MONTHLY_PLAN_ROW
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.MONTHLY_PLAN_US
 import com.duckduckgo.subscriptions.impl.SubscriptionsManager
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
-import com.duckduckgo.subscriptions.impl.repository.RebrandingRepository
-import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.DismissRebrandingBanner
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.FinishSignOut
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.GoToActivationScreen
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.GoToEditEmailScreen
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.GoToPortal
+import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.ShowSwitchPlanDialog
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.SubscriptionDuration.Monthly
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.SubscriptionDuration.Yearly
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.ViewState.Ready
@@ -52,7 +50,7 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
-import java.util.*
+import java.util.Date
 import javax.inject.Inject
 
 @SuppressLint("NoLifecycleObserver") // we don't observe app lifecycle
@@ -61,8 +59,6 @@ class SubscriptionSettingsViewModel @Inject constructor(
     private val subscriptionsManager: SubscriptionsManager,
     private val pixelSender: SubscriptionPixelSender,
     private val privacyProUnifiedFeedback: PrivacyProUnifiedFeedback,
-    private val subscriptionRebrandingFeatureToggle: SubscriptionRebrandingFeatureToggle,
-    private val rebrandingRepository: RebrandingRepository,
 ) : ViewModel(), DefaultLifecycleObserver {
 
     private val command = Channel<Command>(1, DROP_OLDEST)
@@ -96,6 +92,13 @@ class SubscriptionSettingsViewModel @Inject constructor(
             else -> Yearly
         }
 
+        val switchPlanAvailable = subscriptionsManager.isSwitchPlanAvailable()
+        val savingsPercentage = if (switchPlanAvailable && type == Monthly) {
+            subscriptionsManager.getSwitchPlanPricing(isUpgrade = true)?.savingsPercentage
+        } else {
+            null
+        }
+
         _viewState.emit(
             Ready(
                 date = date,
@@ -105,14 +108,11 @@ class SubscriptionSettingsViewModel @Inject constructor(
                 email = account.email?.takeUnless { it.isBlank() },
                 showFeedback = privacyProUnifiedFeedback.shouldUseUnifiedFeedback(source = SUBSCRIPTION_SETTINGS),
                 activeOffers = subscription.activeOffers,
-                showRebrandingBanner = shouldShowRebrandingBanner(),
-                switchPlanAvailable = subscriptionsManager.isSwitchPlanAvailable(),
+                switchPlanAvailable = switchPlanAvailable,
+                savingsPercentage = savingsPercentage,
             ),
         )
     }
-
-    private suspend fun shouldShowRebrandingBanner(): Boolean =
-        subscriptionRebrandingFeatureToggle.isSubscriptionRebrandingEnabled() && !rebrandingRepository.isRebrandingBannerShown()
 
     fun onEditEmailButtonClicked() {
         viewModelScope.launch {
@@ -142,10 +142,19 @@ class SubscriptionSettingsViewModel @Inject constructor(
         }
     }
 
-    fun rebrandingBannerDismissed() {
+    fun onSwitchPlanClicked(currentDuration: SubscriptionDuration) {
         viewModelScope.launch {
-            rebrandingRepository.setRebrandingBannerAsViewed()
-            command.send(DismissRebrandingBanner)
+            val switchType = when (currentDuration) {
+                Monthly -> SwitchPlanType.UPGRADE_TO_YEARLY
+                Yearly -> SwitchPlanType.DOWNGRADE_TO_MONTHLY
+            }
+            command.send(ShowSwitchPlanDialog(switchType))
+        }
+    }
+
+    fun onSwitchPlanSuccess() {
+        viewModelScope.launch {
+            emitChanges()
         }
     }
 
@@ -159,7 +168,12 @@ class SubscriptionSettingsViewModel @Inject constructor(
         data object GoToEditEmailScreen : Command()
         data object GoToActivationScreen : Command()
         data class GoToPortal(val url: String) : Command()
-        data object DismissRebrandingBanner : Command()
+        data class ShowSwitchPlanDialog(val switchType: SwitchPlanType) : Command()
+    }
+
+    enum class SwitchPlanType {
+        UPGRADE_TO_YEARLY,
+        DOWNGRADE_TO_MONTHLY,
     }
 
     sealed class ViewState {
@@ -173,8 +187,8 @@ class SubscriptionSettingsViewModel @Inject constructor(
             val email: String?,
             val showFeedback: Boolean = false,
             val activeOffers: List<ActiveOfferType>,
-            val showRebrandingBanner: Boolean = false,
             val switchPlanAvailable: Boolean,
+            val savingsPercentage: Int?,
         ) : ViewState()
     }
 }

@@ -102,4 +102,18 @@ interface DuckChatFeature {
      */
     @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
     fun showMainButtonsInInputScreen(): Toggle
+
+    /**
+     * @return `true` when the new fullscreen mode is enabled
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    fun fullscreenMode(): Toggle
+
+    /**
+     * @return `true` when the remote config has the "duckAiVoiceSearch"
+     * sub-feature flag enabled
+     * If the remote feature is not present defaults to `internal`
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    fun duckAiVoiceSearch(): Toggle
 }

@@ -23,10 +23,13 @@ import com.duckduckgo.pir.impl.models.scheduling.JobRecord.OptOutJobRecord
 import com.duckduckgo.pir.impl.models.scheduling.JobRecord.OptOutJobRecord.OptOutJobStatus
 import com.duckduckgo.pir.impl.models.scheduling.JobRecord.ScanJobRecord
 import com.duckduckgo.pir.impl.models.scheduling.JobRecord.ScanJobRecord.ScanJobStatus
+import com.duckduckgo.pir.impl.store.db.BrokerJsonDao
 import com.duckduckgo.pir.impl.store.db.EmailConfirmationJobRecordEntity
 import com.duckduckgo.pir.impl.store.db.JobSchedulingDao
 import com.duckduckgo.pir.impl.store.db.OptOutJobRecordEntity
 import com.duckduckgo.pir.impl.store.db.ScanJobRecordEntity
+import com.duckduckgo.pir.impl.store.secure.PirSecureStorageDatabaseFactory
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
@@ -45,14 +48,25 @@ class RealPirSchedulingRepositoryTest {
 
     private val mockJobSchedulingDao: JobSchedulingDao = mock()
     private val mockCurrentTimeProvider: CurrentTimeProvider = mock()
+    private val mockDatabaseFactory: PirSecureStorageDatabaseFactory = mock()
+    private val mockDatabase: PirDatabase = mock()
+    private val mockBrokerJsonDao: BrokerJsonDao = mock()
 
     @Before
     fun setUp() {
+        runBlocking {
+            whenever(mockDatabaseFactory.getDatabase()).thenReturn(mockDatabase)
+        }
+        whenever(mockDatabase.jobSchedulingDao()).thenReturn(mockJobSchedulingDao)
+        whenever(mockDatabase.brokerJsonDao()).thenReturn(mockBrokerJsonDao)
+        whenever(mockBrokerJsonDao.getAllBrokersCount()).thenReturn(0)
+
         testee =
             RealPirSchedulingRepository(
                 dispatcherProvider = coroutineRule.testDispatcherProvider,
-                jobSchedulingDao = mockJobSchedulingDao,
                 currentTimeProvider = mockCurrentTimeProvider,
+                databaseFactory = mockDatabaseFactory,
+                appCoroutineScope = coroutineRule.testScope,
             )
 
         whenever(mockCurrentTimeProvider.currentTimeMillis()).thenReturn(9000L)

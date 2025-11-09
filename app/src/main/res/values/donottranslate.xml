@@ -63,7 +63,6 @@
     <!-- DuckChat -->
     <string name="duckChatMenuItem">@string/duck_chat_title</string>
 
-    <!-- Settings -->
-    <string name="settingsAddressBarPositionHeaderTitle">Address Bar and Toolbar Position</string>
-    <string name="settingsAddressBarPositionSplit">Split</string>
+    <!-- ADS -->
+    <string name="ads_demo_activity_title" translatable="false">Android Design System Demo</string>
 </resources>

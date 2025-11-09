@@ -26,6 +26,7 @@ import com.duckduckgo.duckchat.impl.ReportMetric.USER_DID_SELECT_FIRST_HISTORY_I
 import com.duckduckgo.duckchat.impl.ReportMetric.USER_DID_SUBMIT_FIRST_PROMPT
 import com.duckduckgo.duckchat.impl.ReportMetric.USER_DID_SUBMIT_PROMPT
 import com.duckduckgo.duckchat.impl.ReportMetric.USER_DID_TAP_KEYBOARD_RETURN_KEY
+import com.duckduckgo.duckchat.impl.metric.DuckAiMetricCollector
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
 import com.duckduckgo.duckchat.impl.store.DuckChatDataStore
 import com.duckduckgo.js.messaging.api.JsCallbackData
@@ -50,11 +51,13 @@ class RealDuckChatJSHelperTest {
     private val mockDuckChat: DuckChatInternal = mock()
     private val mockDataStore: DuckChatDataStore = mock()
     private val mockDuckChatPixels: DuckChatPixels = mock()
+    private val mockDuckAiMetricCollector: DuckAiMetricCollector = mock()
 
     private val testee = RealDuckChatJSHelper(
         duckChat = mockDuckChat,
         dataStore = mockDataStore,
         duckChatPixels = mockDuckChatPixels,
+        duckAiMetricCollector = mockDuckAiMetricCollector,
     )
 
     @Test
@@ -384,7 +387,7 @@ class RealDuckChatJSHelperTest {
     }
 
     @Test
-    fun whenReportMetricWithDataThenPixelSent() = runTest {
+    fun whenReportMetricWithDataThenPixelSentAndCollectMetric() = runTest {
         val featureName = "aiChat"
         val method = "reportMetric"
         val id = "123"
@@ -393,10 +396,11 @@ class RealDuckChatJSHelperTest {
         assertNull(testee.processJsCallbackMessage(featureName, method, id, data))
 
         verify(mockDuckChatPixels).sendReportMetricPixel(USER_DID_SUBMIT_PROMPT)
+        verify(mockDuckAiMetricCollector).onMessageSent()
     }
 
     @Test
-    fun whenReportMetricWithFirstPromptThenPixelSent() = runTest {
+    fun whenReportMetricWithFirstPromptThenPixelSentAndCollectMetric() = runTest {
         val featureName = "aiChat"
         val method = "reportMetric"
         val id = "123"
@@ -405,6 +409,7 @@ class RealDuckChatJSHelperTest {
         assertNull(testee.processJsCallbackMessage(featureName, method, id, data))
 
         verify(mockDuckChatPixels).sendReportMetricPixel(USER_DID_SUBMIT_FIRST_PROMPT)
+        verify(mockDuckAiMetricCollector).onMessageSent()
     }
 
     @Test

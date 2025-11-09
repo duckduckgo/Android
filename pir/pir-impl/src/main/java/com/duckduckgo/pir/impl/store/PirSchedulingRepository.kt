@@ -16,6 +16,7 @@
 
 package com.duckduckgo.pir.impl.store
 
+import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
@@ -28,9 +29,16 @@ import com.duckduckgo.pir.impl.store.db.EmailConfirmationJobRecordEntity
 import com.duckduckgo.pir.impl.store.db.JobSchedulingDao
 import com.duckduckgo.pir.impl.store.db.OptOutJobRecordEntity
 import com.duckduckgo.pir.impl.store.db.ScanJobRecordEntity
+import com.duckduckgo.pir.impl.store.secure.PirSecureStorageDatabaseFactory
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.CoroutineStart
+import kotlinx.coroutines.Deferred
+import kotlinx.coroutines.async
 import kotlinx.coroutines.withContext
+import logcat.LogPriority.ERROR
+import logcat.logcat
 import javax.inject.Inject
 
 interface PirSchedulingRepository {
@@ -57,7 +65,10 @@ interface PirSchedulingRepository {
      *
      * @param includeDeprecated If true, will also return deprecated jobs (used to run opt-out jobs on profiles that have been removed)
      */
-    suspend fun getValidOptOutJobRecord(extractedProfileId: Long, includeDeprecated: Boolean = false): OptOutJobRecord?
+    suspend fun getValidOptOutJobRecord(
+        extractedProfileId: Long,
+        includeDeprecated: Boolean = false,
+    ): OptOutJobRecord?
 
     suspend fun updateScanJobRecordStatus(
         newStatus: ScanJobStatus,
@@ -117,16 +128,23 @@ interface PirSchedulingRepository {
 @SingleInstanceIn(AppScope::class)
 class RealPirSchedulingRepository @Inject constructor(
     private val dispatcherProvider: DispatcherProvider,
-    private val jobSchedulingDao: JobSchedulingDao,
     private val currentTimeProvider: CurrentTimeProvider,
+    private val databaseFactory: PirSecureStorageDatabaseFactory,
+    @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
 ) : PirSchedulingRepository {
+
+    private val database: Deferred<PirDatabase?> = appCoroutineScope.async(start = CoroutineStart.LAZY) {
+        prepareDatabase()
+    }
+
     override suspend fun getAllValidScanJobRecords(): List<ScanJobRecord> =
         withContext(dispatcherProvider.io()) {
-            return@withContext jobSchedulingDao
-                .getAllScanJobRecords()
-                .map { it.toRecord() }
+            return@withContext jobSchedulingDao()
+                ?.getAllScanJobRecords()
+                ?.map { it.toRecord() }
                 // do not pick-up deprecated jobs as they belong to removed profiles
-                .filter { !it.deprecated }
+                ?.filter { !it.deprecated }
+                .orEmpty()
         }
 
     override suspend fun getValidScanJobRecord(
@@ -134,8 +152,8 @@ class RealPirSchedulingRepository @Inject constructor(
         userProfileId: Long,
     ): ScanJobRecord? =
         withContext(dispatcherProvider.io()) {
-            return@withContext jobSchedulingDao
-                .getScanJobRecord(brokerName, userProfileId)
+            return@withContext jobSchedulingDao()
+                ?.getScanJobRecord(brokerName, userProfileId)
                 ?.run { this.toRecord() }
                 // do not pick-up deprecated jobs as they belong to removed profiles
                 ?.takeIf { !it.deprecated }
@@ -146,8 +164,8 @@ class RealPirSchedulingRepository @Inject constructor(
         includeDeprecated: Boolean,
     ): OptOutJobRecord? =
         withContext(dispatcherProvider.io()) {
-            return@withContext jobSchedulingDao
-                .getOptOutJobRecord(extractedProfileId)
+            return@withContext jobSchedulingDao()
+                ?.getOptOutJobRecord(extractedProfileId)
                 ?.run { this.toRecord() }
                 // do not pick-up deprecated jobs as they belong to removed profiles
                 ?.takeIf { includeDeprecated || !it.deprecated }
@@ -155,16 +173,17 @@ class RealPirSchedulingRepository @Inject constructor(
 
     override suspend fun getAllValidOptOutJobRecords(): List<OptOutJobRecord> =
         withContext(dispatcherProvider.io()) {
-            return@withContext jobSchedulingDao
-                .getAllOptOutJobRecords()
-                .map { record -> record.toRecord() }
+            return@withContext jobSchedulingDao()
+                ?.getAllOptOutJobRecords()
+                ?.map { record -> record.toRecord() }
                 // do not pick-up deprecated jobs as they belong to removed profiles
-                .filter { !it.deprecated }
+                ?.filter { !it.deprecated }
+                .orEmpty()
         }
 
     override suspend fun saveScanJobRecord(scanJobRecord: ScanJobRecord) {
         withContext(dispatcherProvider.io()) {
-            jobSchedulingDao.saveScanJobRecord(scanJobRecord.toEntity())
+            jobSchedulingDao()?.saveScanJobRecord(scanJobRecord.toEntity())
         }
     }
 
@@ -173,7 +192,7 @@ class RealPirSchedulingRepository @Inject constructor(
             scanJobRecords
                 .map { it.toEntity() }
                 .also {
-                    jobSchedulingDao.saveScanJobRecords(it)
+                    jobSchedulingDao()?.saveScanJobRecords(it)
                 }
         }
     }
@@ -186,7 +205,7 @@ class RealPirSchedulingRepository @Inject constructor(
         deprecated: Boolean,
     ) {
         withContext(dispatcherProvider.io()) {
-            jobSchedulingDao.updateScanJobRecordStatus(
+            jobSchedulingDao()?.updateScanJobRecordStatus(
                 brokerName = brokerName,
                 profileQueryId = profileQueryId,
                 newStatus = newStatus.name,
@@ -201,7 +220,7 @@ class RealPirSchedulingRepository @Inject constructor(
             optOutJobRecord
                 .toEntity()
                 .also {
-                    jobSchedulingDao.saveOptOutJobRecord(it)
+                    jobSchedulingDao()?.saveOptOutJobRecord(it)
                 }
         }
     }
@@ -211,77 +230,77 @@ class RealPirSchedulingRepository @Inject constructor(
             optOutJobRecords
                 .map { it.toEntity() }
                 .also {
-                    jobSchedulingDao.saveOptOutJobRecords(it)
+                    jobSchedulingDao()?.saveOptOutJobRecords(it)
                 }
         }
     }
 
     override suspend fun deleteAllJobRecords() {
         withContext(dispatcherProvider.io()) {
-            jobSchedulingDao.deleteAllScanJobRecords()
-            jobSchedulingDao.deleteAllOptOutJobRecords()
-            jobSchedulingDao.deleteAllEmailConfirmationJobRecords()
+            jobSchedulingDao()?.deleteAllScanJobRecords()
+            jobSchedulingDao()?.deleteAllOptOutJobRecords()
+            jobSchedulingDao()?.deleteAllEmailConfirmationJobRecords()
         }
     }
 
     override suspend fun deleteAllScanJobRecords() {
         withContext(dispatcherProvider.io()) {
-            jobSchedulingDao.deleteAllScanJobRecords()
+            jobSchedulingDao()?.deleteAllScanJobRecords()
         }
     }
 
     override suspend fun deleteJobRecordsForProfiles(profileQueryIds: List<Long>) {
         withContext(dispatcherProvider.io()) {
-            jobSchedulingDao.deleteJobRecordsForProfiles(profileQueryIds)
+            jobSchedulingDao()?.deleteJobRecordsForProfiles(profileQueryIds)
         }
     }
 
     override suspend fun deleteScanJobRecordsWithoutMatchesForProfiles(profileQueryIds: List<Long>) {
         withContext(dispatcherProvider.io()) {
-            jobSchedulingDao.deleteScanJobRecordsWithoutMatchesForProfiles(profileQueryIds)
+            jobSchedulingDao()?.deleteScanJobRecordsWithoutMatchesForProfiles(profileQueryIds)
         }
     }
 
     override suspend fun deleteAllOptOutJobRecords() {
         withContext(dispatcherProvider.io()) {
-            jobSchedulingDao.deleteAllOptOutJobRecords()
+            jobSchedulingDao()?.deleteAllOptOutJobRecords()
         }
     }
 
     override suspend fun saveEmailConfirmationJobRecord(emailConfirmationJobRecord: EmailConfirmationJobRecord) {
         withContext(dispatcherProvider.io()) {
-            jobSchedulingDao.saveEmailConfirmationJobRecord(emailConfirmationJobRecord.toEntity())
+            jobSchedulingDao()?.saveEmailConfirmationJobRecord(emailConfirmationJobRecord.toEntity())
         }
     }
 
     override suspend fun getEmailConfirmationJobsWithNoLink(): List<EmailConfirmationJobRecord> =
         withContext(dispatcherProvider.io()) {
-            return@withContext jobSchedulingDao.getAllActiveEmailConfirmationJobRecordsWithNoLink().map {
+            return@withContext jobSchedulingDao()?.getAllActiveEmailConfirmationJobRecordsWithNoLink()?.map {
                 it.toRecord()
-            }
+            }.orEmpty()
         }
 
     override suspend fun getEmailConfirmationJobsWithLink(): List<EmailConfirmationJobRecord> =
         withContext(dispatcherProvider.io()) {
-            return@withContext jobSchedulingDao.getAllActiveEmailConfirmationJobRecordsWithLink().map {
+            return@withContext jobSchedulingDao()?.getAllActiveEmailConfirmationJobRecordsWithLink()?.map {
                 it.toRecord()
-            }
+            }.orEmpty()
         }
 
     override suspend fun getEmailConfirmationJob(extractedProfileId: Long): EmailConfirmationJobRecord? =
         withContext(dispatcherProvider.io()) {
-            return@withContext jobSchedulingDao.getEmailConfirmationJobRecord(extractedProfileId)?.toRecord()
+            return@withContext jobSchedulingDao()?.getEmailConfirmationJobRecord(extractedProfileId)?.toRecord()
         }
 
     override suspend fun deleteEmailConfirmationJobRecord(extractedProfileId: Long) {
         withContext(dispatcherProvider.io()) {
-            jobSchedulingDao.deleteEmailConfirmationJobRecord(extractedProfileId)
+            jobSchedulingDao()?.deleteEmailConfirmationJobRecord(extractedProfileId)
         }
     }
 
     override suspend fun deleteAllEmailConfirmationJobRecords() {
         withContext(dispatcherProvider.io()) {
-            jobSchedulingDao.deleteAllEmailConfirmationJobRecords()
+            jobSchedulingDao()?.deleteAllEmailConfirmationJobRecords()
         }
     }
 
@@ -375,4 +394,27 @@ class RealPirSchedulingRepository @Inject constructor(
             dateCreatedInMillis = this.dateCreatedInMillis,
             deprecated = this.deprecated,
         )
+
+    private suspend fun prepareDatabase(): PirDatabase? {
+        val database = databaseFactory.getDatabase()
+        return if (database != null && database.databaseContentsAreReadable()) {
+            database
+        } else {
+            logcat(ERROR) { "PIR-DB: PIR scheduling repository is not readable" }
+            null
+        }
+    }
+
+    private fun PirDatabase.databaseContentsAreReadable(): Boolean {
+        return kotlin.runCatching {
+            // Try to read from the database to verify it's accessible
+            jobSchedulingDao().getAllScanJobRecords()
+            true
+        }.getOrElse {
+            logcat(ERROR) { "PIR-DB: Error reading from PIR scheduling repository: ${it.message}" }
+            false
+        }
+    }
+
+    private suspend fun jobSchedulingDao(): JobSchedulingDao? = database.await()?.jobSchedulingDao()
 }

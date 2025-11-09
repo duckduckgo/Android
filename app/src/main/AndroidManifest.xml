@@ -509,6 +509,11 @@
 
         <service android:name="com.duckduckgo.app.notification.NotificationHandlerService" />
 
+        <service
+            android:name="com.google.android.datatransport.runtime.scheduling.jobscheduling.JobInfoSchedulerService"
+            tools:node="remove"
+            tools:ignore="MissingClass" />
+
         <receiver android:name=".shortcut.ShortcutReceiver" android:exported="false" />
 
         <receiver

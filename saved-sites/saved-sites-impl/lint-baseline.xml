@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<issues format="6" by="lint 8.7.3" type="baseline" client="gradle" dependencies="false" name="AGP (8.7.3)" variant="all" version="8.7.3">
+<issues format="6" by="lint 8.8.2" type="baseline" client="gradle" dependencies="false" name="AGP (8.7.3)" variant="all" version="8.8.2">
 
     <issue
         id="DenyListedApi"
@@ -8,7 +8,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/java/com/duckduckgo/savedsites/impl/newtab/BookmarksShortcut.kt"
-            line="66"
+            line="67"
             column="13"/>
     </issue>
 
@@ -19,7 +19,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/java/com/duckduckgo/savedsites/impl/newtab/BookmarksShortcut.kt"
-            line="68"
+            line="69"
             column="13"/>
     </issue>
 
@@ -344,17 +344,6 @@
 
     <issue
         id="VectorPath"
-        message="Very long vector path (1071 characters), which is bad for performance. Considering reducing precision, removing minor details or rasterizing vector."
-        errorLine1="      android:pathData=&quot;M9.713,3.379C10.648,1.482 13.353,1.482 14.288,3.379L15.782,6.41C15.862,6.573 16.017,6.685 16.196,6.711L19.54,7.198C21.631,7.502 22.466,10.071 20.954,11.546L18.531,13.911C18.402,14.037 18.343,14.219 18.374,14.397L18.945,17.734C19.302,19.818 17.114,21.406 15.244,20.421L12.257,18.848C12.096,18.764 11.905,18.764 11.744,18.848L8.757,20.421C6.887,21.406 4.699,19.818 5.056,17.734L5.628,14.397C5.658,14.219 5.599,14.037 5.47,13.911L3.047,11.546C1.535,10.071 2.371,7.502 4.461,7.198L7.805,6.711C7.984,6.685 8.139,6.573 8.219,6.41L9.713,3.379ZM12.494,4.263C12.292,3.854 11.709,3.854 11.507,4.263L10.013,7.294C9.642,8.047 8.924,8.57 8.093,8.691L4.749,9.177C4.298,9.243 4.118,9.797 4.444,10.115L6.867,12.48C7.467,13.065 7.74,13.909 7.599,14.735L7.027,18.072C6.95,18.521 7.422,18.864 7.826,18.651L10.813,17.079C11.556,16.687 12.445,16.687 13.189,17.079L16.176,18.651C16.579,18.864 17.051,18.521 16.974,18.072L16.402,14.735C16.261,13.909 16.535,13.065 17.135,12.48L19.557,10.115C19.883,9.797 19.703,9.243 19.252,9.177L15.908,8.691C15.077,8.57 14.359,8.047 13.988,7.294L12.494,4.263Z&quot;"
-        errorLine2="                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/drawable/ic_favorite_24.xml"
-            line="23"
-            column="25"/>
-    </issue>
-
-    <issue
-        id="VectorPath"
         message="Very long vector path (1068 characters), which is bad for performance. Considering reducing precision, removing minor details or rasterizing vector."
         errorLine1="      android:pathData=&quot;M86.81,51C86.93,50.02 87,49.02 87,48C87,35.3 76.7,25 64,25C51.3,25 41,35.3 41,48C41,60.7 51.3,71 64,71C65.02,71 66.02,70.93 67,70.81C67.06,64.59 69.95,59.06 74.45,55.43C74.71,53.7 74.89,51.88 74.96,50H82.9C82.84,50.49 82.77,50.98 82.68,51.47C84.01,51.17 85.39,51.01 86.81,51ZM71.27,30.44C77.57,33.05 82.16,38.95 82.9,46H74.96C74.76,40.77 73.76,36.01 72.2,32.36C71.91,31.69 71.6,31.05 71.27,30.44ZM68.53,62.06C69.84,58.99 70.76,54.77 70.96,50H57.04C57.24,54.77 58.16,58.99 59.47,62.06C60.23,63.81 61.07,65.1 61.9,65.93C62.73,66.74 63.43,67 64,67C64.57,67 65.27,66.74 66.1,65.93C66.93,65.1 67.77,63.81 68.53,62.06ZM59.47,33.94C58.16,37.01 57.24,41.23 57.04,46H70.96C70.76,41.23 69.84,37.01 68.53,33.94C67.77,32.19 66.93,30.9 66.1,30.07C65.27,29.26 64.57,29 64,29C63.43,29 62.73,29.26 61.9,30.07C61.07,30.9 60.23,32.19 59.47,33.94ZM55.8,32.36C54.24,36.01 53.24,40.77 53.04,46H45.1C45.84,38.95 50.43,33.05 56.73,30.44C56.4,31.05 56.09,31.69 55.8,32.36ZM55.8,63.64C54.24,59.99 53.24,55.23 53.04,50H45.1C45.84,57.05 50.43,62.95 56.73,65.56C56.4,64.95 56.09,64.31 55.8,63.64Z&quot;"
         errorLine2="                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
@@ -417,6 +406,72 @@
             file="src/main/res/layout/popup_window_edit_remove_favorite_delete_menu.xml"
             line="22"
             column="5"/>
+    </issue>
+
+    <issue
+        id="TypographyEllipsis"
+        message="Replace &quot;...&quot; with ellipsis character (…, &amp;#8230;) ?"
+        errorLine1="    &lt;string name=&quot;importBookmarksFromGooglePreImportDialogSelectFileButton&quot;>Избери файл с отметки...&lt;/string>"
+        errorLine2="                                                                            ~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-bg/strings-saved-sites.xml"
+            line="118"
+            column="77"/>
+    </issue>
+
+    <issue
+        id="TypographyEllipsis"
+        message="Replace &quot;...&quot; with ellipsis character (…, &amp;#8230;) ?"
+        errorLine1="    &lt;string name=&quot;importBookmarksFromGooglePreImportDialogSelectFileButton&quot;>Επιλογή αρχείου σελιδοδεικτών...&lt;/string>"
+        errorLine2="                                                                            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-el/strings-saved-sites.xml"
+            line="118"
+            column="77"/>
+    </issue>
+
+    <issue
+        id="TypographyEllipsis"
+        message="Replace &quot;...&quot; with ellipsis character (…, &amp;#8230;) ?"
+        errorLine1="    &lt;string name=&quot;importBookmarksFromGooglePreImportDialogSelectFileButton&quot;>Vali järjehoidjate fail...&lt;/string>"
+        errorLine2="                                                                            ~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-et/strings-saved-sites.xml"
+            line="118"
+            column="77"/>
+    </issue>
+
+    <issue
+        id="TypographyEllipsis"
+        message="Replace &quot;...&quot; with ellipsis character (…, &amp;#8230;) ?"
+        errorLine1="    &lt;string name=&quot;importBookmarksFromGooglePreImportDialogSelectFileButton&quot;>Seleziona il file dei segnalibri...&lt;/string>"
+        errorLine2="                                                                            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-it/strings-saved-sites.xml"
+            line="118"
+            column="77"/>
+    </issue>
+
+    <issue
+        id="TypographyEllipsis"
+        message="Replace &quot;...&quot; with ellipsis character (…, &amp;#8230;) ?"
+        errorLine1="    &lt;string name=&quot;importBookmarksFromGooglePreImportDialogSelectFileButton&quot;>Bladwijzerbestand selecteren...&lt;/string>"
+        errorLine2="                                                                            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-nl/strings-saved-sites.xml"
+            line="118"
+            column="77"/>
+    </issue>
+
+    <issue
+        id="TypographyEllipsis"
+        message="Replace &quot;...&quot; with ellipsis character (…, &amp;#8230;) ?"
+        errorLine1="    &lt;string name=&quot;importBookmarksFromGooglePreImportDialogSelectFileButton&quot;>Selectează fișierul cu marcaje...&lt;/string>"
+        errorLine2="                                                                            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-ro/strings-saved-sites.xml"
+            line="122"
+            column="77"/>
     </issue>
 
     <issue

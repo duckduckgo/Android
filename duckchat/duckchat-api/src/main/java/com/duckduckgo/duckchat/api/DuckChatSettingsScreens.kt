@@ -22,3 +22,8 @@ import com.duckduckgo.navigation.api.GlobalActivityStarter
  * Use this model to launch the DuckChat Settings screen
  */
 object DuckChatSettingsNoParams : GlobalActivityStarter.ActivityParams
+
+/**
+ * Use this model to launch the DuckChat Settings screen and show native settings only
+ */
+data object DuckChatNativeSettingsNoParams : GlobalActivityStarter.ActivityParams

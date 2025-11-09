@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<issues format="6" by="lint 8.7.3" type="baseline" client="gradle" dependencies="false" name="AGP (8.7.3)" variant="all" version="8.7.3">
+<issues format="6" by="lint 8.8.2" type="baseline" client="gradle" dependencies="false" name="AGP (8.7.3)" variant="all" version="8.8.2">
 
     <issue
         id="DenyListedApi"
@@ -85,7 +85,7 @@
         errorLine2="                    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/test/java/com/duckduckgo/subscriptions/impl/RealSubscriptionsManagerTest.kt"
-            line="308"
+            line="319"
             column="21"/>
     </issue>
 
@@ -96,7 +96,7 @@
         errorLine2="                    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/test/java/com/duckduckgo/subscriptions/impl/RealSubscriptionsManagerTest.kt"
-            line="1343"
+            line="1338"
             column="21"/>
     </issue>
 
@@ -107,41 +107,8 @@
         errorLine2="                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/test/java/com/duckduckgo/subscriptions/impl/RealSubscriptionsManagerTest.kt"
-            line="1349"
+            line="1344"
             column="20"/>
-    </issue>
-
-    <issue
-        id="DenyListedApi"
-        message="If you find yourself using this API in production, you&apos;re doing something wrong!!"
-        errorLine1="        privacyProFeature.allowPurchase().setRawStoredState(Toggle.State(enable = true))"
-        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/test/java/com/duckduckgo/subscriptions/impl/ui/SubscriptionWebViewViewModelTest.kt"
-            line="222"
-            column="9"/>
-    </issue>
-
-    <issue
-        id="DenyListedApi"
-        message="If you find yourself using this API in production, you&apos;re doing something wrong!!"
-        errorLine1="        privacyProFeature.allowPurchase().setRawStoredState(Toggle.State(enable = true))"
-        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/test/java/com/duckduckgo/subscriptions/impl/ui/SubscriptionWebViewViewModelTest.kt"
-            line="241"
-            column="9"/>
-    </issue>
-
-    <issue
-        id="DenyListedApi"
-        message="If you find yourself using this API in production, you&apos;re doing something wrong!!"
-        errorLine1="        privacyProFeature.allowPurchase().setRawStoredState(Toggle.State(enable = false))"
-        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/test/java/com/duckduckgo/subscriptions/impl/ui/SubscriptionWebViewViewModelTest.kt"
-            line="277"
-            column="9"/>
     </issue>
 
     <issue
@@ -151,7 +118,7 @@
         errorLine2="                                        ~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/java/com/duckduckgo/subscriptions/impl/ui/SubscriptionsWebViewActivity.kt"
-            line="370"
+            line="415"
             column="41"/>
     </issue>
 
@@ -492,7 +459,7 @@
         errorLine2="                                   ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-bg/strings-subscriptions.xml"
-            line="88"
+            line="96"
             column="36"/>
     </issue>
 
@@ -503,7 +470,7 @@
         errorLine2="                                   ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-cs/strings-subscriptions.xml"
-            line="88"
+            line="96"
             column="36"/>
     </issue>
 
@@ -514,7 +481,7 @@
         errorLine2="                                   ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-da/strings-subscriptions.xml"
-            line="88"
+            line="96"
             column="36"/>
     </issue>
 
@@ -525,7 +492,7 @@
         errorLine2="                                   ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-de/strings-subscriptions.xml"
-            line="88"
+            line="96"
             column="36"/>
     </issue>
 
@@ -536,7 +503,7 @@
         errorLine2="                                   ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-el/strings-subscriptions.xml"
-            line="88"
+            line="96"
             column="36"/>
     </issue>
 
@@ -547,7 +514,7 @@
         errorLine2="                                   ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-es/strings-subscriptions.xml"
-            line="88"
+            line="96"
             column="36"/>
     </issue>
 
@@ -558,7 +525,7 @@
         errorLine2="                                   ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-et/strings-subscriptions.xml"
-            line="88"
+            line="96"
             column="36"/>
     </issue>
 
@@ -569,7 +536,7 @@
         errorLine2="                                   ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-fi/strings-subscriptions.xml"
-            line="88"
+            line="96"
             column="36"/>
     </issue>
 
@@ -580,7 +547,7 @@
         errorLine2="                                   ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-fr/strings-subscriptions.xml"
-            line="88"
+            line="96"
             column="36"/>
     </issue>
 
@@ -591,7 +558,7 @@
         errorLine2="                                   ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-hr/strings-subscriptions.xml"
-            line="88"
+            line="96"
             column="36"/>
     </issue>
 
@@ -602,7 +569,7 @@
         errorLine2="                                   ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-hu/strings-subscriptions.xml"
-            line="88"
+            line="96"
             column="36"/>
     </issue>
 
@@ -613,7 +580,7 @@
         errorLine2="                                   ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-it/strings-subscriptions.xml"
-            line="88"
+            line="96"
             column="36"/>
     </issue>
 
@@ -624,7 +591,7 @@
         errorLine2="                                   ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-lt/strings-subscriptions.xml"
-            line="88"
+            line="96"
             column="36"/>
     </issue>
 
@@ -635,7 +602,7 @@
         errorLine2="                                   ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-lv/strings-subscriptions.xml"
-            line="88"
+            line="96"
             column="36"/>
     </issue>
 
@@ -646,7 +613,7 @@
         errorLine2="                                   ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-nb/strings-subscriptions.xml"
-            line="88"
+            line="96"
             column="36"/>
     </issue>
 
@@ -657,7 +624,7 @@
         errorLine2="                                   ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-nl/strings-subscriptions.xml"
-            line="88"
+            line="96"
             column="36"/>
     </issue>
 
@@ -668,7 +635,7 @@
         errorLine2="                                   ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-pl/strings-subscriptions.xml"
-            line="88"
+            line="96"
             column="36"/>
     </issue>
 
@@ -679,7 +646,7 @@
         errorLine2="                                   ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-pt/strings-subscriptions.xml"
-            line="88"
+            line="96"
             column="36"/>
     </issue>
 
@@ -690,7 +657,7 @@
         errorLine2="                                   ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-ro/strings-subscriptions.xml"
-            line="88"
+            line="96"
             column="36"/>
     </issue>
 
@@ -701,7 +668,7 @@
         errorLine2="                                   ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-ru/strings-subscriptions.xml"
-            line="88"
+            line="96"
             column="36"/>
     </issue>
 
@@ -712,7 +679,7 @@
         errorLine2="                                   ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-sk/strings-subscriptions.xml"
-            line="88"
+            line="96"
             column="36"/>
     </issue>
 
@@ -723,7 +690,7 @@
         errorLine2="                                   ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-sl/strings-subscriptions.xml"
-            line="88"
+            line="96"
             column="36"/>
     </issue>
 
@@ -734,7 +701,7 @@
         errorLine2="                                   ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-sv/strings-subscriptions.xml"
-            line="88"
+            line="96"
             column="36"/>
     </issue>
 
@@ -745,7 +712,7 @@
         errorLine2="                                   ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-tr/strings-subscriptions.xml"
-            line="88"
+            line="96"
             column="36"/>
     </issue>
 
@@ -756,7 +723,7 @@
         errorLine2="                                   ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-bg/strings-subscriptions.xml"
-            line="91"
+            line="99"
             column="36"/>
     </issue>
 
@@ -767,7 +734,7 @@
         errorLine2="                                   ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-cs/strings-subscriptions.xml"
-            line="91"
+            line="99"
             column="36"/>
     </issue>
 
@@ -778,7 +745,7 @@
         errorLine2="                                   ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-da/strings-subscriptions.xml"
-            line="91"
+            line="99"
             column="36"/>
     </issue>
 
@@ -789,7 +756,7 @@
         errorLine2="                                   ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-de/strings-subscriptions.xml"
-            line="91"
+            line="99"
             column="36"/>
     </issue>
 
@@ -800,7 +767,7 @@
         errorLine2="                                   ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-el/strings-subscriptions.xml"
-            line="91"
+            line="99"
             column="36"/>
     </issue>
 
@@ -811,7 +778,7 @@
         errorLine2="                                   ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-es/strings-subscriptions.xml"
-            line="91"
+            line="99"
             column="36"/>
     </issue>
 
@@ -822,7 +789,7 @@
         errorLine2="                                   ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-et/strings-subscriptions.xml"
-            line="91"
+            line="99"
             column="36"/>
     </issue>
 
@@ -833,7 +800,7 @@
         errorLine2="                                   ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-fi/strings-subscriptions.xml"
-            line="91"
+            line="99"
             column="36"/>
     </issue>
 
@@ -844,7 +811,7 @@
         errorLine2="                                   ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-fr/strings-subscriptions.xml"
-            line="91"
+            line="99"
             column="36"/>
     </issue>
 
@@ -855,7 +822,7 @@
         errorLine2="                                   ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-hr/strings-subscriptions.xml"
-            line="91"
+            line="99"
             column="36"/>
     </issue>
 
@@ -866,7 +833,7 @@
         errorLine2="                                   ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-hu/strings-subscriptions.xml"
-            line="91"
+            line="99"
             column="36"/>
     </issue>
 
@@ -877,7 +844,7 @@
         errorLine2="                                   ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-it/strings-subscriptions.xml"
-            line="91"
+            line="99"
             column="36"/>
     </issue>
 
@@ -888,7 +855,7 @@
         errorLine2="                                   ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-lt/strings-subscriptions.xml"
-            line="91"
+            line="99"
             column="36"/>
     </issue>
 
@@ -899,7 +866,7 @@
         errorLine2="                                   ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-lv/strings-subscriptions.xml"
-            line="91"
+            line="99"
             column="36"/>
     </issue>
 
@@ -910,7 +877,7 @@
         errorLine2="                                   ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-nb/strings-subscriptions.xml"
-            line="91"
+            line="99"
             column="36"/>
     </issue>
 
@@ -921,7 +888,7 @@
         errorLine2="                                   ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-nl/strings-subscriptions.xml"
-            line="91"
+            line="99"
             column="36"/>
     </issue>
 
@@ -932,7 +899,7 @@
         errorLine2="                                   ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-pl/strings-subscriptions.xml"
-            line="91"
+            line="99"
             column="36"/>
     </issue>
 
@@ -943,7 +910,7 @@
         errorLine2="                                   ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-pt/strings-subscriptions.xml"
-            line="91"
+            line="99"
             column="36"/>
     </issue>
 
@@ -954,7 +921,7 @@
         errorLine2="                                   ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-ro/strings-subscriptions.xml"
-            line="91"
+            line="99"
             column="36"/>
     </issue>
 
@@ -965,7 +932,7 @@
         errorLine2="                                   ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-ru/strings-subscriptions.xml"
-            line="91"
+            line="99"
             column="36"/>
     </issue>
 
@@ -976,7 +943,7 @@
         errorLine2="                                   ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-sk/strings-subscriptions.xml"
-            line="91"
+            line="99"
             column="36"/>
     </issue>
 
@@ -987,7 +954,7 @@
         errorLine2="                                   ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-sl/strings-subscriptions.xml"
-            line="91"
+            line="99"
             column="36"/>
     </issue>
 
@@ -998,7 +965,7 @@
         errorLine2="                                   ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-sv/strings-subscriptions.xml"
-            line="91"
+            line="99"
             column="36"/>
     </issue>
 
@@ -1009,7 +976,7 @@
         errorLine2="                                   ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-tr/strings-subscriptions.xml"
-            line="91"
+            line="99"
             column="36"/>
     </issue>
 
@@ -1020,7 +987,7 @@
         errorLine2="                                    ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-bg/strings-subscriptions.xml"
-            line="100"
+            line="108"
             column="37"/>
     </issue>
 
@@ -1031,7 +998,7 @@
         errorLine2="                                    ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-cs/strings-subscriptions.xml"
-            line="100"
+            line="108"
             column="37"/>
     </issue>
 
@@ -1042,7 +1009,7 @@
         errorLine2="                                    ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-da/strings-subscriptions.xml"
-            line="100"
+            line="108"
             column="37"/>
     </issue>
 
@@ -1053,7 +1020,7 @@
         errorLine2="                                    ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-de/strings-subscriptions.xml"
-            line="100"
+            line="108"
             column="37"/>
     </issue>
 
@@ -1064,7 +1031,7 @@
         errorLine2="                                    ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-el/strings-subscriptions.xml"
-            line="100"
+            line="108"
             column="37"/>
     </issue>
 
@@ -1075,7 +1042,7 @@
         errorLine2="                                    ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-es/strings-subscriptions.xml"
-            line="100"
+            line="108"
             column="37"/>
     </issue>
 
@@ -1086,7 +1053,7 @@
         errorLine2="                                    ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-et/strings-subscriptions.xml"
-            line="100"
+            line="108"
             column="37"/>
     </issue>
 
@@ -1097,7 +1064,7 @@
         errorLine2="                                    ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-fi/strings-subscriptions.xml"
-            line="100"
+            line="108"
             column="37"/>
     </issue>
 
@@ -1108,7 +1075,7 @@
         errorLine2="                                    ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-fr/strings-subscriptions.xml"
-            line="100"
+            line="108"
             column="37"/>
     </issue>
 
@@ -1119,7 +1086,7 @@
         errorLine2="                                    ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-hr/strings-subscriptions.xml"
-            line="100"
+            line="108"
             column="37"/>
     </issue>
 
@@ -1130,7 +1097,7 @@
         errorLine2="                                    ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-hu/strings-subscriptions.xml"
-            line="100"
+            line="108"
             column="37"/>
     </issue>
 
@@ -1141,7 +1108,7 @@
         errorLine2="                                    ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-it/strings-subscriptions.xml"
-            line="100"
+            line="108"
             column="37"/>
     </issue>
 
@@ -1152,7 +1119,7 @@
         errorLine2="                                    ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-lt/strings-subscriptions.xml"
-            line="100"
+            line="108"
             column="37"/>
     </issue>
 
@@ -1163,7 +1130,7 @@
         errorLine2="                                    ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-lv/strings-subscriptions.xml"
-            line="100"
+            line="108"
             column="37"/>
     </issue>
 
@@ -1174,7 +1141,7 @@
         errorLine2="                                    ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-nb/strings-subscriptions.xml"
-            line="100"
+            line="108"
             column="37"/>
     </issue>
 
@@ -1185,7 +1152,7 @@
         errorLine2="                                    ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-nl/strings-subscriptions.xml"
-            line="100"
+            line="108"
             column="37"/>
     </issue>
 
@@ -1196,7 +1163,7 @@
         errorLine2="                                    ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-pl/strings-subscriptions.xml"
-            line="100"
+            line="108"
             column="37"/>
     </issue>
 
@@ -1207,7 +1174,7 @@
         errorLine2="                                    ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-pt/strings-subscriptions.xml"
-            line="100"
+            line="108"
             column="37"/>
     </issue>
 
@@ -1218,7 +1185,7 @@
         errorLine2="                                    ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-ro/strings-subscriptions.xml"
-            line="100"
+            line="108"
             column="37"/>
     </issue>
 
@@ -1229,7 +1196,7 @@
         errorLine2="                                    ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-ru/strings-subscriptions.xml"
-            line="100"
+            line="108"
             column="37"/>
     </issue>
 
@@ -1240,7 +1207,7 @@
         errorLine2="                                    ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-sk/strings-subscriptions.xml"
-            line="100"
+            line="108"
             column="37"/>
     </issue>
 
@@ -1251,7 +1218,7 @@
         errorLine2="                                    ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-sl/strings-subscriptions.xml"
-            line="100"
+            line="108"
             column="37"/>
     </issue>
 
@@ -1262,7 +1229,7 @@
         errorLine2="                                    ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-sv/strings-subscriptions.xml"
-            line="100"
+            line="108"
             column="37"/>
     </issue>
 
@@ -1273,7 +1240,7 @@
         errorLine2="                                    ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-tr/strings-subscriptions.xml"
-            line="100"
+            line="108"
             column="37"/>
     </issue>
 
@@ -1284,7 +1251,7 @@
         errorLine2="                                  ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-bg/strings-subscriptions.xml"
-            line="101"
+            line="109"
             column="35"/>
     </issue>
 
@@ -1295,7 +1262,7 @@
         errorLine2="                                  ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-cs/strings-subscriptions.xml"
-            line="101"
+            line="109"
             column="35"/>
     </issue>
 
@@ -1306,7 +1273,7 @@
         errorLine2="                                  ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-da/strings-subscriptions.xml"
-            line="101"
+            line="109"
             column="35"/>
     </issue>
 
@@ -1317,7 +1284,7 @@
         errorLine2="                                  ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-de/strings-subscriptions.xml"
-            line="101"
+            line="109"
             column="35"/>
     </issue>
 
@@ -1328,7 +1295,7 @@
         errorLine2="                                  ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-el/strings-subscriptions.xml"
-            line="101"
+            line="109"
             column="35"/>
     </issue>
 
@@ -1339,7 +1306,7 @@
         errorLine2="                                  ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-es/strings-subscriptions.xml"
-            line="101"
+            line="109"
             column="35"/>
     </issue>
 
@@ -1350,7 +1317,7 @@
         errorLine2="                                  ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-et/strings-subscriptions.xml"
-            line="101"
+            line="109"
             column="35"/>
     </issue>
 
@@ -1361,7 +1328,7 @@
         errorLine2="                                  ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-fi/strings-subscriptions.xml"
-            line="101"
+            line="109"
             column="35"/>
     </issue>
 
@@ -1372,7 +1339,7 @@
         errorLine2="                                  ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-fr/strings-subscriptions.xml"
-            line="101"
+            line="109"
             column="35"/>
     </issue>
 
@@ -1383,7 +1350,7 @@
         errorLine2="                                  ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-hr/strings-subscriptions.xml"
-            line="101"
+            line="109"
             column="35"/>
     </issue>
 
@@ -1394,7 +1361,7 @@
         errorLine2="                                  ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-hu/strings-subscriptions.xml"
-            line="101"
+            line="109"
             column="35"/>
     </issue>
 
@@ -1405,7 +1372,7 @@
         errorLine2="                                  ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-it/strings-subscriptions.xml"
-            line="101"
+            line="109"
             column="35"/>
     </issue>
 
@@ -1416,7 +1383,7 @@
         errorLine2="                                  ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-lt/strings-subscriptions.xml"
-            line="101"
+            line="109"
             column="35"/>
     </issue>
 
@@ -1427,7 +1394,7 @@
         errorLine2="                                  ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-lv/strings-subscriptions.xml"
-            line="101"
+            line="109"
             column="35"/>
     </issue>
 
@@ -1438,7 +1405,7 @@
         errorLine2="                                  ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-nb/strings-subscriptions.xml"
-            line="101"
+            line="109"
             column="35"/>
     </issue>
 
@@ -1449,7 +1416,7 @@
         errorLine2="                                  ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-nl/strings-subscriptions.xml"
-            line="101"
+            line="109"
             column="35"/>
     </issue>
 
@@ -1460,7 +1427,7 @@
         errorLine2="                                  ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-pl/strings-subscriptions.xml"
-            line="101"
+            line="109"
             column="35"/>
     </issue>
 
@@ -1471,7 +1438,7 @@
         errorLine2="                                  ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-pt/strings-subscriptions.xml"
-            line="101"
+            line="109"
             column="35"/>
     </issue>
 
@@ -1482,7 +1449,7 @@
         errorLine2="                                  ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-ro/strings-subscriptions.xml"
-            line="101"
+            line="109"
             column="35"/>
     </issue>
 
@@ -1493,7 +1460,7 @@
         errorLine2="                                  ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-ru/strings-subscriptions.xml"
-            line="101"
+            line="109"
             column="35"/>
     </issue>
 
@@ -1504,7 +1471,7 @@
         errorLine2="                                  ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-sk/strings-subscriptions.xml"
-            line="101"
+            line="109"
             column="35"/>
     </issue>
 
@@ -1515,7 +1482,7 @@
         errorLine2="                                  ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-sl/strings-subscriptions.xml"
-            line="101"
+            line="109"
             column="35"/>
     </issue>
 
@@ -1526,7 +1493,7 @@
         errorLine2="                                  ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-sv/strings-subscriptions.xml"
-            line="101"
+            line="109"
             column="35"/>
     </issue>
 
@@ -1537,7 +1504,7 @@
         errorLine2="                                  ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-tr/strings-subscriptions.xml"
-            line="101"
+            line="109"
             column="35"/>
     </issue>
 
@@ -1548,7 +1515,7 @@
         errorLine2="                                       ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-bg/strings-subscriptions.xml"
-            line="120"
+            line="128"
             column="40"/>
     </issue>
 
@@ -1559,7 +1526,7 @@
         errorLine2="                                       ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-cs/strings-subscriptions.xml"
-            line="120"
+            line="128"
             column="40"/>
     </issue>
 
@@ -1570,7 +1537,7 @@
         errorLine2="                                       ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-da/strings-subscriptions.xml"
-            line="120"
+            line="128"
             column="40"/>
     </issue>
 
@@ -1581,7 +1548,7 @@
         errorLine2="                                       ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-de/strings-subscriptions.xml"
-            line="120"
+            line="128"
             column="40"/>
     </issue>
 
@@ -1592,7 +1559,7 @@
         errorLine2="                                       ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-el/strings-subscriptions.xml"
-            line="120"
+            line="128"
             column="40"/>
     </issue>
 
@@ -1603,7 +1570,7 @@
         errorLine2="                                       ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-es/strings-subscriptions.xml"
-            line="120"
+            line="128"
             column="40"/>
     </issue>
 
@@ -1614,7 +1581,7 @@
         errorLine2="                                       ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-et/strings-subscriptions.xml"
-            line="120"
+            line="128"
             column="40"/>
     </issue>
 
@@ -1625,7 +1592,7 @@
         errorLine2="                                       ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-fi/strings-subscriptions.xml"
-            line="120"
+            line="128"
             column="40"/>
     </issue>
 
@@ -1636,7 +1603,7 @@
         errorLine2="                                       ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-fr/strings-subscriptions.xml"
-            line="120"
+            line="128"
             column="40"/>
     </issue>
 
@@ -1647,7 +1614,7 @@
         errorLine2="                                       ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-hr/strings-subscriptions.xml"
-            line="120"
+            line="128"
             column="40"/>
     </issue>
 
@@ -1658,7 +1625,7 @@
         errorLine2="                                       ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-hu/strings-subscriptions.xml"
-            line="120"
+            line="128"
             column="40"/>
     </issue>
 
@@ -1669,7 +1636,7 @@
         errorLine2="                                       ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-it/strings-subscriptions.xml"
-            line="120"
+            line="128"
             column="40"/>
     </issue>
 
@@ -1680,7 +1647,7 @@
         errorLine2="                                       ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-lt/strings-subscriptions.xml"
-            line="120"
+            line="128"
             column="40"/>
     </issue>
 
@@ -1691,7 +1658,7 @@
         errorLine2="                                       ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-lv/strings-subscriptions.xml"
-            line="120"
+            line="128"
             column="40"/>
     </issue>
 
@@ -1702,7 +1669,7 @@
         errorLine2="                                       ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-nb/strings-subscriptions.xml"
-            line="120"
+            line="128"
             column="40"/>
     </issue>
 
@@ -1713,7 +1680,7 @@
         errorLine2="                                       ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-nl/strings-subscriptions.xml"
-            line="120"
+            line="128"
             column="40"/>
     </issue>
 
@@ -1724,7 +1691,7 @@
         errorLine2="                                       ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-pl/strings-subscriptions.xml"
-            line="120"
+            line="128"
             column="40"/>
     </issue>
 
@@ -1735,7 +1702,7 @@
         errorLine2="                                       ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-pt/strings-subscriptions.xml"
-            line="120"
+            line="128"
             column="40"/>
     </issue>
 
@@ -1746,7 +1713,7 @@
         errorLine2="                                       ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-ro/strings-subscriptions.xml"
-            line="120"
+            line="128"
             column="40"/>
     </issue>
 
@@ -1757,7 +1724,7 @@
         errorLine2="                                       ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-ru/strings-subscriptions.xml"
-            line="120"
+            line="128"
             column="40"/>
     </issue>
 
@@ -1768,7 +1735,7 @@
         errorLine2="                                       ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-sk/strings-subscriptions.xml"
-            line="120"
+            line="128"
             column="40"/>
     </issue>
 
@@ -1779,7 +1746,7 @@
         errorLine2="                                       ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-sl/strings-subscriptions.xml"
-            line="120"
+            line="128"
             column="40"/>
     </issue>
 
@@ -1790,7 +1757,7 @@
         errorLine2="                                       ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-sv/strings-subscriptions.xml"
-            line="120"
+            line="128"
             column="40"/>
     </issue>
 
@@ -1801,7 +1768,7 @@
         errorLine2="                                       ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-tr/strings-subscriptions.xml"
-            line="120"
+            line="128"
             column="40"/>
     </issue>
 
@@ -1812,7 +1779,7 @@
         errorLine2="                                       ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-bg/strings-subscriptions.xml"
-            line="121"
+            line="129"
             column="40"/>
     </issue>
 
@@ -1823,7 +1790,7 @@
         errorLine2="                                       ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-cs/strings-subscriptions.xml"
-            line="121"
+            line="129"
             column="40"/>
     </issue>
 
@@ -1834,7 +1801,7 @@
         errorLine2="                                       ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-da/strings-subscriptions.xml"
-            line="121"
+            line="129"
             column="40"/>
     </issue>
 
@@ -1845,7 +1812,7 @@
         errorLine2="                                       ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-de/strings-subscriptions.xml"
-            line="121"
+            line="129"
             column="40"/>
     </issue>
 
@@ -1856,7 +1823,7 @@
         errorLine2="                                       ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-el/strings-subscriptions.xml"
-            line="121"
+            line="129"
             column="40"/>
     </issue>
 
@@ -1867,7 +1834,7 @@
         errorLine2="                                       ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-es/strings-subscriptions.xml"
-            line="121"
+            line="129"
             column="40"/>
     </issue>
 
@@ -1878,7 +1845,7 @@
         errorLine2="                                       ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-et/strings-subscriptions.xml"
-            line="121"
+            line="129"
             column="40"/>
     </issue>
 
@@ -1889,7 +1856,7 @@
         errorLine2="                                       ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-fi/strings-subscriptions.xml"
-            line="121"
+            line="129"
             column="40"/>
     </issue>
 
@@ -1900,7 +1867,7 @@
         errorLine2="                                       ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-fr/strings-subscriptions.xml"
-            line="121"
+            line="129"
             column="40"/>
     </issue>
 
@@ -1911,7 +1878,7 @@
         errorLine2="                                       ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-hr/strings-subscriptions.xml"
-            line="121"
+            line="129"
             column="40"/>
     </issue>
 
@@ -1922,7 +1889,7 @@
         errorLine2="                                       ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-hu/strings-subscriptions.xml"
-            line="121"
+            line="129"
             column="40"/>
     </issue>
 
@@ -1933,7 +1900,7 @@
         errorLine2="                                       ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-it/strings-subscriptions.xml"
-            line="121"
+            line="129"
             column="40"/>
     </issue>
 
@@ -1944,7 +1911,7 @@
         errorLine2="                                       ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-lt/strings-subscriptions.xml"
-            line="121"
+            line="129"
             column="40"/>
     </issue>
 
@@ -1955,7 +1922,7 @@
         errorLine2="                                       ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-lv/strings-subscriptions.xml"
-            line="121"
+            line="129"
             column="40"/>
     </issue>
 
@@ -1966,7 +1933,7 @@
         errorLine2="                                       ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-nb/strings-subscriptions.xml"
-            line="121"
+            line="129"
             column="40"/>
     </issue>
 
@@ -1977,7 +1944,7 @@
         errorLine2="                                       ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-nl/strings-subscriptions.xml"
-            line="121"
+            line="129"
             column="40"/>
     </issue>
 
@@ -1988,7 +1955,7 @@
         errorLine2="                                       ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-pl/strings-subscriptions.xml"
-            line="121"
+            line="129"
             column="40"/>
     </issue>
 
@@ -1999,7 +1966,7 @@
         errorLine2="                                       ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-pt/strings-subscriptions.xml"
-            line="121"
+            line="129"
             column="40"/>
     </issue>
 
@@ -2010,7 +1977,7 @@
         errorLine2="                                       ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-ro/strings-subscriptions.xml"
-            line="121"
+            line="129"
             column="40"/>
     </issue>
 
@@ -2021,7 +1988,7 @@
         errorLine2="                                       ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-ru/strings-subscriptions.xml"
-            line="121"
+            line="129"
             column="40"/>
     </issue>
 
@@ -2032,7 +1999,7 @@
         errorLine2="                                       ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-sk/strings-subscriptions.xml"
-            line="121"
+            line="129"
             column="40"/>
     </issue>
 
@@ -2043,7 +2010,7 @@
         errorLine2="                                       ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-sl/strings-subscriptions.xml"
-            line="121"
+            line="129"
             column="40"/>
     </issue>
 
@@ -2054,7 +2021,7 @@
         errorLine2="                                       ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-sv/strings-subscriptions.xml"
-            line="121"
+            line="129"
             column="40"/>
     </issue>
 
@@ -2065,7 +2032,7 @@
         errorLine2="                                       ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-tr/strings-subscriptions.xml"
-            line="121"
+            line="129"
             column="40"/>
     </issue>
 
@@ -2076,7 +2043,7 @@
         errorLine2="                               ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-bg/strings-subscriptions.xml"
-            line="162"
+            line="171"
             column="32"/>
     </issue>
 
@@ -2087,7 +2054,7 @@
         errorLine2="                               ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-cs/strings-subscriptions.xml"
-            line="162"
+            line="171"
             column="32"/>
     </issue>
 
@@ -2098,7 +2065,7 @@
         errorLine2="                               ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-da/strings-subscriptions.xml"
-            line="162"
+            line="171"
             column="32"/>
     </issue>
 
@@ -2109,7 +2076,7 @@
         errorLine2="                               ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-de/strings-subscriptions.xml"
-            line="162"
+            line="171"
             column="32"/>
     </issue>
 
@@ -2120,7 +2087,7 @@
         errorLine2="                               ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-el/strings-subscriptions.xml"
-            line="162"
+            line="171"
             column="32"/>
     </issue>
 
@@ -2131,7 +2098,7 @@
         errorLine2="                               ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-es/strings-subscriptions.xml"
-            line="162"
+            line="171"
             column="32"/>
     </issue>
 
@@ -2142,7 +2109,7 @@
         errorLine2="                               ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-et/strings-subscriptions.xml"
-            line="162"
+            line="171"
             column="32"/>
     </issue>
 
@@ -2153,7 +2120,7 @@
         errorLine2="                               ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-fi/strings-subscriptions.xml"
-            line="162"
+            line="171"
             column="32"/>
     </issue>
 
@@ -2164,7 +2131,7 @@
         errorLine2="                               ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-fr/strings-subscriptions.xml"
-            line="162"
+            line="171"
             column="32"/>
     </issue>
 
@@ -2175,7 +2142,7 @@
         errorLine2="                               ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-hr/strings-subscriptions.xml"
-            line="162"
+            line="171"
             column="32"/>
     </issue>
 
@@ -2186,7 +2153,7 @@
         errorLine2="                               ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-hu/strings-subscriptions.xml"
-            line="162"
+            line="171"
             column="32"/>
     </issue>
 
@@ -2197,7 +2164,7 @@
         errorLine2="                               ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-it/strings-subscriptions.xml"
-            line="162"
+            line="171"
             column="32"/>
     </issue>
 
@@ -2208,7 +2175,7 @@
         errorLine2="                               ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-lt/strings-subscriptions.xml"
-            line="162"
+            line="171"
             column="32"/>
     </issue>
 
@@ -2219,7 +2186,7 @@
         errorLine2="                               ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-lv/strings-subscriptions.xml"
-            line="162"
+            line="171"
             column="32"/>
     </issue>
 
@@ -2230,7 +2197,7 @@
         errorLine2="                               ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-nb/strings-subscriptions.xml"
-            line="162"
+            line="171"
             column="32"/>
     </issue>
 
@@ -2241,7 +2208,7 @@
         errorLine2="                               ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-nl/strings-subscriptions.xml"
-            line="162"
+            line="171"
             column="32"/>
     </issue>
 
@@ -2252,7 +2219,7 @@
         errorLine2="                               ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-pl/strings-subscriptions.xml"
-            line="162"
+            line="171"
             column="32"/>
     </issue>
 
@@ -2263,7 +2230,7 @@
         errorLine2="                               ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-pt/strings-subscriptions.xml"
-            line="162"
+            line="171"
             column="32"/>
     </issue>
 
@@ -2274,7 +2241,7 @@
         errorLine2="                               ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-ro/strings-subscriptions.xml"
-            line="162"
+            line="171"
             column="32"/>
     </issue>
 
@@ -2285,7 +2252,7 @@
         errorLine2="                               ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-ru/strings-subscriptions.xml"
-            line="162"
+            line="171"
             column="32"/>
     </issue>
 
@@ -2296,7 +2263,7 @@
         errorLine2="                               ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-sk/strings-subscriptions.xml"
-            line="162"
+            line="171"
             column="32"/>
     </issue>
 
@@ -2307,7 +2274,7 @@
         errorLine2="                               ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-sl/strings-subscriptions.xml"
-            line="162"
+            line="171"
             column="32"/>
     </issue>
 
@@ -2318,7 +2285,7 @@
         errorLine2="                               ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-sv/strings-subscriptions.xml"
-            line="162"
+            line="171"
             column="32"/>
     </issue>
 
@@ -2329,8 +2296,272 @@
         errorLine2="                               ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-tr/strings-subscriptions.xml"
-            line="162"
+            line="171"
             column="32"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;subscriptionSettingSectionTitle&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;bg&quot; (Bulgarian) here"
+        errorLine1="    &lt;string name=&quot;subscriptionSettingSectionTitle&quot; translatable=&quot;false&quot;>DuckDuckGo Subscription&lt;/string>"
+        errorLine2="                                                   ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-bg/strings-subscriptions.xml"
+            line="185"
+            column="52"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;subscriptionSettingSectionTitle&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;cs&quot; (Czech) here"
+        errorLine1="    &lt;string name=&quot;subscriptionSettingSectionTitle&quot; translatable=&quot;false&quot;>DuckDuckGo Subscription&lt;/string>"
+        errorLine2="                                                   ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-cs/strings-subscriptions.xml"
+            line="185"
+            column="52"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;subscriptionSettingSectionTitle&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;da&quot; (Danish) here"
+        errorLine1="    &lt;string name=&quot;subscriptionSettingSectionTitle&quot; translatable=&quot;false&quot;>DuckDuckGo Subscription&lt;/string>"
+        errorLine2="                                                   ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-da/strings-subscriptions.xml"
+            line="185"
+            column="52"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;subscriptionSettingSectionTitle&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;de&quot; (German) here"
+        errorLine1="    &lt;string name=&quot;subscriptionSettingSectionTitle&quot; translatable=&quot;false&quot;>DuckDuckGo Subscription&lt;/string>"
+        errorLine2="                                                   ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-de/strings-subscriptions.xml"
+            line="185"
+            column="52"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;subscriptionSettingSectionTitle&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;el&quot; (Greek) here"
+        errorLine1="    &lt;string name=&quot;subscriptionSettingSectionTitle&quot; translatable=&quot;false&quot;>DuckDuckGo Subscription&lt;/string>"
+        errorLine2="                                                   ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-el/strings-subscriptions.xml"
+            line="185"
+            column="52"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;subscriptionSettingSectionTitle&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;es&quot; (Spanish) here"
+        errorLine1="    &lt;string name=&quot;subscriptionSettingSectionTitle&quot; translatable=&quot;false&quot;>DuckDuckGo Subscription&lt;/string>"
+        errorLine2="                                                   ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-es/strings-subscriptions.xml"
+            line="185"
+            column="52"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;subscriptionSettingSectionTitle&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;et&quot; (Estonian) here"
+        errorLine1="    &lt;string name=&quot;subscriptionSettingSectionTitle&quot; translatable=&quot;false&quot;>DuckDuckGo Subscription&lt;/string>"
+        errorLine2="                                                   ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-et/strings-subscriptions.xml"
+            line="185"
+            column="52"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;subscriptionSettingSectionTitle&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;fi&quot; (Finnish) here"
+        errorLine1="    &lt;string name=&quot;subscriptionSettingSectionTitle&quot; translatable=&quot;false&quot;>DuckDuckGo Subscription&lt;/string>"
+        errorLine2="                                                   ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-fi/strings-subscriptions.xml"
+            line="185"
+            column="52"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;subscriptionSettingSectionTitle&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;fr&quot; (French) here"
+        errorLine1="    &lt;string name=&quot;subscriptionSettingSectionTitle&quot; translatable=&quot;false&quot;>DuckDuckGo Subscription&lt;/string>"
+        errorLine2="                                                   ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-fr/strings-subscriptions.xml"
+            line="185"
+            column="52"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;subscriptionSettingSectionTitle&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;hr&quot; (Croatian) here"
+        errorLine1="    &lt;string name=&quot;subscriptionSettingSectionTitle&quot; translatable=&quot;false&quot;>DuckDuckGo Subscription&lt;/string>"
+        errorLine2="                                                   ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-hr/strings-subscriptions.xml"
+            line="185"
+            column="52"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;subscriptionSettingSectionTitle&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;hu&quot; (Hungarian) here"
+        errorLine1="    &lt;string name=&quot;subscriptionSettingSectionTitle&quot; translatable=&quot;false&quot;>DuckDuckGo Subscription&lt;/string>"
+        errorLine2="                                                   ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-hu/strings-subscriptions.xml"
+            line="185"
+            column="52"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;subscriptionSettingSectionTitle&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;it&quot; (Italian) here"
+        errorLine1="    &lt;string name=&quot;subscriptionSettingSectionTitle&quot; translatable=&quot;false&quot;>DuckDuckGo Subscription&lt;/string>"
+        errorLine2="                                                   ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-it/strings-subscriptions.xml"
+            line="185"
+            column="52"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;subscriptionSettingSectionTitle&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;lt&quot; (Lithuanian) here"
+        errorLine1="    &lt;string name=&quot;subscriptionSettingSectionTitle&quot; translatable=&quot;false&quot;>DuckDuckGo Subscription&lt;/string>"
+        errorLine2="                                                   ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-lt/strings-subscriptions.xml"
+            line="185"
+            column="52"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;subscriptionSettingSectionTitle&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;lv&quot; (Latvian) here"
+        errorLine1="    &lt;string name=&quot;subscriptionSettingSectionTitle&quot; translatable=&quot;false&quot;>DuckDuckGo Subscription&lt;/string>"
+        errorLine2="                                                   ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-lv/strings-subscriptions.xml"
+            line="185"
+            column="52"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;subscriptionSettingSectionTitle&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;nb&quot; (Norwegian Bokmål) here"
+        errorLine1="    &lt;string name=&quot;subscriptionSettingSectionTitle&quot; translatable=&quot;false&quot;>DuckDuckGo Subscription&lt;/string>"
+        errorLine2="                                                   ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-nb/strings-subscriptions.xml"
+            line="185"
+            column="52"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;subscriptionSettingSectionTitle&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;nl&quot; (Dutch) here"
+        errorLine1="    &lt;string name=&quot;subscriptionSettingSectionTitle&quot; translatable=&quot;false&quot;>DuckDuckGo Subscription&lt;/string>"
+        errorLine2="                                                   ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-nl/strings-subscriptions.xml"
+            line="185"
+            column="52"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;subscriptionSettingSectionTitle&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;pl&quot; (Polish) here"
+        errorLine1="    &lt;string name=&quot;subscriptionSettingSectionTitle&quot; translatable=&quot;false&quot;>DuckDuckGo Subscription&lt;/string>"
+        errorLine2="                                                   ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-pl/strings-subscriptions.xml"
+            line="185"
+            column="52"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;subscriptionSettingSectionTitle&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;pt&quot; (Portuguese) here"
+        errorLine1="    &lt;string name=&quot;subscriptionSettingSectionTitle&quot; translatable=&quot;false&quot;>DuckDuckGo Subscription&lt;/string>"
+        errorLine2="                                                   ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-pt/strings-subscriptions.xml"
+            line="185"
+            column="52"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;subscriptionSettingSectionTitle&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;ro&quot; (Romanian) here"
+        errorLine1="    &lt;string name=&quot;subscriptionSettingSectionTitle&quot; translatable=&quot;false&quot;>DuckDuckGo Subscription&lt;/string>"
+        errorLine2="                                                   ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-ro/strings-subscriptions.xml"
+            line="185"
+            column="52"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;subscriptionSettingSectionTitle&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;ru&quot; (Russian) here"
+        errorLine1="    &lt;string name=&quot;subscriptionSettingSectionTitle&quot; translatable=&quot;false&quot;>DuckDuckGo Subscription&lt;/string>"
+        errorLine2="                                                   ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-ru/strings-subscriptions.xml"
+            line="185"
+            column="52"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;subscriptionSettingSectionTitle&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;sk&quot; (Slovak) here"
+        errorLine1="    &lt;string name=&quot;subscriptionSettingSectionTitle&quot; translatable=&quot;false&quot;>DuckDuckGo Subscription&lt;/string>"
+        errorLine2="                                                   ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-sk/strings-subscriptions.xml"
+            line="185"
+            column="52"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;subscriptionSettingSectionTitle&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;sl&quot; (Slovenian) here"
+        errorLine1="    &lt;string name=&quot;subscriptionSettingSectionTitle&quot; translatable=&quot;false&quot;>DuckDuckGo Subscription&lt;/string>"
+        errorLine2="                                                   ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-sl/strings-subscriptions.xml"
+            line="185"
+            column="52"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;subscriptionSettingSectionTitle&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;sv&quot; (Swedish) here"
+        errorLine1="    &lt;string name=&quot;subscriptionSettingSectionTitle&quot; translatable=&quot;false&quot;>DuckDuckGo Subscription&lt;/string>"
+        errorLine2="                                                   ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-sv/strings-subscriptions.xml"
+            line="185"
+            column="52"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;subscriptionSettingSectionTitle&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;tr&quot; (Turkish) here"
+        errorLine1="    &lt;string name=&quot;subscriptionSettingSectionTitle&quot; translatable=&quot;false&quot;>DuckDuckGo Subscription&lt;/string>"
+        errorLine2="                                                   ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-tr/strings-subscriptions.xml"
+            line="185"
+            column="52"/>
     </issue>
 
     <issue
@@ -2379,17 +2610,6 @@
 
     <issue
         id="VectorPath"
-        message="Very long vector path (1092 characters), which is bad for performance. Considering reducing precision, removing minor details or rasterizing vector."
-        errorLine1="      android:pathData=&quot;M10.211,2.72A2.51,2.51 0,0 1,11.997 2a2.508,2.508 0,0 1,1.782 0.728c0.876,0.893 1.654,1.374 2.45,1.62 0.796,0.248 1.741,0.3 3.035,0.136a2.569,2.569 0,0 1,1.86 0.478c0.53,0.4 0.869,1.006 0.874,1.68 0.041,4.809 -0.661,7.91 -2.152,10.14 -1.576,2.356 -3.924,3.546 -6.377,4.79l-0.082,0.04c-0.916,0.465 -1.84,0.475 -2.774,0l-0.082,-0.04c-2.453,-1.244 -4.801,-2.434 -6.377,-4.79 -1.49,-2.23 -2.193,-5.331 -2.152,-10.14 0.005,-0.673 0.344,-1.28 0.874,-1.678a2.569,2.569 0,0 1,1.857 -0.48c1.303,0.164 2.251,0.101 3.047,-0.153 0.794,-0.254 1.564,-0.738 2.431,-1.612ZM11.993,3.5c-0.296,0 -0.555,0.112 -0.717,0.276 -0.99,0.997 -1.96,1.638 -3.04,1.983 -1.07,0.343 -2.255,0.394 -3.69,0.213a1.07,1.07 0,0 0,-0.769 0.19c-0.193,0.146 -0.274,0.33 -0.275,0.492 -0.04,4.692 0.655,7.433 1.9,9.294 1.338,2.003 3.343,3.036 5.89,4.327 0.503,0.255 0.922,0.25 1.417,0 2.546,-1.29 4.55,-2.324 5.89,-4.327 1.244,-1.861 1.94,-4.602 1.9,-9.294 -0.002,-0.162 -0.083,-0.347 -0.277,-0.492a1.07,1.07 0,0 0,-0.768 -0.19c-1.42,0.18 -2.598,0.142 -3.67,-0.19 -1.088,-0.338 -2.07,-0.979 -3.076,-2.003a1.01,1.01 0,0 0,-0.715 -0.279Z&quot;"
-        errorLine2="                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/drawable/ic_privacy_pro_color_24.xml"
-            line="16"
-            column="25"/>
-    </issue>
-
-    <issue
-        id="VectorPath"
         message="Very long vector path (1107 characters), which is bad for performance. Considering reducing precision, removing minor details or rasterizing vector."
         errorLine1="      android:pathData=&quot;M60.67,74.67L60.67,74.67C60.48,74.56 60.29,74.46 60.09,74.35C53.24,70.65 46.7,67.12 42.67,60.7C38.94,54.74 36.89,46.01 37,31.23C37.01,30.49 37.33,29.87 37.93,29.39C38.58,28.87 39.39,28.66 40.05,28.75C44.3,29.32 47.83,29.16 51.03,28.07C54.23,26.97 57.08,24.95 59.97,21.85C61.03,20.71 62.93,20.72 63.98,21.86C66.91,25.05 69.8,27.07 73.04,28.14C76.24,29.19 79.75,29.31 83.95,28.74C84.61,28.65 85.42,28.86 86.07,29.38C86.67,29.86 86.99,30.49 87,31.23C87.11,46.01 85.06,54.74 81.33,60.7C77.3,67.12 70.76,70.65 63.91,74.35C63.71,74.46 63.52,74.56 63.33,74.67L63.33,74.67C62.51,75.11 61.49,75.11 60.67,74.67ZM65.71,79.06C63.4,80.31 60.6,80.31 58.29,79.07C57.99,78.9 57.68,78.73 57.37,78.57C50.79,75.02 43.18,70.92 38.43,63.35C33.95,56.2 31.88,46.32 32.01,31.19C32.04,26.42 36.51,23.22 40.72,23.79C44.49,24.3 47.18,24.09 49.41,23.33C51.63,22.58 53.81,21.13 56.31,18.44C59.35,15.18 64.64,15.18 67.66,18.47C70.19,21.22 72.39,22.66 74.61,23.39C76.84,24.13 79.52,24.3 83.27,23.79C87.48,23.22 91.96,26.42 92,31.19C92.12,46.32 90.05,56.2 85.57,63.35C80.82,70.92 73.21,75.02 66.63,78.57C66.32,78.73 66.01,78.9 65.71,79.06Z&quot;"
         errorLine2="                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
@@ -2411,13 +2631,24 @@
     </issue>
 
     <issue
+        id="MergeRootFrame"
+        message="This `&lt;FrameLayout>` can be replaced with a `&lt;merge>` tag"
+        errorLine1="&lt;FrameLayout xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
+        errorLine2="^">
+        <location
+            file="src/main/res/layout/view_settings_info_banner.xml"
+            line="17"
+            column="1"/>
+    </issue>
+
+    <issue
         id="TypographyEllipsis"
         message="Replace &quot;...&quot; with ellipsis character (…, &amp;#8230;) ?"
         errorLine1="    &lt;string name=&quot;subscriptionSettingActivating&quot;>Aktiviranje u tijeku...&lt;/string>"
         errorLine2="                                                 ~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-hr/strings-subscriptions.xml"
-            line="78"
+            line="86"
             column="50"/>
     </issue>
 
@@ -2428,7 +2659,7 @@
         errorLine2="                                                    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-bg/strings-subscriptions.xml"
-            line="146"
+            line="154"
             column="53"/>
     </issue>
 
@@ -2439,7 +2670,7 @@
         errorLine2="                                                    ~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-cs/strings-subscriptions.xml"
-            line="146"
+            line="154"
             column="53"/>
     </issue>
 
@@ -2450,7 +2681,7 @@
         errorLine2="                                                    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-da/strings-subscriptions.xml"
-            line="146"
+            line="154"
             column="53"/>
     </issue>
 
@@ -2461,7 +2692,7 @@
         errorLine2="                                                    ~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-el/strings-subscriptions.xml"
-            line="146"
+            line="154"
             column="53"/>
     </issue>
 
@@ -2472,7 +2703,7 @@
         errorLine2="                                                    ~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-et/strings-subscriptions.xml"
-            line="146"
+            line="154"
             column="53"/>
     </issue>
 
@@ -2483,7 +2714,7 @@
         errorLine2="                                                    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-fi/strings-subscriptions.xml"
-            line="146"
+            line="154"
             column="53"/>
     </issue>
 
@@ -2494,7 +2725,7 @@
         errorLine2="                                                    ~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-hr/strings-subscriptions.xml"
-            line="146"
+            line="154"
             column="53"/>
     </issue>
 
@@ -2505,7 +2736,7 @@
         errorLine2="                                                    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-it/strings-subscriptions.xml"
-            line="146"
+            line="154"
             column="53"/>
     </issue>
 
@@ -2516,7 +2747,7 @@
         errorLine2="                                                    ~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-lt/strings-subscriptions.xml"
-            line="146"
+            line="154"
             column="53"/>
     </issue>
 
@@ -2527,7 +2758,7 @@
         errorLine2="                                                    ~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-ro/strings-subscriptions.xml"
-            line="146"
+            line="154"
             column="53"/>
     </issue>
 
@@ -2538,7 +2769,7 @@
         errorLine2="                                                    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-ru/strings-subscriptions.xml"
-            line="146"
+            line="154"
             column="53"/>
     </issue>
 
@@ -2549,7 +2780,7 @@
         errorLine2="                                                    ~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-sk/strings-subscriptions.xml"
-            line="146"
+            line="154"
             column="53"/>
     </issue>
 
@@ -2560,7 +2791,7 @@
         errorLine2="                                                    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-sl/strings-subscriptions.xml"
-            line="146"
+            line="154"
             column="53"/>
     </issue>
 
@@ -2571,7 +2802,7 @@
         errorLine2="                                                    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-sv/strings-subscriptions.xml"
-            line="146"
+            line="154"
             column="53"/>
     </issue>
 
@@ -2582,7 +2813,7 @@
         errorLine2="                                                    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-tr/strings-subscriptions.xml"
-            line="146"
+            line="154"
             column="53"/>
     </issue>
 
@@ -2593,7 +2824,7 @@
         errorLine2="                                                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-cs/strings-subscriptions.xml"
-            line="155"
+            line="163"
             column="57"/>
     </issue>
 
@@ -2604,7 +2835,7 @@
         errorLine2="                                                        ~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-da/strings-subscriptions.xml"
-            line="155"
+            line="163"
             column="57"/>
     </issue>
 
@@ -2615,7 +2846,7 @@
         errorLine2="                                                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-el/strings-subscriptions.xml"
-            line="155"
+            line="163"
             column="57"/>
     </issue>
 
@@ -2626,7 +2857,7 @@
         errorLine2="                                                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-et/strings-subscriptions.xml"
-            line="155"
+            line="163"
             column="57"/>
     </issue>
 
@@ -2637,7 +2868,7 @@
         errorLine2="                                                        ~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-fi/strings-subscriptions.xml"
-            line="155"
+            line="163"
             column="57"/>
     </issue>
 
@@ -2648,7 +2879,7 @@
         errorLine2="                                                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-it/strings-subscriptions.xml"
-            line="155"
+            line="163"
             column="57"/>
     </issue>
 
@@ -2659,7 +2890,7 @@
         errorLine2="                                                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-lt/strings-subscriptions.xml"
-            line="155"
+            line="163"
             column="57"/>
     </issue>
 
@@ -2670,7 +2901,7 @@
         errorLine2="                                                        ~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-pl/strings-subscriptions.xml"
-            line="155"
+            line="163"
             column="57"/>
     </issue>
 
@@ -2681,7 +2912,7 @@
         errorLine2="                                                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-ro/strings-subscriptions.xml"
-            line="155"
+            line="163"
             column="57"/>
     </issue>
 
@@ -2692,7 +2923,7 @@
         errorLine2="                                                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-ru/strings-subscriptions.xml"
-            line="155"
+            line="163"
             column="57"/>
     </issue>
 
@@ -2703,7 +2934,7 @@
         errorLine2="                                                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-sk/strings-subscriptions.xml"
-            line="155"
+            line="163"
             column="57"/>
     </issue>
 
@@ -2714,7 +2945,7 @@
         errorLine2="                                                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-sl/strings-subscriptions.xml"
-            line="155"
+            line="163"
             column="57"/>
     </issue>
 
@@ -2725,7 +2956,7 @@
         errorLine2="                                                        ~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-sv/strings-subscriptions.xml"
-            line="155"
+            line="163"
             column="57"/>
     </issue>
 
@@ -2736,7 +2967,7 @@
         errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/java/com/duckduckgo/subscriptions/impl/settings/views/ProSettingView.kt"
-            line="104"
+            line="106"
             column="9"/>
     </issue>
 
@@ -2747,7 +2978,7 @@
         errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/java/com/duckduckgo/subscriptions/impl/settings/views/ProSettingView.kt"
-            line="106"
+            line="108"
             column="9"/>
     </issue>
 
@@ -2758,7 +2989,7 @@
         errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/java/com/duckduckgo/subscriptions/impl/settings/views/ProSettingView.kt"
-            line="108"
+            line="110"
             column="9"/>
     </issue>
 
@@ -2769,7 +3000,7 @@
         errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/java/com/duckduckgo/subscriptions/impl/settings/views/ProSettingView.kt"
-            line="109"
+            line="111"
             column="9"/>
     </issue>
 
@@ -2780,7 +3011,7 @@
         errorLine2="             ~~~~~~~~~">
         <location
             file="src/main/res/layout/activity_subscription_settings.xml"
-            line="40"
+            line="44"
             column="14"/>
     </issue>
 
@@ -2791,7 +3022,7 @@
         errorLine2="                 ~~~~~~~~~">
         <location
             file="src/main/res/layout/activity_subscription_settings.xml"
-            line="65"
+            line="70"
             column="18"/>
     </issue>
 
@@ -2802,7 +3033,7 @@
         errorLine2="                 ~~~~~~~~~">
         <location
             file="src/main/res/layout/activity_subscription_settings.xml"
-            line="91"
+            line="96"
             column="18"/>
     </issue>
 

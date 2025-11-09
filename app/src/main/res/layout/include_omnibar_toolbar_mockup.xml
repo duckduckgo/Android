@@ -122,8 +122,8 @@
 
             <ImageView
                 android:id="@+id/browserMenuImageView"
-                android:layout_width="@dimen/bottomNavIcon"
-                android:layout_height="@dimen/bottomNavIcon"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:contentDescription="@string/browserPopupMenu"
                 android:scaleType="center"
@@ -160,6 +160,13 @@
                 android:scaleType="center"
                 android:src="@drawable/ic_fire_24" />
         </FrameLayout>
+
+        <Space
+            android:layout_width="@dimen/omnibarCardExtendedMarginEnd"
+            android:layout_height="match_parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

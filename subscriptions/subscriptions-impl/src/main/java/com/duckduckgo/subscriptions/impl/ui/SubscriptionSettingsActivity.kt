@@ -49,15 +49,17 @@ import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.FAQS_URL
 import com.duckduckgo.subscriptions.impl.databinding.ActivitySubscriptionSettingsBinding
 import com.duckduckgo.subscriptions.impl.internal.SubscriptionsUrlProvider
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
+import com.duckduckgo.subscriptions.impl.switch_plan.SwitchPlanBottomSheetDialogFactory
 import com.duckduckgo.subscriptions.impl.ui.ChangePlanActivity.Companion.ChangePlanScreenWithEmptyParams
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command
-import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.DismissRebrandingBanner
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.FinishSignOut
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.GoToActivationScreen
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.GoToEditEmailScreen
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.GoToPortal
+import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.ShowSwitchPlanDialog
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.SubscriptionDuration.Monthly
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.SubscriptionDuration.Yearly
+import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.SwitchPlanType
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.ViewState
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionsWebViewActivityWithParams.ToolbarConfig.CustomTitle
 import kotlinx.coroutines.flow.filterIsInstance
@@ -77,6 +79,9 @@ class SubscriptionSettingsActivity : DuckDuckGoActivity() {
 
     @Inject
     lateinit var subscriptionsUrlProvider: SubscriptionsUrlProvider
+
+    @Inject
+    lateinit var switchPlanDialogFactory: SwitchPlanBottomSheetDialogFactory
 
     private val viewModel: SubscriptionSettingsViewModel by bindViewModel()
     private val binding: ActivitySubscriptionSettingsBinding by viewBinding()
@@ -153,18 +158,10 @@ class SubscriptionSettingsActivity : DuckDuckGoActivity() {
         binding.faq.setPrimaryText(getString(string.privacyProFaq))
         binding.faq.setSecondaryText(getString(string.privacyProFaqSecondary))
 
-        if (viewState.showRebrandingBanner) {
-            binding.includePrivacyProRebrandingBanner.root.show()
-            binding.includePrivacyProRebrandingBanner.settingsBannerClose.setOnClickListener {
-                viewModel.rebrandingBannerDismissed()
-            }
-        } else {
-            binding.includePrivacyProRebrandingBanner.root.gone()
-        }
-
         if (viewState.status in listOf(INACTIVE, EXPIRED)) {
             binding.viewPlans.isVisible = true
             binding.changePlan.isVisible = false
+            binding.switchPlan.isVisible = false
             binding.subscriptionActiveStatusContainer.isVisible = false
             binding.subscriptionExpiredStatusContainer.isVisible = true
             binding.subscriptionExpiredStatusText.text = getString(string.subscriptionsExpiredData, viewState.date)
@@ -174,8 +171,19 @@ class SubscriptionSettingsActivity : DuckDuckGoActivity() {
             binding.subscriptionActiveStatusContainer.isVisible = true
             binding.subscriptionExpiredStatusContainer.isVisible = false
 
-            if (viewState.switchPlanAvailable) {
-                // TODO Add/edit views for switching plan
+            // Show switch plan option if available (Android only)
+            if (viewState.switchPlanAvailable && viewState.platform.lowercase() == "google") {
+                binding.switchPlan.show()
+                val switchText = when (viewState.duration) {
+                    Monthly -> getString(string.subscriptionSettingSwitchUpgradeDynamic, viewState.savingsPercentage.toString())
+                    Yearly -> getString(string.subscriptionSettingSwitchDowngrade)
+                }
+                binding.switchPlan.setPrimaryText(switchText)
+                binding.switchPlan.setClickListener {
+                    viewModel.onSwitchPlanClicked(viewState.duration)
+                }
+            } else {
+                binding.switchPlan.gone()
             }
 
             // Free Trial active
@@ -290,8 +298,20 @@ class SubscriptionSettingsActivity : DuckDuckGoActivity() {
                 )
             }
 
-            is DismissRebrandingBanner -> dismissRebrandingBanner()
+            is ShowSwitchPlanDialog -> showSwitchPlanDialog(command.switchType)
         }
+    }
+
+    private fun showSwitchPlanDialog(switchType: SwitchPlanType) {
+        val dialog = switchPlanDialogFactory.create(
+            context = this,
+            lifecycleOwner = this,
+            switchType = switchType,
+            onSwitchSuccess = {
+                viewModel.onSwitchPlanSuccess()
+            },
+        )
+        dialog.show()
     }
 
     private fun goToFaqs() {
@@ -350,10 +370,6 @@ class SubscriptionSettingsActivity : DuckDuckGoActivity() {
                 screenTitle = getString(string.privacyPolicyAndTermsOfService),
             ),
         )
-    }
-
-    private fun dismissRebrandingBanner() {
-        binding.includePrivacyProRebrandingBanner.root.gone()
     }
 
     companion object {

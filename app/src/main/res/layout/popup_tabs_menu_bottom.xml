@@ -101,10 +101,4 @@
         app:primaryText="@string/tabSwitcherGridViewMenu"
         app:trailingIcon="@drawable/ic_check_24" />
 
-    <com.duckduckgo.common.ui.view.PopupMenuItemView
-        android:id="@+id/newTabMenuItem"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:primaryText="@string/newTabMenuItem" />
-
 </LinearLayout>

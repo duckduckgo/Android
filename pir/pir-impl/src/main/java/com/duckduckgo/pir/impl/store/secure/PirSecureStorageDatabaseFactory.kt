@@ -73,25 +73,31 @@ class RealPirSecureStorageDatabaseFactory @Inject constructor(
             return _database
         }
 
-        // If we can't access the keystore, it means that L1Key will be null. We don't want to encrypt the db with a null key.
-        return if (keyProvider.canAccessKeyStore()) {
-            // At this point, we are guaranteed that if L1key is null, it's because it hasn't been generated yet. Else, we always use the one stored.
-            _database = Room.databaseBuilder(
-                context,
-                PirDatabase::class.java,
-                "pir_encrypted.db",
-            )
-                .openHelperFactory(
-                    SupportOpenHelperFactory(
-                        keyProvider.getl1Key(),
-                    ),
+        return runCatching {
+            // If we can't access the keystore, it means that L1Key will be null. We don't want to encrypt the db with a null key.
+            if (keyProvider.canAccessKeyStore()) {
+                // At this point, we are guaranteed that if L1key is null, it's because it hasn't been generated yet. Else, we always use the one stored.
+                _database = Room.databaseBuilder(
+                    context,
+                    PirDatabase::class.java,
+                    "pir_encrypted.db",
                 )
-                .enableMultiInstanceInvalidation()
-                .fallbackToDestructiveMigration()
-                .build()
-            _database
-        } else {
-            logcat(ERROR) { "PIR-DB: Cannot access key store!" }
+                    .openHelperFactory(
+                        SupportOpenHelperFactory(
+                            keyProvider.getl1Key(),
+                        ),
+                    )
+                    .enableMultiInstanceInvalidation()
+                    .fallbackToDestructiveMigration()
+                    .build()
+                logcat { "PIR-DB: Ready to use!" }
+                _database
+            } else {
+                logcat(ERROR) { "PIR-DB: Cannot access key store!" }
+                null
+            }
+        }.getOrElse {
+            logcat(ERROR) { "PIR-DB: Cannot instantiate the database due to ${it.message}!" }
             null
         }
     }

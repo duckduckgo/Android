@@ -190,7 +190,6 @@
     <string name="webTrackingProtectionActivityTitle">Protection contre le pistage sur le Web</string>
     <string name="webTrackingProtectionLearnMoreTitle">Protection contre le pistage sur le Web</string>
     <string name="webTrackingProtectionTitle">Protection contre le pistage sur le Web</string>
-    <string name="webTrackingProtectionDescriptionNew"><![CDATA[DuckDuckGo bloque automatiquement les traqueurs cachés lorsque vous naviguez sur le Web.\n<a href=\"\">En savoir plus</a>]]></string>
     <string name="webTrackingProtectionExplanationDescription"><![CDATA[Le navigateur DuckDuckGo fournit des protections contre le pistage qui sont toujours actives.\n<a href=\"\">En savoir plus</a>]]></string>
     <string name="webTrackingProtectionExplanationTitle">Comment nous vous protégeons</string>
     <string name="webTrackingProtectionThirdPartyTrackersTitle">Bloque les traqueurs tiers</string>
@@ -844,8 +843,10 @@
 
     <!-- Appearance settings -->
     <string name="settingsAddressBarPositionTitle">Barre d\'adresse</string>
+    <string name="settingsAddressBarPositionHeaderTitle">Position de la barre d\'adresse</string>
     <string name="settingsAddressBarPositionTop">Haut de page</string>
     <string name="settingsAddressBarPositionBottom">En bas</string>
+    <string name="settingsAddressBarPositionSplit">Séparée</string>
 
     <!-- Show on App Launch Option -->
     <string name="showOnAppLaunchOptionTitle">Afficher au lancement de l\'application</string>

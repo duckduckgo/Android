@@ -43,6 +43,7 @@ import androidx.lifecycle.Observer
 import androidx.room.Room
 import androidx.test.filters.SdkSuppress
 import androidx.test.platform.app.InstrumentationRegistry.getInstrumentation
+import app.cash.turbine.test
 import com.duckduckgo.adclick.api.AdClickManager
 import com.duckduckgo.app.ValueCaptorObserver
 import com.duckduckgo.app.accessibility.data.AccessibilitySettingsDataStore
@@ -74,6 +75,7 @@ import com.duckduckgo.app.browser.commands.Command.CloseCustomTab
 import com.duckduckgo.app.browser.commands.Command.EnqueueCookiesAnimation
 import com.duckduckgo.app.browser.commands.Command.EscapeMaliciousSite
 import com.duckduckgo.app.browser.commands.Command.HideBrokenSitePromptCta
+import com.duckduckgo.app.browser.commands.Command.HideKeyboard
 import com.duckduckgo.app.browser.commands.Command.HideOnboardingDaxBubbleCta
 import com.duckduckgo.app.browser.commands.Command.HideOnboardingDaxDialog
 import com.duckduckgo.app.browser.commands.Command.HideWarningMaliciousSite
@@ -233,6 +235,7 @@ import com.duckduckgo.common.utils.baseHost
 import com.duckduckgo.common.utils.device.DeviceInfo
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.common.utils.plugins.headers.CustomHeadersProvider
+import com.duckduckgo.contentscopescripts.api.ContentScopeScriptsSubscriptionEventPlugin
 import com.duckduckgo.downloads.api.DownloadStateListener
 import com.duckduckgo.downloads.api.FileDownloader
 import com.duckduckgo.downloads.api.FileDownloader.PendingFileDownload
@@ -259,12 +262,8 @@ import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.history.api.HistoryEntry.VisitedPage
 import com.duckduckgo.history.api.NavigationHistory
-import com.duckduckgo.js.messaging.api.AddDocumentStartJavaScriptPlugin
 import com.duckduckgo.js.messaging.api.JsCallbackData
-import com.duckduckgo.js.messaging.api.PostMessageWrapperPlugin
 import com.duckduckgo.js.messaging.api.SubscriptionEventData
-import com.duckduckgo.js.messaging.api.WebMessagingPlugin
-import com.duckduckgo.js.messaging.api.WebViewCompatMessageCallback
 import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.Feed
 import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.Feed.MALWARE
 import com.duckduckgo.newtabpage.impl.pixels.NewTabPixels
@@ -290,6 +289,7 @@ import com.duckduckgo.savedsites.api.models.SavedSite.Favorite
 import com.duckduckgo.savedsites.impl.SavedSitesPixelName
 import com.duckduckgo.serp.logos.api.SerpEasterEggLogosToggles
 import com.duckduckgo.serp.logos.api.SerpLogo
+import com.duckduckgo.settings.api.SettingsPageFeature
 import com.duckduckgo.site.permissions.api.SitePermissionsManager
 import com.duckduckgo.site.permissions.api.SitePermissionsManager.LocationPermissionRequest
 import com.duckduckgo.site.permissions.api.SitePermissionsManager.SitePermissionQueryResponse
@@ -619,6 +619,9 @@ class BrowserTabViewModelTest {
 
     private val mockDeviceAppLookup: DeviceAppLookup = mock()
 
+    private lateinit var fakeContentScopeScriptsSubscriptionEventPluginPoint: FakeContentScopeScriptsSubscriptionEventPluginPoint
+    private var fakeSettingsPageFeature = FakeFeatureToggleFactory.create(SettingsPageFeature::class.java)
+
     @Before
     fun before() =
         runTest {
@@ -758,6 +761,8 @@ class BrowserTabViewModelTest {
 
             whenever(mockSiteErrorHandlerKillSwitch.self()).thenReturn(mockSiteErrorHandlerKillSwitchToggle)
 
+            fakeContentScopeScriptsSubscriptionEventPluginPoint = FakeContentScopeScriptsSubscriptionEventPluginPoint()
+
             testee =
                 BrowserTabViewModel(
                     statisticsUpdater = mockStatisticsUpdater,
@@ -849,6 +854,8 @@ class BrowserTabViewModelTest {
                     addressBarTrackersAnimationFeatureToggle = mockAddressBarTrackersAnimationFeatureToggle,
                     autoconsentPixelManager = mockAutoconsentPixelManager,
                     omnibarFeatureRepository = mockOmnibarFeatureRepository,
+                    contentScopeScriptsSubscriptionEventPluginPoint = fakeContentScopeScriptsSubscriptionEventPluginPoint,
+                    settingsPageFeature = fakeSettingsPageFeature,
                 )
 
             testee.loadData("abc", null, false, false)
@@ -929,6 +936,40 @@ class BrowserTabViewModelTest {
             testee.onViewVisible()
 
             assertCommandNotIssued<ShowKeyboard>()
+        }
+
+    @Test
+    fun whenOmnibarTypeSplitThenThenKeyboardShownOnlyTheFirstTimeNtpIsVisible() =
+        runTest {
+            whenever(mockExtendedOnboardingFeatureToggles.noBrowserCtas()).thenReturn(mockDisabledToggle)
+            whenever(mockWidgetCapabilities.hasInstalledWidgets).thenReturn(true)
+            testee.browserViewState.value = browserViewState().copy(browserShowing = false)
+            whenever(mockSettingsDataStore.omnibarType).thenReturn(OmnibarType.SPLIT)
+
+            testee.onViewVisible()
+
+            assertCommandIssued<ShowKeyboard>()
+
+            testee.onViewVisible()
+
+            assertCommandIssued<HideKeyboard>()
+        }
+
+    @Test
+    fun whenOmnibarTypeNotSplitThenThenKeyboardNotHiddenWhenOpenedMultipleTimes() =
+        runTest {
+            whenever(mockExtendedOnboardingFeatureToggles.noBrowserCtas()).thenReturn(mockDisabledToggle)
+            whenever(mockWidgetCapabilities.hasInstalledWidgets).thenReturn(true)
+            testee.browserViewState.value = browserViewState().copy(browserShowing = false)
+            whenever(mockSettingsDataStore.omnibarType).thenReturn(OmnibarType.SINGLE_TOP)
+
+            testee.onViewVisible()
+
+            assertCommandIssued<ShowKeyboard>()
+
+            testee.onViewVisible()
+
+            assertCommandNotIssued<HideKeyboard>()
         }
 
     @Test
@@ -7415,43 +7456,6 @@ class BrowserTabViewModelTest {
         }
 
     @Test
-    fun whenInputScreenEnabledAndExternalIntentProcessingCompletedThenLaunchInputScreenCommandTriggered() =
-        runTest {
-            val initialTabId = "initial-tab"
-            val initialTab =
-                TabEntity(
-                    tabId = initialTabId,
-                    url = "https://example.com",
-                    title = "EX",
-                    skipHome = false,
-                    viewed = true,
-                    position = 0,
-                )
-            val ntpTabId = "ntp-tab"
-            val ntpTab = TabEntity(tabId = ntpTabId, url = null, title = "", skipHome = false, viewed = true, position = 0)
-            whenever(mockTabRepository.getTab(initialTabId)).thenReturn(initialTab)
-            whenever(mockTabRepository.getTab(ntpTabId)).thenReturn(ntpTab)
-            flowSelectedTab.emit(initialTab)
-
-            testee.loadData(tabId = ntpTabId, initialUrl = null, skipHome = false, isExternal = false)
-            mockDuckAiFeatureStateInputScreenOpenAutomaticallyFlow.emit(true)
-            mockHasPendingTabLaunchFlow.emit(true)
-
-            // Switch to a new tab with no URL
-            flowSelectedTab.emit(ntpTab)
-
-            // Complete external intent processing
-            mockHasPendingTabLaunchFlow.emit(false)
-
-            verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
-            val commands = commandCaptor.allValues
-            assertTrue(
-                "LaunchInputScreen command should be triggered when external intent processing completes",
-                commands.any { it is Command.LaunchInputScreen },
-            )
-        }
-
-    @Test
     fun whenInputScreenEnabledAndDuckAiOpenThenLaunchInputScreenCommandSuppressed() =
         runTest {
             val initialTabId = "initial-tab"
@@ -7480,51 +7484,6 @@ class BrowserTabViewModelTest {
             val commands = commandCaptor.allValues
             assertFalse(
                 "LaunchInputScreen command should be suppressed when Duck.ai is opened",
-                commands.any { it is Command.LaunchInputScreen },
-            )
-        }
-
-    @Test
-    fun whenInputScreenEnabledAndDuckAiClosedThenLaunchInputScreenCommandTriggered() =
-        runTest {
-            val initialTabId = "initial-tab"
-            val initialTab =
-                TabEntity(
-                    tabId = initialTabId,
-                    url = "https://example.com",
-                    title = "EX",
-                    skipHome = false,
-                    viewed = true,
-                    position = 0,
-                )
-            val ntpTabId = "ntp-tab"
-            val ntpTab =
-                TabEntity(
-                    tabId = ntpTabId,
-                    url = null,
-                    title = "",
-                    skipHome = false,
-                    viewed = true,
-                    position = 0,
-                )
-            whenever(mockTabRepository.getTab(initialTabId)).thenReturn(initialTab)
-            whenever(mockTabRepository.getTab(ntpTabId)).thenReturn(ntpTab)
-            flowSelectedTab.emit(initialTab)
-
-            testee.loadData(tabId = ntpTabId, initialUrl = null, skipHome = false, isExternal = false)
-            mockDuckAiFeatureStateInputScreenOpenAutomaticallyFlow.emit(true)
-            mockHasPendingDuckAiOpenFlow.emit(true)
-
-            // Switch to a new tab with no URL
-            flowSelectedTab.emit(ntpTab)
-
-            // Close Duck.ai
-            mockHasPendingDuckAiOpenFlow.emit(false)
-
-            verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
-            val commands = commandCaptor.allValues
-            assertTrue(
-                "LaunchInputScreen command should be triggered when Duck.ai is closed",
                 commands.any { it is Command.LaunchInputScreen },
             )
         }
@@ -7874,74 +7833,102 @@ class BrowserTabViewModelTest {
         override fun getCustomHeaders(url: String): Map<String, String> = headers
     }
 
-    class FakeAddDocumentStartJavaScriptPlugin(
-        override val context: String,
-    ) : AddDocumentStartJavaScriptPlugin {
-        var countInitted = 0
-            private set
+    class FakeContentScopeScriptsSubscriptionEventPlugin(
+        private val eventData: SubscriptionEventData,
+    ) : ContentScopeScriptsSubscriptionEventPlugin {
+        override fun getSubscriptionEventData(): SubscriptionEventData = eventData
+    }
 
-        override suspend fun addDocumentStartJavaScript(webView: WebView) {
-            countInitted++
+    class FakeContentScopeScriptsSubscriptionEventPluginPoint : PluginPoint<ContentScopeScriptsSubscriptionEventPlugin> {
+
+        private val plugins: MutableList<ContentScopeScriptsSubscriptionEventPlugin> = mutableListOf()
+
+        fun addPlugins(plugins: List<ContentScopeScriptsSubscriptionEventPlugin>) {
+            this.plugins.addAll(plugins)
+        }
+
+        override fun getPlugins(): Collection<ContentScopeScriptsSubscriptionEventPlugin> = plugins
+    }
+
+    @Test
+    fun whenOnViewResumedWithNoPluginsThenNoSubscriptionEventsSent() = runTest {
+        fakeSettingsPageFeature.serpSettingsSync().setRawStoredState(State(enable = true))
+
+        testee.onViewResumed()
+
+        testee.subscriptionEventDataFlow.test {
+            expectNoEvents()
+            cancelAndIgnoreRemainingEvents()
         }
     }
 
-    class FakeAddDocumentStartJavaScriptPluginPoint : PluginPoint<AddDocumentStartJavaScriptPlugin> {
-        val cssPlugin = FakeAddDocumentStartJavaScriptPlugin("contentScopeScripts")
-        val otherPlugin = FakeAddDocumentStartJavaScriptPlugin("test")
-
-        override fun getPlugins() = listOf(cssPlugin, otherPlugin)
-    }
-
-    class FakeWebMessagingPlugin : WebMessagingPlugin {
-        var registered = false
-            private set
-
-        override suspend fun unregister(webView: WebView) {
-            registered = false
+    @Test
+    fun whenOnViewResumedWithPluginsThenSubscriptionEventsSent() = runTest {
+        fakeSettingsPageFeature.serpSettingsSync().setRawStoredState(State(enable = true))
+        val events = mutableListOf<SubscriptionEventData>().apply {
+            add(
+                SubscriptionEventData(
+                    featureName = "event1",
+                    subscriptionName = "subscription1",
+                    params = JSONObject().put("param1", "value1"),
+                ),
+            )
+            add(
+                SubscriptionEventData(
+                    featureName = "event2",
+                    subscriptionName = "subscription2",
+                    params = JSONObject().put("param2", "value2"),
+                ),
+            )
         }
 
-        override suspend fun register(
-            jsMessageCallback: WebViewCompatMessageCallback,
-            webView: WebView,
-        ) {
-            registered = true
-        }
+        fakeContentScopeScriptsSubscriptionEventPluginPoint.addPlugins(
+            events.map { FakeContentScopeScriptsSubscriptionEventPlugin(it) },
+        )
 
-        override suspend fun postMessage(
-            webView: WebView,
-            subscriptionEventData: SubscriptionEventData,
-        ) {
-        }
+        testee.onViewResumed()
 
-        override val context: String
-            get() = "test"
+        testee.subscriptionEventDataFlow.test {
+            for (expectedEvent in events) {
+                val emittedEvent = awaitItem()
+                assertEquals(expectedEvent.featureName, emittedEvent.featureName)
+                assertEquals(expectedEvent.subscriptionName, emittedEvent.subscriptionName)
+                assertEquals(expectedEvent.params.toString(), emittedEvent.params.toString())
+            }
+            cancelAndIgnoreRemainingEvents()
+        }
     }
 
-    class FakeWebMessagingPluginPoint : PluginPoint<WebMessagingPlugin> {
-        val plugin = FakeWebMessagingPlugin()
-
-        override fun getPlugins(): Collection<WebMessagingPlugin> = listOf(plugin)
-    }
-
-    class FakePostMessageWrapperPlugin : PostMessageWrapperPlugin {
-        var postMessageCalled = false
-            private set
-
-        override suspend fun postMessage(
-            message: SubscriptionEventData,
-            webView: WebView,
-        ) {
-            postMessageCalled = true
+    @Test
+    fun whenOnViewResumedWithPluginsAndSerpSettingsFeatureFlagOffThenNoEventsSent() = runTest {
+        fakeSettingsPageFeature.serpSettingsSync().setRawStoredState(State(enable = false))
+        val events = mutableListOf<SubscriptionEventData>().apply {
+            add(
+                SubscriptionEventData(
+                    featureName = "event1",
+                    subscriptionName = "subscription1",
+                    params = JSONObject().put("param1", "value1"),
+                ),
+            )
+            add(
+                SubscriptionEventData(
+                    featureName = "event2",
+                    subscriptionName = "subscription2",
+                    params = JSONObject().put("param2", "value2"),
+                ),
+            )
         }
 
-        override val context: String
-            get() = "contentScopeScripts"
-    }
+        fakeContentScopeScriptsSubscriptionEventPluginPoint.addPlugins(
+            events.map { FakeContentScopeScriptsSubscriptionEventPlugin(it) },
+        )
 
-    class FakePostMessageWrapperPluginPoint : PluginPoint<PostMessageWrapperPlugin> {
-        val plugin = FakePostMessageWrapperPlugin()
+        testee.onViewResumed()
 
-        override fun getPlugins(): Collection<PostMessageWrapperPlugin> = listOf(plugin)
+        testee.subscriptionEventDataFlow.test {
+            expectNoEvents()
+            cancelAndIgnoreRemainingEvents()
+        }
     }
 
     @Test

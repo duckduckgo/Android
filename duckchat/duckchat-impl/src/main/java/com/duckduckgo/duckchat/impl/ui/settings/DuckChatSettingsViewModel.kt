@@ -19,10 +19,10 @@ package com.duckduckgo.duckchat.impl.ui.settings
 import androidx.annotation.StringRes
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.utils.DispatcherProvider
-import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.duckchat.api.DuckChatNativeSettingsNoParams
+import com.duckduckgo.duckchat.api.DuckChatSettingsNoParams
 import com.duckduckgo.duckchat.impl.DuckChatInternal
 import com.duckduckgo.duckchat.impl.R
 import com.duckduckgo.duckchat.impl.inputscreen.ui.metrics.discovery.InputScreenDiscoveryFunnel
@@ -30,7 +30,11 @@ import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
 import com.duckduckgo.duckchat.impl.ui.settings.DuckChatSettingsViewModel.Command.OpenLink
 import com.duckduckgo.duckchat.impl.ui.settings.DuckChatSettingsViewModel.Command.OpenLinkInNewTab
 import com.duckduckgo.duckchat.impl.ui.settings.DuckChatSettingsViewModel.Command.OpenShortcutSettings
+import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.settings.api.SettingsPageFeature
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedFactory
+import dagger.assisted.AssistedInject
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.SharingStarted
@@ -40,10 +44,9 @@ import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
-@ContributesViewModel(ActivityScope::class)
-class DuckChatSettingsViewModel @Inject constructor(
+class DuckChatSettingsViewModel @AssistedInject constructor(
+    @Assisted duckChatActivityParams: GlobalActivityStarter.ActivityParams,
     private val duckChat: DuckChatInternal,
     private val pixel: Pixel,
     private val inputScreenDiscoveryFunnel: InputScreenDiscoveryFunnel,
@@ -58,21 +61,28 @@ class DuckChatSettingsViewModel @Inject constructor(
         val isInputScreenEnabled: Boolean = false,
         val shouldShowShortcuts: Boolean = false,
         val shouldShowInputScreenToggle: Boolean = false,
+        val isSearchSectionVisible: Boolean = true,
         val isHideGeneratedImagesOptionVisible: Boolean = false,
+        val shouldShowFullScreenModeToggle: Boolean = false,
+        val isFullScreenModeEnabled: Boolean = false,
     )
 
     val viewState =
         combine(
             duckChat.observeEnableDuckChatUserSetting(),
             duckChat.observeInputScreenUserSettingEnabled(),
+            duckChat.observeFullscreenModeUserSetting(),
             flowOf(settingsPageFeature.hideAiGeneratedImagesOption().isEnabled()).flowOn(dispatcherProvider.io()),
-        ) { isDuckChatUserEnabled, isInputScreenEnabled, isHideAiGeneratedImagesOptionVisible ->
+        ) { isDuckChatUserEnabled, isInputScreenEnabled, isFullScreenModeEnabled, isHideAiGeneratedImagesOptionVisible ->
             ViewState(
                 isDuckChatUserEnabled = isDuckChatUserEnabled,
                 isInputScreenEnabled = isInputScreenEnabled,
                 shouldShowShortcuts = isDuckChatUserEnabled,
                 shouldShowInputScreenToggle = isDuckChatUserEnabled && duckChat.isInputScreenFeatureAvailable(),
+                isSearchSectionVisible = isSearchSectionVisible(duckChatActivityParams),
                 isHideGeneratedImagesOptionVisible = isHideAiGeneratedImagesOptionVisible,
+                shouldShowFullScreenModeToggle = duckChat.isDuckChatFullScreenModeFeatureAvailable(),
+                isFullScreenModeEnabled = isFullScreenModeEnabled,
             )
         }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), ViewState())
 
@@ -188,6 +198,23 @@ class DuckChatSettingsViewModel @Inject constructor(
         viewModelScope.launch {
             commandChannel.send(Command.LaunchFeedback)
         }
+    }
+
+    fun onDuckChatFullscreenModeToggled(checked: Boolean) {
+        viewModelScope.launch {
+            duckChat.setFullScreenModeUserSetting(checked)
+        }
+    }
+
+    private fun isSearchSectionVisible(duckChatActivityParams: GlobalActivityStarter.ActivityParams): Boolean = when (duckChatActivityParams) {
+        is DuckChatSettingsNoParams -> true
+        is DuckChatNativeSettingsNoParams -> false
+        else -> throw IllegalArgumentException("Unknown params type: $duckChatActivityParams")
+    }
+
+    @AssistedFactory
+    interface DuckChatSettingsViewModelFactory {
+        fun create(duckChatActivityParams: GlobalActivityStarter.ActivityParams): DuckChatSettingsViewModel
     }
 
     companion object {

@@ -190,7 +190,6 @@
     <string name="webTrackingProtectionActivityTitle">Beskyttelse mod sporing på nettet</string>
     <string name="webTrackingProtectionLearnMoreTitle">Beskyttelse mod sporing på nettet</string>
     <string name="webTrackingProtectionTitle">Beskyttelse mod sporing på nettet</string>
-    <string name="webTrackingProtectionDescriptionNew"><![CDATA[DuckDuckGo blokerer automatisk skjulte trackere, når du surfer på nettet.\n<a href=\"\">Mere info</a>]]></string>
     <string name="webTrackingProtectionExplanationDescription"><![CDATA[DuckDuckGo-browseren giver sporingbeskyttelse, som altid er aktiv.\n<a href=\"\">Mere info</a>]]></string>
     <string name="webTrackingProtectionExplanationTitle">Sådan beskytter vi dig</string>
     <string name="webTrackingProtectionThirdPartyTrackersTitle">Bloker tredjeparts-trackere</string>
@@ -844,8 +843,10 @@
 
     <!-- Appearance settings -->
     <string name="settingsAddressBarPositionTitle">Adresselinje</string>
+    <string name="settingsAddressBarPositionHeaderTitle">Placering af adresselinje</string>
     <string name="settingsAddressBarPositionTop">Top</string>
     <string name="settingsAddressBarPositionBottom">Nederst</string>
+    <string name="settingsAddressBarPositionSplit">Opdel</string>
 
     <!-- Show on App Launch Option -->
     <string name="showOnAppLaunchOptionTitle">Vis ved app-start</string>

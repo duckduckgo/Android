@@ -47,4 +47,5 @@
     <string name="pirDevDebugOptOut">Debug opt out</string>
     <string name="pirDevOptOut">Run opt out</string>
     <string name="pirDevOptOutDisclaimer">Note: Only brokers with formOptOut are supported and will appear as an option for optout.</string>
+    <string name="pirDevSettingNotAvailableMessage">PIR database is not available. This may be due to keystore access issues.</string>
 </resources>

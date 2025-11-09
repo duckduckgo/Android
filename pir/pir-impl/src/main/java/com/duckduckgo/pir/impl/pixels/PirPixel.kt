@@ -125,6 +125,11 @@ enum class PirPixel(
     PIR_EMAIL_CONFIRMATION_RUN_COMPLETED(
         baseName = "pir_email-confirmation_completed",
         type = Count,
+    ),
+
+    PIR_INTERNAL_SECURE_STORAGE_UNAVAILABLE(
+        baseName = "pir_internal_secure-storage_unavailable",
+        types = setOf(Count, Daily()),
     ), ;
 
     constructor(

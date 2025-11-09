@@ -19,6 +19,7 @@ package com.duckduckgo.duckchat.impl.ui
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import app.cash.turbine.test
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.duckchat.impl.DuckChatInternal
 import com.duckduckgo.duckchat.impl.ui.DuckChatWebViewViewModel.Command
 import com.duckduckgo.subscriptions.api.SubscriptionStatus
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.AUTO_RENEWABLE
@@ -27,7 +28,9 @@ import com.duckduckgo.subscriptions.api.SubscriptionStatus.INACTIVE
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.UNKNOWN
 import com.duckduckgo.subscriptions.api.Subscriptions
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
@@ -43,6 +46,7 @@ class DuckChatWebViewViewModelTest {
     val coroutineTestRule: CoroutineTestRule = CoroutineTestRule()
 
     private val subscriptions: Subscriptions = mock()
+    private val duckChat: DuckChatInternal = mock()
     private val subscriptionStatusFlow = MutableSharedFlow<SubscriptionStatus>()
 
     private lateinit var viewModel: DuckChatWebViewViewModel
@@ -50,7 +54,8 @@ class DuckChatWebViewViewModelTest {
     @Before
     fun setup() {
         whenever(subscriptions.getSubscriptionStatusFlow()).thenReturn(subscriptionStatusFlow)
-        viewModel = DuckChatWebViewViewModel(subscriptions)
+        whenever(duckChat.observeFullscreenModeUserSetting()).thenReturn(flowOf(true))
+        viewModel = DuckChatWebViewViewModel(subscriptions, duckChat)
     }
 
     @Test
@@ -135,4 +140,52 @@ class DuckChatWebViewViewModelTest {
             }
         }
     }
+
+    @Test
+    fun `fullscreen mode - when flags enabled, then viewstate enabled`() =
+        runTest {
+            whenever(duckChat.observeInputScreenUserSettingEnabled()).thenReturn(flowOf(true))
+            whenever(duckChat.observeFullscreenModeUserSetting()).thenReturn(flowOf(true))
+            viewModel = DuckChatWebViewViewModel(
+                subscriptions,
+                duckChat = duckChat,
+            )
+
+            viewModel.viewState.test {
+                val state = awaitItem()
+                assertTrue(state.isFullScreenModeEnabled)
+            }
+        }
+
+    @Test
+    fun `fullscreen mode - when flags disabled, then viewstate disabled`() =
+        runTest {
+            whenever(duckChat.observeInputScreenUserSettingEnabled()).thenReturn(flowOf(true))
+            whenever(duckChat.observeFullscreenModeUserSetting()).thenReturn(flowOf(false))
+            viewModel = DuckChatWebViewViewModel(
+                subscriptions,
+                duckChat = duckChat,
+            )
+
+            viewModel.viewState.test {
+                val state = awaitItem()
+                assertFalse(state.isFullScreenModeEnabled)
+            }
+        }
+
+    @Test
+    fun `fullscreen mode - when input scree disabled, then viewstate disabled`() =
+        runTest {
+            whenever(duckChat.observeInputScreenUserSettingEnabled()).thenReturn(flowOf(false))
+            whenever(duckChat.observeFullscreenModeUserSetting()).thenReturn(flowOf(true))
+            viewModel = DuckChatWebViewViewModel(
+                subscriptions,
+                duckChat = duckChat,
+            )
+
+            viewModel.viewState.test {
+                val state = awaitItem()
+                assertFalse(state.isFullScreenModeEnabled)
+            }
+        }
 }

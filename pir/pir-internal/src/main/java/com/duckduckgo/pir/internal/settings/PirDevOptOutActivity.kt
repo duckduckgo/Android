@@ -134,6 +134,7 @@ class PirDevOptOutActivity : DuckDuckGoActivity() {
                 dropDownAdapter.addAll(brokerOptions)
             }
         }
+
         eventsRepository.getAllSuccessfullySubmittedOptOutFlow()
             .flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
             .onEach { optOuts ->

@@ -1,0 +1,23 @@
+{
+    "m_voice_search_serp_done": {
+        "description": "User completed a voice search with the Search mode selected.",
+        "owners": ["joshliebe"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_voice_search_aichat_done": {
+        "description": "User completed a voice search with the Duck.ai mode selected.",
+        "owners": ["joshliebe"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_voice_search_cancelled": {
+        "description": "User canceled a voice search.",
+        "owners": ["joshliebe"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    }
+}

@@ -49,7 +49,9 @@ class RealBrokerJsonUpdaterTest {
     private val mockBrokerDataDownloader: BrokerDataDownloader = mock()
 
     @Before
-    fun setUp() {
+    fun setUp() = runTest {
+        whenever(mockPirRepository.isRepositoryAvailable()).thenReturn(true)
+
         testee = RealBrokerJsonUpdater(
             dbpService = mockDbpService,
             dispatcherProvider = coroutineRule.testDispatcherProvider,
@@ -250,5 +252,22 @@ class RealBrokerJsonUpdaterTest {
         assertFalse(result)
         verifyNoInteractions(mockDbpService)
         verifyNoInteractions(mockBrokerDataDownloader)
+    }
+
+    @Test
+    fun whenRepositoryNotAvailableThenReturnsFalse() = runTest {
+        // Given
+        whenever(mockPirRepository.isRepositoryAvailable()).thenReturn(false)
+
+        // When
+        val result = testee.update()
+
+        // Then
+        assertFalse(result)
+        verifyNoInteractions(mockDbpService)
+        verifyNoInteractions(mockBrokerDataDownloader)
+        verify(mockPirRepository, never()).getCurrentMainEtag()
+        verify(mockPirRepository, never()).updateMainEtag(any())
+        verify(mockPirRepository, never()).updateBrokerJsons(any())
     }
 }

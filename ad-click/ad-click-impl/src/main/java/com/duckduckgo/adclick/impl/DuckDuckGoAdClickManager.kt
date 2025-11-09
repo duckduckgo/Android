@@ -17,6 +17,7 @@
 package com.duckduckgo.adclick.impl
 
 import com.duckduckgo.adclick.api.AdClickManager
+import com.duckduckgo.adclick.impl.metrics.AdClickCollector
 import com.duckduckgo.adclick.impl.pixels.AdClickPixelName
 import com.duckduckgo.adclick.impl.pixels.AdClickPixels
 import com.duckduckgo.app.browser.UriString
@@ -33,6 +34,7 @@ class DuckDuckGoAdClickManager @Inject constructor(
     private val adClickData: AdClickData,
     private val adClickAttribution: AdClickAttribution,
     private val adClickPixels: AdClickPixels,
+    private val adClickCollector: AdClickCollector,
 ) : AdClickManager {
 
     private val publicSuffixDatabase = PublicSuffixDatabase()
@@ -223,6 +225,7 @@ class DuckDuckGoAdClickManager @Inject constructor(
                     exemptionDeadline = System.currentTimeMillis() + adClickAttribution.getTotalExpirationMillis(),
                 ),
             )
+            adClickCollector.onAdClick()
             adClickPixels.fireAdClickDetectedPixel(
                 savedAdDomain = savedAdDomain,
                 urlAdDomain = urlAdDomain,

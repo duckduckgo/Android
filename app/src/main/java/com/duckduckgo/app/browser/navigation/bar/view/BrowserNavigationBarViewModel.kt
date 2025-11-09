@@ -163,9 +163,9 @@ class BrowserNavigationBarViewModel @Inject constructor(
     }
 
     data class ViewState(
-        val isVisible: Boolean = false,
-        val newTabButtonVisible: Boolean = false,
-        val autofillButtonVisible: Boolean = true,
+        val isVisible: Boolean = true,
+        val newTabButtonVisible: Boolean = true,
+        val autofillButtonVisible: Boolean = false,
         val bookmarksButtonVisible: Boolean = true,
         val fireButtonVisible: Boolean = true,
         val fireButtonHighlighted: Boolean = false,

@@ -28,8 +28,6 @@ import android.widget.FrameLayout
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatDelegate.FEATURE_SUPPORT_ACTION_BAR
 import androidx.appcompat.widget.Toolbar
-import androidx.coordinatorlayout.widget.CoordinatorLayout
-import androidx.core.view.updateLayoutParams
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
@@ -89,8 +87,6 @@ import com.duckduckgo.common.ui.view.dialog.TextAlertDialogBuilder
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.hide
 import com.duckduckgo.common.ui.view.show
-import com.duckduckgo.common.ui.view.toDp
-import com.duckduckgo.common.ui.view.toPx
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
@@ -211,18 +207,26 @@ class TabSwitcherActivity :
 
     private val binding: ActivityTabSwitcherBinding by viewBinding()
     private val popupMenu by lazy {
-        if (settingsDataStore.omnibarType == OmnibarType.SINGLE_BOTTOM && viewModel.isNewToolbarEnabled) {
-            PopupMenu(layoutInflater, R.layout.popup_tabs_menu_bottom)
-        } else {
+        if (settingsDataStore.omnibarType == OmnibarType.SINGLE_TOP) {
             PopupMenu(layoutInflater, R.layout.popup_tabs_menu)
+        } else {
+            PopupMenu(layoutInflater, R.layout.popup_tabs_menu_bottom)
         }
     }
 
     private val snackbarAnchorView by lazy {
-        if (settingsDataStore.omnibarType == OmnibarType.SINGLE_BOTTOM) {
-            toolbar
-        } else {
-            null
+        when (settingsDataStore.omnibarType) {
+            OmnibarType.SINGLE_BOTTOM -> {
+                toolbar
+            }
+
+            OmnibarType.SINGLE_TOP -> {
+                null
+            }
+            OmnibarType.SPLIT -> {
+                null
+                // TODO: add bottom bar
+            }
         }
     }
 
@@ -241,26 +245,10 @@ class TabSwitcherActivity :
         setupToolbar(toolbar)
         configureRecycler()
 
-        if (!viewModel.isNewToolbarEnabled) {
-            configureFabs()
-        }
-
         configureObservers()
         configureOnBackPressedListener()
 
         initMenuClickListeners()
-    }
-
-    private fun configureFabs() {
-        binding.mainFab.apply {
-            setOnClickListener {
-                viewModel.onFabClicked()
-            }
-        }
-
-        binding.aiChatFab.setOnClickListener {
-            viewModel.onDuckAIFabClicked()
-        }
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -276,19 +264,18 @@ class TabSwitcherActivity :
     private fun configureViewReferences() {
         tabsRecycler = findViewById(R.id.tabsRecycler)
 
-        if (viewModel.isNewToolbarEnabled) {
-            when (settingsDataStore.omnibarType) {
-                OmnibarType.SINGLE_TOP, OmnibarType.SPLIT -> {
-                    binding.root.removeView(binding.tabSwitcherToolbarBottom.root)
-                }
-                OmnibarType.SINGLE_BOTTOM -> {
-                    binding.root.removeView(binding.tabSwitcherExperimentToolbarTop.root)
-                }
+        when (settingsDataStore.omnibarType) {
+            OmnibarType.SINGLE_TOP -> {
+                binding.root.removeView(binding.tabSwitcherToolbarBottom.root)
+                // TODO: remove bottom bar
             }
-            binding.root.removeView(binding.tabSwitcherToolbarTop.root)
-        } else {
-            binding.root.removeView(binding.tabSwitcherExperimentToolbarTop.root)
-            binding.root.removeView(binding.tabSwitcherToolbarBottom.root)
+            OmnibarType.SINGLE_BOTTOM -> {
+                binding.root.removeView(binding.tabSwitcherToolbarTop.root)
+                // TODO: remove bottom bar
+            }
+            OmnibarType.SPLIT -> {
+                binding.root.removeView(binding.tabSwitcherToolbarBottom.root)
+            }
         }
 
         toolbar = findViewById(R.id.toolbar)
@@ -320,27 +307,7 @@ class TabSwitcherActivity :
 
         tabsRecycler.setHasFixedSize(true)
 
-        if (viewModel.isNewToolbarEnabled) {
-            handleFabStateUpdates()
-        }
-
         handleSelectionModeCancellation()
-
-        if (viewModel.isNewToolbarEnabled) {
-            // Set the layout params for the tabs recycler view based on omnibar position
-            tabsContainer.updateLayoutParams {
-                this as CoordinatorLayout.LayoutParams
-                this.behavior = null
-                when (settingsDataStore.omnibarType) {
-                    OmnibarType.SINGLE_TOP, OmnibarType.SPLIT -> {
-                        this.topMargin = TABS_CONTENT_PADDING_DP.toPx()
-                    }
-                    OmnibarType.SINGLE_BOTTOM -> {
-                        this.bottomMargin = TABS_CONTENT_PADDING_DP.toPx()
-                    }
-                }
-            }
-        }
     }
 
     private fun handleSelectionModeCancellation() {
@@ -374,25 +341,6 @@ class TabSwitcherActivity :
 
                 override fun onRequestDisallowInterceptTouchEvent(disallowIntercept: Boolean) {
                     // no-op
-                }
-            },
-        )
-    }
-
-    private fun handleFabStateUpdates() {
-        tabsRecycler.addOnScrollListener(
-            object : OnScrollListener() {
-                override fun onScrolled(
-                    recyclerView: RecyclerView,
-                    dx: Int,
-                    dy: Int,
-                ) {
-                    super.onScrolled(recyclerView, dx, dy)
-                    if (dy.toDp(recyclerView.context) > FAB_SCROLL_THRESHOLD) {
-                        binding.mainFab.shrink()
-                    } else if (dy.toDp(recyclerView.context) < -FAB_SCROLL_THRESHOLD) {
-                        binding.mainFab.extend()
-                    }
                 }
             },
         )
@@ -615,27 +563,23 @@ class TabSwitcherActivity :
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        menuInflater.inflate(R.menu.menu_tab_switcher_activity_with_selection, menu)
+        menuInflater.inflate(R.menu.menu_tab_switcher_activity, menu)
 
         val popupBinding = PopupTabsMenuBinding.bind(popupMenu.contentView)
         val viewState = viewModel.selectionViewState.value
 
         val numSelectedTabs = viewModel.selectionViewState.value.numSelectedTabs
         menu.createDynamicInterface(
-            numSelectedTabs,
-            popupBinding,
-            binding.mainFab,
-            binding.aiChatFab,
-            tabsRecycler,
-            toolbar,
-            viewState.dynamicInterface,
+            numSelectedTabs = numSelectedTabs,
+            popupMenu = popupBinding,
+            toolbar = toolbar,
+            dynamicMenu = viewState.dynamicInterface,
         )
 
         return true
     }
 
     private fun initMenuClickListeners() {
-        popupMenu.onMenuItemClicked(popupMenu.contentView.findViewById(R.id.newTabMenuItem)) { onNewTabRequested(fromOverflowMenu = true) }
         popupMenu.onMenuItemClicked(popupMenu.contentView.findViewById(R.id.gridLayoutMenuItem)) { viewModel.onGridLayoutSelected() }
         popupMenu.onMenuItemClicked(popupMenu.contentView.findViewById(R.id.listLayoutMenuItem)) { viewModel.onListLayoutSelected() }
         popupMenu.onMenuItemClicked(popupMenu.contentView.findViewById(R.id.selectAllMenuItem)) { viewModel.onSelectAllTabs() }
@@ -654,7 +598,6 @@ class TabSwitcherActivity :
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
-            R.id.layoutTypeToolbarButton -> onLayoutTypeToggled()
             R.id.fireToolbarButton -> onFireButtonClicked()
             R.id.popupMenuToolbarButton -> showPopupMenu(item.itemId)
             R.id.newTabToolbarButton -> onNewTabRequested(fromOverflowMenu = false)
@@ -700,10 +643,6 @@ class TabSwitcherActivity :
                 onboardingExperimentFireAnimationHelper = onboardingExperimentFireAnimationHelper,
             )
         dialog.show()
-    }
-
-    private fun onLayoutTypeToggled() {
-        viewModel.onLayoutTypeToggled()
     }
 
     override fun onNewTabRequested(fromOverflowMenu: Boolean) {

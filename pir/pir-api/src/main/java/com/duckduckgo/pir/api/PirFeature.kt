@@ -16,12 +16,14 @@
 
 package com.duckduckgo.pir.api
 
+import com.duckduckgo.pir.api.dashboard.PirFeatureState
+
 interface PirFeature {
 
     /**
      * Runs on the IO thread by default.
      *
-     * @return true if the PIR beta is enabled, false otherwise
+     * @return [PirFeatureState] that represents the current state of the feature
      */
-    suspend fun isPirBetaEnabled(): Boolean
+    suspend fun getPirFeatureState(): PirFeatureState
 }

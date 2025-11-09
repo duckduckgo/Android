@@ -502,4 +502,5 @@ sealed class Command {
     data class EnqueueCookiesAnimation(
         val isCosmetic: Boolean,
     ) : Command()
+    data object PageStarted : Command()
 }

@@ -4,22 +4,21 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import app.cash.turbine.test
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.subscriptions.api.PrivacyProUnifiedFeedback
-import com.duckduckgo.subscriptions.api.SubscriptionRebrandingFeatureToggle
 import com.duckduckgo.subscriptions.api.SubscriptionStatus
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.AUTO_RENEWABLE
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants
 import com.duckduckgo.subscriptions.impl.SubscriptionsManager
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
 import com.duckduckgo.subscriptions.impl.repository.Account
-import com.duckduckgo.subscriptions.impl.repository.RebrandingRepository
 import com.duckduckgo.subscriptions.impl.repository.Subscription
-import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.DismissRebrandingBanner
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.FinishSignOut
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.GoToActivationScreen
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.GoToEditEmailScreen
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.GoToPortal
+import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.ShowSwitchPlanDialog
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.SubscriptionDuration.Monthly
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.SubscriptionDuration.Yearly
+import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.SwitchPlanType
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.ViewState.Ready
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.test.runTest
@@ -44,8 +43,6 @@ class SubscriptionSettingsViewModelTest {
     private val subscriptionsManager: SubscriptionsManager = mock()
     private val pixelSender: SubscriptionPixelSender = mock()
     private val privacyProUnifiedFeedback: PrivacyProUnifiedFeedback = mock()
-    private val mockSubscriptionRebrandingFeatureToggle: SubscriptionRebrandingFeatureToggle = mock()
-    private val mockRebrandingRepository: RebrandingRepository = mock()
 
     private lateinit var viewModel: SubscriptionSettingsViewModel
 
@@ -55,8 +52,6 @@ class SubscriptionSettingsViewModelTest {
             subscriptionsManager,
             pixelSender,
             privacyProUnifiedFeedback,
-            mockSubscriptionRebrandingFeatureToggle,
-            mockRebrandingRepository,
         )
     }
 
@@ -236,16 +231,6 @@ class SubscriptionSettingsViewModelTest {
     }
 
     @Test
-    fun whenDismissRebrandingBannerThenSetRebrandingAsViewedAndDismissBannerCommandIsSent() = runTest {
-        viewModel.commands().test {
-            viewModel.rebrandingBannerDismissed()
-            verify(mockRebrandingRepository).setRebrandingBannerAsViewed()
-            assertEquals(DismissRebrandingBanner, awaitItem())
-            cancelAndIgnoreRemainingEvents()
-        }
-    }
-
-    @Test
     fun whenSwitchPlanAvailableThenViewStateIncludesIt() = runTest {
         whenever(privacyProUnifiedFeedback.shouldUseUnifiedFeedback(any())).thenReturn(false)
         whenever(subscriptionsManager.isSwitchPlanAvailable()).thenReturn(true)
@@ -302,6 +287,77 @@ class SubscriptionSettingsViewModelTest {
         flowTest.emit(AUTO_RENEWABLE)
         viewModel.viewState.test {
             assertFalse((awaitItem() as Ready).switchPlanAvailable)
+        }
+    }
+
+    @Test
+    fun whenOnSwitchPlanClickedWithMonthlyThenEmitUpgradeCommand() = runTest {
+        viewModel.commands().test {
+            viewModel.onSwitchPlanClicked(Monthly)
+
+            val command = awaitItem()
+            assertTrue(command is ShowSwitchPlanDialog)
+            assertEquals(SwitchPlanType.UPGRADE_TO_YEARLY, (command as ShowSwitchPlanDialog).switchType)
+        }
+    }
+
+    @Test
+    fun whenOnSwitchPlanClickedWithYearlyThenEmitDowngradeCommand() = runTest {
+        viewModel.commands().test {
+            viewModel.onSwitchPlanClicked(Yearly)
+
+            val command = awaitItem()
+            assertTrue(command is ShowSwitchPlanDialog)
+            assertEquals(SwitchPlanType.DOWNGRADE_TO_MONTHLY, (command as ShowSwitchPlanDialog).switchType)
+        }
+    }
+
+    @Test
+    fun whenOnSwitchPlanSuccessThenRefreshSubscriptionData() = runTest {
+        whenever(subscriptionsManager.isSwitchPlanAvailable()).thenReturn(true)
+        whenever(privacyProUnifiedFeedback.shouldUseUnifiedFeedback(any())).thenReturn(false)
+        whenever(subscriptionsManager.getSubscription()).thenReturn(
+            Subscription(
+                productId = SubscriptionsConstants.MONTHLY_PLAN_US,
+                billingPeriod = "Monthly",
+                startedAt = 1234,
+                expiresOrRenewsAt = 1701694623000,
+                status = AUTO_RENEWABLE,
+                platform = "google",
+                activeOffers = listOf(),
+            ),
+        )
+        whenever(subscriptionsManager.getAccount()).thenReturn(
+            Account(email = "test@example.com", externalId = "external_id"),
+        )
+
+        val flowTest: MutableSharedFlow<SubscriptionStatus> = MutableSharedFlow()
+        whenever(subscriptionsManager.subscriptionStatus).thenReturn(flowTest)
+
+        viewModel.onCreate(mock())
+        flowTest.emit(AUTO_RENEWABLE)
+
+        viewModel.viewState.test {
+            val initialState = awaitItem() as Ready
+            assertEquals(Monthly, initialState.duration)
+
+            // Simulate plan switch success - subscription changed to yearly
+            whenever(subscriptionsManager.getSubscription()).thenReturn(
+                Subscription(
+                    productId = SubscriptionsConstants.YEARLY_PLAN_US,
+                    billingPeriod = "Yearly",
+                    startedAt = 1234,
+                    expiresOrRenewsAt = 1701694623000,
+                    status = AUTO_RENEWABLE,
+                    platform = "google",
+                    activeOffers = listOf(),
+                ),
+            )
+
+            viewModel.onSwitchPlanSuccess()
+
+            val updatedState = awaitItem() as Ready
+            assertEquals(Yearly, updatedState.duration)
         }
     }
 }
