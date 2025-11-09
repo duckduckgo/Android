@@ -466,7 +466,7 @@ class RealSubscriptionsManager @Inject constructor(
             val totalMonthlyAnnual = monthlyPriceAmount * 12.toBigDecimal()
             val savingsAmount = totalMonthlyAnnual - yearlyPriceAmount
             val savingsPercentage = ((savingsAmount / totalMonthlyAnnual) * 100.toBigDecimal())
-                .setScale(0, RoundingMode.HALF_UP)
+                .setScale(0, RoundingMode.DOWN)
                 .toInt()
 
             SwitchPlanPricingInfo(
