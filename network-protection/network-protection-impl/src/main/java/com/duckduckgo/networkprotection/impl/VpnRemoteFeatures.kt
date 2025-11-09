@@ -55,6 +55,9 @@ interface VpnRemoteFeatures {
 
     @DefaultValue(DefaultFeatureValue.FALSE)
     fun localVpnControllerDns(): Toggle
+
+    @DefaultValue(DefaultFeatureValue.TRUE)
+    fun sendVpnEnableWideEvent(): Toggle
 }
 
 @ContributesBinding(AppScope::class)

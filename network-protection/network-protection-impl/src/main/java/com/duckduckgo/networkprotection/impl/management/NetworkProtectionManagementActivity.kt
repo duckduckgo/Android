@@ -470,6 +470,7 @@ class NetworkProtectionManagementActivity : DuckDuckGoActivity() {
                     }
 
                     override fun onNegativeButtonClicked() {
+                        viewModel.onVpnConflictDialogCancel()
                         resetToggle()
                     }
                 },
