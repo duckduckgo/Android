@@ -84,7 +84,7 @@
     <string name="subscriptionSettingSectionHelpAndSupport">Nápověda a podpora</string>
     <string name="subscriptionSettingSendFeedback">Odeslat zpětnou vazbu</string>
     <string name="subscriptionSettingActivating">Aktivuje se</string>
-    <string name="subscriptionSettingSwitchUpgrade">Přejdi na roční tarif a ušetři 16 %</string>
+    <string name="subscriptionSettingSwitchUpgradeDynamic" instruction="%1$s is the savings percentage when switching from monthly to yearly (e.g. 16)">Přejdi na roční tarif a ušetři %1$s %%</string>
     <!-- smartling.character_limit = 10 -->
     <string name="subscriptionSettingSwitchUpgradePill">Top nabídka</string>
     <string name="subscriptionSettingSwitchDowngrade">Změnit tarif</string>
@@ -176,11 +176,6 @@
     <string name="activityPir" translatable="false">Privacy Pro</string>
     <string name="activitySendFeedback">Odeslat zpětnou vazbu</string>
 
-    <!-- Dynamic Switch % -->
-    <string name="switchBottomSheetDynamicTitleUpgrade" instruction="%1$s is the savings percentage when switching from monthly to yearly (e.g. 16)">Ušetři %1$s %%\ns ročním tarifem!</string>
-    <string name="switchBottomSheetDynamicTitleDowngrade" instruction="%1$s is the savings percentage when using a yearly plan instead of monthly (e.g. 16)">S ročním tarifem\nušetříš %1$s %%</string>
-    <string name="subscriptionSettingSwitchUpgradeDynamic" instruction="%1$s is the savings percentage when switching from monthly to yearly (e.g. 16)">Přejdi na roční tarif a ušetři %1$s %%</string>
-
     <!-- Privacy Pro Rebranding-->
     <string name="subscriptionSettingRebrandingMessage">Privacy Pro mění název na „předplatné DuckDuckGo“</string>
 
@@ -198,11 +193,11 @@
     <string name="feedbackGeneralSubscription">Předplatné</string>
 
     <!-- Switch plan-->
-    <string name="switchBottomSheetTitleUpgrade">Ušetři 16 %\ns ročním tarifem!</string>
+    <string name="switchBottomSheetDynamicTitleUpgrade" instruction="%1$s is the savings percentage when switching from monthly to yearly (e.g. 16)">Ušetři %1$s %%\ns ročním tarifem!</string>
     <string name="switchBottomSheetDescriptionUpgrade" instruction="%1$s is the yearly plan monthly equivalent price (e.g. $8.33), %2$s is the current monthly plan price (e.g. $9.99)">Roční tarif stojí jen %1$s za měsíc oproti tvému současnému měsíčnímu tarifu za %2$s.</string>
     <string name="switchBottomSheetPrimaryButtonUpgrade" instruction="%1$s is the yearly plan price (e.g. $99.99)">Přejít na roční tarif (%1$s za rok)</string>
     <string name="switchBottomSheetSecondaryButtonUpgrade">Nechat měsíční tarif</string>
-    <string name="switchBottomSheetTitleDowngrade">S ročním tarifem\nušetříš 16 %!</string>
+    <string name="switchBottomSheetDynamicTitleDowngrade" instruction="%1$s is the savings percentage when using a yearly plan instead of monthly (e.g. 16)">S ročním tarifem\nušetříš %1$s %%</string>
     <string name="switchBottomSheetDescriptionDowngrade" instruction="%1$s is the yearly plan monthly equivalent price (e.g. $8.33), %2$s is the monthly plan price (e.g. $9.99)">Přechodem se tvoje cena za měsíc zvýší z %1$s měsíčně na %2$s měsíčně.</string>
     <string name="switchBottomSheetPrimaryButtonDowngrade">Nechat roční tarif</string>
     <string name="switchBottomSheetSecondaryButtonDowngrade" instruction="%1$s is the monthly plan price (e.g. $9.99)">Přejít na měsíční tarif (%1$s za měsíc)</string>
