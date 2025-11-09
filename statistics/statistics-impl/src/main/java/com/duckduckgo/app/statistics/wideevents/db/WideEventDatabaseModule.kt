@@ -38,7 +38,9 @@ class WideEventDatabaseModule {
                 context = context,
                 klass = WideEventDatabase::class.java,
                 name = "wide_events.db",
-            ).fallbackToDestructiveMigration()
+            )
+            .fallbackToDestructiveMigration()
+            .enableMultiInstanceInvalidation()
             .addTypeConverter(wideEventEntityTypeConverters)
             .build()
 
