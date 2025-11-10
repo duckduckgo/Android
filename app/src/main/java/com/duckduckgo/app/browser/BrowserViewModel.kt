@@ -68,6 +68,7 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.SingleLiveEvent
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.feature.toggles.api.Toggle.DefaultFeatureValue
 import kotlinx.coroutines.CoroutineScope
@@ -101,6 +102,7 @@ class BrowserViewModel @Inject constructor(
     private val showOnAppLaunchOptionHandler: ShowOnAppLaunchOptionHandler,
     private val additionalDefaultBrowserPrompts: AdditionalDefaultBrowserPrompts,
     private val swipingTabsFeature: SwipingTabsFeatureProvider,
+    private val duckAiFeatureState: DuckAiFeatureState,
 ) : ViewModel(), CoroutineScope {
 
     override val coroutineContext: CoroutineContext
@@ -110,6 +112,7 @@ class BrowserViewModel @Inject constructor(
         val hideWebContent: Boolean = true,
         private val isInEditMode: Boolean = false,
         private val isInFullScreenMode: Boolean = false,
+        private val duckAiFullScreenMode: Boolean = false,
     ) {
         val isTabSwipingEnabled: Boolean = !isInEditMode && !isInFullScreenMode
     }
@@ -131,7 +134,13 @@ class BrowserViewModel @Inject constructor(
         data class ShowSystemDefaultBrowserDialog(val intent: Intent) : Command()
         data class ShowSystemDefaultAppsActivity(val intent: Intent) : Command()
         data class ShowUndoDeleteTabsMessage(val tabIds: List<String>) : Command()
-        data class OpenDuckChat(val duckChatUrl: String?, val duckChatSessionActive: Boolean, val withTransition: Boolean, val tabs: Int) : Command()
+        data class OpenDuckChat(
+            val duckChatUrl: String?,
+            val duckChatSessionActive: Boolean,
+            val withTransition: Boolean,
+            val tabs: Int,
+            val fullScreenMode: Boolean,
+        ) : Command()
     }
 
     var viewState: MutableLiveData<ViewState> = MutableLiveData<ViewState>().also {
@@ -165,6 +174,7 @@ class BrowserViewModel @Inject constructor(
                 logcat(INFO) { "App clear state initializing" }
                 viewState.value = currentViewState.copy(hideWebContent = true)
             }
+
             ApplicationClearDataState.FINISHED -> {
                 logcat(INFO) { "App clear state finished" }
                 viewState.value = currentViewState.copy(hideWebContent = false)
@@ -177,12 +187,15 @@ class BrowserViewModel @Inject constructor(
             is AppEnjoymentPromptOptions.ShowEnjoymentPrompt -> {
                 command.value = Command.ShowAppEnjoymentPrompt(promptType.promptCount)
             }
+
             is AppEnjoymentPromptOptions.ShowRatingPrompt -> {
                 command.value = Command.ShowAppRatingPrompt(promptType.promptCount)
             }
+
             is AppEnjoymentPromptOptions.ShowFeedbackPrompt -> {
                 command.value = Command.ShowAppFeedbackPrompt(promptType.promptCount)
             }
+
             else -> {}
         }
     }
@@ -281,7 +294,10 @@ class BrowserViewModel @Inject constructor(
         appEnjoymentPromptEmitter.promptType.removeObserver(appEnjoymentObserver)
     }
 
-    private fun firePixelWithPromptCount(name: Pixel.PixelName, promptCount: PromptCount) {
+    private fun firePixelWithPromptCount(
+        name: Pixel.PixelName,
+        promptCount: PromptCount,
+    ) {
         val formattedPixelName = String.format(name.pixelName, promptCount.value)
         pixel.fire(formattedPixelName)
     }
@@ -460,9 +476,14 @@ class BrowserViewModel @Inject constructor(
         command.value = ShowUndoDeleteTabsMessage(tabIds)
     }
 
-    fun openDuckChat(duckChatUrl: String?, duckChatSessionActive: Boolean, withTransition: Boolean) {
+    fun openDuckChat(
+        duckChatUrl: String?,
+        duckChatSessionActive: Boolean,
+        withTransition: Boolean,
+    ) {
+        val duckAiFullScreenMode = duckAiFeatureState.showFullScreenMode.value
         logcat(INFO) { "Duck.ai openDuckChat duckChatSessionActive $duckChatSessionActive" }
-        command.value = OpenDuckChat(duckChatUrl, duckChatSessionActive, withTransition, tabs.value.size)
+        command.value = OpenDuckChat(duckChatUrl, duckChatSessionActive, withTransition, tabs.value.size, duckAiFullScreenMode)
     }
 }
 

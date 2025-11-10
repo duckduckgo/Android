@@ -297,6 +297,7 @@ import com.duckduckgo.browser.api.webviewcompat.WebViewCompatWrapper
 import com.duckduckgo.browser.ui.omnibar.OmnibarType
 import com.duckduckgo.common.ui.tabs.SwipingTabsFeatureProvider
 import com.duckduckgo.common.utils.AppUrl
+import com.duckduckgo.common.utils.AppUrl.ParamKey.QUERY
 import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.SingleLiveEvent
@@ -1134,15 +1135,17 @@ class BrowserTabViewModel @Inject constructor(
         when (val type = specialUrlDetector.determineType(trimmedInput)) {
             is ShouldLaunchDuckChatLink -> {
                 runCatching {
-                    site?.nextUrl = urlToNavigate
-                    command.value = NavigationCommand.Navigate(urlToNavigate, getUrlHeaders(urlToNavigate))
-
-                    // val queryParameter = urlToNavigate.toUri().getQueryParameter(QUERY)
-                    // if (queryParameter != null) {
-                    //     duckChat.openDuckChatWithPrefill(queryParameter)
-                    // } else {
-                    //     duckChat.openDuckChat()
-                    // }
+                    if (duckAiFeatureState.showFullScreenMode.value) {
+                        site?.nextUrl = urlToNavigate
+                        command.value = NavigationCommand.Navigate(urlToNavigate, getUrlHeaders(urlToNavigate))
+                    } else {
+                        val queryParameter = urlToNavigate.toUri().getQueryParameter(QUERY)
+                        if (queryParameter != null) {
+                            duckChat.openDuckChatWithPrefill(queryParameter)
+                        } else {
+                            duckChat.openDuckChat()
+                        }
+                    }
                     return
                 }
             }
