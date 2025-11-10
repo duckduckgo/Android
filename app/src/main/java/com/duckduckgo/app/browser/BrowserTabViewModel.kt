@@ -1958,15 +1958,14 @@ class BrowserTabViewModel @Inject constructor(
 
             viewModelScope.launch {
                 onboardingDesignExperimentManager.onWebPageFinishedLoading(url)
+                evaluateDuckAIPage(url)
+                evaluateSerpLogoState(url)
             }
-
-            evaluateDuckAIPage(url)
-            evaluateSerpLogoState(url)
         }
     }
 
-    private fun evaluateSerpLogoState(url: String?) {
-        if (serpEasterEggLogosToggles.feature().isEnabled()) {
+    private suspend fun evaluateSerpLogoState(url: String?) {
+        if (withContext(dispatchers.io()) { serpEasterEggLogosToggles.feature().isEnabled() }) {
             if (url != null && duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(url)) {
                 command.value = ExtractSerpLogo(url)
             } else {
