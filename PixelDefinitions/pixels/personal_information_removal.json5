@@ -129,5 +129,24 @@
                 "enum": ["on", "off", "unsupported"]
             }
         ]
+    },
+    "dbp_databroker_custom_stats_optoutsubmit": {
+        "description": "Fired every 24 hours for every broker to measure opt-out request success rate.",
+        "owners": ["karlenDimla", "landomen"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "data_broker",
+                "description": "The URL of the data broker that this opt-out attempt targets",
+                "type": "string"
+            },
+            {
+                "key": "optout_submit_success_rate",
+                "description": "The success rate of how many opt-out jobs successfully requested within 24 hours of creation",
+                "type": "string"
+            }
+        ]
     }
 }
