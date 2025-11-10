@@ -619,6 +619,8 @@ class BrowserTabViewModelTest {
 
     private val mockDeviceAppLookup: DeviceAppLookup = mock()
 
+    private val mockDuckAiFullScreenMode = MutableStateFlow(false)
+
     private lateinit var fakeContentScopeScriptsSubscriptionEventPluginPoint: FakeContentScopeScriptsSubscriptionEventPluginPoint
     private var fakeSettingsPageFeature = FakeFeatureToggleFactory.create(SettingsPageFeature::class.java)
 
@@ -7120,6 +7122,7 @@ class BrowserTabViewModelTest {
         runTest {
             val url = "https://example.com"
             val webViewNavState = WebViewNavigationState(mockStack, 100)
+            whenever(mockDuckAiFeatureState.showFullScreenMode).thenReturn(mockDuckAiFullScreenMode)
 
             testee.pageFinished(mockWebView, webViewNavState, url)
 
@@ -7491,6 +7494,7 @@ class BrowserTabViewModelTest {
     @Test
     fun whenEvaluateSerpLogoStateCalledWithDuckDuckGoUrlAndFeatureEnabledThenExtractSerpLogoCommandIssued() {
         whenever(mockSerpEasterEggLogoToggles.feature()).thenReturn(mockEnabledToggle)
+        whenever(mockDuckAiFeatureState.showFullScreenMode).thenReturn(mockDuckAiFullScreenMode)
         val ddgUrl = "https://duckduckgo.com/?q=test"
         val webViewNavState = WebViewNavigationState(mockStack, 100)
 
@@ -7507,6 +7511,8 @@ class BrowserTabViewModelTest {
     @Test
     fun whenEvaluateSerpLogoStateCalledWithDuckDuckGoUrlAndFeatureDisabledThenExtractSerpLogoCommandNotIssued() {
         whenever(mockSerpEasterEggLogoToggles.feature()).thenReturn(mockDisabledToggle)
+        whenever(mockDuckAiFeatureState.showFullScreenMode).thenReturn(mockDuckAiFullScreenMode)
+
         val ddgUrl = "https://duckduckgo.com/?q=test"
         val webViewNavState = WebViewNavigationState(mockStack, 100)
 
@@ -7522,6 +7528,8 @@ class BrowserTabViewModelTest {
     @Test
     fun whenEvaluateSerpLogoStateCalledWithNonDuckDuckGoUrlAndFeatureEnabledThenExtractSerpLogoCommandNotIssued() {
         whenever(mockSerpEasterEggLogoToggles.feature()).thenReturn(mockEnabledToggle)
+        whenever(mockDuckAiFeatureState.showFullScreenMode).thenReturn(mockDuckAiFullScreenMode)
+
         val nonDdgUrl = "https://example.com/search?q=test"
         val webViewNavState = WebViewNavigationState(mockStack, 100)
 
@@ -7537,6 +7545,7 @@ class BrowserTabViewModelTest {
     @Test
     fun whenEvaluateSerpLogoStateCalledWithNonDuckDuckGoUrlAndFeatureEnabledThenSerpLogoIsCleared() {
         whenever(mockSerpEasterEggLogoToggles.feature()).thenReturn(mockEnabledToggle)
+        whenever(mockDuckAiFeatureState.showFullScreenMode).thenReturn(mockDuckAiFullScreenMode)
         val nonDdgUrl = "https://example.com/search?q=test"
         val webViewNavState = WebViewNavigationState(mockStack, 100)
 

@@ -1948,9 +1948,9 @@ class BrowserTabViewModel @Inject constructor(
                 onboardingDesignExperimentManager.onWebPageFinishedLoading(url)
             }
 
+            evaluateDuckAIPage(url)
             evaluateSerpLogoState(url)
         }
-        evaluateDuckAIPage(url)
     }
 
     private fun evaluateSerpLogoState(url: String?) {
