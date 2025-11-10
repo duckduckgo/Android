@@ -82,6 +82,7 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import logcat.logcat
 import javax.inject.Inject
 import com.duckduckgo.app.global.model.PrivacyShield as PrivacyShieldState
@@ -620,89 +621,41 @@ class OmnibarLayoutViewModel @Inject constructor(
         omnibarViewState: OmnibarViewState,
         forceRender: Boolean,
     ) {
-        if (serpEasterEggLogosToggles.feature().isEnabled()) {
-            val state = if (shouldUpdateOmnibarTextInput(omnibarViewState, _viewState.value.omnibarText) || forceRender) {
-                if (forceRender && !duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(omnibarViewState.queryOrFullUrl)) {
-                    val url = if (settingsDataStore.isFullUrlEnabled) {
-                        omnibarViewState.queryOrFullUrl
+        viewModelScope.launch {
+            if (withContext(dispatcherProvider.io()) { serpEasterEggLogosToggles.feature().isEnabled() }) {
+                val state = if (shouldUpdateOmnibarTextInput(omnibarViewState, _viewState.value.omnibarText) || forceRender) {
+                    if (forceRender && !duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(omnibarViewState.queryOrFullUrl)) {
+                        val url = if (settingsDataStore.isFullUrlEnabled) {
+                            omnibarViewState.queryOrFullUrl
+                        } else {
+                            addressDisplayFormatter.getShortUrl(omnibarViewState.queryOrFullUrl)
+                        }
+                        _viewState.value.copy(
+                            omnibarText = url,
+                            updateOmnibarText = true,
+                        )
                     } else {
-                        addressDisplayFormatter.getShortUrl(omnibarViewState.queryOrFullUrl)
-                    }
-                    _viewState.value.copy(
-                        omnibarText = url,
-                        updateOmnibarText = true,
-                    )
-                } else {
-                    _viewState.value.copy(
-                        omnibarText = omnibarViewState.omnibarText,
-                    )
-                }
-            } else {
-                _viewState.value
-            }
-
-            if (omnibarViewState.navigationChange) {
-                _viewState.update {
-                    state.copy(
-                        expanded = true,
-                        expandedAnimated = true,
-                        updateOmnibarText = true,
-                    )
-                }
-            } else {
-                _viewState.update {
-                    state.copy(
-                        expanded = omnibarViewState.forceExpand,
-                        expandedAnimated = omnibarViewState.forceExpand,
-                        updateOmnibarText = true,
-                        showVoiceSearch = shouldShowVoiceSearch(
-                            hasFocus = omnibarViewState.isEditing,
-                            query = omnibarViewState.omnibarText,
-                            hasQueryChanged = true,
-                            urlLoaded = _viewState.value.url,
-                        ),
-                        leadingIconState = when (omnibarViewState.serpLogo) {
-                            is SerpLogo.EasterEgg -> getLeadingIconState(
-                                hasFocus = omnibarViewState.isEditing,
-                                url = _viewState.value.url,
-                                logoUrl = omnibarViewState.serpLogo.logoUrl,
-                            )
-                            SerpLogo.Normal, null -> getLeadingIconState(
-                                hasFocus = omnibarViewState.isEditing,
-                                url = _viewState.value.url,
-                                logoUrl = null,
-                            )
-                        },
-                    )
-                }
-            }
-        } else {
-            if (shouldUpdateOmnibarTextInput(omnibarViewState, _viewState.value.omnibarText) || forceRender) {
-                val omnibarText = if (forceRender && !duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(omnibarViewState.queryOrFullUrl)) {
-                    if (settingsDataStore.isFullUrlEnabled) {
-                        omnibarViewState.queryOrFullUrl
-                    } else {
-                        addressDisplayFormatter.getShortUrl(omnibarViewState.queryOrFullUrl)
+                        _viewState.value.copy(
+                            omnibarText = omnibarViewState.omnibarText,
+                        )
                     }
                 } else {
-                    omnibarViewState.omnibarText
+                    _viewState.value
                 }
 
                 if (omnibarViewState.navigationChange) {
                     _viewState.update {
-                        it.copy(
+                        state.copy(
                             expanded = true,
                             expandedAnimated = true,
-                            omnibarText = omnibarText,
                             updateOmnibarText = true,
                         )
                     }
                 } else {
                     _viewState.update {
-                        it.copy(
+                        state.copy(
                             expanded = omnibarViewState.forceExpand,
                             expandedAnimated = omnibarViewState.forceExpand,
-                            omnibarText = omnibarText,
                             updateOmnibarText = true,
                             showVoiceSearch = shouldShowVoiceSearch(
                                 hasFocus = omnibarViewState.isEditing,
@@ -710,7 +663,57 @@ class OmnibarLayoutViewModel @Inject constructor(
                                 hasQueryChanged = true,
                                 urlLoaded = _viewState.value.url,
                             ),
+                            leadingIconState = when (omnibarViewState.serpLogo) {
+                                is SerpLogo.EasterEgg -> getLeadingIconState(
+                                    hasFocus = omnibarViewState.isEditing,
+                                    url = _viewState.value.url,
+                                    logoUrl = omnibarViewState.serpLogo.logoUrl,
+                                )
+                                SerpLogo.Normal, null -> getLeadingIconState(
+                                    hasFocus = omnibarViewState.isEditing,
+                                    url = _viewState.value.url,
+                                    logoUrl = null,
+                                )
+                            },
                         )
+                    }
+                }
+            } else {
+                if (shouldUpdateOmnibarTextInput(omnibarViewState, _viewState.value.omnibarText) || forceRender) {
+                    val omnibarText = if (forceRender && !duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(omnibarViewState.queryOrFullUrl)) {
+                        if (settingsDataStore.isFullUrlEnabled) {
+                            omnibarViewState.queryOrFullUrl
+                        } else {
+                            addressDisplayFormatter.getShortUrl(omnibarViewState.queryOrFullUrl)
+                        }
+                    } else {
+                        omnibarViewState.omnibarText
+                    }
+
+                    if (omnibarViewState.navigationChange) {
+                        _viewState.update {
+                            it.copy(
+                                expanded = true,
+                                expandedAnimated = true,
+                                omnibarText = omnibarText,
+                                updateOmnibarText = true,
+                            )
+                        }
+                    } else {
+                        _viewState.update {
+                            it.copy(
+                                expanded = omnibarViewState.forceExpand,
+                                expandedAnimated = omnibarViewState.forceExpand,
+                                omnibarText = omnibarText,
+                                updateOmnibarText = true,
+                                showVoiceSearch = shouldShowVoiceSearch(
+                                    hasFocus = omnibarViewState.isEditing,
+                                    query = omnibarViewState.omnibarText,
+                                    hasQueryChanged = true,
+                                    urlLoaded = _viewState.value.url,
+                                ),
+                            )
+                        }
                     }
                 }
             }

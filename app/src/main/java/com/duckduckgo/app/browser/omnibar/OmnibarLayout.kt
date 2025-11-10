@@ -122,6 +122,7 @@ import dagger.android.support.AndroidSupportInjection
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import logcat.logcat
 import javax.inject.Inject
 import kotlin.collections.isNotEmpty
@@ -711,24 +712,26 @@ class OmnibarLayout @JvmOverloads constructor(
             }
 
             OmnibarLayoutViewModel.LeadingIconState.Dax -> {
-                if (serpEasterEggLogosToggles.feature().isEnabled()) {
-                    with(daxIcon) {
-                        setOnClickListener(null)
-                        show()
-                        Glide
-                            .with(this)
-                            .load(CommonR.drawable.ic_ddg_logo)
-                            .transition(withCrossFade())
-                            .placeholder(daxIcon.drawable)
-                            .into(this)
+                lifecycleOwner.lifecycleScope.launch {
+                    if (withContext(dispatchers.io()) { serpEasterEggLogosToggles.feature().isEnabled() }) {
+                        with(daxIcon) {
+                            setOnClickListener(null)
+                            show()
+                            Glide
+                                .with(this)
+                                .load(CommonR.drawable.ic_ddg_logo)
+                                .transition(withCrossFade())
+                                .placeholder(daxIcon.drawable)
+                                .into(this)
+                        }
+                    } else {
+                        daxIcon.show()
                     }
-                } else {
-                    daxIcon.show()
+                    shieldIcon.gone()
+                    searchIcon.gone()
+                    globeIcon.gone()
+                    duckPlayerIcon.gone()
                 }
-                shieldIcon.gone()
-                searchIcon.gone()
-                globeIcon.gone()
-                duckPlayerIcon.gone()
             }
 
             OmnibarLayoutViewModel.LeadingIconState.Globe -> {
