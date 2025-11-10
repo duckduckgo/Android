@@ -109,7 +109,6 @@ import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.view.toPx
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.DispatcherProvider
-import com.duckduckgo.common.utils.extensions.hideKeyboard
 import com.duckduckgo.common.utils.playstore.PlayStoreUtils
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
@@ -867,19 +866,21 @@ open class BrowserActivity : DuckDuckGoActivity() {
         withTransition: Boolean,
         tabs: Int,
     ) {
-        duckAiFragment?.let { fragment ->
-            if (duckChatSessionActive) {
-                restoreDuckChat(fragment, withTransition)
-            } else {
-                launchNewDuckChat(url, withTransition, tabs)
-            }
-        } ?: run {
-            launchNewDuckChat(url, withTransition, tabs)
-        }
+        currentTab?.submitQuery(url!!)
 
-        currentTab?.getOmnibar()?.omnibarView?.omnibarTextInput?.let {
-            hideKeyboard(it)
-        }
+        // duckAiFragment?.let { fragment ->
+        //     if (duckChatSessionActive) {
+        //         restoreDuckChat(fragment, withTransition)
+        //     } else {
+        //         launchNewDuckChat(url, withTransition, tabs)
+        //     }
+        // } ?: run {
+        //     launchNewDuckChat(url, withTransition, tabs)
+        // }
+        //
+        // currentTab?.getOmnibar()?.omnibarView?.omnibarTextInput?.let {
+        //     hideKeyboard(it)
+        // }
     }
 
     private fun launchNewDuckChat(
