@@ -125,8 +125,6 @@
 
     <!-- Fire -->
     <string name="fireMenu">Adatok törlése</string>
-    <string name="fireClearAll">Összes lap és adat törlése</string>
-    <string name="fireClearAllPlusDuckChats">Összes lap, adat és Duck.ai-csevegés törlése</string>
     <string name="fireCancel">Mégse</string>
     <string name="fireDataCleared">Adatok törölve</string>
 

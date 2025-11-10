@@ -125,8 +125,6 @@
 
     <!-- Fire -->
     <string name="fireMenu">Rensa data</string>
-    <string name="fireClearAll">Rensa alla flikar och data</string>
-    <string name="fireClearAllPlusDuckChats">Rensa alla flikar, data och Duck.ai-chattar</string>
     <string name="fireCancel">Avbryt</string>
     <string name="fireDataCleared">Data rensad</string>
 

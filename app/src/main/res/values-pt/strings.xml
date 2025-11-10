@@ -125,8 +125,6 @@
 
     <!-- Fire -->
     <string name="fireMenu">Limpar dados</string>
-    <string name="fireClearAll">Limpar todos os separadores e dados</string>
-    <string name="fireClearAllPlusDuckChats">Limpar todos os separadores, dados e conversas do Duck.ai</string>
     <string name="fireCancel">Cancelar</string>
     <string name="fireDataCleared">Dados limpos</string>
 

@@ -125,8 +125,6 @@
 
     <!-- Fire -->
     <string name="fireMenu">Daten löschen</string>
-    <string name="fireClearAll">Alle Tabs schließen und Daten löschen</string>
-    <string name="fireClearAllPlusDuckChats">Alle Tabs, Daten und Duck.ai-Chats löschen</string>
     <string name="fireCancel">Abbrechen</string>
     <string name="fireDataCleared">Daten gelöscht</string>
 

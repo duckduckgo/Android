@@ -127,8 +127,6 @@
 
     <!-- Fire -->
     <string name="fireMenu">Сбросить данные</string>
-    <string name="fireClearAll">Закрыть вкладки и удалить данные</string>
-    <string name="fireClearAllPlusDuckChats">Закрыть все вкладки и стереть все данные и чаты Duck.ai</string>
     <string name="fireCancel">Отменить</string>
     <string name="fireDataCleared">Данные сброшены</string>
 

@@ -125,8 +125,6 @@
 
     <!-- Fire -->
     <string name="fireMenu">Poista tiedot</string>
-    <string name="fireClearAll">Poista kaikki välilehdet ja tiedot</string>
-    <string name="fireClearAllPlusDuckChats">Tyhjennä kaikki välilehdet, tiedot ja Duck.ai-keskustelut</string>
     <string name="fireCancel">Peruuta</string>
     <string name="fireDataCleared">Tiedot poistettu</string>
 

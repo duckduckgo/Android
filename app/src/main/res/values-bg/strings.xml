@@ -125,8 +125,6 @@
 
     <!-- Fire -->
     <string name="fireMenu">Изчистване на данни</string>
-    <string name="fireClearAll">Изчистване на всички раздели и данни</string>
-    <string name="fireClearAllPlusDuckChats">Изчистване на всички раздели, данни и чатове с Duck.ai</string>
     <string name="fireCancel">Отмени</string>
     <string name="fireDataCleared">Данните са изчистени</string>
 

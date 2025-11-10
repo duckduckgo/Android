@@ -127,8 +127,6 @@
 
     <!-- Fire -->
     <string name="fireMenu">Obriši podatke</string>
-    <string name="fireClearAll">Obriši sve kartice i podatke</string>
-    <string name="fireClearAllPlusDuckChats">Izbriši sve kartice, podatke i razgovore s Duck.ai</string>
     <string name="fireCancel">Odustani</string>
     <string name="fireDataCleared">Podaci su obrisani</string>
 

@@ -125,8 +125,6 @@
 
     <!-- Fire -->
     <string name="fireMenu">Elimina dati</string>
-    <string name="fireClearAll">Elimina tutte le schede e i dati</string>
-    <string name="fireClearAllPlusDuckChats">Cancella tutte le schede, i dati e le chat di Duck.ai</string>
     <string name="fireCancel">Annulla</string>
     <string name="fireDataCleared">I dati sono stati eliminati</string>
 
