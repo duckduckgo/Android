@@ -570,6 +570,10 @@ class OmnibarLayout @JvmOverloads constructor(
                 renderCustomTabMode(viewState, viewState.viewMode)
             }
 
+            is ViewMode.DuckAI -> {
+                renderDuckAiMode(viewState)
+            }
+
             else -> {
                 renderBrowserMode(viewState)
             }
@@ -845,6 +849,18 @@ class OmnibarLayout @JvmOverloads constructor(
         renderLeadingIconState(viewState)
 
         omnibarTextInput.hint = context.getString(R.string.search)
+    }
+
+    private fun renderDuckAiMode(viewState: ViewState) {
+        logcat { "Omnibar: renderDuckAiMode $viewState" }
+        renderTabIcon(viewState)
+        renderPulseAnimation(viewState)
+        renderLeadingIconState(viewState)
+        if (viewState.isLoading) {
+            pageLoadingIndicator.show()
+        }
+        omnibarTextInput.setText("")
+        omnibarTextInput.hint = context.getString(R.string.duckAiOnlyPinShortcutLabel)
     }
 
     private fun renderCustomTabMode(
