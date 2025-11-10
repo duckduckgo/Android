@@ -36,6 +36,7 @@ import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerSched
 import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerScheduledScanStarted
 import com.duckduckgo.pir.impl.models.AddressCityState
 import com.duckduckgo.pir.impl.models.ExtractedProfile
+import com.duckduckgo.pir.impl.models.scheduling.JobRecord.OptOutJobRecord
 import com.duckduckgo.pir.impl.pixels.PirPixelSender
 import com.duckduckgo.pir.impl.pixels.PirStage
 import com.duckduckgo.pir.impl.scheduling.JobRecordUpdater
@@ -137,7 +138,6 @@ interface PirRunStateHandler {
             val attemptId: String,
             val startTimeInMillis: Long,
             val endTimeInMillis: Long,
-            val tries: Int,
             val emailPattern: String?,
         ) : PirRunState(brokerName)
 
@@ -148,7 +148,6 @@ interface PirRunStateHandler {
             val startTimeInMillis: Long,
             val endTimeInMillis: Long,
             val failedAction: BrokerAction,
-            val tries: Int,
             val stage: PirStage,
             val emailPattern: String?,
         ) : PirRunState(brokerName)
@@ -427,16 +426,16 @@ class RealPirRunStateHandler @Inject constructor(
 
     private suspend fun handleBrokerRecordOptOutSubmitted(state: BrokerRecordOptOutSubmitted) {
         val broker = repository.getBrokerForName(state.brokerName)
-        updateOptOutRecord(true, state.extractedProfile.dbId)
+        val optOutJobRecord = updateOptOutRecord(true, state.extractedProfile.dbId)
 
-        if (broker == null) return
+        if (broker == null || optOutJobRecord == null) return
 
         pixelSender.reportOptOutSubmitted(
             brokerUrl = broker.url,
             parent = broker.parent ?: "",
             attemptId = state.attemptId,
             durationMs = state.endTimeInMillis - state.startTimeInMillis,
-            tries = state.tries,
+            tries = optOutJobRecord.attemptCount,
             emailPattern = state.emailPattern,
         )
 
@@ -451,9 +450,9 @@ class RealPirRunStateHandler @Inject constructor(
 
     private suspend fun handleBrokerRecordOptOutFailed(state: BrokerRecordOptOutFailed) {
         val broker = repository.getBrokerForName(state.brokerName)
-        updateOptOutRecord(false, state.extractedProfile.dbId)
+        val optOutJobRecord = updateOptOutRecord(false, state.extractedProfile.dbId)
 
-        if (broker == null) return
+        if (broker == null || optOutJobRecord == null) return
 
         pixelSender.reportOptOutFailed(
             brokerUrl = broker.url,
@@ -461,7 +460,7 @@ class RealPirRunStateHandler @Inject constructor(
             brokerJsonVersion = broker.version,
             attemptId = state.attemptId,
             durationMs = state.endTimeInMillis - state.startTimeInMillis,
-            tries = state.tries,
+            tries = optOutJobRecord.attemptCount,
             emailPattern = state.emailPattern,
             stage = state.stage,
             actionId = state.failedAction.id,
@@ -512,8 +511,8 @@ class RealPirRunStateHandler @Inject constructor(
     private suspend fun updateOptOutRecord(
         isSubmitted: Boolean,
         extractedProfileId: Long,
-    ) {
-        if (isSubmitted) {
+    ): OptOutJobRecord? {
+        return if (isSubmitted) {
             jobRecordUpdater.updateOptOutRequested(extractedProfileId)
         } else {
             jobRecordUpdater.updateOptOutError(extractedProfileId)

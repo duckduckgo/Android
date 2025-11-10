@@ -124,7 +124,6 @@ class BrokerStepCompletedEventHandler @Inject constructor(
                         attemptId = state.attemptId ?: "no-attempt-id",
                         startTimeInMillis = state.brokerStepStartTime,
                         endTimeInMillis = currentTimeProvider.currentTimeMillis(),
-                        tries = 0,
                         emailPattern = "",
                     )
                 } else {
@@ -138,8 +137,7 @@ class BrokerStepCompletedEventHandler @Inject constructor(
                         endTimeInMillis = currentTimeProvider.currentTimeMillis(),
                         attemptId = state.attemptId ?: "no-attempt-id",
                         failedAction = lastAction,
-                        tries = 1,
-                        stage = PirStage.OTHER,
+                        stage = PirStage.OTHER, // TODO: Integrate stages properly later on
                         emailPattern = "",
                     )
                 }.also {
