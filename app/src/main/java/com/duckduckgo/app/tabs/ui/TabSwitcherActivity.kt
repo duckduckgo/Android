@@ -948,8 +948,5 @@ class TabSwitcherActivity :
         private const val TAB_GRID_COLUMN_WIDTH_DP = 180
         private const val TAB_GRID_MAX_COLUMN_COUNT = 4
         private const val KEY_FIRST_TIME_LOADING = "FIRST_TIME_LOADING"
-        private const val FAB_SCROLL_THRESHOLD = 7
-        private const val TABS_CONTENT_PADDING_DP = 56
-        private const val NAVIGATION_BAR_HEIGHT_DP = 60
     }
 }
