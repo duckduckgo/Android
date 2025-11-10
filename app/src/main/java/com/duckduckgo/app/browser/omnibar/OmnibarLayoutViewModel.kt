@@ -374,7 +374,6 @@ class OmnibarLayoutViewModel @Inject constructor(
         return when (_viewState.value.viewMode) {
             Error, SSLWarning, MaliciousSiteWarning -> Globe
             NewTab -> Search
-            ViewMode.DuckAI -> Dax
             else -> {
                 if (hasFocus) {
                     Search

@@ -1964,12 +1964,14 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     private fun evaluateDuckAIPage(url: String?) {
+        logcat { "Duck.ai: evaluateDuckAIPage $url" }
         url?.let {
-            logcat { "Duck.ai: Page loaded $it" }
             if (duckAiFeatureState.showFullScreenMode.value) {
                 if (duckDuckGoUrlDetector.isDuckDuckGoChatUrl(it)) {
                     logcat { "Duck.ai: AI Chat page loaded $it" }
                     command.value = Command.EnableDuckAIFullScreen
+                } else {
+                    command.value = Command.DisableDuckAIFullScreen(url)
                 }
             }
         }
