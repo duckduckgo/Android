@@ -1037,57 +1037,59 @@ class BrowserTabFragment :
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
 
-        omnibar = Omnibar(
-            omnibarType = settingsDataStore.omnibarType,
-            binding = binding,
-        )
+        lifecycleScope.launch {
+            omnibar = Omnibar(
+                omnibarType = settingsDataStore.omnibarType,
+                binding = binding,
+            )
+            webViewContainer = binding.webViewContainer
+            viewModel.registerWebViewListener(webViewClient, webChromeClient)
+            configureWebView()
+            configureSwipeRefresh()
+            configureAutoComplete()
+            configureNewTab()
+            initPrivacyProtectionsPopup()
+            createPopupMenu()
 
-        webViewContainer = binding.webViewContainer
-        configureObservers()
-        viewModel.registerWebViewListener(webViewClient, webChromeClient)
-        configureWebView()
-        configureSwipeRefresh()
-        configureAutoComplete()
-        configureNewTab()
-        initPrivacyProtectionsPopup()
-        createPopupMenu()
+            configureNavigationBar()
+            configureOmnibar()
 
-        configureNavigationBar()
-        configureOmnibar()
+            configureObservers()
 
-        if (savedInstanceState == null) {
-            viewModel.onViewReady()
-            viewModel.setIsCustomTab(tabDisplayedInCustomTabScreen)
-            messageFromPreviousTab?.let {
-                processMessage(it)
+            if (savedInstanceState == null) {
+                viewModel.onViewReady()
+                viewModel.setIsCustomTab(tabDisplayedInCustomTabScreen)
+                messageFromPreviousTab?.let {
+                    processMessage(it)
+                }
+            } else {
+                viewModel.onViewRecreated()
             }
-        } else {
-            viewModel.onViewRecreated()
-        }
 
-        lifecycle.addObserver(
-            @SuppressLint("NoLifecycleObserver") // we don't observe app lifecycle
-            object : DefaultLifecycleObserver {
-                override fun onStop(owner: LifecycleOwner) {
-                    if (isVisible) {
-                        if (viewModel.browserViewState.value?.maliciousSiteBlocked != true) {
-                            updateOrDeleteWebViewPreview()
+            lifecycle.addObserver(
+                @SuppressLint("NoLifecycleObserver") // we don't observe app lifecycle
+                object : DefaultLifecycleObserver {
+                    override fun onStop(owner: LifecycleOwner) {
+                        if (isVisible) {
+                            if (viewModel.browserViewState.value?.maliciousSiteBlocked != true) {
+                                updateOrDeleteWebViewPreview()
+                            }
                         }
                     }
-                }
-            },
-        )
+                },
+            )
 
-        childFragmentManager.findFragmentByTag(ADD_SAVED_SITE_FRAGMENT_TAG)?.let { dialog ->
-            (dialog as EditSavedSiteDialogFragment).listener = viewModel
-            dialog.deleteBookmarkListener = viewModel
+            childFragmentManager.findFragmentByTag(ADD_SAVED_SITE_FRAGMENT_TAG)?.let { dialog ->
+                (dialog as EditSavedSiteDialogFragment).listener = viewModel
+                dialog.deleteBookmarkListener = viewModel
+            }
+
+            if (swipingTabsFeature.isEnabled) {
+                disableSwipingOutsideTheOmnibar()
+            }
+
+            launchDownloadMessagesJob()
         }
-
-        if (swipingTabsFeature.isEnabled) {
-            disableSwipingOutsideTheOmnibar()
-        }
-
-        launchDownloadMessagesJob()
     }
 
     private fun updateOrDeleteWebViewPreview() {
@@ -2141,7 +2143,9 @@ class BrowserTabFragment :
             }
 
             is Command.ResetHistory -> {
-                resetWebView()
+                lifecycleScope.launch {
+                    resetWebView()
+                }
             }
 
             is Command.LaunchPrivacyPro -> {
@@ -3215,7 +3219,7 @@ class BrowserTabFragment :
     }
 
     @SuppressLint("SetJavaScriptEnabled")
-    private fun configureWebView() {
+    private suspend fun configureWebView() {
         if (!onboardingDesignExperimentManager.isBuckEnrolledAndEnabled()) {
             binding.daxDialogOnboardingCtaContent.layoutTransition = LayoutTransition()
             binding.daxDialogOnboardingCtaContent.layoutTransition.enableTransitionType(LayoutTransition.CHANGING)
@@ -3240,7 +3244,7 @@ class BrowserTabFragment :
             it.clearSslPreferences()
 
             it.settings.apply {
-                clientBrandHintProvider.setDefault(this)
+                withContext(dispatchers.io()) { clientBrandHintProvider.setDefault(this@apply) }
                 webViewClient.clientProvider = clientBrandHintProvider
                 userAgentString = userAgentProvider.userAgent()
                 javaScriptEnabled = true
@@ -3305,12 +3309,10 @@ class BrowserTabFragment :
                 onInContextEmailProtectionSignupPromptShown = { showNativeInContextEmailProtectionSignupPrompt() },
             )
             configureWebViewForBlobDownload(it)
-            lifecycleScope.launch {
-                webViewCompatTestHelper.configureWebViewForWebViewCompatTest(
-                    it,
-                    isBlobDownloadWebViewFeatureEnabled(it),
-                )
-            }
+            webViewCompatTestHelper.configureWebViewForWebViewCompatTest(
+                it,
+                isBlobDownloadWebViewFeatureEnabled(it),
+            )
             configureWebViewForAutofill(it)
             printInjector.addJsInterface(it) { viewModel.printFromWebView() }
             autoconsent.addJsInterface(it, autoconsentCallback)
@@ -3346,11 +3348,9 @@ class BrowserTabFragment :
             )
         }
 
-        WebView.setWebContentsDebuggingEnabled(webContentDebugging.isEnabled())
+        WebView.setWebContentsDebuggingEnabled(withContext(dispatchers.io()) { webContentDebugging.isEnabled() })
 
-        lifecycleScope.launch {
-            webView?.let { passkeyInitializer.configurePasskeySupport(it) }
-        }
+        webView?.let { passkeyInitializer.configurePasskeySupport(it) }
     }
 
     private fun screenLock(data: JsCallbackData) {
@@ -3434,8 +3434,8 @@ class BrowserTabFragment :
     }
 
     @SuppressLint("AddDocumentStartJavaScriptUsage")
-    private fun configureWebViewForBlobDownload(webView: DuckDuckGoWebView) {
-        lifecycleScope.launch(dispatchers.main()) {
+    private suspend fun configureWebViewForBlobDownload(webView: DuckDuckGoWebView) {
+        withContext(dispatchers.main()) {
             if (isBlobDownloadWebViewFeatureEnabled(webView)) {
                 val webViewCompatUsesBlobDownloadsMessageListener = webViewCompatTestHelper.useBlobDownloadsMessageListener()
 
@@ -3547,7 +3547,7 @@ class BrowserTabFragment :
             webViewCapabilityChecker.isSupported(WebViewCapability.WebMessageListener) &&
             webViewCapabilityChecker.isSupported(WebViewCapability.DocumentStartJavaScript)
 
-    private fun configureWebViewForAutofill(it: DuckDuckGoWebView) {
+    private suspend fun configureWebViewForAutofill(it: DuckDuckGoWebView) {
         it.setSystemAutofillCallback {
             systemAutofillEngagement.onSystemAutofillEvent()
         }
@@ -4065,7 +4065,7 @@ class BrowserTabFragment :
         return viewModel.onUserPressedBack(isCustomTab)
     }
 
-    private fun resetWebView() {
+    private suspend fun resetWebView() {
         destroyWebView()
         configureWebView()
     }
