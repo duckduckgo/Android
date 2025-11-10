@@ -22,12 +22,13 @@ import androidx.appcompat.widget.Toolbar
 import androidx.core.view.isVisible
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.PopupTabsMenuBinding
-import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.SelectionViewState.BackButtonType.ARROW
-import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.SelectionViewState.BackButtonType.CLOSE
-import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.SelectionViewState.DynamicInterface
-import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.SelectionViewState.LayoutMode.GRID
-import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.SelectionViewState.LayoutMode.HIDDEN
-import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.SelectionViewState.LayoutMode.LIST
+import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarView
+import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.ViewState.BackButtonType.ARROW
+import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.ViewState.BackButtonType.CLOSE
+import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.ViewState.DynamicInterface
+import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.ViewState.LayoutMode.GRID
+import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.ViewState.LayoutMode.HIDDEN
+import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.ViewState.LayoutMode.LIST
 import com.duckduckgo.mobile.android.R as commonR
 
 fun Menu.createDynamicInterface(
@@ -35,6 +36,7 @@ fun Menu.createDynamicInterface(
     popupMenu: PopupTabsMenuBinding,
     toolbar: Toolbar,
     dynamicMenu: DynamicInterface,
+    navigationBar: BrowserNavigationBarView,
 ) {
     popupMenu.selectAllMenuItem.isVisible = dynamicMenu.isSelectAllVisible
     popupMenu.deselectAllMenuItem.isVisible = dynamicMenu.isDeselectAllVisible
@@ -94,4 +96,7 @@ fun Menu.createDynamicInterface(
     findItem(R.id.fireToolbarButton).isVisible = dynamicMenu.isFireButtonVisible
     findItem(R.id.duckAIToolbarButton).isVisible = dynamicMenu.isDuckAIButtonVisible
     findItem(R.id.newTabToolbarButton).isVisible = dynamicMenu.isNewTabButtonVisible
+    findItem(R.id.popupMenuToolbarButton).isVisible = dynamicMenu.isMenuButtonVisible
+
+    navigationBar.isVisible = dynamicMenu.isBottomBarVisible
 }

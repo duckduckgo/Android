@@ -200,7 +200,7 @@ class AppearanceActivity : DuckDuckGoActivity() {
         val subtitle =
             getString(
                 when (omnibarType) {
-                    OmnibarType.SINGLE_TOP, OmnibarType.SPLIT -> R.string.settingsAddressBarPositionTop
+                    OmnibarType.SPLIT, OmnibarType.SINGLE_TOP -> R.string.settingsAddressBarPositionTop
                     OmnibarType.SINGLE_BOTTOM -> R.string.settingsAddressBarPositionBottom
                 },
             )
@@ -238,9 +238,9 @@ class AppearanceActivity : DuckDuckGoActivity() {
                     override fun onPositiveButtonClicked(selectedItem: Int) {
                         val selectedTheme =
                             when (selectedItem) {
-                                2 -> DuckDuckGoTheme.LIGHT
-                                3 -> DuckDuckGoTheme.DARK
-                                else -> DuckDuckGoTheme.SYSTEM_DEFAULT
+                                2 -> LIGHT
+                                3 -> DARK
+                                else -> SYSTEM_DEFAULT
                             }
                         viewModel.onThemeSelected(selectedTheme)
                     }

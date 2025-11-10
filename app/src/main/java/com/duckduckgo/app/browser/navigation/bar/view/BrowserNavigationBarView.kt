@@ -36,11 +36,8 @@ import com.duckduckgo.app.browser.PulseAnimation
 import com.duckduckgo.app.browser.databinding.ViewBrowserNavigationBarBinding
 import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarViewModel.Command
 import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarViewModel.Command.NotifyAutofillButtonClicked
-import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarViewModel.Command.NotifyBackButtonClicked
-import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarViewModel.Command.NotifyBackButtonLongClicked
 import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarViewModel.Command.NotifyBookmarksButtonClicked
 import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarViewModel.Command.NotifyFireButtonClicked
-import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarViewModel.Command.NotifyForwardButtonClicked
 import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarViewModel.Command.NotifyMenuButtonClicked
 import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarViewModel.Command.NotifyNewTabButtonClicked
 import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarViewModel.Command.NotifyTabsButtonClicked
@@ -208,9 +205,6 @@ class BrowserNavigationBarView @JvmOverloads constructor(
             NotifyTabsButtonClicked -> browserNavigationBarObserver?.onTabsButtonClicked()
             NotifyTabsButtonLongClicked -> browserNavigationBarObserver?.onTabsButtonLongClicked()
             NotifyMenuButtonClicked -> browserNavigationBarObserver?.onMenuButtonClicked()
-            NotifyBackButtonClicked -> browserNavigationBarObserver?.onBackButtonClicked()
-            NotifyBackButtonLongClicked -> browserNavigationBarObserver?.onBackButtonLongClicked()
-            NotifyForwardButtonClicked -> browserNavigationBarObserver?.onForwardButtonClicked()
             NotifyBookmarksButtonClicked -> browserNavigationBarObserver?.onBookmarksButtonClicked()
             NotifyNewTabButtonClicked -> browserNavigationBarObserver?.onNewTabButtonClicked()
             NotifyAutofillButtonClicked -> browserNavigationBarObserver?.onAutofillButtonClicked()
@@ -232,12 +226,13 @@ class BrowserNavigationBarView @JvmOverloads constructor(
     enum class ViewMode {
         NewTab,
         Browser,
+        TabManager,
     }
 
     /**
      * Behavior that offsets the navigation bar proportionally to the offset of the top omnibar.
      */
-    private class BottomViewBehavior(
+    inner class BottomViewBehavior(
         context: Context,
         attrs: AttributeSet?,
     ) : Behavior<View>(context, attrs) {

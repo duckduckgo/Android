@@ -774,8 +774,9 @@ open class BrowserActivity : DuckDuckGoActivity() {
 
             val anchorView =
                 when (settingsDataStore.omnibarType) {
-                    OmnibarType.SINGLE_TOP, OmnibarType.SPLIT -> null
+                    OmnibarType.SINGLE_TOP -> null
                     OmnibarType.SINGLE_BOTTOM -> currentTab?.getOmnibar()?.omnibarView?.toolbar ?: binding.fragmentContainer
+                    OmnibarType.SPLIT -> currentTab?.getBottomNavigationBar() ?: binding.fragmentContainer
                 }
             DefaultSnackbar(
                 parentView = binding.fragmentContainer,

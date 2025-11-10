@@ -23,11 +23,11 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.Observer
 import androidx.lifecycle.liveData
 import com.duckduckgo.app.browser.favicon.FaviconManager
+import com.duckduckgo.app.browser.omnibar.OmnibarFeatureRepository
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
-import com.duckduckgo.app.tabs.TabManagerFeatureFlags
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.tabs.model.TabSwitcherData
@@ -42,12 +42,12 @@ import com.duckduckgo.app.tabs.store.TabSwitcherPrefsDataStore
 import com.duckduckgo.app.tabs.ui.TabSwitcherItem.Tab.NormalTab
 import com.duckduckgo.app.tabs.ui.TabSwitcherItem.Tab.SelectableTab
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command
-import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.SelectionViewState
-import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.SelectionViewState.BackButtonType
-import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.SelectionViewState.DynamicInterface
-import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.SelectionViewState.LayoutMode
-import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.SelectionViewState.Mode.Normal
-import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.SelectionViewState.Mode.Selection
+import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.ViewState
+import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.ViewState.BackButtonType
+import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.ViewState.DynamicInterface
+import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.ViewState.LayoutMode
+import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.ViewState.Mode.Normal
+import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.ViewState.Mode.Selection
 import com.duckduckgo.app.trackerdetection.api.WebTrackersBlockedAppRepository
 import com.duckduckgo.browser.api.UserBrowserProperties
 import com.duckduckgo.common.test.CoroutineTestRule
@@ -91,6 +91,7 @@ import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import java.util.Date
+import kotlin.Boolean
 
 @SuppressLint("DenyListedApi")
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -129,7 +130,8 @@ class TabSwitcherViewModelTest {
 
     private val mockTrackersAnimationInfoPanelPixels: TrackersAnimationInfoPanelPixels = mock()
 
-    private val tabManagerFeatureFlags = FakeFeatureToggleFactory.create(TabManagerFeatureFlags::class.java)
+    private val mockOmnibarFeatureRepository: OmnibarFeatureRepository = mock()
+
     private val swipingTabsFeature = FakeFeatureToggleFactory.create(SwipingTabsFeature::class.java)
     private val swipingTabsFeatureProvider = SwipingTabsFeatureProvider(swipingTabsFeature)
 
@@ -182,12 +184,12 @@ class TabSwitcherViewModelTest {
             swipingTabsFeatureProvider,
             duckChatMock,
             duckAiFeatureState = duckAiFeatureStateMock,
-            tabManagerFeatureFlags,
             mockWebTrackersBlockedAppRepository,
             tabSwitcherDataStore,
             faviconManager,
             savedSitesRepository,
             mockTrackersAnimationInfoPanelPixels,
+            mockOmnibarFeatureRepository,
         )
         testee.command.observeForever(mockCommandObserver)
         testee.tabSwitcherItemsLiveData.observeForever(mockTabSwitcherItemsObserver)
@@ -258,15 +260,15 @@ class TabSwitcherViewModelTest {
         prepareSelectionMode()
 
         testee.onSelectionModeRequested()
-        assertEquals(testee.selectionViewState.value.mode, Selection())
+        assertEquals(testee.viewState.value.mode, Selection())
         val selectedTabId = tabList[1].tabId
         testee.onTabSelected(selectedTabId)
         verify(mockPixel).fire(AppPixelName.TAB_MANAGER_TAB_SELECTED)
-        assertEquals(testee.selectionViewState.value.mode, Selection(selectedTabs = listOf(selectedTabId)))
+        assertEquals(testee.viewState.value.mode, Selection(selectedTabs = listOf(selectedTabId)))
 
         testee.onTabSelected(selectedTabId)
         verify(mockPixel).fire(AppPixelName.TAB_MANAGER_TAB_DESELECTED)
-        assertEquals(testee.selectionViewState.value.mode, Selection())
+        assertEquals(testee.viewState.value.mode, Selection())
     }
 
     @Test
@@ -287,13 +289,13 @@ class TabSwitcherViewModelTest {
         testee.onSelectionModeRequested()
         testee.onSelectAllTabs()
 
-        assertEquals(testee.selectionViewState.value.mode, Selection(tabList.map { it.tabId }))
+        assertEquals(testee.viewState.value.mode, Selection(tabList.map { it.tabId }))
         verify(mockPixel).fire(AppPixelName.TAB_MANAGER_SELECT_MODE_MENU_SELECT_ALL)
         verify(mockPixel).fire(AppPixelName.TAB_MANAGER_SELECT_MODE_MENU_SELECT_ALL_DAILY, type = Daily())
 
         testee.onDeselectAllTabs()
 
-        assertEquals(testee.selectionViewState.value.mode, Selection())
+        assertEquals(testee.viewState.value.mode, Selection())
         verify(mockPixel).fire(AppPixelName.TAB_MANAGER_SELECT_MODE_MENU_DESELECT_ALL)
         verify(mockPixel).fire(AppPixelName.TAB_MANAGER_SELECT_MODE_MENU_DESELECT_ALL_DAILY, type = Daily())
     }
@@ -750,11 +752,12 @@ class TabSwitcherViewModelTest {
 
     @Test
     fun whenNormalModeAndNoTabsThenVerifyDynamicInterface() {
-        val viewState = SelectionViewState(tabSwitcherItems = emptyList(), mode = Normal, layoutType = null, isDuckAIButtonVisible = true)
+        val viewState = ViewState(tabSwitcherItems = emptyList(), mode = Normal, layoutType = null, isDuckAIButtonVisible = true)
         val expected = DynamicInterface(
             isFireButtonVisible = true,
             isNewTabButtonVisible = true,
             isDuckAIButtonVisible = true,
+            isMenuButtonVisible = true,
             isSelectAllVisible = false,
             isDeselectAllVisible = false,
             isSelectionActionsDividerVisible = false,
@@ -768,6 +771,7 @@ class TabSwitcherViewModelTest {
             isCloseAllTabsVisible = true,
             backButtonType = BackButtonType.ARROW,
             layoutMenuMode = LayoutMode.HIDDEN,
+            isBottomBarVisible = false,
         )
         assertEquals(expected, viewState.dynamicInterface)
     }
@@ -775,11 +779,12 @@ class TabSwitcherViewModelTest {
     @Test
     fun whenNormalModeAndOneNewTabPageThenVerifyDynamicInterface() {
         val tabItems = listOf(NormalTab(TabEntity("1"), true))
-        val viewState = SelectionViewState(tabSwitcherItems = tabItems, mode = Normal, layoutType = null, isDuckAIButtonVisible = true)
+        val viewState = ViewState(tabSwitcherItems = tabItems, mode = Normal, layoutType = null, isDuckAIButtonVisible = true)
         val expected = DynamicInterface(
             isFireButtonVisible = true,
             isNewTabButtonVisible = true,
             isDuckAIButtonVisible = true,
+            isMenuButtonVisible = true,
             isSelectAllVisible = false,
             isDeselectAllVisible = false,
             isSelectionActionsDividerVisible = false,
@@ -793,6 +798,7 @@ class TabSwitcherViewModelTest {
             isCloseAllTabsVisible = true,
             backButtonType = BackButtonType.ARROW,
             layoutMenuMode = LayoutMode.HIDDEN,
+            isBottomBarVisible = false,
         )
         assertEquals(expected, viewState.dynamicInterface)
     }
@@ -800,7 +806,7 @@ class TabSwitcherViewModelTest {
     @Test
     fun whenNormalModeAndMultipleTabsThenVerifyDynamicInterface() {
         val tabItems = listOf(NormalTab(TabEntity("1"), true), NormalTab(TabEntity("2"), false))
-        val viewState = SelectionViewState(
+        val viewState = ViewState(
             tabSwitcherItems = tabItems,
             mode = Normal,
             layoutType = null,
@@ -810,6 +816,7 @@ class TabSwitcherViewModelTest {
             isFireButtonVisible = true,
             isNewTabButtonVisible = true,
             isDuckAIButtonVisible = true,
+            isMenuButtonVisible = true,
             isSelectAllVisible = false,
             isDeselectAllVisible = false,
             isSelectionActionsDividerVisible = false,
@@ -823,6 +830,7 @@ class TabSwitcherViewModelTest {
             isCloseAllTabsVisible = true,
             backButtonType = BackButtonType.ARROW,
             layoutMenuMode = LayoutMode.HIDDEN,
+            isBottomBarVisible = false,
         )
         assertEquals(expected, viewState.dynamicInterface)
     }
@@ -830,7 +838,7 @@ class TabSwitcherViewModelTest {
     @Test
     fun whenNormalModeAndNewVisualDesignEnabledAndDuckChatDisabledThenVerifyDynamicInterface() {
         val tabItems = listOf(NormalTab(TabEntity("1"), true), NormalTab(TabEntity("2"), false))
-        val viewState = SelectionViewState(
+        val viewState = ViewState(
             tabSwitcherItems = tabItems,
             mode = Normal,
             layoutType = null,
@@ -840,6 +848,7 @@ class TabSwitcherViewModelTest {
             isFireButtonVisible = true,
             isNewTabButtonVisible = true,
             isDuckAIButtonVisible = false,
+            isMenuButtonVisible = true,
             isSelectAllVisible = false,
             isDeselectAllVisible = false,
             isSelectionActionsDividerVisible = false,
@@ -853,6 +862,7 @@ class TabSwitcherViewModelTest {
             isCloseAllTabsVisible = true,
             backButtonType = BackButtonType.ARROW,
             layoutMenuMode = LayoutMode.HIDDEN,
+            isBottomBarVisible = false,
         )
         assertEquals(expected, viewState.dynamicInterface)
     }
@@ -860,7 +870,7 @@ class TabSwitcherViewModelTest {
     @Test
     fun whenNormalModeAndNewVisualDesignDisabledAndDuckChatDisabledThenVerifyDynamicInterface() {
         val tabItems = listOf(NormalTab(TabEntity("1"), true), NormalTab(TabEntity("2"), false))
-        val viewState = SelectionViewState(
+        val viewState = ViewState(
             tabSwitcherItems = tabItems,
             mode = Normal,
             layoutType = null,
@@ -870,6 +880,7 @@ class TabSwitcherViewModelTest {
             isFireButtonVisible = true,
             isNewTabButtonVisible = true,
             isDuckAIButtonVisible = false,
+            isMenuButtonVisible = true,
             isSelectAllVisible = false,
             isDeselectAllVisible = false,
             isSelectionActionsDividerVisible = false,
@@ -883,6 +894,7 @@ class TabSwitcherViewModelTest {
             isCloseAllTabsVisible = true,
             backButtonType = BackButtonType.ARROW,
             layoutMenuMode = LayoutMode.HIDDEN,
+            isBottomBarVisible = false,
         )
         assertEquals(expected, viewState.dynamicInterface)
     }
@@ -890,11 +902,12 @@ class TabSwitcherViewModelTest {
     @Test
     fun whenNormalModeAndMultipleTabsAndLayoutIsGridThenVerifyDynamicInterface() {
         val tabItems = listOf(NormalTab(TabEntity("1"), true), NormalTab(TabEntity("2"), false))
-        val viewState = SelectionViewState(tabSwitcherItems = tabItems, mode = Normal, layoutType = GRID, isDuckAIButtonVisible = true)
+        val viewState = ViewState(tabSwitcherItems = tabItems, mode = Normal, layoutType = GRID, isDuckAIButtonVisible = true)
         val expected = DynamicInterface(
             isFireButtonVisible = true,
             isNewTabButtonVisible = true,
             isDuckAIButtonVisible = true,
+            isMenuButtonVisible = true,
             isSelectAllVisible = false,
             isDeselectAllVisible = false,
             isSelectionActionsDividerVisible = false,
@@ -908,6 +921,7 @@ class TabSwitcherViewModelTest {
             isCloseAllTabsVisible = true,
             backButtonType = BackButtonType.ARROW,
             layoutMenuMode = LayoutMode.LIST,
+            isBottomBarVisible = false,
         )
         assertEquals(expected, viewState.dynamicInterface)
     }
@@ -915,7 +929,7 @@ class TabSwitcherViewModelTest {
     @Test
     fun whenNormalModeAndMultipleTabsAndLayoutIsListThenVerifyDynamicInterface() {
         val tabItems = listOf(NormalTab(TabEntity("1", "http://cnn.com"), true), NormalTab(TabEntity("2"), false))
-        val viewState = SelectionViewState(
+        val viewState = ViewState(
             tabSwitcherItems = tabItems,
             mode = Normal,
             layoutType = LIST,
@@ -925,6 +939,7 @@ class TabSwitcherViewModelTest {
             isFireButtonVisible = true,
             isNewTabButtonVisible = true,
             isDuckAIButtonVisible = true,
+            isMenuButtonVisible = true,
             isSelectAllVisible = false,
             isDeselectAllVisible = false,
             isSelectionActionsDividerVisible = false,
@@ -938,6 +953,7 @@ class TabSwitcherViewModelTest {
             isCloseAllTabsVisible = true,
             backButtonType = BackButtonType.ARROW,
             layoutMenuMode = LayoutMode.GRID,
+            isBottomBarVisible = false,
         )
         assertEquals(expected, viewState.dynamicInterface)
     }
@@ -948,11 +964,12 @@ class TabSwitcherViewModelTest {
             SelectableTab(TabEntity("1", "http://cnn.com"), false),
             SelectableTab(TabEntity("2"), false),
         )
-        val viewState = SelectionViewState(tabSwitcherItems = tabItems, mode = Selection(emptyList()), layoutType = null)
+        val viewState = ViewState(tabSwitcherItems = tabItems, mode = Selection(emptyList()), layoutType = null)
         val expected = DynamicInterface(
             isFireButtonVisible = false,
             isNewTabButtonVisible = false,
             isDuckAIButtonVisible = false,
+            isMenuButtonVisible = true,
             isSelectAllVisible = true,
             isDeselectAllVisible = false,
             isSelectionActionsDividerVisible = false,
@@ -966,6 +983,7 @@ class TabSwitcherViewModelTest {
             isCloseAllTabsVisible = false,
             backButtonType = BackButtonType.CLOSE,
             layoutMenuMode = LayoutMode.HIDDEN,
+            isBottomBarVisible = false,
         )
         assertEquals(expected, viewState.dynamicInterface)
     }
@@ -976,11 +994,12 @@ class TabSwitcherViewModelTest {
             SelectableTab(TabEntity("1", "http://cnn.com"), true),
             SelectableTab(TabEntity("2"), false),
         )
-        val viewState = SelectionViewState(tabSwitcherItems = tabItems, mode = Selection(listOf("1")), layoutType = null)
+        val viewState = ViewState(tabSwitcherItems = tabItems, mode = Selection(listOf("1")), layoutType = null)
         val expected = DynamicInterface(
             isFireButtonVisible = false,
             isNewTabButtonVisible = false,
             isDuckAIButtonVisible = false,
+            isMenuButtonVisible = true,
             isSelectAllVisible = true,
             isDeselectAllVisible = false,
             isSelectionActionsDividerVisible = true,
@@ -994,6 +1013,7 @@ class TabSwitcherViewModelTest {
             isCloseAllTabsVisible = false,
             backButtonType = BackButtonType.CLOSE,
             layoutMenuMode = LayoutMode.HIDDEN,
+            isBottomBarVisible = false,
         )
         assertEquals(expected, viewState.dynamicInterface)
     }
@@ -1004,11 +1024,12 @@ class TabSwitcherViewModelTest {
             SelectableTab(TabEntity("1"), true),
             SelectableTab(TabEntity("2", url = "cnn.com"), false),
         )
-        val viewState = SelectionViewState(tabSwitcherItems = tabItems, mode = Selection(listOf("1")), layoutType = null)
+        val viewState = ViewState(tabSwitcherItems = tabItems, mode = Selection(listOf("1")), layoutType = null)
         val expected = DynamicInterface(
             isFireButtonVisible = false,
             isNewTabButtonVisible = false,
             isDuckAIButtonVisible = false,
+            isMenuButtonVisible = true,
             isSelectAllVisible = true,
             isDeselectAllVisible = false,
             isSelectionActionsDividerVisible = false,
@@ -1022,6 +1043,7 @@ class TabSwitcherViewModelTest {
             isCloseAllTabsVisible = false,
             backButtonType = BackButtonType.CLOSE,
             layoutMenuMode = LayoutMode.HIDDEN,
+            isBottomBarVisible = false,
         )
         assertEquals(expected, viewState.dynamicInterface)
     }
@@ -1033,11 +1055,12 @@ class TabSwitcherViewModelTest {
             SelectableTab(TabEntity("2", "http://cnn.com"), true),
             SelectableTab(TabEntity("3"), false),
         )
-        val viewState = SelectionViewState(tabSwitcherItems = tabItems, mode = Selection(listOf("1", "2")), layoutType = null)
+        val viewState = ViewState(tabSwitcherItems = tabItems, mode = Selection(listOf("1", "2")), layoutType = null)
         val expected = DynamicInterface(
             isFireButtonVisible = false,
             isNewTabButtonVisible = false,
             isDuckAIButtonVisible = false,
+            isMenuButtonVisible = true,
             isSelectAllVisible = true,
             isDeselectAllVisible = false,
             isSelectionActionsDividerVisible = true,
@@ -1051,6 +1074,7 @@ class TabSwitcherViewModelTest {
             isCloseAllTabsVisible = false,
             backButtonType = BackButtonType.CLOSE,
             layoutMenuMode = LayoutMode.HIDDEN,
+            isBottomBarVisible = false,
         )
         assertEquals(expected, viewState.dynamicInterface)
     }
@@ -1061,11 +1085,12 @@ class TabSwitcherViewModelTest {
             SelectableTab(TabEntity("1", "http://cnn.com"), true),
             SelectableTab(TabEntity("2"), true),
         )
-        val viewState = SelectionViewState(tabSwitcherItems = tabItems, mode = Selection(listOf("1", "2")), layoutType = null)
+        val viewState = ViewState(tabSwitcherItems = tabItems, mode = Selection(listOf("1", "2")), layoutType = null)
         val expected = DynamicInterface(
             isFireButtonVisible = false,
             isNewTabButtonVisible = false,
             isDuckAIButtonVisible = false,
+            isMenuButtonVisible = true,
             isSelectAllVisible = false,
             isDeselectAllVisible = true,
             isSelectionActionsDividerVisible = true,
@@ -1079,6 +1104,7 @@ class TabSwitcherViewModelTest {
             isCloseAllTabsVisible = false,
             backButtonType = BackButtonType.CLOSE,
             layoutMenuMode = LayoutMode.HIDDEN,
+            isBottomBarVisible = false,
         )
         assertEquals(expected, viewState.dynamicInterface)
     }
@@ -1087,7 +1113,7 @@ class TabSwitcherViewModelTest {
 
     @Test
     fun whenNormalModeAndNoTabsAndNewToolbarEnabledThenVerifyDynamicInterface() {
-        val viewState = SelectionViewState(
+        val viewState = ViewState(
             tabSwitcherItems = emptyList(),
             mode = Normal,
             layoutType = null,
@@ -1097,6 +1123,7 @@ class TabSwitcherViewModelTest {
             isFireButtonVisible = true,
             isNewTabButtonVisible = true,
             isDuckAIButtonVisible = true,
+            isMenuButtonVisible = true,
             isSelectAllVisible = false,
             isDeselectAllVisible = false,
             isSelectionActionsDividerVisible = false,
@@ -1110,6 +1137,7 @@ class TabSwitcherViewModelTest {
             isCloseAllTabsVisible = true,
             backButtonType = BackButtonType.ARROW,
             layoutMenuMode = LayoutMode.HIDDEN,
+            isBottomBarVisible = false,
         )
         assertEquals(expected, viewState.dynamicInterface)
     }
@@ -1117,7 +1145,7 @@ class TabSwitcherViewModelTest {
     @Test
     fun whenNormalModeAndOneNewTabPageAndNewToolbarEnabledThenVerifyDynamicInterface() {
         val tabItems = listOf(NormalTab(TabEntity("1"), true))
-        val viewState = SelectionViewState(
+        val viewState = ViewState(
             tabSwitcherItems = tabItems,
             mode = Normal,
             layoutType = null,
@@ -1127,6 +1155,7 @@ class TabSwitcherViewModelTest {
             isFireButtonVisible = true,
             isNewTabButtonVisible = true,
             isDuckAIButtonVisible = true,
+            isMenuButtonVisible = true,
             isSelectAllVisible = false,
             isDeselectAllVisible = false,
             isSelectionActionsDividerVisible = false,
@@ -1140,6 +1169,7 @@ class TabSwitcherViewModelTest {
             isCloseAllTabsVisible = true,
             backButtonType = BackButtonType.ARROW,
             layoutMenuMode = LayoutMode.HIDDEN,
+            isBottomBarVisible = false,
         )
         assertEquals(expected, viewState.dynamicInterface)
     }
@@ -1147,7 +1177,7 @@ class TabSwitcherViewModelTest {
     @Test
     fun whenNormalModeAndMultipleTabsAndNewToolbarEnabledThenVerifyDynamicInterface() {
         val tabItems = listOf(NormalTab(TabEntity("1"), true), NormalTab(TabEntity("2"), false))
-        val viewState = SelectionViewState(
+        val viewState = ViewState(
             tabSwitcherItems = tabItems,
             mode = Normal,
             layoutType = null,
@@ -1157,6 +1187,7 @@ class TabSwitcherViewModelTest {
             isFireButtonVisible = true,
             isNewTabButtonVisible = true,
             isDuckAIButtonVisible = true,
+            isMenuButtonVisible = true,
             isSelectAllVisible = false,
             isDeselectAllVisible = false,
             isSelectionActionsDividerVisible = false,
@@ -1170,6 +1201,7 @@ class TabSwitcherViewModelTest {
             isCloseAllTabsVisible = true,
             backButtonType = BackButtonType.ARROW,
             layoutMenuMode = LayoutMode.HIDDEN,
+            isBottomBarVisible = false,
         )
         assertEquals(expected, viewState.dynamicInterface)
     }
@@ -1177,7 +1209,7 @@ class TabSwitcherViewModelTest {
     @Test
     fun whenNormalModeAndNewVisualDesignEnabledAndDuckChatDisabledAndNewToolbarEnabledThenVerifyDynamicInterface() {
         val tabItems = listOf(NormalTab(TabEntity("1"), true), NormalTab(TabEntity("2"), false))
-        val viewState = SelectionViewState(
+        val viewState = ViewState(
             tabSwitcherItems = tabItems,
             mode = Normal,
             layoutType = null,
@@ -1187,6 +1219,7 @@ class TabSwitcherViewModelTest {
             isFireButtonVisible = true,
             isNewTabButtonVisible = true,
             isDuckAIButtonVisible = false,
+            isMenuButtonVisible = true,
             isSelectAllVisible = false,
             isDeselectAllVisible = false,
             isSelectionActionsDividerVisible = false,
@@ -1200,6 +1233,7 @@ class TabSwitcherViewModelTest {
             isCloseAllTabsVisible = true,
             backButtonType = BackButtonType.ARROW,
             layoutMenuMode = LayoutMode.HIDDEN,
+            isBottomBarVisible = false,
         )
         assertEquals(expected, viewState.dynamicInterface)
     }
@@ -1207,7 +1241,7 @@ class TabSwitcherViewModelTest {
     @Test
     fun whenNormalModeAndNewVisualDesignDisabledAndDuckChatDisabledAndNewToolbarEnabledThenVerifyDynamicInterface() {
         val tabItems = listOf(NormalTab(TabEntity("1"), true), NormalTab(TabEntity("2"), false))
-        val viewState = SelectionViewState(
+        val viewState = ViewState(
             tabSwitcherItems = tabItems,
             mode = Normal,
             layoutType = null,
@@ -1217,6 +1251,7 @@ class TabSwitcherViewModelTest {
             isFireButtonVisible = true,
             isNewTabButtonVisible = true,
             isDuckAIButtonVisible = false,
+            isMenuButtonVisible = true,
             isSelectAllVisible = false,
             isDeselectAllVisible = false,
             isSelectionActionsDividerVisible = false,
@@ -1230,6 +1265,7 @@ class TabSwitcherViewModelTest {
             isCloseAllTabsVisible = true,
             backButtonType = BackButtonType.ARROW,
             layoutMenuMode = LayoutMode.HIDDEN,
+            isBottomBarVisible = false,
         )
         assertEquals(expected, viewState.dynamicInterface)
     }
@@ -1237,7 +1273,7 @@ class TabSwitcherViewModelTest {
     @Test
     fun whenNormalModeAndMultipleTabsAndLayoutIsGridAndNewToolbarEnabledThenVerifyDynamicInterface() {
         val tabItems = listOf(NormalTab(TabEntity("1"), true), NormalTab(TabEntity("2"), false))
-        val viewState = SelectionViewState(
+        val viewState = ViewState(
             tabSwitcherItems = tabItems,
             mode = Normal,
             layoutType = GRID,
@@ -1247,6 +1283,7 @@ class TabSwitcherViewModelTest {
             isFireButtonVisible = true,
             isNewTabButtonVisible = true,
             isDuckAIButtonVisible = true,
+            isMenuButtonVisible = true,
             isSelectAllVisible = false,
             isDeselectAllVisible = false,
             isSelectionActionsDividerVisible = false,
@@ -1260,6 +1297,7 @@ class TabSwitcherViewModelTest {
             isCloseAllTabsVisible = true,
             backButtonType = BackButtonType.ARROW,
             layoutMenuMode = LayoutMode.LIST,
+            isBottomBarVisible = false,
         )
         assertEquals(expected, viewState.dynamicInterface)
     }
@@ -1267,7 +1305,7 @@ class TabSwitcherViewModelTest {
     @Test
     fun whenNormalModeAndMultipleTabsAndLayoutIsListAndNewToolbarEnabledThenVerifyDynamicInterface() {
         val tabItems = listOf(NormalTab(TabEntity("1", "http://cnn.com"), true), NormalTab(TabEntity("2"), false))
-        val viewState = SelectionViewState(
+        val viewState = ViewState(
             tabSwitcherItems = tabItems,
             mode = Normal,
             layoutType = LIST,
@@ -1277,6 +1315,7 @@ class TabSwitcherViewModelTest {
             isFireButtonVisible = true,
             isNewTabButtonVisible = true,
             isDuckAIButtonVisible = true,
+            isMenuButtonVisible = true,
             isSelectAllVisible = false,
             isDeselectAllVisible = false,
             isSelectionActionsDividerVisible = false,
@@ -1290,6 +1329,7 @@ class TabSwitcherViewModelTest {
             isCloseAllTabsVisible = true,
             backButtonType = BackButtonType.ARROW,
             layoutMenuMode = LayoutMode.GRID,
+            isBottomBarVisible = false,
         )
         assertEquals(expected, viewState.dynamicInterface)
     }
@@ -1300,7 +1340,7 @@ class TabSwitcherViewModelTest {
             SelectableTab(TabEntity("1", "http://cnn.com"), false),
             SelectableTab(TabEntity("2"), false),
         )
-        val viewState = SelectionViewState(
+        val viewState = ViewState(
             tabSwitcherItems = tabItems,
             mode = Selection(emptyList()),
             layoutType = null,
@@ -1310,6 +1350,7 @@ class TabSwitcherViewModelTest {
             isNewTabButtonVisible = false,
             isDuckAIButtonVisible = false,
             isSelectAllVisible = true,
+            isMenuButtonVisible = true,
             isDeselectAllVisible = false,
             isSelectionActionsDividerVisible = false,
             isShareSelectedLinksVisible = false,
@@ -1322,6 +1363,7 @@ class TabSwitcherViewModelTest {
             isCloseAllTabsVisible = false,
             backButtonType = BackButtonType.CLOSE,
             layoutMenuMode = LayoutMode.HIDDEN,
+            isBottomBarVisible = false,
         )
         assertEquals(expected, viewState.dynamicInterface)
     }
@@ -1332,7 +1374,7 @@ class TabSwitcherViewModelTest {
             SelectableTab(TabEntity("1", "http://cnn.com"), true),
             SelectableTab(TabEntity("2"), false),
         )
-        val viewState = SelectionViewState(
+        val viewState = ViewState(
             tabSwitcherItems = tabItems,
             mode = Selection(listOf("1")),
             layoutType = null,
@@ -1341,6 +1383,7 @@ class TabSwitcherViewModelTest {
             isFireButtonVisible = false,
             isNewTabButtonVisible = false,
             isDuckAIButtonVisible = false,
+            isMenuButtonVisible = true,
             isSelectAllVisible = true,
             isDeselectAllVisible = false,
             isSelectionActionsDividerVisible = true,
@@ -1354,6 +1397,7 @@ class TabSwitcherViewModelTest {
             isCloseAllTabsVisible = false,
             backButtonType = BackButtonType.CLOSE,
             layoutMenuMode = LayoutMode.HIDDEN,
+            isBottomBarVisible = false,
         )
         assertEquals(expected, viewState.dynamicInterface)
     }
@@ -1364,7 +1408,7 @@ class TabSwitcherViewModelTest {
             SelectableTab(TabEntity("1"), true),
             SelectableTab(TabEntity("2", url = "cnn.com"), false),
         )
-        val viewState = SelectionViewState(
+        val viewState = ViewState(
             tabSwitcherItems = tabItems,
             mode = Selection(listOf("1")),
             layoutType = null,
@@ -1373,6 +1417,7 @@ class TabSwitcherViewModelTest {
             isFireButtonVisible = false,
             isNewTabButtonVisible = false,
             isDuckAIButtonVisible = false,
+            isMenuButtonVisible = true,
             isSelectAllVisible = true,
             isDeselectAllVisible = false,
             isSelectionActionsDividerVisible = false,
@@ -1386,6 +1431,7 @@ class TabSwitcherViewModelTest {
             isCloseAllTabsVisible = false,
             backButtonType = BackButtonType.CLOSE,
             layoutMenuMode = LayoutMode.HIDDEN,
+            isBottomBarVisible = false,
         )
         assertEquals(expected, viewState.dynamicInterface)
     }
@@ -1396,7 +1442,7 @@ class TabSwitcherViewModelTest {
             SelectableTab(TabEntity("1", "http://cnn.com"), true),
             SelectableTab(TabEntity("2"), true),
         )
-        val viewState = SelectionViewState(
+        val viewState = ViewState(
             tabSwitcherItems = tabItems,
             mode = Selection(listOf("1", "2")),
             layoutType = null,
@@ -1405,6 +1451,7 @@ class TabSwitcherViewModelTest {
             isFireButtonVisible = false,
             isNewTabButtonVisible = false,
             isDuckAIButtonVisible = false,
+            isMenuButtonVisible = true,
             isSelectAllVisible = false,
             isDeselectAllVisible = true,
             isSelectionActionsDividerVisible = true,
@@ -1418,6 +1465,7 @@ class TabSwitcherViewModelTest {
             isCloseAllTabsVisible = false,
             backButtonType = BackButtonType.CLOSE,
             layoutMenuMode = LayoutMode.HIDDEN,
+            isBottomBarVisible = false,
         )
         assertEquals(expected, viewState.dynamicInterface)
     }
@@ -1428,7 +1476,7 @@ class TabSwitcherViewModelTest {
             SelectableTab(TabEntity("1", "http://cnn.com"), true),
             SelectableTab(TabEntity("2"), true),
         )
-        val viewState = SelectionViewState(
+        val viewState = ViewState(
             tabSwitcherItems = tabItems,
             mode = Selection(listOf("1", "2")),
             layoutType = null,
@@ -1437,6 +1485,7 @@ class TabSwitcherViewModelTest {
             isFireButtonVisible = false,
             isNewTabButtonVisible = false,
             isDuckAIButtonVisible = false,
+            isMenuButtonVisible = true,
             isSelectAllVisible = false,
             isDeselectAllVisible = true,
             isSelectionActionsDividerVisible = true,
@@ -1450,6 +1499,7 @@ class TabSwitcherViewModelTest {
             isCloseAllTabsVisible = false,
             backButtonType = BackButtonType.CLOSE,
             layoutMenuMode = LayoutMode.HIDDEN,
+            isBottomBarVisible = false,
         )
         assertEquals(expected, viewState.dynamicInterface)
     }
@@ -1560,6 +1610,226 @@ class TabSwitcherViewModelTest {
         verify(mockTrackersAnimationInfoPanelPixels).fireInfoPanelDismissed()
     }
 
+    @Test
+    fun whenNormalModeAndSplitOmnibarEnabledThenMenuButtonHiddenAndBottomBarVisible() {
+        val tabItems = listOf(NormalTab(TabEntity("1"), true), NormalTab(TabEntity("2"), false))
+        val viewState = ViewState(
+            tabSwitcherItems = tabItems,
+            mode = Normal,
+            layoutType = null,
+            isDuckAIButtonVisible = true,
+            isSplitOmnibarEnabled = true,
+        )
+        val expected = DynamicInterface(
+            isFireButtonVisible = false,
+            isNewTabButtonVisible = false,
+            isDuckAIButtonVisible = true,
+            isMenuButtonVisible = false,
+            isSelectAllVisible = false,
+            isDeselectAllVisible = false,
+            isSelectionActionsDividerVisible = false,
+            isShareSelectedLinksVisible = false,
+            isBookmarkSelectedTabsVisible = false,
+            isSelectTabsDividerVisible = true,
+            isSelectTabsVisible = true,
+            isCloseSelectedTabsVisible = false,
+            isCloseOtherTabsVisible = false,
+            isCloseAllTabsDividerVisible = true,
+            isCloseAllTabsVisible = true,
+            backButtonType = BackButtonType.ARROW,
+            layoutMenuMode = LayoutMode.HIDDEN,
+            isBottomBarVisible = true,
+        )
+        assertEquals(expected, viewState.dynamicInterface)
+    }
+
+    @Test
+    fun whenNormalModeAndSplitOmnibarEnabledAndDuckAIDisabledThenMenuButtonHiddenAndBottomBarVisible() {
+        val tabItems = listOf(NormalTab(TabEntity("1"), true), NormalTab(TabEntity("2"), false))
+        val viewState = ViewState(
+            tabSwitcherItems = tabItems,
+            mode = Normal,
+            layoutType = null,
+            isDuckAIButtonVisible = false,
+            isSplitOmnibarEnabled = true,
+        )
+        val expected = DynamicInterface(
+            isFireButtonVisible = false,
+            isNewTabButtonVisible = false,
+            isDuckAIButtonVisible = false,
+            isMenuButtonVisible = false,
+            isSelectAllVisible = false,
+            isDeselectAllVisible = false,
+            isSelectionActionsDividerVisible = false,
+            isShareSelectedLinksVisible = false,
+            isBookmarkSelectedTabsVisible = false,
+            isSelectTabsDividerVisible = true,
+            isSelectTabsVisible = true,
+            isCloseSelectedTabsVisible = false,
+            isCloseOtherTabsVisible = false,
+            isCloseAllTabsDividerVisible = true,
+            isCloseAllTabsVisible = true,
+            backButtonType = BackButtonType.ARROW,
+            layoutMenuMode = LayoutMode.HIDDEN,
+            isBottomBarVisible = true,
+        )
+        assertEquals(expected, viewState.dynamicInterface)
+    }
+
+    @Test
+    fun whenSelectionModeAndSplitOmnibarEnabledThenMenuButtonVisibleAndBottomBarHidden() {
+        val tabItems = listOf(
+            SelectableTab(TabEntity("1", "http://cnn.com"), true),
+            SelectableTab(TabEntity("2"), false),
+        )
+        val viewState = ViewState(
+            tabSwitcherItems = tabItems,
+            mode = Selection(listOf("1")),
+            layoutType = null,
+            isDuckAIButtonVisible = false,
+            isSplitOmnibarEnabled = true,
+        )
+        val expected = DynamicInterface(
+            isFireButtonVisible = false,
+            isNewTabButtonVisible = false,
+            isDuckAIButtonVisible = false,
+            isMenuButtonVisible = true,
+            isSelectAllVisible = true,
+            isDeselectAllVisible = false,
+            isSelectionActionsDividerVisible = true,
+            isShareSelectedLinksVisible = true,
+            isBookmarkSelectedTabsVisible = true,
+            isSelectTabsDividerVisible = false,
+            isSelectTabsVisible = false,
+            isCloseSelectedTabsVisible = true,
+            isCloseOtherTabsVisible = true,
+            isCloseAllTabsDividerVisible = true,
+            isCloseAllTabsVisible = false,
+            backButtonType = BackButtonType.CLOSE,
+            layoutMenuMode = LayoutMode.HIDDEN,
+            isBottomBarVisible = false,
+        )
+        assertEquals(expected, viewState.dynamicInterface)
+    }
+
+    @Test
+    fun whenSelectionModeAndSplitOmnibarEnabledAndNoTabsSelectedThenMenuButtonVisibleAndBottomBarHidden() {
+        val tabItems = listOf(
+            SelectableTab(TabEntity("1", "http://cnn.com"), false),
+            SelectableTab(TabEntity("2"), false),
+        )
+        val viewState = ViewState(
+            tabSwitcherItems = tabItems,
+            mode = Selection(emptyList()),
+            layoutType = null,
+            isDuckAIButtonVisible = false,
+            isSplitOmnibarEnabled = true,
+        )
+        val expected = DynamicInterface(
+            isFireButtonVisible = false,
+            isNewTabButtonVisible = false,
+            isDuckAIButtonVisible = false,
+            isMenuButtonVisible = true,
+            isSelectAllVisible = true,
+            isDeselectAllVisible = false,
+            isSelectionActionsDividerVisible = false,
+            isShareSelectedLinksVisible = false,
+            isBookmarkSelectedTabsVisible = false,
+            isSelectTabsDividerVisible = false,
+            isSelectTabsVisible = false,
+            isCloseSelectedTabsVisible = false,
+            isCloseOtherTabsVisible = false,
+            isCloseAllTabsDividerVisible = false,
+            isCloseAllTabsVisible = false,
+            backButtonType = BackButtonType.CLOSE,
+            layoutMenuMode = LayoutMode.HIDDEN,
+            isBottomBarVisible = false,
+        )
+        assertEquals(expected, viewState.dynamicInterface)
+    }
+
+    @Test
+    fun whenSelectionModeAndSplitOmnibarEnabledAndAllTabsSelectedThenMenuButtonVisibleAndBottomBarHidden() {
+        val tabItems = listOf(
+            SelectableTab(TabEntity("1", "http://cnn.com"), true),
+            SelectableTab(TabEntity("2"), true),
+        )
+        val viewState = ViewState(
+            tabSwitcherItems = tabItems,
+            mode = Selection(listOf("1", "2")),
+            layoutType = null,
+            isDuckAIButtonVisible = false,
+            isSplitOmnibarEnabled = true,
+        )
+        val expected = DynamicInterface(
+            isFireButtonVisible = false,
+            isNewTabButtonVisible = false,
+            isDuckAIButtonVisible = false,
+            isMenuButtonVisible = true,
+            isSelectAllVisible = false,
+            isDeselectAllVisible = true,
+            isSelectionActionsDividerVisible = true,
+            isShareSelectedLinksVisible = true,
+            isBookmarkSelectedTabsVisible = true,
+            isSelectTabsDividerVisible = false,
+            isSelectTabsVisible = false,
+            isCloseSelectedTabsVisible = true,
+            isCloseOtherTabsVisible = false,
+            isCloseAllTabsDividerVisible = true,
+            isCloseAllTabsVisible = false,
+            backButtonType = BackButtonType.CLOSE,
+            layoutMenuMode = LayoutMode.HIDDEN,
+            isBottomBarVisible = false,
+        )
+        assertEquals(expected, viewState.dynamicInterface)
+    }
+
+    // Tests for ViewState.isSplitOmnibarEnabled based on OmnibarFeatureRepository
+
+    @Test
+    fun whenOmnibarFeatureRepositoryHasSplitOmnibarDisabledThenViewStateReflectsIt() = runTest {
+        whenever(mockOmnibarFeatureRepository.isSplitOmnibarEnabled).thenReturn(false)
+
+        initializeViewModel()
+
+        assertFalse(testee.viewState.value.isSplitOmnibarEnabled)
+    }
+
+    @Test
+    fun whenOmnibarFeatureRepositoryHasSplitOmnibarEnabledThenViewStateReflectsIt() = runTest {
+        whenever(mockOmnibarFeatureRepository.isSplitOmnibarEnabled).thenReturn(true)
+
+        initializeViewModel()
+
+        assertTrue(testee.viewState.value.isSplitOmnibarEnabled)
+    }
+
+    @Test
+    fun whenSplitOmnibarDisabledThenDynamicInterfaceShowsMenuButtonAndHidesBottomBar() = runTest {
+        whenever(mockOmnibarFeatureRepository.isSplitOmnibarEnabled).thenReturn(false)
+
+        initializeViewModel()
+
+        val viewState = testee.viewState.value
+        assertTrue(viewState.dynamicInterface.isMenuButtonVisible)
+        assertFalse(viewState.dynamicInterface.isBottomBarVisible)
+        assertTrue(viewState.dynamicInterface.isFireButtonVisible)
+        assertTrue(viewState.dynamicInterface.isNewTabButtonVisible)
+    }
+
+    @Test
+    fun whenSplitOmnibarEnabledThenDynamicInterfaceHidesMenuButtonAndShowsBottomBar() = runTest {
+        whenever(mockOmnibarFeatureRepository.isSplitOmnibarEnabled).thenReturn(true)
+
+        initializeViewModel()
+
+        val viewState = testee.viewState.value
+        assertFalse(viewState.dynamicInterface.isMenuButtonVisible)
+        assertTrue(viewState.dynamicInterface.isBottomBarVisible)
+        assertFalse(viewState.dynamicInterface.isFireButtonVisible)
+        assertFalse(viewState.dynamicInterface.isNewTabButtonVisible)
+    }
+
     private class FakeTabSwitcherDataStore : TabSwitcherDataStore {
 
         private val animationTileDismissedFlow = MutableStateFlow(false)
@@ -1580,7 +1850,7 @@ class TabSwitcherViewModelTest {
 
     private fun TestScope.prepareSelectionMode() {
         backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
-            testee.selectionViewState.collect()
+            testee.viewState.collect()
         }
     }
 

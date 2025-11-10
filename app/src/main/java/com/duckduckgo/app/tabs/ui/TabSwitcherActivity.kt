@@ -42,6 +42,8 @@ import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ActivityTabSwitcherBinding
 import com.duckduckgo.app.browser.databinding.PopupTabsMenuBinding
 import com.duckduckgo.app.browser.favicon.FaviconManager
+import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarObserver
+import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarView
 import com.duckduckgo.app.browser.tabpreview.WebViewPreviewPersister
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.downloads.DownloadsActivity
@@ -50,7 +52,6 @@ import com.duckduckgo.app.global.events.db.UserEventsStore
 import com.duckduckgo.app.global.view.ClearDataAction
 import com.duckduckgo.app.global.view.FireDialog
 import com.duckduckgo.app.onboardingdesignexperiment.OnboardingDesignExperimentManager
-import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.settings.SettingsActivity
 import com.duckduckgo.app.settings.clear.OnboardingExperimentFireAnimationHelper
 import com.duckduckgo.app.settings.db.SettingsDataStore
@@ -72,8 +73,8 @@ import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command.ShareLinks
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command.ShowAnimatedTileDismissalDialog
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command.ShowUndoBookmarkMessage
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command.ShowUndoDeleteTabsMessage
-import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.SelectionViewState.Mode
-import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.SelectionViewState.Mode.Selection
+import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.ViewState.Mode
+import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.ViewState.Mode.Selection
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.browser.ui.omnibar.OmnibarType
 import com.duckduckgo.common.ui.DuckDuckGoActivity
@@ -224,8 +225,7 @@ class TabSwitcherActivity :
                 null
             }
             OmnibarType.SPLIT -> {
-                null
-                // TODO: add bottom bar
+                binding.navigationBar
             }
         }
     }
@@ -244,11 +244,30 @@ class TabSwitcherActivity :
         configureViewReferences()
         setupToolbar(toolbar)
         configureRecycler()
+        configureNavigationBar()
 
         configureObservers()
         configureOnBackPressedListener()
 
         initMenuClickListeners()
+    }
+
+    private fun configureNavigationBar() {
+        binding.navigationBar.browserNavigationBarObserver =
+            object : BrowserNavigationBarObserver {
+                override fun onMenuButtonClicked() {
+                    showPopupMenu(binding.navigationBar.popupMenuAnchor.id)
+                }
+
+                override fun onNewTabButtonClicked() {
+                    viewModel.onNewTabRequested()
+                }
+
+                override fun onFireButtonClicked() {
+                    viewModel.onFireButtonTapped()
+                }
+            }
+        binding.navigationBar.setViewMode(BrowserNavigationBarView.ViewMode.TabManager)
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -267,11 +286,9 @@ class TabSwitcherActivity :
         when (settingsDataStore.omnibarType) {
             OmnibarType.SINGLE_TOP -> {
                 binding.root.removeView(binding.tabSwitcherToolbarBottom.root)
-                // TODO: remove bottom bar
             }
             OmnibarType.SINGLE_BOTTOM -> {
                 binding.root.removeView(binding.tabSwitcherToolbarTop.root)
-                // TODO: remove bottom bar
             }
             OmnibarType.SPLIT -> {
                 binding.root.removeView(binding.tabSwitcherToolbarBottom.root)
@@ -392,7 +409,7 @@ class TabSwitcherActivity :
 
     private fun configureObservers() {
         lifecycleScope.launch {
-            viewModel.selectionViewState.flowWithLifecycle(lifecycle).collectLatest {
+            viewModel.viewState.flowWithLifecycle(lifecycle).collectLatest {
                 tabsRecycler.invalidateItemDecorations()
                 tabsAdapter.updateData(it.tabSwitcherItems)
 
@@ -546,6 +563,7 @@ class TabSwitcherActivity :
             is ShowUndoDeleteTabsMessage -> showTabsDeletedSnackbar(command.tabIds)
             ShowAnimatedTileDismissalDialog -> showAnimatedTileDismissalDialog()
             DismissAnimatedTileDismissalDialog -> tabSwitcherAnimationTileRemovalDialog!!.dismiss()
+            Command.ShowFireBottomSheet -> onFireButtonClicked()
         }
     }
 
@@ -566,14 +584,15 @@ class TabSwitcherActivity :
         menuInflater.inflate(R.menu.menu_tab_switcher_activity, menu)
 
         val popupBinding = PopupTabsMenuBinding.bind(popupMenu.contentView)
-        val viewState = viewModel.selectionViewState.value
+        val viewState = viewModel.viewState.value
 
-        val numSelectedTabs = viewModel.selectionViewState.value.numSelectedTabs
+        val numSelectedTabs = viewModel.viewState.value.numSelectedTabs
         menu.createDynamicInterface(
             numSelectedTabs = numSelectedTabs,
             popupMenu = popupBinding,
             toolbar = toolbar,
             dynamicMenu = viewState.dynamicInterface,
+            navigationBar = binding.navigationBar,
         )
 
         return true
@@ -598,7 +617,7 @@ class TabSwitcherActivity :
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
-            R.id.fireToolbarButton -> onFireButtonClicked()
+            R.id.fireToolbarButton -> viewModel.onFireButtonTapped()
             R.id.popupMenuToolbarButton -> showPopupMenu(item.itemId)
             R.id.newTabToolbarButton -> onNewTabRequested(fromOverflowMenu = false)
             R.id.duckAIToolbarButton -> viewModel.onDuckAIButtonClicked()
@@ -627,7 +646,6 @@ class TabSwitcherActivity :
     }
 
     private fun onFireButtonClicked() {
-        pixel.fire(AppPixelName.FORGET_ALL_PRESSED_TABSWITCHING)
         val dialog =
             FireDialog(
                 context = this,
@@ -930,7 +948,5 @@ class TabSwitcherActivity :
         private const val TAB_GRID_COLUMN_WIDTH_DP = 180
         private const val TAB_GRID_MAX_COLUMN_COUNT = 4
         private const val KEY_FIRST_TIME_LOADING = "FIRST_TIME_LOADING"
-        private const val FAB_SCROLL_THRESHOLD = 7
-        private const val TABS_CONTENT_PADDING_DP = 56
     }
 }
