@@ -945,8 +945,8 @@ class BrowserTabViewModel @Inject constructor(
             command.value = Command.RefreshOmnibar
         }
 
-        if (settingsPageFeature.serpSettingsSync().isEnabled()) {
-            viewModelScope.launch {
+        viewModelScope.launch {
+            if (withContext(dispatchers.io()) { settingsPageFeature.serpSettingsSync().isEnabled() }) {
                 contentScopeScriptsSubscriptionEventPluginPoint.getPlugins().forEach { plugin ->
                     _subscriptionEventDataChannel.send(plugin.getSubscriptionEventData())
                 }
