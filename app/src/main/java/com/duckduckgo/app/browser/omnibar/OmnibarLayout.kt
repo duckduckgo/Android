@@ -856,9 +856,7 @@ class OmnibarLayout @JvmOverloads constructor(
         renderTabIcon(viewState)
         renderPulseAnimation(viewState)
         renderLeadingIconState(viewState)
-        if (viewState.isLoading) {
-            pageLoadingIndicator.show()
-        }
+        pageLoadingIndicator.isVisible = viewState.isLoading
         omnibarTextInput.setText("")
         omnibarTextInput.hint = context.getString(R.string.duckAiOnlyPinShortcutLabel)
     }
