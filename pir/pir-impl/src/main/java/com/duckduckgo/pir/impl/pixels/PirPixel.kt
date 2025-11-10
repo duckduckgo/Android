@@ -128,12 +128,12 @@ enum class PirPixel(
     ),
 
     PIR_OPTOUT_SUBMIT_SUCCESS(
-        baseName = "pir_optout_process_submit-success",
+        baseName = "dbp_optout_process_submit-success",
         types = setOf(Count),
     ),
 
     PIR_OPTOUT_SUBMIT_FAILURE(
-        baseName = "pir_optout_process_failure",
+        baseName = "dbp_optout_process_failure",
         types = setOf(Count),
     ), ;
 

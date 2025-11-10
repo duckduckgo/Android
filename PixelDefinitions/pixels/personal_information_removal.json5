@@ -1,5 +1,5 @@
 {
-    "pir_optout_process_submit-success": {
+    "dbp_optout_process_submit-success": {
         "description": "Fired when an opt-out submission succeeds.",
         "owners": ["karlenDimla", "landomen"],
         "triggers": ["other"],
@@ -49,7 +49,7 @@
             }
         ]
     },
-    "pir_optout_process_failure": {
+    "dbp_optout_process_failure": {
         "description": "Fired when an opt-out attempt fails.",
         "owners": ["karlenDimla", "landomen"],
         "triggers": ["other"],
