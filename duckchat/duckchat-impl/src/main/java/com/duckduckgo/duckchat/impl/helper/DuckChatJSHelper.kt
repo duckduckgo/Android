@@ -146,7 +146,7 @@ class RealDuckChatJSHelper @Inject constructor(
                 put(SUPPORTS_CLOSING_AI_CHAT, true)
                 put(SUPPORTS_OPENING_SETTINGS, true)
                 put(SUPPORTS_NATIVE_CHAT_INPUT, false)
-                put(SUPPORTS_CHAT_ID_RESTORATION, true)
+                put(SUPPORTS_CHAT_ID_RESTORATION, duckChat.isDuckChatFullScreenModeEnabled())
                 put(SUPPORTS_IMAGE_UPLOAD, duckChat.isImageUploadEnabled())
             }
         return JsCallbackData(jsonPayload, featureName, method, id)
