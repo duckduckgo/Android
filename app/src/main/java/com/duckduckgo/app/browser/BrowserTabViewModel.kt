@@ -586,9 +586,11 @@ class BrowserTabViewModel @Inject constructor(
     private var site: Site? = null
         set(value) {
             field = value
-            if (siteErrorHandlerKillSwitch.self().isEnabled()) {
-                siteErrorHandler.assignErrorsAndClearCache(value)
-                siteHttpErrorHandler.assignErrorsAndClearCache(value)
+            viewModelScope.launch(dispatchers.io()) {
+                if (siteErrorHandlerKillSwitch.self().isEnabled()) {
+                    siteErrorHandler.assignErrorsAndClearCache(value)
+                    siteHttpErrorHandler.assignErrorsAndClearCache(value)
+                }
             }
         }
     private lateinit var tabId: String
