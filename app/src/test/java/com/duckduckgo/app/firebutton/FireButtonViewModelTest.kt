@@ -332,6 +332,17 @@ internal class FireButtonViewModelTest {
         )
     }
 
+    @Test
+    fun `when clear data button clicked then Fire Dialog launched`() = runTest {
+        testee.commands().test {
+            testee.onClearDataActionClicked()
+
+            assertEquals(Command.LaunchFireDialog, awaitItem())
+
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
     private fun givenSelectedFireAnimation(fireAnimation: FireAnimation) {
         whenever(mockAppSettingsDataStore.selectedFireAnimation).thenReturn(fireAnimation)
         whenever(mockAppSettingsDataStore.isCurrentlySelected(fireAnimation)).thenReturn(true)
