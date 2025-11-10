@@ -78,6 +78,7 @@ class BrokerStepCompletedEventHandler @Inject constructor(
             state.copy(
                 currentBrokerStepIndex = state.currentBrokerStepIndex + 1,
                 actionRetryCount = 0,
+                generatedEmailData = null,
             ),
             nextEvent = ExecuteNextBrokerStep,
         )
@@ -124,7 +125,7 @@ class BrokerStepCompletedEventHandler @Inject constructor(
                         attemptId = state.attemptId ?: "no-attempt-id",
                         startTimeInMillis = state.brokerStepStartTime,
                         endTimeInMillis = currentTimeProvider.currentTimeMillis(),
-                        emailPattern = "",
+                        emailPattern = state.generatedEmailData?.pattern,
                     )
                 } else {
                     // Whatever last action that was executed is the last action that failed.
@@ -138,7 +139,7 @@ class BrokerStepCompletedEventHandler @Inject constructor(
                         attemptId = state.attemptId ?: "no-attempt-id",
                         failedAction = lastAction,
                         stage = PirStage.OTHER, // TODO: Integrate stages properly later on
-                        emailPattern = "",
+                        emailPattern = state.generatedEmailData?.pattern,
                     )
                 }.also {
                     pirRunStateHandler.handleState(it)
