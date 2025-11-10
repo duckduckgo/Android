@@ -675,7 +675,6 @@ class BrowserTabViewModel @Inject constructor(
         }
 
     init {
-        logcat { "Duck.ai: init" }
         initializeViewStates()
 
         fireproofWebsiteState.observeForever(fireproofWebsitesObserver)
