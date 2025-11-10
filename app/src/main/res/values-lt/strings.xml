@@ -127,8 +127,6 @@
 
     <!-- Fire -->
     <string name="fireMenu">Valyti duomenis</string>
-    <string name="fireClearAll">Valyti visas korteles ir duomenis</string>
-    <string name="fireClearAllPlusDuckChats">Išvalyti visus skirtukus, duomenis ir „Duck.ai“ pokalbius</string>
     <string name="fireCancel">Atšaukti</string>
     <string name="fireDataCleared">Duomenys išvalyti</string>
 

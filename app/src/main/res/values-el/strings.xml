@@ -125,8 +125,6 @@
 
     <!-- Fire -->
     <string name="fireMenu">Εκκαθάριση δεδομένων</string>
-    <string name="fireClearAll">Εκκαθάριση όλων των καρτελών και δεδομένων</string>
-    <string name="fireClearAllPlusDuckChats">Εκκαθάριση όλων των καρτελών, δεδομένων και συνομιλιών Duck.ai</string>
     <string name="fireCancel">Ακύρωση</string>
     <string name="fireDataCleared">Εκκαθάριση δεδομένων</string>
 

@@ -127,8 +127,6 @@
 
     <!-- Fire -->
     <string name="fireMenu">Wyczyść dane</string>
-    <string name="fireClearAll">Wyczyść wszystkie karty i dane</string>
-    <string name="fireClearAllPlusDuckChats">Wyczyść wszystkie karty, dane i czaty Duck.ai</string>
     <string name="fireCancel">Anuluj</string>
     <string name="fireDataCleared">Dane zostały usunięte</string>
 

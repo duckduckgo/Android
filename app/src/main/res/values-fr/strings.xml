@@ -125,8 +125,6 @@
 
     <!-- Fire -->
     <string name="fireMenu">Effacer les données</string>
-    <string name="fireClearAll">Effacer tous les onglets et données</string>
-    <string name="fireClearAllPlusDuckChats">Effacer tous les onglets, données et chats Duck.ai</string>
     <string name="fireCancel">Annuler</string>
     <string name="fireDataCleared">Données effacées</string>
 

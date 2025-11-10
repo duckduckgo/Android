@@ -126,8 +126,6 @@
 
     <!-- Fire -->
     <string name="fireMenu">Ștergere date</string>
-    <string name="fireClearAll">Șterge toate filele și datele</string>
-    <string name="fireClearAllPlusDuckChats">Șterge toate filele, datele și chaturile Duck.ai</string>
     <string name="fireCancel">Anulează</string>
     <string name="fireDataCleared">Date șterse</string>
 

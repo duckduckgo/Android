@@ -126,8 +126,6 @@
 
     <!-- Fire -->
     <string name="fireMenu">Notīrīt datus</string>
-    <string name="fireClearAll">Notīrīt visas cilnes un datus</string>
-    <string name="fireClearAllPlusDuckChats">Notīrīt visas cilnes, datus un Duck.ai tērzējumus</string>
     <string name="fireCancel">Atcelt</string>
     <string name="fireDataCleared">Dati ir notīrīti</string>
 

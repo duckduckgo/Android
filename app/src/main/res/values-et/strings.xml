@@ -125,8 +125,6 @@
 
     <!-- Fire -->
     <string name="fireMenu">Kustuta andmed</string>
-    <string name="fireClearAll">Kustuta kõik vahekaardid ja andmed</string>
-    <string name="fireClearAllPlusDuckChats">Kustuta kõik vahekaardid, andmed ja Duck.ai vestlused</string>
     <string name="fireCancel">Tühista</string>
     <string name="fireDataCleared">Andmed on kustutatud</string>
 

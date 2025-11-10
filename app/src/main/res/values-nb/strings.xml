@@ -125,8 +125,6 @@
 
     <!-- Fire -->
     <string name="fireMenu">Slett data</string>
-    <string name="fireClearAll">Lukk alle faner og slett data</string>
-    <string name="fireClearAllPlusDuckChats">Fjern alle faner, data og Duck.ai-chatter</string>
     <string name="fireCancel">Avbryt</string>
     <string name="fireDataCleared">Data slettet</string>
 

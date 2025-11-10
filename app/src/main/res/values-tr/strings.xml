@@ -125,8 +125,6 @@
 
     <!-- Fire -->
     <string name="fireMenu">Verileri Temizle</string>
-    <string name="fireClearAll">Tüm Sekmeleri ve Verileri Temizle</string>
-    <string name="fireClearAllPlusDuckChats">Tüm Sekmeleri, Verileri ve Duck.ai Sohbetlerini Temizle</string>
     <string name="fireCancel">İptal</string>
     <string name="fireDataCleared">Veri silindi</string>
 

@@ -80,6 +80,19 @@
                 app:secondaryText="@string/settingsClearAiDataDeleteMessage"
                 app:showSwitch="true" />
 
+            <com.duckduckgo.common.ui.view.divider.HorizontalDivider
+                android:id="@+id/clearDataActionDivider"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+            <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
+                android:id="@+id/clearDataAction"
+                android:layout_width="match_parent"
+                app:leadingIcon="@drawable/ic_fire_24"
+                android:layout_height="wrap_content"
+                app:primaryText="@string/fireClearAll"
+                app:secondaryText="@string/settingsClearDataActionSecondaryText"/>
+
         </LinearLayout>
     </ScrollView>
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

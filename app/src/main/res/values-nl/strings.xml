@@ -125,8 +125,6 @@
 
     <!-- Fire -->
     <string name="fireMenu">Gegevens wissen</string>
-    <string name="fireClearAll">Alle tabbladen en gegevens wissen</string>
-    <string name="fireClearAllPlusDuckChats">Alle tabbladen, gegevens en Duck.ai-chats wissen</string>
     <string name="fireCancel">Annuleren</string>
     <string name="fireDataCleared">Gegevens gewist</string>
 

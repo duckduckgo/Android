@@ -47,15 +47,9 @@ import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarObserv
 import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarView
 import com.duckduckgo.app.browser.omnibar.OmnibarType
 import com.duckduckgo.app.browser.tabpreview.WebViewPreviewPersister
-import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.downloads.DownloadsActivity
-import com.duckduckgo.app.firebutton.FireButtonStore
-import com.duckduckgo.app.global.events.db.UserEventsStore
-import com.duckduckgo.app.global.view.ClearDataAction
-import com.duckduckgo.app.global.view.FireDialog
-import com.duckduckgo.app.onboardingdesignexperiment.OnboardingDesignExperimentManager
+import com.duckduckgo.app.global.view.FireDialogProvider
 import com.duckduckgo.app.settings.SettingsActivity
-import com.duckduckgo.app.settings.clear.OnboardingExperimentFireAnimationHelper
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.tabs.TabManagerFeatureFlags
@@ -77,7 +71,6 @@ import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command.ShowUndoBookmarkM
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command.ShowUndoDeleteTabsMessage
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.ViewState.Mode
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.ViewState.Mode.Selection
-import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.menu.PopupMenu
 import com.duckduckgo.common.ui.view.button.ButtonType
@@ -101,7 +94,6 @@ import kotlinx.coroutines.launch
 import logcat.LogPriority.WARN
 import logcat.asLog
 import logcat.logcat
-import java.util.ArrayList
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
 import kotlin.math.max
@@ -121,9 +113,6 @@ class TabSwitcherActivity :
     lateinit var settingsDataStore: SettingsDataStore
 
     @Inject
-    lateinit var clearPersonalDataAction: ClearDataAction
-
-    @Inject
     lateinit var gridViewColumnCalculator: GridViewColumnCalculator
 
     @Inject
@@ -136,22 +125,6 @@ class TabSwitcherActivity :
     lateinit var faviconManager: FaviconManager
 
     @Inject
-    lateinit var userEventsStore: UserEventsStore
-
-    @Inject
-    @AppCoroutineScope
-    lateinit var appCoroutineScope: CoroutineScope
-
-    @Inject
-    lateinit var dispatcherProvider: DispatcherProvider
-
-    @Inject
-    lateinit var fireButtonStore: FireButtonStore
-
-    @Inject
-    lateinit var appBuildConfig: AppBuildConfig
-
-    @Inject
     lateinit var duckChat: DuckChat
 
     @Inject
@@ -161,10 +134,7 @@ class TabSwitcherActivity :
     lateinit var tabManagerFeatureFlags: TabManagerFeatureFlags
 
     @Inject
-    lateinit var onboardingDesignExperimentManager: OnboardingDesignExperimentManager
-
-    @Inject
-    lateinit var onboardingExperimentFireAnimationHelper: OnboardingExperimentFireAnimationHelper
+    lateinit var fireDialogProvider: FireDialogProvider
 
     @Inject
     lateinit var omnibarRepository: OmnibarRepository
@@ -655,20 +625,7 @@ class TabSwitcherActivity :
     }
 
     private fun onFireButtonClicked() {
-        val dialog =
-            FireDialog(
-                context = this,
-                clearPersonalDataAction = clearPersonalDataAction,
-                pixel = pixel,
-                settingsDataStore = settingsDataStore,
-                userEventsStore = userEventsStore,
-                appCoroutineScope = appCoroutineScope,
-                dispatcherProvider = dispatcherProvider,
-                fireButtonStore = fireButtonStore,
-                appBuildConfig = appBuildConfig,
-                onboardingDesignExperimentManager = onboardingDesignExperimentManager,
-                onboardingExperimentFireAnimationHelper = onboardingExperimentFireAnimationHelper,
-            )
+        val dialog = fireDialogProvider.createFireDialog(context = this)
         dialog.show()
     }
 
