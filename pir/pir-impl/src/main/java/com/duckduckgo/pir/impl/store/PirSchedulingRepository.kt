@@ -311,6 +311,7 @@ class RealPirSchedulingRepository @Inject constructor(
             status = ScanJobStatus.entries.find { it.name == this.status } ?: ScanJobStatus.ERROR,
             lastScanDateInMillis = this.lastScanDateInMillis ?: 0L,
             deprecated = this.deprecated,
+            dateCreatedInMillis = this.dateCreatedInMillis,
         )
 
     private fun ScanJobRecord.toEntity(): ScanJobRecordEntity =
@@ -320,6 +321,11 @@ class RealPirSchedulingRepository @Inject constructor(
             status = this.status.name,
             lastScanDateInMillis = this.lastScanDateInMillis,
             deprecated = this.deprecated,
+            dateCreatedInMillis = if (this.dateCreatedInMillis != 0L) {
+                this.dateCreatedInMillis
+            } else {
+                currentTimeProvider.currentTimeMillis()
+            },
         )
 
     private fun OptOutJobRecordEntity.toRecord(): OptOutJobRecord =
@@ -333,6 +339,7 @@ class RealPirSchedulingRepository @Inject constructor(
             optOutRequestedDateInMillis = this.optOutRequestedDate,
             optOutRemovedDateInMillis = this.optOutRemovedDate,
             deprecated = this.deprecated,
+            dateCreatedInMillis = this.dateCreatedInMillis,
         )
 
     private fun OptOutJobRecord.toEntity(): OptOutJobRecordEntity =
@@ -346,6 +353,11 @@ class RealPirSchedulingRepository @Inject constructor(
             optOutRequestedDate = this.optOutRequestedDateInMillis,
             optOutRemovedDate = this.optOutRemovedDateInMillis,
             deprecated = this.deprecated,
+            dateCreatedInMillis = if (this.dateCreatedInMillis != 0L) {
+                this.dateCreatedInMillis
+            } else {
+                currentTimeProvider.currentTimeMillis()
+            },
         )
 
     private fun EmailConfirmationJobRecord.toEntity(): EmailConfirmationJobRecordEntity =
