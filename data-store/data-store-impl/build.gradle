@@ -25,6 +25,7 @@ apply from: "$rootProject.projectDir/gradle/android-library.gradle"
 
 dependencies {
 	implementation project(":data-store-api")
+	implementation project(":anrs-api")
 
     anvil project(':anvil-compiler')
     implementation project(':anvil-annotations')
@@ -57,6 +58,7 @@ dependencies {
     }
 
     coreLibraryDesugaring Android.tools.desugarJdkLibs
+    implementation "org.jetbrains.kotlin:kotlin-test:1.9.24"
 }
 
 android {

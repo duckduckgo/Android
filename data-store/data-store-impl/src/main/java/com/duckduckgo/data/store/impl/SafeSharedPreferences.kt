@@ -19,6 +19,13 @@ package com.duckduckgo.data.store.impl
 import android.content.SharedPreferences
 import android.content.SharedPreferences.Editor
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener
+import com.duckduckgo.anrs.api.CrashLogger
+import com.duckduckgo.anrs.api.CrashLogger.Crash
+import logcat.LogPriority.ERROR
+import logcat.LogPriority.WARN
+import logcat.logcat
+import java.util.concurrent.Executor
+import java.util.concurrent.Executors
 
 /**
  * This class is a wrapper around shared prefs.
@@ -29,137 +36,133 @@ import android.content.SharedPreferences.OnSharedPreferenceChangeListener
  */
 internal class SafeSharedPreferences(
     private val unsafePrefs: SharedPreferences,
+    private val crashLogger: CrashLogger,
+    private val crashLoggerExecutor: Executor = Executors.newSingleThreadExecutor { Thread(it, "SafeSharedPrefsCrashLogger") },
 ) : SharedPreferences {
 
-    override fun getAll(): MutableMap<String, *> {
-        return runCatching { unsafePrefs.all }.getOrDefault(mutableMapOf())
-    }
+    override fun getAll(): MutableMap<String, *> =
+        runCatching { unsafePrefs.all }
+            .getOrElse {
+                handleError("getAll", it)
+                mutableMapOf<String, Any>()
+            }
 
-    override fun getString(
-        key: String?,
-        defValue: String?,
-    ): String? {
-        return runCatching { unsafePrefs.getString(key, defValue) }.getOrDefault(defValue)
-    }
+    override fun getString(key: String?, defValue: String?): String? =
+        runCatching { unsafePrefs.getString(key, defValue) }
+            .getOrElse {
+                handleError(key, it)
+                defValue
+            }
 
-    override fun getStringSet(
-        key: String?,
-        defValue: MutableSet<String>?,
-    ): MutableSet<String>? {
-        return runCatching { unsafePrefs.getStringSet(key, defValue) }.getOrDefault(defValue)
-    }
+    override fun getStringSet(key: String?, defValue: MutableSet<String>?): MutableSet<String>? =
+        runCatching { unsafePrefs.getStringSet(key, defValue) }
+            .getOrElse {
+                handleError(key, it)
+                defValue
+            }
 
-    override fun getInt(
-        key: String?,
-        defValue: Int,
-    ): Int {
-        return runCatching { unsafePrefs.getInt(key, defValue) }.getOrDefault(defValue)
-    }
+    override fun getInt(key: String?, defValue: Int): Int =
+        runCatching { unsafePrefs.getInt(key, defValue) }
+            .getOrElse {
+                handleError(key, it)
+                defValue
+            }
 
-    override fun getLong(
-        key: String?,
-        defValue: Long,
-    ): Long {
-        return runCatching { unsafePrefs.getLong(key, defValue) }.getOrDefault(defValue)
-    }
+    override fun getLong(key: String?, defValue: Long): Long =
+        runCatching { unsafePrefs.getLong(key, defValue) }
+            .getOrElse {
+                handleError(key, it)
+                defValue
+            }
 
-    override fun getFloat(
-        key: String?,
-        defValue: Float,
-    ): Float {
-        return runCatching { unsafePrefs.getFloat(key, defValue) }.getOrDefault(defValue)
-    }
+    override fun getFloat(key: String?, defValue: Float): Float =
+        runCatching { unsafePrefs.getFloat(key, defValue) }
+            .getOrElse {
+                handleError(key, it)
+                defValue
+            }
 
-    override fun getBoolean(
-        key: String?,
-        defValue: Boolean,
-    ): Boolean {
-        return runCatching { unsafePrefs.getBoolean(key, defValue) }.getOrDefault(defValue)
-    }
+    override fun getBoolean(key: String?, defValue: Boolean): Boolean =
+        runCatching { unsafePrefs.getBoolean(key, defValue) }
+            .getOrElse {
+                handleError(key, it)
+                defValue
+            }
 
-    override fun contains(key: String?): Boolean {
-        return runCatching { unsafePrefs.contains(key) }.getOrDefault(false)
-    }
+    override fun contains(key: String?): Boolean =
+        runCatching { unsafePrefs.contains(key) }
+            .getOrElse {
+                handleError(key, it)
+                false
+            }
 
-    override fun edit(): Editor {
-        return SafeEditor(unsafePrefs.edit())
-    }
+    override fun edit(): Editor = SafeEditor(unsafePrefs.edit(), crashLogger, crashLoggerExecutor)
 
-    override fun registerOnSharedPreferenceChangeListener(listener: OnSharedPreferenceChangeListener?) {
+    override fun registerOnSharedPreferenceChangeListener(listener: OnSharedPreferenceChangeListener?) =
         unsafePrefs.registerOnSharedPreferenceChangeListener(listener)
-    }
 
-    override fun unregisterOnSharedPreferenceChangeListener(listener: OnSharedPreferenceChangeListener?) {
+    override fun unregisterOnSharedPreferenceChangeListener(listener: OnSharedPreferenceChangeListener?) =
         unsafePrefs.unregisterOnSharedPreferenceChangeListener(listener)
+
+    private fun handleError(context: String?, t: Throwable) {
+        val root = t.cause ?: t
+        if (root is android.system.ErrnoException) {
+            logcat(WARN) { "fsync failed (EIO) in SharedPreferences at key=$context" }
+            crashLoggerExecutor.execute {
+                crashLogger.logCrash(Crash("shared-prefs", root))
+            }
+        } else {
+            logcat(ERROR) { "Unexpected SharedPreferences error at key=$context" }
+        }
     }
 
     private class SafeEditor(
         private val editor: Editor,
+        private val crashLogger: CrashLogger,
+        private val crashLoggerExecutor: Executor,
     ) : Editor {
-        override fun putString(
-            key: String?,
-            defValue: String?,
-        ): Editor {
-            runCatching { editor.putString(key, defValue) }
-            return this
+
+        private fun handleError(context: String?, t: Throwable) {
+            val root = t.cause ?: t
+            if (root is android.system.ErrnoException) {
+                logcat(ERROR) { "fsync failed (EIO) in SharedPreferences at key=$context" }
+                crashLoggerExecutor.execute {
+                    crashLogger.logCrash(Crash("shared-prefs", root))
+                }
+            } else {
+                logcat(ERROR) { "Unexpected SharedPreferences error at key=$context" }
+            }
         }
 
-        override fun putStringSet(
-            key: String?,
-            defValue: MutableSet<String>?,
-        ): Editor {
-            runCatching { editor.putStringSet(key, defValue) }
-            return this
-        }
+        override fun putString(key: String?, value: String?): Editor =
+            apply { runCatching { editor.putString(key, value) }.onFailure { handleError(key, it) } }
 
-        override fun putInt(
-            key: String?,
-            defValue: Int,
-        ): Editor {
-            runCatching { editor.putInt(key, defValue) }
-            return this
-        }
+        override fun putStringSet(key: String?, values: MutableSet<String>?): Editor =
+            apply { runCatching { editor.putStringSet(key, values) }.onFailure { handleError(key, it) } }
 
-        override fun putLong(
-            key: String?,
-            defValue: Long,
-        ): Editor {
-            runCatching { editor.putLong(key, defValue) }
-            return this
-        }
+        override fun putInt(key: String?, value: Int): Editor =
+            apply { runCatching { editor.putInt(key, value) }.onFailure { handleError(key, it) } }
 
-        override fun putFloat(
-            key: String?,
-            defValue: Float,
-        ): Editor {
-            runCatching { editor.putFloat(key, defValue) }
-            return this
-        }
+        override fun putLong(key: String?, value: Long): Editor =
+            apply { runCatching { editor.putLong(key, value) }.onFailure { handleError(key, it) } }
 
-        override fun putBoolean(
-            key: String?,
-            defValue: Boolean,
-        ): Editor {
-            runCatching { editor.putBoolean(key, defValue) }
-            return this
-        }
+        override fun putFloat(key: String?, value: Float): Editor =
+            apply { runCatching { editor.putFloat(key, value) }.onFailure { handleError(key, it) } }
 
-        override fun remove(key: String?): Editor {
-            runCatching { editor.remove(key) }
-            return this
-        }
+        override fun putBoolean(key: String?, value: Boolean): Editor =
+            apply { runCatching { editor.putBoolean(key, value) }.onFailure { handleError(key, it) } }
 
-        override fun clear(): Editor {
-            runCatching { editor.clear() }
-            return this
-        }
+        override fun remove(key: String?): Editor =
+            apply { runCatching { editor.remove(key) }.onFailure { handleError(key, it) } }
 
-        override fun commit(): Boolean {
-            return runCatching { editor.commit() }.getOrDefault(true)
-        }
+        override fun clear(): Editor =
+            apply { runCatching { editor.clear() }.onFailure { handleError("clear", it) } }
+
+        override fun commit(): Boolean =
+            runCatching { editor.commit() }.onFailure { handleError("commit", it) }.getOrDefault(false)
 
         override fun apply() {
-            runCatching { editor.apply() }
+            runCatching { editor.apply() }.onFailure { handleError("apply", it) }
         }
     }
 }
