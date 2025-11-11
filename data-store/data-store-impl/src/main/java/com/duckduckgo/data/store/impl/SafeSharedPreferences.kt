@@ -37,40 +37,64 @@ import java.util.concurrent.Executors
 internal class SafeSharedPreferences(
     private val unsafePrefs: SharedPreferences,
     private val crashLogger: CrashLogger,
-    private val crashLoggerExecutor: Executor = Executors.newSingleThreadExecutor { Thread(it, "SafeSharedPrefsCrashLogger") }
+    private val crashLoggerExecutor: Executor = Executors.newSingleThreadExecutor { Thread(it, "SafeSharedPrefsCrashLogger") },
 ) : SharedPreferences {
 
     override fun getAll(): MutableMap<String, *> =
         runCatching { unsafePrefs.all }
-            .getOrElse { handleError("getAll", it); mutableMapOf<String, Any>() }
+            .getOrElse {
+                handleError("getAll", it)
+                mutableMapOf<String, Any>()
+            }
 
     override fun getString(key: String?, defValue: String?): String? =
         runCatching { unsafePrefs.getString(key, defValue) }
-            .getOrElse { handleError(key, it); defValue }
+            .getOrElse {
+                handleError(key, it)
+                defValue
+            }
 
     override fun getStringSet(key: String?, defValue: MutableSet<String>?): MutableSet<String>? =
         runCatching { unsafePrefs.getStringSet(key, defValue) }
-            .getOrElse { handleError(key, it); defValue }
+            .getOrElse {
+                handleError(key, it)
+                defValue
+            }
 
     override fun getInt(key: String?, defValue: Int): Int =
         runCatching { unsafePrefs.getInt(key, defValue) }
-            .getOrElse { handleError(key, it); defValue }
+            .getOrElse {
+                handleError(key, it)
+                defValue
+            }
 
     override fun getLong(key: String?, defValue: Long): Long =
         runCatching { unsafePrefs.getLong(key, defValue) }
-            .getOrElse { handleError(key, it); defValue }
+            .getOrElse {
+                handleError(key, it)
+                defValue
+            }
 
     override fun getFloat(key: String?, defValue: Float): Float =
         runCatching { unsafePrefs.getFloat(key, defValue) }
-            .getOrElse { handleError(key, it); defValue }
+            .getOrElse {
+                handleError(key, it)
+                defValue
+            }
 
     override fun getBoolean(key: String?, defValue: Boolean): Boolean =
         runCatching { unsafePrefs.getBoolean(key, defValue) }
-            .getOrElse { handleError(key, it); defValue }
+            .getOrElse {
+                handleError(key, it)
+                defValue
+            }
 
     override fun contains(key: String?): Boolean =
         runCatching { unsafePrefs.contains(key) }
-            .getOrElse { handleError(key, it); false }
+            .getOrElse {
+                handleError(key, it)
+                false
+            }
 
     override fun edit(): Editor = SafeEditor(unsafePrefs.edit(), crashLogger, crashLoggerExecutor)
 
