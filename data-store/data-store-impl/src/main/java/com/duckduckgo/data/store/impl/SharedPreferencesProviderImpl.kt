@@ -42,10 +42,10 @@ class SharedPreferencesProviderImpl @Inject constructor(
     private val crashLogger: Lazy<CrashLogger>,
 ) : SharedPreferencesProvider {
     override fun getSharedPreferences(name: String, multiprocess: Boolean, migrate: Boolean): SharedPreferences {
-        return if (multiprocess) {
+        val prefs = if (multiprocess) {
             if (migrate) {
                 logcat { "Migrate and return preferences to Harmony" }
-                return migrateToHarmonyIfNecessary(name)
+                migrateToHarmonyIfNecessary(name)
             } else {
                 logcat { "Return Harmony preferences" }
                 context.getHarmonySharedPreferences(name)
@@ -53,6 +53,8 @@ class SharedPreferencesProviderImpl @Inject constructor(
         } else {
             context.getSharedPreferences(name, MODE_PRIVATE)
         }
+
+        return SafeSharedPreferences(prefs, crashLogger.get())
     }
 
     override fun getEncryptedSharedPreferences(
