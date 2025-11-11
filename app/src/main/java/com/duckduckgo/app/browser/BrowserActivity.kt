@@ -762,7 +762,14 @@ open class BrowserActivity : DuckDuckGoActivity() {
             is Command.ShowSystemDefaultAppsActivity -> showSystemDefaultAppsActivity(command.intent)
             is Command.ShowSystemDefaultBrowserDialog -> showSystemDefaultBrowserDialog(command.intent)
             is Command.ShowUndoDeleteTabsMessage -> showTabsDeletedSnackbar(command.tabIds)
-            is Command.OpenDuckChat -> openDuckChat(command.duckChatUrl, command.duckChatSessionActive, command.withTransition, command.tabs)
+            is Command.OpenDuckChat -> openDuckChat(
+                command.duckChatUrl,
+                command.duckChatSessionActive,
+                command.withTransition,
+                command.tabs,
+                command.fullScreenMode,
+            )
+
             Command.LaunchTabSwitcher -> currentTab?.launchTabSwitcherAfterTabsUndeleted()
         }
     }
@@ -867,19 +874,24 @@ open class BrowserActivity : DuckDuckGoActivity() {
         duckChatSessionActive: Boolean,
         withTransition: Boolean,
         tabs: Int,
+        fullScreenMode: Boolean,
     ) {
-        duckAiFragment?.let { fragment ->
-            if (duckChatSessionActive) {
-                restoreDuckChat(fragment, withTransition)
-            } else {
+        if (fullScreenMode) {
+            currentTab?.submitQuery(url!!)
+        } else {
+            duckAiFragment?.let { fragment ->
+                if (duckChatSessionActive) {
+                    restoreDuckChat(fragment, withTransition)
+                } else {
+                    launchNewDuckChat(url, withTransition, tabs)
+                }
+            } ?: run {
                 launchNewDuckChat(url, withTransition, tabs)
             }
-        } ?: run {
-            launchNewDuckChat(url, withTransition, tabs)
-        }
 
-        currentTab?.getOmnibar()?.omnibarView?.omnibarTextInput?.let {
-            hideKeyboard(it)
+            currentTab?.getOmnibar()?.omnibarView?.omnibarTextInput?.let {
+                hideKeyboard(it)
+            }
         }
     }
 
@@ -1013,6 +1025,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
                             val intent = TabSwitcherActivity.intent(this@BrowserActivity)
                             tabSwitcherActivityResult.launch(intent)
                         }
+
                         is DuckChatSharedViewModel.Command.SearchRequested -> {
                             closeDuckChat()
                             currentTab?.submitQuery(command.query)

@@ -438,6 +438,23 @@ class OmnibarLayoutViewModel @Inject constructor(
                     }
                 }
 
+                is ViewMode.DuckAI -> {
+                    _viewState.update {
+                        it.copy(
+                            viewMode = viewMode,
+                            showClearButton = false,
+                            showVoiceSearch = false,
+                            showBrowserMenu = true,
+                            showShadows = true,
+                            scrollingEnabled = false,
+                            leadingIconState = Dax,
+                            showChatMenu = false,
+                            hasFocus = false,
+                            isLoading = false,
+                        )
+                    }
+                }
+
                 else -> {
                     val scrollingEnabled = viewMode != NewTab
                     val hasFocus = _viewState.value.hasFocus

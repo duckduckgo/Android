@@ -197,6 +197,11 @@ interface DuckChatInternal : DuckChat {
     fun isDuckChatFullScreenModeFeatureAvailable(): Boolean
 
     /**
+     * Returns whether dedicated Duck.ai full screen mode is enabled by the user and the feature flag is enabled.
+     */
+    fun isDuckChatFullScreenModeEnabled(): Boolean
+
+    /**
      * Checks whether DuckChat is enabled based on remote config flag.
      */
     fun isDuckChatFeatureEnabled(): Boolean
@@ -292,6 +297,7 @@ class RealDuckChat @Inject constructor(
     private val keepSession = MutableStateFlow(false)
     private val _showInputScreenOnSystemSearchLaunch = MutableStateFlow(false)
     private val _showVoiceSearchToggle = MutableStateFlow(false)
+    private val _showFullScreenMode = MutableStateFlow(false)
 
     private val jsonAdapter: JsonAdapter<DuckChatSettingJson> by lazy {
         moshi.adapter(DuckChatSettingJson::class.java)
@@ -367,6 +373,8 @@ class RealDuckChat @Inject constructor(
     override fun isDuckChatFeatureEnabled(): Boolean = isDuckChatFeatureEnabled
 
     override fun isDuckChatFullScreenModeFeatureAvailable(): Boolean = duckChatFeature.fullscreenMode().isEnabled()
+
+    override fun isDuckChatFullScreenModeEnabled(): Boolean = isFullscreenModeEnabled
 
     override fun observeEnableDuckChatUserSetting(): Flow<Boolean> = duckChatFeatureRepository.observeDuckChatUserEnabled()
 
@@ -447,6 +455,8 @@ class RealDuckChat @Inject constructor(
     override val showInputScreenOnSystemSearchLaunch: StateFlow<Boolean> = _showInputScreenOnSystemSearchLaunch.asStateFlow()
 
     override val showVoiceSearchToggle: StateFlow<Boolean> = _showVoiceSearchToggle.asStateFlow()
+
+    override val showFullScreenMode: StateFlow<Boolean> = _showFullScreenMode.asStateFlow()
 
     override val chatState: StateFlow<ChatState> = _chatState.asStateFlow()
 
@@ -729,6 +739,10 @@ class RealDuckChat @Inject constructor(
                 duckChatFeatureRepository.shouldShowInVoiceSearch() &&
                     isDuckChatFeatureEnabled && isDuckChatUserEnabled && isVoiceSearchEntryPointEnabled
             _showVoiceSearchToggle.emit(showVoiceSearchToggle)
+
+            val showFullScreenMode = duckChatFeature.fullscreenMode()
+                .isEnabled() && duckChatFeatureRepository.isFullScreenModeUserSettingEnabled() && isDuckChatFeatureEnabled
+            _showFullScreenMode.emit(showFullScreenMode)
         }
 
     companion object {

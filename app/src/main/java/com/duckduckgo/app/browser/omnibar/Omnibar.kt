@@ -149,6 +149,8 @@ class Omnibar(
             val domain: String?,
             val showDuckPlayerIcon: Boolean = false,
         ) : ViewMode()
+
+        data object DuckAI : ViewMode()
     }
 
     val omnibarView: OmnibarView by lazy {
