@@ -50,6 +50,9 @@ interface WebViewCompatFeature {
 
     @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
     fun sendMessagesUsingReplyProxy(): Toggle
+
+    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
+    fun useLargeScript(): Toggle
 }
 
 data class WebViewCompatFeatureSettings(

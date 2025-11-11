@@ -79,6 +79,7 @@ class RealWebViewCompatTestHelper @Inject constructor(
         val sendMessageOnPageStarted: Boolean,
         val sendMessageOnContextMenuOpen: Boolean,
         val sendMessagesUsingReplyProxy: Boolean,
+        val useLargeScript: Boolean,
     )
 
     private var cachedConfig: WebViewCompatConfig? = null
@@ -98,6 +99,7 @@ class RealWebViewCompatTestHelper @Inject constructor(
                 sendMessageOnPageStarted = webViewCompatFeature.sendMessageOnPageStarted().isEnabled(),
                 sendMessageOnContextMenuOpen = webViewCompatFeature.sendMessageOnContextMenuOpen().isEnabled(),
                 sendMessagesUsingReplyProxy = webViewCompatFeature.sendMessagesUsingReplyProxy().isEnabled(),
+                useLargeScript = webViewCompatFeature.useLargeScript().isEnabled(),
             ).also {
                 cachedConfig = it
             }
@@ -111,8 +113,16 @@ class RealWebViewCompatTestHelper @Inject constructor(
 
         val script = withContext(dispatchers.io()) {
             if (!webViewCompatFeature.self().isEnabled()) return@withContext null
-            webView.context.resources?.openRawResource(R.raw.webviewcompat_test_script)
+            val scriptResourceId = if (config.useLargeScript) {
+                R.raw.webviewcompat_complex_test_script
+            } else {
+                R.raw.webviewcompat_test_script
+            }
+
+            val rawScript = webView.context.resources?.openRawResource(scriptResourceId)
                 ?.bufferedReader().use { it?.readText() }
+
+            rawScript
                 ?.replace(delay, config.settings?.jsInitialPingDelay?.toString() ?: "0")
                 ?.replace(postInitialPing, config.jsSendsInitialPing.toString())
                 ?.replace(replyToNativeMessages, config.jsRepliesToNativeMessages.toString())
