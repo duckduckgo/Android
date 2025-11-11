@@ -20,12 +20,8 @@ import android.content.Context
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import com.duckduckgo.anvil.annotations.ContributesWorker
-import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.pir.impl.store.PirRepository
-import java.util.concurrent.TimeUnit
 import javax.inject.Inject
-import kotlin.math.abs
 
 @ContributesWorker(AppScope::class)
 class PirCustomStatsWorker(
@@ -33,61 +29,11 @@ class PirCustomStatsWorker(
     workerParameters: WorkerParameters,
 ) : CoroutineWorker(context, workerParameters) {
     @Inject
-    lateinit var optOutSubmitRateCalculator: OptOutSubmitRateCalculator
-
-    @Inject
-    lateinit var pirRepository: PirRepository
-
-    @Inject
-    lateinit var currentTimeProvider: CurrentTimeProvider
-
-    @Inject
-    lateinit var pirPixelSender: PirPixelSender
+    lateinit var optOutSubmissionSuccessRateReporter: OptOut24HourSubmissionSuccessRateReporter
 
     override suspend fun doWork(): Result {
-        val startDate = pirRepository.getCustomStatsPixelsLastSentMs()
-        val now = currentTimeProvider.currentTimeMillis()
-
-        if (shouldFirePixel(startDate, now)) {
-            val endDate = now - TimeUnit.HOURS.toMillis(24)
-            val activeBrokers = pirRepository.getAllActiveBrokerObjects()
-            val hasUserProfiles = pirRepository.getAllUserProfileQueries().isNotEmpty()
-
-            if (activeBrokers.isNotEmpty() && hasUserProfiles) {
-                activeBrokers.forEach {
-                    val successRate = optOutSubmitRateCalculator.calculateOptOutSubmitRate(
-                        it.name,
-                        startDate,
-                        endDate,
-                    )
-
-                    if (successRate != null) {
-                        pirPixelSender.reportBrokerCustomStateOptOutSubmitRate(
-                            brokerUrl = it.url,
-                            optOutSuccessRate = successRate,
-                        )
-                    }
-                }
-
-                pirRepository.setCustomStatsPixelsLastSentMs(endDate)
-            }
-        }
-
+        optOutSubmissionSuccessRateReporter.attemptFirePixel()
         return Result.success()
-    }
-
-    private fun shouldFirePixel(
-        startDate: Long,
-        now: Long,
-    ): Boolean {
-        return if (startDate == 0L) {
-            // IF first run, we emit the custom stats pixel
-            true
-        } else {
-            // Else we check if at least 24 hours have passed since last emission
-            val nowDiffFromStart = abs(now - startDate)
-            nowDiffFromStart > TimeUnit.HOURS.toMillis(24)
-        }
     }
 
     companion object {

@@ -17,7 +17,6 @@
 package com.duckduckgo.pir.impl.pixels
 
 import android.content.Context
-import androidx.work.testing.TestListenableWorkerBuilder
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.pir.impl.models.Broker
@@ -35,7 +34,7 @@ import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import java.util.concurrent.TimeUnit
 
-class PirCustomStatsWorkerTest {
+class RealOptOut24HourSubmissionSuccessRateReporterTest {
 
     @get:Rule
     var coroutineRule = CoroutineTestRule()
@@ -46,7 +45,7 @@ class PirCustomStatsWorkerTest {
     private val mockPirPixelSender: PirPixelSender = mock()
     private val context: Context = mock()
 
-    private lateinit var worker: PirCustomStatsWorker
+    private lateinit var toTest: RealOptOut24HourSubmissionSuccessRateReporter
 
     // Test data
     // January 15, 2024 10:00:00 UTC
@@ -89,13 +88,12 @@ class PirCustomStatsWorkerTest {
 
     @Before
     fun setUp() {
-        worker = TestListenableWorkerBuilder
-            .from(context, PirCustomStatsWorker::class.java)
-            .build()
-        worker.pirRepository = mockPirRepository
-        worker.currentTimeProvider = mockCurrentTimeProvider
-        worker.optOutSubmitRateCalculator = mockOptOutSubmitRateCalculator
-        worker.pirPixelSender = mockPirPixelSender
+        toTest = RealOptOut24HourSubmissionSuccessRateReporter(
+            optOutSubmitRateCalculator = mockOptOutSubmitRateCalculator,
+            pirRepository = mockPirRepository,
+            currentTimeProvider = mockCurrentTimeProvider,
+            pirPixelSender = mockPirPixelSender,
+        )
     }
 
     @Test
@@ -113,7 +111,7 @@ class PirCustomStatsWorkerTest {
             ),
         ).thenReturn(0.5)
 
-        worker.doWork()
+        toTest.attemptFirePixel()
 
         verify(mockPirPixelSender).reportBrokerCustomStateOptOutSubmitRate(
             brokerUrl = testBroker1.url,
@@ -130,7 +128,8 @@ class PirCustomStatsWorkerTest {
         whenever(mockPirRepository.getCustomStatsPixelsLastSentMs()).thenReturn(startDate)
         whenever(mockCurrentTimeProvider.currentTimeMillis()).thenReturn(now)
 
-        worker.doWork()
+        toTest.attemptFirePixel()
+
         verify(mockPirRepository, never()).getAllActiveBrokerObjects()
         verify(mockPirPixelSender, never()).reportBrokerCustomStateOptOutSubmitRate(any(), any())
         verify(mockPirRepository, never()).setCustomStatsPixelsLastSentMs(any())
@@ -153,7 +152,8 @@ class PirCustomStatsWorkerTest {
             ),
         ).thenReturn(0.75)
 
-        worker.doWork()
+        toTest.attemptFirePixel()
+
         verify(mockPirPixelSender).reportBrokerCustomStateOptOutSubmitRate(
             brokerUrl = testBroker1.url,
             optOutSuccessRate = 0.75,
@@ -169,7 +169,8 @@ class PirCustomStatsWorkerTest {
         whenever(mockPirRepository.getCustomStatsPixelsLastSentMs()).thenReturn(startDate)
         whenever(mockCurrentTimeProvider.currentTimeMillis()).thenReturn(now)
 
-        worker.doWork()
+        toTest.attemptFirePixel()
+
         verify(mockPirRepository, never()).getAllActiveBrokerObjects()
         verify(mockPirPixelSender, never()).reportBrokerCustomStateOptOutSubmitRate(any(), any())
     }
@@ -182,7 +183,8 @@ class PirCustomStatsWorkerTest {
         whenever(mockPirRepository.getAllActiveBrokerObjects()).thenReturn(emptyList())
         whenever(mockPirRepository.getAllUserProfileQueries()).thenReturn(listOf(testProfileQuery))
 
-        worker.doWork()
+        toTest.attemptFirePixel()
+
         verify(mockOptOutSubmitRateCalculator, never()).calculateOptOutSubmitRate(
             any(),
             any(),
@@ -200,7 +202,8 @@ class PirCustomStatsWorkerTest {
         whenever(mockPirRepository.getAllActiveBrokerObjects()).thenReturn(listOf(testBroker1))
         whenever(mockPirRepository.getAllUserProfileQueries()).thenReturn(emptyList())
 
-        worker.doWork()
+        toTest.attemptFirePixel()
+
         verify(mockOptOutSubmitRateCalculator, never()).calculateOptOutSubmitRate(
             any(),
             any(),
@@ -239,7 +242,8 @@ class PirCustomStatsWorkerTest {
         )
             .thenReturn(0.8)
 
-        worker.doWork()
+        toTest.attemptFirePixel()
+
         verify(mockPirPixelSender).reportBrokerCustomStateOptOutSubmitRate(
             brokerUrl = testBroker1.url,
             optOutSuccessRate = 0.5,
@@ -280,7 +284,8 @@ class PirCustomStatsWorkerTest {
         )
             .thenReturn(null)
 
-        worker.doWork()
+        toTest.attemptFirePixel()
+
         verify(mockPirPixelSender).reportBrokerCustomStateOptOutSubmitRate(
             brokerUrl = testBroker1.url,
             optOutSuccessRate = 0.5,
@@ -307,7 +312,8 @@ class PirCustomStatsWorkerTest {
             ),
         ).thenReturn(null)
 
-        worker.doWork()
+        toTest.attemptFirePixel()
+
         verify(mockPirPixelSender, never()).reportBrokerCustomStateOptOutSubmitRate(any(), any())
         verify(mockPirRepository).setCustomStatsPixelsLastSentMs(now - twentyFourHours)
     }
@@ -330,7 +336,7 @@ class PirCustomStatsWorkerTest {
             ),
         ).thenReturn(0.5)
 
-        worker.doWork()
+        toTest.attemptFirePixel()
 
         verify(mockOptOutSubmitRateCalculator).calculateOptOutSubmitRate(
             brokerName = testBroker1.name,
@@ -369,7 +375,8 @@ class PirCustomStatsWorkerTest {
         )
             .thenReturn(0.9)
 
-        worker.doWork()
+        toTest.attemptFirePixel()
+
         verify(mockPirPixelSender, never()).reportBrokerCustomStateOptOutSubmitRate(
             brokerUrl = eq(testBroker1.url),
             optOutSuccessRate = any(),
@@ -389,7 +396,7 @@ class PirCustomStatsWorkerTest {
         whenever(mockPirRepository.getAllActiveBrokerObjects()).thenReturn(emptyList())
         whenever(mockPirRepository.getAllUserProfileQueries()).thenReturn(emptyList())
 
-        worker.doWork()
+        toTest.attemptFirePixel()
 
         verify(mockOptOutSubmitRateCalculator, never()).calculateOptOutSubmitRate(
             any(),
@@ -408,7 +415,7 @@ class PirCustomStatsWorkerTest {
         whenever(mockPirRepository.getAllActiveBrokerObjects()).thenReturn(emptyList())
         whenever(mockPirRepository.getAllUserProfileQueries()).thenReturn(listOf(testProfileQuery))
 
-        worker.doWork()
+        toTest.attemptFirePixel()
 
         verify(mockOptOutSubmitRateCalculator, never()).calculateOptOutSubmitRate(
             any(),
@@ -427,7 +434,7 @@ class PirCustomStatsWorkerTest {
         whenever(mockPirRepository.getAllActiveBrokerObjects()).thenReturn(listOf(testBroker1))
         whenever(mockPirRepository.getAllUserProfileQueries()).thenReturn(emptyList())
 
-        worker.doWork()
+        toTest.attemptFirePixel()
 
         verify(mockOptOutSubmitRateCalculator, never()).calculateOptOutSubmitRate(
             any(),
