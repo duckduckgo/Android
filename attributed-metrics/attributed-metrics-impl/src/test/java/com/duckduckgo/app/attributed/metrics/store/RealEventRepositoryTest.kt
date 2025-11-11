@@ -21,6 +21,8 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.attributed.metrics.FakeAttributedMetricsDateUtils
 import com.duckduckgo.common.test.CoroutineTestRule
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Before
@@ -29,6 +31,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import java.time.LocalDate
 
+@OptIn(ExperimentalCoroutinesApi::class)
 @RunWith(AndroidJUnit4::class)
 class RealEventRepositoryTest {
     @get:Rule
@@ -152,6 +155,9 @@ class RealEventRepositoryTest {
             eventDao.insertEvent(EventEntity("test_event", count = 1, day = "2025-09-03"))
 
             repository.deleteAllEvents()
+
+            // Wait for the background coroutine to complete
+            advanceUntilIdle()
 
             val remainingEvents = eventDao.getEventsByNameAndTimeframe("test_event", "2025-09-03", "2025-10-03")
             assert(remainingEvents.isEmpty())
