@@ -16,6 +16,7 @@
 
 package com.duckduckgo.networkprotection.impl.pixels
 
+import android.annotation.SuppressLint
 import com.duckduckgo.app.statistics.wideevents.CleanupPolicy
 import com.duckduckgo.app.statistics.wideevents.FlowStatus
 import com.duckduckgo.app.statistics.wideevents.WideEventClient
@@ -42,6 +43,8 @@ class VpnEnableWideEventTest {
     private val wideEventClient: WideEventClient = mock()
     private val networkProtectionState: NetworkProtectionState = mock()
     private val subscriptions: Subscriptions = mock()
+
+    @SuppressLint("DenyListedApi")
     private val vpnRemoteFeatures: VpnRemoteFeatures = FakeFeatureToggleFactory
         .create(VpnRemoteFeatures::class.java)
         .apply { sendVpnEnableWideEvent().setRawStoredState(Toggle.State(enable = true)) }
@@ -258,6 +261,7 @@ class VpnEnableWideEventTest {
         )
     }
 
+    @SuppressLint("DenyListedApi")
     @Test
     fun `feature disabled results in no interactions`() = runTest {
         vpnRemoteFeatures.sendVpnEnableWideEvent().setRawStoredState(Toggle.State(enable = false))

@@ -16,6 +16,7 @@
 
 package com.duckduckgo.mobile.android.vpn.pixels
 
+import android.annotation.SuppressLint
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.statistics.wideevents.FlowStatus
 import com.duckduckgo.app.statistics.wideevents.WideEventClient
@@ -46,6 +47,7 @@ class VpnEnableWideEventImpl @Inject constructor(
 ) : VpnEnableWideEvent {
 
     // This is to ensure modifications of the wide event are serialized
+    @SuppressLint("AvoidComputationUsage")
     private val coroutineScope = CoroutineScope(
         context = appCoroutineScope.coroutineContext +
             dispatchers.computation().limitedParallelism(1),
