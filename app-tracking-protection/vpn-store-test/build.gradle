@@ -26,5 +26,6 @@ dependencies {
     implementation KotlinX.coroutines.core
 }
 android {
+    ndkVersion "21.4.7075529"
   namespace 'com.duckduckgo.mobile.android.vpn.store.test'
 }

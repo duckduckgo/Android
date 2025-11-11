@@ -1,4 +1,3 @@
-import sys
 import argparse
 from datetime import datetime, timedelta, timezone
 from collections import Counter
@@ -159,7 +158,7 @@ def main():
     reviews_data = fetch_reviews_all_languages_countries(package_name, langs, countries, count, (None, yesterday.strftime('%Y-%m-%d')))
     analysis_results = analyze_anomalies(reviews_data)
 
-    print(f"\n--- Analysis Results ---")
+    print("\n--- Analysis Results ---")
     print(f"Most Recent Date: {analysis_results['most_recent_date']}")
     print(f"Total Reviews on Most Recent Date: {analysis_results['total_reviews']}")
     print(f"Number of Days Covered: {analysis_results['num_days']}")

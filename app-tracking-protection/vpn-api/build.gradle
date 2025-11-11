@@ -31,5 +31,6 @@ dependencies {
     androidTestImplementation project(':vpn-api-test')
 }
 android {
+    ndkVersion "21.4.7075529"
   namespace 'com.duckduckgo.mobile.android.vpn.api'
 }
