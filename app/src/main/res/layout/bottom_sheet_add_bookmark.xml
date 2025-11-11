@@ -44,7 +44,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:leadingIconBackground="circular"
-            app:primaryText="@string/addToFavorites"
+            app:primaryText="@string/addBookmarkDialogAddToFavorites"
             app:leadingIcon="@drawable/ic_favorite_24" />
 
         <com.duckduckgo.common.ui.view.DaxSwitch
@@ -62,6 +62,6 @@
         android:layout_height="wrap_content"
         app:leadingIcon="@drawable/ic_edit_24"
         app:leadingIconBackground="circular"
-        app:primaryText="@string/editBookmark" />
+        app:primaryText="@string/addBookmarkDialogEditBookmark" />
 
 </LinearLayout>

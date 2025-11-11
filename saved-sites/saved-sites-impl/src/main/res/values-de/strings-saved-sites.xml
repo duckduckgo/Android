@@ -79,7 +79,6 @@
     <string name="searchBookmarks">Lesezeichen durchsuchen</string>
     <string name="deleteFolder" instruction="%1$s is the folder name">"%1$s löschen?"</string>
     <string name="deleteBookmark" instruction="%1$s is the bookmark name">"Lesezeichen %1$s löschen?"</string>
-    <string name="bookmarkAddedInBookmarks" instruction="%1$s is the folder name">Lesezeichen zu %1$s hinzugefügt</string>
     <string name="addToFavorites">Zu Favoriten hinzufügen</string>
     <string name="editBookmark">Lesezeichen bearbeiten</string>
     <string name="importBookmarksDescription">Wenn deine Lesezeichen in einem anderen Browser gespeichert sind,\nkannst du sie in DuckDuckGo importieren.</string>

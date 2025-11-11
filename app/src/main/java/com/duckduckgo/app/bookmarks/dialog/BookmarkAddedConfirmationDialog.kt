@@ -26,10 +26,10 @@ import android.view.LayoutInflater
 import android.view.WindowManager
 import android.widget.FrameLayout
 import androidx.lifecycle.lifecycleScope
+import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.BottomSheetAddBookmarkBinding
 import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.savedsites.api.models.BookmarkFolder
-import com.google.android.material.R
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.shape.CornerFamily
@@ -38,6 +38,7 @@ import com.google.android.material.shape.ShapeAppearanceModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import com.duckduckgo.mobile.android.R as CommonR
+import com.google.android.material.R as MaterialR
 
 @SuppressLint("NoBottomSheetDialog")
 class BookmarkAddedConfirmationDialog(
@@ -96,7 +97,8 @@ class BookmarkAddedConfirmationDialog(
 
     private fun getBookmarksBottomSheetTitle(context: Context, bookmarkFolder: BookmarkFolder?): SpannableString {
         val folderName = bookmarkFolder?.name ?: ""
-        val fullText = context.getString(com.duckduckgo.saved.sites.impl.R.string.bookmarkAddedInBookmarks, folderName)
+
+        val fullText = context.getString(R.string.addBookmarkDialogBookmarkAddedInFolder, folderName)
         val spannableString = SpannableString(fullText)
 
         val boldStart = fullText.indexOf(folderName)
@@ -114,7 +116,7 @@ class BookmarkAddedConfirmationDialog(
     private fun roundCornersAlways(dialog: BottomSheetDialog) {
         dialog.setOnShowListener { dialogInterface ->
             val bottomSheetDialog = dialogInterface as BottomSheetDialog
-            val bottomSheet = bottomSheetDialog.findViewById<FrameLayout>(R.id.design_bottom_sheet)
+            val bottomSheet = bottomSheetDialog.findViewById<FrameLayout>(MaterialR.id.design_bottom_sheet)
             bottomSheet?.background = MaterialShapeDrawable(
                 ShapeAppearanceModel.builder().apply {
                     setTopLeftCorner(CornerFamily.ROUNDED, context.resources.getDimension(CommonR.dimen.dialogBorderRadius))
