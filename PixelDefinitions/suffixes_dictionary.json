@@ -7,6 +7,11 @@
         "description": "Pixel schedule type",
         "enum": ["first", "daily", "count"]
     },
+    "first_daily_count_short": {
+        "type": "string",
+        "description": "Pixel schedule type",
+        "enum": ["u", "d", "c"]
+    },
     "form_factor": {
         "type": "string",
         "description": "Platform and device form-factor",
