@@ -65,7 +65,7 @@ class VpnEnableWideEventImpl @Inject constructor(
 
     override fun onNotifyVpnStartFailed() {
         updateWideEventAsync { wideEventId ->
-            wideEventClient.flowFinish(wideEventId = wideEventId, FlowStatus.Failure(""))
+            wideEventClient.flowFinish(wideEventId = wideEventId, FlowStatus.Failure("notify_vpn_start_failed"))
         }
     }
 

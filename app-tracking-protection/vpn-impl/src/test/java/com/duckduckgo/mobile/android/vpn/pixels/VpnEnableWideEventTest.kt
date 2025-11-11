@@ -73,7 +73,7 @@ class VpnEnableWideEventTest {
         verify(wideEventClient).getFlowIds("vpn-enable")
         verify(wideEventClient).flowFinish(
             wideEventId = 456L,
-            FlowStatus.Failure(""),
+            FlowStatus.Failure("notify_vpn_start_failed"),
         )
     }
 
