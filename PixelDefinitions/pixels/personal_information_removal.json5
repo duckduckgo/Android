@@ -131,7 +131,7 @@
         ]
     },
     "dbp_databroker_custom_stats_optoutsubmit": {
-        "description": "Fired every 24 hours for every broker to measure opt-out request success rate.",
+        "description": "Pixel that contains a broker's opt-out 24h submission success rate.",
         "owners": ["karlenDimla", "landomen"],
         "triggers": ["other"],
         "suffixes": ["form_factor"],
