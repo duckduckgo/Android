@@ -61,6 +61,11 @@ interface PirSchedulingRepository {
     suspend fun getAllValidOptOutJobRecords(): List<OptOutJobRecord>
 
     /**
+     * Returns all ScanJobRecord whose state is not INVALID for a specific broker
+     */
+    suspend fun getAllValidOptOutJobRecordsForBroker(brokerName: String): List<OptOutJobRecord>
+
+    /**
      * Returns a matching [OptOutJobRecord] whose state is not INVALID
      *
      * @param includeDeprecated If true, will also return deprecated jobs (used to run opt-out jobs on profiles that have been removed)
@@ -175,6 +180,16 @@ class RealPirSchedulingRepository @Inject constructor(
         withContext(dispatcherProvider.io()) {
             return@withContext jobSchedulingDao()
                 ?.getAllOptOutJobRecords()
+                ?.map { record -> record.toRecord() }
+                // do not pick-up deprecated jobs as they belong to removed profiles
+                ?.filter { !it.deprecated }
+                .orEmpty()
+        }
+
+    override suspend fun getAllValidOptOutJobRecordsForBroker(brokerName: String): List<OptOutJobRecord> =
+        withContext(dispatcherProvider.io()) {
+            return@withContext jobSchedulingDao()
+                ?.getAllOptOutJobRecordsForBroker(brokerName)
                 ?.map { record -> record.toRecord() }
                 // do not pick-up deprecated jobs as they belong to removed profiles
                 ?.filter { !it.deprecated }

@@ -40,6 +40,9 @@ interface JobSchedulingDao {
     @Query("SELECT * FROM pir_optout_job_record ORDER BY attemptCount")
     fun getAllOptOutJobRecords(): List<OptOutJobRecordEntity>
 
+    @Query("SELECT * FROM pir_optout_job_record WHERE brokerName = :brokerName ORDER BY attemptCount")
+    fun getAllOptOutJobRecordsForBroker(brokerName: String): List<OptOutJobRecordEntity>
+
     @Query("SELECT * FROM pir_optout_job_record ORDER BY attemptCount")
     fun getAllOptOutJobRecordsFlow(): Flow<List<OptOutJobRecordEntity>>
 

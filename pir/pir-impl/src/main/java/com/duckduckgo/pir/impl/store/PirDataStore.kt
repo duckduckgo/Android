@@ -22,6 +22,7 @@ import com.duckduckgo.data.store.api.SharedPreferencesProvider
 
 interface PirDataStore {
     var mainConfigEtag: String?
+    var customStatsPixelsLastSentMs: Long
 }
 
 internal class RealPirDataStore(
@@ -42,8 +43,17 @@ internal class RealPirDataStore(
             }
         }
 
+    override var customStatsPixelsLastSentMs: Long
+        get() = preferences.getLong(KEY_CUSTOM_STATS_PIXEL_LAST_SENT_MS, 0L)
+        set(value) {
+            preferences.edit {
+                putLong(KEY_CUSTOM_STATS_PIXEL_LAST_SENT_MS, value)
+            }
+        }
+
     companion object {
         private const val FILENAME = "com.duckduckgo.pir.v1"
         private const val KEY_MAIN_ETAG = "KEY_MAIN_ETAG"
+        private const val KEY_CUSTOM_STATS_PIXEL_LAST_SENT_MS = "KEY_CUSTOM_STATS_PIXEL_LAST_SENT_MS"
     }
 }
