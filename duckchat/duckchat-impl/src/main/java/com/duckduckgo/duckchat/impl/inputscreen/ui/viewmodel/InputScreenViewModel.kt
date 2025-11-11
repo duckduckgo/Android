@@ -21,6 +21,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.app.browser.UriString.Companion.isWebUrl
+import com.duckduckgo.app.browser.api.OmnibarRepository
+import com.duckduckgo.app.browser.omnibar.OmnibarType
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
@@ -126,6 +128,7 @@ class InputScreenViewModel @AssistedInject constructor(
     private val inputScreenDiscoveryFunnel: InputScreenDiscoveryFunnel,
     private val inputScreenSessionUsageMetric: InputScreenSessionUsageMetric,
     private val inputScreenConfigResolver: InputScreenConfigResolver,
+    private val omnibarRepository: OmnibarRepository,
 ) : ViewModel() {
 
     private val autoComplete: AutoComplete = autoCompleteFactory.create(
@@ -646,7 +649,8 @@ class InputScreenViewModel @AssistedInject constructor(
 
     private fun canShowMainButtons() = searchInputTextState.value.isEmpty() &&
         userSelectedMode == SEARCH &&
-        inputScreenConfigResolver.mainButtonsEnabled()
+        inputScreenConfigResolver.mainButtonsEnabled() &&
+        omnibarRepository.omnibarType != OmnibarType.SPLIT
 
     class InputScreenViewModelProviderFactory(
         private val assistedFactory: InputScreenViewModelFactory,

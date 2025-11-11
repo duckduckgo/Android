@@ -22,8 +22,9 @@ import android.annotation.SuppressLint
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.Observer
 import androidx.lifecycle.liveData
+import com.duckduckgo.app.browser.api.OmnibarRepository
 import com.duckduckgo.app.browser.favicon.FaviconManager
-import com.duckduckgo.app.browser.omnibar.OmnibarFeatureRepository
+import com.duckduckgo.app.browser.omnibar.OmnibarType
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
@@ -130,7 +131,7 @@ class TabSwitcherViewModelTest {
 
     private val mockTrackersAnimationInfoPanelPixels: TrackersAnimationInfoPanelPixels = mock()
 
-    private val mockOmnibarFeatureRepository: OmnibarFeatureRepository = mock()
+    private val mockOmnibarFeatureRepository: OmnibarRepository = mock()
 
     private val swipingTabsFeature = FakeFeatureToggleFactory.create(SwipingTabsFeature::class.java)
     private val swipingTabsFeatureProvider = SwipingTabsFeatureProvider(swipingTabsFeature)
@@ -1788,7 +1789,7 @@ class TabSwitcherViewModelTest {
 
     @Test
     fun whenOmnibarFeatureRepositoryHasSplitOmnibarDisabledThenViewStateReflectsIt() = runTest {
-        whenever(mockOmnibarFeatureRepository.isSplitOmnibarEnabled).thenReturn(false)
+        whenever(mockOmnibarFeatureRepository.omnibarType).thenReturn(OmnibarType.SINGLE_TOP)
 
         initializeViewModel()
 
@@ -1797,7 +1798,7 @@ class TabSwitcherViewModelTest {
 
     @Test
     fun whenOmnibarFeatureRepositoryHasSplitOmnibarEnabledThenViewStateReflectsIt() = runTest {
-        whenever(mockOmnibarFeatureRepository.isSplitOmnibarEnabled).thenReturn(true)
+        whenever(mockOmnibarFeatureRepository.omnibarType).thenReturn(OmnibarType.SPLIT)
 
         initializeViewModel()
 
@@ -1806,7 +1807,7 @@ class TabSwitcherViewModelTest {
 
     @Test
     fun whenSplitOmnibarDisabledThenDynamicInterfaceShowsMenuButtonAndHidesBottomBar() = runTest {
-        whenever(mockOmnibarFeatureRepository.isSplitOmnibarEnabled).thenReturn(false)
+        whenever(mockOmnibarFeatureRepository.omnibarType).thenReturn(OmnibarType.SINGLE_TOP)
 
         initializeViewModel()
 
@@ -1819,7 +1820,7 @@ class TabSwitcherViewModelTest {
 
     @Test
     fun whenSplitOmnibarEnabledThenDynamicInterfaceHidesMenuButtonAndShowsBottomBar() = runTest {
-        whenever(mockOmnibarFeatureRepository.isSplitOmnibarEnabled).thenReturn(true)
+        whenever(mockOmnibarFeatureRepository.omnibarType).thenReturn(OmnibarType.SPLIT)
 
         initializeViewModel()
 

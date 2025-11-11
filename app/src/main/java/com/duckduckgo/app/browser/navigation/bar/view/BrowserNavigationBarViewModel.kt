@@ -21,6 +21,7 @@ import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
+import com.duckduckgo.app.browser.defaultbrowsing.prompts.AdditionalDefaultBrowserPrompts
 import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarView.ViewMode
 import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarView.ViewMode.Browser
 import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarView.ViewMode.NewTab
@@ -52,9 +53,10 @@ import javax.inject.Inject
 @SuppressLint("NoLifecycleObserver")
 @ContributesViewModel(ViewScope::class)
 class BrowserNavigationBarViewModel @Inject constructor(
-    private val tabRepository: TabRepository,
     private val pixel: Pixel,
-    private val dispatcherProvider: DispatcherProvider,
+    tabRepository: TabRepository,
+    dispatcherProvider: DispatcherProvider,
+    additionalDefaultBrowserPrompts: AdditionalDefaultBrowserPrompts,
 ) : ViewModel(), DefaultLifecycleObserver {
     private val _commands = Channel<Command>(capacity = Channel.CONFLATED)
     val commands: Flow<Command> = _commands.receiveAsFlow()
@@ -65,11 +67,13 @@ class BrowserNavigationBarViewModel @Inject constructor(
         _viewState.asStateFlow(),
         isCustomTab,
         tabRepository.flowTabs,
-    ) { state, isCustomTab, tabs ->
+        additionalDefaultBrowserPrompts.highlightPopupMenu,
+    ) { state, isCustomTab, tabs, highlightOverflowMenu ->
         state.copy(
             isVisible = !isCustomTab,
             tabsCount = tabs.size,
             hasUnreadTabs = tabs.firstOrNull { !it.viewed } != null,
+            showBrowserMenuHighlight = highlightOverflowMenu,
         )
     }.flowOn(dispatcherProvider.io()).stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000L), ViewState())
 
@@ -176,5 +180,6 @@ class BrowserNavigationBarViewModel @Inject constructor(
         val tabsButtonVisible: Boolean = true,
         val tabsCount: Int = 0,
         val hasUnreadTabs: Boolean = false,
+        val showBrowserMenuHighlight: Boolean = false,
     )
 }

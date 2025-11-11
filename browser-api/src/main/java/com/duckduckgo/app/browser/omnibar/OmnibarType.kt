@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.browser.ui.omnibar
+package com.duckduckgo.app.browser.omnibar
 
 enum class OmnibarType(val typeName: String) {
     SINGLE_TOP("TOP"),

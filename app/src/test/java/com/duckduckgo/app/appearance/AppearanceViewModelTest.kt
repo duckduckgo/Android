@@ -21,14 +21,14 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import app.cash.turbine.test
 import com.duckduckgo.app.appearance.AppearanceViewModel.Command
-import com.duckduckgo.app.browser.omnibar.OmnibarFeatureRepository
+import com.duckduckgo.app.browser.api.OmnibarRepository
+import com.duckduckgo.app.browser.omnibar.OmnibarType
 import com.duckduckgo.app.icon.api.AppIcon
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.settings.clear.FireAnimation
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.tabs.store.TabSwitcherDataStore
-import com.duckduckgo.browser.ui.omnibar.OmnibarType
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.ui.DuckDuckGoTheme
 import com.duckduckgo.common.ui.store.AppTheme
@@ -73,7 +73,7 @@ internal class AppearanceViewModelTest {
     private lateinit var mockTabSwitcherDataStore: TabSwitcherDataStore
 
     @Mock
-    private lateinit var mockOmnibarFeatureRepository: OmnibarFeatureRepository
+    private lateinit var mockOmnibarFeatureRepository: OmnibarRepository
 
     @SuppressLint("DenyListedApi")
     @Before
@@ -85,7 +85,7 @@ internal class AppearanceViewModelTest {
         whenever(mockAppSettingsDataStore.selectedFireAnimation).thenReturn(FireAnimation.HeroFire)
         whenever(mockAppSettingsDataStore.omnibarType).thenReturn(OmnibarType.SINGLE_TOP)
         whenever(mockTabSwitcherDataStore.isTrackersAnimationInfoTileHidden()).thenReturn(flowOf(false))
-        whenever(mockOmnibarFeatureRepository.isSplitOmnibarEnabled).thenReturn(false)
+        whenever(mockOmnibarFeatureRepository.isSplitOmnibarAvailable).thenReturn(false)
 
         initializeViewModel()
     }
@@ -322,6 +322,36 @@ internal class AppearanceViewModelTest {
                 assertEquals(DuckDuckGoTheme.LIGHT, value.theme)
                 assertEquals(AppIcon.DEFAULT, value.appIcon)
                 assertEquals(false, value.forceDarkModeEnabled)
+
+                cancelAndConsumeRemainingEvents()
+            }
+        }
+
+    @Test
+    fun whenSplitOmnibarAvailableThenViewStateShowsSetting() =
+        runTest {
+            whenever(mockOmnibarFeatureRepository.isSplitOmnibarAvailable).thenReturn(true)
+            initializeViewModel()
+
+            testee.viewState().test {
+                val value = expectMostRecentItem()
+
+                assertEquals(true, value.shouldShowSplitOmnibarSettings)
+
+                cancelAndConsumeRemainingEvents()
+            }
+        }
+
+    @Test
+    fun whenSplitOmnibarNotAvailableThenViewStateHidesSetting() =
+        runTest {
+            whenever(mockOmnibarFeatureRepository.isSplitOmnibarAvailable).thenReturn(false)
+            initializeViewModel()
+
+            testee.viewState().test {
+                val value = expectMostRecentItem()
+
+                assertEquals(false, value.shouldShowSplitOmnibarSettings)
 
                 cancelAndConsumeRemainingEvents()
             }

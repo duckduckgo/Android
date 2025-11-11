@@ -21,8 +21,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
+import com.duckduckgo.app.browser.api.OmnibarRepository
 import com.duckduckgo.app.browser.favicon.FaviconManager
-import com.duckduckgo.app.browser.omnibar.OmnibarFeatureRepository
+import com.duckduckgo.app.browser.omnibar.OmnibarType
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.pixels.AppPixelName.TAB_MANAGER_GRID_VIEW_BUTTON_CLICKED
 import com.duckduckgo.app.pixels.AppPixelName.TAB_MANAGER_LIST_VIEW_BUTTON_CLICKED
@@ -92,7 +93,7 @@ class TabSwitcherViewModel @Inject constructor(
     private val faviconManager: FaviconManager,
     private val savedSitesRepository: SavedSitesRepository,
     private val trackersAnimationInfoPanelPixels: TrackersAnimationInfoPanelPixels,
-    private val omnibarFeatureRepository: OmnibarFeatureRepository,
+    private val omnibarRepository: OmnibarRepository,
 ) : ViewModel() {
     val deletableTabs: LiveData<List<TabEntity>> = tabRepository.flowDeletableTabs.asLiveData(
         context = viewModelScope.coroutineContext,
@@ -117,7 +118,7 @@ class TabSwitcherViewModel @Inject constructor(
 
     private val _viewState = MutableStateFlow(
         ViewState(
-            isSplitOmnibarEnabled = omnibarFeatureRepository.isSplitOmnibarEnabled,
+            isSplitOmnibarEnabled = omnibarRepository.omnibarType == OmnibarType.SPLIT,
         ),
     )
     val viewState = combine(
@@ -135,7 +136,7 @@ class TabSwitcherViewModel @Inject constructor(
         scope = viewModelScope,
         started = SharingStarted.WhileSubscribed(),
         initialValue = ViewState(
-            isSplitOmnibarEnabled = omnibarFeatureRepository.isSplitOmnibarEnabled,
+            isSplitOmnibarEnabled = omnibarRepository.omnibarType == OmnibarType.SPLIT,
         ),
     )
 
