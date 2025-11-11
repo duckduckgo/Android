@@ -53,6 +53,9 @@ interface WebViewCompatFeature {
 
     @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
     fun useComplexScript(): Toggle
+
+    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
+    fun useLargeScript(): Toggle
 }
 
 data class WebViewCompatFeatureSettings(
