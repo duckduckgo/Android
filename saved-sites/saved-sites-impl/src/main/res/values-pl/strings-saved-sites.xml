@@ -85,7 +85,6 @@
     <string name="searchBookmarks">Wyszukaj zakładki</string>
     <string name="deleteFolder" instruction="%1$s is the folder name">"Usunąć %1$s?"</string>
     <string name="deleteBookmark" instruction="%1$s is the bookmark name">"Usunąć zakładkę %1$s?"</string>
-    <string name="bookmarkAddedInBookmarks" instruction="%1$s is the folder name">Dodano zakładkę w %1$s</string>
     <string name="addToFavorites">Dodaj do ulubionych</string>
     <string name="editBookmark">Edytuj zakładkę</string>
     <string name="importBookmarksDescription">Jeśli zakładki są zapisane w innej przeglądarce, możesz\nzaimportować je do DuckDuckGo.</string>
