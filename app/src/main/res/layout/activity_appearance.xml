@@ -123,19 +123,19 @@
                     android:gravity="center"
                     android:orientation="vertical"
                     android:padding="@dimen/keyline_2"
-                    android:background="@drawable/selectable_rounded_ripple"
-                    app:layout_constraintWidth_max="160dp"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toStartOf="@+id/bottomOmnibarContainer"
                     app:layout_constraintHorizontal_chainStyle="packed"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent">
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintWidth_max="160dp">
 
                     <ImageView
                         android:id="@+id/topOmnibarToggleImage"
-                        android:layout_width="match_parent"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:scaleType="fitCenter"
+                        android:foreground="@drawable/selectable_rounded_ripple"
                         android:contentDescription="@string/settingsAddressBarPositionTop"
                         android:src="@drawable/mobile_toolbar_top_selected_light" />
 
@@ -167,7 +167,6 @@
                     android:orientation="vertical"
                     android:padding="@dimen/keyline_2"
                     app:layout_constraintWidth_max="160dp"
-                    android:background="@drawable/selectable_rounded_ripple"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toStartOf="@+id/splitOmnibarContainer"
                     app:layout_constraintStart_toEndOf="@+id/topOmnibarContainer"
@@ -175,9 +174,10 @@
 
                     <ImageView
                         android:id="@+id/bottomOmnibarToggleImage"
-                        android:layout_width="match_parent"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:scaleType="fitCenter"
+                        android:foreground="@drawable/selectable_rounded_ripple"
                         android:contentDescription="@string/settingsAddressBarPositionBottom"
                         android:src="@drawable/mobile_toolbar_bottom_unselected_light" />
 
@@ -216,7 +216,6 @@
                     android:padding="@dimen/keyline_2"
                     android:gravity="center"
                     android:orientation="vertical"
-                    android:background="@drawable/selectable_rounded_ripple"
                     app:layout_constraintWidth_max="160dp"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
@@ -225,9 +224,10 @@
 
                     <ImageView
                         android:id="@+id/splitOmnibarToggleImage"
-                        android:layout_width="match_parent"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:scaleType="fitCenter"
+                        android:foreground="@drawable/selectable_rounded_ripple"
                         android:contentDescription="@string/settingsAddressBarPositionSplit"
                         android:src="@drawable/mobile_toolbar_split_unselected_light" />
 

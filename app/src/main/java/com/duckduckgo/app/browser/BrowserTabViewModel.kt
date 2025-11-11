@@ -573,7 +573,6 @@ class BrowserTabViewModel @Inject constructor(
     @VisibleForTesting
     internal val autoCompleteStateFlow = MutableStateFlow("")
     private val fireproofWebsiteState: LiveData<List<FireproofWebsiteEntity>> = fireproofWebsiteRepository.getFireproofWebsites()
-    private var alreadyShownKeyboard = false
 
     @ExperimentalCoroutinesApi
     @FlowPreview
@@ -603,6 +602,7 @@ class BrowserTabViewModel @Inject constructor(
     private var isLinkOpenedInNewTab = false
     private var allowlistRefreshTriggerJob: Job? = null
     private var isCustomTabScreen: Boolean = false
+    private var alreadyShownKeyboard: Boolean = false
 
     private val fireproofWebsitesObserver =
         Observer<List<FireproofWebsiteEntity>> {

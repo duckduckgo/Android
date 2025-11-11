@@ -46,8 +46,8 @@
     <dimen name="toolbarSize">60dp</dimen>
 
     <!-- Navigation Bar -->
-    <dimen name="navigationBarPaddingTop">12dp</dimen>
-    <dimen name="navigationBarPaddingBottom">8dp</dimen>
+    <dimen name="navigationBarPaddingTop">8dp</dimen>
+    <dimen name="navigationBarPaddingBottom">4dp</dimen>
     <dimen name="navigationBarPaddingHorizontal">18dp</dimen>
     <dimen name="bottomNavIcon">24dp</dimen>
 
