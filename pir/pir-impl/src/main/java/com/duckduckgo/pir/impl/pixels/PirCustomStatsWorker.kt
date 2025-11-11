@@ -31,8 +31,13 @@ class PirCustomStatsWorker(
     @Inject
     lateinit var optOutSubmissionSuccessRateReporter: OptOut24HourSubmissionSuccessRateReporter
 
+    @Inject
+    lateinit var optOutConfirmationReporter: OptOutConfirmationReporter
+
     override suspend fun doWork(): Result {
         optOutSubmissionSuccessRateReporter.attemptFirePixel()
+        optOutConfirmationReporter.attemptFirePixel()
+
         return Result.success()
     }
 

@@ -118,4 +118,16 @@ interface JobSchedulingDao {
         deleteOptOutJobRecordsForProfiles(profileQueryIds)
         deleteEmailConfirmationJobRecordsForProfiles(profileQueryIds)
     }
+
+    @Query(
+        """
+    UPDATE pir_optout_job_record
+    SET reporting_sevenDayConfirmationReportSentDateMs = :newDate
+    WHERE extractedProfileId = :extractedProfileId
+    """,
+    )
+    fun updateSevenDayConfirmationReportSentDate(
+        extractedProfileId: Long,
+        newDate: Long,
+    )
 }

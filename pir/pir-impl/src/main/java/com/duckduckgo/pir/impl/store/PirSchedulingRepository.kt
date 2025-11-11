@@ -28,6 +28,7 @@ import com.duckduckgo.pir.impl.models.scheduling.JobRecord.ScanJobRecord.ScanJob
 import com.duckduckgo.pir.impl.store.db.EmailConfirmationJobRecordEntity
 import com.duckduckgo.pir.impl.store.db.JobSchedulingDao
 import com.duckduckgo.pir.impl.store.db.OptOutJobRecordEntity
+import com.duckduckgo.pir.impl.store.db.ReportingRecord
 import com.duckduckgo.pir.impl.store.db.ScanJobRecordEntity
 import com.duckduckgo.pir.impl.store.secure.PirSecureStorageDatabaseFactory
 import com.squareup.anvil.annotations.ContributesBinding
@@ -124,6 +125,11 @@ interface PirSchedulingRepository {
     suspend fun deleteEmailConfirmationJobRecord(extractedProfileId: Long)
 
     suspend fun deleteAllEmailConfirmationJobRecords()
+
+    suspend fun markOptOutDay7ConfirmationPixelSent(
+        extractedProfileId: Long,
+        timestampMs: Long,
+    )
 }
 
 @ContributesBinding(
@@ -319,6 +325,15 @@ class RealPirSchedulingRepository @Inject constructor(
         }
     }
 
+    override suspend fun markOptOutDay7ConfirmationPixelSent(
+        extractedProfileId: Long,
+        timestampMs: Long,
+    ) {
+        withContext(dispatcherProvider.io()) {
+            jobSchedulingDao()?.updateSevenDayConfirmationReportSentDate(extractedProfileId, timestampMs)
+        }
+    }
+
     private fun ScanJobRecordEntity.toRecord(): ScanJobRecord =
         ScanJobRecord(
             brokerName = this.brokerName,
@@ -355,6 +370,10 @@ class RealPirSchedulingRepository @Inject constructor(
             optOutRemovedDateInMillis = this.optOutRemovedDate,
             deprecated = this.deprecated,
             dateCreatedInMillis = this.dateCreatedInMillis,
+            confirmation7dayReportSentDateMs = this.reporting.sevenDayConfirmationReportSentDateMs,
+            confirmation14dayReportSentDateMs = this.reporting.fourteenDayConfirmationReportSentDateMs,
+            confirmation21dayReportSentDateMs = this.reporting.twentyOneDayConfirmationReportSentDateMs,
+            confirmation42dayReportSentDateMs = this.reporting.fortyTwoDayConfirmationReportSentDateMs,
         )
 
     private fun OptOutJobRecord.toEntity(): OptOutJobRecordEntity =
@@ -373,6 +392,12 @@ class RealPirSchedulingRepository @Inject constructor(
             } else {
                 currentTimeProvider.currentTimeMillis()
             },
+            reporting = ReportingRecord(
+                sevenDayConfirmationReportSentDateMs = this.confirmation7dayReportSentDateMs,
+                fourteenDayConfirmationReportSentDateMs = this.confirmation14dayReportSentDateMs,
+                twentyOneDayConfirmationReportSentDateMs = this.confirmation21dayReportSentDateMs,
+                fortyTwoDayConfirmationReportSentDateMs = this.confirmation42dayReportSentDateMs,
+            ),
         )
 
     private fun EmailConfirmationJobRecord.toEntity(): EmailConfirmationJobRecordEntity =
