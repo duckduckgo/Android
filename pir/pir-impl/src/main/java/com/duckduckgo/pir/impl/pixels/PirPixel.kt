@@ -140,6 +140,16 @@ enum class PirPixel(
     PIR_BROKER_CUSTOM_STATS_OPTOUT_SUBMIT_SUCCESSRATE(
         baseName = "dbp_databroker_custom_stats_optoutsubmit",
         type = Count,
+    ),
+
+    PIR_BROKER_CUSTOM_STATS_7DAY_CONFIRMED_OPTOUT(
+        baseName = "dbp_optoutjob_at-7-days_confirmed",
+        type = Count,
+    ),
+
+    PIR_BROKER_CUSTOM_STATS_7DAY_UNCONFIRMED_OPTOUT(
+        baseName = "dbp_optoutjob_at-7-days_unconfirmed",
+        type = Count,
     ), ;
 
     constructor(
