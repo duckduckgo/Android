@@ -82,7 +82,7 @@ class DuckDuckGoWebLocalStorageManagerTest {
     }
 
     @Test
-    fun whenClearWebLocalStorageThenIteratorSeeksToFirst() {
+    fun whenClearWebLocalStorageThenIteratorSeeksToFirst() = runTest {
         whenever(mockDB.iterator()).thenReturn(mockIterator)
 
         testee.clearWebLocalStorage()
@@ -91,7 +91,7 @@ class DuckDuckGoWebLocalStorageManagerTest {
     }
 
     @Test
-    fun whenClearWebLocalStorageThenDeletesNonAllowedKeys() {
+    fun whenClearWebLocalStorageThenDeletesNonAllowedKeys() = runTest {
         val key1 = bytes("_https://example.com\u0000\u0001key1")
         val key2 = bytes("_https://duckduckgo.com\u0000\u0001key2")
         val entry1 = createMockDBEntry(key1)
@@ -108,7 +108,7 @@ class DuckDuckGoWebLocalStorageManagerTest {
     }
 
     @Test
-    fun whenClearWebLocalStorageThenDoesNotDeleteKeysWithValidSubdomains() {
+    fun whenClearWebLocalStorageThenDoesNotDeleteKeysWithValidSubdomains() = runTest {
         val key1 = bytes("_https://subdomain.duckduckgo.com\u0000\u0001key1")
         val key2 = bytes("_https://another.subdomain.duckduckgo.com\u0000\u0001key2")
 
@@ -126,7 +126,7 @@ class DuckDuckGoWebLocalStorageManagerTest {
     }
 
     @Test
-    fun whenClearWebLocalStorageThenDeletesKeysWithPartialDomainMatch() {
+    fun whenClearWebLocalStorageThenDeletesKeysWithPartialDomainMatch() = runTest {
         val key1 = bytes("_https://notduckduckgo.com\u0000\u0001key1")
         val key2 = bytes("_https://duckduckgo.something.com\u0000\u0001key2")
 
@@ -144,7 +144,7 @@ class DuckDuckGoWebLocalStorageManagerTest {
     }
 
     @Test
-    fun whenClearWebLocalStorageThenDeletesKeysWithInvalidFormat() {
+    fun whenClearWebLocalStorageThenDeletesKeysWithInvalidFormat() = runTest {
         val key1 = bytes("malformed-key")
         val key2 = bytes("_https://duckduckgo.com")
         val key3 = bytes("_https://duckduckgo.com\u0000\u0001")
@@ -165,7 +165,7 @@ class DuckDuckGoWebLocalStorageManagerTest {
     }
 
     @Test
-    fun whenClearWebLocalStorageThenIteratorIsClosed() {
+    fun whenClearWebLocalStorageThenIteratorIsClosed() = runTest {
         whenever(mockDB.iterator()).thenReturn(mockIterator)
         whenever(mockIterator.hasNext()).thenReturn(false)
 
