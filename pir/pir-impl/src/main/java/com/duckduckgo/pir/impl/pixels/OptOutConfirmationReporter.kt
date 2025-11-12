@@ -52,9 +52,10 @@ class RealOptOutConfirmationReporter @Inject constructor(
             if (activeBrokers.isEmpty() || allValidRequestedOptOutJobs.isEmpty()) return@withContext
 
             allValidRequestedOptOutJobs.also {
+                // Fire 7 day pixel
                 it.attemptFirePixelForConfirmationDay(
                     activeBrokers,
-                    7,
+                    INTERVAL_DAY_7,
                     { jobRecord -> jobRecord.confirmation7dayReportSentDateMs == 0L },
                     { brokerUrl -> pixelSender.reportBrokerOptOutConfirmed7Days(brokerUrl) },
                     { brokerUrl -> pixelSender.reportBrokerOptOutUnconfirmed7Days(brokerUrl) },
@@ -63,9 +64,10 @@ class RealOptOutConfirmationReporter @Inject constructor(
                     },
                 )
 
+                // Fire 14 day pixel
                 it.attemptFirePixelForConfirmationDay(
                     activeBrokers,
-                    14,
+                    INTERVAL_DAY_14,
                     { jobRecord -> jobRecord.confirmation14dayReportSentDateMs == 0L },
                     { brokerUrl -> pixelSender.reportBrokerOptOutConfirmed14Days(brokerUrl) },
                     { brokerUrl -> pixelSender.reportBrokerOptOutUnconfirmed14Days(brokerUrl) },
@@ -74,14 +76,27 @@ class RealOptOutConfirmationReporter @Inject constructor(
                     },
                 )
 
+                // Fire 21 day pixel
                 it.attemptFirePixelForConfirmationDay(
                     activeBrokers,
-                    21,
+                    INTERVAL_DAY_21,
                     { jobRecord -> jobRecord.confirmation21dayReportSentDateMs == 0L },
                     { brokerUrl -> pixelSender.reportBrokerOptOutConfirmed21Days(brokerUrl) },
                     { brokerUrl -> pixelSender.reportBrokerOptOutUnconfirmed21Days(brokerUrl) },
                     { jobRecord, now ->
                         pirSchedulingRepository.markOptOutDay21ConfirmationPixelSent(jobRecord.extractedProfileId, now)
+                    },
+                )
+
+                // Fire 42 day pixel
+                it.attemptFirePixelForConfirmationDay(
+                    activeBrokers,
+                    INTERVAL_DAY_42,
+                    { jobRecord -> jobRecord.confirmation42dayReportSentDateMs == 0L },
+                    { brokerUrl -> pixelSender.reportBrokerOptOutConfirmed42Days(brokerUrl) },
+                    { brokerUrl -> pixelSender.reportBrokerOptOutUnconfirmed42Days(brokerUrl) },
+                    { jobRecord, now ->
+                        pirSchedulingRepository.markOptOutDay42ConfirmationPixelSent(jobRecord.extractedProfileId, now)
                     },
                 )
             }
@@ -119,5 +134,12 @@ class RealOptOutConfirmationReporter @Inject constructor(
         interval: Long,
     ): Boolean {
         return now >= this.optOutRequestedDateInMillis + TimeUnit.DAYS.toMillis(interval)
+    }
+
+    companion object {
+        private const val INTERVAL_DAY_7 = 7L
+        private const val INTERVAL_DAY_14 = 14L
+        private const val INTERVAL_DAY_21 = 21L
+        private const val INTERVAL_DAY_42 = 42L
     }
 }

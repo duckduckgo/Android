@@ -140,6 +140,11 @@ interface PirSchedulingRepository {
         extractedProfileId: Long,
         timestampMs: Long,
     )
+
+    suspend fun markOptOutDay42ConfirmationPixelSent(
+        extractedProfileId: Long,
+        timestampMs: Long,
+    )
 }
 
 @ContributesBinding(
@@ -359,6 +364,15 @@ class RealPirSchedulingRepository @Inject constructor(
     ) {
         withContext(dispatcherProvider.io()) {
             jobSchedulingDao()?.update21DayConfirmationReportSentDate(extractedProfileId, timestampMs)
+        }
+    }
+
+    override suspend fun markOptOutDay42ConfirmationPixelSent(
+        extractedProfileId: Long,
+        timestampMs: Long,
+    ) {
+        withContext(dispatcherProvider.io()) {
+            jobSchedulingDao()?.update42DayConfirmationReportSentDate(extractedProfileId, timestampMs)
         }
     }
 
