@@ -21,6 +21,7 @@ import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import com.duckduckgo.anvil.annotations.ContributesWorker
 import com.duckduckgo.di.scopes.AppScope
+import logcat.logcat
 import javax.inject.Inject
 
 @ContributesWorker(AppScope::class)
@@ -35,6 +36,7 @@ class PirCustomStatsWorker(
     lateinit var optOutConfirmationReporter: OptOutConfirmationReporter
 
     override suspend fun doWork(): Result {
+        logcat { "PIR-CUSTOM-STATS: Attempt to fire custom pixels" }
         optOutSubmissionSuccessRateReporter.attemptFirePixel()
         optOutConfirmationReporter.attemptFirePixel()
 

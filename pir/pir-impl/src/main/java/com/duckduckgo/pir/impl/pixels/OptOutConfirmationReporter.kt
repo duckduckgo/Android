@@ -27,6 +27,7 @@ import com.duckduckgo.pir.impl.store.PirRepository
 import com.duckduckgo.pir.impl.store.PirSchedulingRepository
 import com.squareup.anvil.annotations.ContributesBinding
 import kotlinx.coroutines.withContext
+import logcat.logcat
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
@@ -43,6 +44,8 @@ class RealOptOutConfirmationReporter @Inject constructor(
     private val pixelSender: PirPixelSender,
 ) : OptOutConfirmationReporter {
     override suspend fun attemptFirePixel() {
+        logcat { "PIR-CUSTOM-STATS: Attempt to fire confirmation pixels" }
+
         withContext(dispatcherProvider.io()) {
             val activeBrokers = pirRepository.getAllActiveBrokerObjects().associateBy { it.name }
             val allValidRequestedOptOutJobs = pirSchedulingRepository.getAllValidOptOutJobRecords().filter {
@@ -51,6 +54,7 @@ class RealOptOutConfirmationReporter @Inject constructor(
 
             if (activeBrokers.isEmpty() || allValidRequestedOptOutJobs.isEmpty()) return@withContext
 
+            logcat { "PIR-CUSTOM-STATS: Will fire confirmation pixels for ${allValidRequestedOptOutJobs.size} jobs" }
             allValidRequestedOptOutJobs.also {
                 // Fire 7 day pixel
                 it.attemptFirePixelForConfirmationDay(
@@ -112,17 +116,20 @@ class RealOptOutConfirmationReporter @Inject constructor(
         markOptOutJobRecordReporting: suspend (OptOutJobRecord, Long) -> Unit,
     ) {
         val now = currentTimeProvider.currentTimeMillis()
-        val optOutsForSevenDayPixel = this.filter {
+        val optOutsForPixel = this.filter {
             it.daysPassedSinceSubmission(now, confirmationDay) && jobRecordFilter(it)
         }
 
-        optOutsForSevenDayPixel.forEach { optOutJobRecord ->
-            val brokerUrl = activeBrokers[optOutJobRecord.brokerName]?.url ?: return@forEach
+        logcat { "PIR-CUSTOM-STATS: Firing 7day confirmation pixels for ${optOutsForPixel.size} jobs" }
+        optOutsForPixel.forEach { optOutJobRecord ->
+            val broker = activeBrokers[optOutJobRecord.brokerName] ?: return@forEach
 
             if (optOutJobRecord.status == REMOVED) {
-                emitConfirmPixel(brokerUrl)
+                logcat { "PIR-CUSTOM-STATS: Firing $confirmationDay day confirmation pixels for ${broker.name}" }
+                emitConfirmPixel(broker.url)
             } else {
-                emitUnconfirmPixel(brokerUrl)
+                logcat { "PIR-CUSTOM-STATS: Firing $confirmationDay day unconfirmation pixels for ${broker.name}" }
+                emitUnconfirmPixel(broker.url)
             }
 
             markOptOutJobRecordReporting(optOutJobRecord, now)

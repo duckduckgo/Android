@@ -20,6 +20,7 @@ import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.pir.impl.store.PirRepository
 import com.squareup.anvil.annotations.ContributesBinding
+import logcat.logcat
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 import kotlin.math.abs
@@ -36,10 +37,12 @@ class RealOptOut24HourSubmissionSuccessRateReporter @Inject constructor(
     private val pirPixelSender: PirPixelSender,
 ) : OptOut24HourSubmissionSuccessRateReporter {
     override suspend fun attemptFirePixel() {
+        logcat { "PIR-CUSTOM-STATS: Attempt to fire 24hour submission pixels" }
         val startDate = pirRepository.getCustomStatsPixelsLastSentMs()
         val now = currentTimeProvider.currentTimeMillis()
 
         if (shouldFirePixel(startDate, now)) {
+            logcat { "PIR-CUSTOM-STATS: Should fire pixel - 24hrs passed since last send" }
             val endDate = now - TimeUnit.HOURS.toMillis(24)
             val activeBrokers = pirRepository.getAllActiveBrokerObjects()
             val hasUserProfiles = pirRepository.getAllUserProfileQueries().isNotEmpty()
@@ -52,6 +55,7 @@ class RealOptOut24HourSubmissionSuccessRateReporter @Inject constructor(
                         endDate,
                     )
 
+                    logcat { "PIR-CUSTOM-STATS: 24hr submission ${it.name} : $successRate" }
                     if (successRate != null) {
                         pirPixelSender.reportBrokerCustomStateOptOutSubmitRate(
                             brokerUrl = it.url,
@@ -60,6 +64,7 @@ class RealOptOut24HourSubmissionSuccessRateReporter @Inject constructor(
                     }
                 }
 
+                logcat { "PIR-CUSTOM-STATS: Updating last send date to $endDate" }
                 pirRepository.setCustomStatsPixelsLastSentMs(endDate)
             }
         }
