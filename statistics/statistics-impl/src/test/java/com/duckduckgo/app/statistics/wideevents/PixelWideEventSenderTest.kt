@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.statistics.wideevents
 
+import android.annotation.SuppressLint
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.wideevents.db.WideEventRepository
@@ -45,6 +46,8 @@ class PixelWideEventSenderTest {
     private val pixel: Pixel = mock()
     private val appBuildConfig: AppBuildConfig = mock()
     private val deviceInfo: DeviceInfo = mock()
+
+    @SuppressLint("DenyListedApi")
     private val wideEventFeature: WideEventFeature = FakeFeatureToggleFactory
         .create(WideEventFeature::class.java)
         .also { it.enqueueWideEventPixels().setRawStoredState(Toggle.State(enable = true)) }
