@@ -3211,7 +3211,7 @@ class BrowserTabFragment :
             it.clearSslPreferences()
 
             it.settings.apply {
-                withContext(dispatchers.io()) { clientBrandHintProvider.setDefault(this@apply) }
+                clientBrandHintProvider.setDefault(this)
                 webViewClient.clientProvider = clientBrandHintProvider
                 userAgentString = userAgentProvider.userAgent()
                 javaScriptEnabled = true
@@ -3514,7 +3514,7 @@ class BrowserTabFragment :
             webViewCapabilityChecker.isSupported(WebViewCapability.WebMessageListener) &&
             webViewCapabilityChecker.isSupported(WebViewCapability.DocumentStartJavaScript)
 
-    private suspend fun configureWebViewForAutofill(it: DuckDuckGoWebView) {
+    private fun configureWebViewForAutofill(it: DuckDuckGoWebView) {
         it.setSystemAutofillCallback {
             systemAutofillEngagement.onSystemAutofillEvent()
         }
