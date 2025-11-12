@@ -22,8 +22,6 @@ import com.duckduckgo.app.statistics.wideevents.db.WideEventRepository
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.device.DeviceInfo
-import com.duckduckgo.feature.toggles.api.FeatureTogglesInventory
-import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule
@@ -45,14 +43,12 @@ class PixelWideEventSenderTest {
     private val pixel: Pixel = mock()
     private val appBuildConfig: AppBuildConfig = mock()
     private val deviceInfo: DeviceInfo = mock()
-    private val featureTogglesInventory: FeatureTogglesInventory = mock()
 
     private val pixelWideEventSender =
         PixelWideEventSender(
             pixelSender = pixel,
             appBuildConfig = appBuildConfig,
             deviceInfo = deviceInfo,
-            featureTogglesInventory = featureTogglesInventory,
         )
 
     @Before
@@ -60,9 +56,6 @@ class PixelWideEventSenderTest {
         whenever(appBuildConfig.versionName).thenReturn("5.123.0")
         whenever(appBuildConfig.isDebug).thenReturn(false)
         whenever(deviceInfo.formFactor()).thenReturn(DeviceInfo.FormFactor.PHONE)
-        runBlocking {
-            whenever(featureTogglesInventory.getAllActiveExperimentToggles()).thenReturn(emptyList())
-        }
     }
 
     @Test
@@ -93,7 +86,6 @@ class PixelWideEventSenderTest {
                     "app.name" to "DuckDuckGo Android",
                     "app.version" to "5.123.0",
                     "app.form_factor" to "phone",
-                    "app.native_apps_experiments" to "",
                     "context.name" to "app_settings",
                     "feature.status" to "SUCCESS",
                     "app.dev_mode" to "false",
