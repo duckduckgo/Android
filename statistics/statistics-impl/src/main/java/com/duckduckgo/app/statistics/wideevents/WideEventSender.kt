@@ -24,9 +24,12 @@ import com.duckduckgo.app.statistics.wideevents.db.WideEventRepository.WideEvent
 import com.duckduckgo.app.statistics.wideevents.db.WideEventRepository.WideEventStatus.UNKNOWN
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.utils.device.DeviceInfo
+import com.duckduckgo.common.utils.plugins.pixel.PixelParamRemovalPlugin
+import com.duckduckgo.common.utils.plugins.pixel.PixelParamRemovalPlugin.PixelParameter
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.FeatureTogglesInventory
 import com.squareup.anvil.annotations.ContributesBinding
+import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
 
 interface WideEventSender {
@@ -99,7 +102,6 @@ class PixelWideEventSender @Inject constructor(
     }
 
     private companion object {
-        const val PIXEL_NAME_PREFIX = "wide_"
         const val COUNT_PIXEL_SUFFIX = "_c"
         const val DAILY_PIXEL_SUFFIX = "_d"
 
@@ -126,3 +128,11 @@ private fun WideEventRepository.WideEventStatus.toParamValue(): String =
         CANCELLED -> "CANCELLED"
         UNKNOWN -> "UNKNOWN"
     }
+
+@ContributesMultibinding(AppScope::class)
+class WideEventPixelParamRemovalPlugin @Inject constructor() : PixelParamRemovalPlugin {
+    override fun names(): List<Pair<String, Set<PixelParameter>>> =
+        listOf(PIXEL_NAME_PREFIX to PixelParameter.removeAll())
+}
+
+private const val PIXEL_NAME_PREFIX = "wide_"
