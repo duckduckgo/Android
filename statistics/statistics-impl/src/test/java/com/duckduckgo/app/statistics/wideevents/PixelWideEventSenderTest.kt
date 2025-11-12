@@ -16,12 +16,15 @@
 
 package com.duckduckgo.app.statistics.wideevents
 
+import android.annotation.SuppressLint
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.wideevents.db.WideEventRepository
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.device.DeviceInfo
+import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
+import com.duckduckgo.feature.toggles.api.Toggle
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule
@@ -44,11 +47,18 @@ class PixelWideEventSenderTest {
     private val appBuildConfig: AppBuildConfig = mock()
     private val deviceInfo: DeviceInfo = mock()
 
+    @SuppressLint("DenyListedApi")
+    private val wideEventFeature: WideEventFeature = FakeFeatureToggleFactory
+        .create(WideEventFeature::class.java)
+        .also { it.enqueueWideEventPixels().setRawStoredState(Toggle.State(enable = true)) }
+
     private val pixelWideEventSender =
         PixelWideEventSender(
             pixelSender = pixel,
             appBuildConfig = appBuildConfig,
             deviceInfo = deviceInfo,
+            wideEventFeature = wideEventFeature,
+            dispatchers = coroutineRule.testDispatcherProvider,
         )
 
     @Before
@@ -94,11 +104,10 @@ class PixelWideEventSenderTest {
                 )
             val expectedEncodedParameters = mapOf("feature.data.ext.plan_type" to "premium")
 
-            verify(pixel).fire(
+            verify(pixel).enqueueFire(
                 pixelName = eq("wide_${eventName}_c"),
                 parameters = eq(expectedParameters),
                 encodedParameters = eq(expectedEncodedParameters),
-                type = eq(Pixel.PixelType.Count),
             )
 
             verify(pixel).fire(
