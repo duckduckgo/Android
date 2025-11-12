@@ -1139,7 +1139,9 @@ class BrowserTabViewModel @Inject constructor(
                 runCatching {
                     if (duckAiFeatureState.showFullScreenMode.value) {
                         site?.nextUrl = urlToNavigate
-                        command.value = NavigationCommand.Navigate(urlToNavigate, getUrlHeaders(urlToNavigate))
+                        viewModelScope.launch {
+                            command.value = NavigationCommand.Navigate(urlToNavigate, getUrlHeaders(urlToNavigate))
+                        }
                     } else {
                         val queryParameter = urlToNavigate.toUri().getQueryParameter(QUERY)
                         if (queryParameter != null) {
