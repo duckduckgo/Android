@@ -18,7 +18,6 @@ package com.duckduckgo.app.browser
 
 import android.content.Intent
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -75,6 +74,8 @@ import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -82,6 +83,8 @@ import kotlinx.coroutines.flow.filterNot
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import logcat.LogPriority.INFO
 import logcat.logcat
@@ -145,12 +148,17 @@ class BrowserViewModel @Inject constructor(
         ) : Command()
     }
 
-    var viewState: MutableLiveData<ViewState> = MutableLiveData<ViewState>().also {
-        it.value = ViewState()
-    }
+    private val _viewState = MutableStateFlow(
+        ViewState(),
+    )
 
-    private val currentViewState: ViewState
-        get() = viewState.value!!
+    val viewState =
+        combine(
+            duckAiFeatureState.showFullScreenMode,
+            _viewState,
+        ) { duckAiFullScreenMode, viewState ->
+            viewState.copy(duckAiFullScreenMode = duckAiFullScreenMode)
+        }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), ViewState())
 
     var tabs: LiveData<List<TabEntity>> = tabRepository.liveTabs
     var selectedTab: LiveData<TabEntity> = tabRepository.liveSelectedTab
@@ -176,12 +184,16 @@ class BrowserViewModel @Inject constructor(
         when (state) {
             ApplicationClearDataState.INITIALIZING -> {
                 logcat(INFO) { "App clear state initializing" }
-                viewState.value = currentViewState.copy(hideWebContent = true)
+                _viewState.update {
+                    it.copy(hideWebContent = true)
+                }
             }
 
             ApplicationClearDataState.FINISHED -> {
                 logcat(INFO) { "App clear state finished" }
-                viewState.value = currentViewState.copy(hideWebContent = false)
+                _viewState.update {
+                    it.copy(hideWebContent = false)
+                }
             }
         }
     }
@@ -460,11 +472,15 @@ class BrowserViewModel @Inject constructor(
     }
 
     fun onOmnibarEditModeChanged(isInEditMode: Boolean) {
-        viewState.value = currentViewState.copy(isInEditMode = isInEditMode)
+        _viewState.update {
+            it.copy(isInEditMode = isInEditMode)
+        }
     }
 
     fun onFullScreenModeChanged(isFullScreen: Boolean) {
-        viewState.value = currentViewState.copy(isInFullScreenMode = isFullScreen)
+        _viewState.update {
+            it.copy(isInFullScreenMode = isFullScreen)
+        }
     }
 
     // user has not tapped the Undo action -> purge the deletable tabs and remove all data

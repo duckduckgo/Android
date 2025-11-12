@@ -51,6 +51,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
@@ -194,8 +195,13 @@ class BrowserViewModelTest {
     }
 
     @Test
-    fun whenViewStateCreatedThenWebViewContentShouldBeHidden() {
-        assertTrue(testee.viewState.value!!.hideWebContent)
+    fun whenViewStateCreatedThenWebViewContentShouldBeHidden() = runTest {
+        initSuspendTestee()
+
+        testee.viewState.test {
+            val state = awaitItem()
+            assertTrue(state.hideWebContent)
+        }
     }
 
     @Test
@@ -497,65 +503,94 @@ class BrowserViewModelTest {
     }
 
     @Test
-    fun whenOmnibarIsInEditModeTabSwipingIsDisabled() {
-        swipingTabsFeature.self().setRawStoredState(State(enable = true))
+    fun whenOmnibarIsInEditModeTabSwipingIsDisabled() = runTest {
+        initSuspendTestee()
 
+        swipingTabsFeature.self().setRawStoredState(State(enable = true))
         val isInEditMode = true
         testee.onOmnibarEditModeChanged(isInEditMode)
-        assertEquals(!isInEditMode, testee.viewState.value!!.isTabSwipingEnabled)
+
+        testee.viewState.test {
+            val state = awaitItem()
+            assertFalse(state.isTabSwipingEnabled)
+        }
     }
 
     @Test
-    fun whenOmnibarIsInNotEditModeTabSwipingIsEnabled() {
+    fun whenOmnibarIsInNotEditModeTabSwipingIsEnabled() = runTest {
+        initSuspendTestee()
+
         swipingTabsFeature.self().setRawStoredState(State(enable = true))
-
-        val isInEditMode = false
-        testee.onOmnibarEditModeChanged(isInEditMode)
-        assertEquals(!isInEditMode, testee.viewState.value!!.isTabSwipingEnabled)
-    }
-
-    @Test
-    fun whenBrowserIsNotInFullscreenModeTabSwipingIsEnabled() {
-        swipingTabsFeature.self().setRawStoredState(State(enable = true))
-
-        val isFullScreen = false
-        testee.onFullScreenModeChanged(isFullScreen)
-        assertEquals(true, testee.viewState.value!!.isTabSwipingEnabled)
-    }
-
-    @Test
-    fun whenBrowserIsInFullscreenModeTabSwipingIsDisabled() {
-        swipingTabsFeature.self().setRawStoredState(State(enable = true))
-
-        val isFullScreen = true
-        testee.onFullScreenModeChanged(isFullScreen)
-        assertEquals(false, testee.viewState.value!!.isTabSwipingEnabled)
-    }
-
-    @Test
-    fun whenOmnibarIsNotInEditModeAndBrowserIsInFullscreenModeTabSwipingIsDisabled() {
-        swipingTabsFeature.self().setRawStoredState(State(enable = true))
-
-        val isFullScreen = true
-        testee.onFullScreenModeChanged(isFullScreen)
-
         val isInEditMode = false
         testee.onOmnibarEditModeChanged(isInEditMode)
 
-        assertEquals(false, testee.viewState.value!!.isTabSwipingEnabled)
+        testee.viewState.test {
+            val state = awaitItem()
+            assertTrue(state.isTabSwipingEnabled)
+        }
     }
 
     @Test
-    fun whenOmnibarIsInEditModeAndBrowserIsNotInFullscreenModeTabSwipingIsDisabled() {
+    fun whenBrowserIsNotInFullscreenModeTabSwipingIsEnabled() = runTest {
+        initSuspendTestee()
+
         swipingTabsFeature.self().setRawStoredState(State(enable = true))
 
         val isFullScreen = false
         testee.onFullScreenModeChanged(isFullScreen)
 
+        testee.viewState.test {
+            val state = awaitItem()
+            assertTrue(state.isTabSwipingEnabled)
+        }
+    }
+
+    @Test
+    fun whenBrowserIsInFullscreenModeTabSwipingIsDisabled() = runTest {
+        initSuspendTestee()
+
+        swipingTabsFeature.self().setRawStoredState(State(enable = true))
+        val isFullScreen = true
+        testee.onFullScreenModeChanged(isFullScreen)
+
+        testee.viewState.test {
+            val state = awaitItem()
+            assertFalse(state.isTabSwipingEnabled)
+        }
+    }
+
+    @Test
+    fun whenOmnibarIsNotInEditModeAndBrowserIsInFullscreenModeTabSwipingIsDisabled() = runTest {
+        initSuspendTestee()
+
+        swipingTabsFeature.self().setRawStoredState(State(enable = true))
+        val isFullScreen = true
+        testee.onFullScreenModeChanged(isFullScreen)
+
+        val isInEditMode = false
+        testee.onOmnibarEditModeChanged(isInEditMode)
+
+        testee.viewState.test {
+            val state = awaitItem()
+            assertFalse(state.isTabSwipingEnabled)
+        }
+    }
+
+    @Test
+    fun whenOmnibarIsInEditModeAndBrowserIsNotInFullscreenModeTabSwipingIsDisabled() = runTest {
+        initSuspendTestee()
+
+        swipingTabsFeature.self().setRawStoredState(State(enable = true))
+        val isFullScreen = false
+        testee.onFullScreenModeChanged(isFullScreen)
+
         val isInEditMode = true
         testee.onOmnibarEditModeChanged(isInEditMode)
 
-        assertEquals(false, testee.viewState.value!!.isTabSwipingEnabled)
+        testee.viewState.test {
+            val state = awaitItem()
+            assertFalse(state.isTabSwipingEnabled)
+        }
     }
 
     @Test
@@ -578,6 +613,29 @@ class BrowserViewModelTest {
     }
 
     private fun initTestee() {
+        testee = BrowserViewModel(
+            tabRepository = mockTabRepository,
+            queryUrlConverter = mockOmnibarEntryConverter,
+            dataClearer = mockAutomaticDataClearer,
+            appEnjoymentPromptEmitter = mockAppEnjoymentPromptEmitter,
+            appEnjoymentUserEventRecorder = mockAppEnjoymentUserEventRecorder,
+            defaultBrowserDetector = mockDefaultBrowserDetector,
+            dispatchers = coroutinesTestRule.testDispatcherProvider,
+            pixel = mockPixel,
+            skipUrlConversionOnNewTabFeature = skipUrlConversionOnNewTabFeature,
+            showOnAppLaunchFeature = fakeShowOnAppLaunchFeatureToggle,
+            showOnAppLaunchOptionHandler = showOnAppLaunchOptionHandler,
+            additionalDefaultBrowserPrompts = mockAdditionalDefaultBrowserPrompts,
+            swipingTabsFeature = swipingTabsFeatureProvider,
+            duckAiFeatureState = mockDuckAIFeatureState,
+        )
+    }
+
+    private suspend fun initSuspendTestee() {
+        whenever(mockTabRepository.add()).thenReturn(TAB_ID)
+        whenever(mockOmnibarEntryConverter.convertQueryToUrl(any(), any(), any(), any())).then { it.arguments.first() }
+        whenever(mockDuckAIFeatureState.showFullScreenMode).thenReturn(mockDuckAiFullScreenMode)
+
         testee = BrowserViewModel(
             tabRepository = mockTabRepository,
             queryUrlConverter = mockOmnibarEntryConverter,

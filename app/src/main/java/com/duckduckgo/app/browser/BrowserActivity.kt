@@ -354,9 +354,11 @@ open class BrowserActivity : DuckDuckGoActivity() {
         // flows only once, so a separate initialization is necessary
         configureFlowCollectors()
 
-        viewModel.viewState.observe(this) {
-            renderer.renderBrowserViewState(it)
-        }
+        viewModel.viewState
+            .flowWithLifecycle(lifecycle, Lifecycle.State.RESUMED)
+            .onEach { renderer.renderBrowserViewState(it) }
+            .launchIn(lifecycleScope)
+
         observeDuckChatSharedCommands()
 
         viewModel.awaitClearDataFinishedNotification()
