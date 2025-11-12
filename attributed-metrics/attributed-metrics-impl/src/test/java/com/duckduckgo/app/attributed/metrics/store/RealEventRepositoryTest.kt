@@ -44,12 +44,10 @@ class RealEventRepositoryTest {
 
     @Before
     fun setup() {
-        db =
-            Room
-                .inMemoryDatabaseBuilder(
-                    InstrumentationRegistry.getInstrumentation().targetContext,
-                    AttributedMetricsDatabase::class.java,
-                ).build()
+        db = Room.inMemoryDatabaseBuilder(
+            InstrumentationRegistry.getInstrumentation().targetContext,
+            AttributedMetricsDatabase::class.java,
+        ).allowMainThreadQueries().build()
         eventDao = db.eventDao()
         testDateProvider = FakeAttributedMetricsDateUtils(LocalDate.of(2025, 10, 3))
         repository =
@@ -157,7 +155,7 @@ class RealEventRepositoryTest {
             repository.deleteAllEvents()
 
             // Wait for the background coroutine to complete
-            advanceUntilIdle()
+            coroutineTestRule.testScope.advanceUntilIdle()
 
             val remainingEvents = eventDao.getEventsByNameAndTimeframe("test_event", "2025-09-03", "2025-10-03")
             assert(remainingEvents.isEmpty())
