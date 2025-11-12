@@ -62,7 +62,7 @@ class DuckDuckGoAppLinksHandler @Inject constructor() : AppLinksHandler {
                     previousUrl = urlString
                     launchAppLink()
                     hasTriggeredForDomain = true
-                    if (shouldTrigger) return true
+                    return shouldTrigger || shouldHaltWebNavigation
                 }
                 return false
             }
