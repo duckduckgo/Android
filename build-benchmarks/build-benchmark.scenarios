@@ -1,0 +1,47 @@
+# Scenario 1: Build
+# Measures warm build performance with warm cache and no changes
+build-warm {
+    title = "build-warm"
+    tasks = ["app:buildInternalDebug"]
+    warm-ups = 4
+    iterations = 5
+}
+
+# Scenario 2: Clean Build
+# Measures cold build performance with no incremental compilation
+build-cold {
+    title = "build-cold"
+    tasks = ["app:buildInternalDebug"]
+    gradle-args = ["--no-build-cache", "--no-configuration-cache"]
+    cleanup-tasks = ["clean"]
+    warm-ups = 2
+    iterations = 4
+}
+
+# Scenario 3: ABI Change
+# Measures incremental build performance when public API changes
+# This triggers recompilation of all dependent modules
+build-abi-change-incremental {
+    title = "build-abi-change-incremental"
+    tasks = ["app:buildInternalDebug"]
+
+    # Apply ABI change to a core utility class
+    apply-abi-change-to = "common/common-utils/src/main/java/com/duckduckgo/common/utils/DispatcherProvider.kt"
+
+    warm-ups = 4
+    iterations = 5
+}
+
+# Scenario 4: Non-ABI Change
+# Measures incremental build performance when only implementation changes
+# Only the modified module needs recompilation
+build-non-abi-change-incremental {
+    title = "build-non-abi-change-incremental"
+    tasks = ["app:buildInternalDebug"]
+
+    # Apply non-ABI change to the same file
+    apply-non-abi-change-to = "common/common-utils/src/main/java/com/duckduckgo/common/utils/DispatcherProvider.kt"
+
+    warm-ups = 4
+    iterations = 5
+}
