@@ -16,12 +16,14 @@
 
 package com.duckduckgo.pir.impl.pixels
 
-import android.content.Context
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.pir.impl.models.Broker
 import com.duckduckgo.pir.impl.models.ProfileQuery
+import com.duckduckgo.pir.impl.models.scheduling.JobRecord.OptOutJobRecord
+import com.duckduckgo.pir.impl.models.scheduling.JobRecord.OptOutJobRecord.OptOutJobStatus
 import com.duckduckgo.pir.impl.store.PirRepository
+import com.duckduckgo.pir.impl.store.PirSchedulingRepository
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule
@@ -43,7 +45,7 @@ class RealOptOut24HourSubmissionSuccessRateReporterTest {
     private val mockCurrentTimeProvider: CurrentTimeProvider = mock()
     private val mockOptOutSubmitRateCalculator: OptOutSubmitRateCalculator = mock()
     private val mockPirPixelSender: PirPixelSender = mock()
-    private val context: Context = mock()
+    private val mockSchedulingRepository: PirSchedulingRepository = mock()
 
     private lateinit var toTest: RealOptOut24HourSubmissionSuccessRateReporter
 
@@ -93,16 +95,24 @@ class RealOptOut24HourSubmissionSuccessRateReporterTest {
             pirRepository = mockPirRepository,
             currentTimeProvider = mockCurrentTimeProvider,
             pirPixelSender = mockPirPixelSender,
+            pirSchedulingRepository = mockSchedulingRepository,
+            dispatcherProvider = coroutineRule.testDispatcherProvider,
         )
     }
 
     @Test
     fun whenFirstRunThenShouldFirePixel() = runTest {
         val now = baseTime
+        val jobRecord = createOptOutJobRecord(
+            extractedProfileId = 1L,
+            brokerName = testBroker1.name,
+        )
+
         whenever(mockPirRepository.getCustomStatsPixelsLastSentMs()).thenReturn(0L)
         whenever(mockCurrentTimeProvider.currentTimeMillis()).thenReturn(now)
         whenever(mockPirRepository.getAllActiveBrokerObjects()).thenReturn(listOf(testBroker1))
         whenever(mockPirRepository.getAllUserProfileQueries()).thenReturn(listOf(testProfileQuery))
+        whenever(mockSchedulingRepository.getAllValidOptOutJobRecords()).thenReturn(listOf(jobRecord))
         whenever(
             mockOptOutSubmitRateCalculator.calculateOptOutSubmitRate(
                 any(),
@@ -139,11 +149,16 @@ class RealOptOut24HourSubmissionSuccessRateReporterTest {
     fun whenMoreThan24HoursPassedThenShouldFirePixel() = runTest {
         val startDate = baseTime
         val now = baseTime + twentyFourHours + oneHour // 25 hours passed
+        val jobRecord = createOptOutJobRecord(
+            extractedProfileId = 1L,
+            brokerName = testBroker1.name,
+        )
 
         whenever(mockPirRepository.getCustomStatsPixelsLastSentMs()).thenReturn(startDate)
         whenever(mockCurrentTimeProvider.currentTimeMillis()).thenReturn(now)
         whenever(mockPirRepository.getAllActiveBrokerObjects()).thenReturn(listOf(testBroker1))
         whenever(mockPirRepository.getAllUserProfileQueries()).thenReturn(listOf(testProfileQuery))
+        whenever(mockSchedulingRepository.getAllValidOptOutJobRecords()).thenReturn(listOf(jobRecord))
         whenever(
             mockOptOutSubmitRateCalculator.calculateOptOutSubmitRate(
                 any(),
@@ -201,6 +216,7 @@ class RealOptOut24HourSubmissionSuccessRateReporterTest {
         whenever(mockCurrentTimeProvider.currentTimeMillis()).thenReturn(now)
         whenever(mockPirRepository.getAllActiveBrokerObjects()).thenReturn(listOf(testBroker1))
         whenever(mockPirRepository.getAllUserProfileQueries()).thenReturn(emptyList())
+        whenever(mockSchedulingRepository.getAllValidOptOutJobRecords()).thenReturn(emptyList())
 
         toTest.attemptFirePixel()
 
@@ -216,6 +232,15 @@ class RealOptOut24HourSubmissionSuccessRateReporterTest {
     @Test
     fun whenMultipleBrokersThenShouldFirePixelForEach() = runTest {
         val now = baseTime
+        val jobRecord1 = createOptOutJobRecord(
+            extractedProfileId = 1L,
+            brokerName = testBroker1.name,
+        )
+        val jobRecord2 = createOptOutJobRecord(
+            extractedProfileId = 2L,
+            brokerName = testBroker2.name,
+        )
+
         whenever(mockPirRepository.getCustomStatsPixelsLastSentMs()).thenReturn(0L)
         whenever(mockCurrentTimeProvider.currentTimeMillis()).thenReturn(now)
         whenever(mockPirRepository.getAllActiveBrokerObjects()).thenReturn(
@@ -225,19 +250,20 @@ class RealOptOut24HourSubmissionSuccessRateReporterTest {
             ),
         )
         whenever(mockPirRepository.getAllUserProfileQueries()).thenReturn(listOf(testProfileQuery))
+        whenever(mockSchedulingRepository.getAllValidOptOutJobRecords()).thenReturn(listOf(jobRecord1, jobRecord2))
         whenever(
             mockOptOutSubmitRateCalculator.calculateOptOutSubmitRate(
-                testBroker1.name,
-                0L,
-                now - twentyFourHours,
+                eq(listOf(jobRecord1)),
+                eq(0L),
+                eq(now - twentyFourHours),
             ),
         )
             .thenReturn(0.5)
         whenever(
             mockOptOutSubmitRateCalculator.calculateOptOutSubmitRate(
-                testBroker2.name,
-                0L,
-                now - twentyFourHours,
+                eq(listOf(jobRecord2)),
+                eq(0L),
+                eq(now - twentyFourHours),
             ),
         )
             .thenReturn(0.8)
@@ -258,6 +284,15 @@ class RealOptOut24HourSubmissionSuccessRateReporterTest {
     @Test
     fun whenSuccessRateIsNullThenShouldNotFirePixelForThatBroker() = runTest {
         val now = baseTime
+        val jobRecord1 = createOptOutJobRecord(
+            extractedProfileId = 1L,
+            brokerName = testBroker1.name,
+        )
+        val jobRecord2 = createOptOutJobRecord(
+            extractedProfileId = 2L,
+            brokerName = testBroker2.name,
+        )
+
         whenever(mockPirRepository.getCustomStatsPixelsLastSentMs()).thenReturn(0L)
         whenever(mockCurrentTimeProvider.currentTimeMillis()).thenReturn(now)
         whenever(mockPirRepository.getAllActiveBrokerObjects()).thenReturn(
@@ -267,19 +302,20 @@ class RealOptOut24HourSubmissionSuccessRateReporterTest {
             ),
         )
         whenever(mockPirRepository.getAllUserProfileQueries()).thenReturn(listOf(testProfileQuery))
+        whenever(mockSchedulingRepository.getAllValidOptOutJobRecords()).thenReturn(listOf(jobRecord1, jobRecord2))
         whenever(
             mockOptOutSubmitRateCalculator.calculateOptOutSubmitRate(
-                testBroker1.name,
-                0L,
-                now - twentyFourHours,
+                eq(listOf(jobRecord1)),
+                eq(0L),
+                eq(now - twentyFourHours),
             ),
         )
             .thenReturn(0.5)
         whenever(
             mockOptOutSubmitRateCalculator.calculateOptOutSubmitRate(
-                testBroker2.name,
-                0L,
-                now - twentyFourHours,
+                eq(listOf(jobRecord2)),
+                eq(0L),
+                eq(now - twentyFourHours),
             ),
         )
             .thenReturn(null)
@@ -300,10 +336,16 @@ class RealOptOut24HourSubmissionSuccessRateReporterTest {
     @Test
     fun whenAllSuccessRatesAreNullThenShouldNotFireAnyPixels() = runTest {
         val now = baseTime
+        val jobRecord = createOptOutJobRecord(
+            extractedProfileId = 1L,
+            brokerName = testBroker1.name,
+        )
+
         whenever(mockPirRepository.getCustomStatsPixelsLastSentMs()).thenReturn(0L)
         whenever(mockCurrentTimeProvider.currentTimeMillis()).thenReturn(now)
         whenever(mockPirRepository.getAllActiveBrokerObjects()).thenReturn(listOf(testBroker1))
         whenever(mockPirRepository.getAllUserProfileQueries()).thenReturn(listOf(testProfileQuery))
+        whenever(mockSchedulingRepository.getAllValidOptOutJobRecords()).thenReturn(listOf(jobRecord))
         whenever(
             mockOptOutSubmitRateCalculator.calculateOptOutSubmitRate(
                 any(),
@@ -323,11 +365,16 @@ class RealOptOut24HourSubmissionSuccessRateReporterTest {
         val startDate = baseTime
         val now = baseTime + twentyFourHours + oneHour
         val expectedEndDate = now - twentyFourHours
+        val jobRecord = createOptOutJobRecord(
+            extractedProfileId = 1L,
+            brokerName = testBroker1.name,
+        )
 
         whenever(mockPirRepository.getCustomStatsPixelsLastSentMs()).thenReturn(startDate)
         whenever(mockCurrentTimeProvider.currentTimeMillis()).thenReturn(now)
         whenever(mockPirRepository.getAllActiveBrokerObjects()).thenReturn(listOf(testBroker1))
         whenever(mockPirRepository.getAllUserProfileQueries()).thenReturn(listOf(testProfileQuery))
+        whenever(mockSchedulingRepository.getAllValidOptOutJobRecords()).thenReturn(listOf(jobRecord))
         whenever(
             mockOptOutSubmitRateCalculator.calculateOptOutSubmitRate(
                 any(),
@@ -339,9 +386,9 @@ class RealOptOut24HourSubmissionSuccessRateReporterTest {
         toTest.attemptFirePixel()
 
         verify(mockOptOutSubmitRateCalculator).calculateOptOutSubmitRate(
-            brokerName = testBroker1.name,
-            startDateMs = startDate,
-            endDateMs = expectedEndDate,
+            allActiveOptOutJobsForBroker = eq(listOf(jobRecord)),
+            startDateMs = eq(startDate),
+            endDateMs = eq(expectedEndDate),
         )
         verify(mockPirRepository).setCustomStatsPixelsLastSentMs(expectedEndDate)
     }
@@ -349,6 +396,15 @@ class RealOptOut24HourSubmissionSuccessRateReporterTest {
     @Test
     fun whenMultipleBrokersWithMixedSuccessRatesThenFiresPixelsForNonNullRates() = runTest {
         val now = baseTime
+        val jobRecord1 = createOptOutJobRecord(
+            extractedProfileId = 1L,
+            brokerName = testBroker1.name,
+        )
+        val jobRecord2 = createOptOutJobRecord(
+            extractedProfileId = 2L,
+            brokerName = testBroker2.name,
+        )
+
         whenever(mockPirRepository.getCustomStatsPixelsLastSentMs()).thenReturn(0L)
         whenever(mockCurrentTimeProvider.currentTimeMillis()).thenReturn(now)
         whenever(mockPirRepository.getAllActiveBrokerObjects()).thenReturn(
@@ -358,19 +414,20 @@ class RealOptOut24HourSubmissionSuccessRateReporterTest {
             ),
         )
         whenever(mockPirRepository.getAllUserProfileQueries()).thenReturn(listOf(testProfileQuery))
+        whenever(mockSchedulingRepository.getAllValidOptOutJobRecords()).thenReturn(listOf(jobRecord1, jobRecord2))
         whenever(
             mockOptOutSubmitRateCalculator.calculateOptOutSubmitRate(
-                testBroker1.name,
-                0L,
-                now - twentyFourHours,
+                eq(listOf(jobRecord1)),
+                eq(0L),
+                eq(now - twentyFourHours),
             ),
         )
             .thenReturn(null)
         whenever(
             mockOptOutSubmitRateCalculator.calculateOptOutSubmitRate(
-                testBroker2.name,
-                0L,
-                now - twentyFourHours,
+                eq(listOf(jobRecord2)),
+                eq(0L),
+                eq(now - twentyFourHours),
             ),
         )
             .thenReturn(0.9)
@@ -433,6 +490,7 @@ class RealOptOut24HourSubmissionSuccessRateReporterTest {
         whenever(mockCurrentTimeProvider.currentTimeMillis()).thenReturn(now)
         whenever(mockPirRepository.getAllActiveBrokerObjects()).thenReturn(listOf(testBroker1))
         whenever(mockPirRepository.getAllUserProfileQueries()).thenReturn(emptyList())
+        whenever(mockSchedulingRepository.getAllValidOptOutJobRecords()).thenReturn(emptyList())
 
         toTest.attemptFirePixel()
 
@@ -443,5 +501,71 @@ class RealOptOut24HourSubmissionSuccessRateReporterTest {
         )
         verify(mockPirPixelSender, never()).reportBrokerCustomStateOptOutSubmitRate(any(), any())
         verify(mockPirRepository, never()).setCustomStatsPixelsLastSentMs(any())
+    }
+
+    @Test
+    fun whenBrokerHasNoJobRecordsThenSkipsThatBroker() = runTest {
+        val now = baseTime
+        val jobRecord = createOptOutJobRecord(
+            extractedProfileId = 1L,
+            brokerName = testBroker1.name,
+        )
+
+        whenever(mockPirRepository.getCustomStatsPixelsLastSentMs()).thenReturn(0L)
+        whenever(mockCurrentTimeProvider.currentTimeMillis()).thenReturn(now)
+        whenever(mockPirRepository.getAllActiveBrokerObjects()).thenReturn(
+            listOf(
+                testBroker1,
+                testBroker2, // This broker has no job records
+            ),
+        )
+        whenever(mockPirRepository.getAllUserProfileQueries()).thenReturn(listOf(testProfileQuery))
+        whenever(mockSchedulingRepository.getAllValidOptOutJobRecords()).thenReturn(listOf(jobRecord)) // Only for broker1
+        whenever(
+            mockOptOutSubmitRateCalculator.calculateOptOutSubmitRate(
+                eq(listOf(jobRecord)),
+                eq(0L),
+                eq(now - twentyFourHours),
+            ),
+        ).thenReturn(0.5)
+
+        toTest.attemptFirePixel()
+
+        // Only broker1 should fire pixel, broker2 should be skipped
+        verify(mockPirPixelSender).reportBrokerCustomStateOptOutSubmitRate(
+            brokerUrl = testBroker1.url,
+            optOutSuccessRate = 0.5,
+        )
+        verify(mockPirPixelSender, never()).reportBrokerCustomStateOptOutSubmitRate(
+            brokerUrl = eq(testBroker2.url),
+            optOutSuccessRate = any(),
+        )
+        verify(mockPirRepository).setCustomStatsPixelsLastSentMs(now - twentyFourHours)
+    }
+
+    private fun createOptOutJobRecord(
+        extractedProfileId: Long,
+        brokerName: String = testBroker1.name,
+        userProfileId: Long = 1L,
+        status: OptOutJobStatus = OptOutJobStatus.NOT_EXECUTED,
+        dateCreatedInMillis: Long = baseTime,
+        optOutRequestedDateInMillis: Long = 0L,
+        optOutRemovedDateInMillis: Long = 0L,
+        attemptCount: Int = 0,
+        lastOptOutAttemptDateInMillis: Long = 0L,
+        deprecated: Boolean = false,
+    ): OptOutJobRecord {
+        return OptOutJobRecord(
+            brokerName = brokerName,
+            userProfileId = userProfileId,
+            extractedProfileId = extractedProfileId,
+            status = status,
+            attemptCount = attemptCount,
+            lastOptOutAttemptDateInMillis = lastOptOutAttemptDateInMillis,
+            optOutRequestedDateInMillis = optOutRequestedDateInMillis,
+            optOutRemovedDateInMillis = optOutRemovedDateInMillis,
+            deprecated = deprecated,
+            dateCreatedInMillis = dateCreatedInMillis,
+        )
     }
 }

@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 15,
-    "identityHash": "584648b8b3065521786fb33f44214f2e",
+    "identityHash": "a5782d19654dee4cad932b458037bb37",
     "entities": [
       {
         "tableName": "pir_broker_json_etag",
@@ -696,7 +696,7 @@
       },
       {
         "tableName": "pir_optout_job_record",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`extractedProfileId` INTEGER NOT NULL, `brokerName` TEXT NOT NULL, `userProfileId` INTEGER NOT NULL, `status` TEXT NOT NULL, `attemptCount` INTEGER NOT NULL, `lastOptOutAttemptDate` INTEGER, `optOutRequestedDate` INTEGER NOT NULL, `optOutRemovedDate` INTEGER NOT NULL, `deprecated` INTEGER NOT NULL, `dateCreatedInMillis` INTEGER NOT NULL, PRIMARY KEY(`extractedProfileId`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`extractedProfileId` INTEGER NOT NULL, `brokerName` TEXT NOT NULL, `userProfileId` INTEGER NOT NULL, `status` TEXT NOT NULL, `attemptCount` INTEGER NOT NULL, `lastOptOutAttemptDate` INTEGER, `optOutRequestedDate` INTEGER NOT NULL, `optOutRemovedDate` INTEGER NOT NULL, `deprecated` INTEGER NOT NULL, `dateCreatedInMillis` INTEGER NOT NULL, `reporting_sevenDayConfirmationReportSentDateMs` INTEGER NOT NULL, `reporting_fourteenDayConfirmationReportSentDateMs` INTEGER NOT NULL, `reporting_twentyOneDayConfirmationReportSentDateMs` INTEGER NOT NULL, `reporting_fortyTwoDayConfirmationReportSentDateMs` INTEGER NOT NULL, PRIMARY KEY(`extractedProfileId`))",
         "fields": [
           {
             "fieldPath": "extractedProfileId",
@@ -755,6 +755,30 @@
           {
             "fieldPath": "dateCreatedInMillis",
             "columnName": "dateCreatedInMillis",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "reporting.sevenDayConfirmationReportSentDateMs",
+            "columnName": "reporting_sevenDayConfirmationReportSentDateMs",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "reporting.fourteenDayConfirmationReportSentDateMs",
+            "columnName": "reporting_fourteenDayConfirmationReportSentDateMs",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "reporting.twentyOneDayConfirmationReportSentDateMs",
+            "columnName": "reporting_twentyOneDayConfirmationReportSentDateMs",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "reporting.fortyTwoDayConfirmationReportSentDateMs",
+            "columnName": "reporting_fortyTwoDayConfirmationReportSentDateMs",
             "affinity": "INTEGER",
             "notNull": true
           }
@@ -946,7 +970,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '584648b8b3065521786fb33f44214f2e')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'a5782d19654dee4cad932b458037bb37')"
     ]
   }
 }

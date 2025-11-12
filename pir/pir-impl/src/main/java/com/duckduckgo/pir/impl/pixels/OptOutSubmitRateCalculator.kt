@@ -18,9 +18,9 @@ package com.duckduckgo.pir.impl.pixels
 
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.pir.impl.models.scheduling.JobRecord
 import com.duckduckgo.pir.impl.models.scheduling.JobRecord.OptOutJobRecord.OptOutJobStatus.REMOVED
 import com.duckduckgo.pir.impl.models.scheduling.JobRecord.OptOutJobRecord.OptOutJobStatus.REQUESTED
-import com.duckduckgo.pir.impl.store.PirSchedulingRepository
 import com.squareup.anvil.annotations.ContributesBinding
 import kotlinx.coroutines.withContext
 import java.util.concurrent.TimeUnit
@@ -31,12 +31,12 @@ interface OptOutSubmitRateCalculator {
     /**
      * Calculates the opt-out 24h submit rate for a given broker within the specified date range.
      *
-     * @param brokerName name of the broker to calculate the opt-out submit rate for.
+     * @param allActiveOptOutJobsForBroker all active opt-out job records for the broker.
      * @param startDateMs The opt-out records to include should be created on or after this date. Default is 0L (epoch).
      * @param endDateMs tThe opt-out records to include should be created on or before this date. Default is 0L (epoch).
      */
     suspend fun calculateOptOutSubmitRate(
-        brokerName: String,
+        allActiveOptOutJobsForBroker: List<JobRecord.OptOutJobRecord>,
         startDateMs: Long = 0L,
         endDateMs: Long,
     ): Double?
@@ -45,16 +45,15 @@ interface OptOutSubmitRateCalculator {
 @ContributesBinding(AppScope::class)
 class RealOptOutSubmitRateCalculator @Inject constructor(
     private val dispatcherProvider: DispatcherProvider,
-    private val schedulingRepository: PirSchedulingRepository,
 ) : OptOutSubmitRateCalculator {
     override suspend fun calculateOptOutSubmitRate(
-        brokerName: String,
+        allActiveOptOutJobsForBroker: List<JobRecord.OptOutJobRecord>,
         startDateMs: Long,
         endDateMs: Long,
     ): Double? = withContext(dispatcherProvider.io()) {
         // Get all opt out job records created within the given range for the specified broker
-        val recordsCreatedWithinRange = schedulingRepository.getAllValidOptOutJobRecordsForBroker(brokerName).filter {
-            it.brokerName == brokerName && it.dateCreatedInMillis in startDateMs..endDateMs
+        val recordsCreatedWithinRange = allActiveOptOutJobsForBroker.filter {
+            it.dateCreatedInMillis in startDateMs..endDateMs
         }
 
         // We don't need to calculate the rate if there are no records
@@ -68,7 +67,8 @@ class RealOptOutSubmitRateCalculator @Inject constructor(
                 )
         }
 
-        val optOutSuccessRate = requestedRecordsWithinRange.size.toDouble() / recordsCreatedWithinRange.size.toDouble()
+        val optOutSuccessRate =
+            requestedRecordsWithinRange.size.toDouble() / recordsCreatedWithinRange.size.toDouble()
         val roundedOptOutSuccessRate = round(optOutSuccessRate * 100) / 100
         return@withContext roundedOptOutSuccessRate
     }

@@ -27,6 +27,7 @@ import com.duckduckgo.pir.impl.store.db.BrokerJsonDao
 import com.duckduckgo.pir.impl.store.db.EmailConfirmationJobRecordEntity
 import com.duckduckgo.pir.impl.store.db.JobSchedulingDao
 import com.duckduckgo.pir.impl.store.db.OptOutJobRecordEntity
+import com.duckduckgo.pir.impl.store.db.ReportingRecord
 import com.duckduckgo.pir.impl.store.db.ScanJobRecordEntity
 import com.duckduckgo.pir.impl.store.secure.PirSecureStorageDatabaseFactory
 import kotlinx.coroutines.runBlocking
@@ -103,6 +104,7 @@ class RealPirSchedulingRepositoryTest {
             optOutRequestedDate = 2000L,
             optOutRemovedDate = 0L,
             dateCreatedInMillis = 100L,
+            reporting = ReportingRecord(),
         )
 
     private val deprecatedOptOutJobEntity =
@@ -117,6 +119,7 @@ class RealPirSchedulingRepositoryTest {
             optOutRequestedDate = 4000L,
             optOutRemovedDate = 0L,
             dateCreatedInMillis = 100L,
+            reporting = ReportingRecord(),
         )
 
     private val scanJobRecord =
@@ -405,6 +408,7 @@ class RealPirSchedulingRepositoryTest {
                     optOutRequestedDate = 2000L,
                     optOutRemovedDate = 0L,
                     dateCreatedInMillis = 9000L,
+                    reporting = ReportingRecord(),
                 ),
             )
         }
@@ -439,6 +443,7 @@ class RealPirSchedulingRepositoryTest {
                         optOutRequestedDate = 2000L,
                         optOutRemovedDate = 0L,
                         dateCreatedInMillis = 9000L,
+                        reporting = ReportingRecord(),
                     ),
                     OptOutJobRecordEntity(
                         extractedProfileId = 999L,
@@ -450,6 +455,7 @@ class RealPirSchedulingRepositoryTest {
                         optOutRequestedDate = 4000L,
                         optOutRemovedDate = 5000L,
                         dateCreatedInMillis = 9000L,
+                        reporting = ReportingRecord(),
                     ),
                 ),
             )
