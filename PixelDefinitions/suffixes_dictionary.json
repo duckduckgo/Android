@@ -7,10 +7,10 @@
         "description": "Pixel schedule type",
         "enum": ["first", "daily", "count"]
     },
-    "first_daily_count_short": {
+    "daily_count_short": {
         "type": "string",
-        "description": "Pixel schedule type",
-        "enum": ["u", "d", "c"]
+        "description": "Pixel schedule type - d=daily, c=count.",
+        "enum": ["d", "c"]
     },
     "form_factor": {
         "type": "string",

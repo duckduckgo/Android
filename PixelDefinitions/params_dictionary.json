@@ -51,7 +51,7 @@
         "enum": ["app"]
     },
     "widePixelFormFactor": {
-        "key": "global.form_factor",
+        "key": "app.form_factor",
         "type": "string",
         "description": "The form factor of the current device",
         "enum": ["phone", "tablet"]
