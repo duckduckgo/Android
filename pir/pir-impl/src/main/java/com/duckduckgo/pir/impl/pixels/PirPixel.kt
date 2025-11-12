@@ -150,6 +150,15 @@ enum class PirPixel(
     PIR_BROKER_CUSTOM_STATS_7DAY_UNCONFIRMED_OPTOUT(
         baseName = "dbp_optoutjob_at-7-days_unconfirmed",
         type = Count,
+    ),
+    PIR_BROKER_CUSTOM_STATS_14DAY_CONFIRMED_OPTOUT(
+        baseName = "dbp_optoutjob_at-14-days_confirmed",
+        type = Count,
+    ),
+
+    PIR_BROKER_CUSTOM_STATS_14DAY_UNCONFIRMED_OPTOUT(
+        baseName = "dbp_optoutjob_at-14-days_unconfirmed",
+        type = Count,
     ), ;
 
     constructor(
