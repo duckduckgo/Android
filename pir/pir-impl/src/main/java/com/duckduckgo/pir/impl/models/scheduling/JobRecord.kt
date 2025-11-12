@@ -55,6 +55,7 @@ sealed class JobRecord(
         val optOutRequestedDateInMillis: Long = 0L,
         val optOutRemovedDateInMillis: Long = 0L,
         val deprecated: Boolean = false,
+        val dateCreatedInMillis: Long = 0L,
     ) : JobRecord(brokerName, userProfileId) {
         enum class OptOutJobStatus {
             /** Opt-out has not been executed yet and should be executed when possible */
@@ -90,6 +91,7 @@ sealed class JobRecord(
         val status: ScanJobStatus = ScanJobStatus.NOT_EXECUTED,
         val lastScanDateInMillis: Long = 0L,
         val deprecated: Boolean = false,
+        val dateCreatedInMillis: Long = 0L,
     ) : JobRecord(brokerName, userProfileId) {
         enum class ScanJobStatus {
             /** Scan has not been executed yet and should be executed when possible */

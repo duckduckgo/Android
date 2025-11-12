@@ -135,6 +135,11 @@ enum class PirPixel(
     PIR_OPTOUT_SUBMIT_FAILURE(
         baseName = "dbp_optout_process_failure",
         types = setOf(Count),
+    ),
+
+    PIR_BROKER_CUSTOM_STATS_OPTOUT_SUBMIT_SUCCESSRATE(
+        baseName = "dbp_databroker_custom_stats_optoutsubmit",
+        type = Count,
     ), ;
 
     constructor(

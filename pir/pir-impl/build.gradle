@@ -70,6 +70,7 @@ dependencies {
     testImplementation AndroidX.test.ext.junit
     testImplementation Testing.robolectric
     testImplementation "androidx.lifecycle:lifecycle-runtime-testing:_"
+    testImplementation AndroidX.work.testing
     testImplementation(KotlinX.coroutines.test) {
         // https://github.com/Kotlin/kotlinx.coroutines/issues/2023
         // conflicts with mockito due to direct inclusion of byte buddy

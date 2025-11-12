@@ -79,6 +79,7 @@ class RealPirSchedulingRepositoryTest {
             userProfileId = 123L,
             status = ScanJobStatus.NOT_EXECUTED.name,
             lastScanDateInMillis = 1000L,
+            dateCreatedInMillis = 100L,
         )
 
     private val deprecatedScanJobEntity =
@@ -88,6 +89,7 @@ class RealPirSchedulingRepositoryTest {
             status = ScanJobStatus.MATCHES_FOUND.name,
             deprecated = true,
             lastScanDateInMillis = 2000L,
+            dateCreatedInMillis = 100L,
         )
 
     private val validOptOutJobEntity =
@@ -100,6 +102,7 @@ class RealPirSchedulingRepositoryTest {
             lastOptOutAttemptDate = 1000L,
             optOutRequestedDate = 2000L,
             optOutRemovedDate = 0L,
+            dateCreatedInMillis = 100L,
         )
 
     private val deprecatedOptOutJobEntity =
@@ -113,6 +116,7 @@ class RealPirSchedulingRepositoryTest {
             lastOptOutAttemptDate = 3000L,
             optOutRequestedDate = 4000L,
             optOutRemovedDate = 0L,
+            dateCreatedInMillis = 100L,
         )
 
     private val scanJobRecord =
@@ -243,6 +247,7 @@ class RealPirSchedulingRepositoryTest {
                     userProfileId = 123L,
                     status = "NOT_EXECUTED",
                     lastScanDateInMillis = 1000L,
+                    dateCreatedInMillis = 9000L,
                 ),
             )
         }
@@ -268,12 +273,14 @@ class RealPirSchedulingRepositoryTest {
                         userProfileId = 123L,
                         status = "NOT_EXECUTED",
                         lastScanDateInMillis = 1000L,
+                        dateCreatedInMillis = 9000L,
                     ),
                     ScanJobRecordEntity(
                         brokerName = "another-broker",
                         userProfileId = 456L,
                         status = "MATCHES_FOUND",
                         lastScanDateInMillis = 5000L,
+                        dateCreatedInMillis = 9000L,
                     ),
                 ),
             )
@@ -397,6 +404,7 @@ class RealPirSchedulingRepositoryTest {
                     lastOptOutAttemptDate = 1000L,
                     optOutRequestedDate = 2000L,
                     optOutRemovedDate = 0L,
+                    dateCreatedInMillis = 9000L,
                 ),
             )
         }
@@ -430,6 +438,7 @@ class RealPirSchedulingRepositoryTest {
                         lastOptOutAttemptDate = 1000L,
                         optOutRequestedDate = 2000L,
                         optOutRemovedDate = 0L,
+                        dateCreatedInMillis = 9000L,
                     ),
                     OptOutJobRecordEntity(
                         extractedProfileId = 999L,
@@ -440,6 +449,7 @@ class RealPirSchedulingRepositoryTest {
                         lastOptOutAttemptDate = 3000L,
                         optOutRequestedDate = 4000L,
                         optOutRemovedDate = 5000L,
+                        dateCreatedInMillis = 9000L,
                     ),
                 ),
             )

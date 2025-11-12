@@ -29,6 +29,7 @@ data class ScanJobRecordEntity(
     val status: String,
     val lastScanDateInMillis: Long? = null,
     val deprecated: Boolean = false,
+    val dateCreatedInMillis: Long,
 )
 
 @Entity(tableName = "pir_optout_job_record")
@@ -42,6 +43,7 @@ data class OptOutJobRecordEntity(
     val optOutRequestedDate: Long = 0L,
     val optOutRemovedDate: Long = 0L,
     val deprecated: Boolean = false,
+    val dateCreatedInMillis: Long,
 )
 
 @Entity(tableName = "pir_email_confirmation_job_record")

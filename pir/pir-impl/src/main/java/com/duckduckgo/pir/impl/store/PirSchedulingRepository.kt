@@ -61,6 +61,11 @@ interface PirSchedulingRepository {
     suspend fun getAllValidOptOutJobRecords(): List<OptOutJobRecord>
 
     /**
+     * Returns all ScanJobRecord whose state is not INVALID for a specific broker
+     */
+    suspend fun getAllValidOptOutJobRecordsForBroker(brokerName: String): List<OptOutJobRecord>
+
+    /**
      * Returns a matching [OptOutJobRecord] whose state is not INVALID
      *
      * @param includeDeprecated If true, will also return deprecated jobs (used to run opt-out jobs on profiles that have been removed)
@@ -175,6 +180,16 @@ class RealPirSchedulingRepository @Inject constructor(
         withContext(dispatcherProvider.io()) {
             return@withContext jobSchedulingDao()
                 ?.getAllOptOutJobRecords()
+                ?.map { record -> record.toRecord() }
+                // do not pick-up deprecated jobs as they belong to removed profiles
+                ?.filter { !it.deprecated }
+                .orEmpty()
+        }
+
+    override suspend fun getAllValidOptOutJobRecordsForBroker(brokerName: String): List<OptOutJobRecord> =
+        withContext(dispatcherProvider.io()) {
+            return@withContext jobSchedulingDao()
+                ?.getAllOptOutJobRecordsForBroker(brokerName)
                 ?.map { record -> record.toRecord() }
                 // do not pick-up deprecated jobs as they belong to removed profiles
                 ?.filter { !it.deprecated }
@@ -311,6 +326,7 @@ class RealPirSchedulingRepository @Inject constructor(
             status = ScanJobStatus.entries.find { it.name == this.status } ?: ScanJobStatus.ERROR,
             lastScanDateInMillis = this.lastScanDateInMillis ?: 0L,
             deprecated = this.deprecated,
+            dateCreatedInMillis = this.dateCreatedInMillis,
         )
 
     private fun ScanJobRecord.toEntity(): ScanJobRecordEntity =
@@ -320,6 +336,11 @@ class RealPirSchedulingRepository @Inject constructor(
             status = this.status.name,
             lastScanDateInMillis = this.lastScanDateInMillis,
             deprecated = this.deprecated,
+            dateCreatedInMillis = if (this.dateCreatedInMillis != 0L) {
+                this.dateCreatedInMillis
+            } else {
+                currentTimeProvider.currentTimeMillis()
+            },
         )
 
     private fun OptOutJobRecordEntity.toRecord(): OptOutJobRecord =
@@ -333,6 +354,7 @@ class RealPirSchedulingRepository @Inject constructor(
             optOutRequestedDateInMillis = this.optOutRequestedDate,
             optOutRemovedDateInMillis = this.optOutRemovedDate,
             deprecated = this.deprecated,
+            dateCreatedInMillis = this.dateCreatedInMillis,
         )
 
     private fun OptOutJobRecord.toEntity(): OptOutJobRecordEntity =
@@ -346,6 +368,11 @@ class RealPirSchedulingRepository @Inject constructor(
             optOutRequestedDate = this.optOutRequestedDateInMillis,
             optOutRemovedDate = this.optOutRemovedDateInMillis,
             deprecated = this.deprecated,
+            dateCreatedInMillis = if (this.dateCreatedInMillis != 0L) {
+                this.dateCreatedInMillis
+            } else {
+                currentTimeProvider.currentTimeMillis()
+            },
         )
 
     private fun EmailConfirmationJobRecord.toEntity(): EmailConfirmationJobRecordEntity =

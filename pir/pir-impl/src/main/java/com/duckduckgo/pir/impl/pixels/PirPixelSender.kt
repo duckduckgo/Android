@@ -18,6 +18,7 @@ package com.duckduckgo.pir.impl.pixels
 
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_BROKER_CUSTOM_STATS_OPTOUT_SUBMIT_SUCCESSRATE
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_EMAIL_CONFIRMATION_ATTEMPT_FAILED
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_EMAIL_CONFIRMATION_ATTEMPT_START
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_EMAIL_CONFIRMATION_ATTEMPT_SUCCESS
@@ -321,6 +322,17 @@ interface PirPixelSender {
      * Emits a pixel to signal that PIR encrypted database is unavailable.
      */
     fun reportSecureStorageUnavailable()
+
+    /**
+     * Emits a pixel containing the opt-out submit success rate for a broker for the last 24 hours
+     *
+     * @param brokerUrl url of the Broker for which the opt-out submit rate is for
+     * @param optOutSuccessRate opt out submit success rate for the past 24 hours
+     */
+    fun reportBrokerCustomStateOptOutSubmitRate(
+        brokerUrl: String,
+        optOutSuccessRate: Double,
+    )
 }
 
 @ContributesBinding(AppScope::class)
@@ -603,6 +615,18 @@ class RealPirPixelSender @Inject constructor(
         fire(PIR_INTERNAL_SECURE_STORAGE_UNAVAILABLE)
     }
 
+    override fun reportBrokerCustomStateOptOutSubmitRate(
+        brokerUrl: String,
+        optOutSuccessRate: Double,
+    ) {
+        val params = mapOf(
+            PARAM_KEY_BROKER to brokerUrl,
+            PARAM_KEY_OPTOUT_SUBMIT_SUCCESS_RATE to optOutSuccessRate.toString(),
+        )
+
+        fire(PIR_BROKER_CUSTOM_STATS_OPTOUT_SUBMIT_SUCCESSRATE, params)
+    }
+
     private fun fire(
         pixel: PirPixel,
         params: Map<String, String> = emptyMap(),
@@ -638,5 +662,6 @@ class RealPirPixelSender @Inject constructor(
         private const val PARAM_KEY_STAGE = "stage"
         private const val PARAM_KEY_PATTERN = "pattern"
         private const val PARAM_KEY_ACTION_TYPE = "action_type"
+        private const val PARAM_KEY_OPTOUT_SUBMIT_SUCCESS_RATE = "optout_submit_success_rate"
     }
 }
