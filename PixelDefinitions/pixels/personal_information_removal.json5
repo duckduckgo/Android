@@ -176,5 +176,33 @@
                 "type": "string"
             }
         ]
+    },
+    "dbp_optoutjob_at-14-days_confirmed": {
+        "description": "Pixel that contains if any submitted opt-out has been confirmed 14 days after submission.",
+        "owners": ["karlenDimla", "landomen"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "data_broker",
+                "description": "The URL of the data broker that has a confirmed opt-out after 14 days",
+                "type": "string"
+            }
+        ]
+    },
+    "dbp_optoutjob_at-14-days_unconfirmed": {
+        "description": "Pixel that contains if any submitted opt-out are still unconfirmed 14 days after submission.",
+        "owners": ["karlenDimla", "landomen"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "data_broker",
+                "description": "The URL of the data broker that has an unconfirmed opt-out after 14 days",
+                "type": "string"
+            }
+        ]
     }
 }
