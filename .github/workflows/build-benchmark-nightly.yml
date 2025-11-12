@@ -1,6 +1,9 @@
 name: Build Benchmark - Nightly
 
 on:
+  push:
+    branches:
+      - feature/lukasz-p/ci-build-times-test
   schedule:
     # Run nightly at 2 AM UTC
     - cron: '0 2 * * *'
