@@ -22,6 +22,8 @@ import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_BROKER_CUSTOM_STATS_14DAY_CON
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_BROKER_CUSTOM_STATS_14DAY_UNCONFIRMED_OPTOUT
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_BROKER_CUSTOM_STATS_21DAY_CONFIRMED_OPTOUT
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_BROKER_CUSTOM_STATS_21DAY_UNCONFIRMED_OPTOUT
+import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_BROKER_CUSTOM_STATS_42DAY_CONFIRMED_OPTOUT
+import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_BROKER_CUSTOM_STATS_42DAY_UNCONFIRMED_OPTOUT
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_BROKER_CUSTOM_STATS_7DAY_CONFIRMED_OPTOUT
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_BROKER_CUSTOM_STATS_7DAY_UNCONFIRMED_OPTOUT
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_BROKER_CUSTOM_STATS_OPTOUT_SUBMIT_SUCCESSRATE
@@ -369,6 +371,16 @@ interface PirPixelSender {
      * Emits a pixel when an opt-out is unconfirmed within 21 days.
      */
     fun reportBrokerOptOutUnconfirmed21Days(brokerUrl: String)
+
+    /**
+     * Emits a pixel when an opt-out has been confirmed within 42 days.
+     */
+    fun reportBrokerOptOutConfirmed42Days(brokerUrl: String)
+
+    /**
+     * Emits a pixel when an opt-out is unconfirmed within 42 days.
+     */
+    fun reportBrokerOptOutUnconfirmed42Days(brokerUrl: String)
 }
 
 @ContributesBinding(AppScope::class)
@@ -709,6 +721,22 @@ class RealPirPixelSender @Inject constructor(
         )
 
         fire(PIR_BROKER_CUSTOM_STATS_21DAY_UNCONFIRMED_OPTOUT, params)
+    }
+
+    override fun reportBrokerOptOutConfirmed42Days(brokerUrl: String) {
+        val params = mapOf(
+            PARAM_KEY_BROKER to brokerUrl,
+        )
+
+        fire(PIR_BROKER_CUSTOM_STATS_42DAY_CONFIRMED_OPTOUT, params)
+    }
+
+    override fun reportBrokerOptOutUnconfirmed42Days(brokerUrl: String) {
+        val params = mapOf(
+            PARAM_KEY_BROKER to brokerUrl,
+        )
+
+        fire(PIR_BROKER_CUSTOM_STATS_42DAY_UNCONFIRMED_OPTOUT, params)
     }
 
     private fun fire(
