@@ -130,4 +130,16 @@ interface JobSchedulingDao {
         extractedProfileId: Long,
         newDate: Long,
     )
+
+    @Query(
+        """
+    UPDATE pir_optout_job_record
+    SET reporting_fourteenDayConfirmationReportSentDateMs = :newDate
+    WHERE extractedProfileId = :extractedProfileId
+    """,
+    )
+    fun update14DayConfirmationReportSentDate(
+        extractedProfileId: Long,
+        newDate: Long,
+    )
 }

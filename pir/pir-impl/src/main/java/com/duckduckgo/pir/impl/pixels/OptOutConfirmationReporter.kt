@@ -51,29 +51,55 @@ class RealOptOutConfirmationReporter @Inject constructor(
 
             if (activeBrokers.isEmpty() || allValidRequestedOptOutJobs.isEmpty()) return@withContext
 
-            attemptFire7dayPixel(allValidRequestedOptOutJobs, activeBrokers)
+            allValidRequestedOptOutJobs.also {
+                it.attemptFirePixelForConfirmationDay(
+                    activeBrokers,
+                    7,
+                    { jobRecord -> jobRecord.confirmation7dayReportSentDateMs == 0L },
+                    { brokerUrl -> pixelSender.reportBrokerOptOutConfirmed7Days(brokerUrl) },
+                    { brokerUrl -> pixelSender.reportBrokerOptOutUnconfirmed7Days(brokerUrl) },
+                    { jobRecord, now ->
+                        pirSchedulingRepository.markOptOutDay7ConfirmationPixelSent(jobRecord.extractedProfileId, now)
+                    },
+                )
+
+                it.attemptFirePixelForConfirmationDay(
+                    activeBrokers,
+                    14,
+                    { jobRecord -> jobRecord.confirmation14dayReportSentDateMs == 0L },
+                    { brokerUrl -> pixelSender.reportBrokerOptOutConfirmed14Days(brokerUrl) },
+                    { brokerUrl -> pixelSender.reportBrokerOptOutUnconfirmed14Days(brokerUrl) },
+                    { jobRecord, now ->
+                        pirSchedulingRepository.markOptOutDay14ConfirmationPixelSent(jobRecord.extractedProfileId, now)
+                    },
+                )
+            }
         }
     }
 
-    private suspend fun attemptFire7dayPixel(
-        allValidRequestedOptOutJobs: List<OptOutJobRecord>,
+    private suspend fun List<OptOutJobRecord>.attemptFirePixelForConfirmationDay(
         activeBrokers: Map<String, Broker>,
+        confirmationDay: Long,
+        jobRecordFilter: (OptOutJobRecord) -> Boolean,
+        emitConfirmPixel: (String) -> Unit,
+        emitUnconfirmPixel: (String) -> Unit,
+        markOptOutJobRecordReporting: suspend (OptOutJobRecord, Long) -> Unit,
     ) {
         val now = currentTimeProvider.currentTimeMillis()
-        val optOutsForSevenDayPixel = allValidRequestedOptOutJobs.filter {
-            it.daysPassedSinceSubmission(now, 7) && it.confirmation7dayReportSentDateMs == 0L
+        val optOutsForSevenDayPixel = this.filter {
+            it.daysPassedSinceSubmission(now, confirmationDay) && jobRecordFilter(it)
         }
 
         optOutsForSevenDayPixel.forEach { optOutJobRecord ->
             val brokerUrl = activeBrokers[optOutJobRecord.brokerName]?.url ?: return@forEach
 
             if (optOutJobRecord.status == REMOVED) {
-                pixelSender.reportBrokerOptOutConfirmed7Days(brokerUrl)
+                emitConfirmPixel(brokerUrl)
             } else {
-                pixelSender.reportBrokerOptOutUnconfirmed7Days(brokerUrl)
+                emitUnconfirmPixel(brokerUrl)
             }
 
-            pirSchedulingRepository.markOptOutDay7ConfirmationPixelSent(optOutJobRecord.extractedProfileId, now)
+            markOptOutJobRecordReporting(optOutJobRecord, now)
         }
     }
 
