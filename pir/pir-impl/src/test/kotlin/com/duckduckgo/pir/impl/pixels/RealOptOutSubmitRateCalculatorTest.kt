@@ -19,15 +19,12 @@ package com.duckduckgo.pir.impl.pixels
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.pir.impl.models.scheduling.JobRecord.OptOutJobRecord
 import com.duckduckgo.pir.impl.models.scheduling.JobRecord.OptOutJobRecord.OptOutJobStatus
-import com.duckduckgo.pir.impl.store.PirSchedulingRepository
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import org.mockito.kotlin.mock
-import org.mockito.kotlin.whenever
 import java.util.concurrent.TimeUnit
 
 class RealOptOutSubmitRateCalculatorTest {
@@ -37,19 +34,15 @@ class RealOptOutSubmitRateCalculatorTest {
 
     private lateinit var testee: RealOptOutSubmitRateCalculator
 
-    private val mockSchedulingRepository: PirSchedulingRepository = mock()
-
     @Before
     fun setUp() {
         testee = RealOptOutSubmitRateCalculator(
             dispatcherProvider = coroutineRule.testDispatcherProvider,
-            schedulingRepository = mockSchedulingRepository,
         )
     }
 
     // Test data
     private val testBrokerName = "test-broker"
-    private val testBrokerName2 = "test-broker-2"
 
     // January 15, 2024 10:00:00 UTC
     private val baseTime = 1705309200000L
@@ -62,10 +55,7 @@ class RealOptOutSubmitRateCalculatorTest {
         val startDate = baseTime
         val endDate = baseTime + oneDay
 
-        whenever(mockSchedulingRepository.getAllValidOptOutJobRecordsForBroker(testBrokerName))
-            .thenReturn(emptyList())
-
-        val result = testee.calculateOptOutSubmitRate(testBrokerName, startDate, endDate)
+        val result = testee.calculateOptOutSubmitRate(emptyList(), startDate, endDate)
 
         assertNull(result)
     }
@@ -86,10 +76,11 @@ class RealOptOutSubmitRateCalculatorTest {
             dateCreatedInMillis = baseTime + oneDay + oneHour,
         )
 
-        whenever(mockSchedulingRepository.getAllValidOptOutJobRecordsForBroker(testBrokerName))
-            .thenReturn(listOf(recordBeforeRange, recordAfterRange))
-
-        val result = testee.calculateOptOutSubmitRate(testBrokerName, startDate, endDate)
+        val result = testee.calculateOptOutSubmitRate(
+            listOf(recordBeforeRange, recordAfterRange),
+            startDate,
+            endDate,
+        )
 
         assertNull(result)
     }
@@ -111,11 +102,7 @@ class RealOptOutSubmitRateCalculatorTest {
             status = OptOutJobStatus.ERROR,
             dateCreatedInMillis = baseTime + 2 * oneHour,
         )
-
-        whenever(mockSchedulingRepository.getAllValidOptOutJobRecordsForBroker(testBrokerName))
-            .thenReturn(listOf(record1, record2))
-
-        val result = testee.calculateOptOutSubmitRate(testBrokerName, startDate, endDate)
+        val result = testee.calculateOptOutSubmitRate(listOf(record1, record2), startDate, endDate)
 
         assertEquals(0.0, result!!, 0.0)
     }
@@ -140,11 +127,7 @@ class RealOptOutSubmitRateCalculatorTest {
             dateCreatedInMillis = dateCreated + 2 * oneHour,
             optOutRequestedDateInMillis = dateCreated + 3 * oneHour, // Within 24 hours
         )
-
-        whenever(mockSchedulingRepository.getAllValidOptOutJobRecordsForBroker(testBrokerName))
-            .thenReturn(listOf(record1, record2))
-
-        val result = testee.calculateOptOutSubmitRate(testBrokerName, startDate, endDate)
+        val result = testee.calculateOptOutSubmitRate(listOf(record1, record2), startDate, endDate)
 
         assertEquals(1.0, result!!, 0.0)
     }
@@ -168,11 +151,11 @@ class RealOptOutSubmitRateCalculatorTest {
             status = OptOutJobStatus.NOT_EXECUTED,
             dateCreatedInMillis = dateCreated + 2 * oneHour,
         )
-
-        whenever(mockSchedulingRepository.getAllValidOptOutJobRecordsForBroker(testBrokerName))
-            .thenReturn(listOf(requestedRecord, notExecutedRecord))
-
-        val result = testee.calculateOptOutSubmitRate(testBrokerName, startDate, endDate)
+        val result = testee.calculateOptOutSubmitRate(
+            listOf(requestedRecord, notExecutedRecord),
+            startDate,
+            endDate,
+        )
 
         assertEquals(0.5, result!!, 0.0)
     }
@@ -197,11 +180,7 @@ class RealOptOutSubmitRateCalculatorTest {
             dateCreatedInMillis = dateCreated + 2 * oneHour,
             optOutRequestedDateInMillis = dateCreated + 2 * oneHour + twentyFourHours + oneHour, // Outside 24 hours
         )
-
-        whenever(mockSchedulingRepository.getAllValidOptOutJobRecordsForBroker(testBrokerName))
-            .thenReturn(listOf(requestedWithinWindow, requestedOutsideWindow))
-
-        val result = testee.calculateOptOutSubmitRate(testBrokerName, startDate, endDate)
+        val result = testee.calculateOptOutSubmitRate(listOf(requestedWithinWindow, requestedOutsideWindow), startDate, endDate)
 
         assertEquals(0.5, result!!, 0.0)
     }
@@ -225,44 +204,9 @@ class RealOptOutSubmitRateCalculatorTest {
             status = OptOutJobStatus.NOT_EXECUTED,
             dateCreatedInMillis = dateCreated + 2 * oneHour,
         )
-
-        whenever(mockSchedulingRepository.getAllValidOptOutJobRecordsForBroker(testBrokerName))
-            .thenReturn(listOf(requestedAt24Hours, notExecutedRecord))
-
-        val result = testee.calculateOptOutSubmitRate(testBrokerName, startDate, endDate)
+        val result = testee.calculateOptOutSubmitRate(listOf(requestedAt24Hours, notExecutedRecord), startDate, endDate)
 
         assertEquals(0.5, result!!, 0.0)
-    }
-
-    @Test
-    fun whenRecordsFromDifferentBrokersThenOnlyCountMatchingBroker() = runTest {
-        val startDate = baseTime
-        val endDate = baseTime + oneDay
-        val dateCreated = baseTime + oneHour
-
-        val recordForTestBroker = createOptOutJobRecord(
-            extractedProfileId = 1L,
-            brokerName = testBrokerName,
-            status = OptOutJobStatus.REQUESTED,
-            dateCreatedInMillis = dateCreated,
-            optOutRequestedDateInMillis = dateCreated + oneHour,
-        )
-        val recordForOtherBroker = createOptOutJobRecord(
-            extractedProfileId = 2L,
-            brokerName = testBrokerName2,
-            status = OptOutJobStatus.REQUESTED,
-            dateCreatedInMillis = dateCreated + 2 * oneHour,
-            optOutRequestedDateInMillis = dateCreated + 3 * oneHour,
-        )
-
-        whenever(mockSchedulingRepository.getAllValidOptOutJobRecordsForBroker(testBrokerName))
-            .thenReturn(listOf(recordForTestBroker))
-        whenever(mockSchedulingRepository.getAllValidOptOutJobRecordsForBroker(testBrokerName2))
-            .thenReturn(listOf(recordForOtherBroker))
-
-        val result = testee.calculateOptOutSubmitRate(testBrokerName, startDate, endDate)
-
-        assertEquals(1.0, result!!, 0.0)
     }
 
     @Test
@@ -277,11 +221,7 @@ class RealOptOutSubmitRateCalculatorTest {
             dateCreatedInMillis = dateCreated,
             optOutRequestedDateInMillis = dateCreated + oneHour,
         )
-
-        whenever(mockSchedulingRepository.getAllValidOptOutJobRecordsForBroker(testBrokerName))
-            .thenReturn(listOf(record))
-
-        val result = testee.calculateOptOutSubmitRate(testBrokerName, endDateMs = endDate)
+        val result = testee.calculateOptOutSubmitRate(listOf(record), endDateMs = endDate)
 
         assertEquals(1.0, result!!, 0.0)
     }
@@ -298,11 +238,7 @@ class RealOptOutSubmitRateCalculatorTest {
             dateCreatedInMillis = startDate, // Exactly at start
             optOutRequestedDateInMillis = startDate + oneHour,
         )
-
-        whenever(mockSchedulingRepository.getAllValidOptOutJobRecordsForBroker(testBrokerName))
-            .thenReturn(listOf(recordAtStart))
-
-        val result = testee.calculateOptOutSubmitRate(testBrokerName, startDate, endDate)
+        val result = testee.calculateOptOutSubmitRate(listOf(recordAtStart), startDate, endDate)
 
         assertEquals(1.0, result!!, 0.0)
     }
@@ -319,11 +255,7 @@ class RealOptOutSubmitRateCalculatorTest {
             dateCreatedInMillis = endDate, // Exactly at end
             optOutRequestedDateInMillis = endDate + oneHour,
         )
-
-        whenever(mockSchedulingRepository.getAllValidOptOutJobRecordsForBroker(testBrokerName))
-            .thenReturn(listOf(recordAtEnd))
-
-        val result = testee.calculateOptOutSubmitRate(testBrokerName, startDate, endDate)
+        val result = testee.calculateOptOutSubmitRate(listOf(recordAtEnd), startDate, endDate)
 
         assertEquals(1.0, result!!, 0.0)
     }
@@ -359,11 +291,7 @@ class RealOptOutSubmitRateCalculatorTest {
             status = OptOutJobStatus.PENDING_EMAIL_CONFIRMATION,
             dateCreatedInMillis = dateCreated + 4 * oneHour,
         )
-
-        whenever(mockSchedulingRepository.getAllValidOptOutJobRecordsForBroker(testBrokerName))
-            .thenReturn(listOf(requested, removed, error, pendingEmail))
-
-        val result = testee.calculateOptOutSubmitRate(testBrokerName, startDate, endDate)
+        val result = testee.calculateOptOutSubmitRate(listOf(requested, removed, error, pendingEmail), startDate, endDate)
 
         assertEquals(0.25, result!!, 0.0)
     }
@@ -408,11 +336,7 @@ class RealOptOutSubmitRateCalculatorTest {
             status = OptOutJobStatus.ERROR,
             dateCreatedInMillis = dateCreated + 5 * oneHour,
         )
-
-        whenever(mockSchedulingRepository.getAllValidOptOutJobRecordsForBroker(testBrokerName))
-            .thenReturn(listOf(requested1, requested2, requested3, notExecuted, error))
-
-        val result = testee.calculateOptOutSubmitRate(testBrokerName, startDate, endDate)
+        val result = testee.calculateOptOutSubmitRate(listOf(requested1, requested2, requested3, notExecuted, error), startDate, endDate)
 
         // Only requested1 and requested3 count (2 out of 5)
         assertEquals(0.4, result!!, 0.0)
@@ -438,11 +362,7 @@ class RealOptOutSubmitRateCalculatorTest {
             dateCreatedInMillis = dateCreated + 2 * oneHour,
             optOutRequestedDateInMillis = dateCreated + 2 * oneHour + oneHour, // After creation
         )
-
-        whenever(mockSchedulingRepository.getAllValidOptOutJobRecordsForBroker(testBrokerName))
-            .thenReturn(listOf(requestedAtSameTime, validRequested))
-
-        val result = testee.calculateOptOutSubmitRate(testBrokerName, startDate, endDate)
+        val result = testee.calculateOptOutSubmitRate(listOf(requestedAtSameTime, validRequested), startDate, endDate)
 
         // Only validRequested counts (1 out of 2)
         assertEquals(0.5, result!!, 0.0)
@@ -468,11 +388,7 @@ class RealOptOutSubmitRateCalculatorTest {
             dateCreatedInMillis = dateCreated + 2 * oneHour,
             optOutRequestedDateInMillis = dateCreated + 3 * oneHour, // After creation
         )
-
-        whenever(mockSchedulingRepository.getAllValidOptOutJobRecordsForBroker(testBrokerName))
-            .thenReturn(listOf(requestedBeforeCreation, validRequested))
-
-        val result = testee.calculateOptOutSubmitRate(testBrokerName, startDate, endDate)
+        val result = testee.calculateOptOutSubmitRate(listOf(requestedBeforeCreation, validRequested), startDate, endDate)
 
         // Only validRequested counts (1 out of 2)
         assertEquals(0.5, result!!, 0.0)
@@ -493,10 +409,7 @@ class RealOptOutSubmitRateCalculatorTest {
             optOutRequestedDateInMillis = dateCreated + oneMillisecond, // Just 1ms after (should be counted)
         )
 
-        whenever(mockSchedulingRepository.getAllValidOptOutJobRecordsForBroker(testBrokerName))
-            .thenReturn(listOf(requestedJustAfter))
-
-        val result = testee.calculateOptOutSubmitRate(testBrokerName, startDate, endDate)
+        val result = testee.calculateOptOutSubmitRate(listOf(requestedJustAfter), startDate, endDate)
 
         assertEquals(1.0, result!!, 0.0)
     }
@@ -515,11 +428,7 @@ class RealOptOutSubmitRateCalculatorTest {
             dateCreatedInMillis = dateCreated,
             optOutRequestedDateInMillis = dateCreated + twentyFourHours - oneMillisecond, // Just before 24h limit
         )
-
-        whenever(mockSchedulingRepository.getAllValidOptOutJobRecordsForBroker(testBrokerName))
-            .thenReturn(listOf(requestedJustBefore24h))
-
-        val result = testee.calculateOptOutSubmitRate(testBrokerName, startDate, endDate)
+        val result = testee.calculateOptOutSubmitRate(listOf(requestedJustBefore24h), startDate, endDate)
 
         assertEquals(1.0, result!!, 0.0)
     }
@@ -544,11 +453,7 @@ class RealOptOutSubmitRateCalculatorTest {
             status = OptOutJobStatus.NOT_EXECUTED,
             dateCreatedInMillis = dateCreated + 2 * oneHour,
         )
-
-        whenever(mockSchedulingRepository.getAllValidOptOutJobRecordsForBroker(testBrokerName))
-            .thenReturn(listOf(requestedJustAfter24h, notExecuted))
-
-        val result = testee.calculateOptOutSubmitRate(testBrokerName, startDate, endDate)
+        val result = testee.calculateOptOutSubmitRate(listOf(requestedJustAfter24h, notExecuted), startDate, endDate)
 
         // requestedJustAfter24h doesn't count, so 0 out of 2
         assertEquals(0.0, result!!, 0.0)
@@ -580,11 +485,7 @@ class RealOptOutSubmitRateCalculatorTest {
             status = OptOutJobStatus.NOT_EXECUTED,
             dateCreatedInMillis = dateCreated + 3 * oneHour,
         )
-
-        whenever(mockSchedulingRepository.getAllValidOptOutJobRecordsForBroker(testBrokerName))
-            .thenReturn(listOf(requested, notExecuted1, notExecuted2))
-
-        val result = testee.calculateOptOutSubmitRate(testBrokerName, startDate, endDate)
+        val result = testee.calculateOptOutSubmitRate(listOf(requested, notExecuted1, notExecuted2), startDate, endDate)
 
         // 1/3 = 0.333... rounded to 0.33
         assertEquals(0.33, result!!, 0.0)
@@ -617,46 +518,10 @@ class RealOptOutSubmitRateCalculatorTest {
             status = OptOutJobStatus.NOT_EXECUTED,
             dateCreatedInMillis = dateCreated + 4 * oneHour,
         )
-
-        whenever(mockSchedulingRepository.getAllValidOptOutJobRecordsForBroker(testBrokerName))
-            .thenReturn(listOf(requested1, requested2, notExecuted))
-
-        val result = testee.calculateOptOutSubmitRate(testBrokerName, startDate, endDate)
+        val result = testee.calculateOptOutSubmitRate(listOf(requested1, requested2, notExecuted), startDate, endDate)
 
         // 2/3 = 0.666... rounded to 0.67
         assertEquals(0.67, result!!, 0.0)
-    }
-
-    @Test
-    fun whenRepositoryReturnsWrongBrokerNameThenExcluded() = runTest {
-        val startDate = baseTime
-        val endDate = baseTime + oneDay
-        val dateCreated = baseTime + oneHour
-
-        // Repository might return records with wrong broker name (should be filtered out)
-        val recordWithWrongBroker = createOptOutJobRecord(
-            extractedProfileId = 1L,
-            brokerName = testBrokerName2, // Wrong broker
-            status = OptOutJobStatus.REQUESTED,
-            dateCreatedInMillis = dateCreated,
-            optOutRequestedDateInMillis = dateCreated + oneHour,
-        )
-        val recordWithCorrectBroker = createOptOutJobRecord(
-            extractedProfileId = 2L,
-            brokerName = testBrokerName, // Correct broker
-            status = OptOutJobStatus.REQUESTED,
-            dateCreatedInMillis = dateCreated + 2 * oneHour,
-            optOutRequestedDateInMillis = dateCreated + 3 * oneHour,
-        )
-
-        // Repository returns both, but only correct broker should be counted
-        whenever(mockSchedulingRepository.getAllValidOptOutJobRecordsForBroker(testBrokerName))
-            .thenReturn(listOf(recordWithWrongBroker, recordWithCorrectBroker))
-
-        val result = testee.calculateOptOutSubmitRate(testBrokerName, startDate, endDate)
-
-        // Only recordWithCorrectBroker counts (1 out of 1 after filtering)
-        assertEquals(1.0, result!!, 0.0)
     }
 
     @Test
@@ -672,11 +537,7 @@ class RealOptOutSubmitRateCalculatorTest {
             dateCreatedInMillis = dateCreated,
             optOutRequestedDateInMillis = dateCreated + oneHour,
         )
-
-        whenever(mockSchedulingRepository.getAllValidOptOutJobRecordsForBroker(testBrokerName))
-            .thenReturn(listOf(singleRecord))
-
-        val result = testee.calculateOptOutSubmitRate(testBrokerName, startDate, endDate)
+        val result = testee.calculateOptOutSubmitRate(listOf(singleRecord), startDate, endDate)
 
         assertEquals(1.0, result!!, 0.0)
     }
@@ -693,11 +554,7 @@ class RealOptOutSubmitRateCalculatorTest {
             status = OptOutJobStatus.NOT_EXECUTED,
             dateCreatedInMillis = dateCreated,
         )
-
-        whenever(mockSchedulingRepository.getAllValidOptOutJobRecordsForBroker(testBrokerName))
-            .thenReturn(listOf(singleRecord))
-
-        val result = testee.calculateOptOutSubmitRate(testBrokerName, startDate, endDate)
+        val result = testee.calculateOptOutSubmitRate(listOf(singleRecord), startDate, endDate)
 
         assertEquals(0.0, result!!, 0.0)
     }
@@ -729,10 +586,7 @@ class RealOptOutSubmitRateCalculatorTest {
             dateCreatedInMillis = dateCreated + TimeUnit.DAYS.toMillis(300), // 10 months later
         )
 
-        whenever(mockSchedulingRepository.getAllValidOptOutJobRecordsForBroker(testBrokerName))
-            .thenReturn(listOf(record1, record2, record3))
-
-        val result = testee.calculateOptOutSubmitRate(testBrokerName, startDate, endDate)
+        val result = testee.calculateOptOutSubmitRate(listOf(record1, record2, record3), startDate, endDate)
 
         // 2 out of 3
         assertEquals(0.67, result!!, 0.0)
@@ -759,10 +613,7 @@ class RealOptOutSubmitRateCalculatorTest {
             optOutRequestedDateInMillis = dateCreated + 3 * oneHour,
         )
 
-        whenever(mockSchedulingRepository.getAllValidOptOutJobRecordsForBroker(testBrokerName))
-            .thenReturn(listOf(requestedWithZeroDate, validRequested))
-
-        val result = testee.calculateOptOutSubmitRate(testBrokerName, startDate, endDate)
+        val result = testee.calculateOptOutSubmitRate(listOf(requestedWithZeroDate, validRequested), startDate, endDate)
 
         // Only validRequested counts (1 out of 2)
         assertEquals(0.5, result!!, 0.0)
@@ -791,10 +642,7 @@ class RealOptOutSubmitRateCalculatorTest {
             )
         }
 
-        whenever(mockSchedulingRepository.getAllValidOptOutJobRecordsForBroker(testBrokerName))
-            .thenReturn(listOf(requested) + notExecutedRecords)
-
-        val result = testee.calculateOptOutSubmitRate(testBrokerName, startDate, endDate)
+        val result = testee.calculateOptOutSubmitRate(listOf(requested) + notExecutedRecords, startDate, endDate)
 
         // 1/7 = 0.142857... rounded to 0.14
         assertEquals(0.14, result!!, 0.0)

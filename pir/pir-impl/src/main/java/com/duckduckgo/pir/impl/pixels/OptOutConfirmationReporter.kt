@@ -120,7 +120,7 @@ class RealOptOutConfirmationReporter @Inject constructor(
             it.daysPassedSinceSubmission(now, confirmationDay) && jobRecordFilter(it)
         }
 
-        logcat { "PIR-CUSTOM-STATS: Firing 7day confirmation pixels for ${optOutsForPixel.size} jobs" }
+        logcat { "PIR-CUSTOM-STATS: Firing $confirmationDay day confirmation pixels for ${optOutsForPixel.size} jobs" }
         optOutsForPixel.forEach { optOutJobRecord ->
             val broker = activeBrokers[optOutJobRecord.brokerName] ?: return@forEach
 
