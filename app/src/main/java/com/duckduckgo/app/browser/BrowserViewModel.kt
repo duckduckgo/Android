@@ -65,7 +65,6 @@ import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.common.ui.tabs.SwipingTabsFeatureProvider
 import com.duckduckgo.common.utils.DispatcherProvider
-import com.duckduckgo.common.utils.SingleLiveEvent
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
@@ -73,6 +72,8 @@ import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.feature.toggles.api.Toggle.DefaultFeatureValue
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.debounce
@@ -80,6 +81,7 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filterNot
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import logcat.LogPriority.INFO
 import logcat.logcat
@@ -152,7 +154,9 @@ class BrowserViewModel @Inject constructor(
 
     var tabs: LiveData<List<TabEntity>> = tabRepository.liveTabs
     var selectedTab: LiveData<TabEntity> = tabRepository.liveSelectedTab
-    val command: SingleLiveEvent<Command> = SingleLiveEvent()
+
+    private val commandChannel = Channel<Command>(capacity = 1, onBufferOverflow = DROP_OLDEST)
+    val commands = commandChannel.receiveAsFlow()
 
     val selectedTabFlow: Flow<String> = tabRepository.flowSelectedTab
         .map { tab -> tab?.tabId }
@@ -185,15 +189,15 @@ class BrowserViewModel @Inject constructor(
     private val appEnjoymentObserver = Observer<AppEnjoymentPromptOptions> { promptType ->
         when (promptType) {
             is AppEnjoymentPromptOptions.ShowEnjoymentPrompt -> {
-                command.value = Command.ShowAppEnjoymentPrompt(promptType.promptCount)
+                sendCommand(Command.ShowAppEnjoymentPrompt(promptType.promptCount))
             }
 
             is AppEnjoymentPromptOptions.ShowRatingPrompt -> {
-                command.value = Command.ShowAppRatingPrompt(promptType.promptCount)
+                sendCommand(Command.ShowAppRatingPrompt(promptType.promptCount))
             }
 
             is AppEnjoymentPromptOptions.ShowFeedbackPrompt -> {
-                command.value = Command.ShowAppFeedbackPrompt(promptType.promptCount)
+                sendCommand(Command.ShowAppFeedbackPrompt(promptType.promptCount))
             }
 
             else -> {}
@@ -209,17 +213,17 @@ class BrowserViewModel @Inject constructor(
             additionalDefaultBrowserPrompts.commands.collect {
                 when (it) {
                     OpenMessageDialog -> {
-                        command.value = Command.ShowSetAsDefaultBrowserDialog
+                        sendCommand(Command.ShowSetAsDefaultBrowserDialog)
                     }
 
                     is OpenSystemDefaultAppsActivity -> {
                         lastSystemDefaultAppsTrigger = it.trigger
-                        command.value = Command.ShowSystemDefaultAppsActivity(it.intent)
+                        sendCommand(Command.ShowSystemDefaultAppsActivity(it.intent))
                     }
 
                     is OpenSystemDefaultBrowserDialog -> {
                         lastSystemDefaultBrowserDialogTrigger = it.trigger
-                        command.value = Command.ShowSystemDefaultBrowserDialog(it.intent)
+                        sendCommand(Command.ShowSystemDefaultBrowserDialog(it.intent))
                     }
                 }
             }
@@ -231,6 +235,12 @@ class BrowserViewModel @Inject constructor(
             tabRepository.addFromSourceTab(sourceTabId = sourceTabId)
         } else {
             tabRepository.add()
+        }
+    }
+
+    private fun sendCommand(command: Command) {
+        viewModelScope.launch {
+            commandChannel.send(command)
         }
     }
 
@@ -326,7 +336,7 @@ class BrowserViewModel @Inject constructor(
 
     fun onUserSelectedToRateApp(promptCount: PromptCount) {
         firePixelWithPromptCount(APP_RATING_DIALOG_USER_GAVE_RATING, promptCount)
-        command.value = Command.LaunchPlayStore
+        sendCommand(Command.LaunchPlayStore)
 
         launch { appEnjoymentUserEventRecorder.onUserSelectedToRateApp(promptCount) }
     }
@@ -343,7 +353,7 @@ class BrowserViewModel @Inject constructor(
 
     fun onUserSelectedToGiveFeedback(promptCount: PromptCount) {
         firePixelWithPromptCount(APP_FEEDBACK_DIALOG_USER_GAVE_FEEDBACK, promptCount)
-        command.value = Command.LaunchFeedbackView
+        sendCommand(Command.LaunchFeedbackView)
 
         launch { appEnjoymentUserEventRecorder.onUserSelectedToGiveFeedback(promptCount) }
     }
@@ -379,13 +389,13 @@ class BrowserViewModel @Inject constructor(
             launch {
                 val existingTab = tabRepository.getTabs().firstOrNull { tab -> tab.url == url }
                 if (existingTab == null) {
-                    command.value = Command.OpenSavedSite(url)
+                    sendCommand(Command.OpenSavedSite(url))
                 } else {
-                    command.value = Command.SwitchToTab(existingTab.tabId)
+                    sendCommand(Command.SwitchToTab(existingTab.tabId))
                 }
             }
         } else {
-            command.value = Command.OpenSavedSite(url)
+            sendCommand(Command.OpenSavedSite(url))
         }
     }
 
@@ -414,17 +424,17 @@ class BrowserViewModel @Inject constructor(
     }
 
     fun onSetDefaultBrowserDialogCanceled() {
-        command.value = DismissSetAsDefaultBrowserDialog
+        sendCommand(DismissSetAsDefaultBrowserDialog)
         additionalDefaultBrowserPrompts.onMessageDialogCanceled()
     }
 
     fun onSetDefaultBrowserConfirmationButtonClicked() {
-        command.value = DismissSetAsDefaultBrowserDialog
+        sendCommand(DismissSetAsDefaultBrowserDialog)
         additionalDefaultBrowserPrompts.onMessageDialogConfirmationButtonClicked()
     }
 
     fun onSetDefaultBrowserDoNotAskAgainButtonClicked() {
-        command.value = DoNotAskAgainSetAsDefaultBrowserDialog
+        sendCommand(DoNotAskAgainSetAsDefaultBrowserDialog)
         additionalDefaultBrowserPrompts.onMessageDialogDoNotAskAgainButtonClicked()
     }
 
@@ -468,12 +478,12 @@ class BrowserViewModel @Inject constructor(
     fun undoDeletableTabs(tabIds: List<String>) {
         viewModelScope.launch {
             tabRepository.undoDeletable(tabIds, moveActiveTabToEnd = true)
-            command.value = LaunchTabSwitcher
+            sendCommand(LaunchTabSwitcher)
         }
     }
 
     fun onTabsDeletedInTabSwitcher(tabIds: List<String>) {
-        command.value = ShowUndoDeleteTabsMessage(tabIds)
+        sendCommand(ShowUndoDeleteTabsMessage(tabIds))
     }
 
     fun openDuckChat(
@@ -483,7 +493,7 @@ class BrowserViewModel @Inject constructor(
     ) {
         val duckAiFullScreenMode = duckAiFeatureState.showFullScreenMode.value
         logcat(INFO) { "Duck.ai openDuckChat duckChatSessionActive $duckChatSessionActive" }
-        command.value = OpenDuckChat(duckChatUrl, duckChatSessionActive, withTransition, tabs.value.size, duckAiFullScreenMode)
+        sendCommand(OpenDuckChat(duckChatUrl, duckChatSessionActive, withTransition, tabs.value.size, duckAiFullScreenMode))
     }
 }
 
