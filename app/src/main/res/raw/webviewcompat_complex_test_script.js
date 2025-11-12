@@ -5,6 +5,73 @@
     const replyToNativeMessages = $REPLY_TO_NATIVE_MESSAGES$;
     const messagePrefix = 'webViewCompat ';
 
+    // ============================================================================
+    // MESSAGE HANDLING (ORIGINAL WEBVIEWCOMPAT FUNCTIONALITY)
+    // ============================================================================
+
+    const supportedMessages = ["ContextMenuOpened", "PageStarted"];
+    const webViewCompatPingMessage = messagePrefix + 'Ping:' + window.location.href + ' ' + delay + 'ms';
+
+    // Send initial ping if configured
+    if (postInitialPing) {
+        console.log('Posting initial ping...');
+        if (delay > 0) {
+            setTimeout(() => {
+                ddgObj.postMessage(webViewCompatPingMessage);
+                stateManager.setState(state => ({
+                    ...state,
+                    messageCount: state.messageCount + 1,
+                    lastMessageTime: Date.now()
+                }));
+            }, delay);
+        } else {
+            ddgObj.postMessage(webViewCompatPingMessage);
+            stateManager.setState(state => ({
+                ...state,
+                messageCount: state.messageCount + 1,
+                lastMessageTime: Date.now()
+            }));
+        }
+    }
+
+    // Listen to ddgObj messages
+    ddgObj.addEventListener('message', function(event) {
+        console.log("$OBJECT_NAME$ received", event.data);
+        
+        stateManager.setState(state => ({
+            ...state,
+            messageCount: state.messageCount + 1,
+            lastMessageTime: Date.now()
+        }));
+        
+        eventBus.emit('message-received', { source: '$OBJECT_NAME$', data: event.data });
+        
+        if (replyToNativeMessages && supportedMessages.includes(event.data)) {
+            const response = messagePrefix + event.data + " from $OBJECT_NAME$";
+            ddgObj.postMessage(response);
+            throttledLog('Sent response:', response);
+        }
+    });
+
+    // Listen to window messages
+    window.addEventListener('message', function(event) {
+        console.log("window received", event.data);
+        
+        stateManager.setState(state => ({
+            ...state,
+            messageCount: state.messageCount + 1,
+            lastMessageTime: Date.now()
+        }));
+        
+        eventBus.emit('message-received', { source: 'window', data: event.data });
+        
+        if (replyToNativeMessages && supportedMessages.includes(event.data)) {
+            const response = messagePrefix + event.data + " from window";
+            ddgObj.postMessage(response);
+            throttledLog('Sent response:', response);
+        }
+    });
+
     const config = {"features":{"breakageReporting":{"state":"enabled","exceptions":[{"domain":"marvel.com"},{"domain":"noaprints.com"}],"settings":{"conditionalChanges":[{"condition":{"injectName":"android-adsjs"},"patchSettings":[{"op":"add","path":"\/additionalCheck","value":"disabled"}]}]},"hash":"6413ce9f3177be6181eb61c37aa61940"},"apiManipulation":{"state":"enabled","exceptions":[],"readme":"Example config for apiManipulation to set navigator.plugins to return PDF viewer plugins","settings":{"apiChanges":{},"conditionalChanges":[{"condition":{"injectName":"android-adsjs"},"patchSettings":[{"op":"add","path":"\/additionalCheck","value":"disabled"}]}]},"hash":"e34a9ed1b413fc949f9afce218f94201"},"messageBridge":{"exceptions":[],"settings":{"aiChat":"disabled","subscriptions":"disabled","serpSettings":"disabled","domains":[{"domain":["duckduckgo.com","duck.co","duck.ai"],"patchSettings":[{"op":"replace","path":"\/aiChat","value":"enabled"},{"op":"replace","path":"\/subscriptions","value":"enabled"},{"op":"replace","path":"\/serpSettings","value":"enabled"}]}]},"state":"enabled","minSupportedVersion":52250000,"hash":"305f09b17a3362ba85971b34a2ae6df1"},"navigatorInterface":{"exceptions":[{"domain":"marvel.com"},{"domain":"noaprints.com"}],"settings":{"privilegedDomains":[{"domain":"duckduckgo.com"},{"domain":"duck.co"}]},"state":"enabled","minSupportedVersion":52250000,"hash":"6edf6358b28dc13c98b10270c5f45991"},"cookie":{"settings":{"trackerCookie":"enabled","nonTrackerCookie":"disabled","excludedCookieDomains":[{"domain":"accounts.google.com","reason":"On some Google sign-in flows, there is an error after entering username and proceeding: 'Your browser has cookies disabled. Make sure that your cookies are enabled and try again.'"},{"domain":"pay.google.com","reason":"After sign-in for Google Pay flows, there is repeated flickering and a loading spinner, preventing the flow from proceeding."},{"domain":"payments.google.com","reason":"After sign-in for Google Pay flows (after flickering is resolved), blocking this causes the loading spinner to spin indefinitely, and the payment flow cannot proceed."},{"domain":"docs.google.com","reason":"Embedded Google docs get into redirect loop if signed into a Google account"}],"firstPartyTrackerCookiePolicy":{"threshold":86400,"maxAge":86400},"firstPartyCookiePolicy":{"threshold":604800,"maxAge":604800},"thirdPartyCookieNames":["user_id","__Secure-3PAPISID","SAPISID","APISID"]},"exceptions":[{"domain":"nespresso.com"},{"domain":"optout.aboutads.info"},{"domain":"optout.networkadvertising.org"},{"domain":"news.ti.com"},{"domain":"instructure.com"},{"domain":"duckduckgo.com"},{"domain":"marvel.com"},{"domain":"noaprints.com"}],"state":"enabled","hash":"69f2277bd8ad7e09adcdf4f0e1b6e7c5"},"duckPlayer":{"exceptions":[],"features":{"pip":{"state":"disabled"},"autoplay":{"state":"disabled"},"openInNewTab":{"state":"enabled"},"enableDuckPlayer":{"state":"enabled"},"customError":{"state":"enabled","settings":{"signInRequiredSelector":"[href*=\"\/\/support.google.com\/youtube\/answer\/3037019\"]"}},"nativeUI":{"state":"disabled"},"addCustomEmbedReferer":{"state":"disabled"}},"settings":{"tryDuckPlayerLink":"https:\/\/www.youtube.com\/watch?v=yKWIA-Pys4c","duckPlayerDisabledHelpPageLink":null,"youtubePath":"watch","youtubeEmbedUrl":"youtube-nocookie.com","youTubeUrl":"youtube.com","youTubeReferrerHeaders":["Referer"],"youTubeReferrerQueryParams":["embeds_referring_euri"],"youTubeVideoIDQueryParam":"v","overlays":{"youtube":{"state":"disabled","selectors":{"thumbLink":"a[href^='\/watch']","excludedRegions":["#playlist","ytd-movie-renderer","ytd-grid-movie-renderer"],"videoElement":"[full-bleed-player] #player-full-bleed-container video, #player video","videoElementContainer":"[full-bleed-player] #player-full-bleed-container .html5-video-player, #player .html5-video-player","hoverExcluded":[],"clickExcluded":["ytd-thumbnail-overlay-toggle-button-renderer"],"allowedEventTargets":[".ytp-inline-preview-scrim",".ytd-video-preview","#thumbnail-container","#video-title-link","#video-title","video.video-stream.html5-main-video"],"drawerContainer":"body"},"thumbnailOverlays":{"state":"enabled"},"clickInterception":{"state":"enabled"},"videoOverlays":{"state":"enabled"},"videoDrawer":{"state":"disabled"}},"serpProxy":{"state":"disabled"}},"domains":[{"domain":"www.youtube.com","patchSettings":[{"op":"replace","path":"\/overlays\/youtube\/state","value":"enabled"}]},{"domain":["duckduckgo.com","duck.co"],"patchSettings":[{"op":"replace","path":"\/overlays\/serpProxy\/state","value":"enabled"}]},{"domain":"m.youtube.com","patchSettings":[{"op":"replace","path":"\/overlays\/youtube\/state","value":"enabled"}]}]},"state":"enabled","minSupportedVersion":52160000,"hash":"e6639a3c9da0c7394a51bf64fd020d65"},"elementHiding":{"exceptions":[{"domain":"duckduckgo.com"},{"domain":"duck.co"},{"domain":"gmx.net"},{"domain":"web.de"},{"domain":"marvel.com"},{"domain":"noaprints.com"}],"settings":{"useStrictHideStyleTag":true,"rules":[{"selector":"[id*='gpt-']","type":"hide-empty"},{"selector":"[class*='gpt-']","type":"closest-empty"}]},"state":"enabled","hash":"b69e59a1b851254f9c86275062e37daf"},"fingerprintingBattery":{"exceptions":[{"domain":"litebluesso.usps.gov"},{"domain":"marvel.com"},{"domain":"noaprints.com"}],"state":"enabled","settings":{"conditionalChanges":[{"condition":{"injectName":"android-adsjs"},"patchSettings":[{"op":"add","path":"\/additionalCheck","value":"disabled"}]}]},"hash":"57cf54e4c1b66d467e2cc8ac7d538c6b"},"fingerprintingCanvas":{"settings":{"conditionalChanges":[{"condition":{"injectName":"android-adsjs"},"patchSettings":[{"op":"add","path":"\/additionalCheck","value":"disabled"}]}]},"exceptions":[{"domain":"adidas.com"},{"domain":"godaddy.com"},{"domain":"marvel.com"},{"domain":"noaprints.com"}],"state":"disabled","hash":"178d398b9abca11ce22b3aed8de486db"},"fingerprintingHardware":{"settings":{"keyboard":{"type":"undefined"},"hardwareConcurrency":{"type":"number","value":8},"deviceMemory":{"type":"number","value":4},"conditionalChanges":[{"condition":{"injectName":"android-adsjs"},"patchSettings":[{"op":"add","path":"\/additionalCheck","value":"disabled"}]}]},"exceptions":[{"domain":"www.ticketmaster.com"},{"domain":"gamestop.com"},{"domain":"marvel.com"},{"domain":"noaprints.com"}],"state":"enabled","hash":"a363fd9dde581f3a307379d79267fd6c"},"fingerprintingScreenSize":{"settings":{"availTop":{"type":"number","value":0},"availLeft":{"type":"number","value":0},"colorDepth":{"type":"number","value":24},"pixelDepth":{"type":"number","value":24},"conditionalChanges":[{"condition":{"injectName":"android-adsjs"},"patchSettings":[{"op":"add","path":"\/additionalCheck","value":"disabled"}]}]},"exceptions":[{"domain":"fedex.com"},{"domain":"marvel.com"},{"domain":"noaprints.com"},{"domain":"youtube.com"}],"state":"enabled","hash":"9d7f4e62984d8849cd0041fad54848a1"},"fingerprintingTemporaryStorage":{"exceptions":[{"domain":"fedex.com"},{"domain":"marvel.com"},{"domain":"noaprints.com"},{"domain":"ticketmaster.com"}],"state":"enabled","settings":{"conditionalChanges":[{"condition":{"injectName":"android-adsjs"},"patchSettings":[{"op":"add","path":"\/additionalCheck","value":"disabled"}]}]},"hash":"7cf548230dc0f9164ba05e6e2f8dcc63"},"gpc":{"state":"enabled","exceptions":[{"domain":"boston.com"},{"domain":"marvel.com"},{"domain":"noaprints.com"}],"settings":{"gpcHeaderEnabledSites":["global-privacy-control.glitch.me","globalprivacycontrol.org","washingtonpost.com","nytimes.com","privacytests.org","privacytests2.org","privacy-test-pages.site"],"conditionalChanges":[{"condition":{"injectName":"android-adsjs"},"patchSettings":[{"op":"add","path":"\/additionalCheck","value":"disabled"}]}]},"hash":"bbfe9b8659c53956b70109f1d8d302ac"},"runtimeChecks":{"state":"disabled","exceptions":[{"domain":"marvel.com"},{"domain":"noaprints.com"}],"settings":{},"hash":"1429a8a1ea90fbf887a116e6fe14498c"},"webCompat":{"exceptions":[{"domain":"marvel.com"},{"domain":"noaprints.com"}],"state":"enabled","settings":{"conditionalChanges":[{"condition":{"injectName":"android-adsjs"},"patchSettings":[{"op":"add","path":"\/additionalCheck","value":"disabled"}]}],"cleanIframeValue":{"state":"disabled"},"notification":{"state":"enabled"},"permissions":{"state":"enabled"},"mediaSession":"enabled","presentation":"disabled","viewportWidth":"enabled","viewportWidthLegacy":"enabled","webShare":"enabled","screenLock":"enabled","plainTextViewPort":"enabled","modifyLocalStorage":{"state":"enabled","changes":[]}},"hash":"b3fb65e058fbd38c41d574ddfd0b6645"}},"unprotectedTemporary":[]};
     
     const userUnprotectedDomains = ["example.com", "test.com"];
@@ -79,7 +146,7 @@
         }
         
         result.unprotectedDomains = Array.from(unprotectedSet);
-        
+
         return result;
     }
 
@@ -116,7 +183,7 @@
         if (Array.isArray(userDomains)) {
             userDomains.forEach(domain => merged.add(domain));
         }
-        
+
         return Array.from(merged);
     }
 
@@ -176,7 +243,7 @@
         getFeatureSetting(featureName, settingKey, defaultValue) {
             const feature = this.settings[featureName];
             if (!feature || !feature.settings) return defaultValue;
-            return feature.settings[settingKey] !== undefined 
+            return feature.settings[settingKey] !== undefined
                 ? feature.settings[settingKey] 
                 : defaultValue;
         }
@@ -1007,7 +1074,7 @@
         h1 ^= h1 >>> 13;
         h1 = Math.imul(h1, 0xc2b2ae35);
         h1 ^= h1 >>> 16;
-        
+
         return h1 >>> 0;
     }
 
@@ -1030,7 +1097,7 @@
         h32 ^= h32 >>> 13;
         h32 = Math.imul(h32, PRIME32_3);
         h32 ^= h32 >>> 16;
-        
+
         return h32 >>> 0;
     }
 
@@ -1625,7 +1692,7 @@
         hash = hash ^ (hash >>> 13);
         hash = Math.imul(hash, 0xc2b2ae35);
         hash = hash ^ (hash >>> 16);
-        
+
         return hash;
     }
 
@@ -1674,7 +1741,7 @@
         Object.keys(obj).forEach(key => {
             clonedObj[key] = deepClone(obj[key], seen);
         });
-        
+
         return clonedObj;
     }
 
@@ -1682,7 +1749,7 @@
         const cache = new Map();
         const maxSize = options.maxSize || 100;
         const ttl = options.ttl || Infinity;
-        
+
         return function(...args) {
             const key = JSON.stringify(args);
             
@@ -1713,7 +1780,7 @@
     function throttle(fn, delay) {
         let lastCall = 0;
         let timeoutId = null;
-        
+
         return function(...args) {
             const now = Date.now();
             const timeSinceLastCall = now - lastCall;
@@ -1735,7 +1802,7 @@
 
     function debounce(fn, delay) {
         let timeoutId = null;
-        
+
         return function(...args) {
             if (timeoutId) {
                 clearTimeout(timeoutId);
@@ -1804,7 +1871,7 @@
                 }
             });
         });
-        
+
         return Array.from(merged.values());
     }
 
@@ -1922,7 +1989,7 @@
                 this.listeners.set(event, []);
             }
             this.listeners.get(event).push(handler);
-            
+
             return () => this.off(event, handler);
         }
 
@@ -2132,77 +2199,10 @@
         }));
     }, 500);
 
-    // ============================================================================
-    // MESSAGE HANDLING (ORIGINAL WEBVIEWCOMPAT FUNCTIONALITY)
-    // ============================================================================
-
-    const supportedMessages = ["ContextMenuOpened", "PageStarted"];
-    const webViewCompatPingMessage = messagePrefix + 'Ping:' + window.location.href + ' ' + delay + 'ms';
-
     // Initialize features asynchronously
     featureManager.initFeatures().then(() => {
         stateManager.setState({ initialized: true });
         eventBus.emit('initialized', { timestamp: Date.now() });
-    });
-
-    // Send initial ping if configured
-    if (postInitialPing) {
-        console.log('Posting initial ping...');
-        if (delay > 0) {
-            setTimeout(() => {
-                ddgObj.postMessage(webViewCompatPingMessage);
-                stateManager.setState(state => ({
-                    ...state,
-                    messageCount: state.messageCount + 1,
-                    lastMessageTime: Date.now()
-                }));
-            }, delay);
-        } else {
-            ddgObj.postMessage(webViewCompatPingMessage);
-            stateManager.setState(state => ({
-                ...state,
-                messageCount: state.messageCount + 1,
-                lastMessageTime: Date.now()
-            }));
-        }
-    }
-
-    // Listen to ddgObj messages
-    ddgObj.addEventListener('message', function(event) {
-        console.log("$OBJECT_NAME$ received", event.data);
-        
-        stateManager.setState(state => ({
-            ...state,
-            messageCount: state.messageCount + 1,
-            lastMessageTime: Date.now()
-        }));
-        
-        eventBus.emit('message-received', { source: '$OBJECT_NAME$', data: event.data });
-        
-        if (replyToNativeMessages && supportedMessages.includes(event.data)) {
-            const response = messagePrefix + event.data + " from $OBJECT_NAME$";
-            ddgObj.postMessage(response);
-            throttledLog('Sent response:', response);
-        }
-    });
-
-    // Listen to window messages
-    window.addEventListener('message', function(event) {
-        console.log("window received", event.data);
-        
-        stateManager.setState(state => ({
-            ...state,
-            messageCount: state.messageCount + 1,
-            lastMessageTime: Date.now()
-        }));
-        
-        eventBus.emit('message-received', { source: 'window', data: event.data });
-        
-        if (replyToNativeMessages && supportedMessages.includes(event.data)) {
-            const response = messagePrefix + event.data + " from window";
-            ddgObj.postMessage(response);
-            throttledLog('Sent response:', response);
-        }
     });
 
     // Final performance mark
