@@ -98,6 +98,7 @@ import androidx.webkit.WebViewFeature
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.accessibility.data.AccessibilitySettingsDataStore
 import com.duckduckgo.app.bookmarks.dialog.BookmarkAddedConfirmationDialog
+import com.duckduckgo.app.bookmarks.dialog.BookmarkAddedConfirmationDialogFactory
 import com.duckduckgo.app.browser.BrowserTabViewModel.FileChooserRequestedParams
 import com.duckduckgo.app.browser.R.string
 import com.duckduckgo.app.browser.SSLErrorType.NONE
@@ -424,6 +425,9 @@ class BrowserTabFragment :
 
     @Inject
     lateinit var blobConverterInjector: BlobConverterInjector
+
+    @Inject
+    lateinit var bookmarkAddedConfirmationDialogFactory: BookmarkAddedConfirmationDialogFactory
 
     val tabId get() = requireArguments()[TAB_ID_ARG] as String
     private val customTabToolbarColor get() = requireArguments().getInt(CUSTOM_TAB_TOOLBAR_COLOR_ARG)
@@ -3762,8 +3766,8 @@ class BrowserTabFragment :
     }
 
     private fun savedSiteAdded(savedSiteChangedViewState: SavedSiteChangedViewState) {
-        context?.let { ctx ->
-            val dialog = BookmarkAddedConfirmationDialog(ctx, savedSiteChangedViewState.bookmarkFolder)
+        activity?.let { activity ->
+            val dialog = bookmarkAddedConfirmationDialogFactory.create(activity, savedSiteChangedViewState.bookmarkFolder)
             dialog.addEventListener(
                 object : BookmarkAddedConfirmationDialog.EventListener() {
                     override fun onFavoriteStateChangeClicked(isFavorited: Boolean) {
