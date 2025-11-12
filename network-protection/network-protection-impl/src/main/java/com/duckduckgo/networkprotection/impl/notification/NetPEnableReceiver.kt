@@ -25,6 +25,8 @@ import com.duckduckgo.mobile.android.vpn.Vpn
 import com.duckduckgo.mobile.android.vpn.VpnFeaturesRegistry
 import com.duckduckgo.networkprotection.impl.NetPVpnFeature
 import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixels
+import com.duckduckgo.networkprotection.impl.pixels.VpnEnableWideEvent
+import com.duckduckgo.networkprotection.impl.pixels.VpnEnableWideEvent.EntryPoint.NOTIFICATION
 import dagger.android.AndroidInjection
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -43,6 +45,8 @@ class NetPEnableReceiver : BroadcastReceiver() {
 
     @Inject lateinit var pixels: NetworkProtectionPixels
 
+    @Inject lateinit var vpnEnableWideEvent: VpnEnableWideEvent
+
     override fun onReceive(
         context: Context,
         intent: Intent,
@@ -55,6 +59,7 @@ class NetPEnableReceiver : BroadcastReceiver() {
         if (intent.action == ACTION_NETP_ENABLE) {
             logcat { "NetP will restart because the user asked it" }
             goAsync(pendingResult) {
+                vpnEnableWideEvent.onUserRequestedVpnStart(entryPoint = NOTIFICATION)
                 vpnFeaturesRegistry.registerFeature(NetPVpnFeature.NETP_VPN)
             }
         } else if (intent.action == ACTION_VPN_SNOOZE_CANCEL) {

@@ -63,6 +63,7 @@ import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagem
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.LocationState
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.ViewState
 import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixels
+import com.duckduckgo.networkprotection.impl.pixels.VpnEnableWideEvent
 import com.duckduckgo.networkprotection.impl.settings.NetPSettingsLocalConfig
 import com.duckduckgo.networkprotection.impl.settings.NetpVpnSettingsDataStore
 import com.duckduckgo.networkprotection.impl.store.NetworkProtectionRepository
@@ -128,6 +129,9 @@ class NetworkProtectionManagementViewModelTest {
     @Mock
     private lateinit var privacyProUnifiedFeedback: PrivacyProUnifiedFeedback
 
+    @Mock
+    private lateinit var vpnEnableWideEvent: VpnEnableWideEvent
+
     private var autoExcludePrompt = FakeAutoExcludePrompt()
 
     private var vpnRemoteFeatures = FakeFeatureToggleFactory.create(VpnRemoteFeatures::class.java)
@@ -180,6 +184,7 @@ class NetworkProtectionManagementViewModelTest {
             vpnRemoteFeatures,
             localConfig,
             autoExcludePrompt,
+            vpnEnableWideEvent,
         )
     }
 

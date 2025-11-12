@@ -20,5 +20,51 @@
         "type": "string",
         "description": "ETag for the remote config used when the pixel was sent.  Can be empty string.",
         "pattern": "^$|^[-0-9a-f]{32}$"
+    },
+    "widePixelAppName": {
+        "key": "app.name",
+        "type": "string",
+        "description": "The name of the app sending the pixel",
+        "enum": ["DuckDuckGo Android"]
+    },
+    "widePixelAppVersion": {
+        "key": "app.version",
+        "type": "string",
+        "description": "The version of the app sending the pixel"
+    },
+    "widePixelDevMode": {
+        "key": "app.dev_mode",
+        "type": "string",
+        "description": "Whether the app is a development build",
+        "enum": ["true", "false"]
+    },
+    "widePixelPlatform": {
+        "key": "global.platform",
+        "type": "string",
+        "description": "The name of the platform that the app is running on",
+        "enum": ["Android"]
+    },
+    "widePixelType": {
+        "key": "global.type",
+        "type": "string",
+        "description": "The type of software sending the wide pixel",
+        "enum": ["app"]
+    },
+    "widePixelFormFactor": {
+        "key": "app.form_factor",
+        "type": "string",
+        "description": "The form factor of the current device",
+        "enum": ["phone", "tablet"]
+    },
+    "widePixelSampleRate": {
+        "key": "global.sample_rate",
+        "type": "number",
+        "description": "Sample rate for this pixel, between 0 and 1"
+    },
+    "widePixelFeatureStatus": {
+        "key": "feature.status",
+        "type": "string",
+        "description": "Final status of the wide event flow",
+        "enum": ["SUCCESS", "FAILURE", "CANCELLED", "UNKNOWN"]
     }
 }
