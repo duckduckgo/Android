@@ -2022,7 +2022,7 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
         assertEquals("$9.99", result!!.currentPrice)
         assertEquals("$99.99", result.targetPrice)
         assertEquals("$8.33", result.yearlyMonthlyEquivalent)
-        assertEquals(17, result.savingsPercentage)
+        assertEquals(16, result.savingsPercentage)
     }
 
     @Test
@@ -2042,7 +2042,7 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
         assertEquals("$99.99", result!!.currentPrice)
         assertEquals("$9.99", result.targetPrice)
         assertEquals("$8.33", result.yearlyMonthlyEquivalent)
-        assertEquals(17, result.savingsPercentage)
+        assertEquals(16, result.savingsPercentage)
     }
 
     @Test
@@ -2072,8 +2072,8 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
 
         assertNotNull(result)
         assertEquals("€7.50", result!!.yearlyMonthlyEquivalent)
-        // Savings: (8.99 * 12 - 89.99) / (8.99 * 12) * 100 = 16.58% ≈ 17%
-        assertEquals(17, result.savingsPercentage)
+        // Savings: (8.99 * 12 - 89.99) / (8.99 * 12) * 100 = 16.58% rounds down to 16%
+        assertEquals(16, result.savingsPercentage)
     }
 
     @Test
@@ -2091,8 +2091,8 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
         val result = subscriptionsManager.getSwitchPlanPricing(isUpgrade = true)
 
         assertNotNull(result)
-        // Savings: (10 * 12 - 100) / (10 * 12) * 100 = 16.666...% rounds to 17%
-        assertEquals(17, result!!.savingsPercentage)
+        // Savings: (10 * 12 - 100) / (10 * 12) * 100 = 16.666...% rounds down to 16%
+        assertEquals(16, result!!.savingsPercentage)
     }
 
     @Test
