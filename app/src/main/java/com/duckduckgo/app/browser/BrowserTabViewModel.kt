@@ -1969,7 +1969,7 @@ class BrowserTabViewModel @Inject constructor(
             if (duckAiFeatureState.showFullScreenMode.value) {
                 if (duckDuckGoUrlDetector.isDuckDuckGoChatUrl(it)) {
                     logcat { "Duck.ai: AI Chat page loaded $it" }
-                    command.value = Command.EnableDuckAIFullScreen
+                    command.value = Command.EnableDuckAIFullScreen(currentBrowserViewState())
                 } else {
                     command.value = Command.DisableDuckAIFullScreen(url)
                 }

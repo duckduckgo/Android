@@ -21,7 +21,7 @@ import com.duckduckgo.app.browser.omnibar.Omnibar
 import com.duckduckgo.app.browser.viewstate.BrowserViewState
 import com.duckduckgo.browser.ui.browsermenu.BrowserMenuViewState
 
-object RealBrowserMenuViewStateFactory {
+object BrowserMenuViewStateFactory {
     fun create(
         omnibarViewMode: Omnibar.ViewMode,
         viewState: BrowserViewState,
