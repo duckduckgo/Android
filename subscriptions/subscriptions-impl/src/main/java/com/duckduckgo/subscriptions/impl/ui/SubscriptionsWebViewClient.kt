@@ -19,6 +19,7 @@ package com.duckduckgo.subscriptions.impl.ui
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
+import android.webkit.RenderProcessGoneDetail
 import android.webkit.WebResourceRequest
 import android.webkit.WebView
 import android.webkit.WebViewClient
@@ -27,6 +28,7 @@ import com.duckduckgo.app.browser.SpecialUrlDetector
 class SubscriptionsWebViewClient(
     private val specialUrlDetector: SpecialUrlDetector,
     private val context: Context,
+    private val onRenderProcessCrash: () -> Unit,
 ) : WebViewClient() {
 
     override fun shouldOverrideUrlLoading(
@@ -54,5 +56,13 @@ class SubscriptionsWebViewClient(
         } catch (e: Throwable) {
             false
         }
+    }
+
+    override fun onRenderProcessGone(
+        view: WebView?,
+        detail: RenderProcessGoneDetail?,
+    ): Boolean {
+        onRenderProcessCrash()
+        return true
     }
 }

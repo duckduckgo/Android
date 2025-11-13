@@ -242,7 +242,11 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationD
                     super.onProgressChanged(view, newProgress)
                 }
             }
-            it.webViewClient = SubscriptionsWebViewClient(specialUrlDetector, this)
+            it.webViewClient = SubscriptionsWebViewClient(
+                specialUrlDetector = specialUrlDetector,
+                context = this,
+                onRenderProcessCrash = { recoverFromRenderProcessCrash() },
+            )
             it.settings.apply {
                 userAgentString = CUSTOM_UA
                 javaScriptEnabled = true
@@ -281,6 +285,13 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationD
         }
     }
 
+    private fun recoverFromRenderProcessCrash() {
+        if (!intent.getBooleanExtra(ACTIVITY_LAUNCHED_AFTER_WEBVIEW_RENDER_PROCESS_CRASH, false)) {
+            startActivity(intent.putExtra(ACTIVITY_LAUNCHED_AFTER_WEBVIEW_RENDER_PROCESS_CRASH, true))
+        }
+        finish()
+    }
+
     override fun continueDownload(pendingFileDownload: PendingFileDownload) {
         fileDownloader.enqueueDownload(pendingFileDownload)
     }
@@ -296,7 +307,7 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationD
                 origin = subscriptionPurchaseActivityParams.origin,
             ).let { webViewActivityWithParams ->
                 if (subscriptionPurchaseActivityParams.featurePage.isNullOrBlank().not()) {
-                    val urlWithParams = kotlin.runCatching {
+                    val urlWithParams = runCatching {
                         subscriptionsUrlProvider.buyUrl.toUri()
                             .buildUpon()
                             .appendQueryParameter(FEATURE_PAGE_QUERY_PARAM_KEY, subscriptionPurchaseActivityParams.featurePage)
@@ -642,5 +653,6 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationD
         private const val PERMISSION_REQUEST_WRITE_EXTERNAL_STORAGE = 200
         private const val CUSTOM_UA =
             "Mozilla/5.0 (Linux; Android 12) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/124.0.0.0 Mobile DuckDuckGo/5 Safari/537.36"
+        private const val ACTIVITY_LAUNCHED_AFTER_WEBVIEW_RENDER_PROCESS_CRASH = "activity_launched_after_webview_render_process_crash"
     }
 }
