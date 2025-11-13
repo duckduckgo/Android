@@ -41,6 +41,7 @@ import androidx.core.view.isVisible
 import androidx.core.view.postDelayed
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.Lifecycle.State.STARTED
+import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.viewpager2.widget.MarginPageTransformer
@@ -67,7 +68,6 @@ import com.duckduckgo.app.browser.shortcut.ShortcutBuilder
 import com.duckduckgo.app.browser.tabs.TabManager
 import com.duckduckgo.app.browser.tabs.TabManager.TabModel
 import com.duckduckgo.app.browser.tabs.adapter.TabPagerAdapter
-import com.duckduckgo.app.browser.webview.RealMaliciousSiteBlockerWebViewIntegration
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.dispatchers.ExternalIntentProcessingState
 import com.duckduckgo.app.downloads.DownloadsScreens.DownloadsScreenNoParams
@@ -85,10 +85,10 @@ import com.duckduckgo.app.onboarding.ui.page.DefaultBrowserPage
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.pixels.AppPixelName.FIRE_DIALOG_CANCEL
 import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
+import com.duckduckgo.app.settings.clear.OnboardingExperimentFireAnimationHelper
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter
-import com.duckduckgo.app.tabs.TabManagerFeatureFlags
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.ui.DefaultSnackbar
 import com.duckduckgo.app.tabs.ui.TabSwitcherActivity
@@ -123,6 +123,8 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import logcat.LogPriority.ERROR
@@ -173,13 +175,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
     lateinit var externalIntentProcessingState: ExternalIntentProcessingState
 
     @Inject
-    lateinit var maliciousSiteBlockerWebViewIntegration: RealMaliciousSiteBlockerWebViewIntegration
-
-    @Inject
     lateinit var swipingTabsFeature: SwipingTabsFeatureProvider
-
-    @Inject
-    lateinit var tabManagerFeatureFlags: TabManagerFeatureFlags
 
     @Inject
     lateinit var tabManager: TabManager
@@ -195,9 +191,6 @@ open class BrowserActivity : DuckDuckGoActivity() {
 
     @Inject
     lateinit var omnibarEntryConverter: OmnibarEntryConverter
-
-    @Inject
-    lateinit var browserFeatures: AndroidBrowserConfigFeature
 
     @Inject
     lateinit var newAddressBarOptionManager: NewAddressBarOptionManager
@@ -347,9 +340,11 @@ open class BrowserActivity : DuckDuckGoActivity() {
         // flows only once, so a separate initialization is necessary
         configureFlowCollectors()
 
-        viewModel.viewState.observe(this) {
-            renderer.renderBrowserViewState(it)
-        }
+        viewModel.viewState
+            .flowWithLifecycle(lifecycle, Lifecycle.State.RESUMED)
+            .onEach { renderer.renderBrowserViewState(it) }
+            .launchIn(lifecycleScope)
+
         observeDuckChatSharedCommands()
 
         viewModel.awaitClearDataFinishedNotification()
@@ -669,9 +664,10 @@ open class BrowserActivity : DuckDuckGoActivity() {
     }
 
     private fun configureObservers() {
-        viewModel.command.observe(this) {
-            processCommand(it)
-        }
+        viewModel.commands
+            .flowWithLifecycle(lifecycle, Lifecycle.State.CREATED)
+            .onEach { processCommand(it) }
+            .launchIn(lifecycleScope)
 
         if (!swipingTabsFeature.isEnabled) {
             // when swiping is enabled, the state is controlled be flows initialized in configureFlowCollectors()
@@ -690,8 +686,6 @@ open class BrowserActivity : DuckDuckGoActivity() {
     }
 
     private fun removeObservers() {
-        viewModel.command.removeObservers(this)
-
         if (!swipingTabsFeature.isEnabled) {
             viewModel.selectedTab.removeObservers(this)
             viewModel.tabs.removeObservers(this)
@@ -746,7 +740,14 @@ open class BrowserActivity : DuckDuckGoActivity() {
             is Command.ShowSystemDefaultAppsActivity -> showSystemDefaultAppsActivity(command.intent)
             is Command.ShowSystemDefaultBrowserDialog -> showSystemDefaultBrowserDialog(command.intent)
             is Command.ShowUndoDeleteTabsMessage -> showTabsDeletedSnackbar(command.tabIds)
-            is Command.OpenDuckChat -> openDuckChat(command.duckChatUrl, command.duckChatSessionActive, command.withTransition, command.tabs)
+            is Command.OpenDuckChat -> openDuckChat(
+                command.duckChatUrl,
+                command.duckChatSessionActive,
+                command.withTransition,
+                command.tabs,
+                command.fullScreenMode,
+            )
+
             Command.LaunchTabSwitcher -> currentTab?.launchTabSwitcherAfterTabsUndeleted()
         }
     }
@@ -838,19 +839,24 @@ open class BrowserActivity : DuckDuckGoActivity() {
         duckChatSessionActive: Boolean,
         withTransition: Boolean,
         tabs: Int,
+        fullScreenMode: Boolean,
     ) {
-        duckAiFragment?.let { fragment ->
-            if (duckChatSessionActive) {
-                restoreDuckChat(fragment, withTransition)
-            } else {
+        if (fullScreenMode) {
+            currentTab?.submitQuery(url!!)
+        } else {
+            duckAiFragment?.let { fragment ->
+                if (duckChatSessionActive) {
+                    restoreDuckChat(fragment, withTransition)
+                } else {
+                    launchNewDuckChat(url, withTransition, tabs)
+                }
+            } ?: run {
                 launchNewDuckChat(url, withTransition, tabs)
             }
-        } ?: run {
-            launchNewDuckChat(url, withTransition, tabs)
-        }
 
-        currentTab?.getOmnibar()?.omnibarView?.omnibarTextInput?.let {
-            hideKeyboard(it)
+            currentTab?.getOmnibar()?.omnibarView?.omnibarTextInput?.let {
+                hideKeyboard(it)
+            }
         }
     }
 
@@ -984,6 +990,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
                             val intent = TabSwitcherActivity.intent(this@BrowserActivity)
                             tabSwitcherActivityResult.launch(intent)
                         }
+
                         is DuckChatSharedViewModel.Command.SearchRequested -> {
                             closeDuckChat()
                             currentTab?.submitQuery(command.query)

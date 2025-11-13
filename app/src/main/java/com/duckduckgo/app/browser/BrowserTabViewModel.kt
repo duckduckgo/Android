@@ -469,7 +469,6 @@ class BrowserTabViewModel @Inject constructor(
     private val duckChat: DuckChat,
     private val duckAiFeatureState: DuckAiFeatureState,
     private val duckPlayerJSHelper: DuckPlayerJSHelper,
-    private val duckChatJSHelper: DuckChatJSHelper,
     private val refreshPixelSender: RefreshPixelSender,
     private val privacyProtectionTogglePlugin: PluginPoint<PrivacyProtectionTogglePlugin>,
     private val showOnAppLaunchOptionHandler: ShowOnAppLaunchOptionHandler,
@@ -483,6 +482,7 @@ class BrowserTabViewModel @Inject constructor(
     private val siteErrorHandler: StringSiteErrorHandler,
     private val siteHttpErrorHandler: HttpCodeSiteErrorHandler,
     private val subscriptionsJSHelper: SubscriptionsJSHelper,
+    private val duckChatJSHelper: DuckChatJSHelper,
     private val tabManager: TabManager,
     private val addressDisplayFormatter: AddressDisplayFormatter,
     private val onboardingDesignExperimentManager: OnboardingDesignExperimentManager,
@@ -676,7 +676,6 @@ class BrowserTabViewModel @Inject constructor(
         }
 
     init {
-        logcat { "Duck.ai: init" }
         initializeViewStates()
 
         fireproofWebsiteState.observeForever(fireproofWebsitesObserver)
@@ -1136,11 +1135,16 @@ class BrowserTabViewModel @Inject constructor(
         when (val type = specialUrlDetector.determineType(trimmedInput)) {
             is ShouldLaunchDuckChatLink -> {
                 runCatching {
-                    val queryParameter = urlToNavigate.toUri().getQueryParameter(QUERY)
-                    if (queryParameter != null) {
-                        duckChat.openDuckChatWithPrefill(queryParameter)
+                    if (duckAiFeatureState.showFullScreenMode.value) {
+                        site?.nextUrl = urlToNavigate
+                        command.value = NavigationCommand.Navigate(urlToNavigate, getUrlHeaders(urlToNavigate))
                     } else {
-                        duckChat.openDuckChat()
+                        val queryParameter = urlToNavigate.toUri().getQueryParameter(QUERY)
+                        if (queryParameter != null) {
+                            duckChat.openDuckChatWithPrefill(queryParameter)
+                        } else {
+                            duckChat.openDuckChat()
+                        }
                     }
                     return
                 }
@@ -1944,6 +1948,7 @@ class BrowserTabViewModel @Inject constructor(
                 onboardingDesignExperimentManager.onWebPageFinishedLoading(url)
             }
 
+            evaluateDuckAIPage(url)
             evaluateSerpLogoState(url)
         }
     }
@@ -1954,6 +1959,20 @@ class BrowserTabViewModel @Inject constructor(
                 command.value = ExtractSerpLogo(url)
             } else {
                 omnibarViewState.value = currentOmnibarViewState().copy(serpLogo = null)
+            }
+        }
+    }
+
+    private fun evaluateDuckAIPage(url: String?) {
+        logcat { "Duck.ai: evaluateDuckAIPage $url" }
+        url?.let {
+            if (duckAiFeatureState.showFullScreenMode.value) {
+                if (duckDuckGoUrlDetector.isDuckDuckGoChatUrl(it)) {
+                    logcat { "Duck.ai: AI Chat page loaded $it" }
+                    command.value = Command.EnableDuckAIFullScreen
+                } else {
+                    command.value = Command.DisableDuckAIFullScreen(url)
+                }
             }
         }
     }

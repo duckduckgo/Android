@@ -216,6 +216,8 @@ class OmnibarLayout @JvmOverloads constructor(
     private val omniBarContentContainer: View by lazy { findViewById(R.id.omniBarContentContainer) }
     private val backIcon: ImageView by lazy { findViewById(R.id.backIcon) }
     private val customTabToolbarContainerWrapper: ViewGroup by lazy { findViewById(R.id.customTabToolbarContainerWrapper) }
+    private val leadingIconContainer: View by lazy { findViewById(R.id.omnibarIconContainer) }
+    private val duckAIHeader: View by lazy { findViewById(R.id.duckAIHeader) }
 
     private var isFindInPageVisible = false
     private val findInPageLayoutVisibilityChangeListener =
@@ -557,6 +559,9 @@ class OmnibarLayout @JvmOverloads constructor(
             viewModel.onBackButtonPressed()
             omnibarItemPressedListener?.onBackButtonPressed()
         }
+        duckAIHeader.setOnClickListener {
+            viewModel.onTextInputClickCatcherClicked()
+        }
     }
 
     override fun setLogoClickListener(logoClickListener: LogoClickListener) {
@@ -569,10 +574,18 @@ class OmnibarLayout @JvmOverloads constructor(
                 renderCustomTabMode(viewState, viewState.viewMode)
             }
 
+            is ViewMode.DuckAI -> {
+                renderDuckAiMode(viewState)
+            }
+
             else -> {
                 renderBrowserMode(viewState)
             }
         }
+
+        duckAIHeader.isVisible = viewState.viewMode is ViewMode.DuckAI
+        leadingIconContainer.isGone = viewState.viewMode is ViewMode.DuckAI
+        omnibarTextInput.isGone = viewState.viewMode is ViewMode.DuckAI
 
         if (viewState.leadingIconState == PrivacyShield) {
             renderPrivacyShield(viewState.privacyShield, viewState.viewMode)
@@ -844,6 +857,13 @@ class OmnibarLayout @JvmOverloads constructor(
         renderLeadingIconState(viewState)
 
         omnibarTextInput.hint = context.getString(R.string.search)
+    }
+
+    private fun renderDuckAiMode(viewState: ViewState) {
+        logcat { "Omnibar: renderDuckAiMode $viewState" }
+        renderTabIcon(viewState)
+        renderPulseAnimation(viewState)
+        pageLoadingIndicator.isVisible = viewState.isLoading
     }
 
     private fun renderCustomTabMode(

@@ -34,6 +34,8 @@ import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.networkprotection.api.NetworkProtectionScreens.NetworkProtectionManagementScreenAndEnable
 import com.duckduckgo.networkprotection.api.NetworkProtectionState
 import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixels
+import com.duckduckgo.networkprotection.impl.pixels.VpnEnableWideEvent
+import com.duckduckgo.networkprotection.impl.pixels.VpnEnableWideEvent.EntryPoint.SYSTEM_TILE
 import com.duckduckgo.networkprotection.impl.quickaccess.VpnTileStateProvider.VpnTileState
 import dagger.android.AndroidInjection
 import dagger.binding.VpnTileServiceBindingKey
@@ -68,6 +70,9 @@ class VpnTileService : TileService() {
     @Inject
     lateinit var networkProtectionPixels: NetworkProtectionPixels
 
+    @Inject
+    lateinit var vpnEnableWideEvent: VpnEnableWideEvent
+
     private var statePollingJob = ConflatedJob()
     private val serviceScope = CoroutineScope(Dispatchers.IO)
 
@@ -85,6 +90,7 @@ class VpnTileService : TileService() {
             } else {
                 networkProtectionPixels.reportVpnEnabledFromQuickSettingsTile()
                 if (hasVpnPermission()) {
+                    vpnEnableWideEvent.onUserRequestedVpnStart(entryPoint = SYSTEM_TILE)
                     networkProtectionState.start()
                 } else {
                     globalActivityStarter.startIntent(this@VpnTileService, NetworkProtectionManagementScreenAndEnable(true))?.apply {
