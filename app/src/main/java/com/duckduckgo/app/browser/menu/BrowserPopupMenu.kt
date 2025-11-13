@@ -27,7 +27,7 @@ import com.duckduckgo.app.browser.databinding.PopupWindowBrowserMenuBottomBindin
 import com.duckduckgo.app.browser.menu.BrowserPopupMenu.ResourceType.BOTTOM
 import com.duckduckgo.app.browser.menu.BrowserPopupMenu.ResourceType.TOP
 import com.duckduckgo.app.browser.viewstate.BrowserViewState
-import com.duckduckgo.app.browser.viewstate.VpnMenuState
+import com.duckduckgo.browser.ui.browsermenu.VpnMenuState
 import com.duckduckgo.common.ui.menu.PopupMenu
 import com.duckduckgo.common.ui.view.MenuItemView
 import com.duckduckgo.common.ui.view.StatusIndicatorView
