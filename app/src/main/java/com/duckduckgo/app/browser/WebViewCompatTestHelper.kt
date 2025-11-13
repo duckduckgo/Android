@@ -99,7 +99,7 @@ class RealWebViewCompatTestHelper @Inject constructor(
                 sendMessageOnPageStarted = webViewCompatFeature.sendMessageOnPageStarted().isEnabled(),
                 sendMessageOnContextMenuOpen = webViewCompatFeature.sendMessageOnContextMenuOpen().isEnabled(),
                 sendMessagesUsingReplyProxy = webViewCompatFeature.sendMessagesUsingReplyProxy().isEnabled(),
-                useLargeScript = webViewCompatFeature.useLargeScript().isEnabled(),
+                useComplexScript = webViewCompatFeature.useComplexScript().isEnabled(),
             ).also {
                 cachedConfig = it
             }
@@ -113,7 +113,7 @@ class RealWebViewCompatTestHelper @Inject constructor(
 
         val script = withContext(dispatchers.io()) {
             if (!webViewCompatFeature.self().isEnabled()) return@withContext null
-            val scriptResourceId = if (config.useLargeScript) {
+            val scriptResourceId = if (config.useComplexScript) {
                 R.raw.webviewcompat_complex_test_script
             } else {
                 R.raw.webviewcompat_test_script
