@@ -23,15 +23,19 @@ import com.duckduckgo.browser.ui.browsermenu.BrowserMenuViewState
 
 object RealBrowserMenuViewStateFactory {
     fun create(
-        viewMode: Omnibar.ViewMode,
+        omnibarViewMode: Omnibar.ViewMode,
         viewState: BrowserViewState,
+        customTabsMode: Boolean,
     ): BrowserMenuViewState {
-        return when (viewMode){
-           is Omnibar.ViewMode.Browser -> createBrowserViewState(browserViewState = viewState, browserShowing = true)
-            is Omnibar.ViewMode.CustomTab -> createCustomTabsViewState(viewState)
-            Omnibar.ViewMode.NewTab -> createNewTabPageViewState(viewState)
-            Omnibar.ViewMode.DuckAI -> BrowserMenuViewState.DuckAi
-            else -> createBrowserViewState(browserViewState = viewState, browserShowing = false)
+        return if (customTabsMode) {
+            createCustomTabsViewState(viewState)
+        } else {
+            when (omnibarViewMode) {
+                is Omnibar.ViewMode.Browser -> createBrowserViewState(browserViewState = viewState, browserShowing = true)
+                Omnibar.ViewMode.NewTab -> createNewTabPageViewState(viewState)
+                Omnibar.ViewMode.DuckAI -> BrowserMenuViewState.DuckAi
+                else -> createBrowserViewState(browserViewState = viewState, browserShowing = false)
+            }
         }
     }
 
@@ -42,6 +46,8 @@ object RealBrowserMenuViewStateFactory {
             canGoBack = browserViewState.canGoBack,
             canGoForward = browserViewState.canGoForward,
             canSharePage = browserViewState.canSharePage,
+            canChangeBrowsingMode = browserViewState.canChangeBrowsingMode,
+            isDesktopBrowsingMode = browserViewState.isDesktopBrowsingMode,
             canChangePrivacyProtection = browserViewState.canChangePrivacyProtection,
             isPrivacyProtectionDisabled = browserViewState.isPrivacyProtectionDisabled,
         )

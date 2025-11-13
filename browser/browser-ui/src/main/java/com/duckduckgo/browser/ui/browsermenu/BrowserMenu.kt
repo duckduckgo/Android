@@ -274,7 +274,7 @@ class BrowserMenu(
     /**
      * These are items available across all browser types
      */
-    private fun showCommonItems(){
+    private fun showCommonItems() {
         bookmarksMenuItem.isVisible = true
         downloadsMenuItem.isVisible = true
         settingsMenuItem.isVisible = true
@@ -372,6 +372,33 @@ class BrowserMenu(
         printPageMenuItem.isEnabled = true
 
         sharePageMenuItem.isVisible = viewState.canSharePage
+        findInPageMenuItem.isVisible = viewState.canFindInPage
+
+        changeBrowserModeMenuItem.isVisible = viewState.canChangeBrowsingMode
+        changeBrowserModeMenuItem.label {
+            context.getString(
+                if (viewState.isDesktopBrowsingMode) {
+                    R.string.browserMenuMobileSite
+                } else {
+                    R.string.browserMenuDesktopSite
+                },
+            )
+        }
+
+        privacyProtectionMenuItem.isVisible = viewState.canChangePrivacyProtection
+        privacyProtectionMenuItem.label {
+            context
+                .getText(
+                    if (viewState.isPrivacyProtectionDisabled) {
+                        R.string.browserMenuEnablePrivacyProtection
+                    } else {
+                        R.string.browserMenuDisablePrivacyProtection
+                    },
+                ).toString()
+        }
+        privacyProtectionMenuItem.setIcon(
+            if (viewState.isPrivacyProtectionDisabled) drawable.ic_shield_16 else drawable.ic_shield_disabled_16,
+        )
 
         openInDdgBrowserMenuItem.isVisible = true
         customTabsMenuDivider.isVisible = true
@@ -412,7 +439,6 @@ class BrowserMenu(
     }
 
     private fun renderDuckAIMenu(viewState: BrowserMenuViewState.DuckAi) {
-
     }
 
     private fun getVpnMenuViews() =

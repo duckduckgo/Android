@@ -48,6 +48,9 @@ sealed class BrowserMenuViewState {
         val canGoBack: Boolean = false,
         val canGoForward: Boolean = false,
         val canSharePage: Boolean = false,
+        val canChangeBrowsingMode: Boolean = false,
+        val isDesktopBrowsingMode: Boolean = false,
+        val canFindInPage: Boolean = true,
         val canChangePrivacyProtection: Boolean = false,
         val isPrivacyProtectionDisabled: Boolean = false,
     ) : BrowserMenuViewState()

@@ -1438,7 +1438,6 @@ class BrowserTabFragment :
 
     private fun launchPopupMenu(anchorToNavigationBar: Boolean, addExtraDelay: Boolean = false) {
         val isFocusedNtp = omnibar.viewMode == ViewMode.NewTab && omnibar.getText().isEmpty() && omnibar.omnibarTextInput.hasFocus()
-
         val delay = if (addExtraDelay) POPUP_MENU_DELAY * 2 else POPUP_MENU_DELAY
         // small delay added to let keyboard disappear and avoid jarring transition
         binding.rootView.postDelayed(delay) {
@@ -1451,7 +1450,6 @@ class BrowserTabFragment :
                         vpnMenuStore.incrementVpnMenuShownCount()
                     }
                 }
-
                 if (anchorToNavigationBar) {
                     val anchorView = browserNavigationBarIntegration.navigationBarView.popupMenuAnchor
                     popupMenu.showAnchoredView(requireActivity(), binding.rootView, anchorView)
@@ -4608,8 +4606,12 @@ class BrowserTabFragment :
 
                 browserNavigationBarIntegration.configureFireButtonHighlight(highlighted = viewState.fireButton.isHighlighted())
 
-                val browseMenuState = RealBrowserMenuViewStateFactory.create(viewMode = omnibar.viewMode, viewState = viewState)
-                logcat { "BrowserMenu: render browseMenuState $browseMenuState" }
+                val browseMenuState = RealBrowserMenuViewStateFactory.create(
+                    omnibarViewMode = omnibar.viewMode,
+                    viewState = viewState,
+                    customTabsMode = tabDisplayedInCustomTabScreen,
+                )
+                logcat { "BrowserMenu: viewMode ${omnibar.viewMode} render browseMenuState $browseMenuState" }
                 popupMenu.render(browseMenuState)
 
                 renderFullscreenMode(viewState)
