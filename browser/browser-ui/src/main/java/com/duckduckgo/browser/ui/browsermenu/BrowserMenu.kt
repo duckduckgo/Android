@@ -19,6 +19,8 @@ package com.duckduckgo.browser.ui.browsermenu
 import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
+import android.widget.LinearLayout
+import androidx.core.view.children
 import androidx.core.view.isVisible
 import com.duckduckgo.app.browser.omnibar.OmnibarType
 import com.duckduckgo.browser.ui.R
@@ -27,6 +29,7 @@ import com.duckduckgo.browser.ui.databinding.PopupWindowBrowserMenuBottomBinding
 import com.duckduckgo.common.ui.menu.PopupMenu
 import com.duckduckgo.common.ui.view.MenuItemView
 import com.duckduckgo.common.ui.view.StatusIndicatorView
+import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.mobile.android.R.drawable
 
 class BrowserMenu(
@@ -49,203 +52,211 @@ class BrowserMenu(
             }
     }
 
-    internal val backMenuItem: View by lazy {
+    val backMenuItem: View by lazy {
         when (omnibarType) {
             OmnibarType.SINGLE_BOTTOM -> bottomBinding.backMenuItem
             else -> topBinding.backMenuItem
         }
     }
 
-    internal val forwardMenuItem: View by lazy {
+    val forwardMenuItem: View by lazy {
         when (omnibarType) {
             OmnibarType.SINGLE_BOTTOM -> bottomBinding.forwardMenuItem
             else -> topBinding.forwardMenuItem
         }
     }
 
-    internal val refreshMenuItem: View by lazy {
+    val refreshMenuItem: View by lazy {
         when (omnibarType) {
             OmnibarType.SINGLE_BOTTOM -> bottomBinding.refreshMenuItem
             else -> topBinding.refreshMenuItem
         }
     }
 
-    internal val printPageMenuItem: View by lazy {
+    val printPageMenuItem: View by lazy {
         when (omnibarType) {
             OmnibarType.SINGLE_BOTTOM -> bottomBinding.printPageMenuItem
             else -> topBinding.printPageMenuItem
         }
     }
 
-    internal val newTabMenuItem: View by lazy {
+    val newTabMenuItem: View by lazy {
         when (omnibarType) {
             OmnibarType.SINGLE_BOTTOM -> bottomBinding.newTabMenuItem
             else -> topBinding.newTabMenuItem
         }
     }
 
-    internal val defaultBrowserMenuItem: View by lazy {
+    val defaultBrowserMenuItem: View by lazy {
         when (omnibarType) {
             OmnibarType.SINGLE_BOTTOM -> bottomBinding.includeDefaultBrowserMenuItem.defaultBrowserMenuItem
             else -> topBinding.includeDefaultBrowserMenuItem.defaultBrowserMenuItem
         }
     }
 
-    internal val vpnMenuItem: View by lazy {
+    val vpnMenuItem: View by lazy {
         when (omnibarType) {
             OmnibarType.SINGLE_BOTTOM -> bottomBinding.includeVpnMenuItem.vpnMenuItem
             else -> topBinding.includeVpnMenuItem.vpnMenuItem
         }
     }
 
-    internal val duckChatMenuItem: View by lazy {
+    val duckChatMenuItem: View by lazy {
         when (omnibarType) {
             OmnibarType.SINGLE_BOTTOM -> bottomBinding.includeDuckChatMenuItem
             else -> topBinding.includeDuckChatMenuItem
         }
     }
 
-    internal val sharePageMenuItem: View by lazy {
+    val sharePageMenuItem: View by lazy {
         when (omnibarType) {
             OmnibarType.SINGLE_BOTTOM -> bottomBinding.sharePageMenuItem
             else -> topBinding.sharePageMenuItem
         }
     }
 
-    internal val bookmarksMenuItem: View by lazy {
+    val bookmarksMenuItem: View by lazy {
         when (omnibarType) {
             OmnibarType.SINGLE_BOTTOM -> bottomBinding.bookmarksMenuItem
             else -> topBinding.bookmarksMenuItem
         }
     }
 
-    internal val downloadsMenuItem: View by lazy {
+    val downloadsMenuItem: View by lazy {
         when (omnibarType) {
             OmnibarType.SINGLE_BOTTOM -> bottomBinding.downloadsMenuItem
             else -> topBinding.downloadsMenuItem
         }
     }
 
-    internal val settingsMenuItem: View by lazy {
+    val settingsMenuItem: View by lazy {
         when (omnibarType) {
             OmnibarType.SINGLE_BOTTOM -> bottomBinding.settingsMenuItem
             else -> topBinding.settingsMenuItem
         }
     }
 
-    internal val addBookmarksMenuItem: MenuItemView by lazy {
+    val addBookmarksMenuItem: MenuItemView by lazy {
         when (omnibarType) {
             OmnibarType.SINGLE_BOTTOM -> bottomBinding.addBookmarksMenuItem
             else -> topBinding.addBookmarksMenuItem
         }
     }
 
-    internal val fireproofWebsiteMenuItem: MenuItemView by lazy {
+    val fireproofWebsiteMenuItem: MenuItemView by lazy {
         when (omnibarType) {
             OmnibarType.SINGLE_BOTTOM -> bottomBinding.fireproofWebsiteMenuItem
             else -> topBinding.fireproofWebsiteMenuItem
         }
     }
 
-    internal val createAliasMenuItem: MenuItemView by lazy {
+    val createAliasMenuItem: MenuItemView by lazy {
         when (omnibarType) {
             OmnibarType.SINGLE_BOTTOM -> bottomBinding.createAliasMenuItem
             else -> topBinding.createAliasMenuItem
         }
     }
 
-    internal val changeBrowserModeMenuItem: MenuItemView by lazy {
+    val changeBrowserModeMenuItem: MenuItemView by lazy {
         when (omnibarType) {
             OmnibarType.SINGLE_BOTTOM -> bottomBinding.changeBrowserModeMenuItem
             else -> topBinding.changeBrowserModeMenuItem
         }
     }
 
-    internal val openInAppMenuItem: MenuItemView by lazy {
+    val openInAppMenuItem: MenuItemView by lazy {
         when (omnibarType) {
             OmnibarType.SINGLE_BOTTOM -> bottomBinding.openInAppMenuItem
             else -> topBinding.openInAppMenuItem
         }
     }
 
-    internal val findInPageMenuItem: MenuItemView by lazy {
+    val findInPageMenuItem: MenuItemView by lazy {
         when (omnibarType) {
             OmnibarType.SINGLE_BOTTOM -> bottomBinding.findInPageMenuItem
             else -> topBinding.findInPageMenuItem
         }
     }
 
-    internal val addToHomeMenuItem: MenuItemView by lazy {
+    val addToHomeMenuItem: MenuItemView by lazy {
         when (omnibarType) {
             OmnibarType.SINGLE_BOTTOM -> bottomBinding.addToHomeMenuItem
             else -> topBinding.addToHomeMenuItem
         }
     }
 
-    internal val privacyProtectionMenuItem: MenuItemView by lazy {
+    val privacyProtectionMenuItem: MenuItemView by lazy {
         when (omnibarType) {
             OmnibarType.SINGLE_BOTTOM -> bottomBinding.privacyProtectionMenuItem
             else -> topBinding.privacyProtectionMenuItem
         }
     }
 
-    internal val brokenSiteMenuItem: MenuItemView by lazy {
+    val brokenSiteMenuItem: MenuItemView by lazy {
         when (omnibarType) {
             OmnibarType.SINGLE_BOTTOM -> bottomBinding.brokenSiteMenuItem
             else -> topBinding.brokenSiteMenuItem
         }
     }
 
-    internal val autofillMenuItem: MenuItemView by lazy {
+    val autofillMenuItem: MenuItemView by lazy {
         when (omnibarType) {
             OmnibarType.SINGLE_BOTTOM -> bottomBinding.autofillMenuItem
             else -> topBinding.autofillMenuItem
         }
     }
 
-    internal val runningInDdgBrowserMenuItem: MenuItemView by lazy {
+    val runningInDdgBrowserMenuItem: MenuItemView by lazy {
         when (omnibarType) {
             OmnibarType.SINGLE_BOTTOM -> bottomBinding.runningInDdgBrowserMenuItem
             else -> topBinding.runningInDdgBrowserMenuItem
         }
     }
 
-    internal val siteOptionsMenuDivider: View by lazy {
+    val siteOptionsMenuDivider: View by lazy {
         when (omnibarType) {
             OmnibarType.SINGLE_BOTTOM -> bottomBinding.siteOptionsMenuDivider
             else -> topBinding.siteOptionsMenuDivider
         }
     }
 
-    internal val browserOptionsMenuDivider: View by lazy {
+    val browserOptionsMenuDivider: View by lazy {
         when (omnibarType) {
             OmnibarType.SINGLE_BOTTOM -> bottomBinding.browserOptionsMenuDivider
             else -> topBinding.browserOptionsMenuDivider
         }
     }
 
-    internal val settingsMenuDivider: View by lazy {
+    val settingsMenuDivider: View by lazy {
         when (omnibarType) {
             OmnibarType.SINGLE_BOTTOM -> bottomBinding.settingsMenuDivider
             else -> topBinding.settingsMenuDivider
         }
     }
 
-    internal val customTabsMenuDivider: View by lazy {
+    val customTabsMenuDivider: View by lazy {
         when (omnibarType) {
             OmnibarType.SINGLE_BOTTOM -> bottomBinding.customTabsMenuDivider
             else -> topBinding.customTabsMenuDivider
         }
     }
 
-    internal val openInDdgBrowserMenuItem: MenuItemView by lazy {
+    val openInDdgBrowserMenuItem: MenuItemView by lazy {
         when (omnibarType) {
             OmnibarType.SINGLE_BOTTOM -> bottomBinding.openInDdgBrowserMenuItem
             else -> topBinding.openInDdgBrowserMenuItem
         }
     }
 
+    private val menuItemsContainer: LinearLayout by lazy {
+        when (omnibarType) {
+            OmnibarType.SINGLE_BOTTOM -> bottomBinding.menuItemsContainer
+            else -> topBinding.menuItemsContainer
+        }
+    }
+
     fun render(viewState: BrowserMenuViewState) {
+        hideAllMenuItems()
         when (viewState) {
             is BrowserMenuViewState.Browser -> renderBrowserMenu(viewState)
             is BrowserMenuViewState.CustomTabs -> renderCustomTabsMenu(viewState)
@@ -254,7 +265,23 @@ class BrowserMenu(
         }
     }
 
-    fun renderBrowserMenu(viewState: BrowserMenuViewState.Browser) {
+    private fun hideAllMenuItems() {
+        menuItemsContainer.children.forEach { menuItem ->
+            menuItem.gone()
+        }
+    }
+
+    /**
+     * These are items available across all browser types
+     */
+    private fun showCommonItems(){
+        bookmarksMenuItem.isVisible = true
+        downloadsMenuItem.isVisible = true
+        settingsMenuItem.isVisible = true
+    }
+
+    private fun renderBrowserMenu(viewState: BrowserMenuViewState.Browser) {
+        showCommonItems()
         backMenuItem.isEnabled = viewState.canGoBack
         forwardMenuItem.isEnabled = viewState.canGoForward
         refreshMenuItem.isEnabled = viewState.browserShowing
@@ -265,10 +292,6 @@ class BrowserMenu(
         sharePageMenuItem.isVisible = viewState.canSharePage
 
         defaultBrowserMenuItem.isVisible = viewState.showSelectDefaultBrowserMenuItem
-
-        bookmarksMenuItem.isVisible = true
-        downloadsMenuItem.isVisible = true
-        settingsMenuItem.isVisible = true
 
         addBookmarksMenuItem.isVisible = viewState.canSaveSite
         addBookmarksMenuItem.label {
@@ -341,7 +364,7 @@ class BrowserMenu(
         }
     }
 
-    fun renderCustomTabsMenu(viewState: BrowserMenuViewState.CustomTabs) {
+    private fun renderCustomTabsMenu(viewState: BrowserMenuViewState.CustomTabs) {
         backMenuItem.isEnabled = viewState.canGoBack
         forwardMenuItem.isEnabled = viewState.canGoForward
 
@@ -355,13 +378,16 @@ class BrowserMenu(
         runningInDdgBrowserMenuItem.isVisible = true
     }
 
-    fun renderNewTabPageMenu(viewState: BrowserMenuViewState.NewTabPage) {
+    private fun renderNewTabPageMenu(viewState: BrowserMenuViewState.NewTabPage) {
+        showCommonItems()
+
         backMenuItem.isEnabled = false
         forwardMenuItem.isEnabled = false
         refreshMenuItem.isEnabled = false
 
         newTabMenuItem.isVisible = false
         duckChatMenuItem.isVisible = viewState.showDuckChatOption
+        autofillMenuItem.isVisible = viewState.showAutofill
 
         when (viewState.vpnMenuState) {
             VpnMenuState.Hidden -> {
@@ -385,7 +411,8 @@ class BrowserMenu(
         }
     }
 
-    fun renderDuckAIMenu(viewState: BrowserMenuViewState.DuckAi) {
+    private fun renderDuckAIMenu(viewState: BrowserMenuViewState.DuckAi) {
+
     }
 
     private fun getVpnMenuViews() =

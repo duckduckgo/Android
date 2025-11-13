@@ -81,6 +81,7 @@
         android:paddingTop="4dp">
 
         <LinearLayout
+            android:id="@+id/menuItemsContainer"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
@@ -256,7 +257,7 @@
                 app:textType="secondary"
                 app:typography="body2"
                 app:iconDrawable="@drawable/ic_dax_icon"
-                app:primaryText="@string/runningInDdgMenuItemTitle" />
+                app:primaryText="@string/browserMenuRunningInDDG" />
 
         </LinearLayout>
 

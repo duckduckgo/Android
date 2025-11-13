@@ -54,6 +54,7 @@ sealed class BrowserMenuViewState {
     data class NewTabPage(
         val showDuckChatOption: Boolean = false,
         val vpnMenuState: VpnMenuState = VpnMenuState.Hidden,
+        val showAutofill: Boolean = false,
     ) : BrowserMenuViewState()
     data object DuckAi : BrowserMenuViewState()
 }

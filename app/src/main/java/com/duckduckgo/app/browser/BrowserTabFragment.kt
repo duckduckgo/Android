@@ -136,7 +136,7 @@ import com.duckduckgo.app.browser.history.NavigationHistorySheet
 import com.duckduckgo.app.browser.history.NavigationHistorySheet.NavigationHistorySheetListener
 import com.duckduckgo.app.browser.httpauth.WebViewHttpAuthStore
 import com.duckduckgo.app.browser.logindetection.DOMLoginDetector
-import com.duckduckgo.app.browser.menu.BrowserPopupMenu
+import com.duckduckgo.app.browser.menu.RealBrowserMenuViewStateFactory
 import com.duckduckgo.app.browser.menu.VpnMenuStore
 import com.duckduckgo.app.browser.model.BasicAuthenticationCredentials
 import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
@@ -178,7 +178,6 @@ import com.duckduckgo.app.browser.viewstate.LoadingViewState
 import com.duckduckgo.app.browser.viewstate.OmnibarViewState
 import com.duckduckgo.app.browser.viewstate.PrivacyShieldViewState
 import com.duckduckgo.app.browser.viewstate.SavedSiteChangedViewState
-import com.duckduckgo.app.browser.viewstate.VpnMenuState
 import com.duckduckgo.app.browser.webauthn.WebViewPasskeyInitializer
 import com.duckduckgo.app.browser.webshare.WebShareChooser
 import com.duckduckgo.app.browser.webshare.WebViewCompatWebShareChooser
@@ -253,6 +252,8 @@ import com.duckduckgo.browser.api.ui.BrowserScreens.PrivateSearchScreenNoParams
 import com.duckduckgo.browser.api.ui.BrowserScreens.WebViewActivityWithParams
 import com.duckduckgo.browser.api.webviewcompat.WebViewCompatWrapper
 import com.duckduckgo.browser.ui.autocomplete.BrowserAutoCompleteSuggestionsAdapter
+import com.duckduckgo.browser.ui.browsermenu.BrowserMenu
+import com.duckduckgo.browser.ui.browsermenu.VpnMenuState
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.DuckDuckGoFragment
 import com.duckduckgo.common.ui.store.BrowserAppTheme
@@ -614,7 +615,7 @@ class BrowserTabFragment :
 
     private val skipHome get() = requireArguments().getBoolean(SKIP_HOME_ARG)
 
-    private lateinit var popupMenu: BrowserPopupMenu
+    private lateinit var popupMenu: BrowserMenu
     private lateinit var ctaBottomSheet: PromoBottomSheetDialog
     private lateinit var widgetBottomSheetDialog: AlternativeHomeScreenWidgetBottomSheetDialog
 
@@ -1313,17 +1314,11 @@ class BrowserTabFragment :
     }
 
     private fun createPopupMenu() {
-        val popupMenuResourceType =
-            when (omnibar.omnibarType) {
-                OmnibarType.SINGLE_TOP -> BrowserPopupMenu.ResourceType.TOP
-                OmnibarType.SINGLE_BOTTOM, OmnibarType.SPLIT -> BrowserPopupMenu.ResourceType.BOTTOM
-            }
-
         popupMenu =
-            BrowserPopupMenu(
+            BrowserMenu(
                 context = requireContext(),
                 layoutInflater = layoutInflater,
-                popupMenuResourceType = popupMenuResourceType,
+                omnibarType = omnibar.omnibarType,
             )
         popupMenu.apply {
             onMenuItemClicked(forwardMenuItem) {
@@ -4613,7 +4608,9 @@ class BrowserTabFragment :
 
                 browserNavigationBarIntegration.configureFireButtonHighlight(highlighted = viewState.fireButton.isHighlighted())
 
-                popupMenu.renderState(browserShowing, viewState, tabDisplayedInCustomTabScreen)
+                val browseMenuState = RealBrowserMenuViewStateFactory.create(viewMode = omnibar.viewMode, viewState = viewState)
+                logcat { "BrowserMenu: render browseMenuState $browseMenuState" }
+                popupMenu.render(browseMenuState)
 
                 renderFullscreenMode(viewState)
                 privacyProtectionsPopup.setViewState(viewState.privacyProtectionsPopupViewState)

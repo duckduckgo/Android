@@ -22,7 +22,6 @@
     <string name="browserMenuAddBookmark">Add Bookmark</string>
     <string name="browserMenuEditBookmark">Edit Bookmark</string>
     <string name="browserMenuFireproofSite">Fireproof This Site</string>
-    <string name="browserMenuRemoveFireproofing">Remove Fireproofing</string>
     <string name="browserMenuMobileSite">Mobile Site</string>
     <string name="browserMenuDesktopSite">Desktop Site</string>
     <string name="browserMenuEnablePrivacyProtection">Enable Privacy Protection</string>

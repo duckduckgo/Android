@@ -17,39 +17,22 @@
 package com.duckduckgo.app.browser.menu
 
 import com.duckduckgo.app.browser.SSLErrorType.NONE
+import com.duckduckgo.app.browser.omnibar.Omnibar
 import com.duckduckgo.app.browser.viewstate.BrowserViewState
 import com.duckduckgo.browser.ui.browsermenu.BrowserMenuViewState
 
-interface BrowserMenuViewStateFactory {
-
+object RealBrowserMenuViewStateFactory {
     fun create(
-        browserShowing: Boolean,
+        viewMode: Omnibar.ViewMode,
         viewState: BrowserViewState,
-        displayedInCustomTabScreen: Boolean,
-        duckAIShowing: Boolean,
-    ): BrowserMenuViewState
-}
-
-class RealBrowserMenuViewStateFactory() : BrowserMenuViewStateFactory {
-    override fun create(
-        browserShowing: Boolean,
-        viewState: BrowserViewState,
-        displayedInCustomTabScreen: Boolean,
-        duckAIShowing: Boolean,
     ): BrowserMenuViewState {
-        if (displayedInCustomTabScreen) {
-            return createCustomTabsViewState(viewState)
+        return when (viewMode){
+           is Omnibar.ViewMode.Browser -> createBrowserViewState(browserViewState = viewState, browserShowing = true)
+            is Omnibar.ViewMode.CustomTab -> createCustomTabsViewState(viewState)
+            Omnibar.ViewMode.NewTab -> createNewTabPageViewState(viewState)
+            Omnibar.ViewMode.DuckAI -> BrowserMenuViewState.DuckAi
+            else -> createBrowserViewState(browserViewState = viewState, browserShowing = false)
         }
-
-        if (!browserShowing) {
-            return createNewTabPageViewState(viewState)
-        }
-
-        if (duckAIShowing) {
-            return BrowserMenuViewState.DuckAi
-        }
-
-        return createBrowserViewState(browserViewState = viewState, browserShowing = browserShowing)
     }
 
     private fun createCustomTabsViewState(
@@ -70,6 +53,7 @@ class RealBrowserMenuViewStateFactory() : BrowserMenuViewStateFactory {
         return BrowserMenuViewState.NewTabPage(
             showDuckChatOption = browserViewState.showDuckChatOption,
             vpnMenuState = browserViewState.vpnMenuState,
+            showAutofill = browserViewState.showAutofill,
         )
     }
 
