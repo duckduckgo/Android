@@ -95,8 +95,9 @@ class SurrogatesTest {
         IdlingRegistry.getInstance().register(idlingResourceForDisableProtections)
 
         onView(allOf(withId(R.id.browserMenu), isClickable())).perform(ViewActions.click())
-        onView(isRoot()).perform(waitForView(withId(R.id.privacyProtectionMenuItem)))
-        onView(withId(R.id.privacyProtectionMenuItem)).perform(ViewActions.click())
+        // onView(isRoot()).perform(waitForView(withId(R.id.privacyProtectionMenuItem)))
+        onView(isRoot()).perform(waitForView(withText("Disable Privacy Protection")))
+        onView(withText("Disable Privacy Protection")).perform(ViewActions.click())
 
         // handle the privacy protection toggle check screen showing
         onView(isRoot()).perform(ViewActions.pressBack())
