@@ -79,7 +79,7 @@ class RealWebViewCompatTestHelper @Inject constructor(
         val sendMessageOnPageStarted: Boolean,
         val sendMessageOnContextMenuOpen: Boolean,
         val sendMessagesUsingReplyProxy: Boolean,
-        val useLargeScript: Boolean,
+        val useComplexScript: Boolean,
     )
 
     private var cachedConfig: WebViewCompatConfig? = null
