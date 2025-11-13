@@ -28,7 +28,6 @@ import dagger.Lazy
 import dagger.Module
 import dagger.Provides
 import dagger.SingleInstanceIn
-import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import logcat.logcat
 import org.iq80.leveldb.DB
@@ -39,7 +38,7 @@ import java.nio.charset.StandardCharsets
 import javax.inject.Inject
 
 interface WebLocalStorageManager {
-    fun clearWebLocalStorage()
+    suspend fun clearWebLocalStorage()
 }
 
 @ContributesBinding(AppScope::class)
@@ -56,40 +55,36 @@ class DuckDuckGoWebLocalStorageManager @Inject constructor(
     private var keysToDelete = emptyList<String>()
     private var matchingRegex = emptyList<String>()
 
-    override fun clearWebLocalStorage() = runBlocking {
-        withContext(dispatcherProvider.io()) {
-            val settings = androidBrowserConfigFeature.webLocalStorage().getSettings()
-            val webLocalStorageSettings = webLocalStorageSettingsJsonParser.parseJson(settings)
+    override suspend fun clearWebLocalStorage() = withContext(dispatcherProvider.io()) {
+        val settings = androidBrowserConfigFeature.webLocalStorage().getSettings()
+        val webLocalStorageSettings = webLocalStorageSettingsJsonParser.parseJson(settings)
 
-            val fireproofedDomains = withContext(dispatcherProvider.io()) {
-                fireproofWebsiteRepository.fireproofWebsitesSync().map { it.domain }
-            }
+        val fireproofedDomains = fireproofWebsiteRepository.fireproofWebsitesSync().map { it.domain }
 
-            domains = webLocalStorageSettings.domains.list + fireproofedDomains
-            keysToDelete = webLocalStorageSettings.keysToDelete.list
-            matchingRegex = webLocalStorageSettings.matchingRegex.list
+        domains = webLocalStorageSettings.domains.list + fireproofedDomains
+        keysToDelete = webLocalStorageSettings.keysToDelete.list
+        matchingRegex = webLocalStorageSettings.matchingRegex.list
 
-            logcat { "WebLocalStorageManager: Allowed domains: $domains" }
-            logcat { "WebLocalStorageManager: Keys to delete: $keysToDelete" }
-            logcat { "WebLocalStorageManager: Matching regex: $matchingRegex" }
+        logcat { "WebLocalStorageManager: Allowed domains: $domains" }
+        logcat { "WebLocalStorageManager: Keys to delete: $keysToDelete" }
+        logcat { "WebLocalStorageManager: Matching regex: $matchingRegex" }
 
-            val db = databaseProvider.get()
-            db.iterator().use { iterator ->
-                iterator.seekToFirst()
+        val db = databaseProvider.get()
+        db.iterator().use { iterator ->
+            iterator.seekToFirst()
 
-                while (iterator.hasNext()) {
-                    val entry = iterator.next()
-                    val key = String(entry.key, StandardCharsets.UTF_8)
+            while (iterator.hasNext()) {
+                val entry = iterator.next()
+                val key = String(entry.key, StandardCharsets.UTF_8)
 
-                    val domainForMatchingAllowedKey = getDomainForMatchingAllowedKey(key)
-                    if (domainForMatchingAllowedKey == null) {
+                val domainForMatchingAllowedKey = getDomainForMatchingAllowedKey(key)
+                if (domainForMatchingAllowedKey == null) {
+                    db.delete(entry.key)
+                    logcat { "WebLocalStorageManager: Deleted key: $key" }
+                } else if (settingsDataStore.clearDuckAiData && domainForMatchingAllowedKey == DUCKDUCKGO_DOMAIN) {
+                    if (keysToDelete.any { key.endsWith(it) }) {
                         db.delete(entry.key)
                         logcat { "WebLocalStorageManager: Deleted key: $key" }
-                    } else if (settingsDataStore.clearDuckAiData && domainForMatchingAllowedKey == DUCKDUCKGO_DOMAIN) {
-                        if (keysToDelete.any { key.endsWith(it) }) {
-                            db.delete(entry.key)
-                            logcat { "WebLocalStorageManager: Deleted key: $key" }
-                        }
                     }
                 }
             }
