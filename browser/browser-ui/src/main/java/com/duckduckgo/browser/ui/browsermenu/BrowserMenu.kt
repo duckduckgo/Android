@@ -284,8 +284,8 @@ class BrowserMenu(
         showCommonItems()
         backMenuItem.isEnabled = viewState.canGoBack
         forwardMenuItem.isEnabled = viewState.canGoForward
-        refreshMenuItem.isEnabled = viewState.browserShowing
-        printPageMenuItem.isEnabled = viewState.browserShowing
+        refreshMenuItem.isEnabled = true
+        printPageMenuItem.isEnabled = true
 
         newTabMenuItem.isVisible = true
         duckChatMenuItem.isVisible = viewState.showDuckChatOption
@@ -346,9 +346,9 @@ class BrowserMenu(
         )
         brokenSiteMenuItem.isVisible = viewState.canReportSite
 
-        siteOptionsMenuDivider.isVisible = viewState.browserShowing
-        browserOptionsMenuDivider.isVisible = viewState.browserShowing
-        settingsMenuDivider.isVisible = viewState.browserShowing
+        siteOptionsMenuDivider.isVisible = true
+        browserOptionsMenuDivider.isVisible = true
+        settingsMenuDivider.isVisible = true
         printPageMenuItem.isVisible = viewState.canPrintPage
         autofillMenuItem.isVisible = viewState.showAutofill
 

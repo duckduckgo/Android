@@ -31,10 +31,12 @@ object RealBrowserMenuViewStateFactory {
             createCustomTabsViewState(viewState)
         } else {
             when (omnibarViewMode) {
-                is Omnibar.ViewMode.Browser -> createBrowserViewState(browserViewState = viewState, browserShowing = true)
                 Omnibar.ViewMode.NewTab -> createNewTabPageViewState(viewState)
                 Omnibar.ViewMode.DuckAI -> BrowserMenuViewState.DuckAi
-                else -> createBrowserViewState(browserViewState = viewState, browserShowing = false)
+                Omnibar.ViewMode.Error -> createNewTabPageViewState(viewState)
+                Omnibar.ViewMode.SSLWarning -> createNewTabPageViewState(viewState)
+                Omnibar.ViewMode.MaliciousSiteWarning -> createNewTabPageViewState(viewState)
+                else -> createBrowserViewState(browserViewState = viewState)
             }
         }
     }
@@ -65,10 +67,8 @@ object RealBrowserMenuViewStateFactory {
 
     private fun createBrowserViewState(
         browserViewState: BrowserViewState,
-        browserShowing: Boolean,
     ): BrowserMenuViewState.Browser {
         return BrowserMenuViewState.Browser(
-            browserShowing = browserShowing,
             canGoBack = browserViewState.canGoBack,
             canGoForward = browserViewState.canGoForward,
             showDuckChatOption = browserViewState.showDuckChatOption,

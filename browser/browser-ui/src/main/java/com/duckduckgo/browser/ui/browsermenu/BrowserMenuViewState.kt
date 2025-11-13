@@ -19,7 +19,6 @@ package com.duckduckgo.browser.ui.browsermenu
 sealed class BrowserMenuViewState {
 
     data class Browser(
-        val browserShowing: Boolean,
         val canGoBack: Boolean = false,
         val canGoForward: Boolean = false,
         val showDuckChatOption: Boolean = false,
