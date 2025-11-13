@@ -46,17 +46,12 @@
     <string name="omnibarInputHint">Search or type URL</string>
     <string name="clearButtonContentDescription">Clear search input</string>
     <string name="no_compatible_third_party_app_installed">No compatible app installed</string>
-    <string name="addBookmarkMenuTitle">Add Bookmark</string>
-    <string name="editBookmarkMenuTitle">Edit Bookmark</string>
+
     <string name="addFavoriteMenuTitle">Add Favorite</string>
     <string name="removeFavoriteMenuTitle">Remove Favorite</string>
     <string name="favoriteAddedMessage">Favorite added</string>
     <string name="bookmarkAddedMessage">Bookmark added</string>
-    <string name="requestDesktopSiteMenuTitle">Desktop Site</string>
-    <string name="fireproofWebsiteMenuTitleRemove">Remove Fireproofing</string>
-    <string name="requestMobileSiteMenuTitle">Mobile Site</string>
     <string name="downloadsMenuTitle">Downloads</string>
-    <string name="printMenuTitle">Print Page</string>
     <string name="favoriteDeleteConfirmationMessage">Favorite removed</string>
     <string name="fireproofDeleteConfirmationMessage">Fireproofing removed</string>
     <string name="privacyProtectionEnabledConfirmationMessage" instruction="Placeholder is a website">Privacy Protection enabled for %1$s</string>
@@ -75,11 +70,9 @@
     <!-- Sharing options -->
     <string name="options">Options</string>
     <string name="shareLink">Share Link</string>
-    <string name="shareMenuTitle">Share</string>
     <string name="copyUrl">Copy Link Address</string>
 
     <!-- Find in page -->
-    <string name="findInPageMenuTitle">Find in Page</string>
     <string name="nextSearchTermDescription">Find next</string>
     <string name="previousSearchTermDescription">Find previous</string>
     <string name="closeFindInPageButtonDescription">Close find in page view</string>
@@ -255,7 +248,7 @@
     <string name="no_suggestions">No Suggestions</string>
 
     <!-- Broken Site Activity -->
-    <string name="brokenSiteReportBrokenSiteMenuItem">Report Broken Site</string>
+
 
     <string name="brokenSiteProtectionsOn">Protections are <b>ON</b> for this site</string>
     <string name="brokenSiteProtectionsOff">Protections are <b>OFF</b> for this site</string>
@@ -278,7 +271,7 @@
     <string name="searchWidgetLabel">Search and Duck.ai</string>
 
     <!-- Home Screen Shortcuts -->
-    <string name="addToHome">Add to Home Screen</string>
+
     <string name="shortcutAddedText" instruction="Placeholder is the name of a website">Success! %1$s has been added to your home screen.</string>
 
     <!-- User Survey -->
@@ -484,8 +477,6 @@
 
     <!-- Allowlist -->
     <string name="allowlistActivityTitle">Unprotected Sites</string>
-    <string name="enablePrivacyProtection">Enable Privacy Protection</string>
-    <string name="disablePrivacyProtection">Disable Privacy Protection</string>
     <string name="allowlistEntryOverflowContentDescription" instruction="Placeholder is a website">More options for unprotected site %1$s</string>
     <string name="allowlistEntryDeleteConfirmMessage" instruction="Placeholder is a website">Are you sure you want to remove &lt;b>%1$s&lt;/b> from Unprotected Sites?</string>
     <string name="allowlistExplanation">These sites will not be enhanced by Privacy Protection.</string>
@@ -584,11 +575,9 @@
     <string name="appLinkSnackBarMessage" instruction="Placeholder is the name of an app">You can open this link in %1$s.</string>
     <string name="appLinkMultipleSnackBarMessage">You can open this link in other apps.</string>
     <string name="appLinkIntentChooserTitle">Open with</string>
-    <string name="appLinkMenuItemTitle">Open in App</string>
 
     <!-- Email Autofill -->
     <string name="aliasToClipboardMessage">New address copied to your clipboard</string>
-    <string name="newEmailAliasMenuTitle">Generate Duck Address</string>
 
     <!-- Autofill -->
     <string name="autofillSnackbarAction" instruction="Label for a button that lets the user view the details for a login credential">View</string>
@@ -758,10 +747,6 @@
     <string name="settingsPasswordsAndAutofillLoginsSetting">Passwords &amp; Autofill</string>
     <string name="autofillLoginSavedSnackbarMessage">Password saved</string>
     <string name="autofillLoginUpdatedSnackbarMessage">Password updated</string>
-
-    <!-- Custom Tab -->
-    <string name="openInDdgMenuItemTitle">Open in DuckDuckGo</string>
-    <string name="runningInDdgMenuItemTitle">Running in DuckDuckGo</string>
 
     <!-- SSL Error -->
     <string name="sslErrorTitle">Warning: This site may be insecure</string>

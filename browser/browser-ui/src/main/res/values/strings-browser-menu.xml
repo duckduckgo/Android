@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Copyright (c) 2025 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+<!-- smartling.entity_escaping = false -->
+<!-- smartling.instruction_attributes = instruction -->
+<resources>
+    <!-- Browser Menu -->
+    <string name="browserMenuRemoveFireproofing">Remove Fireproofing</string>
+    <string name="browserMenuBookmarks">Bookmarks</string>
+    <string name="browserMenuAddBookmark">Add Bookmark</string>
+    <string name="browserMenuEditBookmark">Edit Bookmark</string>
+    <string name="browserMenuFireproofSite">Fireproof This Site</string>
+    <string name="browserMenuRemoveFireproofing">Remove Fireproofing</string>
+    <string name="browserMenuMobileSite">Mobile Site</string>
+    <string name="browserMenuDesktopSite">Desktop Site</string>
+    <string name="browserMenuEnablePrivacyProtection">Enable Privacy Protection</string>
+    <string name="browserMenuDisablePrivacyProtection">Disable Privacy Protection</string>
+    <string name="browserMenuNewTab">New Tab</string>
+    <string name="browserMenuDuckChat">Duck.ai</string>
+    <string name="browserMenuShare">Share</string>
+    <string name="browserMenuEmailAlias">Generate Duck Address</string>
+    <string name="browserMenuFindInPage">Find in Page</string>
+    <string name="browserMenuPrint">Print Page</string>
+    <string name="browserMenuOpenAppLink">Open in App</string>
+    <string name="browserMenuAddToHome">Add to Home Screen</string>
+    <string name="browserMenuReportBrokenSite">Report Broken Site</string>
+    <string name="browserMenuAutofill">Passwords</string>
+    <string name="browserMenuDownloads">Downloads</string>
+    <string name="browserMenuSettings">Settings</string>
+    <string name="browserMenuOpenInDDG">Open in DuckDuckGo</string>
+    <string name="browserMenuRunningInDDG">Running in DuckDuckGo</string>
+
+    <!-- Browser Menu Content Description -->
+    <string name="browserMenuBack">Back</string>
+    <string name="browserMenuForward">Forward</string>
+    <string name="browserMenuRefresh">Refresh</string>
+</resources>

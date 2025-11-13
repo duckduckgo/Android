@@ -272,7 +272,7 @@ class BrowserMenu(
 
         addBookmarksMenuItem.isVisible = viewState.canSaveSite
         addBookmarksMenuItem.label {
-            context.getString(if (viewState.isBookmark) R.string.editBookmarkMenuTitle else R.string.addBookmarkMenuTitle)
+            context.getString(if (viewState.isBookmark) R.string.browserMenuEditBookmark else R.string.browserMenuAddBookmark)
         }
         addBookmarksMenuItem.setIcon(if (viewState.isBookmark) drawable.ic_bookmark_solid_16 else drawable.ic_bookmark_16)
 
@@ -280,9 +280,9 @@ class BrowserMenu(
         fireproofWebsiteMenuItem.label {
             context.getString(
                 if (viewState.isFireproofWebsite) {
-                    R.string.fireproofWebsiteMenuTitleRemove
+                    R.string.browserMenuRemoveFireproofing
                 } else {
-                    R.string.fireproofWebsiteMenuTitleAdd
+                    R.string.browserMenuFireproofSite
                 },
             )
         }
@@ -294,9 +294,9 @@ class BrowserMenu(
         changeBrowserModeMenuItem.label {
             context.getString(
                 if (viewState.isDesktopBrowsingMode) {
-                    R.string.requestMobileSiteMenuTitle
+                    R.string.browserMenuMobileSite
                 } else {
-                    R.string.requestDesktopSiteMenuTitle
+                    R.string.browserMenuDesktopSite
                 },
             )
         }
@@ -312,9 +312,9 @@ class BrowserMenu(
             context
                 .getText(
                     if (viewState.isPrivacyProtectionDisabled) {
-                        R.string.enablePrivacyProtection
+                        R.string.browserMenuEnablePrivacyProtection
                     } else {
-                        R.string.disablePrivacyProtection
+                        R.string.browserMenuDisablePrivacyProtection
                     },
                 ).toString()
         }
