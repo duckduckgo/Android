@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.pixels
 
+import android.annotation.SuppressLint
 import androidx.lifecycle.LifecycleOwner
 import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.WorkManager
@@ -31,11 +32,13 @@ import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupExperimentExternalPixels
 import com.duckduckgo.verifiedinstallation.IsVerifiedPlayStoreInstall
+import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.*
 
+@SuppressLint("DenyListedApi")
 class EnqueuedPixelWorkerTest {
     @get:Rule
     var coroutineRule = CoroutineTestRule()
@@ -67,7 +70,8 @@ class EnqueuedPixelWorkerTest {
             privacyProtectionsPopupExperimentExternalPixels,
             isVerifiedPlayStoreInstall,
             appBuildConfig,
-            coroutineRule.testScope,
+            appCoroutineScope = coroutineRule.testScope,
+            dispatchers = coroutineRule.testDispatcherProvider,
         )
         setupRemoteConfig(browserEnabled = false, collectFullWebViewVersionEnabled = false)
     }
@@ -283,6 +287,48 @@ class EnqueuedPixelWorkerTest {
                 "test_key" to "test_value",
             ),
         )
+    }
+
+    @Test
+    fun whenOnStartAndVerifiedAppLaunchThenSendVerifiedAppLaunchPixel() {
+        whenever(isVerifiedPlayStoreInstall.invoke()).thenReturn(true)
+        whenever(unsentForgetAllPixelStore.pendingPixelCountClearData).thenReturn(1)
+        whenever(webViewVersionProvider.getMajorVersion()).thenReturn("91")
+        whenever(defaultBrowserDetector.isDefaultBrowser()).thenReturn(false)
+
+        enqueuedPixelWorker.onCreate(lifecycleOwner)
+        enqueuedPixelWorker.onStart(lifecycleOwner)
+
+        verify(pixel).fire(
+            AppPixelName.APP_LAUNCH_VERIFIED_INSTALL,
+            mapOf(
+                Pixel.PixelParameter.WEBVIEW_VERSION to "91",
+                Pixel.PixelParameter.DEFAULT_BROWSER to "false",
+                Pixel.PixelParameter.IS_DUCKDUCKGO_PACKAGE to "false",
+            ),
+        )
+    }
+
+    @Test
+    fun whenNoUnsentClearDataPixelsPendingThenPixelNotSent() = runTest {
+        whenever(unsentForgetAllPixelStore.pendingPixelCountClearData).thenReturn(0)
+        enqueuedPixelWorker.submitUnsentFirePixels()
+        verify(pixel, never()).fire(AppPixelName.FORGET_ALL_EXECUTED)
+        verify(unsentForgetAllPixelStore, never()).resetCount()
+    }
+
+    @Test
+    fun whenUnsentClearDataPixelsPendingThenPixelSent() = runTest {
+        whenever(unsentForgetAllPixelStore.pendingPixelCountClearData).thenReturn(5)
+        enqueuedPixelWorker.submitUnsentFirePixels()
+        verify(pixel, times(5)).fire(AppPixelName.FORGET_ALL_EXECUTED)
+    }
+
+    @Test
+    fun whenClearDataPixelsSentThenStoreCleared() = runTest {
+        whenever(unsentForgetAllPixelStore.pendingPixelCountClearData).thenReturn(5)
+        enqueuedPixelWorker.submitUnsentFirePixels()
+        verify(unsentForgetAllPixelStore).resetCount()
     }
 
     private fun setupRemoteConfig(browserEnabled: Boolean, collectFullWebViewVersionEnabled: Boolean) {
