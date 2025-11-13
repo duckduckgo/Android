@@ -3245,8 +3245,11 @@ class BrowserTabFragment :
                 lifecycleScope.launch {
                     clientBrandHintProvider.setDefault(this@apply)
                     webViewClient.clientProvider = clientBrandHintProvider
+                    userAgentString = withContext(dispatchers.io()) { userAgentProvider.userAgent() }
+                    if (withContext(dispatchers.io()) { accessibilitySettingsDataStore.overrideSystemFontSize }) {
+                        textZoom = accessibilitySettingsDataStore.fontSize.toInt()
+                    }
                 }
-                userAgentString = userAgentProvider.userAgent()
                 javaScriptEnabled = true
                 domStorageEnabled = true
                 loadWithOverviewMode = true
@@ -3257,9 +3260,6 @@ class BrowserTabFragment :
                 javaScriptCanOpenWindowsAutomatically = appBuildConfig.isTest // only allow when running tests
                 setSupportMultipleWindows(true)
                 setSupportZoom(true)
-                if (accessibilitySettingsDataStore.overrideSystemFontSize) {
-                    textZoom = accessibilitySettingsDataStore.fontSize.toInt()
-                }
                 setAlgorithmicDarkeningAllowed(this)
             }
 
@@ -3302,60 +3302,60 @@ class BrowserTabFragment :
             registerForContextMenu(it)
 
             it.setFindListener(this)
-            loginDetector.addLoginDetection(it) { viewModel.loginDetected() }
-            emailInjector.addJsInterface(
-                it,
-                onSignedInEmailProtectionPromptShown = { viewModel.showEmailProtectionChooseEmailPrompt() },
-                onInContextEmailProtectionSignupPromptShown = { showNativeInContextEmailProtectionSignupPrompt() },
-            )
+
             lifecycleScope.launch {
-                configureWebViewForBlobDownload(it)
-                webViewCompatTestHelper.configureWebViewForWebViewCompatTest(
-                    it,
-                    isBlobDownloadWebViewFeatureEnabled(it),
-                )
+                configureJS(it)
+                WebView.setWebContentsDebuggingEnabled(withContext(dispatchers.io()) { webContentDebugging.isEnabled() })
+                webView?.let { passkeyInitializer.configurePasskeySupport(it) }
             }
-
-            configureWebViewForAutofill(it)
-            printInjector.addJsInterface(it) { viewModel.printFromWebView() }
-            autoconsent.addJsInterface(it, autoconsentCallback)
-            contentScopeScripts.register(
-                it,
-                object : JsMessageCallback() {
-                    override fun process(
-                        featureName: String,
-                        method: String,
-                        id: String?,
-                        data: JSONObject?,
-                    ) {
-                        viewModel.processJsCallbackMessage(featureName, method, id, data, isActiveCustomTab()) {
-                            it.url
-                        }
-                    }
-                },
-            )
-            duckPlayerScripts.register(
-                it,
-                object : JsMessageCallback() {
-                    override fun process(
-                        featureName: String,
-                        method: String,
-                        id: String?,
-                        data: JSONObject?,
-                    ) {
-                        viewModel.processJsCallbackMessage(featureName, method, id, data, isActiveCustomTab()) {
-                            it.url
-                        }
-                    }
-                },
-            )
         }
+    }
 
-        lifecycleScope.launch {
-            WebView.setWebContentsDebuggingEnabled(withContext(dispatchers.io()) { webContentDebugging.isEnabled() })
-
-            webView?.let { passkeyInitializer.configurePasskeySupport(it) }
-        }
+    private suspend fun configureJS(it: DuckDuckGoWebView) {
+        loginDetector.addLoginDetection(it) { viewModel.loginDetected() }
+        emailInjector.addJsInterface(
+            it,
+            onSignedInEmailProtectionPromptShown = { viewModel.showEmailProtectionChooseEmailPrompt() },
+            onInContextEmailProtectionSignupPromptShown = { showNativeInContextEmailProtectionSignupPrompt() },
+        )
+        configureWebViewForAutofill(it)
+        printInjector.addJsInterface(it) { viewModel.printFromWebView() }
+        autoconsent.addJsInterface(it, autoconsentCallback)
+        contentScopeScripts.register(
+            it,
+            object : JsMessageCallback() {
+                override fun process(
+                    featureName: String,
+                    method: String,
+                    id: String?,
+                    data: JSONObject?,
+                ) {
+                    viewModel.processJsCallbackMessage(featureName, method, id, data, isActiveCustomTab()) {
+                        it.url
+                    }
+                }
+            },
+        )
+        duckPlayerScripts.register(
+            it,
+            object : JsMessageCallback() {
+                override fun process(
+                    featureName: String,
+                    method: String,
+                    id: String?,
+                    data: JSONObject?,
+                ) {
+                    viewModel.processJsCallbackMessage(featureName, method, id, data, isActiveCustomTab()) {
+                        it.url
+                    }
+                }
+            },
+        )
+        configureWebViewForBlobDownload(it)
+        webViewCompatTestHelper.configureWebViewForWebViewCompatTest(
+            it,
+            isBlobDownloadWebViewFeatureEnabled(it),
+        )
     }
 
     private fun screenLock(data: JsCallbackData) {
