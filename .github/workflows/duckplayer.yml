@@ -29,6 +29,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           submodules: recursive
+          ref: 'feature/cris/on-activity-created-non-blocking'
 
       - name: Set up JDK version
         uses: actions/setup-java@v4
