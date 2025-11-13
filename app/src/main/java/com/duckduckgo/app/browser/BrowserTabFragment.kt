@@ -3187,8 +3187,10 @@ class BrowserTabFragment :
             binding.daxDialogOnboardingCtaContent.layoutTransition = LayoutTransition()
             binding.daxDialogOnboardingCtaContent.layoutTransition.enableTransitionType(LayoutTransition.CHANGING)
 
-            if (swipingTabsFeature.isEnabled) {
-                binding.daxDialogOnboardingCtaContent.layoutTransition.setAnimateParentHierarchy(false)
+            lifecycleScope.launch {
+                if (withContext(dispatchers.io()) { swipingTabsFeature.isEnabled }) {
+                    binding.daxDialogOnboardingCtaContent.layoutTransition.setAnimateParentHierarchy(false)
+                }
             }
         }
 
