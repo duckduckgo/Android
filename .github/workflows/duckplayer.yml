@@ -78,14 +78,3 @@ jobs:
           android-api-level: 34
           workspace: .maestro
           include-tags: duckplayer
-
-      - name: Create Asana task when workflow failed
-        if: ${{ failure() && github.event_name != 'workflow_dispatch' }}
-        uses: honeycombio/gha-create-asana-task@main
-        with:
-          asana-secret: ${{ secrets.ASANA_ACCESS_TOKEN }}
-          asana-workspace-id: ${{ secrets.GH_ASANA_WORKSPACE_ID }}
-          asana-project-id: ${{ secrets.DUCK_PLAYER_AOR_PROJECT_ID }}
-          asana-section-id: ${{ secrets.DUCK_PLAYER_AOR_INCOMING_ID }}
-          asana-task-name: GH Workflow Failure - Duck Player tests
-          asana-task-description: The Duck Player workflow has failed. See https://github.com/duckduckgo/Android/actions/runs/${{ github.run_id }}
