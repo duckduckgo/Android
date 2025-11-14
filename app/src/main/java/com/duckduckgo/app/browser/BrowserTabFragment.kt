@@ -3187,8 +3187,10 @@ class BrowserTabFragment :
             binding.daxDialogOnboardingCtaContent.layoutTransition = LayoutTransition()
             binding.daxDialogOnboardingCtaContent.layoutTransition.enableTransitionType(LayoutTransition.CHANGING)
 
-            if (swipingTabsFeature.isEnabled) {
-                binding.daxDialogOnboardingCtaContent.layoutTransition.setAnimateParentHierarchy(false)
+            lifecycleScope.launch {
+                if (withContext(dispatchers.io()) { swipingTabsFeature.isEnabled }) {
+                    binding.daxDialogOnboardingCtaContent.layoutTransition.setAnimateParentHierarchy(false)
+                }
             }
         }
 
@@ -3207,9 +3209,14 @@ class BrowserTabFragment :
             it.clearSslPreferences()
 
             it.settings.apply {
-                clientBrandHintProvider.setDefault(this)
-                webViewClient.clientProvider = clientBrandHintProvider
-                userAgentString = userAgentProvider.userAgent()
+                lifecycleScope.launch {
+                    clientBrandHintProvider.setDefault(this@apply)
+                    webViewClient.clientProvider = clientBrandHintProvider
+                    userAgentString = withContext(dispatchers.io()) { userAgentProvider.userAgent() }
+                    if (withContext(dispatchers.io()) { accessibilitySettingsDataStore.overrideSystemFontSize }) {
+                        textZoom = accessibilitySettingsDataStore.fontSize.toInt()
+                    }
+                }
                 javaScriptEnabled = true
                 domStorageEnabled = true
                 loadWithOverviewMode = true
@@ -3220,9 +3227,6 @@ class BrowserTabFragment :
                 javaScriptCanOpenWindowsAutomatically = appBuildConfig.isTest // only allow when running tests
                 setSupportMultipleWindows(true)
                 setSupportZoom(true)
-                if (accessibilitySettingsDataStore.overrideSystemFontSize) {
-                    textZoom = accessibilitySettingsDataStore.fontSize.toInt()
-                }
                 setAlgorithmicDarkeningAllowed(this)
             }
 
@@ -3265,59 +3269,60 @@ class BrowserTabFragment :
             registerForContextMenu(it)
 
             it.setFindListener(this)
-            loginDetector.addLoginDetection(it) { viewModel.loginDetected() }
-            emailInjector.addJsInterface(
-                it,
-                onSignedInEmailProtectionPromptShown = { viewModel.showEmailProtectionChooseEmailPrompt() },
-                onInContextEmailProtectionSignupPromptShown = { showNativeInContextEmailProtectionSignupPrompt() },
-            )
-            configureWebViewForBlobDownload(it)
+
             lifecycleScope.launch {
-                webViewCompatTestHelper.configureWebViewForWebViewCompatTest(
-                    it,
-                    isBlobDownloadWebViewFeatureEnabled(it),
-                )
+                configureJS(it)
+                WebView.setWebContentsDebuggingEnabled(withContext(dispatchers.io()) { webContentDebugging.isEnabled() })
+                webView?.let { passkeyInitializer.configurePasskeySupport(it) }
             }
-            configureWebViewForAutofill(it)
-            printInjector.addJsInterface(it) { viewModel.printFromWebView() }
-            autoconsent.addJsInterface(it, autoconsentCallback)
-            contentScopeScripts.register(
-                it,
-                object : JsMessageCallback() {
-                    override fun process(
-                        featureName: String,
-                        method: String,
-                        id: String?,
-                        data: JSONObject?,
-                    ) {
-                        viewModel.processJsCallbackMessage(featureName, method, id, data, isActiveCustomTab()) {
-                            it.url
-                        }
-                    }
-                },
-            )
-            duckPlayerScripts.register(
-                it,
-                object : JsMessageCallback() {
-                    override fun process(
-                        featureName: String,
-                        method: String,
-                        id: String?,
-                        data: JSONObject?,
-                    ) {
-                        viewModel.processJsCallbackMessage(featureName, method, id, data, isActiveCustomTab()) {
-                            it.url
-                        }
-                    }
-                },
-            )
         }
+    }
 
-        WebView.setWebContentsDebuggingEnabled(webContentDebugging.isEnabled())
-
-        lifecycleScope.launch {
-            webView?.let { passkeyInitializer.configurePasskeySupport(it) }
-        }
+    private suspend fun configureJS(it: DuckDuckGoWebView) {
+        loginDetector.addLoginDetection(it) { viewModel.loginDetected() }
+        emailInjector.addJsInterface(
+            it,
+            onSignedInEmailProtectionPromptShown = { viewModel.showEmailProtectionChooseEmailPrompt() },
+            onInContextEmailProtectionSignupPromptShown = { showNativeInContextEmailProtectionSignupPrompt() },
+        )
+        configureWebViewForAutofill(it)
+        printInjector.addJsInterface(it) { viewModel.printFromWebView() }
+        autoconsent.addJsInterface(it, autoconsentCallback)
+        contentScopeScripts.register(
+            it,
+            object : JsMessageCallback() {
+                override fun process(
+                    featureName: String,
+                    method: String,
+                    id: String?,
+                    data: JSONObject?,
+                ) {
+                    viewModel.processJsCallbackMessage(featureName, method, id, data, isActiveCustomTab()) {
+                        it.url
+                    }
+                }
+            },
+        )
+        duckPlayerScripts.register(
+            it,
+            object : JsMessageCallback() {
+                override fun process(
+                    featureName: String,
+                    method: String,
+                    id: String?,
+                    data: JSONObject?,
+                ) {
+                    viewModel.processJsCallbackMessage(featureName, method, id, data, isActiveCustomTab()) {
+                        it.url
+                    }
+                }
+            },
+        )
+        configureWebViewForBlobDownload(it)
+        webViewCompatTestHelper.configureWebViewForWebViewCompatTest(
+            it,
+            isBlobDownloadWebViewFeatureEnabled(it),
+        )
     }
 
     private fun screenLock(data: JsCallbackData) {
@@ -3401,8 +3406,8 @@ class BrowserTabFragment :
     }
 
     @SuppressLint("AddDocumentStartJavaScriptUsage")
-    private fun configureWebViewForBlobDownload(webView: DuckDuckGoWebView) {
-        lifecycleScope.launch(dispatchers.main()) {
+    private suspend fun configureWebViewForBlobDownload(webView: DuckDuckGoWebView) {
+        withContext(dispatchers.main()) {
             if (isBlobDownloadWebViewFeatureEnabled(webView)) {
                 val webViewCompatUsesBlobDownloadsMessageListener = webViewCompatTestHelper.useBlobDownloadsMessageListener()
 

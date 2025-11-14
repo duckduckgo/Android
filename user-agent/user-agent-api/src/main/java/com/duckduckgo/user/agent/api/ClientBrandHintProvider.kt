@@ -31,7 +31,7 @@ interface ClientBrandHintProvider {
      * Sets the default client hint header SEC-CH-UA
      * @param settings [WebSettings] where the agent metadata will be set
      */
-    fun setDefault(settings: WebSettings)
+    suspend fun setDefault(settings: WebSettings)
 
     /**
      * Checks if the url passed as parameter will force a change of branding

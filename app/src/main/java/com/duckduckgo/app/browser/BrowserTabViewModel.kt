@@ -586,9 +586,11 @@ class BrowserTabViewModel @Inject constructor(
     private var site: Site? = null
         set(value) {
             field = value
-            if (siteErrorHandlerKillSwitch.self().isEnabled()) {
-                siteErrorHandler.assignErrorsAndClearCache(value)
-                siteHttpErrorHandler.assignErrorsAndClearCache(value)
+            viewModelScope.launch(dispatchers.io()) {
+                if (siteErrorHandlerKillSwitch.self().isEnabled()) {
+                    siteErrorHandler.assignErrorsAndClearCache(value)
+                    siteHttpErrorHandler.assignErrorsAndClearCache(value)
+                }
             }
         }
     private lateinit var tabId: String
@@ -943,8 +945,8 @@ class BrowserTabViewModel @Inject constructor(
             command.value = Command.RefreshOmnibar
         }
 
-        if (settingsPageFeature.serpSettingsSync().isEnabled()) {
-            viewModelScope.launch {
+        viewModelScope.launch {
+            if (withContext(dispatchers.io()) { settingsPageFeature.serpSettingsSync().isEnabled() }) {
                 contentScopeScriptsSubscriptionEventPluginPoint.getPlugins().forEach { plugin ->
                     _subscriptionEventDataChannel.send(plugin.getSubscriptionEventData())
                 }
@@ -1137,7 +1139,9 @@ class BrowserTabViewModel @Inject constructor(
                 runCatching {
                     if (duckAiFeatureState.showFullScreenMode.value) {
                         site?.nextUrl = urlToNavigate
-                        command.value = NavigationCommand.Navigate(urlToNavigate, getUrlHeaders(urlToNavigate))
+                        viewModelScope.launch {
+                            command.value = NavigationCommand.Navigate(urlToNavigate, getUrlHeaders(urlToNavigate))
+                        }
                     } else {
                         val queryParameter = urlToNavigate.toUri().getQueryParameter(QUERY)
                         if (queryParameter != null) {
@@ -1190,7 +1194,9 @@ class BrowserTabViewModel @Inject constructor(
                 }
 
                 site?.nextUrl = urlToNavigate
-                command.value = NavigationCommand.Navigate(urlToNavigate, getUrlHeaders(urlToNavigate))
+                viewModelScope.launch {
+                    command.value = NavigationCommand.Navigate(urlToNavigate, getUrlHeaders(urlToNavigate))
+                }
             }
         }
 
@@ -1215,7 +1221,7 @@ class BrowserTabViewModel @Inject constructor(
             currentAutoCompleteViewState().copy(showSuggestions = false, showFavorites = false, searchResults = AutoCompleteResult("", emptyList()))
     }
 
-    private fun getUrlHeaders(url: String?): Map<String, String> = url?.let { customHeadersProvider.getCustomHeaders(it) } ?: emptyMap()
+    private suspend fun getUrlHeaders(url: String?): Map<String, String> = url?.let { customHeadersProvider.getCustomHeaders(it) } ?: emptyMap()
 
     private fun extractVerticalParameter(currentUrl: String?): String? {
         val url = currentUrl ?: return null
@@ -1946,15 +1952,14 @@ class BrowserTabViewModel @Inject constructor(
 
             viewModelScope.launch {
                 onboardingDesignExperimentManager.onWebPageFinishedLoading(url)
+                evaluateDuckAIPage(url)
+                evaluateSerpLogoState(url)
             }
-
-            evaluateDuckAIPage(url)
-            evaluateSerpLogoState(url)
         }
     }
 
-    private fun evaluateSerpLogoState(url: String?) {
-        if (serpEasterEggLogosToggles.feature().isEnabled()) {
+    private suspend fun evaluateSerpLogoState(url: String?) {
+        if (withContext(dispatchers.io()) { serpEasterEggLogosToggles.feature().isEnabled() }) {
             if (url != null && duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(url)) {
                 command.value = ExtractSerpLogo(url)
             } else {
@@ -2767,7 +2772,9 @@ class BrowserTabViewModel @Inject constructor(
         if (desktopSiteRequested && uri.isMobileSite) {
             val desktopUrl = uri.toDesktopUri().toString()
             logcat(INFO) { "Original URL $url - attempting $desktopUrl with desktop site UA string" }
-            command.value = NavigationCommand.Navigate(desktopUrl, getUrlHeaders(desktopUrl))
+            viewModelScope.launch {
+                command.value = NavigationCommand.Navigate(desktopUrl, getUrlHeaders(desktopUrl))
+            }
         } else {
             command.value = NavigationCommand.Refresh
         }
@@ -3137,7 +3144,9 @@ class BrowserTabViewModel @Inject constructor(
 
     fun nonHttpAppLinkClicked(appLink: NonHttpAppLink) {
         if (nonHttpAppLinkChecker.isPermitted(appLink.intent)) {
-            command.value = HandleNonHttpAppLink(appLink, getUrlHeaders(appLink.fallbackUrl))
+            viewModelScope.launch {
+                command.value = HandleNonHttpAppLink(appLink, getUrlHeaders(appLink.fallbackUrl))
+            }
         }
     }
 

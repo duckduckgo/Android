@@ -23,6 +23,7 @@ import androidx.webkit.UserAgentMetadata
 import androidx.webkit.UserAgentMetadata.BrandVersion
 import androidx.webkit.WebSettingsCompat
 import androidx.webkit.WebViewFeature
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.user.agent.api.ClientBrandHintProvider
 import com.duckduckgo.user.agent.impl.remoteconfig.BrandingChange
@@ -35,6 +36,7 @@ import com.duckduckgo.user.agent.impl.remoteconfig.ClientBrandsHints.CHROME
 import com.duckduckgo.user.agent.impl.remoteconfig.ClientBrandsHints.DDG
 import com.duckduckgo.user.agent.impl.remoteconfig.ClientBrandsHints.WEBVIEW
 import com.squareup.anvil.annotations.ContributesBinding
+import kotlinx.coroutines.withContext
 import logcat.LogPriority.INFO
 import logcat.LogPriority.VERBOSE
 import logcat.logcat
@@ -44,13 +46,14 @@ import javax.inject.Inject
 class RealClientBrandHintProvider @Inject constructor(
     private val clientBrandHintFeature: ClientBrandHintFeature,
     private val repository: ClientBrandHintFeatureSettingsRepository,
+    private val dispatcherProvider: DispatcherProvider,
 ) : ClientBrandHintProvider {
 
     private var currentDomain: String? = null
     private var currentBranding: ClientBrandsHints = DDG
 
-    override fun setDefault(settings: WebSettings) {
-        if (clientBrandHintFeature.self().isEnabled()) {
+    override suspend fun setDefault(settings: WebSettings) {
+        if (withContext(dispatcherProvider.io()) { clientBrandHintFeature.self().isEnabled() }) {
             logcat(VERBOSE) { "ClientBrandHintProvider: branding enabled, initialising metadata with DuckDuckGo branding" }
             setUserAgentMetadata(settings, DEFAULT_ENABLED_BRANDING)
         } else {
