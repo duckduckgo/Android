@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (c) 2025 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+<!-- smartling.entity_escaping = false -->
+<!-- smartling.instruction_attributes = instruction -->
+<resources>
+    <!-- Browser Menu -->
+    <string name="browserMenuRemoveFireproofing">Odstrániť zabezpečenie</string>
+    <string name="browserMenuBookmarks">Záložky</string>
+    <string name="browserMenuAddBookmark">Pridať záložku</string>
+    <string name="browserMenuEditBookmark">Upraviť záložku</string>
+    <string name="browserMenuFireproofSite">Zabezpečiť túto lokalitu</string>
+    <string name="browserMenuMobileSite">Mobilný režim</string>
+    <string name="browserMenuDesktopSite">Stránka pre stolové počítače</string>
+    <string name="browserMenuEnablePrivacyProtection">Povoliť ochranu súkromia</string>
+    <string name="browserMenuDisablePrivacyProtection">Vypnúť ochranu súkromia</string>
+    <string name="browserMenuNewTab">Nová karta</string>
+    <string name="browserMenuDuckChat">Duck.ai</string>
+    <string name="browserMenuShare">Zdieľať</string>
+    <string name="browserMenuEmailAlias">Generovanie adresy Duck</string>
+    <string name="browserMenuFindInPage">Hľadať na stránke</string>
+    <string name="browserMenuPrint">Tlačiť stranu</string>
+    <string name="browserMenuOpenAppLink">Otvoriť v aplikácii</string>
+    <string name="browserMenuAddToHome">Pridať na domovskú obrazovku</string>
+    <string name="browserMenuReportBrokenSite">Nahlásiť nefunkčný web</string>
+    <string name="browserMenuAutofill">Heslá</string>
+    <string name="browserMenuDownloads">Stiahnuté</string>
+    <string name="browserMenuSettings">Nastavenia</string>
+    <string name="browserMenuOpenInDDG">Otvoriť v DuckDuckGo</string>
+    <string name="browserMenuRunningInDDG">Spustené v DuckDuckGo</string>
+    <string name="browserMenuSetAsDefaultBrowser">Nastaviť ako predvolený prehliadač</string>
+    <string name="browserMenuNewChat">Nový chat</string>
+    <string name="browserMenuChatHistory">História chatov</string>
+    <string name="browserMenuChatSettings">Nastavenia Duck.ai</string>
+    <string name="browserMenuVPN">VPN</string>
+
+    <!-- Browser Menu Content Description -->
+    <string name="browserMenuBack">Späť</string>
+    <string name="browserMenuForward">Ďalej</string>
+    <string name="browserMenuRefresh">Obnoviť</string>
+</resources>

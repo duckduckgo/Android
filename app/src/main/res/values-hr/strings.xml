@@ -47,17 +47,12 @@
     <string name="omnibarInputHint">Traži ili upiši URL adresu</string>
     <string name="clearButtonContentDescription">Obriši unos pretraživanja</string>
     <string name="no_compatible_third_party_app_installed">Nije instalirana kompatibilna aplikacija</string>
-    <string name="addBookmarkMenuTitle">Dodaj knjižnu oznaku</string>
-    <string name="editBookmarkMenuTitle">Uredi knjižnu oznaku</string>
+
     <string name="addFavoriteMenuTitle">Dodaj omiljenu stavku</string>
     <string name="removeFavoriteMenuTitle">Ukloni omiljeno</string>
     <string name="favoriteAddedMessage">Dodano u Omiljeno</string>
     <string name="bookmarkAddedMessage">Knjižna je oznaka dodana</string>
-    <string name="requestDesktopSiteMenuTitle">Mjesto radne površine</string>
-    <string name="fireproofWebsiteMenuTitleRemove">Ukloni oznaku sigurnog web-mjesta</string>
-    <string name="requestMobileSiteMenuTitle">Mobilno mrežno mjesto</string>
     <string name="downloadsMenuTitle">Preuzimanja</string>
-    <string name="printMenuTitle">Ispiši stranicu</string>
     <string name="favoriteDeleteConfirmationMessage">Omiljena je stavka uklonjena</string>
     <string name="fireproofDeleteConfirmationMessage">Oznaka sigurnog web-mjesta je uklonjena</string>
     <string name="privacyProtectionEnabledConfirmationMessage" instruction="Placeholder is a website">Zaštita privatnosti omogućena za %1$s</string>
@@ -78,11 +73,9 @@
     <!-- Sharing options -->
     <string name="options">Opcije</string>
     <string name="shareLink">Podijeli poveznicu</string>
-    <string name="shareMenuTitle">Podijeli</string>
     <string name="copyUrl">Kopiraj adresu poveznice</string>
 
     <!-- Find in page -->
-    <string name="findInPageMenuTitle">Pronađi na stranici</string>
     <string name="nextSearchTermDescription">Pronađi sljedeće</string>
     <string name="previousSearchTermDescription">Pronađi prethodno</string>
     <string name="closeFindInPageButtonDescription">Zatvori prikaz „Pronađi na stranici”</string>
@@ -260,7 +253,7 @@
     <string name="no_suggestions">Nema prijedloga</string>
 
     <!-- Broken Site Activity -->
-    <string name="brokenSiteReportBrokenSiteMenuItem">Prijavi neispravno web-mjesto</string>
+
 
     <string name="brokenSiteProtectionsOn">Zaštite su <b>UKLJUČENE</b> za ovu web lokaciju</string>
     <string name="brokenSiteProtectionsOff">Zaštite su <b>ISKLJUČENE</b> za ovu web lokaciju</string>
@@ -283,7 +276,7 @@
     <string name="searchWidgetLabel">Pretraživanje i Duck.ai</string>
 
     <!-- Home Screen Shortcuts -->
-    <string name="addToHome">Dodaj na početni zaslon</string>
+
     <string name="shortcutAddedText" instruction="Placeholder is the name of a website">Uspjeh! %1$s dodan je na vaš početni zaslon.</string>
 
     <!-- User Survey -->
@@ -489,8 +482,6 @@
 
     <!-- Allowlist -->
     <string name="allowlistActivityTitle">Nezaštićena web-mjesta</string>
-    <string name="enablePrivacyProtection">Omogući zaštitu privatnosti</string>
-    <string name="disablePrivacyProtection">Onemogući zaštitu privatnosti</string>
     <string name="allowlistEntryOverflowContentDescription" instruction="Placeholder is a website">Dodatne mogućnosti za nezaštićeno mrežno mjesto %1$s</string>
     <string name="allowlistEntryDeleteConfirmMessage" instruction="Placeholder is a website">Jesi li siguran/na da želiš ukloniti &lt;b&gt;%1$s&lt;/b&gt; iz nezaštićenih web-mjesta?</string>
     <string name="allowlistExplanation">Zaštita privatnosti neće poboljšati ova mrežna mjesta.</string>
@@ -589,11 +580,9 @@
     <string name="appLinkSnackBarMessage" instruction="Placeholder is the name of an app">Ovu poveznicu možeš otvoriti u %1$s.</string>
     <string name="appLinkMultipleSnackBarMessage">Ovu poveznicu možeš otvoriti u drugim aplikacijama.</string>
     <string name="appLinkIntentChooserTitle">Otvoriti s aplikacijom</string>
-    <string name="appLinkMenuItemTitle">Otvori u aplikaciji</string>
 
     <!-- Email Autofill -->
     <string name="aliasToClipboardMessage">Nova adresa kopirana je u međuspremnik</string>
-    <string name="newEmailAliasMenuTitle">Generiraj Duck Address</string>
 
     <!-- Autofill -->
     <string name="autofillSnackbarAction" instruction="Label for a button that lets the user view the details for a login credential">Pregled</string>
@@ -789,10 +778,6 @@
     <string name="settingsPasswordsAndAutofillLoginsSetting">Lozinke i automatsko popunjavanje</string>
     <string name="autofillLoginSavedSnackbarMessage">Lozinka je spremljena</string>
     <string name="autofillLoginUpdatedSnackbarMessage">Lozinka je ažurirana</string>
-
-    <!-- Custom Tab -->
-    <string name="openInDdgMenuItemTitle">Otvori u DuckDuckGou</string>
-    <string name="runningInDdgMenuItemTitle">Izvodi se u DuckDuckGou</string>
 
     <!-- SSL Error -->
     <string name="sslErrorTitle">Upozorenje: ova stranica može biti nesigurna</string>

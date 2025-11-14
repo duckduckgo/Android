@@ -47,17 +47,12 @@
     <string name="omnibarInputHint">Търсене или въвеждане на URL адрес</string>
     <string name="clearButtonContentDescription">Изчистване на въведеното търсене</string>
     <string name="no_compatible_third_party_app_installed">Няма инсталирано съвместимо приложение</string>
-    <string name="addBookmarkMenuTitle">Добави отметка</string>
-    <string name="editBookmarkMenuTitle">Редактиране на отметка</string>
+
     <string name="addFavoriteMenuTitle">Добавяне в любими</string>
     <string name="removeFavoriteMenuTitle">Премахване от любими</string>
     <string name="favoriteAddedMessage">Добавено в любими</string>
     <string name="bookmarkAddedMessage">Добавена е отметка</string>
-    <string name="requestDesktopSiteMenuTitle">Сайт на работния плот</string>
-    <string name="fireproofWebsiteMenuTitleRemove">Премахване на огнеустойчивост</string>
-    <string name="requestMobileSiteMenuTitle">Мобилна версия на сайта</string>
     <string name="downloadsMenuTitle">Изтеглени файлове</string>
-    <string name="printMenuTitle">Отпечатване на страницата</string>
     <string name="favoriteDeleteConfirmationMessage">Премахнато от любими</string>
     <string name="fireproofDeleteConfirmationMessage">Премахната огнеустойчивост</string>
     <string name="privacyProtectionEnabledConfirmationMessage" instruction="Placeholder is a website">Защитата на поверителността е активирана за %1$s</string>
@@ -76,11 +71,9 @@
     <!-- Sharing options -->
     <string name="options">Опции</string>
     <string name="shareLink">Споделяне на връзка</string>
-    <string name="shareMenuTitle">Споделяне</string>
     <string name="copyUrl">Копиране на адреса на връзката</string>
 
     <!-- Find in page -->
-    <string name="findInPageMenuTitle">Намери в страницата</string>
     <string name="nextSearchTermDescription">Намери следващ</string>
     <string name="previousSearchTermDescription">Намери предишен</string>
     <string name="closeFindInPageButtonDescription">Затваряне на изгледа за търсене в страницата</string>
@@ -258,7 +251,7 @@
     <string name="no_suggestions">Няма предложения</string>
 
     <!-- Broken Site Activity -->
-    <string name="brokenSiteReportBrokenSiteMenuItem">Подаване на сигнал за повреден сайт</string>
+
 
     <string name="brokenSiteProtectionsOn">Защитите за този сайт са <b>ВКЛЮЧЕНИ</b></string>
     <string name="brokenSiteProtectionsOff">Защитите за този сайт са <b>ИЗКЛЮЧЕНИ</b></string>
@@ -281,7 +274,7 @@
     <string name="searchWidgetLabel">Търсене и Duck.ai</string>
 
     <!-- Home Screen Shortcuts -->
-    <string name="addToHome">Добавете към Начална Страница</string>
+
     <string name="shortcutAddedText" instruction="Placeholder is the name of a website">Готово! %1$s е добавен към началния екран.</string>
 
     <!-- User Survey -->
@@ -487,8 +480,6 @@
 
     <!-- Allowlist -->
     <string name="allowlistActivityTitle">Незащитени сайтове</string>
-    <string name="enablePrivacyProtection">Активиране на защита на поверителността</string>
-    <string name="disablePrivacyProtection">Деактивиране на защита на поверителността</string>
     <string name="allowlistEntryOverflowContentDescription" instruction="Placeholder is a website">Още опции за незащитен сайт %1$s</string>
     <string name="allowlistEntryDeleteConfirmMessage" instruction="Placeholder is a website">Сигурни ли сте, че искате да премахнете &lt;b&gt;%1$s&lt;/b&gt; от незащитените сайтове?</string>
     <string name="allowlistExplanation">Към тези сайтове няма да бъде приложена защита на поверителността.</string>
@@ -587,11 +578,9 @@
     <string name="appLinkSnackBarMessage" instruction="Placeholder is the name of an app">Можете да отворите тази връзка в %1$s.</string>
     <string name="appLinkMultipleSnackBarMessage">Можете да отворите тази връзка в други приложения.</string>
     <string name="appLinkIntentChooserTitle">Отваряне с</string>
-    <string name="appLinkMenuItemTitle">Отваряне в приложението</string>
 
     <!-- Email Autofill -->
     <string name="aliasToClipboardMessage">Новият адрес е копиран в клипборда</string>
-    <string name="newEmailAliasMenuTitle">Генериране на Duck Address</string>
 
     <!-- Autofill -->
     <string name="autofillSnackbarAction" instruction="Label for a button that lets the user view the details for a login credential">Преглед</string>
@@ -761,10 +750,6 @@
     <string name="settingsPasswordsAndAutofillLoginsSetting">Пароли и автоматично попълване</string>
     <string name="autofillLoginSavedSnackbarMessage">Паролата е запазена</string>
     <string name="autofillLoginUpdatedSnackbarMessage">Паролата е актуализирана</string>
-
-    <!-- Custom Tab -->
-    <string name="openInDdgMenuItemTitle">Отваряне в DuckDuckGo</string>
-    <string name="runningInDdgMenuItemTitle">Работи в DuckDuckGo</string>
 
     <!-- SSL Error -->
     <string name="sslErrorTitle">Предупреждение: Този сайт може да не е сигурен</string>

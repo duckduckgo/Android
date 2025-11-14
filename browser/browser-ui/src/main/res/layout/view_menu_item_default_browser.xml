@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="?attr/selectableItemBackground"
-    android:contentDescription="@string/setAsDefaultBrowser"
+    android:contentDescription="@string/browserMenuSetAsDefaultBrowser"
     android:paddingHorizontal="12dp">
 
     <!--Menu item's style defines horizontal padding as 24dp but we want the accent background
@@ -31,7 +31,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
             android:layout_marginStart="@dimen/keyline_2"
-            android:text="@string/setAsDefaultBrowser"
+            android:text="@string/browserMenuSetAsDefaultBrowser"
             app:typography="body1" />
 
     </LinearLayout>

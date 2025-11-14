@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (c) 2025 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+<!-- smartling.entity_escaping = false -->
+<!-- smartling.instruction_attributes = instruction -->
+<resources>
+    <!-- Browser Menu -->
+    <string name="browserMenuRemoveFireproofing">Премахване на огнеустойчивост</string>
+    <string name="browserMenuBookmarks">Отметки</string>
+    <string name="browserMenuAddBookmark">Добави отметка</string>
+    <string name="browserMenuEditBookmark">Редактиране на отметка</string>
+    <string name="browserMenuFireproofSite">Направи този сайт огнеустойчив</string>
+    <string name="browserMenuMobileSite">Мобилна версия на сайта</string>
+    <string name="browserMenuDesktopSite">Сайт на работния плот</string>
+    <string name="browserMenuEnablePrivacyProtection">Активиране на защита на поверителността</string>
+    <string name="browserMenuDisablePrivacyProtection">Деактивиране на защита на поверителността</string>
+    <string name="browserMenuNewTab">Нов раздел</string>
+    <string name="browserMenuDuckChat">Duck.ai</string>
+    <string name="browserMenuShare">Споделяне</string>
+    <string name="browserMenuEmailAlias">Генериране на Duck Address</string>
+    <string name="browserMenuFindInPage">Намери в страницата</string>
+    <string name="browserMenuPrint">Отпечатване на страницата</string>
+    <string name="browserMenuOpenAppLink">Отваряне в приложението</string>
+    <string name="browserMenuAddToHome">Добавете към Начална Страница</string>
+    <string name="browserMenuReportBrokenSite">Подаване на сигнал за повреден сайт</string>
+    <string name="browserMenuAutofill">Пароли</string>
+    <string name="browserMenuDownloads">Изтеглени файлове</string>
+    <string name="browserMenuSettings">Настройки</string>
+    <string name="browserMenuOpenInDDG">Отваряне в DuckDuckGo</string>
+    <string name="browserMenuRunningInDDG">Работи в DuckDuckGo</string>
+    <string name="browserMenuSetAsDefaultBrowser">Задаване като браузър по подразбиране</string>
+    <string name="browserMenuNewChat">Нов чат</string>
+    <string name="browserMenuChatHistory">История на чата</string>
+    <string name="browserMenuChatSettings">Настройки на Duck.ai</string>
+    <string name="browserMenuVPN">VPN</string>
+
+    <!-- Browser Menu Content Description -->
+    <string name="browserMenuBack">Обратно</string>
+    <string name="browserMenuForward">Напред</string>
+    <string name="browserMenuRefresh">Опресняване</string>
+</resources>

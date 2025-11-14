@@ -35,7 +35,7 @@
         app:layout_constraintEnd_toStartOf="@id/trailingBarrier"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:primaryText="@string/vpnMenuTitle"
+        app:primaryText="@string/browserMenuVPN"
         tools:iconDrawable="@drawable/ic_vpn_24" />
 
     <androidx.constraintlayout.widget.Barrier

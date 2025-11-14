@@ -21,6 +21,7 @@ import com.duckduckgo.app.browser.SpecialUrlDetector
 import com.duckduckgo.app.browser.WebViewErrorResponse
 import com.duckduckgo.app.browser.omnibar.QueryOrigin
 import com.duckduckgo.app.global.model.MaliciousSiteStatus
+import com.duckduckgo.browser.ui.browsermenu.VpnMenuState
 import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupViewState
 import com.duckduckgo.savedsites.api.models.SavedSite
 
@@ -62,18 +63,6 @@ data class BrowserViewState(
     val lastQueryOrigin: QueryOrigin = QueryOrigin.FromUser,
     val vpnMenuState: VpnMenuState = VpnMenuState.Hidden,
 )
-
-sealed class VpnMenuState {
-    data object Hidden : VpnMenuState()
-
-    data object NotSubscribed : VpnMenuState()
-
-    data object NotSubscribedNoPill : VpnMenuState()
-
-    data class Subscribed(
-        val isVpnEnabled: Boolean,
-    ) : VpnMenuState()
-}
 
 sealed class HighlightableButton {
     data class Visible(

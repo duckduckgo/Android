@@ -47,17 +47,12 @@
     <string name="omnibarInputHint">Otsige või tippige URL</string>
     <string name="clearButtonContentDescription">Tühjenda otsingusisend</string>
     <string name="no_compatible_third_party_app_installed">Ühtegi ühilduvat rakendust pole installitud</string>
-    <string name="addBookmarkMenuTitle">Lisa järjehoidja</string>
-    <string name="editBookmarkMenuTitle">Redigeeri järjehoidjat</string>
+
     <string name="addFavoriteMenuTitle">Lisa lemmik</string>
     <string name="removeFavoriteMenuTitle">Eemalda lemmik</string>
     <string name="favoriteAddedMessage">Lemmik lisatud</string>
     <string name="bookmarkAddedMessage">Järjehoidja lisatud</string>
-    <string name="requestDesktopSiteMenuTitle">Töölaua sait</string>
-    <string name="fireproofWebsiteMenuTitleRemove">Eemalda tulekindlus</string>
-    <string name="requestMobileSiteMenuTitle">Mobiilisait</string>
     <string name="downloadsMenuTitle">Allalaadimised</string>
-    <string name="printMenuTitle">Prindi leht</string>
     <string name="favoriteDeleteConfirmationMessage">Lemmik on eemaldatud</string>
     <string name="fireproofDeleteConfirmationMessage">Tulekindlus on eemaldatud</string>
     <string name="privacyProtectionEnabledConfirmationMessage" instruction="Placeholder is a website">Privaatsuskaitse on domeeni %1$s jaoks lubatud</string>
@@ -76,11 +71,9 @@
     <!-- Sharing options -->
     <string name="options">Valikud</string>
     <string name="shareLink">Jaga linki</string>
-    <string name="shareMenuTitle">Jaga</string>
     <string name="copyUrl">Kopeeri lingi aadress</string>
 
     <!-- Find in page -->
-    <string name="findInPageMenuTitle">Otsi lehel</string>
     <string name="nextSearchTermDescription">Otsi järgmine</string>
     <string name="previousSearchTermDescription">Otsi eelmine</string>
     <string name="closeFindInPageButtonDescription">Sulge lehe vaates otsimine</string>
@@ -258,7 +251,7 @@
     <string name="no_suggestions">Ettepanekud puuduvad</string>
 
     <!-- Broken Site Activity -->
-    <string name="brokenSiteReportBrokenSiteMenuItem">Teatage katkisest saidist</string>
+
 
     <string name="brokenSiteProtectionsOn">Sellel saidil on kaitsefunktsioonid <b>SISSE</b> lülitatud</string>
     <string name="brokenSiteProtectionsOff">Sellel saidil on kaitsefunktsioonid <b>VÄLJA</b> lülitatud</string>
@@ -281,7 +274,7 @@
     <string name="searchWidgetLabel">Otsing ja Duck.ai</string>
 
     <!-- Home Screen Shortcuts -->
-    <string name="addToHome">Lisa kodukuvale</string>
+
     <string name="shortcutAddedText" instruction="Placeholder is the name of a website">Õnnestus! %1$s lisati teie avaekraanile.</string>
 
     <!-- User Survey -->
@@ -487,8 +480,6 @@
 
     <!-- Allowlist -->
     <string name="allowlistActivityTitle">Kaitseta saidid</string>
-    <string name="enablePrivacyProtection">Luba privaatsuse kaitse</string>
-    <string name="disablePrivacyProtection">Keela privaatsuse kaitse</string>
     <string name="allowlistEntryOverflowContentDescription" instruction="Placeholder is a website">Rohkem võimalusi kaitseta saidi %1$s jaoks</string>
     <string name="allowlistEntryDeleteConfirmMessage" instruction="Placeholder is a website">Oled kindel, et soovid eemaldada &lt;b&gt;%1$s&lt;/b&gt; kaisteta saitide hulgast?</string>
     <string name="allowlistExplanation">Nendele saitidele ei laiene privaatsuse kaitse.</string>
@@ -587,11 +578,9 @@
     <string name="appLinkSnackBarMessage" instruction="Placeholder is the name of an app">Selle lingi saab avada rakenduses %1$s.</string>
     <string name="appLinkMultipleSnackBarMessage">Selle lingi saab avada teistes rakendustes.</string>
     <string name="appLinkIntentChooserTitle">Ava rakendusega</string>
-    <string name="appLinkMenuItemTitle">Ava rakenduses</string>
 
     <!-- Email Autofill -->
     <string name="aliasToClipboardMessage">Uus aadress kopeeriti teie lõikelauale</string>
-    <string name="newEmailAliasMenuTitle">Loo Duck Address</string>
 
     <!-- Autofill -->
     <string name="autofillSnackbarAction" instruction="Label for a button that lets the user view the details for a login credential">Kuva</string>
@@ -761,10 +750,6 @@
     <string name="settingsPasswordsAndAutofillLoginsSetting">Paroolid ja automaatne täitmine</string>
     <string name="autofillLoginSavedSnackbarMessage">Parool salvestatud</string>
     <string name="autofillLoginUpdatedSnackbarMessage">Parool uuendatud</string>
-
-    <!-- Custom Tab -->
-    <string name="openInDdgMenuItemTitle">Ava saidil DuckDuckGo</string>
-    <string name="runningInDdgMenuItemTitle">DuckDuckGo-s käivitamine</string>
 
     <!-- SSL Error -->
     <string name="sslErrorTitle">Hoiatus: see sait võib olla ebaturvaline</string>

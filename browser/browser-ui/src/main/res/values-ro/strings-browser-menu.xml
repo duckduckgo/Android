@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (c) 2025 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+<!-- smartling.entity_escaping = false -->
+<!-- smartling.instruction_attributes = instruction -->
+<resources>
+    <!-- Browser Menu -->
+    <string name="browserMenuRemoveFireproofing">Elimină ștergerea activității și istoricului din browser</string>
+    <string name="browserMenuBookmarks">Marcaje</string>
+    <string name="browserMenuAddBookmark">Adaugă marcaj</string>
+    <string name="browserMenuEditBookmark">Editează marcaj</string>
+    <string name="browserMenuFireproofSite">Șterge activitatea și istoricul din browser pentru acest site</string>
+    <string name="browserMenuMobileSite">Site mobil</string>
+    <string name="browserMenuDesktopSite">Versiune desktop</string>
+    <string name="browserMenuEnablePrivacyProtection">Activează protecția confidențialității</string>
+    <string name="browserMenuDisablePrivacyProtection">Dezactivează protecția confidențialității</string>
+    <string name="browserMenuNewTab">Filă nouă</string>
+    <string name="browserMenuDuckChat">Duck.ai</string>
+    <string name="browserMenuShare">Trimite…</string>
+    <string name="browserMenuEmailAlias">Generează Duck Address</string>
+    <string name="browserMenuFindInPage">Caută în pagină</string>
+    <string name="browserMenuPrint">Imprimă pagina</string>
+    <string name="browserMenuOpenAppLink">Deschide în aplicație</string>
+    <string name="browserMenuAddToHome">Adaugă pe ecranul de pornire</string>
+    <string name="browserMenuReportBrokenSite">Raportează Site-ul Defect</string>
+    <string name="browserMenuAutofill">Parole</string>
+    <string name="browserMenuDownloads">Descărcări</string>
+    <string name="browserMenuSettings">Setări</string>
+    <string name="browserMenuOpenInDDG">Deschide în DuckDuckGo</string>
+    <string name="browserMenuRunningInDDG">Redare în DuckDuckGo</string>
+    <string name="browserMenuSetAsDefaultBrowser">Setare ca browser implicit</string>
+    <string name="browserMenuNewChat">Chat nou</string>
+    <string name="browserMenuChatHistory">Istoricul chaturilor</string>
+    <string name="browserMenuChatSettings">Setări Duck.ai</string>
+    <string name="browserMenuVPN">VPN</string>
+
+    <!-- Browser Menu Content Description -->
+    <string name="browserMenuBack">Înapoi</string>
+    <string name="browserMenuForward">Înainte</string>
+    <string name="browserMenuRefresh">Reîncărcare</string>
+</resources>

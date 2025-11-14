@@ -16,7 +16,7 @@
 
 package com.duckduckgo.app.browser.menu
 
-import com.duckduckgo.app.browser.viewstate.VpnMenuState
+import com.duckduckgo.browser.ui.browsermenu.VpnMenuState
 import org.junit.Assert.assertEquals
 import org.junit.Test
 
