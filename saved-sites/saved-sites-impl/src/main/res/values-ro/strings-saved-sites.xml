@@ -82,7 +82,6 @@
     <string name="searchBookmarks">Caută marcaje</string>
     <string name="deleteFolder" instruction="%1$s is the folder name">"Ștergi %1$s?"</string>
     <string name="deleteBookmark" instruction="%1$s is the bookmark name">"Ștergi marcajul %1$s?"</string>
-    <string name="bookmarkAddedInBookmarks" instruction="%1$s is the folder name">Marcaj adăugat în %1$s</string>
     <string name="addToFavorites">Adaugă la preferințe</string>
     <string name="editBookmark">Editează marcaj</string>
     <string name="importBookmarksDescription">Dacă marcajele tale sunt salvate într-un alt browser, \nle poți importa în DuckDuckGo.</string>

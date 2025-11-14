@@ -79,7 +79,6 @@
     <string name="searchBookmarks">Търсене на отметки</string>
     <string name="deleteFolder" instruction="%1$s is the folder name">"Изтриване на %1$s?"</string>
     <string name="deleteBookmark" instruction="%1$s is the bookmark name">"Изтриване на %1$s отметки?"</string>
-    <string name="bookmarkAddedInBookmarks" instruction="%1$s is the folder name">Отметката е добавена в %1$s</string>
     <string name="addToFavorites">Добавяне към любими</string>
     <string name="editBookmark">Редактиране на отметка</string>
     <string name="importBookmarksDescription">Ако имате запазени отметки в друг браузър, можете\nда ги импортирате в DuckDuckGo.</string>
