@@ -40,8 +40,9 @@
     <!-- Browser Activity -->
     <string name="browserPopupMenu">Browser menu</string>
     <string name="refresh">Refresh</string>
-    <string name="forward">Forward</string>
     <string name="back">Back</string>
+    <string name="forward">Forward</string>
+    <string name="test">Forward</string>
 
     <string name="omnibarInputHint">Search or type URL</string>
     <string name="clearButtonContentDescription">Clear search input</string>
