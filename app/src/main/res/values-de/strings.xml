@@ -125,6 +125,8 @@
 
     <!-- Fire -->
     <string name="fireMenu">Daten löschen</string>
+    <string name="fireClearAll">Tabs und Daten löschen</string>
+    <string name="fireClearAllPlusDuckChats">Tabs, Daten und Duck.ai-Chats löschen</string>
     <string name="fireCancel">Abbrechen</string>
     <string name="fireDataCleared">Daten gelöscht</string>
 
@@ -245,6 +247,8 @@
     <string name="settingsAutomaticallyClearWhenAppExit60Minutes">Beim Verlassen der App, 1 Stunde lang inaktiv</string>
     <string name="settingsClearAiDataTitle">Duck.ai-Chats löschen</string>
     <string name="settingsClearAiDataDeleteMessage">Der Fire Button löscht auch den Verlauf von Duck.ai, einschließlich angehefteter Chats.</string>
+    <string name="settingsClearDataActionSecondaryText">Löscht alle Tabs und Daten für alle Websites, die du nicht als Fireproof markiert hast.</string>
+    <string name="settingsClearDataActionPlusDuckChatsSecondaryText">Löscht alle Tabs, Duck.ai-Chats und Daten für alle Websites, die du nicht als Fireproof markiert hast.</string>
 
     <!-- About Activity -->
     <string name="aboutActivityTitle">Über DuckDuckGo</string>

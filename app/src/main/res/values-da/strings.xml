@@ -125,6 +125,8 @@
 
     <!-- Fire -->
     <string name="fireMenu">Ryd data</string>
+    <string name="fireClearAll">Ryd faner og data</string>
+    <string name="fireClearAllPlusDuckChats">Ryd faner, data og Duck.ai-chats</string>
     <string name="fireCancel">Annuller</string>
     <string name="fireDataCleared">Data ryddet</string>
 
@@ -245,6 +247,8 @@
     <string name="settingsAutomaticallyClearWhenAppExit60Minutes">App-afslutning, inaktiv i 1 time</string>
     <string name="settingsClearAiDataTitle">Ryd Duck.ai-chats</string>
     <string name="settingsClearAiDataDeleteMessage">Fire Button sletter også Duck.ai-historik, inklusive fastgjorte chats.</string>
+    <string name="settingsClearDataActionSecondaryText">Rydder alle faner og data for websteder, du ikke har sikret med Fireproof.</string>
+    <string name="settingsClearDataActionPlusDuckChatsSecondaryText">Rydder alle faner, Duck.ai-chats og data for websteder, du ikke har sikret med Fireproof.</string>
 
     <!-- About Activity -->
     <string name="aboutActivityTitle">Om DuckDuckGo</string>

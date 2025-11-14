@@ -125,6 +125,8 @@
 
     <!-- Fire -->
     <string name="fireMenu">Gegevens wissen</string>
+    <string name="fireClearAll">Tabbladen en gegevens wissen</string>
+    <string name="fireClearAllPlusDuckChats">Tabbladen, gegevens en Duck.ai-chats wissen</string>
     <string name="fireCancel">Annuleren</string>
     <string name="fireDataCleared">Gegevens gewist</string>
 
@@ -245,6 +247,8 @@
     <string name="settingsAutomaticallyClearWhenAppExit60Minutes">App afsluiten, 1 uur inactief</string>
     <string name="settingsClearAiDataTitle">Duck.ai chats wissen</string>
     <string name="settingsClearAiDataDeleteMessage">Fire Button verwijdert ook de Duck.ai-geschiedenis, inclusief vastgepinde chats.</string>
+    <string name="settingsClearDataActionSecondaryText">Wist alle tabbladen en gegevens van sites die je niet Fireproof hebt gemaakt.</string>
+    <string name="settingsClearDataActionPlusDuckChatsSecondaryText">Sluit alle tabbladen, Duck.ai-chats en wist gegevens van sites die je niet Fireproof hebt gemaakt.</string>
 
     <!-- About Activity -->
     <string name="aboutActivityTitle">Over DuckDuckGo</string>

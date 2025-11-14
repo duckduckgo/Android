@@ -125,6 +125,8 @@
 
     <!-- Fire -->
     <string name="fireMenu">Limpar dados</string>
+    <string name="fireClearAll">Limpar separadores e dados</string>
+    <string name="fireClearAllPlusDuckChats">Limpar todos os separadores, dados e conversas do Duck.ai</string>
     <string name="fireCancel">Cancelar</string>
     <string name="fireDataCleared">Dados limpos</string>
 
@@ -245,6 +247,8 @@
     <string name="settingsAutomaticallyClearWhenAppExit60Minutes">Saída da aplicação, inativa por 1 hora</string>
     <string name="settingsClearAiDataTitle">Limpar conversas do Duck.ai</string>
     <string name="settingsClearAiDataDeleteMessage">O Fire Button também elimina o histórico do Duck.ai, incluindo os chats fixados.</string>
+    <string name="settingsClearDataActionSecondaryText">Fecha todas as abas e limpa os dados de quaisquer sites que não tenha protegido com o Fireproof.</string>
+    <string name="settingsClearDataActionPlusDuckChatsSecondaryText">Limpa todos os separadores, chats do Duck.ai e dados de quaisquer sites que não tenhas protegido com o Fireproof.</string>
 
     <!-- About Activity -->
     <string name="aboutActivityTitle">Sobre o DuckDuckGo</string>

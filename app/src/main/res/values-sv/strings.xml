@@ -125,6 +125,8 @@
 
     <!-- Fire -->
     <string name="fireMenu">Rensa data</string>
+    <string name="fireClearAll">Rensa flikar och data</string>
+    <string name="fireClearAllPlusDuckChats">Rensa flikar, data och Duck.ai-chattar</string>
     <string name="fireCancel">Avbryt</string>
     <string name="fireDataCleared">Data rensad</string>
 
@@ -245,6 +247,8 @@
     <string name="settingsAutomaticallyClearWhenAppExit60Minutes">Avsluta app, inaktiv i 1 timme</string>
     <string name="settingsClearAiDataTitle">Rensa Duck.ai-chattar</string>
     <string name="settingsClearAiDataDeleteMessage">Fire Button raderar också Duck.ai-historik, inklusive fästa chattar.</string>
+    <string name="settingsClearDataActionSecondaryText">Rensar alla flikar och data för webbplatser som inte har Fireproof.</string>
+    <string name="settingsClearDataActionPlusDuckChatsSecondaryText">Rensar alla flikar, Duck.ai-chattar och data för webbplatser som inte har Fireproof.</string>
 
     <!-- About Activity -->
     <string name="aboutActivityTitle">Om DuckDuckGo</string>
