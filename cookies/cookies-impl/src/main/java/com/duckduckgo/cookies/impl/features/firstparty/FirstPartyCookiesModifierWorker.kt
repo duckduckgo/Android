@@ -18,6 +18,7 @@ package com.duckduckgo.cookies.impl.features.firstparty
 
 import android.content.Context
 import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.lifecycleScope
 import androidx.work.BackoffPolicy
 import androidx.work.CoroutineWorker
 import androidx.work.ExistingPeriodicWorkPolicy
@@ -32,6 +33,7 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.FeatureToggle
 import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.SingleInstanceIn
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.TimeUnit.DAYS
@@ -64,6 +66,7 @@ class FirstPartyCookiesModifierWorker(
 class FirstPartyCookiesModifierWorkerScheduler @Inject constructor(
     private val workManager: WorkManager,
     private val toggle: FeatureToggle,
+    private val dispatchers: DispatcherProvider,
 ) : MainProcessLifecycleObserver {
 
     private val workerRequest = PeriodicWorkRequestBuilder<FirstPartyCookiesModifierWorker>(1, DAYS)
@@ -72,18 +75,22 @@ class FirstPartyCookiesModifierWorkerScheduler @Inject constructor(
         .build()
 
     override fun onStop(owner: LifecycleOwner) {
-        if (isFeatureEnabled()) {
-            workManager.enqueueUniquePeriodicWork(FIRST_PARTY_COOKIES_EXPIRE_WORKER_TAG, ExistingPeriodicWorkPolicy.REPLACE, workerRequest)
-        } else {
-            workManager.cancelAllWorkByTag(FIRST_PARTY_COOKIES_EXPIRE_WORKER_TAG)
+        owner.lifecycleScope.launch(dispatchers.io()) {
+            if (isFeatureEnabled()) {
+                workManager.enqueueUniquePeriodicWork(FIRST_PARTY_COOKIES_EXPIRE_WORKER_TAG, ExistingPeriodicWorkPolicy.REPLACE, workerRequest)
+            } else {
+                workManager.cancelAllWorkByTag(FIRST_PARTY_COOKIES_EXPIRE_WORKER_TAG)
+            }
         }
     }
 
     override fun onStart(owner: LifecycleOwner) {
-        if (isFeatureEnabled()) {
-            workManager.enqueueUniquePeriodicWork(FIRST_PARTY_COOKIES_EXPIRE_WORKER_TAG, ExistingPeriodicWorkPolicy.KEEP, workerRequest)
-        } else {
-            workManager.cancelAllWorkByTag(FIRST_PARTY_COOKIES_EXPIRE_WORKER_TAG)
+        owner.lifecycleScope.launch(dispatchers.io()) {
+            if (isFeatureEnabled()) {
+                workManager.enqueueUniquePeriodicWork(FIRST_PARTY_COOKIES_EXPIRE_WORKER_TAG, ExistingPeriodicWorkPolicy.KEEP, workerRequest)
+            } else {
+                workManager.cancelAllWorkByTag(FIRST_PARTY_COOKIES_EXPIRE_WORKER_TAG)
+            }
         }
     }
 

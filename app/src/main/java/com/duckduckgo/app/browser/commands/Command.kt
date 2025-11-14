@@ -503,4 +503,7 @@ sealed class Command {
         val isCosmetic: Boolean,
     ) : Command()
     data object PageStarted : Command()
+
+    data object EnableDuckAIFullScreen : Command()
+    data class DisableDuckAIFullScreen(val url: String) : Command()
 }

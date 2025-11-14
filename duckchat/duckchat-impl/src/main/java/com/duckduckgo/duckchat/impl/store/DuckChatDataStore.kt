@@ -34,6 +34,7 @@ import com.duckduckgo.duckchat.impl.store.SharedPreferencesDuckChatDataStore.Key
 import com.duckduckgo.duckchat.impl.store.SharedPreferencesDuckChatDataStore.Keys.DUCK_CHAT_SESSION_DELTA_TIMESTAMP
 import com.duckduckgo.duckchat.impl.store.SharedPreferencesDuckChatDataStore.Keys.DUCK_CHAT_SHOW_IN_ADDRESS_BAR
 import com.duckduckgo.duckchat.impl.store.SharedPreferencesDuckChatDataStore.Keys.DUCK_CHAT_SHOW_IN_MENU
+import com.duckduckgo.duckchat.impl.store.SharedPreferencesDuckChatDataStore.Keys.DUCK_CHAT_SHOW_IN_VOICE_SEARCH
 import com.duckduckgo.duckchat.impl.store.SharedPreferencesDuckChatDataStore.Keys.DUCK_CHAT_USER_ENABLED
 import com.duckduckgo.duckchat.impl.store.SharedPreferencesDuckChatDataStore.Keys.DUCK_CHAT_USER_PREFERENCES
 import com.squareup.anvil.annotations.ContributesBinding
@@ -60,6 +61,8 @@ interface DuckChatDataStore {
 
     suspend fun setFullScreenModeUserSetting(enabled: Boolean)
 
+    suspend fun setShowInVoiceSearch(showToggle: Boolean)
+
     fun observeDuckChatUserEnabled(): Flow<Boolean>
 
     fun observeInputScreenUserSettingEnabled(): Flow<Boolean>
@@ -70,6 +73,8 @@ interface DuckChatDataStore {
 
     fun observeFullscreenMode(): Flow<Boolean>
 
+    fun observeShowInVoiceSearch(): Flow<Boolean>
+
     suspend fun isDuckChatUserEnabled(): Boolean
 
     suspend fun isInputScreenUserSettingEnabled(): Boolean
@@ -79,6 +84,8 @@ interface DuckChatDataStore {
     suspend fun getShowInAddressBar(): Boolean
 
     suspend fun isFullScreenUserSettingEnabled(): Boolean
+
+    suspend fun getShowInVoiceSearch(): Boolean
 
     suspend fun fetchAndClearUserPreferences(): String?
 
@@ -106,6 +113,7 @@ class SharedPreferencesDuckChatDataStore @Inject constructor(
         val DUCK_AI_INPUT_SCREEN_USER_SETTING = booleanPreferencesKey(name = "DUCK_AI_INPUT_SCREEN_USER_SETTING")
         val DUCK_CHAT_SHOW_IN_MENU = booleanPreferencesKey(name = "DUCK_CHAT_SHOW_IN_MENU")
         val DUCK_CHAT_SHOW_IN_ADDRESS_BAR = booleanPreferencesKey(name = "DUCK_CHAT_SHOW_IN_ADDRESS_BAR")
+        val DUCK_CHAT_SHOW_IN_VOICE_SEARCH = booleanPreferencesKey(name = "DUCK_CHAT_SHOW_IN_VOICE_SEARCH")
         val DUCK_CHAT_OPENED = booleanPreferencesKey(name = "DUCK_CHAT_OPENED")
         val DUCK_CHAT_USER_PREFERENCES = stringPreferencesKey("DUCK_CHAT_USER_PREFERENCES")
         val DUCK_CHAT_LAST_SESSION_TIMESTAMP = longPreferencesKey(name = "DUCK_CHAT_LAST_SESSION_TIMESTAMP")
@@ -158,6 +166,12 @@ class SharedPreferencesDuckChatDataStore @Inject constructor(
             .distinctUntilChanged()
             .stateIn(appCoroutineScope, SharingStarted.Eagerly, true)
 
+    private val duckChatShowInVoiceSearch: StateFlow<Boolean> =
+        store.data
+            .map { prefs -> prefs[DUCK_CHAT_SHOW_IN_VOICE_SEARCH] ?: true }
+            .distinctUntilChanged()
+            .stateIn(appCoroutineScope, SharingStarted.Eagerly, true)
+
     override suspend fun setDuckChatUserEnabled(enabled: Boolean) {
         store.edit { prefs -> prefs[DUCK_CHAT_USER_ENABLED] = enabled }
     }
@@ -178,6 +192,10 @@ class SharedPreferencesDuckChatDataStore @Inject constructor(
         store.edit { prefs -> prefs[DUCK_CHAT_SHOW_IN_ADDRESS_BAR] = showDuckChat }
     }
 
+    override suspend fun setShowInVoiceSearch(showToggle: Boolean) {
+        store.edit { prefs -> prefs[DUCK_CHAT_SHOW_IN_VOICE_SEARCH] = showToggle }
+    }
+
     override fun observeDuckChatUserEnabled(): Flow<Boolean> = duckChatUserEnabled
 
     override fun observeInputScreenUserSettingEnabled(): Flow<Boolean> = inputScreenUserSettingEnabled
@@ -188,6 +206,8 @@ class SharedPreferencesDuckChatDataStore @Inject constructor(
 
     override fun observeFullscreenMode(): Flow<Boolean> = store.data.map { it[DUCK_CHAT_FULLSCREEN_MODE_SETTING] ?: false }
 
+    override fun observeShowInVoiceSearch(): Flow<Boolean> = duckChatShowInVoiceSearch
+
     override suspend fun isDuckChatUserEnabled(): Boolean = store.data.firstOrNull()?.let { it[DUCK_CHAT_USER_ENABLED] } ?: true
 
     override suspend fun isInputScreenUserSettingEnabled(): Boolean = store.data.firstOrNull()?.let { it[DUCK_AI_INPUT_SCREEN_USER_SETTING] } ?: false
@@ -197,6 +217,8 @@ class SharedPreferencesDuckChatDataStore @Inject constructor(
     override suspend fun getShowInAddressBar(): Boolean = store.data.firstOrNull()?.defaultShowInAddressBar() ?: true
 
     override suspend fun isFullScreenUserSettingEnabled(): Boolean = store.data.firstOrNull()?.let { it[DUCK_CHAT_FULLSCREEN_MODE_SETTING] } ?: false
+
+    override suspend fun getShowInVoiceSearch(): Boolean = store.data.firstOrNull()?.let { it[DUCK_CHAT_SHOW_IN_VOICE_SEARCH] } ?: true
 
     override suspend fun fetchAndClearUserPreferences(): String? {
         val userPreferences = store.data.map { it[DUCK_CHAT_USER_PREFERENCES] }.firstOrNull()

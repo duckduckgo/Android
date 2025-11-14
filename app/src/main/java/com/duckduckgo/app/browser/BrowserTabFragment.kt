@@ -107,6 +107,7 @@ import com.duckduckgo.app.browser.R.string
 import com.duckduckgo.app.browser.SSLErrorType.NONE
 import com.duckduckgo.app.browser.WebViewErrorResponse.LOADING
 import com.duckduckgo.app.browser.WebViewErrorResponse.OMITTED
+import com.duckduckgo.app.browser.api.OmnibarRepository
 import com.duckduckgo.app.browser.api.WebViewCapabilityChecker
 import com.duckduckgo.app.browser.api.WebViewCapabilityChecker.WebViewCapability
 import com.duckduckgo.app.browser.applinks.AppLinksLauncher
@@ -142,6 +143,7 @@ import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
 import com.duckduckgo.app.browser.model.LongPressTarget
 import com.duckduckgo.app.browser.navigation.bar.BrowserNavigationBarViewIntegration
 import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarObserver
+import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarView
 import com.duckduckgo.app.browser.newtab.NewTabPageProvider
 import com.duckduckgo.app.browser.omnibar.Omnibar
 import com.duckduckgo.app.browser.omnibar.Omnibar.FindInPageListener
@@ -150,8 +152,8 @@ import com.duckduckgo.app.browser.omnibar.Omnibar.LogoClickListener
 import com.duckduckgo.app.browser.omnibar.Omnibar.OmnibarTextState
 import com.duckduckgo.app.browser.omnibar.Omnibar.TextListener
 import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode
-import com.duckduckgo.app.browser.omnibar.OmnibarFeatureRepository
 import com.duckduckgo.app.browser.omnibar.OmnibarItemPressedListener
+import com.duckduckgo.app.browser.omnibar.OmnibarType
 import com.duckduckgo.app.browser.omnibar.QueryOrigin
 import com.duckduckgo.app.browser.print.PrintDocumentAdapterFactory
 import com.duckduckgo.app.browser.print.PrintInjector
@@ -182,7 +184,6 @@ import com.duckduckgo.app.browser.webshare.WebShareChooser
 import com.duckduckgo.app.browser.webshare.WebViewCompatWebShareChooser
 import com.duckduckgo.app.browser.webview.WebContentDebugging
 import com.duckduckgo.app.browser.webview.WebViewBlobDownloadFeature
-import com.duckduckgo.app.browser.webview.safewebview.SafeWebViewFeature
 import com.duckduckgo.app.cta.ui.BrokenSitePromptDialogCta
 import com.duckduckgo.app.cta.ui.Cta
 import com.duckduckgo.app.cta.ui.CtaViewModel
@@ -252,7 +253,6 @@ import com.duckduckgo.browser.api.ui.BrowserScreens.PrivateSearchScreenNoParams
 import com.duckduckgo.browser.api.ui.BrowserScreens.WebViewActivityWithParams
 import com.duckduckgo.browser.api.webviewcompat.WebViewCompatWrapper
 import com.duckduckgo.browser.ui.autocomplete.BrowserAutoCompleteSuggestionsAdapter
-import com.duckduckgo.browser.ui.omnibar.OmnibarType
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.DuckDuckGoFragment
 import com.duckduckgo.common.ui.store.BrowserAppTheme
@@ -564,9 +564,6 @@ class BrowserTabFragment :
     lateinit var newTabPageProvider: NewTabPageProvider
 
     @Inject
-    lateinit var safeWebViewFeature: SafeWebViewFeature
-
-    @Inject
     lateinit var duckPlayer: DuckPlayer
 
     @Inject
@@ -597,7 +594,7 @@ class BrowserTabFragment :
     lateinit var webViewCompatWrapper: WebViewCompatWrapper
 
     @Inject
-    lateinit var omnibarFeatureRepository: OmnibarFeatureRepository
+    lateinit var omnibarRepository: OmnibarRepository
 
     @Inject
     lateinit var webViewCompatTestHelper: WebViewCompatTestHelper
@@ -930,9 +927,10 @@ class BrowserTabFragment :
                 }
 
                 InputScreenActivityResultCodes.MENU_REQUESTED -> {
+                    val isSplitOmnibarEnabled = omnibarRepository.omnibarType == OmnibarType.SPLIT
                     launchPopupMenu(
-                        anchorToNavigationBar = omnibarFeatureRepository.isSplitOmnibarEnabled,
-                        addExtraDelay = omnibarFeatureRepository.isSplitOmnibarEnabled,
+                        anchorToNavigationBar = isSplitOmnibarEnabled,
+                        addExtraDelay = isSplitOmnibarEnabled,
                     )
                 }
 
@@ -961,8 +959,15 @@ class BrowserTabFragment :
         voiceSearchLauncher.registerResultsCallback(this, requireActivity(), BROWSER) {
             when (it) {
                 is VoiceSearchLauncher.Event.VoiceRecognitionSuccess -> {
-                    omnibar.setText(it.result)
-                    userEnteredQuery(it.result)
+                    when (val result = it.result) {
+                        is VoiceSearchLauncher.VoiceRecognitionResult.SearchResult -> {
+                            omnibar.setText(result.query)
+                            userEnteredQuery(result.query)
+                        }
+                        is VoiceSearchLauncher.VoiceRecognitionResult.DuckAiResult -> {
+                            duckChat.openDuckChatWithAutoPrompt(result.query)
+                        }
+                    }
                     resumeWebView()
                 }
 
@@ -1039,7 +1044,7 @@ class BrowserTabFragment :
         omnibar = Omnibar(
             omnibarType = settingsDataStore.omnibarType,
             binding = binding,
-            isUnifiedOmnibarEnabled = omnibarFeatureRepository.isUnifiedOmnibarFlagEnabled,
+            isUnifiedOmnibarEnabled = omnibarRepository.isUnifiedOmnibarLayoutEnabled,
         )
 
         webViewContainer = binding.webViewContainer
@@ -1143,6 +1148,7 @@ class BrowserTabFragment :
     }
 
     private fun launchInputScreen(query: String) {
+        logcat { "Duck.ai: launchInputScreen" }
         val isTopOmnibar = omnibar.omnibarType != OmnibarType.SINGLE_BOTTOM
         val intent =
             globalActivityStarter.startIntent(
@@ -1183,18 +1189,6 @@ class BrowserTabFragment :
                     onBrowserMenuButtonPressed()
                 }
 
-                override fun onBackButtonClicked() {
-                    onBackArrowClicked()
-                }
-
-                override fun onBackButtonLongClicked() {
-                    onBackArrowLongClicked()
-                }
-
-                override fun onForwardButtonClicked() {
-                    onForwardArrowClicked()
-                }
-
                 override fun onNewTabButtonClicked() {
                     viewModel.onNavigationBarNewTabButtonClicked()
                 }
@@ -1211,7 +1205,7 @@ class BrowserTabFragment :
         browserNavigationBarIntegration = BrowserNavigationBarViewIntegration(
             lifecycleScope = lifecycleScope,
             browserTabFragmentBinding = binding,
-            isEnabled = omnibarFeatureRepository.isSplitOmnibarEnabled,
+            isEnabled = omnibarRepository.omnibarType == OmnibarType.SPLIT,
             omnibar = omnibar,
             browserNavigationBarObserver = observer,
         )
@@ -1654,7 +1648,7 @@ class BrowserTabFragment :
                 .flowWithLifecycle(lifecycle, Lifecycle.State.RESUMED)
                 .collectLatest { hasFavorites ->
                     binding.includeNewBrowserTab.topNtpOutlineStroke.isVisible = hasFavorites
-                    binding.includeNewBrowserTab.bottomNtpOutlineStroke.isVisible = hasFavorites && !omnibarFeatureRepository.isSplitOmnibarEnabled
+                    binding.includeNewBrowserTab.bottomNtpOutlineStroke.isVisible = hasFavorites && omnibarRepository.omnibarType != OmnibarType.SPLIT
                 }
         }
 
@@ -2003,6 +1997,10 @@ class BrowserTabFragment :
         } else {
             null
         }
+    }
+
+    fun getBottomNavigationBar(): BrowserNavigationBarView {
+        return binding.navigationBar
     }
 
     private fun processCommand(it: Command?) {
@@ -2364,6 +2362,8 @@ class BrowserTabFragment :
             is Command.SubmitChat -> duckChat.openDuckChatWithAutoPrompt(it.query)
             is Command.EnqueueCookiesAnimation -> enqueueCookiesAnimation(it.isCosmetic)
             is Command.PageStarted -> onPageStarted()
+            is Command.EnableDuckAIFullScreen -> omnibar.setViewMode(ViewMode.DuckAI)
+            is Command.DisableDuckAIFullScreen -> omnibar.setViewMode(ViewMode.Browser(it.url))
         }
     }
 
@@ -3202,7 +3202,6 @@ class BrowserTabFragment :
                 ).findViewById<DuckDuckGoWebView>(R.id.browserWebView)
 
         webView?.let {
-            it.isSafeWebViewEnabled = safeWebViewFeature.self().isEnabled()
             it.webViewClient = webViewClient
             it.webChromeClient = webChromeClient
             it.clearSslPreferences()

@@ -49,9 +49,7 @@
     <string name="duck_ai_shortcut_settings_description">Vælg hvilke Duck.ai-genveje der skal vises</string>
 
     <!-- Input Screen  -->
-    <string name="input_screen_search_tab">Søg</string>
     <string name="input_screen_search_hint">Søg eller indtast adresse</string>
-    <string name="input_screen_chat_tab">Duck.ai</string>
     <string name="input_screen_chat_hint">Spørg privat</string>
     <string name="input_screen_user_pref_without_ai">Kun søgning</string>
     <string name="input_screen_user_pref_with_ai">Søg &amp; Duck.ai</string>

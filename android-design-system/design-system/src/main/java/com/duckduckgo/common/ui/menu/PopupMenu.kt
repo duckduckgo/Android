@@ -142,7 +142,7 @@ open class PopupMenu(
         val y = if (anchorMoreToTopOfScreen) {
             anchorLocation[1] + anchorView.height + 4.toDp()
         } else {
-            screenHeight - anchorLocation[1] + 4.toDp()
+            screenHeight - anchorLocation[1] - anchorView.height + 4.toDp()
         }
 
         showAtLocation(rootView, gravity, x, y)

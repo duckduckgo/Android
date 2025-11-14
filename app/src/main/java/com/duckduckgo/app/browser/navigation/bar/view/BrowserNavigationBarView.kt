@@ -36,20 +36,17 @@ import com.duckduckgo.app.browser.PulseAnimation
 import com.duckduckgo.app.browser.databinding.ViewBrowserNavigationBarBinding
 import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarViewModel.Command
 import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarViewModel.Command.NotifyAutofillButtonClicked
-import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarViewModel.Command.NotifyBackButtonClicked
-import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarViewModel.Command.NotifyBackButtonLongClicked
 import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarViewModel.Command.NotifyBookmarksButtonClicked
 import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarViewModel.Command.NotifyFireButtonClicked
-import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarViewModel.Command.NotifyForwardButtonClicked
 import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarViewModel.Command.NotifyMenuButtonClicked
 import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarViewModel.Command.NotifyNewTabButtonClicked
 import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarViewModel.Command.NotifyTabsButtonClicked
 import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarViewModel.Command.NotifyTabsButtonLongClicked
 import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarViewModel.ViewState
+import com.duckduckgo.app.browser.omnibar.OmnibarType
 import com.duckduckgo.app.browser.omnibar.OmnibarView
 import com.duckduckgo.app.browser.webview.TopOmnibarBrowserContainerLayoutBehavior
 import com.duckduckgo.app.onboardingdesignexperiment.OnboardingDesignExperimentManager
-import com.duckduckgo.browser.ui.omnibar.OmnibarType
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.ViewViewModelFactory
@@ -112,12 +109,6 @@ class BrowserNavigationBarView @JvmOverloads constructor(
     val popupMenuAnchor: View = binding.menuButton
 
     var browserNavigationBarObserver: BrowserNavigationBarObserver? = null
-
-    fun setCustomTab(isCustomTab: Boolean) {
-        doOnAttach {
-            viewModel.setCustomTab(isCustomTab)
-        }
-    }
 
     fun setViewMode(viewMode: ViewMode) {
         doOnAttach {
@@ -198,6 +189,8 @@ class BrowserNavigationBarView @JvmOverloads constructor(
         binding.tabsButton.isVisible = viewState.tabsButtonVisible
         binding.tabsButton.count = viewState.tabsCount
         binding.tabsButton.hasUnread = viewState.hasUnreadTabs
+        binding.browserMenuHighlight.isVisible = viewState.showBrowserMenuHighlight
+        binding.shadowView.isVisible = viewState.showShadow
 
         renderFireButtonPulseAnimation(enabled = viewState.fireButtonHighlighted)
     }
@@ -208,9 +201,6 @@ class BrowserNavigationBarView @JvmOverloads constructor(
             NotifyTabsButtonClicked -> browserNavigationBarObserver?.onTabsButtonClicked()
             NotifyTabsButtonLongClicked -> browserNavigationBarObserver?.onTabsButtonLongClicked()
             NotifyMenuButtonClicked -> browserNavigationBarObserver?.onMenuButtonClicked()
-            NotifyBackButtonClicked -> browserNavigationBarObserver?.onBackButtonClicked()
-            NotifyBackButtonLongClicked -> browserNavigationBarObserver?.onBackButtonLongClicked()
-            NotifyForwardButtonClicked -> browserNavigationBarObserver?.onForwardButtonClicked()
             NotifyBookmarksButtonClicked -> browserNavigationBarObserver?.onBookmarksButtonClicked()
             NotifyNewTabButtonClicked -> browserNavigationBarObserver?.onNewTabButtonClicked()
             NotifyAutofillButtonClicked -> browserNavigationBarObserver?.onAutofillButtonClicked()
@@ -230,14 +220,16 @@ class BrowserNavigationBarView @JvmOverloads constructor(
     }
 
     enum class ViewMode {
+        CustomTab,
         NewTab,
         Browser,
+        TabManager,
     }
 
     /**
      * Behavior that offsets the navigation bar proportionally to the offset of the top omnibar.
      */
-    private class BottomViewBehavior(
+    inner class BottomViewBehavior(
         context: Context,
         attrs: AttributeSet?,
     ) : Behavior<View>(context, attrs) {

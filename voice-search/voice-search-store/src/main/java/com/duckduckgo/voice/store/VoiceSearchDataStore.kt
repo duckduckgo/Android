@@ -19,12 +19,14 @@ package com.duckduckgo.voice.store
 import android.content.Context
 import android.content.SharedPreferences
 import androidx.core.content.edit
+import com.duckduckgo.voice.api.VoiceSearchLauncher.VoiceSearchMode
 
 interface VoiceSearchDataStore {
     var permissionDeclinedForever: Boolean
     var userAcceptedRationaleDialog: Boolean
     var availabilityLogged: Boolean
     var countVoiceSearchDismissed: Int
+    var lastSelectedMode: VoiceSearchMode
 
     fun isVoiceSearchEnabled(default: Boolean): Boolean
     fun setVoiceSearchEnabled(value: Boolean)
@@ -40,6 +42,7 @@ class SharedPreferencesVoiceSearchDataStore constructor(
         const val KEY_VOICE_SEARCH_AVAILABILITY_LOGGED = "KEY_VOICE_SEARCH_AVAILABILITY_LOGGED"
         const val KEY_VOICE_SEARCH_ENABLED = "KEY_VOICE_SEARCH_ENABLED"
         const val KEY_VOICE_SEARCH_DISMISSED = "KEY_VOICE_SEARCH_DISMISSED"
+        const val KEY_LAST_SELECTED_MODE = "KEY_LAST_SELECTED_MODE"
     }
 
     private val preferences: SharedPreferences by lazy { context.getSharedPreferences(FILENAME, Context.MODE_PRIVATE) }
@@ -74,6 +77,12 @@ class SharedPreferencesVoiceSearchDataStore constructor(
         get() = preferences.getInt(KEY_VOICE_SEARCH_DISMISSED, 0)
         set(value) {
             updateValue(KEY_VOICE_SEARCH_DISMISSED, value)
+        }
+
+    override var lastSelectedMode: VoiceSearchMode
+        get() = VoiceSearchMode.fromValue(preferences.getInt(KEY_LAST_SELECTED_MODE, VoiceSearchMode.SEARCH.value))
+        set(value) {
+            updateValue(KEY_LAST_SELECTED_MODE, value.value)
         }
 
     private fun updateValue(

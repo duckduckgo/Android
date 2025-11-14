@@ -4,6 +4,8 @@ import android.content.Intent
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import app.cash.turbine.test
+import com.duckduckgo.app.browser.api.OmnibarRepository
+import com.duckduckgo.app.browser.omnibar.OmnibarType
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Count
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
@@ -82,6 +84,7 @@ class InputScreenViewModelTest {
     private val inputScreenDiscoveryFunnel: InputScreenDiscoveryFunnel = mock()
     private val inputScreenSessionUsageMetric: InputScreenSessionUsageMetric = mock()
     private val inputScreenConfigResolver: InputScreenConfigResolver = mock()
+    private val omnibarRepository: OmnibarRepository = mock()
 
     @Before
     fun setup() =
@@ -94,6 +97,7 @@ class InputScreenViewModelTest {
             whenever(duckChat.wasOpenedBefore()).thenReturn(false)
             whenever(inputScreenConfigResolver.useTopBar()).thenReturn(true)
             whenever(voiceSearchAvailability.isVoiceSearchAvailable).thenReturn(true)
+            whenever(omnibarRepository.omnibarType).thenReturn(OmnibarType.SINGLE_TOP)
         }
 
     private fun createViewModel(currentOmnibarText: String = ""): InputScreenViewModel =
@@ -111,6 +115,7 @@ class InputScreenViewModelTest {
             inputScreenDiscoveryFunnel = inputScreenDiscoveryFunnel,
             inputScreenSessionUsageMetric = inputScreenSessionUsageMetric,
             inputScreenConfigResolver = inputScreenConfigResolver,
+            omnibarRepository = omnibarRepository,
         )
 
     @Test
@@ -1969,5 +1974,30 @@ class InputScreenViewModelTest {
             advanceUntilIdle()
 
             verify(autoComplete).fireAutocompletePixel(suggestions, deviceAppSuggestion, experimentalInputScreen = true)
+        }
+
+    @Test
+    fun `when using split omnibar and search mode selected with empty text then mainButtonsVisible is false`() =
+        runTest {
+            whenever(inputScreenConfigResolver.mainButtonsEnabled()).thenReturn(true)
+            whenever(omnibarRepository.omnibarType).thenReturn(OmnibarType.SPLIT)
+            val viewModel = createViewModel("")
+
+            viewModel.onSearchSelected()
+
+            assertFalse(viewModel.visibilityState.value.mainButtonsVisible)
+        }
+
+    @Test
+    fun `when user deletes all text in search mode and omnibar is SPLIT then buttons are not visible`() =
+        runTest {
+            whenever(inputScreenConfigResolver.mainButtonsEnabled()).thenReturn(true)
+            whenever(omnibarRepository.omnibarType).thenReturn(OmnibarType.SPLIT)
+            val viewModel = createViewModel("")
+            viewModel.onSearchSelected()
+
+            viewModel.onSearchInputTextChanged("")
+
+            assertFalse(viewModel.visibilityState.value.mainButtonsVisible)
         }
 }

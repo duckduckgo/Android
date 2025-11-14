@@ -52,7 +52,6 @@ import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
 import com.duckduckgo.subscriptions.impl.switch_plan.SwitchPlanBottomSheetDialogFactory
 import com.duckduckgo.subscriptions.impl.ui.ChangePlanActivity.Companion.ChangePlanScreenWithEmptyParams
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command
-import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.DismissRebrandingBanner
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.FinishSignOut
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.GoToActivationScreen
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.GoToEditEmailScreen
@@ -159,15 +158,6 @@ class SubscriptionSettingsActivity : DuckDuckGoActivity() {
         binding.faq.setPrimaryText(getString(string.privacyProFaq))
         binding.faq.setSecondaryText(getString(string.privacyProFaqSecondary))
 
-        if (viewState.showRebrandingBanner) {
-            binding.includePrivacyProRebrandingBanner.root.show()
-            binding.includePrivacyProRebrandingBanner.settingsBannerClose.setOnClickListener {
-                viewModel.rebrandingBannerDismissed()
-            }
-        } else {
-            binding.includePrivacyProRebrandingBanner.root.gone()
-        }
-
         if (viewState.status in listOf(INACTIVE, EXPIRED)) {
             binding.viewPlans.isVisible = true
             binding.changePlan.isVisible = false
@@ -185,7 +175,7 @@ class SubscriptionSettingsActivity : DuckDuckGoActivity() {
             if (viewState.switchPlanAvailable && viewState.platform.lowercase() == "google") {
                 binding.switchPlan.show()
                 val switchText = when (viewState.duration) {
-                    Monthly -> getString(string.subscriptionSettingSwitchUpgrade)
+                    Monthly -> getString(string.subscriptionSettingSwitchUpgradeDynamic, viewState.savingsPercentage.toString())
                     Yearly -> getString(string.subscriptionSettingSwitchDowngrade)
                 }
                 binding.switchPlan.setPrimaryText(switchText)
@@ -308,8 +298,6 @@ class SubscriptionSettingsActivity : DuckDuckGoActivity() {
                 )
             }
 
-            is DismissRebrandingBanner -> dismissRebrandingBanner()
-
             is ShowSwitchPlanDialog -> showSwitchPlanDialog(command.switchType)
         }
     }
@@ -382,10 +370,6 @@ class SubscriptionSettingsActivity : DuckDuckGoActivity() {
                 screenTitle = getString(string.privacyPolicyAndTermsOfService),
             ),
         )
-    }
-
-    private fun dismissRebrandingBanner() {
-        binding.includePrivacyProRebrandingBanner.root.gone()
     }
 
     companion object {

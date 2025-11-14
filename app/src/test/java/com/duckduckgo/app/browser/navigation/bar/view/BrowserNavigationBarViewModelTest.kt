@@ -17,39 +17,47 @@
 package com.duckduckgo.app.browser.navigation.bar.view
 
 import app.cash.turbine.test
+import com.duckduckgo.app.browser.defaultbrowsing.prompts.AdditionalDefaultBrowserPrompts
 import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarViewModel.Command
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.common.test.CoroutineTestRule
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import org.mockito.Mock
-import org.mockito.MockitoAnnotations
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.whenever
 
 class BrowserNavigationBarViewModelTest {
 
     @get:Rule
     val coroutineTestRule: CoroutineTestRule = CoroutineTestRule()
 
-    @Mock
-    private lateinit var tabRepositoryMock: TabRepository
+    private val tabRepositoryMock: TabRepository = mock()
 
-    @Mock
-    private lateinit var pixelMock: Pixel
+    private val pixelMock: Pixel = mock()
+
+    private val additionalDefaultBrowserPrompts: AdditionalDefaultBrowserPrompts = mock()
+
+    private val highlightPopupMenuFlow = MutableStateFlow(false)
 
     private lateinit var testee: BrowserNavigationBarViewModel
 
     @Before
     fun setUp() {
-        MockitoAnnotations.openMocks(this)
+        whenever(additionalDefaultBrowserPrompts.highlightPopupMenu).thenReturn(highlightPopupMenuFlow)
+        whenever(tabRepositoryMock.flowTabs).thenReturn(flowOf(listOf(TabEntity("abc"))))
 
         testee = BrowserNavigationBarViewModel(
-            tabRepository = tabRepositoryMock,
             pixel = pixelMock,
+            tabRepository = tabRepositoryMock,
             dispatcherProvider = coroutineTestRule.testDispatcherProvider,
+            additionalDefaultBrowserPrompts = additionalDefaultBrowserPrompts,
         )
     }
 
@@ -127,6 +135,90 @@ class BrowserNavigationBarViewModelTest {
             val command = awaitItem()
             Assert.assertEquals(Command.NotifyBookmarksButtonClicked, command)
             cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `when highlightPopupMenu flow emits true, viewState shows browser menu highlight`() = runTest {
+        testee.viewState.test {
+            val initial = awaitItem()
+            Assert.assertEquals(false, initial.showBrowserMenuHighlight)
+
+            highlightPopupMenuFlow.value = true
+
+            val updated = awaitItem()
+            Assert.assertEquals(true, updated.showBrowserMenuHighlight)
+
+            highlightPopupMenuFlow.value = false
+            val updatedFalse = awaitItem()
+            Assert.assertEquals(false, updatedFalse.showBrowserMenuHighlight)
+
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `when setViewMode NewTab then viewState reflects NewTab configuration`() = runTest {
+        testee.viewState.test {
+            val initial = awaitItem()
+            // sanity check defaults
+            Assert.assertTrue(initial.newTabButtonVisible)
+            Assert.assertFalse(initial.autofillButtonVisible)
+
+            testee.setViewMode(BrowserNavigationBarView.ViewMode.NewTab)
+
+            val updated = awaitItem()
+            Assert.assertFalse(updated.newTabButtonVisible)
+            Assert.assertTrue(updated.autofillButtonVisible)
+            // unchanged flags
+            Assert.assertTrue(updated.tabsButtonVisible)
+            Assert.assertTrue(updated.bookmarksButtonVisible)
+            Assert.assertTrue(updated.showShadow)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `when setViewMode TabManager then viewState reflects TabManager configuration`() = runTest {
+        testee.viewState.test {
+            awaitItem() // initial
+            testee.setViewMode(BrowserNavigationBarView.ViewMode.TabManager)
+            val updated = awaitItem()
+            Assert.assertTrue(updated.newTabButtonVisible)
+            Assert.assertFalse(updated.autofillButtonVisible)
+            Assert.assertFalse(updated.tabsButtonVisible)
+            Assert.assertFalse(updated.bookmarksButtonVisible)
+            Assert.assertFalse(updated.showShadow)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `when switching NewTab then Browser then viewState reflects Browser configuration`() = runTest {
+        testee.viewState.test {
+            awaitItem() // initial
+            testee.setViewMode(BrowserNavigationBarView.ViewMode.NewTab)
+            awaitItem() // NewTab state
+            testee.setViewMode(BrowserNavigationBarView.ViewMode.Browser)
+            val browserState = awaitItem()
+            Assert.assertTrue(browserState.newTabButtonVisible)
+            Assert.assertFalse(browserState.autofillButtonVisible)
+            Assert.assertTrue(browserState.tabsButtonVisible)
+            Assert.assertTrue(browserState.bookmarksButtonVisible)
+            Assert.assertTrue(browserState.showShadow)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `when setViewMode CustomTab then navigation bar becomes hidden`() = runTest {
+        testee.viewState.test {
+            val initial = awaitItem()
+            Assert.assertTrue(initial.isVisible)
+
+            testee.setViewMode(BrowserNavigationBarView.ViewMode.CustomTab)
+            val hidden = awaitItem()
+            Assert.assertFalse(hidden.isVisible)
         }
     }
 }

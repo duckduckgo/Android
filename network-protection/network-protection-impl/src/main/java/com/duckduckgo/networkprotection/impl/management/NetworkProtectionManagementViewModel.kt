@@ -64,6 +64,8 @@ import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagem
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.ConnectionState.Disconnected
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.ConnectionState.Unknown
 import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixels
+import com.duckduckgo.networkprotection.impl.pixels.VpnEnableWideEvent
+import com.duckduckgo.networkprotection.impl.pixels.VpnEnableWideEvent.EntryPoint.APP_SETTINGS
 import com.duckduckgo.networkprotection.impl.settings.NetPSettingsLocalConfig
 import com.duckduckgo.networkprotection.impl.settings.NetpVpnSettingsDataStore
 import com.duckduckgo.networkprotection.impl.settings.geoswitching.getDisplayableCountry
@@ -103,6 +105,7 @@ class NetworkProtectionManagementViewModel @Inject constructor(
     private val vpnRemoteFeatures: VpnRemoteFeatures,
     private val localConfig: NetPSettingsLocalConfig,
     private val autoExcludePrompt: AutoExcludePrompt,
+    private val vpnEnableWideEvent: VpnEnableWideEvent,
 ) : ViewModel(), DefaultLifecycleObserver {
 
     private val refreshVpnRunningState = MutableStateFlow(System.currentTimeMillis())
@@ -304,12 +307,16 @@ class NetworkProtectionManagementViewModel @Inject constructor(
     ) {
         lastVpnRequestTime = lastVpnRequestTimeInMillis
         sendCommand(RequestVPNPermission(vpnIntent))
+        viewModelScope.launch { vpnEnableWideEvent.onAskForVpnPermission() }
     }
 
     fun onNetpToggleClicked(enabled: Boolean) {
         viewModelScope.launch(dispatcherProvider.io()) {
             if (enabled) {
+                vpnEnableWideEvent.onUserRequestedVpnStart(entryPoint = APP_SETTINGS)
+
                 if (externalVpnDetector.isExternalVpnDetected()) {
+                    vpnEnableWideEvent.onVpnConflictDialogShown()
                     networkProtectionPixels.reportVpnConflictDialogShown()
                     sendCommand(Command.ShowVpnConflictDialog)
                 } else {
@@ -333,6 +340,11 @@ class NetworkProtectionManagementViewModel @Inject constructor(
             sendCommand(Command.ShowVpnAlwaysOnConflictDialog)
         }
         lastVpnRequestTime = -1L
+        vpnEnableWideEvent.onVpnPermissionRejected()
+    }
+
+    fun onVpnConflictDialogCancel() {
+        vpnEnableWideEvent.onVpnConflictDialogCancel()
     }
 
     fun onStartVpn() {
@@ -341,6 +353,7 @@ class NetworkProtectionManagementViewModel @Inject constructor(
             networkProtectionRepository.enabledTimeInMillis = -1L
             forceUpdateRunningState()
             tryShowAlwaysOnPromotion()
+            vpnEnableWideEvent.onStartVpn()
         }
     }
 

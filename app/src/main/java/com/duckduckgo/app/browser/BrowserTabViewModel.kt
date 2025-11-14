@@ -61,6 +61,7 @@ import com.duckduckgo.app.browser.WebViewErrorResponse.LOADING
 import com.duckduckgo.app.browser.WebViewErrorResponse.OMITTED
 import com.duckduckgo.app.browser.addtohome.AddToHomeCapabilityDetector
 import com.duckduckgo.app.browser.animations.AddressBarTrackersAnimationFeatureToggle
+import com.duckduckgo.app.browser.api.OmnibarRepository
 import com.duckduckgo.app.browser.applinks.AppLinksHandler
 import com.duckduckgo.app.browser.camera.CameraHardwareChecker
 import com.duckduckgo.app.browser.certificates.BypassedSSLCertificatesRepository
@@ -192,7 +193,7 @@ import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
 import com.duckduckgo.app.browser.model.LongPressTarget
 import com.duckduckgo.app.browser.newtab.FavoritesQuickAccessAdapter
 import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
-import com.duckduckgo.app.browser.omnibar.OmnibarFeatureRepository
+import com.duckduckgo.app.browser.omnibar.OmnibarType
 import com.duckduckgo.app.browser.omnibar.QueryOrigin
 import com.duckduckgo.app.browser.omnibar.QueryOrigin.FromAutocomplete
 import com.duckduckgo.app.browser.refreshpixels.RefreshPixelSender
@@ -294,7 +295,6 @@ import com.duckduckgo.browser.api.brokensite.BrokenSiteData
 import com.duckduckgo.browser.api.brokensite.BrokenSiteData.ReportFlow.MENU
 import com.duckduckgo.browser.api.brokensite.BrokenSiteData.ReportFlow.RELOAD_THREE_TIMES_WITHIN_20_SECONDS
 import com.duckduckgo.browser.api.webviewcompat.WebViewCompatWrapper
-import com.duckduckgo.browser.ui.omnibar.OmnibarType
 import com.duckduckgo.common.ui.tabs.SwipingTabsFeatureProvider
 import com.duckduckgo.common.utils.AppUrl
 import com.duckduckgo.common.utils.AppUrl.ParamKey.QUERY
@@ -380,7 +380,6 @@ import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.distinctUntilChangedBy
 import kotlinx.coroutines.flow.drop
-import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOn
@@ -470,7 +469,6 @@ class BrowserTabViewModel @Inject constructor(
     private val duckChat: DuckChat,
     private val duckAiFeatureState: DuckAiFeatureState,
     private val duckPlayerJSHelper: DuckPlayerJSHelper,
-    private val duckChatJSHelper: DuckChatJSHelper,
     private val refreshPixelSender: RefreshPixelSender,
     private val privacyProtectionTogglePlugin: PluginPoint<PrivacyProtectionTogglePlugin>,
     private val showOnAppLaunchOptionHandler: ShowOnAppLaunchOptionHandler,
@@ -484,6 +482,7 @@ class BrowserTabViewModel @Inject constructor(
     private val siteErrorHandler: StringSiteErrorHandler,
     private val siteHttpErrorHandler: HttpCodeSiteErrorHandler,
     private val subscriptionsJSHelper: SubscriptionsJSHelper,
+    private val duckChatJSHelper: DuckChatJSHelper,
     private val tabManager: TabManager,
     private val addressDisplayFormatter: AddressDisplayFormatter,
     private val onboardingDesignExperimentManager: OnboardingDesignExperimentManager,
@@ -494,7 +493,7 @@ class BrowserTabViewModel @Inject constructor(
     private val webViewCompatWrapper: WebViewCompatWrapper,
     private val addressBarTrackersAnimationFeatureToggle: AddressBarTrackersAnimationFeatureToggle,
     private val autoconsentPixelManager: AutoconsentPixelManager,
-    private val omnibarFeatureRepository: OmnibarFeatureRepository,
+    private val omnibarRepository: OmnibarRepository,
     private val contentScopeScriptsSubscriptionEventPluginPoint: PluginPoint<ContentScopeScriptsSubscriptionEventPlugin>,
     private val settingsPageFeature: SettingsPageFeature,
 ) : ViewModel(),
@@ -603,6 +602,7 @@ class BrowserTabViewModel @Inject constructor(
     private var isLinkOpenedInNewTab = false
     private var allowlistRefreshTriggerJob: Job? = null
     private var isCustomTabScreen: Boolean = false
+    private var alreadyShownKeyboard: Boolean = false
 
     private val fireproofWebsitesObserver =
         Observer<List<FireproofWebsiteEntity>> {
@@ -774,33 +774,24 @@ class BrowserTabViewModel @Inject constructor(
             }.launchIn(viewModelScope)
 
         // auto-launch input screen for new, empty tabs (New Tab Page)
-        combine(
-            externalIntentProcessingState.hasPendingTabLaunch,
-            externalIntentProcessingState.hasPendingDuckAiOpen,
-        ) { hasPendingTabLaunch, hasPendingDuckAiOpen ->
-            hasPendingTabLaunch || hasPendingDuckAiOpen
-        }.flatMapLatest {
-            if (it) {
-                // suppress auto-launch while processing external intents (for example, opening links from other apps)
-                // this prevents the New Tab Page from incorrectly triggering the input screen when the app
-                // is started via external intent while previously left on NTP
-                emptyFlow()
-            } else {
-                tabRepository.flowSelectedTab
-                    .distinctUntilChangedBy { selectedTab -> selectedTab?.tabId } // only observe when the tab changes and ignore further updates
-                    .filter { selectedTab ->
-                        // fire event when activating a new, empty tab
-                        // (has no URL and wasn't opened from another tab)
-                        val showInputScreenAutomatically = duckAiFeatureState.showInputScreenAutomaticallyOnNewTab.value
-                        val isActiveTab = ::tabId.isInitialized && selectedTab?.tabId == tabId
-                        val isOpenedFromAnotherTab = selectedTab?.sourceTabId != null
-                        showInputScreenAutomatically && isActiveTab && selectedTab?.url.isNullOrBlank() && !isOpenedFromAnotherTab
-                    }.flowOn(dispatchers.main()) // don't use the immediate dispatcher so that the tabId field has a chance to initialize
-            }
-        }.onEach {
-            // whenever an event fires, so the user switched to a new tab page, launch the input screen
-            command.value = LaunchInputScreen
-        }.launchIn(viewModelScope)
+        tabRepository.flowSelectedTab
+            .distinctUntilChangedBy { selectedTab -> selectedTab?.tabId } // only observe when the tab changes and ignore further updates
+            .filter { selectedTab ->
+                // fire event when activating a new, empty tab
+                // (has no URL and wasn't opened from another tab)
+                val showInputScreenAutomatically = duckAiFeatureState.showInputScreenAutomaticallyOnNewTab.value
+                val isActiveTab = ::tabId.isInitialized && selectedTab?.tabId == tabId
+                val isOpenedFromAnotherTab = selectedTab?.sourceTabId != null
+                showInputScreenAutomatically && isActiveTab && selectedTab?.url.isNullOrBlank() && !isOpenedFromAnotherTab
+            }.flowOn(dispatchers.main()) // don't use the immediate dispatcher so that the tabId field has a chance to initialize
+            .onEach {
+                val hasPendingTabLaunch = externalIntentProcessingState.hasPendingTabLaunch.value
+                val hasPendingDuckAiOpen = externalIntentProcessingState.hasPendingDuckAiOpen.value
+                if (!hasPendingTabLaunch && !hasPendingDuckAiOpen) {
+                    // whenever an event fires, so the user switched to a new tab page, launch the input screen
+                    command.value = LaunchInputScreen
+                }
+            }.launchIn(viewModelScope)
     }
 
     fun loadData(
@@ -1144,11 +1135,16 @@ class BrowserTabViewModel @Inject constructor(
         when (val type = specialUrlDetector.determineType(trimmedInput)) {
             is ShouldLaunchDuckChatLink -> {
                 runCatching {
-                    val queryParameter = urlToNavigate.toUri().getQueryParameter(QUERY)
-                    if (queryParameter != null) {
-                        duckChat.openDuckChatWithPrefill(queryParameter)
+                    if (duckAiFeatureState.showFullScreenMode.value) {
+                        site?.nextUrl = urlToNavigate
+                        command.value = NavigationCommand.Navigate(urlToNavigate, getUrlHeaders(urlToNavigate))
                     } else {
-                        duckChat.openDuckChat()
+                        val queryParameter = urlToNavigate.toUri().getQueryParameter(QUERY)
+                        if (queryParameter != null) {
+                            duckChat.openDuckChatWithPrefill(queryParameter)
+                        } else {
+                            duckChat.openDuckChat()
+                        }
                     }
                     return
                 }
@@ -1952,6 +1948,7 @@ class BrowserTabViewModel @Inject constructor(
                 onboardingDesignExperimentManager.onWebPageFinishedLoading(url)
             }
 
+            evaluateDuckAIPage(url)
             evaluateSerpLogoState(url)
         }
     }
@@ -1962,6 +1959,20 @@ class BrowserTabViewModel @Inject constructor(
                 command.value = ExtractSerpLogo(url)
             } else {
                 omnibarViewState.value = currentOmnibarViewState().copy(serpLogo = null)
+            }
+        }
+    }
+
+    private fun evaluateDuckAIPage(url: String?) {
+        logcat { "Duck.ai: evaluateDuckAIPage $url" }
+        url?.let {
+            if (duckAiFeatureState.showFullScreenMode.value) {
+                if (duckDuckGoUrlDetector.isDuckDuckGoChatUrl(it)) {
+                    logcat { "Duck.ai: AI Chat page loaded $it" }
+                    command.value = Command.EnableDuckAIFullScreen
+                } else {
+                    command.value = Command.DisableDuckAIFullScreen(url)
+                }
             }
         }
     }
@@ -2147,9 +2158,9 @@ class BrowserTabViewModel @Inject constructor(
                     currentLoadingViewState().copy(
                         isLoading = true,
                         trackersAnimationEnabled = true,
-                    /*We set the progress to 20 so the omnibar starts animating and the user knows we are loading the page.
-                     * We don't show the browser until the page actually starts loading, to prevent previous sites from briefly
-                     * showing in case the URL was blocked locally and therefore never started to show*/
+                        /*We set the progress to 20 so the omnibar starts animating and the user knows we are loading the page.
+                         * We don't show the browser until the page actually starts loading, to prevent previous sites from briefly
+                         * showing in case the URL was blocked locally and therefore never started to show*/
                         progress = 20,
                         url = documentUrlString,
                     )
@@ -2913,7 +2924,7 @@ class BrowserTabViewModel @Inject constructor(
                     showMenuButton = HighlightableButton.Visible(highlighted = false),
                 )
         }
-        command.value = LaunchPopupMenu(anchorToNavigationBar = !isCustomTab && omnibarFeatureRepository.isSplitOmnibarEnabled)
+        command.value = LaunchPopupMenu(anchorToNavigationBar = !isCustomTab && omnibarRepository.omnibarType == OmnibarType.SPLIT)
     }
 
     fun onPopupMenuLaunched() {
@@ -2987,8 +2998,17 @@ class BrowserTabViewModel @Inject constructor(
         // we hide the keyboard when showing a DialogCta and HomeCta type in the home screen otherwise we show it
         val shouldHideKeyboard =
             cta is HomePanelCta || cta is DaxBubbleCta.DaxPrivacyProCta ||
-                duckAiFeatureState.showInputScreen.value || currentBrowserViewState().lastQueryOrigin == QueryOrigin.FromBookmark
-        command.value = if (shouldHideKeyboard) HideKeyboard else ShowKeyboard
+                duckAiFeatureState.showInputScreen.value || currentBrowserViewState().lastQueryOrigin == QueryOrigin.FromBookmark ||
+                (settingsDataStore.omnibarType == OmnibarType.SPLIT && alreadyShownKeyboard)
+
+        logcat { "Duck.ai: shouldHideKeyboard: $shouldHideKeyboard" }
+
+        command.value = if (shouldHideKeyboard) {
+            HideKeyboard
+        } else {
+            alreadyShownKeyboard = true
+            ShowKeyboard
+        }
     }
 
     fun onUserClickCtaOkButton(cta: Cta) {
@@ -3000,6 +3020,7 @@ class BrowserTabViewModel @Inject constructor(
                 is HomePanelCta.AddWidgetAuto, is HomePanelCta.AddWidgetAutoOnboardingExperiment, is HomePanelCta.AddWidgetInstructions -> {
                     LaunchAddWidget
                 }
+
                 is OnboardingDaxDialogCta -> onOnboardingCtaOkButtonClicked(cta)
                 is DaxBubbleCta -> onDaxBubbleCtaOkButtonClicked(cta)
                 is BrokenSitePromptDialogCta -> onBrokenSiteCtaOkButtonClicked(cta)
@@ -3293,7 +3314,10 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     @SuppressLint("RequiresFeature", "PostMessageUsage") // it's already checked in isBlobDownloadWebViewFeatureEnabled
-    private fun postMessageToConvertBlobToDataUri(webView: WebView, url: String) {
+    private fun postMessageToConvertBlobToDataUri(
+        webView: WebView,
+        url: String,
+    ) {
         viewModelScope.launch(dispatchers.main()) {
             // main because postMessage is not always safe in another thread
             for ((key, proxies) in fixedReplyProxyMap) {
@@ -3809,6 +3833,7 @@ class BrowserTabViewModel @Inject constructor(
                         if (id != null && data != null) {
                             webViewCompatWebShare(featureName, method, id, data, onResponse)
                         }
+
                     "permissionsQuery" ->
                         if (id != null && data != null) {
                             webViewCompatPermissionsQuery(featureName, method, id, data, onResponse)
@@ -3822,6 +3847,7 @@ class BrowserTabViewModel @Inject constructor(
                     "screenUnlock" -> screenUnlock()
                 }
             }
+
             "breakageReporting" ->
                 if (data != null) {
                     when (method) {
@@ -3830,6 +3856,7 @@ class BrowserTabViewModel @Inject constructor(
                         }
                     }
                 }
+
             "messaging" ->
                 when (method) {
                     "initialPing" -> {
@@ -4375,10 +4402,12 @@ class BrowserTabViewModel @Inject constructor(
             onboardingDesignExperimentManager.isBuckEnrolledAndEnabled() -> {
                 command.value = SetBrowserBackgroundColor(getBuckOnboardingExperimentBackgroundColor(lightModeEnabled))
             }
+
             onboardingDesignExperimentManager.isBbEnrolledAndEnabled() -> {
                 // TODO if BB wins the we should rename the function to SetBubbleDialogBackground
                 command.value = Command.SetBubbleDialogBackground(getBBBackgroundResource(lightModeEnabled))
             }
+
             else -> {
                 command.value = SetBrowserBackground(getBackgroundResource(lightModeEnabled))
             }
@@ -4397,9 +4426,11 @@ class BrowserTabViewModel @Inject constructor(
             onboardingDesignExperimentManager.isBuckEnrolledAndEnabled() -> {
                 command.value = SetOnboardingDialogBackgroundColor(getBuckOnboardingExperimentBackgroundColor(lightModeEnabled))
             }
+
             onboardingDesignExperimentManager.isBbEnrolledAndEnabled() -> {
                 command.value = SetOnboardingDialogBackground(getBBBackgroundResource(lightModeEnabled))
             }
+
             else -> {
                 command.value = SetOnboardingDialogBackground(getBackgroundResource(lightModeEnabled))
             }
@@ -4464,14 +4495,17 @@ class BrowserTabViewModel @Inject constructor(
                 command.value = LaunchPrivacyPro("https://duckduckgo.com/pro?origin=funnel_appmenu_android".toUri())
                 "pill"
             }
+
             VpnMenuState.NotSubscribedNoPill -> {
                 command.value = LaunchPrivacyPro("https://duckduckgo.com/pro?origin=funnel_appmenu_android".toUri())
                 "no_pill"
             }
+
             is VpnMenuState.Subscribed -> {
                 command.value = LaunchVpnManagement
                 "subscribed"
             }
+
             VpnMenuState.Hidden -> "" // Should not happen as menu item should not be visible
         }
         pixel.fire(AppPixelName.MENU_ACTION_VPN_PRESSED, mapOf(PixelParameter.STATUS to statusParam))

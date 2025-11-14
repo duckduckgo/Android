@@ -16,6 +16,7 @@
 
 package com.duckduckgo.voice.store
 
+import com.duckduckgo.voice.api.VoiceSearchLauncher.VoiceSearchMode
 import com.duckduckgo.voice.api.VoiceSearchStatusListener
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -85,6 +86,15 @@ class RealVoiceSearchRepositoryTest {
 
         assertEquals(1, testee.countVoiceSearchDismissed())
     }
+
+    @Test
+    fun whenSetLastSelectedModeThenGetLastSelectedModeReturnsLastSelectedMode() {
+        assertEquals(VoiceSearchMode.SEARCH, testee.getLastSelectedMode())
+
+        testee.setLastSelectedMode(VoiceSearchMode.DUCK_AI)
+
+        assertEquals(VoiceSearchMode.DUCK_AI, testee.getLastSelectedMode())
+    }
 }
 
 class FakeVoiceSearchDataStore : VoiceSearchDataStore {
@@ -92,6 +102,7 @@ class FakeVoiceSearchDataStore : VoiceSearchDataStore {
     override var userAcceptedRationaleDialog: Boolean = false
     override var availabilityLogged: Boolean = false
     override var countVoiceSearchDismissed: Int = 0
+    override var lastSelectedMode: VoiceSearchMode = VoiceSearchMode.SEARCH
 
     private var _voiceSearchEnabled = false
 

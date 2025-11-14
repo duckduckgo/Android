@@ -1,0 +1,85 @@
+// Wide event pixel for VPN enable flow monitoring
+// https://app.asana.com/1/137249556945/project/1205648422731273/task/1211799839160665?focus=true
+{
+    "wide_vpn-enable": {
+        "description": "User attempts to enable VPN",
+        "owners": ["lmac012"],
+        "triggers": ["other"],
+        "suffixes": ["daily_count_short", "form_factor"],
+        "parameters": [
+            "widePixelPlatform",
+            "widePixelType",
+            "widePixelSampleRate",
+            "widePixelFeatureStatus",
+            "widePixelAppVersion",
+            "widePixelAppName",
+            "widePixelFormFactor",
+            "widePixelDevMode",
+            {
+                "key": "context.name",
+                "description": "Entry point to the VPN enable flow.",
+                "enum": ["app_settings", "system_tile", "notification"]
+            },
+            {
+                "key": "feature.name",
+                "description": "Feature identifier for this wide pixel",
+                "enum": ["vpn-enable"]
+            },
+            {
+                "key": "feature.data.ext.subscription_status",
+                "description": "User's subscription status at the time of VPN enable attempt",
+                "enum": ["Auto-Renewable", "Not Auto-Renewable", "Grace Period", "Inactive", "Expired", "Unknown", "Waiting"]
+            },
+            {
+                "key": "feature.data.ext.is_first_setup",
+                "description": "true if the user is launching the VPN for the first time, false otherwise",
+                "enum": ["true", "false"]
+            },
+            {
+                "key": "feature.data.ext.cancellation_reason",
+                "description": "Reason for cancellation. Only present on CANCELLED events.",
+                "enum": ["vpn_conflict", "permission_denied"]
+            },
+            {
+                "key": "feature.data.ext.failure_reason",
+                "description": "Error message indicating cause of the failure. Based on VpnStopReason enum, but could be a different static message. Only present on FAILURE events.",
+                "type": "string"
+            },
+            {
+                "key": "feature.data.ext.service_start_duration_ms_bucketed",
+                "description": "The duration of TrackerBlockingVpnService (re)start in milliseconds, bucketed (using the upper end of each range)",
+                "enum": ["1000", "5000", "10000", "30000", "60000", "300000", "600000"]
+            },
+            {
+                "key": "feature.data.ext.step.show_vpn_conflict_dialog",
+                "description": "Parameter present if the user was asked if they want to disable existing 3rd party VPN",
+                "enum": ["true"]
+            },
+            {
+                "key": "feature.data.ext.step.ask_for_vpn_permission",
+                "description": "Parameter present if the user was asked to grant the VPN permission",
+                "enum": ["true"]
+            },
+            {
+                "key": "feature.data.ext.step.vpn_start_attempt",
+                "description": "Parameter present if the app attempted to (re)start VPN service. This happens after ensuring app has VPN permissions",
+                "enum": ["true"]
+            },
+            {
+                "key": "feature.data.ext.step.notify_vpn_start",
+                "description": "Parameter present if notifyVpnStart() in TrackerBlockingVpnService completed successfully",
+                "enum": ["true"]
+            },
+            {
+                "key": "feature.data.ext.step.null_tunnel_created",
+                "description": "Parameter present if null tunnel was successfully created.",
+                "enum": ["true"]
+            },
+            {
+                "key": "feature.data.ext.step.network_stack_initialized",
+                "description": "Parameter present if network stack was successfully initialized.",
+                "enum": ["true"]
+            }
+        ]
+    }
+}

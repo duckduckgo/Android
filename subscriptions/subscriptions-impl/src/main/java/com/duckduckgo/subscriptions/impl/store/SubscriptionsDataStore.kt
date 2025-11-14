@@ -38,6 +38,9 @@ interface SubscriptionsDataStore {
     var expiresOrRenewsAt: Long?
     var billingPeriod: String?
     var startedAt: Long?
+
+    // Local purchased at time, not from server or other devices
+    var localPurchasedAt: Long?
     var platform: String?
     var status: String?
     var entitlements: String?
@@ -197,6 +200,18 @@ internal class SubscriptionsEncryptedDataStore(
             }
         }
 
+    override var localPurchasedAt: Long?
+        get() = encryptedPreferences?.getLong(KEY_LOCAL_PURCHASED_AT, 0L).takeIf { it != 0L }
+        set(value) {
+            encryptedPreferences?.edit(commit = true) {
+                if (value == null) {
+                    remove(KEY_LOCAL_PURCHASED_AT)
+                } else {
+                    putLong(KEY_LOCAL_PURCHASED_AT, value)
+                }
+            }
+        }
+
     override var billingPeriod: String?
         get() = encryptedPreferences?.getString(KEY_BILLING_PERIOD, null)
         set(value) {
@@ -231,6 +246,7 @@ internal class SubscriptionsEncryptedDataStore(
         const val KEY_EXTERNAL_ID = "KEY_EXTERNAL_ID"
         const val KEY_EXPIRES_OR_RENEWS_AT = "KEY_EXPIRES_OR_RENEWS_AT"
         const val KEY_STARTED_AT = "KEY_STARTED_AT"
+        const val KEY_LOCAL_PURCHASED_AT = "KEY_LOCAL_PURCHASED_AT"
         const val KEY_BILLING_PERIOD = "KEY_BILLING_PERIOD"
         const val KEY_ENTITLEMENTS = "KEY_ENTITLEMENTS"
         const val KEY_STATUS = "KEY_STATUS"

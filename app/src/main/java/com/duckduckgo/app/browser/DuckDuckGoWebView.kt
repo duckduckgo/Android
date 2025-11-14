@@ -78,7 +78,7 @@ class DuckDuckGoWebView :
     private val helper = CoordinatorLayoutHelper()
 
     private var isDestroyed: Boolean = false
-    var isSafeWebViewEnabled: Boolean = false
+    private var isSafeWebViewEnabled: Boolean = true
 
     @Inject
     lateinit var dispatcherProvider: DispatcherProvider

@@ -99,12 +99,14 @@ class RealDuckChatTest {
     fun setup() = runTest {
         whenever(mockDuckChatFeatureRepository.shouldShowInBrowserMenu()).thenReturn(true)
         whenever(mockDuckChatFeatureRepository.shouldShowInAddressBar()).thenReturn(false)
+        whenever(mockDuckChatFeatureRepository.shouldShowInVoiceSearch()).thenReturn(false)
         whenever(mockDuckChatFeatureRepository.isDuckChatUserEnabled()).thenReturn(true)
         whenever(mockDuckChatFeatureRepository.isInputScreenUserSettingEnabled()).thenReturn(true)
         whenever(mockDuckChatFeatureRepository.sessionDeltaInMinutes()).thenReturn(10L)
         whenever(mockContext.getString(any())).thenReturn("Duck.ai")
         duckChatFeature.self().setRawStoredState(State(enable = true))
         duckChatFeature.duckAiInputScreen().setRawStoredState(State(enable = true))
+        duckChatFeature.duckAiVoiceSearch().setRawStoredState(State(enable = false))
         imageUploadFeature.self().setRawStoredState(State(enable = true))
 
         testee = spy(
@@ -139,6 +141,12 @@ class RealDuckChatTest {
     fun whenSetShowInAddressBarUserSettingThenRepositorySetCalled() = runTest {
         testee.setShowInAddressBarUserSetting(true)
         verify(mockDuckChatFeatureRepository).setShowInAddressBar(true)
+    }
+
+    @Test
+    fun whenSetShowInVoiceSearchUserSettingThenRepositorySetCalled() = runTest {
+        testee.setShowInVoiceSearchUserSetting(true)
+        verify(mockDuckChatFeatureRepository).setShowInVoiceSearch(true)
     }
 
     @Test
@@ -200,6 +208,15 @@ class RealDuckChatTest {
     }
 
     @Test
+    fun whenObserveShowInVoiceSearchUserSettingThenEmitCorrectValues() = runTest {
+        whenever(mockDuckChatFeatureRepository.observeShowInVoiceSearch()).thenReturn(flowOf(true, false))
+
+        val results = testee.observeShowInVoiceSearchUserSetting().take(2).toList()
+        assertTrue(results[0])
+        assertFalse(results[1])
+    }
+
+    @Test
     fun whenFeatureEnabledThenShowPopupMenuShortcutReturnsValueFromRepository() {
         assertTrue(testee.showPopupMenuShortcut.value)
     }
@@ -237,6 +254,22 @@ class RealDuckChatTest {
         testee.onPrivacyConfigDownloaded()
 
         assertFalse(testee.isAddressBarEntryPointEnabled())
+    }
+
+    @Test
+    fun whenConfigSetsVoiceSearchEntryPointTrueThenIsVoiceSearchEntryPointEnabledReturnsTrue() = runTest {
+        duckChatFeature.duckAiVoiceSearch().setRawStoredState(State(enable = true))
+        testee.onPrivacyConfigDownloaded()
+
+        assertTrue(testee.isVoiceSearchEntryPointEnabled())
+    }
+
+    @Test
+    fun whenConfigSetsVoiceSearchEntryPointFalseThenIsVoiceSearchEntryPointEnabledReturnsFalse() = runTest {
+        duckChatFeature.duckAiVoiceSearch().setRawStoredState(State(enable = false))
+        testee.onPrivacyConfigDownloaded()
+
+        assertFalse(testee.isVoiceSearchEntryPointEnabled())
     }
 
     @Test
