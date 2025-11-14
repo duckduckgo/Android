@@ -58,6 +58,7 @@ class FireButtonViewModel @Inject constructor(
         val selectedFireAnimation: FireAnimation = FireAnimation.HeroFire,
         val clearDuckAiData: Boolean = false,
         val showClearDuckAiDataSetting: Boolean = false,
+        val clerDataWithDuckAiChats: Boolean = false,
     )
 
     data class AutomaticallyClearData(
@@ -75,6 +76,7 @@ class FireButtonViewModel @Inject constructor(
 
         data class ShowClearWhenDialog(val option: ClearWhenOption) : Command()
         data class LaunchFireAnimationSettings(val animation: FireAnimation) : Command()
+        data object LaunchFireDialog : Command()
     }
 
     private val viewState = MutableStateFlow(ViewState())
@@ -211,6 +213,10 @@ class FireButtonViewModel @Inject constructor(
         } else {
             pixel.fire(AppPixelName.SETTINGS_CLEAR_DUCK_AI_DATA_TOGGLED_OFF)
         }
+    }
+
+    fun onClearDataActionClicked() {
+        viewModelScope.launch { command.send(Command.LaunchFireDialog) }
     }
 
     private fun ClearWhatOption.pixelEvent(): Pixel.PixelName {

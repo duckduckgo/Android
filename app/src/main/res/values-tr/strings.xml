@@ -125,8 +125,8 @@
 
     <!-- Fire -->
     <string name="fireMenu">Verileri Temizle</string>
-    <string name="fireClearAll">Tüm Sekmeleri ve Verileri Temizle</string>
-    <string name="fireClearAllPlusDuckChats">Tüm Sekmeleri, Verileri ve Duck.ai Sohbetlerini Temizle</string>
+    <string name="fireClearAll">Sekmeleri ve Verileri Temizle</string>
+    <string name="fireClearAllPlusDuckChats">Sekmeleri, Verileri ve Duck.ai Sohbetlerini Temizle</string>
     <string name="fireCancel">İptal</string>
     <string name="fireDataCleared">Veri silindi</string>
 
@@ -247,6 +247,8 @@
     <string name="settingsAutomaticallyClearWhenAppExit60Minutes">1 saat boyunca hareket yoksa uygulamadan çık</string>
     <string name="settingsClearAiDataTitle">Duck.ai Sohbetlerini Temizle</string>
     <string name="settingsClearAiDataDeleteMessage">Fire Button, sabitlenmiş sohbetler dahil olmak üzere Duck.ai geçmişini de silecektir.</string>
+    <string name="settingsClearDataActionSecondaryText">Tüm sekmeleri ve fireproof uygulanmayan sitelere ait verileri temizler.</string>
+    <string name="settingsClearDataActionPlusDuckChatsSecondaryText">Tüm sekmeleri, Duck.ai sohbetlerini ve fireproof uygulanmayan sitelere ait verileri temizler.</string>
 
     <!-- About Activity -->
     <string name="aboutActivityTitle">DuckDuckGo Hakkında</string>

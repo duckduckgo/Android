@@ -125,8 +125,8 @@
 
     <!-- Fire -->
     <string name="fireMenu">Adatok törlése</string>
-    <string name="fireClearAll">Összes lap és adat törlése</string>
-    <string name="fireClearAllPlusDuckChats">Összes lap, adat és Duck.ai-csevegés törlése</string>
+    <string name="fireClearAll">Lapok és adatok törlése</string>
+    <string name="fireClearAllPlusDuckChats">Lapok, adatok és Duck.ai-csevegések törlése</string>
     <string name="fireCancel">Mégse</string>
     <string name="fireDataCleared">Adatok törölve</string>
 
@@ -247,6 +247,8 @@
     <string name="settingsAutomaticallyClearWhenAppExit60Minutes">Kilépés az alkalmazásból 1 óra inaktivitás után</string>
     <string name="settingsClearAiDataTitle">Duck.ai-csevegések törlése</string>
     <string name="settingsClearAiDataDeleteMessage">A Fire Button a Duck.ai-előzményeket is törli, a rögzített csevegéseket is beleértve.</string>
+    <string name="settingsClearDataActionSecondaryText">Törli az összes lapot és minden olyan webhely adatát, amit nem tettél tűzállóvá.</string>
+    <string name="settingsClearDataActionPlusDuckChatsSecondaryText">Törli az összes lapot, Duck.ai-csevegést és minden olyan webhely adatát, amit nem tettél tűzállóvá.</string>
 
     <!-- About Activity -->
     <string name="aboutActivityTitle">A DuckDuckGóról</string>

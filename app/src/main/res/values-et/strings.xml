@@ -125,8 +125,8 @@
 
     <!-- Fire -->
     <string name="fireMenu">Kustuta andmed</string>
-    <string name="fireClearAll">Kustuta kõik vahekaardid ja andmed</string>
-    <string name="fireClearAllPlusDuckChats">Kustuta kõik vahekaardid, andmed ja Duck.ai vestlused</string>
+    <string name="fireClearAll">Kustuta vahekaardid ja andmed</string>
+    <string name="fireClearAllPlusDuckChats">Kustuta vahekaardid, andmed ja Duck.ai vestlused</string>
     <string name="fireCancel">Tühista</string>
     <string name="fireDataCleared">Andmed on kustutatud</string>
 
@@ -247,6 +247,8 @@
     <string name="settingsAutomaticallyClearWhenAppExit60Minutes">Rakendusest väljumisel, 1-tunnise passiivsuse järel</string>
     <string name="settingsClearAiDataTitle">Tühjenda Duck.ai vestlused</string>
     <string name="settingsClearAiDataDeleteMessage">Fire Button kustutab ka Duck.ai ajaloo, sealhulgas kinnitatud vestlused.</string>
+    <string name="settingsClearDataActionSecondaryText">Kustutab kõik vahekaardid ja andmed kõigi saitide kohta, mida sa pole tulekindlaks teinud.</string>
+    <string name="settingsClearDataActionPlusDuckChatsSecondaryText">Kustutab kõik vahekaardid, Duck.ai vestlused ja andmed kõigi saitide kohta, mida sa pole tulekindlaks teinud.</string>
 
     <!-- About Activity -->
     <string name="aboutActivityTitle">DuckDuckGo\'st</string>

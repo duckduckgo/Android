@@ -125,8 +125,8 @@
 
     <!-- Fire -->
     <string name="fireMenu">Elimina dati</string>
-    <string name="fireClearAll">Elimina tutte le schede e i dati</string>
-    <string name="fireClearAllPlusDuckChats">Cancella tutte le schede, i dati e le chat di Duck.ai</string>
+    <string name="fireClearAll">Cancella tutte le schede e i dati</string>
+    <string name="fireClearAllPlusDuckChats">Chiudi le schede e la chat di Duck.ai ed elimina i dati</string>
     <string name="fireCancel">Annulla</string>
     <string name="fireDataCleared">I dati sono stati eliminati</string>
 
@@ -247,6 +247,8 @@
     <string name="settingsAutomaticallyClearWhenAppExit60Minutes">Uscita dall\'app, inattività di 1 ora</string>
     <string name="settingsClearAiDataTitle">Cancella le chat di Duck.ai</string>
     <string name="settingsClearAiDataDeleteMessage">Fire Button eliminerà anche la cronologia di Duck.ai, incluse le chat fissate.</string>
+    <string name="settingsClearDataActionSecondaryText">Cancella tutte le schede e i dati per tutti i siti che non hai protetto con Fireproof.</string>
+    <string name="settingsClearDataActionPlusDuckChatsSecondaryText">Cancella tutte le schede, le chat di Duck.ai e i dati per tutti i siti che non hai protetto con Fireproof.</string>
 
     <!-- About Activity -->
     <string name="aboutActivityTitle">Info su DuckDuckGo</string>

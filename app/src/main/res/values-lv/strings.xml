@@ -126,8 +126,8 @@
 
     <!-- Fire -->
     <string name="fireMenu">Notīrīt datus</string>
-    <string name="fireClearAll">Notīrīt visas cilnes un datus</string>
-    <string name="fireClearAllPlusDuckChats">Notīrīt visas cilnes, datus un Duck.ai tērzējumus</string>
+    <string name="fireClearAll">Notīrīt cilnes un datus</string>
+    <string name="fireClearAllPlusDuckChats">Notīrīt cilnes, datus un Duck.ai tērzēšanas sarunas</string>
     <string name="fireCancel">Atcelt</string>
     <string name="fireDataCleared">Dati ir notīrīti</string>
 
@@ -248,6 +248,8 @@
     <string name="settingsAutomaticallyClearWhenAppExit60Minutes">Iziešana no lietotnes, neaktīva 1 stundu</string>
     <string name="settingsClearAiDataTitle">Notīrīt Duck.ai tērzēšanas sarunas</string>
     <string name="settingsClearAiDataDeleteMessage">Fire Button izdzēsīs arī Duck.ai vēsturi, ieskaitot piespraustās tērzēšanas.</string>
+    <string name="settingsClearDataActionSecondaryText">Notīra visas cilnes un datus par visām vietnēm, kuras neesi iestatījis Fireproof.</string>
+    <string name="settingsClearDataActionPlusDuckChatsSecondaryText">Notīra visas cilnes, Duck.ai tērzēšanas sarunas un datus par visām vietnēm, kurās neesi iestatījis Fireproof.</string>
 
     <!-- About Activity -->
     <string name="aboutActivityTitle">Par DuckDuckGo</string>

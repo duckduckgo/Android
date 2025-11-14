@@ -127,8 +127,8 @@
 
     <!-- Fire -->
     <string name="fireMenu">Сбросить данные</string>
-    <string name="fireClearAll">Закрыть вкладки и удалить данные</string>
-    <string name="fireClearAllPlusDuckChats">Закрыть все вкладки и стереть все данные и чаты Duck.ai</string>
+    <string name="fireClearAll">Сбросить вкладки и данные</string>
+    <string name="fireClearAllPlusDuckChats">Очистить вкладки, данные и чаты Duck.ai</string>
     <string name="fireCancel">Отменить</string>
     <string name="fireDataCleared">Данные сброшены</string>
 
@@ -249,6 +249,8 @@
     <string name="settingsAutomaticallyClearWhenAppExit60Minutes">После выхода из приложения, через 1 час бездействия</string>
     <string name="settingsClearAiDataTitle">Очистить чаты Duck.ai</string>
     <string name="settingsClearAiDataDeleteMessage">Нажатие кнопки Fire Button также сотрет историю Duck.ai, включая закрепленные чаты.</string>
+    <string name="settingsClearDataActionSecondaryText">Стереть все вкладки и данные всех сайтов (кроме огнеупорных)</string>
+    <string name="settingsClearDataActionPlusDuckChatsSecondaryText">Стереть все вкладки, чаты Duck.ai и данные всех сайтов (кроме огнеупорных)</string>
 
     <!-- About Activity -->
     <string name="aboutActivityTitle">Несколько слов о DuckDuckGo</string>

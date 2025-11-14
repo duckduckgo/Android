@@ -32,6 +32,7 @@ import com.duckduckgo.app.browser.databinding.ActivityDataClearingBinding
 import com.duckduckgo.app.fire.fireproofwebsite.ui.FireproofWebsitesActivity
 import com.duckduckgo.app.firebutton.FireButtonViewModel.AutomaticallyClearData
 import com.duckduckgo.app.firebutton.FireButtonViewModel.Command
+import com.duckduckgo.app.global.view.FireDialogProvider
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.settings.FireAnimationActivity
 import com.duckduckgo.app.settings.clear.ClearWhatOption
@@ -61,6 +62,9 @@ class FireButtonActivity : DuckDuckGoActivity() {
     @Inject
     lateinit var appBuildConfig: AppBuildConfig
 
+    @Inject
+    lateinit var fireDialogProvider: FireDialogProvider
+
     private val viewModel: FireButtonViewModel by bindViewModel()
     private val binding: ActivityDataClearingBinding by viewBinding()
 
@@ -86,6 +90,7 @@ class FireButtonActivity : DuckDuckGoActivity() {
             automaticallyClearWhenSetting.setClickListener { viewModel.onAutomaticallyClearWhenClicked() }
             selectedFireAnimationSetting.setClickListener { viewModel.userRequestedToChangeFireAnimation() }
             clearDuckAiDataSetting.setOnCheckedChangeListener { _, isChecked -> viewModel.onClearDuckAiDataToggled(isChecked) }
+            clearDataAction.setClickListener { viewModel.onClearDataActionClicked() }
         }
     }
 
@@ -97,6 +102,7 @@ class FireButtonActivity : DuckDuckGoActivity() {
                     updateAutomaticClearDataOptions(it.automaticallyClearData, it.clearDuckAiData)
                     updateSelectedFireAnimation(it.selectedFireAnimation)
                     updateClearDuckAiDataSetting(it.clearDuckAiData, it.showClearDuckAiDataSetting)
+                    updateClearDataAction(it.clearDuckAiData)
                 }
             }.launchIn(lifecycleScope)
 
@@ -133,12 +139,23 @@ class FireButtonActivity : DuckDuckGoActivity() {
         binding.clearDuckAiDataSetting.visibility = if (isVisible) View.VISIBLE else View.GONE
     }
 
+    private fun updateClearDataAction(clearDuckAiData: Boolean) {
+        if (clearDuckAiData) {
+            binding.clearDataAction.setPrimaryText(resources.getString(R.string.fireClearAllPlusDuckChats))
+            binding.clearDataAction.setSecondaryText(resources.getString(R.string.settingsClearDataActionPlusDuckChatsSecondaryText))
+        } else {
+            binding.clearDataAction.setPrimaryText(resources.getString(R.string.fireClearAll))
+            binding.clearDataAction.setSecondaryText(resources.getString(R.string.settingsClearDataActionSecondaryText))
+        }
+    }
+
     private fun processCommand(it: Command) {
         when (it) {
             is Command.LaunchFireproofWebsites -> launchFireproofWebsites()
             is Command.ShowClearWhatDialog -> launchAutomaticallyClearWhatDialog(it.option, it.clearDuckAi)
             is Command.ShowClearWhenDialog -> launchAutomaticallyClearWhenDialog(it.option)
             is Command.LaunchFireAnimationSettings -> launchFireAnimationSelector(it.animation)
+            is Command.LaunchFireDialog -> launchFireDialog()
         }
     }
 
@@ -268,6 +285,11 @@ class FireButtonActivity : DuckDuckGoActivity() {
                 },
             )
             .show()
+    }
+
+    private fun launchFireDialog() {
+        val dialog = fireDialogProvider.createFireDialog(context = this)
+        dialog.show()
     }
 
     companion object {

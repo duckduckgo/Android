@@ -125,8 +125,8 @@
 
     <!-- Fire -->
     <string name="fireMenu">Effacer les données</string>
-    <string name="fireClearAll">Effacer tous les onglets et données</string>
-    <string name="fireClearAllPlusDuckChats">Effacer tous les onglets, données et chats Duck.ai</string>
+    <string name="fireClearAll">Effacer les onglets et données</string>
+    <string name="fireClearAllPlusDuckChats">Effacer les onglets, les données et les chats Duck.ai</string>
     <string name="fireCancel">Annuler</string>
     <string name="fireDataCleared">Données effacées</string>
 
@@ -247,6 +247,8 @@
     <string name="settingsAutomaticallyClearWhenAppExit60Minutes">Quitter l\'application, inactivité pendant 1 heure</string>
     <string name="settingsClearAiDataTitle">Effacer les chats Duck.ai</string>
     <string name="settingsClearAiDataDeleteMessage">Le Fire Button supprimera également l\'historique de Duck.ai, y compris les discussions épinglées.</string>
+    <string name="settingsClearDataActionSecondaryText">Efface tous les onglets et toutes les données des sites que vous n\'avez pas protégés par Fireproof.</string>
+    <string name="settingsClearDataActionPlusDuckChatsSecondaryText">Efface tous les onglets, les chats Duck.ai et les données des sites que vous n\'avez pas protégés par Fireproof.</string>
 
     <!-- About Activity -->
     <string name="aboutActivityTitle">À propos de DuckDuckGo</string>

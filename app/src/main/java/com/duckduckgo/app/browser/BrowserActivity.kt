@@ -50,6 +50,7 @@ import androidx.webkit.ServiceWorkerClientCompat
 import androidx.webkit.ServiceWorkerControllerCompat
 import androidx.webkit.WebViewFeature
 import com.duckduckgo.anvil.annotations.InjectWith
+import com.duckduckgo.app.browser.BrowserActivity.Companion.DUCK_AI_ANIM_READY_DELAY_MS
 import com.duckduckgo.app.browser.BrowserViewModel.Command
 import com.duckduckgo.app.browser.animations.slideAndFadeInFromLeft
 import com.duckduckgo.app.browser.animations.slideAndFadeInFromRight
@@ -73,27 +74,22 @@ import com.duckduckgo.app.downloads.DownloadsScreens.DownloadsScreenNoParams
 import com.duckduckgo.app.feedback.ui.common.FeedbackActivity
 import com.duckduckgo.app.fire.DataClearer
 import com.duckduckgo.app.fire.DataClearerForegroundAppRestartPixel
-import com.duckduckgo.app.firebutton.FireButtonStore
 import com.duckduckgo.app.global.ApplicationClearDataState
-import com.duckduckgo.app.global.events.db.UserEventsStore
 import com.duckduckgo.app.global.intentText
 import com.duckduckgo.app.global.rating.PromptCount
 import com.duckduckgo.app.global.sanitize
 import com.duckduckgo.app.global.view.ClearDataAction
-import com.duckduckgo.app.global.view.FireDialog
+import com.duckduckgo.app.global.view.FireDialogProvider
 import com.duckduckgo.app.global.view.renderIfChanged
 import com.duckduckgo.app.onboarding.ui.page.DefaultBrowserPage
-import com.duckduckgo.app.onboardingdesignexperiment.OnboardingDesignExperimentManager
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.pixels.AppPixelName.FIRE_DIALOG_CANCEL
-import com.duckduckgo.app.settings.clear.OnboardingExperimentFireAnimationHelper
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.ui.DefaultSnackbar
 import com.duckduckgo.app.tabs.ui.TabSwitcherActivity
-import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.autofill.api.emailprotection.EmailProtectionLinkVerifier
 import com.duckduckgo.browser.api.ui.BrowserScreens.BookmarksScreenNoParams
 import com.duckduckgo.browser.api.ui.BrowserScreens.SettingsScreenNoParams
@@ -159,9 +155,6 @@ open class BrowserActivity : DuckDuckGoActivity() {
     lateinit var dataClearerForegroundAppRestartPixel: DataClearerForegroundAppRestartPixel
 
     @Inject
-    lateinit var userEventsStore: UserEventsStore
-
-    @Inject
     lateinit var serviceWorkerClientCompat: ServiceWorkerClientCompat
 
     @Inject
@@ -177,13 +170,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
     @Inject lateinit var dispatcherProvider: DispatcherProvider
 
     @Inject
-    lateinit var fireButtonStore: FireButtonStore
-
-    @Inject
     lateinit var externalIntentProcessingState: ExternalIntentProcessingState
-
-    @Inject
-    lateinit var appBuildConfig: AppBuildConfig
 
     @Inject
     lateinit var swipingTabsFeature: SwipingTabsFeatureProvider
@@ -201,16 +188,13 @@ open class BrowserActivity : DuckDuckGoActivity() {
     lateinit var syncUrlIdentifier: SyncUrlIdentifier
 
     @Inject
-    lateinit var onboardingDesignExperimentManager: OnboardingDesignExperimentManager
-
-    @Inject
-    lateinit var onboardingExperimentFireAnimationHelper: OnboardingExperimentFireAnimationHelper
-
-    @Inject
     lateinit var omnibarEntryConverter: OmnibarEntryConverter
 
     @Inject
     lateinit var newAddressBarOptionManager: NewAddressBarOptionManager
+
+    @Inject
+    lateinit var fireDialogProvider: FireDialogProvider
 
     private val lastActiveTabs = TabList()
 
@@ -804,20 +788,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
         val params = mapOf(PixelParameter.FROM_FOCUSED_NTP to launchedFromFocusedNtp.toString())
         pixel.fire(AppPixelName.FORGET_ALL_PRESSED_BROWSING, params)
 
-        val dialog =
-            FireDialog(
-                context = this,
-                clearPersonalDataAction = clearPersonalDataAction,
-                pixel = pixel,
-                settingsDataStore = settingsDataStore,
-                userEventsStore = userEventsStore,
-                appCoroutineScope = appCoroutineScope,
-                dispatcherProvider = dispatcherProvider,
-                fireButtonStore = fireButtonStore,
-                appBuildConfig = appBuildConfig,
-                onboardingDesignExperimentManager = onboardingDesignExperimentManager,
-                onboardingExperimentFireAnimationHelper = onboardingExperimentFireAnimationHelper,
-            )
+        val dialog = fireDialogProvider.createFireDialog(context = this)
         dialog.setOnShowListener { currentTab?.onFireDialogVisibilityChanged(isVisible = true) }
         dialog.setOnCancelListener {
             pixel.fire(FIRE_DIALOG_CANCEL)
