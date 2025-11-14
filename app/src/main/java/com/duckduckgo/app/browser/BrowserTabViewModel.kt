@@ -4470,7 +4470,8 @@ class BrowserTabViewModel @Inject constructor(
             val params = duckChat.createWasUsedBeforePixelParams()
             pixel.fire(DuckChatPixelName.DUCK_CHAT_OPEN_BROWSER_MENU, parameters = params)
         }
-        duckChat.openDuckChat()
+        val url = duckChat.getDuckChatUrl("", false)
+        onUserSubmittedQuery(url)
     }
 
     fun onDuckChatOmnibarButtonClicked(
@@ -4481,11 +4482,14 @@ class BrowserTabViewModel @Inject constructor(
         viewModelScope.launch {
             command.value = HideKeyboardForChat
         }
-        when {
-            hasFocus && isNtp && query.isNullOrBlank() -> duckChat.openDuckChat()
-            hasFocus -> duckChat.openDuckChatWithAutoPrompt(query ?: "")
-            else -> duckChat.openDuckChat()
+
+        val url = when {
+            hasFocus && isNtp && query.isNullOrBlank() -> duckChat.getDuckChatUrl(query ?: "", false)
+            hasFocus -> duckChat.getDuckChatUrl(query ?: "", true)
+            else -> duckChat.getDuckChatUrl(query ?: "", false)
         }
+
+        onUserSubmittedQuery(url)
     }
 
     fun onVpnMenuClicked() {

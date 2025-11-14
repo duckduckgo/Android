@@ -481,6 +481,13 @@ class RealDuckChat @Inject constructor(
         openDuckChat(parameters, forceNewSession = true)
     }
 
+    override fun getDuckChatUrl(query: String, autoPrompt: Boolean): String {
+        logcat { "Duck.ai: getDuckChatUrl query $query autoPrompt $autoPrompt" }
+        val parameters = addChatParameters(query, autoPrompt = autoPrompt)
+        val url = appendParameters(parameters, duckChatLink)
+        return url
+    }
+
     private fun addChatParameters(
         query: String,
         autoPrompt: Boolean,

@@ -47,6 +47,11 @@ interface DuckChat {
     fun openDuckChatWithPrefill(query: String)
 
     /**
+     * Returns the Duck Chat URL to be used
+     */
+    fun getDuckChatUrl(query: String, autoPrompt: Boolean): String
+
+    /**
      * Determines whether a given [Uri] is a DuckChat URL.
      *
      * @return true if it is a DuckChat URL, false otherwise.
