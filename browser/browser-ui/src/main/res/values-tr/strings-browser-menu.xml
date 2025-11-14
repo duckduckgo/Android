@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (c) 2025 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+<!-- smartling.entity_escaping = false -->
+<!-- smartling.instruction_attributes = instruction -->
+<resources>
+    <!-- Browser Menu -->
+    <string name="browserMenuRemoveFireproofing">Korumayı Kaldır</string>
+    <string name="browserMenuBookmarks">Yer İmleri</string>
+    <string name="browserMenuAddBookmark">Yer İmi ekle</string>
+    <string name="browserMenuEditBookmark">Yer İşaretini Düzenle</string>
+    <string name="browserMenuFireproofSite">Bu Siteyi Korumalı Yap</string>
+    <string name="browserMenuMobileSite">Mobil Site</string>
+    <string name="browserMenuDesktopSite">Masaüstü Sitesi</string>
+    <string name="browserMenuEnablePrivacyProtection">Gizlilik Korumasını Etkinleştir</string>
+    <string name="browserMenuDisablePrivacyProtection">Gizlilik Korumasını Devre Dışı Bırak</string>
+    <string name="browserMenuNewTab">Yeni Sekme</string>
+    <string name="browserMenuDuckChat">Duck.ai</string>
+    <string name="browserMenuShare">Paylaş</string>
+    <string name="browserMenuEmailAlias">Duck Address Oluştur</string>
+    <string name="browserMenuFindInPage">Sayfada bul</string>
+    <string name="browserMenuPrint">Sayfayı Yazdır</string>
+    <string name="browserMenuOpenAppLink">Uygulamada Aç</string>
+    <string name="browserMenuAddToHome">Ana ekrana ekle</string>
+    <string name="browserMenuReportBrokenSite">Hatalı Siteyi Bildirin</string>
+    <string name="browserMenuAutofill">Şifreler</string>
+    <string name="browserMenuDownloads">İndirilenler</string>
+    <string name="browserMenuSettings">Ayarlar</string>
+    <string name="browserMenuOpenInDDG">DuckDuckGo\'da aç</string>
+    <string name="browserMenuRunningInDDG">DuckDuckGo\'da Çalışıyor</string>
+    <string name="browserMenuSetAsDefaultBrowser">Varsayılan tarayıcı olarak ayarla</string>
+    <string name="browserMenuNewChat">Yeni Sohbet</string>
+    <string name="browserMenuChatHistory">Sohbet Geçmişi</string>
+    <string name="browserMenuChatSettings">Duck.ai Ayarları</string>
+    <string name="browserMenuVPN">VPN</string>
+
+    <!-- Browser Menu Content Description -->
+    <string name="browserMenuBack">Geri</string>
+    <string name="browserMenuForward">İleri</string>
+    <string name="browserMenuRefresh">Yenile</string>
+</resources>
