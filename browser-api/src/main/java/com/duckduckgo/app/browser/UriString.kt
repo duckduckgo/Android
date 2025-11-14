@@ -36,8 +36,13 @@ class UriString {
         private val inputQueryCleanupRegex by lazy { "['\"\n]|\\s+".toRegex() }
         private val cache = LruCache<Int, Boolean>(250_000)
 
-        fun extractUrl(inputQuery: String): String? {
-            val urls = webUrlRegex.findAll(inputQuery).map { it.value }.toList()
+        fun extractUrl(inputQuery: String, cleanInputQuery: Boolean): String? {
+            val processedQuery = if (cleanInputQuery) {
+                cleanupInputQuery(inputQuery)
+            } else {
+                inputQuery
+            }
+            val urls = webUrlRegex.findAll(processedQuery).map { it.value }.toList()
             return when {
                 urls.isEmpty() -> null
                 urls.size == 1 -> urls.first()
@@ -110,8 +115,7 @@ class UriString {
             extractUrlQuery: Boolean = false,
         ): Boolean {
             if (extractUrlQuery) {
-                val cleanInputQuery = cleanupInputQuery(inputQuery)
-                val extractedUrl = extractUrl(cleanInputQuery)
+                val extractedUrl = extractUrl(inputQuery, cleanInputQuery = true)
                 if (extractedUrl != null) {
                     return isWebUrl(extractedUrl)
                 }

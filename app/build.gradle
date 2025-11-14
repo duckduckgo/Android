@@ -469,6 +469,8 @@ dependencies {
     // RxRelay
     implementation "com.jakewharton.rxrelay2:rxrelay:_"
 
+    implementation "com.duckduckgo.urlpredictor:url-predictor-android:_"
+
     // Android KTX
     implementation AndroidX.core.ktx
     implementation AndroidX.core.splashscreen
