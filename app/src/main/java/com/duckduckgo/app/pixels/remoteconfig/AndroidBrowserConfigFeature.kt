@@ -212,4 +212,12 @@ interface AndroidBrowserConfigFeature {
     @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
     @Toggle.InternalAlwaysEnabled
     fun handleAboutBlank(): Toggle
+
+    /**
+     * @return `true` when the remote config has the global "useUrlPredictor" androidBrowserConfig
+     * sub-feature flag enabled
+     * If the remote feature is not present defaults to `true`
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
+    fun useUrlPredictor(): Toggle
 }
