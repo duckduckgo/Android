@@ -107,7 +107,7 @@ class SwitchPlanBottomSheetDialog @AssistedInject constructor(
                 when (switchType) {
                     SwitchPlanType.UPGRADE_TO_YEARLY -> {
                         // Configure for upgrade (Monthly → Yearly)
-                        binding.switchBottomSheetDialogTitle.text = context.getString(R.string.switchBottomSheetTitleUpgrade)
+                        binding.switchBottomSheetDialogTitle.text = context.getString(R.string.switchBottomSheetDynamicTitleUpgrade)
                         binding.switchBottomSheetDialogSubTitle.text = context.getString(
                             R.string.switchBottomSheetDescriptionUpgrade,
                             pricingInfo?.yearlyMonthlyEquivalent ?: "",
@@ -130,7 +130,7 @@ class SwitchPlanBottomSheetDialog @AssistedInject constructor(
 
                     SwitchPlanType.DOWNGRADE_TO_MONTHLY -> {
                         // Configure for downgrade (Yearly → Monthly)
-                        binding.switchBottomSheetDialogTitle.text = context.getString(R.string.switchBottomSheetTitleDowngrade)
+                        binding.switchBottomSheetDialogTitle.text = context.getString(R.string.switchBottomSheetDynamicTitleDowngrade)
                         binding.switchBottomSheetDialogSubTitle.text = context.getString(
                             R.string.switchBottomSheetDescriptionDowngrade,
                             pricingInfo?.yearlyMonthlyEquivalent ?: "",

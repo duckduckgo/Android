@@ -84,7 +84,7 @@
     <string name="subscriptionSettingSectionHelpAndSupport">Справка и поддержка</string>
     <string name="subscriptionSettingSendFeedback">Отправить отзыв</string>
     <string name="subscriptionSettingActivating">Выполняется активация</string>
-    <string name="subscriptionSettingSwitchUpgrade">Переход на годовую подписку сэкономит вам 16%</string>
+    <string name="subscriptionSettingSwitchUpgradeDynamic" instruction="%1$s is the savings percentage when switching from monthly to yearly (e.g. 16)">Переход на годовую подписку сэкономит вам %1$s%%</string>
     <!-- smartling.character_limit = 10 -->
     <string name="subscriptionSettingSwitchUpgradePill">Оптимально</string>
     <string name="subscriptionSettingSwitchDowngrade">Смените тариф</string>
@@ -176,11 +176,6 @@
     <string name="activityPir" translatable="false">Privacy Pro</string>
     <string name="activitySendFeedback">Отправить отзыв</string>
 
-    <!-- Dynamic Switch % -->
-    <string name="switchBottomSheetDynamicTitleUpgrade" instruction="%1$s is the savings percentage when switching from monthly to yearly (e.g. 16)">Годовая подписка\nсэкономит вам %1$s%%</string>
-    <string name="switchBottomSheetDynamicTitleDowngrade" instruction="%1$s is the savings percentage when using a yearly plan instead of monthly (e.g. 16)">Годовая подписка\nэкономит %1$s%%!</string>
-    <string name="subscriptionSettingSwitchUpgradeDynamic" instruction="%1$s is the savings percentage when switching from monthly to yearly (e.g. 16)">Переход на годовую подписку сэкономит вам %1$s%%</string>
-
     <!-- Privacy Pro Rebranding-->
     <string name="subscriptionSettingRebrandingMessage">Пакет Privacy Pro теперь называется просто подпиской DuckDuckGo.</string>
 
@@ -198,11 +193,11 @@
     <string name="feedbackGeneralSubscription">По подписке</string>
 
     <!-- Switch plan-->
-    <string name="switchBottomSheetTitleUpgrade">Экономьте 16%\nна годовой подписке!</string>
+    <string name="switchBottomSheetDynamicTitleUpgrade" instruction="%1$s is the savings percentage when switching from monthly to yearly (e.g. 16)">Годовая подписка\nсэкономит вам %1$s%%</string>
     <string name="switchBottomSheetDescriptionUpgrade" instruction="%1$s is the yearly plan monthly equivalent price (e.g. $8.33), %2$s is the current monthly plan price (e.g. $9.99)">Ваш месячный тариф стоит %2$s, а годовой обойдется всего в %1$s в месяц.</string>
     <string name="switchBottomSheetPrimaryButtonUpgrade" instruction="%1$s is the yearly plan price (e.g. $99.99)">Перейти на годовую подписку (%1$s/год)</string>
     <string name="switchBottomSheetSecondaryButtonUpgrade">Оставить месячный план</string>
-    <string name="switchBottomSheetTitleDowngrade">Годовая подписка \nэкономит 16%!</string>
+    <string name="switchBottomSheetDynamicTitleDowngrade" instruction="%1$s is the savings percentage when using a yearly plan instead of monthly (e.g. 16)">Годовая подписка\nэкономит %1$s%%!</string>
     <string name="switchBottomSheetDescriptionDowngrade" instruction="%1$s is the yearly plan monthly equivalent price (e.g. $8.33), %2$s is the monthly plan price (e.g. $9.99)">Со сменой тарифа ваша ежемесячная плата увеличится с %1$s до %2$s.</string>
     <string name="switchBottomSheetPrimaryButtonDowngrade">Перейти на годовой тариф</string>
     <string name="switchBottomSheetSecondaryButtonDowngrade" instruction="%1$s is the monthly plan price (e.g. $9.99)">Перейти на месячный план (%1$s/мес.)</string>
