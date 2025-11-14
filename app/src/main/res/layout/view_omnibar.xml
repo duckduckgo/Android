@@ -203,8 +203,8 @@
                                 android:layout_width="0dp"
                                 android:layout_height="wrap_content"
                                 android:orientation="horizontal"
-                                android:gravity="center_horizontal"
-                                app:layout_constraintEnd_toStartOf="@+id/endIconsContainer"
+                                android:gravity="center"
+                                app:layout_constraintEnd_toEndOf="parent"
                                 app:layout_constraintStart_toStartOf="parent"
                                 app:layout_constraintBottom_toBottomOf="parent"
                                 app:layout_constraintTop_toTopOf="parent">
@@ -239,6 +239,13 @@
                                     android:layout_marginStart="@dimen/keyline_1"
                                     app:srcCompat="@drawable/ic_ai_chat_omnibar_24"
                                     tools:visibility="visible" />
+
+                                <com.duckduckgo.common.ui.view.text.DaxTextView
+                                    android:id="@+id/aiTitle"
+                                    android:layout_marginStart="@dimen/keyline_1"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="@string/duck_chat_title"/>
 
                             </LinearLayout>
 
