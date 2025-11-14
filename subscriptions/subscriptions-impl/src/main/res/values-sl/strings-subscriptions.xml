@@ -84,6 +84,11 @@
     <string name="subscriptionSettingSectionHelpAndSupport">Pomoč in podpora</string>
     <string name="subscriptionSettingSendFeedback">Pošljite povratne informacije</string>
     <string name="subscriptionSettingActivating">Aktiviranje</string>
+    <string name="subscriptionSettingSwitchUpgrade">Preklopite na letno naročnino in prihranite 16 %</string>
+    <!-- smartling.character_limit = 10 -->
+    <string name="subscriptionSettingSwitchUpgradePill">Najponudba</string>
+    <string name="subscriptionSettingSwitchDowngrade">Zamenjava paketa</string>
+    <string name="subscriptionSettingManagePlan">Upravljaj plačilo</string>
 
     <!--Purchase Subscriptions-->
     <string name="purchaseCompletedTitle">Vse je pripravljeno.</string>
@@ -191,5 +196,15 @@
     <string name="subscriptionSettingSubscribeSecure">Zagotovite varnost omrežja Wi-Fi in se zasebno pogovarjajte z naprednimi modeli umetne inteligence</string>
 
     <string name="feedbackGeneralSubscription">Naročnina</string>
+
+    <!-- Switch plan-->
+    <string name="switchBottomSheetTitleUpgrade">Prihranite 16 %\nz letno naročnino!</string>
+    <string name="switchBottomSheetDescriptionUpgrade" instruction="%1$s is the yearly plan monthly equivalent price (e.g. $8.33), %2$s is the current monthly plan price (e.g. $9.99)">Letna naročnina znaša samo %1$s/mesec v primerjavi z vašo trenutno mesečno naročnino za %2$s.</string>
+    <string name="switchBottomSheetPrimaryButtonUpgrade" instruction="%1$s is the yearly plan price (e.g. $99.99)">Preklopite na letno naročnino (%1$s/leto)</string>
+    <string name="switchBottomSheetSecondaryButtonUpgrade">Obdrži mesečno naročnino</string>
+    <string name="switchBottomSheetTitleDowngrade">Z letno naročnino\nprihranite 16 %!</string>
+    <string name="switchBottomSheetDescriptionDowngrade" instruction="%1$s is the yearly plan monthly equivalent price (e.g. $8.33), %2$s is the monthly plan price (e.g. $9.99)">Ob preklopu se bo mesečna cena povišala z %1$s/mesec na %2$s/mesec.</string>
+    <string name="switchBottomSheetPrimaryButtonDowngrade">Obdrži letno naročnino</string>
+    <string name="switchBottomSheetSecondaryButtonDowngrade" instruction="%1$s is the monthly plan price (e.g. $9.99)">Preklopi na mesečno naročnino (%1$s/mesec)</string>
 
 </resources>

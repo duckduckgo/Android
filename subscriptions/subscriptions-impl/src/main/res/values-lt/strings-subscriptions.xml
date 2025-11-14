@@ -84,6 +84,11 @@
     <string name="subscriptionSettingSectionHelpAndSupport">Pagalba ir palaikymas</string>
     <string name="subscriptionSettingSendFeedback">Siųsti atsiliepimą</string>
     <string name="subscriptionSettingActivating">Aktyvavimas</string>
+    <string name="subscriptionSettingSwitchUpgrade">Pereikite prie metinio abonemento ir sutaupykite 16 %</string>
+    <!-- smartling.character_limit = 10 -->
+    <string name="subscriptionSettingSwitchUpgradePill">Geriausia vertė</string>
+    <string name="subscriptionSettingSwitchDowngrade">Pakeisti planą</string>
+    <string name="subscriptionSettingManagePlan">Tvarkyti mokėjimą</string>
 
     <!--Purchase Subscriptions-->
     <string name="purchaseCompletedTitle">Viskas paruošta.</string>
@@ -191,5 +196,15 @@
     <string name="subscriptionSettingSubscribeSecure">Apsaugok savo Wi-Fi ir kalbėkis privačiai su pažangiais DI modeliais</string>
 
     <string name="feedbackGeneralSubscription">Prenumerata</string>
+
+    <!-- Switch plan-->
+    <string name="switchBottomSheetTitleUpgrade">Sutaupykite 16 % su\n metiniu planu!</string>
+    <string name="switchBottomSheetDescriptionUpgrade" instruction="%1$s is the yearly plan monthly equivalent price (e.g. $8.33), %2$s is the current monthly plan price (e.g. $9.99)">Metinis planas kainuoja tik %1$s/mėn., palyginti su dabartiniu %2$s/mėn. planu.</string>
+    <string name="switchBottomSheetPrimaryButtonUpgrade" instruction="%1$s is the yearly plan price (e.g. $99.99)">Pereiti prie metinio (%1$s/metus)</string>
+    <string name="switchBottomSheetSecondaryButtonUpgrade">Išsaugoti mėnesio planą</string>
+    <string name="switchBottomSheetTitleDowngrade">Sutaupote 16 % su\nmetiniu planu!</string>
+    <string name="switchBottomSheetDescriptionDowngrade" instruction="%1$s is the yearly plan monthly equivalent price (e.g. $8.33), %2$s is the monthly plan price (e.g. $9.99)">Perėjimas padidins jūsų mėnesinę kainą nuo %1$s/mėn. iki %2$s/mėn.</string>
+    <string name="switchBottomSheetPrimaryButtonDowngrade">Išsaugoti metinį planą</string>
+    <string name="switchBottomSheetSecondaryButtonDowngrade" instruction="%1$s is the monthly plan price (e.g. $9.99)">Pereiti prie mėnesinio plano (%1$s/mėn.)</string>
 
 </resources>

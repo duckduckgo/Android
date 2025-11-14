@@ -84,6 +84,11 @@
     <string name="subscriptionSettingSectionHelpAndSupport">Справка и поддержка</string>
     <string name="subscriptionSettingSendFeedback">Отправить отзыв</string>
     <string name="subscriptionSettingActivating">Выполняется активация</string>
+    <string name="subscriptionSettingSwitchUpgrade">Переход на годовую подписку сэкономит вам 16%</string>
+    <!-- smartling.character_limit = 10 -->
+    <string name="subscriptionSettingSwitchUpgradePill">Оптимально</string>
+    <string name="subscriptionSettingSwitchDowngrade">Смените тариф</string>
+    <string name="subscriptionSettingManagePlan">Управление оплатой</string>
 
     <!--Purchase Subscriptions-->
     <string name="purchaseCompletedTitle">Все готово!</string>
@@ -191,5 +196,15 @@
     <string name="subscriptionSettingSubscribeSecure">Безопасный Wi-Fi и приватные чаты с продвинутыми моделями ИИ</string>
 
     <string name="feedbackGeneralSubscription">По подписке</string>
+
+    <!-- Switch plan-->
+    <string name="switchBottomSheetTitleUpgrade">Экономьте 16%\nна годовой подписке!</string>
+    <string name="switchBottomSheetDescriptionUpgrade" instruction="%1$s is the yearly plan monthly equivalent price (e.g. $8.33), %2$s is the current monthly plan price (e.g. $9.99)">Ваш месячный тариф стоит %2$s, а годовой обойдется всего в %1$s в месяц.</string>
+    <string name="switchBottomSheetPrimaryButtonUpgrade" instruction="%1$s is the yearly plan price (e.g. $99.99)">Перейти на годовую подписку (%1$s/год)</string>
+    <string name="switchBottomSheetSecondaryButtonUpgrade">Оставить месячный план</string>
+    <string name="switchBottomSheetTitleDowngrade">Годовая подписка \nэкономит 16%!</string>
+    <string name="switchBottomSheetDescriptionDowngrade" instruction="%1$s is the yearly plan monthly equivalent price (e.g. $8.33), %2$s is the monthly plan price (e.g. $9.99)">Со сменой тарифа ваша ежемесячная плата увеличится с %1$s до %2$s.</string>
+    <string name="switchBottomSheetPrimaryButtonDowngrade">Перейти на годовой тариф</string>
+    <string name="switchBottomSheetSecondaryButtonDowngrade" instruction="%1$s is the monthly plan price (e.g. $9.99)">Перейти на месячный план (%1$s/мес.)</string>
 
 </resources>

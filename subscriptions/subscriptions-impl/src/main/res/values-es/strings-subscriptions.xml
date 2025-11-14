@@ -84,6 +84,11 @@
     <string name="subscriptionSettingSectionHelpAndSupport">Ayuda y asistencia</string>
     <string name="subscriptionSettingSendFeedback">Enviar comentarios</string>
     <string name="subscriptionSettingActivating">Activando</string>
+    <string name="subscriptionSettingSwitchUpgrade">Cambia a un plan anual y ahorra un 16 %</string>
+    <!-- smartling.character_limit = 10 -->
+    <string name="subscriptionSettingSwitchUpgradePill">Mejor oferta</string>
+    <string name="subscriptionSettingSwitchDowngrade">Cambiar de plan</string>
+    <string name="subscriptionSettingManagePlan">Gestionar pago</string>
 
     <!--Purchase Subscriptions-->
     <string name="purchaseCompletedTitle">¡Todo listo!</string>
@@ -191,5 +196,15 @@
     <string name="subscriptionSettingSubscribeSecure">Protege tu Wi-Fi y chatea de forma privada con modelos avanzados de IA</string>
 
     <string name="feedbackGeneralSubscription">Suscripción</string>
+
+    <!-- Switch plan-->
+    <string name="switchBottomSheetTitleUpgrade">Ahorra un 16 % con\nun plan anual.</string>
+    <string name="switchBottomSheetDescriptionUpgrade" instruction="%1$s is the yearly plan monthly equivalent price (e.g. $8.33), %2$s is the current monthly plan price (e.g. $9.99)">El plan anual solo cuesta %1$s/mes, en comparación con tu plan actual de %2$s/mes.</string>
+    <string name="switchBottomSheetPrimaryButtonUpgrade" instruction="%1$s is the yearly plan price (e.g. $99.99)">Cambiar a anual (%1$s/año)</string>
+    <string name="switchBottomSheetSecondaryButtonUpgrade">Mantener el plan mensual</string>
+    <string name="switchBottomSheetTitleDowngrade">¡Te ahorras un 16 %\ncon un plan anual!</string>
+    <string name="switchBottomSheetDescriptionDowngrade" instruction="%1$s is the yearly plan monthly equivalent price (e.g. $8.33), %2$s is the monthly plan price (e.g. $9.99)">Si te cambias, el precio al mes pasará de ser de %1$s/mes a %2$s/mes.</string>
+    <string name="switchBottomSheetPrimaryButtonDowngrade">Mantener el plan anual</string>
+    <string name="switchBottomSheetSecondaryButtonDowngrade" instruction="%1$s is the monthly plan price (e.g. $9.99)">Cambiar a plan mensual (%1$s/mes)</string>
 
 </resources>

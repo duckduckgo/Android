@@ -84,6 +84,11 @@
     <string name="subscriptionSettingSectionHelpAndSupport">Aide et assistance</string>
     <string name="subscriptionSettingSendFeedback">Envoyer vos remarques</string>
     <string name="subscriptionSettingActivating">Activation en cours</string>
+    <string name="subscriptionSettingSwitchUpgrade">Passez au forfait annuel et économisez 16 %</string>
+    <!-- smartling.character_limit = 10 -->
+    <string name="subscriptionSettingSwitchUpgradePill">Meilleure offre</string>
+    <string name="subscriptionSettingSwitchDowngrade">Changer de forfait</string>
+    <string name="subscriptionSettingManagePlan">Gérer le paiement</string>
 
     <!--Purchase Subscriptions-->
     <string name="purchaseCompletedTitle">Tout est prêt !</string>
@@ -191,5 +196,15 @@
     <string name="subscriptionSettingSubscribeSecure">Sécurisez votre Wi-Fi et discutez en toute confidentialité grâce à des modèles d\'IA avancés</string>
 
     <string name="feedbackGeneralSubscription">Abonnement</string>
+
+    <!-- Switch plan-->
+    <string name="switchBottomSheetTitleUpgrade">Économisez 16 % avec\nun forfait annuel !</string>
+    <string name="switchBottomSheetDescriptionUpgrade" instruction="%1$s is the yearly plan monthly equivalent price (e.g. $8.33), %2$s is the current monthly plan price (e.g. $9.99)">Un forfait annuel coûte seulement %1$s/mois, contre %2$s/mois pour votre forfait mensuel actuel.</string>
+    <string name="switchBottomSheetPrimaryButtonUpgrade" instruction="%1$s is the yearly plan price (e.g. $99.99)">Passer à un forfait annuel (%1$s/an)</string>
+    <string name="switchBottomSheetSecondaryButtonUpgrade">Conserver le forfait mensuel</string>
+    <string name="switchBottomSheetTitleDowngrade">Vous économisez 16 % avec\nun forfait annuel !</string>
+    <string name="switchBottomSheetDescriptionDowngrade" instruction="%1$s is the yearly plan monthly equivalent price (e.g. $8.33), %2$s is the monthly plan price (e.g. $9.99)">Ce changement augmentera vos mensualités, qui passeront de %1$s/mois à %2$s/mois.</string>
+    <string name="switchBottomSheetPrimaryButtonDowngrade">Conserver le forfait annuel</string>
+    <string name="switchBottomSheetSecondaryButtonDowngrade" instruction="%1$s is the monthly plan price (e.g. $9.99)">Passer à un forfait mensuel (%1$s/mois)</string>
 
 </resources>
