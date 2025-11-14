@@ -47,17 +47,12 @@
     <string name="omnibarInputHint">Buscar o escribir la URL</string>
     <string name="clearButtonContentDescription">Borrar búsqueda</string>
     <string name="no_compatible_third_party_app_installed">No hay ninguna aplicación compatible instalada</string>
-    <string name="addBookmarkMenuTitle">Añadir marcador</string>
-    <string name="editBookmarkMenuTitle">Editar marcador</string>
+
     <string name="addFavoriteMenuTitle">Añadir favorito</string>
     <string name="removeFavoriteMenuTitle">Eliminar favorito</string>
     <string name="favoriteAddedMessage">Favorito añadido</string>
     <string name="bookmarkAddedMessage">Marcador añadido</string>
-    <string name="requestDesktopSiteMenuTitle">Versión de escritorio del sitio web</string>
-    <string name="fireproofWebsiteMenuTitleRemove">Desactivar a prueba de fuego</string>
-    <string name="requestMobileSiteMenuTitle">Sitio móvil</string>
     <string name="downloadsMenuTitle">Descargas</string>
-    <string name="printMenuTitle">Imprimir página</string>
     <string name="favoriteDeleteConfirmationMessage">Favorito eliminado</string>
     <string name="fireproofDeleteConfirmationMessage">A prueba de fuego desactivado</string>
     <string name="privacyProtectionEnabledConfirmationMessage" instruction="Placeholder is a website">Protección de privacidad activada para %1$s</string>
@@ -76,11 +71,9 @@
     <!-- Sharing options -->
     <string name="options">Opciones</string>
     <string name="shareLink">Compartir enlace</string>
-    <string name="shareMenuTitle">Compartir</string>
     <string name="copyUrl">Copiar dirección de enlace</string>
 
     <!-- Find in page -->
-    <string name="findInPageMenuTitle">Buscar en la página</string>
     <string name="nextSearchTermDescription">Buscar siguiente</string>
     <string name="previousSearchTermDescription">Buscar anterior</string>
     <string name="closeFindInPageButtonDescription">Cerrar búsqueda en la vista de página</string>
@@ -256,7 +249,7 @@
     <string name="no_suggestions">No hay sugerencias</string>
 
     <!-- Broken Site Activity -->
-    <string name="brokenSiteReportBrokenSiteMenuItem">Informar de sitio web dañado</string>
+
 
     <string name="brokenSiteProtectionsOn">Las protecciones están <b>ACTIVADAS</b> para este sitio</string>
     <string name="brokenSiteProtectionsOff">Las protecciones están <b>DESACTIVADAS</b> para este sitio</string>
@@ -279,7 +272,7 @@
     <string name="searchWidgetLabel">Búsqueda y Duck.ai</string>
 
     <!-- Home Screen Shortcuts -->
-    <string name="addToHome">Añadir a la Pantalla de Inicio</string>
+
     <string name="shortcutAddedText" instruction="Placeholder is the name of a website">%1$s se ha añadido a tu pantalla de inicio correctamente.</string>
 
     <!-- User Survey -->
@@ -485,8 +478,6 @@
 
     <!-- Allowlist -->
     <string name="allowlistActivityTitle">Sitios no protegidos</string>
-    <string name="enablePrivacyProtection">Activar la protección de privacidad</string>
-    <string name="disablePrivacyProtection">Desactivar la protección de privacidad</string>
     <string name="allowlistEntryOverflowContentDescription" instruction="Placeholder is a website">Más opciones para el sitio no protegido %1$s</string>
     <string name="allowlistEntryDeleteConfirmMessage" instruction="Placeholder is a website">¿Seguro que quieres eliminar &lt;b&gt;%1$s&lt;/b&gt; de los sitios desprotegidos?</string>
     <string name="allowlistExplanation">La protección de privacidad está deshabilitada para estos sitios.</string>
@@ -585,11 +576,9 @@
     <string name="appLinkSnackBarMessage" instruction="Placeholder is the name of an app">Puedes abrir este enlace en %1$s.</string>
     <string name="appLinkMultipleSnackBarMessage">Puedes abrir este enlace en otras aplicaciones.</string>
     <string name="appLinkIntentChooserTitle">Abrir con</string>
-    <string name="appLinkMenuItemTitle">Abrir en la aplicación</string>
 
     <!-- Email Autofill -->
     <string name="aliasToClipboardMessage">Nueva dirección copiada en el portapapeles</string>
-    <string name="newEmailAliasMenuTitle">Generar Duck Address</string>
 
     <!-- Autofill -->
     <string name="autofillSnackbarAction" instruction="Label for a button that lets the user view the details for a login credential">Ver</string>
@@ -759,10 +748,6 @@
     <string name="settingsPasswordsAndAutofillLoginsSetting">Contraseñas y autocompletar</string>
     <string name="autofillLoginSavedSnackbarMessage">Contraseña guardada</string>
     <string name="autofillLoginUpdatedSnackbarMessage">Contraseña actualizada</string>
-
-    <!-- Custom Tab -->
-    <string name="openInDdgMenuItemTitle">Abrir en DuckDuckGo</string>
-    <string name="runningInDdgMenuItemTitle">Ejecutar en DuckDuckGo</string>
 
     <!-- SSL Error -->
     <string name="sslErrorTitle">Advertencia: este sitio puede ser inseguro</string>
