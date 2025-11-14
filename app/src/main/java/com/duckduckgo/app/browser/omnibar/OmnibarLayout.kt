@@ -864,6 +864,7 @@ class OmnibarLayout @JvmOverloads constructor(
         renderTabIcon(viewState)
         renderPulseAnimation(viewState)
         pageLoadingIndicator.isVisible = viewState.isLoading
+        voiceSearchButton.isVisible = viewState.showVoiceSearch
     }
 
     private fun renderCustomTabMode(

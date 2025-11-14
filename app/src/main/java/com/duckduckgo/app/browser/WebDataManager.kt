@@ -36,14 +36,13 @@ import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import logcat.LogPriority.ERROR
 import logcat.LogPriority.WARN
 import logcat.asLog
 import logcat.logcat
 import java.io.File
 import javax.inject.Inject
-import kotlin.coroutines.resume
-import kotlin.coroutines.suspendCoroutine
 
 interface WebDataManager {
     suspend fun clearData(
@@ -92,25 +91,27 @@ class WebViewDataManager @Inject constructor(
         webView.clearHistory()
     }
 
-    private suspend fun clearWebStorage(webStorage: WebStorage) {
-        suspendCoroutine { continuation ->
-            if (androidBrowserConfigFeature.webLocalStorage().isEnabled()) {
-                kotlin.runCatching {
-                    webLocalStorageManager.clearWebLocalStorage()
-                    continuation.resume(Unit)
-                }.onFailure { e ->
-                    logcat(ERROR) { "WebDataManager: Could not selectively clear web storage: ${e.asLog()}" }
-                    if (appBuildConfig.isInternalBuild()) {
-                        sendCrashPixel(e)
-                    }
-                    // fallback, if we crash we delete everything
-                    webStorage.deleteAllData()
-                    continuation.resume(Unit)
+    private suspend fun clearWebStorage(webStorage: WebStorage) = withContext(dispatcherProvider.io()) {
+        if (androidBrowserConfigFeature.webLocalStorage().isEnabled()) {
+            kotlin.runCatching {
+                webLocalStorageManager.clearWebLocalStorage()
+            }.onFailure { e ->
+                logcat(ERROR) { "WebDataManager: Could not selectively clear web storage: ${e.asLog()}" }
+                if (appBuildConfig.isInternalBuild()) {
+                    sendCrashPixel(e)
                 }
-            } else {
-                webStorage.deleteAllData()
-                continuation.resume(Unit)
+                // fallback, if we crash we delete everything
+                deleteAllData(webStorage)
             }
+        } else {
+            deleteAllData(webStorage)
+        }
+    }
+
+    private suspend fun deleteAllData(webStorage: WebStorage) {
+        // WebStorage API must be called on main thread
+        withContext(dispatcherProvider.main()) {
+            webStorage.deleteAllData()
         }
     }
 
