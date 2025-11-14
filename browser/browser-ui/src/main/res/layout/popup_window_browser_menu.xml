@@ -88,6 +88,22 @@
             android:paddingBottom="@dimen/keyline_2">
 
             <com.duckduckgo.common.ui.view.MenuItemView
+                android:visibility="gone"
+                android:id="@+id/newChatMenuItem"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:iconDrawable="@drawable/ic_ai_chat_add_16"
+                app:primaryText="@string/browserMenuNewChat" />
+
+            <com.duckduckgo.common.ui.view.MenuItemView
+                android:visibility="gone"
+                android:id="@+id/chatHistoryMenuItem"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:iconDrawable="@drawable/ic_history_16"
+                app:primaryText="@string/browserMenuChatHistory" />
+
+            <com.duckduckgo.common.ui.view.MenuItemView
                 android:id="@+id/newTabMenuItem"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -233,6 +249,14 @@
                 android:layout_height="wrap_content"
                 app:iconDrawable="@drawable/ic_settings_16"
                 app:primaryText="@string/browserMenuSettings" />
+
+            <com.duckduckgo.common.ui.view.MenuItemView
+                android:visibility="gone"
+                android:id="@+id/chatSettings"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:iconDrawable="@drawable/ic_settings_ai_16"
+                app:primaryText="@string/browserMenuChatSettings" />
 
             <com.duckduckgo.common.ui.view.MenuItemView
                 android:visibility="gone"

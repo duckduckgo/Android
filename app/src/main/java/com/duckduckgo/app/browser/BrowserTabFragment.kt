@@ -136,7 +136,7 @@ import com.duckduckgo.app.browser.history.NavigationHistorySheet
 import com.duckduckgo.app.browser.history.NavigationHistorySheet.NavigationHistorySheetListener
 import com.duckduckgo.app.browser.httpauth.WebViewHttpAuthStore
 import com.duckduckgo.app.browser.logindetection.DOMLoginDetector
-import com.duckduckgo.app.browser.menu.RealBrowserMenuViewStateFactory
+import com.duckduckgo.app.browser.menu.BrowserMenuViewStateFactory
 import com.duckduckgo.app.browser.menu.VpnMenuStore
 import com.duckduckgo.app.browser.model.BasicAuthenticationCredentials
 import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
@@ -1771,6 +1771,16 @@ class BrowserTabFragment :
         browserNavigationBarIntegration.configureBrowserViewMode()
     }
 
+    private fun showDuckAI(browserViewState: BrowserViewState) {
+        val browseMenuState = BrowserMenuViewStateFactory.create(
+            omnibarViewMode = ViewMode.DuckAI,
+            viewState = browserViewState,
+            customTabsMode = tabDisplayedInCustomTabScreen,
+        )
+        popupMenu.render(browseMenuState)
+        omnibar.setViewMode(ViewMode.DuckAI)
+    }
+
     private fun showMaliciousWarning(
         siteUrl: Uri,
         feed: Feed,
@@ -2355,7 +2365,7 @@ class BrowserTabFragment :
             is Command.SubmitChat -> duckChat.openDuckChatWithAutoPrompt(it.query)
             is Command.EnqueueCookiesAnimation -> enqueueCookiesAnimation(it.isCosmetic)
             is Command.PageStarted -> onPageStarted()
-            is Command.EnableDuckAIFullScreen -> omnibar.setViewMode(ViewMode.DuckAI)
+            is Command.EnableDuckAIFullScreen -> showDuckAI(it.browserViewState)
             is Command.DisableDuckAIFullScreen -> omnibar.setViewMode(ViewMode.Browser(it.url))
         }
     }
@@ -4606,7 +4616,7 @@ class BrowserTabFragment :
 
                 browserNavigationBarIntegration.configureFireButtonHighlight(highlighted = viewState.fireButton.isHighlighted())
 
-                val browseMenuState = RealBrowserMenuViewStateFactory.create(
+                val browseMenuState = BrowserMenuViewStateFactory.create(
                     omnibarViewMode = omnibar.viewMode,
                     viewState = viewState,
                     customTabsMode = tabDisplayedInCustomTabScreen,

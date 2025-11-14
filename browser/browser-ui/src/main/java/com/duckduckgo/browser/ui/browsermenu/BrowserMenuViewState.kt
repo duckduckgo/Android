@@ -58,7 +58,10 @@ sealed class BrowserMenuViewState {
         val vpnMenuState: VpnMenuState = VpnMenuState.Hidden,
         val showAutofill: Boolean = false,
     ) : BrowserMenuViewState()
-    data object DuckAi : BrowserMenuViewState()
+    data class DuckAi(
+        val canPrintPage: Boolean = false,
+        val canReportSite: Boolean = false,
+    ) : BrowserMenuViewState()
 }
 
 sealed class VpnMenuState {

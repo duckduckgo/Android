@@ -47,17 +47,12 @@
     <string name="omnibarInputHint">Vyhledat nebo zadat URL</string>
     <string name="clearButtonContentDescription">Vymazat vyhledávací vstup</string>
     <string name="no_compatible_third_party_app_installed">Nebyla nainstalována žádná kompatibilní aplikace</string>
-    <string name="addBookmarkMenuTitle">Přidat záložku</string>
-    <string name="editBookmarkMenuTitle">Upravit záložku</string>
+
     <string name="addFavoriteMenuTitle">Přidat oblíbené</string>
     <string name="removeFavoriteMenuTitle">Odebrat oblíbenou položku</string>
     <string name="favoriteAddedMessage">Oblíbené položky uloženy</string>
     <string name="bookmarkAddedMessage">Záložka přidána</string>
-    <string name="requestDesktopSiteMenuTitle">Verze pro počítač</string>
-    <string name="fireproofWebsiteMenuTitleRemove">Odstranit ochranu</string>
-    <string name="requestMobileSiteMenuTitle">Mobilní režim</string>
     <string name="downloadsMenuTitle">Stahování</string>
-    <string name="printMenuTitle">Vytisknout stránku</string>
     <string name="favoriteDeleteConfirmationMessage">Oblíbená položka odstraněna</string>
     <string name="fireproofDeleteConfirmationMessage">Ochrana odstraněna</string>
     <string name="privacyProtectionEnabledConfirmationMessage" instruction="Placeholder is a website">Ochrana soukromí zapnutá pro %1$s</string>
@@ -78,11 +73,9 @@
     <!-- Sharing options -->
     <string name="options">Možnosti</string>
     <string name="shareLink">Sdílet odkaz</string>
-    <string name="shareMenuTitle">Sdílet</string>
     <string name="copyUrl">Kopírovat adresu odkazu</string>
 
     <!-- Find in page -->
-    <string name="findInPageMenuTitle">Vyhledávání na stránce</string>
     <string name="nextSearchTermDescription">Najít další</string>
     <string name="previousSearchTermDescription">Najít předchozí</string>
     <string name="closeFindInPageButtonDescription">Zavřít vyhledání v zobrazení stránky</string>
@@ -258,7 +251,7 @@
     <string name="no_suggestions">Žádné návrhy</string>
 
     <!-- Broken Site Activity -->
-    <string name="brokenSiteReportBrokenSiteMenuItem">Nahlásit poškozené stránky</string>
+
 
     <string name="brokenSiteProtectionsOn">Na tomhle webu je ochrana <b>ZAPNUTÁ</b></string>
     <string name="brokenSiteProtectionsOff">Na tomhle webu je ochrana <b>VYPNUTÁ</b></string>
@@ -281,7 +274,7 @@
     <string name="searchWidgetLabel">Vyhledávání a Duck.ai</string>
 
     <!-- Home Screen Shortcuts -->
-    <string name="addToHome">Přidat na domovskou obrazovku</string>
+
     <string name="shortcutAddedText" instruction="Placeholder is the name of a website">Podařilo se! %1$s byla přidána na vaši domovskou obrazovku.</string>
 
     <!-- User Survey -->
@@ -487,8 +480,6 @@
 
     <!-- Allowlist -->
     <string name="allowlistActivityTitle">Nechráněné stránky</string>
-    <string name="enablePrivacyProtection">Povolit ochranu soukromí</string>
-    <string name="disablePrivacyProtection">Zakázat ochranu soukromí</string>
     <string name="allowlistEntryOverflowContentDescription" instruction="Placeholder is a website">Další možnosti pro nechráněný web %1$s</string>
     <string name="allowlistEntryDeleteConfirmMessage" instruction="Placeholder is a website">Opravdu chcete odstranit &lt;b&gt;%1$s&lt;/b&gt; z nechráněných stránek?</string>
     <string name="allowlistExplanation">Tyto stránky nebudou vylepšeny ochranou soukromí.</string>
@@ -587,11 +578,9 @@
     <string name="appLinkSnackBarMessage" instruction="Placeholder is the name of an app">Tenhle odkaz můžeš otevřít v aplikaci %1$s.</string>
     <string name="appLinkMultipleSnackBarMessage">Tenhle odkaz můžeš otevřít v jiných aplikacích.</string>
     <string name="appLinkIntentChooserTitle">Otevřít v aplikaci</string>
-    <string name="appLinkMenuItemTitle">Otevřít v aplikaci</string>
 
     <!-- Email Autofill -->
     <string name="aliasToClipboardMessage">Nová adresa zkopírovaná do vaší schránky</string>
-    <string name="newEmailAliasMenuTitle">Vygenerovat adresu Duck</string>
 
     <!-- Autofill -->
     <string name="autofillSnackbarAction" instruction="Label for a button that lets the user view the details for a login credential">Zobrazit</string>
@@ -787,10 +776,6 @@
     <string name="settingsPasswordsAndAutofillLoginsSetting">Hesla a automatické vyplňování</string>
     <string name="autofillLoginSavedSnackbarMessage">Heslo je uložené</string>
     <string name="autofillLoginUpdatedSnackbarMessage">Heslo je aktualizované</string>
-
-    <!-- Custom Tab -->
-    <string name="openInDdgMenuItemTitle">Otevřít v DuckDuckGo</string>
-    <string name="runningInDdgMenuItemTitle">Spuštěno v DuckDuckGo</string>
 
     <!-- SSL Error -->
     <string name="sslErrorTitle">Pozor: Tenhle web může být nezabezpečený</string>

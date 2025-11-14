@@ -21,7 +21,7 @@ import com.duckduckgo.app.browser.omnibar.Omnibar
 import com.duckduckgo.app.browser.viewstate.BrowserViewState
 import com.duckduckgo.browser.ui.browsermenu.BrowserMenuViewState
 
-object RealBrowserMenuViewStateFactory {
+object BrowserMenuViewStateFactory {
     fun create(
         omnibarViewMode: Omnibar.ViewMode,
         viewState: BrowserViewState,
@@ -32,7 +32,7 @@ object RealBrowserMenuViewStateFactory {
         } else {
             when (omnibarViewMode) {
                 Omnibar.ViewMode.NewTab -> createNewTabPageViewState(viewState)
-                Omnibar.ViewMode.DuckAI -> BrowserMenuViewState.DuckAi
+                Omnibar.ViewMode.DuckAI -> createDuckAiViewState(viewState)
                 Omnibar.ViewMode.Error -> createNewTabPageViewState(viewState)
                 Omnibar.ViewMode.SSLWarning -> createNewTabPageViewState(viewState)
                 Omnibar.ViewMode.MaliciousSiteWarning -> createNewTabPageViewState(viewState)
@@ -62,6 +62,15 @@ object RealBrowserMenuViewStateFactory {
             showDuckChatOption = browserViewState.showDuckChatOption,
             vpnMenuState = browserViewState.vpnMenuState,
             showAutofill = browserViewState.showAutofill,
+        )
+    }
+
+    private fun createDuckAiViewState(
+        browserViewState: BrowserViewState,
+    ): BrowserMenuViewState.DuckAi {
+        return BrowserMenuViewState.DuckAi(
+            canPrintPage = browserViewState.canPrintPage,
+            canReportSite = browserViewState.canReportSite,
         )
     }
 

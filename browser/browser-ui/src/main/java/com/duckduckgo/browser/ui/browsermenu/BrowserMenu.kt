@@ -255,6 +255,27 @@ class BrowserMenu(
         }
     }
 
+    val duckNewChatMenuItem: MenuItemView by lazy {
+        when (omnibarType) {
+            OmnibarType.SINGLE_BOTTOM -> bottomBinding.newChatMenuItem
+            else -> topBinding.newChatMenuItem
+        }
+    }
+
+    val duckChatHistoryMenuItem: MenuItemView by lazy {
+        when (omnibarType) {
+            OmnibarType.SINGLE_BOTTOM -> bottomBinding.chatHistoryMenuItem
+            else -> topBinding.chatHistoryMenuItem
+        }
+    }
+
+    val duckChatSettingsMenuItem: MenuItemView by lazy {
+        when (omnibarType) {
+            OmnibarType.SINGLE_BOTTOM -> bottomBinding.chatSettings
+            else -> topBinding.chatSettings
+        }
+    }
+
     fun render(viewState: BrowserMenuViewState) {
         hideAllMenuItems()
         when (viewState) {
@@ -439,6 +460,11 @@ class BrowserMenu(
     }
 
     private fun renderDuckAIMenu(viewState: BrowserMenuViewState.DuckAi) {
+        brokenSiteMenuItem.isVisible = viewState.canReportSite
+        printPageMenuItem.isVisible = viewState.canPrintPage
+        duckChatHistoryMenuItem.isVisible = true
+        duckChatSettingsMenuItem.isVisible = true
+        duckNewChatMenuItem.isVisible = true
     }
 
     private fun getVpnMenuViews() =
