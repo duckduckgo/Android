@@ -23,7 +23,6 @@ jobs:
         uses: actions/checkout@v4
         with:
           submodules: recursive
-          ref: 'feature/cris/on-activity-created-non-blocking'
 
       - name: Setup jq
         uses: dcarbone/install-jq-action@v1.0.1
