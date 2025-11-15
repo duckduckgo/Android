@@ -48,6 +48,9 @@
     <string name="duck_ai_shortcut_settings_title">Atajos de Duck.ai</string>
     <string name="duck_ai_shortcut_settings_description">Elige qué atajos de Duck.ai quieres mostrar</string>
 
+    <!-- Duck AI Voice Search Shortcut Setting -->
+    <string name="duckAiVoiceSearchVisibilitySetting">Búsqueda por voz</string>
+
     <!-- Input Screen  -->
     <string name="input_screen_search_hint">Buscar o introducir dirección</string>
     <string name="input_screen_chat_hint">Pregunta en privado</string>
