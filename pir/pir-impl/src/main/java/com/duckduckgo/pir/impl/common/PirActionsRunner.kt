@@ -399,7 +399,7 @@ class RealPirActionsRunner @AssistedInject constructor(
                     if (it is Success) {
                         engine?.dispatch(
                             EmailReceived(
-                                email = (it.data as Email).email,
+                                generatedEmailData = (it.data as Email).generatedEmailData,
                             ),
                         )
                     } else {

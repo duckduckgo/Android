@@ -32,6 +32,7 @@ import com.duckduckgo.pir.impl.service.DbpService.PirEmailConfirmationDataReques
 import com.duckduckgo.pir.impl.service.DbpService.PirJsonBroker
 import com.duckduckgo.pir.impl.store.PirRepository.BrokerJson
 import com.duckduckgo.pir.impl.store.PirRepository.EmailConfirmationLinkFetchStatus
+import com.duckduckgo.pir.impl.store.PirRepository.GeneratedEmailData
 import com.duckduckgo.pir.impl.store.db.BrokerDao
 import com.duckduckgo.pir.impl.store.db.BrokerEntity
 import com.duckduckgo.pir.impl.store.db.BrokerJsonDao
@@ -167,11 +168,16 @@ interface PirRepository {
         profileQueryIdsToDelete: List<Long>,
     ): Boolean
 
-    suspend fun getEmailForBroker(dataBroker: String): String
+    suspend fun getEmailForBroker(dataBroker: String): GeneratedEmailData
 
     suspend fun getEmailConfirmationLinkStatus(emailData: List<EmailData>): Map<EmailData, EmailConfirmationLinkFetchStatus>
 
     suspend fun deleteEmailData(emailData: List<EmailData>)
+
+    data class GeneratedEmailData(
+        val emailAddress: String,
+        val pattern: String,
+    )
 
     data class BrokerJson(
         val fileName: String,
@@ -606,9 +612,14 @@ class RealPirRepository(
         }
     }
 
-    override suspend fun getEmailForBroker(dataBroker: String): String =
+    override suspend fun getEmailForBroker(dataBroker: String): GeneratedEmailData =
         withContext(dispatcherProvider.io()) {
-            return@withContext dbpService.getEmail(brokerDao()?.getBrokerDetails(dataBroker)!!.url).emailAddress
+            return@withContext dbpService.getEmail(brokerDao()?.getBrokerDetails(dataBroker)!!.url).run {
+                GeneratedEmailData(
+                    emailAddress,
+                    pattern,
+                )
+            }
         }
 
     override suspend fun getEmailConfirmationLinkStatus(emailData: List<EmailData>): Map<EmailData, EmailConfirmationLinkFetchStatus> =

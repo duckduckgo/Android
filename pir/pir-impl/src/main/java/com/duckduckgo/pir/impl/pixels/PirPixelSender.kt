@@ -27,7 +27,6 @@ import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_EMAIL_CONFIRMATION_LINK_RECEI
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_EMAIL_CONFIRMATION_MAX_RETRIES_EXCEEDED
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_EMAIL_CONFIRMATION_RUN_COMPLETED
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_EMAIL_CONFIRMATION_RUN_STARTED
-import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_INTERNAL_BROKER_OPT_OUT_COMPLETED
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_INTERNAL_BROKER_OPT_OUT_STARTED
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_INTERNAL_BROKER_SCAN_COMPLETED
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_INTERNAL_BROKER_SCAN_STARTED
@@ -41,6 +40,8 @@ import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_INTERNAL_SCHEDULED_SCAN_SCHED
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_INTERNAL_SCHEDULED_SCAN_STARTED
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_INTERNAL_SECURE_STORAGE_UNAVAILABLE
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_OPTOUT_STAGE_PENDING_EMAIL_CONFIRMATION
+import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_OPTOUT_SUBMIT_FAILURE
+import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_OPTOUT_SUBMIT_SUCCESS
 import com.squareup.anvil.annotations.ContributesBinding
 import logcat.logcat
 import javax.inject.Inject
@@ -109,17 +110,49 @@ interface PirPixelSender {
     )
 
     /**
-     * Emits a pixel to signal that an opt-out job for a specific extractedProfile has been completed.
-     * It could mean that the opt-out for the record was successful or failed.
+     * Emits a pixel to signal that an opt-out job for a specific extractedProfile has been successfully submitted.
      *
-     * @param brokerName for which the opt-out is for
-     * @param totalTimeInMillis How long it took to complete the opt-out for the record.
-     * @param isSuccess - if result was not an error, it is a success.
+     * @param brokerUrl url of the Broker for which the opt-out is for
+     * @param parent The parent data broker of the one this opt-out attempt targets
+     * @param attemptId - Client-generated ID of the opt-out attempt
+     * @param durationMs - Total duration of the opt-out attempt in milliseconds
+     * @param tries - The number of tries it took to submit successfully.
+     * @param emailPattern - Email pattern used during submission, when available else null.
      */
-    fun reportOptOutCompleted(
-        brokerName: String,
-        totalTimeInMillis: Long,
-        isSuccess: Boolean,
+    fun reportOptOutSubmitted(
+        brokerUrl: String,
+        parent: String,
+        attemptId: String,
+        durationMs: Long,
+        tries: Int,
+        emailPattern: String?,
+    )
+
+    /**
+     * Emits a pixel to signal that an opt-out job for a specific extractedProfile has been failed.
+     *
+     * @param brokerUrl url of the Broker for which the opt-out is for
+     * @param parent The parent data broker of the one this opt-out attempt targets
+     * @param brokerJsonVersion The version of the broker JSON file
+     * @param attemptId - Client-generated ID of the opt-out attempt
+     * @param durationMs - Total duration of the opt-out attempt in milliseconds
+     * @param stage - The stage where the failure occurred
+     * @param tries - The number of tries it took to submit successfully.
+     * @param emailPattern - Email pattern used during submission, when available else null.
+     * @param actionId - Predefined identifier of the broker action that failed
+     * @param actionType - Type of action that failed
+     */
+    fun reportOptOutFailed(
+        brokerUrl: String,
+        parent: String,
+        brokerJsonVersion: String,
+        attemptId: String,
+        durationMs: Long,
+        stage: PirStage,
+        tries: Int,
+        emailPattern: String?,
+        actionId: String,
+        actionType: String,
     )
 
     /**
@@ -353,17 +386,51 @@ class RealPirPixelSender @Inject constructor(
         fire(PIR_INTERNAL_BROKER_OPT_OUT_STARTED, params)
     }
 
-    override fun reportOptOutCompleted(
-        brokerName: String,
-        totalTimeInMillis: Long,
-        isSuccess: Boolean,
+    override fun reportOptOutSubmitted(
+        brokerUrl: String,
+        parent: String,
+        attemptId: String,
+        durationMs: Long,
+        tries: Int,
+        emailPattern: String?,
     ) {
         val params = mapOf(
-            PARAM_KEY_BROKER_NAME to brokerName,
-            PARAM_KEY_TOTAL_TIME to totalTimeInMillis.toString(),
-            PARAM_KEY_SUCCESS to isSuccess.toString(),
+            PARAM_KEY_BROKER to brokerUrl,
+            PARAM_KEY_PARENT to parent,
+            PARAM_ATTEMPT_ID to attemptId,
+            PARAM_DURATION to durationMs.toString(),
+            PARAM_TRIES to tries.toString(),
+            PARAM_KEY_PATTERN to (emailPattern ?: ""),
         )
-        fire(PIR_INTERNAL_BROKER_OPT_OUT_COMPLETED, params)
+        fire(PIR_OPTOUT_SUBMIT_SUCCESS, params)
+    }
+
+    override fun reportOptOutFailed(
+        brokerUrl: String,
+        parent: String,
+        brokerJsonVersion: String,
+        attemptId: String,
+        durationMs: Long,
+        stage: PirStage,
+        tries: Int,
+        emailPattern: String?,
+        actionId: String,
+        actionType: String,
+    ) {
+        val params = mapOf(
+            PARAM_KEY_BROKER to brokerUrl,
+            PARAM_KEY_PARENT to parent,
+            PARAM_BROKER_VERSION to brokerJsonVersion,
+            PARAM_ATTEMPT_ID to attemptId,
+            PARAM_DURATION to durationMs.toString(),
+            PARAM_KEY_STAGE to stage.stageName,
+            PARAM_TRIES to tries.toString(),
+            PARAM_KEY_PATTERN to (emailPattern ?: ""),
+            PARAM_ACTION_ID to actionId,
+            PARAM_KEY_ACTION_TYPE to actionType,
+        )
+
+        fire(PIR_OPTOUT_SUBMIT_FAILURE, params)
     }
 
     override fun reportScanStats(totalScanToRun: Int) {
@@ -565,5 +632,11 @@ class RealPirPixelSender @Inject constructor(
         private const val PARAM_ATTEMPT_NUMBER = "attempt_number"
         private const val PARAM_TOTAL_FETCH = "totalFetchAttempts"
         private const val PARAM_TOTAL_EMAIL_CONFIRMATION = "totalEmailConfirmationJobs"
+
+        private const val PARAM_KEY_BROKER = "data_broker"
+        private const val PARAM_KEY_PARENT = "parent"
+        private const val PARAM_KEY_STAGE = "stage"
+        private const val PARAM_KEY_PATTERN = "pattern"
+        private const val PARAM_KEY_ACTION_TYPE = "action_type"
     }
 }

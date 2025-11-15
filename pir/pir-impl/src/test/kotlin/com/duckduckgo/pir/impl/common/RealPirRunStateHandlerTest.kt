@@ -22,8 +22,9 @@ import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerManua
 import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerRecordEmailConfirmationCompleted
 import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerRecordEmailConfirmationNeeded
 import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerRecordEmailConfirmationStarted
-import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerRecordOptOutCompleted
+import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerRecordOptOutFailed
 import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerRecordOptOutStarted
+import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerRecordOptOutSubmitted
 import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerScanActionSucceeded
 import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerScheduledScanCompleted
 import com.duckduckgo.pir.impl.models.AddressCityState
@@ -33,12 +34,17 @@ import com.duckduckgo.pir.impl.models.scheduling.JobRecord.EmailConfirmationJobR
 import com.duckduckgo.pir.impl.models.scheduling.JobRecord.EmailConfirmationJobRecord.EmailData
 import com.duckduckgo.pir.impl.models.scheduling.JobRecord.EmailConfirmationJobRecord.JobAttemptData
 import com.duckduckgo.pir.impl.models.scheduling.JobRecord.EmailConfirmationJobRecord.LinkFetchData
+import com.duckduckgo.pir.impl.models.scheduling.JobRecord.OptOutJobRecord
+import com.duckduckgo.pir.impl.models.scheduling.JobRecord.OptOutJobRecord.OptOutJobStatus
 import com.duckduckgo.pir.impl.pixels.PirPixelSender
+import com.duckduckgo.pir.impl.pixels.PirStage.OTHER
 import com.duckduckgo.pir.impl.scheduling.JobRecordUpdater
+import com.duckduckgo.pir.impl.scripts.models.BrokerAction
 import com.duckduckgo.pir.impl.scripts.models.PirSuccessResponse.ExtractedResponse
 import com.duckduckgo.pir.impl.scripts.models.PirSuccessResponse.ExtractedResponse.ScriptAddressCityState
 import com.duckduckgo.pir.impl.scripts.models.PirSuccessResponse.ExtractedResponse.ScriptExtractedProfile
 import com.duckduckgo.pir.impl.scripts.models.PirSuccessResponse.NavigateResponse
+import com.duckduckgo.pir.impl.scripts.models.asActionType
 import com.duckduckgo.pir.impl.store.PirEventsRepository
 import com.duckduckgo.pir.impl.store.PirRepository
 import com.duckduckgo.pir.impl.store.PirSchedulingRepository
@@ -449,13 +455,27 @@ class RealPirRunStateHandlerTest {
     fun whenHandleBrokerRecordOptOutCompletedWithSuccessThenUpdatesRecordAndReportsPixel() =
         runTest {
             val state =
-                BrokerRecordOptOutCompleted(
+                BrokerRecordOptOutSubmitted(
                     brokerName = testBrokerName,
                     extractedProfile = testExtractedProfile,
                     startTimeInMillis = testStartTimeInMillis,
                     endTimeInMillis = testEventTimeInMillis,
-                    isSubmitSuccess = true,
+                    attemptId = "c9982ded-021a-4251-9e03-2c58b130410f",
+                    emailPattern = "ep15",
                 )
+            whenever(mockRepository.getBrokerForName(testBrokerName)).thenReturn(testBroker)
+            whenever(mockJobRecordUpdater.updateOptOutRequested(any())).thenReturn(
+                OptOutJobRecord(
+                    extractedProfileId = 789L,
+                    brokerName = testBrokerName,
+                    userProfileId = 123L,
+                    status = OptOutJobStatus.REQUESTED,
+                    attemptCount = 2,
+                    lastOptOutAttemptDateInMillis = 1000L,
+                    optOutRequestedDateInMillis = 2000L,
+                    optOutRemovedDateInMillis = 0L,
+                ),
+            )
 
             testee.handleState(state)
 
@@ -467,10 +487,13 @@ class RealPirRunStateHandlerTest {
                 endTimeInMillis = testEventTimeInMillis,
                 isSubmitSuccess = true,
             )
-            verify(mockPixelSender).reportOptOutCompleted(
-                brokerName = testBrokerName,
-                totalTimeInMillis = testEventTimeInMillis - testStartTimeInMillis,
-                isSuccess = true,
+            verify(mockPixelSender).reportOptOutSubmitted(
+                brokerUrl = testBroker.url,
+                parent = "",
+                attemptId = state.attemptId,
+                durationMs = testEventTimeInMillis - testStartTimeInMillis,
+                tries = 2,
+                emailPattern = state.emailPattern,
             )
         }
 
@@ -478,13 +501,32 @@ class RealPirRunStateHandlerTest {
     fun whenHandleBrokerRecordOptOutCompletedWithFailureThenUpdatesRecordAndReportsPixel() =
         runTest {
             val state =
-                BrokerRecordOptOutCompleted(
+                BrokerRecordOptOutFailed(
                     brokerName = testBrokerName,
                     extractedProfile = testExtractedProfile,
                     startTimeInMillis = testStartTimeInMillis,
                     endTimeInMillis = testEventTimeInMillis,
-                    isSubmitSuccess = false,
+                    attemptId = "c9982ded-021a-4251-9e03-2c58b130410f",
+                    failedAction = BrokerAction.Navigate(
+                        id = "fail82ded-021a-4251-9e03-2c58b130410f",
+                        url = "https://example.com/fail",
+                    ),
+                    stage = OTHER,
+                    emailPattern = "ep15",
                 )
+            whenever(mockRepository.getBrokerForName(testBrokerName)).thenReturn(testBroker)
+            whenever(mockJobRecordUpdater.updateOptOutError(any())).thenReturn(
+                OptOutJobRecord(
+                    extractedProfileId = 789L,
+                    brokerName = testBrokerName,
+                    userProfileId = 123L,
+                    status = OptOutJobStatus.ERROR,
+                    attemptCount = 2,
+                    lastOptOutAttemptDateInMillis = 1000L,
+                    optOutRequestedDateInMillis = 2000L,
+                    optOutRemovedDateInMillis = 0L,
+                ),
+            )
 
             testee.handleState(state)
 
@@ -496,10 +538,17 @@ class RealPirRunStateHandlerTest {
                 endTimeInMillis = testEventTimeInMillis,
                 isSubmitSuccess = false,
             )
-            verify(mockPixelSender).reportOptOutCompleted(
-                brokerName = testBrokerName,
-                totalTimeInMillis = testEventTimeInMillis - testStartTimeInMillis,
-                isSuccess = false,
+            verify(mockPixelSender).reportOptOutFailed(
+                brokerUrl = testBroker.url,
+                parent = "",
+                brokerJsonVersion = testBroker.version,
+                attemptId = "c9982ded-021a-4251-9e03-2c58b130410f",
+                durationMs = testEventTimeInMillis - testStartTimeInMillis,
+                stage = state.stage,
+                tries = 2,
+                emailPattern = state.emailPattern,
+                actionId = state.failedAction.id,
+                actionType = state.failedAction.asActionType(),
             )
         }
 
