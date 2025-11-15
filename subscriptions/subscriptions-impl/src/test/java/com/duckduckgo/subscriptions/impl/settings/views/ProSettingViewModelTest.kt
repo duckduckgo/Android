@@ -81,6 +81,7 @@ class ProSettingViewModelTest {
         whenever(subscriptionsManager.subscriptionStatus).thenReturn(flowOf(SubscriptionStatus.EXPIRED))
         whenever(subscriptionsManager.getSubscriptionOffer()).thenReturn(emptyList())
         whenever(subscriptionsManager.isFreeTrialEligible()).thenReturn(false)
+        whenever(subscriptionsManager.blackFridayOfferAvailable()).thenReturn(false)
 
         viewModel.onCreate(mock())
         viewModel.viewState.test {
@@ -104,6 +105,7 @@ class ProSettingViewModelTest {
         whenever(subscriptionsManager.subscriptionStatus).thenReturn(flowOf(SubscriptionStatus.INACTIVE))
         whenever(subscriptionsManager.getSubscriptionOffer()).thenReturn(emptyList())
         whenever(subscriptionsManager.isFreeTrialEligible()).thenReturn(true)
+        whenever(subscriptionsManager.blackFridayOfferAvailable()).thenReturn(false)
 
         viewModel.onCreate(mock())
         viewModel.viewState.test {
@@ -118,6 +120,7 @@ class ProSettingViewModelTest {
         whenever(subscriptionsManager.subscriptionStatus).thenReturn(flowOf(SubscriptionStatus.AUTO_RENEWABLE))
         whenever(subscriptionsManager.getSubscriptionOffer()).thenReturn(listOf(subscriptionOffer.copy(features = setOf(Product.DuckAiPlus.value))))
         whenever(subscriptionsManager.isFreeTrialEligible()).thenReturn(true)
+        whenever(subscriptionsManager.blackFridayOfferAvailable()).thenReturn(false)
 
         viewModel.onCreate(mock())
         viewModel.viewState.test {
@@ -132,6 +135,7 @@ class ProSettingViewModelTest {
         whenever(subscriptionsManager.subscriptionStatus).thenReturn(flowOf(SubscriptionStatus.AUTO_RENEWABLE))
         whenever(subscriptionsManager.getSubscriptionOffer()).thenReturn(listOf(subscriptionOffer.copy(features = setOf(Product.NetP.value))))
         whenever(subscriptionsManager.isFreeTrialEligible()).thenReturn(true)
+        whenever(subscriptionsManager.blackFridayOfferAvailable()).thenReturn(false)
 
         viewModel.onCreate(mock())
         viewModel.viewState.test {
@@ -146,10 +150,39 @@ class ProSettingViewModelTest {
         whenever(subscriptionsManager.subscriptionStatus).thenReturn(flowOf(SubscriptionStatus.AUTO_RENEWABLE))
         whenever(subscriptionsManager.getSubscriptionOffer()).thenReturn(listOf(subscriptionOffer.copy(features = setOf(Product.DuckAiPlus.value))))
         whenever(subscriptionsManager.isFreeTrialEligible()).thenReturn(true)
+        whenever(subscriptionsManager.blackFridayOfferAvailable()).thenReturn(false)
 
         viewModel.onCreate(mock())
         viewModel.viewState.test {
             assertFalse(awaitItem().duckAiPlusAvailable)
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenBlackFridayOfferAvailableThenViewStateBlackFridayOfferAvailableTrue() = runTest {
+        whenever(subscriptionsManager.subscriptionStatus).thenReturn(flowOf(SubscriptionStatus.INACTIVE))
+        whenever(subscriptionsManager.getSubscriptionOffer()).thenReturn(emptyList())
+        whenever(subscriptionsManager.isFreeTrialEligible()).thenReturn(false)
+        whenever(subscriptionsManager.blackFridayOfferAvailable()).thenReturn(true)
+
+        viewModel.onCreate(mock())
+        viewModel.viewState.test {
+            assertTrue(awaitItem().blackFridayOfferAvailable)
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenBlackFridayOfferNotAvailableThenViewStateBlackFridayOfferAvailableFalse() = runTest {
+        whenever(subscriptionsManager.subscriptionStatus).thenReturn(flowOf(SubscriptionStatus.INACTIVE))
+        whenever(subscriptionsManager.getSubscriptionOffer()).thenReturn(emptyList())
+        whenever(subscriptionsManager.isFreeTrialEligible()).thenReturn(false)
+        whenever(subscriptionsManager.blackFridayOfferAvailable()).thenReturn(false)
+
+        viewModel.onCreate(mock())
+        viewModel.viewState.test {
+            assertFalse(awaitItem().blackFridayOfferAvailable)
             cancelAndConsumeRemainingEvents()
         }
     }
