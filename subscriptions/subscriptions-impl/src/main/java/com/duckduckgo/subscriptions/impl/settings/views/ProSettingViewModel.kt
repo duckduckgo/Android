@@ -73,6 +73,7 @@ class ProSettingViewModel @Inject constructor(
         val region: SubscriptionRegion? = null,
         val duckAiPlusAvailable: Boolean = false,
         val freeTrialEligible: Boolean = false,
+        val blackFridayOfferAvailable: Boolean = false,
     ) {
         enum class SubscriptionRegion { US, ROW }
     }
@@ -118,6 +119,7 @@ class ProSettingViewModel @Inject constructor(
                             region = region,
                             duckAiPlusAvailable = duckAiAvailable,
                             freeTrialEligible = subscriptionsManager.isFreeTrialEligible(),
+                            blackFridayOfferAvailable = subscriptionsManager.blackFridayOfferAvailable(),
                         ),
                     )
                 }

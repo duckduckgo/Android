@@ -268,6 +268,11 @@ interface SubscriptionsManager {
      * @return [SwitchPlanPricingInfo] containing current price, target price, and yearly monthly equivalent, or null if unavailable
      */
     suspend fun getSwitchPlanPricing(isUpgrade: Boolean): SwitchPlanPricingInfo?
+
+    /**
+     * @return `true` if the Black Friday offer is available, `false` otherwise
+     */
+    suspend fun blackFridayOfferAvailable(): Boolean
 }
 
 @SingleInstanceIn(AppScope::class)
@@ -407,6 +412,10 @@ class RealSubscriptionsManager @Inject constructor(
         val isSwitchFeatureEnabled = privacyProFeature.get().supportsSwitchSubscription().isEnabled()
 
         return@withContext hasActiveSubscription && !isOnFreeTrial && isSwitchFeatureEnabled
+    }
+
+    override suspend fun blackFridayOfferAvailable(): Boolean = withContext(dispatcherProvider.io()) {
+        return@withContext privacyProFeature.get().blackFridayOffer2025().isEnabled()
     }
 
     override suspend fun getSwitchPlanPricing(isUpgrade: Boolean): SwitchPlanPricingInfo? = withContext(dispatcherProvider.io()) {
