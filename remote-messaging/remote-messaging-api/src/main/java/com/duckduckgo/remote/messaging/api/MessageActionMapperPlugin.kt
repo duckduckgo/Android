@@ -29,6 +29,7 @@ data class JsonMessageAction(
 @Suppress("ktlint:standard:class-naming")
 sealed class JsonActionType(val jsonValue: String) {
     data object URL : JsonActionType("url")
+    data object URL_IN_CONTEXT : JsonActionType("url_in_context")
     data object PLAYSTORE : JsonActionType("playstore")
     data object DEFAULT_BROWSER : JsonActionType("defaultBrowser")
     data object DISMISS : JsonActionType("dismiss")
@@ -37,3 +38,12 @@ sealed class JsonActionType(val jsonValue: String) {
     data object NAVIGATION : JsonActionType("navigation")
     data object SURVEY : JsonActionType("survey")
 }
+
+data class JsonListItem(
+    val id: String,
+    val type: String,
+    val titleText: String,
+    val descriptionText: String,
+    val placeholder: String = "",
+    val primaryAction: JsonMessageAction?,
+)

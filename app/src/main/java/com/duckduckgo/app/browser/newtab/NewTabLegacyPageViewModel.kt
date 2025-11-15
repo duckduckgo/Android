@@ -98,6 +98,7 @@ class NewTabLegacyPageViewModel @AssistedInject constructor(
         data object DismissMessage : Command()
         data class LaunchPlayStore(val appPackage: String) : Command()
         data class SubmitUrl(val url: String) : Command()
+        data class SubmitUrlInContext(val url: String) : Command()
         data object LaunchDefaultBrowser : Command()
         data object LaunchAppTPOnboarding : Command()
         data class SharePromoLinkRMF(

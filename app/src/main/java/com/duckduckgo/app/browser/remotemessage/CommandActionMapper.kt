@@ -16,8 +16,6 @@
 
 package com.duckduckgo.app.browser.remotemessage
 
-import com.duckduckgo.app.browser.commands.Command
-import com.duckduckgo.app.browser.commands.Command.*
 import com.duckduckgo.app.browser.newtab.NewTabLegacyPageViewModel
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.remote.messaging.api.Action
@@ -39,6 +37,7 @@ class RealCommandActionMapper @Inject constructor(
             is Dismiss -> NewTabLegacyPageViewModel.Command.DismissMessage
             is PlayStore -> NewTabLegacyPageViewModel.Command.LaunchPlayStore(action.value)
             is Url -> NewTabLegacyPageViewModel.Command.SubmitUrl(action.value)
+            is UrlInContext -> NewTabLegacyPageViewModel.Command.SubmitUrlInContext(action.value)
             is DefaultBrowser -> NewTabLegacyPageViewModel.Command.LaunchDefaultBrowser
             is AppTpOnboarding -> NewTabLegacyPageViewModel.Command.LaunchAppTPOnboarding
             is Share -> NewTabLegacyPageViewModel.Command.SharePromoLinkRMF(action.value, action.title)

@@ -41,6 +41,7 @@ import com.duckduckgo.app.browser.newtab.NewTabLegacyPageViewModel.Command.Launc
 import com.duckduckgo.app.browser.newtab.NewTabLegacyPageViewModel.Command.LaunchScreen
 import com.duckduckgo.app.browser.newtab.NewTabLegacyPageViewModel.Command.SharePromoLinkRMF
 import com.duckduckgo.app.browser.newtab.NewTabLegacyPageViewModel.Command.SubmitUrl
+import com.duckduckgo.app.browser.newtab.NewTabLegacyPageViewModel.Command.SubmitUrlInContext
 import com.duckduckgo.app.browser.newtab.NewTabLegacyPageViewModel.NewTabLegacyPageViewModelFactory
 import com.duckduckgo.app.browser.newtab.NewTabLegacyPageViewModel.NewTabLegacyPageViewModelProviderFactory
 import com.duckduckgo.app.browser.newtab.NewTabLegacyPageViewModel.ViewState
@@ -169,6 +170,7 @@ class NewTabLegacyPageView @JvmOverloads constructor(
             is LaunchScreen -> launchScreen(command.screen, command.payload)
             is SharePromoLinkRMF -> launchSharePromoRMFPageChooser(command.url, command.shareTitle)
             is SubmitUrl -> submitUrl(command.url)
+            is SubmitUrlInContext -> submitUrlInContext(command.url)
         }
     }
 
@@ -215,6 +217,10 @@ class NewTabLegacyPageView @JvmOverloads constructor(
 
     private fun submitUrl(url: String) {
         context.startActivity(browserNav.openInCurrentTab(context, url))
+    }
+
+    private fun submitUrlInContext(url: String) {
+        // TODO: ANA open a webview activity here
     }
 
     private fun showRemoteMessage(

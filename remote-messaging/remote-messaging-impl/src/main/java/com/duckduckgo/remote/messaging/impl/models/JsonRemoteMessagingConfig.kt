@@ -16,6 +16,7 @@
 
 package com.duckduckgo.remote.messaging.impl.models
 
+import com.duckduckgo.remote.messaging.api.JsonListItem
 import com.duckduckgo.remote.messaging.api.JsonMatchingAttribute
 import com.duckduckgo.remote.messaging.api.JsonMessageAction
 
@@ -44,6 +45,7 @@ data class JsonContent(
     val secondaryAction: JsonMessageAction? = null,
     val actionText: String = "",
     val action: JsonMessageAction? = null,
+    val listItems: List<JsonListItem>? = null,
 )
 
 data class JsonContentTranslations(
@@ -72,4 +74,5 @@ sealed class JsonMessageType(val jsonValue: String) {
     data object BIG_SINGLE_ACTION : JsonMessageType("big_single_action")
     data object BIG_TWO_ACTION : JsonMessageType("big_two_action")
     data object PROMO_SINGLE_ACTION : JsonMessageType("promo_single_action")
+    data object CARDS_LIST : JsonMessageType("cards_list")
 }

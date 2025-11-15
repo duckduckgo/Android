@@ -21,6 +21,7 @@ import com.duckduckgo.common.ui.view.MessageCta.MessageType
 import com.duckduckgo.mobile.android.R
 import com.duckduckgo.remote.messaging.api.Content.BigSingleAction
 import com.duckduckgo.remote.messaging.api.Content.BigTwoActions
+import com.duckduckgo.remote.messaging.api.Content.CardsList
 import com.duckduckgo.remote.messaging.api.Content.Medium
 import com.duckduckgo.remote.messaging.api.Content.Placeholder
 import com.duckduckgo.remote.messaging.api.Content.Placeholder.ANNOUNCE
@@ -29,8 +30,11 @@ import com.duckduckgo.remote.messaging.api.Content.Placeholder.CRITICAL_UPDATE
 import com.duckduckgo.remote.messaging.api.Content.Placeholder.DDG_ANNOUNCE
 import com.duckduckgo.remote.messaging.api.Content.Placeholder.DUCK_AI
 import com.duckduckgo.remote.messaging.api.Content.Placeholder.DUCK_AI_OLD
+import com.duckduckgo.remote.messaging.api.Content.Placeholder.IMAGE_AI
+import com.duckduckgo.remote.messaging.api.Content.Placeholder.KEY_IMPORT
 import com.duckduckgo.remote.messaging.api.Content.Placeholder.MAC_AND_WINDOWS
 import com.duckduckgo.remote.messaging.api.Content.Placeholder.PRIVACY_SHIELD
+import com.duckduckgo.remote.messaging.api.Content.Placeholder.RADAR
 import com.duckduckgo.remote.messaging.api.Content.Placeholder.VISUAL_DESIGN_UPDATE
 import com.duckduckgo.remote.messaging.api.Content.PromoSingleAction
 import com.duckduckgo.remote.messaging.api.Content.Small
@@ -71,6 +75,12 @@ fun RemoteMessage.asMessage(isLightModeEnabled: Boolean): Message {
             promoAction = content.actionText,
             messageType = MessageType.REMOTE_PROMO_MESSAGE,
         )
+        is CardsList -> Message(
+            title = content.titleText,
+            subtitle = content.descriptionText,
+            action = content.primaryActionText,
+            messageType = MessageType.REMOTE_WHATS_NEW_MESSAGE,
+        )
     }
 }
 
@@ -89,5 +99,8 @@ private fun Placeholder.drawable(isLightModeEnabled: Boolean): Int {
         } else {
             R.drawable.ic_visual_design_update_artwork_dark
         }
+        IMAGE_AI -> R.drawable.ic_image_ai
+        RADAR -> R.drawable.ic_radar
+        KEY_IMPORT -> R.drawable.ic_key_import
     }
 }
