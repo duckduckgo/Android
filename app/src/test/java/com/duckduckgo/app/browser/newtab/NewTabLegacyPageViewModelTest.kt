@@ -101,7 +101,7 @@ class NewTabLegacyPageViewModelTest {
 
     @Test
     fun whenViewModelIsInitializedThenViewStateShouldEmitInitialState() = runTest {
-        val remoteMessage = RemoteMessage("id1", Content.Small("", ""), emptyList(), emptyList())
+        val remoteMessage = RemoteMessage("id1", Content.Small("", ""), emptyList(), emptyList(), emptyList())
         whenever(mockRemoteMessageModel.getActiveMessages()).thenReturn(flowOf(remoteMessage))
         whenever(mockDismissedCtaDao.exists(DAX_END)).thenReturn(false)
 
@@ -119,7 +119,7 @@ class NewTabLegacyPageViewModelTest {
 
     @Test
     fun whenRemoteMessageAvailableAndOnboardingNotCompleteThenMessageNotShown() = runTest {
-        val remoteMessage = RemoteMessage("id1", Content.Small("", ""), emptyList(), emptyList())
+        val remoteMessage = RemoteMessage("id1", Content.Small("", ""), emptyList(), emptyList(), emptyList())
         whenever(mockRemoteMessageModel.getActiveMessages()).thenReturn(flowOf(remoteMessage))
         whenever(mockDismissedCtaDao.exists(DAX_END)).thenReturn(false)
 
@@ -137,7 +137,7 @@ class NewTabLegacyPageViewModelTest {
 
     @Test
     fun whenRemoteMessageAvailableAndOnboardingCompleteThenMessageShown() = runTest {
-        val remoteMessage = RemoteMessage("id1", Content.Small("", ""), emptyList(), emptyList())
+        val remoteMessage = RemoteMessage("id1", Content.Small("", ""), emptyList(), emptyList(), emptyList())
         whenever(mockRemoteMessageModel.getActiveMessages()).thenReturn(flowOf(remoteMessage))
         whenever(mockDismissedCtaDao.exists(DAX_END)).thenReturn(true)
 
@@ -155,7 +155,7 @@ class NewTabLegacyPageViewModelTest {
 
     @Test
     fun whenRemoteMessageShownThenFirePixelAndMarkAsShown() = runTest {
-        val remoteMessage = RemoteMessage("id1", Content.Small("", ""), emptyList(), emptyList())
+        val remoteMessage = RemoteMessage("id1", Content.Small("", ""), emptyList(), emptyList(), emptyList())
         whenever(mockRemoteMessageModel.getActiveMessages()).thenReturn(flowOf(remoteMessage))
 
         testee.onStart(mockLifecycleOwner)
@@ -167,7 +167,7 @@ class NewTabLegacyPageViewModelTest {
 
     @Test
     fun whenRemoteMessageCloseButtonClickedThenFirePixelAndDismiss() = runTest {
-        val remoteMessage = RemoteMessage("id1", Content.Small("", ""), emptyList(), emptyList())
+        val remoteMessage = RemoteMessage("id1", Content.Small("", ""), emptyList(), emptyList(), emptyList())
         whenever(mockRemoteMessageModel.getActiveMessages()).thenReturn(flowOf(remoteMessage))
 
         testee.onStart(mockLifecycleOwner)
@@ -179,7 +179,7 @@ class NewTabLegacyPageViewModelTest {
 
     @Test
     fun whenRemoteMessagePrimaryButtonClickedThenFirePixelAndDismiss() = runTest {
-        val remoteMessage = RemoteMessage("id1", Content.Small("", ""), emptyList(), emptyList())
+        val remoteMessage = RemoteMessage("id1", Content.Small("", ""), emptyList(), emptyList(), emptyList())
         whenever(mockRemoteMessageModel.getActiveMessages()).thenReturn(flowOf(remoteMessage))
 
         val action = Action.Dismiss
@@ -199,7 +199,7 @@ class NewTabLegacyPageViewModelTest {
 
     @Test
     fun whenRemoteMessageSecondaryButtonClickedThenFirePixelAndDismiss() = runTest {
-        val remoteMessage = RemoteMessage("id1", Content.Small("", ""), emptyList(), emptyList())
+        val remoteMessage = RemoteMessage("id1", Content.Small("", ""), emptyList(), emptyList(), emptyList())
         whenever(mockRemoteMessageModel.getActiveMessages()).thenReturn(flowOf(remoteMessage))
 
         val action = Action.Dismiss
@@ -219,7 +219,7 @@ class NewTabLegacyPageViewModelTest {
 
     @Test
     fun whenRemoteMessageActionButtonClickedThenFirePixelAndDismiss() = runTest {
-        val remoteMessage = RemoteMessage("id1", Content.Small("", ""), emptyList(), emptyList())
+        val remoteMessage = RemoteMessage("id1", Content.Small("", ""), emptyList(), emptyList(), emptyList())
         whenever(mockRemoteMessageModel.getActiveMessages()).thenReturn(flowOf(remoteMessage))
 
         val action = Action.Dismiss
@@ -252,7 +252,7 @@ class NewTabLegacyPageViewModelTest {
 
     @Test
     fun whenRemoteMessageAvailableAndLowPriorityMessageAvailableThenLowPriorityMessageIsNull() = runTest {
-        val remoteMessage = RemoteMessage("id1", Content.Small("", ""), emptyList(), emptyList())
+        val remoteMessage = RemoteMessage("id1", Content.Small("", ""), emptyList(), emptyList(), emptyList())
         val lowPriorityMessage = LowPriorityMessage.DefaultBrowserMessage(
             message = MessageCta.Message(
                 topIllustration = R.drawable.ic_device_mobile_default,
@@ -372,7 +372,7 @@ class NewTabLegacyPageViewModelTest {
 
     @Test
     fun `when onboarding complete and RMF available, then hide logo`() = runTest {
-        val remoteMessage = RemoteMessage("id1", Content.Small("", ""), emptyList(), emptyList())
+        val remoteMessage = RemoteMessage("id1", Content.Small("", ""), emptyList(), emptyList(), emptyList())
         whenever(mockRemoteMessageModel.getActiveMessages()).thenReturn(flowOf(remoteMessage))
         whenever(mockDismissedCtaDao.exists(DAX_END)).thenReturn(true)
 
