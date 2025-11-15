@@ -28,6 +28,7 @@ ext {
 }
 
 android {
+    ndkVersion "21.4.7075529"
     namespace 'com.duckduckgo.sync.impl'
 }
 
@@ -107,6 +108,7 @@ dependencies {
 }
 
 android {
+    ndkVersion "21.4.7075529"
     anvil {
         generateDaggerFactories = true // default is false
     }

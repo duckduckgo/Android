@@ -27,5 +27,6 @@ dependencies {
 }
 
 android {
+    ndkVersion "21.4.7075529"
     namespace 'com.duckduckgo.request.filterer.api'
 }

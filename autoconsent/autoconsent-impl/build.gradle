@@ -24,6 +24,7 @@ plugins {
 apply from: "$rootProject.projectDir/gradle/android-library.gradle"
 
 android {
+    ndkVersion "21.4.7075529"
     namespace 'com.duckduckgo.autoconsent.impl'
     lintOptions {
         baseline file("lint-baseline.xml")
@@ -94,6 +95,7 @@ dependencies {
 }
 
 android {
+    ndkVersion "21.4.7075529"
     sourceSets {
         main {
             java {

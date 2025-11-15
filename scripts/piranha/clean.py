@@ -1,7 +1,6 @@
 import os
 import argparse
 import logging
-from os.path import join, dirname
 from polyglot_piranha import execute_piranha, PiranhaArguments
 
 # Set up logging

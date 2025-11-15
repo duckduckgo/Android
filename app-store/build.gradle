@@ -33,6 +33,7 @@ dependencies {
     coreLibraryDesugaring Android.tools.desugarJdkLibs
 }
 android {
+    ndkVersion "21.4.7075529"
   namespace 'com.duckduckgo.app'
     compileOptions {
         coreLibraryDesugaringEnabled = true

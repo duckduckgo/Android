@@ -99,6 +99,7 @@ ext {
 }
 
 android {
+    ndkVersion "21.4.7075529"
     namespace 'com.duckduckgo.networkprotection.impl'
     anvil {
         generateDaggerFactories = true // default is false

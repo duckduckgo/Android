@@ -23,6 +23,7 @@ plugins {
 apply from: "$rootProject.projectDir/gradle/android-library.gradle"
 
 android {
+    ndkVersion "21.4.7075529"
     namespace 'com.duckduckgo.webcompat.store'
 }
 

@@ -64,6 +64,7 @@ dependencies {
 }
 
 android {
+    ndkVersion "21.4.7075529"
     namespace "com.duckduckgo.remotemessaging.internal"
     anvil {
         generateDaggerFactories = true // default is false

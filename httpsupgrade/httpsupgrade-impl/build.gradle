@@ -60,21 +60,32 @@ dependencies {
 }
 
 android {
-    ndkVersion '21.4.7075529'
     namespace 'com.duckduckgo.httpsupgrade.impl'
+    ndkVersion '21.4.7075529'
+
+    compileSdkVersion rootProject.ext.compile_sdk
+
+    defaultConfig {
+        minSdkVersion rootProject.ext.min_sdk
+        targetSdkVersion rootProject.ext.target_sdk
+    }
+
     anvil {
         generateDaggerFactories = true // default is false
     }
+
     externalNativeBuild {
         cmake {
             path "CMakeLists.txt"
         }
     }
+
     testOptions {
         unitTests {
             includeAndroidResources = true
         }
     }
+
     compileOptions {
         coreLibraryDesugaringEnabled = true
     }
