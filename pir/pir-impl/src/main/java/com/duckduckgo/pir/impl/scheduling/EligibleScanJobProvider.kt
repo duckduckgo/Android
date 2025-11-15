@@ -71,7 +71,24 @@ class RealEligibleScanJobProvider @Inject constructor(
         }.sortedBy {
             it.attemptCount
         }.mapNotNull {
-            pirSchedulingRepository.getValidScanJobRecord(it.brokerName, it.userProfileId)
+            val schedulingConfig =
+                schedulingConfigs.find { config -> config.brokerName == it.brokerName }!!
+
+            val expectedScanDate = when (it.status) {
+                OptOutJobStatus.REQUESTED -> it.getRequestConfirmationScanDate(schedulingConfig)
+                OptOutJobStatus.REMOVED -> it.getRemovedMaintenanceScanDate(schedulingConfig)
+                else -> return@mapNotNull null
+            }
+            val scanJobRecord = pirSchedulingRepository.getValidScanJobRecord(it.brokerName, it.userProfileId)
+
+            // If the last scan happened more recently that the expected scan date from opt outs, it means we have already performed the
+            // maintenance scan / confirmation scan needed for this opt-out.
+            // More info on https://app.asana.com/1/137249556945/project/488551667048375/task/1211207086563708?focus=true
+            return@mapNotNull if (scanJobRecord != null && scanJobRecord.lastScanDateInMillis <= expectedScanDate) {
+                scanJobRecord
+            } else {
+                null
+            }
         }
     }
 
@@ -79,8 +96,13 @@ class RealEligibleScanJobProvider @Inject constructor(
         schedulingConfig: BrokerSchedulingConfig,
         timeInMillis: Long,
     ): Boolean {
-        return this.status == OptOutJobStatus.REQUESTED &&
-            (this.optOutRequestedDateInMillis + schedulingConfig.confirmOptOutScanInMillis) <= timeInMillis
+        return this.status == OptOutJobStatus.REQUESTED && this.getRequestConfirmationScanDate(schedulingConfig) <= timeInMillis
+    }
+
+    private fun OptOutJobRecord.getRequestConfirmationScanDate(
+        schedulingConfig: BrokerSchedulingConfig,
+    ): Long {
+        return this.optOutRequestedDateInMillis + schedulingConfig.confirmOptOutScanInMillis
     }
 
     private fun OptOutJobRecord.isRemovedAndShouldBeMaintainedNow(
@@ -90,7 +112,13 @@ class RealEligibleScanJobProvider @Inject constructor(
         return this.status == OptOutJobStatus.REMOVED &&
             // do not pick-up deprecated opt-out jobs for maintenance scans as they belong to invalid/removed profiles
             !this.deprecated &&
-            (this.optOutRemovedDateInMillis + schedulingConfig.maintenanceScanInMillis) <= timeInMillis
+            this.getRemovedMaintenanceScanDate(schedulingConfig) <= timeInMillis
+    }
+
+    private fun OptOutJobRecord.getRemovedMaintenanceScanDate(
+        schedulingConfig: BrokerSchedulingConfig,
+    ): Long {
+        return this.optOutRemovedDateInMillis + schedulingConfig.maintenanceScanInMillis
     }
 
     private suspend fun getValidScanJobsFromScanJobRecords(

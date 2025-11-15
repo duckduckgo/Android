@@ -30,6 +30,7 @@ import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 import java.util.concurrent.TimeUnit
@@ -208,7 +209,7 @@ class RealEligibleScanJobProviderTest {
 
     @Test
     fun whenGetAllEligibleScanJobsWithOptOutRequestedAndDueForConfirmThenReturnScanRecord() = runTest {
-        val expectedScanRecord = scanJobRecordNotExecuted
+        val expectedScanRecord = scanJobRecordMatchFound
         whenever(mockPirRepository.getAllBrokerSchedulingConfigs()).thenReturn(listOf(brokerSchedulingConfig))
         whenever(mockPirSchedulingRepository.getAllValidOptOutJobRecords()).thenReturn(listOf(optOutJobRecordRequested))
         whenever(mockPirSchedulingRepository.getAllValidScanJobRecords()).thenReturn(emptyList())
@@ -404,9 +405,19 @@ class RealEligibleScanJobProviderTest {
         )
 
         // Create corresponding scan records for opt-out records
-        val scanFromOptOut1 = scanJobRecordNotExecuted.copy(userProfileId = 1001L)
-        val scanFromOptOut2 = scanJobRecordNotExecuted.copy(userProfileId = 1002L)
-        val scanFromOptOut3 = scanJobRecordNotExecuted.copy(userProfileId = 1003L)
+        val scanFromOptOut1 = scanJobRecordNotExecuted.copy(
+            userProfileId = 1001L,
+            lastScanDateInMillis = currentTimeMillis - TimeUnit.HOURS.toMillis(25),
+        )
+        val scanFromOptOut2 = scanJobRecordNotExecuted.copy(
+            userProfileId = 1002L,
+            lastScanDateInMillis = currentTimeMillis - TimeUnit.HOURS.toMillis(25),
+        )
+        val scanFromOptOut3 = scanJobRecordNotExecuted.copy(
+            userProfileId = 1003L,
+
+            lastScanDateInMillis = currentTimeMillis - TimeUnit.HOURS.toMillis(25),
+        )
 
         // Add a duplicate scan record that should be deduplicated
         val duplicateScanRecord = scanFromOptOut3.copy() // Same as scanRecord1
@@ -542,7 +553,7 @@ class RealEligibleScanJobProviderTest {
         // Deprecated flag only affects REMOVED opt-out records for maintenance scans,
         // REQUESTED opt-out records should still trigger confirmation scans
         val deprecatedOptOutRequested = optOutJobRecordRequested.copy(deprecated = true)
-        val expectedScanRecord = scanJobRecordNotExecuted
+        val expectedScanRecord = scanJobRecordMatchFound
 
         whenever(mockPirRepository.getAllBrokerSchedulingConfigs()).thenReturn(listOf(brokerSchedulingConfig))
         whenever(mockPirSchedulingRepository.getAllValidOptOutJobRecords()).thenReturn(listOf(deprecatedOptOutRequested))
@@ -602,8 +613,11 @@ class RealEligibleScanJobProviderTest {
         )
 
         val scanForDeprecatedRemoved = scanJobRecordNotExecuted.copy(userProfileId = 2001L)
-        val scanForNonDeprecatedRemoved = scanJobRecordNotExecuted.copy(userProfileId = 2002L)
-        val scanForRequested = scanJobRecordNotExecuted.copy(userProfileId = 3001L)
+        val scanForNonDeprecatedRemoved = scanJobRecordNotExecuted.copy(
+            userProfileId = 2002L,
+            lastScanDateInMillis = currentTimeMillis - DAYS.toMillis(1),
+        )
+        val scanForRequested = scanJobRecordNotExecuted.copy(userProfileId = 3001L, lastScanDateInMillis = currentTimeMillis - DAYS.toMillis(1))
 
         whenever(mockPirRepository.getAllBrokerSchedulingConfigs()).thenReturn(listOf(brokerSchedulingConfig))
         whenever(mockPirSchedulingRepository.getAllValidOptOutJobRecords()).thenReturn(
@@ -631,5 +645,55 @@ class RealEligibleScanJobProviderTest {
         assertTrue(result.any { it.userProfileId == 3001L }) // scanForRequested
         assertTrue(result.none { it.userProfileId == 1001L }) // deprecated scan record filtered
         assertTrue(result.none { it.userProfileId == 2001L }) // deprecated removed opt-out filtered
+    }
+
+    @Test
+    fun whenOptOutJobRecordIsRequestedButAlreadyScannedThenRecordIsNotEligible() = runTest {
+        // Confirmation scan should have happened 6 hours ago confirmation scan after 24 hours)
+        val requestedJobRecord = optOutJobRecordRequested.copy(
+            userProfileId = 125L,
+            optOutRequestedDateInMillis = currentTimeMillis - HOURS.toMillis(30),
+        )
+
+        // Scan just happened an hour ago
+        val scanJobRecord = scanJobRecordMatchFound.copy(
+            lastScanDateInMillis = currentTimeMillis - HOURS.toMillis(1),
+        )
+        whenever(mockPirRepository.getAllBrokerSchedulingConfigs()).thenReturn(listOf(brokerSchedulingConfig))
+        whenever(mockPirSchedulingRepository.getAllValidOptOutJobRecords()).thenReturn(listOf(requestedJobRecord))
+        whenever(mockPirSchedulingRepository.getValidScanJobRecord("test-broker", 2001L)).thenReturn(scanJobRecord)
+        whenever(mockPirSchedulingRepository.getAllValidScanJobRecords()).thenReturn(
+            listOf(scanJobRecord),
+        )
+
+        val result = testee.getAllEligibleScanJobs(currentTimeMillis)
+
+        // Opt-out not eligible as a scan already happened for the confirmation
+        assertTrue(result.isEmpty())
+    }
+
+    @Test
+    fun whenOptOutJobRecordIsRemovedButAlreadyScannedThenRecordIsNotEligible() = runTest {
+        // Maintenance scan should have happened 3 days ago. Maintenance scan after 7 days of removal)
+        val requestedJobRecord = optOutJobRecordRemoved.copy(
+            userProfileId = 125L,
+            optOutRemovedDateInMillis = currentTimeMillis - DAYS.toMillis(10),
+        )
+
+        // Scan just happened an hour ago
+        val scanJobRecord = scanJobRecordMatchFound.copy(
+            lastScanDateInMillis = currentTimeMillis - HOURS.toMillis(1),
+        )
+        whenever(mockPirRepository.getAllBrokerSchedulingConfigs()).thenReturn(listOf(brokerSchedulingConfig))
+        whenever(mockPirSchedulingRepository.getAllValidOptOutJobRecords()).thenReturn(listOf(requestedJobRecord))
+        whenever(mockPirSchedulingRepository.getValidScanJobRecord("test-broker", 2001L)).thenReturn(scanJobRecord)
+        whenever(mockPirSchedulingRepository.getAllValidScanJobRecords()).thenReturn(
+            listOf(scanJobRecord),
+        )
+
+        val result = testee.getAllEligibleScanJobs(currentTimeMillis)
+
+        // Opt-out not eligible as a scan already happened for the confirmation
+        assertTrue(result.isEmpty())
     }
 }
