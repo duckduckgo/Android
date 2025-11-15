@@ -201,5 +201,4 @@ class AuthTokenRefreshWideEventImpl @Inject constructor(
     }
 }
 
-private fun Exception.toErrorString(): String =
-    listOfNotNull(javaClass.simpleName, message).joinToString(": ")
+private fun Exception.toErrorString(): String = javaClass.simpleName
