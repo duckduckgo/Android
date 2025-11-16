@@ -764,7 +764,7 @@
 
     <!-- Custom Tab -->
     <string name="openInDdgMenuItemTitle">In DuckDuckGo öffnen</string>
-    <string name="runningInDdgMenuItemTitle">Laufen in DuckDuckGo</string>
+    <string name="runningInDdgMenuItemTitle">Läuft in DuckDuckGo</string>
 
     <!-- SSL Error -->
     <string name="sslErrorTitle">Warnung: Diese Website ist möglicherweise unsicher</string>
