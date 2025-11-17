@@ -48,6 +48,9 @@
     <string name="duck_ai_shortcut_settings_title">Zkratky Duck.ai</string>
     <string name="duck_ai_shortcut_settings_description">Vyber, které zkratky Duck.ai se mají zobrazit</string>
 
+    <!-- Duck AI Voice Search Shortcut Setting -->
+    <string name="duckAiVoiceSearchVisibilitySetting">Hlasové vyhledávání</string>
+
     <!-- Input Screen  -->
     <string name="input_screen_search_hint">Vyhledejte nebo zadejte adresu</string>
     <string name="input_screen_chat_hint">Zeptej se soukromě</string>

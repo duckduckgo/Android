@@ -48,6 +48,9 @@
     <string name="duck_ai_shortcut_settings_title">Συντομεύσεις Duck.ai</string>
     <string name="duck_ai_shortcut_settings_description">Επιλέξτε ποιες συντομεύσεις του Duck.ai θα εμφανίζονται</string>
 
+    <!-- Duck AI Voice Search Shortcut Setting -->
+    <string name="duckAiVoiceSearchVisibilitySetting">Φωνητική αναζήτηση</string>
+
     <!-- Input Screen  -->
     <string name="input_screen_search_hint">Αναζήτηση ή εισαγωγή διεύθυνσης</string>
     <string name="input_screen_chat_hint">Ρωτήστε ιδιωτικά</string>
