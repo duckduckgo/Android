@@ -26,5 +26,5 @@ tags:
       - tapOn: "Cancel"
       - assertNotVisible: ".*browsing activity with the Fire Button.*"
       - runFlow: ../shared/browser_screen/click_on_fire_button.yaml
-      - tapOn: "Clear All Tabs And Data"
+      - tapOn: "Clear Tabs and Data"
       - assertVisible: "You've got this!.*"
