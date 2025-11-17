@@ -48,7 +48,7 @@ class EmailReceivedEventHandler @Inject constructor() : EventHandler {
         val currentBrokerStep = state.brokerStepsToExecute[state.currentBrokerStepIndex] as OptOutStep
 
         val updatedProfileWithEmail = currentBrokerStep.profileToOptOut.copy(
-            email = (event as EmailReceived).email,
+            email = (event as EmailReceived).generatedEmailData.emailAddress,
         )
 
         val updatedBrokerSteps = state.brokerStepsToExecute.toMutableList().apply {
@@ -60,6 +60,7 @@ class EmailReceivedEventHandler @Inject constructor() : EventHandler {
         return Next(
             nextState = state.copy(
                 brokerStepsToExecute = updatedBrokerSteps,
+                generatedEmailData = event.generatedEmailData,
             ),
             nextEvent = ExecuteBrokerStepAction(
                 actionRequestData = UserProfile(

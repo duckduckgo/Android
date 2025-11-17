@@ -25,6 +25,7 @@ import com.duckduckgo.pir.impl.scripts.models.PirError
 import com.duckduckgo.pir.impl.scripts.models.PirScriptRequestData
 import com.duckduckgo.pir.impl.scripts.models.PirSuccessResponse
 import com.duckduckgo.pir.impl.scripts.models.PirSuccessResponse.GetCaptchaInfoResponse.ResponseData
+import com.duckduckgo.pir.impl.store.PirRepository.GeneratedEmailData
 import kotlinx.coroutines.flow.Flow
 
 interface PirActionsRunnerStateEngine {
@@ -53,6 +54,7 @@ interface PirActionsRunnerStateEngine {
         val transactionID: String = "",
         val pendingUrl: String? = null,
         val actionRetryCount: Int = 0,
+        val generatedEmailData: GeneratedEmailData? = null,
     )
 
     /**
@@ -76,7 +78,7 @@ interface PirActionsRunnerStateEngine {
         ) : Event()
 
         data class EmailReceived(
-            val email: String,
+            val generatedEmailData: GeneratedEmailData,
         ) : Event()
 
         data object ExecuteNextBrokerStep : Event()
