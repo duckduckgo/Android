@@ -1079,6 +1079,7 @@ class BrowserTabViewModel @Inject constructor(
         query: String,
         queryOrigin: QueryOrigin = QueryOrigin.FromUser,
     ) {
+        logcat { "Duck.ai: onUserSubmittedQuery $query" }
         navigationAwareLoginDetector.onEvent(NavigationEvent.UserAction.NewQuerySubmitted)
 
         if (query.isBlank()) {
@@ -1132,14 +1133,18 @@ class BrowserTabViewModel @Inject constructor(
         val verticalParameter = extractVerticalParameter(url)
         var urlToNavigate = queryUrlConverter.convertQueryToUrl(trimmedInput, verticalParameter, queryOrigin)
 
+        logcat { "Duck.ai: urlToNavigate $urlToNavigate" }
+
         when (val type = specialUrlDetector.determineType(trimmedInput)) {
             is ShouldLaunchDuckChatLink -> {
                 runCatching {
                     if (duckAiFeatureState.showFullScreenMode.value) {
+                        logcat { "Duck.ai: ShouldLaunchDuckChatLink $urlToNavigate" }
                         site?.nextUrl = urlToNavigate
                         command.value = NavigationCommand.Navigate(urlToNavigate, getUrlHeaders(urlToNavigate))
                     } else {
                         val queryParameter = urlToNavigate.toUri().getQueryParameter(QUERY)
+                        logcat { "Duck.ai: ShouldLaunchDuckChatLink queryParameter $queryParameter" }
                         if (queryParameter != null) {
                             duckChat.openDuckChatWithPrefill(queryParameter)
                         } else {
@@ -1544,6 +1549,7 @@ class BrowserTabViewModel @Inject constructor(
 
         when (stateChange) {
             is WebNavigationStateChange.NewPage -> {
+                logcat { "Duck.ai: WebNavigationStateChange.NewPage ${stateChange.url.toUri()}" }
                 val uri = stateChange.url.toUri()
                 viewModelScope.launch(dispatchers.io()) {
                     if (duckPlayer.getDuckPlayerState() == ENABLED && duckPlayer.isSimulatedYoutubeNoCookie(uri)) {
@@ -1569,6 +1575,7 @@ class BrowserTabViewModel @Inject constructor(
 
             is WebNavigationStateChange.PageCleared -> pageCleared()
             is WebNavigationStateChange.UrlUpdated -> {
+                logcat { "Duck.ai: urlUpdated ${stateChange.url}" }
                 val uri = stateChange.url.toUri()
                 viewModelScope.launch(dispatchers.io()) {
                     if (duckPlayer.getDuckPlayerState() == ENABLED && duckPlayer.isSimulatedYoutubeNoCookie(uri)) {
@@ -1626,7 +1633,7 @@ class BrowserTabViewModel @Inject constructor(
         url: String,
         title: String?,
     ) {
-        logcat(VERBOSE) { "Page changed: $url" }
+        logcat(VERBOSE) { "Duck.ai: Page changed: $url" }
         cleanupBlobDownloadReplyProxyMaps()
 
         hasCtaBeenShownForCurrentPage.set(false)
@@ -1899,6 +1906,7 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     override fun pageRefreshed(refreshedUrl: String) {
+        logcat { "Duck.ai pageRefreshed URL: $url refreshedUrl $refreshedUrl" }
         if (url == null || refreshedUrl == url) {
             logcat(VERBOSE) { "Page refreshed: $refreshedUrl" }
             pageChanged(refreshedUrl, title)
@@ -2185,6 +2193,7 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     private fun onSiteChanged() {
+        logcat { "Duck.ai: onSiteChanged" }
         httpsUpgraded = false
         site?.isDesktopMode = currentBrowserViewState().isDesktopBrowsingMode
         viewModelScope.launch {
@@ -4470,8 +4479,14 @@ class BrowserTabViewModel @Inject constructor(
             val params = duckChat.createWasUsedBeforePixelParams()
             pixel.fire(DuckChatPixelName.DUCK_CHAT_OPEN_BROWSER_MENU, parameters = params)
         }
-        val url = duckChat.getDuckChatUrl("", false)
-        onUserSubmittedQuery(url)
+
+        if (duckAiFeatureState.showFullScreenMode.value) {
+            val url = duckChat.getDuckChatUrl("", false)
+            pageRefreshed(url)
+            onUserSubmittedQuery(url)
+        } else {
+            duckChat.openDuckChat()
+        }
     }
 
     fun onDuckChatOmnibarButtonClicked(
@@ -4483,13 +4498,20 @@ class BrowserTabViewModel @Inject constructor(
             command.value = HideKeyboardForChat
         }
 
-        val url = when {
-            hasFocus && isNtp && query.isNullOrBlank() -> duckChat.getDuckChatUrl(query ?: "", false)
-            hasFocus -> duckChat.getDuckChatUrl(query ?: "", true)
-            else -> duckChat.getDuckChatUrl(query ?: "", false)
+        if (duckAiFeatureState.showFullScreenMode.value) {
+            val url = when {
+                hasFocus && isNtp && query.isNullOrBlank() -> duckChat.getDuckChatUrl(query ?: "", false)
+                hasFocus -> duckChat.getDuckChatUrl(query ?: "", true)
+                else -> duckChat.getDuckChatUrl(query ?: "", false)
+            }
+            onUserSubmittedQuery(url)
+        } else {
+            when {
+                hasFocus && isNtp && query.isNullOrBlank() -> duckChat.openDuckChat()
+                hasFocus -> duckChat.openDuckChatWithAutoPrompt(query ?: "")
+                else -> duckChat.openDuckChat()
+            }
         }
-
-        onUserSubmittedQuery(url)
     }
 
     fun onVpnMenuClicked() {
