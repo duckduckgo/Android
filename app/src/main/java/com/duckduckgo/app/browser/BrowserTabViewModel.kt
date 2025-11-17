@@ -23,6 +23,7 @@ import android.net.http.SslCertificate
 import android.os.Message
 import android.print.PrintAttributes
 import android.provider.MediaStore
+import android.util.Log
 import android.util.Patterns
 import android.view.ContextMenu
 import android.view.MenuItem
@@ -953,6 +954,7 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     fun onViewVisible() {
+        Log.d("RadoiuC", "On view visible")
         setAdClickActiveTabData(url)
 
         // we expect refreshCta to be called when a site is fully loaded if browsingShowing -trackers data available-.
@@ -1201,6 +1203,7 @@ class BrowserTabViewModel @Inject constructor(
                 omnibarText = if (settingsDataStore.isFullUrlEnabled) trimmedInput else addressDisplayFormatter.getShortUrl(trimmedInput),
                 queryOrFullUrl = trimmedInput,
                 forceExpand = true,
+                isBlankPageFromExternalTab = false,
             )
         browserViewState.value =
             currentBrowserViewState().copy(
@@ -1326,11 +1329,14 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     private fun openNewTab() {
+        Log.d("RadoiuC", "Open new tab called")
         command.value = GenerateWebViewPreviewImage
 
         if (swipingTabsFeature.isEnabled) {
             viewModelScope.launch {
-                val emptyTab = tabRepository.getTabs().firstOrNull { it.url.isNullOrBlank() }?.tabId
+                val emptyTab = tabRepository.getTabs().firstOrNull {
+                    it.url.isNullOrBlank() && it.sourceTabId.isNullOrBlank()
+                }?.tabId
                 if (emptyTab != null) {
                     tabRepository.select(tabId = emptyTab)
                 } else {
@@ -1429,6 +1435,15 @@ class BrowserTabViewModel @Inject constructor(
      */
     fun onUserPressedBack(isCustomTab: Boolean = false): Boolean {
         navigationAwareLoginDetector.onEvent(NavigationEvent.UserAction.NavigateBack)
+        // val hasSourceTab = tabRepository.liveSelectedTab.value?.sourceTabId != null
+        //
+        // if (isNavigationForEmptyUrlFromParent(hasSourceTab, isCustomTab)) {
+        //     viewModelScope.launch {
+        //         removeCurrentTabFromRepository()
+        //     }
+        //     return true
+        // }
+
         val navigation = webNavigationState ?: return false
         val hasSourceTab = tabRepository.liveSelectedTab.value?.sourceTabId != null
 
@@ -1473,6 +1488,12 @@ class BrowserTabViewModel @Inject constructor(
         }
         return false
     }
+
+    private fun isNavigationForEmptyUrlFromParent(
+        hasSourceTab: Boolean,
+        isCustomTab: Boolean,
+    ): Boolean =
+        isLinkOpenedInNewTab && hasSourceTab && !isCustomTab
 
     private fun navigateHome() {
         site = null
@@ -1520,6 +1541,7 @@ class BrowserTabViewModel @Inject constructor(
      * we will end up in a situation where we receive NewPage events for the previous page while the error is shown.
      */
     fun navigationStateChanged(newWebNavigationState: WebNavigationState) {
+        Log.d("RadoiuC", "NAVIGATION STATE CHANGED")
         val stateChange = newWebNavigationState.compare(webNavigationState)
 
         viewModelScope.launch {
@@ -1626,6 +1648,7 @@ class BrowserTabViewModel @Inject constructor(
         url: String,
         title: String?,
     ) {
+        Log.d("RadoiuC", "Page changed - omnibar text for url: ${omnibarTextForUrl(url, settingsDataStore.isFullUrlEnabled)}")
         logcat(VERBOSE) { "Page changed: $url" }
         cleanupBlobDownloadReplyProxyMaps()
 
@@ -1640,6 +1663,7 @@ class BrowserTabViewModel @Inject constructor(
                 omnibarText = omnibarTextForUrl(url, settingsDataStore.isFullUrlEnabled),
                 forceExpand = true,
                 serpLogo = null,
+                isBlankPageFromExternalTab = false,
             )
         val currentBrowserViewState = currentBrowserViewState()
         val domain = site?.domain
@@ -2143,6 +2167,7 @@ class BrowserTabViewModel @Inject constructor(
                 if (activeCustomTab) {
                     command.postValue(CloseCustomTab)
                 } else {
+                    Log.d("RadoiuC", "Leave site to new tab from malicious site warning")
                     command.postValue(EscapeMaliciousSite)
                     openNewTab()
                     closeCurrentTab()
@@ -2932,6 +2957,7 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     fun onNewTabMenuItemClicked(longPress: Boolean = false) {
+        Log.d("RadoiuC", "On new tab menu item clicked")
         openNewTab()
 
         if (longPress) {
@@ -2949,6 +2975,7 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     fun onNavigationBarNewTabButtonClicked() {
+        Log.d("RadoiuC", "On navigation bar new tab button clicked")
         openNewTab()
     }
 
@@ -2976,6 +3003,8 @@ class BrowserTabViewModel @Inject constructor(
                         detectedRefreshPatterns,
                     )
                 }
+
+            Log.d("RadoiuD", "BrowserTabViewModel - Refresh CTA: $cta")
             val contextDaxDialogsShown =
                 withContext(dispatchers.io()) {
                     ctaViewModel.areBubbleDaxDialogsCompleted()
@@ -3521,6 +3550,8 @@ class BrowserTabViewModel @Inject constructor(
 
     fun onMessageReceived() {
         isLinkOpenedInNewTab = true
+
+        handleNewTabIfEmptyUrl()
     }
 
     override fun linkOpenedInNewTab(): Boolean = isLinkOpenedInNewTab
@@ -3798,6 +3829,15 @@ class BrowserTabViewModel @Inject constructor(
                     data = data,
                     onResponse = onResponse,
                 )
+        }
+    }
+
+    private fun handleNewTabIfEmptyUrl() {
+        if (androidBrowserConfig.handleAboutBlank().isEnabled() && site?.url.isNullOrEmpty()) {
+            omnibarViewState.value = omnibarViewState.value?.copy(
+                omnibarText = ABOUT_BLANk,
+                isBlankPageFromExternalTab = true,
+            )
         }
     }
 
@@ -4597,6 +4637,8 @@ class BrowserTabViewModel @Inject constructor(
 
         private const val CATEGORY_KEY = "category"
         private const val CLIENT_SIDE_HIT_KEY = "clientSideHit"
+
+        private const val ABOUT_BLANk = "about:blank"
 
         // https://www.iso.org/iso-3166-country-codes.html
         private val PRINT_LETTER_FORMAT_COUNTRIES_ISO3166_2 =

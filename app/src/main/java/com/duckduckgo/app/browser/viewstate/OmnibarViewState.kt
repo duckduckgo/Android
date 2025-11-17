@@ -25,4 +25,5 @@ data class OmnibarViewState(
     val navigationChange: Boolean = false,
     val forceExpand: Boolean = true,
     val serpLogo: SerpLogo? = null,
+    val isBlankPageFromExternalTab: Boolean = false,
 )
