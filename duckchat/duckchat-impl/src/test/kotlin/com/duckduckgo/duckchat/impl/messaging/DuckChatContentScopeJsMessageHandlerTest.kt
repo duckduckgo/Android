@@ -28,8 +28,9 @@ class DuckChatContentScopeJsMessageHandlerTest {
     @Test
     fun `only allow duckduckgo dot com domains`() {
         val domains = handler.allowedDomains
-        assertTrue(domains.size == 1)
-        assertTrue(domains.first() == "duckduckgo.com")
+        assertTrue(domains.size == 2)
+        assertTrue(domains[0] == "duckduckgo.com")
+        assertTrue(domains[1] == "duck.ai")
     }
 
     @Test
@@ -40,7 +41,7 @@ class DuckChatContentScopeJsMessageHandlerTest {
     @Test
     fun `only contains valid methods`() {
         val methods = handler.methods
-        assertTrue(methods.size == 10)
+        assertTrue(methods.size == 14)
         assertTrue(methods[0] == "getAIChatNativeHandoffData")
         assertTrue(methods[1] == "getAIChatNativeConfigValues")
         assertTrue(methods[2] == "openAIChat")
@@ -51,6 +52,10 @@ class DuckChatContentScopeJsMessageHandlerTest {
         assertTrue(methods[7] == "showChatInput")
         assertTrue(methods[8] == "reportMetric")
         assertTrue(methods[9] == "openKeyboard")
+        assertTrue(methods[10] == "storeMigrationData")
+        assertTrue(methods[11] == "getMigrationInfo")
+        assertTrue(methods[12] == "getMigrationDataByIndex")
+        assertTrue(methods[13] == "clearMigrationData")
     }
 
     private val callback = object : JsMessageCallback() {

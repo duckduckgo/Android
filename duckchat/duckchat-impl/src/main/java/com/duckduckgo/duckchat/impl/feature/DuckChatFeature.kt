@@ -117,6 +117,14 @@ interface DuckChatFeature {
     @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun duckAiVoiceSearch(): Toggle
 
+
+    /**
+     * @return `true` when standalone migration is supported
+     * If the remote feature is not present defaults to `false`
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
+    fun standaloneMigration(): Toggle
+
     /**
      * @return `true` when the "Hide AI Generated Images" option should be visible in AI Features Settings.
      */

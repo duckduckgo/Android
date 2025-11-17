@@ -38,6 +38,10 @@ class DuckDuckGoUrlDetectorImpl @Inject constructor() : DuckDuckGoUrlDetector {
         return runCatching { AppUrl.Url.HOST == url.toHttpUrl().topPrivateDomain() }.getOrElse { false }
     }
 
+    override fun isDuckAiUrl(url: String): Boolean {
+        return runCatching { AppUrl.Url.HOST_DUCKAI == url.toHttpUrl().topPrivateDomain() }.getOrElse { false }
+    }
+
     override fun isDuckDuckGoQueryUrl(uri: String): Boolean {
         return isDuckDuckGoUrl(uri) && hasQuery(uri)
     }

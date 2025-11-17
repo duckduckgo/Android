@@ -59,6 +59,7 @@ class RealDuckChatJSHelperTest {
         dataStore = mockDataStore,
         duckChatPixels = mockDuckChatPixels,
         duckAiMetricCollector = mockDuckAiMetricCollector,
+        dispatchers = coroutineRule.testDispatcherProvider,
     )
 
     @Test
@@ -186,6 +187,7 @@ class RealDuckChatJSHelperTest {
             put("supportsNativeChatInput", false)
             put("supportsURLChatIDRestoration", false)
             put("supportsImageUpload", false)
+            put("supportsStandaloneMigration", false)
         }
 
         val expected = JsCallbackData(jsonPayload, featureName, method, id)
@@ -244,6 +246,7 @@ class RealDuckChatJSHelperTest {
             put("supportsNativeChatInput", false)
             put("supportsURLChatIDRestoration", true)
             put("supportsImageUpload", false)
+            put("supportsStandaloneMigration", false)
         }
 
         val expected = JsCallbackData(jsonPayload, featureName, method, id)
@@ -406,6 +409,7 @@ class RealDuckChatJSHelperTest {
             put("supportsNativeChatInput", false)
             put("supportsURLChatIDRestoration", false)
             put("supportsImageUpload", true)
+            put("supportsStandaloneMigration", false)
         }
 
         assertEquals(expectedPayload.toString(), result!!.params.toString())
@@ -536,5 +540,91 @@ class RealDuckChatJSHelperTest {
 
         assertEquals("openDuckAiSettings", result.subscriptionName)
         assertEquals(DUCK_CHAT_FEATURE_NAME, result.featureName)
+    }
+
+    @Test
+    fun whenStoreMigrationDataThenItemIsStoredAndInfoCountReflectsIt() = runTest {
+        val featureName = "aiChat"
+        val id = "1"
+
+        // store two items
+        val item1 = JSONObject(mapOf("serializedMigrationFile" to "file-1"))
+        val item2 = JSONObject(mapOf("serializedMigrationFile" to "file-2"))
+        testee.processJsCallbackMessage(featureName, "storeMigrationData", id, item1)
+        testee.processJsCallbackMessage(featureName, "storeMigrationData", id, item2)
+
+        // get count
+        val info = testee.processJsCallbackMessage(featureName, "getMigrationInfo", id, null)
+        val expected = JSONObject().apply {
+            put("ok", true)
+            put("count", 2)
+        }
+        assertEquals(expected.toString(), info!!.params.toString())
+    }
+
+    @Test
+    fun whenGetMigrationDataByIndexWithValidIndexThenReturnItem() = runTest {
+        val featureName = "aiChat"
+        val id = "1"
+
+        // store items
+        testee.processJsCallbackMessage(featureName, "storeMigrationData", id, JSONObject(mapOf("serializedMigrationFile" to "file-1")))
+        testee.processJsCallbackMessage(featureName, "storeMigrationData", id, JSONObject(mapOf("serializedMigrationFile" to "file-2")))
+
+        val result = testee.processJsCallbackMessage(featureName, "getMigrationDataByIndex", id, JSONObject(mapOf("index" to 1)))
+        val expected = JSONObject().apply {
+            put("ok", true)
+            put("serializedMigrationFile", "file-2")
+        }
+        assertEquals(expected.toString(), result!!.params.toString())
+    }
+
+    @Test
+    fun whenGetMigrationDataByIndexWithInvalidIndexThenReturnEmptyPayload() = runTest {
+        val featureName = "aiChat"
+        val id = "1"
+
+        // store one item
+        testee.processJsCallbackMessage(featureName, "storeMigrationData", id, JSONObject(mapOf("serializedMigrationFile" to "file-1")))
+
+        // negative index
+        val negative = testee.processJsCallbackMessage(featureName, "getMigrationDataByIndex", id, JSONObject(mapOf("index" to -1)))
+        val expectedNegative = JSONObject().apply {
+            put("ok", false)
+            put("reason", "nothing at index: -1")
+        }
+        assertEquals(expectedNegative.toString(), negative!!.params.toString())
+
+        // out of range index
+        val outOfRange = testee.processJsCallbackMessage(featureName, "getMigrationDataByIndex", id, JSONObject(mapOf("index" to 5)))
+        val expectedOutOfRange = JSONObject().apply {
+            put("ok", false)
+            put("reason", "nothing at index: 5")
+        }
+        assertEquals(expectedOutOfRange.toString(), outOfRange!!.params.toString())
+    }
+
+    @Test
+    fun whenClearMigrationDataThenItemsRemovedAndCountZero() = runTest {
+        val featureName = "aiChat"
+        val id = "1"
+
+        // store items
+        testee.processJsCallbackMessage(featureName, "storeMigrationData", id, JSONObject(mapOf("serializedMigrationFile" to "file-1")))
+        testee.processJsCallbackMessage(featureName, "storeMigrationData", id, JSONObject(mapOf("serializedMigrationFile" to "file-2")))
+
+        // clear
+        val clearResult = testee.processJsCallbackMessage(featureName, "clearMigrationData", id, null)
+        // clear returns ok true
+        val expectedClear = JSONObject().apply { put("ok", true) }
+        assertEquals(expectedClear.toString(), clearResult!!.params.toString())
+
+        // count is zero
+        val info = testee.processJsCallbackMessage(featureName, "getMigrationInfo", id, null)
+        val expected = JSONObject().apply {
+            put("ok", true)
+            put("count", 0)
+        }
+        assertEquals(expected.toString(), info!!.params.toString())
     }
 }
