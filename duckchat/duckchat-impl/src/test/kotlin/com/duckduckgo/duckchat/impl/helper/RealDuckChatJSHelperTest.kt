@@ -217,6 +217,7 @@ class RealDuckChatJSHelperTest {
             put("supportsNativeChatInput", false)
             put("supportsURLChatIDRestoration", false)
             put("supportsImageUpload", false)
+            put("supportsStandaloneMigration", false)
         }
 
         val expected = JsCallbackData(jsonPayload, featureName, method, id)
