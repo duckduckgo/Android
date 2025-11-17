@@ -47,37 +47,36 @@ class RealOptOut24HourSubmissionSuccessRateReporter @Inject constructor(
             val startDate = pirRepository.getCustomStatsPixelsLastSentMs()
             val now = currentTimeProvider.currentTimeMillis()
 
-            if (shouldFirePixel(startDate, now)) {
-                logcat { "PIR-CUSTOM-STATS: Should fire pixel - 24hrs passed since last send" }
-                val endDate = now - TimeUnit.HOURS.toMillis(24)
-                val activeBrokers = pirRepository.getAllActiveBrokerObjects()
-                val hasUserProfiles = pirRepository.getAllUserProfileQueries().isNotEmpty()
-                val activeOptOutJobRecords = pirSchedulingRepository.getAllValidOptOutJobRecords()
+            if (!shouldFirePixel(startDate, now)) return@withContext
+            logcat { "PIR-CUSTOM-STATS: Should fire pixel - 24hrs passed since last send" }
+            val endDate = now - TimeUnit.HOURS.toMillis(24)
+            val activeBrokers = pirRepository.getAllActiveBrokerObjects()
+            val hasUserProfiles = pirRepository.getAllUserProfileQueries().isNotEmpty()
+            val activeOptOutJobRecords = pirSchedulingRepository.getAllValidOptOutJobRecords()
 
-                if (activeBrokers.isNotEmpty() && activeOptOutJobRecords.isNotEmpty() && hasUserProfiles) {
-                    activeBrokers.forEach { broker ->
-                        val activeJobRecordsForBroker = activeOptOutJobRecords.filter { it.brokerName == broker.name }
+            if (activeBrokers.isNotEmpty() && activeOptOutJobRecords.isNotEmpty() && hasUserProfiles) {
+                activeBrokers.forEach { broker ->
+                    val activeJobRecordsForBroker = activeOptOutJobRecords.filter { it.brokerName == broker.name }
 
-                        if (activeJobRecordsForBroker.isEmpty()) return@forEach
+                    if (activeJobRecordsForBroker.isEmpty()) return@forEach
 
-                        val successRate = optOutSubmitRateCalculator.calculateOptOutSubmitRate(
-                            activeJobRecordsForBroker,
-                            startDate,
-                            endDate,
+                    val successRate = optOutSubmitRateCalculator.calculateOptOutSubmitRate(
+                        activeJobRecordsForBroker,
+                        startDate,
+                        endDate,
+                    )
+
+                    logcat { "PIR-CUSTOM-STATS: 24hr submission ${broker.name} : $successRate" }
+                    if (successRate != null) {
+                        pirPixelSender.reportBrokerCustomStateOptOutSubmitRate(
+                            brokerUrl = broker.url,
+                            optOutSuccessRate = successRate,
                         )
-
-                        logcat { "PIR-CUSTOM-STATS: 24hr submission ${broker.name} : $successRate" }
-                        if (successRate != null) {
-                            pirPixelSender.reportBrokerCustomStateOptOutSubmitRate(
-                                brokerUrl = broker.url,
-                                optOutSuccessRate = successRate,
-                            )
-                        }
                     }
-
-                    logcat { "PIR-CUSTOM-STATS: Updating last send date to $endDate" }
-                    pirRepository.setCustomStatsPixelsLastSentMs(endDate)
                 }
+
+                logcat { "PIR-CUSTOM-STATS: Updating last send date to $endDate" }
+                pirRepository.setCustomStatsPixelsLastSentMs(endDate)
             }
         }
     }
