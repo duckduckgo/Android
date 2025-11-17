@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.browser.omnibar
 
+import android.util.Log
 import android.view.MotionEvent.ACTION_UP
 import android.webkit.URLUtil
 import androidx.lifecycle.ViewModel
@@ -119,6 +120,7 @@ class OmnibarLayoutViewModel @Inject constructor(
         tabRepository.flowTabs,
         additionalDefaultBrowserPrompts.highlightPopupMenu,
     ) { state, tabs, highlightOverflowMenu ->
+        Log.d("RadoiuC", "Update omnibar layout view state - text: ${state.omnibarText}   update text: ${state.updateOmnibarText}")
         state.copy(
             shouldUpdateTabsCount = tabs.size != state.tabCount && tabs.isNotEmpty(),
             tabCount = tabs.size,
@@ -148,7 +150,7 @@ class OmnibarLayoutViewModel @Inject constructor(
     private val command = Channel<Command>(1, DROP_OLDEST)
     fun commands(): Flow<Command> = command.receiveAsFlow()
 
-    data class ViewState(
+    data class ViewState constructor(
         val viewMode: ViewMode = Browser(null),
         val leadingIconState: LeadingIconState = Search,
         val previousLeadingIconState: LeadingIconState? = null,
@@ -180,6 +182,7 @@ class OmnibarLayoutViewModel @Inject constructor(
         val showShadows: Boolean = false,
         val showTextInputClickCatcher: Boolean = false,
         val showFindInPage: Boolean = false,
+        val isForBlankPageFromExternalTab: Boolean = false,
     ) {
         fun shouldUpdateOmnibarText(isFullUrlEnabled: Boolean): Boolean {
             return this.viewMode is Browser || this.viewMode is MaliciousSiteWarning || (!isFullUrlEnabled && omnibarText.isNotEmpty())
@@ -301,7 +304,7 @@ class OmnibarLayoutViewModel @Inject constructor(
             }
         } else {
             _viewState.update {
-                val shouldUpdateOmnibarText = it.shouldUpdateOmnibarText(settingsDataStore.isFullUrlEnabled)
+                val shouldUpdateOmnibarText = it.shouldUpdateOmnibarText(settingsDataStore.isFullUrlEnabled) && !it.isForBlankPageFromExternalTab
                 logcat { "Omnibar: lost focus in Browser or MaliciousSiteWarning mode $shouldUpdateOmnibarText" }
                 val omnibarText = if (shouldUpdateOmnibarText) {
                     if (duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(it.url)) {
@@ -645,6 +648,7 @@ class OmnibarLayoutViewModel @Inject constructor(
         omnibarViewState: OmnibarViewState,
         forceRender: Boolean,
     ) {
+        Log.d("RadoiuC", "onExternalOmnibarStateChanged - navigation change: ${omnibarViewState.navigationChange}")
         if (serpEasterEggLogosToggles.feature().isEnabled()) {
             val state = if (shouldUpdateOmnibarTextInput(omnibarViewState, _viewState.value.omnibarText) || forceRender) {
                 if (forceRender && !duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(omnibarViewState.queryOrFullUrl)) {
@@ -700,6 +704,7 @@ class OmnibarLayoutViewModel @Inject constructor(
                                 logoUrl = null,
                             )
                         },
+                        isForBlankPageFromExternalTab = omnibarViewState.isBlankPageFromExternalTab,
                     )
                 }
             }
@@ -738,6 +743,7 @@ class OmnibarLayoutViewModel @Inject constructor(
                                 hasQueryChanged = true,
                                 urlLoaded = _viewState.value.url,
                             ),
+                            isForBlankPageFromExternalTab = omnibarViewState.isBlankPageFromExternalTab,
                         )
                     }
                 }
