@@ -418,7 +418,7 @@ class InputScreenViewModel @AssistedInject constructor(
     fun onChatSubmitted(query: String) {
         viewModelScope.launch {
             when {
-                _visibilityState.value.fullScreenMode -> {
+                visibilityState.value.fullScreenMode -> {
                     val url = duckChat.getDuckChatUrl(query, true)
                     command.value = Command.SubmitSearch(url)
                 }

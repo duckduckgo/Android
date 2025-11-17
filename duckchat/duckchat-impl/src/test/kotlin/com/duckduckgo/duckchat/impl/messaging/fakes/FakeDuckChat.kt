@@ -46,6 +46,13 @@ class FakeDuckChat(
         openDuckChatWithPrefillCalls.add(query)
     }
 
+    override fun getDuckChatUrl(
+        query: String,
+        autoPrompt: Boolean,
+    ): String {
+        return "https://duckduckgo.com/?q=DuckDuckGo+AI+Chat&ia=chat&duckai=5"
+    }
+
     override fun isDuckChatUrl(uri: Uri): Boolean {
         return uri.toString().contains("duckchat")
     }
