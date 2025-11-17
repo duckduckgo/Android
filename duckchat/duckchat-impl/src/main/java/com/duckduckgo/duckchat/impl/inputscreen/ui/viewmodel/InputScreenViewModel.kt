@@ -41,6 +41,7 @@ import com.duckduckgo.browser.api.autocomplete.AutoCompleteSettings
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.SingleLiveEvent
 import com.duckduckgo.common.utils.extensions.toBinaryString
+import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.impl.inputscreen.ui.InputScreenConfigResolver
 import com.duckduckgo.duckchat.impl.inputscreen.ui.command.Command
@@ -123,6 +124,7 @@ class InputScreenViewModel @AssistedInject constructor(
     private val voiceSearchAvailability: VoiceSearchAvailability,
     private val autoCompleteSettings: AutoCompleteSettings,
     private val duckChat: DuckChat,
+    private val duckAiFeatureState: DuckAiFeatureState,
     private val pixel: Pixel,
     private val sessionStore: InputScreenSessionStore,
     private val inputScreenDiscoveryFunnel: InputScreenDiscoveryFunnel,
@@ -155,6 +157,7 @@ class InputScreenViewModel @AssistedInject constructor(
                 newLineButtonVisible = false,
                 mainButtonsVisible = false,
                 searchMode = true,
+                fullScreenMode = duckAiFeatureState.showFullScreenMode.value,
             ),
         )
     val visibilityState: StateFlow<InputScreenVisibilityState> = _visibilityState.asStateFlow()
@@ -414,14 +417,19 @@ class InputScreenViewModel @AssistedInject constructor(
 
     fun onChatSubmitted(query: String) {
         viewModelScope.launch {
-            val wasDuckAiOpenedBefore = duckChat.wasOpenedBefore()
-            if (isWebUrl(query)) {
-                command.value = Command.SubmitSearch(query)
-            } else {
-                command.value = Command.SubmitChat(query)
-                duckChat.openDuckChatWithAutoPrompt(query)
+            when {
+                _visibilityState.value.fullScreenMode -> {
+                    val url = duckChat.getDuckChatUrl(query, true)
+                    command.value = Command.SubmitSearch(url)
+                }
+                isWebUrl(query) -> command.value = Command.SubmitSearch(query)
+                else -> {
+                    command.value = Command.SubmitChat(query)
+                    duckChat.openDuckChatWithAutoPrompt(query)
+                }
             }
 
+            val wasDuckAiOpenedBefore = duckChat.wasOpenedBefore()
             val params =
                 mapOf(
                     DuckChatPixelParameters.WAS_USED_BEFORE to wasDuckAiOpenedBefore.toBinaryString(),
