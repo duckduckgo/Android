@@ -18,6 +18,14 @@ package com.duckduckgo.pir.impl.pixels
 
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_BROKER_CUSTOM_STATS_14DAY_CONFIRMED_OPTOUT
+import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_BROKER_CUSTOM_STATS_14DAY_UNCONFIRMED_OPTOUT
+import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_BROKER_CUSTOM_STATS_21DAY_CONFIRMED_OPTOUT
+import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_BROKER_CUSTOM_STATS_21DAY_UNCONFIRMED_OPTOUT
+import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_BROKER_CUSTOM_STATS_42DAY_CONFIRMED_OPTOUT
+import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_BROKER_CUSTOM_STATS_42DAY_UNCONFIRMED_OPTOUT
+import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_BROKER_CUSTOM_STATS_7DAY_CONFIRMED_OPTOUT
+import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_BROKER_CUSTOM_STATS_7DAY_UNCONFIRMED_OPTOUT
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_BROKER_CUSTOM_STATS_OPTOUT_SUBMIT_SUCCESSRATE
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_EMAIL_CONFIRMATION_ATTEMPT_FAILED
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_EMAIL_CONFIRMATION_ATTEMPT_START
@@ -333,6 +341,46 @@ interface PirPixelSender {
         brokerUrl: String,
         optOutSuccessRate: Double,
     )
+
+    /**
+     * Emits a pixel when an opt-out has been confirmed within 7 days.
+     */
+    fun reportBrokerOptOutConfirmed7Days(brokerUrl: String)
+
+    /**
+     * Emits a pixel when an opt-out is unconfirmed within 7 days.
+     */
+    fun reportBrokerOptOutUnconfirmed7Days(brokerUrl: String)
+
+    /**
+     * Emits a pixel when an opt-out has been confirmed within 14 days.
+     */
+    fun reportBrokerOptOutConfirmed14Days(brokerUrl: String)
+
+    /**
+     * Emits a pixel when an opt-out is unconfirmed within 14 days.
+     */
+    fun reportBrokerOptOutUnconfirmed14Days(brokerUrl: String)
+
+    /**
+     * Emits a pixel when an opt-out has been confirmed within 21 days.
+     */
+    fun reportBrokerOptOutConfirmed21Days(brokerUrl: String)
+
+    /**
+     * Emits a pixel when an opt-out is unconfirmed within 21 days.
+     */
+    fun reportBrokerOptOutUnconfirmed21Days(brokerUrl: String)
+
+    /**
+     * Emits a pixel when an opt-out has been confirmed within 42 days.
+     */
+    fun reportBrokerOptOutConfirmed42Days(brokerUrl: String)
+
+    /**
+     * Emits a pixel when an opt-out is unconfirmed within 42 days.
+     */
+    fun reportBrokerOptOutUnconfirmed42Days(brokerUrl: String)
 }
 
 @ContributesBinding(AppScope::class)
@@ -625,6 +673,70 @@ class RealPirPixelSender @Inject constructor(
         )
 
         fire(PIR_BROKER_CUSTOM_STATS_OPTOUT_SUBMIT_SUCCESSRATE, params)
+    }
+
+    override fun reportBrokerOptOutConfirmed7Days(brokerUrl: String) {
+        val params = mapOf(
+            PARAM_KEY_BROKER to brokerUrl,
+        )
+
+        fire(PIR_BROKER_CUSTOM_STATS_7DAY_CONFIRMED_OPTOUT, params)
+    }
+
+    override fun reportBrokerOptOutUnconfirmed7Days(brokerUrl: String) {
+        val params = mapOf(
+            PARAM_KEY_BROKER to brokerUrl,
+        )
+
+        fire(PIR_BROKER_CUSTOM_STATS_7DAY_UNCONFIRMED_OPTOUT, params)
+    }
+
+    override fun reportBrokerOptOutConfirmed14Days(brokerUrl: String) {
+        val params = mapOf(
+            PARAM_KEY_BROKER to brokerUrl,
+        )
+
+        fire(PIR_BROKER_CUSTOM_STATS_14DAY_CONFIRMED_OPTOUT, params)
+    }
+
+    override fun reportBrokerOptOutUnconfirmed14Days(brokerUrl: String) {
+        val params = mapOf(
+            PARAM_KEY_BROKER to brokerUrl,
+        )
+
+        fire(PIR_BROKER_CUSTOM_STATS_14DAY_UNCONFIRMED_OPTOUT, params)
+    }
+
+    override fun reportBrokerOptOutConfirmed21Days(brokerUrl: String) {
+        val params = mapOf(
+            PARAM_KEY_BROKER to brokerUrl,
+        )
+
+        fire(PIR_BROKER_CUSTOM_STATS_21DAY_CONFIRMED_OPTOUT, params)
+    }
+
+    override fun reportBrokerOptOutUnconfirmed21Days(brokerUrl: String) {
+        val params = mapOf(
+            PARAM_KEY_BROKER to brokerUrl,
+        )
+
+        fire(PIR_BROKER_CUSTOM_STATS_21DAY_UNCONFIRMED_OPTOUT, params)
+    }
+
+    override fun reportBrokerOptOutConfirmed42Days(brokerUrl: String) {
+        val params = mapOf(
+            PARAM_KEY_BROKER to brokerUrl,
+        )
+
+        fire(PIR_BROKER_CUSTOM_STATS_42DAY_CONFIRMED_OPTOUT, params)
+    }
+
+    override fun reportBrokerOptOutUnconfirmed42Days(brokerUrl: String) {
+        val params = mapOf(
+            PARAM_KEY_BROKER to brokerUrl,
+        )
+
+        fire(PIR_BROKER_CUSTOM_STATS_42DAY_UNCONFIRMED_OPTOUT, params)
     }
 
     private fun fire(

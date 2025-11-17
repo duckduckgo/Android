@@ -31,6 +31,7 @@ import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.pir.impl.common.PirJobConstants.CUSTOM_PIXEL_INTERVAL_HOURS
 import com.duckduckgo.pir.impl.common.PirJobConstants.EMAIL_CONFIRMATION_INTERVAL_HOURS
 import com.duckduckgo.pir.impl.common.PirJobConstants.SCHEDULED_SCAN_INTERVAL_HOURS
 import com.duckduckgo.pir.impl.email.PirEmailConfirmationRemoteWorker
@@ -134,8 +135,9 @@ class RealPirScanScheduler @Inject constructor(
     }
 
     private fun scheduleRecurringPixelStats() {
-        val periodicWorkRequest = PeriodicWorkRequestBuilder<PirCustomStatsWorker>(5, TimeUnit.HOURS)
+        val periodicWorkRequest = PeriodicWorkRequestBuilder<PirCustomStatsWorker>(CUSTOM_PIXEL_INTERVAL_HOURS, TimeUnit.HOURS)
             .addTag(TAG_PIR_RECURRING_CUSTOM_STATS)
+            .setInitialDelay(CUSTOM_PIXEL_INTERVAL_HOURS, TimeUnit.HOURS)
             .build()
 
         workManager.enqueueUniquePeriodicWork(
