@@ -2204,38 +2204,6 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
         privacyProFeature.blackFridayOffer2025().setRawStoredState(State(remoteEnableState = value))
     }
 
-    private fun givenUSPlanOffersExist() {
-        val monthlyOffer: SubscriptionOfferDetails = mock {
-            on { basePlanId } doReturn MONTHLY_PLAN_US
-            on { offerId } doReturn null
-        }
-        val yearlyOffer: SubscriptionOfferDetails = mock {
-            on { basePlanId } doReturn YEARLY_PLAN_US
-            on { offerId } doReturn null
-        }
-        val productDetails: ProductDetails = mock {
-            on { productId } doReturn SubscriptionsConstants.BASIC_SUBSCRIPTION
-            on { subscriptionOfferDetails } doReturn listOf(monthlyOffer, yearlyOffer)
-        }
-        whenever(playBillingManager.products).thenReturn(listOf(productDetails))
-    }
-
-    private fun givenROWPlanOffersExist() {
-        val monthlyOffer: SubscriptionOfferDetails = mock {
-            on { basePlanId } doReturn MONTHLY_PLAN_ROW
-            on { offerId } doReturn null
-        }
-        val yearlyOffer: SubscriptionOfferDetails = mock {
-            on { basePlanId } doReturn YEARLY_PLAN_ROW
-            on { offerId } doReturn null
-        }
-        val productDetails: ProductDetails = mock {
-            on { productId } doReturn SubscriptionsConstants.BASIC_SUBSCRIPTION
-            on { subscriptionOfferDetails } doReturn listOf(monthlyOffer, yearlyOffer)
-        }
-        whenever(playBillingManager.products).thenReturn(listOf(productDetails))
-    }
-
     private companion object {
         @JvmStatic
         @Parameterized.Parameters(name = "authApiV2Enabled={0}")
