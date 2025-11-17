@@ -1138,18 +1138,12 @@ class BrowserTabViewModel @Inject constructor(
         when (val type = specialUrlDetector.determineType(trimmedInput)) {
             is ShouldLaunchDuckChatLink -> {
                 runCatching {
-                    if (duckAiFeatureState.showFullScreenMode.value) {
-                        logcat { "Duck.ai: ShouldLaunchDuckChatLink $urlToNavigate" }
-                        site?.nextUrl = urlToNavigate
-                        command.value = NavigationCommand.Navigate(urlToNavigate, getUrlHeaders(urlToNavigate))
+                    logcat { "Duck.ai: ShouldLaunchDuckChatLink $urlToNavigate" }
+                    val queryParameter = urlToNavigate.toUri().getQueryParameter(QUERY)
+                    if (queryParameter != null) {
+                        duckChat.openDuckChatWithPrefill(queryParameter)
                     } else {
-                        val queryParameter = urlToNavigate.toUri().getQueryParameter(QUERY)
-                        logcat { "Duck.ai: ShouldLaunchDuckChatLink queryParameter $queryParameter" }
-                        if (queryParameter != null) {
-                            duckChat.openDuckChatWithPrefill(queryParameter)
-                        } else {
-                            duckChat.openDuckChat()
-                        }
+                        duckChat.openDuckChat()
                     }
                     return
                 }
