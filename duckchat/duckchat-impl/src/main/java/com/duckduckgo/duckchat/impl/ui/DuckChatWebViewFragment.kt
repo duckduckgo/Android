@@ -47,6 +47,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.InjectWith
+import com.duckduckgo.app.browser.DuckDuckGoUrlDetector
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.tabs.BrowserNav
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
@@ -131,6 +132,9 @@ open class DuckChatWebViewFragment : DuckDuckGoFragment(R.layout.activity_duck_c
     lateinit var duckChatJSHelper: DuckChatJSHelper
 
     @Inject
+    lateinit var duckDuckGoUrlDetector: DuckDuckGoUrlDetector
+
+    @Inject
     lateinit var subscriptionsHandler: SubscriptionsHandler
 
     @Inject
@@ -209,7 +213,12 @@ open class DuckChatWebViewFragment : DuckDuckGoFragment(R.layout.activity_duck_c
                     view?.requestFocusNodeHref(resultMsg)
                     val newWindowUrl = resultMsg?.data?.getString("url")
                     if (newWindowUrl != null) {
-                        startActivity(browserNav.openInNewTab(requireContext(), newWindowUrl))
+                        if (duckDuckGoUrlDetector.isDuckAiUrl(newWindowUrl)) {
+                            // Allow Duck.ai links to load within the same WebView (in-sheet navigation)
+                            simpleWebview.loadUrl(newWindowUrl)
+                        } else {
+                            startActivity(browserNav.openInNewTab(requireContext(), newWindowUrl))
+                        }
                         return true
                     }
                     return false

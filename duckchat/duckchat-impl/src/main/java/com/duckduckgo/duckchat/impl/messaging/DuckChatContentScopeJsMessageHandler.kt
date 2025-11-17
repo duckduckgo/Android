@@ -41,6 +41,7 @@ class DuckChatContentScopeJsMessageHandler @Inject constructor() : ContentScopeJ
             override val allowedDomains: List<String> =
                 listOf(
                     AppUrl.Url.HOST,
+                    AppUrl.Url.HOST_DUCKAI,
                 )
 
             override val featureName: String = "aiChat"
@@ -56,6 +57,12 @@ class DuckChatContentScopeJsMessageHandler @Inject constructor() : ContentScopeJ
                     "showChatInput",
                     "reportMetric",
                     "openKeyboard",
+
+                    // migration handlers
+                    "storeMigrationData",
+                    "getMigrationInfo",
+                    "getMigrationDataByIndex",
+                    "clearMigrationData",
                 )
         }
 }

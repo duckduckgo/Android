@@ -116,4 +116,12 @@ interface DuckChatFeature {
      */
     @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
     fun duckAiVoiceSearch(): Toggle
+
+
+    /**
+     * @return `true` when standalone migration is supported
+     * If the remote feature is not present defaults to `false`
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
+    fun standaloneMigration(): Toggle
 }
