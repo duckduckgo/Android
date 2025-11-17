@@ -135,6 +135,49 @@ enum class PirPixel(
     PIR_OPTOUT_SUBMIT_FAILURE(
         baseName = "dbp_optout_process_failure",
         types = setOf(Count),
+    ),
+
+    PIR_BROKER_CUSTOM_STATS_OPTOUT_SUBMIT_SUCCESSRATE(
+        baseName = "dbp_databroker_custom_stats_optoutsubmit",
+        type = Count,
+    ),
+
+    PIR_BROKER_CUSTOM_STATS_7DAY_CONFIRMED_OPTOUT(
+        baseName = "dbp_optoutjob_at-7-days_confirmed",
+        type = Count,
+    ),
+
+    PIR_BROKER_CUSTOM_STATS_7DAY_UNCONFIRMED_OPTOUT(
+        baseName = "dbp_optoutjob_at-7-days_unconfirmed",
+        type = Count,
+    ),
+    PIR_BROKER_CUSTOM_STATS_14DAY_CONFIRMED_OPTOUT(
+        baseName = "dbp_optoutjob_at-14-days_confirmed",
+        type = Count,
+    ),
+
+    PIR_BROKER_CUSTOM_STATS_14DAY_UNCONFIRMED_OPTOUT(
+        baseName = "dbp_optoutjob_at-14-days_unconfirmed",
+        type = Count,
+    ),
+
+    PIR_BROKER_CUSTOM_STATS_21DAY_CONFIRMED_OPTOUT(
+        baseName = "dbp_optoutjob_at-21-days_confirmed",
+        type = Count,
+    ),
+
+    PIR_BROKER_CUSTOM_STATS_21DAY_UNCONFIRMED_OPTOUT(
+        baseName = "dbp_optoutjob_at-21-days_unconfirmed",
+        type = Count,
+    ),
+    PIR_BROKER_CUSTOM_STATS_42DAY_CONFIRMED_OPTOUT(
+        baseName = "dbp_optoutjob_at-42-days_confirmed",
+        type = Count,
+    ),
+
+    PIR_BROKER_CUSTOM_STATS_42DAY_UNCONFIRMED_OPTOUT(
+        baseName = "dbp_optoutjob_at-42-days_unconfirmed",
+        type = Count,
     ), ;
 
     constructor(
