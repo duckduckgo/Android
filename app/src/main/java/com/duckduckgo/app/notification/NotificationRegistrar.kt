@@ -28,7 +28,6 @@ import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
 import com.duckduckgo.app.notification.model.Channel
 import com.duckduckgo.app.notification.model.NotificationPlugin
 import com.duckduckgo.app.notification.model.SchedulableNotificationPlugin
-import com.duckduckgo.app.notificationpromptexperiment.NotificationPromptExperimentManager
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
@@ -55,7 +54,6 @@ class NotificationRegistrar @Inject constructor(
     private val notificationPluginPoint: PluginPoint<NotificationPlugin>,
     private val appBuildConfig: AppBuildConfig,
     private val dispatcherProvider: DispatcherProvider,
-    private val notificationPromptExperimentManager: NotificationPromptExperimentManager,
 ) : MainProcessLifecycleObserver {
 
     object NotificationId {
@@ -124,11 +122,6 @@ class NotificationRegistrar @Inject constructor(
         if (settingsDataStore.appNotificationsEnabled != enabled) {
             pixel.fire(if (enabled) AppPixelName.NOTIFICATIONS_ENABLED else AppPixelName.NOTIFICATIONS_DISABLED)
             settingsDataStore.appNotificationsEnabled = enabled
-            appCoroutineScope.launch {
-                if (enabled) {
-                    notificationPromptExperimentManager.fireNotificationsEnabledLater()
-                }
-            }
         }
     }
 }

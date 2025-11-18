@@ -49,7 +49,6 @@ import javax.inject.Inject
 class NotifyMeViewModel @Inject constructor(
     private val appBuildConfig: AppBuildConfig,
     private val notifyMeDataStore: NotifyMeDataStore,
-    private val notifyMeListener: NotifyMeListener,
 ) : ViewModel(), DefaultLifecycleObserver {
 
     data class ViewState(
@@ -103,9 +102,6 @@ class NotifyMeViewModel @Inject constructor(
     fun onNotifyMeButtonClicked() {
         if (appBuildConfig.sdkInt >= Build.VERSION_CODES.TIRAMISU) {
             sendCommand(CheckPermissionRationale)
-            viewModelScope.launch {
-                notifyMeListener.onNotifyMeButtonClicked()
-            }
         } else {
             openSettings()
         }
