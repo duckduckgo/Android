@@ -23,7 +23,6 @@ import android.net.http.SslCertificate
 import android.os.Message
 import android.print.PrintAttributes
 import android.provider.MediaStore
-import android.util.Log
 import android.util.Patterns
 import android.view.ContextMenu
 import android.view.MenuItem
@@ -954,7 +953,6 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     fun onViewVisible() {
-        Log.d("RadoiuC", "On view visible")
         setAdClickActiveTabData(url)
 
         // we expect refreshCta to be called when a site is fully loaded if browsingShowing -trackers data available-.
@@ -1329,7 +1327,6 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     private fun openNewTab() {
-        Log.d("RadoiuC", "Open new tab called")
         command.value = GenerateWebViewPreviewImage
 
         if (swipingTabsFeature.isEnabled) {
@@ -1541,7 +1538,6 @@ class BrowserTabViewModel @Inject constructor(
      * we will end up in a situation where we receive NewPage events for the previous page while the error is shown.
      */
     fun navigationStateChanged(newWebNavigationState: WebNavigationState) {
-        Log.d("RadoiuC", "NAVIGATION STATE CHANGED")
         val stateChange = newWebNavigationState.compare(webNavigationState)
 
         viewModelScope.launch {
@@ -1648,7 +1644,6 @@ class BrowserTabViewModel @Inject constructor(
         url: String,
         title: String?,
     ) {
-        Log.d("RadoiuC", "Page changed - omnibar text for url: ${omnibarTextForUrl(url, settingsDataStore.isFullUrlEnabled)}")
         logcat(VERBOSE) { "Page changed: $url" }
         cleanupBlobDownloadReplyProxyMaps()
 
@@ -2167,7 +2162,6 @@ class BrowserTabViewModel @Inject constructor(
                 if (activeCustomTab) {
                     command.postValue(CloseCustomTab)
                 } else {
-                    Log.d("RadoiuC", "Leave site to new tab from malicious site warning")
                     command.postValue(EscapeMaliciousSite)
                     openNewTab()
                     closeCurrentTab()
@@ -2957,7 +2951,6 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     fun onNewTabMenuItemClicked(longPress: Boolean = false) {
-        Log.d("RadoiuC", "On new tab menu item clicked")
         openNewTab()
 
         if (longPress) {
@@ -2975,7 +2968,6 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     fun onNavigationBarNewTabButtonClicked() {
-        Log.d("RadoiuC", "On navigation bar new tab button clicked")
         openNewTab()
     }
 
@@ -3004,7 +2996,6 @@ class BrowserTabViewModel @Inject constructor(
                     )
                 }
 
-            Log.d("RadoiuD", "BrowserTabViewModel - Refresh CTA: $cta")
             val contextDaxDialogsShown =
                 withContext(dispatchers.io()) {
                     ctaViewModel.areBubbleDaxDialogsCompleted()

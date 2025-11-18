@@ -16,7 +16,6 @@
 
 package com.duckduckgo.app.browser.omnibar
 
-import android.util.Log
 import android.view.MotionEvent.ACTION_UP
 import android.webkit.URLUtil
 import androidx.lifecycle.ViewModel
@@ -120,7 +119,6 @@ class OmnibarLayoutViewModel @Inject constructor(
         tabRepository.flowTabs,
         additionalDefaultBrowserPrompts.highlightPopupMenu,
     ) { state, tabs, highlightOverflowMenu ->
-        Log.d("RadoiuC", "Update omnibar layout view state - text: ${state.omnibarText}   update text: ${state.updateOmnibarText}")
         state.copy(
             shouldUpdateTabsCount = tabs.size != state.tabCount && tabs.isNotEmpty(),
             tabCount = tabs.size,
@@ -648,7 +646,6 @@ class OmnibarLayoutViewModel @Inject constructor(
         omnibarViewState: OmnibarViewState,
         forceRender: Boolean,
     ) {
-        Log.d("RadoiuC", "onExternalOmnibarStateChanged - navigation change: ${omnibarViewState.navigationChange}")
         if (serpEasterEggLogosToggles.feature().isEnabled()) {
             val state = if (shouldUpdateOmnibarTextInput(omnibarViewState, _viewState.value.omnibarText) || forceRender) {
                 if (forceRender && !duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(omnibarViewState.queryOrFullUrl)) {
