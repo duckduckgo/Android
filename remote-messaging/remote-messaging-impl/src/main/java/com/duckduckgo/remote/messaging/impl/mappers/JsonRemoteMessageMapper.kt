@@ -110,7 +110,7 @@ private fun JsonRemoteMessage.map(
             content = this.content!!.mapToContent(this.content.messageType, actionMappers),
             matchingRules = this.matchingRules.orEmpty(),
             exclusionRules = this.exclusionRules.orEmpty(),
-            surfaces = Surface.fromList(this.surfaces),
+            surfaces = this.surfaces.toSurfaceList(),
         )
         remoteMessage.localizeMessage(this.translations, locale)
     }.onFailure {
@@ -118,6 +118,11 @@ private fun JsonRemoteMessage.map(
     }.getOrNull()
 }
 
+private fun List<String>?.toSurfaceList(): List<Surface> {
+    return this?.mapNotNull { value ->
+        Surface.entries.firstOrNull { it.jsonValue == value }
+    } ?: listOf(Surface.NEW_TAB_PAGE)
+}
 private fun RemoteMessage.localizeMessage(translations: Map<String, JsonContentTranslations>?, locale: Locale): RemoteMessage {
     if (translations == null) return this
 
