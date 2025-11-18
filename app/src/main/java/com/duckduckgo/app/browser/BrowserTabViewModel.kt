@@ -1331,9 +1331,7 @@ class BrowserTabViewModel @Inject constructor(
 
         if (swipingTabsFeature.isEnabled) {
             viewModelScope.launch {
-                val emptyTab = tabRepository.getTabs().firstOrNull {
-                    it.url.isNullOrBlank() && it.sourceTabId.isNullOrBlank()
-                }?.tabId
+                val emptyTab = tabRepository.getTabs().firstOrNull { it.url.isNullOrBlank() }?.tabId
                 if (emptyTab != null) {
                     tabRepository.select(tabId = emptyTab)
                 } else {
@@ -1432,15 +1430,6 @@ class BrowserTabViewModel @Inject constructor(
      */
     fun onUserPressedBack(isCustomTab: Boolean = false): Boolean {
         navigationAwareLoginDetector.onEvent(NavigationEvent.UserAction.NavigateBack)
-        // val hasSourceTab = tabRepository.liveSelectedTab.value?.sourceTabId != null
-        //
-        // if (isNavigationForEmptyUrlFromParent(hasSourceTab, isCustomTab)) {
-        //     viewModelScope.launch {
-        //         removeCurrentTabFromRepository()
-        //     }
-        //     return true
-        // }
-
         val navigation = webNavigationState ?: return false
         val hasSourceTab = tabRepository.liveSelectedTab.value?.sourceTabId != null
 
@@ -1485,12 +1474,6 @@ class BrowserTabViewModel @Inject constructor(
         }
         return false
     }
-
-    private fun isNavigationForEmptyUrlFromParent(
-        hasSourceTab: Boolean,
-        isCustomTab: Boolean,
-    ): Boolean =
-        isLinkOpenedInNewTab && hasSourceTab && !isCustomTab
 
     private fun navigateHome() {
         site = null

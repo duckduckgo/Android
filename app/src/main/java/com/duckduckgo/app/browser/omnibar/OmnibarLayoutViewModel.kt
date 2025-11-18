@@ -148,7 +148,7 @@ class OmnibarLayoutViewModel @Inject constructor(
     private val command = Channel<Command>(1, DROP_OLDEST)
     fun commands(): Flow<Command> = command.receiveAsFlow()
 
-    data class ViewState constructor(
+    data class ViewState(
         val viewMode: ViewMode = Browser(null),
         val leadingIconState: LeadingIconState = Search,
         val previousLeadingIconState: LeadingIconState? = null,
