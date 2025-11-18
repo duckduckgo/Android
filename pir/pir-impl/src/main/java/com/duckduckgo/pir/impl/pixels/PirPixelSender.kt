@@ -36,6 +36,7 @@ import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_EMAIL_CONFIRMATION_LINK_RECEI
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_EMAIL_CONFIRMATION_MAX_RETRIES_EXCEEDED
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_EMAIL_CONFIRMATION_RUN_COMPLETED
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_EMAIL_CONFIRMATION_RUN_STARTED
+import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_ENGAGEMENT_DAU
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_INTERNAL_BROKER_OPT_OUT_STARTED
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_INTERNAL_BROKER_SCAN_COMPLETED
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_INTERNAL_BROKER_SCAN_STARTED
@@ -381,6 +382,11 @@ interface PirPixelSender {
      * Emits a pixel when an opt-out is unconfirmed within 42 days.
      */
     fun reportBrokerOptOutUnconfirmed42Days(brokerUrl: String)
+
+    /**
+     * Emits a pixel to report Daily Active Users for PIR.
+     */
+    fun reportDAU()
 }
 
 @ContributesBinding(AppScope::class)
@@ -737,6 +743,10 @@ class RealPirPixelSender @Inject constructor(
         )
 
         fire(PIR_BROKER_CUSTOM_STATS_42DAY_UNCONFIRMED_OPTOUT, params)
+    }
+
+    override fun reportDAU() {
+        fire(PIR_ENGAGEMENT_DAU)
     }
 
     private fun fire(

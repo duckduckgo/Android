@@ -178,6 +178,11 @@ enum class PirPixel(
     PIR_BROKER_CUSTOM_STATS_42DAY_UNCONFIRMED_OPTOUT(
         baseName = "dbp_optoutjob_at-42-days_unconfirmed",
         type = Count,
+    ),
+
+    PIR_ENGAGEMENT_DAU(
+        baseName = "dbp_engagement_dau",
+        type = Count,
     ), ;
 
     constructor(
