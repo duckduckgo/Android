@@ -27,19 +27,11 @@
     // Listen to ddgObj messages
     ddgObj.addEventListener('message', function(event) {
         console.log("[complex script] $OBJECT_NAME$-$SCRIPT_ID$ received", event.data);
-        
-        stateManager.setState(state => ({
-            ...state,
-            messageCount: state.messageCount + 1,
-            lastMessageTime: Date.now()
-        }));
-        
-        eventBus.emit('message-received', { source: '$OBJECT_NAME$-$SCRIPT_ID$', data: event.data });
-        
+
         if (replyToNativeMessages && supportedMessages.includes(event.data)) {
             const response = messagePrefix + event.data + " from $OBJECT_NAME$-$SCRIPT_ID$";
             ddgObj.postMessage(response);
-            throttledLog('[complex-script]-$SCRIPT_ID$ Sent response:', response);
+            console.log('[complex-script]-$SCRIPT_ID$ Sent response:', response);
         }
     });
 
@@ -47,18 +39,10 @@
     window.addEventListener('message', function(event) {
         console.log("[complex-script] window-$SCRIPT_ID$ received", event.data);
         
-        stateManager.setState(state => ({
-            ...state,
-            messageCount: state.messageCount + 1,
-            lastMessageTime: Date.now()
-        }));
-        
-        eventBus.emit('message-received', { source: 'window-$SCRIPT_ID$', data: event.data });
-        
         if (replyToNativeMessages && supportedMessages.includes(event.data)) {
             const response = messagePrefix + event.data + " from window-$SCRIPT_ID$";
             ddgObj.postMessage(response);
-            throttledLog('[complex-script]-$SCRIPT_ID$ Sent response:', response);
+            console.log('[complex-script]-$SCRIPT_ID$ Sent response:', response);
         }
     });
 
