@@ -23,38 +23,44 @@ import com.duckduckgo.js.messaging.api.JsMessaging
 import com.duckduckgo.pir.impl.dashboard.messaging.PirDashboardWebMessages
 import com.duckduckgo.pir.impl.dashboard.messaging.model.PirWebMessageRequest
 import com.duckduckgo.pir.impl.dashboard.messaging.model.PirWebMessageResponse
-import com.duckduckgo.pir.impl.dashboard.state.PirWebProfileStateHolder
 import com.squareup.anvil.annotations.ContributesMultibinding
 import logcat.logcat
 import javax.inject.Inject
 
 /**
- * Handles the message from Web to set the birth year for the current user profile.
+ * Handles the message from Web to remove an opt-out record from the dashboard.
  */
 @ContributesMultibinding(
     scope = ActivityScope::class,
     boundType = PirWebJsMessageHandler::class,
 )
-class PirWebSetBirthYearForCurrentUserProfile @Inject constructor(
-    private val pirWebProfileStateHolder: PirWebProfileStateHolder,
-) : PirWebJsMessageHandler() {
+class PirRemoveOptOutFromDashboardMessageHandler @Inject constructor() : PirWebJsMessageHandler() {
 
-    override val message = PirDashboardWebMessages.SET_BIRTH_YEAR_FOR_CURRENT_USER_PROFILE
+    override val message = PirDashboardWebMessages.REMOVE_OPT_OUT_FROM_DASHBOARD
 
     override fun process(
         jsMessage: JsMessage,
         jsMessaging: JsMessaging,
         jsMessageCallback: JsMessageCallback?,
     ) {
-        logcat { "PIR-WEB: PirWebSetBirthYearForCurrentUserProfile: process $jsMessage" }
+        logcat { "PIR-WEB: PirRemoveOptOutFromDashboardMessageHandler: process $jsMessage" }
 
-        val birthYear = jsMessage.toRequestMessage(
-            PirWebMessageRequest.SetBirthYearForCurrentUserProfileRequest::class,
-        )?.year ?: 0
+        val recordId = jsMessage.toRequestMessage(
+            PirWebMessageRequest.RemoveOptOutFromDashboardRequest::class,
+        )?.recordId
 
-        // store the new birth year in the current user profile
-        pirWebProfileStateHolder.setBirthYear(birthYear)
+        if (recordId == null) {
+            logcat { "PIR-WEB: PirRemoveOptOutFromDashboardMessageHandler: missing recordId" }
+            jsMessaging.sendResponse(
+                jsMessage = jsMessage,
+                response = PirWebMessageResponse.DefaultResponse.ERROR,
+            )
+            return
+        }
 
+        logcat { "PIR-WEB: PirRemoveOptOutFromDashboardMessageHandler: removing recordId=$recordId" }
+
+        // TODO: Implement actual removal logic
         jsMessaging.sendResponse(
             jsMessage = jsMessage,
             response = PirWebMessageResponse.DefaultResponse.SUCCESS,
