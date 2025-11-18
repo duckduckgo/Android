@@ -16,6 +16,7 @@
 
 package com.duckduckgo.duckchat.impl.helper
 
+import android.webkit.WebView
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.impl.ChatState
 import com.duckduckgo.duckchat.impl.ChatState.HIDE
@@ -26,7 +27,10 @@ import com.duckduckgo.duckchat.impl.metric.DuckAiMetricCollector
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
 import com.duckduckgo.duckchat.impl.store.DuckChatDataStore
 import com.duckduckgo.js.messaging.api.JsCallbackData
+import com.duckduckgo.js.messaging.api.JsMessageHelper
+import com.duckduckgo.js.messaging.api.SubscriptionEvent
 import com.squareup.anvil.annotations.ContributesBinding
+import com.squareup.moshi.Moshi
 import kotlinx.coroutines.runBlocking
 import org.json.JSONObject
 import java.util.regex.Pattern
@@ -39,6 +43,8 @@ interface DuckChatJSHelper {
         id: String?,
         data: JSONObject?,
     ): JsCallbackData?
+
+    fun sendSubscriptionEvent(subscriptionEvent: SubscriptionEvent, callbackName: String, secret: String, webView: WebView)
 }
 
 @ContributesBinding(AppScope::class)
@@ -47,7 +53,11 @@ class RealDuckChatJSHelper @Inject constructor(
     private val duckChatPixels: DuckChatPixels,
     private val dataStore: DuckChatDataStore,
     private val duckAiMetricCollector: DuckAiMetricCollector,
+    private val jsMessageHelper: JsMessageHelper,
 ) : DuckChatJSHelper {
+
+    private val moshi = Moshi.Builder().add(JSONObjectAdapter()).build()
+
     override suspend fun processJsCallbackMessage(
         featureName: String,
         method: String,
@@ -189,6 +199,10 @@ class RealDuckChatJSHelper @Inject constructor(
                 null
             }
         }
+    }
+
+    override fun sendSubscriptionEvent(subscriptionEvent: SubscriptionEvent, callbackName: String, secret: String, webView: WebView) {
+        jsMessageHelper.sendSubscriptionEvent(subscriptionEvent, callbackName, secret, webView)
     }
 
     companion object {
