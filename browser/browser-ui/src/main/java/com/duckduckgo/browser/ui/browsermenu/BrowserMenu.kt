@@ -433,7 +433,7 @@ class BrowserMenu(
         forwardMenuItem.isEnabled = false
         refreshMenuItem.isEnabled = false
 
-        newTabMenuItem.isVisible = false
+        newTabMenuItem.isVisible = true
         duckChatMenuItem.isVisible = viewState.showDuckChatOption
         autofillMenuItem.isVisible = viewState.showAutofill
 
