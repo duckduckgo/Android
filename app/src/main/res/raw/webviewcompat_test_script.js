@@ -12,6 +12,7 @@
 
 
     if (postInitialPing) {
+        console.log('$SCRIPT_ID$ Posting initial ping...');
         if (delay > 0) {
             setTimeout(() => {
                 ddgObj.postMessage(webViewCompatPingMessage)
