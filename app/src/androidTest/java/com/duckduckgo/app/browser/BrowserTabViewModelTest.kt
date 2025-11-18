@@ -4405,52 +4405,52 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenPageChangedThenSetIsBlankPageFromExternalTabToFalse() {
+    fun whenPageChangedThenSetIsBlankPageFromOtherTabToFalse() {
         fakeAndroidConfigBrowserFeature.handleAboutBlank().setRawStoredState(State(enable = true))
         loadUrl(null)
         testee.onMessageReceived()
-        assertTrue(omnibarViewState().isBlankPageFromExternalTab)
+        assertTrue(omnibarViewState().isBlankPageFromOtherTab)
         loadUrl(url = "www.example.com", isBrowserShowing = true)
-        assertFalse(omnibarViewState().isBlankPageFromExternalTab)
+        assertFalse(omnibarViewState().isBlankPageFromOtherTab)
     }
 
     @Test
-    fun whenUserSubmittedQueryThenSetIsBlankPageFromExternalTabToFalse() {
+    fun whenUserSubmittedQueryThenSetIsBlankPageFromOtherTabToFalse() {
         whenever(mockOmnibarConverter.convertQueryToUrl("query", null)).thenReturn("query")
         whenever(mockSpecialUrlDetector.determineType(anyString()))
             .thenReturn(SpecialUrlDetector.UrlType.SearchQuery(query = "query"))
         fakeAndroidConfigBrowserFeature.handleAboutBlank().setRawStoredState(State(enable = true))
         loadUrl(null)
         testee.onMessageReceived()
-        assertTrue(omnibarViewState().isBlankPageFromExternalTab)
+        assertTrue(omnibarViewState().isBlankPageFromOtherTab)
         testee.onUserSubmittedQuery("query")
-        assertFalse(omnibarViewState().isBlankPageFromExternalTab)
+        assertFalse(omnibarViewState().isBlankPageFromOtherTab)
     }
 
     @Test
-    fun whenHandleAboutBlankEnabledAndMessageReceivedAndNullSiteUrlThenSetAboutBlankLinkOpenedInNewTabToTrue() {
+    fun whenHandleAboutBlankEnabledAndMessageReceivedAndNullSiteUrlThenSetBlankPageFromOtherTabToTrue() {
         fakeAndroidConfigBrowserFeature.handleAboutBlank().setRawStoredState(State(enable = true))
         loadUrl(null)
         testee.onMessageReceived()
-        assertTrue(omnibarViewState().isBlankPageFromExternalTab)
+        assertTrue(omnibarViewState().isBlankPageFromOtherTab)
         assertEquals(omnibarViewState().omnibarText, "about:blank")
     }
 
     @Test
-    fun whenHandleAboutBlankEnabledAndMessageReceivedAndNonNullSiteUrlThenSetAboutBlankLinkOpenedInNewTabToFalse() {
+    fun whenHandleAboutBlankEnabledAndMessageReceivedAndNonNullSiteUrlThenSetBlankPageFromOtherTabToFalse() {
         fakeAndroidConfigBrowserFeature.handleAboutBlank().setRawStoredState(State(enable = true))
         loadUrl("url")
         testee.onMessageReceived()
-        assertFalse(omnibarViewState().isBlankPageFromExternalTab)
+        assertFalse(omnibarViewState().isBlankPageFromOtherTab)
         assertEquals(omnibarViewState().omnibarText, "url")
     }
 
     @Test
-    fun whenHandleAboutBlankDisabledAndMessageReceivedAndNullSiteUrlThenSetAboutBlankLinkOpenedInNewTabToFalse() {
+    fun whenHandleAboutBlankDisabledAndMessageReceivedAndNullSiteUrlThenSetBlankPageFromOtherTabToFalse() {
         fakeAndroidConfigBrowserFeature.handleAboutBlank().setRawStoredState(State(enable = false))
         loadUrl(null)
         testee.onMessageReceived()
-        assertFalse(omnibarViewState().isBlankPageFromExternalTab)
+        assertFalse(omnibarViewState().isBlankPageFromOtherTab)
         assertEquals(omnibarViewState().omnibarText, "")
     }
 

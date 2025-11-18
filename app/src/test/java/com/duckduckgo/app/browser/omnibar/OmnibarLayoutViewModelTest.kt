@@ -1712,12 +1712,12 @@ class OmnibarLayoutViewModelTest {
     }
 
     @Test
-    fun whenOmnibarNotFocusedAndBlankPageForExternalTabThenPersistOmbinarText() = runTest {
+    fun whenOmnibarNotFocusedAndBlankPageFromOtherTabThenPersistOmbinarText() = runTest {
         val omnibarState = OmnibarViewState(
             navigationChange = false,
             omnibarText = "about:blank",
             forceExpand = false,
-            isBlankPageFromExternalTab = true,
+            isBlankPageFromOtherTab = true,
         )
         testee.onExternalStateChange(StateChange.OmnibarStateChange(omnibarState))
 
@@ -1726,45 +1726,45 @@ class OmnibarLayoutViewModelTest {
         testee.viewState.test {
             val viewState = awaitItem()
             assertEquals("about:blank", viewState.omnibarText)
-            assertTrue(viewState.isForBlankPageFromExternalTab)
+            assertTrue(viewState.isForBlankPageFromOtherTab)
         }
     }
 
     @Test
-    fun whenSerpEasterEggLogosFeatureDisabledAndExternalStateChangeWithBlankPageForExternalTabTrueThenStateUpdatedWithBlankPageForExternalTabFlag() =
+    fun whenSerpEasterEggLogosFeatureDisabledAndExternalStateChangeWithBlankPageFromOtherTabTrueThenStateUpdatedWithBlankPageFromOtherTabFlag() =
         runTest {
             whenever(serpEasterEggLogosToggles.feature().isEnabled()).thenReturn(false)
 
             val omnibarState = OmnibarViewState(
                 navigationChange = false,
                 omnibarText = "about:blank",
-                isBlankPageFromExternalTab = true,
+                isBlankPageFromOtherTab = true,
             )
             testee.onExternalStateChange(StateChange.OmnibarStateChange(omnibarState))
 
             testee.viewState.test {
                 val viewState = awaitItem()
                 assertEquals("about:blank", viewState.omnibarText)
-                assertTrue(viewState.isForBlankPageFromExternalTab)
+                assertTrue(viewState.isForBlankPageFromOtherTab)
             }
         }
 
     @Test
-    fun whenSerpEasterEggLogosFeatureEnabledAndExternalStateChangeWithBlankPageForExternalTabTrueThenStateUpdatedWithBlankPageForExternalTabFlag() =
+    fun whenSerpEasterEggLogosFeatureEnabledAndExternalStateChangeWithBlankPageFromOtherTabTrueThenStateUpdatedWithBlankPageFromOtherTabFlag() =
         runTest {
             whenever(serpEasterEggLogosToggles.feature().isEnabled()).thenReturn(true)
 
             val omnibarState = OmnibarViewState(
                 navigationChange = false,
                 omnibarText = "about:blank",
-                isBlankPageFromExternalTab = true,
+                isBlankPageFromOtherTab = true,
             )
             testee.onExternalStateChange(StateChange.OmnibarStateChange(omnibarState))
 
             testee.viewState.test {
                 val viewState = awaitItem()
                 assertEquals("about:blank", viewState.omnibarText)
-                assertTrue(viewState.isForBlankPageFromExternalTab)
+                assertTrue(viewState.isForBlankPageFromOtherTab)
             }
         }
 

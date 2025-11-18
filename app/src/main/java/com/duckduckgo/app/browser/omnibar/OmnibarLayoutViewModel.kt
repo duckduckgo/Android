@@ -180,7 +180,7 @@ class OmnibarLayoutViewModel @Inject constructor(
         val showShadows: Boolean = false,
         val showTextInputClickCatcher: Boolean = false,
         val showFindInPage: Boolean = false,
-        val isForBlankPageFromExternalTab: Boolean = false,
+        val isForBlankPageFromOtherTab: Boolean = false,
     ) {
         fun shouldUpdateOmnibarText(isFullUrlEnabled: Boolean): Boolean {
             return this.viewMode is Browser || this.viewMode is MaliciousSiteWarning || (!isFullUrlEnabled && omnibarText.isNotEmpty())
@@ -302,7 +302,7 @@ class OmnibarLayoutViewModel @Inject constructor(
             }
         } else {
             _viewState.update {
-                val shouldUpdateOmnibarText = it.shouldUpdateOmnibarText(settingsDataStore.isFullUrlEnabled) && !it.isForBlankPageFromExternalTab
+                val shouldUpdateOmnibarText = it.shouldUpdateOmnibarText(settingsDataStore.isFullUrlEnabled) && !it.isForBlankPageFromOtherTab
                 logcat { "Omnibar: lost focus in Browser or MaliciousSiteWarning mode $shouldUpdateOmnibarText" }
                 val omnibarText = if (shouldUpdateOmnibarText) {
                     if (duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(it.url)) {
@@ -701,7 +701,7 @@ class OmnibarLayoutViewModel @Inject constructor(
                                 logoUrl = null,
                             )
                         },
-                        isForBlankPageFromExternalTab = omnibarViewState.isBlankPageFromExternalTab,
+                        isForBlankPageFromOtherTab = omnibarViewState.isBlankPageFromOtherTab,
                     )
                 }
             }
@@ -740,7 +740,7 @@ class OmnibarLayoutViewModel @Inject constructor(
                                 hasQueryChanged = true,
                                 urlLoaded = _viewState.value.url,
                             ),
-                            isForBlankPageFromExternalTab = omnibarViewState.isBlankPageFromExternalTab,
+                            isForBlankPageFromOtherTab = omnibarViewState.isBlankPageFromOtherTab,
                         )
                     }
                 }
