@@ -18,19 +18,9 @@
         if (delay > 0) {
             setTimeout(() => {
                 ddgObj.postMessage(webViewCompatPingMessage);
-                stateManager.setState(state => ({
-                    ...state,
-                    messageCount: state.messageCount + 1,
-                    lastMessageTime: Date.now()
-                }));
             }, delay);
         } else {
             ddgObj.postMessage(webViewCompatPingMessage);
-            stateManager.setState(state => ({
-                ...state,
-                messageCount: state.messageCount + 1,
-                lastMessageTime: Date.now()
-            }));
         }
     }
 
