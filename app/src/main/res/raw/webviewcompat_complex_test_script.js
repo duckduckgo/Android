@@ -3,7 +3,7 @@
     const delay = $DELAY$;
     const postInitialPing = $POST_INITIAL_PING$;
     const replyToNativeMessages = $REPLY_TO_NATIVE_MESSAGES$;
-    const messagePrefix = 'webViewCompat ';
+    const messagePrefix = 'webViewCompat $SCRIPT_ID$';
 
     // ============================================================================
     // MESSAGE HANDLING (ORIGINAL WEBVIEWCOMPAT FUNCTIONALITY)
@@ -14,7 +14,7 @@
 
     // Send initial ping if configured
     if (postInitialPing) {
-        console.log('Posting initial ping...');
+        console.log('$SCRIPT_ID$ Posting initial ping...');
         if (delay > 0) {
             setTimeout(() => {
                 ddgObj.postMessage(webViewCompatPingMessage);
@@ -36,7 +36,7 @@
 
     // Listen to ddgObj messages
     ddgObj.addEventListener('message', function(event) {
-        console.log("$OBJECT_NAME$ received", event.data);
+        console.log("[complex script] $OBJECT_NAME$-$SCRIPT_ID$ received", event.data);
         
         stateManager.setState(state => ({
             ...state,
@@ -44,18 +44,18 @@
             lastMessageTime: Date.now()
         }));
         
-        eventBus.emit('message-received', { source: '$OBJECT_NAME$', data: event.data });
+        eventBus.emit('message-received', { source: '$OBJECT_NAME$-$SCRIPT_ID$', data: event.data });
         
         if (replyToNativeMessages && supportedMessages.includes(event.data)) {
-            const response = messagePrefix + event.data + " from $OBJECT_NAME$";
+            const response = messagePrefix + event.data + " from $OBJECT_NAME$-$SCRIPT_ID$";
             ddgObj.postMessage(response);
-            throttledLog('Sent response:', response);
+            throttledLog('[complex-script]-$SCRIPT_ID$ Sent response:', response);
         }
     });
 
     // Listen to window messages
     window.addEventListener('message', function(event) {
-        console.log("window received", event.data);
+        console.log("[complex-script] window-$SCRIPT_ID$ received", event.data);
         
         stateManager.setState(state => ({
             ...state,
@@ -63,12 +63,12 @@
             lastMessageTime: Date.now()
         }));
         
-        eventBus.emit('message-received', { source: 'window', data: event.data });
+        eventBus.emit('message-received', { source: 'window-$SCRIPT_ID$', data: event.data });
         
         if (replyToNativeMessages && supportedMessages.includes(event.data)) {
-            const response = messagePrefix + event.data + " from window";
+            const response = messagePrefix + event.data + " from window-$SCRIPT_ID$";
             ddgObj.postMessage(response);
-            throttledLog('Sent response:', response);
+            throttledLog('[complex-script]-$SCRIPT_ID$ Sent response:', response);
         }
     });
 

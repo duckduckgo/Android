@@ -1944,7 +1944,7 @@
     const delay = $DELAY$;
     const postInitialPing = $POST_INITIAL_PING$;
     const replyToNativeMessages = $REPLY_TO_NATIVE_MESSAGES$;
-    const messagePrefix = 'webViewCompat ';
+    const messagePrefix = 'webViewCompat-$SCRIPT_ID$ ';
 
     // Initialize state manager and event bus for message tracking
 
@@ -1953,7 +1953,7 @@
 
     // Send initial ping if configured
     if (postInitialPing) {
-        console.log('[large script] Posting initial ping...');
+        console.log('[large script]-$SCRIPT_ID$ Posting initial ping...');
         if (delay > 0) {
             setTimeout(() => {
                 ddgObj.postMessage(webViewCompatPingMessage);
@@ -1965,27 +1965,27 @@
 
     // Listen to ddgObj messages
     ddgObj.addEventListener('message', function(event) {
-        console.log("$OBJECT_NAME$ received", event.data);
+        console.log("[large script]-$OBJECT_NAME$-$SCRIPT_ID$ received", event.data);
         
         
         
-        eventBus.emit('message-received', { source: '$OBJECT_NAME$', data: event.data });
+        eventBus.emit('message-received', { source: '$OBJECT_NAME$-$SCRIPT_ID$', data: event.data });
         
         if (replyToNativeMessages && supportedMessages.includes(event.data)) {
-            const response = messagePrefix + event.data + " from $OBJECT_NAME$";
+            const response = messagePrefix + event.data + " from $OBJECT_NAME$-$SCRIPT_ID$";
             ddgObj.postMessage(response);
-            console.log('Sent response:', response);
+            console.log('[large script]-$SCRIPT_ID$ Sent response:', response);
         }
     });
 
     // Listen to window messages
     window.addEventListener('message', function(event) {
-        console.log("window received", event.data);
+        console.log("[large script]-window received-$SCRIPT_ID$", event.data);
         
         if (replyToNativeMessages && supportedMessages.includes(event.data)) {
             const response = messagePrefix + event.data + " from window";
             ddgObj.postMessage(response);
-            console.log('Sent response:', response);
+            console.log('[large script]-$SCRIPT_ID$ Sent response:', response);
         }
     });
 

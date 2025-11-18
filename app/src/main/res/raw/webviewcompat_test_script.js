@@ -6,7 +6,7 @@
     const delay = $DELAY$;
     const postInitialPing = $POST_INITIAL_PING$;
     const replyToNativeMessages = $REPLY_TO_NATIVE_MESSAGES$;
-    const messagePrefix = 'webViewCompat '
+    const messagePrefix = 'webViewCompat-$SCRIPT_ID$ ';
 
     const webViewCompatPingMessage = messagePrefix + 'Ping:' + window.location.href + ' ' + delay + 'ms'
 
@@ -23,16 +23,16 @@
 
 
     ddgObj.addEventListener('message', function(event) {
-        console.log("$OBJECT_NAME$ received", event.data)
+        console.log("$OBJECT_NAME$-$SCRIPT_ID$ received", event.data)
         if (replyToNativeMessages && supportedMessages.includes(event.data)) {
-            ddgObj.postMessage(messagePrefix + event.data + " from $OBJECT_NAME$")
+            ddgObj.postMessage(messagePrefix + event.data + " from $OBJECT_NAME$-$SCRIPT_ID$")
         }
     });
 
     window.addEventListener('message', function(event) {
-        console.log("window received", event.data)
+        console.log("window-$SCRIPT_ID$ received", event.data)
         if (replyToNativeMessages && supportedMessages.includes(event.data)) {
-            ddgObj.postMessage(messagePrefix + event.data + " from window")
+            ddgObj.postMessage(messagePrefix + event.data + " from window-$SCRIPT_ID$")
         }
     });
 })();

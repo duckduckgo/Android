@@ -61,4 +61,5 @@ interface WebViewCompatFeature {
 data class WebViewCompatFeatureSettings(
     val jsInitialPingDelay: Long = 0,
     val initialPingDelay: Long = 0,
+    val numberOfScriptsToInject: Long = 1,
 )
