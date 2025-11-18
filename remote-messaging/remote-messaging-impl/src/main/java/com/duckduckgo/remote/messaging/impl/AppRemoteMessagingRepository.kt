@@ -69,6 +69,7 @@ class AppRemoteMessagingRepository(
             content = remoteMessage.content,
             emptyList(),
             emptyList(),
+            emptyList(),
         )
         return remoteMessage
     }
@@ -81,6 +82,7 @@ class AppRemoteMessagingRepository(
             RemoteMessage(
                 id = it.id,
                 content = message.content,
+                emptyList(),
                 emptyList(),
                 emptyList(),
             )

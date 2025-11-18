@@ -42,7 +42,7 @@ class RemoteMessagingModelTests {
 
     private lateinit var testee: RealRemoteMessageModel
 
-    val remoteMessage = RemoteMessage("id1", Content.Small("", ""), emptyList(), emptyList())
+    val remoteMessage = RemoteMessage("id1", Content.Small("", ""), emptyList(), emptyList(), emptyList())
 
     @Before
     fun setup() {
@@ -108,6 +108,7 @@ class RemoteMessagingModelTests {
             ),
             matchingRules = emptyList(),
             exclusionRules = emptyList(),
+            surfaces = emptyList(),
         )
         val result = testee.onActionClicked(remoteMessage)
 

@@ -111,12 +111,14 @@ object JsonRemoteMessageOM {
         exclusionRules: List<Int> = emptyList(),
         matchingRules: List<Int> = emptyList(),
         translations: Map<String, JsonContentTranslations> = emptyMap(),
+        surfaces: List<String>? = null,
     ) = JsonRemoteMessage(
         id = id,
         content = content,
         exclusionRules = exclusionRules,
         matchingRules = matchingRules,
         translations = translations,
+        surfaces = surfaces,
     )
 
     fun aJsonRemoteMessagingConfig(

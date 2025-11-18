@@ -31,6 +31,7 @@ data class JsonRemoteMessage(
     val exclusionRules: List<Int>,
     val matchingRules: List<Int>,
     val translations: Map<String, JsonContentTranslations>,
+    val surfaces: List<String>?,
 )
 
 data class JsonContent(
