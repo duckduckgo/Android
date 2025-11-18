@@ -16,7 +16,6 @@
 
 package com.duckduckgo.duckchat.impl.helper
 
-import android.webkit.WebView
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.impl.ChatState
 import com.duckduckgo.duckchat.impl.ChatState.HIDE
@@ -27,10 +26,8 @@ import com.duckduckgo.duckchat.impl.metric.DuckAiMetricCollector
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
 import com.duckduckgo.duckchat.impl.store.DuckChatDataStore
 import com.duckduckgo.js.messaging.api.JsCallbackData
-import com.duckduckgo.js.messaging.api.JsMessageHelper
-import com.duckduckgo.js.messaging.api.SubscriptionEvent
+import com.duckduckgo.js.messaging.api.SubscriptionEventData
 import com.squareup.anvil.annotations.ContributesBinding
-import com.squareup.moshi.Moshi
 import kotlinx.coroutines.runBlocking
 import org.json.JSONObject
 import java.util.regex.Pattern
@@ -44,7 +41,13 @@ interface DuckChatJSHelper {
         data: JSONObject?,
     ): JsCallbackData?
 
-    fun sendSubscriptionEvent(subscriptionEvent: SubscriptionEvent, callbackName: String, secret: String, webView: WebView)
+    fun onNativeAction(action: NativeAction): SubscriptionEventData
+}
+
+enum class NativeAction {
+    NEW_CHAT,
+    HISTORY,
+    DUCK_AI_SETTINGS,
 }
 
 @ContributesBinding(AppScope::class)
@@ -53,10 +56,7 @@ class RealDuckChatJSHelper @Inject constructor(
     private val duckChatPixels: DuckChatPixels,
     private val dataStore: DuckChatDataStore,
     private val duckAiMetricCollector: DuckAiMetricCollector,
-    private val jsMessageHelper: JsMessageHelper,
 ) : DuckChatJSHelper {
-
-    private val moshi = Moshi.Builder().add(JSONObjectAdapter()).build()
 
     override suspend fun processJsCallbackMessage(
         featureName: String,
@@ -130,6 +130,20 @@ class RealDuckChatJSHelper @Inject constructor(
             else -> null
         }
 
+    override fun onNativeAction(action: NativeAction): SubscriptionEventData {
+        val subscriptionName = when (action) {
+            NativeAction.NEW_CHAT -> SUBSCRIPTION_NEW_CHAT
+            NativeAction.HISTORY -> SUBSCRIPTION_HISTORY
+            NativeAction.DUCK_AI_SETTINGS -> SUBSCRIPTION_DUCK_AI_SETTINGS
+        }
+
+        return SubscriptionEventData(
+            DUCK_CHAT_FEATURE_NAME,
+            subscriptionName,
+            JSONObject(),
+        )
+    }
+
     private fun getAIChatNativeHandoffData(
         featureName: String,
         method: String,
@@ -201,10 +215,6 @@ class RealDuckChatJSHelper @Inject constructor(
         }
     }
 
-    override fun sendSubscriptionEvent(subscriptionEvent: SubscriptionEvent, callbackName: String, secret: String, webView: WebView) {
-        jsMessageHelper.sendSubscriptionEvent(subscriptionEvent, callbackName, secret, webView)
-    }
-
     companion object {
         const val DUCK_CHAT_FEATURE_NAME = "aiChat"
         private const val METHOD_GET_AI_CHAT_NATIVE_HANDOFF_DATA = "getAIChatNativeHandoffData"
@@ -231,5 +241,8 @@ class RealDuckChatJSHelper @Inject constructor(
         private const val DEFAULT_SELECTOR = "'user-prompt'"
         private const val SUCCESS = "success"
         private const val ERROR = "error"
+        private const val SUBSCRIPTION_NEW_CHAT = "submitNewChatAction"
+        private const val SUBSCRIPTION_HISTORY = "openDuckAiHistory"
+        private const val SUBSCRIPTION_DUCK_AI_SETTINGS = "openDuckAiSettings"
     }
 }

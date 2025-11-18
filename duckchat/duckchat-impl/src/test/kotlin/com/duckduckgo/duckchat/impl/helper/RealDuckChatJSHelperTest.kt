@@ -26,6 +26,7 @@ import com.duckduckgo.duckchat.impl.ReportMetric.USER_DID_SELECT_FIRST_HISTORY_I
 import com.duckduckgo.duckchat.impl.ReportMetric.USER_DID_SUBMIT_FIRST_PROMPT
 import com.duckduckgo.duckchat.impl.ReportMetric.USER_DID_SUBMIT_PROMPT
 import com.duckduckgo.duckchat.impl.ReportMetric.USER_DID_TAP_KEYBOARD_RETURN_KEY
+import com.duckduckgo.duckchat.impl.helper.RealDuckChatJSHelper.Companion.DUCK_CHAT_FEATURE_NAME
 import com.duckduckgo.duckchat.impl.metric.DuckAiMetricCollector
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
 import com.duckduckgo.duckchat.impl.store.DuckChatDataStore
@@ -511,5 +512,29 @@ class RealDuckChatJSHelperTest {
         }
 
         assertEquals(expectedPayload.toString(), result!!.params.toString())
+    }
+
+    @Test
+    fun whenNativeActionNewChatRequestedThenSubscriptionDataSent() = runTest {
+        val result = testee.onNativeAction(NativeAction.NEW_CHAT)
+
+        assertEquals("submitNewChatAction", result.subscriptionName)
+        assertEquals(DUCK_CHAT_FEATURE_NAME, result.featureName)
+    }
+
+    @Test
+    fun whenNativeActionHistoryRequestedThenSubscriptionDataSent() = runTest {
+        val result = testee.onNativeAction(NativeAction.HISTORY)
+
+        assertEquals("openDuckAiHistory", result.subscriptionName)
+        assertEquals(DUCK_CHAT_FEATURE_NAME, result.featureName)
+    }
+
+    @Test
+    fun whenNativeActionSettingsRequestedThenSubscriptionDataSent() = runTest {
+        val result = testee.onNativeAction(NativeAction.DUCK_AI_SETTINGS)
+
+        assertEquals("openDuckAiSettings", result.subscriptionName)
+        assertEquals(DUCK_CHAT_FEATURE_NAME, result.featureName)
     }
 }
