@@ -90,6 +90,7 @@ class PirWebInitialScanStatusMessageHandler @Inject constructor(
     private suspend fun getResultsFound(): List<ScanResult> {
         return stateProvider.getScanResults().map {
             ScanResult(
+                id = it.extractedProfile.dbId,
                 dataBroker = DataBroker(
                     name = it.broker.name,
                     url = it.broker.url,

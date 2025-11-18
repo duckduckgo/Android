@@ -239,6 +239,7 @@ class PirWebInitialScanStatusMessageHandlerTest {
 
         // Verify first result
         val result1 = response.resultsFound[0]
+        assertEquals(1L, result1.id)
         assertEquals("John Doe", result1.name)
         assertEquals(listOf("J. Doe", "Johnny"), result1.alternativeNames)
         assertEquals(listOf("Jane Doe"), result1.relatives)
@@ -253,6 +254,7 @@ class PirWebInitialScanStatusMessageHandlerTest {
 
         // Verify second result
         val result2 = response.resultsFound[1]
+        assertEquals(1L, result2.id)
         assertEquals("Jane Smith", result2.name)
         assertEquals(listOf("J. Smith"), result2.alternativeNames)
         assertEquals(listOf("John Smith"), result2.relatives)

@@ -99,7 +99,7 @@ sealed interface PirWebMessageResponse {
     }
 
     data class ScanResult(
-        val id: Long? = 0L,
+        val id: Long,
         val dataBroker: DataBroker,
         val name: String,
         val addresses: List<ScanResultAddress>,
