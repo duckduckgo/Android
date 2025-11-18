@@ -3833,11 +3833,16 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     private fun handleNewTabIfEmptyUrl() {
-        if (androidBrowserConfig.handleAboutBlank().isEnabled() && site?.url.isNullOrEmpty()) {
-            omnibarViewState.value = omnibarViewState.value?.copy(
-                omnibarText = ABOUT_BLANk,
-                isBlankPageFromExternalTab = true,
-            )
+        viewModelScope.launch {
+            val shouldDisplayAboutBlank = withContext(dispatchers.io()) {
+                androidBrowserConfig.handleAboutBlank().isEnabled() && site?.url.isNullOrEmpty()
+            }
+            if (shouldDisplayAboutBlank) {
+                omnibarViewState.value = omnibarViewState.value?.copy(
+                    omnibarText = ABOUT_BLANk,
+                    isBlankPageFromExternalTab = true,
+                )
+            }
         }
     }
 
