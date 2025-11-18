@@ -260,5 +260,12 @@
                 "type": "string"
             }
         ]
+    },
+    "dbp_engagement_dau": {
+        "description": "Pixel for PIR engagement tracking - daily active users.",
+        "owners": ["karlenDimla", "landomen"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
     }
 }
