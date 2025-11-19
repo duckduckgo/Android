@@ -1,0 +1,25 @@
+[
+  {
+    "op": "replace",
+    "path": "/features/androidBrowserConfig/features/splitOmnibar/state",
+    "value": "enabled"
+  },
+  {
+    "op": "remove",
+    "path": "/features/androidBrowserConfig/features/splitOmnibar/hash"
+  },
+  {
+    "op": "replace",
+    "path": "/features/androidBrowserConfig/features/useUnifiedOmnibarLayout/state",
+    "value": "enabled"
+  },
+  {
+    "op": "remove",
+    "path": "/features/androidBrowserConfig/features/useUnifiedOmnibarLayout/hash"
+  },
+  {
+    "op": "replace",
+    "path": "/version",
+    "value": "999999999999999"
+  }
+]
