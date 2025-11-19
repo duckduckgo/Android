@@ -281,5 +281,29 @@
         "triggers": ["other"],
         "suffixes": ["form_factor"],
         "parameters": ["appVersion"]
+    },
+    "dbp_weekly_child-broker_orphaned-optouts": {
+        "description": "Pixel to know orphaned opt-out records on child data brokers that don't have matching profiles on their parent broker.",
+        "owners": ["karlenDimla", "landomen"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "data_broker",
+                "description": "The URL of the child data broker site",
+                "type": "string"
+            },
+            {
+                "key": "child-parent-record-difference",
+                "description": "(child opt-outs count) - (parent opt-outs count)",
+                "type": "string"
+            },
+            {
+                "key": "calculated-orphaned-records",
+                "description": "The Number of child profiles with no parent match",
+                "type": "string"
+            }
+        ]
     }
 }
