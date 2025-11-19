@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (c) 2025 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+<!-- smartling.entity_escaping = false -->
+<!-- smartling.instruction_attributes = instruction -->
+<resources>
+    <!-- Browser Menu -->
+    <string name="browserMenuRemoveFireproofing">Αφαίρεση διαγραφής δραστηριότητας</string>
+    <string name="browserMenuBookmarks">Σελιδοδείκτες</string>
+    <string name="browserMenuAddBookmark">Προσθήκη σελιδοδείκτη</string>
+    <string name="browserMenuEditBookmark">Επεξεργασία σελιδοδείκτη</string>
+    <string name="browserMenuFireproofSite">Διαγράψτε τη δραστηριότητα γι\' αυτόν τον ιστότοπο</string>
+    <string name="browserMenuMobileSite">Ιστότοπος για κινητά</string>
+    <string name="browserMenuDesktopSite">Ιστότοπος επιφάνειας εργασίας</string>
+    <string name="browserMenuEnablePrivacyProtection">Ενεργοποίηση Προστασίας προσωπικών δεδομένων</string>
+    <string name="browserMenuDisablePrivacyProtection">Απενεργοποίηση Προστασίας προσωπικών δεδομένων</string>
+    <string name="browserMenuNewTab">Νέα καρτέλα</string>
+    <string name="browserMenuDuckChat">Duck.ai</string>
+    <string name="browserMenuShare">Κοινή χρήση</string>
+    <string name="browserMenuEmailAlias">Δημιουργήστε Duck Address</string>
+    <string name="browserMenuFindInPage">Εύρεση στη σελίδα</string>
+    <string name="browserMenuPrint">Εκτύπωση σελίδας</string>
+    <string name="browserMenuOpenAppLink">Ανοίξτε στην εφαρμογή</string>
+    <string name="browserMenuAddToHome">Προσθήκη στην Αρχική Οθόνη</string>
+    <string name="browserMenuReportBrokenSite">Αναφορά ιστότοπου που δεν λειτουργεί</string>
+    <string name="browserMenuAutofill">Κωδικοί πρόσβασης</string>
+    <string name="browserMenuDownloads">Λήψεις</string>
+    <string name="browserMenuSettings">Ρυθμίσεις</string>
+    <string name="browserMenuOpenInDDG">Άνοιγμα στο DuckDuckGo</string>
+    <string name="browserMenuRunningInDDG">Εκτέλεση στο DuckDuckGo</string>
+    <string name="browserMenuSetAsDefaultBrowser">Ορισμός ως προεπιλεγμένο πρόγραμμα περιήγησης</string>
+    <string name="browserMenuNewChat">Νέα συνομιλία</string>
+    <string name="browserMenuChatHistory">Ιστορικό συνομιλίας</string>
+    <string name="browserMenuChatSettings">Ρυθμίσεις Duck.ai</string>
+    <string name="browserMenuVPN">VPN</string>
+
+    <!-- Browser Menu Content Description -->
+    <string name="browserMenuBack">Πίσω</string>
+    <string name="browserMenuForward">Εμπρός</string>
+    <string name="browserMenuRefresh">Ανανέωση</string>
+</resources>

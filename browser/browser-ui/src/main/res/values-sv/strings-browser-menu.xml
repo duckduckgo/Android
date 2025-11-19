@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (c) 2025 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+<!-- smartling.entity_escaping = false -->
+<!-- smartling.instruction_attributes = instruction -->
+<resources>
+    <!-- Browser Menu -->
+    <string name="browserMenuRemoveFireproofing">Ta bort brandsäkring</string>
+    <string name="browserMenuBookmarks">Bokmärken</string>
+    <string name="browserMenuAddBookmark">Lägg till bokmärke</string>
+    <string name="browserMenuEditBookmark">Redigera bokmärke</string>
+    <string name="browserMenuFireproofSite">Brandsäkra den här webbplatsen</string>
+    <string name="browserMenuMobileSite">Webbplats för mobil</string>
+    <string name="browserMenuDesktopSite">Webbplats för dator</string>
+    <string name="browserMenuEnablePrivacyProtection">Aktivera integritetsskydd</string>
+    <string name="browserMenuDisablePrivacyProtection">Inaktivera integritetsskydd</string>
+    <string name="browserMenuNewTab">Ny flik</string>
+    <string name="browserMenuDuckChat">Duck.ai</string>
+    <string name="browserMenuShare">Dela</string>
+    <string name="browserMenuEmailAlias">Generera en Duck-adress</string>
+    <string name="browserMenuFindInPage">Hitta på sidan</string>
+    <string name="browserMenuPrint">Skriv ut sidan</string>
+    <string name="browserMenuOpenAppLink">Öppna i appen</string>
+    <string name="browserMenuAddToHome">Lägg till på hemskärmen</string>
+    <string name="browserMenuReportBrokenSite">Rapportera skadad webbplats</string>
+    <string name="browserMenuAutofill">Lösenord</string>
+    <string name="browserMenuDownloads">Nerladdningar</string>
+    <string name="browserMenuSettings">Inställningar</string>
+    <string name="browserMenuOpenInDDG">Öppna i DuckDuckGo</string>
+    <string name="browserMenuRunningInDDG">Körs i DuckDuckGo</string>
+    <string name="browserMenuSetAsDefaultBrowser">Ställ in som standardwebbläsare</string>
+    <string name="browserMenuNewChat">Ny chatt</string>
+    <string name="browserMenuChatHistory">Chattlogg</string>
+    <string name="browserMenuChatSettings">Duck.ai-inställningar</string>
+    <string name="browserMenuVPN">VPN</string>
+
+    <!-- Browser Menu Content Description -->
+    <string name="browserMenuBack">Tillbaka</string>
+    <string name="browserMenuForward">Framåt</string>
+    <string name="browserMenuRefresh">Uppdatera</string>
+</resources>

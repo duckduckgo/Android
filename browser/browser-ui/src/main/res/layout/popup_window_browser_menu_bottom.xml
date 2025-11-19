@@ -23,79 +23,51 @@
     android:background="@drawable/popup_menu_bg"
     android:orientation="vertical">
 
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/navigationButtonsContainer"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="10dp"
-        android:layout_marginTop="@dimen/keyline_2"
-        android:layout_marginEnd="10dp"
-        android:layout_marginBottom="@dimen/keyline_2"
-        android:gravity="center"
-        android:orientation="horizontal">
-
-        <ImageButton
-            android:id="@+id/backMenuItem"
-            style="@style/Widget.DuckDuckGo.NavigationalIcon"
-            android:layout_marginStart="@dimen/keyline_4"
-            android:contentDescription="@string/back"
-            app:srcCompat="@drawable/ic_arrow_left_24"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <ImageButton
-            android:id="@+id/forwardMenuItem"
-            style="@style/Widget.DuckDuckGo.NavigationalIcon"
-            android:contentDescription="@string/forward"
-            app:srcCompat="@drawable/ic_arrow_right_24"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/refreshMenuItem"
-            app:layout_constraintStart_toEndOf="@+id/backMenuItem"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <ImageButton
-            android:id="@+id/refreshMenuItem"
-            style="@style/Widget.DuckDuckGo.NavigationalIcon"
-            android:layout_marginEnd="@dimen/keyline_4"
-            android:contentDescription="@string/refresh"
-            app:srcCompat="@drawable/ic_reload_24"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-    </androidx.constraintlayout.widget.ConstraintLayout>
-
-    <com.duckduckgo.common.ui.view.divider.HorizontalDivider
-        android:id="@+id/navigationButtonsSectionDivider"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:defaultPadding="false" />
-
     <ScrollView
         android:id="@+id/menuScrollableContent"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="0dp"
+        android:layout_weight="1"
         android:clipToPadding="false"
         android:overScrollMode="never"
-        android:paddingTop="4dp">
+        android:paddingTop="@dimen/keyline_2">
 
         <LinearLayout
+            android:id="@+id/menuItemsContainer"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:paddingBottom="@dimen/keyline_2">
+            android:paddingBottom="@dimen/keyline_1">
+
+            <com.duckduckgo.common.ui.view.MenuItemView
+                android:visibility="gone"
+                android:id="@+id/newChatMenuItem"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:iconDrawable="@drawable/ic_ai_chat_add_16"
+                app:primaryText="@string/browserMenuNewChat" />
+
+            <com.duckduckgo.common.ui.view.MenuItemView
+                android:visibility="gone"
+                android:id="@+id/chatHistoryMenuItem"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:iconDrawable="@drawable/ic_history_16"
+                app:primaryText="@string/browserMenuChatHistory" />
 
             <com.duckduckgo.common.ui.view.MenuItemView
                 android:id="@+id/newTabMenuItem"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:iconDrawable="@drawable/ic_add_16"
-                app:primaryText="@string/newTabMenuItem" />
+                app:primaryText="@string/browserMenuNewTab" />
 
-            <include
+            <com.duckduckgo.common.ui.view.MenuItemView
                 android:id="@+id/includeDuckChatMenuItem"
-                layout="@layout/view_menu_item_duck_chat" />
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:iconDrawable="@drawable/ic_ai_chat_16"
+                app:primaryText="@string/browserMenuDuckChat" />
 
             <com.duckduckgo.common.ui.view.divider.HorizontalDivider
                 android:id="@+id/siteOptionsMenuDivider"
@@ -112,21 +84,21 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:iconDrawable="@drawable/ic_share_android_16"
-                app:primaryText="@string/shareMenuTitle" />
+                app:primaryText="@string/browserMenuShare" />
 
             <com.duckduckgo.common.ui.view.MenuItemView
                 android:id="@+id/addBookmarksMenuItem"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:iconDrawable="@drawable/ic_bookmark_16"
-                app:primaryText="@string/addBookmarkMenuTitle" />
+                app:primaryText="@string/browserMenuAddBookmark" />
 
             <com.duckduckgo.common.ui.view.MenuItemView
                 android:id="@+id/bookmarksMenuItem"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:iconDrawable="@drawable/ic_bookmarks_16"
-                app:primaryText="@string/bookmarksMenuTitle" />
+                app:primaryText="@string/browserMenuBookmarks" />
 
             <com.duckduckgo.common.ui.view.divider.HorizontalDivider
                 android:id="@+id/browserOptionsMenuDivider"
@@ -139,35 +111,35 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:iconDrawable="@drawable/ic_fireproof_solid_16"
-                app:primaryText="@string/fireproofWebsiteMenuTitleAdd" />
+                app:primaryText="@string/browserMenuFireproofSite" />
 
             <com.duckduckgo.common.ui.view.MenuItemView
                 android:id="@+id/createAliasMenuItem"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:iconDrawable="@drawable/ic_email_16"
-                app:primaryText="@string/newEmailAliasMenuTitle" />
+                app:primaryText="@string/browserMenuEmailAlias" />
 
             <com.duckduckgo.common.ui.view.MenuItemView
                 android:id="@+id/changeBrowserModeMenuItem"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:iconDrawable="@drawable/ic_device_desktop_16"
-                app:primaryText="@string/requestDesktopSiteMenuTitle" />
+                app:primaryText="@string/browserMenuDesktopSite" />
 
             <com.duckduckgo.common.ui.view.MenuItemView
                 android:id="@+id/findInPageMenuItem"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:iconDrawable="@drawable/ic_find_in_page_16"
-                app:primaryText="@string/findInPageMenuTitle" />
+                app:primaryText="@string/browserMenuFindInPage" />
 
             <com.duckduckgo.common.ui.view.MenuItemView
                 android:id="@+id/printPageMenuItem"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:iconDrawable="@drawable/ic_print_16"
-                app:primaryText="@string/printMenuTitle" />
+                app:primaryText="@string/browserMenuPrint" />
 
             <com.duckduckgo.common.ui.view.MenuItemView
                 android:id="@+id/openInAppMenuItem"
@@ -176,28 +148,28 @@
                 android:visibility="gone"
                 tools:visibility="visible"
                 app:iconDrawable="@drawable/ic_open_in_16"
-                app:primaryText="@string/appLinkMenuItemTitle" />
+                app:primaryText="@string/browserMenuOpenAppLink" />
 
             <com.duckduckgo.common.ui.view.MenuItemView
                 android:id="@+id/addToHomeMenuItem"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:iconDrawable="@drawable/ic_add_to_home_16"
-                app:primaryText="@string/addToHome" />
+                app:primaryText="@string/browserMenuAddToHome" />
 
             <com.duckduckgo.common.ui.view.MenuItemView
                 android:id="@+id/privacyProtectionMenuItem"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:iconDrawable="@drawable/ic_shield_disabled_16"
-                app:primaryText="@string/enablePrivacyProtection" />
+                app:primaryText="@string/browserMenuEnablePrivacyProtection" />
 
             <com.duckduckgo.common.ui.view.MenuItemView
                 android:id="@+id/brokenSiteMenuItem"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:iconDrawable="@drawable/ic_feedback_blank_16"
-                app:primaryText="@string/brokenSiteReportBrokenSiteMenuItem" />
+                app:primaryText="@string/browserMenuReportBrokenSite" />
 
             <com.duckduckgo.common.ui.view.divider.HorizontalDivider
                 android:id="@+id/settingsMenuDivider"
@@ -210,14 +182,14 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:iconDrawable="@drawable/ic_key_16"
-                app:primaryText="@string/autofillManagementScreenTitle" />
+                app:primaryText="@string/browserMenuAutofill" />
 
             <com.duckduckgo.common.ui.view.MenuItemView
                 android:id="@+id/downloadsMenuItem"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:iconDrawable="@drawable/ic_downloads_16"
-                app:primaryText="@string/downloadsMenuTitle" />
+                app:primaryText="@string/browserMenuDownloads" />
 
             <include
                 android:id="@+id/includeVpnMenuItem"
@@ -228,7 +200,15 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:iconDrawable="@drawable/ic_settings_16"
-                app:primaryText="@string/settingsMenuItemTitle" />
+                app:primaryText="@string/browserMenuSettings" />
+
+            <com.duckduckgo.common.ui.view.MenuItemView
+                android:visibility="gone"
+                android:id="@+id/chatSettings"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:iconDrawable="@drawable/ic_settings_ai_16"
+                app:primaryText="@string/browserMenuChatSettings" />
 
             <com.duckduckgo.common.ui.view.MenuItemView
                 android:visibility="gone"
@@ -236,7 +216,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:iconDrawable="@drawable/ic_open_in_16"
-                app:primaryText="@string/openInDdgMenuItemTitle" />
+                app:primaryText="@string/browserMenuOpenInDDG" />
 
             <com.duckduckgo.common.ui.view.divider.HorizontalDivider
                 android:visibility="gone"
@@ -253,10 +233,59 @@
                 app:textType="secondary"
                 app:typography="body2"
                 app:iconDrawable="@drawable/ic_dax_icon"
-                app:primaryText="@string/runningInDdgMenuItemTitle" />
+                app:primaryText="@string/browserMenuRunningInDDG" />
 
         </LinearLayout>
 
     </ScrollView>
+
+    <com.duckduckgo.common.ui.view.divider.HorizontalDivider
+        android:id="@+id/navigationButtonsSectionDivider"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:defaultPadding="false" />
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/navigationButtonsContainer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="@dimen/keyline_2"
+        android:layout_marginEnd="10dp"
+        android:layout_marginBottom="@dimen/keyline_2"
+        android:gravity="center"
+        android:orientation="horizontal">
+
+        <ImageButton
+            android:id="@+id/backMenuItem"
+            style="@style/Widget.DuckDuckGo.NavigationalIcon"
+            android:layout_marginStart="@dimen/keyline_4"
+            android:contentDescription="@string/browserMenuBack"
+            app:srcCompat="@drawable/ic_arrow_left_24"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <ImageButton
+            android:id="@+id/forwardMenuItem"
+            style="@style/Widget.DuckDuckGo.NavigationalIcon"
+            android:contentDescription="@string/browserMenuForward"
+            app:srcCompat="@drawable/ic_arrow_right_24"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/refreshMenuItem"
+            app:layout_constraintStart_toEndOf="@+id/backMenuItem"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <ImageButton
+            android:id="@+id/refreshMenuItem"
+            style="@style/Widget.DuckDuckGo.NavigationalIcon"
+            android:layout_marginEnd="@dimen/keyline_4"
+            android:contentDescription="@string/browserMenuRefresh"
+            app:srcCompat="@drawable/ic_reload_24"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
 </LinearLayout>
