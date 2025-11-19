@@ -178,6 +178,10 @@ interface PirRepository {
 
     suspend fun setCustomStatsPixelsLastSentMs(timeMs: Long)
 
+    suspend fun getLastPirDauPixelTimeMs(): Long
+
+    suspend fun setLastPirDauPixelTimeMs(timeMs: Long)
+
     data class GeneratedEmailData(
         val emailAddress: String,
         val pattern: String,
@@ -673,6 +677,16 @@ class RealPirRepository(
 
     override suspend fun setCustomStatsPixelsLastSentMs(timeMs: Long) = withContext(dispatcherProvider.io()) {
         pirDataStore.customStatsPixelsLastSentMs = timeMs
+    }
+
+    override suspend fun getLastPirDauPixelTimeMs(): Long = withContext(dispatcherProvider.io()) {
+        return@withContext pirDataStore.dauLastSentMs
+    }
+
+    override suspend fun setLastPirDauPixelTimeMs(timeMs: Long) {
+        withContext(dispatcherProvider.io()) {
+            pirDataStore.dauLastSentMs = timeMs
+        }
     }
 
     private fun List<EmailData>.toRequest(): PirEmailConfirmationDataRequest =
