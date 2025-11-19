@@ -1090,6 +1090,34 @@ class RealDuckChatTest {
         assertTrue(testee.showInputScreenOnSystemSearchLaunch.value)
     }
 
+    @Test
+    fun `when get duck chat url with query and autoprompt then return correct url`() = runTest {
+        val url = testee.getDuckChatUrl("query", true)
+
+        assertTrue(url == "https://duckduckgo.com/?q=query&prompt=1&ia=chat&duckai=5")
+    }
+
+    @Test
+    fun `when get duck chat url with query and no autoprompt then return correct url`() = runTest {
+        val url = testee.getDuckChatUrl("query", false)
+
+        assertTrue(url == "https://duckduckgo.com/?q=query&ia=chat&duckai=5")
+    }
+
+    @Test
+    fun `when get duck chat url with empty query and no autoprompt then return correct url`() = runTest {
+        val url = testee.getDuckChatUrl("", false)
+
+        assertTrue(url == "https://duckduckgo.com/?q=DuckDuckGo+AI+Chat&ia=chat&duckai=5")
+    }
+
+    @Test
+    fun `when get duck chat url with empty query and autoprompt then return correct url`() = runTest {
+        val url = testee.getDuckChatUrl("", true)
+
+        assertTrue(url == "https://duckduckgo.com/?q=DuckDuckGo+AI+Chat&ia=chat&duckai=5")
+    }
+
     companion object {
         val SETTINGS_JSON = """
         {

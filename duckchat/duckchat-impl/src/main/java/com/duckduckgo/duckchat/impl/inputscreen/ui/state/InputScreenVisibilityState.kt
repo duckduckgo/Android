@@ -17,15 +17,16 @@
 package com.duckduckgo.duckchat.impl.inputscreen.ui.state
 
 data class InputScreenVisibilityState(
-    val submitButtonVisible: Boolean,
-    val voiceInputButtonVisible: Boolean,
-    val autoCompleteSuggestionsVisible: Boolean,
-    val bottomFadeVisible: Boolean,
-    val showChatLogo: Boolean,
-    val showSearchLogo: Boolean,
-    val newLineButtonVisible: Boolean,
-    val mainButtonsVisible: Boolean,
-    val searchMode: Boolean,
+    val submitButtonVisible: Boolean = false,
+    val voiceInputButtonVisible: Boolean = false,
+    val autoCompleteSuggestionsVisible: Boolean = false,
+    val bottomFadeVisible: Boolean = false,
+    val showChatLogo: Boolean = true,
+    val showSearchLogo: Boolean = true,
+    val newLineButtonVisible: Boolean = false,
+    val mainButtonsVisible: Boolean = false,
+    val searchMode: Boolean = false,
+    val fullScreenMode: Boolean = false,
 ) {
     val actionButtonsContainerVisible: Boolean = submitButtonVisible || voiceInputButtonVisible || newLineButtonVisible
 }

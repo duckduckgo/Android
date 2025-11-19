@@ -20,6 +20,7 @@ import com.duckduckgo.browser.api.autocomplete.AutoCompleteFactory
 import com.duckduckgo.browser.api.autocomplete.AutoCompleteSettings
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.extensions.toBinaryString
+import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.impl.inputscreen.ui.InputScreenConfigResolver
 import com.duckduckgo.duckchat.impl.inputscreen.ui.command.Command
@@ -42,6 +43,7 @@ import com.duckduckgo.history.api.NavigationHistory
 import com.duckduckgo.voice.api.VoiceSearchAvailability
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.advanceTimeBy
@@ -86,6 +88,11 @@ class InputScreenViewModelTest {
     private val inputScreenConfigResolver: InputScreenConfigResolver = mock()
     private val omnibarRepository: OmnibarRepository = mock()
 
+    private val duckAiFeatureState: DuckAiFeatureState = mock()
+    private val fullScreenModeDisabledFlow = MutableStateFlow(false)
+    private val fullScreenModeEnabledFlow = MutableStateFlow(true)
+    private val duckChatURL = "https://duckduckgo.com/?q=DuckDuckGo+AI+Chat&ia=chat&duckai=5"
+
     @Before
     fun setup() =
         runTest {
@@ -95,9 +102,11 @@ class InputScreenViewModelTest {
                 flowOf(AutoCompleteResult("", listOf(AutoCompleteDefaultSuggestion("suggestion")))),
             )
             whenever(duckChat.wasOpenedBefore()).thenReturn(false)
+            whenever(duckChat.getDuckChatUrl(any(), any())).thenReturn(duckChatURL)
             whenever(inputScreenConfigResolver.useTopBar()).thenReturn(true)
             whenever(voiceSearchAvailability.isVoiceSearchAvailable).thenReturn(true)
             whenever(omnibarRepository.omnibarType).thenReturn(OmnibarType.SINGLE_TOP)
+            whenever(duckAiFeatureState.showFullScreenMode).thenReturn(fullScreenModeDisabledFlow)
         }
 
     private fun createViewModel(currentOmnibarText: String = ""): InputScreenViewModel =
@@ -116,6 +125,7 @@ class InputScreenViewModelTest {
             inputScreenSessionUsageMetric = inputScreenSessionUsageMetric,
             inputScreenConfigResolver = inputScreenConfigResolver,
             omnibarRepository = omnibarRepository,
+            duckAiFeatureState = duckAiFeatureState,
         )
 
     @Test
@@ -1999,5 +2009,20 @@ class InputScreenViewModelTest {
             viewModel.onSearchInputTextChanged("")
 
             assertFalse(viewModel.visibilityState.value.mainButtonsVisible)
+        }
+
+    @Test
+    fun `when fullscreen mode enabled submitting chat sends a query to the main fragment`() =
+        runTest {
+            whenever(duckAiFeatureState.showFullScreenMode).thenReturn(fullScreenModeEnabledFlow)
+            whenever(inputScreenSessionStore.hasUsedSearchMode()).thenReturn(false)
+            whenever(inputScreenSessionStore.hasUsedChatMode()).thenReturn(false)
+
+            val viewModel = createViewModel()
+            val query = "example"
+
+            viewModel.onChatSubmitted(query)
+
+            assertEquals(SubmitSearch(duckChatURL), viewModel.command.value)
         }
 }
