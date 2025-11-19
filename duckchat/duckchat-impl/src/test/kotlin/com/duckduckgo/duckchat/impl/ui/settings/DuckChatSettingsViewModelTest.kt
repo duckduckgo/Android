@@ -285,10 +285,44 @@ class DuckChatSettingsViewModelTest {
         }
 
     @Test
-    fun whenDuckChatSearchAISettingsClickedAndSaveAndExitEnabledThenOpenSettingsLinkWithReturnParamEmitted() =
+    fun whenDuckChatSearchAISettingsClickedAndEmbeddedEnabledAndHideAiGeneratedImagesDisabledThenOpenSettingsLinkWithLegacyLink() =
         runTest {
             @Suppress("DenyListedApi")
             settingsPageFeature.embeddedSettingsWebView().setRawStoredState(State(enable = true))
+            @Suppress("DenyListedApi")
+            settingsPageFeature.hideAiGeneratedImagesOption().setRawStoredState(State(enable = false))
+
+            testee.duckChatSearchAISettingsClicked()
+
+            testee.commands.test {
+                val command = awaitItem()
+                assertTrue(command is OpenLink)
+                command as OpenLink
+                assertEquals(
+                    DuckChatSettingsViewModel.LEGACY_DUCK_CHAT_SEARCH_AI_SETTINGS_LINK_EMBEDDED,
+                    command.link,
+                )
+                assertEquals(R.string.duck_chat_assist_settings_title, command.titleRes)
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun whenDuckChatSearchAISettingsClickedAndEmbeddedEnabledAndHideAiGeneratedImagesEnabledThenOpenSettingsLinkWithNewLink() =
+        runTest {
+            @Suppress("DenyListedApi")
+            settingsPageFeature.embeddedSettingsWebView().setRawStoredState(State(enable = true))
+            @Suppress("DenyListedApi")
+            settingsPageFeature.hideAiGeneratedImagesOption().setRawStoredState(State(enable = true))
+
+            testee = DuckChatSettingsViewModel(
+                duckChatActivityParams = DuckChatSettingsNoParams,
+                duckChat = duckChat,
+                pixel = mockPixel,
+                inputScreenDiscoveryFunnel = mockInputScreenDiscoveryFunnel,
+                settingsPageFeature = settingsPageFeature,
+                dispatcherProvider = coroutineRule.testDispatcherProvider,
+            )
 
             testee.duckChatSearchAISettingsClicked()
 
@@ -300,7 +334,7 @@ class DuckChatSettingsViewModelTest {
                     DuckChatSettingsViewModel.DUCK_CHAT_SEARCH_AI_SETTINGS_LINK_EMBEDDED,
                     command.link,
                 )
-                assertEquals(R.string.duck_chat_assist_settings_title, command.titleRes)
+                assertEquals(R.string.duckAiSerpSettingsTitle, command.titleRes)
                 cancelAndIgnoreRemainingEvents()
             }
         }
@@ -556,5 +590,23 @@ class DuckChatSettingsViewModelTest {
         runTest {
             testee.onDuckAiHideAiGeneratedImagesClicked()
             verify(mockPixel).fire(DuckChatPixelName.SERP_SETTINGS_OPEN_HIDE_AI_GENERATED_IMAGES)
+        }
+
+    @Test
+    fun `when onDuckAiHideAiGeneratedImagesClicked then OpenLink command with correct link is emitted`() =
+        runTest {
+            testee.onDuckAiHideAiGeneratedImagesClicked()
+
+            testee.commands.test {
+                val command = awaitItem()
+                assertTrue(command is OpenLink)
+                command as OpenLink
+                assertEquals(
+                    DuckChatSettingsViewModel.DUCK_CHAT_HIDE_GENERATED_IMAGES_LINK_EMBEDDED,
+                    command.link,
+                )
+                assertEquals(R.string.duckAiSerpSettingsTitle, command.titleRes)
+                cancelAndIgnoreRemainingEvents()
+            }
         }
 }
