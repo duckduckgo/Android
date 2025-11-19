@@ -40,6 +40,7 @@ data class DuckDuckGoColors(
     val window: Color,
     val destructive: Color,
     val lines: Color,
+    val borders: Color,
     val accentContentPrimary: Color,
     val accentBlue: Color,
     val accentYellow: Color,
@@ -158,6 +159,10 @@ val DisabledColor
     @Composable
     @ReadOnlyComposable
     get() = colorResource(R.color.disabledColor)
+val BackgroundColor
+    @Composable
+    @ReadOnlyComposable
+    get() = colorResource(R.color.background_background_light)
 val AlertGreen
     @Composable
     @ReadOnlyComposable
