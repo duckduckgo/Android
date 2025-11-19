@@ -55,7 +55,10 @@ class SpecialUrlDetectorImpl(
     private val androidBrowserConfigFeature: AndroidBrowserConfigFeature,
 ) : SpecialUrlDetector {
 
-    override fun determineType(initiatingUrl: String?, uri: Uri): UrlType {
+    override fun determineType(
+        initiatingUrl: String?,
+        uri: Uri,
+    ): UrlType {
         val uriString = uri.toString()
 
         return when (val scheme = uri.scheme) {
@@ -71,12 +74,15 @@ class SpecialUrlDetectorImpl(
             null -> {
                 if (subscriptions.shouldLaunchPrivacyProForUrl("https://$uriString")) {
                     UrlType.ShouldLaunchPrivacyProLink
-                } else if (aiChatQueryDetectionFeature.self().isEnabled() && duckChat.isDuckChatUrl(uri)) {
+                } else if (aiChatQueryDetectionFeature.self()
+                        .isEnabled() && duckChat.isDuckChatUrl(uri) && !duckAiFeatureState.showFullScreenMode.value
+                ) {
                     UrlType.ShouldLaunchDuckChatLink
                 } else {
                     UrlType.SearchQuery(uriString)
                 }
             }
+
             else -> {
                 val intentFlags = if (scheme == INTENT_SCHEME && androidBrowserConfigFeature.handleIntentScheme().isEnabled()) {
                     URI_INTENT_SCHEME
@@ -102,7 +108,10 @@ class SpecialUrlDetectorImpl(
     private fun buildSmsTo(uriString: String): UrlType = UrlType.Sms(uriString.removePrefix("$SMSTO_SCHEME:").truncate(SMS_MAX_LENGTH))
 
     @Suppress("NewApi") // we use appBuildConfig
-    override fun processUrl(initiatingUrl: String?, uriString: String): UrlType {
+    override fun processUrl(
+        initiatingUrl: String?,
+        uriString: String,
+    ): UrlType {
         trackingParameters.cleanTrackingParameters(initiatingUrl = initiatingUrl, url = uriString)?.let { cleanedUrl ->
             return UrlType.TrackingParameterLink(cleanedUrl = cleanedUrl)
         }
@@ -189,7 +198,11 @@ class SpecialUrlDetectorImpl(
         intentFlags: Int,
         userInitiated: Boolean,
     ): UrlType {
-        fun buildIntent(uriString: String, intentFlags: Int, userInitiated: Boolean): UrlType {
+        fun buildIntent(
+            uriString: String,
+            intentFlags: Int,
+            userInitiated: Boolean,
+        ): UrlType {
             return try {
                 val intent = Intent.parseUri(uriString, intentFlags)
                 // only proceed if something can handle it

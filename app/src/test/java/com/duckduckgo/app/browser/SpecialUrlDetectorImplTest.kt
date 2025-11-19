@@ -398,6 +398,15 @@ class SpecialUrlDetectorImplTest {
     }
 
     @Test
+    fun whenUrlIsDuckChatUrlAndFullscreenModeEnabledThenDuckChatTypeNotDetected() = runTest {
+        mockDuckAiFullScreenMode.emit(true)
+        whenever(mockAIChatQueryDetectionFeatureToggle.isEnabled()).thenReturn(true)
+        whenever(mockDuckChat.isDuckChatUrl(any())).thenReturn(true)
+        val result = testee.determineType("duckduckgo.com")
+        assertTrue(result is SearchQuery)
+    }
+
+    @Test
     fun whenUrlIsParametrizedQueryThenSearchQueryTypeDetected() {
         val type = testee.determineType("foo site:duckduckgo.com") as SearchQuery
         assertEquals("foo site:duckduckgo.com", type.query)
