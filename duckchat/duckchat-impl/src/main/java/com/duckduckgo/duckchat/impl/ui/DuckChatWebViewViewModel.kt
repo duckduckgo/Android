@@ -65,6 +65,11 @@ class DuckChatWebViewViewModel @Inject constructor(
         observeSubscriptionChanges()
     }
 
+    fun handleOnSameWebView(url: String): Boolean {
+        // Allow Duck.ai links to load within the same WebView (in-sheet navigation)
+        return duckChat.isDuckAiUrl(url)
+    }
+
     private fun observeSubscriptionChanges() {
         subscriptions.getSubscriptionStatusFlow()
             .distinctUntilChanged()

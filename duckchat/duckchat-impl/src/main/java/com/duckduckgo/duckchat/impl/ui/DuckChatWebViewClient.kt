@@ -22,6 +22,7 @@ import android.webkit.WebViewClient
 import androidx.annotation.UiThread
 import com.duckduckgo.browser.api.JsInjectorPlugin
 import com.duckduckgo.common.utils.plugins.PluginPoint
+import logcat.logcat
 import javax.inject.Inject
 
 class DuckChatWebViewClient @Inject constructor(
@@ -37,5 +38,13 @@ class DuckChatWebViewClient @Inject constructor(
         jsPlugins.getPlugins().forEach {
             it.onPageStarted(webView, url, null)
         }
+    }
+
+    override fun onPageFinished(
+        view: WebView?,
+        url: String?,
+    ) {
+        logcat { "Marcos url is $url and ${view?.url}" }
+        super.onPageFinished(view, url)
     }
 }

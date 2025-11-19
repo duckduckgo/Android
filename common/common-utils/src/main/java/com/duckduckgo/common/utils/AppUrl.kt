@@ -20,7 +20,6 @@ class AppUrl {
 
     object Url {
         const val HOST = "duckduckgo.com"
-        const val HOST_DUCKAI = "duck.ai"
         const val API = "https://$HOST"
         const val HOME = "https://$HOST"
         const val COOKIES = "https://$HOST"

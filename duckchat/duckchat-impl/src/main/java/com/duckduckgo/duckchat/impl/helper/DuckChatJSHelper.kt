@@ -16,7 +16,6 @@
 
 package com.duckduckgo.duckchat.impl.helper
 
-import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.impl.ChatState
 import com.duckduckgo.duckchat.impl.ChatState.HIDE
@@ -30,7 +29,6 @@ import com.duckduckgo.js.messaging.api.JsCallbackData
 import com.duckduckgo.js.messaging.api.SubscriptionEventData
 import com.squareup.anvil.annotations.ContributesBinding
 import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.withContext
 import org.json.JSONObject
 import java.util.regex.Pattern
 import javax.inject.Inject
@@ -58,9 +56,7 @@ class RealDuckChatJSHelper @Inject constructor(
     private val duckChatPixels: DuckChatPixels,
     private val dataStore: DuckChatDataStore,
     private val duckAiMetricCollector: DuckAiMetricCollector,
-    private val dispatchers: DispatcherProvider,
 ) : DuckChatJSHelper {
-    private val migrationItems = mutableListOf<String>()
     override suspend fun processJsCallbackMessage(
         featureName: String,
         method: String,
@@ -129,23 +125,6 @@ class RealDuckChatJSHelper @Inject constructor(
                     }
                 null
             }
-
-            METHOD_STORE_MIGRATION_DATA -> id?.let {
-                getStoreMigrationDataResponse(featureName, method, it, data)
-            }
-
-            METHOD_GET_MIGRATION_INFO -> id?.let {
-                getMigrationInfoResponse(featureName, method, it)
-            }
-
-            METHOD_GET_MIGRATION_DATA_BY_INDEX -> id?.let {
-                getMigrationDataByIndexResponse(featureName, method, it, data)
-            }
-
-            METHOD_CLEAR_MIGRATION_DATA -> id?.let {
-                getClearMigrationDataResponse(featureName, method, it)
-            }
-
             else -> null
         }
 
@@ -234,91 +213,6 @@ class RealDuckChatJSHelper @Inject constructor(
             }
         }
     }
-
-    /**
-     * Accept incoming JSON payload { "serializedMigrationFile": "..." }
-     * Store the string value in an ordered list for later retrieval
-     */
-    private suspend fun getStoreMigrationDataResponse(
-        featureName: String,
-        method: String,
-        id: String,
-        data: JSONObject?,
-    ): JsCallbackData {
-        return withContext(dispatchers.io()) {
-            val item = data?.optString(SERIALIZED_MIGRATION_FILE)
-            val jsonPayload = JSONObject()
-            if (item != null && item != JSONObject.NULL) {
-                migrationItems.add(item)
-                jsonPayload.put(OK, true)
-            } else {
-                jsonPayload.put(OK, false)
-                jsonPayload.put(REASON, "Missing or invalid serializedMigrationFile")
-            }
-            JsCallbackData(jsonPayload, featureName, method, id)
-        }
-    }
-
-    /**
-     * Return the count of strings previously stored.
-     * It's ok to return 0 if no items have been stored
-     */
-    private suspend fun getMigrationInfoResponse(
-        featureName: String,
-        method: String,
-        id: String,
-    ): JsCallbackData {
-        return withContext(dispatchers.io()) {
-            val count = migrationItems.size
-            val jsonPayload = JSONObject().apply {
-                put(OK, true)
-                put(COUNT, count)
-            }
-            JsCallbackData(jsonPayload, featureName, method, id)
-        }
-    }
-
-    /**
-     * Try to lookup a string by index
-     *  - when found, return { ok: true, serializedMigrationFile: '...' }
-     *  - when missing, return { ok: false, reason: '...' }
-     */
-    private suspend fun getMigrationDataByIndexResponse(
-        featureName: String,
-        method: String,
-        id: String,
-        data: JSONObject?,
-    ): JsCallbackData {
-        return withContext(dispatchers.io()) {
-            val index = data?.optInt(INDEX, -1) ?: -1
-            val value = migrationItems.getOrNull(index)
-            val jsonPayload = JSONObject()
-            if (value == null) {
-                jsonPayload.put(OK, false)
-                jsonPayload.put(REASON, "nothing at index: $index")
-            } else {
-                jsonPayload.put(OK, true)
-                jsonPayload.put(SERIALIZED_MIGRATION_FILE, value)
-            }
-            JsCallbackData(jsonPayload, featureName, method, id)
-        }
-    }
-
-    /**
-     * Clear migration data, returning { ok: true } when complete
-     */
-    private suspend fun getClearMigrationDataResponse(
-        featureName: String,
-        method: String,
-        id: String,
-    ): JsCallbackData {
-        return withContext(dispatchers.io()) {
-            migrationItems.clear()
-            val jsonPayload = JSONObject().apply { put(OK, true) }
-            JsCallbackData(jsonPayload, featureName, method, id)
-        }
-    }
-
     companion object {
         const val DUCK_CHAT_FEATURE_NAME = "aiChat"
         private const val METHOD_GET_AI_CHAT_NATIVE_HANDOFF_DATA = "getAIChatNativeHandoffData"
@@ -349,17 +243,5 @@ class RealDuckChatJSHelper @Inject constructor(
         private const val SUBSCRIPTION_NEW_CHAT = "submitNewChatAction"
         private const val SUBSCRIPTION_HISTORY = "openDuckAiHistory"
         private const val SUBSCRIPTION_DUCK_AI_SETTINGS = "openDuckAiSettings"
-        private const val OK = "ok"
-        private const val REASON = "reason"
-
-        // Migration messaging constants
-        private const val METHOD_STORE_MIGRATION_DATA = "storeMigrationData"
-        private const val METHOD_GET_MIGRATION_INFO = "getMigrationInfo"
-        private const val METHOD_GET_MIGRATION_DATA_BY_INDEX = "getMigrationDataByIndex"
-        private const val METHOD_CLEAR_MIGRATION_DATA = "clearMigrationData"
-
-        private const val SERIALIZED_MIGRATION_FILE = "serializedMigrationFile"
-        private const val COUNT = "count"
-        private const val INDEX = "index"
     }
 }

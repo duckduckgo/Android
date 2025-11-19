@@ -213,8 +213,7 @@ open class DuckChatWebViewFragment : DuckDuckGoFragment(R.layout.activity_duck_c
                     view?.requestFocusNodeHref(resultMsg)
                     val newWindowUrl = resultMsg?.data?.getString("url")
                     if (newWindowUrl != null) {
-                        if (duckDuckGoUrlDetector.isDuckAiUrl(newWindowUrl)) {
-                            // Allow Duck.ai links to load within the same WebView (in-sheet navigation)
+                        if (viewModel.handleOnSameWebView(newWindowUrl)) {
                             simpleWebview.loadUrl(newWindowUrl)
                         } else {
                             startActivity(browserNav.openInNewTab(requireContext(), newWindowUrl))
