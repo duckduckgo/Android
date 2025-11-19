@@ -1118,6 +1118,14 @@ class RealDuckChatTest {
         assertTrue(url == "https://duckduckgo.com/?q=DuckDuckGo+AI+Chat&ia=chat&duckai=5")
     }
 
+    @Test
+    fun `when url can be handled by webview return true`() {
+        assertTrue(testee.canHandleOnAiWebView("https://duck.ai/somepath"))
+        assertTrue(testee.canHandleOnAiWebView("https://duck.ai/somepath/someotherpath?test=1"))
+        assertTrue(testee.canHandleOnAiWebView("https://duck.ai"))
+        assertTrue(testee.canHandleOnAiWebView("https://duckduckgo.com/revoke-duckai-access"))
+    }
+
     companion object {
         val SETTINGS_JSON = """
         {

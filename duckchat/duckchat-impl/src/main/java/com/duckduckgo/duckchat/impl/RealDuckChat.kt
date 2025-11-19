@@ -215,9 +215,9 @@ interface DuckChatInternal : DuckChat {
 
     /**
      * This method takes a [url] and returns `true` or `false`.
-     * @return `true` if the given [url] belongs to the duck.ai domain (apex or subdomain) or if it's the revoke url and `false` otherwise.
+     * @return `true` if the given [url] can be handled in the duck ai webview and `false` otherwise.
      */
-    fun isDuckAiUrl(url: String): Boolean
+    fun canHandleOnAiWebView(url: String): Boolean
 
     /**
      * Indicates whether Input Screen will present the input box at the bottom, if user has the omnibar also set to the bottom position.
@@ -437,7 +437,7 @@ class RealDuckChat @Inject constructor(
         }
     }
 
-    override fun isDuckAiUrl(url: String): Boolean {
+    override fun canHandleOnAiWebView(url: String): Boolean {
         return runCatching { HOST_DUCK_AI == url.toHttpUrl().topPrivateDomain() || url == REVOKE_URL }.getOrElse { false }
     }
 

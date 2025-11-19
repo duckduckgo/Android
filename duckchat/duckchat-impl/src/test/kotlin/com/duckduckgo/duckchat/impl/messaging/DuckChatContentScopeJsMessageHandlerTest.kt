@@ -41,7 +41,7 @@ class DuckChatContentScopeJsMessageHandlerTest {
     @Test
     fun `only contains valid methods`() {
         val methods = handler.methods
-        assertTrue(methods.size == 14)
+        assertTrue(methods.size == 10)
         assertTrue(methods[0] == "getAIChatNativeHandoffData")
         assertTrue(methods[1] == "getAIChatNativeConfigValues")
         assertTrue(methods[2] == "openAIChat")
@@ -52,10 +52,6 @@ class DuckChatContentScopeJsMessageHandlerTest {
         assertTrue(methods[7] == "showChatInput")
         assertTrue(methods[8] == "reportMetric")
         assertTrue(methods[9] == "openKeyboard")
-        assertTrue(methods[10] == "storeMigrationData")
-        assertTrue(methods[11] == "getMigrationInfo")
-        assertTrue(methods[12] == "getMigrationDataByIndex")
-        assertTrue(methods[13] == "clearMigrationData")
     }
 
     private val callback = object : JsMessageCallback() {

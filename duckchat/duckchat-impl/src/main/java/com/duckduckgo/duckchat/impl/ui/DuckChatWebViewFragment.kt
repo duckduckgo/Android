@@ -605,17 +605,25 @@ open class DuckChatWebViewFragment : DuckDuckGoFragment(R.layout.activity_duck_c
     }
 
     fun onBackPressed(): Boolean {
-        if (isVisible) {
-            if (simpleWebview.canGoBack()) {
-                simpleWebview.goBack()
-            } else {
-                hideSoftKeyboard()
-                duckChat.closeDuckChat()
-            }
+        if (!isVisible) return false
+
+        if (!simpleWebview.canGoBack()) {
+            exit()
             return true
-        } else {
-            return false
         }
+
+        val history = simpleWebview.copyBackForwardList()
+        if (viewModel.shouldCloseDuckChat(history)) {
+            exit()
+        } else {
+            simpleWebview.goBack()
+        }
+        return true
+    }
+
+    private fun exit() {
+        hideSoftKeyboard()
+        duckChat.closeDuckChat()
     }
 
     override fun continueDownload(pendingFileDownload: PendingFileDownload) {
