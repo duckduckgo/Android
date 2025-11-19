@@ -29,6 +29,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           submodules: recursive
+          ref: 'fix/cris/duck-player-test-failed-on-bot-detection'
 
       - name: Set up JDK version
         uses: actions/setup-java@v4
