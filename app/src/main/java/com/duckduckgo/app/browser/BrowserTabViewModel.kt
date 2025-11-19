@@ -2976,7 +2976,6 @@ class BrowserTabViewModel @Inject constructor(
                         detectedRefreshPatterns,
                     )
                 }
-
             val contextDaxDialogsShown =
                 withContext(dispatchers.io()) {
                     ctaViewModel.areBubbleDaxDialogsCompleted()
@@ -3810,8 +3809,8 @@ class BrowserTabViewModel @Inject constructor(
                 androidBrowserConfig.handleAboutBlank().isEnabled() && site?.url.isNullOrEmpty()
             }
             if (shouldDisplayAboutBlank) {
-                omnibarViewState.value = omnibarViewState.value?.copy(
-                    omnibarText = ABOUT_BLANk,
+                omnibarViewState.value = currentOmnibarViewState().copy(
+                    omnibarText = ABOUT_BLANK,
                 )
             }
         }
@@ -4614,7 +4613,7 @@ class BrowserTabViewModel @Inject constructor(
         private const val CATEGORY_KEY = "category"
         private const val CLIENT_SIDE_HIT_KEY = "clientSideHit"
 
-        private const val ABOUT_BLANk = "about:blank"
+        private const val ABOUT_BLANK = "about:blank"
 
         // https://www.iso.org/iso-3166-country-codes.html
         private val PRINT_LETTER_FORMAT_COUNTRIES_ISO3166_2 =

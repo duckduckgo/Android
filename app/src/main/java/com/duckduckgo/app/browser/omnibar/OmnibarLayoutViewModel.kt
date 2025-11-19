@@ -82,7 +82,6 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import logcat.logcat
 import javax.inject.Inject
 import com.duckduckgo.app.global.model.PrivacyShield as PrivacyShieldState
@@ -107,6 +106,8 @@ class OmnibarLayoutViewModel @Inject constructor(
 ) : ViewModel() {
 
     private val isSplitOmnibarEnabled = settingsDataStore.omnibarType == OmnibarType.SPLIT
+
+    private var handleAboutBlankEnabled: Boolean = false
 
     private val _viewState = MutableStateFlow(
         ViewState(
@@ -188,12 +189,12 @@ class OmnibarLayoutViewModel @Inject constructor(
             isFullUrlEnabled: Boolean,
             isAboutBlankHandleEnabled: Boolean,
         ): Boolean {
-            val updateOmbinarText =
+            val updateOmnibarText =
                 this.viewMode is Browser || this.viewMode is MaliciousSiteWarning || (!isFullUrlEnabled && omnibarText.isNotEmpty())
             return if (isAboutBlankHandleEnabled) {
-                updateOmbinarText && url.isNotEmpty()
+                updateOmnibarText && url.isNotEmpty()
             } else {
-                updateOmbinarText
+                updateOmnibarText
             }
         }
     }
@@ -221,6 +222,11 @@ class OmnibarLayoutViewModel @Inject constructor(
 
     init {
         logVoiceSearchAvailability()
+
+        viewModelScope.launch(dispatcherProvider.io()) {
+            handleAboutBlankEnabled = androidBrowserToggles.handleAboutBlank().isEnabled()
+        }
+
         duckAiFeatureState.showInputScreen.onEach { inputScreenEnabled ->
             _viewState.update {
                 it.copy(
@@ -312,56 +318,54 @@ class OmnibarLayoutViewModel @Inject constructor(
                 )
             }
         } else {
-            viewModelScope.launch {
-                _viewState.update {
-                    val handleAboutBlankEnabled = withContext(dispatcherProvider.io()) {
-                        androidBrowserToggles.handleAboutBlank().isEnabled()
-                    }
-                    val shouldUpdateOmnibarText = it.shouldUpdateOmnibarText(settingsDataStore.isFullUrlEnabled, handleAboutBlankEnabled)
-                    logcat { "Omnibar: lost focus in Browser or MaliciousSiteWarning mode $shouldUpdateOmnibarText" }
-                    val omnibarText = if (shouldUpdateOmnibarText) {
-                        if (duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(it.url)) {
-                            logcat { "Omnibar: is DDG url, showing query ${it.query}" }
-                            it.query
-                        } else {
-                            logcat { "Omnibar: is url, showing URL ${it.url}" }
-                            if (settingsDataStore.isFullUrlEnabled) {
-                                it.url
-                            } else {
-                                addressDisplayFormatter.getShortUrl(it.url)
-                            }
-                        }
+            _viewState.update {
+                val shouldUpdateOmnibarText = it.shouldUpdateOmnibarText(settingsDataStore.isFullUrlEnabled, handleAboutBlankEnabled)
+                logcat { "Omnibar: lost focus in Browser or MaliciousSiteWarning mode $shouldUpdateOmnibarText" }
+                val omnibarText = if (shouldUpdateOmnibarText) {
+                    if (duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(it.url)) {
+                        logcat { "Omnibar: is DDG url, showing query ${it.query}" }
+                        it.query
                     } else {
-                        logcat { "Omnibar: not browser or MaliciousSiteWarning mode, not changing omnibar text" }
-                        it.omnibarText
+                        logcat { "Omnibar: is url, showing URL ${it.url}" }
+                        if (settingsDataStore.isFullUrlEnabled) {
+                            it.url
+                        } else {
+                            addressDisplayFormatter.getShortUrl(it.url)
+                        }
                     }
-
-                    val currentLogoUrl = when (val previousState = it.previousLeadingIconState) {
-                        is EasterEggLogo -> previousState.logoUrl
-                        else -> null
-                    }
-
-                    it.copy(
-                        hasFocus = false,
-                        expanded = false,
-                        leadingIconState = getLeadingIconState(false, it.url, currentLogoUrl),
-                        previousLeadingIconState = null,
-                        highlightFireButton = HighlightableButton.Visible(highlighted = false),
-                        showClearButton = false,
-                        showTabsMenu = !isSplitOmnibarEnabled,
-                        showFireIcon = !isSplitOmnibarEnabled,
-                        showBrowserMenu = !isSplitOmnibarEnabled,
-                        showVoiceSearch = shouldShowVoiceSearch(
-                            viewMode = _viewState.value.viewMode,
-                            hasFocus = false,
-                            query = _viewState.value.omnibarText,
-                            hasQueryChanged = false,
-                            urlLoaded = _viewState.value.url,
-                        ),
-                        updateOmnibarText = shouldUpdateOmnibarText,
-                        omnibarText = omnibarText,
-                    )
+                } else {
+                    logcat { "Omnibar: not browser or MaliciousSiteWarning mode, not changing omnibar text" }
+                    it.omnibarText
                 }
+
+                val currentLogoUrl = when (val previousState = it.previousLeadingIconState) {
+                    is EasterEggLogo -> previousState.logoUrl
+                    else -> null
+                }
+
+                it.copy(
+                    hasFocus = false,
+                    expanded = false,
+                    leadingIconState = getLeadingIconState(false, it.url, currentLogoUrl),
+                    previousLeadingIconState = null,
+                    highlightFireButton = HighlightableButton.Visible(highlighted = false),
+                    showClearButton = false,
+                    showTabsMenu = !isSplitOmnibarEnabled,
+                    showFireIcon = !isSplitOmnibarEnabled,
+                    showBrowserMenu = !isSplitOmnibarEnabled,
+                    showVoiceSearch = shouldShowVoiceSearch(
+                        viewMode = _viewState.value.viewMode,
+                        hasFocus = false,
+                        query = _viewState.value.omnibarText,
+                        hasQueryChanged = false,
+                        urlLoaded = _viewState.value.url,
+                    ),
+                    updateOmnibarText = shouldUpdateOmnibarText,
+                    omnibarText = omnibarText,
+                )
+            }
+
+            viewModelScope.launch {
                 command.send(Command.MoveCaretToFront)
             }
         }
