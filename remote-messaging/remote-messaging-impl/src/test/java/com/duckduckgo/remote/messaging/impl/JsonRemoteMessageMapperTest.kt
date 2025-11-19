@@ -20,17 +20,20 @@ import com.duckduckgo.remote.messaging.api.RemoteMessage
 import com.duckduckgo.remote.messaging.fixtures.JsonRemoteMessageOM.aJsonMessage
 import com.duckduckgo.remote.messaging.fixtures.JsonRemoteMessageOM.bigSingleActionJsonContent
 import com.duckduckgo.remote.messaging.fixtures.JsonRemoteMessageOM.bigTwoActionJsonContent
+import com.duckduckgo.remote.messaging.fixtures.JsonRemoteMessageOM.cardsListJsonContent
 import com.duckduckgo.remote.messaging.fixtures.JsonRemoteMessageOM.emptyJsonContent
 import com.duckduckgo.remote.messaging.fixtures.JsonRemoteMessageOM.mediumJsonContent
 import com.duckduckgo.remote.messaging.fixtures.JsonRemoteMessageOM.promoSingleActionJsonContent
 import com.duckduckgo.remote.messaging.fixtures.JsonRemoteMessageOM.smallJsonContent
 import com.duckduckgo.remote.messaging.fixtures.RemoteMessageOM.aBigSingleActionMessage
 import com.duckduckgo.remote.messaging.fixtures.RemoteMessageOM.aBigTwoActionsMessage
+import com.duckduckgo.remote.messaging.fixtures.RemoteMessageOM.aCardsListMessage
 import com.duckduckgo.remote.messaging.fixtures.RemoteMessageOM.aMediumMessage
 import com.duckduckgo.remote.messaging.fixtures.RemoteMessageOM.aPromoSingleActionMessage
 import com.duckduckgo.remote.messaging.fixtures.RemoteMessageOM.aSmallMessage
 import com.duckduckgo.remote.messaging.fixtures.RemoteMessageOM.bigSingleActionContent
 import com.duckduckgo.remote.messaging.fixtures.RemoteMessageOM.bigTwoActionsContent
+import com.duckduckgo.remote.messaging.fixtures.RemoteMessageOM.cardsListContent
 import com.duckduckgo.remote.messaging.fixtures.RemoteMessageOM.mediumContent
 import com.duckduckgo.remote.messaging.fixtures.RemoteMessageOM.promoSingleActionContent
 import com.duckduckgo.remote.messaging.fixtures.RemoteMessageOM.smallContent
@@ -65,6 +68,7 @@ class JsonRemoteMessageMapperTest(private val testCase: TestCase) {
                     aJsonMessage(id = "id3", content = bigSingleActionJsonContent()),
                     aJsonMessage(id = "id4", content = bigTwoActionJsonContent()),
                     aJsonMessage(id = "id5", content = promoSingleActionJsonContent()),
+                    aJsonMessage(id = "id6", content = cardsListJsonContent()),
                 ),
                 listOf(
                     aSmallMessage(id = "id1"),
@@ -72,6 +76,7 @@ class JsonRemoteMessageMapperTest(private val testCase: TestCase) {
                     aBigSingleActionMessage(id = "id3"),
                     aBigTwoActionsMessage(id = "id4"),
                     aPromoSingleActionMessage(id = "id5"),
+                    aCardsListMessage(id = "id6"),
                 ),
             ),
             TestCase(
@@ -82,6 +87,7 @@ class JsonRemoteMessageMapperTest(private val testCase: TestCase) {
                     aJsonMessage(id = "id4", content = bigSingleActionJsonContent()),
                     aJsonMessage(id = "id5", content = bigTwoActionJsonContent()),
                     aJsonMessage(id = "id6", content = promoSingleActionJsonContent()),
+                    aJsonMessage(id = "id7", content = cardsListJsonContent()),
                 ),
                 listOf(
                     aSmallMessage(id = "id2"),
@@ -89,6 +95,7 @@ class JsonRemoteMessageMapperTest(private val testCase: TestCase) {
                     aBigSingleActionMessage(id = "id4"),
                     aBigTwoActionsMessage(id = "id5"),
                     aPromoSingleActionMessage(id = "id6"),
+                    aCardsListMessage(id = "id7"),
                 ),
             ),
             TestCase(
@@ -134,6 +141,11 @@ class JsonRemoteMessageMapperTest(private val testCase: TestCase) {
                         content = promoSingleActionJsonContent(),
                         translations = mapOf("fr" to frenchTranslations()),
                     ),
+                    aJsonMessage(
+                        id = "id6",
+                        content = cardsListJsonContent(),
+                        translations = mapOf("fr" to frenchTranslations()),
+                    ),
                 ),
                 listOf(
                     aSmallMessage(
@@ -170,6 +182,14 @@ class JsonRemoteMessageMapperTest(private val testCase: TestCase) {
                             titleText = frenchTranslations().titleText,
                             descriptionText = frenchTranslations().descriptionText,
                             actionText = frenchTranslations().actionText,
+                        ),
+                    ),
+                    aCardsListMessage(
+                        id = "id6",
+                        cardsListContent(
+                            titleText = frenchTranslations().titleText,
+                            descriptionText = frenchTranslations().descriptionText,
+                            primaryActionText = frenchTranslations().primaryActionText,
                         ),
                     ),
                 ),

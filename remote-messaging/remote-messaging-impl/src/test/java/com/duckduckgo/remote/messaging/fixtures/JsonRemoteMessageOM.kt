@@ -16,6 +16,7 @@
 
 package com.duckduckgo.remote.messaging.fixtures
 
+import com.duckduckgo.remote.messaging.api.JsonListItem
 import com.duckduckgo.remote.messaging.api.JsonMessageAction
 import com.duckduckgo.remote.messaging.impl.models.JsonContent
 import com.duckduckgo.remote.messaging.impl.models.JsonContentTranslations
@@ -101,6 +102,40 @@ object JsonRemoteMessageOM {
         placeholder = placeholder,
         actionText = actionText,
         action = action,
+    )
+
+    fun cardsListJsonContent(
+        titleText: String = "title",
+        descriptionText: String = "description",
+        placeholder: String = "Announce",
+        primaryActionText: String = "Action",
+        primaryAction: JsonMessageAction = jsonMessageAction(),
+        listItems: List<JsonListItem> = listOf(
+            JsonListItem(
+                id = "item1",
+                type = "two_line_list_item",
+                titleText = "Item Title 1",
+                descriptionText = "Item Description 1",
+                placeholder = "ImageAI",
+                primaryAction = jsonMessageAction(),
+            ),
+            JsonListItem(
+                id = "item2",
+                type = "two_line_list_item",
+                titleText = "Item Title 2",
+                descriptionText = "Item Description 2",
+                placeholder = "Radar",
+                primaryAction = jsonMessageAction(),
+            ),
+        ),
+    ) = JsonContent(
+        messageType = "cards_list",
+        titleText = titleText,
+        descriptionText = descriptionText,
+        placeholder = placeholder,
+        primaryActionText = primaryActionText,
+        primaryAction = primaryAction,
+        listItems = listItems,
     )
 
     fun emptyJsonContent(messageType: String = "") = JsonContent(messageType = messageType)
