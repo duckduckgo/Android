@@ -50,7 +50,7 @@ open class OmnibarFeatureRepository @Inject constructor(
         get() = settingsDataStore.omnibarType
 
     override val isSplitOmnibarAvailable: Boolean
-        get() = isSplitOmnibarFlagEnabled && isUnifiedOmnibarFlagEnabled
+        get() = false
 
     override val isUnifiedOmnibarLayoutEnabled: Boolean
         get() = isUnifiedOmnibarFlagEnabled
