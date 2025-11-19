@@ -239,10 +239,6 @@ interface JobRecordUpdater {
      * Marks the [ExtractedProfile], associated [OptOutJobRecord], and [EmailConfirmationJobRecord] as removed by user.
      *
      * This method should be called when the user removes an extracted profile from the dashboard.
-     * It will:
-     * - Mark the ExtractedProfile as deprecated
-     * - Update all OptOutJobRecords for that ExtractedProfile (set status to REMOVED_BY_USER, deprecated = true)
-     * - Update all EmailConfirmationJobRecords for that ExtractedProfile (deprecated = true)
      *
      * @param extractedProfileId The id of the [ExtractedProfile] to be marked as removed by user
      */
@@ -494,7 +490,7 @@ class RealJobRecordUpdater @Inject constructor(
         withContext(dispatcherProvider.io()) {
             repository.markExtractedProfileAsDeprecated(extractedProfileId)
 
-            // update the OptOutJobRecord for this ExtractedProfile
+            // update the OptOutJobRecord for this ExtractedProfile (if it exists)
             schedulingRepository.getValidOptOutJobRecord(extractedProfileId)?.run {
                 schedulingRepository.saveOptOutJobRecord(
                     copy(
@@ -506,15 +502,9 @@ class RealJobRecordUpdater @Inject constructor(
                 )
             }
 
-            // update the EmailConfirmationJobRecord for this ExtractedProfile (if it exists)
-            schedulingRepository.getEmailConfirmationJob(extractedProfileId)?.run {
-                schedulingRepository.saveEmailConfirmationJobRecord(
-                    copy(
-                        deprecated = true,
-                    ).also {
-                        logcat { "PIR-JOB-RECORD: Marked EmailConfirmationJobRecord for $extractedProfileId as deprecated: $it" }
-                    },
-                )
+            // delete the EmailConfirmationJobRecord for this ExtractedProfile (if it exists)
+            schedulingRepository.deleteEmailConfirmationJobRecord(extractedProfileId).also {
+                logcat { "PIR-JOB-RECORD: Delete EmailConfirmationJobRecord for $extractedProfileId" }
             }
         }
     }

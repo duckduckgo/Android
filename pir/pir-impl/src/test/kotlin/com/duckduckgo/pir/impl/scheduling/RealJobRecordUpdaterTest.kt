@@ -805,10 +805,6 @@ class RealJobRecordUpdaterTest {
         runTest {
             whenever(mockSchedulingRepository.getValidOptOutJobRecord(testExtractedProfileId))
                 .thenReturn(testOptOutJobRecord)
-            whenever(mockSchedulingRepository.getEmailConfirmationJob(testExtractedProfileId))
-                .thenReturn(null)
-            whenever(mockSchedulingRepository.getEmailConfirmationJob(testExtractedProfileId))
-                .thenReturn(testEmailConfirmationJobRecord)
 
             toTest.markRecordsAsRemovedByUser(testExtractedProfileId)
 
@@ -819,11 +815,7 @@ class RealJobRecordUpdaterTest {
                     deprecated = true,
                 ),
             )
-            verify(mockSchedulingRepository).saveEmailConfirmationJobRecord(
-                testEmailConfirmationJobRecord.copy(
-                    deprecated = true,
-                ),
-            )
+            verify(mockSchedulingRepository).deleteEmailConfirmationJobRecord(testExtractedProfileId)
         }
 
     @Test
@@ -831,14 +823,12 @@ class RealJobRecordUpdaterTest {
         runTest {
             whenever(mockSchedulingRepository.getValidOptOutJobRecord(testExtractedProfileId))
                 .thenReturn(null)
-            whenever(mockSchedulingRepository.getEmailConfirmationJob(testExtractedProfileId))
-                .thenReturn(null)
 
             toTest.markRecordsAsRemovedByUser(testExtractedProfileId)
 
             verify(mockRepository).markExtractedProfileAsDeprecated(testExtractedProfileId)
             verify(mockSchedulingRepository, never()).saveOptOutJobRecord(any())
-            verify(mockSchedulingRepository, never()).saveEmailConfirmationJobRecord(any())
+            verify(mockSchedulingRepository).deleteEmailConfirmationJobRecord(testExtractedProfileId)
         }
 
     companion object {
