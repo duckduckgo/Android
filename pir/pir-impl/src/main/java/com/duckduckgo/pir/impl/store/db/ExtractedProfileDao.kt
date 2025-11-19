@@ -53,4 +53,10 @@ interface ExtractedProfileDao {
 
     @Query("DELETE from pir_extracted_profiles")
     fun deleteAllExtractedProfiles()
+
+    @Query("UPDATE pir_extracted_profiles SET deprecated = :deprecated WHERE id = :extractedProfileId")
+    fun updateExtractedProfileDeprecated(
+        extractedProfileId: Long,
+        deprecated: Boolean,
+    )
 }

@@ -76,6 +76,9 @@ sealed class JobRecord(
 
             /** The job is waiting for email confirmation to complete before we can move it to [REQUESTED]. */
             PENDING_EMAIL_CONFIRMATION,
+
+            /** The profile was removed from the dashboard by the user. */
+            REMOVED_BY_USER,
         }
     }
 

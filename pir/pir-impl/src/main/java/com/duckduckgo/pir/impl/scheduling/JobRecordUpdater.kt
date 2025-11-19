@@ -234,6 +234,19 @@ interface JobRecordUpdater {
      * that have an extracted profile associated to it to continue running scan jobs on them.
      */
     suspend fun removeScanJobRecordsWithNoMatchesForProfiles(profileQueryIds: List<Long>)
+
+    /**
+     * Marks the [ExtractedProfile], associated [OptOutJobRecord], and [EmailConfirmationJobRecord] as removed by user.
+     *
+     * This method should be called when the user removes an extracted profile from the dashboard.
+     * It will:
+     * - Mark the ExtractedProfile as deprecated
+     * - Update all OptOutJobRecords for that ExtractedProfile (set status to REMOVED_BY_USER, deprecated = true)
+     * - Update all EmailConfirmationJobRecords for that ExtractedProfile (deprecated = true)
+     *
+     * @param extractedProfileId The id of the [ExtractedProfile] to be marked as removed by user
+     */
+    suspend fun markRecordsAsRemovedByUser(extractedProfileId: Long)
 }
 
 @ContributesBinding(AppScope::class)
@@ -474,6 +487,35 @@ class RealJobRecordUpdater @Inject constructor(
     override suspend fun removeScanJobRecordsWithNoMatchesForProfiles(profileQueryIds: List<Long>) {
         withContext(dispatcherProvider.io()) {
             schedulingRepository.deleteScanJobRecordsWithoutMatchesForProfiles(profileQueryIds)
+        }
+    }
+
+    override suspend fun markRecordsAsRemovedByUser(extractedProfileId: Long) {
+        withContext(dispatcherProvider.io()) {
+            repository.markExtractedProfileAsDeprecated(extractedProfileId)
+
+            // update the OptOutJobRecord for this ExtractedProfile
+            schedulingRepository.getValidOptOutJobRecord(extractedProfileId)?.run {
+                schedulingRepository.saveOptOutJobRecord(
+                    copy(
+                        status = OptOutJobStatus.REMOVED_BY_USER,
+                        deprecated = true,
+                    ).also {
+                        logcat { "PIR-JOB-RECORD: Updated OptOutJobRecord for $extractedProfileId to REMOVED_BY_USER: $it" }
+                    },
+                )
+            }
+
+            // update the EmailConfirmationJobRecord for this ExtractedProfile (if it exists)
+            schedulingRepository.getEmailConfirmationJob(extractedProfileId)?.run {
+                schedulingRepository.saveEmailConfirmationJobRecord(
+                    copy(
+                        deprecated = true,
+                    ).also {
+                        logcat { "PIR-JOB-RECORD: Marked EmailConfirmationJobRecord for $extractedProfileId as deprecated: $it" }
+                    },
+                )
+            }
         }
     }
 

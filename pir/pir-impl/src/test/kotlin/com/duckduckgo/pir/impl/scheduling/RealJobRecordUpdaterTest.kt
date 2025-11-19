@@ -795,11 +795,50 @@ class RealJobRecordUpdaterTest {
     @Test
     fun whenRemoveJobRecordsForProfileWithExclusionsThenDeletesJobRecordsExceptExcluded() =
         runTest {
-            val brokersToExclude = listOf("broker1", "broker2")
-
             toTest.removeScanJobRecordsWithNoMatchesForProfiles(listOf(testProfileQueryId))
 
             verify(mockSchedulingRepository).deleteScanJobRecordsWithoutMatchesForProfiles(listOf(testProfileQueryId))
+        }
+
+    @Test
+    fun whenMarkRecordsAsRemovedByUserThenMarksExtractedProfileAndOptOutJobRecordAndEmailConfirmationJobRecordAsDeprecated() =
+        runTest {
+            whenever(mockSchedulingRepository.getValidOptOutJobRecord(testExtractedProfileId))
+                .thenReturn(testOptOutJobRecord)
+            whenever(mockSchedulingRepository.getEmailConfirmationJob(testExtractedProfileId))
+                .thenReturn(null)
+            whenever(mockSchedulingRepository.getEmailConfirmationJob(testExtractedProfileId))
+                .thenReturn(testEmailConfirmationJobRecord)
+
+            toTest.markRecordsAsRemovedByUser(testExtractedProfileId)
+
+            verify(mockRepository).markExtractedProfileAsDeprecated(testExtractedProfileId)
+            verify(mockSchedulingRepository).saveOptOutJobRecord(
+                testOptOutJobRecord.copy(
+                    status = OptOutJobStatus.REMOVED_BY_USER,
+                    deprecated = true,
+                ),
+            )
+            verify(mockSchedulingRepository).saveEmailConfirmationJobRecord(
+                testEmailConfirmationJobRecord.copy(
+                    deprecated = true,
+                ),
+            )
+        }
+
+    @Test
+    fun whenMarkRecordsAsRemovedByUserAndOptOutJobRecordAndEmailConfirmationDoesNotExistThenOnlyMarksExtractedProfileAsDeprecated() =
+        runTest {
+            whenever(mockSchedulingRepository.getValidOptOutJobRecord(testExtractedProfileId))
+                .thenReturn(null)
+            whenever(mockSchedulingRepository.getEmailConfirmationJob(testExtractedProfileId))
+                .thenReturn(null)
+
+            toTest.markRecordsAsRemovedByUser(testExtractedProfileId)
+
+            verify(mockRepository).markExtractedProfileAsDeprecated(testExtractedProfileId)
+            verify(mockSchedulingRepository, never()).saveOptOutJobRecord(any())
+            verify(mockSchedulingRepository, never()).saveEmailConfirmationJobRecord(any())
         }
 
     companion object {
