@@ -183,6 +183,10 @@ enum class PirPixel(
     PIR_ENGAGEMENT_DAU(
         baseName = "dbp_engagement_dau",
         type = Count,
+    ),
+    PIR_ENGAGEMENT_WAU(
+        baseName = "dbp_engagement_wau",
+        type = Count,
     ), ;
 
     constructor(
