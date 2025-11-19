@@ -74,9 +74,7 @@ class MessageCta : FrameLayout {
         when (message.messageType) {
             REMOTE_MESSAGE -> setRemoteMessage(message)
             REMOTE_PROMO_MESSAGE -> setPromoMessage(message)
-            REMOTE_WHATS_NEW_MESSAGE ->  {
-                // TODO: ANA set what's new message
-            }
+            REMOTE_WHATS_NEW_MESSAGE -> { }
         }
     }
 

@@ -224,7 +224,6 @@ class RemoteMessageView @JvmOverloads constructor(
     }
 
     private fun submitUrlInContext(url: String) {
-        // TODO: ANA open a webview activity here
     }
 }
 

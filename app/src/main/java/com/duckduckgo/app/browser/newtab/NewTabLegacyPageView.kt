@@ -220,7 +220,6 @@ class NewTabLegacyPageView @JvmOverloads constructor(
     }
 
     private fun submitUrlInContext(url: String) {
-        // TODO: ANA open a webview activity here
     }
 
     private fun showRemoteMessage(
