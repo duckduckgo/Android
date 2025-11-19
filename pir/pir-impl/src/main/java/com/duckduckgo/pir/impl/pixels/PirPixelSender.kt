@@ -37,6 +37,7 @@ import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_EMAIL_CONFIRMATION_MAX_RETRIE
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_EMAIL_CONFIRMATION_RUN_COMPLETED
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_EMAIL_CONFIRMATION_RUN_STARTED
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_ENGAGEMENT_DAU
+import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_ENGAGEMENT_MAU
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_ENGAGEMENT_WAU
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_INTERNAL_BROKER_OPT_OUT_STARTED
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_INTERNAL_BROKER_SCAN_COMPLETED
@@ -393,6 +394,11 @@ interface PirPixelSender {
      * Emits a pixel to report Weekly Active Users for PIR.
      */
     fun reportWAU()
+
+    /**
+     * Emits a pixel to report Monthly Active Users for PIR.
+     */
+    fun reportMAU()
 }
 
 @ContributesBinding(AppScope::class)
@@ -757,6 +763,10 @@ class RealPirPixelSender @Inject constructor(
 
     override fun reportWAU() {
         fire(PIR_ENGAGEMENT_WAU)
+    }
+
+    override fun reportMAU() {
+        fire(PIR_ENGAGEMENT_MAU)
     }
 
     private fun fire(
