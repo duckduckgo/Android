@@ -98,9 +98,6 @@ class SurrogatesTest {
         onView(isRoot()).perform(waitForView(withId(R.id.privacyProtectionMenuItem)))
         onView(withId(R.id.privacyProtectionMenuItem)).perform(ViewActions.click())
 
-        // handle the privacy protection toggle check screen showing
-        onView(isRoot()).perform(ViewActions.pressBack())
-
         val idlingResourceForScript: IdlingResource = WebViewIdlingResource(webView!!)
         IdlingRegistry.getInstance().register(idlingResourceForScript)
 
