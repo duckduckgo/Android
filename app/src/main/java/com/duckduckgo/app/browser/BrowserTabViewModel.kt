@@ -1201,7 +1201,6 @@ class BrowserTabViewModel @Inject constructor(
                 omnibarText = if (settingsDataStore.isFullUrlEnabled) trimmedInput else addressDisplayFormatter.getShortUrl(trimmedInput),
                 queryOrFullUrl = trimmedInput,
                 forceExpand = true,
-                isBlankPageFromOtherTab = false,
             )
         browserViewState.value =
             currentBrowserViewState().copy(
@@ -1641,7 +1640,6 @@ class BrowserTabViewModel @Inject constructor(
                 omnibarText = omnibarTextForUrl(url, settingsDataStore.isFullUrlEnabled),
                 forceExpand = true,
                 serpLogo = null,
-                isBlankPageFromOtherTab = false,
             )
         val currentBrowserViewState = currentBrowserViewState()
         val domain = site?.domain
@@ -3814,7 +3812,6 @@ class BrowserTabViewModel @Inject constructor(
             if (shouldDisplayAboutBlank) {
                 omnibarViewState.value = omnibarViewState.value?.copy(
                     omnibarText = ABOUT_BLANk,
-                    isBlankPageFromOtherTab = true,
                 )
             }
         }

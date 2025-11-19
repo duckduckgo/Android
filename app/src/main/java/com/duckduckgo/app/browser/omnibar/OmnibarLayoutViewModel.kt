@@ -48,6 +48,7 @@ import com.duckduckgo.app.browser.viewstate.LoadingViewState
 import com.duckduckgo.app.browser.viewstate.OmnibarViewState
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.pixels.duckchat.createWasUsedBeforePixelParams
+import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.FIRE_BUTTON_STATE
@@ -81,6 +82,7 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import logcat.logcat
 import javax.inject.Inject
 import com.duckduckgo.app.global.model.PrivacyShield as PrivacyShieldState
@@ -101,6 +103,7 @@ class OmnibarLayoutViewModel @Inject constructor(
     private val addressDisplayFormatter: AddressDisplayFormatter,
     private val settingsDataStore: SettingsDataStore,
     private val serpEasterEggLogosToggles: SerpEasterEggLogosToggles,
+    private val androidBrowserToggles: AndroidBrowserConfigFeature,
 ) : ViewModel() {
 
     private val isSplitOmnibarEnabled = settingsDataStore.omnibarType == OmnibarType.SPLIT
@@ -180,10 +183,18 @@ class OmnibarLayoutViewModel @Inject constructor(
         val showShadows: Boolean = false,
         val showTextInputClickCatcher: Boolean = false,
         val showFindInPage: Boolean = false,
-        val isForBlankPageFromOtherTab: Boolean = false,
     ) {
-        fun shouldUpdateOmnibarText(isFullUrlEnabled: Boolean): Boolean {
-            return this.viewMode is Browser || this.viewMode is MaliciousSiteWarning || (!isFullUrlEnabled && omnibarText.isNotEmpty())
+        fun shouldUpdateOmnibarText(
+            isFullUrlEnabled: Boolean,
+            isAboutBlankHandleEnabled: Boolean,
+        ): Boolean {
+            val updateOmbinarText =
+                this.viewMode is Browser || this.viewMode is MaliciousSiteWarning || (!isFullUrlEnabled && omnibarText.isNotEmpty())
+            return if (isAboutBlankHandleEnabled) {
+                updateOmbinarText && url.isNotEmpty()
+            } else {
+                updateOmbinarText
+            }
         }
     }
 
@@ -301,54 +312,56 @@ class OmnibarLayoutViewModel @Inject constructor(
                 )
             }
         } else {
-            _viewState.update {
-                val shouldUpdateOmnibarText = it.shouldUpdateOmnibarText(settingsDataStore.isFullUrlEnabled) && !it.isForBlankPageFromOtherTab
-                logcat { "Omnibar: lost focus in Browser or MaliciousSiteWarning mode $shouldUpdateOmnibarText" }
-                val omnibarText = if (shouldUpdateOmnibarText) {
-                    if (duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(it.url)) {
-                        logcat { "Omnibar: is DDG url, showing query ${it.query}" }
-                        it.query
-                    } else {
-                        logcat { "Omnibar: is url, showing URL ${it.url}" }
-                        if (settingsDataStore.isFullUrlEnabled) {
-                            it.url
-                        } else {
-                            addressDisplayFormatter.getShortUrl(it.url)
-                        }
-                    }
-                } else {
-                    logcat { "Omnibar: not browser or MaliciousSiteWarning mode, not changing omnibar text" }
-                    it.omnibarText
-                }
-
-                val currentLogoUrl = when (val previousState = it.previousLeadingIconState) {
-                    is EasterEggLogo -> previousState.logoUrl
-                    else -> null
-                }
-
-                it.copy(
-                    hasFocus = false,
-                    expanded = false,
-                    leadingIconState = getLeadingIconState(false, it.url, currentLogoUrl),
-                    previousLeadingIconState = null,
-                    highlightFireButton = HighlightableButton.Visible(highlighted = false),
-                    showClearButton = false,
-                    showTabsMenu = !isSplitOmnibarEnabled,
-                    showFireIcon = !isSplitOmnibarEnabled,
-                    showBrowserMenu = !isSplitOmnibarEnabled,
-                    showVoiceSearch = shouldShowVoiceSearch(
-                        viewMode = _viewState.value.viewMode,
-                        hasFocus = false,
-                        query = _viewState.value.omnibarText,
-                        hasQueryChanged = false,
-                        urlLoaded = _viewState.value.url,
-                    ),
-                    updateOmnibarText = shouldUpdateOmnibarText,
-                    omnibarText = omnibarText,
-                )
-            }
-
             viewModelScope.launch {
+                _viewState.update {
+                    val handleAboutBlankEnabled = withContext(dispatcherProvider.io()) {
+                        androidBrowserToggles.handleAboutBlank().isEnabled()
+                    }
+                    val shouldUpdateOmnibarText = it.shouldUpdateOmnibarText(settingsDataStore.isFullUrlEnabled, handleAboutBlankEnabled)
+                    logcat { "Omnibar: lost focus in Browser or MaliciousSiteWarning mode $shouldUpdateOmnibarText" }
+                    val omnibarText = if (shouldUpdateOmnibarText) {
+                        if (duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(it.url)) {
+                            logcat { "Omnibar: is DDG url, showing query ${it.query}" }
+                            it.query
+                        } else {
+                            logcat { "Omnibar: is url, showing URL ${it.url}" }
+                            if (settingsDataStore.isFullUrlEnabled) {
+                                it.url
+                            } else {
+                                addressDisplayFormatter.getShortUrl(it.url)
+                            }
+                        }
+                    } else {
+                        logcat { "Omnibar: not browser or MaliciousSiteWarning mode, not changing omnibar text" }
+                        it.omnibarText
+                    }
+
+                    val currentLogoUrl = when (val previousState = it.previousLeadingIconState) {
+                        is EasterEggLogo -> previousState.logoUrl
+                        else -> null
+                    }
+
+                    it.copy(
+                        hasFocus = false,
+                        expanded = false,
+                        leadingIconState = getLeadingIconState(false, it.url, currentLogoUrl),
+                        previousLeadingIconState = null,
+                        highlightFireButton = HighlightableButton.Visible(highlighted = false),
+                        showClearButton = false,
+                        showTabsMenu = !isSplitOmnibarEnabled,
+                        showFireIcon = !isSplitOmnibarEnabled,
+                        showBrowserMenu = !isSplitOmnibarEnabled,
+                        showVoiceSearch = shouldShowVoiceSearch(
+                            viewMode = _viewState.value.viewMode,
+                            hasFocus = false,
+                            query = _viewState.value.omnibarText,
+                            hasQueryChanged = false,
+                            urlLoaded = _viewState.value.url,
+                        ),
+                        updateOmnibarText = shouldUpdateOmnibarText,
+                        omnibarText = omnibarText,
+                    )
+                }
                 command.send(Command.MoveCaretToFront)
             }
         }
@@ -701,7 +714,6 @@ class OmnibarLayoutViewModel @Inject constructor(
                                 logoUrl = null,
                             )
                         },
-                        isForBlankPageFromOtherTab = omnibarViewState.isBlankPageFromOtherTab,
                     )
                 }
             }
@@ -740,7 +752,6 @@ class OmnibarLayoutViewModel @Inject constructor(
                                 hasQueryChanged = true,
                                 urlLoaded = _viewState.value.url,
                             ),
-                            isForBlankPageFromOtherTab = omnibarViewState.isBlankPageFromOtherTab,
                         )
                     }
                 }
