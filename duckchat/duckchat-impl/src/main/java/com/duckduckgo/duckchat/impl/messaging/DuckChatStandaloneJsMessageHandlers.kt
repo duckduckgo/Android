@@ -75,17 +75,21 @@ class StoreMigrationDataHandler @Inject constructor(
                 jsMessageCallback: JsMessageCallback?,
             ) {
                 if (jsMessage.id.isNullOrEmpty()) return
-
                 val item = jsMessage.params.optString(SERIALIZED_MIGRATION_FILE)
-                val jsonPayload = JSONObject()
-                if (item != null && item != JSONObject.NULL) {
+
+                val result = if (!item.isNullOrEmpty() && item != JSONObject.NULL.toString()) {
                     standaloneDuckChatStore.storeMigrationItem(item)
-                    jsonPayload.put(OK, true)
+                    true
                 } else {
-                    jsonPayload.put(OK, false)
-                    jsonPayload.put(REASON, "Missing or invalid serializedMigrationFile")
+                    false
                 }
-                jsMessaging.onResponse(JsCallbackData(jsonPayload, featureName, jsMessage.method, jsMessage.id!!))
+
+                val payload = JSONObject().apply {
+                    put(OK, result)
+                    if (!result) put(REASON, "Missing or invalid serializedMigrationFile")
+                }
+
+                jsMessaging.onResponse(JsCallbackData(payload, featureName, jsMessage.method, jsMessage.id!!))
             }
 
             override val allowedDomains: List<String> =
@@ -113,12 +117,12 @@ class GetMigrationInfoHandler @Inject constructor(
                 if (jsMessage.id.isNullOrEmpty()) return
 
                 val count = standaloneDuckChatStore.getMigrationItemCount()
-                val jsonPayload = JSONObject().apply {
+                val payload = JSONObject().apply {
                     put(OK, true)
                     put(COUNT, count)
                 }
 
-                jsMessaging.onResponse(JsCallbackData(jsonPayload, featureName, jsMessage.method, jsMessage.id!!))
+                jsMessaging.onResponse(JsCallbackData(payload, featureName, jsMessage.method, jsMessage.id!!))
             }
 
             override val allowedDomains: List<String> =
@@ -146,15 +150,17 @@ class GetMigrationDataByIndexHandler @Inject constructor(
                 if (jsMessage.id.isNullOrEmpty()) return
                 val index = jsMessage.params.optInt(INDEX, -1)
                 val value = standaloneDuckChatStore.getMigrationItemByIndex(index)
-                val jsonPayload = JSONObject()
-                if (value == null) {
-                    jsonPayload.put(OK, false)
-                    jsonPayload.put(REASON, "nothing at index: $index")
-                } else {
-                    jsonPayload.put(OK, true)
-                    jsonPayload.put(SERIALIZED_MIGRATION_FILE, value)
+
+                val payload = JSONObject().apply {
+                    if (value == null) {
+                        put(OK, false)
+                        put(REASON, "nothing at index: $index")
+                    } else {
+                        put(OK, true)
+                        put(SERIALIZED_MIGRATION_FILE, value)
+                    }
                 }
-                jsMessaging.onResponse(JsCallbackData(jsonPayload, featureName, jsMessage.method, jsMessage.id!!))
+                jsMessaging.onResponse(JsCallbackData(payload, featureName, jsMessage.method, jsMessage.id!!))
             }
 
             override val allowedDomains: List<String> =

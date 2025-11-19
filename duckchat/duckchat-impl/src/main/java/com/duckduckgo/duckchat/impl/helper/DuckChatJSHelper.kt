@@ -125,6 +125,7 @@ class RealDuckChatJSHelper @Inject constructor(
                     }
                 null
             }
+
             else -> null
         }
 
@@ -213,6 +214,7 @@ class RealDuckChatJSHelper @Inject constructor(
             }
         }
     }
+
     companion object {
         const val DUCK_CHAT_FEATURE_NAME = "aiChat"
         private const val METHOD_GET_AI_CHAT_NATIVE_HANDOFF_DATA = "getAIChatNativeHandoffData"

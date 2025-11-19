@@ -65,9 +65,6 @@ class ContentScopeScriptsJsMessaging @Inject constructor(
         message: String,
         secret: String,
     ) {
-        logcat {
-            "Marcos is $message"
-        }
         try {
             val adapter = moshi.adapter(JsMessage::class.java)
             val jsMessage = adapter.fromJson(message)

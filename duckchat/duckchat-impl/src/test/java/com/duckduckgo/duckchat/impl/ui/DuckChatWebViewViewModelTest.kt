@@ -16,6 +16,8 @@
 
 package com.duckduckgo.duckchat.impl.ui
 
+import android.webkit.WebBackForwardList
+import android.webkit.WebHistoryItem
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import app.cash.turbine.test
 import com.duckduckgo.common.test.CoroutineTestRule
@@ -36,7 +38,9 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
 @RunWith(AndroidJUnit4::class)
@@ -188,4 +192,67 @@ class DuckChatWebViewViewModelTest {
                 assertFalse(state.isFullScreenModeEnabled)
             }
         }
+
+    @Test
+    fun `when handle on same webview then call duck chat`() {
+        viewModel.handleOnSameWebView("https://duck.ai/somepath")
+        verify(duckChat).canHandleOnAiWebView("https://duck.ai/somepath")
+    }
+
+    @Test
+    fun `when should close duck chat and current is duck ai and first is duckduckgo then return true`() {
+        whenever(duckChat.isStandaloneMigrationEnabled()).thenReturn(true)
+        val history = mock<WebBackForwardList>()
+
+        val currentItem = mock<WebHistoryItem> {
+            on { url } doReturn "https://duck.ai/somepath"
+        }
+        val firstItem = mock<WebHistoryItem> {
+            on { url } doReturn "https://duckduckgo.com/somepath"
+        }
+        whenever(history.currentItem).thenReturn(currentItem)
+        whenever(history.getItemAtIndex(0)).thenReturn(firstItem)
+        assertTrue(viewModel.shouldCloseDuckChat(history))
+    }
+
+    @Test
+    fun `when should close duck chat and current is not duck ai or first is no duckduckgo then return false`() {
+        whenever(duckChat.isStandaloneMigrationEnabled()).thenReturn(true)
+        val history = mock<WebBackForwardList>()
+
+        var currentItem = mock<WebHistoryItem> {
+            on { url } doReturn "https://duckduckgo.com/somepath"
+        }
+        var firstItem = mock<WebHistoryItem> {
+            on { url } doReturn "https://duckduckgo.com/somepath"
+        }
+        whenever(history.currentItem).thenReturn(currentItem)
+        whenever(history.getItemAtIndex(0)).thenReturn(firstItem)
+        assertFalse(viewModel.shouldCloseDuckChat(history))
+        currentItem = mock<WebHistoryItem> {
+            on { url } doReturn "https://duck.ai/somepath"
+        }
+        firstItem = mock<WebHistoryItem> {
+            on { url } doReturn "https://somesite.com"
+        }
+        whenever(history.currentItem).thenReturn(currentItem)
+        whenever(history.getItemAtIndex(0)).thenReturn(firstItem)
+        assertFalse(viewModel.shouldCloseDuckChat(history))
+    }
+
+    @Test
+    fun `when should close duck chat and feature flag is disabled then return false`() {
+        whenever(duckChat.isStandaloneMigrationEnabled()).thenReturn(false)
+        val history = mock<WebBackForwardList>()
+
+        val currentItem = mock<WebHistoryItem> {
+            on { url } doReturn "https://duck.ai/somepath"
+        }
+        val firstItem = mock<WebHistoryItem> {
+            on { url } doReturn "https://duckduckgo.com/somepath"
+        }
+        whenever(history.currentItem).thenReturn(currentItem)
+        whenever(history.getItemAtIndex(0)).thenReturn(firstItem)
+        assertFalse(viewModel.shouldCloseDuckChat(history))
+    }
 }

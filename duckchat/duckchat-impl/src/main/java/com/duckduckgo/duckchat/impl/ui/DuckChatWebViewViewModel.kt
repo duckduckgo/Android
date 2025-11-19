@@ -16,12 +16,14 @@
 
 package com.duckduckgo.duckchat.impl.ui
 
+import android.webkit.WebBackForwardList
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
+import com.duckduckgo.common.utils.AppUrl
 import com.duckduckgo.di.scopes.FragmentScope
+import com.duckduckgo.duckchat.impl.DuckChatConstants.HOST_DUCK_AI
 import com.duckduckgo.duckchat.impl.DuckChatInternal
-import com.duckduckgo.duckchat.impl.ui.settings.DuckChatSettingsViewModel.ViewState
 import com.duckduckgo.subscriptions.api.Subscriptions
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
 import kotlinx.coroutines.channels.Channel
@@ -32,6 +34,7 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
+import okhttp3.HttpUrl.Companion.toHttpUrl
 import javax.inject.Inject
 
 @ContributesViewModel(FragmentScope::class)
@@ -67,7 +70,17 @@ class DuckChatWebViewViewModel @Inject constructor(
 
     fun handleOnSameWebView(url: String): Boolean {
         // Allow Duck.ai links to load within the same WebView (in-sheet navigation)
-        return duckChat.isDuckAiUrl(url)
+        return duckChat.canHandleOnAiWebView(url)
+    }
+
+    fun shouldCloseDuckChat(history: WebBackForwardList): Boolean {
+        return runCatching {
+            if (!duckChat.isStandaloneMigrationEnabled()) return false
+            val currentItem = history.currentItem?.url
+            val firstItem = history.getItemAtIndex(0).url
+            currentItem?.toHttpUrl()?.topPrivateDomain() == HOST_DUCK_AI &&
+                firstItem.toHttpUrl().topPrivateDomain() == AppUrl.Url.HOST
+        }.getOrElse { false }
     }
 
     private fun observeSubscriptionChanges() {
