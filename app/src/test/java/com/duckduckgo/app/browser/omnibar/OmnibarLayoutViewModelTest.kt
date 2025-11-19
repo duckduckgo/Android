@@ -1720,6 +1720,7 @@ class OmnibarLayoutViewModelTest {
     @Test
     fun whenHandleAboutBlankEnabledOmnibarNotFocusedAndBlankPageFromOtherTabThenPersistOmbinarText() = runTest {
         whenever(androidBrowserToggles.handleAboutBlank().isEnabled()).thenReturn(true)
+        initializeViewModel()
         val omnibarState = OmnibarViewState(
             navigationChange = false,
             omnibarText = "about:blank",
@@ -1738,6 +1739,7 @@ class OmnibarLayoutViewModelTest {
     @Test
     fun whenHandleAboutBlankDisabledOmnibarNotFocusedAndBlankPageFromOtherTabThenDoNotPersistOmbinarText() = runTest {
         whenever(androidBrowserToggles.handleAboutBlank().isEnabled()).thenReturn(false)
+        initializeViewModel()
         val omnibarState = OmnibarViewState(
             navigationChange = false,
             omnibarText = "about:blank",
