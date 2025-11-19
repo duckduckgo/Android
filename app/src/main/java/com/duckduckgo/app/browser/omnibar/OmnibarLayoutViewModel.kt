@@ -55,7 +55,6 @@ import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Unique
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.trackerdetection.model.Entity
 import com.duckduckgo.browser.api.UserBrowserProperties
-import com.duckduckgo.browser.ui.omnibar.OmnibarType
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
@@ -290,6 +289,7 @@ class OmnibarLayoutViewModel @Inject constructor(
                     showFireIcon = showControls,
                     showBrowserMenu = showControls,
                     showVoiceSearch = shouldShowVoiceSearch(
+                        viewMode = _viewState.value.viewMode,
                         hasFocus = true,
                         query = _viewState.value.omnibarText,
                         hasQueryChanged = false,
@@ -336,6 +336,7 @@ class OmnibarLayoutViewModel @Inject constructor(
                     showFireIcon = !isSplitOmnibarEnabled,
                     showBrowserMenu = !isSplitOmnibarEnabled,
                     showVoiceSearch = shouldShowVoiceSearch(
+                        viewMode = _viewState.value.viewMode,
                         hasFocus = false,
                         query = _viewState.value.omnibarText,
                         hasQueryChanged = false,
@@ -405,17 +406,22 @@ class OmnibarLayoutViewModel @Inject constructor(
     }
 
     private fun shouldShowVoiceSearch(
+        viewMode: ViewMode,
         hasFocus: Boolean = false,
         query: String = "",
         hasQueryChanged: Boolean = false,
         urlLoaded: String = "",
     ): Boolean {
-        return voiceSearchAvailability.shouldShowVoiceSearch(
-            hasFocus = hasFocus,
-            query = query,
-            hasQueryChanged = hasQueryChanged,
-            urlLoaded = urlLoaded,
-        )
+        return if (viewMode == ViewMode.DuckAI) {
+            false
+        } else {
+            voiceSearchAvailability.shouldShowVoiceSearch(
+                hasFocus = hasFocus,
+                query = query,
+                hasQueryChanged = hasQueryChanged,
+                urlLoaded = urlLoaded,
+            )
+        }
     }
 
     fun onViewModeChanged(viewMode: ViewMode) {
@@ -439,6 +445,23 @@ class OmnibarLayoutViewModel @Inject constructor(
                     }
                 }
 
+                is ViewMode.DuckAI -> {
+                    _viewState.update {
+                        it.copy(
+                            viewMode = viewMode,
+                            showClearButton = false,
+                            showVoiceSearch = false,
+                            showBrowserMenu = true,
+                            showShadows = true,
+                            scrollingEnabled = false,
+                            leadingIconState = Dax,
+                            showChatMenu = false,
+                            hasFocus = false,
+                            isLoading = false,
+                        )
+                    }
+                }
+
                 else -> {
                     val scrollingEnabled = viewMode != NewTab
                     val hasFocus = _viewState.value.hasFocus
@@ -458,6 +481,7 @@ class OmnibarLayoutViewModel @Inject constructor(
                             leadingIconState = leadingIcon,
                             scrollingEnabled = scrollingEnabled,
                             showVoiceSearch = shouldShowVoiceSearch(
+                                viewMode = _viewState.value.viewMode,
                                 hasFocus = _viewState.value.hasFocus,
                                 query = _viewState.value.omnibarText,
                                 hasQueryChanged = false,
@@ -581,6 +605,7 @@ class OmnibarLayoutViewModel @Inject constructor(
                 showFireIcon = showControls,
                 showClearButton = showClearButton,
                 showVoiceSearch = shouldShowVoiceSearch(
+                    viewMode = _viewState.value.viewMode,
                     hasFocus = hasFocus,
                     query = query,
                     hasQueryChanged = query != updatedQuery,
@@ -656,6 +681,7 @@ class OmnibarLayoutViewModel @Inject constructor(
                         expandedAnimated = omnibarViewState.forceExpand,
                         updateOmnibarText = true,
                         showVoiceSearch = shouldShowVoiceSearch(
+                            viewMode = _viewState.value.viewMode,
                             hasFocus = omnibarViewState.isEditing,
                             query = omnibarViewState.omnibarText,
                             hasQueryChanged = true,
@@ -667,6 +693,7 @@ class OmnibarLayoutViewModel @Inject constructor(
                                 url = _viewState.value.url,
                                 logoUrl = omnibarViewState.serpLogo.logoUrl,
                             )
+
                             SerpLogo.Normal, null -> getLeadingIconState(
                                 hasFocus = omnibarViewState.isEditing,
                                 url = _viewState.value.url,
@@ -705,6 +732,7 @@ class OmnibarLayoutViewModel @Inject constructor(
                             omnibarText = omnibarText,
                             updateOmnibarText = true,
                             showVoiceSearch = shouldShowVoiceSearch(
+                                viewMode = _viewState.value.viewMode,
                                 hasFocus = omnibarViewState.isEditing,
                                 query = omnibarViewState.omnibarText,
                                 hasQueryChanged = true,
@@ -731,6 +759,7 @@ class OmnibarLayoutViewModel @Inject constructor(
                 loadingProgress = loadingState.progress,
                 leadingIconState = getLeadingIconState(it.hasFocus, loadingState.url, currentLogoUrl),
                 showVoiceSearch = shouldShowVoiceSearch(
+                    viewMode = _viewState.value.viewMode,
                     hasFocus = _viewState.value.hasFocus,
                     query = _viewState.value.omnibarText,
                     hasQueryChanged = false,
@@ -849,6 +878,7 @@ class OmnibarLayoutViewModel @Inject constructor(
         _viewState.update {
             it.copy(
                 showVoiceSearch = shouldShowVoiceSearch(
+                    viewMode = _viewState.value.viewMode,
                     urlLoaded = url,
                 ),
             )
@@ -879,6 +909,7 @@ class OmnibarLayoutViewModel @Inject constructor(
                     duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(viewState.value.url) -> "serp"
                     else -> "website"
                 }
+
                 else -> "unknown"
             }
             val launchSourceParams = mapOf("source" to launchSource)

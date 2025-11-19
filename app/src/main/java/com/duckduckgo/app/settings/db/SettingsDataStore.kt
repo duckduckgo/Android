@@ -19,6 +19,7 @@ package com.duckduckgo.app.settings.db
 import android.content.Context
 import android.content.SharedPreferences
 import androidx.core.content.edit
+import com.duckduckgo.app.browser.omnibar.OmnibarType
 import com.duckduckgo.app.fire.fireproofwebsite.ui.AutomaticFireproofSetting
 import com.duckduckgo.app.fire.fireproofwebsite.ui.AutomaticFireproofSetting.ASK_EVERY_TIME
 import com.duckduckgo.app.fire.fireproofwebsite.ui.AutomaticFireproofSetting.NEVER
@@ -28,7 +29,6 @@ import com.duckduckgo.app.settings.clear.ClearWhenOption
 import com.duckduckgo.app.settings.clear.FireAnimation
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.browser.api.autocomplete.AutoCompleteSettings
-import com.duckduckgo.browser.ui.omnibar.OmnibarType
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn

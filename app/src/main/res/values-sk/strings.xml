@@ -127,8 +127,8 @@
 
     <!-- Fire -->
     <string name="fireMenu">Vymazať údaje</string>
-    <string name="fireClearAll">Vymazať všetky karty a údaje</string>
-    <string name="fireClearAllPlusDuckChats">Vymazať všetky karty, údaje a chaty Duck.ai</string>
+    <string name="fireClearAll">Vymazať karty a údaje</string>
+    <string name="fireClearAllPlusDuckChats">Vymazať karty, údaje a chaty Duck.ai</string>
     <string name="fireCancel">Zrušiť</string>
     <string name="fireDataCleared">Údaje boli vymazané</string>
 
@@ -192,7 +192,6 @@
     <string name="webTrackingProtectionActivityTitle">Ochrana pred sledovaním webu</string>
     <string name="webTrackingProtectionLearnMoreTitle">Ochrana pred sledovaním webu</string>
     <string name="webTrackingProtectionTitle">Ochrana pred sledovaním webu</string>
-    <string name="webTrackingProtectionDescriptionNew"><![CDATA[DuckDuckGo pri prehliadaní webu automaticky blokuje skryté sledovače.\n<a href=\"\">Zisti viac</a>]]></string>
     <string name="webTrackingProtectionExplanationDescription"><![CDATA[Prehliadač DuckDuckGo poskytuje ochrany proti sledovaniu, ktoré sú vždy aktívne.\n<a href=\"\">Zisti viac</a>]]></string>
     <string name="webTrackingProtectionExplanationTitle">Ako ťa chránime</string>
     <string name="webTrackingProtectionThirdPartyTrackersTitle">Blokuje sledovanie tretích strán</string>
@@ -250,6 +249,8 @@
     <string name="settingsAutomaticallyClearWhenAppExit60Minutes">Ukončení aplikácie, neaktívnej po dobu 1 hodiny</string>
     <string name="settingsClearAiDataTitle">Vymazať chaty Duck.ai</string>
     <string name="settingsClearAiDataDeleteMessage">Fire Button tiež vymaže históriu Duck.ai vrátane pripnutých rozhovorov.</string>
+    <string name="settingsClearDataActionSecondaryText">Vymaže všetky karty a údaje pre všetky stránky, ktoré si neochránil/-a ochranou Fireproof.</string>
+    <string name="settingsClearDataActionPlusDuckChatsSecondaryText">Zatvorí všetky karty, chaty Duck.ai a vymaže údaje zo všetkých stránok, ktoré si neochránil/-a ochranou Fireproof.</string>
 
     <!-- About Activity -->
     <string name="aboutActivityTitle">O DuckDuckGo</string>

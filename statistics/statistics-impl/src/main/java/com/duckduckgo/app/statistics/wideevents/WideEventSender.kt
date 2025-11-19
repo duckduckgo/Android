@@ -23,10 +23,14 @@ import com.duckduckgo.app.statistics.wideevents.db.WideEventRepository.WideEvent
 import com.duckduckgo.app.statistics.wideevents.db.WideEventRepository.WideEventStatus.SUCCESS
 import com.duckduckgo.app.statistics.wideevents.db.WideEventRepository.WideEventStatus.UNKNOWN
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.device.DeviceInfo
+import com.duckduckgo.common.utils.plugins.pixel.PixelParamRemovalPlugin
+import com.duckduckgo.common.utils.plugins.pixel.PixelParamRemovalPlugin.PixelParameter
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.feature.toggles.api.FeatureTogglesInventory
 import com.squareup.anvil.annotations.ContributesBinding
+import com.squareup.anvil.annotations.ContributesMultibinding
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 interface WideEventSender {
@@ -35,10 +39,11 @@ interface WideEventSender {
 
 @ContributesBinding(AppScope::class)
 class PixelWideEventSender @Inject constructor(
+    private val wideEventFeature: WideEventFeature,
+    private val dispatchers: DispatcherProvider,
     private val pixelSender: Pixel,
     private val appBuildConfig: AppBuildConfig,
     private val deviceInfo: DeviceInfo,
-    private val featureTogglesInventory: FeatureTogglesInventory,
 ) : WideEventSender {
     override suspend fun sendWideEvent(event: WideEventRepository.WideEvent) {
         requireNotNull(event.status) { "Attempting to send wide event with null status" }
@@ -64,13 +69,22 @@ class PixelWideEventSender @Inject constructor(
                 .mapKeys { PARAM_METADATA_PREFIX + it.key }
 
         val basePixelName = PIXEL_NAME_PREFIX + event.name
+        val countPixelName = basePixelName + COUNT_PIXEL_SUFFIX
 
-        pixelSender.fire(
-            pixelName = basePixelName + COUNT_PIXEL_SUFFIX,
-            parameters = parameters,
-            encodedParameters = encodedParameters,
-            type = Pixel.PixelType.Count,
-        )
+        if (shouldEnqueuePixel()) {
+            pixelSender.enqueueFire(
+                pixelName = countPixelName,
+                parameters = parameters,
+                encodedParameters = encodedParameters,
+            )
+        } else {
+            pixelSender.fire(
+                pixelName = countPixelName,
+                parameters = parameters,
+                encodedParameters = encodedParameters,
+                type = Pixel.PixelType.Count,
+            )
+        }
 
         pixelSender.fire(
             pixelName = basePixelName + DAILY_PIXEL_SUFFIX,
@@ -80,12 +94,7 @@ class PixelWideEventSender @Inject constructor(
         )
     }
 
-    private suspend fun getCommonPixelParameters(): Map<String, String> {
-        val activeNaExperimentNames =
-            featureTogglesInventory
-                .getAllActiveExperimentToggles()
-                .map { it.featureName().name }
-
+    private fun getCommonPixelParameters(): Map<String, String> {
         return mapOf(
             PARAM_PLATFORM to "Android",
             PARAM_TYPE to "app",
@@ -93,13 +102,15 @@ class PixelWideEventSender @Inject constructor(
             PARAM_APP_NAME to "DuckDuckGo Android",
             PARAM_APP_VERSION to appBuildConfig.versionName,
             PARAM_FORM_FACTOR to deviceInfo.formFactor().description,
-            PARAM_NA_EXPERIMENTS to activeNaExperimentNames.joinToString(","),
             PARAM_DEV_MODE to appBuildConfig.isDebug.toString(),
         )
     }
 
+    private suspend fun shouldEnqueuePixel() = withContext(dispatchers.io()) {
+        wideEventFeature.enqueueWideEventPixels().isEnabled()
+    }
+
     private companion object {
-        const val PIXEL_NAME_PREFIX = "wide_"
         const val COUNT_PIXEL_SUFFIX = "_c"
         const val DAILY_PIXEL_SUFFIX = "_d"
 
@@ -111,7 +122,6 @@ class PixelWideEventSender @Inject constructor(
         const val PARAM_APP_NAME = "app.name"
         const val PARAM_APP_VERSION = "app.version"
         const val PARAM_FORM_FACTOR = "app.form_factor"
-        const val PARAM_NA_EXPERIMENTS = "app.native_apps_experiments"
         const val PARAM_DEV_MODE = "app.dev_mode"
 
         const val PARAM_METADATA_PREFIX = "feature.data.ext."
@@ -126,3 +136,11 @@ private fun WideEventRepository.WideEventStatus.toParamValue(): String =
         CANCELLED -> "CANCELLED"
         UNKNOWN -> "UNKNOWN"
     }
+
+@ContributesMultibinding(AppScope::class)
+class WideEventPixelParamRemovalPlugin @Inject constructor() : PixelParamRemovalPlugin {
+    override fun names(): List<Pair<String, Set<PixelParameter>>> =
+        listOf(PIXEL_NAME_PREFIX to PixelParameter.removeAll())
+}
+
+private const val PIXEL_NAME_PREFIX = "wide_"

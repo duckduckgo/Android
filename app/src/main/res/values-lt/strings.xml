@@ -127,8 +127,8 @@
 
     <!-- Fire -->
     <string name="fireMenu">Valyti duomenis</string>
-    <string name="fireClearAll">Valyti visas korteles ir duomenis</string>
-    <string name="fireClearAllPlusDuckChats">Išvalyti visus skirtukus, duomenis ir „Duck.ai“ pokalbius</string>
+    <string name="fireClearAll">Valyti skirtukus ir duomenis</string>
+    <string name="fireClearAllPlusDuckChats">Išvalyti skirtukus, duomenis ir „Duck.ai“ pokalbius</string>
     <string name="fireCancel">Atšaukti</string>
     <string name="fireDataCleared">Duomenys išvalyti</string>
 
@@ -192,7 +192,6 @@
     <string name="webTrackingProtectionActivityTitle">Apsauga nuo žiniatinklio sekimo</string>
     <string name="webTrackingProtectionLearnMoreTitle">Apsauga nuo žiniatinklio sekimo</string>
     <string name="webTrackingProtectionTitle">Apsauga nuo žiniatinklio sekimo</string>
-    <string name="webTrackingProtectionDescriptionNew"><![CDATA[„DuckDuckGo“ automatiškai blokuoja paslėptas stebėjimo priemones naršant internete.\n<a href=\"\">Sužinoti daugiau</a>]]></string>
     <string name="webTrackingProtectionExplanationDescription"><![CDATA[\"DuckDuckGo\" naršyklėje yra visada aktyvi stebėjimo apsauga.\n<a href=\"\">Sužinoti daugiau</a>]]></string>
     <string name="webTrackingProtectionExplanationTitle">Kaip jus saugome</string>
     <string name="webTrackingProtectionThirdPartyTrackersTitle">Blokuoja trečiųjų šalių stebėjimo priemones</string>
@@ -250,6 +249,8 @@
     <string name="settingsAutomaticallyClearWhenAppExit60Minutes">Išeinant iš programos, po 1 val. neveikimo</string>
     <string name="settingsClearAiDataTitle">Išvalyti „Duck.ai“ pokalbius</string>
     <string name="settingsClearAiDataDeleteMessage">„Fire Button“ taip pat ištrins „Duck.ai“ istoriją, įskaitant prisegtus pokalbius.</string>
+    <string name="settingsClearDataActionSecondaryText">Išvalo visus skirtukus ir duomenis visose svetainėse, kurių neapsaugojote ugniasiene.</string>
+    <string name="settingsClearDataActionPlusDuckChatsSecondaryText">Išvalo visus skirtukus, „Duck.ai“ pokalbius ir duomenis visose svetainėse, kurių neapsaugojote ugniasiene.</string>
 
     <!-- About Activity -->
     <string name="aboutActivityTitle">Apie „DuckDuckGo“</string>

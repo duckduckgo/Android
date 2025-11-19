@@ -22,13 +22,18 @@ import android.content.SharedPreferences
 import androidx.core.content.edit
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
+import com.duckduckgo.anrs.api.CrashLogger
+import com.duckduckgo.anrs.api.CrashLogger.Crash
 import com.duckduckgo.data.store.api.SharedPreferencesProvider
+import org.junit.After
 import org.junit.Assert.assertEquals
-import org.junit.Assert.assertNotEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import java.util.UUID
+import java.util.concurrent.Executor
 
 @RunWith(AndroidJUnit4::class)
 class SharedPreferencesProviderImplTest {
@@ -36,24 +41,33 @@ class SharedPreferencesProviderImplTest {
     private val context: Context = InstrumentationRegistry.getInstrumentation().context.applicationContext
     private lateinit var prefs: SharedPreferences
     private lateinit var vpnPreferencesProvider: SharedPreferencesProvider
-    private lateinit var NAME: String
+    private lateinit var name: String
+
+    private val crashLogger = object : CrashLogger {
+        val crashes = mutableListOf<Crash>()
+        override fun logCrash(crash: Crash) {
+            crashes.add(crash)
+        }
+    }
 
     @Before
     fun setup() {
-        NAME = UUID.randomUUID().toString()
-        prefs = context.getSharedPreferences(NAME, MODE_PRIVATE)
-        vpnPreferencesProvider = SharedPreferencesProviderImpl(context)
+        name = UUID.randomUUID().toString()
+        prefs = context.getSharedPreferences(name, MODE_PRIVATE)
+        vpnPreferencesProvider = SharedPreferencesProviderImpl(context) { crashLogger }
+    }
+
+    @After
+    fun teardown() {
+        context.deleteSharedPreferences(name)
+        context.deleteSharedPreferences("$name.harmony")
     }
 
     @Test
     fun whenGetMultiprocessPreferencesThenMigrateToHarmony() {
-        prefs.edit(commit = true) { putBoolean("bool", true) }
-        prefs.edit(commit = true) { putString("string", "true") }
-        prefs.edit(commit = true) { putInt("int", 1) }
-        prefs.edit(commit = true) { putFloat("float", 1f) }
-        prefs.edit(commit = true) { putLong("long", 1L) }
+        putAllTypes(prefs)
 
-        val harmony = vpnPreferencesProvider.getSharedPreferences(NAME, multiprocess = true, migrate = true)
+        val harmony = vpnPreferencesProvider.getSharedPreferences(name, multiprocess = true, migrate = true)
 
         assertEquals(true, harmony.getBoolean("bool", false))
         assertEquals("true", harmony.getString("string", "false"))
@@ -64,35 +78,57 @@ class SharedPreferencesProviderImplTest {
 
     @Test
     fun whenGetMultiprocessPreferencesAndMigrateIsFalseThenDoNotMigrateToHarmony() {
-        prefs.edit(commit = true) { putBoolean("bool", true) }
-        prefs.edit(commit = true) { putString("string", "true") }
-        prefs.edit(commit = true) { putInt("int", 1) }
-        prefs.edit(commit = true) { putFloat("float", 1f) }
-        prefs.edit(commit = true) { putLong("long", 1L) }
+        putAllTypes(prefs)
 
-        val harmony = vpnPreferencesProvider.getSharedPreferences(NAME, multiprocess = true)
+        val harmony = vpnPreferencesProvider.getSharedPreferences(name, multiprocess = true)
 
-        assertNotEquals(true, harmony.getBoolean("bool", false))
-        assertNotEquals("true", harmony.getString("string", "false"))
-        assertNotEquals(1, harmony.getInt("int", 0))
-        assertNotEquals(1f, harmony.getFloat("float", 0f))
-        assertNotEquals(1L, harmony.getLong("long", 0L))
+        // Data should not have been migrated yet
+        assertFalse(harmony.getBoolean("bool", false))
+        assertEquals("false", harmony.getString("string", "false"))
+        assertEquals(0, harmony.getInt("int", 0))
+        assertEquals(0f, harmony.getFloat("float", 0f))
+        assertEquals(0L, harmony.getLong("long", 0L))
     }
 
     @Test
-    fun testSafeSharedPreferences() {
-        val prefs = com.duckduckgo.data.store.impl.SafeSharedPreferences(vpnPreferencesProvider.getSharedPreferences(NAME))
+    fun whenSafeSharedPreferencesFails_thenCrashIsLoggedAndDefaultReturned() {
+        val brokenPrefs = object : SharedPreferences by prefs {
+            override fun getString(key: String?, defValue: String?): String? {
+                throw android.system.ErrnoException("fsync", 5)
+            }
+        }
 
-        prefs.edit(commit = true) { putBoolean("bool", true) }
-        prefs.edit(commit = true) { putString("string", "true") }
-        prefs.edit(commit = true) { putInt("int", 1) }
-        prefs.edit(commit = true) { putFloat("float", 1f) }
-        prefs.edit(commit = true) { putLong("long", 1L) }
+        val sameThreadExecutor = Executor { it.run() }
+        val safe = SafeSharedPreferences(brokenPrefs, crashLogger, crashLoggerExecutor = sameThreadExecutor)
 
-        assertEquals(true, prefs.getBoolean("bool", false))
-        assertEquals("true", prefs.getString("string", "false"))
-        assertEquals(1, prefs.getInt("int", 0))
-        assertEquals(1f, prefs.getFloat("float", 0f))
-        assertEquals(1L, prefs.getLong("long", 0L))
+        val result = safe.getString("key", "fallback")
+        assertEquals("fallback", result)
+
+        assertTrue(crashLogger.crashes.any { it.shortName == "shared-prefs" })
+    }
+
+    @Test
+    fun whenSafeSharedPreferencesWorksNormally_thenNoCrashLogged() {
+        val sameThreadExecutor = Executor { it.run() }
+        val safe = SafeSharedPreferences(prefs, crashLogger, crashLoggerExecutor = sameThreadExecutor)
+
+        safe.edit(commit = true) {
+            putBoolean("bool", true)
+            putInt("int", 42)
+        }
+
+        assertEquals(true, safe.getBoolean("bool", false))
+        assertEquals(42, safe.getInt("int", 0))
+        assertTrue(crashLogger.crashes.isEmpty())
+    }
+
+    private fun putAllTypes(prefs: SharedPreferences) {
+        prefs.edit(commit = true) {
+            putBoolean("bool", true)
+            putString("string", "true")
+            putInt("int", 1)
+            putFloat("float", 1f)
+            putLong("long", 1L)
+        }
     }
 }

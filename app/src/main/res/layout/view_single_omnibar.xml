@@ -199,6 +199,57 @@
 
                             </FrameLayout>
 
+                            <LinearLayout
+                                android:id="@+id/duckAIHeader"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:orientation="horizontal"
+                                android:gravity="center_horizontal"
+                                app:layout_constraintEnd_toStartOf="@+id/endIconsContainer"
+                                app:layout_constraintStart_toStartOf="parent"
+                                app:layout_constraintBottom_toBottomOf="parent"
+                                app:layout_constraintTop_toTopOf="parent">
+
+                                <ImageView
+                                    android:id="@+id/duckAiHeaderDaxIcon"
+                                    android:layout_width="@dimen/toolbarIconSize"
+                                    android:layout_height="@dimen/toolbarIconSize"
+                                    android:importantForAccessibility="no"
+                                    android:scaleType="fitCenter"
+                                    app:srcCompat="@drawable/ic_dax_icon"
+                                    tools:visibility="visible" />
+
+                                <ImageView
+                                    android:id="@+id/caretIcon"
+                                    android:layout_width="@dimen/toolbarIconSize"
+                                    android:layout_height="@dimen/toolbarIconSize"
+                                    android:layout_gravity="center"
+                                    android:importantForAccessibility="no"
+                                    android:scaleType="fitCenter"
+                                    android:layout_marginStart="@dimen/keyline_1"
+                                    app:srcCompat="@drawable/ic_chevron_small_right_24"
+                                    tools:visibility="visible" />
+
+                                <ImageView
+                                    android:id="@+id/aiIcon"
+                                    android:layout_width="@dimen/toolbarIconSize"
+                                    android:layout_height="@dimen/toolbarIconSize"
+                                    android:layout_gravity="center"
+                                    android:importantForAccessibility="no"
+                                    android:scaleType="fitCenter"
+                                    android:layout_marginStart="@dimen/keyline_1"
+                                    app:srcCompat="@drawable/ic_ai_chat_omnibar_24"
+                                    tools:visibility="visible" />
+
+                                <com.duckduckgo.common.ui.view.text.DaxTextView
+                                    android:id="@+id/aiTitle"
+                                    android:layout_marginStart="@dimen/keyline_1"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="@string/duck_chat_title"/>
+
+                            </LinearLayout>
+
                             <View
                                 android:id="@+id/animatedIconBackgroundView"
                                 android:layout_width="@dimen/omnibarCookieAnimationBannerHeight"

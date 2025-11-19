@@ -42,7 +42,6 @@ import com.duckduckgo.app.browser.viewstate.OmnibarViewState
 import com.duckduckgo.app.browser.webview.BottomOmnibarBrowserContainerLayoutBehavior
 import com.duckduckgo.app.global.model.PrivacyShield
 import com.duckduckgo.app.trackerdetection.model.Entity
-import com.duckduckgo.browser.ui.omnibar.OmnibarType
 import com.duckduckgo.common.ui.view.KeyboardAwareEditText
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.hide
@@ -150,6 +149,8 @@ class Omnibar(
             val domain: String?,
             val showDuckPlayerIcon: Boolean = false,
         ) : ViewMode()
+
+        data object DuckAI : ViewMode()
     }
 
     val omnibarView: OmnibarView by lazy {

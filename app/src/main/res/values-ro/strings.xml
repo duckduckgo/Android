@@ -126,8 +126,8 @@
 
     <!-- Fire -->
     <string name="fireMenu">Ștergere date</string>
-    <string name="fireClearAll">Șterge toate filele și datele</string>
-    <string name="fireClearAllPlusDuckChats">Șterge toate filele, datele și chaturile Duck.ai</string>
+    <string name="fireClearAll">Șterge filele și datele</string>
+    <string name="fireClearAllPlusDuckChats">Șterge filele, datele și chaturile Duck.ai</string>
     <string name="fireCancel">Anulează</string>
     <string name="fireDataCleared">Date șterse</string>
 
@@ -191,7 +191,6 @@
     <string name="webTrackingProtectionActivityTitle">Protecție împotriva urmăririi pe web</string>
     <string name="webTrackingProtectionLearnMoreTitle">Protecție împotriva urmăririi pe web</string>
     <string name="webTrackingProtectionTitle">Protecție împotriva urmăririi pe web</string>
-    <string name="webTrackingProtectionDescriptionNew"><![CDATA[DuckDuckGo blochează automat tehnologiile de urmărire ascunse în timp ce navighezi pe web.\n<a href=\"\">Află mai multe</a>]]></string>
     <string name="webTrackingProtectionExplanationDescription"><![CDATA[Browserul DuckDuckGo oferă instrumente de protecție împotriva urmăririi, care sunt mereu active.\n<a href=\"\">Află mai multe</a>]]></string>
     <string name="webTrackingProtectionExplanationTitle">Cum te protejăm</string>
     <string name="webTrackingProtectionThirdPartyTrackersTitle">Blochează tehnologiile de urmărire terță parte</string>
@@ -249,6 +248,8 @@
     <string name="settingsAutomaticallyClearWhenAppExit60Minutes">Ieșire din aplicație, inactiv timp de 1 oră</string>
     <string name="settingsClearAiDataTitle">Șterge chaturile Duck.ai</string>
     <string name="settingsClearAiDataDeleteMessage">Fire Button va șterge și istoricul Duck.ai, inclusiv chaturile fixate.</string>
+    <string name="settingsClearDataActionSecondaryText">Șterge toate filele și datele pentru site-urile pe care nu le-ai protejat cu Fireproof.</string>
+    <string name="settingsClearDataActionPlusDuckChatsSecondaryText">Șterge toate filele, conversațiile Duck.ai și datele pentru site-urile pe care nu le-ai protejat cu Fireproof.</string>
 
     <!-- About Activity -->
     <string name="aboutActivityTitle">Despre DuckDuckGo</string>

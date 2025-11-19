@@ -27,18 +27,23 @@ import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerOptOu
 import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerRecordEmailConfirmationCompleted
 import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerRecordEmailConfirmationNeeded
 import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerRecordEmailConfirmationStarted
-import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerRecordOptOutCompleted
+import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerRecordOptOutFailed
 import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerRecordOptOutStarted
+import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerRecordOptOutSubmitted
 import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerScanActionFailed
 import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerScanActionSucceeded
 import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerScheduledScanCompleted
 import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerScheduledScanStarted
 import com.duckduckgo.pir.impl.models.AddressCityState
 import com.duckduckgo.pir.impl.models.ExtractedProfile
+import com.duckduckgo.pir.impl.models.scheduling.JobRecord.OptOutJobRecord
 import com.duckduckgo.pir.impl.pixels.PirPixelSender
+import com.duckduckgo.pir.impl.pixels.PirStage
 import com.duckduckgo.pir.impl.scheduling.JobRecordUpdater
+import com.duckduckgo.pir.impl.scripts.models.BrokerAction
 import com.duckduckgo.pir.impl.scripts.models.PirSuccessResponse
 import com.duckduckgo.pir.impl.scripts.models.PirSuccessResponse.ExtractedResponse
+import com.duckduckgo.pir.impl.scripts.models.asActionType
 import com.duckduckgo.pir.impl.store.PirEventsRepository
 import com.duckduckgo.pir.impl.store.PirRepository
 import com.duckduckgo.pir.impl.store.PirSchedulingRepository
@@ -127,12 +132,24 @@ interface PirRunStateHandler {
             val extractedProfile: ExtractedProfile,
         ) : PirRunState(brokerName)
 
-        data class BrokerRecordOptOutCompleted(
+        data class BrokerRecordOptOutSubmitted(
             override val brokerName: String,
             val extractedProfile: ExtractedProfile,
+            val attemptId: String,
             val startTimeInMillis: Long,
             val endTimeInMillis: Long,
-            val isSubmitSuccess: Boolean,
+            val emailPattern: String?,
+        ) : PirRunState(brokerName)
+
+        data class BrokerRecordOptOutFailed(
+            override val brokerName: String,
+            val extractedProfile: ExtractedProfile,
+            val attemptId: String,
+            val startTimeInMillis: Long,
+            val endTimeInMillis: Long,
+            val failedAction: BrokerAction,
+            val stage: PirStage,
+            val emailPattern: String?,
         ) : PirRunState(brokerName)
 
         data class BrokerOptOutActionSucceeded(
@@ -177,7 +194,8 @@ class RealPirRunStateHandler @Inject constructor(
                 is BrokerScanActionSucceeded -> handleBrokerScanActionSucceeded(pirRunState)
                 is BrokerScanActionFailed -> handleBrokerScanActionFailed(pirRunState)
                 is BrokerRecordOptOutStarted -> handleRecordOptOutStarted(pirRunState)
-                is BrokerRecordOptOutCompleted -> handleRecordOptOutCompleted(pirRunState)
+                is BrokerRecordOptOutSubmitted -> handleBrokerRecordOptOutSubmitted(pirRunState)
+                is BrokerRecordOptOutFailed -> handleBrokerRecordOptOutFailed(pirRunState)
                 is BrokerOptOutActionSucceeded -> handleBrokerOptOutActionSucceeded(pirRunState)
                 is BrokerOptOutActionFailed -> handleBrokerOptOutActionFailed(pirRunState)
                 is BrokerRecordEmailConfirmationNeeded -> handleBrokerRecordEmailConfirmationNeeded(pirRunState)
@@ -406,19 +424,55 @@ class RealPirRunStateHandler @Inject constructor(
         )
     }
 
-    private suspend fun handleRecordOptOutCompleted(state: BrokerRecordOptOutCompleted) {
-        updateOptOutRecord(state.isSubmitSuccess, state.extractedProfile.dbId)
-        pixelSender.reportOptOutCompleted(
-            brokerName = state.brokerName,
-            totalTimeInMillis = state.endTimeInMillis - state.startTimeInMillis,
-            isSuccess = state.isSubmitSuccess,
+    private suspend fun handleBrokerRecordOptOutSubmitted(state: BrokerRecordOptOutSubmitted) {
+        val broker = repository.getBrokerForName(state.brokerName)
+        val optOutJobRecord = updateOptOutRecord(true, state.extractedProfile.dbId)
+
+        if (broker == null || optOutJobRecord == null) return
+
+        pixelSender.reportOptOutSubmitted(
+            brokerUrl = broker.url,
+            parent = broker.parent ?: "",
+            attemptId = state.attemptId,
+            durationMs = state.endTimeInMillis - state.startTimeInMillis,
+            tries = optOutJobRecord.attemptCount,
+            emailPattern = state.emailPattern,
         )
+
         eventsRepository.saveOptOutCompleted(
             brokerName = state.brokerName,
             extractedProfile = state.extractedProfile,
             startTimeInMillis = state.startTimeInMillis,
             endTimeInMillis = state.endTimeInMillis,
-            isSubmitSuccess = state.isSubmitSuccess,
+            isSubmitSuccess = true,
+        )
+    }
+
+    private suspend fun handleBrokerRecordOptOutFailed(state: BrokerRecordOptOutFailed) {
+        val broker = repository.getBrokerForName(state.brokerName)
+        val optOutJobRecord = updateOptOutRecord(false, state.extractedProfile.dbId)
+
+        if (broker == null || optOutJobRecord == null) return
+
+        pixelSender.reportOptOutFailed(
+            brokerUrl = broker.url,
+            parent = broker.parent ?: "",
+            brokerJsonVersion = broker.version,
+            attemptId = state.attemptId,
+            durationMs = state.endTimeInMillis - state.startTimeInMillis,
+            tries = optOutJobRecord.attemptCount,
+            emailPattern = state.emailPattern,
+            stage = state.stage,
+            actionId = state.failedAction.id,
+            actionType = state.failedAction.asActionType(),
+        )
+
+        eventsRepository.saveOptOutCompleted(
+            brokerName = state.brokerName,
+            extractedProfile = state.extractedProfile,
+            startTimeInMillis = state.startTimeInMillis,
+            endTimeInMillis = state.endTimeInMillis,
+            isSubmitSuccess = false,
         )
     }
 
@@ -457,8 +511,8 @@ class RealPirRunStateHandler @Inject constructor(
     private suspend fun updateOptOutRecord(
         isSubmitted: Boolean,
         extractedProfileId: Long,
-    ) {
-        if (isSubmitted) {
+    ): OptOutJobRecord? {
+        return if (isSubmitted) {
             jobRecordUpdater.updateOptOutRequested(extractedProfileId)
         } else {
             jobRecordUpdater.updateOptOutError(extractedProfileId)

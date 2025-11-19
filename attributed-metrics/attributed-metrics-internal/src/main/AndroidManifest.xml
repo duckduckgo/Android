@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <application>
+        <activity
+            android:name="com.duckduckgo.app.attributed.metrics.internal.ui.AttributedMetricsDevSettingsActivity"
+            android:label="Attributed Metrics Dev Settings"
+            android:exported="false" />
+    </application>
+
+</manifest>

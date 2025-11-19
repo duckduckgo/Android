@@ -127,8 +127,8 @@
 
     <!-- Fire -->
     <string name="fireMenu">Počisti podatke</string>
-    <string name="fireClearAll">Počisti vse zavihke in podatke</string>
-    <string name="fireClearAllPlusDuckChats">Počisti vse zavihke, podatke in klepete Duck.ai</string>
+    <string name="fireClearAll">Počisti zavihke in podatke</string>
+    <string name="fireClearAllPlusDuckChats">Počisti zavihke, podatke in klepete Duck.ai</string>
     <string name="fireCancel">Preklic</string>
     <string name="fireDataCleared">Podatki izbrisani</string>
 
@@ -192,7 +192,6 @@
     <string name="webTrackingProtectionActivityTitle">Zaščita pred spletnim sledenjem</string>
     <string name="webTrackingProtectionLearnMoreTitle">Zaščita pred spletnim sledenjem</string>
     <string name="webTrackingProtectionTitle">Zaščita pred spletnim sledenjem</string>
-    <string name="webTrackingProtectionDescriptionNew"><![CDATA[DuckDuckGo samodejno blokira skrite sledilnike med brskanjem po spletu.\n<a href=\"\">Več o tem</a>]]></string>
     <string name="webTrackingProtectionExplanationDescription"><![CDATA[Brskalnik DuckDuckGo nudi zaščito pred sledenjem, ki je vedno aktivna.\n<a href=\"\">Več o tem</a>]]></string>
     <string name="webTrackingProtectionExplanationTitle">Kako vas ščitimo</string>
     <string name="webTrackingProtectionThirdPartyTrackersTitle">Blokira sledilnike tretjih oseb</string>
@@ -250,6 +249,8 @@
     <string name="settingsAutomaticallyClearWhenAppExit60Minutes">Izhod iz aplikacije, neaktivnost 1 ura</string>
     <string name="settingsClearAiDataTitle">Počisti klepete Duck.ai</string>
     <string name="settingsClearAiDataDeleteMessage">Fire Button bo izbrisal tudi zgodovino Duck.ai, vključno s pripetimi klepeti.</string>
+    <string name="settingsClearDataActionSecondaryText">Počisti vse zavihke in podatke za vsa spletna mesta, ki jih niste zaščitili s funkcijo Fireproof.</string>
+    <string name="settingsClearDataActionPlusDuckChatsSecondaryText">Počisti vse zavihke, klepete Duck.ai in podatke za vsa spletna mesta, ki jih niste zaščitili s funkcijo Fireproof.</string>
 
     <!-- About Activity -->
     <string name="aboutActivityTitle">O DuckDuckGo</string>

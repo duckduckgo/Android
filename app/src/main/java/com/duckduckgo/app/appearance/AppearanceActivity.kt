@@ -35,8 +35,8 @@ import com.duckduckgo.app.appearance.AppearanceViewModel.Command.LaunchThemeSett
 import com.duckduckgo.app.appearance.AppearanceViewModel.Command.UpdateTheme
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ActivityAppearanceBinding
+import com.duckduckgo.app.browser.omnibar.OmnibarType
 import com.duckduckgo.app.fire.FireActivity
-import com.duckduckgo.browser.ui.omnibar.OmnibarType
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.DuckDuckGoTheme
 import com.duckduckgo.common.ui.DuckDuckGoTheme.DARK
@@ -200,7 +200,7 @@ class AppearanceActivity : DuckDuckGoActivity() {
         val subtitle =
             getString(
                 when (omnibarType) {
-                    OmnibarType.SINGLE_TOP, OmnibarType.SPLIT -> R.string.settingsAddressBarPositionTop
+                    OmnibarType.SPLIT, OmnibarType.SINGLE_TOP -> R.string.settingsAddressBarPositionTop
                     OmnibarType.SINGLE_BOTTOM -> R.string.settingsAddressBarPositionBottom
                 },
             )
@@ -238,9 +238,9 @@ class AppearanceActivity : DuckDuckGoActivity() {
                     override fun onPositiveButtonClicked(selectedItem: Int) {
                         val selectedTheme =
                             when (selectedItem) {
-                                2 -> DuckDuckGoTheme.LIGHT
-                                3 -> DuckDuckGoTheme.DARK
-                                else -> DuckDuckGoTheme.SYSTEM_DEFAULT
+                                2 -> LIGHT
+                                3 -> DARK
+                                else -> SYSTEM_DEFAULT
                             }
                         viewModel.onThemeSelected(selectedTheme)
                     }

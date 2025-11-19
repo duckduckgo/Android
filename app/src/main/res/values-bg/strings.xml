@@ -125,8 +125,8 @@
 
     <!-- Fire -->
     <string name="fireMenu">Изчистване на данни</string>
-    <string name="fireClearAll">Изчистване на всички раздели и данни</string>
-    <string name="fireClearAllPlusDuckChats">Изчистване на всички раздели, данни и чатове с Duck.ai</string>
+    <string name="fireClearAll">Изчистване на раздели и данни</string>
+    <string name="fireClearAllPlusDuckChats">Изчистване на раздели, данни и чатове с Duck.ai</string>
     <string name="fireCancel">Отмени</string>
     <string name="fireDataCleared">Данните са изчистени</string>
 
@@ -190,7 +190,6 @@
     <string name="webTrackingProtectionActivityTitle">Защита от проследяване в мрежата</string>
     <string name="webTrackingProtectionLearnMoreTitle">Защита от проследяване в мрежата</string>
     <string name="webTrackingProtectionTitle">Защита от проследяване в мрежата</string>
-    <string name="webTrackingProtectionDescriptionNew"><![CDATA[DuckDuckGo автоматично блокира скритите тракери, докато сърфирате в мрежата.\n<a href=\"\">Научете повече</a>]]></string>
     <string name="webTrackingProtectionExplanationDescription"><![CDATA[Браузърът DuckDuckGo предоставя защити от проследяване, които винаги са активни.\n<a href=\"\">Научете повече</a>]]></string>
     <string name="webTrackingProtectionExplanationTitle">Как защитаваме теб</string>
     <string name="webTrackingProtectionThirdPartyTrackersTitle">Блокира тракерите на трети страни</string>
@@ -248,6 +247,8 @@
     <string name="settingsAutomaticallyClearWhenAppExit60Minutes">Изход от приложението, 1 час без активност</string>
     <string name="settingsClearAiDataTitle">Изчистване на чатовете с Duck.ai</string>
     <string name="settingsClearAiDataDeleteMessage">Fire Button ще изтрие също и историята на Duck.ai, включително закачените чатове.</string>
+    <string name="settingsClearDataActionSecondaryText">Изчиства всички раздели и данни за всички сайтове, които не защитиш с Fireproof.</string>
+    <string name="settingsClearDataActionPlusDuckChatsSecondaryText">Изчиства всички раздели, Duck.ai чатове и данни за всички сайтове, които не защитиш с Fireproof.</string>
 
     <!-- About Activity -->
     <string name="aboutActivityTitle">Относно DuckDuckGo</string>

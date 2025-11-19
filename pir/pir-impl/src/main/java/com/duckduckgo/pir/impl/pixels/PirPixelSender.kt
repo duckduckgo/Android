@@ -18,6 +18,15 @@ package com.duckduckgo.pir.impl.pixels
 
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_BROKER_CUSTOM_STATS_14DAY_CONFIRMED_OPTOUT
+import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_BROKER_CUSTOM_STATS_14DAY_UNCONFIRMED_OPTOUT
+import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_BROKER_CUSTOM_STATS_21DAY_CONFIRMED_OPTOUT
+import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_BROKER_CUSTOM_STATS_21DAY_UNCONFIRMED_OPTOUT
+import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_BROKER_CUSTOM_STATS_42DAY_CONFIRMED_OPTOUT
+import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_BROKER_CUSTOM_STATS_42DAY_UNCONFIRMED_OPTOUT
+import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_BROKER_CUSTOM_STATS_7DAY_CONFIRMED_OPTOUT
+import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_BROKER_CUSTOM_STATS_7DAY_UNCONFIRMED_OPTOUT
+import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_BROKER_CUSTOM_STATS_OPTOUT_SUBMIT_SUCCESSRATE
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_EMAIL_CONFIRMATION_ATTEMPT_FAILED
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_EMAIL_CONFIRMATION_ATTEMPT_START
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_EMAIL_CONFIRMATION_ATTEMPT_SUCCESS
@@ -27,7 +36,6 @@ import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_EMAIL_CONFIRMATION_LINK_RECEI
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_EMAIL_CONFIRMATION_MAX_RETRIES_EXCEEDED
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_EMAIL_CONFIRMATION_RUN_COMPLETED
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_EMAIL_CONFIRMATION_RUN_STARTED
-import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_INTERNAL_BROKER_OPT_OUT_COMPLETED
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_INTERNAL_BROKER_OPT_OUT_STARTED
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_INTERNAL_BROKER_SCAN_COMPLETED
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_INTERNAL_BROKER_SCAN_STARTED
@@ -41,6 +49,8 @@ import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_INTERNAL_SCHEDULED_SCAN_SCHED
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_INTERNAL_SCHEDULED_SCAN_STARTED
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_INTERNAL_SECURE_STORAGE_UNAVAILABLE
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_OPTOUT_STAGE_PENDING_EMAIL_CONFIRMATION
+import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_OPTOUT_SUBMIT_FAILURE
+import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_OPTOUT_SUBMIT_SUCCESS
 import com.squareup.anvil.annotations.ContributesBinding
 import logcat.logcat
 import javax.inject.Inject
@@ -109,17 +119,49 @@ interface PirPixelSender {
     )
 
     /**
-     * Emits a pixel to signal that an opt-out job for a specific extractedProfile has been completed.
-     * It could mean that the opt-out for the record was successful or failed.
+     * Emits a pixel to signal that an opt-out job for a specific extractedProfile has been successfully submitted.
      *
-     * @param brokerName for which the opt-out is for
-     * @param totalTimeInMillis How long it took to complete the opt-out for the record.
-     * @param isSuccess - if result was not an error, it is a success.
+     * @param brokerUrl url of the Broker for which the opt-out is for
+     * @param parent The parent data broker of the one this opt-out attempt targets
+     * @param attemptId - Client-generated ID of the opt-out attempt
+     * @param durationMs - Total duration of the opt-out attempt in milliseconds
+     * @param tries - The number of tries it took to submit successfully.
+     * @param emailPattern - Email pattern used during submission, when available else null.
      */
-    fun reportOptOutCompleted(
-        brokerName: String,
-        totalTimeInMillis: Long,
-        isSuccess: Boolean,
+    fun reportOptOutSubmitted(
+        brokerUrl: String,
+        parent: String,
+        attemptId: String,
+        durationMs: Long,
+        tries: Int,
+        emailPattern: String?,
+    )
+
+    /**
+     * Emits a pixel to signal that an opt-out job for a specific extractedProfile has been failed.
+     *
+     * @param brokerUrl url of the Broker for which the opt-out is for
+     * @param parent The parent data broker of the one this opt-out attempt targets
+     * @param brokerJsonVersion The version of the broker JSON file
+     * @param attemptId - Client-generated ID of the opt-out attempt
+     * @param durationMs - Total duration of the opt-out attempt in milliseconds
+     * @param stage - The stage where the failure occurred
+     * @param tries - The number of tries it took to submit successfully.
+     * @param emailPattern - Email pattern used during submission, when available else null.
+     * @param actionId - Predefined identifier of the broker action that failed
+     * @param actionType - Type of action that failed
+     */
+    fun reportOptOutFailed(
+        brokerUrl: String,
+        parent: String,
+        brokerJsonVersion: String,
+        attemptId: String,
+        durationMs: Long,
+        stage: PirStage,
+        tries: Int,
+        emailPattern: String?,
+        actionId: String,
+        actionType: String,
     )
 
     /**
@@ -288,6 +330,57 @@ interface PirPixelSender {
      * Emits a pixel to signal that PIR encrypted database is unavailable.
      */
     fun reportSecureStorageUnavailable()
+
+    /**
+     * Emits a pixel containing the opt-out submit success rate for a broker for the last 24 hours
+     *
+     * @param brokerUrl url of the Broker for which the opt-out submit rate is for
+     * @param optOutSuccessRate opt out submit success rate for the past 24 hours
+     */
+    fun reportBrokerCustomStateOptOutSubmitRate(
+        brokerUrl: String,
+        optOutSuccessRate: Double,
+    )
+
+    /**
+     * Emits a pixel when an opt-out has been confirmed within 7 days.
+     */
+    fun reportBrokerOptOutConfirmed7Days(brokerUrl: String)
+
+    /**
+     * Emits a pixel when an opt-out is unconfirmed within 7 days.
+     */
+    fun reportBrokerOptOutUnconfirmed7Days(brokerUrl: String)
+
+    /**
+     * Emits a pixel when an opt-out has been confirmed within 14 days.
+     */
+    fun reportBrokerOptOutConfirmed14Days(brokerUrl: String)
+
+    /**
+     * Emits a pixel when an opt-out is unconfirmed within 14 days.
+     */
+    fun reportBrokerOptOutUnconfirmed14Days(brokerUrl: String)
+
+    /**
+     * Emits a pixel when an opt-out has been confirmed within 21 days.
+     */
+    fun reportBrokerOptOutConfirmed21Days(brokerUrl: String)
+
+    /**
+     * Emits a pixel when an opt-out is unconfirmed within 21 days.
+     */
+    fun reportBrokerOptOutUnconfirmed21Days(brokerUrl: String)
+
+    /**
+     * Emits a pixel when an opt-out has been confirmed within 42 days.
+     */
+    fun reportBrokerOptOutConfirmed42Days(brokerUrl: String)
+
+    /**
+     * Emits a pixel when an opt-out is unconfirmed within 42 days.
+     */
+    fun reportBrokerOptOutUnconfirmed42Days(brokerUrl: String)
 }
 
 @ContributesBinding(AppScope::class)
@@ -353,17 +446,51 @@ class RealPirPixelSender @Inject constructor(
         fire(PIR_INTERNAL_BROKER_OPT_OUT_STARTED, params)
     }
 
-    override fun reportOptOutCompleted(
-        brokerName: String,
-        totalTimeInMillis: Long,
-        isSuccess: Boolean,
+    override fun reportOptOutSubmitted(
+        brokerUrl: String,
+        parent: String,
+        attemptId: String,
+        durationMs: Long,
+        tries: Int,
+        emailPattern: String?,
     ) {
         val params = mapOf(
-            PARAM_KEY_BROKER_NAME to brokerName,
-            PARAM_KEY_TOTAL_TIME to totalTimeInMillis.toString(),
-            PARAM_KEY_SUCCESS to isSuccess.toString(),
+            PARAM_KEY_BROKER to brokerUrl,
+            PARAM_KEY_PARENT to parent,
+            PARAM_ATTEMPT_ID to attemptId,
+            PARAM_DURATION to durationMs.toString(),
+            PARAM_TRIES to tries.toString(),
+            PARAM_KEY_PATTERN to (emailPattern ?: ""),
         )
-        fire(PIR_INTERNAL_BROKER_OPT_OUT_COMPLETED, params)
+        fire(PIR_OPTOUT_SUBMIT_SUCCESS, params)
+    }
+
+    override fun reportOptOutFailed(
+        brokerUrl: String,
+        parent: String,
+        brokerJsonVersion: String,
+        attemptId: String,
+        durationMs: Long,
+        stage: PirStage,
+        tries: Int,
+        emailPattern: String?,
+        actionId: String,
+        actionType: String,
+    ) {
+        val params = mapOf(
+            PARAM_KEY_BROKER to brokerUrl,
+            PARAM_KEY_PARENT to parent,
+            PARAM_BROKER_VERSION to brokerJsonVersion,
+            PARAM_ATTEMPT_ID to attemptId,
+            PARAM_DURATION to durationMs.toString(),
+            PARAM_KEY_STAGE to stage.stageName,
+            PARAM_TRIES to tries.toString(),
+            PARAM_KEY_PATTERN to (emailPattern ?: ""),
+            PARAM_ACTION_ID to actionId,
+            PARAM_KEY_ACTION_TYPE to actionType,
+        )
+
+        fire(PIR_OPTOUT_SUBMIT_FAILURE, params)
     }
 
     override fun reportScanStats(totalScanToRun: Int) {
@@ -536,6 +663,82 @@ class RealPirPixelSender @Inject constructor(
         fire(PIR_INTERNAL_SECURE_STORAGE_UNAVAILABLE)
     }
 
+    override fun reportBrokerCustomStateOptOutSubmitRate(
+        brokerUrl: String,
+        optOutSuccessRate: Double,
+    ) {
+        val params = mapOf(
+            PARAM_KEY_BROKER to brokerUrl,
+            PARAM_KEY_OPTOUT_SUBMIT_SUCCESS_RATE to optOutSuccessRate.toString(),
+        )
+
+        fire(PIR_BROKER_CUSTOM_STATS_OPTOUT_SUBMIT_SUCCESSRATE, params)
+    }
+
+    override fun reportBrokerOptOutConfirmed7Days(brokerUrl: String) {
+        val params = mapOf(
+            PARAM_KEY_BROKER to brokerUrl,
+        )
+
+        fire(PIR_BROKER_CUSTOM_STATS_7DAY_CONFIRMED_OPTOUT, params)
+    }
+
+    override fun reportBrokerOptOutUnconfirmed7Days(brokerUrl: String) {
+        val params = mapOf(
+            PARAM_KEY_BROKER to brokerUrl,
+        )
+
+        fire(PIR_BROKER_CUSTOM_STATS_7DAY_UNCONFIRMED_OPTOUT, params)
+    }
+
+    override fun reportBrokerOptOutConfirmed14Days(brokerUrl: String) {
+        val params = mapOf(
+            PARAM_KEY_BROKER to brokerUrl,
+        )
+
+        fire(PIR_BROKER_CUSTOM_STATS_14DAY_CONFIRMED_OPTOUT, params)
+    }
+
+    override fun reportBrokerOptOutUnconfirmed14Days(brokerUrl: String) {
+        val params = mapOf(
+            PARAM_KEY_BROKER to brokerUrl,
+        )
+
+        fire(PIR_BROKER_CUSTOM_STATS_14DAY_UNCONFIRMED_OPTOUT, params)
+    }
+
+    override fun reportBrokerOptOutConfirmed21Days(brokerUrl: String) {
+        val params = mapOf(
+            PARAM_KEY_BROKER to brokerUrl,
+        )
+
+        fire(PIR_BROKER_CUSTOM_STATS_21DAY_CONFIRMED_OPTOUT, params)
+    }
+
+    override fun reportBrokerOptOutUnconfirmed21Days(brokerUrl: String) {
+        val params = mapOf(
+            PARAM_KEY_BROKER to brokerUrl,
+        )
+
+        fire(PIR_BROKER_CUSTOM_STATS_21DAY_UNCONFIRMED_OPTOUT, params)
+    }
+
+    override fun reportBrokerOptOutConfirmed42Days(brokerUrl: String) {
+        val params = mapOf(
+            PARAM_KEY_BROKER to brokerUrl,
+        )
+
+        fire(PIR_BROKER_CUSTOM_STATS_42DAY_CONFIRMED_OPTOUT, params)
+    }
+
+    override fun reportBrokerOptOutUnconfirmed42Days(brokerUrl: String) {
+        val params = mapOf(
+            PARAM_KEY_BROKER to brokerUrl,
+        )
+
+        fire(PIR_BROKER_CUSTOM_STATS_42DAY_UNCONFIRMED_OPTOUT, params)
+    }
+
     private fun fire(
         pixel: PirPixel,
         params: Map<String, String> = emptyMap(),
@@ -565,5 +768,12 @@ class RealPirPixelSender @Inject constructor(
         private const val PARAM_ATTEMPT_NUMBER = "attempt_number"
         private const val PARAM_TOTAL_FETCH = "totalFetchAttempts"
         private const val PARAM_TOTAL_EMAIL_CONFIRMATION = "totalEmailConfirmationJobs"
+
+        private const val PARAM_KEY_BROKER = "data_broker"
+        private const val PARAM_KEY_PARENT = "parent"
+        private const val PARAM_KEY_STAGE = "stage"
+        private const val PARAM_KEY_PATTERN = "pattern"
+        private const val PARAM_KEY_ACTION_TYPE = "action_type"
+        private const val PARAM_KEY_OPTOUT_SUBMIT_SUCCESS_RATE = "optout_submit_success_rate"
     }
 }

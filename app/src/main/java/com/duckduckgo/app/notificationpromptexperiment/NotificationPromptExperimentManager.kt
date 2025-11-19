@@ -93,7 +93,9 @@ class NotificationPromptExperimentManagerImpl @Inject constructor(
         return true
     }
 
-    override suspend fun isWaitForLocalPrivacyConfigEnabled(): Boolean = notificationPromptExperimentToggles.waitForLocalPrivacyConfig().isEnabled()
+    override suspend fun isWaitForLocalPrivacyConfigEnabled(): Boolean = withContext(dispatcherProvider.io()) {
+        notificationPromptExperimentToggles.waitForLocalPrivacyConfig().isEnabled()
+    }
 
     override suspend fun fireDdgSetAsDefault() {
         withContext(dispatcherProvider.io()) {

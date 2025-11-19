@@ -127,8 +127,8 @@
 
     <!-- Fire -->
     <string name="fireMenu">Wyczyść dane</string>
-    <string name="fireClearAll">Wyczyść wszystkie karty i dane</string>
-    <string name="fireClearAllPlusDuckChats">Wyczyść wszystkie karty, dane i czaty Duck.ai</string>
+    <string name="fireClearAll">Wyczyść karty i dane</string>
+    <string name="fireClearAllPlusDuckChats">Wyczyść karty, dane i czaty Duck.ai</string>
     <string name="fireCancel">Anuluj</string>
     <string name="fireDataCleared">Dane zostały usunięte</string>
 
@@ -192,7 +192,6 @@
     <string name="webTrackingProtectionActivityTitle">Ochrona przed śledzeniem w sieci</string>
     <string name="webTrackingProtectionLearnMoreTitle">Ochrona przed śledzeniem w sieci</string>
     <string name="webTrackingProtectionTitle">Ochrona przed śledzeniem w sieci</string>
-    <string name="webTrackingProtectionDescriptionNew"><![CDATA[Podczas przeglądania stron internetowych DuckDuckGo automatycznie blokuje ukryte mechanizmy śledzące.\n<a href=\"\">Dowiedz się więcej</a>]]></string>
     <string name="webTrackingProtectionExplanationDescription"><![CDATA[Przeglądarka DuckDuckGo zapewnia ochronę przed śledzeniem, która jest zawsze aktywna.\n<a href=\"\">Dowiedz się więcej</a>]]></string>
     <string name="webTrackingProtectionExplanationTitle">W jaki sposób Cię chronimy</string>
     <string name="webTrackingProtectionThirdPartyTrackersTitle">Blokuje mechanizmy śledzące innych firm</string>
@@ -250,6 +249,8 @@
     <string name="settingsAutomaticallyClearWhenAppExit60Minutes">Zamknięcie aplikacji, nieaktywna przez 1 godzinę</string>
     <string name="settingsClearAiDataTitle">Wyczyść czaty Duck.ai</string>
     <string name="settingsClearAiDataDeleteMessage">Przycisk Fire Button usunie także historię Duck.ai, w tym przypięte czaty.</string>
+    <string name="settingsClearDataActionSecondaryText">Czyści wszystkie karty i dane dla witryn, które nie zostały oznaczone jako Fireproof.</string>
+    <string name="settingsClearDataActionPlusDuckChatsSecondaryText">Czyści wszystkie karty, czaty Duck.ai i dane dla wszystkich witryn, które nie zostały oznaczone jako Fireproof.</string>
 
     <!-- About Activity -->
     <string name="aboutActivityTitle">O DuckDuckGo</string>

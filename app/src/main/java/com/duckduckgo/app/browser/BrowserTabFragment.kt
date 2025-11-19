@@ -31,21 +31,16 @@ import android.content.pm.ActivityInfo
 import android.content.pm.PackageManager
 import android.content.pm.ResolveInfo
 import android.content.res.Configuration
-import android.graphics.Typeface
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.os.Environment
 import android.os.Handler
-import android.os.Looper
 import android.os.Message
 import android.print.PrintAttributes
 import android.print.PrintManager
 import android.provider.MediaStore
-import android.text.Spannable
-import android.text.SpannableString
 import android.text.Spanned
-import android.text.style.StyleSpan
 import android.view.ContextMenu
 import android.view.MenuItem
 import android.view.MotionEvent
@@ -102,11 +97,13 @@ import androidx.webkit.WebViewCompat
 import androidx.webkit.WebViewFeature
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.accessibility.data.AccessibilitySettingsDataStore
+import com.duckduckgo.app.bookmarks.dialog.BookmarkAddedConfirmationDialog
 import com.duckduckgo.app.browser.BrowserTabViewModel.FileChooserRequestedParams
 import com.duckduckgo.app.browser.R.string
 import com.duckduckgo.app.browser.SSLErrorType.NONE
 import com.duckduckgo.app.browser.WebViewErrorResponse.LOADING
 import com.duckduckgo.app.browser.WebViewErrorResponse.OMITTED
+import com.duckduckgo.app.browser.api.OmnibarRepository
 import com.duckduckgo.app.browser.api.WebViewCapabilityChecker
 import com.duckduckgo.app.browser.api.WebViewCapabilityChecker.WebViewCapability
 import com.duckduckgo.app.browser.applinks.AppLinksLauncher
@@ -142,6 +139,7 @@ import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
 import com.duckduckgo.app.browser.model.LongPressTarget
 import com.duckduckgo.app.browser.navigation.bar.BrowserNavigationBarViewIntegration
 import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarObserver
+import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarView
 import com.duckduckgo.app.browser.newtab.NewTabPageProvider
 import com.duckduckgo.app.browser.omnibar.Omnibar
 import com.duckduckgo.app.browser.omnibar.Omnibar.FindInPageListener
@@ -150,8 +148,8 @@ import com.duckduckgo.app.browser.omnibar.Omnibar.LogoClickListener
 import com.duckduckgo.app.browser.omnibar.Omnibar.OmnibarTextState
 import com.duckduckgo.app.browser.omnibar.Omnibar.TextListener
 import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode
-import com.duckduckgo.app.browser.omnibar.OmnibarFeatureRepository
 import com.duckduckgo.app.browser.omnibar.OmnibarItemPressedListener
+import com.duckduckgo.app.browser.omnibar.OmnibarType
 import com.duckduckgo.app.browser.omnibar.QueryOrigin
 import com.duckduckgo.app.browser.print.PrintDocumentAdapterFactory
 import com.duckduckgo.app.browser.print.PrintInjector
@@ -182,7 +180,6 @@ import com.duckduckgo.app.browser.webshare.WebShareChooser
 import com.duckduckgo.app.browser.webshare.WebViewCompatWebShareChooser
 import com.duckduckgo.app.browser.webview.WebContentDebugging
 import com.duckduckgo.app.browser.webview.WebViewBlobDownloadFeature
-import com.duckduckgo.app.browser.webview.safewebview.SafeWebViewFeature
 import com.duckduckgo.app.cta.ui.BrokenSitePromptDialogCta
 import com.duckduckgo.app.cta.ui.Cta
 import com.duckduckgo.app.cta.ui.CtaViewModel
@@ -252,7 +249,6 @@ import com.duckduckgo.browser.api.ui.BrowserScreens.PrivateSearchScreenNoParams
 import com.duckduckgo.browser.api.ui.BrowserScreens.WebViewActivityWithParams
 import com.duckduckgo.browser.api.webviewcompat.WebViewCompatWrapper
 import com.duckduckgo.browser.ui.autocomplete.BrowserAutoCompleteSuggestionsAdapter
-import com.duckduckgo.browser.ui.omnibar.OmnibarType
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.DuckDuckGoFragment
 import com.duckduckgo.common.ui.store.BrowserAppTheme
@@ -322,11 +318,9 @@ import com.duckduckgo.privacy.dashboard.api.ui.PrivacyDashboardHybridScreenResul
 import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopup
 import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupFactory
 import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupViewState
-import com.duckduckgo.savedsites.api.models.BookmarkFolder
 import com.duckduckgo.savedsites.api.models.SavedSite
 import com.duckduckgo.savedsites.api.models.SavedSite.Bookmark
 import com.duckduckgo.savedsites.api.models.SavedSitesNames
-import com.duckduckgo.savedsites.impl.bookmarks.BookmarksBottomSheetDialog
 import com.duckduckgo.savedsites.impl.bookmarks.FaviconPromptSheet
 import com.duckduckgo.savedsites.impl.dialogs.EditSavedSiteDialogFragment
 import com.duckduckgo.serp.logos.api.SerpLogoScreens.EasterEggLogoScreen
@@ -564,9 +558,6 @@ class BrowserTabFragment :
     lateinit var newTabPageProvider: NewTabPageProvider
 
     @Inject
-    lateinit var safeWebViewFeature: SafeWebViewFeature
-
-    @Inject
     lateinit var duckPlayer: DuckPlayer
 
     @Inject
@@ -597,7 +588,7 @@ class BrowserTabFragment :
     lateinit var webViewCompatWrapper: WebViewCompatWrapper
 
     @Inject
-    lateinit var omnibarFeatureRepository: OmnibarFeatureRepository
+    lateinit var omnibarRepository: OmnibarRepository
 
     @Inject
     lateinit var webViewCompatTestHelper: WebViewCompatTestHelper
@@ -653,8 +644,6 @@ class BrowserTabFragment :
     private lateinit var omnibar: Omnibar
 
     private lateinit var webViewContainer: FrameLayout
-
-    private var bookmarksBottomSheetDialog: BookmarksBottomSheetDialog.Builder? = null
 
     private var autocompleteItemOffsetTop: Int = 0
     private var autocompleteFirstVisibleItemPosition: Int = 0
@@ -930,9 +919,10 @@ class BrowserTabFragment :
                 }
 
                 InputScreenActivityResultCodes.MENU_REQUESTED -> {
+                    val isSplitOmnibarEnabled = omnibarRepository.omnibarType == OmnibarType.SPLIT
                     launchPopupMenu(
-                        anchorToNavigationBar = omnibarFeatureRepository.isSplitOmnibarEnabled,
-                        addExtraDelay = omnibarFeatureRepository.isSplitOmnibarEnabled,
+                        anchorToNavigationBar = isSplitOmnibarEnabled,
+                        addExtraDelay = isSplitOmnibarEnabled,
                     )
                 }
 
@@ -961,8 +951,15 @@ class BrowserTabFragment :
         voiceSearchLauncher.registerResultsCallback(this, requireActivity(), BROWSER) {
             when (it) {
                 is VoiceSearchLauncher.Event.VoiceRecognitionSuccess -> {
-                    omnibar.setText(it.result)
-                    userEnteredQuery(it.result)
+                    when (val result = it.result) {
+                        is VoiceSearchLauncher.VoiceRecognitionResult.SearchResult -> {
+                            omnibar.setText(result.query)
+                            userEnteredQuery(result.query)
+                        }
+                        is VoiceSearchLauncher.VoiceRecognitionResult.DuckAiResult -> {
+                            duckChat.openDuckChatWithAutoPrompt(result.query)
+                        }
+                    }
                     resumeWebView()
                 }
 
@@ -1039,7 +1036,7 @@ class BrowserTabFragment :
         omnibar = Omnibar(
             omnibarType = settingsDataStore.omnibarType,
             binding = binding,
-            isUnifiedOmnibarEnabled = omnibarFeatureRepository.isUnifiedOmnibarFlagEnabled,
+            isUnifiedOmnibarEnabled = omnibarRepository.isUnifiedOmnibarLayoutEnabled,
         )
 
         webViewContainer = binding.webViewContainer
@@ -1143,6 +1140,7 @@ class BrowserTabFragment :
     }
 
     private fun launchInputScreen(query: String) {
+        logcat { "Duck.ai: launchInputScreen" }
         val isTopOmnibar = omnibar.omnibarType != OmnibarType.SINGLE_BOTTOM
         val intent =
             globalActivityStarter.startIntent(
@@ -1183,18 +1181,6 @@ class BrowserTabFragment :
                     onBrowserMenuButtonPressed()
                 }
 
-                override fun onBackButtonClicked() {
-                    onBackArrowClicked()
-                }
-
-                override fun onBackButtonLongClicked() {
-                    onBackArrowLongClicked()
-                }
-
-                override fun onForwardButtonClicked() {
-                    onForwardArrowClicked()
-                }
-
                 override fun onNewTabButtonClicked() {
                     viewModel.onNavigationBarNewTabButtonClicked()
                 }
@@ -1211,7 +1197,7 @@ class BrowserTabFragment :
         browserNavigationBarIntegration = BrowserNavigationBarViewIntegration(
             lifecycleScope = lifecycleScope,
             browserTabFragmentBinding = binding,
-            isEnabled = omnibarFeatureRepository.isSplitOmnibarEnabled,
+            isEnabled = omnibarRepository.omnibarType == OmnibarType.SPLIT,
             omnibar = omnibar,
             browserNavigationBarObserver = observer,
         )
@@ -1654,7 +1640,7 @@ class BrowserTabFragment :
                 .flowWithLifecycle(lifecycle, Lifecycle.State.RESUMED)
                 .collectLatest { hasFavorites ->
                     binding.includeNewBrowserTab.topNtpOutlineStroke.isVisible = hasFavorites
-                    binding.includeNewBrowserTab.bottomNtpOutlineStroke.isVisible = hasFavorites && !omnibarFeatureRepository.isSplitOmnibarEnabled
+                    binding.includeNewBrowserTab.bottomNtpOutlineStroke.isVisible = hasFavorites && omnibarRepository.omnibarType != OmnibarType.SPLIT
                 }
         }
 
@@ -2003,6 +1989,10 @@ class BrowserTabFragment :
         } else {
             null
         }
+    }
+
+    fun getBottomNavigationBar(): BrowserNavigationBarView {
+        return binding.navigationBar
     }
 
     private fun processCommand(it: Command?) {
@@ -2364,6 +2354,8 @@ class BrowserTabFragment :
             is Command.SubmitChat -> duckChat.openDuckChatWithAutoPrompt(it.query)
             is Command.EnqueueCookiesAnimation -> enqueueCookiesAnimation(it.isCosmetic)
             is Command.PageStarted -> onPageStarted()
+            is Command.EnableDuckAIFullScreen -> omnibar.setViewMode(ViewMode.DuckAI)
+            is Command.DisableDuckAIFullScreen -> omnibar.setViewMode(ViewMode.Browser(it.url))
         }
     }
 
@@ -3202,7 +3194,6 @@ class BrowserTabFragment :
                 ).findViewById<DuckDuckGoWebView>(R.id.browserWebView)
 
         webView?.let {
-            it.isSafeWebViewEnabled = safeWebViewFeature.self().isEnabled()
             it.webViewClient = webViewClient
             it.webChromeClient = webChromeClient
             it.clearSslPreferences()
@@ -3771,70 +3762,30 @@ class BrowserTabFragment :
     }
 
     private fun savedSiteAdded(savedSiteChangedViewState: SavedSiteChangedViewState) {
-        val dismissHandler = Handler(Looper.getMainLooper())
-        val dismissRunnable =
-            Runnable {
-                if (isAdded) {
-                    bookmarksBottomSheetDialog?.dialog?.let { dialog ->
-                        if (dialog.isShowing) {
-                            dialog.dismiss()
+        context?.let { ctx ->
+            val dialog = BookmarkAddedConfirmationDialog(ctx, savedSiteChangedViewState.bookmarkFolder)
+            dialog.addEventListener(
+                object : BookmarkAddedConfirmationDialog.EventListener() {
+                    override fun onFavoriteStateChangeClicked(isFavorited: Boolean) {
+                        viewModel.onFavoriteMenuClicked()
+                    }
+
+                    override fun onEditBookmarkClicked() {
+                        if (savedSiteChangedViewState.savedSite is Bookmark) {
+                            pixel.fire(AppPixelName.ADD_BOOKMARK_CONFIRM_EDITED)
+                            editSavedSite(
+                                savedSiteChangedViewState.copy(
+                                    savedSite = savedSiteChangedViewState.savedSite.copy(
+                                        isFavorite = viewModel.browserViewState.value?.favorite != null,
+                                    ),
+                                ),
+                            )
                         }
                     }
-                }
-            }
-        val title = getBookmarksBottomSheetTitle(savedSiteChangedViewState.bookmarkFolder)
-
-        bookmarksBottomSheetDialog =
-            BookmarksBottomSheetDialog
-                .Builder(requireContext())
-                .setTitle(title)
-                .setPrimaryItem(
-                    getString(com.duckduckgo.saved.sites.impl.R.string.addToFavorites),
-                    icon = com.duckduckgo.mobile.android.R.drawable.ic_favorite_24,
-                ).setSecondaryItem(
-                    getString(com.duckduckgo.saved.sites.impl.R.string.editBookmark),
-                    icon = com.duckduckgo.mobile.android.R.drawable.ic_edit_24,
-                ).addEventListener(
-                    object : BookmarksBottomSheetDialog.EventListener() {
-                        override fun onPrimaryItemClicked() {
-                            viewModel.onFavoriteMenuClicked()
-                            dismissHandler.removeCallbacks(dismissRunnable)
-                        }
-
-                        override fun onSecondaryItemClicked() {
-                            if (savedSiteChangedViewState.savedSite is Bookmark) {
-                                pixel.fire(AppPixelName.ADD_BOOKMARK_CONFIRM_EDITED)
-                                editSavedSite(
-                                    savedSiteChangedViewState.copy(
-                                        savedSite = savedSiteChangedViewState.savedSite.copy(
-                                            isFavorite = viewModel.browserViewState.value?.favorite != null,
-                                        ),
-                                    ),
-                                )
-                                dismissHandler.removeCallbacks(dismissRunnable)
-                            }
-                        }
-
-                        override fun onBottomSheetDismissed() {
-                            super.onBottomSheetDismissed()
-                            dismissHandler.removeCallbacks(dismissRunnable)
-                        }
-                    },
-                )
-        bookmarksBottomSheetDialog?.show()
-
-        dismissHandler.postDelayed(dismissRunnable, BOOKMARKS_BOTTOM_SHEET_DURATION)
-    }
-
-    private fun getBookmarksBottomSheetTitle(bookmarkFolder: BookmarkFolder?): SpannableString {
-        val folderName = bookmarkFolder?.name ?: ""
-        val fullText = getString(com.duckduckgo.saved.sites.impl.R.string.bookmarkAddedInBookmarks, folderName)
-        val spannableString = SpannableString(fullText)
-
-        val boldStart = fullText.indexOf(folderName)
-        val boldEnd = boldStart + folderName.length
-        spannableString.setSpan(StyleSpan(Typeface.BOLD), boldStart, boldEnd, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
-        return spannableString
+                },
+            )
+            dialog.show()
+        }
     }
 
     private fun editSavedSite(savedSiteChangedViewState: SavedSiteChangedViewState) {
@@ -4372,8 +4323,6 @@ class BrowserTabFragment :
 
         private const val COOKIES_ANIMATION_DELAY = 400L
 
-        private const val BOOKMARKS_BOTTOM_SHEET_DURATION = 3500L
-
         private const val AUTOCOMPLETE_PADDING_DP = 6
 
         private const val SITE_SECURITY_WARNING = "Warning: Security Risk"
@@ -4619,7 +4568,6 @@ class BrowserTabFragment :
                 renderFullscreenMode(viewState)
                 privacyProtectionsPopup.setViewState(viewState.privacyProtectionsPopupViewState)
 
-                bookmarksBottomSheetDialog?.dialog?.toggleSwitch(viewState.favorite != null)
                 val bookmark =
                     viewModel.browserViewState.value
                         ?.bookmark

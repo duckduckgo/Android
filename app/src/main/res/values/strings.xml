@@ -124,8 +124,8 @@
 
     <!-- Fire -->
     <string name="fireMenu">Clear Data</string>
-    <string name="fireClearAll">Clear All Tabs And Data</string>
-    <string name="fireClearAllPlusDuckChats">Clear All Tabs, Data, and Duck.ai Chats</string>
+    <string name="fireClearAll">Clear Tabs and Data</string>
+    <string name="fireClearAllPlusDuckChats">Clear Tabs, Data, and Duck.ai Chats</string>
     <string name="fireCancel">Cancel</string>
     <string name="fireDataCleared">Data cleared</string>
 
@@ -189,7 +189,6 @@
     <string name="webTrackingProtectionActivityTitle">Web Tracking Protection</string>
     <string name="webTrackingProtectionLearnMoreTitle">Web Tracking Protection</string>
     <string name="webTrackingProtectionTitle">Web Tracking Protection</string>
-    <string name="webTrackingProtectionDescriptionNew"><![CDATA[DuckDuckGo automatically blocks hidden trackers as you browse the web.\n<a href="">Learn More</a>]]></string>
     <string name="webTrackingProtectionExplanationDescription"><![CDATA[The DuckDuckGo browser provides tracking protections, which are always active.\n<a href="">Learn More</a>]]></string>
     <string name="webTrackingProtectionExplanationTitle">How We Protect You</string>
     <string name="webTrackingProtectionThirdPartyTrackersTitle">Blocks 3rd-party trackers</string>
@@ -247,6 +246,8 @@
     <string name="settingsAutomaticallyClearWhenAppExit60Minutes">App exit, inactive for 1 hour</string>
     <string name="settingsClearAiDataTitle">Clear Duck.ai Chats</string>
     <string name="settingsClearAiDataDeleteMessage">Fire Button will also delete Duck.ai history, including pinned chats.</string>
+    <string name="settingsClearDataActionSecondaryText">Clears all tabs and data for any sites you haven\'t fireproofed.</string>
+    <string name="settingsClearDataActionPlusDuckChatsSecondaryText">Clears all tabs, Duck.ai chats, and data for any sites you haven\'t fireproofed.</string>
 
     <!-- About Activity -->
     <string name="aboutActivityTitle">About DuckDuckGo</string>

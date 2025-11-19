@@ -190,6 +190,10 @@ class InputModeWidget @JvmOverloads constructor(
         inputField.clearFocus()
     }
 
+    fun getSelectedTabPosition(): Int {
+        return inputModeSwitch.selectedTabPosition
+    }
+
     private fun configureClickListeners() {
         inputFieldClearText.setOnClickListener {
             inputField.text.clear()

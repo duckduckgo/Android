@@ -24,6 +24,7 @@ import com.duckduckgo.remote.messaging.api.Content.Placeholder.ANNOUNCE
 import com.duckduckgo.remote.messaging.api.Content.Placeholder.APP_UPDATE
 import com.duckduckgo.remote.messaging.api.Content.Placeholder.CRITICAL_UPDATE
 import com.duckduckgo.remote.messaging.api.RemoteMessage
+import com.duckduckgo.remote.messaging.api.Surface.NEW_TAB_PAGE
 import com.duckduckgo.remote.messaging.fixtures.jsonMatchingAttributeMappers
 import com.duckduckgo.remote.messaging.fixtures.messageActionPlugins
 import com.duckduckgo.remote.messaging.impl.mappers.RemoteMessagingConfigJsonMapper
@@ -72,6 +73,7 @@ class RemoteMessagingConfigJsonMapperTest {
             ),
             matchingRules = emptyList(),
             exclusionRules = emptyList(),
+            surfaces = listOf(NEW_TAB_PAGE),
         )
         assertEquals(bigSingleActionMessage, config.messages[0])
 
@@ -83,6 +85,7 @@ class RemoteMessagingConfigJsonMapperTest {
             ),
             matchingRules = listOf(5, 6),
             exclusionRules = listOf(7, 8, 9),
+            surfaces = listOf(NEW_TAB_PAGE),
         )
         assertEquals(smallMessage, config.messages[2])
 
@@ -95,6 +98,7 @@ class RemoteMessagingConfigJsonMapperTest {
             ),
             matchingRules = emptyList(),
             exclusionRules = emptyList(),
+            surfaces = listOf(NEW_TAB_PAGE),
         )
         assertEquals(mediumMessage, config.messages[3])
 
@@ -113,6 +117,7 @@ class RemoteMessagingConfigJsonMapperTest {
             ),
             matchingRules = emptyList(),
             exclusionRules = emptyList(),
+            surfaces = listOf(NEW_TAB_PAGE),
         )
         assertEquals(bigTwoActions, config.messages[4])
     }
@@ -192,6 +197,7 @@ class RemoteMessagingConfigJsonMapperTest {
             ),
             matchingRules = listOf(5, 6),
             exclusionRules = listOf(7, 8, 9),
+            surfaces = listOf(NEW_TAB_PAGE),
         )
         assertEquals(smallMessage, config.messages[0])
     }

@@ -125,8 +125,8 @@
 
     <!-- Fire -->
     <string name="fireMenu">Rensa data</string>
-    <string name="fireClearAll">Rensa alla flikar och data</string>
-    <string name="fireClearAllPlusDuckChats">Rensa alla flikar, data och Duck.ai-chattar</string>
+    <string name="fireClearAll">Rensa flikar och data</string>
+    <string name="fireClearAllPlusDuckChats">Rensa flikar, data och Duck.ai-chattar</string>
     <string name="fireCancel">Avbryt</string>
     <string name="fireDataCleared">Data rensad</string>
 
@@ -190,7 +190,6 @@
     <string name="webTrackingProtectionActivityTitle">Web Tracking Protection</string>
     <string name="webTrackingProtectionLearnMoreTitle">Web Tracking Protection</string>
     <string name="webTrackingProtectionTitle">Web Tracking Protection</string>
-    <string name="webTrackingProtectionDescriptionNew"><![CDATA[DuckDuckGo blockerar automatiskt dolda spårare när du surfar på webben.\n<a href=\"\">Läs mer</a>]]></string>
     <string name="webTrackingProtectionExplanationDescription"><![CDATA[DuckDuckGo-webbläsaren erbjuder spårningsskydd som alltid är aktiva.\n<a href=\"\">Läs mer</a>]]></string>
     <string name="webTrackingProtectionExplanationTitle">Hur vi skyddar dig</string>
     <string name="webTrackingProtectionThirdPartyTrackersTitle">Blockerar spårare från tredje part</string>
@@ -248,6 +247,8 @@
     <string name="settingsAutomaticallyClearWhenAppExit60Minutes">Avsluta app, inaktiv i 1 timme</string>
     <string name="settingsClearAiDataTitle">Rensa Duck.ai-chattar</string>
     <string name="settingsClearAiDataDeleteMessage">Fire Button raderar också Duck.ai-historik, inklusive fästa chattar.</string>
+    <string name="settingsClearDataActionSecondaryText">Rensar alla flikar och data för webbplatser som inte har Fireproof.</string>
+    <string name="settingsClearDataActionPlusDuckChatsSecondaryText">Rensar alla flikar, Duck.ai-chattar och data för webbplatser som inte har Fireproof.</string>
 
     <!-- About Activity -->
     <string name="aboutActivityTitle">Om DuckDuckGo</string>

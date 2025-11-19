@@ -125,8 +125,8 @@
 
     <!-- Fire -->
     <string name="fireMenu">Borrar datos</string>
-    <string name="fireClearAll">Borrar todos los datos y pestañas</string>
-    <string name="fireClearAllPlusDuckChats">Borra todas las pestañas, datos y chats de Duck.ai</string>
+    <string name="fireClearAll">Borrar datos y pestañas</string>
+    <string name="fireClearAllPlusDuckChats">Borrar pestañas, datos y chats de Duck.ai</string>
     <string name="fireCancel">Cancelar</string>
     <string name="fireDataCleared">Datos eliminados</string>
 
@@ -190,7 +190,6 @@
     <string name="webTrackingProtectionActivityTitle">Protección de rastreo en la web</string>
     <string name="webTrackingProtectionLearnMoreTitle">Protección de rastreo en la web</string>
     <string name="webTrackingProtectionTitle">Protección de rastreo en la web</string>
-    <string name="webTrackingProtectionDescriptionNew"><![CDATA[DuckDuckGo bloquea automáticamente los rastreadores ocultos mientras navegas por la web.\n<a href=\"\">Más información</a>]]></string>
     <string name="webTrackingProtectionExplanationDescription"><![CDATA[El navegador DuckDuckGo proporciona protecciones de rastreo que están siempre activas.\n<a href=\"\">Más información</a>]]></string>
     <string name="webTrackingProtectionExplanationTitle">Cómo te protegemos</string>
     <string name="webTrackingProtectionThirdPartyTrackersTitle">Bloquea rastreadores de terceros</string>
@@ -248,6 +247,8 @@
     <string name="settingsAutomaticallyClearWhenAppExit60Minutes">Salir de la aplicación (1 hora de inactividad)</string>
     <string name="settingsClearAiDataTitle">Borra chats de Duck.ai</string>
     <string name="settingsClearAiDataDeleteMessage">Fire Button también eliminará el historial de Duck.ai, incluidos los chats anclados.</string>
+    <string name="settingsClearDataActionSecondaryText">Borrar todas las pestañas y los datos de los sitios no protegidos con Fireproof.</string>
+    <string name="settingsClearDataActionPlusDuckChatsSecondaryText">Borra todas las pestañas, los chats de Duck.ai y los datos de los sitios que no hayas protegido con Fireproof.</string>
 
     <!-- About Activity -->
     <string name="aboutActivityTitle">Acerca de DuckDuckGo</string>

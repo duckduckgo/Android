@@ -55,7 +55,7 @@ tags:
             - tapOn: "Copy"
             - action: back
             - runFlow: ../shared/browser_screen/click_on_fire_button.yaml
-            - tapOn: "Clear All Tabs And Data"
+            - tapOn: "Clear Tabs and Data"
             - longPressOn:
                 id: "omnibarTextInput"
             - tapOn: "Paste"

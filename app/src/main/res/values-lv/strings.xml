@@ -126,8 +126,8 @@
 
     <!-- Fire -->
     <string name="fireMenu">Notīrīt datus</string>
-    <string name="fireClearAll">Notīrīt visas cilnes un datus</string>
-    <string name="fireClearAllPlusDuckChats">Notīrīt visas cilnes, datus un Duck.ai tērzējumus</string>
+    <string name="fireClearAll">Notīrīt cilnes un datus</string>
+    <string name="fireClearAllPlusDuckChats">Notīrīt cilnes, datus un Duck.ai tērzēšanas sarunas</string>
     <string name="fireCancel">Atcelt</string>
     <string name="fireDataCleared">Dati ir notīrīti</string>
 
@@ -191,7 +191,6 @@
     <string name="webTrackingProtectionActivityTitle">Tīmekļa izsekošanas aizsardzība</string>
     <string name="webTrackingProtectionLearnMoreTitle">Tīmekļa izsekošanas aizsardzība</string>
     <string name="webTrackingProtectionTitle">Tīmekļa izsekošanas aizsardzība</string>
-    <string name="webTrackingProtectionDescriptionNew"><![CDATA[DuckDuckGo automātiski bloķē slēptos izsekotājus tīmekļa pārlūkošanas laikā.\n<a href=\"\">Uzzināt vairāk</a>]]></string>
     <string name="webTrackingProtectionExplanationDescription"><![CDATA[DuckDuckGo pārlūkprogramma nodrošina izsekošanas aizsardzības, kas vienmēr ir aktīvas.\n<a href=\"\">Uzzināt vairāk</a>]]></string>
     <string name="webTrackingProtectionExplanationTitle">Kā mēs tevi aizsargājam</string>
     <string name="webTrackingProtectionThirdPartyTrackersTitle">Bloķē trešo pušu izsekotājus</string>
@@ -249,6 +248,8 @@
     <string name="settingsAutomaticallyClearWhenAppExit60Minutes">Iziešana no lietotnes, neaktīva 1 stundu</string>
     <string name="settingsClearAiDataTitle">Notīrīt Duck.ai tērzēšanas sarunas</string>
     <string name="settingsClearAiDataDeleteMessage">Fire Button izdzēsīs arī Duck.ai vēsturi, ieskaitot piespraustās tērzēšanas.</string>
+    <string name="settingsClearDataActionSecondaryText">Notīra visas cilnes un datus par visām vietnēm, kuras neesi iestatījis Fireproof.</string>
+    <string name="settingsClearDataActionPlusDuckChatsSecondaryText">Notīra visas cilnes, Duck.ai tērzēšanas sarunas un datus par visām vietnēm, kurās neesi iestatījis Fireproof.</string>
 
     <!-- About Activity -->
     <string name="aboutActivityTitle">Par DuckDuckGo</string>

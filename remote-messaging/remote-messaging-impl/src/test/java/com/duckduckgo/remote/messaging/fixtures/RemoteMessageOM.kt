@@ -26,6 +26,7 @@ import com.duckduckgo.remote.messaging.api.Content.Placeholder.IMAGE_AI
 import com.duckduckgo.remote.messaging.api.Content.Placeholder.MAC_AND_WINDOWS
 import com.duckduckgo.remote.messaging.api.Content.Placeholder.RADAR
 import com.duckduckgo.remote.messaging.api.RemoteMessage
+import com.duckduckgo.remote.messaging.api.Surface
 
 @Suppress("MemberVisibilityCanBePrivate")
 object RemoteMessageOM {
@@ -135,12 +136,14 @@ object RemoteMessageOM {
         content: Content = smallContent(),
         exclusionRules: List<Int> = emptyList(),
         matchingRules: List<Int> = emptyList(),
+        surfaces: List<Surface> = emptyList(),
     ): RemoteMessage {
         return RemoteMessage(
             id = id,
             content = content,
             exclusionRules = exclusionRules,
             matchingRules = matchingRules,
+            surfaces = surfaces,
         )
     }
 
@@ -149,12 +152,14 @@ object RemoteMessageOM {
         content: Content = mediumContent(),
         exclusionRules: List<Int> = emptyList(),
         matchingRules: List<Int> = emptyList(),
+        surfaces: List<Surface> = emptyList(),
     ): RemoteMessage {
         return RemoteMessage(
             id = id,
             content = content,
             exclusionRules = exclusionRules,
             matchingRules = matchingRules,
+            surfaces = surfaces,
         )
     }
 
@@ -163,12 +168,14 @@ object RemoteMessageOM {
         content: Content = bigSingleActionContent(),
         exclusionRules: List<Int> = emptyList(),
         matchingRules: List<Int> = emptyList(),
+        surfaces: List<Surface> = emptyList(),
     ): RemoteMessage {
         return RemoteMessage(
             id = id,
             content = content,
             exclusionRules = exclusionRules,
             matchingRules = matchingRules,
+            surfaces = surfaces,
         )
     }
 
@@ -177,12 +184,14 @@ object RemoteMessageOM {
         content: Content = bigTwoActionsContent(),
         exclusionRules: List<Int> = emptyList(),
         matchingRules: List<Int> = emptyList(),
+        surfaces: List<Surface> = emptyList(),
     ): RemoteMessage {
         return RemoteMessage(
             id = id,
             content = content,
             exclusionRules = exclusionRules,
             matchingRules = matchingRules,
+            surfaces = surfaces,
         )
     }
 
@@ -191,12 +200,14 @@ object RemoteMessageOM {
         content: Content = promoSingleActionContent(),
         exclusionRules: List<Int> = emptyList(),
         matchingRules: List<Int> = emptyList(),
+        surfaces: List<Surface> = emptyList(),
     ): RemoteMessage {
         return RemoteMessage(
             id = id,
             content = content,
             exclusionRules = exclusionRules,
             matchingRules = matchingRules,
+            surfaces = surfaces,
         )
     }
 
@@ -205,12 +216,14 @@ object RemoteMessageOM {
         content: Content = cardsListContent(),
         exclusionRules: List<Int> = emptyList(),
         matchingRules: List<Int> = emptyList(),
+        surfaces: List<Surface> = emptyList(),
     ): RemoteMessage {
         return RemoteMessage(
             id = id,
             content = content,
             exclusionRules = exclusionRules,
             matchingRules = matchingRules,
+            surfaces = surfaces,
         )
     }
 }

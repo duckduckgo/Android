@@ -40,6 +40,7 @@ private const val delay = "\$DELAY$"
 private const val postInitialPing = "\$POST_INITIAL_PING$"
 private const val replyToNativeMessages = "\$REPLY_TO_NATIVE_MESSAGES$"
 private const val objectName = "\$OBJECT_NAME$"
+private const val scriptID = "\$SCRIPT_ID$"
 
 interface WebViewCompatTestHelper {
     suspend fun configureWebViewForWebViewCompatTest(webView: DuckDuckGoWebView, isBlobDownloadWebViewFeatureEnabled: Boolean)
@@ -79,6 +80,8 @@ class RealWebViewCompatTestHelper @Inject constructor(
         val sendMessageOnPageStarted: Boolean,
         val sendMessageOnContextMenuOpen: Boolean,
         val sendMessagesUsingReplyProxy: Boolean,
+        val useComplexScript: Boolean,
+        val useLargeScript: Boolean,
     )
 
     private var cachedConfig: WebViewCompatConfig? = null
@@ -98,6 +101,8 @@ class RealWebViewCompatTestHelper @Inject constructor(
                 sendMessageOnPageStarted = webViewCompatFeature.sendMessageOnPageStarted().isEnabled(),
                 sendMessageOnContextMenuOpen = webViewCompatFeature.sendMessageOnContextMenuOpen().isEnabled(),
                 sendMessagesUsingReplyProxy = webViewCompatFeature.sendMessagesUsingReplyProxy().isEnabled(),
+                useComplexScript = webViewCompatFeature.useComplexScript().isEnabled(),
+                useLargeScript = webViewCompatFeature.useLargeScript().isEnabled(),
             ).also {
                 cachedConfig = it
             }
@@ -108,28 +113,43 @@ class RealWebViewCompatTestHelper @Inject constructor(
         val config = getWebViewCompatConfig()
 
         val useDedicatedListener = !config.useBlobDownloadsMessageListener || !isBlobDownloadWebViewFeatureEnabled
+        val numberOfScriptsToInject = config.settings?.numberOfScriptsToInject ?: 0L
 
         val script = withContext(dispatchers.io()) {
-            if (!webViewCompatFeature.self().isEnabled()) return@withContext null
-            webView.context.resources?.openRawResource(R.raw.webviewcompat_test_script)
+            if (!webViewCompatFeature.self().isEnabled() || numberOfScriptsToInject == 0L) return@withContext null
+            val scriptResourceId = if (config.useComplexScript) {
+                R.raw.webviewcompat_complex_test_script
+            } else if (config.useLargeScript) {
+                R.raw.webviewcompat_large_test_script
+            } else {
+                R.raw.webviewcompat_test_script
+            }
+
+            val rawScript = webView.context.resources?.openRawResource(scriptResourceId)
                 ?.bufferedReader().use { it?.readText() }
+
+            rawScript
                 ?.replace(delay, config.settings?.jsInitialPingDelay?.toString() ?: "0")
                 ?.replace(postInitialPing, config.jsSendsInitialPing.toString())
                 ?.replace(replyToNativeMessages, config.jsRepliesToNativeMessages.toString())
                 ?.replace(objectName, if (useDedicatedListener) "webViewCompatTestObj" else "ddgBlobDownloadObj")
         } ?: return
 
-        withContext(dispatchers.main()) {
-            webViewCompatWrapper.addDocumentStartJavaScript(webView, script, setOf("*"))
+        for (i in 0 until numberOfScriptsToInject) {
+            withContext(dispatchers.io()) { script.replace(scriptID, i.toString()) }.let {
+                withContext(dispatchers.main()) {
+                    webViewCompatWrapper.addDocumentStartJavaScript(webView, it, setOf("*"))
 
-            if (useDedicatedListener) {
-                webViewCompatWrapper.addWebMessageListener(
-                    webView,
-                    "webViewCompatTestObj",
-                    setOf("*"),
-                ) { view, message, sourceOrigin, isMainFrame, replyProxy ->
-                    webView.findViewTreeLifecycleOwner()?.lifecycleScope?.launch {
-                        handleWebViewCompatMessage(message, replyProxy, isMainFrame)
+                    if (useDedicatedListener && i == 0L) {
+                        webViewCompatWrapper.addWebMessageListener(
+                            webView,
+                            "webViewCompatTestObj",
+                            setOf("*"),
+                        ) { view, message, sourceOrigin, isMainFrame, replyProxy ->
+                            webView.findViewTreeLifecycleOwner()?.lifecycleScope?.launch {
+                                handleWebViewCompatMessage(message, replyProxy, isMainFrame)
+                            }
+                        }
                     }
                 }
             }

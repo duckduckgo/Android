@@ -16,12 +16,17 @@
 
 package com.duckduckgo.voice.impl
 
+import android.app.Activity
 import com.duckduckgo.voice.api.VoiceSearchAvailability
+import com.duckduckgo.voice.api.VoiceSearchLauncher.Source
+import com.duckduckgo.voice.api.VoiceSearchLauncher.VoiceSearchMode
 import org.junit.Before
 import org.junit.Test
 import org.mockito.Mock
 import org.mockito.MockitoAnnotations
 import org.mockito.kotlin.any
+import org.mockito.kotlin.anyOrNull
+import org.mockito.kotlin.argumentCaptor
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
@@ -57,7 +62,7 @@ class PermissionAwareVoiceSearchLauncherTest {
         testee.launch(mock())
 
         verify(permissionRequest).launch(any())
-        verify(voiceSearchActivityLauncher, never()).launch(any())
+        verify(voiceSearchActivityLauncher, never()).launch(any(), anyOrNull())
     }
 
     @Test
@@ -68,7 +73,7 @@ class PermissionAwareVoiceSearchLauncherTest {
         testee.launch(mock())
 
         verify(permissionRequest, never()).launch(any())
-        verify(voiceSearchActivityLauncher, never()).launch(any())
+        verify(voiceSearchActivityLauncher, never()).launch(any(), anyOrNull())
     }
 
     @Test
@@ -78,7 +83,7 @@ class PermissionAwareVoiceSearchLauncherTest {
 
         testee.launch(mock())
 
-        verify(voiceSearchActivityLauncher).launch(any())
+        verify(voiceSearchActivityLauncher).launch(any(), anyOrNull())
         verify(permissionRequest, never()).launch(any())
     }
 
@@ -89,7 +94,89 @@ class PermissionAwareVoiceSearchLauncherTest {
 
         testee.launch(mock())
 
-        verify(voiceSearchActivityLauncher, never()).launch(any())
+        verify(voiceSearchActivityLauncher, never()).launch(any(), anyOrNull())
         verify(permissionRequest, never()).launch(any())
+    }
+
+    @Test
+    fun whenLaunchWithModeAndPermissionsNotGrantedThenPendingInitialModeStored() {
+        val activity = mock<Activity>()
+        whenever(voiceSearchPermissionCheck.hasRequiredPermissionsGranted()).thenReturn(false)
+        whenever(voiceSearchAvailability.isVoiceSearchAvailable).thenReturn(true)
+
+        testee.launch(activity, VoiceSearchMode.DUCK_AI)
+
+        verify(permissionRequest).launch(activity)
+        verify(voiceSearchActivityLauncher, never()).launch(any(), anyOrNull())
+    }
+
+    @Test
+    fun whenLaunchWithModeAndPermissionsGrantedThenModePassedDirectly() {
+        val activity = mock<Activity>()
+        whenever(voiceSearchPermissionCheck.hasRequiredPermissionsGranted()).thenReturn(true)
+        whenever(voiceSearchAvailability.isVoiceSearchAvailable).thenReturn(true)
+
+        testee.launch(activity, VoiceSearchMode.DUCK_AI)
+
+        verify(voiceSearchActivityLauncher).launch(activity, VoiceSearchMode.DUCK_AI)
+        verify(permissionRequest, never()).launch(any())
+    }
+
+    @Test
+    fun whenLaunchWithNullModeAndPermissionsNotGrantedThenPendingInitialModeIsNull() {
+        val activity = mock<Activity>()
+        whenever(voiceSearchPermissionCheck.hasRequiredPermissionsGranted()).thenReturn(false)
+        whenever(voiceSearchAvailability.isVoiceSearchAvailable).thenReturn(true)
+
+        testee.launch(activity, null)
+
+        verify(permissionRequest).launch(activity)
+        verify(voiceSearchActivityLauncher, never()).launch(any(), anyOrNull())
+    }
+
+    @Test
+    fun whenPermissionsGrantedAfterRequestThenPendingInitialModeUsed() {
+        val activity = mock<Activity>()
+        val onPermissionsGrantedCaptor = argumentCaptor<() -> Unit>()
+        whenever(voiceSearchPermissionCheck.hasRequiredPermissionsGranted()).thenReturn(false)
+        whenever(voiceSearchAvailability.isVoiceSearchAvailable).thenReturn(true)
+
+        testee.registerResultsCallback(mock(), activity, Source.BROWSER) {}
+        testee.launch(activity, VoiceSearchMode.DUCK_AI)
+
+        verify(permissionRequest).registerResultsCallback(
+            any(),
+            any(),
+            onPermissionsGrantedCaptor.capture(),
+            any(),
+        )
+
+        whenever(voiceSearchPermissionCheck.hasRequiredPermissionsGranted()).thenReturn(true)
+        onPermissionsGrantedCaptor.firstValue.invoke()
+
+        verify(voiceSearchActivityLauncher).launch(activity, VoiceSearchMode.DUCK_AI)
+    }
+
+    @Test
+    fun whenPermissionsGrantedAfterRequestWithNullModeThenNullModeUsed() {
+        val activity = mock<Activity>()
+        val onPermissionsGrantedCaptor = argumentCaptor<() -> Unit>()
+        whenever(voiceSearchPermissionCheck.hasRequiredPermissionsGranted()).thenReturn(false)
+        whenever(voiceSearchAvailability.isVoiceSearchAvailable).thenReturn(true)
+
+        testee.registerResultsCallback(mock(), activity, Source.BROWSER) {}
+        testee.launch(activity, null)
+
+        verify(permissionRequest).registerResultsCallback(
+            any(),
+            any(),
+            onPermissionsGrantedCaptor.capture(),
+            any(),
+        )
+
+        whenever(voiceSearchPermissionCheck.hasRequiredPermissionsGranted()).thenReturn(true)
+        onPermissionsGrantedCaptor.firstValue.invoke()
+
+        verify(voiceSearchActivityLauncher).launch(activity, null)
     }
 }

@@ -48,10 +48,11 @@
     <string name="duck_ai_shortcut_settings_title">Duck.ai īsceļi</string>
     <string name="duck_ai_shortcut_settings_description">Izvēlies, kurus Duck.ai īsceļus parādīt</string>
 
+    <!-- Duck AI Voice Search Shortcut Setting -->
+    <string name="duckAiVoiceSearchVisibilitySetting">Balss meklēšana</string>
+
     <!-- Input Screen  -->
-    <string name="input_screen_search_tab">Meklēt</string>
     <string name="input_screen_search_hint">Meklē vai ievadi adresi</string>
-    <string name="input_screen_chat_tab">Duck.ai</string>
     <string name="input_screen_chat_hint">Pajautāt privāti</string>
     <string name="input_screen_user_pref_without_ai">Meklēt tikai</string>
     <string name="input_screen_user_pref_with_ai">Meklēšana &amp; Duck.ai</string>

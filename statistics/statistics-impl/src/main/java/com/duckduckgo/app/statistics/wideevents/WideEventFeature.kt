@@ -28,4 +28,7 @@ import com.duckduckgo.feature.toggles.api.Toggle.DefaultFeatureValue
 interface WideEventFeature {
     @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun self(): Toggle
+
+    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
+    fun enqueueWideEventPixels(): Toggle
 }

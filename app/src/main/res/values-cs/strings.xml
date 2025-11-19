@@ -127,8 +127,8 @@
 
     <!-- Fire -->
     <string name="fireMenu">Vymazat data</string>
-    <string name="fireClearAll">Vymazat všechny karty a data</string>
-    <string name="fireClearAllPlusDuckChats">Vymazat všechny karty, data a chaty Duck.ai</string>
+    <string name="fireClearAll">Vymazat karty a data</string>
+    <string name="fireClearAllPlusDuckChats">Vymazat karty, data a chaty Duck.ai</string>
     <string name="fireCancel">Zrušit</string>
     <string name="fireDataCleared">Data vymazána</string>
 
@@ -192,7 +192,6 @@
     <string name="webTrackingProtectionActivityTitle">Ochrana před sledováním na webu</string>
     <string name="webTrackingProtectionLearnMoreTitle">Ochrana před sledováním na webu</string>
     <string name="webTrackingProtectionTitle">Ochrana před sledováním na webu</string>
-    <string name="webTrackingProtectionDescriptionNew"><![CDATA[DuckDuckGo automaticky blokuje skryté trackery při procházení webu.\n<a href=\"\">Další informace</a>]]></string>
     <string name="webTrackingProtectionExplanationDescription"><![CDATA[Prohlížeč DuckDuckGo poskytuje ochranu proti sledování, která je neustále zapnutá.\n<a href=\"\">Další informace</a>]]></string>
     <string name="webTrackingProtectionExplanationTitle">Jak tě chráníme</string>
     <string name="webTrackingProtectionThirdPartyTrackersTitle">Blokuje trackery třetích stran</string>
@@ -250,6 +249,8 @@
     <string name="settingsAutomaticallyClearWhenAppExit60Minutes">Ukončení aplikace, neaktivní po dobu 1 hodiny</string>
     <string name="settingsClearAiDataTitle">Vymazat chaty Duck.ai</string>
     <string name="settingsClearAiDataDeleteMessage">Tlačítko Fire Button taky smaže historii Duck.ai, včetně připnutých chatů.</string>
+    <string name="settingsClearDataActionSecondaryText">Vymaže všechny karty a data všech webů, které nechrání funkce Fireproof.</string>
+    <string name="settingsClearDataActionPlusDuckChatsSecondaryText">Vymaže všechny karty, chaty Duck.ai a data všech webů, které nechrání funkce Fireproof.</string>
 
     <!-- About Activity -->
     <string name="aboutActivityTitle">O DuckDuckGo</string>

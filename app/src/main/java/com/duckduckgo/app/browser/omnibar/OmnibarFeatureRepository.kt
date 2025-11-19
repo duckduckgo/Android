@@ -17,13 +17,14 @@
 package com.duckduckgo.app.browser.omnibar
 
 import androidx.lifecycle.LifecycleOwner
+import com.duckduckgo.app.browser.api.OmnibarRepository
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
 import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.app.settings.db.SettingsDataStore
-import com.duckduckgo.browser.ui.omnibar.OmnibarType
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
+import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.SingleInstanceIn
 import kotlinx.coroutines.CoroutineScope
@@ -35,28 +36,26 @@ import javax.inject.Inject
     boundType = MainProcessLifecycleObserver::class,
 )
 @SingleInstanceIn(AppScope::class)
+@ContributesBinding(scope = AppScope::class, boundType = OmnibarRepository::class)
 open class OmnibarFeatureRepository @Inject constructor(
     private val settingsDataStore: SettingsDataStore,
     private val browserFeatures: AndroidBrowserConfigFeature,
     private val dispatcherProvider: DispatcherProvider,
     @AppCoroutineScope private val coroutineScope: CoroutineScope,
-) : MainProcessLifecycleObserver {
+) : OmnibarRepository, MainProcessLifecycleObserver {
     private var isSplitOmnibarFlagEnabled: Boolean = false
+    private var isUnifiedOmnibarFlagEnabled: Boolean = false
 
-    var isUnifiedOmnibarFlagEnabled: Boolean = false
-        private set
+    override val omnibarType: OmnibarType
+        get() = settingsDataStore.omnibarType
 
-    val isSplitOmnibarEnabled: Boolean
-        get() = isSplitOmnibarAvailable && settingsDataStore.omnibarType == OmnibarType.SPLIT
-
-    val isSplitOmnibarAvailable: Boolean
+    override val isSplitOmnibarAvailable: Boolean
         get() = isSplitOmnibarFlagEnabled && isUnifiedOmnibarFlagEnabled
 
-    override fun onStart(owner: LifecycleOwner) {
-        updateFeatureFlags()
-    }
+    override val isUnifiedOmnibarLayoutEnabled: Boolean
+        get() = isUnifiedOmnibarFlagEnabled
 
-    fun updateFeatureFlags() {
+    override fun onStart(owner: LifecycleOwner) {
         coroutineScope.launch(dispatcherProvider.io()) {
             isUnifiedOmnibarFlagEnabled = browserFeatures.useUnifiedOmnibarLayout().isEnabled()
             isSplitOmnibarFlagEnabled = browserFeatures.splitOmnibar().isEnabled()
