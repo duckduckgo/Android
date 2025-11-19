@@ -34,6 +34,7 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.api.DuckChatSettingsNoParams
+import com.duckduckgo.duckchat.impl.DuckChatConstants.HOST_DUCK_AI
 import com.duckduckgo.duckchat.impl.feature.AIChatImageUploadFeature
 import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
 import com.duckduckgo.duckchat.impl.inputscreen.newaddressbaroption.NewAddressBarCallback
@@ -65,6 +66,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import logcat.logcat
+import okhttp3.HttpUrl.Companion.toHttpUrl
 import javax.inject.Inject
 
 interface DuckChatInternal : DuckChat {
@@ -210,6 +212,12 @@ interface DuckChatInternal : DuckChat {
      * Checks whether DuckChat is enabled based on remote config flag.
      */
     fun isDuckChatFeatureEnabled(): Boolean
+
+    /**
+     * This method takes a [url] and returns `true` or `false`.
+     * @return `true` if the given [url] belongs to the duck.ai domain (apex or subdomain) or if it's the revoke url and `false` otherwise.
+     */
+    fun isDuckAiUrl(url: String): Boolean
 
     /**
      * Indicates whether Input Screen will present the input box at the bottom, if user has the omnibar also set to the bottom position.
@@ -427,6 +435,10 @@ class RealDuckChat @Inject constructor(
                 }
             }
         }
+    }
+
+    override fun isDuckAiUrl(url: String): Boolean {
+        return runCatching { HOST_DUCK_AI == url.toHttpUrl().topPrivateDomain() || url == REVOKE_URL }.getOrElse { false }
     }
 
     override fun isAddressBarEntryPointEnabled(): Boolean = isAddressBarEntryPointEnabled
@@ -772,5 +784,6 @@ class RealDuckChat @Inject constructor(
         private const val BANG_QUERY_NAME = "bang"
         private const val BANG_QUERY_VALUE = "true"
         private const val DEFAULT_SESSION_ALIVE = 60
+        private const val REVOKE_URL = "https://duckduckgo.com/revoke-duckai-access"
     }
 }

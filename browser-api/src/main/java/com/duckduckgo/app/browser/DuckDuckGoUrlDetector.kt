@@ -34,12 +34,6 @@ interface DuckDuckGoUrlDetector {
     fun isDuckDuckGoUrl(url: String): Boolean
 
     /**
-     * This method takes a [url] and returns `true` or `false`.
-     * @return `true` if the given [url] belongs to the duck.ai domain (apex or subdomain) and `false` otherwise.
-     */
-    fun isDuckAiUrl(url: String): Boolean
-
-    /**
      * This method takes a [uri] and returns `true` or `false`.
      * @return `true` if the given [uri] is a DuckDuckGo query and `false`
      * otherwise.
