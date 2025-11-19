@@ -150,7 +150,11 @@ class DuckChatSettingsViewModel @AssistedInject constructor(
             if (settingsPageFeature.embeddedSettingsWebView().isEnabled()) {
                 commandChannel.send(
                     OpenLink(
-                        link = DUCK_CHAT_SEARCH_AI_SETTINGS_LINK_EMBEDDED,
+                        link = if (hideAiGeneratedImagesOptionEnabled) {
+                            DUCK_CHAT_SEARCH_AI_SETTINGS_LINK_EMBEDDED
+                        } else {
+                            LEGACY_DUCK_CHAT_SEARCH_AI_SETTINGS_LINK_EMBEDDED
+                        },
                         titleRes = if (hideAiGeneratedImagesOptionEnabled) {
                             R.string.duckAiSerpSettingsTitle
                         } else {
@@ -225,7 +229,8 @@ class DuckChatSettingsViewModel @AssistedInject constructor(
     companion object {
         const val DUCK_CHAT_LEARN_MORE_LINK = "https://duckduckgo.com/duckduckgo-help-pages/aichat/"
         const val DUCK_CHAT_SEARCH_AI_SETTINGS_LINK = "https://duckduckgo.com/settings?ko=-1#aifeatures"
-        const val DUCK_CHAT_SEARCH_AI_SETTINGS_LINK_EMBEDDED = "https://duckduckgo.com/settings?ko=-1&embedded=1&highlight=kbe#aifeatures"
+        const val LEGACY_DUCK_CHAT_SEARCH_AI_SETTINGS_LINK_EMBEDDED = "https://duckduckgo.com/settings?ko=-1&embedded=1&highlight=kbe#aifeatures"
+        const val DUCK_CHAT_SEARCH_AI_SETTINGS_LINK_EMBEDDED = "https://duckduckgo.com/settings?ko=-1&embedded=1&highlight=kbe&hideduckai=1#aifeatures"
         const val DUCK_CHAT_HIDE_GENERATED_IMAGES_LINK_EMBEDDED = "https://duckduckgo.com/settings?ko=-1&embedded=1&highlight=kbj&hideduckai=1#aifeatures"
     }
 }
