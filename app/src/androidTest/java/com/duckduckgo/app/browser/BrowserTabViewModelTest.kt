@@ -2663,6 +2663,181 @@ class BrowserTabViewModelTest {
     }
 
     @Test
+    fun whenNewTabMenuItemClickedAndHandleAboutBlankEnabledAndEmptyTabWithBlankUrlAndBlankSourceTabIdExistsThenSelectEmptyTab() =
+        runTest {
+            swipingTabsFeature.self().setRawStoredState(State(enable = true))
+            swipingTabsFeature.enabledForUsers().setRawStoredState(State(enable = true))
+            fakeAndroidConfigBrowserFeature.handleAboutBlank().setRawStoredState(State(enable = true))
+
+            val emptyTabId = "EMPTY_TAB"
+            whenever(mockTabRepository.getTabs()).thenReturn(
+                listOf(
+                    TabEntity("1", "https://example.com", position = 0),
+                    TabEntity(emptyTabId, url = "", sourceTabId = null, position = 1),
+                ),
+            )
+
+            testee.onNewTabMenuItemClicked()
+
+            verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
+            val command = commandCaptor.allValues.find { it is Command.LaunchNewTab }
+            assertNull(command)
+            verify(mockTabRepository).select(emptyTabId)
+        }
+
+    @Test
+    fun whenNewTabMenuItemClickedAndHandleAboutBlankEnabledAndEmptyTabWithBlankUrlButSourceTabIdExistsThenAddNewTab() =
+        runTest {
+            swipingTabsFeature.self().setRawStoredState(State(enable = true))
+            swipingTabsFeature.enabledForUsers().setRawStoredState(State(enable = true))
+            fakeAndroidConfigBrowserFeature.handleAboutBlank().setRawStoredState(State(enable = true))
+
+            whenever(mockTabRepository.getTabs()).thenReturn(
+                listOf(
+                    TabEntity("1", "https://example.com", position = 0),
+                    TabEntity("EMPTY_TAB", url = "", sourceTabId = "SOURCE_TAB", position = 1),
+                ),
+            )
+
+            testee.onNewTabMenuItemClicked()
+
+            verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
+            val command = commandCaptor.allValues.find { it is Command.LaunchNewTab }
+            assertNotNull(command)
+            assertTrue(command is Command.LaunchNewTab)
+            verify(mockTabRepository, never()).select(any())
+        }
+
+    @Test
+    fun whenNewTabMenuItemClickedAndHandleAboutBlankEnabledAndNoEmptyTabWithBlankUrlExistsThenAddNewTab() =
+        runTest {
+            swipingTabsFeature.self().setRawStoredState(State(enable = true))
+            swipingTabsFeature.enabledForUsers().setRawStoredState(State(enable = true))
+            fakeAndroidConfigBrowserFeature.handleAboutBlank().setRawStoredState(State(enable = true))
+
+            whenever(mockTabRepository.getTabs()).thenReturn(
+                listOf(
+                    TabEntity("1", "https://example.com", position = 0),
+                    TabEntity("2", "https://test.com", position = 1),
+                ),
+            )
+
+            testee.onNewTabMenuItemClicked()
+
+            verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
+            val command = commandCaptor.allValues.find { it is Command.LaunchNewTab }
+            assertNotNull(command)
+            assertTrue(command is Command.LaunchNewTab)
+            verify(mockTabRepository, never()).select(any())
+        }
+
+    @Test
+    fun whenNavigationBarNewTabButtonClickedThenGenerateWebViewPreviewImage() {
+        testee.onNavigationBarNewTabButtonClicked()
+        assertCommandIssued<Command.GenerateWebViewPreviewImage>()
+    }
+
+    @Test
+    fun whenNavigationBarNewTabButtonClickedAndSwipingTabsEnabledAndNoEmptyTabExistsThenLaunchNewTabCommandIssued() =
+        runTest {
+            swipingTabsFeature.self().setRawStoredState(State(enable = true))
+            swipingTabsFeature.enabledForUsers().setRawStoredState(State(enable = true))
+            fakeAndroidConfigBrowserFeature.handleAboutBlank().setRawStoredState(State(enable = true))
+            whenever(mockTabRepository.getTabs()).thenReturn(
+                listOf(
+                    TabEntity("1", "https://example.com", position = 0),
+                    TabEntity("2", "https://test.com", position = 1),
+                ),
+            )
+
+            testee.onNavigationBarNewTabButtonClicked()
+
+            verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
+            val command = commandCaptor.allValues.find { it is Command.LaunchNewTab }
+            assertNotNull(command)
+            assertTrue(command is Command.LaunchNewTab)
+            verify(mockTabRepository, never()).select(any())
+        }
+
+    @Test
+    fun whenNavigationBarNewTabButtonClickedAndSwipingTabsEnabledAndEmptyTabExistsWithHandleAboutBlankEnabledThenSelectEmptyTab() =
+        runTest {
+            swipingTabsFeature.self().setRawStoredState(State(enable = true))
+            swipingTabsFeature.enabledForUsers().setRawStoredState(State(enable = true))
+            fakeAndroidConfigBrowserFeature.handleAboutBlank().setRawStoredState(State(enable = true))
+            val emptyTabId = "EMPTY_TAB"
+            whenever(mockTabRepository.getTabs()).thenReturn(
+                listOf(
+                    TabEntity("1", "https://example.com", position = 0),
+                    TabEntity(emptyTabId, url = "", sourceTabId = null, position = 1),
+                ),
+            )
+
+            testee.onNavigationBarNewTabButtonClicked()
+
+            verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
+            val launchNewTabCommand = commandCaptor.allValues.find { it is Command.LaunchNewTab }
+            assertNull(launchNewTabCommand)
+            verify(mockTabRepository).select(emptyTabId)
+        }
+
+    @Test
+    fun whenNavigationBarNewTabButtonClickedAndSwipingTabsEnabledAndEmptyTabExistsWithHandleAboutBlankDisabledThenSelectEmptyTab() =
+        runTest {
+            swipingTabsFeature.self().setRawStoredState(State(enable = true))
+            swipingTabsFeature.enabledForUsers().setRawStoredState(State(enable = true))
+            fakeAndroidConfigBrowserFeature.handleAboutBlank().setRawStoredState(State(enable = false))
+            val emptyTabId = "EMPTY_TAB"
+            whenever(mockTabRepository.getTabs()).thenReturn(
+                listOf(
+                    TabEntity("1", "https://example.com", position = 0),
+                    TabEntity(emptyTabId, url = "", sourceTabId = "SOURCE_TAB", position = 1),
+                ),
+            )
+
+            testee.onNavigationBarNewTabButtonClicked()
+
+            verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
+            val launchNewTabCommand = commandCaptor.allValues.find { it is Command.LaunchNewTab }
+            assertNull(launchNewTabCommand)
+            verify(mockTabRepository).select(emptyTabId)
+        }
+
+    @Test
+    fun whenNavigationBarNewTabButtonClickedAndSwipingTabsEnabledAndEmptyTabWithSourceTabIdExistsWithHandleAboutBlankEnabledThenLaunchNewTab() =
+        runTest {
+            swipingTabsFeature.self().setRawStoredState(State(enable = true))
+            swipingTabsFeature.enabledForUsers().setRawStoredState(State(enable = true))
+            fakeAndroidConfigBrowserFeature.handleAboutBlank().setRawStoredState(State(enable = true))
+            whenever(mockTabRepository.getTabs()).thenReturn(
+                listOf(
+                    TabEntity("1", url = "", sourceTabId = "SOURCE_TAB", position = 0),
+                ),
+            )
+
+            testee.onNavigationBarNewTabButtonClicked()
+
+            verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
+            val command = commandCaptor.allValues.find { it is Command.LaunchNewTab }
+            assertNotNull(command)
+            assertTrue(command is Command.LaunchNewTab)
+            verify(mockTabRepository, never()).select(any())
+        }
+
+    @Test
+    fun whenNavigationBarNewTabButtonClickedWithCtaThenCommandIssued() =
+        runTest {
+            val mockCta: Cta = mock()
+            testee.ctaViewState.value = CtaViewState(cta = mockCta)
+
+            testee.onNavigationBarNewTabButtonClicked()
+
+            // Verify that the method completes successfully and issues commands
+            verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
+            assertCommandIssued<Command.GenerateWebViewPreviewImage>()
+        }
+
+    @Test
     fun whenCloseCurrentTabSelectedThenTabDeletedFromRepository() =
         runTest {
             givenOneActiveTabSelected()
