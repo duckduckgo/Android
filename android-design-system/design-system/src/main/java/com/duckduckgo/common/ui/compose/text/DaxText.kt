@@ -16,10 +16,12 @@
 
 package com.duckduckgo.common.ui.compose.text
 
+import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.PreviewLightDark
@@ -43,7 +45,7 @@ import com.duckduckgo.common.ui.compose.tools.PreviewBoxInverted
 fun DaxText(
     text: String,
     modifier: Modifier = Modifier,
-    style: DuckDuckGoTextStyle = DuckDuckGoTheme.typography.body1,
+    style: DuckDuckGoTextStyle? = DuckDuckGoTheme.typography.body1,
     color: Color = DuckDuckGoTheme.textColors.primary,
     textAlign: TextAlign? = null,
     overflow: TextOverflow = TextOverflow.Ellipsis,
@@ -52,7 +54,7 @@ fun DaxText(
     Text(
         text = text,
         color = color,
-        style = style.asTextStyle,
+        style = style?.asTextStyle ?: LocalTextStyle.current,
         textAlign = textAlign,
         overflow = overflow,
         maxLines = maxLines,
