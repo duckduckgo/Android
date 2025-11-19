@@ -7,6 +7,23 @@ on:
         description: 'App Version for Release'
         required: true
         default: 'PLACEHOLDER'
+  workflow_call:
+    inputs:
+      app-version:
+        description: 'App Version for Release'
+        required: true
+        type: string
+    outputs:
+      asana-task-url:
+        description: "The URL of the created Asana task"
+        value: ${{ jobs.create_release_task.outputs.asana_task_url }}
+    secrets:
+      ASANA_ACCESS_TOKEN:
+        required: true
+      MM_AUTH_TOKEN:
+        required: true
+      MM_TEAM_ID:
+        required: true
 
 env:
   ASANA_PAT: ${{ secrets.ASANA_ACCESS_TOKEN }}

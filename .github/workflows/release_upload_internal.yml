@@ -3,8 +3,24 @@ name: Release to Internal and Firebase
 on:
   schedule:
     - cron: '0 2 * * *' # run at 3 AM UTC
-  workflow_call:
   workflow_dispatch:
+  workflow_call:
+    secrets:
+      ASANA_ACCESS_TOKEN:
+        required: true
+      GT_DAXMOBILE:
+        required: true
+      UPLOAD_PLAY_CREDENTIALS:
+        required: true
+      UPLOAD_FIREBASE_CREDENTIALS:
+        required: true
+      MALICIOUS_SITE_PROTECTION_AUTH_TOKEN:
+        required: true
+      MM_AUTH_TOKEN:
+        required: true
+      MM_TEAM_ID:
+        required: true
+
 
 env:
   ASANA_PAT: ${{ secrets.ASANA_ACCESS_TOKEN }}

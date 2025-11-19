@@ -1,0 +1,60 @@
+name: Release - Full Release Process
+
+on:
+  workflow_dispatch:
+    inputs:
+      app-version:
+        description: 'App Version for Release'
+        required: true
+        default: 'PLACEHOLDER'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.inputs.app-version }}
+  cancel-in-progress: true
+
+jobs:
+  # =================================================================
+  # Step 1: Create the Asana Task for the Release
+  # =================================================================
+  create_task:
+    name: 'Step 1: Create Asana Task'
+    uses: ./.github/workflows/release_create_task.yml
+    with:
+      app-version: ${{ github.event.inputs.app-version }}
+    secrets: inherit # Pass all secrets from the caller
+
+  # =================================================================
+  # Step 2: Run Release Tests
+  # =================================================================
+  run_tests:
+    name: 'Step 2: Run Release Tests'
+    needs: create_task # Ensures this runs after the task is created
+    uses: ./.github/workflows/release_tests.yml
+    with:
+      app-version: ${{ github.event.inputs.app-version }}
+      asana-task-url: ${{ needs.create_task.outputs.asana-task-url }}
+    secrets: inherit
+
+  # =================================================================
+  # Step 3: Upload to Play Store
+  # =================================================================
+  upload_play_store:
+    name: 'Step 3: Upload to Play Store'
+    needs: run_tests # Ensures this runs after tests pass
+    uses: ./.github/workflows/release_upload_play_store.yml
+    with:
+      app-version: ${{ github.event.inputs.app-version }}
+      asana-task-url: ${{ needs.create_task.outputs.asana-task-url }}
+    secrets: inherit
+
+  # =================================================================
+  # Step 4: Upload Internal Build
+  # =================================================================
+  upload_internal:
+    name: 'Step 4: Upload Internal Build'
+    needs: run_tests # Can run in parallel with Play Store upload
+    uses: ./.github/workflows/release_upload_internal.yml
+    with:
+      app-version: ${{ github.event.inputs.app-version }}
+      asana-task-url: ${{ needs.create_task.outputs.asana-task-url }}
+    secrets: inherit
