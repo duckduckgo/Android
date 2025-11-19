@@ -193,6 +193,11 @@ enum class PirPixel(
     PIR_ENGAGEMENT_MAU(
         baseName = "dbp_engagement_mau",
         type = Count,
+    ),
+
+    PIR_WEEKLY_CHILD_ORPHANED_OPTOUTS(
+        baseName = "dbp_weekly_child-broker_orphaned-optouts",
+        type = Count,
     ), ;
 
     constructor(
