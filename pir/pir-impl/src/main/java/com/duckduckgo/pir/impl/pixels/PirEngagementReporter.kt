@@ -47,6 +47,7 @@ class RealPirEngagementReporter @Inject constructor(
 
             val nowMs = currentTimeProvider.currentTimeMillis()
             attemptToFireDauPixel(nowMs)
+            attemptToFireWauPixel(nowMs)
         }
     }
 
@@ -57,6 +58,15 @@ class RealPirEngagementReporter @Inject constructor(
 
         pirPixelSender.reportDAU()
         pirRepository.setLastPirDauPixelTimeMs(nowMs)
+    }
+
+    private suspend fun attemptToFireWauPixel(nowMs: Long) {
+        val lastPixelMs = pirRepository.getLastPirWauPixelTimeMs()
+
+        if (!hasDateElapsed(DIFF_DATE_WAU, lastPixelMs, nowMs)) return
+
+        pirPixelSender.reportWAU()
+        pirRepository.setLastPirWauPixelTimeMs(nowMs)
     }
 
     /**
@@ -83,5 +93,6 @@ class RealPirEngagementReporter @Inject constructor(
 
     companion object {
         private const val DIFF_DATE_DAU = 1L
+        private const val DIFF_DATE_WAU = 7L
     }
 }
