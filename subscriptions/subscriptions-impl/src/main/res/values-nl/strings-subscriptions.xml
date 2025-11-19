@@ -84,6 +84,11 @@
     <string name="subscriptionSettingSectionHelpAndSupport">Hulp en ondersteuning</string>
     <string name="subscriptionSettingSendFeedback">Verstuur feedback</string>
     <string name="subscriptionSettingActivating">Bezig met activeren</string>
+    <string name="subscriptionSettingSwitchUpgradeDynamic" instruction="%1$s is the savings percentage when switching from monthly to yearly (e.g. 16)">Schakel over naar een jaarabonnement en bespaar %1$s%%</string>
+    <!-- smartling.character_limit = 10 -->
+    <string name="subscriptionSettingSwitchUpgradePill">Topdeal</string>
+    <string name="subscriptionSettingSwitchDowngrade">Abonnement wijzigen</string>
+    <string name="subscriptionSettingManagePlan">Betaling beheren</string>
 
     <!--Purchase Subscriptions-->
     <string name="purchaseCompletedTitle">Je bent klaar.</string>
@@ -171,11 +176,6 @@
     <string name="activityPir" translatable="false">Privacy Pro</string>
     <string name="activitySendFeedback">Verstuur feedback</string>
 
-    <!-- Dynamic Switch % -->
-    <string name="switchBottomSheetDynamicTitleUpgrade" instruction="%1$s is the savings percentage when switching from monthly to yearly (e.g. 16)">Bespaar %1$s%% met\neen jaarlijks abonnement!</string>
-    <string name="switchBottomSheetDynamicTitleDowngrade" instruction="%1$s is the savings percentage when using a yearly plan instead of monthly (e.g. 16)">Je bespaart %1$s%% met\neen jaarabonnement!</string>
-    <string name="subscriptionSettingSwitchUpgradeDynamic" instruction="%1$s is the savings percentage when switching from monthly to yearly (e.g. 16)">Schakel over naar een jaarabonnement en bespaar %1$s%%</string>
-
     <!-- Privacy Pro Rebranding-->
     <string name="subscriptionSettingRebrandingMessage">Privacy Pro heet nu gewoon het DuckDuckGo-abonnement</string>
 
@@ -191,5 +191,15 @@
     <string name="subscriptionSettingSubscribeSecure">Beveilig je wifi en chat privé met geavanceerde AI-modellen</string>
 
     <string name="feedbackGeneralSubscription">Abonnement</string>
+
+    <!-- Switch plan-->
+    <string name="switchBottomSheetDynamicTitleUpgrade" instruction="%1$s is the savings percentage when switching from monthly to yearly (e.g. 16)">Bespaar %1$s%% met\neen jaarlijks abonnement!</string>
+    <string name="switchBottomSheetDescriptionUpgrade" instruction="%1$s is the yearly plan monthly equivalent price (e.g. $8.33), %2$s is the current monthly plan price (e.g. $9.99)">Een jaarabonnement kost slechts %1$s/maand, vergeleken met je huidige %2$s maandabonnement.</string>
+    <string name="switchBottomSheetPrimaryButtonUpgrade" instruction="%1$s is the yearly plan price (e.g. $99.99)">Overschakelen naar jaarlijks (%1$s/jaar)</string>
+    <string name="switchBottomSheetSecondaryButtonUpgrade">Maandabonnement behouden</string>
+    <string name="switchBottomSheetDynamicTitleDowngrade" instruction="%1$s is the savings percentage when using a yearly plan instead of monthly (e.g. 16)">Je bespaart %1$s%% met\neen jaarabonnement!</string>
+    <string name="switchBottomSheetDescriptionDowngrade" instruction="%1$s is the yearly plan monthly equivalent price (e.g. $8.33), %2$s is the monthly plan price (e.g. $9.99)">Overstappen zal je maandprijs verhogen van %1$s/maand naar %2$s/maand.</string>
+    <string name="switchBottomSheetPrimaryButtonDowngrade">Behoud je jaarabonnement</string>
+    <string name="switchBottomSheetSecondaryButtonDowngrade" instruction="%1$s is the monthly plan price (e.g. $9.99)">Overschakelen naar een maandelijks (%1$s/maand)</string>
 
 </resources>

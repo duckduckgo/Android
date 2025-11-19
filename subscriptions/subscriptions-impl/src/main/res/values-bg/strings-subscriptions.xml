@@ -84,6 +84,11 @@
     <string name="subscriptionSettingSectionHelpAndSupport">Помощ и поддръжка</string>
     <string name="subscriptionSettingSendFeedback">Изпратете отзив</string>
     <string name="subscriptionSettingActivating">Активиране</string>
+    <string name="subscriptionSettingSwitchUpgradeDynamic" instruction="%1$s is the savings percentage when switching from monthly to yearly (e.g. 16)">Превключи на годишен план и спести %1$s%%</string>
+    <!-- smartling.character_limit = 10 -->
+    <string name="subscriptionSettingSwitchUpgradePill">Най-изгодно</string>
+    <string name="subscriptionSettingSwitchDowngrade">Смяна на плана</string>
+    <string name="subscriptionSettingManagePlan">Управлявай плащане</string>
 
     <!--Purchase Subscriptions-->
     <string name="purchaseCompletedTitle">Всичко е готово.</string>
@@ -171,11 +176,6 @@
     <string name="activityPir" translatable="false">Privacy Pro</string>
     <string name="activitySendFeedback">Изпратете отзив</string>
 
-    <!-- Dynamic Switch % -->
-    <string name="switchBottomSheetDynamicTitleUpgrade" instruction="%1$s is the savings percentage when switching from monthly to yearly (e.g. 16)">Спести %1$s%% с\nгодишен план!</string>
-    <string name="switchBottomSheetDynamicTitleDowngrade" instruction="%1$s is the savings percentage when using a yearly plan instead of monthly (e.g. 16)">Спестяваш %1$s%% с\nгодишен план!</string>
-    <string name="subscriptionSettingSwitchUpgradeDynamic" instruction="%1$s is the savings percentage when switching from monthly to yearly (e.g. 16)">Превключи на годишен план и спести %1$s%%</string>
-
     <!-- Privacy Pro Rebranding-->
     <string name="subscriptionSettingRebrandingMessage">Privacy Pro вече се нарича просто абонамент за DuckDuckGo</string>
 
@@ -191,5 +191,15 @@
     <string name="subscriptionSettingSubscribeSecure">Сигурна Wi-Fi мрежа и поверителен чат с усъвършенствани AI модели</string>
 
     <string name="feedbackGeneralSubscription">Абонамент</string>
+
+    <!-- Switch plan-->
+    <string name="switchBottomSheetDynamicTitleUpgrade" instruction="%1$s is the savings percentage when switching from monthly to yearly (e.g. 16)">Спести %1$s%% с\nгодишен план!</string>
+    <string name="switchBottomSheetDescriptionUpgrade" instruction="%1$s is the yearly plan monthly equivalent price (e.g. $8.33), %2$s is the current monthly plan price (e.g. $9.99)">Годишният план е само %1$s/месец, в сравнение с текущия ти месечен план от %2$s.</string>
+    <string name="switchBottomSheetPrimaryButtonUpgrade" instruction="%1$s is the yearly plan price (e.g. $99.99)">Превключи на годишен план (%1$s/година)</string>
+    <string name="switchBottomSheetSecondaryButtonUpgrade">Запази месечен план</string>
+    <string name="switchBottomSheetDynamicTitleDowngrade" instruction="%1$s is the savings percentage when using a yearly plan instead of monthly (e.g. 16)">Спестяваш %1$s%% с\nгодишен план!</string>
+    <string name="switchBottomSheetDescriptionDowngrade" instruction="%1$s is the yearly plan monthly equivalent price (e.g. $8.33), %2$s is the monthly plan price (e.g. $9.99)">Превключването ще увеличи месечната ти цена от %1$s/месец на %2$s/месец.</string>
+    <string name="switchBottomSheetPrimaryButtonDowngrade">Запази годишния план</string>
+    <string name="switchBottomSheetSecondaryButtonDowngrade" instruction="%1$s is the monthly plan price (e.g. $9.99)">Превключи на месечен план (%1$s/месец)</string>
 
 </resources>
