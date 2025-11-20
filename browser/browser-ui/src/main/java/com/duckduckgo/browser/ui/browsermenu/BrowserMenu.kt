@@ -460,6 +460,14 @@ class BrowserMenu(
     }
 
     private fun renderDuckAIMenu(viewState: BrowserMenuViewState.DuckAi) {
+        showCommonItems()
+
+        siteOptionsMenuDivider.isVisible = true
+        browserOptionsMenuDivider.isVisible = true
+        settingsMenuDivider.isVisible = true
+
+        newTabMenuItem.isVisible = true
+
         brokenSiteMenuItem.isVisible = viewState.canReportSite
         printPageMenuItem.isVisible = viewState.canPrintPage
         duckChatHistoryMenuItem.isVisible = true
