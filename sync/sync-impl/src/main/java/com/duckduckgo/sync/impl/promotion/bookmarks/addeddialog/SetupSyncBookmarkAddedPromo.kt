@@ -22,7 +22,7 @@ import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.PriorityKey
-import com.duckduckgo.app.bookmarks.BookmarkAddedPromotionPlugin
+import com.duckduckgo.app.bookmarks.BookmarkAddedDialogPlugin
 import com.duckduckgo.common.ui.menu.PopupMenu
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.listitem.OneLineListItem
@@ -33,20 +33,22 @@ import com.duckduckgo.sync.api.SyncActivityWithEmptyParams
 import com.duckduckgo.sync.api.SyncState
 import com.duckduckgo.sync.api.SyncStateMonitor
 import com.duckduckgo.sync.impl.R
+import com.duckduckgo.sync.impl.pixels.SyncPixels
 import com.duckduckgo.sync.impl.promotion.SyncPromotions
 import com.squareup.anvil.annotations.ContributesMultibinding
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @ContributesMultibinding(scope = ActivityScope::class)
-@PriorityKey(BookmarkAddedPromotionPlugin.PRIORITY_KEY_BOOKMARK_ADDED_PROMOTION)
+@PriorityKey(BookmarkAddedDialogPlugin.PRIORITY_KEY_SETUP_SYNC)
 class SetupSyncBookmarkAddedPromo @Inject constructor(
     private val globalActivityStarter: GlobalActivityStarter,
     private val dispatchers: DispatcherProvider,
     private val activity: AppCompatActivity,
     private val syncPromotions: SyncPromotions,
     private val syncStateMonitor: SyncStateMonitor,
-) : BookmarkAddedPromotionPlugin {
+    private val syncPixels: SyncPixels,
+) : BookmarkAddedDialogPlugin {
 
     @SuppressLint("InflateParams")
     override suspend fun getView(): View? {
@@ -55,8 +57,12 @@ class SetupSyncBookmarkAddedPromo @Inject constructor(
         }
 
         val root = LayoutInflater.from(activity).inflate(R.layout.view_sync_setup_bookmark_added_promo, null) as OneLineListItem
-        root.setOnClickListener { onLaunchSyncFlow(activity) }
+        root.setOnClickListener {
+            onLaunchSyncFlow(activity)
+            syncPixels.fireSetupSyncPromoBookmarkAddedDialogConfirmed()
+        }
         root.configureOverflowMenu()
+        root.configureViewAttachedListener()
 
         activity.lifecycleScope.launch {
             syncStateMonitor.syncState().collect { syncState -> onSyncStateAvailable(syncState, root) }
@@ -102,10 +108,23 @@ class SetupSyncBookmarkAddedPromo @Inject constructor(
                 activity.lifecycleScope.launch(dispatchers.main()) {
                     rootView.gone()
                     syncPromotions.recordBookmarkAddedDialogPromotionDismissed()
+                    syncPixels.fireSetupSyncPromoBookmarkAddedDialogDismissed()
                 }
             }
         }
 
         return popupMenu
+    }
+
+    private fun OneLineListItem.configureViewAttachedListener() {
+        this.addOnAttachStateChangeListener(object : View.OnAttachStateChangeListener {
+            override fun onViewAttachedToWindow(v: View) {
+                syncPixels.fireSetupSyncPromoBookmarkAddedDialogShown()
+            }
+
+            override fun onViewDetachedFromWindow(v: View) {
+                // no-op
+            }
+        })
     }
 }

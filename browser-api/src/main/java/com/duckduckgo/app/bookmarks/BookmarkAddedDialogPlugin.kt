@@ -18,7 +18,7 @@ package com.duckduckgo.app.bookmarks
 
 import android.view.View
 
-interface BookmarkAddedPromotionPlugin {
+interface BookmarkAddedDialogPlugin {
 
     /**
      * Returns a view to be displayed in the bookmark added confirmation dialog, or null if the promotion should not be shown.
@@ -27,6 +27,6 @@ interface BookmarkAddedPromotionPlugin {
     suspend fun getView(): View?
 
     companion object {
-        const val PRIORITY_KEY_BOOKMARK_ADDED_PROMOTION = 100
+        const val PRIORITY_KEY_SETUP_SYNC = 100
     }
 }

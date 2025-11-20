@@ -17,7 +17,7 @@
 package com.duckduckgo.app.bookmarks.dialog
 
 import android.content.Context
-import com.duckduckgo.app.bookmarks.BookmarkAddedPromotionPlugin
+import com.duckduckgo.app.bookmarks.BookmarkAddedDialogPlugin
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.savedsites.api.models.BookmarkFolder
@@ -31,7 +31,7 @@ interface BookmarkAddedConfirmationDialogFactory {
 
 @ContributesBinding(AppScope::class)
 class ReadyBookmarkAddedConfirmationDialogFactory @Inject constructor(
-    private val plugins: PluginPoint<BookmarkAddedPromotionPlugin>,
+    private val plugins: PluginPoint<BookmarkAddedDialogPlugin>,
 ) : BookmarkAddedConfirmationDialogFactory {
     override fun create(context: Context, bookmarkFolder: BookmarkFolder?): BookmarkAddedConfirmationDialog {
         return BookmarkAddedConfirmationDialog(context, bookmarkFolder, plugins)

@@ -25,7 +25,7 @@ import androidx.datastore.preferences.preferencesDataStore
 import androidx.work.WorkManager
 import com.duckduckgo.adclick.api.AdClickManager
 import com.duckduckgo.anvil.annotations.ContributesPluginPoint
-import com.duckduckgo.app.bookmarks.BookmarkAddedPromotionPlugin
+import com.duckduckgo.app.bookmarks.BookmarkAddedDialogPlugin
 import com.duckduckgo.app.browser.*
 import com.duckduckgo.app.browser.addtohome.AddToHomeCapabilityDetector
 import com.duckduckgo.app.browser.addtohome.AddToHomeSystemCapabilityDetector
@@ -389,5 +389,5 @@ class BrowserModule {
 @Qualifier
 annotation class IndonesiaNewTabSection
 
-@ContributesPluginPoint(scope = AppScope::class, boundType = BookmarkAddedPromotionPlugin::class)
-private interface BookmarkAddedPromotionPluginPoint
+@ContributesPluginPoint(scope = AppScope::class, boundType = BookmarkAddedDialogPlugin::class)
+private interface BookmarkAddedDialogPluginPoint

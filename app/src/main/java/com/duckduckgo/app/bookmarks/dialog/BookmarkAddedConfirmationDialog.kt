@@ -31,7 +31,7 @@ import android.widget.LinearLayout
 import androidx.core.view.children
 import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
-import com.duckduckgo.app.bookmarks.BookmarkAddedPromotionPlugin
+import com.duckduckgo.app.bookmarks.BookmarkAddedDialogPlugin
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.BottomSheetAddBookmarkBinding
 import com.duckduckgo.common.ui.view.gone
@@ -54,7 +54,7 @@ import com.google.android.material.R as MaterialR
 class BookmarkAddedConfirmationDialog(
     context: Context,
     private val bookmarkFolder: BookmarkFolder?,
-    private val promoPlugins: PluginPoint<BookmarkAddedPromotionPlugin>,
+    private val promoPlugins: PluginPoint<BookmarkAddedDialogPlugin>,
 ) : BottomSheetDialog(context) {
 
     abstract class EventListener {
