@@ -104,7 +104,6 @@ import com.duckduckgo.app.browser.history.NavigationHistoryEntry
 import com.duckduckgo.app.browser.httperrors.HttpCodeSiteErrorHandler
 import com.duckduckgo.app.browser.httperrors.HttpErrorPixelName
 import com.duckduckgo.app.browser.httperrors.HttpErrorPixels
-import com.duckduckgo.app.browser.httperrors.SiteErrorHandlerKillSwitch
 import com.duckduckgo.app.browser.httperrors.StringSiteErrorHandler
 import com.duckduckgo.app.browser.logindetection.FireproofDialogsEventHandler
 import com.duckduckgo.app.browser.logindetection.LoginDetected
@@ -118,7 +117,8 @@ import com.duckduckgo.app.browser.model.LongPressTarget
 import com.duckduckgo.app.browser.newtab.FavoritesQuickAccessAdapter.QuickAccessFavorite
 import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
 import com.duckduckgo.app.browser.omnibar.OmnibarType
-import com.duckduckgo.app.browser.omnibar.QueryOrigin.*
+import com.duckduckgo.app.browser.omnibar.QueryOrigin.FromBookmark
+import com.duckduckgo.app.browser.omnibar.QueryOrigin.FromUser
 import com.duckduckgo.app.browser.refreshpixels.RefreshPixelSender
 import com.duckduckgo.app.browser.remotemessage.RemoteMessagingModel
 import com.duckduckgo.app.browser.santize.NonHttpAppLinkChecker
@@ -579,8 +579,6 @@ class BrowserTabViewModelTest {
     private val mockAdditionalDefaultBrowserPrompts: AdditionalDefaultBrowserPrompts = mock()
     val mockStack: WebBackForwardList = mock()
 
-    private val mockSiteErrorHandlerKillSwitch: SiteErrorHandlerKillSwitch = mock()
-    private val mockSiteErrorHandlerKillSwitchToggle: Toggle = mock { on { it.isEnabled() } doReturn true }
     private val mockSiteErrorHandler: StringSiteErrorHandler = mock()
     private val mockSiteHttpErrorHandler: HttpCodeSiteErrorHandler = mock()
     private val mockSubscriptionsJSHelper: SubscriptionsJSHelper = mock()
@@ -766,8 +764,6 @@ class BrowserTabViewModelTest {
                 defaultBrowserPromptsExperimentShowPopupMenuItemFlow,
             )
 
-            whenever(mockSiteErrorHandlerKillSwitch.self()).thenReturn(mockSiteErrorHandlerKillSwitchToggle)
-
             fakeContentScopeScriptsSubscriptionEventPluginPoint = FakeContentScopeScriptsSubscriptionEventPluginPoint()
 
             whenever(mockDuckChat.getDuckChatUrl(any(), any())).thenReturn(duckChatURL)
@@ -847,7 +843,6 @@ class BrowserTabViewModelTest {
                     tabStatsBucketing = mockTabStatsBucketing,
                     additionalDefaultBrowserPrompts = mockAdditionalDefaultBrowserPrompts,
                     swipingTabsFeature = swipingTabsFeatureProvider,
-                    siteErrorHandlerKillSwitch = mockSiteErrorHandlerKillSwitch,
                     siteErrorHandler = mockSiteErrorHandler,
                     siteHttpErrorHandler = mockSiteHttpErrorHandler,
                     subscriptionsJSHelper = mockSubscriptionsJSHelper,
@@ -5303,25 +5298,6 @@ class BrowserTabViewModelTest {
                 url = "example2.com",
                 httpErrorCodes = emptyList(),
                 hasBrowserError = true,
-            )
-        }
-
-    @Test
-    fun whenErrorHandlerKilledAndPageIsChangedWithHttpErrorThenPrivacyProtectionsPopupManagerIsNotified() =
-        runTest {
-            whenever(mockSiteErrorHandlerKillSwitchToggle.isEnabled()).thenReturn(false)
-            testee.recordHttpErrorCode(statusCode = 404, url = "example2.com")
-
-            updateUrl(
-                originalUrl = "example.com",
-                currentUrl = "example2.com",
-                isBrowserShowing = true,
-            )
-
-            verify(mockPrivacyProtectionsPopupManager).onPageLoaded(
-                url = "example2.com",
-                httpErrorCodes = listOf(404),
-                hasBrowserError = false,
             )
         }
 
