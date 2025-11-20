@@ -49,3 +49,20 @@ internal fun ExtractedProfile.toParams(fullName: String): ExtractedProfileParams
         email = this.email.ifEmpty { null },
     )
 }
+
+internal fun ExtractedProfile.hasMatchingProfileOnParent(extractedProfiles: List<ExtractedProfile>): Boolean {
+    return extractedProfiles.any {
+        it.brokerName == this.brokerName && this.matches(it)
+    }
+}
+
+internal fun ExtractedProfile.matches(extractedProfile: ExtractedProfile): Boolean {
+    return this.name == extractedProfile.name && this.age == extractedProfile.age &&
+        this.alternativeNames.isASubSetOrSuperSetOf(extractedProfile.alternativeNames) &&
+        this.relatives.isASubSetOrSuperSetOf(extractedProfile.relatives) &&
+        this.addresses.isASubSetOrSuperSetOf(extractedProfile.addresses)
+}
+
+private fun <T> List<T>.isASubSetOrSuperSetOf(other: List<T>): Boolean {
+    return this.containsAll(other) || other.containsAll(this)
+}
