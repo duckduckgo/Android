@@ -54,7 +54,7 @@
         android:id="@+id/editQueryImage"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:background="@drawable/selectable_item_experimental_background"
+        android:background="@drawable/selectable_item_rounded_corner_background"
         android:contentDescription="@string/editQueryBeforeSubmitting"
         android:padding="@dimen/keyline_2"
         android:src="@drawable/ic_arrow_circle_up_left_16"

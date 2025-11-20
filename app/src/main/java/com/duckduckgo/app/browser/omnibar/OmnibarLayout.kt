@@ -233,11 +233,11 @@ class OmnibarLayout @JvmOverloads constructor(
             }
         }
 
-    private val experimentalOmnibarCardMarginTop by lazy {
+    private val omnibarCardMarginTop by lazy {
         resources.getDimensionPixelSize(CommonR.dimen.omnibarCardMarginTop)
     }
 
-    private val experimentalOmnibarCardMarginBottom by lazy {
+    private val omnibarCardMarginBottom by lazy {
         resources.getDimensionPixelSize(CommonR.dimen.omnibarCardMarginBottom)
     }
 
@@ -626,22 +626,22 @@ class OmnibarLayout @JvmOverloads constructor(
             // When omnibar is at the bottom, we're adding an additional space at the top
             omnibarCardShadow.updateLayoutParams {
                 (this as MarginLayoutParams).apply {
-                    topMargin = experimentalOmnibarCardMarginBottom
-                    bottomMargin = experimentalOmnibarCardMarginTop
+                    topMargin = omnibarCardMarginBottom
+                    bottomMargin = omnibarCardMarginTop
                 }
             }
 
             iconsContainer.updateLayoutParams {
                 (this as MarginLayoutParams).apply {
-                    topMargin = experimentalOmnibarCardMarginBottom
-                    bottomMargin = experimentalOmnibarCardMarginTop
+                    topMargin = omnibarCardMarginBottom
+                    bottomMargin = omnibarCardMarginTop
                 }
             }
 
             shieldIconPulseAnimationContainer.updateLayoutParams {
                 (this as MarginLayoutParams).apply {
-                    topMargin = experimentalOmnibarCardMarginBottom
-                    bottomMargin = experimentalOmnibarCardMarginTop
+                    topMargin = omnibarCardMarginBottom
+                    bottomMargin = omnibarCardMarginTop
                     if (addressBarTrackersAnimationFeatureToggle.feature().isEnabled()) {
                         // TODO when the animation is made permanent we should add this adjustment to the actual layout
                         marginStart = 1.toPx()

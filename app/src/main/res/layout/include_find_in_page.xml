@@ -59,7 +59,7 @@
         android:id="@+id/previousSearchTermButton"
         android:layout_width="@dimen/toolbarIcon"
         android:layout_height="@dimen/toolbarIcon"
-        android:background="@drawable/selectable_item_experimental_background"
+        android:background="@drawable/selectable_item_rounded_corner_background"
         android:contentDescription="@string/previousSearchTermDescription"
         android:scaleType="center"
         android:src="@drawable/ic_chevron_up_24" />
@@ -68,7 +68,7 @@
         android:id="@+id/nextSearchTermButton"
         android:layout_width="@dimen/toolbarIcon"
         android:layout_height="@dimen/toolbarIcon"
-        android:background="@drawable/selectable_item_experimental_background"
+        android:background="@drawable/selectable_item_rounded_corner_background"
         android:contentDescription="@string/nextSearchTermDescription"
         android:scaleType="center"
         android:src="@drawable/ic_chevron_down_24" />
@@ -77,7 +77,7 @@
         android:id="@+id/closeFindInPagePanel"
         android:layout_width="@dimen/toolbarIcon"
         android:layout_height="@dimen/toolbarIcon"
-        android:background="@drawable/selectable_item_experimental_background"
+        android:background="@drawable/selectable_item_rounded_corner_background"
         android:contentDescription="@string/closeFindInPageButtonDescription"
         android:scaleType="center"
         android:src="@drawable/ic_close_24" />
