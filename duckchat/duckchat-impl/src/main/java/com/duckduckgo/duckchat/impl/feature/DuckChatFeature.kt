@@ -116,4 +116,10 @@ interface DuckChatFeature {
      */
     @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
     fun duckAiVoiceSearch(): Toggle
+
+    /**
+     * @return `true` when the "Hide AI Generated Images" option should be visible in AI Features Settings.
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    fun showHideAiGeneratedImages(): Toggle
 }

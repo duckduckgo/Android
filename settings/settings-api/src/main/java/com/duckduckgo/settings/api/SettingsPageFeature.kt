@@ -32,9 +32,5 @@ interface SettingsPageFeature {
     fun embeddedSettingsWebView(): Toggle
 
     @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
-    @Toggle.InternalAlwaysEnabled
-    fun hideAiGeneratedImagesOption(): Toggle
-
-    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
     fun serpSettingsSync(): Toggle
 }
