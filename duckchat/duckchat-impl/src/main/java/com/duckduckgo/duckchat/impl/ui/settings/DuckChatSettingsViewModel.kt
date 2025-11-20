@@ -25,6 +25,7 @@ import com.duckduckgo.duckchat.api.DuckChatNativeSettingsNoParams
 import com.duckduckgo.duckchat.api.DuckChatSettingsNoParams
 import com.duckduckgo.duckchat.impl.DuckChatInternal
 import com.duckduckgo.duckchat.impl.R
+import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
 import com.duckduckgo.duckchat.impl.inputscreen.ui.metrics.discovery.InputScreenDiscoveryFunnel
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
 import com.duckduckgo.duckchat.impl.ui.settings.DuckChatSettingsViewModel.Command.OpenLink
@@ -53,6 +54,7 @@ class DuckChatSettingsViewModel @AssistedInject constructor(
     private val inputScreenDiscoveryFunnel: InputScreenDiscoveryFunnel,
     private val settingsPageFeature: SettingsPageFeature,
     private val dispatcherProvider: DispatcherProvider,
+    private val duckChatFeature: DuckChatFeature,
 ) : ViewModel() {
     private val commandChannel = Channel<Command>(capacity = 1, onBufferOverflow = DROP_OLDEST)
     val commands = commandChannel.receiveAsFlow()
@@ -73,15 +75,15 @@ class DuckChatSettingsViewModel @AssistedInject constructor(
             duckChat.observeEnableDuckChatUserSetting(),
             duckChat.observeInputScreenUserSettingEnabled(),
             duckChat.observeFullscreenModeUserSetting(),
-            flowOf(settingsPageFeature.hideAiGeneratedImagesOption().isEnabled()).flowOn(dispatcherProvider.io()),
-        ) { isDuckChatUserEnabled, isInputScreenEnabled, isFullScreenModeEnabled, isHideAiGeneratedImagesOptionVisible ->
+            flowOf(duckChatFeature.showHideAiGeneratedImages().isEnabled()).flowOn(dispatcherProvider.io()),
+        ) { isDuckChatUserEnabled, isInputScreenEnabled, isFullScreenModeEnabled, showHideAiGeneratedImagesOption ->
             ViewState(
                 isDuckChatUserEnabled = isDuckChatUserEnabled,
                 isInputScreenEnabled = isInputScreenEnabled,
                 shouldShowShortcuts = isDuckChatUserEnabled,
                 shouldShowInputScreenToggle = isDuckChatUserEnabled && duckChat.isInputScreenFeatureAvailable(),
                 isSearchSectionVisible = isSearchSectionVisible(duckChatActivityParams),
-                isHideGeneratedImagesOptionVisible = isHideAiGeneratedImagesOptionVisible,
+                isHideGeneratedImagesOptionVisible = showHideAiGeneratedImagesOption,
                 shouldShowFullScreenModeToggle = duckChat.isDuckChatFullScreenModeFeatureAvailable(),
                 isFullScreenModeEnabled = isFullScreenModeEnabled,
             )
@@ -143,19 +145,19 @@ class DuckChatSettingsViewModel @AssistedInject constructor(
 
     fun duckChatSearchAISettingsClicked() {
         viewModelScope.launch {
-            val hideAiGeneratedImagesOptionEnabled = withContext(dispatcherProvider.io()) {
-                settingsPageFeature.hideAiGeneratedImagesOption().isEnabled()
+            val showHideAiGeneratedImages = withContext(dispatcherProvider.io()) {
+                duckChatFeature.showHideAiGeneratedImages().isEnabled()
             }
 
             if (settingsPageFeature.embeddedSettingsWebView().isEnabled()) {
                 commandChannel.send(
                     OpenLink(
-                        link = if (hideAiGeneratedImagesOptionEnabled) {
+                        link = if (showHideAiGeneratedImages) {
                             DUCK_CHAT_SEARCH_AI_SETTINGS_LINK_EMBEDDED
                         } else {
                             LEGACY_DUCK_CHAT_SEARCH_AI_SETTINGS_LINK_EMBEDDED
                         },
-                        titleRes = if (hideAiGeneratedImagesOptionEnabled) {
+                        titleRes = if (showHideAiGeneratedImages) {
                             R.string.duckAiSerpSettingsTitle
                         } else {
                             R.string.duck_chat_assist_settings_title

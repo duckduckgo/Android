@@ -289,7 +289,7 @@ import com.duckduckgo.savedsites.api.models.SavedSite.Favorite
 import com.duckduckgo.savedsites.impl.SavedSitesPixelName
 import com.duckduckgo.serp.logos.api.SerpEasterEggLogosToggles
 import com.duckduckgo.serp.logos.api.SerpLogo
-import com.duckduckgo.settings.api.SettingsPageFeature
+import com.duckduckgo.settings.api.SerpSettingsFeature
 import com.duckduckgo.site.permissions.api.SitePermissionsManager
 import com.duckduckgo.site.permissions.api.SitePermissionsManager.LocationPermissionRequest
 import com.duckduckgo.site.permissions.api.SitePermissionsManager.SitePermissionQueryResponse
@@ -623,10 +623,9 @@ class BrowserTabViewModelTest {
     private val mockDeviceAppLookup: DeviceAppLookup = mock()
 
     private val mockDuckAiFullScreenMode = MutableStateFlow(false)
-    private val mockDuckAiFullScreenModeEnabled = MutableStateFlow(false)
 
     private lateinit var fakeContentScopeScriptsSubscriptionEventPluginPoint: FakeContentScopeScriptsSubscriptionEventPluginPoint
-    private var fakeSettingsPageFeature = FakeFeatureToggleFactory.create(SettingsPageFeature::class.java)
+    private var serpSettingsFeature = FakeFeatureToggleFactory.create(SerpSettingsFeature::class.java)
 
     @Before
     fun before() =
@@ -864,7 +863,7 @@ class BrowserTabViewModelTest {
                     autoconsentPixelManager = mockAutoconsentPixelManager,
                     omnibarRepository = mockOmnibarFeatureRepository,
                     contentScopeScriptsSubscriptionEventPluginPoint = fakeContentScopeScriptsSubscriptionEventPluginPoint,
-                    settingsPageFeature = fakeSettingsPageFeature,
+                    serpSettingsFeature = serpSettingsFeature,
                 )
 
             testee.loadData("abc", null, false, false)
@@ -7924,7 +7923,7 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenOnViewResumedWithNoPluginsThenNoSubscriptionEventsSent() = runTest {
-        fakeSettingsPageFeature.serpSettingsSync().setRawStoredState(State(enable = true))
+        serpSettingsFeature.storeSerpSettings().setRawStoredState(State(enable = true))
 
         testee.onViewResumed()
 
@@ -7936,7 +7935,7 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenOnViewResumedWithPluginsThenSubscriptionEventsSent() = runTest {
-        fakeSettingsPageFeature.serpSettingsSync().setRawStoredState(State(enable = true))
+        serpSettingsFeature.storeSerpSettings().setRawStoredState(State(enable = true))
         val events = mutableListOf<SubscriptionEventData>().apply {
             add(
                 SubscriptionEventData(
@@ -7973,7 +7972,7 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenOnViewResumedWithPluginsAndSerpSettingsFeatureFlagOffThenNoEventsSent() = runTest {
-        fakeSettingsPageFeature.serpSettingsSync().setRawStoredState(State(enable = false))
+        serpSettingsFeature.storeSerpSettings().setRawStoredState(State(enable = false))
         val events = mutableListOf<SubscriptionEventData>().apply {
             add(
                 SubscriptionEventData(

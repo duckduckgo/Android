@@ -30,8 +30,10 @@ import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.experiments.api.VariantManager
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle.State
-import com.duckduckgo.settings.api.SettingsPageFeature
-import org.junit.Assert.*
+import com.duckduckgo.settings.api.SerpSettingsFeature
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -47,7 +49,7 @@ class DuckDuckGoRequestRewriterTest {
     private val mockVariantManager: VariantManager = mock()
     private val mockAppReferrerDataStore: AppReferrerDataStore = mock()
     private val duckChat: DuckChat = mock()
-    private val settingsPageFeature: SettingsPageFeature = FakeFeatureToggleFactory.create(SettingsPageFeature::class.java)
+    private val serpSettingsFeature: SerpSettingsFeature = FakeFeatureToggleFactory.create(SerpSettingsFeature::class.java)
     private val androidBrowserConfigFeature: AndroidBrowserConfigFeature = FakeFeatureToggleFactory.create(AndroidBrowserConfigFeature::class.java)
     private lateinit var builder: Uri.Builder
 
@@ -66,7 +68,7 @@ class DuckDuckGoRequestRewriterTest {
             mockAppReferrerDataStore,
             duckChat,
             androidBrowserConfigFeature,
-            settingsPageFeature,
+            serpSettingsFeature,
         )
         builder = Uri.Builder()
     }
@@ -157,7 +159,7 @@ class DuckDuckGoRequestRewriterTest {
 
     @Test
     fun whenSerpSettingsSyncIsEnabledThenDoNotHideDuckAi() {
-        settingsPageFeature.serpSettingsSync().setRawStoredState(State(true))
+        serpSettingsFeature.storeSerpSettings().setRawStoredState(State(true))
         whenever(duckChat.isEnabled()).thenReturn(false)
         androidBrowserConfigFeature.hideDuckAiInSerpKillSwitch().setRawStoredState(State(true))
 
