@@ -84,7 +84,7 @@
     <string name="subscriptionSettingSectionHelpAndSupport">Pagalba ir palaikymas</string>
     <string name="subscriptionSettingSendFeedback">Siųsti atsiliepimą</string>
     <string name="subscriptionSettingActivating">Aktyvavimas</string>
-    <string name="subscriptionSettingSwitchUpgradeDynamic" instruction="%1$s is the savings percentage when switching from monthly to yearly (e.g. 16)">Pereikite prie metinio plano ir sutaupykite %1$s %%</string>
+    <string name="subscriptionSettingSwitchUpgradeDynamic" instruction="%1$s is the savings percentage when switching from monthly to yearly (e.g. 16)">Sutaupykite %1$s%% su metiniu planu</string>
     <!-- smartling.character_limit = 10 -->
     <string name="subscriptionSettingSwitchUpgradePill">Geriausia vertė</string>
     <string name="subscriptionSettingSwitchDowngrade">Pakeisti planą</string>
