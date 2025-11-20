@@ -21,8 +21,7 @@ import com.duckduckgo.remote.messaging.api.AttributeMatcherPlugin
 import com.duckduckgo.remote.messaging.api.JsonMatchingAttribute
 import com.duckduckgo.remote.messaging.api.JsonToMatchingAttributeMapper
 import com.duckduckgo.remote.messaging.api.MatchingAttribute
-import com.duckduckgo.subscriptions.api.ActiveOfferType
-import com.duckduckgo.subscriptions.impl.SubscriptionsManager
+import com.duckduckgo.subscriptions.impl.repository.AuthRepository
 import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.SingleInstanceIn
 import javax.inject.Inject
@@ -37,15 +36,12 @@ import javax.inject.Inject
 )
 @SingleInstanceIn(AppScope::class)
 class RMFSubscriptionFreeTrialActiveMatchingAttribute @Inject constructor(
-    private val subscriptionsManager: SubscriptionsManager,
+    private val authRepository: AuthRepository,
 ) : JsonToMatchingAttributeMapper, AttributeMatcherPlugin {
     override suspend fun evaluate(matchingAttribute: MatchingAttribute): Boolean? {
         return when (matchingAttribute) {
             is SubscriptionFreeTrialActiveMatchingAttribute -> {
-                val hasActiveTrial = subscriptionsManager.getSubscription()
-                    ?.activeOffers
-                    ?.any { it == ActiveOfferType.TRIAL } == true
-                hasActiveTrial == matchingAttribute.remoteValue
+                authRepository.isFreeTrialActive() == matchingAttribute.remoteValue
             }
 
             else -> null
