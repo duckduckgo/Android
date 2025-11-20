@@ -84,7 +84,7 @@
     <string name="subscriptionSettingSectionHelpAndSupport">Hulp en ondersteuning</string>
     <string name="subscriptionSettingSendFeedback">Verstuur feedback</string>
     <string name="subscriptionSettingActivating">Bezig met activeren</string>
-    <string name="subscriptionSettingSwitchUpgradeDynamic" instruction="%1$s is the savings percentage when switching from monthly to yearly (e.g. 16)">Schakel over naar een jaarabonnement en bespaar %1$s%%</string>
+    <string name="subscriptionSettingSwitchUpgradeDynamic" instruction="%1$s is the savings percentage when switching from monthly to yearly (e.g. 16)">Bespaar %1$s%% met een jaarabonnement</string>
     <!-- smartling.character_limit = 10 -->
     <string name="subscriptionSettingSwitchUpgradePill">Topdeal</string>
     <string name="subscriptionSettingSwitchDowngrade">Abonnement wijzigen</string>
