@@ -180,7 +180,6 @@ import com.duckduckgo.app.browser.history.NavigationHistoryAdapter.NavigationHis
 import com.duckduckgo.app.browser.httperrors.HttpCodeSiteErrorHandler
 import com.duckduckgo.app.browser.httperrors.HttpErrorPixelName
 import com.duckduckgo.app.browser.httperrors.HttpErrorPixels
-import com.duckduckgo.app.browser.httperrors.SiteErrorHandlerKillSwitch
 import com.duckduckgo.app.browser.httperrors.StringSiteErrorHandler
 import com.duckduckgo.app.browser.logindetection.FireproofDialogsEventHandler
 import com.duckduckgo.app.browser.logindetection.FireproofDialogsEventHandler.Event
@@ -478,7 +477,6 @@ class BrowserTabViewModel @Inject constructor(
     private val tabStatsBucketing: TabStatsBucketing,
     private val additionalDefaultBrowserPrompts: AdditionalDefaultBrowserPrompts,
     private val swipingTabsFeature: SwipingTabsFeatureProvider,
-    private val siteErrorHandlerKillSwitch: SiteErrorHandlerKillSwitch,
     private val siteErrorHandler: StringSiteErrorHandler,
     private val siteHttpErrorHandler: HttpCodeSiteErrorHandler,
     private val subscriptionsJSHelper: SubscriptionsJSHelper,
@@ -586,7 +584,7 @@ class BrowserTabViewModel @Inject constructor(
     private var site: Site? = null
         set(value) {
             field = value
-            if (siteErrorHandlerKillSwitch.self().isEnabled()) {
+            viewModelScope.launch(dispatchers.io()) {
                 siteErrorHandler.assignErrorsAndClearCache(value)
                 siteHttpErrorHandler.assignErrorsAndClearCache(value)
             }
@@ -3653,16 +3651,7 @@ class BrowserTabViewModel @Inject constructor(
         error: String,
         url: String,
     ) {
-        if (siteErrorHandlerKillSwitch.self().isEnabled()) {
-            siteErrorHandler.handleError(currentSite = site, urlWithError = url, error = error)
-        } else {
-            // when navigating from one page to another it can happen that errors are recorded before pageChanged etc. are
-            // called triggering a buildSite.
-            if (url != site?.url) {
-                site = siteFactory.buildSite(url = url, tabId = tabId)
-            }
-            site?.onErrorDetected(error)
-        }
+        siteErrorHandler.handleError(currentSite = site, urlWithError = url, error = error)
         logcat { "recordErrorCode $error in ${site?.url}" }
     }
 
@@ -3670,16 +3659,7 @@ class BrowserTabViewModel @Inject constructor(
         statusCode: Int,
         url: String,
     ) {
-        if (siteErrorHandlerKillSwitch.self().isEnabled()) {
-            siteHttpErrorHandler.handleError(currentSite = site, urlWithError = url, error = statusCode)
-        } else {
-            // when navigating from one page to another it can happen that errors are recorded before pageChanged etc. are
-            // called triggering a buildSite.
-            if (url != site?.url) {
-                site = siteFactory.buildSite(url = url, tabId = tabId)
-            }
-            site?.onHttpErrorDetected(statusCode)
-        }
+        siteHttpErrorHandler.handleError(currentSite = site, urlWithError = url, error = statusCode)
         logcat { "recordHttpErrorCode $statusCode in ${site?.url}" }
         updateHttpErrorCount(statusCode)
     }
