@@ -26,7 +26,9 @@ import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
@@ -83,6 +85,7 @@ class RealWeeklyPixelReporterTest {
 
     @Test
     fun `when no extracted profiles then does not fire pixel`() = runTest {
+        whenever(mockPirRepository.getWeeklyStatLastSentMs()).thenReturn(0L)
         whenever(mockCurrentTimeProvider.currentTimeMillis()).thenReturn(baseTime)
         whenever(mockPirRepository.getAllExtractedProfiles()).thenReturn(emptyList())
         whenever(mockPirRepository.getAllActiveBrokerObjects()).thenReturn(emptyList())
@@ -90,6 +93,7 @@ class RealWeeklyPixelReporterTest {
         testee.attemptFirePixel()
 
         verifyNoInteractions(mockPixelSender)
+        verify(mockPirRepository).setWeeklyStatLastSentMs(baseTime)
     }
 
     @Test
@@ -98,6 +102,7 @@ class RealWeeklyPixelReporterTest {
             brokerName = childBrokerName,
             dateAddedInMillis = baseTime - sixDaysInMillis,
         )
+        whenever(mockPirRepository.getWeeklyStatLastSentMs()).thenReturn(0L)
         whenever(mockCurrentTimeProvider.currentTimeMillis()).thenReturn(baseTime)
         whenever(mockPirRepository.getAllExtractedProfiles()).thenReturn(listOf(extractedProfile))
         whenever(mockPirRepository.getAllActiveBrokerObjects()).thenReturn(emptyList())
@@ -118,6 +123,7 @@ class RealWeeklyPixelReporterTest {
             brokerName = parentBrokerName,
             dateAddedInMillis = baseTime - sixDaysInMillis,
         )
+        whenever(mockPirRepository.getWeeklyStatLastSentMs()).thenReturn(0L)
         whenever(mockCurrentTimeProvider.currentTimeMillis()).thenReturn(baseTime)
         whenever(mockPirRepository.getAllExtractedProfiles()).thenReturn(listOf(extractedProfile))
         whenever(mockPirRepository.getAllActiveBrokerObjects()).thenReturn(listOf(parentBroker))
@@ -148,6 +154,7 @@ class RealWeeklyPixelReporterTest {
             dateAddedInMillis = baseTime - sixDaysInMillis,
             deprecated = true,
         )
+        whenever(mockPirRepository.getWeeklyStatLastSentMs()).thenReturn(0L)
         whenever(mockCurrentTimeProvider.currentTimeMillis()).thenReturn(baseTime)
         whenever(mockPirRepository.getAllExtractedProfiles()).thenReturn(listOf(deprecatedProfile))
         whenever(mockPirRepository.getAllActiveBrokerObjects()).thenReturn(listOf(parentBroker, childBroker))
@@ -155,6 +162,95 @@ class RealWeeklyPixelReporterTest {
         testee.attemptFirePixel()
 
         verifyNoInteractions(mockPixelSender)
+    }
+
+    @Test
+    fun `when 7 days has not passed since last weekly pixel then do not fire pixel`() = runTest {
+        val parentBroker = createBroker(
+            name = parentBrokerName,
+            url = parentBrokerUrl,
+            parent = null,
+        )
+        val childBroker = createBroker(
+            name = childBrokerName,
+            url = childBrokerUrl,
+            parent = parentBrokerUrl,
+        )
+        val recentProfile = createExtractedProfile(
+            brokerName = childBrokerName,
+            dateAddedInMillis = baseTime - sixDaysInMillis,
+        )
+        whenever(mockPirRepository.getWeeklyStatLastSentMs()).thenReturn(baseTime - sixDaysInMillis)
+        whenever(mockCurrentTimeProvider.currentTimeMillis()).thenReturn(baseTime)
+        whenever(mockPirRepository.getAllExtractedProfiles()).thenReturn(listOf(recentProfile))
+        whenever(mockPirRepository.getAllActiveBrokerObjects()).thenReturn(listOf(parentBroker, childBroker))
+
+        testee.attemptFirePixel()
+
+        verifyNoInteractions(mockPixelSender)
+        verify(mockPirRepository, never()).setWeeklyStatLastSentMs(any())
+    }
+
+    @Test
+    fun `when exactly 7 days has passed since last weekly pixel then fire pixel`() = runTest {
+        val parentBroker = createBroker(
+            name = parentBrokerName,
+            url = parentBrokerUrl,
+            parent = null,
+        )
+        val childBroker = createBroker(
+            name = childBrokerName,
+            url = childBrokerUrl,
+            parent = parentBrokerUrl,
+        )
+        val recentProfile = createExtractedProfile(
+            brokerName = childBrokerName,
+            dateAddedInMillis = baseTime - sixDaysInMillis,
+        )
+        whenever(mockPirRepository.getWeeklyStatLastSentMs()).thenReturn(baseTime - sevenDaysInMillis)
+        whenever(mockCurrentTimeProvider.currentTimeMillis()).thenReturn(baseTime)
+        whenever(mockPirRepository.getAllExtractedProfiles()).thenReturn(listOf(recentProfile))
+        whenever(mockPirRepository.getAllActiveBrokerObjects()).thenReturn(listOf(parentBroker, childBroker))
+
+        testee.attemptFirePixel()
+
+        verify(mockPixelSender).reportWeeklyChildOrphanedOptOuts(
+            brokerUrl = childBrokerUrl,
+            childParentRecordDifference = 1,
+            orphanedRecordsCount = 1,
+        )
+        verify(mockPirRepository).setWeeklyStatLastSentMs(baseTime)
+    }
+
+    @Test
+    fun `when more than 7 days has passed since last weekly pixel then fire pixel`() = runTest {
+        val parentBroker = createBroker(
+            name = parentBrokerName,
+            url = parentBrokerUrl,
+            parent = null,
+        )
+        val childBroker = createBroker(
+            name = childBrokerName,
+            url = childBrokerUrl,
+            parent = parentBrokerUrl,
+        )
+        val recentProfile = createExtractedProfile(
+            brokerName = childBrokerName,
+            dateAddedInMillis = baseTime - sixDaysInMillis,
+        )
+        whenever(mockPirRepository.getWeeklyStatLastSentMs()).thenReturn(baseTime - eightDaysInMillis)
+        whenever(mockCurrentTimeProvider.currentTimeMillis()).thenReturn(baseTime)
+        whenever(mockPirRepository.getAllExtractedProfiles()).thenReturn(listOf(recentProfile))
+        whenever(mockPirRepository.getAllActiveBrokerObjects()).thenReturn(listOf(parentBroker, childBroker))
+
+        testee.attemptFirePixel()
+
+        verify(mockPixelSender).reportWeeklyChildOrphanedOptOuts(
+            brokerUrl = childBrokerUrl,
+            childParentRecordDifference = 1,
+            orphanedRecordsCount = 1,
+        )
+        verify(mockPirRepository).setWeeklyStatLastSentMs(baseTime)
     }
 
     @Test
@@ -173,6 +269,7 @@ class RealWeeklyPixelReporterTest {
             brokerName = childBrokerName,
             dateAddedInMillis = baseTime - sixDaysInMillis,
         )
+        whenever(mockPirRepository.getWeeklyStatLastSentMs()).thenReturn(0L)
         whenever(mockCurrentTimeProvider.currentTimeMillis()).thenReturn(baseTime)
         whenever(mockPirRepository.getAllExtractedProfiles()).thenReturn(listOf(recentProfile))
         whenever(mockPirRepository.getAllActiveBrokerObjects()).thenReturn(listOf(parentBroker, childBroker))
@@ -202,6 +299,7 @@ class RealWeeklyPixelReporterTest {
             brokerName = childBrokerName,
             dateAddedInMillis = baseTime - sevenDaysInMillis,
         )
+        whenever(mockPirRepository.getWeeklyStatLastSentMs()).thenReturn(0L)
         whenever(mockCurrentTimeProvider.currentTimeMillis()).thenReturn(baseTime)
         whenever(mockPirRepository.getAllExtractedProfiles()).thenReturn(listOf(weekOldProfile))
         whenever(mockPirRepository.getAllActiveBrokerObjects()).thenReturn(listOf(parentBroker, childBroker))
@@ -227,6 +325,7 @@ class RealWeeklyPixelReporterTest {
             brokerName = childBrokerName,
             dateAddedInMillis = baseTime - eightDaysInMillis,
         )
+        whenever(mockPirRepository.getWeeklyStatLastSentMs()).thenReturn(0L)
         whenever(mockCurrentTimeProvider.currentTimeMillis()).thenReturn(baseTime)
         whenever(mockPirRepository.getAllExtractedProfiles()).thenReturn(listOf(oldProfile))
         whenever(mockPirRepository.getAllActiveBrokerObjects()).thenReturn(listOf(parentBroker, childBroker))
@@ -252,6 +351,7 @@ class RealWeeklyPixelReporterTest {
             brokerName = childBrokerName,
             dateAddedInMillis = baseTime,
         )
+        whenever(mockPirRepository.getWeeklyStatLastSentMs()).thenReturn(0L)
         whenever(mockCurrentTimeProvider.currentTimeMillis()).thenReturn(baseTime)
         whenever(mockPirRepository.getAllExtractedProfiles()).thenReturn(listOf(oldProfile))
         whenever(mockPirRepository.getAllActiveBrokerObjects()).thenReturn(listOf(parentBroker, childBroker))
@@ -291,6 +391,7 @@ class RealWeeklyPixelReporterTest {
             dateAddedInMillis = baseTime - sixDaysInMillis,
             profileQueryId = 2L,
         )
+        whenever(mockPirRepository.getWeeklyStatLastSentMs()).thenReturn(0L)
         whenever(mockCurrentTimeProvider.currentTimeMillis()).thenReturn(baseTime)
         whenever(mockPirRepository.getAllExtractedProfiles()).thenReturn(listOf(childProfile1, childProfile2))
         whenever(mockPirRepository.getAllActiveBrokerObjects()).thenReturn(listOf(parentBroker, childBroker))
@@ -332,6 +433,7 @@ class RealWeeklyPixelReporterTest {
             name = "John Doe",
             age = "30",
         )
+        whenever(mockPirRepository.getWeeklyStatLastSentMs()).thenReturn(0L)
         whenever(mockCurrentTimeProvider.currentTimeMillis()).thenReturn(baseTime)
         whenever(mockPirRepository.getAllExtractedProfiles()).thenReturn(listOf(childProfile, parentProfile))
         whenever(mockPirRepository.getAllActiveBrokerObjects()).thenReturn(listOf(parentBroker, childBroker))
@@ -367,6 +469,7 @@ class RealWeeklyPixelReporterTest {
             name = "Jane Smith",
             age = "25",
         )
+        whenever(mockPirRepository.getWeeklyStatLastSentMs()).thenReturn(0L)
         whenever(mockCurrentTimeProvider.currentTimeMillis()).thenReturn(baseTime)
         whenever(mockPirRepository.getAllExtractedProfiles()).thenReturn(listOf(childProfile, parentProfile))
         whenever(mockPirRepository.getAllActiveBrokerObjects()).thenReturn(listOf(parentBroker, childBroker))
@@ -410,6 +513,7 @@ class RealWeeklyPixelReporterTest {
             profileQueryId = 3L,
             name = "John Doe",
         )
+        whenever(mockPirRepository.getWeeklyStatLastSentMs()).thenReturn(0L)
         whenever(mockCurrentTimeProvider.currentTimeMillis()).thenReturn(baseTime)
         whenever(mockPirRepository.getAllExtractedProfiles()).thenReturn(listOf(childProfile1, childProfile2, parentProfile))
         whenever(mockPirRepository.getAllActiveBrokerObjects()).thenReturn(listOf(parentBroker, childBroker))
@@ -453,6 +557,7 @@ class RealWeeklyPixelReporterTest {
             profileQueryId = 3L,
             name = "Jane Doe",
         )
+        whenever(mockPirRepository.getWeeklyStatLastSentMs()).thenReturn(0L)
         whenever(mockCurrentTimeProvider.currentTimeMillis()).thenReturn(baseTime)
         whenever(mockPirRepository.getAllExtractedProfiles()).thenReturn(listOf(childProfile, parentProfile1, parentProfile2))
         whenever(mockPirRepository.getAllActiveBrokerObjects()).thenReturn(listOf(parentBroker, childBroker))
@@ -483,6 +588,7 @@ class RealWeeklyPixelReporterTest {
             parent = parentBrokerUrl,
         )
         // No profiles at all - should not fire
+        whenever(mockPirRepository.getWeeklyStatLastSentMs()).thenReturn(0L)
         whenever(mockCurrentTimeProvider.currentTimeMillis()).thenReturn(baseTime)
         whenever(mockPirRepository.getAllExtractedProfiles()).thenReturn(emptyList())
         whenever(mockPirRepository.getAllActiveBrokerObjects()).thenReturn(listOf(parentBroker, childBroker))
@@ -510,6 +616,7 @@ class RealWeeklyPixelReporterTest {
             profileQueryId = 1L,
         )
         // No child profiles - should not fire (no child profiles to report)
+        whenever(mockPirRepository.getWeeklyStatLastSentMs()).thenReturn(0L)
         whenever(mockCurrentTimeProvider.currentTimeMillis()).thenReturn(baseTime)
         whenever(mockPirRepository.getAllExtractedProfiles()).thenReturn(listOf(parentProfile))
         whenever(mockPirRepository.getAllActiveBrokerObjects()).thenReturn(listOf(parentBroker, childBroker))
@@ -531,6 +638,7 @@ class RealWeeklyPixelReporterTest {
             dateAddedInMillis = baseTime - sixDaysInMillis,
             profileQueryId = 1L,
         )
+        whenever(mockPirRepository.getWeeklyStatLastSentMs()).thenReturn(0L)
         whenever(mockCurrentTimeProvider.currentTimeMillis()).thenReturn(baseTime)
         whenever(mockPirRepository.getAllExtractedProfiles()).thenReturn(listOf(childProfile))
         whenever(mockPirRepository.getAllActiveBrokerObjects()).thenReturn(listOf(childBroker))
@@ -556,6 +664,7 @@ class RealWeeklyPixelReporterTest {
             dateAddedInMillis = baseTime - sixDaysInMillis,
             profileQueryId = 1L,
         )
+        whenever(mockPirRepository.getWeeklyStatLastSentMs()).thenReturn(0L)
         whenever(mockCurrentTimeProvider.currentTimeMillis()).thenReturn(baseTime)
         whenever(mockPirRepository.getAllExtractedProfiles()).thenReturn(listOf(childProfile))
         whenever(mockPirRepository.getAllActiveBrokerObjects()).thenReturn(listOf(childBroker))
@@ -577,6 +686,7 @@ class RealWeeklyPixelReporterTest {
             dateAddedInMillis = baseTime - sixDaysInMillis,
             profileQueryId = 1L,
         )
+        whenever(mockPirRepository.getWeeklyStatLastSentMs()).thenReturn(0L)
         whenever(mockCurrentTimeProvider.currentTimeMillis()).thenReturn(baseTime)
         whenever(mockPirRepository.getAllExtractedProfiles()).thenReturn(listOf(childProfile))
         whenever(mockPirRepository.getAllActiveBrokerObjects()).thenReturn(listOf(childBroker))
@@ -610,6 +720,7 @@ class RealWeeklyPixelReporterTest {
             dateAddedInMillis = baseTime - sixDaysInMillis,
             profileQueryId = 2L,
         )
+        whenever(mockPirRepository.getWeeklyStatLastSentMs()).thenReturn(0L)
         // No parent profiles
         whenever(mockCurrentTimeProvider.currentTimeMillis()).thenReturn(baseTime)
         whenever(mockPirRepository.getAllExtractedProfiles()).thenReturn(listOf(childProfile1, childProfile2))
@@ -655,6 +766,7 @@ class RealWeeklyPixelReporterTest {
             dateAddedInMillis = baseTime - sixDaysInMillis,
             profileQueryId = 2L,
         )
+        whenever(mockPirRepository.getWeeklyStatLastSentMs()).thenReturn(0L)
         whenever(mockCurrentTimeProvider.currentTimeMillis()).thenReturn(baseTime)
         whenever(mockPirRepository.getAllExtractedProfiles()).thenReturn(listOf(childProfile1, childProfile2))
         whenever(mockPirRepository.getAllActiveBrokerObjects()).thenReturn(listOf(parentBroker, childBroker1, childBroker2))
@@ -705,6 +817,7 @@ class RealWeeklyPixelReporterTest {
             dateAddedInMillis = baseTime - sixDaysInMillis,
             profileQueryId = 2L,
         )
+        whenever(mockPirRepository.getWeeklyStatLastSentMs()).thenReturn(0L)
         whenever(mockCurrentTimeProvider.currentTimeMillis()).thenReturn(baseTime)
         whenever(mockPirRepository.getAllExtractedProfiles()).thenReturn(listOf(childProfile1, childProfile2))
         whenever(mockPirRepository.getAllActiveBrokerObjects()).thenReturn(
@@ -769,6 +882,7 @@ class RealWeeklyPixelReporterTest {
             name = "John Doe",
             age = "30",
         )
+        whenever(mockPirRepository.getWeeklyStatLastSentMs()).thenReturn(0L)
         whenever(mockCurrentTimeProvider.currentTimeMillis()).thenReturn(baseTime)
         whenever(mockPirRepository.getAllExtractedProfiles()).thenReturn(
             listOf(
@@ -817,6 +931,7 @@ class RealWeeklyPixelReporterTest {
             age = "30",
             alternativeNames = listOf("Jane"),
         )
+        whenever(mockPirRepository.getWeeklyStatLastSentMs()).thenReturn(0L)
         whenever(mockCurrentTimeProvider.currentTimeMillis()).thenReturn(baseTime)
         whenever(mockPirRepository.getAllExtractedProfiles()).thenReturn(listOf(childProfile, parentProfile))
         whenever(mockPirRepository.getAllActiveBrokerObjects()).thenReturn(listOf(parentBroker, childBroker))
@@ -858,6 +973,7 @@ class RealWeeklyPixelReporterTest {
             age = "30",
             relatives = listOf("Jane Doe", "Bob Doe", "Alice Doe"),
         )
+        whenever(mockPirRepository.getWeeklyStatLastSentMs()).thenReturn(0L)
         whenever(mockCurrentTimeProvider.currentTimeMillis()).thenReturn(baseTime)
         whenever(mockPirRepository.getAllExtractedProfiles()).thenReturn(listOf(childProfile, parentProfile))
         whenever(mockPirRepository.getAllActiveBrokerObjects()).thenReturn(listOf(parentBroker, childBroker))
@@ -900,6 +1016,7 @@ class RealWeeklyPixelReporterTest {
             age = "35",
             relatives = listOf("Jane Doe", "Bob Doe", "Mary Doe"),
         )
+        whenever(mockPirRepository.getWeeklyStatLastSentMs()).thenReturn(0L)
         whenever(mockCurrentTimeProvider.currentTimeMillis()).thenReturn(baseTime)
         whenever(mockPirRepository.getAllExtractedProfiles()).thenReturn(listOf(childProfile, parentProfile))
         whenever(mockPirRepository.getAllActiveBrokerObjects()).thenReturn(listOf(parentBroker, childBroker))
@@ -942,6 +1059,7 @@ class RealWeeklyPixelReporterTest {
             age = "30",
             addresses = listOf(AddressCityState("New York", "NY"), AddressCityState("Los Angeles", "CA")),
         )
+        whenever(mockPirRepository.getWeeklyStatLastSentMs()).thenReturn(0L)
         whenever(mockCurrentTimeProvider.currentTimeMillis()).thenReturn(baseTime)
         whenever(mockPirRepository.getAllExtractedProfiles()).thenReturn(listOf(childProfile, parentProfile))
         whenever(mockPirRepository.getAllActiveBrokerObjects()).thenReturn(listOf(parentBroker, childBroker))
@@ -1003,6 +1121,7 @@ class RealWeeklyPixelReporterTest {
             name = "Alice Brown",
             age = "35",
         )
+        whenever(mockPirRepository.getWeeklyStatLastSentMs()).thenReturn(0L)
         whenever(mockCurrentTimeProvider.currentTimeMillis()).thenReturn(baseTime)
         whenever(mockPirRepository.getAllExtractedProfiles()).thenReturn(
             listOf(childProfile1, childProfile2, childProfile3, parentProfile1, parentProfile2),

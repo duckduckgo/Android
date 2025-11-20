@@ -41,15 +41,19 @@ class RealWeeklyPixelReporter @Inject constructor(
 ) : WeeklyPixelReporter {
     override suspend fun attemptFirePixel() {
         withContext(dispatcherProvider.io()) {
-            attemptFireWeeklyChildBrokerOrphanedOptOutsPixel()
+            val now = currentTimeProvider.currentTimeMillis()
+            val weeklyStatLastSentMs = pirRepository.getWeeklyStatLastSentMs()
+            if (weeklyStatLastSentMs == 0L || didWeekPassedBetweenDates(weeklyStatLastSentMs, now)) {
+                attemptFireWeeklyChildBrokerOrphanedOptOutsPixel(now)
+                pirRepository.setWeeklyStatLastSentMs(now)
+            }
         }
     }
 
-    private suspend fun attemptFireWeeklyChildBrokerOrphanedOptOutsPixel() {
-        val now = currentTimeProvider.currentTimeMillis()
+    private suspend fun attemptFireWeeklyChildBrokerOrphanedOptOutsPixel(nowMs: Long) {
         val activeBrokers = pirRepository.getAllActiveBrokerObjects()
         val groupedWeekExtractedProfiles = pirRepository.getAllExtractedProfiles().filter {
-            !it.deprecated && it.lessThan7DaysSinceCreation(now)
+            !it.deprecated && it.lessThan7DaysSinceCreation(nowMs)
         }.groupBy { it.brokerName }
 
         val groupedWeekChildExtractedProfiles = groupedWeekExtractedProfiles.filter {
@@ -95,6 +99,13 @@ class RealWeeklyPixelReporter @Inject constructor(
     }
 
     private fun ExtractedProfile.lessThan7DaysSinceCreation(timeMs: Long): Boolean {
-        return (timeMs - this.dateAddedInMillis) < 7.days.inWholeMilliseconds
+        return !didWeekPassedBetweenDates(this.dateAddedInMillis, timeMs)
+    }
+
+    private fun didWeekPassedBetweenDates(
+        startMs: Long,
+        endMs: Long,
+    ): Boolean {
+        return endMs - startMs >= 7.days.inWholeMilliseconds
     }
 }

@@ -26,6 +26,7 @@ interface PirDataStore {
     var dauLastSentMs: Long
     var wauLastSentMs: Long
     var mauLastSentMs: Long
+    var weeklyStatLastSentMs: Long
 }
 
 internal class RealPirDataStore(
@@ -78,6 +79,14 @@ internal class RealPirDataStore(
             }
         }
 
+    override var weeklyStatLastSentMs: Long
+        get() = preferences.getLong(KEY_WEEKLY_STATS_LAST_SENT_MS, 0L)
+        set(value) {
+            preferences.edit {
+                putLong(KEY_WEEKLY_STATS_LAST_SENT_MS, value)
+            }
+        }
+
     companion object {
         private const val FILENAME = "com.duckduckgo.pir.v1"
         private const val KEY_MAIN_ETAG = "KEY_MAIN_ETAG"
@@ -85,5 +94,6 @@ internal class RealPirDataStore(
         private const val KEY_ENGAGEMENT_DAU_LAST_MS = "KEY_ENGAGEMENT_DAU_LAST_MS"
         private const val KEY_ENGAGEMENT_WAU_LAST_MS = "KEY_ENGAGEMENT_WAU_LAST_MS"
         private const val KEY_ENGAGEMENT_MAU_LAST_MS = "KEY_ENGAGEMENT_MAU_LAST_MS"
+        private const val KEY_WEEKLY_STATS_LAST_SENT_MS = "KEY_WEEKLY_STATS_LAST_SENT_MS"
     }
 }
