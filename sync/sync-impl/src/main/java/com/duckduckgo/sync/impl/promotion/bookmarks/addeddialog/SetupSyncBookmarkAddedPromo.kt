@@ -36,7 +36,6 @@ import com.duckduckgo.sync.impl.R
 import com.duckduckgo.sync.impl.promotion.SyncPromotions
 import com.squareup.anvil.annotations.ContributesMultibinding
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @ContributesMultibinding(scope = ActivityScope::class)
@@ -102,9 +101,7 @@ class SetupSyncBookmarkAddedPromo @Inject constructor(
             onMenuItemClicked(hideButton) {
                 activity.lifecycleScope.launch(dispatchers.main()) {
                     rootView.gone()
-                    withContext(dispatchers.io()) {
-                        syncPromotions.recordBookmarkAddedDialogPromotionDismissed()
-                    }
+                    syncPromotions.recordBookmarkAddedDialogPromotionDismissed()
                 }
             }
         }

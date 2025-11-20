@@ -17,7 +17,6 @@
 package com.duckduckgo.app.bookmarks.dialog
 
 import android.annotation.SuppressLint
-import android.app.Activity
 import android.content.Context
 import android.graphics.Typeface
 import android.text.Spannable
@@ -53,10 +52,10 @@ import com.google.android.material.R as MaterialR
 
 @SuppressLint("NoBottomSheetDialog")
 class BookmarkAddedConfirmationDialog(
-    activity: Activity,
+    context: Context,
     private val bookmarkFolder: BookmarkFolder?,
     private val promoPlugins: PluginPoint<BookmarkAddedPromotionPlugin>,
-) : BottomSheetDialog(activity) {
+) : BottomSheetDialog(context) {
 
     abstract class EventListener {
         /** Sets a listener to be invoked when favorite state is changed */
