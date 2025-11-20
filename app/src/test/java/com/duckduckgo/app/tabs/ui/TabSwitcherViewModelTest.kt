@@ -237,10 +237,9 @@ class TabSwitcherViewModelTest {
         tabList = tabListWithEmptyTab
         initializeMockTabEntitesData()
         initializeViewModel()
-        advanceUntilIdle()
+        prepareSelectionMode()
 
         testee.onNewTabRequested()
-        advanceUntilIdle()
 
         verify(mockTabRepository).select("EMPTY_TAB")
         verify(mockTabRepository, never()).add()
@@ -259,10 +258,9 @@ class TabSwitcherViewModelTest {
         tabList = tabListWithEmptyTabWithSource
         initializeMockTabEntitesData()
         initializeViewModel()
-        advanceUntilIdle()
+        prepareSelectionMode()
 
         testee.onNewTabRequested()
-        advanceUntilIdle()
 
         verify(mockTabRepository, never()).select(any())
         verify(mockTabRepository).add()
@@ -281,10 +279,9 @@ class TabSwitcherViewModelTest {
         tabList = tabListWithoutEmptyTab
         initializeMockTabEntitesData()
         initializeViewModel()
-        advanceUntilIdle()
+        prepareSelectionMode()
 
         testee.onNewTabRequested()
-        advanceUntilIdle()
 
         verify(mockTabRepository, never()).select(any())
         verify(mockTabRepository).add()
@@ -304,10 +301,9 @@ class TabSwitcherViewModelTest {
         tabList = tabListWithEmptyTab
         initializeMockTabEntitesData()
         initializeViewModel()
-        advanceUntilIdle()
+        prepareSelectionMode()
 
         testee.onNewTabRequested()
-        advanceUntilIdle()
 
         verify(mockTabRepository).select("EMPTY_TAB")
         verify(mockTabRepository, never()).add()
@@ -326,10 +322,9 @@ class TabSwitcherViewModelTest {
         tabList = tabListWithoutEmptyTab
         initializeMockTabEntitesData()
         initializeViewModel()
-        advanceUntilIdle()
+        prepareSelectionMode()
 
         testee.onNewTabRequested()
-        advanceUntilIdle()
 
         verify(mockTabRepository, never()).select(any())
         verify(mockTabRepository).add()
