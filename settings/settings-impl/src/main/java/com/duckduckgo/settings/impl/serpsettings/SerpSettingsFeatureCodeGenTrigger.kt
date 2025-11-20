@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 DuckDuckGo
+ * Copyright (c) 2025 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,20 +14,15 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.settings.api
+package com.duckduckgo.settings.impl.serpsettings
 
-import com.duckduckgo.feature.toggles.api.Toggle
-import com.duckduckgo.feature.toggles.api.Toggle.DefaultFeatureValue
+import com.duckduckgo.anvil.annotations.ContributesRemoteFeature
+import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.settings.api.SerpSettingsFeature
 
-interface SettingsPageFeature {
-    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
-    @Toggle.InternalAlwaysEnabled
-    fun self(): Toggle
-
-    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
-    fun widgetAsProtection(): Toggle
-
-    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
-    @Toggle.InternalAlwaysEnabled
-    fun embeddedSettingsWebView(): Toggle
-}
+@ContributesRemoteFeature(
+    scope = AppScope::class,
+    featureName = "serp",
+    boundType = SerpSettingsFeature::class,
+)
+private interface SerpSettingsFeatureCodeGenTrigger
