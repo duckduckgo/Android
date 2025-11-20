@@ -84,7 +84,7 @@
     <string name="subscriptionSettingSectionHelpAndSupport">Abi ja tugi</string>
     <string name="subscriptionSettingSendFeedback">Saada tagasisidet</string>
     <string name="subscriptionSettingActivating">Aktiveerimine</string>
-    <string name="subscriptionSettingSwitchUpgradeDynamic" instruction="%1$s is the savings percentage when switching from monthly to yearly (e.g. 16)">Mine üle aastasele plaanile ja säästa %1$s%%</string>
+    <string name="subscriptionSettingSwitchUpgradeDynamic" instruction="%1$s is the savings percentage when switching from monthly to yearly (e.g. 16)">Säästa aastase plaaniga %1$s%%</string>
     <!-- smartling.character_limit = 10 -->
     <string name="subscriptionSettingSwitchUpgradePill">Parim hind</string>
     <string name="subscriptionSettingSwitchDowngrade">Vaheta plaani</string>
