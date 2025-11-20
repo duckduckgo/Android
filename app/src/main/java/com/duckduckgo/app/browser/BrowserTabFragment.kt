@@ -149,7 +149,6 @@ import com.duckduckgo.app.browser.omnibar.Omnibar.LogoClickListener
 import com.duckduckgo.app.browser.omnibar.Omnibar.OmnibarTextState
 import com.duckduckgo.app.browser.omnibar.Omnibar.TextListener
 import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode
-import com.duckduckgo.app.browser.omnibar.OmnibarItemPressedListener
 import com.duckduckgo.app.browser.omnibar.OmnibarType
 import com.duckduckgo.app.browser.omnibar.QueryOrigin
 import com.duckduckgo.app.browser.print.PrintDocumentAdapterFactory
@@ -1041,7 +1040,6 @@ class BrowserTabFragment :
         omnibar = Omnibar(
             omnibarType = settingsDataStore.omnibarType,
             binding = binding,
-            isUnifiedOmnibarEnabled = omnibarRepository.isUnifiedOmnibarLayoutEnabled,
         )
 
         webViewContainer = binding.webViewContainer
@@ -3082,13 +3080,6 @@ class BrowserTabFragment :
                     onOmnibarDuckChatPressed(query = omnibar.getText(), hasFocus = hasFocus, isNtp = isNtp)
                 }
 
-                override fun onBackButtonPressed() {
-                    hideKeyboard()
-                }
-            },
-        )
-        omnibar.configureOmnibarItemPressedListeners(
-            object : OmnibarItemPressedListener {
                 override fun onBackButtonPressed() {
                     hideKeyboard()
                 }
