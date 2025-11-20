@@ -352,7 +352,7 @@ import com.duckduckgo.savedsites.impl.dialogs.EditSavedSiteDialogFragment.Delete
 import com.duckduckgo.savedsites.impl.dialogs.EditSavedSiteDialogFragment.EditSavedSiteListener
 import com.duckduckgo.serp.logos.api.SerpEasterEggLogosToggles
 import com.duckduckgo.serp.logos.api.SerpLogo
-import com.duckduckgo.settings.api.SettingsPageFeature
+import com.duckduckgo.settings.api.SerpSettingsFeature
 import com.duckduckgo.site.permissions.api.SitePermissionsManager
 import com.duckduckgo.site.permissions.api.SitePermissionsManager.LocationPermissionRequest
 import com.duckduckgo.site.permissions.api.SitePermissionsManager.SitePermissionQueryResponse
@@ -495,7 +495,7 @@ class BrowserTabViewModel @Inject constructor(
     private val autoconsentPixelManager: AutoconsentPixelManager,
     private val omnibarRepository: OmnibarRepository,
     private val contentScopeScriptsSubscriptionEventPluginPoint: PluginPoint<ContentScopeScriptsSubscriptionEventPlugin>,
-    private val settingsPageFeature: SettingsPageFeature,
+    private val serpSettingsFeature: SerpSettingsFeature,
 ) : ViewModel(),
     WebViewClientListener,
     EditSavedSiteListener,
@@ -943,7 +943,7 @@ class BrowserTabViewModel @Inject constructor(
             command.value = Command.RefreshOmnibar
         }
 
-        if (settingsPageFeature.serpSettingsSync().isEnabled()) {
+        if (serpSettingsFeature.storeSerpSettings().isEnabled()) {
             viewModelScope.launch {
                 contentScopeScriptsSubscriptionEventPluginPoint.getPlugins().forEach { plugin ->
                     _subscriptionEventDataChannel.send(plugin.getSubscriptionEventData())

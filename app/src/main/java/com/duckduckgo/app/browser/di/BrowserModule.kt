@@ -93,7 +93,7 @@ import com.duckduckgo.privacy.config.api.AmpLinks
 import com.duckduckgo.privacy.config.api.Gpc
 import com.duckduckgo.privacy.config.api.TrackingParameters
 import com.duckduckgo.request.filterer.api.RequestFilterer
-import com.duckduckgo.settings.api.SettingsPageFeature
+import com.duckduckgo.settings.api.SerpSettingsFeature
 import com.duckduckgo.subscriptions.api.Subscriptions
 import com.duckduckgo.user.agent.api.UserAgentProvider
 import dagger.Module
@@ -115,7 +115,7 @@ class BrowserModule {
         appReferrerDataStore: AppReferrerDataStore,
         duckChat: DuckChat,
         androidBrowserConfigFeature: AndroidBrowserConfigFeature,
-        settingsPageFeature: SettingsPageFeature,
+        serpSettingsFeature: SerpSettingsFeature,
     ): RequestRewriter {
         return DuckDuckGoRequestRewriter(
             urlDetector,
@@ -124,7 +124,7 @@ class BrowserModule {
             appReferrerDataStore,
             duckChat,
             androidBrowserConfigFeature,
-            settingsPageFeature,
+            serpSettingsFeature,
         )
     }
 

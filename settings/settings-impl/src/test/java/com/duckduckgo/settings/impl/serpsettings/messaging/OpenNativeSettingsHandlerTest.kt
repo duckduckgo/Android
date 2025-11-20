@@ -25,7 +25,7 @@ import com.duckduckgo.duckchat.api.DuckChatNativeSettingsNoParams
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.js.messaging.api.JsMessage
-import com.duckduckgo.settings.api.SettingsPageFeature
+import com.duckduckgo.settings.api.SerpSettingsFeature
 import com.duckduckgo.settings.impl.serpsettings.fakes.FakeGlobalActivityStarter
 import com.duckduckgo.settings.impl.serpsettings.fakes.FakeJsMessaging
 import com.duckduckgo.settings.impl.serpsettings.fakes.FakePixel
@@ -46,8 +46,8 @@ class OpenNativeSettingsHandlerTest {
     @get:Rule
     val coroutineTestRule: CoroutineTestRule = CoroutineTestRule()
 
-    private val fakeSettingsPageFeature: SettingsPageFeature =
-        FakeFeatureToggleFactory.create(SettingsPageFeature::class.java)
+    private val fakeSerpSettingsFeature: SerpSettingsFeature =
+        FakeFeatureToggleFactory.create(SerpSettingsFeature::class.java)
     private lateinit var fakePixel: FakePixel
     private lateinit var fakeJsMessaging: FakeJsMessaging
     private lateinit var fakeGlobalActivityStarter: FakeGlobalActivityStarter
@@ -64,7 +64,7 @@ class OpenNativeSettingsHandlerTest {
             appScope = coroutineTestRule.testScope,
             context = ApplicationProvider.getApplicationContext(),
             globalActivityStarter = fakeGlobalActivityStarter,
-            settingsPageFeature = fakeSettingsPageFeature,
+            serpSettingsFeature = fakeSerpSettingsFeature,
             pixel = fakePixel,
         )
     }
@@ -90,7 +90,7 @@ class OpenNativeSettingsHandlerTest {
 
     @Test
     fun `when openNativeSettings called with aiFeatures screen then pixel is fired`() = runTest {
-        fakeSettingsPageFeature.serpSettingsSync().setRawStoredState(Toggle.State(enable = true))
+        fakeSerpSettingsFeature.storeSerpSettings().setRawStoredState(Toggle.State(enable = true))
         val jsMessage = createJsMessage(screenParam = "aiFeatures")
         fakeGlobalActivityStarter.intentToReturn = Intent()
 
@@ -108,7 +108,7 @@ class OpenNativeSettingsHandlerTest {
 
     @Test
     fun `when openNativeSettings called with aiFeatures screen then launches DuckChat settings`() = runTest {
-        fakeSettingsPageFeature.serpSettingsSync().setRawStoredState(Toggle.State(enable = true))
+        fakeSerpSettingsFeature.storeSerpSettings().setRawStoredState(Toggle.State(enable = true))
         val jsMessage = createJsMessage(screenParam = "aiFeatures")
         fakeGlobalActivityStarter.intentToReturn = Intent()
 
@@ -126,7 +126,7 @@ class OpenNativeSettingsHandlerTest {
 
     @Test
     fun `when feature flag is disabled then no pixel is fired and no activity is launched`() = runTest {
-        fakeSettingsPageFeature.serpSettingsSync().setRawStoredState(Toggle.State(enable = false))
+        fakeSerpSettingsFeature.storeSerpSettings().setRawStoredState(Toggle.State(enable = false))
         val jsMessage = createJsMessage(screenParam = "aiFeatures")
 
         handler.getJsMessageHandler().process(
