@@ -84,7 +84,7 @@
     <string name="subscriptionSettingSectionHelpAndSupport">Yardım ve Destek</string>
     <string name="subscriptionSettingSendFeedback">Geri Bildirim gönder</string>
     <string name="subscriptionSettingActivating">Etkinleştiriliyor</string>
-    <string name="subscriptionSettingSwitchUpgradeDynamic" instruction="%1$s is the savings percentage when switching from monthly to yearly (e.g. 16)">Yıllık Plana Geçip %%%1$s Tasarruf Edin</string>
+    <string name="subscriptionSettingSwitchUpgradeDynamic" instruction="%1$s is the savings percentage when switching from monthly to yearly (e.g. 16)">Yıllık planla %%%1$s tasarruf edin</string>
     <!-- smartling.character_limit = 10 -->
     <string name="subscriptionSettingSwitchUpgradePill">En iyi</string>
     <string name="subscriptionSettingSwitchDowngrade">Planı Değiştir</string>
