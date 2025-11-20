@@ -187,7 +187,7 @@
     <string name="feedbackSubCategoryDuckAiLoginThirdPartyBrowser">Не могу воспользоваться Duck.ai по подписке в других браузерах</string>
     <string name="feedbackSubCategoryDuckAiOther">Другие отзывы о Duck.ai</string>
 
-    <string name="subscriptionSettingSectionTitle" translatable="false">DuckDuckGo Subscription</string>
+    <string name="subscriptionSettingSectionTitle">Подписка DuckDuckGo</string>
     <string name="subscriptionSettingSubscribeSecure">Безопасный Wi-Fi и приватные чаты с продвинутыми моделями ИИ</string>
 
     <string name="feedbackGeneralSubscription">По подписке</string>

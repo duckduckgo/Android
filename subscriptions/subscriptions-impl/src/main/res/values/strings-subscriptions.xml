@@ -186,7 +186,7 @@
     <string name="feedbackSubCategoryDuckAiLoginThirdPartyBrowser">Can\'t access Duck.ai with my subscription in other browsers</string>
     <string name="feedbackSubCategoryDuckAiOther">Other Duck.ai feedback</string>
 
-    <string name="subscriptionSettingSectionTitle" translatable="false">DuckDuckGo Subscription</string>
+    <string name="subscriptionSettingSectionTitle">DuckDuckGo Subscription</string>
     <string name="subscriptionSettingSubscribeSecure">Secure your Wi-Fi, and chat privately with advanced AI models</string>
 
     <string name="feedbackGeneralSubscription">Subscription</string>

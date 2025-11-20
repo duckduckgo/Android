@@ -187,7 +187,7 @@
     <string name="feedbackSubCategoryDuckAiLoginThirdPartyBrowser">En voi käyttää Duck.ai:ta muissa selaimissa tilauksellani.</string>
     <string name="feedbackSubCategoryDuckAiOther">Muu Duck.ai -palaute</string>
 
-    <string name="subscriptionSettingSectionTitle" translatable="false">DuckDuckGo Subscription</string>
+    <string name="subscriptionSettingSectionTitle">DuckDuckGo-tilaus</string>
     <string name="subscriptionSettingSubscribeSecure">Suojaa WiFi-yhteytesi ja keskustele yksityisesti edistyneiden tekoälymallien kanssa</string>
 
     <string name="feedbackGeneralSubscription">Tilaus</string>

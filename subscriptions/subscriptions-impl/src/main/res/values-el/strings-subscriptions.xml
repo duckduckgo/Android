@@ -187,7 +187,7 @@
     <string name="feedbackSubCategoryDuckAiLoginThirdPartyBrowser">Δεν μπορώ να αποκτήσω πρόσβαση στο Duck.ai με τη συνδρομή μου σε άλλα προγράμματα περιήγησης</string>
     <string name="feedbackSubCategoryDuckAiOther">Άλλα σχόλια για το Duck.ai</string>
 
-    <string name="subscriptionSettingSectionTitle" translatable="false">DuckDuckGo Subscription</string>
+    <string name="subscriptionSettingSectionTitle">Συνδρομή DuckDuckGo</string>
     <string name="subscriptionSettingSubscribeSecure">Ασφαλίστε το Wi-Fi σας και συνομιλήστε ιδιωτικά με προηγμένα μοντέλα τεχνητής νοημοσύνης</string>
 
     <string name="feedbackGeneralSubscription">Συνδρομή</string>

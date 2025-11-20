@@ -187,7 +187,7 @@
     <string name="feedbackSubCategoryDuckAiLoginThirdPartyBrowser">Nemôžem sa s mojím predplatným dostať na Duck.ai v iných prehliadačoch.</string>
     <string name="feedbackSubCategoryDuckAiOther">Ďalšie pripomienky Duck.ai</string>
 
-    <string name="subscriptionSettingSectionTitle" translatable="false">DuckDuckGo Subscription</string>
+    <string name="subscriptionSettingSectionTitle">Predplatné DuckDuckGo</string>
     <string name="subscriptionSettingSubscribeSecure">Zabezpeč si Wi-Fi a chatuj súkromne s pokročilými modelmi umelej inteligencie</string>
 
     <string name="feedbackGeneralSubscription">Predplatné</string>

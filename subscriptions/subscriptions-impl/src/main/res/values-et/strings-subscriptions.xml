@@ -187,7 +187,7 @@
     <string name="feedbackSubCategoryDuckAiLoginThirdPartyBrowser">Ei pääse Duck.ai-le teistes brauserites oma tellimusega ligi</string>
     <string name="feedbackSubCategoryDuckAiOther">Muu Duck.ai tagasiside</string>
 
-    <string name="subscriptionSettingSectionTitle" translatable="false">DuckDuckGo Subscription</string>
+    <string name="subscriptionSettingSectionTitle">DuckDuckGo tellimus</string>
     <string name="subscriptionSettingSubscribeSecure">Muuda oma Wi-Fi turvaliseks ja vestle privaatselt täiustatud tehisintellekti mudelitega</string>
 
     <string name="feedbackGeneralSubscription">Püsitellimus</string>

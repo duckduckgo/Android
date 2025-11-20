@@ -187,7 +187,7 @@
     <string name="feedbackSubCategoryDuckAiLoginThirdPartyBrowser">Ik kan Duck.ai niet openen met mijn abonnement in andere browsers.</string>
     <string name="feedbackSubCategoryDuckAiOther">Andere feedback over Duck.ai</string>
 
-    <string name="subscriptionSettingSectionTitle" translatable="false">DuckDuckGo Subscription</string>
+    <string name="subscriptionSettingSectionTitle">DuckDuckGo-abonnement</string>
     <string name="subscriptionSettingSubscribeSecure">Beveilig je wifi en chat privé met geavanceerde AI-modellen</string>
 
     <string name="feedbackGeneralSubscription">Abonnement</string>

@@ -187,7 +187,7 @@
     <string name="feedbackSubCategoryDuckAiLoginThirdPartyBrowser">Nu pot accesa Duck.ai cu abonamentul meu în alte browsere</string>
     <string name="feedbackSubCategoryDuckAiOther">Alt feedback privind Duck.ai</string>
 
-    <string name="subscriptionSettingSectionTitle" translatable="false">DuckDuckGo Subscription</string>
+    <string name="subscriptionSettingSectionTitle">Abonament DuckDuckGo</string>
     <string name="subscriptionSettingSubscribeSecure">Asigură-ți rețeaua Wi-Fi și discută în privat cu modele avansate de IA</string>
 
     <string name="feedbackGeneralSubscription">Abonament</string>

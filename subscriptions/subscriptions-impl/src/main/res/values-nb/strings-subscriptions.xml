@@ -187,7 +187,7 @@
     <string name="feedbackSubCategoryDuckAiLoginThirdPartyBrowser">Får ikke tilgang til Duck.ai med abonnementet mitt i andre nettlesere</string>
     <string name="feedbackSubCategoryDuckAiOther">Andre tilbakemeldinger om Duck.ai</string>
 
-    <string name="subscriptionSettingSectionTitle" translatable="false">DuckDuckGo Subscription</string>
+    <string name="subscriptionSettingSectionTitle">DuckDuckGo-abonnement</string>
     <string name="subscriptionSettingSubscribeSecure">Sikre wifien din og chat privat med avanserte AI-modeller</string>
 
     <string name="feedbackGeneralSubscription">Abonnement</string>

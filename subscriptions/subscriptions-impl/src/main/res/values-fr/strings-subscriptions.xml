@@ -187,7 +187,7 @@
     <string name="feedbackSubCategoryDuckAiLoginThirdPartyBrowser">Je n\'arrive pas à accéder à Duck.ai dans d\'autres navigateurs avec mon abonnement</string>
     <string name="feedbackSubCategoryDuckAiOther">Autres commentaires sur Duck.ai</string>
 
-    <string name="subscriptionSettingSectionTitle" translatable="false">DuckDuckGo Subscription</string>
+    <string name="subscriptionSettingSectionTitle">Abonnement DuckDuckGo</string>
     <string name="subscriptionSettingSubscribeSecure">Sécurisez votre Wi-Fi et discutez en toute confidentialité grâce à des modèles d\'IA avancés</string>
 
     <string name="feedbackGeneralSubscription">Abonnement</string>

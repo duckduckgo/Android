@@ -187,7 +187,7 @@
     <string name="feedbackSubCategoryDuckAiLoginThirdPartyBrowser">Aboneliğimle diğer tarayıcılarda Duck.ai\'a erişemiyorum.</string>
     <string name="feedbackSubCategoryDuckAiOther">Diğer Duck.ai geri bildirimleri</string>
 
-    <string name="subscriptionSettingSectionTitle" translatable="false">DuckDuckGo Subscription</string>
+    <string name="subscriptionSettingSectionTitle">DuckDuckGo Aboneliği</string>
     <string name="subscriptionSettingSubscribeSecure">Wi-Fi bağlantınızı güvence altına alın ve gelişmiş yapay zeka modelleriyle gizlice sohbet edin</string>
 
     <string name="feedbackGeneralSubscription">Abonelik</string>

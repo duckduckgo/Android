@@ -187,7 +187,7 @@
     <string name="feedbackSubCategoryDuckAiLoginThirdPartyBrowser">V drugih brskalnikih ne morem dostopati do Duck.ai s svojo naročnino</string>
     <string name="feedbackSubCategoryDuckAiOther">Druge povratne informacije o Duck.ai</string>
 
-    <string name="subscriptionSettingSectionTitle" translatable="false">DuckDuckGo Subscription</string>
+    <string name="subscriptionSettingSectionTitle">Naročnina DuckDuckGo</string>
     <string name="subscriptionSettingSubscribeSecure">Zagotovite varnost omrežja Wi-Fi in se zasebno pogovarjajte z naprednimi modeli umetne inteligence</string>
 
     <string name="feedbackGeneralSubscription">Naročnina</string>

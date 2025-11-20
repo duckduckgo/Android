@@ -187,7 +187,7 @@
     <string name="feedbackSubCategoryDuckAiLoginThirdPartyBrowser">Nevaru piekļūt Duck.ai ar savu abonementu citās pārlūkprogrammās.</string>
     <string name="feedbackSubCategoryDuckAiOther">Citas Duck.ai atsauksmes</string>
 
-    <string name="subscriptionSettingSectionTitle" translatable="false">DuckDuckGo Subscription</string>
+    <string name="subscriptionSettingSectionTitle">DuckDuckGo abonements</string>
     <string name="subscriptionSettingSubscribeSecure">Nodrošini sava Wi-Fi drošību un privāti tērzē ar uzlabotiem mākslīgā intelekta modeļiem</string>
 
     <string name="feedbackGeneralSubscription">Abonements</string>
