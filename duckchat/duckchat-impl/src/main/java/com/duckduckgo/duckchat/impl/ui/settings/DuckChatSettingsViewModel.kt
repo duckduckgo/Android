@@ -44,6 +44,7 @@ import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class DuckChatSettingsViewModel @AssistedInject constructor(
     @Assisted duckChatActivityParams: GlobalActivityStarter.ActivityParams,
@@ -51,7 +52,7 @@ class DuckChatSettingsViewModel @AssistedInject constructor(
     private val pixel: Pixel,
     private val inputScreenDiscoveryFunnel: InputScreenDiscoveryFunnel,
     private val settingsPageFeature: SettingsPageFeature,
-    dispatcherProvider: DispatcherProvider,
+    private val dispatcherProvider: DispatcherProvider,
 ) : ViewModel() {
     private val commandChannel = Channel<Command>(capacity = 1, onBufferOverflow = DROP_OLDEST)
     val commands = commandChannel.receiveAsFlow()
@@ -142,11 +143,19 @@ class DuckChatSettingsViewModel @AssistedInject constructor(
 
     fun duckChatSearchAISettingsClicked() {
         viewModelScope.launch {
+            val hideAiGeneratedImagesOptionEnabled = withContext(dispatcherProvider.io()) {
+                settingsPageFeature.hideAiGeneratedImagesOption().isEnabled()
+            }
+
             if (settingsPageFeature.embeddedSettingsWebView().isEnabled()) {
                 commandChannel.send(
                     OpenLink(
-                        link = DUCK_CHAT_SEARCH_AI_SETTINGS_LINK_EMBEDDED,
-                        titleRes = if (settingsPageFeature.hideAiGeneratedImagesOption().isEnabled()) {
+                        link = if (hideAiGeneratedImagesOptionEnabled) {
+                            DUCK_CHAT_SEARCH_AI_SETTINGS_LINK_EMBEDDED
+                        } else {
+                            LEGACY_DUCK_CHAT_SEARCH_AI_SETTINGS_LINK_EMBEDDED
+                        },
+                        titleRes = if (hideAiGeneratedImagesOptionEnabled) {
                             R.string.duckAiSerpSettingsTitle
                         } else {
                             R.string.duck_chat_assist_settings_title
@@ -220,7 +229,10 @@ class DuckChatSettingsViewModel @AssistedInject constructor(
     companion object {
         const val DUCK_CHAT_LEARN_MORE_LINK = "https://duckduckgo.com/duckduckgo-help-pages/aichat/"
         const val DUCK_CHAT_SEARCH_AI_SETTINGS_LINK = "https://duckduckgo.com/settings?ko=-1#aifeatures"
-        const val DUCK_CHAT_SEARCH_AI_SETTINGS_LINK_EMBEDDED = "https://duckduckgo.com/settings?ko=-1&embedded=1&highlight=kbe#aifeatures"
-        const val DUCK_CHAT_HIDE_GENERATED_IMAGES_LINK_EMBEDDED = "https://duckduckgo.com/settings?ko=-1&embedded=1&highlight=kbj#aifeatures"
+        const val LEGACY_DUCK_CHAT_SEARCH_AI_SETTINGS_LINK_EMBEDDED = "https://duckduckgo.com/settings?ko=-1&embedded=1&highlight=kbe#aifeatures"
+        const val DUCK_CHAT_SEARCH_AI_SETTINGS_LINK_EMBEDDED =
+            "https://duckduckgo.com/settings?ko=-1&embedded=1&highlight=kbe&hideduckai=1#aifeatures"
+        const val DUCK_CHAT_HIDE_GENERATED_IMAGES_LINK_EMBEDDED =
+            "https://duckduckgo.com/settings?ko=-1&embedded=1&highlight=kbj&hideduckai=1#aifeatures"
     }
 }
