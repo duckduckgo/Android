@@ -155,11 +155,4 @@ data class CardItem(
 
 enum class CardItemType(val jsonValue: String) {
     TWO_LINE_LIST_ITEM("two_line_list_item"),
-    ;
-
-    companion object {
-        fun from(jsonValue: String): CardItemType {
-            return CardItemType.values().first { it.jsonValue == jsonValue }
-        }
-    }
 }

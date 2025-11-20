@@ -172,11 +172,15 @@ private fun String.failIfEmpty() = this.ifEmpty { throw IllegalStateException("E
 
 private fun String.asPlaceholder(): Placeholder = Placeholder.from(this)
 
+private fun String.toCardItemType(): CardItemType {
+    return CardItemType.entries.first { it.jsonValue == this }
+}
+
 private fun List<JsonListItem>?.toListItems(actionMappers: Set<MessageActionMapperPlugin>): List<CardItem> {
     return this?.map { jsonItem ->
         CardItem(
             id = jsonItem.id.failIfEmpty(),
-            type = CardItemType.from(jsonItem.type),
+            type = jsonItem.type.toCardItemType(),
             titleText = jsonItem.titleText.failIfEmpty(),
             descriptionText = jsonItem.descriptionText.failIfEmpty(),
             placeholder = jsonItem.placeholder.asPlaceholder(),

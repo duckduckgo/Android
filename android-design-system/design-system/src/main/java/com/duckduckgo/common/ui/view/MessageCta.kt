@@ -26,9 +26,9 @@ import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.text.HtmlCompat
 import androidx.core.view.isVisible
 import com.airbnb.lottie.LottieAnimationView
+import com.duckduckgo.common.ui.view.MessageCta.MessageType.REMOTE_LIST_MESSAGE
 import com.duckduckgo.common.ui.view.MessageCta.MessageType.REMOTE_MESSAGE
 import com.duckduckgo.common.ui.view.MessageCta.MessageType.REMOTE_PROMO_MESSAGE
-import com.duckduckgo.common.ui.view.MessageCta.MessageType.REMOTE_LIST_MESSAGE
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.mobile.android.databinding.ViewMessageCtaBinding
 
