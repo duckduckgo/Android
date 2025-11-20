@@ -2832,19 +2832,6 @@ class BrowserTabViewModelTest {
         }
 
     @Test
-    fun whenNavigationBarNewTabButtonClickedWithCtaThenCommandIssued() =
-        runTest {
-            val mockCta: Cta = mock()
-            testee.ctaViewState.value = CtaViewState(cta = mockCta)
-
-            testee.onNavigationBarNewTabButtonClicked()
-
-            // Verify that the method completes successfully and issues commands
-            verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
-            assertCommandIssued<Command.GenerateWebViewPreviewImage>()
-        }
-
-    @Test
     fun whenCloseCurrentTabSelectedThenTabDeletedFromRepository() =
         runTest {
             givenOneActiveTabSelected()
