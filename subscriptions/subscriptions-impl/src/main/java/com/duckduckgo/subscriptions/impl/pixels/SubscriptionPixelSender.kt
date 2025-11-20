@@ -64,6 +64,7 @@ import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.SUBSCRIPTION_P
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.SUBSCRIPTION_SETTINGS_CHANGE_PLAN_OR_BILLING_CLICK
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.SUBSCRIPTION_SETTINGS_REMOVE_FROM_DEVICE_CLICK
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.SUBSCRIPTION_SETTINGS_SHOWN
+import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.SUBSCRIPTION_WEBVIEW_RENDER_PROCESS_CRASH
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
 
@@ -112,6 +113,7 @@ interface SubscriptionPixelSender {
     fun reportAuthV2MigrationFailureOther()
     fun reportAuthV2TokenValidationError()
     fun reportAuthV2TokenStoreError()
+    fun reportSubscriptionsWebViewRenderProcessCrash(isRepeated: Boolean)
 }
 
 @ContributesBinding(AppScope::class)
@@ -272,6 +274,10 @@ class SubscriptionPixelSenderImpl @Inject constructor(
 
     override fun reportAuthV2TokenStoreError() {
         fire(AUTH_V2_TOKEN_STORE_ERROR)
+    }
+
+    override fun reportSubscriptionsWebViewRenderProcessCrash(isRepeated: Boolean) {
+        fire(SUBSCRIPTION_WEBVIEW_RENDER_PROCESS_CRASH, mapOf("is_repeated" to isRepeated.toString()))
     }
 
     private fun fire(pixel: SubscriptionPixel, params: Map<String, String> = emptyMap()) {

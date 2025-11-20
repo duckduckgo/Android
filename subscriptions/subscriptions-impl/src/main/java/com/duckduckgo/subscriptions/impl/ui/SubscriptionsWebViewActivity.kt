@@ -286,7 +286,9 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationD
     }
 
     private fun recoverFromRenderProcessCrash() {
-        if (!intent.getBooleanExtra(ACTIVITY_LAUNCHED_AFTER_WEBVIEW_RENDER_PROCESS_CRASH, false)) {
+        val isRepeatedCrash = intent.getBooleanExtra(ACTIVITY_LAUNCHED_AFTER_WEBVIEW_RENDER_PROCESS_CRASH, false)
+        pixelSender.reportSubscriptionsWebViewRenderProcessCrash(isRepeatedCrash)
+        if (!isRepeatedCrash) {
             startActivity(intent.putExtra(ACTIVITY_LAUNCHED_AFTER_WEBVIEW_RENDER_PROCESS_CRASH, true))
         }
         finish()
