@@ -19,13 +19,13 @@ package com.duckduckgo.remote.messaging.impl
 import com.duckduckgo.remote.messaging.api.Action
 import com.duckduckgo.remote.messaging.api.CardItemType
 import com.duckduckgo.remote.messaging.api.Content
-import com.duckduckgo.remote.messaging.api.JsonListItem
 import com.duckduckgo.remote.messaging.api.JsonMessageAction
 import com.duckduckgo.remote.messaging.fixtures.JsonRemoteMessageOM.aJsonMessage
 import com.duckduckgo.remote.messaging.fixtures.JsonRemoteMessageOM.cardsListJsonContent
 import com.duckduckgo.remote.messaging.fixtures.messageActionPlugins
 import com.duckduckgo.remote.messaging.impl.mappers.mapToRemoteMessage
 import com.duckduckgo.remote.messaging.impl.models.JsonContent
+import com.duckduckgo.remote.messaging.impl.models.JsonListItem
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertTrue

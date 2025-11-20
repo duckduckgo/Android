@@ -38,12 +38,3 @@ sealed class JsonActionType(val jsonValue: String) {
     data object NAVIGATION : JsonActionType("navigation")
     data object SURVEY : JsonActionType("survey")
 }
-
-data class JsonListItem(
-    val id: String,
-    val type: String,
-    val titleText: String,
-    val descriptionText: String,
-    val placeholder: String = "",
-    val primaryAction: JsonMessageAction?,
-)

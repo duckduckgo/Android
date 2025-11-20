@@ -16,7 +16,6 @@
 
 package com.duckduckgo.remote.messaging.impl.models
 
-import com.duckduckgo.remote.messaging.api.JsonListItem
 import com.duckduckgo.remote.messaging.api.JsonMatchingAttribute
 import com.duckduckgo.remote.messaging.api.JsonMessageAction
 
@@ -66,6 +65,15 @@ data class JsonMatchingRule(
 
 data class JsonTargetPercentile(
     val before: Float?,
+)
+
+data class JsonListItem(
+    val id: String,
+    val type: String,
+    val titleText: String,
+    val descriptionText: String,
+    val placeholder: String = "",
+    val primaryAction: JsonMessageAction?,
 )
 
 @Suppress("ktlint:standard:class-naming")

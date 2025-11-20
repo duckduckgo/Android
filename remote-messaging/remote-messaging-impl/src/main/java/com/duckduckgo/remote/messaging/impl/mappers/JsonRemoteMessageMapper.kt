@@ -27,7 +27,6 @@ import com.duckduckgo.remote.messaging.api.Content.Medium
 import com.duckduckgo.remote.messaging.api.Content.Placeholder
 import com.duckduckgo.remote.messaging.api.Content.PromoSingleAction
 import com.duckduckgo.remote.messaging.api.Content.Small
-import com.duckduckgo.remote.messaging.api.JsonListItem
 import com.duckduckgo.remote.messaging.api.JsonMessageAction
 import com.duckduckgo.remote.messaging.api.MessageActionMapperPlugin
 import com.duckduckgo.remote.messaging.api.RemoteMessage
