@@ -28,7 +28,7 @@ import androidx.core.view.isVisible
 import com.airbnb.lottie.LottieAnimationView
 import com.duckduckgo.common.ui.view.MessageCta.MessageType.REMOTE_MESSAGE
 import com.duckduckgo.common.ui.view.MessageCta.MessageType.REMOTE_PROMO_MESSAGE
-import com.duckduckgo.common.ui.view.MessageCta.MessageType.REMOTE_WHATS_NEW_MESSAGE
+import com.duckduckgo.common.ui.view.MessageCta.MessageType.REMOTE_LIST_MESSAGE
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.mobile.android.databinding.ViewMessageCtaBinding
 
@@ -74,7 +74,7 @@ class MessageCta : FrameLayout {
         when (message.messageType) {
             REMOTE_MESSAGE -> setRemoteMessage(message)
             REMOTE_PROMO_MESSAGE -> setPromoMessage(message)
-            REMOTE_WHATS_NEW_MESSAGE -> { }
+            REMOTE_LIST_MESSAGE -> { }
         }
     }
 
@@ -201,7 +201,6 @@ class MessageCta : FrameLayout {
     enum class MessageType {
         REMOTE_MESSAGE,
         REMOTE_PROMO_MESSAGE,
-
-        REMOTE_WHATS_NEW_MESSAGE,
+        REMOTE_LIST_MESSAGE,
     }
 }

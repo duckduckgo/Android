@@ -79,7 +79,7 @@ fun RemoteMessage.asMessage(isLightModeEnabled: Boolean): Message {
             title = content.titleText,
             subtitle = content.descriptionText,
             action = content.primaryActionText,
-            messageType = MessageType.REMOTE_WHATS_NEW_MESSAGE,
+            messageType = MessageType.REMOTE_LIST_MESSAGE,
         )
     }
 }
