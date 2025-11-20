@@ -23,7 +23,7 @@ import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.contentscopescripts.api.ContentScopeScriptsSubscriptionEventPlugin
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.js.messaging.api.SubscriptionEventData
-import com.duckduckgo.settings.api.SettingsPageFeature
+import com.duckduckgo.settings.api.SerpSettingsFeature
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
@@ -36,7 +36,7 @@ import javax.inject.Inject
 @ContributesViewModel(ActivityScope::class)
 class SettingsWebViewViewModel @Inject constructor(
     private val contentScopeScriptsSubscriptionEventPluginPoint: PluginPoint<ContentScopeScriptsSubscriptionEventPlugin>,
-    private val settingsPageFeature: SettingsPageFeature,
+    private val serpSettingsFeature: SerpSettingsFeature,
 ) : ViewModel() {
 
     private val commandChannel = Channel<Command>(capacity = 1, onBufferOverflow = DROP_OLDEST)
@@ -67,7 +67,7 @@ class SettingsWebViewViewModel @Inject constructor(
     }
 
     private fun processContentScopeScriptsSubscriptionEventPlugin() {
-        if (settingsPageFeature.serpSettingsSync().isEnabled()) {
+        if (serpSettingsFeature.storeSerpSettings().isEnabled()) {
             viewModelScope.launch {
                 contentScopeScriptsSubscriptionEventPluginPoint.getPlugins().forEach { plugin ->
                     _subscriptionEventDataChannel.send(plugin.getSubscriptionEventData())

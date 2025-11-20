@@ -19,6 +19,8 @@ package com.duckduckgo.sync.impl.promotion
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.sync.api.DeviceSyncState
+import com.duckduckgo.sync.impl.promotion.SyncPromotionDataStore.PromotionType
+import com.duckduckgo.sync.impl.promotion.bookmarks.addeddialog.SetupSyncBookmarkAddedPromoRules
 import com.squareup.anvil.annotations.ContributesBinding
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
@@ -40,6 +42,16 @@ interface SyncPromotions {
     suspend fun recordBookmarksPromotionDismissed()
 
     /**
+     * Returns true if the `bookmark added` dialog promotion should be shown to the user.
+     */
+    suspend fun canShowBookmarkAddedDialogPromotion(): Boolean
+
+    /**
+     * Records that the `bookmark added` promotion has been dismissed.
+     */
+    suspend fun recordBookmarkAddedDialogPromotionDismissed()
+
+    /**
      * Returns true if the passwords promotion should be shown to the user.
      */
     suspend fun canShowPasswordsPromotion(savedPasswords: Int): Boolean
@@ -56,6 +68,7 @@ class SyncPromotionsImpl @Inject constructor(
     private val syncPromotionFeature: SyncPromotionFeature,
     private val dispatchers: DispatcherProvider,
     private val dataStore: SyncPromotionDataStore,
+    private val bookmarkAddedPromoRules: SetupSyncBookmarkAddedPromoRules,
 ) : SyncPromotions {
 
     override suspend fun canShowBookmarksPromotion(savedBookmarks: Int): Boolean {
@@ -65,7 +78,7 @@ class SyncPromotionsImpl @Inject constructor(
             if (!isSyncFeatureEnabled() || isUserSyncingAlready()) return@withContext false
             if (!isBookmarksPromoEnabled()) return@withContext false
 
-            if (dataStore.hasBookmarksPromoBeenDismissed()) return@withContext false
+            if (dataStore.hasPromoBeenDismissed(PromotionType.BookmarksScreen)) return@withContext false
 
             true
         }
@@ -73,7 +86,17 @@ class SyncPromotionsImpl @Inject constructor(
 
     override suspend fun recordBookmarksPromotionDismissed() {
         withContext(dispatchers.io()) {
-            dataStore.recordBookmarksPromoDismissed()
+            dataStore.recordPromoDismissed(PromotionType.BookmarksScreen)
+        }
+    }
+
+    override suspend fun canShowBookmarkAddedDialogPromotion(): Boolean {
+        return bookmarkAddedPromoRules.canShowPromo()
+    }
+
+    override suspend fun recordBookmarkAddedDialogPromotionDismissed() {
+        withContext(dispatchers.io()) {
+            dataStore.recordPromoDismissed(PromotionType.BookmarkAddedDialog)
         }
     }
 
@@ -84,7 +107,7 @@ class SyncPromotionsImpl @Inject constructor(
             if (!isSyncFeatureEnabled() || isUserSyncingAlready()) return@withContext false
             if (!isPasswordsPromoEnabled()) return@withContext false
 
-            if (dataStore.hasPasswordsPromoBeenDismissed()) return@withContext false
+            if (dataStore.hasPromoBeenDismissed(PromotionType.PasswordsScreen)) return@withContext false
 
             true
         }
@@ -92,7 +115,7 @@ class SyncPromotionsImpl @Inject constructor(
 
     override suspend fun recordPasswordsPromotionDismissed() {
         withContext(dispatchers.io()) {
-            dataStore.recordPasswordsPromoDismissed()
+            dataStore.recordPromoDismissed(PromotionType.PasswordsScreen)
         }
     }
 

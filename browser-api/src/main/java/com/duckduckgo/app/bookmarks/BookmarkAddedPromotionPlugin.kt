@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 DuckDuckGo
+ * Copyright (c) 2025 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,20 +14,19 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.settings.api
+package com.duckduckgo.app.bookmarks
 
-import com.duckduckgo.feature.toggles.api.Toggle
-import com.duckduckgo.feature.toggles.api.Toggle.DefaultFeatureValue
+import android.view.View
 
-interface SettingsPageFeature {
-    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
-    @Toggle.InternalAlwaysEnabled
-    fun self(): Toggle
+interface BookmarkAddedPromotionPlugin {
 
-    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
-    fun widgetAsProtection(): Toggle
+    /**
+     * Returns a view to be displayed in the bookmark added confirmation dialog, or null if the promotion should not be shown.
+     * @return Some promotions may require criteria to be met before they are shown. If the criteria is not met, this method should return null.
+     */
+    suspend fun getView(): View?
 
-    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
-    @Toggle.InternalAlwaysEnabled
-    fun embeddedSettingsWebView(): Toggle
+    companion object {
+        const val PRIORITY_KEY_BOOKMARK_ADDED_PROMOTION = 100
+    }
 }

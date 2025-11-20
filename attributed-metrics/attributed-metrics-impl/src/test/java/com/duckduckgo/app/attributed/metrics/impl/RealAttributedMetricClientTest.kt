@@ -51,6 +51,7 @@ class RealAttributedMetricClientTest {
     private val appReferrer: AppReferrer = mock()
     private val appInstall: AppInstall = mock()
     private val dateUtils: AttributedMetricsDateUtils = mock()
+    private val mockOriginParamManager: OriginParamManager = mock()
 
     private lateinit var testee: RealAttributedMetricClient
 
@@ -65,6 +66,7 @@ class RealAttributedMetricClientTest {
             appReferrer = appReferrer,
             dateUtils = dateUtils,
             appInstall = appInstall,
+            originParamManager = mockOriginParamManager,
         )
     }
 
@@ -109,27 +111,49 @@ class RealAttributedMetricClientTest {
     }
 
     @Test
-    fun whenEmitMetricAndClientActiveWithOriginThenMetricIsEmittedWithOrigin() = runTest {
+    fun whenEmitMetricAndOriginParamManagerReturnsTrueThenMetricIsEmittedWithOrigin() = runTest {
         val testMetric = TestAttributedMetric()
+        val origin = "campaign_paid_test"
         whenever(mockMetricsState.isActive()).thenReturn(true)
         whenever(mockMetricsState.canEmitMetrics()).thenReturn(true)
-        whenever(appReferrer.getOriginAttributeCampaign()).thenReturn("campaign_origin")
+        whenever(appReferrer.getOriginAttributeCampaign()).thenReturn(origin)
+        whenever(mockOriginParamManager.shouldSendOrigin(origin)).thenReturn(true)
 
         testee.emitMetric(testMetric)
 
         verify(mockPixel).fire(
             pixelName = "test_pixel",
-            parameters = mapOf("param" to "value", "origin" to "campaign_origin"),
+            parameters = mapOf("param" to "value", "origin" to origin),
             type = Unique("test_pixel_test_tag"),
         )
     }
 
     @Test
-    fun whenEmitMetricAndClientActiveWithoutOriginThenMetricIsEmittedWithInstallDate() = runTest {
+    fun whenEmitMetricAndOriginParamManagerReturnsFalseThenMetricIsEmittedWithInstallDate() = runTest {
+        val testMetric = TestAttributedMetric()
+        val origin = "campaign_organic"
+        whenever(mockMetricsState.isActive()).thenReturn(true)
+        whenever(mockMetricsState.canEmitMetrics()).thenReturn(true)
+        whenever(appReferrer.getOriginAttributeCampaign()).thenReturn(origin)
+        whenever(mockOriginParamManager.shouldSendOrigin(origin)).thenReturn(false)
+        whenever(dateUtils.getDateFromTimestamp(any())).thenReturn("2025-01-01")
+
+        testee.emitMetric(testMetric)
+
+        verify(mockPixel).fire(
+            pixelName = "test_pixel",
+            parameters = mapOf("param" to "value", "install_date" to "2025-01-01"),
+            type = Unique("test_pixel_test_tag"),
+        )
+    }
+
+    @Test
+    fun whenEmitMetricAndOriginIsNullThenMetricIsEmittedWithInstallDate() = runTest {
         val testMetric = TestAttributedMetric()
         whenever(mockMetricsState.isActive()).thenReturn(true)
         whenever(mockMetricsState.canEmitMetrics()).thenReturn(true)
         whenever(appReferrer.getOriginAttributeCampaign()).thenReturn(null)
+        whenever(mockOriginParamManager.shouldSendOrigin(null)).thenReturn(false)
         whenever(dateUtils.getDateFromTimestamp(any())).thenReturn("2025-01-01")
 
         testee.emitMetric(testMetric)

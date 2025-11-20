@@ -24,7 +24,7 @@ import com.duckduckgo.common.utils.AppUrl.ParamKey
 import com.duckduckgo.common.utils.AppUrl.ParamValue
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.experiments.api.VariantManager
-import com.duckduckgo.settings.api.SettingsPageFeature
+import com.duckduckgo.settings.api.SerpSettingsFeature
 import logcat.logcat
 
 interface RequestRewriter {
@@ -40,7 +40,7 @@ class DuckDuckGoRequestRewriter(
     private val appReferrerDataStore: AppReferrerDataStore,
     private val duckChat: DuckChat,
     private val androidConfigFeatures: AndroidBrowserConfigFeature,
-    private val settingsPageFeature: SettingsPageFeature,
+    private val serpSettingsFeature: SerpSettingsFeature,
 ) : RequestRewriter {
 
     private val hideDuckAiSerpKillSwitch by lazy { androidConfigFeatures.hideDuckAiInSerpKillSwitch().isEnabled() }
@@ -82,7 +82,7 @@ class DuckDuckGoRequestRewriter(
         val sourceValue = if (appReferrerDataStore.installedFromEuAuction) ParamValue.SOURCE_EU_AUCTION else ParamValue.SOURCE
 
         builder.appendQueryParameter(ParamKey.HIDE_SERP, ParamValue.HIDE_SERP)
-        if (!settingsPageFeature.serpSettingsSync().isEnabled()) {
+        if (!serpSettingsFeature.storeSerpSettings().isEnabled()) {
             // Once serpSettingsSync feature is permanently enabled this can be removed.
             if (!duckChat.isEnabled() && hideDuckAiSerpKillSwitch) {
                 builder.appendQueryParameter(ParamKey.HIDE_DUCK_AI, ParamValue.HIDE_DUCK_AI)

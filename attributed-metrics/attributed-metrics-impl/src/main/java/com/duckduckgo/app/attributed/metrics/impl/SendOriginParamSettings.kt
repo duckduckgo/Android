@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 DuckDuckGo
+ * Copyright (c) 2025 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,20 +14,10 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.settings.api
+package com.duckduckgo.app.attributed.metrics.impl
 
-import com.duckduckgo.feature.toggles.api.Toggle
-import com.duckduckgo.feature.toggles.api.Toggle.DefaultFeatureValue
+import com.squareup.moshi.Json
 
-interface SettingsPageFeature {
-    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
-    @Toggle.InternalAlwaysEnabled
-    fun self(): Toggle
-
-    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
-    fun widgetAsProtection(): Toggle
-
-    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
-    @Toggle.InternalAlwaysEnabled
-    fun embeddedSettingsWebView(): Toggle
-}
+data class SendOriginParamSettings(
+    @Json(name = "originCampaignSubstrings") val originCampaignSubstrings: List<String> = emptyList(),
+)

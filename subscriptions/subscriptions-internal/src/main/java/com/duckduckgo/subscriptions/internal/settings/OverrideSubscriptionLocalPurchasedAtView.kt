@@ -69,7 +69,7 @@ class OverrideSubscriptionLocalPurchasedAtView @JvmOverloads constructor(
     }
 
     private val dateETFormat = SimpleDateFormat("yyyy-MM-dd", Locale.US).apply {
-        timeZone = TimeZone.getTimeZone("US/Eastern")
+        timeZone = TimeZone.getTimeZone("America/New_York")
     }
 
     private val viewCoroutineScope: LifecycleCoroutineScope?

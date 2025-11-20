@@ -33,7 +33,7 @@ import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.js.messaging.api.JsMessageCallback
 import com.duckduckgo.js.messaging.api.JsMessaging
 import com.duckduckgo.navigation.api.getActivityParams
-import com.duckduckgo.settings.api.SettingsPageFeature
+import com.duckduckgo.settings.api.SerpSettingsFeature
 import com.duckduckgo.settings.api.SettingsWebViewScreenWithParams
 import com.duckduckgo.settings.impl.databinding.ActivitySettingsWebviewBinding
 import kotlinx.coroutines.flow.launchIn
@@ -60,7 +60,7 @@ class SettingsWebViewActivity : DuckDuckGoActivity() {
     lateinit var settingsWebViewClient: SettingsWebViewClient
 
     @Inject
-    lateinit var settingsPageFeature: SettingsPageFeature
+    lateinit var serpSettingsFeature: SerpSettingsFeature
 
     private val binding: ActivitySettingsWebviewBinding by viewBinding()
 
@@ -154,7 +154,7 @@ class SettingsWebViewActivity : DuckDuckGoActivity() {
                 setSupportZoom(true)
             }
 
-            if (settingsPageFeature.serpSettingsSync().isEnabled()) {
+            if (serpSettingsFeature.storeSerpSettings().isEnabled()) {
                 webView.webViewClient = settingsWebViewClient
 
                 contentScopeScripts.register(

@@ -274,5 +274,35 @@
             android:layout_height="wrap_content"
             android:text="Reset" />
 
+        <com.duckduckgo.common.ui.view.divider.HorizontalDivider
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:primaryText="@string/sync_internal_promotions_header" />
+
+        <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
+            android:id="@+id/clearHistoryBookmarkAddedDialogPromo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            android:text="@string/sync_internal_promotions_clear_history_bookmark_added_promo" />
+
+        <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
+            android:id="@+id/clearHistoryBookmarkScreenPromo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            android:text="@string/sync_internal_promotions_clear_history_bookmark_screen_promo" />
+
+        <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
+            android:id="@+id/clearHistoryPasswordScreenPromo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            android:text="@string/sync_internal_promotions_clear_history_password_screen_promo" />
+
     </LinearLayout>
 </ScrollView>

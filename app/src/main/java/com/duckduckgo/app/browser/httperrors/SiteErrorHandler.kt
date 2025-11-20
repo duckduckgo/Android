@@ -16,12 +16,8 @@
 
 package com.duckduckgo.app.browser.httperrors
 
-import com.duckduckgo.anvil.annotations.ContributesRemoteFeature
 import com.duckduckgo.app.browser.BrowserTabViewModel
 import com.duckduckgo.app.global.model.Site
-import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.feature.toggles.api.Toggle
-import com.duckduckgo.feature.toggles.api.Toggle.DefaultFeatureValue
 import javax.inject.Inject
 
 interface SiteErrorHandler<T> {
@@ -83,14 +79,4 @@ class HttpCodeSiteErrorHandlerImpl @Inject constructor() : HttpCodeSiteErrorHand
     override fun assignError(site: Site, error: Int) {
         site.onHttpErrorDetected(error)
     }
-}
-
-@ContributesRemoteFeature(
-    scope = AppScope::class,
-    featureName = "siteErrorHandlerKillSwitch",
-)
-interface SiteErrorHandlerKillSwitch {
-
-    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
-    fun self(): Toggle
 }

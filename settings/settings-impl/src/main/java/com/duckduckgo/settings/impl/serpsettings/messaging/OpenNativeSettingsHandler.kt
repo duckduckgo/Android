@@ -30,7 +30,7 @@ import com.duckduckgo.js.messaging.api.JsMessageCallback
 import com.duckduckgo.js.messaging.api.JsMessageHandler
 import com.duckduckgo.js.messaging.api.JsMessaging
 import com.duckduckgo.navigation.api.GlobalActivityStarter
-import com.duckduckgo.settings.api.SettingsPageFeature
+import com.duckduckgo.settings.api.SerpSettingsFeature
 import com.duckduckgo.settings.impl.serpsettings.pixel.SerpSettingsPixelName.SERP_SETTINGS_OPEN_DUCK_AI
 import com.squareup.anvil.annotations.ContributesMultibinding
 import kotlinx.coroutines.CoroutineScope
@@ -48,7 +48,7 @@ class OpenNativeSettingsHandler @Inject constructor(
     @AppCoroutineScope private val appScope: CoroutineScope,
     private val context: Context,
     private val globalActivityStarter: GlobalActivityStarter,
-    private val settingsPageFeature: SettingsPageFeature,
+    private val serpSettingsFeature: SerpSettingsFeature,
     private val pixel: Pixel,
 ) : ContentScopeJsMessageHandlersPlugin {
 
@@ -60,7 +60,7 @@ class OpenNativeSettingsHandler @Inject constructor(
                 jsMessageCallback: JsMessageCallback?,
             ) {
                 appScope.launch(dispatcherProvider.io()) {
-                    if (settingsPageFeature.serpSettingsSync().isEnabled()) {
+                    if (serpSettingsFeature.storeSerpSettings().isEnabled()) {
                         logcat { "SERP-SETTINGS: OpenNativeSettingsHandler processing message" }
                         val params = jsMessage.params
 

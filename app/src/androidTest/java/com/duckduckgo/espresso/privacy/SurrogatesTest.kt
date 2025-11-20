@@ -17,7 +17,6 @@
 package com.duckduckgo.espresso.privacy
 
 import android.webkit.WebView
-import androidx.test.core.app.*
 import androidx.test.espresso.*
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions
@@ -33,6 +32,7 @@ import com.duckduckgo.privacy.config.impl.network.JSONObjectAdapter
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import org.hamcrest.Matchers.allOf
+import org.junit.After
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Rule
@@ -41,21 +41,26 @@ import org.junit.Test
 class SurrogatesTest {
 
     @get:Rule
-    var activityScenarioRule = activityScenarioRule<BrowserActivity>()
+    var activityScenarioRule = activityScenarioRule<BrowserActivity>(
+        BrowserActivity.intent(
+            InstrumentationRegistry.getInstrumentation().targetContext,
+            queryExtra = "https://privacy-test-pages.site/privacy-protections/surrogates/",
+        ),
+    )
+
+    @After
+    fun tearDown() {
+        IdlingRegistry.getInstance().resources.toList().forEach { resource ->
+            IdlingRegistry.getInstance().unregister(resource)
+        }
+    }
 
     @Test @PrivacyTest
     fun whenProtectionsAreEnabledSurrogatesAreLoaded() {
         preparationsForPrivacyTest()
 
         var webView: WebView? = null
-
-        val scenario = ActivityScenario.launch<BrowserActivity>(
-            BrowserActivity.intent(
-                InstrumentationRegistry.getInstrumentation().targetContext,
-                "https://privacy-test-pages.site/privacy-protections/surrogates/",
-            ),
-        )
-        scenario.onActivity {
+        activityScenarioRule.scenario.onActivity {
             webView = it.findViewById(R.id.browserWebView)
         }
 
@@ -68,7 +73,7 @@ class SurrogatesTest {
 
         val testJson: TestJson? = getTestJson(results.toJSONString())
 
-        testJson?.value?.map {
+        testJson?.value?.forEach {
             if (compatibleIds.contains(it.id)) {
                 assertTrue("Loaded for ${it.id} should be loaded and is ${it.loaded}", it.loaded)
             }
@@ -80,14 +85,7 @@ class SurrogatesTest {
         preparationsForPrivacyTest()
 
         var webView: WebView? = null
-
-        val scenario = ActivityScenario.launch<BrowserActivity>(
-            BrowserActivity.intent(
-                InstrumentationRegistry.getInstrumentation().targetContext,
-                "https://privacy-test-pages.site/privacy-protections/surrogates/",
-            ),
-        )
-        scenario.onActivity {
+        activityScenarioRule.scenario.onActivity {
             webView = it.findViewById(R.id.browserWebView)
         }
 
@@ -110,7 +108,7 @@ class SurrogatesTest {
 
         val testJson: TestJson? = getTestJson(results.toJSONString())
 
-        testJson?.value?.map {
+        testJson?.value?.forEach {
             if (compatibleIds.contains(it.id)) {
                 assertFalse("Loaded for ${it.id} should not be loaded and is ${it.loaded}", it.loaded)
             }

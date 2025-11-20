@@ -29,6 +29,10 @@ import com.duckduckgo.sync.impl.Result.Success
 import com.duckduckgo.sync.impl.SyncAccountRepository
 import com.duckduckgo.sync.impl.getOrNull
 import com.duckduckgo.sync.impl.internal.SyncInternalEnvDataStore
+import com.duckduckgo.sync.impl.promotion.SyncPromotionDataStore
+import com.duckduckgo.sync.impl.promotion.SyncPromotionDataStore.PromotionType.BookmarkAddedDialog
+import com.duckduckgo.sync.impl.promotion.SyncPromotionDataStore.PromotionType.BookmarksScreen
+import com.duckduckgo.sync.impl.promotion.SyncPromotionDataStore.PromotionType.PasswordsScreen
 import com.duckduckgo.sync.impl.ui.SyncInternalSettingsViewModel.Command.ReadConnectQR
 import com.duckduckgo.sync.impl.ui.SyncInternalSettingsViewModel.Command.ReadQR
 import com.duckduckgo.sync.impl.ui.SyncInternalSettingsViewModel.Command.ShowMessage
@@ -54,6 +58,7 @@ constructor(
     private val syncEnvDataStore: SyncInternalEnvDataStore,
     private val syncFaviconFetchingStore: FaviconsFetchingStore,
     private val dispatchers: DispatcherProvider,
+    private val syncPromotionDataStore: SyncPromotionDataStore,
 ) : ViewModel() {
 
     private val command = Channel<Command>(1, BufferOverflow.DROP_OLDEST)
@@ -298,6 +303,27 @@ constructor(
             is Result.Error -> {
                 command.send(ShowMessage("Something went wrong"))
             }
+        }
+    }
+
+    fun onClearHistoryBookmarkAddedDialogPromoClicked() {
+        viewModelScope.launch {
+            syncPromotionDataStore.clearPromoHistory(BookmarkAddedDialog)
+            command.send(ShowMessage("'Bookmark added' promo history cleared"))
+        }
+    }
+
+    fun onClearHistoryBookmarkScreenPromoClicked() {
+        viewModelScope.launch {
+            syncPromotionDataStore.clearPromoHistory(BookmarksScreen)
+            command.send(ShowMessage("'Bookmark screen' promo history cleared"))
+        }
+    }
+
+    fun onClearHistoryPasswordScreenPromoClicked() {
+        viewModelScope.launch {
+            syncPromotionDataStore.clearPromoHistory(PasswordsScreen)
+            command.send(ShowMessage("'Password screen' promo history cleared"))
         }
     }
 }

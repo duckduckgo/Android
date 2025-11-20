@@ -98,6 +98,9 @@ class SyncInternalSettingsActivity : DuckDuckGoActivity() {
         binding.syncFaviconsPromptCta.setOnClickListener {
             viewModel.resetFaviconsPrompt()
         }
+        binding.clearHistoryBookmarkAddedDialogPromo.setOnClickListener { viewModel.onClearHistoryBookmarkAddedDialogPromoClicked() }
+        binding.clearHistoryBookmarkScreenPromo.setOnClickListener { viewModel.onClearHistoryBookmarkScreenPromoClicked() }
+        binding.clearHistoryPasswordScreenPromo.setOnClickListener { viewModel.onClearHistoryPasswordScreenPromoClicked() }
     }
 
     private fun observeUiEvents() {

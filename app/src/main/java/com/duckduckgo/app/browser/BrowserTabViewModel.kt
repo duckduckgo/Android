@@ -180,7 +180,6 @@ import com.duckduckgo.app.browser.history.NavigationHistoryAdapter.NavigationHis
 import com.duckduckgo.app.browser.httperrors.HttpCodeSiteErrorHandler
 import com.duckduckgo.app.browser.httperrors.HttpErrorPixelName
 import com.duckduckgo.app.browser.httperrors.HttpErrorPixels
-import com.duckduckgo.app.browser.httperrors.SiteErrorHandlerKillSwitch
 import com.duckduckgo.app.browser.httperrors.StringSiteErrorHandler
 import com.duckduckgo.app.browser.logindetection.FireproofDialogsEventHandler
 import com.duckduckgo.app.browser.logindetection.FireproofDialogsEventHandler.Event
@@ -317,6 +316,7 @@ import com.duckduckgo.downloads.api.FileDownloader.PendingFileDownload
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.impl.helper.DuckChatJSHelper
+import com.duckduckgo.duckchat.impl.helper.NativeAction
 import com.duckduckgo.duckchat.impl.helper.RealDuckChatJSHelper.Companion.DUCK_CHAT_FEATURE_NAME
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
 import com.duckduckgo.duckplayer.api.DuckPlayer
@@ -352,7 +352,7 @@ import com.duckduckgo.savedsites.impl.dialogs.EditSavedSiteDialogFragment.Delete
 import com.duckduckgo.savedsites.impl.dialogs.EditSavedSiteDialogFragment.EditSavedSiteListener
 import com.duckduckgo.serp.logos.api.SerpEasterEggLogosToggles
 import com.duckduckgo.serp.logos.api.SerpLogo
-import com.duckduckgo.settings.api.SettingsPageFeature
+import com.duckduckgo.settings.api.SerpSettingsFeature
 import com.duckduckgo.site.permissions.api.SitePermissionsManager
 import com.duckduckgo.site.permissions.api.SitePermissionsManager.LocationPermissionRequest
 import com.duckduckgo.site.permissions.api.SitePermissionsManager.SitePermissionQueryResponse
@@ -478,7 +478,6 @@ class BrowserTabViewModel @Inject constructor(
     private val tabStatsBucketing: TabStatsBucketing,
     private val additionalDefaultBrowserPrompts: AdditionalDefaultBrowserPrompts,
     private val swipingTabsFeature: SwipingTabsFeatureProvider,
-    private val siteErrorHandlerKillSwitch: SiteErrorHandlerKillSwitch,
     private val siteErrorHandler: StringSiteErrorHandler,
     private val siteHttpErrorHandler: HttpCodeSiteErrorHandler,
     private val subscriptionsJSHelper: SubscriptionsJSHelper,
@@ -495,7 +494,7 @@ class BrowserTabViewModel @Inject constructor(
     private val autoconsentPixelManager: AutoconsentPixelManager,
     private val omnibarRepository: OmnibarRepository,
     private val contentScopeScriptsSubscriptionEventPluginPoint: PluginPoint<ContentScopeScriptsSubscriptionEventPlugin>,
-    private val settingsPageFeature: SettingsPageFeature,
+    private val serpSettingsFeature: SerpSettingsFeature,
 ) : ViewModel(),
     WebViewClientListener,
     EditSavedSiteListener,
@@ -586,7 +585,7 @@ class BrowserTabViewModel @Inject constructor(
     private var site: Site? = null
         set(value) {
             field = value
-            if (siteErrorHandlerKillSwitch.self().isEnabled()) {
+            viewModelScope.launch(dispatchers.io()) {
                 siteErrorHandler.assignErrorsAndClearCache(value)
                 siteHttpErrorHandler.assignErrorsAndClearCache(value)
             }
@@ -943,7 +942,7 @@ class BrowserTabViewModel @Inject constructor(
             command.value = Command.RefreshOmnibar
         }
 
-        if (settingsPageFeature.serpSettingsSync().isEnabled()) {
+        if (serpSettingsFeature.storeSerpSettings().isEnabled()) {
             viewModelScope.launch {
                 contentScopeScriptsSubscriptionEventPluginPoint.getPlugins().forEach { plugin ->
                     _subscriptionEventDataChannel.send(plugin.getSubscriptionEventData())
@@ -3653,16 +3652,7 @@ class BrowserTabViewModel @Inject constructor(
         error: String,
         url: String,
     ) {
-        if (siteErrorHandlerKillSwitch.self().isEnabled()) {
-            siteErrorHandler.handleError(currentSite = site, urlWithError = url, error = error)
-        } else {
-            // when navigating from one page to another it can happen that errors are recorded before pageChanged etc. are
-            // called triggering a buildSite.
-            if (url != site?.url) {
-                site = siteFactory.buildSite(url = url, tabId = tabId)
-            }
-            site?.onErrorDetected(error)
-        }
+        siteErrorHandler.handleError(currentSite = site, urlWithError = url, error = error)
         logcat { "recordErrorCode $error in ${site?.url}" }
     }
 
@@ -3670,16 +3660,7 @@ class BrowserTabViewModel @Inject constructor(
         statusCode: Int,
         url: String,
     ) {
-        if (siteErrorHandlerKillSwitch.self().isEnabled()) {
-            siteHttpErrorHandler.handleError(currentSite = site, urlWithError = url, error = statusCode)
-        } else {
-            // when navigating from one page to another it can happen that errors are recorded before pageChanged etc. are
-            // called triggering a buildSite.
-            if (url != site?.url) {
-                site = siteFactory.buildSite(url = url, tabId = tabId)
-            }
-            site?.onHttpErrorDetected(statusCode)
-        }
+        siteHttpErrorHandler.handleError(currentSite = site, urlWithError = url, error = statusCode)
         logcat { "recordHttpErrorCode $statusCode in ${site?.url}" }
         updateHttpErrorCount(statusCode)
     }
@@ -4479,6 +4460,27 @@ class BrowserTabViewModel @Inject constructor(
         viewModelScope.launch {
             val params = duckChat.createWasUsedBeforePixelParams()
             pixel.fire(DuckChatPixelName.DUCK_CHAT_OPEN_AUTOCOMPLETE_LEGACY, parameters = params)
+        }
+    }
+
+    fun openNewDuckChat() {
+        viewModelScope.launch {
+            val subscriptionEvent = duckChatJSHelper.onNativeAction(NativeAction.NEW_CHAT)
+            _subscriptionEventDataChannel.send(subscriptionEvent)
+        }
+    }
+
+    fun openDuckChatHistory() {
+        viewModelScope.launch {
+            val subscriptionEvent = duckChatJSHelper.onNativeAction(NativeAction.HISTORY)
+            _subscriptionEventDataChannel.send(subscriptionEvent)
+        }
+    }
+
+    fun openDuckChatSettings() {
+        viewModelScope.launch {
+            val subscriptionEvent = duckChatJSHelper.onNativeAction(NativeAction.DUCK_AI_SETTINGS)
+            _subscriptionEventDataChannel.send(subscriptionEvent)
         }
     }
 

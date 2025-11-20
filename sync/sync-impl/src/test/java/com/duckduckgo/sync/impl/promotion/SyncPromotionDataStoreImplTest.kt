@@ -4,6 +4,9 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.PreferenceDataStoreFactory
 import androidx.datastore.preferences.core.Preferences
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.sync.impl.promotion.SyncPromotionDataStore.PromotionType.BookmarkAddedDialog
+import com.duckduckgo.sync.impl.promotion.SyncPromotionDataStore.PromotionType.BookmarksScreen
+import com.duckduckgo.sync.impl.promotion.SyncPromotionDataStore.PromotionType.PasswordsScreen
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.*
 import org.junit.Rule
@@ -26,24 +29,35 @@ class SyncPromotionDataStoreImplTest {
     private val testee = SyncPromotionDataStoreImpl(testDataStore)
 
     @Test
-    fun whenInitializedThenBookmarksPromoHasNotBeenDismissed() = runTest {
-        assertFalse(testee.hasBookmarksPromoBeenDismissed())
+    fun whenInitializedThenBookmarksScreenPromoHasNotBeenDismissed() = runTest {
+        assertFalse(testee.hasPromoBeenDismissed(BookmarksScreen))
     }
 
     @Test
     fun whenBookmarksPromoRecordedThenBookmarksPromoHasBeenDismissed() = runTest {
-        testee.recordBookmarksPromoDismissed()
-        assertTrue(testee.hasBookmarksPromoBeenDismissed())
+        testee.recordPromoDismissed(BookmarksScreen)
+        assertTrue(testee.hasPromoBeenDismissed(BookmarksScreen))
     }
 
     @Test
     fun whenInitializedThenPasswordsPromoHasNotBeenDismissed() = runTest {
-        assertFalse(testee.hasPasswordsPromoBeenDismissed())
+        assertFalse(testee.hasPromoBeenDismissed(PasswordsScreen))
     }
 
     @Test
     fun whenPasswordsPromoRecordedThenPasswordsPromoHasBeenDismissed() = runTest {
-        testee.recordPasswordsPromoDismissed()
-        assertTrue(testee.hasPasswordsPromoBeenDismissed())
+        testee.recordPromoDismissed(PasswordsScreen)
+        assertTrue(testee.hasPromoBeenDismissed(PasswordsScreen))
+    }
+
+    @Test
+    fun whenInitializedThenBookmarkAddedPromoHasNotBeenDismissed() = runTest {
+        assertFalse(testee.hasPromoBeenDismissed(BookmarkAddedDialog))
+    }
+
+    @Test
+    fun whenBookmarkAddedPromoRecordedThenPromoHasBeenDismissed() = runTest {
+        testee.recordPromoDismissed(BookmarkAddedDialog)
+        assertTrue(testee.hasPromoBeenDismissed(BookmarkAddedDialog))
     }
 }

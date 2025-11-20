@@ -24,6 +24,8 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.preferencesDataStore
 import androidx.work.WorkManager
 import com.duckduckgo.adclick.api.AdClickManager
+import com.duckduckgo.anvil.annotations.ContributesPluginPoint
+import com.duckduckgo.app.bookmarks.BookmarkAddedPromotionPlugin
 import com.duckduckgo.app.browser.*
 import com.duckduckgo.app.browser.addtohome.AddToHomeCapabilityDetector
 import com.duckduckgo.app.browser.addtohome.AddToHomeSystemCapabilityDetector
@@ -93,7 +95,7 @@ import com.duckduckgo.privacy.config.api.AmpLinks
 import com.duckduckgo.privacy.config.api.Gpc
 import com.duckduckgo.privacy.config.api.TrackingParameters
 import com.duckduckgo.request.filterer.api.RequestFilterer
-import com.duckduckgo.settings.api.SettingsPageFeature
+import com.duckduckgo.settings.api.SerpSettingsFeature
 import com.duckduckgo.subscriptions.api.Subscriptions
 import com.duckduckgo.user.agent.api.UserAgentProvider
 import dagger.Module
@@ -115,7 +117,7 @@ class BrowserModule {
         appReferrerDataStore: AppReferrerDataStore,
         duckChat: DuckChat,
         androidBrowserConfigFeature: AndroidBrowserConfigFeature,
-        settingsPageFeature: SettingsPageFeature,
+        serpSettingsFeature: SerpSettingsFeature,
     ): RequestRewriter {
         return DuckDuckGoRequestRewriter(
             urlDetector,
@@ -124,7 +126,7 @@ class BrowserModule {
             appReferrerDataStore,
             duckChat,
             androidBrowserConfigFeature,
-            settingsPageFeature,
+            serpSettingsFeature,
         )
     }
 
@@ -386,3 +388,6 @@ class BrowserModule {
 
 @Qualifier
 annotation class IndonesiaNewTabSection
+
+@ContributesPluginPoint(scope = AppScope::class, boundType = BookmarkAddedPromotionPlugin::class)
+private interface BookmarkAddedPromotionPluginPoint

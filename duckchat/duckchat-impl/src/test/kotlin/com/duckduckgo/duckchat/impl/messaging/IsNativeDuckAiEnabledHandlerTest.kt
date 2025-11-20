@@ -23,7 +23,7 @@ import com.duckduckgo.duckchat.impl.messaging.fakes.FakeJsMessaging
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.js.messaging.api.JsMessage
-import com.duckduckgo.settings.api.SettingsPageFeature
+import com.duckduckgo.settings.api.SerpSettingsFeature
 import kotlinx.coroutines.test.runTest
 import org.json.JSONObject
 import org.junit.Assert.assertEquals
@@ -39,7 +39,7 @@ class IsNativeDuckAiEnabledHandlerTest {
     val coroutineTestRule: CoroutineTestRule = CoroutineTestRule()
 
     private val fakeDuckChat = FakeDuckChat(enabled = true)
-    private val settingsPageFeature = FakeFeatureToggleFactory.create(SettingsPageFeature::class.java)
+    private val serpSettingsFeature = FakeFeatureToggleFactory.create(SerpSettingsFeature::class.java)
     private lateinit var handler: IsNativeDuckAiEnabledHandler
 
     @Before
@@ -47,7 +47,7 @@ class IsNativeDuckAiEnabledHandlerTest {
         handler = IsNativeDuckAiEnabledHandler(
             dispatcherProvider = coroutineTestRule.testDispatcherProvider,
             appScope = coroutineTestRule.testScope,
-            settingsPageFeature = settingsPageFeature,
+            serpSettingsFeature = serpSettingsFeature,
             duckChat = fakeDuckChat,
         )
     }
@@ -74,7 +74,7 @@ class IsNativeDuckAiEnabledHandlerTest {
     @Test
     fun `when id is null then no response is sent`() = runTest {
         @Suppress("DenyListedApi")
-        settingsPageFeature.serpSettingsSync().setRawStoredState(Toggle.State(enable = true))
+        serpSettingsFeature.storeSerpSettings().setRawStoredState(Toggle.State(enable = true))
         fakeDuckChat.setEnabled(true)
 
         val fakeJsMessaging = FakeJsMessaging()
@@ -96,7 +96,7 @@ class IsNativeDuckAiEnabledHandlerTest {
     @Test
     fun `when id is not null then response is sent`() = runTest {
         @Suppress("DenyListedApi")
-        settingsPageFeature.serpSettingsSync().setRawStoredState(Toggle.State(enable = true))
+        serpSettingsFeature.storeSerpSettings().setRawStoredState(Toggle.State(enable = true))
         fakeDuckChat.setEnabled(true)
 
         val fakeJsMessaging = FakeJsMessaging()

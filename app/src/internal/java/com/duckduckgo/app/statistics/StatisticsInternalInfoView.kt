@@ -48,7 +48,7 @@ class StatisticsInternalInfoView @JvmOverloads constructor(
     private val binding: ViewStatisticsAttributedMetricsBinding by viewBinding()
 
     private val dateETFormat = SimpleDateFormat("yyyy-MM-dd", Locale.US).apply {
-        timeZone = TimeZone.getTimeZone("US/Eastern")
+        timeZone = TimeZone.getTimeZone("America/New_York")
     }
     override fun onAttachedToWindow() {
         AndroidSupportInjection.inject(this)

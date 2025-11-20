@@ -25,7 +25,7 @@ import com.duckduckgo.contentscopescripts.api.ContentScopeScriptsSubscriptionEve
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.js.messaging.api.SubscriptionEventData
-import com.duckduckgo.settings.api.SettingsPageFeature
+import com.duckduckgo.settings.api.SerpSettingsFeature
 import com.duckduckgo.settings.impl.SettingsWebViewViewModel.Command
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
@@ -47,7 +47,7 @@ class SettingsWebViewViewModelTest {
 
     private lateinit var viewModel: SettingsWebViewViewModel
     private lateinit var fakeContentScopeScriptsSubscriptionEventPluginPoint: FakeContentScopeScriptsSubscriptionEventPluginPoint
-    private var fakeSettingsPageFeature = FakeFeatureToggleFactory.create(SettingsPageFeature::class.java)
+    private var fakeSerpSettingsFeature = FakeFeatureToggleFactory.create(SerpSettingsFeature::class.java)
 
     @Before
     fun setup() {
@@ -55,7 +55,7 @@ class SettingsWebViewViewModelTest {
 
         viewModel = SettingsWebViewViewModel(
             contentScopeScriptsSubscriptionEventPluginPoint = fakeContentScopeScriptsSubscriptionEventPluginPoint,
-            settingsPageFeature = fakeSettingsPageFeature,
+            serpSettingsFeature = fakeSerpSettingsFeature,
         )
     }
 
@@ -83,7 +83,7 @@ class SettingsWebViewViewModelTest {
 
     @Test
     fun whenOnViewResumedWithNoPluginsThenNoSubscriptionEventsSent() = runTest {
-        fakeSettingsPageFeature.serpSettingsSync().setRawStoredState(State(enable = true))
+        fakeSerpSettingsFeature.storeSerpSettings().setRawStoredState(State(enable = true))
 
         viewModel.onResume()
 
@@ -95,7 +95,7 @@ class SettingsWebViewViewModelTest {
 
     @Test
     fun whenOnViewResumedWithPluginsThenSubscriptionEventsSent() = runTest {
-        fakeSettingsPageFeature.serpSettingsSync().setRawStoredState(State(enable = true))
+        fakeSerpSettingsFeature.storeSerpSettings().setRawStoredState(State(enable = true))
         val events = mutableListOf<SubscriptionEventData>().apply {
             add(
                 SubscriptionEventData(
@@ -132,7 +132,7 @@ class SettingsWebViewViewModelTest {
 
     @Test
     fun whenOnViewResumedWithPluginsAndSerpSettingsFeatureFlagOffThenNoEventsSent() = runTest {
-        fakeSettingsPageFeature.serpSettingsSync().setRawStoredState(State(enable = false))
+        fakeSerpSettingsFeature.storeSerpSettings().setRawStoredState(State(enable = false))
         val events = mutableListOf<SubscriptionEventData>().apply {
             add(
                 SubscriptionEventData(
