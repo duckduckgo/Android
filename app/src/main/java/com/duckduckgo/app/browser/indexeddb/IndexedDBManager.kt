@@ -91,7 +91,7 @@ class DuckDuckGoIndexedDBManager @Inject constructor(
                 val host = it.name.split("_").getOrNull(1) ?: return@filter false
                 val isAllowed = allowedDomains.any { domain -> sameOrSubdomain(host, domain) }
 
-                if (clearDuckAiData && sameOrSubdomain(host, DUCKDUCKGO_DOMAIN)) {
+                if (clearDuckAiData && isFromDuckDuckGoDomains(host)) {
                     false
                 } else {
                     isAllowed
@@ -100,7 +100,11 @@ class DuckDuckGoIndexedDBManager @Inject constructor(
             .map { it.name }
     }
 
+    private fun isFromDuckDuckGoDomains(domain: String): Boolean {
+        return DUCKDUCKGO_DOMAINS.any { sameOrSubdomain(domain, it) }
+    }
+
     companion object {
-        const val DUCKDUCKGO_DOMAIN = "duckduckgo.com"
+        val DUCKDUCKGO_DOMAINS = listOf("duckduckgo.com", "duck.ai")
     }
 }
