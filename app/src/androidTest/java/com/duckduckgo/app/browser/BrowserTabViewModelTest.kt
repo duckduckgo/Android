@@ -623,7 +623,6 @@ class BrowserTabViewModelTest {
     private val mockDeviceAppLookup: DeviceAppLookup = mock()
 
     private val mockDuckAiFullScreenMode = MutableStateFlow(false)
-    private val mockDuckAiFullScreenModeEnabled = MutableStateFlow(false)
 
     private lateinit var fakeContentScopeScriptsSubscriptionEventPluginPoint: FakeContentScopeScriptsSubscriptionEventPluginPoint
     private var serpSettingsFeature = FakeFeatureToggleFactory.create(SerpSettingsFeature::class.java)
