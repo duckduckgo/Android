@@ -64,7 +64,7 @@ class AttributedMetricsDevSettingsActivity : DuckDuckGoActivity() {
     lateinit var settingsPlugins: PluginPoint<AttributedMetricsSettingPlugin>
 
     private val dateETFormat = SimpleDateFormat("yyyy-MM-dd", Locale.US).apply {
-        timeZone = TimeZone.getTimeZone("US/Eastern")
+        timeZone = TimeZone.getTimeZone("America/New_York")
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
