@@ -84,7 +84,7 @@
     <string name="subscriptionSettingSectionHelpAndSupport">Ajutor și suport</string>
     <string name="subscriptionSettingSendFeedback">Trimite feedback</string>
     <string name="subscriptionSettingActivating">Se activează</string>
-    <string name="subscriptionSettingSwitchUpgradeDynamic" instruction="%1$s is the savings percentage when switching from monthly to yearly (e.g. 16)">Treci la abonamentul anual și economisește %1$s%%</string>
+    <string name="subscriptionSettingSwitchUpgradeDynamic" instruction="%1$s is the savings percentage when switching from monthly to yearly (e.g. 16)">Economisește %1$s%% cu un plan anual</string>
     <!-- smartling.character_limit = 10 -->
     <string name="subscriptionSettingSwitchUpgradePill">Cea mai bună ofertă</string>
     <string name="subscriptionSettingSwitchDowngrade">Schimbă planul</string>
