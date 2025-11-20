@@ -47,6 +47,7 @@ class RealAttributedMetricClient @Inject constructor(
     private val appReferrer: AppReferrer,
     private val dateUtils: AttributedMetricsDateUtils,
     private val appInstall: AppInstall,
+    private val originParamManager: OriginParamManager,
 ) : AttributedMetricClient {
 
     override fun collectEvent(eventName: String) {
@@ -99,7 +100,7 @@ class RealAttributedMetricClient @Inject constructor(
 
             val origin = appReferrer.getOriginAttributeCampaign()
             val paramsMutableMap = params.toMutableMap()
-            if (!origin.isNullOrBlank()) {
+            if (!origin.isNullOrBlank() && originParamManager.shouldSendOrigin(origin)) {
                 paramsMutableMap["origin"] = origin
             } else {
                 paramsMutableMap["install_date"] = getInstallDate()
