@@ -187,9 +187,10 @@ class ProSettingView @JvmOverloads constructor(
         }
     }
 
-    private fun getActionButtonText(viewState: ViewState) = when (viewState.freeTrialEligible) {
-        true -> R.string.subscriptionSettingTryFreeTrial
-        false -> R.string.subscriptionSettingGet
+    private fun getActionButtonText(viewState: ViewState) = when {
+        viewState.blackFridayOfferAvailable -> R.string.subscriptionSettingBlackFridayOffer
+        viewState.freeTrialEligible -> R.string.subscriptionSettingTryFreeTrial
+        else -> R.string.subscriptionSettingGet
     }
 
     private fun getSubscriptionSecondaryText(viewState: ViewState) = if (viewState.duckAiPlusAvailable) {

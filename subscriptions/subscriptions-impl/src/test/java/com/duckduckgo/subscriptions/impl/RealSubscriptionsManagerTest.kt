@@ -2181,6 +2181,29 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
         whenever(playBillingManager.products).thenReturn(listOf(productDetails))
     }
 
+    @Test
+    fun whenBlackFridayOfferAvailableWithFeatureFlagEnabledThenReturnTrue() = runTest {
+        givenBlackFridayFeatureFlagEnabled(true)
+
+        val result = subscriptionsManager.blackFridayOfferAvailable()
+
+        assertTrue(result)
+    }
+
+    @Test
+    fun whenBlackFridayOfferAvailableWithFeatureFlagDisabledThenReturnFalse() = runTest {
+        givenBlackFridayFeatureFlagEnabled(false)
+
+        val result = subscriptionsManager.blackFridayOfferAvailable()
+
+        assertFalse(result)
+    }
+
+    @SuppressLint("DenyListedApi")
+    private fun givenBlackFridayFeatureFlagEnabled(value: Boolean) {
+        privacyProFeature.blackFridayOffer2025().setRawStoredState(State(remoteEnableState = value))
+    }
+
     private companion object {
         @JvmStatic
         @Parameterized.Parameters(name = "authApiV2Enabled={0}")

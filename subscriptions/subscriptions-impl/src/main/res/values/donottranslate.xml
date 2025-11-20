@@ -21,4 +21,7 @@
     <string name="pirStorageUnavailableDialogMessage">Personal Information Removal is not available at this moment. Please restart the app and try again.</string>
     <string name="pirStorageUnavailableDialogButton">OK</string>
 
+    <!-- Black Friday offer-->
+    <string name="subscriptionSettingBlackFridayOffer">Save 40% on First Year</string>
+
 </resources>
