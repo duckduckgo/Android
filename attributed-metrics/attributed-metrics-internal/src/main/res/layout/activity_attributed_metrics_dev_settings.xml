@@ -64,6 +64,22 @@
                 android:layout_height="wrap_content"
                 android:orientation="vertical" />
 
+            <com.duckduckgo.common.ui.view.text.DaxTextInput
+                android:id="@+id/clientInitDateInput"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="@dimen/keyline_6"
+                android:hint="Client Started Running At (ET time)"
+                app:endIcon="@drawable/ic_copy_24" />
+
+            <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
+                android:id="@+id/clientInitDateSave"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="@dimen/keyline_6"
+                android:layout_gravity="end"
+                android:text="Save" />
+
         </LinearLayout>
 
     </ScrollView>
