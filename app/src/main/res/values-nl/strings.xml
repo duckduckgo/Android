@@ -47,17 +47,12 @@
     <string name="omnibarInputHint">URL typen of zoeken</string>
     <string name="clearButtonContentDescription">Zoekinvoer wissen</string>
     <string name="no_compatible_third_party_app_installed">Geen compatibele app geïnstalleerd</string>
-    <string name="addBookmarkMenuTitle">Bladwijzer toevoegen</string>
-    <string name="editBookmarkMenuTitle">Bladwijzer bewerken</string>
+
     <string name="addFavoriteMenuTitle">Favoriet toevoegen</string>
     <string name="removeFavoriteMenuTitle">Favoriet verwijderen</string>
     <string name="favoriteAddedMessage">Favoriet toegevoegd</string>
     <string name="bookmarkAddedMessage">Bladwijzer toegevoegd</string>
-    <string name="requestDesktopSiteMenuTitle">Desktopsite</string>
-    <string name="fireproofWebsiteMenuTitleRemove">Brandveiligheid uitschakelen</string>
-    <string name="requestMobileSiteMenuTitle">Mobiele site</string>
     <string name="downloadsMenuTitle">Downloads</string>
-    <string name="printMenuTitle">Pagina printen</string>
     <string name="favoriteDeleteConfirmationMessage">Favoriet verwijderd</string>
     <string name="fireproofDeleteConfirmationMessage">Brandveiligheid uitgeschakeld</string>
     <string name="privacyProtectionEnabledConfirmationMessage" instruction="Placeholder is a website">Privacybescherming ingeschakeld voor %1$s</string>
@@ -76,11 +71,9 @@
     <!-- Sharing options -->
     <string name="options">Opties</string>
     <string name="shareLink">Link delen</string>
-    <string name="shareMenuTitle">Delen</string>
     <string name="copyUrl">Adres link kopiëren</string>
 
     <!-- Find in page -->
-    <string name="findInPageMenuTitle">Zoek op pagina</string>
     <string name="nextSearchTermDescription">Volgende zoeken</string>
     <string name="previousSearchTermDescription">Vorige zoeken</string>
     <string name="closeFindInPageButtonDescription">Scherm zoek op pagina sluiten</string>
@@ -258,7 +251,7 @@
     <string name="no_suggestions">Geen suggesties</string>
 
     <!-- Broken Site Activity -->
-    <string name="brokenSiteReportBrokenSiteMenuItem">Defecte website melden</string>
+
 
     <string name="brokenSiteProtectionsOn">Beveiliging is <b>INGESCHAKELD</b> voor deze website</string>
     <string name="brokenSiteProtectionsOff">Beveiliging is <b>UITGESCHAKELD</b> voor deze website</string>
@@ -281,7 +274,7 @@
     <string name="searchWidgetLabel">Zoeken en Duck.ai</string>
 
     <!-- Home Screen Shortcuts -->
-    <string name="addToHome">Toevoegen aan Home Screen</string>
+
     <string name="shortcutAddedText" instruction="Placeholder is the name of a website">%1$s is toegevoegd aan je startscherm.</string>
 
     <!-- User Survey -->
@@ -487,8 +480,6 @@
 
     <!-- Allowlist -->
     <string name="allowlistActivityTitle">Onbeschermde sites</string>
-    <string name="enablePrivacyProtection">Privacybescherming inschakelen</string>
-    <string name="disablePrivacyProtection">Privacybescherming uitschakelen</string>
     <string name="allowlistEntryOverflowContentDescription" instruction="Placeholder is a website">Meer opties voor onbeschermde site %1$s</string>
     <string name="allowlistEntryDeleteConfirmMessage" instruction="Placeholder is a website">Weet je zeker dat je &lt;b&gt;%1$s&lt;/b&gt; wilt verwijderen uit onbeschermde sites?</string>
     <string name="allowlistExplanation">Deze sites worden niet beschermd met Privacybescherming.</string>
@@ -587,11 +578,9 @@
     <string name="appLinkSnackBarMessage" instruction="Placeholder is the name of an app">Je kunt deze link openen in %1$s.</string>
     <string name="appLinkMultipleSnackBarMessage">Je kunt deze link openen in andere apps.</string>
     <string name="appLinkIntentChooserTitle">Openen met</string>
-    <string name="appLinkMenuItemTitle">Openen in de app</string>
 
     <!-- Email Autofill -->
     <string name="aliasToClipboardMessage">Nieuw adres gekopieerd naar je klembord</string>
-    <string name="newEmailAliasMenuTitle">Duck Address genereren</string>
 
     <!-- Autofill -->
     <string name="autofillSnackbarAction" instruction="Label for a button that lets the user view the details for a login credential">Weergeven</string>
@@ -761,10 +750,6 @@
     <string name="settingsPasswordsAndAutofillLoginsSetting">Wachtwoorden en automatisch invullen</string>
     <string name="autofillLoginSavedSnackbarMessage">Wachtwoord opgeslagen</string>
     <string name="autofillLoginUpdatedSnackbarMessage">Wachtwoord bijgewerkt</string>
-
-    <!-- Custom Tab -->
-    <string name="openInDdgMenuItemTitle">Openen in DuckDuckGo</string>
-    <string name="runningInDdgMenuItemTitle">Uitgevoerd in DuckDuckGo</string>
 
     <!-- SSL Error -->
     <string name="sslErrorTitle">Waarschuwing: Deze website is mogelijk onveilig</string>

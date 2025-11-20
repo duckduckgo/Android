@@ -73,6 +73,7 @@ class ProSettingViewModel @Inject constructor(
         val region: SubscriptionRegion? = null,
         val duckAiPlusAvailable: Boolean = false,
         val freeTrialEligible: Boolean = false,
+        val blackFridayOfferAvailable: Boolean = false,
     ) {
         enum class SubscriptionRegion { US, ROW }
     }
@@ -99,7 +100,7 @@ class ProSettingViewModel @Inject constructor(
         subscriptionsManager.subscriptionStatus
             .distinctUntilChanged()
             .onEach { subscriptionStatus ->
-                withContext(dispatcherProvider.io()) {
+                val newViewState = withContext(dispatcherProvider.io()) {
                     val offer = subscriptionsManager.getSubscriptionOffer().firstOrNull()
                     val region = when (offer?.planId) {
                         MONTHLY_PLAN_ROW, YEARLY_PLAN_ROW -> SubscriptionRegion.ROW
@@ -112,15 +113,15 @@ class ProSettingViewModel @Inject constructor(
                         feature == DuckAiPlus.value
                     } ?: false
 
-                    _viewState.emit(
-                        viewState.value.copy(
-                            status = subscriptionStatus,
-                            region = region,
-                            duckAiPlusAvailable = duckAiAvailable,
-                            freeTrialEligible = subscriptionsManager.isFreeTrialEligible(),
-                        ),
+                    viewState.value.copy(
+                        status = subscriptionStatus,
+                        region = region,
+                        duckAiPlusAvailable = duckAiAvailable,
+                        freeTrialEligible = subscriptionsManager.isFreeTrialEligible(),
+                        blackFridayOfferAvailable = subscriptionsManager.blackFridayOfferAvailable(),
                     )
                 }
+                _viewState.emit(newViewState)
             }.launchIn(viewModelScope)
     }
 

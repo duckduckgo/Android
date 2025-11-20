@@ -84,6 +84,11 @@
     <string name="subscriptionSettingSectionHelpAndSupport">Ajuda e Suporte</string>
     <string name="subscriptionSettingSendFeedback">Enviar comentário</string>
     <string name="subscriptionSettingActivating">A ativar…</string>
+    <string name="subscriptionSettingSwitchUpgradeDynamic" instruction="%1$s is the savings percentage when switching from monthly to yearly (e.g. 16)">Muda para o plano anual e poupa %1$s%%</string>
+    <!-- smartling.character_limit = 10 -->
+    <string name="subscriptionSettingSwitchUpgradePill">Boa oferta</string>
+    <string name="subscriptionSettingSwitchDowngrade">Mudar plano</string>
+    <string name="subscriptionSettingManagePlan">Gerir pagamento</string>
 
     <!--Purchase Subscriptions-->
     <string name="purchaseCompletedTitle">Está tudo pronto.</string>
@@ -171,11 +176,6 @@
     <string name="activityPir" translatable="false">Privacy Pro</string>
     <string name="activitySendFeedback">Enviar comentário</string>
 
-    <!-- Dynamic Switch % -->
-    <string name="switchBottomSheetDynamicTitleUpgrade" instruction="%1$s is the savings percentage when switching from monthly to yearly (e.g. 16)">Poupa %1$s%% com\num plano anual!</string>
-    <string name="switchBottomSheetDynamicTitleDowngrade" instruction="%1$s is the savings percentage when using a yearly plan instead of monthly (e.g. 16)">Estás a poupar %1$s%% com\num plano anual!</string>
-    <string name="subscriptionSettingSwitchUpgradeDynamic" instruction="%1$s is the savings percentage when switching from monthly to yearly (e.g. 16)">Muda para o plano anual e poupa %1$s%%</string>
-
     <!-- Privacy Pro Rebranding-->
     <string name="subscriptionSettingRebrandingMessage">O Privacy Pro chama-se agora subscrição da DuckDuckGo</string>
 
@@ -191,5 +191,15 @@
     <string name="subscriptionSettingSubscribeSecure">Protege a tua rede Wi-Fi e conversa em privado com modelos de IA avançados</string>
 
     <string name="feedbackGeneralSubscription">Subscrição</string>
+
+    <!-- Switch plan-->
+    <string name="switchBottomSheetDynamicTitleUpgrade" instruction="%1$s is the savings percentage when switching from monthly to yearly (e.g. 16)">Poupa %1$s%% com\num plano anual!</string>
+    <string name="switchBottomSheetDescriptionUpgrade" instruction="%1$s is the yearly plan monthly equivalent price (e.g. $8.33), %2$s is the current monthly plan price (e.g. $9.99)">Um plano anual é apenas %1$s/mês, em comparação com o teu plano mensal atual de %2$s.</string>
+    <string name="switchBottomSheetPrimaryButtonUpgrade" instruction="%1$s is the yearly plan price (e.g. $99.99)">Mudar para anual (%1$s/ano)</string>
+    <string name="switchBottomSheetSecondaryButtonUpgrade">Manter plano mensal</string>
+    <string name="switchBottomSheetDynamicTitleDowngrade" instruction="%1$s is the savings percentage when using a yearly plan instead of monthly (e.g. 16)">Estás a poupar %1$s%% com\num plano anual!</string>
+    <string name="switchBottomSheetDescriptionDowngrade" instruction="%1$s is the yearly plan monthly equivalent price (e.g. $8.33), %2$s is the monthly plan price (e.g. $9.99)">A mudança aumenta o preço mensal de %1$s/mês para %2$s/mês.</string>
+    <string name="switchBottomSheetPrimaryButtonDowngrade">Manter plano anual</string>
+    <string name="switchBottomSheetSecondaryButtonDowngrade" instruction="%1$s is the monthly plan price (e.g. $9.99)">Mudar para mensal (%1$s/mês)</string>
 
 </resources>

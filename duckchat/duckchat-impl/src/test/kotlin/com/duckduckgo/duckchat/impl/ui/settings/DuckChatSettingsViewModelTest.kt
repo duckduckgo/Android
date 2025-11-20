@@ -550,4 +550,11 @@ class DuckChatSettingsViewModelTest {
                 assertFalse(state.isFullScreenModeEnabled)
             }
         }
+
+    @Test
+    fun `when onDuckAiHideAiGeneratedImagesClicked then pixel is fired`() =
+        runTest {
+            testee.onDuckAiHideAiGeneratedImagesClicked()
+            verify(mockPixel).fire(DuckChatPixelName.SERP_SETTINGS_OPEN_HIDE_AI_GENERATED_IMAGES)
+        }
 }

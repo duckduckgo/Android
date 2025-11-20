@@ -88,8 +88,8 @@ class RequestBlockingTest {
         IdlingRegistry.getInstance().register(idlingResourceForDisableProtections)
 
         onView(allOf(withId(R.id.browserMenu), isClickable())).perform(click())
-        onView(isRoot()).perform(waitForView(withId(R.id.privacyProtectionMenuItem)))
-        onView(withId(R.id.privacyProtectionMenuItem)).perform(click())
+        onView(isRoot()).perform(waitForView(withText("Disable Privacy Protection")))
+        onView(withText("Disable Privacy Protection")).perform(click())
 
         // handle the privacy protection toggle check screen showing
         onView(isRoot()).perform(ViewActions.pressBack())

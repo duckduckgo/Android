@@ -79,7 +79,6 @@
     <string name="searchBookmarks">Otsi järjehoidjaid</string>
     <string name="deleteFolder" instruction="%1$s is the folder name">"Kas kustutada %1$s?"</string>
     <string name="deleteBookmark" instruction="%1$s is the bookmark name">"Kas kustutada järjehoidja %1$s?"</string>
-    <string name="bookmarkAddedInBookmarks" instruction="%1$s is the folder name">Järjehoidja lisati kausta %1$s</string>
     <string name="addToFavorites">Lisa lemmikutesse</string>
     <string name="editBookmark">Redigeeri järjehoidjat</string>
     <string name="importBookmarksDescription">Kui sinu järjehoidjad on salvestatud mõnes teises brauseris,\nsaad need importida DuckDuckGosse.</string>

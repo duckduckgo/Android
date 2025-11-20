@@ -19,10 +19,10 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@drawable/rounded_top_corners_bottom_sheet_drawable"
     android:orientation="vertical"
     android:paddingTop="@dimen/actionBottomSheetVerticalPadding"
-    android:paddingBottom="@dimen/actionBottomSheetVerticalPadding"
-    android:background="@drawable/rounded_top_corners_bottom_sheet_drawable">
+    android:paddingBottom="@dimen/actionBottomSheetVerticalPadding">
 
     <com.duckduckgo.common.ui.view.text.DaxTextView
         android:id="@+id/bookmarksBottomSheetDialogTitle"
@@ -31,7 +31,6 @@
         android:layout_marginStart="@dimen/keyline_4"
         android:paddingTop="@dimen/bottomSheetTitleVerticalPadding"
         android:paddingBottom="@dimen/bottomSheetTitleVerticalPadding"
-        android:visibility="gone"
         app:textType="secondary"
         app:typography="body1"
         tools:text="Actions" />
@@ -41,14 +40,15 @@
         android:layout_height="wrap_content">
 
         <com.duckduckgo.common.ui.view.listitem.OneLineListItem
-            android:id="@+id/bookmarksBottomSheetDialogPrimaryItem"
+            android:id="@+id/setAsFavorite"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:leadingIconBackground="circular"
-            app:primaryText="Primary Item" />
+            app:primaryText="@string/addBookmarkDialogAddToFavorites"
+            app:leadingIcon="@drawable/ic_favorite_24" />
 
         <com.duckduckgo.common.ui.view.DaxSwitch
-            android:id="@+id/bookmarksBottomSheetSwitch"
+            android:id="@+id/setAsFavoriteSwitch"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="end|center_vertical"
@@ -57,10 +57,11 @@
 
 
     <com.duckduckgo.common.ui.view.listitem.OneLineListItem
-        android:id="@+id/bookmarksBottomSheetDialogSecondaryItem"
+        android:id="@+id/editBookmark"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        app:leadingIcon="@drawable/ic_edit_24"
         app:leadingIconBackground="circular"
-        app:primaryText="Secondary Item" />
+        app:primaryText="@string/addBookmarkDialogEditBookmark" />
 
 </LinearLayout>

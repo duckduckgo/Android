@@ -144,7 +144,6 @@ class BrowserViewModel @Inject constructor(
             val duckChatSessionActive: Boolean,
             val withTransition: Boolean,
             val tabs: Int,
-            val fullScreenMode: Boolean,
         ) : Command()
     }
 
@@ -507,10 +506,9 @@ class BrowserViewModel @Inject constructor(
         duckChatSessionActive: Boolean,
         withTransition: Boolean,
     ) {
-        val duckAiFullScreenMode = duckAiFeatureState.showFullScreenMode.value
         logcat(INFO) { "Duck.ai openDuckChat duckChatSessionActive $duckChatSessionActive" }
         val tabsCount = tabs.value?.size ?: 0
-        sendCommand(OpenDuckChat(duckChatUrl, duckChatSessionActive, withTransition, tabsCount, duckAiFullScreenMode))
+        sendCommand(OpenDuckChat(duckChatUrl, duckChatSessionActive, withTransition, tabsCount))
     }
 }
 

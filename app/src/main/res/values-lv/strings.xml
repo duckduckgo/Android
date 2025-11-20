@@ -47,17 +47,12 @@
     <string name="omnibarInputHint">Meklē vai ieraksti URL</string>
     <string name="clearButtonContentDescription">Notīrīt meklēšanas ievadi</string>
     <string name="no_compatible_third_party_app_installed">Nav instalēta saderīga lietotne</string>
-    <string name="addBookmarkMenuTitle">Pievienot grāmatzīmi</string>
-    <string name="editBookmarkMenuTitle">Rediģēt grāmatzīmi</string>
+
     <string name="addFavoriteMenuTitle">Pievienot izlases vienumu</string>
     <string name="removeFavoriteMenuTitle">Noņemt izlasi</string>
     <string name="favoriteAddedMessage">Izlases vienums ir pievienots</string>
     <string name="bookmarkAddedMessage">Pievienota grāmatzīme</string>
-    <string name="requestDesktopSiteMenuTitle">Darbvirsmas vietne</string>
-    <string name="fireproofWebsiteMenuTitleRemove">Noņemt ugunsdrošību</string>
-    <string name="requestMobileSiteMenuTitle">Mobilā vietne</string>
     <string name="downloadsMenuTitle">Lejupielādes</string>
-    <string name="printMenuTitle">Drukāt lapu</string>
     <string name="favoriteDeleteConfirmationMessage">Izlase ir noņemta</string>
     <string name="fireproofDeleteConfirmationMessage">Ugunsdrošība noņemta</string>
     <string name="privacyProtectionEnabledConfirmationMessage" instruction="Placeholder is a website">Iespējota %1$s privātuma aizsardzība</string>
@@ -77,11 +72,9 @@
     <!-- Sharing options -->
     <string name="options">Opcijas</string>
     <string name="shareLink">Kopīgot saiti</string>
-    <string name="shareMenuTitle">Kopīgot</string>
     <string name="copyUrl">Kopēt saites adresi</string>
 
     <!-- Find in page -->
-    <string name="findInPageMenuTitle">Atrast lapā</string>
     <string name="nextSearchTermDescription">Atrast nākamo</string>
     <string name="previousSearchTermDescription">Atrast iepriekšējo</string>
     <string name="closeFindInPageButtonDescription">Aizvērt atrašanas lapā skatu</string>
@@ -259,7 +252,7 @@
     <string name="no_suggestions">Nav ieteikumu</string>
 
     <!-- Broken Site Activity -->
-    <string name="brokenSiteReportBrokenSiteMenuItem">Ziņot par bojātu vietni</string>
+
 
     <string name="brokenSiteProtectionsOn">Aizsardzība šai vietnei ir <b>IESLĒGTA</b></string>
     <string name="brokenSiteProtectionsOff">Aizsardzība šai vietnei ir <b>IZSLĒGTA</b></string>
@@ -282,7 +275,7 @@
     <string name="searchWidgetLabel">Meklēšana un Duck.ai</string>
 
     <!-- Home Screen Shortcuts -->
-    <string name="addToHome">Pievienot sākuma ekrānam</string>
+
     <string name="shortcutAddedText" instruction="Placeholder is the name of a website">Izdevās! %1$s ir pievienots tavam sākuma ekrānam.</string>
 
     <!-- User Survey -->
@@ -488,8 +481,6 @@
 
     <!-- Allowlist -->
     <string name="allowlistActivityTitle">Neaizsargātas vietnes</string>
-    <string name="enablePrivacyProtection">Iespējot privātuma aizsardzību</string>
-    <string name="disablePrivacyProtection">Atspējot privātuma aizsardzību</string>
     <string name="allowlistEntryOverflowContentDescription" instruction="Placeholder is a website">Citas opcijas neaizsargātai vietnei %1$s</string>
     <string name="allowlistEntryDeleteConfirmMessage" instruction="Placeholder is a website">Vai tiešām vēlies noņemt &lt;b&gt;%1$s&lt;/b&gt; no neaizsargātām vietnēm?</string>
     <string name="allowlistExplanation">Šīs vietnes netiks uzlabotas ar privātuma aizsardzību.</string>
@@ -588,11 +579,9 @@
     <string name="appLinkSnackBarMessage" instruction="Placeholder is the name of an app">Tu vari atvērt šo saiti ar %1$s.</string>
     <string name="appLinkMultipleSnackBarMessage">Tu vari atvērt šo saiti citās lietotnēs.</string>
     <string name="appLinkIntentChooserTitle">Atvērt ar</string>
-    <string name="appLinkMenuItemTitle">Atvērt lietotnē</string>
 
     <!-- Email Autofill -->
     <string name="aliasToClipboardMessage">Jaunā adrese tika iekopēta tavā starpliktuvē</string>
-    <string name="newEmailAliasMenuTitle">Izveidot Duck adresi</string>
 
     <!-- Autofill -->
     <string name="autofillSnackbarAction" instruction="Label for a button that lets the user view the details for a login credential">Skatīt</string>
@@ -775,10 +764,6 @@
     <string name="settingsPasswordsAndAutofillLoginsSetting">Paroles un automātiskā aizpildīšana</string>
     <string name="autofillLoginSavedSnackbarMessage">Parole saglabāta</string>
     <string name="autofillLoginUpdatedSnackbarMessage">Parole atjaunināta</string>
-
-    <!-- Custom Tab -->
-    <string name="openInDdgMenuItemTitle">Atvērt vietnē DuckDuckGo</string>
-    <string name="runningInDdgMenuItemTitle">Darbojas programmā DuckDuckGo</string>
 
     <!-- SSL Error -->
     <string name="sslErrorTitle">Brīdinājums: šī vietne var būt nedroša</string>

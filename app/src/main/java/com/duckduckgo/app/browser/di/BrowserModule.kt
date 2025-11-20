@@ -84,6 +84,7 @@ import com.duckduckgo.downloads.api.FileDownloader
 import com.duckduckgo.downloads.impl.AndroidFileDownloader
 import com.duckduckgo.downloads.impl.DataUriDownloader
 import com.duckduckgo.downloads.impl.FileDownloadCallback
+import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckplayer.api.DuckPlayer
 import com.duckduckgo.experiments.api.VariantManager
@@ -193,6 +194,7 @@ class BrowserModule {
         externalAppIntentFlagsFeature: ExternalAppIntentFlagsFeature,
         duckPlayer: DuckPlayer,
         duckChat: DuckChat,
+        duckChaFeatureState: DuckAiFeatureState,
         aiChatQueryDetectionFeature: AIChatQueryDetectionFeature,
         androidBrowserConfigFeature: AndroidBrowserConfigFeature,
     ): SpecialUrlDetector = SpecialUrlDetectorImpl(
@@ -203,6 +205,7 @@ class BrowserModule {
         externalAppIntentFlagsFeature,
         duckPlayer,
         duckChat,
+        duckChaFeatureState,
         aiChatQueryDetectionFeature,
         androidBrowserConfigFeature,
     )

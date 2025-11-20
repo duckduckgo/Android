@@ -17,8 +17,8 @@
 package com.duckduckgo.app.browser.menu
 
 import app.cash.turbine.test
-import com.duckduckgo.app.browser.viewstate.VpnMenuState
 import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
+import com.duckduckgo.browser.ui.browsermenu.VpnMenuState
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.networkprotection.api.NetworkProtectionState

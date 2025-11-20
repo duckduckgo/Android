@@ -57,7 +57,7 @@
             android:paddingHorizontal="@dimen/keyline_5"
             app:textType="primary"
             app:typography="h1"
-            tools:text="@string/switchBottomSheetTitleUpgrade" />
+            tools:text="@string/switchBottomSheetDynamicTitleUpgrade" />
 
         <com.duckduckgo.common.ui.view.text.DaxTextView
             android:id="@+id/switchBottomSheetDialogSubTitle"

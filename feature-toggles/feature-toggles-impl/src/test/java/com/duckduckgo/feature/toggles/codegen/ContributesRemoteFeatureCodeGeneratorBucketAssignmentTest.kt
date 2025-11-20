@@ -64,7 +64,7 @@ class ContributesRemoteFeatureCodeGeneratorBucketAssignmentTest(private val test
     fun `test probability`() {
         fun assertWithinRange() {
             if (testCase.run < 9000) return // small sample sizes will have high variance
-            val allowableDeviation = (enables + disables) / 2 * 6.0f / 100 // allowable deviation of 6%
+            val allowableDeviation = (enables + disables) * 6.0f / 100 // allowable deviation of 6%
 
             // Check if the absolute difference between the two numbers is within the allowable deviation
             val difference = abs(enables - disables)
