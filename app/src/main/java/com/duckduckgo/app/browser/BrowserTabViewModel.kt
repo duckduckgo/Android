@@ -3524,6 +3524,8 @@ class BrowserTabViewModel @Inject constructor(
 
     fun onMessageReceived() {
         isLinkOpenedInNewTab = true
+
+        handleNewTabIfEmptyUrl()
     }
 
     override fun linkOpenedInNewTab(): Boolean = isLinkOpenedInNewTab
@@ -3801,6 +3803,19 @@ class BrowserTabViewModel @Inject constructor(
                     data = data,
                     onResponse = onResponse,
                 )
+        }
+    }
+
+    private fun handleNewTabIfEmptyUrl() {
+        viewModelScope.launch {
+            val shouldDisplayAboutBlank = withContext(dispatchers.io()) {
+                androidBrowserConfig.handleAboutBlank().isEnabled() && site?.url.isNullOrEmpty()
+            }
+            if (shouldDisplayAboutBlank) {
+                omnibarViewState.value = currentOmnibarViewState().copy(
+                    omnibarText = ABOUT_BLANK,
+                )
+            }
         }
     }
 
@@ -4616,6 +4631,8 @@ class BrowserTabViewModel @Inject constructor(
 
         private const val CATEGORY_KEY = "category"
         private const val CLIENT_SIDE_HIT_KEY = "clientSideHit"
+
+        private const val ABOUT_BLANK = "about:blank"
 
         // https://www.iso.org/iso-3166-country-codes.html
         private val PRINT_LETTER_FORMAT_COUNTRIES_ISO3166_2 =

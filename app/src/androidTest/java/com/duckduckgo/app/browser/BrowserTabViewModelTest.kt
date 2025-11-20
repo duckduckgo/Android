@@ -4412,6 +4412,30 @@ class BrowserTabViewModelTest {
     }
 
     @Test
+    fun whenHandleAboutBlankEnabledAndMessageReceivedAndNullSiteUrlThenSetOmnibarText() {
+        fakeAndroidConfigBrowserFeature.handleAboutBlank().setRawStoredState(State(enable = true))
+        loadUrl(null)
+        testee.onMessageReceived()
+        assertEquals(omnibarViewState().omnibarText, "about:blank")
+    }
+
+    @Test
+    fun whenHandleAboutBlankEnabledAndMessageReceivedAndNonNullSiteUrlThenThenDoNotSetOmnibarText() {
+        fakeAndroidConfigBrowserFeature.handleAboutBlank().setRawStoredState(State(enable = true))
+        loadUrl("url")
+        testee.onMessageReceived()
+        assertEquals(omnibarViewState().omnibarText, "url")
+    }
+
+    @Test
+    fun whenHandleAboutBlankDisabledAndMessageReceivedAndNullSiteUrlThenDoNotSetOmnibarText() {
+        fakeAndroidConfigBrowserFeature.handleAboutBlank().setRawStoredState(State(enable = false))
+        loadUrl(null)
+        testee.onMessageReceived()
+        assertEquals(omnibarViewState().omnibarText, "")
+    }
+
+    @Test
     fun whenUserLongPressedBackOnEmptyStackBrowserNotShowingThenShowHistoryCommandNotSent() {
         setBrowserShowing(false)
         testee.onUserLongPressedBack()
