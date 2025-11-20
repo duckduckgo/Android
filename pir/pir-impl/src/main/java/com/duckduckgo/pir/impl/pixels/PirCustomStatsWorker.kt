@@ -38,11 +38,15 @@ class PirCustomStatsWorker(
     @Inject
     lateinit var engagementReporter: PirEngagementReporter
 
+    @Inject
+    lateinit var weeklyPixelReporter: WeeklyPixelReporter
+
     override suspend fun doWork(): Result {
         logcat { "PIR-CUSTOM-STATS: Attempt to fire custom pixels" }
         optOutSubmissionSuccessRateReporter.attemptFirePixel()
         optOutConfirmationReporter.attemptFirePixel()
         engagementReporter.attemptFirePixel()
+        weeklyPixelReporter.attemptFirePixel()
 
         return Result.success()
     }

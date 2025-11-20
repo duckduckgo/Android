@@ -25,6 +25,7 @@ import com.duckduckgo.pir.impl.models.ExtractedProfile
 import com.duckduckgo.pir.impl.store.PirRepository
 import com.squareup.anvil.annotations.ContributesBinding
 import kotlinx.coroutines.withContext
+import logcat.logcat
 import javax.inject.Inject
 import kotlin.time.Duration.Companion.days
 
@@ -41,26 +42,33 @@ class RealWeeklyPixelReporter @Inject constructor(
 ) : WeeklyPixelReporter {
     override suspend fun attemptFirePixel() {
         withContext(dispatcherProvider.io()) {
+            logcat { "PIR-CUSTOM-STATS: Attempt to fire weekly pixels" }
             val now = currentTimeProvider.currentTimeMillis()
             val weeklyStatLastSentMs = pirRepository.getWeeklyStatLastSentMs()
             if (weeklyStatLastSentMs == 0L || didWeekPassedBetweenDates(weeklyStatLastSentMs, now)) {
+                logcat { "PIR-CUSTOM-STATS: Calculating weekly pixels" }
                 attemptFireWeeklyChildBrokerOrphanedOptOutsPixel(now)
                 pirRepository.setWeeklyStatLastSentMs(now)
             }
+            logcat { "PIR-CUSTOM-STATS: Done attempting to fire weekly pixels" }
         }
     }
 
     private suspend fun attemptFireWeeklyChildBrokerOrphanedOptOutsPixel(nowMs: Long) {
         val activeBrokers = pirRepository.getAllActiveBrokerObjects()
+
+        // Map broker names to extracted profiles created in the last week
         val groupedWeekExtractedProfiles = pirRepository.getAllExtractedProfiles().filter {
             !it.deprecated && it.lessThan7DaysSinceCreation(nowMs)
         }.groupBy { it.brokerName }
 
+        // Take only child brokers (Brokers with parent)
         val groupedWeekChildExtractedProfiles = groupedWeekExtractedProfiles.filter {
             val broker = activeBrokers.getBrokerWithName(it.key) ?: return@filter false
             return@filter !broker.parent.isNullOrEmpty()
         }
 
+        logcat { "PIR-CUSTOM-STATS: Child broker created past week: ${groupedWeekChildExtractedProfiles.size}" }
         groupedWeekChildExtractedProfiles.forEach {
             val broker = activeBrokers.getBrokerWithName(it.key)!!
             val parent = activeBrokers.getBrokerWithUrl(broker.parent!!)
@@ -80,8 +88,11 @@ class RealWeeklyPixelReporter @Inject constructor(
                 }.size
             }
 
+            logcat { "PIR-CUSTOM-STATS: Child broker ${broker.name} -> Parent ${parent?.name}" }
+            logcat { "PIR-CUSTOM-STATS: childParentRecordDifference: $recordDiff orphanedRecordsCount: $orphanedRecordsCount" }
             if (recordDiff <= 0 && orphanedRecordsCount == 0) return@forEach
 
+            logcat { "PIR-CUSTOM-STATS: Emitting pixel for ${broker.name}" }
             pixelSender.reportWeeklyChildOrphanedOptOuts(
                 brokerUrl = broker.url,
                 childParentRecordDifference = recordDiff,
