@@ -84,7 +84,7 @@
     <string name="subscriptionSettingSectionHelpAndSupport">Hjælp og support</string>
     <string name="subscriptionSettingSendFeedback">Send tilbagemelding</string>
     <string name="subscriptionSettingActivating">Aktiverer</string>
-    <string name="subscriptionSettingSwitchUpgradeDynamic" instruction="%1$s is the savings percentage when switching from monthly to yearly (e.g. 16)">Skift til årligt og spar %1$s %%</string>
+    <string name="subscriptionSettingSwitchUpgradeDynamic" instruction="%1$s is the savings percentage when switching from monthly to yearly (e.g. 16)">Spar %1$s %% med et årligt abonnement</string>
     <!-- smartling.character_limit = 10 -->
     <string name="subscriptionSettingSwitchUpgradePill">Anbefales</string>
     <string name="subscriptionSettingSwitchDowngrade">Skift abonnement</string>
