@@ -28,7 +28,7 @@ import com.duckduckgo.app.browser.SpecialUrlDetector
 class SubscriptionsWebViewClient(
     private val specialUrlDetector: SpecialUrlDetector,
     private val context: Context,
-    private val onRenderProcessCrash: () -> Unit,
+    private val onRenderProcessCrash: () -> Boolean,
 ) : WebViewClient() {
 
     override fun shouldOverrideUrlLoading(
@@ -61,8 +61,5 @@ class SubscriptionsWebViewClient(
     override fun onRenderProcessGone(
         view: WebView?,
         detail: RenderProcessGoneDetail?,
-    ): Boolean {
-        onRenderProcessCrash()
-        return true
-    }
+    ): Boolean = onRenderProcessCrash()
 }

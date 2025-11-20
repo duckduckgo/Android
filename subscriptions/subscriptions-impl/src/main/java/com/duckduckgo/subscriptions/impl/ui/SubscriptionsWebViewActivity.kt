@@ -72,6 +72,7 @@ import com.duckduckgo.navigation.api.getActivityParams
 import com.duckduckgo.subscriptions.api.SubscriptionScreens.RestoreSubscriptionScreenWithParams
 import com.duckduckgo.subscriptions.api.SubscriptionScreens.SubscriptionPurchase
 import com.duckduckgo.subscriptions.api.Subscriptions
+import com.duckduckgo.subscriptions.impl.PrivacyProFeature
 import com.duckduckgo.subscriptions.impl.R.string
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.FEATURE_PAGE_QUERY_PARAM_KEY
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.ITR_URL
@@ -176,6 +177,9 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationD
     @Inject
     lateinit var subscriptionsUrlProvider: SubscriptionsUrlProvider
 
+    @Inject
+    lateinit var privacyProFeature: PrivacyProFeature
+
     private val viewModel: SubscriptionWebViewViewModel by bindViewModel()
 
     private val binding: ActivitySubscriptionsWebviewBinding by viewBinding()
@@ -245,7 +249,7 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationD
             it.webViewClient = SubscriptionsWebViewClient(
                 specialUrlDetector = specialUrlDetector,
                 context = this,
-                onRenderProcessCrash = { recoverFromRenderProcessCrash() },
+                onRenderProcessCrash = ::recoverFromRenderProcessCrash,
             )
             it.settings.apply {
                 userAgentString = CUSTOM_UA
@@ -285,13 +289,16 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationD
         }
     }
 
-    private fun recoverFromRenderProcessCrash() {
+    private fun recoverFromRenderProcessCrash(): Boolean {
+        if (!privacyProFeature.handleSubscriptionsWebViewRenderProcessCrash().isEnabled()) return false
+
         val isRepeatedCrash = intent.getBooleanExtra(ACTIVITY_LAUNCHED_AFTER_WEBVIEW_RENDER_PROCESS_CRASH, false)
         pixelSender.reportSubscriptionsWebViewRenderProcessCrash(isRepeatedCrash)
         if (!isRepeatedCrash) {
             startActivity(intent.putExtra(ACTIVITY_LAUNCHED_AFTER_WEBVIEW_RENDER_PROCESS_CRASH, true))
         }
         finish()
+        return true
     }
 
     override fun continueDownload(pendingFileDownload: PendingFileDownload) {
