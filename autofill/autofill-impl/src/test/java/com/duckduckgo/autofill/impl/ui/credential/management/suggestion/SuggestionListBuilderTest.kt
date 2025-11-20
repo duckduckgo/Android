@@ -39,62 +39,62 @@ class SuggestionListBuilderTest {
 
     @Test
     fun whenNoSuggestionThenEmptyListReturned() {
-        assertTrue(testee.build(emptyList(), emptyList(), allowBreakageReporting = false).isEmpty())
+        assertTrue(testee.build(emptyList(), emptyList(), emptyList(), allowBreakageReporting = false).isEmpty())
     }
 
     @Test
     fun whenOneDirectSuggestionThenDividerAddedLast() {
         val suggestions = buildSuggestions(1)
-        val list = testee.build(suggestions, emptyList(), allowBreakageReporting = false)
+        val list = testee.build(emptyList(), suggestions, emptyList(), allowBreakageReporting = false)
         assertTrue(list.last() is ListItem.Divider)
     }
 
     @Test
     fun whenTwoDirectSuggestionsThenDividerAddedLast() {
         val suggestions = buildSuggestions(2)
-        val list = testee.build(suggestions, emptyList(), allowBreakageReporting = false)
+        val list = testee.build(emptyList(), suggestions, emptyList(), allowBreakageReporting = false)
         assertTrue(list.last() is ListItem.Divider)
     }
 
     @Test
     fun whenOneDirectSuggestionThenCorrectNumberOfListItemsReturned() {
         val suggestions = buildSuggestions(1)
-        val list = testee.build(suggestions, emptyList(), allowBreakageReporting = false)
+        val list = testee.build(emptyList(), suggestions, emptyList(), allowBreakageReporting = false)
         assertEquals(NUM_SUGGESTION_HEADERS + NUM_DIVIDERS + suggestions.size, list.size)
     }
 
     @Test
     fun whenTwoDirectSuggestionsThenCorrectNumberOfListItemsReturned() {
         val suggestions = buildSuggestions(2)
-        val list = testee.build(suggestions, emptyList(), allowBreakageReporting = false)
+        val list = testee.build(emptyList(), suggestions, emptyList(), allowBreakageReporting = false)
         assertEquals(NUM_SUGGESTION_HEADERS + NUM_DIVIDERS + suggestions.size, list.size)
     }
 
     @Test
     fun whenTenDirectSuggestionsThenThirteenListItemsReturned() {
         val suggestions = buildSuggestions(10)
-        val list = testee.build(suggestions, emptyList(), allowBreakageReporting = false)
+        val list = testee.build(emptyList(), suggestions, emptyList(), allowBreakageReporting = false)
         assertEquals(NUM_SUGGESTION_HEADERS + NUM_DIVIDERS + suggestions.size, list.size)
     }
 
     @Test
     fun whenDirectSuggestionAddedThenGroupNameIsCorrect() {
         val suggestions = buildSuggestions(1)
-        val heading = testee.build(suggestions, emptyList(), allowBreakageReporting = false).first()
+        val heading = testee.build(emptyList(), suggestions, emptyList(), allowBreakageReporting = false).first()
         assertTrue(heading is ListItem.GroupHeading)
     }
 
     @Test
     fun whenNoDirectSuggestionsButOneShareableThenCorrectNumberOfListItemsReturned() {
         val suggestions = buildSuggestions(1)
-        val list = testee.build(emptyList(), suggestions, allowBreakageReporting = false)
+        val list = testee.build(emptyList(), emptyList(), suggestions, allowBreakageReporting = false)
         assertEquals(NUM_SUGGESTION_HEADERS + NUM_DIVIDERS + suggestions.size, list.size)
     }
 
     @Test
     fun whenNoDirectSuggestionsButMultipleShareableThenCorrectNumberOfListItemsReturned() {
         val suggestions = buildSuggestions(10)
-        val list = testee.build(emptyList(), suggestions, allowBreakageReporting = false)
+        val list = testee.build(emptyList(), emptyList(), suggestions, allowBreakageReporting = false)
         assertEquals(NUM_SUGGESTION_HEADERS + NUM_DIVIDERS + suggestions.size, list.size)
     }
 
@@ -102,7 +102,7 @@ class SuggestionListBuilderTest {
     fun whenOneDirectAndOneShareableThenDirectSuggestionsAppearFirst() {
         val directSuggestions = buildSuggestions(1)
         val sharableSuggestions = buildSuggestions(1, startingIndex = directSuggestions.size)
-        val list = testee.build(directSuggestions, sharableSuggestions, allowBreakageReporting = false)
+        val list = testee.build(emptyList(), directSuggestions, sharableSuggestions, allowBreakageReporting = false)
         assertEquals(NUM_SUGGESTION_HEADERS + NUM_DIVIDERS + directSuggestions.size + sharableSuggestions.size, list.size)
         assertTrue(list[0] is ListItem.GroupHeading)
         assertEquals(0L, (list[1] as SuggestedCredential).credentials.id)
@@ -113,7 +113,7 @@ class SuggestionListBuilderTest {
     fun whenMultipleDirectAndSomeShareableThenDirectSuggestionsAppearFirst() {
         val directSuggestions = buildSuggestions(10, isShareable = false)
         val sharableSuggestions = buildSuggestions(1, isShareable = true, startingIndex = directSuggestions.size)
-        val list = testee.build(directSuggestions, sharableSuggestions, allowBreakageReporting = false)
+        val list = testee.build(emptyList(), directSuggestions, sharableSuggestions, allowBreakageReporting = false)
         assertEquals(NUM_SUGGESTION_HEADERS + NUM_DIVIDERS + directSuggestions.size + sharableSuggestions.size, list.size)
         assertTrue(list[0] is ListItem.GroupHeading)
         assertEquals("direct", (list[1] as SuggestedCredential).credentials.username)

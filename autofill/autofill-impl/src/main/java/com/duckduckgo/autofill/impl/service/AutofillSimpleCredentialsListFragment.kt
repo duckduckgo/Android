@@ -231,7 +231,12 @@ class AutofillSimpleCredentialsListFragment : DuckDuckGoFragment(R.layout.fragme
             logcat(INFO) { "DDGAutofillService showSuggestionsFor: $showSuggestionsFor" }
             val directSuggestions = suggestionMatcher.getDirectSuggestions(showSuggestionsFor, credentials)
             val shareableCredentials = suggestionMatcher.getShareableSuggestions(showSuggestionsFor)
-            val directSuggestionsListItems = suggestionListBuilder.build(directSuggestions, shareableCredentials, allowBreakageReporting = false)
+            val directSuggestionsListItems = suggestionListBuilder.build(
+                listOf(),
+                directSuggestions,
+                shareableCredentials,
+                allowBreakageReporting = false,
+            )
             val groupedCredentials = credentialGrouper.group(credentials)
 
             withContext(dispatchers.main()) {
