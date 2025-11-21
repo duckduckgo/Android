@@ -84,7 +84,7 @@
     <string name="subscriptionSettingSectionHelpAndSupport">Βοήθεια και υποστήριξη</string>
     <string name="subscriptionSettingSendFeedback">Αποστολή σχολίου</string>
     <string name="subscriptionSettingActivating">Ενεργοποίηση</string>
-    <string name="subscriptionSettingSwitchUpgradeDynamic" instruction="%1$s is the savings percentage when switching from monthly to yearly (e.g. 16)">Αλλάξτε σε ετήσιο και εξοικονομήστε %1$s%%</string>
+    <string name="subscriptionSettingSwitchUpgradeDynamic" instruction="%1$s is the savings percentage when switching from monthly to yearly (e.g. 16)">Εξοικονομήστε %1$s%% με ένα ετήσιο πρόγραμμα</string>
     <!-- smartling.character_limit = 10 -->
     <string name="subscriptionSettingSwitchUpgradePill">Καλύτερη προσφορά</string>
     <string name="subscriptionSettingSwitchDowngrade">Αλλαγή προγράμματος</string>
