@@ -16,9 +16,7 @@
 
 package com.duckduckgo.duckchat.impl.messaging
 
-import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.common.utils.AppUrl
-import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.contentscopescripts.api.ContentScopeJsMessageHandlersPlugin
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.api.DuckChat
@@ -27,10 +25,7 @@ import com.duckduckgo.js.messaging.api.JsMessage
 import com.duckduckgo.js.messaging.api.JsMessageCallback
 import com.duckduckgo.js.messaging.api.JsMessageHandler
 import com.duckduckgo.js.messaging.api.JsMessaging
-import com.duckduckgo.settings.api.SerpSettingsFeature
 import com.squareup.anvil.annotations.ContributesMultibinding
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.launch
 import logcat.logcat
 import org.json.JSONObject
 import javax.inject.Inject
@@ -43,9 +38,6 @@ import javax.inject.Inject
  */
 @ContributesMultibinding(AppScope::class)
 class IsNativeDuckAiEnabledHandler @Inject constructor(
-    private val dispatcherProvider: DispatcherProvider,
-    @AppCoroutineScope private val appScope: CoroutineScope,
-    private val serpSettingsFeature: SerpSettingsFeature,
     private val duckChat: DuckChat,
 ) : ContentScopeJsMessageHandlersPlugin {
 
@@ -56,24 +48,20 @@ class IsNativeDuckAiEnabledHandler @Inject constructor(
                 jsMessaging: JsMessaging,
                 jsMessageCallback: JsMessageCallback?,
             ) {
-                appScope.launch(dispatcherProvider.main()) {
-                    if (serpSettingsFeature.storeSerpSettings().isEnabled()) {
-                        logcat { "SERP-SETTINGS: IsNativeDuckAiEnabledHandler processing message" }
-                        val response = JSONObject().apply {
-                            put("enabled", duckChat.isEnabled())
-                        }
+                logcat { "SERP-SETTINGS: IsNativeDuckAiEnabledHandler processing message" }
+                val response = JSONObject().apply {
+                    put("enabled", duckChat.isEnabled())
+                }
 
-                        jsMessage.id?.let { id ->
-                            jsMessaging.onResponse(
-                                JsCallbackData(
-                                    params = response,
-                                    featureName = jsMessage.featureName,
-                                    method = jsMessage.method,
-                                    id = id,
-                                ),
-                            )
-                        }
-                    }
+                jsMessage.id?.let { id ->
+                    jsMessaging.onResponse(
+                        JsCallbackData(
+                            params = response,
+                            featureName = jsMessage.featureName,
+                            method = jsMessage.method,
+                            id = id,
+                        ),
+                    )
                 }
             }
 
