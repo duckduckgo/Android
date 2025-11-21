@@ -24,19 +24,15 @@ import com.duckduckgo.app.launch.LaunchViewModel.Command.Home
 import com.duckduckgo.app.launch.LaunchViewModel.Command.Onboarding
 import com.duckduckgo.app.onboarding.store.AppStage
 import com.duckduckgo.app.onboarding.store.UserStageStore
-import com.duckduckgo.app.onboardingdesignexperiment.OnboardingDesignExperimentManager
 import com.duckduckgo.app.referral.StubAppReferrerFoundStateListener
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.daxprompts.api.DaxPrompts
 import com.duckduckgo.daxprompts.api.DaxPrompts.ActionType
-import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.test.runTest
 import org.junit.After
-import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.any
-import org.mockito.kotlin.doSuspendableAnswer
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
@@ -54,14 +50,8 @@ class LaunchViewModelTest {
     private val mockCommandObserver: Observer<LaunchViewModel.Command> = mock()
     private val mockDaxPrompts: DaxPrompts = mock()
     private val mockAppInstallStore: AppInstallStore = mock()
-    private val mockOnboardingExperiment: OnboardingDesignExperimentManager = mock()
 
     private lateinit var testee: LaunchViewModel
-
-    @Before
-    fun before() = runTest {
-        whenever(mockOnboardingExperiment.isWaitForLocalPrivacyConfigEnabled()).thenReturn(false)
-    }
 
     @After
     fun after() {
@@ -177,85 +167,5 @@ class LaunchViewModelTest {
         testee.command.observeForever(mockCommandObserver)
         testee.determineViewToShow()
         verify(mockCommandObserver).onChanged(any<DaxPromptBrowserComparison>())
-    }
-
-    @Test
-    fun whenOnboardingShouldShowAndPrivacyConfigIsEnabledThenCommandIsOnboarding() = runTest {
-        whenever(mockOnboardingExperiment.isWaitForLocalPrivacyConfigEnabled()).thenReturn(true)
-        testee = LaunchViewModel(
-            userStageStore,
-            StubAppReferrerFoundStateListener("xx"),
-            mockDaxPrompts,
-            mockAppInstallStore,
-        )
-        whenever(mockDaxPrompts.evaluate()).thenReturn(ActionType.NONE)
-        whenever(userStageStore.getUserAppStage()).thenReturn(AppStage.NEW)
-        testee.command.observeForever(mockCommandObserver)
-
-        testee.determineViewToShow()
-
-        verify(mockOnboardingExperiment).waitForPrivacyConfig()
-        verify(mockCommandObserver).onChanged(any<Onboarding>())
-    }
-
-    @Test
-    fun whenOnboardingShouldNotShowAndPrivacyConfigIsEnabledThenCommandIsHome() = runTest {
-        whenever(mockOnboardingExperiment.isWaitForLocalPrivacyConfigEnabled()).thenReturn(true)
-        testee = LaunchViewModel(
-            userStageStore,
-            StubAppReferrerFoundStateListener("xx"),
-            mockDaxPrompts,
-            mockAppInstallStore,
-        )
-        whenever(mockDaxPrompts.evaluate()).thenReturn(ActionType.NONE)
-        whenever(userStageStore.getUserAppStage()).thenReturn(AppStage.DAX_ONBOARDING)
-        testee.command.observeForever(mockCommandObserver)
-
-        testee.determineViewToShow()
-
-        verify(mockOnboardingExperiment).waitForPrivacyConfig()
-        verify(mockCommandObserver).onChanged(any<Home>())
-    }
-
-    @Test
-    fun whenOnboardingExperimentIsEnabledAndOnboardingShouldShowAndReferrerTimesOutThenCommandIsOnboarding() = runTest {
-        whenever(mockOnboardingExperiment.isWaitForLocalPrivacyConfigEnabled()).thenReturn(true)
-
-        testee = LaunchViewModel(
-            userStageStore,
-            StubAppReferrerFoundStateListener("xx", mockDelayMs = Long.MAX_VALUE),
-            mockDaxPrompts,
-            mockAppInstallStore,
-        )
-        whenever(mockDaxPrompts.evaluate()).thenReturn(ActionType.NONE)
-        whenever(userStageStore.getUserAppStage()).thenReturn(AppStage.NEW)
-        testee.command.observeForever(mockCommandObserver)
-
-        testee.determineViewToShow()
-
-        verify(mockOnboardingExperiment).waitForPrivacyConfig()
-        verify(mockCommandObserver).onChanged(any<Onboarding>())
-    }
-
-    @Test
-    fun whenOnboardingExperimentIsEnabledAndOnboardingShouldShowAndWaitForPrivacyConfigTimesOutThenCommandIsOnboarding() = runTest {
-        whenever(mockOnboardingExperiment.isWaitForLocalPrivacyConfigEnabled()).thenReturn(true)
-        whenever(mockOnboardingExperiment.waitForPrivacyConfig()).doSuspendableAnswer {
-            CompletableDeferred<Boolean>().await()
-        }
-
-        testee = LaunchViewModel(
-            userStageStore,
-            StubAppReferrerFoundStateListener("xx"),
-            mockDaxPrompts,
-            mockAppInstallStore,
-        )
-        whenever(mockDaxPrompts.evaluate()).thenReturn(ActionType.NONE)
-        whenever(userStageStore.getUserAppStage()).thenReturn(AppStage.NEW)
-        testee.command.observeForever(mockCommandObserver)
-
-        testee.determineViewToShow()
-
-        verify(mockCommandObserver).onChanged(any<Onboarding>())
     }
 }
