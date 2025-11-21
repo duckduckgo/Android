@@ -153,7 +153,7 @@ class SearchAndFavoritesWidget : AppWidgetProvider() {
         logcat(INFO) { "SearchAndFavoritesWidget theme for $appWidgetId is $widgetTheme" }
 
         val (columns, rows) = getCurrentWidgetSize(context, appWidgetManager.getAppWidgetOptions(appWidgetId), newOptions)
-        layoutId = getLayoutThemed(columns, widgetTheme)
+        layoutId = getLayoutThemed(widgetTheme)
 
         withContext(dispatchers.io()) {
             widgetPrefs.storeWidgetSize(appWidgetId, columns, rows)
@@ -177,41 +177,12 @@ class SearchAndFavoritesWidget : AppWidgetProvider() {
     }
 
     private fun getLayoutThemed(
-        numColumns: Int,
         theme: WidgetTheme,
     ): Int {
-        // numcolumns method is not available for remoteViews. We rely on different xml to use different values on that attribute
         return when (theme) {
-            WidgetTheme.LIGHT -> {
-                when (numColumns) {
-                    2 -> R.layout.search_favorites_widget_light_col2
-                    3 -> R.layout.search_favorites_widget_light_col3
-                    4 -> R.layout.search_favorites_widget_light_col4
-                    5 -> R.layout.search_favorites_widget_light_col5
-                    6 -> R.layout.search_favorites_widget_light_col6
-                    else -> R.layout.search_favorites_widget_light_auto
-                }
-            }
-            WidgetTheme.DARK -> {
-                when (numColumns) {
-                    2 -> R.layout.search_favorites_widget_dark_col2
-                    3 -> R.layout.search_favorites_widget_dark_col3
-                    4 -> R.layout.search_favorites_widget_dark_col4
-                    5 -> R.layout.search_favorites_widget_dark_col5
-                    6 -> R.layout.search_favorites_widget_dark_col6
-                    else -> R.layout.search_favorites_widget_dark_auto
-                }
-            }
-            WidgetTheme.SYSTEM_DEFAULT -> {
-                when (numColumns) {
-                    2 -> R.layout.search_favorites_widget_daynight_col2
-                    3 -> R.layout.search_favorites_widget_daynight_col3
-                    4 -> R.layout.search_favorites_widget_daynight_col4
-                    5 -> R.layout.search_favorites_widget_daynight_col5
-                    6 -> R.layout.search_favorites_widget_daynight_col6
-                    else -> R.layout.search_favorites_widget_daynight_auto
-                }
-            }
+            WidgetTheme.LIGHT -> R.layout.search_favorites_widget_light_auto
+            WidgetTheme.DARK -> R.layout.search_favorites_widget_dark_auto
+            WidgetTheme.SYSTEM_DEFAULT -> R.layout.search_favorites_widget_daynight_auto
         }
     }
 
