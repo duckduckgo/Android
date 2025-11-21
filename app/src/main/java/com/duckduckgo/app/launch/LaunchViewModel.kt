@@ -42,9 +42,7 @@ class LaunchViewModel @Inject constructor(
     private val appReferrerStateListener: AppInstallationReferrerStateListener,
     private val daxPrompts: DaxPrompts,
     private val appInstallStore: AppInstallStore,
-    private val onboardingDesignExperimentManager: OnboardingDesignExperimentManager,
-) :
-    ViewModel() {
+) : ViewModel() {
 
     val command: SingleLiveEvent<Command> = SingleLiveEvent()
 
@@ -56,19 +54,7 @@ class LaunchViewModel @Inject constructor(
     }
 
     suspend fun determineViewToShow() {
-        if (onboardingDesignExperimentManager.isWaitForLocalPrivacyConfigEnabled()) {
-            withTimeoutOrNull(MAX_REFERRER_WAIT_TIME_MS) {
-                val referrerJob = async {
-                    waitForReferrerData()
-                }
-                val configJob = async {
-                    onboardingDesignExperimentManager.waitForPrivacyConfig()
-                }
-                awaitAll(referrerJob, configJob)
-            }
-        } else {
-            waitForReferrerData()
-        }
+        waitForReferrerData()
 
         when (daxPrompts.evaluate()) {
             NONE, TOO_SOON_TO_SHOW_OTHER_PROMPTS -> {
