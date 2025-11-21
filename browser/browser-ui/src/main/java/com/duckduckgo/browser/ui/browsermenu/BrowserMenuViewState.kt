@@ -62,7 +62,6 @@ sealed class BrowserMenuViewState {
         val canPrintPage: Boolean = false,
         val canReportSite: Boolean = false,
         val showAutofill: Boolean = false,
-        val canFindInPage: Boolean = true,
     ) : BrowserMenuViewState()
 }
 

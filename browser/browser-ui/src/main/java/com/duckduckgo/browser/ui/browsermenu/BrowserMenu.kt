@@ -470,9 +470,12 @@ class BrowserMenu(
 
         brokenSiteMenuItem.isVisible = viewState.canReportSite
         printPageMenuItem.isVisible = viewState.canPrintPage
+        autofillMenuItem.isVisible = viewState.showAutofill
+
         duckChatHistoryMenuItem.isVisible = true
         duckChatSettingsMenuItem.isVisible = true
         duckNewChatMenuItem.isVisible = true
+
     }
 
     private fun getVpnMenuViews() =
