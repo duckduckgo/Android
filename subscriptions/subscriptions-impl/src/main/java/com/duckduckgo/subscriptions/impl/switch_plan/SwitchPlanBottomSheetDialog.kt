@@ -35,6 +35,7 @@ import com.duckduckgo.subscriptions.impl.SubscriptionsManager
 import com.duckduckgo.subscriptions.impl.billing.SubscriptionReplacementMode
 import com.duckduckgo.subscriptions.impl.databinding.BottomSheetSwitchPlanBinding
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.SwitchPlanType
+import com.duckduckgo.subscriptions.impl.wideevents.SubscriptionSwitchWideEvent
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.shape.CornerFamily
@@ -54,6 +55,7 @@ class SwitchPlanBottomSheetDialog @AssistedInject constructor(
     @Assisted private val onSwitchSuccess: () -> Unit,
     private val subscriptionsManager: SubscriptionsManager,
     private val dispatcherProvider: DispatcherProvider,
+    private val subscriptionSwitchWideEvent: SubscriptionSwitchWideEvent,
 ) : BottomSheetDialog(context) {
 
     private val binding: BottomSheetSwitchPlanBinding = BottomSheetSwitchPlanBinding.inflate(LayoutInflater.from(context))
@@ -89,6 +91,11 @@ class SwitchPlanBottomSheetDialog @AssistedInject constructor(
 
     override fun onAttachedToWindow() {
         super.onAttachedToWindow()
+
+        // Track that user confirmation dialog was shown
+        lifecycleOwner.lifecycleScope.launch(dispatcherProvider.io()) {
+            subscriptionSwitchWideEvent.onUserConfirmationShown()
+        }
 
         configureViews()
         observePurchaseState()
@@ -127,6 +134,10 @@ class SwitchPlanBottomSheetDialog @AssistedInject constructor(
                             dismiss()
                         }
                         binding.switchBottomSheetDialogSecondaryButton.setOnClickListener {
+                            // User cancelled the switch by keeping monthly plan
+                            lifecycleOwner.lifecycleScope.launch(dispatcherProvider.io()) {
+                                subscriptionSwitchWideEvent.onUserCancelled()
+                            }
                             dismiss()
                         }
                     }
@@ -149,6 +160,10 @@ class SwitchPlanBottomSheetDialog @AssistedInject constructor(
                         )
 
                         binding.switchBottomSheetDialogPrimaryButton.setOnClickListener {
+                            // User cancelled the switch by keeping yearly plan
+                            lifecycleOwner.lifecycleScope.launch(dispatcherProvider.io()) {
+                                subscriptionSwitchWideEvent.onUserCancelled()
+                            }
                             dismiss()
                         }
                         binding.switchBottomSheetDialogSecondaryButton.setOnClickListener {
@@ -167,6 +182,9 @@ class SwitchPlanBottomSheetDialog @AssistedInject constructor(
                 when (it) {
                     is CurrentPurchase.Success -> {
                         logcat { "Switch flow: Successfully switched plans" }
+                        lifecycleOwner.lifecycleScope.launch(dispatcherProvider.io()) {
+                            subscriptionSwitchWideEvent.onUIRefreshed()
+                        }
                         onSwitchSuccess.invoke()
                     }
 
