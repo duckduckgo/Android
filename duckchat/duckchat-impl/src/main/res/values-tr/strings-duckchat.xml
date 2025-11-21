@@ -78,4 +78,14 @@
     <string name="newAddressBarOptionBottomSheetDialogSearchOnly">Yalnızca Arama</string>
     <string name="newAddressBarOptionBottomSheetDialogSearchAndDuckAi">Arama ve Duck.ai</string>
     <string name="newAddressBarOptionBottomSheetDialogHeader">Adres çubuğu seçeneği</string>
+
+    <!-- Duck AI SERP Settings Title -->
+    <string name="duckAiSerpSettingsTitle">AI Özellikleri</string>
+
+    <!-- Duck AI Search Section Header -->
+    <string name="duckAiSearchSettingsSectionHeader">Arama yap</string>
+
+    <!-- Duck AI Hide Generated Images Settings Option -->
+    <string name="duckAiHideAiGeneratedImagesTitle">Yapay Zeka Tarafından Oluşturulan Görselleri Gizle</string>
+    <string name="duckAiHideAiGeneratedImagesDescription">Görsel arama sonuçlarından yapay zeka tarafından üretilmiş görselleri filtreler</string>
 </resources>

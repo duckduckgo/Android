@@ -78,4 +78,14 @@
     <string name="newAddressBarOptionBottomSheetDialogSearchOnly">Pesquisar apenas</string>
     <string name="newAddressBarOptionBottomSheetDialogSearchAndDuckAi">Pesquisa e Duck.ai</string>
     <string name="newAddressBarOptionBottomSheetDialogHeader">Opção da barra de endereço</string>
+
+    <!-- Duck AI SERP Settings Title -->
+    <string name="duckAiSerpSettingsTitle">Funcionalidades de IA</string>
+
+    <!-- Duck AI Search Section Header -->
+    <string name="duckAiSearchSettingsSectionHeader">Pesquisar</string>
+
+    <!-- Duck AI Hide Generated Images Settings Option -->
+    <string name="duckAiHideAiGeneratedImagesTitle">Ocultar Imagens Geradas por IA</string>
+    <string name="duckAiHideAiGeneratedImagesDescription">Filtra imagens geradas por IA dos resultados de pesquisa de imagens</string>
 </resources>

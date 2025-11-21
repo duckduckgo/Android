@@ -78,4 +78,14 @@
     <string name="newAddressBarOptionBottomSheetDialogSearchOnly">Alleen zoeken</string>
     <string name="newAddressBarOptionBottomSheetDialogSearchAndDuckAi">Zoeken en Duck.ai</string>
     <string name="newAddressBarOptionBottomSheetDialogHeader">Optie voor adresbalk</string>
+
+    <!-- Duck AI SERP Settings Title -->
+    <string name="duckAiSerpSettingsTitle">AI-functies</string>
+
+    <!-- Duck AI Search Section Header -->
+    <string name="duckAiSearchSettingsSectionHeader">Zoeken</string>
+
+    <!-- Duck AI Hide Generated Images Settings Option -->
+    <string name="duckAiHideAiGeneratedImagesTitle">Verberg AI-gegenereerde afbeeldingen.</string>
+    <string name="duckAiHideAiGeneratedImagesDescription">Filtert AI-gegenereerde afbeeldingen uit de zoekresultaten van afbeeldingen.</string>
 </resources>

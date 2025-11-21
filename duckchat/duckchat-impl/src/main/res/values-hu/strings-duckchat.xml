@@ -78,4 +78,14 @@
     <string name="newAddressBarOptionBottomSheetDialogSearchOnly">Csak keresés</string>
     <string name="newAddressBarOptionBottomSheetDialogSearchAndDuckAi">Keresés és Duck.ai</string>
     <string name="newAddressBarOptionBottomSheetDialogHeader">Címsorbeállítás</string>
+
+    <!-- Duck AI SERP Settings Title -->
+    <string name="duckAiSerpSettingsTitle">AI funkciók</string>
+
+    <!-- Duck AI Search Section Header -->
+    <string name="duckAiSearchSettingsSectionHeader">Keresés</string>
+
+    <!-- Duck AI Hide Generated Images Settings Option -->
+    <string name="duckAiHideAiGeneratedImagesTitle">AI által generált képek elrejtése</string>
+    <string name="duckAiHideAiGeneratedImagesDescription">Kiszűri az AI által generált képeket a képkeresési találatokból</string>
 </resources>
