@@ -31,9 +31,9 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 
 @RunWith(AndroidJUnit4::class)
-class PirWebSetBirthYearForCurrentUserProfileTest {
+class PirWebSetBirthYearForCurrentUserProfileMessageHandlerTest {
 
-    private lateinit var testee: PirWebSetBirthYearForCurrentUserProfile
+    private lateinit var testee: PirWebSetBirthYearForCurrentUserProfileMessageHandler
 
     private val mockPirWebProfileStateHolder: PirWebProfileStateHolder = mock()
     private val mockJsMessaging: JsMessaging = mock()
@@ -41,7 +41,7 @@ class PirWebSetBirthYearForCurrentUserProfileTest {
 
     @Before
     fun setUp() {
-        testee = PirWebSetBirthYearForCurrentUserProfile(
+        testee = PirWebSetBirthYearForCurrentUserProfileMessageHandler(
             pirWebProfileStateHolder = mockPirWebProfileStateHolder,
         )
     }
