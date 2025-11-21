@@ -475,7 +475,6 @@ class BrowserMenu(
         duckChatHistoryMenuItem.isVisible = true
         duckChatSettingsMenuItem.isVisible = true
         duckNewChatMenuItem.isVisible = true
-
     }
 
     private fun getVpnMenuViews() =
