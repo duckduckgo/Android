@@ -23,7 +23,6 @@ import com.duckduckgo.app.browser.newaddressbaroption.RealNewAddressBarOptionMan
 import com.duckduckgo.app.onboarding.store.AppStage
 import com.duckduckgo.app.onboarding.store.UserStageStore
 import com.duckduckgo.app.onboarding.ui.page.OnboardingPageFragment
-import com.duckduckgo.app.onboardingdesignexperiment.OnboardingDesignExperimentManager
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
@@ -39,27 +38,14 @@ class OnboardingViewModel @Inject constructor(
     private val dispatchers: DispatcherProvider,
     private val onboardingSkipper: OnboardingSkipper,
     private val appBuildConfig: AppBuildConfig,
-    private val onboardingDesignExperimentManager: OnboardingDesignExperimentManager,
     private val newAddressBarOptionManager: RealNewAddressBarOptionManager,
 ) : ViewModel() {
 
     private val _viewState = MutableStateFlow(ViewState())
     val viewState = _viewState.asStateFlow()
 
-    suspend fun initializePages() {
-        onboardingDesignExperimentManager.enroll()
-
-        when {
-            onboardingDesignExperimentManager.isBbEnrolledAndEnabled() -> {
-                pageLayoutManager.buildPageBlueprintsBb()
-            }
-            onboardingDesignExperimentManager.isBuckEnrolledAndEnabled() -> {
-                pageLayoutManager.buildPageBlueprintsBuck()
-            }
-            else -> {
-                pageLayoutManager.buildPageBlueprints()
-            }
-        }
+    fun initializePages() {
+        pageLayoutManager.buildPageBlueprints()
     }
 
     fun pageCount(): Int {
