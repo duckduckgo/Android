@@ -84,7 +84,7 @@
     <string name="subscriptionSettingSectionHelpAndSupport">Помощ и поддръжка</string>
     <string name="subscriptionSettingSendFeedback">Изпратете отзив</string>
     <string name="subscriptionSettingActivating">Активиране</string>
-    <string name="subscriptionSettingSwitchUpgradeDynamic" instruction="%1$s is the savings percentage when switching from monthly to yearly (e.g. 16)">Превключи на годишен план и спести %1$s%%</string>
+    <string name="subscriptionSettingSwitchUpgradeDynamic" instruction="%1$s is the savings percentage when switching from monthly to yearly (e.g. 16)">Спести %1$s%% с годишен план!</string>
     <!-- smartling.character_limit = 10 -->
     <string name="subscriptionSettingSwitchUpgradePill">Най-изгодно</string>
     <string name="subscriptionSettingSwitchDowngrade">Смяна на плана</string>
