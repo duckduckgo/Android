@@ -262,21 +262,21 @@
         ]
     },
     "dbp_engagement_dau": {
-        "description": "Pixel for PIR engagement tracking - daily active users.",
+        "description": "Pixel for PIR daily active users.",
         "owners": ["karlenDimla", "landomen"],
         "triggers": ["other"],
         "suffixes": ["form_factor"],
         "parameters": ["appVersion"]
     },
     "dbp_engagement_wau": {
-        "description": "Pixel for PIR engagement tracking - weekly active users.",
+        "description": "Pixel for PIR weekly active users.",
         "owners": ["karlenDimla", "landomen"],
         "triggers": ["other"],
         "suffixes": ["form_factor"],
         "parameters": ["appVersion"]
     },
     "dbp_engagement_mau": {
-        "description": "Pixel for PIR engagement tracking - monthly active users.",
+        "description": "Pixel for PIR monthly active users.",
         "owners": ["karlenDimla", "landomen"],
         "triggers": ["other"],
         "suffixes": ["form_factor"],
