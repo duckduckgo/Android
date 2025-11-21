@@ -261,7 +261,7 @@ interface PrivacyProFeature {
     @Toggle.DefaultValue(defaultValue = DefaultFeatureValue.INTERNAL)
     fun supportsSwitchSubscription(): Toggle
 
-    @Toggle.DefaultValue(defaultValue = DefaultFeatureValue.INTERNAL)
+    @Toggle.DefaultValue(defaultValue = DefaultFeatureValue.FALSE)
     fun blackFridayOffer2025(): Toggle
 }
 
