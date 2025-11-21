@@ -4493,7 +4493,7 @@ class BrowserTabViewModel @Inject constructor(
 
         if (duckAiFeatureState.showFullScreenMode.value) {
             val url = duckChat.getDuckChatUrl("", false)
-            onUserSubmittedQuery(url)
+            command.value = OpenInNewTab(url, tabId)
         } else {
             duckChat.openDuckChat()
         }

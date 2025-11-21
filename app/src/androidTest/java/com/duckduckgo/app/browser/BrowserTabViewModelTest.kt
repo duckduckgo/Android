@@ -6359,7 +6359,8 @@ class BrowserTabViewModelTest {
 
             verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
 
-            assertTrue(commandCaptor.lastValue is Navigate)
+            val command = commandCaptor.lastValue as Command.OpenInNewTab
+            assertTrue(command.query == duckChatURL)
 
             verify(mockDuckChat, never()).openDuckChat()
         }
