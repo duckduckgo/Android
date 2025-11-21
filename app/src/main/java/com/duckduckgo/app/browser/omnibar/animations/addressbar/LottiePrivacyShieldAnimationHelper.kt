@@ -19,6 +19,7 @@ package com.duckduckgo.app.browser.omnibar.animations.addressbar
 import com.airbnb.lottie.LottieAnimationView
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.animations.AddressBarTrackersAnimationFeatureToggle
+import com.duckduckgo.app.browser.api.OmnibarRepository
 import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode
 import com.duckduckgo.app.global.model.PrivacyShield
 import com.duckduckgo.app.global.model.PrivacyShield.MALICIOUS
@@ -37,6 +38,7 @@ import javax.inject.Inject
 class LottiePrivacyShieldAnimationHelper @Inject constructor(
     private val appTheme: AppTheme,
     private val addressBarTrackersAnimationFeatureToggle: AddressBarTrackersAnimationFeatureToggle,
+    private val omnibarRepository: OmnibarRepository,
 ) : PrivacyShieldAnimationHelper {
 
     override fun setAnimationView(
@@ -46,7 +48,7 @@ class LottiePrivacyShieldAnimationHelper @Inject constructor(
     ) {
         val protectedShield: Int
         val protectedShieldDark: Int
-        if (viewMode is ViewMode.CustomTab) {
+        if (viewMode is ViewMode.CustomTab && !omnibarRepository.isNewCustomTabAvailable) {
             protectedShield = R.raw.protected_shield_custom_tab
             protectedShieldDark = R.raw.dark_protected_shield_custom_tab
         } else {

@@ -39,6 +39,7 @@ import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.appcompat.widget.Toolbar
 import androidx.coordinatorlayout.widget.CoordinatorLayout
+import androidx.core.graphics.ColorUtils
 import androidx.core.graphics.drawable.toDrawable
 import androidx.core.transition.doOnEnd
 import androidx.core.view.doOnLayout
@@ -60,8 +61,10 @@ import com.duckduckgo.app.browser.PulseAnimation
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.SmoothProgressAnimator
 import com.duckduckgo.app.browser.animations.AddressBarTrackersAnimationFeatureToggle
+import com.duckduckgo.app.browser.api.OmnibarRepository
 import com.duckduckgo.app.browser.databinding.IncludeCustomTabToolbarBinding
 import com.duckduckgo.app.browser.databinding.IncludeFindInPageBinding
+import com.duckduckgo.app.browser.databinding.IncludeNewCustomTabToolbarBinding
 import com.duckduckgo.app.browser.omnibar.Omnibar.InputScreenLaunchListener
 import com.duckduckgo.app.browser.omnibar.Omnibar.ItemPressedListener
 import com.duckduckgo.app.browser.omnibar.Omnibar.LogoClickListener
@@ -123,8 +126,6 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import logcat.logcat
 import javax.inject.Inject
-import kotlin.collections.isNotEmpty
-import kotlin.jvm.java
 import com.duckduckgo.app.global.model.PrivacyShield as PrivacyShieldState
 import com.duckduckgo.mobile.android.R as CommonR
 
@@ -190,6 +191,9 @@ class OmnibarLayout @JvmOverloads constructor(
 
     @Inject
     lateinit var settingsDataStore: SettingsDataStore
+
+    @Inject
+    lateinit var omnibarRepository: OmnibarRepository
 
     private var previousTransitionState: TransitionState? = null
 
@@ -284,6 +288,11 @@ class OmnibarLayout @JvmOverloads constructor(
             findViewById(R.id.customTabToolbarContainer),
         )
     }
+    internal val newCustomTabToolbarContainer by lazy {
+        IncludeNewCustomTabToolbarBinding.bind(
+            findViewById(R.id.newCustomTabToolbarContainer),
+        )
+    }
     internal val browserMenuImageView: ImageView by lazy { findViewById(R.id.browserMenuImageView) }
     override val shieldIcon: LottieAnimationView by lazy { findViewById(R.id.shieldIcon) }
     internal val addressBarTrackersBlockedAnimationShieldIcon: LottieAnimationView by lazy {
@@ -330,9 +339,19 @@ class OmnibarLayout @JvmOverloads constructor(
             searchIcon,
         )
 
+    internal fun customTabViews(): List<View> =
+        listOf(
+            newCustomTabToolbarContainer.customTabDomain,
+        )
+
     internal fun shieldViews(): List<View> =
         listOf(
             shieldIcon,
+        )
+
+    internal fun customTabShieldViews(): List<View> =
+        listOf(
+            newCustomTabToolbarContainer.customTabShieldIcon,
         )
 
     override var isScrollingEnabled: Boolean
@@ -678,7 +697,7 @@ class OmnibarLayout @JvmOverloads constructor(
             }
 
             is StartTrackersAnimation -> {
-                startTrackersAnimation(command.entities)
+                startTrackersAnimation(command.entities, command.isCustomTab)
             }
 
             is LaunchInputScreen -> {
@@ -997,25 +1016,47 @@ class OmnibarLayout @JvmOverloads constructor(
         }
     }
 
-    private fun startTrackersAnimation(events: List<Entity>?) {
-        if (addressBarTrackersAnimationFeatureToggle.feature().isEnabled()) {
-            animatorHelper.startAddressBarTrackersAnimation(
-                context = context,
-                addressBarTrackersBlockedAnimationShieldIcon = addressBarTrackersBlockedAnimationShieldIcon,
-                sceneRoot = sceneRoot,
-                animatedIconBackgroundView = animatedIconBackgroundView,
-                omnibarViews = omnibarViews(),
-                shieldViews = shieldViews(),
-                entities = events,
-            )
-        } else {
-            animatorHelper.startTrackersAnimation(
-                context = context,
-                shieldAnimationView = shieldIcon,
-                trackersAnimationView = trackersAnimation,
-                omnibarViews = omnibarViews(),
-                entities = events,
-            )
+    private fun startTrackersAnimation(events: List<Entity>?, isCustomTab: Boolean) {
+        if (!isCustomTab) {
+            if (addressBarTrackersAnimationFeatureToggle.feature().isEnabled()) {
+                animatorHelper.startAddressBarTrackersAnimation(
+                    context = context,
+                    addressBarTrackersBlockedAnimationShieldIcon = addressBarTrackersBlockedAnimationShieldIcon,
+                    sceneRoot = sceneRoot,
+                    animatedIconBackgroundView = animatedIconBackgroundView,
+                    omnibarViews = omnibarViews(),
+                    shieldViews = shieldViews(),
+                    entities = events,
+                )
+            } else {
+                animatorHelper.startTrackersAnimation(
+                    context = context,
+                    shieldAnimationView = shieldIcon,
+                    trackersAnimationView = trackersAnimation,
+                    omnibarViews = omnibarViews(),
+                    entities = events,
+                )
+            }
+        } else if (omnibarRepository.isNewCustomTabAvailable) {
+            if (addressBarTrackersAnimationFeatureToggle.feature().isEnabled()) {
+                animatorHelper.startAddressBarTrackersAnimation(
+                    context = context,
+                    addressBarTrackersBlockedAnimationShieldIcon = newCustomTabToolbarContainer.customTabShieldIcon,
+                    sceneRoot = sceneRoot,
+                    animatedIconBackgroundView = newCustomTabToolbarContainer.animatedIconBackgroundView,
+                    omnibarViews = customTabViews(),
+                    shieldViews = customTabShieldViews(),
+                    entities = events,
+                )
+            } else {
+                animatorHelper.startTrackersAnimation(
+                    context = context,
+                    shieldAnimationView = newCustomTabToolbarContainer.customTabShieldIcon,
+                    trackersAnimationView = newCustomTabToolbarContainer.trackersAnimation,
+                    omnibarViews = customTabViews(),
+                    entities = events,
+                )
+            }
         }
     }
 
@@ -1041,51 +1082,118 @@ class OmnibarLayout @JvmOverloads constructor(
     }
 
     private fun configureCustomTabOmnibar(customTab: ViewMode.CustomTab) {
-        if (!customTabToolbarContainer.customTabToolbar.isVisible) {
-            customTabToolbarContainer.customTabCloseIcon.setOnClickListener {
-                omnibarItemPressedListener?.onCustomTabClosePressed()
-            }
-
-            customTabToolbarContainer.customTabShieldIcon.setOnClickListener { _ ->
-                omnibarItemPressedListener?.onCustomTabPrivacyDashboardPressed()
-            }
-
+        if (omnibarRepository.isNewCustomTabAvailable) {
             omniBarContainer.hide()
+            with(newCustomTabToolbarContainer) {
+                if (!customTabToolbar.isVisible) {
+                    if (customTab.toolbarColor != 0) {
+                        toolbar.background = customTab.toolbarColor.toDrawable()
+                        toolbarContainer.background = customTab.toolbarColor.toDrawable()
 
-            toolbar.background = customTab.toolbarColor.toDrawable()
-            toolbarContainer.background = customTab.toolbarColor.toDrawable()
+                        browserMenu.isVisible = true
 
-            customTabToolbarContainer.customTabToolbar.show()
+                        val foregroundColor = calculateCustomTabForegroundColor(customTab.toolbarColor)
+                        val secondaryToolbarColor = customTab.toolbarColor.calculateAddressBarColor()
+                        customTabCloseIcon.setColorFilter(foregroundColor)
+                        customTabDomain.setTextColor(calculateCustomTabForegroundColor(secondaryToolbarColor))
+                        customToolbarContainer.setCardBackgroundColor(secondaryToolbarColor)
+                        browserMenuImageView.setColorFilter(foregroundColor)
+                    }
 
-            browserMenu.isVisible = true
+                    customTabToolbar.show()
 
-            val foregroundColor = calculateCustomTabBackgroundColor(customTab.toolbarColor)
-            customTabToolbarContainer.customTabCloseIcon.setColorFilter(foregroundColor)
-            customTabToolbarContainer.customTabDomain.setTextColor(foregroundColor)
-            customTabToolbarContainer.customTabDomainOnly.setTextColor(foregroundColor)
-            customTabToolbarContainer.customTabTitle.setTextColor(foregroundColor)
-            browserMenuImageView.setColorFilter(foregroundColor)
+                    customTabCloseIcon.setOnClickListener {
+                        omnibarItemPressedListener?.onCustomTabClosePressed()
+                    }
+
+                    customTabShieldIcon.setOnClickListener { _ ->
+                        omnibarItemPressedListener?.onCustomTabPrivacyDashboardPressed()
+                    }
+                }
+            }
+        } else {
+            with(customTabToolbarContainer) {
+                if (!customTabToolbar.isVisible) {
+                    customTabCloseIcon.setOnClickListener {
+                        omnibarItemPressedListener?.onCustomTabClosePressed()
+                    }
+
+                    customTabShieldIcon.setOnClickListener { _ ->
+                        omnibarItemPressedListener?.onCustomTabPrivacyDashboardPressed()
+                    }
+
+                    toolbar.background = customTab.toolbarColor.toDrawable()
+                    toolbarContainer.background = customTab.toolbarColor.toDrawable()
+
+                    omniBarContainer.hide()
+                    customTabToolbar.show()
+
+                    browserMenu.isVisible = true
+
+                    val foregroundColor = calculateCustomTabBackgroundColor(customTab.toolbarColor)
+                    customTabCloseIcon.setColorFilter(foregroundColor)
+                    customTabDomain.setTextColor(foregroundColor)
+                    customTabDomainOnly.setTextColor(foregroundColor)
+                    customTabTitle.setTextColor(foregroundColor)
+                    browserMenuImageView.setColorFilter(foregroundColor)
+                }
+            }
         }
+    }
+
+    private fun Int.calculateAddressBarColor(): Int {
+        // Create a lighter, muted version of the toolbar color for the address bar
+        val targetSaturation = 0.55f // 15% Saturation for muted, pastel tone
+        val targetLightness = 0.90f // Target lightness for consistently light appearance
+
+        // 1. Convert the main color to HSL
+        val hsl = floatArrayOf(0f, 0f, 0f)
+        ColorUtils.colorToHSL(this, hsl)
+
+        // hsl[0] is Hue (H) - keep this the same to maintain color identity
+        // hsl[1] is Saturation (S) - reduce for muted appearance
+        // hsl[2] is Lightness (L) - increase for lighter shade
+
+        // 2. Apply the target Saturation and Lightness for a lighter, muted version
+        hsl[1] = targetSaturation
+        hsl[2] = targetLightness
+
+        // 3. Convert the modified HSL back to an Android color Int
+        return ColorUtils.HSLToColor(hsl)
     }
 
     private fun renderCustomTab(viewMode: ViewMode.CustomTab) {
         logcat { "Omnibar: updateCustomTabTitle $decoration" }
 
-        viewMode.domain?.let {
-            customTabToolbarContainer.customTabDomain.text = viewMode.domain
-            customTabToolbarContainer.customTabDomainOnly.text = viewMode.domain
-            customTabToolbarContainer.customTabDomain.show()
-            customTabToolbarContainer.customTabDomainOnly.show()
-        }
+        if (omnibarRepository.isNewCustomTabAvailable) {
+            with(newCustomTabToolbarContainer) {
+                viewMode.domain?.let {
+                    customTabDomain.text = viewMode.domain
+                    customTabDomain.show()
+                }
 
-        viewMode.title?.let {
-            customTabToolbarContainer.customTabTitle.text = viewMode.title
-            customTabToolbarContainer.customTabTitle.show()
-            customTabToolbarContainer.customTabDomainOnly.hide()
-        }
+                customTabShieldIcon.isInvisible = viewMode.showDuckPlayerIcon
+                customTabDuckPlayerIcon.isVisible = viewMode.showDuckPlayerIcon
+            }
+        } else {
+            with(customTabToolbarContainer) {
+                viewMode.domain?.let {
+                    customTabDomain.text = viewMode.domain
+                    customTabDomainOnly.text = viewMode.domain
+                    customTabDomain.show()
+                    customTabDomainOnly.show()
+                }
 
-        customTabToolbarContainer.customTabShieldIcon.isInvisible = viewMode.showDuckPlayerIcon
-        customTabToolbarContainer.customTabDuckPlayerIcon.isVisible = viewMode.showDuckPlayerIcon
+                viewMode.title?.let {
+                    customTabTitle.text = viewMode.title
+                    customTabTitle.show()
+                    customTabDomainOnly.hide()
+                }
+
+                customTabShieldIcon.isInvisible = viewMode.showDuckPlayerIcon
+                customTabDuckPlayerIcon.isVisible = viewMode.showDuckPlayerIcon
+            }
+        }
     }
 
     private fun calculateCustomTabBackgroundColor(color: Int): Int {
@@ -1103,6 +1211,26 @@ class OmnibarLayout @JvmOverloads constructor(
             Color.WHITE
         } else {
             Color.BLACK
+        }
+    }
+
+    private fun calculateCustomTabForegroundColor(color: Int): Int {
+        // Handle the case where we did not receive a color.
+        if (color == 0) {
+            return if ((context as DuckDuckGoActivity).isDarkThemeEnabled()) Color.WHITE else Color.BLACK
+        }
+
+        if (color == Color.WHITE || Color.alpha(color) < 128) {
+            return Color.BLACK
+        }
+
+        // Use W3C relative luminance calculation for better contrast
+        val luminance = ColorUtils.calculateLuminance(color)
+        // Use 0.5 threshold - lighter backgrounds get dark text, darker backgrounds get light text
+        return if (luminance > 0.5) {
+            Color.BLACK
+        } else {
+            Color.WHITE
         }
     }
 

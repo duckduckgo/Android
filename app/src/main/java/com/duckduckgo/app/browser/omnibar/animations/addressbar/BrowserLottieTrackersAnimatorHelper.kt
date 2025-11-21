@@ -217,6 +217,7 @@ class BrowserLottieTrackersAnimatorHelper @Inject constructor(
         context: Context,
         omnibarViews: List<View>,
     ) {
+        if (omnibarViews.any { it.id == R.id.customTabDomain }) return // Do not show cookies animation in custom tabs
         isCookiesAnimationRunning = true
 
         if (cookieCosmeticHide) {
