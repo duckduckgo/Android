@@ -178,6 +178,22 @@ interface PirRepository {
 
     suspend fun setCustomStatsPixelsLastSentMs(timeMs: Long)
 
+    suspend fun getLastPirDauPixelTimeMs(): Long
+
+    suspend fun setLastPirDauPixelTimeMs(timeMs: Long)
+
+    suspend fun getLastPirWauPixelTimeMs(): Long
+
+    suspend fun setLastPirWauPixelTimeMs(timeMs: Long)
+
+    suspend fun getLastPirMauPixelTimeMs(): Long
+
+    suspend fun setLastPirMauPixelTimeMs(timeMs: Long)
+
+    suspend fun getWeeklyStatLastSentMs(): Long
+
+    suspend fun setWeeklyStatLastSentMs(timeMs: Long)
+
     data class GeneratedEmailData(
         val emailAddress: String,
         val pattern: String,
@@ -673,6 +689,46 @@ class RealPirRepository(
 
     override suspend fun setCustomStatsPixelsLastSentMs(timeMs: Long) = withContext(dispatcherProvider.io()) {
         pirDataStore.customStatsPixelsLastSentMs = timeMs
+    }
+
+    override suspend fun getLastPirDauPixelTimeMs(): Long = withContext(dispatcherProvider.io()) {
+        return@withContext pirDataStore.dauLastSentMs
+    }
+
+    override suspend fun setLastPirDauPixelTimeMs(timeMs: Long) {
+        withContext(dispatcherProvider.io()) {
+            pirDataStore.dauLastSentMs = timeMs
+        }
+    }
+
+    override suspend fun getLastPirWauPixelTimeMs(): Long = withContext(dispatcherProvider.io()) {
+        return@withContext pirDataStore.wauLastSentMs
+    }
+
+    override suspend fun setLastPirWauPixelTimeMs(timeMs: Long) {
+        withContext(dispatcherProvider.io()) {
+            pirDataStore.wauLastSentMs = timeMs
+        }
+    }
+
+    override suspend fun getLastPirMauPixelTimeMs(): Long = withContext(dispatcherProvider.io()) {
+        return@withContext pirDataStore.mauLastSentMs
+    }
+
+    override suspend fun setLastPirMauPixelTimeMs(timeMs: Long) {
+        withContext(dispatcherProvider.io()) {
+            pirDataStore.mauLastSentMs = timeMs
+        }
+    }
+
+    override suspend fun getWeeklyStatLastSentMs(): Long = withContext(dispatcherProvider.io()) {
+        return@withContext pirDataStore.weeklyStatLastSentMs
+    }
+
+    override suspend fun setWeeklyStatLastSentMs(timeMs: Long) {
+        withContext(dispatcherProvider.io()) {
+            pirDataStore.weeklyStatLastSentMs = timeMs
+        }
     }
 
     private fun List<EmailData>.toRequest(): PirEmailConfirmationDataRequest =

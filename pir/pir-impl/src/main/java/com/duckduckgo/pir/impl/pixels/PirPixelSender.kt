@@ -36,6 +36,9 @@ import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_EMAIL_CONFIRMATION_LINK_RECEI
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_EMAIL_CONFIRMATION_MAX_RETRIES_EXCEEDED
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_EMAIL_CONFIRMATION_RUN_COMPLETED
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_EMAIL_CONFIRMATION_RUN_STARTED
+import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_ENGAGEMENT_DAU
+import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_ENGAGEMENT_MAU
+import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_ENGAGEMENT_WAU
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_INTERNAL_BROKER_OPT_OUT_STARTED
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_INTERNAL_BROKER_SCAN_COMPLETED
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_INTERNAL_BROKER_SCAN_STARTED
@@ -51,6 +54,7 @@ import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_INTERNAL_SECURE_STORAGE_UNAVA
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_OPTOUT_STAGE_PENDING_EMAIL_CONFIRMATION
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_OPTOUT_SUBMIT_FAILURE
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_OPTOUT_SUBMIT_SUCCESS
+import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_WEEKLY_CHILD_ORPHANED_OPTOUTS
 import com.squareup.anvil.annotations.ContributesBinding
 import logcat.logcat
 import javax.inject.Inject
@@ -381,6 +385,34 @@ interface PirPixelSender {
      * Emits a pixel when an opt-out is unconfirmed within 42 days.
      */
     fun reportBrokerOptOutUnconfirmed42Days(brokerUrl: String)
+
+    /**
+     * Emits a pixel to report Daily Active Users for PIR.
+     */
+    fun reportDAU()
+
+    /**
+     * Emits a pixel to report Weekly Active Users for PIR.
+     */
+    fun reportWAU()
+
+    /**
+     * Emits a pixel to report Monthly Active Users for PIR.
+     */
+    fun reportMAU()
+
+    /**
+     * Emits a pixel to report weekly data on orphaned opt-out records on child data brokers that don't have matching profiles on their parent broker.
+     *
+     * @param brokerUrl The URL of the child data broker site
+     * @param childParentRecordDifference (child extracted profile count) - (parent extracted profile count)
+     * @param orphanedRecordsCount The Number of child profiles with no parent match
+     */
+    fun reportWeeklyChildOrphanedOptOuts(
+        brokerUrl: String,
+        childParentRecordDifference: Int,
+        orphanedRecordsCount: Int,
+    )
 }
 
 @ContributesBinding(AppScope::class)
@@ -739,6 +771,32 @@ class RealPirPixelSender @Inject constructor(
         fire(PIR_BROKER_CUSTOM_STATS_42DAY_UNCONFIRMED_OPTOUT, params)
     }
 
+    override fun reportDAU() {
+        fire(PIR_ENGAGEMENT_DAU)
+    }
+
+    override fun reportWAU() {
+        fire(PIR_ENGAGEMENT_WAU)
+    }
+
+    override fun reportMAU() {
+        fire(PIR_ENGAGEMENT_MAU)
+    }
+
+    override fun reportWeeklyChildOrphanedOptOuts(
+        brokerUrl: String,
+        childParentRecordDifference: Int,
+        orphanedRecordsCount: Int,
+    ) {
+        val params = mapOf(
+            PARAM_KEY_BROKER to brokerUrl,
+            PARAM_KEY_ORPHANED_DIFF to childParentRecordDifference.toString(),
+            PARAM_KEY_ORPHANED_COUNT to orphanedRecordsCount.toString(),
+        )
+
+        fire(PIR_WEEKLY_CHILD_ORPHANED_OPTOUTS, params)
+    }
+
     private fun fire(
         pixel: PirPixel,
         params: Map<String, String> = emptyMap(),
@@ -775,5 +833,7 @@ class RealPirPixelSender @Inject constructor(
         private const val PARAM_KEY_PATTERN = "pattern"
         private const val PARAM_KEY_ACTION_TYPE = "action_type"
         private const val PARAM_KEY_OPTOUT_SUBMIT_SUCCESS_RATE = "optout_submit_success_rate"
+        private const val PARAM_KEY_ORPHANED_DIFF = "child-parent-record-difference"
+        private const val PARAM_KEY_ORPHANED_COUNT = "calculated-orphaned-records"
     }
 }
