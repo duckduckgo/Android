@@ -17,6 +17,7 @@
 package com.duckduckgo.pir.impl.dashboard.state
 
 import com.duckduckgo.common.utils.CurrentTimeProvider
+import com.duckduckgo.pir.impl.common.hasMatchingProfileOnParent
 import com.duckduckgo.pir.impl.dashboard.state.PirDashboardInitialScanStateProvider.DashboardBrokerWithStatus
 import com.duckduckgo.pir.impl.dashboard.state.PirDashboardInitialScanStateProvider.DashboardBrokerWithStatus.Status.COMPLETED
 import com.duckduckgo.pir.impl.dashboard.state.PirDashboardInitialScanStateProvider.DashboardBrokerWithStatus.Status.IN_PROGRESS
@@ -191,23 +192,6 @@ abstract class PirDashboardStateProvider(
                 )
             }
         }.flatten()
-    }
-
-    private fun ExtractedProfile.hasMatchingProfileOnParent(extractedProfiles: List<ExtractedProfile>): Boolean {
-        return extractedProfiles.any {
-            it.brokerName == this.brokerName && this.matches(it)
-        }
-    }
-
-    private fun ExtractedProfile.matches(extractedProfile: ExtractedProfile): Boolean {
-        return this.name == extractedProfile.name && this.age == extractedProfile.age &&
-            this.alternativeNames.isASubSetOrSuperSetOf(extractedProfile.alternativeNames) &&
-            this.relatives.isASubSetOrSuperSetOf(extractedProfile.relatives) &&
-            this.addresses.isASubSetOrSuperSetOf(extractedProfile.addresses)
-    }
-
-    private fun <T> List<T>.isASubSetOrSuperSetOf(other: List<T>): Boolean {
-        return this.containsAll(other) || other.containsAll(this)
     }
 
     private fun getEstimatedRemovalDateInMillis(
