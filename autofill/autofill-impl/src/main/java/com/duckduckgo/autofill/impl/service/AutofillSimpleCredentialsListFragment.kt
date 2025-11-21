@@ -232,9 +232,9 @@ class AutofillSimpleCredentialsListFragment : DuckDuckGoFragment(R.layout.fragme
             val directSuggestions = suggestionMatcher.getDirectSuggestions(showSuggestionsFor, credentials)
             val shareableCredentials = suggestionMatcher.getShareableSuggestions(showSuggestionsFor)
             val directSuggestionsListItems = suggestionListBuilder.build(
-                listOf(),
-                directSuggestions,
-                shareableCredentials,
+                unsortedQuerySuggestions = listOf(),
+                unsortedDirectSuggestions = directSuggestions,
+                unsortedSharableSuggestions = shareableCredentials,
                 allowBreakageReporting = false,
             )
             val groupedCredentials = credentialGrouper.group(credentials)
