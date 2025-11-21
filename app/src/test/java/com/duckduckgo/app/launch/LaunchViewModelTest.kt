@@ -75,7 +75,6 @@ class LaunchViewModelTest {
             StubAppReferrerFoundStateListener("xx"),
             mockDaxPrompts,
             mockAppInstallStore,
-            mockOnboardingExperiment,
         )
         whenever(mockDaxPrompts.evaluate()).thenReturn(ActionType.NONE)
         whenever(userStageStore.getUserAppStage()).thenReturn(AppStage.NEW)
@@ -93,7 +92,6 @@ class LaunchViewModelTest {
             StubAppReferrerFoundStateListener("xx", mockDelayMs = 1_000),
             mockDaxPrompts,
             mockAppInstallStore,
-            mockOnboardingExperiment,
         )
         whenever(mockDaxPrompts.evaluate()).thenReturn(ActionType.NONE)
         whenever(userStageStore.getUserAppStage()).thenReturn(AppStage.NEW)
@@ -111,7 +109,6 @@ class LaunchViewModelTest {
             StubAppReferrerFoundStateListener("xx", mockDelayMs = Long.MAX_VALUE),
             mockDaxPrompts,
             mockAppInstallStore,
-            mockOnboardingExperiment,
         )
         whenever(mockDaxPrompts.evaluate()).thenReturn(ActionType.NONE)
         whenever(userStageStore.getUserAppStage()).thenReturn(AppStage.NEW)
@@ -129,7 +126,6 @@ class LaunchViewModelTest {
             StubAppReferrerFoundStateListener("xx"),
             mockDaxPrompts,
             mockAppInstallStore,
-            mockOnboardingExperiment,
         )
         whenever(mockDaxPrompts.evaluate()).thenReturn(ActionType.NONE)
         whenever(userStageStore.getUserAppStage()).thenReturn(AppStage.DAX_ONBOARDING)
@@ -145,7 +141,6 @@ class LaunchViewModelTest {
             StubAppReferrerFoundStateListener("xx", mockDelayMs = 1_000),
             mockDaxPrompts,
             mockAppInstallStore,
-            mockOnboardingExperiment,
         )
         whenever(mockDaxPrompts.evaluate()).thenReturn(ActionType.NONE)
         whenever(userStageStore.getUserAppStage()).thenReturn(AppStage.DAX_ONBOARDING)
@@ -161,7 +156,6 @@ class LaunchViewModelTest {
             StubAppReferrerFoundStateListener("xx", mockDelayMs = Long.MAX_VALUE),
             mockDaxPrompts,
             mockAppInstallStore,
-            mockOnboardingExperiment,
         )
         whenever(mockDaxPrompts.evaluate()).thenReturn(ActionType.NONE)
         whenever(userStageStore.getUserAppStage()).thenReturn(AppStage.DAX_ONBOARDING)
@@ -177,7 +171,6 @@ class LaunchViewModelTest {
             StubAppReferrerFoundStateListener("xx", mockDelayMs = Long.MAX_VALUE),
             mockDaxPrompts,
             mockAppInstallStore,
-            mockOnboardingExperiment,
         )
         whenever(mockDaxPrompts.evaluate()).thenReturn(ActionType.SHOW_BROWSER_COMPARISON_PROMPT)
         whenever(userStageStore.getUserAppStage()).thenReturn(AppStage.DAX_ONBOARDING)
@@ -194,7 +187,6 @@ class LaunchViewModelTest {
             StubAppReferrerFoundStateListener("xx"),
             mockDaxPrompts,
             mockAppInstallStore,
-            mockOnboardingExperiment,
         )
         whenever(mockDaxPrompts.evaluate()).thenReturn(ActionType.NONE)
         whenever(userStageStore.getUserAppStage()).thenReturn(AppStage.NEW)
@@ -214,7 +206,6 @@ class LaunchViewModelTest {
             StubAppReferrerFoundStateListener("xx"),
             mockDaxPrompts,
             mockAppInstallStore,
-            mockOnboardingExperiment,
         )
         whenever(mockDaxPrompts.evaluate()).thenReturn(ActionType.NONE)
         whenever(userStageStore.getUserAppStage()).thenReturn(AppStage.DAX_ONBOARDING)
@@ -235,7 +226,6 @@ class LaunchViewModelTest {
             StubAppReferrerFoundStateListener("xx", mockDelayMs = Long.MAX_VALUE),
             mockDaxPrompts,
             mockAppInstallStore,
-            mockOnboardingExperiment,
         )
         whenever(mockDaxPrompts.evaluate()).thenReturn(ActionType.NONE)
         whenever(userStageStore.getUserAppStage()).thenReturn(AppStage.NEW)
@@ -259,7 +249,6 @@ class LaunchViewModelTest {
             StubAppReferrerFoundStateListener("xx"),
             mockDaxPrompts,
             mockAppInstallStore,
-            mockOnboardingExperiment,
         )
         whenever(mockDaxPrompts.evaluate()).thenReturn(ActionType.NONE)
         whenever(userStageStore.getUserAppStage()).thenReturn(AppStage.NEW)
