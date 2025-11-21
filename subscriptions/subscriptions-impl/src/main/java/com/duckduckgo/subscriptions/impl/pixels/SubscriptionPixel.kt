@@ -251,6 +251,11 @@ enum class SubscriptionPixel(
         types = setOf(Count, Daily()),
         includedParameters = setOf(APP_VERSION),
     ),
+    SUBSCRIPTION_WEBVIEW_RENDER_PROCESS_CRASH(
+        baseName = "subscription_webview_render_process_crash",
+        types = setOf(Count, Daily()),
+        includedParameters = setOf(APP_VERSION),
+    ),
     ;
 
     constructor(

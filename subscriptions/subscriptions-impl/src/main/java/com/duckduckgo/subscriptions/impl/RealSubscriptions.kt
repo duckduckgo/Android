@@ -263,6 +263,9 @@ interface PrivacyProFeature {
 
     @Toggle.DefaultValue(defaultValue = DefaultFeatureValue.FALSE)
     fun blackFridayOffer2025(): Toggle
+
+    @Toggle.DefaultValue(defaultValue = DefaultFeatureValue.TRUE)
+    fun handleSubscriptionsWebViewRenderProcessCrash(): Toggle
 }
 
 @ContributesBinding(AppScope::class)
