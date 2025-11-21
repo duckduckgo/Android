@@ -191,7 +191,7 @@ class AuthTokenRefreshWideEventTest {
             metadata = mapOf("play_login_error" to "sign-in-required"),
         )
         verify(wideEventClient).intervalEnd(16L, "total_duration_ms_bucketed")
-        verify(wideEventClient).flowFinish(16L, FlowStatus.Failure("IllegalStateException: boom"), emptyMap())
+        verify(wideEventClient).flowFinish(16L, FlowStatus.Failure("IllegalStateException"), emptyMap())
 
         reset(wideEventClient)
 
@@ -241,7 +241,7 @@ class AuthTokenRefreshWideEventTest {
         authWideEvent.onFailure(IllegalArgumentException("nope"))
 
         verify(wideEventClient).intervalEnd(19L, "total_duration_ms_bucketed")
-        verify(wideEventClient).flowFinish(19L, FlowStatus.Failure("IllegalArgumentException: nope"), emptyMap())
+        verify(wideEventClient).flowFinish(19L, FlowStatus.Failure("IllegalArgumentException"), emptyMap())
     }
 
     @SuppressLint("DenyListedApi")

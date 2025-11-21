@@ -337,5 +337,4 @@ class SubscriptionPurchaseWideEventImpl @Inject constructor(
     }
 }
 
-private fun Exception.toErrorString(): String =
-    listOf(javaClass.simpleName, message).joinToString(": ")
+private fun Exception.toErrorString(): String = javaClass.simpleName
