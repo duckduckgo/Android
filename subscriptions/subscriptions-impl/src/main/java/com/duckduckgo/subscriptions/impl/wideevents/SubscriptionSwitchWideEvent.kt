@@ -33,6 +33,7 @@ import javax.inject.Inject
 
 interface SubscriptionSwitchWideEvent {
     suspend fun onSwitchFlowStarted(
+        context: String?,
         fromPlan: String,
         toPlan: String,
         switchType: String,
@@ -83,6 +84,7 @@ class SubscriptionSwitchWideEventImpl @Inject constructor(
     private var cachedFlowId: Long? = null
 
     override suspend fun onSwitchFlowStarted(
+        context: String?,
         fromPlan: String,
         toPlan: String,
         switchType: String,
@@ -100,6 +102,7 @@ class SubscriptionSwitchWideEventImpl @Inject constructor(
         cachedFlowId = wideEventClient
             .flowStart(
                 name = SUBSCRIPTION_SWITCH_FEATURE_NAME,
+                flowEntryPoint = context,
                 metadata = mapOf(
                     KEY_FROM_PLAN to fromPlan,
                     KEY_TO_PLAN to toPlan,

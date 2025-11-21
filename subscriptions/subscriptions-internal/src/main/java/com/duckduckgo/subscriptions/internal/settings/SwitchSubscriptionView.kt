@@ -299,6 +299,7 @@ class SwitchSubscriptionView @JvmOverloads constructor(
                     planId = planOption.planId,
                     offerId = planOption.offerId,
                     replacementMode = replacementMode,
+                    origin = "dev_settings",
                 )
             } catch (e: Exception) {
                 launch(dispatcherProvider.main()) {

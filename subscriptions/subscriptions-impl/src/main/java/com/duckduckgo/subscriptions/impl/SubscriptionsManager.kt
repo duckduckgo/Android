@@ -253,6 +253,7 @@ interface SubscriptionsManager {
      * @param planId The new plan ID to switch to
      * @param offerId The offer ID for the new plan (optional)
      * @param replacementMode The replacement mode for the subscription switch
+     * @param origin The entry point where the switch was initiated (e.g., "subscription_settings", "dev_settings")
      *
      */
     suspend fun switchSubscriptionPlan(
@@ -260,6 +261,7 @@ interface SubscriptionsManager {
         planId: String,
         offerId: String? = null,
         replacementMode: SubscriptionReplacementMode,
+        origin: String? = null,
     )
 
     /**
@@ -500,6 +502,7 @@ class RealSubscriptionsManager @Inject constructor(
         planId: String,
         offerId: String?,
         replacementMode: SubscriptionReplacementMode,
+        origin: String?,
     ) = withContext(dispatcherProvider.io()) {
         try {
             if (!isSignedIn()) {
@@ -520,6 +523,7 @@ class RealSubscriptionsManager @Inject constructor(
             val isUpgrade = currentSubscription.productId in listOf(MONTHLY_PLAN_US, MONTHLY_PLAN_ROW)
             val switchType = if (isUpgrade) "upgrade" else "downgrade"
             subscriptionSwitchWideEvent.onSwitchFlowStarted(
+                context = origin,
                 fromPlan = currentSubscription.productId,
                 toPlan = planId,
                 switchType = switchType,

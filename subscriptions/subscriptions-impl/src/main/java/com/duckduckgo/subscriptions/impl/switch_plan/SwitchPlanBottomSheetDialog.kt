@@ -228,6 +228,7 @@ class SwitchPlanBottomSheetDialog @AssistedInject constructor(
                         planId = targetPlanId,
                         offerId = null,
                         replacementMode = SubscriptionReplacementMode.WITHOUT_PRORATION,
+                        origin = "subscription_settings",
                     )
                 }
             } catch (e: Exception) {
