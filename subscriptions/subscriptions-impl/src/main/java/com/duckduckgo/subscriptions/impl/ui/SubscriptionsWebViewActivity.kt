@@ -655,8 +655,18 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationD
 
     override fun onDestroy() {
         downloadMessagesJob.cancel()
+        destroyWebView()
         super.onDestroy()
     }
+
+    private fun destroyWebView() {
+        binding.webview.stopLoading()
+        binding.webview.removeJavascriptInterface(subscriptionJsMessaging.context)
+        binding.webview.removeJavascriptInterface(itrJsMessaging.context)
+        binding.root.removeView(binding.webview)
+        binding.webview.destroy()
+    }
+
     companion object {
         private const val DOWNLOAD_CONFIRMATION_TAG = "DOWNLOAD_CONFIRMATION_TAG"
         private const val PERMISSION_REQUEST_WRITE_EXTERNAL_STORAGE = 200
