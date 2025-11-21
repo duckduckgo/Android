@@ -46,7 +46,7 @@ jobs:
         uses: gradle/actions/setup-gradle@v3
 
       - name: Assemble the project
-        run: ./gradlew assemblePlayRelease -Pforce-default-variant -Pconfig_patches=privacy-config/privacy-config-internal/local-config-patches/split_omnibar_test_patch.json
+        run: ./gradlew assemblePlayRelease
 
       - name: Move APK to new folder
         if: always()
