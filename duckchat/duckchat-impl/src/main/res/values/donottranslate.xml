@@ -15,16 +15,6 @@
   -->
 
 <resources>
-    <!-- Duck AI SERP Settings Title -->
-    <string name="duckAiSerpSettingsTitle">AI Features</string>
-
-    <!-- Duck AI Search Section Header -->
-    <string name="duckAiSearchSettingsSectionHeader">Search</string>
-
-    <!-- Duck AI Hide Generated Images Settings Option -->
-    <string name="duckAiHideAiGeneratedImagesTitle">Hide AI-Generated Images</string>
-    <string name="duckAiHideAiGeneratedImagesDescription">Filters out AI-generated images from image search results</string>
-
     <!-- Duck AI Fullscreen Mode -->
     <string name="duckAiFullScreenModeTitle">Full Screen Mode</string>
     <string name="duckAiFullScreenModeDescription">Internal setting for O-J work</string>
