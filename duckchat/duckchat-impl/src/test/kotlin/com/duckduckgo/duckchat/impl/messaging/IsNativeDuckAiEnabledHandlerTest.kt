@@ -45,9 +45,6 @@ class IsNativeDuckAiEnabledHandlerTest {
     @Before
     fun setUp() {
         handler = IsNativeDuckAiEnabledHandler(
-            dispatcherProvider = coroutineTestRule.testDispatcherProvider,
-            appScope = coroutineTestRule.testScope,
-            serpSettingsFeature = serpSettingsFeature,
             duckChat = fakeDuckChat,
         )
     }
