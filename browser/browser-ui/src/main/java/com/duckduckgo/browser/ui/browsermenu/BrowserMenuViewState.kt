@@ -61,6 +61,7 @@ sealed class BrowserMenuViewState {
     data class DuckAi(
         val canPrintPage: Boolean = false,
         val canReportSite: Boolean = false,
+        val showAutofill: Boolean = false,
     ) : BrowserMenuViewState()
 }
 

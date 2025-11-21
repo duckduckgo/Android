@@ -242,6 +242,7 @@ import com.duckduckgo.downloads.api.FileDownloader.PendingFileDownload
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.impl.helper.DuckChatJSHelper
+import com.duckduckgo.duckchat.impl.helper.NativeAction
 import com.duckduckgo.duckchat.impl.helper.RealDuckChatJSHelper.Companion.DUCK_CHAT_FEATURE_NAME
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
 import com.duckduckgo.duckplayer.api.DuckPlayer
@@ -6520,7 +6521,8 @@ class BrowserTabViewModelTest {
 
             verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
 
-            assertTrue(commandCaptor.lastValue is Navigate)
+            val command = commandCaptor.lastValue as Command.OpenInNewTab
+            assertTrue(command.query == duckChatURL)
 
             verify(mockDuckChat, never()).openDuckChat()
         }
@@ -8180,5 +8182,65 @@ class BrowserTabViewModelTest {
             AppPixelName.MENU_ACTION_VPN_PRESSED,
             mapOf(PixelParameter.STATUS to "subscribed"),
         )
+    }
+
+    @Test
+    fun whenDuckChatNativeNewChatRequested() = runTest {
+        val expectedEvent = SubscriptionEventData(
+            featureName = "event1",
+            subscriptionName = "subscription1",
+            params = JSONObject(),
+        )
+        whenever(mockDuckChatJSHelper.onNativeAction(NativeAction.NEW_CHAT)).thenReturn(expectedEvent)
+
+        testee.openNewDuckChat()
+
+        testee.subscriptionEventDataFlow.test {
+            val emittedEvent = awaitItem()
+            assertEquals(expectedEvent.featureName, emittedEvent.featureName)
+            assertEquals(expectedEvent.subscriptionName, emittedEvent.subscriptionName)
+            assertEquals(expectedEvent.params.toString(), emittedEvent.params.toString())
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenDuckChatNativeHistoryRequested() = runTest {
+        val expectedEvent = SubscriptionEventData(
+            featureName = "event1",
+            subscriptionName = "subscription1",
+            params = JSONObject(),
+        )
+        whenever(mockDuckChatJSHelper.onNativeAction(NativeAction.HISTORY)).thenReturn(expectedEvent)
+
+        testee.openDuckChatHistory()
+
+        testee.subscriptionEventDataFlow.test {
+            val emittedEvent = awaitItem()
+            assertEquals(expectedEvent.featureName, emittedEvent.featureName)
+            assertEquals(expectedEvent.subscriptionName, emittedEvent.subscriptionName)
+            assertEquals(expectedEvent.params.toString(), emittedEvent.params.toString())
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenDuckChatNativeSettingsRequested() = runTest {
+        val expectedEvent = SubscriptionEventData(
+            featureName = "event1",
+            subscriptionName = "subscription1",
+            params = JSONObject(),
+        )
+        whenever(mockDuckChatJSHelper.onNativeAction(NativeAction.DUCK_AI_SETTINGS)).thenReturn(expectedEvent)
+
+        testee.openDuckChatSettings()
+
+        testee.subscriptionEventDataFlow.test {
+            val emittedEvent = awaitItem()
+            assertEquals(expectedEvent.featureName, emittedEvent.featureName)
+            assertEquals(expectedEvent.subscriptionName, emittedEvent.subscriptionName)
+            assertEquals(expectedEvent.params.toString(), emittedEvent.params.toString())
+            cancelAndIgnoreRemainingEvents()
+        }
     }
 }

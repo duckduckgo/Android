@@ -71,6 +71,7 @@ object BrowserMenuViewStateFactory {
         return BrowserMenuViewState.DuckAi(
             canPrintPage = browserViewState.canPrintPage,
             canReportSite = browserViewState.canReportSite,
+            showAutofill = browserViewState.showAutofill,
         )
     }
 

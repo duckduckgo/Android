@@ -316,6 +316,7 @@ import com.duckduckgo.downloads.api.FileDownloader.PendingFileDownload
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.impl.helper.DuckChatJSHelper
+import com.duckduckgo.duckchat.impl.helper.NativeAction
 import com.duckduckgo.duckchat.impl.helper.RealDuckChatJSHelper.Companion.DUCK_CHAT_FEATURE_NAME
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
 import com.duckduckgo.duckplayer.api.DuckPlayer
@@ -4471,6 +4472,27 @@ class BrowserTabViewModel @Inject constructor(
         }
     }
 
+    fun openNewDuckChat() {
+        viewModelScope.launch {
+            val subscriptionEvent = duckChatJSHelper.onNativeAction(NativeAction.NEW_CHAT)
+            _subscriptionEventDataChannel.send(subscriptionEvent)
+        }
+    }
+
+    fun openDuckChatHistory() {
+        viewModelScope.launch {
+            val subscriptionEvent = duckChatJSHelper.onNativeAction(NativeAction.HISTORY)
+            _subscriptionEventDataChannel.send(subscriptionEvent)
+        }
+    }
+
+    fun openDuckChatSettings() {
+        viewModelScope.launch {
+            val subscriptionEvent = duckChatJSHelper.onNativeAction(NativeAction.DUCK_AI_SETTINGS)
+            _subscriptionEventDataChannel.send(subscriptionEvent)
+        }
+    }
+
     fun onDuckChatMenuClicked() {
         viewModelScope.launch {
             command.value = HideKeyboardForChat
@@ -4480,7 +4502,7 @@ class BrowserTabViewModel @Inject constructor(
 
         if (duckAiFeatureState.showFullScreenMode.value) {
             val url = duckChat.getDuckChatUrl("", false)
-            onUserSubmittedQuery(url)
+            command.value = OpenInNewTab(url, tabId)
         } else {
             duckChat.openDuckChat()
         }

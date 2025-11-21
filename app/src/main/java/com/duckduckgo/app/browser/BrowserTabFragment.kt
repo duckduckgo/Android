@@ -1396,16 +1396,23 @@ class BrowserTabFragment :
                 pixel.fire(AppPixelName.MENU_ACTION_AUTOFILL_PRESSED)
                 viewModel.onAutofillMenuSelected()
             }
-
             onMenuItemClicked(openInDdgBrowserMenuItem) {
                 viewModel.url?.let {
                     launchCustomTabUrlInDdg(it)
                     pixel.fire(CustomTabPixelNames.CUSTOM_TABS_OPEN_IN_DDG)
                 }
             }
-
             onMenuItemClicked(vpnMenuItem) {
                 viewModel.onVpnMenuClicked()
+            }
+            onMenuItemClicked(duckNewChatMenuItem) {
+                viewModel.openNewDuckChat()
+            }
+            onMenuItemClicked(duckChatHistoryMenuItem) {
+                viewModel.openDuckChatHistory()
+            }
+            onMenuItemClicked(duckChatSettingsMenuItem) {
+                viewModel.openDuckChatSettings()
             }
         }
     }
