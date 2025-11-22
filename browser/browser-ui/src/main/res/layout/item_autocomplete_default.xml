@@ -57,7 +57,7 @@
         android:contentDescription="@string/editQueryBeforeSubmitting"
         android:padding="@dimen/keyline_2"
         android:src="@drawable/ic_arrow_circle_up_left_16"
-        android:background="@drawable/selectable_item_experimental_background"
+        android:background="@drawable/selectable_item_rounded_corner_background"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"

@@ -37,11 +37,4 @@ interface OmnibarRepository {
      * feature flags are enabled).
      */
     val isSplitOmnibarAvailable: Boolean
-
-    /**
-     * True when the unified omnibar UI feature flag is enabled.
-     *
-     * A precondition for the split omnibar to be available.
-     */
-    val isUnifiedOmnibarLayoutEnabled: Boolean
 }

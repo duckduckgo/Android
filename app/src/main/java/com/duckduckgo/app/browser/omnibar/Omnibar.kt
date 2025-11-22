@@ -60,7 +60,6 @@ import logcat.logcat
 class Omnibar(
     val omnibarType: OmnibarType,
     private val binding: FragmentBrowserTabBinding,
-    isUnifiedOmnibarEnabled: Boolean,
 ) {
     interface ItemPressedListener {
         fun onTabsButtonPressed()
@@ -154,37 +153,7 @@ class Omnibar(
     }
 
     val omnibarView: OmnibarView by lazy {
-        if (isUnifiedOmnibarEnabled) {
-            setupUnifiedOmnibar()
-        } else {
-            setupSingleOmnibar()
-        }
-    }
-
-    private fun setupSingleOmnibar(): OmnibarView {
-        binding.rootView.removeView(binding.omnibarLayoutTop)
-        binding.rootView.removeView(binding.omnibarLayoutBottom)
-
-        return when (omnibarType) {
-            OmnibarType.SINGLE_TOP -> {
-                binding.rootView.removeView(binding.singleOmnibarLayoutBottom)
-                binding.singleOmnibarLayoutTop
-            }
-
-            OmnibarType.SINGLE_BOTTOM -> {
-                binding.rootView.removeView(binding.singleOmnibarLayoutTop)
-                adjustCoordinatorLayoutBehaviorForBottomOmnibar()
-                binding.singleOmnibarLayoutBottom
-            }
-            else -> throw IllegalStateException("Invalid omnibar type for single omnibar setup: $omnibarType")
-        }
-    }
-
-    private fun setupUnifiedOmnibar(): OmnibarView {
-        binding.rootView.removeView(binding.singleOmnibarLayoutTop)
-        binding.rootView.removeView(binding.singleOmnibarLayoutBottom)
-
-        return when (omnibarType) {
+        when (omnibarType) {
             OmnibarType.SINGLE_TOP -> {
                 binding.rootView.removeView(binding.omnibarLayoutBottom)
                 binding.omnibarLayoutTop
@@ -233,10 +202,6 @@ class Omnibar(
 
     val omnibarTextInput: KeyboardAwareEditText by lazy {
         omnibarView.omnibarTextInput
-    }
-
-    val omniBarContainer: View by lazy {
-        omnibarView.omniBarContainer
     }
 
     val toolbar: Toolbar by lazy {
@@ -303,13 +268,6 @@ class Omnibar(
 
     fun configureLogoClickListener(logoClickListener: LogoClickListener) {
         omnibarView.setLogoClickListener(logoClickListener)
-    }
-
-    fun configureOmnibarItemPressedListeners(listener: OmnibarItemPressedListener) {
-        val omnibar = omnibarView
-        if (omnibar is SingleOmnibarLayout) {
-            omnibar.setSingleOmnibarItemPressedListener(listener)
-        }
     }
 
     fun configureInputScreenLaunchListener(listener: InputScreenLaunchListener) {
