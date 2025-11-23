@@ -84,7 +84,7 @@
     <string name="subscriptionSettingSectionHelpAndSupport">Segítség és támogatás</string>
     <string name="subscriptionSettingSendFeedback">Visszajelzés küldése</string>
     <string name="subscriptionSettingActivating">Aktiválás</string>
-    <string name="subscriptionSettingSwitchUpgradeDynamic" instruction="%1$s is the savings percentage when switching from monthly to yearly (e.g. 16)">Válts éves előfizetésre, és takaríts meg %1$s%%-ot</string>
+    <string name="subscriptionSettingSwitchUpgradeDynamic" instruction="%1$s is the savings percentage when switching from monthly to yearly (e.g. 16)">Spórolj %1$s%%-ot az éves csomaggal</string>
     <!-- smartling.character_limit = 10 -->
     <string name="subscriptionSettingSwitchUpgradePill">Legjobb ajánlat</string>
     <string name="subscriptionSettingSwitchDowngrade">Csomagváltás</string>

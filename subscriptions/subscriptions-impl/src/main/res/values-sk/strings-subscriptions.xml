@@ -84,7 +84,7 @@
     <string name="subscriptionSettingSectionHelpAndSupport">Pomoc a podpora</string>
     <string name="subscriptionSettingSendFeedback">Odoslať spätnú väzbu</string>
     <string name="subscriptionSettingActivating">Aktivácia</string>
-    <string name="subscriptionSettingSwitchUpgradeDynamic" instruction="%1$s is the savings percentage when switching from monthly to yearly (e.g. 16)">Prejdi na ročný plán a ušetri %1$s %%</string>
+    <string name="subscriptionSettingSwitchUpgradeDynamic" instruction="%1$s is the savings percentage when switching from monthly to yearly (e.g. 16)">Ušetri %1$s %% s ročným plánom</string>
     <!-- smartling.character_limit = 10 -->
     <string name="subscriptionSettingSwitchUpgradePill">Zľava!</string>
     <string name="subscriptionSettingSwitchDowngrade">Zmeniť plán</string>

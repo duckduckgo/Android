@@ -84,7 +84,7 @@
     <string name="subscriptionSettingSectionHelpAndSupport">Palīdzība un atbalsts</string>
     <string name="subscriptionSettingSendFeedback">Sūtīt atsauksmi</string>
     <string name="subscriptionSettingActivating">Notiek aktivizēšana</string>
-    <string name="subscriptionSettingSwitchUpgradeDynamic" instruction="%1$s is the savings percentage when switching from monthly to yearly (e.g. 16)">Maini plānu uz ikgadējo un ietaupi %1$s%%</string>
+    <string name="subscriptionSettingSwitchUpgradeDynamic" instruction="%1$s is the savings percentage when switching from monthly to yearly (e.g. 16)">Ietaupi %1$s%% ar ikgadējo plānu</string>
     <!-- smartling.character_limit = 10 -->
     <string name="subscriptionSettingSwitchUpgradePill">Labākais piedāvājums</string>
     <string name="subscriptionSettingSwitchDowngrade">Mainīt plānu</string>
