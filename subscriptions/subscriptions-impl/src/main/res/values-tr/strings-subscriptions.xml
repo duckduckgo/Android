@@ -176,9 +176,6 @@
     <string name="activityPir" translatable="false">Privacy Pro</string>
     <string name="activitySendFeedback">Geri Bildirim gönder</string>
 
-    <!-- Privacy Pro Rebranding-->
-    <string name="subscriptionSettingRebrandingMessage">Privacy Pro artık sadece DuckDuckGo aboneliği olarak adlandırılıyor</string>
-
     <string name="subscriptionSettingSubscribeWithDuckAiSubtitle">Aboneler VPN ve Duck.ai\'dski gelişmiş yapay zeka modellerinden yararlanır. Personal Information Removal ve Identity Theft Restoration.</string>
     <string name="subscriptionSettingSubscribeWithDuckAiSubtitleRow">Aboneler VPN, Duck.ai\'daki gelişmiş yapay zeka modelleri ve Identity Theft Restoration hizmetlerimizden yararlanır.</string>
 

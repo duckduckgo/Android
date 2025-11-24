@@ -176,9 +176,6 @@
     <string name="activityPir" translatable="false">Privacy Pro</string>
     <string name="activitySendFeedback">Αποστολή σχολίου</string>
 
-    <!-- Privacy Pro Rebranding-->
-    <string name="subscriptionSettingRebrandingMessage">Το Privacy Pro ονομάζεται πλέον απλά Συνδρομή DuckDuckGo</string>
-
     <string name="subscriptionSettingSubscribeWithDuckAiSubtitle">Οι συνδρομητές αποκτούν το VPN μας, προηγμένα μοντέλα τεχνητής νοημοσύνης στο Duck.ai, το Personal Information Removal και το Identity Theft Restoration.</string>
     <string name="subscriptionSettingSubscribeWithDuckAiSubtitleRow">Οι συνδρομητές αποκτούν το VPN μας, προηγμένα μοντέλα τεχνητής νοημοσύνης στο Duck.ai και το Identity Theft Restoration.</string>
 

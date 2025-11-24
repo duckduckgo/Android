@@ -176,9 +176,6 @@
     <string name="activityPir" translatable="false">Privacy Pro</string>
     <string name="activitySendFeedback">Lähetä palautetta</string>
 
-    <!-- Privacy Pro Rebranding-->
-    <string name="subscriptionSettingRebrandingMessage">Privacy Pro on nyt nimeltään DuckDuckGo-tilaus</string>
-
     <string name="subscriptionSettingSubscribeWithDuckAiSubtitle">Tilaajat saavat VPN:n ja edistyneet tekoälymallit Duck.ai:ssa, Personal Information Removalin ja Identity Theft Restorationin.</string>
     <string name="subscriptionSettingSubscribeWithDuckAiSubtitleRow">Tilaajat saavat VPN:n, edistyneet tekoälymallit Duck.ai:ssa ja Identity Theft Restorationin.</string>
 

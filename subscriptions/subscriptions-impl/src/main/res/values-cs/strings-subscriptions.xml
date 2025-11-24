@@ -176,9 +176,6 @@
     <string name="activityPir" translatable="false">Privacy Pro</string>
     <string name="activitySendFeedback">Odeslat zpětnou vazbu</string>
 
-    <!-- Privacy Pro Rebranding-->
-    <string name="subscriptionSettingRebrandingMessage">Privacy Pro mění název na „předplatné DuckDuckGo“</string>
-
     <string name="subscriptionSettingSubscribeWithDuckAiSubtitle">Předplatitelé získají naši VPN, pokročilé modely AI ve funkci Duck.ai, službu Personal Information Removal a Identity Theft Restoration.</string>
     <string name="subscriptionSettingSubscribeWithDuckAiSubtitleRow">Předplatitelé získají naši VPN, pokročilé modely umělé inteligence ve funkci Duck.ai a službu Identity Theft Restoration.</string>
 
