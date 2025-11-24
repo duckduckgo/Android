@@ -115,6 +115,9 @@ interface SyncPixels {
     fun fireSetupDeepLinkFlowAbandoned()
     fun fireUserConfirmedToTurnOffSync()
     fun fireUserConfirmedToTurnOffSyncAndDelete(connectedDevices: Int)
+    fun fireSetupSyncPromoBookmarkAddedDialogDismissed()
+    fun fireSetupSyncPromoBookmarkAddedDialogConfirmed()
+    fun fireSetupSyncPromoBookmarkAddedDialogShown()
 }
 
 @ContributesBinding(AppScope::class)
@@ -338,6 +341,18 @@ class RealSyncPixels @Inject constructor(
         pixel.fire(SyncPixelName.SYNC_USER_CONFIRMED_TO_TURN_OFF_SYNC_AND_DELETE, parameters = params)
     }
 
+    override fun fireSetupSyncPromoBookmarkAddedDialogDismissed() {
+        pixel.fire(SyncPixelName.SYNC_SETUP_PROMO_BOOKMARK_ADDED_DIALOG_DISMISSED)
+    }
+
+    override fun fireSetupSyncPromoBookmarkAddedDialogConfirmed() {
+        pixel.fire(SyncPixelName.SYNC_SETUP_PROMO_BOOKMARK_ADDED_DIALOG_CONFIRMED)
+    }
+
+    override fun fireSetupSyncPromoBookmarkAddedDialogShown() {
+        pixel.fire(SyncPixelName.SYNC_SETUP_PROMO_BOOKMARK_ADDED_DIALOG_SHOWN)
+    }
+
     override fun fireSyncBarcodeScreenShown(screenType: ScreenType) {
         val params = mapOf(SYNC_SETUP_SCREEN_TYPE to screenType.value)
         pixel.fire(SyncPixelName.SYNC_SETUP_BARCODE_SCREEN_SHOWN, parameters = params)
@@ -452,6 +467,9 @@ enum class SyncPixelName(override val pixelName: String) : Pixel.PixelName {
     SYNC_SETUP_ENDED_SUCCESS("sync_setup_ended_successful"),
     SYNC_USER_CONFIRMED_TO_TURN_OFF_SYNC("sync_disabled"),
     SYNC_USER_CONFIRMED_TO_TURN_OFF_SYNC_AND_DELETE("sync_disabledanddeleted"),
+    SYNC_SETUP_PROMO_BOOKMARK_ADDED_DIALOG_SHOWN("sync_setup_promo_bookmark_added_dialog_shown"),
+    SYNC_SETUP_PROMO_BOOKMARK_ADDED_DIALOG_DISMISSED("sync_setup_promo_bookmark_added_dialog_dismissed"),
+    SYNC_SETUP_PROMO_BOOKMARK_ADDED_DIALOG_CONFIRMED("sync_setup_promo_bookmark_added_dialog_confirmed"),
 }
 
 object SyncPixelParameters {
@@ -485,6 +503,9 @@ object SyncPixelsRequiringDataCleaning : PixelParamRemovalPlugin {
         return listOf(
             SyncPixelName.SYNC_USER_CONFIRMED_TO_TURN_OFF_SYNC.pixelName to removeAtb(),
             SyncPixelName.SYNC_USER_CONFIRMED_TO_TURN_OFF_SYNC_AND_DELETE.pixelName to removeAtb(),
+            SyncPixelName.SYNC_SETUP_PROMO_BOOKMARK_ADDED_DIALOG_SHOWN.pixelName to removeAtb(),
+            SyncPixelName.SYNC_SETUP_PROMO_BOOKMARK_ADDED_DIALOG_DISMISSED.pixelName to removeAtb(),
+            SyncPixelName.SYNC_SETUP_PROMO_BOOKMARK_ADDED_DIALOG_CONFIRMED.pixelName to removeAtb(),
         )
     }
 }
