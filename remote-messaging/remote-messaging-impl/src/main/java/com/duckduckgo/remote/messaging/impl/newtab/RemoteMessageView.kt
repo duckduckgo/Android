@@ -140,7 +140,7 @@ class RemoteMessageView @JvmOverloads constructor(
             is LaunchScreen -> launchScreen(command.screen, command.payload)
             is SharePromoLinkRMF -> launchSharePromoRMFPageChooser(command.url, command.shareTitle)
             is SubmitUrl -> submitUrl(command.url)
-            is Command.SubmitUrlInContext -> submitUrlInContext(command.url)
+            is Command.SubmitUrlInContext -> submitUrl(command.url)
         }
     }
 
@@ -222,9 +222,6 @@ class RemoteMessageView @JvmOverloads constructor(
 
     private fun submitUrl(url: String) {
         context.startActivity(browserNav.openInCurrentTab(context, url))
-    }
-
-    private fun submitUrlInContext(url: String) {
     }
 }
 
