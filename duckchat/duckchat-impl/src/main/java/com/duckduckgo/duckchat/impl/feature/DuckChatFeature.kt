@@ -112,9 +112,9 @@ interface DuckChatFeature {
     /**
      * @return `true` when the remote config has the "duckAiVoiceSearch"
      * sub-feature flag enabled
-     * If the remote feature is not present defaults to `internal`
+     * If the remote feature is not present defaults to `true`
      */
-    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun duckAiVoiceSearch(): Toggle
 
     /**
