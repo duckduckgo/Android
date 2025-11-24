@@ -176,9 +176,6 @@
     <string name="activityPir" translatable="false">Privacy Pro</string>
     <string name="activitySendFeedback">Envoyer vos remarques</string>
 
-    <!-- Privacy Pro Rebranding-->
-    <string name="subscriptionSettingRebrandingMessage">Privacy Pro s\'appelle désormais simplement l\'abonnement DuckDuckGo</string>
-
     <string name="subscriptionSettingSubscribeWithDuckAiSubtitle">Les abonnés bénéficient de notre VPN, de modèles d\'IA avancés dans Duck.ai, de Personal Information Removal et d\'Identity Theft Restoration.</string>
     <string name="subscriptionSettingSubscribeWithDuckAiSubtitleRow">Les abonnés bénéficient de notre VPN, de modèles d\'IA avancés dans Duck.ai et d\'Identity Theft Restoration.</string>
 
