@@ -8330,9 +8330,9 @@ class BrowserTabViewModelTest {
             subscriptionName = "subscription1",
             params = JSONObject(),
         )
-        whenever(mockDuckChatJSHelper.onNativeAction(NativeAction.HISTORY)).thenReturn(expectedEvent)
+        whenever(mockDuckChatJSHelper.onNativeAction(NativeAction.SIDEBAR)).thenReturn(expectedEvent)
 
-        testee.openDuckChatHistory()
+        testee.openDuckChatSidebar()
 
         testee.subscriptionEventDataFlow.test {
             val emittedEvent = awaitItem()

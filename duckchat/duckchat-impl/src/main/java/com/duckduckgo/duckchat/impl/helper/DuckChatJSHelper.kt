@@ -46,7 +46,7 @@ interface DuckChatJSHelper {
 
 enum class NativeAction {
     NEW_CHAT,
-    HISTORY,
+    SIDEBAR,
     DUCK_AI_SETTINGS,
 }
 
@@ -132,7 +132,7 @@ class RealDuckChatJSHelper @Inject constructor(
     override fun onNativeAction(action: NativeAction): SubscriptionEventData {
         val subscriptionName = when (action) {
             NativeAction.NEW_CHAT -> SUBSCRIPTION_NEW_CHAT
-            NativeAction.HISTORY -> SUBSCRIPTION_HISTORY
+            NativeAction.SIDEBAR -> SUBSCRIPTION_HISTORY
             NativeAction.DUCK_AI_SETTINGS -> SUBSCRIPTION_DUCK_AI_SETTINGS
         }
 

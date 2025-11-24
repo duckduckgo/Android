@@ -1443,7 +1443,7 @@ class BrowserTabFragment :
                 viewModel.openNewDuckChat()
             }
             onMenuItemClicked(duckChatHistoryMenuItem) {
-                viewModel.openDuckChatHistory()
+                viewModel.openDuckChatSidebar()
             }
             onMenuItemClicked(duckChatSettingsMenuItem) {
                 viewModel.openDuckChatSettings()
@@ -3125,6 +3125,10 @@ class BrowserTabFragment :
 
                 override fun onBackButtonPressed() {
                     hideKeyboard()
+                }
+
+                override fun onDuckAISidebarButtonPressed() {
+                    viewModel.openDuckChatSidebar()
                 }
             },
         )

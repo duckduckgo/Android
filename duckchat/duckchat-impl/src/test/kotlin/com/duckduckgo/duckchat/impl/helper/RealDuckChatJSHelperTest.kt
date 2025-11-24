@@ -557,7 +557,7 @@ class RealDuckChatJSHelperTest {
 
     @Test
     fun whenNativeActionHistoryRequestedThenSubscriptionDataSent() = runTest {
-        val result = testee.onNativeAction(NativeAction.HISTORY)
+        val result = testee.onNativeAction(NativeAction.SIDEBAR)
 
         assertEquals("openDuckAiHistory", result.subscriptionName)
         assertEquals(DUCK_CHAT_FEATURE_NAME, result.featureName)

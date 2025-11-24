@@ -4520,9 +4520,9 @@ class BrowserTabViewModel @Inject constructor(
         }
     }
 
-    fun openDuckChatHistory() {
+    fun openDuckChatSidebar() {
         viewModelScope.launch {
-            val subscriptionEvent = duckChatJSHelper.onNativeAction(NativeAction.HISTORY)
+            val subscriptionEvent = duckChatJSHelper.onNativeAction(NativeAction.SIDEBAR)
             _subscriptionEventDataChannel.send(subscriptionEvent)
         }
     }

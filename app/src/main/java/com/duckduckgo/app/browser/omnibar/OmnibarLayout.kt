@@ -224,6 +224,7 @@ class OmnibarLayout @JvmOverloads constructor(
     private val customTabToolbarContainerWrapper: ViewGroup by lazy { findViewById(R.id.customTabToolbarContainerWrapper) }
     private val leadingIconContainer: View by lazy { findViewById(R.id.omnibarIconContainer) }
     private val duckAIHeader: View by lazy { findViewById(R.id.duckAIHeader) }
+    private val duckAISidebar: View by lazy { findViewById(R.id.duckAiSidebar) }
 
     private var isFindInPageVisible = false
     private val findInPageLayoutVisibilityChangeListener =
@@ -583,6 +584,9 @@ class OmnibarLayout @JvmOverloads constructor(
         duckAIHeader.setOnClickListener {
             viewModel.onTextInputClickCatcherClicked()
         }
+        duckAISidebar.setOnClickListener {
+            omnibarItemPressedListener?.onDuckAISidebarButtonPressed()
+        }
     }
 
     override fun setLogoClickListener(logoClickListener: LogoClickListener) {
@@ -605,6 +609,7 @@ class OmnibarLayout @JvmOverloads constructor(
         }
 
         duckAIHeader.isVisible = viewState.viewMode is ViewMode.DuckAI
+        duckAISidebar.isVisible = viewState.viewMode is ViewMode.DuckAI
         leadingIconContainer.isGone = viewState.viewMode is ViewMode.DuckAI
         omnibarTextInput.isGone = viewState.viewMode is ViewMode.DuckAI
 
