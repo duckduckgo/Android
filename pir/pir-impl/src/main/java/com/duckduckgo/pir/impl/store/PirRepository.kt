@@ -143,6 +143,8 @@ interface PirRepository {
 
     suspend fun getAllExtractedProfiles(): List<ExtractedProfile>
 
+    suspend fun markExtractedProfileAsDeprecated(extractedProfileId: Long)
+
     suspend fun getUserProfileQuery(id: Long): ProfileQuery?
 
     /**
@@ -551,6 +553,12 @@ class RealPirRepository(
                 it.toExtractedProfile()
             }.orEmpty()
         }
+
+    override suspend fun markExtractedProfileAsDeprecated(extractedProfileId: Long) {
+        withContext(dispatcherProvider.io()) {
+            extractedProfileDao()?.updateExtractedProfileDeprecated(extractedProfileId, deprecated = true)
+        }
+    }
 
     override suspend fun getUserProfileQuery(id: Long): ProfileQuery? =
         withContext(dispatcherProvider.io()) {
