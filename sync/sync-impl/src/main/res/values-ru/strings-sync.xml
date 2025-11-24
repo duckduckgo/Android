@@ -208,4 +208,8 @@
 
     <string name="deep_link_auth_prompt_title">Настройка синхронизации и резервного копирования</string>
     <string name="deep_link_auth_prompt_message">Для настройки синхронизации и резервного копирования нужно разблокировать устройство.</string>
+
+    <!-- Sync promo in bookmark added confirmation dialog -->
+    <string name="addBookmarkDialogSyncPromoText">Синхронизировать закладки</string>
+    <string name="addBookmarkDialogHideSyncSuggestion">Скрыть</string>
 </resources>

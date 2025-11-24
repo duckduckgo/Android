@@ -208,4 +208,8 @@
 
     <string name="deep_link_auth_prompt_title">Configurer Sync &amp; Backup</string>
     <string name="deep_link_auth_prompt_message">Déverrouiller l\'appareil pour configurer Sync &amp; Backup</string>
+
+    <!-- Sync promo in bookmark added confirmation dialog -->
+    <string name="addBookmarkDialogSyncPromoText">Synchroniser les favoris sur plusieurs appareils</string>
+    <string name="addBookmarkDialogHideSyncSuggestion">Masquer</string>
 </resources>
