@@ -305,5 +305,256 @@
                 "type": "string"
             }
         ]
+    },
+    "dbp_scan_started": {
+        "description": "Pixel emitted when scan is started for a broker",
+        "owners": ["karlenDimla", "landomen"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "data_broker",
+                "description": "The URL of the broker the stage was for",
+                "type": "string"
+            }
+        ]
+    },
+    "dbp_scan_stage": {
+        "description": "Pixel emitted for every stage of a scan for a broker x profile.",
+        "owners": ["karlenDimla", "landomen"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "data_broker",
+                "description": "The URL of the broker the stage was for",
+                "type": "string"
+            },
+            {
+                "key": "broker_version",
+                "description": "The version of the broker JSON file",
+                "type": "string"
+            },
+            {
+                "key": "tries",
+                "description": "The number of tries recorded when the stage happened",
+                "type": "string"
+            },
+            {
+                "key": "parent",
+                "description": "The parent data broker of the scan",
+                "type": "string"
+            },
+            {
+                "key": "action_id",
+                "description": "Predefined identifier of the broker action the stage is for",
+                "type": "string"
+            },
+            {
+                "key": "action_type",
+                "description": "Type of action associated to the stage",
+                "type": "string",
+                "enum": [
+                    "extract",
+                    "navigate",
+                    "fillForm",
+                    "click",
+                    "expectation",
+                    "emailConfirmation",
+                    "getCaptchaInfo",
+                    "solveCaptcha",
+                    "condition"
+                ]
+            }
+        ]
+    },
+    "dbp_search_stage_main_status_success": {
+        "description": "Pixel emitted when the scan is completed with results.",
+        "owners": ["karlenDimla", "landomen"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "data_broker",
+                "description": "The URL of the broker scanned",
+                "type": "string"
+            },
+            {
+                "key": "num_found",
+                "description": "The profiles extracted from the broker",
+                "type": "string"
+            },
+            {
+                "key": "duration",
+                "description": "Total duration of the scan in ms",
+                "type": "string"
+            },
+            {
+                "key": "is_manual_scan",
+                "description": "True if the scan was manually initiated",
+                "type": "string"
+            },
+            {
+                "key": "vpn_connection_state",
+                "description": "Reported VPN connection state when the scan happened",
+                "type": "string"
+            },
+            {
+                "key": "vpn_bypass",
+                "description": "VPN bypass status when the scan happened",
+                "type": "string",
+                "enum": ["on", "off", "unsupported"]
+            },
+            {
+                "key": "parent",
+                "description": "The parent data broker of the broker scanned",
+                "type": "string"
+            }
+        ]
+    },
+    "dbp_search_stage_main_status_no_results": {
+        "description": "Pixel for PIR monthly active users.",
+        "owners": ["karlenDimla", "landomen"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "data_broker",
+                "description": "The URL of the broker scanned",
+                "type": "string"
+            },
+            {
+                "key": "broker_version",
+                "description": "The version of the broker JSON file",
+                "type": "string"
+            },
+            {
+                "key": "duration",
+                "description": "Total duration of the scan in ms",
+                "type": "string"
+            },
+            {
+                "key": "is_manual_scan",
+                "description": "True if the scan was manually initiated",
+                "type": "string"
+            },
+            {
+                "key": "vpn_connection_state",
+                "description": "Reported VPN connection state when the scan happened",
+                "type": "string"
+            },
+            {
+                "key": "vpn_bypass",
+                "description": "VPN bypass status when the scan happened",
+                "type": "string",
+                "enum": ["on", "off", "unsupported"]
+            },
+            {
+                "key": "parent",
+                "description": "The parent data broker of the broker scanned",
+                "type": "string"
+            },
+            {
+                "key": "action_id",
+                "description": "Predefined identifier of the broker action last executed",
+                "type": "string"
+            },
+            {
+                "key": "action_type",
+                "description": "Type of action last executed",
+                "type": "string",
+                "enum": [
+                    "extract",
+                    "navigate",
+                    "fillForm",
+                    "click",
+                    "expectation",
+                    "emailConfirmation",
+                    "getCaptchaInfo",
+                    "solveCaptcha",
+                    "condition"
+                ]
+            }
+        ]
+    },
+    "dbp_search_stage_main_status_error": {
+        "description": "Pixel for PIR monthly active users.",
+        "owners": ["karlenDimla", "landomen"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "data_broker",
+                "description": "The URL of the broker scanned",
+                "type": "string"
+            },
+            {
+                "key": "broker_version",
+                "description": "The version of the broker JSON file",
+                "type": "string"
+            },
+            {
+                "key": "duration",
+                "description": "Total duration of the scan in ms",
+                "type": "string"
+            },
+            {
+                "key": "error_category",
+                "description": "Category associated to the error",
+                "type": "string"
+            },
+            {
+                "key": "error_details",
+                "description": "Localized description of the error if available",
+                "type": "string"
+            },
+            {
+                "key": "is_manual_scan",
+                "description": "True if the scan was manually initiated",
+                "type": "string"
+            },
+            {
+                "key": "vpn_connection_state",
+                "description": "Reported VPN connection state when the error happened",
+                "type": "string"
+            },
+            {
+                "key": "vpn_bypass",
+                "description": "VPN bypass status when the error happened",
+                "type": "string",
+                "enum": ["on", "off", "unsupported"]
+            },
+            {
+                "key": "parent",
+                "description": "The parent data broker of the broker scanned",
+                "type": "string"
+            },
+            {
+                "key": "action_id",
+                "description": "Predefined identifier of the broker action that failed",
+                "type": "string"
+            },
+            {
+                "key": "action_type",
+                "description": "Type of action that failed",
+                "type": "string",
+                "enum": [
+                    "extract",
+                    "navigate",
+                    "fillForm",
+                    "click",
+                    "expectation",
+                    "emailConfirmation",
+                    "getCaptchaInfo",
+                    "solveCaptcha",
+                    "condition"
+                ]
+            }
+        ]
     }
 }
