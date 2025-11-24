@@ -208,4 +208,8 @@
 
     <string name="deep_link_auth_prompt_title">Synkronoinnin ja varmuuskopioinnin määrittäminen</string>
     <string name="deep_link_auth_prompt_message">Avaa laitteen lukitus ja määritä Sync &amp; Backup</string>
+
+    <!-- Sync promo in bookmark added confirmation dialog -->
+    <string name="addBookmarkDialogSyncPromoText">Synkronoi kirjanmerkit laitteidesi välillä</string>
+    <string name="addBookmarkDialogHideSyncSuggestion">Piilota</string>
 </resources>
