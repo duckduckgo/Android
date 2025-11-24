@@ -45,10 +45,11 @@ class LottiePrivacyShieldAnimationHelper @Inject constructor(
         holder: LottieAnimationView,
         privacyShield: PrivacyShield,
         viewMode: ViewMode,
+        useLightAnimation: Boolean?,
     ) {
         val protectedShield: Int
         val protectedShieldDark: Int
-        if (viewMode is ViewMode.CustomTab && !omnibarRepository.isNewCustomTabAvailable) {
+        if (viewMode is ViewMode.CustomTab && !omnibarRepository.isNewCustomTabEnabled) {
             protectedShield = R.raw.protected_shield_custom_tab
             protectedShieldDark = R.raw.dark_protected_shield_custom_tab
         } else {
@@ -63,12 +64,15 @@ class LottiePrivacyShieldAnimationHelper @Inject constructor(
         val unprotectedShield: Int = R.raw.unprotected_shield
         val unprotectedShieldDark: Int = R.raw.dark_unprotected_shield
 
+        // Determine if we should use light mode animations
+        val isLightMode = useLightAnimation ?: appTheme.isLightModeEnabled()
+
         val currentAnimation = holder.tag as? Int
         val newAnimation = when (privacyShield) {
-            PROTECTED -> if (appTheme.isLightModeEnabled()) protectedShield else protectedShieldDark
-            UNPROTECTED -> if (appTheme.isLightModeEnabled()) unprotectedShield else unprotectedShieldDark
+            PROTECTED -> if (isLightMode) protectedShield else protectedShieldDark
+            UNPROTECTED -> if (isLightMode) unprotectedShield else unprotectedShieldDark
             UNKNOWN -> null
-            MALICIOUS -> if (appTheme.isLightModeEnabled()) R.raw.alert_red else R.raw.alert_red_dark
+            MALICIOUS -> if (isLightMode) R.raw.alert_red else R.raw.alert_red_dark
         }
 
         if (newAnimation != null && newAnimation != currentAnimation) {

@@ -52,8 +52,8 @@ open class OmnibarFeatureRepository @Inject constructor(
     override val isSplitOmnibarAvailable: Boolean
         get() = isSplitOmnibarFlagEnabled
 
-    override val isNewCustomTabAvailable: Boolean
-        get() = isSplitOmnibarFlagEnabled
+    override val isNewCustomTabEnabled: Boolean
+        get() = isNewCustomTagFlagEnabled
 
     override fun onStart(owner: LifecycleOwner) {
         coroutineScope.launch(dispatcherProvider.io()) {

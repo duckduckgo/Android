@@ -79,6 +79,7 @@ class BrowserLottieTrackersAnimatorHelper @Inject constructor(
         trackersAnimationView: LottieAnimationView,
         omnibarViews: List<View>,
         entities: List<Entity>?,
+        useLightAnimation: Boolean?,
     ) {
         if (isCookiesAnimationRunning) return // If cookies animation is running let it finish to avoid weird glitches with the other animations
         if (trackersAnimationView.isAnimating) return
@@ -97,7 +98,8 @@ class BrowserLottieTrackersAnimatorHelper @Inject constructor(
             return
         }
 
-        val animationRawRes = getVisualDesignAnimationRawRes(logos, theme)
+        val isLightMode = useLightAnimation ?: theme.isLightModeEnabled()
+        val animationRawRes = getVisualDesignAnimationRawRes(logos, isLightMode)
 
         with(trackersAnimationView) {
             this.setCacheComposition(false) // ensure assets are not cached
@@ -140,6 +142,7 @@ class BrowserLottieTrackersAnimatorHelper @Inject constructor(
         omnibarViews: List<View>,
         shieldViews: List<View>,
         entities: List<Entity>?,
+        customBackgroundColor: Int?,
     ) {
         if (isCookiesAnimationRunning || addressBarTrackersAnimator.isAnimationRunning) return
 
@@ -151,6 +154,7 @@ class BrowserLottieTrackersAnimatorHelper @Inject constructor(
             omnibarViews = omnibarViews,
             shieldViews = shieldViews,
             entities = entities,
+            customBackgroundColor = customBackgroundColor,
             onAnimationComplete = {
                 conflatedJob +=
                     coroutineScope.launch {
@@ -347,15 +351,15 @@ class BrowserLottieTrackersAnimatorHelper @Inject constructor(
 
     private fun getVisualDesignAnimationRawRes(
         logos: List<TrackerLogo>,
-        theme: AppTheme,
+        isLightMode: Boolean,
     ): Int {
         val trackers = logos.size
         return when {
-            trackers == 1 -> if (theme.isLightModeEnabled()) R.raw.light_trackers else R.raw.dark_trackers
-            trackers == 2 -> if (theme.isLightModeEnabled()) R.raw.light_trackers_1 else R.raw.dark_trackers_1
-            trackers >= 3 -> if (theme.isLightModeEnabled()) R.raw.light_trackers_2 else R.raw.dark_trackers_2
+            trackers == 1 -> if (isLightMode) R.raw.light_trackers else R.raw.dark_trackers
+            trackers == 2 -> if (isLightMode) R.raw.light_trackers_1 else R.raw.dark_trackers_1
+            trackers >= 3 -> if (isLightMode) R.raw.light_trackers_2 else R.raw.dark_trackers_2
             // we shouldn't be here but we also don't want to crash so we'll show the default
-            else -> if (theme.isLightModeEnabled()) R.raw.light_trackers else R.raw.dark_trackers
+            else -> if (isLightMode) R.raw.light_trackers else R.raw.dark_trackers
         }
     }
 

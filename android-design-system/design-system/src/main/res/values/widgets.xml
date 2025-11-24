@@ -479,7 +479,7 @@
     </style>
 
     <style name="Widget.DuckDuckGo.CustomToolbarCardView" parent="Widget.MaterialComponents.CardView">
-        <item name="cardBackgroundColor">?attr/daxColorWindow</item>
+        <item name="cardBackgroundColor">?attr/daxColorSurface</item>
         <item name="cardCornerRadius">100dp</item>
     </style>
 

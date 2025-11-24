@@ -40,5 +40,5 @@ interface OmnibarRepository {
     /**
      * True when the new custom tab UI is available (the feature flag is enabled).
      */
-    val isNewCustomTabAvailable: Boolean
+    val isNewCustomTabEnabled: Boolean
 }
