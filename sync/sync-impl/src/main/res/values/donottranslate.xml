@@ -34,7 +34,4 @@
     <string name="sync_internal_promotions_clear_history_bookmark_screen_promo">Clear history (bookmark screen)</string>
     <string name="sync_internal_promotions_clear_history_password_screen_promo">Clear history (password screen)</string>
 
-    <string name="addBookmarkDialogSyncPromoText">Sync Bookmarks Across Devices</string>
-    <string name="addBookmarkDialogHideSyncSuggestion">Hide</string>
-
 </resources>
