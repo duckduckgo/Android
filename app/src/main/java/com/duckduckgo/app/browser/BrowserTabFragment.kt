@@ -1,6 +1,4 @@
-/*
- * Copyright (c) 2018 DuckDuckGo
- *
+/* * Copyright (c) 2018 DuckDuckGo *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -235,6 +233,7 @@ import com.duckduckgo.autofill.api.ExistingCredentialMatchDetector.ContainsCrede
 import com.duckduckgo.autofill.api.ExistingCredentialMatchDetector.ContainsCredentialsResult.UsernameMatchDifferentPassword
 import com.duckduckgo.autofill.api.ExistingCredentialMatchDetector.ContainsCredentialsResult.UsernameMatchMissingPassword
 import com.duckduckgo.autofill.api.ExistingCredentialMatchDetector.ContainsCredentialsResult.UsernameMissing
+import com.duckduckgo.autofill.api.PasskeyDetection
 import com.duckduckgo.autofill.api.UseGeneratedPasswordDialog
 import com.duckduckgo.autofill.api.credential.saving.DuckAddressLoginCreator
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
@@ -630,6 +629,9 @@ class BrowserTabFragment :
 
     @Inject
     lateinit var systemAutofillEngagement: SystemAutofillEngagement
+
+    @Inject
+    lateinit var passkeyDetection: PasskeyDetection
 
     private var isActiveTab: Boolean = false
 
@@ -3533,6 +3535,10 @@ class BrowserTabFragment :
                     }
                 }
             }
+        }
+
+        lifecycleScope.launch {
+            passkeyDetection.addJsInterface(it)
         }
     }
 

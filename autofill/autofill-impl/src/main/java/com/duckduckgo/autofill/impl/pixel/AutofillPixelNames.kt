@@ -222,10 +222,18 @@ enum class AutofillPixelNames(override val pixelName: String) : Pixel.PixelName 
     BOOKMARK_IMPORT_FROM_GOOGLE_FLOW_ERROR("bookmark_import_from_google_flow_error"),
     BOOKMARK_IMPORT_FROM_GOOGLE_FLOW_CANCELLED("bookmark_import_from_google_flow_cancelled"),
     BOOKMARK_IMPORT_FROM_GOOGLE_FLOW_EXTRA_CHROME_EXPORT("bookmark_import_from_google_flow_extra_chrome_export"),
+
+    AUTOFILL_PASSKEY_AUTH_STARTED("autofill_passkey_auth_started"),
+    AUTOFILL_PASSKEY_AUTH_SUCCEEDED("autofill_passkey_auth_succeeded"),
+    AUTOFILL_PASSKEY_AUTH_FAILED("autofill_passkey_auth_failed"),
+    AUTOFILL_PASSKEY_REGISTRATION_STARTED("autofill_passkey_registration_started"),
+    AUTOFILL_PASSKEY_REGISTRATION_SUCCEEDED("autofill_passkey_registration_succeeded"),
+    AUTOFILL_PASSKEY_REGISTRATION_FAILED("autofill_passkey_registration_failed"),
 }
 
 object AutofillPixelParameters {
     const val LAST_USED_PIXEL_KEY = "last_used"
+    const val ERROR_PIXEL_KEY = "error"
 }
 
 @ContributesMultibinding(
