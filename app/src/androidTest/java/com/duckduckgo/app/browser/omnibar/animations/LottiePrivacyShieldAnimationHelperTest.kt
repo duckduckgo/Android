@@ -428,7 +428,7 @@ class LottiePrivacyShieldAnimationHelperTest {
 
     @SuppressLint("DenyListedApi")
     @Test
-    fun whenNewCustomTabEnabledAndAddressBarTrackersAnimationFeatureToggleIsOnAndCustomTabViewModeAndProtectedThenUseAddressBarTrackersAnimationShieldVariant() = runTest {
+    fun whenAddressBarTrackersAnimationFeatureToggleIsOnAndCustomTabViewModeAndProtectedThenUseAddressBarTrackersAnimationShieldVariant() = runTest {
         val holder: LottieAnimationView = mock()
         val appTheme: AppTheme = mock()
         val newCustomTabRepository: OmnibarRepository = mock<OmnibarRepository>().apply {
@@ -445,7 +445,7 @@ class LottiePrivacyShieldAnimationHelperTest {
 
     @SuppressLint("DenyListedApi")
     @Test
-    fun whenNewCustomTabEnabledAndAddressBarTrackersAnimationFeatureToggleIsOnAndDarkModeAndCustomTabViewModeAndProtectedThenUseAddressBarTrackersAnimationShieldVariant() = runTest {
+    fun whenAndAddressBarTrackersAnimationFeatureToggleIsOnAndDarkModeAndCustomTabViewModeAndProtectedThenUseCorrectShieldVariant() = runTest {
         val holder: LottieAnimationView = mock()
         val appTheme: AppTheme = mock()
         val newCustomTabRepository: OmnibarRepository = mock<OmnibarRepository>().apply {
