@@ -31,6 +31,7 @@ import com.duckduckgo.pir.impl.common.PirJob.RunType
 import com.duckduckgo.pir.impl.common.PirJobConstants.MAX_DETACHED_WEBVIEW_COUNT
 import com.duckduckgo.pir.impl.common.RealPirActionsRunner
 import com.duckduckgo.pir.impl.common.splitIntoParts
+import com.duckduckgo.pir.impl.models.Broker
 import com.duckduckgo.pir.impl.models.ProfileQuery
 import com.duckduckgo.pir.impl.models.scheduling.JobRecord.ScanJobRecord
 import com.duckduckgo.pir.impl.scripts.PirCssScriptLoader
@@ -118,6 +119,13 @@ class RealPirScan @Inject constructor(
         val startTimeMillis = currentTimeProvider.currentTimeMillis()
         emitScanStartPixel(runType)
 
+        val activeBrokers = repository.getAllActiveBrokerObjects().associateBy { it.name }
+        if (activeBrokers.isEmpty()) {
+            logcat { "PIR-SCAN: No active brokers here." }
+            completeScan(runType)
+            return@withContext Result.success(Unit)
+        }
+
         if (jobRecords.isEmpty()) {
             logcat { "PIR-SCAN: Nothing to scan here." }
             completeScan(runType)
@@ -126,7 +134,7 @@ class RealPirScan @Inject constructor(
 
         cleanPreviousRun()
 
-        val processedJobRecords = processJobRecords(jobRecords)
+        val processedJobRecords = processJobRecords(jobRecords, activeBrokers)
         logcat { "PIR-SCAN: Total processed records ${processedJobRecords.size}" }
 
         if (processedJobRecords.isEmpty()) {
@@ -151,7 +159,7 @@ class RealPirScan @Inject constructor(
         // Execute the steps in parallel
         jobRecordsParts.mapIndexed { index, partSteps ->
             logcat { "PIR-SCAN: Record part [$index] -> ${partSteps.size}" }
-            logcat { "PIR-SCAN: Record part [$index] breakdown -> ${partSteps.map { it.first.id to it.second.brokerName }}" }
+            logcat { "PIR-SCAN: Record part [$index] breakdown -> ${partSteps.map { it.first.id to it.second.broker.name }}" }
             // We want to run the runners in parallel but wait for everything to complete before we proceed
             async {
                 partSteps.forEach { (profile, step) ->
@@ -167,10 +175,15 @@ class RealPirScan @Inject constructor(
         return@withContext Result.success(Unit)
     }
 
-    private suspend fun processJobRecords(jobRecords: List<ScanJobRecord>): List<Pair<ProfileQuery, BrokerStep>> {
+    private suspend fun processJobRecords(
+        jobRecords: List<ScanJobRecord>,
+        activeBrokers: Map<String, Broker>,
+    ): List<Pair<ProfileQuery, BrokerStep>> {
         val relevantBrokerSteps = jobRecords.mapTo(mutableSetOf()) { it.brokerName }.mapNotNull {
+            val broker = activeBrokers[it] ?: return@mapNotNull null
+
             val steps = repository.getBrokerScanSteps(it)?.run {
-                brokerStepsParser.parseStep(it, this)
+                brokerStepsParser.parseStep(broker, this)
             }
             if (!steps.isNullOrEmpty()) {
                 it to steps[0]
@@ -248,9 +261,12 @@ class RealPirScan @Inject constructor(
             runners.add(pirActionsRunnerFactory.create(context, script, runType))
         }
 
+        val activeBrokers = repository.getAllActiveBrokerObjects().associateBy { it.name }
+
         // Prepare a list of all broker steps that need to be run
-        val brokerScanSteps = brokers.mapNotNull { broker ->
-            repository.getBrokerScanSteps(broker)?.run {
+        val brokerScanSteps = brokers.mapNotNull { brokerName ->
+            val broker = activeBrokers[brokerName] ?: return@mapNotNull null
+            repository.getBrokerScanSteps(brokerName)?.run {
                 brokerStepsParser.parseStep(broker, this)
             }
         }.filter {
