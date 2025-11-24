@@ -148,12 +148,13 @@ class RemoteMessageView @JvmOverloads constructor(
         message: RemoteMessage,
         newMessage: Boolean,
     ) {
+        val msg = message.asMessage(isLightModeEnabled = appTheme.isLightModeEnabled())
         val shouldRender = newMessage || binding.root.visibility == View.GONE
 
-        if (shouldRender) {
+        if (msg != null && shouldRender) {
             binding.messageCta.show()
             viewModel.onMessageShown()
-            binding.messageCta.setMessage(message.asMessage(isLightModeEnabled = appTheme.isLightModeEnabled()))
+            binding.messageCta.setMessage(msg)
             binding.messageCta.onCloseButtonClicked {
                 viewModel.onMessageCloseButtonClicked()
             }

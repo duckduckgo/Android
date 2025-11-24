@@ -46,9 +46,10 @@ class UrlActionMapper @Inject constructor() : MessageActionMapperPlugin {
     }
 }
 
-@ContributesMultibinding(
-    AppScope::class,
-)
+// TODO ANA: Uncomment the below annotation once we are able to use this action (i.e is fully implemented).
+// @ContributesMultibinding(
+//     AppScope::class,
+// )
 class UrlInContextActionMapper @Inject constructor() : MessageActionMapperPlugin {
     override fun evaluate(jsonMessageAction: JsonMessageAction): Action? {
         return if (jsonMessageAction.type == JsonActionType.URL_IN_CONTEXT.jsonValue) {

@@ -37,7 +37,7 @@ class RealCommandActionMapper @Inject constructor(
             is Dismiss -> NewTabLegacyPageViewModel.Command.DismissMessage
             is PlayStore -> NewTabLegacyPageViewModel.Command.LaunchPlayStore(action.value)
             is Url -> NewTabLegacyPageViewModel.Command.SubmitUrl(action.value)
-            is UrlInContext -> NewTabLegacyPageViewModel.Command.SubmitUrlInContext(action.value)
+            is UrlInContext -> NewTabLegacyPageViewModel.Command.SubmitUrl(action.value)
             is DefaultBrowser -> NewTabLegacyPageViewModel.Command.LaunchDefaultBrowser
             is AppTpOnboarding -> NewTabLegacyPageViewModel.Command.LaunchAppTPOnboarding
             is Share -> NewTabLegacyPageViewModel.Command.SharePromoLinkRMF(action.value, action.title)

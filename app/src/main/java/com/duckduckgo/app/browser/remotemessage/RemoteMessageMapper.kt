@@ -21,7 +21,6 @@ import com.duckduckgo.common.ui.view.MessageCta.MessageType
 import com.duckduckgo.mobile.android.R
 import com.duckduckgo.remote.messaging.api.Content.BigSingleAction
 import com.duckduckgo.remote.messaging.api.Content.BigTwoActions
-import com.duckduckgo.remote.messaging.api.Content.CardsList
 import com.duckduckgo.remote.messaging.api.Content.Medium
 import com.duckduckgo.remote.messaging.api.Content.Placeholder
 import com.duckduckgo.remote.messaging.api.Content.Placeholder.ANNOUNCE
@@ -40,7 +39,7 @@ import com.duckduckgo.remote.messaging.api.Content.PromoSingleAction
 import com.duckduckgo.remote.messaging.api.Content.Small
 import com.duckduckgo.remote.messaging.api.RemoteMessage
 
-fun RemoteMessage.asMessage(isLightModeEnabled: Boolean): Message {
+fun RemoteMessage.asMessage(isLightModeEnabled: Boolean): Message? {
     return when (val content = this.content) {
         is Small -> Message(
             title = content.titleText,
@@ -75,12 +74,7 @@ fun RemoteMessage.asMessage(isLightModeEnabled: Boolean): Message {
             promoAction = content.actionText,
             messageType = MessageType.REMOTE_PROMO_MESSAGE,
         )
-        is CardsList -> Message(
-            title = content.titleText,
-            subtitle = content.descriptionText,
-            action = content.primaryActionText,
-            messageType = MessageType.REMOTE_LIST_MESSAGE,
-        )
+        else -> null
     }
 }
 

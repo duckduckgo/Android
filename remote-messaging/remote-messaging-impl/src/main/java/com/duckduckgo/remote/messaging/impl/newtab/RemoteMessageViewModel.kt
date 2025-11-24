@@ -37,6 +37,7 @@ import com.duckduckgo.remote.messaging.api.Action.Url
 import com.duckduckgo.remote.messaging.api.Action.UrlInContext
 import com.duckduckgo.remote.messaging.api.RemoteMessage
 import com.duckduckgo.remote.messaging.api.RemoteMessageModel
+import com.duckduckgo.remote.messaging.api.Surface
 import com.duckduckgo.survey.api.SurveyParameterManager
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
@@ -45,6 +46,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
@@ -96,6 +98,9 @@ class RemoteMessageViewModel @Inject constructor(
 
         viewModelScope.launch(dispatchers.io()) {
             remoteMessagingModel.getActiveMessages()
+                .map { message ->
+                    if (message?.surfaces?.contains(Surface.NEW_TAB_PAGE) == true) message else null
+                }
                 .flowOn(dispatchers.io())
                 .onEach { message ->
                     withContext(dispatchers.main()) {
