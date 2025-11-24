@@ -24,4 +24,6 @@ import com.duckduckgo.app.statistics.pixels.Pixel.PixelName
 enum class StatisticsPixelName(override val pixelName: String) : PixelName {
     BROWSER_DAILY_ACTIVE_FEATURE_STATE("m_browser_feature_daily_active_user_d"),
     RETENTION_SEGMENTS("m_retention_segments"),
+
+    ATB_PRE_INITIALIZER_PLUGIN_TIMEOUT("timeout_atb_pre_initializer_plugin"),
 }

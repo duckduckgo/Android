@@ -21,8 +21,10 @@ import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.onboarding.store.UserStageStore
 import com.duckduckgo.app.onboarding.store.isNewUser
+import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.referral.AppInstallationReferrerStateListener
 import com.duckduckgo.app.referral.AppInstallationReferrerStateListener.Companion.MAX_REFERRER_WAIT_TIME_MS
+import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.utils.SingleLiveEvent
 import com.duckduckgo.daxprompts.api.DaxPrompts
 import com.duckduckgo.daxprompts.api.DaxPrompts.ActionType.NONE
@@ -30,6 +32,7 @@ import com.duckduckgo.daxprompts.api.DaxPrompts.ActionType.SHOW_BROWSER_COMPARIS
 import com.duckduckgo.daxprompts.api.DaxPrompts.ActionType.TOO_SOON_TO_SHOW_OTHER_PROMPTS
 import com.duckduckgo.di.scopes.ActivityScope
 import kotlinx.coroutines.withTimeoutOrNull
+import logcat.LogPriority
 import logcat.logcat
 import javax.inject.Inject
 
@@ -39,6 +42,7 @@ class LaunchViewModel @Inject constructor(
     private val appReferrerStateListener: AppInstallationReferrerStateListener,
     private val daxPrompts: DaxPrompts,
     private val appInstallStore: AppInstallStore,
+    private val pixel: Pixel,
 ) : ViewModel() {
 
     val command: SingleLiveEvent<Command> = SingleLiveEvent()
@@ -87,8 +91,13 @@ class LaunchViewModel @Inject constructor(
         withTimeoutOrNull(MAX_REFERRER_WAIT_TIME_MS) {
             logcat { "Waiting for referrer" }
             return@withTimeoutOrNull appReferrerStateListener.waitForReferrerCode()
-        }
+        } ?: onReferrerTimeout()
 
         logcat { "Waited ${System.currentTimeMillis() - startTime}ms for referrer" }
+    }
+
+    private fun onReferrerTimeout() {
+        logcat(LogPriority.ERROR) { "LaunchViewModel timed out waiting for referrer" }
+        pixel.fire(AppPixelName.TIMEOUT_WAITING_FOR_APP_REFERRER)
     }
 }
