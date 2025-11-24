@@ -45,6 +45,14 @@ class SuggestionMatcher @Inject constructor(
         }
     }
 
+    fun getQuerySuggestions(
+        query: String?,
+        credentials: List<LoginCredentials>,
+    ): List<LoginCredentials> {
+        if (query.isNullOrBlank()) return emptyList()
+        return credentials.filter { it.domain?.contains(query, ignoreCase = true) == true }
+    }
+
     /**
      * Returns a list of credentials that are not a direct match for the current URL, but are considered shareable.
      */

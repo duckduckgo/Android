@@ -32,19 +32,21 @@ class SuggestionListBuilder @Inject constructor(
 ) {
 
     fun build(
+        unsortedQuerySuggestions: List<LoginCredentials>,
         unsortedDirectSuggestions: List<LoginCredentials>,
         unsortedSharableSuggestions: List<LoginCredentials>,
         allowBreakageReporting: Boolean,
     ): List<ListItem> {
         val list = mutableListOf<ListItem>()
 
-        if (unsortedDirectSuggestions.isNotEmpty() || unsortedSharableSuggestions.isNotEmpty()) {
+        if (unsortedQuerySuggestions.isNotEmpty() || unsortedDirectSuggestions.isNotEmpty() || unsortedSharableSuggestions.isNotEmpty()) {
             list.add(GroupHeading(context.getString(string.credentialManagementSuggestionsLabel)))
 
+            val sortedQuerySuggestions = sorter.sort(unsortedQuerySuggestions)
             val sortedDirectSuggestions = sorter.sort(unsortedDirectSuggestions)
             val sortedSharableSuggestions = sorter.sort(unsortedSharableSuggestions)
 
-            val allSuggestions = sortedDirectSuggestions + sortedSharableSuggestions
+            val allSuggestions = (sortedQuerySuggestions + sortedDirectSuggestions + sortedSharableSuggestions).distinct()
             list.addAll(allSuggestions.map { SuggestedCredential(it) })
 
             if (allowBreakageReporting) {
