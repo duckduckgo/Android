@@ -47,21 +47,15 @@ interface SubscriptionSwitchWideEvent {
 
     suspend fun onTargetPlanRetrievalFailure()
 
-    suspend fun onUserConfirmationShown()
-
-    suspend fun onUserCancelled()
-
     suspend fun onBillingFlowInitSuccess()
 
     suspend fun onBillingFlowInitFailure(error: String)
 
+    suspend fun onUserCancelled()
+
     suspend fun onPlayBillingSwitchSuccess()
 
-    suspend fun onPlayBillingSwitchFailure(error: String)
-
-    suspend fun onSwitchConfirmed()
-
-    suspend fun onSwitchConfirmationFailure(error: String)
+    suspend fun onSwitchConfirmationSuccess()
 
     suspend fun onSubscriptionUpdated(
         oldStatus: SubscriptionStatus?,
@@ -91,14 +85,6 @@ class SubscriptionSwitchWideEventImpl @Inject constructor(
     ) {
         if (!isFeatureEnabled()) return
 
-        getCurrentWideEventId()?.let { wideEventId ->
-            wideEventClient.flowFinish(
-                wideEventId = wideEventId,
-                status = FlowStatus.Unknown,
-            )
-            cachedFlowId = null
-        }
-
         cachedFlowId = wideEventClient
             .flowStart(
                 name = SUBSCRIPTION_SWITCH_FEATURE_NAME,
@@ -115,178 +101,139 @@ class SubscriptionSwitchWideEventImpl @Inject constructor(
 
     override suspend fun onCurrentSubscriptionValidated() {
         if (!isFeatureEnabled()) return
-        val wideEventId = getCurrentWideEventId() ?: return
 
-        wideEventClient.flowStep(
-            wideEventId = wideEventId,
-            stepName = STEP_VALIDATE_CURRENT_SUBSCRIPTION,
-            success = true,
-        )
+        getCurrentWideEventId()?.let { wideEventId ->
+            wideEventClient.flowStep(
+                wideEventId = wideEventId,
+                stepName = STEP_VALIDATE_CURRENT_SUBSCRIPTION,
+                success = true,
+            )
+        }
     }
 
     override suspend fun onValidationFailure(error: String) {
         if (!isFeatureEnabled()) return
-        val wideEventId = getCurrentWideEventId() ?: return
 
-        wideEventClient.flowStep(
-            wideEventId = wideEventId,
-            stepName = STEP_VALIDATE_CURRENT_SUBSCRIPTION,
-            success = false,
-        )
-
-        wideEventClient.flowFinish(
-            wideEventId = wideEventId,
-            status = FlowStatus.Failure(reason = error),
-        )
-        cachedFlowId = null
+        getCurrentWideEventId()?.let { wideEventId ->
+            wideEventClient.flowStep(
+                wideEventId = wideEventId,
+                stepName = STEP_VALIDATE_CURRENT_SUBSCRIPTION,
+                success = false,
+            )
+            wideEventClient.flowFinish(
+                wideEventId = wideEventId,
+                status = FlowStatus.Failure(reason = error),
+            )
+            cachedFlowId = null
+        }
     }
 
     override suspend fun onTargetPlanRetrieved() {
         if (!isFeatureEnabled()) return
-        val wideEventId = getCurrentWideEventId() ?: return
 
-        wideEventClient.flowStep(
-            wideEventId = wideEventId,
-            stepName = STEP_RETRIEVE_TARGET_PLAN,
-            success = true,
-        )
+        getCurrentWideEventId()?.let { wideEventId ->
+            wideEventClient.flowStep(
+                wideEventId = wideEventId,
+                stepName = STEP_RETRIEVE_TARGET_PLAN,
+                success = true,
+            )
+        }
     }
 
     override suspend fun onTargetPlanRetrievalFailure() {
         if (!isFeatureEnabled()) return
-        val wideEventId = getCurrentWideEventId() ?: return
 
-        wideEventClient.flowStep(
-            wideEventId = wideEventId,
-            stepName = STEP_RETRIEVE_TARGET_PLAN,
-            success = false,
-        )
-
-        wideEventClient.flowFinish(
-            wideEventId = wideEventId,
-            status = FlowStatus.Failure(reason = "Failed to retrieve target plan"),
-        )
-        cachedFlowId = null
-    }
-
-    override suspend fun onUserConfirmationShown() {
-        if (!isFeatureEnabled()) return
-        val wideEventId = getCurrentWideEventId() ?: return
-
-        wideEventClient.flowStep(
-            wideEventId = wideEventId,
-            stepName = STEP_USER_CONFIRMATION_SHOWN,
-        )
-    }
-
-    override suspend fun onUserCancelled() {
-        if (!isFeatureEnabled()) return
-        val wideEventId = getCurrentWideEventId() ?: return
-
-        wideEventClient.flowFinish(wideEventId = wideEventId, status = FlowStatus.Cancelled)
-        cachedFlowId = null
+        getCurrentWideEventId()?.let { wideEventId ->
+            wideEventClient.flowStep(
+                wideEventId = wideEventId,
+                stepName = STEP_RETRIEVE_TARGET_PLAN,
+                success = false,
+            )
+            wideEventClient.flowFinish(
+                wideEventId = wideEventId,
+                status = FlowStatus.Failure(reason = "Target plan not found"),
+            )
+            cachedFlowId = null
+        }
     }
 
     override suspend fun onBillingFlowInitSuccess() {
         if (!isFeatureEnabled()) return
-        val wideEventId = getCurrentWideEventId() ?: return
 
-        wideEventClient.flowStep(
-            wideEventId = wideEventId,
-            stepName = STEP_BILLING_FLOW_INIT,
-            success = true,
-        )
+        getCurrentWideEventId()?.let { wideEventId ->
+            wideEventClient.flowStep(
+                wideEventId = wideEventId,
+                stepName = STEP_BILLING_FLOW_INIT,
+                success = true,
+            )
+        }
     }
 
     override suspend fun onBillingFlowInitFailure(error: String) {
         if (!isFeatureEnabled()) return
-        val wideEventId = getCurrentWideEventId() ?: return
 
-        wideEventClient.flowStep(
-            wideEventId = wideEventId,
-            stepName = STEP_BILLING_FLOW_INIT,
-            success = false,
-        )
+        getCurrentWideEventId()?.let { wideEventId ->
+            wideEventClient.flowStep(
+                wideEventId = wideEventId,
+                stepName = STEP_BILLING_FLOW_INIT,
+                success = false,
+            )
+            wideEventClient.flowFinish(
+                wideEventId = wideEventId,
+                status = FlowStatus.Failure(reason = error),
+            )
+            cachedFlowId = null
+        }
+    }
 
-        wideEventClient.flowFinish(
-            wideEventId = wideEventId,
-            status = FlowStatus.Failure(reason = error),
-        )
-        cachedFlowId = null
+    override suspend fun onUserCancelled() {
+        if (!isFeatureEnabled()) return
+
+        getCurrentWideEventId()?.let { wideEventId ->
+            wideEventClient.flowFinish(
+                wideEventId = wideEventId,
+                status = FlowStatus.Cancelled,
+            )
+            cachedFlowId = null
+        }
     }
 
     override suspend fun onPlayBillingSwitchSuccess() {
         if (!isFeatureEnabled()) return
-        val wideEventId = getCurrentWideEventId() ?: return
 
-        wideEventClient.intervalStart(
-            wideEventId = wideEventId,
-            key = KEY_ACTIVATION_LATENCY_MS_BUCKETED,
-            timeout = Duration.ofHours(4),
-        )
-
-        wideEventClient.flowStep(
-            wideEventId = wideEventId,
-            stepName = STEP_PLAY_BILLING_SWITCH,
-            success = true,
-        )
+        getCurrentWideEventId()?.let { wideEventId ->
+            wideEventClient.intervalStart(
+                wideEventId = wideEventId,
+                key = KEY_ACTIVATION_LATENCY,
+                timeout = Duration.ofMinutes(10),
+            )
+            wideEventClient.flowStep(
+                wideEventId = wideEventId,
+                stepName = STEP_BILLING_FLOW_SWITCH,
+                success = true,
+            )
+        }
     }
 
-    override suspend fun onPlayBillingSwitchFailure(error: String) {
+    override suspend fun onSwitchConfirmationSuccess() {
         if (!isFeatureEnabled()) return
-        val wideEventId = getCurrentWideEventId() ?: return
 
-        wideEventClient.flowStep(
-            wideEventId = wideEventId,
-            stepName = STEP_PLAY_BILLING_SWITCH,
-            success = false,
-        )
-
-        wideEventClient.flowFinish(
-            wideEventId = wideEventId,
-            status = FlowStatus.Failure(reason = error),
-        )
-        cachedFlowId = null
-    }
-
-    override suspend fun onSwitchConfirmed() {
-        if (!isFeatureEnabled()) return
-        val wideEventId = getCurrentWideEventId() ?: return
-
-        wideEventClient.flowStep(
-            wideEventId = wideEventId,
-            stepName = STEP_CONFIRM_SWITCH,
-            success = true,
-        )
-
-        wideEventClient.intervalEnd(
-            wideEventId = wideEventId,
-            key = KEY_ACTIVATION_LATENCY_MS_BUCKETED,
-        )
-
-        wideEventClient.flowFinish(
-            wideEventId = wideEventId,
-            status = FlowStatus.Success,
-        )
-
-        cachedFlowId = null
-    }
-
-    override suspend fun onSwitchConfirmationFailure(error: String) {
-        if (!isFeatureEnabled()) return
-        val wideEventId = getCurrentWideEventId() ?: return
-
-        wideEventClient.flowStep(
-            wideEventId = wideEventId,
-            stepName = STEP_CONFIRM_SWITCH,
-            success = false,
-        )
-
-        wideEventClient.flowFinish(
-            wideEventId = wideEventId,
-            status = FlowStatus.Failure(reason = error),
-        )
-        cachedFlowId = null
+        getCurrentWideEventId()?.let { wideEventId ->
+            wideEventClient.intervalEnd(
+                wideEventId = wideEventId,
+                key = KEY_ACTIVATION_LATENCY,
+            )
+            wideEventClient.flowStep(
+                wideEventId = wideEventId,
+                stepName = STEP_CONFIRM_SWITCH,
+                success = true,
+            )
+            wideEventClient.flowFinish(
+                wideEventId = wideEventId,
+                status = FlowStatus.Success,
+            )
+            cachedFlowId = null
+        }
     }
 
     override suspend fun onSubscriptionUpdated(
@@ -297,7 +244,7 @@ class SubscriptionSwitchWideEventImpl @Inject constructor(
 
         if (oldStatus == SubscriptionStatus.WAITING && newStatus?.isActive() == true) {
             val wideEventId = getCurrentWideEventId() ?: return
-            wideEventClient.intervalEnd(wideEventId = wideEventId, key = KEY_ACTIVATION_LATENCY_MS_BUCKETED)
+            wideEventClient.intervalEnd(wideEventId = wideEventId, key = KEY_ACTIVATION_LATENCY)
             wideEventClient.flowFinish(wideEventId = wideEventId, status = FlowStatus.Success)
             cachedFlowId = null
         }
@@ -305,24 +252,25 @@ class SubscriptionSwitchWideEventImpl @Inject constructor(
 
     override suspend fun onUIRefreshed() {
         if (!isFeatureEnabled()) return
-        val wideEventId = getCurrentWideEventId() ?: return
 
-        wideEventClient.flowStep(
-            wideEventId = wideEventId,
-            stepName = STEP_UI_REFRESH,
-        )
+        getCurrentWideEventId()?.let { wideEventId ->
+            wideEventClient.flowStep(
+                wideEventId = wideEventId,
+                stepName = STEP_UI_REFRESH,
+            )
+        }
     }
 
     override suspend fun onSwitchFailed(error: String) {
         if (!isFeatureEnabled()) return
-        val wideEventId = getCurrentWideEventId() ?: return
 
-        wideEventClient.flowFinish(
-            wideEventId = wideEventId,
-            status = FlowStatus.Failure(reason = error),
-        )
-
-        cachedFlowId = null
+        getCurrentWideEventId()?.let { wideEventId ->
+            wideEventClient.flowFinish(
+                wideEventId = wideEventId,
+                status = FlowStatus.Failure(reason = error),
+            )
+            cachedFlowId = null
+        }
     }
 
     private suspend fun isFeatureEnabled(): Boolean = withContext(dispatchers.io()) {
@@ -342,24 +290,17 @@ class SubscriptionSwitchWideEventImpl @Inject constructor(
 
     private companion object {
         const val SUBSCRIPTION_SWITCH_FEATURE_NAME = "subscription-switch"
-
-        // Wide event metadata keys
-        const val KEY_ACTIVATION_LATENCY_MS_BUCKETED = "activation_latency_ms_bucketed"
         const val KEY_FROM_PLAN = "from_plan"
         const val KEY_TO_PLAN = "to_plan"
         const val KEY_SWITCH_TYPE = "switch_type"
+        const val KEY_ACTIVATION_LATENCY = "activation_latency_ms_bucketed"
 
         // Steps
         const val STEP_VALIDATE_CURRENT_SUBSCRIPTION = "validate_current_subscription"
         const val STEP_RETRIEVE_TARGET_PLAN = "retrieve_target_plan"
-        const val STEP_USER_CONFIRMATION_SHOWN = "user_confirmation_shown"
         const val STEP_BILLING_FLOW_INIT = "billing_flow_init"
-        const val STEP_PLAY_BILLING_SWITCH = "billing_flow_switch"
+        const val STEP_BILLING_FLOW_SWITCH = "billing_flow_switch"
         const val STEP_CONFIRM_SWITCH = "confirm_switch"
         const val STEP_UI_REFRESH = "ui_refresh"
     }
 }
-
-private fun Exception.toErrorString(): String =
-    listOf(javaClass.simpleName, message).joinToString(": ")
-

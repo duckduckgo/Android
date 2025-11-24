@@ -140,6 +140,7 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
     fun before() = runTest {
         whenever(emailManager.getToken()).thenReturn(null)
         whenever(context.packageName).thenReturn("packageName")
+        whenever(playBillingManager.purchaseState).thenReturn(flowOf())
         subscriptionsManager = RealSubscriptionsManager(
             authService,
             subscriptionsService,
@@ -584,6 +585,7 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
 
     @Test
     fun whenSubscribedToSubscriptionStatusThenEmit() = runTest {
+        whenever(playBillingManager.purchaseState).thenReturn(flowOf())
         val manager = RealSubscriptionsManager(
             authService,
             subscriptionsService,
@@ -615,6 +617,7 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
     fun whenSubscribedToSubscriptionStatusAndSubscriptionExistsThenEmit() = runTest {
         givenUserIsSignedIn()
         givenSubscriptionExists()
+        whenever(playBillingManager.purchaseState).thenReturn(flowOf())
         val manager = RealSubscriptionsManager(
             authService,
             subscriptionsService,
@@ -1093,6 +1096,7 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
     @Test
     fun whenSignOutThenCallRepositorySignOut() = runTest {
         val mockRepo: AuthRepository = mock()
+        whenever(playBillingManager.purchaseState).thenReturn(flowOf())
         val manager = RealSubscriptionsManager(
             authService,
             subscriptionsService,
@@ -1140,6 +1144,7 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
     fun whenSignOutThenEmitUnknown() = runTest {
         givenUserIsSignedIn()
         givenSubscriptionExists()
+        whenever(playBillingManager.purchaseState).thenReturn(flowOf())
 
         val manager = RealSubscriptionsManager(
             authService,
@@ -1325,6 +1330,7 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
     fun whenCanSupportEncryptionIfCannotThenReturnFalse() = runTest {
         val authDataStore: SubscriptionsDataStore = FakeSubscriptionsDataStore(supportEncryption = false)
         val authRepository = RealAuthRepository(authDataStore, coroutineRule.testDispatcherProvider, serpPromo)
+        whenever(playBillingManager.purchaseState).thenReturn(flowOf())
         subscriptionsManager = RealSubscriptionsManager(
             authService,
             subscriptionsService,
@@ -1843,6 +1849,8 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
 
     @Test
     fun whenSwitchSubscriptionPlanWithUserNotSignedInThenEmitFailure() = runTest {
+        givenActiveSubscription()
+
         subscriptionsManager.currentPurchaseState.test {
             subscriptionsManager.switchSubscriptionPlan(
                 activity = mock(),

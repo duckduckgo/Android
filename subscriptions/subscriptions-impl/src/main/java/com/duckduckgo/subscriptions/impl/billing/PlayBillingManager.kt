@@ -42,6 +42,7 @@ import com.duckduckgo.subscriptions.impl.billing.PurchasesUpdateResult.PurchaseP
 import com.duckduckgo.subscriptions.impl.billing.PurchasesUpdateResult.UserCancelled
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
 import com.duckduckgo.subscriptions.impl.wideevents.SubscriptionPurchaseWideEvent
+import com.duckduckgo.subscriptions.impl.wideevents.SubscriptionSwitchWideEvent
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.SingleInstanceIn
@@ -111,6 +112,7 @@ class RealPlayBillingManager @Inject constructor(
     private val billingClient: BillingClientAdapter,
     private val dispatcherProvider: DispatcherProvider,
     private val subscriptionPurchaseWideEvent: SubscriptionPurchaseWideEvent,
+    private val subscriptionSwitchWideEvent: SubscriptionSwitchWideEvent,
 ) : PlayBillingManager, MainProcessLifecycleObserver {
 
     private val connectionMutex = Mutex()
@@ -265,7 +267,9 @@ class RealPlayBillingManager @Inject constructor(
         logcat { "Billing: Using provided old purchase token: ${oldPurchaseToken.take(10)}..." }
 
         if (oldPurchaseToken.isEmpty()) {
-            logcat(logcat.LogPriority.ERROR) { "Billing: Cannot launch subscription update - empty purchase token" }
+            val errorMessage = "empty old purchase token"
+            logcat { "Billing: $errorMessage" }
+            subscriptionSwitchWideEvent.onBillingFlowInitFailure(errorMessage)
             _purchaseState.emit(Canceled)
             return@withContext
         }
@@ -278,9 +282,9 @@ class RealPlayBillingManager @Inject constructor(
             ?.offerToken
 
         if (productDetails == null || offerToken == null) {
-            logcat(logcat.LogPriority.ERROR) {
-                "Billing: Cannot launch subscription update - productDetails: ${productDetails != null}, offerToken: ${offerToken != null}"
-            }
+            val errorMessage = "Missing product details"
+            logcat { "Billing: $errorMessage" }
+            subscriptionSwitchWideEvent.onBillingFlowInitFailure(errorMessage)
             _purchaseState.emit(Canceled)
             return@withContext
         }
@@ -296,6 +300,7 @@ class RealPlayBillingManager @Inject constructor(
 
         when (launchBillingFlowResult) {
             LaunchBillingFlowResult.Success -> {
+                subscriptionSwitchWideEvent.onBillingFlowInitSuccess()
                 _purchaseState.emit(InProgress)
                 billingFlowInProgress = true
             }

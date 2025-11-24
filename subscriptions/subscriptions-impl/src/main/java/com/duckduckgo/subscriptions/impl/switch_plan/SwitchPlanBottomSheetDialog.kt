@@ -92,11 +92,6 @@ class SwitchPlanBottomSheetDialog @AssistedInject constructor(
     override fun onAttachedToWindow() {
         super.onAttachedToWindow()
 
-        // Track that user confirmation dialog was shown
-        lifecycleOwner.lifecycleScope.launch(dispatcherProvider.io()) {
-            subscriptionSwitchWideEvent.onUserConfirmationShown()
-        }
-
         configureViews()
         observePurchaseState()
     }
@@ -134,10 +129,6 @@ class SwitchPlanBottomSheetDialog @AssistedInject constructor(
                             dismiss()
                         }
                         binding.switchBottomSheetDialogSecondaryButton.setOnClickListener {
-                            // User cancelled the switch by keeping monthly plan
-                            lifecycleOwner.lifecycleScope.launch(dispatcherProvider.io()) {
-                                subscriptionSwitchWideEvent.onUserCancelled()
-                            }
                             dismiss()
                         }
                     }
@@ -160,10 +151,6 @@ class SwitchPlanBottomSheetDialog @AssistedInject constructor(
                         )
 
                         binding.switchBottomSheetDialogPrimaryButton.setOnClickListener {
-                            // User cancelled the switch by keeping yearly plan
-                            lifecycleOwner.lifecycleScope.launch(dispatcherProvider.io()) {
-                                subscriptionSwitchWideEvent.onUserCancelled()
-                            }
                             dismiss()
                         }
                         binding.switchBottomSheetDialogSecondaryButton.setOnClickListener {
@@ -186,14 +173,6 @@ class SwitchPlanBottomSheetDialog @AssistedInject constructor(
                             subscriptionSwitchWideEvent.onUIRefreshed()
                         }
                         onSwitchSuccess.invoke()
-                    }
-
-                    is CurrentPurchase.Failure -> {
-                        logcat { "Switch flow: Failed to switch plans. Error: ${it.message}" }
-                    }
-
-                    is CurrentPurchase.Canceled -> {
-                        logcat { "Switch flow: Canceled switch plans" }
                     }
 
                     else -> {}
