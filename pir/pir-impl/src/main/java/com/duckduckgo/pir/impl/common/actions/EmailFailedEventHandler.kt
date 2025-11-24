@@ -43,7 +43,7 @@ class EmailFailedEventHandler @Inject constructor() : EventHandler {
          * We don't need to retry the action, as it is not a recoverable error.
          */
         val currentBroker = state.brokerStepsToExecute[state.currentBrokerStepIndex]
-        val currentAction = currentBroker.actions[state.currentActionIndex]
+        val currentAction = currentBroker.step.actions[state.currentActionIndex]
 
         return Next(
             nextState = state,
