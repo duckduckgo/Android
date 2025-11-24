@@ -61,16 +61,6 @@ enum class PirPixel(
         type = Count,
     ),
 
-    PIR_INTERNAL_BROKER_SCAN_STARTED(
-        baseName = "pir_internal_broker_scan_started",
-        type = Count,
-    ),
-
-    PIR_INTERNAL_BROKER_SCAN_COMPLETED(
-        baseName = "pir_internal_broker_scan_completed",
-        type = Count,
-    ),
-
     PIR_INTERNAL_BROKER_OPT_OUT_STARTED(
         baseName = "pir_internal_opt-out_started",
         type = Count,
@@ -197,6 +187,26 @@ enum class PirPixel(
 
     PIR_WEEKLY_CHILD_ORPHANED_OPTOUTS(
         baseName = "dbp_weekly_child-broker_orphaned-optouts",
+        type = Count,
+    ),
+    PIR_SCAN_STARTED(
+        baseName = "dbp_scan_started",
+        type = Count,
+    ),
+    PIR_SCAN_STAGE(
+        baseName = "dbp_scan_stage",
+        type = Count,
+    ),
+    PIR_SCAN_STAGE_RESULT_MATCHES(
+        baseName = "dbp_search_stage_main_status_success",
+        type = Count,
+    ),
+    PIR_SCAN_STAGE_RESULT_NO_MATCH(
+        baseName = "dbp_search_stage_main_status_no_results",
+        type = Count,
+    ),
+    PIR_SCAN_STAGE_RESULT_ERROR(
+        baseName = "dbp_search_stage_main_status_error",
         type = Count,
     ), ;
 

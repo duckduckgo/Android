@@ -40,8 +40,6 @@ import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_ENGAGEMENT_DAU
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_ENGAGEMENT_MAU
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_ENGAGEMENT_WAU
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_INTERNAL_BROKER_OPT_OUT_STARTED
-import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_INTERNAL_BROKER_SCAN_COMPLETED
-import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_INTERNAL_BROKER_SCAN_STARTED
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_INTERNAL_CPU_USAGE
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_INTERNAL_MANUAL_SCAN_COMPLETED
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_INTERNAL_MANUAL_SCAN_STARTED
@@ -54,6 +52,11 @@ import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_INTERNAL_SECURE_STORAGE_UNAVA
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_OPTOUT_STAGE_PENDING_EMAIL_CONFIRMATION
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_OPTOUT_SUBMIT_FAILURE
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_OPTOUT_SUBMIT_SUCCESS
+import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_SCAN_STAGE
+import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_SCAN_STAGE_RESULT_ERROR
+import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_SCAN_STAGE_RESULT_MATCHES
+import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_SCAN_STAGE_RESULT_NO_MATCH
+import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_SCAN_STARTED
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_WEEKLY_CHILD_ORPHANED_OPTOUTS
 import com.squareup.anvil.annotations.ContributesBinding
 import logcat.logcat
@@ -89,28 +92,6 @@ interface PirPixelSender {
      */
     fun reportScheduledScanCompleted(
         totalTimeInMillis: Long,
-    )
-
-    /**
-     * Emits a pixel to signal that a scan job for a specific broker x profile has been started.
-     *
-     * @param brokerName for which this scan job is for
-     */
-    fun reportBrokerScanStarted(
-        brokerName: String,
-    )
-
-    /**
-     * Emits a pixel to signal that a scan job for a specific broker x profile has been completed (status received: either error or success).
-     *
-     * @param brokerName - broker name
-     * @param totalTimeInMillis - How long it took to complete the scan for the broker.
-     * @param isSuccess - if result was not an error, it is a success. Doesn't tell us if the profile was found.
-     */
-    fun reportBrokerScanCompleted(
-        brokerName: String,
-        totalTimeInMillis: Long,
-        isSuccess: Boolean,
     )
 
     /**
@@ -413,6 +394,49 @@ interface PirPixelSender {
         childParentRecordDifference: Int,
         orphanedRecordsCount: Int,
     )
+
+    fun reportScanStarted(
+        brokerUrl: String,
+    )
+
+    fun reportScanStage(
+        brokerUrl: String,
+        brokerVersion: String,
+        tries: Int,
+        parentUrl: String,
+        actionId: String,
+        actionType: String,
+    )
+
+    fun reportScanMatches(
+        brokerUrl: String,
+        totalMatches: Int,
+        durationMs: Long,
+        inManualStarted: Boolean,
+        parentUrl: String,
+    )
+
+    fun reportScanNoMatch(
+        brokerUrl: String,
+        brokerVersion: String,
+        durationMs: Long,
+        inManualStarted: Boolean,
+        parentUrl: String,
+        actionId: String,
+        actionType: String,
+    )
+
+    fun reportScanError(
+        brokerUrl: String,
+        brokerVersion: String,
+        durationMs: Long,
+        errorCategory: String,
+        errorDetails: String,
+        inManualStarted: Boolean,
+        parentUrl: String,
+        actionId: String,
+        actionType: String,
+    )
 }
 
 @ContributesBinding(AppScope::class)
@@ -430,26 +454,6 @@ class RealPirPixelSender @Inject constructor(
             PARAM_KEY_TOTAL_TIME to totalTimeInMillis.toString(),
         )
         fire(PIR_INTERNAL_MANUAL_SCAN_COMPLETED, params)
-    }
-
-    override fun reportBrokerScanStarted(brokerName: String) {
-        val params = mapOf(
-            PARAM_KEY_BROKER_NAME to brokerName,
-        )
-        fire(PIR_INTERNAL_BROKER_SCAN_STARTED, params)
-    }
-
-    override fun reportBrokerScanCompleted(
-        brokerName: String,
-        totalTimeInMillis: Long,
-        isSuccess: Boolean,
-    ) {
-        val params = mapOf(
-            PARAM_KEY_BROKER_NAME to brokerName,
-            PARAM_KEY_TOTAL_TIME to totalTimeInMillis.toString(),
-            PARAM_KEY_SUCCESS to isSuccess.toString(),
-        )
-        fire(PIR_INTERNAL_BROKER_SCAN_COMPLETED, params)
     }
 
     override fun reportScheduledScanScheduled() {
@@ -797,6 +801,101 @@ class RealPirPixelSender @Inject constructor(
         fire(PIR_WEEKLY_CHILD_ORPHANED_OPTOUTS, params)
     }
 
+    override fun reportScanStarted(brokerUrl: String) {
+        val params = mapOf(
+            PARAM_KEY_BROKER to brokerUrl,
+        )
+
+        fire(PIR_SCAN_STARTED, params)
+    }
+
+    override fun reportScanStage(
+        brokerUrl: String,
+        brokerVersion: String,
+        tries: Int,
+        parentUrl: String,
+        actionId: String,
+        actionType: String,
+    ) {
+        val params = mapOf(
+            PARAM_KEY_BROKER to brokerUrl,
+            PARAM_BROKER_VERSION to brokerVersion,
+            PARAM_TRIES to tries.toString(),
+            PARAM_KEY_PARENT to parentUrl,
+            PARAM_ACTION_ID to actionId,
+            PARAM_KEY_ACTION_TYPE to actionType,
+        )
+
+        fire(PIR_SCAN_STAGE, params)
+    }
+
+    override fun reportScanMatches(
+        brokerUrl: String,
+        totalMatches: Int,
+        durationMs: Long,
+        inManualStarted: Boolean,
+        parentUrl: String,
+    ) {
+        val params = mapOf(
+            PARAM_KEY_BROKER to brokerUrl,
+            PARAM_KEY_MATCHES_COUNT to totalMatches.toString(),
+            PARAM_DURATION to durationMs.toString(),
+            PARAM_KEY_PARENT to parentUrl,
+            PARAM_KEY_MANUAL_STARTED to inManualStarted.toString(),
+            PARAM_KEY_PARENT to parentUrl,
+        )
+
+        fire(PIR_SCAN_STAGE_RESULT_MATCHES, params)
+    }
+
+    override fun reportScanNoMatch(
+        brokerUrl: String,
+        brokerVersion: String,
+        durationMs: Long,
+        inManualStarted: Boolean,
+        parentUrl: String,
+        actionId: String,
+        actionType: String,
+    ) {
+        val params = mapOf(
+            PARAM_KEY_BROKER to brokerUrl,
+            PARAM_BROKER_VERSION to brokerVersion,
+            PARAM_DURATION to durationMs.toString(),
+            PARAM_KEY_MANUAL_STARTED to inManualStarted.toString(),
+            PARAM_KEY_PARENT to parentUrl,
+            PARAM_ACTION_ID to actionId,
+            PARAM_KEY_ACTION_TYPE to actionType,
+        )
+
+        fire(PIR_SCAN_STAGE_RESULT_NO_MATCH, params)
+    }
+
+    override fun reportScanError(
+        brokerUrl: String,
+        brokerVersion: String,
+        durationMs: Long,
+        errorCategory: String,
+        errorDetails: String,
+        inManualStarted: Boolean,
+        parentUrl: String,
+        actionId: String,
+        actionType: String,
+    ) {
+        val params = mapOf(
+            PARAM_KEY_BROKER to brokerUrl,
+            PARAM_BROKER_VERSION to brokerVersion,
+            PARAM_DURATION to durationMs.toString(),
+            PARAM_KEY_ERROR_CATEGORY to errorCategory,
+            PARAM_KEY_ERROR_DETAILS to errorDetails,
+            PARAM_KEY_MANUAL_STARTED to inManualStarted.toString(),
+            PARAM_KEY_PARENT to parentUrl,
+            PARAM_ACTION_ID to actionId,
+            PARAM_KEY_ACTION_TYPE to actionType,
+        )
+
+        fire(PIR_SCAN_STAGE_RESULT_ERROR, params)
+    }
+
     private fun fire(
         pixel: PirPixel,
         params: Map<String, String> = emptyMap(),
@@ -810,7 +909,6 @@ class RealPirPixelSender @Inject constructor(
     companion object {
         private const val PARAM_KEY_BROKER_NAME = "brokerName"
         private const val PARAM_KEY_TOTAL_TIME = "totalTimeInMillis"
-        private const val PARAM_KEY_SUCCESS = "isSuccess"
         private const val PARAM_KEY_SCAN_COUNT = "totalScanToRun"
         private const val PARAM_KEY_OPTOUT_COUNT = "totalOptOutToRun"
         private const val PARAM_KEY_CPU_USAGE = "cpuUsage"
@@ -835,5 +933,9 @@ class RealPirPixelSender @Inject constructor(
         private const val PARAM_KEY_OPTOUT_SUBMIT_SUCCESS_RATE = "optout_submit_success_rate"
         private const val PARAM_KEY_ORPHANED_DIFF = "child-parent-record-difference"
         private const val PARAM_KEY_ORPHANED_COUNT = "calculated-orphaned-records"
+        private const val PARAM_KEY_MATCHES_COUNT = "num_found"
+        private const val PARAM_KEY_MANUAL_STARTED = "is_manual_scan"
+        private const val PARAM_KEY_ERROR_CATEGORY = "error_category"
+        private const val PARAM_KEY_ERROR_DETAILS = "error_details"
     }
 }

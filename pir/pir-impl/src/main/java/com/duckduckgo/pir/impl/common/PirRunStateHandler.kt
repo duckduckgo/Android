@@ -295,7 +295,6 @@ class RealPirRunStateHandler @Inject constructor(
     }
 
     private suspend fun handleBrokerManualScanStarted(state: BrokerManualScanStarted) {
-        pixelSender.reportBrokerScanStarted(state.brokerName)
         eventsRepository.saveBrokerScanLog(
             PirBrokerScanLog(
                 eventTimeInMillis = state.eventTimeInMillis,
@@ -307,11 +306,6 @@ class RealPirRunStateHandler @Inject constructor(
 
     private suspend fun handleBrokerManualScanCompleted(state: BrokerManualScanCompleted) {
         handleScanError(state.isSuccess, state.brokerName, state.profileQueryId)
-        pixelSender.reportBrokerScanCompleted(
-            brokerName = state.brokerName,
-            totalTimeInMillis = state.totalTimeMillis,
-            isSuccess = state.isSuccess,
-        )
         eventsRepository.saveBrokerScanLog(
             PirBrokerScanLog(
                 eventTimeInMillis = state.eventTimeInMillis,
@@ -329,7 +323,6 @@ class RealPirRunStateHandler @Inject constructor(
     }
 
     private suspend fun handleBrokerScheduledScanStarted(state: BrokerScheduledScanStarted) {
-        pixelSender.reportBrokerScanStarted(state.brokerName)
         eventsRepository.saveBrokerScanLog(
             PirBrokerScanLog(
                 eventTimeInMillis = state.eventTimeInMillis,
@@ -341,11 +334,6 @@ class RealPirRunStateHandler @Inject constructor(
 
     private suspend fun handleBrokerScheduledScanCompleted(state: BrokerScheduledScanCompleted) {
         handleScanError(state.isSuccess, state.brokerName, state.profileQueryId)
-        pixelSender.reportBrokerScanCompleted(
-            brokerName = state.brokerName,
-            totalTimeInMillis = state.totalTimeMillis,
-            isSuccess = state.isSuccess,
-        )
         eventsRepository.saveBrokerScanLog(
             PirBrokerScanLog(
                 eventTimeInMillis = state.eventTimeInMillis,
