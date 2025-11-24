@@ -78,4 +78,14 @@
     <string name="newAddressBarOptionBottomSheetDialogSearchOnly">Kun søgning</string>
     <string name="newAddressBarOptionBottomSheetDialogSearchAndDuckAi">Søg &amp; Duck.ai</string>
     <string name="newAddressBarOptionBottomSheetDialogHeader">Indstilling af adresselinje</string>
+
+    <!-- Duck AI SERP Settings Title -->
+    <string name="duckAiSerpSettingsTitle">AI-funktioner</string>
+
+    <!-- Duck AI Search Section Header -->
+    <string name="duckAiSearchSettingsSectionHeader">Søg</string>
+
+    <!-- Duck AI Hide Generated Images Settings Option -->
+    <string name="duckAiHideAiGeneratedImagesTitle">Skjul AI-genererede billeder</string>
+    <string name="duckAiHideAiGeneratedImagesDescription">Filtrerer AI-genererede billeder fra billedsøgeresultater</string>
 </resources>

@@ -78,4 +78,14 @@
     <string name="newAddressBarOptionBottomSheetDialogSearchOnly">Jen vyhledávání</string>
     <string name="newAddressBarOptionBottomSheetDialogSearchAndDuckAi">Vyhledávání a Duck.ai</string>
     <string name="newAddressBarOptionBottomSheetDialogHeader">Možnost adresního řádku</string>
+
+    <!-- Duck AI SERP Settings Title -->
+    <string name="duckAiSerpSettingsTitle">Funkce AI</string>
+
+    <!-- Duck AI Search Section Header -->
+    <string name="duckAiSearchSettingsSectionHeader">Vyhledávání</string>
+
+    <!-- Duck AI Hide Generated Images Settings Option -->
+    <string name="duckAiHideAiGeneratedImagesTitle">Skrýt obrázky vygenerované umělou inteligencí</string>
+    <string name="duckAiHideAiGeneratedImagesDescription">Odstraní obrázky vytvořené umělou inteligencí z výsledků vyhledávání obrázků</string>
 </resources>

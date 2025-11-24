@@ -78,4 +78,14 @@
     <string name="newAddressBarOptionBottomSheetDialogSearchOnly">Tik paieška</string>
     <string name="newAddressBarOptionBottomSheetDialogSearchAndDuckAi">Paieška ir „Duck.ai“</string>
     <string name="newAddressBarOptionBottomSheetDialogHeader">Adreso juostos parinktis</string>
+
+    <!-- Duck AI SERP Settings Title -->
+    <string name="duckAiSerpSettingsTitle">DI funkcijos</string>
+
+    <!-- Duck AI Search Section Header -->
+    <string name="duckAiSearchSettingsSectionHeader">Paieška</string>
+
+    <!-- Duck AI Hide Generated Images Settings Option -->
+    <string name="duckAiHideAiGeneratedImagesTitle">Slėpti DI generuotus vaizdus</string>
+    <string name="duckAiHideAiGeneratedImagesDescription">Vaizdų paieškos rezultatuose nepalieka Di sukurtų vaizdų</string>
 </resources>

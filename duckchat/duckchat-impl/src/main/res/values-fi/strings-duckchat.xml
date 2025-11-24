@@ -78,4 +78,14 @@
     <string name="newAddressBarOptionBottomSheetDialogSearchOnly">Vain haku</string>
     <string name="newAddressBarOptionBottomSheetDialogSearchAndDuckAi">Haku ja Duck.ai</string>
     <string name="newAddressBarOptionBottomSheetDialogHeader">Osoiterivi-vaihtoehto</string>
+
+    <!-- Duck AI SERP Settings Title -->
+    <string name="duckAiSerpSettingsTitle">Tekoälyominaisuudet</string>
+
+    <!-- Duck AI Search Section Header -->
+    <string name="duckAiSearchSettingsSectionHeader">Hae</string>
+
+    <!-- Duck AI Hide Generated Images Settings Option -->
+    <string name="duckAiHideAiGeneratedImagesTitle">Piilota tekoälyn luomat kuvat</string>
+    <string name="duckAiHideAiGeneratedImagesDescription">Suodattaa pois tekoälyn luomat kuvat kuvahaun tuloksista</string>
 </resources>

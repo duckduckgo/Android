@@ -78,4 +78,14 @@
     <string name="newAddressBarOptionBottomSheetDialogSearchOnly">Только поиск</string>
     <string name="newAddressBarOptionBottomSheetDialogSearchAndDuckAi">Поиск и Duck.ai</string>
     <string name="newAddressBarOptionBottomSheetDialogHeader">Опция адресной строки</string>
+
+    <!-- Duck AI SERP Settings Title -->
+    <string name="duckAiSerpSettingsTitle">Функции ИИ</string>
+
+    <!-- Duck AI Search Section Header -->
+    <string name="duckAiSearchSettingsSectionHeader">Поиск</string>
+
+    <!-- Duck AI Hide Generated Images Settings Option -->
+    <string name="duckAiHideAiGeneratedImagesTitle">Скрыть ИИ-картинки</string>
+    <string name="duckAiHideAiGeneratedImagesDescription">Исключает из результатов поиска изображения, созданные нейросетью</string>
 </resources>

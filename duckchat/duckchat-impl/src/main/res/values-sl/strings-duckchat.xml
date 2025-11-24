@@ -78,4 +78,14 @@
     <string name="newAddressBarOptionBottomSheetDialogSearchOnly">Samo iskanje</string>
     <string name="newAddressBarOptionBottomSheetDialogSearchAndDuckAi">Iskanje in Duck.ai</string>
     <string name="newAddressBarOptionBottomSheetDialogHeader">Možnost naslovne vrstice</string>
+
+    <!-- Duck AI SERP Settings Title -->
+    <string name="duckAiSerpSettingsTitle">Lastnosti UI</string>
+
+    <!-- Duck AI Search Section Header -->
+    <string name="duckAiSearchSettingsSectionHeader">Iskanje</string>
+
+    <!-- Duck AI Hide Generated Images Settings Option -->
+    <string name="duckAiHideAiGeneratedImagesTitle">Skrij slike, ki jih ustvari umetna inteligenca</string>
+    <string name="duckAiHideAiGeneratedImagesDescription">Iz rezultatov iskanja slik odstrani slike, ki jih je ustvarila umetna inteligenca</string>
 </resources>

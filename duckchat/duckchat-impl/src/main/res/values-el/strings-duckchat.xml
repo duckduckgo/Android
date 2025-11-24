@@ -78,4 +78,14 @@
     <string name="newAddressBarOptionBottomSheetDialogSearchOnly">Αναζήτηση μόνο</string>
     <string name="newAddressBarOptionBottomSheetDialogSearchAndDuckAi">Αναζήτηση και Duck.ai</string>
     <string name="newAddressBarOptionBottomSheetDialogHeader">Επιλογή γραμμής διευθύνσεων</string>
+
+    <!-- Duck AI SERP Settings Title -->
+    <string name="duckAiSerpSettingsTitle">Λειτουργίες τεχνητής νοημοσύνης</string>
+
+    <!-- Duck AI Search Section Header -->
+    <string name="duckAiSearchSettingsSectionHeader">Αναζήτηση</string>
+
+    <!-- Duck AI Hide Generated Images Settings Option -->
+    <string name="duckAiHideAiGeneratedImagesTitle">Απόκρυψη εικόνων που δημιουργήθηκαν με τεχνητή νοημοσύνη</string>
+    <string name="duckAiHideAiGeneratedImagesDescription">Φιλτράρει τις εικόνες που δημιουργούνται με τεχνητή νοημοσύνη από τα αποτελέσματα αναζήτησης εικόνων</string>
 </resources>

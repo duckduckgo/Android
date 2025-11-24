@@ -78,4 +78,14 @@
     <string name="newAddressBarOptionBottomSheetDialogSearchOnly">Len vyhľadávanie</string>
     <string name="newAddressBarOptionBottomSheetDialogSearchAndDuckAi">Vyhľadávanie &amp; Duck.ai</string>
     <string name="newAddressBarOptionBottomSheetDialogHeader">Možnosť panela s adresou</string>
+
+    <!-- Duck AI SERP Settings Title -->
+    <string name="duckAiSerpSettingsTitle">Funkcie AI</string>
+
+    <!-- Duck AI Search Section Header -->
+    <string name="duckAiSearchSettingsSectionHeader">Vyhľadávať</string>
+
+    <!-- Duck AI Hide Generated Images Settings Option -->
+    <string name="duckAiHideAiGeneratedImagesTitle">Skryť obrázky generované umelou inteligenciou</string>
+    <string name="duckAiHideAiGeneratedImagesDescription">Odstraňuje obrázky vytvorené umelou inteligenciou z výsledkov vyhľadávania obrázkov</string>
 </resources>
