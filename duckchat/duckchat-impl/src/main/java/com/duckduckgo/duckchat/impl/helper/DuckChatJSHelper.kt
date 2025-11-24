@@ -26,6 +26,7 @@ import com.duckduckgo.duckchat.impl.metric.DuckAiMetricCollector
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
 import com.duckduckgo.duckchat.impl.store.DuckChatDataStore
 import com.duckduckgo.js.messaging.api.JsCallbackData
+import com.duckduckgo.js.messaging.api.SubscriptionEventData
 import com.squareup.anvil.annotations.ContributesBinding
 import kotlinx.coroutines.runBlocking
 import org.json.JSONObject
@@ -39,6 +40,14 @@ interface DuckChatJSHelper {
         id: String?,
         data: JSONObject?,
     ): JsCallbackData?
+
+    fun onNativeAction(action: NativeAction): SubscriptionEventData
+}
+
+enum class NativeAction {
+    NEW_CHAT,
+    HISTORY,
+    DUCK_AI_SETTINGS,
 }
 
 @ContributesBinding(AppScope::class)
@@ -48,6 +57,7 @@ class RealDuckChatJSHelper @Inject constructor(
     private val dataStore: DuckChatDataStore,
     private val duckAiMetricCollector: DuckAiMetricCollector,
 ) : DuckChatJSHelper {
+
     override suspend fun processJsCallbackMessage(
         featureName: String,
         method: String,
@@ -119,6 +129,20 @@ class RealDuckChatJSHelper @Inject constructor(
 
             else -> null
         }
+
+    override fun onNativeAction(action: NativeAction): SubscriptionEventData {
+        val subscriptionName = when (action) {
+            NativeAction.NEW_CHAT -> SUBSCRIPTION_NEW_CHAT
+            NativeAction.HISTORY -> SUBSCRIPTION_HISTORY
+            NativeAction.DUCK_AI_SETTINGS -> SUBSCRIPTION_DUCK_AI_SETTINGS
+        }
+
+        return SubscriptionEventData(
+            DUCK_CHAT_FEATURE_NAME,
+            subscriptionName,
+            JSONObject(),
+        )
+    }
 
     private fun getAIChatNativeHandoffData(
         featureName: String,
@@ -217,5 +241,8 @@ class RealDuckChatJSHelper @Inject constructor(
         private const val DEFAULT_SELECTOR = "'user-prompt'"
         private const val SUCCESS = "success"
         private const val ERROR = "error"
+        private const val SUBSCRIPTION_NEW_CHAT = "submitNewChatAction"
+        private const val SUBSCRIPTION_HISTORY = "openDuckAiHistory"
+        private const val SUBSCRIPTION_DUCK_AI_SETTINGS = "openDuckAiSettings"
     }
 }

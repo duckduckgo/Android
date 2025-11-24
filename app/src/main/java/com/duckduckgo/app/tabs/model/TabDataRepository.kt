@@ -287,6 +287,7 @@ class TabDataRepository @Inject constructor(
         site: Site?,
     ) {
         databaseExecutor().scheduleDirect {
+            logcat { "Duck.ai: updateUrlAndTitle url: ${site?.url} title: ${site?.title}" }
             tabsDao.updateUrlAndTitle(tabId, site?.url, site?.title, viewed = true)
         }
     }

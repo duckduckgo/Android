@@ -32,6 +32,7 @@ import com.duckduckgo.pir.impl.service.DbpService.PirEmailConfirmationDataReques
 import com.duckduckgo.pir.impl.service.DbpService.PirJsonBroker
 import com.duckduckgo.pir.impl.store.PirRepository.BrokerJson
 import com.duckduckgo.pir.impl.store.PirRepository.EmailConfirmationLinkFetchStatus
+import com.duckduckgo.pir.impl.store.PirRepository.GeneratedEmailData
 import com.duckduckgo.pir.impl.store.db.BrokerDao
 import com.duckduckgo.pir.impl.store.db.BrokerEntity
 import com.duckduckgo.pir.impl.store.db.BrokerJsonDao
@@ -167,11 +168,36 @@ interface PirRepository {
         profileQueryIdsToDelete: List<Long>,
     ): Boolean
 
-    suspend fun getEmailForBroker(dataBroker: String): String
+    suspend fun getEmailForBroker(dataBroker: String): GeneratedEmailData
 
     suspend fun getEmailConfirmationLinkStatus(emailData: List<EmailData>): Map<EmailData, EmailConfirmationLinkFetchStatus>
 
     suspend fun deleteEmailData(emailData: List<EmailData>)
+
+    suspend fun getCustomStatsPixelsLastSentMs(): Long
+
+    suspend fun setCustomStatsPixelsLastSentMs(timeMs: Long)
+
+    suspend fun getLastPirDauPixelTimeMs(): Long
+
+    suspend fun setLastPirDauPixelTimeMs(timeMs: Long)
+
+    suspend fun getLastPirWauPixelTimeMs(): Long
+
+    suspend fun setLastPirWauPixelTimeMs(timeMs: Long)
+
+    suspend fun getLastPirMauPixelTimeMs(): Long
+
+    suspend fun setLastPirMauPixelTimeMs(timeMs: Long)
+
+    suspend fun getWeeklyStatLastSentMs(): Long
+
+    suspend fun setWeeklyStatLastSentMs(timeMs: Long)
+
+    data class GeneratedEmailData(
+        val emailAddress: String,
+        val pattern: String,
+    )
 
     data class BrokerJson(
         val fileName: String,
@@ -606,9 +632,14 @@ class RealPirRepository(
         }
     }
 
-    override suspend fun getEmailForBroker(dataBroker: String): String =
+    override suspend fun getEmailForBroker(dataBroker: String): GeneratedEmailData =
         withContext(dispatcherProvider.io()) {
-            return@withContext dbpService.getEmail(brokerDao()?.getBrokerDetails(dataBroker)!!.url).emailAddress
+            return@withContext dbpService.getEmail(brokerDao()?.getBrokerDetails(dataBroker)!!.url).run {
+                GeneratedEmailData(
+                    emailAddress,
+                    pattern,
+                )
+            }
         }
 
     override suspend fun getEmailConfirmationLinkStatus(emailData: List<EmailData>): Map<EmailData, EmailConfirmationLinkFetchStatus> =
@@ -651,6 +682,54 @@ class RealPirRepository(
                 }
             return@withContext
         }
+
+    override suspend fun getCustomStatsPixelsLastSentMs(): Long = withContext(dispatcherProvider.io()) {
+        pirDataStore.customStatsPixelsLastSentMs
+    }
+
+    override suspend fun setCustomStatsPixelsLastSentMs(timeMs: Long) = withContext(dispatcherProvider.io()) {
+        pirDataStore.customStatsPixelsLastSentMs = timeMs
+    }
+
+    override suspend fun getLastPirDauPixelTimeMs(): Long = withContext(dispatcherProvider.io()) {
+        return@withContext pirDataStore.dauLastSentMs
+    }
+
+    override suspend fun setLastPirDauPixelTimeMs(timeMs: Long) {
+        withContext(dispatcherProvider.io()) {
+            pirDataStore.dauLastSentMs = timeMs
+        }
+    }
+
+    override suspend fun getLastPirWauPixelTimeMs(): Long = withContext(dispatcherProvider.io()) {
+        return@withContext pirDataStore.wauLastSentMs
+    }
+
+    override suspend fun setLastPirWauPixelTimeMs(timeMs: Long) {
+        withContext(dispatcherProvider.io()) {
+            pirDataStore.wauLastSentMs = timeMs
+        }
+    }
+
+    override suspend fun getLastPirMauPixelTimeMs(): Long = withContext(dispatcherProvider.io()) {
+        return@withContext pirDataStore.mauLastSentMs
+    }
+
+    override suspend fun setLastPirMauPixelTimeMs(timeMs: Long) {
+        withContext(dispatcherProvider.io()) {
+            pirDataStore.mauLastSentMs = timeMs
+        }
+    }
+
+    override suspend fun getWeeklyStatLastSentMs(): Long = withContext(dispatcherProvider.io()) {
+        return@withContext pirDataStore.weeklyStatLastSentMs
+    }
+
+    override suspend fun setWeeklyStatLastSentMs(timeMs: Long) {
+        withContext(dispatcherProvider.io()) {
+            pirDataStore.weeklyStatLastSentMs = timeMs
+        }
+    }
 
     private fun List<EmailData>.toRequest(): PirEmailConfirmationDataRequest =
         PirEmailConfirmationDataRequest(

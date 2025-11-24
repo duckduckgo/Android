@@ -180,14 +180,6 @@ interface AndroidBrowserConfigFeature {
     fun vpnMenuItem(): Toggle
 
     /**
-     * @return `true` when the remote config has the global "useUnifiedOmnibarLayout" androidBrowserConfig
-     * sub-feature flag enabled
-     * If the remote feature is not present defaults to `true`
-     */
-    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
-    fun useUnifiedOmnibarLayout(): Toggle
-
-    /**
      * @return `true` when the remote config has the global "splitOmnibar" androidBrowserConfig
      * sub-feature flag enabled
      * If the remote feature is not present defaults to `false`
@@ -203,4 +195,21 @@ interface AndroidBrowserConfigFeature {
      */
     @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
     fun reportWebViewCapabilities(): Toggle
+
+    /**
+     * @return `true` when the remote config has the global "handleAboutBlank" androidBrowserConfig
+     * sub-feature flag enabled
+     * If the remote feature is not present defaults to `false`
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
+    @Toggle.InternalAlwaysEnabled
+    fun handleAboutBlank(): Toggle
+
+    /**
+     * @return `true` when the remote config has the global "useUrlPredictor" androidBrowserConfig
+     * sub-feature flag enabled
+     * If the remote feature is not present defaults to `true`
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
+    fun useUrlPredictor(): Toggle
 }

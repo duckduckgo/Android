@@ -41,7 +41,7 @@
                 android:id="@+id/newTabButton"
                 android:layout_width="@dimen/toolbarIcon"
                 android:layout_height="@dimen/toolbarIcon"
-                android:background="@drawable/selectable_item_experimental_background"
+                android:background="@drawable/selectable_item_rounded_corner_background"
                 android:visibility="gone"
                 tools:visibility="visible">
 
@@ -59,7 +59,7 @@
                 android:id="@+id/autofillButton"
                 android:layout_width="@dimen/toolbarIcon"
                 android:layout_height="@dimen/toolbarIcon"
-                android:background="@drawable/selectable_item_experimental_background"
+                android:background="@drawable/selectable_item_rounded_corner_background"
                 android:visibility="gone"
                 tools:visibility="visible">
 
@@ -84,7 +84,7 @@
             android:id="@+id/bookmarksButton"
             android:layout_width="@dimen/toolbarIcon"
             android:layout_height="@dimen/toolbarIcon"
-            android:background="@drawable/selectable_item_experimental_background">
+            android:background="@drawable/selectable_item_rounded_corner_background">
 
             <ImageView
                 android:id="@+id/bookmarksImageView"
@@ -105,7 +105,7 @@
             android:id="@+id/fireButton"
             android:layout_width="@dimen/toolbarIcon"
             android:layout_height="@dimen/toolbarIcon"
-            android:background="@drawable/selectable_item_experimental_background">
+            android:background="@drawable/selectable_item_rounded_corner_background">
 
             <ImageView
                 android:id="@+id/fireIconImageView"
@@ -136,7 +136,7 @@
             android:id="@+id/menuButton"
             android:layout_width="@dimen/toolbarIcon"
             android:layout_height="@dimen/toolbarIcon"
-            android:background="@drawable/selectable_item_experimental_background">
+            android:background="@drawable/selectable_item_rounded_corner_background">
 
             <ImageView
                 android:id="@+id/browserMenuImageView"

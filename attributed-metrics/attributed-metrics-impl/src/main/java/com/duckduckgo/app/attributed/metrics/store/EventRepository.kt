@@ -17,12 +17,8 @@
 package com.duckduckgo.app.attributed.metrics.store
 
 import com.duckduckgo.app.attributed.metrics.api.EventStats
-import com.duckduckgo.app.di.AppCoroutineScope
-import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 interface EventRepository {
@@ -40,8 +36,6 @@ interface EventRepository {
 class RealEventRepository @Inject constructor(
     private val eventDao: EventDao,
     private val attributedMetricsDateUtils: AttributedMetricsDateUtils,
-    @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
-    private val dispatcherProvider: DispatcherProvider,
 ) : EventRepository {
     override suspend fun collectEvent(eventName: String) {
         val today = attributedMetricsDateUtils.getCurrentDate()
@@ -73,8 +67,6 @@ class RealEventRepository @Inject constructor(
     }
 
     override suspend fun deleteAllEvents() {
-        appCoroutineScope.launch(dispatcherProvider.io()) {
-            eventDao.deleteAllEvents()
-        }
+        eventDao.deleteAllEvents()
     }
 }

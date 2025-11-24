@@ -47,17 +47,12 @@
     <string name="omnibarInputHint">Căutare sau tastare URL</string>
     <string name="clearButtonContentDescription">Șterge datele introduse pentru căutare</string>
     <string name="no_compatible_third_party_app_installed">Nicio aplicație compatibilă instalată</string>
-    <string name="addBookmarkMenuTitle">Adaugă marcaj</string>
-    <string name="editBookmarkMenuTitle">Editează marcaj</string>
+
     <string name="addFavoriteMenuTitle">Adaugă favorit</string>
     <string name="removeFavoriteMenuTitle">Elimină favoritul</string>
     <string name="favoriteAddedMessage">Favorit adăugat</string>
     <string name="bookmarkAddedMessage">Marcaj adăugat</string>
-    <string name="requestDesktopSiteMenuTitle">Versiune desktop</string>
-    <string name="fireproofWebsiteMenuTitleRemove">Elimină ștergerea activității și istoricului din browser</string>
-    <string name="requestMobileSiteMenuTitle">Site mobil</string>
     <string name="downloadsMenuTitle">Descărcări</string>
-    <string name="printMenuTitle">Imprimă pagina</string>
     <string name="favoriteDeleteConfirmationMessage">Favorit eliminat</string>
     <string name="fireproofDeleteConfirmationMessage">Ștergerea activității și istoricului din browser a fost eliminată</string>
     <string name="privacyProtectionEnabledConfirmationMessage" instruction="Placeholder is a website">Protecția confidențialității activată pentru %1$s</string>
@@ -77,11 +72,9 @@
     <!-- Sharing options -->
     <string name="options">Opțiuni</string>
     <string name="shareLink">Trimite linkul</string>
-    <string name="shareMenuTitle">Trimite…</string>
     <string name="copyUrl">Copiază adresa linkului</string>
 
     <!-- Find in page -->
-    <string name="findInPageMenuTitle">Caută în pagină</string>
     <string name="nextSearchTermDescription">Arată rezultatul următor</string>
     <string name="previousSearchTermDescription">Arată rezultatul anterior</string>
     <string name="closeFindInPageButtonDescription">Închide vizualizarea „caută în pagină”</string>
@@ -126,8 +119,8 @@
 
     <!-- Fire -->
     <string name="fireMenu">Ștergere date</string>
-    <string name="fireClearAll">Șterge toate filele și datele</string>
-    <string name="fireClearAllPlusDuckChats">Șterge toate filele, datele și chaturile Duck.ai</string>
+    <string name="fireClearAll">Șterge filele și datele</string>
+    <string name="fireClearAllPlusDuckChats">Șterge filele, datele și chaturile Duck.ai</string>
     <string name="fireCancel">Anulează</string>
     <string name="fireDataCleared">Date șterse</string>
 
@@ -248,6 +241,8 @@
     <string name="settingsAutomaticallyClearWhenAppExit60Minutes">Ieșire din aplicație, inactiv timp de 1 oră</string>
     <string name="settingsClearAiDataTitle">Șterge chaturile Duck.ai</string>
     <string name="settingsClearAiDataDeleteMessage">Fire Button va șterge și istoricul Duck.ai, inclusiv chaturile fixate.</string>
+    <string name="settingsClearDataActionSecondaryText">Șterge toate filele și datele pentru site-urile pe care nu le-ai protejat cu Fireproof.</string>
+    <string name="settingsClearDataActionPlusDuckChatsSecondaryText">Șterge toate filele, conversațiile Duck.ai și datele pentru site-urile pe care nu le-ai protejat cu Fireproof.</string>
 
     <!-- About Activity -->
     <string name="aboutActivityTitle">Despre DuckDuckGo</string>
@@ -257,7 +252,7 @@
     <string name="no_suggestions">Fără sugestii</string>
 
     <!-- Broken Site Activity -->
-    <string name="brokenSiteReportBrokenSiteMenuItem">Raportează site defect</string>
+
 
     <string name="brokenSiteProtectionsOn">Protecțiile sunt <b>ACTIVATE</b> pentru acest site</string>
     <string name="brokenSiteProtectionsOff">Protecțiile sunt <b>DEZACTIVATE</b> pentru acest site</string>
@@ -280,7 +275,7 @@
     <string name="searchWidgetLabel">Caută și pe Duck.ai</string>
 
     <!-- Home Screen Shortcuts -->
-    <string name="addToHome">Adaugă pe ecranul de pornire</string>
+
     <string name="shortcutAddedText" instruction="Placeholder is the name of a website">Succes! %1$s a fost adăugat pe ecranul de pornire.</string>
 
     <!-- User Survey -->
@@ -486,8 +481,6 @@
 
     <!-- Allowlist -->
     <string name="allowlistActivityTitle">Site-uri neprotejate</string>
-    <string name="enablePrivacyProtection">Activează protecția confidențialității</string>
-    <string name="disablePrivacyProtection">Dezactivează protecția confidențialității</string>
     <string name="allowlistEntryOverflowContentDescription" instruction="Placeholder is a website">Mai multe opțiuni pentru site-ul neprotejat %1$s</string>
     <string name="allowlistEntryDeleteConfirmMessage" instruction="Placeholder is a website">Sigur dorești să elimini &lt;b&gt;%1$s&lt;/b&gt; din site-urile neprotejate?</string>
     <string name="allowlistExplanation">Aceste site-uri nu vor fi îmbunătățite de protecția confidențialității.</string>
@@ -586,11 +579,9 @@
     <string name="appLinkSnackBarMessage" instruction="Placeholder is the name of an app">Poți deschide acest link în %1$s.</string>
     <string name="appLinkMultipleSnackBarMessage">Poți deschide acest link în alte aplicații.</string>
     <string name="appLinkIntentChooserTitle">Deschide cu</string>
-    <string name="appLinkMenuItemTitle">Deschide în aplicație</string>
 
     <!-- Email Autofill -->
     <string name="aliasToClipboardMessage">Adresă nouă copiată în clipboard</string>
-    <string name="newEmailAliasMenuTitle">Generează Duck Address</string>
 
     <!-- Autofill -->
     <string name="autofillSnackbarAction" instruction="Label for a button that lets the user view the details for a login credential">Vezi</string>
@@ -773,10 +764,6 @@
     <string name="settingsPasswordsAndAutofillLoginsSetting">Parole și completare automată</string>
     <string name="autofillLoginSavedSnackbarMessage">Parolă salvată</string>
     <string name="autofillLoginUpdatedSnackbarMessage">Parolă actualizată</string>
-
-    <!-- Custom Tab -->
-    <string name="openInDdgMenuItemTitle">Deschide în DuckDuckGo</string>
-    <string name="runningInDdgMenuItemTitle">Redare în DuckDuckGo</string>
 
     <!-- SSL Error -->
     <string name="sslErrorTitle">Avertisment: acest site poate fi nesigur</string>

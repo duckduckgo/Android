@@ -47,17 +47,12 @@
     <string name="omnibarInputHint">Sök eller skriv in URL</string>
     <string name="clearButtonContentDescription">Rensa sökfältet</string>
     <string name="no_compatible_third_party_app_installed">Ingen kompatibel app installerad</string>
-    <string name="addBookmarkMenuTitle">Lägg till bokmärke</string>
-    <string name="editBookmarkMenuTitle">Redigera bokmärke</string>
+
     <string name="addFavoriteMenuTitle">Lägg till favorit</string>
     <string name="removeFavoriteMenuTitle">Ta bort favorit</string>
     <string name="favoriteAddedMessage">Favorit har lagts till</string>
     <string name="bookmarkAddedMessage">Bokmärke sparat</string>
-    <string name="requestDesktopSiteMenuTitle">Webbplats för dator</string>
-    <string name="fireproofWebsiteMenuTitleRemove">Ta bort brandsäkring</string>
-    <string name="requestMobileSiteMenuTitle">Webbplats för mobil</string>
     <string name="downloadsMenuTitle">Nerladdningar</string>
-    <string name="printMenuTitle">Skriv ut sidan</string>
     <string name="favoriteDeleteConfirmationMessage">Favorit borttagen</string>
     <string name="fireproofDeleteConfirmationMessage">Brandsäkring har tagits bort</string>
     <string name="privacyProtectionEnabledConfirmationMessage" instruction="Placeholder is a website">Integritetsskydd aktiverat för %1$s</string>
@@ -76,11 +71,9 @@
     <!-- Sharing options -->
     <string name="options">Alternativ</string>
     <string name="shareLink">Dela länk</string>
-    <string name="shareMenuTitle">Dela</string>
     <string name="copyUrl">Kopia länkadress</string>
 
     <!-- Find in page -->
-    <string name="findInPageMenuTitle">Hitta på sidan</string>
     <string name="nextSearchTermDescription">Hitta nästa</string>
     <string name="previousSearchTermDescription">Hitta föregående</string>
     <string name="closeFindInPageButtonDescription">Stäng sökning i sidvy</string>
@@ -125,8 +118,8 @@
 
     <!-- Fire -->
     <string name="fireMenu">Rensa data</string>
-    <string name="fireClearAll">Rensa alla flikar och data</string>
-    <string name="fireClearAllPlusDuckChats">Rensa alla flikar, data och Duck.ai-chattar</string>
+    <string name="fireClearAll">Rensa flikar och data</string>
+    <string name="fireClearAllPlusDuckChats">Rensa flikar, data och Duck.ai-chattar</string>
     <string name="fireCancel">Avbryt</string>
     <string name="fireDataCleared">Data rensad</string>
 
@@ -247,6 +240,8 @@
     <string name="settingsAutomaticallyClearWhenAppExit60Minutes">Avsluta app, inaktiv i 1 timme</string>
     <string name="settingsClearAiDataTitle">Rensa Duck.ai-chattar</string>
     <string name="settingsClearAiDataDeleteMessage">Fire Button raderar också Duck.ai-historik, inklusive fästa chattar.</string>
+    <string name="settingsClearDataActionSecondaryText">Rensar alla flikar och data för webbplatser som inte har Fireproof.</string>
+    <string name="settingsClearDataActionPlusDuckChatsSecondaryText">Rensar alla flikar, Duck.ai-chattar och data för webbplatser som inte har Fireproof.</string>
 
     <!-- About Activity -->
     <string name="aboutActivityTitle">Om DuckDuckGo</string>
@@ -256,7 +251,7 @@
     <string name="no_suggestions">Inga förslag</string>
 
     <!-- Broken Site Activity -->
-    <string name="brokenSiteReportBrokenSiteMenuItem">Rapportera skadad webbplats</string>
+
 
     <string name="brokenSiteProtectionsOn">Skydd är <b>PÅ</b> för den här webbplatsen</string>
     <string name="brokenSiteProtectionsOff">Skydd är <b>AV</b> för den här webbplatsen</string>
@@ -279,7 +274,7 @@
     <string name="searchWidgetLabel">Sök och Duck.ai</string>
 
     <!-- Home Screen Shortcuts -->
-    <string name="addToHome">Lägg till på hemskärmen</string>
+
     <string name="shortcutAddedText" instruction="Placeholder is the name of a website">Klart! %1$s har lagts till på din startsida.</string>
 
     <!-- User Survey -->
@@ -485,8 +480,6 @@
 
     <!-- Allowlist -->
     <string name="allowlistActivityTitle">Oskyddade webbplatser</string>
-    <string name="enablePrivacyProtection">Aktivera integritetsskydd</string>
-    <string name="disablePrivacyProtection">Inaktivera integritetsskydd</string>
     <string name="allowlistEntryOverflowContentDescription" instruction="Placeholder is a website">Fler alternativ för den oskyddade webbplatsen %1$s</string>
     <string name="allowlistEntryDeleteConfirmMessage" instruction="Placeholder is a website">Är du säker på att du vill ta bort &lt;b&gt;%1$s&lt;/b&gt; från de oskyddade webbplatserna?</string>
     <string name="allowlistExplanation">Dessa webbplatser kommer inte att förbättras av integritetsskydd.</string>
@@ -585,11 +578,9 @@
     <string name="appLinkSnackBarMessage" instruction="Placeholder is the name of an app">Du kan öppna den här länken i %1$s.</string>
     <string name="appLinkMultipleSnackBarMessage">Du kan öppna den här länken i andra appar.</string>
     <string name="appLinkIntentChooserTitle">Öppna med</string>
-    <string name="appLinkMenuItemTitle">Öppna i appen</string>
 
     <!-- Email Autofill -->
     <string name="aliasToClipboardMessage">Ny adress har kopierats till Urklipp</string>
-    <string name="newEmailAliasMenuTitle">Generera en Duck-adress</string>
 
     <!-- Autofill -->
     <string name="autofillSnackbarAction" instruction="Label for a button that lets the user view the details for a login credential">Visa</string>
@@ -759,10 +750,6 @@
     <string name="settingsPasswordsAndAutofillLoginsSetting">Lösenord och automatisk ifyllning</string>
     <string name="autofillLoginSavedSnackbarMessage">Lösenord sparat</string>
     <string name="autofillLoginUpdatedSnackbarMessage">Lösenordet har uppdaterats</string>
-
-    <!-- Custom Tab -->
-    <string name="openInDdgMenuItemTitle">Öppna i DuckDuckGo</string>
-    <string name="runningInDdgMenuItemTitle">Körs i DuckDuckGo</string>
 
     <!-- SSL Error -->
     <string name="sslErrorTitle">Varning: Denna webbplats kan vara osäker</string>

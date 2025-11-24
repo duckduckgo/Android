@@ -176,4 +176,7 @@ interface AutofillFeature {
 
     @Toggle.DefaultValue(defaultValue = DefaultFeatureValue.TRUE)
     fun canDetectSystemAutofillEngagement(): Toggle
+
+    @Toggle.DefaultValue(defaultValue = DefaultFeatureValue.TRUE)
+    fun prioritizeDomainMatchesOnSearch(): Toggle
 }

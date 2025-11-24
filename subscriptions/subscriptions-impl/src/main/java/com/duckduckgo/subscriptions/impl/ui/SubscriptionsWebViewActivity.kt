@@ -72,6 +72,7 @@ import com.duckduckgo.navigation.api.getActivityParams
 import com.duckduckgo.subscriptions.api.SubscriptionScreens.RestoreSubscriptionScreenWithParams
 import com.duckduckgo.subscriptions.api.SubscriptionScreens.SubscriptionPurchase
 import com.duckduckgo.subscriptions.api.Subscriptions
+import com.duckduckgo.subscriptions.impl.PrivacyProFeature
 import com.duckduckgo.subscriptions.impl.R.string
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.FEATURE_PAGE_QUERY_PARAM_KEY
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.ITR_URL
@@ -176,6 +177,9 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationD
     @Inject
     lateinit var subscriptionsUrlProvider: SubscriptionsUrlProvider
 
+    @Inject
+    lateinit var privacyProFeature: PrivacyProFeature
+
     private val viewModel: SubscriptionWebViewViewModel by bindViewModel()
 
     private val binding: ActivitySubscriptionsWebviewBinding by viewBinding()
@@ -242,7 +246,11 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationD
                     super.onProgressChanged(view, newProgress)
                 }
             }
-            it.webViewClient = SubscriptionsWebViewClient(specialUrlDetector, this)
+            it.webViewClient = SubscriptionsWebViewClient(
+                specialUrlDetector = specialUrlDetector,
+                context = this,
+                onRenderProcessCrash = ::recoverFromRenderProcessCrash,
+            )
             it.settings.apply {
                 userAgentString = CUSTOM_UA
                 javaScriptEnabled = true
@@ -281,6 +289,18 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationD
         }
     }
 
+    private fun recoverFromRenderProcessCrash(): Boolean {
+        if (!privacyProFeature.handleSubscriptionsWebViewRenderProcessCrash().isEnabled()) return false
+
+        val isRepeatedCrash = intent.getBooleanExtra(ACTIVITY_LAUNCHED_AFTER_WEBVIEW_RENDER_PROCESS_CRASH, false)
+        pixelSender.reportSubscriptionsWebViewRenderProcessCrash(isRepeatedCrash)
+        if (!isRepeatedCrash) {
+            startActivity(intent.putExtra(ACTIVITY_LAUNCHED_AFTER_WEBVIEW_RENDER_PROCESS_CRASH, true))
+        }
+        finish()
+        return true
+    }
+
     override fun continueDownload(pendingFileDownload: PendingFileDownload) {
         fileDownloader.enqueueDownload(pendingFileDownload)
     }
@@ -296,7 +316,7 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationD
                 origin = subscriptionPurchaseActivityParams.origin,
             ).let { webViewActivityWithParams ->
                 if (subscriptionPurchaseActivityParams.featurePage.isNullOrBlank().not()) {
-                    val urlWithParams = kotlin.runCatching {
+                    val urlWithParams = runCatching {
                         subscriptionsUrlProvider.buyUrl.toUri()
                             .buildUpon()
                             .appendQueryParameter(FEATURE_PAGE_QUERY_PARAM_KEY, subscriptionPurchaseActivityParams.featurePage)
@@ -635,12 +655,23 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationD
 
     override fun onDestroy() {
         downloadMessagesJob.cancel()
+        destroyWebView()
         super.onDestroy()
     }
+
+    private fun destroyWebView() {
+        binding.webview.stopLoading()
+        binding.webview.removeJavascriptInterface(subscriptionJsMessaging.context)
+        binding.webview.removeJavascriptInterface(itrJsMessaging.context)
+        binding.root.removeView(binding.webview)
+        binding.webview.destroy()
+    }
+
     companion object {
         private const val DOWNLOAD_CONFIRMATION_TAG = "DOWNLOAD_CONFIRMATION_TAG"
         private const val PERMISSION_REQUEST_WRITE_EXTERNAL_STORAGE = 200
         private const val CUSTOM_UA =
             "Mozilla/5.0 (Linux; Android 12) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/124.0.0.0 Mobile DuckDuckGo/5 Safari/537.36"
+        private const val ACTIVITY_LAUNCHED_AFTER_WEBVIEW_RENDER_PROCESS_CRASH = "activity_launched_after_webview_render_process_crash"
     }
 }

@@ -21,7 +21,7 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import app.cash.turbine.test
 import com.duckduckgo.app.browser.commands.Command
 import com.duckduckgo.app.browser.menu.VpnMenuStateProvider
-import com.duckduckgo.app.browser.viewstate.VpnMenuState
+import com.duckduckgo.browser.ui.browsermenu.VpnMenuState
 import com.duckduckgo.common.test.CoroutineTestRule
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest

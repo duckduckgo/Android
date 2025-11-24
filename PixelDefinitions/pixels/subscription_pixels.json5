@@ -1,0 +1,17 @@
+{
+    "subscription_webview_render_process_crash": {
+        "description": "Fired when a render process crash is reported by the WebView that shows subscription pages.",
+        "owners": ["lmac012"],
+        "triggers": ["other"],
+        "suffixes": ["daily_count_short", "form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "is_repeated",
+                "description": "Indicates whether this is a repeated crash after a recovery attempt. 'false' for first crash, 'true' for repeated crash.",
+                "type": "string",
+                "enum": ["true", "false"]
+            }
+        ]
+    }
+}

@@ -47,17 +47,12 @@
     <string name="omnibarInputHint">Ieškoti arba įvesti URL</string>
     <string name="clearButtonContentDescription">Išvalyti paieškos įvestį</string>
     <string name="no_compatible_third_party_app_installed">Neįdiegta suderinama programa</string>
-    <string name="addBookmarkMenuTitle">Pridėti žymę</string>
-    <string name="editBookmarkMenuTitle">Redaguoti žymę</string>
+
     <string name="addFavoriteMenuTitle">Pridėti mėgstamą</string>
     <string name="removeFavoriteMenuTitle">Šalinti mėgstamą</string>
     <string name="favoriteAddedMessage">Mėgstamas pridėtas</string>
     <string name="bookmarkAddedMessage">Žymė pridėta</string>
-    <string name="requestDesktopSiteMenuTitle">Darbalaukio svetainė</string>
-    <string name="fireproofWebsiteMenuTitleRemove">Šalinti apsaugą</string>
-    <string name="requestMobileSiteMenuTitle">Mobilioji svetainė</string>
     <string name="downloadsMenuTitle">Atsisiuntimai</string>
-    <string name="printMenuTitle">Spausdinti puslapį</string>
     <string name="favoriteDeleteConfirmationMessage">Mėgstamas pašalintas</string>
     <string name="fireproofDeleteConfirmationMessage">Apsauga pašalinta</string>
     <string name="privacyProtectionEnabledConfirmationMessage" instruction="Placeholder is a website">Privatumo apsauga įjungta dėl %1$s</string>
@@ -78,11 +73,9 @@
     <!-- Sharing options -->
     <string name="options">Parinktys</string>
     <string name="shareLink">Bendrinti nuorodą</string>
-    <string name="shareMenuTitle">Bendrinti</string>
     <string name="copyUrl">Kopijuoti nuorodos adresą</string>
 
     <!-- Find in page -->
-    <string name="findInPageMenuTitle">Rasti puslapyje</string>
     <string name="nextSearchTermDescription">Rasti kitą</string>
     <string name="previousSearchTermDescription">Rasti ankstesnį</string>
     <string name="closeFindInPageButtonDescription">Uždaryti paiešką puslapio peržiūroje</string>
@@ -127,8 +120,8 @@
 
     <!-- Fire -->
     <string name="fireMenu">Valyti duomenis</string>
-    <string name="fireClearAll">Valyti visas korteles ir duomenis</string>
-    <string name="fireClearAllPlusDuckChats">Išvalyti visus skirtukus, duomenis ir „Duck.ai“ pokalbius</string>
+    <string name="fireClearAll">Valyti skirtukus ir duomenis</string>
+    <string name="fireClearAllPlusDuckChats">Išvalyti skirtukus, duomenis ir „Duck.ai“ pokalbius</string>
     <string name="fireCancel">Atšaukti</string>
     <string name="fireDataCleared">Duomenys išvalyti</string>
 
@@ -249,6 +242,8 @@
     <string name="settingsAutomaticallyClearWhenAppExit60Minutes">Išeinant iš programos, po 1 val. neveikimo</string>
     <string name="settingsClearAiDataTitle">Išvalyti „Duck.ai“ pokalbius</string>
     <string name="settingsClearAiDataDeleteMessage">„Fire Button“ taip pat ištrins „Duck.ai“ istoriją, įskaitant prisegtus pokalbius.</string>
+    <string name="settingsClearDataActionSecondaryText">Išvalo visus skirtukus ir duomenis visose svetainėse, kurių neapsaugojote ugniasiene.</string>
+    <string name="settingsClearDataActionPlusDuckChatsSecondaryText">Išvalo visus skirtukus, „Duck.ai“ pokalbius ir duomenis visose svetainėse, kurių neapsaugojote ugniasiene.</string>
 
     <!-- About Activity -->
     <string name="aboutActivityTitle">Apie „DuckDuckGo“</string>
@@ -258,7 +253,7 @@
     <string name="no_suggestions">Pasiūlymų nėra</string>
 
     <!-- Broken Site Activity -->
-    <string name="brokenSiteReportBrokenSiteMenuItem">Pranešti apie neveikiančią svetainę</string>
+
 
     <string name="brokenSiteProtectionsOn">Šios svetainės apsaugos priemonės yra <b>ĮJUNGTOS</b></string>
     <string name="brokenSiteProtectionsOff">Šios svetainės apsaugos priemonės yra <b>IŠJUNGTOS</b></string>
@@ -281,7 +276,7 @@
     <string name="searchWidgetLabel">Paieška ir „Duck.ai“</string>
 
     <!-- Home Screen Shortcuts -->
-    <string name="addToHome">Pridėti prie pagrindinio ekrano</string>
+
     <string name="shortcutAddedText" instruction="Placeholder is the name of a website">Pavyko! %1$s pridėtas prie jūsų pagrindinio ekrano.</string>
 
     <!-- User Survey -->
@@ -487,8 +482,6 @@
 
     <!-- Allowlist -->
     <string name="allowlistActivityTitle">Neapsaugotos svetainės</string>
-    <string name="enablePrivacyProtection">Įjungti privatumo apsaugą</string>
-    <string name="disablePrivacyProtection">Išjungti privatumo apsaugą</string>
     <string name="allowlistEntryOverflowContentDescription" instruction="Placeholder is a website">Daugiau neapsaugotos svetainės %1$s parinkčių</string>
     <string name="allowlistEntryDeleteConfirmMessage" instruction="Placeholder is a website">Ar tikrai norite pašalinti &lt;b&gt;%1$s&lt;/b&gt; iš neapsaugotų svetainių sąrašo?</string>
     <string name="allowlistExplanation">Šių svetainių nepatobulins privatumo apsauga.</string>
@@ -587,11 +580,9 @@
     <string name="appLinkSnackBarMessage" instruction="Placeholder is the name of an app">Galite atverti šią nuorodą %1$s.</string>
     <string name="appLinkMultipleSnackBarMessage">Galite atidaryti šią nuorodą kitose programėlėse.</string>
     <string name="appLinkIntentChooserTitle">Atidaryti</string>
-    <string name="appLinkMenuItemTitle">Atidaryti programėlėje</string>
 
     <!-- Email Autofill -->
     <string name="aliasToClipboardMessage">Naujas adresas nukopijuotas į jūsų iškarpinę</string>
-    <string name="newEmailAliasMenuTitle">Sukurkite „Duck“ adresą</string>
 
     <!-- Autofill -->
     <string name="autofillSnackbarAction" instruction="Label for a button that lets the user view the details for a login credential">Peržiūrėti</string>
@@ -787,10 +778,6 @@
     <string name="settingsPasswordsAndAutofillLoginsSetting">Slaptažodžiai ir automatinis užpildymas</string>
     <string name="autofillLoginSavedSnackbarMessage">Slaptažodis išsaugotas</string>
     <string name="autofillLoginUpdatedSnackbarMessage">Slaptažodis atnaujintas</string>
-
-    <!-- Custom Tab -->
-    <string name="openInDdgMenuItemTitle">Atidaryti „DuckDuckGo“</string>
-    <string name="runningInDdgMenuItemTitle">Veikia sistemoje „DuckDuckGo“</string>
 
     <!-- SSL Error -->
     <string name="sslErrorTitle">Įspėjimas: ši svetainė gali būti nesaugi</string>

@@ -322,6 +322,8 @@ class AutofillManagementListMode : DuckDuckGoFragment(R.layout.fragment_autofill
             canShowImportGooglePasswordsButton = state.canImportFromGooglePasswords,
             showAutofillToggle = state.showAutofillEnabledToggle,
             promotionView = promotionView,
+            query = state.credentialSearchQuery,
+            prioritizeDomainMatchesOnSearch = state.prioritizeDomainMatchesOnSearch,
         )
         parentActivity()?.invalidateOptionsMenu()
     }
@@ -413,6 +415,8 @@ class AutofillManagementListMode : DuckDuckGoFragment(R.layout.fragment_autofill
         canShowImportGooglePasswordsButton: Boolean,
         showAutofillToggle: Boolean,
         promotionView: View?,
+        query: String,
+        prioritizeDomainMatchesOnSearch: Boolean,
     ) {
         if (credentials == null) {
             logcat(VERBOSE) { "Credentials is null, meaning we haven't retrieved them yet. Don't know if empty or not yet" }
@@ -423,12 +427,16 @@ class AutofillManagementListMode : DuckDuckGoFragment(R.layout.fragment_autofill
                 autofillEnabled = viewModel.viewState.value.autofillEnabled,
                 promotionView = promotionView,
                 showGoogleImportPasswordsButton = canShowImportGooglePasswordsButton,
+                query = query,
+                prioritizeDomainMatchesOnSearch = prioritizeDomainMatchesOnSearch,
             )
         } else if (credentials.isEmpty() && credentialSearchQuery.isEmpty()) {
             showEmptyCredentialsPlaceholders(
                 canShowImportGooglePasswordsButton = canShowImportGooglePasswordsButton,
                 showAutofillToggle = showAutofillToggle,
                 promotionView = promotionView,
+                query = query,
+                prioritizeDomainMatchesOnSearch = prioritizeDomainMatchesOnSearch,
             )
         } else if (credentials.isEmpty()) {
             showNoResultsPlaceholders(credentialSearchQuery)
@@ -440,6 +448,8 @@ class AutofillManagementListMode : DuckDuckGoFragment(R.layout.fragment_autofill
                 autofillEnabled = viewModel.viewState.value.autofillEnabled,
                 promotionView = promotionView,
                 showGoogleImportPasswordsButton = canShowImportGooglePasswordsButton,
+                query = query,
+                prioritizeDomainMatchesOnSearch = prioritizeDomainMatchesOnSearch,
             )
         }
     }
@@ -452,6 +462,8 @@ class AutofillManagementListMode : DuckDuckGoFragment(R.layout.fragment_autofill
         canShowImportGooglePasswordsButton: Boolean,
         showAutofillToggle: Boolean,
         promotionView: View?,
+        query: String,
+        prioritizeDomainMatchesOnSearch: Boolean,
     ) {
         renderCredentialList(
             credentials = emptyList(),
@@ -460,6 +472,8 @@ class AutofillManagementListMode : DuckDuckGoFragment(R.layout.fragment_autofill
             autofillEnabled = viewModel.viewState.value.autofillEnabled,
             promotionView = promotionView,
             showGoogleImportPasswordsButton = canShowImportGooglePasswordsButton,
+            query = query,
+            prioritizeDomainMatchesOnSearch = prioritizeDomainMatchesOnSearch,
         )
 
         if (canShowImportGooglePasswordsButton) {
@@ -474,16 +488,24 @@ class AutofillManagementListMode : DuckDuckGoFragment(R.layout.fragment_autofill
         autofillEnabled: Boolean,
         promotionView: View?,
         showGoogleImportPasswordsButton: Boolean,
+        query: String,
+        prioritizeDomainMatchesOnSearch: Boolean,
     ) {
         withContext(dispatchers.io()) {
             val currentUrl = getCurrentSiteUrl()
-
             val credentialLoadingState = if (credentials == null) {
                 Loading
             } else {
+                val querySuggestions =
+                    if (prioritizeDomainMatchesOnSearch) { suggestionMatcher.getQuerySuggestions(query, credentials) } else emptyList()
                 val directSuggestions = suggestionMatcher.getDirectSuggestions(currentUrl, credentials)
                 val shareableCredentials = suggestionMatcher.getShareableSuggestions(currentUrl)
-                val directSuggestionsListItems = suggestionListBuilder.build(directSuggestions, shareableCredentials, allowBreakageReporting)
+                val directSuggestionsListItems = suggestionListBuilder.build(
+                    querySuggestions,
+                    directSuggestions,
+                    shareableCredentials,
+                    allowBreakageReporting,
+                )
                 val groupedCredentials = grouper.group(credentials)
 
                 val hasSuggestions = directSuggestions.isNotEmpty() || shareableCredentials.isNotEmpty()

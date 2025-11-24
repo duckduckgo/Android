@@ -22,6 +22,7 @@ import com.duckduckgo.app.global.model.PrivacyShield
 import com.duckduckgo.app.global.model.PrivacyShield.PROTECTED
 import com.duckduckgo.app.global.model.PrivacyShield.UNPROTECTED
 import com.duckduckgo.app.pixels.AppPixelName
+import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.app.privacy.model.TestingEntity
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
@@ -95,6 +96,8 @@ class OmnibarLayoutViewModelTest {
     }
     private val serpEasterEggLogosToggles: SerpEasterEggLogosToggles = mock()
 
+    private val androidBrowserToggles: AndroidBrowserConfigFeature = mock()
+
     private lateinit var testee: OmnibarLayoutViewModel
 
     private val EMPTY_URL = ""
@@ -115,6 +118,8 @@ class OmnibarLayoutViewModelTest {
         whenever(duckAiFeatureState.showInputScreen).thenReturn(duckAiShowInputScreenFlow)
         whenever(serpEasterEggLogosToggles.feature()).thenReturn(mock())
         whenever(serpEasterEggLogosToggles.feature().isEnabled()).thenReturn(false)
+        whenever(androidBrowserToggles.handleAboutBlank()).thenReturn(mock())
+        whenever(androidBrowserToggles.handleAboutBlank().isEnabled()).thenReturn(false)
 
         initializeViewModel()
     }
@@ -156,6 +161,7 @@ class OmnibarLayoutViewModelTest {
             addressDisplayFormatter = mockAddressDisplayFormatter,
             settingsDataStore = settingsDataStore,
             serpEasterEggLogosToggles = serpEasterEggLogosToggles,
+            androidBrowserToggles = androidBrowserToggles,
         )
     }
 
@@ -1709,6 +1715,44 @@ class OmnibarLayoutViewModelTest {
                 Pixel.PixelParameter.IS_BROWSER_MENU_BUTTON_SHOWN to "false",
             ),
         )
+    }
+
+    @Test
+    fun whenHandleAboutBlankEnabledOmnibarNotFocusedAndBlankPageFromOtherTabThenPersistOmbinarText() = runTest {
+        whenever(androidBrowserToggles.handleAboutBlank().isEnabled()).thenReturn(true)
+        initializeViewModel()
+        val omnibarState = OmnibarViewState(
+            navigationChange = false,
+            omnibarText = "about:blank",
+            forceExpand = false,
+        )
+        testee.onExternalStateChange(StateChange.OmnibarStateChange(omnibarState))
+
+        testee.onOmnibarFocusChanged(false, "")
+
+        testee.viewState.test {
+            val viewState = awaitItem()
+            assertEquals("about:blank", viewState.omnibarText)
+        }
+    }
+
+    @Test
+    fun whenHandleAboutBlankDisabledOmnibarNotFocusedAndBlankPageFromOtherTabThenDoNotPersistOmbinarText() = runTest {
+        whenever(androidBrowserToggles.handleAboutBlank().isEnabled()).thenReturn(false)
+        initializeViewModel()
+        val omnibarState = OmnibarViewState(
+            navigationChange = false,
+            omnibarText = "about:blank",
+            forceExpand = false,
+        )
+        testee.onExternalStateChange(StateChange.OmnibarStateChange(omnibarState))
+
+        testee.onOmnibarFocusChanged(false, "")
+
+        testee.viewState.test {
+            val viewState = awaitItem()
+            assertEquals("", viewState.omnibarText)
+        }
     }
 
     @Test

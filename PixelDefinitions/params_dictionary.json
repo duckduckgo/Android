@@ -66,5 +66,11 @@
         "type": "string",
         "description": "Final status of the wide event flow",
         "enum": ["SUCCESS", "FAILURE", "CANCELLED", "UNKNOWN"]
+    },
+    "source": {
+        "key": "source",
+        "type": "string",
+        "description": "Source from which voice search was launched",
+        "enum": ["browser", "widget"]
     }
 }

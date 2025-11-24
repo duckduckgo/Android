@@ -428,7 +428,10 @@ class AutofillPasswordsManagementViewModel @Inject constructor(
     fun onViewCreated() {
         if (combineJob != null) return
         combineJob = viewModelScope.launch(dispatchers.io()) {
-            _viewState.value = _viewState.value.copy(autofillEnabled = autofillStore.autofillEnabled)
+            _viewState.value = _viewState.value.copy(
+                autofillEnabled = autofillStore.autofillEnabled,
+                prioritizeDomainMatchesOnSearch = autofillFeature.prioritizeDomainMatchesOnSearch().isEnabled(),
+            )
 
             val allCredentials = autofillStore.getAllCredentials().distinctUntilChanged()
             val combined = allCredentials.combine(searchQueryFilter) { credentials, filter ->
@@ -820,6 +823,7 @@ class AutofillPasswordsManagementViewModel @Inject constructor(
         val reportBreakageState: ReportBreakageState = ReportBreakageState(),
         val canShowPromo: Boolean = false,
         val canImportFromGooglePasswords: Boolean = false,
+        val prioritizeDomainMatchesOnSearch: Boolean = false,
     )
 
     data class ReportBreakageState(

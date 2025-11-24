@@ -254,6 +254,7 @@ class PirWebMaintenanceScanStatusMessageHandlerTest {
         // Verify in-progress opt-out
         assertEquals(1, parsedResponse!!.inProgressOptOuts.size)
         val inProgressResult = parsedResponse.inProgressOptOuts[0]
+        assertEquals(1L, inProgressResult.id)
         assertEquals("John Doe", inProgressResult.name)
         assertEquals(listOf("Johnny", "J. Doe"), inProgressResult.alternativeNames)
         assertEquals(listOf("Jane Doe"), inProgressResult.relatives)
@@ -271,6 +272,7 @@ class PirWebMaintenanceScanStatusMessageHandlerTest {
         // Verify completed opt-out
         assertEquals(1, parsedResponse.completedOptOuts.size)
         val completedResult = parsedResponse.completedOptOuts[0]
+        assertEquals(1L, completedResult.id)
         assertEquals("John Doe", completedResult.name)
         assertEquals(TimeUnit.MILLISECONDS.toSeconds(1643673600000L), completedResult.removedDate)
         assertEquals(5, completedResult.matches)

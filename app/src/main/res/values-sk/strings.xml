@@ -47,17 +47,12 @@
     <string name="omnibarInputHint">Vyhľadať alebo zadať webovú adresu</string>
     <string name="clearButtonContentDescription">Vymazať hľadaný výraz</string>
     <string name="no_compatible_third_party_app_installed">Žiadna kompatibilná aplikácia nie je nainštalovaná</string>
-    <string name="addBookmarkMenuTitle">Pridať záložku</string>
-    <string name="editBookmarkMenuTitle">Upraviť záložku</string>
+
     <string name="addFavoriteMenuTitle">Pridať do obľúbených položiek</string>
     <string name="removeFavoriteMenuTitle">Odstrániť obľúbenú položku</string>
     <string name="favoriteAddedMessage">Obľúbená položka bola pridaná</string>
     <string name="bookmarkAddedMessage">Záložka je pridaná</string>
-    <string name="requestDesktopSiteMenuTitle">Stránka pre stolové počítače</string>
-    <string name="fireproofWebsiteMenuTitleRemove">Odstrániť zabezpečenie</string>
-    <string name="requestMobileSiteMenuTitle">Mobilný režim</string>
     <string name="downloadsMenuTitle">Stiahnuté</string>
-    <string name="printMenuTitle">Tlačiť stranu</string>
     <string name="favoriteDeleteConfirmationMessage">Obľúbená položka bola odstránená</string>
     <string name="fireproofDeleteConfirmationMessage">Zabezpečenie bolo odstránené</string>
     <string name="privacyProtectionEnabledConfirmationMessage" instruction="Placeholder is a website">Ochrana súkromia je zapnutá pre %1$s</string>
@@ -78,11 +73,9 @@
     <!-- Sharing options -->
     <string name="options">Možnosti</string>
     <string name="shareLink">Zdieľať odkaz</string>
-    <string name="shareMenuTitle">Zdieľať</string>
     <string name="copyUrl">Kopírovať adresu odkazu</string>
 
     <!-- Find in page -->
-    <string name="findInPageMenuTitle">Hľadať na stránke</string>
     <string name="nextSearchTermDescription">Hľadať ďalšie</string>
     <string name="previousSearchTermDescription">Hľadať predchádzajúce</string>
     <string name="closeFindInPageButtonDescription">Zavrieť vyhľadávanie v zobrazení stránky</string>
@@ -127,8 +120,8 @@
 
     <!-- Fire -->
     <string name="fireMenu">Vymazať údaje</string>
-    <string name="fireClearAll">Vymazať všetky karty a údaje</string>
-    <string name="fireClearAllPlusDuckChats">Vymazať všetky karty, údaje a chaty Duck.ai</string>
+    <string name="fireClearAll">Vymazať karty a údaje</string>
+    <string name="fireClearAllPlusDuckChats">Vymazať karty, údaje a chaty Duck.ai</string>
     <string name="fireCancel">Zrušiť</string>
     <string name="fireDataCleared">Údaje boli vymazané</string>
 
@@ -249,6 +242,8 @@
     <string name="settingsAutomaticallyClearWhenAppExit60Minutes">Ukončení aplikácie, neaktívnej po dobu 1 hodiny</string>
     <string name="settingsClearAiDataTitle">Vymazať chaty Duck.ai</string>
     <string name="settingsClearAiDataDeleteMessage">Fire Button tiež vymaže históriu Duck.ai vrátane pripnutých rozhovorov.</string>
+    <string name="settingsClearDataActionSecondaryText">Vymaže všetky karty a údaje pre všetky stránky, ktoré si neochránil/-a ochranou Fireproof.</string>
+    <string name="settingsClearDataActionPlusDuckChatsSecondaryText">Zatvorí všetky karty, chaty Duck.ai a vymaže údaje zo všetkých stránok, ktoré si neochránil/-a ochranou Fireproof.</string>
 
     <!-- About Activity -->
     <string name="aboutActivityTitle">O DuckDuckGo</string>
@@ -258,7 +253,7 @@
     <string name="no_suggestions">Žiadne návrhy</string>
 
     <!-- Broken Site Activity -->
-    <string name="brokenSiteReportBrokenSiteMenuItem">Nahlásiť nefunkčný web</string>
+
 
     <string name="brokenSiteProtectionsOn">Ochrany pre túto lokalitu sú <b>ZAPNUTÉ</b></string>
     <string name="brokenSiteProtectionsOff">Ochrany pre túto lokalitu sú <b>VYPNUTÉ</b></string>
@@ -281,7 +276,7 @@
     <string name="searchWidgetLabel">Vyhľadať a Duck.ai</string>
 
     <!-- Home Screen Shortcuts -->
-    <string name="addToHome">Pridať na domovskú obrazovku</string>
+
     <string name="shortcutAddedText" instruction="Placeholder is the name of a website">Úspech! Na vašej ploche pribudla položka %1$s.</string>
 
     <!-- User Survey -->
@@ -487,8 +482,6 @@
 
     <!-- Allowlist -->
     <string name="allowlistActivityTitle">Nezabezpečené webové stránky</string>
-    <string name="enablePrivacyProtection">Povoliť ochranu súkromia</string>
-    <string name="disablePrivacyProtection">Vypnúť ochranu súkromia</string>
     <string name="allowlistEntryOverflowContentDescription" instruction="Placeholder is a website">Viac možností pre nezabezpečené webové stránky %1$s</string>
     <string name="allowlistEntryDeleteConfirmMessage" instruction="Placeholder is a website">Naozaj chcete odstrániť &lt;b&gt;%1$s&lt;/b&gt; z nezabezpečených webových stránok?</string>
     <string name="allowlistExplanation">Tieto webové stránky nebudú rozšírené o ochranu súkromia.</string>
@@ -587,11 +580,9 @@
     <string name="appLinkSnackBarMessage" instruction="Placeholder is the name of an app">Tento odkaz môžete otvoriť cez %1$s.</string>
     <string name="appLinkMultipleSnackBarMessage">Tento odkaz môžete otvoriť v iných aplikáciách.</string>
     <string name="appLinkIntentChooserTitle">Otvoriť cez</string>
-    <string name="appLinkMenuItemTitle">Otvoriť v aplikácii</string>
 
     <!-- Email Autofill -->
     <string name="aliasToClipboardMessage">Nová adresa bola skopírovaná do schránky</string>
-    <string name="newEmailAliasMenuTitle">Generovanie adresy Duck</string>
 
     <!-- Autofill -->
     <string name="autofillSnackbarAction" instruction="Label for a button that lets the user view the details for a login credential">Zobraziť</string>
@@ -787,10 +778,6 @@
     <string name="settingsPasswordsAndAutofillLoginsSetting">Heslá a automatické dopĺňanie</string>
     <string name="autofillLoginSavedSnackbarMessage">Uložené heslo</string>
     <string name="autofillLoginUpdatedSnackbarMessage">Aktualizácia hesla</string>
-
-    <!-- Custom Tab -->
-    <string name="openInDdgMenuItemTitle">Otvoriť v DuckDuckGo</string>
-    <string name="runningInDdgMenuItemTitle">Spustené v DuckDuckGo</string>
 
     <!-- SSL Error -->
     <string name="sslErrorTitle">Varovanie: Táto stránka môže byť nezabezpečená</string>

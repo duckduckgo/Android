@@ -104,7 +104,6 @@ import com.duckduckgo.app.browser.history.NavigationHistoryEntry
 import com.duckduckgo.app.browser.httperrors.HttpCodeSiteErrorHandler
 import com.duckduckgo.app.browser.httperrors.HttpErrorPixelName
 import com.duckduckgo.app.browser.httperrors.HttpErrorPixels
-import com.duckduckgo.app.browser.httperrors.SiteErrorHandlerKillSwitch
 import com.duckduckgo.app.browser.httperrors.StringSiteErrorHandler
 import com.duckduckgo.app.browser.logindetection.FireproofDialogsEventHandler
 import com.duckduckgo.app.browser.logindetection.LoginDetected
@@ -118,7 +117,8 @@ import com.duckduckgo.app.browser.model.LongPressTarget
 import com.duckduckgo.app.browser.newtab.FavoritesQuickAccessAdapter.QuickAccessFavorite
 import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
 import com.duckduckgo.app.browser.omnibar.OmnibarType
-import com.duckduckgo.app.browser.omnibar.QueryOrigin.*
+import com.duckduckgo.app.browser.omnibar.QueryOrigin.FromBookmark
+import com.duckduckgo.app.browser.omnibar.QueryOrigin.FromUser
 import com.duckduckgo.app.browser.refreshpixels.RefreshPixelSender
 import com.duckduckgo.app.browser.remotemessage.RemoteMessagingModel
 import com.duckduckgo.app.browser.santize.NonHttpAppLinkChecker
@@ -132,7 +132,6 @@ import com.duckduckgo.app.browser.viewstate.FindInPageViewState
 import com.duckduckgo.app.browser.viewstate.GlobalLayoutViewState
 import com.duckduckgo.app.browser.viewstate.HighlightableButton
 import com.duckduckgo.app.browser.viewstate.LoadingViewState
-import com.duckduckgo.app.browser.viewstate.VpnMenuState
 import com.duckduckgo.app.browser.webview.MaliciousSiteBlockedWarningLayout.Action.LearnMore
 import com.duckduckgo.app.browser.webview.MaliciousSiteBlockedWarningLayout.Action.LeaveSite
 import com.duckduckgo.app.browser.webview.MaliciousSiteBlockedWarningLayout.Action.ReportError
@@ -225,6 +224,7 @@ import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggesti
 import com.duckduckgo.browser.api.autocomplete.AutoCompleteSettings
 import com.duckduckgo.browser.api.brokensite.BrokenSiteContext
 import com.duckduckgo.browser.api.webviewcompat.WebViewCompatWrapper
+import com.duckduckgo.browser.ui.browsermenu.VpnMenuState
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.test.InstantSchedulersRule
 import com.duckduckgo.common.ui.tabs.SwipingTabsFeature
@@ -242,6 +242,7 @@ import com.duckduckgo.downloads.api.FileDownloader.PendingFileDownload
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.impl.helper.DuckChatJSHelper
+import com.duckduckgo.duckchat.impl.helper.NativeAction
 import com.duckduckgo.duckchat.impl.helper.RealDuckChatJSHelper.Companion.DUCK_CHAT_FEATURE_NAME
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
 import com.duckduckgo.duckplayer.api.DuckPlayer
@@ -289,7 +290,7 @@ import com.duckduckgo.savedsites.api.models.SavedSite.Favorite
 import com.duckduckgo.savedsites.impl.SavedSitesPixelName
 import com.duckduckgo.serp.logos.api.SerpEasterEggLogosToggles
 import com.duckduckgo.serp.logos.api.SerpLogo
-import com.duckduckgo.settings.api.SettingsPageFeature
+import com.duckduckgo.settings.api.SerpSettingsFeature
 import com.duckduckgo.site.permissions.api.SitePermissionsManager
 import com.duckduckgo.site.permissions.api.SitePermissionsManager.LocationPermissionRequest
 import com.duckduckgo.site.permissions.api.SitePermissionsManager.SitePermissionQueryResponse
@@ -459,6 +460,8 @@ class BrowserTabViewModelTest {
 
     private val mockDuckAiFeatureStateInputScreenOpenAutomaticallyFlow = MutableStateFlow(false)
 
+    private val mockDuckAiFeatureStateFullScreenModeFlow = MutableStateFlow(false)
+
     private val mockExternalIntentProcessingState: ExternalIntentProcessingState = mock()
 
     private val mockVpnMenuStateProvider: VpnMenuStateProvider = mock()
@@ -577,8 +580,6 @@ class BrowserTabViewModelTest {
     private val mockAdditionalDefaultBrowserPrompts: AdditionalDefaultBrowserPrompts = mock()
     val mockStack: WebBackForwardList = mock()
 
-    private val mockSiteErrorHandlerKillSwitch: SiteErrorHandlerKillSwitch = mock()
-    private val mockSiteErrorHandlerKillSwitchToggle: Toggle = mock { on { it.isEnabled() } doReturn true }
     private val mockSiteErrorHandler: StringSiteErrorHandler = mock()
     private val mockSiteHttpErrorHandler: HttpCodeSiteErrorHandler = mock()
     private val mockSubscriptionsJSHelper: SubscriptionsJSHelper = mock()
@@ -607,6 +608,7 @@ class BrowserTabViewModelTest {
 
     private val exampleUrl = "http://example.com"
     private val shortExampleUrl = "example.com"
+    private val duckChatURL = "https://duckduckgo.com/?q=DuckDuckGo+AI+Chat&ia=chat&duckai=5"
 
     private val selectedTab = TabEntity("TAB_ID", exampleUrl, position = 0, sourceTabId = "TAB_ID_SOURCE")
     private val flowSelectedTab = MutableStateFlow(selectedTab)
@@ -622,7 +624,7 @@ class BrowserTabViewModelTest {
     private val mockDuckAiFullScreenMode = MutableStateFlow(false)
 
     private lateinit var fakeContentScopeScriptsSubscriptionEventPluginPoint: FakeContentScopeScriptsSubscriptionEventPluginPoint
-    private var fakeSettingsPageFeature = FakeFeatureToggleFactory.create(SettingsPageFeature::class.java)
+    private var serpSettingsFeature = FakeFeatureToggleFactory.create(SerpSettingsFeature::class.java)
 
     @Before
     fun before() =
@@ -692,6 +694,7 @@ class BrowserTabViewModelTest {
             whenever(mockDuckAiFeatureState.showPopupMenuShortcut).thenReturn(MutableStateFlow(false))
             whenever(mockDuckAiFeatureState.showInputScreen).thenReturn(mockDuckAiFeatureStateInputScreenFlow)
             whenever(mockDuckAiFeatureState.showInputScreenAutomaticallyOnNewTab).thenReturn(mockDuckAiFeatureStateInputScreenOpenAutomaticallyFlow)
+            whenever(mockDuckAiFeatureState.showFullScreenMode).thenReturn(mockDuckAiFeatureStateFullScreenModeFlow)
             whenever(mockExternalIntentProcessingState.hasPendingTabLaunch).thenReturn(mockHasPendingTabLaunchFlow)
             whenever(mockExternalIntentProcessingState.hasPendingDuckAiOpen).thenReturn(mockHasPendingDuckAiOpenFlow)
             whenever(mockVpnMenuStateProvider.getVpnMenuState()).thenReturn(flowOf(VpnMenuState.Hidden))
@@ -761,9 +764,9 @@ class BrowserTabViewModelTest {
                 defaultBrowserPromptsExperimentShowPopupMenuItemFlow,
             )
 
-            whenever(mockSiteErrorHandlerKillSwitch.self()).thenReturn(mockSiteErrorHandlerKillSwitchToggle)
-
             fakeContentScopeScriptsSubscriptionEventPluginPoint = FakeContentScopeScriptsSubscriptionEventPluginPoint()
+
+            whenever(mockDuckChat.getDuckChatUrl(any(), any())).thenReturn(duckChatURL)
 
             testee =
                 BrowserTabViewModel(
@@ -840,7 +843,6 @@ class BrowserTabViewModelTest {
                     tabStatsBucketing = mockTabStatsBucketing,
                     additionalDefaultBrowserPrompts = mockAdditionalDefaultBrowserPrompts,
                     swipingTabsFeature = swipingTabsFeatureProvider,
-                    siteErrorHandlerKillSwitch = mockSiteErrorHandlerKillSwitch,
                     siteErrorHandler = mockSiteErrorHandler,
                     siteHttpErrorHandler = mockSiteHttpErrorHandler,
                     subscriptionsJSHelper = mockSubscriptionsJSHelper,
@@ -857,7 +859,7 @@ class BrowserTabViewModelTest {
                     autoconsentPixelManager = mockAutoconsentPixelManager,
                     omnibarRepository = mockOmnibarFeatureRepository,
                     contentScopeScriptsSubscriptionEventPluginPoint = fakeContentScopeScriptsSubscriptionEventPluginPoint,
-                    settingsPageFeature = fakeSettingsPageFeature,
+                    serpSettingsFeature = serpSettingsFeature,
                 )
 
             testee.loadData("abc", null, false, false)
@@ -2663,6 +2665,168 @@ class BrowserTabViewModelTest {
     }
 
     @Test
+    fun whenNewTabMenuItemClickedAndHandleAboutBlankEnabledAndEmptyTabWithBlankUrlAndBlankSourceTabIdExistsThenSelectEmptyTab() =
+        runTest {
+            swipingTabsFeature.self().setRawStoredState(State(enable = true))
+            swipingTabsFeature.enabledForUsers().setRawStoredState(State(enable = true))
+            fakeAndroidConfigBrowserFeature.handleAboutBlank().setRawStoredState(State(enable = true))
+
+            val emptyTabId = "EMPTY_TAB"
+            whenever(mockTabRepository.getTabs()).thenReturn(
+                listOf(
+                    TabEntity("1", "https://example.com", position = 0),
+                    TabEntity(emptyTabId, url = "", sourceTabId = null, position = 1),
+                ),
+            )
+
+            testee.onNewTabMenuItemClicked()
+
+            verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
+            val command = commandCaptor.allValues.find { it is Command.LaunchNewTab }
+            assertNull(command)
+            verify(mockTabRepository).select(emptyTabId)
+        }
+
+    @Test
+    fun whenNewTabMenuItemClickedAndHandleAboutBlankEnabledAndEmptyTabWithBlankUrlButSourceTabIdExistsThenAddNewTab() =
+        runTest {
+            swipingTabsFeature.self().setRawStoredState(State(enable = true))
+            swipingTabsFeature.enabledForUsers().setRawStoredState(State(enable = true))
+            fakeAndroidConfigBrowserFeature.handleAboutBlank().setRawStoredState(State(enable = true))
+
+            whenever(mockTabRepository.getTabs()).thenReturn(
+                listOf(
+                    TabEntity("1", "https://example.com", position = 0),
+                    TabEntity("EMPTY_TAB", url = "", sourceTabId = "SOURCE_TAB", position = 1),
+                ),
+            )
+
+            testee.onNewTabMenuItemClicked()
+
+            verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
+            val command = commandCaptor.allValues.find { it is Command.LaunchNewTab }
+            assertNotNull(command)
+            assertTrue(command is Command.LaunchNewTab)
+            verify(mockTabRepository, never()).select(any())
+        }
+
+    @Test
+    fun whenNewTabMenuItemClickedAndHandleAboutBlankEnabledAndNoEmptyTabWithBlankUrlExistsThenAddNewTab() =
+        runTest {
+            swipingTabsFeature.self().setRawStoredState(State(enable = true))
+            swipingTabsFeature.enabledForUsers().setRawStoredState(State(enable = true))
+            fakeAndroidConfigBrowserFeature.handleAboutBlank().setRawStoredState(State(enable = true))
+
+            whenever(mockTabRepository.getTabs()).thenReturn(
+                listOf(
+                    TabEntity("1", "https://example.com", position = 0),
+                    TabEntity("2", "https://test.com", position = 1),
+                ),
+            )
+
+            testee.onNewTabMenuItemClicked()
+
+            verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
+            val command = commandCaptor.allValues.find { it is Command.LaunchNewTab }
+            assertNotNull(command)
+            assertTrue(command is Command.LaunchNewTab)
+            verify(mockTabRepository, never()).select(any())
+        }
+
+    @Test
+    fun whenNavigationBarNewTabButtonClickedThenGenerateWebViewPreviewImage() {
+        testee.onNavigationBarNewTabButtonClicked()
+        assertCommandIssued<Command.GenerateWebViewPreviewImage>()
+    }
+
+    @Test
+    fun whenNavigationBarNewTabButtonClickedAndSwipingTabsEnabledAndNoEmptyTabExistsThenLaunchNewTabCommandIssued() =
+        runTest {
+            swipingTabsFeature.self().setRawStoredState(State(enable = true))
+            swipingTabsFeature.enabledForUsers().setRawStoredState(State(enable = true))
+            fakeAndroidConfigBrowserFeature.handleAboutBlank().setRawStoredState(State(enable = true))
+            whenever(mockTabRepository.getTabs()).thenReturn(
+                listOf(
+                    TabEntity("1", "https://example.com", position = 0),
+                    TabEntity("2", "https://test.com", position = 1),
+                ),
+            )
+
+            testee.onNavigationBarNewTabButtonClicked()
+
+            verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
+            val command = commandCaptor.allValues.find { it is Command.LaunchNewTab }
+            assertNotNull(command)
+            assertTrue(command is Command.LaunchNewTab)
+            verify(mockTabRepository, never()).select(any())
+        }
+
+    @Test
+    fun whenNavigationBarNewTabButtonClickedAndSwipingTabsEnabledAndEmptyTabExistsWithHandleAboutBlankEnabledThenSelectEmptyTab() =
+        runTest {
+            swipingTabsFeature.self().setRawStoredState(State(enable = true))
+            swipingTabsFeature.enabledForUsers().setRawStoredState(State(enable = true))
+            fakeAndroidConfigBrowserFeature.handleAboutBlank().setRawStoredState(State(enable = true))
+            val emptyTabId = "EMPTY_TAB"
+            whenever(mockTabRepository.getTabs()).thenReturn(
+                listOf(
+                    TabEntity("1", "https://example.com", position = 0),
+                    TabEntity(emptyTabId, url = "", sourceTabId = null, position = 1),
+                ),
+            )
+
+            testee.onNavigationBarNewTabButtonClicked()
+
+            verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
+            val launchNewTabCommand = commandCaptor.allValues.find { it is Command.LaunchNewTab }
+            assertNull(launchNewTabCommand)
+            verify(mockTabRepository).select(emptyTabId)
+        }
+
+    @Test
+    fun whenNavigationBarNewTabButtonClickedAndSwipingTabsEnabledAndEmptyTabExistsWithHandleAboutBlankDisabledThenSelectEmptyTab() =
+        runTest {
+            swipingTabsFeature.self().setRawStoredState(State(enable = true))
+            swipingTabsFeature.enabledForUsers().setRawStoredState(State(enable = true))
+            fakeAndroidConfigBrowserFeature.handleAboutBlank().setRawStoredState(State(enable = false))
+            val emptyTabId = "EMPTY_TAB"
+            whenever(mockTabRepository.getTabs()).thenReturn(
+                listOf(
+                    TabEntity("1", "https://example.com", position = 0),
+                    TabEntity(emptyTabId, url = "", sourceTabId = "SOURCE_TAB", position = 1),
+                ),
+            )
+
+            testee.onNavigationBarNewTabButtonClicked()
+
+            verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
+            val launchNewTabCommand = commandCaptor.allValues.find { it is Command.LaunchNewTab }
+            assertNull(launchNewTabCommand)
+            verify(mockTabRepository).select(emptyTabId)
+        }
+
+    @Test
+    fun whenNavigationBarNewTabButtonClickedAndSwipingTabsEnabledAndEmptyTabWithSourceTabIdExistsWithHandleAboutBlankEnabledThenLaunchNewTab() =
+        runTest {
+            swipingTabsFeature.self().setRawStoredState(State(enable = true))
+            swipingTabsFeature.enabledForUsers().setRawStoredState(State(enable = true))
+            fakeAndroidConfigBrowserFeature.handleAboutBlank().setRawStoredState(State(enable = true))
+            whenever(mockTabRepository.getTabs()).thenReturn(
+                listOf(
+                    TabEntity("1", url = "", sourceTabId = "SOURCE_TAB", position = 0),
+                ),
+            )
+
+            testee.onNavigationBarNewTabButtonClicked()
+
+            verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
+            val command = commandCaptor.allValues.find { it is Command.LaunchNewTab }
+            assertNotNull(command)
+            assertTrue(command is Command.LaunchNewTab)
+            verify(mockTabRepository, never()).select(any())
+        }
+
+    @Test
     fun whenCloseCurrentTabSelectedThenTabDeletedFromRepository() =
         runTest {
             givenOneActiveTabSelected()
@@ -4405,6 +4569,30 @@ class BrowserTabViewModelTest {
     }
 
     @Test
+    fun whenHandleAboutBlankEnabledAndMessageReceivedAndNullSiteUrlThenSetOmnibarText() {
+        fakeAndroidConfigBrowserFeature.handleAboutBlank().setRawStoredState(State(enable = true))
+        loadUrl(null)
+        testee.onMessageReceived()
+        assertEquals(omnibarViewState().omnibarText, "about:blank")
+    }
+
+    @Test
+    fun whenHandleAboutBlankEnabledAndMessageReceivedAndNonNullSiteUrlThenThenDoNotSetOmnibarText() {
+        fakeAndroidConfigBrowserFeature.handleAboutBlank().setRawStoredState(State(enable = true))
+        loadUrl("url")
+        testee.onMessageReceived()
+        assertEquals(omnibarViewState().omnibarText, "url")
+    }
+
+    @Test
+    fun whenHandleAboutBlankDisabledAndMessageReceivedAndNullSiteUrlThenDoNotSetOmnibarText() {
+        fakeAndroidConfigBrowserFeature.handleAboutBlank().setRawStoredState(State(enable = false))
+        loadUrl(null)
+        testee.onMessageReceived()
+        assertEquals(omnibarViewState().omnibarText, "")
+    }
+
+    @Test
     fun whenUserLongPressedBackOnEmptyStackBrowserNotShowingThenShowHistoryCommandNotSent() {
         setBrowserShowing(false)
         testee.onUserLongPressedBack()
@@ -5272,25 +5460,6 @@ class BrowserTabViewModelTest {
                 url = "example2.com",
                 httpErrorCodes = emptyList(),
                 hasBrowserError = true,
-            )
-        }
-
-    @Test
-    fun whenErrorHandlerKilledAndPageIsChangedWithHttpErrorThenPrivacyProtectionsPopupManagerIsNotified() =
-        runTest {
-            whenever(mockSiteErrorHandlerKillSwitchToggle.isEnabled()).thenReturn(false)
-            testee.recordHttpErrorCode(statusCode = 404, url = "example2.com")
-
-            updateUrl(
-                originalUrl = "example.com",
-                currentUrl = "example2.com",
-                isBrowserShowing = true,
-            )
-
-            verify(mockPrivacyProtectionsPopupManager).onPageLoaded(
-                url = "example2.com",
-                httpErrorCodes = listOf(404),
-                hasBrowserError = false,
             )
         }
 
@@ -6342,6 +6511,23 @@ class BrowserTabViewModelTest {
         }
 
     @Test
+    fun whenDuckChatMenuItemClickedAndFullScreenModeThenDontOpenDuckChatScreen() =
+        runTest {
+            mockDuckAiFeatureStateFullScreenModeFlow.emit(true)
+            whenever(mockDuckChat.wasOpenedBefore()).thenReturn(false)
+            whenever(mockOmnibarConverter.convertQueryToUrl(duckChatURL, null)).thenReturn(duckChatURL)
+
+            testee.onDuckChatMenuClicked()
+
+            verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
+
+            val command = commandCaptor.lastValue as Command.OpenInNewTab
+            assertTrue(command.query == duckChatURL)
+
+            verify(mockDuckChat, never()).openDuckChat()
+        }
+
+    @Test
     fun whenDuckChatMenuItemClickedAndItWasUsedBeforeThenOpenDuckChatAndSendPixel() =
         runTest {
             whenever(mockDuckChat.wasOpenedBefore()).thenReturn(true)
@@ -6398,6 +6584,22 @@ class BrowserTabViewModelTest {
     fun whenOnDuckChatOmnibarButtonClickedWhenOnNtpWithQueryAndWithoutFocusThenOpenDuckChat() {
         testee.onDuckChatOmnibarButtonClicked(query = "example", hasFocus = false, isNtp = true)
         verify(mockDuckChat).openDuckChat()
+    }
+
+    @Test
+    fun whenOnDuckChatOmnibarButtonClickedAndFullScreenModeThenOpenChatNotCalled() = runTest {
+        val duckAIUrl = "https://duckduckgo.com/?q=test"
+        mockDuckAiFeatureStateFullScreenModeFlow.emit(true)
+        whenever(mockDuckChat.getDuckChatUrl(any(), any())).thenReturn(duckAIUrl)
+        whenever(mockOmnibarConverter.convertQueryToUrl(duckAIUrl, null)).thenReturn(duckAIUrl)
+
+        testee.onDuckChatOmnibarButtonClicked(query = "example", hasFocus = false, isNtp = true)
+
+        verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
+        val command = commandCaptor.lastValue as Navigate
+        assertEquals(duckAIUrl, command.url)
+
+        verify(mockDuckChat, never()).openDuckChat()
     }
 
     @Test
@@ -7861,7 +8063,7 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenOnViewResumedWithNoPluginsThenNoSubscriptionEventsSent() = runTest {
-        fakeSettingsPageFeature.serpSettingsSync().setRawStoredState(State(enable = true))
+        serpSettingsFeature.storeSerpSettings().setRawStoredState(State(enable = true))
 
         testee.onViewResumed()
 
@@ -7873,7 +8075,7 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenOnViewResumedWithPluginsThenSubscriptionEventsSent() = runTest {
-        fakeSettingsPageFeature.serpSettingsSync().setRawStoredState(State(enable = true))
+        serpSettingsFeature.storeSerpSettings().setRawStoredState(State(enable = true))
         val events = mutableListOf<SubscriptionEventData>().apply {
             add(
                 SubscriptionEventData(
@@ -7910,7 +8112,7 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenOnViewResumedWithPluginsAndSerpSettingsFeatureFlagOffThenNoEventsSent() = runTest {
-        fakeSettingsPageFeature.serpSettingsSync().setRawStoredState(State(enable = false))
+        serpSettingsFeature.storeSerpSettings().setRawStoredState(State(enable = false))
         val events = mutableListOf<SubscriptionEventData>().apply {
             add(
                 SubscriptionEventData(
@@ -7980,5 +8182,65 @@ class BrowserTabViewModelTest {
             AppPixelName.MENU_ACTION_VPN_PRESSED,
             mapOf(PixelParameter.STATUS to "subscribed"),
         )
+    }
+
+    @Test
+    fun whenDuckChatNativeNewChatRequested() = runTest {
+        val expectedEvent = SubscriptionEventData(
+            featureName = "event1",
+            subscriptionName = "subscription1",
+            params = JSONObject(),
+        )
+        whenever(mockDuckChatJSHelper.onNativeAction(NativeAction.NEW_CHAT)).thenReturn(expectedEvent)
+
+        testee.openNewDuckChat()
+
+        testee.subscriptionEventDataFlow.test {
+            val emittedEvent = awaitItem()
+            assertEquals(expectedEvent.featureName, emittedEvent.featureName)
+            assertEquals(expectedEvent.subscriptionName, emittedEvent.subscriptionName)
+            assertEquals(expectedEvent.params.toString(), emittedEvent.params.toString())
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenDuckChatNativeHistoryRequested() = runTest {
+        val expectedEvent = SubscriptionEventData(
+            featureName = "event1",
+            subscriptionName = "subscription1",
+            params = JSONObject(),
+        )
+        whenever(mockDuckChatJSHelper.onNativeAction(NativeAction.HISTORY)).thenReturn(expectedEvent)
+
+        testee.openDuckChatHistory()
+
+        testee.subscriptionEventDataFlow.test {
+            val emittedEvent = awaitItem()
+            assertEquals(expectedEvent.featureName, emittedEvent.featureName)
+            assertEquals(expectedEvent.subscriptionName, emittedEvent.subscriptionName)
+            assertEquals(expectedEvent.params.toString(), emittedEvent.params.toString())
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenDuckChatNativeSettingsRequested() = runTest {
+        val expectedEvent = SubscriptionEventData(
+            featureName = "event1",
+            subscriptionName = "subscription1",
+            params = JSONObject(),
+        )
+        whenever(mockDuckChatJSHelper.onNativeAction(NativeAction.DUCK_AI_SETTINGS)).thenReturn(expectedEvent)
+
+        testee.openDuckChatSettings()
+
+        testee.subscriptionEventDataFlow.test {
+            val emittedEvent = awaitItem()
+            assertEquals(expectedEvent.featureName, emittedEvent.featureName)
+            assertEquals(expectedEvent.subscriptionName, emittedEvent.subscriptionName)
+            assertEquals(expectedEvent.params.toString(), emittedEvent.params.toString())
+            cancelAndIgnoreRemainingEvents()
+        }
     }
 }

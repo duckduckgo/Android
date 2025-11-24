@@ -47,17 +47,12 @@
     <string name="omnibarInputHint">Ara ya da URL girin</string>
     <string name="clearButtonContentDescription">Arama girişini temizle</string>
     <string name="no_compatible_third_party_app_installed">Yüklü uyumlu uygulama yok</string>
-    <string name="addBookmarkMenuTitle">Yer İmi ekle</string>
-    <string name="editBookmarkMenuTitle">Yer İşaretini Düzenle</string>
+
     <string name="addFavoriteMenuTitle">Favori Ekle</string>
     <string name="removeFavoriteMenuTitle">Favoriyi Kaldır</string>
     <string name="favoriteAddedMessage">Favori eklendi</string>
     <string name="bookmarkAddedMessage">Yer imi eklendi</string>
-    <string name="requestDesktopSiteMenuTitle">Masaüstü Sitesi</string>
-    <string name="fireproofWebsiteMenuTitleRemove">Korumayı Kaldır</string>
-    <string name="requestMobileSiteMenuTitle">Mobil Site</string>
     <string name="downloadsMenuTitle">İndirilenler</string>
-    <string name="printMenuTitle">Sayfayı Yazdır</string>
     <string name="favoriteDeleteConfirmationMessage">Favori kaldırıldı</string>
     <string name="fireproofDeleteConfirmationMessage">Koruma kaldırıldı</string>
     <string name="privacyProtectionEnabledConfirmationMessage" instruction="Placeholder is a website">%1$s için Gizlilik Koruması etkin</string>
@@ -76,11 +71,9 @@
     <!-- Sharing options -->
     <string name="options">Seçenekler</string>
     <string name="shareLink">Bağlantıyı paylaş</string>
-    <string name="shareMenuTitle">Paylaş</string>
     <string name="copyUrl">Bağlantı Adresini Kopyala</string>
 
     <!-- Find in page -->
-    <string name="findInPageMenuTitle">Sayfada bul</string>
     <string name="nextSearchTermDescription">Sonrakini bul</string>
     <string name="previousSearchTermDescription">Öncekini bul</string>
     <string name="closeFindInPageButtonDescription">Sayfa görünümünde bul özelliğini kapat</string>
@@ -125,8 +118,8 @@
 
     <!-- Fire -->
     <string name="fireMenu">Verileri Temizle</string>
-    <string name="fireClearAll">Tüm Sekmeleri ve Verileri Temizle</string>
-    <string name="fireClearAllPlusDuckChats">Tüm Sekmeleri, Verileri ve Duck.ai Sohbetlerini Temizle</string>
+    <string name="fireClearAll">Sekmeleri ve Verileri Temizle</string>
+    <string name="fireClearAllPlusDuckChats">Sekmeleri, Verileri ve Duck.ai Sohbetlerini Temizle</string>
     <string name="fireCancel">İptal</string>
     <string name="fireDataCleared">Veri silindi</string>
 
@@ -247,6 +240,8 @@
     <string name="settingsAutomaticallyClearWhenAppExit60Minutes">1 saat boyunca hareket yoksa uygulamadan çık</string>
     <string name="settingsClearAiDataTitle">Duck.ai Sohbetlerini Temizle</string>
     <string name="settingsClearAiDataDeleteMessage">Fire Button, sabitlenmiş sohbetler dahil olmak üzere Duck.ai geçmişini de silecektir.</string>
+    <string name="settingsClearDataActionSecondaryText">Tüm sekmeleri ve fireproof uygulanmayan sitelere ait verileri temizler.</string>
+    <string name="settingsClearDataActionPlusDuckChatsSecondaryText">Tüm sekmeleri, Duck.ai sohbetlerini ve fireproof uygulanmayan sitelere ait verileri temizler.</string>
 
     <!-- About Activity -->
     <string name="aboutActivityTitle">DuckDuckGo Hakkında</string>
@@ -256,7 +251,7 @@
     <string name="no_suggestions">Öneri yok</string>
 
     <!-- Broken Site Activity -->
-    <string name="brokenSiteReportBrokenSiteMenuItem">Hatalı Siteyi Bildirin</string>
+
 
     <string name="brokenSiteProtectionsOn">Bu site için korumalar <b>AÇIK</b></string>
     <string name="brokenSiteProtectionsOff">Bu site için korumalar <b>KAPALI</b></string>
@@ -279,7 +274,7 @@
     <string name="searchWidgetLabel">Arama ve Duck.ai</string>
 
     <!-- Home Screen Shortcuts -->
-    <string name="addToHome">Ana ekrana ekle</string>
+
     <string name="shortcutAddedText" instruction="Placeholder is the name of a website">Başarılı! %1$s ana ekranınıza eklendi.</string>
 
     <!-- User Survey -->
@@ -485,8 +480,6 @@
 
     <!-- Allowlist -->
     <string name="allowlistActivityTitle">Korumasız Siteler</string>
-    <string name="enablePrivacyProtection">Gizlilik Korumasını Etkinleştir</string>
-    <string name="disablePrivacyProtection">Gizlilik Korumasını Devre Dışı Bırak</string>
     <string name="allowlistEntryOverflowContentDescription" instruction="Placeholder is a website">Korumasız %1$s sitesi için diğer seçenekler</string>
     <string name="allowlistEntryDeleteConfirmMessage" instruction="Placeholder is a website">&lt;b&gt;%1$s&lt;/b&gt; sitesini korumasız sitelerden kaldırmak istediğinizden emin misiniz?</string>
     <string name="allowlistExplanation">Bu siteler için Gizlilik Koruması uygulanmayacaktır.</string>
@@ -585,11 +578,9 @@
     <string name="appLinkSnackBarMessage" instruction="Placeholder is the name of an app">Bu bağlantıyı %1$s uygulamasında açabilirsiniz.</string>
     <string name="appLinkMultipleSnackBarMessage">Bu bağlantıyı diğer uygulamalarda açabilirsiniz.</string>
     <string name="appLinkIntentChooserTitle">Şununla aç:</string>
-    <string name="appLinkMenuItemTitle">Uygulamada Aç</string>
 
     <!-- Email Autofill -->
     <string name="aliasToClipboardMessage">Yeni adres panoya kopyalandı</string>
-    <string name="newEmailAliasMenuTitle">Duck Address Oluştur</string>
 
     <!-- Autofill -->
     <string name="autofillSnackbarAction" instruction="Label for a button that lets the user view the details for a login credential">Görüntüle</string>
@@ -759,10 +750,6 @@
     <string name="settingsPasswordsAndAutofillLoginsSetting">Şifreler ve Otomatik Doldurma</string>
     <string name="autofillLoginSavedSnackbarMessage">Şifre kaydedildi</string>
     <string name="autofillLoginUpdatedSnackbarMessage">Şifre güncellendi</string>
-
-    <!-- Custom Tab -->
-    <string name="openInDdgMenuItemTitle">DuckDuckGo\'da aç</string>
-    <string name="runningInDdgMenuItemTitle">DuckDuckGo\'da Çalışıyor</string>
 
     <!-- SSL Error -->
     <string name="sslErrorTitle">Uyarı: Bu site güvenli olmayabilir</string>

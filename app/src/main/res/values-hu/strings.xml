@@ -47,17 +47,12 @@
     <string name="omnibarInputHint">Keresés vagy URL beírása</string>
     <string name="clearButtonContentDescription">Megadott keresés törlése</string>
     <string name="no_compatible_third_party_app_installed">Nincs telepítve kompatibilis alkalmazás</string>
-    <string name="addBookmarkMenuTitle">Könyvjelző mentése</string>
-    <string name="editBookmarkMenuTitle">Könyvjelző szerkesztése</string>
+
     <string name="addFavoriteMenuTitle">Kedvenc hozzáadása</string>
     <string name="removeFavoriteMenuTitle">Kedvenc eltávolítása</string>
     <string name="favoriteAddedMessage">Kedvenc hozzáadva</string>
     <string name="bookmarkAddedMessage">Könyvjelző hozzáadva</string>
-    <string name="requestDesktopSiteMenuTitle">Weboldal asztali nézete</string>
-    <string name="fireproofWebsiteMenuTitleRemove">Tűzállóság eltávolítása</string>
-    <string name="requestMobileSiteMenuTitle">Weboldal mobil nézete</string>
     <string name="downloadsMenuTitle">Letöltések</string>
-    <string name="printMenuTitle">Oldal nyomtatása</string>
     <string name="favoriteDeleteConfirmationMessage">Kedvenc eltávolítva</string>
     <string name="fireproofDeleteConfirmationMessage">Tűzállóság eltávolítva</string>
     <string name="privacyProtectionEnabledConfirmationMessage" instruction="Placeholder is a website">Adatvédelem engedélyezve a következőhöz: %1$s</string>
@@ -76,11 +71,9 @@
     <!-- Sharing options -->
     <string name="options">Opciók</string>
     <string name="shareLink">Link megosztása</string>
-    <string name="shareMenuTitle">Megosztás</string>
     <string name="copyUrl">Link címének másolása</string>
 
     <!-- Find in page -->
-    <string name="findInPageMenuTitle">Keresés az oldalon</string>
     <string name="nextSearchTermDescription">Következő keresése</string>
     <string name="previousSearchTermDescription">Előző keresése</string>
     <string name="closeFindInPageButtonDescription">Keresés az oldalon nézet bezárása</string>
@@ -125,8 +118,8 @@
 
     <!-- Fire -->
     <string name="fireMenu">Adatok törlése</string>
-    <string name="fireClearAll">Összes lap és adat törlése</string>
-    <string name="fireClearAllPlusDuckChats">Összes lap, adat és Duck.ai-csevegés törlése</string>
+    <string name="fireClearAll">Lapok és adatok törlése</string>
+    <string name="fireClearAllPlusDuckChats">Lapok, adatok és Duck.ai-csevegések törlése</string>
     <string name="fireCancel">Mégse</string>
     <string name="fireDataCleared">Adatok törölve</string>
 
@@ -247,6 +240,8 @@
     <string name="settingsAutomaticallyClearWhenAppExit60Minutes">Kilépés az alkalmazásból 1 óra inaktivitás után</string>
     <string name="settingsClearAiDataTitle">Duck.ai-csevegések törlése</string>
     <string name="settingsClearAiDataDeleteMessage">A Fire Button a Duck.ai-előzményeket is törli, a rögzített csevegéseket is beleértve.</string>
+    <string name="settingsClearDataActionSecondaryText">Törli az összes lapot és minden olyan webhely adatát, amit nem tettél tűzállóvá.</string>
+    <string name="settingsClearDataActionPlusDuckChatsSecondaryText">Törli az összes lapot, Duck.ai-csevegést és minden olyan webhely adatát, amit nem tettél tűzállóvá.</string>
 
     <!-- About Activity -->
     <string name="aboutActivityTitle">A DuckDuckGóról</string>
@@ -256,7 +251,7 @@
     <string name="no_suggestions">Nincs javaslat</string>
 
     <!-- Broken Site Activity -->
-    <string name="brokenSiteReportBrokenSiteMenuItem">Hibás weboldal bejelentése</string>
+
 
     <string name="brokenSiteProtectionsOn">A védelmek <b>BE</b> vannak kapcsolva ezen a webhelyen</string>
     <string name="brokenSiteProtectionsOff">A védelmek <b>KI</b> vannak kapcsolva ezen a webhelyen</string>
@@ -279,7 +274,7 @@
     <string name="searchWidgetLabel">Keresés és Duck.ai</string>
 
     <!-- Home Screen Shortcuts -->
-    <string name="addToHome">Hozzáadás a kezdőlaphoz</string>
+
     <string name="shortcutAddedText" instruction="Placeholder is the name of a website">Siker! %1$s hozzáadva a kezdőképernyődhöz.</string>
 
     <!-- User Survey -->
@@ -485,8 +480,6 @@
 
     <!-- Allowlist -->
     <string name="allowlistActivityTitle">Védelem nélküli weboldalak</string>
-    <string name="enablePrivacyProtection">Adatvédelem engedélyezése</string>
-    <string name="disablePrivacyProtection">Adatvédelem letiltása</string>
     <string name="allowlistEntryOverflowContentDescription" instruction="Placeholder is a website">További lehetőségek az %1$s védelem nélküli weboldalhoz</string>
     <string name="allowlistEntryDeleteConfirmMessage" instruction="Placeholder is a website">Biztosan eltávolítod az &lt;b&gt;%1$s&lt;/b&gt; elemet a védelem nélküli weboldalak közül?</string>
     <string name="allowlistExplanation">Ezeket az oldalakat nem erősíti adatvédelem.</string>
@@ -585,11 +578,9 @@
     <string name="appLinkSnackBarMessage" instruction="Placeholder is the name of an app">A hivatkozás a következő alkalmazásban nyitható meg: %1$s.</string>
     <string name="appLinkMultipleSnackBarMessage">A hivatkozás más alkalmazásokban nyitható meg.</string>
     <string name="appLinkIntentChooserTitle">Megnyitás ezzel:</string>
-    <string name="appLinkMenuItemTitle">Megnyitás az alkalmazásban</string>
 
     <!-- Email Autofill -->
     <string name="aliasToClipboardMessage">Új cím a vágólapra másolva</string>
-    <string name="newEmailAliasMenuTitle">Duck-cím létrehozása</string>
 
     <!-- Autofill -->
     <string name="autofillSnackbarAction" instruction="Label for a button that lets the user view the details for a login credential">Megtekintés</string>
@@ -759,10 +750,6 @@
     <string name="settingsPasswordsAndAutofillLoginsSetting">Jelszavak és automatikus kitöltés</string>
     <string name="autofillLoginSavedSnackbarMessage">Jelszó mentve</string>
     <string name="autofillLoginUpdatedSnackbarMessage">Jelszó frissítve</string>
-
-    <!-- Custom Tab -->
-    <string name="openInDdgMenuItemTitle">Megnyitás DuckDuckGo-ban</string>
-    <string name="runningInDdgMenuItemTitle">Futtatás a DuckDuckGo-ban</string>
 
     <!-- SSL Error -->
     <string name="sslErrorTitle">Figyelmeztetés: Lehet, hogy ez a webhely nem biztonságos</string>

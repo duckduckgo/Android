@@ -167,11 +167,14 @@ class SecureStoreBackedAutofillStore @Inject constructor(
 
         logcat(INFO) { "Saving login credentials for $url. username=${credentials.username}" }
 
+        val timestamp = lastUpdatedTimeProvider.getInMillis()
+
         val loginDetails = WebsiteLoginDetails(
             domain = url,
             username = credentials.username,
             domainTitle = credentials.domainTitle,
-            lastUpdatedMillis = lastUpdatedTimeProvider.getInMillis(),
+            lastUpdatedMillis = timestamp,
+            lastUsedInMillis = timestamp,
         )
         val webSiteLoginCredentials = WebsiteLoginDetailsWithCredentials(
             details = loginDetails,

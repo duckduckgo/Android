@@ -18,8 +18,13 @@ tags:
 
       - runFlow: common/assert_duckplayer_visible.yaml
 
-      - tapOn:
-          id: app
+      - runFlow:
+          when:
+            visible: 
+              id: "global-loader"
+          commands:
+          - tapOn:
+              id: app
 
       - tapOn:
           text: "Watch on YouTube"

@@ -47,17 +47,12 @@
     <string name="omnibarInputHint">Αναζήτηση ή πληκτρολόγηση διεύθυνσης URL</string>
     <string name="clearButtonContentDescription">Εκκαθάριση εισαγωγής αναζήτησης</string>
     <string name="no_compatible_third_party_app_installed">Δεν υπάρχει εγκατεστημένη συμβατή εφαρμογή</string>
-    <string name="addBookmarkMenuTitle">Προσθήκη σελιδοδείκτη</string>
-    <string name="editBookmarkMenuTitle">Επεξεργασία σελιδοδείκτη</string>
+
     <string name="addFavoriteMenuTitle">Προσθήκη Αγαπημένου</string>
     <string name="removeFavoriteMenuTitle">Αφαίρεση αγαπημένου</string>
     <string name="favoriteAddedMessage">Προστέθηκε αγαπημένο</string>
     <string name="bookmarkAddedMessage">Προστέθηκε σελιδοδείκτης</string>
-    <string name="requestDesktopSiteMenuTitle">Ιστότοπος επιφάνειας εργασίας</string>
-    <string name="fireproofWebsiteMenuTitleRemove">Αφαίρεση διαγραφής δραστηριότητας</string>
-    <string name="requestMobileSiteMenuTitle">Ιστότοπος για κινητά</string>
     <string name="downloadsMenuTitle">Λήψεις</string>
-    <string name="printMenuTitle">Εκτύπωση σελίδας</string>
     <string name="favoriteDeleteConfirmationMessage">Το Αγαπημένο αφαιρέθηκε</string>
     <string name="fireproofDeleteConfirmationMessage">Η διαγραφή δραστηριότητας αφαιρέθηκε</string>
     <string name="privacyProtectionEnabledConfirmationMessage" instruction="Placeholder is a website">Η προστασία απορρήτου ενεργοποιήθηκε για %1$s</string>
@@ -76,11 +71,9 @@
     <!-- Sharing options -->
     <string name="options">Επιλογές</string>
     <string name="shareLink">Κοινή χρήση συνδέσμου</string>
-    <string name="shareMenuTitle">Κοινή χρήση</string>
     <string name="copyUrl">Αντιγραφή διεύθυνσης συνδέσμου</string>
 
     <!-- Find in page -->
-    <string name="findInPageMenuTitle">Εύρεση στη σελίδα</string>
     <string name="nextSearchTermDescription">Εύρεση επόμενου</string>
     <string name="previousSearchTermDescription">Εύρεση προηγούμενου</string>
     <string name="closeFindInPageButtonDescription">Κλείσιμο εύρεσης στην προβολή σελίδας</string>
@@ -125,8 +118,8 @@
 
     <!-- Fire -->
     <string name="fireMenu">Εκκαθάριση δεδομένων</string>
-    <string name="fireClearAll">Εκκαθάριση όλων των καρτελών και δεδομένων</string>
-    <string name="fireClearAllPlusDuckChats">Εκκαθάριση όλων των καρτελών, δεδομένων και συνομιλιών Duck.ai</string>
+    <string name="fireClearAll">Εκκαθάριση καρτελών και δεδομένων</string>
+    <string name="fireClearAllPlusDuckChats">Εκκαθάριση καρτελών, δεδομένων και συνομιλιών Duck.ai</string>
     <string name="fireCancel">Ακύρωση</string>
     <string name="fireDataCleared">Εκκαθάριση δεδομένων</string>
 
@@ -247,6 +240,8 @@
     <string name="settingsAutomaticallyClearWhenAppExit60Minutes">Έξοδος εφαρμογής, ανενεργή για 1 ώρα</string>
     <string name="settingsClearAiDataTitle">Εκκαθάριση συνομιλιών Duck.ai</string>
     <string name="settingsClearAiDataDeleteMessage">Το Fire Button θα διαγράψει επίσης το ιστορικό του Duck.ai, συμπεριλαμβανομένων των καρφιτσωμένων συνομιλιών.</string>
+    <string name="settingsClearDataActionSecondaryText">Εκκαθαρίζει όλες τις καρτέλες και τα δεδομένα για ιστότοπους που δεν έχετε προστατεύσει με Fireproof.</string>
+    <string name="settingsClearDataActionPlusDuckChatsSecondaryText">Εκκαθαρίζει όλες τις καρτέλες, τις συνομιλίες Duck.ai και τα δεδομένα για οποιονδήποτε ιστότοπο δεν έχετε προστατεύσει με Fireproof.</string>
 
     <!-- About Activity -->
     <string name="aboutActivityTitle">Σχετικά με το DuckDuckGo</string>
@@ -256,7 +251,7 @@
     <string name="no_suggestions">Δεν υπάρχουν προτάσεις</string>
 
     <!-- Broken Site Activity -->
-    <string name="brokenSiteReportBrokenSiteMenuItem">Αναφορά κατεστραμμένου ιστότοπου</string>
+
 
     <string name="brokenSiteProtectionsOn">Οι επιλογές προστασίας είναι <b>ΕΝΕΡΓΕΣ</b> για τον συγκεκριμένο ιστότοπο</string>
     <string name="brokenSiteProtectionsOff">Οι επιλογές προστασίας είναι <b>ΑΝΕΝΕΡΓΕΣ</b> για τον συγκεκριμένο ιστότοπο</string>
@@ -279,7 +274,7 @@
     <string name="searchWidgetLabel">Αναζήτηση και Duck.ai</string>
 
     <!-- Home Screen Shortcuts -->
-    <string name="addToHome">Προσθήκη στην Αρχική Οθόνη</string>
+
     <string name="shortcutAddedText" instruction="Placeholder is the name of a website">Επιτυχία! Το %1$s έχει προστεθεί στην αρχική οθόνη σας.</string>
 
     <!-- User Survey -->
@@ -485,8 +480,6 @@
 
     <!-- Allowlist -->
     <string name="allowlistActivityTitle">Μη προστατευόμενοι ιστότοποι</string>
-    <string name="enablePrivacyProtection">Ενεργοποίηση Προστασίας προσωπικών δεδομένων</string>
-    <string name="disablePrivacyProtection">Απενεργοποίηση Προστασίας προσωπικών δεδομένων</string>
     <string name="allowlistEntryOverflowContentDescription" instruction="Placeholder is a website">Περισσότερες επιλογές για τον μη προστατευόμενο ιστότοπο %1$s</string>
     <string name="allowlistEntryDeleteConfirmMessage" instruction="Placeholder is a website">Είστε βέβαιοι ότι θέλετε να καταργήσετε το &lt;b&gt;%1$s&lt;/b&gt; από τους Μη προστατευόμενους ιστότοπους;</string>
     <string name="allowlistExplanation">Οι ιστότοποι αυτοί δεν θα ενισχυθούν από την Προστασία προσωπικών δεδομένων.</string>
@@ -585,11 +578,9 @@
     <string name="appLinkSnackBarMessage" instruction="Placeholder is the name of an app">Μπορείτε να ανοίξετε τον σύνδεσμο αυτό σε %1$s.</string>
     <string name="appLinkMultipleSnackBarMessage">Μπορείτε να ανοίξετε τον σύνδεσμο αυτό σε άλλες εφαρμογές.</string>
     <string name="appLinkIntentChooserTitle">Ανοίξτε με</string>
-    <string name="appLinkMenuItemTitle">Ανοίξτε στην εφαρμογή</string>
 
     <!-- Email Autofill -->
     <string name="aliasToClipboardMessage">Έγινε αντιγραφή νέας διεύθυνσης στο πρόχειρό σας</string>
-    <string name="newEmailAliasMenuTitle">Δημιουργήστε Duck Address</string>
 
     <!-- Autofill -->
     <string name="autofillSnackbarAction" instruction="Label for a button that lets the user view the details for a login credential">Προβολή</string>
@@ -759,10 +750,6 @@
     <string name="settingsPasswordsAndAutofillLoginsSetting">Κωδικοί πρόσβασης και Αυτόματη συμπλήρωση</string>
     <string name="autofillLoginSavedSnackbarMessage">Αποθηκευμένος κωδικός πρόσβασης</string>
     <string name="autofillLoginUpdatedSnackbarMessage">Ο κωδικός πρόσβασης ενημερώθηκε</string>
-
-    <!-- Custom Tab -->
-    <string name="openInDdgMenuItemTitle">Άνοιγμα στο DuckDuckGo</string>
-    <string name="runningInDdgMenuItemTitle">Εκτέλεση στο DuckDuckGo</string>
 
     <!-- SSL Error -->
     <string name="sslErrorTitle">Προειδοποίηση: Αυτός ο ιστότοπος ενδέχεται να μην είναι ασφαλής</string>

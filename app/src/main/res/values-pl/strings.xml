@@ -47,17 +47,12 @@
     <string name="omnibarInputHint">Wyszukaj lub wpisz adres URL</string>
     <string name="clearButtonContentDescription">Usuń treść wyszukiwania</string>
     <string name="no_compatible_third_party_app_installed">Brak kompatybilnej aplikacji</string>
-    <string name="addBookmarkMenuTitle">Dodaj zakładkę</string>
-    <string name="editBookmarkMenuTitle">Edytuj zakładkę</string>
+
     <string name="addFavoriteMenuTitle">Dodaj do Ulubionych</string>
     <string name="removeFavoriteMenuTitle">Usuń ulubione</string>
     <string name="favoriteAddedMessage">Dodano ulubione</string>
     <string name="bookmarkAddedMessage">Dodano zakładkę</string>
-    <string name="requestDesktopSiteMenuTitle">Witryna w wersji komputerowej</string>
-    <string name="fireproofWebsiteMenuTitleRemove">Usuń zabezpieczenie</string>
-    <string name="requestMobileSiteMenuTitle">Witryna mobilna</string>
     <string name="downloadsMenuTitle">Pobrane</string>
-    <string name="printMenuTitle">Drukuj stronę</string>
     <string name="favoriteDeleteConfirmationMessage">Usunięto ulubione</string>
     <string name="fireproofDeleteConfirmationMessage">Zabezpieczenie zostało usunięte</string>
     <string name="privacyProtectionEnabledConfirmationMessage" instruction="Placeholder is a website">Ochrona prywatności włączona dla %1$s</string>
@@ -78,11 +73,9 @@
     <!-- Sharing options -->
     <string name="options">Opcje</string>
     <string name="shareLink">Udostępnij link</string>
-    <string name="shareMenuTitle">Udostępnij</string>
     <string name="copyUrl">Skopiuj adres linku</string>
 
     <!-- Find in page -->
-    <string name="findInPageMenuTitle">Znajdź na stronie</string>
     <string name="nextSearchTermDescription">Znajdź następny element</string>
     <string name="previousSearchTermDescription">Znajdź poprzedni element</string>
     <string name="closeFindInPageButtonDescription">Zamknij widok wyszukiwania na stronie</string>
@@ -127,8 +120,8 @@
 
     <!-- Fire -->
     <string name="fireMenu">Wyczyść dane</string>
-    <string name="fireClearAll">Wyczyść wszystkie karty i dane</string>
-    <string name="fireClearAllPlusDuckChats">Wyczyść wszystkie karty, dane i czaty Duck.ai</string>
+    <string name="fireClearAll">Wyczyść karty i dane</string>
+    <string name="fireClearAllPlusDuckChats">Wyczyść karty, dane i czaty Duck.ai</string>
     <string name="fireCancel">Anuluj</string>
     <string name="fireDataCleared">Dane zostały usunięte</string>
 
@@ -249,6 +242,8 @@
     <string name="settingsAutomaticallyClearWhenAppExit60Minutes">Zamknięcie aplikacji, nieaktywna przez 1 godzinę</string>
     <string name="settingsClearAiDataTitle">Wyczyść czaty Duck.ai</string>
     <string name="settingsClearAiDataDeleteMessage">Przycisk Fire Button usunie także historię Duck.ai, w tym przypięte czaty.</string>
+    <string name="settingsClearDataActionSecondaryText">Czyści wszystkie karty i dane dla witryn, które nie zostały oznaczone jako Fireproof.</string>
+    <string name="settingsClearDataActionPlusDuckChatsSecondaryText">Czyści wszystkie karty, czaty Duck.ai i dane dla wszystkich witryn, które nie zostały oznaczone jako Fireproof.</string>
 
     <!-- About Activity -->
     <string name="aboutActivityTitle">O DuckDuckGo</string>
@@ -258,7 +253,7 @@
     <string name="no_suggestions">Brak sugestii</string>
 
     <!-- Broken Site Activity -->
-    <string name="brokenSiteReportBrokenSiteMenuItem">Zgłoś uszkodzoną witrynę</string>
+
 
     <string name="brokenSiteProtectionsOn">Zabezpieczenia są <b>WŁĄCZONE</b> dla tej witryny</string>
     <string name="brokenSiteProtectionsOff">Zabezpieczenia są <b>WYŁĄCZONE</b> dla tej witryny</string>
@@ -281,7 +276,7 @@
     <string name="searchWidgetLabel">Wyszukiwanie i Duck.ai</string>
 
     <!-- Home Screen Shortcuts -->
-    <string name="addToHome">Dodaj do ekranu głównego</string>
+
     <string name="shortcutAddedText" instruction="Placeholder is the name of a website">Sukces! %1$s został dodany do Twojego ekranu głównego.</string>
 
     <!-- User Survey -->
@@ -487,8 +482,6 @@
 
     <!-- Allowlist -->
     <string name="allowlistActivityTitle">Niezabezpieczone witryny</string>
-    <string name="enablePrivacyProtection">Włącz ochronę prywatności</string>
-    <string name="disablePrivacyProtection">Wyłącz ochronę prywatności</string>
     <string name="allowlistEntryOverflowContentDescription" instruction="Placeholder is a website">Więcej opcji dla niezabezpieczonej witryny %1$s</string>
     <string name="allowlistEntryDeleteConfirmMessage" instruction="Placeholder is a website">Na pewno usunąć &lt;b&gt;%1$s&lt;/b&gt; z niezabezpieczonych witryn?</string>
     <string name="allowlistExplanation">Te witryny nie będą ulepszane przez ochronę prywatności.</string>
@@ -587,11 +580,9 @@
     <string name="appLinkSnackBarMessage" instruction="Placeholder is the name of an app">Możesz otworzyć ten link w %1$s.</string>
     <string name="appLinkMultipleSnackBarMessage">Możesz otworzyć ten link w innych aplikacjach.</string>
     <string name="appLinkIntentChooserTitle">Otwórz za pomocą</string>
-    <string name="appLinkMenuItemTitle">Otwórz w aplikacji</string>
 
     <!-- Email Autofill -->
     <string name="aliasToClipboardMessage">Nowy adres skopiowany do schowka</string>
-    <string name="newEmailAliasMenuTitle">Wygeneruj Duck Address</string>
 
     <!-- Autofill -->
     <string name="autofillSnackbarAction" instruction="Label for a button that lets the user view the details for a login credential">Wyświetl</string>
@@ -787,10 +778,6 @@
     <string name="settingsPasswordsAndAutofillLoginsSetting">Hasła i autouzupełnianie</string>
     <string name="autofillLoginSavedSnackbarMessage">Hasło zapisane</string>
     <string name="autofillLoginUpdatedSnackbarMessage">Zaktualizowano hasło</string>
-
-    <!-- Custom Tab -->
-    <string name="openInDdgMenuItemTitle">Otwórz w DuckDuckGo</string>
-    <string name="runningInDdgMenuItemTitle">Uruchamianie w DuckDuckGo</string>
 
     <!-- SSL Error -->
     <string name="sslErrorTitle">Ostrzeżenie: ta witryna może być niebezpieczna</string>

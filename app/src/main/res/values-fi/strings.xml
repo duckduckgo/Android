@@ -47,17 +47,12 @@
     <string name="omnibarInputHint">Hae tai kirjoita URL</string>
     <string name="clearButtonContentDescription">Tyhjennä hakusyöte</string>
     <string name="no_compatible_third_party_app_installed">Yhteensopivaa sovellusta ei ole asennettu</string>
-    <string name="addBookmarkMenuTitle">Lisää kirjanmerkki</string>
-    <string name="editBookmarkMenuTitle">Muokkaa kirjanmerkkiä</string>
+
     <string name="addFavoriteMenuTitle">Lisää suosikki</string>
     <string name="removeFavoriteMenuTitle">Poista suosikki</string>
     <string name="favoriteAddedMessage">Suosikki lisätty</string>
     <string name="bookmarkAddedMessage">Kirjanmerkki lisätty</string>
-    <string name="requestDesktopSiteMenuTitle">Pöytäkonesivusto</string>
-    <string name="fireproofWebsiteMenuTitleRemove">Poista palonkestävyys</string>
-    <string name="requestMobileSiteMenuTitle">Mobiilisivusto</string>
     <string name="downloadsMenuTitle">Lataukset</string>
-    <string name="printMenuTitle">Tulosta sivu</string>
     <string name="favoriteDeleteConfirmationMessage">Suosikki poistettu</string>
     <string name="fireproofDeleteConfirmationMessage">Palonkestävyys poistettu</string>
     <string name="privacyProtectionEnabledConfirmationMessage" instruction="Placeholder is a website">Yksityisyyden suoja käytössä: %1$s</string>
@@ -76,11 +71,9 @@
     <!-- Sharing options -->
     <string name="options">Valinnat</string>
     <string name="shareLink">Jaa linkki</string>
-    <string name="shareMenuTitle">Jaa</string>
     <string name="copyUrl">Kopioi linkin osoite</string>
 
     <!-- Find in page -->
-    <string name="findInPageMenuTitle">Etsi sivulta</string>
     <string name="nextSearchTermDescription">Etsi seuraava</string>
     <string name="previousSearchTermDescription">Etsi edellinen</string>
     <string name="closeFindInPageButtonDescription">Sulje etsi sivulta -näkymä</string>
@@ -125,8 +118,8 @@
 
     <!-- Fire -->
     <string name="fireMenu">Poista tiedot</string>
-    <string name="fireClearAll">Poista kaikki välilehdet ja tiedot</string>
-    <string name="fireClearAllPlusDuckChats">Tyhjennä kaikki välilehdet, tiedot ja Duck.ai-keskustelut</string>
+    <string name="fireClearAll">Tyhjennä välilehdet ja tiedot</string>
+    <string name="fireClearAllPlusDuckChats">Tyhjennä välilehdet, tiedot ja Duck.ai-keskustelut</string>
     <string name="fireCancel">Peruuta</string>
     <string name="fireDataCleared">Tiedot poistettu</string>
 
@@ -247,6 +240,8 @@
     <string name="settingsAutomaticallyClearWhenAppExit60Minutes">Sovelluksesta poistuttaessa, 1 tunnin toimettomuuden jälkeen</string>
     <string name="settingsClearAiDataTitle">Tyhjennä Duck.ai-keskustelut</string>
     <string name="settingsClearAiDataDeleteMessage">Fire Button poistaa myös Duck.ai-historian, mukaan lukien kiinnitetyt keskustelut.</string>
+    <string name="settingsClearDataActionSecondaryText">Tyhjentää kaikki välilehdet ja tiedot sivustoilta, joita et ole tehnyt palonkestäviksi Fireproof-ominaisuudella.</string>
+    <string name="settingsClearDataActionPlusDuckChatsSecondaryText">Tyhjentää kaikki välilehdet, Duck.ai-keskustelut ja tiedot sivustoilta, joita et ole tehnyt palonkestäviksi Fireproof-ominaisuudella.</string>
 
     <!-- About Activity -->
     <string name="aboutActivityTitle">Tietoa DuckDuckGo:sta</string>
@@ -256,7 +251,7 @@
     <string name="no_suggestions">Ei ehdotuksia</string>
 
     <!-- Broken Site Activity -->
-    <string name="brokenSiteReportBrokenSiteMenuItem">Ilmoita viallisesta sivustosta</string>
+
 
     <string name="brokenSiteProtectionsOn">Tämän sivuston suojaukset ovat <b>KÄYTÖSSÄ</b></string>
     <string name="brokenSiteProtectionsOff">Tämän sivuston suojaukset ovat <b>POIS KÄYTÖSTÄ</b></string>
@@ -279,7 +274,7 @@
     <string name="searchWidgetLabel">Haku ja Duck.ai</string>
 
     <!-- Home Screen Shortcuts -->
-    <string name="addToHome">Lisää kotinäytölle</string>
+
     <string name="shortcutAddedText" instruction="Placeholder is the name of a website">Onnistui! %1$s on lisätty aloitusnäytöllesi.</string>
 
     <!-- User Survey -->
@@ -485,8 +480,6 @@
 
     <!-- Allowlist -->
     <string name="allowlistActivityTitle">Suojaamattomat sivustot</string>
-    <string name="enablePrivacyProtection">Ota yksityisyyden suoja käyttöön</string>
-    <string name="disablePrivacyProtection">Poista yksityisyyden suoja käytöstä</string>
     <string name="allowlistEntryOverflowContentDescription" instruction="Placeholder is a website">Lisää valintoja suojaamattomalle sivustolle %1$s</string>
     <string name="allowlistEntryDeleteConfirmMessage" instruction="Placeholder is a website">Haluatko varmasti poistaa sivuston &lt;b&gt;%1$s&lt;/b&gt; suojaamattomista sivustoista?</string>
     <string name="allowlistExplanation">Yksityisyyden suoja ei paranna näitä sivustoja.</string>
@@ -585,11 +578,9 @@
     <string name="appLinkSnackBarMessage" instruction="Placeholder is the name of an app">Voit avata tämän linkin sovelluksessa %1$s.</string>
     <string name="appLinkMultipleSnackBarMessage">Voit avata tämän linkin muissa sovelluksissa.</string>
     <string name="appLinkIntentChooserTitle">Avaa sovelluksessa:</string>
-    <string name="appLinkMenuItemTitle">Avaa sovelluksessa</string>
 
     <!-- Email Autofill -->
     <string name="aliasToClipboardMessage">Uusi osoite on kopioitu leikepöydälle</string>
-    <string name="newEmailAliasMenuTitle">Luo Duck Address</string>
 
     <!-- Autofill -->
     <string name="autofillSnackbarAction" instruction="Label for a button that lets the user view the details for a login credential">Näytä</string>
@@ -759,10 +750,6 @@
     <string name="settingsPasswordsAndAutofillLoginsSetting">Salasanat ja automaattinen täyttö</string>
     <string name="autofillLoginSavedSnackbarMessage">Salasana tallennettu</string>
     <string name="autofillLoginUpdatedSnackbarMessage">Salasana päivitetty</string>
-
-    <!-- Custom Tab -->
-    <string name="openInDdgMenuItemTitle">Avaa DuckDuckGo:ssa</string>
-    <string name="runningInDdgMenuItemTitle">Käynnissä DuckDuckGossa</string>
 
     <!-- SSL Error -->
     <string name="sslErrorTitle">Varoitus: Tämä sivusto ei välttämättä ole turvallinen</string>

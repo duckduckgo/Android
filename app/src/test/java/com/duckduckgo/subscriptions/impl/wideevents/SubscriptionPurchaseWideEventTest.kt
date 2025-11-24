@@ -102,7 +102,7 @@ class SubscriptionPurchaseWideEventTest {
             verify(wideEventClient).flowStep(456L, "refresh_subscription", false)
             verify(wideEventClient).flowFinish(
                 wideEventId = 456L,
-                status = FlowStatus.Failure("IllegalStateException: boom"),
+                status = FlowStatus.Failure("IllegalStateException"),
                 metadata = emptyMap(),
             )
         }

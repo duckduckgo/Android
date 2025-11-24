@@ -167,7 +167,7 @@
                                     android:layout_width="@dimen/toolbarIcon"
                                     android:layout_height="@dimen/toolbarIcon"
                                     android:layout_gravity="center"
-                                    android:background="@drawable/selectable_item_experimental_background"
+                                    android:background="@drawable/selectable_item_rounded_corner_background"
                                     android:contentDescription="@string/back"
                                     android:gravity="center"
                                     android:padding="@dimen/keyline_2"
@@ -203,8 +203,8 @@
                                 android:layout_width="0dp"
                                 android:layout_height="wrap_content"
                                 android:orientation="horizontal"
-                                android:gravity="center_horizontal"
-                                app:layout_constraintEnd_toStartOf="@+id/endIconsContainer"
+                                android:gravity="center"
+                                app:layout_constraintEnd_toEndOf="parent"
                                 app:layout_constraintStart_toStartOf="parent"
                                 app:layout_constraintBottom_toBottomOf="parent"
                                 app:layout_constraintTop_toTopOf="parent">
@@ -239,6 +239,13 @@
                                     android:layout_marginStart="@dimen/keyline_1"
                                     app:srcCompat="@drawable/ic_ai_chat_omnibar_24"
                                     tools:visibility="visible" />
+
+                                <com.duckduckgo.common.ui.view.text.DaxTextView
+                                    android:id="@+id/aiTitle"
+                                    android:layout_marginStart="@dimen/keyline_1"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="@string/duck_chat_title"/>
 
                             </LinearLayout>
 
@@ -315,7 +322,7 @@
                                     android:id="@+id/clearTextButton"
                                     android:layout_width="@dimen/toolbarIcon"
                                     android:layout_height="@dimen/toolbarIcon"
-                                    android:background="@drawable/selectable_item_experimental_background"
+                                    android:background="@drawable/selectable_item_rounded_corner_background"
                                     android:contentDescription="@string/clearButtonContentDescription"
                                     android:scaleType="center"
                                     android:src="@drawable/ic_close_circle_small_secondary_24"
@@ -329,7 +336,7 @@
                                     android:id="@+id/voiceSearchButton"
                                     android:layout_width="@dimen/toolbarIcon"
                                     android:layout_height="@dimen/toolbarIcon"
-                                    android:background="@drawable/selectable_item_experimental_background"
+                                    android:background="@drawable/selectable_item_rounded_corner_background"
                                     android:contentDescription="@string/voiceSearchIconContentDescription"
                                     android:scaleType="center"
                                     android:visibility="gone"
@@ -356,7 +363,7 @@
                                     android:layout_width="@dimen/toolbarIcon"
                                     android:layout_height="@dimen/toolbarIcon"
                                     android:layout_gravity="center"
-                                    android:background="@drawable/selectable_item_experimental_background"
+                                    android:background="@drawable/selectable_item_rounded_corner_background"
                                     android:contentDescription="@string/browserPopupMenu"
                                     android:scaleType="center"
                                     android:src="@drawable/ic_ai_chat_24"
@@ -467,7 +474,7 @@
                     android:id="@+id/browserMenu"
                     android:layout_width="@dimen/toolbarIcon"
                     android:layout_height="@dimen/toolbarIcon"
-                    android:background="@drawable/selectable_item_experimental_background"
+                    android:background="@drawable/selectable_item_rounded_corner_background"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toEndOf="@id/tabsMenu"
@@ -497,7 +504,7 @@
                     android:id="@+id/fireIconMenu"
                     android:layout_width="@dimen/toolbarIcon"
                     android:layout_height="@dimen/toolbarIcon"
-                    android:background="@drawable/selectable_item_experimental_background"
+                    android:background="@drawable/selectable_item_rounded_corner_background"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toStartOf="@id/tabsMenu"
                     app:layout_constraintStart_toStartOf="parent"

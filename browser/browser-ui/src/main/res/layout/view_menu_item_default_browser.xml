@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/defaultBrowserMenuItem"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="?attr/selectableItemBackground"
+    android:contentDescription="@string/browserMenuSetAsDefaultBrowser"
+    android:paddingHorizontal="12dp">
+
+    <!--Menu item's style defines horizontal padding as 24dp but we want the accent background
+    to bleed by 12 dp, so we're applying 12dp on the parent and 12dp on contents. -->
+
+    <LinearLayout
+        style="@style/Widget.DuckDuckGo.MenuItemView"
+        android:background="@drawable/background_default_browser_menu_item"
+        android:paddingHorizontal="12dp">
+
+        <ImageView
+            android:id="@+id/icon"
+            android:layout_width="@dimen/keyline_4"
+            android:layout_height="@dimen/keyline_4"
+            android:layout_gravity="center_vertical"
+            android:src="@drawable/ic_default_browser_mobile_grey_16"
+            tools:ignore="ContentDescription" />
+
+        <com.duckduckgo.common.ui.view.text.DaxTextView
+            android:id="@+id/label"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_marginStart="@dimen/keyline_2"
+            android:text="@string/browserMenuSetAsDefaultBrowser"
+            app:typography="body1" />
+
+    </LinearLayout>
+
+</FrameLayout>

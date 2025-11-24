@@ -84,6 +84,11 @@
     <string name="subscriptionSettingSectionHelpAndSupport">Βοήθεια και υποστήριξη</string>
     <string name="subscriptionSettingSendFeedback">Αποστολή σχολίου</string>
     <string name="subscriptionSettingActivating">Ενεργοποίηση</string>
+    <string name="subscriptionSettingSwitchUpgradeDynamic" instruction="%1$s is the savings percentage when switching from monthly to yearly (e.g. 16)">Εξοικονομήστε %1$s%% με ένα ετήσιο πρόγραμμα</string>
+    <!-- smartling.character_limit = 10 -->
+    <string name="subscriptionSettingSwitchUpgradePill">Καλύτερη προσφορά</string>
+    <string name="subscriptionSettingSwitchDowngrade">Αλλαγή προγράμματος</string>
+    <string name="subscriptionSettingManagePlan">Διαχείριση πληρωμής</string>
 
     <!--Purchase Subscriptions-->
     <string name="purchaseCompletedTitle">Είστε πανέτοιμοι.</string>
@@ -171,11 +176,6 @@
     <string name="activityPir" translatable="false">Privacy Pro</string>
     <string name="activitySendFeedback">Αποστολή σχολίου</string>
 
-    <!-- Dynamic Switch % -->
-    <string name="switchBottomSheetDynamicTitleUpgrade" instruction="%1$s is the savings percentage when switching from monthly to yearly (e.g. 16)">Εξοικονομήστε %1$s%% με\nένα ετήσιο πρόγραμμα!</string>
-    <string name="switchBottomSheetDynamicTitleDowngrade" instruction="%1$s is the savings percentage when using a yearly plan instead of monthly (e.g. 16)">Εξοικονομείτε %1$s%% με\nένα ετήσιο πρόγραμμα!</string>
-    <string name="subscriptionSettingSwitchUpgradeDynamic" instruction="%1$s is the savings percentage when switching from monthly to yearly (e.g. 16)">Αλλάξτε σε ετήσιο και εξοικονομήστε %1$s%%</string>
-
     <!-- Privacy Pro Rebranding-->
     <string name="subscriptionSettingRebrandingMessage">Το Privacy Pro ονομάζεται πλέον απλά Συνδρομή DuckDuckGo</string>
 
@@ -187,9 +187,19 @@
     <string name="feedbackSubCategoryDuckAiLoginThirdPartyBrowser">Δεν μπορώ να αποκτήσω πρόσβαση στο Duck.ai με τη συνδρομή μου σε άλλα προγράμματα περιήγησης</string>
     <string name="feedbackSubCategoryDuckAiOther">Άλλα σχόλια για το Duck.ai</string>
 
-    <string name="subscriptionSettingSectionTitle" translatable="false">DuckDuckGo Subscription</string>
+    <string name="subscriptionSettingSectionTitle">Συνδρομή DuckDuckGo</string>
     <string name="subscriptionSettingSubscribeSecure">Ασφαλίστε το Wi-Fi σας και συνομιλήστε ιδιωτικά με προηγμένα μοντέλα τεχνητής νοημοσύνης</string>
 
     <string name="feedbackGeneralSubscription">Συνδρομή</string>
+
+    <!-- Switch plan-->
+    <string name="switchBottomSheetDynamicTitleUpgrade" instruction="%1$s is the savings percentage when switching from monthly to yearly (e.g. 16)">Εξοικονομήστε %1$s%% με\nένα ετήσιο πρόγραμμα!</string>
+    <string name="switchBottomSheetDescriptionUpgrade" instruction="%1$s is the yearly plan monthly equivalent price (e.g. $8.33), %2$s is the current monthly plan price (e.g. $9.99)">Ένα ετήσιο πρόγραμμα κοστίζει μόλις %1$s/μήνα, σε σύγκριση με το τρέχον μηνιαίο πρόγραμμά σου των %2$s.</string>
+    <string name="switchBottomSheetPrimaryButtonUpgrade" instruction="%1$s is the yearly plan price (e.g. $99.99)">Μετάβαση σε ετήσια συνδρομή (%1$s/έτος)</string>
+    <string name="switchBottomSheetSecondaryButtonUpgrade">Διατήρηση μηνιαίου προγράμματος</string>
+    <string name="switchBottomSheetDynamicTitleDowngrade" instruction="%1$s is the savings percentage when using a yearly plan instead of monthly (e.g. 16)">Εξοικονομείτε %1$s%% με\nένα ετήσιο πρόγραμμα!</string>
+    <string name="switchBottomSheetDescriptionDowngrade" instruction="%1$s is the yearly plan monthly equivalent price (e.g. $8.33), %2$s is the monthly plan price (e.g. $9.99)">Η αλλαγή θα αυξήσει τη μηνιαία τιμή σας από %1$s/μήνα σε %2$s/μήνα.</string>
+    <string name="switchBottomSheetPrimaryButtonDowngrade">Διατήρηση ετήσιου προγράμματος</string>
+    <string name="switchBottomSheetSecondaryButtonDowngrade" instruction="%1$s is the monthly plan price (e.g. $9.99)">Αλλαγή σε μηνιαίο (%1$s/μήνα)</string>
 
 </resources>

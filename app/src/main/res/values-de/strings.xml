@@ -47,17 +47,12 @@
     <string name="omnibarInputHint">URL eingeben oder suchen</string>
     <string name="clearButtonContentDescription">Sucheingabe löschen</string>
     <string name="no_compatible_third_party_app_installed">Keine kompatible App installiert</string>
-    <string name="addBookmarkMenuTitle">Lesezeichen hinzufügen</string>
-    <string name="editBookmarkMenuTitle">Lesezeichen bearbeiten</string>
+
     <string name="addFavoriteMenuTitle">Favorit hinzufügen</string>
     <string name="removeFavoriteMenuTitle">Favorit entfernen</string>
     <string name="favoriteAddedMessage">Favorit wurde hinzugefügt</string>
     <string name="bookmarkAddedMessage">Lesezeichen hinzugefügt</string>
-    <string name="requestDesktopSiteMenuTitle">Desktop-Seite</string>
-    <string name="fireproofWebsiteMenuTitleRemove">Feuerfest-Einstellung deaktivieren</string>
-    <string name="requestMobileSiteMenuTitle">Mobile Website</string>
     <string name="downloadsMenuTitle">Downloads</string>
-    <string name="printMenuTitle">Seite drucken</string>
     <string name="favoriteDeleteConfirmationMessage">Favorit wurde entfernt</string>
     <string name="fireproofDeleteConfirmationMessage">Feuerfest-Einstellung deaktiviert</string>
     <string name="privacyProtectionEnabledConfirmationMessage" instruction="Placeholder is a website">Datenschutz aktiviert für %1$s</string>
@@ -76,11 +71,9 @@
     <!-- Sharing options -->
     <string name="options">Optionen</string>
     <string name="shareLink">Link teilen</string>
-    <string name="shareMenuTitle">Teilen</string>
     <string name="copyUrl">Link-Adresse kopieren</string>
 
     <!-- Find in page -->
-    <string name="findInPageMenuTitle">Auf Seite suchen</string>
     <string name="nextSearchTermDescription">Nächstes Ergebnis</string>
     <string name="previousSearchTermDescription">Vorheriges Ergebnis</string>
     <string name="closeFindInPageButtonDescription">Seitensuchansicht schließen</string>
@@ -125,8 +118,8 @@
 
     <!-- Fire -->
     <string name="fireMenu">Daten löschen</string>
-    <string name="fireClearAll">Alle Tabs schließen und Daten löschen</string>
-    <string name="fireClearAllPlusDuckChats">Alle Tabs, Daten und Duck.ai-Chats löschen</string>
+    <string name="fireClearAll">Tabs und Daten löschen</string>
+    <string name="fireClearAllPlusDuckChats">Tabs, Daten und Duck.ai-Chats löschen</string>
     <string name="fireCancel">Abbrechen</string>
     <string name="fireDataCleared">Daten gelöscht</string>
 
@@ -247,6 +240,8 @@
     <string name="settingsAutomaticallyClearWhenAppExit60Minutes">Beim Verlassen der App, 1 Stunde lang inaktiv</string>
     <string name="settingsClearAiDataTitle">Duck.ai-Chats löschen</string>
     <string name="settingsClearAiDataDeleteMessage">Der Fire Button löscht auch den Verlauf von Duck.ai, einschließlich angehefteter Chats.</string>
+    <string name="settingsClearDataActionSecondaryText">Löscht alle Tabs und Daten für alle Websites, die du nicht als Fireproof markiert hast.</string>
+    <string name="settingsClearDataActionPlusDuckChatsSecondaryText">Löscht alle Tabs, Duck.ai-Chats und Daten für alle Websites, die du nicht als Fireproof markiert hast.</string>
 
     <!-- About Activity -->
     <string name="aboutActivityTitle">Über DuckDuckGo</string>
@@ -256,7 +251,7 @@
     <string name="no_suggestions">Keine Vorschläge</string>
 
     <!-- Broken Site Activity -->
-    <string name="brokenSiteReportBrokenSiteMenuItem">Fehlerhafte Seite melden</string>
+
 
     <string name="brokenSiteProtectionsOn">Der Schutz ist für diese Website ist <b>AKTIVIERT</b></string>
     <string name="brokenSiteProtectionsOff">Der Schutz für diese Website ist <b>DEAKTIVIERT</b></string>
@@ -279,7 +274,7 @@
     <string name="searchWidgetLabel">Suche &amp; Duck.ai</string>
 
     <!-- Home Screen Shortcuts -->
-    <string name="addToHome">Zum Startbildschirm hinzufügen</string>
+
     <string name="shortcutAddedText" instruction="Placeholder is the name of a website">%1$s wurde erfolgreich zu deinem Startbildschirm hinzugefügt.</string>
 
     <!-- User Survey -->
@@ -485,8 +480,6 @@
 
     <!-- Allowlist -->
     <string name="allowlistActivityTitle">Ungeschützte Websites</string>
-    <string name="enablePrivacyProtection">Datenschutz aktivieren</string>
-    <string name="disablePrivacyProtection">Datenschutz deaktivieren</string>
     <string name="allowlistEntryOverflowContentDescription" instruction="Placeholder is a website">Weitere Optionen für die ungeschützte Website %1$s</string>
     <string name="allowlistEntryDeleteConfirmMessage" instruction="Placeholder is a website">Möchtest du &lt;b&gt;%1$s&lt;/b&gt; wirklich von den ungeschützten Websites entfernen?</string>
     <string name="allowlistExplanation">Für diese Websites ist der Datenschutz nicht aktiviert.</string>
@@ -585,11 +578,9 @@
     <string name="appLinkSnackBarMessage" instruction="Placeholder is the name of an app">Du kannst diesen Link in %1$s öffnen.</string>
     <string name="appLinkMultipleSnackBarMessage">Du kannst diesen Link in anderen Apps öffnen.</string>
     <string name="appLinkIntentChooserTitle">Öffnen mit</string>
-    <string name="appLinkMenuItemTitle">In App öffnen</string>
 
     <!-- Email Autofill -->
     <string name="aliasToClipboardMessage">Neue Adresse wurde in deine Zwischenablage kopiert</string>
-    <string name="newEmailAliasMenuTitle">Duck-Adresse generieren</string>
 
     <!-- Autofill -->
     <string name="autofillSnackbarAction" instruction="Label for a button that lets the user view the details for a login credential">Ansehen</string>
@@ -759,10 +750,6 @@
     <string name="settingsPasswordsAndAutofillLoginsSetting">Passwörter und Autovervollständigen</string>
     <string name="autofillLoginSavedSnackbarMessage">Passwort gespeichert</string>
     <string name="autofillLoginUpdatedSnackbarMessage">Passwort aktualisiert</string>
-
-    <!-- Custom Tab -->
-    <string name="openInDdgMenuItemTitle">In DuckDuckGo öffnen</string>
-    <string name="runningInDdgMenuItemTitle">Laufen in DuckDuckGo</string>
 
     <!-- SSL Error -->
     <string name="sslErrorTitle">Warnung: Diese Website ist möglicherweise unsicher</string>

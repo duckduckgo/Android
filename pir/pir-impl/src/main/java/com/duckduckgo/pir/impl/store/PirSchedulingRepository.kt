@@ -28,6 +28,7 @@ import com.duckduckgo.pir.impl.models.scheduling.JobRecord.ScanJobRecord.ScanJob
 import com.duckduckgo.pir.impl.store.db.EmailConfirmationJobRecordEntity
 import com.duckduckgo.pir.impl.store.db.JobSchedulingDao
 import com.duckduckgo.pir.impl.store.db.OptOutJobRecordEntity
+import com.duckduckgo.pir.impl.store.db.ReportingRecord
 import com.duckduckgo.pir.impl.store.db.ScanJobRecordEntity
 import com.duckduckgo.pir.impl.store.secure.PirSecureStorageDatabaseFactory
 import com.squareup.anvil.annotations.ContributesBinding
@@ -59,6 +60,11 @@ interface PirSchedulingRepository {
      * Returns all ScanJobRecord whose state is not INVALID
      */
     suspend fun getAllValidOptOutJobRecords(): List<OptOutJobRecord>
+
+    /**
+     * Returns all ScanJobRecord whose state is not INVALID for a specific broker
+     */
+    suspend fun getAllValidOptOutJobRecordsForBroker(brokerName: String): List<OptOutJobRecord>
 
     /**
      * Returns a matching [OptOutJobRecord] whose state is not INVALID
@@ -119,6 +125,26 @@ interface PirSchedulingRepository {
     suspend fun deleteEmailConfirmationJobRecord(extractedProfileId: Long)
 
     suspend fun deleteAllEmailConfirmationJobRecords()
+
+    suspend fun markOptOutDay7ConfirmationPixelSent(
+        extractedProfileId: Long,
+        timestampMs: Long,
+    )
+
+    suspend fun markOptOutDay14ConfirmationPixelSent(
+        extractedProfileId: Long,
+        timestampMs: Long,
+    )
+
+    suspend fun markOptOutDay21ConfirmationPixelSent(
+        extractedProfileId: Long,
+        timestampMs: Long,
+    )
+
+    suspend fun markOptOutDay42ConfirmationPixelSent(
+        extractedProfileId: Long,
+        timestampMs: Long,
+    )
 }
 
 @ContributesBinding(
@@ -175,6 +201,16 @@ class RealPirSchedulingRepository @Inject constructor(
         withContext(dispatcherProvider.io()) {
             return@withContext jobSchedulingDao()
                 ?.getAllOptOutJobRecords()
+                ?.map { record -> record.toRecord() }
+                // do not pick-up deprecated jobs as they belong to removed profiles
+                ?.filter { !it.deprecated }
+                .orEmpty()
+        }
+
+    override suspend fun getAllValidOptOutJobRecordsForBroker(brokerName: String): List<OptOutJobRecord> =
+        withContext(dispatcherProvider.io()) {
+            return@withContext jobSchedulingDao()
+                ?.getAllOptOutJobRecordsForBroker(brokerName)
                 ?.map { record -> record.toRecord() }
                 // do not pick-up deprecated jobs as they belong to removed profiles
                 ?.filter { !it.deprecated }
@@ -304,6 +340,42 @@ class RealPirSchedulingRepository @Inject constructor(
         }
     }
 
+    override suspend fun markOptOutDay7ConfirmationPixelSent(
+        extractedProfileId: Long,
+        timestampMs: Long,
+    ) {
+        withContext(dispatcherProvider.io()) {
+            jobSchedulingDao()?.updateSevenDayConfirmationReportSentDate(extractedProfileId, timestampMs)
+        }
+    }
+
+    override suspend fun markOptOutDay14ConfirmationPixelSent(
+        extractedProfileId: Long,
+        timestampMs: Long,
+    ) {
+        withContext(dispatcherProvider.io()) {
+            jobSchedulingDao()?.update14DayConfirmationReportSentDate(extractedProfileId, timestampMs)
+        }
+    }
+
+    override suspend fun markOptOutDay21ConfirmationPixelSent(
+        extractedProfileId: Long,
+        timestampMs: Long,
+    ) {
+        withContext(dispatcherProvider.io()) {
+            jobSchedulingDao()?.update21DayConfirmationReportSentDate(extractedProfileId, timestampMs)
+        }
+    }
+
+    override suspend fun markOptOutDay42ConfirmationPixelSent(
+        extractedProfileId: Long,
+        timestampMs: Long,
+    ) {
+        withContext(dispatcherProvider.io()) {
+            jobSchedulingDao()?.update42DayConfirmationReportSentDate(extractedProfileId, timestampMs)
+        }
+    }
+
     private fun ScanJobRecordEntity.toRecord(): ScanJobRecord =
         ScanJobRecord(
             brokerName = this.brokerName,
@@ -311,6 +383,7 @@ class RealPirSchedulingRepository @Inject constructor(
             status = ScanJobStatus.entries.find { it.name == this.status } ?: ScanJobStatus.ERROR,
             lastScanDateInMillis = this.lastScanDateInMillis ?: 0L,
             deprecated = this.deprecated,
+            dateCreatedInMillis = this.dateCreatedInMillis,
         )
 
     private fun ScanJobRecord.toEntity(): ScanJobRecordEntity =
@@ -320,6 +393,11 @@ class RealPirSchedulingRepository @Inject constructor(
             status = this.status.name,
             lastScanDateInMillis = this.lastScanDateInMillis,
             deprecated = this.deprecated,
+            dateCreatedInMillis = if (this.dateCreatedInMillis != 0L) {
+                this.dateCreatedInMillis
+            } else {
+                currentTimeProvider.currentTimeMillis()
+            },
         )
 
     private fun OptOutJobRecordEntity.toRecord(): OptOutJobRecord =
@@ -333,6 +411,11 @@ class RealPirSchedulingRepository @Inject constructor(
             optOutRequestedDateInMillis = this.optOutRequestedDate,
             optOutRemovedDateInMillis = this.optOutRemovedDate,
             deprecated = this.deprecated,
+            dateCreatedInMillis = this.dateCreatedInMillis,
+            confirmation7dayReportSentDateMs = this.reporting.sevenDayConfirmationReportSentDateMs,
+            confirmation14dayReportSentDateMs = this.reporting.fourteenDayConfirmationReportSentDateMs,
+            confirmation21dayReportSentDateMs = this.reporting.twentyOneDayConfirmationReportSentDateMs,
+            confirmation42dayReportSentDateMs = this.reporting.fortyTwoDayConfirmationReportSentDateMs,
         )
 
     private fun OptOutJobRecord.toEntity(): OptOutJobRecordEntity =
@@ -346,6 +429,17 @@ class RealPirSchedulingRepository @Inject constructor(
             optOutRequestedDate = this.optOutRequestedDateInMillis,
             optOutRemovedDate = this.optOutRemovedDateInMillis,
             deprecated = this.deprecated,
+            dateCreatedInMillis = if (this.dateCreatedInMillis != 0L) {
+                this.dateCreatedInMillis
+            } else {
+                currentTimeProvider.currentTimeMillis()
+            },
+            reporting = ReportingRecord(
+                sevenDayConfirmationReportSentDateMs = this.confirmation7dayReportSentDateMs,
+                fourteenDayConfirmationReportSentDateMs = this.confirmation14dayReportSentDateMs,
+                twentyOneDayConfirmationReportSentDateMs = this.confirmation21dayReportSentDateMs,
+                fortyTwoDayConfirmationReportSentDateMs = this.confirmation42dayReportSentDateMs,
+            ),
         )
 
     private fun EmailConfirmationJobRecord.toEntity(): EmailConfirmationJobRecordEntity =

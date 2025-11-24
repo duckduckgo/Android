@@ -47,17 +47,12 @@
     <string name="omnibarInputHint">Введите поисковый запрос или адрес сайта</string>
     <string name="clearButtonContentDescription">Сбросить поисковый запрос</string>
     <string name="no_compatible_third_party_app_installed">Совместимое приложение не установлено</string>
-    <string name="addBookmarkMenuTitle">Добавить закладку</string>
-    <string name="editBookmarkMenuTitle">Редактировать закладку</string>
+
     <string name="addFavoriteMenuTitle">Добавить в избранное</string>
     <string name="removeFavoriteMenuTitle">Удалить из избранного</string>
     <string name="favoriteAddedMessage">Сайт добавлен в избранное</string>
     <string name="bookmarkAddedMessage">Закладка добавлена</string>
-    <string name="requestDesktopSiteMenuTitle">Полная версия сайта</string>
-    <string name="fireproofWebsiteMenuTitleRemove">Снять огнеупорность</string>
-    <string name="requestMobileSiteMenuTitle">Мобильная версия</string>
     <string name="downloadsMenuTitle">Загрузки</string>
-    <string name="printMenuTitle">Печать страницы</string>
     <string name="favoriteDeleteConfirmationMessage">Страница удалена из избранного</string>
     <string name="fireproofDeleteConfirmationMessage">Огнеупорность снята</string>
     <string name="privacyProtectionEnabledConfirmationMessage" instruction="Placeholder is a website">Защита конфиденциальности на сайте %1$s включена</string>
@@ -78,11 +73,9 @@
     <!-- Sharing options -->
     <string name="options">Параметры</string>
     <string name="shareLink">Поделиться ссылкой</string>
-    <string name="shareMenuTitle">Поделиться</string>
     <string name="copyUrl">Скопировать ссылку</string>
 
     <!-- Find in page -->
-    <string name="findInPageMenuTitle">Найти на странице</string>
     <string name="nextSearchTermDescription">Найти следующий</string>
     <string name="previousSearchTermDescription">Найти предыдущий</string>
     <string name="closeFindInPageButtonDescription">Закрыть окно поиска на странице</string>
@@ -127,8 +120,8 @@
 
     <!-- Fire -->
     <string name="fireMenu">Сбросить данные</string>
-    <string name="fireClearAll">Закрыть вкладки и удалить данные</string>
-    <string name="fireClearAllPlusDuckChats">Закрыть все вкладки и стереть все данные и чаты Duck.ai</string>
+    <string name="fireClearAll">Сбросить вкладки и данные</string>
+    <string name="fireClearAllPlusDuckChats">Очистить вкладки, данные и чаты Duck.ai</string>
     <string name="fireCancel">Отменить</string>
     <string name="fireDataCleared">Данные сброшены</string>
 
@@ -249,6 +242,8 @@
     <string name="settingsAutomaticallyClearWhenAppExit60Minutes">После выхода из приложения, через 1 час бездействия</string>
     <string name="settingsClearAiDataTitle">Очистить чаты Duck.ai</string>
     <string name="settingsClearAiDataDeleteMessage">Нажатие кнопки Fire Button также сотрет историю Duck.ai, включая закрепленные чаты.</string>
+    <string name="settingsClearDataActionSecondaryText">Стереть все вкладки и данные всех сайтов (кроме огнеупорных)</string>
+    <string name="settingsClearDataActionPlusDuckChatsSecondaryText">Стереть все вкладки, чаты Duck.ai и данные всех сайтов (кроме огнеупорных)</string>
 
     <!-- About Activity -->
     <string name="aboutActivityTitle">Несколько слов о DuckDuckGo</string>
@@ -258,7 +253,7 @@
     <string name="no_suggestions">Нет предложений</string>
 
     <!-- Broken Site Activity -->
-    <string name="brokenSiteReportBrokenSiteMenuItem">Сообщить о неработающем сайте</string>
+
 
     <string name="brokenSiteProtectionsOn">На этом сайте <b>ВКЛЮЧЕНЫ</b> функции защиты</string>
     <string name="brokenSiteProtectionsOff">На этом сайте <b>ВЫКЛЮЧЕНЫ</b> функции защиты</string>
@@ -281,7 +276,7 @@
     <string name="searchWidgetLabel">Поиск плюс Duck.ai</string>
 
     <!-- Home Screen Shortcuts -->
-    <string name="addToHome">Добавить на домашнюю страницу</string>
+
     <string name="shortcutAddedText" instruction="Placeholder is the name of a website">Готово! Мы добавили %1$s на ваш домашний экран.</string>
 
     <!-- User Survey -->
@@ -487,8 +482,6 @@
 
     <!-- Allowlist -->
     <string name="allowlistActivityTitle">Незащищенные сайты</string>
-    <string name="enablePrivacyProtection">Включить защиту конфиденциальности</string>
-    <string name="disablePrivacyProtection">Отключить защиту конфиденциальности</string>
     <string name="allowlistEntryOverflowContentDescription" instruction="Placeholder is a website">Дополнительные параметры для незащищенного сайта %1$s</string>
     <string name="allowlistEntryDeleteConfirmMessage" instruction="Placeholder is a website">Вы точно хотите удалить &lt;b&gt;%1$s&lt;/b&gt; из списка незащищенных сайтов?</string>
     <string name="allowlistExplanation">Сайты без защиты конфиденциальности.</string>
@@ -587,11 +580,9 @@
     <string name="appLinkSnackBarMessage" instruction="Placeholder is the name of an app">Эту ссылку можно открыть в %1$s.</string>
     <string name="appLinkMultipleSnackBarMessage">Эту ссылку можно открыть в других приложениях.</string>
     <string name="appLinkIntentChooserTitle">Открыть в</string>
-    <string name="appLinkMenuItemTitle">Открыть в приложении</string>
 
     <!-- Email Autofill -->
     <string name="aliasToClipboardMessage">Новый адрес скопирован в буфер обмена</string>
-    <string name="newEmailAliasMenuTitle">Создать адрес Duck</string>
 
     <!-- Autofill -->
     <string name="autofillSnackbarAction" instruction="Label for a button that lets the user view the details for a login credential">Просмотр</string>
@@ -787,10 +778,6 @@
     <string name="settingsPasswordsAndAutofillLoginsSetting">Пароли и автозаполнение</string>
     <string name="autofillLoginSavedSnackbarMessage">Пароль сохранен</string>
     <string name="autofillLoginUpdatedSnackbarMessage">Пароль обновлен</string>
-
-    <!-- Custom Tab -->
-    <string name="openInDdgMenuItemTitle">Открыть в DuckDuckGo</string>
-    <string name="runningInDdgMenuItemTitle">Выполняется в DuckDuckGo</string>
 
     <!-- SSL Error -->
     <string name="sslErrorTitle">Внимание! Возможно, сайт небезопасен</string>

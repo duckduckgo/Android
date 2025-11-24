@@ -3,7 +3,7 @@
     const delay = $DELAY$;
     const postInitialPing = $POST_INITIAL_PING$;
     const replyToNativeMessages = $REPLY_TO_NATIVE_MESSAGES$;
-    const messagePrefix = 'webViewCompat ';
+    const messagePrefix = 'webViewCompat $SCRIPT_ID$';
 
     // ============================================================================
     // MESSAGE HANDLING (ORIGINAL WEBVIEWCOMPAT FUNCTIONALITY)
@@ -14,61 +14,35 @@
 
     // Send initial ping if configured
     if (postInitialPing) {
-        console.log('Posting initial ping...');
+        console.log('$SCRIPT_ID$ Posting initial ping...');
         if (delay > 0) {
             setTimeout(() => {
                 ddgObj.postMessage(webViewCompatPingMessage);
-                stateManager.setState(state => ({
-                    ...state,
-                    messageCount: state.messageCount + 1,
-                    lastMessageTime: Date.now()
-                }));
             }, delay);
         } else {
             ddgObj.postMessage(webViewCompatPingMessage);
-            stateManager.setState(state => ({
-                ...state,
-                messageCount: state.messageCount + 1,
-                lastMessageTime: Date.now()
-            }));
         }
     }
 
     // Listen to ddgObj messages
     ddgObj.addEventListener('message', function(event) {
-        console.log("$OBJECT_NAME$ received", event.data);
-        
-        stateManager.setState(state => ({
-            ...state,
-            messageCount: state.messageCount + 1,
-            lastMessageTime: Date.now()
-        }));
-        
-        eventBus.emit('message-received', { source: '$OBJECT_NAME$', data: event.data });
-        
+        console.log("[complex script] $OBJECT_NAME$-$SCRIPT_ID$ received", event.data);
+
         if (replyToNativeMessages && supportedMessages.includes(event.data)) {
-            const response = messagePrefix + event.data + " from $OBJECT_NAME$";
+            const response = messagePrefix + event.data + " from $OBJECT_NAME$-$SCRIPT_ID$";
             ddgObj.postMessage(response);
-            throttledLog('Sent response:', response);
+            console.log('[complex-script]-$SCRIPT_ID$ Sent response:', response);
         }
     });
 
     // Listen to window messages
     window.addEventListener('message', function(event) {
-        console.log("window received", event.data);
-        
-        stateManager.setState(state => ({
-            ...state,
-            messageCount: state.messageCount + 1,
-            lastMessageTime: Date.now()
-        }));
-        
-        eventBus.emit('message-received', { source: 'window', data: event.data });
+        console.log("[complex-script] window-$SCRIPT_ID$ received", event.data);
         
         if (replyToNativeMessages && supportedMessages.includes(event.data)) {
-            const response = messagePrefix + event.data + " from window";
+            const response = messagePrefix + event.data + " from window-$SCRIPT_ID$";
             ddgObj.postMessage(response);
-            throttledLog('Sent response:', response);
+            console.log('[complex-script]-$SCRIPT_ID$ Sent response:', response);
         }
     });
 

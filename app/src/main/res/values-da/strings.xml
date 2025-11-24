@@ -47,17 +47,12 @@
     <string name="omnibarInputHint">Søg eller indtast URL</string>
     <string name="clearButtonContentDescription">Ryd søgeinput</string>
     <string name="no_compatible_third_party_app_installed">Ingen kompatibel app installeret</string>
-    <string name="addBookmarkMenuTitle">Tilføj bogmærke</string>
-    <string name="editBookmarkMenuTitle">Rediger bogmærke</string>
+
     <string name="addFavoriteMenuTitle">Tilføj til favorit</string>
     <string name="removeFavoriteMenuTitle">Fjern favorit</string>
     <string name="favoriteAddedMessage">Favorit tilføjet</string>
     <string name="bookmarkAddedMessage">Bogmærke tilføjet</string>
-    <string name="requestDesktopSiteMenuTitle">Stationær computer</string>
-    <string name="fireproofWebsiteMenuTitleRemove">Fjern brandsikring</string>
-    <string name="requestMobileSiteMenuTitle">Mobilwebsted</string>
     <string name="downloadsMenuTitle">Downloads</string>
-    <string name="printMenuTitle">Udskriv side</string>
     <string name="favoriteDeleteConfirmationMessage">Favorit fjernet</string>
     <string name="fireproofDeleteConfirmationMessage">Brandsikring fjernet</string>
     <string name="privacyProtectionEnabledConfirmationMessage" instruction="Placeholder is a website">Beskyttelse af privatlivet aktiveret for %1$s</string>
@@ -76,11 +71,9 @@
     <!-- Sharing options -->
     <string name="options">Valgmuligheder</string>
     <string name="shareLink">Del link</string>
-    <string name="shareMenuTitle">Del</string>
     <string name="copyUrl">Kopiér linkadresse</string>
 
     <!-- Find in page -->
-    <string name="findInPageMenuTitle">Find på side</string>
     <string name="nextSearchTermDescription">Find næste</string>
     <string name="previousSearchTermDescription">Find tidligere</string>
     <string name="closeFindInPageButtonDescription">Luk visningen find på side</string>
@@ -125,8 +118,8 @@
 
     <!-- Fire -->
     <string name="fireMenu">Ryd data</string>
-    <string name="fireClearAll">Ryd alle faner og data</string>
-    <string name="fireClearAllPlusDuckChats">Ryd alle faner, data og Duck.ai-chats</string>
+    <string name="fireClearAll">Ryd faner og data</string>
+    <string name="fireClearAllPlusDuckChats">Ryd faner, data og Duck.ai-chats</string>
     <string name="fireCancel">Annuller</string>
     <string name="fireDataCleared">Data ryddet</string>
 
@@ -247,6 +240,8 @@
     <string name="settingsAutomaticallyClearWhenAppExit60Minutes">App-afslutning, inaktiv i 1 time</string>
     <string name="settingsClearAiDataTitle">Ryd Duck.ai-chats</string>
     <string name="settingsClearAiDataDeleteMessage">Fire Button sletter også Duck.ai-historik, inklusive fastgjorte chats.</string>
+    <string name="settingsClearDataActionSecondaryText">Rydder alle faner og data for websteder, du ikke har sikret med Fireproof.</string>
+    <string name="settingsClearDataActionPlusDuckChatsSecondaryText">Rydder alle faner, Duck.ai-chats og data for websteder, du ikke har sikret med Fireproof.</string>
 
     <!-- About Activity -->
     <string name="aboutActivityTitle">Om DuckDuckGo</string>
@@ -256,7 +251,7 @@
     <string name="no_suggestions">Ingen forslag</string>
 
     <!-- Broken Site Activity -->
-    <string name="brokenSiteReportBrokenSiteMenuItem">Rapporter ødelagt websted</string>
+
 
     <string name="brokenSiteProtectionsOn">Beskyttelse er <b>TIL</b> for dette websted</string>
     <string name="brokenSiteProtectionsOff">Beskyttelse er <b>FRA</b> for dette websted</string>
@@ -279,7 +274,7 @@
     <string name="searchWidgetLabel">Søg og Duck.ai</string>
 
     <!-- Home Screen Shortcuts -->
-    <string name="addToHome">Tilføj til startskærm</string>
+
     <string name="shortcutAddedText" instruction="Placeholder is the name of a website">Det lykkedes! %1$s er blevet føjet til din startskærm.</string>
 
     <!-- User Survey -->
@@ -485,8 +480,6 @@
 
     <!-- Allowlist -->
     <string name="allowlistActivityTitle">Ubeskyttede websteder</string>
-    <string name="enablePrivacyProtection">Aktiver Beskyttelse af privatlivet</string>
-    <string name="disablePrivacyProtection">Deaktiver Beskyttelse af privatlivet</string>
     <string name="allowlistEntryOverflowContentDescription" instruction="Placeholder is a website">Flere indstillinger for ubeskyttet websted %1$s</string>
     <string name="allowlistEntryDeleteConfirmMessage" instruction="Placeholder is a website">Er du sikker på, at du vil fjerne &lt;b&gt;%1$s&lt;/b&gt; fra ubeskyttede websteder?</string>
     <string name="allowlistExplanation">Disse websteder vil ikke blive forbedret ved Beskyttelse af privatlivet.</string>
@@ -585,11 +578,9 @@
     <string name="appLinkSnackBarMessage" instruction="Placeholder is the name of an app">Du kan åbne dette link i %1$s.</string>
     <string name="appLinkMultipleSnackBarMessage">Du kan åbne dette link i andre apps.</string>
     <string name="appLinkIntentChooserTitle">Åben med</string>
-    <string name="appLinkMenuItemTitle">Åbn i app</string>
 
     <!-- Email Autofill -->
     <string name="aliasToClipboardMessage">Ny adresse kopieret til din udklipsholder</string>
-    <string name="newEmailAliasMenuTitle">Generér Duck-adresse</string>
 
     <!-- Autofill -->
     <string name="autofillSnackbarAction" instruction="Label for a button that lets the user view the details for a login credential">Se</string>
@@ -759,10 +750,6 @@
     <string name="settingsPasswordsAndAutofillLoginsSetting">Adgangskoder og automatisk udfyldning</string>
     <string name="autofillLoginSavedSnackbarMessage">Adgangskode gemt</string>
     <string name="autofillLoginUpdatedSnackbarMessage">Adgangskode opdateret</string>
-
-    <!-- Custom Tab -->
-    <string name="openInDdgMenuItemTitle">Åben i DuckDuckGo</string>
-    <string name="runningInDdgMenuItemTitle">Kører i DuckDuckGo</string>
 
     <!-- SSL Error -->
     <string name="sslErrorTitle">Advarsel: Denne side kan være usikker</string>

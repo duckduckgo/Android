@@ -22,7 +22,6 @@ import app.cash.turbine.test
 import com.duckduckgo.app.browser.omnibar.OmnibarType
 import com.duckduckgo.app.global.DefaultRoleBrowserDialog
 import com.duckduckgo.app.global.install.AppInstallStore
-import com.duckduckgo.app.notificationpromptexperiment.NotificationPromptExperimentManager
 import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.Finish
 import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.OnboardingSkipped
 import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.ShowAddressBarPositionDialog
@@ -69,7 +68,6 @@ class WelcomePageViewModelTest {
     private val mockSettingsDataStore: SettingsDataStore = mock()
     private val mockAppBuildConfig: AppBuildConfig = mock()
     private val mockOnboardingDesignExperimentManager: OnboardingDesignExperimentManager = mock()
-    private val mockNotificationPromptExperimentManager: NotificationPromptExperimentManager = mock()
 
     private val testee: WelcomePageViewModel by lazy {
         WelcomePageViewModel(
@@ -81,7 +79,6 @@ class WelcomePageViewModelTest {
             coroutineRule.testDispatcherProvider,
             mockAppBuildConfig,
             mockOnboardingDesignExperimentManager,
-            mockNotificationPromptExperimentManager,
         )
     }
 
@@ -175,14 +172,6 @@ class WelcomePageViewModelTest {
             testee.onDefaultBrowserSet()
 
             verify(mockOnboardingDesignExperimentManager).fireSetDefaultRatePixel()
-        }
-
-    @Test
-    fun whenDefaultBrowserIsSetThenFireDdgSetAsDefaultPixel() =
-        runTest {
-            testee.onDefaultBrowserSet()
-
-            verify(mockNotificationPromptExperimentManager).fireDdgSetAsDefault()
         }
 
     @Test

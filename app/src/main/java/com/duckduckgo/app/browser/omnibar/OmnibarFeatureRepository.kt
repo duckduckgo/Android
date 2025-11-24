@@ -44,20 +44,15 @@ open class OmnibarFeatureRepository @Inject constructor(
     @AppCoroutineScope private val coroutineScope: CoroutineScope,
 ) : OmnibarRepository, MainProcessLifecycleObserver {
     private var isSplitOmnibarFlagEnabled: Boolean = false
-    private var isUnifiedOmnibarFlagEnabled: Boolean = false
 
     override val omnibarType: OmnibarType
         get() = settingsDataStore.omnibarType
 
     override val isSplitOmnibarAvailable: Boolean
-        get() = isSplitOmnibarFlagEnabled && isUnifiedOmnibarFlagEnabled
-
-    override val isUnifiedOmnibarLayoutEnabled: Boolean
-        get() = isUnifiedOmnibarFlagEnabled
+        get() = isSplitOmnibarFlagEnabled
 
     override fun onStart(owner: LifecycleOwner) {
         coroutineScope.launch(dispatcherProvider.io()) {
-            isUnifiedOmnibarFlagEnabled = browserFeatures.useUnifiedOmnibarLayout().isEnabled()
             isSplitOmnibarFlagEnabled = browserFeatures.splitOmnibar().isEnabled()
 
             resetOmnibarTypeIfNecessary()

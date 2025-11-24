@@ -547,7 +547,10 @@ class SecureStoreBackedAutofillStoreTest {
         )
         testee.saveCredentials(url, credentials)
 
-        assertEquals(credentials.copy(domain = "example.com", lastUpdatedMillis = UPDATED_INITIAL_LAST_UPDATED), testee.getCredentials(url)[0])
+        assertEquals(
+            credentials.copy(domain = "example.com", lastUpdatedMillis = UPDATED_INITIAL_LAST_UPDATED, lastUsedMillis = UPDATED_INITIAL_LAST_UPDATED),
+            testee.getCredentials(url)[0],
+        )
     }
 
     @Test

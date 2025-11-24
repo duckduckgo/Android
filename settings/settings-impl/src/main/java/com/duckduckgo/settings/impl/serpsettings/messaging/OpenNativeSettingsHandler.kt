@@ -19,6 +19,7 @@ package com.duckduckgo.settings.impl.serpsettings.messaging
 import android.content.Context
 import android.content.Intent
 import com.duckduckgo.app.di.AppCoroutineScope
+import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.utils.AppUrl
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.contentscopescripts.api.ContentScopeJsMessageHandlersPlugin
@@ -29,7 +30,8 @@ import com.duckduckgo.js.messaging.api.JsMessageCallback
 import com.duckduckgo.js.messaging.api.JsMessageHandler
 import com.duckduckgo.js.messaging.api.JsMessaging
 import com.duckduckgo.navigation.api.GlobalActivityStarter
-import com.duckduckgo.settings.api.SettingsPageFeature
+import com.duckduckgo.settings.api.SerpSettingsFeature
+import com.duckduckgo.settings.impl.serpsettings.pixel.SerpSettingsPixelName.SERP_SETTINGS_OPEN_DUCK_AI
 import com.squareup.anvil.annotations.ContributesMultibinding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -46,7 +48,8 @@ class OpenNativeSettingsHandler @Inject constructor(
     @AppCoroutineScope private val appScope: CoroutineScope,
     private val context: Context,
     private val globalActivityStarter: GlobalActivityStarter,
-    private val settingsPageFeature: SettingsPageFeature,
+    private val serpSettingsFeature: SerpSettingsFeature,
+    private val pixel: Pixel,
 ) : ContentScopeJsMessageHandlersPlugin {
 
     override fun getJsMessageHandler(): JsMessageHandler =
@@ -57,12 +60,13 @@ class OpenNativeSettingsHandler @Inject constructor(
                 jsMessageCallback: JsMessageCallback?,
             ) {
                 appScope.launch(dispatcherProvider.io()) {
-                    if (settingsPageFeature.serpSettingsSync().isEnabled()) {
+                    if (serpSettingsFeature.storeSerpSettings().isEnabled()) {
                         logcat { "SERP-SETTINGS: OpenNativeSettingsHandler processing message" }
                         val params = jsMessage.params
 
                         when (val screenParam = params.optString("screen", "")) {
                             AI_FEATURES_SCREEN_NAME -> {
+                                pixel.fire(SERP_SETTINGS_OPEN_DUCK_AI)
                                 val intent = globalActivityStarter.startIntent(context, DuckChatNativeSettingsNoParams)
                                 intent?.flags = Intent.FLAG_ACTIVITY_NEW_TASK
                                 context.startActivity(intent)

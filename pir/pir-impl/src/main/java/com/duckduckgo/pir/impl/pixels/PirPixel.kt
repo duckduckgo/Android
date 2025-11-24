@@ -76,11 +76,6 @@ enum class PirPixel(
         type = Count,
     ),
 
-    PIR_INTERNAL_BROKER_OPT_OUT_COMPLETED(
-        baseName = "pir_internal_opt-out_completed",
-        type = Count,
-    ),
-
     PIR_INTERNAL_CPU_USAGE(
         baseName = "pir_internal_cpu_usage",
         type = Count,
@@ -130,6 +125,79 @@ enum class PirPixel(
     PIR_INTERNAL_SECURE_STORAGE_UNAVAILABLE(
         baseName = "pir_internal_secure-storage_unavailable",
         types = setOf(Count, Daily()),
+    ),
+
+    PIR_OPTOUT_SUBMIT_SUCCESS(
+        baseName = "dbp_optout_process_submit-success",
+        types = setOf(Count),
+    ),
+
+    PIR_OPTOUT_SUBMIT_FAILURE(
+        baseName = "dbp_optout_process_failure",
+        types = setOf(Count),
+    ),
+
+    PIR_BROKER_CUSTOM_STATS_OPTOUT_SUBMIT_SUCCESSRATE(
+        baseName = "dbp_databroker_custom_stats_optoutsubmit",
+        type = Count,
+    ),
+
+    PIR_BROKER_CUSTOM_STATS_7DAY_CONFIRMED_OPTOUT(
+        baseName = "dbp_optoutjob_at-7-days_confirmed",
+        type = Count,
+    ),
+
+    PIR_BROKER_CUSTOM_STATS_7DAY_UNCONFIRMED_OPTOUT(
+        baseName = "dbp_optoutjob_at-7-days_unconfirmed",
+        type = Count,
+    ),
+    PIR_BROKER_CUSTOM_STATS_14DAY_CONFIRMED_OPTOUT(
+        baseName = "dbp_optoutjob_at-14-days_confirmed",
+        type = Count,
+    ),
+
+    PIR_BROKER_CUSTOM_STATS_14DAY_UNCONFIRMED_OPTOUT(
+        baseName = "dbp_optoutjob_at-14-days_unconfirmed",
+        type = Count,
+    ),
+
+    PIR_BROKER_CUSTOM_STATS_21DAY_CONFIRMED_OPTOUT(
+        baseName = "dbp_optoutjob_at-21-days_confirmed",
+        type = Count,
+    ),
+
+    PIR_BROKER_CUSTOM_STATS_21DAY_UNCONFIRMED_OPTOUT(
+        baseName = "dbp_optoutjob_at-21-days_unconfirmed",
+        type = Count,
+    ),
+    PIR_BROKER_CUSTOM_STATS_42DAY_CONFIRMED_OPTOUT(
+        baseName = "dbp_optoutjob_at-42-days_confirmed",
+        type = Count,
+    ),
+
+    PIR_BROKER_CUSTOM_STATS_42DAY_UNCONFIRMED_OPTOUT(
+        baseName = "dbp_optoutjob_at-42-days_unconfirmed",
+        type = Count,
+    ),
+
+    PIR_ENGAGEMENT_DAU(
+        baseName = "dbp_engagement_dau",
+        type = Count,
+    ),
+
+    PIR_ENGAGEMENT_WAU(
+        baseName = "dbp_engagement_wau",
+        type = Count,
+    ),
+
+    PIR_ENGAGEMENT_MAU(
+        baseName = "dbp_engagement_mau",
+        type = Count,
+    ),
+
+    PIR_WEEKLY_CHILD_ORPHANED_OPTOUTS(
+        baseName = "dbp_weekly_child-broker_orphaned-optouts",
+        type = Count,
     ), ;
 
     constructor(

@@ -36,7 +36,13 @@ data class RemoteMessage(
     val content: Content,
     val matchingRules: List<Int>,
     val exclusionRules: List<Int>,
+    val surfaces: List<Surface>,
 )
+
+enum class Surface(val jsonValue: String) {
+    MODAL("modal"),
+    NEW_TAB_PAGE("new_tab_page"),
+}
 
 sealed class Content(val messageType: MessageType) {
     data class Small(val titleText: String, val descriptionText: String) : Content(SMALL)

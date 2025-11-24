@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (c) 2025 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+<!-- smartling.entity_escaping = false -->
+<!-- smartling.instruction_attributes = instruction -->
+<resources>
+    <!-- Browser Menu -->
+    <string name="browserMenuRemoveFireproofing">Désactiver le mode coupe-feu</string>
+    <string name="browserMenuBookmarks">Signets</string>
+    <string name="browserMenuAddBookmark">Ajouter un signet</string>
+    <string name="browserMenuEditBookmark">Modifier le signet</string>
+    <string name="browserMenuFireproofSite">Activer le mode coupe-feu pour ce site</string>
+    <string name="browserMenuMobileSite">Version mobile</string>
+    <string name="browserMenuDesktopSite">Site en version bureau</string>
+    <string name="browserMenuEnablePrivacyProtection">Activer la protection de la confidentialité</string>
+    <string name="browserMenuDisablePrivacyProtection">Désactiver la protection de la confidentialité</string>
+    <string name="browserMenuNewTab">Nouvel onglet</string>
+    <string name="browserMenuDuckChat">Duck.ai</string>
+    <string name="browserMenuShare">Partager</string>
+    <string name="browserMenuEmailAlias">Générer une Duck Address</string>
+    <string name="browserMenuFindInPage">Rechercher dans la page</string>
+    <string name="browserMenuPrint">Imprimer la page</string>
+    <string name="browserMenuOpenAppLink">Ouvrir dans l\'application</string>
+    <string name="browserMenuAddToHome">Ajouter à la page d\'accueil</string>
+    <string name="browserMenuReportBrokenSite">Signaler un problème de site</string>
+    <string name="browserMenuAutofill">Mots de passe</string>
+    <string name="browserMenuDownloads">Téléchargements</string>
+    <string name="browserMenuSettings">Paramètres</string>
+    <string name="browserMenuOpenInDDG">Ouvrir dans DuckDuckGo</string>
+    <string name="browserMenuRunningInDDG">S\'exécute dans DuckDuckGo</string>
+    <string name="browserMenuSetAsDefaultBrowser">Définir comme navigateur par défaut</string>
+    <string name="browserMenuNewChat">Nouvelle discussion</string>
+    <string name="browserMenuChatHistory">Historique des chats</string>
+    <string name="browserMenuChatSettings">Paramètres Duck.ai</string>
+    <string name="browserMenuVPN">VPN</string>
+
+    <!-- Browser Menu Content Description -->
+    <string name="browserMenuBack">Retour</string>
+    <string name="browserMenuForward">Avancer</string>
+    <string name="browserMenuRefresh">Actualiser</string>
+</resources>

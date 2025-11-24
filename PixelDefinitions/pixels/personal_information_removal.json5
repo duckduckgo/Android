@@ -1,0 +1,309 @@
+{
+    "dbp_optout_process_submit-success": {
+        "description": "Fired when an opt-out submission succeeds.",
+        "owners": ["karlenDimla", "landomen"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "data_broker",
+                "description": "The URL of the data broker that this opt-out attempt targets",
+                "type": "string"
+            },
+            {
+                "key": "parent",
+                "description": "The parent data broker of the one this opt-out attempt targets",
+                "type": "string"
+            },
+            {
+                "key": "attempt_id",
+                "description": "Client-generated ID of the opt-out attempt",
+                "type": "string"
+            },
+            {
+                "key": "duration",
+                "description": "Total duration of the opt-out attempt in milliseconds",
+                "type": "string"
+            },
+            {
+                "key": "tries",
+                "description": "The number of tries it took to submit successfully",
+                "type": "string"
+            },
+            {
+                "key": "pattern",
+                "description": "Email pattern used during submission, when available",
+                "type": "string"
+            },
+            {
+                "key": "vpn_connection_state",
+                "description": "Reported VPN connection state when the submission succeeded",
+                "type": "string"
+            },
+            {
+                "key": "vpn_bypass",
+                "description": "VPN bypass status when the submission succeeded",
+                "type": "string",
+                "enum": ["on", "off", "unsupported"]
+            }
+        ]
+    },
+    "dbp_optout_process_failure": {
+        "description": "Fired when an opt-out attempt fails.",
+        "owners": ["karlenDimla", "landomen"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "data_broker",
+                "description": "The URL of the data broker that this opt-out attempt targets",
+                "type": "string"
+            },
+            {
+                "key": "parent",
+                "description": "The parent data broker of the one this opt-out attempt targets",
+                "type": "string"
+            },
+            {
+                "key": "broker_version",
+                "description": "The version of the broker JSON file",
+                "type": "string"
+            },
+            {
+                "key": "attempt_id",
+                "description": "Client-generated ID of the opt-out attempt",
+                "type": "string"
+            },
+            {
+                "key": "duration",
+                "description": "Total duration of the opt-out attempt in milliseconds",
+                "type": "string"
+            },
+            {
+                "key": "stage",
+                "description": "The stage where the failure occurred",
+                "type": "string"
+            },
+            {
+                "key": "tries",
+                "description": "The number of tries recorded when the failure happened",
+                "type": "string"
+            },
+            {
+                "key": "pattern",
+                "description": "Email pattern used during the attempt, when available",
+                "type": "string"
+            },
+            {
+                "key": "action_id",
+                "description": "Predefined identifier of the broker action that failed",
+                "type": "string"
+            },
+            {
+                "key": "action_type",
+                "description": "Type of action that failed",
+                "type": "string",
+                "enum": [
+                    "extract",
+                    "navigate",
+                    "fillForm",
+                    "click",
+                    "expectation",
+                    "emailConfirmation",
+                    "getCaptchaInfo",
+                    "solveCaptcha",
+                    "condition"
+                ]
+            },
+            {
+                "key": "vpn_connection_state",
+                "description": "Reported VPN connection state when the failure happened",
+                "type": "string"
+            },
+            {
+                "key": "vpn_bypass",
+                "description": "VPN bypass status when the failure happened",
+                "type": "string",
+                "enum": ["on", "off", "unsupported"]
+            }
+        ]
+    },
+    "dbp_databroker_custom_stats_optoutsubmit": {
+        "description": "Pixel that contains a broker's opt-out 24h submission success rate.",
+        "owners": ["karlenDimla", "landomen"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "data_broker",
+                "description": "The URL of the data broker that this opt-out attempt targets",
+                "type": "string"
+            },
+            {
+                "key": "optout_submit_success_rate",
+                "description": "The success rate of how many opt-out jobs successfully requested within 24 hours of creation",
+                "type": "string"
+            }
+        ]
+    },
+    "dbp_optoutjob_at-7-days_confirmed": {
+        "description": "Pixel that contains if any submitted opt-out has been confirmed 7 days after submission.",
+        "owners": ["karlenDimla", "landomen"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "data_broker",
+                "description": "The URL of the data broker that has a confirmed opt-out after 7 days",
+                "type": "string"
+            }
+        ]
+    },
+    "dbp_optoutjob_at-7-days_unconfirmed": {
+        "description": "Pixel that contains if any submitted opt-out are still unconfirmed 7 days after submission.",
+        "owners": ["karlenDimla", "landomen"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "data_broker",
+                "description": "The URL of the data broker that has an unconfirmed opt-out after 7 days",
+                "type": "string"
+            }
+        ]
+    },
+    "dbp_optoutjob_at-14-days_confirmed": {
+        "description": "Pixel that contains if any submitted opt-out has been confirmed 14 days after submission.",
+        "owners": ["karlenDimla", "landomen"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "data_broker",
+                "description": "The URL of the data broker that has a confirmed opt-out after 14 days",
+                "type": "string"
+            }
+        ]
+    },
+    "dbp_optoutjob_at-14-days_unconfirmed": {
+        "description": "Pixel that contains if any submitted opt-out are still unconfirmed 14 days after submission.",
+        "owners": ["karlenDimla", "landomen"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "data_broker",
+                "description": "The URL of the data broker that has an unconfirmed opt-out after 14 days",
+                "type": "string"
+            }
+        ]
+    },
+    "dbp_optoutjob_at-21-days_confirmed": {
+        "description": "Pixel that contains if any submitted opt-out has been confirmed 21 days after submission.",
+        "owners": ["karlenDimla", "landomen"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "data_broker",
+                "description": "The URL of the data broker that has a confirmed opt-out after 21 days",
+                "type": "string"
+            }
+        ]
+    },
+    "dbp_optoutjob_at-21-days_unconfirmed": {
+        "description": "Pixel that contains if any submitted opt-out are still unconfirmed 21 days after submission.",
+        "owners": ["karlenDimla", "landomen"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "data_broker",
+                "description": "The URL of the data broker that has an unconfirmed opt-out after 21 days",
+                "type": "string"
+            }
+        ]
+    },
+    "dbp_optoutjob_at-42-days_confirmed": {
+        "description": "Pixel that contains if any submitted opt-out has been confirmed 42 days after submission.",
+        "owners": ["karlenDimla", "landomen"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "data_broker",
+                "description": "The URL of the data broker that has a confirmed opt-out after 42 days",
+                "type": "string"
+            }
+        ]
+    },
+    "dbp_optoutjob_at-42-days_unconfirmed": {
+        "description": "Pixel that contains if any submitted opt-out are still unconfirmed 42 days after submission.",
+        "owners": ["karlenDimla", "landomen"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "data_broker",
+                "description": "The URL of the data broker that has an unconfirmed opt-out after 42 days",
+                "type": "string"
+            }
+        ]
+    },
+    "dbp_engagement_dau": {
+        "description": "Pixel for PIR daily active users.",
+        "owners": ["karlenDimla", "landomen"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "dbp_engagement_wau": {
+        "description": "Pixel for PIR weekly active users.",
+        "owners": ["karlenDimla", "landomen"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "dbp_engagement_mau": {
+        "description": "Pixel for PIR monthly active users.",
+        "owners": ["karlenDimla", "landomen"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "dbp_weekly_child-broker_orphaned-optouts": {
+        "description": "Pixel to know orphaned opt-out records on child data brokers that don't have matching profiles on their parent broker.",
+        "owners": ["karlenDimla", "landomen"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "data_broker",
+                "description": "The URL of the child data broker site",
+                "type": "string"
+            },
+            {
+                "key": "child-parent-record-difference",
+                "description": "(child opt-outs count) - (parent opt-outs count)",
+                "type": "string"
+            },
+            {
+                "key": "calculated-orphaned-records",
+                "description": "The Number of child profiles with no parent match",
+                "type": "string"
+            }
+        ]
+    }
+}

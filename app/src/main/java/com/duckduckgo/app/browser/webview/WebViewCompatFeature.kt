@@ -53,9 +53,13 @@ interface WebViewCompatFeature {
 
     @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
     fun useComplexScript(): Toggle
+
+    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
+    fun useLargeScript(): Toggle
 }
 
 data class WebViewCompatFeatureSettings(
     val jsInitialPingDelay: Long = 0,
     val initialPingDelay: Long = 0,
+    val numberOfScriptsToInject: Long = 1,
 )
