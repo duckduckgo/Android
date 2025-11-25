@@ -3128,7 +3128,9 @@ class BrowserTabFragment :
                 }
 
                 override fun onDuckAISidebarButtonPressed() {
-                    viewModel.openDuckChatSidebar()
+                    showKeyboard()
+                    omnibar.omnibarTextInput.requestFocus()
+                    // viewModel.openDuckChatSidebar()
                 }
             },
         )

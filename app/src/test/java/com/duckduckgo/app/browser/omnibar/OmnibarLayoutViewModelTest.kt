@@ -2009,4 +2009,28 @@ class OmnibarLayoutViewModelTest {
         testee.onBackButtonPressed()
         verify(pixel).fire(DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_LEGACY_OMNIBAR_BACK_BUTTON_PRESSED)
     }
+
+    @Test
+    fun whenDuckAiHeaderPressedAndInputScreenEnabledThenInputScreenShown() = runTest {
+        duckAiShowInputScreenFlow.value = true
+        testee.onDuckAiHeaderClicked()
+
+        testee.commands().test {
+            val command = awaitItem()
+            assertTrue(command is LaunchInputScreen)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenDuckAiHeaderPressedAndInputScreenDisabledThenFocusInputFieldCommandSent() = runTest {
+        duckAiShowInputScreenFlow.value = false
+        testee.onDuckAiHeaderClicked()
+
+        testee.commands().test {
+            val command = awaitItem()
+            assertTrue(command is Command.FocusInputField)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
 }

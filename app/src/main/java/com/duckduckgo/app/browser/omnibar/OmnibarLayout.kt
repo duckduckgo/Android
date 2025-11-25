@@ -582,7 +582,8 @@ class OmnibarLayout @JvmOverloads constructor(
             omnibarItemPressedListener?.onBackButtonPressed()
         }
         duckAIHeader.setOnClickListener {
-            viewModel.onTextInputClickCatcherClicked()
+            viewModel.onDuckAiHeaderClicked()
+            omnibarItemPressedListener?.onDuckAISidebarButtonPressed()
         }
         duckAISidebar.setOnClickListener {
             omnibarItemPressedListener?.onDuckAISidebarButtonPressed()
@@ -608,10 +609,9 @@ class OmnibarLayout @JvmOverloads constructor(
             }
         }
 
-        duckAIHeader.isVisible = viewState.viewMode is ViewMode.DuckAI
-        duckAISidebar.isVisible = viewState.viewMode is ViewMode.DuckAI
-        leadingIconContainer.isGone = viewState.viewMode is ViewMode.DuckAI
-        omnibarTextInput.isGone = viewState.viewMode is ViewMode.DuckAI
+        duckAIHeader.isVisible = viewState.showDuckAIHeader
+        leadingIconContainer.isGone = viewState.showDuckAIHeader
+        omnibarTextInput.isGone = viewState.showDuckAIHeader
 
         if (viewState.leadingIconState == PrivacyShield) {
             renderPrivacyShield(viewState.privacyShield, viewState.viewMode)
@@ -713,6 +713,15 @@ class OmnibarLayout @JvmOverloads constructor(
 
             is Command.EasterEggLogoClicked -> {
                 onLogoClicked(command.url)
+            }
+
+            is Command.FocusInputField -> {
+                omnibarTextInput.postDelayed(
+                    {
+                        omnibarTextInput.requestFocus()
+                    },
+                    200,
+                )
             }
         }
     }
@@ -891,6 +900,7 @@ class OmnibarLayout @JvmOverloads constructor(
         renderPulseAnimation(viewState)
         pageLoadingIndicator.isVisible = viewState.isLoading
         voiceSearchButton.isVisible = viewState.showVoiceSearch
+        duckAISidebar.isVisible = viewState.showDuckAIHeader
     }
 
     private fun renderCustomTabMode(
