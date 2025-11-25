@@ -25,10 +25,9 @@ import com.duckduckgo.pir.impl.common.PirJob.RunType.MANUAL
 import com.duckduckgo.pir.impl.common.PirJob.RunType.OPTOUT
 import com.duckduckgo.pir.impl.common.PirJob.RunType.SCHEDULED
 import com.duckduckgo.pir.impl.common.PirRunStateHandler
-import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerManualScanStarted
 import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerRecordEmailConfirmationStarted
 import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerRecordOptOutStarted
-import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerScheduledScanStarted
+import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerScanStarted
 import com.duckduckgo.pir.impl.common.actions.EventHandler.Next
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.Event
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.Event.ExecuteBrokerStepAction
@@ -94,21 +93,14 @@ class ExecuteNextBrokerStepEventHandler @Inject constructor(
         val brokerName = currentBrokerStep.broker.name
 
         when (runType) {
-            MANUAL ->
+            MANUAL, SCHEDULED -> {
                 pirRunStateHandler.handleState(
-                    BrokerManualScanStarted(
+                    BrokerScanStarted(
                         broker = currentBrokerStep.broker,
                         currentTimeProvider.currentTimeMillis(),
                     ),
                 )
-
-            SCHEDULED ->
-                pirRunStateHandler.handleState(
-                    BrokerScheduledScanStarted(
-                        broker = currentBrokerStep.broker,
-                        currentTimeProvider.currentTimeMillis(),
-                    ),
-                )
+            }
 
             OPTOUT -> {
                 // It also means we are starting it for the first profile. Succeeding profiles are handled in HandleNextProfileForBroker
@@ -129,6 +121,7 @@ class ExecuteNextBrokerStepEventHandler @Inject constructor(
                     ),
                 )
             }
+
             else -> {
                 // No-op
             }

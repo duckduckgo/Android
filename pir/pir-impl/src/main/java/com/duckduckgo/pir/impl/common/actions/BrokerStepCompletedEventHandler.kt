@@ -22,12 +22,13 @@ import com.duckduckgo.pir.impl.common.BrokerStepsParser.BrokerStep.EmailConfirma
 import com.duckduckgo.pir.impl.common.BrokerStepsParser.BrokerStep.OptOutStep
 import com.duckduckgo.pir.impl.common.PirJob.RunType
 import com.duckduckgo.pir.impl.common.PirJob.RunType.EMAIL_CONFIRMATION
+import com.duckduckgo.pir.impl.common.PirJob.RunType.SCHEDULED
 import com.duckduckgo.pir.impl.common.PirRunStateHandler
-import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerManualScanCompleted
 import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerRecordEmailConfirmationCompleted
 import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerRecordOptOutFailed
 import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerRecordOptOutSubmitted
-import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerScheduledScanCompleted
+import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerScanFailed
+import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerScanSuccess
 import com.duckduckgo.pir.impl.common.actions.EventHandler.Next
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.Event
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.Event.BrokerStepCompleted
@@ -92,29 +93,41 @@ class BrokerStepCompletedEventHandler @Inject constructor(
         val currentBrokerStep = state.brokerStepsToExecute[state.currentBrokerStepIndex]
         val brokerStartTime = state.brokerStepStartTime
         when (state.runType) {
-            RunType.MANUAL ->
-                pirRunStateHandler.handleState(
-                    BrokerManualScanCompleted(
-                        broker = currentBrokerStep.broker,
-                        profileQueryId = state.profileQuery.id,
-                        eventTimeInMillis = currentTimeProvider.currentTimeMillis(),
-                        totalTimeMillis = totalTimeMillis,
-                        isSuccess = isSuccess,
-                        startTimeInMillis = brokerStartTime,
-                    ),
-                )
+            RunType.MANUAL, SCHEDULED -> {
+                val isManual = state.runType == RunType.MANUAL
+                if (isSuccess) {
+                    // If success, it means we reached currentBrokerStepIndex == currentBrokerStep.step.actions.size, so last action would be -1.
+                    val lastAction = currentBrokerStep.step.actions[state.currentBrokerStepIndex - 1]
 
-            RunType.SCHEDULED ->
-                pirRunStateHandler.handleState(
-                    BrokerScheduledScanCompleted(
-                        broker = currentBrokerStep.broker,
-                        profileQueryId = state.profileQuery.id,
-                        eventTimeInMillis = currentTimeProvider.currentTimeMillis(),
-                        totalTimeMillis = totalTimeMillis,
-                        isSuccess = isSuccess,
-                        startTimeInMillis = brokerStartTime,
-                    ),
-                )
+                    pirRunStateHandler.handleState(
+                        BrokerScanSuccess(
+                            broker = currentBrokerStep.broker,
+                            profileQueryId = state.profileQuery.id,
+                            eventTimeInMillis = currentTimeProvider.currentTimeMillis(),
+                            totalTimeMillis = totalTimeMillis,
+                            startTimeInMillis = brokerStartTime,
+                            isManualRun = isManual,
+                            lastAction = lastAction,
+                        ),
+                    )
+                } else {
+                    // Whatever last action that was executed is the last action that failed.
+                    val lastAction = currentBrokerStep.step.actions[state.currentBrokerStepIndex]
+                    pirRunStateHandler.handleState(
+                        BrokerScanFailed(
+                            broker = currentBrokerStep.broker,
+                            profileQueryId = state.profileQuery.id,
+                            eventTimeInMillis = currentTimeProvider.currentTimeMillis(),
+                            totalTimeMillis = totalTimeMillis,
+                            startTimeInMillis = brokerStartTime,
+                            isManualRun = isManual,
+                            errorCategory = "", // TODO: Integrate failure later on
+                            errorDetails = "", // TODO: Integrate failure later on
+                            failedAction = lastAction,
+                        ),
+                    )
+                }
+            }
 
             RunType.OPTOUT -> {
                 val currentOptOutStep = currentBrokerStep as OptOutStep
