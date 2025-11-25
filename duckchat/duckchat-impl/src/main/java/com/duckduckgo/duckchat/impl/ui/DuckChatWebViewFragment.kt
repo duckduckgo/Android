@@ -30,6 +30,7 @@ import android.provider.MediaStore
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
+import android.webkit.CookieManager
 import android.webkit.MimeTypeMap
 import android.webkit.ValueCallback
 import android.webkit.WebChromeClient
@@ -47,7 +48,6 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.InjectWith
-import com.duckduckgo.app.browser.DuckDuckGoUrlDetector
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.tabs.BrowserNav
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
@@ -132,9 +132,6 @@ open class DuckChatWebViewFragment : DuckDuckGoFragment(R.layout.activity_duck_c
     lateinit var duckChatJSHelper: DuckChatJSHelper
 
     @Inject
-    lateinit var duckDuckGoUrlDetector: DuckDuckGoUrlDetector
-
-    @Inject
     lateinit var subscriptionsHandler: SubscriptionsHandler
 
     @Inject
@@ -179,6 +176,8 @@ open class DuckChatWebViewFragment : DuckDuckGoFragment(R.layout.activity_duck_c
 
     @Inject
     lateinit var browserAndInputScreenTransitionProvider: BrowserAndInputScreenTransitionProvider
+
+    private val cookieManager: CookieManager by lazy { CookieManager.getInstance() }
 
     private var pendingFileDownload: PendingFileDownload? = null
     private val downloadMessagesJob = ConflatedJob()
@@ -752,7 +751,13 @@ open class DuckChatWebViewFragment : DuckDuckGoFragment(R.layout.activity_duck_c
     override fun onPause() {
         downloadMessagesJob.cancel()
         simpleWebview.onPause()
+        cookieManager.flush()
         super.onPause()
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        cookieManager.flush()
     }
 
     companion object {
