@@ -33,8 +33,12 @@ interface OmnibarRepository {
     val omnibarType: OmnibarType
 
     /**
-     * True when the split omnibar option is available (both the unified omnibar layout and split omnibar
-     * feature flags are enabled).
+     * True when the split omnibar option is available (the split omnibar feature flag is enabled).
      */
     val isSplitOmnibarAvailable: Boolean
+
+    /**
+     * True when the new custom tab UI is available (the feature flag is enabled).
+     */
+    val isNewCustomTabEnabled: Boolean
 }

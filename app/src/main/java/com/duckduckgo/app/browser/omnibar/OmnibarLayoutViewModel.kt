@@ -201,7 +201,7 @@ class OmnibarLayoutViewModel @Inject constructor(
 
     sealed class Command {
         data object CancelAnimations : Command()
-        data class StartTrackersAnimation(val entities: List<Entity>?) : Command()
+        data class StartTrackersAnimation(val entities: List<Entity>?, val isCustomTab: Boolean) : Command()
         data class StartCookiesAnimation(val isCosmetic: Boolean) : Command()
         data object MoveCaretToFront : Command()
         data class LaunchInputScreen(val query: String) : Command()
@@ -851,7 +851,7 @@ class OmnibarLayoutViewModel @Inject constructor(
                         }
                         viewModelScope.launch {
                             command.send(
-                                Command.StartTrackersAnimation(decoration.entities),
+                                Command.StartTrackersAnimation(decoration.entities, viewState.value.viewMode is CustomTab),
                             )
                         }
                     }

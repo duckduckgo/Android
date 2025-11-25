@@ -478,6 +478,11 @@
         <item name="cardCornerRadius">@dimen/largeShapeCornerRadius</item>
     </style>
 
+    <style name="Widget.DuckDuckGo.CustomToolbarCardView" parent="Widget.MaterialComponents.CardView">
+        <item name="cardBackgroundColor">?attr/daxColorSurface</item>
+        <item name="cardCornerRadius">@dimen/largeShapeCornerRadius</item>
+    </style>
+
     <style name="Widget.DuckDuckGo.TabCardView" parent="Widget.MaterialComponents.CardView">
         <item name="cardBackgroundColor">?attr/daxColorWindow</item>
     </style>
