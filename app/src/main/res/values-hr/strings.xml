@@ -860,6 +860,11 @@
     <!-- Bubble BB & Buck experiment-->
     <string name="onboardingBubbleExperimentSearchDaxDialogDescription">Tvoja su DuckDuckGo pretraživanja uvijek anonimna.</string>
 
+    <!-- Input Screen Onboarding step -->
+    <string name="preOnboardingInputScreenTitle">Želiš jednostavan pristup privatnom AI čavrljanju?</string>
+    <string name="preOnboardingInputScreenButton">Dalje</string>
+    <string name="preOnboardingInputScreenDescription"><![CDATA[Značajke umjetne inteligencije privatne su i neobavezne. Izmjene možeš napraviti u izborniku <b>Postavke > AI značajke</b>.]]></string>
+
     <!-- Appearance settings -->
     <string name="settingsAddressBarPositionTitle">Adresna traka</string>
     <string name="settingsAddressBarPositionHeaderTitle">Položaj adresne trake</string>
