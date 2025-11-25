@@ -17,7 +17,6 @@
 package com.duckduckgo.cookies.impl.di
 
 import android.content.Context
-import androidx.room.Room
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.di.IsMainProcess
 import com.duckduckgo.common.utils.DispatcherProvider
@@ -31,6 +30,8 @@ import com.duckduckgo.cookies.store.RealCookiesFeatureToggleRepository
 import com.duckduckgo.cookies.store.RealCookiesFeatureToggleStore
 import com.duckduckgo.cookies.store.contentscopescripts.ContentScopeScriptsCookieRepository
 import com.duckduckgo.cookies.store.contentscopescripts.RealContentScopeScriptsCookieRepository
+import com.duckduckgo.data.store.api.DatabaseProvider
+import com.duckduckgo.data.store.api.RoomDatabaseConfig
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
@@ -42,17 +43,21 @@ import kotlinx.coroutines.CoroutineScope
 @ContributesTo(AppScope::class)
 object CookiesModule {
 
-    @SingleInstanceIn(AppScope::class)
     @Provides
-    fun provideCookiesDatabase(context: Context): CookiesDatabase {
-        return Room.databaseBuilder(context, CookiesDatabase::class.java, "cookies.db")
-            .fallbackToDestructiveMigration()
-            .addMigrations(*ALL_MIGRATIONS)
-            .build()
+    @SingleInstanceIn(AppScope::class)
+    fun provideCookiesDatabase(databaseProvider: DatabaseProvider): CookiesDatabase {
+        return databaseProvider.buildRoomDatabase(
+            CookiesDatabase::class.java,
+            "cookies.db",
+            config = RoomDatabaseConfig(
+                fallbackToDestructiveMigration = true,
+                migrations = ALL_MIGRATIONS,
+            ),
+        )
     }
 
-    @SingleInstanceIn(AppScope::class)
     @Provides
+    @SingleInstanceIn(AppScope::class)
     fun provideCookiesRepository(
         database: CookiesDatabase,
         @AppCoroutineScope appCoroutineScope: CoroutineScope,

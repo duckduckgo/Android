@@ -38,4 +38,4 @@ abstract class CookiesDatabase : RoomDatabase() {
     abstract fun contentScopeScriptsCookieDao(): ContentScopeScriptsCookieDao
 }
 
-val ALL_MIGRATIONS = emptyArray<Migration>()
+val ALL_MIGRATIONS = emptyList<Migration>()
