@@ -312,6 +312,7 @@ class SubscriptionSwitchWideEventTest {
         )
     }
 
+    @SuppressLint("DenyListedApi")
     @Test
     fun `when feature disabled then no events are sent`() = runTest {
         privacyProFeature.sendSubscriptionSwitchWideEvent().setRawStoredState(Toggle.State(false))
