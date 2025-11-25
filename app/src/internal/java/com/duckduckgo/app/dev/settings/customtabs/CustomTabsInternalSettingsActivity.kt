@@ -16,18 +16,23 @@
 
 package com.duckduckgo.app.dev.settings.customtabs
 
+import android.app.AlertDialog
 import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import android.net.Uri
 import android.os.Bundle
+import android.view.ViewGroup
+import android.widget.GridLayout
 import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.browser.customtabs.CustomTabColorSchemeParams
 import androidx.browser.customtabs.CustomTabsIntent
+import androidx.core.view.setPadding
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ActivityCustomTabsInternalSettingsBinding
@@ -71,6 +76,10 @@ class CustomTabsInternalSettingsActivity : DuckDuckGoActivity() {
             } else {
                 Toast.makeText(this, getString(R.string.customTabsEmptyUrl), Toast.LENGTH_SHORT).show()
             }
+        }
+
+        binding.colorPicker.setOnClickListener {
+            showColorPicker()
         }
 
         binding.clearColor.setOnClickListener {
@@ -117,6 +126,62 @@ class CustomTabsInternalSettingsActivity : DuckDuckGoActivity() {
         } catch (e: IllegalArgumentException) {
             false
         }
+    }
+
+    private fun showColorPicker() {
+        val presetColors = listOf(
+            "#DE5833" to "DuckDuckGo Orange",
+            "#F44336" to "Red",
+            "#E91E63" to "Pink",
+            "#9C27B0" to "Purple",
+            "#673AB7" to "Deep Purple",
+            "#3F51B5" to "Indigo",
+            "#2196F3" to "Blue",
+            "#03A9F4" to "Light Blue",
+            "#00BCD4" to "Cyan",
+            "#009688" to "Teal",
+            "#4CAF50" to "Green",
+            "#8BC34A" to "Light Green",
+            "#CDDC39" to "Lime",
+            "#FFEB3B" to "Yellow",
+            "#FFC107" to "Amber",
+            "#FF9800" to "Orange",
+            "#FFFFFF" to "White",
+            "#795548" to "Brown",
+            "#607D8B" to "Blue Grey",
+            "#000000" to "Black",
+        )
+
+        val gridLayout = GridLayout(this).apply {
+            columnCount = 4
+            setPadding(32)
+        }
+
+        val colorSize = resources.displayMetrics.density * 56
+
+        val dialog = AlertDialog.Builder(this)
+            .setTitle("Pick a Color")
+            .setView(gridLayout)
+            .setNegativeButton("Cancel", null)
+            .create()
+
+        presetColors.forEach { (colorHex, colorName) ->
+            val colorView = android.view.View(this).apply {
+                layoutParams = ViewGroup.MarginLayoutParams(colorSize.toInt(), colorSize.toInt()).apply {
+                    setMargins(8, 8, 8, 8)
+                }
+                background = ColorDrawable(Color.parseColor(colorHex))
+                contentDescription = colorName
+                setOnClickListener {
+                    binding.toolbarColorInput.text = colorHex
+                    Toast.makeText(this@CustomTabsInternalSettingsActivity, "Selected: $colorName", Toast.LENGTH_SHORT).show()
+                    dialog.dismiss()
+                }
+            }
+            gridLayout.addView(colorView)
+        }
+
+        dialog.show()
     }
 
     private fun openCustomTab(url: String) {

@@ -103,6 +103,7 @@
     <string name="customTabsEmptyUrl">Enter a URL</string>
     <string name="customTabsInvalidColor">Invalid color format. Use hex format like #FF5733</string>
     <string name="customTabsClearColor">Clear Custom Color</string>
+    <string name="customTabsColorPicker">Pick a Color</string>
     <string name="customTabsDefaultBrowserTitle">Default Browser</string>
 
     <!-- Notifications -->
