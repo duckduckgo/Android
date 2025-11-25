@@ -208,4 +208,8 @@
 
     <string name="deep_link_auth_prompt_title">Configurează Sincronizare și backup</string>
     <string name="deep_link_auth_prompt_message">Deblochează dispozitivul pentru a configura Sync &amp; Backup</string>
+
+    <!-- Sync promo in bookmark added confirmation dialog -->
+    <string name="addBookmarkDialogSyncPromoText">Sincronizează marcajele pe mai multe dispozitive</string>
+    <string name="addBookmarkDialogHideSyncSuggestion">Ascunde</string>
 </resources>
