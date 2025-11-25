@@ -44,7 +44,7 @@ open class OmnibarFeatureRepository @Inject constructor(
     @AppCoroutineScope private val coroutineScope: CoroutineScope,
 ) : OmnibarRepository, MainProcessLifecycleObserver {
     private var isSplitOmnibarFlagEnabled: Boolean = false
-    private var isNewCustomTagFlagEnabled: Boolean = false
+    private var isNewCustomTabFlagEnabled: Boolean = false
 
     override val omnibarType: OmnibarType
         get() = settingsDataStore.omnibarType
@@ -53,12 +53,12 @@ open class OmnibarFeatureRepository @Inject constructor(
         get() = isSplitOmnibarFlagEnabled
 
     override val isNewCustomTabEnabled: Boolean
-        get() = isNewCustomTagFlagEnabled
+        get() = isNewCustomTabFlagEnabled
 
     override fun onStart(owner: LifecycleOwner) {
         coroutineScope.launch(dispatcherProvider.io()) {
             isSplitOmnibarFlagEnabled = browserFeatures.splitOmnibar().isEnabled()
-            isNewCustomTagFlagEnabled = browserFeatures.newCustomTab().isEnabled()
+            isNewCustomTabFlagEnabled = browserFeatures.newCustomTab().isEnabled()
 
             resetOmnibarTypeIfNecessary()
         }
