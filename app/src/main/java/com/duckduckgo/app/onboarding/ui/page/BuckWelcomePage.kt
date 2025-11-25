@@ -53,6 +53,7 @@ import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.ADDRESS_BAR
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.COMPARISON_CHART
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.INITIAL
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.INITIAL_REINSTALL_USER
+import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.INPUT_SCREEN
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.SKIP_ONBOARDING_OPTION
 import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.Finish
 import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.OnboardingSkipped
@@ -62,6 +63,7 @@ import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.ShowCo
 import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.ShowDefaultBrowserDialog
 import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.ShowInitialDialog
 import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.ShowInitialReinstallUserDialog
+import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.ShowInputScreenDialog
 import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.ShowSkipOnboardingOption
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.ui.store.AppTheme
@@ -116,6 +118,7 @@ class BuckWelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welco
                 is ShowSkipOnboardingOption -> configureDaxCta(SKIP_ONBOARDING_OPTION)
                 is ShowDefaultBrowserDialog -> showDefaultBrowserDialog(it.intent)
                 is ShowAddressBarPositionDialog -> configureDaxCta(ADDRESS_BAR_POSITION)
+                is ShowInputScreenDialog -> onContinuePressed()
                 is Finish -> onContinuePressed()
                 is OnboardingSkipped -> onSkipPressed()
                 is SetAddressBarPositionOptions -> setAddressBarPositionOptions(it.defaultOption)
@@ -394,6 +397,10 @@ class BuckWelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welco
                             playAnimation(LottieOnboardingAnimationSpec.POPUP_SMALL)
                         },
                     )
+                }
+
+                INPUT_SCREEN -> {
+                    // Ignored
                 }
             }
             binding.sceneBg.setOnClickListener { afterTypingAnimation() }

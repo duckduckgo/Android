@@ -782,6 +782,9 @@
     <string name="highlightsPreOnboardingAddressBarOption1Description">Easy to see</string>
     <string name="highlightsPreOnboardingAddressBarOption2Title">Bottom</string>
     <string name="highlightsPreOnboardingAddressBarOption2Description">Easy to reach</string>
+    <string name="preOnboardingAiChatAccessTitle">Want easy access to private AI chat?</string>
+    <string name="preOnboardingAiChatAccessButton">Next</string>
+    <string name="preOnboardingAiChatAccessDescription"><![CDATA[AI features are private and optional. You can make changes in <b>Settings > AI Features</b>.]]></string>
     <string name="onboardingSearchDaxDialogTitle">Try a search!</string>
     <string name="onboardingSearchDaxDialogDescription">Your DuckDuckGo searches are always private.</string>
     <string name="onboardingSearchDaxDialogOption1" instruction="translate 'duck' too.">how to say "duck" in english</string>

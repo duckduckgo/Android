@@ -163,8 +163,21 @@ class OnboardingStoreImpl @Inject constructor(
         )
     }
 
+    override fun storeInputScreenSelection(selected: Boolean) {
+        preferences.edit { putBoolean(KEY_INPUT_SCREEN_SELECTION, selected) }
+    }
+
+    override fun getInputScreenSelection(): Boolean? {
+        return if (preferences.contains(KEY_INPUT_SCREEN_SELECTION)) {
+            preferences.getBoolean(KEY_INPUT_SCREEN_SELECTION, false)
+        } else {
+            null
+        }
+    }
+
     companion object {
         const val FILENAME = "com.duckduckgo.app.onboarding.settings"
         const val ONBOARDING_JOURNEY = "onboardingJourney"
+        private const val KEY_INPUT_SCREEN_SELECTION = "inputScreenSelection"
     }
 }

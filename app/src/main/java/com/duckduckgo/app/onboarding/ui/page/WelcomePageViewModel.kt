@@ -25,10 +25,12 @@ import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.browser.omnibar.OmnibarType
 import com.duckduckgo.app.global.DefaultRoleBrowserDialog
 import com.duckduckgo.app.global.install.AppInstallStore
+import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.ADDRESS_BAR_POSITION
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.COMPARISON_CHART
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.INITIAL
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.INITIAL_REINSTALL_USER
+import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.INPUT_SCREEN
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.SKIP_ONBOARDING_OPTION
 import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.Finish
 import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.OnboardingSkipped
@@ -78,11 +80,13 @@ class WelcomePageViewModel @Inject constructor(
     private val dispatchers: DispatcherProvider,
     private val appBuildConfig: AppBuildConfig,
     private val onboardingDesignExperimentManager: OnboardingDesignExperimentManager,
+    private val onboardingStore: OnboardingStore,
 ) : ViewModel() {
     private val _commands = Channel<Command>(1, DROP_OLDEST)
     val commands: Flow<Command> = _commands.receiveAsFlow()
 
     private var defaultAddressBarPosition: Boolean = true
+    private var inputScreenSelected: Boolean = true
 
     sealed interface Command {
         data object ShowInitialReinstallUserDialog : Command
@@ -98,6 +102,8 @@ class WelcomePageViewModel @Inject constructor(
         ) : Command
 
         data object ShowAddressBarPositionDialog : Command
+
+        data object ShowInputScreenDialog : Command
 
         data object Finish : Command
 
@@ -163,6 +169,13 @@ class WelcomePageViewModel @Inject constructor(
                     } else {
                         onboardingDesignExperimentManager.fireAddressBarSetTopPixel()
                     }
+                    _commands.send(Command.ShowInputScreenDialog)
+                }
+            }
+
+            INPUT_SCREEN -> {
+                viewModelScope.launch(dispatchers.io()) {
+                    onboardingStore.storeInputScreenSelection(inputScreenSelected)
                     _commands.send(Finish)
                 }
             }
@@ -194,6 +207,10 @@ class WelcomePageViewModel @Inject constructor(
             }
 
             ADDRESS_BAR_POSITION -> {
+                // no-op
+            }
+
+            INPUT_SCREEN -> {
                 // no-op
             }
         }
@@ -255,6 +272,9 @@ class WelcomePageViewModel @Inject constructor(
                     onboardingDesignExperimentManager.fireSetAddressBarDisplayedPixel()
                 }
             }
+            INPUT_SCREEN -> {
+                // Pixel tracking can be added here if needed
+            }
         }
     }
 
@@ -263,6 +283,10 @@ class WelcomePageViewModel @Inject constructor(
         viewModelScope.launch {
             _commands.send(SetAddressBarPositionOptions(defaultOption))
         }
+    }
+
+    fun onInputScreenOptionSelected(withAi: Boolean) {
+        inputScreenSelected = withAi
     }
 
     fun loadDaxDialog() {

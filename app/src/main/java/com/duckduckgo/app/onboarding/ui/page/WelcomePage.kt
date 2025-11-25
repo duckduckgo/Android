@@ -41,6 +41,7 @@ import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.ADDRESS_BAR
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.COMPARISON_CHART
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.INITIAL
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.INITIAL_REINSTALL_USER
+import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.INPUT_SCREEN
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.SKIP_ONBOARDING_OPTION
 import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.Finish
 import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.OnboardingSkipped
@@ -50,6 +51,7 @@ import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.ShowCo
 import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.ShowDefaultBrowserDialog
 import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.ShowInitialDialog
 import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.ShowInitialReinstallUserDialog
+import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.ShowInputScreenDialog
 import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.ShowSkipOnboardingOption
 import com.duckduckgo.app.onboardingdesignexperiment.OnboardingDesignExperimentManager
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
@@ -64,6 +66,7 @@ import com.duckduckgo.di.scopes.FragmentScope
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import javax.inject.Inject
+import com.duckduckgo.mobile.android.R as CommonR
 
 @InjectWith(FragmentScope::class)
 class WelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome_page) {
@@ -110,6 +113,7 @@ class WelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome_p
                 is ShowSkipOnboardingOption -> configureDaxCta(SKIP_ONBOARDING_OPTION)
                 is ShowDefaultBrowserDialog -> showDefaultBrowserDialog(it.intent)
                 is ShowAddressBarPositionDialog -> configureDaxCta(ADDRESS_BAR_POSITION)
+                is ShowInputScreenDialog -> configureDaxCta(INPUT_SCREEN)
                 is Finish -> onContinuePressed()
                 is OnboardingSkipped -> onSkipPressed()
                 is SetAddressBarPositionOptions -> setAddressBarPositionOptions(it.defaultOption)
@@ -243,7 +247,7 @@ class WelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome_p
                     binding.daxDialogCta.dialogTextCta.text = ""
                     TransitionManager.beginDelayedTransition(binding.daxDialogCta.cardView, AutoTransition())
                     binding.daxDialogCta.progressBarText.show()
-                    binding.daxDialogCta.progressBarText.text = "1 / 2"
+                    binding.daxDialogCta.progressBarText.text = "1 / 3"
                     binding.daxDialogCta.progressBar.show()
                     binding.daxDialogCta.progressBar.progress = 1
                     val ctaText = it.getString(R.string.preOnboardingDaxDialog2Title)
@@ -296,7 +300,7 @@ class WelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome_p
                     binding.daxDialogCta.comparisonChart.root.gone()
                     TransitionManager.beginDelayedTransition(binding.daxDialogCta.cardView, AutoTransition())
                     binding.daxDialogCta.progressBarText.show()
-                    binding.daxDialogCta.progressBarText.text = "2 / 2"
+                    binding.daxDialogCta.progressBarText.text = "2 / 3"
                     binding.daxDialogCta.progressBar.show()
                     binding.daxDialogCta.progressBar.progress = 2
                     val ctaText = it.getString(R.string.preOnboardingAddressBarTitle).run {
@@ -326,6 +330,52 @@ class WelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome_p
                         binding.daxDialogCta.addressBarPosition.root.animate().alpha(MAX_ALPHA).duration = ANIMATION_DURATION
                     }
 
+                    scheduleTypingAnimation(ctaText) { afterAnimation() }
+                }
+
+                INPUT_SCREEN -> {
+                    binding.daxDialogCta.descriptionCta.gone()
+                    binding.daxDialogCta.secondaryCta.gone()
+                    binding.daxDialogCta.dialogTextCta.text = ""
+                    binding.daxDialogCta.comparisonChart.root.gone()
+                    binding.daxDialogCta.addressBarPosition.root.gone()
+                    TransitionManager.beginDelayedTransition(binding.daxDialogCta.cardView, AutoTransition())
+                    binding.daxDialogCta.progressBarText.show()
+                    binding.daxDialogCta.progressBarText.text = "3 / 3"
+                    binding.daxDialogCta.progressBar.show()
+                    binding.daxDialogCta.progressBar.progress = 3
+                    val ctaText = it.getString(R.string.preOnboardingAiChatAccessTitle)
+                    binding.daxDialogCta.hiddenTextCta.text = ctaText.html(it)
+                    binding.daxDialogCta.primaryCta.alpha = MIN_ALPHA
+                    binding.daxDialogCta.duckAiInputScreenToggleContainer.show()
+                    binding.daxDialogCta.duckAiInputScreenToggleContainer.alpha = MIN_ALPHA
+
+                    val isLightMode = appTheme.isLightModeEnabled()
+                    updateAiChatToggleState(binding, isLightMode, withAi = true)
+                    viewModel.onInputScreenOptionSelected(withAi = true)
+
+                    binding.daxDialogCta.duckAiInputScreenWithoutAiContainer.setOnClickListener {
+                        updateAiChatToggleState(binding, isLightMode, withAi = false)
+                        viewModel.onInputScreenOptionSelected(withAi = false)
+                    }
+                    binding.daxDialogCta.duckAiInputScreenWithAiContainer.setOnClickListener {
+                        updateAiChatToggleState(binding, isLightMode, withAi = true)
+                        viewModel.onInputScreenOptionSelected(withAi = true)
+                    }
+
+                    val descriptionText = it.getString(R.string.preOnboardingAiChatAccessDescription)
+                    binding.daxDialogCta.duckAiInputScreenToggleDescription.text = descriptionText.html(it)
+                    binding.daxDialogCta.duckAiInputScreenToggleDescription.show()
+                    binding.daxDialogCta.duckAiInputScreenToggleDescription.alpha = MIN_ALPHA
+
+                    afterAnimation = {
+                        binding.daxDialogCta.dialogTextCta.finishAnimation()
+                        binding.daxDialogCta.primaryCta.text = it.getString(R.string.preOnboardingAiChatAccessButton)
+                        binding.daxDialogCta.primaryCta.setOnClickListener { viewModel.onPrimaryCtaClicked(INPUT_SCREEN) }
+                        binding.daxDialogCta.primaryCta.animate().alpha(MAX_ALPHA).duration = ANIMATION_DURATION
+                        binding.daxDialogCta.duckAiInputScreenToggleContainer.animate().alpha(MAX_ALPHA).duration = ANIMATION_DURATION
+                        binding.daxDialogCta.duckAiInputScreenToggleDescription.animate().alpha(MAX_ALPHA).duration = ANIMATION_DURATION
+                    }
                     scheduleTypingAnimation(ctaText) { afterAnimation() }
                 }
             }
@@ -395,6 +445,42 @@ class WelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome_p
 
     private fun setBackgroundRes(backgroundRes: Int) {
         binding.sceneBg.setImageResource(backgroundRes)
+    }
+
+    private fun updateAiChatToggleState(
+        binding: ContentOnboardingWelcomePageBinding,
+        isLightMode: Boolean,
+        withAi: Boolean,
+    ) {
+        val withoutAiImageRes = when {
+            !withAi && isLightMode -> com.duckduckgo.duckchat.impl.R.drawable.searchbox_withoutai_active
+            !withAi && !isLightMode -> com.duckduckgo.duckchat.impl.R.drawable.searchbox_withoutai_active_dark
+            withAi && isLightMode -> com.duckduckgo.duckchat.impl.R.drawable.searchbox_withoutai_inactive
+            else -> com.duckduckgo.duckchat.impl.R.drawable.searchbox_withoutai_inactive_dark
+        }
+        val withAiImageRes = when {
+            withAi && isLightMode -> com.duckduckgo.duckchat.impl.R.drawable.searchbox_withai_active
+            withAi && !isLightMode -> com.duckduckgo.duckchat.impl.R.drawable.searchbox_withai_active_dark
+            !withAi && isLightMode -> com.duckduckgo.duckchat.impl.R.drawable.searchbox_withai_inactive
+            else -> com.duckduckgo.duckchat.impl.R.drawable.searchbox_withai_inactive_dark
+        }
+
+        binding.daxDialogCta.duckAiInputScreenToggleWithoutAiImage.setImageResource(withoutAiImageRes)
+        binding.daxDialogCta.duckAiInputScreenToggleWithAiImage.setImageResource(withAiImageRes)
+
+        val withoutAiCheckRes = if (!withAi) {
+            CommonR.drawable.ic_check_accent_24
+        } else {
+            CommonR.drawable.ic_shape_circle_24
+        }
+        val withAiCheckRes = if (withAi) {
+            CommonR.drawable.ic_check_accent_24
+        } else {
+            CommonR.drawable.ic_shape_circle_24
+        }
+
+        binding.daxDialogCta.duckAiInputScreenToggleWithoutAiCheck.setImageResource(withoutAiCheckRes)
+        binding.daxDialogCta.duckAiInputScreenToggleWithAiCheck.setImageResource(withAiCheckRes)
     }
 
     companion object {
