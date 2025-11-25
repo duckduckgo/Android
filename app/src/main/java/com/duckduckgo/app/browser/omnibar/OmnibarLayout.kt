@@ -253,20 +253,16 @@ class OmnibarLayout @JvmOverloads constructor(
 
     private var focusAnimator: ValueAnimator? = null
 
-    override val omnibarType: OmnibarType
+    override val omnibarType: OmnibarType by lazy {
+        settingsDataStore.omnibarType
+    }
 
     init {
         inflate(context, R.layout.view_omnibar, this)
 
         AndroidSupportInjection.inject(this)
 
-        omnibarType = settingsDataStore.omnibarType
-
-        val attr = context.theme.obtainStyledAttributes(attrs, R.styleable.OmnibarLayout, defStyle, 0)
-        val omnibarType = OmnibarType.entries[attr.getInt(R.styleable.OmnibarLayout_omnibarPosition, 0)]
-        val isTopPosition = omnibarType == OmnibarType.SINGLE_TOP || omnibarType == OmnibarType.SPLIT
-
-        renderPosition(isTopPosition)
+        renderPosition()
 
         if (Build.VERSION.SDK_INT >= 28) {
             omnibarCardShadow.addBottomShadow()
@@ -638,8 +634,8 @@ class OmnibarLayout @JvmOverloads constructor(
         }
     }
 
-    private fun renderPosition(isTopPosition: Boolean) {
-        if (isTopPosition) {
+    private fun renderPosition() {
+        if (omnibarType == OmnibarType.SINGLE_TOP || omnibarType == OmnibarType.SPLIT) {
             if (Build.VERSION.SDK_INT < 28) {
                 omnibarCardShadow.cardElevation = 2f.toPx(context)
             }

@@ -48,6 +48,7 @@ import com.duckduckgo.common.ui.view.hide
 import com.duckduckgo.common.ui.view.hideKeyboard
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.view.showKeyboard
+import com.duckduckgo.common.ui.view.toPx
 import com.duckduckgo.common.utils.extensions.replaceTextChangedListener
 import com.duckduckgo.common.utils.text.TextChangedWatcher
 import com.google.android.material.appbar.AppBarLayout.GONE
@@ -156,21 +157,47 @@ class Omnibar(
     val omnibarView: OmnibarView by lazy {
         when (omnibarType) {
             OmnibarType.SINGLE_TOP -> {
-                binding.rootView.removeView(binding.omnibarLayoutBottom)
-                binding.omnibarLayoutTop
+                createAndAddOmnibarLayout(isBottomPosition = false)
             }
             OmnibarType.SPLIT -> {
-                binding.rootView.removeView(binding.omnibarLayoutBottom)
                 binding.bottomBrowserOutlineStroke.gone()
                 binding.includeNewBrowserTab.bottomNtpOutlineStroke.gone()
-                binding.omnibarLayoutTop
+                createAndAddOmnibarLayout(isBottomPosition = false)
             }
             OmnibarType.SINGLE_BOTTOM -> {
-                binding.rootView.removeView(binding.omnibarLayoutTop)
                 adjustCoordinatorLayoutBehaviorForBottomOmnibar()
-                binding.omnibarLayoutBottom
+                createAndAddOmnibarLayout(isBottomPosition = true)
             }
         }
+    }
+
+    private fun createAndAddOmnibarLayout(isBottomPosition: Boolean): OmnibarLayout {
+        val omnibarLayout = OmnibarLayout(binding.root.context)
+        omnibarLayout.id = View.generateViewId()
+        omnibarLayout.outlineProvider = null
+
+        val layoutParams = CoordinatorLayout.LayoutParams(
+            CoordinatorLayout.LayoutParams.MATCH_PARENT,
+            CoordinatorLayout.LayoutParams.WRAP_CONTENT,
+        )
+
+        if (isBottomPosition) {
+            layoutParams.gravity = android.view.Gravity.BOTTOM
+        } else {
+            omnibarLayout.elevation = 1f.toPx()
+        }
+
+        omnibarLayout.layoutParams = layoutParams
+
+        val insertIndex = if (isBottomPosition) {
+            binding.rootView.childCount
+        } else {
+            0
+        }
+
+        binding.rootView.addView(omnibarLayout, insertIndex)
+
+        return omnibarLayout
     }
 
     /**
