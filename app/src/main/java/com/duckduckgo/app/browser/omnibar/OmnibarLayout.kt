@@ -61,7 +61,6 @@ import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.PulseAnimation
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.SmoothProgressAnimator
-import com.duckduckgo.app.browser.animations.AddressBarTrackersAnimationFeatureToggle
 import com.duckduckgo.app.browser.api.OmnibarRepository
 import com.duckduckgo.app.browser.customtabs.CustomTabPixelNames
 import com.duckduckgo.app.browser.databinding.IncludeCustomTabToolbarBinding
@@ -192,9 +191,6 @@ class OmnibarLayout @JvmOverloads constructor(
 
     @Inject
     lateinit var globalActivityStarter: GlobalActivityStarter
-
-    @Inject
-    lateinit var addressBarTrackersAnimationFeatureToggle: AddressBarTrackersAnimationFeatureToggle
 
     @Inject
     lateinit var settingsDataStore: SettingsDataStore
@@ -638,15 +634,6 @@ class OmnibarLayout @JvmOverloads constructor(
             if (Build.VERSION.SDK_INT < 28) {
                 omnibarCardShadow.cardElevation = 2f.toPx(context)
             }
-
-            shieldIconPulseAnimationContainer.updateLayoutParams {
-                (this as MarginLayoutParams).apply {
-                    if (addressBarTrackersAnimationFeatureToggle.feature().isEnabled()) {
-                        // TODO when the animation is made permanent we should add this adjustment to the actual layout
-                        marginStart = 1.toPx()
-                    }
-                }
-            }
         } else {
             // When omnibar is at the bottom, we're adding an additional space at the top
             omnibarCardShadow.updateLayoutParams {
@@ -666,12 +653,6 @@ class OmnibarLayout @JvmOverloads constructor(
 
             shieldIconPulseAnimationContainer.updateLayoutParams {
                 flipOmnibarMargins()
-                (this as MarginLayoutParams).apply {
-                    if (addressBarTrackersAnimationFeatureToggle.feature().isEnabled()) {
-                        // TODO when the animation is made permanent we should add this adjustment to the actual layout
-                        marginStart = 1.toPx()
-                    }
-                }
             }
 
             shieldIconPulseAnimationContainer.setPadding(
@@ -703,7 +684,7 @@ class OmnibarLayout @JvmOverloads constructor(
             }
 
             is StartTrackersAnimation -> {
-                startTrackersAnimation(command.entities, command.isCustomTab)
+                startTrackersAnimation(command.entities, command.isCustomTab, command.isAddressBarTrackersAnimationEnabled)
             }
 
             is LaunchInputScreen -> {
@@ -892,6 +873,15 @@ class OmnibarLayout @JvmOverloads constructor(
 
         isScrollingEnabled = viewState.scrollingEnabled
 
+        if (viewState.isAddressBarTrackersAnimationEnabled) {
+            shieldIconPulseAnimationContainer.updateLayoutParams {
+                (this as MarginLayoutParams).apply {
+                    // TODO when the animation is made permanent we should add this adjustment to the actual layout
+                    marginStart = 1.toPx()
+                }
+            }
+        }
+
         renderTabIcon(viewState)
         renderPulseAnimation(viewState)
 
@@ -1038,9 +1028,13 @@ class OmnibarLayout @JvmOverloads constructor(
         }
     }
 
-    private fun startTrackersAnimation(events: List<Entity>?, isCustomTab: Boolean) {
+    private fun startTrackersAnimation(
+        events: List<Entity>?,
+        isCustomTab: Boolean,
+        isAddressBarTrackersAnimationEnabled: Boolean,
+    ) {
         if (!isCustomTab) {
-            if (addressBarTrackersAnimationFeatureToggle.feature().isEnabled()) {
+            if (isAddressBarTrackersAnimationEnabled) {
                 animatorHelper.startAddressBarTrackersAnimation(
                     context = context,
                     addressBarTrackersBlockedAnimationShieldIcon = addressBarTrackersBlockedAnimationShieldIcon,
@@ -1067,7 +1061,7 @@ class OmnibarLayout @JvmOverloads constructor(
                 Pair(customTabToolbarColor, null)
             }
 
-            if (addressBarTrackersAnimationFeatureToggle.feature().isEnabled()) {
+            if (isAddressBarTrackersAnimationEnabled) {
                 animatorHelper.startAddressBarTrackersAnimation(
                     context = context,
                     addressBarTrackersBlockedAnimationShieldIcon = newCustomTabToolbarContainer.addressBarTrackersBlockedAnimationShieldIcon,

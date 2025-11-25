@@ -23,6 +23,7 @@ import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.browser.AddressDisplayFormatter
 import com.duckduckgo.app.browser.DuckDuckGoUrlDetector
+import com.duckduckgo.app.browser.animations.AddressBarTrackersAnimationManager
 import com.duckduckgo.app.browser.defaultbrowsing.prompts.AdditionalDefaultBrowserPrompts
 import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode
 import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode.Browser
@@ -85,6 +86,7 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import logcat.logcat
 import javax.inject.Inject
 import com.duckduckgo.app.global.model.PrivacyShield as PrivacyShieldState
@@ -107,6 +109,7 @@ class OmnibarLayoutViewModel @Inject constructor(
     private val urlDisplayRepository: UrlDisplayRepository,
     private val serpEasterEggLogosToggles: SerpEasterEggLogosToggles,
     private val androidBrowserToggles: AndroidBrowserConfigFeature,
+    private val addressBarTrackersAnimationManager: AddressBarTrackersAnimationManager,
 ) : ViewModel() {
 
     private val isSplitOmnibarEnabled = settingsDataStore.omnibarType == OmnibarType.SPLIT
@@ -119,6 +122,7 @@ class OmnibarLayoutViewModel @Inject constructor(
             showFireIcon = !isSplitOmnibarEnabled,
             showTabsMenu = !isSplitOmnibarEnabled,
             showBrowserMenu = !isSplitOmnibarEnabled,
+            isAddressBarTrackersAnimationEnabled = runBlocking { addressBarTrackersAnimationManager.isFeatureEnabled() },
         ),
     )
 
@@ -219,6 +223,7 @@ class OmnibarLayoutViewModel @Inject constructor(
         val showFindInPage: Boolean = false,
         val showDuckAIHeader: Boolean = false,
         val showDuckAISidebar: Boolean = false,
+        val isAddressBarTrackersAnimationEnabled: Boolean = false,
     ) {
         fun shouldUpdateOmnibarText(
             isFullUrlEnabled: Boolean,
@@ -239,6 +244,7 @@ class OmnibarLayoutViewModel @Inject constructor(
         data class StartTrackersAnimation(
             val entities: List<Entity>?,
             val isCustomTab: Boolean,
+            val isAddressBarTrackersAnimationEnabled: Boolean,
         ) : Command()
 
         data class StartCookiesAnimation(val isCosmetic: Boolean) : Command()
@@ -937,7 +943,11 @@ class OmnibarLayoutViewModel @Inject constructor(
                         }
                         viewModelScope.launch {
                             command.send(
-                                Command.StartTrackersAnimation(decoration.entities, viewState.value.viewMode is CustomTab),
+                                Command.StartTrackersAnimation(
+                                    entities = decoration.entities,
+                                    isCustomTab = viewState.value.viewMode is CustomTab,
+                                    isAddressBarTrackersAnimationEnabled = addressBarTrackersAnimationManager.isFeatureEnabled(),
+                                ),
                             )
                         }
                     }

@@ -6,6 +6,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import app.cash.turbine.test
 import com.duckduckgo.app.browser.AddressDisplayFormatter
 import com.duckduckgo.app.browser.DuckDuckGoUrlDetectorImpl
+import com.duckduckgo.app.browser.animations.AddressBarTrackersAnimationManager
 import com.duckduckgo.app.browser.defaultbrowsing.prompts.AdditionalDefaultBrowserPrompts
 import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.Command
@@ -46,6 +47,7 @@ import com.duckduckgo.voice.api.VoiceSearchAvailability
 import com.duckduckgo.voice.api.VoiceSearchAvailabilityPixelLogger
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -100,6 +102,7 @@ class OmnibarLayoutViewModelTest {
     private val serpEasterEggLogosToggles: SerpEasterEggLogosToggles = mock()
 
     private val androidBrowserToggles: AndroidBrowserConfigFeature = mock()
+    private val addressBarTrackersAnimationManager: AddressBarTrackersAnimationManager = mock()
 
     private lateinit var testee: OmnibarLayoutViewModel
 
@@ -124,6 +127,9 @@ class OmnibarLayoutViewModelTest {
         whenever(serpEasterEggLogosToggles.feature().isEnabled()).thenReturn(false)
         whenever(androidBrowserToggles.handleAboutBlank()).thenReturn(mock())
         whenever(androidBrowserToggles.handleAboutBlank().isEnabled()).thenReturn(false)
+        runBlocking {
+            whenever(addressBarTrackersAnimationManager.isFeatureEnabled()).thenReturn(false)
+        }
 
         initializeViewModel()
     }
@@ -167,6 +173,7 @@ class OmnibarLayoutViewModelTest {
             urlDisplayRepository = urlDisplayRepository,
             serpEasterEggLogosToggles = serpEasterEggLogosToggles,
             androidBrowserToggles = androidBrowserToggles,
+            addressBarTrackersAnimationManager = addressBarTrackersAnimationManager,
         )
     }
 
