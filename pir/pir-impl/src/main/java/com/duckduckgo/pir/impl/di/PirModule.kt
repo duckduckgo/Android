@@ -22,9 +22,9 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.data.store.api.SharedPreferencesProvider
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.pir.impl.common.BrokerStepsParser.BrokerStep
-import com.duckduckgo.pir.impl.common.BrokerStepsParser.BrokerStep.OptOutStep
-import com.duckduckgo.pir.impl.common.BrokerStepsParser.BrokerStep.ScanStep
+import com.duckduckgo.pir.impl.common.BrokerStepsParser.BrokerStepActions
+import com.duckduckgo.pir.impl.common.BrokerStepsParser.BrokerStepActions.OptOutStepActions
+import com.duckduckgo.pir.impl.common.BrokerStepsParser.BrokerStepActions.ScanStepActions
 import com.duckduckgo.pir.impl.common.CaptchaResolver
 import com.duckduckgo.pir.impl.common.NativeBrokerActionHandler
 import com.duckduckgo.pir.impl.common.RealNativeBrokerActionHandler
@@ -144,9 +144,9 @@ class PirModule {
                     .withSubtype(BrokerAction.EmailConfirmation::class.java, "emailConfirmation")
                     .withSubtype(BrokerAction.Condition::class.java, "condition"),
             ).add(
-                PolymorphicJsonAdapterFactory.of(BrokerStep::class.java, "stepType")
-                    .withSubtype(ScanStep::class.java, "scan")
-                    .withSubtype(OptOutStep::class.java, "optOut"),
+                PolymorphicJsonAdapterFactory.of(BrokerStepActions::class.java, "stepType")
+                    .withSubtype(ScanStepActions::class.java, "scan")
+                    .withSubtype(OptOutStepActions::class.java, "optOut"),
             ).add(
                 PolymorphicJsonAdapterFactory.of(PirSuccessResponse::class.java, "actionType")
                     .withSubtype(NavigateResponse::class.java, "navigate")

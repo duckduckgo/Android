@@ -91,12 +91,13 @@ class ExecuteNextBrokerStepEventHandler @Inject constructor(
     private suspend fun emitBrokerStartPixel(state: State) {
         val runType = state.runType
         val currentBrokerStep = state.brokerStepsToExecute[state.currentBrokerStepIndex]
+        val brokerName = currentBrokerStep.broker.name
 
         when (runType) {
             MANUAL ->
                 pirRunStateHandler.handleState(
                     BrokerManualScanStarted(
-                        currentBrokerStep.brokerName,
+                        brokerName,
                         currentTimeProvider.currentTimeMillis(),
                     ),
                 )
@@ -104,7 +105,7 @@ class ExecuteNextBrokerStepEventHandler @Inject constructor(
             SCHEDULED ->
                 pirRunStateHandler.handleState(
                     BrokerScheduledScanStarted(
-                        currentBrokerStep.brokerName,
+                        brokerName,
                         currentTimeProvider.currentTimeMillis(),
                     ),
                 )
@@ -113,7 +114,7 @@ class ExecuteNextBrokerStepEventHandler @Inject constructor(
                 // It also means we are starting it for the first profile. Succeeding profiles are handled in HandleNextProfileForBroker
                 pirRunStateHandler.handleState(
                     BrokerRecordOptOutStarted(
-                        currentBrokerStep.brokerName,
+                        brokerName,
                         (currentBrokerStep as OptOutStep).profileToOptOut,
                     ),
                 )
@@ -122,9 +123,9 @@ class ExecuteNextBrokerStepEventHandler @Inject constructor(
             EMAIL_CONFIRMATION -> {
                 pirRunStateHandler.handleState(
                     BrokerRecordEmailConfirmationStarted(
-                        brokerName = currentBrokerStep.brokerName,
+                        brokerName = brokerName,
                         extractedProfileId = (currentBrokerStep as EmailConfirmationStep).emailConfirmationJob.extractedProfileId,
-                        firstActionId = currentBrokerStep.actions[state.currentActionIndex].id,
+                        firstActionId = currentBrokerStep.step.actions[state.currentActionIndex].id,
                     ),
                 )
             }

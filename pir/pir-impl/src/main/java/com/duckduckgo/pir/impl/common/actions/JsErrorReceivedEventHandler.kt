@@ -44,7 +44,7 @@ class JsErrorReceivedEventHandler @Inject constructor() : EventHandler {
          * We fail the current js action if that was the case. We donn't retry the action as this is an unrecoverable error.
          */
         val currentBroker = state.brokerStepsToExecute[state.currentBrokerStepIndex]
-        val currentAction = currentBroker.actions[state.currentActionIndex]
+        val currentAction = currentBroker.step.actions[state.currentActionIndex]
 
         return Next(
             nextState = state,

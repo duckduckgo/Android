@@ -21,6 +21,8 @@ import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.pir.impl.common.BrokerStepsParser.BrokerStep.EmailConfirmationStep
 import com.duckduckgo.pir.impl.common.BrokerStepsParser.BrokerStep.OptOutStep
 import com.duckduckgo.pir.impl.common.BrokerStepsParser.BrokerStep.ScanStep
+import com.duckduckgo.pir.impl.common.BrokerStepsParser.BrokerStepActions.OptOutStepActions
+import com.duckduckgo.pir.impl.common.BrokerStepsParser.BrokerStepActions.ScanStepActions
 import com.duckduckgo.pir.impl.common.PirJob.RunType
 import com.duckduckgo.pir.impl.common.PirRunStateHandler
 import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerOptOutActionSucceeded
@@ -31,6 +33,7 @@ import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.SideEf
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.SideEffect.GetCaptchaSolution
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.SideEffect.LoadUrl
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.State
+import com.duckduckgo.pir.impl.models.Broker
 import com.duckduckgo.pir.impl.models.ExtractedProfile
 import com.duckduckgo.pir.impl.models.ProfileQuery
 import com.duckduckgo.pir.impl.models.scheduling.JobRecord.EmailConfirmationJobRecord
@@ -123,6 +126,25 @@ class JsActionSuccessEventHandlerTest {
         url = "https://example.com",
     )
 
+    private val testBroker1 = Broker(
+        name = testBrokerName,
+        fileName = "test-broker-1.json",
+        url = "https://test-broker-1.com",
+        version = "1.0",
+        parent = null,
+        addedDatetime = testCurrentTimeInMillis,
+        removedAt = 0L,
+    )
+
+    private val testScanStep = ScanStep(
+        broker = testBroker1,
+        step = ScanStepActions(
+            stepType = "scan",
+            actions = listOf(testAction),
+            scanType = "initial",
+        ),
+    )
+
     @Before
     fun setUp() {
         testee =
@@ -147,17 +169,10 @@ class JsActionSuccessEventHandlerTest {
                 actionType = "navigate",
                 response = NavigateResponse.ResponseData(url = "https://example.com/result"),
             )
-        val scanStep =
-            ScanStep(
-                brokerName = testBrokerName,
-                stepType = "scan",
-                actions = listOf(testAction),
-                scanType = "initial",
-            )
         val state =
             State(
                 runType = RunType.MANUAL,
-                brokerStepsToExecute = listOf(scanStep),
+                brokerStepsToExecute = listOf(testScanStep),
                 profileQuery = testProfileQuery,
                 currentBrokerStepIndex = 0,
                 currentActionIndex = testCurrentActionIndex,
@@ -190,17 +205,10 @@ class JsActionSuccessEventHandlerTest {
                 actionID = "fillform-1",
                 actionType = "fillForm",
             )
-        val scanStep =
-            ScanStep(
-                brokerName = testBrokerName,
-                stepType = "scan",
-                actions = listOf(testAction),
-                scanType = "initial",
-            )
         val state =
             State(
                 runType = RunType.MANUAL,
-                brokerStepsToExecute = listOf(scanStep),
+                brokerStepsToExecute = listOf(testScanStep),
                 profileQuery = testProfileQuery,
                 currentBrokerStepIndex = 0,
                 currentActionIndex = testCurrentActionIndex,
@@ -232,17 +240,10 @@ class JsActionSuccessEventHandlerTest {
                 actionID = "click-1",
                 actionType = "click",
             )
-        val scanStep =
-            ScanStep(
-                brokerName = testBrokerName,
-                stepType = "scan",
-                actions = listOf(testAction),
-                scanType = "initial",
-            )
         val state =
             State(
                 runType = RunType.MANUAL,
-                brokerStepsToExecute = listOf(scanStep),
+                brokerStepsToExecute = listOf(testScanStep),
                 profileQuery = testProfileQuery,
                 currentBrokerStepIndex = 0,
                 currentActionIndex = testCurrentActionIndex,
@@ -272,17 +273,10 @@ class JsActionSuccessEventHandlerTest {
                 actionID = "expectation-1",
                 actionType = "expectation",
             )
-        val scanStep =
-            ScanStep(
-                brokerName = testBrokerName,
-                stepType = "scan",
-                actions = listOf(testAction),
-                scanType = "initial",
-            )
         val state =
             State(
                 runType = RunType.MANUAL,
-                brokerStepsToExecute = listOf(scanStep),
+                brokerStepsToExecute = listOf(testScanStep),
                 profileQuery = testProfileQuery,
                 currentBrokerStepIndex = 0,
                 currentActionIndex = testCurrentActionIndex,
@@ -313,17 +307,10 @@ class JsActionSuccessEventHandlerTest {
                 actionType = "extract",
                 response = emptyList(),
             )
-        val scanStep =
-            ScanStep(
-                brokerName = testBrokerName,
-                stepType = "scan",
-                actions = listOf(testAction),
-                scanType = "initial",
-            )
         val state =
             State(
                 runType = RunType.MANUAL,
-                brokerStepsToExecute = listOf(scanStep),
+                brokerStepsToExecute = listOf(testScanStep),
                 profileQuery = testProfileQuery,
                 currentBrokerStepIndex = 0,
                 currentActionIndex = testCurrentActionIndex,
@@ -360,17 +347,10 @@ class JsActionSuccessEventHandlerTest {
                         type = "recaptcha",
                     ),
                 )
-            val scanStep =
-                ScanStep(
-                    brokerName = testBrokerName,
-                    stepType = "scan",
-                    actions = listOf(testAction),
-                    scanType = "initial",
-                )
             val state =
                 State(
                     runType = RunType.MANUAL,
-                    brokerStepsToExecute = listOf(scanStep),
+                    brokerStepsToExecute = listOf(testScanStep),
                     profileQuery = testProfileQuery,
                     currentBrokerStepIndex = 0,
                     currentActionIndex = testCurrentActionIndex,
@@ -405,17 +385,10 @@ class JsActionSuccessEventHandlerTest {
                         callback = SolveCaptchaResponse.CallbackData(eval = "callback-script"),
                     ),
                 )
-            val scanStep =
-                ScanStep(
-                    brokerName = testBrokerName,
-                    stepType = "scan",
-                    actions = listOf(testAction),
-                    scanType = "initial",
-                )
             val state =
                 State(
                     runType = RunType.MANUAL,
-                    brokerStepsToExecute = listOf(scanStep),
+                    brokerStepsToExecute = listOf(testScanStep),
                     profileQuery = testProfileQuery,
                     currentBrokerStepIndex = 0,
                     currentActionIndex = testCurrentActionIndex,
@@ -455,17 +428,10 @@ class JsActionSuccessEventHandlerTest {
                     actionType = "condition",
                     response = ConditionResponse.ResponseData(actions = conditionActions),
                 )
-            val scanStep =
-                ScanStep(
-                    brokerName = testBrokerName,
-                    stepType = "scan",
-                    actions = listOf(testAction),
-                    scanType = "initial",
-                )
             val state =
                 State(
                     runType = RunType.MANUAL,
-                    brokerStepsToExecute = listOf(scanStep),
+                    brokerStepsToExecute = listOf(testScanStep),
                     profileQuery = testProfileQuery,
                     currentBrokerStepIndex = 0,
                     currentActionIndex = testCurrentActionIndex,
@@ -492,17 +458,10 @@ class JsActionSuccessEventHandlerTest {
                 actionType = "condition",
                 response = ConditionResponse.ResponseData(actions = emptyList()),
             )
-        val scanStep =
-            ScanStep(
-                brokerName = testBrokerName,
-                stepType = "scan",
-                actions = listOf(testAction),
-                scanType = "initial",
-            )
         val state =
             State(
                 runType = RunType.MANUAL,
-                brokerStepsToExecute = listOf(scanStep),
+                brokerStepsToExecute = listOf(testScanStep),
                 profileQuery = testProfileQuery,
                 currentBrokerStepIndex = 0,
                 currentActionIndex = testCurrentActionIndex,
@@ -534,10 +493,12 @@ class JsActionSuccessEventHandlerTest {
             )
         val optOutStep =
             OptOutStep(
-                brokerName = testBrokerName,
-                stepType = "optout",
-                actions = listOf(testAction),
-                optOutType = "form",
+                broker = testBroker1,
+                step = OptOutStepActions(
+                    stepType = "optout",
+                    actions = listOf(testAction),
+                    optOutType = "form",
+                ),
                 profileToOptOut = testExtractedProfile,
             )
         val state =
@@ -574,9 +535,12 @@ class JsActionSuccessEventHandlerTest {
             )
         val emailConfirmationStep =
             EmailConfirmationStep(
-                brokerName = testBrokerName,
-                stepType = "emailConfirmation",
-                actions = listOf(testAction),
+                broker = testBroker1,
+                step = OptOutStepActions(
+                    stepType = "optout",
+                    actions = listOf(testAction),
+                    optOutType = "form",
+                ),
                 emailConfirmationJob = testEmailConfirmationJob,
                 profileToOptOut = testExtractedProfile,
             )

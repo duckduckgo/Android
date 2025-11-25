@@ -70,13 +70,13 @@ class ExecuteBrokerStepActionEventHandler @Inject constructor() : EventHandler {
         val currentBrokerStep = state.brokerStepsToExecute[state.currentBrokerStepIndex]
         val requestData = (event as ExecuteBrokerStepAction).actionRequestData
 
-        return if (state.currentActionIndex == currentBrokerStep.actions.size) {
+        return if (state.currentActionIndex == currentBrokerStep.step.actions.size) {
             Next(
                 nextState = state,
                 nextEvent = BrokerStepCompleted(needsEmailConfirmation = false, isSuccess = true),
             )
         } else {
-            val actionToExecute = currentBrokerStep.actions[state.currentActionIndex]
+            val actionToExecute = currentBrokerStep.step.actions[state.currentActionIndex]
 
             if ((currentBrokerStep is OptOutStep || currentBrokerStep is EmailConfirmationStep) &&
                 actionToExecute.needsEmail &&
@@ -97,7 +97,7 @@ class ExecuteBrokerStepActionEventHandler @Inject constructor() : EventHandler {
                     sideEffect =
                     GetEmailForProfile(
                         actionId = actionToExecute.id,
-                        brokerName = currentBrokerStep.brokerName,
+                        brokerName = currentBrokerStep.broker.name,
                         extractedProfile = extractedProfile!!,
                         profileQuery = state.profileQuery,
                     ),
@@ -153,7 +153,7 @@ class ExecuteBrokerStepActionEventHandler @Inject constructor() : EventHandler {
                         sideEffect =
                         AwaitCaptchaSolution(
                             actionId = actionToExecute.id,
-                            brokerName = currentBrokerStep.brokerName,
+                            brokerName = currentBrokerStep.broker.name,
                             transactionID = state.transactionID,
                             attempt = 0,
                         ),
