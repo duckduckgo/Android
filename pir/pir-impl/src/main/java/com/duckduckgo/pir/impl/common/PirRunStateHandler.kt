@@ -289,6 +289,7 @@ class RealPirRunStateHandler @Inject constructor(
     }
 
     private suspend fun handleBrokerManualScanStarted(state: BrokerManualScanStarted) {
+        pixelSender.reportScanStarted(brokerUrl = state.broker.url)
         eventsRepository.saveBrokerScanLog(
             PirBrokerScanLog(
                 eventTimeInMillis = state.eventTimeInMillis,
@@ -318,6 +319,7 @@ class RealPirRunStateHandler @Inject constructor(
     }
 
     private suspend fun handleBrokerScheduledScanStarted(state: BrokerScheduledScanStarted) {
+        pixelSender.reportScanStarted(brokerUrl = state.broker.url)
         eventsRepository.saveBrokerScanLog(
             PirBrokerScanLog(
                 eventTimeInMillis = state.eventTimeInMillis,

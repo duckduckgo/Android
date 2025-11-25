@@ -62,6 +62,9 @@ import com.squareup.anvil.annotations.ContributesBinding
 import logcat.logcat
 import javax.inject.Inject
 
+/**
+ * Refer to personal_information_removal.json5 for definition of pixels in this class.
+ */
 interface PirPixelSender {
     /**
      * Emits a pixel to signal that a manually initiated scan has started.
