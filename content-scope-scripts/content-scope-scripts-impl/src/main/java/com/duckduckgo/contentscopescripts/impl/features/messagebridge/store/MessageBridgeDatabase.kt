@@ -31,4 +31,4 @@ abstract class MessageBridgeDatabase : RoomDatabase() {
     abstract fun messageBridgeDao(): MessageBridgeDao
 }
 
-val ALL_MIGRATIONS = emptyArray<Migration>()
+val ALL_MIGRATIONS = emptyList<Migration>()

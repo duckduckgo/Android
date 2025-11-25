@@ -31,4 +31,4 @@ abstract class NavigatorInterfaceDatabase : RoomDatabase() {
     abstract fun navigatorInterfaceDao(): NavigatorInterfaceDao
 }
 
-val ALL_MIGRATIONS = emptyArray<Migration>()
+val ALL_MIGRATIONS = emptyList<Migration>()
