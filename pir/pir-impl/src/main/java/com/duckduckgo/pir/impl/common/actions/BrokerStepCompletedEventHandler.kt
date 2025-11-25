@@ -62,7 +62,7 @@ class BrokerStepCompletedEventHandler @Inject constructor(
                     broker = currentBrokerStep.broker,
                     extractedProfile = (currentBrokerStep as OptOutStep).profileToOptOut,
                     attemptId = state.attemptId ?: "no-attempt-id",
-                    lastActionId = currentBrokerStep.step.actions[state.currentBrokerStepIndex].id,
+                    lastActionId = currentBrokerStep.step.actions[state.currentActionIndex].id,
                 ),
             )
         } else {
@@ -97,7 +97,7 @@ class BrokerStepCompletedEventHandler @Inject constructor(
                 val isManual = state.runType == RunType.MANUAL
                 if (isSuccess) {
                     // If success, it means we reached currentBrokerStepIndex == currentBrokerStep.step.actions.size, so last action would be -1.
-                    val lastAction = currentBrokerStep.step.actions[state.currentBrokerStepIndex - 1]
+                    val lastAction = currentBrokerStep.step.actions[state.currentActionIndex - 1]
 
                     pirRunStateHandler.handleState(
                         BrokerScanSuccess(
@@ -112,7 +112,7 @@ class BrokerStepCompletedEventHandler @Inject constructor(
                     )
                 } else {
                     // Whatever last action that was executed is the last action that failed.
-                    val lastAction = currentBrokerStep.step.actions[state.currentBrokerStepIndex]
+                    val lastAction = currentBrokerStep.step.actions[state.currentActionIndex]
                     pirRunStateHandler.handleState(
                         BrokerScanFailed(
                             broker = currentBrokerStep.broker,
@@ -142,7 +142,7 @@ class BrokerStepCompletedEventHandler @Inject constructor(
                     )
                 } else {
                     // Whatever last action that was executed is the last action that failed.
-                    val lastAction = currentBrokerStep.step.actions[state.currentBrokerStepIndex]
+                    val lastAction = currentBrokerStep.step.actions[state.currentActionIndex]
 
                     BrokerRecordOptOutFailed(
                         broker = currentBrokerStep.broker,

@@ -20,7 +20,6 @@ import com.duckduckgo.pir.impl.common.BrokerStepsParser.BrokerStep
 import com.duckduckgo.pir.impl.common.PirJob.RunType
 import com.duckduckgo.pir.impl.models.ExtractedProfile
 import com.duckduckgo.pir.impl.models.ProfileQuery
-import com.duckduckgo.pir.impl.pixels.PirStage
 import com.duckduckgo.pir.impl.scripts.models.BrokerAction
 import com.duckduckgo.pir.impl.scripts.models.PirError
 import com.duckduckgo.pir.impl.scripts.models.PirScriptRequestData
@@ -56,14 +55,6 @@ interface PirActionsRunnerStateEngine {
         val actionRetryCount: Int = 0,
         val generatedEmailData: GeneratedEmailData? = null,
         val attemptId: String? = null,
-        val stage: StageState = StageState(
-            stage = PirStage.NOT_STARTED,
-        ),
-    )
-
-    data class StageState(
-        val stage: PirStage,
-        val stageStartTimeMs: Long = 0L,
     )
 
     /**

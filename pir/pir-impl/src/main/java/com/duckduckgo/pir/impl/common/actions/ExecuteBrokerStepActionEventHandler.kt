@@ -171,7 +171,7 @@ class ExecuteBrokerStepActionEventHandler @Inject constructor(
                             BrokerScanActionStarted(
                                 broker = currentBrokerStep.broker,
                                 profileQueryId = state.profileQuery.id,
-                                currentAtemptCount = state.actionRetryCount,
+                                currentAtemptCount = state.actionRetryCount + 1, // actionRetryCount starts at 0
                                 currentAction = actionToExecute,
                             ),
                         )
