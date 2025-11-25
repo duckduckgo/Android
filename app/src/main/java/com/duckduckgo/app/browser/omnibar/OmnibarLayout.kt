@@ -610,6 +610,8 @@ class OmnibarLayout @JvmOverloads constructor(
         }
 
         duckAIHeader.isVisible = viewState.showDuckAIHeader
+        duckAISidebar.isVisible = viewState.showDuckAIHeader
+
         leadingIconContainer.isGone = viewState.showDuckAIHeader
         omnibarTextInput.isGone = viewState.showDuckAIHeader
 
@@ -900,7 +902,6 @@ class OmnibarLayout @JvmOverloads constructor(
         renderPulseAnimation(viewState)
         pageLoadingIndicator.isVisible = viewState.isLoading
         voiceSearchButton.isVisible = viewState.showVoiceSearch
-        duckAISidebar.isVisible = viewState.showDuckAIHeader
     }
 
     private fun renderCustomTabMode(

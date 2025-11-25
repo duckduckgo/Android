@@ -1581,6 +1581,7 @@ class BrowserTabViewModel @Inject constructor(
                         }
                     } else {
                         withContext(dispatchers.main()) {
+                            evaluateDuckAIPage(stateChange.url)
                             pageChanged(stateChange.url, stateChange.title)
                         }
                     }
@@ -2214,7 +2215,6 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     private fun onSiteChanged() {
-        logcat { "Duck.ai: onSiteChanged" }
         httpsUpgraded = false
         site?.isDesktopMode = currentBrowserViewState().isDesktopBrowsingMode
         viewModelScope.launch {
