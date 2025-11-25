@@ -18,7 +18,9 @@ package com.duckduckgo.malicioussiteprotection.impl
 
 import android.annotation.SuppressLint
 import android.content.Context
-import androidx.room.Room
+import com.duckduckgo.data.store.api.DatabaseExecutor.Custom
+import com.duckduckgo.data.store.api.DatabaseProvider
+import com.duckduckgo.data.store.api.RoomDatabaseConfig
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.malicioussiteprotection.impl.data.db.MaliciousSiteDao
 import com.duckduckgo.malicioussiteprotection.impl.data.db.MaliciousSitesDatabase
@@ -35,7 +37,6 @@ import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import java.io.File
 import java.security.MessageDigest
-import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit.SECONDS
 import javax.inject.Named
 import javax.inject.Qualifier
@@ -54,13 +55,16 @@ class MaliciousSiteModule {
 
     @Provides
     @SingleInstanceIn(AppScope::class)
-    fun provideMaliciousSiteProtectionDatabase(context: Context): MaliciousSitesDatabase {
-        return Room.databaseBuilder(context, MaliciousSitesDatabase::class.java, "malicious_sites.db")
-            .addMigrations(*ALL_MIGRATIONS)
-            .setQueryExecutor(Executors.newFixedThreadPool(4))
-            .setTransactionExecutor(Executors.newSingleThreadExecutor())
-            .fallbackToDestructiveMigration()
-            .build()
+    fun provideMaliciousSiteProtectionDatabase(databaseProvider: DatabaseProvider): MaliciousSitesDatabase {
+        return databaseProvider.buildRoomDatabase(
+            MaliciousSitesDatabase::class.java,
+            "malicious_sites.db",
+            RoomDatabaseConfig(
+                migrations = ALL_MIGRATIONS.toList(),
+                fallbackToDestructiveMigration = true,
+                executor = Custom(queryPoolSize = 1, transactionPoolSize = 4),
+            ),
+        )
     }
 
     @Provides
