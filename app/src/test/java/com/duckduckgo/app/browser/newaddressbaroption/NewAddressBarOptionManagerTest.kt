@@ -18,6 +18,7 @@ package com.duckduckgo.app.browser.newaddressbaroption
 
 import com.duckduckgo.app.browser.omnibar.OmnibarType
 import com.duckduckgo.app.onboarding.store.AppStage
+import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.onboarding.store.UserStageStore
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.common.test.CoroutineTestRule
@@ -62,6 +63,9 @@ class NewAddressBarOptionManagerTest {
     @Mock
     private var settingsDataStoreMock: SettingsDataStore = mock()
 
+    @Mock
+    private var onboardingStoreMock: OnboardingStore = mock()
+
     private val showNewAddressBarOptionAnnouncementFlow = MutableStateFlow(false)
     private val showOmnibarShortcutInAllStatesFlow = MutableStateFlow(false)
     private val showInputScreenFlow = MutableStateFlow(false)
@@ -85,6 +89,7 @@ class NewAddressBarOptionManagerTest {
                     remoteMessagingRepositoryMock,
                     newAddressBarOptionDataStoreMock,
                     settingsDataStoreMock,
+                    onboardingStoreMock,
                     coroutineTestRule.testDispatcherProvider,
                 )
         }
@@ -294,6 +299,28 @@ class NewAddressBarOptionManagerTest {
             verify(newAddressBarOptionDataStoreMock).setAsShown()
         }
 
+    @Test
+    fun `when input screen selection exists then showChoiceScreen does not show dialog`() =
+        runTest {
+            setupAllConditionsMet()
+            whenever(onboardingStoreMock.getInputScreenSelection()).thenReturn(true)
+
+            testee.showChoiceScreen(mock(), isLaunchedFromExternal = false)
+
+            verify(duckChatMock, never()).showNewAddressBarOptionChoiceScreen(any(), any())
+        }
+
+    @Test
+    fun `when input screen selection is false then showChoiceScreen does not show dialog`() =
+        runTest {
+            setupAllConditionsMet()
+            whenever(onboardingStoreMock.getInputScreenSelection()).thenReturn(false)
+
+            testee.showChoiceScreen(mock(), isLaunchedFromExternal = false)
+
+            verify(duckChatMock, never()).showNewAddressBarOptionChoiceScreen(any(), any())
+        }
+
     private suspend fun setupAllConditionsMet() {
         whenever(duckChatMock.isEnabled()).thenReturn(true)
         whenever(userStageStoreMock.getUserAppStage()).thenReturn(AppStage.ESTABLISHED)
@@ -304,5 +331,6 @@ class NewAddressBarOptionManagerTest {
         whenever(remoteMessagingRepositoryMock.dismissedMessages()).thenReturn(emptyList())
         whenever(settingsDataStoreMock.omnibarType).thenReturn(OmnibarType.SINGLE_TOP)
         whenever(newAddressBarOptionDataStoreMock.wasValidated()).thenReturn(true)
+        whenever(onboardingStoreMock.getInputScreenSelection()).thenReturn(null)
     }
 }

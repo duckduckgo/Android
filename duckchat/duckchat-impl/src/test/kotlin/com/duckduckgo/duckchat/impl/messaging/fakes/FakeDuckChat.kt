@@ -65,6 +65,10 @@ class FakeDuckChat(
         // No-op for testing
     }
 
+    override suspend fun setInputScreenUserSetting(enabled: Boolean) {
+        // No-op for testing
+    }
+
     fun setEnabled(enabled: Boolean) {
         this.enabled = enabled
     }

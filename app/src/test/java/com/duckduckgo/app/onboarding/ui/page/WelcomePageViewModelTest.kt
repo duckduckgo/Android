@@ -22,6 +22,7 @@ import app.cash.turbine.test
 import com.duckduckgo.app.browser.omnibar.OmnibarType
 import com.duckduckgo.app.global.DefaultRoleBrowserDialog
 import com.duckduckgo.app.global.install.AppInstallStore
+import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.Finish
 import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.OnboardingSkipped
 import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.ShowAddressBarPositionDialog
@@ -42,12 +43,15 @@ import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_INTRO_SHOWN_UNIQUE
 import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_RESUME_ONBOARDING_PRESSED
 import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_SKIP_ONBOARDING_PRESSED
 import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_SKIP_ONBOARDING_SHOWN_UNIQUE
+import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Unique
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
+import com.duckduckgo.feature.toggles.api.Toggle
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert
 import org.junit.Rule
@@ -68,6 +72,25 @@ class WelcomePageViewModelTest {
     private val mockSettingsDataStore: SettingsDataStore = mock()
     private val mockAppBuildConfig: AppBuildConfig = mock()
     private val mockOnboardingDesignExperimentManager: OnboardingDesignExperimentManager = mock()
+    private val mockOnboardingStore: OnboardingStore = mock()
+    private val mockAndroidBrowserConfigFeature: AndroidBrowserConfigFeature = FakeFeatureToggleFactory.create(
+        AndroidBrowserConfigFeature::class.java,
+    )
+
+    private fun createViewModel(): WelcomePageViewModel {
+        return WelcomePageViewModel(
+            mockDefaultRoleBrowserDialog,
+            mockContext,
+            mockPixel,
+            mockAppInstallStore,
+            mockSettingsDataStore,
+            coroutineRule.testDispatcherProvider,
+            mockAppBuildConfig,
+            mockOnboardingDesignExperimentManager,
+            mockOnboardingStore,
+            mockAndroidBrowserConfigFeature,
+        )
+    }
 
     private val testee: WelcomePageViewModel by lazy {
         WelcomePageViewModel(
@@ -79,6 +102,8 @@ class WelcomePageViewModelTest {
             coroutineRule.testDispatcherProvider,
             mockAppBuildConfig,
             mockOnboardingDesignExperimentManager,
+            mockOnboardingStore,
+            mockAndroidBrowserConfigFeature,
         )
     }
 
@@ -386,5 +411,51 @@ class WelcomePageViewModelTest {
                 Assert.assertTrue(command is ShowComparisonChart)
             }
             verify(mockPixel).fire(PREONBOARDING_RESUME_ONBOARDING_PRESSED)
+        }
+
+    @Test
+    fun whenOnPrimaryCtaClickedWithInputScreenSelectedThenStoreSelectionAndFinish() =
+        runTest {
+            mockAndroidBrowserConfigFeature.showInputScreenOnboarding().setRawStoredState(Toggle.State(enable = true))
+            testee.onInputScreenOptionSelected(true)
+            testee.onPrimaryCtaClicked(PreOnboardingDialogType.INPUT_SCREEN)
+
+            testee.commands.test {
+                val command = awaitItem()
+                Assert.assertTrue(command is Finish)
+            }
+            verify(mockOnboardingStore).storeInputScreenSelection(true)
+        }
+
+    @Test
+    fun whenOnPrimaryCtaClickedWithInputScreenNotSelectedThenStoreSelectionAndFinish() =
+        runTest {
+            mockAndroidBrowserConfigFeature.showInputScreenOnboarding().setRawStoredState(Toggle.State(enable = true))
+            testee.onInputScreenOptionSelected(false)
+            testee.onPrimaryCtaClicked(PreOnboardingDialogType.INPUT_SCREEN)
+
+            testee.commands.test {
+                val command = awaitItem()
+                Assert.assertTrue(command is Finish)
+            }
+            verify(mockOnboardingStore).storeInputScreenSelection(false)
+        }
+
+    @Test
+    fun whenInputScreenOnboardingIsEnabledThenGetMaxPageCountReturns3() =
+        runTest {
+            mockAndroidBrowserConfigFeature.showInputScreenOnboarding().setRawStoredState(Toggle.State(enable = true))
+            val viewModel = createViewModel()
+
+            Assert.assertEquals(3, viewModel.getMaxPageCount())
+        }
+
+    @Test
+    fun whenInputScreenOnboardingIsDisabledThenGetMaxPageCountReturns2() =
+        runTest {
+            mockAndroidBrowserConfigFeature.showInputScreenOnboarding().setRawStoredState(Toggle.State(enable = false))
+            val viewModel = createViewModel()
+
+            Assert.assertEquals(2, viewModel.getMaxPageCount())
         }
 }

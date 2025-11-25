@@ -54,6 +54,7 @@ import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_INTRO_SHOWN_UNIQUE
 import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_RESUME_ONBOARDING_PRESSED
 import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_SKIP_ONBOARDING_PRESSED
 import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_SKIP_ONBOARDING_SHOWN_UNIQUE
+import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter
@@ -81,12 +82,24 @@ class WelcomePageViewModel @Inject constructor(
     private val appBuildConfig: AppBuildConfig,
     private val onboardingDesignExperimentManager: OnboardingDesignExperimentManager,
     private val onboardingStore: OnboardingStore,
+    private val androidBrowserConfigFeature: AndroidBrowserConfigFeature,
 ) : ViewModel() {
     private val _commands = Channel<Command>(1, DROP_OLDEST)
     val commands: Flow<Command> = _commands.receiveAsFlow()
 
     private var defaultAddressBarPosition: Boolean = true
     private var inputScreenSelected: Boolean = true
+    private var maxPageCount: Int = 2
+
+    init {
+        viewModelScope.launch(dispatchers.io()) {
+            maxPageCount = if (androidBrowserConfigFeature.showInputScreenOnboarding().isEnabled()) {
+                3
+            } else {
+                2
+            }
+        }
+    }
 
     sealed interface Command {
         data object ShowInitialReinstallUserDialog : Command
@@ -169,7 +182,11 @@ class WelcomePageViewModel @Inject constructor(
                     } else {
                         onboardingDesignExperimentManager.fireAddressBarSetTopPixel()
                     }
-                    _commands.send(Command.ShowInputScreenDialog)
+                    if (androidBrowserConfigFeature.showInputScreenOnboarding().isEnabled()) {
+                        _commands.send(Command.ShowInputScreenDialog)
+                    } else {
+                        _commands.send(Finish)
+                    }
                 }
             }
 
@@ -273,7 +290,7 @@ class WelcomePageViewModel @Inject constructor(
                 }
             }
             INPUT_SCREEN -> {
-                // Pixel tracking can be added here if needed
+                // no-op
             }
         }
     }
@@ -287,6 +304,10 @@ class WelcomePageViewModel @Inject constructor(
 
     fun onInputScreenOptionSelected(withAi: Boolean) {
         inputScreenSelected = withAi
+    }
+
+    fun getMaxPageCount(): Int {
+        return maxPageCount
     }
 
     fun loadDaxDialog() {

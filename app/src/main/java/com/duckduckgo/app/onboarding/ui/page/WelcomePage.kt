@@ -247,8 +247,10 @@ class WelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome_p
                     binding.daxDialogCta.dialogTextCta.text = ""
                     TransitionManager.beginDelayedTransition(binding.daxDialogCta.cardView, AutoTransition())
                     binding.daxDialogCta.progressBarText.show()
-                    binding.daxDialogCta.progressBarText.text = "1 / 3"
+                    val maxPages = viewModel.getMaxPageCount()
+                    binding.daxDialogCta.progressBarText.text = "1 / $maxPages"
                     binding.daxDialogCta.progressBar.show()
+                    binding.daxDialogCta.progressBar.max = maxPages
                     binding.daxDialogCta.progressBar.progress = 1
                     val ctaText = it.getString(R.string.preOnboardingDaxDialog2Title)
                     binding.daxDialogCta.hiddenTextCta.text = ctaText.html(it)
@@ -300,8 +302,10 @@ class WelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome_p
                     binding.daxDialogCta.comparisonChart.root.gone()
                     TransitionManager.beginDelayedTransition(binding.daxDialogCta.cardView, AutoTransition())
                     binding.daxDialogCta.progressBarText.show()
-                    binding.daxDialogCta.progressBarText.text = "2 / 3"
+                    val maxPages = viewModel.getMaxPageCount()
+                    binding.daxDialogCta.progressBarText.text = "2 / $maxPages"
                     binding.daxDialogCta.progressBar.show()
+                    binding.daxDialogCta.progressBar.max = maxPages
                     binding.daxDialogCta.progressBar.progress = 2
                     val ctaText = it.getString(R.string.preOnboardingAddressBarTitle).run {
                         if (onboardingDesignExperimentManager.isModifiedControlEnrolledAndEnabled()) {
@@ -341,10 +345,12 @@ class WelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome_p
                     binding.daxDialogCta.addressBarPosition.root.gone()
                     TransitionManager.beginDelayedTransition(binding.daxDialogCta.cardView, AutoTransition())
                     binding.daxDialogCta.progressBarText.show()
-                    binding.daxDialogCta.progressBarText.text = "3 / 3"
+                    val maxPages = viewModel.getMaxPageCount()
+                    binding.daxDialogCta.progressBarText.text = "3 / $maxPages"
                     binding.daxDialogCta.progressBar.show()
+                    binding.daxDialogCta.progressBar.max = maxPages
                     binding.daxDialogCta.progressBar.progress = 3
-                    val ctaText = it.getString(R.string.preOnboardingAiChatAccessTitle)
+                    val ctaText = it.getString(R.string.preOnboardingInputScreenTitle)
                     binding.daxDialogCta.hiddenTextCta.text = ctaText.html(it)
                     binding.daxDialogCta.primaryCta.alpha = MIN_ALPHA
                     binding.daxDialogCta.duckAiInputScreenToggleContainer.show()
@@ -363,14 +369,14 @@ class WelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome_p
                         viewModel.onInputScreenOptionSelected(withAi = true)
                     }
 
-                    val descriptionText = it.getString(R.string.preOnboardingAiChatAccessDescription)
+                    val descriptionText = it.getString(R.string.preOnboardingInputScreenDescription)
                     binding.daxDialogCta.duckAiInputScreenToggleDescription.text = descriptionText.html(it)
                     binding.daxDialogCta.duckAiInputScreenToggleDescription.show()
                     binding.daxDialogCta.duckAiInputScreenToggleDescription.alpha = MIN_ALPHA
 
                     afterAnimation = {
                         binding.daxDialogCta.dialogTextCta.finishAnimation()
-                        binding.daxDialogCta.primaryCta.text = it.getString(R.string.preOnboardingAiChatAccessButton)
+                        binding.daxDialogCta.primaryCta.text = it.getString(R.string.preOnboardingInputScreenButton)
                         binding.daxDialogCta.primaryCta.setOnClickListener { viewModel.onPrimaryCtaClicked(INPUT_SCREEN) }
                         binding.daxDialogCta.primaryCta.animate().alpha(MAX_ALPHA).duration = ANIMATION_DURATION
                         binding.daxDialogCta.duckAiInputScreenToggleContainer.animate().alpha(MAX_ALPHA).duration = ANIMATION_DURATION
