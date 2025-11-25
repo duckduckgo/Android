@@ -1,0 +1,25 @@
+appId: com.duckduckgo.mobile.android
+androidWebViewHierarchy: devtools
+tags:
+  ## This tag will be updated to securityTest once we close the https://app.asana.com/1/137249556945/project/1211724162604201/task/1212015085457815?focus=true task
+  - securityTestInternal
+---
+- retry:
+    maxRetries: 3
+    commands:
+      - launchApp:
+          clearState: true
+          stopApp: true
+      - runFlow: ../shared/skip_all_onboarding.yaml
+
+      - doubleTapOn:
+          id: "omnibarTextInput"
+      - inputText: "http://privacy-test-pages.site/security/address-bar-spoofing/spoof-about-blank-emptyaddress.html"
+      - pressKey: Enter
+
+      - tapOn: "run"
+
+      - copyTextFrom:
+          id: "omnibarTextInput"
+
+      - assertTrue: ${maestro.copiedText == "about:blank" }
