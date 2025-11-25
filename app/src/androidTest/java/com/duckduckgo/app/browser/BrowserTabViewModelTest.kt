@@ -1959,7 +1959,7 @@ class BrowserTabViewModelTest {
         loadUrl(null)
         testee.onMessageReceived()
 
-        val result = testee.onUserPressedBack(isCustomTab = false)
+        testee.onUserPressedBack(isCustomTab = false)
 
         verify(mockTabRepository, never()).deleteTabAndSelectSource(any())
     }
@@ -1988,7 +1988,7 @@ class BrowserTabViewModelTest {
         setupNavigation(isBrowsing = true, canGoBack = true)
         testee.onMessageReceived()
 
-        val result = testee.onUserPressedBack(isCustomTab = true)
+        testee.onUserPressedBack(isCustomTab = true)
 
         verify(mockTabRepository, never()).deleteTabAndSelectSource(any())
     }
