@@ -20,11 +20,13 @@ import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.graphics.Color
 import android.net.Uri
 import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.browser.customtabs.CustomTabColorSchemeParams
 import androidx.browser.customtabs.CustomTabsIntent
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.R
@@ -71,6 +73,10 @@ class CustomTabsInternalSettingsActivity : DuckDuckGoActivity() {
             }
         }
 
+        binding.clearColor.setOnClickListener {
+            clearColor()
+        }
+
         binding.defaultBrowser.setOnClickListener {
             launchDefaultAppActivityForResult(defaultAppActivityResultLauncher)
         }
@@ -95,8 +101,42 @@ class CustomTabsInternalSettingsActivity : DuckDuckGoActivity() {
         }
     }
 
+    private fun clearColor() {
+        binding.toolbarColorInput.text = ""
+        Toast.makeText(this, "Custom color cleared", Toast.LENGTH_SHORT).show()
+    }
+
+    private fun validateColorFormat(colorText: String): Boolean {
+        return try {
+            if (!colorText.startsWith("#")) {
+                false
+            } else {
+                Color.parseColor(colorText)
+                true
+            }
+        } catch (e: IllegalArgumentException) {
+            false
+        }
+    }
+
     private fun openCustomTab(url: String) {
-        val customTabsIntent = CustomTabsIntent.Builder().build()
+        val builder = CustomTabsIntent.Builder()
+
+        // Apply custom toolbar color if available and valid
+        val color = binding.toolbarColorInput.text
+        if (color.isNotEmpty() && validateColorFormat(color)) {
+            try {
+                val color = Color.parseColor(color)
+                val colorSchemeParams = CustomTabColorSchemeParams.Builder()
+                    .setToolbarColor(color)
+                    .build()
+                builder.setDefaultColorSchemeParams(colorSchemeParams)
+            } catch (e: IllegalArgumentException) {
+                logcat(WARN) { "Failed to parse color: $color" }
+            }
+        }
+
+        val customTabsIntent = builder.build()
         kotlin.runCatching {
             customTabsIntent.launchUrl(this, Uri.parse(url))
         }.onFailure {
