@@ -58,7 +58,7 @@ class BrokerStepCompletedEventHandler @Inject constructor(
             val currentBrokerStep = state.brokerStepsToExecute[state.currentBrokerStepIndex]
             pirRunStateHandler.handleState(
                 PirRunStateHandler.PirRunState.BrokerRecordEmailConfirmationNeeded(
-                    brokerName = currentBrokerStep.broker.name,
+                    broker = currentBrokerStep.broker,
                     extractedProfile = (currentBrokerStep as OptOutStep).profileToOptOut,
                     attemptId = state.attemptId ?: "no-attempt-id",
                     lastActionId = currentBrokerStep.step.actions[state.currentBrokerStepIndex].id,
@@ -95,7 +95,7 @@ class BrokerStepCompletedEventHandler @Inject constructor(
             RunType.MANUAL ->
                 pirRunStateHandler.handleState(
                     BrokerManualScanCompleted(
-                        brokerName = currentBrokerStep.broker.name,
+                        broker = currentBrokerStep.broker,
                         profileQueryId = state.profileQuery.id,
                         eventTimeInMillis = currentTimeProvider.currentTimeMillis(),
                         totalTimeMillis = totalTimeMillis,
@@ -107,7 +107,7 @@ class BrokerStepCompletedEventHandler @Inject constructor(
             RunType.SCHEDULED ->
                 pirRunStateHandler.handleState(
                     BrokerScheduledScanCompleted(
-                        brokerName = currentBrokerStep.broker.name,
+                        broker = currentBrokerStep.broker,
                         profileQueryId = state.profileQuery.id,
                         eventTimeInMillis = currentTimeProvider.currentTimeMillis(),
                         totalTimeMillis = totalTimeMillis,
@@ -120,7 +120,7 @@ class BrokerStepCompletedEventHandler @Inject constructor(
                 val currentOptOutStep = currentBrokerStep as OptOutStep
                 if (isSuccess) {
                     BrokerRecordOptOutSubmitted(
-                        brokerName = currentOptOutStep.broker.name,
+                        broker = currentBrokerStep.broker,
                         extractedProfile = currentOptOutStep.profileToOptOut,
                         attemptId = state.attemptId ?: "no-attempt-id",
                         startTimeInMillis = state.brokerStepStartTime,
@@ -132,7 +132,7 @@ class BrokerStepCompletedEventHandler @Inject constructor(
                     val lastAction = currentBrokerStep.step.actions[state.currentBrokerStepIndex]
 
                     BrokerRecordOptOutFailed(
-                        brokerName = currentOptOutStep.broker.name,
+                        broker = currentBrokerStep.broker,
                         extractedProfile = currentOptOutStep.profileToOptOut,
                         startTimeInMillis = state.brokerStepStartTime,
                         endTimeInMillis = currentTimeProvider.currentTimeMillis(),
@@ -150,7 +150,7 @@ class BrokerStepCompletedEventHandler @Inject constructor(
                 val currentOptOutStep = currentBrokerStep as EmailConfirmationStep
                 pirRunStateHandler.handleState(
                     BrokerRecordEmailConfirmationCompleted(
-                        brokerName = currentOptOutStep.broker.name,
+                        broker = currentBrokerStep.broker,
                         isSuccess = isSuccess,
                         // Success means we finished all steps and reaching here means that index has been incremented. If error, we don't increment.
                         lastActionId = if (isSuccess) {

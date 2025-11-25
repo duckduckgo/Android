@@ -97,7 +97,7 @@ class ExecuteNextBrokerStepEventHandler @Inject constructor(
             MANUAL ->
                 pirRunStateHandler.handleState(
                     BrokerManualScanStarted(
-                        brokerName,
+                        broker = currentBrokerStep.broker,
                         currentTimeProvider.currentTimeMillis(),
                     ),
                 )
@@ -105,7 +105,7 @@ class ExecuteNextBrokerStepEventHandler @Inject constructor(
             SCHEDULED ->
                 pirRunStateHandler.handleState(
                     BrokerScheduledScanStarted(
-                        brokerName,
+                        broker = currentBrokerStep.broker,
                         currentTimeProvider.currentTimeMillis(),
                     ),
                 )
@@ -114,7 +114,7 @@ class ExecuteNextBrokerStepEventHandler @Inject constructor(
                 // It also means we are starting it for the first profile. Succeeding profiles are handled in HandleNextProfileForBroker
                 pirRunStateHandler.handleState(
                     BrokerRecordOptOutStarted(
-                        brokerName,
+                        broker = currentBrokerStep.broker,
                         (currentBrokerStep as OptOutStep).profileToOptOut,
                     ),
                 )
@@ -123,7 +123,7 @@ class ExecuteNextBrokerStepEventHandler @Inject constructor(
             EMAIL_CONFIRMATION -> {
                 pirRunStateHandler.handleState(
                     BrokerRecordEmailConfirmationStarted(
-                        brokerName = brokerName,
+                        broker = currentBrokerStep.broker,
                         extractedProfileId = (currentBrokerStep as EmailConfirmationStep).emailConfirmationJob.extractedProfileId,
                         firstActionId = currentBrokerStep.step.actions[state.currentActionIndex].id,
                     ),

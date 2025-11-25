@@ -193,7 +193,7 @@ class JsActionSuccessEventHandlerTest {
 
         val capturedState = argumentCaptor<BrokerScanActionSucceeded>()
         verify(mockPirRunStateHandler).handleState(capturedState.capture())
-        assertEquals(testBrokerName, capturedState.firstValue.brokerName)
+        assertEquals(testBroker1, capturedState.firstValue.broker)
         assertEquals(testProfileQueryId, capturedState.firstValue.profileQueryId)
         assertEquals(navigateResponse, capturedState.firstValue.pirSuccessResponse)
     }
@@ -516,7 +516,7 @@ class JsActionSuccessEventHandlerTest {
 
         val capturedState = argumentCaptor<BrokerOptOutActionSucceeded>()
         verify(mockPirRunStateHandler).handleState(capturedState.capture())
-        assertEquals(testBrokerName, capturedState.firstValue.brokerName)
+        assertEquals(testBroker1, capturedState.firstValue.broker)
         assertEquals(testExtractedProfile, capturedState.firstValue.extractedProfile)
         assertEquals(testCurrentTimeInMillis, capturedState.firstValue.completionTimeInMillis)
         assertEquals("navigate", capturedState.firstValue.actionType)
@@ -559,7 +559,7 @@ class JsActionSuccessEventHandlerTest {
 
         val capturedState = argumentCaptor<BrokerOptOutActionSucceeded>()
         verify(mockPirRunStateHandler).handleState(capturedState.capture())
-        assertEquals(testBrokerName, capturedState.firstValue.brokerName)
+        assertEquals(testBroker1, capturedState.firstValue.broker)
         assertEquals(testExtractedProfile, capturedState.firstValue.extractedProfile)
         assertEquals(testCurrentTimeInMillis, capturedState.firstValue.completionTimeInMillis)
         assertEquals("navigate", capturedState.firstValue.actionType)
