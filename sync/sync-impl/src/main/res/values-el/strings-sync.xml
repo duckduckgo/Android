@@ -208,4 +208,8 @@
 
     <string name="deep_link_auth_prompt_title">Ρύθμιση της επιλογής Συγχρονισμός και δημιουργία αντιγράφων ασφαλείας</string>
     <string name="deep_link_auth_prompt_message">Ξεκλειδώστε τη συσκευή για να ρυθμίσετε τη λειτουργία Sync &amp; Backup</string>
+
+    <!-- Sync promo in bookmark added confirmation dialog -->
+    <string name="addBookmarkDialogSyncPromoText">Συγχρόνισε σελιδοδείκτες σε όλες τις συσκευές</string>
+    <string name="addBookmarkDialogHideSyncSuggestion">Αποκρυψη</string>
 </resources>
