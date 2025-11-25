@@ -172,7 +172,7 @@ class BrowserViewModel @Inject constructor(
         .debounce(100)
 
     val tabsFlow: Flow<List<TabModel>> = tabRepository.flowTabs
-        .map { tabs -> tabs.map { tab -> TabModel(tab.tabId, tab.url, tab.skipHome) } }
+        .map { tabs -> tabs.map { tab -> TabModel(tab.tabId, tab.url, tab.skipHome, tab.sourceTabId) } }
         .distinctUntilChanged()
 
     val selectedTabIndex: Flow<Int> = combine(tabsFlow, selectedTabFlow) { tabs, selectedTab ->

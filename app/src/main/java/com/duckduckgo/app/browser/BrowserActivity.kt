@@ -1344,7 +1344,10 @@ open class BrowserActivity : DuckDuckGoActivity() {
         openMessageInNewTabJob =
             lifecycleScope.launch {
                 if (swipingTabsFeature.isEnabled) {
-                    tabPagerAdapter.setMessageForNewFragment(message)
+                    // Set the pending message BEFORE creating the tab to avoid race conditions
+                    if (sourceTabId != null) {
+                        tabPagerAdapter.setMessageForNewFragment(sourceTabId, message)
+                    }
                     tabManager.openNewTab(sourceTabId = sourceTabId)
                 } else {
                     val tabId = viewModel.onNewTabRequested(sourceTabId = sourceTabId)
