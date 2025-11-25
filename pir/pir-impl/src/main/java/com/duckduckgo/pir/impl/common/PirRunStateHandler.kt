@@ -29,6 +29,7 @@ import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerRecor
 import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerRecordOptOutStarted
 import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerRecordOptOutSubmitted
 import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerScanActionFailed
+import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerScanActionStarted
 import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerScanActionSucceeded
 import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerScanFailed
 import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerScanStarted
@@ -90,6 +91,13 @@ interface PirRunStateHandler {
             val errorCategory: String?,
             val errorDetails: String?,
             val failedAction: BrokerAction,
+        ) : PirRunState(broker)
+
+        data class BrokerScanActionStarted(
+            override val broker: Broker,
+            val profileQueryId: Long,
+            val currentAtemptCount: Int,
+            val currentAction: BrokerAction,
         ) : PirRunState(broker)
 
         data class BrokerScanActionSucceeded(
@@ -189,6 +197,7 @@ class RealPirRunStateHandler @Inject constructor(
                 is BrokerScanStarted -> handleBrokerScanStarted(pirRunState)
                 is BrokerScanFailed -> handleBrokerScanFailed(pirRunState)
                 is BrokerScanSuccess -> handleBrokerScanSuccess(pirRunState)
+                is BrokerScanActionStarted -> handleBrokerScanActionStarted(pirRunState)
                 is BrokerScanActionSucceeded -> handleBrokerScanActionSucceeded(pirRunState)
                 is BrokerScanActionFailed -> handleBrokerScanActionFailed(pirRunState)
                 is BrokerRecordOptOutStarted -> handleRecordOptOutStarted(pirRunState)
@@ -201,6 +210,17 @@ class RealPirRunStateHandler @Inject constructor(
                 is BrokerRecordEmailConfirmationCompleted -> handleBrokerRecordEmailConfirmationCompleted(pirRunState)
             }
         }
+
+    private fun handleBrokerScanActionStarted(state: BrokerScanActionStarted) {
+        pixelSender.reportScanStage(
+            brokerUrl = state.broker.url,
+            brokerVersion = state.broker.version,
+            tries = state.currentAtemptCount,
+            parentUrl = state.broker.parent ?: "",
+            actionId = state.currentAction.id,
+            actionType = state.currentAction.asActionType(),
+        )
+    }
 
     private suspend fun handleBrokerScanStarted(state: BrokerScanStarted) {
         pixelSender.reportScanStarted(brokerUrl = state.broker.url)

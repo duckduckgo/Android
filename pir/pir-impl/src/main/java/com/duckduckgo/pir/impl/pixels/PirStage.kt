@@ -87,4 +87,6 @@ enum class PirStage(val stageName: String) {
      *  (2) when it doesn't meet its expectation, continuing with regular action execution.
      */
     CONDITION_NOT_FOUND("condition-not-found"),
+
+    NOT_STARTED("not-started"),
 }

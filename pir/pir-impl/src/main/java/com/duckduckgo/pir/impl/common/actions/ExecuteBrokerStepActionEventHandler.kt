@@ -20,7 +20,10 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.pir.impl.common.BrokerStepsParser.BrokerStep
 import com.duckduckgo.pir.impl.common.BrokerStepsParser.BrokerStep.EmailConfirmationStep
 import com.duckduckgo.pir.impl.common.BrokerStepsParser.BrokerStep.OptOutStep
+import com.duckduckgo.pir.impl.common.BrokerStepsParser.BrokerStep.ScanStep
 import com.duckduckgo.pir.impl.common.PirJob
+import com.duckduckgo.pir.impl.common.PirRunStateHandler
+import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerScanActionStarted
 import com.duckduckgo.pir.impl.common.actions.EventHandler.Next
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.Event
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.Event.BrokerStepCompleted
@@ -48,7 +51,9 @@ import kotlin.reflect.KClass
     scope = AppScope::class,
     boundType = EventHandler::class,
 )
-class ExecuteBrokerStepActionEventHandler @Inject constructor() : EventHandler {
+class ExecuteBrokerStepActionEventHandler @Inject constructor(
+    private val pirRunStateHandler: PirRunStateHandler,
+) : EventHandler {
     override val event: KClass<out Event> = ExecuteBrokerStepAction::class
 
     override suspend fun invoke(
@@ -86,9 +91,11 @@ class ExecuteBrokerStepActionEventHandler @Inject constructor() : EventHandler {
                     is OptOutStep -> {
                         currentBrokerStep.profileToOptOut
                     }
+
                     is EmailConfirmationStep -> {
                         currentBrokerStep.profileToOptOut
                     }
+
                     else -> null // Invalid state
                 }
 
@@ -159,6 +166,16 @@ class ExecuteBrokerStepActionEventHandler @Inject constructor() : EventHandler {
                         ),
                     )
                 } else {
+                    if (currentBrokerStep is ScanStep) {
+                        pirRunStateHandler.handleState(
+                            BrokerScanActionStarted(
+                                broker = currentBrokerStep.broker,
+                                profileQueryId = state.profileQuery.id,
+                                currentAtemptCount = state.actionRetryCount,
+                                currentAction = actionToExecute,
+                            ),
+                        )
+                    }
                     Next(
                         nextState = state,
                         sideEffect =
