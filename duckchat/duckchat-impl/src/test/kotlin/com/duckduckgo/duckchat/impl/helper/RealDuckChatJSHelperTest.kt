@@ -559,7 +559,7 @@ class RealDuckChatJSHelperTest {
     fun whenNativeActionHistoryRequestedThenSubscriptionDataSent() = runTest {
         val result = testee.onNativeAction(NativeAction.SIDEBAR)
 
-        assertEquals("openDuckAiHistory", result.subscriptionName)
+        assertEquals("submitToggleSidebarAction", result.subscriptionName)
         assertEquals(DUCK_CHAT_FEATURE_NAME, result.featureName)
     }
 
@@ -567,7 +567,7 @@ class RealDuckChatJSHelperTest {
     fun whenNativeActionSettingsRequestedThenSubscriptionDataSent() = runTest {
         val result = testee.onNativeAction(NativeAction.DUCK_AI_SETTINGS)
 
-        assertEquals("openDuckAiSettings", result.subscriptionName)
+        assertEquals("submitOpenSettingsAction", result.subscriptionName)
         assertEquals(DUCK_CHAT_FEATURE_NAME, result.featureName)
     }
 }
