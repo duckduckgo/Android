@@ -1974,6 +1974,7 @@ class BrowserTabViewModelTest {
         initialiseViewModel()
         loadUrl(null, isBrowserShowing = true)
         setupNavigation(isBrowsing = true, canGoBack = true)
+        selectedTabLiveData.value = aTabEntity(id = "id").copy(sourceTabId = "source")
 
         val result = testee.onUserPressedBack(isCustomTab = false)
 
@@ -1989,6 +1990,7 @@ class BrowserTabViewModelTest {
 
         loadUrl(null, isBrowserShowing = true)
         setupNavigation(isBrowsing = true, canGoBack = true)
+        selectedTabLiveData.value = aTabEntity(id = "id").copy(sourceTabId = "source")
         testee.onMessageReceived()
 
         testee.onUserPressedBack(isCustomTab = true)
