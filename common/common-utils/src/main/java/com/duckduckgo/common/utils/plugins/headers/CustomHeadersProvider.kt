@@ -17,11 +17,9 @@
 package com.duckduckgo.common.utils.plugins.headers
 
 import com.duckduckgo.anvil.annotations.ContributesPluginPoint
-import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
-import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 interface CustomHeadersProvider {
@@ -45,23 +43,20 @@ interface CustomHeadersProvider {
          * @param url The url of the request.
          * @return A [Map] of headers.
          */
-        fun getHeaders(url: String): Map<String, String>
+        suspend fun getHeaders(url: String): Map<String, String>
     }
 }
 
 @ContributesBinding(AppScope::class)
 class RealCustomHeadersProvider @Inject constructor(
     private val customHeadersPluginPoint: PluginPoint<CustomHeadersProvider.CustomHeadersPlugin>,
-    private val dispatcherProvider: DispatcherProvider,
 ) : CustomHeadersProvider {
 
     override suspend fun getCustomHeaders(url: String): Map<String, String> {
-        return withContext(dispatcherProvider.io()) {
-            val customHeaders = mutableMapOf<String, String>()
-            customHeadersPluginPoint.getPlugins().forEach {
-                customHeaders.putAll(it.getHeaders(url))
-            }
-            return@withContext customHeaders.toMap()
+        val customHeaders = mutableMapOf<String, String>()
+        customHeadersPluginPoint.getPlugins().forEach {
+            customHeaders.putAll(it.getHeaders(url))
         }
+        return customHeaders.toMap()
     }
 }

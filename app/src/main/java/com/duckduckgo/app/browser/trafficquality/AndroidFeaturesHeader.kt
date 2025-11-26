@@ -21,9 +21,11 @@ import com.duckduckgo.app.browser.trafficquality.Result.Allowed
 import com.duckduckgo.app.browser.trafficquality.Result.NotAllowed
 import com.duckduckgo.app.browser.trafficquality.remote.AndroidFeaturesHeaderProvider
 import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.plugins.headers.CustomHeadersProvider.CustomHeadersPlugin
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesMultibinding
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @ContributesMultibinding(scope = AppScope::class)
@@ -33,9 +35,10 @@ class AndroidFeaturesHeaderPlugin @Inject constructor(
     private val androidBrowserConfigFeature: AndroidBrowserConfigFeature,
     private val androidFeaturesHeaderProvider: AndroidFeaturesHeaderProvider,
     private val appVersionProvider: AppVersionHeaderProvider,
+    private val dispatchers: DispatcherProvider,
 ) : CustomHeadersPlugin {
 
-    override fun getHeaders(url: String): Map<String, String> {
+    override suspend fun getHeaders(url: String): Map<String, String> {
         if (isFeatureEnabled() && duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(url)) {
             return when (val result = customHeaderAllowedChecker.isAllowed()) {
                 is Allowed -> {
@@ -58,9 +61,11 @@ class AndroidFeaturesHeaderPlugin @Inject constructor(
         }
     }
 
-    private fun isFeatureEnabled(): Boolean {
-        return androidBrowserConfigFeature.self().isEnabled() &&
-            androidBrowserConfigFeature.featuresRequestHeader().isEnabled()
+    private suspend fun isFeatureEnabled(): Boolean {
+        return withContext(dispatchers.io()) {
+            androidBrowserConfigFeature.self().isEnabled() &&
+                androidBrowserConfigFeature.featuresRequestHeader().isEnabled()
+        }
     }
 
     companion object {

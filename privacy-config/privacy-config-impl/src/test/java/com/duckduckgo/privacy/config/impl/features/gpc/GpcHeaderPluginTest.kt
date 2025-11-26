@@ -1,25 +1,31 @@
 package com.duckduckgo.privacy.config.impl.features.gpc
 
+import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.privacy.config.api.Gpc
 import com.duckduckgo.privacy.config.impl.features.gpc.RealGpc.Companion.GPC_HEADER
 import com.duckduckgo.privacy.config.impl.features.gpc.RealGpc.Companion.GPC_HEADER_VALUE
+import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
+import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 
 class GpcHeaderPluginTest {
 
+    @get:Rule
+    val coroutineRule = CoroutineTestRule()
+
     private lateinit var testee: GpcHeaderPlugin
 
     private val mockGpc: Gpc = mock()
 
     @Test
-    fun whenGetHeadersCalledWithUrlThenGpcGetHeadersIsCalledWithTheSameUrlAndHeadersReturned() {
+    fun whenGetHeadersCalledWithUrlThenGpcGetHeadersIsCalledWithTheSameUrlAndHeadersReturned() = runTest {
         val url = "url"
         val gpcHeaders = mapOf(GPC_HEADER to GPC_HEADER_VALUE)
         whenever(mockGpc.getHeaders(url)).thenReturn(gpcHeaders)
-        testee = GpcHeaderPlugin(mockGpc)
+        testee = GpcHeaderPlugin(mockGpc, coroutineRule.testDispatcherProvider)
 
         val headers = testee.getHeaders(url)
 

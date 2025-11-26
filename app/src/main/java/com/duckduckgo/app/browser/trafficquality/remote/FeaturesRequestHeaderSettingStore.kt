@@ -17,14 +17,16 @@
 package com.duckduckgo.app.browser.trafficquality.remote
 
 import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 interface FeaturesRequestHeaderStore {
-    fun getConfig(): List<TrafficQualityAppVersion>
+    suspend fun getConfig(): List<TrafficQualityAppVersion>
 }
 
 data class TrafficQualitySettingsJson(
@@ -49,19 +51,22 @@ data class TrafficQualityAppVersionFeatures(
 class FeaturesRequestHeaderSettingStore @Inject constructor(
     private val androidBrowserConfigFeature: AndroidBrowserConfigFeature,
     private val moshi: Moshi,
+    private val dispatcherProvider: DispatcherProvider,
 ) : FeaturesRequestHeaderStore {
 
     private val jsonAdapter: JsonAdapter<TrafficQualitySettingsJson> by lazy {
         moshi.adapter(TrafficQualitySettingsJson::class.java)
     }
 
-    override fun getConfig(): List<TrafficQualityAppVersion> {
-        val config = androidBrowserConfigFeature.featuresRequestHeader().getSettings()?.let {
-            runCatching {
-                val configJson = jsonAdapter.fromJson(it)
-                configJson?.versions
-            }.getOrDefault(emptyList())
-        } ?: emptyList()
-        return config
+    override suspend fun getConfig(): List<TrafficQualityAppVersion> {
+        return withContext(dispatcherProvider.io()) {
+            val config = androidBrowserConfigFeature.featuresRequestHeader().getSettings()?.let {
+                runCatching {
+                    val configJson = jsonAdapter.fromJson(it)
+                    configJson?.versions
+                }.getOrDefault(emptyList())
+            } ?: emptyList()
+            config
+        }
     }
 }
