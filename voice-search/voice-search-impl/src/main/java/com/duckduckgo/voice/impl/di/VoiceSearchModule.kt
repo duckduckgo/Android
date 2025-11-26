@@ -17,10 +17,11 @@
 package com.duckduckgo.voice.impl.di
 
 import android.content.Context
-import androidx.room.Room
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.di.IsMainProcess
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.data.store.api.DatabaseProvider
+import com.duckduckgo.data.store.api.RoomDatabaseConfig
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.voice.api.VoiceSearchStatusListener
 import com.duckduckgo.voice.impl.remoteconfig.RealVoiceSearchFeatureRepository
@@ -54,11 +55,15 @@ object VoiceSearchModule {
 
     @SingleInstanceIn(AppScope::class)
     @Provides
-    fun provideDatabase(context: Context): VoiceSearchDatabase {
-        return Room.databaseBuilder(context, VoiceSearchDatabase::class.java, "voicesearch.db")
-            .fallbackToDestructiveMigration()
-            .addMigrations(*ALL_MIGRATIONS)
-            .build()
+    fun provideVoiceSearchDatabase(databaseProvider: DatabaseProvider): VoiceSearchDatabase {
+        return databaseProvider.buildRoomDatabase(
+            VoiceSearchDatabase::class.java,
+            "voice_search.db",
+            config = RoomDatabaseConfig(
+                fallbackToDestructiveMigration = true,
+                migrations = ALL_MIGRATIONS,
+            ),
+        )
     }
 
     @SingleInstanceIn(AppScope::class)
