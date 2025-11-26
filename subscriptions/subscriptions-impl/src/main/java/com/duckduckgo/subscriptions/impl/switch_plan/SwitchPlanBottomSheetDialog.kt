@@ -169,9 +169,7 @@ class SwitchPlanBottomSheetDialog @AssistedInject constructor(
                 when (it) {
                     is CurrentPurchase.Success -> {
                         logcat { "Switch flow: Successfully switched plans" }
-                        lifecycleOwner.lifecycleScope.launch(dispatcherProvider.io()) {
-                            subscriptionSwitchWideEvent.onUIRefreshed()
-                        }
+                        subscriptionSwitchWideEvent.onUIRefreshed()
                         onSwitchSuccess.invoke()
                     }
 

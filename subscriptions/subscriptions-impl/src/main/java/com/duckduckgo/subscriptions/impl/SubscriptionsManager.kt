@@ -510,13 +510,10 @@ class RealSubscriptionsManager @Inject constructor(
             }
 
             // Start wide event tracking
-            val isUpgrade = currentSubscription.productId in listOf(MONTHLY_PLAN_US, MONTHLY_PLAN_ROW)
-            val switchType = if (isUpgrade) "upgrade" else "downgrade"
             subscriptionSwitchWideEvent.onSwitchFlowStarted(
                 context = origin,
                 fromPlan = currentSubscription.productId,
                 toPlan = planId,
-                switchType = switchType,
             )
 
             if (!isSignedIn()) {

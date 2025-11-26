@@ -16,6 +16,7 @@
 
 package com.duckduckgo.subscriptions.impl.wideevents
 
+import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.statistics.wideevents.CleanupPolicy.OnProcessStart
 import com.duckduckgo.app.statistics.wideevents.FlowStatus
 import com.duckduckgo.app.statistics.wideevents.WideEventClient
@@ -23,10 +24,14 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.subscriptions.api.SubscriptionStatus
 import com.duckduckgo.subscriptions.impl.PrivacyProFeature
+import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.MONTHLY_PLAN_ROW
+import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.MONTHLY_PLAN_US
 import com.duckduckgo.subscriptions.impl.repository.isActive
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.Lazy
 import dagger.SingleInstanceIn
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.time.Duration
 import javax.inject.Inject
@@ -36,7 +41,6 @@ interface SubscriptionSwitchWideEvent {
         context: String?,
         fromPlan: String,
         toPlan: String,
-        switchType: String,
     )
 
     suspend fun onCurrentSubscriptionValidated()
@@ -62,7 +66,7 @@ interface SubscriptionSwitchWideEvent {
         newStatus: SubscriptionStatus?,
     )
 
-    suspend fun onUIRefreshed()
+    fun onUIRefreshed()
 
     suspend fun onSwitchFailed(error: String)
 }
@@ -73,6 +77,7 @@ class SubscriptionSwitchWideEventImpl @Inject constructor(
     private val wideEventClient: WideEventClient,
     private val privacyProFeature: Lazy<PrivacyProFeature>,
     private val dispatchers: DispatcherProvider,
+    @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
 ) : SubscriptionSwitchWideEvent {
 
     private var cachedFlowId: Long? = null
@@ -81,9 +86,11 @@ class SubscriptionSwitchWideEventImpl @Inject constructor(
         context: String?,
         fromPlan: String,
         toPlan: String,
-        switchType: String,
     ) {
         if (!isFeatureEnabled()) return
+
+        val isUpgrade = fromPlan in listOf(MONTHLY_PLAN_US, MONTHLY_PLAN_ROW)
+        val switchType = if (isUpgrade) SWITCH_TYPE_UPGRADE else SWITCH_TYPE_DOWNGRADE
 
         cachedFlowId = wideEventClient
             .flowStart(
@@ -250,14 +257,16 @@ class SubscriptionSwitchWideEventImpl @Inject constructor(
         }
     }
 
-    override suspend fun onUIRefreshed() {
-        if (!isFeatureEnabled()) return
+    override fun onUIRefreshed() {
+        appCoroutineScope.launch(dispatchers.io()) {
+            if (!isFeatureEnabled()) return@launch
 
-        getCurrentWideEventId()?.let { wideEventId ->
-            wideEventClient.flowStep(
-                wideEventId = wideEventId,
-                stepName = STEP_UI_REFRESH,
-            )
+            getCurrentWideEventId()?.let { wideEventId ->
+                wideEventClient.flowStep(
+                    wideEventId = wideEventId,
+                    stepName = STEP_UI_REFRESH,
+                )
+            }
         }
     }
 
@@ -294,6 +303,10 @@ class SubscriptionSwitchWideEventImpl @Inject constructor(
         const val KEY_TO_PLAN = "to_plan"
         const val KEY_SWITCH_TYPE = "switch_type"
         const val KEY_ACTIVATION_LATENCY = "activation_latency_ms_bucketed"
+
+        // Switch types
+        const val SWITCH_TYPE_UPGRADE = "upgrade"
+        const val SWITCH_TYPE_DOWNGRADE = "downgrade"
 
         // Steps
         const val STEP_VALIDATE_CURRENT_SUBSCRIPTION = "validate_current_subscription"

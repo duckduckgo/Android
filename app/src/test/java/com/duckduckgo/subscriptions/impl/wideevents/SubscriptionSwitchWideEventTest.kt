@@ -57,6 +57,7 @@ class SubscriptionSwitchWideEventTest {
             wideEventClient = wideEventClient,
             privacyProFeature = { privacyProFeature },
             dispatchers = coroutineRule.testDispatcherProvider,
+            appCoroutineScope = coroutineRule.testScope,
         )
     }
 
@@ -66,17 +67,17 @@ class SubscriptionSwitchWideEventTest {
 
         subscriptionSwitchWideEvent.onSwitchFlowStarted(
             context = "subscription_settings",
-            fromPlan = "ddg.privacy.pro.monthly.renews.us",
-            toPlan = "ddg.privacy.pro.yearly.renews.us",
-            switchType = "upgrade",
+            fromPlan = "ddg-privacy-pro-monthly-renews-us",
+            toPlan = "ddg-privacy-pro-yearly-renews-us",
         )
 
+        // fromPlan is monthly, so switchType should be computed as "upgrade"
         verify(wideEventClient).flowStart(
             name = "subscription-switch",
             flowEntryPoint = "subscription_settings",
             metadata = mapOf(
-                "from_plan" to "ddg.privacy.pro.monthly.renews.us",
-                "to_plan" to "ddg.privacy.pro.yearly.renews.us",
+                "from_plan" to "ddg-privacy-pro-monthly-renews-us",
+                "to_plan" to "ddg-privacy-pro-yearly-renews-us",
                 "switch_type" to "upgrade",
             ),
             cleanupPolicy = CleanupPolicy.OnProcessStart(ignoreIfIntervalTimeoutPresent = true),
@@ -323,9 +324,8 @@ class SubscriptionSwitchWideEventTest {
 
         subscriptionSwitchWideEvent.onSwitchFlowStarted(
             context = "subscription_settings",
-            fromPlan = "ddg.privacy.pro.monthly.renews.us",
-            toPlan = "ddg.privacy.pro.yearly.renews.us",
-            switchType = "upgrade",
+            fromPlan = "ddg-privacy-pro-monthly-renews-us",
+            toPlan = "ddg-privacy-pro-yearly-renews-us",
         )
         subscriptionSwitchWideEvent.onCurrentSubscriptionValidated()
         subscriptionSwitchWideEvent.onTargetPlanRetrieved()
