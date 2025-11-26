@@ -845,21 +845,26 @@
             }
         ]
     },
-    "dbp_optout_stage_email-receive": {
-        "description": "Fired at the email receive stage of an opt-out attempt.",
+    "dbp_optout_stage_condition-not-found": {
+        "description": "Fired when PIR runs a condition action and its expectation is not met",
         "owners": ["karlenDimla", "landomen"],
         "triggers": ["other"],
         "suffixes": ["form_factor"],
         "parameters": [
             "appVersion",
             {
+                "key": "tries",
+                "description": "The number of tries it took for the action to complete",
+                "type": "integer"
+            },
+            {
                 "key": "data_broker",
-                "description": "The URL of the data broker that this opt-out attempt targets",
+                "description": "The URL of the data broker that this action was operating on",
                 "type": "string"
             },
             {
                 "key": "parent",
-                "description": "The parent data broker of the one this opt-out attempt targets",
+                "description": "The parent data broker of the one this action was operating on",
                 "type": "string"
             },
             {
@@ -869,67 +874,18 @@
             },
             {
                 "key": "attempt_id",
-                "description": "Client-generated ID of the opt-out attempt",
-                "type": "string"
-            },
-            {
-                "key": "duration",
-                "description": "Stage duration in milliseconds",
-                "type": "string"
-            },
-            {
-                "key": "tries",
-                "description": "The number of tries it took to complete the stage",
+                "description": "The ID of the opt out attempt",
                 "type": "string"
             },
             {
                 "key": "action_id",
-                "description": "Predefined identifier of the broker action executed in this stage",
-                "type": "string"
-            }
-        ]
-    },
-    "dbp_optout_stage_email-confirm": {
-        "description": "Fired at the email confirmation stage of an opt-out attempt.",
-        "owners": ["karlenDimla", "landomen"],
-        "triggers": ["other"],
-        "suffixes": ["form_factor"],
-        "parameters": [
-            "appVersion",
-            {
-                "key": "data_broker",
-                "description": "The URL of the data broker that this opt-out attempt targets",
-                "type": "string"
-            },
-            {
-                "key": "parent",
-                "description": "The parent data broker of the one this opt-out attempt targets",
-                "type": "string"
-            },
-            {
-                "key": "broker_version",
-                "description": "The version of the broker JSON file",
-                "type": "string"
-            },
-            {
-                "key": "attempt_id",
-                "description": "Client-generated ID of the opt-out attempt",
+                "description": "The ID of the action, to disambiguate between multiple actions in the same opt out attempt",
                 "type": "string"
             },
             {
                 "key": "duration",
-                "description": "Stage duration in milliseconds",
-                "type": "string"
-            },
-            {
-                "key": "tries",
-                "description": "The number of tries it took to complete the stage",
-                "type": "string"
-            },
-            {
-                "key": "action_id",
-                "description": "Predefined identifier of the broker action executed in this stage",
-                "type": "string"
+                "description": "The duration of the action execution in milliseconds",
+                "type": "number"
             }
         ]
     },

@@ -237,12 +237,8 @@ enum class PirPixel(
         baseName = "dbp_optout_stage_condition-found",
         type = Count,
     ),
-    PIR_OPTOUT_STAGE_EMAIL_RECEIVE(
-        baseName = "dbp_optout_stage_email-receive",
-        type = Count,
-    ),
-    PIR_OPTOUT_STAGE_EMAIL_CONFIRM(
-        baseName = "dbp_optout_stage_email-confirm",
+    PIR_OPTOUT_STAGE_CONDITION_NOT_FOUND(
+        baseName = "dbp_optout_stage_condition-not-found",
         type = Count,
     ),
     PIR_OPTOUT_STAGE_VALIDATE(

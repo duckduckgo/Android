@@ -53,7 +53,7 @@ import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_OPTOUT_STAGE_CAPTCHA_PARSE
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_OPTOUT_STAGE_CAPTCHA_SEND
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_OPTOUT_STAGE_CAPTCHA_SOLVE
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_OPTOUT_STAGE_CONDITION_FOUND
-import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_OPTOUT_STAGE_EMAIL_CONFIRM
+import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_OPTOUT_STAGE_CONDITION_NOT_FOUND
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_OPTOUT_STAGE_EMAIL_GENERATE
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_OPTOUT_STAGE_FILLFORM
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_OPTOUT_STAGE_FINISH
@@ -1002,15 +1002,6 @@ class RealPirPixelSender @Inject constructor(
                 actionId ?: "",
             )
 
-            EMAIL_CONFIRM_HALTED -> fireStagePixel(
-                PIR_OPTOUT_STAGE_EMAIL_CONFIRM,
-                defaultParams,
-                brokerVersion,
-                durationMs,
-                tries,
-                actionId ?: "",
-            )
-
             VALIDATE -> fireStagePixel(
                 PIR_OPTOUT_STAGE_VALIDATE,
                 defaultParams,
@@ -1022,6 +1013,14 @@ class RealPirPixelSender @Inject constructor(
 
             CONDITION_FOUND -> fireStagePixel(
                 PIR_OPTOUT_STAGE_CONDITION_FOUND,
+                defaultParams,
+                brokerVersion,
+                durationMs,
+                tries,
+                actionId ?: "",
+            )
+            CONDITION_NOT_FOUND -> fireStagePixel(
+                PIR_OPTOUT_STAGE_CONDITION_NOT_FOUND,
                 defaultParams,
                 brokerVersion,
                 durationMs,
@@ -1043,7 +1042,7 @@ class RealPirPixelSender @Inject constructor(
                 fire(PIR_OPTOUT_STAGE_FINISH, defaultParams)
             }
 
-            EMAIL_CONFIRM_DECOUPLED, CONDITION_NOT_FOUND, OTHER, NOT_STARTED -> {
+            EMAIL_CONFIRM_HALTED, EMAIL_CONFIRM_DECOUPLED, OTHER, NOT_STARTED -> {
                 // No pixels are emitted for these stages
             }
         }
