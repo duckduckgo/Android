@@ -24,6 +24,7 @@ import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.privacy.config.api.PrivacyConfigCallbackPlugin
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.SingleInstanceIn
@@ -42,7 +43,7 @@ open class OmnibarFeatureRepository @Inject constructor(
     private val browserFeatures: AndroidBrowserConfigFeature,
     private val dispatcherProvider: DispatcherProvider,
     @AppCoroutineScope private val coroutineScope: CoroutineScope,
-) : OmnibarRepository, MainProcessLifecycleObserver {
+) : OmnibarRepository, MainProcessLifecycleObserver, PrivacyConfigCallbackPlugin {
     private var isSplitOmnibarFlagEnabled: Boolean = false
     private var isNewCustomTabFlagEnabled: Boolean = false
 
@@ -72,6 +73,15 @@ open class OmnibarFeatureRepository @Inject constructor(
             // Restore user's choice if the feature is re-enabled
             settingsDataStore.omnibarType = OmnibarType.SPLIT
             settingsDataStore.isSplitOmnibarSelected = false
+        }
+    }
+
+    override fun onPrivacyConfigDownloaded() {
+        coroutineScope.launch(dispatcherProvider.io()) {
+            if (settingsDataStore.omnibarType != OmnibarType.SPLIT) {
+                isSplitOmnibarFlagEnabled = browserFeatures.splitOmnibar().isEnabled()
+            }
+            isNewCustomTabFlagEnabled = browserFeatures.newCustomTab().isEnabled()
         }
     }
 }
