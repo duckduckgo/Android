@@ -88,6 +88,11 @@ interface SettingsDataStore {
     var isFullUrlEnabled: Boolean
     var clearDuckAiData: Boolean
 
+    /**
+     * Check if user has explicitly set their URL display preference.
+     */
+    fun hasUrlPreferenceSet(): Boolean
+
     fun isCurrentlySelected(clearWhatOption: ClearWhatOption): Boolean
 
     fun isCurrentlySelected(clearWhenOption: ClearWhenOption): Boolean
@@ -229,6 +234,8 @@ class SettingsSharedPreferences @Inject constructor(
     override var isFullUrlEnabled: Boolean
         get() = preferences.getBoolean(KEY_IS_FULL_URL_ENABLED, true)
         set(enabled) = preferences.edit { putBoolean(KEY_IS_FULL_URL_ENABLED, enabled) }
+
+    override fun hasUrlPreferenceSet(): Boolean = preferences.contains(KEY_IS_FULL_URL_ENABLED)
 
     override var clearDuckAiData: Boolean
         get() = preferences.getBoolean(KEY_CLEAR_DUCK_AI_DATA, false)
