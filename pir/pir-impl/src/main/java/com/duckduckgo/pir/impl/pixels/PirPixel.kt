@@ -261,6 +261,10 @@ enum class PirPixel(
         baseName = "dbp_update_databrokers_failure",
         type = Count,
     ),
+    PIR_DOWNLOAD_MAINCONFIG_BE_FAILURE(
+        baseName = "dbp_download_mainconfig_service_failure",
+        type = Count,
+    ),
     PIR_DOWNLOAD_MAINCONFIG_FAILURE(
         baseName = "dbp_download_mainconfig_failure",
         type = Count,

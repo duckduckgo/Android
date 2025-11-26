@@ -27,6 +27,7 @@ import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_BROKER_CUSTOM_STATS_42DAY_UNC
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_BROKER_CUSTOM_STATS_7DAY_CONFIRMED_OPTOUT
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_BROKER_CUSTOM_STATS_7DAY_UNCONFIRMED_OPTOUT
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_BROKER_CUSTOM_STATS_OPTOUT_SUBMIT_SUCCESSRATE
+import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_DOWNLOAD_MAINCONFIG_BE_FAILURE
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_DOWNLOAD_MAINCONFIG_FAILURE
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_EMAIL_CONFIRMATION_ATTEMPT_FAILED
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_EMAIL_CONFIRMATION_ATTEMPT_START
@@ -568,9 +569,11 @@ interface PirPixelSender {
         removedAtMs: Long,
     )
 
-    fun reportDownloadMainConfigFailure(
+    fun reportDownloadMainConfigBEFailure(
         errorCode: String,
     )
+
+    fun reportDownloadMainConfigFailure()
 }
 
 @ContributesBinding(AppScope::class)
@@ -1311,12 +1314,16 @@ class RealPirPixelSender @Inject constructor(
         fire(PIR_UPDATE_BROKER_FAILURE, params)
     }
 
-    override fun reportDownloadMainConfigFailure(errorCode: String) {
+    override fun reportDownloadMainConfigBEFailure(errorCode: String) {
         val params = mapOf(
             PARAM_ERROR_CODE to errorCode,
         )
 
-        fire(PIR_DOWNLOAD_MAINCONFIG_FAILURE, params)
+        fire(PIR_DOWNLOAD_MAINCONFIG_BE_FAILURE, params)
+    }
+
+    override fun reportDownloadMainConfigFailure() {
+        fire(PIR_DOWNLOAD_MAINCONFIG_FAILURE)
     }
 
     private fun fire(

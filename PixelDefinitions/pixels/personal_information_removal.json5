@@ -1044,8 +1044,8 @@
             }
         ]
     },
-    "dbp_download_mainconfig_failure": {
-        "description": "Android specific pixel which is fired when downloading the main config failed.",
+    "dbp_download_mainconfig_service_failure": {
+        "description": "Android specific pixel which is fired when downloading the main config failed due to a BE error.",
         "owners": ["karlenDimla", "landomen"],
         "triggers": ["other"],
         "suffixes": ["form_factor"],
@@ -1053,9 +1053,16 @@
             "appVersion",
             {
                 "key": "error_code",
-                "description": "The error code returned by the backend",
+                "description": "Error code from BE",
                 "type": "string"
             }
         ]
+    },
+    "dbp_download_mainconfig_failure": {
+        "description": "Android specific pixel which is fired when downloading the main config failed.",
+        "owners": ["karlenDimla", "landomen"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
     }
 }
