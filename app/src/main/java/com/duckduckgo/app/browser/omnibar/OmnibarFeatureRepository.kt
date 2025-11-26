@@ -36,6 +36,10 @@ import javax.inject.Inject
     scope = AppScope::class,
     boundType = MainProcessLifecycleObserver::class,
 )
+@ContributesMultibinding(
+    scope = AppScope::class,
+    boundType = PrivacyConfigCallbackPlugin::class,
+)
 @SingleInstanceIn(AppScope::class)
 @ContributesBinding(scope = AppScope::class, boundType = OmnibarRepository::class)
 open class OmnibarFeatureRepository @Inject constructor(
