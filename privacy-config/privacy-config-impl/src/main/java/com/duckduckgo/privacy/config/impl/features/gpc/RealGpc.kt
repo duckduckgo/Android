@@ -41,9 +41,8 @@ class RealGpc @Inject constructor(
     private val dispatcherProvider: DispatcherProvider,
 ) : Gpc {
 
-    // TODO (cbarreiro) Try to make suspend as well later
-    override fun isEnabled(): Boolean {
-        return gpcRepository.isGpcEnabled()
+    override suspend fun isEnabled(): Boolean {
+        return withContext(dispatcherProvider.io()) { gpcRepository.isGpcEnabled() }
     }
 
     override suspend fun getHeaders(url: String): Map<String, String> {

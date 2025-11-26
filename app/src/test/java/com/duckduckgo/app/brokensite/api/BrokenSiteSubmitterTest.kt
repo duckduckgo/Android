@@ -119,7 +119,7 @@ class BrokenSiteSubmitterTest {
     private lateinit var testee: BrokenSiteSubmitter
 
     @Before
-    fun before() {
+    fun before() = runTest {
         whenever(mockAppBuildConfig.deviceLocale).thenReturn(Locale.ENGLISH)
         whenever(mockAppBuildConfig.sdkInt).thenReturn(1)
         whenever(mockAppBuildConfig.manufacturer).thenReturn("manufacturer")

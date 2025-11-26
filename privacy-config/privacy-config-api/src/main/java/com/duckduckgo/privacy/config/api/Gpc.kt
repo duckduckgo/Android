@@ -25,7 +25,7 @@ interface Gpc {
      * configuration value prevails over the user choice.
      * @return `true` if the feature is enabled and `false` is is not.
      */
-    fun isEnabled(): Boolean
+    suspend fun isEnabled(): Boolean
 
     /**
      * This method returns a [Map] with the GPC headers IF the url passed allows for them to be
