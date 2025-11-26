@@ -17,6 +17,7 @@
 package com.duckduckgo.privacy.config.impl.referencetests.gpc
 
 import com.duckduckgo.app.privacy.db.UserAllowListRepository
+import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.test.FileUtilities
 import com.duckduckgo.feature.toggles.api.FeatureToggle
 import com.duckduckgo.privacy.config.api.Gpc
@@ -33,8 +34,10 @@ import com.duckduckgo.privacy.config.store.features.unprotectedtemporary.Unprote
 import com.duckduckgo.privacy.config.store.toGpcException
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
+import kotlinx.coroutines.test.runTest
 import org.junit.Assert.*
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.mock
@@ -44,6 +47,9 @@ import java.util.concurrent.CopyOnWriteArrayList
 
 @RunWith(ParameterizedRobolectricTestRunner::class)
 class GpcHeaderReferenceTest(private val testCase: TestCase) {
+
+    @get:Rule
+    var coroutinesTestRule = CoroutineTestRule()
 
     private val mockUnprotectedTemporaryRepository: UnprotectedTemporaryRepository = mock()
     private val mockGpcRepository: GpcRepository = mock()
@@ -72,11 +78,17 @@ class GpcHeaderReferenceTest(private val testCase: TestCase) {
     fun setup() {
         whenever(mockGpcRepository.isGpcEnabled()).thenReturn(testCase.gpcUserSettingOn)
         mockGpcPrivacyConfig()
-        gpc = RealGpc(mockFeatureToggle, mockGpcRepository, RealUnprotectedTemporary(mockUnprotectedTemporaryRepository), mockUserAllowListRepository)
+        gpc = RealGpc(
+            mockFeatureToggle,
+            mockGpcRepository,
+            RealUnprotectedTemporary(mockUnprotectedTemporaryRepository),
+            mockUserAllowListRepository,
+            coroutinesTestRule.testDispatcherProvider,
+        )
     }
 
     @Test
-    fun whenReferenceTestRunsItReturnsTheExpectedResult() {
+    fun whenReferenceTestRunsItReturnsTheExpectedResult() = runTest {
         val gpcHeader = gpc.getHeaders(testCase.requestURL)[RealGpc.GPC_HEADER]
         val gpcHeaderExists = gpcHeader != null
         assertEquals(testCase.expectGPCHeader, gpcHeaderExists)

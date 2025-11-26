@@ -64,7 +64,7 @@ class RealGpcTest {
     }
 
     @Test
-    fun whenIsEnabledThenIsGpcEnabledCalled() {
+    fun whenIsEnabledThenIsGpcEnabledCalled() = runTest {
         testee.isEnabled()
         verify(mockGpcRepository).isGpcEnabled()
     }
