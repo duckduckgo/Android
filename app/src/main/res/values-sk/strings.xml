@@ -860,6 +860,11 @@
     <!-- Bubble BB & Buck experiment-->
     <string name="onboardingBubbleExperimentSearchDaxDialogDescription">Vyhľadávania v službe DuckDuckGo sú vždy anonymné.</string>
 
+    <!-- Input Screen Onboarding step -->
+    <string name="preOnboardingInputScreenTitle">Chceš jednoduchší prístup k súkromnému AI chatu?</string>
+    <string name="preOnboardingInputScreenButton">Ďalšie</string>
+    <string name="preOnboardingInputScreenDescription"><![CDATA[Funkcie AI sú súkromné a voliteľné. Môžeš urobiť zmeny v&nbsp;<b>Nastaveniach >&nbsp;Funkcie AI</b>.]]></string>
+
     <!-- Appearance settings -->
     <string name="settingsAddressBarPositionTitle">Riadok adresy</string>
     <string name="settingsAddressBarPositionHeaderTitle">Poloha riadku s adresou</string>
