@@ -1005,5 +1005,57 @@
                 "type": "string"
             }
         ]
+    },
+    "dbp_update_databrokers_success": {
+        "description": "Fired when a data broker JSON is updated successfuly.",
+        "owners": ["karlenDimla", "landomen"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "data_broker_json_file",
+                "description": "The JSON file name for the data broker that this action was operating on",
+                "type": "string"
+            },
+            {
+                "key": "removed_at",
+                "description": "Timestamp, in milliseconds, when the broker was removed at (contained on the JSON)",
+                "type": "string"
+            }
+        ]
+    },
+    "dbp_update_databrokers_failure": {
+        "description": "Fired when a data broker JSON update has failed.",
+        "owners": ["karlenDimla", "landomen"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "data_broker_json_file",
+                "description": "The JSON file name for the data broker that this action was operating on",
+                "type": "string"
+            },
+            {
+                "key": "removed_at",
+                "description": "Timestamp, in milliseconds, when the broker was removed at (contained on the JSON)",
+                "type": "string"
+            }
+        ]
+    },
+    "dbp_download_mainconfig_failure": {
+        "description": "Android specific pixel which is fired when downloading the main config failed.",
+        "owners": ["karlenDimla", "landomen"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "error_code",
+                "description": "The error code returned by the backend",
+                "type": "string"
+            }
+        ]
     }
 }
