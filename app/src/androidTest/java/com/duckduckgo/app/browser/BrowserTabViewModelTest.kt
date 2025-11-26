@@ -4665,6 +4665,37 @@ class BrowserTabViewModelTest {
     }
 
     @Test
+    fun whenHandleAboutBlankEnabledAndMessageReceivedAndNullSiteUrlAndCustomTabEmitCommandForUpdateTitle() = runTest {
+        fakeAndroidConfigBrowserFeature.handleAboutBlank().setRawStoredState(State(enable = true))
+        resetChannels()
+        initialiseViewModel()
+        loadUrl(null)
+        testee.setIsCustomTab(true)
+        testee.onMessageReceived()
+
+        val command = captureCommands().lastValue as Command.ShowWebPageTitle
+        assertFalse(command.showDuckPlayerIcon)
+        assertEquals("about:blank", command.title)
+        assertNull("Web page url should be null when opening a page with no url", command.url)
+    }
+
+    @Test
+    fun whenHandleAboutBlankEnabledAndMessageReceivedAndNullSiteUrlAndNewCustomTabEmitCommandForUpdateTitle() = runTest {
+        fakeAndroidConfigBrowserFeature.handleAboutBlank().setRawStoredState(State(enable = true))
+        fakeAndroidConfigBrowserFeature.newCustomTab().setRawStoredState(State(enable = true))
+        resetChannels()
+        initialiseViewModel()
+        loadUrl(null)
+        testee.setIsCustomTab(true)
+        testee.onMessageReceived()
+
+        val command = captureCommands().lastValue as Command.ShowWebPageTitle
+        assertFalse(command.showDuckPlayerIcon)
+        assertEquals("about:blank", command.title)
+        assertEquals("about:blank", command.url)
+    }
+
+    @Test
     fun whenHandleAboutBlankEnabledAndMessageReceivedAndNonNullSiteUrlThenThenDoNotSetOmnibarText() {
         fakeAndroidConfigBrowserFeature.handleAboutBlank().setRawStoredState(State(enable = true))
         loadUrl("url")
