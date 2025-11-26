@@ -252,6 +252,18 @@ enum class PirPixel(
     PIR_OPTOUT_STAGE_FINISH(
         baseName = "dbp_optout_stage_finish",
         type = Count,
+    ),
+    PIR_UPDATE_BROKER_SUCCESS(
+        baseName = "dbp_update_databrokers_success",
+        type = Count,
+    ),
+    PIR_UPDATE_BROKER_FAILURE(
+        baseName = "dbp_update_databrokers_failure",
+        type = Count,
+    ),
+    PIR_DOWNLOAD_MAINCONFIG_FAILURE(
+        baseName = "dbp_download_mainconfig_failure",
+        type = Count,
     ), ;
 
     constructor(
