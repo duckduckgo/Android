@@ -16,8 +16,8 @@
 
 package com.duckduckgo.privacyprotectionspopup.impl.db
 
-import android.content.Context
-import androidx.room.Room
+import com.duckduckgo.data.store.api.DatabaseProvider
+import com.duckduckgo.data.store.api.RoomDatabaseConfig
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
@@ -30,15 +30,13 @@ class PrivacyProtectionsPopupDatabaseModule {
 
     @Provides
     @SingleInstanceIn(AppScope::class)
-    fun providesPrivacyProtectionsPopupDatabase(context: Context): PrivacyProtectionsPopupDatabase =
-        Room
-            .databaseBuilder(
-                context = context,
-                klass = PrivacyProtectionsPopupDatabase::class.java,
-                name = "privacy_protections_popup.db",
-            )
-            .fallbackToDestructiveMigration()
-            .build()
+    fun providesPrivacyProtectionsPopupDatabase(databaseProvider: DatabaseProvider): PrivacyProtectionsPopupDatabase {
+        return databaseProvider.buildRoomDatabase(
+            PrivacyProtectionsPopupDatabase::class.java,
+            "privacy_protections_popup.db",
+            config = RoomDatabaseConfig(fallbackToDestructiveMigration = true),
+        )
+    }
 
     @Provides
     @SingleInstanceIn(AppScope::class)
