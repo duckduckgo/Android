@@ -860,6 +860,11 @@
     <!-- Bubble BB & Buck experiment-->
     <string name="onboardingBubbleExperimentSearchDaxDialogDescription">Ваши поисковые запросы в DuckDuckGo всегда анонимны.</string>
 
+    <!-- Input Screen Onboarding step -->
+    <string name="preOnboardingInputScreenTitle">Нужен удобный доступ к приватному чату с ИИ?</string>
+    <string name="preOnboardingInputScreenButton">Далее</string>
+    <string name="preOnboardingInputScreenDescription"><![CDATA[Функции на базе ИИ работают конфиденциально и предлагаются дополнительно. Их можно изменить в разделе <b>Настройки > Функции ИИ</b>.]]></string>
+
     <!-- Appearance settings -->
     <string name="settingsAddressBarPositionTitle">Адресная строка</string>
     <string name="settingsAddressBarPositionHeaderTitle">Положение адресной строки</string>

@@ -844,6 +844,11 @@
     <!-- Bubble BB & Buck experiment-->
     <string name="onboardingBubbleExperimentSearchDaxDialogDescription">Tavi DuckDuckGo meklējumi vienmēr ir anonīmi.</string>
 
+    <!-- Input Screen Onboarding step -->
+    <string name="preOnboardingInputScreenTitle">Vēlies ērtu piekļuvi privātai MI tērzēšanai?</string>
+    <string name="preOnboardingInputScreenButton">Nākamais</string>
+    <string name="preOnboardingInputScreenDescription"><![CDATA[MI funkcijas ir privātas un nav obligātas. Tu vari veikt izmaiņas sadaļā <b>Iestatījumi > MI funkcijas</b>.]]></string>
+
     <!-- Appearance settings -->
     <string name="settingsAddressBarPositionTitle">Adreses josla</string>
     <string name="settingsAddressBarPositionHeaderTitle">Adreses joslas pozīcija</string>
