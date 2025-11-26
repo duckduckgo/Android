@@ -891,6 +891,7 @@ class BrowserTabViewModelTest {
 
     @After
     fun after() {
+        dismissedCtaDaoChannel.close()
         bookmarksListFlow.close()
         favoriteListFlow.close()
         remoteMessageFlow.close()
@@ -1940,6 +1941,7 @@ class BrowserTabViewModelTest {
         resetChannels()
         initialiseViewModel()
         loadUrl(null)
+        setupNavigation(isBrowsing = true, canGoBack = true)
         testee.onMessageReceived()
         selectedTabLiveData.value = aTabEntity(id = "id").copy(sourceTabId = "source")
 
@@ -1955,9 +1957,10 @@ class BrowserTabViewModelTest {
         fakeAndroidConfigBrowserFeature.handleAboutBlank().setRawStoredState(State(enable = false))
         resetChannels()
         initialiseViewModel()
-        setupNavigation(isBrowsing = false, canGoBack = false)
         loadUrl(null)
+        setupNavigation(isBrowsing = true, canGoBack = true)
         testee.onMessageReceived()
+        selectedTabLiveData.value = aTabEntity(id = "id").copy(sourceTabId = "source")
 
         testee.onUserPressedBack(isCustomTab = false)
 
@@ -1970,11 +1973,11 @@ class BrowserTabViewModelTest {
         resetChannels()
         initialiseViewModel()
         loadUrl(null, isBrowserShowing = true)
-        setupNavigation(isBrowsing = false, canGoBack = false)
+        setupNavigation(isBrowsing = true, canGoBack = true)
 
         val result = testee.onUserPressedBack(isCustomTab = false)
 
-        assertFalse(result)
+        assertTrue(result)
         verify(mockTabRepository, never()).deleteTabAndSelectSource(any())
     }
 
