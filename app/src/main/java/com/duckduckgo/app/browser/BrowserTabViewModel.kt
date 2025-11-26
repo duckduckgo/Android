@@ -1469,7 +1469,6 @@ class BrowserTabViewModel @Inject constructor(
             return false
         }
 
-        logcat(tag = "RadoiuC") { "Can go back :${navigation.canGoBack}" }
         if (navigation.canGoBack) {
             command.value = NavigationCommand.NavigateBack(navigation.stepsToPreviousPage)
             return true
