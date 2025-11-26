@@ -16,11 +16,11 @@
 
 package com.duckduckgo.webcompat.impl.di
 
-import android.content.Context
-import androidx.room.Room
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.di.IsMainProcess
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.data.store.api.DatabaseProvider
+import com.duckduckgo.data.store.api.RoomDatabaseConfig
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.webcompat.store.ALL_MIGRATIONS
 import com.duckduckgo.webcompat.store.RealWebCompatRepository
@@ -38,12 +38,15 @@ object WebCompatModule {
 
     @SingleInstanceIn(AppScope::class)
     @Provides
-    fun provideWebCompatDatabase(context: Context): WebCompatDatabase {
-        return Room.databaseBuilder(context, WebCompatDatabase::class.java, "web_compat.db")
-            .enableMultiInstanceInvalidation()
-            .fallbackToDestructiveMigration()
-            .addMigrations(*ALL_MIGRATIONS)
-            .build()
+    fun provideWebCompatDatabase(databaseProvider: DatabaseProvider): WebCompatDatabase {
+        return databaseProvider.buildRoomDatabase(
+            WebCompatDatabase::class.java,
+            "web_compat.db",
+            config = RoomDatabaseConfig(
+                fallbackToDestructiveMigration = true,
+                migrations = ALL_MIGRATIONS,
+            ),
+        )
     }
 
     @SingleInstanceIn(AppScope::class)
