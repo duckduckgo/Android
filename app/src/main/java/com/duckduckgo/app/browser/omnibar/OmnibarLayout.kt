@@ -585,7 +585,6 @@ class OmnibarLayout @JvmOverloads constructor(
         }
         duckAIHeader.setOnClickListener {
             viewModel.onDuckAiHeaderClicked()
-            omnibarItemPressedListener?.onDuckAISidebarButtonPressed()
         }
         duckAISidebar.setOnClickListener {
             omnibarItemPressedListener?.onDuckAISidebarButtonPressed()
@@ -834,7 +833,8 @@ class OmnibarLayout @JvmOverloads constructor(
             (
                 newTransitionState.showFireIcon != previousTransitionState?.showFireIcon ||
                     newTransitionState.showTabsMenu != previousTransitionState?.showTabsMenu ||
-                    newTransitionState.showBrowserMenu != previousTransitionState?.showBrowserMenu
+                    newTransitionState.showBrowserMenu != previousTransitionState?.showBrowserMenu ||
+                    newTransitionState.showDuckSidebar != previousTransitionState?.showDuckSidebar
                 )
         ) {
             TransitionManager.beginDelayedTransition(toolbarContainer, omniBarButtonTransitionSet)
@@ -848,7 +848,7 @@ class OmnibarLayout @JvmOverloads constructor(
         browserMenuHighlight.isVisible = newTransitionState.showBrowserMenuHighlight
         aiChatMenu?.isVisible = newTransitionState.showChatMenu
         aiChatDivider.isVisible = (viewState.showVoiceSearch || viewState.showClearButton) && viewState.showChatMenu
-        duckAISidebar.isVisible = viewState.showDuckAIHeader
+        duckAISidebar.isVisible = newTransitionState.showDuckSidebar
 
         if (omnibarAnimationManager.isFeatureEnabled()) {
             toolbarContainer.requestLayout()

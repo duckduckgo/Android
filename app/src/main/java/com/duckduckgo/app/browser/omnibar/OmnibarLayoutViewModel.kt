@@ -978,7 +978,6 @@ class OmnibarLayoutViewModel @Inject constructor(
         if (duckAiFeatureState.showInputScreen.value) {
             onTextInputClickCatcherClicked()
         } else {
-            logcat { "Omnibar: onDuckAiHeaderClicked" }
             _viewState.update {
                 it.copy(
                     showDuckAIHeader = false,
