@@ -48,7 +48,7 @@ jobs:
         uses: gradle/actions/setup-gradle@v3
 
       - name: Assemble the project
-        run: ./gradlew assemblePlayRelease
+        run: ./gradlew assemblePlayRelease -Pforce-default-variant -Pskip-onboarding -x lint
 
       - name: Move APK to new folder
         if: always()
