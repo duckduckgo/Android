@@ -66,28 +66,12 @@ enum class PirStage(val stageName: String) {
     VALIDATE("validate"),
 
     /**
-     * Catch-all stage
-     */
-    OTHER("other"),
-
-    /**
      * Stage at the start of the click and fillForm actions.
      */
     FILL_FORM("fill-form"),
 
     /**
-     * Stage when the opt-out's condition action meets its expectation.
+     * Catch-all stage
      */
-    CONDITION_FOUND("condition-found"),
-
-    /**
-     *
-     * Stage when either:
-     *  (1) the opt-out's condition action completes with no follow-up actions or
-     *  (2) when it doesn't meet its expectation, continuing with regular action execution.
-     */
-    CONDITION_NOT_FOUND("condition-not-found"),
-
-    NOT_STARTED("not-started"),
-    FINISH("finish"),
+    OTHER("other"),
 }

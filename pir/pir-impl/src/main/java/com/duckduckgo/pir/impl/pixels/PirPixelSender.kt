@@ -72,14 +72,10 @@ import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_WEEKLY_CHILD_ORPHANED_OPTOUTS
 import com.duckduckgo.pir.impl.pixels.PirStage.CAPTCHA_PARSE
 import com.duckduckgo.pir.impl.pixels.PirStage.CAPTCHA_SEND
 import com.duckduckgo.pir.impl.pixels.PirStage.CAPTCHA_SOLVE
-import com.duckduckgo.pir.impl.pixels.PirStage.CONDITION_FOUND
-import com.duckduckgo.pir.impl.pixels.PirStage.CONDITION_NOT_FOUND
 import com.duckduckgo.pir.impl.pixels.PirStage.EMAIL_CONFIRM_DECOUPLED
 import com.duckduckgo.pir.impl.pixels.PirStage.EMAIL_CONFIRM_HALTED
 import com.duckduckgo.pir.impl.pixels.PirStage.EMAIL_GENERATE
 import com.duckduckgo.pir.impl.pixels.PirStage.FILL_FORM
-import com.duckduckgo.pir.impl.pixels.PirStage.FINISH
-import com.duckduckgo.pir.impl.pixels.PirStage.NOT_STARTED
 import com.duckduckgo.pir.impl.pixels.PirStage.OTHER
 import com.duckduckgo.pir.impl.pixels.PirStage.START
 import com.duckduckgo.pir.impl.pixels.PirStage.SUBMIT
@@ -476,6 +472,33 @@ interface PirPixelSender {
         durationMs: Long,
         tries: Int,
         actionId: String?,
+    )
+
+    fun reportConditionFound(
+        brokerUrl: String,
+        parentUrl: String,
+        brokerVersion: String,
+        attemptId: String,
+        durationMs: Long,
+        tries: Int,
+        actionId: String,
+    )
+
+    fun reportConditionNotFound(
+        brokerUrl: String,
+        parentUrl: String,
+        brokerVersion: String,
+        attemptId: String,
+        durationMs: Long,
+        tries: Int,
+        actionId: String,
+    )
+
+    fun reportOptOutFinish(
+        brokerUrl: String,
+        parentUrl: String,
+        attemptId: String,
+        durationMs: Long,
     )
 }
 
@@ -1011,23 +1034,6 @@ class RealPirPixelSender @Inject constructor(
                 actionId ?: "",
             )
 
-            CONDITION_FOUND -> fireStagePixel(
-                PIR_OPTOUT_STAGE_CONDITION_FOUND,
-                defaultParams,
-                brokerVersion,
-                durationMs,
-                tries,
-                actionId ?: "",
-            )
-            CONDITION_NOT_FOUND -> fireStagePixel(
-                PIR_OPTOUT_STAGE_CONDITION_NOT_FOUND,
-                defaultParams,
-                brokerVersion,
-                durationMs,
-                tries,
-                actionId ?: "",
-            )
-
             FILL_FORM -> fireStagePixel(
                 PIR_OPTOUT_STAGE_FILLFORM,
                 defaultParams,
@@ -1037,15 +1043,70 @@ class RealPirPixelSender @Inject constructor(
                 actionId ?: "",
             )
 
-            FINISH -> {
-                defaultParams[PARAM_DURATION] = durationMs.toString()
-                fire(PIR_OPTOUT_STAGE_FINISH, defaultParams)
-            }
-
-            EMAIL_CONFIRM_HALTED, EMAIL_CONFIRM_DECOUPLED, OTHER, NOT_STARTED -> {
+            EMAIL_CONFIRM_HALTED, EMAIL_CONFIRM_DECOUPLED, OTHER -> {
                 // No pixels are emitted for these stages
             }
         }
+    }
+
+    override fun reportConditionFound(
+        brokerUrl: String,
+        parentUrl: String,
+        brokerVersion: String,
+        attemptId: String,
+        durationMs: Long,
+        tries: Int,
+        actionId: String,
+    ) {
+        val params = mapOf(
+            PARAM_KEY_BROKER to brokerUrl,
+            PARAM_KEY_PARENT to parentUrl,
+            PARAM_ATTEMPT_ID to attemptId,
+            PARAM_BROKER_VERSION to brokerVersion,
+            PARAM_DURATION to durationMs.toString(),
+            PARAM_TRIES to tries.toString(),
+            PARAM_ACTION_ID to actionId,
+        )
+
+        fire(PIR_OPTOUT_STAGE_CONDITION_FOUND, params)
+    }
+
+    override fun reportConditionNotFound(
+        brokerUrl: String,
+        parentUrl: String,
+        brokerVersion: String,
+        attemptId: String,
+        durationMs: Long,
+        tries: Int,
+        actionId: String,
+    ) {
+        val params = mapOf(
+            PARAM_KEY_BROKER to brokerUrl,
+            PARAM_KEY_PARENT to parentUrl,
+            PARAM_ATTEMPT_ID to attemptId,
+            PARAM_BROKER_VERSION to brokerVersion,
+            PARAM_DURATION to durationMs.toString(),
+            PARAM_TRIES to tries.toString(),
+            PARAM_ACTION_ID to actionId,
+        )
+
+        fire(PIR_OPTOUT_STAGE_CONDITION_NOT_FOUND, params)
+    }
+
+    override fun reportOptOutFinish(
+        brokerUrl: String,
+        parentUrl: String,
+        attemptId: String,
+        durationMs: Long,
+    ) {
+        val params = mapOf(
+            PARAM_KEY_BROKER to brokerUrl,
+            PARAM_KEY_PARENT to parentUrl,
+            PARAM_ATTEMPT_ID to attemptId,
+            PARAM_DURATION to durationMs.toString(),
+        )
+
+        fire(PIR_OPTOUT_STAGE_FINISH, params)
     }
 
     private fun fireStagePixel(

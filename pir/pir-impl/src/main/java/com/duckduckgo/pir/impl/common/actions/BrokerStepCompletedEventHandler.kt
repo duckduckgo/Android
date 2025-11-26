@@ -33,6 +33,7 @@ import com.duckduckgo.pir.impl.common.actions.EventHandler.Next
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.Event
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.Event.BrokerStepCompleted
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.Event.ExecuteNextBrokerStep
+import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.PirStageStatus
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.State
 import com.duckduckgo.pir.impl.pixels.PirStage
 import com.squareup.anvil.annotations.ContributesMultibinding
@@ -80,6 +81,10 @@ class BrokerStepCompletedEventHandler @Inject constructor(
                 currentBrokerStepIndex = state.currentBrokerStepIndex + 1,
                 actionRetryCount = 0,
                 generatedEmailData = null,
+                stageStatus = PirStageStatus(
+                    currentStage = PirStage.VALIDATE,
+                    stageStartMs = currentTimeProvider.currentTimeMillis(),
+                ),
             ),
             nextEvent = ExecuteNextBrokerStep,
         )

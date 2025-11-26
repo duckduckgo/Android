@@ -28,10 +28,12 @@ import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.Event
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.Event.ConditionExpectationSucceeded
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.Event.ExecuteBrokerStepAction
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.Event.JsActionSuccess
+import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.PirStageStatus
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.SideEffect.EvaluateJs
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.SideEffect.GetCaptchaSolution
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.SideEffect.LoadUrl
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.State
+import com.duckduckgo.pir.impl.pixels.PirStage
 import com.duckduckgo.pir.impl.scripts.models.PirScriptRequestData.UserProfile
 import com.duckduckgo.pir.impl.scripts.models.PirSuccessResponse.ClickResponse
 import com.duckduckgo.pir.impl.scripts.models.PirSuccessResponse.ConditionResponse
@@ -130,7 +132,12 @@ class JsActionSuccessEventHandler @Inject constructor(
 
             is GetCaptchaInfoResponse -> {
                 Next(
-                    nextState = baseSuccessState,
+                    nextState = baseSuccessState.copy(
+                        stageStatus = PirStageStatus(
+                            currentStage = PirStage.CAPTCHA_SEND,
+                            stageStartMs = currentTimeProvider.currentTimeMillis(),
+                        ),
+                    ),
                     sideEffect = GetCaptchaSolution(
                         actionId = pirSuccessResponse.actionID,
                         responseData = pirSuccessResponse.response,
