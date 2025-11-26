@@ -19,6 +19,7 @@ package com.duckduckgo.privacy.config.impl.features.gpc
 import androidx.annotation.VisibleForTesting
 import com.duckduckgo.app.browser.UriString.Companion.sameOrSubdomain
 import com.duckduckgo.app.privacy.db.UserAllowListRepository
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.FeatureToggle
 import com.duckduckgo.privacy.config.api.Gpc
@@ -27,6 +28,7 @@ import com.duckduckgo.privacy.config.api.UnprotectedTemporary
 import com.duckduckgo.privacy.config.store.features.gpc.GpcRepository
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @ContributesBinding(AppScope::class)
@@ -36,13 +38,15 @@ class RealGpc @Inject constructor(
     private val gpcRepository: GpcRepository,
     private val unprotectedTemporary: UnprotectedTemporary,
     private val userAllowListRepository: UserAllowListRepository,
+    private val dispatcherProvider: DispatcherProvider,
 ) : Gpc {
 
+    // TODO (cbarreiro) Try to make suspend as well later
     override fun isEnabled(): Boolean {
         return gpcRepository.isGpcEnabled()
     }
 
-    override fun getHeaders(url: String): Map<String, String> {
+    override suspend fun getHeaders(url: String): Map<String, String> {
         return if (canGpcBeUsedByUrl(url)) {
             mapOf(GPC_HEADER to GPC_HEADER_VALUE)
         } else {
@@ -50,7 +54,7 @@ class RealGpc @Inject constructor(
         }
     }
 
-    override fun canUrlAddHeaders(
+    override suspend fun canUrlAddHeaders(
         url: String,
         existingHeaders: Map<String, String>,
     ): Boolean {
@@ -70,8 +74,8 @@ class RealGpc @Inject constructor(
     }
 
     @VisibleForTesting
-    fun canGpcBeUsedByUrl(url: String): Boolean {
-        return isFeatureEnabled() && isEnabled() && !isAnException(url)
+    suspend fun canGpcBeUsedByUrl(url: String): Boolean {
+        return withContext(dispatcherProvider.io()) { isFeatureEnabled() && isEnabled() && !isAnException(url) }
     }
 
     private fun isFeatureEnabled(): Boolean {

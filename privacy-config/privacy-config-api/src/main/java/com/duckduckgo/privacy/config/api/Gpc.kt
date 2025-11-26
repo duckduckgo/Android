@@ -32,14 +32,14 @@ interface Gpc {
      * added.
      * @return a [Map] with the GPC headers or an empty [Map] if the above conditions are not met
      */
-    fun getHeaders(url: String): Map<String, String>
+    suspend fun getHeaders(url: String): Map<String, String>
 
     /**
      * This method takes a [url] and a map with its [existingHeaders] and it then returns `true` if
      * the given [url] can add the GPC headers
      * @return a `true` if the given [url] and [existingHeaders] permit the GPC headers to be added
      */
-    fun canUrlAddHeaders(
+    suspend fun canUrlAddHeaders(
         url: String,
         existingHeaders: Map<String, String>,
     ): Boolean

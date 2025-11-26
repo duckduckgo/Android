@@ -18,6 +18,7 @@ package com.duckduckgo.privacy.config.impl.features.gpc
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.app.privacy.db.UserAllowListRepository
+import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.feature.toggles.api.FeatureToggle
 import com.duckduckgo.privacy.config.api.GpcException
 import com.duckduckgo.privacy.config.api.GpcHeaderEnabledSite
@@ -26,8 +27,10 @@ import com.duckduckgo.privacy.config.api.UnprotectedTemporary
 import com.duckduckgo.privacy.config.impl.features.gpc.RealGpc.Companion.GPC_HEADER
 import com.duckduckgo.privacy.config.impl.features.gpc.RealGpc.Companion.GPC_HEADER_VALUE
 import com.duckduckgo.privacy.config.store.features.gpc.GpcRepository
+import kotlinx.coroutines.test.runTest
 import org.junit.Assert.*
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.ArgumentMatchers.anyString
@@ -38,6 +41,9 @@ import java.util.concurrent.CopyOnWriteArrayList
 
 @RunWith(AndroidJUnit4::class)
 class RealGpcTest {
+    @get:Rule
+    val coroutineRule = CoroutineTestRule()
+
     private val mockGpcRepository: GpcRepository = mock()
     private val mockFeatureToggle: FeatureToggle = mock()
     private val mockUnprotectedTemporary: UnprotectedTemporary = mock()
@@ -54,7 +60,7 @@ class RealGpcTest {
         whenever(mockGpcRepository.headerEnabledSites).thenReturn(headers)
 
         testee =
-            RealGpc(mockFeatureToggle, mockGpcRepository, mockUnprotectedTemporary, mockUserAllowListRepository)
+            RealGpc(mockFeatureToggle, mockGpcRepository, mockUnprotectedTemporary, mockUserAllowListRepository, coroutineRule.testDispatcherProvider)
     }
 
     @Test
@@ -76,7 +82,7 @@ class RealGpcTest {
     }
 
     @Test
-    fun whenGetHeadersIfFeatureAndGpcAreEnabledAndUrlIsInExceptionsThenReturnEmptyMap() {
+    fun whenGetHeadersIfFeatureAndGpcAreEnabledAndUrlIsInExceptionsThenReturnEmptyMap() = runTest {
         givenFeatureAndGpcAreEnabled()
 
         val result = testee.getHeaders(EXCEPTION_URL)
@@ -85,7 +91,7 @@ class RealGpcTest {
     }
 
     @Test
-    fun whenGetHeadersIfFeatureAndGpcAreEnabledAndUrlIsNotInExceptionsThenReturnMapWithHeaders() {
+    fun whenGetHeadersIfFeatureAndGpcAreEnabledAndUrlIsNotInExceptionsThenReturnMapWithHeaders() = runTest {
         givenFeatureAndGpcAreEnabled()
 
         val result = testee.getHeaders("test.com")
@@ -95,7 +101,7 @@ class RealGpcTest {
     }
 
     @Test
-    fun whenGetHeadersIfFeatureIsEnabledAndGpcIsNotEnabledAndUrlIsNotInExceptionsThenReturnEmptyMap() {
+    fun whenGetHeadersIfFeatureIsEnabledAndGpcIsNotEnabledAndUrlIsNotInExceptionsThenReturnEmptyMap() = runTest {
         givenFeatureIsEnabledButGpcIsNot()
 
         val result = testee.getHeaders("test.com")
@@ -104,7 +110,7 @@ class RealGpcTest {
     }
 
     @Test
-    fun whenGetHeadersIfFeatureIsNotEnabledAndGpcIsEnabledAndUrlIsNotInExceptionsThenReturnEmptyMap() {
+    fun whenGetHeadersIfFeatureIsNotEnabledAndGpcIsEnabledAndUrlIsNotInExceptionsThenReturnEmptyMap() = runTest {
         givenFeatureIsNotEnabledButGpcIsEnabled()
 
         val result = testee.getHeaders("test.com")
@@ -113,14 +119,14 @@ class RealGpcTest {
     }
 
     @Test
-    fun whenCanUrlAddHeadersIfFeatureAndGpcAreEnabledAndAndUrlIsInExceptionsThenReturnFalse() {
+    fun whenCanUrlAddHeadersIfFeatureAndGpcAreEnabledAndAndUrlIsInExceptionsThenReturnFalse() = runTest {
         givenFeatureAndGpcAreEnabled()
 
         assertFalse(testee.canUrlAddHeaders(EXCEPTION_URL, emptyMap()))
     }
 
     @Test
-    fun whenCanUrlAddHeadersIfFeatureAndGpcAreEnabledAndAndUrlIsInConsumersListsAndHeaderAlreadyExistsThenReturnFalse() {
+    fun whenCanUrlAddHeadersIfFeatureAndGpcAreEnabledAndAndUrlIsInConsumersListsAndHeaderAlreadyExistsThenReturnFalse() = runTest {
         givenFeatureAndGpcAreEnabled()
 
         assertFalse(
@@ -129,21 +135,21 @@ class RealGpcTest {
     }
 
     @Test
-    fun whenCanUrlAddHeadersIfFeatureAndGpcAreEnabledAndAndUrlIsInConsumersListAndHeaderDoNotExistsThenReturnTrue() {
+    fun whenCanUrlAddHeadersIfFeatureAndGpcAreEnabledAndAndUrlIsInConsumersListAndHeaderDoNotExistsThenReturnTrue() = runTest {
         givenFeatureAndGpcAreEnabled()
 
         assertTrue(testee.canUrlAddHeaders(VALID_CONSUMER_URL, emptyMap()))
     }
 
     @Test
-    fun whenCanUrlAddHeadersIfFeatureAndGpcAreEnabledAndAndUrlIsInNotInConsumersListAndHeaderDoNotExistsThenReturnFalse() {
+    fun whenCanUrlAddHeadersIfFeatureAndGpcAreEnabledAndAndUrlIsInNotInConsumersListAndHeaderDoNotExistsThenReturnFalse() = runTest {
         givenFeatureAndGpcAreEnabled()
 
         assertFalse(testee.canUrlAddHeaders("test.com", emptyMap()))
     }
 
     @Test
-    fun whenCanUrlAddHeadersIfFeatureAndGpcAreEnabledAndUrlIsInConsumersButInTheExceptionListThenReturnFalse() {
+    fun whenCanUrlAddHeadersIfFeatureAndGpcAreEnabledAndUrlIsInConsumersButInTheExceptionListThenReturnFalse() = runTest {
         val exceptions =
             CopyOnWriteArrayList<GpcException>().apply { add(GpcException(VALID_CONSUMER_URL)) }
         whenever(mockGpcRepository.exceptions).thenReturn(exceptions)
@@ -153,49 +159,49 @@ class RealGpcTest {
     }
 
     @Test
-    fun whenCanUrlAddHeadersIfFeatureIsNotEnabledAndGpcIsEnabledAndAndUrlIsInConsumersListAndHeaderDoNotExistsThenReturnFalse() {
+    fun whenCanUrlAddHeadersIfFeatureIsNotEnabledAndGpcIsEnabledAndAndUrlIsInConsumersListAndHeaderDoNotExistsThenReturnFalse() = runTest {
         givenFeatureIsNotEnabledButGpcIsEnabled()
 
         assertFalse(testee.canUrlAddHeaders(VALID_CONSUMER_URL, emptyMap()))
     }
 
     @Test
-    fun whenCanUrlAddHeadersIfFeatureIsEnabledAndGpcIsNotEnabledAndAndUrlIsInConsumersListAndHeaderDoNotExistsThenReturnFalse() {
+    fun whenCanUrlAddHeadersIfFeatureIsEnabledAndGpcIsNotEnabledAndAndUrlIsInConsumersListAndHeaderDoNotExistsThenReturnFalse() = runTest {
         givenFeatureIsEnabledButGpcIsNot()
 
         assertFalse(testee.canUrlAddHeaders(VALID_CONSUMER_URL, emptyMap()))
     }
 
     @Test
-    fun whenCanGpcBeUsedByUrlIfFeatureAndGpcAreEnabledAnUrlIsNotAnExceptionThenReturnTrue() {
+    fun whenCanGpcBeUsedByUrlIfFeatureAndGpcAreEnabledAnUrlIsNotAnExceptionThenReturnTrue() = runTest {
         givenFeatureAndGpcAreEnabled()
 
         assertTrue(testee.canGpcBeUsedByUrl("test.com"))
     }
 
     @Test
-    fun whenCanGpcBeUsedByUrlIfFeatureAndGpcAreEnabledAnUrlIsAnExceptionThenReturnFalse() {
+    fun whenCanGpcBeUsedByUrlIfFeatureAndGpcAreEnabledAnUrlIsAnExceptionThenReturnFalse() = runTest {
         givenFeatureAndGpcAreEnabled()
 
         assertFalse(testee.canGpcBeUsedByUrl(EXCEPTION_URL))
     }
 
     @Test
-    fun whenCanGpcBeUsedByUrlIfFeatureIsEnabledAndGpcIsNotEnabledAnUrlIsNotAnExceptionThenReturnFalse() {
+    fun whenCanGpcBeUsedByUrlIfFeatureIsEnabledAndGpcIsNotEnabledAnUrlIsNotAnExceptionThenReturnFalse() = runTest {
         givenFeatureIsEnabledButGpcIsNot()
 
         assertFalse(testee.canGpcBeUsedByUrl("test.com"))
     }
 
     @Test
-    fun whenCanGpcBeUsedByUrlIfFeatureIsNotEnabledAndGpcIsEnabledAnUrlIsNotAnExceptionThenReturnFalse() {
+    fun whenCanGpcBeUsedByUrlIfFeatureIsNotEnabledAndGpcIsEnabledAnUrlIsNotAnExceptionThenReturnFalse() = runTest {
         givenFeatureIsNotEnabledButGpcIsEnabled()
 
         assertFalse(testee.canGpcBeUsedByUrl("test.com"))
     }
 
     @Test
-    fun whenCanGpcBeUsedByUrlIfFeatureAndGpcAreEnabledAnUrlIsInUnprotectedTemporaryThenReturnFalse() {
+    fun whenCanGpcBeUsedByUrlIfFeatureAndGpcAreEnabledAnUrlIsInUnprotectedTemporaryThenReturnFalse() = runTest {
         givenFeatureAndGpcAreEnabled()
         whenever(mockUnprotectedTemporary.isAnException(VALID_CONSUMER_URL)).thenReturn(true)
 
