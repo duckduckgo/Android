@@ -1108,7 +1108,6 @@ class OmnibarLayout @JvmOverloads constructor(
 
     private fun configureCustomTabOmnibar(customTab: ViewMode.CustomTab) {
         if (omnibarRepository.isNewCustomTabEnabled) {
-            omniBarContainer.hide()
             customTabToolbarColor = customTab.toolbarColor
             with(newCustomTabToolbarContainer) {
                 if (!customTabToolbar.isVisible) {
@@ -1147,6 +1146,7 @@ class OmnibarLayout @JvmOverloads constructor(
 
                     browserMenu.isVisible = true
 
+                    omniBarContainer.hide()
                     customTabToolbar.show()
 
                     customTabCloseIcon.setOnClickListener {
