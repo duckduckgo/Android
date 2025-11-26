@@ -25,6 +25,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Parcelable;
+import android.os.SystemClock;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewParent;
@@ -186,6 +187,7 @@ public abstract class FragmentStateAdapter extends RecyclerView.Adapter<Fragment
 
     @Override
     public final void onBindViewHolder(final @NonNull FragmentViewHolder holder, int position) {
+        long startTime = SystemClock.elapsedRealtime();
         final long itemId = holder.getItemId();
         final int viewHolderId = holder.getContainer().getId();
         final Long boundItemId = itemForViewHolder(viewHolderId); // item currently bound to the VH
@@ -205,6 +207,12 @@ public abstract class FragmentStateAdapter extends RecyclerView.Adapter<Fragment
         }
 
         gcFragments();
+
+        long duration = SystemClock.elapsedRealtime() - startTime;
+        LogcatKt.logcat("TabPerf", LogPriority.DEBUG, () ->
+                String.format("[TabCreation] onBindViewHolder completed in %dms (position: %d, itemId: %d)",
+                        duration, position, itemId)
+        );
     }
 
     @SuppressWarnings("WeakerAccess") // to avoid creation of a synthetic accessor
@@ -287,10 +295,16 @@ public abstract class FragmentStateAdapter extends RecyclerView.Adapter<Fragment
 
     @Override
     public final void onViewAttachedToWindow(@NonNull final FragmentViewHolder holder) {
+        long startTime = SystemClock.elapsedRealtime();
         if (shouldPlaceFragmentInViewHolder(holder.getBindingAdapterPosition())) {
             placeFragmentInViewHolder(holder);
             gcFragments();
         }
+        long duration = SystemClock.elapsedRealtime() - startTime;
+        LogcatKt.logcat("TabPerf", LogPriority.DEBUG, () ->
+                String.format("[TabCreation] onViewAttachedToWindow completed in %dms (itemId: %d)",
+                        duration, holder.getItemId())
+        );
     }
 
     /**
@@ -298,6 +312,7 @@ public abstract class FragmentStateAdapter extends RecyclerView.Adapter<Fragment
      */
     @SuppressWarnings("WeakerAccess") // to avoid creation of a synthetic accessor
     void placeFragmentInViewHolder(@NonNull final FragmentViewHolder holder) {
+        long startTime = SystemClock.elapsedRealtime();
         long itemId = holder.getItemId();
         itemIdQueue.remove(itemId);
         itemIdQueue.add(itemId);
@@ -336,6 +351,11 @@ public abstract class FragmentStateAdapter extends RecyclerView.Adapter<Fragment
         // { f:added, v:notCreated, v:notAttached} -> schedule callback for when created
         if (fragment.isAdded() && view == null) {
             scheduleViewAttach(fragment, container);
+            long duration = SystemClock.elapsedRealtime() - startTime;
+            LogcatKt.logcat("TabPerf", LogPriority.DEBUG, () ->
+                    String.format("[TabCreation] placeFragmentInViewHolder: scheduled view attach in %dms (itemId: %d)",
+                            duration, itemId)
+            );
             return;
         }
 
@@ -345,6 +365,11 @@ public abstract class FragmentStateAdapter extends RecyclerView.Adapter<Fragment
                 addViewToContainer(view, container);
             }
             showFragment(holder.getItemId());
+            long duration = SystemClock.elapsedRealtime() - startTime;
+            LogcatKt.logcat("TabPerf", LogPriority.DEBUG, () ->
+                    String.format("[TabCreation] placeFragmentInViewHolder: reattached view in %dms (itemId: %d)",
+                            duration, itemId)
+            );
             return;
         }
 
@@ -352,25 +377,42 @@ public abstract class FragmentStateAdapter extends RecyclerView.Adapter<Fragment
         if (fragment.isAdded()) {
             addViewToContainer(view, container);
             showFragment(holder.getItemId());
+            long duration = SystemClock.elapsedRealtime() - startTime;
+            LogcatKt.logcat("TabPerf", LogPriority.DEBUG, () ->
+                    String.format("[TabCreation] placeFragmentInViewHolder: attached view in %dms (itemId: %d)",
+                            duration, itemId)
+            );
             return;
         }
 
         // { f:notAdded, v:notCreated, v:notAttached } -> add, create, attach
         if (!shouldDelayFragmentTransactions()) {
+            long fragmentAddStartTime = SystemClock.elapsedRealtime();
             scheduleViewAttach(fragment, container);
             List<FragmentTransactionCallback.OnPostEventListener> onPost =
                     mFragmentEventDispatcher.dispatchPreAdded(fragment);
             try {
                 fragment.setMenuVisibility(false); // appropriate for maxLifecycle == STARTED
+                long transactionStartTime = SystemClock.elapsedRealtime();
                 mFragmentManager
                         .beginTransaction()
                         .add(fragment, "f" + holder.getItemId())
                         .setMaxLifecycle(fragment, STARTED)
                         .commitNow();
+                long transactionDuration = SystemClock.elapsedRealtime() - transactionStartTime;
+                LogcatKt.logcat("TabPerf", LogPriority.DEBUG, () ->
+                        String.format("[TabCreation] Fragment transaction (add + commitNow) took %dms (itemId: %d)",
+                                transactionDuration, itemId)
+                );
                 mFragmentMaxLifecycleEnforcer.updateFragmentMaxLifecycle(false);
             } finally {
                 mFragmentEventDispatcher.dispatchPostEvents(onPost);
             }
+            long duration = SystemClock.elapsedRealtime() - startTime;
+            LogcatKt.logcat("TabPerf", LogPriority.DEBUG, () ->
+                    String.format("[TabCreation] placeFragmentInViewHolder: added new fragment in %dms (itemId: %d)",
+                            duration, itemId)
+            );
         } else {
             if (mFragmentManager.isDestroyed()) {
                 return; // nothing we can do
@@ -397,6 +439,7 @@ public abstract class FragmentStateAdapter extends RecyclerView.Adapter<Fragment
         // ViewHolder container ids are dynamically generated, we opted to manually handle
         // attaching Fragment views to containers. For consistency, we use the same mechanism for
         // all Fragment views.
+        final long scheduleTime = SystemClock.elapsedRealtime();
         mFragmentManager.registerFragmentLifecycleCallbacks(
                 new FragmentManager.FragmentLifecycleCallbacks() {
                     // TODO(b/141956012): Suppressed during upgrade to AGP 3.6.
@@ -408,6 +451,11 @@ public abstract class FragmentStateAdapter extends RecyclerView.Adapter<Fragment
                             @NonNull View v,
                             @Nullable Bundle savedInstanceState) {
                         if (f == fragment) {
+                            long viewCreationDuration = SystemClock.elapsedRealtime() - scheduleTime;
+                            LogcatKt.logcat("TabPerf", LogPriority.DEBUG, () ->
+                                    String.format("[TabCreation] Fragment view created (inflation) took %dms",
+                                            viewCreationDuration)
+                            );
                             fm.unregisterFragmentLifecycleCallbacks(this);
                             addViewToContainer(v, container);
                         }
@@ -418,6 +466,7 @@ public abstract class FragmentStateAdapter extends RecyclerView.Adapter<Fragment
 
     @SuppressWarnings("WeakerAccess") // to avoid creation of a synthetic accessor
     void addViewToContainer(@NonNull View v, @NonNull FrameLayout container) {
+        long startTime = SystemClock.elapsedRealtime();
         Object lock = containerLocks.computeIfAbsent(container, k -> new Object());
         synchronized(lock) {
             if (container.getChildCount() > 1) {
@@ -425,6 +474,10 @@ public abstract class FragmentStateAdapter extends RecyclerView.Adapter<Fragment
             }
 
             if (v.getParent() == container) {
+                long duration = SystemClock.elapsedRealtime() - startTime;
+                LogcatKt.logcat("TabPerf", LogPriority.DEBUG, () ->
+                        String.format("[TabCreation] addViewToContainer: view already in container (%dms)", duration)
+                );
                 return;
             }
 
@@ -437,6 +490,10 @@ public abstract class FragmentStateAdapter extends RecyclerView.Adapter<Fragment
             }
 
             container.addView(v);
+            long duration = SystemClock.elapsedRealtime() - startTime;
+            LogcatKt.logcat("TabPerf", LogPriority.DEBUG, () ->
+                    String.format("[TabCreation] addViewToContainer completed in %dms", duration)
+            );
         }
     }
 
