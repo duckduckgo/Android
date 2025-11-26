@@ -380,7 +380,6 @@ class RealSubscriptionsManager @Inject constructor(
                     }
                     is PurchaseState.Canceled -> {
                         _currentPurchaseState.emit(CurrentPurchase.Canceled)
-                        subscriptionSwitchWideEvent.onUserCancelled()
                         if (removeExpiredSubscriptionOnCancelledPurchase) {
                             if (subscriptionStatus().isExpired()) {
                                 signOut()
