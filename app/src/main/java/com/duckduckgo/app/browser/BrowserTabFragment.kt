@@ -947,6 +947,7 @@ class BrowserTabFragment :
         }
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        val startTime = android.os.SystemClock.elapsedRealtime()
         super.onCreate(savedInstanceState)
         logcat { "onCreate called for tabId=$tabId" }
 
@@ -995,6 +996,9 @@ class BrowserTabFragment :
         viewModel.handleExternalLaunch(isLaunchedFromExternalApp)
 
         observeSubscriptionEventDataChannel()
+
+        val duration = android.os.SystemClock.elapsedRealtime() - startTime
+        logcat("TabPerf") { "[TabCreation] Fragment onCreate completed in ${duration}ms for tabId=$tabId" }
     }
 
     private fun observeSubscriptionEventDataChannel() {
@@ -1035,12 +1039,16 @@ class BrowserTabFragment :
         }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
+        val startTime = android.os.SystemClock.elapsedRealtime()
         super.onActivityCreated(savedInstanceState)
 
+        val bindingStartTime = android.os.SystemClock.elapsedRealtime()
         omnibar = Omnibar(
             omnibarType = settingsDataStore.omnibarType,
             binding = binding,
         )
+        val bindingDuration = android.os.SystemClock.elapsedRealtime() - bindingStartTime
+        logcat("TabPerf") { "[TabCreation] View binding/inflation completed in ${bindingDuration}ms for tabId=$tabId" }
 
         webViewContainer = binding.webViewContainer
         configureObservers()
@@ -1088,6 +1096,9 @@ class BrowserTabFragment :
         }
 
         launchDownloadMessagesJob()
+
+        val duration = android.os.SystemClock.elapsedRealtime() - startTime
+        logcat("TabPerf") { "[TabCreation] Fragment onActivityCreated completed in ${duration}ms for tabId=$tabId" }
     }
 
     private fun updateOrDeleteWebViewPreview() {
