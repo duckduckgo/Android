@@ -23,6 +23,7 @@ import com.duckduckgo.remote.messaging.api.Content.MessageType.BIG_TWO_ACTION
 import com.duckduckgo.remote.messaging.api.Content.MessageType.MEDIUM
 import com.duckduckgo.remote.messaging.api.Content.MessageType.PROMO_SINGLE_ACTION
 import com.duckduckgo.remote.messaging.api.Content.MessageType.SMALL
+import com.duckduckgo.remote.messaging.api.Content.Placeholder
 import com.duckduckgo.remote.messaging.api.JsonActionType.APP_TP_ONBOARDING
 import com.duckduckgo.remote.messaging.api.JsonActionType.DEFAULT_BROWSER
 import com.duckduckgo.remote.messaging.api.JsonActionType.DISMISS
@@ -73,12 +74,22 @@ sealed class Content(val messageType: MessageType) {
         val action: Action,
     ) : Content(PROMO_SINGLE_ACTION)
 
+    data class CardsList(
+        val titleText: String,
+        val descriptionText: String,
+        val placeholder: Placeholder,
+        val primaryActionText: String,
+        val primaryAction: Action,
+        val listItems: List<CardItem>,
+    ) : Content(MessageType.CARDS_LIST)
+
     enum class MessageType {
         SMALL,
         MEDIUM,
         BIG_SINGLE_ACTION,
         BIG_TWO_ACTION,
         PROMO_SINGLE_ACTION,
+        CARDS_LIST,
     }
 
     enum class Placeholder(val jsonValue: String) {
@@ -91,6 +102,9 @@ sealed class Content(val messageType: MessageType) {
         DUCK_AI_OLD("Duck.ai"),
         DUCK_AI("DuckAi"),
         VISUAL_DESIGN_UPDATE("VisualDesignUpdate"),
+        IMAGE_AI("ImageAI"),
+        RADAR("Radar"),
+        KEY_IMPORT("KeyImport"),
         ;
 
         companion object {
@@ -103,6 +117,7 @@ sealed class Content(val messageType: MessageType) {
 
 sealed class Action(val actionType: String, open val value: String, open val additionalParameters: Map<String, String>?) {
     data class Url(override val value: String) : Action(URL.jsonValue, value, null)
+    data class UrlInContext(override val value: String) : Action(JsonActionType.URL_IN_CONTEXT.jsonValue, value, null)
     data class PlayStore(override val value: String) : Action(PLAYSTORE.jsonValue, value, null)
     data object DefaultBrowser : Action(DEFAULT_BROWSER.jsonValue, "", null)
     data object Dismiss : Action(DISMISS.jsonValue, "", null)
@@ -127,4 +142,17 @@ sealed class Action(val actionType: String, open val value: String, open val add
         override val value: String,
         override val additionalParameters: Map<String, String>?,
     ) : Action(JsonActionType.SURVEY.jsonValue, value, additionalParameters)
+}
+
+data class CardItem(
+    val id: String,
+    val type: CardItemType,
+    val titleText: String,
+    val descriptionText: String,
+    val placeholder: Placeholder,
+    val primaryAction: Action,
+)
+
+enum class CardItemType(val jsonValue: String) {
+    TWO_LINE_LIST_ITEM("two_line_list_item"),
 }

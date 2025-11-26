@@ -25,6 +25,7 @@ import com.duckduckgo.remote.messaging.api.Action.Survey
 import com.duckduckgo.remote.messaging.api.Content
 import com.duckduckgo.remote.messaging.api.RemoteMessage
 import com.duckduckgo.remote.messaging.api.RemoteMessageModel
+import com.duckduckgo.remote.messaging.api.Surface
 import com.duckduckgo.remote.messaging.impl.newtab.RemoteMessageViewModel
 import com.duckduckgo.remote.messaging.impl.newtab.RemoteMessageViewModel.Command.SubmitUrl
 import com.duckduckgo.survey.api.SurveyParameterManager
@@ -73,6 +74,18 @@ class RemoteMessageViewModelTest {
     }
 
     @Test
+    fun whenViewModelInitialisedWithMessageAndModalSurfaceThenViewStateEmitInitStateWithNoMessageToShow() = runTest {
+        val remoteMessage = RemoteMessage("id1", Content.Small("", ""), emptyList(), emptyList(), listOf(Surface.MODAL))
+        whenever(remoteMessageModel.getActiveMessages()).thenReturn(flowOf(remoteMessage))
+        testee.onStart(mockLifecycleOwner)
+        testee.viewState.test {
+            expectMostRecentItem().also {
+                assertFalse(it.newMessage)
+            }
+        }
+    }
+
+    @Test
     fun whenViewModelInitialisedThenViewStateEmitInitState() = runTest {
         val remoteMessage = whenRemoteMessageAvailable()
 
@@ -87,7 +100,7 @@ class RemoteMessageViewModelTest {
 
     @Test
     fun whenMessageShownThenRemoteMessagingModelUpdated() = runTest {
-        val remoteMessage = RemoteMessage("id1", Content.Small("", ""), emptyList(), emptyList(), emptyList())
+        val remoteMessage = RemoteMessage("id1", Content.Small("", ""), emptyList(), emptyList(), listOf(Surface.NEW_TAB_PAGE))
         whenever(remoteMessageModel.getActiveMessages()).thenReturn(flowOf(remoteMessage))
         testee.onStart(mockLifecycleOwner)
 
@@ -105,7 +118,7 @@ class RemoteMessageViewModelTest {
 
     @Test
     fun whenMessagePrimaryButtonCLickedThenRemoteMessagingModelDismissed() = runTest {
-        val remoteMessage = RemoteMessage("id1", Content.Small("", ""), emptyList(), emptyList(), emptyList())
+        val remoteMessage = RemoteMessage("id1", Content.Small("", ""), emptyList(), emptyList(), listOf(Surface.NEW_TAB_PAGE))
         whenever(remoteMessageModel.getActiveMessages()).thenReturn(flowOf(remoteMessage))
         whenever(remoteMessageModel.onPrimaryActionClicked(remoteMessage)).thenReturn(DefaultBrowser)
         testee.onStart(mockLifecycleOwner)
@@ -120,7 +133,7 @@ class RemoteMessageViewModelTest {
 
     @Test
     fun whenMessageSecondaryButtonCLickedThenRemoteMessagingModelDismissed() = runTest {
-        val remoteMessage = RemoteMessage("id1", Content.Small("", ""), emptyList(), emptyList(), emptyList())
+        val remoteMessage = RemoteMessage("id1", Content.Small("", ""), emptyList(), emptyList(), listOf(Surface.NEW_TAB_PAGE))
         whenever(remoteMessageModel.getActiveMessages()).thenReturn(flowOf(remoteMessage))
         whenever(remoteMessageModel.onSecondaryActionClicked(remoteMessage)).thenReturn(DefaultBrowser)
         testee.onStart(mockLifecycleOwner)
@@ -135,7 +148,7 @@ class RemoteMessageViewModelTest {
 
     @Test
     fun whenMessageActionCLickedThenRemoteMessagingModelDismissed() = runTest {
-        val remoteMessage = RemoteMessage("id1", Content.Small("", ""), emptyList(), emptyList(), emptyList())
+        val remoteMessage = RemoteMessage("id1", Content.Small("", ""), emptyList(), emptyList(), listOf(Surface.NEW_TAB_PAGE))
         whenever(remoteMessageModel.getActiveMessages()).thenReturn(flowOf(remoteMessage))
         whenever(remoteMessageModel.onActionClicked(remoteMessage)).thenReturn(DefaultBrowser)
         testee.onStart(mockLifecycleOwner)
@@ -150,7 +163,7 @@ class RemoteMessageViewModelTest {
 
     @Test
     fun whenMessageActionClickedIsSurveyThenSubmitUrlCommandSent() = runTest {
-        val remoteMessage = RemoteMessage("id1", Content.Small("", ""), emptyList(), emptyList(), emptyList())
+        val remoteMessage = RemoteMessage("id1", Content.Small("", ""), emptyList(), emptyList(), listOf(Surface.NEW_TAB_PAGE))
         whenever(surveyParameterManager.buildSurveyUrl("https://example.com", listOf("atb"))).thenReturn("https://example.com?atb")
         whenever(remoteMessageModel.getActiveMessages()).thenReturn(flowOf(remoteMessage))
         whenever(remoteMessageModel.onPrimaryActionClicked(remoteMessage)).thenReturn(
@@ -175,7 +188,7 @@ class RemoteMessageViewModelTest {
     }
 
     private fun whenRemoteMessageAvailable(): RemoteMessage {
-        val remoteMessage = RemoteMessage("id1", Content.Small("", ""), emptyList(), emptyList(), emptyList())
+        val remoteMessage = RemoteMessage("id1", Content.Small("", ""), emptyList(), emptyList(), listOf(Surface.NEW_TAB_PAGE))
         whenever(remoteMessageModel.getActiveMessages()).thenReturn(flowOf(remoteMessage))
         testee.onStart(mockLifecycleOwner)
         return remoteMessage

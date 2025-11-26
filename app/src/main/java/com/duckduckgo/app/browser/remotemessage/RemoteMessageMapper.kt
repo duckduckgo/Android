@@ -29,14 +29,17 @@ import com.duckduckgo.remote.messaging.api.Content.Placeholder.CRITICAL_UPDATE
 import com.duckduckgo.remote.messaging.api.Content.Placeholder.DDG_ANNOUNCE
 import com.duckduckgo.remote.messaging.api.Content.Placeholder.DUCK_AI
 import com.duckduckgo.remote.messaging.api.Content.Placeholder.DUCK_AI_OLD
+import com.duckduckgo.remote.messaging.api.Content.Placeholder.IMAGE_AI
+import com.duckduckgo.remote.messaging.api.Content.Placeholder.KEY_IMPORT
 import com.duckduckgo.remote.messaging.api.Content.Placeholder.MAC_AND_WINDOWS
 import com.duckduckgo.remote.messaging.api.Content.Placeholder.PRIVACY_SHIELD
+import com.duckduckgo.remote.messaging.api.Content.Placeholder.RADAR
 import com.duckduckgo.remote.messaging.api.Content.Placeholder.VISUAL_DESIGN_UPDATE
 import com.duckduckgo.remote.messaging.api.Content.PromoSingleAction
 import com.duckduckgo.remote.messaging.api.Content.Small
 import com.duckduckgo.remote.messaging.api.RemoteMessage
 
-fun RemoteMessage.asMessage(isLightModeEnabled: Boolean): Message {
+fun RemoteMessage.asMessage(isLightModeEnabled: Boolean): Message? {
     return when (val content = this.content) {
         is Small -> Message(
             title = content.titleText,
@@ -71,6 +74,7 @@ fun RemoteMessage.asMessage(isLightModeEnabled: Boolean): Message {
             promoAction = content.actionText,
             messageType = MessageType.REMOTE_PROMO_MESSAGE,
         )
+        else -> null
     }
 }
 
@@ -89,5 +93,8 @@ private fun Placeholder.drawable(isLightModeEnabled: Boolean): Int {
         } else {
             R.drawable.ic_visual_design_update_artwork_dark
         }
+        IMAGE_AI -> R.drawable.ic_image_ai
+        RADAR -> R.drawable.ic_radar
+        KEY_IMPORT -> R.drawable.ic_key_import
     }
 }

@@ -32,6 +32,7 @@ import com.duckduckgo.common.utils.playstore.PlayStoreUtils
 import com.duckduckgo.mobile.android.app.tracking.AppTrackingProtection
 import com.duckduckgo.remote.messaging.api.RemoteMessage
 import com.duckduckgo.remote.messaging.api.RemoteMessageModel
+import com.duckduckgo.remote.messaging.api.Surface
 import com.duckduckgo.savedsites.api.SavedSitesRepository
 import com.duckduckgo.savedsites.api.models.SavedSite.Favorite
 import com.duckduckgo.sync.api.engine.SyncEngine
@@ -47,6 +48,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
@@ -123,7 +125,12 @@ class NewTabLegacyPageViewModel @AssistedInject constructor(
 
         viewModelScope.launch(dispatchers.io()) {
             savedSitesRepository.getFavorites()
-                .combine(remoteMessagingModel.getActiveMessages()) { favorites, activeMessage ->
+                .combine(
+                    remoteMessagingModel.getActiveMessages()
+                        .map { message ->
+                            if (message?.surfaces?.contains(Surface.NEW_TAB_PAGE) == true) message else null
+                        },
+                ) { favorites, activeMessage ->
                     if (favorites.isNotEmpty()) {
                         syncEngine.triggerSync(FEATURE_READ)
                     }

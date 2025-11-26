@@ -31,6 +31,7 @@ import com.duckduckgo.remote.messaging.api.Content.Placeholder.MAC_AND_WINDOWS
 import com.duckduckgo.remote.messaging.api.Content.PromoSingleAction
 import com.duckduckgo.remote.messaging.api.Content.Small
 import com.duckduckgo.remote.messaging.api.RemoteMessage
+import com.duckduckgo.remote.messaging.api.Surface
 import com.duckduckgo.remote.messaging.fixtures.getMessageMapper
 import com.duckduckgo.remote.messaging.store.RemoteMessageEntity.Status
 import com.duckduckgo.remote.messaging.store.RemoteMessagingConfigRepository
@@ -86,7 +87,7 @@ class AppRemoteMessagingRepositoryTest {
                 ),
                 matchingRules = emptyList(),
                 exclusionRules = emptyList(),
-                surfaces = emptyList(),
+                surfaces = listOf(Surface.NEW_TAB_PAGE),
             ),
         )
 
@@ -103,7 +104,7 @@ class AppRemoteMessagingRepositoryTest {
                     ),
                     matchingRules = emptyList(),
                     exclusionRules = emptyList(),
-                    surfaces = emptyList(),
+                    surfaces = listOf(Surface.NEW_TAB_PAGE),
                 ),
                 message,
             )
@@ -122,7 +123,7 @@ class AppRemoteMessagingRepositoryTest {
                 ),
                 matchingRules = emptyList(),
                 exclusionRules = emptyList(),
-                surfaces = emptyList(),
+                surfaces = listOf(Surface.NEW_TAB_PAGE),
             ),
         )
 
@@ -138,7 +139,7 @@ class AppRemoteMessagingRepositoryTest {
                     ),
                     matchingRules = emptyList(),
                     exclusionRules = emptyList(),
-                    surfaces = emptyList(),
+                    surfaces = listOf(Surface.NEW_TAB_PAGE),
                 ),
                 message,
             )
@@ -160,7 +161,7 @@ class AppRemoteMessagingRepositoryTest {
                 ),
                 matchingRules = emptyList(),
                 exclusionRules = emptyList(),
-                surfaces = emptyList(),
+                surfaces = listOf(Surface.NEW_TAB_PAGE),
             ),
         )
 
@@ -179,7 +180,7 @@ class AppRemoteMessagingRepositoryTest {
                     ),
                     matchingRules = emptyList(),
                     exclusionRules = emptyList(),
-                    surfaces = emptyList(),
+                    surfaces = listOf(Surface.NEW_TAB_PAGE),
                 ),
                 message,
             )
@@ -203,7 +204,7 @@ class AppRemoteMessagingRepositoryTest {
                 ),
                 matchingRules = emptyList(),
                 exclusionRules = emptyList(),
-                surfaces = emptyList(),
+                surfaces = listOf(Surface.NEW_TAB_PAGE),
             ),
         )
 
@@ -224,7 +225,7 @@ class AppRemoteMessagingRepositoryTest {
                     ),
                     matchingRules = emptyList(),
                     exclusionRules = emptyList(),
-                    surfaces = emptyList(),
+                    surfaces = listOf(Surface.NEW_TAB_PAGE),
                 ),
                 message,
             )
@@ -246,7 +247,7 @@ class AppRemoteMessagingRepositoryTest {
                 ),
                 matchingRules = emptyList(),
                 exclusionRules = emptyList(),
-                surfaces = emptyList(),
+                surfaces = listOf(Surface.NEW_TAB_PAGE),
             ),
         )
 
@@ -265,7 +266,7 @@ class AppRemoteMessagingRepositoryTest {
                     ),
                     matchingRules = emptyList(),
                     exclusionRules = emptyList(),
-                    surfaces = emptyList(),
+                    surfaces = listOf(Surface.NEW_TAB_PAGE),
                 ),
                 message,
             )
@@ -436,7 +437,7 @@ class AppRemoteMessagingRepositoryTest {
             ),
             matchingRules = emptyList(),
             exclusionRules = emptyList(),
-            surfaces = emptyList(),
+            surfaces = listOf(Surface.NEW_TAB_PAGE),
         )
     }
 }
