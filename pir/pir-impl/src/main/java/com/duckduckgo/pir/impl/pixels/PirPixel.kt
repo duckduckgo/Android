@@ -79,10 +79,6 @@ enum class PirPixel(
         baseName = "pir_email-confirmation-link_backend-status_error",
         type = Count,
     ),
-    PIR_OPTOUT_STAGE_PENDING_EMAIL_CONFIRMATION(
-        baseName = "pir_optout_stage_submit-awaiting-email-confirmation",
-        type = Count,
-    ),
     PIR_EMAIL_CONFIRMATION_ATTEMPT_START(
         baseName = "pir_email-confirmation_attempt-start",
         type = Count,
@@ -215,6 +211,10 @@ enum class PirPixel(
     ),
     PIR_OPTOUT_STAGE_EMAIL_GENERATE(
         baseName = "dbp_optout_stage_email-generate",
+        type = Count,
+    ),
+    PIR_OPTOUT_STAGE_PENDING_EMAIL_CONFIRMATION(
+        baseName = "dbp_optout_stage_submit-awaiting-email-confirmation",
         type = Count,
     ),
     PIR_OPTOUT_STAGE_CAPTCHA_PARSE(

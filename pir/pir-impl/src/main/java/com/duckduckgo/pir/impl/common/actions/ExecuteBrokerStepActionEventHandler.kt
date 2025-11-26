@@ -24,6 +24,8 @@ import com.duckduckgo.pir.impl.common.BrokerStepsParser.BrokerStep.OptOutStep
 import com.duckduckgo.pir.impl.common.BrokerStepsParser.BrokerStep.ScanStep
 import com.duckduckgo.pir.impl.common.PirJob
 import com.duckduckgo.pir.impl.common.PirRunStateHandler
+import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerOptOutStageCaptchaSolved
+import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerOptOutStageSubmit
 import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerScanActionStarted
 import com.duckduckgo.pir.impl.common.actions.EventHandler.Next
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.Event
@@ -135,6 +137,15 @@ class ExecuteBrokerStepActionEventHandler @Inject constructor(
                 }
 
                 if (currentBrokerStep is OptOutStep && actionToExecute is EmailConfirmation) {
+                    pirRunStateHandler.handleState(
+                        BrokerOptOutStageSubmit(
+                            broker = currentBrokerStep.broker,
+                            actionID = actionToExecute.id,
+                            attemptId = state.attemptId,
+                            durationMs = currentTimeProvider.currentTimeMillis() - state.stageStatus.stageStartMs,
+                            tries = state.actionRetryCount + 1,
+                        ),
+                    )
                     Next(
                         nextState = state.copy(
                             stageStatus = PirStageStatus(
@@ -194,6 +205,16 @@ class ExecuteBrokerStepActionEventHandler @Inject constructor(
                                 profileQueryId = state.profileQuery.id,
                                 currentAtemptCount = state.actionRetryCount + 1, // actionRetryCount starts at 0
                                 currentAction = actionToExecute,
+                            ),
+                        )
+                    } else if (currentBrokerStep is OptOutStep && actionToExecute is SolveCaptcha) {
+                        pirRunStateHandler.handleState(
+                            BrokerOptOutStageCaptchaSolved(
+                                broker = currentBrokerStep.broker,
+                                actionID = currentBrokerStep.step.actions[state.currentActionIndex].id,
+                                attemptId = state.attemptId,
+                                durationMs = currentTimeProvider.currentTimeMillis() - state.stageStatus.stageStartMs,
+                                tries = state.actionRetryCount + 1,
                             ),
                         )
                     }

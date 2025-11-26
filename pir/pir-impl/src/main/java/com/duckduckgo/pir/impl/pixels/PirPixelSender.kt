@@ -69,17 +69,6 @@ import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_SCAN_STAGE_RESULT_MATCHES
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_SCAN_STAGE_RESULT_NO_MATCH
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_SCAN_STARTED
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_WEEKLY_CHILD_ORPHANED_OPTOUTS
-import com.duckduckgo.pir.impl.pixels.PirStage.CAPTCHA_PARSE
-import com.duckduckgo.pir.impl.pixels.PirStage.CAPTCHA_SEND
-import com.duckduckgo.pir.impl.pixels.PirStage.CAPTCHA_SOLVE
-import com.duckduckgo.pir.impl.pixels.PirStage.EMAIL_CONFIRM_DECOUPLED
-import com.duckduckgo.pir.impl.pixels.PirStage.EMAIL_CONFIRM_HALTED
-import com.duckduckgo.pir.impl.pixels.PirStage.EMAIL_GENERATE
-import com.duckduckgo.pir.impl.pixels.PirStage.FILL_FORM
-import com.duckduckgo.pir.impl.pixels.PirStage.OTHER
-import com.duckduckgo.pir.impl.pixels.PirStage.START
-import com.duckduckgo.pir.impl.pixels.PirStage.SUBMIT
-import com.duckduckgo.pir.impl.pixels.PirStage.VALIDATE
 import com.squareup.anvil.annotations.ContributesBinding
 import logcat.logcat
 import javax.inject.Inject
@@ -463,28 +452,13 @@ interface PirPixelSender {
         actionType: String,
     )
 
-    fun reportOptOutStage(
-        pirStage: PirStage,
+    fun reportOptOutStageStart(
         brokerUrl: String,
         parentUrl: String,
-        brokerVersion: String,
         attemptId: String,
-        durationMs: Long,
-        tries: Int,
-        actionId: String?,
     )
 
-    fun reportConditionFound(
-        brokerUrl: String,
-        parentUrl: String,
-        brokerVersion: String,
-        attemptId: String,
-        durationMs: Long,
-        tries: Int,
-        actionId: String,
-    )
-
-    fun reportConditionNotFound(
+    fun reportOptOutStageEmailGenerate(
         brokerUrl: String,
         parentUrl: String,
         brokerVersion: String,
@@ -494,7 +468,87 @@ interface PirPixelSender {
         actionId: String,
     )
 
-    fun reportOptOutFinish(
+    fun reportOptOutStageCaptchaParse(
+        brokerUrl: String,
+        parentUrl: String,
+        brokerVersion: String,
+        attemptId: String,
+        durationMs: Long,
+        tries: Int,
+        actionId: String,
+    )
+
+    fun reportOptOutStageCaptchaSend(
+        brokerUrl: String,
+        parentUrl: String,
+        brokerVersion: String,
+        attemptId: String,
+        durationMs: Long,
+        tries: Int,
+        actionId: String,
+    )
+
+    fun reportOptOutStageCaptchaSolve(
+        brokerUrl: String,
+        parentUrl: String,
+        brokerVersion: String,
+        attemptId: String,
+        durationMs: Long,
+        tries: Int,
+        actionId: String,
+    )
+
+    fun reportOptOutStageSubmit(
+        brokerUrl: String,
+        parentUrl: String,
+        brokerVersion: String,
+        attemptId: String,
+        durationMs: Long,
+        tries: Int,
+        actionId: String,
+    )
+
+    fun reportOptOutStageValidate(
+        brokerUrl: String,
+        parentUrl: String,
+        brokerVersion: String,
+        attemptId: String,
+        durationMs: Long,
+        tries: Int,
+        actionId: String,
+    )
+
+    fun reportOptOutStageFillForm(
+        brokerUrl: String,
+        parentUrl: String,
+        brokerVersion: String,
+        attemptId: String,
+        durationMs: Long,
+        tries: Int,
+        actionId: String,
+    )
+
+    fun reportOptOutConditionFound(
+        brokerUrl: String,
+        parentUrl: String,
+        brokerVersion: String,
+        attemptId: String,
+        durationMs: Long,
+        tries: Int,
+        actionId: String,
+    )
+
+    fun reportOptOutConditionNotFound(
+        brokerUrl: String,
+        parentUrl: String,
+        brokerVersion: String,
+        attemptId: String,
+        durationMs: Long,
+        tries: Int,
+        actionId: String,
+    )
+
+    fun reportOptOutStageFinish(
         brokerUrl: String,
         parentUrl: String,
         attemptId: String,
@@ -959,15 +1013,10 @@ class RealPirPixelSender @Inject constructor(
         fire(PIR_SCAN_STAGE_RESULT_ERROR, params)
     }
 
-    override fun reportOptOutStage(
-        pirStage: PirStage,
+    override fun reportOptOutStageStart(
         brokerUrl: String,
         parentUrl: String,
-        brokerVersion: String,
         attemptId: String,
-        durationMs: Long,
-        tries: Int,
-        actionId: String?,
     ) {
         val defaultParams = mutableMapOf(
             PARAM_KEY_BROKER to brokerUrl,
@@ -975,81 +1024,10 @@ class RealPirPixelSender @Inject constructor(
             PARAM_ATTEMPT_ID to attemptId,
         )
 
-        when (pirStage) {
-            START -> {
-                fire(PIR_OPTOUT_STAGE_START, defaultParams)
-            }
-
-            EMAIL_GENERATE -> fireStagePixel(
-                PIR_OPTOUT_STAGE_EMAIL_GENERATE,
-                defaultParams,
-                brokerVersion,
-                durationMs,
-                tries,
-                actionId ?: "",
-            )
-
-            CAPTCHA_PARSE -> fireStagePixel(
-                PIR_OPTOUT_STAGE_CAPTCHA_PARSE,
-                defaultParams,
-                brokerVersion,
-                durationMs,
-                tries,
-                actionId ?: "",
-            )
-
-            CAPTCHA_SEND -> fireStagePixel(
-                PIR_OPTOUT_STAGE_CAPTCHA_SEND,
-                defaultParams,
-                brokerVersion,
-                durationMs,
-                tries,
-                actionId ?: "",
-            )
-
-            CAPTCHA_SOLVE -> fireStagePixel(
-                PIR_OPTOUT_STAGE_CAPTCHA_SOLVE,
-                defaultParams,
-                brokerVersion,
-                durationMs,
-                tries,
-                actionId ?: "",
-            )
-
-            SUBMIT -> fireStagePixel(
-                PIR_OPTOUT_STAGE_SUBMIT,
-                defaultParams,
-                brokerVersion,
-                durationMs,
-                tries,
-                actionId ?: "",
-            )
-
-            VALIDATE -> fireStagePixel(
-                PIR_OPTOUT_STAGE_VALIDATE,
-                defaultParams,
-                brokerVersion,
-                durationMs,
-                tries,
-                actionId ?: "",
-            )
-
-            FILL_FORM -> fireStagePixel(
-                PIR_OPTOUT_STAGE_FILLFORM,
-                defaultParams,
-                brokerVersion,
-                durationMs,
-                tries,
-                actionId ?: "",
-            )
-
-            EMAIL_CONFIRM_HALTED, EMAIL_CONFIRM_DECOUPLED, OTHER -> {
-                // No pixels are emitted for these stages
-            }
-        }
+        fire(PIR_OPTOUT_STAGE_START, defaultParams)
     }
 
-    override fun reportConditionFound(
+    override fun reportOptOutStageEmailGenerate(
         brokerUrl: String,
         parentUrl: String,
         brokerVersion: String,
@@ -1058,20 +1036,21 @@ class RealPirPixelSender @Inject constructor(
         tries: Int,
         actionId: String,
     ) {
-        val params = mapOf(
-            PARAM_KEY_BROKER to brokerUrl,
-            PARAM_KEY_PARENT to parentUrl,
-            PARAM_ATTEMPT_ID to attemptId,
-            PARAM_BROKER_VERSION to brokerVersion,
-            PARAM_DURATION to durationMs.toString(),
-            PARAM_TRIES to tries.toString(),
-            PARAM_ACTION_ID to actionId,
+        fire(
+            PIR_OPTOUT_STAGE_EMAIL_GENERATE,
+            getFullStageParams(
+                brokerUrl = brokerUrl,
+                parentUrl = parentUrl,
+                brokerVersion = brokerVersion,
+                attemptId = attemptId,
+                durationMs = durationMs,
+                tries = tries,
+                actionId = actionId,
+            ),
         )
-
-        fire(PIR_OPTOUT_STAGE_CONDITION_FOUND, params)
     }
 
-    override fun reportConditionNotFound(
+    override fun reportOptOutStageCaptchaParse(
         brokerUrl: String,
         parentUrl: String,
         brokerVersion: String,
@@ -1080,7 +1059,191 @@ class RealPirPixelSender @Inject constructor(
         tries: Int,
         actionId: String,
     ) {
-        val params = mapOf(
+        fire(
+            PIR_OPTOUT_STAGE_CAPTCHA_PARSE,
+            getFullStageParams(
+                brokerUrl = brokerUrl,
+                parentUrl = parentUrl,
+                brokerVersion = brokerVersion,
+                attemptId = attemptId,
+                durationMs = durationMs,
+                tries = tries,
+                actionId = actionId,
+            ),
+        )
+    }
+
+    override fun reportOptOutStageCaptchaSend(
+        brokerUrl: String,
+        parentUrl: String,
+        brokerVersion: String,
+        attemptId: String,
+        durationMs: Long,
+        tries: Int,
+        actionId: String,
+    ) {
+        fire(
+            PIR_OPTOUT_STAGE_CAPTCHA_SEND,
+            getFullStageParams(
+                brokerUrl = brokerUrl,
+                parentUrl = parentUrl,
+                brokerVersion = brokerVersion,
+                attemptId = attemptId,
+                durationMs = durationMs,
+                tries = tries,
+                actionId = actionId,
+            ),
+        )
+    }
+
+    override fun reportOptOutStageCaptchaSolve(
+        brokerUrl: String,
+        parentUrl: String,
+        brokerVersion: String,
+        attemptId: String,
+        durationMs: Long,
+        tries: Int,
+        actionId: String,
+    ) {
+        fire(
+            PIR_OPTOUT_STAGE_CAPTCHA_SOLVE,
+            getFullStageParams(
+                brokerUrl = brokerUrl,
+                parentUrl = parentUrl,
+                brokerVersion = brokerVersion,
+                attemptId = attemptId,
+                durationMs = durationMs,
+                tries = tries,
+                actionId = actionId,
+            ),
+        )
+    }
+
+    override fun reportOptOutStageSubmit(
+        brokerUrl: String,
+        parentUrl: String,
+        brokerVersion: String,
+        attemptId: String,
+        durationMs: Long,
+        tries: Int,
+        actionId: String,
+    ) {
+        fire(
+            PIR_OPTOUT_STAGE_SUBMIT,
+            getFullStageParams(
+                brokerUrl = brokerUrl,
+                parentUrl = parentUrl,
+                brokerVersion = brokerVersion,
+                attemptId = attemptId,
+                durationMs = durationMs,
+                tries = tries,
+                actionId = actionId,
+            ),
+        )
+    }
+
+    override fun reportOptOutStageValidate(
+        brokerUrl: String,
+        parentUrl: String,
+        brokerVersion: String,
+        attemptId: String,
+        durationMs: Long,
+        tries: Int,
+        actionId: String,
+    ) {
+        fire(
+            PIR_OPTOUT_STAGE_VALIDATE,
+            getFullStageParams(
+                brokerUrl = brokerUrl,
+                parentUrl = parentUrl,
+                brokerVersion = brokerVersion,
+                attemptId = attemptId,
+                durationMs = durationMs,
+                tries = tries,
+                actionId = actionId,
+            ),
+        )
+    }
+
+    override fun reportOptOutStageFillForm(
+        brokerUrl: String,
+        parentUrl: String,
+        brokerVersion: String,
+        attemptId: String,
+        durationMs: Long,
+        tries: Int,
+        actionId: String,
+    ) {
+        fire(
+            PIR_OPTOUT_STAGE_FILLFORM,
+            getFullStageParams(
+                brokerUrl = brokerUrl,
+                parentUrl = parentUrl,
+                brokerVersion = brokerVersion,
+                attemptId = attemptId,
+                durationMs = durationMs,
+                tries = tries,
+                actionId = actionId,
+            ),
+        )
+    }
+
+    override fun reportOptOutConditionFound(
+        brokerUrl: String,
+        parentUrl: String,
+        brokerVersion: String,
+        attemptId: String,
+        durationMs: Long,
+        tries: Int,
+        actionId: String,
+    ) {
+        fire(
+            PIR_OPTOUT_STAGE_CONDITION_FOUND,
+            getFullStageParams(
+                brokerUrl = brokerUrl,
+                parentUrl = parentUrl,
+                brokerVersion = brokerVersion,
+                attemptId = attemptId,
+                durationMs = durationMs,
+                tries = tries,
+                actionId = actionId,
+            ),
+        )
+    }
+
+    override fun reportOptOutConditionNotFound(
+        brokerUrl: String,
+        parentUrl: String,
+        brokerVersion: String,
+        attemptId: String,
+        durationMs: Long,
+        tries: Int,
+        actionId: String,
+    ) {
+        fire(
+            PIR_OPTOUT_STAGE_CONDITION_NOT_FOUND,
+            getFullStageParams(
+                brokerUrl = brokerUrl,
+                parentUrl = parentUrl,
+                brokerVersion = brokerVersion,
+                attemptId = attemptId,
+                durationMs = durationMs,
+                tries = tries,
+                actionId = actionId,
+            ),
+        )
+    }
+
+    private fun getFullStageParams(
+        brokerUrl: String,
+        parentUrl: String,
+        brokerVersion: String,
+        attemptId: String,
+        durationMs: Long,
+        tries: Int,
+        actionId: String,
+    ): Map<String, String> {
+        return mapOf(
             PARAM_KEY_BROKER to brokerUrl,
             PARAM_KEY_PARENT to parentUrl,
             PARAM_ATTEMPT_ID to attemptId,
@@ -1089,11 +1252,9 @@ class RealPirPixelSender @Inject constructor(
             PARAM_TRIES to tries.toString(),
             PARAM_ACTION_ID to actionId,
         )
-
-        fire(PIR_OPTOUT_STAGE_CONDITION_NOT_FOUND, params)
     }
 
-    override fun reportOptOutFinish(
+    override fun reportOptOutStageFinish(
         brokerUrl: String,
         parentUrl: String,
         attemptId: String,
@@ -1107,23 +1268,6 @@ class RealPirPixelSender @Inject constructor(
         )
 
         fire(PIR_OPTOUT_STAGE_FINISH, params)
-    }
-
-    private fun fireStagePixel(
-        pirPixel: PirPixel,
-        defaultParams: Map<String, String>,
-        brokerVersion: String,
-        durationMs: Long,
-        tries: Int,
-        actionId: String,
-    ) {
-        val allParams = defaultParams.toMutableMap()
-        allParams[PARAM_BROKER_VERSION] = brokerVersion
-        allParams[PARAM_DURATION] = durationMs.toString()
-        allParams[PARAM_TRIES] = tries.toString()
-        allParams[PARAM_ACTION_ID] = actionId
-
-        fire(pirPixel, allParams)
     }
 
     private fun fire(

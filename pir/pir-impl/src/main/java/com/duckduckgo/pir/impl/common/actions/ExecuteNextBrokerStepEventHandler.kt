@@ -70,9 +70,7 @@ class ExecuteNextBrokerStepEventHandler @Inject constructor(
             )
         } else {
             // Entry point of execution for a Broker
-            emitBrokerStartPixel(state)
-
-            val stateStatus = if (state.brokerStepsToExecute[state.currentBrokerStepIndex] is EmailConfirmationStep) {
+            val nextStage = if (state.brokerStepsToExecute[state.currentBrokerStepIndex] is EmailConfirmationStep) {
                 PirStageStatus(
                     currentStage = PirStage.EMAIL_CONFIRM_DECOUPLED,
                     stageStartMs = currentTimeProvider.currentTimeMillis(),
@@ -84,13 +82,15 @@ class ExecuteNextBrokerStepEventHandler @Inject constructor(
                 )
             }
 
+            emitBrokerStartPixel(state)
+
             Next(
                 nextState =
                 state.copy(
                     currentActionIndex = 0,
                     brokerStepStartTime = currentTimeProvider.currentTimeMillis(),
                     actionRetryCount = 0,
-                    stageStatus = stateStatus,
+                    stageStatus = nextStage,
                 ),
                 nextEvent =
                 ExecuteBrokerStepAction(
@@ -121,7 +121,8 @@ class ExecuteNextBrokerStepEventHandler @Inject constructor(
                 pirRunStateHandler.handleState(
                     BrokerRecordOptOutStarted(
                         broker = currentBrokerStep.broker,
-                        (currentBrokerStep as OptOutStep).profileToOptOut,
+                        extractedProfile = (currentBrokerStep as OptOutStep).profileToOptOut,
+                        attemptId = state.attemptId,
                     ),
                 )
             }

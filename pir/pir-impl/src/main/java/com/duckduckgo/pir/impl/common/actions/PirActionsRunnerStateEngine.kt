@@ -55,7 +55,7 @@ interface PirActionsRunnerStateEngine {
         val pendingUrl: String? = null,
         val actionRetryCount: Int = 0,
         val generatedEmailData: GeneratedEmailData? = null,
-        val attemptId: String? = null,
+        val attemptId: String = "",
         val stageStatus: PirStageStatus,
     )
 

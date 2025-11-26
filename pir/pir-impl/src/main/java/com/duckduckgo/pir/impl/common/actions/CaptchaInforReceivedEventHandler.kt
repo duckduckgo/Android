@@ -16,7 +16,11 @@
 
 package com.duckduckgo.pir.impl.common.actions
 
+import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.pir.impl.common.BrokerStepsParser.BrokerStep.OptOutStep
+import com.duckduckgo.pir.impl.common.PirRunStateHandler
+import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerOptOutStageCaptchaSent
 import com.duckduckgo.pir.impl.common.actions.EventHandler.Next
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.Event
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.Event.CaptchaInfoReceived
@@ -31,7 +35,10 @@ import kotlin.reflect.KClass
     scope = AppScope::class,
     boundType = EventHandler::class,
 )
-class CaptchaInforReceivedEventHandler @Inject constructor() : EventHandler {
+class CaptchaInforReceivedEventHandler @Inject constructor(
+    private val currentTimeProvider: CurrentTimeProvider,
+    private val pirRunStateHandler: PirRunStateHandler,
+) : EventHandler {
     override val event: KClass<out Event> = CaptchaInfoReceived::class
 
     override suspend fun invoke(
@@ -43,6 +50,19 @@ class CaptchaInforReceivedEventHandler @Inject constructor() : EventHandler {
          * from the GetCaptchaInfo js action.
          * We should proceed to the next broker action.
          */
+        val currentBrokerStep = state.brokerStepsToExecute[state.currentBrokerStepIndex]
+
+        if (currentBrokerStep is OptOutStep) {
+            pirRunStateHandler.handleState(
+                BrokerOptOutStageCaptchaSent(
+                    broker = currentBrokerStep.broker,
+                    actionID = currentBrokerStep.step.actions[state.currentActionIndex].id,
+                    attemptId = state.attemptId,
+                    durationMs = currentTimeProvider.currentTimeMillis() - state.stageStatus.stageStartMs,
+                    tries = state.actionRetryCount + 1,
+                ),
+            )
+        }
         return Next(
             nextState = state.copy(
                 currentActionIndex = state.currentActionIndex + 1,
