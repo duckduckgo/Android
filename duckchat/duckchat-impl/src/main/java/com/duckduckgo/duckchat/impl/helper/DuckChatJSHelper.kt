@@ -57,7 +57,6 @@ class RealDuckChatJSHelper @Inject constructor(
     private val dataStore: DuckChatDataStore,
     private val duckAiMetricCollector: DuckAiMetricCollector,
 ) : DuckChatJSHelper {
-
     override suspend fun processJsCallbackMessage(
         featureName: String,
         method: String,
@@ -172,6 +171,7 @@ class RealDuckChatJSHelper @Inject constructor(
                 put(SUPPORTS_NATIVE_CHAT_INPUT, false)
                 put(SUPPORTS_CHAT_ID_RESTORATION, duckChat.isDuckChatFullScreenModeEnabled())
                 put(SUPPORTS_IMAGE_UPLOAD, duckChat.isImageUploadEnabled())
+                put(SUPPORTS_STANDALONE_MIGRATION, duckChat.isStandaloneMigrationEnabled())
             }
         return JsCallbackData(jsonPayload, featureName, method, id)
     }
@@ -234,6 +234,7 @@ class RealDuckChatJSHelper @Inject constructor(
         private const val SUPPORTS_NATIVE_CHAT_INPUT = "supportsNativeChatInput"
         private const val SUPPORTS_IMAGE_UPLOAD = "supportsImageUpload"
         private const val SUPPORTS_CHAT_ID_RESTORATION = "supportsURLChatIDRestoration"
+        private const val SUPPORTS_STANDALONE_MIGRATION = "supportsStandaloneMigration"
         private const val REPORT_METRIC = "reportMetric"
         private const val PLATFORM = "platform"
         private const val ANDROID = "android"

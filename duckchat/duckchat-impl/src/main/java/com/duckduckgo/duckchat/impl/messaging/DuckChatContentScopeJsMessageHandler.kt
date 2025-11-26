@@ -19,6 +19,7 @@ package com.duckduckgo.duckchat.impl.messaging
 import com.duckduckgo.common.utils.AppUrl
 import com.duckduckgo.contentscopescripts.api.ContentScopeJsMessageHandlersPlugin
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.duckchat.impl.DuckChatConstants.HOST_DUCK_AI
 import com.duckduckgo.js.messaging.api.JsMessage
 import com.duckduckgo.js.messaging.api.JsMessageCallback
 import com.duckduckgo.js.messaging.api.JsMessageHandler
@@ -41,6 +42,7 @@ class DuckChatContentScopeJsMessageHandler @Inject constructor() : ContentScopeJ
             override val allowedDomains: List<String> =
                 listOf(
                     AppUrl.Url.HOST,
+                    HOST_DUCK_AI,
                 )
 
             override val featureName: String = "aiChat"
