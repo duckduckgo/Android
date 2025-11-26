@@ -828,6 +828,11 @@
     <!-- Bubble BB & Buck experiment-->
     <string name="onboardingBubbleExperimentSearchDaxDialogDescription">Dine DuckDuckGo-søgninger er altid anonyme.</string>
 
+    <!-- Input Screen Onboarding step -->
+    <string name="preOnboardingInputScreenTitle">Vil du have nem adgang til privat AI-chat?</string>
+    <string name="preOnboardingInputScreenButton">Næste</string>
+    <string name="preOnboardingInputScreenDescription"><![CDATA[AI-funktioner er private og valgfrie. Du kan foretage ændringer i <b>Indstillinger > AI-funktioner</b>.]]></string>
+
     <!-- Appearance settings -->
     <string name="settingsAddressBarPositionTitle">Adresselinje</string>
     <string name="settingsAddressBarPositionHeaderTitle">Placering af adresselinje</string>
