@@ -149,6 +149,7 @@ class OmnibarLayout @JvmOverloads constructor(
         val showBrowserMenuHighlight: Boolean,
         val showChatMenu: Boolean,
         val showSpacer: Boolean,
+        val showDuckSidebar: Boolean,
     )
 
     @Inject
@@ -329,6 +330,7 @@ class OmnibarLayout @JvmOverloads constructor(
                     addTarget(tabsMenu)
                     addTarget(aiChatMenu)
                     addTarget(browserMenu)
+                    addTarget(duckAISidebar)
                 },
             )
         }
@@ -610,7 +612,6 @@ class OmnibarLayout @JvmOverloads constructor(
         }
 
         duckAIHeader.isVisible = viewState.showDuckAIHeader
-        duckAISidebar.isVisible = viewState.showDuckAIHeader
 
         leadingIconContainer.isGone = viewState.showDuckAIHeader
         omnibarTextInput.isGone = viewState.showDuckAIHeader
@@ -826,6 +827,7 @@ class OmnibarLayout @JvmOverloads constructor(
                 showBrowserMenuHighlight = viewState.showBrowserMenuHighlight,
                 showChatMenu = viewState.showChatMenu,
                 showSpacer = viewState.showClearButton || viewState.showVoiceSearch,
+                showDuckSidebar = viewState.showDuckAIHeader,
             )
 
         if (omnibarAnimationManager.isFeatureEnabled() && previousTransitionState != null &&
@@ -846,6 +848,7 @@ class OmnibarLayout @JvmOverloads constructor(
         browserMenuHighlight.isVisible = newTransitionState.showBrowserMenuHighlight
         aiChatMenu?.isVisible = newTransitionState.showChatMenu
         aiChatDivider.isVisible = (viewState.showVoiceSearch || viewState.showClearButton) && viewState.showChatMenu
+        duckAISidebar.isVisible = viewState.showDuckAIHeader
 
         if (omnibarAnimationManager.isFeatureEnabled()) {
             toolbarContainer.requestLayout()

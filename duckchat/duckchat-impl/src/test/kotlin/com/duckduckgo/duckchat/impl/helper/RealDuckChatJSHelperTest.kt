@@ -187,6 +187,7 @@ class RealDuckChatJSHelperTest {
             put("supportsURLChatIDRestoration", false)
             put("supportsImageUpload", false)
             put("supportsStandaloneMigration", false)
+            put("supportsAIChatFullMode", false)
         }
 
         val expected = JsCallbackData(jsonPayload, featureName, method, id)
@@ -217,6 +218,7 @@ class RealDuckChatJSHelperTest {
             put("supportsURLChatIDRestoration", false)
             put("supportsImageUpload", false)
             put("supportsStandaloneMigration", false)
+            put("supportsAIChatFullMode", false)
         }
 
         val expected = JsCallbackData(jsonPayload, featureName, method, id)
@@ -247,6 +249,7 @@ class RealDuckChatJSHelperTest {
             put("supportsURLChatIDRestoration", true)
             put("supportsImageUpload", false)
             put("supportsStandaloneMigration", false)
+            put("supportsAIChatFullMode", true)
         }
 
         val expected = JsCallbackData(jsonPayload, featureName, method, id)
@@ -439,6 +442,7 @@ class RealDuckChatJSHelperTest {
             put("supportsURLChatIDRestoration", false)
             put("supportsImageUpload", true)
             put("supportsStandaloneMigration", false)
+            put("supportsAIChatFullMode", false)
         }
 
         assertEquals(expectedPayload.toString(), result!!.params.toString())
