@@ -34,6 +34,7 @@ interface BrowserTrackersAnimatorHelper {
      * @param trackersAnimationView holder of the trackers animations.
      * @param omnibarViews are the views that should be hidden while the animation is running
      * @param entities are the tracker entities detected on the current site
+     * @param useLightAnimation if specified, determines whether to use light (true) or dark (false) animation variant. If null, uses system theme.
      */
     fun startTrackersAnimation(
         context: Context,
@@ -41,6 +42,7 @@ interface BrowserTrackersAnimatorHelper {
         trackersAnimationView: LottieAnimationView,
         omnibarViews: List<View>,
         entities: List<Entity>?,
+        useLightAnimation: Boolean? = null,
     )
 
     /**
@@ -54,6 +56,7 @@ interface BrowserTrackersAnimatorHelper {
      * @param omnibarViews are the views that should be hidden while the animation is running.
      * @param shieldViews are the views that should be hidden while the animation is running.
      * @param entities are the tracker entities detected on the current site
+     * @param customBackgroundColor if specified, the background color to use for the animation text container.
      */
     fun startAddressBarTrackersAnimation(
         context: Context,
@@ -63,6 +66,7 @@ interface BrowserTrackersAnimatorHelper {
         omnibarViews: List<View>,
         shieldViews: List<View>,
         entities: List<Entity>?,
+        customBackgroundColor: Int? = null,
     )
 
     /**

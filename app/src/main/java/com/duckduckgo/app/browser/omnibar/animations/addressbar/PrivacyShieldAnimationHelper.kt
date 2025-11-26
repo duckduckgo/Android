@@ -25,6 +25,8 @@ interface PrivacyShieldAnimationHelper {
 
     /**
      * This method will setup into [holder] a LottieAnimation based on [PrivacyShield] state.
+     *
+     * @param useLightAnimation if specified, determines whether to use light (true) or dark (false) animation variant. If null, uses system theme.
      */
-    fun setAnimationView(holder: LottieAnimationView, privacyShield: PrivacyShield, viewMode: ViewMode)
+    fun setAnimationView(holder: LottieAnimationView, privacyShield: PrivacyShield, viewMode: ViewMode, useLightAnimation: Boolean? = null)
 }

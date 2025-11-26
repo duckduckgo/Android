@@ -49,7 +49,7 @@ class RealOptOutConfirmationReporter @Inject constructor(
         withContext(dispatcherProvider.io()) {
             val activeBrokers = pirRepository.getAllActiveBrokerObjects().associateBy { it.name }
             val allValidRequestedOptOutJobs = pirSchedulingRepository.getAllValidOptOutJobRecords().filter {
-                it.status == REQUESTED || it.status == REMOVED // TODO: Filter out removed by user
+                it.status == REQUESTED || it.status == REMOVED
             }
 
             if (activeBrokers.isEmpty() || allValidRequestedOptOutJobs.isEmpty()) return@withContext

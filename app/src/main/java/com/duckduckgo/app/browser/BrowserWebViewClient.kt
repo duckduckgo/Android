@@ -412,11 +412,12 @@ class BrowserWebViewClient @Inject constructor(
                         listener.openLinkInNewTab(url)
                         return true
                     } else {
-                        val headers = androidFeaturesHeaderPlugin.getHeaders(url.toString())
-                        if (headers.isNotEmpty()) {
-                            loadUrl(webView, url.toString(), headers)
-                            return true
-                        }
+                        // See: https://app.asana.com/1/137249556945/project/1200905986587319/task/1212075841576596?focus=true
+                        // val headers = androidFeaturesHeaderPlugin.getHeaders(url.toString())
+                        // if (headers.isNotEmpty()) {
+                        //     loadUrl(webView, url.toString(), headers)
+                        //     return true
+                        // }
                         return false
                     }
                 }
