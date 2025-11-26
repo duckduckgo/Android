@@ -31,4 +31,4 @@ abstract class RuntimeChecksDatabase : RoomDatabase() {
     abstract fun runtimeChecksDao(): RuntimeChecksDao
 }
 
-val ALL_MIGRATIONS = emptyArray<Migration>()
+val ALL_MIGRATIONS = emptyList<Migration>()

@@ -39,6 +39,7 @@ dependencies {
     implementation project(path: ':app-build-config-api')
     implementation project(path: ':runtime-checks-store')
     implementation project(path: ':content-scope-scripts-api')
+    implementation project(path: ':data-store-api')
 
     implementation AndroidX.core.ktx
 
