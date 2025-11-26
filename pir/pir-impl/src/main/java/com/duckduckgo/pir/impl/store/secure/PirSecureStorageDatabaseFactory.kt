@@ -17,7 +17,8 @@
 package com.duckduckgo.pir.impl.store.secure
 
 import android.content.Context
-import androidx.room.Room
+import com.duckduckgo.data.store.api.DatabaseProvider
+import com.duckduckgo.data.store.api.RoomDatabaseConfig
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.library.loader.LibraryLoader
 import com.duckduckgo.pir.impl.store.PirDatabase
@@ -43,6 +44,7 @@ interface PirSecureStorageDatabaseFactory {
 class RealPirSecureStorageDatabaseFactory @Inject constructor(
     private val context: Context,
     private val keyProvider: PirSecureStorageKeyProvider,
+    private val databaseProvider: DatabaseProvider,
 ) : PirSecureStorageDatabaseFactory {
     private var _database: PirDatabase? = null
 
@@ -77,19 +79,17 @@ class RealPirSecureStorageDatabaseFactory @Inject constructor(
             // If we can't access the keystore, it means that L1Key will be null. We don't want to encrypt the db with a null key.
             if (keyProvider.canAccessKeyStore()) {
                 // At this point, we are guaranteed that if L1key is null, it's because it hasn't been generated yet. Else, we always use the one stored.
-                _database = Room.databaseBuilder(
-                    context,
+                _database = databaseProvider.buildRoomDatabase(
                     PirDatabase::class.java,
                     "pir_encrypted.db",
-                )
-                    .openHelperFactory(
-                        SupportOpenHelperFactory(
+                    RoomDatabaseConfig(
+                        openHelperFactory = SupportOpenHelperFactory(
                             keyProvider.getl1Key(),
                         ),
-                    )
-                    .enableMultiInstanceInvalidation()
-                    .fallbackToDestructiveMigration()
-                    .build()
+                        enableMultiInstanceInvalidation = true,
+                        fallbackToDestructiveMigration = true,
+                    ),
+                )
                 logcat { "PIR-DB: Ready to use!" }
                 _database
             } else {
