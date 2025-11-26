@@ -17,12 +17,13 @@
 package com.duckduckgo.savedsites.impl.di
 
 import android.content.Context
-import androidx.room.Room
 import com.duckduckgo.anvil.annotations.ContributesPluginPoint
 import com.duckduckgo.app.di.*
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.utils.DefaultDispatcherProvider
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.data.store.api.DatabaseProvider
+import com.duckduckgo.data.store.api.RoomDatabaseConfig
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.savedsites.api.SavedSitesRepository
@@ -129,11 +130,15 @@ class SavedSitesModule {
 
     @SingleInstanceIn(AppScope::class)
     @Provides
-    fun provideSavedSitesDatabase(context: Context): SavedSitesSyncMetadataDatabase {
-        return Room.databaseBuilder(context, SavedSitesSyncMetadataDatabase::class.java, "saved_sites_metadata.db")
-            .fallbackToDestructiveMigration()
-            .addMigrations(*ALL_MIGRATIONS)
-            .build()
+    fun provideSavedSitesDatabase(databaseProvider: DatabaseProvider): SavedSitesSyncMetadataDatabase {
+        return databaseProvider.buildRoomDatabase(
+            SavedSitesSyncMetadataDatabase::class.java,
+            "saved_sites_metadata.db",
+            config = RoomDatabaseConfig(
+                fallbackToDestructiveMigration = true,
+                migrations = ALL_MIGRATIONS,
+            ),
+        )
     }
 
     @SingleInstanceIn(AppScope::class)
