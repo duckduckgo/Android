@@ -16,10 +16,11 @@
 
 package com.duckduckgo.networkprotection.store.remote_config
 
-import android.content.Context
 import androidx.room.*
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
+import com.duckduckgo.data.store.api.DatabaseProvider
+import com.duckduckgo.data.store.api.RoomDatabaseConfig
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.Types.newParameterizedType
@@ -40,12 +41,16 @@ abstract class NetPInternalConfigDatabase : RoomDatabase() {
     abstract fun serversDao(): NetPServersDao
 
     companion object {
-        fun create(context: Context): NetPInternalConfigDatabase {
-            return Room.databaseBuilder(context, NetPInternalConfigDatabase::class.java, "netp_internal.db")
-                .enableMultiInstanceInvalidation()
-                .fallbackToDestructiveMigration()
-                .addMigrations(*ALL_MIGRATIONS)
-                .build()
+        fun create(databaseProvider: DatabaseProvider): NetPInternalConfigDatabase {
+            return databaseProvider.buildRoomDatabase(
+                NetPInternalConfigDatabase::class.java,
+                "netp_internal.db",
+                config = RoomDatabaseConfig(
+                    fallbackToDestructiveMigration = true,
+                    enableMultiInstanceInvalidation = true,
+                    migrations = ALL_MIGRATIONS,
+                ),
+            )
         }
     }
 }
@@ -57,7 +62,7 @@ val MIGRATION_2_3 = object : Migration(2, 3) {
     }
 }
 
-val ALL_MIGRATIONS = arrayOf(MIGRATION_2_3)
+val ALL_MIGRATIONS = listOf(MIGRATION_2_3)
 
 object InternalDatabaseConverters {
 
