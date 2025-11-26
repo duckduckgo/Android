@@ -81,7 +81,7 @@ class DuckDuckGoWebLocalStorageManager @Inject constructor(
                 if (domainForMatchingAllowedKey == null) {
                     db.delete(entry.key)
                     logcat { "WebLocalStorageManager: Deleted key: $key" }
-                } else if (settingsDataStore.clearDuckAiData && domainForMatchingAllowedKey == DUCKDUCKGO_DOMAIN) {
+                } else if (settingsDataStore.clearDuckAiData && DUCKDUCKGO_DOMAINS.contains(domainForMatchingAllowedKey)) {
                     if (keysToDelete.any { key.endsWith(it) }) {
                         db.delete(entry.key)
                         logcat { "WebLocalStorageManager: Deleted key: $key" }
@@ -105,7 +105,7 @@ class DuckDuckGoWebLocalStorageManager @Inject constructor(
     }
 
     companion object {
-        const val DUCKDUCKGO_DOMAIN = "duckduckgo.com"
+        val DUCKDUCKGO_DOMAINS = listOf("duckduckgo.com", "duck.ai")
     }
 }
 

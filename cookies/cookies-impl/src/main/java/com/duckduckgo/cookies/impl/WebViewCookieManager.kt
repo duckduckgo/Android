@@ -17,6 +17,7 @@
 package com.duckduckgo.cookies.impl
 
 import com.duckduckgo.common.utils.AppUrl
+import com.duckduckgo.common.utils.AppUrl.Url.DUCK_AI
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.cookies.api.CookieManagerProvider
 import com.duckduckgo.cookies.api.DuckDuckGoCookieManager
@@ -90,6 +91,6 @@ class WebViewCookieManager @Inject constructor(
     }
 
     companion object {
-        val DDG_COOKIE_DOMAINS = listOf(AppUrl.Url.COOKIES, AppUrl.Url.SURVEY_COOKIES)
+        val DDG_COOKIE_DOMAINS = listOf(AppUrl.Url.COOKIES, AppUrl.Url.SURVEY_COOKIES, DUCK_AI)
     }
 }
