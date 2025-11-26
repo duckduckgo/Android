@@ -17,9 +17,10 @@
 package com.duckduckgo.history.impl
 
 import android.content.Context
-import androidx.room.Room
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.data.store.api.DatabaseProvider
+import com.duckduckgo.data.store.api.RoomDatabaseConfig
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.history.impl.store.ALL_MIGRATIONS
 import com.duckduckgo.history.impl.store.HistoryDataStore
@@ -48,11 +49,15 @@ class HistoryModule {
 
     @SingleInstanceIn(AppScope::class)
     @Provides
-    fun provideDatabase(context: Context): HistoryDatabase {
-        return Room.databaseBuilder(context, HistoryDatabase::class.java, "history.db")
-            .fallbackToDestructiveMigration()
-            .addMigrations(*ALL_MIGRATIONS)
-            .build()
+    fun provideDatabase(databaseProvider: DatabaseProvider): HistoryDatabase {
+        return databaseProvider.buildRoomDatabase(
+            HistoryDatabase::class.java,
+            "history.db",
+            config = RoomDatabaseConfig(
+                fallbackToDestructiveMigration = true,
+                migrations = ALL_MIGRATIONS,
+            ),
+        )
     }
 
     @SingleInstanceIn(AppScope::class)
