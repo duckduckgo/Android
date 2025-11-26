@@ -2,7 +2,6 @@ appId: com.duckduckgo.mobile.android
 name: "Split omnibar test"
 tags:
   - omnibarTest
-  - releaseTest
 ---
 - retry:
     maxRetries: 3
