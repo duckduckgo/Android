@@ -388,6 +388,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import logcat.LogPriority.ERROR
@@ -1468,6 +1469,7 @@ class BrowserTabViewModel @Inject constructor(
             return false
         }
 
+        logcat(tag = "RadoiuC") { "Can go back :${navigation.canGoBack}" }
         if (navigation.canGoBack) {
             command.value = NavigationCommand.NavigateBack(navigation.stepsToPreviousPage)
             return true
@@ -3815,8 +3817,30 @@ class BrowserTabViewModel @Inject constructor(
     private fun handleNewTabIfEmptyUrl() {
         val shouldDisplayAboutBlank = handleAboutBlankEnabled && site?.url.isNullOrEmpty()
         if (shouldDisplayAboutBlank) {
-            omnibarViewState.value = currentOmnibarViewState().copy(
-                omnibarText = ABOUT_BLANK,
+            if (isCustomTabScreen) {
+                handleNewTabForEmptyUrlOnCustomTab()
+            } else {
+                omnibarViewState.value = currentOmnibarViewState().copy(
+                    omnibarText = ABOUT_BLANK,
+                )
+            }
+        }
+    }
+
+    private fun handleNewTabForEmptyUrlOnCustomTab() {
+        viewModelScope.launch {
+            val newCustomTabEnabled = withContext(dispatchers.io()) {
+                androidBrowserConfig.newCustomTab().isEnabled()
+            }
+            command.postValue(
+                ShowWebPageTitle(
+                    title = ABOUT_BLANK,
+                    url = if (newCustomTabEnabled) {
+                        ABOUT_BLANK
+                    } else {
+                        site?.url
+                    },
+                ),
             )
         }
     }
