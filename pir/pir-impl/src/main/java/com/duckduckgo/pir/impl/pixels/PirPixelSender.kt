@@ -49,7 +49,18 @@ import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_INTERNAL_SCHEDULED_SCAN_COMPL
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_INTERNAL_SCHEDULED_SCAN_SCHEDULED
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_INTERNAL_SCHEDULED_SCAN_STARTED
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_INTERNAL_SECURE_STORAGE_UNAVAILABLE
+import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_OPTOUT_STAGE_CAPTCHA_PARSE
+import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_OPTOUT_STAGE_CAPTCHA_SEND
+import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_OPTOUT_STAGE_CAPTCHA_SOLVE
+import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_OPTOUT_STAGE_CONDITION_FOUND
+import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_OPTOUT_STAGE_EMAIL_CONFIRM
+import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_OPTOUT_STAGE_EMAIL_GENERATE
+import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_OPTOUT_STAGE_FILLFORM
+import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_OPTOUT_STAGE_FINISH
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_OPTOUT_STAGE_PENDING_EMAIL_CONFIRMATION
+import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_OPTOUT_STAGE_START
+import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_OPTOUT_STAGE_SUBMIT
+import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_OPTOUT_STAGE_VALIDATE
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_OPTOUT_SUBMIT_FAILURE
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_OPTOUT_SUBMIT_SUCCESS
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_SCAN_STAGE
@@ -58,6 +69,21 @@ import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_SCAN_STAGE_RESULT_MATCHES
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_SCAN_STAGE_RESULT_NO_MATCH
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_SCAN_STARTED
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_WEEKLY_CHILD_ORPHANED_OPTOUTS
+import com.duckduckgo.pir.impl.pixels.PirStage.CAPTCHA_PARSE
+import com.duckduckgo.pir.impl.pixels.PirStage.CAPTCHA_SEND
+import com.duckduckgo.pir.impl.pixels.PirStage.CAPTCHA_SOLVE
+import com.duckduckgo.pir.impl.pixels.PirStage.CONDITION_FOUND
+import com.duckduckgo.pir.impl.pixels.PirStage.CONDITION_NOT_FOUND
+import com.duckduckgo.pir.impl.pixels.PirStage.EMAIL_CONFIRM_DECOUPLED
+import com.duckduckgo.pir.impl.pixels.PirStage.EMAIL_CONFIRM_HALTED
+import com.duckduckgo.pir.impl.pixels.PirStage.EMAIL_GENERATE
+import com.duckduckgo.pir.impl.pixels.PirStage.FILL_FORM
+import com.duckduckgo.pir.impl.pixels.PirStage.FINISH
+import com.duckduckgo.pir.impl.pixels.PirStage.NOT_STARTED
+import com.duckduckgo.pir.impl.pixels.PirStage.OTHER
+import com.duckduckgo.pir.impl.pixels.PirStage.START
+import com.duckduckgo.pir.impl.pixels.PirStage.SUBMIT
+import com.duckduckgo.pir.impl.pixels.PirStage.VALIDATE
 import com.squareup.anvil.annotations.ContributesBinding
 import logcat.logcat
 import javax.inject.Inject
@@ -439,6 +465,17 @@ interface PirPixelSender {
         parentUrl: String,
         actionId: String,
         actionType: String,
+    )
+
+    fun reportOptOutStage(
+        pirStage: PirStage,
+        brokerUrl: String,
+        parentUrl: String,
+        brokerVersion: String,
+        attemptId: String,
+        durationMs: Long,
+        tries: Int,
+        actionId: String?,
     )
 }
 
@@ -897,6 +934,136 @@ class RealPirPixelSender @Inject constructor(
         )
 
         fire(PIR_SCAN_STAGE_RESULT_ERROR, params)
+    }
+
+    override fun reportOptOutStage(
+        pirStage: PirStage,
+        brokerUrl: String,
+        parentUrl: String,
+        brokerVersion: String,
+        attemptId: String,
+        durationMs: Long,
+        tries: Int,
+        actionId: String?,
+    ) {
+        val defaultParams = mutableMapOf(
+            PARAM_KEY_BROKER to brokerUrl,
+            PARAM_KEY_PARENT to parentUrl,
+            PARAM_ATTEMPT_ID to attemptId,
+        )
+
+        when (pirStage) {
+            START -> {
+                fire(PIR_OPTOUT_STAGE_START, defaultParams)
+            }
+
+            EMAIL_GENERATE -> fireStagePixel(
+                PIR_OPTOUT_STAGE_EMAIL_GENERATE,
+                defaultParams,
+                brokerVersion,
+                durationMs,
+                tries,
+                actionId ?: "",
+            )
+
+            CAPTCHA_PARSE -> fireStagePixel(
+                PIR_OPTOUT_STAGE_CAPTCHA_PARSE,
+                defaultParams,
+                brokerVersion,
+                durationMs,
+                tries,
+                actionId ?: "",
+            )
+
+            CAPTCHA_SEND -> fireStagePixel(
+                PIR_OPTOUT_STAGE_CAPTCHA_SEND,
+                defaultParams,
+                brokerVersion,
+                durationMs,
+                tries,
+                actionId ?: "",
+            )
+
+            CAPTCHA_SOLVE -> fireStagePixel(
+                PIR_OPTOUT_STAGE_CAPTCHA_SOLVE,
+                defaultParams,
+                brokerVersion,
+                durationMs,
+                tries,
+                actionId ?: "",
+            )
+
+            SUBMIT -> fireStagePixel(
+                PIR_OPTOUT_STAGE_SUBMIT,
+                defaultParams,
+                brokerVersion,
+                durationMs,
+                tries,
+                actionId ?: "",
+            )
+
+            EMAIL_CONFIRM_HALTED -> fireStagePixel(
+                PIR_OPTOUT_STAGE_EMAIL_CONFIRM,
+                defaultParams,
+                brokerVersion,
+                durationMs,
+                tries,
+                actionId ?: "",
+            )
+
+            VALIDATE -> fireStagePixel(
+                PIR_OPTOUT_STAGE_VALIDATE,
+                defaultParams,
+                brokerVersion,
+                durationMs,
+                tries,
+                actionId ?: "",
+            )
+
+            CONDITION_FOUND -> fireStagePixel(
+                PIR_OPTOUT_STAGE_CONDITION_FOUND,
+                defaultParams,
+                brokerVersion,
+                durationMs,
+                tries,
+                actionId ?: "",
+            )
+
+            FILL_FORM -> fireStagePixel(
+                PIR_OPTOUT_STAGE_FILLFORM,
+                defaultParams,
+                brokerVersion,
+                durationMs,
+                tries,
+                actionId ?: "",
+            )
+
+            FINISH -> {
+                defaultParams[PARAM_DURATION] = durationMs.toString()
+                fire(PIR_OPTOUT_STAGE_FINISH, defaultParams)
+            }
+
+            EMAIL_CONFIRM_DECOUPLED, CONDITION_NOT_FOUND, OTHER, NOT_STARTED -> {
+                // No pixels are emitted for these stages
+            }
+        }
+    }
+
+    private fun fireStagePixel(
+        pirPixel: PirPixel,
+        defaultParams: Map<String, String>,
+        brokerVersion: String,
+        durationMs: Long,
+        tries: Int,
+        actionId: String,
+    ) {
+        val allParams = defaultParams.toMutableMap()
+        allParams[PARAM_BROKER_VERSION] = brokerVersion
+        allParams[PARAM_DURATION] = durationMs.toString()
+        allParams[PARAM_TRIES] = tries.toString()
+        allParams[PARAM_ACTION_ID] = actionId
+
+        fire(pirPixel, allParams)
     }
 
     private fun fire(

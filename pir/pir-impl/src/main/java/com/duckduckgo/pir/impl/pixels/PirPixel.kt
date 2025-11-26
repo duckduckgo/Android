@@ -208,6 +208,54 @@ enum class PirPixel(
     PIR_SCAN_STAGE_RESULT_ERROR(
         baseName = "dbp_search_stage_main_status_error",
         type = Count,
+    ),
+    PIR_OPTOUT_STAGE_START(
+        baseName = "dbp_optout_stage_start",
+        type = Count,
+    ),
+    PIR_OPTOUT_STAGE_EMAIL_GENERATE(
+        baseName = "dbp_optout_stage_email-generate",
+        type = Count,
+    ),
+    PIR_OPTOUT_STAGE_CAPTCHA_PARSE(
+        baseName = "dbp_optout_stage_captcha-parse",
+        type = Count,
+    ),
+    PIR_OPTOUT_STAGE_CAPTCHA_SEND(
+        baseName = "dbp_optout_stage_captcha-send",
+        type = Count,
+    ),
+    PIR_OPTOUT_STAGE_CAPTCHA_SOLVE(
+        baseName = "dbp_optout_stage_captcha-solve",
+        type = Count,
+    ),
+    PIR_OPTOUT_STAGE_SUBMIT(
+        baseName = "dbp_optout_stage_submit",
+        type = Count,
+    ),
+    PIR_OPTOUT_STAGE_CONDITION_FOUND(
+        baseName = "dbp_optout_stage_condition-found",
+        type = Count,
+    ),
+    PIR_OPTOUT_STAGE_EMAIL_RECEIVE(
+        baseName = "dbp_optout_stage_email-receive",
+        type = Count,
+    ),
+    PIR_OPTOUT_STAGE_EMAIL_CONFIRM(
+        baseName = "dbp_optout_stage_email-confirm",
+        type = Count,
+    ),
+    PIR_OPTOUT_STAGE_VALIDATE(
+        baseName = "dbp_optout_stage_validate",
+        type = Count,
+    ),
+    PIR_OPTOUT_STAGE_FILLFORM(
+        baseName = "dbp_optout_stage_fill-form",
+        type = Count,
+    ),
+    PIR_OPTOUT_STAGE_FINISH(
+        baseName = "dbp_optout_stage_finish",
+        type = Count,
     ), ;
 
     constructor(

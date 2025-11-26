@@ -89,4 +89,5 @@ enum class PirStage(val stageName: String) {
     CONDITION_NOT_FOUND("condition-not-found"),
 
     NOT_STARTED("not-started"),
+    FINISH("finish"),
 }
