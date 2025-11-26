@@ -55,6 +55,7 @@ class RealPlayBillingManagerTest {
         billingClient = billingClientAdapter,
         dispatcherProvider = coroutineRule.testDispatcherProvider,
         subscriptionPurchaseWideEvent = mock(),
+        subscriptionSwitchWideEvent = mock(),
     )
 
     @Before

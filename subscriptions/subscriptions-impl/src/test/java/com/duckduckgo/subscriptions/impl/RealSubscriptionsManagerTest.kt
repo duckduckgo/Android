@@ -65,6 +65,7 @@ import com.duckduckgo.subscriptions.impl.services.ValidateTokenResponse
 import com.duckduckgo.subscriptions.impl.store.SubscriptionsDataStore
 import com.duckduckgo.subscriptions.impl.wideevents.AuthTokenRefreshWideEvent
 import com.duckduckgo.subscriptions.impl.wideevents.SubscriptionPurchaseWideEvent
+import com.duckduckgo.subscriptions.impl.wideevents.SubscriptionSwitchWideEvent
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOf
@@ -123,6 +124,7 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
     private val pixelSender: SubscriptionPixelSender = mock()
     private val subscriptionPurchaseWideEvent: SubscriptionPurchaseWideEvent = mock()
     private val tokenRefreshWideEvent: AuthTokenRefreshWideEvent = mock()
+    private val subscriptionSwitchWideEvent: SubscriptionSwitchWideEvent = mock()
 
     @SuppressLint("DenyListedApi")
     private val privacyProFeature: PrivacyProFeature = FakeFeatureToggleFactory.create(PrivacyProFeature::class.java)
@@ -138,6 +140,7 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
     fun before() = runTest {
         whenever(emailManager.getToken()).thenReturn(null)
         whenever(context.packageName).thenReturn("packageName")
+        whenever(playBillingManager.purchaseState).thenReturn(flowOf())
         subscriptionsManager = RealSubscriptionsManager(
             authService,
             subscriptionsService,
@@ -156,6 +159,7 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
             backgroundTokenRefresh,
             subscriptionPurchaseWideEvent,
             tokenRefreshWideEvent,
+            subscriptionSwitchWideEvent,
         )
     }
 
@@ -581,6 +585,7 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
 
     @Test
     fun whenSubscribedToSubscriptionStatusThenEmit() = runTest {
+        whenever(playBillingManager.purchaseState).thenReturn(flowOf())
         val manager = RealSubscriptionsManager(
             authService,
             subscriptionsService,
@@ -599,6 +604,7 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
             backgroundTokenRefresh,
             subscriptionPurchaseWideEvent,
             tokenRefreshWideEvent,
+            subscriptionSwitchWideEvent,
         )
 
         manager.subscriptionStatus.test {
@@ -611,6 +617,7 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
     fun whenSubscribedToSubscriptionStatusAndSubscriptionExistsThenEmit() = runTest {
         givenUserIsSignedIn()
         givenSubscriptionExists()
+        whenever(playBillingManager.purchaseState).thenReturn(flowOf())
         val manager = RealSubscriptionsManager(
             authService,
             subscriptionsService,
@@ -629,6 +636,7 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
             backgroundTokenRefresh,
             subscriptionPurchaseWideEvent,
             tokenRefreshWideEvent,
+            subscriptionSwitchWideEvent,
         )
 
         manager.subscriptionStatus.test {
@@ -664,6 +672,7 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
             backgroundTokenRefresh,
             subscriptionPurchaseWideEvent,
             tokenRefreshWideEvent,
+            subscriptionSwitchWideEvent,
         )
 
         manager.currentPurchaseState.test {
@@ -713,6 +722,7 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
             backgroundTokenRefresh,
             subscriptionPurchaseWideEvent,
             tokenRefreshWideEvent,
+            subscriptionSwitchWideEvent,
         )
 
         manager.currentPurchaseState.test {
@@ -752,6 +762,7 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
             backgroundTokenRefresh,
             subscriptionPurchaseWideEvent,
             tokenRefreshWideEvent,
+            subscriptionSwitchWideEvent,
         )
 
         manager.currentPurchaseState.test {
@@ -1085,6 +1096,7 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
     @Test
     fun whenSignOutThenCallRepositorySignOut() = runTest {
         val mockRepo: AuthRepository = mock()
+        whenever(playBillingManager.purchaseState).thenReturn(flowOf())
         val manager = RealSubscriptionsManager(
             authService,
             subscriptionsService,
@@ -1103,6 +1115,7 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
             backgroundTokenRefresh,
             subscriptionPurchaseWideEvent,
             tokenRefreshWideEvent,
+            subscriptionSwitchWideEvent,
         )
         manager.signOut()
         verify(mockRepo).setSubscription(null)
@@ -1131,6 +1144,7 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
     fun whenSignOutThenEmitUnknown() = runTest {
         givenUserIsSignedIn()
         givenSubscriptionExists()
+        whenever(playBillingManager.purchaseState).thenReturn(flowOf())
 
         val manager = RealSubscriptionsManager(
             authService,
@@ -1150,6 +1164,7 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
             backgroundTokenRefresh,
             subscriptionPurchaseWideEvent,
             tokenRefreshWideEvent,
+            subscriptionSwitchWideEvent,
         )
 
         manager.subscriptionStatus.test {
@@ -1315,6 +1330,7 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
     fun whenCanSupportEncryptionIfCannotThenReturnFalse() = runTest {
         val authDataStore: SubscriptionsDataStore = FakeSubscriptionsDataStore(supportEncryption = false)
         val authRepository = RealAuthRepository(authDataStore, coroutineRule.testDispatcherProvider, serpPromo)
+        whenever(playBillingManager.purchaseState).thenReturn(flowOf())
         subscriptionsManager = RealSubscriptionsManager(
             authService,
             subscriptionsService,
@@ -1333,6 +1349,7 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
             backgroundTokenRefresh,
             subscriptionPurchaseWideEvent,
             tokenRefreshWideEvent,
+            subscriptionSwitchWideEvent,
         )
 
         assertFalse(subscriptionsManager.canSupportEncryption())
@@ -1832,6 +1849,8 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
 
     @Test
     fun whenSwitchSubscriptionPlanWithUserNotSignedInThenEmitFailure() = runTest {
+        givenActiveSubscription()
+
         subscriptionsManager.currentPurchaseState.test {
             subscriptionsManager.switchSubscriptionPlan(
                 activity = mock(),
