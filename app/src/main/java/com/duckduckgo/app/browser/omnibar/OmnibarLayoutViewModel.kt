@@ -185,6 +185,7 @@ class OmnibarLayoutViewModel @Inject constructor(
         val showTextInputClickCatcher: Boolean = false,
         val showFindInPage: Boolean = false,
         val showDuckAIHeader: Boolean = false,
+        val showDuckAISidebar: Boolean = false,
     ) {
         fun shouldUpdateOmnibarText(
             isFullUrlEnabled: Boolean,
@@ -318,6 +319,7 @@ class OmnibarLayoutViewModel @Inject constructor(
                     updateOmnibarText = shouldUpdateOmnibarText,
                     omnibarText = omnibarText,
                     showDuckAIHeader = shouldShowDuckAiHeader(_viewState.value.viewMode, true),
+                    showDuckAISidebar = shouldShowDuckAiHeader(_viewState.value.viewMode, true),
                 )
             }
         } else {
@@ -366,6 +368,7 @@ class OmnibarLayoutViewModel @Inject constructor(
                     updateOmnibarText = shouldUpdateOmnibarText,
                     omnibarText = omnibarText,
                     showDuckAIHeader = shouldShowDuckAiHeader(_viewState.value.viewMode, false),
+                    showDuckAISidebar = shouldShowDuckAiHeader(_viewState.value.viewMode, false),
                 )
             }
 
@@ -494,6 +497,7 @@ class OmnibarLayoutViewModel @Inject constructor(
                             hasFocus = false,
                             isLoading = false,
                             showDuckAIHeader = shouldShowDuckAiHeader(viewMode, hasFocus),
+                            showDuckAISidebar = shouldShowDuckAiHeader(viewMode, hasFocus),
                         )
                     }
                 }
@@ -525,6 +529,7 @@ class OmnibarLayoutViewModel @Inject constructor(
                             ),
                             showShadows = false,
                             showDuckAIHeader = shouldShowDuckAiHeader(viewMode, hasFocus),
+                            showDuckAISidebar = shouldShowDuckAiHeader(viewMode, hasFocus),
                         )
                     }
                 }

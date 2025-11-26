@@ -826,7 +826,7 @@ class OmnibarLayout @JvmOverloads constructor(
                 showBrowserMenuHighlight = viewState.showBrowserMenuHighlight,
                 showChatMenu = viewState.showChatMenu,
                 showSpacer = viewState.showClearButton || viewState.showVoiceSearch,
-                showDuckSidebar = viewState.showDuckAIHeader,
+                showDuckSidebar = viewState.showDuckAISidebar,
             )
 
         if (omnibarAnimationManager.isFeatureEnabled() && previousTransitionState != null &&
@@ -902,7 +902,6 @@ class OmnibarLayout @JvmOverloads constructor(
     private fun renderDuckAiMode(viewState: ViewState) {
         logcat { "Omnibar: renderDuckAiMode $viewState" }
         renderTabIcon(viewState)
-        renderPulseAnimation(viewState)
         pageLoadingIndicator.isVisible = viewState.isLoading
         voiceSearchButton.isVisible = viewState.showVoiceSearch
     }

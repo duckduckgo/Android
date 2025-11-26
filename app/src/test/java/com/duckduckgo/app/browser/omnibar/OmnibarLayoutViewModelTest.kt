@@ -102,6 +102,7 @@ class OmnibarLayoutViewModelTest {
 
     private val EMPTY_URL = ""
     private val SERP_URL = "https://duckduckgo.com/?q=test&atb=v395-1-wb&ia=web"
+    private val DUCK_AI_URL = "https://duckduckgo.com/?q=DuckDuckGo+AI+Chat&ia=chat&duckai=5"
     private val DUCK_PLAYER_URL = "duck://player/21bPE0BJdOA"
     private val RANDOM_URL = "https://as.com"
     private val QUERY = "query"
@@ -1645,6 +1646,20 @@ class OmnibarLayoutViewModelTest {
         )
     }
 
+    private fun givenDuckAILoaded() {
+        testee.onViewModeChanged(ViewMode.DuckAI)
+        testee.onExternalStateChange(
+            StateChange.LoadingStateChange(
+                LoadingViewState(
+                    isLoading = true,
+                    trackersAnimationEnabled = true,
+                    progress = 100,
+                    url = DUCK_AI_URL,
+                ),
+            ),
+        )
+    }
+
     private fun givenSomeTrackers(): List<Entity> {
         val network = TestingEntity("Network", "Network", 1.0)
         val majorNetwork = TestingEntity("MajorNetwork", "MajorNetwork", Entity.MAJOR_NETWORK_PREVALENCE + 1)
@@ -2025,12 +2040,30 @@ class OmnibarLayoutViewModelTest {
     @Test
     fun whenDuckAiHeaderPressedAndInputScreenDisabledThenFocusInputFieldCommandSent() = runTest {
         duckAiShowInputScreenFlow.value = false
+        givenDuckAILoaded()
         testee.onDuckAiHeaderClicked()
+
+        testee.viewState.test {
+            val viewState = expectMostRecentItem()
+            assertTrue(viewState.showDuckAISidebar)
+            assertFalse(viewState.showDuckAIHeader)
+        }
 
         testee.commands().test {
             val command = awaitItem()
             assertTrue(command is Command.FocusInputField)
             cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenOmnibarFocusedAndDuckAIModeThenViewStateUpdated() = runTest {
+        givenDuckAILoaded()
+        testee.onOmnibarFocusChanged(true, QUERY)
+        testee.viewState.test {
+            val viewState = expectMostRecentItem()
+            assertFalse(viewState.showDuckAISidebar)
+            assertFalse(viewState.showDuckAISidebar)
         }
     }
 }
