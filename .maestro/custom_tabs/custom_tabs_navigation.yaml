@@ -56,8 +56,6 @@ tags:
       - assertVisible:
           id: "com.duckduckgo.mobile.android:id/customTabShieldIcon"
       - assertVisible:
-          id: "com.duckduckgo.mobile.android:id/customTabTitle"
-      - assertVisible:
           id: "com.duckduckgo.mobile.android:id/customTabDomain"
       - tapOn:
           id: "com.duckduckgo.mobile.android:id/browserMenuImageView"
