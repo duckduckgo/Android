@@ -46,6 +46,7 @@ import androidx.core.transition.doOnEnd
 import androidx.core.view.doOnLayout
 import androidx.core.view.isGone
 import androidx.core.view.isInvisible
+import androidx.core.view.isNotEmpty
 import androidx.core.view.isVisible
 import androidx.core.view.updateLayoutParams
 import androidx.lifecycle.LifecycleOwner
@@ -1296,6 +1297,35 @@ class OmnibarLayout @JvmOverloads constructor(
         return luminance > 0.5
     }
 
+    private fun applyFindInPageTheme(toolbarColor: Int) {
+        val backgroundColor = calculateAddressBarColor(toolbarColor)
+        val isColorLight = isColorLight(backgroundColor)
+
+        with(findInPage) {
+            findInPageContainer.background = backgroundColor.toDrawable()
+
+            val foregroundColor = if (isColorLight) Color.BLACK else Color.WHITE
+            val hintColor = if (foregroundColor == Color.WHITE) {
+                Color.argb(153, 255, 255, 255) // 60% white for dark theme
+            } else {
+                Color.argb(153, 0, 0, 0) // 60% black for light theme
+            }
+
+            findInPageInput.setTextColor(foregroundColor)
+            findInPageInput.setHintTextColor(hintColor)
+            findInPageMatches.setTextColor(foregroundColor)
+
+            listOf(
+                findIcon,
+                previousSearchTermButton,
+                nextSearchTermButton,
+                closeFindInPagePanel,
+            ).forEach { imageView ->
+                imageView.setColorFilter(foregroundColor)
+            }
+        }
+    }
+
     private fun onLogoClicked(url: String) {
         omnibarLogoClickedListener?.onClick(url)
     }
@@ -1370,6 +1400,11 @@ class OmnibarLayout @JvmOverloads constructor(
         omniBarContentContainer.hide()
         customTabToolbarContainerWrapper.hide()
         if (viewModel.viewState.value.viewMode is ViewMode.CustomTab) {
+            val toolbarColor = (viewModel.viewState.value.viewMode as ViewMode.CustomTab).toolbarColor
+
+            if (!isDefaultToolbarColor(toolbarColor)) {
+                applyFindInPageTheme(toolbarColor)
+            }
             omniBarContainer.show()
             browserMenu.gone()
         }
