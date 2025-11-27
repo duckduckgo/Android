@@ -18,6 +18,7 @@ package com.duckduckgo.pir.impl.pixels
 
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_BROKER_ACTION_FAILED
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_BROKER_CUSTOM_STATS_14DAY_CONFIRMED_OPTOUT
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_BROKER_CUSTOM_STATS_14DAY_UNCONFIRMED_OPTOUT
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_BROKER_CUSTOM_STATS_21DAY_CONFIRMED_OPTOUT
@@ -574,6 +575,15 @@ interface PirPixelSender {
     )
 
     fun reportDownloadMainConfigFailure()
+
+    fun reportBrokerActionFailure(
+        brokerUrl: String,
+        brokerVersion: String,
+        parentUrl: String,
+        actionId: String,
+        errorMessage: String,
+        stepType: String,
+    )
 }
 
 @ContributesBinding(AppScope::class)
@@ -1326,6 +1336,26 @@ class RealPirPixelSender @Inject constructor(
         fire(PIR_DOWNLOAD_MAINCONFIG_FAILURE)
     }
 
+    override fun reportBrokerActionFailure(
+        brokerUrl: String,
+        brokerVersion: String,
+        parentUrl: String,
+        actionId: String,
+        errorMessage: String,
+        stepType: String,
+    ) {
+        val params = mapOf(
+            PARAM_KEY_BROKER to brokerUrl,
+            PARAM_KEY_PARENT to parentUrl,
+            PARAM_BROKER_VERSION to brokerVersion,
+            PARAM_ACTION_ID to actionId,
+            PARAM_KEY_MSG to errorMessage,
+            PARAM_KEY_STEP to stepType,
+        )
+
+        fire(PIR_BROKER_ACTION_FAILED, params)
+    }
+
     private fun fire(
         pixel: PirPixel,
         params: Map<String, String> = emptyMap(),
@@ -1369,5 +1399,7 @@ class RealPirPixelSender @Inject constructor(
         private const val PARAM_KEY_ERROR_DETAILS = "error_details"
         private const val PARAM_KEY_BROKER_JSON_FILE = "data_broker_json_file"
         private const val PARAM_KEY_REMOVED_AT = "removed_at"
+        private const val PARAM_KEY_MSG = "message"
+        private const val PARAM_KEY_STEP = "stepType"
     }
 }
