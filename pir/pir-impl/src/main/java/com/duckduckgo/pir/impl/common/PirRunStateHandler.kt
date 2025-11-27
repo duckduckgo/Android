@@ -20,7 +20,7 @@ import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState
-import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerOptOutActionFailed
+import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerActionFailed
 import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerOptOutActionSucceeded
 import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerOptOutConditionFound
 import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerOptOutConditionNotFound
@@ -37,7 +37,6 @@ import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerRecor
 import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerRecordOptOutFailed
 import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerRecordOptOutStarted
 import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerRecordOptOutSubmitted
-import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerScanActionFailed
 import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerScanActionStarted
 import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerScanActionSucceeded
 import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerScanFailed
@@ -115,13 +114,6 @@ interface PirRunStateHandler {
             val pirSuccessResponse: PirSuccessResponse,
         ) : PirRunState(broker)
 
-        data class BrokerScanActionFailed(
-            override val broker: Broker,
-            val actionType: String,
-            val actionID: String,
-            val message: String,
-        ) : PirRunState(broker)
-
         data class BrokerRecordEmailConfirmationNeeded(
             override val broker: Broker,
             val extractedProfile: ExtractedProfile,
@@ -177,15 +169,6 @@ interface PirRunStateHandler {
             val completionTimeInMillis: Long,
             val actionType: String,
             val result: PirSuccessResponse,
-        ) : PirRunState(broker)
-
-        data class BrokerOptOutActionFailed(
-            override val broker: Broker,
-            val extractedProfile: ExtractedProfile,
-            val completionTimeInMillis: Long,
-            val actionType: String,
-            val actionID: String,
-            val message: String,
         ) : PirRunState(broker)
 
         data class BrokerOptOutStageGenerateEmailReceived(
@@ -259,6 +242,16 @@ interface PirRunStateHandler {
             val durationMs: Long,
             val tries: Int,
         ) : PirRunState(broker)
+
+        data class BrokerActionFailed(
+            override val broker: Broker,
+            val extractedProfile: ExtractedProfile?,
+            val completionTimeInMillis: Long,
+            val stepType: String,
+            val actionType: String,
+            val actionID: String,
+            val errorMessage: String,
+        ) : PirRunState(broker)
     }
 }
 
@@ -283,12 +276,11 @@ class RealPirRunStateHandler @Inject constructor(
                 is BrokerScanSuccess -> handleBrokerScanSuccess(pirRunState)
                 is BrokerScanActionStarted -> handleBrokerScanActionStarted(pirRunState)
                 is BrokerScanActionSucceeded -> handleBrokerScanActionSucceeded(pirRunState)
-                is BrokerScanActionFailed -> handleBrokerScanActionFailed(pirRunState)
+                is BrokerActionFailed -> handleBrokerActionFailed(pirRunState)
                 is BrokerRecordOptOutStarted -> handleRecordOptOutStarted(pirRunState)
                 is BrokerRecordOptOutSubmitted -> handleBrokerRecordOptOutSubmitted(pirRunState)
                 is BrokerRecordOptOutFailed -> handleBrokerRecordOptOutFailed(pirRunState)
                 is BrokerOptOutActionSucceeded -> handleBrokerOptOutActionSucceeded(pirRunState)
-                is BrokerOptOutActionFailed -> handleBrokerOptOutActionFailed(pirRunState)
                 is BrokerRecordEmailConfirmationNeeded -> handleBrokerRecordEmailConfirmationNeeded(pirRunState)
                 is BrokerRecordEmailConfirmationStarted -> handleBrokerRecordEmailConfirmationStarted(pirRunState)
                 is BrokerRecordEmailConfirmationCompleted -> handleBrokerRecordEmailConfirmationCompleted(pirRunState)
@@ -633,8 +625,26 @@ class RealPirRunStateHandler @Inject constructor(
         }
     }
 
-    private fun handleBrokerScanActionFailed(state: BrokerScanActionFailed) {
-        // TODO: remove if not needed later, might be used for stages
+    private suspend fun handleBrokerActionFailed(state: BrokerActionFailed) {
+        pixelSender.reportBrokerActionFailure(
+            brokerUrl = state.broker.url,
+            brokerVersion = state.broker.version,
+            parentUrl = state.broker.url,
+            actionId = state.actionID,
+            errorMessage = state.errorMessage,
+            stepType = state.stepType,
+        )
+
+        if (state.stepType == KEY_STEPTYPE_OPTOUT && state.extractedProfile != null) {
+            eventsRepository.saveOptOutActionLog(
+                brokerName = state.broker.name,
+                extractedProfile = state.extractedProfile,
+                completionTimeInMillis = state.completionTimeInMillis,
+                actionType = state.actionType,
+                isError = true,
+                result = "${state.actionID}: ${state.errorMessage}}",
+            )
+        }
     }
 
     private suspend fun handleRecordOptOutStarted(state: BrokerRecordOptOutStarted) {
@@ -707,17 +717,6 @@ class RealPirRunStateHandler @Inject constructor(
         )
     }
 
-    private suspend fun handleBrokerOptOutActionFailed(state: BrokerOptOutActionFailed) {
-        eventsRepository.saveOptOutActionLog(
-            brokerName = state.broker.name,
-            extractedProfile = state.extractedProfile,
-            completionTimeInMillis = state.completionTimeInMillis,
-            actionType = state.actionType,
-            isError = true,
-            result = "${state.actionID}: ${state.message}}",
-        )
-    }
-
     private suspend fun updateOptOutRecord(
         isSubmitted: Boolean,
         extractedProfileId: Long,
@@ -727,5 +726,9 @@ class RealPirRunStateHandler @Inject constructor(
         } else {
             jobRecordUpdater.updateOptOutError(extractedProfileId)
         }
+    }
+
+    companion object {
+        private const val KEY_STEPTYPE_OPTOUT = "optOut"
     }
 }
