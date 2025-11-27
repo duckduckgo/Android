@@ -876,7 +876,7 @@ class TabSwitcherViewModelTest {
 
         testee.onDuckAIButtonClicked()
 
-        verify(mockTabRepository).add(duckChatURL, true))
+        verify(mockTabRepository).add(duckChatURL, true)
 
         verify(mockCommandObserver).onChanged(commandCaptor.capture())
         assertEquals(Command.Close, commandCaptor.lastValue)
