@@ -208,4 +208,8 @@
 
     <string name="deep_link_auth_prompt_title">Sync &amp; Backup\'ı ayarlayın</string>
     <string name="deep_link_auth_prompt_message">Sync &amp; Backup kurulumu için cihazın kilidini açın</string>
+
+    <!-- Sync promo in bookmark added confirmation dialog -->
+    <string name="addBookmarkDialogSyncPromoText">Yer İşaretlerini Cihazlar Arasında Senkronize Et</string>
+    <string name="addBookmarkDialogHideSyncSuggestion">Gizle</string>
 </resources>

@@ -208,4 +208,8 @@
 
     <string name="deep_link_auth_prompt_title">Sync &amp; Backup einrichten</string>
     <string name="deep_link_auth_prompt_message">Gerät entsperren, um Sync &amp; Backup einzurichten</string>
+
+    <!-- Sync promo in bookmark added confirmation dialog -->
+    <string name="addBookmarkDialogSyncPromoText">Lesezeichen geräteübergreifend synchronisieren</string>
+    <string name="addBookmarkDialogHideSyncSuggestion">Ausblenden</string>
 </resources>

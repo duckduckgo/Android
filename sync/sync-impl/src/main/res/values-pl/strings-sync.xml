@@ -208,4 +208,8 @@
 
     <string name="deep_link_auth_prompt_title">Konfigurowanie funkcji Sync &amp; Backup</string>
     <string name="deep_link_auth_prompt_message">Odblokuj urządzenie, aby skonfigurować funkcję Sync &amp; Backup</string>
+
+    <!-- Sync promo in bookmark added confirmation dialog -->
+    <string name="addBookmarkDialogSyncPromoText">Synchronizuj zakładki pomiędzy urządzeniami</string>
+    <string name="addBookmarkDialogHideSyncSuggestion">Ukryj</string>
 </resources>

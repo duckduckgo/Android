@@ -208,4 +208,8 @@
 
     <string name="deep_link_auth_prompt_title">Ställ in Sync &amp; Backup</string>
     <string name="deep_link_auth_prompt_message">Lås upp enheten för att konfigurera Sync &amp; Backup.</string>
+
+    <!-- Sync promo in bookmark added confirmation dialog -->
+    <string name="addBookmarkDialogSyncPromoText">Synkronisera bokmärken mellan dina enheter</string>
+    <string name="addBookmarkDialogHideSyncSuggestion">Dölj</string>
 </resources>

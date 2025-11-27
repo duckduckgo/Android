@@ -208,4 +208,8 @@
 
     <string name="deep_link_auth_prompt_title">Iestatīt Sinhronizēt un dublēt</string>
     <string name="deep_link_auth_prompt_message">Atbloķē ierīci, lai iestatītu funkciju Sync &amp; Backup</string>
+
+    <!-- Sync promo in bookmark added confirmation dialog -->
+    <string name="addBookmarkDialogSyncPromoText">Sinhronizēt grāmatzīmes visās ierīcēs</string>
+    <string name="addBookmarkDialogHideSyncSuggestion">Paslēpt</string>
 </resources>

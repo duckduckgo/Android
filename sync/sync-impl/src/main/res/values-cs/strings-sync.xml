@@ -208,4 +208,8 @@
 
     <string name="deep_link_auth_prompt_title">Nastavení synchronizace a zálohování</string>
     <string name="deep_link_auth_prompt_message">Pokud chceš nastavit funkci Sync &amp; Backup, odemkni zařízení</string>
+
+    <!-- Sync promo in bookmark added confirmation dialog -->
+    <string name="addBookmarkDialogSyncPromoText">Měj na svých zařízeních synchronizované záložky</string>
+    <string name="addBookmarkDialogHideSyncSuggestion">Skrýt</string>
 </resources>
