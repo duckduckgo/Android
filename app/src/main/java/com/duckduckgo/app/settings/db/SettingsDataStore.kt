@@ -86,6 +86,20 @@ interface SettingsDataStore {
     var notifyMeInDownloadsDismissed: Boolean
     var experimentalWebsiteDarkMode: Boolean
     var isFullUrlEnabled: Boolean
+
+    /**
+     * Indicates whether URL preference migration has been performed for this installation.
+     * This ensures users who manually set their URL preference in older app versions
+     * have their choice preserved and protected from feature flag rollbacks.
+     */
+    var urlPreferenceMigrated: Boolean
+
+    /**
+     * Indicates whether the user has manually set their URL display preference.
+     * When true, the user's preference should be preserved even if default behavior changes.
+     * When false, the preference may be updated if business rules change (via feature flags).
+     */
+    var urlPreferenceManuallySet: Boolean
     var clearDuckAiData: Boolean
 
     /**
@@ -237,6 +251,14 @@ class SettingsSharedPreferences @Inject constructor(
 
     override fun hasUrlPreferenceSet(): Boolean = preferences.contains(KEY_IS_FULL_URL_ENABLED)
 
+    override var urlPreferenceMigrated: Boolean
+        get() = preferences.getBoolean(URL_PREFERENCE_MIGRATED, false)
+        set(value) = preferences.edit { putBoolean(URL_PREFERENCE_MIGRATED, value) }
+
+    override var urlPreferenceManuallySet: Boolean
+        get() = preferences.getBoolean(URL_PREFERENCE_MANUALLY_SET, false)
+        set(value) = preferences.edit { putBoolean(URL_PREFERENCE_MANUALLY_SET, value) }
+
     override var clearDuckAiData: Boolean
         get() = preferences.getBoolean(KEY_CLEAR_DUCK_AI_DATA, false)
         set(enabled) = preferences.edit { putBoolean(KEY_CLEAR_DUCK_AI_DATA, enabled) }
@@ -316,6 +338,8 @@ class SettingsSharedPreferences @Inject constructor(
         const val KEY_OMNIBAR_TYPE = "KEY_OMNIBAR_POSITION"
         const val KEY_SPLIT_OMNIBAR = "KEY_SPLIT_OMNIBAR"
         const val KEY_IS_FULL_URL_ENABLED = "KEY_IS_FULL_URL_ENABLED"
+        const val URL_PREFERENCE_MIGRATED = "URL_PREFERENCE_MIGRATED"
+        const val URL_PREFERENCE_MANUALLY_SET = "URL_PREFERENCE_MANUALLY_SET"
         const val KEY_CLEAR_DUCK_AI_DATA = "KEY_CLEAR_DUCK_AI_DATA"
     }
 

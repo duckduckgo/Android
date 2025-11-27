@@ -18,9 +18,9 @@ package com.duckduckgo.app.pixels
 
 import androidx.annotation.UiThread
 import androidx.lifecycle.LifecycleOwner
+import com.duckduckgo.app.browser.urldisplay.UrlDisplayRepository
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
-import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
@@ -39,7 +39,7 @@ class DailyPixelSender @Inject constructor(
     private val pixel: Pixel,
     private val dispatcherProvider: DispatcherProvider,
     @AppCoroutineScope private val coroutineScope: CoroutineScope,
-    private val settingsDataStore: SettingsDataStore,
+    private val urlDisplayRepository: UrlDisplayRepository,
 ) : MainProcessLifecycleObserver {
 
     @UiThread
@@ -47,7 +47,7 @@ class DailyPixelSender @Inject constructor(
         coroutineScope.launch(dispatcherProvider.io()) {
             pixel.fire(
                 pixel = AppPixelName.APPEARANCE_SETTINGS_IS_FULL_URL_ENABLED_DAILY,
-                parameters = mapOf(PixelParameter.IS_ENABLED to settingsDataStore.isFullUrlEnabled.toString()),
+                parameters = mapOf(PixelParameter.IS_ENABLED to urlDisplayRepository.isFullUrlEnabled().toString()),
                 type = Daily(),
             )
         }
