@@ -27,7 +27,7 @@ class RealDatabaseExecutorProviderTest {
 
     @Before
     fun setUp() {
-        subject = RealDatabaseExecutorProvider { databaseProviderFeature }
+        subject = RealDatabaseExecutorProvider(databaseProviderFeature)
     }
 
     @Test

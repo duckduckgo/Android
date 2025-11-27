@@ -58,7 +58,7 @@ class RoomDatabaseProviderImplTest {
 
     private val context: Context = mock()
     private val databaseProviderFeature: DatabaseProviderFeature = FakeFeatureToggleFactory.create(DatabaseProviderFeature::class.java)
-    private val databaseExecutorProvider: DatabaseExecutorProvider = RealDatabaseExecutorProvider({ databaseProviderFeature })
+    private val databaseExecutorProvider: DatabaseExecutorProvider = RealDatabaseExecutorProvider(databaseProviderFeature)
     private val roomDatabaseBuilderFactory: RoomDatabaseBuilderFactory = mock()
     private val mockDatabase = mock<TestDatabase>()
     private val mockRoomBuilder: RoomDatabase.Builder<TestDatabase> = mock()
