@@ -16,12 +16,10 @@
 
 package com.duckduckgo.app.browser.urldisplay
 
-import android.content.Context
-import android.content.pm.PackageInfo
-import android.content.pm.PackageManager
 import app.cash.turbine.test
 import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.app.settings.db.SettingsDataStore
+import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.feature.toggles.api.Toggle
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -46,20 +44,17 @@ class RealUrlDisplayRepositoryTest {
     private val settingsDataStore = mock<SettingsDataStore>()
     private val browserConfigFeature = mock<AndroidBrowserConfigFeature>()
     private val shorterUrlToggle = mock<Toggle>()
-    private val context = mock<Context>()
-    private val packageManager = mock<PackageManager>()
+    private val appBuildConfig = mock<AppBuildConfig>()
     private lateinit var testee: UrlDisplayRepository
 
     @Before
     fun setup() {
-        whenever(context.packageManager).thenReturn(packageManager)
         whenever(browserConfigFeature.shorterUrlDefault()).thenReturn(shorterUrlToggle)
-        whenever(context.packageName).thenReturn("com.duckduckgo.mobile.android")
 
         testee = RealUrlDisplayRepository(
             settingsDataStore = settingsDataStore,
             browserConfigFeature = browserConfigFeature,
-            context = context,
+            appBuildConfig = appBuildConfig,
             appCoroutineScope = coroutineRule.testScope,
         )
     }
@@ -175,11 +170,7 @@ class RealUrlDisplayRepositoryTest {
         whenever(settingsDataStore.urlPreferenceManuallySet).thenReturn(false)
         whenever(shorterUrlToggle.isEnabled()).thenReturn(true)
         whenever(settingsDataStore.hasUrlPreferenceSet()).thenReturn(false)
-        val packageInfo = PackageInfo().apply {
-            firstInstallTime = 1000L
-            lastUpdateTime = 1000L
-        }
-        whenever(packageManager.getPackageInfo(context.packageName, 0)).thenReturn(packageInfo)
+        whenever(appBuildConfig.isNewInstall()).thenReturn(true)
 
         // When
         val result = testee.isFullUrlEnabled()
@@ -231,11 +222,7 @@ class RealUrlDisplayRepositoryTest {
         whenever(settingsDataStore.urlPreferenceManuallySet).thenReturn(false)
         whenever(shorterUrlToggle.isEnabled()).thenReturn(true)
         whenever(settingsDataStore.hasUrlPreferenceSet()).thenReturn(false)
-        val packageInfo = PackageInfo().apply {
-            firstInstallTime = 1000L
-            lastUpdateTime = 2000L
-        }
-        whenever(packageManager.getPackageInfo(context.packageName, 0)).thenReturn(packageInfo)
+        whenever(appBuildConfig.isNewInstall()).thenReturn(false)
 
         // When
         val result = testee.isFullUrlEnabled()
@@ -253,11 +240,7 @@ class RealUrlDisplayRepositoryTest {
         whenever(settingsDataStore.urlPreferenceManuallySet).thenReturn(false)
         whenever(shorterUrlToggle.isEnabled()).thenReturn(true)
         whenever(settingsDataStore.hasUrlPreferenceSet()).thenReturn(false)
-        val packageInfo = PackageInfo().apply {
-            firstInstallTime = 1000L
-            lastUpdateTime = 1000L
-        }
-        whenever(packageManager.getPackageInfo(context.packageName, 0)).thenReturn(packageInfo)
+        whenever(appBuildConfig.isNewInstall()).thenReturn(true)
 
         // When
         val result = testee.isFullUrlEnabled()
@@ -312,11 +295,7 @@ class RealUrlDisplayRepositoryTest {
         whenever(settingsDataStore.urlPreferenceManuallySet).thenReturn(false)
         whenever(shorterUrlToggle.isEnabled()).thenReturn(true)
         whenever(settingsDataStore.hasUrlPreferenceSet()).thenReturn(false)
-        val packageInfo = PackageInfo().apply {
-            firstInstallTime = 1000L
-            lastUpdateTime = 1000L
-        }
-        whenever(packageManager.getPackageInfo(context.packageName, 0)).thenReturn(packageInfo)
+        whenever(appBuildConfig.isNewInstall()).thenReturn(true)
 
         testee.isFullUrlEnabled.test {
             // First emission: new user gets false
