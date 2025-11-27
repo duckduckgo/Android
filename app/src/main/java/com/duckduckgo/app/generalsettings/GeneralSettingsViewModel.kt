@@ -101,8 +101,8 @@ class GeneralSettingsViewModel @Inject constructor(
                 autoCompleteSuggestionsEnabled = autoCompleteSettings.autoCompleteSuggestionsEnabled,
                 autoCompleteRecentlyVisitedSitesSuggestionsUserEnabled = history.isHistoryUserEnabled(),
                 storeHistoryEnabled = history.isHistoryFeatureAvailable(),
-                showVoiceSearch = voiceSearchAvailability.isVoiceSearchSupported,
-                voiceSearchEnabled = voiceSearchAvailability.isVoiceSearchAvailable,
+                showVoiceSearch = voiceSearchAvailability.isVoiceSearchSupported(),
+                voiceSearchEnabled = voiceSearchAvailability.isVoiceSearchAvailable(),
                 isShowOnAppLaunchOptionVisible = showOnAppLaunchFeature.self().isEnabled(),
                 showOnAppLaunchSelectedOption = showOnAppLaunchOptionDataStore.optionFlow.first(),
                 maliciousSiteProtectionEnabled = settingsDataStore.maliciousSiteProtectionEnabled,
@@ -157,7 +157,7 @@ class GeneralSettingsViewModel @Inject constructor(
             } else {
                 pixel.fire(VOICE_SEARCH_GENERAL_SETTINGS_OFF)
             }
-            _viewState.value = _viewState.value?.copy(voiceSearchEnabled = voiceSearchAvailability.isVoiceSearchAvailable)
+            _viewState.value = _viewState.value?.copy(voiceSearchEnabled = voiceSearchAvailability.isVoiceSearchAvailable())
         }
     }
 

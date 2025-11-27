@@ -55,8 +55,8 @@ class PermissionAwareVoiceSearchLauncher @Inject constructor(
         )
     }
 
-    override fun launch(activity: Activity, mode: VoiceSearchMode?) {
-        if (!voiceSearchAvailability.isVoiceSearchAvailable) return
+    override suspend fun launch(activity: Activity, mode: VoiceSearchMode?) {
+        if (!voiceSearchAvailability.isVoiceSearchAvailable()) return
 
         pendingInitialMode = mode
         if (voiceSearchPermissionCheck.hasRequiredPermissionsGranted()) {

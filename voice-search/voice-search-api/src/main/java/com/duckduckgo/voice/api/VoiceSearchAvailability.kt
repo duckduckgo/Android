@@ -17,9 +17,9 @@
 package com.duckduckgo.voice.api
 
 interface VoiceSearchAvailability {
-    val isVoiceSearchSupported: Boolean
-    val isVoiceSearchAvailable: Boolean
-    fun shouldShowVoiceSearch(
+    suspend fun isVoiceSearchSupported(): Boolean
+    suspend fun isVoiceSearchAvailable(): Boolean
+    suspend fun shouldShowVoiceSearch(
         hasFocus: Boolean = false,
         query: String = "",
         hasQueryChanged: Boolean = false,

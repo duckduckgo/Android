@@ -16,6 +16,7 @@
 
 package com.duckduckgo.voice.impl
 
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.voice.api.VoiceSearchAvailability
 import com.duckduckgo.voice.impl.language.LanguageSupportChecker
@@ -23,6 +24,7 @@ import com.duckduckgo.voice.impl.remoteconfig.VoiceSearchFeature
 import com.duckduckgo.voice.impl.remoteconfig.VoiceSearchFeatureRepository
 import com.duckduckgo.voice.store.VoiceSearchRepository
 import com.squareup.anvil.annotations.ContributesBinding
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @ContributesBinding(AppScope::class)
@@ -32,23 +34,25 @@ class RealVoiceSearchAvailability @Inject constructor(
     private val voiceSearchFeatureRepository: VoiceSearchFeatureRepository,
     private val voiceSearchRepository: VoiceSearchRepository,
     private val languageSupportChecker: LanguageSupportChecker,
+    private val dispatcherProvider: DispatcherProvider,
 ) : VoiceSearchAvailability {
     companion object {
         private const val URL_DDG_SERP = "https://duckduckgo.com/?"
     }
 
-    override val isVoiceSearchSupported: Boolean
-        get() = configProvider.get().run {
-            voiceSearchFeature.self().isEnabled() &&
+    override suspend fun isVoiceSearchSupported(): Boolean {
+        return configProvider.get().run {
+            withContext(dispatcherProvider.io()) { voiceSearchFeature.self().isEnabled() } &&
                 hasValidVersion(sdkInt) &&
                 isOnDeviceSpeechRecognitionSupported &&
                 languageSupportChecker.isLanguageSupported() &&
                 hasValidLocale(languageTag) &&
                 voiceSearchFeatureRepository.manufacturerExceptions.none { it.name == deviceManufacturer }
         }
+    }
 
-    override val isVoiceSearchAvailable: Boolean
-        get() = isVoiceSearchSupported && voiceSearchRepository.isVoiceSearchUserEnabled(voiceSearchRepository.getHasAcceptedRationaleDialog())
+    override suspend fun isVoiceSearchAvailable(): Boolean =
+        isVoiceSearchSupported() && voiceSearchRepository.isVoiceSearchUserEnabled(voiceSearchRepository.getHasAcceptedRationaleDialog())
 
     private fun hasValidVersion(sdkInt: Int) = voiceSearchFeatureRepository.minVersion?.let { minVersion ->
         sdkInt >= minVersion
@@ -56,7 +60,7 @@ class RealVoiceSearchAvailability @Inject constructor(
 
     private fun hasValidLocale(localeLanguageTag: String) = voiceSearchFeatureRepository.localeExceptions.none { it.name == localeLanguageTag }
 
-    override fun shouldShowVoiceSearch(
+    override suspend fun shouldShowVoiceSearch(
         hasFocus: Boolean,
         query: String,
         hasQueryChanged: Boolean,
@@ -67,7 +71,7 @@ class RealVoiceSearchAvailability @Inject constructor(
         // - omnibar is focused and query is empty
         // - url loaded is empty and query hasn't changed
         // - DDG SERP is shown and query hasn't changed
-        return if (isVoiceSearchAvailable) {
+        return if (isVoiceSearchAvailable()) {
             hasFocus && query.isNotBlank() && !hasQueryChanged ||
                 query.isBlank() && hasFocus ||
                 urlLoaded.isEmpty() && !hasQueryChanged ||

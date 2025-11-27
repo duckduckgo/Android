@@ -408,6 +408,15 @@ internal class ToggleImpl constructor(
     }
 
     override fun isEnabled(): Boolean {
+        val threadName = Thread.currentThread().name
+        if (threadName == "main" || threadName == "Main") {
+            val stackTrace = Thread.currentThread().stackTrace
+                .drop(1) // Skip getStackTrace itself
+                .take(10) // Limit to first 10 frames to avoid too much output
+                .joinToString("\n  ") { "at ${it.className}.${it.methodName}(${it.fileName}:${it.lineNumber})" }
+            System.err.println("FeatureToggles: isEnabled() called on main thread for feature: ${featureName()}\nCall stack:\n  $stackTrace")
+        }
+
         // This fun is in there because it should never be called outside this method
         fun Toggle.State.evaluateTargetMatching(isExperiment: Boolean): Boolean {
             val variant = appVariantProvider.invoke()

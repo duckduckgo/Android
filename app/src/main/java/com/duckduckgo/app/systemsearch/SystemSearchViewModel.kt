@@ -234,7 +234,7 @@ class SystemSearchViewModel @Inject constructor(
 
     val omnibarViewState =
         combine(
-            flow = voiceSearchState.map { voiceSearchAvailability.isVoiceSearchAvailable },
+            flow = voiceSearchState.map { voiceSearchAvailability.isVoiceSearchAvailable() },
             flow2 = queryFlow,
             flow3 = duckAiFeatureState.showOmnibarShortcutOnNtpAndOnFocus,
             flow4 = isSearchOnly,

@@ -44,7 +44,7 @@ class SearchWidgetConfigurator @Inject constructor(
         fromSearchOnlyWidget: Boolean = false,
     ) {
         val (voiceSearchEnabled, duckAiEnabled) = withContext(dispatcherProvider.io()) {
-            voiceSearchAvailability.isVoiceSearchAvailable to (duckChat.isEnabled() && duckChat.wasOpenedBefore())
+            voiceSearchAvailability.isVoiceSearchAvailable() to (duckChat.isEnabled() && duckChat.wasOpenedBefore())
         }
 
         logcat { "SearchWidgetConfigurator voiceSearchEnabled=$voiceSearchEnabled, duckAiEnabled=$duckAiEnabled, searchOnly=$fromSearchOnlyWidget" }

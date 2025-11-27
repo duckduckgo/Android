@@ -1278,7 +1278,9 @@ class BrowserTabFragment :
     private fun onOmnibarVoiceSearchPressed() {
         webView?.onPause()
         hideKeyboard()
-        voiceSearchLauncher.launch(requireActivity())
+        lifecycleScope.launch {
+            voiceSearchLauncher.launch(requireActivity())
+        }
     }
 
     private fun onOmnibarDuckChatPressed(

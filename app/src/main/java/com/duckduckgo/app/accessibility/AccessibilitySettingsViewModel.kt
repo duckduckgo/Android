@@ -63,8 +63,8 @@ class AccessibilitySettingsViewModel @Inject constructor(
                     overrideSystemFontSize = accessibilitySettings.overrideSystemFontSize,
                     appFontSize = accessibilitySettings.appFontSize,
                     forceZoom = accessibilitySettings.forceZoom,
-                    showVoiceSearch = voiceSearchAvailability.isVoiceSearchSupported,
-                    voiceSearchEnabled = voiceSearchAvailability.isVoiceSearchAvailable,
+                    showVoiceSearch = voiceSearchAvailability.isVoiceSearchSupported(),
+                    voiceSearchEnabled = voiceSearchAvailability.isVoiceSearchAvailable(),
                 ),
             )
         }
@@ -118,7 +118,7 @@ class AccessibilitySettingsViewModel @Inject constructor(
             withContext(dispatcherProvider.main()) {
                 viewState.emit(
                     currentViewState().copy(
-                        voiceSearchEnabled = voiceSearchAvailability.isVoiceSearchAvailable,
+                        voiceSearchEnabled = voiceSearchAvailability.isVoiceSearchAvailable(),
                     ),
                 )
             }

@@ -48,8 +48,8 @@ object VoiceSearchModule {
 
     @SingleInstanceIn(AppScope::class)
     @Provides
-    fun provideVoiceSearchDataStore(context: Context): VoiceSearchDataStore {
-        return SharedPreferencesVoiceSearchDataStore(context)
+    fun provideVoiceSearchDataStore(context: Context, dispatcherProvider: DispatcherProvider): VoiceSearchDataStore {
+        return SharedPreferencesVoiceSearchDataStore(context, dispatcherProvider)
     }
 
     @SingleInstanceIn(AppScope::class)

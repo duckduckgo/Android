@@ -23,10 +23,10 @@ interface VoiceSearchRepository {
     fun declinePermissionForever()
     fun acceptRationaleDialog()
     fun saveLoggedAvailability()
-    fun getHasPermissionDeclinedForever(): Boolean
-    fun getHasAcceptedRationaleDialog(): Boolean
+    suspend fun getHasPermissionDeclinedForever(): Boolean
+    suspend fun getHasAcceptedRationaleDialog(): Boolean
     fun getHasLoggedAvailability(): Boolean
-    fun isVoiceSearchUserEnabled(default: Boolean): Boolean
+    suspend fun isVoiceSearchUserEnabled(default: Boolean): Boolean
     fun setVoiceSearchUserEnabled(enabled: Boolean)
     fun countVoiceSearchDismissed(): Int
     fun dismissVoiceSearch()
@@ -40,24 +40,24 @@ class RealVoiceSearchRepository constructor(
     private val voiceSearchStatusListener: VoiceSearchStatusListener,
 ) : VoiceSearchRepository {
     override fun declinePermissionForever() {
-        dataStore.permissionDeclinedForever = true
+        dataStore.setPermissionDeclinedForever()
     }
 
     override fun acceptRationaleDialog() {
-        dataStore.userAcceptedRationaleDialog = true
+        dataStore.setUserAcceptedRationaleDialog()
     }
 
     override fun saveLoggedAvailability() {
         dataStore.availabilityLogged = true
     }
 
-    override fun getHasPermissionDeclinedForever(): Boolean = dataStore.permissionDeclinedForever
+    override suspend fun getHasPermissionDeclinedForever(): Boolean = dataStore.hasPermissionDeclinedForever()
 
-    override fun getHasAcceptedRationaleDialog(): Boolean = dataStore.userAcceptedRationaleDialog
+    override suspend fun getHasAcceptedRationaleDialog(): Boolean = dataStore.hasUserAcceptedRationaleDialog()
 
     override fun getHasLoggedAvailability(): Boolean = dataStore.availabilityLogged
 
-    override fun isVoiceSearchUserEnabled(default: Boolean): Boolean = dataStore.isVoiceSearchEnabled(default)
+    override suspend fun isVoiceSearchUserEnabled(default: Boolean): Boolean = dataStore.isVoiceSearchEnabled(default)
 
     override fun setVoiceSearchUserEnabled(enabled: Boolean) {
         dataStore.setVoiceSearchEnabled(enabled)

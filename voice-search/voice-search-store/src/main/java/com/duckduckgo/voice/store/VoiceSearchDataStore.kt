@@ -19,21 +19,29 @@ package com.duckduckgo.voice.store
 import android.content.Context
 import android.content.SharedPreferences
 import androidx.core.content.edit
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.voice.api.VoiceSearchLauncher.VoiceSearchMode
+import kotlinx.coroutines.withContext
 
 interface VoiceSearchDataStore {
-    var permissionDeclinedForever: Boolean
-    var userAcceptedRationaleDialog: Boolean
+    suspend fun hasPermissionDeclinedForever(): Boolean
+
+    fun setPermissionDeclinedForever()
+
+    suspend fun hasUserAcceptedRationaleDialog(): Boolean
+
+    fun setUserAcceptedRationaleDialog()
     var availabilityLogged: Boolean
     var countVoiceSearchDismissed: Int
     var lastSelectedMode: VoiceSearchMode
 
-    fun isVoiceSearchEnabled(default: Boolean): Boolean
+    suspend fun isVoiceSearchEnabled(default: Boolean): Boolean
     fun setVoiceSearchEnabled(value: Boolean)
 }
 
 class SharedPreferencesVoiceSearchDataStore constructor(
     private val context: Context,
+    private val dispatcherProvider: DispatcherProvider,
 ) : VoiceSearchDataStore {
     companion object {
         const val FILENAME = "com.duckduckgo.app.voice"
@@ -47,17 +55,21 @@ class SharedPreferencesVoiceSearchDataStore constructor(
 
     private val preferences: SharedPreferences by lazy { context.getSharedPreferences(FILENAME, Context.MODE_PRIVATE) }
 
-    override var permissionDeclinedForever: Boolean
-        get() = preferences.getBoolean(KEY_DECLINED_PERMISSION_FOREVER, false)
-        set(declined) {
-            updateValue(KEY_DECLINED_PERMISSION_FOREVER, declined)
-        }
+    override suspend fun hasPermissionDeclinedForever(): Boolean {
+        return withContext(dispatcherProvider.io()) { preferences.getBoolean(KEY_DECLINED_PERMISSION_FOREVER, false) }
+    }
 
-    override var userAcceptedRationaleDialog: Boolean
-        get() = preferences.getBoolean(KEY_RATIONALE_DIALOG_ACCEPTED, false)
-        set(accept) {
-            updateValue(KEY_RATIONALE_DIALOG_ACCEPTED, accept)
-        }
+    override fun setPermissionDeclinedForever() {
+        updateValue(KEY_DECLINED_PERMISSION_FOREVER, true)
+    }
+
+    override suspend fun hasUserAcceptedRationaleDialog(): Boolean {
+        return withContext(dispatcherProvider.io()) { preferences.getBoolean(KEY_RATIONALE_DIALOG_ACCEPTED, false) }
+    }
+
+    override fun setUserAcceptedRationaleDialog() {
+        updateValue(KEY_RATIONALE_DIALOG_ACCEPTED, true)
+    }
 
     override var availabilityLogged: Boolean
         get() = preferences.getBoolean(KEY_VOICE_SEARCH_AVAILABILITY_LOGGED, false)
@@ -65,8 +77,8 @@ class SharedPreferencesVoiceSearchDataStore constructor(
             updateValue(KEY_VOICE_SEARCH_AVAILABILITY_LOGGED, value)
         }
 
-    override fun isVoiceSearchEnabled(default: Boolean): Boolean {
-        return preferences.getBoolean(KEY_VOICE_SEARCH_ENABLED, default)
+    override suspend fun isVoiceSearchEnabled(default: Boolean): Boolean {
+        return withContext(dispatcherProvider.io()) { preferences.getBoolean(KEY_VOICE_SEARCH_ENABLED, default) }
     }
 
     override fun setVoiceSearchEnabled(value: Boolean) {

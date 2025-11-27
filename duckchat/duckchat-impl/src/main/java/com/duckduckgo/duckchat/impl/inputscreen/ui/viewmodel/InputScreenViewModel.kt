@@ -141,7 +141,7 @@ class InputScreenViewModel @AssistedInject constructor(
     private var isTapTransition = false
 
     private val newTabPageHasContent = MutableStateFlow(false)
-    private val voiceServiceAvailable = MutableStateFlow(voiceSearchAvailability.isVoiceSearchAvailable)
+    private val voiceServiceAvailable = MutableStateFlow(false)
     private val voiceInputAllowed = MutableStateFlow(true)
     private var userSelectedMode: UserSelectedMode = NONE
     private var currentPagePosition: Int = 0
@@ -290,7 +290,9 @@ class InputScreenViewModel @AssistedInject constructor(
 
     fun onActivityResume() {
         autoCompleteSuggestionsEnabled.value = autoCompleteSettings.autoCompleteSuggestionsEnabled
-        voiceServiceAvailable.value = voiceSearchAvailability.isVoiceSearchAvailable
+        viewModelScope.launch {
+            voiceServiceAvailable.value = voiceSearchAvailability.isVoiceSearchAvailable()
+        }
     }
 
     fun userSelectedAutocomplete(suggestion: AutoCompleteSuggestion) {

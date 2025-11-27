@@ -38,7 +38,7 @@ interface PermissionRequest {
         onVoiceSearchDisabled: () -> Unit = {},
     )
 
-    fun launch(activity: Activity)
+    suspend fun launch(activity: Activity)
 }
 
 @ContributesBinding(ActivityScope::class)
@@ -76,7 +76,7 @@ class MicrophonePermissionRequest @Inject constructor(
         voiceSearchDisabled = onVoiceSearchDisabled
     }
 
-    override fun launch(activity: Activity) {
+    override suspend fun launch(activity: Activity) {
         if (voiceSearchRepository.getHasPermissionDeclinedForever()) {
             voiceSearchPermissionDialogsLauncher.showNoMicAccessDialog(
                 activity,

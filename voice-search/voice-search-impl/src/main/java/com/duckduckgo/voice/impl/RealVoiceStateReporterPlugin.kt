@@ -23,6 +23,7 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.voice.api.VoiceSearchAvailability
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.anvil.annotations.ContributesMultibinding
+import kotlinx.coroutines.runBlocking
 import javax.inject.Inject
 
 interface VoiceStateReporterPlugin
@@ -33,6 +34,6 @@ class RealVoiceStateReporterPlugin @Inject constructor(
     private val voiceSearchAvailability: VoiceSearchAvailability,
 ) : VoiceStateReporterPlugin, BrowserFeatureStateReporterPlugin {
     override fun featureStateParams(): Map<String, String> {
-        return mapOf(PixelParameter.VOICE_SEARCH to voiceSearchAvailability.isVoiceSearchAvailable.toBinaryString())
+        return mapOf(PixelParameter.VOICE_SEARCH to runBlocking { voiceSearchAvailability.isVoiceSearchAvailable().toBinaryString() })
     }
 }

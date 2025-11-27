@@ -210,7 +210,7 @@ class SettingsViewModel @Inject constructor(
                     isPrivacyProEnabled = subscriptions.isEligible(),
                     isDuckPlayerEnabled = duckPlayer.getDuckPlayerState().let { it == ENABLED || it == DISABLED_WIH_HELP_LINK },
                     isNewThreatProtectionSettingsEnabled = androidBrowserConfigFeature.newThreatProtectionSettings().isEnabled(),
-                    isVoiceSearchVisible = voiceSearchAvailability.isVoiceSearchSupported,
+                    isVoiceSearchVisible = voiceSearchAvailability.isVoiceSearchSupported(),
                     isAddWidgetInProtectionsVisible = withContext(dispatcherProvider.io()) {
                         settingsPageFeature.self().isEnabled() && settingsPageFeature.widgetAsProtection().isEnabled()
                     },

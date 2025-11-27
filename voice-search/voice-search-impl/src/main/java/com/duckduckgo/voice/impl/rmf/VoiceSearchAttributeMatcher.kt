@@ -48,11 +48,11 @@ class VoiceSearchAttributeMatcherPlugin @Inject constructor(
     override suspend fun evaluate(matchingAttribute: MatchingAttribute): Boolean? {
         return when (matchingAttribute) {
             is VoiceSearchSupportedMatchingAttribute -> {
-                matchingAttribute.remoteValue == voiceSearchAvailability.isVoiceSearchSupported
+                matchingAttribute.remoteValue == voiceSearchAvailability.isVoiceSearchSupported()
             }
 
             is VoiceSearchEnabledMatchingAttribute -> {
-                matchingAttribute.remoteValue == voiceSearchAvailability.isVoiceSearchAvailable
+                matchingAttribute.remoteValue == voiceSearchAvailability.isVoiceSearchAvailable()
             }
 
             else -> return null
