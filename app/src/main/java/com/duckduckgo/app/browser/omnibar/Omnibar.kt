@@ -155,24 +155,17 @@ class Omnibar(
     }
 
     val omnibarView: OmnibarView by lazy {
-        when (omnibarType) {
-            OmnibarType.SINGLE_TOP -> {
-                createAndAddOmnibarLayout(isBottomPosition = false)
-            }
-            OmnibarType.SPLIT -> {
-                binding.bottomBrowserOutlineStroke.gone()
-                binding.includeNewBrowserTab.bottomNtpOutlineStroke.gone()
-                createAndAddOmnibarLayout(isBottomPosition = false)
-            }
-            OmnibarType.SINGLE_BOTTOM -> {
-                adjustCoordinatorLayoutBehaviorForBottomOmnibar()
-                createAndAddOmnibarLayout(isBottomPosition = true)
-            }
+        if (omnibarType == OmnibarType.SPLIT) {
+            binding.bottomBrowserOutlineStroke.gone()
+            binding.includeNewBrowserTab.bottomNtpOutlineStroke.gone()
+        } else if (omnibarType == OmnibarType.SINGLE_BOTTOM) {
+            adjustCoordinatorLayoutBehaviorForBottomOmnibar()
         }
+        createAndAddOmnibarLayout(omnibarType)
     }
 
-    private fun createAndAddOmnibarLayout(isBottomPosition: Boolean): OmnibarLayout {
-        val omnibarLayout = OmnibarLayout(binding.root.context)
+    private fun createAndAddOmnibarLayout(omnibarType: OmnibarType): OmnibarLayout {
+        val omnibarLayout = OmnibarLayout(binding.root.context, omnibarType)
         omnibarLayout.id = View.generateViewId()
         omnibarLayout.outlineProvider = null
 
@@ -181,6 +174,7 @@ class Omnibar(
             CoordinatorLayout.LayoutParams.WRAP_CONTENT,
         )
 
+        val isBottomPosition = omnibarType == OmnibarType.SINGLE_BOTTOM
         if (isBottomPosition) {
             layoutParams.gravity = android.view.Gravity.BOTTOM
         } else {

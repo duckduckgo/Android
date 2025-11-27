@@ -135,12 +135,19 @@ import com.duckduckgo.mobile.android.R as CommonR
 @InjectWith(FragmentScope::class)
 class OmnibarLayout @JvmOverloads constructor(
     context: Context,
+    override val omnibarType: OmnibarType,
     attrs: AttributeSet? = null,
     defStyle: Int = 0,
 ) : AppBarLayout(context, attrs, defStyle),
     OmnibarView,
     OmnibarBehaviour,
     TrackersAnimatorListener {
+
+    constructor(
+        context: Context,
+        attrs: AttributeSet? = null,
+        defStyle: Int = 0,
+    ) : this(context, OmnibarType.SINGLE_TOP, attrs, defStyle)
 
     data class TransitionState(
         val showClearButton: Boolean,
@@ -252,10 +259,6 @@ class OmnibarLayout @JvmOverloads constructor(
     }
 
     private var focusAnimator: ValueAnimator? = null
-
-    override val omnibarType: OmnibarType by lazy {
-        settingsDataStore.omnibarType
-    }
 
     init {
         inflate(context, R.layout.view_omnibar, this)
