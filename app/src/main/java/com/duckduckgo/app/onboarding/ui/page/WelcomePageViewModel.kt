@@ -62,6 +62,7 @@ import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Unique
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.FragmentScope
+import com.duckduckgo.duckchat.impl.inputscreen.wideevents.InputScreenOnboardingWideEvent
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
@@ -83,6 +84,7 @@ class WelcomePageViewModel @Inject constructor(
     private val onboardingDesignExperimentManager: OnboardingDesignExperimentManager,
     private val onboardingStore: OnboardingStore,
     private val androidBrowserConfigFeature: AndroidBrowserConfigFeature,
+    private val inputScreenOnboardingWideEvent: InputScreenOnboardingWideEvent,
 ) : ViewModel() {
     private val _commands = Channel<Command>(1, DROP_OLDEST)
     val commands: Flow<Command> = _commands.receiveAsFlow()
@@ -193,6 +195,9 @@ class WelcomePageViewModel @Inject constructor(
             INPUT_SCREEN -> {
                 viewModelScope.launch(dispatchers.io()) {
                     onboardingStore.storeInputScreenSelection(inputScreenSelected)
+                    if (inputScreenSelected) {
+                        inputScreenOnboardingWideEvent.onInputScreenEnabledDuringOnboarding()
+                    }
                     _commands.send(Finish)
                 }
             }

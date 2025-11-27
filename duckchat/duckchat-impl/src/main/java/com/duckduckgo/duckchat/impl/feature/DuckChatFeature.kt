@@ -129,4 +129,11 @@ interface DuckChatFeature {
      */
     @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
     fun showHideAiGeneratedImages(): Toggle
+
+    /**
+     * @return `true` when the Input Screen onboarding wide event should be sent
+     * If the remote feature is not present defaults to `internal`
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    fun sendInputScreenOnboardingWideEvent(): Toggle
 }
