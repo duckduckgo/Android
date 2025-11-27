@@ -130,11 +130,12 @@ class OnboardingInputScreenSelectionObserverTest {
         }
 
     @Test
-    fun whenUserChangesInputScreenSettingBeforeEstablishedThenClearOnboardingSelection() =
+    fun whenUserChangesInputScreenSettingBeforeEstablishedThenMarkAsOverriddenByUser() =
         runTest {
             whenever(mockUserStageStore.userAppStageFlow()).thenReturn(userAppStageFlow)
             whenever(mockUserStageStore.getUserAppStage()).thenReturn(AppStage.NEW)
-            whenever(mockOnboardingStore.getInputScreenSelection()).thenReturn(true, null)
+            whenever(mockOnboardingStore.getInputScreenSelection()).thenReturn(true)
+            whenever(mockOnboardingStore.isInputScreenSelectionOverriddenByUser()).thenReturn(true)
             whenever(mockDuckChat.observeInputScreenUserSettingEnabled()).thenReturn(inputScreenSettingFlow)
 
             OnboardingInputScreenSelectionObserver(
@@ -147,7 +148,7 @@ class OnboardingInputScreenSelectionObserverTest {
 
             inputScreenSettingFlow.value = true
 
-            verify(mockOnboardingStore).clearInputScreenSelection()
+            verify(mockOnboardingStore).setInputScreenSelectionOverriddenByUser()
 
             userAppStageFlow.value = AppStage.ESTABLISHED
 

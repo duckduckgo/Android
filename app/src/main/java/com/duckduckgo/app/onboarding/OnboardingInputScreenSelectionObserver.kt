@@ -57,7 +57,7 @@ class OnboardingInputScreenSelectionObserver @Inject constructor(
             .drop(1)
             .onEach {
                 if (userStageStore.getUserAppStage() != AppStage.ESTABLISHED && onboardingStore.getInputScreenSelection() != null) {
-                    onboardingStore.clearInputScreenSelection()
+                    onboardingStore.setInputScreenSelectionOverriddenByUser()
                 }
             }
             .flowOn(dispatchers.io())
@@ -69,7 +69,8 @@ class OnboardingInputScreenSelectionObserver @Inject constructor(
             .distinctUntilChanged()
             .filter { it == AppStage.ESTABLISHED }
             .onEach {
-                onboardingStore.getInputScreenSelection()?.let { selection ->
+                val selection = onboardingStore.getInputScreenSelection()
+                if (!onboardingStore.isInputScreenSelectionOverriddenByUser() && selection != null) {
                     duckChat.setInputScreenUserSetting(selection)
                 }
             }

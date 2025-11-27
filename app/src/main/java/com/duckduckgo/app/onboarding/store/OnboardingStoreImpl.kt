@@ -175,13 +175,18 @@ class OnboardingStoreImpl @Inject constructor(
         }
     }
 
-    override fun clearInputScreenSelection() {
-        preferences.edit { remove(KEY_INPUT_SCREEN_SELECTION) }
+    override fun isInputScreenSelectionOverriddenByUser(): Boolean {
+        return preferences.getBoolean(KEY_INPUT_SCREEN_SELECTION_OVERRIDDEN_BY_USER, false)
+    }
+
+    override fun setInputScreenSelectionOverriddenByUser() {
+        preferences.edit { putBoolean(KEY_INPUT_SCREEN_SELECTION_OVERRIDDEN_BY_USER, true) }
     }
 
     companion object {
         const val FILENAME = "com.duckduckgo.app.onboarding.settings"
         const val ONBOARDING_JOURNEY = "onboardingJourney"
         private const val KEY_INPUT_SCREEN_SELECTION = "inputScreenSelection"
+        private const val KEY_INPUT_SCREEN_SELECTION_OVERRIDDEN_BY_USER = "inputScreenSelectionOverriddenByUser"
     }
 }
