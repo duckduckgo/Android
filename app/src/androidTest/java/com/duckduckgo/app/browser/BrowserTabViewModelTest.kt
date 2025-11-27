@@ -6645,6 +6645,7 @@ class BrowserTabViewModelTest {
             assertTrue(command.query == duckChatURL)
 
             verify(mockDuckChat, never()).openDuckChat()
+            verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_SETTINGS_NEW_CHAT_TAB_TAPPED)
         }
 
     @Test
@@ -8322,6 +8323,7 @@ class BrowserTabViewModelTest {
             assertEquals(expectedEvent.params.toString(), emittedEvent.params.toString())
             cancelAndIgnoreRemainingEvents()
         }
+        verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_OMNIBAR_NEW_CHAT_TAPPED)
     }
 
     @Test
@@ -8362,6 +8364,8 @@ class BrowserTabViewModelTest {
             assertEquals(expectedEvent.params.toString(), emittedEvent.params.toString())
             cancelAndIgnoreRemainingEvents()
         }
+
+        verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_DUCK_AI_SETTINGS_TAPPED)
     }
 
     @Test
