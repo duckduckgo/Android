@@ -149,6 +149,7 @@ class OmnibarLayout @JvmOverloads constructor(
         val showBrowserMenuHighlight: Boolean,
         val showChatMenu: Boolean,
         val showSpacer: Boolean,
+        val showDuckSidebar: Boolean,
     )
 
     @Inject
@@ -224,6 +225,7 @@ class OmnibarLayout @JvmOverloads constructor(
     private val customTabToolbarContainerWrapper: ViewGroup by lazy { findViewById(R.id.customTabToolbarContainerWrapper) }
     private val leadingIconContainer: View by lazy { findViewById(R.id.omnibarIconContainer) }
     private val duckAIHeader: View by lazy { findViewById(R.id.duckAIHeader) }
+    private val duckAISidebar: View by lazy { findViewById(R.id.duckAiSidebar) }
 
     private var isFindInPageVisible = false
     private val findInPageLayoutVisibilityChangeListener =
@@ -328,6 +330,7 @@ class OmnibarLayout @JvmOverloads constructor(
                     addTarget(tabsMenu)
                     addTarget(aiChatMenu)
                     addTarget(browserMenu)
+                    addTarget(duckAISidebar)
                 },
             )
         }
@@ -581,7 +584,10 @@ class OmnibarLayout @JvmOverloads constructor(
             omnibarItemPressedListener?.onBackButtonPressed()
         }
         duckAIHeader.setOnClickListener {
-            viewModel.onTextInputClickCatcherClicked()
+            viewModel.onDuckAiHeaderClicked()
+        }
+        duckAISidebar.setOnClickListener {
+            omnibarItemPressedListener?.onDuckAISidebarButtonPressed()
         }
     }
 
@@ -604,9 +610,10 @@ class OmnibarLayout @JvmOverloads constructor(
             }
         }
 
-        duckAIHeader.isVisible = viewState.viewMode is ViewMode.DuckAI
-        leadingIconContainer.isGone = viewState.viewMode is ViewMode.DuckAI
-        omnibarTextInput.isGone = viewState.viewMode is ViewMode.DuckAI
+        duckAIHeader.isVisible = viewState.showDuckAIHeader
+
+        leadingIconContainer.isGone = viewState.showDuckAIHeader
+        omnibarTextInput.isGone = viewState.showDuckAIHeader
 
         if (viewState.leadingIconState == PrivacyShield) {
             renderPrivacyShield(viewState.privacyShield, viewState.viewMode)
@@ -709,6 +716,15 @@ class OmnibarLayout @JvmOverloads constructor(
             is Command.EasterEggLogoClicked -> {
                 onLogoClicked(command.url)
             }
+
+            is Command.FocusInputField -> {
+                omnibarTextInput.postDelayed(
+                    {
+                        omnibarTextInput.requestFocus()
+                    },
+                    200,
+                )
+            }
         }
     }
 
@@ -810,13 +826,15 @@ class OmnibarLayout @JvmOverloads constructor(
                 showBrowserMenuHighlight = viewState.showBrowserMenuHighlight,
                 showChatMenu = viewState.showChatMenu,
                 showSpacer = viewState.showClearButton || viewState.showVoiceSearch,
+                showDuckSidebar = viewState.showDuckAISidebar,
             )
 
         if (omnibarAnimationManager.isFeatureEnabled() && previousTransitionState != null &&
             (
                 newTransitionState.showFireIcon != previousTransitionState?.showFireIcon ||
                     newTransitionState.showTabsMenu != previousTransitionState?.showTabsMenu ||
-                    newTransitionState.showBrowserMenu != previousTransitionState?.showBrowserMenu
+                    newTransitionState.showBrowserMenu != previousTransitionState?.showBrowserMenu ||
+                    newTransitionState.showDuckSidebar != previousTransitionState?.showDuckSidebar
                 )
         ) {
             TransitionManager.beginDelayedTransition(toolbarContainer, omniBarButtonTransitionSet)
@@ -830,6 +848,7 @@ class OmnibarLayout @JvmOverloads constructor(
         browserMenuHighlight.isVisible = newTransitionState.showBrowserMenuHighlight
         aiChatMenu?.isVisible = newTransitionState.showChatMenu
         aiChatDivider.isVisible = (viewState.showVoiceSearch || viewState.showClearButton) && viewState.showChatMenu
+        duckAISidebar.isVisible = newTransitionState.showDuckSidebar
 
         if (omnibarAnimationManager.isFeatureEnabled()) {
             toolbarContainer.requestLayout()
@@ -883,7 +902,6 @@ class OmnibarLayout @JvmOverloads constructor(
     private fun renderDuckAiMode(viewState: ViewState) {
         logcat { "Omnibar: renderDuckAiMode $viewState" }
         renderTabIcon(viewState)
-        renderPulseAnimation(viewState)
         pageLoadingIndicator.isVisible = viewState.isLoading
         voiceSearchButton.isVisible = viewState.showVoiceSearch
     }

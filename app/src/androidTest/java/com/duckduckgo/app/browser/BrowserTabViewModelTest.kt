@@ -622,6 +622,7 @@ class BrowserTabViewModelTest {
     private val mockDeviceAppLookup: DeviceAppLookup = mock()
 
     private val mockDuckAiFullScreenMode = MutableStateFlow(false)
+    private val mockDuckAiFullScreenModeEnabled = MutableStateFlow(true)
 
     private lateinit var fakeContentScopeScriptsSubscriptionEventPluginPoint: FakeContentScopeScriptsSubscriptionEventPluginPoint
     private var serpSettingsFeature = FakeFeatureToggleFactory.create(SerpSettingsFeature::class.java)
@@ -8330,9 +8331,9 @@ class BrowserTabViewModelTest {
             subscriptionName = "subscription1",
             params = JSONObject(),
         )
-        whenever(mockDuckChatJSHelper.onNativeAction(NativeAction.HISTORY)).thenReturn(expectedEvent)
+        whenever(mockDuckChatJSHelper.onNativeAction(NativeAction.SIDEBAR)).thenReturn(expectedEvent)
 
-        testee.openDuckChatHistory()
+        testee.openDuckChatSidebar()
 
         testee.subscriptionEventDataFlow.test {
             val emittedEvent = awaitItem()
@@ -8361,5 +8362,143 @@ class BrowserTabViewModelTest {
             assertEquals(expectedEvent.params.toString(), emittedEvent.params.toString())
             cancelAndIgnoreRemainingEvents()
         }
+    }
+
+    @Test
+    fun whenNonDuckAiPageFinishedAndFullscreenModeEnabledThenDisabledDuckAiModeCommandSent() = runTest {
+        whenever(mockDuckDuckGoUrlDetector.isDuckDuckGoChatUrl(any())).thenReturn(false)
+        whenever(mockDuckAiFeatureState.showFullScreenMode).thenReturn(mockDuckAiFullScreenModeEnabled)
+
+        val nonDdgUrl = "https://example.com/search?q=test"
+        val webViewNavState = WebViewNavigationState(mockStack, 100)
+
+        testee.pageFinished(mockWebView, webViewNavState, nonDdgUrl)
+
+        verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
+
+        val commands = commandCaptor.allValues
+        assertFalse(commands.any { it is Command.EnableDuckAIFullScreen })
+        assertTrue(commands.any { it is Command.DisableDuckAIFullScreen })
+    }
+
+    @Test
+    fun whenDuckAiPageFinishedAndFullscreenModeEnabledThenEnableDuckAiModeCommandSent() = runTest {
+        whenever(mockDuckDuckGoUrlDetector.isDuckDuckGoChatUrl(any())).thenReturn(true)
+        whenever(mockDuckAiFeatureState.showFullScreenMode).thenReturn(mockDuckAiFullScreenModeEnabled)
+
+        val nonDdgUrl = "https://duckduckgo.com/?q=DuckDuckGo+AI+Chat&ia=chat&duckai=5"
+        val webViewNavState = WebViewNavigationState(mockStack, 100)
+
+        testee.pageFinished(mockWebView, webViewNavState, nonDdgUrl)
+
+        verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
+
+        val commands = commandCaptor.allValues
+        assertFalse(commands.any { it is Command.DisableDuckAIFullScreen })
+        assertTrue(commands.any { it is Command.EnableDuckAIFullScreen })
+    }
+
+    @Test
+    fun whenNonDuckAiPageFinishedAndFullscreenModeDisabledThenDuckAiCommandsNotSent() = runTest {
+        mockDuckAiFullScreenMode.emit(false)
+
+        val nonDdgUrl = "https://example.com/search?q=test"
+        val webViewNavState = WebViewNavigationState(mockStack, 100)
+
+        testee.pageFinished(mockWebView, webViewNavState, nonDdgUrl)
+
+        val commands = commandCaptor.allValues
+        assertFalse(commands.any { it is Command.EnableDuckAIFullScreen })
+        assertFalse(commands.any { it is Command.DisableDuckAIFullScreen })
+    }
+
+    @Test
+    fun whenDuckAiPageFinishedAndFullscreenModeDisabledThenDuckAiCommandsNotSent() = runTest {
+        mockDuckAiFullScreenMode.emit(false)
+
+        val nonDdgUrl = "https://duckduckgo.com/?q=DuckDuckGo+AI+Chat&ia=chat&duckai=5"
+        val webViewNavState = WebViewNavigationState(mockStack, 100)
+
+        testee.pageFinished(mockWebView, webViewNavState, nonDdgUrl)
+
+        val commands = commandCaptor.allValues
+        assertFalse(commands.any { it is Command.DisableDuckAIFullScreen })
+        assertFalse(commands.any { it is Command.EnableDuckAIFullScreen })
+    }
+
+    @Test
+    fun whenNewPageWithDuckAIUrlAndFullscreenModeEnabledThenEnableDuckAiModeCommandSent() = runTest {
+        whenever(mockDuckDuckGoUrlDetector.isDuckDuckGoChatUrl(any())).thenReturn(true)
+        whenever(mockDuckAiFeatureState.showFullScreenMode).thenReturn(mockDuckAiFullScreenModeEnabled)
+        testee.browserViewState.value = browserViewState().copy(browserShowing = true)
+
+        testee.navigationStateChanged(
+            buildWebNavigation(
+                currentUrl = "https://duckduckgo.com/?q=DuckDuckGo+AI+Chat&ia=chat&duckai=5",
+                originalUrl = "https://www.example.com",
+            ),
+        )
+
+        verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
+
+        val commands = commandCaptor.allValues
+        assertFalse(commands.any { it is Command.DisableDuckAIFullScreen })
+        assertTrue(commands.any { it is Command.EnableDuckAIFullScreen })
+    }
+
+    @Test
+    fun whenNewPageWithNonDuckAIUrlAndFullscreenModeEnabledThenDisableDuckAiModeCommandSent() = runTest {
+        whenever(mockDuckDuckGoUrlDetector.isDuckDuckGoChatUrl(any())).thenReturn(false)
+        whenever(mockDuckAiFeatureState.showFullScreenMode).thenReturn(mockDuckAiFullScreenModeEnabled)
+        testee.browserViewState.value = browserViewState().copy(browserShowing = true)
+
+        testee.navigationStateChanged(
+            buildWebNavigation(
+                currentUrl = "https://test.com",
+                originalUrl = "https://www.example.com",
+            ),
+        )
+
+        verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
+
+        val commands = commandCaptor.allValues
+        assertTrue(commands.any { it is Command.DisableDuckAIFullScreen })
+        assertFalse(commands.any { it is Command.EnableDuckAIFullScreen })
+    }
+
+    @Test
+    fun whenNewPageWithDuckAIUrlAndFullscreenModeDisabledThenNoDuckAICommandsSent() = runTest {
+        testee.browserViewState.value = browserViewState().copy(browserShowing = true)
+
+        testee.navigationStateChanged(
+            buildWebNavigation(
+                currentUrl = "https://duckduckgo.com/?q=DuckDuckGo+AI+Chat&ia=chat&duckai=5",
+                originalUrl = "https://www.example.com",
+            ),
+        )
+
+        verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
+
+        val commands = commandCaptor.allValues
+        assertFalse(commands.any { it is Command.DisableDuckAIFullScreen })
+        assertFalse(commands.any { it is Command.EnableDuckAIFullScreen })
+    }
+
+    @Test
+    fun whenNewPageWithNonDuckAIUrlAndFullscreenModeDisabledThenNoDuckAICommandsSent() = runTest {
+        testee.browserViewState.value = browserViewState().copy(browserShowing = true)
+
+        testee.navigationStateChanged(
+            buildWebNavigation(
+                currentUrl = "https://test.com",
+                originalUrl = "https://www.example.com",
+            ),
+        )
+
+        verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
+
+        val commands = commandCaptor.allValues
+        assertFalse(commands.any { it is Command.DisableDuckAIFullScreen })
+        assertFalse(commands.any { it is Command.EnableDuckAIFullScreen })
     }
 }

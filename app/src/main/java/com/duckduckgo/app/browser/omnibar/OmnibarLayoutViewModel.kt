@@ -184,6 +184,8 @@ class OmnibarLayoutViewModel @Inject constructor(
         val showShadows: Boolean = false,
         val showTextInputClickCatcher: Boolean = false,
         val showFindInPage: Boolean = false,
+        val showDuckAIHeader: Boolean = false,
+        val showDuckAISidebar: Boolean = false,
     ) {
         fun shouldUpdateOmnibarText(
             isFullUrlEnabled: Boolean,
@@ -206,6 +208,7 @@ class OmnibarLayoutViewModel @Inject constructor(
         data object MoveCaretToFront : Command()
         data class LaunchInputScreen(val query: String) : Command()
         data class EasterEggLogoClicked(val url: String) : Command()
+        data object FocusInputField : Command()
     }
 
     sealed class LeadingIconState {
@@ -315,6 +318,8 @@ class OmnibarLayoutViewModel @Inject constructor(
                     ),
                     updateOmnibarText = shouldUpdateOmnibarText,
                     omnibarText = omnibarText,
+                    showDuckAIHeader = shouldShowDuckAiHeader(_viewState.value.viewMode, true),
+                    showDuckAISidebar = shouldShowDuckAiHeader(_viewState.value.viewMode, true),
                 )
             }
         } else {
@@ -362,6 +367,8 @@ class OmnibarLayoutViewModel @Inject constructor(
                     ),
                     updateOmnibarText = shouldUpdateOmnibarText,
                     omnibarText = omnibarText,
+                    showDuckAIHeader = shouldShowDuckAiHeader(_viewState.value.viewMode, false),
+                    showDuckAISidebar = shouldShowDuckAiHeader(_viewState.value.viewMode, false),
                 )
             }
 
@@ -442,8 +449,21 @@ class OmnibarLayoutViewModel @Inject constructor(
         }
     }
 
+    private fun shouldShowDuckAiHeader(
+        viewMode: ViewMode,
+        hasFocus: Boolean,
+    ): Boolean {
+        logcat { "Omnibar: shouldShowDuckAiHeader $viewMode, focus: $hasFocus" }
+        return if (viewMode == ViewMode.DuckAI) {
+            !hasFocus
+        } else {
+            false
+        }
+    }
+
     fun onViewModeChanged(viewMode: ViewMode) {
         val currentViewMode = _viewState.value.viewMode
+        val hasFocus = _viewState.value.hasFocus
         logcat { "Omnibar: onViewModeChanged $viewMode" }
         if (currentViewMode is CustomTab) {
             logcat { "Omnibar: custom tab mode enabled, sending updates there" }
@@ -476,6 +496,8 @@ class OmnibarLayoutViewModel @Inject constructor(
                             showChatMenu = false,
                             hasFocus = false,
                             isLoading = false,
+                            showDuckAIHeader = shouldShowDuckAiHeader(viewMode, hasFocus),
+                            showDuckAISidebar = shouldShowDuckAiHeader(viewMode, hasFocus),
                         )
                     }
                 }
@@ -506,6 +528,8 @@ class OmnibarLayoutViewModel @Inject constructor(
                                 urlLoaded = _viewState.value.url,
                             ),
                             showShadows = false,
+                            showDuckAIHeader = shouldShowDuckAiHeader(viewMode, hasFocus),
+                            showDuckAISidebar = shouldShowDuckAiHeader(viewMode, hasFocus),
                         )
                     }
                 }
@@ -951,6 +975,21 @@ class OmnibarLayoutViewModel @Inject constructor(
                     omnibarText = query,
                     updateOmnibarText = true,
                 )
+            }
+        }
+    }
+
+    fun onDuckAiHeaderClicked() {
+        if (duckAiFeatureState.showInputScreen.value) {
+            onTextInputClickCatcherClicked()
+        } else {
+            _viewState.update {
+                it.copy(
+                    showDuckAIHeader = false,
+                )
+            }
+            viewModelScope.launch {
+                command.send(Command.FocusInputField)
             }
         }
     }

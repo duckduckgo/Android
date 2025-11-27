@@ -100,7 +100,7 @@ interface DuckChatFeature {
     /**
      * @return `true` when the new input screen should show the three main buttons (fire, tabs, menu)
      */
-    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun showMainButtonsInInputScreen(): Toggle
 
     /**

@@ -36,7 +36,32 @@
             android:id="@+id/toolbarContainer"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:paddingStart="@dimen/keyline_2"
             android:background="?attr/daxColorToolbar">
+
+            <FrameLayout
+                android:id="@+id/duckAiSidebar"
+                android:layout_width="@dimen/toolbarIcon"
+                android:layout_height="@dimen/toolbarIcon"
+                android:visibility="gone"
+                tools:visibility="visible"
+                android:layout_marginStart="@dimen/keyline_1"
+                android:layout_marginTop="@dimen/omnibarCardMarginTop"
+                android:layout_marginBottom="@dimen/omnibarCardMarginBottom"
+                android:background="@drawable/selectable_item_rounded_corner_background"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
+
+                <ImageView
+                    android:id="@+id/duckAiSidebarButton"
+                    android:layout_width="@dimen/bottomNavIcon"
+                    android:layout_height="@dimen/bottomNavIcon"
+                    android:layout_gravity="center"
+                    android:contentDescription="@string/browserMenuChatHistory"
+                    android:scaleType="center"
+                    android:src="@drawable/ic_list_24" />
+            </FrameLayout>
 
             <androidx.appcompat.widget.Toolbar
                 android:id="@+id/toolbar"
@@ -49,7 +74,7 @@
                 android:paddingRight="0dp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toStartOf="@id/iconsContainer"
-                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintStart_toEndOf="@id/duckAiSidebar"
                 app:layout_constraintTop_toTopOf="parent"
                 app:popupTheme="@style/Widget.DuckDuckGo.PopUpOverflowMenu">
 
@@ -204,6 +229,7 @@
                                 android:layout_height="wrap_content"
                                 android:orientation="horizontal"
                                 android:gravity="center"
+                                android:background="?daxColorWindow"
                                 app:layout_constraintEnd_toEndOf="parent"
                                 app:layout_constraintStart_toStartOf="parent"
                                 app:layout_constraintBottom_toBottomOf="parent"

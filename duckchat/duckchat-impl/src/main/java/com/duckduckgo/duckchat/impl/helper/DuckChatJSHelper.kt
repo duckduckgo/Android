@@ -46,7 +46,7 @@ interface DuckChatJSHelper {
 
 enum class NativeAction {
     NEW_CHAT,
-    HISTORY,
+    SIDEBAR,
     DUCK_AI_SETTINGS,
 }
 
@@ -132,7 +132,7 @@ class RealDuckChatJSHelper @Inject constructor(
     override fun onNativeAction(action: NativeAction): SubscriptionEventData {
         val subscriptionName = when (action) {
             NativeAction.NEW_CHAT -> SUBSCRIPTION_NEW_CHAT
-            NativeAction.HISTORY -> SUBSCRIPTION_HISTORY
+            NativeAction.SIDEBAR -> SUBSCRIPTION_TOGGLE_SIDEBAR
             NativeAction.DUCK_AI_SETTINGS -> SUBSCRIPTION_DUCK_AI_SETTINGS
         }
 
@@ -172,6 +172,7 @@ class RealDuckChatJSHelper @Inject constructor(
                 put(SUPPORTS_CHAT_ID_RESTORATION, duckChat.isDuckChatFullScreenModeEnabled())
                 put(SUPPORTS_IMAGE_UPLOAD, duckChat.isImageUploadEnabled())
                 put(SUPPORTS_STANDALONE_MIGRATION, duckChat.isStandaloneMigrationEnabled())
+                put(SUPPORTS_CHAT_FULLSCREEN_MODE, duckChat.isDuckChatFullScreenModeEnabled())
             }
         return JsCallbackData(jsonPayload, featureName, method, id)
     }
@@ -235,6 +236,7 @@ class RealDuckChatJSHelper @Inject constructor(
         private const val SUPPORTS_IMAGE_UPLOAD = "supportsImageUpload"
         private const val SUPPORTS_CHAT_ID_RESTORATION = "supportsURLChatIDRestoration"
         private const val SUPPORTS_STANDALONE_MIGRATION = "supportsStandaloneMigration"
+        private const val SUPPORTS_CHAT_FULLSCREEN_MODE = "supportsAIChatFullMode"
         private const val REPORT_METRIC = "reportMetric"
         private const val PLATFORM = "platform"
         private const val ANDROID = "android"
@@ -243,7 +245,7 @@ class RealDuckChatJSHelper @Inject constructor(
         private const val SUCCESS = "success"
         private const val ERROR = "error"
         private const val SUBSCRIPTION_NEW_CHAT = "submitNewChatAction"
-        private const val SUBSCRIPTION_HISTORY = "openDuckAiHistory"
-        private const val SUBSCRIPTION_DUCK_AI_SETTINGS = "openDuckAiSettings"
+        private const val SUBSCRIPTION_TOGGLE_SIDEBAR = "submitToggleSidebarAction"
+        private const val SUBSCRIPTION_DUCK_AI_SETTINGS = "submitOpenSettingsAction"
     }
 }

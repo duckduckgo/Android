@@ -1579,6 +1579,7 @@ class BrowserTabViewModel @Inject constructor(
                         }
                     } else {
                         withContext(dispatchers.main()) {
+                            evaluateDuckAIPage(stateChange.url)
                             pageChanged(stateChange.url, stateChange.title)
                         }
                     }
@@ -2212,7 +2213,6 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     private fun onSiteChanged() {
-        logcat { "Duck.ai: onSiteChanged" }
         httpsUpgraded = false
         site?.isDesktopMode = currentBrowserViewState().isDesktopBrowsingMode
         viewModelScope.launch {
@@ -4514,9 +4514,9 @@ class BrowserTabViewModel @Inject constructor(
         }
     }
 
-    fun openDuckChatHistory() {
+    fun openDuckChatSidebar() {
         viewModelScope.launch {
-            val subscriptionEvent = duckChatJSHelper.onNativeAction(NativeAction.HISTORY)
+            val subscriptionEvent = duckChatJSHelper.onNativeAction(NativeAction.SIDEBAR)
             _subscriptionEventDataChannel.send(subscriptionEvent)
         }
     }

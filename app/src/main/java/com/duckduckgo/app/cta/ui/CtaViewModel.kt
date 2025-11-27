@@ -387,6 +387,8 @@ class CtaViewModel @Inject constructor(
 
         if (subscriptions.isPrivacyProUrl(uri)) return true
 
+        if (duckDuckGoUrlDetector.isDuckDuckGoChatUrl(uri.toString())) return true
+
         val isDuckPlayerUrl =
             duckPlayer.getDuckPlayerState() == DuckPlayerState.ENABLED &&
                 (
