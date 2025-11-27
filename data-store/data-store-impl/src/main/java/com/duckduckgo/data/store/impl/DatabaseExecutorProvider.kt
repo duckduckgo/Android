@@ -12,7 +12,6 @@ import java.util.concurrent.Executors
 import java.util.concurrent.ThreadPoolExecutor
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
-import javax.inject.Provider
 
 interface DatabaseExecutorProvider {
     fun createQueryExecutor(executor: DatabaseExecutor): Executor?
@@ -22,11 +21,11 @@ interface DatabaseExecutorProvider {
 @SingleInstanceIn(AppScope::class)
 @ContributesBinding(AppScope::class)
 class RealDatabaseExecutorProvider @Inject constructor(
-    databaseProviderFeatureProvider: Provider<DatabaseProviderFeature>,
+    databaseProviderFeature: DatabaseProviderFeature,
 ) : DatabaseExecutorProvider {
 
     private val defaultPoolSize = 6
-    private val defaultExecutor by lazy {
+    private val defaultExecutor =
         ThreadPoolExecutor(
             defaultPoolSize,
             defaultPoolSize,
@@ -35,11 +34,8 @@ class RealDatabaseExecutorProvider @Inject constructor(
             ArrayBlockingQueue(defaultPoolSize * 2),
             ThreadPoolExecutor.CallerRunsPolicy(),
         )
-    }
 
-    private val isFeatureFlagEnabled by lazy {
-        databaseProviderFeatureProvider.get().self().isEnabled()
-    }
+    private val isFeatureFlagEnabled = databaseProviderFeature.self().isEnabled()
 
     override fun createQueryExecutor(executor: DatabaseExecutor): Executor? {
         return when (executor) {
