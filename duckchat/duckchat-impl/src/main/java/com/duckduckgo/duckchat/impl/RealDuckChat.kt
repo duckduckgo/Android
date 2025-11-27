@@ -101,11 +101,6 @@ interface DuckChatInternal : DuckChat {
     fun observeEnableDuckChatUserSetting(): Flow<Boolean>
 
     /**
-     * Observes whether Duck.ai input screen with a mode switch is enabled or disabled.
-     */
-    fun observeInputScreenUserSettingEnabled(): Flow<Boolean>
-
-    /**
      * Observes whether DuckChat should be shown in browser menu based on user settings only.
      */
     fun observeShowInBrowserMenuUserSetting(): Flow<Boolean>
