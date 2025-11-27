@@ -12,7 +12,6 @@ import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertSame
 import org.junit.Assert.assertTrue
-import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import java.util.concurrent.Executor
@@ -25,14 +24,9 @@ class RealDatabaseExecutorProviderTest {
     private val databaseProviderFeature: DatabaseProviderFeature = FakeFeatureToggleFactory.create(DatabaseProviderFeature::class.java)
     private lateinit var subject: RealDatabaseExecutorProvider
 
-    @Before
-    fun setUp() {
-        subject = RealDatabaseExecutorProvider(databaseProviderFeature)
-    }
-
     @Test
     fun whenFeatureFlagEnabledAndDefaultExecutorThenSameExecutorInstanceIsReturned() = runTest {
-        databaseProviderFeature.self().setRawStoredState(State(enable = true))
+        prepareSubject(true)
 
         val queryExecutor1 = subject.createQueryExecutor(DatabaseExecutor.Default)
         val queryExecutor2 = subject.createQueryExecutor(DatabaseExecutor.Default)
@@ -48,7 +42,7 @@ class RealDatabaseExecutorProviderTest {
 
     @Test
     fun whenFeatureFlagDisabledAndDefaultExecutorThenNullIsReturned() = runTest {
-        databaseProviderFeature.self().setRawStoredState(State(enable = false))
+        prepareSubject(false)
 
         val queryExecutor = subject.createQueryExecutor(DatabaseExecutor.Default)
         val transactionExecutor = subject.createTransactionExecutor(DatabaseExecutor.Default)
@@ -59,7 +53,7 @@ class RealDatabaseExecutorProviderTest {
 
     @Test
     fun whenFeatureFlagEnabledAndCustomExecutorThenCustomExecutorsAreCreated() = runTest {
-        databaseProviderFeature.self().setRawStoredState(State(enable = true))
+        prepareSubject(true)
         val customExecutor = DatabaseExecutor.Custom(
             transactionPoolSize = 2,
             queryPoolSize = 4,
@@ -89,7 +83,7 @@ class RealDatabaseExecutorProviderTest {
 
     @Test
     fun whenFeatureFlagDisabledAndCustomExecutorThenLegacyExecutorsAreCreated() = runTest {
-        databaseProviderFeature.self().setRawStoredState(State(enable = false))
+        prepareSubject(false)
         val customExecutor = DatabaseExecutor.Custom(
             transactionPoolSize = 2,
             queryPoolSize = 4,
@@ -106,7 +100,7 @@ class RealDatabaseExecutorProviderTest {
 
     @Test
     fun whenCustomExecutorsCreatedMultipleTimesThenDifferentInstancesAreReturned() = runTest {
-        databaseProviderFeature.self().setRawStoredState(State(enable = true))
+        prepareSubject(true)
         val customExecutor = DatabaseExecutor.Custom(
             transactionPoolSize = 2,
             queryPoolSize = 4,
@@ -123,5 +117,10 @@ class RealDatabaseExecutorProviderTest {
         assertNotNull(transactionExecutor2)
         assertNotEquals(queryExecutor1, queryExecutor2)
         assertNotEquals(transactionExecutor1, transactionExecutor2)
+    }
+
+    private fun prepareSubject(flagEnabled: Boolean) {
+        databaseProviderFeature.self().setRawStoredState(State(enable = flagEnabled))
+        subject = RealDatabaseExecutorProvider(databaseProviderFeature)
     }
 }

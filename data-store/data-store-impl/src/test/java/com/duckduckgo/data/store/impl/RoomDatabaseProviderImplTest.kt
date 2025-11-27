@@ -58,11 +58,10 @@ class RoomDatabaseProviderImplTest {
 
     private val context: Context = mock()
     private val databaseProviderFeature: DatabaseProviderFeature = FakeFeatureToggleFactory.create(DatabaseProviderFeature::class.java)
-    private val databaseExecutorProvider: DatabaseExecutorProvider = RealDatabaseExecutorProvider(databaseProviderFeature)
     private val roomDatabaseBuilderFactory: RoomDatabaseBuilderFactory = mock()
     private val mockDatabase = mock<TestDatabase>()
     private val mockRoomBuilder: RoomDatabase.Builder<TestDatabase> = mock()
-    private val subject: RoomDatabaseProviderImpl = RoomDatabaseProviderImpl(context, roomDatabaseBuilderFactory, { databaseExecutorProvider })
+    private lateinit var subject: RoomDatabaseProviderImpl
 
     @Before
     fun setUp() {
@@ -82,7 +81,7 @@ class RoomDatabaseProviderImplTest {
 
     @Test
     fun whenFeatureFlagDisabledAndCustomExecutorThenLegacyExecutorsAreUsed() = runTest {
-        databaseProviderFeature.self().setRawStoredState(State(enable = false))
+        prepareSubject(flagEnabled = false)
         val config = RoomDatabaseConfig(
             executor = DatabaseExecutor.Custom(
                 transactionPoolSize = 2,
@@ -108,6 +107,7 @@ class RoomDatabaseProviderImplTest {
 
     @Test
     fun whenFeatureFlagEnabledAndCustomExecutorWithExplicitQueueSizesThenCustomExecutorsAreCreated() = runTest {
+        prepareSubject(flagEnabled = true)
         databaseProviderFeature.self().setRawStoredState(State(enable = true))
         val customExecutor = DatabaseExecutor.Custom(
             transactionPoolSize = 2,
@@ -147,7 +147,7 @@ class RoomDatabaseProviderImplTest {
 
     @Test
     fun whenFeatureFlagEnabledAndDefaultExecutorThenDefaultExecutorIsUsed() = runTest {
-        databaseProviderFeature.self().setRawStoredState(State(enable = true))
+        prepareSubject(flagEnabled = true)
         val config = RoomDatabaseConfig(executor = DatabaseExecutor.Default)
 
         subject.buildRoomDatabase(TestDatabase::class.java, "test.db", config)
@@ -166,7 +166,7 @@ class RoomDatabaseProviderImplTest {
 
     @Test
     fun whenFeatureFlagDisabledAndDefaultExecutorThenNoExecutorsAreSet() = runTest {
-        databaseProviderFeature.self().setRawStoredState(State(enable = false))
+        prepareSubject(flagEnabled = false)
         val config = RoomDatabaseConfig(executor = DatabaseExecutor.Default)
 
         subject.buildRoomDatabase(TestDatabase::class.java, "test.db", config)
@@ -177,6 +177,7 @@ class RoomDatabaseProviderImplTest {
 
     @Test
     fun whenMigrationsProvidedThenMigrationsArePassedToBuilder() = runTest {
+        prepareSubject(flagEnabled = true)
         val migration = mock<Migration>()
         val config = RoomDatabaseConfig(migrations = listOf(migration))
 
@@ -187,6 +188,7 @@ class RoomDatabaseProviderImplTest {
 
     @Test
     fun whenFallbackToDestructiveMigrationEnabledThenFlagIsPassedToBuilder() = runTest {
+        prepareSubject(flagEnabled = true)
         val config = RoomDatabaseConfig(fallbackToDestructiveMigration = true)
 
         subject.buildRoomDatabase(TestDatabase::class.java, "test.db", config)
@@ -196,6 +198,7 @@ class RoomDatabaseProviderImplTest {
 
     @Test
     fun whenOpenHelperFactoryProvidedThenFactoryIsPassedToBuilder() = runTest {
+        prepareSubject(flagEnabled = true)
         val mockFactory = mock<SupportSQLiteOpenHelper.Factory>()
         val config = RoomDatabaseConfig(openHelperFactory = mockFactory)
 
@@ -206,6 +209,7 @@ class RoomDatabaseProviderImplTest {
 
     @Test
     fun whenMultiInstanceInvalidationEnabledThenFlagIsPassedToBuilder() = runTest {
+        prepareSubject(flagEnabled = true)
         val config = RoomDatabaseConfig(enableMultiInstanceInvalidation = true)
 
         subject.buildRoomDatabase(TestDatabase::class.java, "test.db", config)
@@ -215,6 +219,7 @@ class RoomDatabaseProviderImplTest {
 
     @Test
     fun whenJournalModeProvidedThenJournalModeIsPassedToBuilder() = runTest {
+        prepareSubject(flagEnabled = true)
         val journalMode = RoomDatabase.JournalMode.TRUNCATE
         val config = RoomDatabaseConfig(journalMode = journalMode)
 
@@ -225,6 +230,7 @@ class RoomDatabaseProviderImplTest {
 
     @Test
     fun whenCallbacksProvidedThenCallbacksArePassedToBuilder() = runTest {
+        prepareSubject(flagEnabled = true)
         val callback = mock<RoomDatabase.Callback>()
         val config = RoomDatabaseConfig(callbacks = listOf(callback))
 
@@ -235,6 +241,7 @@ class RoomDatabaseProviderImplTest {
 
     @Test
     fun whenFallbackToDestructiveMigrationFromVersionProvidedThenVersionsArePassedToBuilder() = runTest {
+        prepareSubject(flagEnabled = true)
         val versions = listOf(1, 2, 3)
         val config = RoomDatabaseConfig(fallbackToDestructiveMigrationFromVersion = versions)
 
@@ -245,6 +252,7 @@ class RoomDatabaseProviderImplTest {
 
     @Test
     fun whenEmptyConfigProvidedThenDefaultValuesArePassedToBuilder() = runTest {
+        prepareSubject(flagEnabled = false)
         val config = RoomDatabaseConfig()
 
         subject.buildRoomDatabase(TestDatabase::class.java, "test.db", config)
@@ -261,7 +269,7 @@ class RoomDatabaseProviderImplTest {
 
     @Test
     fun whenDefaultExecutorUsedThenThreadPoolExecutorIsCreatedWithDefaultConfig() = runTest {
-        databaseProviderFeature.self().setRawStoredState(State(enable = true))
+        prepareSubject(flagEnabled = true)
         val config = RoomDatabaseConfig(executor = DatabaseExecutor.Default)
         val queryArgumentCaptor = argumentCaptor<ThreadPoolExecutor>()
         val transactionArgumentCaptor = argumentCaptor<ThreadPoolExecutor>()
@@ -292,7 +300,7 @@ class RoomDatabaseProviderImplTest {
 
     @Test
     fun whenSameCustomExecutorConfigUsedTwiceThenDifferentInstancesAreCreated() = runTest {
-        databaseProviderFeature.self().setRawStoredState(State(enable = true))
+        prepareSubject(flagEnabled = true)
         val customExecutor = DatabaseExecutor.Custom(transactionPoolSize = 2, queryPoolSize = 4)
         val config = RoomDatabaseConfig(executor = customExecutor)
         val queryArgumentCaptor = argumentCaptor<ThreadPoolExecutor>()
@@ -318,5 +326,14 @@ class RoomDatabaseProviderImplTest {
     @androidx.room.Database(version = 1, entities = [TestEntity::class], exportSchema = false)
     abstract class TestDatabase : RoomDatabase() {
         // Empty implementation for testing
+    }
+
+    private fun prepareSubject(flagEnabled: Boolean) {
+        databaseProviderFeature.self().setRawStoredState(State(enable = flagEnabled))
+        subject = RoomDatabaseProviderImpl(
+            context,
+            roomDatabaseBuilderFactory,
+            { RealDatabaseExecutorProvider(databaseProviderFeature) },
+        )
     }
 }
