@@ -115,6 +115,7 @@ import com.duckduckgo.app.browser.model.BasicAuthenticationCredentials
 import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
 import com.duckduckgo.app.browser.model.LongPressTarget
 import com.duckduckgo.app.browser.newtab.FavoritesQuickAccessAdapter.QuickAccessFavorite
+import com.duckduckgo.app.browser.omnibar.Omnibar
 import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
 import com.duckduckgo.app.browser.omnibar.OmnibarType
 import com.duckduckgo.app.browser.omnibar.QueryOrigin.FromBookmark
@@ -6046,7 +6047,7 @@ class BrowserTabViewModelTest {
                 )
             testee.ctaViewState.value = ctaViewState().copy(cta = cta)
 
-            testee.userLaunchingTabSwitcher(false)
+            testee.userLaunchingTabSwitcher(Omnibar.ViewMode.Browser(exampleUrl), false)
 
             verify(mockDismissedCtaDao).insert(DismissedCta(cta.ctaId))
         }
@@ -6204,11 +6205,43 @@ class BrowserTabViewModelTest {
                     PixelParameter.TAB_INACTIVE_3W to inactive3w,
                 )
 
-            testee.userLaunchingTabSwitcher(false)
+            testee.userLaunchingTabSwitcher(Omnibar.ViewMode.Browser(exampleUrl), false)
 
             assertCommandIssued<Command.LaunchTabSwitcher>()
             verify(mockPixel).fire(AppPixelName.TAB_MANAGER_CLICKED)
             verify(mockPixel).fire(AppPixelName.TAB_MANAGER_CLICKED_DAILY, params, emptyMap(), Daily())
+        }
+
+    @Test
+    fun whenUserLaunchingTabSwitcherInDuckAIThenLaunchTabSwitcherCommandSentAndPixelsFired() =
+        runTest {
+            val tabCount = "61-80"
+            val active7d = "21+"
+            val inactive1w = "11-20"
+            val inactive2w = "6-10"
+            val inactive3w = "0"
+
+            whenever(mockTabStatsBucketing.getNumberOfOpenTabs()).thenReturn(tabCount)
+            whenever(mockTabStatsBucketing.getTabsActiveLastWeek()).thenReturn(active7d)
+            whenever(mockTabStatsBucketing.getTabsActiveOneWeekAgo()).thenReturn(inactive1w)
+            whenever(mockTabStatsBucketing.getTabsActiveTwoWeeksAgo()).thenReturn(inactive2w)
+            whenever(mockTabStatsBucketing.getTabsActiveMoreThanThreeWeeksAgo()).thenReturn(inactive3w)
+
+            val params =
+                mapOf(
+                    PixelParameter.TAB_COUNT to tabCount,
+                    PixelParameter.TAB_ACTIVE_7D to active7d,
+                    PixelParameter.TAB_INACTIVE_1W to inactive1w,
+                    PixelParameter.TAB_INACTIVE_2W to inactive2w,
+                    PixelParameter.TAB_INACTIVE_3W to inactive3w,
+                )
+
+            testee.userLaunchingTabSwitcher(Omnibar.ViewMode.DuckAI, false)
+
+            assertCommandIssued<Command.LaunchTabSwitcher>()
+            verify(mockPixel).fire(AppPixelName.TAB_MANAGER_CLICKED)
+            verify(mockPixel).fire(AppPixelName.TAB_MANAGER_CLICKED_DAILY, params, emptyMap(), Daily())
+            verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_TAB_SWITCHER_OPENED)
         }
 
     @Test
@@ -6486,7 +6519,7 @@ class BrowserTabViewModelTest {
             val domain = "https://www.example.com"
             givenCurrentSite(domain)
 
-            testee.userLaunchingTabSwitcher(false)
+            testee.userLaunchingTabSwitcher(Omnibar.ViewMode.Browser(domain), false)
 
             verify(mockPixel).fire(AppPixelName.TAB_MANAGER_OPENED_FROM_SITE)
         }
@@ -6497,7 +6530,7 @@ class BrowserTabViewModelTest {
             givenTabManagerData()
             setBrowserShowing(false)
 
-            testee.userLaunchingTabSwitcher(false)
+            testee.userLaunchingTabSwitcher(Omnibar.ViewMode.NewTab, false)
 
             verify(mockPixel).fire(AppPixelName.TAB_MANAGER_OPENED_FROM_NEW_TAB, mapOf(PixelParameter.FROM_FOCUSED_NTP to "false"))
         }
@@ -6508,7 +6541,7 @@ class BrowserTabViewModelTest {
             givenTabManagerData()
             setBrowserShowing(false)
 
-            testee.userLaunchingTabSwitcher(true)
+            testee.userLaunchingTabSwitcher(Omnibar.ViewMode.NewTab, true)
 
             verify(mockPixel).fire(AppPixelName.TAB_MANAGER_OPENED_FROM_NEW_TAB, mapOf(PixelParameter.FROM_FOCUSED_NTP to "true"))
         }
@@ -6522,7 +6555,7 @@ class BrowserTabViewModelTest {
             val domain = "https://duckduckgo.com/?q=test&atb=v395-1-wb&ia=web"
             givenCurrentSite(domain)
 
-            testee.userLaunchingTabSwitcher(false)
+            testee.userLaunchingTabSwitcher(Omnibar.ViewMode.Browser(domain), false)
 
             verify(mockPixel).fire(AppPixelName.TAB_MANAGER_OPENED_FROM_SERP)
         }
@@ -7469,7 +7502,7 @@ class BrowserTabViewModelTest {
             val cta = OnboardingDaxDialogCta.DaxFireButtonCta(mockOnboardingStore, mockAppInstallStore, mockOnboardingDesignExperimentManager)
             setCta(cta)
 
-            testee.onFireMenuSelected()
+            testee.onFireMenuSelected(Omnibar.ViewMode.Browser(exampleUrl))
 
             verify(mockOnboardingDesignExperimentManager).fireFireButtonClickedFromOnboardingPixel()
         }
@@ -7478,7 +7511,7 @@ class BrowserTabViewModelTest {
     fun whenFireMenuSelectedAndFireButtonHighlightedThenHighlightIsCleared() = runTest {
         testee.browserViewState.value = browserViewState().copy(fireButton = HighlightableButton.Visible(highlighted = true))
 
-        testee.onFireMenuSelected()
+        testee.onFireMenuSelected(Omnibar.ViewMode.Browser(exampleUrl))
 
         val viewState = testee.browserViewState.value
         assertNotNull(viewState)
@@ -7489,11 +7522,20 @@ class BrowserTabViewModelTest {
     fun whenFireMenuSelectedAndFireButtonNotHighlightedThenStateUnchanged() = runTest {
         testee.browserViewState.value = browserViewState().copy(fireButton = HighlightableButton.Visible(highlighted = false))
 
-        testee.onFireMenuSelected()
+        testee.onFireMenuSelected(Omnibar.ViewMode.Browser(exampleUrl))
 
         val viewState = testee.browserViewState.value
         assertNotNull(viewState)
         assertFalse((viewState.fireButton as HighlightableButton.Visible).highlighted)
+    }
+
+    @Test
+    fun whenFireMenuSelectedAndDuckAIModeThenPixelFired() = runTest {
+        testee.browserViewState.value = browserViewState()
+
+        testee.onFireMenuSelected(Omnibar.ViewMode.DuckAI)
+
+        verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_FIRE_BUTTON_TAPPED)
     }
 
     @Test

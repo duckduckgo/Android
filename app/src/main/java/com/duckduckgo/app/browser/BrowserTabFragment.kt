@@ -1216,8 +1216,7 @@ class BrowserTabFragment :
     }
 
     private fun onTabsButtonPressed() {
-        val isFocusedNtp = omnibar.viewMode == ViewMode.NewTab && omnibar.getText().isEmpty() && omnibar.omnibarTextInput.hasFocus()
-        launch { viewModel.userLaunchingTabSwitcher(isFocusedNtp) }
+        launch { viewModel.userLaunchingTabSwitcher(omnibar.viewMode, omnibar.getText().isEmpty() && omnibar.omnibarTextInput.hasFocus()) }
     }
 
     private fun onTabsButtonLongPressed() {
@@ -1252,7 +1251,7 @@ class BrowserTabFragment :
     private fun onFireButtonPressed() {
         val isFocusedNtp = omnibar.viewMode == ViewMode.NewTab && omnibar.getText().isEmpty() && omnibar.omnibarTextInput.hasFocus()
         browserActivity?.launchFire(launchedFromFocusedNtp = isFocusedNtp)
-        viewModel.onFireMenuSelected()
+        viewModel.onFireMenuSelected(omnibar.viewMode)
     }
 
     private fun onBrowserMenuButtonPressed() {
