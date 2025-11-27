@@ -242,7 +242,7 @@ interface AndroidBrowserConfigFeature {
      * Controls default URL display for new users only.
      * @return `true` when the remote config has the global "shorterUrlDefault" androidBrowserConfig
      * sub-feature flag enabled
-     * If the remote feature is not present defaults to `false`
+     * If the remote feature is not present defaults to `true`
      */
     @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun shorterUrlDefault(): Toggle
