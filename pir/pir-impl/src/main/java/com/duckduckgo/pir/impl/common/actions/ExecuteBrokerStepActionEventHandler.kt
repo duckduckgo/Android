@@ -233,7 +233,7 @@ class ExecuteBrokerStepActionEventHandler @Inject constructor(
                                 stageStartMs = currentTimeProvider.currentTimeMillis(),
                             ),
                         )
-                    } else if (actionToExecute is FillForm) {
+                    } else if (actionToExecute is FillForm || actionToExecute is Click) {
                         state.copy(
                             stageStatus = PirStageStatus(
                                 currentStage = PirStage.FILL_FORM,
