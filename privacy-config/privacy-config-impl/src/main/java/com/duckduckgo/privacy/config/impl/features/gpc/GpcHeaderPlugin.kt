@@ -27,7 +27,7 @@ class GpcHeaderPlugin @Inject constructor(
     private val gpc: Gpc,
 ) : CustomHeadersPlugin {
 
-    override fun getHeaders(url: String): Map<String, String> {
+    override suspend fun getHeaders(url: String): Map<String, String> {
         return gpc.getHeaders(url)
     }
 }

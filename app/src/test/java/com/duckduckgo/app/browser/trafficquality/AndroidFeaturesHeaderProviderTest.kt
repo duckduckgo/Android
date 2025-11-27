@@ -61,7 +61,7 @@ class AndroidFeaturesHeaderProviderTest {
     }
 
     @Test
-    fun whenGPCFeatureEnabledAndGPCDisabledThenValueProvided() {
+    fun whenGPCFeatureEnabledAndGPCDisabledThenValueProvided() = runTest {
         whenever(mockGpc.isEnabled()).thenReturn(false)
         val config = TrafficQualityAppVersion(currentVersion, 5, 5, featuresEnabled(gpc = true))
 
@@ -71,7 +71,7 @@ class AndroidFeaturesHeaderProviderTest {
     }
 
     @Test
-    fun whenGPCFeatureEnabledAndGPCEnabledThenValueProvided() {
+    fun whenGPCFeatureEnabledAndGPCEnabledThenValueProvided() = runTest {
         whenever(mockGpc.isEnabled()).thenReturn(true)
         val config = TrafficQualityAppVersion(currentVersion, 5, 5, featuresEnabled(gpc = true))
 

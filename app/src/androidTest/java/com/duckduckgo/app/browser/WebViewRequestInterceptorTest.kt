@@ -109,9 +109,12 @@ class WebViewRequestInterceptorTest {
 
     @UiThreadTest
     @Before
-    fun setup() {
+    fun setup() = runTest {
         configureUserAgent()
         configureStack()
+        whenever(mockGpc.canUrlAddHeaders(anyString(), anyMap<String, String>())).thenReturn(false)
+        whenever(mockRequest.requestHeaders).thenReturn(mutableMapOf())
+        whenever(mockGpc.getHeaders(anyString())).thenReturn(mapOf())
 
         testee = WebViewRequestInterceptor(
             trackerDetector = mockTrackerDetector,
