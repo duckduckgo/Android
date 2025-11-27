@@ -18,7 +18,6 @@ package com.duckduckgo.duckchat.api
 
 import android.content.Context
 import android.net.Uri
-import kotlinx.coroutines.flow.Flow
 
 /**
  * DuckChat interface provides a set of methods for interacting and controlling DuckChat.
@@ -73,9 +72,4 @@ interface DuckChat {
      * Set user setting to determine whether dedicated Duck.ai input screen with a mode switch should be used.
      */
     suspend fun setInputScreenUserSetting(enabled: Boolean)
-
-    /**
-     * Observes whether Duck.ai input screen with a mode switch is enabled or disabled.
-     */
-    fun observeInputScreenUserSettingEnabled(): Flow<Boolean>
 }

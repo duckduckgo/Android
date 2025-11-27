@@ -42,16 +42,14 @@ class OnboardingInputScreenSelectionObserverTest {
     private val mockOnboardingStore: OnboardingStore = mock()
     private val mockDuckChat: DuckChat = mock()
     private val dispatcherProvider: DispatcherProvider = coroutineRule.testDispatcherProvider
+
     private val userAppStageFlow = MutableStateFlow(AppStage.NEW)
-    private val inputScreenSettingFlow = MutableStateFlow(false)
 
     @Test
     fun whenUserStageIsEstablishedAndInputScreenSelectionIsTrueThenSetInputScreenUserSettingToTrue() =
         runTest {
             whenever(mockUserStageStore.userAppStageFlow()).thenReturn(userAppStageFlow)
-            whenever(mockUserStageStore.getUserAppStage()).thenReturn(AppStage.NEW)
             whenever(mockOnboardingStore.getInputScreenSelection()).thenReturn(true)
-            whenever(mockDuckChat.observeInputScreenUserSettingEnabled()).thenReturn(inputScreenSettingFlow)
 
             OnboardingInputScreenSelectionObserver(
                 mockAppCoroutineScope,
@@ -70,9 +68,7 @@ class OnboardingInputScreenSelectionObserverTest {
     fun whenUserStageIsEstablishedAndInputScreenSelectionIsFalseThenSetInputScreenUserSettingToFalse() =
         runTest {
             whenever(mockUserStageStore.userAppStageFlow()).thenReturn(userAppStageFlow)
-            whenever(mockUserStageStore.getUserAppStage()).thenReturn(AppStage.NEW)
             whenever(mockOnboardingStore.getInputScreenSelection()).thenReturn(false)
-            whenever(mockDuckChat.observeInputScreenUserSettingEnabled()).thenReturn(inputScreenSettingFlow)
 
             OnboardingInputScreenSelectionObserver(
                 mockAppCoroutineScope,
@@ -91,9 +87,7 @@ class OnboardingInputScreenSelectionObserverTest {
     fun whenUserStageIsEstablishedAndInputScreenSelectionIsNullThenDoNotSetInputScreenUserSetting() =
         runTest {
             whenever(mockUserStageStore.userAppStageFlow()).thenReturn(userAppStageFlow)
-            whenever(mockUserStageStore.getUserAppStage()).thenReturn(AppStage.NEW)
             whenever(mockOnboardingStore.getInputScreenSelection()).thenReturn(null)
-            whenever(mockDuckChat.observeInputScreenUserSettingEnabled()).thenReturn(inputScreenSettingFlow)
 
             OnboardingInputScreenSelectionObserver(
                 mockAppCoroutineScope,
@@ -112,9 +106,7 @@ class OnboardingInputScreenSelectionObserverTest {
     fun whenUserStageIsNotEstablishedThenDoNotSetInputScreenUserSetting() =
         runTest {
             whenever(mockUserStageStore.userAppStageFlow()).thenReturn(userAppStageFlow)
-            whenever(mockUserStageStore.getUserAppStage()).thenReturn(AppStage.DAX_ONBOARDING)
             whenever(mockOnboardingStore.getInputScreenSelection()).thenReturn(true)
-            whenever(mockDuckChat.observeInputScreenUserSettingEnabled()).thenReturn(inputScreenSettingFlow)
 
             OnboardingInputScreenSelectionObserver(
                 mockAppCoroutineScope,
@@ -125,31 +117,6 @@ class OnboardingInputScreenSelectionObserverTest {
             )
 
             userAppStageFlow.value = AppStage.DAX_ONBOARDING
-
-            verify(mockDuckChat, never()).setInputScreenUserSetting(any())
-        }
-
-    @Test
-    fun whenUserChangesInputScreenSettingBeforeEstablishedThenClearOnboardingSelection() =
-        runTest {
-            whenever(mockUserStageStore.userAppStageFlow()).thenReturn(userAppStageFlow)
-            whenever(mockUserStageStore.getUserAppStage()).thenReturn(AppStage.NEW)
-            whenever(mockOnboardingStore.getInputScreenSelection()).thenReturn(true, null)
-            whenever(mockDuckChat.observeInputScreenUserSettingEnabled()).thenReturn(inputScreenSettingFlow)
-
-            OnboardingInputScreenSelectionObserver(
-                mockAppCoroutineScope,
-                dispatcherProvider,
-                mockUserStageStore,
-                mockOnboardingStore,
-                mockDuckChat,
-            )
-
-            inputScreenSettingFlow.value = true
-
-            verify(mockOnboardingStore).clearInputScreenSelection()
-
-            userAppStageFlow.value = AppStage.ESTABLISHED
 
             verify(mockDuckChat, never()).setInputScreenUserSetting(any())
         }

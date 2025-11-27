@@ -175,10 +175,6 @@ class OnboardingStoreImpl @Inject constructor(
         }
     }
 
-    override fun clearInputScreenSelection() {
-        preferences.edit { remove(KEY_INPUT_SCREEN_SELECTION) }
-    }
-
     companion object {
         const val FILENAME = "com.duckduckgo.app.onboarding.settings"
         const val ONBOARDING_JOURNEY = "onboardingJourney"
