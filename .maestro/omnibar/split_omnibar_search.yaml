@@ -97,6 +97,7 @@ tags:
 # verify that tapping on a new tab button opens a new tab
 - tapOn:
     id: "newTabButton"
+- hideKeyboard
 - assertVisible:
     text: "2"
     childOf:
