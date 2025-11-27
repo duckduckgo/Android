@@ -30,6 +30,7 @@ import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerScanA
 import com.duckduckgo.pir.impl.common.actions.EventHandler.Next
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.Event
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.Event.BrokerStepCompleted
+import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.Event.BrokerStepCompleted.StepStatus
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.Event.ExecuteBrokerStepAction
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.PirStageStatus
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.SideEffect.AwaitCaptchaSolution
@@ -48,6 +49,7 @@ import com.duckduckgo.pir.impl.scripts.models.BrokerAction.FillForm
 import com.duckduckgo.pir.impl.scripts.models.BrokerAction.GetCaptchaInfo
 import com.duckduckgo.pir.impl.scripts.models.BrokerAction.SolveCaptcha
 import com.duckduckgo.pir.impl.scripts.models.DataSource.EXTRACTED_PROFILE
+import com.duckduckgo.pir.impl.scripts.models.PirError
 import com.duckduckgo.pir.impl.scripts.models.PirScriptRequestData
 import com.duckduckgo.pir.impl.scripts.models.PirScriptRequestData.UserProfile
 import com.squareup.anvil.annotations.ContributesMultibinding
@@ -86,7 +88,7 @@ class ExecuteBrokerStepActionEventHandler @Inject constructor(
         return if (state.currentActionIndex == currentBrokerStep.step.actions.size) {
             Next(
                 nextState = state,
-                nextEvent = BrokerStepCompleted(needsEmailConfirmation = false, isSuccess = true),
+                nextEvent = BrokerStepCompleted(needsEmailConfirmation = false, stepStatus = StepStatus.Success),
             )
         } else {
             val actionToExecute = currentBrokerStep.step.actions[state.currentActionIndex]
@@ -156,7 +158,7 @@ class ExecuteBrokerStepActionEventHandler @Inject constructor(
                         nextEvent =
                         BrokerStepCompleted(
                             needsEmailConfirmation = true,
-                            isSuccess = true,
+                            stepStatus = StepStatus.Success,
                         ),
                     )
                 } else if (currentBrokerStep is EmailConfirmationStep && actionToExecute is EmailConfirmation) {
@@ -168,7 +170,9 @@ class ExecuteBrokerStepActionEventHandler @Inject constructor(
                             nextEvent =
                             BrokerStepCompleted(
                                 needsEmailConfirmation = true,
-                                isSuccess = false,
+                                stepStatus = StepStatus.Failure(
+                                    error = PirError.Unknown(""),
+                                ),
                             ),
                         )
                     } else {

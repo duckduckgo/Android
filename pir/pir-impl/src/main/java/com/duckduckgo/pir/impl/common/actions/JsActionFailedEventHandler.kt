@@ -26,6 +26,7 @@ import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerActio
 import com.duckduckgo.pir.impl.common.actions.EventHandler.Next
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.Event
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.Event.BrokerStepCompleted
+import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.Event.BrokerStepCompleted.StepStatus.Failure
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.Event.ExecuteBrokerStepAction
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.Event.JsActionFailed
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.State
@@ -80,7 +81,12 @@ class JsActionFailedEventHandler @Inject constructor(
             emitBrokerActionFailedPixel(state, error)
             Next(
                 nextState = state,
-                nextEvent = BrokerStepCompleted(needsEmailConfirmation = false, isSuccess = false),
+                nextEvent = BrokerStepCompleted(
+                    needsEmailConfirmation = false,
+                    stepStatus = Failure(
+                        error = error,
+                    ),
+                ),
             )
         }
     }

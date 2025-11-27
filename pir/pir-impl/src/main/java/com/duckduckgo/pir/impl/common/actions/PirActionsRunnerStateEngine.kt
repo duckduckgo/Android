@@ -96,8 +96,15 @@ interface PirActionsRunnerStateEngine {
 
         data class BrokerStepCompleted(
             val needsEmailConfirmation: Boolean,
-            val isSuccess: Boolean,
-        ) : Event()
+            val stepStatus: StepStatus,
+        ) : Event() {
+            sealed class StepStatus {
+                data object Success : StepStatus()
+                data class Failure(
+                    val error: PirError,
+                ) : StepStatus()
+            }
+        }
 
         data class JsErrorReceived(
             val error: PirError.JsError,
