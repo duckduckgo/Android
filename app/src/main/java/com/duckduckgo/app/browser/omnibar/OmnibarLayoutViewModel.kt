@@ -43,6 +43,7 @@ import com.duckduckgo.app.browser.omnibar.model.Decoration.LaunchCookiesAnimatio
 import com.duckduckgo.app.browser.omnibar.model.Decoration.LaunchTrackersAnimation
 import com.duckduckgo.app.browser.omnibar.model.StateChange
 import com.duckduckgo.app.browser.omnibar.model.StateChange.OmnibarStateChange
+import com.duckduckgo.app.browser.urldisplay.UrlDisplayRepository
 import com.duckduckgo.app.browser.viewstate.HighlightableButton
 import com.duckduckgo.app.browser.viewstate.LoadingViewState
 import com.duckduckgo.app.browser.viewstate.OmnibarViewState
@@ -103,6 +104,7 @@ class OmnibarLayoutViewModel @Inject constructor(
     private val duckAiFeatureState: DuckAiFeatureState,
     private val addressDisplayFormatter: AddressDisplayFormatter,
     private val settingsDataStore: SettingsDataStore,
+    private val urlDisplayRepository: UrlDisplayRepository,
     private val serpEasterEggLogosToggles: SerpEasterEggLogosToggles,
     private val androidBrowserToggles: AndroidBrowserConfigFeature,
 ) : ViewModel() {
@@ -168,6 +170,13 @@ class OmnibarLayoutViewModel @Inject constructor(
             else -> showOnNtpAndOnFocus && (viewState.viewMode is NewTab || viewState.hasFocus && viewState.omnibarText.isNotBlank())
         }
     }.distinctUntilChanged()
+
+    private val isFullUrlEnabled = urlDisplayRepository.isFullUrlEnabled
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.Eagerly,
+            initialValue = true,
+        )
 
     private val command = Channel<Command>(1, DROP_OLDEST)
     fun commands(): Flow<Command> = command.receiveAsFlow()
@@ -310,7 +319,7 @@ class OmnibarLayoutViewModel @Inject constructor(
             }
 
             _viewState.update {
-                val shouldUpdateOmnibarText = !settingsDataStore.isFullUrlEnabled &&
+                val shouldUpdateOmnibarText = !isFullUrlEnabled.value &&
                     !it.omnibarText.isEmpty() &&
                     !duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(it.url)
                 val omnibarText = if (shouldUpdateOmnibarText) {
@@ -344,7 +353,7 @@ class OmnibarLayoutViewModel @Inject constructor(
             }
         } else {
             _viewState.update {
-                val shouldUpdateOmnibarText = it.shouldUpdateOmnibarText(settingsDataStore.isFullUrlEnabled, handleAboutBlankEnabled)
+                val shouldUpdateOmnibarText = it.shouldUpdateOmnibarText(isFullUrlEnabled.value, handleAboutBlankEnabled)
                 logcat { "Omnibar: lost focus in Browser or MaliciousSiteWarning mode $shouldUpdateOmnibarText" }
                 val omnibarText = if (shouldUpdateOmnibarText) {
                     if (duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(it.url)) {
@@ -352,7 +361,7 @@ class OmnibarLayoutViewModel @Inject constructor(
                         it.query
                     } else {
                         logcat { "Omnibar: is url, showing URL ${it.url}" }
-                        if (settingsDataStore.isFullUrlEnabled) {
+                        if (isFullUrlEnabled.value) {
                             it.url
                         } else {
                             addressDisplayFormatter.getShortUrl(it.url)
@@ -644,7 +653,7 @@ class OmnibarLayoutViewModel @Inject constructor(
         _viewState.update {
             val updatedQuery = if (deleteLastCharacter) {
                 logcat { "Omnibar: deleting last character, old query ${it.query} also deleted" }
-                if (settingsDataStore.isFullUrlEnabled) {
+                if (isFullUrlEnabled.value) {
                     it.url
                 } else {
                     addressDisplayFormatter.getShortUrl(it.url)
@@ -710,7 +719,7 @@ class OmnibarLayoutViewModel @Inject constructor(
         if (serpEasterEggLogosToggles.feature().isEnabled()) {
             val state = if (shouldUpdateOmnibarTextInput(omnibarViewState, _viewState.value.omnibarText) || forceRender) {
                 if (forceRender && !duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(omnibarViewState.queryOrFullUrl)) {
-                    val url = if (settingsDataStore.isFullUrlEnabled) {
+                    val url = if (isFullUrlEnabled.value) {
                         omnibarViewState.queryOrFullUrl
                     } else {
                         addressDisplayFormatter.getShortUrl(omnibarViewState.queryOrFullUrl)
@@ -768,7 +777,7 @@ class OmnibarLayoutViewModel @Inject constructor(
         } else {
             if (shouldUpdateOmnibarTextInput(omnibarViewState, _viewState.value.omnibarText) || forceRender) {
                 val omnibarText = if (forceRender && !duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(omnibarViewState.queryOrFullUrl)) {
-                    if (settingsDataStore.isFullUrlEnabled) {
+                    if (isFullUrlEnabled.value) {
                         omnibarViewState.queryOrFullUrl
                     } else {
                         addressDisplayFormatter.getShortUrl(omnibarViewState.queryOrFullUrl)
@@ -851,7 +860,7 @@ class OmnibarLayoutViewModel @Inject constructor(
         )
         _viewState.update {
             it.copy(
-                omnibarText = if (settingsDataStore.isFullUrlEnabled) it.url else addressDisplayFormatter.getShortUrl(it.url),
+                omnibarText = if (isFullUrlEnabled.value) it.url else addressDisplayFormatter.getShortUrl(it.url),
                 updateOmnibarText = true,
             )
         }

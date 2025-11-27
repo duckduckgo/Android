@@ -192,6 +192,18 @@ class FakeSettingsDataStore :
             store["isFullUrlEnabled"] = value
         }
 
+    override var urlPreferenceMigrated: Boolean
+        get() = store["urlPreferenceMigrated"] as Boolean? ?: false
+        set(value) {
+            store["urlPreferenceMigrated"] = value
+        }
+
+    override var urlPreferenceManuallySet: Boolean
+        get() = store["urlPreferenceManuallySet"] as Boolean? ?: false
+        set(value) {
+            store["urlPreferenceManuallySet"] = value
+        }
+
     override fun hasUrlPreferenceSet(): Boolean {
         return store.containsKey("isFullUrlEnabled")
     }

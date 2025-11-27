@@ -23,6 +23,7 @@ import app.cash.turbine.test
 import com.duckduckgo.app.appearance.AppearanceViewModel.Command
 import com.duckduckgo.app.browser.api.OmnibarRepository
 import com.duckduckgo.app.browser.omnibar.OmnibarType
+import com.duckduckgo.app.browser.urldisplay.UrlDisplayRepository
 import com.duckduckgo.app.icon.api.AppIcon
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.settings.clear.FireAnimation
@@ -64,6 +65,9 @@ internal class AppearanceViewModelTest {
     private lateinit var mockAppSettingsDataStore: SettingsDataStore
 
     @Mock
+    private lateinit var mockUrlDisplayRepository: UrlDisplayRepository
+
+    @Mock
     private lateinit var mockPixel: Pixel
 
     @Mock
@@ -84,6 +88,7 @@ internal class AppearanceViewModelTest {
         whenever(mockThemeSettingsDataStore.theme).thenReturn(DuckDuckGoTheme.SYSTEM_DEFAULT)
         whenever(mockAppSettingsDataStore.selectedFireAnimation).thenReturn(FireAnimation.HeroFire)
         whenever(mockAppSettingsDataStore.omnibarType).thenReturn(OmnibarType.SINGLE_TOP)
+        whenever(mockUrlDisplayRepository.isFullUrlEnabled).thenReturn(flowOf(true))
         whenever(mockTabSwitcherDataStore.isTrackersAnimationInfoTileHidden()).thenReturn(flowOf(false))
         whenever(mockOmnibarFeatureRepository.isSplitOmnibarAvailable).thenReturn(false)
 
@@ -95,6 +100,7 @@ internal class AppearanceViewModelTest {
             AppearanceViewModel(
                 mockThemeSettingsDataStore,
                 mockAppSettingsDataStore,
+                mockUrlDisplayRepository,
                 mockPixel,
                 coroutineTestRule.testDispatcherProvider,
                 mockTabSwitcherDataStore,
@@ -253,7 +259,7 @@ internal class AppearanceViewModelTest {
         runTest {
             val enabled = true
             testee.onFullUrlSettingChanged(enabled)
-            verify(mockAppSettingsDataStore).isFullUrlEnabled = enabled
+            verify(mockUrlDisplayRepository).setFullUrlEnabled(enabled)
             val params = mapOf(Pixel.PixelParameter.IS_ENABLED to enabled.toString())
             verify(mockPixel).fire(
                 AppPixelName.SETTINGS_APPEARANCE_IS_FULL_URL_OPTION_TOGGLED,
@@ -268,7 +274,7 @@ internal class AppearanceViewModelTest {
         runTest {
             val enabled = false
             testee.onFullUrlSettingChanged(enabled)
-            verify(mockAppSettingsDataStore).isFullUrlEnabled = enabled
+            verify(mockUrlDisplayRepository).setFullUrlEnabled(enabled)
             val params = mapOf(Pixel.PixelParameter.IS_ENABLED to enabled.toString())
             verify(mockPixel).fire(
                 AppPixelName.SETTINGS_APPEARANCE_IS_FULL_URL_OPTION_TOGGLED,

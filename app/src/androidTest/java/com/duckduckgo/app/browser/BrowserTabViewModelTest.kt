@@ -127,6 +127,7 @@ import com.duckduckgo.app.browser.session.WebViewSessionStorage
 import com.duckduckgo.app.browser.tabs.TabManager
 import com.duckduckgo.app.browser.trafficquality.AndroidFeaturesHeaderPlugin.Companion.X_DUCKDUCKGO_ANDROID_HEADER
 import com.duckduckgo.app.browser.ui.dialogs.widgetprompt.OnboardingHomeScreenWidgetToggles
+import com.duckduckgo.app.browser.urldisplay.UrlDisplayRepository
 import com.duckduckgo.app.browser.viewstate.BrowserViewState
 import com.duckduckgo.app.browser.viewstate.CtaViewState
 import com.duckduckgo.app.browser.viewstate.FindInPageViewState
@@ -441,6 +442,7 @@ class BrowserTabViewModelTest {
     private val voiceSearchPixelLogger: VoiceSearchAvailabilityPixelLogger = mock()
 
     private val mockSettingsDataStore: SettingsDataStore = mock()
+    private val mockUrlDisplayRepository: UrlDisplayRepository = mock()
 
     private val mockAutoCompleteSettings: AutoCompleteSettings = mock()
 
@@ -613,7 +615,7 @@ class BrowserTabViewModelTest {
     private val selectedTab = TabEntity("TAB_ID", exampleUrl, position = 0, sourceTabId = "TAB_ID_SOURCE")
     private val flowSelectedTab = MutableStateFlow(selectedTab)
 
-    private var isFullSiteAddressEnabled = true
+    private val isFullSiteAddressEnabled = Channel<Boolean>()
 
     private val mockWebViewCompatWrapper: WebViewCompatWrapper = mock()
 
@@ -680,7 +682,7 @@ class BrowserTabViewModelTest {
             whenever(mockRemoteMessagingRepository.messageFlow()).thenReturn(remoteMessageFlow.consumeAsFlow())
             whenever(mockSettingsDataStore.automaticFireproofSetting).thenReturn(AutomaticFireproofSetting.ASK_EVERY_TIME)
             whenever(mockSettingsDataStore.omnibarType).thenReturn(OmnibarType.SINGLE_TOP)
-            whenever(mockSettingsDataStore.isFullUrlEnabled).then { isFullSiteAddressEnabled }
+            whenever(mockUrlDisplayRepository.isFullUrlEnabled).then { isFullSiteAddressEnabled.consumeAsFlow() }
             whenever(mockSSLCertificatesFeature.allowBypass()).thenReturn(mockEnabledToggle)
             whenever(subscriptions.shouldLaunchPrivacyProForUrl(any())).thenReturn(false)
             whenever(mockDuckDuckGoUrlDetector.isDuckDuckGoUrl(any())).thenReturn(false)
@@ -820,6 +822,7 @@ class BrowserTabViewModelTest {
                 downloadCallback = mockDownloadCallback,
                 trackingParameters = mockTrackingParameters,
                 settingsDataStore = mockSettingsDataStore,
+                urlDisplayRepository = mockUrlDisplayRepository,
                 adClickManager = mockAdClickManager,
                 autofillCapabilityChecker = autofillCapabilityChecker,
                 autofillFireproofDialogSuppressor = autofillFireproofDialogSuppressor,
@@ -896,6 +899,7 @@ class BrowserTabViewModelTest {
         bookmarksListFlow.close()
         favoriteListFlow.close()
         remoteMessageFlow.close()
+        isFullSiteAddressEnabled.close()
         testee.onCleared()
         db.close()
         testee.command.removeObserver(mockCommandObserver)
@@ -1437,8 +1441,8 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenBrowsingAndUrlLoadedAndFullUrlDisabledThenUrlTitleAndOmnibarTextUpdatedToMatch() {
-        isFullSiteAddressEnabled = false
+    fun whenBrowsingAndUrlLoadedAndFullUrlDisabledThenUrlTitleAndOmnibarTextUpdatedToMatch() = runTest {
+        isFullSiteAddressEnabled.send(false)
         val exampleUrl = "http://example.com/abc"
         val exampleTitle = "Title"
         loadUrl(exampleUrl, title = exampleTitle, isBrowserShowing = true)
@@ -1466,8 +1470,8 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenBrowsingAndUrlIsUpdatedAndFullUrlDisabledThenUrlAndOmnibarTextUpdatedToMatch() {
-        isFullSiteAddressEnabled = false
+    fun whenBrowsingAndUrlIsUpdatedAndFullUrlDisabledThenUrlAndOmnibarTextUpdatedToMatch() = runTest {
+        isFullSiteAddressEnabled.send(false)
         val currentUrl = "http://example.com/current"
         loadUrl(exampleUrl, isBrowserShowing = true)
         updateUrl(exampleUrl, currentUrl, true)
@@ -1486,8 +1490,8 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenNotBrowsingAndUrlIsUpdatedAndFullUrlDisabledThenUrlAndOmnibarTextRemainUnchanged() {
-        isFullSiteAddressEnabled = false
+    fun whenNotBrowsingAndUrlIsUpdatedAndFullUrlDisabledThenUrlAndOmnibarTextRemainUnchanged() = runTest {
+        isFullSiteAddressEnabled.send(false)
         val currentUrl = "http://example.com/current"
         loadUrl(exampleUrl, isBrowserShowing = true)
         updateUrl(exampleUrl, currentUrl, false)
@@ -1574,8 +1578,8 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenDuckDuckGoUrlNotContainingQueryLoadedAndFullUrlDisabledThenShortUrlShown() {
-        isFullSiteAddressEnabled = false
+    fun whenDuckDuckGoUrlNotContainingQueryLoadedAndFullUrlDisabledThenShortUrlShown() = runTest {
+        isFullSiteAddressEnabled.send(false)
         loadUrl("http://duckduckgo.com")
         assertEquals("duckduckgo.com", omnibarViewState().omnibarText)
     }
@@ -1587,8 +1591,8 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenNonDuckDuckGoUrlLoadedAndFullUrlDisabledThenShortUrlShown() {
-        isFullSiteAddressEnabled = false
+    fun whenNonDuckDuckGoUrlLoadedAndFullUrlDisabledThenShortUrlShown() = runTest {
+        isFullSiteAddressEnabled.send(false)
         loadUrl(exampleUrl)
         assertEquals(shortExampleUrl, omnibarViewState().omnibarText)
     }
@@ -2597,8 +2601,8 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenAuthenticationIsRequiredForSameHostAndFullUrlDisabledThenNoChangesOnBrowser() {
-        isFullSiteAddressEnabled = false
+    fun whenAuthenticationIsRequiredForSameHostAndFullUrlDisabledThenNoChangesOnBrowser() = runTest {
+        isFullSiteAddressEnabled.send(false)
 
         val mockHandler = mock<HttpAuthHandler>()
         val siteURL = "http://example.com/requires-auth"
@@ -2625,8 +2629,8 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenAuthenticationIsRequiredForDifferentHostAndFullUrlDisabledThenUpdateUrlAndHideWebContent() {
-        isFullSiteAddressEnabled = false
+    fun whenAuthenticationIsRequiredForDifferentHostAndFullUrlDisabledThenUpdateUrlAndHideWebContent() = runTest {
+        isFullSiteAddressEnabled.send(false)
         val mockHandler = mock<HttpAuthHandler>()
         val siteURL = "http://example.com/requires-auth"
         val authenticationRequest = BasicAuthenticationRequest(mockHandler, "example.com", "test realm", siteURL)
@@ -6293,7 +6297,7 @@ class BrowserTabViewModelTest {
     @Test
     fun whenNewPageWithUrlYouTubeNoCookieAndFullUrlDisabledThenReplaceUrlWithDuckPlayer() =
         runTest {
-            isFullSiteAddressEnabled = false
+            isFullSiteAddressEnabled.send(false)
             whenever(mockDuckPlayer.isSimulatedYoutubeNoCookie("https://youtube-nocookie.com/?videoID=1234".toUri())).thenReturn(true)
             whenever(mockDuckPlayer.isSimulatedYoutubeNoCookie("duck://player/1234".toUri())).thenReturn(false)
             whenever(mockDuckPlayer.createDuckPlayerUriFromYoutubeNoCookie("https://youtube-nocookie.com/?videoID=1234".toUri())).thenReturn(
@@ -6340,7 +6344,7 @@ class BrowserTabViewModelTest {
     @Test
     fun whenUrlUpdatedWithUrlYouTubeNoCookieAndFullUrlDisabledThenReplaceUrlWithDuckPlayerString() =
         runTest {
-            isFullSiteAddressEnabled = false
+            isFullSiteAddressEnabled.send(false)
             whenever(mockDuckPlayer.isSimulatedYoutubeNoCookie("https://youtube-nocookie.com/?videoID=1234".toUri())).thenReturn(true)
             whenever(mockDuckPlayer.isSimulatedYoutubeNoCookie("duck://player/1234".toUri())).thenReturn(false)
             whenever(mockDuckPlayer.isSimulatedYoutubeNoCookie(exampleUrl.toUri())).thenReturn(false)
@@ -6939,8 +6943,8 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenVisitSiteThenUpdateLoadingViewStateAndOmnibarViewStateAndFullUrlDisabled() {
-        isFullSiteAddressEnabled = false
+    fun whenVisitSiteThenUpdateLoadingViewStateAndOmnibarViewStateAndFullUrlDisabled() = runTest {
+        isFullSiteAddressEnabled.send(false)
 
         testee.browserViewState.value =
             browserViewState().copy(
@@ -7124,13 +7128,9 @@ class BrowserTabViewModelTest {
     @Test
     fun whenShowFullSiteAddressSettingDisabledThenOmnibarIsRefreshed() =
         runTest {
-            testee.onViewResumed()
-
-            assertCommandNotIssued<Command.RefreshOmnibar>()
-
-            isFullSiteAddressEnabled = false
-
-            testee.onViewResumed()
+            // Because it is flow-based implementation, we just need to update the flow
+            // to call the refresh omnibar command
+            isFullSiteAddressEnabled.send(false)
 
             assertCommandIssued<Command.RefreshOmnibar>()
         }
@@ -7138,11 +7138,11 @@ class BrowserTabViewModelTest {
     @Test
     fun whenShowFullSiteAddressSettingEnabledThenOmnibarIsRefreshed() =
         runTest {
-            isFullSiteAddressEnabled = false
+            isFullSiteAddressEnabled.send(false)
 
             testee.onViewResumed()
 
-            isFullSiteAddressEnabled = true
+            isFullSiteAddressEnabled.send(true)
 
             testee.onViewResumed()
 
@@ -7282,7 +7282,7 @@ class BrowserTabViewModelTest {
             // Setup initial state
             val initialUrl = "https://example.org"
             val title = "Example Page"
-            isFullSiteAddressEnabled = false
+            isFullSiteAddressEnabled.send(false)
 
             // First load initial URL
             loadUrl(initialUrl)
@@ -7314,7 +7314,7 @@ class BrowserTabViewModelTest {
     @Test
     fun whenNavigatingAndFullUrlDisabledThenQueryOrFullUrlIsPreserved() =
         runTest {
-            isFullSiteAddressEnabled = false
+            isFullSiteAddressEnabled.send(false)
 
             loadUrl(exampleUrl)
 
@@ -7350,8 +7350,8 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenMaliciousSiteVisitedAndFullUrlDisabledThenQueryOrFullUrlUpdates() {
-        isFullSiteAddressEnabled = false
+    fun whenMaliciousSiteVisitedAndFullUrlDisabledThenQueryOrFullUrlUpdates() = runTest {
+        isFullSiteAddressEnabled.send(false)
 
         testee.browserViewState.value =
             browserViewState().copy(
