@@ -167,7 +167,6 @@ class BrowserWebViewClientTest {
             mockAndroidBrowserConfigFeature,
             mockFeaturesHeaderProvider,
             mock(),
-            coroutinesTestRule.testDispatcherProvider,
         )
     private val mockDuckChat: DuckChat = mock()
 

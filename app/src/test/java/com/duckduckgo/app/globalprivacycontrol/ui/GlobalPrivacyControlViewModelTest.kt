@@ -20,11 +20,9 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.Observer
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.test.InstantSchedulersRule
 import com.duckduckgo.feature.toggles.api.FeatureToggle
 import com.duckduckgo.privacy.config.api.Gpc
-import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Assert.*
 import org.junit.Before
@@ -32,14 +30,11 @@ import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.argumentCaptor
 import org.mockito.kotlin.atLeastOnce
+import org.mockito.kotlin.lastValue
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
-import org.mockito.kotlin.whenever
 
 class GlobalPrivacyControlViewModelTest {
-
-    @get:Rule
-    val coroutineRule = CoroutineTestRule()
 
     @get:Rule
     var instantTaskExecutorRule = InstantTaskExecutorRule()
@@ -57,8 +52,7 @@ class GlobalPrivacyControlViewModelTest {
     lateinit var testee: GlobalPrivacyControlViewModel
 
     @Before
-    fun setup() = runTest {
-        whenever(mockGpc.isEnabled()).thenReturn(false)
+    fun setup() {
         testee = GlobalPrivacyControlViewModel(mockPixel, mockFeatureToggle, mockGpc)
         testee.command.observeForever(mockCommandObserver)
         testee.viewState.observeForever(mockViewStateObserver)

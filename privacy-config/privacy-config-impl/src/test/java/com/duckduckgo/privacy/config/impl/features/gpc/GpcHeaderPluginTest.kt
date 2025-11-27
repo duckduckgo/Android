@@ -3,7 +3,6 @@ package com.duckduckgo.privacy.config.impl.features.gpc
 import com.duckduckgo.privacy.config.api.Gpc
 import com.duckduckgo.privacy.config.impl.features.gpc.RealGpc.Companion.GPC_HEADER
 import com.duckduckgo.privacy.config.impl.features.gpc.RealGpc.Companion.GPC_HEADER_VALUE
-import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Test
 import org.mockito.kotlin.mock
@@ -16,7 +15,7 @@ class GpcHeaderPluginTest {
     private val mockGpc: Gpc = mock()
 
     @Test
-    fun whenGetHeadersCalledWithUrlThenGpcGetHeadersIsCalledWithTheSameUrlAndHeadersReturned() = runTest {
+    fun whenGetHeadersCalledWithUrlThenGpcGetHeadersIsCalledWithTheSameUrlAndHeadersReturned() {
         val url = "url"
         val gpcHeaders = mapOf(GPC_HEADER to GPC_HEADER_VALUE)
         whenever(mockGpc.getHeaders(url)).thenReturn(gpcHeaders)
