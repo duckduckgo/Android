@@ -47,6 +47,7 @@ dependencies {
     implementation project(path: ':statistics-api')
     implementation project(path: ':app-build-config-api')
     implementation project(path: ':broken-site-store')
+    implementation project(path: ':data-store-api')
 
     implementation AndroidX.core.ktx
 
