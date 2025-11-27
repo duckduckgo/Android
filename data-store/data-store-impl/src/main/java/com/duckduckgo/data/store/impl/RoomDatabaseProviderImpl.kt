@@ -25,16 +25,16 @@ import com.duckduckgo.data.store.api.RoomDatabaseConfig
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.Lazy
+import dagger.SingleInstanceIn
 import javax.inject.Inject
 
+@SingleInstanceIn(AppScope::class)
 @ContributesBinding(AppScope::class)
 class RoomDatabaseProviderImpl @Inject constructor(
     private val context: Context,
     private val roomDatabaseBuilderFactory: RoomDatabaseBuilderFactory,
-    lazyDatabaseExecutorProvider: Lazy<DatabaseExecutorProvider>,
+    private val lazyDatabaseExecutorProvider: Lazy<DatabaseExecutorProvider>,
 ) : DatabaseProvider {
-
-    private val databaseExecutorProvider by lazy { lazyDatabaseExecutorProvider.get() }
 
     override fun<T : RoomDatabase> buildRoomDatabase(
         klass: Class<T>,
@@ -92,6 +92,7 @@ class RoomDatabaseProviderImpl @Inject constructor(
     }
 
     private fun RoomDatabase.Builder<*>.applyExecutors(executor: com.duckduckgo.data.store.api.DatabaseExecutor) {
+        val databaseExecutorProvider = lazyDatabaseExecutorProvider.get()
         val queryExecutor = databaseExecutorProvider.createQueryExecutor(executor)
         val transactionExecutor = databaseExecutorProvider.createTransactionExecutor(executor)
 
